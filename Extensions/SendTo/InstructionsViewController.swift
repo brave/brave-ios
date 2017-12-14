@@ -27,7 +27,13 @@ private func highlightLink(_ s: NSString, withColor color: UIColor) -> NSAttribu
     s = s.replacingCharacters(in: end, with: "") as NSString
     let a = NSMutableAttributedString(string: s as String)
     let r = NSRange(location: start.location, length: end.location-start.location)
-    a.addAttribute(NSForegroundColorAttributeName, value: color, range: r)
+
+    #if swift(>=4.0)
+        a.addAttribute(NSAttributedStringKey.foregroundColor, value: color, range: r)
+    #else
+        a.addAttribute(NSForegroundColorAttributeName, value: color, range: r)
+    #endif
+
     return a
 }
 
@@ -85,7 +91,7 @@ class InstructionsViewController: UIViewController {
                 showMeText: NSLocalizedString("Please open Firefox, go to Settings and sign in to continue.", tableName: "SendTo", comment: "See http://mzl.la/1ISlXnU"))
     }
 
-    func close() {
+    @objc func close() {
         delegate?.instructionsViewControllerDidClose(self)
     }
 

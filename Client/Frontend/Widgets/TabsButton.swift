@@ -205,7 +205,7 @@ class TabsButton: UIButton {
             }
         }
     }
-    func cloneDidClickTabs() {
+    @objc func cloneDidClickTabs() {
         sendActions(for: UIControlEvents.touchUpInside)
     }
 }

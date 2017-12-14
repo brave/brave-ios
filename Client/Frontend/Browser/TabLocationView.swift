@@ -34,7 +34,7 @@ class TabLocationView: UIView {
     var longPressRecognizer: UILongPressGestureRecognizer!
     var tapRecognizer: UITapGestureRecognizer!
 
-    dynamic var baseURLFontColor: UIColor = TabLocationViewUX.BaseURLFontColor {
+    @objc dynamic var baseURLFontColor: UIColor = TabLocationViewUX.BaseURLFontColor {
         didSet { updateTextWithURL() }
     }
 
@@ -85,7 +85,7 @@ class TabLocationView: UIView {
 
     lazy var placeholder: NSAttributedString = {
         let placeholderText = NSLocalizedString("Search or enter address", comment: "The text shown in the URL bar on about:home")
-        return NSAttributedString(string: placeholderText, attributes: [NSForegroundColorAttributeName: UIColor.gray])
+        return NSAttributedString(string: placeholderText, attributes: [NSAttributedStringKey.foregroundColor: UIColor.gray])
     }()
 
     lazy var urlTextField: UITextField = {
@@ -97,7 +97,7 @@ class TabLocationView: UIView {
         urlTextField.addGestureRecognizer(self.tapRecognizer)
 
         // Prevent the field from compressing the toolbar buttons on the 4S in landscape.
-        urlTextField.setContentCompressionResistancePriority(250, for: UILayoutConstraintAxis.horizontal)
+        urlTextField.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 250), for: UILayoutConstraintAxis.horizontal)
         urlTextField.attributedPlaceholder = self.placeholder
         urlTextField.accessibilityIdentifier = "url"
         urlTextField.accessibilityActionsSource = self
@@ -222,35 +222,35 @@ class TabLocationView: UIView {
         super.updateConstraints()
     }
 
-    func SELtapReaderModeButton() {
+    @objc func SELtapReaderModeButton() {
         delegate?.tabLocationViewDidTapReaderMode(self)
     }
 
-    func SELlongPressReaderModeButton(_ recognizer: UILongPressGestureRecognizer) {
+    @objc func SELlongPressReaderModeButton(_ recognizer: UILongPressGestureRecognizer) {
         if recognizer.state == UIGestureRecognizerState.began {
             delegate?.tabLocationViewDidLongPressReaderMode(self)
         }
     }
     
-    func SELDidPressPageOptionsButton(_ button: UIButton) {
+    @objc func SELDidPressPageOptionsButton(_ button: UIButton) {
         delegate?.tabLocationViewDidTapPageOptions(self, from: button)
     }
     
-    func SELDidLongPressPageOptionsButton(_ recognizer: UILongPressGestureRecognizer) {
+    @objc func SELDidLongPressPageOptionsButton(_ recognizer: UILongPressGestureRecognizer) {
         delegate?.tabLocationViewDidLongPressPageOptions(self)
     }
 
-    func SELlongPressLocation(_ recognizer: UITapGestureRecognizer) {
+    @objc func SELlongPressLocation(_ recognizer: UITapGestureRecognizer) {
         if recognizer.state == UIGestureRecognizerState.began {
             delegate?.tabLocationViewDidLongPressLocation(self)
         }
     }
 
-    func SELtapLocation(_ recognizer: UITapGestureRecognizer) {
+    @objc func SELtapLocation(_ recognizer: UITapGestureRecognizer) {
         delegate?.tabLocationViewDidTapLocation(self)
     }
 
-    func SELreaderModeCustomAction() -> Bool {
+    @objc func SELreaderModeCustomAction() -> Bool {
         return delegate?.tabLocationViewDidLongPressReaderMode(self) ?? false
     }
 

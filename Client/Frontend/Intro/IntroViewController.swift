@@ -236,7 +236,7 @@ class IntroViewController: UIViewController, UIScrollViewDelegate {
         NotificationCenter.default.removeObserver(self, name: NotificationDynamicFontChanged, object: nil)
     }
 
-    func SELDynamicFontChanged(_ notification: Notification) {
+    @objc func SELDynamicFontChanged(_ notification: Notification) {
         guard notification.name == NotificationDynamicFontChanged else { return }
         setupDynamicFonts()
     }
@@ -273,12 +273,12 @@ class IntroViewController: UIViewController, UIScrollViewDelegate {
         return UIInterfaceOrientationMask.portrait
     }
 
-    func SELstartBrowsing() {
+    @objc func SELstartBrowsing() {
         LeanPlumClient.shared.track(event: .dismissedOnboarding)
         delegate?.introViewControllerDidFinish(self, requestToLogin: false)
     }
 
-    func SELlogin() {
+    @objc func SELlogin() {
         delegate?.introViewControllerDidFinish(self, requestToLogin: true)
     }
 
@@ -287,7 +287,7 @@ class IntroViewController: UIViewController, UIScrollViewDelegate {
         return String(format: NSLocalizedString("Introductory slide %@ of %@", tableName: "Intro", comment: "String spoken by assistive technology (like VoiceOver) stating on which page of the intro wizard we currently are. E.g. Introductory slide 1 of 3"), NumberFormatter.localizedString(from: number, number: .decimal), NumberFormatter.localizedString(from: NSNumber(value: IntroViewControllerUX.NumberOfCards), number: .decimal))
     }
 
-    func changePage() {
+    @objc func changePage() {
         let swipeCoordinate = CGFloat(pageControl.currentPage) * scrollView.frame.size.width
         scrollView.setContentOffset(CGPoint(x: swipeCoordinate, y: 0), animated: true)
     }
@@ -365,7 +365,7 @@ class IntroViewController: UIViewController, UIScrollViewDelegate {
         paragraphStyle.alignment = .center
 
         let string = NSMutableAttributedString(string: text)
-        string.addAttribute(NSParagraphStyleAttributeName, value: paragraphStyle, range: NSRange(location: 0, length: string.length))
+        string.addAttribute(NSAttributedStringKey.paragraphStyle, value: paragraphStyle, range: NSRange(location: 0, length: string.length))
         return string
     }
     

@@ -175,7 +175,7 @@ class ButtonToast: UIView {
         superview?.addGestureRecognizer(gestureRecognizer)
     }
     
-    func handleTap(_ gestureRecognizer: UIGestureRecognizer) {
+    @objc func handleTap(_ gestureRecognizer: UIGestureRecognizer) {
         dismiss(false)
     }
 }

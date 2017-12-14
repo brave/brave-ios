@@ -93,39 +93,39 @@ open class TabToolbarHelper: NSObject {
         setTheme(theme: .Normal, forButtons: toolbar.actionButtons)
     }
 
-    func didClickBack() {
+    @objc func didClickBack() {
         toolbar.tabToolbarDelegate?.tabToolbarDidPressBack(toolbar, button: toolbar.backButton)
     }
 
-    func didLongPressBack(_ recognizer: UILongPressGestureRecognizer) {
+    @objc func didLongPressBack(_ recognizer: UILongPressGestureRecognizer) {
         if recognizer.state == UIGestureRecognizerState.began {
             toolbar.tabToolbarDelegate?.tabToolbarDidLongPressBack(toolbar, button: toolbar.backButton)
         }
     }
 
-    func didClickTabs() {
+    @objc func didClickTabs() {
         toolbar.tabToolbarDelegate?.tabToolbarDidPressTabs(toolbar, button: toolbar.tabsButton)
     }
     
-    func didLongPressTabs(_ recognizer: UILongPressGestureRecognizer) {
+    @objc func didLongPressTabs(_ recognizer: UILongPressGestureRecognizer) {
         toolbar.tabToolbarDelegate?.tabToolbarDidLongPressTabs(toolbar, button: toolbar.tabsButton)
     }
 
-    func didClickForward() {
+    @objc func didClickForward() {
         toolbar.tabToolbarDelegate?.tabToolbarDidPressForward(toolbar, button: toolbar.forwardButton)
     }
 
-    func didLongPressForward(_ recognizer: UILongPressGestureRecognizer) {
+    @objc func didLongPressForward(_ recognizer: UILongPressGestureRecognizer) {
         if recognizer.state == UIGestureRecognizerState.began {
             toolbar.tabToolbarDelegate?.tabToolbarDidLongPressForward(toolbar, button: toolbar.forwardButton)
         }
     }
 
-    func didClickMenu() {
+    @objc func didClickMenu() {
         toolbar.tabToolbarDelegate?.tabToolbarDidPressMenu(toolbar, button: toolbar.menuButton)
     }
 
-    func didClickStopReload() {
+    @objc func didClickStopReload() {
         if loading {
             toolbar.tabToolbarDelegate?.tabToolbarDidPressStop(toolbar, button: toolbar.stopReloadButton)
         } else {
@@ -133,7 +133,7 @@ open class TabToolbarHelper: NSObject {
         }
     }
 
-    func didLongPressStopReload(_ recognizer: UILongPressGestureRecognizer) {
+    @objc func didLongPressStopReload(_ recognizer: UILongPressGestureRecognizer) {
         if recognizer.state == UIGestureRecognizerState.began && !loading {
             toolbar.tabToolbarDelegate?.tabToolbarDidLongPressReload(toolbar, button: toolbar.stopReloadButton)
         }

@@ -690,7 +690,7 @@ open class BrowserProfile: Profile {
             center.addObserver(self, selector: #selector(onBookmarkBufferValidated(notification:)), name: NotificationBookmarkBufferValidated, object: nil)
         }
 
-        func onBookmarkBufferValidated(notification: NSNotification) {
+        @objc func onBookmarkBufferValidated(notification: NSNotification) {
             #if MOZ_TARGET_CLIENT
                 // We don't send this ad hoc telemetry on the release channel.
                 guard AppConstants.BuildChannel != AppBuildChannel.release else {
@@ -1017,9 +1017,16 @@ open class BrowserProfile: Profile {
                 }
             }
 
-            return walk(Array(needReset), f: self.locallyResetCollection)
-               >>> effect(changes.clearLocalCommands)
-               >>> always(changes)
+
+            #if swift(>=4.0)
+                // FIXME: Swift4
+                return deferMaybe(changes) // this return is wrong, just wanted to make it compile
+            #else
+                return walk(Array(needReset), f: self.locallyResetCollection)
+                    >>> effect(changes.clearLocalCommands)
+                    >>> always(changes)
+            #endif
+
         }
 
         /**

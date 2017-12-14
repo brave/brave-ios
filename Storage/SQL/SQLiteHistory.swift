@@ -164,7 +164,7 @@ extension SQLiteHistory: BrowserHistory {
     // Note: clearing history isn't really a sane concept in the presence of Sync.
     // This method should be split to do something else.
     // Bug 1162778.
-    public func clearHistory() -> Success {
+    public func clearHistory() -> Deferred<Maybe<Void>> {
         return self.db.run([
             ("DELETE FROM \(TableVisits)", nil),
             ("DELETE FROM \(TableHistory)", nil),

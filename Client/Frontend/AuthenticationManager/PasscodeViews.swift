@@ -31,11 +31,11 @@ class PasscodeInputView: UIView, UIKeyInput {
     fileprivate var inputtedCode: String = ""
 
     fileprivate var blankDigitString: NSAttributedString {
-        return NSAttributedString(string: "\(blankCharacter)", attributes: [NSFontAttributeName: digitFont])
+        return NSAttributedString(string: "\(blankCharacter)", attributes: [NSAttributedStringKey.font: digitFont])
     }
 
     fileprivate var filledDigitString: NSAttributedString {
-        return NSAttributedString(string: "\(filledCharacter)", attributes: [NSFontAttributeName: digitFont])
+        return NSAttributedString(string: "\(filledCharacter)", attributes: [NSAttributedStringKey.font: digitFont])
     }
 
     @objc var keyboardType: UIKeyboardType = .numberPad
@@ -186,7 +186,7 @@ class PasscodePane: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func keyboardWillShow(_ sender: Notification) {
+    @objc func keyboardWillShow(_ sender: Notification) {
         guard let keyboardFrame = (sender.userInfo?[UIKeyboardFrameEndUserInfoKey] as AnyObject).cgRectValue else {
             return
         }
@@ -197,7 +197,7 @@ class PasscodePane: UIView {
         })
     }
     
-    func keyboardWillHide(_ sender: Notification) {
+    @objc func keyboardWillHide(_ sender: Notification) {
         UIView.animate(withDuration: 0.1, animations: {
             self.containerCenterConstraint?.update(offset: 0)
             self.layoutIfNeeded()

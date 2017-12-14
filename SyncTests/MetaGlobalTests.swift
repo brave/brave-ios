@@ -59,7 +59,7 @@ class MetaGlobalTests: XCTestCase {
     }
 
     func storeMetaGlobal(metaGlobal: MetaGlobal) {
-        let envelope = EnvelopeJSON(JSON(object: [
+        let envelope = EnvelopeJSON(JSON([
             "id": "global",
             "collection": "meta",
             "payload": metaGlobal.asPayload().json.stringValue()!,

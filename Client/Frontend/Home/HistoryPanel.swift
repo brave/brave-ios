@@ -121,7 +121,7 @@ class HistoryPanel: SiteTableViewController, HomePanel {
         }
     }
 
-    func notificationReceived(_ notification: Notification) {
+    @objc func notificationReceived(_ notification: Notification) {
         reloadData()
 
         switch notification.name {

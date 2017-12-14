@@ -47,14 +47,14 @@ protocol URLBarDelegate: class {
 
 class URLBarView: UIView {
     // Additional UIAppearance-configurable properties
-    dynamic var locationBorderColor: UIColor = URLBarViewUX.TextFieldBorderColor {
+    @objc dynamic var locationBorderColor: UIColor = URLBarViewUX.TextFieldBorderColor {
         didSet {
             if !inOverlayMode {
                 locationContainer.layer.borderColor = locationBorderColor.cgColor
             }
         }
     }
-    dynamic var locationActiveBorderColor: UIColor = URLBarViewUX.TextFieldActiveBorderColor {
+    @objc dynamic var locationActiveBorderColor: UIColor = URLBarViewUX.TextFieldActiveBorderColor {
         didSet {
             if inOverlayMode {
                 locationContainer.layer.borderColor = locationActiveBorderColor.cgColor
@@ -135,8 +135,8 @@ class URLBarView: UIView {
         button.accessibilityIdentifier = "urlBar-scanQRCode"
         button.clipsToBounds = false
         button.addTarget(self, action: #selector(URLBarView.showQRScanner), for: .touchUpInside)
-        button.setContentHuggingPriority(1000, for: UILayoutConstraintAxis.horizontal)
-        button.setContentCompressionResistancePriority(1000, for: UILayoutConstraintAxis.horizontal)
+        button.setContentHuggingPriority(UILayoutPriority(rawValue: 1000), for: UILayoutConstraintAxis.horizontal)
+        button.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 1000), for: UILayoutConstraintAxis.horizontal)
         return button
     }()
 
@@ -303,7 +303,7 @@ class URLBarView: UIView {
 
     }
     
-    func showQRScanner() {
+    @objc func showQRScanner() {
         self.delegate?.urlBarDidPressQRButton(self)
     }
 
@@ -482,7 +482,7 @@ class URLBarView: UIView {
             removeLocationTextField()
         }
 
-        UIView.animate(withDuration: 0.3, delay: 0.0, usingSpringWithDamping: 0.85, initialSpringVelocity: 0.0, options: [], animations: { _ in
+        UIView.animate(withDuration: 0.3, delay: 0.0, usingSpringWithDamping: 0.85, initialSpringVelocity: 0.0, options: [], animations: { 
             self.transitionToOverlay(cancel)
             self.setNeedsUpdateConstraints()
             self.layoutIfNeeded()
@@ -495,11 +495,11 @@ class URLBarView: UIView {
         delegate?.urlBarDidPressTabs(self)
     }
 
-    func SELdidClickCancel() {
+    @objc func SELdidClickCancel() {
         leaveOverlayMode(didCancel: true)
     }
 
-    func SELtappedScrollToTopArea() {
+    @objc func SELtappedScrollToTopArea() {
         delegate?.urlBarDidPressScrollToTop(self)
     }
 }
@@ -622,12 +622,12 @@ extension URLBarView: AutocompleteTextFieldDelegate {
 // MARK: UIAppearance
 extension URLBarView {
 
-    dynamic var cancelTintColor: UIColor? {
+    @objc dynamic var cancelTintColor: UIColor? {
         get { return cancelButton.tintColor }
         set { return cancelButton.tintColor = newValue }
     }
     
-    dynamic var showQRButtonTintColor: UIColor? {
+    @objc dynamic var showQRButtonTintColor: UIColor? {
         get { return showQRScannerButton.tintColor }
         set { return showQRScannerButton.tintColor = newValue }
     }
@@ -691,7 +691,7 @@ class TabLocationContainerView: UIView {
 
 class ToolbarTextField: AutocompleteTextField {
 
-    dynamic var clearButtonTintColor: UIColor? {
+    @objc dynamic var clearButtonTintColor: UIColor? {
         didSet {
             // Clear previous tinted image that's cache and ask for a relayout
             tintedClearImage = nil

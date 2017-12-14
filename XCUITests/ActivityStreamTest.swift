@@ -286,7 +286,7 @@ class ActivityStreamTest: BaseTestCase {
         waitforExistence(app.cells["TopSitesCell"])
         XCTAssertTrue(app.cells["TopSitesCell"].exists)
         let numberOfTopSites = TopSiteCellgroup.cells.matching(identifier: "TopSite").count
-        XCTAssertEqual(numberOfTopSites, UInt(numberOfExpectedTopSites), "The number of Top Sites is not correct")
+        XCTAssertEqual(numberOfTopSites, numberOfExpectedTopSites, "The number of Top Sites is not correct")
     }
 
     func testOpenTopSitesFromContextMenu () {
@@ -352,7 +352,7 @@ class ActivityStreamTest: BaseTestCase {
     }
 
     func testContextMenuInLandscape() {
-        XCUIDevice.shared().orientation = .landscapeLeft
+        XCUIDevice.shared.orientation = .landscapeLeft
 
         navigator.openURL("http://example.com")
         waitUntilPageLoad()

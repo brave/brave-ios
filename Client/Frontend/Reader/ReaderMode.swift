@@ -201,7 +201,7 @@ struct ReadabilityResult {
     /// Encode to a JSON encoded string
     func encode() -> String {
         let dict: [String: Any] = self.encode()
-        return JSON(object: dict).stringValue()!
+        return JSON(dict).stringValue()!
     }
 }
 
