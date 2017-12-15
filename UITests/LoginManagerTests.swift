@@ -554,6 +554,8 @@ class LoginManagerTests: KIFTestCase {
      closeLoginManager()
      }
      */
+
+    /*
     func testEditingDetailUpdatesPassword() {
         openLoginManager()
         
@@ -602,6 +604,7 @@ class LoginManagerTests: KIFTestCase {
         tester().tapView(withAccessibilityLabel: "Logins")
         closeLoginManager()
     }
+    */
     
     func testDeleteLoginFromDetailScreen() {
         
@@ -641,7 +644,8 @@ class LoginManagerTests: KIFTestCase {
         tester().tapView(withAccessibilityLabel: "Logins")
         closeLoginManager()
     }
-    
+
+    /*
     func testPreventBlankPasswordInDetail() {
         openLoginManager()
         
@@ -696,5 +700,7 @@ class LoginManagerTests: KIFTestCase {
         
         closeLoginManager()
     }
+    */
 }
+
 
