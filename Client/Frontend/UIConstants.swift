@@ -31,56 +31,58 @@ struct BrowserColor {
 extension UIColor {
     // These are defaults from http://design.firefox.com/photon/visuals/color.html
     struct Defaults {
-        static let Grey10 = UIColor(rgb: 0xf9f9fa)
-        static let Grey30 = UIColor(rgb: 0xd7d7db)
-        static let Grey40 = UIColor(rgb: 0xb1b1b3)
-        static let Grey50 = UIColor(rgb: 0x737373)
-        static let Grey60 = UIColor(rgb: 0x4a4a4f)
-        static let Grey70 = UIColor(rgb: 0x38383d)
-        static let Grey80 = UIColor(rgb: 0x272727) // Grey80 is actually #2a2a2e
-        static let Grey90 = UIColor(rgb: 0x0c0c0d)
-        static let Blue40 = UIColor(rgb: 0x45a1ff)
-        static let Blue50 = UIColor(rgb: 0x0a84ff)
-        static let Blue60 = UIColor(rgb: 0x0066DC) // Blue60 is actually #0060df
-        static let Purple50 = UIColor(rgb: 0x9400ff)
-        static let Magenta50 = UIColor(rgb: 0xff1ad9)
-        static let Red50 = UIColor(rgb: 0xff0039)
-        static let LockGreen = UIColor(rgb: 0x16DA00)
+        static let Grey10 = UIColor(rgb: 0xF7F8F9)
+        static let Grey30 = UIColor(rgb: 0xE7EBEE)
+        static let Grey40 = UIColor(rgb: 0xDBDFE3)
+        static let Grey50 = UIColor(rgb: 0xCDD1D5)
+        static let Grey60 = UIColor(rgb: 0xA7ACB2)
+        static let Grey70 = UIColor(rgb: 0x999EA2)
+        static let Grey80 = UIColor(rgb: 0x818589)
+        static let Grey90 = UIColor(rgb: 0x606467)
+        static let Blue40 = UIColor(rgb: 0x00BCD6)
+        static let Blue50 = UIColor(rgb: 0x00BCD6)
+        static let Blue60 = UIColor(rgb: 0x00BCD6)
+        static let Purple50 = UIColor(rgb: 0x7D7BDC)
+        static let Magenta50 = UIColor(rgb: 0xFF3F3F)
+        static let Red50 = UIColor(rgb: 0xE2052A)
+        static let LockGreen = UIColor(rgb: 0x02B999)
 
         // Non-Photon design system colors. These are not in the design doc yet.
-        static let MobileGreyA = UIColor(rgb: 0xD2D2D4)
-        static let MobileGreyC = UIColor(rgb: 0xE4E4E4)
-        static let MobileGreyD = UIColor(rgb: 0x414146)
-        static let MobileGreyE = UIColor(rgb: 0x2D2D31)
-        static let MobileGreyF = UIColor(rgb: 0x636369)
-        static let MobileGreyH = UIColor(rgb: 0xADADb0)
-        static let MobileGreyI = UIColor(rgb: 0x3f3f43)
-        static let MobileGreyJ = UIColor(rgb: 0xE5E5E5)
-        static let MobileBlueA = UIColor(rgb: 0xB0D5FB)
-        static let MobileBlueB = UIColor(rgb: 0x00dcfc)
-        static let MobileBlueC = UIColor(rgb: 0xccdded)
-        static let MobileBlueD = UIColor(rgb: 0x00A2FE)
-        static let MobilePurple = UIColor(rgb: 0x7878a5)
-        static let MobilePurpleB = UIColor(rgb: 0xAC39FF)
-        static let MobilePrivatePurple = UIColor(rgb: 0xcf68ff)
+        static let MobileGreyA = UIColor(rgb: 0xF7F8F9)
+        static let MobileGreyB = UIColor(rgb: 0xE7EBEE)
+        static let MobileGreyC = UIColor(rgb: 0xDBDFE3)
+        static let MobileGreyD = UIColor(rgb: 0xCDD1D5)
+        static let MobileGreyE = UIColor(rgb: 0xA7ACB2)
+        static let MobileGreyF = UIColor(rgb: 0x999EA2)
+        static let MobileGreyG = UIColor(rgb: 0x818589)
+        static let MobileGreyH = UIColor(rgb: 0x606467)
+        static let MobileGreyI = UIColor(rgb: 0x484B4E)
+        static let MobileGreyJ = UIColor(rgb: 0x222326)
+        static let MobileBlueA = UIColor(rgb: 0x00BCD6)
+        static let MobileBlueB = UIColor(rgb: 0x00BCD6)
+        static let MobileBlueC = UIColor(rgb: 0x00BCD6)
+        static let MobileBlueD = UIColor(rgb: 0x00BCD6)
+        static let MobilePurple = UIColor(rgb: 0x7D7BDC)
+        static let MobilePurpleB = UIColor(rgb: 0x7D7BDC)
+        static let MobilePrivatePurple = UIColor(rgb: 0x7D7BDC)
     }
 
     struct Browser {
-        static let Background = BrowserColor(normal: Defaults.Grey10, pbm: Defaults.Grey70)
+        static let Background = BrowserColor(normal: Defaults.MobileGreyB, pbm: Defaults.MobileGreyI)
         static let Text = BrowserColor(normal: .white, pbm: Defaults.MobileGreyD)
-        static let URLBarDivider = BrowserColor(normal: Defaults.MobileGreyC, pbm: Defaults.MobileGreyD)
-        static let LocationBarBackground = Defaults.Grey30
-        static let Tint = BrowserColor(normal: Defaults.Grey80, pbm: Defaults.MobileGreyA)
+        static let URLBarDivider = BrowserColor(normal: .clear, pbm: .clear)
+        static let LocationBarBackground = BrowserColor(normal: Defaults.MobileGreyB, pbm: Defaults.MobileGreyI)
+        static let Tint = BrowserColor(normal: Defaults.MobileGreyH, pbm: Defaults.MobileGreyF)
     }
 
     struct URLBar {
-        static let Border = BrowserColor(normal: Defaults.Grey50, pbm: Defaults.MobileGreyE)
-        static let ActiveBorder = BrowserColor(normal: Defaults.MobileBlueA, pbm: Defaults.Grey60)
-        static let Tint = BrowserColor(normal: Defaults.MobileBlueB, pbm: Defaults.Grey10)
+        static let Border = BrowserColor(normal: Defaults.MobileGreyD, pbm: Defaults.MobileGreyI)
+        static let ActiveBorder = BrowserColor(normal: Defaults.MobileBlueA, pbm: Defaults.MobileGreyI)
+        static let Tint = BrowserColor(normal: Defaults.MobileBlueB, pbm: Defaults.MobileBlueB)
     }
 
     struct TextField {
-        static let Background = BrowserColor(normal: .white, pbm: Defaults.MobileGreyF)
+        static let Background = BrowserColor(normal: .white, pbm: Defaults.MobileGreyJ)
         static let TextAndTint = BrowserColor(normal: Defaults.Grey80, pbm: .white)
         static let Highlight = BrowserColor(normal: Defaults.MobileBlueC, pbm: Defaults.MobilePurple)
         static let ReaderModeButtonSelected = BrowserColor(normal: Defaults.MobileBlueD, pbm: Defaults.MobilePrivatePurple)
@@ -114,9 +116,9 @@ extension UIColor {
         // These values are the same for both private/normal.
         // The homepanel toolbar needed to be able to theme, not anymore.
         // Keep this just in case someone decides they want it to theme again
-        static let ToolbarBackground = BrowserColor(normal: Defaults.Grey10, pbm: Defaults.Grey10)
-        static let ToolbarHighlight = BrowserColor(normal: Defaults.Blue50, pbm: Defaults.Blue50)
-        static let ToolbarTint = BrowserColor(normal: Defaults.Grey50, pbm: Defaults.Grey50)
+        static let ToolbarBackground = BrowserColor(normal: Defaults.MobileGreyB, pbm: Defaults.MobileGreyI)
+        static let ToolbarHighlight = BrowserColor(normal: Defaults.MobileBlueA, pbm: Defaults.MobileBlueA)
+        static let ToolbarTint = BrowserColor(normal: Defaults.MobileGreyH, pbm: Defaults.MobileGreyF)
     }
 }
 
@@ -139,11 +141,11 @@ public struct UIConstants {
         }
     }
 
-    static let AppBackgroundColor = UIColor.Defaults.Grey10
+    static let AppBackgroundColor = UIColor.white
     static let SystemBlueColor = UIColor.Defaults.Blue50
     static let ControlTintColor = UIColor.Defaults.Blue50
     static let PasscodeDotColor = UIColor.Defaults.Grey60
-    static let PrivateModeAssistantToolbarBackgroundColor = UIColor.Defaults.Grey50
+    static let PrivateModeAssistantToolbarBackgroundColor = UIColor.Defaults.MobileGreyI
     static let PrivateModeTextHighlightColor = UIColor.Defaults.Purple50
     static let PrivateModePurple = UIColor.Defaults.MobilePrivatePurple
 

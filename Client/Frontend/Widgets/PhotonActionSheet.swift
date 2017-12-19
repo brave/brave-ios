@@ -13,7 +13,7 @@ private struct PhotonActionSheetUX {
     static let SectionVerticalPadding: CGFloat = 13
     static let HeaderHeight: CGFloat = 80
     static let RowHeight: CGFloat = 44
-    static let LabelColor = UIAccessibilityDarkerSystemColorsEnabled() ? UIColor.black : UIColor.Defaults.Grey70
+    static let LabelColor = UIAccessibilityDarkerSystemColorsEnabled() ? UIColor.black : UIColor.Defaults.MobileGreyJ
     static let PlaceholderImage = UIImage(named: "defaultTopSiteIcon")
     static let BorderWidth: CGFloat = 0.5
     static let BorderColor = UIColor(white: 0, alpha: 0.1)
@@ -54,7 +54,7 @@ class PhotonActionSheet: UIViewController, UITableViewDelegate, UITableViewDataS
         return self.style == .bottom && self.modalPresentationStyle != .popover
     }()
     var tableView = UITableView(frame: CGRect.zero, style: .grouped)
-    private var tintColor = UIColor.Defaults.Grey80
+    private var tintColor = UIColor.Defaults.MobileGreyJ
     private var outerScrollView = UIScrollView()
     
     lazy var tapRecognizer: UITapGestureRecognizer = {

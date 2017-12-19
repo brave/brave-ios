@@ -23,8 +23,8 @@ protocol TabLocationViewDelegate {
 }
 
 private struct TabLocationViewUX {
-    static let HostFontColor = UIColor.black
-    static let BaseURLFontColor = UIColor.gray
+    static let HostFontColor = UIColor.Defaults.MobileGreyJ
+    static let BaseURLFontColor = UIColor.Defaults.MobileGreyD
     static let LocationContentInset = 8
     static let URLBarPadding = 4
 }
@@ -145,7 +145,7 @@ class TabLocationView: UIView {
     
     lazy var separatorLine: UIView = {
         let line = UIView()
-        line.layer.cornerRadius = 2
+        line.layer.cornerRadius = 8
         line.isHidden = true
         return line
     }()
