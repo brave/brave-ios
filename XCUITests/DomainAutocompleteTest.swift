@@ -6,7 +6,7 @@ import XCTest
 
 let website = ["url": "www.mozilla.org", "value": "www.mozilla.org", "subDomain": "https://www.mozilla.org/en-US/firefox/products"]
 
-class DomainAutocompleteTest: BaseTestCase {
+class DomainAutocompleteTest: BaseXCUITestCase {
     func testAutocomplete() {
         navigator.openURL(urlString: website["url"]!)
 

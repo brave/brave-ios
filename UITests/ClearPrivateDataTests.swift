@@ -9,7 +9,7 @@ import UIKit
 import EarlGrey
 import GCDWebServers
 
-class ClearPrivateDataTests: KIFTestCase, UITextFieldDelegate {
+class ClearPrivateDataTests: BaseUITestCase, UITextFieldDelegate {
 
     fileprivate var webRoot: String!
 

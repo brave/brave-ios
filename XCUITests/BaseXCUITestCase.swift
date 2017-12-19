@@ -4,7 +4,7 @@
 
 import XCTest
 
-class BaseTestCase: XCTestCase {
+class BaseXCUITestCase: XCTestCase {
     var navigator: Navigator<FxUserState>!
     var app: XCUIApplication!
     var userState: FxUserState!
@@ -98,7 +98,7 @@ class BaseTestCase: XCTestCase {
     }
 }
 
-extension BaseTestCase {
+extension BaseXCUITestCase {
     func tabTrayButton(forApp app: XCUIApplication) -> XCUIElement {
         return app.buttons["TopTabsViewController.tabsButton"].exists ? app.buttons["TopTabsViewController.tabsButton"] : app.buttons["TabToolbar.tabsButton"]
     }

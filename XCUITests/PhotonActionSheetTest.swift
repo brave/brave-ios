@@ -4,7 +4,7 @@
 
 import XCTest
 
-class PhotonActionSheetTest: BaseTestCase {
+class PhotonActionSheetTest: BaseXCUITestCase {
     func testPinToTop() {
         navigator.openURL(urlString: "http://example.com")
         waitUntilPageLoad()

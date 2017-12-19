@@ -7,7 +7,7 @@ import XCTest
 let website1: [String: String] = ["url": "www.mozilla.org", "label": "Internet for people, not profit — Mozilla", "value": "mozilla.org"]
 let website2 = "example.com"
 
-class ToolbarTests: BaseTestCase {
+class ToolbarTests: BaseXCUITestCase {
     override func setUp() {
         super.setUp()
         XCUIDevice.shared().orientation = UIDeviceOrientation.landscapeLeft

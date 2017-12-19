@@ -5,7 +5,7 @@
 import Foundation
 import EarlGrey
 
-class AuthenticationTests: KIFTestCase {
+class AuthenticationTests: BaseUITestCase {
     fileprivate var webRoot: String!
 
     override func setUp() {

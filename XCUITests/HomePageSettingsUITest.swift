@@ -8,7 +8,7 @@ let websiteUrl1 = "www.mozilla.org"
 let websiteUrl2 = "developer.mozilla.org"
 let invalidUrl = "1-2-3"
 
-class HomePageSettingsUITests: BaseTestCase {
+class HomePageSettingsUITests: BaseXCUITestCase {
     private func enterWebPageAsHomepage(text: String) {
         app.textFields["HomePageSettingTextField"].tap()
         app.textFields["HomePageSettingTextField"].typeText(text)

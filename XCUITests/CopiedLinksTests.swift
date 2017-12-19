@@ -4,7 +4,7 @@
 
 import XCTest
 
-class CopiedLinksTests: BaseTestCase {
+class CopiedLinksTests: BaseXCUITestCase {
     // This test is enable Offer to open copied links, when opening firefox
     func testCopiedLinks() {
         navigator.goto(SettingsScreen)

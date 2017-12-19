@@ -4,7 +4,7 @@
 
 import XCTest
 
-class AuthenticationTest: BaseTestCase {
+class AuthenticationTest: BaseXCUITestCase {
 
     fileprivate func setInterval(_ interval: String = "Immediately") {
         navigator.goto(PasscodeIntervalSettings)

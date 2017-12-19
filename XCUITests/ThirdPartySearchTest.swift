@@ -4,7 +4,7 @@
 
 import XCTest
 
-class ThirdPartySearchTest: BaseTestCase {
+class ThirdPartySearchTest: BaseXCUITestCase {
     fileprivate func dismissKeyboardAssistant(forApp app: XCUIApplication) {
         if iPad() {
             let searchTheDocsSearchField = app.webViews.searchFields["Search the docs"]

@@ -12,7 +12,7 @@ let urlExample = "example.com"
 let urlLabelExample = "Example Domain"
 let urlValueExample = "example"
 
-class TopTabsTest: BaseTestCase {
+class TopTabsTest: BaseXCUITestCase {
     func testAddTabFromSettings() {
         navigator.createNewTab()
         navigator.openURL(url)

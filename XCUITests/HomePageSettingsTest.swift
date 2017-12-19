@@ -4,7 +4,7 @@
 
 import XCTest
 
-class HomePageSettingsTest: BaseTestCase {
+class HomePageSettingsTest: BaseXCUITestCase {
     // This test has moved from KIF UITest - accesses google.com instead of local webserver instance
     func testCurrentPage() {
         navigator.goto(BrowserTab)
