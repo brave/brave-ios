@@ -7,7 +7,7 @@ import XCTest
 private let LabelPrompt: String = "Turn on search suggestions?"
 private let SuggestedSite: String = "foobar skins"
 
-class SearchTests: BaseTestCase {
+class SearchTests: BaseXCUITestCase {
     private func typeOnSearchBar(text: String) {
         waitforExistence(app.textFields["address"])
         app.textFields["address"].typeText(text)

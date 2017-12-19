@@ -6,7 +6,7 @@ import XCTest
 
 let webpage = ["url": "www.mozilla.org", "label": "Internet for people, not profit — Mozilla", "value": "mozilla.org"]
 
-class HistoryTests: BaseTestCase {
+class HistoryTests: BaseXCUITestCase {
     func testEmptyHistoryListFirstTime() {
         // Go to History List from Top Sites and check it is empty
         navigator.goto(HomePanel_History)

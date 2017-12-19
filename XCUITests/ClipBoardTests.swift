@@ -4,7 +4,7 @@
 
 import XCTest
 
-class ClipBoardTests: BaseTestCase {
+class ClipBoardTests: BaseXCUITestCase {
     let url = "www.example.com"
 
     //Check for test url in the browser

@@ -4,7 +4,7 @@
 
 import XCTest
 
-class SettingsTest: BaseTestCase {
+class SettingsTest: BaseXCUITestCase {
     func testHelpOpensSUMOInTab() {
         navigator.goto(SettingsScreen)
         let settingsTableView = app.tables["AppSettingsTableViewController.tableView"]

@@ -8,7 +8,7 @@ let defaultSearchEngine1 = "Google"
 let defaultSearchEngine2 = "Amazon.com"
 let customSearchEngine = ["name": "youtube", "url": "http://youtube.com/search?q=%s"]
 
-class SearchSettingsUITests: BaseTestCase {
+class SearchSettingsUITests: BaseXCUITestCase {
     func testDefaultSearchEngine() {
         navigator.goto(SearchSettings)
         // Check the default browser

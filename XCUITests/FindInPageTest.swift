@@ -4,7 +4,7 @@
 
 import XCTest
 
-class FindInPageTests: BaseTestCase {
+class FindInPageTests: BaseXCUITestCase {
     private func openFindInPageFromMenu() {
         navigator.goto(FindInPage)
 

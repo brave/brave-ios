@@ -8,7 +8,7 @@ let defaultTopSite = ["topSiteLabel": "wikipedia", "bookmarkLabel": "Wikipedia"]
 let newTopSite = ["url": "www.mozilla.org", "topSiteLabel": "mozilla", "bookmarkLabel": "Internet for people, not profit — Mozilla"]
 let allDefaultTopSites = ["facebook", "youtube", "amazon", "wikipedia", "twitter"]
 
-class ActivityStreamTest: BaseTestCase {
+class ActivityStreamTest: BaseXCUITestCase {
     let TopSiteCellgroup = XCUIApplication().collectionViews.cells["TopSitesCell"]
 
     override func setUp() {

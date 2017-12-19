@@ -4,7 +4,7 @@
 
 import XCTest
 
-class ReaderViewTest: BaseTestCase {
+class ReaderViewTest: BaseXCUITestCase {
     func testLoadReaderContent() {
         navigator.goto(BrowserTab)
         app.buttons["Reader View"].tap()

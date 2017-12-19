@@ -4,7 +4,7 @@
 
 import XCTest
 
-class TrackingProtectionTests: BaseTestCase {
+class TrackingProtectionTests: BaseXCUITestCase {
     // This test is to change the tracking protection to block known blockers
     func testTrackingProtection() {
         navigator.goto(SettingsScreen)

@@ -13,7 +13,7 @@ let urlGoogle = "www.google.com"
 let requestMobileSiteLabel = "Request Mobile Site"
 let requestDesktopSiteLabel = "Request Desktop Site"
 
-class NavigationTest: BaseTestCase {
+class NavigationTest: BaseXCUITestCase {
     func testNavigation() {
         navigator.goto(URLBarOpen)
         let urlPlaceholder = "Search or enter address"

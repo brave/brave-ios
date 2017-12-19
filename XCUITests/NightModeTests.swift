@@ -3,7 +3,7 @@
  file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import XCTest
-class NightModeTests: BaseTestCase {
+class NightModeTests: BaseXCUITestCase {
     private func nightModeOff() {
         navigator.goto(BrowserTabMenu)
         app.tables.cells["Disable Night Mode"].tap()

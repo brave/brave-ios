@@ -7,7 +7,7 @@ import XCTest
 let NoImageButtonIdentifier = "menu-NoImageMode"
 let ContextMenuIdentifier = "Context Menu"
 
-class NoImageTests: BaseTestCase {
+class NoImageTests: BaseXCUITestCase {
     private func showImages() {
         navigator.goto(BrowserTabMenu)
         app.tables[ContextMenuIdentifier].cells[NoImageButtonIdentifier].tap()

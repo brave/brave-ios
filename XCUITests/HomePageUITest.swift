@@ -4,7 +4,7 @@
 
 import XCTest
 
-class HomePageUITest: BaseTestCase {
+class HomePageUITest: BaseXCUITestCase {
     func testSetInternalURLAsHomepage() {
         loadWebPage("http://en.m.wikipedia.org/wiki/Main_Page")
         app.buttons["Reader View"].tap()

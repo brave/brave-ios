@@ -10,7 +10,7 @@ let url2 = "www.facebook.com"
 let url1Label = "Internet for people, not profit — Mozilla"
 let url2Label = "Facebook - Log In or Sign Up"
 
-class PrivateBrowsingTest: BaseTestCase {
+class PrivateBrowsingTest: BaseXCUITestCase {
     func testPrivateTabDoesNotTrackHistory() {
         navigator.openURL(url1)
         navigator.goto(BrowserTabMenu)
