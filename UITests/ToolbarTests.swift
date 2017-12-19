@@ -7,7 +7,7 @@ import WebKit
 import UIKit
 import EarlGrey
 
-class ToolbarTests: KIFTestCase, UITextFieldDelegate {
+class ToolbarTests: BaseUITestCase, UITextFieldDelegate {
     fileprivate var webRoot: String!
 
     override func setUp() {

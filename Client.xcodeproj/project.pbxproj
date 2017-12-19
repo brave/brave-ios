@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		03CCC9181AF05E7300DBF30D /* RelativeDatesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03CCC9171AF05E7300DBF30D /* RelativeDatesTests.swift */; };
+		0A2B968E1FE9318E00614239 /* BaseUITestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2B968D1FE9318E00614239 /* BaseUITestCase.swift */; };
 		0B1C05D71A798B1F004C78B0 /* UIImageViewAligned.m in Sources */ = {isa = PBXBuildFile; fileRef = 0B1C05D61A798B1F004C78B0 /* UIImageViewAligned.m */; };
 		0B21E8061E26CCB7000C8779 /* EarlGrey.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 0B21E8051E26CCB7000C8779 /* EarlGrey.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		0B305E1B1E3A98A900BE0767 /* BookmarkingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B305E1A1E3A98A900BE0767 /* BookmarkingTests.swift */; };
@@ -1385,6 +1386,7 @@
 
 /* Begin PBXFileReference section */
 		03CCC9171AF05E7300DBF30D /* RelativeDatesTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RelativeDatesTests.swift; sourceTree = "<group>"; };
+		0A2B968D1FE9318E00614239 /* BaseUITestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseUITestCase.swift; sourceTree = "<group>"; };
 		0B1C05D51A798B1F004C78B0 /* UIImageViewAligned.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIImageViewAligned.h; sourceTree = "<group>"; };
 		0B1C05D61A798B1F004C78B0 /* UIImageViewAligned.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UIImageViewAligned.m; sourceTree = "<group>"; };
 		0B21E8051E26CCB7000C8779 /* EarlGrey.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EarlGrey.framework; path = Carthage/Build/iOS/EarlGrey.framework; sourceTree = "<group>"; };
@@ -3070,6 +3072,7 @@
 				E6EAC5951B29CB3A00E1DE1E /* scrollablePage.html */,
 				E67422C41CFF2D39009E8373 /* youtube.ico */,
 				D3E171C11A841EAD00AB44CD /* KIFHelper.js */,
+				0A2B968D1FE9318E00614239 /* BaseUITestCase.swift */,
 				D38F036F1C06387900175932 /* AuthenticationTests.swift */,
 				28C8B7841C852535006D8318 /* BookmarksPanelTests.swift */,
 				E6B4C4021C68F58B001F97E8 /* BrowserTests.swift */,
@@ -4430,7 +4433,7 @@
 					};
 					397848DA1ED86605004C0C0B = {
 						CreatedOnToolsVersion = 8.3.2;
-						DevelopmentTeam = 43AQ936H96;
+                        DevelopmentTeam = 43AQ936H96;
 						ProvisioningStyle = Manual;
 						SystemCapabilities = {
 							com.apple.Push = {
@@ -4447,7 +4450,7 @@
 					};
 					3BFE4B061D342FB800DDF53F = {
 						CreatedOnToolsVersion = 7.3.1;
-						DevelopmentTeam = 43AQ936H96;
+                        DevelopmentTeam = 43AQ936H96;
 						LastSwiftMigration = 0820;
 						TestTargetID = F84B21BD1A090F8100AAB793;
 					};
@@ -4461,7 +4464,7 @@
 					};
 					D39FA15E1A83E0EC00EE869C = {
 						CreatedOnToolsVersion = 6.1.1;
-						DevelopmentTeam = 43AQ936H96;
+                        DevelopmentTeam = 43AQ936H96;
 						LastSwiftMigration = 0820;
 						TestTargetID = F84B21BD1A090F8100AAB793;
 					};
@@ -4483,7 +4486,7 @@
 					};
 					E4D567211ADECE2700F1EFE7 = {
 						CreatedOnToolsVersion = 6.3;
-						DevelopmentTeam = 43AQ936H96;
+                        DevelopmentTeam = 43AQ936H96;
 						LastSwiftMigration = 0820;
 						TestTargetID = F84B21BD1A090F8100AAB793;
 					};
@@ -5426,6 +5429,7 @@
 			files = (
 				0B5A93221B1EB4C8004F47A2 /* ReadingListTest.swift in Sources */,
 				D38F03701C06387900175932 /* AuthenticationTests.swift in Sources */,
+				0A2B968E1FE9318E00614239 /* BaseUITestCase.swift in Sources */,
 				28C8B7851C852535006D8318 /* BookmarksPanelTests.swift in Sources */,
 				C8611CB01F71AEBA00C3DE7D /* NoImageModeTests.swift in Sources */,
 				E6B4C4031C68F58B001F97E8 /* BrowserTests.swift in Sources */,

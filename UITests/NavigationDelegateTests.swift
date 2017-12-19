@@ -9,7 +9,7 @@ import EarlGrey
 // WKWebView's WKNavigationDelegate is used for custom URL handling
 // such as telephone links, app store links, etc.
 
-class NavigationDelegateTests: KIFTestCase {
+class NavigationDelegateTests: BaseUITestCase {
     fileprivate var webRoot: String!
 
     override func setUp() {

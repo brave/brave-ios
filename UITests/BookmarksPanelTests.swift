@@ -9,7 +9,7 @@ import Foundation
 import WebKit
 import EarlGrey
 
-class BookmarksPanelTests: KIFTestCase {
+class BookmarksPanelTests: BaseUITestCase {
     
     override func setUp() {
         super.setUp()

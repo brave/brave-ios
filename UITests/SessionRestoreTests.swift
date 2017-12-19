@@ -9,7 +9,7 @@ import EarlGrey
 import SwiftyJSON
 
 /// This test should be disabled since session restore does not seem to work
-class SessionRestoreTests: KIFTestCase {
+class SessionRestoreTests: BaseUITestCase {
     fileprivate var webRoot: String!
     
     override func setUp() {

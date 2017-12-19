@@ -6,7 +6,7 @@ import Foundation
 import Shared
 import EarlGrey
 
-class DomainAutocompleteTests: KIFTestCase {
+class DomainAutocompleteTests: BaseUITestCase {
     override func setUp() {
 
         super.setUp()

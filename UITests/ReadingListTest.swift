@@ -6,7 +6,7 @@ import Foundation
 import EarlGrey
 import WebKit
 
-class ReadingListTests: KIFTestCase, UITextFieldDelegate {
+class ReadingListTests: BaseUITestCase, UITextFieldDelegate {
     fileprivate var webRoot: String!
     
     override func setUp() {

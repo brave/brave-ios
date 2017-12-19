@@ -6,7 +6,7 @@ import Foundation
 import EarlGrey
 @testable import Client
 
-class LoginInputTests: KIFTestCase {
+class LoginInputTests: BaseUITestCase {
     fileprivate var webRoot: String!
     fileprivate var profile: Profile!
     

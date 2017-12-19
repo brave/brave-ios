@@ -7,7 +7,7 @@ import Storage
 import EarlGrey
 @testable import Client
 
-class LoginManagerTests: KIFTestCase {
+class LoginManagerTests: BaseUITestCase {
     
     fileprivate var webRoot: String!
     

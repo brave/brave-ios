@@ -6,7 +6,7 @@ import Foundation
 import WebKit
 import EarlGrey
 
-class HistoryTests: KIFTestCase {
+class HistoryTests: BaseUITestCase {
     fileprivate var webRoot: String!
     
     override func setUp() {

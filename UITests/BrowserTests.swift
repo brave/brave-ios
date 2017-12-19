@@ -7,7 +7,7 @@ import Storage
 import EarlGrey
 @testable import Client
 
-class BrowserTests: KIFTestCase {
+class BrowserTests: BaseUITestCase {
     
     private var webRoot: String!
     
