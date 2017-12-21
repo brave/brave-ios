@@ -80,7 +80,7 @@ class SiteTableViewController: UIViewController, UITableViewDelegate, UITableVie
         }
     }
     var data: Cursor<Site> = Cursor<Site>(status: .success, msg: "No data set")
-    var tableView = UITableView()
+    @objc var tableView = UITableView()
 
     override func viewDidLoad() {
         super.viewDidLoad()

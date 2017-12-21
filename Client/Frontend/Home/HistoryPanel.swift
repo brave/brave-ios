@@ -369,7 +369,7 @@ class HistoryPanel: SiteTableViewController, HomePanel {
         return cell
     }
 
-    func numberOfSectionsInTableView(_ tableView: UITableView) -> Int {
+    @objc func numberOfSectionsInTableView(_ tableView: UITableView) -> Int {
         var count = 1
         for category in self.categories where category.rows > 0 {
             count += 1
@@ -534,7 +534,7 @@ class HistoryPanel: SiteTableViewController, HomePanel {
         }
     }
 
-    func tableView(_ tableView: UITableView, editActionsForRowAtIndexPath indexPath: IndexPath) -> [AnyObject]? {
+    @objc func tableView(_ tableView: UITableView, editActionsForRowAtIndexPath indexPath: IndexPath) -> [AnyObject]? {
         if indexPath.section == 0 {
             return []
         }
