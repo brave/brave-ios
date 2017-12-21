@@ -10,11 +10,11 @@ let website2 = "example.com"
 class ToolbarTests: BaseTestCase {
     override func setUp() {
         super.setUp()
-        XCUIDevice.shared().orientation = UIDeviceOrientation.landscapeLeft
+        XCUIDevice.shared.orientation = UIDeviceOrientation.landscapeLeft
     }
 
     override func tearDown() {
-        XCUIDevice.shared().orientation = UIDeviceOrientation.portrait
+        XCUIDevice.shared.orientation = UIDeviceOrientation.portrait
         super.tearDown()
     }
 

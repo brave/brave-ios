@@ -369,6 +369,6 @@ class ActivityStreamTest: BaseTestCase {
         XCTAssertLessThanOrEqual(contextMenuHeight, parentViewHeight)
 
         // Go back to portrait mode
-        XCUIDevice.shared().orientation = .portrait
+        XCUIDevice.shared.orientation = .portrait
     }
 }

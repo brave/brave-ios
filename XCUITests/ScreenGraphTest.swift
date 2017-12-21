@@ -137,7 +137,7 @@ class TestUserState: UserState {
 
     var url: String? = nil
     var nightMode = false
-    var passcode: String? = nil
+    @objc var passcode: String? = nil
     var newPasscode: String = "111111"
 }
 
