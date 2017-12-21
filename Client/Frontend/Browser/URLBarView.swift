@@ -13,7 +13,7 @@ private struct URLBarViewUX {
     static let LocationContentOffset: CGFloat = 8
     static let TextFieldCornerRadius: CGFloat = 8
     static let TextFieldBorderWidth: CGFloat = 1
-    static let TextFieldBorderWidthSelected: CGFloat = 1
+    static let TextFieldBorderWidthSelected: CGFloat = 0
     static let ProgressBarHeight: CGFloat = 2
 
     static let TabsButtonRotationOffset: CGFloat = 1.5

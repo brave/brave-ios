@@ -72,7 +72,7 @@ extension UIColor {
         static let Text = BrowserColor(normal: .white, pbm: Defaults.MobileGreyD)
         static let URLBarDivider = BrowserColor(normal: .clear, pbm: .clear)
         static let LocationBarBackground = BrowserColor(normal: Defaults.MobileGreyB, pbm: Defaults.MobileGreyI)
-        static let Tint = BrowserColor(normal: Defaults.MobileGreyH, pbm: Defaults.MobileGreyF)
+        static let Tint = BrowserColor(normal: Defaults.MobileGreyG, pbm: Defaults.MobileGreyF)
     }
 
     struct URLBar {
@@ -83,19 +83,23 @@ extension UIColor {
 
     struct TextField {
         static let Background = BrowserColor(normal: .white, pbm: Defaults.MobileGreyJ)
-        static let TextAndTint = BrowserColor(normal: Defaults.Grey80, pbm: .white)
-        static let Highlight = BrowserColor(normal: Defaults.MobileBlueC, pbm: Defaults.MobilePurple)
-        static let ReaderModeButtonSelected = BrowserColor(normal: Defaults.MobileBlueD, pbm: Defaults.MobilePrivatePurple)
-        static let ReaderModeButtonUnselected = BrowserColor(normal: Defaults.Grey50, pbm: Defaults.MobileGreyH)
+        static let TextAndTint = BrowserColor(normal: Defaults.MobileGreyJ, pbm: .white)
+        static let Highlight = BrowserColor(normal: Defaults.MobileBlueA.withAlphaComponent(0.15), pbm: Defaults.MobilePurple.withAlphaComponent(0.15))
+        static let ReaderModeButtonSelected = BrowserColor(normal: Defaults.MobileBlueA, pbm: Defaults.MobilePrivatePurple)
+        static let ReaderModeButtonUnselected = BrowserColor(normal: Defaults.MobileGreyG, pbm: Defaults.MobileGreyF)
         static let PageOptionsSelected = ReaderModeButtonSelected
         static let PageOptionsUnselected = UIColor.Browser.Tint
-        static let Separator = BrowserColor(normal: Defaults.MobileGreyJ, pbm: Defaults.MobileGreyI)
+        static let Separator = BrowserColor(normal: Defaults.MobileGreyC, pbm: Defaults.MobileGreyI)
+    }
+    
+    struct ToolBar {
+        static let ToolBarDivider = BrowserColor(normal: UIColor.black.withAlphaComponent(0.25), pbm: UIColor.black.withAlphaComponent(0.5))
     }
 
     // The back/forward/refresh/menu button (bottom toolbar)
     struct ToolbarButton {
-        static let SelectedTint = BrowserColor(normal: Defaults.MobileBlueD, pbm: Defaults.MobilePurpleB)
-        static let DisabledTint = BrowserColor(normal: UIColor.lightGray, pbm: UIColor.gray)
+        static let SelectedTint = BrowserColor(normal: Defaults.MobileBlueA, pbm: Defaults.MobilePurpleB)
+        static let DisabledTint = BrowserColor(normal: Defaults.MobileGreyG.withAlphaComponent(0.3), pbm: Defaults.MobileGreyF.withAlphaComponent(0.3))
     }
 
     struct LoadingBar {
@@ -108,8 +112,8 @@ extension UIColor {
     }
 
     struct TopTabs {
-        static let PrivateModeTint = BrowserColor(normal: Defaults.Grey10, pbm: Defaults.Grey40)
-        static let Background = UIColor.Defaults.Grey80
+        static let PrivateModeTint = BrowserColor(normal: Defaults.MobileBlueA, pbm: Defaults.MobileGreyE)
+        static let Background = Defaults.MobileGreyB
     }
 
     struct HomePanel {
@@ -118,7 +122,7 @@ extension UIColor {
         // Keep this just in case someone decides they want it to theme again
         static let ToolbarBackground = BrowserColor(normal: Defaults.MobileGreyB, pbm: Defaults.MobileGreyI)
         static let ToolbarHighlight = BrowserColor(normal: Defaults.MobileBlueA, pbm: Defaults.MobileBlueA)
-        static let ToolbarTint = BrowserColor(normal: Defaults.MobileGreyH, pbm: Defaults.MobileGreyF)
+        static let ToolbarTint = BrowserColor(normal: Defaults.MobileGreyG, pbm: Defaults.MobileGreyF)
     }
 }
 

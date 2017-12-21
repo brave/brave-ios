@@ -244,14 +244,14 @@ class TabToolbar: UIView {
     }
 
     override func draw(_ rect: CGRect) {
-        if let context = UIGraphicsGetCurrentContext() {
-            drawLine(context, start: CGPoint(x: 0, y: 0), end: CGPoint(x: frame.width, y: 0))
-        }
+//        if let context = UIGraphicsGetCurrentContext() {
+//            drawLine(context, start: CGPoint(x: 0, y: 0), end: CGPoint(x: frame.width, y: 0))
+//        }
     }
 
     fileprivate func drawLine(_ context: CGContext, start: CGPoint, end: CGPoint) {
-        context.setStrokeColor(UIColor.black.withAlphaComponent(0.05).cgColor)
-        context.setLineWidth(2)
+        context.setStrokeColor(UIColor.black.withAlphaComponent(0.25).cgColor)
+        context.setLineWidth(1)
         context.move(to: CGPoint(x: start.x, y: start.y))
         context.addLine(to: CGPoint(x: end.x, y: end.y))
         context.strokePath()

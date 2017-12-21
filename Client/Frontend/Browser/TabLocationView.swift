@@ -290,7 +290,7 @@ extension TabLocationView: AccessibilityActionsSource {
 extension TabLocationView: Themeable {
     func applyTheme(_ theme: Theme) {
         backgroundColor = UIColor.TextField.Background.colorFor(theme)
-        urlTextField.textColor = UIColor.Browser.Tint.colorFor(theme)
+        urlTextField.textColor = UIColor.TextField.TextAndTint.colorFor(theme)
         readerModeButton.selectedTintColor = UIColor.TextField.ReaderModeButtonSelected.colorFor(theme)
         readerModeButton.unselectedTintColor = UIColor.TextField.ReaderModeButtonUnselected.colorFor(theme)
         
