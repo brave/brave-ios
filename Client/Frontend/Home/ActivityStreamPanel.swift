@@ -1010,7 +1010,7 @@ class ASHeaderView: UICollectionReusableView {
         return button
     }()
 
-    var title: String? {
+    @objc var title: String? {
         willSet(newTitle) {
             titleLabel.text = newTitle
         }
