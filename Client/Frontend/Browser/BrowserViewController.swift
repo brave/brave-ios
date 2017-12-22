@@ -261,17 +261,17 @@ class BrowserViewController: UIViewController {
             }, completion: nil)
     }
 
-    func SELappDidEnterBackgroundNotification() {
+    @objc func SELappDidEnterBackgroundNotification() {
         displayedPopoverController?.dismiss(animated: false) {
             self.displayedPopoverController = nil
         }
     }
 
-    func SELtappedTopArea() {
+    @objc func SELtappedTopArea() {
         scrollController.showToolbars(animated: true)
     }
 
-    func SELappWillResignActiveNotification() {
+    @objc func SELappWillResignActiveNotification() {
         // Dismiss any popovers that might be visible
         displayedPopoverController?.dismiss(animated: false) {
             self.displayedPopoverController = nil
@@ -291,7 +291,7 @@ class BrowserViewController: UIViewController {
         presentedViewController?.view.alpha = 0
     }
 
-    func SELappDidBecomeActiveNotification() {
+    @objc func SELappDidBecomeActiveNotification() {
         // Re-show any components that might have been hidden because they were being displayed
         // as part of a private mode tab
         UIView.animate(withDuration: 0.2, delay: 0, options: UIViewAnimationOptions(), animations: {
@@ -1655,14 +1655,14 @@ extension BrowserViewController: TabDelegate {
 
     func showBar(_ bar: SnackBar, animated: Bool) {
         view.layoutIfNeeded()
-        UIView.animate(withDuration: animated ? 0.25 : 0, animations: { _ in
+        UIView.animate(withDuration: animated ? 0.25 : 0, animations: { 
             self.alertStackView.insertArrangedSubview(bar, at: 0)
             self.view.layoutIfNeeded()
         })
     }
 
     func removeBar(_ bar: SnackBar, animated: Bool) {
-        UIView.animate(withDuration: animated ? 0.25 : 0, animations: { _ in
+        UIView.animate(withDuration: animated ? 0.25 : 0, animations: { 
             bar.removeFromSuperview()
         })
     }
@@ -2188,7 +2188,7 @@ extension BrowserViewController {
         }
     }
 
-    func SELDynamicFontChanged(_ notification: Notification) {
+    @objc func SELDynamicFontChanged(_ notification: Notification) {
         guard notification.name == NotificationDynamicFontChanged else { return }
 
         var readerModeStyle = DefaultReaderModeStyle
@@ -2316,7 +2316,7 @@ extension BrowserViewController: IntroViewControllerDelegate {
 
     func introViewControllerDidFinish(_ introViewController: IntroViewController, requestToLogin: Bool) {
         self.profile.prefs.setInt(1, forKey: IntroViewControllerSeenProfileKey)
-        introViewController.dismiss(animated: true) { finished in
+        introViewController.dismiss(animated: true) {
             if self.navigationController?.viewControllers.count ?? 0 > 1 {
                 _ = self.navigationController?.popToRootViewController(animated: true)
             }
@@ -2348,7 +2348,7 @@ extension BrowserViewController: IntroViewControllerDelegate {
         self.present(settingsNavigationController, animated: true, completion: nil)
     }
 
-    func dismissSignInViewController() {
+    @objc func dismissSignInViewController() {
         self.dismiss(animated: true, completion: nil)
     }
 
@@ -2459,7 +2459,7 @@ extension BrowserViewController: ContextMenuHelperDelegate {
                 let changeCount = pasteboard.changeCount
                 let application = UIApplication.shared
                 var taskId: UIBackgroundTaskIdentifier = 0
-                taskId = application.beginBackgroundTask (expirationHandler: { _ in
+                taskId = application.beginBackgroundTask (expirationHandler: {
                     application.endBackgroundTask(taskId)
                 })
 
@@ -2511,7 +2511,7 @@ extension BrowserViewController: ContextMenuHelperDelegate {
 }
 
 extension BrowserViewController {
-    func image(_ image: UIImage, didFinishSavingWithError error: NSError?, contextInfo: UnsafeRawPointer) {
+    @objc func image(_ image: UIImage, didFinishSavingWithError error: NSError?, contextInfo: UnsafeRawPointer) {
         if error == nil {
             LeanPlumClient.shared.track(event: .saveImage)
         }
@@ -2592,7 +2592,7 @@ extension BrowserViewController {
         }
     }
 
-    func addCustomSearchEngineForFocusedElement() {
+    @objc func addCustomSearchEngineForFocusedElement() {
         guard let webView = tabManager.selectedTab?.webView else {
             return
         }

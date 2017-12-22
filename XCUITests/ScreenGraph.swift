@@ -105,13 +105,13 @@ extension ScreenGraph {
 
         let firstNodeName = actions[0]
         if let existing = namedScenes[firstNodeName] {
-            xcTest.recordFailure(withDescription: "Action \(firstNodeName) is defined elsewhere, but should be unique", inFile: file, atLine: line, expected: true)
-            xcTest.recordFailure(withDescription: "Action \(firstNodeName) is defined elsewhere, but should be unique", inFile: existing.file, atLine: existing.line, expected: true)
+            xcTest.recordFailure(withDescription: "Action \(firstNodeName) is defined elsewhere, but should be unique", inFile: file, atLine: Int(line), expected: true)
+            xcTest.recordFailure(withDescription: "Action \(firstNodeName) is defined elsewhere, but should be unique", inFile: existing.file, atLine: Int(existing.line), expected: true)
         }
 
         if let screenState = screenState {
             guard let _ = namedScenes[screenState] as? ScreenStateNode else {
-                xcTest.recordFailure(withDescription: "Expected \(screenState) to be a screen state", inFile: file, atLine: line, expected: false)
+                xcTest.recordFailure(withDescription: "Expected \(screenState) to be a screen state", inFile: file, atLine: Int(line), expected: false)
                 return
             }
         }
@@ -133,8 +133,8 @@ extension ScreenGraph {
         let actionNode: ScreenActionNode<T>
         if let existingNode = namedScenes[name] {
             guard let existing = existingNode as? ScreenActionNode else {
-                self.xcTest.recordFailure(withDescription: "Screen state \(name) conflicts with an identically named action", inFile: existingNode.file, atLine: existingNode.line, expected: false)
-                self.xcTest.recordFailure(withDescription: "Action \(name) conflicts with an identically named screen state", inFile: file, atLine: line, expected: false)
+                self.xcTest.recordFailure(withDescription: "Screen state \(name) conflicts with an identically named action", inFile: existingNode.file, atLine: Int(existingNode.line), expected: false)
+                self.xcTest.recordFailure(withDescription: "Action \(name) conflicts with an identically named screen state", inFile: file, atLine: Int(line), expected: false)
                 return
             }
             // The new node has to have the same nextNodeName as the existing node.
@@ -142,8 +142,8 @@ extension ScreenGraph {
             if let d1 = existing.nextNodeName,
                 let d2 = nextNodeName,
                 d1 != d2 {
-                self.xcTest.recordFailure(withDescription: "\(name) action points to \(d2) elsewhere", inFile: existing.file, atLine: existing.line, expected: false)
-                self.xcTest.recordFailure(withDescription: "\(name) action points to \(d1) elsewhere", inFile: file, atLine: line, expected: false)
+                self.xcTest.recordFailure(withDescription: "\(name) action points to \(d2) elsewhere", inFile: existing.file, atLine: Int(existing.line), expected: false)
+                self.xcTest.recordFailure(withDescription: "\(name) action points to \(d1) elsewhere", inFile: file, atLine: Int(line), expected: false)
                 return
             }
 
@@ -193,7 +193,7 @@ extension ScreenGraph {
         guard let name = startingAt ?? userState.initialScreenState,
             let startingScreenState = namedScenes[name] as? ScreenStateNode else {
                 xcTest.recordFailure(withDescription: "The app's initial state couldn't be established.",
-                                     inFile: file, atLine: line, expected: false)
+                                     inFile: file, atLine: Int(line), expected: false)
                 fatalError("The app's initial state couldn't be established.")
         }
 
@@ -405,16 +405,16 @@ extension ScreenStateNode {
 
         let edge = Edge(destinationName: nodeName, predicate: predicate, transition: { xcTest, file, line in
             if let el = element {
-                waitOrTimeout(existsPredicate, object: el) { _ in
-                    xcTest.recordFailure(withDescription: "Cannot get from \(self.name) to \(nodeName). See \(declFile):\(declLine)", inFile: file, atLine: line, expected: false)
-                    xcTest.recordFailure(withDescription: "Cannot find \(el)", inFile: declFile, atLine: declLine, expected: false)
+                waitOrTimeout(existsPredicate, object: el) {
+                    xcTest.recordFailure(withDescription: "Cannot get from \(self.name) to \(nodeName). See \(declFile):\(declLine)", inFile: file, atLine: Int(line), expected: false)
+                    xcTest.recordFailure(withDescription: "Cannot find \(el)", inFile: declFile, atLine: Int(declLine), expected: false)
                 }
             }
             g()
         })
 
         guard let _ = map?.namedScenes[nodeName] else {
-            map?.xcTest.recordFailure(withDescription: "Node \(nodeName) has not been declared anywhere", inFile: file, atLine: line, expected: false)
+            map?.xcTest.recordFailure(withDescription: "Node \(nodeName) has not been declared anywhere", inFile: file, atLine: Int(line), expected: false)
             return 
         }
         addEdge(nodeName, by: edge)
@@ -663,7 +663,8 @@ class Navigator<T: UserState> {
             return path
         }
 
-        let extras = followUpActions(destNode).flatMap { $0.name }
+        // FIXME: swift4, moved from flatMap to map, not 100% sure about this
+        let extras = followUpActions(destNode).map { $0.name }
 
         return path + extras
     }
@@ -675,13 +676,13 @@ class Navigator<T: UserState> {
     func goto(_ nodeName: String, file: String = #file, line: UInt = #line, visitWith nodeVisitor: @escaping NodeVisitor) {
         let gkSrc = currentScene.gkNode
         guard let gkDest = map.namedScenes[nodeName]?.gkNode else {
-            xcTest.recordFailure(withDescription: "Cannot route to \(nodeName), because it doesn't exist", inFile: file, atLine: line, expected: false)
+            xcTest.recordFailure(withDescription: "Cannot route to \(nodeName), because it doesn't exist", inFile: file, atLine: Int(line), expected: false)
             return
         }
 
         var gkPath = map.gkGraph.findPath(from: gkSrc, to: gkDest)
         guard gkPath.count > 0 else {
-            xcTest.recordFailure(withDescription: "Cannot route from \(currentScene.name) to \(nodeName)", inFile: file, atLine: line, expected: false)
+            xcTest.recordFailure(withDescription: "Cannot route from \(currentScene.name) to \(nodeName)", inFile: file, atLine: Int(line), expected: false)
             return
         }
 
@@ -747,7 +748,7 @@ class Navigator<T: UserState> {
     /// This method will always return the app to a valid screen state.
     func performAction(_ screenActionName: String, file: String = #file, line: UInt = #line) {
         guard let _ = map.namedScenes[screenActionName] as? ScreenActionNode else {
-            xcTest.recordFailure(withDescription: "\(screenActionName) is not an action", inFile: file, atLine: line, expected: false)
+            xcTest.recordFailure(withDescription: "\(screenActionName) is not an action", inFile: file, atLine: Int(line), expected: false)
             return
         }
         goto(screenActionName, file: file, line: line)
@@ -760,8 +761,8 @@ class Navigator<T: UserState> {
 
         guard let returnNode = currentScene.returnNode,
             let _ = currentScene.backAction else {
-                xcTest.recordFailure(withDescription: "No valid back action", inFile: currentScene.file, atLine: currentScene.line, expected: false)
-                xcTest.recordFailure(withDescription: "No valid back action", inFile: file, atLine: line, expected: false)
+                xcTest.recordFailure(withDescription: "No valid back action", inFile: currentScene.file, atLine: Int(currentScene.line), expected: false)
+                xcTest.recordFailure(withDescription: "No valid back action", inFile: file, atLine: Int(line), expected: false)
                 return
         }
 
@@ -787,7 +788,7 @@ class Navigator<T: UserState> {
      */
     func nowAt(_ nodeName: String, file: String = #file, line: UInt = #line) {
         guard let newScene = map.namedScenes[nodeName] else {
-            xcTest.recordFailure(withDescription: "Cannot force to unknown \(nodeName). Currently at \(currentScene.name)", inFile: file, atLine: line, expected: false)
+            xcTest.recordFailure(withDescription: "Cannot force to unknown \(nodeName). Currently at \(currentScene.name)", inFile: file, atLine: Int(line), expected: false)
             return
         }
         currentScene = newScene
@@ -863,10 +864,10 @@ fileprivate extension Navigator {
             }
 
             if shouldWait {
-                condition.wait { _ in
+                condition.wait {
                     self.xcTest.recordFailure(withDescription: "Unsuccessfully entered \(nextScene.name)",
                         inFile: condition.file,
-                        atLine: condition.line,
+                        atLine: Int(condition.line),
                         expected: false)
                 }
             }

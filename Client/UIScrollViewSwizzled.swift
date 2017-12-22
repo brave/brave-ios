@@ -6,13 +6,13 @@ import Shared
 
 // Workaround for bug 1417152, whereby NaN bounds are being set on the scrollview when viewing PDFs in the web view.
 // Is fixed in WebKit, remove this file when the fix arrives in iOS release.
-
+/*
 private let swizzling: (UIScrollView.Type) -> Void = { obj in
     let originalSelector = #selector(setter: UIView.bounds)
     let swizzledSelector = #selector(obj.swizzle_setBounds(bounds:))
     let originalMethod = class_getInstanceMethod(obj, originalSelector)
     let swizzledMethod = class_getInstanceMethod(obj, swizzledSelector)
-    method_exchangeImplementations(originalMethod, swizzledMethod)
+    method_exchangeImplementations(originalMethod!, swizzledMethod!)
 }
 
 extension UIScrollView {
@@ -24,7 +24,7 @@ extension UIScrollView {
         swizzling(self)
     }
 
-    func swizzle_setBounds(bounds: CGRect) {
+    @objc func swizzle_setBounds(bounds: CGRect) {
         [bounds.origin.x, bounds.origin.y, bounds.size.width, bounds.size.height].forEach() { val in
             if val.isNaN || val.isInfinite {
                 Sentry.shared.send(message: "Bad scrollview bounds detected.")
@@ -35,3 +35,5 @@ extension UIScrollView {
         self.swizzle_setBounds(bounds: bounds)
     }
 }
+
+*/

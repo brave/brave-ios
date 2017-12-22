@@ -35,7 +35,7 @@ private struct ShareDialogControllerUX {
     static let NavigationBarIconSize = 40                                                           // Width and height of the icon
     static let NavigationBarBottomPadding = 12
 
-    static let ItemTitleFontMedium = UIFont.systemFont(ofSize: 15, weight: UIFontWeightMedium)
+    static let ItemTitleFontMedium = UIFont.systemFont(ofSize: 15, weight: UIFont.Weight.medium)
     static let ItemTitleFont = UIFont.systemFont(ofSize: 15)
     static let ItemTitleMaxNumberOfLines = 2
     static let ItemTitleLeftPadding = 44
@@ -95,11 +95,11 @@ class ShareDialogController: UIViewController, UITableViewDataSource, UITableVie
             target: self,
             action: #selector(ShareDialogController.cancel)
         )
-        navItem.leftBarButtonItem?.setTitleTextAttributes([NSFontAttributeName: ShareDialogControllerUX.NavigationBarCancelButtonFont], for: UIControlState())
+        navItem.leftBarButtonItem?.setTitleTextAttributes([NSAttributedStringKey.font: ShareDialogControllerUX.NavigationBarCancelButtonFont], for: UIControlState())
         navItem.leftBarButtonItem?.accessibilityIdentifier = "ShareDialogController.navigationItem.leftBarButtonItem"
 
         navItem.rightBarButtonItem = UIBarButtonItem(title: NSLocalizedString("Add", tableName: "ShareTo", comment: "Add button in the share dialog"), style: UIBarButtonItemStyle.done, target: self, action: #selector(ShareDialogController.add))
-        navItem.rightBarButtonItem?.setTitleTextAttributes([NSFontAttributeName: ShareDialogControllerUX.NavigationBarAddButtonFont], for: UIControlState())
+        navItem.rightBarButtonItem?.setTitleTextAttributes([NSAttributedStringKey.font: ShareDialogControllerUX.NavigationBarAddButtonFont], for: UIControlState())
 
         let logo = UIImageView(image: UIImage(named: "Icon-Small"))
         logo.contentMode = UIViewContentMode.scaleAspectFit // TODO Can go away if icon is provided in correct size
@@ -193,11 +193,11 @@ class ShareDialogController: UIViewController, UITableViewDataSource, UITableVie
 
     // UITabBarItem Actions that map to our delegate methods
 
-    func cancel() {
+    @objc func cancel() {
         delegate?.shareControllerDidCancel(self)
     }
 
-    func add() {
+    @objc func add() {
         delegate?.shareController(self, didShareItem: item, toDestinations: NSSet(set: selectedShareDestinations))
     }
 

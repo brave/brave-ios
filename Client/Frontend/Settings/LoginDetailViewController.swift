@@ -301,7 +301,7 @@ extension LoginDetailViewController {
         }
     }
 
-    func SELedit() {
+    @objc func SELedit() {
         editingInfo = true
 
         let cell = tableView.cellForRow(at: InfoItem.usernameItem.indexPath) as! LoginTableViewCell
@@ -310,7 +310,7 @@ extension LoginDetailViewController {
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(LoginDetailViewController.SELdoneEditing))
     }
 
-    func SELdoneEditing() {
+    @objc func SELdoneEditing() {
         editingInfo = false
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(LoginDetailViewController.SELedit))
         

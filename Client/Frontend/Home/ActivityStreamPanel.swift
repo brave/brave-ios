@@ -144,7 +144,7 @@ class ActivityStreamPanel: UICollectionViewController, HomePanel {
         self.topSitesManager.currentTraits = self.traitCollection
     }
 
-    func didChangeFontSize(notification: Notification) {
+    @objc func didChangeFontSize(notification: Notification) {
         // Don't need to invalidate the data for a font change. Just reload the UI.
         reloadAll()
     }
@@ -1010,7 +1010,7 @@ class ASHeaderView: UICollectionReusableView {
         return button
     }()
 
-    var title: String? {
+    @objc var title: String? {
         willSet(newTitle) {
             titleLabel.text = newTitle
         }
@@ -1039,7 +1039,7 @@ class ASHeaderView: UICollectionReusableView {
             make.bottom.equalTo(self)
             self.rightConstraint = make.trailing.equalTo(self).inset(-titleInsets).constraint
         }
-        moreButton.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: UILayoutConstraintAxis.horizontal)
+        moreButton.setContentCompressionResistancePriority(UILayoutPriority.required, for: UILayoutConstraintAxis.horizontal)
         titleLabel.snp.makeConstraints { make in
             self.leftConstraint = make.leading.equalTo(self).inset(titleInsets).constraint
             make.trailing.equalTo(moreButton.snp.leading).inset(-ASHeaderViewUX.TitleTopInset)

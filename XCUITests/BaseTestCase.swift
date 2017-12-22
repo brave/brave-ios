@@ -25,7 +25,7 @@ class BaseTestCase: XCTestCase {
     }
 
     func restart(_ app: XCUIApplication, args: [String] = []) {
-        XCUIDevice.shared().press(.home)
+        XCUIDevice.shared.press(.home)
         var launchArguments = [LaunchArguments.Test]
         args.forEach { arg in
             launchArguments.append(arg)
@@ -62,7 +62,7 @@ class BaseTestCase: XCTestCase {
         let result = XCTWaiter().wait(for: [expectation], timeout: timeout)
         if result != .completed {
             let message = description ?? "Expect predicate \(predicateString) for \(element.description)"
-            self.recordFailure(withDescription: message, inFile: file, atLine: line, expected: false)
+            self.recordFailure(withDescription: message, inFile: file, atLine: Int(line), expected: false)
         }
     }
 

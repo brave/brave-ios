@@ -16,9 +16,9 @@ class ContentBlockerSettingsTableView: SettingsTableViewController {
         // TODO: Get a dedicated string for this.
         let title = NSLocalizedString("More Info…", tableName: "SendAnonymousUsageData", comment: "Re-using more info label from 'anonymous usage data' item for showing a 'More Info' link on the Tracking Protection settings screen.")
 
-        var attributes = [String: AnyObject]()
-        attributes[NSFontAttributeName] = UIFont.systemFont(ofSize: 12, weight: UIFontWeightRegular)
-        attributes[NSForegroundColorAttributeName] = UIConstants.HighlightBlue
+        var attributes = [NSAttributedStringKey: AnyObject]()
+        attributes[NSAttributedStringKey.font] = UIFont.systemFont(ofSize: 12, weight: UIFont.Weight.regular)
+        attributes[NSAttributedStringKey.foregroundColor] = UIConstants.HighlightBlue
 
         let button = UIButton()
         button.setAttributedTitle(NSAttributedString(string: title, attributes: attributes), for: .normal)
@@ -29,7 +29,7 @@ class ContentBlockerSettingsTableView: SettingsTableViewController {
         return button
     }
 
-    func moreInfoTapped() {
+    @objc func moreInfoTapped() {
         let viewController = SettingsContentViewController()
         viewController.url = SupportUtils.URLForTopic("tracking-protection-ios")
         navigationController?.pushViewController(viewController, animated: true)

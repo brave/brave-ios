@@ -165,16 +165,22 @@ class ReadingListSQLStorage: ReadingListStorage {
 
     fileprivate func rowToDictionary(_ row: Row) -> [String: Any] {
         var result: [String: Any] = [:]
-        result["client_id"] = NSNumber(value: row.get(ItemColumns.ClientId))
-        result["client_last_modified"] = NSNumber(value: row.get(ItemColumns.ClientLastModified))
-        result["id"] = row.get(ItemColumns.Id)
-        result["last_modified"] = NSNumber(value: row.get(ItemColumns.LastModified) ?? 0)
-        result["url"] = row.get(ItemColumns.Url)
-        result["title"] = row.get(ItemColumns.Title)
-        result["added_by"] = row.get(ItemColumns.AddedBy)
-        result["archived"] = row.get(ItemColumns.Archived)
-        result["favorite"] = row.get(ItemColumns.Favorite)
-        result["unread"] = row.get(ItemColumns.Unread)
-        return result
+        do {
+        result["client_id"] = try NSNumber(value: row.get(ItemColumns.ClientId))
+        result["client_last_modified"] = try NSNumber(value: row.get(ItemColumns.ClientLastModified))
+        result["id"] = try row.get(ItemColumns.Id)
+        result["last_modified"] = try NSNumber(value: row.get(ItemColumns.LastModified) ?? 0)
+        result["url"] = try row.get(ItemColumns.Url)
+        result["title"] = try row.get(ItemColumns.Title)
+        result["added_by"] = try row.get(ItemColumns.AddedBy)
+        result["archived"] = try row.get(ItemColumns.Archived)
+        result["favorite"] = try row.get(ItemColumns.Favorite)
+        result["unread"] = try row.get(ItemColumns.Unread)
+        } catch {
+            // FIXME: Swift 4, handle the error better
+            print("rowToDictionary error")
+            return [:]
+        }
+            return result
     }
 }

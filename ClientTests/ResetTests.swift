@@ -50,6 +50,7 @@ func assertClientsHaveGUIDsFromStorage(_ storage: RemoteClientsAndTabs, expected
 }
 
 class ResetTests: XCTestCase {
+
     func testResetting() {
         let profile = MockBrowserProfile(localName: "testResetTests")
 
@@ -75,4 +76,5 @@ class ResetTests: XCTestCase {
         XCTAssertNotNil(empty)
         XCTAssertEqual(empty!, [])
     }
+
 }

@@ -51,7 +51,7 @@ class ReaderModeBarView: UIView {
     var settingsButton: UIButton!
     var listStatusButton: UIButton!
 
-    dynamic var buttonTintColor: UIColor = UIColor.clear {
+    @objc dynamic var buttonTintColor: UIColor = UIColor.clear {
         didSet {
             readStatusButton.tintColor = self.buttonTintColor
             settingsButton.tintColor = self.buttonTintColor
@@ -110,15 +110,15 @@ class ReaderModeBarView: UIView {
         return button
     }
 
-    func SELtappedReadStatusButton(_ sender: UIButton!) {
+    @objc func SELtappedReadStatusButton(_ sender: UIButton!) {
         delegate?.readerModeBar(self, didSelectButton: unread ? .markAsRead : .markAsUnread)
     }
 
-    func SELtappedSettingsButton(_ sender: UIButton!) {
+    @objc func SELtappedSettingsButton(_ sender: UIButton!) {
         delegate?.readerModeBar(self, didSelectButton: .settings)
     }
 
-    func SELtappedListStatusButton(_ sender: UIButton!) {
+    @objc func SELtappedListStatusButton(_ sender: UIButton!) {
         delegate?.readerModeBar(self, didSelectButton: added ? .removeFromReadingList : .addToReadingList)
     }
 

@@ -201,15 +201,15 @@ class ClientPickerViewController: UITableViewController {
         })
     }
 
-    func refresh() {
+    @objc func refresh() {
         reloadClients()
     }
 
-    func cancel() {
+    @objc func cancel() {
         clientPickerDelegate?.clientPickerViewControllerDidCancel(self)
     }
 
-    func send() {
+    @objc func send() {
         var clients = [RemoteClient]()
         for indexPath in selectedClients {
             clients.append(self.clients[(indexPath as AnyObject).row])

@@ -164,7 +164,7 @@ private var isTablet: Bool {
 }
 
 // Matches the available options in app settings for enabling Tracking Protection
-fileprivate enum TrackingProtectionSetting : Int { case alwaysOn; case privateOnly; case off }
+enum TrackingProtectionSetting : Int { case alwaysOn; case privateOnly; case off }
 
 class FxUserState: UserState {
     required init() {
@@ -172,33 +172,33 @@ class FxUserState: UserState {
         initialScreenState = FirstRun
     }
 
-    var isTablet: Bool {
+    @objc var isTablet: Bool {
         return UIDevice.current.userInterfaceIdiom == .pad
     }
 
-    var isPrivate = false
-    var showIntro = false
-    var showWhatsNew = false
-    var waitForLoading = true
+    @objc var isPrivate = false
+    @objc var showIntro = false
+    @objc var showWhatsNew = false
+    @objc var waitForLoading = true
     var url: String? = nil
     var requestDesktopSite = false
 
-    var passcode: String? = nil
+    @objc var passcode: String? = nil
     var newPasscode: String = "111111"
     var wrongPasscode: String = "111112"
 
-    var noImageMode = false
-    var nightMode = false
+    @objc var noImageMode = false
+    @objc var nightMode = false
 
-    var pocketInNewTab = false
+    @objc var pocketInNewTab = false
 
-    var fxaUsername: String? = nil
-    var fxaPassword: String? = nil
+    @objc var fxaUsername: String? = nil
+    @objc var fxaPassword: String? = nil
 
     var numTabs: Int = 0
 
     var trackingProtectionPerTabEnabled = true // TP can be shut off on a per-tab basis
-    var trackingProtectionSetting = TrackingProtectionSetting.privateOnly.rawValue // NSPredicate doesn't work with enum
+    @objc var trackingProtectionSetting = TrackingProtectionSetting.privateOnly.rawValue // NSPredicate doesn't work with enum
     // Construct an NSPredicate with this condition to use it.
     static let trackingProtectionIsOnCondition = "trackingProtectionSetting == \(TrackingProtectionSetting.alwaysOn.rawValue) || (trackingProtectionSetting == \(TrackingProtectionSetting.privateOnly.rawValue) && isPrivate == YES)"
 }
@@ -855,7 +855,7 @@ extension XCUIElement {
             return
         }
 
-        func firstInvisibleCell(_ start: UInt) -> UInt {
+        func firstInvisibleCell(_ start: Int) -> Int {
             let cells = self.cells
             for i in start ..< cells.count {
                 let cell = cells.element(boundBy: i)
@@ -866,10 +866,10 @@ extension XCUIElement {
                 }
             }
 
-            return UInt.min
+            return 0
         }
 
-        var cellNum: UInt = 0
+        var cellNum: Int = 0
         var screenNum = 0
 
         while true {

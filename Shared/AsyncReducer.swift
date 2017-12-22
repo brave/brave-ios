@@ -50,11 +50,11 @@ open class AsyncReducer<T, U> {
         return terminal.isFilled
     }
 
-    public convenience init(initialValue: T, queue: DispatchQueue = DefaultDispatchQueue, combine: @escaping Combine) {
+    public convenience init(initialValue: T, queue: DispatchQueue = DispatchQueue.global(qos: DispatchQoS.default.qosClass), combine: @escaping Combine) {
         self.init(initialValue: deferMaybe(initialValue), queue: queue, combine: combine)
     }
 
-    public init(initialValue: Deferred<Maybe<T>>, queue: DispatchQueue = DefaultDispatchQueue, combine: @escaping Combine) {
+    public init(initialValue: Deferred<Maybe<T>>, queue: DispatchQueue = DispatchQueue.global(qos: DispatchQoS.default.qosClass), combine: @escaping Combine) {
         self.dispatchQueue = queue
         self.combine = combine
         self.initialValueDeferred = initialValue
@@ -94,7 +94,7 @@ open class AsyncReducer<T, U> {
                 return
             }
 
-            let combineItem = deferDispatchAsync(dispatchQueue) { _ in
+            let combineItem = deferDispatchAsync(dispatchQueue) { 
                 return self.combine(accumulator, item)
             }
 

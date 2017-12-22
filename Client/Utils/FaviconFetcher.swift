@@ -71,7 +71,7 @@ open class FaviconFetcher: NSObject, XMLParserDelegate {
 
         var oldIcons: [Favicon] = oldIcons
 
-        queue.async { _ in
+        queue.async { 
             self.parseHTMLForFavicons(url).bind({ (result: Maybe<[Favicon]>) -> Deferred<[Maybe<Favicon>]> in
                 var deferreds = [Deferred<Maybe<Favicon>>]()
                 if let icons = result.successValue {
@@ -102,7 +102,7 @@ open class FaviconFetcher: NSObject, XMLParserDelegate {
     lazy fileprivate var alamofire: SessionManager = {
         let configuration = URLSessionConfiguration.default
         var defaultHeaders = SessionManager.default.session.configuration.httpAdditionalHeaders ?? [:]
-        defaultHeaders["User-Agent"] = userAgent
+        defaultHeaders["User-Agent"] = FaviconFetcher.userAgent
         configuration.httpAdditionalHeaders = defaultHeaders
         configuration.timeoutIntervalForRequest = 5
         return SessionManager(configuration: configuration)
@@ -276,7 +276,7 @@ open class FaviconFetcher: NSObject, XMLParserDelegate {
         let faviconLabel = UILabel(frame: CGRect(x: 0, y: 0, width: TwoLineCellUX.ImageSize, height: TwoLineCellUX.ImageSize))
         faviconLabel.text = faviconLetter
         faviconLabel.textAlignment = .center
-        faviconLabel.font = UIFont.systemFont(ofSize: 18, weight: UIFontWeightMedium)
+        faviconLabel.font = UIFont.systemFont(ofSize: 18, weight: UIFont.Weight.medium)
         faviconLabel.textColor = UIColor.white
         UIGraphicsBeginImageContextWithOptions(faviconLabel.bounds.size, false, 0.0)
         faviconLabel.layer.render(in: UIGraphicsGetCurrentContext()!)

@@ -45,7 +45,7 @@ class HistoryTests: KIFTestCase {
         EarlGrey.select(elementWithMatcher: grey_accessibilityLabel("History")).perform(grey_tap())
         
         // Wait until the dialog shows up
-        let listAppeared = GREYCondition(name: "Wait the history list to appear", block: { _ in
+        let listAppeared = GREYCondition(name: "Wait the history list to appear", block: { 
             var errorOrNil: NSError?
             let matcher = grey_allOf([grey_accessibilityLabel("Page 2"),
                                       grey_sufficientlyVisible()])
@@ -91,7 +91,7 @@ class HistoryTests: KIFTestCase {
             .assert(grey_notNil())
         
         // check page 1 does not exist
-        let historyRemoved = GREYCondition(name: "Check entry is removed", block: { _ in
+        let historyRemoved = GREYCondition(name: "Check entry is removed", block: { 
             var errorOrNil: NSError?
             let matcher = grey_allOf([grey_accessibilityLabel(urls[0]),
                                               grey_sufficientlyVisible()])
@@ -128,7 +128,7 @@ class HistoryTests: KIFTestCase {
             .assert(grey_notNil())
         
         // check page 1 does not exist
-        let historyRemoved = GREYCondition(name: "Check entry is removed", block: { _ in
+        let historyRemoved = GREYCondition(name: "Check entry is removed", block: { 
             var errorOrNil: NSError?
             let matcher = grey_allOf([grey_accessibilityLabel(urlToDelete),
                                               grey_sufficientlyVisible()])

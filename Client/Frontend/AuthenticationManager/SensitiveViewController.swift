@@ -35,7 +35,7 @@ class SensitiveViewController: UIViewController {
         notificationCenter.removeObserver(self, name: NSNotification.Name.UIApplicationDidEnterBackground, object: nil)
     }
 
-    func checkIfUserRequiresValidation() {
+    @objc func checkIfUserRequiresValidation() {
         guard authState != .presenting else {
             return
         }
@@ -67,11 +67,11 @@ class SensitiveViewController: UIViewController {
         authState = .presenting
     }
 
-    func hideLogins() {
+    @objc func hideLogins() {
         _ = self.navigationController?.popToRootViewController(animated: true)
     }
 
-    func blurContents() {
+    @objc func blurContents() {
         if backgroundedBlur == nil {
             backgroundedBlur = addBlurredContent()
         }

@@ -300,7 +300,7 @@ class TabTrayController: UIViewController {
         self.tabManager.removeDelegate(self)
     }
 
-    func dynamicFontChanged(_ notification: Notification) {
+    @objc func dynamicFontChanged(_ notification: Notification) {
         guard notification.name == NotificationDynamicFontChanged else { return }
 
         self.collectionView.reloadData()
@@ -415,12 +415,12 @@ class TabTrayController: UIViewController {
         present(controller, animated: true, completion: nil)
     }
 
-    func didClickAddTab() {
+    @objc func didClickAddTab() {
         openNewTab()
         LeanPlumClient.shared.track(event: .openedNewTab, withParameters: ["Source": "Tab Tray" as AnyObject])
     }
 
-    func didTapLearnMore() {
+    @objc func didTapLearnMore() {
         let appVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
         if let langID = Locale.preferredLanguages.first {
             let learnMoreRequest = URLRequest(url: "https://support.mozilla.org/1/mobile/\(appVersion)/iOS/\(langID)/private-browsing-ios".asURL!)
@@ -428,7 +428,7 @@ class TabTrayController: UIViewController {
         }
     }
 
-    func didTogglePrivateMode() {
+    @objc func didTogglePrivateMode() {
         let scaleDownTransform = CGAffineTransform(scaleX: 0.9, y: 0.9)
 
         let fromView: UIView
@@ -499,7 +499,7 @@ class TabTrayController: UIViewController {
 
         // We're only doing one update here, but using a batch update lets us delay selecting the tab
         // until after its insert animation finishes.
-        self.collectionView.performBatchUpdates({ _ in
+        self.collectionView.performBatchUpdates({
             let tab = self.tabManager.addTab(request, isPrivate: self.privateMode)
         }, completion: { finished in
             // The addTab delegate method will pop to the BVC no need to do anything here.
@@ -524,13 +524,13 @@ class TabTrayController: UIViewController {
 
 // MARK: - App Notifications
 extension TabTrayController {
-    func appWillResignActiveNotification() {
+    @objc func appWillResignActiveNotification() {
         if privateMode {
             collectionView.alpha = 0
         }
     }
 
-    func appDidBecomeActiveNotification() {
+    @objc func appDidBecomeActiveNotification() {
         // Re-show any components that might have been hidden because they were being displayed
         // as part of a private mode tab
         UIView.animate(withDuration: 0.2, delay: 0, options: UIViewAnimationOptions(), animations: {
@@ -572,7 +572,7 @@ extension TabTrayController: TabManagerDelegate {
         }
 
         tabDataSource.addTab(tab)
-        self.collectionView?.performBatchUpdates({ _ in
+        self.collectionView?.performBatchUpdates({
             self.collectionView.insertItems(at: [IndexPath(item: index, section: 0)])
         }, completion: { finished in
             if finished {
@@ -682,7 +682,7 @@ extension TabTrayController: SettingsDelegate {
 }
 
 extension TabTrayController: PhotonActionSheetProtocol {
-    func didTapDelete(_ sender: UIButton) {
+    @objc func didTapDelete(_ sender: UIButton) {
         let controller = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         controller.addAction(UIAlertAction(title: Strings.AppMenuCloseAllTabsTitleString, style: .default, handler: { _ in self.closeTabsForCurrentTray() }))
         controller.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: "Label for Cancel button"), style: .cancel, handler: nil))
@@ -838,10 +838,10 @@ fileprivate class TabLayoutDelegate: NSObject, UICollectionViewDelegateFlowLayou
 
 private struct EmptyPrivateTabsViewUX {
     static let TitleColor = UIColor.white
-    static let TitleFont = UIFont.systemFont(ofSize: 22, weight: UIFontWeightMedium)
+    static let TitleFont = UIFont.systemFont(ofSize: 22, weight: UIFont.Weight.medium)
     static let DescriptionColor = UIColor.white
     static let DescriptionFont = UIFont.systemFont(ofSize: 17)
-    static let LearnMoreFont = UIFont.systemFont(ofSize: 15, weight: UIFontWeightMedium)
+    static let LearnMoreFont = UIFont.systemFont(ofSize: 15, weight: UIFont.Weight.medium)
     static let TextMargin: CGFloat = 18
     static let LearnMoreMargin: CGFloat = 30
     static let MaxDescriptionWidth: CGFloat = 250

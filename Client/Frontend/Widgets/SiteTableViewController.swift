@@ -11,7 +11,7 @@ struct SiteTableViewControllerUX {
     static let HeaderBorderColor = UIColor(rgb: 0xCFD5D9).withAlphaComponent(0.8)
     static let HeaderTextColor = UIAccessibilityDarkerSystemColorsEnabled() ? UIColor.black : UIColor.Defaults.Grey80
     static let HeaderBackgroundColor = UIColor.Defaults.Grey10
-    static let HeaderFont = UIFont.systemFont(ofSize: 12, weight: UIFontWeightMedium)
+    static let HeaderFont = UIFont.systemFont(ofSize: 12, weight: UIFont.Weight.medium)
     static let HeaderTextMargin = CGFloat(16)
 }
 
@@ -80,7 +80,7 @@ class SiteTableViewController: UIViewController, UITableViewDelegate, UITableVie
         }
     }
     var data: Cursor<Site> = Cursor<Site>(status: .success, msg: "No data set")
-    var tableView = UITableView()
+    @objc var tableView = UITableView()
 
     override func viewDidLoad() {
         super.viewDidLoad()

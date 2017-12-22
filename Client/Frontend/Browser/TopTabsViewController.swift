@@ -175,11 +175,11 @@ class TopTabsViewController: UIViewController {
         self.tabsButton.updateTabCount(count, animated: animated)
     }
     
-    func tabsTrayTapped() {
+    @objc func tabsTrayTapped() {
         delegate?.topTabsDidPressTabs()
     }
     
-    func newTabTapped() {
+    @objc func newTabTapped() {
         if pendingReloadData {
             return
         }
@@ -187,7 +187,7 @@ class TopTabsViewController: UIViewController {
         LeanPlumClient.shared.track(event: .openedNewTab, withParameters: ["Source": "Add tab button in the URL Bar on iPad" as AnyObject])
     }
 
-    func togglePrivateModeTapped() {
+    @objc func togglePrivateModeTapped() {
         if isUpdating || pendingReloadData {
             return
         }
@@ -213,7 +213,7 @@ class TopTabsViewController: UIViewController {
         }
     }
 
-    func reloadFavicons(_ notification: Notification) {
+    @objc func reloadFavicons(_ notification: Notification) {
         // Notifications might be called from a different thread. Make sure animations only happen on the main thread.
         DispatchQueue.main.async {
             if let tab = notification.object as? Tab, self.tabStore.index(of: tab) != nil {

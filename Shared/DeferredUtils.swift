@@ -34,10 +34,10 @@ public func >>== <T>(x: Deferred<Maybe<T>>, f: @escaping (T) -> Void) {
 }
 
 // Monadic `do` for Deferred.
-@discardableResult public func >>> <T, U>(x: Deferred<Maybe<T>>, f: @escaping () -> Deferred<Maybe<U>>) -> Deferred<Maybe<U>> {
+@discardableResult public func >>> <T, U>(x: Deferred<Maybe<T>>, f: @escaping (()) -> Deferred<Maybe<U>>) -> Deferred<Maybe<U>> {
     return x.bind { res in
         if res.isSuccess {
-            return f()
+            return f(())
         }
         return deferMaybe(res.failureValue!)
     }
