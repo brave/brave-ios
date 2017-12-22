@@ -4433,7 +4433,7 @@
 					397848DA1ED86605004C0C0B = {
 						CreatedOnToolsVersion = 8.3.2;
 						DevelopmentTeam = 43AQ936H96;
-						LastSwiftMigration = "";
+						LastSwiftMigration = 0920;
 						ProvisioningStyle = Manual;
 						SystemCapabilities = {
 							com.apple.Push = {
@@ -4471,7 +4471,7 @@
 					E4BA8A2A1B4B0A1600BC2E95 = {
 						CreatedOnToolsVersion = 6.4;
 						DevelopmentTeam = 43AQ936H96;
-						LastSwiftMigration = "";
+						LastSwiftMigration = 0920;
 						ProvisioningStyle = Manual;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
@@ -4540,7 +4540,7 @@
 					F84B22481A0920C600AAB793 = {
 						CreatedOnToolsVersion = 6.1;
 						DevelopmentTeam = 43AQ936H96;
-						LastSwiftMigration = "";
+						LastSwiftMigration = 0920;
 						ProvisioningStyle = Manual;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
@@ -4557,7 +4557,7 @@
 					F84B225B1A09210A00AAB793 = {
 						CreatedOnToolsVersion = 6.1;
 						DevelopmentTeam = 43AQ936H96;
-						LastSwiftMigration = "";
+						LastSwiftMigration = 0920;
 						ProvisioningStyle = Manual;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
@@ -6381,7 +6381,7 @@
 				PRODUCT_NAME = NotificationService;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_SWIFT3_OBJC_INFERENCE = On;
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 			};
 			name = Fennec_Enterprise;
 		};
@@ -6443,7 +6443,7 @@
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_SWIFT3_OBJC_INFERENCE = On;
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 			};
 			name = Fennec;
 		};
@@ -6500,7 +6500,7 @@
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				SWIFT_SWIFT3_OBJC_INFERENCE = On;
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Firefox;
@@ -6558,7 +6558,7 @@
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				SWIFT_SWIFT3_OBJC_INFERENCE = On;
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = FirefoxBeta;
@@ -7048,7 +7048,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "Firefox ShareTo Development";
 				SKIP_INSTALL = YES;
 				SWIFT_SWIFT3_OBJC_INFERENCE = On;
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Firefox;
@@ -7076,7 +7076,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "Firefox SendTo Development";
 				SKIP_INSTALL = YES;
 				SWIFT_SWIFT3_OBJC_INFERENCE = On;
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 			};
 			name = Firefox;
 		};
@@ -7333,7 +7333,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "Fennec View Later Development";
 				SKIP_INSTALL = YES;
 				SWIFT_SWIFT3_OBJC_INFERENCE = On;
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 			};
 			name = Fennec;
 		};
@@ -7360,7 +7360,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "Firefox View Later Development";
 				SKIP_INSTALL = YES;
 				SWIFT_SWIFT3_OBJC_INFERENCE = On;
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 			};
 			name = Firefox;
 		};
@@ -8107,7 +8107,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "FennecEnterprise SendTo Development";
 				SKIP_INSTALL = YES;
 				SWIFT_SWIFT3_OBJC_INFERENCE = On;
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 			};
 			name = Fennec_Enterprise;
 		};
@@ -8133,7 +8133,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "FennecEnterprise Share To Development";
 				SKIP_INSTALL = YES;
 				SWIFT_SWIFT3_OBJC_INFERENCE = On;
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Fennec_Enterprise;
@@ -8182,7 +8182,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "FennecEnterprise ViewLater Development";
 				SKIP_INSTALL = YES;
 				SWIFT_SWIFT3_OBJC_INFERENCE = On;
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 			};
 			name = Fennec_Enterprise;
 		};
@@ -8759,7 +8759,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "Firefox Beta SentTo Development";
 				SKIP_INSTALL = YES;
 				SWIFT_SWIFT3_OBJC_INFERENCE = On;
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 			};
 			name = FirefoxBeta;
 		};
@@ -8785,7 +8785,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "Firefox Beta ShareTo Development";
 				SKIP_INSTALL = YES;
 				SWIFT_SWIFT3_OBJC_INFERENCE = On;
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = FirefoxBeta;
@@ -8813,7 +8813,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "Firefox Beta ViewLater Development";
 				SKIP_INSTALL = YES;
 				SWIFT_SWIFT3_OBJC_INFERENCE = On;
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 			};
 			name = FirefoxBeta;
 		};
@@ -9238,7 +9238,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "Fennec ShareTo Development";
 				SKIP_INSTALL = YES;
 				SWIFT_SWIFT3_OBJC_INFERENCE = On;
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Fennec;
@@ -9266,7 +9266,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "Fennec SendTo Development";
 				SKIP_INSTALL = YES;
 				SWIFT_SWIFT3_OBJC_INFERENCE = On;
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 			};
 			name = Fennec;
 		};

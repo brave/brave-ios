@@ -31,7 +31,7 @@ private func highlightLink(_ s: NSString, withColor color: UIColor) -> NSAttribu
     #if swift(>=4.0)
         a.addAttribute(NSAttributedStringKey.foregroundColor, value: color, range: r)
     #else
-        a.addAttribute(NSForegroundColorAttributeName, value: color, range: r)
+        a.addAttribute(NSAttributedStringKey.foregroundColor, value: color, range: r)
     #endif
 
     return a

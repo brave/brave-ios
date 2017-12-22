@@ -114,7 +114,7 @@ class InitialViewController: UIViewController, ShareControllerDelegate {
         
         let cx = NSLayoutConstraint(item: shareDialogController.view, attribute: NSLayoutAttribute.centerX,
             relatedBy: NSLayoutRelation.equal, toItem: view, attribute: NSLayoutAttribute.centerX, multiplier: 1.0, constant: 0)
-        cx.priority = 1000 // TODO: Why does UILayoutPriorityRequired give a linker error? SDK Bug?
+        cx.priority = UILayoutPriority(rawValue: 1000) // TODO: Why does UILayoutPriorityRequired give a linker error? SDK Bug?
         view.addConstraint(cx)
         
         view.addConstraint(NSLayoutConstraint(item: shareDialogController.view, attribute: NSLayoutAttribute.centerY,
