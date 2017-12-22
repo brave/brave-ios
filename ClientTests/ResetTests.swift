@@ -51,8 +51,6 @@ func assertClientsHaveGUIDsFromStorage(_ storage: RemoteClientsAndTabs, expected
 
 class ResetTests: XCTestCase {
 
-    // FIXME: swift4, broken test, Sync related
-    /*
     func testResetting() {
         let profile = MockBrowserProfile(localName: "testResetTests")
 
@@ -78,5 +76,5 @@ class ResetTests: XCTestCase {
         XCTAssertNotNil(empty)
         XCTAssertEqual(empty!, [])
     }
-    */
+
 }

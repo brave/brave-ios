@@ -28,11 +28,7 @@ private func highlightLink(_ s: NSString, withColor color: UIColor) -> NSAttribu
     let a = NSMutableAttributedString(string: s as String)
     let r = NSRange(location: start.location, length: end.location-start.location)
 
-    #if swift(>=4.0)
-        a.addAttribute(NSAttributedStringKey.foregroundColor, value: color, range: r)
-    #else
-        a.addAttribute(NSAttributedStringKey.foregroundColor, value: color, range: r)
-    #endif
+    a.addAttribute(NSAttributedStringKey.foregroundColor, value: color, range: r)
 
     return a
 }

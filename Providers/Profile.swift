@@ -1018,15 +1018,9 @@ open class BrowserProfile: Profile {
             }
 
 
-            #if swift(>=4.0)
-                // FIXME: Swift4
-                return deferMaybe(changes) // this return is wrong, just wanted to make it compile
-            #else
-                return walk(Array(needReset), f: self.locallyResetCollection)
-                    >>> effect(changes.clearLocalCommands)
-                    >>> always(changes)
-            #endif
-
+            return walk(Array(needReset), f: self.locallyResetCollection)
+                >>> effect(changes.clearLocalCommands)
+                >>> always(changes)
         }
 
         /**
