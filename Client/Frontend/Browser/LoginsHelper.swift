@@ -91,9 +91,8 @@ class LoginsHelper: TabHelper {
         }
 
         var attributes = [NSAttributedStringKey: AnyObject]()
-        // FIXME: swift4
-        // attributes[NSAttributedStringKey.font] = UIFont.systemFont(ofSize: 13, weight: UIFont.Weight.regular)
-        // attributes[NSAttributedStringKey.foregroundColor] = UIColor.darkGray
+        attributes[NSAttributedStringKey.font] = UIFont.systemFont(ofSize: 13, weight: UIFont.Weight.regular)
+        attributes[NSAttributedStringKey.foregroundColor] = UIColor.darkGray
         let attr = NSMutableAttributedString(string: string, attributes: attributes)
         let font: UIFont = UIFont.systemFont(ofSize: 13, weight: UIFont.Weight.medium)
         for range in ranges {
