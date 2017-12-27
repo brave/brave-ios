@@ -5,7 +5,7 @@
 MOZ_BUNDLE_DISPLAY_NAME = Brave ($(USER))
 
 // Bundle Identifier
-MOZ_BUNDLE_ID = id.fake.$(USER)
+MOZ_BUNDLE_ID = com.brave.ios.BrowserDevelopment
 
 // Flag to indicate if we want to include the debug settings bundle or not
 INCLUDE_SETTINGS_BUNDLE = YES
