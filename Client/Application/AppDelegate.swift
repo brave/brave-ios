@@ -327,7 +327,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         let readingListAction = UNNotificationAction(identifier: SentTabAction.readingList.rawValue, title: Strings.SentTabAddToReadingListActionTitle, options: .authenticationRequired)
 
         // Register ourselves to handle the notification category set by NotificationService for APNS notifications
-        let sentTabCategory = UNNotificationCategory(identifier: "org.mozilla.ios.SentTab.placeholder", actions: [viewAction, bookmarkAction, readingListAction], intentIdentifiers: [], options: UNNotificationCategoryOptions(rawValue: 0))
+        let sentTabCategory = UNNotificationCategory(identifier: "com.brave.ios.SentTab.placeholder", actions: [viewAction, bookmarkAction, readingListAction], intentIdentifiers: [], options: UNNotificationCategoryOptions(rawValue: 0))
         UNUserNotificationCenter.current().setNotificationCategories([sentTabCategory])
     }
 
@@ -338,7 +338,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
 
         guard let urlTypes = Bundle.main.object(forInfoDictionaryKey: "CFBundleURLTypes") as? [AnyObject],
                 let urlSchemes = urlTypes.first?["CFBundleURLSchemes"] as? [String] else {
-            // Something very strange has happened; org.mozilla.Client should be the zeroeth URL type.
+            // Something very strange has happened; com.brave.Client should be the zeroeth URL type.
             log.error("Custom URL schemes not available for validating")
             return false
         }
@@ -871,7 +871,7 @@ class AppSyncDelegate: SyncDelegate {
                     notificationContent.title = title
                     notificationContent.body = url.absoluteDisplayExternalString
                     notificationContent.userInfo = [TabSendURLKey: url.absoluteString, TabSendTitleKey: title]
-                    notificationContent.categoryIdentifier = "org.mozilla.ios.SentTab.placeholder"
+                    notificationContent.categoryIdentifier = "com.brave.ios.SentTab.placeholder"
 
                     // `timeInterval` must be greater than zero
                     let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)
