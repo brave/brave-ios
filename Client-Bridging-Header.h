@@ -10,10 +10,6 @@
 #import "ThirdParty/UIImageViewAligned/UIImageViewAligned/UIImageViewAligned.h"
 #import "ThirdParty/Apple/UIImage+ImageEffects.h"
 
-#ifdef BUDDYBUILD
-#import <BuddyBuildSDK/BuddyBuildSDK.h>
-#endif
-
 #import "Shared-Bridging-Header.h"
 #import "Storage-Bridging-Header.h"
 

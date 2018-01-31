@@ -294,13 +294,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
 
         UNUserNotificationCenter.current().delegate = self
         self.registerNotificationCategories()
-
-        #if BUDDYBUILD
-            // Typically should use `BuildChannel` but do not want even compile BB for
-            // production builds, need to exclude this during compiling
-            print("Setting up BuddyBuild SDK")
-            BuddyBuildSDK.setup()
-        #endif
         
         window!.makeKeyAndVisible()
 
