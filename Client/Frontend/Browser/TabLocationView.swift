@@ -23,8 +23,8 @@ protocol TabLocationViewDelegate {
 }
 
 private struct TabLocationViewUX {
-    static let HostFontColor = UIColor.Defaults.MobileGreyJ
-    static let BaseURLFontColor = UIColor.Defaults.MobileGreyD
+    static let HostFontColor = UIColor.Defaults.GreyJ
+    static let BaseURLFontColor = UIColor.Defaults.GreyD
     static let LocationContentInset = 8
     static let URLBarPadding = 4
 }
@@ -109,7 +109,7 @@ class TabLocationView: UIView {
     fileprivate lazy var lockImageView: UIImageView = {
         let lockImageView = UIImageView(image: UIImage.templateImageNamed("lock_verified"))
         lockImageView.isHidden = true
-        lockImageView.tintColor = UIColor.Defaults.LockGreen
+        lockImageView.tintColor = UIColor.Defaults.Green
         lockImageView.isAccessibilityElement = true
         lockImageView.contentMode = UIViewContentMode.center
         lockImageView.accessibilityLabel = NSLocalizedString("Secure connection", comment: "Accessibility label for the lock icon, which is only present if the connection is secure")

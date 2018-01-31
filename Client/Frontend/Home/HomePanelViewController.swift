@@ -13,8 +13,8 @@ private struct HomePanelViewControllerUX {
     static let ButtonContainerHeight: CGFloat = 40
     static let ButtonContainerBorderColor = UIColor.clear
     static let BackgroundColorPrivateMode = UIConstants.PrivateModeAssistantToolbarBackgroundColor
-    static let ToolbarButtonDeselectedColorNormalMode = UIColor.Defaults.MobileGreyH
-    static let ToolbarButtonDeselectedColorPrivateMode = UIColor.Defaults.MobileGreyF
+    static let ToolbarButtonDeselectedColorNormalMode = UIColor.Defaults.GreyH
+    static let ToolbarButtonDeselectedColorPrivateMode = UIColor.Defaults.GreyF
     static let ButtonHighlightLineHeight: CGFloat = 1.5
     static let ButtonSelectionAnimationDuration = 0.2
 }

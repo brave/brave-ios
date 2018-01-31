@@ -17,10 +17,10 @@ struct IntroViewControllerUX {
     static let PagerCenterOffsetFromScrollViewBottom = UIScreen.main.bounds.width <= 320 ? 20 : 30
 
     static let StartBrowsingButtonTitle = NSLocalizedString("Start Browsing", tableName: "Intro", comment: "See http://mzl.la/1T8gxwo")
-    static let StartBrowsingButtonColor = UIColor.Defaults.Blue40
+    static let StartBrowsingButtonColor = UIColor.Defaults.Blue
     static let StartBrowsingButtonHeight = 56
     static let SignInButtonTitle = NSLocalizedString("Sign in to Firefox", tableName: "Intro", comment: "See http://mzl.la/1T8gxwo")
-    static let SignInButtonColor = UIColor.Defaults.Blue40
+    static let SignInButtonColor = UIColor.Defaults.Blue
     static let SignInButtonHeight = 60
     static let SignInButtonWidth = 290
 

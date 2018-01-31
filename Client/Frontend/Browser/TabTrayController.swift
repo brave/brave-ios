@@ -139,7 +139,7 @@ class TabCell: UICollectionViewCell {
 
     func setTabSelected(_ isPrivate: Bool) {
         // This creates a border around a tabcell. Using the shadow craetes a border _outside_ of the tab frame.
-        layer.shadowColor = (isPrivate ? UIColor.Defaults.MobilePurple : UIColor.Defaults.MobileBlueA).cgColor
+        layer.shadowColor = (isPrivate ? UIColor.Defaults.Purple : UIColor.Defaults.Blue).cgColor
         layer.shadowOpacity = 0.65
         layer.shadowRadius = 3 // A 0 radius creates a solid border instead of a gradient blur
         layer.masksToBounds = false
