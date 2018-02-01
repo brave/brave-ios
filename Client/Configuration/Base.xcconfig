@@ -9,6 +9,7 @@
 
 OTHER_SWIFT_FLAGS_BASE=-DMOZ_TARGET_$(TARGET_NAME:upper)
 
+DEVELOPMENT_TEAM = KL8N8XSYF4
 
 // Additional Info //
 // Can specify target specific flags via:

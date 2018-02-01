@@ -3,11 +3,12 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "Base.xcconfig"
+#include "Local.xcconfig"
 
 MOZ_BUNDLE_DISPLAY_NAME = Brave ($(USER))
 
 // Bundle Identifier
-MOZ_BUNDLE_ID = com.brave.ios.BrowserDevelopment
+// MOZ_BUNDLE_ID = set in Local.xconfig
 
 // Flag to indicate if we want to include the debug settings bundle or not
 INCLUDE_SETTINGS_BUNDLE = YES

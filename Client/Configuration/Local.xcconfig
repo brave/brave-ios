@@ -1,0 +1,11 @@
+// Git ignored
+// Place localized configurations here
+// These are only compiled into the Local target
+
+
+// App currently uses automatic code signing, so as long as a bundle id is added that is unique enough
+// Xcode should easily create the necessary certificates for app signing
+MOZ_BUNDLE_ID = $(USER).fake.id
+
+// Add personal development team here
+DEVELOPMENT_TEAM = // SET ME!!
