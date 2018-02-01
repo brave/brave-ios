@@ -11,11 +11,11 @@ import Storage
 private struct HomePanelViewControllerUX {
     // Height of the top panel switcher button toolbar.
     static let ButtonContainerHeight: CGFloat = 40
-    static let ButtonContainerBorderColor = UIColor.black.withAlphaComponent(0.1)
+    static let ButtonContainerBorderColor = UIColor.clear
     static let BackgroundColorPrivateMode = UIConstants.PrivateModeAssistantToolbarBackgroundColor
-    static let ToolbarButtonDeselectedColorNormalMode = UIColor(white: 0.2, alpha: 0.5)
-    static let ToolbarButtonDeselectedColorPrivateMode = UIColor(white: 0.9, alpha: 1)
-    static let ButtonHighlightLineHeight: CGFloat = 2
+    static let ToolbarButtonDeselectedColorNormalMode = UIColor.Defaults.GreyH
+    static let ToolbarButtonDeselectedColorPrivateMode = UIColor.Defaults.GreyF
+    static let ButtonHighlightLineHeight: CGFloat = 1.5
     static let ButtonSelectionAnimationDuration = 0.2
 }
 

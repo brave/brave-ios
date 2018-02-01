@@ -255,7 +255,7 @@ class BrowserViewController: UIViewController {
         coordinator.animate(alongsideTransition: { context in
             self.scrollController.showToolbars(animated: false)
             if self.isViewLoaded {
-                self.statusBarOverlay.backgroundColor = self.shouldShowTopTabsForTraitCollection(self.traitCollection) ? UIColor.Defaults.Grey80 : self.urlBar.backgroundColor
+                self.statusBarOverlay.backgroundColor = self.shouldShowTopTabsForTraitCollection(self.traitCollection) ? UIColor.Defaults.GreyH : self.urlBar.backgroundColor
                 self.setNeedsStatusBarAppearanceUpdate()
             }
             }, completion: nil)
@@ -2722,7 +2722,7 @@ extension BrowserViewController: Themeable {
     func applyTheme(_ theme: Theme) {
         let ui: [Themeable?] = [urlBar, toolbar, readerModeBar, topTabsViewController]
         ui.forEach { $0?.applyTheme(theme) }
-        statusBarOverlay.backgroundColor = shouldShowTopTabsForTraitCollection(traitCollection) ? UIColor.Defaults.Grey80 : urlBar.backgroundColor
+        statusBarOverlay.backgroundColor = shouldShowTopTabsForTraitCollection(traitCollection) ? UIColor.Defaults.GreyI : urlBar.backgroundColor
         setNeedsStatusBarAppearanceUpdate()
     }
 }

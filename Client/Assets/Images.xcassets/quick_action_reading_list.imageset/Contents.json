@@ -2,17 +2,16 @@
   "images" : [
     {
       "idiom" : "universal",
-      "filename" : "reading-list.png",
       "scale" : "1x"
     },
     {
       "idiom" : "universal",
-      "filename" : "reading-list2x.png",
+      "filename" : "reader@2x.png",
       "scale" : "2x"
     },
     {
       "idiom" : "universal",
-      "filename" : "reading-list@3x.png",
+      "filename" : "reader@3x.png",
       "scale" : "3x"
     }
   ],
