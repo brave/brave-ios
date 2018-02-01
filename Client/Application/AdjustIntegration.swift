@@ -6,7 +6,7 @@ import Foundation
 import Shared
 import AdjustSdk
 
-private let AdjustIntegrationErrorDomain = "org.mozilla.ios.Firefox.AdjustIntegrationErrorDomain"
+private let AdjustIntegrationErrorDomain = "com.brave.ios.Browser.AdjustIntegrationErrorDomain"
 
 private let AdjustAttributionFileName = "AdjustAttribution.json"
 

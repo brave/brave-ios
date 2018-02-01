@@ -23,7 +23,7 @@ import SwiftyJSON
 //    static let UnknownError: Int32               = 999
 //}
 
-public let PushClientErrorDomain = "org.mozilla.push.error"
+public let PushClientErrorDomain = "com.brave.push.error"
 private let PushClientUnknownError = NSError(domain: PushClientErrorDomain, code: 999,
                                              userInfo: [NSLocalizedDescriptionKey: "Invalid server response"])
 private let log = Logger.browserLogger

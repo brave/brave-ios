@@ -9,7 +9,7 @@ import FxA
 import Deferred
 import SwiftyJSON
 
-public let FxAClientErrorDomain = "org.mozilla.fxa.error"
+public let FxAClientErrorDomain = "com.brave.fxa.error"
 public let FxAClientUnknownError = NSError(domain: FxAClientErrorDomain, code: 999,
     userInfo: [NSLocalizedDescriptionKey: "Invalid server response"])
 

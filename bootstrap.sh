@@ -26,3 +26,5 @@ if [ ! -z "$XCS_BOT_ID"  ]; then
 fi
 
 carthage bootstrap $CARTHAGE_VERBOSE --platform ios --color auto --cache-builds 
+
+git update-index --assume-unchanged Client/Configuration/Local.xcconfig

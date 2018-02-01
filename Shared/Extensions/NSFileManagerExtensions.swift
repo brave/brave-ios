@@ -7,7 +7,7 @@
 
 import Foundation
 
-public let NSFileManagerExtensionsDomain = "org.mozilla.NSFileManagerExtensions"
+public let NSFileManagerExtensionsDomain = "com.brave.NSFileManagerExtensions"
 
 public enum NSFileManagerExtensionsErrorCodes: Int {
     case enumeratorFailure = 0

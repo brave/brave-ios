@@ -8,7 +8,7 @@ import Foundation
 import Deferred
 import SwiftyJSON
 
-let TokenServerClientErrorDomain = "org.mozilla.token.error"
+let TokenServerClientErrorDomain = "com.brave.token.error"
 let TokenServerClientUnknownError = TokenServerError.local(
     NSError(domain: TokenServerClientErrorDomain, code: 999,
     userInfo: [NSLocalizedDescriptionKey: "Invalid server response"]))
