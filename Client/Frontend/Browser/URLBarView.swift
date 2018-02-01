@@ -6,9 +6,6 @@ import Shared
 import SnapKit
 
 private struct URLBarViewUX {
-    static let TextFieldBorderColor = UIColor(rgb: 0xBBBBBB)
-    static let TextFieldActiveBorderColor = UIColor(rgb: 0xB0D5FB)
-
     static let LocationLeftPadding: CGFloat = 8
     static let Padding: CGFloat = 10
     static let LocationHeight: CGFloat = 40
@@ -16,8 +13,8 @@ private struct URLBarViewUX {
     static let LocationContentOffset: CGFloat = 8
     static let TextFieldCornerRadius: CGFloat = 8
     static let TextFieldBorderWidth: CGFloat = 1
-    static let TextFieldBorderWidthSelected: CGFloat = 4
-    static let ProgressBarHeight: CGFloat = 3
+    static let TextFieldBorderWidthSelected: CGFloat = 0
+    static let ProgressBarHeight: CGFloat = 2
 
     static let TabsButtonRotationOffset: CGFloat = 1.5
     static let TabsButtonHeight: CGFloat = 18.0
@@ -47,14 +44,14 @@ protocol URLBarDelegate: class {
 
 class URLBarView: UIView {
     // Additional UIAppearance-configurable properties
-    dynamic var locationBorderColor: UIColor = URLBarViewUX.TextFieldBorderColor {
+    dynamic var locationBorderColor: UIColor = UIColor.clear {
         didSet {
             if !inOverlayMode {
                 locationContainer.layer.borderColor = locationBorderColor.cgColor
             }
         }
     }
-    dynamic var locationActiveBorderColor: UIColor = URLBarViewUX.TextFieldActiveBorderColor {
+    dynamic var locationActiveBorderColor: UIColor = UIColor.clear {
         didSet {
             if inOverlayMode {
                 locationContainer.layer.borderColor = locationActiveBorderColor.cgColor
@@ -191,6 +188,8 @@ class URLBarView: UIView {
 
         // Make sure we hide any views that shouldn't be showing in non-overlay mode.
         updateViewsForOverlayModeAndToolbarChanges()
+        
+        locationView.layer.cornerRadius = URLBarViewUX.TextFieldCornerRadius
     }
 
     fileprivate func setupConstraints() {
@@ -659,9 +658,10 @@ extension URLBarView: Themeable {
 class TabLocationContainerView: UIView {
     
     private struct LocationContainerUX {
-        static let CornerRadius: CGFloat = 4
-        static let ShadowRadius: CGFloat = 2
-        static let ShadowOpacity: Float = 1
+        static let CornerRadius: CGFloat = 8
+        static let ShadowRadius: CGFloat = 0
+        static let ShadowOpacity: Float = 0
+        static let ShadowLength: CGFloat = 2
     }
     
     override init(frame: CGRect) {
@@ -682,7 +682,7 @@ class TabLocationContainerView: UIView {
         
         layer.shadowOffset = CGSize(width: 0, height: 1)
         // the shadow appears 2px off from the view rect
-        let shadowLength: CGFloat = 2
+        let shadowLength: CGFloat = LocationContainerUX.ShadowLength
         let shadowPath = CGRect(x: shadowLength, y: shadowLength, width: layer.frame.width - (shadowLength * 2), height: layer.frame.height - (shadowLength * 2))
         layer.shadowPath = UIBezierPath(roundedRect: shadowPath, cornerRadius: layer.cornerRadius).cgPath
         super.layoutSubviews()

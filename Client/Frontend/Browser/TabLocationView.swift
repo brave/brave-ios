@@ -23,8 +23,8 @@ protocol TabLocationViewDelegate {
 }
 
 private struct TabLocationViewUX {
-    static let HostFontColor = UIColor.black
-    static let BaseURLFontColor = UIColor.gray
+    static let HostFontColor = UIColor.Defaults.GreyJ
+    static let BaseURLFontColor = UIColor.Defaults.GreyD
     static let LocationContentInset = 8
     static let URLBarPadding = 4
 }
@@ -109,7 +109,7 @@ class TabLocationView: UIView {
     fileprivate lazy var lockImageView: UIImageView = {
         let lockImageView = UIImageView(image: UIImage.templateImageNamed("lock_verified"))
         lockImageView.isHidden = true
-        lockImageView.tintColor = UIColor.Defaults.LockGreen
+        lockImageView.tintColor = UIColor.Defaults.Green
         lockImageView.isAccessibilityElement = true
         lockImageView.contentMode = UIViewContentMode.center
         lockImageView.accessibilityLabel = NSLocalizedString("Secure connection", comment: "Accessibility label for the lock icon, which is only present if the connection is secure")
@@ -145,7 +145,7 @@ class TabLocationView: UIView {
     
     lazy var separatorLine: UIView = {
         let line = UIView()
-        line.layer.cornerRadius = 2
+        line.layer.cornerRadius = 8
         line.isHidden = true
         return line
     }()
@@ -290,7 +290,7 @@ extension TabLocationView: AccessibilityActionsSource {
 extension TabLocationView: Themeable {
     func applyTheme(_ theme: Theme) {
         backgroundColor = UIColor.TextField.Background.colorFor(theme)
-        urlTextField.textColor = UIColor.Browser.Tint.colorFor(theme)
+        urlTextField.textColor = UIColor.TextField.TextAndTint.colorFor(theme)
         readerModeButton.selectedTintColor = UIColor.TextField.ReaderModeButtonSelected.colorFor(theme)
         readerModeButton.unselectedTintColor = UIColor.TextField.ReaderModeButtonUnselected.colorFor(theme)
         

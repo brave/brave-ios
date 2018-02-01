@@ -2,13 +2,12 @@
   "images" : [
     {
       "idiom" : "universal",
-      "scale" : "1x",
-      "filename" : "fxa_get_started.png"
+      "scale" : "1x"
     },
     {
       "idiom" : "universal",
-      "scale" : "2x",
-      "filename" : "fxa_get_started@2x.png"
+      "filename" : "fxa_get_started@2x.png",
+      "scale" : "2x"
     },
     {
       "idiom" : "universal",
