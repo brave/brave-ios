@@ -244,9 +244,9 @@ class TabToolbar: UIView {
     }
 
     override func draw(_ rect: CGRect) {
-//        if let context = UIGraphicsGetCurrentContext() {
-//            drawLine(context, start: CGPoint(x: 0, y: 0), end: CGPoint(x: frame.width, y: 0))
-//        }
+        if let context = UIGraphicsGetCurrentContext() {
+            drawLine(context, start: CGPoint(x: 0, y: 0), end: CGPoint(x: frame.width, y: 0))
+        }
     }
 
     fileprivate func drawLine(_ context: CGContext, start: CGPoint, end: CGPoint) {
