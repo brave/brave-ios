@@ -293,6 +293,8 @@
 		59A68D66379CFA85C4EAF00B /* TwoLineCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59A68B1F857A8638598A63A0 /* TwoLineCell.swift */; };
 		59A68E0B4ABBF55E14819668 /* BookmarksPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59A6839879D615FC1C0D71CE /* BookmarksPanel.swift */; };
 		59A68FD5260B8D520F890F4A /* ReaderPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59A685F4EAD19EDEC854BCA4 /* ReaderPanel.swift */; };
+		5C56FF61202E4027009FF126 /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C56FF59202E4026009FF126 /* DataManager.swift */; };
+		5C56FF62202E4027009FF126 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 5C56FF5A202E4027009FF126 /* Model.xcdatamodeld */; };
 		742A56391D80B54A00BDB803 /* PhotonActionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 742A56381D80B54A00BDB803 /* PhotonActionSheet.swift */; };
 		744B0FFE1B4F172E00100422 /* ToolbarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 744B0FFD1B4F172E00100422 /* ToolbarTests.swift */; };
 		744ED5611DBFEB8D00A2B5BE /* MailtoLinkHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 744ED5601DBFEB8D00A2B5BE /* MailtoLinkHandler.swift */; };
@@ -1649,6 +1651,13 @@
 		59A685F4EAD19EDEC854BCA4 /* ReaderPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReaderPanel.swift; sourceTree = "<group>"; };
 		59A68B1F857A8638598A63A0 /* TwoLineCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TwoLineCell.swift; sourceTree = "<group>"; };
 		59A68CCB63E2A565CB03F832 /* SearchViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
+		5C56FF59202E4026009FF126 /* DataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DataManager.swift; path = CoreData/DataManager.swift; sourceTree = "<group>"; };
+		5C56FF5B202E4027009FF126 /* Model2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model2.xcdatamodel; sourceTree = "<group>"; };
+		5C56FF5C202E4027009FF126 /* Model4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model4.xcdatamodel; sourceTree = "<group>"; };
+		5C56FF5D202E4027009FF126 /* Model3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model3.xcdatamodel; sourceTree = "<group>"; };
+		5C56FF5E202E4027009FF126 /* Model6.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model6.xcdatamodel; sourceTree = "<group>"; };
+		5C56FF5F202E4027009FF126 /* Model5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model5.xcdatamodel; sourceTree = "<group>"; };
+		5C56FF60202E4027009FF126 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
 		5D092FAC2023A342007369B4 /* Base.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Base.xcconfig; path = Configuration/Base.xcconfig; sourceTree = "<group>"; };
 		5D092FAE2023A355007369B4 /* Local.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Local.xcconfig; path = Configuration/Local.xcconfig; sourceTree = "<group>"; };
 		742A56381D80B54A00BDB803 /* PhotonActionSheet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotonActionSheet.swift; sourceTree = "<group>"; };
@@ -2660,6 +2669,7 @@
 		2FCAE21B1ABB51F800877008 /* Storage */ = {
 			isa = PBXGroup;
 			children = (
+				5C56FF4A202E4018009FF126 /* CoreData */,
 				74B195431CF503FC007F36EF /* RecentlyClosedTabs.swift */,
 				2FCAE33D1ABB5F1800877008 /* Storage-Bridging-Header.h */,
 				D37DE2821CA2047500A5EC69 /* CertStore.swift */,
@@ -2886,6 +2896,15 @@
 				39012F271F8ED262002E3D31 /* ScreenGraphTest.swift */,
 			);
 			path = XCUITests;
+			sourceTree = "<group>";
+		};
+		5C56FF4A202E4018009FF126 /* CoreData */ = {
+			isa = PBXGroup;
+			children = (
+				5C56FF59202E4026009FF126 /* DataManager.swift */,
+				5C56FF5A202E4027009FF126 /* Model.xcdatamodeld */,
+			);
+			name = CoreData;
 			sourceTree = "<group>";
 		};
 		7B0B1B9C1C1B69F500DF4AB5 /* Extensions */ = {
@@ -4390,58 +4409,58 @@
 				TargetAttributes = {
 					2827315D1ABC9BE600AA1954 = {
 						CreatedOnToolsVersion = 6.2;
-						DevelopmentTeam = PZD3LUMK95;
+						DevelopmentTeam = ULR7CC4V8L;
 						LastSwiftMigration = 0820;
 						ProvisioningStyle = Automatic;
 					};
 					282731671ABC9BE700AA1954 = {
 						CreatedOnToolsVersion = 6.2;
-						DevelopmentTeam = PZD3LUMK95;
+						DevelopmentTeam = ULR7CC4V8L;
 						LastSwiftMigration = 0820;
 						ProvisioningStyle = Automatic;
 						TestTargetID = F84B21BD1A090F8100AAB793;
 					};
 					288A2D851AB8B3260023ABC3 = {
 						CreatedOnToolsVersion = 6.2;
-						DevelopmentTeam = PZD3LUMK95;
+						DevelopmentTeam = ULR7CC4V8L;
 						LastSwiftMigration = 0820;
 						ProvisioningStyle = Automatic;
 					};
 					2FA435FA1ABB83B4008031D1 = {
 						CreatedOnToolsVersion = 6.2;
-						DevelopmentTeam = PZD3LUMK95;
+						DevelopmentTeam = ULR7CC4V8L;
 						LastSwiftMigration = 0820;
 						ProvisioningStyle = Automatic;
 					};
 					2FA436041ABB83B4008031D1 = {
 						CreatedOnToolsVersion = 6.2;
-						DevelopmentTeam = PZD3LUMK95;
+						DevelopmentTeam = ULR7CC4V8L;
 						LastSwiftMigration = 0820;
 						ProvisioningStyle = Automatic;
 						TestTargetID = F84B21BD1A090F8100AAB793;
 					};
 					2FCAE2191ABB51F800877008 = {
 						CreatedOnToolsVersion = 6.2;
-						DevelopmentTeam = PZD3LUMK95;
+						DevelopmentTeam = ULR7CC4V8L;
 						LastSwiftMigration = 0820;
 						ProvisioningStyle = Automatic;
 					};
 					2FCAE2231ABB51F800877008 = {
 						CreatedOnToolsVersion = 6.2;
-						DevelopmentTeam = PZD3LUMK95;
+						DevelopmentTeam = ULR7CC4V8L;
 						LastSwiftMigration = 0820;
 						ProvisioningStyle = Automatic;
 						TestTargetID = F84B21BD1A090F8100AAB793;
 					};
 					390527491C874D35007E0BB7 = {
 						CreatedOnToolsVersion = 7.2.1;
-						DevelopmentTeam = PZD3LUMK95;
+						DevelopmentTeam = ULR7CC4V8L;
 						LastSwiftMigration = 0820;
 						ProvisioningStyle = Automatic;
 					};
 					397848DA1ED86605004C0C0B = {
 						CreatedOnToolsVersion = 8.3.2;
-						DevelopmentTeam = PZD3LUMK95;
+						DevelopmentTeam = ULR7CC4V8L;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
@@ -4454,19 +4473,19 @@
 					};
 					3B43E3CF1D95C48D00BBA9DB = {
 						CreatedOnToolsVersion = 8.0;
-						DevelopmentTeam = PZD3LUMK95;
+						DevelopmentTeam = ULR7CC4V8L;
 						LastSwiftMigration = 0820;
 						ProvisioningStyle = Automatic;
 						TestTargetID = F84B21BD1A090F8100AAB793;
 					};
 					3BFE4B061D342FB800DDF53F = {
 						CreatedOnToolsVersion = 7.3.1;
-						DevelopmentTeam = PZD3LUMK95;
+						DevelopmentTeam = ULR7CC4V8L;
 						LastSwiftMigration = 0820;
 						TestTargetID = F84B21BD1A090F8100AAB793;
 					};
 					7BEB64401C7345600092C02E = {
-						DevelopmentTeam = PZD3LUMK95;
+						DevelopmentTeam = ULR7CC4V8L;
 						ProvisioningStyle = Automatic;
 						TestTargetID = F84B21BD1A090F8100AAB793;
 					};
@@ -4477,14 +4496,14 @@
 					};
 					D39FA15E1A83E0EC00EE869C = {
 						CreatedOnToolsVersion = 6.1.1;
-						DevelopmentTeam = KL8N8XSYF4;
+						DevelopmentTeam = ULR7CC4V8L;
 						LastSwiftMigration = 0820;
 						ProvisioningStyle = Automatic;
 						TestTargetID = F84B21BD1A090F8100AAB793;
 					};
 					E4BA8A2A1B4B0A1600BC2E95 = {
 						CreatedOnToolsVersion = 6.4;
-						DevelopmentTeam = PZD3LUMK95;
+						DevelopmentTeam = ULR7CC4V8L;
 						LastSwiftMigration = 0820;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
@@ -4495,7 +4514,7 @@
 					};
 					E4D567171ADECE2700F1EFE7 = {
 						CreatedOnToolsVersion = 6.3;
-						DevelopmentTeam = PZD3LUMK95;
+						DevelopmentTeam = ULR7CC4V8L;
 						LastSwiftMigration = 0820;
 						ProvisioningStyle = Automatic;
 					};
@@ -4508,25 +4527,25 @@
 					};
 					E69DB0741E97DEA9008A67E6 = {
 						CreatedOnToolsVersion = 8.3;
-						DevelopmentTeam = PZD3LUMK95;
+						DevelopmentTeam = ULR7CC4V8L;
 						ProvisioningStyle = Automatic;
 					};
 					E69DB07C1E97DEA9008A67E6 = {
 						CreatedOnToolsVersion = 8.3;
-						DevelopmentTeam = PZD3LUMK95;
+						DevelopmentTeam = ULR7CC4V8L;
 						LastSwiftMigration = 0830;
 						ProvisioningStyle = Automatic;
 						TestTargetID = F84B21BD1A090F8100AAB793;
 					};
 					E6F9650B1B2F1CF20034B023 = {
 						CreatedOnToolsVersion = 6.3.2;
-						DevelopmentTeam = PZD3LUMK95;
+						DevelopmentTeam = ULR7CC4V8L;
 						LastSwiftMigration = 0820;
 						ProvisioningStyle = Automatic;
 					};
 					F84B21BD1A090F8100AAB793 = {
 						CreatedOnToolsVersion = 6.1;
-						DevelopmentTeam = PZD3LUMK95;
+						DevelopmentTeam = ULR7CC4V8L;
 						LastSwiftMigration = 0820;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
@@ -4549,14 +4568,14 @@
 					};
 					F84B21D21A090F8100AAB793 = {
 						CreatedOnToolsVersion = 6.1;
-						DevelopmentTeam = PZD3LUMK95;
+						DevelopmentTeam = ULR7CC4V8L;
 						LastSwiftMigration = 0820;
 						ProvisioningStyle = Automatic;
 						TestTargetID = F84B21BD1A090F8100AAB793;
 					};
 					F84B22481A0920C600AAB793 = {
 						CreatedOnToolsVersion = 6.1;
-						DevelopmentTeam = PZD3LUMK95;
+						DevelopmentTeam = ULR7CC4V8L;
 						LastSwiftMigration = 0820;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
@@ -4573,7 +4592,7 @@
 					};
 					F84B225B1A09210A00AAB793 = {
 						CreatedOnToolsVersion = 6.1;
-						DevelopmentTeam = PZD3LUMK95;
+						DevelopmentTeam = ULR7CC4V8L;
 						LastSwiftMigration = 0820;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
@@ -5283,12 +5302,14 @@
 				28126F6E1C2F94F9006466CC /* SQLiteBookmarksModel.swift in Sources */,
 				7B9BF9301E449D2500CB24F4 /* MockLogins.swift in Sources */,
 				0BDA56B21B26B1E4008C9B96 /* Logins.swift in Sources */,
+				5C56FF61202E4027009FF126 /* DataManager.swift in Sources */,
 				0BDA56B41B26B203008C9B96 /* SQLiteLogins.swift in Sources */,
 				E6F368291D7F594F008CDD67 /* SQLiteHistoryRecommendations.swift in Sources */,
 				2829D3A01C2F0AD400DCF931 /* Sharing.swift in Sources */,
 				2FCAE2751ABB531100877008 /* SQLiteRemoteClientsAndTabs.swift in Sources */,
 				285F2DC11AF80B4600211843 /* SQLiteBookmarksSyncing.swift in Sources */,
 				28C4AB721AD42D4300D9ACE3 /* Clients.swift in Sources */,
+				5C56FF62202E4027009FF126 /* Model.xcdatamodeld in Sources */,
 				D0131B4D1F3CF7D8000CDE86 /* SQLiteFavicons.swift in Sources */,
 				28126F741C2F96F1006466CC /* SQLiteBookmarksResetting.swift in Sources */,
 				28B62ACE1BC745E7004A585A /* Syncable.swift in Sources */,
@@ -6972,6 +6993,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = ULR7CC4V8L;
 				ENABLE_BITCODE = NO;
 				ENABLE_TESTABILITY = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -8028,6 +8050,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon_Developer;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = ULR7CC4V8L;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -8673,6 +8696,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon_Beta;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = ULR7CC4V8L;
 				ENABLE_BITCODE = NO;
 				ENABLE_TESTABILITY = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -9134,6 +9158,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon_Developer;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = ULR7CC4V8L;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -9533,6 +9558,25 @@
 			defaultConfigurationName = Fennec;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		5C56FF5A202E4027009FF126 /* Model.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				5C56FF5B202E4027009FF126 /* Model2.xcdatamodel */,
+				5C56FF5C202E4027009FF126 /* Model4.xcdatamodel */,
+				5C56FF5D202E4027009FF126 /* Model3.xcdatamodel */,
+				5C56FF5E202E4027009FF126 /* Model6.xcdatamodel */,
+				5C56FF5F202E4027009FF126 /* Model5.xcdatamodel */,
+				5C56FF60202E4027009FF126 /* Model.xcdatamodel */,
+			);
+			currentVersion = 5C56FF5E202E4027009FF126 /* Model6.xcdatamodel */;
+			name = Model.xcdatamodeld;
+			path = CoreData/Model.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = F84B21B61A090F8100AAB793 /* Project object */;
 }
