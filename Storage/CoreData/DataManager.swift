@@ -2,7 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import UIKit
 import CoreData
 
 //      Now that sync is disabled, we hvae fallen back to the original design (from floriankugler)
@@ -28,8 +27,8 @@ import CoreData
 // Previoulsy attempted stack which had significant impact on main thread saves
 // Follow the stack design from http://floriankugler.com/2013/04/02/the-concurrent-core-data-stack/
 
-class DataManager: NSObject {
-    static let shared = DataManager()
+public class DataManager: NSObject {
+    public static let shared = DataManager()
     
     fileprivate lazy var writeContext: NSManagedObjectContext = {
         let write = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
@@ -40,7 +39,8 @@ class DataManager: NSObject {
         return write
     }()
     
-    lazy var workerContext: NSManagedObjectContext = {
+    public lazy var workerContext: NSManagedObjectContext = {
+
         
         let worker = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         worker.undoManager = nil
@@ -51,7 +51,7 @@ class DataManager: NSObject {
         return worker
     }()
     
-    lazy var mainThreadContext: NSManagedObjectContext = {
+    public lazy var mainThreadContext: NSManagedObjectContext = {
         let main = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
         main.undoManager = nil
         main.mergePolicy = NSOverwriteMergePolicy
@@ -69,7 +69,7 @@ class DataManager: NSObject {
         
         // TransformerUUID.setValueTransformer(transformer: NSValueTransformer?, forName name: String)
         
-        guard let modelURL = Bundle.main.url(forResource: "Model", withExtension:"momd") else {
+        guard let modelURL = Bundle(for: type(of: self)).url(forResource: "Model", withExtension:"momd") else {
             fatalError("Error loading model from bundle")
         }
         guard let mom = NSManagedObjectModel(contentsOf: modelURL) else {
@@ -105,12 +105,12 @@ class DataManager: NSObject {
         _ = mainThreadContext
     }
     
-    static func remove(object: NSManagedObject, context: NSManagedObjectContext = DataManager.shared.mainThreadContext) {
+    public static func remove(object: NSManagedObject, context: NSManagedObjectContext = DataManager.shared.mainThreadContext) {
         context.delete(object)
         DataManager.saveContext(context: context)
     }
     
-    static func saveContext(context: NSManagedObjectContext?) {
+    public static func saveContext(context: NSManagedObjectContext?) {
         guard let context = context else {
             print("No context on save")
             return
@@ -148,11 +148,11 @@ class DataManager: NSObject {
 }
 
 extension NSManagedObjectContext {
-    static var mainThreadContext: NSManagedObjectContext {
+    public static var mainThreadContext: NSManagedObjectContext {
         return DataManager.shared.mainThreadContext
     }
     
-    static var workerThreadContext: NSManagedObjectContext {
+    public static var workerThreadContext: NSManagedObjectContext {
         return DataManager.shared.workerContext
     }
 }
