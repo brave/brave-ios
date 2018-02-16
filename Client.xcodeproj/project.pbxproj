@@ -295,8 +295,13 @@
 		59A68FD5260B8D520F890F4A /* ReaderPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59A685F4EAD19EDEC854BCA4 /* ReaderPanel.swift */; };
 		5C3787CB20321DB1009E6BCB /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 5C3787B620321DB1009E6BCB /* Model.xcdatamodeld */; };
 		5C56FF61202E4027009FF126 /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C56FF59202E4026009FF126 /* DataManager.swift */; };
-		5C56FF68202E5A65009FF126 /* Domain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C56FF67202E5A65009FF126 /* Domain.swift */; };
+		5C56FF68202E5A65009FF126 /* DomainMO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C56FF67202E5A65009FF126 /* DomainMO.swift */; };
 		5C56FF6A202E5B6D009FF126 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5C56FF69202E5B6D009FF126 /* CoreData.framework */; };
+		5CA9770B2035FB4C00181058 /* BookmarkMO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CA976FA2035FB4B00181058 /* BookmarkMO.swift */; };
+		5CA9770C2035FB4C00181058 /* HistoryMO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CA977092035FB4C00181058 /* HistoryMO.swift */; };
+		5CA9770D2035FB4C00181058 /* FaviconMO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CA9770A2035FB4C00181058 /* FaviconMO.swift */; };
+		5CA977542037857B00181058 /* TopSiteMO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CA977522037857A00181058 /* TopSiteMO.swift */; };
+		5CA977552037857B00181058 /* TabMO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CA977532037857A00181058 /* TabMO.swift */; };
 		742A56391D80B54A00BDB803 /* PhotonActionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 742A56381D80B54A00BDB803 /* PhotonActionSheet.swift */; };
 		744B0FFE1B4F172E00100422 /* ToolbarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 744B0FFD1B4F172E00100422 /* ToolbarTests.swift */; };
 		744ED5611DBFEB8D00A2B5BE /* MailtoLinkHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 744ED5601DBFEB8D00A2B5BE /* MailtoLinkHandler.swift */; };
@@ -1660,8 +1665,13 @@
 		5C3787BB20321DB1009E6BCB /* Model5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model5.xcdatamodel; sourceTree = "<group>"; };
 		5C3787BC20321DB1009E6BCB /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
 		5C56FF59202E4026009FF126 /* DataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DataManager.swift; path = CoreData/DataManager.swift; sourceTree = "<group>"; };
-		5C56FF67202E5A65009FF126 /* Domain.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Domain.swift; path = CoreData/Domain.swift; sourceTree = "<group>"; };
+		5C56FF67202E5A65009FF126 /* DomainMO.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DomainMO.swift; path = CoreData/DomainMO.swift; sourceTree = "<group>"; };
 		5C56FF69202E5B6D009FF126 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		5CA976FA2035FB4B00181058 /* BookmarkMO.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BookmarkMO.swift; path = CoreData/BookmarkMO.swift; sourceTree = "<group>"; };
+		5CA977092035FB4C00181058 /* HistoryMO.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = HistoryMO.swift; path = CoreData/HistoryMO.swift; sourceTree = "<group>"; };
+		5CA9770A2035FB4C00181058 /* FaviconMO.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FaviconMO.swift; path = CoreData/FaviconMO.swift; sourceTree = "<group>"; };
+		5CA977522037857A00181058 /* TopSiteMO.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TopSiteMO.swift; path = CoreData/TopSiteMO.swift; sourceTree = "<group>"; };
+		5CA977532037857A00181058 /* TabMO.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TabMO.swift; path = CoreData/TabMO.swift; sourceTree = "<group>"; };
 		5D092FAC2023A342007369B4 /* Base.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Base.xcconfig; path = Configuration/Base.xcconfig; sourceTree = "<group>"; };
 		5D092FAE2023A355007369B4 /* Local.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Local.xcconfig; path = Configuration/Local.xcconfig; sourceTree = "<group>"; };
 		742A56381D80B54A00BDB803 /* PhotonActionSheet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotonActionSheet.swift; sourceTree = "<group>"; };
@@ -2906,7 +2916,12 @@
 		5C56FF4A202E4018009FF126 /* CoreData */ = {
 			isa = PBXGroup;
 			children = (
-				5C56FF67202E5A65009FF126 /* Domain.swift */,
+				5CA977532037857A00181058 /* TabMO.swift */,
+				5CA977522037857A00181058 /* TopSiteMO.swift */,
+				5CA976FA2035FB4B00181058 /* BookmarkMO.swift */,
+				5CA9770A2035FB4C00181058 /* FaviconMO.swift */,
+				5CA977092035FB4C00181058 /* HistoryMO.swift */,
+				5C56FF67202E5A65009FF126 /* DomainMO.swift */,
 				5C56FF59202E4026009FF126 /* DataManager.swift */,
 				5C3787B620321DB1009E6BCB /* Model.xcdatamodeld */,
 			);
@@ -4480,7 +4495,7 @@
 					};
 					3B43E3CF1D95C48D00BBA9DB = {
 						CreatedOnToolsVersion = 8.0;
-						DevelopmentTeam = ULR7CC4V8L;
+						DevelopmentTeam = KL8N8XSYF4;
 						LastSwiftMigration = 0820;
 						ProvisioningStyle = Automatic;
 						TestTargetID = F84B21BD1A090F8100AAB793;
@@ -4503,7 +4518,7 @@
 					};
 					D39FA15E1A83E0EC00EE869C = {
 						CreatedOnToolsVersion = 6.1.1;
-						DevelopmentTeam = KL8N8XSYF4;
+						DevelopmentTeam = ULR7CC4V8L;
 						LastSwiftMigration = 0820;
 						ProvisioningStyle = Automatic;
 						TestTargetID = F84B21BD1A090F8100AAB793;
@@ -5305,6 +5320,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5CA9770C2035FB4C00181058 /* HistoryMO.swift in Sources */,
 				2FCAE2621ABB531100877008 /* History.swift in Sources */,
 				28126F6E1C2F94F9006466CC /* SQLiteBookmarksModel.swift in Sources */,
 				7B9BF9301E449D2500CB24F4 /* MockLogins.swift in Sources */,
@@ -5329,9 +5345,11 @@
 				28532D321C483E3D000072D9 /* CompletionOps.swift in Sources */,
 				2FCAE25D1ABB531100877008 /* Bookmarks.swift in Sources */,
 				394CF6CF1BAA493C00906917 /* DefaultSuggestedSites.swift in Sources */,
+				5CA977552037857B00181058 /* TabMO.swift in Sources */,
 				2FCAE2781ABB531100877008 /* Visit.swift in Sources */,
+				5CA9770B2035FB4C00181058 /* BookmarkMO.swift in Sources */,
 				D3BF8CBB1B7425570007AFE6 /* DiskImageStore.swift in Sources */,
-				5C56FF68202E5A65009FF126 /* Domain.swift in Sources */,
+				5C56FF68202E5A65009FF126 /* DomainMO.swift in Sources */,
 				E6FF6ACA1D873CFF0070C294 /* PageMetadata.swift in Sources */,
 				2FCAE2611ABB531100877008 /* FileAccessor.swift in Sources */,
 				28126F481C2F948E006466CC /* SQLiteBookmarksHelpers.swift in Sources */,
@@ -5343,9 +5361,11 @@
 				0B54BD191B698B7C004C822C /* SuggestedSites.swift in Sources */,
 				318FB6EB1DB5600D0004E40F /* SQLiteHistoryFactories.swift in Sources */,
 				285D3B681B4380B70035FD22 /* Queue.swift in Sources */,
+				5CA9770D2035FB4C00181058 /* FaviconMO.swift in Sources */,
 				28E08C9A1AF44F00009BA2FA /* BrowserSchema.swift in Sources */,
 				2FCAE2681ABB531100877008 /* BrowserDB.swift in Sources */,
 				283586FD1C73F18E00A55435 /* CachingItemSource.swift in Sources */,
+				5CA977542037857B00181058 /* TopSiteMO.swift in Sources */,
 				D0B29EE01F460BDF00C7CEFC /* LoginsSchema.swift in Sources */,
 				2FCAE2651ABB531100877008 /* RemoteTabs.swift in Sources */,
 				2FCAE2601ABB531100877008 /* Favicons.swift in Sources */,

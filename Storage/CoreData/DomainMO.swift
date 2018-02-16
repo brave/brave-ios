@@ -2,7 +2,7 @@
 
 import CoreData
 
-public class Domain: NSManagedObject {
+public class DomainMO: NSManagedObject {
     
     @NSManaged public var url: String?
     @NSManaged public var visits: Int32
@@ -35,19 +35,19 @@ public class Domain: NSManagedObject {
         return domainUrl
     }
 
-    public class func getOrCreateForUrl(_ url: URL, context: NSManagedObjectContext) -> Domain? {
-        let domainString = Domain.domainAndScheme(fromUrl: url)
+    public class func getOrCreateForUrl(_ url: URL, context: NSManagedObjectContext) -> DomainMO? {
+        let domainString = DomainMO.domainAndScheme(fromUrl: url)
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
-        fetchRequest.entity = Domain.entity(context)
+        fetchRequest.entity = DomainMO.entity(context)
         fetchRequest.predicate = NSPredicate(format: "url == %@", domainString)
-        var result: Domain? = nil
+        var result: DomainMO? = nil
         context.performAndWait {
             do {
-                let results = try context.fetch(fetchRequest) as? [Domain]
+                let results = try context.fetch(fetchRequest) as? [DomainMO]
                 if let item = results?.first {
                     result = item
                 } else {
-                    result = Domain(entity: Domain.entity(context), insertInto: context)
+                    result = DomainMO(entity: DomainMO.entity(context), insertInto: context)
                     result?.url = domainString
                 }
             } catch {
@@ -65,40 +65,40 @@ public class Domain: NSManagedObject {
         }
     }
 
-    public class func blockedTopSites(_ context: NSManagedObjectContext) -> [Domain] {
+    public class func blockedTopSites(_ context: NSManagedObjectContext) -> [DomainMO] {
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
-        fetchRequest.entity = Domain.entity(context)
+        fetchRequest.entity = DomainMO.entity(context)
         fetchRequest.predicate = NSPredicate(format: "blockedFromTopSites == %@", NSNumber(value: true as Bool))
         do {
-            if let results = try context.fetch(fetchRequest) as? [Domain] {
+            if let results = try context.fetch(fetchRequest) as? [DomainMO] {
                 return results
             }
         } catch {
             let fetchError = error as NSError
             print(fetchError)
         }
-        return [Domain]()
+        return [DomainMO]()
     }
 
-    public class func topSitesQuery(_ limit: Int, context: NSManagedObjectContext) -> [Domain] {
+    public class func topSitesQuery(_ limit: Int, context: NSManagedObjectContext) -> [DomainMO] {
         assert(!Thread.isMainThread)
 
         let minVisits = 5
 
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
         fetchRequest.fetchLimit = limit
-        fetchRequest.entity = Domain.entity(context)
+        fetchRequest.entity = DomainMO.entity(context)
         fetchRequest.predicate = NSPredicate(format: "visits > %i AND blockedFromTopSites != %@", minVisits, NSNumber(value: true as Bool))
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: "visits", ascending: false)]
         do {
-            if let results = try context.fetch(fetchRequest) as? [Domain] {
+            if let results = try context.fetch(fetchRequest) as? [DomainMO] {
                 return results
             }
         } catch {
             let fetchError = error as NSError
             print(fetchError)
         }
-        return [Domain]()
+        return [DomainMO]()
     }
 
 //    class func setBraveShield(forDomain domainString: String, state: (BraveShieldState.Shield, Bool?), context: NSManagedObjectContext) {
@@ -165,10 +165,10 @@ public class Domain: NSManagedObject {
         let context = DataManager.shared.workerContext
         context.perform {
             let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
-            fetchRequest.entity = Domain.entity(context)
+            fetchRequest.entity = DomainMO.entity(context)
             do {
                 let results = try context.fetch(fetchRequest)
-                (results as? [Domain])?.forEach {
+                (results as? [DomainMO])?.forEach {
                     if let bms = $0.bookmarks, bms.count > 0 {
                         // Clear visit count
                         $0.visits = 0
