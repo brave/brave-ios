@@ -8,7 +8,7 @@ public class DomainMO: NSManagedObject {
     @NSManaged public var visits: Int32
     @NSManaged public var topsite: Bool // not currently used. Should be used once proper frecency code is in.
     @NSManaged public var blockedFromTopSites: Bool // don't show ever on top sites
-//    @NSManaged var favicon: FaviconMO?
+    @NSManaged public var favicon: FaviconMO?
 
     @NSManaged public var shield_allOff: NSNumber?
     @NSManaged public var shield_adblockAndTp: NSNumber?

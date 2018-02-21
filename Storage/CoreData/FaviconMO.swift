@@ -2,7 +2,7 @@
 
 import CoreData
 
-class FaviconMO: NSManagedObject {
+public class FaviconMO: NSManagedObject {
     
     @NSManaged public var url: String?
     @NSManaged public var width: Int16
