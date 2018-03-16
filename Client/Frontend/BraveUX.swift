@@ -9,5 +9,6 @@ struct BraveUX {
 
     struct TabsBar {
         static let buttonWidth = UIDevice.current.userInterfaceIdiom == .pad ? 40 : 0
+        static let height: CGFloat = 29
     }
 }

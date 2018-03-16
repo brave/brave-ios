@@ -41,6 +41,7 @@ class BrowserViewController: UIViewController {
     var homePanelController: HomePanelViewController?
     var webViewContainer: UIView!
     var urlBar: URLBarView!
+    var tabsBar: TabsBarViewController!
     var clipboardBarDisplayHandler: ClipboardBarDisplayHandler?
     var readerModeBar: ReaderModeBarView?
     var readerModeCache: ReaderModeCache
@@ -342,7 +343,15 @@ class BrowserViewController: UIViewController {
         header = urlBarTopTabsContainer
         urlBarTopTabsContainer.addSubview(urlBar)
         urlBarTopTabsContainer.addSubview(topTabsContainer)
+
+        tabsBar = TabsBarViewController()
+        tabsBar.tabManager = tabManager
+        urlBarTopTabsContainer.addSubview(tabsBar.view)
+
         view.addSubview(header)
+
+        addChildViewController(tabsBar)
+        tabsBar.didMove(toParentViewController: self)
 
         // UIAccessibilityCustomAction subclass holding an AccessibleAction instance does not work, thus unable to generate AccessibleActions and UIAccessibilityCustomActions "on-demand" and need to make them "persistent" e.g. by being stored in BVC
         pasteGoAction = AccessibleAction(name: NSLocalizedString("Paste & Go", comment: "Paste the URL into the location bar and visit"), handler: { () -> Bool in
@@ -398,10 +407,20 @@ class BrowserViewController: UIViewController {
         }
         
         urlBar.snp.makeConstraints { make in
-            make.leading.trailing.bottom.equalTo(urlBarTopTabsContainer)
+            make.leading.trailing.equalTo(urlBarTopTabsContainer)
             make.height.equalTo(UIConstants.TopToolbarHeight)
             make.top.equalTo(topTabsContainer.snp.bottom)
         }
+
+        // FIXME: Hide tabs bar when not used
+//        if tabsBar.view.superview != nil {
+//            bringSubview(toFront: tabsBarController.view)
+            tabsBar.view.snp.makeConstraints { make in
+                make.leading.trailing.bottom.equalTo(urlBarTopTabsContainer)
+                make.height.equalTo(BraveUX.TabsBar.height)
+                make.top.equalTo(urlBar.snp.bottom)
+            }
+//        }
 
         header.snp.makeConstraints { make in
             scrollController.headerTopConstraint = make.top.equalTo(self.topLayoutGuide.snp.bottom).constraint

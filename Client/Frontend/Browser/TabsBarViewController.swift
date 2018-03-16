@@ -27,10 +27,10 @@ class TabBarCell: UICollectionViewCell {
     let close = UIButton()
     let separatorLine = UIView()
     let separatorLineRight = UIView()
+    weak var tabManager: TabManager?
     var currentIndex: Int = -1 {
         didSet {
-            // FIXME: getApp
-//            isSelected = currentIndex == getApp().tabManager.currentDisplayedIndex
+            isSelected = currentIndex == tabManager?.currentDisplayedIndex
         }
     }
     weak var browser: Tab? {
@@ -62,7 +62,7 @@ class TabBarCell: UICollectionViewCell {
             make.right.equalTo(close.snp.left)
         })
         
-        close.setImage(UIImage(named: "stop")?.withRenderingMode(.alwaysTemplate), for: .normal)
+        close.setImage(UIImage(named: "close_tab_bar")?.withRenderingMode(.alwaysTemplate), for: .normal)
         close.snp.makeConstraints({ (make) in
             make.top.bottom.equalTo(self)
             make.right.equalTo(self).inset(2)
@@ -71,7 +71,7 @@ class TabBarCell: UICollectionViewCell {
 
         // FIXME: Private browsing color
         // close.tintColor = PrivateBrowsing.singleton.isOn ? UIColor.white : UIColor.black
-        close.tintColor = UIColor.white
+        close.tintColor = UIColor.black
 
         // Close button is a bit wider to increase tap area, this aligns 'X' image closer to the right.
         close.imageEdgeInsets.left = 6
@@ -115,17 +115,21 @@ class TabBarCell: UICollectionViewCell {
                 close.tintColor = UIColor.black
                 backgroundColor = BraveUX.barsBackgroundSolidColor
             }
-            // FIXME: getApp, selected tab
-            /*
-            else if currentIndex != getApp().tabManager.currentDisplayedIndex {
+            else if currentIndex != tabManager?.currentDisplayedIndex {
                 // prevent swipe and release outside- deselects cell.
                 title.font = UIFont.systemFont(ofSize: 12)
+                // FIXME: Private browsing
+                /*
                 title.textColor = PrivateBrowsing.singleton.isOn ? UIColor(white: 1.0, alpha: 0.4) : UIColor(white: 0.0, alpha: 0.4)
                 close.isHidden = true
                 close.tintColor = PrivateBrowsing.singleton.isOn ? UIColor.white : UIColor.black
                 backgroundColor = UIColor.clear
+                */
+                title.textColor = UIColor(white: 0.0, alpha: 0.4)
+                close.isHidden = true
+                close.tintColor = UIColor.black
+                backgroundColor = UIColor.clear
             }
-            */
         }
     }
     
@@ -173,13 +177,15 @@ class TabsBarViewController: UIViewController {
     
     var collectionLayout: UICollectionViewFlowLayout!
     var collectionView: UICollectionView!
+
+    weak var tabManager: TabManager?
     
     fileprivate var tabList = WeakList<Tab>()
 
     var isVisible:Bool {
         return self.view.alpha > 0
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -223,8 +229,7 @@ class TabsBarViewController: UIViewController {
             make.right.equalTo(view).inset(BraveUX.TabsBar.buttonWidth)
         }
 
-        // FIXME: getApp
-        // getApp().tabManager.addDelegate(self)
+        tabManager?.addDelegate(self)
         
         NotificationCenter.default.addObserver(self, selector: #selector(updateData), name: kRearangeTabNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(orientationChanged), name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
@@ -234,16 +239,13 @@ class TabsBarViewController: UIViewController {
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
 
-        // FIXME: getApp selected tab
-        /*
         // ensure the selected tab is visible after rotations
-        if let index = getApp().tabManager.currentDisplayedIndex {
+        if let index = tabManager?.currentDisplayedIndex {
             let indexPath = IndexPath(item: index, section: 0)
             // since bouncing is disabled, centering horizontally
             // will not overshoot the edges for the bookend tabs
             collectionView?.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: false)
         }
-        */
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             self.reloadDataAndRestoreSelectedTab()
@@ -260,12 +262,12 @@ class TabsBarViewController: UIViewController {
     
     func updateData() {
         tabList = WeakList<Tab>()
-        // FIXME: getApp
-        /*
-        getApp().tabManager.tabs.displayedTabsForCurrentPrivateMode.forEach {
+
+        // FIXME: Add private tabs option
+        tabManager?.normalTabs.forEach {
             tabList.insert($0)
         }
-        */
+
         overflowIndicators()
         
         reloadDataAndRestoreSelectedTab()
@@ -274,15 +276,12 @@ class TabsBarViewController: UIViewController {
     func reloadDataAndRestoreSelectedTab() {
         collectionView.reloadData()
 
-        // FIXME: getApp selected tab
-        /*
-        if let selectedTab = getApp().tabManager.selectedTab {
+        if let selectedTab = tabManager?.selectedTab, let tabManager = tabManager {
             let selectedIndex = tabList.index(of: selectedTab) ?? 0
             if selectedIndex < tabList.count() {
-                collectionView.selectItem(at: IndexPath(row: selectedIndex, section: 0), animated: (!getApp().tabManager.isRestoring), scrollPosition: .centeredHorizontally)
+                collectionView.selectItem(at: IndexPath(row: selectedIndex, section: 0), animated: (!tabManager.isRestoring), scrollPosition: .centeredHorizontally)
             }
         }
-        */
     }
     
     func handleLongGesture(gesture: UILongPressGestureRecognizer) {
@@ -302,8 +301,7 @@ class TabsBarViewController: UIViewController {
     }
     
     func addTabPressed() {
-        // FIXME: getApp
-        // getApp().tabManager.addTabAndSelect()
+        tabManager?.addTabAndSelect()
     }
 
     func tabOverflowWidth(_ tabCount: Int) -> CGFloat {
@@ -322,7 +320,7 @@ class TabsBarViewController: UIViewController {
         collectionView.backgroundColor = UIColor(white: 0.0, alpha: 0.075)
         scrollHints()
 
-        // FIXME: getApp tab count
+        // FIXME: getApp tab count, we are not going to show tabs count btw.
         /*
         if tabOverflowWidth(getApp().tabManager.tabCount) < 1 {
             leftOverflowIndicator.opacity = 0
@@ -392,6 +390,7 @@ extension TabsBarViewController: UICollectionViewDelegate, UICollectionViewDataS
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell: TabBarCell = collectionView.dequeueReusableCell(withReuseIdentifier: "TabCell", for: indexPath) as! TabBarCell
         guard let tab = tabList.at(indexPath.row) else { return cell }
+        cell.tabManager = tabManager
         cell.delegate = self
         cell.browser = tab
         cell.title.text = tab.displayTitle
@@ -404,8 +403,7 @@ extension TabsBarViewController: UICollectionViewDelegate, UICollectionViewDataS
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let tab = tabList.at(indexPath.row)
-        // FIXME: getApp
-        // getApp().tabManager.selectTab(tab)
+        tabManager?.selectTab(tab)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -431,33 +429,31 @@ extension TabsBarViewController: UICollectionViewDelegate, UICollectionViewDataS
         guard let tab = tabList.at(sourceIndexPath.row) else { return }
         
         // Find original from/to index... we need to target the full list not partial.
-        // FIXME: getApp, moving tabs, this is important
-
-        /*
-        guard let tabManager = getApp().tabManager else { return }
-        guard let from = tabManager.tabs.tabs.index(where: {$0 === tab}) else { return }
+        guard let tabManager = tabManager else { return }
+        guard let from = tabManager.tabs.index(where: {$0 === tab}) else { return }
         
         let toTab = tabList.at(destinationIndexPath.row)
-        guard let to = tabManager.tabs.tabs.index(where: {$0 === toTab}) else { return }
-        
-        tabManager.move(tab: tab, from: from, to: to)
+        guard let to = tabManager.tabs.index(where: {$0 === toTab}) else { return }
+
+        // FIXME: Move in private mode too
+        tabManager.moveTab(isPrivate: false, fromIndex: from, toIndex: to)
         updateData()
         
         guard let selectedTab = tabList.at(destinationIndexPath.row) else { return }
         tabManager.selectTab(selectedTab)
-        */
     }
 }
 
 extension TabsBarViewController: TabBarCellDelegate {
     func tabClose(_ tab: Tab?) {
         guard let tab = tab else { return }
-        // FIXME: getApp
-        /*
-        guard let tabManager = getApp().tabManager else { return }
-        guard let previousIndex = tabList.index(of: tab) else { return }
         
-        tabManager.removeTab(tab, createTabIfNoneLeft: true)
+        guard let tabManager = tabManager else { return }
+        guard let previousIndex = tabList.index(of: tab) else { return }
+
+        // FIXME: Not sure if we need 'createTabIfNoneLeft'
+        // tabManager.removeTab(tab, createTabIfNoneLeft: true)
+        tabManager.removeTab(tab)
         
         updateData()
         
@@ -465,7 +461,6 @@ extension TabsBarViewController: TabBarCellDelegate {
         tabManager.selectTab(tabList.at(previousOrNext))
         
         collectionView.selectItem(at: IndexPath(row: previousOrNext, section: 0), animated: true, scrollPosition: .centeredHorizontally)
-        */
     }
 }
 

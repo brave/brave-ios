@@ -130,6 +130,25 @@ class TabManager: NSObject {
         return tabs[_selectedIndex]
     }
 
+    var currentDisplayedIndex: Int? {
+        assert(Thread.isMainThread)
+
+        guard let selectedTab = self.selectedTab else {
+            return nil
+        }
+
+        // FIXME: Counting only normal tabs
+        return normalTabs.index(of: selectedTab)
+    }
+
+    // What the users sees displayed based on current private browsing mode
+    var displayedTabsForCurrentPrivateMode: [Tab] {
+        // FIXME: Private browsing
+        // return PrivateBrowsing.singleton.isOn ? privateTabs : nonprivateTabs
+
+        return normalTabs
+    }
+
     subscript(index: Int) -> Tab? {
         assert(Thread.isMainThread)
 
