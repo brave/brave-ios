@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		03CCC9181AF05E7300DBF30D /* RelativeDatesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03CCC9171AF05E7300DBF30D /* RelativeDatesTests.swift */; };
+		0A95582F205C1D7800DBE009 /* TabsBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A955820205C1D7800DBE009 /* TabsBarViewController.swift */; };
+		0A955831205C1F9C00DBE009 /* BraveUX.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A955830205C1F9C00DBE009 /* BraveUX.swift */; };
 		0B1C05D71A798B1F004C78B0 /* UIImageViewAligned.m in Sources */ = {isa = PBXBuildFile; fileRef = 0B1C05D61A798B1F004C78B0 /* UIImageViewAligned.m */; };
 		0B21E8061E26CCB7000C8779 /* EarlGrey.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 0B21E8051E26CCB7000C8779 /* EarlGrey.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		0B305E1B1E3A98A900BE0767 /* BookmarkingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B305E1A1E3A98A900BE0767 /* BookmarkingTests.swift */; };
@@ -1385,6 +1387,8 @@
 
 /* Begin PBXFileReference section */
 		03CCC9171AF05E7300DBF30D /* RelativeDatesTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RelativeDatesTests.swift; sourceTree = "<group>"; };
+		0A955820205C1D7800DBE009 /* TabsBarViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabsBarViewController.swift; sourceTree = "<group>"; };
+		0A955830205C1F9C00DBE009 /* BraveUX.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveUX.swift; sourceTree = "<group>"; };
 		0B1C05D51A798B1F004C78B0 /* UIImageViewAligned.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIImageViewAligned.h; sourceTree = "<group>"; };
 		0B1C05D61A798B1F004C78B0 /* UIImageViewAligned.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UIImageViewAligned.m; sourceTree = "<group>"; };
 		0B21E8051E26CCB7000C8779 /* EarlGrey.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EarlGrey.framework; path = Carthage/Build/iOS/EarlGrey.framework; sourceTree = "<group>"; };
@@ -3149,6 +3153,7 @@
 				3BF56D261CDBBE1F00AC4D75 /* SimpleToast.swift */,
 				E68AEDAF1B18F81A00133D99 /* SwipeAnimator.swift */,
 				D3A994961A3686BD008AD1AC /* Tab.swift */,
+				0A955820205C1D7800DBE009 /* TabsBarViewController.swift */,
 				E4CD9F2C1A6DC91200318571 /* TabLocationView.swift */,
 				D3968F241A38FE8500CEFD3B /* TabManager.swift */,
 				7BA0601A1C0F4DE200DFADB6 /* TabPeekViewController.swift */,
@@ -3721,6 +3726,7 @@
 		F84B21F11A0910F600AAB793 /* Frontend */ = {
 			isa = PBXGroup;
 			children = (
+				0A955830205C1F9C00DBE009 /* BraveUX.swift */,
 				EB2A63241F3B49A7004EF8B0 /* ContentBlocker */,
 				D331DFC91CB6E9EE009B5DA2 /* OldStrings.swift */,
 				2816EFFF1B33E05400522243 /* UIConstants.swift */,
@@ -5566,6 +5572,7 @@
 				E692E3371C46E86A009D1240 /* AppSettingsOptions.swift in Sources */,
 				D38F02D11C05127100175932 /* Authenticator.swift in Sources */,
 				E68E7ADC1CAC208200FDCA76 /* SetupPasscodeViewController.swift in Sources */,
+				0A955831205C1F9C00DBE009 /* BraveUX.swift in Sources */,
 				7B3631EA1C244FEE00D12AF9 /* Theme.swift in Sources */,
 				3B61CD491F2A74EF00D38DE1 /* PocketFeed.swift in Sources */,
 				396E38F11EE0C8EC00CC180F /* FxAPushMessageHandler.swift in Sources */,
@@ -5658,6 +5665,7 @@
 				E4A961341AC051360069AD6F /* ReadabilityTabHelper.swift in Sources */,
 				D31A0FC71A65D6D000DC8C7E /* SearchSuggestClient.swift in Sources */,
 				A83E5AB71C1D993D0026D912 /* UIPasteboardExtensions.swift in Sources */,
+				0A95582F205C1D7800DBE009 /* TabsBarViewController.swift in Sources */,
 				D0E55C4F1FB4FD23006DC274 /* FormPostHelper.swift in Sources */,
 				E650754E1E37F6AE006961AC /* GeometryExtensions.swift in Sources */,
 				D3972BF41C22412B00035B87 /* TitleActivityItemProvider.swift in Sources */,

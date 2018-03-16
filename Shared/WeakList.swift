@@ -53,6 +53,18 @@ open class WeakList<T: AnyObject>: Sequence {
             return nil
         }
     }
+
+    open func count() -> Int {
+        return self.items.count
+    }
+
+    open func at(_ index: Int) -> T? {
+        return self.items[index].value
+    }
+
+    open func index(of object: T) -> Int? {
+        return self.items.index(where: { $0.value === object })
+    }
 }
 
 open class WeakRef<T: AnyObject> {
