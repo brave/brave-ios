@@ -4337,60 +4337,28 @@
 				TargetAttributes = {
 					2827315D1ABC9BE600AA1954 = {
 						CreatedOnToolsVersion = 6.2;
-<<<<<<< HEAD
-						DevelopmentTeam = 43AQ936H96;
-=======
->>>>>>> d0b63bfcb... References #12: Removed additional refs to 'developmentteam'
 						LastSwiftMigration = 0820;
 					};
 					282731671ABC9BE700AA1954 = {
 						CreatedOnToolsVersion = 6.2;
-<<<<<<< HEAD
-						DevelopmentTeam = 43AQ936H96;
-=======
->>>>>>> d0b63bfcb... References #12: Removed additional refs to 'developmentteam'
 						LastSwiftMigration = 0820;
 						TestTargetID = F84B21BD1A090F8100AAB793;
 					};
 					288A2D851AB8B3260023ABC3 = {
 						CreatedOnToolsVersion = 6.2;
-<<<<<<< HEAD
-						DevelopmentTeam = 43AQ936H96;
-=======
->>>>>>> d0b63bfcb... References #12: Removed additional refs to 'developmentteam'
 						LastSwiftMigration = 0820;
 					};
 					2FA435FA1ABB83B4008031D1 = {
 						CreatedOnToolsVersion = 6.2;
-<<<<<<< HEAD
-						DevelopmentTeam = 43AQ936H96;
-=======
->>>>>>> d0b63bfcb... References #12: Removed additional refs to 'developmentteam'
-						LastSwiftMigration = 0820;
-					};
-					2FA436041ABB83B4008031D1 = {
-						CreatedOnToolsVersion = 6.2;
-<<<<<<< HEAD
-						DevelopmentTeam = 43AQ936H96;
-=======
->>>>>>> d0b63bfcb... References #12: Removed additional refs to 'developmentteam'
 						LastSwiftMigration = 0820;
 						TestTargetID = F84B21BD1A090F8100AAB793;
 					};
 					2FCAE2191ABB51F800877008 = {
 						CreatedOnToolsVersion = 6.2;
-<<<<<<< HEAD
-						DevelopmentTeam = 43AQ936H96;
-=======
->>>>>>> d0b63bfcb... References #12: Removed additional refs to 'developmentteam'
 						LastSwiftMigration = 0820;
 					};
 					2FCAE2231ABB51F800877008 = {
 						CreatedOnToolsVersion = 6.2;
-<<<<<<< HEAD
-						DevelopmentTeam = 43AQ936H96;
-=======
->>>>>>> d0b63bfcb... References #12: Removed additional refs to 'developmentteam'
 						LastSwiftMigration = 0820;
 						TestTargetID = F84B21BD1A090F8100AAB793;
 					};
@@ -4416,60 +4384,18 @@
 					};
 					3B43E3CF1D95C48D00BBA9DB = {
 						CreatedOnToolsVersion = 8.0;
-<<<<<<< HEAD
-						DevelopmentTeam = 43AQ936H96;
-=======
->>>>>>> d0b63bfcb... References #12: Removed additional refs to 'developmentteam'
 						LastSwiftMigration = 0820;
 						ProvisioningStyle = Automatic;
 						TestTargetID = F84B21BD1A090F8100AAB793;
 					};
 					3BFE4B061D342FB800DDF53F = {
 						CreatedOnToolsVersion = 7.3.1;
-<<<<<<< HEAD
-						DevelopmentTeam = 43AQ936H96;
-						LastSwiftMigration = 0820;
-						TestTargetID = F84B21BD1A090F8100AAB793;
-					};
-					5D1DC51220AC9AF900905E5A = {
-						CreatedOnToolsVersion = 9.3;
-						DevelopmentTeam = 43AQ936H96;
-=======
 						LastSwiftMigration = 0820;
 						TestTargetID = F84B21BD1A090F8100AAB793;
 					};
 					7BEB64401C7345600092C02E = {
->>>>>>> d0b63bfcb... References #12: Removed additional refs to 'developmentteam'
 						ProvisioningStyle = Automatic;
 					};
-<<<<<<< HEAD
-					5D1DC51A20AC9AFA00905E5A = {
-						CreatedOnToolsVersion = 9.3;
-						DevelopmentTeam = KL8N8XSYF4;
-						ProvisioningStyle = Automatic;
-						TestTargetID = F84B21BD1A090F8100AAB793;
-					};
-					5DE7688320B3456C00FF5533 = {
-						CreatedOnToolsVersion = 9.3;
-					};
-					5DE7688B20B3456E00FF5533 = {
-						CreatedOnToolsVersion = 9.3;
-						DevelopmentTeam = KL8N8XSYF4;
-						ProvisioningStyle = Automatic;
-						TestTargetID = F84B21BD1A090F8100AAB793;
-					};
-					7BEB64401C7345600092C02E = {
-						DevelopmentTeam = 43AQ936H96;
-						TestTargetID = F84B21BD1A090F8100AAB793;
-					};
-					7BEB644F1C7345990092C02E = {
-						DevelopmentTeam = 43AQ936H96;
-						TestTargetID = F84B21BD1A090F8100AAB793;
-					};
-					D39FA15E1A83E0EC00EE869C = {
-						CreatedOnToolsVersion = 6.1.1;
-						DevelopmentTeam = 43AQ936H96;
-=======
 					7BEB644F1C7345990092C02E = {
 						ProvisioningStyle = Automatic;
 						TestTargetID = F84B21BD1A090F8100AAB793;
@@ -4497,35 +4423,21 @@
 					};
 					E4D567211ADECE2700F1EFE7 = {
 						CreatedOnToolsVersion = 6.3;
->>>>>>> d0b63bfcb... References #12: Removed additional refs to 'developmentteam'
 						LastSwiftMigration = 0820;
 						TestTargetID = F84B21BD1A090F8100AAB793;
 					};
 					E69DB0741E97DEA9008A67E6 = {
 						CreatedOnToolsVersion = 8.3;
-<<<<<<< HEAD
-						DevelopmentTeam = 43AQ936H96;
-						ProvisioningStyle = Manual;
-					};
-					E69DB07C1E97DEA9008A67E6 = {
-						CreatedOnToolsVersion = 8.3;
-						DevelopmentTeam = 43AQ936H96;
-=======
 						ProvisioningStyle = Automatic;
 					};
 					E69DB07C1E97DEA9008A67E6 = {
 						CreatedOnToolsVersion = 8.3;
->>>>>>> d0b63bfcb... References #12: Removed additional refs to 'developmentteam'
 						LastSwiftMigration = 0830;
 						ProvisioningStyle = Automatic;
 						TestTargetID = F84B21BD1A090F8100AAB793;
 					};
 					E6F9650B1B2F1CF20034B023 = {
 						CreatedOnToolsVersion = 6.3.2;
-<<<<<<< HEAD
-						DevelopmentTeam = 43AQ936H96;
-=======
->>>>>>> d0b63bfcb... References #12: Removed additional refs to 'developmentteam'
 						LastSwiftMigration = 0820;
 					};
 					F84B21BD1A090F8100AAB793 = {
@@ -4552,10 +4464,6 @@
 					};
 					F84B21D21A090F8100AAB793 = {
 						CreatedOnToolsVersion = 6.1;
-<<<<<<< HEAD
-						DevelopmentTeam = 43AQ936H96;
-=======
->>>>>>> d0b63bfcb... References #12: Removed additional refs to 'developmentteam'
 						LastSwiftMigration = 0820;
 						TestTargetID = F84B21BD1A090F8100AAB793;
 					};
@@ -4568,8 +4476,6 @@
 								enabled = 0;
 							};
 							com.apple.Keychain = {
-<<<<<<< HEAD
-=======
 								enabled = 1;
 							};
 							com.apple.Push = {
@@ -4583,7 +4489,6 @@
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
->>>>>>> d0b63bfcb... References #12: Removed additional refs to 'developmentteam'
 								enabled = 0;
 							};
 							com.apple.Push = {

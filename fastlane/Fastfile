@@ -1,0 +1,289 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+fastlane_version "2.86.0"
+
+default_platform :ios
+
+import "../../build-tools/fastlane/Fastfile"
+
+
+# platform :ios do
+#   before_all do
+#     sh("./scripts/mkdirs.sh")
+#     ensure_git_status_clean()
+#   end
+
+#   after_all do |lane|
+#     reset_git_repo(force: true)
+#   end
+
+#   error do |lane, exception|
+#     reset_git_repo(force: true)
+#   end
+
+#   desc "Joel's lane"
+#   lane :joel do |options|
+#   end
+
+#   desc "Creates a Firefox Nightly build for TestFlight"
+#   lane :nightly do |options|
+#     update_build_number_to_next()
+
+#     build_name = "FirefoxNightly-v#{get_version_number}b#{get_build_number}"
+
+#     add_badge(color: "blue")
+
+#     carthage(platform: "iOS", use_binaries: false)
+
+#     sh("../scripts/localise.sh")
+
+#     gym(
+#       scheme: "FirefoxNightly",
+#       output_directory: "./builds/",
+#       output_name: "#{build_name}.ipa",
+#       sdk: "iphoneos",
+#       clean: true,
+#       export_method: "app-store",
+#       include_symbols: true,
+#       include_bitcode: true,
+#       use_legacy_build_api: true,
+#       toolchain: "swift_2_3"
+#     )
+
+#     git_tagify(
+#       tag_name: build_name
+#     )
+
+#     pilot(
+#       ipa: "./builds/#{build_name}.ipa"
+#     )
+#   end
+
+#   desc "Creates a Firefox Beta build for TestFlight. Takes the following arguments: \"
+#   :adjust_sandbox_key   Adjust API Key for sandbox environment."
+#   lane :beta do |options|
+#     update_build_number_to_next()
+
+#     build_name = "FirefoxBeta-v#{get_version_number}b#{get_build_number}"
+
+#     add_badge(color: "orange")
+
+#     carthage(platform: "iOS", use_binaries: false)
+
+#     configure_adjust(
+#       config: "FirefoxBeta",
+#       environment: "sandbox",
+#       app_token: options[:adjust_sandbox_key]
+#     )
+
+#     sh("../scripts/localise.sh")
+
+#     gym(
+#       scheme: "FirefoxBeta",
+#       output_directory: "./builds/",
+#       output_name: "#{build_name}.ipa",
+#       sdk: "iphoneos",
+#       clean: true,
+#       export_method: "app-store",
+#       include_symbols: true,
+#       include_bitcode: true,
+#       use_legacy_build_api: true,
+#       toolchain: "swift_2_3"
+#     )
+
+#     git_tagify(
+#       tag_name: build_name
+#     )
+
+#     pilot(
+#       ipa: "./builds/#{build_name}.ipa"
+#     )
+#   end
+
+#   desc "Creates a Firefox Release build for TestFlight. Takes the following arguments: \"
+#   :adjust_production_key   Adjust API Key for production."
+#   lane :release do |options|
+#     update_build_number_to_next()
+
+#     build_name = "Firefox-v#{get_version_number}b#{get_build_number}"
+
+#     carthage(platform: "iOS", use_binaries: false)
+
+#     configure_adjust(
+#       config: "Firefox",
+#       environment: "production",
+#       app_token: options[:adjust_production_key]
+#     )
+
+#     sh("../scripts/localise.sh --release")
+
+#     gym(
+#       scheme: "Firefox",
+#       output_directory: "./builds/",
+#       output_name: "#{build_name}.ipa",
+#       sdk: "iphoneos",
+#       clean: true,
+#       export_method: "app-store",
+#       include_symbols: true,
+#       include_bitcode: true,
+#       use_legacy_build_api: true,
+#       toolchain: "swift_2_3"
+#     )
+
+#     git_tagify(
+#       tag_name: build_name
+#     )
+
+#     pilot(
+#       ipa: "./builds/#{build_name}.ipa",
+#       skip_submission: true
+#     )
+#   end
+
+#   desc "Builds a FennacAurora l10n build. Takes the following arguments: \n \
+#   :build                the build number for the l10n build."
+#   lane :l10n do |options|
+#     increment_build_number(
+#       build_number: options[:build],
+#       xcodeproj: 'Client.xcodeproj'
+#     )
+
+#     build_name = "FennecAuroraL10N-v#{get_version_number}b#{options[:build]}"
+
+#     carthage(platform: "iOS", use_binaries: false)
+
+#     sh("../scripts/localise.sh")
+
+#     # This is duplicating the original AppDelegate hack from firefox-ios-builde copy an l10n specific AppDelegate into the project
+#     sh("cp templates/FennecAurora-L10N.swift ../Client/Application/AuroraAppDelegate.swift || exit 1")
+
+#     gym(scheme: "FennecAurora",
+#       output_directory: "./builds/",
+#       output_name: "#{build_name}.ipa",
+#       sdk: "iphoneos",
+#       clean: true,
+#       export_method: "enterprise",
+#       include_symbols: true,
+#       include_bitcode: false,
+#       include_bitcode: true,
+#       use_legacy_build_api: true
+#     )
+
+#     upload_enterprise_build(
+#       version: get_version_number,
+#       build: options[:build],
+#       datestamp: Time.now.utc.iso8601.gsub(/\W/, ''),
+#       scheme: "FennecAurora-L10N", # This is really build_flavour
+#       plist: "fastlane/templates/FennecAurora-L10N.plist.tmpl",
+#       html: "fastlane/templates/FennecAurora-L10N.html.tmpl",
+#       release_notes: "/dev/null",
+#       build_location: "builds",
+#       build_name: build_name,
+#       host: "people.mozilla.org",
+#       upload_location: "/home/iosbuilds"
+#     )
+#   end
+
+#   desc "Takes marketing snapshots using current branch"
+#   lane :marketing do
+#     snapshot(reinstall_app: true)
+#     frameit(white: true)
+#   end
+
+#   desc "Takes localization snapshots \
+#   :devices - a comma separated list of devices to take snapshots on. Defaults to [iPhone 4s, iPhone 5s, iPhone 6s, iPhone 6s Plus, iPad 2, iPad Pro] \
+#   :languages - a comma separated list of languages to take snapshots of. Defaults to list of languages in ./firefoxios-l10n \
+#   :output_directory - the directory to output the snapshots to"
+#   lane :snapshotL10n do |options|
+#     if options[:devices]
+#       devices = options[:devices].split(",")
+#     else
+#       devices = ["iPhone 4s", "iPhone 5s", "iPhone 6s", "iPhone 6s Plus", "iPad 2", "iPad Pro"]
+#     end
+
+#     if options[:languages]
+#       languages = options[:languages].split(",")
+#     else
+#       # get the languages from the repo
+#       language_options = Dir.entries("../firefoxios-l10n")
+#       languages = []
+#       for language in language_options
+#         if language != "templates" && language != "README.md" && language != "." && language != ".."
+#           languages.push(language)
+#         end
+#       end
+#     end
+
+#     output_dir = options[:output_directory] || "./screenshots"
+#     Dir.mkdir(output_dir) unless File.directory?(output_dir)
+
+#     output_links = ""
+#     # loop through languages
+#     for language in languages
+#       # create a new directory (if it doesn't exist) for the language
+#       language_dir = "#{output_dir}/#{language}"
+#       Dir.mkdir(language_dir) unless File.directory?(language_dir)
+#       if not options[:output_directory]
+#         language_dir = "./fastlane/screenshots/#{language}"
+#       end
+#       # pass that directory as the output directory into snapshot
+#       snapshot(
+#         scheme: "L10nSnapshotTests",
+#         devices: devices,
+#         languages: [language],
+#         output_directory: language_dir,
+#         stop_after_first_error: true,
+#         reinstall_app: true,
+#         skip_open_summary: true
+#       )
+#       # add dir name to array
+#       output_file = "#{language}/screenshots.html"
+#       output_links << "<li><a href='#{output_file}'>#{language}</a></li>\n"
+#       Helper.log.debug "Creating snapshots for #{language} in #{language_dir}/screenshots.html"
+#     end
+#     Helper.log.debug "all screenshots: #{output_links}"
+#     # create (from a template) a new HTML file in options[:output_directory] || "./fastlane/screenshots" to index all language files
+#     index_html = ""
+#     File.open("./templates/SnapshotIndex.html.tmpl", "r") do |f|
+#       f.each_line do |line|
+#         index_html += line
+#       end
+#     end
+#     index_html.gsub! '#{locale_links}', output_links
+#     File.open("#{output_dir}/index.html", 'w') {|f| f.write(index_html) }
+#     Helper.log.info "Snapshot Index can be found at #{output_dir}/index.html"
+#     sh("open #{output_dir}/index.html")
+#   end
+
+
+
+#   # Private helper methods ---------------------------------------
+
+#   desc "Adds the version/build tag on top of the AppIcon. Takes the following arguments: \"
+#   :color              The color of the right area of the badge."
+#   private_lane :add_badge do |options|
+#     badge(
+#       shield: "#{get_version_number}-Build%20#{get_build_number}-#{options[:color]}",
+#       no_badge: true,
+#       shield_no_resize: true
+#     )
+#   end
+
+#   desc "Updates the project's build number to be the next number acceptable by TestFlight. Takes the following arguments: \"
+#   :username             Apple ID to use to talk to iTunes Connect with."
+#   private_lane :update_build_number_to_next do |options|
+#     latest_build_number = latest_testflight_build_number(
+#       version: get_version_number,
+#       initial_build_number: 0
+#     )
+
+#     build_number = latest_build_number + 1
+#     increment_build_number(
+#       build_number: build_number,
+#       xcodeproj: 'Client.xcodeproj'
+#     )
+#   end
+
+# end
