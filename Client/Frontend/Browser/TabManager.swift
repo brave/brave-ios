@@ -137,16 +137,12 @@ class TabManager: NSObject {
             return nil
         }
 
-        // FIXME: Counting only normal tabs
-        return normalTabs.index(of: selectedTab)
+        return UIApplication.isInPrivateMode ? privateTabs.index(of: selectedTab) : normalTabs.index(of: selectedTab)
     }
 
     // What the users sees displayed based on current private browsing mode
     var displayedTabsForCurrentPrivateMode: [Tab] {
-        // FIXME: Private browsing
-        // return PrivateBrowsing.singleton.isOn ? privateTabs : nonprivateTabs
-
-        return normalTabs
+        return UIApplication.isInPrivateMode ? privateTabs : normalTabs
     }
 
     subscript(index: Int) -> Tab? {
@@ -297,14 +293,10 @@ class TabManager: NSObject {
     
     func moveTab(isPrivate privateMode: Bool, fromIndex visibleFromIndex: Int, toIndex visibleToIndex: Int) {
         assert(Thread.isMainThread)
-        
-        let currentTabs = privateMode ? privateTabs : normalTabs
-        let fromIndex = tabs.index(of: currentTabs[visibleFromIndex]) ?? tabs.count - 1
-        let toIndex = tabs.index(of: currentTabs[visibleToIndex]) ?? tabs.count - 1
-        
+
         let previouslySelectedTab = selectedTab
         
-        tabs.insert(tabs.remove(at: fromIndex), at: toIndex)
+        tabs.insert(tabs.remove(at: visibleFromIndex), at: visibleToIndex)
         
         if let previouslySelectedTab = previouslySelectedTab, let previousSelectedIndex = tabs.index(of: previouslySelectedTab) {
             _selectedIndex = previousSelectedIndex

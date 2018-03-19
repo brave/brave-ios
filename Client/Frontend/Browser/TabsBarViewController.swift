@@ -69,9 +69,7 @@ class TabBarCell: UICollectionViewCell {
             make.width.equalTo(30)
         })
 
-        // FIXME: Private browsing color
-        // close.tintColor = PrivateBrowsing.singleton.isOn ? UIColor.white : UIColor.black
-        close.tintColor = UIColor.black
+        close.tintColor = UIApplication.isInPrivateMode ? UIColor.white : UIColor.black
 
         // Close button is a bit wider to increase tap area, this aligns 'X' image closer to the right.
         close.imageEdgeInsets.left = 6
@@ -105,30 +103,19 @@ class TabBarCell: UICollectionViewCell {
             if selected {
                 title.font = UIFont.systemFont(ofSize: 12, weight: UIFontWeightSemibold)
                 close.isHidden = false
-                // FIXME: Private browsing colors
-                /*
-                title.textColor = PrivateBrowsing.singleton.isOn ? UIColor.white : UIColor.black
-                close.tintColor = PrivateBrowsing.singleton.isOn ? UIColor.white : UIColor.black
-                backgroundColor = PrivateBrowsing.singleton.isOn ? BraveUX.DarkToolbarsBackgroundSolidColor : BraveUX.ToolbarsBackgroundSolidColor
-                */
-                title.textColor = UIColor.black
-                close.tintColor = UIColor.black
-                backgroundColor = BraveUX.barsBackgroundSolidColor
+
+                title.textColor = UIApplication.isInPrivateMode ? UIColor.white : UIColor.black
+                close.tintColor = UIApplication.isInPrivateMode ? UIColor.white : UIColor.black
+                backgroundColor = UIApplication.isInPrivateMode ? BraveUX.barsDarkBackgroundSolidColor : BraveUX.barsBackgroundSolidColor
             }
             else if currentIndex != tabManager?.currentDisplayedIndex {
                 // prevent swipe and release outside- deselects cell.
                 title.font = UIFont.systemFont(ofSize: 12)
-                // FIXME: Private browsing
-                /*
-                title.textColor = PrivateBrowsing.singleton.isOn ? UIColor(white: 1.0, alpha: 0.4) : UIColor(white: 0.0, alpha: 0.4)
+
+                title.textColor = UIApplication.isInPrivateMode ? UIColor(white: 1.0, alpha: 0.4) : UIColor(white: 0.0, alpha: 0.4)
                 close.isHidden = true
-                close.tintColor = PrivateBrowsing.singleton.isOn ? UIColor.white : UIColor.black
-                backgroundColor = UIColor.clear
-                */
-                title.textColor = UIColor(white: 0.0, alpha: 0.4)
-                close.isHidden = true
-                close.tintColor = UIColor.black
-                backgroundColor = UIColor.clear
+                close.tintColor = UIApplication.isInPrivateMode ? UIColor.white : UIColor.black
+                backgroundColor = UIApplication.isInPrivateMode ? UIColor.black : UIColor.clear
             }
         }
     }
@@ -143,7 +130,6 @@ class TabBarCell: UICollectionViewCell {
             return
         }
         titleUpdateScheduled = true
-//        postAsyncToMain(0.2) { [weak self] in
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
             self?.titleUpdateScheduled = false
             self?.title.text = self?.browser?.displayTitle
@@ -263,8 +249,11 @@ class TabsBarViewController: UIViewController {
     func updateData() {
         tabList = WeakList<Tab>()
 
-        // FIXME: Add private tabs option
-        tabManager?.normalTabs.forEach {
+        guard let tabsToUpdate = UIApplication.isInPrivateMode ? tabManager?.privateTabs : tabManager?.normalTabs else {
+            return
+        }
+
+        tabsToUpdate.forEach {
             tabList.insert($0)
         }
 
@@ -311,13 +300,9 @@ class TabsBarViewController: UIViewController {
     
     func overflowIndicators() {
         // super lame place to put this, need to find a better solution.
-        // FIXME: Private browsing
-        /*
-        plusButton.tintColor = PrivateBrowsing.singleton.isOn ? UIColor.white : UIColor.black
-        collectionView.backgroundColor = PrivateBrowsing.singleton.isOn ? UIColor(white: 0.0, alpha: 0.2) : UIColor(white: 0.0, alpha: 0.075)
-        */
-        plusButton.tintColor = UIColor.black
-        collectionView.backgroundColor = UIColor(white: 0.0, alpha: 0.075)
+        plusButton.tintColor = UIApplication.isInPrivateMode ? UIColor.white : UIColor.black
+        collectionView.backgroundColor = UIApplication.isInPrivateMode ? UIColor(white: 0.0, alpha: 0.2) : UIColor(white: 0.0, alpha: 0.075)
+
         scrollHints()
 
         // FIXME: getApp tab count, we are not going to show tabs count btw.
@@ -353,12 +338,9 @@ class TabsBarViewController: UIViewController {
 
     func addLeftRightScrollHint(_ isRightSide: Bool, maskLayer: CAGradientLayer) {
         maskLayer.removeFromSuperlayer()
-        // FIXME: Private browsing
 
-        /*
-        let colors = PrivateBrowsing.singleton.isOn ? [BraveUX.DarkToolbarsBackgroundSolidColor.withAlphaComponent(0).cgColor, BraveUX.DarkToolbarsBackgroundSolidColor.cgColor] : [BraveUX.ToolbarsBackgroundSolidColor.withAlphaComponent(0).cgColor, BraveUX.ToolbarsBackgroundSolidColor.cgColor]
-        */
-        let colors = [BraveUX.barsBackgroundSolidColor.withAlphaComponent(0).cgColor, BraveUX.barsBackgroundSolidColor.cgColor]
+        let colors = UIApplication.isInPrivateMode ? [BraveUX.barsDarkBackgroundSolidColor.withAlphaComponent(0).cgColor, BraveUX.barsDarkBackgroundSolidColor.cgColor] : [BraveUX.barsBackgroundSolidColor.withAlphaComponent(0).cgColor, BraveUX.barsBackgroundSolidColor.cgColor]
+
         let locations = [0.9, 1.0]
         maskLayer.startPoint = CGPoint(x: isRightSide ? 0 : 1.0, y: 0.5)
         maskLayer.endPoint = CGPoint(x: isRightSide ? 1.0 : 0, y: 0.5)
@@ -396,8 +378,6 @@ extension TabsBarViewController: UICollectionViewDelegate, UICollectionViewDataS
         cell.title.text = tab.displayTitle
         cell.currentIndex = indexPath.row
         cell.separatorLineRight.isHidden = (indexPath.row != tabList.count() - 1)
-        // FIXME: getApp
-        // debugPrint("index: \(getApp().tabManager.currentDisplayedIndex ?? -1)")
         return cell
     }
     
@@ -435,8 +415,7 @@ extension TabsBarViewController: UICollectionViewDelegate, UICollectionViewDataS
         let toTab = tabList.at(destinationIndexPath.row)
         guard let to = tabManager.tabs.index(where: {$0 === toTab}) else { return }
 
-        // FIXME: Move in private mode too
-        tabManager.moveTab(isPrivate: false, fromIndex: from, toIndex: to)
+        tabManager.moveTab(isPrivate: UIApplication.isInPrivateMode, fromIndex: from, toIndex: to)
         updateData()
         
         guard let selectedTab = tabList.at(destinationIndexPath.row) else { return }

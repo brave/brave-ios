@@ -6,6 +6,7 @@ import Foundation
 
 struct BraveUX {
     static let barsBackgroundSolidColor = UIColor(red: 234/255.0, green: 234/255.0, blue: 234/255.0, alpha: 1.0)
+    static let barsDarkBackgroundSolidColor = UIColor(red: 63/255.0, green: 63/255.0, blue: 63/255.0, alpha: 1.0)
 
     struct TabsBar {
         static let buttonWidth = UIDevice.current.userInterfaceIdiom == .pad ? 40 : 0
