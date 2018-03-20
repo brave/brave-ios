@@ -90,6 +90,11 @@ class BrowserViewController: UIViewController {
     var topTabsVisible: Bool {
         return topTabsViewController != nil
     }
+
+    // These constraints allow to show/hide tabs bar
+    var headerHeightConstraint: Constraint?
+    var webViewContainerTopOffset: Constraint?
+
     // Backdrop used for displaying greyed background for private tabs
     var webViewContainerBackdrop: UIView!
 
@@ -241,6 +246,8 @@ class BrowserViewController: UIViewController {
             navigationToolbar.updateForwardStatus(webView.canGoForward)
             navigationToolbar.updateReloadStatus(tab.loading)
         }
+
+        updateTabsBarVisibility()
     }
 
     override func willTransition(to newCollection: UITraitCollection, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -352,6 +359,7 @@ class BrowserViewController: UIViewController {
 
         addChildViewController(tabsBar)
         tabsBar.didMove(toParentViewController: self)
+        tabsBar.view.isHidden = true
 
         // UIAccessibilityCustomAction subclass holding an AccessibleAction instance does not work, thus unable to generate AccessibleActions and UIAccessibilityCustomActions "on-demand" and need to make them "persistent" e.g. by being stored in BVC
         pasteGoAction = AccessibleAction(name: NSLocalizedString("Paste & Go", comment: "Paste the URL into the location bar and visit"), handler: { () -> Bool in
@@ -412,19 +420,21 @@ class BrowserViewController: UIViewController {
             make.top.equalTo(topTabsContainer.snp.bottom)
         }
 
-        // FIXME: Hide tabs bar when not used
-//        if tabsBar.view.superview != nil {
-//            bringSubview(toFront: tabsBarController.view)
-            tabsBar.view.snp.makeConstraints { make in
-                make.leading.trailing.bottom.equalTo(urlBarTopTabsContainer)
-                make.height.equalTo(BraveUX.TabsBar.height)
-                make.top.equalTo(urlBar.snp.bottom)
-            }
-//        }
+        tabsBar.view.snp.makeConstraints { make in
+            make.leading.trailing.bottom.equalTo(urlBarTopTabsContainer)
+            make.height.equalTo(BraveUX.TabsBar.height)
+            make.top.equalTo(urlBar.snp.bottom)
+        }
 
         header.snp.makeConstraints { make in
             scrollController.headerTopConstraint = make.top.equalTo(self.topLayoutGuide.snp.bottom).constraint
             make.left.right.equalTo(self.view)
+
+            if let headerHeightConstraint = headerHeightConstraint {
+                headerHeightConstraint.update(offset: BraveUX.UrlBar.height)
+            } else {
+                headerHeightConstraint = make.height.equalTo(BraveUX.UrlBar.height).constraint
+            }
         }
 
         webViewContainerBackdrop.snp.makeConstraints { make in
@@ -639,11 +649,7 @@ class BrowserViewController: UIViewController {
         webViewContainer.snp.remakeConstraints { make in
             make.left.right.equalTo(self.view)
 
-            if let readerModeBarBottom = readerModeBar?.snp.bottom {
-                make.top.equalTo(readerModeBarBottom)
-            } else {
-                make.top.equalTo(self.header.snp.bottom)
-            }
+            webViewContainerTopOffset = make.top.equalTo(readerModeBar?.snp.bottom ?? self.header.snp.bottom).constraint
 
             let findInPageHeight = (findInPageBar == nil) ? 0 : UIConstants.ToolbarHeight
             if let toolbar = self.toolbar {
@@ -665,6 +671,7 @@ class BrowserViewController: UIViewController {
         }
 
         urlBar.setNeedsUpdateConstraints()
+        updateTabsBarVisibility()
 
         // Remake constraints even if we're already showing the home controller.
         // The home controller may change sizes if we tap the URL bar while on about:home.
@@ -767,6 +774,25 @@ class BrowserViewController: UIViewController {
                 showHomePanelController(inline: true)
             } else if !url.isLocalUtility || url.isReaderModeURL {
                 hideHomePanelController()
+            }
+        }
+    }
+
+    func updateTabsBarVisibility() {
+        let isShowing = !tabsBar.view.isHidden
+        let shouldShow = UIApplication.isInPrivateMode ? tabManager.privateTabs.count > 1 : tabManager.normalTabs.count > 1
+
+        // FIXME: Without waiting, tabmanager count returns 0, 0.1 delay is enough to make it work properly.
+        // I don't like this approach, there must be a better way.
+        // Maybe changing storage from SQLite to CoreData will change things.
+        if isShowing != shouldShow {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                UIView.animate(withDuration: 0.1) {
+                    self.tabsBar.view.isHidden = !shouldShow
+                    self.headerHeightConstraint?.update(offset: BraveUX.UrlBar.height)
+                    self.webViewContainerTopOffset?.update(inset: shouldShow ? 0 : BraveUX.TabsBar.height)
+                    self.view.layoutIfNeeded()
+                }
             }
         }
     }
