@@ -125,35 +125,17 @@ class TabBarCell: UICollectionViewCell {
     }
     
     fileprivate var titleUpdateScheduled = false
-    func updateTitle_throttled() {
+    func updateTitleThrottled(for tab: Tab) {
         if titleUpdateScheduled {
             return
         }
         titleUpdateScheduled = true
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
             self?.titleUpdateScheduled = false
-            self?.title.text = self?.browser?.displayTitle
+            self?.title.text = tab.displayTitle
         }
     }
 }
-
-// FIXME: WebPageStateDelegate
-/*
-extension TabBarCell: WebPageStateDelegate {
-    func webView(_ webView: UIWebView, urlChanged: String) {
-        title.text = browser?.displayTitle
-        updateTitle_throttled()
-    }
-    
-    func webView(_ webView: UIWebView, progressChanged: Float) {
-        updateTitle_throttled()
-    }
-    
-    func webView(_ webView: UIWebView, isLoading: Bool) {}
-    func webView(_ webView: UIWebView, canGoBack: Bool) {}
-    func webView(_ webView: UIWebView, canGoForward: Bool) {}
-}
-*/
 
 class TabsBarViewController: UIViewController {
     var plusButton = UIButton()
@@ -244,6 +226,10 @@ class TabsBarViewController: UIViewController {
     
     func orientationChanged() {
         overflowIndicators()
+    }
+
+    func refreshTabTitles() {
+        collectionView.reloadData()
     }
     
     func updateData() {
