@@ -464,47 +464,4 @@ extension TabsBarViewController: TabManagerDelegate {
     func tabManagerDidRemoveAllTabs(_ tabManager: TabManager, toast: ButtonToast?) {
 
     }
-
-
-    // FIXME: TabManagerDelegate changed a bit
-
-    /*
-    func tabManagerDidEnterPrivateBrowsingMode(_ tabManager: TabManager) {
-        assert(Thread.current.isMainThread)
-        updateData()
-    }
-
-    func tabManagerDidExitPrivateBrowsingMode(_ tabManager: TabManager) {
-        assert(Thread.current.isMainThread)
-        updateData()
-    }
-
-    func tabManager(_ tabManager: TabManager, didSelectedTabChange selected: Tab?) {
-        assert(Thread.current.isMainThread)
-        updateData()
-    }
-
-    func tabManager(_ tabManager: TabManager, didCreateWebView tab: Tab, url: URL?, at: Int?) {
-        updateData()
-        // getApp().browserViewController.urlBar.updateTabsBarShowing()
-    }
-
-    func tabManager(_ tabManager: TabManager, didAddTab tab: Tab) {
-        updateData()
-    }
-
-    func tabManager(_ tabManager: TabManager, didRemoveTab tab: Tab) {
-        assert(Thread.current.isMainThread)
-        updateData()
-        // getApp().browserViewController.urlBar.updateTabsBarShowing()
-    }
-
-    func tabManagerDidRestoreTabs(_ tabManager: TabManager) {
-        assert(Thread.current.isMainThread)
-        updateData()
-        // getApp().browserViewController.urlBar.updateTabsBarShowing()
-    }
-
-    func tabManagerDidAddTabs(_ tabManager: TabManager) {}
-    */
 }
