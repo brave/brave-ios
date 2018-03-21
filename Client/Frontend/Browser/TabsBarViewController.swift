@@ -178,7 +178,7 @@ class TabsBarViewController: UIViewController {
         collectionView.addGestureRecognizer(longPressGesture)
 
         if UIDevice.current.userInterfaceIdiom == .pad {
-            plusButton.setImage(UIImage(named: "add")!.withRenderingMode(.alwaysTemplate), for: .normal)
+            plusButton.setImage(UIImage(named: "add_tab")!.withRenderingMode(.alwaysTemplate), for: .normal)
             plusButton.imageEdgeInsets = UIEdgeInsetsMake(6, 10, 6, 10)
             plusButton.tintColor = UIColor.black
             plusButton.contentMode = .scaleAspectFit
