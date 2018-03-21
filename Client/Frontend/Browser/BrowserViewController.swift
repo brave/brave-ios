@@ -208,7 +208,17 @@ class BrowserViewController: UIViewController {
             toolbar?.applyTheme(theme)
             updateTabCountUsingTabManager(self.tabManager)
         }
-        
+
+        topTabsContainer.snp.updateConstraints { make in
+            make.height.equalTo(0)
+        }
+        topTabsViewController?.view.removeFromSuperview()
+        topTabsViewController?.removeFromParentViewController()
+        topTabsViewController = nil
+
+        // Hiding ff's tabs for now
+        // TODO: Remove everything related to firefox tabs, our own implementation is going to be used.
+        /*
         if showTopTabs {
             if topTabsViewController == nil {
                 let topTabsViewController = TopTabsViewController(tabManager: tabManager)
@@ -233,6 +243,7 @@ class BrowserViewController: UIViewController {
             topTabsViewController?.removeFromParentViewController()
             topTabsViewController = nil
         }
+        */
 
         view.setNeedsUpdateConstraints()
         if let home = homePanelController {
