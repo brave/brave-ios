@@ -143,16 +143,6 @@ class LeanPlumClient {
         Leanplum.start(withUserId: nil, userAttributes: attributes, responseHandler: { _ in
             self.track(event: .openedApp)
 
-            // We need to check if the app is a clean install to use for
-            // preventing the What's New URL from appearing.
-            if self.prefs?.intForKey(IntroViewControllerSeenProfileKey) == nil {
-                self.prefs?.setString(AppInfo.appVersion, forKey: LatestAppVersionProfileKey)
-                self.track(event: .firstRun)
-            } else if self.prefs?.boolForKey("SecondRun") == nil {
-                self.prefs?.setBool(true, forKey: "SecondRun")
-                self.track(event: .secondRun)
-            }
-
             self.checkIfAppWasInstalled(key: PrefsKeys.HasFocusInstalled, isAppInstalled: self.focusInstalled(), lpEvent: .downloadedFocus)
             self.checkIfAppWasInstalled(key: PrefsKeys.HasPocketInstalled, isAppInstalled: self.pocketInstalled(), lpEvent: .downloadedPocket)
         })
