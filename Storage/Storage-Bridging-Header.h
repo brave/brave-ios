@@ -6,5 +6,6 @@
 #import "Shared-Bridging-Header.h"
 #import <Foundation/Foundation.h>
 #import "ThirdParty/sqlcipher/sqlite3.h"
+#import <CoreData/CoreData.h>
 
 #endif

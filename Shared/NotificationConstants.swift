@@ -29,3 +29,6 @@ public let NotificationFirefoxAccountVerified = Notification.Name("FirefoxAccoun
 public let NotificationUserInfoKeyHasSyncableAccount = Notification.Name("NotificationUserInfoKeyHasSyncableAccount")
 
 public let NotificationDidRestoreSession = Notification.Name("NotificationDidRestoreSession")
+
+public let NotificationMainThreadContextSignificantlyChanged = Notification.Name("NotificationMainThreadContextSignificantlyChanged")
+

@@ -118,7 +118,15 @@ extension Strings {
     public static let RecentlyClosedTabsButtonTitle = NSLocalizedString("HistoryPanel.RecentlyClosedTabsButton.Title", value: "Recently Closed", comment: "Title for the Recently Closed button in the History Panel")
     public static let RecentlyClosedTabsPanelTitle = NSLocalizedString("RecentlyClosedTabsPanel.Title", value: "Recently Closed", comment: "Title for the Recently Closed Tabs Panel")
     public static let FirefoxHomePage = NSLocalizedString("Firefox.HomePage.Title", value: "Firefox Home Page", comment: "Title for firefox about:home page in tab history list")
+    
+    // History MO
+    public static let Today = NSLocalizedString("Today", comment: "History tableview section header")
+    public static let Yesterday = NSLocalizedString("Yesterday", comment: "History tableview section header")
+    public static let Last_week = NSLocalizedString("Last week", comment: "History tableview section header")
+    public static let Last_month = NSLocalizedString("Last month", comment: "History tableview section header")
 }
+
+
 
 // Syncing
 extension Strings {
