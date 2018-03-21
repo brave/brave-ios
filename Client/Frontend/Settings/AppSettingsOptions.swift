@@ -667,26 +667,6 @@ class YourRightsSetting: Setting {
     }
 }
 
-// Opens the on-boarding screen again
-class ShowIntroductionSetting: Setting {
-    let profile: Profile
-
-    override var accessibilityIdentifier: String? { return "ShowTour" }
-
-    init(settings: SettingsTableViewController) {
-        self.profile = settings.profile
-        super.init(title: NSAttributedString(string: NSLocalizedString("Show Tour", comment: "Show the on-boarding screen again from the settings"), attributes: [NSForegroundColorAttributeName: SettingsUX.TableViewRowTextColor]))
-    }
-
-    override func onClick(_ navigationController: UINavigationController?) {
-        navigationController?.dismiss(animated: true, completion: {
-            if let appDelegate = UIApplication.shared.delegate as? AppDelegate {
-                appDelegate.browserViewController.presentIntroViewController(true)
-            }
-        })
-    }
-}
-
 class SendFeedbackSetting: Setting {
     override var title: NSAttributedString? {
         return NSAttributedString(string: NSLocalizedString("Send Feedback", comment: "Menu item in settings used to open input.mozilla.org where people can submit feedback"), attributes: [NSForegroundColorAttributeName: SettingsUX.TableViewRowTextColor])

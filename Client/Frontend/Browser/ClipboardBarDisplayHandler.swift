@@ -105,8 +105,7 @@ class ClipboardBarDisplayHandler: NSObject {
         if !sessionStarted ||
             !sessionRestored ||
             !firstTabLoaded ||
-            isClipboardURLAlreadyDisplayed(copiedURL) ||
-            self.prefs.intForKey(IntroViewControllerSeenProfileKey) == nil {
+            isClipboardURLAlreadyDisplayed(copiedURL) {
             return false
         }
         sessionStarted = false

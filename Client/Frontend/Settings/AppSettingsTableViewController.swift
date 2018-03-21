@@ -119,7 +119,6 @@ class AppSettingsTableViewController: SettingsTableViewController {
         settings += [
             SettingSection(title: NSAttributedString(string: privacyTitle), children: privacySettings),
             SettingSection(title: NSAttributedString(string: NSLocalizedString("Support", comment: "Support section title")), children: [
-                ShowIntroductionSetting(settings: self),
                 SendFeedbackSetting(),
                 SendAnonymousUsageDataSetting(prefs: prefs, delegate: settingsDelegate),
                 OpenSupportPageSetting(delegate: settingsDelegate),

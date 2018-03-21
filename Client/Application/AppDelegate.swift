@@ -247,7 +247,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
                     viewController.tabManager = self.tabManager
                     controller.pushViewController(viewController, animated: true)
                 case "fxa":
-                    self.browserViewController.presentSignInViewController()
+                    // Used to be intro screens, should remove
+                    break
             default:
                 break
             }
@@ -388,10 +389,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
     }
 
     func launchFxAFromURL(_ params: FxALaunchParams) {
-        guard params.query != nil else {
-            return
-        }
-        self.browserViewController.presentSignInViewController(params)
+        // TODO: Remove
     }
 
     func launchFromURL(_ params: LaunchParams) {
@@ -600,7 +598,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
             
             // Check for fxa sign-in code and launch the login screen directly
             if query["signin"] != nil {
-                browserViewController.launchFxAFromDeeplinkURL(url)
+                // TODO: Error, remove this (and all FxA)
                 return true
             }
             
