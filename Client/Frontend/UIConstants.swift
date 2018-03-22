@@ -41,19 +41,25 @@ extension UIColor {
         static let GreyH = UIColor(rgb: 0x606467)
         static let GreyI = UIColor(rgb: 0x484B4E)
         static let GreyJ = UIColor(rgb: 0x222326)
-        static let Blue = UIColor(rgb: 0x00BCD6)
-        static let Purple = UIColor(rgb: 0x7D7BDC)
-        static let Green = UIColor(rgb: 0x02B999)
+        
+        static let BraveOrange = UIColor(rgb: 0xfb542b)
+        
+        static let Blue = UIColor(rgb: 0x424acb)
+        static let LightBlue = UIColor(rgb: 0x4A90E2)
+        static let Purple = UIColor(rgb: 0x8236b9)
+        static let Green = UIColor(rgb: 0x1bc760)
         static let Red = UIColor(rgb: 0xE2052A)
-        static let BraveOrange = UIColor(rgb: 0x7D7BDC)
+        
+        static let White = UIColor.white
+        static let Black = UIColor.black
     }
 
     struct Browser {
-        static let Background = BrowserColor(normal: Defaults.GreyB, pbm: Defaults.GreyI)
-        static let Text = BrowserColor(normal: .white, pbm: Defaults.GreyD)
+        static let Background = BrowserColor(normal: Defaults.White, pbm: Defaults.GreyJ)
+        static let Text = BrowserColor(normal: Defaults.White, pbm: Defaults.GreyD)
         static let URLBarDivider = BrowserColor(normal: .clear, pbm: .clear)
-        static let LocationBarBackground = BrowserColor(normal: Defaults.GreyB, pbm: Defaults.GreyI)
-        static let Tint = BrowserColor(normal: Defaults.GreyG, pbm: Defaults.GreyF)
+        static let LocationBarBackground = BrowserColor(normal: Defaults.White, pbm: Defaults.GreyJ)
+        static let Tint = BrowserColor(normal: Defaults.GreyI, pbm: Defaults.GreyF)
     }
 
     struct URLBar {
@@ -63,8 +69,8 @@ extension UIColor {
     }
 
     struct TextField {
-        static let Background = BrowserColor(normal: .white, pbm: Defaults.GreyJ)
-        static let TextAndTint = BrowserColor(normal: Defaults.GreyJ, pbm: .white)
+        static let Background = BrowserColor(normal: Defaults.White, pbm: Defaults.GreyJ)
+        static let TextAndTint = BrowserColor(normal: Defaults.GreyJ, pbm: Defaults.White)
         static let Highlight = BrowserColor(normal: Defaults.Blue.withAlphaComponent(0.15), pbm: Defaults.Purple.withAlphaComponent(0.15))
         static let ReaderModeButtonSelected = BrowserColor(normal: Defaults.Blue, pbm: Defaults.Purple)
         static let ReaderModeButtonUnselected = BrowserColor(normal: Defaults.GreyG, pbm: Defaults.GreyF)
@@ -80,7 +86,7 @@ extension UIColor {
     // The back/forward/refresh/menu button (bottom toolbar)
     struct ToolbarButton {
         static let SelectedTint = BrowserColor(normal: Defaults.Blue, pbm: Defaults.Purple)
-        static let DisabledTint = BrowserColor(normal: Defaults.GreyG.withAlphaComponent(0.3), pbm: Defaults.GreyF.withAlphaComponent(0.3))
+        static let DisabledTint = BrowserColor(normal: Defaults.GreyE, pbm: Defaults.GreyI)
     }
 
     struct LoadingBar {
@@ -101,9 +107,9 @@ extension UIColor {
         // These values are the same for both private/normal.
         // The homepanel toolbar needed to be able to theme, not anymore.
         // Keep this just in case someone decides they want it to theme again
-        static let ToolbarBackground = BrowserColor(normal: Defaults.GreyB, pbm: Defaults.GreyI)
+        static let ToolbarBackground = BrowserColor(normal: Defaults.White, pbm: Defaults.GreyJ)
         static let ToolbarHighlight = BrowserColor(normal: Defaults.Blue, pbm: Defaults.Blue)
-        static let ToolbarTint = BrowserColor(normal: Defaults.GreyG, pbm: Defaults.GreyF)
+        static let ToolbarTint = BrowserColor(normal: Defaults.GreyI, pbm: Defaults.GreyF)
     }
 }
 
@@ -126,10 +132,10 @@ public struct UIConstants {
         }
     }
 
-    static let AppBackgroundColor = UIColor.white
+    static let AppBackgroundColor = UIColor.Defaults.White
     static let SystemBlueColor = UIColor.Defaults.Blue
     static let ControlTintColor = UIColor.Defaults.Blue
-    static let PasscodeDotColor = UIColor.Defaults.GreyF
+    static let PasscodeDotColor = UIColor.Defaults.BraveOrange
     static let PrivateModeAssistantToolbarBackgroundColor = UIColor.Defaults.GreyI
     static let PrivateModeTextHighlightColor = UIColor.Defaults.Purple
     static let PrivateModePurple = UIColor.Defaults.Purple
@@ -142,11 +148,11 @@ public struct UIConstants {
     static let DefaultChromeSmallFontBold = UIFont.boldSystemFont(ofSize: DefaultChromeSmallSize)
     static let PasscodeEntryFont = UIFont.systemFont(ofSize: PasscodeEntryFontSize, weight: UIFontWeightBold)
 
-    static let PanelBackgroundColor = UIColor.white
+    static let PanelBackgroundColor = UIColor.Defaults.White
     static let SeparatorColor = UIColor.Defaults.GreyB
     static let HighlightBlue = UIColor.Defaults.Blue
     static let DestructiveRed = UIColor.Defaults.Red
-    static let BorderColor = UIColor.darkGray
+    static let BorderColor = UIColor.Defaults.GreyC
     static let BackgroundColor = AppBackgroundColor
 
     // Used as backgrounds for favicons

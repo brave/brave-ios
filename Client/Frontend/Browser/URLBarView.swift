@@ -105,8 +105,8 @@ class URLBarView: UIView {
     
     let line = UIView()
 
-    lazy var tabsButton: TabsButton = {
-        let tabsButton = TabsButton.tabTrayButton()
+    lazy var tabsButton: ToolbarButton = {
+        let tabsButton = ToolbarButton()
         tabsButton.accessibilityIdentifier = "URLBarView.tabsButton"
         return tabsButton
     }()
@@ -146,7 +146,7 @@ class URLBarView: UIView {
     var menuButton = ToolbarButton()
     var bookmarkButton = ToolbarButton()
     var forwardButton = ToolbarButton()
-    var stopReloadButton = ToolbarButton()
+    var dynamicButton = ToolbarButton()
 
     var backButton: ToolbarButton = {
         let backButton = ToolbarButton()
@@ -154,7 +154,7 @@ class URLBarView: UIView {
         return backButton
     }()
 
-    lazy var actionButtons: [Themeable & UIButton] = [self.tabsButton, self.menuButton, self.forwardButton, self.backButton, self.stopReloadButton]
+    lazy var actionButtons: [Themeable & UIButton] = [self.tabsButton, self.menuButton, self.forwardButton, self.backButton, self.dynamicButton]
 
     var currentURL: URL? {
         get {
@@ -181,7 +181,7 @@ class URLBarView: UIView {
         locationContainer.addSubview(locationView)
     
         [scrollToTopButton, line, tabsButton, progressBar, cancelButton, showQRScannerButton].forEach { addSubview($0) }
-        [menuButton, forwardButton, backButton, stopReloadButton, locationContainer].forEach { addSubview($0) }
+        [menuButton, forwardButton, backButton, dynamicButton, locationContainer].forEach { addSubview($0) }
         
         helper = TabToolbarHelper(toolbar: self)
         setupConstraints()
@@ -232,7 +232,7 @@ class URLBarView: UIView {
             make.size.equalTo(URLBarViewUX.ButtonHeight)
         }
 
-        stopReloadButton.snp.makeConstraints { make in
+        dynamicButton.snp.makeConstraints { make in
             make.left.equalTo(self.forwardButton.snp.right)
             make.centerY.equalTo(self)
             make.size.equalTo(URLBarViewUX.ButtonHeight)
@@ -279,7 +279,7 @@ class URLBarView: UIView {
             self.locationContainer.snp.remakeConstraints { make in
                 if self.toolbarIsShowing {
                     // If we are showing a toolbar, show the text field next to the forward button
-                    make.leading.equalTo(self.stopReloadButton.snp.trailing).offset(URLBarViewUX.Padding)
+                    make.leading.equalTo(self.dynamicButton.snp.trailing).offset(URLBarViewUX.Padding)
                     if self.topTabsIsShowing {
                         make.trailing.equalTo(self.menuButton.snp.leading).offset(-URLBarViewUX.Padding)
                     } else {
@@ -430,7 +430,7 @@ class URLBarView: UIView {
         forwardButton.isHidden = !toolbarIsShowing
         backButton.isHidden = !toolbarIsShowing
         tabsButton.isHidden = !toolbarIsShowing || topTabsIsShowing
-        stopReloadButton.isHidden = !toolbarIsShowing
+        dynamicButton.isHidden = !toolbarIsShowing
     }
 
     func transitionToOverlay(_ didCancel: Bool = false) {
@@ -441,7 +441,7 @@ class URLBarView: UIView {
         menuButton.alpha = inOverlayMode ? 0 : 1
         forwardButton.alpha = inOverlayMode ? 0 : 1
         backButton.alpha = inOverlayMode ? 0 : 1
-        stopReloadButton.alpha = inOverlayMode ? 0 : 1
+        dynamicButton.alpha = inOverlayMode ? 0 : 1
 
         let borderColor = inOverlayMode ? locationActiveBorderColor : locationBorderColor
         locationContainer.layer.borderColor = borderColor.cgColor
@@ -468,7 +468,7 @@ class URLBarView: UIView {
         forwardButton.isHidden = !toolbarIsShowing || inOverlayMode
         backButton.isHidden = !toolbarIsShowing || inOverlayMode
         tabsButton.isHidden = !toolbarIsShowing || inOverlayMode || topTabsIsShowing
-        stopReloadButton.isHidden = !toolbarIsShowing || inOverlayMode
+        dynamicButton.isHidden = !toolbarIsShowing || inOverlayMode
     }
 
     func animateToOverlayState(overlayMode overlay: Bool, didCancel cancel: Bool = false) {
@@ -513,21 +513,17 @@ extension URLBarView: TabToolbarProtocol {
         forwardButton.isEnabled = canGoForward
     }
 
-    func updateTabCount(_ count: Int, animated: Bool = true) {
-        tabsButton.updateTabCount(count, animated: animated)
-    }
-
     func updateReloadStatus(_ isLoading: Bool) {
         helper?.updateReloadStatus(isLoading)
         if isLoading {
-            stopReloadButton.setImage(helper?.ImageStop, for: .normal)
+            dynamicButton.setImage(helper?.ImageStop, for: .normal)
         } else {
-            stopReloadButton.setImage(helper?.ImageReload, for: .normal)
+            dynamicButton.setImage(helper?.ImageReload, for: .normal)
         }
     }
 
     func updatePageStatus(_ isWebPage: Bool) {
-        stopReloadButton.isEnabled = isWebPage
+        dynamicButton.isEnabled = isWebPage
     }
 
     var access: [Any]? {
@@ -537,7 +533,7 @@ extension URLBarView: TabToolbarProtocol {
                 return [locationTextField, cancelButton]
             } else {
                 if toolbarIsShowing {
-                    return [backButton, forwardButton, stopReloadButton, locationView, tabsButton, menuButton, progressBar]
+                    return [backButton, forwardButton, dynamicButton, locationView, tabsButton, menuButton, progressBar]
                 } else {
                     return [locationView, progressBar]
                 }

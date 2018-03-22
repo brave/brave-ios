@@ -683,7 +683,7 @@ func createScreenGraph(for test: XCTestCase, with app: XCUIApplication) -> Scree
         screenState.press(link, to: WebLinkContextMenu)
         screenState.press(image, to: WebImageContextMenu)
 
-        let reloadButton = app.buttons["TabToolbar.stopReloadButton"]
+        let reloadButton = app.buttons["TabToolbar.dynamicButton"]
         screenState.press(reloadButton, to: ReloadLongPressMenu)
         screenState.tap(reloadButton, forAction: Action.ReloadURL, transitionTo: WebPageLoading) { _ in }
 

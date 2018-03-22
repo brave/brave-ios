@@ -49,8 +49,8 @@ class TopTabsViewController: UIViewController {
         return collectionView
     }()
     
-    fileprivate lazy var tabsButton: TabsButton = {
-        let tabsButton = TabsButton.tabTrayButton()
+    fileprivate lazy var tabsButton: ToolbarButton = {
+        let tabsButton = ToolbarButton()
         tabsButton.addTarget(self, action: #selector(TopTabsViewController.tabsTrayTapped), for: UIControlEvents.touchUpInside)
         tabsButton.accessibilityIdentifier = "TopTabsViewController.tabsButton"
         return tabsButton
@@ -157,7 +157,6 @@ class TopTabsViewController: UIViewController {
         if let currentTab = tabManager.selectedTab {
             applyTheme(currentTab.isPrivate ? .Private : .Normal)
         }
-        updateTabCount(tabStore.count, animated: false)
     }
     
     func switchForegroundStatus(isInForeground reveal: Bool) {
@@ -169,10 +168,6 @@ class TopTabsViewController: UIViewController {
                 cell.favicon.alpha = alpha
             }
         }
-    }
-    
-    func updateTabCount(_ count: Int, animated: Bool = true) {
-        self.tabsButton.updateTabCount(count, animated: animated)
     }
     
     func tabsTrayTapped() {
@@ -250,9 +245,7 @@ class TopTabsViewController: UIViewController {
 extension TopTabsViewController: Themeable {
     func applyTheme(_ theme: Theme) {
         tabsButton.applyTheme(theme)
-        tabsButton.titleBackgroundColor = view.backgroundColor ?? UIColor.Defaults.GreyH
-        tabsButton.textColor = UIColor.Defaults.GreyD
-
+        
         isPrivate = (theme == Theme.Private)
         privateModeButton.applyTheme(theme)
         privateModeButton.tintColor = UIColor.TopTabs.PrivateModeTint.colorFor(theme)

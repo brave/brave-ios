@@ -49,7 +49,16 @@ class TabScrollingController: NSObject {
     fileprivate var isZoomedOut: Bool = false
     fileprivate var lastZoomedScale: CGFloat = 0
     fileprivate var isUserZoom: Bool = false
-
+    fileprivate var isDragging: Bool = false
+    fileprivate var adjustWithScroll: Bool = false
+    fileprivate var adjustWithDrag: Bool = false {
+        didSet {
+            dragStartY = scrollView?.contentOffset.y ?? 0
+        }
+    }
+    fileprivate var dragStartY: CGFloat = 0
+    fileprivate var previousScrollOffset: CGFloat = 0
+    
     fileprivate var headerTopOffset: CGFloat = 0 {
         didSet {
             headerTopConstraint?.update(offset: headerTopOffset)
@@ -303,6 +312,51 @@ extension TabScrollingController: UIScrollViewDelegate {
             } else if scrollDirection == .down {
                 hideToolbars(animated: !isTabShowingPDF)
             }
+        }
+    }
+    
+    func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+        if tabIsLoading() || isBouncingAtBottom() {
+            return
+        }
+        
+        // Check if we should keep animation moving with scroll speed.
+        if fabsf(Float(velocity.y)) < 0.8 && checkScrollHeightIsLargeEnoughForScrolling() {
+            previousScrollOffset = scrollView.contentOffset.y
+            adjustWithScroll = true
+        }
+        else if checkScrollHeightIsLargeEnoughForScrolling() {
+            adjustWithScroll = false
+            // scrolling too fast, keeps animation smooth.
+            if scrollDirection == .up {
+                showToolbars(animated: true)
+            } else if scrollDirection == .down {
+                hideToolbars(animated: true)
+            }
+        }
+        
+        adjustWithDrag = false
+    }
+    
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        adjustWithScroll = false
+        adjustWithDrag = true
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let offset = scrollView.contentOffset.y
+        if tabIsLoading() || isBouncingAtBottom() || offset <= 0  {
+            return
+        }
+        
+        if adjustWithScroll  {
+            let delta = scrollView.contentOffset.y - previousScrollOffset
+            scrollWithDelta(delta)
+            previousScrollOffset = scrollView.contentOffset.y
+        }
+        else if adjustWithDrag && dragStartY - offset > topScrollHeight * 2 {
+            adjustWithScroll = true
+            previousScrollOffset = scrollView.contentOffset.y
         }
     }
 

@@ -9,18 +9,17 @@ import Shared
 
 protocol TabToolbarProtocol: class {
     weak var tabToolbarDelegate: TabToolbarDelegate? { get set }
-    var tabsButton: TabsButton { get }
+    var tabsButton: ToolbarButton { get }
     var menuButton: ToolbarButton { get }
     var forwardButton: ToolbarButton { get }
     var backButton: ToolbarButton { get }
-    var stopReloadButton: ToolbarButton { get }
+    var dynamicButton: ToolbarButton { get }
     var actionButtons: [Themeable & UIButton] { get }
 
     func updateBackStatus(_ canGoBack: Bool)
     func updateForwardStatus(_ canGoForward: Bool)
     func updateReloadStatus(_ isLoading: Bool)
     func updatePageStatus(_ isWebPage: Bool)
-    func updateTabCount(_ count: Int, animated: Bool)
 }
 
 protocol TabToolbarDelegate: class {
@@ -28,9 +27,8 @@ protocol TabToolbarDelegate: class {
     func tabToolbarDidPressForward(_ tabToolbar: TabToolbarProtocol, button: UIButton)
     func tabToolbarDidLongPressBack(_ tabToolbar: TabToolbarProtocol, button: UIButton)
     func tabToolbarDidLongPressForward(_ tabToolbar: TabToolbarProtocol, button: UIButton)
-    func tabToolbarDidPressReload(_ tabToolbar: TabToolbarProtocol, button: UIButton)
-    func tabToolbarDidLongPressReload(_ tabToolbar: TabToolbarProtocol, button: UIButton)
-    func tabToolbarDidPressStop(_ tabToolbar: TabToolbarProtocol, button: UIButton)
+    func tabToolbarDidLongPressDynamic(_ tabToolbar: TabToolbarProtocol, button: UIButton)
+    func tabToolbarDidPressDynamic(_ tabToolbar: TabToolbarProtocol, button: UIButton)
     func tabToolbarDidPressMenu(_ tabToolbar: TabToolbarProtocol, button: UIButton)
     func tabToolbarDidPressTabs(_ tabToolbar: TabToolbarProtocol, button: UIButton)
     func tabToolbarDidLongPressTabs(_ tabToolbar: TabToolbarProtocol, button: UIButton)
@@ -42,16 +40,16 @@ open class TabToolbarHelper: NSObject {
 
     let ImageReload = UIImage.templateImageNamed("nav-refresh")
     let ImageStop = UIImage.templateImageNamed("nav-stop")
-
+    
     var loading: Bool = false {
         didSet {
-            if loading {
-                toolbar.stopReloadButton.setImage(ImageStop, for: .normal)
-                toolbar.stopReloadButton.accessibilityLabel = NSLocalizedString("Stop", comment: "Accessibility Label for the tab toolbar Stop button")
-            } else {
-                toolbar.stopReloadButton.setImage(ImageReload, for: .normal)
-                toolbar.stopReloadButton.accessibilityLabel = NSLocalizedString("Reload", comment: "Accessibility Label for the tab toolbar Reload button")
-            }
+//            if loading {
+//                toolbar.dynamicButton.setImage(ImageStop, for: .normal)
+//                toolbar.dynamicButton.accessibilityLabel = NSLocalizedString("Stop", comment: "Accessibility Label for the tab toolbar Stop button")
+//            } else {
+//                toolbar.dynamicButton.setImage(ImageReload, for: .normal)
+//                toolbar.dynamicButton.accessibilityLabel = NSLocalizedString("Reload", comment: "Accessibility Label for the tab toolbar Reload button")
+//            }
         }
     }
 
@@ -75,15 +73,17 @@ open class TabToolbarHelper: NSObject {
         toolbar.forwardButton.addGestureRecognizer(longPressGestureForwardButton)
         toolbar.forwardButton.addTarget(self, action: #selector(TabToolbarHelper.didClickForward), for: UIControlEvents.touchUpInside)
 
-        toolbar.stopReloadButton.setImage(UIImage.templateImageNamed("nav-refresh"), for: .normal)
-        toolbar.stopReloadButton.accessibilityLabel = NSLocalizedString("Reload", comment: "Accessibility Label for the tab toolbar Reload button")
-        let longPressGestureStopReloadButton = UILongPressGestureRecognizer(target: self, action: #selector(TabToolbarHelper.didLongPressStopReload(_:)))
-        toolbar.stopReloadButton.addGestureRecognizer(longPressGestureStopReloadButton)
-        toolbar.stopReloadButton.addTarget(self, action: #selector(TabToolbarHelper.didClickStopReload), for: UIControlEvents.touchUpInside)
+        toolbar.dynamicButton.setImage(UIImage.templateImageNamed("nav-search"), for: .normal)
+        toolbar.dynamicButton.accessibilityLabel = NSLocalizedString("Dynamic", comment: "Accessibility Label for the tab toolbar Dynamic button")
+        let longPressGestureDynamicButton = UILongPressGestureRecognizer(target: self, action: #selector(TabToolbarHelper.didLongPressDynamic(_:)))
+        toolbar.dynamicButton.addGestureRecognizer(longPressGestureDynamicButton)
+        toolbar.dynamicButton.addTarget(self, action: #selector(TabToolbarHelper.didClickDynamic), for: UIControlEvents.touchUpInside)
 
-        toolbar.tabsButton.addTarget(self, action: #selector(TabToolbarHelper.didClickTabs), for: .touchUpInside)
+        toolbar.tabsButton.setImage(UIImage.templateImageNamed("nav-tabs"), for: .normal)
+        toolbar.tabsButton.accessibilityLabel = NSLocalizedString("Tabs", comment: "Accessibility Label for the tab toolbar Menu button")
         let longPressGestureTabsButton = UILongPressGestureRecognizer(target: self, action: #selector(TabToolbarHelper.didLongPressTabs(_:)))
         toolbar.tabsButton.addGestureRecognizer(longPressGestureTabsButton)
+        toolbar.tabsButton.addTarget(self, action: #selector(TabToolbarHelper.didClickTabs), for: UIControlEvents.touchUpInside)
 
         toolbar.menuButton.contentMode = UIViewContentMode.center
         toolbar.menuButton.setImage(UIImage.templateImageNamed("nav-menu"), for: .normal)
@@ -125,17 +125,13 @@ open class TabToolbarHelper: NSObject {
         toolbar.tabToolbarDelegate?.tabToolbarDidPressMenu(toolbar, button: toolbar.menuButton)
     }
 
-    func didClickStopReload() {
-        if loading {
-            toolbar.tabToolbarDelegate?.tabToolbarDidPressStop(toolbar, button: toolbar.stopReloadButton)
-        } else {
-            toolbar.tabToolbarDelegate?.tabToolbarDidPressReload(toolbar, button: toolbar.stopReloadButton)
-        }
+    func didClickDynamic() {
+        toolbar.tabToolbarDelegate?.tabToolbarDidPressDynamic(toolbar, button: toolbar.dynamicButton)
     }
 
-    func didLongPressStopReload(_ recognizer: UILongPressGestureRecognizer) {
+    func didLongPressDynamic(_ recognizer: UILongPressGestureRecognizer) {
         if recognizer.state == UIGestureRecognizerState.began && !loading {
-            toolbar.tabToolbarDelegate?.tabToolbarDidLongPressReload(toolbar, button: toolbar.stopReloadButton)
+            toolbar.tabToolbarDelegate?.tabToolbarDidLongPressDynamic(toolbar, button: toolbar.dynamicButton)
         }
     }
 
@@ -195,18 +191,18 @@ extension ToolbarButton: Themeable {
 class TabToolbar: UIView {
     weak var tabToolbarDelegate: TabToolbarDelegate?
 
-    let tabsButton = TabsButton()
+    let tabsButton = ToolbarButton()
     let menuButton = ToolbarButton()
     let forwardButton = ToolbarButton()
     let backButton = ToolbarButton()
-    let stopReloadButton = ToolbarButton()
+    let dynamicButton = ToolbarButton()
     let actionButtons: [Themeable & UIButton]
 
     var helper: TabToolbarHelper?
     private let contentView = UIStackView()
 
     fileprivate override init(frame: CGRect) {
-        actionButtons = [backButton, forwardButton, stopReloadButton, tabsButton, menuButton]
+        actionButtons = [backButton, forwardButton, menuButton, dynamicButton, tabsButton]
         super.init(frame: frame)
         setupAccessibility()
 
@@ -228,7 +224,7 @@ class TabToolbar: UIView {
     private func setupAccessibility() {
         backButton.accessibilityIdentifier = "TabToolbar.backButton"
         forwardButton.accessibilityIdentifier = "TabToolbar.forwardButton"
-        stopReloadButton.accessibilityIdentifier = "TabToolbar.stopReloadButton"
+        dynamicButton.accessibilityIdentifier = "TabToolbar.dynamicButton"
         tabsButton.accessibilityIdentifier = "TabToolbar.tabsButton"
         menuButton.accessibilityIdentifier = "TabToolbar.menuButton"
         accessibilityNavigationStyle = .combined
@@ -272,11 +268,7 @@ extension TabToolbar: TabToolbarProtocol {
     }
 
     func updatePageStatus(_ isWebPage: Bool) {
-        stopReloadButton.isEnabled = isWebPage
-    }
-
-    func updateTabCount(_ count: Int, animated: Bool) {
-        tabsButton.updateTabCount(count, animated: animated)
+        dynamicButton.isEnabled = isWebPage
     }
 }
 

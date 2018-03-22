@@ -244,7 +244,7 @@ class NavigationTest: BaseTestCase {
         if iPad() {
                 app.buttons["Reload"].tap()
         } else {
-                app.buttons["TabToolbar.stopReloadButton"].tap()
+                app.buttons["TabToolbar.dynamicButton"].tap()
         }
         waitForValueContains(app.textFields["url"], value: "google")
         waitUntilPageLoad()
@@ -259,7 +259,7 @@ class NavigationTest: BaseTestCase {
         if iPad() {
             app.buttons["Reload"].tap()
         } else {
-            app.buttons["TabToolbar.stopReloadButton"].tap()
+            app.buttons["TabToolbar.dynamicButton"].tap()
         }
         checkMobileView()
     }
