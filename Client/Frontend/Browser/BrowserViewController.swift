@@ -410,6 +410,7 @@ class BrowserViewController: UIViewController {
         
         scrollController.urlBar = urlBar
         scrollController.header = header
+        scrollController.tabsBar = tabsBar
         scrollController.footer = footer
         scrollController.snackBars = alertStackView
         scrollController.webViewContainerToolbar = webViewContainerToolbar
@@ -660,7 +661,8 @@ class BrowserViewController: UIViewController {
         webViewContainer.snp.remakeConstraints { make in
             make.left.right.equalTo(self.view)
 
-            webViewContainerTopOffset = make.top.equalTo(readerModeBar?.snp.bottom ?? self.header.snp.bottom).constraint
+            let tabsBarOffset = tabsBar.view.isHidden ? BraveUX.TabsBar.height : 0
+            webViewContainerTopOffset = make.top.equalTo(readerModeBar?.snp.bottom ?? self.header.snp.bottom).inset(tabsBarOffset).constraint
 
             let findInPageHeight = (findInPageBar == nil) ? 0 : UIConstants.ToolbarHeight
             if let toolbar = self.toolbar {

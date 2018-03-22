@@ -115,7 +115,7 @@ class TabBarCell: UICollectionViewCell {
                 title.textColor = UIApplication.isInPrivateMode ? UIColor(white: 1.0, alpha: 0.4) : UIColor(white: 0.0, alpha: 0.4)
                 close.isHidden = true
                 close.tintColor = UIApplication.isInPrivateMode ? UIColor.white : UIColor.black
-                backgroundColor = UIApplication.isInPrivateMode ? UIColor.black : UIColor.clear
+                backgroundColor = UIApplication.isInPrivateMode ? UIColor.black : UIColor.lightGray
             }
         }
     }
