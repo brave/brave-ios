@@ -1883,6 +1883,7 @@ extension BrowserViewController: TabManagerDelegate {
             updateTabCountUsingTabManager(tabManager)
         }
         tab.tabDelegate = self
+        updateTabsBarVisibility()
     }
 
     func tabManager(_ tabManager: TabManager, willRemoveTab tab: Tab) {
@@ -1896,6 +1897,7 @@ extension BrowserViewController: TabManagerDelegate {
         if let url = tab.url, !url.isAboutURL && !tab.isPrivate {
             profile.recentlyClosedTabs.addTab(url as URL, title: tab.title, faviconURL: tab.displayFavicon?.url)
         }
+        updateTabsBarVisibility()
     }
 
     func tabManagerDidAddTabs(_ tabManager: TabManager) {
