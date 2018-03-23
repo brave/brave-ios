@@ -227,10 +227,6 @@ class TabsBarViewController: UIViewController {
     func orientationChanged() {
         overflowIndicators()
     }
-
-    func refreshTabTitles() {
-        collectionView.reloadData()
-    }
     
     func updateData() {
         tabList = WeakList<Tab>()
