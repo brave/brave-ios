@@ -280,11 +280,7 @@ class URLBarView: UIView {
                 if self.toolbarIsShowing {
                     // If we are showing a toolbar, show the text field next to the forward button
                     make.leading.equalTo(self.stopReloadButton.snp.trailing).offset(URLBarViewUX.Padding)
-                    if self.topTabsIsShowing {
-                        make.trailing.equalTo(self.menuButton.snp.leading).offset(-URLBarViewUX.Padding)
-                    } else {
-                        make.trailing.equalTo(self.tabsButton.snp.leading).offset(-URLBarViewUX.Padding)
-                    }
+                    make.trailing.equalTo(self.tabsButton.snp.leading).offset(-URLBarViewUX.Padding)
 
                 } else {
                     // Otherwise, left align the location view
@@ -429,7 +425,7 @@ class URLBarView: UIView {
         menuButton.isHidden = !toolbarIsShowing
         forwardButton.isHidden = !toolbarIsShowing
         backButton.isHidden = !toolbarIsShowing
-        tabsButton.isHidden = !toolbarIsShowing || topTabsIsShowing
+        tabsButton.isHidden = !toolbarIsShowing
         stopReloadButton.isHidden = !toolbarIsShowing
     }
 
@@ -467,7 +463,7 @@ class URLBarView: UIView {
         menuButton.isHidden = !toolbarIsShowing || inOverlayMode
         forwardButton.isHidden = !toolbarIsShowing || inOverlayMode
         backButton.isHidden = !toolbarIsShowing || inOverlayMode
-        tabsButton.isHidden = !toolbarIsShowing || inOverlayMode || topTabsIsShowing
+        tabsButton.isHidden = !toolbarIsShowing || inOverlayMode
         stopReloadButton.isHidden = !toolbarIsShowing || inOverlayMode
     }
 
