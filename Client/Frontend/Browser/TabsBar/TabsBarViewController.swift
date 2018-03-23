@@ -233,8 +233,8 @@ extension TabsBarViewController: UICollectionViewDelegate, UICollectionViewDataS
         let cell: TabBarCell = collectionView.dequeueReusableCell(withReuseIdentifier: "TabCell", for: indexPath) as! TabBarCell
         guard let tab = tabList.at(indexPath.row) else { return cell }
         cell.tabManager = tabManager
-        cell.browser = tab
-        cell.title.text = tab.displayTitle
+        cell.tab = tab
+        cell.titleLabel.text = tab.displayTitle
         cell.currentIndex = indexPath.row
         cell.separatorLineRight.isHidden = (indexPath.row != tabList.count() - 1)
 
