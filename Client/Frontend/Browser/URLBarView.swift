@@ -75,7 +75,6 @@ class URLBarView: UIView {
     fileprivate var currentTheme: Theme = .Normal
 
     var toolbarIsShowing = false
-    var topTabsIsShowing = false
 
     fileprivate var locationTextField: ToolbarTextField?
 
