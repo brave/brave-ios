@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		03CCC9181AF05E7300DBF30D /* RelativeDatesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03CCC9171AF05E7300DBF30D /* RelativeDatesTests.swift */; };
+		0A7D449520655ED4009C55FF /* TabBarCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7D449420655ED4009C55FF /* TabBarCell.swift */; };
 		0A95582F205C1D7800DBE009 /* TabsBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A955820205C1D7800DBE009 /* TabsBarViewController.swift */; };
 		0A955831205C1F9C00DBE009 /* BraveUX.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A955830205C1F9C00DBE009 /* BraveUX.swift */; };
 		0B1C05D71A798B1F004C78B0 /* UIImageViewAligned.m in Sources */ = {isa = PBXBuildFile; fileRef = 0B1C05D61A798B1F004C78B0 /* UIImageViewAligned.m */; };
@@ -1384,6 +1385,7 @@
 
 /* Begin PBXFileReference section */
 		03CCC9171AF05E7300DBF30D /* RelativeDatesTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RelativeDatesTests.swift; sourceTree = "<group>"; };
+		0A7D449420655ED4009C55FF /* TabBarCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarCell.swift; sourceTree = "<group>"; };
 		0A955820205C1D7800DBE009 /* TabsBarViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabsBarViewController.swift; sourceTree = "<group>"; };
 		0A955830205C1F9C00DBE009 /* BraveUX.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveUX.swift; sourceTree = "<group>"; };
 		0B1C05D51A798B1F004C78B0 /* UIImageViewAligned.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIImageViewAligned.h; sourceTree = "<group>"; };
@@ -2348,6 +2350,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0A7D449320655E9A009C55FF /* TabsBar */ = {
+			isa = PBXGroup;
+			children = (
+				0A955820205C1D7800DBE009 /* TabsBarViewController.swift */,
+				0A7D449420655ED4009C55FF /* TabBarCell.swift */,
+			);
+			path = TabsBar;
+			sourceTree = "<group>";
+		};
 		0B1C05D41A798B1F004C78B0 /* UIImageViewAligned */ = {
 			isa = PBXGroup;
 			children = (
@@ -3146,8 +3157,8 @@
 				F35B8D2C1D6383E9008E3D61 /* SessionRestoreHelper.swift */,
 				3BF56D261CDBBE1F00AC4D75 /* SimpleToast.swift */,
 				E68AEDAF1B18F81A00133D99 /* SwipeAnimator.swift */,
+				0A7D449320655E9A009C55FF /* TabsBar */,
 				D3A994961A3686BD008AD1AC /* Tab.swift */,
-				0A955820205C1D7800DBE009 /* TabsBarViewController.swift */,
 				E4CD9F2C1A6DC91200318571 /* TabLocationView.swift */,
 				D3968F241A38FE8500CEFD3B /* TabManager.swift */,
 				7BA0601A1C0F4DE200DFADB6 /* TabPeekViewController.swift */,
@@ -5693,6 +5704,7 @@
 				392ED7E41D0AEF56009D9B62 /* NewTabAccessors.swift in Sources */,
 				D3A9949D1A3686BD008AD1AC /* Tab.swift in Sources */,
 				A93067E81D0FE18E00C49C6E /* NightModeHelper.swift in Sources */,
+				0A7D449520655ED4009C55FF /* TabBarCell.swift in Sources */,
 				3B39EDCB1E16E1AA00EF029F /* CustomSearchViewController.swift in Sources */,
 				E65075571E37F714006961AC /* FaviconFetcher.swift in Sources */,
 				D863C8F21F68BFC20058D95F /* GradientProgressBar.swift in Sources */,

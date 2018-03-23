@@ -5,137 +5,13 @@ import UIKit
 import SnapKit
 import Shared
 
-enum TabsBarShowPolicy : Int {
-    case never
-    case always
-    case landscapeOnly
+enum TabsBarShowPolicy: Int {
+    case never, always, landscapeOnly
 }
 
 let kRearangeTabNotification = Notification.Name("kRearangeTabNotification")
 let kPrefKeyTabsBarShowPolicy = "kPrefKeyTabsBarShowPolicy"
 let kPrefKeyTabsBarOnDefaultValue = TabsBarShowPolicy.always
-
-let minTabWidth =  UIDevice.current.userInterfaceIdiom == .pad ? CGFloat(180) : CGFloat(160)
-let tabHeight: CGFloat = 29
-
-protocol TabBarCellDelegate: class {
-    func tabClose(_ tab: Tab?)
-}
-
-class TabBarCell: UICollectionViewCell {
-    let title = UILabel()
-    let close = UIButton()
-    let separatorLine = UIView()
-    let separatorLineRight = UIView()
-    weak var tabManager: TabManager?
-    var currentIndex: Int = -1 {
-        didSet {
-            isSelected = currentIndex == tabManager?.currentDisplayedIndex
-        }
-    }
-    weak var browser: Tab? {
-
-        didSet {
-            // FIXME: web page state delegate
-            /*
-            if let wv = self.browser?.webView {
-                wv.delegatesForPageState.append(BraveWebView.Weak_WebPageStateDelegate(value: self))
-            }
-            */
-        }
-    }
-    weak var delegate: TabBarCellDelegate?
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        
-        backgroundColor = UIColor.clear
-        
-        close.addTarget(self, action: #selector(closeTab), for: .touchUpInside)
-        
-        [close, title, separatorLine, separatorLineRight].forEach { contentView.addSubview($0) }
-        
-        title.textAlignment = .center
-        title.snp.makeConstraints({ (make) in
-            make.top.bottom.equalTo(self)
-            make.left.equalTo(self).inset(16)
-            make.right.equalTo(close.snp.left)
-        })
-        
-        close.setImage(UIImage(named: "close_tab_bar")?.withRenderingMode(.alwaysTemplate), for: .normal)
-        close.snp.makeConstraints({ (make) in
-            make.top.bottom.equalTo(self)
-            make.right.equalTo(self).inset(2)
-            make.width.equalTo(30)
-        })
-
-        close.tintColor = UIApplication.isInPrivateMode ? UIColor.white : UIColor.black
-
-        // Close button is a bit wider to increase tap area, this aligns 'X' image closer to the right.
-        close.imageEdgeInsets.left = 6
-        
-        separatorLine.backgroundColor = UIColor.black.withAlphaComponent(0.15)
-        separatorLine.snp.makeConstraints { (make) in
-            make.left.equalTo(self)
-            make.width.equalTo(0.5)
-            make.height.equalTo(self)
-            make.centerY.equalTo(self.snp.centerY)
-        }
-        
-        separatorLineRight.backgroundColor = UIColor.black.withAlphaComponent(0.15)
-        separatorLineRight.isHidden = true
-        separatorLineRight.snp.makeConstraints { (make) in
-            make.right.equalTo(self)
-            make.width.equalTo(0.5)
-            make.height.equalTo(self)
-            make.centerY.equalTo(self.snp.centerY)
-        }
-        
-        isSelected = false
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override var isSelected: Bool {
-        didSet(selected) {
-            if selected {
-                title.font = UIFont.systemFont(ofSize: 12, weight: UIFontWeightSemibold)
-                close.isHidden = false
-
-                title.textColor = UIApplication.isInPrivateMode ? UIColor.white : UIColor.black
-                close.tintColor = UIApplication.isInPrivateMode ? UIColor.white : UIColor.black
-                backgroundColor = UIApplication.isInPrivateMode ? BraveUX.barsDarkBackgroundSolidColor : BraveUX.barsBackgroundSolidColor
-            }
-            else if currentIndex != tabManager?.currentDisplayedIndex {
-                // prevent swipe and release outside- deselects cell.
-                title.font = UIFont.systemFont(ofSize: 12)
-
-                title.textColor = UIApplication.isInPrivateMode ? UIColor(white: 1.0, alpha: 0.4) : UIColor(white: 0.0, alpha: 0.4)
-                close.isHidden = true
-                close.tintColor = UIApplication.isInPrivateMode ? UIColor.white : UIColor.black
-                backgroundColor = UIApplication.isInPrivateMode ? UIColor.black : UIColor.lightGray
-            }
-        }
-    }
-    
-    func closeTab() {
-        delegate?.tabClose(browser)
-    }
-    
-    fileprivate var titleUpdateScheduled = false
-    func updateTitleThrottled(for tab: Tab) {
-        if titleUpdateScheduled {
-            return
-        }
-        titleUpdateScheduled = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
-            self?.titleUpdateScheduled = false
-            self?.title.text = tab.displayTitle
-        }
-    }
-}
 
 class TabsBarViewController: UIViewController {
     var plusButton = UIButton()
@@ -159,7 +35,7 @@ class TabsBarViewController: UIViewController {
         
         collectionLayout = UICollectionViewFlowLayout()
         collectionLayout.scrollDirection = .horizontal
-        collectionLayout.itemSize = CGSize(width: minTabWidth, height: view.frame.height)
+        collectionLayout.itemSize = CGSize(width: BraveUX.TabsBar.minimumWidth, height: view.frame.height)
         collectionLayout.minimumInteritemSpacing = 0
         collectionLayout.minimumLineSpacing = 0
         
@@ -202,6 +78,8 @@ class TabsBarViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(updateData), name: kRearangeTabNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(orientationChanged), name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
         updateData()
+
+
     }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -276,7 +154,7 @@ class TabsBarViewController: UIViewController {
     }
 
     func tabOverflowWidth(_ tabCount: Int) -> CGFloat {
-        let overflow = CGFloat(tabCount) * minTabWidth - collectionView.frame.width
+        let overflow = CGFloat(tabCount) * BraveUX.TabsBar.minimumWidth - collectionView.frame.width
         return overflow > 0 ? overflow : 0
     }
     
@@ -329,7 +207,7 @@ class TabsBarViewController: UIViewController {
         maskLayer.opacity = 0
         maskLayer.colors = colors;
         maskLayer.locations = locations as [NSNumber];
-        maskLayer.bounds = CGRect(x: 0, y: 0, width: collectionView.frame.width, height: tabHeight)
+        maskLayer.bounds = CGRect(x: 0, y: 0, width: collectionView.frame.width, height: BraveUX.TabsBar.height)
         maskLayer.anchorPoint = CGPoint.zero;
         // you must add the mask to the root view, not the scrollView, otherwise the masks will move as the user scrolls!
         view.layer.addSublayer(maskLayer)
@@ -355,11 +233,23 @@ extension TabsBarViewController: UICollectionViewDelegate, UICollectionViewDataS
         let cell: TabBarCell = collectionView.dequeueReusableCell(withReuseIdentifier: "TabCell", for: indexPath) as! TabBarCell
         guard let tab = tabList.at(indexPath.row) else { return cell }
         cell.tabManager = tabManager
-        cell.delegate = self
         cell.browser = tab
         cell.title.text = tab.displayTitle
         cell.currentIndex = indexPath.row
         cell.separatorLineRight.isHidden = (indexPath.row != tabList.count() - 1)
+
+        cell.closeTabCallback = { [weak self] tab in
+            guard let strongSelf = self, let tabManager = self?.tabManager, let previousIndex = self?.tabList.index(of: tab) else { return }
+
+            tabManager.removeTab(tab)
+            strongSelf.updateData()
+
+            let previousOrNext = max(0, previousIndex - 1)
+            tabManager.selectTab(strongSelf.tabList.at(previousOrNext))
+
+            strongSelf.collectionView.selectItem(at: IndexPath(row: previousOrNext, section: 0), animated: true, scrollPosition: .centeredHorizontally)
+        }
+
         return cell
     }
     
@@ -374,13 +264,13 @@ extension TabsBarViewController: UICollectionViewDelegate, UICollectionViewDataS
         }
         
         let newTabButtonWidth = CGFloat(UIDevice.current.userInterfaceIdiom == .pad ? BraveUX.TabsBar.buttonWidth : 0)
-        let tabsAndButtonWidth = CGFloat(tabList.count()) * minTabWidth
+        let tabsAndButtonWidth = CGFloat(tabList.count()) * BraveUX.TabsBar.minimumWidth
         if tabsAndButtonWidth < collectionView.frame.width - newTabButtonWidth {
             let maxWidth = (collectionView.frame.width - newTabButtonWidth) / CGFloat(tabList.count())
             return CGSize(width: maxWidth, height: view.frame.height)
         }
         
-        return CGSize(width: minTabWidth, height: view.frame.height)
+        return CGSize(width: BraveUX.TabsBar.minimumWidth, height: view.frame.height)
     }
     
     func collectionView(_ collectionView: UICollectionView, canMoveItemAt indexPath: IndexPath) -> Bool {
@@ -402,26 +292,6 @@ extension TabsBarViewController: UICollectionViewDelegate, UICollectionViewDataS
         
         guard let selectedTab = tabList.at(destinationIndexPath.row) else { return }
         tabManager.selectTab(selectedTab)
-    }
-}
-
-extension TabsBarViewController: TabBarCellDelegate {
-    func tabClose(_ tab: Tab?) {
-        guard let tab = tab else { return }
-        
-        guard let tabManager = tabManager else { return }
-        guard let previousIndex = tabList.index(of: tab) else { return }
-
-        // FIXME: Not sure if we need 'createTabIfNoneLeft'
-        // tabManager.removeTab(tab, createTabIfNoneLeft: true)
-        tabManager.removeTab(tab)
-        
-        updateData()
-        
-        let previousOrNext = max(0, previousIndex - 1)
-        tabManager.selectTab(tabList.at(previousOrNext))
-        
-        collectionView.selectItem(at: IndexPath(row: previousOrNext, section: 0), animated: true, scrollPosition: .centeredHorizontally)
     }
 }
 
