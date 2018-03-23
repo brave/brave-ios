@@ -11,8 +11,8 @@ import Shared
 
 struct TabTrayControllerUX {
     static let CornerRadius = CGFloat(6.0)
-    static let BackgroundColor = UIColor.TopTabs.Background
-    static let CellBackgroundColor = UIColor.TopTabs.Background
+    static let BackgroundColor = UIColor.TabTray.Background.color(isPBM: false)
+    static let CellBackgroundColor = UIColor.TabTray.Background.color(isPBM: false)
     static let TextBoxHeight = CGFloat(32.0)
     static let FaviconSize = CGFloat(20)
     static let Margin = CGFloat(15)
