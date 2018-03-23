@@ -985,3 +985,11 @@ class TabManagerNavDelegate: NSObject, WKNavigationDelegate {
         decisionHandler(res)
     }
 }
+
+// MARK: - TabManagerDelegate optional methods.
+extension TabManagerDelegate {
+    func tabManager(_ tabManager: TabManager, willAddTab tab: Tab) {}
+    func tabManager(_ tabManager: TabManager, willRemoveTab tab: Tab) {}
+    func tabManagerDidAddTabs(_ tabManager: TabManager) {}
+    func tabManagerDidRemoveAllTabs(_ tabManager: TabManager, toast: ButtonToast?) {}
+}
