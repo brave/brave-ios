@@ -69,7 +69,10 @@ class TabsBarViewController: UIViewController {
             make.bottom.top.left.equalTo(view)
             make.right.equalTo(view).inset(BraveUX.TabsBar.buttonWidth)
         }
+    }
 
+    override func viewWillAppear(_ animated: Bool) {
+        // Updating tabs here is especially handy when tabs are reordered from the tab tray.
         updateData()
     }
 
