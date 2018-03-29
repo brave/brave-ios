@@ -61,7 +61,7 @@ class TabScrollingController: NSObject {
     fileprivate var tabsBarOffset: CGFloat {
         guard let tabsBar = tabsBar else { return 0 }
 
-        return (scrollDirection == .down && tabsBar.view.isHidden == false) ? 29 : 0
+        return (scrollDirection == .down && tabsBar.view.isHidden == false) ? BraveUX.TabsBar.height : 0
     }
 
     fileprivate var footerBottomOffset: CGFloat = 0 {
