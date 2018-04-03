@@ -707,7 +707,7 @@ class SendAnonymousUsageDataSetting: BoolSetting {
         super.init(
             prefs: prefs, prefKey: AppConstants.PrefSendUsageData, defaultValue: true,
             attributedTitleText: NSAttributedString(string: Strings.SendUsageSettingTitle),
-            attributedStatusText: createStatusText(),
+            attributedStatusText: SendAnonymousUsageDataSetting.createStatusText(),
             settingDidChange: {
                 AdjustIntegration.setEnabled($0)
                 LeanPlumClient.shared.set(attributes: [LPAttributeKey.telemetryOptIn: $0])
@@ -716,7 +716,7 @@ class SendAnonymousUsageDataSetting: BoolSetting {
         )
     }
 
-    private func createStatusText() -> NSAttributedString {
+    private static func createStatusText() -> NSAttributedString {
         let statusText = NSMutableAttributedString()
         statusText.append(NSAttributedString(string: Strings.SendUsageSettingMessage, attributes: [NSForegroundColorAttributeName: SettingsUX.TableViewHeaderTextColor]))
         statusText.append(NSAttributedString(string: " "))
