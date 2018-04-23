@@ -11,8 +11,8 @@ import Shared
 
 struct TabTrayControllerUX {
     static let CornerRadius = CGFloat(6.0)
-    static let BackgroundColor = UIColor.TopTabs.Background
-    static let CellBackgroundColor = UIColor.TopTabs.Background
+    static let BackgroundColor = UIColor.TabTray.Background.color(isPBM: false)
+    static let CellBackgroundColor = UIColor.TabTray.Background.color(isPBM: false)
     static let TextBoxHeight = CGFloat(32.0)
     static let FaviconSize = CGFloat(20)
     static let Margin = CGFloat(15)
@@ -320,6 +320,12 @@ class TabTrayController: UIViewController {
         collectionView.register(TabCell.self, forCellWithReuseIdentifier: TabCell.Identifier)
         collectionView.backgroundColor = TabTrayControllerUX.BackgroundColor
 
+        if #available(iOS 11, *) {
+            collectionView.dragInteractionEnabled = true
+            collectionView.dragDelegate = tabDataSource
+            collectionView.dropDelegate = tabDataSource
+        }
+
         view.addSubview(collectionView)
         view.addSubview(toolbar)
 
@@ -556,12 +562,15 @@ extension TabTrayController: PresentingModalViewControllerDelegate {
 
 extension TabTrayController: TabManagerDelegate {
     func tabManager(_ tabManager: TabManager, didSelectedTabChange selected: Tab?, previous: Tab?) {
+        tabDataSource.isDragging = false
     }
 
     func tabManager(_ tabManager: TabManager, willAddTab tab: Tab) {
+        tabDataSource.isDragging = false
     }
 
     func tabManager(_ tabManager: TabManager, willRemoveTab tab: Tab) {
+        tabDataSource.isDragging = false
     }
 
     func tabManager(_ tabManager: TabManager, didAddTab tab: Tab) {
@@ -696,6 +705,7 @@ fileprivate class TabManagerDataSource: NSObject, UICollectionViewDataSource {
     unowned var cellDelegate: TabCellDelegate & SwipeAnimatorDelegate
     fileprivate var tabs: [Tab]
     fileprivate var tabManager: TabManager
+    fileprivate var isDragging = false
 
     init(tabs: [Tab], cellDelegate: TabCellDelegate & SwipeAnimatorDelegate, tabManager: TabManager) {
         self.cellDelegate = cellDelegate
@@ -775,6 +785,80 @@ fileprivate class TabManagerDataSource: NSObject, UICollectionViewDataSource {
         let toIndex = destinationIndexPath.item
         tabs.insert(tabs.remove(at: fromIndex), at: toIndex < fromIndex ? toIndex : toIndex - 1)
         tabManager.moveTab(isPrivate: tabs[fromIndex].isPrivate, fromIndex: fromIndex, toIndex: toIndex)
+    }
+}
+
+@available(iOS 11.0, *)
+extension TabManagerDataSource: UICollectionViewDragDelegate {
+    func collectionView(_ collectionView: UICollectionView, dragSessionWillBegin session: UIDragSession) {
+        isDragging = true
+    }
+
+    func collectionView(_ collectionView: UICollectionView, dragSessionDidEnd session: UIDragSession) {
+        isDragging = false
+    }
+
+    func collectionView(_ collectionView: UICollectionView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
+        let tab = tabs[indexPath.item]
+
+        // Get the tab's current URL. If it is `nil`, check the `sessionData` since
+        // it may be a tab that has not been restored yet.
+        var url = tab.url
+        if url == nil, let sessionData = tab.sessionData {
+            let urls = sessionData.urls
+            let index = sessionData.currentPage + urls.count - 1
+            if index < urls.count {
+                url = urls[index]
+            }
+        }
+
+        // Ensure we actually have a URL for the tab being dragged and that the URL is not local.
+        // If not, just create an empty `NSItemProvider` so we can create a drag item with the
+        // `Tab` so that it can at still be re-ordered.
+        var itemProvider: NSItemProvider?
+        if let url = url, !url.isLocal {
+            itemProvider = NSItemProvider(contentsOf: url)
+        }
+
+        let dragItem = UIDragItem(itemProvider: itemProvider ?? .init())
+        dragItem.localObject = tab
+        return [dragItem]
+    }
+}
+
+@available(iOS 11.0, *)
+extension TabManagerDataSource: UICollectionViewDropDelegate {
+    func collectionView(_ collectionView: UICollectionView, performDropWith coordinator: UICollectionViewDropCoordinator) {
+        guard isDragging, let destinationIndexPath = coordinator.destinationIndexPath, 
+            let dragItem = coordinator.items.first?.dragItem, 
+            let tab = dragItem.localObject as? Tab, 
+            let sourceIndex = tabs.index(of: tab) else {
+            return
+        }
+
+        coordinator.drop(dragItem, toItemAt: destinationIndexPath)
+        isDragging = false
+
+        let destinationIndex = destinationIndexPath.item
+        tabManager.moveTab(isPrivate: tab.isPrivate, fromIndex: sourceIndex, toIndex: destinationIndex)
+        tabs.insert(tabs.remove(at: sourceIndex), at: destinationIndex)
+        collectionView.moveItem(at: IndexPath(item: sourceIndex, section: 0), to: destinationIndexPath)
+    }
+
+    func collectionView(_ collectionView: UICollectionView, dropSessionDidUpdate session: UIDropSession, withDestinationIndexPath destinationIndexPath: IndexPath?) -> UICollectionViewDropProposal {
+        guard let localDragSession = session.localDragSession, 
+            let item = localDragSession.items.first, 
+            let tab = item.localObject as? Tab else {
+            return UICollectionViewDropProposal(operation: .forbidden)
+        }
+
+        // If the tab doesn't exist by the time we get here, we must return a
+        // `.cancel` operation continuously until `isDragging` can be reset.
+        if !isDragging && tabs.index(of: tab) == nil {
+            return UICollectionViewDropProposal(operation: .cancel)
+        }
+
+        return UICollectionViewDropProposal(operation: .move, intent: .insertAtDestinationIndexPath)
     }
 }
 

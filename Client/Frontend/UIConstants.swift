@@ -92,11 +92,6 @@ extension UIColor {
         static let Background = Browser.Background
     }
 
-    struct TopTabs {
-        static let PrivateModeTint = BrowserColor(normal: Defaults.Blue, pbm: Defaults.GreyE)
-        static let Background = Defaults.GreyB
-    }
-
     struct HomePanel {
         // These values are the same for both private/normal.
         // The homepanel toolbar needed to be able to theme, not anymore.

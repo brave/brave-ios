@@ -41,6 +41,7 @@ class BrowserViewController: UIViewController {
     var homePanelController: HomePanelViewController?
     var webViewContainer: UIView!
     var urlBar: URLBarView!
+    var tabsBar: TabsBarViewController!
     var clipboardBarDisplayHandler: ClipboardBarDisplayHandler?
     var readerModeBar: ReaderModeBarView?
     var readerModeCache: ReaderModeCache
@@ -85,10 +86,11 @@ class BrowserViewController: UIViewController {
     var header: UIView!
     var footer: UIView!
     fileprivate var topTouchArea: UIButton!
-    let urlBarTopTabsContainer = UIView(frame: CGRect.zero)
-    var topTabsVisible: Bool {
-        return topTabsViewController != nil
-    }
+
+    // These constraints allow to show/hide tabs bar
+    var headerHeightConstraint: Constraint?
+    var webViewContainerTopOffset: Constraint?
+
     // Backdrop used for displaying greyed background for private tabs
     var webViewContainerBackdrop: UIView!
 
@@ -105,9 +107,6 @@ class BrowserViewController: UIViewController {
     var navigationToolbar: TabToolbarProtocol {
         return toolbar ?? urlBar
     }
-    
-    var topTabsViewController: TopTabsViewController?
-    let topTabsContainer = UIView()
 
     init(profile: Profile, tabManager: TabManager) {
         self.profile = profile
@@ -142,7 +141,6 @@ class BrowserViewController: UIViewController {
 
         coordinator.animate(alongsideTransition: { context in
             self.scrollController.updateMinimumZoom()
-            self.topTabsViewController?.scrollToCurrentTab(false, centerCell: false)
             if let popover = self.displayedPopoverController {
                 self.updateDisplayedPopoverProperties?()
                 self.present(popover, animated: true, completion: nil)
@@ -164,16 +162,11 @@ class BrowserViewController: UIViewController {
 
     override var preferredStatusBarStyle: UIStatusBarStyle {
         let isPrivate = tabManager.selectedTab?.isPrivate ?? false
-        let isIpad = shouldShowTopTabsForTraitCollection(traitCollection)
-        return (isPrivate || isIpad) ? UIStatusBarStyle.lightContent : UIStatusBarStyle.default
+        return isPrivate ? UIStatusBarStyle.lightContent : UIStatusBarStyle.default
     }
 
     func shouldShowFooterForTraitCollection(_ previousTraitCollection: UITraitCollection) -> Bool {
         return previousTraitCollection.verticalSizeClass != .compact && previousTraitCollection.horizontalSizeClass != .regular
-    }
-
-    func shouldShowTopTabsForTraitCollection(_ newTraitCollection: UITraitCollection) -> Bool {
-        return newTraitCollection.verticalSizeClass == .regular && newTraitCollection.horizontalSizeClass == .regular
     }
 
     func toggleSnackBarVisibility(show: Bool) {
@@ -186,9 +179,7 @@ class BrowserViewController: UIViewController {
 
     fileprivate func updateToolbarStateForTraitCollection(_ newCollection: UITraitCollection, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator? = nil) {
         let showToolbar = shouldShowFooterForTraitCollection(newCollection)
-        let showTopTabs = shouldShowTopTabsForTraitCollection(newCollection)
 
-        urlBar.topTabsIsShowing = showTopTabs
         urlBar.setShowToolbar(!showToolbar)
         toolbar?.removeFromSuperview()
         toolbar?.tabToolbarDelegate = nil
@@ -201,31 +192,6 @@ class BrowserViewController: UIViewController {
             let theme = (tabManager.selectedTab?.isPrivate ?? false) ? Theme.Private : Theme.Normal
             toolbar?.applyTheme(theme)
             updateTabCountUsingTabManager(self.tabManager)
-        }
-        
-        if showTopTabs {
-            if topTabsViewController == nil {
-                let topTabsViewController = TopTabsViewController(tabManager: tabManager)
-                topTabsViewController.delegate = self
-                addChildViewController(topTabsViewController)
-                topTabsViewController.view.frame = topTabsContainer.frame
-                topTabsContainer.addSubview(topTabsViewController.view)
-                topTabsViewController.view.snp.makeConstraints { make in
-                    make.edges.equalTo(topTabsContainer)
-                    make.height.equalTo(TopTabsUX.TopTabsViewHeight)
-                }
-                self.topTabsViewController = topTabsViewController
-            }
-            topTabsContainer.snp.updateConstraints { make in
-                make.height.equalTo(TopTabsUX.TopTabsViewHeight)
-            }
-        } else {
-            topTabsContainer.snp.updateConstraints { make in
-                make.height.equalTo(0)
-            }
-            topTabsViewController?.view.removeFromSuperview()
-            topTabsViewController?.removeFromParentViewController()
-            topTabsViewController = nil
         }
 
         view.setNeedsUpdateConstraints()
@@ -240,6 +206,8 @@ class BrowserViewController: UIViewController {
             navigationToolbar.updateForwardStatus(webView.canGoForward)
             navigationToolbar.updateReloadStatus(tab.loading)
         }
+
+        updateTabsBarVisibility()
     }
 
     override func willTransition(to newCollection: UITraitCollection, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -255,7 +223,7 @@ class BrowserViewController: UIViewController {
         coordinator.animate(alongsideTransition: { context in
             self.scrollController.showToolbars(animated: false)
             if self.isViewLoaded {
-                self.statusBarOverlay.backgroundColor = self.shouldShowTopTabsForTraitCollection(self.traitCollection) ? UIColor.Defaults.GreyH : self.urlBar.backgroundColor
+                self.statusBarOverlay.backgroundColor = self.urlBar.backgroundColor
                 self.setNeedsStatusBarAppearanceUpdate()
             }
             }, completion: nil)
@@ -286,7 +254,6 @@ class BrowserViewController: UIViewController {
         webViewContainerBackdrop.alpha = 1
         webViewContainer.alpha = 0
         urlBar.locationContainer.alpha = 0
-        topTabsViewController?.switchForegroundStatus(isInForeground: false)
         presentedViewController?.popoverPresentationController?.containerView?.alpha = 0
         presentedViewController?.view.alpha = 0
     }
@@ -297,7 +264,6 @@ class BrowserViewController: UIViewController {
         UIView.animate(withDuration: 0.2, delay: 0, options: UIViewAnimationOptions(), animations: {
             self.webViewContainer.alpha = 1
             self.urlBar.locationContainer.alpha = 1
-            self.topTabsViewController?.switchForegroundStatus(isInForeground: true)
             self.presentedViewController?.popoverPresentationController?.containerView?.alpha = 1
             self.presentedViewController?.view.alpha = 1
             self.view.backgroundColor = UIColor.clear
@@ -339,10 +305,17 @@ class BrowserViewController: UIViewController {
         urlBar.translatesAutoresizingMaskIntoConstraints = false
         urlBar.delegate = self
         urlBar.tabToolbarDelegate = self
-        header = urlBarTopTabsContainer
-        urlBarTopTabsContainer.addSubview(urlBar)
-        urlBarTopTabsContainer.addSubview(topTabsContainer)
+        header = UIView(frame: CGRect.zero)
+        header.addSubview(urlBar)
+
+        tabsBar = TabsBarViewController(tabManager: tabManager)
+        header.addSubview(tabsBar.view)
+
         view.addSubview(header)
+
+        addChildViewController(tabsBar)
+        tabsBar.didMove(toParentViewController: self)
+        tabsBar.view.isHidden = true
 
         // UIAccessibilityCustomAction subclass holding an AccessibleAction instance does not work, thus unable to generate AccessibleActions and UIAccessibilityCustomActions "on-demand" and need to make them "persistent" e.g. by being stored in BVC
         pasteGoAction = AccessibleAction(name: NSLocalizedString("Paste & Go", comment: "Paste the URL into the location bar and visit"), handler: { () -> Bool in
@@ -382,6 +355,7 @@ class BrowserViewController: UIViewController {
         
         scrollController.urlBar = urlBar
         scrollController.header = header
+        scrollController.tabsBar = tabsBar
         scrollController.footer = footer
         scrollController.snackBars = alertStackView
         scrollController.webViewContainerToolbar = webViewContainerToolbar
@@ -392,20 +366,27 @@ class BrowserViewController: UIViewController {
     }
 
     fileprivate func setupConstraints() {
-        topTabsContainer.snp.makeConstraints { make in
-            make.leading.trailing.equalTo(self.header)
-            make.top.equalTo(urlBarTopTabsContainer)
-        }
-        
-        urlBar.snp.makeConstraints { make in
-            make.leading.trailing.bottom.equalTo(urlBarTopTabsContainer)
-            make.height.equalTo(UIConstants.TopToolbarHeight)
-            make.top.equalTo(topTabsContainer.snp.bottom)
-        }
-
         header.snp.makeConstraints { make in
             scrollController.headerTopConstraint = make.top.equalTo(self.topLayoutGuide.snp.bottom).constraint
             make.left.right.equalTo(self.view)
+
+            if let headerHeightConstraint = headerHeightConstraint {
+                headerHeightConstraint.update(offset: UX.UrlBar.height)
+            } else {
+                headerHeightConstraint = make.height.equalTo(UX.UrlBar.height).constraint
+            }
+        }
+
+        urlBar.snp.makeConstraints { make in
+            make.leading.trailing.equalTo(header)
+            make.height.equalTo(UIConstants.TopToolbarHeight)
+            make.top.equalTo(header.snp.top)
+        }
+
+        tabsBar.view.snp.makeConstraints { make in
+            make.leading.trailing.bottom.equalTo(header)
+            make.height.equalTo(UX.TabsBar.height)
+            make.top.equalTo(urlBar.snp.bottom)
         }
 
         webViewContainerBackdrop.snp.makeConstraints { make in
@@ -620,11 +601,8 @@ class BrowserViewController: UIViewController {
         webViewContainer.snp.remakeConstraints { make in
             make.left.right.equalTo(self.view)
 
-            if let readerModeBarBottom = readerModeBar?.snp.bottom {
-                make.top.equalTo(readerModeBarBottom)
-            } else {
-                make.top.equalTo(self.header.snp.bottom)
-            }
+            let tabsBarOffset = tabsBar.view.isHidden ? UX.TabsBar.height : 0
+            webViewContainerTopOffset = make.top.equalTo(readerModeBar?.snp.bottom ?? self.header.snp.bottom).inset(tabsBarOffset).constraint
 
             let findInPageHeight = (findInPageBar == nil) ? 0 : UIConstants.ToolbarHeight
             if let toolbar = self.toolbar {
@@ -646,6 +624,7 @@ class BrowserViewController: UIViewController {
         }
 
         urlBar.setNeedsUpdateConstraints()
+        updateTabsBarVisibility()
 
         // Remake constraints even if we're already showing the home controller.
         // The home controller may change sizes if we tap the URL bar while on about:home.
@@ -748,6 +727,25 @@ class BrowserViewController: UIViewController {
                 showHomePanelController(inline: true)
             } else if !url.isLocalUtility || url.isReaderModeURL {
                 hideHomePanelController()
+            }
+        }
+    }
+
+    func updateTabsBarVisibility() {
+        let isShowing = !tabsBar.view.isHidden
+        let shouldShow = UIApplication.isInPrivateMode ? tabManager.privateTabs.count > 1 : tabManager.normalTabs.count > 1
+
+        // FIXME: Without waiting, tabmanager count returns 0, 0.1 delay is enough to make it work properly.
+        // I don't like this approach, there must be a better way.
+        // Maybe changing storage from SQLite to CoreData will change things.
+        if isShowing != shouldShow {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                UIView.animate(withDuration: 0.1) {
+                    self.tabsBar.view.isHidden = !shouldShow
+                    self.headerHeightConstraint?.update(offset: UX.UrlBar.height)
+                    self.webViewContainerTopOffset?.update(inset: shouldShow ? 0 : UX.TabsBar.height)
+                    self.view.layoutIfNeeded()
+                }
             }
         }
     }
@@ -1527,7 +1525,8 @@ extension BrowserViewController: TabToolbarDelegate, PhotonActionSheetProtocol {
         actions.append(getHomePanelActions())
         actions.append(getOtherPanelActions(vcDelegate: self))
         // force a modal if the menu is being displayed in compact split screen
-        let shouldSupress = !topTabsVisible && UIDevice.current.userInterfaceIdiom == .pad
+        let isCompact = traitCollection.verticalSizeClass == .compact || traitCollection.horizontalSizeClass == .compact
+        let shouldSupress = isCompact && UIDevice.current.userInterfaceIdiom == .pad
         presentSheetWith(actions: actions, on: self, from: button, supressPopover: shouldSupress)
     }
 
@@ -1706,9 +1705,8 @@ extension BrowserViewController: HomePanelViewControllerDelegate {
 
     func homePanelViewControllerDidRequestToOpenInNewTab(_ url: URL, isPrivate: Bool) {
         let tab = self.tabManager.addTab(PrivilegedRequest(url: url) as URLRequest, afterTab: self.tabManager.selectedTab, isPrivate: isPrivate)
-        // If we are showing toptabs a user can just use the top tab bar
         // If in overlay mode switching doesnt correctly dismiss the homepanels
-        guard !topTabsVisible, !self.urlBar.inOverlayMode else {
+        guard !self.urlBar.inOverlayMode else {
             return
         }
         // We're not showing the top tabs; show a toast to quick switch to the fresh new tab.
@@ -1760,9 +1758,6 @@ extension BrowserViewController: TabManagerDelegate {
                 applyTheme(tab.isPrivate ? .Private : .Normal)
             }
             readerModeCache = tab.isPrivate ? MemoryReaderModeCache.sharedInstance : DiskReaderModeCache.sharedInstance
-            if let privateModeButton = topTabsViewController?.privateModeButton, previous != nil && previous?.isPrivate != tab.isPrivate {
-                privateModeButton.setSelected(tab.isPrivate, animated: true)
-            }
             ReaderModeHandlers.readerModeCache = readerModeCache
 
             scrollController.tab = selected
@@ -1825,6 +1820,7 @@ extension BrowserViewController: TabManagerDelegate {
             updateTabCountUsingTabManager(tabManager)
         }
         tab.tabDelegate = self
+        updateTabsBarVisibility()
     }
 
     func tabManager(_ tabManager: TabManager, willRemoveTab tab: Tab) {
@@ -1838,6 +1834,7 @@ extension BrowserViewController: TabManagerDelegate {
         if let url = tab.url, !url.isAboutURL && !tab.isPrivate {
             profile.recentlyClosedTabs.addTab(url as URL, title: tab.title, faviconURL: tab.displayFavicon?.url)
         }
+        updateTabsBarVisibility()
     }
 
     func tabManagerDidAddTabs(_ tabManager: TabManager) {
@@ -1877,7 +1874,6 @@ extension BrowserViewController: TabManagerDelegate {
             let count = selectedTab.isPrivate ? tabManager.privateTabs.count : tabManager.normalTabs.count
             toolbar?.updateTabCount(count, animated: animated)
             urlBar.updateTabCount(count, animated: !urlBar.inOverlayMode)
-            topTabsViewController?.updateTabCount(count, animated: animated)
         }
     }
 }
@@ -2288,7 +2284,7 @@ extension BrowserViewController: IntroViewControllerDelegate {
             let introViewController = IntroViewController()
             introViewController.delegate = self
             // On iPad we present it modally in a controller
-            if topTabsVisible {
+            if UIDevice.current.userInterfaceIdiom == .pad {
                 introViewController.preferredContentSize = CGSize(width: IntroViewControllerUX.Width, height: IntroViewControllerUX.Height)
                 introViewController.modalPresentationStyle = UIModalPresentationStyle.formSheet
             }
@@ -2386,9 +2382,7 @@ extension BrowserViewController: ContextMenuHelperDelegate {
             let addTab = { (rURL: URL, isPrivate: Bool) in
                     let tab = self.tabManager.addTab(URLRequest(url: rURL as URL), afterTab: currentTab, isPrivate: isPrivate)
                     LeanPlumClient.shared.track(event: .openedNewTab, withParameters: ["Source": "Long Press Context Menu" as AnyObject])
-                    guard !self.topTabsVisible else {
-                        return
-                    }
+
                     // We're not showing the top tabs; show a toast to quick switch to the fresh new tab.
                     let toast = ButtonToast(labelText: Strings.ContextMenuButtonToastNewTabOpenedLabelText, buttonText: Strings.ContextMenuButtonToastNewTabOpenedButtonText, completion: { buttonPressed in
                         if buttonPressed {
@@ -2720,9 +2714,9 @@ extension BrowserViewController: TabTrayDelegate {
 extension BrowserViewController: Themeable {
 
     func applyTheme(_ theme: Theme) {
-        let ui: [Themeable?] = [urlBar, toolbar, readerModeBar, topTabsViewController]
+        let ui: [Themeable?] = [urlBar, toolbar, readerModeBar]
         ui.forEach { $0?.applyTheme(theme) }
-        statusBarOverlay.backgroundColor = shouldShowTopTabsForTraitCollection(traitCollection) ? UIColor.Defaults.GreyI : urlBar.backgroundColor
+        statusBarOverlay.backgroundColor = urlBar.backgroundColor
         setNeedsStatusBarAppearanceUpdate()
     }
 }
@@ -2764,28 +2758,6 @@ extension BrowserViewController: FindInPageBarDelegate, FindInPageHelperDelegate
 extension BrowserViewController: JSPromptAlertControllerDelegate {
     func promptAlertControllerDidDismiss(_ alertController: JSPromptAlertController) {
         showQueuedAlertIfAvailable()
-    }
-}
-
-extension BrowserViewController: TopTabsDelegate {
-    func topTabsDidPressTabs() {
-        urlBar.leaveOverlayMode(didCancel: true)
-        self.urlBarDidPressTabs(urlBar)
-    }
-    
-    func topTabsDidPressNewTab(_ isPrivate: Bool) {
-        openBlankNewTab(focusLocationField: false, isPrivate: isPrivate)
-    }
-
-    func topTabsDidTogglePrivateMode() {
-        guard let _ = tabManager.selectedTab else {
-            return
-        }
-        urlBar.leaveOverlayMode()
-    }
-    
-    func topTabsDidChangeTab() {
-        urlBar.leaveOverlayMode(didCancel: true)
     }
 }
 
