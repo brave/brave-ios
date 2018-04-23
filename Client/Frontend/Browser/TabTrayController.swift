@@ -815,14 +815,12 @@ extension TabManagerDataSource: UICollectionViewDragDelegate {
         // Ensure we actually have a URL for the tab being dragged and that the URL is not local.
         // If not, just create an empty `NSItemProvider` so we can create a drag item with the
         // `Tab` so that it can at still be re-ordered.
-        var itemProvider: NSItemProvider
-        if url != nil, !(url?.isLocal ?? true) {
-            itemProvider = NSItemProvider(contentsOf: url) ?? NSItemProvider()
-        }  else {
-            itemProvider = NSItemProvider()
+        var itemProvider: NSItemProvider?
+        if let url = url, !url.isLocal {
+            itemProvider = NSItemProvider(contentsOf: url)
         }
 
-        let dragItem = UIDragItem(itemProvider: itemProvider)
+        let dragItem = UIDragItem(itemProvider: itemProvider ?? .init())
         dragItem.localObject = tab
         return [dragItem]
     }

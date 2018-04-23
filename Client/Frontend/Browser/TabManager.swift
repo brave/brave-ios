@@ -137,7 +137,7 @@ class TabManager: NSObject {
             return nil
         }
 
-        return UIApplication.isInPrivateMode ? privateTabs.index(of: selectedTab) : normalTabs.index(of: selectedTab)
+        return displayedTabsForCurrentPrivateMode.index(of: selectedTab)
     }
 
     // What the users sees displayed based on current private browsing mode

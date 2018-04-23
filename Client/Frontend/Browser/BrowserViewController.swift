@@ -308,8 +308,7 @@ class BrowserViewController: UIViewController {
         header = UIView(frame: CGRect.zero)
         header.addSubview(urlBar)
 
-        tabsBar = TabsBarViewController()
-        tabsBar.tabManager = tabManager
+        tabsBar = TabsBarViewController(tabManager: tabManager)
         header.addSubview(tabsBar.view)
 
         view.addSubview(header)

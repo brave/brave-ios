@@ -6,6 +6,9 @@ import SnapKit
 import Shared
 
 class TabsBarViewController: UIViewController {
+    private let leftOverflowIndicator = CAGradientLayer()
+    private let rightOverflowIndicator = CAGradientLayer()
+    
     private lazy var plusButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(named: "add_tab")?.withRenderingMode(.alwaysTemplate), for: .normal)
@@ -34,12 +37,18 @@ class TabsBarViewController: UIViewController {
         return view
     }()
 
-    private let leftOverflowIndicator = CAGradientLayer()
-    private let rightOverflowIndicator = CAGradientLayer()
-
-    weak var tabManager: TabManager?
+    fileprivate weak var tabManager: TabManager?
     fileprivate var tabList = WeakList<Tab>()
-
+    
+    init(tabManager: TabManager) {
+        self.tabManager = tabManager
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -107,11 +116,7 @@ class TabsBarViewController: UIViewController {
     func updateData() {
         tabList = WeakList<Tab>()
 
-        guard let tabsToUpdate = UIApplication.isInPrivateMode ? tabManager?.privateTabs : tabManager?.normalTabs else {
-            return
-        }
-
-        tabsToUpdate.forEach {
+        tabManager?.displayedTabsForCurrentPrivateMode.forEach {
             tabList.insert($0)
         }
 
@@ -122,7 +127,7 @@ class TabsBarViewController: UIViewController {
     func reloadDataAndRestoreSelectedTab() {
         collectionView.reloadData()
 
-        if let selectedTab = tabManager?.selectedTab, let tabManager = tabManager {
+        if let tabManager = tabManager, let selectedTab = tabManager.selectedTab {
             let selectedIndex = tabList.index(of: selectedTab) ?? 0
             if selectedIndex < tabList.count() {
                 collectionView.selectItem(at: IndexPath(row: selectedIndex, section: 0), animated: (!tabManager.isRestoring), scrollPosition: .centeredHorizontally)
@@ -132,14 +137,16 @@ class TabsBarViewController: UIViewController {
     
     func handleLongGesture(gesture: UILongPressGestureRecognizer) {
         switch(gesture.state) {
-        case UIGestureRecognizerState.began:
+        case .began:
             guard let selectedIndexPath = self.collectionView.indexPathForItem(at: gesture.location(in: self.collectionView)) else {
                 break
             }
             collectionView.beginInteractiveMovementForItem(at: selectedIndexPath)
-        case UIGestureRecognizerState.changed:
-            collectionView.updateInteractiveMovementTargetPosition(gesture.location(in: gesture.view!))
-        case UIGestureRecognizerState.ended:
+        case .changed:
+            if let gestureView = gesture.view {
+                collectionView.updateInteractiveMovementTargetPosition(gesture.location(in: gestureView))
+            }
+        case .ended:
             collectionView.endInteractiveMovement()
         default:
             collectionView.cancelInteractiveMovement()
@@ -148,7 +155,7 @@ class TabsBarViewController: UIViewController {
 
     private func tabOverflowWidth(_ tabCount: Int) -> CGFloat {
         let overflow = CGFloat(tabCount) * BraveUX.TabsBar.minimumWidth - collectionView.frame.width
-        return overflow > 0 ? overflow : 0
+        return max(overflow, 0)
     }
     
     fileprivate func overflowIndicators() {
@@ -161,19 +168,11 @@ class TabsBarViewController: UIViewController {
         
         let offset = Float(collectionView.contentOffset.x)
         let startFade = Float(30)
-        if offset < startFade {
-            leftOverflowIndicator.opacity = offset / startFade
-        } else {
-            leftOverflowIndicator.opacity = 1
-        }
+        leftOverflowIndicator.opacity = min(1, offset / startFade)
         
         // all the way scrolled right
         let offsetFromRight = collectionView.contentSize.width - CGFloat(offset) - collectionView.frame.width
-        if offsetFromRight < CGFloat(startFade) {
-            rightOverflowIndicator.opacity = Float(offsetFromRight) / startFade
-        } else {
-            rightOverflowIndicator.opacity = 1
-        }
+        rightOverflowIndicator.opacity = min(1, Float(offsetFromRight) / startFade)
     }
 
     private enum HintSide { case leftSide, rightSide }
@@ -216,14 +215,15 @@ extension TabsBarViewController: UICollectionViewDelegate {
 // MARK: - UICollectionViewDelegateFlowLayout
 extension TabsBarViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        if tabList.count() == 1 {
-            return CGSize(width: view.frame.width, height: view.frame.height)
-        }
+        let tabCount = CGFloat(tabList.count())
+        
+        if tabCount < 1 { return CGSize.zero }
+        if tabCount == 1 { return view.frame.size }
 
         let newTabButtonWidth = CGFloat(UIDevice.current.userInterfaceIdiom == .pad ? BraveUX.TabsBar.buttonWidth : 0)
-        let tabsAndButtonWidth = CGFloat(tabList.count()) * BraveUX.TabsBar.minimumWidth
+        let tabsAndButtonWidth = tabCount * BraveUX.TabsBar.minimumWidth
         if tabsAndButtonWidth < collectionView.frame.width - newTabButtonWidth {
-            let maxWidth = (collectionView.frame.width - newTabButtonWidth) / CGFloat(tabList.count())
+            let maxWidth = (collectionView.frame.width - newTabButtonWidth) / tabCount
             return CGSize(width: maxWidth, height: view.frame.height)
         }
 
@@ -254,7 +254,7 @@ extension TabsBarViewController: UICollectionViewDataSource {
         cell.separatorLineRight.isHidden = (indexPath.row != tabList.count() - 1)
 
         cell.closeTabCallback = { [weak self] tab in
-            guard let strongSelf = self, let tabManager = self?.tabManager, let previousIndex = self?.tabList.index(of: tab) else { return }
+            guard let strongSelf = self, let tabManager = strongSelf.tabManager, let previousIndex = strongSelf.tabList.index(of: tab) else { return }
 
             tabManager.removeTab(tab)
             strongSelf.updateData()
@@ -305,3 +305,4 @@ extension TabsBarViewController: TabManagerDelegate {
         updateData()
     }
 }
+
