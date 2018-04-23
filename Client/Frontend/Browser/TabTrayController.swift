@@ -829,7 +829,10 @@ extension TabManagerDataSource: UICollectionViewDragDelegate {
 @available(iOS 11.0, *)
 extension TabManagerDataSource: UICollectionViewDropDelegate {
     func collectionView(_ collectionView: UICollectionView, performDropWith coordinator: UICollectionViewDropCoordinator) {
-        guard isDragging, let destinationIndexPath = coordinator.destinationIndexPath, let dragItem = coordinator.items.first?.dragItem, let tab = dragItem.localObject as? Tab, let sourceIndex = tabs.index(of: tab) else {
+        guard isDragging, let destinationIndexPath = coordinator.destinationIndexPath, 
+            let dragItem = coordinator.items.first?.dragItem, 
+            let tab = dragItem.localObject as? Tab, 
+            let sourceIndex = tabs.index(of: tab) else {
             return
         }
 
@@ -843,13 +846,15 @@ extension TabManagerDataSource: UICollectionViewDropDelegate {
     }
 
     func collectionView(_ collectionView: UICollectionView, dropSessionDidUpdate session: UIDropSession, withDestinationIndexPath destinationIndexPath: IndexPath?) -> UICollectionViewDropProposal {
-        guard let localDragSession = session.localDragSession, let item = localDragSession.items.first, let tab = item.localObject as? Tab else {
+        guard let localDragSession = session.localDragSession, 
+            let item = localDragSession.items.first, 
+            let tab = item.localObject as? Tab else {
             return UICollectionViewDropProposal(operation: .forbidden)
         }
 
         // If the tab doesn't exist by the time we get here, we must return a
         // `.cancel` operation continuously until `isDragging` can be reset.
-        if !isDragging, tabs.index(of: tab) == nil {
+        if !isDragging && tabs.index(of: tab) == nil {
             return UICollectionViewDropProposal(operation: .cancel)
         }
 

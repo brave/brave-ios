@@ -296,6 +296,7 @@ class TabManager: NSObject {
 
         let previouslySelectedTab = selectedTab
         
+        // TODO: Move to Tab model once we migrate to CoreData.
         tabs.insert(tabs.remove(at: visibleFromIndex), at: visibleToIndex)
         
         if let previouslySelectedTab = previouslySelectedTab, let previousSelectedIndex = tabs.index(of: previouslySelectedTab) {
