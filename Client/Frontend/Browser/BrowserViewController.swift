@@ -371,9 +371,9 @@ class BrowserViewController: UIViewController {
             make.left.right.equalTo(self.view)
 
             if let headerHeightConstraint = headerHeightConstraint {
-                headerHeightConstraint.update(offset: BraveUX.UrlBar.height)
+                headerHeightConstraint.update(offset: UX.UrlBar.height)
             } else {
-                headerHeightConstraint = make.height.equalTo(BraveUX.UrlBar.height).constraint
+                headerHeightConstraint = make.height.equalTo(UX.UrlBar.height).constraint
             }
         }
 
@@ -385,7 +385,7 @@ class BrowserViewController: UIViewController {
 
         tabsBar.view.snp.makeConstraints { make in
             make.leading.trailing.bottom.equalTo(header)
-            make.height.equalTo(BraveUX.TabsBar.height)
+            make.height.equalTo(UX.TabsBar.height)
             make.top.equalTo(urlBar.snp.bottom)
         }
 
@@ -601,7 +601,7 @@ class BrowserViewController: UIViewController {
         webViewContainer.snp.remakeConstraints { make in
             make.left.right.equalTo(self.view)
 
-            let tabsBarOffset = tabsBar.view.isHidden ? BraveUX.TabsBar.height : 0
+            let tabsBarOffset = tabsBar.view.isHidden ? UX.TabsBar.height : 0
             webViewContainerTopOffset = make.top.equalTo(readerModeBar?.snp.bottom ?? self.header.snp.bottom).inset(tabsBarOffset).constraint
 
             let findInPageHeight = (findInPageBar == nil) ? 0 : UIConstants.ToolbarHeight
@@ -742,8 +742,8 @@ class BrowserViewController: UIViewController {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 UIView.animate(withDuration: 0.1) {
                     self.tabsBar.view.isHidden = !shouldShow
-                    self.headerHeightConstraint?.update(offset: BraveUX.UrlBar.height)
-                    self.webViewContainerTopOffset?.update(inset: shouldShow ? 0 : BraveUX.TabsBar.height)
+                    self.headerHeightConstraint?.update(offset: UX.UrlBar.height)
+                    self.webViewContainerTopOffset?.update(inset: shouldShow ? 0 : UX.TabsBar.height)
                     self.view.layoutIfNeeded()
                 }
             }

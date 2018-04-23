@@ -4,7 +4,7 @@
 
 import Foundation
 
-struct BraveUX {
+struct UX {
     static let barsBackgroundSolidColor = UIColor(red: 234/255.0, green: 234/255.0, blue: 234/255.0, alpha: 1.0)
     static let barsDarkBackgroundSolidColor = UIColor(red: 63/255.0, green: 63/255.0, blue: 63/255.0, alpha: 1.0)
 
@@ -15,6 +15,6 @@ struct BraveUX {
     }
 
     struct UrlBar {
-        static let height: CGFloat = UIConstants.TopToolbarHeight + BraveUX.TabsBar.height
+        static let height: CGFloat = UIConstants.TopToolbarHeight + UX.TabsBar.height
     }
 }

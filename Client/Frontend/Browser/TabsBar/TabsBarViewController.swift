@@ -56,7 +56,7 @@ class TabsBarViewController: UIViewController {
         
         // Can't get view.frame inside of lazy property, need to put this code here.
         collectionView.frame = view.frame
-        (collectionView.collectionViewLayout as? UICollectionViewFlowLayout)?.itemSize = CGSize(width: BraveUX.TabsBar.minimumWidth, height: view.frame.height)
+        (collectionView.collectionViewLayout as? UICollectionViewFlowLayout)?.itemSize = CGSize(width: UX.TabsBar.minimumWidth, height: view.frame.height)
         view.addSubview(collectionView)
         
         let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongGesture(gesture:)))
@@ -70,13 +70,13 @@ class TabsBarViewController: UIViewController {
 
             plusButton.snp.makeConstraints { make in
                 make.right.top.bottom.equalTo(view)
-                make.width.equalTo(BraveUX.TabsBar.buttonWidth)
+                make.width.equalTo(UX.TabsBar.buttonWidth)
             }
         }
         
         collectionView.snp.makeConstraints { make in
             make.bottom.top.left.equalTo(view)
-            make.right.equalTo(view).inset(BraveUX.TabsBar.buttonWidth)
+            make.right.equalTo(view).inset(UX.TabsBar.buttonWidth)
         }
     }
 
@@ -154,7 +154,7 @@ class TabsBarViewController: UIViewController {
     }
 
     private func tabOverflowWidth(_ tabCount: Int) -> CGFloat {
-        let overflow = CGFloat(tabCount) * BraveUX.TabsBar.minimumWidth - collectionView.frame.width
+        let overflow = CGFloat(tabCount) * UX.TabsBar.minimumWidth - collectionView.frame.width
         return max(overflow, 0)
     }
     
@@ -181,7 +181,7 @@ class TabsBarViewController: UIViewController {
         maskLayer.removeFromSuperlayer()
 
         let barsColor = UIApplication.isInPrivateMode ?
-            BraveUX.barsDarkBackgroundSolidColor : BraveUX.barsBackgroundSolidColor
+            UX.barsDarkBackgroundSolidColor : UX.barsBackgroundSolidColor
         let colors = [barsColor.withAlphaComponent(0).cgColor, barsColor.cgColor]
 
         let locations = [0.9, 1.0]
@@ -190,7 +190,7 @@ class TabsBarViewController: UIViewController {
         maskLayer.opacity = 0
         maskLayer.colors = colors
         maskLayer.locations = locations as [NSNumber]
-        maskLayer.bounds = CGRect(x: 0, y: 0, width: collectionView.frame.width, height: BraveUX.TabsBar.height)
+        maskLayer.bounds = CGRect(x: 0, y: 0, width: collectionView.frame.width, height: UX.TabsBar.height)
         maskLayer.anchorPoint = CGPoint.zero
         // you must add the mask to the root view, not the scrollView, otherwise the masks will move as the user scrolls!
         view.layer.addSublayer(maskLayer)
@@ -220,14 +220,14 @@ extension TabsBarViewController: UICollectionViewDelegateFlowLayout {
         if tabCount < 1 { return CGSize.zero }
         if tabCount == 1 { return view.frame.size }
 
-        let newTabButtonWidth = CGFloat(UIDevice.current.userInterfaceIdiom == .pad ? BraveUX.TabsBar.buttonWidth : 0)
-        let tabsAndButtonWidth = tabCount * BraveUX.TabsBar.minimumWidth
+        let newTabButtonWidth = CGFloat(UIDevice.current.userInterfaceIdiom == .pad ? UX.TabsBar.buttonWidth : 0)
+        let tabsAndButtonWidth = tabCount * UX.TabsBar.minimumWidth
         if tabsAndButtonWidth < collectionView.frame.width - newTabButtonWidth {
             let maxWidth = (collectionView.frame.width - newTabButtonWidth) / tabCount
             return CGSize(width: maxWidth, height: view.frame.height)
         }
 
-        return CGSize(width: BraveUX.TabsBar.minimumWidth, height: view.frame.height)
+        return CGSize(width: UX.TabsBar.minimumWidth, height: view.frame.height)
     }
 }
 

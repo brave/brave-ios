@@ -92,7 +92,7 @@ class TabBarCell: UICollectionViewCell {
                 titleLabel.font = UIFont.systemFont(ofSize: 12, weight: UIFontWeightSemibold)
                 closeButton.isHidden = false
                 titleLabel.textColor = UIApplication.isInPrivateMode ? UIColor.white : UIColor.black
-                backgroundColor = UIApplication.isInPrivateMode ? BraveUX.barsDarkBackgroundSolidColor : BraveUX.barsBackgroundSolidColor
+                backgroundColor = UIApplication.isInPrivateMode ? UX.barsDarkBackgroundSolidColor : UX.barsBackgroundSolidColor
             }
             // Prevent swipe and release outside- deselects cell.
             else if currentIndex != tabManager?.currentDisplayedIndex {
