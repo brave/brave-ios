@@ -207,7 +207,7 @@ extension TabsBarViewController: UIScrollViewDelegate {
 // MARK: - UICollectionViewDelegate
 extension TabsBarViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let tab = tabList.at(indexPath.row)
+        let tab = tabList[indexPath.row]
         tabManager?.selectTab(tab)
     }
 }
@@ -245,7 +245,7 @@ extension TabsBarViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TabCell", for: indexPath) as? TabBarCell
             else { return UICollectionViewCell() }
-        guard let tab = tabList.at(indexPath.row) else { return cell }
+        guard let tab = tabList[indexPath.row] else { return cell }
 
         cell.tabManager = tabManager
         cell.tab = tab
@@ -260,7 +260,7 @@ extension TabsBarViewController: UICollectionViewDataSource {
             strongSelf.updateData()
 
             let previousOrNext = max(0, previousIndex - 1)
-            tabManager.selectTab(strongSelf.tabList.at(previousOrNext))
+            tabManager.selectTab(strongSelf.tabList[previousOrNext])
 
             strongSelf.collectionView.selectItem(at: IndexPath(row: previousOrNext, section: 0), animated: true, scrollPosition: .centeredHorizontally)
         }
@@ -269,8 +269,8 @@ extension TabsBarViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, moveItemAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-        guard let manager = tabManager, let fromTab = tabList.at(sourceIndexPath.row),
-            let toTab = tabList.at(destinationIndexPath.row) else { return }
+        guard let manager = tabManager, let fromTab = tabList[sourceIndexPath.row],
+            let toTab = tabList[destinationIndexPath.row] else { return }
 
         // Find original from/to index... we need to target the full list not partial.
         guard let from = manager.tabs.index(where: {$0 === fromTab}),
@@ -279,7 +279,7 @@ extension TabsBarViewController: UICollectionViewDataSource {
         manager.moveTab(isPrivate: UIApplication.isInPrivateMode, fromIndex: from, toIndex: to)
         updateData()
         
-        guard let selectedTab = tabList.at(destinationIndexPath.row) else { return }
+        guard let selectedTab = tabList[destinationIndexPath.row] else { return }
         manager.selectTab(selectedTab)
     }
 }
