@@ -293,183 +293,110 @@
 		59A68D66379CFA85C4EAF00B /* TwoLineCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59A68B1F857A8638598A63A0 /* TwoLineCell.swift */; };
 		59A68E0B4ABBF55E14819668 /* BookmarksPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59A6839879D615FC1C0D71CE /* BookmarksPanel.swift */; };
 		59A68FD5260B8D520F890F4A /* ReaderPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59A685F4EAD19EDEC854BCA4 /* ReaderPanel.swift */; };
-		5D6183C8208E88C0003835EF /* HttpsEverywhere.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183B5208E88C0003835EF /* HttpsEverywhere.swift */; };
 		5D6183C9208E88C0003835EF /* HttpsEverywhere.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183B5208E88C0003835EF /* HttpsEverywhere.swift */; };
-		5D6183CA208E88C0003835EF /* AdBlocker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183B6208E88C0003835EF /* AdBlocker.swift */; };
 		5D6183CB208E88C0003835EF /* AdBlocker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183B6208E88C0003835EF /* AdBlocker.swift */; };
-		5D6183CC208E88C0003835EF /* TrackingProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183B7208E88C0003835EF /* TrackingProtection.swift */; };
 		5D6183CD208E88C0003835EF /* TrackingProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183B7208E88C0003835EF /* TrackingProtection.swift */; };
-		5D6183CE208E88C0003835EF /* SafeBrowsingError.html in Resources */ = {isa = PBXBuildFile; fileRef = 5D6183B8208E88C0003835EF /* SafeBrowsingError.html */; };
 		5D6183CF208E88C0003835EF /* SafeBrowsingError.html in Resources */ = {isa = PBXBuildFile; fileRef = 5D6183B8208E88C0003835EF /* SafeBrowsingError.html */; };
-		5D6183D0208E88C0003835EF /* SafeBrowsing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183B9208E88C0003835EF /* SafeBrowsing.swift */; };
 		5D6183D1208E88C0003835EF /* SafeBrowsing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183B9208E88C0003835EF /* SafeBrowsing.swift */; };
-		5D6183D2208E88C0003835EF /* HttpsEverywhereObjC.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183BD208E88C0003835EF /* HttpsEverywhereObjC.mm */; };
 		5D6183D3208E88C0003835EF /* HttpsEverywhereObjC.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183BD208E88C0003835EF /* HttpsEverywhereObjC.mm */; };
-		5D6183D4208E88C0003835EF /* HttpsEverywhere.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183C0208E88C0003835EF /* HttpsEverywhere.cpp */; };
 		5D6183D5208E88C0003835EF /* HttpsEverywhere.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183C0208E88C0003835EF /* HttpsEverywhere.cpp */; };
-		5D6183D6208E88C0003835EF /* ABPFilterLibWrapper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183C1208E88C0003835EF /* ABPFilterLibWrapper.mm */; };
 		5D6183D7208E88C0003835EF /* ABPFilterLibWrapper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183C1208E88C0003835EF /* ABPFilterLibWrapper.mm */; };
-		5D6183D8208E88C0003835EF /* BraveShieldState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183C2208E88C0003835EF /* BraveShieldState.swift */; };
 		5D6183D9208E88C0003835EF /* BraveShieldState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183C2208E88C0003835EF /* BraveShieldState.swift */; };
-		5D6183DA208E88C0003835EF /* UrlProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183C3208E88C0003835EF /* UrlProtocol.swift */; };
 		5D6183DB208E88C0003835EF /* UrlProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183C3208E88C0003835EF /* UrlProtocol.swift */; };
-		5D6183DC208E88C0003835EF /* NetworkDataFileLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183C5208E88C0003835EF /* NetworkDataFileLoader.swift */; };
 		5D6183DD208E88C0003835EF /* NetworkDataFileLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183C5208E88C0003835EF /* NetworkDataFileLoader.swift */; };
-		5D6183DE208E88C0003835EF /* TrackingProtectionCpp.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183C6208E88C0003835EF /* TrackingProtectionCpp.mm */; };
 		5D6183DF208E88C0003835EF /* TrackingProtectionCpp.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183C6208E88C0003835EF /* TrackingProtectionCpp.mm */; };
 		5D6183E3208F78CA003835EF /* FifoDict.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183E0208F78A7003835EF /* FifoDict.swift */; };
-		5D6183E5208F8A9C003835EF /* TempBraveApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183E4208F8A9C003835EF /* TempBraveApp.swift */; };
 		5D6183E6208F8A9C003835EF /* TempBraveApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183E4208F8A9C003835EF /* TempBraveApp.swift */; };
-		5D61A68B208FB6E2003835EF /* ad_block_client.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A68A208FB6E2003835EF /* ad_block_client.h */; };
-		5D61A694208FD116003835EF /* TPParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A693208FD115003835EF /* TPParser.h */; };
-		5D61A696208FD149003835EF /* hashFn.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A695208FD148003835EF /* hashFn.h */; };
-		5D61A698208FD410003835EF /* HashSet.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A697208FD40F003835EF /* HashSet.h */; };
-		5D61A702208FE1C7003835EF /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 5D61A69A208FE1C6003835EF /* LICENSE */; };
-		5D61A703208FE1C7003835EF /* testutil.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A69C208FE1C6003835EF /* testutil.cc */; };
-		5D61A704208FE1C7003835EF /* status.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A69D208FE1C6003835EF /* status.cc */; };
-		5D61A705208FE1C7003835EF /* arena.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A69E208FE1C6003835EF /* arena.cc */; };
-		5D61A706208FE1C7003835EF /* bloom.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A69F208FE1C6003835EF /* bloom.cc */; };
-		5D61A707208FE1C7003835EF /* posix_logger.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6A0208FE1C6003835EF /* posix_logger.h */; };
-		5D61A708208FE1C7003835EF /* testharness.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6A1208FE1C6003835EF /* testharness.h */; };
-		5D61A709208FE1C7003835EF /* hash.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6A2208FE1C6003835EF /* hash.cc */; };
-		5D61A70A208FE1C7003835EF /* coding.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6A3208FE1C6003835EF /* coding.h */; };
-		5D61A70B208FE1C7003835EF /* logging.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6A4208FE1C6003835EF /* logging.h */; };
-		5D61A70C208FE1C7003835EF /* filter_policy.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6A5208FE1C6003835EF /* filter_policy.cc */; };
-		5D61A70D208FE1C7003835EF /* histogram.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6A6208FE1C6003835EF /* histogram.cc */; };
-		5D61A70E208FE1C7003835EF /* crc32c.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6A7208FE1C6003835EF /* crc32c.cc */; };
-		5D61A70F208FE1C7003835EF /* mutexlock.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6A8208FE1C6003835EF /* mutexlock.h */; };
-		5D61A710208FE1C7003835EF /* cache.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6A9208FE1C6003835EF /* cache.cc */; };
-		5D61A711208FE1C7003835EF /* testharness.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6AA208FE1C6003835EF /* testharness.cc */; };
-		5D61A712208FE1C7003835EF /* histogram.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6AB208FE1C6003835EF /* histogram.h */; };
-		5D61A713208FE1C7003835EF /* crc32c.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6AC208FE1C6003835EF /* crc32c.h */; };
-		5D61A714208FE1C7003835EF /* logging.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6AD208FE1C6003835EF /* logging.cc */; };
-		5D61A715208FE1C7003835EF /* options.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6AE208FE1C6003835EF /* options.cc */; };
-		5D61A716208FE1C7003835EF /* arena.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6AF208FE1C6003835EF /* arena.h */; };
-		5D61A717208FE1C7003835EF /* comparator.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6B0208FE1C6003835EF /* comparator.cc */; };
-		5D61A718208FE1C7003835EF /* coding.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6B1208FE1C6003835EF /* coding.cc */; };
-		5D61A719208FE1C7003835EF /* hash.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6B2208FE1C6003835EF /* hash.h */; };
-		5D61A71A208FE1C7003835EF /* random.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6B3208FE1C6003835EF /* random.h */; };
-		5D61A71B208FE1C7003835EF /* env_posix.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6B4208FE1C6003835EF /* env_posix.cc */; };
-		5D61A71C208FE1C7003835EF /* testutil.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6B5208FE1C6003835EF /* testutil.h */; };
-		5D61A71D208FE1C7003835EF /* env.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6B6208FE1C6003835EF /* env.cc */; };
-		5D61A71E208FE1C7003835EF /* env.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6B9208FE1C6003835EF /* env.h */; };
-		5D61A71F208FE1C7003835EF /* status.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6BA208FE1C6003835EF /* status.h */; };
-		5D61A720208FE1C7003835EF /* db.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6BB208FE1C6003835EF /* db.h */; };
-		5D61A721208FE1C7003835EF /* slice.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6BC208FE1C6003835EF /* slice.h */; };
-		5D61A722208FE1C7003835EF /* cache.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6BD208FE1C6003835EF /* cache.h */; };
-		5D61A723208FE1C7003835EF /* write_batch.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6BE208FE1C6003835EF /* write_batch.h */; };
-		5D61A724208FE1C7003835EF /* options.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6BF208FE1C6003835EF /* options.h */; };
-		5D61A725208FE1C7003835EF /* dumpfile.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6C0208FE1C6003835EF /* dumpfile.h */; };
-		5D61A726208FE1C7003835EF /* c.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6C1208FE1C6003835EF /* c.h */; };
-		5D61A727208FE1C7003835EF /* filter_policy.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6C2208FE1C6003835EF /* filter_policy.h */; };
-		5D61A728208FE1C7003835EF /* comparator.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6C3208FE1C6003835EF /* comparator.h */; };
-		5D61A729208FE1C7003835EF /* table.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6C4208FE1C6003835EF /* table.h */; };
-		5D61A72A208FE1C7003835EF /* table_builder.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6C5208FE1C6003835EF /* table_builder.h */; };
-		5D61A72B208FE1C7003835EF /* iterator.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6C6208FE1C6003835EF /* iterator.h */; };
-		5D61A72C208FE1C7003835EF /* table.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6C8208FE1C6003835EF /* table.cc */; };
-		5D61A72D208FE1C7003835EF /* block.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6C9208FE1C6003835EF /* block.cc */; };
-		5D61A72E208FE1C7003835EF /* merger.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6CA208FE1C6003835EF /* merger.cc */; };
-		5D61A72F208FE1C7003835EF /* iterator.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6CB208FE1C6003835EF /* iterator.cc */; };
-		5D61A730208FE1C7003835EF /* block_.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6CC208FE1C6003835EF /* block_.h */; };
-		5D61A731208FE1C7003835EF /* block_builder.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6CD208FE1C6003835EF /* block_builder.cc */; };
-		5D61A732208FE1C7003835EF /* iterator_wrapper.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6CE208FE1C6003835EF /* iterator_wrapper.h */; };
-		5D61A733208FE1C7003835EF /* merger.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6CF208FE1C6003835EF /* merger.h */; };
-		5D61A734208FE1C7003835EF /* table_builder.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6D0208FE1C6003835EF /* table_builder.cc */; };
-		5D61A735208FE1C7003835EF /* block_builder.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6D1208FE1C6003835EF /* block_builder.h */; };
-		5D61A736208FE1C7003835EF /* filter_block.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6D2208FE1C6003835EF /* filter_block.cc */; };
-		5D61A737208FE1C7003835EF /* format.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6D3208FE1C6003835EF /* format.cc */; };
-		5D61A738208FE1C7003835EF /* filter_block.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6D4208FE1C6003835EF /* filter_block.h */; };
-		5D61A739208FE1C7003835EF /* two_level_iterator.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6D5208FE1C6003835EF /* two_level_iterator.h */; };
-		5D61A73A208FE1C7003835EF /* format.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6D6208FE1C6003835EF /* format.h */; };
-		5D61A73B208FE1C7003835EF /* two_level_iterator.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6D7208FE1C6003835EF /* two_level_iterator.cc */; };
-		5D61A73C208FE1C7003835EF /* log_format.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6D9208FE1C6003835EF /* log_format.h */; };
-		5D61A73D208FE1C7003835EF /* log_writer.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6DA208FE1C6003835EF /* log_writer.cc */; };
-		5D61A73E208FE1C7003835EF /* table_cache.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6DB208FE1C6003835EF /* table_cache.h */; };
-		5D61A73F208FE1C7003835EF /* db_impl.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6DC208FE1C6003835EF /* db_impl.cc */; };
-		5D61A740208FE1C7003835EF /* filename.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6DD208FE1C6003835EF /* filename.cc */; };
-		5D61A741208FE1C7003835EF /* skiplist.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6DE208FE1C6003835EF /* skiplist.h */; };
-		5D61A742208FE1C7003835EF /* dbformat.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6DF208FE1C6003835EF /* dbformat.h */; };
-		5D61A743208FE1C7003835EF /* table_cache.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6E0208FE1C6003835EF /* table_cache.cc */; };
-		5D61A744208FE1C7003835EF /* log_reader.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6E1208FE1C6003835EF /* log_reader.cc */; };
-		5D61A745208FE1C7003835EF /* write_batch.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6E2208FE1C6003835EF /* write_batch.cc */; };
-		5D61A746208FE1C7003835EF /* c.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6E3208FE1C6003835EF /* c.cc */; };
-		5D61A747208FE1C7003835EF /* builder.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6E4208FE1C6003835EF /* builder.cc */; };
-		5D61A748208FE1C7003835EF /* log_writer.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6E5208FE1C6003835EF /* log_writer.h */; };
-		5D61A749208FE1C7003835EF /* version_edit.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6E6208FE1C6003835EF /* version_edit.cc */; };
-		5D61A74A208FE1C7003835EF /* db_impl.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6E7208FE1C6003835EF /* db_impl.h */; };
-		5D61A74B208FE1C7003835EF /* db_iter.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6E8208FE1C6003835EF /* db_iter.h */; };
-		5D61A74C208FE1C7003835EF /* dbformat.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6E9208FE1C6003835EF /* dbformat.cc */; };
-		5D61A74D208FE1C7003835EF /* memtable.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6EA208FE1C6003835EF /* memtable.h */; };
-		5D61A74E208FE1C7003835EF /* version_edit.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6EB208FE1C6003835EF /* version_edit.h */; };
-		5D61A74F208FE1C7003835EF /* version_set.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6EC208FE1C6003835EF /* version_set.h */; };
-		5D61A750208FE1C7003835EF /* builder.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6ED208FE1C6003835EF /* builder.h */; };
-		5D61A751208FE1C7003835EF /* version_set.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6EE208FE1C6003835EF /* version_set.cc */; };
-		5D61A752208FE1C7003835EF /* dumpfile.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6EF208FE1C6003835EF /* dumpfile.cc */; };
-		5D61A753208FE1C7003835EF /* log_reader.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6F0208FE1C6003835EF /* log_reader.h */; };
-		5D61A754208FE1C7003835EF /* write_batch_internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6F1208FE1C6003835EF /* write_batch_internal.h */; };
-		5D61A755208FE1C7003835EF /* db_iter.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6F2208FE1C6003835EF /* db_iter.cc */; };
-		5D61A756208FE1C7003835EF /* repair.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6F3208FE1C6003835EF /* repair.cc */; };
-		5D61A757208FE1C7003835EF /* filename.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6F4208FE1C6003835EF /* filename.h */; };
-		5D61A758208FE1C7003835EF /* snapshot.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6F5208FE1C6003835EF /* snapshot.h */; };
-		5D61A759208FE1C7003835EF /* memtable.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6F6208FE1C6003835EF /* memtable.cc */; };
-		5D61A75A208FE1C7003835EF /* atomic_pointer.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6F8208FE1C6003835EF /* atomic_pointer.h */; };
-		5D61A75B208FE1C7003835EF /* port.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6F9208FE1C6003835EF /* port.h */; };
-		5D61A75C208FE1C7003835EF /* port_posix.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6FA208FE1C6003835EF /* port_posix.cc */; };
-		5D61A75D208FE1C7003835EF /* port_posix.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6FB208FE1C6003835EF /* port_posix.h */; };
-		5D61A75E208FE1C7003835EF /* port_example.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6FC208FE1C6003835EF /* port_example.h */; };
-		5D61A75F208FE1C7003835EF /* thread_annotations.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A6FD208FE1C6003835EF /* thread_annotations.h */; };
-		5D61A760208FE1C7003835EF /* memenv.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A700208FE1C6003835EF /* memenv.cc */; };
-		5D61A761208FE1C7003835EF /* memenv.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A701208FE1C6003835EF /* memenv.h */; };
-		5D61A7982090C929003835EF /* mix.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A7642090C929003835EF /* mix.h */; };
-		5D61A7992090C929003835EF /* sparse_array.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A7652090C929003835EF /* sparse_array.h */; };
-		5D61A79A2090C929003835EF /* flags.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A7662090C929003835EF /* flags.h */; };
-		5D61A79B2090C929003835EF /* rune.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A7672090C929003835EF /* rune.cc */; };
-		5D61A79C2090C929003835EF /* utf.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A7682090C929003835EF /* utf.h */; };
-		5D61A79D2090C929003835EF /* pcre.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A7692090C929003835EF /* pcre.cc */; };
-		5D61A79E2090C929003835EF /* logging.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A76A2090C929003835EF /* logging.h */; };
-		5D61A79F2090C929003835EF /* util.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A76B2090C929003835EF /* util.h */; };
-		5D61A7A02090C929003835EF /* pcre.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A76C2090C929003835EF /* pcre.h */; };
-		5D61A7A12090C929003835EF /* strutil.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A76D2090C929003835EF /* strutil.cc */; };
-		5D61A7A22090C929003835EF /* sparse_set.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A76E2090C929003835EF /* sparse_set.h */; };
-		5D61A7A32090C929003835EF /* mutex.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A76F2090C929003835EF /* mutex.h */; };
-		5D61A7A42090C929003835EF /* strutil.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A7702090C929003835EF /* strutil.h */; };
-		5D61A7A52090C929003835EF /* stringpiece.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A7722090C929003835EF /* stringpiece.h */; };
-		5D61A7A62090C929003835EF /* set.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A7732090C929003835EF /* set.cc */; };
-		5D61A7A72090C929003835EF /* make_unicode_casefold.py in Resources */ = {isa = PBXBuildFile; fileRef = 5D61A7742090C929003835EF /* make_unicode_casefold.py */; };
-		5D61A7A82090C929003835EF /* parse.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A7752090C929003835EF /* parse.cc */; };
-		5D61A7A92090C929003835EF /* re2_fuzzer.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A7772090C929003835EF /* re2_fuzzer.cc */; };
-		5D61A7AA2090C929003835EF /* nfa.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A7782090C929003835EF /* nfa.cc */; };
-		5D61A7AB2090C929003835EF /* prog.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A7792090C929003835EF /* prog.h */; };
-		5D61A7AC2090C929003835EF /* unicode_groups.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A77A2090C929003835EF /* unicode_groups.cc */; };
-		5D61A7AD2090C929003835EF /* unicode_casefold.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A77B2090C929003835EF /* unicode_casefold.cc */; };
-		5D61A7AE2090C929003835EF /* unicode.py in Resources */ = {isa = PBXBuildFile; fileRef = 5D61A77C2090C929003835EF /* unicode.py */; };
-		5D61A7AF2090C929003835EF /* regexp.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A77D2090C929003835EF /* regexp.cc */; };
-		5D61A7B02090C929003835EF /* onepass.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A77E2090C929003835EF /* onepass.cc */; };
-		5D61A7B12090C929003835EF /* perl_groups.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A77F2090C929003835EF /* perl_groups.cc */; };
-		5D61A7B22090C929003835EF /* prefilter.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A7802090C929003835EF /* prefilter.h */; };
-		5D61A7B32090C929003835EF /* mimics_pcre.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A7812090C929003835EF /* mimics_pcre.cc */; };
-		5D61A7B42090C929003835EF /* walker-inl.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A7822090C929003835EF /* walker-inl.h */; };
-		5D61A7B52090C929003835EF /* prefilter_tree.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A7832090C929003835EF /* prefilter_tree.h */; };
-		5D61A7B62090C929003835EF /* filtered_re2.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A7842090C929003835EF /* filtered_re2.h */; };
-		5D61A7B72090C929003835EF /* dfa.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A7852090C929003835EF /* dfa.cc */; };
-		5D61A7B82090C929003835EF /* compile.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A7862090C929003835EF /* compile.cc */; };
-		5D61A7B92090C929003835EF /* re2.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A7872090C929003835EF /* re2.cc */; };
-		5D61A7BA2090C929003835EF /* filtered_re2.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A7882090C929003835EF /* filtered_re2.cc */; };
-		5D61A7BB2090C929003835EF /* tostring.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A7892090C929003835EF /* tostring.cc */; };
-		5D61A7BC2090C929003835EF /* unicode_casefold.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A78A2090C929003835EF /* unicode_casefold.h */; };
-		5D61A7BD2090C929003835EF /* unicode_groups.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A78B2090C929003835EF /* unicode_groups.h */; };
-		5D61A7BE2090C929003835EF /* prefilter.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A78C2090C929003835EF /* prefilter.cc */; };
-		5D61A7BF2090C929003835EF /* simplify.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A78D2090C929003835EF /* simplify.cc */; };
-		5D61A7C02090C929003835EF /* prefilter_tree.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A78E2090C929003835EF /* prefilter_tree.cc */; };
-		5D61A7C12090C929003835EF /* bitstate.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A78F2090C929003835EF /* bitstate.cc */; };
-		5D61A7C22090C929003835EF /* make_unicode_groups.py in Resources */ = {isa = PBXBuildFile; fileRef = 5D61A7902090C929003835EF /* make_unicode_groups.py */; };
-		5D61A7C32090C929003835EF /* make_perl_groups.pl in Resources */ = {isa = PBXBuildFile; fileRef = 5D61A7912090C929003835EF /* make_perl_groups.pl */; };
-		5D61A7C42090C929003835EF /* regexp.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A7922090C929003835EF /* regexp.h */; };
-		5D61A7C52090C929003835EF /* bitmap256.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A7932090C929003835EF /* bitmap256.h */; };
-		5D61A7C62090C929003835EF /* re2.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A7942090C929003835EF /* re2.h */; };
-		5D61A7C72090C929003835EF /* set.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D61A7952090C929003835EF /* set.h */; };
-		5D61A7C82090C929003835EF /* stringpiece.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A7962090C929003835EF /* stringpiece.cc */; };
-		5D61A7C92090C929003835EF /* prog.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A7972090C929003835EF /* prog.cc */; };
+		5D61A7FC2090CFD6003835EF /* TempBraveApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183E4208F8A9C003835EF /* TempBraveApp.swift */; };
+		5D61A7FD2090CFDA003835EF /* HttpsEverywhere.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183B5208E88C0003835EF /* HttpsEverywhere.swift */; };
+		5D61A7FE2090CFDC003835EF /* AdBlocker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183B6208E88C0003835EF /* AdBlocker.swift */; };
+		5D61A7FF2090CFDE003835EF /* TrackingProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183B7208E88C0003835EF /* TrackingProtection.swift */; };
+		5D61A8002090CFE1003835EF /* SafeBrowsingError.html in Resources */ = {isa = PBXBuildFile; fileRef = 5D6183B8208E88C0003835EF /* SafeBrowsingError.html */; };
+		5D61A8012090CFE4003835EF /* SafeBrowsing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183B9208E88C0003835EF /* SafeBrowsing.swift */; };
+		5D61A8022090CFF2003835EF /* HttpsEverywhereObjC.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183BD208E88C0003835EF /* HttpsEverywhereObjC.mm */; };
+		5D61A8032090CFF8003835EF /* HttpsEverywhere.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183C0208E88C0003835EF /* HttpsEverywhere.cpp */; };
+		5D61A8042090CFFB003835EF /* ABPFilterLibWrapper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183C1208E88C0003835EF /* ABPFilterLibWrapper.mm */; };
+		5D61A8052090D000003835EF /* BraveShieldState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183C2208E88C0003835EF /* BraveShieldState.swift */; };
+		5D61A8062090D000003835EF /* UrlProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183C3208E88C0003835EF /* UrlProtocol.swift */; };
+		5D61A8072090D008003835EF /* NetworkDataFileLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183C5208E88C0003835EF /* NetworkDataFileLoader.swift */; };
+		5D61A8082090D008003835EF /* TrackingProtectionCpp.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183C6208E88C0003835EF /* TrackingProtectionCpp.mm */; };
+		5D61A8092090D021003835EF /* rune.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A7672090C929003835EF /* rune.cc */; };
+		5D61A80A2090D024003835EF /* pcre.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A7692090C929003835EF /* pcre.cc */; };
+		5D61A80B2090D027003835EF /* strutil.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A76D2090C929003835EF /* strutil.cc */; };
+		5D61A80C2090D02D003835EF /* set.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A7732090C929003835EF /* set.cc */; };
+		5D61A80D2090D02D003835EF /* make_unicode_casefold.py in Resources */ = {isa = PBXBuildFile; fileRef = 5D61A7742090C929003835EF /* make_unicode_casefold.py */; };
+		5D61A80E2090D02D003835EF /* parse.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A7752090C929003835EF /* parse.cc */; };
+		5D61A80F2090D040003835EF /* nfa.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A7782090C929003835EF /* nfa.cc */; };
+		5D61A8102090D040003835EF /* unicode_groups.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A77A2090C929003835EF /* unicode_groups.cc */; };
+		5D61A8112090D040003835EF /* unicode_casefold.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A77B2090C929003835EF /* unicode_casefold.cc */; };
+		5D61A8122090D040003835EF /* unicode.py in Resources */ = {isa = PBXBuildFile; fileRef = 5D61A77C2090C929003835EF /* unicode.py */; };
+		5D61A8132090D040003835EF /* regexp.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A77D2090C929003835EF /* regexp.cc */; };
+		5D61A8142090D040003835EF /* onepass.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A77E2090C929003835EF /* onepass.cc */; };
+		5D61A8152090D040003835EF /* perl_groups.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A77F2090C929003835EF /* perl_groups.cc */; };
+		5D61A8162090D040003835EF /* mimics_pcre.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A7812090C929003835EF /* mimics_pcre.cc */; };
+		5D61A8172090D040003835EF /* dfa.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A7852090C929003835EF /* dfa.cc */; };
+		5D61A8182090D040003835EF /* compile.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A7862090C929003835EF /* compile.cc */; };
+		5D61A8192090D040003835EF /* re2.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A7872090C929003835EF /* re2.cc */; };
+		5D61A81A2090D040003835EF /* filtered_re2.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A7882090C929003835EF /* filtered_re2.cc */; };
+		5D61A81B2090D040003835EF /* tostring.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A7892090C929003835EF /* tostring.cc */; };
+		5D61A81C2090D040003835EF /* prefilter.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A78C2090C929003835EF /* prefilter.cc */; };
+		5D61A81D2090D040003835EF /* simplify.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A78D2090C929003835EF /* simplify.cc */; };
+		5D61A81E2090D040003835EF /* prefilter_tree.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A78E2090C929003835EF /* prefilter_tree.cc */; };
+		5D61A81F2090D040003835EF /* bitstate.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A78F2090C929003835EF /* bitstate.cc */; };
+		5D61A8202090D040003835EF /* make_unicode_groups.py in Resources */ = {isa = PBXBuildFile; fileRef = 5D61A7902090C929003835EF /* make_unicode_groups.py */; };
+		5D61A8212090D040003835EF /* make_perl_groups.pl in Resources */ = {isa = PBXBuildFile; fileRef = 5D61A7912090C929003835EF /* make_perl_groups.pl */; };
+		5D61A8222090D044003835EF /* stringpiece.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A7962090C929003835EF /* stringpiece.cc */; };
+		5D61A8232090D044003835EF /* prog.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A7972090C929003835EF /* prog.cc */; };
+		5D61A8252090D05B003835EF /* testutil.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A69C208FE1C6003835EF /* testutil.cc */; };
+		5D61A8262090D05B003835EF /* status.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A69D208FE1C6003835EF /* status.cc */; };
+		5D61A8272090D05B003835EF /* arena.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A69E208FE1C6003835EF /* arena.cc */; };
+		5D61A8282090D05B003835EF /* bloom.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A69F208FE1C6003835EF /* bloom.cc */; };
+		5D61A8292090D05B003835EF /* hash.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6A2208FE1C6003835EF /* hash.cc */; };
+		5D61A82A2090D05B003835EF /* filter_policy.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6A5208FE1C6003835EF /* filter_policy.cc */; };
+		5D61A82B2090D05B003835EF /* histogram.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6A6208FE1C6003835EF /* histogram.cc */; };
+		5D61A82C2090D05B003835EF /* crc32c.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6A7208FE1C6003835EF /* crc32c.cc */; };
+		5D61A82D2090D05B003835EF /* cache.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6A9208FE1C6003835EF /* cache.cc */; };
+		5D61A82E2090D05B003835EF /* testharness.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6AA208FE1C6003835EF /* testharness.cc */; };
+		5D61A82F2090D05B003835EF /* logging.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6AD208FE1C6003835EF /* logging.cc */; };
+		5D61A8302090D05B003835EF /* options.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6AE208FE1C6003835EF /* options.cc */; };
+		5D61A8312090D05B003835EF /* comparator.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6B0208FE1C6003835EF /* comparator.cc */; };
+		5D61A8322090D05B003835EF /* coding.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6B1208FE1C6003835EF /* coding.cc */; };
+		5D61A8332090D05B003835EF /* env_posix.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6B4208FE1C6003835EF /* env_posix.cc */; };
+		5D61A8342090D05B003835EF /* env.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6B6208FE1C6003835EF /* env.cc */; };
+		5D61A8352090D06E003835EF /* table.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6C8208FE1C6003835EF /* table.cc */; };
+		5D61A8362090D06E003835EF /* block.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6C9208FE1C6003835EF /* block.cc */; };
+		5D61A8372090D06E003835EF /* merger.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6CA208FE1C6003835EF /* merger.cc */; };
+		5D61A8382090D06E003835EF /* iterator.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6CB208FE1C6003835EF /* iterator.cc */; };
+		5D61A8392090D06E003835EF /* block_builder.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6CD208FE1C6003835EF /* block_builder.cc */; };
+		5D61A83A2090D06E003835EF /* table_builder.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6D0208FE1C6003835EF /* table_builder.cc */; };
+		5D61A83B2090D06E003835EF /* filter_block.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6D2208FE1C6003835EF /* filter_block.cc */; };
+		5D61A83C2090D06E003835EF /* format.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6D3208FE1C6003835EF /* format.cc */; };
+		5D61A83D2090D06E003835EF /* two_level_iterator.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6D7208FE1C6003835EF /* two_level_iterator.cc */; };
+		5D61A83E2090D08E003835EF /* log_writer.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6DA208FE1C6003835EF /* log_writer.cc */; };
+		5D61A83F2090D08E003835EF /* db_impl.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6DC208FE1C6003835EF /* db_impl.cc */; };
+		5D61A8402090D08E003835EF /* filename.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6DD208FE1C6003835EF /* filename.cc */; };
+		5D61A8412090D08E003835EF /* table_cache.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6E0208FE1C6003835EF /* table_cache.cc */; };
+		5D61A8422090D08E003835EF /* log_reader.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6E1208FE1C6003835EF /* log_reader.cc */; };
+		5D61A8432090D08E003835EF /* write_batch.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6E2208FE1C6003835EF /* write_batch.cc */; };
+		5D61A8442090D08E003835EF /* c.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6E3208FE1C6003835EF /* c.cc */; };
+		5D61A8452090D08E003835EF /* builder.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6E4208FE1C6003835EF /* builder.cc */; };
+		5D61A8462090D08E003835EF /* version_edit.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6E6208FE1C6003835EF /* version_edit.cc */; };
+		5D61A8472090D08E003835EF /* dbformat.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6E9208FE1C6003835EF /* dbformat.cc */; };
+		5D61A8482090D08E003835EF /* version_set.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6EE208FE1C6003835EF /* version_set.cc */; };
+		5D61A8492090D08E003835EF /* dumpfile.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6EF208FE1C6003835EF /* dumpfile.cc */; };
+		5D61A84A2090D08E003835EF /* db_iter.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6F2208FE1C6003835EF /* db_iter.cc */; };
+		5D61A84B2090D08E003835EF /* repair.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6F3208FE1C6003835EF /* repair.cc */; };
+		5D61A84C2090D08E003835EF /* memtable.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6F6208FE1C6003835EF /* memtable.cc */; };
+		5D61A84D2090D097003835EF /* port_posix.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A6FA208FE1C6003835EF /* port_posix.cc */; };
+		5D61A84E2090D09E003835EF /* memenv.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A700208FE1C6003835EF /* memenv.cc */; };
+		5D61A84F2090DDBF003835EF /* re2_fuzzer.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A7772090C929003835EF /* re2_fuzzer.cc */; };
+		5D61A8522090DE7D003835EF /* TPParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A8502090DE7D003835EF /* TPParser.cpp */; };
+		5D61A8562090DEAC003835EF /* ad_block_client.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A8542090DEAC003835EF /* ad_block_client.cc */; };
+		5D61A8572090DEAC003835EF /* cosmetic_filter.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A8552090DEAC003835EF /* cosmetic_filter.cc */; };
+		5D61A85C2090DF48003835EF /* HashSet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A85A2090DF48003835EF /* HashSet.cpp */; };
+		5D61A8612090DFD3003835EF /* hashFn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A85E2090DFD2003835EF /* hashFn.cpp */; };
+		5D61A8622090DFD3003835EF /* BloomFilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A85F2090DFD2003835EF /* BloomFilter.cpp */; };
+		5D61A8652090EFC6003835EF /* filter.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A8642090EFC6003835EF /* filter.cc */; };
 		742A56391D80B54A00BDB803 /* PhotonActionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 742A56381D80B54A00BDB803 /* PhotonActionSheet.swift */; };
 		744B0FFE1B4F172E00100422 /* ToolbarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 744B0FFD1B4F172E00100422 /* ToolbarTests.swift */; };
 		744ED5611DBFEB8D00A2B5BE /* MailtoLinkHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 744ED5601DBFEB8D00A2B5BE /* MailtoLinkHandler.swift */; };
@@ -1850,7 +1777,6 @@
 		5D6183E4208F8A9C003835EF /* TempBraveApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TempBraveApp.swift; sourceTree = "<group>"; };
 		5D61A68A208FB6E2003835EF /* ad_block_client.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ad_block_client.h; path = "NPM/node_modules/ad-block/ad_block_client.h"; sourceTree = SOURCE_ROOT; };
 		5D61A693208FD115003835EF /* TPParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TPParser.h; path = "NPM/node_modules/tracking-protection/TPParser.h"; sourceTree = SOURCE_ROOT; };
-		5D61A695208FD148003835EF /* hashFn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = hashFn.h; path = "NPM/node_modules/hashset-cpp/hashFn.h"; sourceTree = SOURCE_ROOT; };
 		5D61A697208FD40F003835EF /* HashSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HashSet.h; path = "NPM/node_modules/hashset-cpp/HashSet.h"; sourceTree = SOURCE_ROOT; };
 		5D61A69A208FE1C6003835EF /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		5D61A69C208FE1C6003835EF /* testutil.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = testutil.cc; sourceTree = "<group>"; };
@@ -1998,6 +1924,19 @@
 		5D61A7952090C929003835EF /* set.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = set.h; sourceTree = "<group>"; };
 		5D61A7962090C929003835EF /* stringpiece.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = stringpiece.cc; sourceTree = "<group>"; };
 		5D61A7972090C929003835EF /* prog.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = prog.cc; sourceTree = "<group>"; };
+		5D61A8502090DE7D003835EF /* TPParser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TPParser.cpp; path = "NPM/node_modules/tracking-protection/TPParser.cpp"; sourceTree = SOURCE_ROOT; };
+		5D61A8512090DE7D003835EF /* FirstPartyHost.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FirstPartyHost.h; path = "NPM/node_modules/tracking-protection/FirstPartyHost.h"; sourceTree = SOURCE_ROOT; };
+		5D61A8532090DEAC003835EF /* cosmetic_filter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cosmetic_filter.h; path = "NPM/node_modules/ad-block/cosmetic_filter.h"; sourceTree = SOURCE_ROOT; };
+		5D61A8542090DEAC003835EF /* ad_block_client.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ad_block_client.cc; path = "NPM/node_modules/ad-block/ad_block_client.cc"; sourceTree = SOURCE_ROOT; };
+		5D61A8552090DEAC003835EF /* cosmetic_filter.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = cosmetic_filter.cc; path = "NPM/node_modules/ad-block/cosmetic_filter.cc"; sourceTree = SOURCE_ROOT; };
+		5D61A85A2090DF48003835EF /* HashSet.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = HashSet.cpp; path = "NPM/node_modules/hashset-cpp/HashSet.cpp"; sourceTree = SOURCE_ROOT; };
+		5D61A85B2090DF48003835EF /* HashItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HashItem.h; path = "NPM/node_modules/hashset-cpp/HashItem.h"; sourceTree = SOURCE_ROOT; };
+		5D61A85D2090DFD2003835EF /* hashFn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = hashFn.h; path = "NPM/node_modules/bloom-filter-cpp/hashFn.h"; sourceTree = SOURCE_ROOT; };
+		5D61A85E2090DFD2003835EF /* hashFn.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = hashFn.cpp; path = "NPM/node_modules/bloom-filter-cpp/hashFn.cpp"; sourceTree = SOURCE_ROOT; };
+		5D61A85F2090DFD2003835EF /* BloomFilter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BloomFilter.cpp; path = "NPM/node_modules/bloom-filter-cpp/BloomFilter.cpp"; sourceTree = SOURCE_ROOT; };
+		5D61A8602090DFD3003835EF /* BloomFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BloomFilter.h; path = "NPM/node_modules/bloom-filter-cpp/BloomFilter.h"; sourceTree = SOURCE_ROOT; };
+		5D61A8632090EFC6003835EF /* filter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = filter.h; path = "NPM/node_modules/ad-block/filter.h"; sourceTree = SOURCE_ROOT; };
+		5D61A8642090EFC6003835EF /* filter.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = filter.cc; path = "NPM/node_modules/ad-block/filter.cc"; sourceTree = SOURCE_ROOT; };
 		742A56381D80B54A00BDB803 /* PhotonActionSheet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotonActionSheet.swift; sourceTree = "<group>"; };
 		744B0FFD1B4F172E00100422 /* ToolbarTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ToolbarTests.swift; sourceTree = "<group>"; };
 		744ED5601DBFEB8D00A2B5BE /* MailtoLinkHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MailtoLinkHandler.swift; sourceTree = "<group>"; };
@@ -3278,33 +3217,42 @@
 				5D61A68E208FB9ED003835EF /* tracking-protection */,
 				5D61A689208FB6D8003835EF /* ad-block */,
 				5D61A688208FB6B6003835EF /* hashset-cpp */,
+				5D61A8582090DEF1003835EF /* bloom-filter-cpp */,
 			);
-			path = "NPM Deps";
+			name = "NPM Deps";
 			sourceTree = "<group>";
 		};
 		5D61A688208FB6B6003835EF /* hashset-cpp */ = {
 			isa = PBXGroup;
 			children = (
-				5D61A695208FD148003835EF /* hashFn.h */,
+				5D61A85B2090DF48003835EF /* HashItem.h */,
 				5D61A697208FD40F003835EF /* HashSet.h */,
+				5D61A85A2090DF48003835EF /* HashSet.cpp */,
 			);
-			path = "hashset-cpp";
+			name = "hashset-cpp";
 			sourceTree = "<group>";
 		};
 		5D61A689208FB6D8003835EF /* ad-block */ = {
 			isa = PBXGroup;
 			children = (
+				5D61A8532090DEAC003835EF /* cosmetic_filter.h */,
+				5D61A8552090DEAC003835EF /* cosmetic_filter.cc */,
 				5D61A68A208FB6E2003835EF /* ad_block_client.h */,
+				5D61A8542090DEAC003835EF /* ad_block_client.cc */,
+				5D61A8642090EFC6003835EF /* filter.cc */,
+				5D61A8632090EFC6003835EF /* filter.h */,
 			);
-			path = "ad-block";
+			name = "ad-block";
 			sourceTree = "<group>";
 		};
 		5D61A68E208FB9ED003835EF /* tracking-protection */ = {
 			isa = PBXGroup;
 			children = (
 				5D61A693208FD115003835EF /* TPParser.h */,
+				5D61A8512090DE7D003835EF /* FirstPartyHost.h */,
+				5D61A8502090DE7D003835EF /* TPParser.cpp */,
 			);
-			path = "tracking-protection";
+			name = "tracking-protection";
 			sourceTree = "<group>";
 		};
 		5D61A699208FE1C6003835EF /* leveldb */ = {
@@ -3555,6 +3503,17 @@
 				5D61A7772090C929003835EF /* re2_fuzzer.cc */,
 			);
 			path = fuzzing;
+			sourceTree = "<group>";
+		};
+		5D61A8582090DEF1003835EF /* bloom-filter-cpp */ = {
+			isa = PBXGroup;
+			children = (
+				5D61A85F2090DFD2003835EF /* BloomFilter.cpp */,
+				5D61A8602090DFD3003835EF /* BloomFilter.h */,
+				5D61A85E2090DFD2003835EF /* hashFn.cpp */,
+				5D61A85D2090DFD2003835EF /* hashFn.h */,
+			);
+			name = "bloom-filter-cpp";
 			sourceTree = "<group>";
 		};
 		7B0B1B9C1C1B69F500DF4AB5 /* Extensions */ = {
@@ -4523,87 +4482,8 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5D61A79F2090C929003835EF /* util.h in Headers */,
-				5D61A721208FE1C7003835EF /* slice.h in Headers */,
-				5D61A716208FE1C7003835EF /* arena.h in Headers */,
-				5D61A753208FE1C7003835EF /* log_reader.h in Headers */,
-				5D61A7C62090C929003835EF /* re2.h in Headers */,
-				5D61A68B208FB6E2003835EF /* ad_block_client.h in Headers */,
-				5D61A74E208FE1C7003835EF /* version_edit.h in Headers */,
-				5D61A71C208FE1C7003835EF /* testutil.h in Headers */,
-				5D61A79E2090C929003835EF /* logging.h in Headers */,
 				E650759A1E37F7AB006961AC /* CrashSimulator.h in Headers */,
-				5D61A696208FD149003835EF /* hashFn.h in Headers */,
-				5D61A712208FE1C7003835EF /* histogram.h in Headers */,
-				5D61A757208FE1C7003835EF /* filename.h in Headers */,
-				5D61A7A32090C929003835EF /* mutex.h in Headers */,
-				5D61A741208FE1C7003835EF /* skiplist.h in Headers */,
-				5D61A719208FE1C7003835EF /* hash.h in Headers */,
-				5D61A75E208FE1C7003835EF /* port_example.h in Headers */,
-				5D61A730208FE1C7003835EF /* block_.h in Headers */,
-				5D61A698208FD410003835EF /* HashSet.h in Headers */,
-				5D61A723208FE1C7003835EF /* write_batch.h in Headers */,
-				5D61A7AB2090C929003835EF /* prog.h in Headers */,
-				5D61A7B42090C929003835EF /* walker-inl.h in Headers */,
-				5D61A7A42090C929003835EF /* strutil.h in Headers */,
-				5D61A754208FE1C7003835EF /* write_batch_internal.h in Headers */,
-				5D61A7C42090C929003835EF /* regexp.h in Headers */,
-				5D61A739208FE1C7003835EF /* two_level_iterator.h in Headers */,
-				5D61A7B52090C929003835EF /* prefilter_tree.h in Headers */,
-				5D61A728208FE1C7003835EF /* comparator.h in Headers */,
-				5D61A727208FE1C7003835EF /* filter_policy.h in Headers */,
-				5D61A70A208FE1C7003835EF /* coding.h in Headers */,
-				5D61A729208FE1C7003835EF /* table.h in Headers */,
-				5D61A7A52090C929003835EF /* stringpiece.h in Headers */,
-				5D61A725208FE1C7003835EF /* dumpfile.h in Headers */,
-				5D61A7BC2090C929003835EF /* unicode_casefold.h in Headers */,
-				5D61A707208FE1C7003835EF /* posix_logger.h in Headers */,
-				5D61A7992090C929003835EF /* sparse_array.h in Headers */,
-				5D61A74F208FE1C7003835EF /* version_set.h in Headers */,
-				5D61A74D208FE1C7003835EF /* memtable.h in Headers */,
 				E65075B01E37F7AB006961AC /* FSUtils.h in Headers */,
-				5D61A735208FE1C7003835EF /* block_builder.h in Headers */,
-				5D61A73C208FE1C7003835EF /* log_format.h in Headers */,
-				5D61A694208FD116003835EF /* TPParser.h in Headers */,
-				5D61A750208FE1C7003835EF /* builder.h in Headers */,
-				5D61A73E208FE1C7003835EF /* table_cache.h in Headers */,
-				5D61A722208FE1C7003835EF /* cache.h in Headers */,
-				5D61A761208FE1C7003835EF /* memenv.h in Headers */,
-				5D61A726208FE1C7003835EF /* c.h in Headers */,
-				5D61A7B62090C929003835EF /* filtered_re2.h in Headers */,
-				5D61A75A208FE1C7003835EF /* atomic_pointer.h in Headers */,
-				5D61A72B208FE1C7003835EF /* iterator.h in Headers */,
-				5D61A7C52090C929003835EF /* bitmap256.h in Headers */,
-				5D61A742208FE1C7003835EF /* dbformat.h in Headers */,
-				5D61A79C2090C929003835EF /* utf.h in Headers */,
-				5D61A733208FE1C7003835EF /* merger.h in Headers */,
-				5D61A71F208FE1C7003835EF /* status.h in Headers */,
-				5D61A71E208FE1C7003835EF /* env.h in Headers */,
-				5D61A70B208FE1C7003835EF /* logging.h in Headers */,
-				5D61A7A02090C929003835EF /* pcre.h in Headers */,
-				5D61A72A208FE1C7003835EF /* table_builder.h in Headers */,
-				5D61A738208FE1C7003835EF /* filter_block.h in Headers */,
-				5D61A7A22090C929003835EF /* sparse_set.h in Headers */,
-				5D61A713208FE1C7003835EF /* crc32c.h in Headers */,
-				5D61A7982090C929003835EF /* mix.h in Headers */,
-				5D61A724208FE1C7003835EF /* options.h in Headers */,
-				5D61A732208FE1C7003835EF /* iterator_wrapper.h in Headers */,
-				5D61A75B208FE1C7003835EF /* port.h in Headers */,
-				5D61A7C72090C929003835EF /* set.h in Headers */,
-				5D61A75F208FE1C7003835EF /* thread_annotations.h in Headers */,
-				5D61A720208FE1C7003835EF /* db.h in Headers */,
-				5D61A758208FE1C7003835EF /* snapshot.h in Headers */,
-				5D61A708208FE1C7003835EF /* testharness.h in Headers */,
-				5D61A75D208FE1C7003835EF /* port_posix.h in Headers */,
-				5D61A70F208FE1C7003835EF /* mutexlock.h in Headers */,
-				5D61A79A2090C929003835EF /* flags.h in Headers */,
-				5D61A71A208FE1C7003835EF /* random.h in Headers */,
-				5D61A7BD2090C929003835EF /* unicode_groups.h in Headers */,
-				5D61A73A208FE1C7003835EF /* format.h in Headers */,
-				5D61A74A208FE1C7003835EF /* db_impl.h in Headers */,
-				5D61A74B208FE1C7003835EF /* db_iter.h in Headers */,
-				5D61A7B22090C929003835EF /* prefilter.h in Headers */,
-				5D61A748208FE1C7003835EF /* log_writer.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5178,11 +5058,13 @@
 					};
 					390527491C874D35007E0BB7 = {
 						CreatedOnToolsVersion = 7.2.1;
+						DevelopmentTeam = KL8N8XSYF4;
 						LastSwiftMigration = 0820;
 						ProvisioningStyle = Automatic;
 					};
 					397848DA1ED86605004C0C0B = {
 						CreatedOnToolsVersion = 8.3.2;
+						DevelopmentTeam = KL8N8XSYF4;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
@@ -5222,6 +5104,7 @@
 					};
 					E4BA8A2A1B4B0A1600BC2E95 = {
 						CreatedOnToolsVersion = 6.4;
+						DevelopmentTeam = KL8N8XSYF4;
 						LastSwiftMigration = 0820;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
@@ -5259,6 +5142,7 @@
 					};
 					F84B21BD1A090F8100AAB793 = {
 						CreatedOnToolsVersion = 6.1;
+						DevelopmentTeam = KL8N8XSYF4;
 						LastSwiftMigration = 0820;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
@@ -5287,6 +5171,7 @@
 					};
 					F84B22481A0920C600AAB793 = {
 						CreatedOnToolsVersion = 6.1;
+						DevelopmentTeam = KL8N8XSYF4;
 						LastSwiftMigration = 0820;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
@@ -5303,6 +5188,7 @@
 					};
 					F84B225B1A09210A00AAB793 = {
 						CreatedOnToolsVersion = 6.1;
+						DevelopmentTeam = KL8N8XSYF4;
 						LastSwiftMigration = 0820;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
@@ -5514,11 +5400,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5D61A7C32090C929003835EF /* make_perl_groups.pl in Resources */,
-				5D61A7AE2090C929003835EF /* unicode.py in Resources */,
-				5D61A7C22090C929003835EF /* make_unicode_groups.py in Resources */,
-				5D61A702208FE1C7003835EF /* LICENSE in Resources */,
-				5D61A7A72090C929003835EF /* make_unicode_casefold.py in Resources */,
 				E650759E1E37F7AB006961AC /* effective_tld_names.dat in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -5676,7 +5557,7 @@
 				F84B220B1A0910F600AAB793 /* Images.xcassets in Resources */,
 				F35B8D2B1D6380EA008E3D61 /* SessionRestore.html in Resources */,
 				7B42406E1CA04CAC009B5C28 /* Menu.xcassets in Resources */,
-				5D6183CE208E88C0003835EF /* SafeBrowsingError.html in Resources */,
+				5D61A8002090CFE1003835EF /* SafeBrowsingError.html in Resources */,
 				E49943F71AE69EDD00BF9DE4 /* Intro.xcassets in Resources */,
 				3BC659591E5BA505006D560F /* top_sites.json in Resources */,
 				D02816D21ECA60DF00240CAA /* HistoryStateHelper.js in Resources */,
@@ -5691,6 +5572,7 @@
 				D37524871C6E8B5A00A5F6C2 /* topdomains.txt in Resources */,
 				E4B7B7621A793CF20022C5E0 /* CharisSILBI.ttf in Resources */,
 				7B4980A81CE363ED0017547C /* Settings.xcassets in Resources */,
+				5D61A80D2090D02D003835EF /* make_unicode_casefold.py in Resources */,
 				3B4262E71E538EC400CA681C /* page-metadata-parser.js in Resources */,
 				E4A961361AC052DE0069AD6F /* ReadabilityTabHelper.js in Resources */,
 				E4B7B7861A793CF20022C5E0 /* FiraSans-UltraLight.ttf in Resources */,
@@ -5702,6 +5584,7 @@
 				E4B7B7791A793CF20022C5E0 /* FiraSans-Light.ttf in Resources */,
 				E49BFF591B1F48C3009368CC /* Readability.js in Resources */,
 				E4CD9E9A1A68980A00318571 /* ReaderMode.js in Resources */,
+				5D61A8212090D040003835EF /* make_perl_groups.pl in Resources */,
 				D30684F11C84F12A002D8D82 /* SearchPlugins in Resources */,
 				3B4262E51E538EC400CA681C /* MetadataHelper.js in Resources */,
 				E47536FC1C85415F0022CC69 /* PrintHelper.js in Resources */,
@@ -5722,8 +5605,10 @@
 				0BF42D391A7C0E8900889E28 /* Favicons.js in Resources */,
 				39A35AED1C0662A3006B9E87 /* SpotlightHelper.js in Resources */,
 				E689C6F81E0C6E72008BAADB /* FxASignIn.js in Resources */,
+				5D61A8122090D040003835EF /* unicode.py in Resources */,
 				E4D6BEB91A0930EC00F538BD /* LaunchScreen.xib in Resources */,
 				A93067D91D0FE15E00C49C6E /* NightModeHelper.js in Resources */,
+				5D61A8202090D040003835EF /* make_unicode_groups.py in Resources */,
 				2F44FB2D1A9D5D8500FD20CC /* FiraSans-BoldItalic.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -5913,58 +5798,25 @@
 			buildActionMask = 2147483647;
 			files = (
 				E65075991E37F7AB006961AC /* Cancellable.swift in Sources */,
-				5D61A756208FE1C7003835EF /* repair.cc in Sources */,
-				5D61A704208FE1C7003835EF /* status.cc in Sources */,
 				E65075BE1E37F7AB006961AC /* TimeConstants.swift in Sources */,
 				E65075B21E37F7AB006961AC /* Functions.swift in Sources */,
-				5D61A736208FE1C7003835EF /* filter_block.cc in Sources */,
-				5D61A715208FE1C7003835EF /* options.cc in Sources */,
-				5D61A749208FE1C7003835EF /* version_edit.cc in Sources */,
 				E65075B41E37F7AB006961AC /* KeychainCache.swift in Sources */,
-				5D61A7B82090C929003835EF /* compile.cc in Sources */,
 				E65075BA1E37F7AB006961AC /* Prefs.swift in Sources */,
-				5D61A7B92090C929003835EF /* re2.cc in Sources */,
-				5D61A711208FE1C7003835EF /* testharness.cc in Sources */,
 				7B10AABB1E3A1F650002DD08 /* URLRequestExtensions.swift in Sources */,
-				5D61A718208FE1C7003835EF /* coding.cc in Sources */,
-				5D61A746208FE1C7003835EF /* c.cc in Sources */,
 				D02818611EF056C800240CAA /* SentryIntegration.swift in Sources */,
-				5D61A752208FE1C7003835EF /* dumpfile.cc in Sources */,
-				5D61A70D208FE1C7003835EF /* histogram.cc in Sources */,
-				5D61A744208FE1C7003835EF /* log_reader.cc in Sources */,
-				5D61A70E208FE1C7003835EF /* crc32c.cc in Sources */,
-				5D61A71B208FE1C7003835EF /* env_posix.cc in Sources */,
 				E693F0D91E9D64BD0086DC17 /* OptionalExtensions.swift in Sources */,
-				5D61A7C92090C929003835EF /* prog.cc in Sources */,
 				E65075A01E37F7AB006961AC /* ArrayExtensions.swift in Sources */,
 				288A2DAA1AB8B3700023ABC3 /* Box.swift in Sources */,
-				5D61A7AC2090C929003835EF /* unicode_groups.cc in Sources */,
-				5D61A71D208FE1C7003835EF /* env.cc in Sources */,
-				5D61A734208FE1C7003835EF /* table_builder.cc in Sources */,
-				5D61A751208FE1C7003835EF /* version_set.cc in Sources */,
 				E65075A31E37F7AB006961AC /* KeychainWrapperExtensions.swift in Sources */,
-				5D61A709208FE1C7003835EF /* hash.cc in Sources */,
-				5D61A759208FE1C7003835EF /* memtable.cc in Sources */,
-				5D61A731208FE1C7003835EF /* block_builder.cc in Sources */,
 				E65075921E37F7AB006961AC /* Accessibility.swift in Sources */,
 				E65075B51E37F7AB006961AC /* LaunchArguments.swift in Sources */,
-				5D61A75C208FE1C7003835EF /* port_posix.cc in Sources */,
-				5D61A7A92090C929003835EF /* re2_fuzzer.cc in Sources */,
-				5D61A747208FE1C7003835EF /* builder.cc in Sources */,
-				5D61A7B12090C929003835EF /* perl_groups.cc in Sources */,
 				288A2DAB1AB8B3700023ABC3 /* BoxType.swift in Sources */,
-				5D61A72D208FE1C7003835EF /* block.cc in Sources */,
 				E65075BB1E37F7AB006961AC /* RollingFileLogger.swift in Sources */,
-				5D61A7C82090C929003835EF /* stringpiece.cc in Sources */,
 				E650759D1E37F7AB006961AC /* DeviceInfo.swift in Sources */,
 				E65075971E37F7AB006961AC /* AuthenticationKeychainInfo.swift in Sources */,
-				5D61A79D2090C929003835EF /* pcre.cc in Sources */,
-				5D61A7BB2090C929003835EF /* tostring.cc in Sources */,
 				E65075A51E37F7AB006961AC /* NSFileManagerExtensions.swift in Sources */,
 				E65075A11E37F7AB006961AC /* HashExtensions.swift in Sources */,
-				5D61A72F208FE1C7003835EF /* iterator.cc in Sources */,
 				3964B09A1EA8F06F00F2EEF4 /* FeatureSwitch.swift in Sources */,
-				5D61A73B208FE1C7003835EF /* two_level_iterator.cc in Sources */,
 				E65075981E37F7AB006961AC /* Bytes.swift in Sources */,
 				E65075B11E37F7AB006961AC /* FSUtils.m in Sources */,
 				CE7F11941F3CEEC800ABFC0B /* RemoteDevices.swift in Sources */,
@@ -5974,65 +5826,32 @@
 				E65075931E37F7AB006961AC /* AppConstants.swift in Sources */,
 				E65075B81E37F7AB006961AC /* NotificationConstants.swift in Sources */,
 				E65075AC1E37F7AB006961AC /* StringExtensions.swift in Sources */,
-				5D61A743208FE1C7003835EF /* table_cache.cc in Sources */,
-				5D61A74C208FE1C7003835EF /* dbformat.cc in Sources */,
-				5D61A7A82090C929003835EF /* parse.cc in Sources */,
 				E65075951E37F7AB006961AC /* AssertionUtils.swift in Sources */,
 				E683F0C21E93D4E90035D990 /* DictionaryExtensions.swift in Sources */,
-				5D61A760208FE1C7003835EF /* memenv.cc in Sources */,
 				E650759B1E37F7AB006961AC /* CrashSimulator.m in Sources */,
-				5D61A73D208FE1C7003835EF /* log_writer.cc in Sources */,
-				5D61A7AD2090C929003835EF /* unicode_casefold.cc in Sources */,
-				5D61A72C208FE1C7003835EF /* table.cc in Sources */,
-				5D61A79B2090C929003835EF /* rune.cc in Sources */,
 				288A2DB51AB8B38D0023ABC3 /* Error.swift in Sources */,
-				5D61A7AA2090C929003835EF /* nfa.cc in Sources */,
-				5D61A737208FE1C7003835EF /* format.cc in Sources */,
 				E65075A91E37F7AB006961AC /* NSURLExtensions.swift in Sources */,
 				7479B4EF1C5306A200DF000B /* Reachability.swift in Sources */,
-				5D61A73F208FE1C7003835EF /* db_impl.cc in Sources */,
-				5D61A7C12090C929003835EF /* bitstate.cc in Sources */,
 				E65075B31E37F7AB006961AC /* KeyboardHelper.swift in Sources */,
 				E65075AA1E37F7AB006961AC /* NSURLProtectionSpaceExtensions.swift in Sources */,
 				E65075BC1E37F7AB006961AC /* SupportUtils.swift in Sources */,
 				E65075B61E37F7AB006961AC /* Loader.swift in Sources */,
-				5D61A7B32090C929003835EF /* mimics_pcre.cc in Sources */,
-				5D61A710208FE1C7003835EF /* cache.cc in Sources */,
-				5D61A717208FE1C7003835EF /* comparator.cc in Sources */,
-				5D61A705208FE1C7003835EF /* arena.cc in Sources */,
 				E65075BF1E37F7AB006961AC /* UserAgent.swift in Sources */,
 				E65075C01E37F7AB006961AC /* WeakList.swift in Sources */,
-				5D61A7C02090C929003835EF /* prefilter_tree.cc in Sources */,
 				E65075AE1E37F7AB006961AC /* UIImageExtensions.swift in Sources */,
-				5D61A7B72090C929003835EF /* dfa.cc in Sources */,
-				5D61A7A62090C929003835EF /* set.cc in Sources */,
 				E65075A71E37F7AB006961AC /* NSScannerExtensions.swift in Sources */,
-				5D61A7B02090C929003835EF /* onepass.cc in Sources */,
 				E65075A21E37F7AB006961AC /* HexExtensions.swift in Sources */,
 				288A2DB61AB8B38D0023ABC3 /* Result.swift in Sources */,
 				E65075AD1E37F7AB006961AC /* UIColorExtensions.swift in Sources */,
 				E650759C1E37F7AB006961AC /* DeferredUtils.swift in Sources */,
-				5D61A72E208FE1C7003835EF /* merger.cc in Sources */,
-				5D61A740208FE1C7003835EF /* filename.cc in Sources */,
-				5D61A7BE2090C929003835EF /* prefilter.cc in Sources */,
 				E65075941E37F7AB006961AC /* AppInfo.swift in Sources */,
 				288A2DAC1AB8B3700023ABC3 /* MutableBox.swift in Sources */,
-				5D61A706208FE1C7003835EF /* bloom.cc in Sources */,
 				E65075A41E37F7AB006961AC /* NSCharacterSetExtensions.swift in Sources */,
-				5D61A714208FE1C7003835EF /* logging.cc in Sources */,
 				E65075B71E37F7AB006961AC /* Logger.swift in Sources */,
-				5D61A703208FE1C7003835EF /* testutil.cc in Sources */,
 				E65075961E37F7AB006961AC /* AsyncReducer.swift in Sources */,
-				5D61A755208FE1C7003835EF /* db_iter.cc in Sources */,
-				5D61A70C208FE1C7003835EF /* filter_policy.cc in Sources */,
-				5D61A745208FE1C7003835EF /* write_batch.cc in Sources */,
-				5D61A7AF2090C929003835EF /* regexp.cc in Sources */,
 				7B9BF91C1E43472E00CB24F4 /* JSONExtensions.swift in Sources */,
 				E65075A61E37F7AB006961AC /* NSMutableAttributedStringExtensions.swift in Sources */,
-				5D61A7BA2090C929003835EF /* filtered_re2.cc in Sources */,
 				E65075BD1E37F7AB006961AC /* SystemUtils.swift in Sources */,
-				5D61A7A12090C929003835EF /* strutil.cc in Sources */,
-				5D61A7BF2090C929003835EF /* simplify.cc in Sources */,
 				E65075AB1E37F7AB006961AC /* SetExtensions.swift in Sources */,
 				E65075A81E37F7AB006961AC /* NSStringExtensions.swift in Sources */,
 				5D6183E3208F78CA003835EF /* FifoDict.swift in Sources */,
@@ -6378,25 +6197,38 @@
 			files = (
 				E68E39BE1C46F42000B85F42 /* AppSettingsTableViewController.swift in Sources */,
 				E640E86A1C73A47C00C5F072 /* PasscodeViews.swift in Sources */,
+				5D61A8152090D040003835EF /* perl_groups.cc in Sources */,
 				E692E3371C46E86A009D1240 /* AppSettingsOptions.swift in Sources */,
 				D38F02D11C05127100175932 /* Authenticator.swift in Sources */,
 				E68E7ADC1CAC208200FDCA76 /* SetupPasscodeViewController.swift in Sources */,
 				7B3631EA1C244FEE00D12AF9 /* Theme.swift in Sources */,
+				5D61A83D2090D06E003835EF /* two_level_iterator.cc in Sources */,
+				5D61A80C2090D02D003835EF /* set.cc in Sources */,
 				3B61CD491F2A74EF00D38DE1 /* PocketFeed.swift in Sources */,
 				396E38F11EE0C8EC00CC180F /* FxAPushMessageHandler.swift in Sources */,
 				E66C5B481BDA81050051AA93 /* UIImage+ImageEffects.m in Sources */,
-				5D6183D6208E88C0003835EF /* ABPFilterLibWrapper.mm in Sources */,
 				E4CD9F6D1A77DD2800318571 /* ReaderModeStyleViewController.swift in Sources */,
 				E4A960061ABB9C450069AD6F /* ReaderModeUtils.swift in Sources */,
+				5D61A8462090D08E003835EF /* version_edit.cc in Sources */,
 				EBF47E701F7979DF00899189 /* UnifiedTelemetry.swift in Sources */,
 				E68F36981EA694000048CF44 /* PanelDataObservers.swift in Sources */,
+				5D61A8132090D040003835EF /* regexp.cc in Sources */,
 				31ADB5DA1E58CEC300E87909 /* ClipboardBarDisplayHandler.swift in Sources */,
+				5D61A8562090DEAC003835EF /* ad_block_client.cc in Sources */,
 				745DAB3F1CDAB09E00D44181 /* HistoryBackButton.swift in Sources */,
 				396E38F31EE0C90D00CC180F /* FxALoginHelper.swift in Sources */,
+				5D61A8372090D06E003835EF /* merger.cc in Sources */,
+				5D61A8522090DE7D003835EF /* TPParser.cpp in Sources */,
+				5D61A81F2090D040003835EF /* bitstate.cc in Sources */,
 				D3B6923F1B9F9A58004B87A4 /* FindInPageHelper.swift in Sources */,
 				D3C3696E1CC6B78800348A61 /* LocalRequestHelper.swift in Sources */,
+				5D61A83A2090D06E003835EF /* table_builder.cc in Sources */,
+				5D61A8452090D08E003835EF /* builder.cc in Sources */,
 				E4B423DD1ABA0318007E66C8 /* ReaderModeHandlers.swift in Sources */,
 				7B0B1B9D1C1B6A3F00DF4AB5 /* InstructionsViewController.swift in Sources */,
+				5D61A8232090D044003835EF /* prog.cc in Sources */,
+				5D61A8332090D05B003835EF /* env_posix.cc in Sources */,
+				5D61A8412090D08E003835EF /* table_cache.cc in Sources */,
 				D308E4E41A5306F500842685 /* SearchEngines.swift in Sources */,
 				3BCE6D3C1CEB9E4D0080928C /* ThirdPartySearchAlerts.swift in Sources */,
 				745DAB301CDAAFAA00D44181 /* RecentlyClosedTabsPanel.swift in Sources */,
@@ -6405,33 +6237,54 @@
 				C817B34D1FC609500086018E /* UIScrollViewSwizzled.swift in Sources */,
 				E65607611C08B4E200534B02 /* SearchInputView.swift in Sources */,
 				EB2A63341F3B49A7004EF8B0 /* ContentBlockerHelper.swift in Sources */,
+				5D61A8442090D08E003835EF /* c.cc in Sources */,
+				5D61A8382090D06E003835EF /* iterator.cc in Sources */,
 				FA6B2AC21D41F02D00429414 /* Punycode.swift in Sources */,
 				D301AAEE1A3A55B70078DD1D /* TabTrayController.swift in Sources */,
+				5D61A8342090D05B003835EF /* env.cc in Sources */,
 				0B3E7D951B27A7CE00E2E84D /* AboutHomeHandler.swift in Sources */,
 				D331DFCA1CB6E9EE009B5DA2 /* OldStrings.swift in Sources */,
 				D3BE7B461B054F8600641031 /* TestAppDelegate.swift in Sources */,
 				3BB50E111D6274CD004B33DF /* ActivityStreamTopSitesCell.swift in Sources */,
+				5D61A8482090D08E003835EF /* version_set.cc in Sources */,
+				5D61A8102090D040003835EF /* unicode_groups.cc in Sources */,
+				5D61A82E2090D05B003835EF /* testharness.cc in Sources */,
+				5D61A8222090D044003835EF /* stringpiece.cc in Sources */,
+				5D61A8352090D06E003835EF /* table.cc in Sources */,
+				5D61A7FE2090CFDC003835EF /* AdBlocker.swift in Sources */,
+				5D61A83B2090D06E003835EF /* filter_block.cc in Sources */,
 				0B62EFD21AD63CD100ACB9CD /* Clearables.swift in Sources */,
+				5D61A8192090D040003835EF /* re2.cc in Sources */,
+				5D61A83F2090D08E003835EF /* db_impl.cc in Sources */,
 				7482205C1DBAB56300EEEA72 /* MailProviders.swift in Sources */,
+				5D61A8072090D008003835EF /* NetworkDataFileLoader.swift in Sources */,
 				C40046FA1CF8E0B200B08303 /* BackForwardListAnimator.swift in Sources */,
+				5D61A83E2090D08E003835EF /* log_writer.cc in Sources */,
 				DD31E0FB1B382B520077078A /* TabPrintPageRenderer.swift in Sources */,
-				5D6183D2208E88C0003835EF /* HttpsEverywhereObjC.mm in Sources */,
 				D81E45131F82C56D004EFFBA /* NewTabContentSettingsViewController.swift in Sources */,
 				E4CD9E911A6897FB00318571 /* ReaderMode.swift in Sources */,
+				5D61A84A2090D08E003835EF /* db_iter.cc in Sources */,
+				5D61A8172090D040003835EF /* dfa.cc in Sources */,
 				E68E7ADE1CAC208A00FDCA76 /* RemovePasscodeViewController.swift in Sources */,
+				5D61A8402090D08E003835EF /* filename.cc in Sources */,
 				74C027451B2A348C001B1E88 /* SessionData.swift in Sources */,
 				D314E7F71A37B98700426A76 /* TabToolbar.swift in Sources */,
 				CEFA977E1FAA6B490016F365 /* SyncContentSettingsViewController.swift in Sources */,
+				5D61A80B2090D027003835EF /* strutil.cc in Sources */,
 				E60D03181D511398002FE3F6 /* SyncStatusResolver.swift in Sources */,
 				E689C6FA1E0C6E98008BAADB /* FxAContentViewController.swift in Sources */,
 				C4E3983D1D21F1E7004E89BA /* TopTabsViews.swift in Sources */,
 				3B0943811D6CC4FC004F24E1 /* FilledPageControl.swift in Sources */,
 				FA9293D41D6580E100AC8D33 /* QRCodeViewController.swift in Sources */,
+				5D61A8182090D040003835EF /* compile.cc in Sources */,
 				E6108FF91C84E91C005D25E8 /* BasePasscodeViewController.swift in Sources */,
 				E4CD9F2D1A6DC91200318571 /* TabLocationView.swift in Sources */,
+				5D61A83C2090D06E003835EF /* format.cc in Sources */,
 				0BB5B2881AC0A2B90052877D /* SnackBar.swift in Sources */,
 				7BEFC6801BFF68C30059C952 /* QuickActions.swift in Sources */,
+				5D61A8112090D040003835EF /* unicode_casefold.cc in Sources */,
 				0BF1B7E31AC60DEA00A7B407 /* InsetButton.swift in Sources */,
+				5D61A8432090D08E003835EF /* write_batch.cc in Sources */,
 				D31CF65C1CC1959A001D0BD0 /* PrivilegedRequest.swift in Sources */,
 				D8D33A7D1FBD080300A20A28 /* SnapKitExtensions.swift in Sources */,
 				E650755C1E37F747006961AC /* Swizzling.m in Sources */,
@@ -6443,36 +6296,53 @@
 				D3BA7E0E1B0E934F00153782 /* ContextMenuHelper.swift in Sources */,
 				E660BE061BB0666D009AC090 /* InnerStrokedView.swift in Sources */,
 				0B1C05D71A798B1F004C78B0 /* UIImageViewAligned.m in Sources */,
-				5D6183DA208E88C0003835EF /* UrlProtocol.swift in Sources */,
 				0BB5B30B1AC0AD1F0052877D /* LoginsHelper.swift in Sources */,
+				5D61A8362090D06E003835EF /* block.cc in Sources */,
 				E69E06C91C76198000D0F926 /* AuthenticationManagerConstants.swift in Sources */,
 				E47536ED1C85412C0022CC69 /* PrintHelper.swift in Sources */,
+				5D61A7FF2090CFDE003835EF /* TrackingProtection.swift in Sources */,
 				392ED7E61D0AEFEF009D9B62 /* HomePageAccessors.swift in Sources */,
 				7BA8D1C71BA037F500C8AE9E /* OpenInHelper.swift in Sources */,
 				E4B423BE1AB9FE6A007E66C8 /* ReaderModeCache.swift in Sources */,
 				74E36D781B71323500D69DA1 /* SettingsContentViewController.swift in Sources */,
+				5D61A8092090D021003835EF /* rune.cc in Sources */,
 				742A56391D80B54A00BDB803 /* PhotonActionSheet.swift in Sources */,
 				C4EFEECF1CEBB6F2009762A4 /* BackForwardTableViewCell.swift in Sources */,
+				5D61A82A2090D05B003835EF /* filter_policy.cc in Sources */,
 				E689C7301E0C7617008BAADB /* NSAttributedStringExtensions.swift in Sources */,
+				5D61A7FD2090CFDA003835EF /* HttpsEverywhere.swift in Sources */,
 				E64ED8FA1BC55AE300DAF864 /* UIAlertControllerExtensions.swift in Sources */,
+				5D61A80A2090D024003835EF /* pcre.cc in Sources */,
+				5D61A8282090D05B003835EF /* bloom.cc in Sources */,
 				282DA4731A68C1E700A406E2 /* OpenSearch.swift in Sources */,
 				F35B8D2F1D638408008E3D61 /* SessionRestoreHandler.swift in Sources */,
 				E63ED8E11BFD25580097D08E /* LoginListViewController.swift in Sources */,
 				2F44FCC71A9E8CF500FD20CC /* SearchSettingsTableViewController.swift in Sources */,
 				0BF42D371A7C0B8E00889E28 /* FaviconManager.swift in Sources */,
 				39A359E41BFCCE94006B9E87 /* SpotlightHelper.swift in Sources */,
+				5D61A8392090D06E003835EF /* block_builder.cc in Sources */,
 				D88FDAAF1F4E2BA000FD9709 /* PhotonActionSheetAnimator.swift in Sources */,
+				5D61A8622090DFD3003835EF /* BloomFilter.cpp in Sources */,
 				E698FFDA1B4AADF40001F623 /* TabScrollController.swift in Sources */,
 				D34510881ACF415700EC27F0 /* SearchLoader.swift in Sources */,
 				E65075521E37F6D1006961AC /* UIViewExtensions.swift in Sources */,
 				C8F457A81F1FD75A000CB895 /* BrowserViewController+WKNavigationDelegate.swift in Sources */,
 				E6927EC01C7B6FB800D03F75 /* ErrorToast.swift in Sources */,
+				5D61A8032090CFF8003835EF /* HttpsEverywhere.cpp in Sources */,
 				D30B101E1AA7F9C600C01CA3 /* HomePanels.swift in Sources */,
 				F84B22041A0910F600AAB793 /* AppDelegate.swift in Sources */,
+				5D61A7FC2090CFD6003835EF /* TempBraveApp.swift in Sources */,
+				5D61A8292090D05B003835EF /* hash.cc in Sources */,
 				E653422D1C5944F90039DD9E /* BrowserPrompts.swift in Sources */,
 				2FDE87FE1ABB3817005317B1 /* RemoteTabsPanel.swift in Sources */,
+				5D61A81C2090D040003835EF /* prefilter.cc in Sources */,
+				5D61A82B2090D05B003835EF /* histogram.cc in Sources */,
+				5D61A82C2090D05B003835EF /* crc32c.cc in Sources */,
 				39DD030D1CD53E1900BC09B3 /* HomePageHelper.swift in Sources */,
 				C4F3B29A1CFCF93A00966259 /* ButtonToast.swift in Sources */,
+				5D61A82F2090D05B003835EF /* logging.cc in Sources */,
+				5D61A8012090CFE4003835EF /* SafeBrowsing.swift in Sources */,
+				5D61A81E2090D040003835EF /* prefilter_tree.cc in Sources */,
 				E4A961341AC051360069AD6F /* ReadabilityTabHelper.swift in Sources */,
 				D31A0FC71A65D6D000DC8C7E /* SearchSuggestClient.swift in Sources */,
 				A83E5AB71C1D993D0026D912 /* UIPasteboardExtensions.swift in Sources */,
@@ -6481,53 +6351,70 @@
 				D3972BF41C22412B00035B87 /* TitleActivityItemProvider.swift in Sources */,
 				D38A1BEE1A9FA2CA00F6A386 /* SiteTableViewController.swift in Sources */,
 				7BA0601B1C0F4DE200DFADB6 /* TabPeekViewController.swift in Sources */,
+				5D61A8252090D05B003835EF /* testutil.cc in Sources */,
 				E6D8D5E71B569D70009E5A58 /* BrowserTrayAnimators.swift in Sources */,
 				E65075611E37F77D006961AC /* MenuHelper.swift in Sources */,
 				E63ED7D81BFCD9990097D08E /* LoginTableViewCell.swift in Sources */,
 				3BB50E201D627539004B33DF /* ActivityStreamPanel.swift in Sources */,
+				5D61A8612090DFD3003835EF /* hashFn.cpp in Sources */,
 				F84B22241A09122500AAB793 /* HomePanelViewController.swift in Sources */,
 				E47616C71AB74CA600E7DD25 /* ReaderModeBarView.swift in Sources */,
 				D88FDA9F1F4E2B9200FD9709 /* PhotonActionSheetProtocol.swift in Sources */,
-				5D6183E5208F8A9C003835EF /* TempBraveApp.swift in Sources */,
+				5D61A84E2090D09E003835EF /* memenv.cc in Sources */,
+				5D61A80E2090D02D003835EF /* parse.cc in Sources */,
 				E65075511E37F6D1006961AC /* NSURLExtensionsMailTo.swift in Sources */,
 				D83822001FC7961D00303C12 /* DispatchQueueExtensions.swift in Sources */,
+				5D61A8422090D08E003835EF /* log_reader.cc in Sources */,
 				2F44FCC51A9E85E900FD20CC /* SettingsTableViewController.swift in Sources */,
 				A9072B801D07B34100459960 /* NoImageModeHelper.swift in Sources */,
+				5D61A84C2090D08E003835EF /* memtable.cc in Sources */,
+				5D61A8302090D05B003835EF /* options.cc in Sources */,
 				E660BDD91BB06521009AC090 /* TabsButton.swift in Sources */,
-				5D6183DE208E88C0003835EF /* TrackingProtectionCpp.mm in Sources */,
+				5D61A8262090D05B003835EF /* status.cc in Sources */,
 				2F44FCCB1A9E972E00FD20CC /* SearchEnginePicker.swift in Sources */,
 				D02816C21ECA5E2A00240CAA /* HistoryStateHelper.swift in Sources */,
 				E68E7ACB1CAC1D4500FDCA76 /* PagingPasscodeViewController.swift in Sources */,
 				D34DC8531A16C40C00D49B7B /* Profile.swift in Sources */,
+				5D61A8572090DEAC003835EF /* cosmetic_filter.cc in Sources */,
+				5D61A8472090D08E003835EF /* dbformat.cc in Sources */,
 				392ED6B71D06E85E009D9B62 /* NewTabChoiceViewController.swift in Sources */,
+				5D61A81A2090D040003835EF /* filtered_re2.cc in Sources */,
 				E4B3348C1BC01D8F004E2BFF /* AdjustIntegration.swift in Sources */,
 				E65075541E37F6FC006961AC /* DynamicFontHelper.swift in Sources */,
+				5D61A8052090D000003835EF /* BraveShieldState.swift in Sources */,
 				C4E3984C1D21F2FD004E89BA /* TabTrayButtonExtensions.swift in Sources */,
 				D3FEC38D1AC4B42F00494F45 /* AutocompleteTextField.swift in Sources */,
 				0BD19A671A25309B0084FBA7 /* NSUserDefaultsPrefs.swift in Sources */,
 				E68AEDB01B18F81A00133D99 /* SwipeAnimator.swift in Sources */,
+				5D61A8082090D008003835EF /* TrackingProtectionCpp.mm in Sources */,
 				3BF56D271CDBBE1F00AC4D75 /* SimpleToast.swift in Sources */,
 				D31F95E91AC226CB005C9F3B /* ScreenshotHelper.swift in Sources */,
+				5D61A81B2090D040003835EF /* tostring.cc in Sources */,
 				28EADE5D1AFC3A78007FB2FB /* UIImageViewExtensions.swift in Sources */,
+				5D61A8142090D040003835EF /* onepass.cc in Sources */,
 				D3968F251A38FE8500CEFD3B /* TabManager.swift in Sources */,
 				C4E398601D22C409004E89BA /* TopTabsLayout.swift in Sources */,
 				2816F0001B33E05400522243 /* UIConstants.swift in Sources */,
 				E650755F1E37F756006961AC /* Try.m in Sources */,
+				5D61A8652090EFC6003835EF /* filter.cc in Sources */,
 				3B6889C51D66950E002AC85E /* UIImageColors.swift in Sources */,
 				392ED7E41D0AEF56009D9B62 /* NewTabAccessors.swift in Sources */,
-				5D6183C8208E88C0003835EF /* HttpsEverywhere.swift in Sources */,
 				D3A9949D1A3686BD008AD1AC /* Tab.swift in Sources */,
 				A93067E81D0FE18E00C49C6E /* NightModeHelper.swift in Sources */,
+				5D61A8492090D08E003835EF /* dumpfile.cc in Sources */,
 				3B39EDCB1E16E1AA00EF029F /* CustomSearchViewController.swift in Sources */,
 				E65075571E37F714006961AC /* FaviconFetcher.swift in Sources */,
+				5D61A8162090D040003835EF /* mimics_pcre.cc in Sources */,
 				D863C8F21F68BFC20058D95F /* GradientProgressBar.swift in Sources */,
-				5D6183D4208E88C0003835EF /* HttpsEverywhere.cpp in Sources */,
+				5D61A82D2090D05B003835EF /* cache.cc in Sources */,
 				D3C744CD1A687D6C004CE85D /* URIFixup.swift in Sources */,
 				39AC591A1CC574AB0042C2F5 /* HomePageSettingsViewController.swift in Sources */,
 				E4A961181AC041C40069AD6F /* ReadabilityService.swift in Sources */,
-				5D6183D0208E88C0003835EF /* SafeBrowsing.swift in Sources */,
 				D3BE7B261B054D4400641031 /* main.swift in Sources */,
 				0BA1E02E1B046F1E007675AF /* ErrorPageHelper.swift in Sources */,
+				5D61A8312090D05B003835EF /* comparator.cc in Sources */,
+				5D61A84B2090D08E003835EF /* repair.cc in Sources */,
+				5D61A84D2090D097003835EF /* port_posix.cc in Sources */,
 				D3A9949C1A3686BD008AD1AC /* BrowserViewController.swift in Sources */,
 				59A681BDFC95A19F05E07223 /* SearchViewController.swift in Sources */,
 				E6CF28E71CB43B7900151AB3 /* SensitiveViewController.swift in Sources */,
@@ -6535,35 +6422,40 @@
 				E640E85E1C73A45A00C5F072 /* PasscodeEntryViewController.swift in Sources */,
 				8D8251811F4DE67F00780643 /* AdvanceAccountSettingViewController.swift in Sources */,
 				E633E2DA1C21EAF8001FFF6C /* LoginDetailViewController.swift in Sources */,
+				5D61A8272090D05B003835EF /* arena.cc in Sources */,
 				59A68B280D62462B85CF57A4 /* HistoryPanel.swift in Sources */,
 				19DE1F671EC13B6400428B8C /* LeanplumIntegration.swift in Sources */,
 				E65D89181C8647420006EA35 /* AppAuthenticator.swift in Sources */,
 				28FDFF0C1C1F725800840F86 /* SeparatorTableCell.swift in Sources */,
+				5D61A8322090D05B003835EF /* coding.cc in Sources */,
 				C400467C1CF4E43E00B08303 /* BackForwardListViewController.swift in Sources */,
+				5D61A8062090D000003835EF /* UrlProtocol.swift in Sources */,
 				D3972BF31C22412B00035B87 /* ShareExtensionHelper.swift in Sources */,
 				F35B8D2D1D6383E9008E3D61 /* SessionRestoreHelper.swift in Sources */,
-				5D6183CA208E88C0003835EF /* AdBlocker.swift in Sources */,
 				744ED5611DBFEB8D00A2B5BE /* MailtoLinkHandler.swift in Sources */,
 				59A68E0B4ABBF55E14819668 /* BookmarksPanel.swift in Sources */,
 				7B0B1B791C1B69C900DF4AB5 /* ClientPickerViewController.swift in Sources */,
 				7B844E3D1BBDDB9D00E733A2 /* ChevronView.swift in Sources */,
 				E4C358551AF144BA00299F7E /* FSReadingList.m in Sources */,
 				3BE7275D1CCFE8B60099189F /* CustomSearchHandler.swift in Sources */,
+				5D61A81D2090D040003835EF /* simplify.cc in Sources */,
 				E692E3291C46E62D009D1240 /* AuthenticationSettingsViewController.swift in Sources */,
 				E663D5781BB341C4001EF30E /* ToggleButton.swift in Sources */,
 				C88601C61F4228AD00BBDE4F /* ContentBlockerSettingViewController.swift in Sources */,
 				E6327A641BF6438E008D12E0 /* DebugSettingsBundleOptions.swift in Sources */,
 				D3E8EF101B97BE69001900FB /* ClearPrivateDataTableViewController.swift in Sources */,
+				5D61A84F2090DDBF003835EF /* re2_fuzzer.cc in Sources */,
 				C8F457AA1F1FDD9B000CB895 /* BrowserViewController+KeyCommands.swift in Sources */,
+				5D61A8022090CFF2003835EF /* HttpsEverywhereObjC.mm in Sources */,
 				E69DB0BD1E97E301008A67E6 /* ActivityStreamTopics.swift in Sources */,
 				59A68FD5260B8D520F890F4A /* ReaderPanel.swift in Sources */,
-				5D6183CC208E88C0003835EF /* TrackingProtection.swift in Sources */,
-				5D6183D8208E88C0003835EF /* BraveShieldState.swift in Sources */,
-				5D6183DC208E88C0003835EF /* NetworkDataFileLoader.swift in Sources */,
 				E40FAB0C1A7ABB77009CB80D /* WebServer.swift in Sources */,
+				5D61A85C2090DF48003835EF /* HashSet.cpp in Sources */,
+				5D61A80F2090D040003835EF /* nfa.cc in Sources */,
 				59A68D66379CFA85C4EAF00B /* TwoLineCell.swift in Sources */,
 				E49943F51AE6879C00BF9DE4 /* IntroViewController.swift in Sources */,
 				3B4262E61E538EC400CA681C /* MetadataParserHelper.swift in Sources */,
+				5D61A8042090CFFB003835EF /* ABPFilterLibWrapper.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7167,6 +7059,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = KL8N8XSYF4;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Extensions/Today/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
@@ -7186,6 +7079,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = KL8N8XSYF4;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Extensions/Today/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
@@ -7205,6 +7099,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = KL8N8XSYF4;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Extensions/Today/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
@@ -7222,6 +7117,7 @@
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Extensions/Entitlements/FennecEnterprise.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = KL8N8XSYF4;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Extensions/NotificationService/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
@@ -7262,6 +7158,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = KL8N8XSYF4;
 				ENABLE_BITCODE = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -7321,6 +7218,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = KL8N8XSYF4;
 				ENABLE_BITCODE = NO;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -7376,6 +7274,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = KL8N8XSYF4;
 				ENABLE_BITCODE = NO;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -7805,6 +7704,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = KL8N8XSYF4;
 				ENABLE_BITCODE = NO;
 				ENABLE_TESTABILITY = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -7865,6 +7765,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = KL8N8XSYF4;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -7891,6 +7792,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = KL8N8XSYF4;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -8161,6 +8063,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = KL8N8XSYF4;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -8186,6 +8089,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = KL8N8XSYF4;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -8867,6 +8771,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon_Developer;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = KL8N8XSYF4;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -8924,6 +8829,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = KL8N8XSYF4;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -8948,6 +8854,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = KL8N8XSYF4;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -8973,6 +8880,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = KL8N8XSYF4;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Extensions/Today/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
@@ -8993,6 +8901,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = KL8N8XSYF4;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -9518,6 +9427,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon_Beta;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = KL8N8XSYF4;
 				ENABLE_BITCODE = NO;
 				ENABLE_TESTABILITY = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -9578,6 +9488,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = KL8N8XSYF4;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -9602,6 +9513,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = KL8N8XSYF4;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -9628,6 +9540,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = KL8N8XSYF4;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -9985,6 +9898,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon_Developer;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = KL8N8XSYF4;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -10062,6 +9976,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = KL8N8XSYF4;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -10088,6 +10003,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = KL8N8XSYF4;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
