@@ -1,3 +1,0 @@
-Display history of all branches in a colorized terminal format.
-
-// vim: ft=asciidoc:

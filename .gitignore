@@ -75,3 +75,7 @@ MozBuildID.xcconfig
 # SQLite
 *.db-shm
 *.db-wal
+
+# Brave
+
+NPM/node_modules

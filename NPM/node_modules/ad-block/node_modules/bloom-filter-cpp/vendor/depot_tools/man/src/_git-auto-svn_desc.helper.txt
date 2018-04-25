@@ -1,1 +1,0 @@
-Automatically set up git-svn metadata for a repo mirrored from SVN.

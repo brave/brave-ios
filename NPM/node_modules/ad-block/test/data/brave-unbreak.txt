@@ -1,7 +1,0 @@
-||ntv.io^$third-party
-@@||creative.sonobi.com
-@@||adm.fwmrm.net^*/AdManager.js$domain=msnbc.com|sky.com|cnbc.com
-||novately.com^$third-party
-||webspectator.com^$third-party
-! Would be nice to find an alt fix, but unbreaks cnet video
-@@||tags.tiqcdn.com/utag/*/utag.js$domain=cnet.com

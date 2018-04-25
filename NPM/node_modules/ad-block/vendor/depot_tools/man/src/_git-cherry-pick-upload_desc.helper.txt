@@ -1,1 +1,0 @@
-Upload the diff between a revision and its parent to rietveld.

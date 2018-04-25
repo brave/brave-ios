@@ -1,4 +1,0 @@
-Helper script to display all local git branches with ‘upstream’ hierarchy in
-colorized terminal format.
-
-// vim: ft=asciidoc:

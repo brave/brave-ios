@@ -1,1 +1,0 @@
-Print a diff of the current branch, compared to its upstream.
