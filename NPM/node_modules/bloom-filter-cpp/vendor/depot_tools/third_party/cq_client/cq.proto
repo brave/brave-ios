@@ -1,0 +1,201 @@
+syntax = "proto2";
+
+// This message describes a Commit Queue configuration. The config file cq.cfg
+// should be stored in the config directory located on the branch that this CQ
+// should commit to.
+message Config {
+  // Required. Version of the config format.
+  optional int32 version = 1;
+
+  // Required. Name of the CQ. May only contain characters [a-zA-Z0-9_]. It is
+  // used for various purposes, including, but not limited to match the project
+  // name for CLs on Rietveld, name of the project in the status app, internal
+  // name for logging etc. CQ name should not be confused with the project name
+  // in LUCI as there may be multiple CQs per project.
+  optional string cq_name = 2;
+
+  // List of verifiers that verify if the CL is ready to be committed.
+  optional Verifiers verifiers = 3;
+
+  // URL of the CQ status app to push updates to.
+  optional string cq_status_url = 4;
+
+  // When true, hash of the commit is not posted by CQ. This is used for
+  // projects using gnumbd as latter publishes actual hash later. Default value
+  // is false.
+  optional bool hide_ref_in_committed_msg = 5;
+
+  // Delay between commit bursts in seconds. Default value is 480.
+  optional int32 commit_burst_delay = 6;
+
+  // Maximum number of commits done sequentially, before waiting for
+  // commit_burst_delay. Default value is 4.
+  optional int32 max_commit_burst = 7;
+
+  // Defines whether a CQ is used in production. Allows to disable CQ for a
+  // given branch. Default is true.
+  optional bool in_production = 8;
+
+  // Configuration options for Rietveld code review.
+  optional Rietveld rietveld = 9;
+
+  // EXPERIMENTAL! Configuration options for Gerrit code review.
+  // TODO(tandrii): update this doc (GERRIT).
+  optional Gerrit gerrit = 15;
+
+  // This can be used to override the Git repository URL used to checkout and
+  // commit changes on CQ host. This should only be used in case, when the
+  // source repository is not supported by luci-config (e.g. GitHub).
+  optional string git_repo_url = 10;
+
+  // Target ref to commit to. This can be used to specify a different ref than
+  // the one where the luci config is located. This is useful, e.g. for projects
+  // that use gnumbd where CQ should commit into a pending ref.
+  optional string target_ref = 11;
+
+  // Deprecated. URL of the SVN repository. We are deprecating SVN support.
+  optional string svn_repo_url = 12;
+}
+
+message Rietveld {
+  // Required. URL of the codereview site.
+  optional string url = 1;
+
+  // List of regular expressions used to check if CL's base URL should be
+  // processed by this CQ. This may be useful if a single branch has multiple
+  // sub-directories that are handled by different CQs. When no regular
+  // expressions are specified, the regular expression '.*', which matches any
+  // directory, is used.
+  repeated string project_bases = 2;
+}
+
+// Gerrit CQ is EXPERIMENTAL! See http://crbug.com/493899 for more info.
+//
+// Unlike Rietveld, Gerrit doesn't need a separate url.
+// Instead, the git_repo_url must be specified on the Gerrit instance,
+// and CQ will deduce Gerrit url from it.
+//
+// TODO(tandrii): support Rietveld and Gerrit at the same time.
+// This basically requires to start two CQ instances, instead of one.
+//
+// For example, if https://chromium.googlesource.com/infra/infra.git is your
+// repo url provided in `git_repo_url` above, then
+// https://chromium-review.googlesource.com/#/admin/projects/infra/infra should
+// show general properties of your project.
+//
+// Also,
+// https://chromium-review.googlesource.com/#/admin/projects/infra/infra,access
+// should show ACLs for refs in your project, but you may need to be admin to
+// see it. This will come handy to enable and customize the CQ-related workflows
+// for your project.
+message Gerrit {
+  // If set, tells CQ to set score on a given label to mark result of CQ run.
+  // Typically, this is Commit-Queue-Verified label.
+  // If not set, CQ will just try to hit submit button.
+  optional string cq_verified_label = 1;
+}
+
+// Verifiers are various types of checks that a Commit Queue performs on a CL.
+// All verifiers must pass in order for a CL to be landed. Configuration file
+// describes types of verifiers that should be applied to each CL and their
+// parameters.
+message Verifiers {
+  // This verifier is used to ensure that an LGTM was posted to the code review
+  // site from a valid project committer.
+  // This verifier is not supported with Gerrit.
+  optional ReviewerLgtmVerifier reviewer_lgtm = 1;
+
+  // This verifier is used to check tree status before committing a CL. If the
+  // tree is closed, then the verifier will wait until it is reopened.
+  optional TreeStatusLgtmVerifier tree_status = 2;
+
+  // This verifier triggers a set of tryjobs that are to be run on builders on
+  // Buildbot. It automatically retries failed try-jobs and only allows CL to
+  // land if each builder has succeeded in the latest retry. If a given tryjob
+  // result is too old (>1 day) it is ignored.
+  optional TryJobVerifier try_job = 3;
+
+  // This verifier is used to ensure that the author has signed Google's
+  // Contributor License Agreement.
+  optional SignCLAVerifier sign_cla = 4;
+
+  message ReviewerLgtmVerifier {
+    // Required. Name of the chrome-infra-auth group, which contains the
+    // list of identities authorized to approve (lgtm) a CL. This list is also
+    // known as a committer list and often corresponds to the list of accounts
+    // that have direct commit/push access to the repository. Some older lists
+    // are still stored in the CQ source code, but are being moved to the new
+    // location (https://crbug.com/511311).
+    optional string committer_list = 1;
+
+    // Number of seconds to wait for LGTM on CQ. Default value is 0.
+    optional int32 max_wait_secs = 2;
+
+    // Message to be posted to code review site when no LGTM is found. Default
+    // value is "No LGTM from a valid reviewer yet. Only full committers are "
+    // "accepted.\nEven if an LGTM may have been provided, it was from a "
+    // "non-committer,\n_not_ a full super star committer.\nSee "
+    // "http://www.chromium.org/getting-involved/become-a-committer\nNote that "
+    // "this has nothing to do with OWNERS files."
+    optional string no_lgtm_msg = 3;
+  }
+
+  message TreeStatusLgtmVerifier {
+    // Required. URL of the project tree status app.
+    optional string tree_status_url = 1;
+  }
+
+  message TryJobVerifier {
+    message Builder {
+      // Name of the builder.
+      optional string name = 1;
+
+      // Optionally specify a builder name that triggers the given builder.
+      // Otherwise, CQ will trigger this builder (default). If in doubt, you
+      // probably won't need this.
+      optional string triggered_by = 2;
+
+      // When this field is present, it marks given builder as experimental. It
+      // is only executed on a given percentage of the CLs and the outcome does
+      // not affect the decicion whether a CL can land or not. This is typically
+      // used to test new builders and estimate their capacity requirements.
+      optional float experiment_percentage = 4;
+    }
+
+    message Bucket {
+      // Name of the bucket. This is typically the same as a master name without
+      // the 'master.' prefix, e.g. 'chromium.linux' or 'tryserver.webrtc'. CQ
+      // will automatically add 'master.' prefix if not there.
+      optional string name = 1;
+
+      // Builders on which tryjobs should be triggered.
+      repeated Builder builders = 2;
+    }
+
+    // Buckets on which tryjobs are triggered/watched.
+    repeated Bucket buckets = 1;
+
+    message TryJobRetryConfig {
+      // Retry quota for a single tryjob.
+      optional int32 try_job_retry_quota = 1;
+
+      // Retry quota for all tryjobs in a CL.
+      optional int32 global_retry_quota = 2;
+
+      // The weight assigned to each tryjob failure.
+      optional int32 failure_retry_weight = 3;
+
+      // The weight assigned to each transient failure.
+      optional int32 transient_failure_retry_weight = 4;
+
+      // The weight assigned to tryjob timeouts.
+      optional int32 timeout_retry_weight = 5;
+    }
+
+    // Provides project specific trybot retry configuration. This overrides the
+    // defaults used in the CQ.
+    optional TryJobRetryConfig try_job_retry_config = 2;
+  }
+
+  message SignCLAVerifier {}
+}

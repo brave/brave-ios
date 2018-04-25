@@ -1,0 +1,69 @@
+git-auto-svn(1)
+===============
+
+NAME
+----
+git-auto-svn -
+include::_git-auto-svn_desc.helper.txt[]
+
+SYNOPSIS
+--------
+[verse]
+'git auto-svn'
+
+DESCRIPTION
+-----------
+
+`git auto-svn` automatically sets up git-svn metadata and runs git-svn fetch for
+repos that are homed in SVN but mirrored to Git (such as depot_tools itself).
+
+It determines the metadata to use by inspecting the `git-svn-id` footer of the
+HEAD of the remote upstream ref (by default, `origin/master`). `git-svn-id`
+footers look like this:
+
+  git-svn-id: svn://some.host.org/repo/path/to/a/sub/folder@123456 0039d316-1c4b-4281-b951-d872f2087c98
+
+`git auto-svn` extracts the repository url
+(svn://some.host.org/repo/path/to/a/sub/folder) from the `git-svn-id`, and
+splits it into the root repository (svn://some.host.org/repo) and the path
+within that repository (/path/to/a/sub/folder).
+
+It then sets up the following stanza in .git/config:
+
+  [svn-remote "svn"]
+      url = svn://some.host.org/repo
+      fetch = path/to/a/sub/folder:refs/remotes/origin/master
+
+Finally, it runs `git svn fetch` to pull in the data from the svn remote.
+
+CONFIGURATION VARIABLES
+-----------------------
+
+svn-remote.svn.url
+~~~~~~~~~~~~~~~~~~
+
+This is the url of the root of the remote svn repository.
+
+svn-remote.svn.fetch
+~~~~~~~~~~~~~~~~~~~~
+
+This looks like a git refspec, but maps a subdirectory of the svn repository
+to a single ref in the git remote.
+
+EXAMPLE
+-------
+
+  git clone https://chromium.googlesource.com/chromium/tools/depot_tools
+  cd depot_tools
+  git auto-svn
+
+This results in the following stanza in `depot_tools/.git/config`:
+
+  [svn-remote "svn"]
+      url = svn://svn.chromium.org/chrome
+      fetch = trunk/tools/depot_tools:refs/remotes/origin/master
+
+
+include::_footer.txt[]
+
+// vim: ft=asciidoc:

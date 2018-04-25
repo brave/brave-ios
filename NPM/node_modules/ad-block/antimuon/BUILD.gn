@@ -1,0 +1,22 @@
+dep_base = rebase_path("../..", "//")
+
+config("internal_config") {
+  include_dirs = [ ".." ]
+}
+
+source_set("ad-block") {
+  configs += [ ":internal_config" ]
+  sources = [
+    "../ad_block_client.cc",
+    "../ad_block_client.h",
+    "../cosmetic_filter.cc",
+    "../cosmetic_filter.h",
+    "../filter.cc",
+    "../filter.h",
+  ]
+
+  deps = [
+    rebase_path("hashset-cpp/antimuon:hashset-cpp", dep_base),
+    rebase_path("bloom-filter-cpp/antimuon:bloom-filter-cpp", dep_base),
+  ]
+}

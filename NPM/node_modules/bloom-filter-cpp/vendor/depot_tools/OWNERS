@@ -1,0 +1,19 @@
+set noparent
+agable@chromium.org
+bradnelson@chromium.org
+dpranke@chromium.org
+hinoka@chromium.org
+iannucci@chromium.org
+jochen@chromium.org
+maruel@chromium.org
+nodir@chromium.org
+petermayo@chromium.org
+pgervais@chromium.org
+rogerta@chromium.org
+stip@chromium.org
+tandrii@chromium.org
+
+per-file commit_queue*=akuegel@chromium.org
+per-file commit_queue*=phajdan.jr@chromium.org
+per-file commit_queue*=sergiyb@chromium.org
+per-file commit_queue*=tandrii@chromium.org

@@ -1,0 +1,12 @@
+{
+  'variables': {
+    'files': [
+      'luci_recipe_run.py',
+    ],
+    'command': [
+      'python',
+      'luci_recipe_run.py',
+    ],
+  },
+}
+
