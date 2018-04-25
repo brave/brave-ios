@@ -175,6 +175,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         fxaLoginHelper.application(application, didLoadProfile: profile)
 
         setUpDeepLinks(application: application)
+        
+        
+        AdBlocker.singleton.startLoading()
+        SafeBrowsing.singleton.networkFileLoader.loadData()
+        TrackingProtection.singleton.networkFileLoader.loadData()
+        HttpsEverywhere.singleton.networkFileLoader.loadData()
+        
 
         log.info("startApplication end")
         return true

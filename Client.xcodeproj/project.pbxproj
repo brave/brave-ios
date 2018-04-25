@@ -397,6 +397,7 @@
 		5D61A8612090DFD3003835EF /* hashFn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A85E2090DFD2003835EF /* hashFn.cpp */; };
 		5D61A8622090DFD3003835EF /* BloomFilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A85F2090DFD2003835EF /* BloomFilter.cpp */; };
 		5D61A8652090EFC6003835EF /* filter.cc in Sources */ = {isa = PBXBuildFile; fileRef = 5D61A8642090EFC6003835EF /* filter.cc */; };
+		5D61A86720910C20003835EF /* adblock-regions.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5D61A86620910C20003835EF /* adblock-regions.txt */; };
 		742A56391D80B54A00BDB803 /* PhotonActionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 742A56381D80B54A00BDB803 /* PhotonActionSheet.swift */; };
 		744B0FFE1B4F172E00100422 /* ToolbarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 744B0FFD1B4F172E00100422 /* ToolbarTests.swift */; };
 		744ED5611DBFEB8D00A2B5BE /* MailtoLinkHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 744ED5601DBFEB8D00A2B5BE /* MailtoLinkHandler.swift */; };
@@ -1937,6 +1938,7 @@
 		5D61A8602090DFD3003835EF /* BloomFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BloomFilter.h; path = "NPM/node_modules/bloom-filter-cpp/BloomFilter.h"; sourceTree = SOURCE_ROOT; };
 		5D61A8632090EFC6003835EF /* filter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = filter.h; path = "NPM/node_modules/ad-block/filter.h"; sourceTree = SOURCE_ROOT; };
 		5D61A8642090EFC6003835EF /* filter.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = filter.cc; path = "NPM/node_modules/ad-block/filter.cc"; sourceTree = SOURCE_ROOT; };
+		5D61A86620910C20003835EF /* adblock-regions.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "adblock-regions.txt"; sourceTree = "<group>"; };
 		742A56381D80B54A00BDB803 /* PhotonActionSheet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotonActionSheet.swift; sourceTree = "<group>"; };
 		744B0FFD1B4F172E00100422 /* ToolbarTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ToolbarTests.swift; sourceTree = "<group>"; };
 		744ED5601DBFEB8D00A2B5BE /* MailtoLinkHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MailtoLinkHandler.swift; sourceTree = "<group>"; };
@@ -3194,6 +3196,7 @@
 				5D6183C5208E88C0003835EF /* NetworkDataFileLoader.swift */,
 				5D6183C6208E88C0003835EF /* TrackingProtectionCpp.mm */,
 				5D6183C7208E88C0003835EF /* TrackingProtectionCpp.h */,
+				5D61A86620910C20003835EF /* adblock-regions.txt */,
 			);
 			path = Shields;
 			sourceTree = SOURCE_ROOT;
@@ -5605,6 +5608,7 @@
 				0BF42D391A7C0E8900889E28 /* Favicons.js in Resources */,
 				39A35AED1C0662A3006B9E87 /* SpotlightHelper.js in Resources */,
 				E689C6F81E0C6E72008BAADB /* FxASignIn.js in Resources */,
+				5D61A86720910C20003835EF /* adblock-regions.txt in Resources */,
 				5D61A8122090D040003835EF /* unicode.py in Resources */,
 				E4D6BEB91A0930EC00F538BD /* LaunchScreen.xib in Resources */,
 				A93067D91D0FE15E00C49C6E /* NightModeHelper.js in Resources */,

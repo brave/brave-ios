@@ -74,6 +74,17 @@ extension BrowserViewController: WKNavigationDelegate {
             decisionHandler(WKNavigationActionPolicy.cancel)
             return
         }
+        
+//        decisionHandler(.cancel)
+
+        let request = navigationAction.request
+        
+        if TrackingProtection.singleton.shouldBlock(request) ||
+            AdBlocker.singleton.shouldBlock(request) ||
+            SafeBrowsing.singleton.shouldBlock(request) {
+                decisionHandler(.cancel)
+            return
+        }
 
         if url.scheme == "about" {
             decisionHandler(WKNavigationActionPolicy.allow)
