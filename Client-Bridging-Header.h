@@ -13,4 +13,9 @@
 #import "Shared-Bridging-Header.h"
 #import "Storage-Bridging-Header.h"
 
+// Brave
+#import "HttpsEverywhereObjC.h"
+#import "ABPFilterLibWrapper.h"
+#import "TrackingProtectionCpp.h"
+
 #endif

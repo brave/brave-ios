@@ -74,6 +74,17 @@ extension BrowserViewController: WKNavigationDelegate {
             decisionHandler(WKNavigationActionPolicy.cancel)
             return
         }
+        
+//        decisionHandler(.cancel)
+
+        let request = navigationAction.request
+        
+        if TrackingProtection.singleton.shouldBlock(request) ||
+            AdBlocker.singleton.shouldBlock(request) ||
+            SafeBrowsing.singleton.shouldBlock(request) {
+                decisionHandler(.cancel)
+            return
+        }
 
         if url.scheme == "about" {
             decisionHandler(WKNavigationActionPolicy.allow)
@@ -131,7 +142,7 @@ extension BrowserViewController: WKNavigationDelegate {
         // This is the normal case, opening a http or https url, which we handle by loading them in this WKWebView. We
         // always allow this. Additionally, data URIs are also handled just like normal web pages.
 
-        if url.scheme == "http" || url.scheme == "https" || url.scheme == "data" || url.scheme == "blob" {
+        if ["http", "https", "data", "blob"].contains(url.scheme ?? "") {
             if navigationAction.navigationType == .linkActivated {
                 resetSpoofedUserAgentIfRequired(webView, newURL: url)
             } else if navigationAction.navigationType == .backForward {

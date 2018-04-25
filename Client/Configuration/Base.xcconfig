@@ -7,6 +7,8 @@
 // So need to use unique name and utilize in subclasses 
 // (e.g. can't use $(inherited) to 'pull' these changes, into sub-configurations)
 
+HEADER_SEARCH_PATHS = ./ThirdParty/leveldb/include ./ThirdParty/leveldb ./ThirdParty/re2
+
 OTHER_SWIFT_FLAGS_BASE=-DMOZ_TARGET_$(TARGET_NAME:upper)
 
 DEVELOPMENT_TEAM = KL8N8XSYF4
