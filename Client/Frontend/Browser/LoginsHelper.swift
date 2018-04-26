@@ -47,10 +47,10 @@ class LoginsHelper: TabHelper {
         // Check to see that we're in the foreground before trying to check the logins. We want to
         // make sure we don't try accessing the logins database while we're backgrounded to avoid
         // the system from terminating our app due to background disk access.
-        // 
+        //
         // See https://bugzilla.mozilla.org/show_bug.cgi?id=1307822 for details.
         guard UIApplication.shared.applicationState == .active && !profile.isShutdown else {
-            return 
+            return
         }
 
         // We don't use the WKWebView's URL since the page can spoof the URL by using document.location
@@ -85,8 +85,8 @@ class LoginsHelper: TabHelper {
                 range: nil,
                 locale: nil)!
             string.replaceSubrange(range, with: replace)
-            let nsRange = NSRange(location: string.characters.distance(from: string.startIndex, to: range.lowerBound),
-                                  length: replace.characters.count)
+            let nsRange = NSRange(location: string.distance(from: string.startIndex, to: range.lowerBound),
+                                  length: replace.count)
             ranges.append(nsRange)
         }
 

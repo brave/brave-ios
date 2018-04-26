@@ -184,16 +184,16 @@ extension SQLiteHistory: BrowserHistory {
 
         return db.withConnection { conn -> Void in
             let now = Date.now()
-            
+
             if self.updateSite(site, atTime: now, withConnection: conn) > 0 {
                 return
             }
-            
+
             // Insert instead.
             if self.insertSite(site, atTime: now, withConnection: conn) > 0 {
                 return
             }
-            
+
             let err = DatabaseError(description: "Unable to update or insert site; Invalid key returned")
             log.error("recordVisitedSite(_:) encountered an error: \(err.localizedDescription)")
             throw err
@@ -354,7 +354,7 @@ extension SQLiteHistory: BrowserHistory {
             }
 
             for i in words.indices where i != index {
-                if words[i].range(of: word) != nil && (words[i].characters.count != word.characters.count || i < index) {
+                if words[i].range(of: word) != nil && (words[i].count != word.count || i < index) {
                     return false
                 }
             }
@@ -421,7 +421,7 @@ extension SQLiteHistory: BrowserHistory {
         "ORDER BY MAX(localVisitDate, remoteVisitDate) DESC",
         "LIMIT \(limit)",
         ].joined(separator: " ")
-        
+
         let factory = includeIcon ? SQLiteHistory.iconHistoryColumnFactory : SQLiteHistory.basicHistoryColumnFactory
         return db.runQuery(sql, args: args, factory: factory)
     }

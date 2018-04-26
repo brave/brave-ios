@@ -77,9 +77,9 @@ extension Expressible {
     public func asSQL() -> String {
         let expressed = expression
         var idx = 0
-        return expressed.template.characters.reduce("") { template, character in
+        return expressed.template.reduce("") { template, character in
             let transcoded: String
-            
+
             if character == "?" {
                 transcoded = transcode(expressed.bindings[idx])
                 idx += 1

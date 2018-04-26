@@ -149,7 +149,7 @@ class ReadingListTableViewCell: UITableViewCell {
         let hostname = url.host ?? ""
         for prefix in prefixesToSimplify {
             if hostname.hasPrefix(prefix) {
-                return hostname.substring(from: hostname.characters.index(hostname.startIndex, offsetBy: prefix.characters.count))
+                return hostname.substring(from: hostname.index(hostname.startIndex, offsetBy: prefix.count))
             }
         }
         return hostname
@@ -402,7 +402,7 @@ class ReadingListPanel: UITableViewController, HomePanel {
             homePanelDelegate?.homePanel(self, didSelectURL: encodedURL, visitType: visitType)
         }
     }
-    
+
     fileprivate func deleteItem(atIndex indexPath: IndexPath) {
         if let record = records?[indexPath.row] {
             if let result = profile.readingList?.deleteRecord(record), result.isSuccess {
