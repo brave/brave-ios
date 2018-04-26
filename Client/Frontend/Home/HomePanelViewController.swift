@@ -28,7 +28,7 @@ protocol HomePanelViewControllerDelegate: class {
 }
 
 protocol HomePanel: class {
-    weak var homePanelDelegate: HomePanelDelegate? { get set }
+    var homePanelDelegate: HomePanelDelegate? { get set }
 }
 
 struct HomePanelUX {
