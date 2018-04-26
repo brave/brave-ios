@@ -159,7 +159,11 @@ extension AdjustIntegration: AdjustDelegate {
     ///
     /// Here we also disable Adjust based on the Send Anonymous Usage Data setting.
 
-    func adjustAttributionChanged(_ attribution: ADJAttribution!) {
+    func adjustAttributionChanged(_ attribution: ADJAttribution?) {
+        guard let attribution = attribution else {
+            Logger.browserLogger.info("Attribution is nil")
+            return
+        }
         do {
             Logger.browserLogger.info("Adjust - Saving attribution info to disk")
             try saveAttribution(attribution)
@@ -187,8 +191,8 @@ extension AdjustIntegration: AdjustDelegate {
     /// with launching the deeplink. We let the interstial view decide what to do with deeplink.
     /// Ref: https://github.com/adjust/ios_sdk#deferred-deep-linking-scenario
     
-    func adjustDeeplinkResponse(_ deeplink: URL!) -> Bool {
-        profile.prefs.setString("\(deeplink)", forKey: "AdjustDeeplinkKey")
+    func adjustDeeplinkResponse(_ deeplink: URL?) -> Bool {
+        profile.prefs.setString("\(String(describing: deeplink))", forKey: "AdjustDeeplinkKey")
         return true
     }
 

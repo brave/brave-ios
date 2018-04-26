@@ -809,7 +809,7 @@ class BrowserViewController: UIViewController {
         guard let url = tabState.url else { return }
         let absoluteString = url.absoluteString
         let shareItem = ShareItem(url: absoluteString, title: tabState.title, favicon: tabState.favicon)
-        profile.bookmarks.shareItem(shareItem)
+        _ = profile.bookmarks.shareItem(shareItem)
         var userData = [QuickActions.TabURLKey: shareItem.url]
         if let title = shareItem.title {
             userData[QuickActions.TabTitleKey] = title
@@ -924,10 +924,6 @@ class BrowserViewController: UIViewController {
 
         let isPage = tab.url?.displayURL?.isWebPage() ?? false
         navigationToolbar.updatePageStatus(isPage)
-
-        guard let url = tab.url?.displayURL?.absoluteString else {
-            return
-        }
     }
     // MARK: Opening New Tabs
 
@@ -2020,7 +2016,8 @@ extension BrowserViewController: WKUIDelegate {
             return decisionHandler(WKNavigationResponsePolicy.allow)
         }
 
-        openInHelper.openInView = openInHelper.openInView ?? navigationToolbar.menuButton
+        let openInView = openInHelper.openInView 
+        openInHelper.openInView = openInView ?? navigationToolbar.menuButton
         openInHelper.open()
         decisionHandler(WKNavigationResponsePolicy.cancel)
     }

@@ -167,7 +167,7 @@ protocol Profile: class {
 
     @discardableResult func storeTabs(_ tabs: [RemoteTab]) -> Deferred<Maybe<Int>>
 
-    func sendItems(_ items: [ShareItem], toClients clients: [RemoteClient]) -> Deferred<Maybe<SyncStatus>>
+    @discardableResult func sendItems(_ items: [ShareItem], toClients clients: [RemoteClient]) -> Deferred<Maybe<SyncStatus>>
 
     var syncManager: SyncManager! { get }
     var isChinaEdition: Bool { get }

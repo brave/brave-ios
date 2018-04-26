@@ -609,7 +609,7 @@ extension MergedSQLiteBookmarks: LocalItemSource {
 }
 
 extension MergedSQLiteBookmarks: ShareToDestination {
-    public func shareItem(_ item: ShareItem) -> Success {
+    @discardableResult public func shareItem(_ item: ShareItem) -> Success {
         return self.local.shareItem(item)
     }
 }
