@@ -79,7 +79,7 @@ extension Expressible {
         var idx = 0
         return expressed.template.reduce("") { template, character in
             let transcoded: String
-
+            
             if character == "?" {
                 transcoded = transcode(expressed.bindings[idx])
                 idx += 1
