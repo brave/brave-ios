@@ -78,4 +78,4 @@ MozBuildID.xcconfig
 
 # Brave
 
-NPM/node_modules
+node_modules/

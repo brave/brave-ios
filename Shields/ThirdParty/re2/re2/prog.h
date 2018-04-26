@@ -16,7 +16,7 @@
 #include <vector>
 
 #include "re2util/util.h"
-#include "logging.h"
+#include "re2util/logging.h"
 #include "re2util/sparse_array.h"
 #include "re2util/sparse_set.h"
 #include "re2/re2.h"

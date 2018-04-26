@@ -1,3 +1,6 @@
+import Shared
+import Shields
+
 private let _singleton = TrackingProtection()
 
 class TrackingProtection {
@@ -9,8 +12,8 @@ class TrackingProtection {
     var parser: TrackingProtectionCpp = TrackingProtectionCpp()
 
     lazy var networkFileLoader: NetworkDataFileLoader = {
-        let dataUrl = URL(string: "https://s3.amazonaws.com/tracking-protection-data/\(dataVersion)/TrackingProtection.dat")!
-        let dataFile = "tp-data-\(dataVersion).dat"
+        let dataUrl = URL(string: "https://s3.amazonaws.com/tracking-protection-data/\(TrackingProtection.dataVersion)/TrackingProtection.dat")!
+        let dataFile = "tp-data-\(TrackingProtection.dataVersion).dat"
         let loader = NetworkDataFileLoader(url: dataUrl, file: dataFile, localDirName: "tp-data")
         loader.delegate = self
         return loader
@@ -49,9 +52,9 @@ class TrackingProtection {
         }
         guard var host = url.host else { return false}
 
-        if request.mainDocumentURL?.absoluteString.startsWith(WebServer.sharedInstance.base) ?? false {
-            return false
-        }
+//        if request.mainDocumentURL?.absoluteString.startsWith(WebServer.sharedInstance.base) ?? false {
+//            return false
+//        }
 
         let whitelist = ["connect.facebook.net", "connect.facebook.com", "staticxx.facebook.com", "www.facebook.com", "scontent.xx.fbcdn.net", "pbs.twimg.com", "scontent-sjc2-1.xx.fbcdn.net", "platform.twitter.com", "syndication.twitter.com", "cdn.syndication.twimg.com"]
 

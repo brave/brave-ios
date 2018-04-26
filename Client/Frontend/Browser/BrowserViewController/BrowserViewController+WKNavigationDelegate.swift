@@ -5,6 +5,7 @@
 import Foundation
 import WebKit
 import Shared
+import Shields
 
 private let log = Logger.browserLogger
 

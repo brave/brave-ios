@@ -214,11 +214,11 @@ class AdBlocker {
         }
 
 
-        if let main = request.mainDocumentURL?.absoluteString, (main.startsWith(WebServer.sharedInstance.base)) {
-            if !main.contains("testing/") { // don't skip for localhost testing
-                return false
-            }
-        }
+//        if let main = request.mainDocumentURL?.absoluteString, (main.startsWith(WebServer.sharedInstance.base)) {
+//            if !main.contains("testing/") { // don't skip for localhost testing
+//                return false
+//            }
+//        }
 
         var mainDocDomain = request.mainDocumentURL?.host ?? ""
         mainDocDomain = stripLocalhostWebServer(mainDocDomain)

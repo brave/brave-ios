@@ -2,6 +2,7 @@
 
 import Foundation
 import Shared
+import Shields
 
 private let _singleton = SafeBrowsing()
 
@@ -13,8 +14,8 @@ class SafeBrowsing {
     lazy var abpFilterLibWrapper: ABPFilterLibWrapper = { return ABPFilterLibWrapper() }()
 
     lazy var networkFileLoader: NetworkDataFileLoader = {
-        let dataUrl = URL(string: "https://s3.amazonaws.com/adblock-data/\(dataVersion)/SafeBrowsingData.dat")!
-        let dataFile = "safe-browsing-data-\(dataVersion).dat"
+        let dataUrl = URL(string: "https://s3.amazonaws.com/adblock-data/\(TrackingProtection.dataVersion)/SafeBrowsingData.dat")!
+        let dataFile = "safe-browsing-data-\(TrackingProtection.dataVersion).dat"
         let loader = NetworkDataFileLoader(url: dataUrl, file: dataFile, localDirName: "safe-browsing-data")
         loader.delegate = self
         return loader
@@ -46,10 +47,10 @@ class SafeBrowsing {
         objc_sync_enter(self)
         defer { objc_sync_exit(self) }
 
-        if request.mainDocumentURL?.absoluteString.startsWith(WebServer.sharedInstance.base) ?? false ||
-            request.url?.absoluteString.startsWith(WebServer.sharedInstance.base) ?? false {
-            return false
-        }
+//        if request.mainDocumentURL?.absoluteString.startsWith(WebServer.sharedInstance.base) ?? false ||
+//            request.url?.absoluteString.startsWith(WebServer.sharedInstance.base) ?? false {
+//            return false
+//        }
 
         guard let url = request.url else { return false }
 
