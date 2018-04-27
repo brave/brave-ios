@@ -231,7 +231,7 @@ class PhotonActionSheet: UIViewController, UITableViewDelegate, UITableViewDataS
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
-
+        
         if self.traitCollection.verticalSizeClass != previousTraitCollection?.verticalSizeClass
             || self.traitCollection.horizontalSizeClass != previousTraitCollection?.horizontalSizeClass {
             updateViewConstraints()

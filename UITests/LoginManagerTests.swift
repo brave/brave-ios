@@ -247,7 +247,7 @@ class LoginManagerTests: KIFTestCase {
         tester().wait(forTimeInterval: 5)
         tester().waitForViewWithAccessibilityValue("a0.com/")
     }
-
+    
     func testOpenAndFillFromPrivateContext() {
         if BrowserUtils.iPad() {
             EarlGrey.select(elementWithMatcher: grey_accessibilityID("TopTabsViewController.tabsButton"))
@@ -338,7 +338,7 @@ class LoginManagerTests: KIFTestCase {
         // Deselect only first row
         tester().tapRow(at: firstIndexPath, inTableViewWithAccessibilityIdentifier: "Login List")
         XCTAssertFalse(firstCell.isSelected)
-
+        
         // Make sure delete is still showing
         tester().waitForView(withAccessibilityLabel: "Delete")
         
@@ -550,7 +550,7 @@ class LoginManagerTests: KIFTestCase {
      
      let loginsList = tester().waitForView(withAccessibilityIdentifier: "Login List") as! UITableView
      XCTAssertEqual(loginsList.numberOfRows(inSection: 0), 1)
-
+     
      closeLoginManager()
      }
      */
@@ -628,7 +628,7 @@ class LoginManagerTests: KIFTestCase {
         
         closeLoginManager()
     }
-
+    
     func testLoginDetailDisplaysLastModified() {
         openLoginManager()
         
