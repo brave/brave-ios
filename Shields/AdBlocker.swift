@@ -9,8 +9,8 @@ class AdblockNetworkDataFileLoader: NetworkDataFileLoader {
 
 typealias localeCode = String
 
-class AdBlocker {
-    static let singleton = AdBlocker()
+public class AdBlocker {
+    public static let singleton = AdBlocker()
 
     static let prefKey = "braveBlockAdsAndTracking"
     static let prefKeyDefaultValue = true
@@ -75,7 +75,7 @@ class AdBlocker {
         return loader
     }
 
-    func startLoading() {
+    public func startLoading() {
         networkLoaders.forEach { $0.1.loadData() }
     }
 
@@ -190,7 +190,7 @@ class AdBlocker {
     // Set the window as 10x in 10sec, after that stop forwarding the page.
     var forbesRedirectGuard = RedirectLoopGuard(timeWindow: 10.0, maxRedirects: 10)
 
-    func shouldBlock(_ request: URLRequest) -> Bool {
+    public func shouldBlock(_ request: URLRequest) -> Bool {
         // synchronize code from this point on.
         objc_sync_enter(self)
         defer { objc_sync_exit(self) }

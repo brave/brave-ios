@@ -10,7 +10,7 @@ protocol NetworkDataFileLoaderDelegate: class {
     func fileLoaderDelegateWillHandleInitialRead(_: NetworkDataFileLoader) -> Bool
 }
 
-class NetworkDataFileLoader {
+public class NetworkDataFileLoader {
     let dataUrl: URL
     let dataFile: String
     let nameOfDataDir: String
@@ -123,7 +123,7 @@ class NetworkDataFileLoader {
         }
     }
 
-    func loadData() {
+    public func loadData() {
         guard let delegate = delegate else { return }
         checkForUpdatedFileAfterDelay()
 

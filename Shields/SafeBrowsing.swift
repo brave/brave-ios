@@ -6,14 +6,14 @@ import Shields
 
 private let _singleton = SafeBrowsing()
 
-class SafeBrowsing {
+public class SafeBrowsing {
     static let prefKey = "braveSafeBrowsing"
     static let prefKeyDefaultValue = true
     static let dataVersion = AdBlocker.dataVersion
 
     lazy var abpFilterLibWrapper: ABPFilterLibWrapper = { return ABPFilterLibWrapper() }()
 
-    lazy var networkFileLoader: NetworkDataFileLoader = {
+    public lazy var networkFileLoader: NetworkDataFileLoader = {
         let dataUrl = URL(string: "https://s3.amazonaws.com/adblock-data/\(TrackingProtection.dataVersion)/SafeBrowsingData.dat")!
         let dataFile = "safe-browsing-data-\(TrackingProtection.dataVersion).dat"
         let loader = NetworkDataFileLoader(url: dataUrl, file: dataFile, localDirName: "safe-browsing-data")
@@ -21,7 +21,6 @@ class SafeBrowsing {
         return loader
     }()
 
-    var blah = WeakList<SafeBrowsing>()
     var fifoCacheOfUrlsChecked = FifoDict()
     var isNSPrefEnabled = true
 
@@ -30,7 +29,7 @@ class SafeBrowsing {
         updateEnabledState()
     }
 
-    class var singleton: SafeBrowsing {
+    public class var singleton: SafeBrowsing {
         return _singleton
     }
 
@@ -42,7 +41,7 @@ class SafeBrowsing {
         updateEnabledState()
     }
 
-    func shouldBlock(_ request: URLRequest) -> Bool {
+    public func shouldBlock(_ request: URLRequest) -> Bool {
         // synchronize code from this point on.
         objc_sync_enter(self)
         defer { objc_sync_exit(self) }

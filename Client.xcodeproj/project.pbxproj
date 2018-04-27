@@ -414,18 +414,18 @@
 		5DEC006C209212CA007B7442 /* logging.h in Headers */ = {isa = PBXBuildFile; fileRef = 5DECFF992091502F007B7442 /* logging.h */; };
 		5DEC006D2092236B007B7442 /* HttpsEverywhere.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D6183BF208E88C0003835EF /* HttpsEverywhere.h */; };
 		5DEC006E20922380007B7442 /* adblock-regions.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5D61A86620910C20003835EF /* adblock-regions.txt */; };
-		5DEC006F20922388007B7442 /* TrackingProtectionCpp.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D6183C7208E88C0003835EF /* TrackingProtectionCpp.h */; };
+		5DEC006F20922388007B7442 /* TrackingProtectionCpp.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D6183C7208E88C0003835EF /* TrackingProtectionCpp.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5DEC00702092238B007B7442 /* TrackingProtectionCpp.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183C6208E88C0003835EF /* TrackingProtectionCpp.mm */; };
 		5DEC00712092238F007B7442 /* NetworkDataFileLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183C5208E88C0003835EF /* NetworkDataFileLoader.swift */; };
 		5DEC007220922396007B7442 /* UrlProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183C3208E88C0003835EF /* UrlProtocol.swift */; };
-		5DEC007320922396007B7442 /* ABPFilterLibWrapper.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D6183C4208E88C0003835EF /* ABPFilterLibWrapper.h */; };
+		5DEC007320922396007B7442 /* ABPFilterLibWrapper.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D6183C4208E88C0003835EF /* ABPFilterLibWrapper.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5DEC00742092239E007B7442 /* BraveShieldState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183C2208E88C0003835EF /* BraveShieldState.swift */; };
 		5DEC0075209223A0007B7442 /* ABPFilterLibWrapper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183C1208E88C0003835EF /* ABPFilterLibWrapper.mm */; };
 		5DEC0077209223A6007B7442 /* HttpsEverywhere.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183C0208E88C0003835EF /* HttpsEverywhere.cpp */; };
 		5DEC0078209223AD007B7442 /* RecentlyUsedCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D6183BE208E88C0003835EF /* RecentlyUsedCache.h */; };
 		5DEC0079209223AF007B7442 /* HttpsEverywhereObjC.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183BD208E88C0003835EF /* HttpsEverywhereObjC.mm */; };
 		5DEC007A209223B2007B7442 /* JsonCpp.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D6183BC208E88C0003835EF /* JsonCpp.h */; };
-		5DEC007B209223B4007B7442 /* HttpsEverywhereObjC.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D6183BB208E88C0003835EF /* HttpsEverywhereObjC.h */; };
+		5DEC007B209223B4007B7442 /* HttpsEverywhereObjC.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D6183BB208E88C0003835EF /* HttpsEverywhereObjC.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5DEC007C209223B6007B7442 /* SafeBrowsing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183B9208E88C0003835EF /* SafeBrowsing.swift */; };
 		5DEC007D209223BC007B7442 /* SafeBrowsingError.html in Resources */ = {isa = PBXBuildFile; fileRef = 5D6183B8208E88C0003835EF /* SafeBrowsingError.html */; };
 		5DEC007E209223BF007B7442 /* TempBraveApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183E4208F8A9C003835EF /* TempBraveApp.swift */; };
@@ -433,7 +433,6 @@
 		5DEC0080209223BF007B7442 /* AdBlocker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183B6208E88C0003835EF /* AdBlocker.swift */; };
 		5DEC0081209223BF007B7442 /* TrackingProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6183B7208E88C0003835EF /* TrackingProtection.swift */; };
 		5DEC008320924040007B7442 /* Storage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2FCAE21A1ABB51F800877008 /* Storage.framework */; };
-		5DEC008520924260007B7442 /* Shields-Bridging-Header.h in Headers */ = {isa = PBXBuildFile; fileRef = 5DEC008420924260007B7442 /* Shields-Bridging-Header.h */; };
 		5DECFF0020914B15007B7442 /* Shields.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DECFEF720914B14007B7442 /* Shields.framework */; };
 		5DECFF0720914B15007B7442 /* ShieldsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DECFF0620914B15007B7442 /* ShieldsTests.swift */; };
 		5DECFF0920914B15007B7442 /* Shields.h in Headers */ = {isa = PBXBuildFile; fileRef = 5DECFEF920914B15007B7442 /* Shields.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1914,7 +1913,6 @@
 		5D61A8632090EFC6003835EF /* filter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = filter.h; path = "node_modules/ad-block/filter.h"; sourceTree = "<group>"; };
 		5D61A8642090EFC6003835EF /* filter.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = filter.cc; path = "node_modules/ad-block/filter.cc"; sourceTree = "<group>"; };
 		5D61A86620910C20003835EF /* adblock-regions.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "adblock-regions.txt"; sourceTree = "<group>"; };
-		5DEC008420924260007B7442 /* Shields-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Shields-Bridging-Header.h"; sourceTree = "<group>"; };
 		5DECFEF720914B14007B7442 /* Shields.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Shields.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5DECFEF920914B15007B7442 /* Shields.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Shields.h; sourceTree = "<group>"; };
 		5DECFEFA20914B15007B7442 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -3326,7 +3324,6 @@
 			isa = PBXGroup;
 			children = (
 				5DECFEF920914B15007B7442 /* Shields.h */,
-				5DEC008420924260007B7442 /* Shields-Bridging-Header.h */,
 				5DECFEFA20914B15007B7442 /* Info.plist */,
 				5D61A685208FB620003835EF /* NPM */,
 				5D6183E4208F8A9C003835EF /* TempBraveApp.swift */,
@@ -4677,6 +4674,9 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5DEC007B209223B4007B7442 /* HttpsEverywhereObjC.h in Headers */,
+				5DEC007320922396007B7442 /* ABPFilterLibWrapper.h in Headers */,
+				5DEC006F20922388007B7442 /* TrackingProtectionCpp.h in Headers */,
 				5DECFF0920914B15007B7442 /* Shields.h in Headers */,
 				5DEC002820915030007B7442 /* sparse_array.h in Headers */,
 				5DEC002720915030007B7442 /* mix.h in Headers */,
@@ -4694,7 +4694,6 @@
 				5DECFFFE20915030007B7442 /* two_level_iterator.h in Headers */,
 				5DEC003420915030007B7442 /* stringpiece.h in Headers */,
 				5DEC0078209223AD007B7442 /* RecentlyUsedCache.h in Headers */,
-				5DEC007B209223B4007B7442 /* HttpsEverywhereObjC.h in Headers */,
 				5DECFFE720915030007B7442 /* cache.h in Headers */,
 				5DEC005B209207A8007B7442 /* BloomFilter.h in Headers */,
 				5DEC001520915030007B7442 /* builder.h in Headers */,
@@ -4717,11 +4716,9 @@
 				5DECFFDF20915030007B7442 /* random.h in Headers */,
 				5DEC001820915030007B7442 /* log_reader.h in Headers */,
 				5DECFFCF20915030007B7442 /* coding.h in Headers */,
-				5DEC006F20922388007B7442 /* TrackingProtectionCpp.h in Headers */,
 				5DEC000120915030007B7442 /* log_format.h in Headers */,
 				5DEC005E209207AC007B7442 /* HashItem.h in Headers */,
 				5DEC000620915030007B7442 /* skiplist.h in Headers */,
-				5DEC008520924260007B7442 /* Shields-Bridging-Header.h in Headers */,
 				5DECFFD720915030007B7442 /* histogram.h in Headers */,
 				5DECFFFD20915030007B7442 /* filter_block.h in Headers */,
 				5DEC004B20915030007B7442 /* unicode_casefold.h in Headers */,
@@ -4765,7 +4762,6 @@
 				5DEC001420915030007B7442 /* version_set.h in Headers */,
 				5DEC002620915030007B7442 /* memenv.h in Headers */,
 				5DECFFE820915030007B7442 /* write_batch.h in Headers */,
-				5DEC007320922396007B7442 /* ABPFilterLibWrapper.h in Headers */,
 				5DEC005320915030007B7442 /* regexp.h in Headers */,
 				5DEC0061209207AF007B7442 /* cosmetic_filter.h in Headers */,
 				5DEC006C209212CA007B7442 /* logging.h in Headers */,

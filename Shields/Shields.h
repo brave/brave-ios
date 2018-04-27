@@ -16,4 +16,9 @@ FOUNDATION_EXPORT const unsigned char ShieldsVersionString[];
 
 // In this header, you should import all the public headers of your framework using statements like #import <Shields/PublicHeader.h>
 
+#import <Shields/HttpsEverywhereObjC.h>
+//#import <Shields/ABPFilterLibWrapper.h>
+//#import <Shields/TrackingProtectionCpp.h>
 
+#import "ABPFilterLibWrapper.h"
+#import "TrackingProtectionCpp.h"

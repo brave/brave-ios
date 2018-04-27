@@ -15,6 +15,7 @@ import SwiftRouter
 import Sync
 import CoreSpotlight
 import UserNotifications
+import Shields
 
 private let log = Logger.browserLogger
 
@@ -180,7 +181,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         AdBlocker.singleton.startLoading()
         SafeBrowsing.singleton.networkFileLoader.loadData()
         TrackingProtection.singleton.networkFileLoader.loadData()
-        HttpsEverywhere.singleton.networkFileLoader.loadData()
+//        HttpsEverywhere.singleton.networkFileLoader.loadData()
         
 
         log.info("startApplication end")

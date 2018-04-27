@@ -146,7 +146,7 @@ class URLProtocol: Foundation.URLProtocol {
         client?.urlProtocolDidFinishLoading(self)
     }
 
-    override func startLoading() {
+    public override func startLoading() {
         let newRequest = URLProtocol.cloneRequest(request)
         Foundation.URLProtocol.setProperty(true, forKey: markerRequestHandled, in: newRequest)
 

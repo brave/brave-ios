@@ -13,8 +13,4 @@
 #import "Shared-Bridging-Header.h"
 #import "Storage-Bridging-Header.h"
 
-// Brave
-#import "Shields-Bridging-Header.h"
-
-
 #endif

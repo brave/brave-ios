@@ -1,9 +1,8 @@
 import Shared
-import Shields
 
 private let _singleton = TrackingProtection()
 
-class TrackingProtection {
+public class TrackingProtection {
     fileprivate static let prefKey: Bool? = nil // Use the prefkey from Adblock for both
 
     static let dataVersion = "1"
@@ -11,7 +10,7 @@ class TrackingProtection {
 
     var parser: TrackingProtectionCpp = TrackingProtectionCpp()
 
-    lazy var networkFileLoader: NetworkDataFileLoader = {
+    public lazy var networkFileLoader: NetworkDataFileLoader = {
         let dataUrl = URL(string: "https://s3.amazonaws.com/tracking-protection-data/\(TrackingProtection.dataVersion)/TrackingProtection.dat")!
         let dataFile = "tp-data-\(TrackingProtection.dataVersion).dat"
         let loader = NetworkDataFileLoader(url: dataUrl, file: dataFile, localDirName: "tp-data")
@@ -19,7 +18,7 @@ class TrackingProtection {
         return loader
     }()
 
-    class var singleton: TrackingProtection {
+    public class var singleton: TrackingProtection {
         return _singleton
     }
 
@@ -37,7 +36,7 @@ class TrackingProtection {
     }
 
 
-    func shouldBlock(_ request: URLRequest) -> Bool {
+    public func shouldBlock(_ request: URLRequest) -> Bool {
         // synchronize code from this point on.
         objc_sync_enter(self)
         defer { objc_sync_exit(self) }
