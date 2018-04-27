@@ -77,7 +77,7 @@ open class DisplayURICommand: Command {
             return succeed()
         }
 
-        guard let getClientWithId = synchronizer.localClients?.getClientWithId(sender) else {
+        guard let getClientWithId = synchronizer.localClients?.getClient(guid: sender) else {
             return display()
         }
 

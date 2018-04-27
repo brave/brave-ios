@@ -86,7 +86,7 @@ extension ShareExtensionHelper: UIActivityItemSource {
     // get removed by the optimizer which leads to a crash when that happens.
     @_semantics("optimize.sil.never") func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivityType) -> Any? {
         // activityType actually is nil sometimes (in the simulator at least)
-        if activityType != nil && isPasswordManagerActivityType(activityType.rawValue) {
+        if isPasswordManagerActivityType(activityType.rawValue) {
             return onePasswordExtensionItem
         } else {
             // Return the URL for the selected tab. If we are in reader view then decode

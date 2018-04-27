@@ -521,7 +521,7 @@ open class ConcreteSQLiteDBConnection: SQLiteDBConnection {
     }
 
     fileprivate func setKey(_ key: String?) -> NSError? {
-        sqlite3_key(sqliteDB, key ?? "", Int32((key ?? "").characters.count))
+        sqlite3_key(sqliteDB, key ?? "", Int32((key ?? "").count))
         let cursor = executeQuery("SELECT count(*) FROM sqlite_master;", factory: IntFactory, withArgs: nil as Args?)
         if cursor.status != .success {
             return NSError(domain: "mozilla", code: 0, userInfo: [NSLocalizedDescriptionKey: "Invalid key"])
@@ -530,10 +530,10 @@ open class ConcreteSQLiteDBConnection: SQLiteDBConnection {
     }
 
     fileprivate func reKey(_ oldKey: String?, newKey: String?) -> NSError? {
-        sqlite3_key(sqliteDB, oldKey ?? "", Int32((oldKey ?? "").characters.count))
-        sqlite3_rekey(sqliteDB, newKey ?? "", Int32((newKey ?? "").characters.count))
+        sqlite3_key(sqliteDB, oldKey ?? "", Int32((oldKey ?? "").count))
+        sqlite3_rekey(sqliteDB, newKey ?? "", Int32((newKey ?? "").count))
         // Check that the new key actually works
-        sqlite3_key(sqliteDB, newKey ?? "", Int32((newKey ?? "").characters.count))
+        sqlite3_key(sqliteDB, newKey ?? "", Int32((newKey ?? "").count))
         let cursor = executeQuery("SELECT count(*) FROM sqlite_master;", factory: IntFactory, withArgs: nil as Args?)
         if cursor.status != .success {
             return NSError(domain: "mozilla", code: 0, userInfo: [NSLocalizedDescriptionKey: "Rekey failed"])
@@ -753,7 +753,7 @@ open class ConcreteSQLiteDBConnection: SQLiteDBConnection {
         }
         
         log.debug("Schema \(self.schema.name) needs created or updated from version \(currentVersion) to \(self.schema.version).")
-
+        
         var success = true
         
         do {
@@ -988,7 +988,7 @@ open class ConcreteSQLiteDBConnection: SQLiteDBConnection {
                 Sentry.shared.sendWithStacktrace(message: "SQLITE_CORRUPT", tag: SentryTag.swiftData, severity: .error, description: "DB file '\(filename)'. \(error.localizedDescription)")
             }
 
-            let message = "Error code: \(error.code), \(error) for SQL \(String(sqlStr.characters.prefix(500)))."
+            let message = "Error code: \(error.code), \(error) for SQL \(String(sqlStr.prefix(500)))."
             Sentry.shared.sendWithStacktrace(message: "SQL error", tag: SentryTag.swiftData, severity: .error, description: message)
 
             throw error
@@ -1027,7 +1027,7 @@ open class ConcreteSQLiteDBConnection: SQLiteDBConnection {
                 writeCorruptionInfoForDBNamed(filename, toLogger: Logger.corruptLogger)
                 Sentry.shared.sendWithStacktrace(message: "SQLITE_CORRUPT", tag: SentryTag.swiftData, severity: .error, description: "DB file '\(filename)'. \(error.localizedDescription)")
             }
-            Sentry.shared.sendWithStacktrace(message: "SQL error", tag: SentryTag.swiftData, severity: .error, description: "Error code: \(error.code), \(error) for SQL \(String(sqlStr.characters.prefix(500))).")
+            Sentry.shared.sendWithStacktrace(message: "SQL error", tag: SentryTag.swiftData, severity: .error, description: "Error code: \(error.code), \(error) for SQL \(String(sqlStr.prefix(500))).")
 
             return Cursor<T>(err: error)
         }

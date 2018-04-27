@@ -101,7 +101,7 @@ class MetaGlobalTests: XCTestCase {
         // Basic verifications.
         XCTAssertEqual(ready.collectionKeys.defaultBundle.encKey.count, 32)
         if let clients = ready.scratchpad.global?.value.engines["clients"] {
-            XCTAssertTrue(clients.syncID.characters.count == 12)
+            XCTAssertTrue(clients.syncID.count == 12)
         }
     }
 
@@ -239,7 +239,7 @@ class MetaGlobalTests: XCTestCase {
     }
 
     func testFailingOptimisticStateMachine() {
-        // We test only the optimistic state machine, knowing it will need to go through 
+        // We test only the optimistic state machine, knowing it will need to go through
         // needsFreshMetaGlobal, and fail.
         let metaGlobal = MetaGlobal(syncID: "id", storageVersion: 5, engines: [String: EngineMeta](), declined: [])
         let cryptoKeys = Keys.random()

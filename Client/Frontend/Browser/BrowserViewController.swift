@@ -463,7 +463,7 @@ class BrowserViewController: UIViewController {
                 // rather than losing data.
                 self.profile.queue.clearQueuedTabs()
             }
-                
+            
             // Then, open any received URLs from push notifications.
             if !receivedURLs.isEmpty {
                 DispatchQueue.main.async {
@@ -809,7 +809,7 @@ class BrowserViewController: UIViewController {
         guard let url = tabState.url else { return }
         let absoluteString = url.absoluteString
         let shareItem = ShareItem(url: absoluteString, title: tabState.title, favicon: tabState.favicon)
-        profile.bookmarks.shareItem(shareItem)
+        _ = profile.bookmarks.shareItem(shareItem)
         var userData = [QuickActions.TabURLKey: shareItem.url]
         if let title = shareItem.title {
             userData[QuickActions.TabTitleKey] = title
@@ -924,10 +924,6 @@ class BrowserViewController: UIViewController {
 
         let isPage = tab.url?.displayURL?.isWebPage() ?? false
         navigationToolbar.updatePageStatus(isPage)
-
-        guard let url = tab.url?.displayURL?.absoluteString else {
-            return
-        }
     }
     // MARK: Opening New Tabs
 
@@ -1406,7 +1402,7 @@ extension BrowserViewController: URLBarDelegate {
 
         // We couldn't build a URL, so check for a matching search keyword.
         let trimmedText = text.trimmingCharacters(in: CharacterSet.whitespaces)
-        guard let possibleKeywordQuerySeparatorSpace = trimmedText.characters.index(of: " ") else {
+        guard let possibleKeywordQuerySeparatorSpace = trimmedText.index(of: " ") else {
             submitSearchText(text)
             return
         }
@@ -2020,7 +2016,8 @@ extension BrowserViewController: WKUIDelegate {
             return decisionHandler(WKNavigationResponsePolicy.allow)
         }
 
-        openInHelper.openInView = openInHelper.openInView ?? navigationToolbar.menuButton
+        let openInView = openInHelper.openInView 
+        openInHelper.openInView = openInView ?? navigationToolbar.menuButton
         openInHelper.open()
         decisionHandler(WKNavigationResponsePolicy.cancel)
     }
@@ -2337,7 +2334,7 @@ extension BrowserViewController: IntroViewControllerDelegate {
             vcToPresent = settingsTableViewController
         } else {
             let signInVC = FxAContentViewController(profile: profile, fxaOptions: fxaOptions)
-            signInVC.delegate = self            
+            signInVC.delegate = self
             signInVC.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.done, target: self, action: #selector(BrowserViewController.dismissSignInViewController))
             vcToPresent = signInVC
         }
@@ -2702,12 +2699,12 @@ extension BrowserViewController: TabTrayDelegate {
     }
 
     func tabTrayDidAddBookmark(_ tab: Tab) {
-        guard let url = tab.url?.absoluteString, url.characters.count > 0 else { return }
+        guard let url = tab.url?.absoluteString, url.count > 0 else { return }
         self.addBookmark(tab.tabState)
     }
 
     func tabTrayDidAddToReadingList(_ tab: Tab) -> ReadingListClientRecord? {
-        guard let url = tab.url?.absoluteString, url.characters.count > 0 else { return nil }
+        guard let url = tab.url?.absoluteString, url.count > 0 else { return nil }
         return profile.readingList?.createRecordWithURL(url, title: tab.title ?? url, addedBy: UIDevice.current.name).successValue
     }
 

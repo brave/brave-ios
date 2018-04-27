@@ -24,7 +24,7 @@ public struct ExtensionUtils {
                 if attachment.hasItemConformingToTypeIdentifier(kUTTypeURL as String) {
                     attachment.loadItem(forTypeIdentifier: kUTTypeURL as String, options: nil) { obj, err in
                         guard err == nil else {
-                            completionHandler(nil, err as NSError!)
+                            completionHandler(nil, err as NSError?)
                             return
                         }
 

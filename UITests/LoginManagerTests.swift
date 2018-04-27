@@ -68,7 +68,7 @@ class LoginManagerTests: KIFTestCase {
         let hostnames = generateStringListWithFormat("http://%@%d.com", numRange: numRange, prefixes: prefixes)
         let usernames = generateStringListWithFormat("%@%d@email.com", numRange: numRange, prefixes: prefixes)
         
-        (0..<(numRange.count * prefixes.characters.count)).forEach { index in
+        (0..<(numRange.count * prefixes.count)).forEach { index in
             let login = Login(guid: "\(index)", hostname: hostnames[index], username: usernames[index], password: passwords[index])
             login.formSubmitURL = hostnames[index]
             profile.logins.addLogin(login).value
@@ -93,7 +93,7 @@ class LoginManagerTests: KIFTestCase {
     }
     
     fileprivate func generateStringListWithFormat(_ format: String, numRange: CountableRange<Int>, prefixes: String) -> [String] {
-        return prefixes.characters.map { char in
+        return prefixes.map { char in
             
             return numRange.map { num in
                 return String(format: format, "\(char)", num)
@@ -206,7 +206,7 @@ class LoginManagerTests: KIFTestCase {
         // Tap the ‘Copy’ menu option
         EarlGrey.select(elementWithMatcher: grey_accessibilityID("passwordField")).perform(grey_tap())
         waitForMatcher(name: "Copy")
-    
+        
         tester().tapView(withAccessibilityLabel: "Logins")
         closeLoginManager()
         XCTAssertEqual(UIPasteboard.general.string, "passworda0")
@@ -247,7 +247,7 @@ class LoginManagerTests: KIFTestCase {
         tester().wait(forTimeInterval: 5)
         tester().waitForViewWithAccessibilityValue("a0.com/")
     }
-    
+
     func testOpenAndFillFromPrivateContext() {
         if BrowserUtils.iPad() {
             EarlGrey.select(elementWithMatcher: grey_accessibilityID("TopTabsViewController.tabsButton"))
@@ -338,7 +338,7 @@ class LoginManagerTests: KIFTestCase {
         // Deselect only first row
         tester().tapRow(at: firstIndexPath, inTableViewWithAccessibilityIdentifier: "Login List")
         XCTAssertFalse(firstCell.isSelected)
-        
+
         // Make sure delete is still showing
         tester().waitForView(withAccessibilityLabel: "Delete")
         
@@ -550,7 +550,7 @@ class LoginManagerTests: KIFTestCase {
      
      let loginsList = tester().waitForView(withAccessibilityIdentifier: "Login List") as! UITableView
      XCTAssertEqual(loginsList.numberOfRows(inSection: 0), 1)
-     
+
      closeLoginManager()
      }
      */
@@ -628,7 +628,7 @@ class LoginManagerTests: KIFTestCase {
         
         closeLoginManager()
     }
-    
+
     func testLoginDetailDisplaysLastModified() {
         openLoginManager()
         

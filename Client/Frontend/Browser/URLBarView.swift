@@ -555,7 +555,10 @@ extension URLBarView: TabLocationViewDelegate {
     }
 
     func tabLocationViewDidTapLocation(_ tabLocationView: TabLocationView) {
-        guard var (locationText, isSearchQuery) = delegate?.urlBarDisplayTextForURL(locationView.url as URL?) else { return }
+        let urlDisplayText = delegate?.urlBarDisplayTextForURL(locationView.url as URL?)
+        
+        var locationText = urlDisplayText?.0
+        guard let isSearchQuery = urlDisplayText?.1 else { return }
 
         // Make sure to use the result from urlBarDisplayTextForURL as it is responsible for extracting out search terms when on a search page
         if let text = locationText, let url = URL(string: text), let host = url.host, AppConstants.MOZ_PUNYCODE {

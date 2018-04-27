@@ -264,22 +264,22 @@ class BrowserUtils {
 
         GREYAssertTrue(topsiteAppeared, reason: "Failed to return to topsite view")
     }
-	
+    
 	class func dismissFirstRunUI() {
 		var error: NSError?
         
 		let matcher = grey_allOf([
 			grey_accessibilityID("IntroViewController.scrollView"), grey_sufficientlyVisible()])
-		
+        
         EarlGrey.select(elementWithMatcher: matcher).assert(grey_notNil(), error: &error)
-		
+        
 		if error == nil {
             EarlGrey.select(elementWithMatcher: matcher).perform(grey_swipeFastInDirection(GREYDirection.left))
             let buttonMatcher = grey_allOf([
                 grey_accessibilityID("IntroViewController.startBrowsingButton"), grey_sufficientlyVisible()])
             
             EarlGrey.select(elementWithMatcher: buttonMatcher).assert(grey_notNil(), error: &error)
-        
+            
             if error == nil {
                 EarlGrey.select(elementWithMatcher: buttonMatcher).perform(grey_tap())
             }
@@ -634,10 +634,10 @@ class PasscodeUtils {
     }
 
     static func enterPasscode(_ tester: KIFUITestActor, digits: String) {
-        tester.tapView(withAccessibilityLabel: String(digits.characters[digits.startIndex]))
-        tester.tapView(withAccessibilityLabel: String(digits.characters[digits.characters.index(digits.startIndex, offsetBy: 1)]))
-        tester.tapView(withAccessibilityLabel: String(digits.characters[digits.characters.index(digits.startIndex, offsetBy: 2)]))
-        tester.tapView(withAccessibilityLabel: String(digits.characters[digits.characters.index(digits.startIndex, offsetBy: 3)]))
+        tester.tapView(withAccessibilityLabel: String(digits[digits.startIndex]))
+        tester.tapView(withAccessibilityLabel: String(digits[digits.index(digits.startIndex, offsetBy: 1)]))
+        tester.tapView(withAccessibilityLabel: String(digits[digits.index(digits.startIndex, offsetBy: 2)]))
+        tester.tapView(withAccessibilityLabel: String(digits[digits.index(digits.startIndex, offsetBy: 3)]))
     }
 }
 

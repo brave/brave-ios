@@ -35,10 +35,10 @@ private func loadEntriesFromDisk() -> TLDEntryMap? {
             let key: String
             if entry.isWild {
                 // Trim off the '*.' part of the line
-                key = line.substring(from: line.characters.index(line.startIndex, offsetBy: 2))
+                key = line.substring(from: line.index(line.startIndex, offsetBy: 2))
             } else if entry.isException {
                 // Trim off the '!' part of the line
-                key = line.substring(from: line.characters.index(line.startIndex, offsetBy: 1))
+                key = line.substring(from: line.index(line.startIndex, offsetBy: 1))
             } else {
                 key = line
             }
@@ -94,7 +94,7 @@ extension URL {
     }
 }
 
-// The list of permanent URI schemes has been taken from http://www.iana.org/assignments/uri-schemes/uri-schemes.xhtml 
+// The list of permanent URI schemes has been taken from http://www.iana.org/assignments/uri-schemes/uri-schemes.xhtml
 private let permanentURISchemes = ["aaa", "aaas", "about", "acap", "acct", "cap", "cid", "coap", "coaps", "crid", "data", "dav", "dict", "dns", "example", "file", "ftp", "geo", "go", "gopher", "h323", "http", "https", "iax", "icap", "im", "imap", "info", "ipp", "ipps", "iris", "iris.beep", "iris.lwz", "iris.xpc", "iris.xpcs", "jabber", "ldap", "mailto", "mid", "msrp", "msrps", "mtqp", "mupdate", "news", "nfs", "ni", "nih", "nntp", "opaquelocktoken", "pkcs11", "pop", "pres", "reload", "rtsp", "rtsps", "rtspu", "service", "session", "shttp", "sieve", "sip", "sips", "sms", "snmp", "soap.beep", "soap.beeps", "stun", "stuns", "tag", "tel", "telnet", "tftp", "thismessage", "tip", "tn3270", "turn", "turns", "tv", "urn", "vemmi", "vnc", "ws", "wss", "xcon", "xcon-userid", "xmlrpc.beep", "xmlrpc.beeps", "xmpp", "z39.50r", "z39.50s"]
 
 extension URL {
@@ -172,11 +172,11 @@ extension URL {
         var urlString = self.absoluteString
         // For http URLs, get rid of the trailing slash if the path is empty or '/'
         if (self.scheme == "http" || self.scheme == "https") && (self.path == "/") && urlString.endsWith("/") {
-            urlString = urlString.substring(to: urlString.characters.index(urlString.endIndex, offsetBy: -1))
+            urlString = urlString.substring(to: urlString.index(urlString.endIndex, offsetBy: -1))
         }
         // If it's basic http, strip out the string but leave anything else in
         if urlString.hasPrefix("http://") {
-            return urlString.substring(from: urlString.characters.index(urlString.startIndex, offsetBy: 7))
+            return urlString.substring(from: urlString.index(urlString.startIndex, offsetBy: 7))
         } else {
             return urlString
         }
@@ -261,7 +261,7 @@ extension URL {
     }
 
     /**
-    Returns the public portion of the host name determined by the public suffix list found here: https://publicsuffix.org/list/. 
+    Returns the public portion of the host name determined by the public suffix list found here: https://publicsuffix.org/list/.
     For example for the url www.bbc.co.uk, based on the entries in the TLD list, the public suffix would return co.uk.
 
     :returns: The public suffix for within the given hostname.
@@ -438,7 +438,7 @@ private extension URL {
         *
         *  On the next run through the loop, we set the new domain to check as the part after the next dot,
         *  update the next dot reference to be the string after the new next dot, and check the TLD entries again.
-        *  If we reach the end of the host (nextDot = nil) and we haven't found anything, then we've hit the 
+        *  If we reach the end of the host (nextDot = nil) and we haven't found anything, then we've hit the
         *  top domain level so we use it by default.
         */
 

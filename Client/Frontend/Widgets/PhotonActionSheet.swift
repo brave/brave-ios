@@ -157,7 +157,7 @@ class PhotonActionSheet: UIViewController, UITableViewDelegate, UITableViewDataS
                 if #available(iOS 11, *) {
                     let bottomPad: CGFloat
                     if let window = UIApplication.shared.keyWindow, window.safeAreaInsets.bottom != 0  {
-                        // for iPhone X and similar 
+                        // for iPhone X and similar
                         bottomPad = 0
                     } else {
                         bottomPad = PhotonActionSheetUX.Padding
@@ -231,7 +231,7 @@ class PhotonActionSheet: UIViewController, UITableViewDelegate, UITableViewDataS
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
-        
+
         if self.traitCollection.verticalSizeClass != previousTraitCollection?.verticalSizeClass
             || self.traitCollection.horizontalSizeClass != previousTraitCollection?.horizontalSizeClass {
             updateViewConstraints()
@@ -375,7 +375,7 @@ private class PhotonActionSheetHeaderView: UITableViewHeaderFooterView {
             self.siteImageView.backgroundColor = color
             self.siteImageView.image = self.siteImageView.image?.createScaled(PhotonActionSheetUX.IconSize)
         }
-        self.titleLabel.text = site.title.characters.count <= 1 ? site.url : site.title
+        self.titleLabel.text = site.title.count <= 1 ? site.url : site.title
         self.descriptionLabel.text = site.tileURL.baseDomain
     }
 }
