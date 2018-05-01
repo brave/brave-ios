@@ -38,8 +38,14 @@ public class AdBlocker {
         updateEnabledState()
 
         networkLoaders["en"] = getNetworkLoader(forLocale: "en", name: "ABPFilterParserData")
+        
+        guard
+            let shieldsBundle = Bundle(identifier: "com.brave.Shields"),
+            let regionalFilePath = shieldsBundle.path(forResource: "adblock-regions", ofType: "txt"),
+            let regional = try? String(contentsOfFile: regionalFilePath, encoding: .utf8) else {
+            fatalError("Adblock regions file not found")
+        }
 
-        let regional = try! NSString(contentsOfFile: Bundle.main.path(forResource: "adblock-regions", ofType: "txt")!, encoding: String.Encoding.utf8.rawValue) as String
         regional.components(separatedBy: "\n").forEach {
             let parts = String($0).components(separatedBy: ",")
             guard let filename = parts.last, parts.count > 1 else {
