@@ -7,6 +7,7 @@ import Shared
 import Account
 import SwiftKeychainWrapper
 import LocalAuthentication
+import Storage
 
 // This file contains all of the settings available in the main settings screen of the app.
 
@@ -26,6 +27,34 @@ class HiddenSetting: Setting {
         return !ShowDebugSettings
     }
 }
+
+// FIXME: Sync
+/*
+class SyncDeviceSetting: Setting {
+    let profile: Profile
+    
+    var onTap: (()->Void)?
+    internal var device: Device
+    
+    internal var displayTitle: String {
+        return device.name ?? ""
+    }
+    
+    override var accessoryType: UITableViewCellAccessoryType { return .none }
+    
+    override var accessibilityIdentifier: String? { return "SyncDevice" }
+    
+    init(profile: Profile, device: Device) {
+        self.profile = profile
+        self.device = device
+        super.init(title: NSAttributedString(string: device.name ?? "", attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor]))
+    }
+    
+    override func onClick(_ navigationController: UINavigationController?) {
+        onTap?()
+    }
+}
+*/
 
 // Sync setting for connecting a Firefox Account.  Shown when we don't have an account.
 class ConnectSetting: WithoutAccountSetting {

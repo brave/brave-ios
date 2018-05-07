@@ -2,7 +2,8 @@
 
 import CoreData 
 
-public class BookmarkMO: NSManagedObject {
+public class BookmarkMO: NSManagedObject, Syncable {
+    public var recordType: SyncRecordType = .bookmark
 
     // Favorite bookmarks are shown only on homepanel as a tile, they are not visible on bookmarks panel.
     @NSManaged public var isFavorite: Bool
@@ -68,6 +69,154 @@ public class BookmarkMO: NSManagedObject {
 
         return NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext:context,
                                           sectionNameKeyPath: nil, cacheName: nil)
+    }
+    
+    public func asDictionary(deviceId: [Int]?, action: Int?) -> [String: Any] {
+        return SyncBookmark(record: self, deviceId: deviceId, action: action).dictionaryRepresentation()
+    }
+    
+    // Syncable
+    public func update(syncRecord record: SyncRecord?) {
+        guard let bookmark = record as? SyncBookmark, let site = bookmark.site else { return }
+        title = site.title
+        update(customTitle: site.customTitle, url: site.location)
+        lastVisited = Date(timeIntervalSince1970:(Double(site.lastAccessedTime ?? 0) / 1000.0))
+        // FIXME: Sync
+        // syncParentUUID = bookmark.parentFolderObjectId
+        // No auto-save, must be handled by caller if desired
+    }
+    
+    public static func add(rootObject root: SyncRecord?, save: Bool, sendToSync: Bool, context: NSManagedObjectContext) -> Syncable? {
+        // Explicit parentFolder to force method decision
+        return add(rootObject: root as? SyncBookmark, save: save, sendToSync: sendToSync, parentFolder: nil, context: context)
+    }
+    
+    // Should not be used for updating, modify to increase protection
+    public class func add(rootObject root: SyncBookmark?, save: Bool = false, sendToSync: Bool = false, parentFolder: BookmarkMO? = nil, context: NSManagedObjectContext) -> BookmarkMO? {
+        let bookmark = root
+        let site = bookmark?.site
+        
+        var bk: BookmarkMO!
+        if let id = root?.objectId, let foundbks = BookmarkMO.get(syncUUIDs: [id], context: context) as? [BookmarkMO], let foundBK = foundbks.first {
+            // Found a pre-existing bookmark, cannot add duplicate
+            // Turn into 'update' record instead
+            bk = foundBK
+        } else {
+            bk = BookmarkMO(entity: BookmarkMO.entity(context: context), insertInto: context)
+        }
+        
+        // FIXME: WebServer?
+        /*
+         // Should probably have visual indication before reaching this point
+         if site?.location?.startsWith(WebServer.sharedInstance.base) ?? false {
+         return nil
+         }
+         */
+        
+        // Use new values, fallback to previous values
+        bk.url = site?.location ?? bk.url
+        bk.title = site?.title ?? bk.title
+        bk.customTitle = site?.customTitle ?? bk.customTitle // TODO: Check against empty titles
+        bk.isFavorite = bookmark?.isFavorite ?? bk.isFavorite
+        bk.isFolder = bookmark?.isFolder ?? bk.isFolder
+        // FIXME: Sync
+        // bk.syncUUID = root?.objectId ?? bk.syncUUID ?? SyncCrypto.shared.uniqueSerialBytes(count: 16)
+        bk.created = site?.creationNativeDate ?? Date()
+        bk.lastVisited = site?.lastAccessedNativeDate ?? Date()
+        
+        if let location = site?.location, let url = URL(string: location) {
+            bk.domain = DomainMO.getOrCreateForUrl(url, context: context)
+        }
+        
+        // Must assign both, in cae parentFolder does not exist, need syncParentUUID to attach later
+        bk.parentFolder = parentFolder
+        // FIXME: Sync
+        // bk.syncParentUUID = bookmark?.parentFolderObjectId ?? bk.syncParentUUID
+        
+        // For folders that are saved _with_ a syncUUID, there may be child bookmarks
+        //  (e.g. sync sent down bookmark before parent folder)
+        if bk.isFolder {
+            // Find all children and attach them
+            if let children = BookmarkMO.getChildren(forFolderUUID: bk.syncUUID, context: context) {
+                
+                // TODO: Setup via bk.children property instead
+                children.forEach { $0.parentFolder = bk }
+            }
+        }
+        
+        if save {
+            DataManager.saveContext(context: context)
+        }
+        
+        // FIXME: Sync
+        /*
+         if sendToSync && !bk.isFavorite {
+         // Submit to server
+         Sync.shared.sendSyncRecords(action: .create, records: [bk])
+         }
+         */
+        
+        return bk
+    }
+    
+    // TODO: DELETE
+    // Aways uses main context
+    @discardableResult class func add(url: URL?,
+                                      title: String?,
+                                      customTitle: String? = nil, // Folders only use customTitle
+        parentFolder:BookmarkMO? = nil,
+        isFolder: Bool = false,
+        isFavorite: Bool = false) -> BookmarkMO? {
+        
+        let site = SyncSite()
+        site.title = title
+        site.customTitle = customTitle
+        site.location = url?.absoluteString
+        
+        let bookmark = SyncBookmark()
+        bookmark.isFavorite = isFavorite
+        bookmark.isFolder = isFolder
+        bookmark.parentFolderObjectId = parentFolder?.syncUUID
+        bookmark.site = site
+        
+        let context = isFavorite ? DataManager.shared.mainThreadContext : DataManager.shared.workerContext
+        
+        // Fetching bookmarks happen on mainThreadContext but we add it on worker context to work around the 
+        // duplicated bookmarks bug.
+        // To avoid CoreData crashes we get the parent folder on worker context via its objectID.
+        // Favorites can't be nested, this is only relevant for bookmarks.
+        var folderOnWorkerContext: BookmarkMO?
+        if let folder = parentFolder {
+            folderOnWorkerContext = (try? context.existingObject(with: folder.objectID)) as? BookmarkMO
+        } 
+        
+        // Using worker context here, this propogates up, and merged into main.
+        // There is some odd issue with duplicates when using main thread
+        return self.add(rootObject: bookmark, save: true, sendToSync: true, parentFolder: folderOnWorkerContext, context: context)
+    }
+    
+    static func getChildren(forFolderUUID syncUUID: [Int]?, ignoreFolders: Bool = false, context: NSManagedObjectContext,
+                            orderSort: Bool = false) -> [BookmarkMO]? {
+        guard let searchableUUID = SyncHelpers.syncDisplay(fromUUID: syncUUID) else {
+            return nil
+        }
+        
+        // New bookmarks are added with order 0, we are looking at created date then
+        let sortRules = [NSSortDescriptor(key:"order", ascending: true), NSSortDescriptor(key:"created", ascending: false)]
+        let sort = orderSort ? sortRules : nil
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
+        fetchRequest.entity = BookmarkMO.entity(context: context)
+        fetchRequest.predicate =  NSPredicate(format: "syncParentDisplayUUID == %@ and isFolder == %@", searchableUUID, ignoreFolders ? "true" : "false")
+        fetchRequest.sortDescriptors = sort
+        
+        do {
+            let results = try context.fetch(fetchRequest) as? [BookmarkMO]
+            return results
+        } catch {
+            let fetchError = error as NSError
+            print(fetchError)
+        }
+        return nil
     }
     
     public func update(customTitle: String?, url: String?, save: Bool = false) {
@@ -182,4 +331,3 @@ extension BookmarkMO {
         return nil
     }
 }
-

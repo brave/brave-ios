@@ -8,6 +8,14 @@
 
 /* Begin PBXBuildFile section */
 		03CCC9181AF05E7300DBF30D /* RelativeDatesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03CCC9171AF05E7300DBF30D /* RelativeDatesTests.swift */; };
+		0A1E466E20A059A7004CDE5A /* Syncable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A1E466C20A059A6004CDE5A /* Syncable.swift */; };
+		0A1E466F20A059A7004CDE5A /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A1E466D20A059A7004CDE5A /* Device.swift */; };
+		0A1E467620A059D2004CDE5A /* SyncResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A1E467120A059D1004CDE5A /* SyncResponse.swift */; };
+		0A1E467720A059D2004CDE5A /* SyncSite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A1E467220A059D2004CDE5A /* SyncSite.swift */; };
+		0A1E467820A059D2004CDE5A /* SyncDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A1E467320A059D2004CDE5A /* SyncDevice.swift */; };
+		0A1E467920A059D2004CDE5A /* SyncBookmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A1E467420A059D2004CDE5A /* SyncBookmark.swift */; };
+		0A1E467A20A059D2004CDE5A /* SyncRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A1E467520A059D2004CDE5A /* SyncRecord.swift */; };
+		0A1E467C20A059F0004CDE5A /* Sync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A1E467B20A059F0004CDE5A /* Sync.swift */; };
 		0B1C05D71A798B1F004C78B0 /* UIImageViewAligned.m in Sources */ = {isa = PBXBuildFile; fileRef = 0B1C05D61A798B1F004C78B0 /* UIImageViewAligned.m */; };
 		0B21E8061E26CCB7000C8779 /* EarlGrey.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 0B21E8051E26CCB7000C8779 /* EarlGrey.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		0B305E1B1E3A98A900BE0767 /* BookmarkingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B305E1A1E3A98A900BE0767 /* BookmarkingTests.swift */; };
@@ -108,7 +116,7 @@
 		289A4C141C4EB90600A460E3 /* StorageTestUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 289A4C121C4EB90600A460E3 /* StorageTestUtils.swift */; };
 		28A17B671BEC727500BC14ED /* Downloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A17B661BEC727500BC14ED /* Downloader.swift */; };
 		28AA941D1B97DCA800703DC6 /* BookmarkPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AA941C1B97DCA800703DC6 /* BookmarkPayload.swift */; };
-		28B62ACE1BC745E7004A585A /* Syncable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28B62ACD1BC745E7004A585A /* Syncable.swift */; };
+		28B62ACE1BC745E7004A585A /* FFSyncable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28B62ACD1BC745E7004A585A /* FFSyncable.swift */; };
 		28C28BFD1C51A3B900D5460E /* Merging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28C28BFC1C51A3B900D5460E /* Merging.swift */; };
 		28C4AB721AD42D4300D9ACE3 /* Clients.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28C4AB711AD42D4300D9ACE3 /* Clients.swift */; };
 		28C8B7851C852535006D8318 /* BookmarksPanelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28C8B7841C852535006D8318 /* BookmarksPanelTests.swift */; };
@@ -1394,6 +1402,14 @@
 
 /* Begin PBXFileReference section */
 		03CCC9171AF05E7300DBF30D /* RelativeDatesTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RelativeDatesTests.swift; sourceTree = "<group>"; };
+		0A1E466C20A059A6004CDE5A /* Syncable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Syncable.swift; sourceTree = "<group>"; };
+		0A1E466D20A059A7004CDE5A /* Device.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Device.swift; sourceTree = "<group>"; };
+		0A1E467120A059D1004CDE5A /* SyncResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncResponse.swift; sourceTree = "<group>"; };
+		0A1E467220A059D2004CDE5A /* SyncSite.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncSite.swift; sourceTree = "<group>"; };
+		0A1E467320A059D2004CDE5A /* SyncDevice.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncDevice.swift; sourceTree = "<group>"; };
+		0A1E467420A059D2004CDE5A /* SyncBookmark.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncBookmark.swift; sourceTree = "<group>"; };
+		0A1E467520A059D2004CDE5A /* SyncRecord.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncRecord.swift; sourceTree = "<group>"; };
+		0A1E467B20A059F0004CDE5A /* Sync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sync.swift; sourceTree = "<group>"; };
 		0B1C05D51A798B1F004C78B0 /* UIImageViewAligned.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIImageViewAligned.h; sourceTree = "<group>"; };
 		0B1C05D61A798B1F004C78B0 /* UIImageViewAligned.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UIImageViewAligned.m; sourceTree = "<group>"; };
 		0B21E8051E26CCB7000C8779 /* EarlGrey.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EarlGrey.framework; path = Carthage/Build/iOS/EarlGrey.framework; sourceTree = "<group>"; };
@@ -1480,7 +1496,7 @@
 		28A17B661BEC727500BC14ED /* Downloader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Downloader.swift; path = Synchronizers/Downloader.swift; sourceTree = "<group>"; };
 		28A6CE891AC082E200C1A2D4 /* UtilsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UtilsTests.swift; sourceTree = "<group>"; };
 		28AA941C1B97DCA800703DC6 /* BookmarkPayload.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkPayload.swift; sourceTree = "<group>"; };
-		28B62ACD1BC745E7004A585A /* Syncable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Syncable.swift; sourceTree = "<group>"; };
+		28B62ACD1BC745E7004A585A /* FFSyncable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FFSyncable.swift; sourceTree = "<group>"; };
 		28C077971A3B064000834FE5 /* CryptoTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CryptoTests.swift; path = SyncTests/CryptoTests.swift; sourceTree = "<group>"; };
 		28C0779D1A3B066000834FE5 /* RecordTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RecordTests.swift; path = SyncTests/RecordTests.swift; sourceTree = "<group>"; };
 		28C28BFC1C51A3B900D5460E /* Merging.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Merging.swift; sourceTree = "<group>"; };
@@ -2374,6 +2390,27 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0A1E465920A05941004CDE5A /* BraveSync */ = {
+			isa = PBXGroup;
+			children = (
+				0A1E467020A059BE004CDE5A /* fetched_models */,
+				0A1E467B20A059F0004CDE5A /* Sync.swift */,
+			);
+			path = BraveSync;
+			sourceTree = "<group>";
+		};
+		0A1E467020A059BE004CDE5A /* fetched_models */ = {
+			isa = PBXGroup;
+			children = (
+				0A1E467420A059D2004CDE5A /* SyncBookmark.swift */,
+				0A1E467320A059D2004CDE5A /* SyncDevice.swift */,
+				0A1E467520A059D2004CDE5A /* SyncRecord.swift */,
+				0A1E467120A059D1004CDE5A /* SyncResponse.swift */,
+				0A1E467220A059D2004CDE5A /* SyncSite.swift */,
+			);
+			path = fetched_models;
+			sourceTree = "<group>";
+		};
 		0B1C05D41A798B1F004C78B0 /* UIImageViewAligned */ = {
 			isa = PBXGroup;
 			children = (
@@ -2685,6 +2722,8 @@
 			isa = PBXGroup;
 			children = (
 				5C56FF4A202E4018009FF126 /* CoreData */,
+				0A1E466D20A059A7004CDE5A /* Device.swift */,
+				0A1E466C20A059A6004CDE5A /* Syncable.swift */,
 				74B195431CF503FC007F36EF /* RecentlyClosedTabs.swift */,
 				2FCAE33D1ABB5F1800877008 /* Storage-Bridging-Header.h */,
 				D37DE2821CA2047500A5EC69 /* CertStore.swift */,
@@ -2706,7 +2745,7 @@
 				2829D39F1C2F0AD400DCF931 /* Sharing.swift */,
 				2FCAE2481ABB531100877008 /* Site.swift */,
 				0B54BD181B698B7C004C822C /* SuggestedSites.swift */,
-				28B62ACD1BC745E7004A585A /* Syncable.swift */,
+				28B62ACD1BC745E7004A585A /* FFSyncable.swift */,
 				7BF5A1E91B41640500EA9DD8 /* SyncQueue.swift */,
 				2FCAE25C1ABB531100877008 /* Visit.swift */,
 				28532D301C483DEB000072D9 /* Bookmarks */,
@@ -3585,6 +3624,7 @@
 				E6C191D51E38F7B7000A213B /* Cartfile.resolved */,
 				2FA435FC1ABB83B4008031D1 /* Account */,
 				2FA4360B1ABB83B4008031D1 /* AccountTests */,
+				0A1E465920A05941004CDE5A /* BraveSync */,
 				F84B21C01A090F8100AAB793 /* Client */,
 				F84B21D61A090F8100AAB793 /* ClientTests */,
 				F8708D1E1A0970990051AB07 /* Extensions */,
@@ -5320,6 +5360,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0A1E467920A059D2004CDE5A /* SyncBookmark.swift in Sources */,
 				5CA9770C2035FB4C00181058 /* HistoryMO.swift in Sources */,
 				2FCAE2621ABB531100877008 /* History.swift in Sources */,
 				28126F6E1C2F94F9006466CC /* SQLiteBookmarksModel.swift in Sources */,
@@ -5334,17 +5375,20 @@
 				28C4AB721AD42D4300D9ACE3 /* Clients.swift in Sources */,
 				D0131B4D1F3CF7D8000CDE86 /* SQLiteFavicons.swift in Sources */,
 				28126F741C2F96F1006466CC /* SQLiteBookmarksResetting.swift in Sources */,
-				28B62ACE1BC745E7004A585A /* Syncable.swift in Sources */,
+				28B62ACE1BC745E7004A585A /* FFSyncable.swift in Sources */,
 				74B195441CF503FC007F36EF /* RecentlyClosedTabs.swift in Sources */,
 				E65075C21E37F956006961AC /* ExtensionUtils.swift in Sources */,
 				7BF5A1EA1B41640500EA9DD8 /* SyncQueue.swift in Sources */,
 				2852B8441C51996B00591EAC /* Trees.swift in Sources */,
+				0A1E466E20A059A7004CDE5A /* Syncable.swift in Sources */,
 				E677F0541D94247300ECF1FB /* Metadata.swift in Sources */,
 				28E08C991AF44EF9009BA2FA /* SQLiteHistory.swift in Sources */,
 				285D3B901B4386520035FD22 /* SQLiteQueue.swift in Sources */,
+				0A1E467720A059D2004CDE5A /* SyncSite.swift in Sources */,
 				28532D321C483E3D000072D9 /* CompletionOps.swift in Sources */,
 				2FCAE25D1ABB531100877008 /* Bookmarks.swift in Sources */,
 				394CF6CF1BAA493C00906917 /* DefaultSuggestedSites.swift in Sources */,
+				0A1E467C20A059F0004CDE5A /* Sync.swift in Sources */,
 				5CA977552037857B00181058 /* TabMO.swift in Sources */,
 				2FCAE2781ABB531100877008 /* Visit.swift in Sources */,
 				5CA9770B2035FB4C00181058 /* BookmarkMO.swift in Sources */,
@@ -5366,14 +5410,18 @@
 				2FCAE2681ABB531100877008 /* BrowserDB.swift in Sources */,
 				283586FD1C73F18E00A55435 /* CachingItemSource.swift in Sources */,
 				5CA977542037857B00181058 /* TopSiteMO.swift in Sources */,
+				0A1E466F20A059A7004CDE5A /* Device.swift in Sources */,
 				D0B29EE01F460BDF00C7CEFC /* LoginsSchema.swift in Sources */,
 				2FCAE2651ABB531100877008 /* RemoteTabs.swift in Sources */,
 				2FCAE2601ABB531100877008 /* Favicons.swift in Sources */,
 				28126F771C2F9833006466CC /* SQLiteBookmarksBase.swift in Sources */,
 				2FCAE2771ABB531100877008 /* SwiftData.swift in Sources */,
+				0A1E467620A059D2004CDE5A /* SyncResponse.swift in Sources */,
 				5C3787CB20321DB1009E6BCB /* Model.xcdatamodeld in Sources */,
 				2FCAE25F1ABB531100877008 /* Cursor.swift in Sources */,
+				0A1E467820A059D2004CDE5A /* SyncDevice.swift in Sources */,
 				28302E401AF0747800521E2E /* DatabaseError.swift in Sources */,
+				0A1E467A20A059D2004CDE5A /* SyncRecord.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

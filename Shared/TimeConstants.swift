@@ -98,6 +98,10 @@ extension Date {
     public func toRFC822String() -> String {
         return rfc822DateFormatter.string(from: self)
     }
+    
+    public func toTimestamp() -> Timestamp {
+        return UInt64(self.timeIntervalSince1970 * 1000)
+    }
 }
 
 let MaxTimestampAsDouble: Double = Double(UInt64.max)
