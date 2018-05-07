@@ -745,7 +745,7 @@ class SendAnonymousUsageDataSetting: BoolSetting {
         )
     }
 
-    private static func createStatusText() -> NSAttributedString {
+    class private func createStatusText() -> NSAttributedString {
         let statusText = NSMutableAttributedString()
         statusText.append(NSAttributedString(string: Strings.SendUsageSettingMessage, attributes: [NSForegroundColorAttributeName: SettingsUX.TableViewHeaderTextColor]))
         statusText.append(NSAttributedString(string: " "))
