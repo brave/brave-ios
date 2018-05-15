@@ -486,13 +486,6 @@ class BrowserViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        // On iPhone, if we are about to show the On-Boarding, blank out the tab so that it does
-        // not flash before we present. This change of alpha also participates in the animation when
-        // the intro view is dismissed.
-        if UIDevice.current.userInterfaceIdiom == .phone {
-            self.view.alpha = (profile.prefs.intForKey(IntroViewControllerSeenProfileKey) != nil) ? 1.0 : 0.0
-        }
-
         if !displayedRestoreTabsAlert && !cleanlyBackgrounded() && crashedLastLaunch() {
             displayedRestoreTabsAlert = true
             showRestoreTabsAlert()
@@ -537,7 +530,6 @@ class BrowserViewController: UIViewController {
     }
 
     override func viewDidAppear(_ animated: Bool) {
-        presentIntroViewController()
         self.webViewContainerToolbar.isHidden = false
 
         screenshotHelper.viewIsVisible = true
@@ -1697,11 +1689,11 @@ extension BrowserViewController: HomePanelViewControllerDelegate {
     }
 
     func homePanelViewControllerDidRequestToCreateAccount(_ homePanelViewController: HomePanelViewController) {
-        presentSignInViewController() // TODO UX Right now the flow for sign in and create account is the same
+        // TODO: Remove this
     }
 
     func homePanelViewControllerDidRequestToSignIn(_ homePanelViewController: HomePanelViewController) {
-        presentSignInViewController() // TODO UX Right now the flow for sign in and create account is the same
+        // TODO: Remove this
     }
 
     func homePanelViewControllerDidRequestToOpenInNewTab(_ url: URL, isPrivate: Bool) {
@@ -2275,83 +2267,6 @@ extension BrowserViewController: ReaderModeBarViewDelegate {
             }
         }
     }
-}
-
-extension BrowserViewController: IntroViewControllerDelegate {
-    @discardableResult func presentIntroViewController(_ force: Bool = false, animated: Bool = true) -> Bool {
-        if let deeplink = self.profile.prefs.stringForKey("AdjustDeeplinkKey"), let url = URL(string: deeplink) {
-            self.launchFxAFromDeeplinkURL(url)
-            return true
-        }
-        
-        if force || profile.prefs.intForKey(IntroViewControllerSeenProfileKey) == nil {
-            let introViewController = IntroViewController()
-            introViewController.delegate = self
-            // On iPad we present it modally in a controller
-            if topTabsVisible {
-                introViewController.preferredContentSize = CGSize(width: IntroViewControllerUX.Width, height: IntroViewControllerUX.Height)
-                introViewController.modalPresentationStyle = UIModalPresentationStyle.formSheet
-            }
-            present(introViewController, animated: animated) {
-                // On first run (and forced) open up the homepage in the background.
-                if let homePageURL = HomePageAccessors.getHomePage(self.profile.prefs), let tab = self.tabManager.selectedTab, DeviceInfo.hasConnectivity() {
-                    tab.loadRequest(URLRequest(url: homePageURL))
-                }
-            }
-
-            return true
-        }
-
-        return false
-    }
-    
-    func launchFxAFromDeeplinkURL(_ url: URL) {
-        self.profile.prefs.removeObjectForKey("AdjustDeeplinkKey")
-        var query = url.getQuery()
-        query["entrypoint"] = "adjust_deepklink_ios"
-        let fxaParams: FxALaunchParams
-        fxaParams = FxALaunchParams(query: query)
-        self.presentSignInViewController(fxaParams)
-    }
-
-    func introViewControllerDidFinish(_ introViewController: IntroViewController, requestToLogin: Bool) {
-        self.profile.prefs.setInt(1, forKey: IntroViewControllerSeenProfileKey)
-        introViewController.dismiss(animated: true) { finished in
-            if self.navigationController?.viewControllers.count ?? 0 > 1 {
-                _ = self.navigationController?.popToRootViewController(animated: true)
-            }
-            
-            if requestToLogin {
-                self.presentSignInViewController()
-            }
-        }
-    }
-
-    func presentSignInViewController(_ fxaOptions: FxALaunchParams? = nil) {
-        // Show the settings page if we have already signed in. If we haven't then show the signin page
-        let vcToPresent: UIViewController
-        if profile.hasAccount() {
-            let settingsTableViewController = AppSettingsTableViewController()
-            settingsTableViewController.profile = profile
-            settingsTableViewController.tabManager = tabManager
-            vcToPresent = settingsTableViewController
-        } else {
-            let signInVC = FxAContentViewController(profile: profile, fxaOptions: fxaOptions)
-            signInVC.delegate = self            
-            signInVC.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.done, target: self, action: #selector(BrowserViewController.dismissSignInViewController))
-            vcToPresent = signInVC
-        }
-
-        let settingsNavigationController = SettingsNavigationController(rootViewController: vcToPresent)
-		settingsNavigationController.modalPresentationStyle = .formSheet
-        settingsNavigationController.navigationBar.isTranslucent = false
-        self.present(settingsNavigationController, animated: true, completion: nil)
-    }
-
-    func dismissSignInViewController() {
-        self.dismiss(animated: true, completion: nil)
-    }
-
 }
 
 extension BrowserViewController: FxAContentViewControllerDelegate {
