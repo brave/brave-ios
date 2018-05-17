@@ -292,6 +292,28 @@
 		5D1DC52520AC9AFB00905E5A /* Data.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D1DC51520AC9AFA00905E5A /* Data.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5D1DC52820AC9AFB00905E5A /* Data.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1DC51320AC9AF900905E5A /* Data.framework */; };
 		5D1DC52920AC9AFB00905E5A /* Data.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1DC51320AC9AF900905E5A /* Data.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		5D1DC55420AE004600905E5A /* WebsitePresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC54120AE004600905E5A /* WebsitePresentable.swift */; };
+		5D1DC55520AE004600905E5A /* TabMO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC54220AE004600905E5A /* TabMO.swift */; };
+		5D1DC55620AE004600905E5A /* DataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC54320AE004600905E5A /* DataController.swift */; };
+		5D1DC55720AE004600905E5A /* TopSite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC54420AE004600905E5A /* TopSite.swift */; };
+		5D1DC55820AE004600905E5A /* MigrateData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC54520AE004600905E5A /* MigrateData.swift */; };
+		5D1DC55920AE004600905E5A /* Bookmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC54620AE004600905E5A /* Bookmark.swift */; };
+		5D1DC55A20AE004600905E5A /* FaviconMO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC54720AE004600905E5A /* FaviconMO.swift */; };
+		5D1DC55B20AE004600905E5A /* Domain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC54820AE004600905E5A /* Domain.swift */; };
+		5D1DC55C20AE004600905E5A /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC54920AE004600905E5A /* Device.swift */; };
+		5D1DC55D20AE004600905E5A /* History.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC54A20AE004600905E5A /* History.swift */; };
+		5D1DC55E20AE004600905E5A /* Syncable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC54B20AE004600905E5A /* Syncable.swift */; };
+		5D1DC55F20AE004600905E5A /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC54C20AE004600905E5A /* Model.xcdatamodeld */; };
+		5D1DC56B20AE005400905E5A /* SyncCrypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC56120AE005400905E5A /* SyncCrypto.swift */; };
+		5D1DC56C20AE005400905E5A /* SyncShowCodewords.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC56220AE005400905E5A /* SyncShowCodewords.swift */; };
+		5D1DC56D20AE005400905E5A /* Sync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC56320AE005400905E5A /* Sync.swift */; };
+		5D1DC56E20AE005400905E5A /* SyncBookmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC56420AE005400905E5A /* SyncBookmark.swift */; };
+		5D1DC56F20AE005400905E5A /* SyncResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC56520AE005400905E5A /* SyncResponse.swift */; };
+		5D1DC57020AE005400905E5A /* SyncRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC56620AE005400905E5A /* SyncRecord.swift */; };
+		5D1DC57120AE005400905E5A /* SyncDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC56720AE005400905E5A /* SyncDevice.swift */; };
+		5D1DC57220AE005400905E5A /* JSInjector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC56820AE005400905E5A /* JSInjector.swift */; };
+		5D1DC57320AE005400905E5A /* SyncSite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC56920AE005400905E5A /* SyncSite.swift */; };
+		5D1DC57420AE005400905E5A /* ios-sync.js in Resources */ = {isa = PBXBuildFile; fileRef = 5D1DC56A20AE005400905E5A /* ios-sync.js */; };
 		742A56391D80B54A00BDB803 /* PhotonActionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 742A56381D80B54A00BDB803 /* PhotonActionSheet.swift */; };
 		744B0FFE1B4F172E00100422 /* ToolbarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 744B0FFD1B4F172E00100422 /* ToolbarTests.swift */; };
 		744ED5611DBFEB8D00A2B5BE /* MailtoLinkHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 744ED5601DBFEB8D00A2B5BE /* MailtoLinkHandler.swift */; };
@@ -1462,6 +1484,34 @@
 		5D1DC51B20AC9AFA00905E5A /* DataTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DataTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		5D1DC52220AC9AFB00905E5A /* DataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataTests.swift; sourceTree = "<group>"; };
 		5D1DC52420AC9AFB00905E5A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		5D1DC54120AE004600905E5A /* WebsitePresentable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebsitePresentable.swift; sourceTree = "<group>"; };
+		5D1DC54220AE004600905E5A /* TabMO.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabMO.swift; sourceTree = "<group>"; };
+		5D1DC54320AE004600905E5A /* DataController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataController.swift; sourceTree = "<group>"; };
+		5D1DC54420AE004600905E5A /* TopSite.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TopSite.swift; sourceTree = "<group>"; };
+		5D1DC54520AE004600905E5A /* MigrateData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MigrateData.swift; sourceTree = "<group>"; };
+		5D1DC54620AE004600905E5A /* Bookmark.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Bookmark.swift; sourceTree = "<group>"; };
+		5D1DC54720AE004600905E5A /* FaviconMO.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FaviconMO.swift; sourceTree = "<group>"; };
+		5D1DC54820AE004600905E5A /* Domain.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Domain.swift; sourceTree = "<group>"; };
+		5D1DC54920AE004600905E5A /* Device.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Device.swift; sourceTree = "<group>"; };
+		5D1DC54A20AE004600905E5A /* History.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = History.swift; sourceTree = "<group>"; };
+		5D1DC54B20AE004600905E5A /* Syncable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Syncable.swift; sourceTree = "<group>"; };
+		5D1DC54D20AE004600905E5A /* Model7.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model7.xcdatamodel; sourceTree = "<group>"; };
+		5D1DC54E20AE004600905E5A /* Model2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model2.xcdatamodel; sourceTree = "<group>"; };
+		5D1DC54F20AE004600905E5A /* Model4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model4.xcdatamodel; sourceTree = "<group>"; };
+		5D1DC55020AE004600905E5A /* Model3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model3.xcdatamodel; sourceTree = "<group>"; };
+		5D1DC55120AE004600905E5A /* Model6.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model6.xcdatamodel; sourceTree = "<group>"; };
+		5D1DC55220AE004600905E5A /* Model5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model5.xcdatamodel; sourceTree = "<group>"; };
+		5D1DC55320AE004600905E5A /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
+		5D1DC56120AE005400905E5A /* SyncCrypto.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncCrypto.swift; sourceTree = "<group>"; };
+		5D1DC56220AE005400905E5A /* SyncShowCodewords.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncShowCodewords.swift; sourceTree = "<group>"; };
+		5D1DC56320AE005400905E5A /* Sync.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sync.swift; sourceTree = "<group>"; };
+		5D1DC56420AE005400905E5A /* SyncBookmark.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncBookmark.swift; sourceTree = "<group>"; };
+		5D1DC56520AE005400905E5A /* SyncResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncResponse.swift; sourceTree = "<group>"; };
+		5D1DC56620AE005400905E5A /* SyncRecord.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncRecord.swift; sourceTree = "<group>"; };
+		5D1DC56720AE005400905E5A /* SyncDevice.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncDevice.swift; sourceTree = "<group>"; };
+		5D1DC56820AE005400905E5A /* JSInjector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSInjector.swift; sourceTree = "<group>"; };
+		5D1DC56920AE005400905E5A /* SyncSite.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncSite.swift; sourceTree = "<group>"; };
+		5D1DC56A20AE005400905E5A /* ios-sync.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "ios-sync.js"; sourceTree = "<group>"; };
 		742A56381D80B54A00BDB803 /* PhotonActionSheet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotonActionSheet.swift; sourceTree = "<group>"; };
 		744B0FFD1B4F172E00100422 /* ToolbarTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ToolbarTests.swift; sourceTree = "<group>"; };
 		744ED5601DBFEB8D00A2B5BE /* MailtoLinkHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MailtoLinkHandler.swift; sourceTree = "<group>"; };
@@ -2653,6 +2703,8 @@
 		5D1DC51420AC9AFA00905E5A /* Data */ = {
 			isa = PBXGroup;
 			children = (
+				5D1DC54020AE004600905E5A /* models */,
+				5D1DC56020AE005400905E5A /* sync */,
 				5D1DC51520AC9AFA00905E5A /* Data.h */,
 				5D1DC51620AC9AFA00905E5A /* Info.plist */,
 			);
@@ -2666,6 +2718,42 @@
 				5D1DC52420AC9AFB00905E5A /* Info.plist */,
 			);
 			path = DataTests;
+			sourceTree = "<group>";
+		};
+		5D1DC54020AE004600905E5A /* models */ = {
+			isa = PBXGroup;
+			children = (
+				5D1DC54120AE004600905E5A /* WebsitePresentable.swift */,
+				5D1DC54220AE004600905E5A /* TabMO.swift */,
+				5D1DC54320AE004600905E5A /* DataController.swift */,
+				5D1DC54420AE004600905E5A /* TopSite.swift */,
+				5D1DC54520AE004600905E5A /* MigrateData.swift */,
+				5D1DC54620AE004600905E5A /* Bookmark.swift */,
+				5D1DC54720AE004600905E5A /* FaviconMO.swift */,
+				5D1DC54820AE004600905E5A /* Domain.swift */,
+				5D1DC54920AE004600905E5A /* Device.swift */,
+				5D1DC54A20AE004600905E5A /* History.swift */,
+				5D1DC54B20AE004600905E5A /* Syncable.swift */,
+				5D1DC54C20AE004600905E5A /* Model.xcdatamodeld */,
+			);
+			path = models;
+			sourceTree = "<group>";
+		};
+		5D1DC56020AE005400905E5A /* sync */ = {
+			isa = PBXGroup;
+			children = (
+				5D1DC56120AE005400905E5A /* SyncCrypto.swift */,
+				5D1DC56220AE005400905E5A /* SyncShowCodewords.swift */,
+				5D1DC56320AE005400905E5A /* Sync.swift */,
+				5D1DC56420AE005400905E5A /* SyncBookmark.swift */,
+				5D1DC56520AE005400905E5A /* SyncResponse.swift */,
+				5D1DC56620AE005400905E5A /* SyncRecord.swift */,
+				5D1DC56720AE005400905E5A /* SyncDevice.swift */,
+				5D1DC56820AE005400905E5A /* JSInjector.swift */,
+				5D1DC56920AE005400905E5A /* SyncSite.swift */,
+				5D1DC56A20AE005400905E5A /* ios-sync.js */,
+			);
+			path = sync;
 			sourceTree = "<group>";
 		};
 		7B0B1B9C1C1B69F500DF4AB5 /* Extensions */ = {
@@ -4476,6 +4564,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5D1DC57420AE005400905E5A /* ios-sync.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5034,6 +5123,27 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5D1DC56E20AE005400905E5A /* SyncBookmark.swift in Sources */,
+				5D1DC55A20AE004600905E5A /* FaviconMO.swift in Sources */,
+				5D1DC55720AE004600905E5A /* TopSite.swift in Sources */,
+				5D1DC55820AE004600905E5A /* MigrateData.swift in Sources */,
+				5D1DC55C20AE004600905E5A /* Device.swift in Sources */,
+				5D1DC56C20AE005400905E5A /* SyncShowCodewords.swift in Sources */,
+				5D1DC55D20AE004600905E5A /* History.swift in Sources */,
+				5D1DC57120AE005400905E5A /* SyncDevice.swift in Sources */,
+				5D1DC55420AE004600905E5A /* WebsitePresentable.swift in Sources */,
+				5D1DC55620AE004600905E5A /* DataController.swift in Sources */,
+				5D1DC56F20AE005400905E5A /* SyncResponse.swift in Sources */,
+				5D1DC57320AE005400905E5A /* SyncSite.swift in Sources */,
+				5D1DC55520AE004600905E5A /* TabMO.swift in Sources */,
+				5D1DC55E20AE004600905E5A /* Syncable.swift in Sources */,
+				5D1DC56D20AE005400905E5A /* Sync.swift in Sources */,
+				5D1DC57220AE005400905E5A /* JSInjector.swift in Sources */,
+				5D1DC55920AE004600905E5A /* Bookmark.swift in Sources */,
+				5D1DC55B20AE004600905E5A /* Domain.swift in Sources */,
+				5D1DC56B20AE005400905E5A /* SyncCrypto.swift in Sources */,
+				5D1DC55F20AE004600905E5A /* Model.xcdatamodeld in Sources */,
+				5D1DC57020AE005400905E5A /* SyncRecord.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9192,6 +9302,25 @@
 			defaultConfigurationName = Fennec;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		5D1DC54C20AE004600905E5A /* Model.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				5D1DC54D20AE004600905E5A /* Model7.xcdatamodel */,
+				5D1DC54E20AE004600905E5A /* Model2.xcdatamodel */,
+				5D1DC54F20AE004600905E5A /* Model4.xcdatamodel */,
+				5D1DC55020AE004600905E5A /* Model3.xcdatamodel */,
+				5D1DC55120AE004600905E5A /* Model6.xcdatamodel */,
+				5D1DC55220AE004600905E5A /* Model5.xcdatamodel */,
+				5D1DC55320AE004600905E5A /* Model.xcdatamodel */,
+			);
+			currentVersion = 5D1DC54D20AE004600905E5A /* Model7.xcdatamodel */;
+			path = Model.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = F84B21B61A090F8100AAB793 /* Project object */;
 }
