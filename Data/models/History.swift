@@ -3,6 +3,7 @@
 
 import CoreData
 import Shared
+import BraveShared
 
 private func getDate(_ dayOffset: Int) -> Date {
     let calendar = Calendar(identifier: Calendar.Identifier.gregorian)
@@ -66,7 +67,8 @@ class History: NSManagedObject, WebsitePresentable {
             item?.title = title
             item?.domain?.visits += 1
             item?.visitedOn = Date()
-            item?.sectionIdentifier = Strings.Today
+            // BRAVE TODO:
+//            item?.sectionIdentifier = BraveStrings.Today
 
             DataController.saveContext(context: context)
         }

@@ -5,6 +5,8 @@ import CoreData
 import Foundation
 import FastImageCache
 import Shared
+import WebKit
+import XCGLogger
 
 typealias SavedTab = (id: String, title: String, url: String, isSelected: Bool, order: Int16, screenshot: UIImage?, history: [String], historyIndex: Int16)
 private let log = Logger.browserLogger
@@ -36,11 +38,12 @@ class TabMO: NSManagedObject {
     
     override func prepareForDeletion() {
         super.prepareForDeletion()
-        
+
+        // BRAVE TODO: uncomment
         // Remove cached image
-        if let url = imageUrl, !PrivateBrowsing.singleton.isOn {
-            ImageCache.shared.remove(url, type: .portrait)
-        }
+//        if let url = imageUrl, !PrivateBrowsing.singleton.isOn {
+//            ImageCache.shared.remove(url, type: .portrait)
+//        }
     }
 
     // Currently required, because not `syncable`
@@ -53,7 +56,8 @@ class TabMO: NSManagedObject {
         // TODO: replace with logic to create sync uuid then buble up new uuid to browser.
         tab.syncUUID = UUID().uuidString
         tab.title = Strings.New_Tab
-        tab.isPrivate = PrivateBrowsing.singleton.isOn
+        // BRAVE TODO:
+//        tab.isPrivate = PrivateBrowsing.singleton.isOn
         DataController.saveContext(context: context)
         return tab
     }
@@ -128,36 +132,33 @@ class TabMO: NSManagedObject {
         return result
     }
     
-    class func preserve(tab: Browser) {
-        if let data = savedTabData(tab: tab) {
-            let context = DataController.shared.workerContext
-            context.perform {
-                _ = TabMO.add(data, context: context)
-                DataController.saveContext(context: context)
-            }
-        }
+    class func preserve() {
+        // BRAVE TODO:
+//        if let data = savedTabData(tab: tab) {
+//            let context = DataController.shared.workerContext
+//            context.perform {
+//                _ = TabMO.add(data, context: context)
+//                DataController.saveContext(context: context)
+//            }
+//        }
     }
     
-    class func savedTabData(tab: Browser, context: NSManagedObjectContext = DataController.shared.mainThreadContext, urlOverride: String? = nil) -> SavedTab? {
-        guard let tabManager = getApp().tabManager, let webView = tab.webView, let order = tabManager.indexOfWebView(webView) else { return nil }
+    class func savedTabData(webView: WKWebView?, url: URL?, order: UInt, tabID: String, displayTitle: String, isSelected: Bool, context: NSManagedObjectContext = DataController.shared.mainThreadContext, urlOverride: String? = nil) -> SavedTab? {
         
         // Ignore session restore data.
-        if let url = tab.url?.absoluteString, url.contains("localhost") {
-            return nil
-        }
+        guard let urlString = url?.absoluteString else { return nil }
+        if urlString.contains("localhost") { return nil }
         
         var urls = [String]()
         var currentPage = 0
         
-        tab.webView?.backForwardList.update()
-        
-        if let currentItem = tab.webView?.backForwardList.currentItem {
+        if let currentItem = webView?.backForwardList.currentItem {
             // Freshly created web views won't have any history entries at all.
-            let backList = tab.webView?.backForwardList.backList ?? []
-            let forwardList = tab.webView?.backForwardList.forwardList ?? []
-            var backListMap = backList.map { $0.URL.absoluteString }
-            let forwardListMap = forwardList.map { $0.URL.absoluteString }
-            var currentItemString = currentItem.URL.absoluteString
+            let backList = webView?.backForwardList.backList ?? []
+            let forwardList = webView?.backForwardList.forwardList ?? []
+            var backListMap = backList.map { $0.url.absoluteString }
+            let forwardListMap = forwardList.map { $0.url.absoluteString }
+            var currentItemString = currentItem.url.absoluteString
             
             log.debug("backList: \(backListMap)")
             log.debug("forwardList: \(forwardListMap)")
@@ -190,15 +191,13 @@ class TabMO: NSManagedObject {
             
             log.debug("---stack: \(urls)")
         }
-        if let id = TabMO.get(byId: tab.tabID, context: context)?.syncUUID {
-            let title = tab.displayTitle != "" ? tab.displayTitle : urlOverride ?? ""
-            if urlOverride == nil && tab.url == nil {
+        if let id = TabMO.get(byId: tabID, context: context)?.syncUUID {
+            let title = displayTitle != "" ? displayTitle : urlOverride ?? ""
+            if urlOverride == nil && url == nil {
                 log.warning("Missing tab url, using empty string as a fallback. Should not happen.")
             }
             
-            let url = tab.url?.absoluteString ?? ""
-            
-            let data = SavedTab(id, title, urlOverride ?? url, tabManager.selectedTab === tab, Int16(order), nil, urls, Int16(currentPage))
+            let data = SavedTab(id, title, urlOverride ?? urlString, isSelected, Int16(order), nil, urls, Int16(currentPage))
             return data
         }
         

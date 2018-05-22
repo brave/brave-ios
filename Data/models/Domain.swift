@@ -4,6 +4,7 @@
 import UIKit
 import CoreData
 import Foundation
+import BraveShared
 
 class Domain: NSManagedObject {
     
@@ -104,23 +105,25 @@ class Domain: NSManagedObject {
         return [Domain]()
     }
 
-    class func setBraveShield(forDomain domainString: String, state: (BraveShieldState.Shield, Bool?), context: NSManagedObjectContext) {
-        guard let url = URL(string: domainString) else { return }
-        let domain = Domain.getOrCreateForUrl(url, context: context)
-        let shield = state.0
-        switch (shield) {
-            case .AllOff: domain?.shield_allOff = state.1 as NSNumber?
-            case .AdblockAndTp: domain?.shield_adblockAndTp = state.1 as NSNumber?
-            case .HTTPSE: domain?.shield_httpse = state.1 as NSNumber?
-            case .SafeBrowsing: domain?.shield_safeBrowsing = state.1 as NSNumber?
-            case .FpProtection: domain?.shield_fpProtection = state.1 as NSNumber?
-            case .NoScript: domain?.shield_noScript = state.1 as NSNumber?
-        }
-        DataController.saveContext(context: context)
+    class func setBraveShield(forDomain domainString: String, state: Bool?, context: NSManagedObjectContext) {
+        // BRAVE TODO:
+//        guard let url = URL(string: domainString) else { return }
+//        let domain = Domain.getOrCreateForUrl(url, context: context)
+//        let shield = state.0
+//        switch (shield) {
+//            case .AllOff: domain?.shield_allOff = state.1 as NSNumber?
+//            case .AdblockAndTp: domain?.shield_adblockAndTp = state.1 as NSNumber?
+//            case .HTTPSE: domain?.shield_httpse = state.1 as NSNumber?
+//            case .SafeBrowsing: domain?.shield_safeBrowsing = state.1 as NSNumber?
+//            case .FpProtection: domain?.shield_fpProtection = state.1 as NSNumber?
+//            case .NoScript: domain?.shield_noScript = state.1 as NSNumber?
+//        }
+//        DataController.saveContext(context: context)
     }
 
     class func loadShieldsIntoMemory(_ completionOnMain: @escaping ()->()) {
-        BraveShieldState.perNormalizedDomain.removeAll()
+        // Brave TODO:
+//        BraveShieldState.perNormalizedDomain.removeAll()
 
         let context = DataController.shared.workerContext
         context.perform {
@@ -133,32 +136,32 @@ class Domain: NSManagedObject {
                     guard let urlString = domain.url, let url = URL(string: urlString) else { continue }
                     let normalizedUrl = url.normalizedHost ?? ""
 
-                    print(normalizedUrl)
-                    if let shield = domain.shield_allOff {
-                        BraveShieldState.setInMemoryforDomain(normalizedUrl, setState: (.AllOff, shield.boolValue))
-                    }
-                    if let shield = domain.shield_adblockAndTp {
-                        BraveShieldState.setInMemoryforDomain(normalizedUrl, setState: (.AdblockAndTp, shield.boolValue))
-                    }
-                    if let shield = domain.shield_safeBrowsing {
-                        BraveShieldState.setInMemoryforDomain(normalizedUrl, setState: (.SafeBrowsing, shield.boolValue))
-                    }
-                    if let shield = domain.shield_httpse {
-                        BraveShieldState.setInMemoryforDomain(normalizedUrl, setState: (.HTTPSE, shield.boolValue))
-                    }
-                    if let shield = domain.shield_fpProtection {
-                        BraveShieldState.setInMemoryforDomain(normalizedUrl, setState: (.FpProtection, shield.boolValue))
-                    }
-                    if let shield = domain.shield_noScript {
-                        BraveShieldState.setInMemoryforDomain(normalizedUrl, setState: (.NoScript, shield.boolValue))
-                    }
+//                    print(normalizedUrl)
+//                    if let shield = domain.shield_allOff {
+//                        BraveShieldState.setInMemoryforDomain(normalizedUrl, setState: (.AllOff, shield.boolValue))
+//                    }
+//                    if let shield = domain.shield_adblockAndTp {
+//                        BraveShieldState.setInMemoryforDomain(normalizedUrl, setState: (.AdblockAndTp, shield.boolValue))
+//                    }
+//                    if let shield = domain.shield_safeBrowsing {
+//                        BraveShieldState.setInMemoryforDomain(normalizedUrl, setState: (.SafeBrowsing, shield.boolValue))
+//                    }
+//                    if let shield = domain.shield_httpse {
+//                        BraveShieldState.setInMemoryforDomain(normalizedUrl, setState: (.HTTPSE, shield.boolValue))
+//                    }
+//                    if let shield = domain.shield_fpProtection {
+//                        BraveShieldState.setInMemoryforDomain(normalizedUrl, setState: (.FpProtection, shield.boolValue))
+//                    }
+//                    if let shield = domain.shield_noScript {
+//                        BraveShieldState.setInMemoryforDomain(normalizedUrl, setState: (.NoScript, shield.boolValue))
+//                    }
                 }
             } catch {
                 let fetchError = error as NSError
                 print(fetchError)
             }
 
-            postAsyncToMain {
+            DispatchQueue.main.async {
                 completionOnMain()
             }
         }
@@ -190,7 +193,7 @@ class Domain: NSManagedObject {
             }
 
             DataController.saveContext(context: context)
-            postAsyncToMain {
+            DispatchQueue.main.async {
                 completionOnMain()
             }
         }

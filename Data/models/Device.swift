@@ -29,15 +29,6 @@ class Device: NSManagedObject, Syncable {
         set(value) { deviceDisplayId = SyncHelpers.syncDisplay(fromUUID: value) }
     }
     
-    class func deviceSettings(profile: Profile) -> [SyncDeviceSetting]? {
-        // Building settings off of device objects
-        let deviceSettings: [SyncDeviceSetting]? = (Device.get(predicate: nil, context: DataController.shared.workerContext) as? [Device])?.map {
-            // Even if no 'real' title, still want it to show up in list
-            return SyncDeviceSetting(profile: profile, device: $0)
-        }
-        return deviceSettings
-    }
-    
     // This should be abstractable
     func asDictionary(deviceId: [Int]?, action: Int?) -> [String: Any] {
         return SyncDevice(record: self, deviceId: deviceId, action: action).dictionaryRepresentation()

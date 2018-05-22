@@ -6,6 +6,7 @@ import CoreData
 import Foundation
 import Shared
 import Storage
+import BraveShared
 
 private let log = Logger.browserLogger
 
@@ -150,11 +151,12 @@ class Bookmark: NSManagedObject, WebsitePresentable, Syncable {
         } else {
             bk = Bookmark(entity: Bookmark.entity(context: context), insertInto: context)
         }
-        
+
+        // BRAVE TODO:
         // Should probably have visual indication before reaching this point
-        if site?.location?.startsWith(WebServer.sharedInstance.base) ?? false {
-            return nil
-        }
+//        if site?.location?.startsWith(WebServer.sharedInstance.base) ?? false {
+//            return nil
+//        }
         
         // Use new values, fallback to previous values
         bk.url = site?.location ?? bk.url
@@ -316,7 +318,7 @@ class Bookmark: NSManagedObject, WebsitePresentable, Syncable {
         // I am stumped, I can't find the notification that animation is complete for moving.
         // If I save while the animation is happening, the rows look screwed up (draw on top of each other).
         // Adding a delay to let animation complete avoids this problem
-        postAsyncToMain(0.25) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(250)) {
             DataController.saveContext(context: frc?.managedObjectContext)
         }
 
