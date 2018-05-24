@@ -7,6 +7,7 @@ import Data
 import Shared
 import XCGLogger
 import Storage
+import CoreData
 
 private let log = Logger.browserLogger
 
@@ -43,6 +44,8 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
     var parentFolders = [BookmarkFolder]()
     var bookmarkFolder: BookmarkFolder?
     var refreshControl: UIRefreshControl?
+    
+    var bookmarksFRC: NSFetchedResultsController<NSFetchRequestResult>?
 
     fileprivate lazy var longPressRecognizer: UILongPressGestureRecognizer = {
         return UILongPressGestureRecognizer(target: self, action: #selector(longPress))
