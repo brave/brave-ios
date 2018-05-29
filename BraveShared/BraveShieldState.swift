@@ -10,6 +10,7 @@ public struct BraveShieldState {
     public static func set(forDomain domain: String, state: (BraveShieldState.Shield, Bool?)) {
         BraveShieldState.setInMemoryforDomain(domain, setState: state)
 
+        // BRAVE TODO:
 //        if PrivateBrowsing.singleton.isOn {
 //            return
 //        }
