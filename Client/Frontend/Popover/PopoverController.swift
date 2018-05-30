@@ -1,10 +1,6 @@
-//
-//  PopoverController.swift
-//  Brave
-//
-//  Created by Kyle Hickinson on 2018-05-22.
-//  Copyright © 2018 Kyle Hickinson. All rights reserved.
-//
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import Foundation
 import UIKit
@@ -12,8 +8,6 @@ import pop
 import SnapKit
 
 /// A popover which presents a `UIViewController` from a point of origin
-///
-/// The content controller controls the height of the popover via constraints
 ///
 /// - note: You must use `present(from:on:)` from an instantiated `PopoverController` to present a popover. Presenting
 /// another way will result in undefined behavior
@@ -37,7 +31,7 @@ class PopoverController: UIViewController {
         case autoLayout
         /// The popover will size itself based on `UIViewController.preferredContentSize`
         case preferredContentSize
-        /// The popover content view will be fixed to a given height
+        /// The popover content view will be fixed to a given size
         case fixedSize(CGSize)
     }
     

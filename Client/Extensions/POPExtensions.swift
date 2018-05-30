@@ -1,10 +1,6 @@
-//
-//  Animation.swift
-//  BraveMenu
-//
-//  Created by Kyle Hickinson on 2018-05-22.
-//  Copyright © 2018 Kyle Hickinson. All rights reserved.
-//
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import Foundation
 import CoreGraphics
@@ -32,13 +28,6 @@ extension String: ExpressibleByPropertyAnimator {
 }
 
 extension NSObject {
-  
-  public var animationKeys: [String] {
-    if pop_animationKeys() != nil {
-      return pop_animationKeys().map { String(describing: $0) }
-    }
-    return []
-  }
   
   private func animate<T>(type: T.Type,
                           property: ExpressibleByPropertyAnimator,

@@ -1,10 +1,6 @@
-//
-//  PopoverContainerView.swift
-//  Brave
-//
-//  Created by Kyle Hickinson on 2018-05-22.
-//  Copyright © 2018 Kyle Hickinson. All rights reserved.
-//
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import Foundation
 import UIKit
@@ -52,43 +48,47 @@ extension PopoverController {
         }
         
         /// The view where you will place the content controller's view
-        let contentView = UIView()
+        let contentView = UIView().then {
+            $0.backgroundColor = PopoverUX.backgroundColor
+            $0.layer.cornerRadius = PopoverUX.cornerRadius
+            $0.clipsToBounds = true
+        }
         
         /// The actual white background view with the arrow. We have two separate views to ensure content placed within
         /// the popover are clipped at the corners
-        private let backgroundView = UIView()
+        private let backgroundView = UIView().then {
+            $0.backgroundColor = PopoverUX.backgroundColor
+            $0.layer.cornerRadius = PopoverUX.cornerRadius
+            $0.layer.shadowColor = PopoverUX.shadowColor.cgColor
+            $0.layer.shadowOffset = PopoverUX.shadowOffset
+            $0.layer.shadowRadius = PopoverUX.shadowRadius
+            $0.layer.shadowOpacity = PopoverUX.shadowOpacity
+            $0.translatesAutoresizingMaskIntoConstraints = false
+        }
         
-        private let triangleLayer = CAShapeLayer()
+        private let triangleLayer = CAShapeLayer().then {
+            $0.fillColor = PopoverUX.backgroundColor.cgColor
+            $0.shadowColor = PopoverUX.shadowColor.cgColor
+            $0.shadowOffset = PopoverUX.shadowOffset
+            $0.shadowRadius = PopoverUX.shadowRadius
+            $0.shadowOpacity = PopoverUX.shadowOpacity
+        }
         
         override init(frame: CGRect) {
             super.init(frame: frame)
             
             backgroundColor = .clear
             
-            triangleLayer.fillColor = PopoverUX.backgroundColor.cgColor
-            triangleLayer.shadowColor = PopoverUX.shadowColor.cgColor
-            triangleLayer.shadowOffset = PopoverUX.shadowOffset
-            triangleLayer.shadowRadius = PopoverUX.shadowRadius
-            triangleLayer.shadowOpacity = PopoverUX.shadowOpacity
-            
-            contentView.backgroundColor = PopoverUX.backgroundColor
-            contentView.layer.cornerRadius = PopoverUX.cornerRadius
-            contentView.clipsToBounds = true
-            contentView.translatesAutoresizingMaskIntoConstraints = false
-            
-            backgroundView.backgroundColor = PopoverUX.backgroundColor
-            backgroundView.layer.cornerRadius = PopoverUX.cornerRadius
-            backgroundView.layer.shadowColor = PopoverUX.shadowColor.cgColor
-            backgroundView.layer.shadowOffset = PopoverUX.shadowOffset
-            backgroundView.layer.shadowRadius = PopoverUX.shadowRadius
-            backgroundView.layer.shadowOpacity = PopoverUX.shadowOpacity
-            backgroundView.translatesAutoresizingMaskIntoConstraints = false
-            
             addSubview(backgroundView)
             addSubview(contentView)
             layer.addSublayer(triangleLayer)
             
             updateTrianglePath()
+            
+            contentView.snp.makeConstraints { make in
+                make.left.right.equalTo(self)
+                make.top.bottom.equalTo(backgroundView)
+            }
             
             let backgroundViewTopConstraint = backgroundView.topAnchor.constraint(equalTo: topAnchor)
             let backgroundViewBottomConstraint = backgroundView.bottomAnchor.constraint(equalTo: bottomAnchor)
@@ -97,12 +97,7 @@ extension PopoverController {
                 backgroundView.leftAnchor.constraint(equalTo: leftAnchor),
                 backgroundView.rightAnchor.constraint(equalTo: rightAnchor),
                 backgroundViewTopConstraint,
-                backgroundViewBottomConstraint,
-                
-                contentView.leftAnchor.constraint(equalTo: leftAnchor),
-                contentView.rightAnchor.constraint(equalTo: rightAnchor),
-                contentView.topAnchor.constraint(equalTo: backgroundView.topAnchor),
-                contentView.bottomAnchor.constraint(equalTo: backgroundView.bottomAnchor)
+                backgroundViewBottomConstraint
             ])
             
             self.backgroundViewTopConstraint = backgroundViewTopConstraint
@@ -122,16 +117,8 @@ extension PopoverController {
             // Assure the arrow will not be hanging off a corner
             let clampedArrowXOrigin = min(max(arrowOrigin.x, PopoverUX.cornerRadius), bounds.width - PopoverUX.cornerRadius - PopoverUX.arrowSize.width / 2.0) - PopoverUX.arrowSize.width / 2.0
             
-            var contentRect = bounds
-            contentRect.size.height -= PopoverUX.arrowSize.height
-            
             CATransaction.setDisableActions(true)
-            switch arrowDirection {
-            case .down:
-                triangleLayer.position = CGPoint(x: clampedArrowXOrigin, y: contentRect.size.height - 1.0)
-            case .up:
-                triangleLayer.position = CGPoint(x: clampedArrowXOrigin, y: 1.0)
-            }
+            triangleLayer.position = CGPoint(x: clampedArrowXOrigin, y: arrowDirection == .down ? bounds.size.height - PopoverUX.arrowSize.height - 1.0 : 1.0)
             CATransaction.setDisableActions(false)
             
             backgroundView.layer.shadowPath = UIBezierPath(roundedRect: backgroundView.bounds, cornerRadius: PopoverUX.cornerRadius).cgPath
