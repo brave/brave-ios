@@ -1514,6 +1514,15 @@ extension BrowserViewController: TabToolbarDelegate, PhotonActionSheetProtocol {
     }
 
     func tabToolbarDidPressMenu(_ tabToolbar: TabToolbarProtocol, button: UIButton) {
+        guard let selectedTab = tabManager.selectedTab else { return }
+        
+        let homePanel = HomeMenuController(profile: profile, tabState: selectedTab.tabState)
+        homePanel.preferredContentSize = CGSize(width: 320, height: 600.0)
+        //        homePanel.view.heightAnchor.constraint(equalToConstant: 580.0).isActive = true
+        let popover = PopoverController(contentController: homePanel, contentSizeBehavior: .preferredContentSize)
+        popover.present(from: button, on: self)
+        return;
+
         // ensure that any keyboards or spinners are dismissed before presenting the menu
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
         var actions: [[PhotonActionSheetItem]] = []

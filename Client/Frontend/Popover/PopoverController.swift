@@ -429,17 +429,33 @@ extension PopoverController: UIGestureRecognizerDelegate {
         
         if let scrollView = otherGestureRecognizer.view as? UIScrollView {
             let topInset: CGFloat
+            let leftInset: CGFloat
             if #available(iOS 11.0, *) {
                 topInset = scrollView.adjustedContentInset.top
+                leftInset = scrollView.adjustedContentInset.left
             } else {
                 topInset = scrollView.contentInset.top
+                leftInset = scrollView.contentInset.left
             }
             
-            if scrollView.contentOffset.y >= scrollView.contentSize.height - scrollView.frame.size.height && pan.velocity(in: pan.view).y < 0 ||
-                scrollView.contentOffset.y <= -topInset && pan.velocity(in: pan.view).y > 0 {
-                otherGestureRecognizer.isEnabled = false
-                otherGestureRecognizer.isEnabled = true
-                return true
+            let velocity = pan.velocity(in: pan.view)
+            if abs(velocity.y) > abs(velocity.x) {
+                if scrollView.contentOffset.y >= scrollView.contentSize.height - scrollView.frame.size.height && velocity.y < 0 ||
+                    scrollView.contentOffset.y <= -topInset && velocity.y > 0 {
+                    otherGestureRecognizer.cancel()
+                    return true
+                }
+            } else {
+                if let tableView = scrollView as? UITableView, let ds = tableView.dataSource, velocity.x < 0, ds.responds(to: #selector(UITableViewDataSource.tableView(_:commit:forRowAt:))) {
+                    // Fix table view cell actions
+                    pan.cancel()
+                    return false
+                }
+                if scrollView.contentOffset.x >= scrollView.contentSize.width - scrollView.frame.size.width && velocity.x < 0 ||
+                    scrollView.contentOffset.x <= -leftInset && velocity.x > 0 {
+                    otherGestureRecognizer.cancel()
+                    return true
+                }
             }
         }
         return false
