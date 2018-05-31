@@ -50,6 +50,10 @@ class HomeMenuController: UIViewController, PopoverContentComponent {
     super.init(nibName: nil, bundle: nil)
     bookmarksPanel.profile = profile
     history.profile = profile
+    
+    bookmarksPanel.bookmarksDidChange = { [weak self] in
+      self?.updateBookmarkStatus()
+    }
   }
   
   @available(*, unavailable)
@@ -155,9 +159,9 @@ class HomeMenuController: UIViewController, PopoverContentComponent {
     onClickPageButton(bookmarksButton)
     
     if Bookmark.contains(url: url, context: DataController.shared.workerContext) {
-      print("remove")
+      Bookmark.remove(forUrl: url, context: DataController.shared.workerContext)
     } else {
-      print("add")
+      Bookmark.add(url: url, title: tabState.title)
     }
   }
   
@@ -253,6 +257,6 @@ class HomeMenuController: UIViewController, PopoverContentComponent {
     }
     
     addBookmarkButton.isEnabled = true
-    addBookmarkButton.isSelected = Bookmark.contains(url: url, context: DataController.shared.workerContext)
+    addBookmarkButton.isSelected = Bookmark.contains(url: url, context: DataController.shared.mainThreadContext)
   }
 }

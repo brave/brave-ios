@@ -103,6 +103,9 @@ class BookmarkEditingViewController: FormViewController {
 }
 
 class OldBookmarksPanel: SiteTableViewController, HomePanel {
+  // Called when the bookmarks are updated via some user input (i.e. Delete, edit, etc.)
+  var bookmarksDidChange: (() -> Void)?
+  
   weak var homePanelDelegate: HomePanelDelegate? = nil
   var bookmarksFRC: NSFetchedResultsController<NSFetchRequestResult>?
   
@@ -256,8 +259,7 @@ class OldBookmarksPanel: SiteTableViewController, HomePanel {
     }
     
     // TODO: Needs to be recursive
-    // FIXME:
-//    currentFolder.remove(save: true)
+    currentFolder.remove(save: true)
     
     self.navigationController?.popViewController(animated: true)
   }
@@ -479,6 +481,7 @@ class OldBookmarksPanel: SiteTableViewController, HomePanel {
       }
       else {
         let nextController = OldBookmarksPanel(folder: bookmark)
+        nextController.bookmarksDidChange = bookmarksDidChange
         nextController.homePanelDelegate = self.homePanelDelegate
         
         self.navigationController?.pushViewController(nextController, animated: true)
@@ -494,18 +497,13 @@ class OldBookmarksPanel: SiteTableViewController, HomePanel {
     return .delete
   }
   
-  func tableView(_ tableView: UITableView, editActionsForRowAtIndexPath indexPath: IndexPath) -> [AnyObject]? {
+  func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
     guard let item = bookmarksFRC?.object(at: indexPath) as? Bookmark else { return nil }
     
     let deleteAction = UITableViewRowAction(style: UITableViewRowActionStyle.destructive, title: Strings.Delete, handler: { (action, indexPath) in
       
       func delete() {
-        // FIXME:
-//        item.remove(save: true)
-        
-        // Updates the bookmark state
-        // FIXME:
-//        getApp().browserViewController.updateURLBarDisplayURL(tab: nil)
+        item.remove(save: true)
       }
       
       if let children = item.children, !children.isEmpty {
@@ -637,6 +635,7 @@ extension OldBookmarksPanel : NSFetchedResultsControllerDelegate {
   
   func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
     tableView.endUpdates()
+    bookmarksDidChange?()
   }
   
   func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {

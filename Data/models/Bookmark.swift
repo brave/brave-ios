@@ -399,6 +399,7 @@ extension Bookmark {
 
 // TODO: REMOVE!! This should be located in abstraction
 extension Bookmark {
+    @discardableResult
     public class func remove(forUrl url: URL, save: Bool = true, context: NSManagedObjectContext) -> Bool {
         if let bm = get(forUrl: url, context: context) as? Bookmark {
             bm.remove(save: save)

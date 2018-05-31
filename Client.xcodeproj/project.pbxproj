@@ -2811,8 +2811,10 @@
 				5D1DC51520AC9AFA00905E5A /* Data.h */,
 				5D1DC51620AC9AFA00905E5A /* Info.plist */,
 			);
+			indentWidth = 4;
 			path = Data;
 			sourceTree = "<group>";
+			tabWidth = 4;
 		};
 		5D1DC52120AC9AFB00905E5A /* DataTests */ = {
 			isa = PBXGroup;
