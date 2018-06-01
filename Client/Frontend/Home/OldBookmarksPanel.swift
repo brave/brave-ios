@@ -27,17 +27,17 @@ struct OldBookmarksPanelUX {
 }
 
 class BookmarkEditingViewController: FormViewController {
-  var completionBlock:((_ controller:BookmarkEditingViewController) -> Void)?
+  var completionBlock: ((_ controller: BookmarkEditingViewController) -> Void)?
   
-  var folders = [Bookmark]()
+  var folders: [Bookmark] = []
   
-  var bookmarksPanel:OldBookmarksPanel!
-  var bookmark:Bookmark!
-  var bookmarkIndexPath:IndexPath!
+  var bookmarksPanel: OldBookmarksPanel!
+  var bookmark: Bookmark!
+  var bookmarkIndexPath: IndexPath!
   
-  let BOOKMARK_TITLE_ROW_TAG:String = "BOOKMARK_TITLE_ROW_TAG"
-  let BOOKMARK_URL_ROW_TAG:String = "BOOKMARK_URL_ROW_TAG"
-  let BOOKMARK_FOLDER_ROW_TAG:String = "BOOKMARK_FOLDER_ROW_TAG"
+  let BOOKMARK_TITLE_ROW_TAG: String = "BOOKMARK_TITLE_ROW_TAG"
+  let BOOKMARK_URL_ROW_TAG: String = "BOOKMARK_URL_ROW_TAG"
+  let BOOKMARK_FOLDER_ROW_TAG: String = "BOOKMARK_FOLDER_ROW_TAG"
   
   var titleRow:TextRow?
   var urlRow: URLRow?
@@ -67,7 +67,7 @@ class BookmarkEditingViewController: FormViewController {
     self.bookmark.update(customTitle: self.titleRow?.value, url: self.urlRow?.value?.absoluteString, save: true)
   }
   
-  var isEditingFolder:Bool {
+  var isEditingFolder: Bool {
     return bookmark.isFolder
   }
   
@@ -103,18 +103,15 @@ class BookmarkEditingViewController: FormViewController {
 }
 
 class OldBookmarksPanel: SiteTableViewController, HomePanel {
-  // Called when the bookmarks are updated via some user input (i.e. Delete, edit, etc.)
+  /// Called when the bookmarks are updated via some user input (i.e. Delete, edit, etc.)
   var bookmarksDidChange: (() -> Void)?
   
-  weak var homePanelDelegate: HomePanelDelegate? = nil
+  weak var homePanelDelegate: HomePanelDelegate?
+  
   var bookmarksFRC: NSFetchedResultsController<NSFetchRequestResult>?
   
-  fileprivate let BookmarkFolderCellIdentifier = "BookmarkFolderIdentifier"
-  //private let BookmarkSeparatorCellIdentifier = "BookmarkSeparatorIdentifier"
-  fileprivate let BookmarkFolderHeaderViewIdentifier = "BookmarkFolderHeaderIdentifier"
-  
-  var editBookmarksToolbar:UIToolbar!
-  var editBookmarksButton:UIBarButtonItem!
+  var editBookmarksToolbar: UIToolbar!
+  var editBookmarksButton: UIBarButtonItem!
   var addFolderButton: UIBarButtonItem?
   weak var addBookmarksFolderOkAction: UIAlertAction?
   
@@ -125,7 +122,6 @@ class OldBookmarksPanel: SiteTableViewController, HomePanel {
   init() {
     super.init(nibName: nil, bundle: nil)
     self.title = Strings.Bookmarks
-    // NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(OldBookmarksPanel.notificationReceived(_:)), name: NotificationFirefoxAccountChanged, object: nil)
   }
   
   convenience init(folder: Bookmark?) {
@@ -202,7 +198,6 @@ class OldBookmarksPanel: SiteTableViewController, HomePanel {
   func disableTableEditingMode() {
     switchTableEditingMode(true)
   }
-  
   
   func switchTableEditingMode(_ forceOff:Bool = false) {
     let editMode:Bool = forceOff ? false : !tableView.isEditing
@@ -330,8 +325,6 @@ class OldBookmarksPanel: SiteTableViewController, HomePanel {
 //    guard let obj = bookmarksFRC?.object(at: indexPath) as? Bookmark else { return (nil, nil) }
 //    return (obj.url != nil ? URL(string: obj.url!) : nil, obj.isFolder ? obj.syncUUID : nil)
 //  }
-
-  
   
   fileprivate func configureCell(_ cell: UITableViewCell, atIndexPath indexPath: IndexPath) {
     
@@ -470,8 +463,7 @@ class OldBookmarksPanel: SiteTableViewController, HomePanel {
       }
       else {
         if let url = URL(string: bookmark.url ?? "") {
-          // FIXME:
-//          homePanelDelegate?.homePanel(self, didSelectURL: url)
+          homePanelDelegate?.homePanel(self, didSelectURL: url, visitType: .bookmark)
         }
       }
     } else {

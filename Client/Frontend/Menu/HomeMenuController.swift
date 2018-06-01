@@ -10,10 +10,29 @@ import SnapKit
 import Data
 import Storage
 
+/// The types of actions a user can do in the menu given a URL
+enum MenuURLAction {
+  /// Opens in URL the current tab
+  case openInCurrentTab
+  /// Opens in URL a new tab
+  case openInNewTab(isPrivate: Bool)
+  /// Copy the URL to clipboard
+  case copy
+  /// Show a share sheet for the URL
+  case share
+}
+
+protocol HomeMenuControllerDelegate: class {
+  /// The user selected a url in one of the menu panels (i.e. bookmarks or history)
+  func menuDidSelectURL(_ menu: HomeMenuController, url: URL, visitType: VisitType, action: MenuURLAction)
+}
+
 class HomeMenuController: UIViewController, PopoverContentComponent {
   
+  weak var delegate: HomeMenuControllerDelegate?
+  
   let bookmarksPanel = OldBookmarksPanel(folder: nil)
-  fileprivate var bookmarksNavController:UINavigationController!
+  fileprivate var bookmarksNavController: UINavigationController!
   
   let history = HistoryPanel()
   
@@ -28,7 +47,7 @@ class HomeMenuController: UIViewController, PopoverContentComponent {
   let divider = UIView()
   
   // Buttons swap out the full page, meaning only one can be active at a time
-  var pageButtons: Dictionary<UIButton, UIViewController> {
+  var pageButtons: [UIButton: UIViewController] {
     return [
       bookmarksButton: bookmarksNavController,
       historyButton: history,
@@ -47,6 +66,7 @@ class HomeMenuController: UIViewController, PopoverContentComponent {
     bookmarksPanel.profile = profile
     history.profile = profile
     
+    bookmarksPanel.homePanelDelegate = self
     bookmarksPanel.bookmarksDidChange = { [weak self] in
       self?.updateBookmarkStatus()
     }
@@ -108,25 +128,14 @@ class HomeMenuController: UIViewController, PopoverContentComponent {
     
     setupConstraints()
     updateBookmarkStatus()
-    
-    // NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(historyItemAdded), name: kNotificationSiteAddedToHistory, object: nil)
   }
-
-//  func willHide() {
-//    //check if we are editing bookmark, if so pop controller then continue
-//    if self.bookmarksNavController?.visibleViewController is BookmarkEditingViewController {
-//      self.bookmarksNavController?.popViewController(animated: false)
-//    }
-//    if self.bookmarksPanel.currentBookmarksPanel().tableView.isEditing {
-//      self.bookmarksPanel.currentBookmarksPanel().disableTableEditingMode()
-//    }
-//  }
   
   @objc private func onClickSettingsButton() {
     guard let profile = profile else {
       return
     }
-//
+
+    // BRAVE TODO: Add back settings
 //    let settingsTableViewController = BraveSettingsView(style: .grouped)
 //    settingsTableViewController.profile = getApp().profile
 //
@@ -135,9 +144,6 @@ class HomeMenuController: UIViewController, PopoverContentComponent {
 //    present(controller, animated: true, completion: nil)
   }
   
-  //For this function to be called there *must* be a selected tab and URL
-  //since we disable the button when there's no URL
-  //see MainSidePanelViewController#updateBookmarkStatus(isBookmarked,url)
   @objc private func onClickBookmarksButton() {
     guard let url = tabState.url else { return }
     
@@ -173,35 +179,30 @@ class HomeMenuController: UIViewController, PopoverContentComponent {
       make.width.equalTo(60)
     }
     
-    settingsButton.snp.remakeConstraints {
-      make in
+    settingsButton.snp.remakeConstraints { make in
       common(make)
       make.centerX.equalTo(self.topButtonsView).multipliedBy(0.25)
     }
     
-    divider.snp.remakeConstraints {
-      make in
+    divider.snp.remakeConstraints { make in
       make.bottom.equalTo(self.topButtonsView)
       make.width.equalTo(self.topButtonsView)
       make.height.equalTo(0.5)
     }
     
-    historyButton.snp.remakeConstraints {
-      make in
+    historyButton.snp.remakeConstraints { make in
       make.bottom.equalTo(self.topButtonsView)
       make.height.equalTo(UIConstants.ToolbarHeight)
       make.centerX.equalTo(self.topButtonsView).multipliedBy(0.75)
     }
     
-    bookmarksButton.snp.remakeConstraints {
-      make in
+    bookmarksButton.snp.remakeConstraints { make in
       make.bottom.equalTo(self.topButtonsView)
       make.height.equalTo(UIConstants.ToolbarHeight)
       make.centerX.equalTo(self.topButtonsView).multipliedBy(1.25)
     }
     
-    addBookmarkButton.snp.remakeConstraints {
-      make in
+    addBookmarkButton.snp.remakeConstraints { make in
       make.bottom.equalTo(self.topButtonsView)
       make.height.equalTo(UIConstants.ToolbarHeight)
       make.centerX.equalTo(self.topButtonsView).multipliedBy(1.75)
@@ -254,5 +255,41 @@ class HomeMenuController: UIViewController, PopoverContentComponent {
     
     addBookmarkButton.isEnabled = true
     addBookmarkButton.isSelected = Bookmark.contains(url: url, context: DataController.shared.mainThreadContext)
+  }
+}
+
+extension HomeMenuController: HomePanelDelegate {
+  
+  func homePanelDidRequestToSignIn(_ homePanel: HomePanel) {
+    // New from FF, but has no use in Brave
+  }
+  
+  func homePanelDidRequestToCreateAccount(_ homePanel: HomePanel) {
+    // New from FF, but has no use in Brave
+  }
+  
+  func homePanelDidRequestToOpenInNewTab(_ url: URL, isPrivate: Bool) {
+    delegate?.menuDidSelectURL(self, url: url, visitType: .unknown, action: .openInNewTab(isPrivate: isPrivate))
+  }
+  
+  func homePanel(_ homePanel: HomePanel, didSelectURL url: URL, visitType: VisitType) {
+    delegate?.menuDidSelectURL(self, url: url, visitType: visitType, action: .openInCurrentTab)
+  }
+  
+  func homePanel(_ homePanel: HomePanel, didSelectURLString url: String, visitType: VisitType) {
+    guard let profile = profile else { return }
+    
+    // If we can't get a real URL out of what should be a URL, we let the user's
+    // default search engine give it a shot.
+    // Typically we'll be in this state if the user has tapped a bookmarked search template
+    // (e.g., "http://foo.com/bar/?query=%s"), and this will get them the same behavior as if
+    // they'd copied and pasted into the URL bar.
+    // See BrowserViewController.urlBar:didSubmitText:.
+    guard let url = URIFixup.getURL(url) ?? profile.searchEngines.defaultEngine.searchURLForQuery(url) else {
+      Logger.browserLogger.warning("Invalid URL, and couldn't generate a search URL for it.")
+      return
+    }
+    
+    return self.homePanel(homePanel, didSelectURL: url, visitType: visitType)
   }
 }

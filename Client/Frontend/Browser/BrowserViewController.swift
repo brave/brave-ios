@@ -1518,6 +1518,7 @@ extension BrowserViewController: TabToolbarDelegate, PhotonActionSheetProtocol {
         
         let homePanel = HomeMenuController(profile: profile, tabState: selectedTab.tabState)
         homePanel.preferredContentSize = CGSize(width: 320, height: 600.0)
+        homePanel.delegate = self
         //        homePanel.view.heightAnchor.constraint(equalToConstant: 580.0).isActive = true
         let popover = PopoverController(contentController: homePanel, contentSizeBehavior: .preferredContentSize)
         popover.present(from: button, on: self)
@@ -2812,3 +2813,35 @@ extension BrowserViewController: ClientPickerViewControllerDelegate, Instruction
     }
 }
 
+extension BrowserViewController: HomeMenuControllerDelegate {
+    func menuDidSelectURL(_ menu: HomeMenuController, url: URL, visitType: VisitType, action: MenuURLAction) {
+        switch action {
+        case .openInCurrentTab:
+            menu.dismiss(animated: true)
+            finishEditingAndSubmit(url, visitType: visitType)
+            
+        case .openInNewTab(let isPrivate):
+            menu.dismiss(animated: true)
+            
+            let tab = self.tabManager.addTab(PrivilegedRequest(url: url) as URLRequest, afterTab: self.tabManager.selectedTab, isPrivate: isPrivate)
+            // If we are showing toptabs a user can just use the top tab bar
+            // If in overlay mode switching doesnt correctly dismiss the homepanels
+            guard !topTabsVisible, !self.urlBar.inOverlayMode else {
+                return
+            }
+            // We're not showing the top tabs; show a toast to quick switch to the fresh new tab.
+            let toast = ButtonToast(labelText: Strings.ContextMenuButtonToastNewTabOpenedLabelText, buttonText: Strings.ContextMenuButtonToastNewTabOpenedButtonText, completion: { buttonPressed in
+                if buttonPressed {
+                    self.tabManager.selectTab(tab)
+                }
+            })
+            self.show(toast: toast)
+            
+        case .copy:
+            UIPasteboard.general.url = url
+        case .share:
+            let activityController = UIActivityViewController(activityItems: [url], applicationActivities: nil)
+            menu.present(activityController, animated: true)
+        }
+    }
+}

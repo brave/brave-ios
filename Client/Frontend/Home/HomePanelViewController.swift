@@ -33,6 +33,7 @@ struct HomePanelUX {
 }
 
 protocol HomePanelDelegate: class {
+    // TODO: Remove sign in/create account delegate methods
     func homePanelDidRequestToSignIn(_ homePanel: HomePanel)
     func homePanelDidRequestToCreateAccount(_ homePanel: HomePanel)
     func homePanelDidRequestToOpenInNewTab(_ url: URL, isPrivate: Bool)
