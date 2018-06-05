@@ -2,13 +2,25 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-MOZ_BUNDLE_DISPLAY_NAME = Fennec ($(USER))
+#include "Base.xcconfig"
+#include "Local.xcconfig"
+
+MOZ_BUNDLE_DISPLAY_NAME = Brave ($(USER))
 
 // Bundle Identifier
-MOZ_BUNDLE_ID = org.mozilla.ios.Fennec
+// MOZ_BUNDLE_ID = set in Local.xconfig
+
+// Currently duplicated, as it needs a full `MOZ_BUNDLE_ID` set, should abstract
+PRODUCT_BUNDLE_IDENTIFIER=$(MOZ_BUNDLE_ID).$(PRODUCT_NAME:rfc1034identifier)
 
 // Flag to indicate if we want to include the debug settings bundle or not
 INCLUDE_SETTINGS_BUNDLE = YES
+
+// Defines Swift Flags, (used as #if/#endif) inside *Swift* code
+// BASE 'inheritence' at end, due to dynamic nature of those flags
+OTHER_SWIFT_FLAGS=-DMOZ_CHANNEL_FENNEC $(OTHER_SWIFT_FLAGS_BASE)
+
+GCC_PREPROCESSOR_DEFINITIONS= DEBUG=1
 
 // Adjust SDK Variables
 ADJUST_ENVIRONMENT =
