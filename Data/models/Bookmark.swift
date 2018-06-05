@@ -347,7 +347,7 @@ extension Bookmark {
         return nil
     }
     
-    static func getChildren(forFolderUUID syncUUID: [Int]?, ignoreFolders: Bool = false, context: NSManagedObjectContext,
+    public static func getChildren(forFolderUUID syncUUID: [Int]?, ignoreFolders: Bool = false, context: NSManagedObjectContext,
                             orderSort: Bool = false) -> [Bookmark]? {
         guard let searchableUUID = SyncHelpers.syncDisplay(fromUUID: syncUUID) else {
             return nil

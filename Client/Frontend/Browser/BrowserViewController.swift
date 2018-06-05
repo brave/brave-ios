@@ -2840,8 +2840,18 @@ extension BrowserViewController: HomeMenuControllerDelegate {
         case .copy:
             UIPasteboard.general.url = url
         case .share:
-            let activityController = UIActivityViewController(activityItems: [url], applicationActivities: nil)
-            menu.present(activityController, animated: true)
+            menu.dismiss(animated: true) {
+                let activityController = UIActivityViewController(activityItems: [url], applicationActivities: nil)
+                if UIDevice.current.userInterfaceIdiom == .pad {
+                    activityController.popoverPresentationController?.sourceView = self.view
+                    activityController.popoverPresentationController?.sourceRect = self.view.convert(self.urlBar.menuButton.frame, from: self.urlBar.menuButton.superview)
+                }
+                self.present(activityController, animated: true)
+            }
         }
+    }
+    
+    func menuDidBatchOpenURLs(_ menu: HomeMenuController, urls: [URL]) {
+        self.tabManager.addTabsForURLs(urls, zombie: false)
     }
 }

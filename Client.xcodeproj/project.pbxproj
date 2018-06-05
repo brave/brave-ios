@@ -386,7 +386,7 @@
 		7BF5A1EE1B429B3100EA9DD8 /* SyncCommandsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF5A1ED1B429B3100EA9DD8 /* SyncCommandsTests.swift */; };
 		8D8251811F4DE67F00780643 /* AdvanceAccountSettingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D8251721F4DE67E00780643 /* AdvanceAccountSettingViewController.swift */; };
 		8DCD3BCD1ED5B7FA00446D38 /* FxADeepLinkingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DCD3BCC1ED5B7FA00446D38 /* FxADeepLinkingTests.swift */; };
-		A1AD4BCF20BF3E8C007A6EA1 /* OldBookmarksPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AD4BCE20BF3E8C007A6EA1 /* OldBookmarksPanel.swift */; };
+		A1AD4BCF20BF3E8C007A6EA1 /* BookmarksViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AD4BCE20BF3E8C007A6EA1 /* BookmarksViewController.swift */; };
 		A1AD4BD120BF3F4D007A6EA1 /* Eureka.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1AD4BD020BF3F4D007A6EA1 /* Eureka.framework */; };
 		A1AD4BD420BF4757007A6EA1 /* ImageCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AD4BD220BF4712007A6EA1 /* ImageCache.swift */; };
 		A1AD4BD720BF4772007A6EA1 /* FastImageCache.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1AD4BD520BF476E007A6EA1 /* FastImageCache.framework */; };
@@ -1621,7 +1621,7 @@
 		7BF5A1ED1B429B3100EA9DD8 /* SyncCommandsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncCommandsTests.swift; sourceTree = "<group>"; };
 		8D8251721F4DE67E00780643 /* AdvanceAccountSettingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdvanceAccountSettingViewController.swift; sourceTree = "<group>"; };
 		8DCD3BCC1ED5B7FA00446D38 /* FxADeepLinkingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FxADeepLinkingTests.swift; sourceTree = "<group>"; };
-		A1AD4BCE20BF3E8C007A6EA1 /* OldBookmarksPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OldBookmarksPanel.swift; sourceTree = "<group>"; };
+		A1AD4BCE20BF3E8C007A6EA1 /* BookmarksViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksViewController.swift; sourceTree = "<group>"; };
 		A1AD4BD020BF3F4D007A6EA1 /* Eureka.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Eureka.framework; path = Carthage/Build/iOS/Eureka.framework; sourceTree = "<group>"; };
 		A1AD4BD220BF4712007A6EA1 /* ImageCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCache.swift; sourceTree = "<group>"; };
 		A1AD4BD520BF476E007A6EA1 /* FastImageCache.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FastImageCache.framework; path = Carthage/Build/iOS/FastImageCache.framework; sourceTree = "<group>"; };
@@ -3790,7 +3790,7 @@
 				3BB50E1F1D627539004B33DF /* ActivityStreamPanel.swift */,
 				3BB50E101D6274CD004B33DF /* ActivityStreamTopSitesCell.swift */,
 				59A6839879D615FC1C0D71CE /* BookmarksPanel.swift */,
-				A1AD4BCE20BF3E8C007A6EA1 /* OldBookmarksPanel.swift */,
+				A1AD4BCE20BF3E8C007A6EA1 /* BookmarksViewController.swift */,
 				D0E89A2820910917001CE5C7 /* DownloadsPanel.swift */,
 				59A6825233896FC846499289 /* HistoryPanel.swift */,
 				D30B101D1AA7F9C600C01CA3 /* HomePanels.swift */,
@@ -5577,7 +5577,7 @@
 				E69E06C91C76198000D0F926 /* AuthenticationManagerConstants.swift in Sources */,
 				392ED7E61D0AEFEF009D9B62 /* HomePageAccessors.swift in Sources */,
 				7BA8D1C71BA037F500C8AE9E /* OpenInHelper.swift in Sources */,
-				A1AD4BCF20BF3E8C007A6EA1 /* OldBookmarksPanel.swift in Sources */,
+				A1AD4BCF20BF3E8C007A6EA1 /* BookmarksViewController.swift in Sources */,
 				E4B423BE1AB9FE6A007E66C8 /* ReaderModeCache.swift in Sources */,
 				396CDB55203C5B870034A3A3 /* TabTrayController+KeyCommands.swift in Sources */,
 				74E36D781B71323500D69DA1 /* SettingsContentViewController.swift in Sources */,

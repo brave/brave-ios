@@ -25,13 +25,15 @@ enum MenuURLAction {
 protocol HomeMenuControllerDelegate: class {
   /// The user selected a url in one of the menu panels (i.e. bookmarks or history)
   func menuDidSelectURL(_ menu: HomeMenuController, url: URL, visitType: VisitType, action: MenuURLAction)
+  /// The user tapped "Open All" on a folder
+  func menuDidBatchOpenURLs(_ menu: HomeMenuController, urls: [URL])
 }
 
 class HomeMenuController: UIViewController, PopoverContentComponent {
   
   weak var delegate: HomeMenuControllerDelegate?
   
-  let bookmarksPanel = OldBookmarksPanel(folder: nil)
+  let bookmarksPanel = BookmarksViewController(folder: nil)
   fileprivate var bookmarksNavController: UINavigationController!
   
   let history = HistoryPanel()
@@ -160,10 +162,10 @@ class HomeMenuController: UIViewController, PopoverContentComponent {
     //switch to bookmarks 'tab' in case we're looking at history and tapped the add/remove bookmark button
     onClickPageButton(bookmarksButton)
     
-    if Bookmark.contains(url: url, context: DataController.shared.workerContext) {
-      Bookmark.remove(forUrl: url, context: DataController.shared.workerContext)
+    if Bookmark.contains(url: url, context: DataController.shared.mainThreadContext) {
+      Bookmark.remove(forUrl: url, context: DataController.shared.mainThreadContext)
     } else {
-      Bookmark.add(url: url, title: tabState.title)
+      Bookmark.add(url: url, title: tabState.title, parentFolder: bookmarksPanel.currentBookmarksPanel().currentFolder)
     }
   }
   
@@ -270,6 +272,18 @@ extension HomeMenuController: HomePanelDelegate {
   
   func homePanelDidRequestToOpenInNewTab(_ url: URL, isPrivate: Bool) {
     delegate?.menuDidSelectURL(self, url: url, visitType: .unknown, action: .openInNewTab(isPrivate: isPrivate))
+  }
+  
+  func homePanelDidRequestToCopyURL(_ url: URL) {
+    delegate?.menuDidSelectURL(self, url: url, visitType: .unknown, action: .copy)
+  }
+  
+  func homePanelDidRequestToShareURL(_ url: URL) {
+    delegate?.menuDidSelectURL(self, url: url, visitType: .unknown, action: .share)
+  }
+  
+  func homePanelDidRequestToBatchOpenURLs(_ urls: [URL]) {
+    delegate?.menuDidBatchOpenURLs(self, urls: urls)
   }
   
   func homePanel(_ homePanel: HomePanel, didSelectURL url: URL, visitType: VisitType) {

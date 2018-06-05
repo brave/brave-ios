@@ -15,7 +15,7 @@ private let log = Logger.browserLogger
 
 // MARK: - UX constants.
 
-struct OldBookmarksPanelUX {
+struct BookmarksViewControllerUX {
   fileprivate static let BookmarkFolderHeaderViewChevronInset: CGFloat = 10
   fileprivate static let BookmarkFolderChevronSize: CGFloat = 20
   fileprivate static let BookmarkFolderChevronLineWidth: CGFloat = 4.0
@@ -31,7 +31,7 @@ class BookmarkEditingViewController: FormViewController {
   
   var folders: [Bookmark] = []
   
-  var bookmarksPanel: OldBookmarksPanel!
+  var bookmarksPanel: BookmarksViewController!
   var bookmark: Bookmark!
   var bookmarkIndexPath: IndexPath!
   
@@ -42,7 +42,7 @@ class BookmarkEditingViewController: FormViewController {
   var titleRow:TextRow?
   var urlRow: URLRow?
   
-  init(bookmarksPanel: OldBookmarksPanel, indexPath: IndexPath, bookmark: Bookmark) {
+  init(bookmarksPanel: BookmarksViewController, indexPath: IndexPath, bookmark: Bookmark) {
     super.init(nibName: nil, bundle: nil)
     
     self.bookmark = bookmark
@@ -102,7 +102,7 @@ class BookmarkEditingViewController: FormViewController {
   }
 }
 
-class OldBookmarksPanel: SiteTableViewController, HomePanel {
+class BookmarksViewController: SiteTableViewController, HomePanel {
   /// Called when the bookmarks are updated via some user input (i.e. Delete, edit, etc.)
   var bookmarksDidChange: (() -> Void)?
   
@@ -195,6 +195,12 @@ class OldBookmarksPanel: SiteTableViewController, HomePanel {
     super.reloadData()
   }
   
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    
+    reloadData()
+  }
+  
   func disableTableEditingMode() {
     switchTableEditingMode(true)
   }
@@ -217,10 +223,8 @@ class OldBookmarksPanel: SiteTableViewController, HomePanel {
   func resetCellLongpressGesture(_ editing: Bool) {
     for cell in self.tableView.visibleCells {
       cell.gestureRecognizers?.forEach { cell.removeGestureRecognizer($0) }
-      if editing == false {
-        // FIXME:
-//        let lp = UILongPressGestureRecognizer(target: self, action: #selector(longPressOnCell))
-//        cell.addGestureRecognizer(lp)
+      if !editing {
+        cell.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(longPressedCell(_:))))
       }
     }
   }
@@ -304,11 +308,11 @@ class OldBookmarksPanel: SiteTableViewController, HomePanel {
     }
   }
   
-  func currentBookmarksPanel() -> OldBookmarksPanel {
-    guard let controllers = navigationController?.viewControllers.filter({ $0 as? OldBookmarksPanel != nil }) else {
+  func currentBookmarksPanel() -> BookmarksViewController {
+    guard let controllers = navigationController?.viewControllers.filter({ $0 as? BookmarksViewController != nil }) else {
       return self
     }
-    return controllers.last as? OldBookmarksPanel ?? self
+    return controllers.last as? BookmarksViewController ?? self
   }
   
   override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -331,12 +335,11 @@ class OldBookmarksPanel: SiteTableViewController, HomePanel {
     guard let item = bookmarksFRC?.object(at: indexPath) as? Bookmark else { return }
     cell.tag = item.objectID.hashValue
     
-    func configCell(image: UIImage? = nil, icon: FaviconMO? = nil, longPressForContextMenu: Bool = false) {
-      if longPressForContextMenu && !tableView.isEditing {
+    func configCell(image: UIImage? = nil, icon: FaviconMO? = nil) {
+      if !tableView.isEditing {
         cell.gestureRecognizers?.forEach { cell.removeGestureRecognizer($0) }
-        // FIXME:
-//        let lp = UILongPressGestureRecognizer(target: self, action: #selector(longPressOnCell))
-//        cell.addGestureRecognizer(lp)
+        let lp = UILongPressGestureRecognizer(target: self, action: #selector(longPressedCell(_:)))
+        cell.addGestureRecognizer(lp)
       }
       
       cell.imageView?.contentMode = .scaleAspectFit
@@ -385,7 +388,7 @@ class OldBookmarksPanel: SiteTableViewController, HomePanel {
     cell.contentView.backgroundColor = .white
     
     if !item.isFolder {
-      configCell(icon: item.domain?.favicon, longPressForContextMenu: true)
+      configCell(icon: item.domain?.favicon)
       cell.textLabel?.font = UIFont.systemFont(ofSize: fontSize)
       cell.accessoryType = .none
     } else {
@@ -472,9 +475,26 @@ class OldBookmarksPanel: SiteTableViewController, HomePanel {
         self.showEditBookmarkController(tableView, indexPath: indexPath)
       }
       else {
-        let nextController = OldBookmarksPanel(folder: bookmark)
+//        let frc = Bookmark.frc(parentFolder: bookmark)
+//        do {
+//          try frc.performFetch()
+//          if let bookmarks = frc.fetchedObjects as? [Bookmark] {
+//            let urls: [URL] = bookmarks.compactMap { b in
+//              guard let url = b.url else { return nil }
+//              return URL(string: url)
+//            }
+//            homePanelDelegate?.homePanelDidRequestToBatchOpenURLs(urls)
+//            return
+//          }
+//        } catch {
+//          print("Failed to fetch bookmarks with error: \(error)")
+//        }
+//
+        
+        let nextController = BookmarksViewController(folder: bookmark)
+        nextController.profile = profile
         nextController.bookmarksDidChange = bookmarksDidChange
-        nextController.homePanelDelegate = self.homePanelDelegate
+        nextController.homePanelDelegate = homePanelDelegate
         
         self.navigationController?.pushViewController(nextController, animated: true)
       }
@@ -535,7 +555,7 @@ private protocol BookmarkFolderTableViewHeaderDelegate {
   func didSelectHeader()
 }
 
-extension OldBookmarksPanel: BookmarkFolderTableViewHeaderDelegate {
+extension BookmarksViewController: BookmarkFolderTableViewHeaderDelegate {
   fileprivate func didSelectHeader() {
     self.navigationController?.popViewController(animated: true)
   }
@@ -553,7 +573,7 @@ fileprivate class BookmarkFolderTableViewHeader : UITableViewHeaderFooterView {
   lazy var chevron: ChevronView = {
     let chevron = ChevronView(direction: .left)
     chevron.tintColor = UIConstants.HighlightBlue
-    chevron.lineWidth = OldBookmarksPanelUX.BookmarkFolderChevronLineWidth
+    chevron.lineWidth = BookmarksViewControllerUX.BookmarkFolderChevronLineWidth
     return chevron
   }()
   
@@ -588,14 +608,14 @@ fileprivate class BookmarkFolderTableViewHeader : UITableViewHeaderFooterView {
     contentView.addSubview(titleLabel)
     
     chevron.snp.makeConstraints { make in
-      make.left.equalTo(contentView).offset(OldBookmarksPanelUX.BookmarkFolderHeaderViewChevronInset)
+      make.left.equalTo(contentView).offset(BookmarksViewControllerUX.BookmarkFolderHeaderViewChevronInset)
       make.centerY.equalTo(contentView)
-      make.size.equalTo(OldBookmarksPanelUX.BookmarkFolderChevronSize)
+      make.size.equalTo(BookmarksViewControllerUX.BookmarkFolderChevronSize)
     }
     
     titleLabel.snp.makeConstraints { make in
-      make.left.equalTo(chevron.snp.right).offset(OldBookmarksPanelUX.BookmarkFolderHeaderViewChevronInset)
-      make.right.greaterThanOrEqualTo(contentView).offset(-OldBookmarksPanelUX.BookmarkFolderHeaderViewChevronInset)
+      make.left.equalTo(chevron.snp.right).offset(BookmarksViewControllerUX.BookmarkFolderHeaderViewChevronInset)
+      make.right.greaterThanOrEqualTo(contentView).offset(-BookmarksViewControllerUX.BookmarkFolderHeaderViewChevronInset)
       make.centerY.equalTo(contentView)
     }
     
@@ -620,7 +640,7 @@ fileprivate class BookmarkFolderTableViewHeader : UITableViewHeaderFooterView {
   }
 }
 
-extension OldBookmarksPanel : NSFetchedResultsControllerDelegate {
+extension BookmarksViewController : NSFetchedResultsControllerDelegate {
   func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
     tableView.beginUpdates()
   }
@@ -650,5 +670,89 @@ extension OldBookmarksPanel : NSFetchedResultsControllerDelegate {
     case .move:
       break
     }
+  }
+}
+
+private let ActionSheetTitleMaxLength = 120
+
+extension BookmarksViewController {
+  
+  @objc private func longPressedCell(_ gesture: UILongPressGestureRecognizer) {
+    guard gesture.state == .began,
+      let cell = gesture.view as? UITableViewCell,
+      let indexPath = tableView.indexPath(for: cell),
+      let bookmark = bookmarksFRC?.object(at: indexPath) as? Bookmark else {
+      return
+    }
+    
+    let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+    
+    if bookmark.isFolder {
+      actionsForFolder(bookmark).forEach { alert.addAction($0) }
+    } else {
+      alert.title = bookmark.url?.replacingOccurrences(of: "mailto:", with: "").ellipsize(maxLength: ActionSheetTitleMaxLength)
+      actionsForBookmark(bookmark, currentTabIsPrivate: false).forEach { alert.addAction($0) }
+    }
+    
+    let cancelAction = UIAlertAction(title: Strings.Cancel, style: .cancel, handler: nil)
+    alert.addAction(cancelAction)
+    
+    // If we're showing an arrow popup, set the anchor to the long press location.
+    if let popoverPresentationController = alert.popoverPresentationController {
+      popoverPresentationController.sourceView = view
+      popoverPresentationController.sourceRect = CGRect(origin: gesture.location(in: view), size: CGSize(width: 0, height: 16))
+      popoverPresentationController.permittedArrowDirections = .any
+    }
+    
+    present(alert, animated: true)
+  }
+  
+  private func actionsForFolder(_ folder: Bookmark) -> [UIAlertAction] {
+    let children = Bookmark.getChildren(forFolderUUID: folder.syncUUID, ignoreFolders: true, context: DataController.shared.mainThreadContext) ?? []
+    
+    let urls: [URL] = children.compactMap { b in
+      guard let url = b.url else { return nil }
+      return URL(string: url)
+    }
+    
+    return [
+      UIAlertAction(
+        title: String(format: Strings.Open_All_Bookmarks, children.count),
+        style: .default,
+        handler: { [weak self] _ in
+          self?.homePanelDelegate?.homePanelDidRequestToBatchOpenURLs(urls)
+        }
+      )
+    ]
+  }
+  
+  private func actionsForBookmark(_ bookmark: Bookmark, currentTabIsPrivate: Bool) -> [UIAlertAction] {
+    guard let urlString = bookmark.url, let url = URL(string: urlString) else { return [] }
+    
+    var items: [UIAlertAction] = []
+    // New Tab
+    items.append(UIAlertAction(title: Strings.Open_In_Background_Tab, style: .default, handler: { [weak self] _ in
+      guard let `self` = self else { return }
+      self.homePanelDelegate?.homePanelDidRequestToOpenInNewTab(url, isPrivate: false)
+    }))
+    if !currentTabIsPrivate {
+      // New Private Tab
+      items.append(UIAlertAction(title: Strings.Open_In_New_Private_Tab, style: .default, handler: { [weak self] _ in
+        guard let `self` = self else { return }
+        self.homePanelDelegate?.homePanelDidRequestToOpenInNewTab(url, isPrivate: true)
+      }))
+    }
+    // Copy
+    items.append(UIAlertAction(title: Strings.Copy_Link, style: .default, handler: { [weak self] _ in
+      guard let `self` = self else { return }
+      self.homePanelDelegate?.homePanelDidRequestToCopyURL(url)
+    }))
+    // Share
+    items.append(UIAlertAction(title: Strings.Share_Link, style: .default, handler: { [weak self] _ in
+      guard let `self` = self else { return }
+      self.homePanelDelegate?.homePanelDidRequestToShareURL(url)
+    }))
+    
+    return items
   }
 }

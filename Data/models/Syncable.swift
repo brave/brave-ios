@@ -68,7 +68,7 @@ extension Syncable {
 extension Syncable {
     
     // Is conveted to better store in CD
-    var syncUUID: [Int]? {
+    public var syncUUID: [Int]? {
         get { return SyncHelpers.syncUUID(fromString: syncDisplayUUID) }
         set(value) { syncDisplayUUID = SyncHelpers.syncDisplay(fromUUID: value) }
     }
