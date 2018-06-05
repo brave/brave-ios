@@ -475,22 +475,6 @@ class BookmarksViewController: SiteTableViewController, HomePanel {
         self.showEditBookmarkController(tableView, indexPath: indexPath)
       }
       else {
-//        let frc = Bookmark.frc(parentFolder: bookmark)
-//        do {
-//          try frc.performFetch()
-//          if let bookmarks = frc.fetchedObjects as? [Bookmark] {
-//            let urls: [URL] = bookmarks.compactMap { b in
-//              guard let url = b.url else { return nil }
-//              return URL(string: url)
-//            }
-//            homePanelDelegate?.homePanelDidRequestToBatchOpenURLs(urls)
-//            return
-//          }
-//        } catch {
-//          print("Failed to fetch bookmarks with error: \(error)")
-//        }
-//
-        
         let nextController = BookmarksViewController(folder: bookmark)
         nextController.profile = profile
         nextController.bookmarksDidChange = bookmarksDidChange

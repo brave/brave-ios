@@ -48,6 +48,16 @@ class HomeMenuController: UIViewController, PopoverContentComponent {
   
   let divider = UIView()
   
+  weak var visibleController: UIViewController?
+  
+  var isPanToDismissEnabled: Bool {
+    if visibleController === bookmarksNavController {
+      // Don't break reordering bookmarks
+      return !bookmarksPanel.tableView.isEditing
+    }
+    return true
+  }
+  
   // Buttons swap out the full page, meaning only one can be active at a time
   var pageButtons: [UIButton: UIViewController] {
     return [
@@ -222,7 +232,7 @@ class HomeMenuController: UIViewController, PopoverContentComponent {
   }
   
   @objc private func onClickPageButton(_ sender: UIButton) {
-    guard let newView = self.pageButtons[sender]?.view else { return }
+    guard let vc = self.pageButtons[sender], let newView = vc.view else { return }
     
     // Hide all old views
     self.pageButtons.forEach { (btn, controller) in
@@ -235,6 +245,8 @@ class HomeMenuController: UIViewController, PopoverContentComponent {
     newView.isHidden = false
     sender.isSelected = true
     sender.tintColor = BraveUX.ActionButtonSelectedTintColor
+    
+    visibleController = vc
   }
   
   func setHomePanelDelegate(_ delegate: HomePanelDelegate?) {

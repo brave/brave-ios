@@ -73,7 +73,6 @@ class PopoverController: UIViewController {
         
         let pan = UIPanGestureRecognizer(target: self, action: #selector(pannedPopover(_:)))
         pan.delegate = self
-        pan.isEnabled = contentController.isPanToDismissEnabled
         view.addGestureRecognizer(pan)
         
         containerView.translatesAutoresizingMaskIntoConstraints = false
@@ -421,6 +420,10 @@ extension PopoverController: UIViewControllerTransitioningDelegate {
 }
 
 extension PopoverController: UIGestureRecognizerDelegate {
+    
+    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        return contentController.isPanToDismissEnabled
+    }
     
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         guard let pan = gestureRecognizer as? UIPanGestureRecognizer else {
