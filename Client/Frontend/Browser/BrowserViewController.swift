@@ -2853,6 +2853,6 @@ extension BrowserViewController: HomeMenuControllerDelegate {
     }
     
     func menuDidBatchOpenURLs(_ menu: HomeMenuController, urls: [URL]) {
-        self.tabManager.addTabsForURLs(urls, zombie: false)
+        self.tabManager.addTabsForURLs(urls, zombie: false, isPrivate: tabManager.selectedTab?.tabState.isPrivate ?? false)
     }
 }
