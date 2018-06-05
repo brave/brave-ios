@@ -2845,6 +2845,7 @@ extension BrowserViewController: HomeMenuControllerDelegate {
                 if UIDevice.current.userInterfaceIdiom == .pad {
                     activityController.popoverPresentationController?.sourceView = self.view
                     activityController.popoverPresentationController?.sourceRect = self.view.convert(self.urlBar.menuButton.frame, from: self.urlBar.menuButton.superview)
+                    activityController.popoverPresentationController?.permittedArrowDirections = [.up]
                 }
                 self.present(activityController, animated: true)
             }

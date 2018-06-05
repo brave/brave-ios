@@ -118,14 +118,12 @@ class BookmarksViewController: SiteTableViewController, HomePanel {
   var isEditingIndividualBookmark:Bool = false
   
   var currentFolder: Bookmark? = nil
+  let tabState: TabState
   
-  init() {
+  init(folder: Bookmark?, tabState: TabState) {
+    self.tabState = tabState
+    
     super.init(nibName: nil, bundle: nil)
-    self.title = Strings.Bookmarks
-  }
-  
-  convenience init(folder: Bookmark?) {
-    self.init()
     
     self.currentFolder = folder
     self.title = folder?.displayTitle ?? Strings.Bookmarks
@@ -475,7 +473,7 @@ class BookmarksViewController: SiteTableViewController, HomePanel {
         self.showEditBookmarkController(tableView, indexPath: indexPath)
       }
       else {
-        let nextController = BookmarksViewController(folder: bookmark)
+        let nextController = BookmarksViewController(folder: bookmark, tabState: tabState)
         nextController.profile = profile
         nextController.bookmarksDidChange = bookmarksDidChange
         nextController.homePanelDelegate = homePanelDelegate
@@ -675,7 +673,7 @@ extension BookmarksViewController {
       actionsForFolder(bookmark).forEach { alert.addAction($0) }
     } else {
       alert.title = bookmark.url?.replacingOccurrences(of: "mailto:", with: "").ellipsize(maxLength: ActionSheetTitleMaxLength)
-      actionsForBookmark(bookmark, currentTabIsPrivate: false).forEach { alert.addAction($0) }
+      actionsForBookmark(bookmark, currentTabIsPrivate: tabState.isPrivate).forEach { alert.addAction($0) }
     }
     
     let cancelAction = UIAlertAction(title: Strings.Cancel, style: .cancel, handler: nil)
@@ -717,7 +715,7 @@ extension BookmarksViewController {
     // New Tab
     items.append(UIAlertAction(title: Strings.Open_In_Background_Tab, style: .default, handler: { [weak self] _ in
       guard let `self` = self else { return }
-      self.homePanelDelegate?.homePanelDidRequestToOpenInNewTab(url, isPrivate: false)
+      self.homePanelDelegate?.homePanelDidRequestToOpenInNewTab(url, isPrivate: currentTabIsPrivate)
     }))
     if !currentTabIsPrivate {
       // New Private Tab

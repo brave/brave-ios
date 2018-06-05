@@ -33,7 +33,7 @@ class HomeMenuController: UIViewController, PopoverContentComponent {
   
   weak var delegate: HomeMenuControllerDelegate?
   
-  let bookmarksPanel = BookmarksViewController(folder: nil)
+  let bookmarksPanel: BookmarksViewController
   fileprivate var bookmarksNavController: UINavigationController!
   
   let history = HistoryPanel()
@@ -73,6 +73,7 @@ class HomeMenuController: UIViewController, PopoverContentComponent {
   init(profile: Profile, tabState: TabState) {
     self.profile = profile
     self.tabState = tabState
+    self.bookmarksPanel = BookmarksViewController(folder: nil, tabState: tabState)
     
     super.init(nibName: nil, bundle: nil)
     bookmarksPanel.profile = profile
