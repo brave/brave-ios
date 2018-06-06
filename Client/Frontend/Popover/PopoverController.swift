@@ -323,34 +323,20 @@ extension PopoverController: BasicAnimationControllerDelegate {
             ])
         } else {
             // iPhone variant will always be full-width
-            if #available(iOS 11.0, *) {
-                NSLayoutConstraint.activate([
-                    containerView.leftAnchor.constraint(equalTo: viewController.view.safeAreaLayoutGuide.leftAnchor, constant: outerMargins.left),
-                    containerView.rightAnchor.constraint(equalTo: viewController.view.safeAreaLayoutGuide.rightAnchor, constant: -outerMargins.right)
-                ])
-            } else {
-                NSLayoutConstraint.activate([
-                    containerView.leftAnchor.constraint(equalTo: viewController.view.leftAnchor, constant: outerMargins.left),
-                    containerView.rightAnchor.constraint(equalTo: viewController.view.rightAnchor, constant: -outerMargins.right)
-                ])
-            }
+            NSLayoutConstraint.activate([
+                containerView.leftAnchor.constraint(equalTo: viewController.view.safeAreaLayoutGuide.leftAnchor, constant: outerMargins.left),
+                containerView.rightAnchor.constraint(equalTo: viewController.view.safeAreaLayoutGuide.rightAnchor, constant: -outerMargins.right)
+            ])
         }
         
         let centerX = containerView.centerXAnchor.constraint(equalTo: popoverContext.originView.centerXAnchor)
         centerX.priority = .defaultHigh
         centerX.isActive = true
         
-        if #available(iOS 11.0, *) {
-            NSLayoutConstraint.activate([
-                containerView.topAnchor.constraint(greaterThanOrEqualTo: viewController.view.safeAreaLayoutGuide.topAnchor, constant: outerMargins.top),
-                containerView.bottomAnchor.constraint(lessThanOrEqualTo: viewController.view.safeAreaLayoutGuide.bottomAnchor, constant: -outerMargins.bottom)
-            ])
-        } else {
-            NSLayoutConstraint.activate([
-                containerView.topAnchor.constraint(greaterThanOrEqualTo: viewController.topLayoutGuide.bottomAnchor, constant: outerMargins.top),
-                containerView.bottomAnchor.constraint(lessThanOrEqualTo: viewController.bottomLayoutGuide.topAnchor, constant: -outerMargins.bottom)
-            ])
-        }
+        NSLayoutConstraint.activate([
+            containerView.topAnchor.constraint(greaterThanOrEqualTo: viewController.view.safeAreaLayoutGuide.topAnchor, constant: outerMargins.top),
+            containerView.bottomAnchor.constraint(lessThanOrEqualTo: viewController.view.safeAreaLayoutGuide.bottomAnchor, constant: -outerMargins.bottom)
+        ])
         
         backgroundOverlayView.alpha = 0.0
         backgroundOverlayView.basicAnimate(property: kPOPViewAlpha, key: "alpha") { animation, _ in
@@ -438,15 +424,8 @@ extension PopoverController: UIGestureRecognizerDelegate {
         }
         
         if let scrollView = otherGestureRecognizer.view as? UIScrollView {
-            let topInset: CGFloat
-            let leftInset: CGFloat
-            if #available(iOS 11.0, *) {
-                topInset = scrollView.adjustedContentInset.top
-                leftInset = scrollView.adjustedContentInset.left
-            } else {
-                topInset = scrollView.contentInset.top
-                leftInset = scrollView.contentInset.left
-            }
+            let topInset = scrollView.adjustedContentInset.top
+            let leftInset = scrollView.adjustedContentInset.left
             
             let velocity = pan.velocity(in: pan.view)
             if abs(velocity.y) > abs(velocity.x) {

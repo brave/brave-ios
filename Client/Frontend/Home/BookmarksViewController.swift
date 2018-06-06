@@ -168,11 +168,7 @@ class BookmarksViewController: SiteTableViewController, HomePanel {
       make.height.equalTo(toolbarHeight)
       make.left.equalTo(self.view)
       make.right.equalTo(self.view)
-      if #available(iOS 11.0, *) {
-        make.bottom.equalTo(self.view.safeAreaLayoutGuide)
-      } else {
-        make.bottom.equalTo(self.view)
-      }
+      make.bottom.equalTo(self.view.safeAreaLayoutGuide)
     }
     
     tableView.snp.makeConstraints { make in
