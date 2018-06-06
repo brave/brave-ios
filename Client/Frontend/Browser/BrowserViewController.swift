@@ -18,6 +18,7 @@ import SwiftyJSON
 import Telemetry
 import Sentry
 import Deferred
+import Data
 
 private let KVOs: [KVOConstants] = [
     .estimatedProgress,
@@ -1134,6 +1135,7 @@ class BrowserViewController: UIViewController {
             }
 
             TabEvent.post(.didChangeURL(url), for: tab)
+            History.add(tab.title ?? "", url: url)
         }
 
         if tab === tabManager.selectedTab {

@@ -36,7 +36,7 @@ class HomeMenuController: UIViewController, PopoverContentComponent {
   let bookmarksPanel: BookmarksViewController
   fileprivate var bookmarksNavController: UINavigationController!
   
-  let history = HistoryPanel()
+  let history = HistoryViewController()
   
   var bookmarksButton = UIButton()
   var historyButton = UIButton()
@@ -83,6 +83,8 @@ class HomeMenuController: UIViewController, PopoverContentComponent {
     bookmarksPanel.bookmarksDidChange = { [weak self] in
       self?.updateBookmarkStatus()
     }
+    
+    history.homePanelDelegate = self
   }
   
   @available(*, unavailable)
@@ -248,16 +250,6 @@ class HomeMenuController: UIViewController, PopoverContentComponent {
     sender.tintColor = BraveUX.ActionButtonSelectedTintColor
     
     visibleController = vc
-  }
-  
-  func setHomePanelDelegate(_ delegate: HomePanelDelegate?) {
-    bookmarksPanel.homePanelDelegate = delegate
-    history.homePanelDelegate = delegate
-
-    if (delegate != nil) {
-      bookmarksPanel.reloadData()
-      history.reloadData()
-    }
   }
   
   func updateBookmarkStatus() {
