@@ -323,10 +323,17 @@ extension PopoverController: BasicAnimationControllerDelegate {
             ])
         } else {
             // iPhone variant will always be full-width
-            NSLayoutConstraint.activate([
-                containerView.leftAnchor.constraint(equalTo: viewController.view.leftAnchor, constant: outerMargins.left),
-                containerView.rightAnchor.constraint(equalTo: viewController.view.rightAnchor, constant: -outerMargins.right)
-            ])
+            if #available(iOS 11.0, *) {
+                NSLayoutConstraint.activate([
+                    containerView.leftAnchor.constraint(equalTo: viewController.view.safeAreaLayoutGuide.leftAnchor, constant: outerMargins.left),
+                    containerView.rightAnchor.constraint(equalTo: viewController.view.safeAreaLayoutGuide.rightAnchor, constant: -outerMargins.right)
+                ])
+            } else {
+                NSLayoutConstraint.activate([
+                    containerView.leftAnchor.constraint(equalTo: viewController.view.leftAnchor, constant: outerMargins.left),
+                    containerView.rightAnchor.constraint(equalTo: viewController.view.rightAnchor, constant: -outerMargins.right)
+                ])
+            }
         }
         
         let centerX = containerView.centerXAnchor.constraint(equalTo: popoverContext.originView.centerXAnchor)
