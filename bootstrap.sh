@@ -31,3 +31,6 @@ carthage bootstrap $CARTHAGE_VERBOSE --platform ios --color auto --cache-builds
 
 npm install
 npm run build
+
+# Do not commit changes to local file, this allows signing without causing git changes.
+git update-index --assume-unchanged Client/Configuration/Local.xcconfig

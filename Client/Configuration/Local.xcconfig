@@ -8,4 +8,4 @@
 MOZ_BUNDLE_ID = $(USER).fake.id
 
 // Add personal development team here
-DEVELOPMENT_TEAM = // SET ME!!
+DEVELOPMENT_TEAM = // Set for code signing (e.g. running on device)
