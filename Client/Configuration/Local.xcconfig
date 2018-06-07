@@ -1,12 +1,11 @@
-// Git ignored
-// Place localized configurations here
+// Imports local configurations to be utilized for local builds.
 // These are only compiled into the Local target
 
+#include "Local/BundleId.xcconfig"
+#include "Local/DevTeam.xcconfig"
 
-// App currently uses automatic code signing, so as long as a bundle id is added that is unique enough
-// Xcode should easily create the necessary certificates for app signing.
-// You may need to adjust this if your `USER` is not unique enough.
-MOZ_BUNDLE_ID = brave.$(USER).local.id
+// Set in Local/BundleId.xcconfig
+MOZ_BUNDLE_ID = $(LOCAL_BUILD_ID)
 
-// Add personal development team here
-DEVELOPMENT_TEAM = // Set for code signing (e.g. running on devices)
+// Set in Local/DevTeam.xcconfig
+DEVELOPMENT_TEAM = $(LOCAL_DEVELOPMENT_TEAM)
