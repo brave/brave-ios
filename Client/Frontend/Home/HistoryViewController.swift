@@ -18,12 +18,24 @@ private struct HistoryViewControllerUX {
 class HistoryViewController: SiteTableViewController, HomePanel {
   weak var homePanelDelegate: HomePanelDelegate? = nil
   fileprivate lazy var emptyStateOverlayView: UIView = self.createEmptyStateOverview()
-  fileprivate var kvoContext: UInt8 = 1
   var frc: NSFetchedResultsController<NSFetchRequestResult>?
   
-  init() {
+  let tabState: TabState
+  
+  init(tabState: TabState) {
+    self.tabState = tabState
+    
     super.init(nibName: nil, bundle: nil)
+    
     NotificationCenter.default.addObserver(self, selector: #selector(HistoryViewController.notificationReceived(_:)), name: .DynamicFontChanged, object: nil)
+  }
+  
+  required init?(coder aDecoder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+  
+  deinit {
+    NotificationCenter.default.removeObserver(self, name: .DynamicFontChanged, object: nil)
   }
   
   override func viewDidLoad() {
@@ -33,14 +45,6 @@ class HistoryViewController: SiteTableViewController, HomePanel {
     self.tableView.accessibilityIdentifier = "History List"
     
     reloadData()
-  }
-  
-  required init?(coder aDecoder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
-  }
-  
-  deinit {
-    NotificationCenter.default.removeObserver(self, name: .DynamicFontChanged, object: nil)
   }
   
   @objc func notificationReceived(_ notification: Notification) {
@@ -100,6 +104,13 @@ class HistoryViewController: SiteTableViewController, HomePanel {
   
   func configureCell(_ _cell: UITableViewCell, atIndexPath indexPath: IndexPath) {
     guard let cell = _cell as? TwoLineTableViewCell else { return }
+    
+    if !tableView.isEditing {
+      cell.gestureRecognizers?.forEach { cell.removeGestureRecognizer($0) }
+      let lp = UILongPressGestureRecognizer(target: self, action: #selector(longPressedCell(_:)))
+      cell.addGestureRecognizer(lp)
+    }
+    
     let site = frc!.object(at: indexPath) as! History
     cell.backgroundColor = UIColor.clear
     cell.setLines(site.title, detailText: site.url)
@@ -167,11 +178,6 @@ class HistoryViewController: SiteTableViewController, HomePanel {
       }
     }
   }
-  
-//  override func getLongPressUrl(forIndexPath indexPath: IndexPath) -> (URL?, [Int]?) {
-//    guard let obj = frc?.object(at: indexPath) as? History else { return (nil, nil) }
-//    return (obj.url != nil ? URL(string: obj.url!) : nil, nil)
-//  }
 }
 
 extension HistoryViewController : NSFetchedResultsControllerDelegate {
@@ -219,5 +225,66 @@ extension HistoryViewController : NSFetchedResultsControllerDelegate {
       }
     }
     updateEmptyPanelState()
+  }
+}
+
+private let ActionSheetTitleMaxLength = 120
+
+extension HistoryViewController {
+  
+  @objc private func longPressedCell(_ gesture: UILongPressGestureRecognizer) {
+    guard gesture.state == .began,
+      let cell = gesture.view as? UITableViewCell,
+      let indexPath = tableView.indexPath(for: cell),
+      let history = frc?.object(at: indexPath) as? History else {
+        return
+    }
+    
+    let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+    
+    alert.title = history.url?.replacingOccurrences(of: "mailto:", with: "").ellipsize(maxLength: ActionSheetTitleMaxLength)
+    actionsForHistory(history, currentTabIsPrivate: tabState.isPrivate).forEach { alert.addAction($0) }
+    
+    let cancelAction = UIAlertAction(title: Strings.Cancel, style: .cancel, handler: nil)
+    alert.addAction(cancelAction)
+    
+    // If we're showing an arrow popup, set the anchor to the long press location.
+    if let popoverPresentationController = alert.popoverPresentationController {
+      popoverPresentationController.sourceView = view
+      popoverPresentationController.sourceRect = CGRect(origin: gesture.location(in: view), size: CGSize(width: 0, height: 16))
+      popoverPresentationController.permittedArrowDirections = .any
+    }
+    
+    present(alert, animated: true)
+  }
+  
+  private func actionsForHistory(_ history: History, currentTabIsPrivate: Bool) -> [UIAlertAction] {
+    guard let urlString = history.url, let url = URL(string: urlString) else { return [] }
+    
+    var items: [UIAlertAction] = []
+    // New Tab
+    items.append(UIAlertAction(title: Strings.Open_In_Background_Tab, style: .default, handler: { [weak self] _ in
+      guard let `self` = self else { return }
+      self.homePanelDelegate?.homePanelDidRequestToOpenInNewTab(url, isPrivate: currentTabIsPrivate)
+    }))
+    if !currentTabIsPrivate {
+      // New Private Tab
+      items.append(UIAlertAction(title: Strings.Open_In_New_Private_Tab, style: .default, handler: { [weak self] _ in
+        guard let `self` = self else { return }
+        self.homePanelDelegate?.homePanelDidRequestToOpenInNewTab(url, isPrivate: true)
+      }))
+    }
+    // Copy
+    items.append(UIAlertAction(title: Strings.Copy_Link, style: .default, handler: { [weak self] _ in
+      guard let `self` = self else { return }
+      self.homePanelDelegate?.homePanelDidRequestToCopyURL(url)
+    }))
+    // Share
+    items.append(UIAlertAction(title: Strings.Share_Link, style: .default, handler: { [weak self] _ in
+      guard let `self` = self else { return }
+      self.homePanelDelegate?.homePanelDidRequestToShareURL(url)
+    }))
+    
+    return items
   }
 }
