@@ -32,14 +32,6 @@ carthage bootstrap $CARTHAGE_VERBOSE --platform ios --color auto --cache-builds
 npm install
 npm run build
 
-# Do not commit changes to local file, this allows signing without causing git changes.
-# git update-index --assume-unchanged Client/Configuration/Local.xcconfig
-
-CONFIG_PATH="Client/Configuration/"
-if [ ! -d /$CONFIG_PATH/Local ]; then
-  echo "File not found!"
-fi
-
 # Sets up local configurations from the tracked .template files
 
 # Checking the `Local` Directory
@@ -54,7 +46,6 @@ fi
 for CONFIG_FILE_NAME in BundleId DevTeam BuildId
 do
   CONFIG_FILE=$CONFIG_FILE_NAME.xcconfig
-  echo $CONFIG_PATH $CONFIG_FILE
   (cd $CONFIG_PATH \
     && cp -n Local.templates/$CONFIG_FILE Local/$CONFIG_FILE \
   )
