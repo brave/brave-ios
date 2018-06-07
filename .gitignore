@@ -81,6 +81,6 @@ node_modules
 
 # Brave
 scripts/
-Build_Id.xcconfig
+BuildId.xcconfig
 
 Client/Configuration/Local/
