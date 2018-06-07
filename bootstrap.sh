@@ -51,7 +51,7 @@ if [ ! -d "$CONFIG_PATH/Local/" ]; then
 fi
 
 # Copying over any necessary files into `Local`
-for CONFIG_FILE_NAME in BundleId DevTeam
+for CONFIG_FILE_NAME in BundleId DevTeam BuildId
 do
   CONFIG_FILE=$CONFIG_FILE_NAME.xcconfig
   echo $CONFIG_PATH $CONFIG_FILE

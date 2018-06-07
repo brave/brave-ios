@@ -7,7 +7,7 @@
 // So need to use unique name and utilize in subclasses 
 // (e.g. can't use $(inherited) to 'pull' these changes, into sub-configurations)
 
-#include "Build_Id.xcconfig"
+#include "Local/BuildId.xcconfig"
 
 OTHER_SWIFT_FLAGS_BASE=-DMOZ_TARGET_$(TARGET_NAME:upper)
 
