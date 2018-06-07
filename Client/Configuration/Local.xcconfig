@@ -4,8 +4,9 @@
 
 
 // App currently uses automatic code signing, so as long as a bundle id is added that is unique enough
-// Xcode should easily create the necessary certificates for app signing
-MOZ_BUNDLE_ID = $(USER).fake.id
+// Xcode should easily create the necessary certificates for app signing.
+// You may need to adjust this if your `USER` is not unique enough.
+MOZ_BUNDLE_ID = brave.$(USER).local.id
 
 // Add personal development team here
-DEVELOPMENT_TEAM = // Set for code signing (e.g. running on device)
+DEVELOPMENT_TEAM = // Set for code signing (e.g. running on devices)
