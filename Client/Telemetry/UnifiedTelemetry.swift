@@ -68,7 +68,7 @@ class UnifiedTelemetry {
             return outputDict
         }
 
-        Telemetry.default.beforeSerializePing(pingType: MobileEventPingBuilder.PingType) { (inputDict) -> [String: Any?] in
+        Telemetry.default.beforeSerializePing(pingType: FocusEventPingBuilder.PingType) { (inputDict) -> [String: Any?] in
             var outputDict = inputDict
 
             var settings: [String: String?] = inputDict["settings"] as? [String: String?] ?? [:]
@@ -100,7 +100,7 @@ class UnifiedTelemetry {
         }
 
        Telemetry.default.add(pingBuilderType: CorePingBuilder.self)
-       Telemetry.default.add(pingBuilderType: MobileEventPingBuilder.self)
+        Telemetry.default.add(pingBuilderType: FocusEventPingBuilder.self)
     }
 
     @objc func uploadError(notification: NSNotification) {
