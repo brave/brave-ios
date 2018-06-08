@@ -239,11 +239,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
 
         if let profile = profile, let _ = profile.prefs.boolForKey(PrefsKeys.AppExtensionTelemetryOpenUrl) {
             profile.prefs.removeObjectForKey(PrefsKeys.AppExtensionTelemetryOpenUrl)
-            var object = UnifiedTelemetry.EventObject.url
-            if case .text(_) = routerpath {
-                object = .searchText
-            }
-            UnifiedTelemetry.recordEvent(category: .appExtensionAction, method: .applicationOpenUrl, object: object)
         }
 
 
@@ -293,8 +288,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
             quickActions.handleShortCutItem(shortcut, withBrowserViewController: browserViewController)
             quickActions.launchedShortcutItem = nil
         }
-
-        UnifiedTelemetry.recordEvent(category: .action, method: .foreground, object: .app)
     }
 
     func applicationDidEnterBackground(_ application: UIApplication) {
@@ -309,8 +302,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         defaults.synchronize()
 
         syncOnDidEnterBackground(application: application)
-
-        UnifiedTelemetry.recordEvent(category: .action, method: .background, object: .app)
     }
 
     fileprivate func syncOnDidEnterBackground(application: UIApplication) {

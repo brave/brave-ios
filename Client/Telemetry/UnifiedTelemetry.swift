@@ -89,9 +89,6 @@ class UnifiedTelemetry {
                 profile.prefs.removeObjectForKey(PrefsKeys.AppExtensionTelemetryEventArray)
 
                 extensionEvents.forEach { extensionEvent in
-                    let category = UnifiedTelemetry.EventCategory.appExtensionAction.rawValue
-                    let newEvent = TelemetryEvent(category: category, method: extensionEvent["method"] ?? "", object: extensionEvent["object"] ?? "")
-                    pingEvents.append(newEvent.toArray())
                 }
                 outputDict["events"] = pingEvents
             }
@@ -106,83 +103,5 @@ class UnifiedTelemetry {
     @objc func uploadError(notification: NSNotification) {
         guard !DeviceInfo.isSimulator(), let error = notification.userInfo?["error"] as? NSError else { return }
         Sentry.shared.send(message: "Upload Error", tag: SentryTag.unifiedTelemetry, severity: .info, description: error.debugDescription)
-    }
-}
-
-// Enums for Event telemetry.
-extension UnifiedTelemetry {
-    public enum EventCategory: String {
-        case action = "action"
-        case appExtensionAction = "app-extension-action"
-    }
-
-    public enum EventMethod: String {
-        case add = "add"
-        case background = "background"
-        case cancel = "cancel"
-        case change = "change"
-        case delete = "delete"
-        case drag = "drag"
-        case drop = "drop"
-        case foreground = "foreground"
-        case open = "open"
-        case press = "press"
-        case scan = "scan"
-        case share = "share"
-        case tap = "tap"
-        case view = "view"
-        case applicationOpenUrl = "application-open-url"
-    }
-
-    public enum EventObject: String {
-        case app = "app"
-        case bookmark = "bookmark"
-        case bookmarksPanel = "bookmarks-panel"
-        case download = "download"
-        case downloadLinkButton = "download-link-button"
-        case downloadNowButton = "download-now-button"
-        case downloadsPanel = "downloads-panel"
-        case keyCommand = "key-command"
-        case locationBar = "location-bar"
-        case qrCodeText = "qr-code-text"
-        case qrCodeURL = "qr-code-url"
-        case readerModeCloseButton = "reader-mode-close-button"
-        case readerModeOpenButton = "reader-mode-open-button"
-        case readingListItem = "reading-list-item"
-        case setting = "setting"
-        case tab = "tab"
-        case trackingProtectionStatistics = "tracking-protection-statistics"
-        case trackingProtectionWhitelist = "tracking-protection-whitelist"
-        case url = "url"
-        case searchText = "searchText"
-    }
-
-    public enum EventValue: String {
-        case activityStream = "activity-stream"
-        case appMenu = "app-menu"
-        case awesomebarResults = "awesomebar-results"
-        case bookmarksPanel = "bookmarks-panel"
-        case browser = "browser"
-        case downloadCompleteToast = "download-complete-toast"
-        case downloadsPanel = "downloads-panel"
-        case homePanel = "home-panel"
-        case homePanelTabButton = "home-panel-tab-button"
-        case markAsRead = "mark-as-read"
-        case markAsUnread = "mark-as-unread"
-        case pageActionMenu = "page-action-menu"
-        case readerModeToolbar = "reader-mode-toolbar"
-        case readingListPanel = "reading-list-panel"
-        case shareExtension = "share-extension"
-        case shareMenu = "share-menu"
-        case tabTray = "tab-tray"
-        case topTabs = "top-tabs"
-    }
-
-    public static func recordEvent(category: EventCategory, method: EventMethod, object: EventObject, value: EventValue, extras: [String: Any?]? = nil) {
-        Telemetry.default.recordEvent(category: category.rawValue, method: method.rawValue, object: object.rawValue, value: value.rawValue, extras: extras)
-    }
-
-    public static func recordEvent(category: EventCategory, method: EventMethod, object: EventObject, value: String? = nil, extras: [String: Any?]? = nil) {
-        Telemetry.default.recordEvent(category: category.rawValue, method: method.rawValue, object: object.rawValue, value: value, extras: extras)
     }
 }

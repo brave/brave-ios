@@ -353,7 +353,6 @@ class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, Loa
             if let site = data[indexPath.row] {
                 if let url = URL(string: site.url) {
                     searchDelegate?.searchViewController(self, didSelectURL: url)
-                    UnifiedTelemetry.recordEvent(category: .action, method: .open, object: .bookmark, value: .awesomebarResults)
                 }
             }
         }
