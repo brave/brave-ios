@@ -15,12 +15,3 @@ INCLUDE_SETTINGS_BUNDLE = NO
 // Defines Swift Flags, (used as #if/#endif) inside *Swift* code
 // BASE 'inheritence' at end, due to dynamic nature of those flags
 OTHER_SWIFT_FLAGS=-DMOZ_CHANNEL_RELEASE $(OTHER_SWIFT_FLAGS_BASE)
-
-// Adjust SDK Variables
-ADJUST_ENVIRONMENT =
-ADJUST_APP_TOKEN =
-
-// Leanplum SDK Variables
-LEANPLUM_ENVIRONMENT =
-LEANPLUM_APP_ID =
-LEANPLUM_KEY =
