@@ -20,9 +20,8 @@ platform :ios do
     #reset_git_repo(force: true)
   end
 
-  desc "Creates a Brave Release build for TestFlight. Takes the following arguments: \"
-  :adjust_production_key   Adjust API Key for production."
-  lane :release do |options|
+  desc "Creates a Brave Beta Release build for TestFlight."
+  lane :beta do |options|
     UI.message "Neutral message (usually white)"
     UI.message "1: #{options[:one]}"
     UI.message "2: #{options[:two]}"
