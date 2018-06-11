@@ -4,10 +4,8 @@
 
 @testable import Client
 import Foundation
-import Account
 import Shared
 import Storage
-import Sync
 import XCTest
 import Deferred
 
