@@ -33,9 +33,13 @@ struct HomePanelUX {
 }
 
 protocol HomePanelDelegate: class {
+    // TODO: Remove sign in/create account delegate methods
     func homePanelDidRequestToSignIn(_ homePanel: HomePanel)
     func homePanelDidRequestToCreateAccount(_ homePanel: HomePanel)
     func homePanelDidRequestToOpenInNewTab(_ url: URL, isPrivate: Bool)
+    func homePanelDidRequestToCopyURL(_ url: URL)
+    func homePanelDidRequestToShareURL(_ url: URL)
+    func homePanelDidRequestToBatchOpenURLs(_ urls: [URL])
     func homePanel(_ homePanel: HomePanel, didSelectURL url: URL, visitType: VisitType)
     func homePanel(_ homePanel: HomePanel, didSelectURLString url: String, visitType: VisitType)
 }
@@ -204,11 +208,6 @@ class HomePanelViewController: UIViewController, UITextFieldDelegate, HomePanelD
         for (index, button) in buttons.enumerated() where button == sender {
             selectedPanel = HomePanelType(rawValue: index)
             delegate?.homePanelViewController(self, didSelectPanel: index)
-            if selectedPanel == .bookmarks {
-                UnifiedTelemetry.recordEvent(category: .action, method: .view, object: .bookmarksPanel, value: .homePanelTabButton)
-            } else if selectedPanel == .downloads {
-                UnifiedTelemetry.recordEvent(category: .action, method: .view, object: .downloadsPanel, value: .homePanelTabButton)
-            }
             break
         }
     }
@@ -272,6 +271,9 @@ class HomePanelViewController: UIViewController, UITextFieldDelegate, HomePanelD
         return self.homePanel(homePanel, didSelectURL: url, visitType: visitType)
     }
 
+    func homePanelDidRequestToBatchOpenURLs(_ urls: [URL]) {  
+    }
+  
     func homePanel(_ homePanel: HomePanel, didSelectURL url: URL, visitType: VisitType) {
         delegate?.homePanelViewController(self, didSelectURL: url, visitType: visitType)
         dismiss(animated: true, completion: nil)
@@ -287,6 +289,12 @@ class HomePanelViewController: UIViewController, UITextFieldDelegate, HomePanelD
     
     func homePanelDidRequestToOpenInNewTab(_ url: URL, isPrivate: Bool) {
         delegate?.homePanelViewControllerDidRequestToOpenInNewTab(url, isPrivate: isPrivate)
+    }
+  
+    func homePanelDidRequestToCopyURL(_ url: URL) {
+    }
+  
+    func homePanelDidRequestToShareURL(_ url: URL) {
     }
 }
 

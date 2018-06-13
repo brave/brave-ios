@@ -25,10 +25,6 @@ extension PhotonActionSheetProtocol {
         let sheet = PhotonActionSheet(title: title, actions: actions, closeButtonTitle: closeButtonTitle, style: style)
         sheet.modalPresentationStyle = style
         sheet.photonTransitionDelegate = PhotonActionSheetAnimator()
-        if let account = profile.getAccount(), account.actionNeeded == .none {
-            // the sync manager is only needed when we have a logged in user with sync in a good state
-            sheet.syncManager = profile.syncManager // the syncmanager is used to display the sync button in the browser menu
-        }
 
         if let popoverVC = sheet.popoverPresentationController, sheet.modalPresentationStyle == .popover {
             popoverVC.delegate = viewController
@@ -51,7 +47,6 @@ extension PhotonActionSheetProtocol {
 
         let openBookmarks = PhotonActionSheetItem(title: Strings.AppMenuBookmarksTitleString, iconString: "menu-panel-Bookmarks") { action in
             tab.loadRequest(PrivilegedRequest(url: HomePanelType.bookmarks.localhostURL) as URLRequest)
-            UnifiedTelemetry.recordEvent(category: .action, method: .view, object: .bookmarksPanel, value: .appMenu)
         }
 
         let openReadingList = PhotonActionSheetItem(title: Strings.AppMenuReadingListTitleString, iconString: "menu-panel-ReadingList") { action in
@@ -64,7 +59,6 @@ extension PhotonActionSheetProtocol {
 
         let openDownloads = PhotonActionSheetItem(title: Strings.AppMenuDownloadsTitleString, iconString: "menu-panel-Downloads") { action in
             tab.loadRequest(PrivilegedRequest(url: HomePanelType.downloads.localhostURL) as URLRequest)
-            UnifiedTelemetry.recordEvent(category: .action, method: .view, object: .downloadsPanel, value: .appMenu)
         }
 
         let openHomePage = PhotonActionSheetItem(title: Strings.AppMenuOpenHomePageTitleString, iconString: "menu-Home") { _ in
@@ -166,7 +160,6 @@ extension PhotonActionSheetProtocol {
             guard let url = tab.url?.displayURL else { return }
 
             self.profile.readingList.createRecordWithURL(url.absoluteString, title: tab.title ?? "", addedBy: UIDevice.current.name)
-            UnifiedTelemetry.recordEvent(category: .action, method: .add, object: .readingListItem, value: .pageActionMenu)
             success(Strings.AppMenuAddToReadingListConfirmMessage)
         }
 
@@ -187,7 +180,6 @@ extension PhotonActionSheetProtocol {
             QuickActions.sharedInstance.addDynamicApplicationShortcutItemOfType(.openLastBookmark,
                                                                                 withUserData: userData,
                                                                                 toApplication: .shared)
-            UnifiedTelemetry.recordEvent(category: .action, method: .add, object: .bookmark, value: .pageActionMenu)
             success(Strings.AppMenuAddBookmarkConfirmMessage)
         }
         
@@ -198,7 +190,6 @@ extension PhotonActionSheetProtocol {
             self.profile.bookmarks.modelFactory >>== {
                 $0.removeByURL(absoluteString).uponQueue(.main) { res in
                     if res.isSuccess {
-                        UnifiedTelemetry.recordEvent(category: .action, method: .delete, object: .bookmark, value: .pageActionMenu)
                         success(Strings.AppMenuRemoveBookmarkConfirmMessage)
                     }
                 }
@@ -231,22 +222,22 @@ extension PhotonActionSheetProtocol {
 
         let sendToDevice = PhotonActionSheetItem(title: Strings.SendToDeviceTitle, iconString: "menu-Send-to-Device") { action in
             guard let bvc = presentableVC as? PresentableVC & InstructionsViewControllerDelegate & ClientPickerViewControllerDelegate else { return }
-            if !self.profile.hasAccount() {
+//            if !self.profile.hasAccount() {
                 let instructionsViewController = InstructionsViewController()
                 instructionsViewController.delegate = bvc
                 let navigationController = UINavigationController(rootViewController: instructionsViewController)
                 navigationController.modalPresentationStyle = .formSheet
                 bvc.present(navigationController, animated: true, completion: nil)
                 return
-            }
+//            }
 
-            let clientPickerViewController = ClientPickerViewController()
-            clientPickerViewController.clientPickerDelegate = bvc
-            clientPickerViewController.profile = self.profile
-            clientPickerViewController.profileNeedsShutdown = false
-            let navigationController = UINavigationController(rootViewController: clientPickerViewController)
-            navigationController.modalPresentationStyle = .formSheet
-            bvc.present(navigationController, animated: true, completion: nil)
+//            let clientPickerViewController = ClientPickerViewController()
+//            clientPickerViewController.clientPickerDelegate = bvc
+//            clientPickerViewController.profile = self.profile
+//            clientPickerViewController.profileNeedsShutdown = false
+//            let navigationController = UINavigationController(rootViewController: clientPickerViewController)
+//            navigationController.modalPresentationStyle = .formSheet
+//            bvc.present(navigationController, animated: true, completion: nil)
         }
         
         let sharePage = PhotonActionSheetItem(title: Strings.AppMenuSharePageTitleString, iconString: "action_share") { action in
@@ -364,7 +355,6 @@ extension PhotonActionSheetProtocol {
         let statList = [totalCount, adCount, analyticsCount, socialCount, contentCount]
 
         let addToWhitelist = PhotonActionSheetItem(title: Strings.TrackingProtectionDisableTitle, iconString: "menu-TrackingProtection-Off") { _ in
-            UnifiedTelemetry.recordEvent(category: .action, method: .add, object: .trackingProtectionWhitelist)
             ContentBlockerHelper.whitelist(enable: true, url: currentURL) {
                 tab.reload()
             }
@@ -399,7 +389,6 @@ extension PhotonActionSheetProtocol {
             let actions = menuActionsForTrackingProtectionEnabled(for: tab)
             let tpBlocking = PhotonActionSheetItem(title: Strings.SettingsTrackingProtectionSectionName, text: Strings.TPBlockingDescription, iconString: "menu-TrackingProtection", isEnabled: false, accessory: .Disclosure) { _ in
                 guard let bvc = self as? PresentableVC else { return }
-                UnifiedTelemetry.recordEvent(category: .action, method: .view, object: .trackingProtectionStatistics)
                 self.presentSheetWith(title: Strings.SettingsTrackingProtectionSectionName, actions: actions, on: bvc, from: urlBar)
             }
             return [tpBlocking]
@@ -457,48 +446,5 @@ extension PhotonActionSheetProtocol {
         } else {
             return [toggleDesktopSite]
         }
-    }
-
-    func syncMenuButton(showFxA: @escaping (_ params: FxALaunchParams?) -> ()) -> [PhotonActionSheetItem]? {
-        profile.getAccount()?.updateProfile()
-        let account = profile.getAccount()
-
-        func title() -> String? {
-            guard let status = account?.actionNeeded else { return Strings.FxASignInToSync }
-            switch status {
-            case .none:
-                return account?.fxaProfile?.displayName ?? account?.fxaProfile?.email
-            case .needsVerification:
-                return Strings.FxAAccountVerifyEmail
-            case .needsPassword:
-                return Strings.FxAAccountVerifyPassword
-            case .needsUpgrade:
-                return Strings.FxAAccountUpgradeFirefox
-            }
-        }
-
-        func imageName() -> String? {
-            guard let status = account?.actionNeeded else { return "menu-sync" }
-            switch status {
-            case .none:
-                return "placeholder-avatar"
-            case .needsVerification, .needsPassword, .needsUpgrade:
-                return "menu-warning"
-            }
-        }
-
-        let action: ((PhotonActionSheetItem) -> Void) = { action in
-            let fxaParams = FxALaunchParams(query: ["entrypoint": "browsermenu"])
-            showFxA(fxaParams)
-        }
-
-        guard let title = title(), let iconString = imageName() else { return nil }
-        // .none is also a case on the swift enum "Optional" so the value needs to be unwrapped before we check
-        var iconURL: URL? = nil
-        if let actionNeeded = account?.actionNeeded {
-            iconURL = (actionNeeded == .none) ? account?.fxaProfile?.avatar.url : nil
-        }
-        let syncOption = PhotonActionSheetItem(title: title, iconString: iconString, iconURL: iconURL, accessory: .Sync, handler: action)
-        return [syncOption]
     }
 }

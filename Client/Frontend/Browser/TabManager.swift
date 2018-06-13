@@ -153,6 +153,21 @@ class TabManager: NSObject {
 
         return nil
     }
+    
+    var currentDisplayedIndex: Int? {
+        assert(Thread.isMainThread)
+        
+        guard let selectedTab = self.selectedTab else {
+            return nil
+        }
+        
+        return displayedTabsForCurrentPrivateMode.index(of: selectedTab)
+    }
+    
+    // What the users sees displayed based on current private browsing mode
+    var displayedTabsForCurrentPrivateMode: [Tab] {
+        return UIApplication.isInPrivateMode ? privateTabs : normalTabs
+    }
 
     func getTabFor(_ url: URL) -> Tab? {
         assert(Thread.isMainThread)
@@ -264,7 +279,7 @@ class TabManager: NSObject {
         return self.addTab(request, configuration: configuration, afterTab: afterTab, flushToDisk: true, zombie: false)
     }
 
-    func addTabsForURLs(_ urls: [URL], zombie: Bool) {
+    func addTabsForURLs(_ urls: [URL], zombie: Bool, isPrivate: Bool = false) {
         assert(Thread.isMainThread)
 
         if urls.isEmpty {
@@ -274,7 +289,7 @@ class TabManager: NSObject {
         self.isRestoring = true
         var tab: Tab!
         for url in urls {
-            tab = self.addTab(URLRequest(url: url), flushToDisk: false, zombie: zombie)
+            tab = self.addTab(URLRequest(url: url), flushToDisk: false, zombie: zombie, isPrivate: isPrivate)
         }
         // Flush.
         storeChanges()
@@ -313,12 +328,10 @@ class TabManager: NSObject {
             return
         }
 
-        let fromIndex = tabs.index(of: currentTabs[visibleFromIndex]) ?? tabs.count - 1
-        let toIndex = tabs.index(of: currentTabs[visibleToIndex]) ?? tabs.count - 1
-
         let previouslySelectedTab = selectedTab
 
-        tabs.insert(tabs.remove(at: fromIndex), at: toIndex)
+        // TODO: Move to Tab model once we migrate to CoreData.
+        tabs.insert(tabs.remove(at: visibleFromIndex), at: visibleToIndex)
 
         if let previouslySelectedTab = previouslySelectedTab, let previousSelectedIndex = tabs.index(of: previouslySelectedTab) {
             _selectedIndex = previousSelectedIndex
@@ -1059,4 +1072,12 @@ class TabManagerNavDelegate: NSObject, WKNavigationDelegate {
 
         decisionHandler(res)
     }
+}
+
+// MARK: - TabManagerDelegate optional methods.
+extension TabManagerDelegate {
+    func tabManager(_ tabManager: TabManager, willAddTab tab: Tab) {}
+    func tabManager(_ tabManager: TabManager, willRemoveTab tab: Tab) {}
+    func tabManagerDidAddTabs(_ tabManager: TabManager) {}
+    func tabManagerDidRemoveAllTabs(_ tabManager: TabManager, toast: ButtonToast?) {}
 }

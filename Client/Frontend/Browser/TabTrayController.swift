@@ -508,7 +508,6 @@ class TabTrayController: UIViewController {
     }
 
     func openNewTab() {
-        LeanPlumClient.shared.track(event: .openedNewTab, withParameters: ["Source": "Tab Tray"])
         openNewTab(nil)
     }
 
@@ -850,8 +849,6 @@ extension TabManagerDataSource: UICollectionViewDragDelegate {
             itemProvider = NSItemProvider()
         }
 
-        UnifiedTelemetry.recordEvent(category: .action, method: .drag, object: .tab, value: .tabTray)
-
         let dragItem = UIDragItem(itemProvider: itemProvider)
         dragItem.localObject = tab
         return [dragItem]
@@ -864,8 +861,6 @@ extension TabManagerDataSource: UICollectionViewDropDelegate {
         guard isDragging, let destinationIndexPath = coordinator.destinationIndexPath, let dragItem = coordinator.items.first?.dragItem, let tab = dragItem.localObject as? Tab, let sourceIndex = tabs.index(of: tab) else {
             return
         }
-
-        UnifiedTelemetry.recordEvent(category: .action, method: .drop, object: .tab, value: .tabTray)
 
         coordinator.drop(dragItem, toItemAt: destinationIndexPath)
         isDragging = false
@@ -1089,10 +1084,7 @@ extension TabTrayController: UIViewControllerPreviewingDelegate {
 extension TabTrayController: ClientPickerViewControllerDelegate {
 
     func clientPickerViewController(_ clientPickerViewController: ClientPickerViewController, didPickClients clients: [RemoteClient]) {
-        if let item = clientPickerViewController.shareItem {
-            _ = self.profile.sendItems([item], toClients: clients)
-        }
-        clientPickerViewController.dismiss(animated: true, completion: nil)
+        // BRAVE TODO: Not sure what ClientPickerViewController is for or when its used yet
     }
 
     func clientPickerViewControllerDidCancel(_ clientPickerViewController: ClientPickerViewController) {

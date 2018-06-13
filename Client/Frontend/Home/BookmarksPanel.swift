@@ -58,7 +58,6 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
 
     init() {
         super.init(nibName: nil, bundle: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(notificationReceived), name: .FirefoxAccountChanged, object: nil)
 
         self.tableView.register(SeparatorTableCell.self, forCellReuseIdentifier: BookmarkSeparatorCellIdentifier)
         self.tableView.register(BookmarkFolderTableViewCell.self, forCellReuseIdentifier: BookmarkFolderCellIdentifier)
@@ -111,26 +110,12 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
             source.selectFolder(BookmarkRoots.MobileFolderGUID).upon(onModelFetched)
         }
     }
-
-    @objc func notificationReceived(_ notification: Notification) {
-        switch notification.name {
-        case .FirefoxAccountChanged:
-            self.reloadData()
-            break
-        default:
-            // no need to do anything at all
-            log.warning("Received unexpected notification \(notification.name)")
-            break
-        }
-    }
     
     @objc fileprivate func refreshBookmarks() {
-        profile.syncManager.mirrorBookmarks().upon { (_) in
-            DispatchQueue.main.async {
-                self.loadData()
-                self.refreshControl?.endRefreshing()
-            }
-        }
+      DispatchQueue.main.async {
+        self.loadData()
+        self.refreshControl?.endRefreshing()
+      }
     }
 
     fileprivate func createEmptyStateOverlayView() -> UIView {
@@ -335,9 +320,6 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
         switch bookmark {
         case let item as BookmarkItem:
             homePanelDelegate?.homePanel(self, didSelectURLString: item.url, visitType: VisitType.bookmark)
-            LeanPlumClient.shared.track(event: .openedBookmark)
-            UnifiedTelemetry.recordEvent(category: .action, method: .open, object: .bookmark, value: .bookmarksPanel)
-            break
 
         case let folder as BookmarkFolder:
             log.debug("Selected \(folder.guid)")
@@ -398,7 +380,6 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
 
         let delete = UITableViewRowAction(style: .default, title: title, handler: { (action, indexPath) in
             self.deleteBookmark(indexPath: indexPath, source: source)
-            UnifiedTelemetry.recordEvent(category: .action, method: .delete, object: .bookmark, value: .bookmarksPanel, extras: ["gesture": "swipe"])
         })
 
         return [delete]
@@ -472,7 +453,6 @@ extension BookmarksPanel: HomePanelContextMenu {
         if source.current.itemIsEditableAtIndex(indexPath.row) {
             let removeAction = PhotonActionSheetItem(title: Strings.RemoveBookmarkContextMenuTitle, iconString: "action_bookmark_remove", handler: { action in
                 self.deleteBookmark(indexPath: indexPath, source: source)
-                UnifiedTelemetry.recordEvent(category: .action, method: .delete, object: .bookmark, value: .bookmarksPanel, extras: ["gesture": "long-press"])
             })
             actions.append(removeAction)
         }
