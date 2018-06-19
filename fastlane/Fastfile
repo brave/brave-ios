@@ -49,6 +49,7 @@ platform :ios do
       export_method: "app-store",
       include_symbols: true,
       include_bitcode: false,
+      xcargs: "-allowProvisioningUpdates",
     )
 
     testflight(
