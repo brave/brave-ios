@@ -22,10 +22,6 @@ platform :ios do
 
   desc "Creates a Brave Beta Release build for TestFlight."
   lane :beta do |options|
-    UI.message "Neutral message (usually white)"
-    UI.message "1: #{options[:one]}"
-    UI.message "2: #{options[:two]}"
-
     set_build_number()
 
     # TODO: make name dynamic
