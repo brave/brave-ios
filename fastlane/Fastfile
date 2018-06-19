@@ -88,7 +88,7 @@ platform :ios do
       formattedBuildNumber = time.strftime(dateFormat) 
     end
 
-    sh("echo GENERATED_BUILD_ID=#{formattedBuildNumber} >> ../Client/Configuration/Local/BuildId.xcconfig")
+    sh("echo GENERATED_BUILD_ID=#{formattedBuildNumber} > ../Client/Configuration/Local/BuildId.xcconfig")
   end
 
   # TODO: Attempt action override on same name
