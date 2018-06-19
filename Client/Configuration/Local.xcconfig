@@ -5,7 +5,7 @@
 #include "Local/DevTeam.xcconfig"
 
 // Set in Local/BundleId.xcconfig
-MOZ_BUNDLE_ID = $(LOCAL_BUILD_ID)
+MOZ_BUNDLE_ID = $(LOCAL_BUNDLE_ID)
 
 // Set in Local/DevTeam.xcconfig
 DEVELOPMENT_TEAM = $(LOCAL_DEVELOPMENT_TEAM)

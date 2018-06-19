@@ -3,4 +3,4 @@
 // Xcode should easily create the necessary certificates for app signing.
 
 // This may need to be adjusted if `USER` is not unique.
-LOCAL_BUILD_ID = brave.$(USER).local.id
+LOCAL_BUNDLE_ID = brave.$(USER).local.id
