@@ -7,17 +7,19 @@ fastlane_version "2.86.0"
 default_platform :ios
 
 platform :ios do
-  before_all do
-    #sh("./scripts/mkdirs.sh")
-    #ensure_git_status_clean()
+  before_all do |lane, options|
+    # Verify clean repo by default
+    unless options[:ignore_git_status]
+      UI.message "Running git status check"
+      ensure_git_status_clean()
+    end
   end
 
-  after_all do |lane|
-    #reset_git_repo(force: true)
-  end
-
-  error do |lane, exception|
-    #reset_git_repo(force: true)
+  after_all do |lane, options|
+    # If no uncommitted changes existed before running `lane`, reset any changes potential fastlane changes
+    unless options[:ignore_git_status]
+      reset_git_repo(skip_clean: true)
+    end
   end
 
   desc "Creates a Brave Beta Release build for TestFlight."
@@ -36,6 +38,10 @@ platform :ios do
       configuration: "Release",
     )
 
+    add_badge(
+      color: "green"
+    )
+
     gym(
       scheme: "FirefoxBeta",
       output_directory: "./builds/",
@@ -49,6 +55,7 @@ platform :ios do
     )
 
     testflight(
+      username: sh("cat", "../Client/Configuration/Local/AppleId"),
       ipa: "./builds/#{build_name}.ipa",
       skip_waiting_for_build_processing: true,
     )
@@ -60,19 +67,19 @@ platform :ios do
   :color              The color of the right area of the badge."
   private_lane :add_badge do |options|
     badge(
-      shield: "#{get_client_version_number}-Build%20#{get_build_number}-#{options[:color]}",
+      shield: "#{get_client_version_number}-#{get_build_number}-#{options[:color]}",
       no_badge: true,
-      shield_no_resize: true
+      shield_no_resize: true,
+      shield_gravity: "south",
     )
   end
 
-  desc "Updates the project's build number to be the next number acceptable by TestFlight. Takes the following arguments: \"
-  :username             Apple ID to use to talk to iTunes Connect with."
-  lane :set_build_number do |options|
+  desc "Updates the project's build number to be the next number acceptable by TestFlight. Takes the following arguments:"
+  lane :set_build_number do
     latest_build_number = latest_testflight_build_number(
       version: get_client_version_number,
       initial_build_number: 0,
-      username: "joel@brave.com",
+      username: sh("cat", "../Client/Configuration/Local/AppleId"),
       app_identifier: "com.brave.ios.BrowserBeta",
     )
 
@@ -92,7 +99,7 @@ platform :ios do
   end
 
   # TODO: Attempt action override on same name
-  private_lane :get_client_version_number do |options|
+  private_lane :get_client_version_number do
     buildIdFile = Xcodeproj::Config.new("../Client/Configuration/Base.xcconfig")
     buildId = buildIdFile.attributes['BRAVE_VERSION']
 
@@ -102,17 +109,20 @@ platform :ios do
     #   these very well (e.g. this returns the literal value: "$(BRAVE_VERSION)")
   end
 
-  private_lane :get_client_build_number do |options|
+  private_lane :get_client_build_number do
     buildIdFile = Xcodeproj::Config.new("../Client/Configuration/Local/BuildId.xcconfig")
     buildId = buildIdFile.attributes['GENERATED_BUILD_ID']
   end
 
-  override_lane :get_build_number do |options|
+  override_lane :get_build_number do
     get_client_build_number()
   end
 
-  lane :logtest do |options| 
-    UI.message get_build_number()
+  lane :logtest do |options|
+    UI.message "1: #{options[:one]}"
+
+    foo = sh("cat", "../Client/Configuration/Local/AppleId")
+    UI.message foo
   end
 
 end
