@@ -695,6 +695,13 @@
 			remoteGlobalIDString = 2FCAE2191ABB51F800877008;
 			remoteInfo = Storage;
 		};
+		5D977A2520DAA0E300D6ADF3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F84B21B61A090F8100AAB793 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2FCAE2191ABB51F800877008;
+			remoteInfo = Storage;
+		};
 		5DE7688E20B3456E00FF5533 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F84B21B61A090F8100AAB793 /* Project object */;
@@ -3155,6 +3162,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				5D977A2620DAA0E300D6ADF3 /* PBXTargetDependency */,
 				5D977A1B20DA9D1200D6ADF3 /* PBXTargetDependency */,
 			);
 			name = BraveShared;
@@ -4410,6 +4418,11 @@
 			isa = PBXTargetDependency;
 			target = 2FCAE2191ABB51F800877008 /* Storage */;
 			targetProxy = 5D977A2320DA9D2200D6ADF3 /* PBXContainerItemProxy */;
+		};
+		5D977A2620DAA0E300D6ADF3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2FCAE2191ABB51F800877008 /* Storage */;
+			targetProxy = 5D977A2520DAA0E300D6ADF3 /* PBXContainerItemProxy */;
 		};
 		5DE7688F20B3456E00FF5533 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
