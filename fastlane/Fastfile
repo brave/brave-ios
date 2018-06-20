@@ -38,9 +38,7 @@ platform :ios do
       configuration: "Release",
     )
 
-    add_badge(
-      color: "green"
-    )
+    add_badge(color: "green")
 
     gym(
       scheme: "FirefoxBeta",
