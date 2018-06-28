@@ -6,6 +6,9 @@ fastlane_version "2.86.0"
 
 default_platform :ios
 
+CONFIG_PATH = "../Client/Configuration"
+LOCAL_PATH = "#{CONFIG_PATH}/Local"
+
 platform :ios do
   before_all do |lane, options|
     # Verify clean repo by default
@@ -16,10 +19,8 @@ platform :ios do
   end
 
   after_all do |lane, options|
-    # If no uncommitted changes existed before running `lane`, reset any changes potential fastlane changes
-    unless options[:ignore_git_status]
-      reset_git_repo(skip_clean: true)
-    end
+    # If no uncommitted changes existed before running `lane`, reset any potential fastlane changes
+    reset_git_repo(skip_clean: true) unless options[:ignore_git_status]
   end
 
   desc "Creates a Brave Beta Release build for TestFlight."
@@ -53,7 +54,7 @@ platform :ios do
     )
 
     testflight(
-      username: sh("cat", "../Client/Configuration/Local/AppleId"),
+      username: sh("cat", "#{LOCAL_PATH}/AppleId"),
       ipa: "./builds/#{build_name}.ipa",
       skip_waiting_for_build_processing: true,
     )
@@ -77,7 +78,7 @@ platform :ios do
     latest_build_number = latest_testflight_build_number(
       version: get_client_version_number,
       initial_build_number: 0,
-      username: sh("cat", "../Client/Configuration/Local/AppleId"),
+      username: sh("cat", "#{LOCAL_PATH}/AppleId"),
       app_identifier: "com.brave.ios.BrowserBeta",
     )
 
@@ -93,12 +94,12 @@ platform :ios do
       formattedBuildNumber = time.strftime(dateFormat) 
     end
 
-    sh("echo GENERATED_BUILD_ID=#{formattedBuildNumber} > ../Client/Configuration/Local/BuildId.xcconfig")
+    sh("echo GENERATED_BUILD_ID=#{formattedBuildNumber} > #{LOCAL_PATH}/BuildId.xcconfig")
   end
 
   # TODO: Attempt action override on same name
   private_lane :get_client_version_number do
-    buildIdFile = Xcodeproj::Config.new("../Client/Configuration/Base.xcconfig")
+    buildIdFile = Xcodeproj::Config.new("#{CONFIG_PATH}/Base.xcconfig")
     buildId = buildIdFile.attributes['BRAVE_VERSION']
 
     # Traditionally, would pull version number via:
@@ -108,7 +109,7 @@ platform :ios do
   end
 
   private_lane :get_client_build_number do
-    buildIdFile = Xcodeproj::Config.new("../Client/Configuration/Local/BuildId.xcconfig")
+    buildIdFile = Xcodeproj::Config.new("#{LOCAL_PATH}/BuildId.xcconfig")
     buildId = buildIdFile.attributes['GENERATED_BUILD_ID']
   end
 
@@ -119,7 +120,7 @@ platform :ios do
   lane :logtest do |options|
     UI.message "1: #{options[:one]}"
 
-    foo = sh("cat", "../Client/Configuration/Local/AppleId")
+    foo = sh("cat", "#{LOCAL_PATH}/AppleId")
     UI.message foo
   end
 
