@@ -10,7 +10,7 @@
 	</array>
 	<key>keychain-access-groups</key>
 	<array>
-		<string>$(AppIdentifierPrefix)org.mozilla.ios.Fennec.enterprise</string>
+		<string>$(AppIdentifierPrefix)com.brave.ios.Fennec.enterprise</string>
 	</array>
 </dict>
 </plist>
