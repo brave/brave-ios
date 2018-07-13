@@ -25,7 +25,7 @@ private struct ETLDEntry: CustomStringConvertible {
 private typealias TLDEntryMap = [String: ETLDEntry]
 
 private func loadEntriesFromDisk() -> TLDEntryMap? {
-    if let data = String.contentsOfFileWithResourceName("effective_tld_names", ofType: "dat", fromBundle: Bundle(identifier: "org.mozilla.Shared")!, encoding: .utf8, error: nil) {
+    if let data = String.contentsOfFileWithResourceName("effective_tld_names", ofType: "dat", fromBundle: Bundle(identifier: "com.brave.Shared")!, encoding: .utf8, error: nil) {
         let lines = data.components(separatedBy: "\n")
         let trimmedLines = lines.filter { !$0.hasPrefix("//") && $0 != "\n" && $0 != "" }
 
@@ -55,6 +55,12 @@ private var etldEntries: TLDEntryMap? = {
 
 // MARK: - Local Resource URL Extensions
 extension URL {
+    public struct Strings {
+        static let localhost = "localhost"
+        static let localhostIp = "127.0.0.1"
+        static let http = "http"
+        
+    }
 
     public func allocatedFileSize() -> Int64 {
         // First try to get the total allocated size and in failing that, get the file allocated size
