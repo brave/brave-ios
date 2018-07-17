@@ -41,7 +41,7 @@ class SensitiveViewController: UIViewController {
             return
         }
         
-        guard authState != .presenting else {
+        if authState == .presenting {
             return
         }
         
@@ -79,7 +79,7 @@ class SensitiveViewController: UIViewController {
     }
 
     @objc func blurContents() {
-        guard KeychainWrapper.sharedAppContainerKeychain.authenticationInfo() != nil else {
+        if KeychainWrapper.sharedAppContainerKeychain.authenticationInfo() == nil {
             return
         }
         
