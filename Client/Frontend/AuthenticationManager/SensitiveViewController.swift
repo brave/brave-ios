@@ -26,7 +26,7 @@ class SensitiveViewController: UIViewController {
         notificationCenter.addObserver(self, selector: #selector(checkIfUserRequiresValidation), name: .UIApplicationWillEnterForeground, object: nil)
         notificationCenter.addObserver(self, selector: #selector(checkIfUserRequiresValidation), name: .UIApplicationDidBecomeActive, object: nil)
         notificationCenter.addObserver(self, selector: #selector(blurContents), name: .UIApplicationWillResignActive, object: nil)
-        notificationCenter.addObserver(self, selector: #selector(hideLogins), name: .UIApplicationDidEnterBackground, object: nil)
+        notificationCenter.addObserver(self, selector: #selector(applicationBackgrounded), name: .UIApplicationDidEnterBackground, object: nil)
 
     }
 
@@ -36,17 +36,17 @@ class SensitiveViewController: UIViewController {
     }
 
     @objc func checkIfUserRequiresValidation() {
-        guard authState != .presenting else {
+        if isSessionValidated {
+            removeBackgroundedBlur()
+            return
+        }
+        
+        if authState == .presenting {
             return
         }
         
         presentedViewController?.dismiss(animated: false, completion: nil)
         guard let authInfo = KeychainWrapper.sharedAppContainerKeychain.authenticationInfo() else {
-            return
-        }
-        
-        if !authInfo.isPasscodeRequiredImmediately && isSessionValidated {
-            removeBackgroundedBlur()
             return
         }
 
@@ -57,6 +57,7 @@ class SensitiveViewController: UIViewController {
                 self.promptingForTouchID = false
                 self.authState = .notAuthenticating
                 self.removeBackgroundedBlur()
+                isSessionValidated = true
             },
             cancel: {
                 self.promptingForTouchID = false
@@ -71,11 +72,17 @@ class SensitiveViewController: UIViewController {
         authState = .presenting
     }
 
-    @objc func hideLogins() {
-        _ = self.navigationController?.popToRootViewController(animated: true)
+    @objc func applicationBackgrounded() {
+        if let authInfo = KeychainWrapper.sharedAppContainerKeychain.authenticationInfo(), authInfo.isPasscodeRequiredImmediately {
+            isSessionValidated = false
+        }
     }
 
     @objc func blurContents() {
+        if KeychainWrapper.sharedAppContainerKeychain.authenticationInfo() == nil {
+            return
+        }
+        
         if backgroundedBlur == nil {
             backgroundedBlur = addBlurredContent()
         }
