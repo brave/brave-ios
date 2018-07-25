@@ -12,7 +12,8 @@
   "license": "MPL-2.0",
   "dependencies": {
     "page-metadata-parser": "^1.1.2",
-    "readability": "mozilla/readability#3c76104adb00eb9897517e6be6c74c6c05918dfe"
+    "readability": "mozilla/readability#3c76104adb00eb9897517e6be6c74c6c05918dfe",
+    "web3": "^1.0.0-beta.35"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",
