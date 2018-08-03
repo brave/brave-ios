@@ -82,5 +82,6 @@ node_modules
 # Brave
 scripts/
 BuildId.xcconfig
+.vscode/
 
 Client/Configuration/Local/
