@@ -80,8 +80,13 @@ platform :ios do
     #   cache_builds: true,
     #   configuration: "Release",
     # )
-    # 
+    #
     # add_badge(color: "green")
+
+    get_certificates(
+      development: false,
+      team_id: "L6556KQ6XT"
+    )
 
     gym(
       scheme: "Fennec_Enterprise",
@@ -89,10 +94,10 @@ platform :ios do
       output_name: "#{build_name}.ipa",
       sdk: "iphoneos",
       clean: true,
-      export_method: "app-store",
+      export_method: "enterprise",
       include_symbols: true,
       include_bitcode: false,
-      xcargs: "-allowProvisioningUpdates",
+      xcargs: "-allowProvisioningUpdates"
     )
 
   end
