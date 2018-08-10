@@ -182,6 +182,8 @@ class BookmarksViewController: SiteTableViewController, HomePanel {
       print(error.description)
     }
     
+    editBookmarksButton?.isEnabled = (self.bookmarksFRC?.fetchedObjects?.count ?? 0) > 0
+    
     super.reloadData()
   }
   
@@ -230,6 +232,7 @@ class BookmarksViewController: SiteTableViewController, HomePanel {
     items.append(UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil))
     
     editBookmarksButton = UIBarButtonItem(image: UIImage(named: "edit")?.withRenderingMode(.alwaysTemplate), style: .plain, target: self, action: #selector(onEditBookmarksButton))
+    editBookmarksButton.isEnabled = false
     items.append(editBookmarksButton)
     items.append(UIBarButtonItem.fixedSpace(5))
     
@@ -633,11 +636,18 @@ extension BookmarksViewController : NSFetchedResultsControllerDelegate {
         return
       }
       tableView.insertRows(at: [path], with: .automatic)
+      editBookmarksButton.isEnabled = true
     case .delete:
       guard let indexPath = indexPath else {
         return
       }
       tableView.deleteRows(at: [indexPath], with: .automatic)
+      let foldersCount = controller.fetchedObjects?.count ?? 0
+      if foldersCount == 0 {
+        editBookmarksButton.isEnabled = false
+        switchTableEditingMode(true)
+      }
+      
     case .move:
       break
     }
