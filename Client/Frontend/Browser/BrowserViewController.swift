@@ -26,6 +26,7 @@ private let KVOs: [KVOConstants] = [
     .canGoForward,
     .URL,
     .title,
+    .hasOnlySecureContent,
 ]
 
 private let ActionSheetTitleMaxLength = 120
@@ -879,6 +880,9 @@ class BrowserViewController: UIViewController {
                 let canGoForward = change?[.newKey] as? Bool else { break }
 
             navigationToolbar.updateForwardStatus(canGoForward)
+        case .hasOnlySecureContent:
+            guard let tab = tabManager[webView], tab === tabManager.selectedTab else { break }
+            urlBar.hasOnlySecureContent = webView.hasOnlySecureContent
         default:
             assertionFailure("Unhandled KVO key: \(keyPath ?? "nil")")
         }
@@ -916,6 +920,7 @@ class BrowserViewController: UIViewController {
     /// Call this whenever the page URL changes.
     fileprivate func updateURLBarDisplayURL(_ tab: Tab) {
         urlBar.currentURL = tab.url?.displayURL
+        urlBar.hasOnlySecureContent = tab.webView?.hasOnlySecureContent ?? false
 
         let isPage = tab.url?.displayURL?.isWebPage() ?? false
         navigationToolbar.updatePageStatus(isPage)

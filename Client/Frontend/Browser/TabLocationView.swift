@@ -46,17 +46,28 @@ class TabLocationView: UIView {
 
     var url: URL? {
         didSet {
-            let wasHidden = lockImageView.isHidden
-            lockImageView.isHidden = url?.scheme != "https"
-            if wasHidden != lockImageView.isHidden {
-                UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil)
-            }
+            updateLockImageView()
             updateTextWithURL()
             pageOptionsButton.isHidden = (url == nil)
             if url == nil {
                 trackingProtectionButton.isHidden = true
             }
             setNeedsUpdateConstraints()
+        }
+    }
+
+    var hasOnlySecureContent = false {
+        didSet {
+            updateLockImageView()
+        }
+    }
+
+    private func updateLockImageView() {
+        let wasHidden = lockImageView.isHidden
+        let isFullySecure = (url?.scheme == "https" && hasOnlySecureContent)
+        lockImageView.isHidden = !isFullySecure
+        if wasHidden != lockImageView.isHidden {
+            UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil)
         }
     }
 
