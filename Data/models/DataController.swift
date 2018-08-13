@@ -30,7 +30,7 @@ private let log = Logger.browserLogger
 // Follow the stack design from http://floriankugler.com/2013/04/02/the-concurrent-core-data-stack/
 
 public class DataController: NSObject {
-    public static let shared = DataController()
+    public static var shared: DataController? = DataController()
     
     fileprivate lazy var writeContext: NSManagedObjectContext = {
         let write = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
@@ -90,12 +90,14 @@ public class DataController: NSObject {
                     NSPersistentStoreFileProtectionKey : FileProtectionType.complete as AnyObject
                 ]
                 
+                let type = AppConstants.IsRunningTest ? NSInMemoryStoreType : NSSQLiteStoreType
+                
                 // Old store URL from old beta, can be removed at some point (thorough migration testing though)
                 var storeURL = docURL.appendingPathComponent("Brave.sqlite")
-                try self.persistentStoreCoordinator.addPersistentStore(ofType: NSSQLiteStoreType, configurationName: nil, at: storeURL, options: options)
+                try self.persistentStoreCoordinator.addPersistentStore(ofType: type, configurationName: nil, at: storeURL, options: options)
                 
                 storeURL = docURL.appendingPathComponent("Model.sqlite")
-                try self.persistentStoreCoordinator.addPersistentStore(ofType: NSSQLiteStoreType, configurationName: nil, at: storeURL, options: options)
+                try self.persistentStoreCoordinator.addPersistentStore(ofType: type, configurationName: nil, at: storeURL, options: options)
             }
             catch {
                 fatalError("Error migrating store: \(error)")
@@ -106,7 +108,10 @@ public class DataController: NSObject {
         _ = mainThreadContext
     }
     
-    public static func remove(object: NSManagedObject, context: NSManagedObjectContext = DataController.shared.mainThreadContext) {
+    public static func remove(object: NSManagedObject, context: NSManagedObjectContext? = nil) {
+        guard let shared = DataController.shared else { fatalError() }
+        
+        let context = context ?? shared.mainThreadContext 
         context.delete(object)
         DataController.saveContext(context: context)
     }
@@ -117,7 +122,9 @@ public class DataController: NSObject {
             return
         }
         
-        if context === DataController.shared.writeContext {
+        guard let shared = DataController.shared else { fatalError() }
+        
+        if context === shared.writeContext {
             log.warning("Do not use with the write moc, this save is handled internally here.")
             return
         }
@@ -131,12 +138,12 @@ public class DataController: NSObject {
             do {
                 try context.save()
                 
-                DataController.shared.writeContext.perform {
-                    if !DataController.shared.writeContext.hasChanges {
+                shared.writeContext.perform {
+                    if !shared.writeContext.hasChanges {
                         return
                     }
                     do {
-                        try DataController.shared.writeContext.save()
+                        try shared.writeContext.save()
                     } catch {
                         fatalError("Error saving DB to disk: \(error)")
                     }
@@ -146,14 +153,24 @@ public class DataController: NSObject {
             }
         }
     }
-}
-
-extension NSManagedObjectContext {
-    static var mainThreadContext: NSManagedObjectContext {
-        return DataController.shared.mainThreadContext
+    
+    public static func resetDatabase() {
+        // Only available in testing enviroment
+        if !AppConstants.IsRunningTest { return }
+        
+        DataController.shared = nil
+        DataController.shared = DataController()
     }
     
-    static var workerThreadContext: NSManagedObjectContext {
-        return DataController.shared.workerContext
+    public static var mainThreadContext: NSManagedObjectContext {
+        guard let shared = DataController.shared else { fatalError() }
+        
+        return shared.mainThreadContext
+    }
+    
+    public static var workerThreadContext: NSManagedObjectContext {
+        guard let shared = DataController.shared else { fatalError() }
+        return shared.workerContext
     }
 }
+

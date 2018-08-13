@@ -56,7 +56,7 @@ public class History: NSManagedObject, WebsitePresentable {
     }
 
     public class func add(_ title: String, url: URL) {
-        let context = DataController.shared.workerContext
+        let context = DataController.workerThreadContext
         context.perform {
             var item = History.getExisting(url, context: context)
             if item == nil {
@@ -76,7 +76,7 @@ public class History: NSManagedObject, WebsitePresentable {
 
     public class func frc() -> NSFetchedResultsController<NSFetchRequestResult> {
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
-        let context = DataController.shared.mainThreadContext
+        let context = DataController.mainThreadContext
         
         fetchRequest.entity = History.entity(context)
         fetchRequest.fetchBatchSize = 20
@@ -157,7 +157,7 @@ public class History: NSManagedObject, WebsitePresentable {
     }
     
     public class func deleteAll(_ completionOnMain: @escaping ()->()) {
-        let context = DataController.shared.workerContext
+        let context = DataController.workerThreadContext
         context.perform {
             let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
             fetchRequest.entity = History.entity(context)

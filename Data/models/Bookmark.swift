@@ -73,7 +73,7 @@ public class Bookmark: NSManagedObject, WebsitePresentable, Syncable {
     }
 
     public class func frc(parentFolder: Bookmark?) -> NSFetchedResultsController<NSFetchRequestResult> {
-        let context = DataController.shared.mainThreadContext
+        let context = DataController.mainThreadContext
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
         
         fetchRequest.entity = Bookmark.entity(context: context)
@@ -221,7 +221,7 @@ public class Bookmark: NSManagedObject, WebsitePresentable, Syncable {
         bookmark.parentFolderObjectId = parentFolder?.syncUUID
         bookmark.site = site
         
-        let context = isFavorite ? DataController.shared.mainThreadContext : DataController.shared.workerContext
+        let context = isFavorite ? DataController.mainThreadContext : DataController.workerThreadContext
         
         // Fetching bookmarks happen on mainThreadContext but we add it on worker context to work around the 
         // duplicated bookmarks bug.
@@ -252,7 +252,7 @@ public class Bookmark: NSManagedObject, WebsitePresentable, Syncable {
         // bookmark.parentFolderObjectId = [parentFolder]
         bookmark.site = site
         
-        return self.add(rootObject: bookmark, save: true, context: DataController.shared.workerContext)
+        return self.add(rootObject: bookmark, save: true, context: DataController.workerThreadContext)
     }
 
     public class func contains(url: URL, getFavorites: Bool = false, context: NSManagedObjectContext) -> Bool {
@@ -410,7 +410,7 @@ extension Bookmark {
     
     /** Removes all bookmarks. Used to reset state for bookmark UITests */
     class func removeAll() {
-        let context = DataController.shared.workerContext
+        let context = DataController.workerThreadContext
         
         self.getAllBookmarks(context: context).forEach {
             $0.remove(save: false)
