@@ -37,10 +37,11 @@ class CoreDataTestCase: XCTestCase {
     /// This expecation can be used on most tests.
     /// For more complex multi thread tests, expectations need to be written manually.
     func contextSaveExpectation() {
-        let contextSaveExpectation = expectation(description: "Save context expectation")
+        var contextSaveExpectation: XCTestExpectation? = expectation(description: "Save context expectation")
         
         contextSaveCompletionHandler = {
-            contextSaveExpectation.fulfill()
+            contextSaveExpectation?.fulfill()
+            contextSaveExpectation = nil
         }
     }
     
