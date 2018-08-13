@@ -22,6 +22,7 @@ class CoreDataTestCase: XCTestCase {
         NotificationCenter.default.removeObserver(self)
         contextSaveCompletionHandler = nil
         // Device.clearSharedDevice()
+        DataController.workerThreadContext.reset()
         super.tearDown()
     }
     

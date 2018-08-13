@@ -166,8 +166,6 @@ public class Bookmark: NSManagedObject, WebsitePresentable, Syncable {
         bk.isFavorite = bookmark?.isFavorite ?? bk.isFavorite
         bk.isFolder = bookmark?.isFolder ?? bk.isFolder
         bk.syncUUID = root?.objectId ?? bk.syncUUID ?? SyncCrypto.shared.uniqueSerialBytes(count: 16)
-        bk.created = site?.creationNativeDate ?? Date()
-        bk.lastVisited = site?.lastAccessedNativeDate ?? Date()
         
         if let location = site?.location, let url = URL(string: location) {
             bk.domain = Domain.getOrCreateForUrl(url, context: context)
@@ -291,8 +289,10 @@ public class Bookmark: NSManagedObject, WebsitePresentable, Syncable {
 
     public class func reorderBookmarks(frc: NSFetchedResultsController<NSFetchRequestResult>?, sourceIndexPath: IndexPath,
                                 destinationIndexPath: IndexPath) {
-        let dest = frc?.object(at: destinationIndexPath) as! Bookmark
-        let src = frc?.object(at: sourceIndexPath) as! Bookmark
+        guard let frc = frc else { return }
+        
+        let dest = frc.object(at: destinationIndexPath) as! Bookmark
+        let src = frc.object(at: sourceIndexPath) as! Bookmark
         
         if dest === src {
             return
@@ -301,7 +301,7 @@ public class Bookmark: NSManagedObject, WebsitePresentable, Syncable {
         // Warning, this could be a bottleneck, grabs ALL the bookmarks in the current folder
         // But realistically, with a batch size of 20, and most reads around 1ms, a bottleneck here is an edge case.
         // Optionally: grab the parent folder, and the on a bg thread iterate the bms and update their order. Seems like overkill.
-        var bms = frc?.fetchedObjects as! [Bookmark]
+        var bms = frc.fetchedObjects as! [Bookmark]
         bms.remove(at: bms.index(of: src)!)
         if sourceIndexPath.row > destinationIndexPath.row {
             // insert before
@@ -319,7 +319,7 @@ public class Bookmark: NSManagedObject, WebsitePresentable, Syncable {
         // If I save while the animation is happening, the rows look screwed up (draw on top of each other).
         // Adding a delay to let animation complete avoids this problem
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(250)) {
-            DataController.saveContext(context: frc?.managedObjectContext)
+            DataController.saveContext(context: frc.managedObjectContext)
         }
 
     }
@@ -331,7 +331,7 @@ extension Bookmark {
     fileprivate static func get(forUrl url: URL, countOnly: Bool = false, getFavorites: Bool = false, context: NSManagedObjectContext) -> AnyObject? {
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
         fetchRequest.entity = Bookmark.entity(context: context)
-        let isFavoritePredicate = getFavorites ? "YES" : "NO"
+        let isFavoritePredicate = NSNumber(value: getFavorites)
         fetchRequest.predicate = NSPredicate(format: "url == %@ AND isFavorite == \(isFavoritePredicate)", url.absoluteString)
         do {
             if countOnly {
@@ -358,7 +358,7 @@ extension Bookmark {
         let sort = orderSort ? sortRules : nil
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
         fetchRequest.entity = Bookmark.entity(context: context)
-        fetchRequest.predicate =  NSPredicate(format: "syncParentDisplayUUID == %@ and isFolder == %@", searchableUUID, ignoreFolders ? "true" : "false")
+        fetchRequest.predicate =  NSPredicate(format: "syncParentDisplayUUID == %@ and isFolder == %@", searchableUUID, NSNumber(value: ignoreFolders))
         fetchRequest.sortDescriptors = sort
         
         do {
@@ -385,7 +385,7 @@ extension Bookmark {
         if let parent = bookmark?.parentFolder {
             predicate = NSPredicate(format: "isFolder == true and parentFolder == %@", parent)
         } else {
-            predicate = NSPredicate(format: "isFolder == true and parentFolder.@count = 0")
+            predicate = NSPredicate(format: "isFolder == true and parentFolder = nil")
         }
         
         return get(predicate: predicate, context: context) ?? [Bookmark]()
