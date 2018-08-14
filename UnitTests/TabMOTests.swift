@@ -152,6 +152,8 @@ class TabMOTests: CoreDataTestCase {
     private func createAndUpdate(order: Int) {
         let object = createAndWait()
         
+        // There are some threading problems on the old CD stack, need to add small delay here
+        sleep(UInt32(0.25))
         let tabData = SavedTab(id: object.syncUUID!, title: "title", url: "url", isSelected: false, order: Int16(order), 
                                screenshot: nil, history: [], historyIndex: 0)
         backgroundSaveAndWaitForExpectation {
