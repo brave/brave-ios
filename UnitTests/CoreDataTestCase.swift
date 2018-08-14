@@ -21,9 +21,9 @@ class CoreDataTestCase: XCTestCase {
     override func tearDown() {
         NotificationCenter.default.removeObserver(self)
         contextSaveCompletionHandler = nil
-        // Device.clearSharedDevice()
         DataController.workerThreadContext.reset()
         DataController.mainThreadContext.reset()
+        Device.clearSharedDevice()
         super.tearDown()
     }
     

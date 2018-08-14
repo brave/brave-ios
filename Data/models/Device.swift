@@ -110,4 +110,13 @@ class Device: NSManagedObject, Syncable {
         }
     }
     
+    // Needed for testing only. No need to set it public, @testable annotation allows use to use internal methods.
+    class func clearSharedDevice() {
+        let isRunningTest = NSClassFromString("XCTestCase") != nil 
+            || ProcessInfo.processInfo.arguments.contains(LaunchArguments.Test)
+        
+        if !isRunningTest { return }
+        
+        Device.sharedCurrentDevice = nil
+    }
 }
