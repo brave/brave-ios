@@ -57,13 +57,12 @@ class DataControllerTests: CoreDataTestCase {
     func testSavingBackgroundContext() {
         let context = DataController.workerThreadContext
         
-        contextSaveExpectation()
-        
         _ = TopSite(entity: entity(for: context), insertInto: context)
-        DataController.saveContext(context: context)
+        backgroundSaveAndWaitForExpectation {
+            DataController.saveContext(context: context)
+        }
         
         let result = try! context.fetch(fetchRequest)
-        waitForExpectations(timeout: 1, handler: nil)
         
         XCTAssertEqual(result.count, 1)
         
@@ -74,21 +73,20 @@ class DataControllerTests: CoreDataTestCase {
     func testSaveAndRemove() {
         let context = DataController.workerThreadContext
         
-        let object = TopSite(entity: entity(for: context), insertInto: context)
+        _ = TopSite(entity: entity(for: context), insertInto: context)
         backgroundSaveAndWaitForExpectation {
             DataController.saveContext(context: context)
         }
         
-        var result = try! context.fetch(fetchRequest)
+        let result = try! DataController.mainThreadContext.fetch(fetchRequest)
         XCTAssertEqual(result.count, 1)
         
-        backgroundSaveAndWaitForExpectation {
-            DataController.remove(object: object, context: context)
-        }
+        DataController.remove(object: result.first as! TopSite)
         
-        result = try! DataController.mainThreadContext.fetch(fetchRequest)
+        DataController.mainThreadContext.refreshAllObjects()
+        let newResult = try! DataController.mainThreadContext.fetch(fetchRequest)
         
-        XCTAssertEqual(result.count, 0)
+        XCTAssertEqual(newResult.count, 0)
     }
     
     func testNilContext() {

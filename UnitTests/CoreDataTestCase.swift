@@ -21,14 +21,17 @@ class CoreDataTestCase: XCTestCase {
     override func tearDown() {
         NotificationCenter.default.removeObserver(self)
         contextSaveCompletionHandler = nil
+        saveExpectation = nil
         // Device.clearSharedDevice()
         DataController.workerThreadContext.reset()
+        DataController.mainThreadContext.reset()
         super.tearDown()
     }
     
     // MARK: - Handling background context reads/writes
 
     var contextSaveCompletionHandler: (()->())?
+    var saveExpectation: XCTestExpectation?
     
     @objc func contextSaved() {
         contextSaveCompletionHandler?()
@@ -37,17 +40,19 @@ class CoreDataTestCase: XCTestCase {
     /// This expecation can be used on most tests.
     /// For more complex multi thread tests, expectations need to be written manually.
     func contextSaveExpectation() {
-        var contextSaveExpectation: XCTestExpectation? = expectation(description: "Save context expectation")
+        let uuid = UUID().uuidString
+        saveExpectation = expectation(description: uuid)
         
-        contextSaveCompletionHandler = {
-            contextSaveExpectation?.fulfill()
-            contextSaveExpectation = nil
+        contextSaveCompletionHandler = { [weak self] in
+            self?.saveExpectation?.fulfill()
+            self?.saveExpectation = nil
+            self?.contextSaveCompletionHandler = nil
         }
     }
     
     /// Waits for core data context save notification. Use this for single background context saves if you want to wait
     /// for view context to update itself. Unfortunately there is no notification after changes are merged into context.
-    func backgroundSaveAndWaitForExpectation(code: () -> ()) {
+    func backgroundSaveAndWaitForExpectation(code: () -> ()) {        
         contextSaveExpectation()
         code()
         waitForExpectations(timeout: 2, handler: nil)
