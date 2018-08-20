@@ -104,8 +104,6 @@ public class History: NSManagedObject, WebsitePresentable {
     }
 
     class func getExisting(_ url: URL, context: NSManagedObjectContext) -> History? {
-        assert(!Thread.isMainThread)
-
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
         fetchRequest.entity = History.entity(context)
         fetchRequest.predicate = NSPredicate(format: "url == %@", url.absoluteString)
