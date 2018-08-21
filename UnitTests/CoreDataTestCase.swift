@@ -10,7 +10,8 @@ class CoreDataTestCase: XCTestCase {
     
     // Always call super.setUp() in your subclasses to reset the database.
     override func setUp() {
-        DataController.resetDatabase()
+        // Reset the database.
+        DataController.shared = DataController()
         
         NotificationCenter.default.addObserver(self, selector: #selector(contextSaved), 
                                                name: NSNotification.Name.NSManagedObjectContextDidSave, 
@@ -23,7 +24,7 @@ class CoreDataTestCase: XCTestCase {
         contextSaveCompletionsArray.removeAll()
         DataController.workerThreadContext.reset()
         DataController.mainThreadContext.reset()
-        Device.clearSharedDevice()
+        Device.sharedCurrentDevice = nil
         super.tearDown()
     }
     

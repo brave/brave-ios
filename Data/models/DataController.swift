@@ -30,7 +30,7 @@ private let log = Logger.browserLogger
 // Follow the stack design from http://floriankugler.com/2013/04/02/the-concurrent-core-data-stack/
 
 public class DataController: NSObject {
-    public static var shared: DataController? = DataController()
+    public static var shared: DataController = DataController()
     
     fileprivate lazy var writeContext: NSManagedObjectContext = {
         let write = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
@@ -65,7 +65,7 @@ public class DataController: NSObject {
     fileprivate var managedObjectModel: NSManagedObjectModel!
     fileprivate var persistentStoreCoordinator: NSPersistentStoreCoordinator!
     
-    fileprivate override init() {
+    override init() {
         super.init()
 
        // TransformerUUID.setValueTransformer(transformer: NSValueTransformer?, forName name: String)
@@ -109,9 +109,7 @@ public class DataController: NSObject {
     }
     
     public static func remove(object: NSManagedObject, context: NSManagedObjectContext? = nil) {
-        guard let shared = DataController.shared else { fatalError() }
-        
-        let context = context ?? shared.mainThreadContext 
+        let context = context ?? DataController.shared.mainThreadContext
         context.delete(object)
         DataController.saveContext(context: context)
     }
@@ -122,9 +120,7 @@ public class DataController: NSObject {
             return
         }
         
-        guard let shared = DataController.shared else { fatalError() }
-        
-        if context === shared.writeContext {
+        if context === DataController.shared.writeContext {
             log.warning("Do not use with the write moc, this save is handled internally here.")
             return
         }
@@ -154,23 +150,12 @@ public class DataController: NSObject {
         }
     }
     
-    public static func resetDatabase() {
-        // Only available in testing enviroment
-        if !AppConstants.IsRunningTest { return }
-        
-        DataController.shared = nil
-        DataController.shared = DataController()
-    }
-    
     public static var mainThreadContext: NSManagedObjectContext {
-        guard let shared = DataController.shared else { fatalError() }
-        
-        return shared.mainThreadContext
+        return DataController.shared.mainThreadContext
     }
     
     public static var workerThreadContext: NSManagedObjectContext {
-        guard let shared = DataController.shared else { fatalError() }
-        return shared.workerContext
+        return DataController.shared.workerContext
     }
 }
 

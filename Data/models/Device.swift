@@ -9,7 +9,7 @@ import Shared
 class Device: NSManagedObject, Syncable {
     
     // Check if this can be nested inside the method
-    private static var sharedCurrentDevice: Device?
+    static var sharedCurrentDevice: Device?
     
     // Assign on parent model via CD
     @NSManaged var isSynced: Bool
@@ -108,15 +108,5 @@ class Device: NSManagedObject, Syncable {
             
             DataController.saveContext(context: context)
         }
-    }
-    
-    // Needed for testing only. No need to set it public, @testable annotation allows use of internal methods.
-    class func clearSharedDevice() {
-        let isRunningTest = NSClassFromString("XCTestCase") != nil 
-            || ProcessInfo.processInfo.arguments.contains(LaunchArguments.Test)
-        
-        if !isRunningTest { return }
-        
-        Device.sharedCurrentDevice = nil
     }
 }
