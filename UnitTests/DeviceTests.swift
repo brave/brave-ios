@@ -33,8 +33,6 @@ class DeviceTests: CoreDataTestCase {
             _ = Device.currentDevice()
         }
         
-        sleep(UInt32(0.25))
-        
         backgroundSaveAndWaitForExpectation {
             Device.deleteAll { }
         }
