@@ -1420,7 +1420,7 @@ extension BrowserViewController: URLBarDelegate {
     }
 
     fileprivate func submitSearchText(_ text: String) {
-        let engine = profile.searchEngines.defaultEngine
+        let engine = profile.searchEngines.defaultEngine()
 
         if let searchURL = engine.searchURLForQuery(text) {
             // We couldn't find a matching search keyword, so do a search query.
