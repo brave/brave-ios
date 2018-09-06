@@ -202,7 +202,6 @@
 		5D1DC55420AE004600905E5A /* WebsitePresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC54120AE004600905E5A /* WebsitePresentable.swift */; };
 		5D1DC55520AE004600905E5A /* TabMO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC54220AE004600905E5A /* TabMO.swift */; };
 		5D1DC55620AE004600905E5A /* DataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC54320AE004600905E5A /* DataController.swift */; };
-		5D1DC55720AE004600905E5A /* TopSite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC54420AE004600905E5A /* TopSite.swift */; };
 		5D1DC55920AE004600905E5A /* Bookmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC54620AE004600905E5A /* Bookmark.swift */; };
 		5D1DC55A20AE004600905E5A /* FaviconMO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC54720AE004600905E5A /* FaviconMO.swift */; };
 		5D1DC55B20AE004600905E5A /* Domain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC54820AE004600905E5A /* Domain.swift */; };
@@ -933,6 +932,7 @@
 		0BF1B7E21AC60DEA00A7B407 /* InsetButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InsetButton.swift; sourceTree = "<group>"; };
 		0BF42D4E1A7CD09600889E28 /* TestFavicons.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestFavicons.swift; sourceTree = "<group>"; };
 		0BF8F8D91AEFF1C900E90BC2 /* noTitle.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = noTitle.html; sourceTree = "<group>"; };
+		2715F39B21416BA5008FEEB8 /* Model9.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model9.xcdatamodel; sourceTree = "<group>"; };
 		2798E015213EFC3F003EDBB1 /* FavoriteTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FavoriteTests.swift; sourceTree = "<group>"; };
 		27C461DD211B76500088A441 /* ShieldsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShieldsView.swift; sourceTree = "<group>"; };
 		27F443952135E11200296C58 /* BraveShareTo.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BraveShareTo.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1083,7 +1083,6 @@
 		5D1DC54120AE004600905E5A /* WebsitePresentable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebsitePresentable.swift; sourceTree = "<group>"; };
 		5D1DC54220AE004600905E5A /* TabMO.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabMO.swift; sourceTree = "<group>"; };
 		5D1DC54320AE004600905E5A /* DataController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataController.swift; sourceTree = "<group>"; };
-		5D1DC54420AE004600905E5A /* TopSite.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TopSite.swift; sourceTree = "<group>"; };
 		5D1DC54620AE004600905E5A /* Bookmark.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Bookmark.swift; sourceTree = "<group>"; };
 		5D1DC54720AE004600905E5A /* FaviconMO.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FaviconMO.swift; sourceTree = "<group>"; };
 		5D1DC54820AE004600905E5A /* Domain.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Domain.swift; sourceTree = "<group>"; };
@@ -2063,7 +2062,6 @@
 				5D1DC54120AE004600905E5A /* WebsitePresentable.swift */,
 				5D1DC54220AE004600905E5A /* TabMO.swift */,
 				5D1DC54320AE004600905E5A /* DataController.swift */,
-				5D1DC54420AE004600905E5A /* TopSite.swift */,
 				5D1DC54620AE004600905E5A /* Bookmark.swift */,
 				5D1DC54720AE004600905E5A /* FaviconMO.swift */,
 				5D1DC54820AE004600905E5A /* Domain.swift */,
@@ -4080,7 +4078,6 @@
 			files = (
 				5D1DC56E20AE005400905E5A /* SyncBookmark.swift in Sources */,
 				5D1DC55A20AE004600905E5A /* FaviconMO.swift in Sources */,
-				5D1DC55720AE004600905E5A /* TopSite.swift in Sources */,
 				5D1DC55C20AE004600905E5A /* Device.swift in Sources */,
 				5D1DC56C20AE005400905E5A /* SyncShowCodewords.swift in Sources */,
 				5D1DC55D20AE004600905E5A /* History.swift in Sources */,
@@ -7979,6 +7976,7 @@
 		5D1DC54C20AE004600905E5A /* Model.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				2715F39B21416BA5008FEEB8 /* Model9.xcdatamodel */,
 				0A9B6A3420E6453400712BC9 /* Model8.xcdatamodel */,
 				5D1DC54D20AE004600905E5A /* Model7.xcdatamodel */,
 				5D1DC54E20AE004600905E5A /* Model2.xcdatamodel */,
@@ -7988,7 +7986,7 @@
 				5D1DC55220AE004600905E5A /* Model5.xcdatamodel */,
 				5D1DC55320AE004600905E5A /* Model.xcdatamodel */,
 			);
-			currentVersion = 0A9B6A3420E6453400712BC9 /* Model8.xcdatamodel */;
+			currentVersion = 2715F39B21416BA5008FEEB8 /* Model9.xcdatamodel */;
 			path = Model.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
