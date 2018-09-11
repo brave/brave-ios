@@ -1519,14 +1519,31 @@ extension BrowserViewController: TabToolbarDelegate, PhotonActionSheetProtocol {
     }
     
     func tabToolbarDidPressShare(_ tabToolbar: TabToolbarProtocol, button: UIButton) {
-        guard let url = tabManager.selectedTab?.url else { return }
-        presentActivityViewController(
-            url,
-            tab: tabManager.selectedTab,
-            sourceView: view,
-            sourceRect: view.convert(urlBar.shareButton.frame, from: urlBar.shareButton.superview),
-            arrowDirection: [.up]
-        )
+        func share(url: URL) {
+            presentActivityViewController(
+                url,
+                tab: url.isFileURL ? nil : tabManager.selectedTab,
+                sourceView: view,
+                sourceRect: view.convert(urlBar.shareButton.frame, from: urlBar.shareButton.superview),
+                arrowDirection: [.up]
+            )
+        }
+        
+        guard let tab = tabManager.selectedTab, let url = tab.url else { return }
+        
+        if let temporaryDocument = tab.temporaryDocument {
+            temporaryDocument.getURL().uponQueue(.main, block: { tempDocURL in
+                // If we successfully got a temp file URL, share it like a downloaded file,
+                // otherwise present the ordinary share menu for the web URL.
+                if tempDocURL.isFileURL {
+                    share(url: tempDocURL)
+                } else {
+                    share(url: url)
+                }
+            })
+        } else {
+            share(url: url)
+        }
     }
     
     func tabToolbarDidPressAddTab(_ tabToolbar: TabToolbarProtocol, button: UIButton) {
