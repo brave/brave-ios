@@ -1039,15 +1039,17 @@ class BrowserViewController: UIViewController {
         
         var activities: [UIActivity] = [findInPageActivity]
         
-        // We don't allow to have 2 same favorites.
-        if !FavoritesHelper.isAlreadyAdded(url) {
-            let addToFavoritesActivity = AddToFavoritesActivity() { [weak tab] in
-                FavoritesHelper.add(url: url, title: tab?.displayTitle, color: nil)
+        // These actions don't apply if we're sharing a temporary document
+        if !url.isFileURL {
+            // We don't allow to have 2 same favorites.
+            if !FavoritesHelper.isAlreadyAdded(url) {
+                let addToFavoritesActivity = AddToFavoritesActivity() { [weak tab] in
+                    FavoritesHelper.add(url: url, title: tab?.displayTitle, color: nil)
+                }
+                activities.append(addToFavoritesActivity)
             }
-            activities.append(addToFavoritesActivity)
+            activities.append(requestDesktopSiteActivity)
         }
-        
-        activities.append(requestDesktopSiteActivity)
         
         let controller = helper.createActivityViewController(activities: activities, { [unowned self] completed, _ in
             // After dismissing, check to see if there were any prompts we queued up
