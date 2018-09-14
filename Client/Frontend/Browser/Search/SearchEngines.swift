@@ -71,11 +71,16 @@ class SearchEngines {
         
         // The default engine is always enabled.
         enableEngine(defaultEngine(forType: type))
-        // The default engine is always first in the list.
-        var newlyOrderedEngines =
-            orderedEngines.filter { engine in engine.shortName != defaultEngine(forType: type).shortName }
-        newlyOrderedEngines.insert(defaultEngine(forType: type), at: 0)
-        orderedEngines = newlyOrderedEngines
+        
+        // When re-sorting engines only look at default search for standard browsing.
+        if type == .standard {
+            // The default engine is always first in the list.
+            var newlyOrderedEngines =
+                orderedEngines.filter { engine in engine.shortName != defaultEngine(forType: type).shortName }
+            newlyOrderedEngines.insert(defaultEngine(forType: type), at: 0)
+            orderedEngines = newlyOrderedEngines
+        }
+            
     }
 
     func isEngineDefault(_ engine: OpenSearchEngine, type: DefaultEngineType? = nil) -> Bool {
