@@ -48,8 +48,6 @@ class SearchEnginesTests: XCTestCase {
         let profile = MockProfile()
         let engines = SearchEngines(prefs: profile.prefs, files: profile.files)
         let engineSet = engines.orderedEngines
-
-        // engines.defaultEngine = (engineSet?[0])!
         
         engines.setDefaultEngine((engineSet?[0])!.shortName, forType: .standard)
         XCTAssertTrue(engines.isEngineDefault((engineSet?[0])!))
