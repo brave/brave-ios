@@ -171,7 +171,7 @@ class SearchSettingsTableViewController: UITableViewController {
             let searchEnginePicker = SearchEnginePicker(type: .standard)
             // Order alphabetically, so that picker is always consistently ordered.
             // Every engine is a valid choice for the default engine, even the current default engine.
-            searchEnginePicker.engines = model.orderedEngines.sorted { e, f in e.shortName < f.shortName }
+            searchEnginePicker.engines = model.orderedEngines.sorted { $0.shortName < $1.shortName }
             searchEnginePicker.delegate = self
             searchEnginePicker.selectedSearchEngineName = model.defaultEngine(forType: .standard).shortName
             navigationController?.pushViewController(searchEnginePicker, animated: true)
@@ -180,7 +180,7 @@ class SearchSettingsTableViewController: UITableViewController {
             let searchEnginePicker = SearchEnginePicker(type: .privateMode)
             // Order alphabetically, so that picker is always consistently ordered.
             // Every engine is a valid choice for the default engine, even the current default engine.
-            searchEnginePicker.engines = model.orderedEngines.sorted { e, f in e.shortName < f.shortName }
+            searchEnginePicker.engines = model.orderedEngines.sorted { $0.shortName < $1.shortName }
             searchEnginePicker.delegate = self
             searchEnginePicker.selectedSearchEngineName = model.defaultEngine(forType: .privateMode).shortName
             navigationController?.pushViewController(searchEnginePicker, animated: true)

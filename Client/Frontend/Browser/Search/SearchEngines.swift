@@ -56,7 +56,7 @@ class SearchEngines {
     
     /// If no engine type is specified this method returns search engine for regular browsing.
     func defaultEngine(forType type: DefaultEngineType? = nil) -> OpenSearchEngine {
-            let engineType = type ?? (PrivateBrowsingManager.shared.isPrivateBrowsing ? .privateMode : .standard)
+        let engineType = type ?? (PrivateBrowsingManager.shared.isPrivateBrowsing ? .privateMode : .standard)
             
         if let name = prefs.stringForKey(engineType.rawValue),
             let defaultEngine = self.orderedEngines.first(where: { $0.shortName == name }) {
@@ -70,12 +70,12 @@ class SearchEngines {
         prefs.setString(engine, forKey: type.rawValue)
         
         // The default engine is always enabled.
-        self.enableEngine(defaultEngine(forType: type))
+        enableEngine(defaultEngine(forType: type))
         // The default engine is always first in the list.
-        var orderedEngines =
-            self.orderedEngines.filter { engine in engine.shortName != defaultEngine(forType: type).shortName }
-        orderedEngines.insert(defaultEngine(forType: type), at: 0)
-        self.orderedEngines = orderedEngines
+        var newlyOrderedEngines =
+            orderedEngines.filter { engine in engine.shortName != defaultEngine(forType: type).shortName }
+        newlyOrderedEngines.insert(defaultEngine(forType: type), at: 0)
+        orderedEngines = newlyOrderedEngines
     }
 
     func isEngineDefault(_ engine: OpenSearchEngine, type: DefaultEngineType? = nil) -> Bool {
