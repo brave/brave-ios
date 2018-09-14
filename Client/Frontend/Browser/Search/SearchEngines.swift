@@ -68,6 +68,14 @@ class SearchEngines {
 
     func setDefaultEngine(_ engine: String, forType type: DefaultEngineType) {
         prefs.setString(engine, forKey: type.rawValue)
+        
+        // The default engine is always enabled.
+        self.enableEngine(defaultEngine(forType: type))
+        // The default engine is always first in the list.
+        var orderedEngines =
+            self.orderedEngines.filter { engine in engine.shortName != defaultEngine(forType: type).shortName }
+        orderedEngines.insert(defaultEngine(forType: type), at: 0)
+        self.orderedEngines = orderedEngines
     }
 
     func isEngineDefault(_ engine: OpenSearchEngine) -> Bool {

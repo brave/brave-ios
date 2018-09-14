@@ -28,7 +28,7 @@ class SearchEnginesTests: XCTestCase {
         // If this is our first run, Google should be first for the en locale.
         let profile = MockProfile()
         let engines = SearchEngines(prefs: profile.prefs, files: profile.files)
-        XCTAssertEqual(engines.defaultEngine.shortName, DefaultSearchEngineName)
+        XCTAssertEqual(engines.defaultEngine().shortName, DefaultSearchEngineName)
         XCTAssertEqual(engines.orderedEngines[0].shortName, DefaultSearchEngineName)
     }
 
@@ -49,13 +49,15 @@ class SearchEnginesTests: XCTestCase {
         let engines = SearchEngines(prefs: profile.prefs, files: profile.files)
         let engineSet = engines.orderedEngines
 
-        engines.defaultEngine = (engineSet?[0])!
+        // engines.defaultEngine = (engineSet?[0])!
+        
+        engines.setDefaultEngine((engineSet?[0])!.shortName, forType: .standard)
         XCTAssertTrue(engines.isEngineDefault((engineSet?[0])!))
         XCTAssertFalse(engines.isEngineDefault((engineSet?[1])!))
         // The first ordered engine is the default.
         XCTAssertEqual(engines.orderedEngines[0].shortName, engineSet?[0].shortName)
 
-        engines.defaultEngine = (engineSet?[1])!
+        engines.setDefaultEngine((engineSet?[1])!.shortName, forType: .standard)
         XCTAssertFalse(engines.isEngineDefault((engineSet?[0])!))
         XCTAssertTrue(engines.isEngineDefault((engineSet?[1])!))
         // The first ordered engine is the default.
@@ -98,7 +100,7 @@ class SearchEnginesTests: XCTestCase {
         let engineSet = engines.orderedEngines
 
         // You can't disable the default engine.
-        engines.defaultEngine = (engineSet?[1])!
+        engines.setDefaultEngine((engineSet?[1])!.shortName, forType: .standard)
         engines.disableEngine((engineSet?[1])!)
         XCTAssertTrue(engines.isEngineEnabled((engineSet?[1])!))
 
@@ -115,12 +117,11 @@ class SearchEnginesTests: XCTestCase {
         XCTAssertEqual(0, engines.quickSearchEngines.filter { engine in engine.shortName == engineSet?[0].shortName }.count)
 
         // Setting the default engine enables it.
-        engines.defaultEngine = (engineSet?[0])!
+        engines.setDefaultEngine((engineSet?[0])!.shortName, forType: .standard)
         XCTAssertTrue(engines.isEngineEnabled((engineSet?[1])!))
 
         // Setting the order may change the default engine, which enables it.
         engines.orderedEngines = [(engineSet?[2])!, (engineSet?[1])!, (engineSet?[0])!]
-        XCTAssertTrue(engines.isEngineDefault((engineSet?[2])!))
         XCTAssertTrue(engines.isEngineEnabled((engineSet?[2])!))
 
         // The enabling should be persisted.
