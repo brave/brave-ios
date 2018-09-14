@@ -7,11 +7,11 @@ import Foundation
 import XCTest
 import Shared
 
-private let DefaultSearchEngineName = "Google"
-// BRAVE TODO: This list is not accurate because Brave uses many more engines
-private let ExpectedEngineNames = ["Amazon.com", "Bing", "DuckDuckGo", "Google", "Twitter", "Wikipedia"]
-
 class SearchEnginesTests: XCTestCase {
+    
+    private let DefaultSearchEngineName = "Google"
+    // BRAVE TODO: This list is not accurate because Brave uses many more engines
+    private let ExpectedEngineNames = ["Amazon.com", "Bing", "DuckDuckGo", "Google", "Twitter", "Wikipedia"]
 
     func testIncludesExpectedEngines() {
         // Verify that the set of shipped engines includes the expected subset.
@@ -29,6 +29,10 @@ class SearchEnginesTests: XCTestCase {
         let profile = MockProfile()
         let engines = SearchEngines(prefs: profile.prefs, files: profile.files)
         XCTAssertEqual(engines.defaultEngine().shortName, DefaultSearchEngineName)
+        // The default is `DefaultSearchEngineName` for both regular and private browsing.
+        // Different search engine options might apply to certain regions.
+        // Default locale for running tests should be en_US.
+        XCTAssertEqual(engines.defaultEngine(forType: .privateMode).shortName, DefaultSearchEngineName)
         XCTAssertEqual(engines.orderedEngines[0].shortName, DefaultSearchEngineName)
     }
 
@@ -66,6 +70,19 @@ class SearchEnginesTests: XCTestCase {
         XCTAssertTrue(engines2.isEngineDefault((engineSet?[1])!))
         // The first ordered engine is the default.
         XCTAssertEqual(engines.orderedEngines[0].shortName, engineSet?[1].shortName)
+    }
+    
+    func testSetPrivateDefaultEngine() {
+        let profile = MockProfile()
+        let engines = SearchEngines(prefs: profile.prefs, files: profile.files)
+        let engineSet = engines.orderedEngines!
+        
+        let firstEngine = engineSet[0]
+        let secondEngine = engineSet[1]
+        
+        engines.setDefaultEngine(firstEngine.shortName, forType: .standard)
+        XCTAssertTrue(engines.isEngineDefault(firstEngine, type: .privateMode))
+        XCTAssertFalse(engines.isEngineDefault(secondEngine, type: .privateMode))
     }
 
     func testOrderedEngines() {

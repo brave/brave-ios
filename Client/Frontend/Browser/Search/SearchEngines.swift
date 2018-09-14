@@ -78,8 +78,8 @@ class SearchEngines {
         self.orderedEngines = orderedEngines
     }
 
-    func isEngineDefault(_ engine: OpenSearchEngine) -> Bool {
-        return defaultEngine().shortName == engine.shortName
+    func isEngineDefault(_ engine: OpenSearchEngine, type: DefaultEngineType? = nil) -> Bool {
+        return defaultEngine(forType: type).shortName == engine.shortName
     }
 
     // The keys of this dictionary are used as a set.
