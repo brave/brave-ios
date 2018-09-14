@@ -56,7 +56,7 @@ class SearchEngines {
     
     /// If no engine type is specified this method returns search engine for regular browsing.
     func defaultEngine(forType type: DefaultEngineType? = nil) -> OpenSearchEngine {
-            let engineType = type ?? (UIApplication.isInPrivateMode ? .privateMode : .standard)
+            let engineType = type ?? (PrivateBrowsingManager.shared.isPrivateBrowsing ? .privateMode : .standard)
             
         if let name = prefs.stringForKey(engineType.rawValue),
             let defaultEngine = self.orderedEngines.first(where: { $0.shortName == name }) {

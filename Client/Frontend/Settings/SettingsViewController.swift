@@ -142,7 +142,7 @@ class SettingsViewController: TableViewController {
                     viewController.profile = self.profile
                     self.navigationController?.pushViewController(viewController, animated: true)
                 }, accessory: .disclosureIndicator),
-                BoolRow(title: Strings.SaveLogin, option: Preferences.General.saveLogins),
+                BoolRow(title: Strings.Save_Logins, option: Preferences.General.saveLogins),
                 BoolRow(title: Strings.Block_Popups, option: Preferences.General.blockPopups),
             ]
         )

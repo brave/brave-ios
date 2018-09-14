@@ -24,7 +24,7 @@ private extension TrayToBrowserAnimator {
         guard let selectedTab = bvc.tabManager.selectedTab else { return }
 
         let tabManager = bvc.tabManager
-        let displayedTabs = selectedTab.isPrivate ? tabManager.privateTabs : tabManager.normalTabs
+        let displayedTabs = tabManager.tabs(withType: selectedTab.type)
         guard let expandFromIndex = displayedTabs.index(of: selectedTab) else { return }
 
         bvc.view.frame = transitionContext.finalFrame(for: bvc)
@@ -32,7 +32,7 @@ private extension TrayToBrowserAnimator {
         // Hide browser components
         bvc.toggleSnackBarVisibility(show: false)
         toggleWebViewVisibility(false, usingTabManager: bvc.tabManager)
-        bvc.topSitesViewController?.view.isHidden = true
+        bvc.favoritesViewController?.view.isHidden = true
         bvc.webViewContainerBackdrop.isHidden = true
         bvc.statusBarOverlay.isHidden = false
         if let url = selectedTab.url, !url.isReaderModeURL {
@@ -88,7 +88,7 @@ private extension TrayToBrowserAnimator {
             bvc.toggleSnackBarVisibility(show: true)
             toggleWebViewVisibility(true, usingTabManager: bvc.tabManager)
             bvc.webViewContainerBackdrop.isHidden = false
-            bvc.topSitesViewController?.view.isHidden = false
+            bvc.favoritesViewController?.view.isHidden = false
             bvc.urlBar.isTransitioning = false
             transitionContext.completeTransition(true)
         })
@@ -115,7 +115,7 @@ private extension BrowserToTrayAnimator {
         guard let selectedTab = bvc.tabManager.selectedTab else { return }
 
         let tabManager = bvc.tabManager
-        let displayedTabs = selectedTab.isPrivate ? tabManager.privateTabs : tabManager.normalTabs
+        let displayedTabs = tabManager.tabs(withType: selectedTab.type)
         guard let scrollToIndex = displayedTabs.index(of: selectedTab) else { return }
 
         tabTray.view.frame = transitionContext.finalFrame(for: tabTray)
@@ -149,7 +149,7 @@ private extension BrowserToTrayAnimator {
         cell.title.transform = CGAffineTransform(translationX: 0, y: -cell.title.frame.size.height)
 
         // Hide views we don't want to show during the animation in the BVC
-        bvc.topSitesViewController?.view.isHidden = true
+        bvc.favoritesViewController?.view.isHidden = true
         bvc.statusBarOverlay.isHidden = true
         bvc.toggleSnackBarVisibility(show: false)
         toggleWebViewVisibility(false, usingTabManager: bvc.tabManager)
@@ -193,7 +193,7 @@ private extension BrowserToTrayAnimator {
 
                 bvc.toggleSnackBarVisibility(show: true)
                 toggleWebViewVisibility(true, usingTabManager: bvc.tabManager)
-                bvc.topSitesViewController?.view.isHidden = false
+                bvc.favoritesViewController?.view.isHidden = false
 
                 resetTransformsForViews([bvc.header, bvc.readerModeBar, bvc.footer])
                 bvc.urlBar.isTransitioning = false
@@ -304,20 +304,25 @@ private func createTransitionCellFromTab(_ tab: Tab?, withFrame frame: CGRect) -
     cell.screenshotView.image = tab?.screenshot
     cell.titleText.text = tab?.displayTitle
 
-    if let tab = tab, tab.isPrivate {
+    let tabType = TabType.of(tab)
+    
+    switch tabType {
+    case .regular: break
+    case .private:
         cell.style = .dark
     }
 
     if let favIcon = tab?.displayFavicon {
         cell.favicon.sd_setImage(with: URL(string: favIcon.url)!)
     } else {
-        let defaultFavicon = #imageLiteral(resourceName: "defaultFavicon")
-        if tab?.isPrivate ?? false {
-            cell.favicon.image = defaultFavicon
-            cell.favicon.tintColor = (tab?.isPrivate ?? false) ? UIColor.Photon.White100 : UIColor.Photon.Grey60
-        } else {
-            cell.favicon.image = defaultFavicon
+        cell.favicon.image = #imageLiteral(resourceName: "defaultFavicon")
+
+        switch tabType {
+        case .regular: break
+        case .private:
+            cell.favicon.tintColor = UIColor.Photon.White100
         }
     }
+
     return cell
 }

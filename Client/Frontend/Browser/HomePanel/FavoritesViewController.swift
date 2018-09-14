@@ -6,7 +6,6 @@ import UIKit
 import Shared
 import XCGLogger
 import Storage
-import SDWebImage
 import Deferred
 import Data
 
@@ -16,7 +15,7 @@ protocol TopSitesDelegate: class {
     func didSelectUrl(url: URL)
 }
 
-class TopSitesViewController: UIViewController {
+class FavoritesViewController: UIViewController {
     private struct UI {
         static let statsHeight: CGFloat = 110.0
         static let statsBottomMargin: CGFloat = 5
@@ -31,7 +30,7 @@ class TopSitesViewController: UIViewController {
         layout.minimumLineSpacing = 6
         
         let view = UICollectionView(frame: self.view.frame, collectionViewLayout: layout).then {
-            $0.backgroundColor = UIApplication.isInPrivateMode ? UX.HomePanel.BackgroundColorPBM : UX.HomePanel.BackgroundColor
+            $0.backgroundColor = PrivateBrowsingManager.shared.isPrivateBrowsing ? UX.HomePanel.BackgroundColorPBM : UX.HomePanel.BackgroundColor
             $0.delegate = self
         
             let cellIdentifier = FavoriteCell.identifier
@@ -50,7 +49,7 @@ class TopSitesViewController: UIViewController {
     // MARK: - Views initialization
     private let privateTabMessageContainer = UIView().then {
         $0.isUserInteractionEnabled = true
-        $0.isHidden = !UIApplication.isInPrivateMode
+        $0.isHidden = !PrivateBrowsingManager.shared.isPrivateBrowsing
     }
     
     private let privateTabTitleLabel = UILabel().then {
@@ -137,13 +136,13 @@ class TopSitesViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = UIApplication.isInPrivateMode ? UX.HomePanel.BackgroundColorPBM : UX.HomePanel.BackgroundColor
+        view.backgroundColor = PrivateBrowsingManager.shared.isPrivateBrowsing ? UX.HomePanel.BackgroundColorPBM : UX.HomePanel.BackgroundColor
         
         let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongGesture(gesture:)))
         collection.addGestureRecognizer(longPressGesture)
         
         view.addSubview(collection)
-        collection.dataSource = UIApplication.isInPrivateMode ? nil : dataSource
+        collection.dataSource = PrivateBrowsingManager.shared.isPrivateBrowsing ? nil : dataSource
         dataSource.collectionView = collection
         
         // Could setup as section header but would need to use flow layout,
@@ -352,7 +351,7 @@ class TopSitesViewController: UIViewController {
     
     // MARK: - Private browsing modde
     @objc func privateBrowsingModeChanged() {
-        let isPrivateBrowsing = UIApplication.isInPrivateMode
+        let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
         
         // TODO: This entire blockshould be abstracted
         //  to make code in this class DRY (duplicates from elsewhere)
@@ -379,7 +378,7 @@ class TopSitesViewController: UIViewController {
 }
 
 // MARK: - Delegates
-extension TopSitesViewController: UICollectionViewDelegateFlowLayout {
+extension FavoritesViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let fav = dataSource.favoriteBookmark(at: indexPath)
         
@@ -436,7 +435,7 @@ extension TopSitesViewController: UICollectionViewDelegateFlowLayout {
     }
 }
 
-extension TopSitesViewController: FavoriteCellDelegate {
+extension FavoritesViewController: FavoriteCellDelegate {
     func editFavorite(_ favoriteCell: FavoriteCell) {
         guard let indexPath = collection.indexPath(for: favoriteCell),
             let fav = dataSource.frc?.fetchedObjects?[indexPath.item] as? Bookmark else { return }
