@@ -203,7 +203,9 @@ class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, Loa
         searchButton.imageView?.contentMode = .center
         searchButton.layer.backgroundColor = SearchViewControllerUX.EngineButtonBackgroundColor
         searchButton.addTarget(self, action: #selector(didClickSearchButton), for: .touchUpInside)
-        searchButton.accessibilityLabel = String(format: NSLocalizedString("Search Settings", tableName: "Search", comment: "Label for search settings button."))
+        searchButton.accessibilityLabel =
+            String(format: NSLocalizedString("Search Settings", tableName: "Search",
+                                             comment: "Label for search settings button."))
 
         searchButton.imageView?.snp.makeConstraints { make in
             make.width.height.equalTo(SearchViewControllerUX.SearchImageWidth)

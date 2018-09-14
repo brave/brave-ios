@@ -15,6 +15,7 @@ private let ShowSearchSuggestionsOptIn = "search.suggestions.showOptIn"
 private let ShowSearchSuggestions = "search.suggestions.show"
 private let customSearchEnginesFileName = "customEngines.plist"
 
+// BRAVE TODO: Move to newer Preferences class.
 enum DefaultEngineType: String {
     case standard = "search.default.name"
     case privateMode = "search.defaultprivate.name"
@@ -53,6 +54,7 @@ class SearchEngines {
         self.orderedEngines = getOrderedEngines()
     }
     
+    /// If no engine type is specified this method returns search engine for regular browsing.
     func defaultEngine(forType type: DefaultEngineType? = nil) -> OpenSearchEngine {
             let engineType = type ?? (UIApplication.isInPrivateMode ? .privateMode : .standard)
             
