@@ -7,7 +7,7 @@ import Shared
 
 // Used by the App to navigate to different views.
 // To open a URL use /open-url or to open a blank tab use /open-url with no params
-enum DeepLink: Equatable {
+enum DeepLink {
     init?(urlString: String) {
         let paths = urlString.split(separator: "/")
         guard let component = paths[safe: 0], let componentPath = paths[safe: 1] else {
@@ -25,7 +25,7 @@ extension URLComponents {
 }
     
 // The root navigation for the Router. Look at the tests to see a complete URL
-enum NavigationPath: Equatable {
+enum NavigationPath {
     case url(webURL: URL?, isPrivate: Bool)
     case deepLink(DeepLink)
     case text(String)
