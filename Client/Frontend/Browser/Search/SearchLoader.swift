@@ -25,7 +25,7 @@ class _SearchLoader<UnusedA, UnusedB>: Loader<[Site], SearchViewController> {
     fileprivate let profile: Profile
     fileprivate let urlBar: URLBarView
     fileprivate let frecentHistory: FrecentHistory
-    fileprivate var inProgress: Cancellable? = nil
+    fileprivate var inProgress: Cancellable?
 
     init(profile: Profile, urlBar: URLBarView) {
         self.profile = profile
@@ -52,7 +52,7 @@ class _SearchLoader<UnusedA, UnusedB>: Loader<[Site], SearchViewController> {
             }
 
             if query.isEmpty {
-                load([Site]())
+                load([])
                 return
             }
             
