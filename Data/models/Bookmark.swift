@@ -264,8 +264,6 @@ public class Bookmark: NSManagedObject, WebsitePresentable, Syncable {
     }
 
     public class func frecencyQuery(context: NSManagedObjectContext, containing: String?) -> [Bookmark] {
-        assert(!Thread.isMainThread)
-
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
         fetchRequest.fetchLimit = 5
         fetchRequest.entity = Bookmark.entity(context: context)
