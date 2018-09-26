@@ -120,7 +120,7 @@ public class History: NSManagedObject, WebsitePresentable {
         return result
     }
 
-    class func frecencyQuery(_ context: NSManagedObjectContext, containing:String? = nil) -> [History] {
+    public class func frecencyQuery(_ context: NSManagedObjectContext, containing:String? = nil) -> [History] {
         assert(!Thread.isMainThread)
 
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
