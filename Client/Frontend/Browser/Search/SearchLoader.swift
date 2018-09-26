@@ -89,7 +89,7 @@ class _SearchLoader<UnusedA, UnusedB>: Loader<[Site], SearchViewController> {
         }
     }
     
-    // TODO: This is not a proper frecency query, it just gets sites from the past week
+    // TODO: This is not a proper frecency query, it just gets sites from the past week. See issue #289
     fileprivate func getSitesByFrecency(_ containing: String? = nil) -> Deferred<[Site]> {
         let result = Deferred<[Site]>()
         
