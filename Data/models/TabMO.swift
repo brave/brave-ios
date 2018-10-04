@@ -44,7 +44,6 @@ public final class TabMO: NSManagedObject, CRUD {
     @NSManaged public var urlHistoryCurrentIndex: Int16
     @NSManaged public var screenshot: Data?
     @NSManaged public var isSelected: Bool
-    @NSManaged public var color: String?
     @NSManaged public var screenshotUUID: String?
     
     public var imageUrl: URL? {

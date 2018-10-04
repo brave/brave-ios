@@ -46,8 +46,8 @@ struct FavoritesHelper {
         }
     }
 
-    static func add(url: URL, title: String?, color: UIColor?) {
-        Bookmark.add(url: url, title: title, isFavorite: true, color: color)
+    static func add(url: URL, title: String?) {
+        Bookmark.add(url: url, title: title, isFavorite: true)
     }
 
     static func isAlreadyAdded(_ url: URL) -> Bool {

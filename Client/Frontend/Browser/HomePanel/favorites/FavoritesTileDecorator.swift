@@ -27,7 +27,6 @@ class FavoritesTileDecorator {
     let normalizedHost: String
     let cell: FavoriteCell
     let indexPath: IndexPath
-    let color: UIColor?
     weak var collection: UICollectionView?
 
     /// Returns SuggestedSite for given tile or nil if no suggested sites found.
@@ -53,7 +52,6 @@ class FavoritesTileDecorator {
         self.url = url
         self.cell = cell
         self.indexPath = indexPath
-        self.color = color
         normalizedHost = url.normalizedHost ?? ""
     }
 
@@ -123,12 +121,7 @@ class FavoritesTileDecorator {
                         }
 
                         if useFallback, let host = self.url.host, let letter = host.replacingOccurrences(of: "www.", with: "").first {
-                            var tabColor = FallbackIconUX.color
-                            
-                            // Only use stored color if it's not too light.
-                            if let color = self.color, !color.isLight {
-                                tabColor = color
-                            }
+                            let tabColor = FallbackIconUX.color
                             
                             finalImage = FavoritesHelper.fallbackIcon(withLetter: String(letter), color: tabColor, andSize: FallbackIconUX.size)
                         }

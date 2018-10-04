@@ -22,7 +22,6 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
     @NSManaged public var created: Date?
     @NSManaged public var order: Int16
     @NSManaged public var tags: [String]?
-    @NSManaged public var color: String?
     
     /// Should not be set directly, due to specific formatting required, use `syncUUID` instead
     /// CD does not allow (easily) searching on transformable properties, could use binary, but would still require tranformtion
@@ -157,7 +156,7 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
     }
     
     // Should not be used for updating, modify to increase protection
-    class func add(rootObject root: SyncBookmark?, save: Bool = false, sendToSync: Bool = false, parentFolder: Bookmark? = nil, color: UIColor? = nil) {
+    class func add(rootObject root: SyncBookmark?, save: Bool = false, sendToSync: Bool = false, parentFolder: Bookmark? = nil) {
         let context = DataController.newBackgroundContext()
         
         let bookmark = root
@@ -181,7 +180,6 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         // Use new values, fallback to previous values
         bk.url = site?.location ?? bk.url
         bk.title = site?.title ?? bk.title
-        bk.color = (color ?? BraveUX.GreyE).toHexString()
         bk.customTitle = site?.customTitle ?? bk.customTitle // TODO: Check against empty titles
         bk.isFavorite = bookmark?.isFavorite ?? bk.isFavorite
         bk.isFolder = bookmark?.isFolder ?? bk.isFolder
@@ -220,8 +218,7 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
                           customTitle: String? = nil, // Folders only use customTitle
                           parentFolder: Bookmark? = nil,
                           isFolder: Bool = false,
-                          isFavorite: Bool = false,
-                          color: UIColor? = nil) {
+                          isFavorite: Bool = false) {
         
         let site = SyncSite()
         site.title = title
@@ -234,7 +231,7 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         bookmark.parentFolderObjectId = parentFolder?.syncUUID
         bookmark.site = site
         
-        add(rootObject: bookmark, save: true, sendToSync: true, parentFolder: parentFolder, color: color)
+        add(rootObject: bookmark, save: true, sendToSync: true, parentFolder: parentFolder)
     }
 
     public class func contains(url: URL, getFavorites: Bool = false) -> Bool {

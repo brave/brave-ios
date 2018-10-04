@@ -538,7 +538,6 @@ class BookmarkTests: CoreDataTestCase {
         XCTAssertNil(record.syncParentUUID)
         
         XCTAssertNotNil(record.syncDisplayUUID)
-        XCTAssertNotNil(record.color)
         XCTAssertNotNil(record.children)
         XCTAssert(record.children!.isEmpty)
     }

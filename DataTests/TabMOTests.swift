@@ -29,7 +29,6 @@ class TabMOTests: CoreDataTestCase {
         
         XCTAssertFalse(object.isSelected)
         
-        XCTAssertNil(object.color)
         XCTAssertNil(object.screenshot)
         XCTAssertNil(object.screenshotUUID)
         XCTAssertNil(object.url)
@@ -72,7 +71,6 @@ class TabMOTests: CoreDataTestCase {
         
         XCTAssert(object.isSelected)
         
-        XCTAssertNil(object.color)
         XCTAssertNil(object.screenshotUUID)
     }
     
