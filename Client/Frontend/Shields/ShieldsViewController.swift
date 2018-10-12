@@ -24,7 +24,7 @@ class ShieldsViewController: UIViewController, PopoverContentComponent {
         }
     }
     /// The blocked stats. Update this as the pages block stats change
-    var shieldBlockStats: ShieldBlockedStats? {
+    var shieldBlockStats: ShieldBlockedStats {
         didSet {
             updateShieldBlockStats()
         }
@@ -33,7 +33,7 @@ class ShieldsViewController: UIViewController, PopoverContentComponent {
     var shieldsSettingsChanged: ((ShieldsViewController) -> Void)?
     
     /// Create with an initial URL and block stats (or nil if you are not on any web page)
-    init(url: URL?, shieldBlockStats: ShieldBlockedStats?) {
+    init(url: URL?, shieldBlockStats: ShieldBlockedStats) {
         self.url = url
         self.shieldBlockStats = shieldBlockStats
         
@@ -73,18 +73,10 @@ class ShieldsViewController: UIViewController, PopoverContentComponent {
     }
     
     private func updateShieldBlockStats() {
-        guard let stats = shieldBlockStats else {
-            // All 0
-            shieldsView.shieldsContainerStackView.adsTrackersStatView.valueLabel.text = "0"
-            shieldsView.shieldsContainerStackView.httpsUpgradesStatView.valueLabel.text = "0"
-            shieldsView.shieldsContainerStackView.scriptsBlockedStatView.valueLabel.text = "0"
-            shieldsView.shieldsContainerStackView.fingerprintingStatView.valueLabel.text = "0"
-            return
-        }
-        shieldsView.shieldsContainerStackView.adsTrackersStatView.valueLabel.text = String(stats.adsAndTrackers)
-        shieldsView.shieldsContainerStackView.httpsUpgradesStatView.valueLabel.text = String(stats.httpsUpgrades)
-        shieldsView.shieldsContainerStackView.scriptsBlockedStatView.valueLabel.text = String(stats.blockedScripts)
-        shieldsView.shieldsContainerStackView.fingerprintingStatView.valueLabel.text = String(stats.fingerprintingProtection)
+        shieldsView.shieldsContainerStackView.adsTrackersStatView.valueLabel.text = String(shieldBlockStats.adsAndTrackers)
+        shieldsView.shieldsContainerStackView.httpsUpgradesStatView.valueLabel.text = String(shieldBlockStats.httpsUpgrades)
+        shieldsView.shieldsContainerStackView.scriptsBlockedStatView.valueLabel.text = String(shieldBlockStats.blockedScripts)
+        shieldsView.shieldsContainerStackView.fingerprintingStatView.valueLabel.text = String(shieldBlockStats.fingerprintingProtection)
     }
     
     private func updateBraveShieldState(shield: BraveShieldState.Shield, on: Bool) {
