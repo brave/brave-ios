@@ -6,6 +6,7 @@ import Foundation
 import WebKit
 import Storage
 import Shared
+import BraveShared
 import XCGLogger
 import Data
 import CoreData
@@ -345,7 +346,8 @@ class TabManager: NSObject {
             return
         }
 
-        tabs.swapAt(fromIndex, toIndex)
+        let tab = tabs.remove(at: fromIndex)
+        tabs.insert(tab, at: toIndex)
 
         if let previouslySelectedTab = selectedTab, let previousSelectedIndex = tabs.index(of: previouslySelectedTab) {
             _selectedIndex = previousSelectedIndex
@@ -355,7 +357,7 @@ class TabManager: NSObject {
     }
     
     private func saveTabOrder() {
-        let context = DataController.workerThreadContext
+        let context = DataController.newBackgroundContext()
         context.perform {
             for (i, tab) in self.tabs.enumerated() {
                 guard let managedObject = TabMO.get(fromId: tab.id, context: context) else { 
@@ -365,7 +367,7 @@ class TabManager: NSObject {
                 managedObject.order = Int16(i)
             }
             
-            DataController.saveContext(context: context)
+            DataController.save(context: context)
         }
     }
 
@@ -439,7 +441,7 @@ class TabManager: NSObject {
     func saveTab(_ tab: Tab, saveOrder: Bool = false) {
         guard let data = savedTabData(tab: tab) else { return }
         
-        TabMO.preserve(savedTab: data)
+        TabMO.update(tabData: data)
         if saveOrder {
             saveTabOrder()
         }
@@ -449,7 +451,7 @@ class TabManager: NSObject {
         
         guard let webView = tab.webView, let order = indexOfWebView(webView) else { return nil }
         
-        let context = DataController.mainThreadContext
+        let context = DataController.viewContext
         
         // Ignore session restore data.
         guard let urlString = tab.url?.absoluteString, !urlString.contains("localhost") else { return nil }
@@ -508,28 +510,30 @@ class TabManager: NSObject {
         delegates.forEach { $0.get()?.tabManager(self, willRemoveTab: tab) }
 
         // The index of the tab in its respective tab grouping. Used to figure out which tab is next
-        let viableTabs = tabs(withType: tab.type)
+        var currentTabs = tabs(withType: tab.type)
 
         var tabIndex: Int = -1
         if let oldTab = oldSelectedTab {
-            tabIndex = viableTabs.index(of: oldTab) ?? -1
+            tabIndex = currentTabs.index(of: oldTab) ?? -1
         }
 
         let prevCount = count
         tabs.remove(at: removalIndex)
         
-        let context = DataController.mainThreadContext
+        let context = DataController.viewContext
         if let tab = TabMO.get(fromId: tab.id, context: context) {
-            DataController.remove(object: tab, context: context)
+            tab.delete()
         }
 
+        currentTabs = tabs(withType: tab.type)
+        
         // Let's select the tab to be selected next.
         if let oldTab = oldSelectedTab, tab !== oldTab {
             // If it wasn't the selected tab we removed, then keep it like that.
             // It might have changed index, so we look it up again.
             _selectedIndex = tabs.index(of: oldTab) ?? -1
         } else if let parentTab = tab.parent,
-            let newTab = viableTabs.reduce(viableTabs.first, { currentBestTab, tab2 in
+            let newTab = currentTabs.reduce(currentTabs.first, { currentBestTab, tab2 in
             if let tab1 = currentBestTab, let time1 = tab1.lastExecutedTime {
                 if let time2 = tab2.lastExecutedTime {
                     return time1 <= time2 ? tab2 : tab1
@@ -544,11 +548,11 @@ class TabManager: NSObject {
         } else {
             // By now, we've just removed the selected one, and no previously loaded
             // tabs. So let's load the final one in the tab tray.
-            if tabIndex == viableTabs.count {
+            if tabIndex == currentTabs.count {
                 tabIndex -= 1
             }
 
-            if let currentTab = viableTabs[safe: tabIndex] {
+            if let currentTab = currentTabs[safe: tabIndex] {
                 _selectedIndex = tabs.index(of: currentTab) ?? -1
             } else {
                 _selectedIndex = -1
@@ -563,7 +567,7 @@ class TabManager: NSObject {
         delegates.forEach { $0.get()?.tabManager(self, didRemoveTab: tab) }
         TabEvent.post(.didClose, for: tab)
 
-        if tab.isPrivate && viableTabs.isEmpty {
+        if !tab.isPrivate && currentTabs.isEmpty {
             addTab()
         }
 
@@ -782,7 +786,7 @@ extension TabManager {
         var tabToSelect: Tab?
         for savedTab in savedTabs {
             if savedTab.url == nil {
-                DataController.remove(object: savedTab)
+                savedTab.delete()
                 continue
             }
             
@@ -793,7 +797,8 @@ extension TabManager {
             // Since this is a restored tab, reset the URL to be loaded as that will be handled by the SessionRestoreHandler
             tab.url = nil
 
-            if let urlString = savedTab.url, let url = URL(string: urlString), let faviconURL = Domain.getOrCreateForUrl(url, context: DataController.shared.workerContext)?.favicon?.url {
+            if let urlString = savedTab.url, let url = URL(string: urlString),
+                let faviconURL = Domain.getOrCreateForUrl(url, context: DataController.viewContext)?.favicon?.url {
                 let icon = Favicon(url: faviconURL, date: Date())
                 icon.width = 1
                 tab.favicons.append(icon)
@@ -803,9 +808,9 @@ extension TabManager {
             // the screenshot in the tab as long as long as a newer one hasn't been taken.
             if let screenshotUUID = savedTab.screenshotUUID,
                let imageStore = self.imageStore {
-                tab.screenshotUUID = screenshotUUID
-                imageStore.get(screenshotUUID.uuidString) >>== { screenshot in
-                    if tab.screenshotUUID == screenshotUUID {
+                tab.screenshotUUID = UUID(uuidString: screenshotUUID)
+                imageStore.get(screenshotUUID) >>== { screenshot in
+                    if tab.screenshotUUID?.uuidString == screenshotUUID {
                         tab.setScreenshot(screenshot, revUUID: false)
                     }
                 }
@@ -839,7 +844,7 @@ extension TabManager {
     
     func restoreTab(_ tab: Tab) {
         // Tab was created with no active webview or session data. Restore tab data from CD and configure.
-        guard let savedTab = TabMO.get(fromId: tab.id, context: DataController.mainThreadContext) else { return }
+        guard let savedTab = TabMO.get(fromId: tab.id, context: DataController.viewContext) else { return }
         
         if let history = savedTab.urlHistorySnapshot as? [String], let tabUUID = savedTab.syncUUID, let url = savedTab.url {
             let data = SavedTab(id: tabUUID, title: savedTab.title, url: url, isSelected: savedTab.isSelected, order: savedTab.order, screenshot: nil, history: history, historyIndex: savedTab.urlHistoryCurrentIndex)
@@ -929,13 +934,7 @@ extension TabManager: WKNavigationDelegate {
     func tabForWebView(_ webView: WKWebView) -> Tab? {
         objc_sync_enter(self); defer { objc_sync_exit(self) }
         
-        for tab in tabs {
-            if tab.webView === webView {
-                return tab
-            }
-        }
-        
-        return nil
+        return tabs.first(where: { $0.webView === webView })
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {

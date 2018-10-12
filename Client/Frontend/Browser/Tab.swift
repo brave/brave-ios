@@ -48,7 +48,9 @@ class Tab: NSObject {
     var isPrivate: Bool {
         return type.isPrivate
     }
-
+    
+    var contentIsSecure = false
+    
     var tabState: TabState {
         return TabState(type: type, desktopSite: desktopSite, url: url, title: displayTitle, favicon: displayFavicon)
     }
@@ -229,7 +231,7 @@ class Tab: NSObject {
             for urlString in sessionData.history {
                 guard let url = URL(string: urlString) else { continue }
                 let updatedURL = WebServer.sharedInstance.updateLocalURL(url)!.absoluteString
-                let current = updatedURL.regexReplacePattern("https?:..", with: "")
+                guard let current = try? updatedURL.regexReplacePattern("https?:..", with: "") else { continue }
                 if current.count > 1 && current == previous {
                     updatedURLs.removeLast()
                 }
@@ -300,15 +302,14 @@ class Tab: NSObject {
     var displayTitle: String {
         if let title = webView?.title, !title.isEmpty {
             return title.contains("localhost") ? "" : title
-        }
-        else if let url = webView?.url, url.isAboutHomeURL {
+        } else if let url = webView?.url ?? self.url, url.isAboutHomeURL {
             return Strings.NewTabTitle
         }
         
         guard let lastTitle = lastTitle, !lastTitle.isEmpty else {
             if let title = url?.absoluteString {
                 return title
-            } else if let tab = TabMO.get(fromId: id, context: DataController.mainThreadContext) {
+            } else if let tab = TabMO.get(fromId: id, context: DataController.viewContext) {
                 return tab.title ?? tab.url ?? ""
             }
             return ""
@@ -571,6 +572,15 @@ class TabWebView: BraveWebView, MenuHelperInterface {
         becomeFirstResponder()
 
         return super.hitTest(point, with: event)
+    }
+    
+    // rdar://33283179 Apple bug where `serverTrust` is not defined as KVO when it should be
+    override func value(forUndefinedKey key: String) -> Any? {
+        if key == #keyPath(WKWebView.serverTrust) {
+            return serverTrust
+        }
+
+        return super.value(forUndefinedKey: key)
     }
 }
 

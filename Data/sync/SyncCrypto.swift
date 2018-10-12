@@ -22,12 +22,12 @@ class SyncCrypto: JSInjector {
         self.isJavascriptReadyCheck = { return self.isSyncCryptoReady }
         
         // Load HTML and await for response, to verify the webpage is loaded to receive brave-crypto commands
-        self.syncCryptoWebView.navigationDelegate = self;
+        self.syncCryptoWebView.navigationDelegate = self
         // Must load HTML for delegate method to fire
         self.syncCryptoWebView.loadHTMLString("<body>TEST</body>", baseURL: nil)
     }
     
-    fileprivate class var webConfig:WKWebViewConfiguration {
+    fileprivate class var webConfig: WKWebViewConfiguration {
         let webCfg = WKWebViewConfiguration()
         webCfg.userContentController = WKUserContentController()
         
@@ -38,8 +38,7 @@ class SyncCrypto: JSInjector {
         return webCfg
     }
     
-    ///
-    func uniqueSerialBytes(count byteCount: Int) -> [Int]? {
+    class func uniqueSerialBytes(count byteCount: Int) -> [Int]? {
         if byteCount % 2 != 0 { return nil }
         return (0..<byteCount).map { _ in Int(arc4random_uniform(256)) }
     }

@@ -1,12 +1,11 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-
 import UIKit
 import CoreData
 import Foundation
 import BraveShared
 
-public class Domain: NSManagedObject {
+public final class Domain: NSManagedObject, CRUD {
     
     @NSManaged public var url: String?
     @NSManaged public var visits: Int32
@@ -44,7 +43,7 @@ public class Domain: NSManagedObject {
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
         fetchRequest.entity = Domain.entity(context)
         fetchRequest.predicate = NSPredicate(format: "url == %@", domainString)
-        var result: Domain? = nil
+        var result: Domain?
         context.performAndWait {
             do {
                 let results = try context.fetch(fetchRequest) as? [Domain]
@@ -65,44 +64,25 @@ public class Domain: NSManagedObject {
     class func blockFromTopSites(_ url: URL, context: NSManagedObjectContext) {
         if let domain = getOrCreateForUrl(url, context: context) {
             domain.blockedFromTopSites = true
-            DataController.saveContext(context: context)
+            DataController.save(context: context)
         }
     }
 
     class func blockedTopSites(_ context: NSManagedObjectContext) -> [Domain] {
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
-        fetchRequest.entity = Domain.entity(context)
-        fetchRequest.predicate = NSPredicate(format: "blockedFromTopSites == %@", NSNumber(value: true as Bool))
-        do {
-            if let results = try context.fetch(fetchRequest) as? [Domain] {
-                return results
-            }
-        } catch {
-            let fetchError = error as NSError
-            print(fetchError)
-        }
-        return [Domain]()
+        let blockedFromTopSitesKeyPath = #keyPath(Domain.blockedFromTopSites)
+        let predicate = NSPredicate(format: "\(blockedFromTopSitesKeyPath) = YES")
+        return all(where: predicate) ?? []
     }
 
     class func topSitesQuery(_ limit: Int, context: NSManagedObjectContext) -> [Domain] {
-        assert(!Thread.isMainThread)
-
+        let visitsKeyPath = #keyPath(Domain.visits)
+        let blockedFromTopSitesKeyPath = #keyPath(Domain.blockedFromTopSites)
         let minVisits = 5
-
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
-        fetchRequest.fetchLimit = limit
-        fetchRequest.entity = Domain.entity(context)
-        fetchRequest.predicate = NSPredicate(format: "visits > %i AND blockedFromTopSites != %@", minVisits, NSNumber(value: true as Bool))
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "visits", ascending: false)]
-        do {
-            if let results = try context.fetch(fetchRequest) as? [Domain] {
-                return results
-            }
-        } catch {
-            let fetchError = error as NSError
-            print(fetchError)
-        }
-        return [Domain]()
+        
+        let predicate = NSPredicate(format: "\(visitsKeyPath) > %i AND \(blockedFromTopSitesKeyPath) != YES", minVisits)
+        let sortDescriptors = [NSSortDescriptor(key: visitsKeyPath, ascending: false)]
+        
+        return all(where: predicate, sortDescriptors: sortDescriptors) ?? []
     }
 
     class func setBraveShield(forDomain domainString: String, state: Bool?, context: NSManagedObjectContext) {
@@ -118,23 +98,22 @@ public class Domain: NSManagedObject {
 //            case .FpProtection: domain?.shield_fpProtection = state.1 as NSNumber?
 //            case .NoScript: domain?.shield_noScript = state.1 as NSNumber?
 //        }
-//        DataController.saveContext(context: context)
+//        DataController.save(context: context)
     }
 
-    class func loadShieldsIntoMemory(_ completionOnMain: @escaping ()->()) {
+    class func loadShieldsIntoMemory(_ completionOnMain: @escaping () -> Void) {
         // Brave TODO:
 //        BraveShieldState.perNormalizedDomain.removeAll()
 
-        let context = DataController.workerThreadContext
+        let context = DataController.newBackgroundContext()
         context.perform {
-            let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
+            let fetchRequest = NSFetchRequest<Domain>()
             fetchRequest.entity = Domain.entity(context)
-            do {
-                let results = try context.fetch(fetchRequest)
-                for obj in results {
-                    let domain = obj as! Domain
-                    guard let urlString = domain.url, let url = URL(string: urlString) else { continue }
-                    let normalizedUrl = url.normalizedHost ?? ""
+//            do {
+//                let results = try context.fetch(fetchRequest)
+//                for domain in results {
+//                    guard let urlString = domain.url, let url = URL(string: urlString) else { continue }
+//                    let normalizedUrl = url.normalizedHost ?? ""
 
 //                    print(normalizedUrl)
 //                    if let shield = domain.shield_allOff {
@@ -155,11 +134,11 @@ public class Domain: NSManagedObject {
 //                    if let shield = domain.shield_noScript {
 //                        BraveShieldState.setInMemoryforDomain(normalizedUrl, setState: (.NoScript, shield.boolValue))
 //                    }
-                }
-            } catch {
-                let fetchError = error as NSError
-                print(fetchError)
-            }
+//                }
+//            } catch {
+//                let fetchError = error as NSError
+//                print(fetchError)
+//            }
 
             DispatchQueue.main.async {
                 completionOnMain()
@@ -167,14 +146,14 @@ public class Domain: NSManagedObject {
         }
     }
 
-    class func deleteNonBookmarkedAndClearSiteVisits(_ completionOnMain: @escaping ()->()) {
-        let context = DataController.workerThreadContext
+    class func deleteNonBookmarkedAndClearSiteVisits(context: NSManagedObjectContext, _ completionOnMain: @escaping () -> Void) {
+        
         context.perform {
-            let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
+            let fetchRequest = NSFetchRequest<Domain>()
             fetchRequest.entity = Domain.entity(context)
             do {
                 let results = try context.fetch(fetchRequest)
-                (results as? [Domain])?.forEach {
+                results.forEach {
                     if let bms = $0.bookmarks, bms.count > 0 {
                         // Clear visit count
                         $0.visits = 0
@@ -185,14 +164,14 @@ public class Domain: NSManagedObject {
                 }
                 for obj in results {
                     // Cascading delete on favicon, it will also get deleted
-                    context.delete(obj as! NSManagedObject)
+                    context.delete(obj)
                 }
             } catch {
                 let fetchError = error as NSError
                 print(fetchError)
             }
 
-            DataController.saveContext(context: context)
+            DataController.save(context: context)
             DispatchQueue.main.async {
                 completionOnMain()
             }

@@ -33,13 +33,13 @@ public extension Strings {
 
 // Error pages.
 public extension Strings {
-//    public static let ErrorPagesAdvancedButton = NSLocalizedString("Advanced", comment: "Label for button to perform advanced actions on the error page")
-//    public static let ErrorPagesAdvancedWarning1 = NSLocalizedString("Warning: we can't confirm your connection to this website is secure.", comment: "Warning text when clicking the Advanced button on error pages")
-//    public static let ErrorPagesAdvancedWarning2 = NSLocalizedString("It may be a misconfiguration or tampering by an attacker. Proceed if you accept the potential risk.", comment: "Additional warning text when clicking the Advanced button on error pages")
-//    public static let ErrorPagesCertWarningDescription = NSLocalizedString("The owner of %@ has configured their website improperly. To protect your information from being stolen, Brave has not connected to this website.", comment: "Warning text on the certificate error page")
-//    public static let ErrorPagesCertWarningTitle = NSLocalizedString("Your connection is not private", comment: "Title on the certificate error page")
-//    public static let ErrorPagesGoBackButton = NSLocalizedString("Go Back", comment: "Label for button to go back from the error page")
-//    public static let ErrorPagesVisitOnceButton = NSLocalizedString("Visit site anyway", comment: "Button label to temporarily continue to the site from the certificate error page")
+    public static let ErrorPagesAdvancedButton = NSLocalizedString("Advanced", comment: "Label for button to perform advanced actions on the error page")
+    public static let ErrorPagesAdvancedWarning1 = NSLocalizedString("Warning: we can't confirm your connection to this website is secure.", comment: "Warning text when clicking the Advanced button on error pages")
+    public static let ErrorPagesAdvancedWarning2 = NSLocalizedString("It may be a misconfiguration or tampering by an attacker. Proceed if you accept the potential risk.", comment: "Additional warning text when clicking the Advanced button on error pages")
+    public static let ErrorPagesCertWarningDescription = NSLocalizedString("The owner of %@ has configured their website improperly. To protect your information from being stolen, Brave has not connected to this website.", comment: "Warning text on the certificate error page")
+    public static let ErrorPagesCertWarningTitle = NSLocalizedString("Your connection is not private", comment: "Title on the certificate error page")
+    public static let ErrorPagesGoBackButton = NSLocalizedString("Go Back", comment: "Label for button to go back from the error page")
+    public static let ErrorPagesVisitOnceButton = NSLocalizedString("Visit site anyway", comment: "Button label to temporarily continue to the site from the certificate error page")
 }
 
 // Logins Helper.
@@ -88,7 +88,11 @@ public extension Strings {
     public static let SyncUnableCreateGroup = NSLocalizedString("Unable to create new sync group.", comment: "Description on popup when setting up a sync group fails")
     
     public static let ShowTour = NSLocalizedString("Show Tour", comment: "Show the on-boarding screen again from the settings")
-    public static let DefaultSearchEngine = NSLocalizedString("Settings.Open.Default.Search", value: "Default Search Engine", comment: "Open search section of settings")
+    public static let CurrentlyUsedSearchEngines = NSLocalizedString("Settings.Open.Default.SearchEngineForMode", value: "Currently used search engines", comment: "Currently usedd search engines section name.")
+    public static let QuickSearchEngines = NSLocalizedString("Quick-Search Engines", comment: "Title for quick-search engines settings section.")
+    public static let StandardTabSearch = NSLocalizedString("Standard Tab", comment: "Open search section of settings")
+    public static let PrivateTabSearch = NSLocalizedString("Private Tab", comment: "Default engine for private search.")
+    public static let SearchEngines = NSLocalizedString("Settings.Open.Default.Search", value: "Search Engines", comment: "Search engines section of settings")
     public static let Logins = NSLocalizedString("Logins", comment: "Label used as an item in Settings. When touched, the user will be navigated to the Logins/Password manager.")
     public static let Settings = NSLocalizedString("Settings", comment: "")
     public static let OtherSettings = NSLocalizedString("Other Settings", comment: "Other settings sectiont title")
@@ -140,7 +144,7 @@ public extension Strings {
     public static let This_allows_you_to_save_the_image_to_your_CameraRoll = NSLocalizedString("This allows you to save the image to your Camera Roll.", comment: "See http://mzl.la/1G7uHo7")
     public static let Open_Settings = NSLocalizedString("Open Settings", comment: "See http://mzl.la/1G7uHo7")
     public static let Copy_Image = NSLocalizedString("Copy Image", comment: "Context menu item for copying an image to the clipboard")
-    public static let Call = NSLocalizedString("Call", comment:"Alert Call Button")
+    public static let Call = NSLocalizedString("Call", comment: "Alert Call Button")
     public static let AllowOpenITunes_template = NSLocalizedString("Allow %@ to open iTunes?", comment: "Ask user if site can open iTunes store URL")
     public static let Paste_and_Go = NSLocalizedString("Paste & Go", comment: "Paste the URL into the location bar and visit")
     public static let Paste = NSLocalizedString("Paste", comment: "Paste the URL into the location bar")
@@ -312,7 +316,6 @@ public extension Strings {
     public static let desktopBookmarksLabel = NSLocalizedString("Desktop Bookmarks", comment: "The folder name for the virtual folder that contains all desktop bookmarks.")
 }
 
-
 public extension Strings {
     public static let Block_Popups = NSLocalizedString("Block Popups", comment: "Setting to enable popup blocking")
     public static let Show_Tabs_Bar = NSLocalizedString("Show Tabs Bar", comment: "Setting to show/hide the tabs bar")
@@ -370,6 +373,11 @@ public extension Strings {
     public static let Browser_lock_callout_message = NSLocalizedString("With Browser Lock, you will need to enter a PIN in order to access Brave.", comment: "Browser Lock feature callout message.")
     public static let Browser_lock_callout_not_now = NSLocalizedString("Not Now", comment: "Browser Lock feature callout not now action.")
     public static let Browser_lock_callout_enable = NSLocalizedString("Enable", comment: "Browser Lock feature callout enable action.")
+    public static let DDG_callout_title = NSLocalizedString("Private search with DuckDuckGo?", comment: "DuckDuckGo callout title.")
+    public static let DDG_callout_message = NSLocalizedString("With private search, Brave will use DuckDuckGo to answer your searches while you are in this private tab. DuckDuckGo is a search engine that does not track your search history, enabling you to search privately.", comment: "DuckDuckGo message.")
+    public static let DDG_callout_no = NSLocalizedString("No", comment: "DuckDuckGo callout no action.")
+    public static let DDG_callout_enable = NSLocalizedString("Yes", comment: "DuckDuckGo callout enable action.")
+    public static let DDG_promotion = NSLocalizedString("Learn about private search \rwith DuckDuckGo", comment: "DuckDuckGo promotion label.")
 }
 
 // SYNC.

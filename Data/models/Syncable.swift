@@ -13,7 +13,7 @@ public protocol Syncable: class /* where Self: NSManagedObject */ {
     // Primarily used for generic record deletion
     var recordType: SyncRecordType { get }
     
-    static func entity(context:NSManagedObjectContext) -> NSEntityDescription
+    static func entity(context: NSManagedObjectContext) -> NSEntityDescription
     
     func asDictionary(deviceId: [Int]?, action: Int?) -> [String: Any]
     
@@ -23,7 +23,7 @@ public protocol Syncable: class /* where Self: NSManagedObject */ {
 }
 
 extension Syncable {
-    public static func entity(context:NSManagedObjectContext) -> NSEntityDescription {
+    public static func entity(context: NSManagedObjectContext) -> NSEntityDescription {
         // Swift 4 version
         // let className = String(describing: type(of: self))
         let className = String(describing: self)
@@ -48,9 +48,8 @@ extension Syncable {
         fetchRequest.entity = Self.entity(context: context)
         fetchRequest.predicate = predicate
         
-        var result: [NSManagedObject]? = nil
+        var result: [NSManagedObject]?
         context.performAndWait {
-            
             
             do {
                 result = try context.fetch(fetchRequest) as? [NSManagedObject]
@@ -110,7 +109,7 @@ extension Syncable /* where Self: NSManagedObject */ {
         // Force a sync resync instead, should not be slow
         context.delete(s)
         if save {
-            DataController.saveContext(context: context)
+            DataController.save(context: context)
         }
     }
 }
@@ -120,7 +119,7 @@ class SyncHelpers {
     
     /// UUID -> DisplayUUID
     static func syncDisplay(fromUUID uuid: [Int]?) -> String? {
-        return uuid?.map{ $0.description }.joined(separator: ",")
+        return uuid?.map { $0.description }.joined(separator: ",")
     }
     
     /// DisplayUUID -> UUID

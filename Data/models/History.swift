@@ -1,6 +1,5 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-
 import CoreData
 import Shared
 import BraveShared
@@ -36,7 +35,7 @@ public func isIgnoredURL(_ url: String) -> Bool {
     return false
 }
 
-public class History: NSManagedObject, WebsitePresentable {
+public final class History: NSManagedObject, WebsitePresentable, CRUD {
 
     @NSManaged public var title: String?
     @NSManaged public var url: String?
@@ -56,7 +55,7 @@ public class History: NSManagedObject, WebsitePresentable {
     }
 
     public class func add(_ title: String, url: URL) {
-        let context = DataController.workerThreadContext
+        let context = DataController.newBackgroundContext()
         context.perform {
             var item = History.getExisting(url, context: context)
             if item == nil {
@@ -70,21 +69,21 @@ public class History: NSManagedObject, WebsitePresentable {
             // BRAVE TODO:
 //            item?.sectionIdentifier = BraveStrings.Today
 
-            DataController.saveContext(context: context)
+            DataController.save(context: context)
         }
     }
 
-    public class func frc() -> NSFetchedResultsController<NSFetchRequestResult> {
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
-        let context = DataController.mainThreadContext
+    public class func frc() -> NSFetchedResultsController<History> {
+        let fetchRequest = NSFetchRequest<History>()
+        let context = DataController.viewContext
         
         fetchRequest.entity = History.entity(context)
         fetchRequest.fetchBatchSize = 20
         fetchRequest.fetchLimit = 200
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key:"visitedOn", ascending: false)]
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "visitedOn", ascending: false)]
         fetchRequest.predicate = NSPredicate(format: "visitedOn >= %@", History.ThisMonth as CVarArg)
 
-        return NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext:context, sectionNameKeyPath: "sectionIdentifier", cacheName: nil)
+        return NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: context, sectionNameKeyPath: "sectionIdentifier", cacheName: nil)
     }
 
     public override func awakeFromFetch() {
@@ -104,78 +103,32 @@ public class History: NSManagedObject, WebsitePresentable {
     }
 
     class func getExisting(_ url: URL, context: NSManagedObjectContext) -> History? {
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
-        fetchRequest.entity = History.entity(context)
-        fetchRequest.predicate = NSPredicate(format: "url == %@", url.absoluteString)
-        var result: History? = nil
-        do {
-            let results = try context.fetch(fetchRequest) as? [History]
-            if let item = results?.first {
-                result = item
-            }
-        } catch {
-            let fetchError = error as NSError
-            print(fetchError)
-        }
-        return result
+        let urlKeyPath = #keyPath(History.url)
+        let predicate = NSPredicate(format: "\(urlKeyPath) == %@", url.absoluteString)
+        
+        return first(where: predicate, context: context)
     }
 
-    class func frecencyQuery(_ context: NSManagedObjectContext, containing:String? = nil) -> [History] {
-        assert(!Thread.isMainThread)
+    public class func frecencyQuery(_ context: NSManagedObjectContext, containing: String? = nil) -> [History] {
+        let urlKeyPath = #keyPath(History.url)
+        let visitedOnKeyPath = #keyPath(History.visitedOn) 
 
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
-        fetchRequest.fetchLimit = 100
-        fetchRequest.entity = History.entity(context)
-        
-        var predicate = NSPredicate(format: "visitedOn > %@", History.ThisWeek as CVarArg)
+        var predicate = NSPredicate(format: "\(visitedOnKeyPath) > %@", History.ThisWeek as CVarArg)
         if let query = containing {
-            predicate = NSPredicate(format: predicate.predicateFormat + " AND url CONTAINS %@", query)
+            predicate = NSPredicate(format: predicate.predicateFormat + " AND \(urlKeyPath) CONTAINS %@", query)
         }
         
-        fetchRequest.predicate = predicate
-
-        do {
-            if let results = try context.fetch(fetchRequest) as? [History] {
-                return results
-            }
-        } catch {
-            let fetchError = error as NSError
-            print(fetchError)
-        }
-        return []
+        return all(where: predicate, fetchLimit: 100) ?? []
     }
     
-    public func remove(save: Bool) {
-        guard let context = managedObjectContext else { return }
-        context.delete(self)
+    public class func deleteAll(_ completionOnMain: @escaping () -> Void) {
+        let context = DataController.newBackgroundContext()
         
-        if save {
-            DataController.saveContext(context: context)
-        }
-    }
-    
-    public class func deleteAll(_ completionOnMain: @escaping ()->()) {
-        let context = DataController.workerThreadContext
-        context.perform {
-            let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
-            fetchRequest.entity = History.entity(context)
-            fetchRequest.includesPropertyValues = false
-            do {
-                let results = try context.fetch(fetchRequest)
-                for result in results {
-                    context.delete(result as! NSManagedObject)
-                }
-
-            } catch {
-                let fetchError = error as NSError
-                print(fetchError)
-            }
-
-            // No save, save in Domain
-
-            Domain.deleteNonBookmarkedAndClearSiteVisits {
-                completionOnMain()
-            }
+        // No save, save in Domain
+        History.deleteAll(context: context, includesPropertyValues: false, save: false)
+        
+        Domain.deleteNonBookmarkedAndClearSiteVisits(context: context) {
+            completionOnMain()
         }
     }
 
