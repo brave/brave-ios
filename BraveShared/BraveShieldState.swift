@@ -6,20 +6,6 @@ import SwiftyJSON
 // These override the setting in the prefs
 public struct BraveShieldState {
 
-    public static func set(forDomain domain: String, state: (BraveShieldState.Shield, Bool?)) {
-        BraveShieldState.setInMemoryforDomain(domain, setState: state)
-
-        // BRAVE TODO:
-//        if PrivateBrowsing.singleton.isOn {
-//            return
-//        }
-//
-//        let context = DataController.newBackgroundContext()
-//        context.perform {
-//            Domain.setBraveShield(forDomain: domain, state: state, context: context)
-//        }
-    }
-
     public enum Shield: String {
         case AllOff = "all_off"
         case AdblockAndTp = "adblock_and_tp"
@@ -34,17 +20,15 @@ public struct BraveShieldState {
     typealias DomainKey = String
     static var perNormalizedDomain = [DomainKey: BraveShieldState]()
 
-    public static func setInMemoryforDomain(_ domain: String, setState state: (BraveShieldState.Shield, Bool?)) {
-        var shields = perNormalizedDomain[domain]
-        if shields == nil {
-            if state.1 == nil {
-                return
-            }
-            shields = BraveShieldState()
-        }
-
-        shields!.setState(state.0, on: state.1)
-        perNormalizedDomain[domain] = shields!
+    public static func clearAllInMemoryDomainStates() {
+        self.perNormalizedDomain.removeAll()
+    }
+    
+    public static func set(forUrl url: URL, state: (BraveShieldState.Shield, Bool)) {
+        let domain = url.domainURL.absoluteString
+        var shields = perNormalizedDomain[domain] ?? BraveShieldState()
+        shields.setState(state.0, on: state.1)
+        perNormalizedDomain[domain] = shields
     }
 
     public static func getStateForDomain(_ domain: String) -> BraveShieldState? {
@@ -62,8 +46,7 @@ public struct BraveShieldState {
         }
     }
 
-    public init() {
-    }
+    public init() {}
 
     public init(orig: BraveShieldState) {
         self.state = orig.state // Dict value type is copied

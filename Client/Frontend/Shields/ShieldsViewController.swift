@@ -8,7 +8,7 @@ import Shared
 import BraveShared
 import Data
 
-struct ShieldBlockedStats {
+class ShieldBlockedStats: NSObject {
     var adsAndTrackers = 0
     var httpsUpgrades = 0
     var blockedScripts = 0
@@ -49,6 +49,9 @@ class ShieldsViewController: UIViewController, PopoverContentComponent {
     
     private func updateToggleStatus() {
         shieldControlMapping.forEach { shield, view, option in
+            
+            // Updating based on global settings
+            
             if let option = option {
                 // Sets the default setting
                 view.toggleSwitch.isOn = option.value
@@ -57,7 +60,10 @@ class ShieldsViewController: UIViewController, PopoverContentComponent {
                 // Therefore its the only shield we have to give a default value of true
                 view.toggleSwitch.isOn = shield == .AllOff
             }
-            if let host = url?.normalizedHost, let shieldState = BraveShieldState.getStateForDomain(host) {
+            
+            // Domain specific overrides after defaults have already been setup
+            
+            if let host = url?.domainURL.absoluteString, let shieldState = BraveShieldState.getStateForDomain(host) {
                 // Sets the site-specific setting
                 if var shieldOverrideEnabled = shieldState.isShieldOverrideEnabled(shield) {
                     if shield == .AllOff {
@@ -80,13 +86,12 @@ class ShieldsViewController: UIViewController, PopoverContentComponent {
     }
     
     private func updateBraveShieldState(shield: BraveShieldState.Shield, on: Bool) {
-        guard let domain = url?.normalizedHost else { return }
-        if shield == .AllOff {
-            // Technically we set "all off" when the switch is OFF, unlike all the others
-            BraveShieldState.set(forDomain: domain, state: (.AllOff, !on))
-        } else {
-            BraveShieldState.set(forDomain: domain, state: (shield, on))
-        }
+        guard let url = url else { return }
+        let allOff = shield == .AllOff
+        // `.AllOff` uses inverse logic
+        // Technically we set "all off" when the switch is OFF, unlike all the others
+        let state = (shield, allOff ? !on : on)
+        Domain.setBraveShield(forUrl: url, state: state)
     }
     
     private func updateGlobalShieldState(_ on: Bool, animated: Bool = false) {
@@ -142,6 +147,7 @@ class ShieldsViewController: UIViewController, PopoverContentComponent {
                     // Update the content size
                     self.updateGlobalShieldState(on, animated: true)
                 }
+                // Localized / per domain toggles triggered here
                 self.updateBraveShieldState(shield: shield, on: on)
                 self.shieldsSettingsChanged?(self)
             }
