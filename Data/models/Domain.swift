@@ -99,11 +99,11 @@ public final class Domain: NSManagedObject, CRUD {
         BraveShieldState.set(forUrl: url, state: state)
     }
 
-    // TODO: Move logic to ShieldState init
-    public class func loadShieldsIntoMemory(_ completionOnMain: @escaping () -> Void) {
+    // If `static` nature here is removed, this logic can be placed inside ShieldState's init
+    public class func loadShieldsIntoMemory() {
         BraveShieldState.clearAllInMemoryDomainStates()
 
-        // TODO: Should consider fetching Domains and passing list to shield states to flush themselves.
+        // Should consider fetching Domains and passing list to shield states to flush themselves.
         //  Or just place all of this directly on shield states, (reset memory states)
         let context = DataController.newBackgroundContext()
         context.perform {

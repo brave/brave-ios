@@ -122,7 +122,7 @@ class BrowserViewController: UIViewController {
     let downloadQueue = DownloadQueue()
     
     fileprivate let shieldBlockStats = ShieldBlockedStats().then { _ in
-        Domain.loadShieldsIntoMemory {}
+        Domain.loadShieldsIntoMemory()
     }
     
 

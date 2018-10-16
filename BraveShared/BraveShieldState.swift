@@ -21,7 +21,7 @@ public struct BraveShieldState {
     static var perNormalizedDomain = [DomainKey: BraveShieldState]()
 
     public static func clearAllInMemoryDomainStates() {
-        self.perNormalizedDomain.removeAll()
+        perNormalizedDomain.removeAll()
     }
     
     public static func set(forUrl url: URL, state: (BraveShieldState.Shield, Bool)) {
