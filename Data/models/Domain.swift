@@ -32,21 +32,24 @@ public final class Domain: NSManagedObject, CRUD {
         super.awakeFromInsert()
     }
 
-    public class func getOrCreateForUrl(_ url: URL, context: NSManagedObjectContext) -> Domain? {
+    public class func getOrCreateForUrl(_ url: URL, context: NSManagedObjectContext) -> Domain {
         let domainString = url.domainURL.absoluteString
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
         fetchRequest.entity = Domain.entity(context)
         fetchRequest.predicate = NSPredicate(format: "url == %@", domainString)
-        var result: Domain?
+        var result: Domain!
         context.performAndWait {
             do {
-                let results = try context.fetch(fetchRequest) as? [Domain]
-                if let item = results?.first {
-                    result = item
+                var domain: Domain
+                let domains = try context.fetch(fetchRequest) as? [Domain]
+                if let item = domains?.first {
+                    domain = item
                 } else {
-                    result = Domain(entity: Domain.entity(context), insertInto: context)
-                    result?.url = domainString
+                    domain = Domain(entity: Domain.entity(context), insertInto: context)
+                    domain.url = domainString
                 }
+                
+                result = domain
             } catch {
                 let fetchError = error as NSError
                 print(fetchError)
@@ -56,10 +59,9 @@ public final class Domain: NSManagedObject, CRUD {
     }
 
     class func blockFromTopSites(_ url: URL, context: NSManagedObjectContext) {
-        if let domain = getOrCreateForUrl(url, context: context) {
-            domain.blockedFromTopSites = true
-            DataController.save(context: context)
-        }
+        let domain = getOrCreateForUrl(url, context: context)
+        domain.blockedFromTopSites = true
+        DataController.save(context: context)
     }
 
     class func blockedTopSites(_ context: NSManagedObjectContext) -> [Domain] {
@@ -85,12 +87,12 @@ public final class Domain: NSManagedObject, CRUD {
         let domain = Domain.getOrCreateForUrl(url, context: context)
         let (shield, setting) = (state.0, state.1 as NSNumber)
         switch shield {
-            case .AllOff: domain?.shield_allOff = setting
-            case .AdblockAndTp: domain?.shield_adblockAndTp = setting
-            case .HTTPSE: domain?.shield_httpse = setting
-            case .SafeBrowsing: domain?.shield_safeBrowsing = setting
-            case .FpProtection: domain?.shield_fpProtection = setting
-            case .NoScript: domain?.shield_noScript = setting
+            case .AllOff: domain.shield_allOff = setting
+            case .AdblockAndTp: domain.shield_adblockAndTp = setting
+            case .HTTPSE: domain.shield_httpse = setting
+            case .SafeBrowsing: domain.shield_safeBrowsing = setting
+            case .FpProtection: domain.shield_fpProtection = setting
+            case .NoScript: domain.shield_noScript = setting
         }
         
         DataController.save(context: context)
@@ -136,10 +138,6 @@ public final class Domain: NSManagedObject, CRUD {
             } catch {
                 let fetchError = error as NSError
                 print(fetchError)
-            }
-
-            DispatchQueue.main.async {
-                completionOnMain()
             }
         }
     }
