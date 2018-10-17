@@ -81,11 +81,11 @@ public final class Domain: NSManagedObject, CRUD {
         return all(where: predicate, sortDescriptors: sortDescriptors) ?? []
     }
 
-    public class func setBraveShield(forUrl url: URL, state: (BraveShieldState.Shield, Bool)) {
+    public class func setBraveShield(forUrl url: URL, shield: BraveShieldState.Shield, isOn: Bool?) {
         let context = DataController.newBackgroundContext()
         
         let domain = Domain.getOrCreateForUrl(url, context: context)
-        let (shield, setting) = (state.0, state.1 as NSNumber)
+        let setting = isOn as NSNumber?
         switch shield {
             case .AllOff: domain.shield_allOff = setting
             case .AdblockAndTp: domain.shield_adblockAndTp = setting
@@ -98,7 +98,7 @@ public final class Domain: NSManagedObject, CRUD {
         DataController.save(context: context)
         
         // After save update app state
-        BraveShieldState.set(forUrl: url, state: state)
+        BraveShieldState.set(forUrl: url, state: (shield, isOn))
     }
 
     // If `static` nature here is removed, this logic can be placed inside ShieldState's init
@@ -110,23 +110,16 @@ public final class Domain: NSManagedObject, CRUD {
         for domain in Domain.all() ?? [] {
             guard let urlString = domain.url, let url = URL(string: urlString) else { continue }
             
-            if let shield = domain.shield_allOff {
-                BraveShieldState.set(forUrl: url, state: (.AllOff, shield.boolValue))
-            }
-            if let shield = domain.shield_adblockAndTp {
-                BraveShieldState.set(forUrl: url, state: (.AdblockAndTp, shield.boolValue))
-            }
-            if let shield = domain.shield_safeBrowsing {
-                BraveShieldState.set(forUrl: url, state: (.SafeBrowsing, shield.boolValue))
-            }
-            if let shield = domain.shield_httpse {
-                BraveShieldState.set(forUrl: url, state: (.HTTPSE, shield.boolValue))
-            }
-            if let shield = domain.shield_fpProtection {
-                BraveShieldState.set(forUrl: url, state: (.FpProtection, shield.boolValue))
-            }
-            if let shield = domain.shield_noScript {
-                BraveShieldState.set(forUrl: url, state: (.NoScript, shield.boolValue))
+            let shieldOptions: [(BraveShieldState.Shield, NSNumber?)] = [
+                (.AllOff, domain.shield_allOff),
+                (.AdblockAndTp, domain.shield_adblockAndTp),
+                (.SafeBrowsing, domain.shield_safeBrowsing),
+                (.HTTPSE, domain.shield_httpse),
+                (.FpProtection, domain.shield_fpProtection),
+                (.NoScript, domain.shield_noScript)
+            ]
+            shieldOptions.forEach { (shield, isOn) in
+                BraveShieldState.set(forUrl: url, state: (shield, isOn?.boolValue))
             }
         }
     }

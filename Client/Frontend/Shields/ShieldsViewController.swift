@@ -90,8 +90,8 @@ class ShieldsViewController: UIViewController, PopoverContentComponent {
         let allOff = shield == .AllOff
         // `.AllOff` uses inverse logic
         // Technically we set "all off" when the switch is OFF, unlike all the others
-        let state = (shield, allOff ? !on : on)
-        Domain.setBraveShield(forUrl: url, state: state)
+        let isOn = allOff ? !on : on
+        Domain.setBraveShield(forUrl: url, shield: shield, isOn: isOn)
     }
     
     private func updateGlobalShieldState(_ on: Bool, animated: Bool = false) {

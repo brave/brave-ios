@@ -124,7 +124,6 @@ class BrowserViewController: UIViewController {
     fileprivate let shieldBlockStats = ShieldBlockedStats().then { _ in
         Domain.loadShieldsIntoMemory()
     }
-    
 
     init(profile: Profile, tabManager: TabManager) {
         self.profile = profile

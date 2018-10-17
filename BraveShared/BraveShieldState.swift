@@ -24,10 +24,10 @@ public struct BraveShieldState {
         inMemoryDomainSheildSettings.removeAll()
     }
     
-    public static func set(forUrl url: URL, state: (BraveShieldState.Shield, Bool)) {
+    public static func set(forUrl url: URL, state: (BraveShieldState.Shield, Bool?)) {
         let domain = url.domainURL.absoluteString
         var shields = inMemoryDomainSheildSettings[domain] ?? BraveShieldState()
-        shields.setState(state.0, on: state.1)
+        shields.set(shield: state.0, toOn: state.1)
         inMemoryDomainSheildSettings[domain] = shields
     }
 
@@ -39,7 +39,7 @@ public struct BraveShieldState {
         let js = JSON(parseJSON: jsonStateFromDbRow)
         for (k, v) in (js.dictionary ?? [:]) {
             if let key = Shield(rawValue: k) {
-                setState(key, on: v.bool)
+                set(shield: key, toOn: v.bool)
             } else {
                 assert(false, "db has bad brave shield state")
             }
@@ -60,11 +60,11 @@ public struct BraveShieldState {
         return JSON(_state).rawString()
     }
 
-    mutating func setState(_ key: Shield, on: Bool?) {
+    mutating func set(shield: Shield, toOn on: Bool?) {
         if let on = on {
-            state[key] = on
+            state[shield] = on
         } else {
-            state.removeValue(forKey: key)
+            state.removeValue(forKey: shield)
         }
     }
 
