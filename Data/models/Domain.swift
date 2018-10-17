@@ -107,37 +107,26 @@ public final class Domain: NSManagedObject, CRUD {
 
         // Should consider fetching Domains and passing list to shield states to flush themselves.
         //  Or just place all of this directly on shield states, (reset memory states)
-        let context = DataController.newBackgroundContext()
-        context.perform {
-            let fetchRequest = NSFetchRequest<Domain>()
-            fetchRequest.entity = Domain.entity(context)
-            do {
-                let results = try context.fetch(fetchRequest)
-                for domain in results {
-                    guard let urlString = domain.url, let url = URL(string: urlString) else { continue }
-                    
-                    if let shield = domain.shield_allOff {
-                        BraveShieldState.set(forUrl: url, state: (.AllOff, shield.boolValue))
-                    }
-                    if let shield = domain.shield_adblockAndTp {
-                        BraveShieldState.set(forUrl: url, state: (.AdblockAndTp, shield.boolValue))
-                    }
-                    if let shield = domain.shield_safeBrowsing {
-                        BraveShieldState.set(forUrl: url, state: (.SafeBrowsing, shield.boolValue))
-                    }
-                    if let shield = domain.shield_httpse {
-                        BraveShieldState.set(forUrl: url, state: (.HTTPSE, shield.boolValue))
-                    }
-                    if let shield = domain.shield_fpProtection {
-                        BraveShieldState.set(forUrl: url, state: (.FpProtection, shield.boolValue))
-                    }
-                    if let shield = domain.shield_noScript {
-                        BraveShieldState.set(forUrl: url, state: (.NoScript, shield.boolValue))
-                    }
-                }
-            } catch {
-                let fetchError = error as NSError
-                print(fetchError)
+        for domain in Domain.all() ?? [] {
+            guard let urlString = domain.url, let url = URL(string: urlString) else { continue }
+            
+            if let shield = domain.shield_allOff {
+                BraveShieldState.set(forUrl: url, state: (.AllOff, shield.boolValue))
+            }
+            if let shield = domain.shield_adblockAndTp {
+                BraveShieldState.set(forUrl: url, state: (.AdblockAndTp, shield.boolValue))
+            }
+            if let shield = domain.shield_safeBrowsing {
+                BraveShieldState.set(forUrl: url, state: (.SafeBrowsing, shield.boolValue))
+            }
+            if let shield = domain.shield_httpse {
+                BraveShieldState.set(forUrl: url, state: (.HTTPSE, shield.boolValue))
+            }
+            if let shield = domain.shield_fpProtection {
+                BraveShieldState.set(forUrl: url, state: (.FpProtection, shield.boolValue))
+            }
+            if let shield = domain.shield_noScript {
+                BraveShieldState.set(forUrl: url, state: (.NoScript, shield.boolValue))
             }
         }
     }
