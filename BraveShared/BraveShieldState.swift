@@ -18,21 +18,21 @@ public struct BraveShieldState {
     fileprivate var state = [Shield: Bool]()
 
     typealias DomainKey = String
-    static var perNormalizedDomain = [DomainKey: BraveShieldState]()
+    private static var inMemoryDomainSheildSettings = [DomainKey: BraveShieldState]()
 
     public static func clearAllInMemoryDomainStates() {
-        perNormalizedDomain.removeAll()
+        inMemoryDomainSheildSettings.removeAll()
     }
     
     public static func set(forUrl url: URL, state: (BraveShieldState.Shield, Bool)) {
         let domain = url.domainURL.absoluteString
-        var shields = perNormalizedDomain[domain] ?? BraveShieldState()
+        var shields = inMemoryDomainSheildSettings[domain] ?? BraveShieldState()
         shields.setState(state.0, on: state.1)
-        perNormalizedDomain[domain] = shields
+        inMemoryDomainSheildSettings[domain] = shields
     }
 
     public static func getStateForDomain(_ domain: String) -> BraveShieldState? {
-        return perNormalizedDomain[domain]
+        return inMemoryDomainSheildSettings[domain]
     }
 
     public init(jsonStateFromDbRow: String) {
