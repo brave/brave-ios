@@ -10,7 +10,7 @@ import SwiftKeychainWrapper
 /// for the various Passcode configuration screens.
 class BasePasscodeViewController: UIViewController {
     var authenticationInfo: AuthenticationKeychainInfo?
-
+    var scrollView: UIScrollView?
     var errorToast: ErrorToast?
     let errorPadding: CGFloat = 10
 
@@ -39,7 +39,9 @@ class BasePasscodeViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = SettingsUX.TableViewHeaderBackgroundColor
         updateRightBarButtonItem()
-        automaticallyAdjustsScrollViewInsets = false
+        if #available(iOS 11.0, *) {
+            scrollView?.contentInsetAdjustmentBehavior = .never
+        }
     }
 
     @objc func dismissAnimated() {

@@ -70,6 +70,8 @@ class LoginListViewController: UIViewController {
     fileprivate var selectedIndexPaths = [IndexPath]()
 
     fileprivate let tableView = UITableView()
+    
+    fileprivate var scrollView = UIScrollView()
 
     weak var settingsDelegate: SettingsDelegate?
 
@@ -89,7 +91,9 @@ class LoginListViewController: UIViewController {
         notificationCenter.addObserver(self, selector: #selector(remoteLoginsDidChange), name: .DataRemoteLoginChangesWereApplied, object: nil)
         notificationCenter.addObserver(self, selector: #selector(dismissAlertController), name: .UIApplicationDidEnterBackground, object: nil)
 
-        automaticallyAdjustsScrollViewInsets = false
+        if #available(iOS 11.0, *) {
+            scrollView.contentInsetAdjustmentBehavior = .never
+        }
         self.view.backgroundColor = UIColor.Photon.White100
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(beginEditing))
 
