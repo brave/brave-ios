@@ -34,28 +34,16 @@ public final class Domain: NSManagedObject, CRUD {
 
     public class func getOrCreateForUrl(_ url: URL, context: NSManagedObjectContext) -> Domain {
         let domainString = url.domainURL.absoluteString
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
-        fetchRequest.entity = Domain.entity(context)
-        fetchRequest.predicate = NSPredicate(format: "url == %@", domainString)
-        var result: Domain!
-        context.performAndWait {
-            do {
-                var domain: Domain
-                let domains = try context.fetch(fetchRequest) as? [Domain]
-                if let item = domains?.first {
-                    domain = item
-                } else {
-                    domain = Domain(entity: Domain.entity(context), insertInto: context)
-                    domain.url = domainString
-                }
-                
-                result = domain
-            } catch {
-                let fetchError = error as NSError
-                print(fetchError)
-            }
+        if let domain = Domain.first(where: NSPredicate(format: "url == %@", domainString), context: context) {
+            return domain
         }
-        return result
+            
+        var newDomain: Domain!
+        context.performAndWait {
+            newDomain = Domain(entity: Domain.entity(context), insertInto: context)
+            newDomain.url = domainString
+        }
+        return newDomain
     }
 
     class func blockFromTopSites(_ url: URL, context: NSManagedObjectContext) {
