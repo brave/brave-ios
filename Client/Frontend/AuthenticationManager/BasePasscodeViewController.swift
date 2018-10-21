@@ -41,6 +41,8 @@ class BasePasscodeViewController: UIViewController {
         updateRightBarButtonItem()
         if #available(iOS 11.0, *) {
             scrollView?.contentInsetAdjustmentBehavior = .never
+        } else {
+            automaticallyAdjustsScrollViewInsets = false
         }
     }
 

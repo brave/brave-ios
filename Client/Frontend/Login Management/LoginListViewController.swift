@@ -93,7 +93,10 @@ class LoginListViewController: UIViewController {
 
         if #available(iOS 11.0, *) {
             scrollView.contentInsetAdjustmentBehavior = .never
+        } else {
+            automaticallyAdjustsScrollViewInsets = false
         }
+        
         self.view.backgroundColor = UIColor.Photon.White100
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(beginEditing))
 
