@@ -14,6 +14,7 @@ class AlertPopupView: PopupView {
     
     fileprivate let kAlertPopupScreenFraction: CGFloat = 0.8
     fileprivate let kPadding: CGFloat = 20.0
+    fileprivate var resizePercentage: CGFloat = 1.0
     
     init(image: UIImage?, title: String, message: String) {
         super.init(frame: CGRect.zero)
@@ -60,29 +61,42 @@ class AlertPopupView: PopupView {
         
         var imageFrame: CGRect = dialogImage?.frame ?? CGRect.zero
         if let dialogImage = dialogImage {
+            imageFrame.size = CGSize(width: dialogImage.image!.size.width * resizePercentage, height: dialogImage.image!.size.height * resizePercentage)
             imageFrame.origin.x = (width - imageFrame.width) / 2.0
-            imageFrame.origin.y = kPadding * 2.0
+            imageFrame.origin.y = kPadding * 2.0 * resizePercentage
             dialogImage.frame = imageFrame
         }
         
-        let titleLabelSize: CGSize = titleLabel.sizeThatFits(CGSize(width: width - kPadding * 3.0, height: CGFloat.greatestFiniteMagnitude))
+        var titleLabelSize: CGSize = titleLabel.sizeThatFits(CGSize(width: width - kPadding * 3.0, height: CGFloat.greatestFiniteMagnitude))
+        titleLabelSize.height = titleLabelSize.height * resizePercentage
         var titleLabelFrame: CGRect = titleLabel.frame
         titleLabelFrame.size = titleLabelSize
         titleLabelFrame.origin.x = rint((width - titleLabelSize.width) / 2.0)
-        titleLabelFrame.origin.y = imageFrame.maxY + kPadding
+        titleLabelFrame.origin.y = imageFrame.maxY + kPadding * resizePercentage
         titleLabel.frame = titleLabelFrame
         
-        let messageLabelSize: CGSize = messageLabel.sizeThatFits(CGSize(width: width - kPadding * 4.0, height: CGFloat.greatestFiniteMagnitude))
+        var messageLabelSize: CGSize = messageLabel.sizeThatFits(CGSize(width: width - kPadding * 4.0, height: CGFloat.greatestFiniteMagnitude))
+        messageLabelSize.height = messageLabelSize.height * resizePercentage
         var messageLabelFrame: CGRect = messageLabel.frame
         messageLabelFrame.size = messageLabelSize
         messageLabelFrame.origin.x = rint((width - messageLabelSize.width) / 2.0)
-        messageLabelFrame.origin.y = rint(titleLabelFrame.maxY + kPadding * 1.5 / 2.0)
+        messageLabelFrame.origin.y = rint(titleLabelFrame.maxY + kPadding * 1.5 / 2.0 * resizePercentage)
         messageLabel.frame = messageLabelFrame
         
         var containerViewFrame: CGRect = containerView.frame
         containerViewFrame.size.width = width
-        containerViewFrame.size.height = messageLabelFrame.maxY + kPadding * 1.5
+        containerViewFrame.size.height = rint(messageLabelFrame.maxY + kPadding * 1.5 * resizePercentage)
         containerView.frame = containerViewFrame
+        
+        let externalContentHeight: CGFloat = dialogButtons.count == 0 ? padding * 3.0 : kPopupDialogButtonHeight + padding * 3.0
+        resizePercentage = 1.0
+        if containerViewFrame.height + externalContentHeight > UIScreen.main.bounds.height {
+            let desiredHeight: CGFloat = UIScreen.main.bounds.height - externalContentHeight
+            resizePercentage = desiredHeight / containerViewFrame.height
+            titleLabel.adjustsFontSizeToFitWidth = true
+            messageLabel.adjustsFontSizeToFitWidth = true
+            updateSubviews()
+        }
     }
     
     override func layoutSubviews() {
