@@ -14,7 +14,6 @@ class AlertPopupView: PopupView {
     
     fileprivate let kAlertPopupScreenFraction: CGFloat = 0.8
     fileprivate let kPadding: CGFloat = 20.0
-    fileprivate var resizePercentage: CGFloat = 1.0
     
     init(image: UIImage?, title: String, message: String) {
         super.init(frame: CGRect.zero)
@@ -57,6 +56,25 @@ class AlertPopupView: PopupView {
     }
     
     func updateSubviews() {
+        titleLabel.adjustsFontSizeToFitWidth = false
+        messageLabel.adjustsFontSizeToFitWidth = false
+
+        _updateSubviews()
+        
+        let paddingHeight: CGFloat = padding * 3.0
+        let externalContentHeight: CGFloat = dialogButtons.count == 0 ? paddingHeight
+            : kPopupDialogButtonHeight + paddingHeight
+        
+        if containerView.frame.height + externalContentHeight > UIScreen.main.bounds.height {
+            let desiredHeight: CGFloat = UIScreen.main.bounds.height - externalContentHeight
+            let resizePercentage = desiredHeight / containerView.frame.height
+            titleLabel.adjustsFontSizeToFitWidth = true
+            messageLabel.adjustsFontSizeToFitWidth = true
+            _updateSubviews(resizePercentage)
+        }
+    }
+    
+    fileprivate func _updateSubviews(_ resizePercentage: CGFloat = 1.0) {
         let width: CGFloat = dialogWidth
         
         var imageFrame: CGRect = dialogImage?.frame ?? CGRect.zero
@@ -87,16 +105,6 @@ class AlertPopupView: PopupView {
         containerViewFrame.size.width = width
         containerViewFrame.size.height = rint(messageLabelFrame.maxY + kPadding * 1.5 * resizePercentage)
         containerView.frame = containerViewFrame
-        
-        let externalContentHeight: CGFloat = dialogButtons.count == 0 ? padding * 3.0 : kPopupDialogButtonHeight + padding * 3.0
-        resizePercentage = 1.0
-        if containerViewFrame.height + externalContentHeight > UIScreen.main.bounds.height {
-            let desiredHeight: CGFloat = UIScreen.main.bounds.height - externalContentHeight
-            resizePercentage = desiredHeight / containerViewFrame.height
-            titleLabel.adjustsFontSizeToFitWidth = true
-            messageLabel.adjustsFontSizeToFitWidth = true
-            updateSubviews()
-        }
     }
     
     override func layoutSubviews() {
