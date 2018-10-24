@@ -59,27 +59,26 @@ class AlertPopupView: PopupView {
         titleLabel.adjustsFontSizeToFitWidth = false
         messageLabel.adjustsFontSizeToFitWidth = false
 
-        _updateSubviews()
+        updateSubviews(resizePercentage: 1.0)
         
-        let paddingHeight: CGFloat = padding * 3.0
-        let externalContentHeight: CGFloat = dialogButtons.count == 0 ? paddingHeight
-            : kPopupDialogButtonHeight + paddingHeight
+        let paddingHeight = padding * 3.0
+        let externalContentHeight = dialogButtons.count == 0 ? paddingHeight : kPopupDialogButtonHeight + paddingHeight
+        let desiredHeight = UIScreen.main.bounds.height - externalContentHeight
         
-        if containerView.frame.height + externalContentHeight > UIScreen.main.bounds.height {
-            let desiredHeight: CGFloat = UIScreen.main.bounds.height - externalContentHeight
+        if containerView.frame.height > desiredHeight {
             let resizePercentage = desiredHeight / containerView.frame.height
             titleLabel.adjustsFontSizeToFitWidth = true
             messageLabel.adjustsFontSizeToFitWidth = true
-            _updateSubviews(resizePercentage)
+            updateSubviews(resizePercentage: resizePercentage)
         }
     }
     
-    fileprivate func _updateSubviews(_ resizePercentage: CGFloat = 1.0) {
+    fileprivate func updateSubviews(resizePercentage: CGFloat) {
         let width: CGFloat = dialogWidth
         
         var imageFrame: CGRect = dialogImage?.frame ?? CGRect.zero
-        if let dialogImage = dialogImage {
-            imageFrame.size = CGSize(width: dialogImage.image!.size.width * resizePercentage, height: dialogImage.image!.size.height * resizePercentage)
+        if let dialogImage = dialogImage, let dialogImageSize = dialogImage.image?.size {
+            imageFrame.size = CGSize(width: dialogImageSize.width * resizePercentage, height: dialogImageSize.height * resizePercentage)
             imageFrame.origin.x = (width - imageFrame.width) / 2.0
             imageFrame.origin.y = kPadding * 2.0 * resizePercentage
             dialogImage.frame = imageFrame
