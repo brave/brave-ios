@@ -467,7 +467,7 @@ class PopupView: UIView, UIGestureRecognizerDelegate {
         buttonData.isDefault = true
         buttonData.handler = tapped
         dialogButtons.append(buttonData)
-        layoutSubviews()
+        layoutIfNeeded()
     }
     
     func addButton(title: String, tapped: (() -> PopupViewDismissType)?) {
