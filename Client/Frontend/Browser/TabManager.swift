@@ -715,9 +715,6 @@ class TabManager: NSObject {
 
         configuration.processPool = WKProcessPool()
     }
-}
-
-extension TabManager {
 
     static fileprivate func tabsStateArchivePath() -> String {
         guard let profilePath = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: AppInfo.sharedContainerIdentifier)?.appendingPathComponent("profile.profile").path else {
@@ -779,25 +776,25 @@ extension TabManager {
         imageStore?.clearExcluding(savedUUIDs)
     }
 
-    fileprivate func restoreTabsInternal() {
+    fileprivate lazy var restoreTabsInternal: () -> Tab? = {
         let savedTabs = TabMO.getAll()
-        if savedTabs.isEmpty { return }
+        if savedTabs.isEmpty { return { nil } }
 
         var tabToSelect: Tab?
         for savedTab in savedTabs {
-            if savedTab.url == nil {
+            guard let urlString = savedTab.url else {
                 savedTab.delete()
                 continue
             }
             
             // Provide an empty request to prevent a new tab from loading the home screen
-            let tab = self.addTab(nil, configuration: nil, afterTab: nil, flushToDisk: false, zombie: true, 
+            let tab = addTab(nil, configuration: nil, afterTab: nil, flushToDisk: false, zombie: true,
                                   id: savedTab.syncUUID, isPrivate: false)
 
             // Since this is a restored tab, reset the URL to be loaded as that will be handled by the SessionRestoreHandler
             tab.url = nil
 
-            if let urlString = savedTab.url, let url = URL(string: urlString),
+            if let url = URL(string: urlString),
                 let faviconURL = Domain.getOrCreateForUrl(url, context: DataController.viewContext).favicon?.url {
                 let icon = Favicon(url: faviconURL, date: Date())
                 icon.width = 1
@@ -806,8 +803,7 @@ extension TabManager {
             
             // Set the UUID for the tab, asynchronously fetch the UIImage, then store
             // the screenshot in the tab as long as long as a newer one hasn't been taken.
-            if let screenshotUUID = savedTab.screenshotUUID,
-               let imageStore = self.imageStore {
+            if let screenshotUUID = savedTab.screenshotUUID, let imageStore = imageStore {
                 tab.screenshotUUID = UUID(uuidString: screenshotUUID)
                 imageStore.get(screenshotUUID) >>== { screenshot in
                     if tab.screenshotUUID?.uuidString == screenshotUUID {
@@ -823,24 +819,19 @@ extension TabManager {
             tab.lastTitle = savedTab.title
         }
 
-        if tabToSelect == nil {
-            tabToSelect = tabs.first
-        }
-
-        // Only tell our delegates that we restored tabs if we actually restored a tab(s)
-        if savedTabs.count > 0 {
-            for delegate in delegates {
-                delegate.get()?.tabManagerDidRestoreTabs(self)
+        if let tabToSelect = tabToSelect ?? tabs.first {
+            // Only tell our delegates that we restored tabs if we actually restored something
+            delegates.forEach {
+                $0.get()?.tabManagerDidRestoreTabs(self)
             }
+            
+            // No tab selection, since this is unfamiliar with launch timings (e.g. compiling blocklists)
+            restoreTab(tabToSelect)
+            // Must return inside this `if` to potentially return the fallback
+            return { tabToSelect }
         }
-
-        if let tab = tabToSelect {
-            // TODO: only selected tab has webView attached
-            selectTab(tab)
-            restoreTab(tab)
-            tab.createWebview()
-        }
-    }
+        return { nil }
+    }()
     
     func restoreTab(_ tab: Tab) {
         // Tab was created with no active webview or session data. Restore tab data from CD and configure.
@@ -855,32 +846,16 @@ extension TabManager {
         }
     }
 
-    func restoreTabs() {
+    lazy var restoreTabs: () -> Tab = {
         isRestoring = true
-
-        if count == 0 && !AppConstants.IsRunningTest && !DebugSettingsBundleOptions.skipSessionRestore {
-            // This is wrapped in an Objective-C @try/@catch handler because NSKeyedUnarchiver may throw exceptions which Swift cannot handle
-            _ = Try(
-                withTry: { () -> Void in
-                    self.restoreTabsInternal()
-                },
-                catch: { exception in
-                    log.error("Failed to restore tabs: \(String(describing: exception))")
-                }
-            )
-        }
+        let tabToSelect = self.restoreTabsInternal()
         isRestoring = false
+        
+        // Always make sure there is at least one tab.
+        return { tabToSelect ?? self.addTab() }
+    }()
 
-        // Always make sure there is a single normal tab.
-        let tabs = self.tabs(withType: .regular)
-        if tabs.isEmpty {
-            let tab = addTab()
-            if selectedTab == nil {
-                selectTab(tab)
-            }
-        }
-    }
-    
+    /// Used to restore previously deleted tabs
     func restoreTabs(_ savedTabs: [Tab]) {
         isRestoring = true
         for tab in savedTabs {
