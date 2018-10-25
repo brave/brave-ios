@@ -113,10 +113,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         self.tabManager = TabManager(prefs: profile.prefs, imageStore: imageStore)
         self.tabManager.stateDelegate = self
 
+        // Make sure current private browsing flag respects the private browsing only user preference
+        PrivateBrowsingManager.shared.isPrivateBrowsing = Preferences.Privacy.privateBrowsingOnly.value
+
         // Don't track crashes if we're building the development environment due to the fact that terminating/stopping
         // the simulator via Xcode will count as a "crash" and lead to restore popups in the subsequent launch
         let crashedLastSession = !Preferences.AppState.backgroundedCleanly.value && AppConstants.BuildChannel != .developer
-        
         browserViewController = BrowserViewController(profile: self.profile!, tabManager: self.tabManager, crashedLastSession: crashedLastSession)
         browserViewController.edgesForExtendedLayout = []
 
