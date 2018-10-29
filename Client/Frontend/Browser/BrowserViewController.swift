@@ -125,6 +125,7 @@ class BrowserViewController: UIViewController {
     let downloadQueue = DownloadQueue()
     
     fileprivate let shieldBlockStats = ShieldBlockedStats()
+    fileprivate var contentBlockListDeferred: Deferred<()>?
 
     init(profile: Profile, tabManager: TabManager, crashedLastSession: Bool) {
         self.profile = profile
@@ -179,7 +180,10 @@ class BrowserViewController: UIViewController {
         Preferences.General.tabBarVisibility.observe(from: self)
         Preferences.Shields.fingerprintingProtection.observe(from: self)
         
-        prepareBootData()
+        // Domain shield need to be setup before compiling lists
+        Domain.loadShieldsIntoMemory()
+        // Lists need to be compiled before attempting tab restoration
+        contentBlockListDeferred = ContentBlockerHelper.compileListsNotInStore()
     }
 
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -271,7 +275,7 @@ class BrowserViewController: UIViewController {
         scrollController.showToolbars(animated: true)
     }
 
-   @objc  func appWillResignActiveNotification() {
+    @objc func appWillResignActiveNotification() {
         // Dismiss any popovers that might be visible
         displayedPopoverController?.dismiss(animated: false) {
             self.displayedPopoverController = nil
@@ -398,22 +402,9 @@ class BrowserViewController: UIViewController {
         view.addInteraction(dropInteraction)
     }
     
-    var contentBlockListDeferred: Deferred<()>?
-    fileprivate func prepareBootData() {
-        // Domain shield need to be setup before compiling lists
-        Domain.loadShieldsIntoMemory()
-        // Lists need to be compiled before attempting tab restoration
-        contentBlockListDeferred = ContentBlockerHelper.compileListsNotInStore()
-        
-        if !crashedLastSession {
-            setupTabs()
-        }
-    }
-    
     fileprivate func setupTabs() {
         let tabToSelect = tabManager.restoreTabs()
         contentBlockListDeferred?.uponQueue(.main) {
-            tabToSelect.createWebview()
             self.tabManager.selectTab(tabToSelect)
         }
     }
@@ -511,6 +502,8 @@ class BrowserViewController: UIViewController {
     fileprivate lazy var checkCrashRestoration: () -> Void = {
         if crashedLastSession {
             showRestoreTabsAlert()
+        } else {
+            setupTabs()
         }
         return {}
     }()

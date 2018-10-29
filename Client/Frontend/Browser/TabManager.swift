@@ -812,8 +812,8 @@ class TabManager: NSObject {
             }
             
             // No tab selection, since this is unfamiliar with launch timings (e.g. compiling blocklists)
-            restoreTab(tabToSelect)
-            // Must return inside this `if` to potentially return the fallback
+            
+            // Must return inside this `if` to potentially return the conditional fallback
             return { tabToSelect }
         }
         return { nil }
