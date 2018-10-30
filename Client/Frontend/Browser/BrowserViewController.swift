@@ -403,7 +403,7 @@ class BrowserViewController: UIViewController {
     }
     
     fileprivate func setupTabs() {
-        let tabToSelect = tabManager.restoreTabs()
+        let tabToSelect = tabManager.restoreAllTabs()
         contentBlockListDeferred?.uponQueue(.main) {
             self.tabManager.selectTab(tabToSelect)
         }
@@ -492,7 +492,7 @@ class BrowserViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        self.checkCrashRestoration()
+        checkCrashRestoration()
         
         updateTabCountUsingTabManager(tabManager, animated: false)
         clipboardBarDisplayHandler?.checkIfShouldDisplayBar()

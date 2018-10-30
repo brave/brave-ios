@@ -646,7 +646,7 @@ class TabManager: NSObject {
 
         let tabsCopy = tabs(withType: .regular)
 
-        restoreTabs(tempTabs)
+        restoreDeletedTabs(tempTabs)
         self.isRestoring = true
 
         for tab in tempTabs {
@@ -832,7 +832,7 @@ class TabManager: NSObject {
         }
     }
 
-    lazy var restoreTabs: () -> Tab = {
+    lazy var restoreAllTabs: () -> Tab = {
         isRestoring = true
         let tabToSelect = self.restoreTabsInternal()
         isRestoring = false
@@ -842,7 +842,7 @@ class TabManager: NSObject {
         return { tabToSelect ?? self.addTab(isPrivate: isPrivate) }
     }()
 
-    func restoreTabs(_ savedTabs: [Tab]) {
+    func restoreDeletedTabs(_ savedTabs: [Tab]) {
         isRestoring = true
         for tab in savedTabs {
             tabs.append(tab)
