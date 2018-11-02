@@ -11,6 +11,7 @@
 		0A4B012020D02EC4004D4011 /* TabsBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A4B011F20D02EC4004D4011 /* TabsBarViewController.swift */; };
 		0A4B012220D02F26004D4011 /* TabBarCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A4B012120D02F26004D4011 /* TabBarCell.swift */; };
 		0A4B012420D0321A004D4011 /* UX.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A4B012320D0321A004D4011 /* UX.swift */; };
+		0A771D35218C8FDC00336E0D /* Bookmark+Sync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A771D34218C8FDC00336E0D /* Bookmark+Sync.swift */; };
 		0AA4FC392109D685000B173A /* CRUDProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AA4FC382109D685000B173A /* CRUDProtocols.swift */; };
 		0AADC4C820D2A55A00FDE368 /* FavoritesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AADC4C720D2A55A00FDE368 /* FavoritesViewController.swift */; };
 		0AADC4CA20D2A66E00FDE368 /* FavoriteCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AADC4C920D2A66E00FDE368 /* FavoriteCell.swift */; };
@@ -879,6 +880,7 @@
 		0A4B012120D02F26004D4011 /* TabBarCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarCell.swift; sourceTree = "<group>"; };
 		0A4B012320D0321A004D4011 /* UX.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UX.swift; sourceTree = "<group>"; };
 		0A6231E32121F761007B429B /* UnitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = UnitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		0A771D34218C8FDC00336E0D /* Bookmark+Sync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bookmark+Sync.swift"; sourceTree = "<group>"; };
 		0A9B6A3420E6453400712BC9 /* Model8.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model8.xcdatamodel; sourceTree = "<group>"; };
 		0AA4FC382109D685000B173A /* CRUDProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CRUDProtocols.swift; sourceTree = "<group>"; };
 		0AADC4C720D2A55A00FDE368 /* FavoritesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesViewController.swift; sourceTree = "<group>"; };
@@ -2081,6 +2083,7 @@
 				5D1DC54120AE004600905E5A /* WebsitePresentable.swift */,
 				5D1DC54220AE004600905E5A /* TabMO.swift */,
 				5D1DC54620AE004600905E5A /* Bookmark.swift */,
+				0A771D34218C8FDC00336E0D /* Bookmark+Sync.swift */,
 				5D1DC54720AE004600905E5A /* FaviconMO.swift */,
 				5D1DC54820AE004600905E5A /* Domain.swift */,
 				5D1DC54920AE004600905E5A /* Device.swift */,
@@ -4100,6 +4103,7 @@
 				5D1DC55520AE004600905E5A /* TabMO.swift in Sources */,
 				5D1DC55E20AE004600905E5A /* Syncable.swift in Sources */,
 				5D1DC56D20AE005400905E5A /* Sync.swift in Sources */,
+				0A771D35218C8FDC00336E0D /* Bookmark+Sync.swift in Sources */,
 				5D1DC57220AE005400905E5A /* JSInjector.swift in Sources */,
 				5D1DC55920AE004600905E5A /* Bookmark.swift in Sources */,
 				5D1DC55B20AE004600905E5A /* Domain.swift in Sources */,

@@ -76,7 +76,8 @@ class FavoritesDataSource: NSObject, UICollectionViewDataSource {
             return UICollectionViewCell()
         }
         
-        let ftd = FavoritesTileDecorator(url: url, cell: cell, indexPath: indexPath, color: fav.color != nil ? UIColor(colorString: fav.color!) : nil)
+        // BRAVE TODO: Update Favorites logic, color argument is outdated here. Setting nil for now.b
+        let ftd = FavoritesTileDecorator(url: url, cell: cell, indexPath: indexPath, color: nil)
         ftd.collection = collectionView
         ftd.decorateTile()
 
