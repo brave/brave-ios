@@ -37,7 +37,7 @@ extension ContentBlockerHelper: TabContentScript {
         components.scheme = "http"
         guard let url = components.url else { return }
 
-        TPStatsBlocklistChecker.shared.isBlocked(url: url, isStrictMode: blockingStrengthPref == .strict).uponQueue(.main) { listItem in
+        TPStatsBlocklistChecker.shared.isBlocked(url: url).uponQueue(.main) { listItem in
             if let listItem = listItem {
                 self.stats = self.stats.create(byAddingListItem: listItem)
             }

@@ -183,7 +183,7 @@ class BrowserViewController: UIViewController {
         // Domain shield need to be setup before compiling lists
         Domain.loadShieldsIntoMemory()
         // Lists need to be compiled before attempting tab restoration
-        contentBlockListDeferred = ContentBlockerHelper.compileListsNotInStore()
+        contentBlockListDeferred = ContentBlockerHelper.compileLists()
     }
 
     override var preferredStatusBarStyle: UIStatusBarStyle {

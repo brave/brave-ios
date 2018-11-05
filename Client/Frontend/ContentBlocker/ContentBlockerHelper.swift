@@ -8,21 +8,71 @@ import Deferred
 
 private let log = Logger.browserLogger
 
-enum BlocklistName: String {
-    case advertising = "disconnect-advertising"
-    case analytics = "disconnect-analytics"
-    case content = "disconnect-content"
-    case social = "disconnect-social"
+// Rename to BlockList
+class BlocklistName: Equatable {
+    static let ad = BlocklistName(filename: "block-ads")
+    static let tracker = BlocklistName(filename: "block-trackers")
+    static let https = BlocklistName(filename: "upgrade-http")
+    static let script = BlocklistName(filename: "block-scripts")
+    static let image = BlocklistName(filename: "block-images")
 
-    var filename: String { return self.rawValue }
-
-    static var all: [BlocklistName] { return [.advertising, .analytics, .content, .social] }
-    static var basic: [BlocklistName] { return [.advertising, .analytics, .social] }
-    static var strict: [BlocklistName] { return [.content] }
-
-    static func forStrictMode(isOn: Bool) -> [BlocklistName] {
-        return BlocklistName.basic + (isOn ? BlocklistName.strict : [])
+    static var allLists: [BlocklistName] { return [.ad, .tracker, .https, .script, .image] }
+    
+    let filename: String
+    var rule: WKContentRuleList?
+    
+    init(filename: String) {
+        self.filename = filename
     }
+
+    private func compile(ruleStore: WKContentRuleListStore) -> Deferred<Void> {
+        let compilerDeferred = Deferred<Void>()
+        BlocklistName.loadJsonFromBundle(forResource: filename) { jsonString in
+            ruleStore.compileContentRuleList(forIdentifier: self.filename, encodedContentRuleList: jsonString) { rule, error in
+                if let error = error {
+                    log.error("Content blocker error: \(error.localizedDescription)")
+                    assert(false)
+                }
+                assert(rule != nil)
+                
+                self.rule = rule
+                compilerDeferred.fill(())
+            }
+        }
+        return compilerDeferred
+    }
+    
+    static func compileAll(ruleStore: WKContentRuleListStore) -> Deferred<Void> {
+        let allCompiledDeferred = Deferred<Void>()
+        let allOfThem = BlocklistName.allLists.map {
+            $0.compile(ruleStore: ruleStore)
+        }
+        
+        all(allOfThem).upon { _ in
+            allCompiledDeferred.fill(())
+        }
+        
+        return allCompiledDeferred
+    }
+    
+    private static func loadJsonFromBundle(forResource file: String, completion: @escaping (_ jsonString: String) -> Void) {
+        DispatchQueue.global().async {
+            guard let path = Bundle.main.path(forResource: file, ofType: "json"),
+                let source = try? String(contentsOfFile: path, encoding: .utf8) else {
+                    assert(false)
+                    return
+            }
+            
+            DispatchQueue.main.async {
+                completion(source)
+            }
+        }
+    }
+    
+    public static func == (lhs: BlocklistName, rhs: BlocklistName) -> Bool {
+        return lhs.filename == rhs.filename
+    }
+
 }
 
 @available(iOS 11.0, *)
@@ -35,7 +85,6 @@ enum BlockerStatus: String {
 
 struct ContentBlockingConfig {
     struct Prefs {
-        static let StrengthKey = "prefkey.trackingprotection.strength"
         static let NormalBrowsingEnabledKey = "prefkey.trackingprotection.normalbrowsing"
         static let PrivateBrowsingEnabledKey = "prefkey.trackingprotection.privatebrowsing"
     }
@@ -123,10 +172,6 @@ class ContentBlockerHelper {
         return userPrefs?.boolForKey(ContentBlockingConfig.Prefs.PrivateBrowsingEnabledKey) ?? ContentBlockingConfig.Defaults.PrivateBrowsing
     }
 
-    var blockingStrengthPref: BlockingStrength {
-        return userPrefs?.stringForKey(ContentBlockingConfig.Prefs.StrengthKey).flatMap(BlockingStrength.init) ?? .basic
-    }
-
     static private var blockImagesRule: WKContentRuleList?
     static var heavyInitHasRunOnce = false
 
@@ -163,7 +208,7 @@ class ContentBlockerHelper {
 
         ContentBlockerHelper.removeOldListsByDateFromStore(prefs: prefs) {
             ContentBlockerHelper.removeOldListsByNameFromStore(prefs: prefs) {
-                let deferred = ContentBlockerHelper.compileListsNotInStore()
+                let deferred = ContentBlockerHelper.compileLists()
                 deferred.uponQueue(.main) {
                     ContentBlockerHelper.heavyInitHasRunOnce = true
                     NotificationCenter.default.post(name: .ContentBlockerTabSetupRequired, object: nil)
@@ -193,7 +238,7 @@ class ContentBlockerHelper {
             return
         }
 
-        let rules = BlocklistName.forStrictMode(isOn: blockingStrengthPref == .strict)
+        let rules = BlocklistName.allLists
         for list in rules {
             let name = list.filename
             ContentBlockerHelper.ruleStore.lookUpContentRuleList(forIdentifier: name) { rule, error in
@@ -244,20 +289,6 @@ class ContentBlockerHelper {
 // ruleStore.
 @available(iOS 11, *)
 extension ContentBlockerHelper {
-    private static func loadJsonFromBundle(forResource file: String, completion: @escaping (_ jsonString: String) -> Void) {
-        DispatchQueue.global().async {
-            guard let path = Bundle.main.path(forResource: file, ofType: "json"),
-                let source = try? String(contentsOfFile: path, encoding: .utf8) else {
-                    assert(false)
-                    return
-            }
-
-            DispatchQueue.main.async {
-                completion(source)
-            }
-        }
-    }
-
     private static func lastModifiedSince1970(forFileAtPath path: String) -> Timestamp? {
         do {
             let url = URL(fileURLWithPath: path)
@@ -270,7 +301,7 @@ extension ContentBlockerHelper {
     }
 
     private static func dateOfMostRecentBlockerFile() -> Timestamp {
-        let blocklists = BlocklistName.all
+        let blocklists = BlocklistName.allLists
         return blocklists.reduce(Timestamp(0)) { result, list in
             guard let path = Bundle.main.path(forResource: list.filename, ofType: "json") else { return result }
             let date = lastModifiedSince1970(forFileAtPath: path) ?? 0
@@ -322,7 +353,7 @@ extension ContentBlockerHelper {
                 return
             }
 
-            let blocklists = BlocklistName.all.map { $0.filename }
+            let blocklists = BlocklistName.allLists.map { $0.filename }
             for contentRuleIdentifier in available {
                 if !blocklists.contains(where: { $0 == contentRuleIdentifier }) {
                     noMatchingIdentifierFoundForRule = true
@@ -344,38 +375,8 @@ extension ContentBlockerHelper {
         }
     }
 
-    static func compileListsNotInStore() -> Deferred<()> {
-        let masterDeferred = Deferred<()>()
-        let blocklists = BlocklistName.all.map { $0.filename }
-        let deferreds: [Deferred<Void>] = blocklists.map { filename in
-            let result = Deferred<Void>()
-            ruleStore.lookUpContentRuleList(forIdentifier: filename) { contentRuleList, error in
-                if contentRuleList != nil {
-                    result.fill(())
-                    return
-                }
-                loadJsonFromBundle(forResource: filename) { jsonString in
-                    var str = jsonString
-                    str.insert(contentsOf: whitelistAsJSON(), at: str.index(str.endIndex, offsetBy: -1))
-                    ruleStore.compileContentRuleList(forIdentifier: filename, encodedContentRuleList: str) { rule, error in
-                        if let error = error {
-                            log.error("Content blocker error: \(error.localizedDescription)")
-                            assert(false)
-                        }
-                        assert(rule != nil)
-
-                        result.fill(())
-                    }
-                }
-            }
-            return result
-        }
-
-        all(deferreds).upon { _ in
-            masterDeferred.fill(())
-        }
-        
-        return masterDeferred
+    static func compileLists() -> Deferred<()> {
+        return BlocklistName.compileAll(ruleStore: ruleStore)
     }
 }
 

@@ -10,33 +10,26 @@ import Deferred
 
 struct TPPageStats {
     let adCount: Int
-    let analyticCount: Int
-    let contentCount: Int
-    let socialCount: Int
+    let trackerCount: Int
+    let scriptCount: Int
 
-    var total: Int { return adCount + socialCount + analyticCount + contentCount }
-
-    init() {
-        adCount = 0
-        analyticCount = 0
-        contentCount = 0
-        socialCount = 0
-    }
+    var total: Int { return adCount + trackerCount + scriptCount }
     
-    private init(adCount: Int, analyticCount: Int, contentCount: Int, socialCount: Int) {
+    init(adCount: Int = 0, trackerCount: Int = 0, scriptCount: Int = 0) {
         self.adCount = adCount
-        self.analyticCount = analyticCount
-        self.contentCount = contentCount
-        self.socialCount = socialCount
+        self.trackerCount = trackerCount
+        self.scriptCount = scriptCount
     }
 
     func create(byAddingListItem listItem: BlocklistName) -> TPPageStats {
         switch listItem {
-        case .advertising: return TPPageStats(adCount: adCount + 1, analyticCount: analyticCount, contentCount: contentCount, socialCount: socialCount)
-        case .analytics: return TPPageStats(adCount: adCount, analyticCount: analyticCount + 1, contentCount: contentCount, socialCount: socialCount)
-        case .content: return TPPageStats(adCount: adCount, analyticCount: analyticCount, contentCount: contentCount + 1, socialCount: socialCount)
-        case .social: return TPPageStats(adCount: adCount, analyticCount: analyticCount, contentCount: contentCount, socialCount: socialCount + 1)
+        case .ad: return TPPageStats(adCount: adCount + 1, trackerCount: trackerCount, scriptCount: scriptCount)
+        case .tracker: return TPPageStats(adCount: adCount, trackerCount: trackerCount + 1, scriptCount: scriptCount)
+        case .script: return TPPageStats(adCount: adCount, trackerCount: trackerCount, scriptCount: scriptCount + 1)
+        default:
+            break
         }
+        return self
     }
 }
 
@@ -46,7 +39,7 @@ class TPStatsBlocklistChecker {
 
     private var blockLists: TPStatsBlocklists?
 
-    func isBlocked(url: URL, isStrictMode: Bool) -> Deferred<BlocklistName?> {
+    func isBlocked(url: URL) -> Deferred<BlocklistName?> {
         let deferred = Deferred<BlocklistName?>()
 
         guard let blockLists = blockLists, let host = url.host, !host.isEmpty else {
@@ -59,7 +52,7 @@ class TPStatsBlocklistChecker {
         let whitelistRegex = ContentBlockerHelper.whitelistedDomains.domainRegex
 
         DispatchQueue.global().async {
-            let enabledLists = BlocklistName.forStrictMode(isOn: isStrictMode)
+            let enabledLists = BlocklistName.allLists
             deferred.fill(blockLists.urlIsInList(url, whitelistedDomains: whitelistRegex).flatMap { return enabledLists.contains($0) ? $0 : nil })
         }
         return deferred
@@ -133,7 +126,7 @@ fileprivate class TPStatsBlocklists {
         // All rules have this prefix on the domain to match.
         let standardPrefix = "^https?://([^/]+\\.)?"
         
-        for blockList in BlocklistName.all {
+        for blockList in BlocklistName.allLists {
             let list: [[String: AnyObject]]
             do {
                 guard let path = Bundle.main.path(forResource: blockList.filename, ofType: "json") else {
