@@ -5,6 +5,7 @@
 import UIKit
 import Storage
 import Shared
+import Data
 
 public extension UIImageView {
 
@@ -16,6 +17,42 @@ public extension UIImageView {
         } else {
             let imageURL = URL(string: icon?.url ?? "")
             let defaults = defaultFavicon(url)
+            self.sd_setImage(with: imageURL, placeholderImage: defaults.image, options: []) {(img, err, _, _) in
+                guard let image = img, let dUrl = url, err == nil else {
+                    self.backgroundColor = defaults.color
+                    completionBlock?(defaults.color, url)
+                    return
+                }
+                self.color(forImage: image, andURL: dUrl, completed: completionBlock)
+            }
+        }
+    }
+    
+    public func setIcon(_ icon: FaviconMO?, forURL url: URL?, completed completionBlock: ((UIColor, URL?) -> Void)? = nil ) {
+        if let url = url, let defaultIcon = FaviconFetcher.getDefaultIconForURL(url: url), icon == nil {
+            self.image = UIImage(contentsOfFile: defaultIcon.url)?.createScaled(CGSize(width: 40, height: 40))
+            self.contentMode = .center
+            self.backgroundColor = defaultIcon.color
+            completionBlock?(defaultIcon.color, url)
+        } else {
+            let defaults = defaultFavicon(url)
+            if let url = url, icon == nil {
+                FaviconFetcher.getForURL(url).uponQueue(.main) { result in
+                    guard let favicons = result.successValue, favicons.count > 0, let foundIconUrl = favicons.first?.url.asURL else {
+                        return
+                    }
+                    self.sd_setImage(with: foundIconUrl, placeholderImage: defaults.image, options: []) {(img, err, _, _) in
+                        guard let image = img, err == nil else {
+                            self.backgroundColor = defaults.color
+                            completionBlock?(defaults.color, url)
+                            return
+                        }
+                        self.color(forImage: image, andURL: url, completed: completionBlock)
+                    }
+                }
+                return
+            }
+            let imageURL = URL(string: icon?.url ?? "")
             self.sd_setImage(with: imageURL, placeholderImage: defaults.image, options: []) {(img, err, _, _) in
                 guard let image = img, let dUrl = url, err == nil else {
                     self.backgroundColor = defaults.color

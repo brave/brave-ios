@@ -16,8 +16,8 @@ class FavoriteCell: UICollectionViewCell {
     
     private struct UI {
         /// Ratio of width:height of the thumbnail image.
-        static let borderColor = UX.GreyJ
-        static let borderWidth: CGFloat = 0
+        static let borderColor = UIColor(white: 0, alpha: 0.2)
+        static let borderWidth: CGFloat = 1.0 / UIScreen.main.scale
         static let cornerRadius: CGFloat = 8
         
         static let labelColor = UIAccessibilityDarkerSystemColorsEnabled() ? UX.GreyJ : UX.GreyH
@@ -32,35 +32,6 @@ class FavoriteCell: UICollectionViewCell {
     
     var imageInsets: UIEdgeInsets = UIEdgeInsets.zero
     var cellInsets: UIEdgeInsets = UIEdgeInsets.zero
-    
-    var image: UIImage? = nil {
-        didSet {
-            struct ContainerSize {
-                static var size: CGSize = CGSize.zero
-                static func scaledDown() -> CGSize {
-                    return CGSize(width: size.width * 0.75, height: size.height * 0.75)
-                }
-            }
-            
-            if imageView.frame.size.width > 0 {
-                ContainerSize.size = imageView.frame.size
-            }
-            
-            if var image = image {
-                if image.size.width <= 32 && ContainerSize.size != CGSize.zero {                    
-                    image = image.scale(toSize: ContainerSize.scaledDown())
-                    
-                    imageView.contentMode = .center
-                } else if image.size.width > 32 {
-                    imageView.contentMode = .scaleAspectFit
-                }
-                imageView.image = image
-            } else {
-                imageView.image = FavoriteCell.placeholderImage
-                imageView.contentMode = .center
-            }
-        }
-    }
     
     let textLabel = UILabel().then {
         $0.setContentHuggingPriority(UILayoutPriority.defaultHigh, for: UILayoutConstraintAxis.vertical)
@@ -159,7 +130,6 @@ class FavoriteCell: UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         editButton.isHidden = true
-        showBorder(false)
         backgroundColor = UIColor.clear
         textLabel.font = DynamicFontHelper.defaultHelper.DefaultSmallFont
         textLabel.textColor = 
@@ -204,9 +174,5 @@ class FavoriteCell: UICollectionViewCell {
                 self.editButton.isHidden = true
             }
         })
-    }
-    
-    func showBorder(_ show: Bool) {
-        imageView.layer.borderWidth = show ? UI.borderWidth : 0
     }
 }
