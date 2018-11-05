@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		03CCC9181AF05E7300DBF30D /* RelativeDatesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03CCC9171AF05E7300DBF30D /* RelativeDatesTests.swift */; };
+		0A1E842D21909CA70042F782 /* crypto.js in Resources */ = {isa = PBXBuildFile; fileRef = 0A1E842C21909CA70042F782 /* crypto.js */; };
+		0A1E842F21909CBC0042F782 /* bundle.js in Resources */ = {isa = PBXBuildFile; fileRef = 0A1E842E21909CBB0042F782 /* bundle.js */; };
+		0A1E843121909CC40042F782 /* fetch.js in Resources */ = {isa = PBXBuildFile; fileRef = 0A1E843021909CC30042F782 /* fetch.js */; };
 		0A4B012020D02EC4004D4011 /* TabsBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A4B011F20D02EC4004D4011 /* TabsBarViewController.swift */; };
 		0A4B012220D02F26004D4011 /* TabBarCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A4B012120D02F26004D4011 /* TabBarCell.swift */; };
 		0A4B012420D0321A004D4011 /* UX.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A4B012320D0321A004D4011 /* UX.swift */; };
@@ -875,6 +878,10 @@
 
 /* Begin PBXFileReference section */
 		03CCC9171AF05E7300DBF30D /* RelativeDatesTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RelativeDatesTests.swift; sourceTree = "<group>"; };
+		0A1E841B219095410042F782 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		0A1E842C21909CA70042F782 /* crypto.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = crypto.js; path = "node_modules/brave-sync/node_modules/brave-crypto/browser/crypto.js"; sourceTree = SOURCE_ROOT; };
+		0A1E842E21909CBB0042F782 /* bundle.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = bundle.js; path = "node_modules/brave-sync/bundles/bundle.js"; sourceTree = SOURCE_ROOT; };
+		0A1E843021909CC30042F782 /* fetch.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = fetch.js; path = "node_modules/brave-sync/client/polyfill/fetch.js"; sourceTree = SOURCE_ROOT; };
 		0A38EA7F216532DB00142710 /* CRUDProtocolsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CRUDProtocolsTests.swift; sourceTree = "<group>"; };
 		0A4B011F20D02EC4004D4011 /* TabsBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabsBarViewController.swift; sourceTree = "<group>"; };
 		0A4B012120D02F26004D4011 /* TabBarCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarCell.swift; sourceTree = "<group>"; };
@@ -1665,6 +1672,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0A1E8413219094100042F782 /* Dependencies */ = {
+			isa = PBXGroup;
+			children = (
+				0A1E841B219095410042F782 /* README.md */,
+				0A1E842E21909CBB0042F782 /* bundle.js */,
+				0A1E842C21909CA70042F782 /* crypto.js */,
+				0A1E843021909CC30042F782 /* fetch.js */,
+			);
+			path = Dependencies;
+			sourceTree = "<group>";
+		};
 		0A4B011620D02DAC004D4011 /* TabsBar */ = {
 			isa = PBXGroup;
 			children = (
@@ -2097,6 +2115,7 @@
 		5D1DC56020AE005400905E5A /* sync */ = {
 			isa = PBXGroup;
 			children = (
+				0A1E8413219094100042F782 /* Dependencies */,
 				5D1DC56120AE005400905E5A /* SyncCrypto.swift */,
 				5D1DC56220AE005400905E5A /* SyncShowCodewords.swift */,
 				5D1DC56320AE005400905E5A /* Sync.swift */,
@@ -3656,6 +3675,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				5D1DC57420AE005400905E5A /* ios-sync.js in Resources */,
+				0A1E843121909CC40042F782 /* fetch.js in Resources */,
+				0A1E842D21909CA70042F782 /* crypto.js in Resources */,
+				0A1E842F21909CBC0042F782 /* bundle.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
