@@ -30,7 +30,8 @@ class BlocklistName: Equatable {
         BlocklistName.loadJsonFromBundle(forResource: filename) { jsonString in
             ruleStore.compileContentRuleList(forIdentifier: self.filename, encodedContentRuleList: jsonString) { rule, error in
                 if let error = error {
-                    log.error("Content blocker error: \(error.localizedDescription)")
+                    // TODO #382: Potential telemetry location
+                    log.error("Content blocker '\(self.filename)' errored: \(error.localizedDescription)")
                     assert(false)
                 }
                 assert(rule != nil)
