@@ -15,9 +15,9 @@ protocol TabPeekDelegate: class {
 
 class TabPeekViewController: UIViewController, WKNavigationDelegate {
 
-    fileprivate static let PreviewActionAddToBookmarks = NSLocalizedString("Add to Bookmarks", tableName: "3DTouchActions", comment: "Label for preview action on Tab Tray Tab to add current tab to Bookmarks")
-    fileprivate static let PreviewActionCopyURL = NSLocalizedString("Copy URL", tableName: "3DTouchActions", comment: "Label for preview action on Tab Tray Tab to copy the URL of the current tab to clipboard")
-    fileprivate static let PreviewActionCloseTab = NSLocalizedString("Close Tab", tableName: "3DTouchActions", comment: "Label for preview action on Tab Tray Tab to close the current tab")
+    fileprivate static let PreviewActionAddToBookmarks = NSLocalizedString("AddToBookmarks", value: "Add to Bookmarks", comment: "Label for preview action on Tab Tray Tab to add current tab to Bookmarks")
+    fileprivate static let PreviewActionCopyURL = NSLocalizedString("CopyURL", value: "Copy URL", comment: "Label for preview action on Tab Tray Tab to copy the URL of the current tab to clipboard")
+    fileprivate static let PreviewActionCloseTab = NSLocalizedString("CloseTab", value: "Close Tab", comment: "Label for preview action on Tab Tray Tab to close the current tab")
 
     weak var tab: Tab?
 
@@ -72,7 +72,7 @@ class TabPeekViewController: UIViewController, WKNavigationDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         if let webViewAccessibilityLabel = tab?.webView?.accessibilityLabel {
-            previewAccessibilityLabel = String(format: NSLocalizedString("Preview of %@", tableName: "3DTouchActions", comment: "Accessibility label, associated to the 3D Touch action on the current tab in the tab tray, used to display a larger preview of the tab."), webViewAccessibilityLabel)
+            previewAccessibilityLabel = String(format: NSLocalizedString("PreviewOf", value: "Preview of %@", comment: "Accessibility label, associated to the 3D Touch action on the current tab in the tab tray, used to display a larger preview of the tab."), webViewAccessibilityLabel)
         }
         // if there is no screenshot, load the URL in a web page
         // otherwise just show the screenshot

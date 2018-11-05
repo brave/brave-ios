@@ -8,86 +8,80 @@ import Shared
 // Strings used in multiple areas within the Authentication Manager
 struct AuthenticationStrings {
     static let passcode =
-        NSLocalizedString("Passcode For Logins", tableName: "AuthenticationManager", comment: "Label for the Passcode item in Settings")
+        NSLocalizedString("PasscodeForLogins", value: "Passcode For Logins", comment: "Label for the Passcode item in Settings")
 
     static let touchIDPasscodeSetting =
-        NSLocalizedString("Touch ID & Passcode", tableName: "AuthenticationManager", comment: "Label for the Touch ID/Passcode item in Settings")
+        NSLocalizedString("TouchIDPasscode", value: "Touch ID & Passcode", comment: "Label for the Touch ID/Passcode item in Settings")
 
     static let faceIDPasscodeSetting =
-        NSLocalizedString("Face ID & Passcode", tableName: "AuthenticationManager", comment: "Label for the Face ID/Passcode item in Settings")
+        NSLocalizedString("FaceIDPasscode", value: "Face ID & Passcode", comment: "Label for the Face ID/Passcode item in Settings")
 
     static let requirePasscode =
-        NSLocalizedString("Require Passcode", tableName: "AuthenticationManager", comment: "Text displayed in the 'Interval' section, followed by the current interval setting, e.g. 'Immediately'")
+        NSLocalizedString("RequirePasscode", value: "Require Passcode", comment: "Text displayed in the 'Interval' section, followed by the current interval setting, e.g. 'Immediately'")
 
     static let enterAPasscode =
-        NSLocalizedString("Enter a passcode", tableName: "AuthenticationManager", comment: "Text displayed above the input field when entering a new passcode")
+        NSLocalizedString("EnterAPasscode", value: "Enter a passcode", comment: "Text displayed above the input field when entering a new passcode")
 
     static let enterPasscodeTitle =
-        NSLocalizedString("Enter Passcode", tableName: "AuthenticationManager", comment: "Title of the dialog used to request the passcode")
+        NSLocalizedString("EnterPasscode", value: "Enter Passcode", comment: "Title of the dialog used to request the passcode")
 
     static let enterPasscode =
-        NSLocalizedString("Enter passcode", tableName: "AuthenticationManager", comment: "Text displayed above the input field when changing the existing passcode")
+        NSLocalizedString("EnterPasscode", value: "Enter passcode", comment: "Text displayed above the input field when changing the existing passcode")
 
     static let reenterPasscode =
-        NSLocalizedString("Re-enter passcode", tableName: "AuthenticationManager", comment: "Text displayed above the input field when confirming a passcode")
+        NSLocalizedString("ReEnterPasscode", value: "Re-enter passcode", comment: "Text displayed above the input field when confirming a passcode")
 
     static let setPasscode =
-        NSLocalizedString("Set Passcode", tableName: "AuthenticationManager", comment: "Title of the dialog used to set a passcode")
+        NSLocalizedString("SetPasscode", value: "Set Passcode", comment: "Title of the dialog used to set a passcode")
 
     static let turnOffPasscode =
-        NSLocalizedString("Turn Passcode Off", tableName: "AuthenticationManager", comment: "Label used as a setting item to turn off passcode")
+        NSLocalizedString("TurnPasscodeOff", value: "Turn Passcode Off", comment: "Label used as a setting item to turn off passcode")
 
     static let turnOnPasscode =
-        NSLocalizedString("Turn Passcode On", tableName: "AuthenticationManager", comment: "Label used as a setting item to turn on passcode")
+        NSLocalizedString("TurnPasscodeOn", value: "Turn Passcode On", comment: "Label used as a setting item to turn on passcode")
 
     static let changePasscode =
-        NSLocalizedString("Change Passcode", tableName: "AuthenticationManager", comment: "Label used as a setting item and title of the following screen to change the current passcode")
+        NSLocalizedString("ChangePasscode", value: "Change Passcode", comment: "Label used as a setting item and title of the following screen to change the current passcode")
 
     static let enterNewPasscode =
-        NSLocalizedString("Enter a new passcode", tableName: "AuthenticationManager", comment: "Text displayed above the input field when changing the existing passcode")
+        NSLocalizedString("EnterANewPasscode", value: "Enter a new passcode", comment: "Text displayed above the input field when changing the existing passcode")
 
     static let immediately =
-        NSLocalizedString("Immediately", tableName: "AuthenticationManager", comment: "'Immediately' interval item for selecting when to require passcode")
+        NSLocalizedString("Immediately", value: "Immediately", comment: "Immediately' interval item for selecting when to require passcode")
 
     static let oneMinute =
-        NSLocalizedString("After 1 minute", tableName: "AuthenticationManager", comment: "'After 1 minute' interval item for selecting when to require passcode")
+        NSLocalizedString("After1Minute", value: "After 1 minute", comment: "After 1 minute' interval item for selecting when to require passcode")
 
     static let fiveMinutes =
-        NSLocalizedString("After 5 minutes", tableName: "AuthenticationManager", comment: "'After 5 minutes' interval item for selecting when to require passcode")
+        NSLocalizedString("After5Minutes", value: "After 5 minutes", comment: "After 5 minutes' interval item for selecting when to require passcode")
 
     static let tenMinutes =
-        NSLocalizedString("After 10 minutes", tableName: "AuthenticationManager", comment: "'After 10 minutes' interval item for selecting when to require passcode")
+        NSLocalizedString("After10Minutes", value: "After 10 minutes", comment: "After 10 minutes' interval item for selecting when to require passcode")
 
     static let fifteenMinutes =
-        NSLocalizedString("After 15 minutes", tableName: "AuthenticationManager", comment: "'After 15 minutes' interval item for selecting when to require passcode")
+        NSLocalizedString("After15Minutes", value: "After 15 minutes", comment: "After 15 minutes' interval item for selecting when to require passcode")
 
     static let oneHour =
-        NSLocalizedString("After 1 hour", tableName: "AuthenticationManager", comment: "'After 1 hour' interval item for selecting when to require passcode")
+        NSLocalizedString("After1Hour", value: "After 1 hour", comment: "After 1 hour' interval item for selecting when to require passcode")
 
     static let loginsTouchReason =
-        NSLocalizedString("Use your fingerprint to access Logins now.", tableName: "AuthenticationManager", comment: "Touch ID prompt subtitle when accessing logins")
+        NSLocalizedString("UseYourFingerprintToAccessLoginsNow", value: "Use your fingerprint to access Logins now.", comment: "Touch ID prompt subtitle when accessing logins")
 
     static let requirePasscodeTouchReason =
-        NSLocalizedString("touchid.require.passcode.reason.label",
-                          tableName: "AuthenticationManager",
-                          value: "Use your fingerprint to access configuring your required passcode interval.",
-                          comment: "Touch ID prompt subtitle when accessing the require passcode setting")
+        NSLocalizedString("TouchidRequirePasscodeReasonLabel", value: "Use your fingerprint to access configuring your required passcode interval.", comment: "Touch ID prompt subtitle when accessing the require passcode setting")
 
     static let disableTouchReason =
-        NSLocalizedString("touchid.disable.reason.label",
-                          tableName: "AuthenticationManager",
-                          value: "Use your fingerprint to disable Touch ID.",
-                          comment: "Touch ID prompt subtitle when disabling Touch ID")
+        NSLocalizedString("TouchidDisableReasonLabel", value: "Use your fingerprint to disable Touch ID.", comment: "Touch ID prompt subtitle when disabling Touch ID")
 
     static let wrongPasscodeError =
-        NSLocalizedString("Incorrect passcode. Try again.", tableName: "AuthenticationManager", comment: "Error message displayed when user enters incorrect passcode when trying to enter a protected section of the app")
+        NSLocalizedString("IncorrectPasscodeTryAgain", value: "Incorrect passcode. Try again.", comment: "Error message displayed when user enters incorrect passcode when trying to enter a protected section of the app")
 
     static let incorrectAttemptsRemaining =
-        NSLocalizedString("Incorrect passcode. Try again (Attempts remaining: %d).", tableName: "AuthenticationManager", comment: "Error message displayed when user enters incorrect passcode when trying to enter a protected section of the app with attempts remaining")
+        NSLocalizedString("IncorrectPasscodeTryAgainAttemptsRemainingd", value: "Incorrect passcode. Try again (Attempts remaining: %d).", comment: "Error message displayed when user enters incorrect passcode when trying to enter a protected section of the app with attempts remaining")
 
     static let maximumAttemptsReached =
-        NSLocalizedString("Maximum attempts reached. Please try again in an hour.", tableName: "AuthenticationManager", comment: "Error message displayed when user enters incorrect passcode and has reached the maximum number of attempts.")
+        NSLocalizedString("MaximumAttemptsReachedPleaseTryAgainInAnHour", value: "Maximum attempts reached. Please try again in an hour.", comment: "Error message displayed when user enters incorrect passcode and has reached the maximum number of attempts.")
 
     static let maximumAttemptsReachedNoTime =
-        NSLocalizedString("Maximum attempts reached. Please try again later.", tableName: "AuthenticationManager", comment: "Error message displayed when user enters incorrect passcode and has reached the maximum number of attempts.")
+        NSLocalizedString("MaximumAttemptsReachedPleaseTryAgainLater", value: "Maximum attempts reached. Please try again later.", comment: "Error message displayed when user enters incorrect passcode and has reached the maximum number of attempts.")
 }

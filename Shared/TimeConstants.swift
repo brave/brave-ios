@@ -63,7 +63,7 @@ extension Date {
         }
 
         if components.month == 1 {
-            return String(format: NSLocalizedString("more than a month ago", comment: "Relative date for dates older than a month and less than two months."))
+            return String(format: NSLocalizedString("MoreThanAMonthAgo", tableName: "Shared", value: "more than a month ago", comment: "Relative date for dates older than a month and less than two months."))
         }
 
         if components.month! > 1 {
@@ -71,24 +71,24 @@ extension Date {
         }
 
         if components.weekOfYear! > 0 {
-            return String(format: NSLocalizedString("more than a week ago", comment: "Description for a date more than a week ago, but less than a month ago."))
+            return String(format: NSLocalizedString("MoreThanAWeekAgo", tableName: "Shared", value: "more than a week ago", comment: "Description for a date more than a week ago, but less than a month ago."))
         }
 
         if components.day == 1 {
-            return String(format: NSLocalizedString("yesterday", comment: "Relative date for yesterday."))
+            return String(format: NSLocalizedString("Yesterday", tableName: "Shared", value: "yesterday", comment: "Relative date for yesterday."))
         }
 
         if components.day! > 1 {
-            return String(format: NSLocalizedString("this week", comment: "Relative date for date in past week."), String(describing: components.day))
+            return String(format: NSLocalizedString("ThisWeek", tableName: "Shared", value: "this week", comment: "Relative date for date in past week."), String(describing: components.day))
         }
 
         if components.hour! > 0 || components.minute! > 0 {
             let absoluteTime = DateFormatter.localizedString(from: self, dateStyle: .none, timeStyle: .short)
-            let format = NSLocalizedString("today at %@", comment: "Relative date for date older than a minute.")
+            let format = NSLocalizedString("TodayAt", tableName: "Shared", value: "today at %@", comment: "Relative date for date older than a minute.")
             return String(format: format, absoluteTime)
         }
 
-        return String(format: NSLocalizedString("just now", comment: "Relative time for a tab that was visited within the last few moments."))
+        return String(format: NSLocalizedString("JustNow", tableName: "Shared", value: "just now", comment: "Relative time for a tab that was visited within the last few moments."))
     }
 
     public func toRFC822String() -> String {

@@ -7,7 +7,7 @@ import Foundation
 import Shared
 
 private let log = Logger.syncLogger
-private let desktopBookmarksLabel: String = NSLocalizedString("Desktop Bookmarks", tableName: "BookmarkPanel", comment: "The folder name for the virtual folder that contains all desktop bookmarks.")
+private let desktopBookmarksLabel: String = NSLocalizedString("DesktopBookmarks", tableName: "Storage", value: "Desktop Bookmarks", comment: "The folder name for the virtual folder that contains all desktop bookmarks.")
 
 public enum Direction {
     case buffer

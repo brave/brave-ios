@@ -1664,7 +1664,7 @@ extension BrowserViewController: TabToolbarDelegate {
                 self.tabManager.removeTab(tab)
             }
         }), accessibilityIdentifier: "toolbarTabButtonLongPress.closeTab")
-        controller.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: "Label for Cancel button"), style: .cancel, handler: nil), accessibilityIdentifier: "toolbarTabButtonLongPress.cancel")
+        controller.addAction(UIAlertAction(title: NSLocalizedString("Cancel", value: "Cancel", comment: "Label for Cancel button"), style: .cancel, handler: nil), accessibilityIdentifier: "toolbarTabButtonLongPress.cancel")
         controller.popoverPresentationController?.sourceView = toolbar ?? urlBar
         controller.popoverPresentationController?.sourceRect = button.frame
         let generator = UIImpactFeedbackGenerator(style: .heavy)
@@ -1859,7 +1859,7 @@ extension BrowserViewController: TabManagerDelegate {
             webView.snp.makeConstraints { make in
                 make.left.right.top.bottom.equalTo(self.webViewContainer)
             }
-            webView.accessibilityLabel = NSLocalizedString("Web content", comment: "Accessibility label for the main web content view")
+            webView.accessibilityLabel = NSLocalizedString("WebContent", value: "Web content", comment: "Accessibility label for the main web content view")
             webView.accessibilityIdentifier = "contentView"
             webView.accessibilityElementsHidden = false
 
@@ -2324,33 +2324,33 @@ extension BrowserViewController: ContextMenuHelperDelegate {
             }
 
             if !tabType.isPrivate {
-                let newTabTitle = NSLocalizedString("Open in New Tab", comment: "Context menu item for opening a link in a new tab")
+                let newTabTitle = NSLocalizedString("OpenInNewTab", value: "Open in New Tab", comment: "Context menu item for opening a link in a new tab")
                 let openNewTabAction =  UIAlertAction(title: newTabTitle, style: .default) { _ in
                     addTab(url, false)
                 }
                 actionSheetController.addAction(openNewTabAction, accessibilityIdentifier: "linkContextMenu.openInNewTab")
             }
 
-            let openNewPrivateTabTitle = NSLocalizedString("Open in New Private Tab", tableName: "PrivateBrowsing", comment: "Context menu option for opening a link in a new private tab")
+            let openNewPrivateTabTitle = NSLocalizedString("OpenInNewPrivateTab", value: "Open in New Private Tab", comment: "Context menu option for opening a link in a new private tab")
             let openNewPrivateTabAction =  UIAlertAction(title: openNewPrivateTabTitle, style: .default) { _ in
                 addTab(url, true)
             }
             actionSheetController.addAction(openNewPrivateTabAction, accessibilityIdentifier: "linkContextMenu.openInNewPrivateTab")
 
-            let downloadTitle = NSLocalizedString("Download Link", comment: "Context menu item for downloading a link URL")
+            let downloadTitle = NSLocalizedString("DownloadLink", value: "Download Link", comment: "Context menu item for downloading a link URL")
             let downloadAction = UIAlertAction(title: downloadTitle, style: .default) { _ in
                 self.pendingDownloadURL = url
                 currentTab.webView?.evaluateJavaScript("window.__firefox__.download('\(url.absoluteString)', '\(UserScriptManager.securityToken)')")
             }
             actionSheetController.addAction(downloadAction, accessibilityIdentifier: "linkContextMenu.download")
 
-            let copyTitle = NSLocalizedString("Copy Link", comment: "Context menu item for copying a link URL to the clipboard")
+            let copyTitle = NSLocalizedString("CopyLink", value: "Copy Link", comment: "Context menu item for copying a link URL to the clipboard")
             let copyAction = UIAlertAction(title: copyTitle, style: .default) { _ in
                 UIPasteboard.general.url = url as URL
             }
             actionSheetController.addAction(copyAction, accessibilityIdentifier: "linkContextMenu.copyLink")
 
-            let shareTitle = NSLocalizedString("Share Link", comment: "Context menu item for sharing a link URL")
+            let shareTitle = NSLocalizedString("ShareLink", value: "Share Link", comment: "Context menu item for sharing a link URL")
             let shareAction = UIAlertAction(title: shareTitle, style: .default) { _ in
                 self.presentActivityViewController(url as URL, sourceView: self.view, sourceRect: CGRect(origin: touchPoint, size: touchSize), arrowDirection: .any)
             }
@@ -2363,17 +2363,17 @@ extension BrowserViewController: ContextMenuHelperDelegate {
             }
 
             let photoAuthorizeStatus = PHPhotoLibrary.authorizationStatus()
-            let saveImageTitle = NSLocalizedString("Save Image", comment: "Context menu item for saving an image")
+            let saveImageTitle = NSLocalizedString("SaveImage", value: "Save Image", comment: "Context menu item for saving an image")
             let saveImageAction = UIAlertAction(title: saveImageTitle, style: .default) { _ in
                 if photoAuthorizeStatus == .authorized || photoAuthorizeStatus == .notDetermined {
                     self.getImage(url as URL) {
                         UIImageWriteToSavedPhotosAlbum($0, self, nil, nil)
                     }
                 } else {
-                    let accessDenied = UIAlertController(title: NSLocalizedString("Brave would like to access your Photos", comment: "See http://mzl.la/1G7uHo7"), message: NSLocalizedString("This allows you to save the image to your Camera Roll.", comment: "See http://mzl.la/1G7uHo7"), preferredStyle: .alert)
+                    let accessDenied = UIAlertController(title: NSLocalizedString("BraveWouldLikeToAccessYourPhotos", value: "Brave would like to access your Photos", comment: "See http://mzl.la/1G7uHo7"), message: NSLocalizedString("ThisAllowsYouToSaveTheImageToYourCameraRoll", value: "This allows you to save the image to your Camera Roll.", comment: "See http://mzl.la/1G7uHo7"), preferredStyle: .alert)
                     let dismissAction = UIAlertAction(title: Strings.CancelString, style: .default, handler: nil)
                     accessDenied.addAction(dismissAction)
-                    let settingsAction = UIAlertAction(title: NSLocalizedString("Open Settings", comment: "See http://mzl.la/1G7uHo7"), style: .default ) { _ in
+                    let settingsAction = UIAlertAction(title: NSLocalizedString("OpenSettings", value: "Open Settings", comment: "See http://mzl.la/1G7uHo7"), style: .default ) { _ in
                         UIApplication.shared.open(URL(string: UIApplicationOpenSettingsURLString)!, options: [:])
                     }
                     accessDenied.addAction(settingsAction)
@@ -2382,7 +2382,7 @@ extension BrowserViewController: ContextMenuHelperDelegate {
             }
             actionSheetController.addAction(saveImageAction, accessibilityIdentifier: "linkContextMenu.saveImage")
 
-            let copyImageTitle = NSLocalizedString("Copy Image", comment: "Context menu item for copying an image to the clipboard")
+            let copyImageTitle = NSLocalizedString("CopyImage", value: "Copy Image", comment: "Context menu item for copying an image to the clipboard")
             let copyAction = UIAlertAction(title: copyImageTitle, style: .default) { _ in
                 // put the actual image on the clipboard
                 // do this asynchronously just in case we're in a low bandwidth situation

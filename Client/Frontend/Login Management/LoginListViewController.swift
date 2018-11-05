@@ -52,9 +52,9 @@ class LoginListViewController: UIViewController {
     fileprivate var deleteAlert: UIAlertController?
 
     // Titles for selection/deselect/delete buttons
-    fileprivate let deselectAllTitle = NSLocalizedString("Deselect All", tableName: "LoginManager", comment: "Label for the button used to deselect all logins.")
-    fileprivate let selectAllTitle = NSLocalizedString("Select All", tableName: "LoginManager", comment: "Label for the button used to select all logins.")
-    fileprivate let deleteLoginTitle = NSLocalizedString("Delete", tableName: "LoginManager", comment: "Label for the button used to delete the current login.")
+    fileprivate let deselectAllTitle = NSLocalizedString("DeselectAll", value: "Deselect All", comment: "Label for the button used to deselect all logins.")
+    fileprivate let selectAllTitle = NSLocalizedString("SelectAll", value: "Select All", comment: "Label for the button used to select all logins.")
+    fileprivate let deleteLoginTitle = NSLocalizedString("Delete", value: "Delete", comment: "Label for the button used to delete the current login.")
 
     fileprivate lazy var selectionButton: UIButton = {
         let button = UIButton()
@@ -94,7 +94,7 @@ class LoginListViewController: UIViewController {
         self.view.backgroundColor = UIColor.Photon.White100
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(beginEditing))
 
-        self.title = NSLocalizedString("Logins", tableName: "LoginManager", comment: "Title for Logins List View screen.")
+        self.title = NSLocalizedString("Logins", value: "Logins", comment: "Title for Logins List View screen.")
 
         searchView.delegate = self
         tableView.register(LoginTableViewCell.self, forCellReuseIdentifier: LoginCellIdentifier)
@@ -578,7 +578,7 @@ fileprivate class NoLoginsView: UIView {
         let label = UILabel()
         label.font = LoginListUX.NoResultsFont
         label.textColor = LoginListUX.NoResultsTextColor
-        label.text = NSLocalizedString("No logins found", tableName: "LoginManager", comment: "Label displayed when no logins are found after searching.")
+        label.text = NSLocalizedString("NoLoginsFound", value: "No logins found", comment: "Label displayed when no logins are found after searching.")
         return label
     }()
 

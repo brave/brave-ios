@@ -68,17 +68,13 @@ extension BasePasscodeViewController {
 
     func failMismatchPasscode() {
         let mismatchPasscodeError
-            = NSLocalizedString("Passcodes didn’t match. Try again.",
-                tableName: "AuthenticationManager",
-                comment: "Error message displayed to user when their confirming passcode doesn't match the first code.")
+            = NSLocalizedString("PasscodesDidntMatchTryAgain", value: "Passcodes didn’t match. Try again.", comment: "Error message displayed to user when their confirming passcode doesn't match the first code.")
         displayError(mismatchPasscodeError)
     }
 
     func failMustBeDifferent() {
         let useNewPasscodeError
-            = NSLocalizedString("New passcode must be different than existing code.",
-                tableName: "AuthenticationManager",
-                comment: "Error message displayed when user tries to enter the same passcode as their existing code when changing it.")
+            = NSLocalizedString("NewPasscodeMustBeDifferentThanExistingCode", value: "New passcode must be different than existing code.", comment: "Error message displayed when user tries to enter the same passcode as their existing code when changing it.")
         displayError(useNewPasscodeError)
     }
 

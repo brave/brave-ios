@@ -8,7 +8,7 @@ import UIKit
 import WebKit
 
 let DefaultTimeoutTimeInterval = 10.0 // Seconds.  We'll want some telemetry on load times in the wild.
-private var TODOPageLoadErrorString = NSLocalizedString("Could not load page.", comment: "Error message that is shown in settings when there was a problem loading")
+private var TODOPageLoadErrorString = NSLocalizedString("CouldNotLoadPage", value: "Could not load page.", comment: "Error message that is shown in settings when there was a problem loading")
 
 /**
  * A controller that manages a single web view and provides a way for

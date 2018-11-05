@@ -41,7 +41,7 @@ open class DefaultSuggestedSites {
                 imageUrl: "asset://suggestedsites_youtube",
                 faviconUrl: "asset://defaultFavicon",
                 trackingId: 631,
-                title: NSLocalizedString("YouTube", comment: "Tile title for YouTube")
+                title: NSLocalizedString("YouTube", tableName: "Storage", value: "YouTube", comment: "Tile title for YouTube")
             ),
             SuggestedSiteData(
                 url: "https://www.amazon.com/",
@@ -49,7 +49,7 @@ open class DefaultSuggestedSites {
                 imageUrl: "asset://suggestedsites_amazon",
                 faviconUrl: "asset://defaultFavicon",
                 trackingId: 630,
-                title: NSLocalizedString("Amazon", comment: "Tile title for Amazon")
+                title: NSLocalizedString("Amazon", tableName: "Storage", value: "Amazon", comment: "Tile title for Amazon")
             ),
             SuggestedSiteData(
                 url: "https://www.wikipedia.org/",
@@ -57,7 +57,7 @@ open class DefaultSuggestedSites {
                 imageUrl: "asset://suggestedsites_wikipedia",
                 faviconUrl: "asset://defaultFavicon",
                 trackingId: 629,
-                title: NSLocalizedString("Wikipedia", comment: "Tile title for Wikipedia")
+                title: NSLocalizedString("Wikipedia", tableName: "Storage", value: "Wikipedia", comment: "Tile title for Wikipedia")
             ),
             SuggestedSiteData(
                 url: "https://mobile.twitter.com/",
@@ -65,7 +65,7 @@ open class DefaultSuggestedSites {
                 imageUrl: "asset://suggestedsites_twitter",
                 faviconUrl: "asset://defaultFavicon",
                 trackingId: 628,
-                title: NSLocalizedString("Twitter", comment: "Tile title for Twitter")
+                title: NSLocalizedString("Twitter", tableName: "Storage", value: "Twitter", comment: "Tile title for Twitter")
             ),
             SuggestedSiteData(
                 url: "https://reddit.com/",
@@ -73,7 +73,7 @@ open class DefaultSuggestedSites {
                 imageUrl: "asset://suggestedsites_reddit",
                 faviconUrl: "asset://defaultFavicon",
                 trackingId: 632,
-                title: NSLocalizedString("Reddit", comment: "Tile title for Reddit")
+                title: NSLocalizedString("Reddit", tableName: "Storage", value: "Reddit", comment: "Tile title for Reddit")
             ),
             SuggestedSiteData(
                 url: "https://coinmarketcap.com/",
@@ -81,7 +81,7 @@ open class DefaultSuggestedSites {
                 imageUrl: "asset://suggestedsites_coinmarketcap",
                 faviconUrl: "asset://defaultFavicon",
                 trackingId: 633,
-                title: NSLocalizedString("Coinmarketcap", comment: "Tile title for Coinmarketcap")
+                title: NSLocalizedString("Coinmarketcap", tableName: "Storage", value: "Coinmarketcap", comment: "Tile title for Coinmarketcap")
             )
         ],
         "zh_CN": [

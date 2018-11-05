@@ -47,13 +47,13 @@ open class TabToolbarHelper: NSObject {
         super.init()
 
         toolbar.backButton.setImage(#imageLiteral(resourceName: "nav-back").template, for: .normal)
-        toolbar.backButton.accessibilityLabel = NSLocalizedString("Back", comment: "Accessibility label for the Back button in the tab toolbar.")
+        toolbar.backButton.accessibilityLabel = NSLocalizedString("Back", value: "Back", comment: "Accessibility label for the Back button in the tab toolbar.")
         let longPressGestureBackButton = UILongPressGestureRecognizer(target: self, action: #selector(didLongPressBack))
         toolbar.backButton.addGestureRecognizer(longPressGestureBackButton)
         toolbar.backButton.addTarget(self, action: #selector(didClickBack), for: .touchUpInside)
 
         toolbar.forwardButton.setImage(#imageLiteral(resourceName: "nav-forward").template, for: .normal)
-        toolbar.forwardButton.accessibilityLabel = NSLocalizedString("Forward", comment: "Accessibility Label for the tab toolbar Forward button")
+        toolbar.forwardButton.accessibilityLabel = NSLocalizedString("Forward", value: "Forward", comment: "Accessibility Label for the tab toolbar Forward button")
         let longPressGestureForwardButton = UILongPressGestureRecognizer(target: self, action: #selector(didLongPressForward))
         toolbar.forwardButton.addGestureRecognizer(longPressGestureForwardButton)
         toolbar.forwardButton.addTarget(self, action: #selector(didClickForward), for: .touchUpInside)
@@ -205,7 +205,7 @@ class TabToolbar: UIView {
         shareButton.accessibilityIdentifier = "TabToolbar.shareButton"
         addTabButton.accessibilityIdentifier = "TabToolbar.addTabButton"
         accessibilityNavigationStyle = .combined
-        accessibilityLabel = NSLocalizedString("Navigation Toolbar", comment: "Accessibility label for the navigation toolbar displayed at the bottom of the screen.")
+        accessibilityLabel = NSLocalizedString("NavigationToolbar", value: "Navigation Toolbar", comment: "Accessibility label for the navigation toolbar displayed at the bottom of the screen.")
     }
 
     required init(coder aDecoder: NSCoder) {

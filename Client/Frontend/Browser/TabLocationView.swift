@@ -63,10 +63,10 @@ class TabLocationView: UIView {
         didSet {
             if loading {
                 reloadButton.setImage(#imageLiteral(resourceName: "nav-stop").template, for: .normal)
-                reloadButton.accessibilityLabel = NSLocalizedString("Stop", comment: "Accessibility Label for the tab toolbar Stop button")
+                reloadButton.accessibilityLabel = NSLocalizedString("Stop", value: "Stop", comment: "Accessibility Label for the tab toolbar Stop button")
             } else {
                 reloadButton.setImage(#imageLiteral(resourceName: "nav-refresh").template, for: .normal)
-                reloadButton.accessibilityLabel = NSLocalizedString("Reload", comment: "Accessibility Label for the tab toolbar Reload button")
+                reloadButton.accessibilityLabel = NSLocalizedString("Reload", value: "Reload", comment: "Accessibility Label for the tab toolbar Reload button")
             }
         }
     }
@@ -111,7 +111,7 @@ class TabLocationView: UIView {
     }
 
     lazy var placeholder: NSAttributedString = {
-        let placeholderText = NSLocalizedString("Search or enter address", comment: "The text shown in the URL bar on about:home")
+        let placeholderText = NSLocalizedString("SearchOrEnterAddress", value: "Search or enter address", comment: "The text shown in the URL bar on about:home")
         return NSAttributedString(string: placeholderText, attributes: [NSAttributedStringKey.foregroundColor: UIColor.Photon.Grey40])
     }()
 
@@ -140,7 +140,7 @@ class TabLocationView: UIView {
         lockImageView.tintColor = UIColor.Photon.Green50
         lockImageView.isAccessibilityElement = true
         lockImageView.contentMode = .center
-        lockImageView.accessibilityLabel = NSLocalizedString("Secure connection", comment: "Accessibility label for the lock icon, which is only present if the connection is secure")
+        lockImageView.accessibilityLabel = NSLocalizedString("SecureConnection", value: "Secure connection", comment: "Accessibility label for the lock icon, which is only present if the connection is secure")
         lockImageView.setContentHuggingPriority(.defaultHigh, for: .horizontal)
         return lockImageView
     }()
@@ -153,15 +153,15 @@ class TabLocationView: UIView {
         readerModeButton.isHidden = true
         readerModeButton.imageView?.contentMode = .scaleAspectFit
         readerModeButton.contentHorizontalAlignment = .left
-        readerModeButton.accessibilityLabel = NSLocalizedString("Reader View", comment: "Accessibility label for the Reader View button")
+        readerModeButton.accessibilityLabel = NSLocalizedString("ReaderView", value: "Reader View", comment: "Accessibility label for the Reader View button")
         readerModeButton.accessibilityIdentifier = "TabLocationView.readerModeButton"
-        readerModeButton.accessibilityCustomActions = [UIAccessibilityCustomAction(name: NSLocalizedString("Add to Reading List", comment: "Accessibility label for action adding current page to reading list."), target: self, selector: #selector(readerModeCustomAction))]
+        readerModeButton.accessibilityCustomActions = [UIAccessibilityCustomAction(name: NSLocalizedString("AddToReadingList", value: "Add to Reading List", comment: "Accessibility label for action adding current page to reading list."), target: self, selector: #selector(readerModeCustomAction))]
         return readerModeButton
     }()
     
     lazy var reloadButton = ToolbarButton().then {
         $0.accessibilityIdentifier = "TabToolbar.stopReloadButton"
-        $0.accessibilityLabel = NSLocalizedString("Reload", comment: "Accessibility Label for the tab toolbar Reload button")
+        $0.accessibilityLabel = NSLocalizedString("Reload", value: "Reload", comment: "Accessibility Label for the tab toolbar Reload button")
         $0.setImage(#imageLiteral(resourceName: "nav-refresh").template, for: .normal)
         let longPressGestureStopReloadButton = UILongPressGestureRecognizer(target: self, action: #selector(didLongPressStopReload(_:)))
         $0.addGestureRecognizer(longPressGestureStopReloadButton)

@@ -41,7 +41,7 @@ class SearchInputView: UIView {
         textField.textColor = SearchInputViewUX.inputColor
         textField.tintColor = SearchInputViewUX.inputColor
         textField.addTarget(self, action: #selector(inputTextDidChange), for: .editingChanged)
-        textField.accessibilityLabel = NSLocalizedString("Search Input Field", tableName: "LoginManager", comment: "Accessibility label for the search input field in the Logins list")
+        textField.accessibilityLabel = NSLocalizedString("SearchInputField", value: "Search Input Field", comment: "Accessibility label for the search input field in the Logins list")
         textField.autocorrectionType = .no
         textField.autocapitalizationType = .none
         return textField
@@ -49,7 +49,7 @@ class SearchInputView: UIView {
 
     lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = NSLocalizedString("Search.Field.Title", tableName: "LoginManager", value: "Search", comment: "Title for the search field at the top of the Logins list screen")
+        label.text = NSLocalizedString("SearchFieldTitle", value: "Search", comment: "Title for the search field at the top of the Logins list screen")
         label.font = SearchInputViewUX.titleFont
         label.textColor = SearchInputViewUX.titleColor
         return label
@@ -63,8 +63,7 @@ class SearchInputView: UIView {
         let button = UIButton()
         button.addTarget(self, action: #selector(tappedClose), for: .touchUpInside)
         button.setImage(#imageLiteral(resourceName: "clear"), for: [])
-        button.accessibilityLabel = NSLocalizedString("Clear Search", tableName: "LoginManager",
-            comment: "Accessibility message e.g. spoken by VoiceOver after the user taps the close button in the search field to clear the search and exit search mode")
+        button.accessibilityLabel = NSLocalizedString("ClearSearch", value: "Clear Search", comment: "Accessibility message e.g. spoken by VoiceOver after the user taps the close button in the search field to clear the search and exit search mode")
         return button
     }()
 
@@ -82,7 +81,7 @@ class SearchInputView: UIView {
         view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(tappedSearch)))
 
         view.isAccessibilityElement = true
-        view.accessibilityLabel =  NSLocalizedString("Enter Search Mode", tableName: "LoginManager", comment: "Accessibility label for entering search mode for logins")
+        view.accessibilityLabel =  NSLocalizedString("EnterSearchMode", value: "Enter Search Mode", comment: "Accessibility label for entering search mode for logins")
         return view
     }()
 

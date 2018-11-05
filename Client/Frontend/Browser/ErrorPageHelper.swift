@@ -162,7 +162,7 @@ class ErrorPageHelper {
                 "short_description": errDomain,
             ]
 
-            let tryAgain = NSLocalizedString("Try again", tableName: "ErrorPages", comment: "Shown in error pages on a button that will try to load the page again")
+            let tryAgain = NSLocalizedString("TryAgain", value: "Try again", comment: "Shown in error pages on a button that will try to load the page again")
             var actions = "<button onclick='webkit.messageHandlers.localRequestHelper.postMessage({ type: \"reload\" })'>\(tryAgain)</button>"
 
             if errDomain == kCFErrorDomainCFNetwork as String {
@@ -171,7 +171,7 @@ class ErrorPageHelper {
                 }
             } else if errDomain == ErrorPageHelper.MozDomain {
                 if errCode == ErrorPageHelper.MozErrorDownloadsNotEnabled {
-                    let downloadInSafari = NSLocalizedString("Open in Safari", tableName: "ErrorPages", comment: "Shown in error pages for files that can't be shown and need to be downloaded.")
+                    let downloadInSafari = NSLocalizedString("OpenInSafari", value: "Open in Safari", comment: "Shown in error pages for files that can't be shown and need to be downloaded.")
 
                     // Overwrite the normal try-again action.
                     actions = "<button onclick='webkit.messageHandlers.errorPageHelperMessageManager.postMessage({type: \"\(MessageOpenInSafari)\"})'>\(downloadInSafari)</button>"

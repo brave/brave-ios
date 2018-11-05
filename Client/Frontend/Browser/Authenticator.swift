@@ -7,8 +7,8 @@ import Shared
 import Storage
 import Deferred
 
-private let CancelButtonTitle = NSLocalizedString("Cancel", comment: "Label for Cancel button")
-private let LogInButtonTitle  = NSLocalizedString("Log in", comment: "Authentication prompt log in button")
+private let CancelButtonTitle = NSLocalizedString("Cancel", value: "Cancel", comment: "Label for Cancel button")
+private let LogInButtonTitle  = NSLocalizedString("LogIn", value: "Log in", comment: "Authentication prompt log in button")
 private let log = Logger.browserLogger
 
 class Authenticator {
@@ -105,13 +105,13 @@ class Authenticator {
 
         let deferred = Deferred<Maybe<LoginData>>()
         let alert: AlertController
-        let title = NSLocalizedString("Authentication required", comment: "Authentication prompt title")
+        let title = NSLocalizedString("AuthenticationRequired", value: "Authentication required", comment: "Authentication prompt title")
         if !(protectionSpace.realm?.isEmpty ?? true) {
-            let msg = NSLocalizedString("A username and password are being requested by %@. The site says: %@", comment: "Authentication prompt message with a realm. First parameter is the hostname. Second is the realm string")
+            let msg = NSLocalizedString("AUsernameAndPasswordAreBeingRequestedByTheSiteSays", value: "A username and password are being requested by %@. The site says: %@", comment: "Authentication prompt message with a realm. First parameter is the hostname. Second is the realm string")
             let formatted = NSString(format: msg as NSString, protectionSpace.host, protectionSpace.realm ?? "") as String
             alert = AlertController(title: title, message: formatted, preferredStyle: .alert)
         } else {
-            let msg = NSLocalizedString("A username and password are being requested by %@.", comment: "Authentication prompt message with no realm. Parameter is the hostname of the site")
+            let msg = NSLocalizedString("AUsernameAndPasswordAreBeingRequestedBy", value: "A username and password are being requested by %@.", comment: "Authentication prompt message with no realm. Parameter is the hostname of the site")
             let formatted = NSString(format: msg as NSString, protectionSpace.host) as String
             alert = AlertController(title: title, message: formatted, preferredStyle: .alert)
         }
@@ -135,13 +135,13 @@ class Authenticator {
 
         // Add a username textfield.
         alert.addTextField { (textfield) -> Void in
-            textfield.placeholder = NSLocalizedString("Username", comment: "Username textbox in Authentication prompt")
+            textfield.placeholder = NSLocalizedString("Username", value: "Username", comment: "Username textbox in Authentication prompt")
             textfield.text = credentials?.user
         }
 
         // Add a password textfield.
         alert.addTextField { (textfield) -> Void in
-            textfield.placeholder = NSLocalizedString("Password", comment: "Password textbox in Authentication prompt")
+            textfield.placeholder = NSLocalizedString("Password", value: "Password", comment: "Password textbox in Authentication prompt")
             textfield.isSecureTextEntry = true
             textfield.text = credentials?.password
         }

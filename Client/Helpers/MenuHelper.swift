@@ -27,19 +27,19 @@ open class MenuHelper: NSObject {
     }
 
     open func setItems() {
-        let revealPasswordTitle = NSLocalizedString("Reveal", tableName: "LoginManager", comment: "Reveal password text selection menu item")
+        let revealPasswordTitle = NSLocalizedString("Reveal", value: "Reveal", comment: "Reveal password text selection menu item")
         let revealPasswordItem = UIMenuItem(title: revealPasswordTitle, action: MenuHelper.SelectorReveal)
 
-        let hidePasswordTitle = NSLocalizedString("Hide", tableName: "LoginManager", comment: "Hide password text selection menu item")
+        let hidePasswordTitle = NSLocalizedString("Hide", value: "Hide", comment: "Hide password text selection menu item")
         let hidePasswordItem = UIMenuItem(title: hidePasswordTitle, action: MenuHelper.SelectorHide)
 
-        let copyTitle = NSLocalizedString("Copy", tableName: "LoginManager", comment: "Copy password text selection menu item")
+        let copyTitle = NSLocalizedString("Copy", value: "Copy", comment: "Copy password text selection menu item")
         let copyItem = UIMenuItem(title: copyTitle, action: MenuHelper.SelectorCopy)
 
-        let openAndFillTitle = NSLocalizedString("Open & Fill", tableName: "LoginManager", comment: "Open and Fill website text selection menu item")
+        let openAndFillTitle = NSLocalizedString("OpenFill", value: "Open & Fill", comment: "Open and Fill website text selection menu item")
         let openAndFillItem = UIMenuItem(title: openAndFillTitle, action: MenuHelper.SelectorOpenAndFill)
 
-        let findInPageTitle = NSLocalizedString("Find in Page", tableName: "FindInPage", comment: "Text selection menu item")
+        let findInPageTitle = NSLocalizedString("FindInPage", value: "Find in Page", comment: "Text selection menu item")
         let findInPageItem = UIMenuItem(title: findInPageTitle, action: MenuHelper.SelectorFindInPage)
 
         UIMenuController.shared.menuItems = [copyItem, revealPasswordItem, hidePasswordItem, openAndFillItem, findInPageItem]
