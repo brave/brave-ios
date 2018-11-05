@@ -9,6 +9,7 @@ import Static
 import SwiftKeychainWrapper
 import LocalAuthentication
 import SwiftyJSON
+import Data
 
 extension TabBarVisibility: RepresentableOptionType {
     public var displayString: String {
@@ -95,6 +96,7 @@ class SettingsViewController: TableViewController {
         
         dataSource.sections = [
             generalSection,
+            syncSection,
             privacySection,
             securitySection,
             shieldsSection,
@@ -154,6 +156,38 @@ class SettingsViewController: TableViewController {
         }
         
         return general
+    }()
+    
+    private lazy var syncSection: Section = {
+        
+        return Section(
+            // BRAVE TODO: Change it once we finalize our decision how to name the section.
+            header: .title("Other Settings"),
+            rows: [
+                Row(text: Strings.Sync, selection: { [unowned self] in
+                    
+                    if Sync.shared.isInSyncGroup {
+                        let syncSettingsVC = SyncSettingsTableViewController(style: .grouped)
+                        syncSettingsVC.dismissHandler = {
+                            self.navigationController?.popToRootViewController(animated: true)
+                        }
+                        
+                        self.navigationController?.pushViewController(syncSettingsVC, animated: true)
+                    } else {
+                        let view = SyncWelcomeViewController()
+                        view.dismissHandler = {
+                            view.navigationController?.popToRootViewController(animated: true)
+                        }
+                        self.navigationController?.pushViewController(view, animated: true)
+                    }
+                    
+                    // TODO: Show sync vc
+                    // let passcodeSettings = PasscodeSettingsViewController()
+                    // self.navigationController?.pushViewController(passcodeSettings, animated: true)
+                    
+                    }, accessory: .disclosureIndicator)
+            ]
+        )
     }()
     
     private lazy var privacySection: Section = {

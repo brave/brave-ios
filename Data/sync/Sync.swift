@@ -24,7 +24,7 @@ private let log = Logger.browserLogger
  }
  */
 
-let NotificationSyncReady = "NotificationSyncReady"
+public let NotificationSyncReady = "NotificationSyncReady"
 
 // TODO: Make capitals - pluralize - call 'categories' not 'type'
 public enum SyncRecordType: String {
@@ -70,12 +70,12 @@ enum SyncActions: Int {
     
 }
 
-class Sync: JSInjector {
+public class Sync: JSInjector {
     
-    static let SeedByteLength = 32
+    public static let SeedByteLength = 32
     /// Number of records that is considered a fetch limit as opposed to full data set
     static let RecordFetchAmount = 300
-    static let shared = Sync()
+    public static let shared = Sync()
     
     /// This must be public so it can be added into the view hierarchy
     var webView: WKWebView!
@@ -91,7 +91,7 @@ class Sync: JSInjector {
                                   deleteSiteSettingsReady: Bool,
                                   deleteCategoryReady: Bool)(false, false, false, false, false, false, false, false)
     
-    var isInSyncGroup: Bool {
+    public var isInSyncGroup: Bool {
         return syncSeed != nil
     }
     
@@ -180,7 +180,7 @@ class Sync: JSInjector {
         initializeSync()
     }
     
-    func leaveSyncGroup() {
+    public func leaveSyncGroup() {
         // No, `leaving` logic should be here, any related logic should be in `syncSeed` setter
         syncSeed = nil
     }
@@ -192,7 +192,7 @@ class Sync: JSInjector {
     /// Sets up sync to actually start pulling/pushing data. This method can only be called once
     /// seed (optional): The user seed, in the form of string hex values. Must be even number : ["00", "ee", "4a", "42"]
     /// Notice:: seed will be ignored if the keychain already has one, a user must disconnect from existing sync group prior to joining a new one
-    func initializeSync(seed: [Int]? = nil, deviceName: String? = nil) {
+    public func initializeSync(seed: [Int]? = nil, deviceName: String? = nil) {
         
         
         #if NO_SYNC
@@ -226,7 +226,7 @@ class Sync: JSInjector {
         }
     }
     
-    func initializeNewSyncGroup(deviceName name: String?) {
+    public func initializeNewSyncGroup(deviceName name: String?) {
         if syncSeed != nil {
             // Error, to setup new sync group, must have no seed
             return
@@ -302,7 +302,7 @@ class Sync: JSInjector {
         }
     }
     
-    var syncSeedArray: [Int]? {
+    public var syncSeedArray: [Int]? {
         let splitBytes = syncSeed?.components(separatedBy: CharacterSet(charactersIn: "[], ")).filter { !$0.isEmpty }
         let seed = splitBytes?.map { Int($0) }.flatMap { $0 }
         return seed?.count == Sync.SeedByteLength ? seed : nil
@@ -668,7 +668,7 @@ extension Sync {
 }
 
 extension Sync: WKScriptMessageHandler {
-    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+    public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         
         // JS execution must be on main thread
         

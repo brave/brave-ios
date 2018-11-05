@@ -33,7 +33,7 @@ public final class Device: NSManagedObject, Syncable, CRUD {
         return SyncDevice(record: self, deviceId: deviceId, action: action).dictionaryRepresentation()
     }
     
-    static func frc() -> NSFetchedResultsController<Device> {
+    public static func frc() -> NSFetchedResultsController<Device> {
         let context = DataController.viewContext
         let fetchRequest = NSFetchRequest<Device>()
         fetchRequest.entity = Device.entity(context: context)
