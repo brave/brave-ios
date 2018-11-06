@@ -28,11 +28,8 @@ extension ContentBlockerHelper: TabContentScript {
             return
         }
         
-        // Reset the pageStats to make sure the trackingprotection shield icon knows that a page was whitelisted
-        guard !ContentBlockerHelper.isWhitelisted(url: mainDocumentUrl) else {
-            clearPageStats()
-            return
-        }
+        // TODO: 161, if domain is "all_off", can just skip
+        
         guard var components = URLComponents(string: urlString) else { return }
         components.scheme = "http"
         guard let url = components.url else { return }

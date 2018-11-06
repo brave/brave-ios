@@ -563,7 +563,6 @@
 		E6F965121B2F1CF20034B023 /* Shared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288A2D861AB8B3260023ABC3 /* Shared.framework */; };
 		E6F9653C1B2F1D5D0034B023 /* NSURLExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F9653B1B2F1D5D0034B023 /* NSURLExtensionsTests.swift */; };
 		E6FF6ACA1D873CFF0070C294 /* PageMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FF6AC91D873CFF0070C294 /* PageMetadata.swift */; };
-		EB11A1042044A90E0018F749 /* ContentBlockerHelper+Whitelist.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB11A1012044A90D0018F749 /* ContentBlockerHelper+Whitelist.swift */; };
 		EB11A1052044A90E0018F749 /* TrackingProtectionPageStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB11A1022044A90D0018F749 /* TrackingProtectionPageStats.swift */; };
 		EB11A1062044A90E0018F749 /* ContentBlockerHelper+TabContentScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB11A1032044A90E0018F749 /* ContentBlockerHelper+TabContentScript.swift */; };
 		EB2A63341F3B49A7004EF8B0 /* ContentBlockerHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB2A63251F3B49A7004EF8B0 /* ContentBlockerHelper.swift */; };
@@ -1476,7 +1475,6 @@
 		E6F9653B1B2F1D5D0034B023 /* NSURLExtensionsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSURLExtensionsTests.swift; sourceTree = "<group>"; };
 		E6FCC43C1C40565200DF6113 /* FirefoxBeta.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = FirefoxBeta.xcconfig; path = Configuration/FirefoxBeta.xcconfig; sourceTree = "<group>"; };
 		E6FF6AC91D873CFF0070C294 /* PageMetadata.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PageMetadata.swift; sourceTree = "<group>"; };
-		EB11A1012044A90D0018F749 /* ContentBlockerHelper+Whitelist.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ContentBlockerHelper+Whitelist.swift"; sourceTree = "<group>"; };
 		EB11A1022044A90D0018F749 /* TrackingProtectionPageStats.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrackingProtectionPageStats.swift; sourceTree = "<group>"; };
 		EB11A1032044A90E0018F749 /* ContentBlockerHelper+TabContentScript.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ContentBlockerHelper+TabContentScript.swift"; sourceTree = "<group>"; };
 		EB2A63251F3B49A7004EF8B0 /* ContentBlockerHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentBlockerHelper.swift; sourceTree = "<group>"; };
@@ -2773,7 +2771,6 @@
 			children = (
 				EB2A63251F3B49A7004EF8B0 /* ContentBlockerHelper.swift */,
 				EB11A1032044A90E0018F749 /* ContentBlockerHelper+TabContentScript.swift */,
-				EB11A1012044A90D0018F749 /* ContentBlockerHelper+Whitelist.swift */,
 				EB11A1022044A90D0018F749 /* TrackingProtectionPageStats.swift */,
 				EB54A8712028CE4000018880 /* Lists */,
 			);
@@ -4387,7 +4384,6 @@
 				3B6889C51D66950E002AC85E /* UIImageColors.swift in Sources */,
 				392ED7E41D0AEF56009D9B62 /* NewTabAccessors.swift in Sources */,
 				D3A9949D1A3686BD008AD1AC /* Tab.swift in Sources */,
-				EB11A1042044A90E0018F749 /* ContentBlockerHelper+Whitelist.swift in Sources */,
 				A93067E81D0FE18E00C49C6E /* NightModeHelper.swift in Sources */,
 				0AADC4C820D2A55A00FDE368 /* FavoritesViewController.swift in Sources */,
 				E65075571E37F714006961AC /* FaviconFetcher.swift in Sources */,

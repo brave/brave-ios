@@ -39,22 +39,14 @@ class TPStatsBlocklistChecker {
 
     private var blockLists: TPStatsBlocklists?
 
+    // TODO: 161, if this is called regardless of whitelist conditions then it will need `mainFrameURL`
+    // to know if the main frame is blocked (as opposed to solely the requested URL)
     func isBlocked(url: URL) -> Deferred<BlocklistName?> {
         let deferred = Deferred<BlocklistName?>()
 
-        guard let blockLists = blockLists, let host = url.host, !host.isEmpty else {
-            // TP Stats init isn't complete yet
-            deferred.fill(nil)
-            return deferred
-        }
-
-        // Make a copy on the main thread
-        let whitelistRegex = ContentBlockerHelper.whitelistedDomains.domainRegex
-
-        DispatchQueue.global().async {
-            let enabledLists = BlocklistName.allLists
-            deferred.fill(blockLists.urlIsInList(url, whitelistedDomains: whitelistRegex).flatMap { return enabledLists.contains($0) ? $0 : nil })
-        }
+        // TODO: 161, use `urlIsInList` to identify if `url` is inside a blocklist
+        
+        deferred.fill(nil)
         return deferred
     }
 

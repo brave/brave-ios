@@ -110,11 +110,14 @@ enum BlockingStrength: String {
 
 @available(iOS 11.0, *)
 class ContentBlockerHelper {
-    static var whitelistedDomains = WhitelistedDomains()
 
     static let ruleStore: WKContentRuleListStore = WKContentRuleListStore.default()
     weak var tab: Tab?
     private(set) var userPrefs: Prefs?
+    
+    static func compileLists() -> Deferred<()> {
+        return BlocklistName.compileAll(ruleStore: ruleStore)
+    }
 
     var isUserEnabled: Bool? {
         didSet {
@@ -147,10 +150,8 @@ class ContentBlockerHelper {
             return .Disabled
         }
         if stats.total == 0 {
-            guard let url = tab?.url else {
-                return .NoBlockedURLs
-            }
-            return ContentBlockerHelper.isWhitelisted(url: url) ? .Whitelisted : .NoBlockedURLs
+            // TODO: 161, _may_ need to handle whitelisted situations here
+            return .NoBlockedURLs
         } else {
             return .Blocking
         }
@@ -181,41 +182,6 @@ class ContentBlockerHelper {
         self.userPrefs = profile.prefs
 
         NotificationCenter.default.addObserver(self, selector: #selector(setupTabTrackingProtection), name: .ContentBlockerTabSetupRequired, object: nil)
-
-        guard let prefs = userPrefs, !ContentBlockerHelper.heavyInitHasRunOnce else {
-            return
-        }
-
-        performHeavyOneTimeInit(prefs)
-    }
-
-    private func performHeavyOneTimeInit(_ prefs: Prefs) {
-        struct RunOnce { static var hasRun = false }
-        guard !RunOnce.hasRun else { return }
-        RunOnce.hasRun = true
-
-        let blockImages = NoImageModeDefaults.Script
-        ContentBlockerHelper.ruleStore.compileContentRuleList(forIdentifier: NoImageModeDefaults.ScriptName, encodedContentRuleList: blockImages) { rule, error in
-            assert(rule != nil && error == nil)
-            ContentBlockerHelper.blockImagesRule = rule
-        }
-
-        // Read the whitelist at startup
-        if let list = ContentBlockerHelper.readWhitelistFile() {
-            ContentBlockerHelper.whitelistedDomains.domainSet = Set(list)
-        }
-
-        TPStatsBlocklistChecker.shared.startup()
-
-        ContentBlockerHelper.removeOldListsByDateFromStore(prefs: prefs) {
-            ContentBlockerHelper.removeOldListsByNameFromStore(prefs: prefs) {
-                let deferred = ContentBlockerHelper.compileLists()
-                deferred.uponQueue(.main) {
-                    ContentBlockerHelper.heavyInitHasRunOnce = true
-                    NotificationCenter.default.post(name: .ContentBlockerTabSetupRequired, object: nil)
-                }
-            }
-        }
     }
 
     class func prefsChanged() {
@@ -281,104 +247,6 @@ class ContentBlockerHelper {
         }
     }
 
-}
-
-// MARK: Initialization code
-// The rule store can compile JSON rule files into a private format which is cached on disk.
-// On app boot, we need to check if the ruleStore's data is out-of-date, or if the names of the rule files
-// no longer match. Finally, any JSON rule files that aren't in the ruleStore need to be compiled and stored in the
-// ruleStore.
-@available(iOS 11, *)
-extension ContentBlockerHelper {
-    private static func lastModifiedSince1970(forFileAtPath path: String) -> Timestamp? {
-        do {
-            let url = URL(fileURLWithPath: path)
-            let attr = try FileManager.default.attributesOfItem(atPath: url.path)
-            guard let date = attr[FileAttributeKey.modificationDate] as? Date else { return nil }
-            return UInt64(1000.0 * date.timeIntervalSince1970)
-        } catch {
-            return nil
-        }
-    }
-
-    private static func dateOfMostRecentBlockerFile() -> Timestamp {
-        let blocklists = BlocklistName.allLists
-        return blocklists.reduce(Timestamp(0)) { result, list in
-            guard let path = Bundle.main.path(forResource: list.filename, ofType: "json") else { return result }
-            let date = lastModifiedSince1970(forFileAtPath: path) ?? 0
-            return date > result ? date : result
-        }
-    }
-
-    static func removeAllRulesInStore(completion: @escaping () -> Void) {
-        ContentBlockerHelper.ruleStore.getAvailableContentRuleListIdentifiers { available in
-            guard let available = available else {
-                completion()
-                return
-            }
-            let deferreds: [Deferred<Void>] = available.map { filename in
-                let result = Deferred<Void>()
-                ContentBlockerHelper.ruleStore.removeContentRuleList(forIdentifier: filename) { _ in
-                    result.fill(())
-                }
-                return result
-            }
-            all(deferreds).uponQueue(.main) { _ in
-                completion()
-            }
-        }
-    }
-
-    // If any blocker files are newer than the date saved in prefs,
-    // remove all the content blockers and reload them.
-    static func removeOldListsByDateFromStore(prefs: Prefs, completion: @escaping () -> Void) {
-        let fileDate = dateOfMostRecentBlockerFile()
-        let prefsNewestDate = prefs.longForKey("blocker-file-date") ?? 0
-        if prefsNewestDate < 1 || fileDate <= prefsNewestDate {
-            completion()
-            return
-        }
-
-        prefs.setTimestamp(fileDate, forKey: "blocker-file-date")
-        removeAllRulesInStore() {
-            completion()
-        }
-    }
-
-    static func removeOldListsByNameFromStore(prefs: Prefs, completion: @escaping () -> Void) {
-        var noMatchingIdentifierFoundForRule = false
-
-        ContentBlockerHelper.ruleStore.getAvailableContentRuleListIdentifiers { available in
-            guard let available = available else {
-                completion()
-                return
-            }
-
-            let blocklists = BlocklistName.allLists.map { $0.filename }
-            for contentRuleIdentifier in available {
-                if !blocklists.contains(where: { $0 == contentRuleIdentifier }) {
-                    noMatchingIdentifierFoundForRule = true
-                    break
-                }
-            }
-
-            let fileDate = dateOfMostRecentBlockerFile()
-            let prefsNewestDate = prefs.timestampForKey("blocker-file-date") ?? 0
-            if prefsNewestDate > 0 && fileDate <= prefsNewestDate && !noMatchingIdentifierFoundForRule {
-                completion()
-                return
-            }
-            prefs.setTimestamp(fileDate, forKey: "blocker-file-date")
-
-            self.removeAllRulesInStore {
-                completion()
-            }
-        }
-    }
-
-    static func compileLists() -> Deferred<()> {
-        return BlocklistName.compileAll(ruleStore: ruleStore)
-    }
 }
 
 // MARK: Static methods to check if Tracking Protection is enabled in the user's prefs
