@@ -238,9 +238,16 @@ public class Sync: JSInjector {
     }
     
     class func getScript(_ name: String) -> String? {
+        let identifier = "com.brave.Data"
+        guard let bundle = Bundle(identifier: identifier) else {
+            assertionFailure("Could not get a Data framework with identifier: \(identifier)")
+            return nil
+        }
+
         // TODO: Add unwrapping warnings
         // TODO: Place in helper location
-        guard let filePath = Bundle.main.path(forResource: name, ofType: "js") else {
+        guard let filePath = bundle.path(forResource: name, ofType: "js") else {
+            log.error("Could not find script named: \(name)")
             return nil
         }
         
