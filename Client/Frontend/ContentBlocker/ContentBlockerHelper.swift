@@ -27,17 +27,31 @@ class BlocklistName: Equatable {
 
     private func compile(ruleStore: WKContentRuleListStore) -> Deferred<Void> {
         let compilerDeferred = Deferred<Void>()
-        BlocklistName.loadJsonFromBundle(forResource: filename) { jsonString in
-            ruleStore.compileContentRuleList(forIdentifier: self.filename, encodedContentRuleList: jsonString) { rule, error in
-                if let error = error {
-                    // TODO #382: Potential telemetry location
-                    log.error("Content blocker '\(self.filename)' errored: \(error.localizedDescription)")
-                    assert(false)
-                }
-                assert(rule != nil)
-                
-                self.rule = rule
+        
+        let ruleExists = Deferred<Bool>()
+        ruleStore.lookUpContentRuleList(forIdentifier: self.filename) { rule, error in
+            self.rule = rule
+            ruleExists.fill(self.rule != nil)
+        }
+        
+        ruleExists.upon { exists in
+            if exists {
                 compilerDeferred.fill(())
+                return
+            }
+            
+            BlocklistName.loadJsonFromBundle(forResource: self.filename) { jsonString in
+                ruleStore.compileContentRuleList(forIdentifier: self.filename, encodedContentRuleList: jsonString) { rule, error in
+                    if let error = error {
+                        // TODO #382: Potential telemetry location
+                        log.error("Content blocker '\(self.filename)' errored: \(error.localizedDescription)")
+                        assert(false)
+                    }
+                    assert(rule != nil)
+                    
+                    self.rule = rule
+                    compilerDeferred.fill(())
+                }
             }
         }
         return compilerDeferred
