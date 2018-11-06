@@ -148,7 +148,14 @@ public class Sync: JSInjector {
         context?.exceptionHandler = { _, exc in
             log.error(exc.debugDescription)
         }
-        guard let path = Bundle.main.path(forResource: "bookmark_util", ofType: "js") else {
+        
+        let identifier = "com.brave.Data"
+        guard let bundle = Bundle(identifier: identifier) else {
+            assertionFailure("Could not get a Data framework with identifier: \(identifier)")
+            return nil
+        }
+        
+        guard let path = bundle.path(forResource: "bookmark_util", ofType: "js") else {
             log.error("Could not load bookmark_util.js")
             return nil
         }
@@ -255,6 +262,7 @@ public class Sync: JSInjector {
     }
     
     fileprivate func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        print("did finish")
         print(#function)
     }
     
@@ -455,6 +463,7 @@ extension Sync {
             self.webView.evaluateJavaScript(evaluate,
                                             completionHandler: { (result, error) in
                                                 if let error = error {
+                                                    print("error")
                                                     print(error)
                                                 }
                                                 

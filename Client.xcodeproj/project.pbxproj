@@ -42,6 +42,7 @@
 		0AF3B4F2213D8E3300695962 /* BookmarkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AF3B4EA213D8E3200695962 /* BookmarkTests.swift */; };
 		0AF3B4F3213D8E3300695962 /* DeviceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AF3B4EB213D8E3300695962 /* DeviceTests.swift */; };
 		0AF3B4F4213D8E3300695962 /* TabMOTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AF3B4EC213D8E3300695962 /* TabMOTests.swift */; };
+		0AF684622191D6470079EC77 /* bookmark_util.js in Resources */ = {isa = PBXBuildFile; fileRef = 0AF6845A2191D6470079EC77 /* bookmark_util.js */; };
 		0B21E8061E26CCB7000C8779 /* EarlGrey.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 0B21E8051E26CCB7000C8779 /* EarlGrey.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		0B305E1B1E3A98A900BE0767 /* BookmarkingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B305E1A1E3A98A900BE0767 /* BookmarkingTests.swift */; };
 		0B3D670E1E09B90B00C1EFC7 /* AuthenticationTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B3D670D1E09B90B00C1EFC7 /* AuthenticationTest.swift */; };
@@ -925,6 +926,7 @@
 		0AF3B4EA213D8E3200695962 /* BookmarkTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkTests.swift; sourceTree = "<group>"; };
 		0AF3B4EB213D8E3300695962 /* DeviceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeviceTests.swift; sourceTree = "<group>"; };
 		0AF3B4EC213D8E3300695962 /* TabMOTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabMOTests.swift; sourceTree = "<group>"; };
+		0AF6845A2191D6470079EC77 /* bookmark_util.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = bookmark_util.js; sourceTree = "<group>"; };
 		0B21E8051E26CCB7000C8779 /* EarlGrey.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EarlGrey.framework; path = Carthage/Build/iOS/EarlGrey.framework; sourceTree = "<group>"; };
 		0B305E1A1E3A98A900BE0767 /* BookmarkingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkingTests.swift; sourceTree = "<group>"; };
 		0B3D670D1E09B90B00C1EFC7 /* AuthenticationTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthenticationTest.swift; sourceTree = "<group>"; };
@@ -2163,6 +2165,7 @@
 				5D1DC56820AE005400905E5A /* JSInjector.swift */,
 				5D1DC56920AE005400905E5A /* SyncSite.swift */,
 				5D1DC56A20AE005400905E5A /* ios-sync.js */,
+				0AF6845A2191D6470079EC77 /* bookmark_util.js */,
 			);
 			path = sync;
 			sourceTree = "<group>";
@@ -3712,6 +3715,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0AF684622191D6470079EC77 /* bookmark_util.js in Resources */,
 				5D1DC57420AE005400905E5A /* ios-sync.js in Resources */,
 				0A1E843121909CC40042F782 /* fetch.js in Resources */,
 				0A1E842D21909CA70042F782 /* crypto.js in Resources */,
