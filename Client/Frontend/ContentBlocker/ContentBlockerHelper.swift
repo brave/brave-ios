@@ -5,24 +5,51 @@
 import WebKit
 import Shared
 import Deferred
+import Data
+import BraveShared
 
 private let log = Logger.browserLogger
 
 // Rename to BlockList
-class BlocklistName: Equatable {
+class BlocklistName: Equatable, Hashable {
     static let ad = BlocklistName(filename: "block-ads")
     static let tracker = BlocklistName(filename: "block-trackers")
     static let https = BlocklistName(filename: "upgrade-http")
     static let script = BlocklistName(filename: "block-scripts")
     static let image = BlocklistName(filename: "block-images")
 
-    static var allLists: [BlocklistName] { return [.ad, .tracker, .https, .script, .image] }
+    static var allLists: Set<BlocklistName> { return [.ad, .tracker, .https, .script, .image] }
     
     let filename: String
     var rule: WKContentRuleList?
     
     init(filename: String) {
         self.filename = filename
+    }
+    
+    static func blocklists(forDomain domain: Domain) -> (on: Set<BlocklistName>, off: Set<BlocklistName>) {
+        if domain.shield_allOff == 1 {
+            return ([], allLists)
+        }
+        
+        var onList = Set<BlocklistName>()
+        
+        if include(domainSetting: domain.shield_adblockAndTp, globalValue: Preferences.Shields.blockAdsAndTracking) {
+            onList.formUnion([.ad, .tracker])
+        }
+        
+        if include(domainSetting: domain.shield_noScript, globalValue: Preferences.Shields.blockScripts) {
+            onList.insert(.script)
+        }
+        
+        // TODO #159: Setup image shield
+        // TODO #269: Setup HTTPS shield
+        
+        return (onList, allLists.subtracting(onList))
+    }
+    
+    private static func include(domainSetting domain: NSNumber?, globalValue global: Preferences.Option<Bool>) -> Bool {
+        return domain == 1 || (domain == nil && global.value)
     }
 
     private func compile(ruleStore: WKContentRuleListStore) -> Deferred<Void> {
@@ -88,6 +115,9 @@ class BlocklistName: Equatable {
         return lhs.filename == rhs.filename
     }
 
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(filename)
+    }
 }
 
 @available(iOS 11.0, *)
