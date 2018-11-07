@@ -31,7 +31,7 @@ public class SyncCrypto: JSInjector {
         let webCfg = WKWebViewConfiguration()
         webCfg.userContentController = WKUserContentController()
         
-        if let script = Sync.getScript("crypto") {
+        if let script = ScriptOpener.get(withName: "crypto") {
             webCfg.userContentController.addUserScript(WKUserScript(source: script, injectionTime: .atDocumentEnd, forMainFrameOnly: true))
         }
         

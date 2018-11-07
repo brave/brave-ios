@@ -132,10 +132,10 @@ public class Sync: JSInjector {
         userController.add(self, name: "syncToIOS_send")
         
         // ios-sync must be called before bundle, since it auto-runs
-        ["fetch", "ios-sync", "bundle"].forEach() {
-            if let script = Sync.getScript($0) {
-                userController.addUserScript(WKUserScript(source: script, injectionTime: .atDocumentEnd, forMainFrameOnly: true))
-            }
+        let scripts = ["fetch", "ios-sync", "bundle"]
+        
+        scripts.compactMap { ScriptOpener.get(withName: $0) }.forEach {
+            userController.addUserScript(WKUserScript(source: $0, injectionTime: .atDocumentEnd, forMainFrameOnly: true))
         }
         
         webCfg.userContentController = userController
@@ -149,26 +149,8 @@ public class Sync: JSInjector {
             log.error(exc.debugDescription)
         }
         
-        let identifier = "com.brave.Data"
-        guard let bundle = Bundle(identifier: identifier) else {
-            assertionFailure("Could not get a Data framework with identifier: \(identifier)")
-            return nil
-        }
-        
-        guard let path = bundle.path(forResource: "bookmark_util", ofType: "js") else {
-            log.error("Could not load bookmark_util.js")
-            return nil
-        }
-        
-        do {
-            let scriptAsString = try String(contentsOfFile: path, encoding: String.Encoding.utf8)
-            // bookmark_util script is loaded for later use.
-            _ = context?.evaluateScript(scriptAsString)
-            
-        } catch {
-            log.error("Failed to parse script file: \(error)")
-            return nil
-        }
+        let script = ScriptOpener.get(withName: "bookmark_util")
+        context?.evaluateScript(script)
         
         return context
     }()
@@ -244,25 +226,7 @@ public class Sync: JSInjector {
         self.webView.loadHTMLString("<body>TEST</body>", baseURL: nil)
     }
     
-    class func getScript(_ name: String) -> String? {
-        let identifier = "com.brave.Data"
-        guard let bundle = Bundle(identifier: identifier) else {
-            assertionFailure("Could not get a Data framework with identifier: \(identifier)")
-            return nil
-        }
-
-        // TODO: Add unwrapping warnings
-        // TODO: Place in helper location
-        guard let filePath = bundle.path(forResource: name, ofType: "js") else {
-            log.error("Could not find script named: \(name)")
-            return nil
-        }
-        
-        return try? String(contentsOfFile: filePath, encoding: String.Encoding.utf8)
-    }
-    
     fileprivate func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        print("did finish")
         print(#function)
     }
     
@@ -463,7 +427,6 @@ extension Sync {
             self.webView.evaluateJavaScript(evaluate,
                                             completionHandler: { (result, error) in
                                                 if let error = error {
-                                                    print("error")
                                                     print(error)
                                                 }
                                                 
