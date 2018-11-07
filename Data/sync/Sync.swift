@@ -78,7 +78,7 @@ public class Sync: JSInjector {
     public static let shared = Sync()
     
     /// This must be public so it can be added into the view hierarchy
-    var webView: WKWebView!
+    public var webView: WKWebView!
     
     // Should not be accessed directly
     fileprivate var syncReadyLock = false
