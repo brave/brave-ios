@@ -93,20 +93,27 @@ class SettingsViewController: TableViewController {
         tableView.accessibilityIdentifier = "SettingsViewController.tableView"
         tableView.separatorColor = UIConstants.TableViewSeparatorColor
         tableView.backgroundColor = UIConstants.TableViewHeaderBackgroundColor
-        
-        dataSource.sections = [
-            generalSection,
-            syncSection,
-            privacySection,
-            securitySection,
-            shieldsSection,
-            supportSection,
-            aboutSection
-        ]
+
+        dataSource.sections = sections
+    }
+    
+    private var sections: [Section] {
+        var list = [Section]()
+        list.append(generalSection)
+        #if !NO_SYNC
+            list.append(syncSection)
+        #endif
+        list.append(contentsOf: [privacySection,
+                                 securitySection,
+                                 shieldsSection,
+                                 supportSection,
+                                 aboutSection])
         
         if let debugSection = debugSection {
-            dataSource.sections.append(debugSection)
+            list.append(debugSection)
         }
+
+        return list
     }
     
     @objc private func tappedDone() {
@@ -161,7 +168,7 @@ class SettingsViewController: TableViewController {
     private lazy var syncSection: Section = {
         
         return Section(
-            // BRAVE TODO: Change it once we finalize our decision how to name the section.
+            // BRAVE TODO: Change it once we finalize our decision how to name the section.(#385)
             header: .title("Other Settings"),
             rows: [
                 Row(text: Strings.Sync, selection: { [unowned self] in
@@ -180,11 +187,6 @@ class SettingsViewController: TableViewController {
                         }
                         self.navigationController?.pushViewController(view, animated: true)
                     }
-                    
-                    // TODO: Show sync vc
-                    // let passcodeSettings = PasscodeSettingsViewController()
-                    // self.navigationController?.pushViewController(passcodeSettings, animated: true)
-                    
                     }, accessory: .disclosureIndicator)
             ]
         )
