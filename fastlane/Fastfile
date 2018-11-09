@@ -29,6 +29,11 @@ platform :ios do
     clean_icons()
   end
 
+  desc "Run Unit Tests"
+  lane :test do |options|
+    run_tests(scheme: "Fennec")
+  end
+
   desc "Creates a Brave Beta Release build for TestFlight."
   lane :beta do |options|
     set_build_number(options)
