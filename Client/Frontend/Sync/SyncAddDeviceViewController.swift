@@ -11,7 +11,7 @@ enum DeviceType {
 }
 
 class SyncAddDeviceViewController: SyncViewController {
-    var doneHandler: (() -> ())?
+    var doneHandler: (() -> Void)?
 
     lazy var stackView: UIStackView = {
         let stack = UIStackView()
@@ -35,7 +35,7 @@ class SyncAddDeviceViewController: SyncViewController {
         button.setTitle(Strings.CopyToClipboard, for: .normal)
         button.addTarget(self, action: #selector(SEL_copy), for: .touchUpInside)
         button.setTitleColor(BraveUX.BraveOrange, for: .normal)
-        button.contentEdgeInsets = UIEdgeInsetsMake(8, 8, 8, 8)
+        button.contentEdgeInsets = UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
         button.isHidden = true
         return button
     }()
@@ -204,7 +204,6 @@ class SyncAddDeviceViewController: SyncViewController {
                                                               doneEnterWordsStackView,
                                                               UIView.spacer(.horizontal, amount: 16)])
         buttonsStackView.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 1000), for: .vertical)
-
 
         stackView.addArrangedSubview(buttonsStackView)
         

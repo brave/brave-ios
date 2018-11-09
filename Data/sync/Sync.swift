@@ -36,7 +36,6 @@ public enum SyncRecordType: String {
     case devices = "DEVICES"
     //
     
-    
     // These are 'static', and do not change, would make actually lazy/static, but not allow for enums
     var fetchedModelType: SyncRecord.Type? {
         let map: [SyncRecordType: SyncRecord.Type] = [.bookmark: SyncBookmark.self, .prefs: SyncDevice.self]
@@ -155,7 +154,7 @@ public class Sync: JSInjector {
         return context
     }()
     
-    private var syncFetchedHandlers = [() -> ()]()
+    private var syncFetchedHandlers = [() -> Void]()
     
     override init() {
         super.init()
@@ -174,7 +173,7 @@ public class Sync: JSInjector {
         syncSeed = nil
     }
     
-    func addFetchedHandler(_ handler: @escaping () -> ()) {
+    func addFetchedHandler(_ handler: @escaping () -> Void) {
         syncFetchedHandlers.append(handler)
     }
     
@@ -182,7 +181,6 @@ public class Sync: JSInjector {
     /// seed (optional): The user seed, in the form of string hex values. Must be even number : ["00", "ee", "4a", "42"]
     /// Notice:: seed will be ignored if the keychain already has one, a user must disconnect from existing sync group prior to joining a new one
     public func initializeSync(seed: [Int]? = nil, deviceName: String? = nil) {
-        
         
         #if NO_SYNC
         if syncSeed == nil { return }
@@ -196,7 +194,10 @@ public class Sync: JSInjector {
         
         let alert = UIAlertController(title: "Sync Disabled", message: msg, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
-        (UIApplication.shared.delegate as! AppDelegate).browserViewController.present(alert, animated: true, completion: nil)
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+            fatalError()
+        }
+        appDelegate.browserViewController.present(alert, animated: true, completion: nil)
         #endif
         
         if let joinedSeed = seed, joinedSeed.count == Sync.SeedByteLength {
@@ -287,7 +288,6 @@ public class Sync: JSInjector {
         return seed?.count == Sync.SeedByteLength ? seed : nil
     }
     
-    
     // TODO: Abstract into classes as static members, each object type needs their own sync time stamp!
     // This includes just the last record that was fetched, used to store timestamp until full process has been completed
     //  then set into defaults
@@ -308,7 +308,6 @@ public class Sync: JSInjector {
     fileprivate var lastFetchWasTrimmed: Bool = false
     ////////////////////////////////
     
-    
     @discardableResult func checkIsSyncReady() -> Bool {
         
         if syncReadyLock {
@@ -316,7 +315,13 @@ public class Sync: JSInjector {
         }
         
         let mirror = Mirror(reflecting: isSyncFullyInitialized)
-        let ready = mirror.children.reduce(true) { $0 && $1.1 as! Bool }
+        let ready = mirror.children.reduce(true) {
+            guard let secondArgAsBool = $1.1 as? Bool else {
+                assertionFailure("second argument could not be cast to bool")
+                return false
+            }
+            return $0 && secondArgAsBool
+        }
         if ready {
             // Attempt to authorize device
             
@@ -567,7 +572,6 @@ extension Sync {
         let ids = fetchedRecords.map { $0.objectId }.compactMap { $0 }
         let localbookmarks = recordType.coredataModelType?.get(syncUUIDs: ids, context: DataController.newBackgroundContext()) as? [Bookmark]
         
-        
         var matchedBookmarks = [[Any]]()
         for fetchedBM in fetchedRecords {
             
@@ -630,8 +634,6 @@ extension Sync {
         } else if Device.currentDevice()?.deviceId == nil {
             print("Device Id expected!")
         }
-        
-        
         
     }
     

@@ -12,7 +12,7 @@ protocol NavigationPrevention {
 }
 
 class SyncWelcomeViewController: SyncViewController {
-    var dismissHandler: (() -> ())?
+    var dismissHandler: (() -> Void)?
     
     lazy var mainStackView: UIStackView = {
         let stackView = UIStackView()
@@ -177,7 +177,7 @@ class SyncWelcomeViewController: SyncViewController {
         navigationController?.pushViewController(pairCamera, animated: true)
     }
 
-    private func addSyncReadyNotificationObserver(completion: @escaping () -> ()) {
+    private func addSyncReadyNotificationObserver(completion: @escaping () -> Void) {
         NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: NotificationSyncReady),
                                                object: nil,
                                                queue: OperationQueue.main,

@@ -42,7 +42,7 @@ class SyncCodewordsView: UIView, UITextViewDelegate {
         }
 
         placeholder.snp.makeConstraints { (make) in
-            make.top.left.right.equalTo(field).inset(UIEdgeInsetsMake(8, 4, 0, 0))
+            make.top.left.right.equalTo(field).inset(UIEdgeInsets(top: 8, left: 4, bottom: 0, right: 0))
         }
         
         field.delegate = self

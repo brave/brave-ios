@@ -142,7 +142,10 @@ class SyncCameraView: UIView, AVCaptureMetadataOutputObjectsDelegate {
         
         if metadataObjects.isEmpty { return }
         
-        let metadataObj = metadataObjects[0] as! AVMetadataMachineReadableCodeObject
+        guard let metadataObj = metadataObjects[0] as? AVMetadataMachineReadableCodeObject else {
+            assertionFailure("Could not cast metadataObj to AVMetadataMachineReadableCodeObject")
+            return
+        }
         if metadataObj.type == AVMetadataObject.ObjectType.qr {
             if let callback = scanCallback {
                 if let stringValue = metadataObj.stringValue {

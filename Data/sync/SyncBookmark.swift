@@ -39,7 +39,6 @@ final class SyncBookmark: SyncRecord {
         
         let bm = record as? Bookmark
         
-        
         let unixCreated = Int(bm?.created?.toTimestamp() ?? 0)
         let unixAccessed = Int(bm?.lastVisited?.toTimestamp() ?? 0)
         
@@ -58,7 +57,6 @@ final class SyncBookmark: SyncRecord {
         self.site = site
         syncOrder = bm?.syncOrder
     }
-    
     
     /// Initiates the instance based on the JSON that was passed.
     ///

@@ -246,10 +246,10 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
     public class func add(url: URL?,
                           title: String?,
                           customTitle: String? = nil, // Folders only use customTitle
-        parentFolder: Bookmark? = nil,
-        isFolder: Bool = false,
-        isFavorite: Bool = false,
-        syncOrder: String? = nil) {
+                          parentFolder: Bookmark? = nil,
+                          isFolder: Bool = false,
+                          isFavorite: Bool = false,
+                          syncOrder: String? = nil) {
         
         let site = SyncSite()
         site.title = title
@@ -263,7 +263,7 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         bookmark.site = site
         bookmark.syncOrder = syncOrder
         
-        add(rootObject: bookmark, save: true, sendToSync: true, parentFolder: parentFolder)
+        _ = add(rootObject: bookmark, save: true, sendToSync: true, parentFolder: parentFolder)
     }
     
     public class func contains(url: URL, getFavorites: Bool = false) -> Bool {

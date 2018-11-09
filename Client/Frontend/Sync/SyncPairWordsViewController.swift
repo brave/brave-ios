@@ -9,7 +9,7 @@ private let log = Logger.browserLogger
 
 class SyncPairWordsViewController: SyncViewController {
     
-    var syncHandler: (([Int]?) -> ())?
+    var syncHandler: (([Int]?) -> Void)?
     var scrollView: UIScrollView!
     var containerView: UIView!
     var codewordsView: SyncCodewordsView!
@@ -85,7 +85,7 @@ class SyncPairWordsViewController: SyncViewController {
         }
         
         codewordsView.snp.makeConstraints { (make) in
-            make.edges.equalTo(self.containerView).inset(UIEdgeInsetsMake(0, 0, 45, 0))
+            make.edges.equalTo(self.containerView).inset(UIEdgeInsets(top: 0, left: 0, bottom: 45, right: 0))
         }
         
         wordCountLabel.snp.makeConstraints { (make) in
@@ -163,7 +163,7 @@ class SyncPairWordsViewController: SyncViewController {
         
         SyncCrypto.shared.bytes(fromPassphrase: codes) { (result, error) in
             if result?.count == 0 || error != nil {
-                var errorText = (error as? NSError)?.userInfo["WKJavaScriptExceptionMessage"] as? String
+                var errorText = (error as NSError?)?.userInfo["WKJavaScriptExceptionMessage"] as? String
                 if let er = errorText, er.contains("Invalid word") {
                     errorText = er + "\n Please recheck spelling"
                 }

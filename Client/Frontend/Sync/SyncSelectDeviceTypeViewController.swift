@@ -92,7 +92,7 @@ class SyncDeviceTypeButton: UIControl {
 }
 
 class SyncSelectDeviceTypeViewController: SyncViewController {
-    var syncInitHandler: ((String, DeviceType) -> ())?
+    var syncInitHandler: ((String, DeviceType) -> Void)?
 
     let loadingView = UIView()
     let mobileButton = SyncDeviceTypeButton(image: "sync-mobile", title: Strings.SyncAddMobileButton, type: .mobile)

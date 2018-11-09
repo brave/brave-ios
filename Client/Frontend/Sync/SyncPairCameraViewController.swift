@@ -8,7 +8,7 @@ import Data
 
 class SyncPairCameraViewController: SyncViewController {
     
-    var syncHandler: (([Int]?) -> ())?
+    var syncHandler: (([Int]?) -> Void)?
     var cameraView: SyncCameraView!
     var titleLabel: UILabel!
     var descriptionLabel: UILabel!
@@ -52,7 +52,7 @@ class SyncPairCameraViewController: SyncViewController {
             // TODO: Functional, but needs some cleanup
             struct Scanner { static var Lock = false }
             if let bytes = SyncCrypto.shared.splitBytes(fromJoinedBytes: data) {
-                if (Scanner.Lock) {
+                if Scanner.Lock {
                     // Have internal, so camera error does not show
                     return
                 }

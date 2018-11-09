@@ -20,7 +20,7 @@ class SyncSettingsTableViewController: UITableViewController {
     }
     
     /// Handles dismissing parent view controller.
-    var dismissHandler: (() -> ())?
+    var dismissHandler: (() -> Void)?
     
     /// After synchronization is completed, user needs to tap on `Done` to go back.
     /// Standard navigation is disabled then.
