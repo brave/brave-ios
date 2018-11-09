@@ -32,6 +32,11 @@ class BlocklistName: Equatable, Hashable {
             return ([], allLists)
         }
         
+        /// Returns true if a certain Blocklist, should be included for `Domain`
+        func include(domainSetting domain: NSNumber?, globalValue global: Preferences.Option<Bool>) -> Bool {
+            return domain == 1 || (domain == nil && global.value)
+        }
+        
         var onList = Set<BlocklistName>()
         
         if include(domainSetting: domain.shield_adblockAndTp, globalValue: Preferences.Shields.blockAdsAndTracking) {
@@ -46,10 +51,6 @@ class BlocklistName: Equatable, Hashable {
         // TODO #269: Setup HTTPS shield
         
         return (onList, allLists.subtracting(onList))
-    }
-    
-    private static func include(domainSetting domain: NSNumber?, globalValue global: Preferences.Option<Bool>) -> Bool {
-        return domain == 1 || (domain == nil && global.value)
     }
 
     private func compile(ruleStore: WKContentRuleListStore) -> Deferred<Void> {
