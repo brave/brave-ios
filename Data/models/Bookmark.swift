@@ -75,7 +75,7 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         return SyncBookmark(record: self, deviceId: deviceId, action: action).dictionaryRepresentation()
     }
     
-    public class func frc(parentFolder: Bookmark?) -> NSFetchedResultsController<Bookmark> {
+    public class func frc(forFavorites: Bool = false, parentFolder: Bookmark?) -> NSFetchedResultsController<Bookmark> {
         let context = DataController.viewContext
         let fetchRequest = NSFetchRequest<Bookmark>()
         
@@ -87,7 +87,8 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         let createdSort = NSSortDescriptor(key: "created", ascending: true)
         fetchRequest.sortDescriptors = [syncOrderSort, createdSort]
         
-        fetchRequest.predicate = allBookmarksOfAGivenLevelPredicate(parent: parentFolder)
+        fetchRequest.predicate = forFavorites ?
+            NSPredicate(format: "isFavorite == YES") : allBookmarksOfAGivenLevelPredicate(parent: parentFolder)
         
         return NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: context,
                                           sectionNameKeyPath: nil, cacheName: nil)
