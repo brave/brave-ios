@@ -350,6 +350,28 @@ class BookmarkTests: CoreDataTestCase {
         // Assert nothing.
     }
     
+    func testSortingManyBookmarks() {
+        let sortedOrders = ["1.1.0.1", "1.1.1", "1.1.2", "1.1.3", "1.1.4", "1.1.5", "1.1.6", "1.1.7", "1.1.8",
+                            "1.1.9", "1.1.10", "1.1.11", "1.1.12", "1.1.12.1", "1.1.12.1.2", "1.1.12.1.3",
+                            "1.1.13", "1.1.14", "1.1.15", "1.1.16", "1.1.17", "1.1.19", "1.1.20", "1.1.21"]
+        
+        let shuffledOrders = sortedOrders.shuffled()
+        XCTAssertNotEqual(sortedOrders, shuffledOrders)
+        
+        // Adding bookmarks in random order
+        shuffledOrders.forEach {
+            let url = URL(string: "http://brave.com/\($0)")!
+            createAndWait(url: url, title: "Brave", syncOrder: $0)
+        }
+        
+        let frc = Bookmark.frc(parentFolder: nil)
+        // Frc should sort them back
+        try! frc.performFetch()
+        let frcOrders = frc.fetchedObjects!.compactMap { $0.syncOrder }
+        
+        XCTAssertEqual(sortedOrders, frcOrders)
+    }
+    
     // MARK: - Delete
     
     func testRemoveByUrl() {
@@ -470,10 +492,11 @@ class BookmarkTests: CoreDataTestCase {
     /// Wrapper around `Bookmark.create()` with context save wait expectation and fetching object from view context.
     @discardableResult 
     private func createAndWait(url: URL?, title: String?, customTitle: String? = nil, 
-                                                  parentFolder: Bookmark? = nil, isFolder: Bool = false, isFavorite: Bool = false, color: UIColor? = nil) -> Bookmark {
+                               parentFolder: Bookmark? = nil, isFolder: Bool = false, isFavorite: Bool = false, color: UIColor? = nil, syncOrder: String? = nil) -> Bookmark {
         
         backgroundSaveAndWaitForExpectation {
-            Bookmark.add(url: url, title: title, customTitle: customTitle, parentFolder: parentFolder, isFolder: isFolder, isFavorite: isFavorite)
+            Bookmark.add(url: url, title: title, customTitle: customTitle, parentFolder: parentFolder,
+                         isFolder: isFolder, isFavorite: isFavorite, syncOrder: syncOrder)
         }
         
         return try! DataController.viewContext.fetch(fetchRequest).first!
