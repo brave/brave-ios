@@ -340,8 +340,8 @@ class BookmarksViewController: SiteTableViewController {
         cell.imageView?.contentMode = .center
         cell.imageView?.layer.borderWidth = 0.0
       } else {
-        cell.imageView?.layer.borderColor = UIColor(white: 0, alpha: 0.2).cgColor
-        cell.imageView?.layer.borderWidth = 1.0 / UIScreen.main.scale
+        cell.imageView?.layer.borderColor = BraveUX.faviconBorderColor.cgColor
+        cell.imageView?.layer.borderWidth = BraveUX.faviconBorderWidth
         // favicon object associated through domain relationship - set from cache or download
         cell.imageView?.setIcon(item.domain?.favicon, forURL: URL(string: item.url ?? ""))
       }

@@ -4,6 +4,7 @@
 
 import UIKit
 import Shared
+import BraveShared
 
 @objc protocol FavoriteCellDelegate {
     func editFavorite(_ favoriteCell: FavoriteCell)
@@ -16,8 +17,6 @@ class FavoriteCell: UICollectionViewCell {
     
     private struct UI {
         /// Ratio of width:height of the thumbnail image.
-        static let borderColor = UIColor(white: 0, alpha: 0.2)
-        static let borderWidth: CGFloat = 1.0 / UIScreen.main.scale
         static let cornerRadius: CGFloat = 8
         
         static let labelColor = UIAccessibilityDarkerSystemColorsEnabled() ? UX.GreyJ : UX.GreyH
@@ -46,8 +45,8 @@ class FavoriteCell: UICollectionViewCell {
         $0.contentMode = .scaleAspectFit
         $0.clipsToBounds = true
         $0.layer.cornerRadius = UI.cornerRadius
-        $0.layer.borderColor = UI.borderColor.cgColor
-        $0.layer.borderWidth = UI.borderWidth
+        $0.layer.borderColor = BraveUX.faviconBorderColor.cgColor
+        $0.layer.borderWidth = BraveUX.faviconBorderWidth
         $0.layer.minificationFilter = kCAFilterTrilinear
         $0.layer.magnificationFilter = kCAFilterNearest
     }

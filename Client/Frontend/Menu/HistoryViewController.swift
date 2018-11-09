@@ -117,8 +117,8 @@ class HistoryViewController: SiteTableViewController {
     
     cell.imageView?.contentMode = .scaleAspectFit
     cell.imageView?.image = FaviconFetcher.defaultFavicon
-    cell.imageView?.layer.borderColor = UIColor(white: 0, alpha: 0.2).cgColor
-    cell.imageView?.layer.borderWidth = 1.0 / UIScreen.main.scale
+    cell.imageView?.layer.borderColor = BraveUX.faviconBorderColor.cgColor
+    cell.imageView?.layer.borderWidth = BraveUX.faviconBorderWidth
     cell.imageView?.layer.cornerRadius = 6
     cell.imageView?.layer.masksToBounds = true
     
