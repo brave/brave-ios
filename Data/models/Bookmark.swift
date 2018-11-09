@@ -443,8 +443,6 @@ extension Bookmark {
     }
     
     public class func frecencyQuery(context: NSManagedObjectContext, containing: String?) -> [Bookmark] {
-        assert(!Thread.isMainThread)
-        
         let fetchRequest = NSFetchRequest<Bookmark>()
         fetchRequest.fetchLimit = 5
         fetchRequest.entity = Bookmark.entity(context: context)
