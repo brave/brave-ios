@@ -82,10 +82,10 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         fetchRequest.entity = Bookmark.entity(context: context)
         fetchRequest.fetchBatchSize = 20
         
-        let syncOrderSort = NSSortDescriptor(key: "syncOrder", ascending: true)
-        let orderSort = NSSortDescriptor(key: "order", ascending: true)
+        let syncOrderSort = NSSortDescriptor(key: "syncOrder", ascending: true,
+                                             selector: #selector(NSString.localizedStandardCompare))
         let createdSort = NSSortDescriptor(key: "created", ascending: true)
-        fetchRequest.sortDescriptors = [syncOrderSort, orderSort, createdSort]
+        fetchRequest.sortDescriptors = [syncOrderSort, createdSort]
         
         fetchRequest.predicate = allBookmarksOfAGivenLevelPredicate(parent: parentFolder)
         
