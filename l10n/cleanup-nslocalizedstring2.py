@@ -11,22 +11,22 @@ import json
 blacklisted_parent_directories = ["ThirdParty", "Carthage", "fastlane", "L10nSnapshotTests", "l10n"]
 frameworks = ["BraveShared", "Data", "Shared", "Storage"]
 
-def pascal_case(string):
-  # Convert full stops, hyphens and underscores to spaces so that words are correctly pascal cased
-  string = string.replace(".", " ")
-  string = string.replace("-", " ")
-  string = string.replace("_", " ")
-
-  # Convert first letter of each word to uppercase
-  string = re.sub(r'(^|\s)(\S)', lambda match: match.group(1) + match.group(2).upper(), string)
-
-  # Strip punctuation
-  string = re.sub(r'[^\w\s]', '', string)
-
-  # Strip spaces
-  string = string.replace(" ", "")
-
-  return string
+#def pascal_case(string):
+#  # Convert full stops, hyphens and underscores to spaces so that words are correctly pascal cased
+#  string = string.replace(".", " ")
+#  string = string.replace("-", " ")
+#  string = string.replace("_", " ")
+#
+#  # Convert first letter of each word to uppercase
+#  string = re.sub(r'(^|\s)(\S)', lambda match: match.group(1) + match.group(2).upper(), string)
+#
+#  # Strip punctuation
+#  string = re.sub(r'[^\w\s]', '', string)
+#
+#  # Strip spaces
+#  string = string.replace(" ", "")
+#
+#  return string
 
 def replacement_string(key, table_name, value, comment, file):
   if key in keyDict:
@@ -44,7 +44,7 @@ def replacement_string(key, table_name, value, comment, file):
   content += ', value: "' + value + '"'
 
   content += ', comment: "' + comment + '")'
-  
+  print(content)
   return content
 
 def parent_directory(path):
@@ -78,12 +78,12 @@ for path, directories, files in os.walk("."):
       else:
         print "Processing " + path + "/" + file
 
-      quoted_string_pattern = r'((?<![\\])[\'"])((?:.(?!(?<![\\])\1))*.?)\1'
-
-      key_pattern = ' *' + quoted_string_pattern + ' *'
-      table_name_pattern = ',[ \t]*(.?)[ \t]*tableName:[ \t]*(.?)[ \t]*' + quoted_string_pattern + '[ \t]*'
-      value_pattern = ',[ \t]*(.?)[ \t]*value:[ \t]*(.?)[ \t]*' + quoted_string_pattern + '[ \t]*'
-      comment_pattern = ',[ \t]*(.?)[ \t]*comment:[ \t]*(.?)[ \t]*' + quoted_string_pattern + '[ \t]*'
+#      quoted_string_pattern = r'((?<![\\])[\'"])((?:.(?!(?<![\\])\1))*.?)\1'
+#
+#      key_pattern = ' *' + quoted_string_pattern + ' *'
+#      table_name_pattern = ',[ \t]*(.?)[ \t]*tableName:[ \t]*(.?)[ \t]*' + quoted_string_pattern + '[ \t]*'
+#      value_pattern = ',[ \t]*(.?)[ \t]*value:[ \t]*(.?)[ \t]*' + quoted_string_pattern + '[ \t]*'
+#      comment_pattern = ',[ \t]*(.?)[ \t]*comment:[ \t]*(.?)[ \t]*' + quoted_string_pattern + '[ \t]*'
 
       flags = re.MULTILINE | re.DOTALL
 
