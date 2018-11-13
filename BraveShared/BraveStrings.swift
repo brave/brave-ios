@@ -66,6 +66,7 @@ public extension Strings {
     public static let SearchEngineFormatText = NSLocalizedString("SearchEngineFormatText", tableName: "BraveShared", value: "%@ search", comment: "Label for search engine buttons. The argument corresponds to the name of the search engine.")
     public static let SearchSuggestionFromFormatText = NSLocalizedString("SearchSuggestionFromFormatText", tableName: "BraveShared", value: "Search suggestions from %@", comment: "Accessibility label for image of default search engine displayed left to the actual search suggestions from the engine. The parameter substituted for \"%@\" is the name of the search engine. E.g.: Search suggestions from Google")
     public static let SearchesForSuggestionButtonAccessibilityText = NSLocalizedString("SearchesForSuggestionButtonAccessibilityText", tableName: "BraveShared", value: "Searches for the suggestion", comment: "Accessibility hint describing the action performed when a search suggestion is clicked")
+    public static let Turn_on_search_suggestions = NSLocalizedString("Turn on search suggestions?", comment: "Prompt shown before enabling provider search queries")
 }
 
 // PRAGMA MARK: Authenticator.swift
@@ -343,10 +344,10 @@ public extension Strings {
     public static let Delete = NSLocalizedString("Delete", tableName: "BraveShared", value: "Delete", comment: "")
     
     public static let New_Tab = NSLocalizedString("NewTab", tableName: "BraveShared", value: "New Tab", comment: "New Tab title")
-    
+    public static let Yes = NSLocalizedString("Yes", comment: "For search suggestions prompt. This string should be short so it fits nicely on the prompt row.")
+    public static let No = NSLocalizedString("No", comment: "For search suggestions prompt. This string should be short so it fits nicely on the prompt row.")
     public static let Open_In_Background_Tab = NSLocalizedString("OpenInBackgroundTab", tableName: "BraveShared", value: "Open Link In New Tab", comment: "Context menu item for opening a link in a new tab")
     public static let Open_All_Bookmarks = NSLocalizedString("OpenAllBookmarks", tableName: "BraveShared", value: "Open All (%i)", comment: "Context menu item for opening all folder bookmarks")
-    
     
     public static let Bookmark_Folder = NSLocalizedString("BookmarkFolder", tableName: "BraveShared", value: "Bookmark Folder", comment: "Bookmark Folder Section Title")
     public static let Bookmark_Info = NSLocalizedString("BookmarkInfo", tableName: "BraveShared", value: "Bookmark Info", comment: "Bookmark Info Section Title")
