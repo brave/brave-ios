@@ -172,6 +172,13 @@ class DAUTests: XCTestCase {
         XCTAssertEqual(sunday.weeksMonday, "2017-11-27")
     }
     
+    func testNoPingOnDevelopmentBuild() {
+        XCTAssertTrue(AppConstants.BuildChannel == .developer)
+        
+        let dau = DAU()
+        XCTAssertFalse(dau.sendPingToServer())
+    }
+    
     // MARK: Helpers
     
     private func dateFrom(string: String) -> Date {

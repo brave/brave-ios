@@ -30,8 +30,15 @@ public class DAU {
         today = date
     }
     
-    public func sendPingToServer() {
-        if launchTimer != nil { return }
+    /// Sends ping to server and returns a boolean whether a timer for the server call was scheduled.
+    /// A user needs to be active for a certain amount of time before we ping the server.
+    @discardableResult public func sendPingToServer() -> Bool {
+        if AppConstants.BuildChannel == .developer {
+            log.info("Development build detected, no server ping.")
+            return false
+        }
+        
+        if launchTimer != nil { return false }
         launchTimer =
             Timer.scheduledTimer(
                 timeInterval: activeUserDuration,
@@ -39,6 +46,8 @@ public class DAU {
                 selector: #selector(sendPingToServerInternal),
                 userInfo: nil,
                 repeats: false)
+        
+        return true
     }
     
     @objc public func sendPingToServerInternal() {
