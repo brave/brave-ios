@@ -78,7 +78,7 @@ for path, directories, files in os.walk("."):
       else:
         print "Processing " + path + "/" + file
 
-#      quoted_string_pattern = r'((?<![\\])[\'"])((?:.(?!(?<![\\])\1))*.?)\1'
+      quoted_string_pattern = r' *\"([^\"\\]*(?:(?:\\\.|\"\")[^\"\\]*)*)\" *'
 #
 #      key_pattern = ' *' + quoted_string_pattern + ' *'
 #      table_name_pattern = ',[ \t]*(.?)[ \t]*tableName:[ \t]*(.?)[ \t]*' + quoted_string_pattern + '[ \t]*'
@@ -95,47 +95,45 @@ for path, directories, files in os.walk("."):
         #       V = value
         #       C = comment
         
-        # KTVC
-        
-        pattern = 'public static let (\w+) = NSLocalizedString\( *\"(.+?)\" *, *tableName: *\"(.+?)\" *, *value: *\"(.+?)\" *, *comment: *\"(.+?)\" *\)'
+        pattern = 'public static let (\w+) = NSLocalizedString\(' + quoted_string_pattern + ', *tableName:' + quoted_string_pattern + ', *value:' + quoted_string_pattern + ', *comment:' + quoted_string_pattern + '\)'
         replacement_pattern = lambda match: replacement_string(match.group(1), table_name, match.group(4), match.group(5), file)
         content = re.sub(pattern, replacement_pattern, content, flags = flags)
-
-#        # KTV-
-#        pattern = 'NSLocalizedString\(' + key_pattern + table_name_pattern + value_pattern + '\)'
-#        replacement_pattern = lambda match: replacement_string(match.group(2), table_name, match.group(6), "", file)
-#        content = re.sub(pattern, replacement_pattern, content, flags = flags)
-#
-#        # KT-C
-#        pattern = 'NSLocalizedString\(' + key_pattern + table_name_pattern + comment_pattern + '\)'
-#        replacement_pattern = lambda match: replacement_string(match.group(2), table_name, match.group(2), match.group(10), file)
-#        content = re.sub(pattern, replacement_pattern, content, flags = flags)
-#
-#        # KT--
-#        pattern = 'NSLocalizedString\(' + key_pattern + table_name_pattern + '\)'
-#        replacement_pattern = lambda match: replacement_string(match.group(2), table_name, match.group(2), "", file)
-#        content = re.sub(pattern, replacement_pattern, content, flags = flags)
-
+        
+        # KTV-
+        pattern = 'public static let (\w+) = NSLocalizedString\(' + quoted_string_pattern + ', *tableName:' + quoted_string_pattern + ', *value:' + quoted_string_pattern + '\)'
+        replacement_pattern = lambda match: replacement_string(match.group(1), table_name, match.group(4), "", file)
+        content = re.sub(pattern, replacement_pattern, content, flags = flags)
+        
+        # KT-C
+        pattern = 'public static let (\w+) = NSLocalizedString\(' + quoted_string_pattern + ', *tableName:' + quoted_string_pattern + ', *comment:' + quoted_string_pattern + '\)'
+        replacement_pattern = lambda match: replacement_string(match.group(1), table_name, match.group(2), match.group(4), file)
+        content = re.sub(pattern, replacement_pattern, content, flags = flags)
+        
+        # KT--
+        pattern = 'public static let (\w+) = NSLocalizedString\(' + quoted_string_pattern + ', *tableName:' + quoted_string_pattern + '\)'
+        replacement_pattern = lambda match: replacement_string(match.group(1), table_name, match.group(2), "", file)
+        content = re.sub(pattern, replacement_pattern, content, flags = flags)
+        
         # K-VC
         
-        pattern = 'public static let (\w+) = NSLocalizedString\( *\"(.+?)\" *, *value: *\"(.+?)\" *, *comment: *\"(.+?)\" *\)'
+        pattern = 'public static let (\w+) = NSLocalizedString\(' + quoted_string_pattern + ', *value:' + quoted_string_pattern + ', *comment:' + quoted_string_pattern + '\)'
         replacement_pattern = lambda match: replacement_string(match.group(1), table_name, match.group(3), match.group(4), file)
         content = re.sub(pattern, replacement_pattern, content, flags = flags)
-
-#        # K-V-
-#        pattern = 'NSLocalizedString\(' + key_pattern + value_pattern + '\)'
-#        replacement_pattern = lambda match: replacement_string(match.group(2), table_name, match.group(6), "", file)
-#        content = re.sub(pattern, replacement_pattern, content, flags = flags)
-#
-#        # # K--C
-#        pattern = 'NSLocalizedString\(' + key_pattern + comment_pattern + '\)'
-#        replacement_pattern = lambda match: replacement_string(match.group(2), table_name, match.group(2), match.group(6), file)
-#        content = re.sub(pattern, replacement_pattern, content, flags = flags)
-#
-#        # K---
-#        pattern = 'NSLocalizedString\(' + key_pattern + '\)'
-#        replacement_pattern = lambda match: replacement_string(match.group(2), table_name, match.group(2), "", file)
-#        content = re.sub(pattern, replacement_pattern, content, flags = flags)
+        
+        # # K--C
+        pattern = 'public static let (\w+) = NSLocalizedString\(' + quoted_string_pattern + ', *comment:' + quoted_string_pattern + '\)'
+        replacement_pattern = lambda match: replacement_string(match.group(1), table_name, match.group(2), match.group(3), file)
+        content = re.sub(pattern, replacement_pattern, content, flags = flags)
+        
+        # K-V-
+        pattern = 'public static let (\w+) = NSLocalizedString\(' + quoted_string_pattern + ', *value:' + quoted_string_pattern + '\)'
+        replacement_pattern = lambda match: replacement_string(match.group(1), table_name, match.group(3), "", file)
+        content = re.sub(pattern, replacement_pattern, content, flags = flags)
+        
+        # K---
+        pattern = 'public static let (\w+) = NSLocalizedString\(' + quoted_string_pattern + '\)'
+        replacement_pattern = lambda match: replacement_string(match.group(1), table_name, match.group(2), "", file)
+        content = re.sub(pattern, replacement_pattern, content, flags = flags)
 
         with open(os.path.join(path, file), 'w') as source:
           source.write(content)
