@@ -6,10 +6,6 @@ import Foundation
 import Shared
 import XCGLogger
 
-let BookmarksFolderTitleMobile: String = NSLocalizedString("MobileBookmarks", tableName: "Storage", value: "Mobile Bookmarks", comment: "The title of the folder that contains mobile bookmarks. This should match bookmarks.folder.mobile.label on Android.")
-let BookmarksFolderTitleMenu: String = NSLocalizedString("BookmarksMenu", tableName: "Storage", value: "Bookmarks Menu", comment: "The name of the folder that contains desktop bookmarks in the menu. This should match bookmarks.folder.menu.label on Android.")
-let BookmarksFolderTitleToolbar: String = NSLocalizedString("BookmarksToolbar", tableName: "Storage", value: "Bookmarks Toolbar", comment: "The name of the folder that contains desktop bookmarks in the toolbar. This should match bookmarks.folder.toolbar.label on Android.")
-let BookmarksFolderTitleUnsorted: String = NSLocalizedString("UnsortedBookmarks", tableName: "Storage", value: "Unsorted Bookmarks", comment: "The name of the folder that contains unsorted desktop bookmarks. This should match bookmarks.folder.unfiled.label on Android.")
 
 let _TableBookmarks = "bookmarks"                                      // Removed in v12. Kept for migration.
 let TableBookmarksMirror = "bookmarksMirror"                           // Added in v9.

@@ -36,9 +36,6 @@ class QuickActions: NSObject {
     static let TabURLKey = "url"
     static let TabTitleKey = "title"
 
-    fileprivate let lastBookmarkTitle = NSLocalizedString("OpenLastBookmark", value: "Open Last Bookmark", comment: "String describing the action of opening the last added bookmark from the home screen Quick Actions via 3D Touch")
-    fileprivate let _lastTabTitle = NSLocalizedString("OpenLastTab", value: "Open Last Tab", comment: "String describing the action of opening the last tab sent to Brave from the home screen Quick Actions via 3D Touch")
-
     static var sharedInstance = QuickActions()
 
     var launchedShortcutItem: UIApplicationShortcutItem?

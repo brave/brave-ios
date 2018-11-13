@@ -15,23 +15,338 @@
 
 import Shared
 
-// SendTo extension.
+// PRAGMA MARK: SendTo extension.
 public extension Strings {
-    public static let Cancel = NSLocalizedString("Cancel", tableName: "BraveShared", value: "Cancel", comment: "")
+    public static let CancelButtonTitle = NSLocalizedString("CancelButtonTitle", tableName: "BraveShared", value: "Cancel", comment: "")
+//    public static let lastBookmarkTitle = NSLocalizedString("OpenLastBookmark", value: "Open Last Bookmark", comment: "String describing the action of opening the last added bookmark from the home screen Quick Actions via 3D Touch")
+//    public static let _lastTabTitle = NSLocalizedString("OpenLastTab", value: "Open Last Tab", comment: "String describing the action of opening the last tab sent to Brave from the home screen Quick Actions via 3D Touch")
+    
 }
 
-// Top Sites.
+// PRAGMA MARK: UIAlertControllerExtensions.swift
 public extension Strings {
-//    public static let TopSitesEmptyStateDescription = NSLocalizedString("YourMostVisitedSitesWillShowUpHere", tableName: "BraveShared", value: "Your most visited sites will show up here.", comment: "Description label for the empty Top Sites state.")
-//    public static let TopSitesEmptyStateTitle = NSLocalizedString("WelcomeToTopSites", tableName: "BraveShared", value: "Welcome to Top Sites", comment: "The title for the empty Top Sites state")
+    public static let SendCrashReportAlertTitle = NSLocalizedString("SendCrashReportAlertTitle", value: "Oops! Brave crashed", comment: "Title for prompt displayed to user after the app crashes")
+    public static let SendCrashReportAlertMessage = NSLocalizedString("SendCrashReportAlertMessage", value: "Send a crash report so Brave can fix the problem?", comment: "Message displayed in the crash dialog above the buttons used to select when sending reports")
+    public static let SendReportButtonTitle = NSLocalizedString("SendReport", value: "Send Report", comment: "Used as a button label for crash dialog prompt")
+    public static let AlwaysSendButtonTitle = NSLocalizedString("AlwaysSend", value: "Always Send", comment: "Used as a button label for crash dialog prompt")
+    public static let DontSendButtonTitle = NSLocalizedString("DontSend", value: "Don’t Send", comment: "Used as a button label for crash dialog prompt")
+    public static let RestoreTabOnCrashAlertTitle = NSLocalizedString("WellThisIsEmbarrassing", value: "Well, this is embarrassing.", comment: "Restore Tabs Prompt Title")
+    public static let RestoreTabOnCrashAlertMessage = NSLocalizedString("LooksLikeBraveCrashedPreviouslyWouldYouLikeToRestoreYourTabs", value: "Looks like Brave crashed previously. Would you like to restore your tabs?", comment: "Restore Tabs Prompt Description")
+    public static let RestoreTabNegativeButtonTitle = NSLocalizedString("No", value: "No", comment: "Restore Tabs Negative Action")
+    public static let RestoreTabAffirmativeButtonTitle = NSLocalizedString("Okay", value: "Okay", comment: "Restore Tabs Affirmative Action")
+    public static let ClearPrivateDataAlertMessage = NSLocalizedString("ThisActionWillClearAllOfYourPrivateDataItCannotBeUndone", value: "This action will clear all of your private data. It cannot be undone.", comment: "Description of the confirmation dialog shown when a user tries to clear their private data.")
+    public static let ClearPrivateDataAlertCancelButtonTitle = NSLocalizedString("Cancel", value: "Cancel", comment: "The cancel button when confirming clear private data.")
+    public static let ClearPrivateDataAlertOkButtonTitle = NSLocalizedString("OK", value: "OK", comment: "The button that clears private data.")
+    public static let ClearSyncedHistoryAlertMessage = NSLocalizedString("ThisActionWillClearAllOfYourPrivateDataIncludingHistoryFromYourSyncedDevices", value: "This action will clear all of your private data, including history from your synced devices.", comment: "Description of the confirmation dialog shown when a user tries to clear history that's synced to another device.")
+    public static let ClearSyncedHistoryAlertCancelButtoTitle = NSLocalizedString("Cancel", value: "Cancel", comment: "The cancel button when confirming clear history.")
+    public static let ClearSyncedHistoryAlertOkButtoTitle = NSLocalizedString("OK", value: "OK", comment: "The confirmation button that clears history even when Sync is connected.")
+    public static let DeleteLoginAlertTitle = NSLocalizedString("AreYouSure", value: "Are you sure?", comment: "Prompt title when deleting logins")
+    public static let DeleteLoginAlertLocalMessage = NSLocalizedString("LoginsWillBePermanentlyRemoved", value: "Logins will be permanently removed.", comment: "Prompt message warning the user that deleting non-synced logins will permanently remove them")
+    public static let DeleteLoginAlertSyncedDevicesMessage = NSLocalizedString("LoginsWillBeRemovedFromAllConnectedDevices", value: "Logins will be removed from all connected devices.", comment: "Prompt message warning the user that deleted logins will remove logins from all connected devices")
+    public static let DeleteLoginAlertCancelActionTitle = NSLocalizedString("Cancel", value: "Cancel", comment: "Prompt option for cancelling out of deletion")
+    public static let DeleteLoginAlertDeleteActionTitle = NSLocalizedString("Delete", value: "Delete", comment: "Label for the button used to delete the current login.")
 }
 
-// Settings.
+// PRAGMA MARK: BasePasscodeViewController.swift
+public extension Strings {
+    public static let PasscodeConfirmMisMatchErrorText = NSLocalizedString("PasscodesDidntMatchTryAgain", value: "Passcodes didn’t match. Try again.", comment: "Error message displayed to user when their confirming passcode doesn't match the first code.")
+    public static let PasscodeMatchOldErrorText = NSLocalizedString("NewPasscodeMustBeDifferentThanExistingCode", value: "New passcode must be different than existing code.", comment: "Error message displayed when user tries to enter the same passcode as their existing code when changing it.")
+}
+
+// PRAGMA MARK: AuthenticationManagerConstants.swift
+public extension Strings {
+    
+}
+
+// PRAGMA MARK: SearchViewController.swift
+public extension Strings {
+    public static let SearchSettingsButtonTitle = NSLocalizedString("SearchSettings", value: "Search Settings", comment: "Label for search settings button.")
+    public static let SearchEngineFormatText = NSLocalizedString("Search", value: "%@ search", comment: "Label for search engine buttons. The argument corresponds to the name of the search engine.")
+    public static let SearchSuggestionFromFormatText = NSLocalizedString("SearchSuggestionsFrom", value: "Search suggestions from %@", comment: "Accessibility label for image of default search engine displayed left to the actual search suggestions from the engine. The parameter substituted for \"%@\" is the name of the search engine. E.g.: Search suggestions from Google")
+    public static let SearchesForSuggestionButtonAccessibilityText = NSLocalizedString("SearchesForTheSuggestion", value: "Searches for the suggestion", comment: "Accessibility hint describing the action performed when a search suggestion is clicked")
+}
+
+// PRAGMA MARK: Authenticator.swift
+public extension Strings {
+    public static let AuthPromptAlertCancelButtonTitle = NSLocalizedString("Cancel", value: "Cancel", comment: "Label for Cancel button")
+    public static let AuthPromptAlertLogInButtonTitle  = NSLocalizedString("LogIn", value: "Log in", comment: "Authentication prompt log in button")
+    public static let AuthPromptAlertTitle = NSLocalizedString("AuthenticationRequired", value: "Authentication required", comment: "Authentication prompt title")
+    public static let AuthPromptAlertFormatRealmMessageText = NSLocalizedString("AUsernameAndPasswordAreBeingRequestedByTheSiteSays", value: "A username and password are being requested by %@. The site says: %@", comment: "Authentication prompt message with a realm. First parameter is the hostname. Second is the realm string")
+    public static let AuthPromptAlertMessageText = NSLocalizedString("AUsernameAndPasswordAreBeingRequestedBy", value: "A username and password are being requested by %@.", comment: "Authentication prompt message with no realm. Parameter is the hostname of the site")
+    public static let AuthPromptAlertUsernamePlaceholderText = NSLocalizedString("Username", value: "Username", comment: "Username textbox in Authentication prompt")
+    public static let AuthPromptAlertPasswordPlaceholderText = NSLocalizedString("Password", value: "Password", comment: "Password textbox in Authentication prompt")
+    
+}
+
+// PRAGMA MARK: BrowserViewController.swift
+public extension Strings {
+    public static let CloseTabCancelButtonTitle = NSLocalizedString("Cancel", value: "Cancel", comment: "Label for Cancel button")
+    public static let WebContentAccessibilityLabel = NSLocalizedString("WebContent", value: "Web content", comment: "Accessibility label for the main web content view")
+    public static let OpenNewTabButtonTitle = NSLocalizedString("OpenInNewTab", value: "Open in New Tab", comment: "Context menu item for opening a link in a new tab")
+    public static  let OpenNewPrivateTabButtonTitle = NSLocalizedString("OpenInNewPrivateTab", value: "Open in New Private Tab", comment: "Context menu option for opening a link in a new private tab")
+    public static let DownloadLinkActionTitle = NSLocalizedString("DownloadLink", value: "Download Link", comment: "Context menu item for downloading a link URL")
+    public static let CopyLinkActionTitle = NSLocalizedString("CopyLink", value: "Copy Link", comment: "Context menu item for copying a link URL to the clipboard")
+    public static let ShareLinkActionTitle = NSLocalizedString("ShareLink", value: "Share Link", comment: "Context menu item for sharing a link URL")
+    public static let SaveImageActionTitle = NSLocalizedString("SaveImage", value: "Save Image", comment: "Context menu item for saving an image")
+    public static let AccessPhotoDeniedAlertTitle = NSLocalizedString("BraveWouldLikeToAccessYourPhotos", value: "Brave would like to access your Photos", comment: "See http://mzl.la/1G7uHo7")
+    public static let AccessPhotoDeniedAlertMessage = NSLocalizedString("ThisAllowsYouToSaveTheImageToYourCameraRoll", value: "This allows you to save the image to your Camera Roll.", comment: "See http://mzl.la/1G7uHo7")
+    public static let OpenPhoneSettingsActionTitle = NSLocalizedString("OpenSettings", value: "Open Settings", comment: "See http://mzl.la/1G7uHo7")
+    public static let CopyImageActionTitle = NSLocalizedString("CopyImage", value: "Copy Image", comment: "Context menu item for copying an image to the clipboard")
+}
+
+// PRAGMA MARK: ErrorPageHelper.swift
+public extension Strings {
+    public static let ErrorPageReloadButtonTitle = NSLocalizedString("TryAgain", value: "Try again", comment: "Shown in error pages on a button that will try to load the page again")
+    public static let ErrorPageOpenInSafariButtonTitle = NSLocalizedString("OpenInSafari", value: "Open in Safari", comment: "Shown in error pages for files that can't be shown and need to be downloaded.")
+}
+
+// PRAGMA MARK: FindInPageBar.swift
+public extension Strings {
+    public static let FindInPagePreviousResultButtonAccessibilityLabel = NSLocalizedString("PreviousInPageResult", value: "Previous in-page result", comment: "Accessibility label for previous result button in Find in Page Toolbar.")
+    public static let FindInPageNextResultButtonAccessibilityLabel = NSLocalizedString("NextInPageResult", value: "Next in-page result", comment: "Accessibility label for next result button in Find in Page Toolbar.")
+    public static let FindInPageDoneButtonAccessibilityLabel = NSLocalizedString("Done", value: "Done", comment: "Done button in Find in Page Toolbar.")
+}
+
+// PRAGMA MARK: ReaderModeBarView.swift
+public extension Strings {
+    public static let ReaderModeDisplaySettingsButtonTitle = NSLocalizedString("DisplaySettings", value: "Display Settings", comment: "Name for display settings button in reader mode. Display in the meaning of presentation, not monitor.")
+}
+
+// PRAGMA MARK: Tab.swift
+public extension Strings {
+    public static let TabWebContentViewAccessibilityLabel = NSLocalizedString("WebContent", value: "Web content", comment: "Accessibility label for the main web content view")
+}
+
+// PRAGMA MARK: TabLocationView.swift
+public extension Strings {
+    public static let TabToolbarStopButtonAccessibilityLabel = NSLocalizedString("Stop", value: "Stop", comment: "Accessibility Label for the tab toolbar Stop button")
+    public static let TabToolbarReloadButtonAccessibilityLabel = NSLocalizedString("Reload", value: "Reload", comment: "Accessibility Label for the tab toolbar Reload button")
+    public static let TabToolbarSearchAddressPlaceholderText = NSLocalizedString("SearchOrEnterAddress", value: "Search or enter address", comment: "The text shown in the URL bar on about:home")
+    public static let TabToolbarLockImageAccessibilityLabel = NSLocalizedString("SecureConnection", value: "Secure connection", comment: "Accessibility label for the lock icon, which is only present if the connection is secure")
+    public static let TabToolbarReaderViewButtonAccessibilityLabel = NSLocalizedString("ReaderView", value: "Reader View", comment: "Accessibility label for the Reader View button")
+    public static let TabToolbarReaderViewButtonTitle = NSLocalizedString("AddToReadingList", value: "Add to Reading List", comment: "Accessibility label for action adding current page to reading list.")
+}
+
+// PRAGMA MARK: TabPeekViewController.swift
+public extension Strings {
+    public static let PreviewActionAddToBookmarksActionTitle = NSLocalizedString("AddToBookmarks", value: "Add to Bookmarks", comment: "Label for preview action on Tab Tray Tab to add current tab to Bookmarks")
+    public static let PreviewActionCopyURLActionTitle = NSLocalizedString("CopyURL", value: "Copy URL", comment: "Label for preview action on Tab Tray Tab to copy the URL of the current tab to clipboard")
+    public static let PreviewActionCloseTabActionTitle = NSLocalizedString("CloseTab", value: "Close Tab", comment: "Label for preview action on Tab Tray Tab to close the current tab")
+    public static let PreviewFormatAccessibilityLabel = NSLocalizedString("PreviewOf", value: "Preview of %@", comment: "Accessibility label, associated to the 3D Touch action on the current tab in the tab tray, used to display a larger preview of the tab.")
+}
+
+// PRAGMA MARK: TabToolbar.swift
+public extension Strings {
+    public static let TabToolbarBackButtonAccessibilityLabel = NSLocalizedString("Back", value: "Back", comment: "Accessibility label for the Back button in the tab toolbar.")
+    public static let TabToolbarForwardButtonAccessibilityLabel = NSLocalizedString("Forward", value: "Forward", comment: "Accessibility Label for the tab toolbar Forward button")
+    public static let TabToolbarShareButtonAccessibilityLabel = NSLocalizedString("Share", tableName: "BraveShared", value: "Share", comment: "Accessibility Label for the browser toolbar Share button")
+    public static let TabToolbarAddTabButtonAccessibilityLabel = NSLocalizedString("AddTab", tableName: "BraveShared", value: "Add Tab", comment: "Accessibility label for the Add Tab button in the Tab Tray.")
+    public static let TabToolbarAccessibilityLabel = NSLocalizedString("NavigationToolbar", value: "Navigation Toolbar", comment: "Accessibility label for the navigation toolbar displayed at the bottom of the screen.")
+}
+
+// PRAGMA MARK: TabTrayController.swift
+public extension Strings {
+    public static let TabAccessibilityCloseActionLabel = NSLocalizedString("Close", value: "Close", comment: "Accessibility label for action denoting closing a tab in tab list (tray)")
+    public static let TabTrayAccessibilityLabel = NSLocalizedString("TabsTray", value: "Tabs Tray", comment: "Accessibility label for the Tabs Tray view.")
+    public static let TabTrayEmptyVoiceOverText = NSLocalizedString("NoTabs", value: "No tabs", comment: "Message spoken by VoiceOver to indicate that there are no tabs in the Tabs Tray")
+    public static let TabTraySingleTabPositionFormatVoiceOverText = NSLocalizedString("TabOf", value: "Tab %@ of %@", comment: "Message spoken by VoiceOver saying the position of the single currently visible tab in Tabs Tray, along with the total number of tabs. E.g. \"Tab 2 of 5\" says that tab 2 is visible (and is the only visible tab), out of 5 tabs total.")
+    public static let TabTrayMultiTabPositionFormatVoiceOverText = NSLocalizedString("TabsToOf", value: "Tabs %@ to %@ of %@", comment: "Message spoken by VoiceOver saying the range of tabs that are currently visible in Tabs Tray, along with the total number of tabs. E.g. \"Tabs 8 to 10 of 15\" says tabs 8, 9 and 10 are visible, out of 15 tabs total.")
+    public static let TabTrayClosingTabAccessibilityNotificationText = NSLocalizedString("ClosingTab", value: "Closing tab", comment: "Accessibility label (used by assistive technology) notifying the user that the tab is being closed.")
+    public static let TabTrayCellCloseAccessibilityHint = NSLocalizedString("SwipeRightOrLeftWithThreeFingersToCloseTheTab", value: "Swipe right or left with three fingers to close the tab.", comment: "Accessibility hint for tab tray's displayed tab.")
+    public static let TabTrayAddTabAccessibilityLabel = NSLocalizedString("AddTab", value: "Add Tab", comment: "Accessibility label for the Add Tab button in the Tab Tray.")
+}
+
+// PRAGMA MARK: TabTrayButtonExtensions.swift
+public extension Strings {
+    public static let TabPrivateModeToggleAccessibilityLabel = NSLocalizedString("PrivateMode", value: "Private Mode", comment: "Accessibility label for toggling on/off private mode")
+    public static let TabPrivateModeToggleAccessibilityHint = NSLocalizedString("TurnsPrivateModeOnOrOff", value: "Turns private mode on or off", comment: "Accessiblity hint for toggling on/off private mode")
+    public static let TabPrivateModeToggleAccessibilityValueOn = NSLocalizedString("On", value: "On", comment: "Toggled ON accessibility value")
+    public static let TabPrivateModeToggleAccessibilityValueOff = NSLocalizedString("Off", value: "Off", comment: "Toggled OFF accessibility value")
+    public static let TabTrayNewTabButtonAccessibilityLabel = NSLocalizedString("NewTab", value: "New Tab", comment: "Accessibility label for the New Tab button in the tab toolbar.")
+    public static let TabTrayShowTabButtonAccessibilityLabel = NSLocalizedString("ToolbarShowTabsButtonAccessibilityLabel", value: "Show Tabs", comment: "Accessibility Label for the tabs button in the tab toolbar")
+}
+
+// PRAGMA MARK: URLBarView.swift
+public extension Strings {
+    public static let URLBarViewLocationTextViewAccessibilityLabel = NSLocalizedString("AddressAndSearch", value: "Address and Search", comment: "Accessibility label for address and search field, both words (Address, Search) are therefore nouns.")
+}
+
+// PRAGMA MARK: LoginListViewController.swift
+public extension Strings {
+    // Titles for selection/deselect/delete buttons
+    public static let LoginListDeselectAllButtonTitle = NSLocalizedString("DeselectAll", value: "Deselect All", comment: "Label for the button used to deselect all logins.")
+    public static let LoginListSelectAllButtonTitle = NSLocalizedString("SelectAll", value: "Select All", comment: "Label for the button used to select all logins.")
+    public static let LoginListDeleteLoginButtonTitle = NSLocalizedString("Delete", value: "Delete", comment: "Label for the button used to delete the current login.")
+    public static let LoginListScreenTitle = NSLocalizedString("Logins", value: "Logins", comment: "Title for Logins List View screen.")
+    public static let LoginListNoLoginTitle = NSLocalizedString("NoLoginsFound", value: "No logins found", comment: "Label displayed when no logins are found after searching.")
+}
+
+// PRAGMA MARK: LoginDetailViewController.swift
+public extension Strings {
+    public static let LoginDetailUsernameCellTitle = NSLocalizedString("Username", value: "username", comment: "Label displayed above the username row in Login Detail View.")
+    public static let LoginDetailPasswordCellTitle = NSLocalizedString("Password", value: "password", comment: "Label displayed above the password row in Login Detail View.")
+    public static let LoginDetailWebsiteCellTitle = NSLocalizedString("Website", value: "website", comment: "Label displayed above the website row in Login Detail View.")
+    public static let LoginDetailLastModifiedCellFormatTitle  = NSLocalizedString("LastModified", value: "Last modified %@", comment: "Footer label describing when the current login was last modified with the timestamp as the parameter.")
+    public static let LoginDetailDeleteCellTitle = NSLocalizedString("Delete", value: "Delete", comment: "Label for the button used to delete the current login.")
+}
+
+// PRAGMA MARK: ReaderModeHandlers.swift
+public extension Strings {
+    public static let ReaderModeLoadingContentDisplayText = NSLocalizedString("LoadingContent", value: "Loading content…", comment: "Message displayed when the reader mode page is loading. This message will appear only when sharing to Firefox reader mode from another app.")
+    public static let ReaderModePageCantShowDisplayText = NSLocalizedString("ThePageCouldNotBeDisplayedInReaderView", value: "The page could not be displayed in Reader View.", comment: "Message displayed when the reader mode page could not be loaded. This message will appear only when sharing to Firefox reader mode from another app.")
+    public static let ReaderModeLoadOriginalLinkText = NSLocalizedString("LoadOriginalPage", value: "Load original page", comment: "Link for going to the non-reader page when the reader view could not be loaded. This message will appear only when sharing to Firefox reader mode from another app.")
+    public static let ReaderModeErrorConvertDisplayText = NSLocalizedString("ThereWasAnErrorConvertingThePage", value: "There was an error converting the page", comment: "Error displayed when reader mode cannot be enabled")
+}
+
+// PRAGMA MARK: ReaderModeStyleViewController.swift
+public extension Strings {
+    public static let ReaderModeBrightSliderAccessibilityLabel = NSLocalizedString("Brightness", value: "Brightness", comment: "Accessibility label for brightness adjustment slider in Reader Mode display settings")
+    public static let ReaderModeFontTypeButtonAccessibilityHint = NSLocalizedString("ChangesFontType", value: "Changes font type.", comment: "Accessibility hint for the font type buttons in reader mode display settings")
+    public static let ReaderModeFontButtonSansSerifTitle = NSLocalizedString("SansSerif", value: "Sans-serif", comment: "Font type setting in the reading view settings")
+    public static let ReaderModeFontButtonSerifTitle = NSLocalizedString("Serif", value: "Serif", comment: "Font type setting in the reading view settings")
+    public static let ReaderModeSmallerFontButtonTitle = NSLocalizedString("", value: "-", comment: "Button for smaller reader font size. Keep this extremely short! This is shown in the reader mode toolbar.")
+    public static let ReaderModeSmallerFontButtonAccessibilityLabel = NSLocalizedString("DecreaseTextSize", value: "Decrease text size", comment: "Accessibility label for button decreasing font size in display settings of reader mode")
+    public static let ReaderModeBiggerFontButtonTitle = NSLocalizedString("", value: "+", comment: "Button for larger reader font size. Keep this extremely short! This is shown in the reader mode toolbar.")
+    public static let ReaderModeBiggerFontButtonAccessibilityLabel = NSLocalizedString("IncreaseTextSize", value: "Increase text size", comment: "Accessibility label for button increasing font size in display settings of reader mode")
+    public static let ReaderModeFontSizeLabelText = NSLocalizedString("Aa", value: "Aa", comment: "Button for reader mode font size. Keep this extremely short! This is shown in the reader mode toolbar.")
+    public static let ReaderModeThemeButtonAccessibilityHint = NSLocalizedString("ChangesColorTheme", value: "Changes color theme.", comment: "Accessibility hint for the color theme setting buttons in reader mode display settings")
+    public static let ReaderModeThemeButtonTitleLight = NSLocalizedString("Light", value: "Light", comment: "Light theme setting in Reading View settings")
+    public static let ReaderModeThemeButtonTitleDark = NSLocalizedString("Dark", value: "Dark", comment: "Dark theme setting in Reading View settings")
+    public static let ReaderModeThemeButtonTitleSepia = NSLocalizedString("Sepia", value: "Sepia", comment: "Sepia theme setting in Reading View settings")
+}
+
+// PRAGMA MARK: SearchEnginePicker.swift
+public extension Strings {
+    public static let SearchEnginePickerNavTitle = NSLocalizedString("SearchPickerDefaultSearchEngineTitle", value: "Default Search Engine", comment: "Title for default search engine picker.")
+    public static let SearchEnginePickerCancelButtonTitle = NSLocalizedString("Cancel", value: "Cancel", comment: "Label for Cancel button")
+}
+
+// PRAGMA MARK: SearchSettingsTableViewController.swift
+public extension Strings {
+    public static let SearchSettingNavTitle = NSLocalizedString("SettingsSearchNavigationTitle", value: "Search", comment: "Navigation title for search settings.")
+    public static let SearchSettingSuggestionCellTitle = NSLocalizedString("ShowSearchSuggestions", value: "Show Search Suggestions", comment: "Label for show search suggestions setting.")
+}
+
+// PRAGMA MARK: SettingsContentViewController.swift
+public extension Strings {
+    public static let SettingsContentLoadErrorMessage = NSLocalizedString("CouldNotLoadPage", value: "Could not load page.", comment: "Error message that is shown in settings when there was a problem loading")
+}
+
+// PRAGMA MARK: TabsButton.swift
+public extension Strings {
+    public static let BrowserToolbarShowTabsButtonAccessibilityLabel = NSLocalizedString("BrowserToolbarShowTabsButtonAccessibilityLabel", value: "Show Tabs", comment: "Accessibility label for the tabs button in the (top) tab toolbar")
+}
+
+// PRAGMA MARK: SearchInputView.swift
+public extension Strings {
+    public static let SearchInputViewTextFieldAccessibilityLabel = NSLocalizedString("SearchInputField", value: "Search Input Field", comment: "Accessibility label for the search input field in the Logins list")
+    public static let SearchInputViewTitle = NSLocalizedString("SearchFieldTitle", value: "Search", comment: "Title for the search field at the top of the Logins list screen")
+    public static let SearchInputViewClearButtonTitle = NSLocalizedString("ClearSearch", value: "Clear Search", comment: "Accessibility message e.g. spoken by VoiceOver after the user taps the close button in the search field to clear the search and exit search mode")
+    public static let SearchInputViewOverlayAccessibilityLabel = NSLocalizedString("EnterSearchMode", value: "Enter Search Mode", comment: "Accessibility label for entering search mode for logins")
+}
+
+// PRAGMA MARK: MenuHelper.swift
+public extension Strings {
+    public static let MenuItemRevealPasswordTitle = NSLocalizedString("Reveal", value: "Reveal", comment: "Reveal password text selection menu item")
+    public static let MenuItemHidePasswordTitle = NSLocalizedString("Hide", value: "Hide", comment: "Hide password text selection menu item")
+    public static let MenuItemCopyTitle = NSLocalizedString("Copy", value: "Copy", comment: "Copy password text selection menu item")
+    public static let MenuItemOpenAndFillTitle = NSLocalizedString("OpenFill", value: "Open & Fill", comment: "Open and Fill website text selection menu item")
+    public static let MenuItemFindInPageTitle = NSLocalizedString("FindInPage", value: "Find in Page", comment: "Text selection menu item")
+}
+
+// PRAGMA MARK: AuthenticationManagerConstants.swift
+public extension Strings {
+    public static let AuthenticationPasscode =
+        NSLocalizedString("PasscodeForLogins", value: "Passcode For Logins", comment: "Label for the Passcode item in Settings")
+    
+    public static let AuthenticationTouchIDPasscodeSetting =
+        NSLocalizedString("TouchIDPasscode", value: "Touch ID & Passcode", comment: "Label for the Touch ID/Passcode item in Settings")
+    
+    public static let AuthenticationFaceIDPasscodeSetting =
+        NSLocalizedString("FaceIDPasscode", value: "Face ID & Passcode", comment: "Label for the Face ID/Passcode item in Settings")
+    
+    public static let AuthenticationRequirePasscode =
+        NSLocalizedString("RequirePasscode", value: "Require Passcode", comment: "Text displayed in the 'Interval' section, followed by the current interval setting, e.g. 'Immediately'")
+    
+    public static let AuthenticationEnterAPasscode =
+        NSLocalizedString("EnterAPasscode", value: "Enter a passcode", comment: "Text displayed above the input field when entering a new passcode")
+    
+    public static let AuthenticationEnterPasscodeTitle =
+        NSLocalizedString("EnterPasscode", value: "Enter Passcode", comment: "Title of the dialog used to request the passcode")
+    
+    public static let AuthenticationEnterPasscode =
+        NSLocalizedString("EnterPasscode", value: "Enter passcode", comment: "Text displayed above the input field when changing the existing passcode")
+    
+    public static let AuthenticationReenterPasscode =
+        NSLocalizedString("ReEnterPasscode", value: "Re-enter passcode", comment: "Text displayed above the input field when confirming a passcode")
+    
+    public static let AuthenticationSetPasscode =
+        NSLocalizedString("SetPasscode", value: "Set Passcode", comment: "Title of the dialog used to set a passcode")
+    
+    public static let AuthenticationTurnOffPasscode =
+        NSLocalizedString("TurnPasscodeOff", value: "Turn Passcode Off", comment: "Label used as a setting item to turn off passcode")
+    
+    public static let AuthenticationTurnOnPasscode =
+        NSLocalizedString("TurnPasscodeOn", value: "Turn Passcode On", comment: "Label used as a setting item to turn on passcode")
+    
+    public static let AuthenticationChangePasscode =
+        NSLocalizedString("ChangePasscode", value: "Change Passcode", comment: "Label used as a setting item and title of the following screen to change the current passcode")
+    
+    public static let AuthenticationEnterNewPasscode =
+        NSLocalizedString("EnterANewPasscode", value: "Enter a new passcode", comment: "Text displayed above the input field when changing the existing passcode")
+    
+    public static let AuthenticationImmediately =
+        NSLocalizedString("Immediately", value: "Immediately", comment: "Immediately' interval item for selecting when to require passcode")
+    
+    public static let AuthenticationOneMinute =
+        NSLocalizedString("After1Minute", value: "After 1 minute", comment: "After 1 minute' interval item for selecting when to require passcode")
+    
+    public static let AuthenticationFiveMinutes =
+        NSLocalizedString("After5Minutes", value: "After 5 minutes", comment: "After 5 minutes' interval item for selecting when to require passcode")
+    
+    public static let AuthenticationTenMinutes =
+        NSLocalizedString("After10Minutes", value: "After 10 minutes", comment: "After 10 minutes' interval item for selecting when to require passcode")
+    
+    public static let AuthenticationFifteenMinutes =
+        NSLocalizedString("After15Minutes", value: "After 15 minutes", comment: "After 15 minutes' interval item for selecting when to require passcode")
+    
+    public static let AuthenticationOneHour =
+        NSLocalizedString("After1Hour", value: "After 1 hour", comment: "After 1 hour' interval item for selecting when to require passcode")
+    
+    public static let AuthenticationLoginsTouchReason =
+        NSLocalizedString("UseYourFingerprintToAccessLoginsNow", value: "Use your fingerprint to access Logins now.", comment: "Touch ID prompt subtitle when accessing logins")
+    
+    public static let AuthenticationRequirePasscodeTouchReason =
+        NSLocalizedString("TouchidRequirePasscodeReasonLabel", value: "Use your fingerprint to access configuring your required passcode interval.", comment: "Touch ID prompt subtitle when accessing the require passcode setting")
+    
+    public static let AuthenticationDisableTouchReason =
+        NSLocalizedString("TouchidDisableReasonLabel", value: "Use your fingerprint to disable Touch ID.", comment: "Touch ID prompt subtitle when disabling Touch ID")
+    
+    public static let AuthenticationWrongPasscodeError =
+        NSLocalizedString("IncorrectPasscodeTryAgain", value: "Incorrect passcode. Try again.", comment: "Error message displayed when user enters incorrect passcode when trying to enter a protected section of the app")
+    
+    public static let AuthenticationIncorrectAttemptsRemaining =
+        NSLocalizedString("IncorrectPasscodeTryAgainAttemptsRemainingd", value: "Incorrect passcode. Try again (Attempts remaining: %d).", comment: "Error message displayed when user enters incorrect passcode when trying to enter a protected section of the app with attempts remaining")
+    
+    public static let AuthenticationMaximumAttemptsReached =
+        NSLocalizedString("MaximumAttemptsReachedPleaseTryAgainInAnHour", value: "Maximum attempts reached. Please try again in an hour.", comment: "Error message displayed when user enters incorrect passcode and has reached the maximum number of attempts.")
+    
+    public static let AuthenticationMaximumAttemptsReachedNoTime =
+        NSLocalizedString("MaximumAttemptsReachedPleaseTryAgainLater", value: "Maximum attempts reached. Please try again later.", comment: "Error message displayed when user enters incorrect passcode and has reached the maximum number of attempts.")
+}
+
+
+// PRAGMA MARK:
+public extension Strings {
+    
+}
+
+// PRAGMA MARK:Settings.
 public extension Strings {
     public static let ClearPrivateData = NSLocalizedString("ClearPrivateData", tableName: "BraveShared", value: "Clear Private Data", comment: "Button in settings that clears private data for the selected items. Also used as section title in settings panel")
 }
 
-// Error pages.
+// PRAGMA MARK:Error pages.
 public extension Strings {
     public static let ErrorPagesAdvancedButton = NSLocalizedString("Advanced", tableName: "BraveShared", value: "Advanced", comment: "Label for button to perform advanced actions on the error page")
     public static let ErrorPagesAdvancedWarning1 = NSLocalizedString("WarningWeCantConfirmYourConnectionToThisWebsiteIsSecure", tableName: "BraveShared", value: "Warning: we can't confirm your connection to this website is secure.", comment: "Warning text when clicking the Advanced button on error pages")
@@ -42,7 +357,7 @@ public extension Strings {
     public static let ErrorPagesVisitOnceButton = NSLocalizedString("VisitSiteAnyway", tableName: "BraveShared", value: "Visit site anyway", comment: "Button label to temporarily continue to the site from the certificate error page")
 }
 
-// Logins Helper.
+// PRAGMA MARK:Logins Helper.
 public extension Strings {
     public static let SaveLogin = NSLocalizedString("SaveLogin", tableName: "BraveShared", value: "Save Login", comment: "Button to save the user's password")
     public static let DontSave = NSLocalizedString("DontSave", tableName: "BraveShared", value: "Don’t Save", comment: "Button to not save the user's password")
@@ -50,21 +365,10 @@ public extension Strings {
 }
 
 public extension Strings {
-//    public static let ReloadPageTitle = NSLocalizedString("ReloadPage", tableName: "BraveShared", value: "Reload Page", comment: "")
-//    public static let BackTitle = NSLocalizedString("Back", tableName: "BraveShared", value: "Back", comment: "")
-//    public static let ForwardTitle = NSLocalizedString("Forward", tableName: "BraveShared", value: "Forward", comment: "")
-    
-//    public static let FindTitle = NSLocalizedString("Find", tableName: "BraveShared", value: "Find", comment: "")
-//    public static let SelectLocationBarTitle = NSLocalizedString("SelectLocationBar", tableName: "BraveShared", value: "Select Location Bar", comment: "")
-//    public static let NewTabTitle = NSLocalizedString("NewTab", tableName: "BraveShared", value: "New Tab", comment: "")
-//    public static let NewPrivateTabTitle = NSLocalizedString("NewPrivateTab", tableName: "BraveShared", value: "New Private Tab", comment: "")
     public static let Home = NSLocalizedString("Home", tableName: "BraveShared", value: "Home", comment: "")
     public static let SearchNewTabTitle = NSLocalizedString("SearchInNewTab", tableName: "BraveShared", value: "Search in New Tab", comment: "")
     public static let SearchNewPrivateTabTitle = NSLocalizedString("SearchInNewPrivateTab", tableName: "BraveShared", value: "Search in New Private Tab", comment: "")
     public static let CloseAllTabsTitle = NSLocalizedString("CloseAlliTabs", tableName: "BraveShared", value: "Close All %i Tabs", comment: "")
-//    public static let CloseTabTitle = NSLocalizedString("CloseTab", tableName: "BraveShared", value: "Close Tab", comment: "")
-//    public static let ShowNextTabTitle = NSLocalizedString("ShowNextTab", tableName: "BraveShared", value: "Show Next Tab", comment: "")
-//    public static let ShowPreviousTabTitle = NSLocalizedString("ShowPreviousTab", tableName: "BraveShared", value: "Show Previous Tab", comment: "")
 }
 
 public extension Strings {
@@ -127,7 +431,7 @@ public extension Strings {
     public static let Reload = NSLocalizedString("Reload", tableName: "BraveShared", value: "Reload", comment: "Accessibility Label for the browser toolbar Reload button")
     public static let Back = NSLocalizedString("Back", tableName: "BraveShared", value: "Back", comment: "Accessibility Label for the browser toolbar Back button")
     public static let Forward = NSLocalizedString("Forward", tableName: "BraveShared", value: "Forward", comment: "Accessibility Label for the browser toolbar Forward button")
-    public static let Share = NSLocalizedString("Share", tableName: "BraveShared", value: "Share", comment: "Accessibility Label for the browser toolbar Share button")
+    
     public static let PasswordManager = NSLocalizedString("PasswordManager", tableName: "BraveShared", value: "Password Manager", comment: "Accessibility Label for the browser toolbar Password Manager button")
     public static let Bookmark = NSLocalizedString("Bookmark", tableName: "BraveShared", value: "Bookmark", comment: "Accessibility Label for the browser toolbar Bookmark button")
     public static let FavoritesFolder = NSLocalizedString("Favorites", tableName: "BraveShared", value: "Favorites", comment: "Folder for storing favorite bookmarks.")
@@ -179,7 +483,7 @@ public extension Strings {
     public static let Tabs_Tray = NSLocalizedString("TabsTray", tableName: "BraveShared", value: "Tabs Tray", comment: "Accessibility label for the Tabs Tray view.")
     public static let Tabs = NSLocalizedString("Tabs", tableName: "BraveShared", value: "Tabs", comment: "Accessibility label for the Tabs.")
     public static let Tab = NSLocalizedString("Tab", tableName: "BraveShared", value: "Tab", comment: "Accessibility label for a Tab.")
-    public static let Add_Tab = NSLocalizedString("AddTab", tableName: "BraveShared", value: "Add Tab", comment: "Accessibility label for the Add Tab button in the Tab Tray.")
+    
     public static let No_tabs = NSLocalizedString("NoTabs", tableName: "BraveShared", value: "No tabs", comment: "Message spoken by VoiceOver to indicate that there are no tabs in the Tabs Tray")
     public static let Tab_xofx_template = NSLocalizedString("TabOf", tableName: "BraveShared", value: "Tab %@ of %@", comment: "Message spoken by VoiceOver saying the position of the single currently visible tab in Tabs Tray, along with the total number of tabs. E.g. \"Tab 2 of 5\" says that tab 2 is visible (and is the only visible tab), out of 5 tabs total.")
     public static let Tabs_xtoxofx_template = NSLocalizedString("TabsToOf", tableName: "BraveShared", value: "Tabs %@ to %@ of %@", comment: "Message spoken by VoiceOver saying the range of tabs that are currently visible in Tabs Tray, along with the total number of tabs. E.g. \"Tabs 8 to 10 of 15\" says tabs 8, 9 and 10 are visible, out of 15 tabs total.")
@@ -286,38 +590,6 @@ public extension Strings {
 }
 
 public extension Strings {
-    public static let RevealPassword = NSLocalizedString("Reveal", tableName: "BraveShared", value: "Reveal", comment: "Reveal password text selection menu item")
-    public static let HidePassword = NSLocalizedString("Hide", tableName: "BraveShared", value: "Hide", comment: "Hide password text selection menu item")
-    public static let Copy = NSLocalizedString("Copy", tableName: "BraveShared", value: "Copy", comment: "")
-    public static let Open_and_Fill = NSLocalizedString("OpenFill", tableName: "BraveShared", value: "Open & Fill", comment: "Open and Fill website text selection menu item")
-    
-    public static let Just_now = NSLocalizedString("JustNow", tableName: "BraveShared", value: "just now", comment: "Relative time for a tab that was visited within the last few moments.")
-    
-    public static let More_than_a_month = NSLocalizedString("MoreThanAMonthAgo", tableName: "BraveShared", value: "more than a month ago", comment: "Relative date for dates older than a month and less than two months.")
-    public static let More_than_a_week = NSLocalizedString("MoreThanAWeekAgo", tableName: "BraveShared", value: "more than a week ago", comment: "Description for a date more than a week ago, but less than a month ago.")
-    public static let This_week = NSLocalizedString("ThisWeek", tableName: "BraveShared", value: "this week", comment: "Relative date for date in past week.")
-    public static let Today_at_template = NSLocalizedString("TodayAt", tableName: "BraveShared", value: "today at %@", comment: "Relative date for date older than a minute.")
-    
-    public static let Brave_would_like_to_access_your_photos = NSLocalizedString("BraveWouldLikeToAccessYourPhotos", tableName: "BraveShared", value: "Brave would like to access your Photos", comment: "See http://mzl.la/1G7uHo7")
-    public static let Added_page_to_reading_list = NSLocalizedString("AddedPageToReadingList", tableName: "BraveShared", value: "Added page to Reading List", comment: "Accessibility message e.g. spoken by VoiceOver after the current page gets added to the Reading List using the Reader View button, e.g. by long-pressing it or by its accessibility custom action.")
-    
-    public static let Search_Settings = NSLocalizedString("SearchSettings", tableName: "BraveShared", value: "Search Settings", comment: "")
-    public static let Search = NSLocalizedString("Search", tableName: "BraveShared", value: "Search", comment: "")
-    public static let SearchInPage = NSLocalizedString("SearchInPage", tableName: "BraveShared", value: "Search in page", comment: "")
-    public static let FindInPage = NSLocalizedString("Find", tableName: "BraveShared", value: "Find \"%@\"", comment: "Find text in page.")
-}
-
-public extension Strings {
-    
-    public static let BookmarksFolderTitleMobile = NSLocalizedString("MobileBookmarks", tableName: "BraveShared", value: "Mobile Bookmarks", comment: "The title of the folder that contains mobile bookmarks. This should match bookmarks.folder.mobile.label on Android.")
-    public static let BookmarksFolderTitleMenu = NSLocalizedString("BookmarksMenu", tableName: "BraveShared", value: "Bookmarks Menu", comment: "The name of the folder that contains desktop bookmarks in the menu. This should match bookmarks.folder.menu.label on Android.")
-    public static let BookmarksFolderTitleToolbar = NSLocalizedString("BookmarksToolbar", tableName: "BraveShared", value: "Bookmarks Toolbar", comment: "The name of the folder that contains desktop bookmarks in the toolbar. This should match bookmarks.folder.toolbar.label on Android.")
-    public static let BookmarksFolderTitleUnsorted = NSLocalizedString("UnsortedBookmarks", tableName: "BraveShared", value: "Unsorted Bookmarks", comment: "The name of the folder that contains unsorted desktop bookmarks. This should match bookmarks.folder.unfiled.label on Android.")
-    public static let DefaultTitleUntitled = NSLocalizedString("DefaultBookmarkTitle", tableName: "BraveShared", value: "Untitled", comment: "The default name for bookmark item without titles.")
-    public static let desktopBookmarksLabel = NSLocalizedString("DesktopBookmarks", tableName: "BraveShared", value: "Desktop Bookmarks", comment: "The folder name for the virtual folder that contains all desktop bookmarks.")
-}
-
-public extension Strings {
     public static let Block_Popups = NSLocalizedString("BlockPopups", tableName: "BraveShared", value: "Block Popups", comment: "Setting to enable popup blocking")
     public static let Show_Tabs_Bar = NSLocalizedString("ShowTabsBar", tableName: "BraveShared", value: "Show Tabs Bar", comment: "Setting to show/hide the tabs bar")
     public static let Private_Browsing_Only = NSLocalizedString("PrivateBrowsingOnly", tableName: "BraveShared", value: "Private Browsing Only", comment: "Setting to keep app in private mode")
@@ -388,56 +660,4 @@ If an employer manages your device, they might also keep track of what you do wi
     public static let DDG_callout_no = NSLocalizedString("No", tableName: "BraveShared", value: "No", comment: "DuckDuckGo callout no action.")
     public static let DDG_callout_enable = NSLocalizedString("Yes", tableName: "BraveShared", value: "Yes", comment: "DuckDuckGo callout enable action.")
     public static let DDG_promotion = NSLocalizedString("LearnAboutPrivateSearchrwithDuckDuckGo", tableName: "BraveShared", value: "Learn about private search \rwith DuckDuckGo", comment: "DuckDuckGo promotion label.")
-}
-
-// SYNC.
-public extension Strings {
-    public static let QRCode = NSLocalizedString("QRCode", tableName: "BraveShared", value: "QR Code", comment: "QR Code section title")
-    public static let CodeWords = NSLocalizedString("CodeWords", tableName: "BraveShared", value: "Code Words", comment: "Code words section title")
-    public static let Sync = NSLocalizedString("Sync", tableName: "BraveShared", value: "Sync", comment: "Sync settings section title")
-    public static let BraveSync = NSLocalizedString("BraveSync", tableName: "BraveShared", value: "Brave Sync", comment: "Brave sync page title")
-    public static let BraveSyncWelcome = NSLocalizedString("BraveSyncAllowsYouToSyncBookmarksDataPrivatelyBetweenYourBraveBrowsersOnYourVariousDevicesrrSimplyScanTheCodeFromYourSyncChainThatYouCreatedOnAnotherDeviceOrStartANewSyncChain", tableName: "BraveShared", value: "Brave Sync allows you to sync bookmarks data privately between your Brave Browsers on your various devices. \r\rSimply scan the code from your sync chain that you created on another device. Or start a new sync chain. ", comment: "Sync settings welcome")
-    public static let NewSyncCode = NSLocalizedString("StartANewSyncChain", tableName: "BraveShared", value: "Start a new sync chain", comment: "New sync code button title")
-    public static let ScanSyncCode = NSLocalizedString("ScanOrEnterSyncCode", tableName: "BraveShared", value: "Scan or enter sync code", comment: "Scan sync code button title")
-    public static let Scan = NSLocalizedString("Scan", tableName: "BraveShared", value: "Scan", comment: "Scan sync code title")
-    public static let SyncAddDevice = NSLocalizedString("AddDevice", tableName: "BraveShared", value: "Add Device", comment: "Add device to sync")
-    public static let SyncAddDeviceScan = NSLocalizedString("ScanThisSyncCode", tableName: "BraveShared", value: "Scan this sync code", comment: "Add mobile device to sync with scan")
-    public static let SyncAddDeviceWords = NSLocalizedString("EnterTheSyncCode", tableName: "BraveShared", value: "Enter the sync code", comment: "Add device to sync with code words")
-    public static let SyncToDevice = NSLocalizedString("SyncToDevice", tableName: "BraveShared", value: "Sync to device", comment: "Sync to existing device")
-    public static let SyncToDeviceDescription = NSLocalizedString("UsingExistingSyncedDeviceOpenBraveSettingsAndNavigateToDevicesSettingsTapToAddANewDeviceAndRevealSyncCode", tableName: "BraveShared", value: "Using existing synced device open Brave Settings and navigate to “Devices & Settings”, tap ‘+’ to add a new device and reveal sync code.", comment: "Sync to existing device description")
-    
-    public static let SyncAddMobileScanDescription = NSLocalizedString("UsingASecondPhoneOrTabletNavigateToBraveSettingsSyncScannnCaptureTheQRCodeaboveWithYourSecondDeviceOrEnterCodeWordsIfNoCameraIsAvailable", tableName: "BraveShared", value: "Using a second phone or tablet, navigate to Brave Settings > Sync > Scan. \n\nCapture the QR Code (above) with your second device, or enter code words if no camera is available.", comment: "Sync add device description")
-    public static let SyncAddMobileWordsDescription = NSLocalizedString("UsingASecondPhoneOrTabletNavigateToBraveSettingsSyncChooseEnterASyncChainCodennEnterTheCodeWordsAboveIncludingSpaces", tableName: "BraveShared", value: "Using a second phone or tablet, navigate to Brave Settings > Sync. Choose “Enter a Sync Chain Code.” \n\nEnter the code words above, including spaces.", comment: "Sync add device description")
-    
-    public static let SyncAddComputerScanDescription = NSLocalizedString("OnYourComputerNavigateToBraveSettingsSyncScannnCaptureTheQRCodeaboveWithYourSecondDeviceOrEnterCodeWordsIfNoCameraIsAvailable", tableName: "BraveShared", value: "On your computer, navigate to Brave Settings > Sync > Scan. \n\nCapture the QR Code (above) with your second device, or enter code words if no camera is available.", comment: "Sync add device description")
-    public static let SyncAddComputerWordsDescription = NSLocalizedString("OnYourComputerNavigateToBraveSettingsSyncChooseEnterASyncChainCodennEnterTheCodeWordsAboveIncludingSpaces", tableName: "BraveShared", value: "On your computer, navigate to Brave Settings > Sync. Choose “Enter a Sync Chain Code.” \n\nEnter the code words above, including spaces.", comment: "Sync add device description")
-    
-    public static let EnterCodeWords = NSLocalizedString("EnterCodeWords", tableName: "BraveShared", value: "Enter code words", comment: "Sync enter code words")
-    public static let ShowCodeWords = NSLocalizedString("ShowCodeWordsInstead", tableName: "BraveShared", value: "Show code words instead", comment: "Show code words instead")
-    public static let SyncDevices = NSLocalizedString("DevicesSettings", tableName: "BraveShared", value: "Devices & Settings", comment: "Sync you browser settings across devices.")
-    public static let Devices = NSLocalizedString("Devices", tableName: "BraveShared", value: "Devices", comment: "Sync device settings page title.")
-    
-    public static let EnterCodeWordsBelow = NSLocalizedString("EnterCodeWordsBelow", tableName: "BraveShared", value: "Enter code words below", comment: "Enter sync code words below")
-    public static let SyncRemoveThisDevice = NSLocalizedString("RemoveThisDevice", tableName: "BraveShared", value: "Remove this device", comment: "Sync remove device.")
-    public static let SyncRemoveThisDeviceQuestion = NSLocalizedString("RemoveThisDevice", tableName: "BraveShared", value: "Remove this device?", comment: "Sync remove device?")
-    public static let SyncRemoveThisDeviceQuestionDesc = NSLocalizedString("ThisDeviceWillBeDisconnectedFromSyncGroupAndNoLongerReceiveOrSendSyncDataAllExistingDataWillRemainOnDevice", tableName: "BraveShared", value: "This device will be disconnected from sync group and no longer receive or send sync data. All existing data will remain on device.", comment: "Sync remove device?")
-    public static let Pair = NSLocalizedString("Pair", tableName: "BraveShared", value: "Pair", comment: "Sync pair device settings section title")
-    public static let SyncDeviceSettingsFooter = NSLocalizedString("ChangingSettingsWillOnlyAffectDataThatThisDeviceSharesWithOthers", tableName: "BraveShared", value: "Changing settings will only affect data that this device shares with others.", comment: "Sync device settings footer details")
-    public static let SyncAddAnotherDevice = NSLocalizedString("AddAnotherDevice", tableName: "BraveShared", value: "Add another device", comment: "Add another device cell button.")
-    public static let SyncAddMobileButton = NSLocalizedString("AddAMobileDevice", tableName: "BraveShared", value: "Add a Mobile Device", comment: "Add mobile device button title")
-    public static let SyncAddComputerButton = NSLocalizedString("AddAComputer", tableName: "BraveShared", value: "Add a Computer", comment: "Add mobile device button title")
-    
-    public static let Copied = NSLocalizedString("Copied", tableName: "BraveShared", value: "Copied!", comment: "Copied action complete title")
-    
-    public static let WordCount = NSLocalizedString("WordCounti", tableName: "BraveShared", value: "Word count: %i", comment: "Word count title")
-    
-    public static let UnableToConnectTitle = NSLocalizedString("UnableToConnect", tableName: "BraveShared", value: "Unable to Connect", comment: "Sync Alert")
-    public static let UnableToConnectDescription = NSLocalizedString("UnableToJoinSyncGroupPleaseCheckTheEnteredWordsAndTryAgain", tableName: "BraveShared", value: "Unable to join sync group. Please check the entered words and try again.", comment: "Sync Alert")
-    
-    public static let NotEnoughWordsTitle = NSLocalizedString("NotEnoughWords", tableName: "BraveShared", value: "Not Enough Words", comment: "Sync Alert")
-    public static let NotEnoughWordsDescription = NSLocalizedString("PleaseEnterAllOfTheWordsAndTryAgain", tableName: "BraveShared", value: "Please enter all of the words and try again.", comment: "Sync Alert")
-    
-    public static let CodeWordInputHelp = NSLocalizedString("UsingExistingSyncedDeviceOpenBraveSettingsAndNavigateToSettingsSyncChooseAddDeviceThenDisplayCodeWordsInstead", tableName: "BraveShared", value: "Using existing synced device, open Brave Settings and navigate to Settings > Sync. Choose “Add Device” then “Display code words instead”", comment: "Code words input help")
-    public static let CopyToClipboard = NSLocalizedString("CopyToClipboard", tableName: "BraveShared", value: "Copy to Clipboard", comment: "Copy codewords title")
-    public static let CopiedToClipboard = NSLocalizedString("CopiedToClipboard", tableName: "BraveShared", value: "Copied to Clipboard!", comment: "Copied codewords title")
 }

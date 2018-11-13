@@ -304,15 +304,15 @@ extension Strings {
 }
 
 // Add Custom Search Engine
-extension Strings {
-    public static let SettingsAddCustomEngine = NSLocalizedString("SettingsAddCustomEngine", value: "Add Search Engine", comment: "The button text in Search Settings that opens the Custom Search Engine view.")
-    public static let SettingsAddCustomEngineTitle = NSLocalizedString("SettingsAddCustomEngineTitle", value: "Add Search Engine", comment: "The title of the  Custom Search Engine view.")
-    public static let SettingsAddCustomEngineTitleLabel = NSLocalizedString("SettingsAddCustomEngineTitleLabel", value: "Title", comment: "The title for the field which sets the title for a custom search engine.")
-    public static let SettingsAddCustomEngineURLLabel = NSLocalizedString("SettingsAddCustomEngineURLLabel", value: "URL", comment: "The title for URL Field")
-    public static let SettingsAddCustomEngineTitlePlaceholder = NSLocalizedString("SettingsAddCustomEngineTitlePlaceholder", value: "Search Engine", comment: "The placeholder for Title Field when saving a custom search engine.")
-    public static let SettingsAddCustomEngineURLPlaceholder = NSLocalizedString("SettingsAddCustomEngineURLPlaceholder", value: "URL (Replace Query with %s)", comment: "The placeholder for URL Field when saving a custom search engine")
-    public static let SettingsAddCustomEngineSaveButtonText = NSLocalizedString("SettingsAddCustomEngineSaveButtonText", value: "Save", comment: "The text on the Save button when saving a custom search engine")
-}
+//extension Strings {
+//    public static let SettingsAddCustomEngine = NSLocalizedString("SettingsAddCustomEngine", value: "Add Search Engine", comment: "The button text in Search Settings that opens the Custom Search Engine view.")
+//    public static let SettingsAddCustomEngineTitle = NSLocalizedString("SettingsAddCustomEngineTitle", value: "Add Search Engine", comment: "The title of the  Custom Search Engine view.")
+//    public static let SettingsAddCustomEngineTitleLabel = NSLocalizedString("SettingsAddCustomEngineTitleLabel", value: "Title", comment: "The title for the field which sets the title for a custom search engine.")
+//    public static let SettingsAddCustomEngineURLLabel = NSLocalizedString("SettingsAddCustomEngineURLLabel", value: "URL", comment: "The title for URL Field")
+//    public static let SettingsAddCustomEngineTitlePlaceholder = NSLocalizedString("SettingsAddCustomEngineTitlePlaceholder", value: "Search Engine", comment: "The placeholder for Title Field when saving a custom search engine.")
+//    public static let SettingsAddCustomEngineURLPlaceholder = NSLocalizedString("SettingsAddCustomEngineURLPlaceholder", value: "URL (Replace Query with %s)", comment: "The placeholder for URL Field when saving a custom search engine")
+//    public static let SettingsAddCustomEngineSaveButtonText = NSLocalizedString("SettingsAddCustomEngineSaveButtonText", value: "Save", comment: "The text on the Save button when saving a custom search engine")
+//}
 
 // Context menu ButtonToast instances.
 extension Strings {
@@ -376,41 +376,41 @@ extension Strings {
 }
 
 // ContentBlocker/TrackingProtection strings
-extension Strings {
-    public static let SettingsTrackingProtectionSectionName = NSLocalizedString("SettingsTrackingProtectionSectionName", value: "Tracking Protection", comment: "Row in top-level of settings that gets tapped to show the tracking protection settings detail view.")
-    public static let TrackingProtectionOptionOnInPrivateBrowsing = NSLocalizedString("SettingsTrackingProtectionOptionOnInPrivateBrowsingLabel", value: "Private Browsing Mode", comment: "Settings option to specify that Tracking Protection is on only in Private Browsing mode.")
-    public static let TrackingProtectionOptionOnInNormalBrowsing = NSLocalizedString("SettingsTrackingProtectionOptionOnInNormalBrowsingLabel", value: "Normal Browsing Mode", comment: "Settings option to specify that Tracking Protection is on only in Private Browsing mode.")
-    public static let TrackingProtectionOptionOnOffHeader = NSLocalizedString("SettingsTrackingProtectionOptionEnabledStateHeaderLabel", value: "Enable", comment: "Description label shown at the top of tracking protection options screen.")
-    public static let TrackingProtectionOptionOnOffFooter = NSLocalizedString("SettingsTrackingProtectionOptionEnabledStateFooterLabel", value: "Tracking is the collection of your browsing data across multiple websites.", comment: "Description label shown on tracking protection options screen.")
-    public static let TrackingProtectionOptionBlockListsTitle = NSLocalizedString("SettingsTrackingProtectionBlockListsTitle", value: "Block Lists", comment: "Title for tracking protection options section where Basic/Strict block list can be selected")
-    public static let TrackingProtectionOptionBlockListsHeader = NSLocalizedString("SettingsTrackingProtectionBlockListsHeader", value: "You can choose which list Firefox will use to block Web elements that may track your browsing activity.", comment: "Header description for tracking protection options section where Basic/Strict block list can be selected")
-    public static let TrackingProtectionOptionBlockListTypeBasic = NSLocalizedString("SettingsTrackingProtectionOptionBlockListBasic", value: "Basic (Recommended)", comment: "Tracking protection settings option for using the basic blocklist.")
-    public static let TrackingProtectionOptionBlockListTypeBasicDescription = NSLocalizedString("SettingsTrackingProtectionOptionBlockListBasicDescription", value: "Allows some trackers so websites function properly.", comment: "Tracking protection settings option description for using the basic blocklist.")
-    public static let TrackingProtectionOptionBlockListTypeStrict = NSLocalizedString("SettingsTrackingProtectionOptionBlockListStrict", value: "Strict", comment: "Tracking protection settings option for using the strict blocklist.")
-    public static let TrackingProtectionOptionBlockListTypeStrictDescription = NSLocalizedString("SettingsTrackingProtectionOptionBlockListStrictDescription", value: "Blocks known trackers. Some websites may not function properly.", comment: "Tracking protection settings option description for using the strict blocklist.")
-    public static let TrackingProtectionReloadWithout = NSLocalizedString("MenuReloadWithoutTrackingProtectionTitle", value: "Reload Without Tracking Protection", comment: "Label for the button, displayed in the menu, used to reload the current website without Tracking Protection")
-    public static let TrackingProtectionReloadWith = NSLocalizedString("MenuReloadWithTrackingProtectionTitle", value: "Reload With Tracking Protection", comment: "Label for the button, displayed in the menu, used to reload the current website with Tracking Protection enabled")
-}
+//extension Strings {
+//    public static let SettingsTrackingProtectionSectionName = NSLocalizedString("SettingsTrackingProtectionSectionName", value: "Tracking Protection", comment: "Row in top-level of settings that gets tapped to show the tracking protection settings detail view.")
+//    public static let TrackingProtectionOptionOnInPrivateBrowsing = NSLocalizedString("SettingsTrackingProtectionOptionOnInPrivateBrowsingLabel", value: "Private Browsing Mode", comment: "Settings option to specify that Tracking Protection is on only in Private Browsing mode.")
+//    public static let TrackingProtectionOptionOnInNormalBrowsing = NSLocalizedString("SettingsTrackingProtectionOptionOnInNormalBrowsingLabel", value: "Normal Browsing Mode", comment: "Settings option to specify that Tracking Protection is on only in Private Browsing mode.")
+//    public static let TrackingProtectionOptionOnOffHeader = NSLocalizedString("SettingsTrackingProtectionOptionEnabledStateHeaderLabel", value: "Enable", comment: "Description label shown at the top of tracking protection options screen.")
+//    public static let TrackingProtectionOptionOnOffFooter = NSLocalizedString("SettingsTrackingProtectionOptionEnabledStateFooterLabel", value: "Tracking is the collection of your browsing data across multiple websites.", comment: "Description label shown on tracking protection options screen.")
+//    public static let TrackingProtectionOptionBlockListsTitle = NSLocalizedString("SettingsTrackingProtectionBlockListsTitle", value: "Block Lists", comment: "Title for tracking protection options section where Basic/Strict block list can be selected")
+//    public static let TrackingProtectionOptionBlockListsHeader = NSLocalizedString("SettingsTrackingProtectionBlockListsHeader", value: "You can choose which list Firefox will use to block Web elements that may track your browsing activity.", comment: "Header description for tracking protection options section where Basic/Strict block list can be selected")
+//    public static let TrackingProtectionOptionBlockListTypeBasic = NSLocalizedString("SettingsTrackingProtectionOptionBlockListBasic", value: "Basic (Recommended)", comment: "Tracking protection settings option for using the basic blocklist.")
+//    public static let TrackingProtectionOptionBlockListTypeBasicDescription = NSLocalizedString("SettingsTrackingProtectionOptionBlockListBasicDescription", value: "Allows some trackers so websites function properly.", comment: "Tracking protection settings option description for using the basic blocklist.")
+//    public static let TrackingProtectionOptionBlockListTypeStrict = NSLocalizedString("SettingsTrackingProtectionOptionBlockListStrict", value: "Strict", comment: "Tracking protection settings option for using the strict blocklist.")
+//    public static let TrackingProtectionOptionBlockListTypeStrictDescription = NSLocalizedString("SettingsTrackingProtectionOptionBlockListStrictDescription", value: "Blocks known trackers. Some websites may not function properly.", comment: "Tracking protection settings option description for using the strict blocklist.")
+//    public static let TrackingProtectionReloadWithout = NSLocalizedString("MenuReloadWithoutTrackingProtectionTitle", value: "Reload Without Tracking Protection", comment: "Label for the button, displayed in the menu, used to reload the current website without Tracking Protection")
+//    public static let TrackingProtectionReloadWith = NSLocalizedString("MenuReloadWithTrackingProtectionTitle", value: "Reload With Tracking Protection", comment: "Label for the button, displayed in the menu, used to reload the current website with Tracking Protection enabled")
+//}
 
 // Tracking Protection menu
-extension Strings {
-    public static let TPMenuTitle = NSLocalizedString("MenuTrackingProtectionTitle", value: "Tracking Protection", comment: "Label for the button, displayed in the menu, used to get more info about Tracking Protection")
-    public static let TPBlockingDescription = NSLocalizedString("MenuTrackingProtectionBlockingDescription", value: "Firefox is blocking parts of the page that may track your browsing.", comment: "Description of the Tracking protection menu when TP is blocking parts of the page")
-    public static let TPNoBlockingDescription = NSLocalizedString("MenuTrackingProtectionNoBlockingDescription", value: "No tracking elements detected on this page.", comment: "The description of the Tracking Protection menu item when no scripts are blocked but tracking protection is enabled.")
-    public static let TPBlockingDisabledDescription = NSLocalizedString("MenuTrackingProtectionBlockingDisabledDescription", value: "Block online trackers", comment: "The description of the Tracking Protection menu item when tracking is enabled")
-    public static let TPBlockingMoreInfo = NSLocalizedString("MenuTrackingProtectionMoreInfoDescription", value: "Learn more about how Tracking Protection blocks online trackers that collect your browsing data across multiple websites.", comment: "more info about what tracking protection is about")
-    public static let EnableTPBlocking = NSLocalizedString("MenuTrackingProtectionEnableTitle", value: "Enable Tracking Protection", comment: "A button to enable tracking protection inside the menu.")
-    public static let TrackingProtectionEnabledConfirmed = NSLocalizedString("MenuTrackingProtectionEnabledTitle", value: "Tracking Protection is now on for this site.", comment: "The confirmation toast once tracking protection has been enabled")
-    public static let TrackingProtectionDisabledConfirmed = NSLocalizedString("MenuTrackingProtectionDisabledTitle", value: "Tracking Protection is now off for this site.", comment: "The confirmation toast once tracking protection has been disabled")
-    public static let TrackingProtectionDisableTitle = NSLocalizedString("MenuTrackingProtectionDisableTitle", value: "Disable for this site", comment: "The button that disabled TP for a site.")
-    public static let TrackingProtectionTotalBlocked = NSLocalizedString("MenuTrackingProtectionTotalBlockedTitle", value: "Total trackers blocked", comment: "The title that shows the total number of scripts blocked")
-    public static let TrackingProtectionAdsBlocked = NSLocalizedString("MenuTrackingProtectionAdsBlockedTitle", value: "Ad trackers", comment: "The title that shows the number of Analytics scripts blocked")
-    public static let TrackingProtectionAnalyticsBlocked = NSLocalizedString("MenuTrackingProtectionAnalyticsBlockedTitle", value: "Analytic trackers", comment: "The title that shows the number of Analytics scripts blocked")
-    public static let TrackingProtectionSocialBlocked = NSLocalizedString("MenuTrackingProtectionSocialBlockedTitle", value: "Social trackers", comment: "The title that shows the number of social scripts blocked")
-    public static let TrackingProtectionContentBlocked = NSLocalizedString("MenuTrackingProtectionContentBlockedTitle", value: "Content trackers", comment: "The title that shows the number of content scripts blocked")
-    public static let TrackingProtectionWhiteListOn = NSLocalizedString("MenuTrackingProtectionOptionWhiteListOnDescription", value: "The site includes elements that may track your browsing. You have disabled protection.", comment: "label for the menu item to show when the website is whitelisted from blocking trackers.")
-    public static let TrackingProtectionWhiteListRemove = NSLocalizedString("MenuTrackingProtectionWhitelistRemoveTitle", value: "Enable for this site", comment: "label for the menu item that lets you remove a website from the tracking protection whitelist")
-}
+//extension Strings {
+//    public static let TPMenuTitle = NSLocalizedString("MenuTrackingProtectionTitle", value: "Tracking Protection", comment: "Label for the button, displayed in the menu, used to get more info about Tracking Protection")
+//    public static let TPBlockingDescription = NSLocalizedString("MenuTrackingProtectionBlockingDescription", value: "Firefox is blocking parts of the page that may track your browsing.", comment: "Description of the Tracking protection menu when TP is blocking parts of the page")
+//    public static let TPNoBlockingDescription = NSLocalizedString("MenuTrackingProtectionNoBlockingDescription", value: "No tracking elements detected on this page.", comment: "The description of the Tracking Protection menu item when no scripts are blocked but tracking protection is enabled.")
+//    public static let TPBlockingDisabledDescription = NSLocalizedString("MenuTrackingProtectionBlockingDisabledDescription", value: "Block online trackers", comment: "The description of the Tracking Protection menu item when tracking is enabled")
+//    public static let TPBlockingMoreInfo = NSLocalizedString("MenuTrackingProtectionMoreInfoDescription", value: "Learn more about how Tracking Protection blocks online trackers that collect your browsing data across multiple websites.", comment: "more info about what tracking protection is about")
+//    public static let EnableTPBlocking = NSLocalizedString("MenuTrackingProtectionEnableTitle", value: "Enable Tracking Protection", comment: "A button to enable tracking protection inside the menu.")
+//    public static let TrackingProtectionEnabledConfirmed = NSLocalizedString("MenuTrackingProtectionEnabledTitle", value: "Tracking Protection is now on for this site.", comment: "The confirmation toast once tracking protection has been enabled")
+//    public static let TrackingProtectionDisabledConfirmed = NSLocalizedString("MenuTrackingProtectionDisabledTitle", value: "Tracking Protection is now off for this site.", comment: "The confirmation toast once tracking protection has been disabled")
+//    public static let TrackingProtectionDisableTitle = NSLocalizedString("MenuTrackingProtectionDisableTitle", value: "Disable for this site", comment: "The button that disabled TP for a site.")
+//    public static let TrackingProtectionTotalBlocked = NSLocalizedString("MenuTrackingProtectionTotalBlockedTitle", value: "Total trackers blocked", comment: "The title that shows the total number of scripts blocked")
+//    public static let TrackingProtectionAdsBlocked = NSLocalizedString("MenuTrackingProtectionAdsBlockedTitle", value: "Ad trackers", comment: "The title that shows the number of Analytics scripts blocked")
+//    public static let TrackingProtectionAnalyticsBlocked = NSLocalizedString("MenuTrackingProtectionAnalyticsBlockedTitle", value: "Analytic trackers", comment: "The title that shows the number of Analytics scripts blocked")
+//    public static let TrackingProtectionSocialBlocked = NSLocalizedString("MenuTrackingProtectionSocialBlockedTitle", value: "Social trackers", comment: "The title that shows the number of social scripts blocked")
+//    public static let TrackingProtectionContentBlocked = NSLocalizedString("MenuTrackingProtectionContentBlockedTitle", value: "Content trackers", comment: "The title that shows the number of content scripts blocked")
+//    public static let TrackingProtectionWhiteListOn = NSLocalizedString("MenuTrackingProtectionOptionWhiteListOnDescription", value: "The site includes elements that may track your browsing. You have disabled protection.", comment: "label for the menu item to show when the website is whitelisted from blocking trackers.")
+//    public static let TrackingProtectionWhiteListRemove = NSLocalizedString("MenuTrackingProtectionWhitelistRemoveTitle", value: "Enable for this site", comment: "label for the menu item that lets you remove a website from the tracking protection whitelist")
+//}
 
 // Location bar long press menu
 extension Strings {
@@ -418,37 +418,37 @@ extension Strings {
     public static let PasteTitle = NSLocalizedString("MenuPasteTitle", value: "Paste", comment: "The title for the button that lets you paste into the location bar")
     public static let CopyAddressTitle = NSLocalizedString("MenuCopyTitle", value: "Copy Address", comment: "The title for the button that lets you copy the url from the location bar.")
 }
-
-// Settings Home
-extension Strings {
-    public static let SendUsageSettingTitle = NSLocalizedString("SettingsSendUsageTitle", value: "Send Usage Data", comment: "The title for the setting to send usage data.")
-    public static let SendUsageSettingLink = NSLocalizedString("SettingsSendUsageLink", value: "Learn More.", comment: "title for a link that explains how mozilla collects telemetry")
-    public static let SendUsageSettingMessage = NSLocalizedString("SettingsSendUsageMessage", value: "Mozilla strives to only collect what we need to provide and improve Firefox for everyone.", comment: "A short description that explains why mozilla collects usage data.")
-}
-
-// Do not track
-extension Strings {
-    public static let SettingsDoNotTrackTitle = NSLocalizedString("SettingsDNTTitle", value: "Send websites a Do Not Track signal that you don’t want to be tracked", comment: "DNT Settings title")
-    public static let SettingsDoNotTrackOptionOnWithTP = NSLocalizedString("SettingsDNTOptionOnWithTP", value: "Only when using Tracking Protection", comment: "DNT Settings option for only turning on when Tracking Protection is also on")
-    public static let SettingsDoNotTrackOptionAlwaysOn = NSLocalizedString("SettingsDNTOptionAlwaysOn", value: "Always", comment: "DNT Settings option for always on")
-}
-
-// Intro Onboarding slides
-extension Strings {
-    public static let CardTitleWelcome = NSLocalizedString("IntroSlidesWelcomeTitle", value: "Thanks for choosing Firefox!", comment: "Title for the first panel 'Welcome' in the First Run tour.")
-    public static let CardTitleSearch = NSLocalizedString("IntroSlidesSearchTitle", value: "Your search, your way", comment: "Title for the second  panel 'Search' in the First Run tour.")
-    public static let CardTitlePrivate = NSLocalizedString("IntroSlidesPrivateTitle", value: "Browse like no one’s watching", comment: "Title for the third panel 'Private Browsing' in the First Run tour.")
-    public static let CardTitleMail = NSLocalizedString("IntroSlidesMailTitle", value: "You’ve got mail… options", comment: "Title for the fourth panel 'Mail' in the First Run tour.")
-    public static let CardTitleSync = NSLocalizedString("IntroSlidesSyncTitle", value: "Pick up where you left off", comment: "Title for the fifth panel 'Sync' in the First Run tour.")
-
-    public static let CardTextWelcome = NSLocalizedString("IntroSlidesWelcomeDescription", value: "A modern mobile browser from Mozilla, the non-profit committed to a free and open web.", comment: "Description for the 'Welcome' panel in the First Run tour.")
-    public static let CardTextSearch = NSLocalizedString("IntroSlidesSearchDescription", value: "Searching for something different? Choose another default search engine (or add your own) in Settings.", comment: "Description for the 'Favorite Search Engine' panel in the First Run tour.")
-    public static let CardTextPrivate = NSLocalizedString("IntroSlidesPrivateDescription", value: "Tap the mask icon to slip into Private Browsing mode.", comment: "Description for the 'Private Browsing' panel in the First Run tour.")
-    public static let CardTextMail = NSLocalizedString("IntroSlidesMailDescription", value: "Use any email app — not just Mail — with Firefox.", comment: "Description for the 'Mail' panel in the First Run tour.")
-    public static let CardTextSync = NSLocalizedString("IntroSlidesSyncDescription", value: "Use Sync to find the bookmarks, passwords, and other things you save to Firefox on all your devices.", comment: "Description for the 'Sync' panel in the First Run tour.")
-    public static let SignInButtonTitle = NSLocalizedString("SignInToFirefox", value: "Sign in to Firefox", comment: "See http://mzl.la/1T8gxwo")
-    public static let StartBrowsingButtonTitle = NSLocalizedString("StartBrowsing", value: "Start Browsing", comment: "See http://mzl.la/1T8gxwo")
-}
+//
+//// Settings Home
+//extension Strings {
+//    public static let SendUsageSettingTitle = NSLocalizedString("SettingsSendUsageTitle", value: "Send Usage Data", comment: "The title for the setting to send usage data.")
+//    public static let SendUsageSettingLink = NSLocalizedString("SettingsSendUsageLink", value: "Learn More.", comment: "title for a link that explains how mozilla collects telemetry")
+//    public static let SendUsageSettingMessage = NSLocalizedString("SettingsSendUsageMessage", value: "Mozilla strives to only collect what we need to provide and improve Firefox for everyone.", comment: "A short description that explains why mozilla collects usage data.")
+//}
+//
+//// Do not track
+//extension Strings {
+//    public static let SettingsDoNotTrackTitle = NSLocalizedString("SettingsDNTTitle", value: "Send websites a Do Not Track signal that you don’t want to be tracked", comment: "DNT Settings title")
+//    public static let SettingsDoNotTrackOptionOnWithTP = NSLocalizedString("SettingsDNTOptionOnWithTP", value: "Only when using Tracking Protection", comment: "DNT Settings option for only turning on when Tracking Protection is also on")
+//    public static let SettingsDoNotTrackOptionAlwaysOn = NSLocalizedString("SettingsDNTOptionAlwaysOn", value: "Always", comment: "DNT Settings option for always on")
+//}
+//
+//// Intro Onboarding slides
+//extension Strings {
+//    public static let CardTitleWelcome = NSLocalizedString("IntroSlidesWelcomeTitle", value: "Thanks for choosing Firefox!", comment: "Title for the first panel 'Welcome' in the First Run tour.")
+//    public static let CardTitleSearch = NSLocalizedString("IntroSlidesSearchTitle", value: "Your search, your way", comment: "Title for the second  panel 'Search' in the First Run tour.")
+//    public static let CardTitlePrivate = NSLocalizedString("IntroSlidesPrivateTitle", value: "Browse like no one’s watching", comment: "Title for the third panel 'Private Browsing' in the First Run tour.")
+//    public static let CardTitleMail = NSLocalizedString("IntroSlidesMailTitle", value: "You’ve got mail… options", comment: "Title for the fourth panel 'Mail' in the First Run tour.")
+//    public static let CardTitleSync = NSLocalizedString("IntroSlidesSyncTitle", value: "Pick up where you left off", comment: "Title for the fifth panel 'Sync' in the First Run tour.")
+//
+//    public static let CardTextWelcome = NSLocalizedString("IntroSlidesWelcomeDescription", value: "A modern mobile browser from Mozilla, the non-profit committed to a free and open web.", comment: "Description for the 'Welcome' panel in the First Run tour.")
+//    public static let CardTextSearch = NSLocalizedString("IntroSlidesSearchDescription", value: "Searching for something different? Choose another default search engine (or add your own) in Settings.", comment: "Description for the 'Favorite Search Engine' panel in the First Run tour.")
+//    public static let CardTextPrivate = NSLocalizedString("IntroSlidesPrivateDescription", value: "Tap the mask icon to slip into Private Browsing mode.", comment: "Description for the 'Private Browsing' panel in the First Run tour.")
+//    public static let CardTextMail = NSLocalizedString("IntroSlidesMailDescription", value: "Use any email app — not just Mail — with Firefox.", comment: "Description for the 'Mail' panel in the First Run tour.")
+//    public static let CardTextSync = NSLocalizedString("IntroSlidesSyncDescription", value: "Use Sync to find the bookmarks, passwords, and other things you save to Firefox on all your devices.", comment: "Description for the 'Sync' panel in the First Run tour.")
+//    public static let SignInButtonTitle = NSLocalizedString("SignInToFirefox", value: "Sign in to Firefox", comment: "See http://mzl.la/1T8gxwo")
+//    public static let StartBrowsingButtonTitle = NSLocalizedString("StartBrowsing", value: "Start Browsing", comment: "See http://mzl.la/1T8gxwo")
+//}
 
 // Keyboard short cuts
 extension Strings {
@@ -463,28 +463,28 @@ extension Strings {
 }
 
 // Share extension
-extension Strings {
-    public static let SendToCancelButton = NSLocalizedString("SendToCancelButton", value: "Cancel", comment: "Button title for cancelling share screen")
-    public static let SendToErrorOKButton = NSLocalizedString("SendToErrorOKButton", value: "OK", comment: "OK button to dismiss the error prompt.")
-    public static let SendToErrorTitle = NSLocalizedString("SendToErrorTitle", value: "The link you are trying to share cannot be shared.", comment: "Title of error prompt displayed when an invalid URL is shared.")
-    public static let SendToErrorMessage = NSLocalizedString("SendToErrorMessage", value: "Only HTTP and HTTPS links can be shared.", comment: "Message in error prompt explaining why the URL is invalid.")
+//extension Strings {
+//    public static let SendToCancelButton = NSLocalizedString("SendToCancelButton", value: "Cancel", comment: "Button title for cancelling share screen")
+//    public static let SendToErrorOKButton = NSLocalizedString("SendToErrorOKButton", value: "OK", comment: "OK button to dismiss the error prompt.")
+//    public static let SendToErrorTitle = NSLocalizedString("SendToErrorTitle", value: "The link you are trying to share cannot be shared.", comment: "Title of error prompt displayed when an invalid URL is shared.")
+//    public static let SendToErrorMessage = NSLocalizedString("SendToErrorMessage", value: "Only HTTP and HTTPS links can be shared.", comment: "Message in error prompt explaining why the URL is invalid.")
+//
+//    // The above items are re-used strings from the old extension. New strings below.
+//
+//    public static let ShareAddToReadingList = NSLocalizedString("ShareExtensionAddToReadingListActionTitle", value: "Add to Reading List", comment: "Action label on share extension to add page to the Firefox reading list.")
+//    public static let ShareAddToReadingListDone = NSLocalizedString("ShareExtensionAddToReadingListActionDoneTitle", value: "Added to Reading List", comment: "Share extension label shown after user has performed 'Add to Reading List' action.")
+//    public static let ShareBookmarkThisPage = NSLocalizedString("ShareExtensionBookmarkThisPageActionTitle", value: "Bookmark This Page", comment: "Action label on share extension to bookmark the page in Firefox.")
+//    public static let ShareBookmarkThisPageDone = NSLocalizedString("ShareExtensionBookmarkThisPageActionDoneTitle", value: "Bookmarked", comment: "Share extension label shown after user has performed 'Bookmark this Page' action.")
+//
+//    public static let ShareOpenInFirefox = NSLocalizedString("ShareExtensionOpenInFirefoxActionTitle", value: "Open in Firefox", comment: "Action label on share extension to immediately open page in Firefox.")
+//    public static let ShareSearchInFirefox = NSLocalizedString("ShareExtensionSeachInFirefoxActionTitle", value: "Search in Firefox", comment: "Action label on share extension to search for the selected text in Firefox.")
+//    public static let ShareOpenInPrivateModeNow = NSLocalizedString("ShareExtensionOpenInPrivateModeActionTitle", value: "Open in Private Mode", comment: "Action label on share extension to immediately open page in Firefox in private mode.")
+//
+//    public static let ShareLoadInBackground = NSLocalizedString("ShareExtensionLoadInBackgroundActionTitle", value: "Load in Background", comment: "Action label on share extension to load the page in Firefox when user switches apps to bring it to foreground.")
+//    public static let ShareLoadInBackgroundDone = NSLocalizedString("ShareExtensionLoadInBackgroundActionDoneTitle", value: "Loading in Firefox", comment: "Share extension label shown after user has performed 'Load in Background' action.")
+//}
 
-    // The above items are re-used strings from the old extension. New strings below.
-
-    public static let ShareAddToReadingList = NSLocalizedString("ShareExtensionAddToReadingListActionTitle", value: "Add to Reading List", comment: "Action label on share extension to add page to the Firefox reading list.")
-    public static let ShareAddToReadingListDone = NSLocalizedString("ShareExtensionAddToReadingListActionDoneTitle", value: "Added to Reading List", comment: "Share extension label shown after user has performed 'Add to Reading List' action.")
-    public static let ShareBookmarkThisPage = NSLocalizedString("ShareExtensionBookmarkThisPageActionTitle", value: "Bookmark This Page", comment: "Action label on share extension to bookmark the page in Firefox.")
-    public static let ShareBookmarkThisPageDone = NSLocalizedString("ShareExtensionBookmarkThisPageActionDoneTitle", value: "Bookmarked", comment: "Share extension label shown after user has performed 'Bookmark this Page' action.")
-
-    public static let ShareOpenInFirefox = NSLocalizedString("ShareExtensionOpenInFirefoxActionTitle", value: "Open in Firefox", comment: "Action label on share extension to immediately open page in Firefox.")
-    public static let ShareSearchInFirefox = NSLocalizedString("ShareExtensionSeachInFirefoxActionTitle", value: "Search in Firefox", comment: "Action label on share extension to search for the selected text in Firefox.")
-    public static let ShareOpenInPrivateModeNow = NSLocalizedString("ShareExtensionOpenInPrivateModeActionTitle", value: "Open in Private Mode", comment: "Action label on share extension to immediately open page in Firefox in private mode.")
-
-    public static let ShareLoadInBackground = NSLocalizedString("ShareExtensionLoadInBackgroundActionTitle", value: "Load in Background", comment: "Action label on share extension to load the page in Firefox when user switches apps to bring it to foreground.")
-    public static let ShareLoadInBackgroundDone = NSLocalizedString("ShareExtensionLoadInBackgroundActionDoneTitle", value: "Loading in Firefox", comment: "Share extension label shown after user has performed 'Load in Background' action.")
-}
-
-// MARK: Deprecated Strings (to be removed in next version)
-private let logOut = NSLocalizedString("SettingsLogOutButtonTitle", value: "Log Out", comment: "Button in settings screen to disconnect from your account")
-private let logOutQuestion = NSLocalizedString("LogOut", value: "Log Out?", comment: "Title of the 'log out firefox account' alert")
-private let logOutDestructive = NSLocalizedString("LogOut", value: "Log Out", comment: "Disconnect button in the 'log out firefox account' alert")
+//// MARK: Deprecated Strings (to be removed in next version)
+//private let logOut = NSLocalizedString("SettingsLogOutButtonTitle", value: "Log Out", comment: "Button in settings screen to disconnect from your account")
+//private let logOutQuestion = NSLocalizedString("LogOut", value: "Log Out?", comment: "Title of the 'log out firefox account' alert")
+//private let logOutDestructive = NSLocalizedString("LogOut", value: "Log Out", comment: "Disconnect button in the 'log out firefox account' alert")

@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import Foundation
+import Shared
 
 open class DefaultSuggestedSites {
     public static let urlMap = [
@@ -41,7 +42,7 @@ open class DefaultSuggestedSites {
                 imageUrl: "asset://suggestedsites_youtube",
                 faviconUrl: "asset://defaultFavicon",
                 trackingId: 631,
-                title: NSLocalizedString("YouTube", tableName: "Storage", value: "YouTube", comment: "Tile title for YouTube")
+                title: Strings.YoutubeDisplayTitle
             ),
             SuggestedSiteData(
                 url: "https://www.amazon.com/",
@@ -49,7 +50,7 @@ open class DefaultSuggestedSites {
                 imageUrl: "asset://suggestedsites_amazon",
                 faviconUrl: "asset://defaultFavicon",
                 trackingId: 630,
-                title: NSLocalizedString("Amazon", tableName: "Storage", value: "Amazon", comment: "Tile title for Amazon")
+                title: Strings.AmazonDisplayTitle
             ),
             SuggestedSiteData(
                 url: "https://www.wikipedia.org/",
@@ -57,7 +58,7 @@ open class DefaultSuggestedSites {
                 imageUrl: "asset://suggestedsites_wikipedia",
                 faviconUrl: "asset://defaultFavicon",
                 trackingId: 629,
-                title: NSLocalizedString("Wikipedia", tableName: "Storage", value: "Wikipedia", comment: "Tile title for Wikipedia")
+                title: Strings.WikipediaDisplayTitle
             ),
             SuggestedSiteData(
                 url: "https://mobile.twitter.com/",
@@ -65,7 +66,7 @@ open class DefaultSuggestedSites {
                 imageUrl: "asset://suggestedsites_twitter",
                 faviconUrl: "asset://defaultFavicon",
                 trackingId: 628,
-                title: NSLocalizedString("Twitter", tableName: "Storage", value: "Twitter", comment: "Tile title for Twitter")
+                title: Strings.TwitterDisplayTitle
             ),
             SuggestedSiteData(
                 url: "https://reddit.com/",
@@ -73,7 +74,7 @@ open class DefaultSuggestedSites {
                 imageUrl: "asset://suggestedsites_reddit",
                 faviconUrl: "asset://defaultFavicon",
                 trackingId: 632,
-                title: NSLocalizedString("Reddit", tableName: "Storage", value: "Reddit", comment: "Tile title for Reddit")
+                title: Strings.RedditDisplayTitle
             ),
             SuggestedSiteData(
                 url: "https://coinmarketcap.com/",
@@ -81,7 +82,7 @@ open class DefaultSuggestedSites {
                 imageUrl: "asset://suggestedsites_coinmarketcap",
                 faviconUrl: "asset://defaultFavicon",
                 trackingId: 633,
-                title: NSLocalizedString("Coinmarketcap", tableName: "Storage", value: "Coinmarketcap", comment: "Tile title for Coinmarketcap")
+                title: Strings.CoinmarketcapDisplayTitle
             )
         ],
         "zh_CN": [
@@ -135,4 +136,14 @@ open class DefaultSuggestedSites {
             )
         ]
     ]
+}
+
+
+extension Strings {
+    static let YoutubeDisplayTitle = NSLocalizedString("YouTube", tableName: "Storage", value: "YouTube", comment: "Tile title for YouTube")
+    static let AmazonDisplayTitle = NSLocalizedString("Amazon", tableName: "Storage", value: "Amazon", comment: "Tile title for Amazon")
+    static let WikipediaDisplayTitle = NSLocalizedString("Wikipedia", tableName: "Storage", value: "Wikipedia", comment: "Tile title for Wikipedia")
+    static let TwitterDisplayTitle = NSLocalizedString("Twitter", tableName: "Storage", value: "Twitter", comment: "Tile title for Twitter")
+    static let RedditDisplayTitle = NSLocalizedString("Reddit", tableName: "Storage", value: "Reddit", comment: "Tile title for Reddit")
+    static let CoinmarketcapDisplayTitle = NSLocalizedString("Coinmarketcap", tableName: "Storage", value: "Coinmarketcap", comment: "Tile title for Coinmarketcap")
 }

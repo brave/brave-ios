@@ -659,7 +659,7 @@ extension BookmarksViewController {
       actionsForBookmark(bookmark, currentTabIsPrivate: tabState.type.isPrivate).forEach { alert.addAction($0) }
     }
     
-    let cancelAction = UIAlertAction(title: Strings.Cancel, style: .cancel, handler: nil)
+    let cancelAction = UIAlertAction(title: Strings.CancelButtonTitle, style: .cancel, handler: nil)
     alert.addAction(cancelAction)
     
     // If we're showing an arrow popup, set the anchor to the long press location.

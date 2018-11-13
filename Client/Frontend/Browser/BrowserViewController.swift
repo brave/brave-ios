@@ -1370,7 +1370,7 @@ extension BrowserViewController: URLBarDelegate {
     func urlBarDidLongPressReloadButton(_ urlBar: URLBarView, from button: UIButton) {
         guard let tab = tabManager.selectedTab else { return }
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        alert.addAction(UIAlertAction(title: Strings.Cancel, style: .cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: Strings.CancelButtonTitle, style: .cancel, handler: nil))
         
         let toggleActionTitle = tab.desktopSite ? Strings.AppMenuViewMobileSiteTitleString : Strings.AppMenuViewDesktopSiteTitleString
         alert.addAction(UIAlertAction(title: toggleActionTitle, style: .default, handler: { _ in
@@ -1439,7 +1439,7 @@ extension BrowserViewController: URLBarDelegate {
             alert.addAction(action.alertAction(style: .default))
         }
         
-        alert.addAction(UIAlertAction(title: Strings.Cancel, style: .cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: Strings.CancelButtonTitle, style: .cancel, handler: nil))
         
         let setupPopover = { [unowned self] in
             if let popoverPresentationController = alert.popoverPresentationController {
@@ -1622,7 +1622,7 @@ extension BrowserViewController: TabToolbarDelegate {
 
     func tabToolbarDidLongPressAddTab(_ tabToolbar: TabToolbarProtocol, button: UIButton) {
         let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        alertController.addAction(UIAlertAction(title: Strings.Cancel, style: .cancel, handler: nil))
+        alertController.addAction(UIAlertAction(title: Strings.CancelButtonTitle, style: .cancel, handler: nil))
         if !PrivateBrowsingManager.shared.isPrivateBrowsing {
             let newPrivateTabAction = UIAlertAction(title: Strings.NewPrivateTabTitle, style: .default, handler: { [unowned self] _ in
                 // BRAVE TODO: Add check for DuckDuckGo popup (and based on 1.6, whether the browser lock is enabled?)
@@ -1664,7 +1664,7 @@ extension BrowserViewController: TabToolbarDelegate {
                 self.tabManager.removeTab(tab)
             }
         }), accessibilityIdentifier: "toolbarTabButtonLongPress.closeTab")
-        controller.addAction(UIAlertAction(title: NSLocalizedString("Cancel", value: "Cancel", comment: "Label for Cancel button"), style: .cancel, handler: nil), accessibilityIdentifier: "toolbarTabButtonLongPress.cancel")
+        controller.addAction(UIAlertAction(title: Strings.CloseTabCancelButtonTitle, style: .cancel, handler: nil), accessibilityIdentifier: "toolbarTabButtonLongPress.cancel")
         controller.popoverPresentationController?.sourceView = toolbar ?? urlBar
         controller.popoverPresentationController?.sourceRect = button.frame
         let generator = UIImpactFeedbackGenerator(style: .heavy)
@@ -1859,7 +1859,7 @@ extension BrowserViewController: TabManagerDelegate {
             webView.snp.makeConstraints { make in
                 make.left.right.top.bottom.equalTo(self.webViewContainer)
             }
-            webView.accessibilityLabel = NSLocalizedString("WebContent", value: "Web content", comment: "Accessibility label for the main web content view")
+            webView.accessibilityLabel = Strings.WebContentAccessibilityLabel
             webView.accessibilityIdentifier = "contentView"
             webView.accessibilityElementsHidden = false
 
@@ -2324,34 +2324,29 @@ extension BrowserViewController: ContextMenuHelperDelegate {
             }
 
             if !tabType.isPrivate {
-                let newTabTitle = NSLocalizedString("OpenInNewTab", value: "Open in New Tab", comment: "Context menu item for opening a link in a new tab")
-                let openNewTabAction =  UIAlertAction(title: newTabTitle, style: .default) { _ in
+                let openNewTabAction =  UIAlertAction(title: Strings.OpenNewTabButtonTitle, style: .default) { _ in
                     addTab(url, false)
                 }
                 actionSheetController.addAction(openNewTabAction, accessibilityIdentifier: "linkContextMenu.openInNewTab")
             }
-
-            let openNewPrivateTabTitle = NSLocalizedString("OpenInNewPrivateTab", value: "Open in New Private Tab", comment: "Context menu option for opening a link in a new private tab")
-            let openNewPrivateTabAction =  UIAlertAction(title: openNewPrivateTabTitle, style: .default) { _ in
+           
+            let openNewPrivateTabAction =  UIAlertAction(title: Strings.OpenNewPrivateTabButtonTitle, style: .default) { _ in
                 addTab(url, true)
             }
             actionSheetController.addAction(openNewPrivateTabAction, accessibilityIdentifier: "linkContextMenu.openInNewPrivateTab")
 
-            let downloadTitle = NSLocalizedString("DownloadLink", value: "Download Link", comment: "Context menu item for downloading a link URL")
-            let downloadAction = UIAlertAction(title: downloadTitle, style: .default) { _ in
+            let downloadAction = UIAlertAction(title: Strings.DownloadLinkActionTitle, style: .default) { _ in
                 self.pendingDownloadURL = url
                 currentTab.webView?.evaluateJavaScript("window.__firefox__.download('\(url.absoluteString)', '\(UserScriptManager.securityToken)')")
             }
             actionSheetController.addAction(downloadAction, accessibilityIdentifier: "linkContextMenu.download")
 
-            let copyTitle = NSLocalizedString("CopyLink", value: "Copy Link", comment: "Context menu item for copying a link URL to the clipboard")
-            let copyAction = UIAlertAction(title: copyTitle, style: .default) { _ in
+            let copyAction = UIAlertAction(title: Strings.CopyLinkActionTitle, style: .default) { _ in
                 UIPasteboard.general.url = url as URL
             }
             actionSheetController.addAction(copyAction, accessibilityIdentifier: "linkContextMenu.copyLink")
 
-            let shareTitle = NSLocalizedString("ShareLink", value: "Share Link", comment: "Context menu item for sharing a link URL")
-            let shareAction = UIAlertAction(title: shareTitle, style: .default) { _ in
+            let shareAction = UIAlertAction(title: Strings.ShareLinkActionTitle, style: .default) { _ in
                 self.presentActivityViewController(url as URL, sourceView: self.view, sourceRect: CGRect(origin: touchPoint, size: touchSize), arrowDirection: .any)
             }
             actionSheetController.addAction(shareAction, accessibilityIdentifier: "linkContextMenu.share")
@@ -2363,17 +2358,16 @@ extension BrowserViewController: ContextMenuHelperDelegate {
             }
 
             let photoAuthorizeStatus = PHPhotoLibrary.authorizationStatus()
-            let saveImageTitle = NSLocalizedString("SaveImage", value: "Save Image", comment: "Context menu item for saving an image")
-            let saveImageAction = UIAlertAction(title: saveImageTitle, style: .default) { _ in
+            let saveImageAction = UIAlertAction(title: Strings.SaveImageActionTitle, style: .default) { _ in
                 if photoAuthorizeStatus == .authorized || photoAuthorizeStatus == .notDetermined {
                     self.getImage(url as URL) {
                         UIImageWriteToSavedPhotosAlbum($0, self, nil, nil)
                     }
                 } else {
-                    let accessDenied = UIAlertController(title: NSLocalizedString("BraveWouldLikeToAccessYourPhotos", value: "Brave would like to access your Photos", comment: "See http://mzl.la/1G7uHo7"), message: NSLocalizedString("ThisAllowsYouToSaveTheImageToYourCameraRoll", value: "This allows you to save the image to your Camera Roll.", comment: "See http://mzl.la/1G7uHo7"), preferredStyle: .alert)
+                    let accessDenied = UIAlertController(title: Strings.AccessPhotoDeniedAlertTitle, message: Strings.AccessPhotoDeniedAlertMessage, preferredStyle: .alert)
                     let dismissAction = UIAlertAction(title: Strings.CancelString, style: .default, handler: nil)
                     accessDenied.addAction(dismissAction)
-                    let settingsAction = UIAlertAction(title: NSLocalizedString("OpenSettings", value: "Open Settings", comment: "See http://mzl.la/1G7uHo7"), style: .default ) { _ in
+                    let settingsAction = UIAlertAction(title: Strings.OpenPhoneSettingsActionTitle, style: .default ) { _ in
                         UIApplication.shared.open(URL(string: UIApplicationOpenSettingsURLString)!, options: [:])
                     }
                     accessDenied.addAction(settingsAction)
@@ -2382,8 +2376,7 @@ extension BrowserViewController: ContextMenuHelperDelegate {
             }
             actionSheetController.addAction(saveImageAction, accessibilityIdentifier: "linkContextMenu.saveImage")
 
-            let copyImageTitle = NSLocalizedString("CopyImage", value: "Copy Image", comment: "Context menu item for copying an image to the clipboard")
-            let copyAction = UIAlertAction(title: copyImageTitle, style: .default) { _ in
+            let copyAction = UIAlertAction(title: Strings.CopyImageActionTitle, style: .default) { _ in
                 // put the actual image on the clipboard
                 // do this asynchronously just in case we're in a low bandwidth situation
                 let pasteboard = UIPasteboard.general
