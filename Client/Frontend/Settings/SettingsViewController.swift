@@ -206,7 +206,7 @@ class SettingsViewController: TableViewController {
                     return Strings.AuthenticationTouchIDPasscodeSetting
                 }
             } else {
-                return Strings.passcode
+                return Strings.AuthenticationPasscode
             }
         }()
         
