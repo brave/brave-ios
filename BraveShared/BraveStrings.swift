@@ -18,6 +18,12 @@ import Shared
 // PRAGMA MARK: Common Strings Here.
 public extension Strings {
     public static let CancelButtonTitle = NSLocalizedString("CancelButtonTitle", tableName: "BraveShared", value: "Cancel", comment: "")
+    public static let WebContentAccessibilityLabel = NSLocalizedString("WebContentAccessibilityLabel", tableName: "BraveShared", value: "Web content", comment: "Accessibility label for the main web content view")
+    public static let ShareLinkActionTitle = NSLocalizedString("ShareLinkActionTitle", tableName: "BraveShared", value: "Share Link", comment: "Context menu item for sharing a link URL")
+    public static let Show_Tabs = NSLocalizedString("ShowTabs", tableName: "BraveShared", value: "Show Tabs", comment: "Accessibility Label for the tabs button in the browser toolbar")
+    public static let CopyLinkActionTitle = NSLocalizedString("CopyLinkActionTitle", tableName: "BraveShared", value: "Copy Link", comment: "Context menu item for copying a link URL to the clipboard")
+    public static let OpenNewPrivateTabButtonTitle = NSLocalizedString("OpenNewPrivateTabButtonTitle", tableName: "BraveShared", value: "Open in New Private Tab", comment: "Context menu option for opening a link in a new private tab")
+    public static let DeleteLoginButtonTitle = NSLocalizedString("DeleteLoginButtonTitle", tableName: "BraveShared", value: "Delete", comment: "Label for the button used to delete the current login.")
 }
 
 // PRAGMA MARK: UIAlertControllerExtensions.swift
@@ -41,7 +47,6 @@ public extension Strings {
     public static let DeleteLoginAlertLocalMessage = NSLocalizedString("DeleteLoginAlertLocalMessage", tableName: "BraveShared", value: "Logins will be permanently removed.", comment: "Prompt message warning the user that deleting non-synced logins will permanently remove them")
     public static let DeleteLoginAlertSyncedDevicesMessage = NSLocalizedString("DeleteLoginAlertSyncedDevicesMessage", tableName: "BraveShared", value: "Logins will be removed from all connected devices.", comment: "Prompt message warning the user that deleted logins will remove logins from all connected devices")
     public static let DeleteLoginAlertCancelActionTitle = NSLocalizedString("DeleteLoginAlertCancelActionTitle", tableName: "BraveShared", value: "Cancel", comment: "Prompt option for cancelling out of deletion")
-    public static let DeleteLoginAlertDeleteActionTitle = NSLocalizedString("DeleteLoginAlertDeleteActionTitle", tableName: "BraveShared", value: "Delete", comment: "Label for the button used to delete the current login.")
 }
 
 // PRAGMA MARK: BasePasscodeViewController.swift
@@ -72,18 +77,13 @@ public extension Strings {
     public static let AuthPromptAlertMessageText = NSLocalizedString("AuthPromptAlertMessageText", tableName: "BraveShared", value: "A username and password are being requested by %@.", comment: "Authentication prompt message with no realm. Parameter is the hostname of the site")
     public static let AuthPromptAlertUsernamePlaceholderText = NSLocalizedString("AuthPromptAlertUsernamePlaceholderText", tableName: "BraveShared", value: "Username", comment: "Username textbox in Authentication prompt")
     public static let AuthPromptAlertPasswordPlaceholderText = NSLocalizedString("AuthPromptAlertPasswordPlaceholderText", tableName: "BraveShared", value: "Password", comment: "Password textbox in Authentication prompt")
-    
 }
 
 // PRAGMA MARK: BrowserViewController.swift
 public extension Strings {
-    public static let CloseTabCancelButtonTitle = NSLocalizedString("CloseTabCancelButtonTitle", tableName: "BraveShared", value: "Cancel", comment: "Label for Cancel button")
-    public static let WebContentAccessibilityLabel = NSLocalizedString("WebContentAccessibilityLabel", tableName: "BraveShared", value: "Web content", comment: "Accessibility label for the main web content view")
     public static let OpenNewTabButtonTitle = NSLocalizedString("OpenNewTabButtonTitle", tableName: "BraveShared", value: "Open in New Tab", comment: "Context menu item for opening a link in a new tab")
-    public static let OpenNewPrivateTabButtonTitle = NSLocalizedString("OpenNewPrivateTabButtonTitle", tableName: "BraveShared", value: "Open in New Private Tab", comment: "Context menu option for opening a link in a new private tab")
     public static let DownloadLinkActionTitle = NSLocalizedString("DownloadLinkActionTitle", tableName: "BraveShared", value: "Download Link", comment: "Context menu item for downloading a link URL")
-    public static let CopyLinkActionTitle = NSLocalizedString("CopyLinkActionTitle", tableName: "BraveShared", value: "Copy Link", comment: "Context menu item for copying a link URL to the clipboard")
-    public static let ShareLinkActionTitle = NSLocalizedString("ShareLinkActionTitle", tableName: "BraveShared", value: "Share Link", comment: "Context menu item for sharing a link URL")
+    
     public static let SaveImageActionTitle = NSLocalizedString("SaveImageActionTitle", tableName: "BraveShared", value: "Save Image", comment: "Context menu item for saving an image")
     public static let AccessPhotoDeniedAlertTitle = NSLocalizedString("AccessPhotoDeniedAlertTitle", tableName: "BraveShared", value: "Brave would like to access your Photos", comment: "See http://mzl.la/1G7uHo7")
     public static let AccessPhotoDeniedAlertMessage = NSLocalizedString("AccessPhotoDeniedAlertMessage", tableName: "BraveShared", value: "This allows you to save the image to your Camera Roll.", comment: "See http://mzl.la/1G7uHo7")
@@ -108,11 +108,6 @@ public extension Strings {
 // PRAGMA MARK: ReaderModeBarView.swift
 public extension Strings {
     public static let ReaderModeDisplaySettingsButtonTitle = NSLocalizedString("ReaderModeDisplaySettingsButtonTitle", tableName: "BraveShared", value: "Display Settings", comment: "Name for display settings button in reader mode. Display in the meaning of presentation, not monitor.")
-}
-
-// PRAGMA MARK: Tab.swift
-public extension Strings {
-    public static let TabWebContentViewAccessibilityLabel = NSLocalizedString("TabWebContentViewAccessibilityLabel", tableName: "BraveShared", value: "Web content", comment: "Accessibility label for the main web content view")
 }
 
 // PRAGMA MARK: TabLocationView.swift
@@ -163,7 +158,6 @@ public extension Strings {
     public static let TabPrivateModeToggleAccessibilityValueOn = NSLocalizedString("TabPrivateModeToggleAccessibilityValueOn", tableName: "BraveShared", value: "On", comment: "Toggled ON accessibility value")
     public static let TabPrivateModeToggleAccessibilityValueOff = NSLocalizedString("TabPrivateModeToggleAccessibilityValueOff", tableName: "BraveShared", value: "Off", comment: "Toggled OFF accessibility value")
     public static let TabTrayNewTabButtonAccessibilityLabel = NSLocalizedString("TabTrayNewTabButtonAccessibilityLabel", tableName: "BraveShared", value: "New Tab", comment: "Accessibility label for the New Tab button in the tab toolbar.")
-    public static let TabTrayShowTabButtonAccessibilityLabel = NSLocalizedString("TabTrayShowTabButtonAccessibilityLabel", tableName: "BraveShared", value: "Show Tabs", comment: "Accessibility Label for the tabs button in the tab toolbar")
 }
 
 // PRAGMA MARK: URLBarView.swift
@@ -176,7 +170,6 @@ public extension Strings {
     // Titles for selection/deselect/delete buttons
     public static let LoginListDeselectAllButtonTitle = NSLocalizedString("LoginListDeselectAllButtonTitle", tableName: "BraveShared", value: "Deselect All", comment: "Label for the button used to deselect all logins.")
     public static let LoginListSelectAllButtonTitle = NSLocalizedString("LoginListSelectAllButtonTitle", tableName: "BraveShared", value: "Select All", comment: "Label for the button used to select all logins.")
-    public static let LoginListDeleteLoginButtonTitle = NSLocalizedString("LoginListDeleteLoginButtonTitle", tableName: "BraveShared", value: "Delete", comment: "Label for the button used to delete the current login.")
     public static let LoginListScreenTitle = NSLocalizedString("LoginListScreenTitle", tableName: "BraveShared", value: "Logins", comment: "Title for Logins List View screen.")
     public static let LoginListNoLoginTitle = NSLocalizedString("LoginListNoLoginTitle", tableName: "BraveShared", value: "No logins found", comment: "Label displayed when no logins are found after searching.")
 }
@@ -187,7 +180,6 @@ public extension Strings {
     public static let LoginDetailPasswordCellTitle = NSLocalizedString("LoginDetailPasswordCellTitle", tableName: "BraveShared", value: "password", comment: "Label displayed above the password row in Login Detail View.")
     public static let LoginDetailWebsiteCellTitle = NSLocalizedString("LoginDetailWebsiteCellTitle", tableName: "BraveShared", value: "website", comment: "Label displayed above the website row in Login Detail View.")
     public static let LoginDetailLastModifiedCellFormatTitle = NSLocalizedString("LoginDetailLastModifiedCellFormatTitle", tableName: "BraveShared", value: "Last modified %@", comment: "Footer label describing when the current login was last modified with the timestamp as the parameter.")
-    public static let LoginDetailDeleteCellTitle = NSLocalizedString("LoginDetailDeleteCellTitle", tableName: "BraveShared", value: "Delete", comment: "Label for the button used to delete the current login.")
 }
 
 // PRAGMA MARK: ReaderModeHandlers.swift
@@ -218,7 +210,6 @@ public extension Strings {
 // PRAGMA MARK: SearchEnginePicker.swift
 public extension Strings {
     public static let SearchEnginePickerNavTitle = NSLocalizedString("SearchEnginePickerNavTitle", tableName: "BraveShared", value: "Default Search Engine", comment: "Title for default search engine picker.")
-    public static let SearchEnginePickerCancelButtonTitle = NSLocalizedString("SearchEnginePickerCancelButtonTitle", tableName: "BraveShared", value: "Cancel", comment: "Label for Cancel button")
 }
 
 // PRAGMA MARK: SearchSettingsTableViewController.swift
@@ -230,11 +221,6 @@ public extension Strings {
 // PRAGMA MARK: SettingsContentViewController.swift
 public extension Strings {
     public static let SettingsContentLoadErrorMessage = NSLocalizedString("SettingsContentLoadErrorMessage", tableName: "BraveShared", value: "Could not load page.", comment: "Error message that is shown in settings when there was a problem loading")
-}
-
-// PRAGMA MARK: TabsButton.swift
-public extension Strings {
-    public static let BrowserToolbarShowTabsButtonAccessibilityLabel = NSLocalizedString("BrowserToolbarShowTabsButtonAccessibilityLabel", tableName: "BraveShared", value: "Show Tabs", comment: "Accessibility label for the tabs button in the (top) tab toolbar")
 }
 
 // PRAGMA MARK: SearchInputView.swift
@@ -335,9 +321,6 @@ public extension Strings {
     public static let EnterFolderName = NSLocalizedString("EnterFolderName", tableName: "BraveShared", value: "Enter folder name", comment: "Description for new folder popup")
     public static let Edit = NSLocalizedString("Edit", tableName: "BraveShared", value: "Edit", comment: "")
     
-    
-    
-
     public static let CurrentlyUsedSearchEngines = NSLocalizedString("CurrentlyUsedSearchEngines", tableName: "BraveShared", value: "Currently used search engines", comment: "Currently usedd search engines section name.")
     public static let QuickSearchEngines = NSLocalizedString("QuickSearchEngines", tableName: "BraveShared", value: "Quick-Search Engines", comment: "Title for quick-search engines settings section.")
     public static let StandardTabSearch = NSLocalizedString("StandardTabSearch", tableName: "BraveShared", value: "Standard Tab", comment: "Open search section of settings")
@@ -357,18 +340,14 @@ public extension Strings {
     public static let ShieldsTimeStatsMinutes = NSLocalizedString("ShieldsTimeStatsMinutes", tableName: "BraveShared", value: "min", comment: "Time Saved Minutes")
     public static let ShieldsTimeStatsSeconds = NSLocalizedString("ShieldsTimeStatsSeconds", tableName: "BraveShared", value: "s", comment: "Time Saved Seconds")
     public static let ShieldsTimeStatsDays = NSLocalizedString("ShieldsTimeStatsDays", tableName: "BraveShared", value: "d", comment: "Time Saved Days")
-    public static let OK = NSLocalizedString("OK", tableName: "BraveShared", value: "OK", comment: "OK button")
     public static let Delete = NSLocalizedString("Delete", tableName: "BraveShared", value: "Delete", comment: "")
     
     public static let New_Tab = NSLocalizedString("NewTab", tableName: "BraveShared", value: "New Tab", comment: "New Tab title")
     
     public static let Open_In_Background_Tab = NSLocalizedString("OpenInBackgroundTab", tableName: "BraveShared", value: "Open Link In New Tab", comment: "Context menu item for opening a link in a new tab")
-    public static let Open_In_New_Private_Tab = NSLocalizedString("OpenInNewPrivateTab", tableName: "BraveShared", value: "Open In New Private Tab", comment: "Context menu option for opening a link in a new private tab")
-    public static let Copy_Link = NSLocalizedString("CopyLink", tableName: "BraveShared", value: "Copy Link", comment: "Context menu item for copying a link URL to the clipboard")
     public static let Open_All_Bookmarks = NSLocalizedString("OpenAllBookmarks", tableName: "BraveShared", value: "Open All (%i)", comment: "Context menu item for opening all folder bookmarks")
-    public static let Share_Link = NSLocalizedString("ShareLink", tableName: "BraveShared", value: "Share Link", comment: "Context menu item for sharing a link URL")
     
-    public static let Show_Tabs = NSLocalizedString("ShowTabs", tableName: "BraveShared", value: "Show Tabs", comment: "Accessibility Label for the tabs button in the browser toolbar")
+    
     public static let Bookmark_Folder = NSLocalizedString("BookmarkFolder", tableName: "BraveShared", value: "Bookmark Folder", comment: "Bookmark Folder Section Title")
     public static let Bookmark_Info = NSLocalizedString("BookmarkInfo", tableName: "BraveShared", value: "Bookmark Info", comment: "Bookmark Info Section Title")
     public static let Name = NSLocalizedString("Name", tableName: "BraveShared", value: "Name", comment: "Bookmark title / Device name")

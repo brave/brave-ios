@@ -152,7 +152,7 @@ class LoginListViewController: UIViewController {
         // Show delete bar button item if we have selected any items
         if loginSelectionController.selectedCount > 0 {
             if navigationItem.rightBarButtonItem == nil {
-                navigationItem.rightBarButtonItem = UIBarButtonItem(title: Strings.LoginListDeleteLoginButtonTitle, style: .plain, target: self, action: #selector(tappedDelete))
+                navigationItem.rightBarButtonItem = UIBarButtonItem(title: Strings.DeleteLoginButtonTitle, style: .plain, target: self, action: #selector(tappedDelete))
                 navigationItem.rightBarButtonItem?.tintColor = UIColor.Photon.Red50
             }
         } else {

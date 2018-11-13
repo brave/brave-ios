@@ -1,204 +1,4 @@
-[ 
- [
-  "enter passcode", 
-  [
-   "BraveStrings.swift", 
-   "BraveStrings.swift"
-  ]
- ],  
- [
-  "settings", 
-  [
-   "Strings.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "share", 
-  [
-   "Strings.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "back", 
-  [
-   "BraveStrings.swift", 
-   "BraveStrings.swift", 
-   "Strings.swift"
-  ]
- ], 
- [
-  "bookmark", 
-  [
-   "Strings.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "reading list", 
-  [
-   "Strings.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "web content", 
-  [
-   "BraveStrings.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "done", 
-  [
-   "BraveStrings.swift", 
-   "BraveStrings.swift", 
-   "Strings.swift"
-  ]
- ], 
- [
-  "url", 
-  [
-   "Strings.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "cancel", 
-  [
-   "BraveStrings.swift", 
-   "BraveStrings.swift", 
-   "BraveStrings.swift", 
-   "BraveStrings.swift", 
-   "BraveStrings.swift", 
-   "BraveStrings.swift", 
-   "BraveStrings.swift", 
-   "Strings.swift", 
-   "Strings.swift", 
-   "Strings.swift", 
-   "Strings.swift", 
-   "Strings.swift"
-  ]
- ], 
- [
-  "close", 
-  [
-   "BraveStrings.swift", 
-   "BraveStrings.swift", 
-   "Strings.swift"
-  ]
- ], 
- [
-  "search suggestions from %@", 
-  [
-   "BraveStrings.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "share link", 
-  [
-   "BraveStrings.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "clear private data", 
-  [
-   "Strings.swift", 
-   "BraveStrings.swift", 
-   "Strings.swift", 
-   "Strings.swift"
-  ]
- ], 
- [
-  "visited", 
-  [
-   "Strings.swift", 
-   "Strings.swift"
-  ]
- ], 
- [
-  "no", 
-  [
-   "BraveStrings.swift", 
-   "BraveStrings.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "show tabs", 
-  [
-   "BraveStrings.swift", 
-   "BraveStrings.swift", 
-   "BraveStrings.swift", 
-   "Strings.swift"
-  ]
- ], 
- [
-  "paste & go", 
-  [
-   "Strings.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "scan qr code", 
-  [
-   "Strings.swift", 
-   "Strings.swift"
-  ]
- ], 
- [
-  "copy link", 
-  [
-   "BraveStrings.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "last modified %@", 
-  [
-   "BraveStrings.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "location", 
-  [
-   "Strings.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "open new tab", 
-  [
-   "Strings.swift", 
-   "Strings.swift"
-  ]
- ], 
- [
-  "don\u2019t save", 
-  [
-   "Strings.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "folder", 
-  [
-   "Strings.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "save login", 
-  [
-   "Strings.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
+[
  [
   "username", 
   [
@@ -207,7 +7,14 @@
   ]
  ], 
  [
-  "yes", 
+  "enter passcode", 
+  [
+   "BraveStrings.swift", 
+   "BraveStrings.swift"
+  ]
+ ], 
+ [
+  "search", 
   [
    "BraveStrings.swift", 
    "BraveStrings.swift"
@@ -217,99 +24,36 @@
   "find in page", 
   [
    "BraveStrings.swift", 
-   "BraveStrings.swift", 
-   "Strings.swift"
+   "BraveStrings.swift"
   ]
  ], 
  [
-  "general", 
+  "ok", 
   [
+   "BraveStrings.swift", 
+   "BraveStrings.swift", 
    "Strings.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "logins", 
-  [
-   "BraveStrings.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "downloads", 
-  [
+   "Strings.swift", 
    "Strings.swift", 
    "Strings.swift"
   ]
  ], 
  [
-  "recently closed", 
-  [
-   "Strings.swift", 
-   "Strings.swift"
-  ]
- ], 
- [
-  "yesterday", 
-  [
-   "BraveStrings.swift", 
-   "TimeConstants.swift", 
-   "Strings.swift"
-  ]
- ], 
- [
-  "last week", 
+  "close", 
   [
    "Strings.swift", 
    "BraveStrings.swift"
   ]
  ], 
  [
-  "forward", 
-  [
-   "Strings.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "new tab", 
-  [
-   "BraveStrings.swift", 
-   "BraveStrings.swift", 
-   "Strings.swift", 
-   "Strings.swift"
-  ]
- ], 
- [
-  "add tab", 
+  "no", 
   [
    "BraveStrings.swift", 
    "BraveStrings.swift"
   ]
  ], 
  [
-  "bookmarks", 
-  [
-   "Strings.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "password", 
-  [
-   "BraveStrings.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "paste", 
-  [
-   "Strings.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "save login %@ for %@?", 
+  "edit", 
   [
    "Strings.swift", 
    "BraveStrings.swift"
@@ -323,83 +67,10 @@
   ]
  ], 
  [
-  "close all tabs", 
-  [
-   "Strings.swift", 
-   "Strings.swift", 
-   "Strings.swift"
-  ]
- ], 
- [
-  "search", 
+  "yesterday", 
   [
    "BraveStrings.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "update login %@ for %@?", 
-  [
-   "Strings.swift", 
-   "BraveStrings.swift", 
-   "Strings.swift"
-  ]
- ], 
- [
-  "ok", 
-  [
-   "BraveStrings.swift", 
-   "BraveStrings.swift", 
-   "BraveStrings.swift", 
-   "Strings.swift", 
-   "Strings.swift", 
-   "Strings.swift", 
-   "Strings.swift"
-  ]
- ], 
- [
-  "failed", 
-  [
-   "Strings.swift", 
-   "Strings.swift", 
-   "Strings.swift"
-  ]
- ], 
- [
-  "add to reading list", 
-  [
-   "BraveStrings.swift", 
-   "BraveStrings.swift", 
-   "Strings.swift"
-  ]
- ], 
- [
-  "edit", 
-  [
-   "Strings.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "clear", 
-  [
-   "Strings.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "remove bookmark", 
-  [
-   "Strings.swift", 
-   "BraveStrings.swift", 
-   "Strings.swift"
-  ]
- ], 
- [
-  "remove", 
-  [
-   "Strings.swift", 
-   "BraveStrings.swift"
+   "TimeConstants.swift"
   ]
  ], 
  [
@@ -410,62 +81,72 @@
   ]
  ], 
  [
-  "top sites", 
-  [
-   "Strings.swift", 
-   "BraveStrings.swift", 
-   "Strings.swift"
-  ]
- ], 
- [
-  "open in new tab", 
+  "forward", 
   [
    "Strings.swift", 
    "BraveStrings.swift"
   ]
  ], 
  [
-  "switch", 
+  "update login %@ for %@?", 
   [
    "Strings.swift", 
    "Strings.swift"
   ]
  ], 
  [
-  "save password for %@?", 
+  "done", 
+  [
+   "BraveStrings.swift", 
+   "BraveStrings.swift", 
+   "Strings.swift"
+  ]
+ ], 
+ [
+  "back", 
   [
    "Strings.swift", 
    "BraveStrings.swift"
   ]
  ], 
  [
-  "quick-search engines", 
+  "add tab", 
   [
    "BraveStrings.swift", 
    "BraveStrings.swift"
   ]
  ], 
  [
-  "open in new private tab", 
+  "cancel", 
+  [
+   "BraveStrings.swift", 
+   "BraveStrings.swift", 
+   "BraveStrings.swift", 
+   "BraveStrings.swift", 
+   "BraveStrings.swift", 
+   "Strings.swift", 
+   "Strings.swift", 
+   "Strings.swift"
+  ]
+ ], 
+ [
+  "new tab", 
   [
    "BraveStrings.swift", 
    "BraveStrings.swift", 
    "Strings.swift"
   ]
- ],  
+ ], 
  [
-  "history", 
+  "password", 
   [
-   "Strings.swift", 
    "BraveStrings.swift", 
-   "Strings.swift"
+   "BraveStrings.swift"
   ]
  ], 
  [
   "delete", 
   [
-   "BraveStrings.swift", 
-   "BraveStrings.swift", 
    "BraveStrings.swift", 
    "BraveStrings.swift"
   ]

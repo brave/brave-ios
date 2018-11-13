@@ -198,7 +198,7 @@ class Tab: NSObject {
             webView.delegate = self
             configuration = nil
 
-            webView.accessibilityLabel = Strings.TabWebContentViewAccessibilityLabel
+            webView.accessibilityLabel = Strings.WebContentAccessibilityLabel
             webView.allowsBackForwardNavigationGestures = true
             webView.allowsLinkPreview = false
 

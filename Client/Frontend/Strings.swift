@@ -18,7 +18,7 @@ private func applicationBundle() -> Bundle {
 
 extension Strings {
     public static let OKString = NSLocalizedString("OKString", value: "OK", comment: "OK button")
-    public static let CancelString = NSLocalizedString("CancelString", value: "Cancel", comment: "Label for Cancel button")
+    public static let ThirdPartySearchFailedTitle = NSLocalizedString("ThirdPartySearchFailedTitle", value: "Failed", comment: "A title explaining that we failed to add a search engine")
 }
 
 //  PhotonActionSheet Strings
@@ -142,11 +142,8 @@ extension Strings {
     public static let ThirdPartySearchAddMessage = NSLocalizedString("ThirdPartySearchAddMessage", value: "The new search engine will appear in the quick search bar.", comment: "The message that asks the user to Add the search provider explaining where the search engine will appear")
     public static let ThirdPartySearchCancelButton = NSLocalizedString("ThirdPartySearchCancelButton", value: "Cancel", comment: "The cancel button if you do not want to add a search engine.")
     public static let ThirdPartySearchOkayButton = NSLocalizedString("ThirdPartySearchOkayButton", value: "OK", comment: "The confirmation button")
-    public static let ThirdPartySearchFailedTitle = NSLocalizedString("ThirdPartySearchFailedTitle", value: "Failed", comment: "A title explaining that we failed to add a search engine")
     public static let ThirdPartySearchFailedMessage = NSLocalizedString("ThirdPartySearchFailedMessage", value: "The search provider could not be added.", comment: "A title explaining that we failed to add a search engine")
-    public static let CustomEngineFormErrorTitle = NSLocalizedString("CustomEngineFormErrorTitle", value: "Failed", comment: "A title stating that we failed to add custom search engine.")
     public static let CustomEngineFormErrorMessage = NSLocalizedString("CustomEngineFormErrorMessage", value: "Please fill all fields correctly.", comment: "A message explaining fault in custom search engine form.")
-    public static let CustomEngineDuplicateErrorTitle = NSLocalizedString("CustomEngineDuplicateErrorTitle", value: "Failed", comment: "A title stating that we failed to add custom search engine.")
     public static let CustomEngineDuplicateErrorMessage = NSLocalizedString("CustomEngineDuplicateErrorMessage", value: "A search engine with this title or URL has already been added.", comment: "A message explaining fault in custom search engine form.")
 }
 

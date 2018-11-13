@@ -197,7 +197,7 @@ class TabsButton: UIButton {
                     self.insideButton.layer.opacity = 1
                     self.insideButton.layer.transform = CATransform3DIdentity
                 }
-                self.accessibilityLabel = Strings.BrowserToolbarShowTabsButtonAccessibilityLabel
+                self.accessibilityLabel = Strings.Show_Tabs
                 self.countLabel.text = countToBe
                 self.accessibilityValue = countToBe
             }

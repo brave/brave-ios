@@ -165,7 +165,7 @@ extension UIAlertController {
         }
         
         let cancelAction = UIAlertAction(title: Strings.DeleteLoginAlertCancelActionTitle, style: .cancel, handler: nil)
-        let deleteAction = UIAlertAction(title: Strings.DeleteLoginAlertDeleteActionTitle, style: .destructive, handler: deleteCallback)
+        let deleteAction = UIAlertAction(title: Strings.DeleteLoginButtonTitle, style: .destructive, handler: deleteCallback)
         
         deleteAlert.addAction(cancelAction)
         deleteAlert.addAction(deleteAction)
@@ -237,7 +237,7 @@ class UserTextInputAlert {
             }
         }
         
-        let okAlertAction = UIAlertAction(title: Strings.OK, style: .default) { _ in
+        let okAlertAction = UIAlertAction(title: Strings.OKString, style: .default) { _ in
             guard let textFields = self.alert.textFields else { return }
             
             let secondOptionalInput = textFields.count > 1 ? textFields[1].text : nil

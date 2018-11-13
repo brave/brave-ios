@@ -30,7 +30,7 @@ class SearchEnginePicker: UITableViewController {
         super.viewDidLoad()
 
         navigationItem.title = Strings.SearchEnginePickerNavTitle
-        navigationItem.leftBarButtonItem = UIBarButtonItem(title: Strings.SearchEnginePickerCancelButtonTitle, style: .plain, target: self, action: #selector(cancel))
+        navigationItem.leftBarButtonItem = UIBarButtonItem(title: Strings.CancelButtonTitle, style: .plain, target: self, action: #selector(cancel))
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
