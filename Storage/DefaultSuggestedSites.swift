@@ -140,10 +140,10 @@ open class DefaultSuggestedSites {
 
 
 extension Strings {
-    public static let YoutubeDisplayTitle = NSLocalizedString("YouTube", tableName: "Storage", value: "YouTube", comment: "Tile title for YouTube")
-    public static let AmazonDisplayTitle = NSLocalizedString("Amazon", tableName: "Storage", value: "Amazon", comment: "Tile title for Amazon")
-    public static let WikipediaDisplayTitle = NSLocalizedString("Wikipedia", tableName: "Storage", value: "Wikipedia", comment: "Tile title for Wikipedia")
-    public static let TwitterDisplayTitle = NSLocalizedString("Twitter", tableName: "Storage", value: "Twitter", comment: "Tile title for Twitter")
-    public static let RedditDisplayTitle = NSLocalizedString("Reddit", tableName: "Storage", value: "Reddit", comment: "Tile title for Reddit")
-    public static let CoinmarketcapDisplayTitle = NSLocalizedString("Coinmarketcap", tableName: "Storage", value: "Coinmarketcap", comment: "Tile title for Coinmarketcap")
+    public static let YoutubeDisplayTitle = NSLocalizedString("YoutubeDisplayTitle", tableName: "Storage", value: "YouTube", comment: "Tile title for YouTube")
+    public static let AmazonDisplayTitle = NSLocalizedString("AmazonDisplayTitle", tableName: "Storage", value: "Amazon", comment: "Tile title for Amazon")
+    public static let WikipediaDisplayTitle = NSLocalizedString("WikipediaDisplayTitle", tableName: "Storage", value: "Wikipedia", comment: "Tile title for Wikipedia")
+    public static let TwitterDisplayTitle = NSLocalizedString("TwitterDisplayTitle", tableName: "Storage", value: "Twitter", comment: "Tile title for Twitter")
+    public static let RedditDisplayTitle = NSLocalizedString("RedditDisplayTitle", tableName: "Storage", value: "Reddit", comment: "Tile title for Reddit")
+    public static let CoinmarketcapDisplayTitle = NSLocalizedString("CoinmarketcapDisplayTitle", tableName: "Storage", value: "Coinmarketcap", comment: "Tile title for Coinmarketcap")
 }

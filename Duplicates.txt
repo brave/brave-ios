@@ -1,331 +1,341 @@
-[
+
  [
-  "", 
+  "New Tab", 
   [
    "BraveStrings.swift", 
-   "BraveStrings.swift", 
-   "ReaderModeStyleViewController.swift", 
-   "ReaderModeStyleViewController.swift"
+   "BraveStrings.swift",
+   "Strings.swift", 
+   "Strings.swift"
   ]
  ], 
+
+ ],  
  [
-  "ChangesFontType", 
-  [
-   "ReaderModeStyleViewController.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
  [
-  "Hide", 
-  [
-   "MenuHelper.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "ShowSearchSuggestions", 
-  [
-   "SearchSettingsTableViewController.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "TabOf", 
-  [
-   "TabTrayController.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "Forward", 
-  [
-   "BraveStrings.swift", 
-   "BraveStrings.swift", 
-   "TabToolbar.swift"
-  ]
- ], 
- [
-  "Today", 
+  "URL", 
   [
    "Strings.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "IncreaseTextSize", 
-  [
-   "ReaderModeStyleViewController.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "BrowserToolbarShowTabsButtonAccessibilityLabel", 
-  [
-   "TabsButton.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "OpenInSafari", 
-  [
-   "ErrorPageHelper.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "AddToReadingList", 
-  [
-   "TabLocationView.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "Serif", 
-  [
-   "ReaderModeStyleViewController.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "On", 
-  [
    "BraveStrings.swift", 
-   "DeviceInfo.swift", 
-   "TabTrayController.swift"
+   "Strings.swift"
   ]
+ ],   
  ], 
- [
-  "SearchInputField", 
-  [
-   "SearchInputView.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "ThePageCouldNotBeDisplayedInReaderView", 
-  [
-   "ReaderModeHandlers.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "Copy", 
-  [
-   "MenuHelper.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
+ [ 
+
  [
   "OK", 
   [
+   "BraveStrings.swift", 
+   "BraveStrings.swift", 
+   "BraveStrings.swift", 
    "Strings.swift", 
-   "BraveStrings.swift", 
-   "UIAlertControllerExtensions.swift", 
-   "UIAlertControllerExtensions.swift"
+   "Strings.swift", 
+   "Strings.swift", 
+   "Strings.swift", 
+   "Strings.swift"
   ]
  ], 
  [
-  "MoreThanAWeekAgo", 
-  [
-   "BraveStrings.swift", 
-   "TimeConstants.swift"
-  ]
- ], 
- [
-  "PrivateMode", 
-  [
-   "TabTrayController.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "ChangesColorTheme", 
-  [
-   "ReaderModeStyleViewController.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "BookmarksToolbar", 
-  [
-   "BraveStrings.swift", 
-   "BrowserSchema.swift"
-  ]
- ], 
- [
-  "LoadingContent", 
-  [
-   "ReaderModeHandlers.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "Sepia", 
-  [
-   "ReaderModeStyleViewController.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "Reveal", 
-  [
-   "MenuHelper.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "UnsortedBookmarks", 
-  [
-   "BraveStrings.swift", 
-   "BrowserSchema.swift"
-  ]
- ], 
- [
-  "AreYouSure", 
-  [
-   "UIAlertControllerExtensions.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "MobileBookmarks", 
-  [
-   "BraveStrings.swift", 
-   "BrowserSchema.swift"
-  ]
- ], 
- [
-  "ReaderView", 
-  [
-   "TabLocationView.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "Off", 
-  [
-   "TabTrayController.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "Username", 
-  [
-   "LoginDetailViewController.swift", 
-   "BraveStrings.swift", 
-   "Authenticator.swift"
-  ]
- ], 
- [
-  "LastMonth", 
+  "Paste", 
   [
    "Strings.swift", 
    "BraveStrings.swift"
   ]
  ], 
  [
-  "NextInPageResult", 
+  "Share", 
   [
-   "FindInPageBar.swift", 
+   "Strings.swift", 
    "BraveStrings.swift"
   ]
  ], 
  [
-  "SecureConnection", 
+  "Bookmarks", 
   [
-   "TabLocationView.swift", 
+   "Strings.swift", 
+   "BraveStrings.swift"
+  ]
+ ],   
+ [
+  "Failed", 
+  [
+   "Strings.swift", 
+   "Strings.swift", 
+   "Strings.swift"
+  ]
+ ], 
+ [
+  "Location", 
+  [
+   "Strings.swift", 
+   "BraveStrings.swift"
+  ]
+ ],  
+ [
+  "Enable", 
+  [
+   "Strings.swift", 
    "BraveStrings.swift"
   ]
  ], 
  [
-  "OpenInNewPrivateTab", 
+ [
+  "Add to Reading List", 
   [
-   "BrowserViewController.swift", 
+   "BraveStrings.swift", 
+   "BraveStrings.swift", 
+   "Strings.swift", 
+   "Strings.swift"
+  ]
+ ], 
+ [
+  "Tracking Protection", 
+  [
+   "Strings.swift", 
+   "Strings.swift"
+  ]
+ ], 
+ 
+ [
+  "Save Login", 
+  [
+   "Strings.swift", 
+   "BraveStrings.swift"
+  ]
+ ], 
+ ], 
+ ], 
+
+ ], 
+ [
+  "Recently Closed", 
+  [
+   "Strings.swift", 
+   "Strings.swift"
+  ]
+ ], 
+ ], 
+ [
+  "Clear Private Data", 
+  [
+   "Strings.swift", 
+   "BraveStrings.swift", 
+   "Strings.swift", 
+   "Strings.swift"
+  ]
+ ], 
+ [
+  "Add Tab", 
+  [
+   "BraveStrings.swift", 
    "BraveStrings.swift"
   ]
  ], 
  [
-  "Website", 
-  [
-   "LoginDetailViewController.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "SearchesForTheSuggestion", 
-  [
-   "SearchViewController.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "Brightness", 
-  [
-   "ReaderModeStyleViewController.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "Light", 
-  [
-   "ReaderModeStyleViewController.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "LoginsWillBePermanentlyRemoved", 
-  [
-   "UIAlertControllerExtensions.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "SearchSettings", 
-  [
-   "SearchViewController.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "DecreaseTextSize", 
-  [
-   "ReaderModeStyleViewController.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "TabsToOf", 
-  [
-   "TabTrayController.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "ThisActionWillClearAllOfYourPrivateDataItCannotBeUndone", 
-  [
-   "UIAlertControllerExtensions.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
+
  [
   "Delete", 
   [
-   "LoginDetailViewController.swift", 
    "BraveStrings.swift", 
-   "LoginListViewController.swift", 
-   "UIAlertControllerExtensions.swift"
+   "BraveStrings.swift", 
+   "BraveStrings.swift", 
+   "BraveStrings.swift"
   ]
  ], 
+ ], 
  [
-  "Reload", 
+  "Yes", 
   [
-   "TabLocationView.swift", 
    "BraveStrings.swift", 
-   "TabLocationView.swift"
+   "BraveStrings.swift"
   ]
  ], 
  [
-  "LastWeek", 
+  "Find in Page", 
+  [
+   "BraveStrings.swift", 
+   "BraveStrings.swift", 
+   "Strings.swift"
+  ]
+ ], 
+ [
+  "No", 
+  [
+   "BraveStrings.swift", 
+   "BraveStrings.swift", 
+   "BraveStrings.swift"
+  ]
+ ], 
+ [
+  "Don\u2019t Save", 
+  [
+   "Strings.swift", 
+   "BraveStrings.swift"
+  ]
+ ], 
+ [
+  "Scan QR Code", 
+  [
+   "Strings.swift", 
+   "Strings.swift"
+  ]
+ ], 
+ [
+  "Open in New Tab", 
+  [
+   "Strings.swift", 
+   "BraveStrings.swift"
+  ]
+ ], 
+ [
+  "Save password for %@?", 
+  [
+   "Strings.swift", 
+   "BraveStrings.swift"
+  ]
+ ], 
+ 
+ [
+  "Private Browsing Mode", 
+  [
+   "Strings.swift", 
+   "Strings.swift"
+  ]
+ ], 
+ [
+  "Logins", 
+  [
+   "BraveStrings.swift", 
+   "BraveStrings.swift"
+  ]
+ ], 
+ [
+  "Last week", 
+  [
+   "Strings.swift", 
+   "BraveStrings.swift"
+  ]
+ ], 
+
+ [
+  "Save login %@ for %@?", 
+  [
+   "Strings.swift", 
+   "BraveStrings.swift"
+  ]
+ ], 
+ ], 
+ [
+  "Last month", 
+  [
+   "Strings.swift", 
+   "BraveStrings.swift"
+  ]
+ ], 
+ [
+  "Update login %@ for %@?", 
+  [
+   "Strings.swift", 
+   "BraveStrings.swift", 
+   "Strings.swift"
+  ]
+ ], 
+ [
+  "Switch", 
+  [
+   "Strings.swift", 
+   "Strings.swift"
+  ]
+ ], 
+ [
+  "Visited", 
+  [
+   "Strings.swift", 
+   "Strings.swift"
+  ]
+ ], 
+ [
+  "History", 
+  [
+   "Strings.swift", 
+   "BraveStrings.swift", 
+   "Strings.swift"
+  ]
+ ], 
+ [
+  "Close Tab", 
+  [
+   "Strings.swift", 
+   "BraveStrings.swift"
+  ]
+ ],  
+ [
+  "Show Tabs", 
+  [
+   "BraveStrings.swift", 
+   "BraveStrings.swift", 
+   "BraveStrings.swift", 
+   "Strings.swift"
+  ]
+ ],   
+ [
+  "General", 
+  [
+   "Strings.swift", 
+   "BraveStrings.swift"
+  ]
+ ], 
+ [
+  "Done", 
+  [
+   "BraveStrings.swift", 
+   "BraveStrings.swift", 
+   "Strings.swift"
+  ]
+ ],  
+ [
+  "Cancel", 
+  [
+   "BraveStrings.swift", 
+   "BraveStrings.swift", 
+   "BraveStrings.swift", 
+   "BraveStrings.swift", 
+   "BraveStrings.swift", 
+   "BraveStrings.swift", 
+   "BraveStrings.swift", 
+   "Strings.swift", 
+   "Strings.swift", 
+   "Strings.swift", 
+   "Strings.swift", 
+   "Strings.swift", 
+   "Strings.swift"
+  ]
+ ], 
+ [
+  "Close", 
+  [
+   "BraveStrings.swift", 
+   "BraveStrings.swift", 
+   "Strings.swift"
+  ]
+ ], 
+ ], 
+ [
+  "Settings", 
+  [
+   "Strings.swift", 
+   "BraveStrings.swift"
+  ]
+ ], 
+ [
+  "Bookmarked", 
+  [
+   "Strings.swift", 
+   "Strings.swift"
+  ]
+ ],  
+ [
+  "Bookmark", 
   [
    "Strings.swift", 
    "BraveStrings.swift"
@@ -336,425 +346,127 @@
   [
    "BraveStrings.swift", 
    "BraveStrings.swift", 
-   "TabToolbar.swift"
-  ]
- ], 
- [
-  "Find", 
-  [
-   "BraveStrings.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "Yes", 
-  [
-   "BraveStrings.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "EnterSearchMode", 
-  [
-   "SearchInputView.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "DeselectAll", 
-  [
-   "LoginListViewController.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "No", 
-  [
-   "BraveStrings.swift", 
-   "BraveStrings.swift", 
-   "UIAlertControllerExtensions.swift"
-  ]
- ], 
- [
-  "LoginsHelperPromptUpdateLoginTitle", 
-  [
-   "Strings.swift", 
    "Strings.swift"
   ]
  ], 
- [
-  "LogOut", 
-  [
-   "Strings.swift", 
-   "Strings.swift"
-  ]
  ], 
  [
-  "SelectAll", 
-  [
-   "LoginListViewController.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "Logins", 
-  [
-   "LoginListViewController.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "CloseTab", 
-  [
-   "TabPeekViewController.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "ThisAllowsYouToSaveTheImageToYourCameraRoll", 
-  [
-   "BrowserViewController.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "JustNow", 
-  [
-   "BraveStrings.swift", 
-   "TimeConstants.swift"
-  ]
- ], 
- [
-  "QuickSearchEngines", 
-  [
-   "BraveStrings.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "SaveImage", 
-  [
-   "BrowserViewController.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "ShareLink", 
-  [
-   "BrowserViewController.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "StartBrowsing", 
+  "Folder", 
   [
    "Strings.swift", 
    "BraveStrings.swift"
   ]
  ], 
  [
-  "TryAgain", 
-  [
-   "ErrorPageHelper.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "Search", 
-  [
-   "BraveStrings.swift", 
-   "BraveStrings.swift", 
-   "SearchViewController.swift"
-  ]
- ], 
- [
-  "FindInPage", 
-  [
-   "MenuHelper.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "LoginsWillBeRemovedFromAllConnectedDevices", 
-  [
-   "UIAlertControllerExtensions.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "MoreThanAMonthAgo", 
-  [
-   "BraveStrings.swift", 
-   "TimeConstants.swift"
-  ]
- ], 
- [
-  "NoTabs", 
-  [
-   "TabTrayController.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "DesktopBookmarks", 
-  [
-   "BraveStrings.swift", 
-   "SQLiteBookmarksModel.swift"
-  ]
- ], 
- [
-  "LoadOriginalPage", 
-  [
-   "ReaderModeHandlers.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "Done", 
-  [
-   "FindInPageBar.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "SearchSuggestionsFrom", 
-  [
-   "SearchViewController.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "BraveWouldLikeToAccessYourPhotos", 
-  [
-   "BrowserViewController.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "Cancel", 
-  [
-   "Strings.swift", 
-   "BraveStrings.swift", 
-   "SearchEnginePicker.swift", 
-   "Authenticator.swift", 
-   "BrowserViewController.swift", 
-   "UIAlertControllerExtensions.swift", 
-   "UIAlertControllerExtensions.swift", 
-   "UIAlertControllerExtensions.swift"
-  ]
- ], 
- [
-  "Close", 
-  [
-   "TabTrayController.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "OpenFill", 
-  [
-   "MenuHelper.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "TodayAt", 
-  [
-   "BraveStrings.swift", 
-   "TimeConstants.swift"
-  ]
- ], 
- [
-  "WebContent", 
-  [
-   "Tab.swift", 
-   "BraveStrings.swift", 
-   "BrowserViewController.swift"
-  ]
- ], 
- [
-  "LastModified", 
-  [
-   "LoginDetailViewController.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "AddressAndSearch", 
-  [
-   "URLBarView.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "ClosingTab", 
-  [
-   "TabTrayController.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "AddTab", 
-  [
-   "TabTrayController.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "NavigationToolbar", 
-  [
-   "TabToolbar.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "BookmarksMenu", 
-  [
-   "BraveStrings.swift", 
-   "BrowserSchema.swift"
-  ]
- ], 
- [
-  "EnterPasscode", 
-  [
-   "AuthenticationManagerConstants.swift", 
-   "AuthenticationManagerConstants.swift"
-  ]
- ], 
- [
-  "SwipeRightOrLeftWithThreeFingersToCloseTheTab", 
-  [
-   "TabTrayController.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "CopyLink", 
-  [
-   "BrowserViewController.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "NewTab", 
-  [
-   "BraveStrings.swift", 
-   "BraveStrings.swift", 
-   "TabTrayButtonExtensions.swift"
-  ]
- ], 
- [
-  "OpenSettings", 
-  [
-   "BrowserViewController.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "Stop", 
-  [
-   "TabLocationView.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
  [
   "Yesterday", 
   [
-   "BraveStrings.swift", 
-   "TimeConstants.swift", 
+   "Strings.swift", 
+   "BraveStrings.swift"
+  ]
+ ], 
+
+ ], 
+ [
+  "New Folder", 
+  [
+   "Strings.swift", 
+   "BraveStrings.swift"
+  ]
+ ], 
+ [
+  "Close All Tabs", 
+  [
+   "Strings.swift", 
+   "Strings.swift", 
+   "Strings.swift"
+  ]
+ ],  
+ [
+  "Start Browsing", 
+  [
+   "Strings.swift", 
+   "BraveStrings.swift"
+  ]
+ ], 
+ [
+  "Edit", 
+  [
+   "Strings.swift", 
+   "BraveStrings.swift"
+  ]
+ ], 
+ [
+  "Clear", 
+  [
+   "Strings.swift", 
+   "BraveStrings.swift"
+  ]
+ ],  
+ [
+  "Remove", 
+  [
+   "Strings.swift", 
+   "BraveStrings.swift"
+  ]
+ ], 
+ ], 
+
+ ], 
+ [
+  "Open New Tab", 
+  [
+   "Strings.swift", 
+   "Strings.swift"
+  ]
+ ], 
+
+ ], 
+ [
+  "Normal Browsing Mode", 
+  [
+   "Strings.swift", 
    "Strings.swift"
   ]
  ], 
  [
-  "ThereWasAnErrorConvertingThePage", 
+  "Remove Bookmark", 
   [
-   "ReaderModeHandlers.swift", 
+   "Strings.swift", 
+   "BraveStrings.swift", 
+   "Strings.swift"
+  ]
+ ], 
+ [
+  "Paste & Go", 
+  [
+   "Strings.swift", 
    "BraveStrings.swift"
   ]
  ], 
  [
-  "Dark", 
+  "Web content", 
   [
-   "ReaderModeStyleViewController.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "RemoveThisDevice", 
-  [
+   "BraveStrings.swift", 
    "BraveStrings.swift", 
    "BraveStrings.swift"
   ]
  ], 
+
+
+ ], 
  [
-  "Password", 
+  "Downloads", 
   [
-   "LoginDetailViewController.swift", 
-   "BraveStrings.swift", 
-   "Authenticator.swift"
+   "Strings.swift", 
+   "Strings.swift"
   ]
  ], 
  [
-  "CopyImage", 
+  "Bookmark This Page", 
   [
-   "BrowserViewController.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "TabsTray", 
-  [
-   "TabTrayController.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "SansSerif", 
-  [
-   "ReaderModeStyleViewController.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "ThisWeek", 
-  [
-   "BraveStrings.swift", 
-   "TimeConstants.swift"
-  ]
- ], 
- [
-  "NoLoginsFound", 
-  [
-   "LoginListViewController.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "TurnsPrivateModeOnOrOff", 
-  [
-   "TabTrayController.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "Aa", 
-  [
-   "ReaderModeStyleViewController.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "ClearSearch", 
-  [
-   "SearchInputView.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
- [
-  "PreviousInPageResult", 
-  [
-   "FindInPageBar.swift", 
-   "BraveStrings.swift"
+   "Strings.swift", 
+   "Strings.swift"
   ]
  ]
 ]

@@ -11,32 +11,32 @@ import json
 blacklisted_parent_directories = ["ThirdParty", "Carthage", "fastlane", "L10nSnapshotTests", "l10n"]
 frameworks = ["BraveShared", "Data", "Shared", "Storage"]
 
-#def pascal_case(string):
-#  # Convert full stops, hyphens and underscores to spaces so that words are correctly pascal cased
-#  string = string.replace(".", " ")
-#  string = string.replace("-", " ")
-#  string = string.replace("_", " ")
-#
-#  # Convert first letter of each word to uppercase
-#  string = re.sub(r'(^|\s)(\S)', lambda match: match.group(1) + match.group(2).upper(), string)
-#
-#  # Strip punctuation
-#  string = re.sub(r'[^\w\s]', '', string)
-#
-#  # Strip spaces
-#  string = string.replace(" ", "")
-#
-#  return string
+def pascal_case(string):
+  # Convert full stops, hyphens and underscores to spaces so that words are correctly pascal cased
+  string = string.replace(".", " ")
+  string = string.replace("-", " ")
+  string = string.replace("_", " ")
+
+  # Convert first letter of each word to uppercase
+  string = re.sub(r'(^|\s)(\S)', lambda match: match.group(1) + match.group(2).upper(), string)
+
+  # Strip punctuation
+  string = re.sub(r'[^\w\s]', '', string)
+
+  # Strip spaces
+  string = string.replace(" ", "")
+
+  return string
 
 def replacement_string(key, table_name, value, comment, file):
-  if key in keyDict:
-    if key in duplicate:
-      duplicate[key].append(file)
+  if value in keyDict:
+    if value in duplicate:
+      duplicate[value].append(file)
     else:
-      duplicate[key] = [file,keyDict[key]]
+      duplicate[value] = [file,keyDict[value]]
   else:
-    keyDict[key] = file
-  content = 'public static let ' + key + ' = NSLocalizedString("' + key + '"'
+    keyDict[value] = file
+  content = 'public static let ' + key + ' = NSLocalizedString("' + pascal_case(key) + '"'
 
   if table_name:
     content += ', tableName: "' + table_name + '"'
