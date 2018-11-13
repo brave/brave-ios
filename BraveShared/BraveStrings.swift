@@ -412,7 +412,7 @@ public extension Strings {
     public static let SyncAddComputerScanDescription = NSLocalizedString("On your computer, navigate to Brave Settings > Sync > Scan. \n\nCapture the QR Code (above) with your second device, or enter code words if no camera is available.", comment: "Sync add device description")
     public static let SyncAddComputerWordsDescription = NSLocalizedString("On your computer, navigate to Brave Settings > Sync. Choose “Enter a Sync Chain Code.” \n\nEnter the code words above, including spaces.", comment: "Sync add device description")
     public static let SyncNoConnectionTitle = NSLocalizedString("Can't connect to sync", comment: "No internet connection alert title.")
-     public static let SyncNoConnectionBody = NSLocalizedString("Check your internet connection and try again.", comment: "No internet connection alert body.")
+    public static let SyncNoConnectionBody = NSLocalizedString("Check your internet connection and try again.", comment: "No internet connection alert body.")
     public static let EnterCodeWords = NSLocalizedString("Enter code words", comment: "Sync enter code words")
     public static let ShowCodeWords = NSLocalizedString("Show code words instead", comment: "Show code words instead")
     public static let SyncDevices = NSLocalizedString("Devices & Settings", comment: "Sync you browser settings across devices.")
