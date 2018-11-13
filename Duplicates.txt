@@ -1,25 +1,11 @@
-[
- [
-  "last month", 
-  [
-   "Strings.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
+[ 
  [
   "enter passcode", 
   [
    "BraveStrings.swift", 
    "BraveStrings.swift"
   ]
- ], 
- [
-  "tab %@ of %@", 
-  [
-   "BraveStrings.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
+ ],  
  [
   "settings", 
   [
@@ -466,27 +452,13 @@
    "BraveStrings.swift", 
    "Strings.swift"
   ]
- ], 
- [
-  "tabs %@ to %@ of %@", 
-  [
-   "BraveStrings.swift", 
-   "BraveStrings.swift"
-  ]
- ], 
+ ],  
  [
   "history", 
   [
    "Strings.swift", 
    "BraveStrings.swift", 
    "Strings.swift"
-  ]
- ], 
- [
-  "new folder", 
-  [
-   "Strings.swift", 
-   "BraveStrings.swift"
   ]
  ], 
  [

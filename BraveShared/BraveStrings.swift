@@ -89,6 +89,7 @@ public extension Strings {
     public static let AccessPhotoDeniedAlertMessage = NSLocalizedString("AccessPhotoDeniedAlertMessage", tableName: "BraveShared", value: "This allows you to save the image to your Camera Roll.", comment: "See http://mzl.la/1G7uHo7")
     public static let OpenPhoneSettingsActionTitle = NSLocalizedString("OpenPhoneSettingsActionTitle", tableName: "BraveShared", value: "Open Settings", comment: "See http://mzl.la/1G7uHo7")
     public static let CopyImageActionTitle = NSLocalizedString("CopyImageActionTitle", tableName: "BraveShared", value: "Copy Image", comment: "Context menu item for copying an image to the clipboard")
+    public static let CloseAllTabsTitle = NSLocalizedString("CloseAllTabsTitle", tableName: "BraveShared", value: "Close All %i Tabs", comment: "")
 }
 
 // PRAGMA MARK: ErrorPageHelper.swift
@@ -151,6 +152,8 @@ public extension Strings {
     public static let TabTrayClosingTabAccessibilityNotificationText = NSLocalizedString("TabTrayClosingTabAccessibilityNotificationText", tableName: "BraveShared", value: "Closing tab", comment: "Accessibility label (used by assistive technology) notifying the user that the tab is being closed.")
     public static let TabTrayCellCloseAccessibilityHint = NSLocalizedString("TabTrayCellCloseAccessibilityHint", tableName: "BraveShared", value: "Swipe right or left with three fingers to close the tab.", comment: "Accessibility hint for tab tray's displayed tab.")
     public static let TabTrayAddTabAccessibilityLabel = NSLocalizedString("TabTrayAddTabAccessibilityLabel", tableName: "BraveShared", value: "Add Tab", comment: "Accessibility label for the Add Tab button in the Tab Tray.")
+    public static let Private = NSLocalizedString("Private", tableName: "BraveShared", value: "Private", comment: "Private button title")
+    public static let Private_Browsing = NSLocalizedString("PrivateBrowsing", tableName: "BraveShared", value: "Private Browsing", comment: "")
 }
 
 // PRAGMA MARK: TabTrayButtonExtensions.swift
@@ -306,12 +309,6 @@ public extension Strings {
     public static let AuthenticationMaximumAttemptsReachedNoTime = NSLocalizedString("AuthenticationMaximumAttemptsReachedNoTime", tableName: "BraveShared", value: "Maximum attempts reached. Please try again later.", comment: "Error message displayed when user enters incorrect passcode and has reached the maximum number of attempts.")
 }
 
-
-// PRAGMA MARK:
-public extension Strings {
-    
-}
-
 // PRAGMA MARK:Settings.
 public extension Strings {
     public static let ClearPrivateData = NSLocalizedString("ClearPrivateData", tableName: "BraveShared", value: "Clear Private Data", comment: "Button in settings that clears private data for the selected items. Also used as section title in settings panel")
@@ -328,54 +325,29 @@ public extension Strings {
     public static let ErrorPagesVisitOnceButton = NSLocalizedString("ErrorPagesVisitOnceButton", tableName: "BraveShared", value: "Visit site anyway", comment: "Button label to temporarily continue to the site from the certificate error page")
 }
 
-// PRAGMA MARK:Logins Helper.
-public extension Strings {
-    public static let SaveLogin = NSLocalizedString("SaveLogin", tableName: "BraveShared", value: "Save Login", comment: "Button to save the user's password")
-    public static let DontSave = NSLocalizedString("DontSave", tableName: "BraveShared", value: "Don’t Save", comment: "Button to not save the user's password")
-}
-
 public extension Strings {
     public static let Home = NSLocalizedString("Home", tableName: "BraveShared", value: "Home", comment: "")
-    public static let SearchNewTabTitle = NSLocalizedString("SearchNewTabTitle", tableName: "BraveShared", value: "Search in New Tab", comment: "")
-    public static let SearchNewPrivateTabTitle = NSLocalizedString("SearchNewPrivateTabTitle", tableName: "BraveShared", value: "Search in New Private Tab", comment: "")
-    public static let CloseAllTabsTitle = NSLocalizedString("CloseAllTabsTitle", tableName: "BraveShared", value: "Close All %i Tabs", comment: "")
 }
 
 public extension Strings {
     
-    public static let Allow = NSLocalizedString("Allow", tableName: "BraveShared", value: "Allow", comment: "")
-    public static let DontAllow = NSLocalizedString("DontAllow", tableName: "BraveShared", value: "Don't Allow", comment: "")
     public static let NewFolder = NSLocalizedString("NewFolder", tableName: "BraveShared", value: "New Folder", comment: "Title for new folder popup")
     public static let EnterFolderName = NSLocalizedString("EnterFolderName", tableName: "BraveShared", value: "Enter folder name", comment: "Description for new folder popup")
     public static let Edit = NSLocalizedString("Edit", tableName: "BraveShared", value: "Edit", comment: "")
     
-    public static let NewDevice = NSLocalizedString("NewDevice", tableName: "BraveShared", value: "Device Name", comment: "Title for new device popup")
-    public static let DeviceFolderName = NSLocalizedString("DeviceFolderName", tableName: "BraveShared", value: "Please enter a name for this device", comment: "Description for new device popup")
     
-    public static let FavoritesPopupTitle = NSLocalizedString("FavoritesPopupTitle", tableName: "BraveShared", value: "Top sites are now favorites.", comment: "Title for convert favorites popup")
-    public static let FavoritesPopupDescription = NSLocalizedString("FavoritesPopupDescription", tableName: "BraveShared", value: "You can now edit and arrange favorites however you like. Add favorites from the share menu when visiting a website.", comment: "Description for convert favorites popup")
-    public static let Convert = NSLocalizedString("Convert", tableName: "BraveShared", value: "Convert", comment: "Title for convert favorites popup convert button")
-    public static let UseDefaults = NSLocalizedString("UseDefaults", tableName: "BraveShared", value: "Use Defaults", comment: "Title for convert favorites popup use defaults button")
     
-    public static let RequestSwitchAppsTitle = NSLocalizedString("RequestSwitchAppsTitle", tableName: "BraveShared", value: "Allow link to switch apps?", comment: "")
-    public static let RequestSwitchAppsMessage = NSLocalizedString("RequestSwitchAppsMessage", tableName: "BraveShared", value: "%@ will launch an external application", comment: "")
-    public static let SyncUnsuccessful = NSLocalizedString("SyncUnsuccessful", tableName: "BraveShared", value: "Unsuccessful", comment: "")
-    public static let SyncUnableCreateGroup = NSLocalizedString("SyncUnableCreateGroup", tableName: "BraveShared", value: "Unable to create new sync group.", comment: "Description on popup when setting up a sync group fails")
-    
-    public static let ShowTour = NSLocalizedString("ShowTour", tableName: "BraveShared", value: "Show Tour", comment: "Show the on-boarding screen again from the settings")
+
     public static let CurrentlyUsedSearchEngines = NSLocalizedString("CurrentlyUsedSearchEngines", tableName: "BraveShared", value: "Currently used search engines", comment: "Currently usedd search engines section name.")
     public static let QuickSearchEngines = NSLocalizedString("QuickSearchEngines", tableName: "BraveShared", value: "Quick-Search Engines", comment: "Title for quick-search engines settings section.")
     public static let StandardTabSearch = NSLocalizedString("StandardTabSearch", tableName: "BraveShared", value: "Standard Tab", comment: "Open search section of settings")
     public static let PrivateTabSearch = NSLocalizedString("PrivateTabSearch", tableName: "BraveShared", value: "Private Tab", comment: "Default engine for private search.")
     public static let SearchEngines = NSLocalizedString("SearchEngines", tableName: "BraveShared", value: "Search Engines", comment: "Search engines section of settings")
-    public static let Logins = NSLocalizedString("Logins", tableName: "BraveShared", value: "Logins", comment: "Label used as an item in Settings. When touched, the user will be navigated to the Logins/Password manager.")
     public static let Settings = NSLocalizedString("Settings", tableName: "BraveShared", value: "Settings", comment: "")
-    public static let OtherSettings = NSLocalizedString("OtherSettings", tableName: "BraveShared", value: "Other Settings", comment: "Other settings sectiont title")
     public static let Done = NSLocalizedString("Done", tableName: "BraveShared", value: "Done", comment: "")
     public static let Confirm = NSLocalizedString("Confirm", tableName: "BraveShared", value: "Confirm", comment: "")
     public static let Privacy = NSLocalizedString("Privacy", tableName: "BraveShared", value: "Privacy", comment: "Settings privacy section title")
     public static let Security = NSLocalizedString("Security", tableName: "BraveShared", value: "Security", comment: "Settings security section title")
-    public static let BlockPopupWindows = NSLocalizedString("BlockPopupWindows", tableName: "BraveShared", value: "Block Pop-up Windows", comment: "Block pop-up windows setting")
     public static let Save_Logins = NSLocalizedString("SaveLogins", tableName: "BraveShared", value: "Save Logins", comment: "Setting to enable the built-in password manager")
     public static let ShieldsAdStats = NSLocalizedString("AdsrBlocked", tableName: "BraveShared", value: "Ads \rBlocked", comment: "Shields Ads Stat")
     public static let ShieldsTrackerStats = NSLocalizedString("TrackersrBlocked", tableName: "BraveShared", value: "Trackers \rBlocked", comment: "Shields Trackers Stat")
@@ -387,117 +359,36 @@ public extension Strings {
     public static let ShieldsTimeStatsDays = NSLocalizedString("ShieldsTimeStatsDays", tableName: "BraveShared", value: "d", comment: "Time Saved Days")
     public static let OK = NSLocalizedString("OK", tableName: "BraveShared", value: "OK", comment: "OK button")
     public static let Delete = NSLocalizedString("Delete", tableName: "BraveShared", value: "Delete", comment: "")
-    public static let Search_or_enter_address = NSLocalizedString("SearchOrEnterAddress", tableName: "BraveShared", value: "Search or enter website", comment: "The text shown in the URL bar on about:home")
-    public static let Private_mode_icon = NSLocalizedString("PrivateModeIcon", tableName: "BraveShared", value: "Private mode icon", comment: "Private mode icon next to location string")
-    public static let Add_to_Reading_List = NSLocalizedString("AddToReadingList", tableName: "BraveShared", value: "Add to Reading List", comment: "Accessibility label for action adding current page to reading list.")
-    public static let Back = NSLocalizedString("Back", tableName: "BraveShared", value: "Back", comment: "Accessibility Label for the browser toolbar Back button")
     
-    public static let PasswordManager = NSLocalizedString("PasswordManager", tableName: "BraveShared", value: "Password Manager", comment: "Accessibility Label for the browser toolbar Password Manager button")
-    public static let Bookmark = NSLocalizedString("Bookmark", tableName: "BraveShared", value: "Bookmark", comment: "Accessibility Label for the browser toolbar Bookmark button")
-    public static let FavoritesFolder = NSLocalizedString("FavoritesFolder", tableName: "BraveShared", value: "Favorites", comment: "Folder for storing favorite bookmarks.")
     public static let New_Tab = NSLocalizedString("NewTab", tableName: "BraveShared", value: "New Tab", comment: "New Tab title")
     
     public static let Open_In_Background_Tab = NSLocalizedString("OpenInBackgroundTab", tableName: "BraveShared", value: "Open Link In New Tab", comment: "Context menu item for opening a link in a new tab")
     public static let Open_In_New_Private_Tab = NSLocalizedString("OpenInNewPrivateTab", tableName: "BraveShared", value: "Open In New Private Tab", comment: "Context menu option for opening a link in a new private tab")
-    public static let Share_Image = NSLocalizedString("ShareImage", tableName: "BraveShared", value: "Share Image", comment: "Context menu option for sharing an image")
     public static let Copy_Link = NSLocalizedString("CopyLink", tableName: "BraveShared", value: "Copy Link", comment: "Context menu item for copying a link URL to the clipboard")
     public static let Open_All_Bookmarks = NSLocalizedString("OpenAllBookmarks", tableName: "BraveShared", value: "Open All (%i)", comment: "Context menu item for opening all folder bookmarks")
     public static let Share_Link = NSLocalizedString("ShareLink", tableName: "BraveShared", value: "Share Link", comment: "Context menu item for sharing a link URL")
-    public static let Open_Image_In_Background_Tab = NSLocalizedString("OpenImageInBackgroundTab", tableName: "BraveShared", value: "Open Image In New Tab", comment: "Context menu for opening image in new tab")
-    public static let Call = NSLocalizedString("Call", tableName: "BraveShared", value: "Call", comment: "Alert Call Button")
-    public static let AllowOpenITunes_template = NSLocalizedString("AllowOpenITunesTemplate", tableName: "BraveShared", value: "Allow %@ to open iTunes?", comment: "Ask user if site can open iTunes store URL")
-    public static let Paste_and_Go = NSLocalizedString("PasteAndGo", tableName: "BraveShared", value: "Paste & Go", comment: "Paste the URL into the location bar and visit")
-    public static let Paste = NSLocalizedString("Paste", tableName: "BraveShared", value: "Paste", comment: "Paste the URL into the location bar")
-    public static let Save_login_for_template = NSLocalizedString("SaveLoginForTemplate", tableName: "BraveShared", value: "Save login %@ for %@?", comment: "Prompt for saving a login. The first parameter is the username being saved. The second parameter is the hostname of the site.")
-    public static let Save_password_for_template = NSLocalizedString("SavePasswordForTemplate", tableName: "BraveShared", value: "Save password for %@?", comment: "Prompt for saving a password with no username. The parameter is the hostname of the site.")
-    public static let Update_login_for_template = NSLocalizedString("UpdateLoginForTemplate", tableName: "BraveShared", value: "Update login %@ for %@?", comment: "Prompt for updating a login. The first parameter is the username for which the password will be updated for. The second parameter is the hostname of the site.")
-    public static let Update_password_for_template = NSLocalizedString("UpdatePasswordForTemplate", tableName: "BraveShared", value: "Update password for %@?", comment: "Prompt for updating a password with no username. The parameter is the hostname of the site.")
-    public static let Open_in = NSLocalizedString("OpenIn", tableName: "BraveShared", value: "Open in…", comment: "String indicating that the file can be opened in another application on the device")
-    public static let Mark_as_Read = NSLocalizedString("MarkAsRead", tableName: "BraveShared", value: "Mark as Read", comment: "Name for Mark as read button in reader mode")
-    public static let Mark_as_Unread = NSLocalizedString("MarkAsUnread", tableName: "BraveShared", value: "Mark as Unread", comment: "Name for Mark as unread button in reader mode")
-    public static let Reader_Mode_Settings = NSLocalizedString("ReaderModeSettings", tableName: "BraveShared", value: "Reader Mode Settings", comment: "Name for display settings button in reader mode. Display in the meaning of presentation, not monitor.")
-    public static let Could_not_add_page_to_Reading_List = NSLocalizedString("CouldNotAddPageToReadingList", tableName: "BraveShared", value: "Could not add page to Reading List. Maybe it's already there?", comment: "Accessibility message e.g. spoken by VoiceOver after the user wanted to add current page to the Reading List and this was not done, likely because it already was in the Reading List, but perhaps also because of real failures.")
-    public static let Remove_from_Reading_List = NSLocalizedString("RemoveFromReadingList", tableName: "BraveShared", value: "Remove from Reading List", comment: "Name for button removing current article from reading list in reader mode")
-    public static let Turn_on_search_suggestions = NSLocalizedString("TurnOnSearchSuggestions", tableName: "BraveShared", value: "Turn on search suggestions?", comment: "Prompt shown before enabling provider search queries")
-    public static let Yes = NSLocalizedString("Yes", tableName: "BraveShared", value: "Yes", comment: "For search suggestions prompt. This string should be short so it fits nicely on the prompt row.")
-    public static let No = NSLocalizedString("No", tableName: "BraveShared", value: "No", comment: "For search suggestions prompt. This string should be short so it fits nicely on the prompt row.")
-    public static let Search_suggestions_from_template = NSLocalizedString("SearchSuggestionsFromTemplate", tableName: "BraveShared", value: "Search suggestions from %@", comment: "Accessibility label for image of default search engine displayed left to the actual search suggestions from the engine. The parameter substituted for \"%@\" is the name of the search engine. E.g.: Search suggestions from Google")
-    public static let Close = NSLocalizedString("Close", tableName: "BraveShared", value: "Close", comment: "Accessibility label for action denoting closing a tab in tab list (tray)")
-    public static let Private = NSLocalizedString("Private", tableName: "BraveShared", value: "Private", comment: "Private button title")
-    public static let Tabs = NSLocalizedString("Tabs", tableName: "BraveShared", value: "Tabs", comment: "Accessibility label for the Tabs.")
-    public static let Tab = NSLocalizedString("Tab", tableName: "BraveShared", value: "Tab", comment: "Accessibility label for a Tab.")
     
-    public static let Tab_xofx_template = NSLocalizedString("TabXofxTemplate", tableName: "BraveShared", value: "Tab %@ of %@", comment: "Message spoken by VoiceOver saying the position of the single currently visible tab in Tabs Tray, along with the total number of tabs. E.g. \"Tab 2 of 5\" says that tab 2 is visible (and is the only visible tab), out of 5 tabs total.")
-    public static let Tabs_xtoxofx_template = NSLocalizedString("TabsXtoxofxTemplate", tableName: "BraveShared", value: "Tabs %@ to %@ of %@", comment: "Message spoken by VoiceOver saying the range of tabs that are currently visible in Tabs Tray, along with the total number of tabs. E.g. \"Tabs 8 to 10 of 15\" says tabs 8, 9 and 10 are visible, out of 15 tabs total.")
-
-    public static let Learn_More = NSLocalizedString("LearnMore", tableName: "BraveShared", value: "Learn More", comment: "Text button displayed when there are no tabs open while in private mode")
-    public static let Private_Browsing = NSLocalizedString("PrivateBrowsing", tableName: "BraveShared", value: "Private Browsing", comment: "")
     public static let Show_Tabs = NSLocalizedString("ShowTabs", tableName: "BraveShared", value: "Show Tabs", comment: "Accessibility Label for the tabs button in the browser toolbar")
-    public static let This_folder_isnt_empty = NSLocalizedString("ThisFolderIsntEmpty", tableName: "BraveShared", value: "This folder isn't empty.", comment: "Title of the confirmation alert when the user tries to delete_a_folder_that_still_contains_bookmarks_and/or folders.")
-    public static let Are_you_sure_you_want_to_delete_it_and_its_contents = NSLocalizedString("AreYouSureYouWantToDeleteItAndItsContents", tableName: "BraveShared", value: "Are you sure you want to delete it and its contents?", comment: "Main body of the confirmation alert when the user tries to delete a folder that still contains bookmarks and/or folders.")
     public static let Bookmark_Folder = NSLocalizedString("BookmarkFolder", tableName: "BraveShared", value: "Bookmark Folder", comment: "Bookmark Folder Section Title")
     public static let Bookmark_Info = NSLocalizedString("BookmarkInfo", tableName: "BraveShared", value: "Bookmark Info", comment: "Bookmark Info Section Title")
     public static let Name = NSLocalizedString("Name", tableName: "BraveShared", value: "Name", comment: "Bookmark title / Device name")
     public static let URL = NSLocalizedString("URL", tableName: "BraveShared", value: "URL", comment: "Bookmark URL")
-    public static let Location = NSLocalizedString("Location", tableName: "BraveShared", value: "Location", comment: "Bookmark folder location")
-    public static let Folder = NSLocalizedString("Folder", tableName: "BraveShared", value: "Folder", comment: "Folder")
     public static let Bookmarks = NSLocalizedString("Bookmarks", tableName: "BraveShared", value: "Bookmarks", comment: "title for bookmarks panel")
     public static let Today = NSLocalizedString("Today", tableName: "BraveShared", value: "Today", comment: "History tableview section header")
     public static let Yesterday = NSLocalizedString("Yesterday", tableName: "BraveShared", value: "Yesterday", comment: "History tableview section header")
     public static let Last_week = NSLocalizedString("LastWeek", tableName: "BraveShared", value: "Last week", comment: "History tableview section header")
     public static let Last_month = NSLocalizedString("LastMonth", tableName: "BraveShared", value: "Last month", comment: "History tableview section header")
-    public static let Remove = NSLocalizedString("Remove", tableName: "BraveShared", value: "Remove", comment: "Action button for deleting_history_entries_in_the_history_panel.")
-    public static let Top_sites = NSLocalizedString("TopSites", tableName: "BraveShared", value: "Top sites", comment: "Panel accessibility label")
-    public static let History = NSLocalizedString("History", tableName: "BraveShared", value: "History", comment: "Panel accessibility label")
-    public static let Reading_list = NSLocalizedString("ReadingList", tableName: "BraveShared", value: "Reading list", comment: "Panel accessibility label")
-    public static let Panel_Chooser = NSLocalizedString("PanelChooser", tableName: "BraveShared", value: "Panel Chooser", comment: "Accessibility label for the Home panel's top toolbar containing list of the home panels (top sites, bookmarsk, history, remote tabs, reading list).")
-    public static let Read = NSLocalizedString("Read", tableName: "BraveShared", value: "read", comment: "Accessibility label for read article in reading list. It's a past participle - functions as an adjective.")
-    public static let Unread = NSLocalizedString("Unread", tableName: "BraveShared", value: "unread", comment: "Accessibility label for unread article in reading list. It's a past participle - functions as an adjective.")
-    public static let Welcome_to_your_Reading_List = NSLocalizedString("WelcomeToYourReadingList", tableName: "BraveShared", value: "Welcome to your Reading List", comment: "See http://mzl.la/1LXbDOL")
-    public static let Open_articles_in_Reader_View_by_tapping_the_book_icon = NSLocalizedString("OpenArticlesInReaderViewByTappingTheBookIcon", tableName: "BraveShared", value: "Open articles in Reader View by tapping the book icon when it appears in the title bar.", comment: "See http://mzl.la/1LXbDOL")
-    public static let Save_pages_to_your_Reading_List_by_tapping_the_book = NSLocalizedString("SavePagesToYourReadingListByTappingTheBook", tableName: "BraveShared", value: "Save pages to your Reading List by tapping the book plus icon in the Reader View controls.", comment: "See http://mzl.la/1LXbDOL")
-    public static let Start_Browsing = NSLocalizedString("StartBrowsing", tableName: "BraveShared", value: "Start Browsing", comment: "")
-    public static let Welcome_to_Brave = NSLocalizedString("WelcomeToBrave", tableName: "BraveShared", value: "Welcome to Brave.", comment: "Shown in intro screens")
-    public static let Get_ready_to_experience_a_Faster = NSLocalizedString("GetReadyToExperienceAFaster", tableName: "BraveShared", value: "Get ready to experience a Faster, Safer, Better Web.", comment: "Shown in intro screens")
-    public static let Brave_is_Faster = NSLocalizedString("BraveIsFasternandHeresWhy", tableName: "BraveShared", value: "Brave is Faster,\nand here's why...", comment: "Shown in intro screens")
-    public static let Brave_blocks_ads_and_trackers = NSLocalizedString("BraveBlocksAdsnBraveStopsTrackersnBraveIsDesignedForSpeedAndEfficiency", tableName: "BraveShared", value: "Brave blocks ads.\nBrave stops trackers.\nBrave is designed for speed and efficiency.", comment: "Shown in intro screens")
-    public static let Brave_keeps_you_safe_as_you_browse = NSLocalizedString("BraveKeepsYouSafeAsYouBrowse", tableName: "BraveShared", value: "Brave keeps you safe as you browse.", comment: "Shown in intro screens")
-    public static let Browsewithusandyourprivacyisprotected = NSLocalizedString("Browsewithusandyourprivacyisprotected", tableName: "BraveShared", value: "Browse with us and your privacy is protected, with nothing further to install, learn or configure.", comment: "Shown in intro screens")
-    public static let Incaseyouhitaspeedbump = NSLocalizedString("Incaseyouhitaspeedbump", tableName: "BraveShared", value: "In case you hit a speed bump", comment: "Shown in intro screens")
-    public static let TapTheBraveButtonToTemporarilyDisable = NSLocalizedString("TapTheBraveButtonToTemporarilyDisable", tableName: "BraveShared", value: "Tap the Brave button to temporarily disable ad blocking and privacy features.", comment: "Shown in intro screens")
-    public static let IntroTourCarousel = NSLocalizedString("IntroTourCarousel", tableName: "BraveShared", value: "Intro Tour Carousel", comment: "Accessibility label for the introduction tour carousel")
-    public static let IntroductorySlideXofX_template = NSLocalizedString("IntroductorySlideXofXTemplate", tableName: "BraveShared", value: "Introductory slide %@ of %@", comment: "String spoken by assistive technology (like VoiceOver) stating on which page of the intro wizard we currently are. E.g. Introductory slide 1 of 3")
-    public static let General = NSLocalizedString("General", tableName: "BraveShared", value: "General", comment: "General settings section title")
-    public static let PinNew = NSLocalizedString("PinNew", tableName: "BraveShared", value: "Enter New PIN", comment: "Browser Lock New Pin")
-    public static let PinNewRe = NSLocalizedString("PinNewRe", tableName: "BraveShared", value: "Re-Enter New PIN", comment: "Browser Lock Re-Enter New Pin")
-    public static let PinSet = NSLocalizedString("PinSet", tableName: "BraveShared", value: "Set PIN", comment: "Browser Lock Set Pin")
-    public static let PinEnterToUnlock = NSLocalizedString("PinEnterToUnlock", tableName: "BraveShared", value: "Enter PIN to Unlock Brave", comment: "Unlock Brave with Browser Lock Pin")
-    public static let PinFingerprintUnlock = NSLocalizedString("PinFingerprintUnlock", tableName: "BraveShared", value: "Use your fingerprint to unlock Brave.", comment: "Unlock Brave with fingerprint.")
-    public static let Close_Private_Tabs = NSLocalizedString("ClosePrivateTabs", tableName: "BraveShared", value: "Close Private Tabs", comment: "Setting for closing private tabs")
-    public static let When_Leaving_Private_Browsing = NSLocalizedString("WhenLeavingPrivateBrowsing", tableName: "BraveShared", value: "When Leaving Private Browsing", comment: "Will be displayed in Settings under 'Close Private Tabs'")
     public static let Saved_Logins = NSLocalizedString("SavedLogins", tableName: "BraveShared", value: "Saved Logins", comment: "Settings item for clearing passwords and login data")
     public static let Browsing_History = NSLocalizedString("BrowsingHistory", tableName: "BraveShared", value: "Browsing History", comment: "Settings item for clearing browsing history")
-    public static let GrantCameraAccess = NSLocalizedString("GrantCameraAccess", tableName: "BraveShared", value: "Enable Camera", comment: "Grand camera access")
     public static let Cache = NSLocalizedString("Cache", tableName: "BraveShared", value: "Cache", comment: "Settings item for clearing the cache")
-    public static let Offline_Website_Data = NSLocalizedString("OfflineWebsiteData", tableName: "BraveShared", value: "Offline Website Data", comment: "Settings item for clearing website data")
     public static let Cookies = NSLocalizedString("Cookies", tableName: "BraveShared", value: "Cookies", comment: "Settings item for clearing cookies")
-    public static let ShowPicker = NSLocalizedString("ShowPicker", tableName: "BraveShared", value: "Show picker", comment: "Password Manager show picker option")
-    public static let Last_modified_date_template = NSLocalizedString("LastModifiedDateTemplate", tableName: "BraveShared", value: "Last modified %@", comment: "Footer label describing when the login was last modified with the timestamp as the parameter")
-    public static let Quicksearch_Engines = NSLocalizedString("QuicksearchEngines", tableName: "BraveShared", value: "Quick-search Engines", comment: "Title for quick-search engines settings section.")
-    public static let Clear_Everything = NSLocalizedString("ClearEverything", tableName: "BraveShared", value: "Clear Everything", comment: "Title of the Clear private data dialog.")
-    public static let Are_you_sure_you_want_to_clear_all_of_your_data = NSLocalizedString("AreYouSureYouWantToClearAllOfYourData", tableName: "BraveShared", value: "Are you sure you want to clear all of your data? This will also close all open tabs.", comment: "Message shown in the dialog prompting users if they want to clear everything")
-    public static let Clear = NSLocalizedString("Clear", tableName: "BraveShared", value: "Clear", comment: "Used as a button label in the dialog to Clear private data dialog")
     public static let Find_in_Page = NSLocalizedString("FindInPage", tableName: "BraveShared", value: "Find in Page", comment: "Share action title")
-    public static let Open_Desktop_Site_tab = NSLocalizedString("OpenDesktopSiteTab", tableName: "BraveShared", value: "Open Desktop Site tab", comment: "Share action title")
     public static let Add_to_favorites = NSLocalizedString("AddToFavorites", tableName: "BraveShared", value: "Add to Favorites", comment: "Add to favorites share action.")
-    
-    public static let Remove_page = NSLocalizedString("RemovePage", tableName: "BraveShared", value: "Remove page", comment: "Button shown in editing mode to remove this site from the top sites panel.")
     
     public static let Show_Bookmarks = NSLocalizedString("ShowBookmarks", tableName: "BraveShared", value: "Show Bookmarks", comment: "Button to show the bookmarks list")
     public static let Show_History = NSLocalizedString("ShowHistory", tableName: "BraveShared", value: "Show History", comment: "Button to show the history list")
     public static let Add_Bookmark = NSLocalizedString("AddBookmark", tableName: "BraveShared", value: "Add Bookmark", comment: "Button to add a bookmark")
     public static let Edit_Bookmark = NSLocalizedString("EditBookmark", tableName: "BraveShared", value: "Edit Bookmark", comment: "Button to edit a bookmark")
-    public static let Remove_Bookmark = NSLocalizedString("RemoveBookmark", tableName: "BraveShared", value: "Remove Bookmark", comment: "Button to remove a bookmark")
     public static let Edit_Favorite = NSLocalizedString("EditFavorite", tableName: "BraveShared", value: "Edit Favorite", comment: "Button to edit a favorite")
     public static let Remove_Favorite = NSLocalizedString("RemoveFavorite", tableName: "BraveShared", value: "Remove Favorite", comment: "Button to remove a favorite")
 }
@@ -506,8 +397,6 @@ public extension Strings {
     public static let Block_Popups = NSLocalizedString("BlockPopups", tableName: "BraveShared", value: "Block Popups", comment: "Setting to enable popup blocking")
     public static let Show_Tabs_Bar = NSLocalizedString("ShowTabsBar", tableName: "BraveShared", value: "Show Tabs Bar", comment: "Setting to show/hide the tabs bar")
     public static let Private_Browsing_Only = NSLocalizedString("PrivateBrowsingOnly", tableName: "BraveShared", value: "Private Browsing Only", comment: "Setting to keep app in private mode")
-    public static let Browser_Lock = NSLocalizedString("BrowserLock", tableName: "BraveShared", value: "Browser Lock", comment: "Setting to enable browser pin locking")
-    public static let Change_Pin = NSLocalizedString("ChangePin", tableName: "BraveShared", value: "PIN", comment: "Setting to change browser lock pin")
     public static let Brave_Shield_Defaults = NSLocalizedString("BraveShieldDefaults", tableName: "BraveShared", value: "Brave Shield Defaults", comment: "Section title for adbblock, tracking protection, HTTPS-E, and cookies")
     public static let Block_Ads_and_Tracking = NSLocalizedString("BlockAdsAndTracking", tableName: "BraveShared", value: "Block Ads & Tracking", comment: "")
     public static let HTTPS_Everywhere = NSLocalizedString("HTTPSEverywhere", tableName: "BraveShared", value: "HTTPS Everywhere", comment: "")
@@ -515,13 +404,10 @@ public extension Strings {
     public static let Block_Scripts = NSLocalizedString("BlockScripts", tableName: "BraveShared", value: "Block Scripts", comment: "")
     public static let Fingerprinting_Protection = NSLocalizedString("FingerprintingProtection", tableName: "BraveShared", value: "Fingerprinting Protection", comment: "")
     public static let Support = NSLocalizedString("Support", tableName: "BraveShared", value: "Support", comment: "Support section title")
-    public static let Opt_in_to_telemetry = NSLocalizedString("OptInToTelemetry", tableName: "BraveShared", value: "Send crash reports and metrics", comment: "option in settings screen")
     public static let About = NSLocalizedString("About", tableName: "BraveShared", value: "About", comment: "About settings section title")
     public static let Version_template = NSLocalizedString("VersionTemplate", tableName: "BraveShared", value: "Version %@ (%@)", comment: "Version number of Brave shown in settings")
     public static let Device_template = NSLocalizedString("DeviceTemplate", tableName: "BraveShared", value: "Device %@ (%@)", comment: "Current device model and iOS version copied to clipboard.")
     public static let Copy_app_info_to_clipboard = NSLocalizedString("CopyAppInfoToClipboard", tableName: "BraveShared", value: "Copy app info to clipboard.", comment: "Copy app info to clipboard action sheet action.")
-    public static let Password_manager_button_settings_footer = NSLocalizedString("PasswordManagerButtonSettingsFooter", tableName: "BraveShared", value: "You can choose to show a popup to pick your password manager, or have the selected one open automatically.", comment: "Footer message on picker for 3rd party password manager setting")
-    public static let Password_manager_button = NSLocalizedString("PasswordManagerButton", tableName: "BraveShared", value: "Password Manager Button", comment: "Setting for behaviour of password manager button")
     public static let Block_3rd_party_cookies = NSLocalizedString("Block3rdPartyCookies", tableName: "BraveShared", value: "Block 3rd party cookies", comment: "cookie settings option")
     public static let Block_all_cookies = NSLocalizedString("BlockAllCookies", tableName: "BraveShared", value: "Block all cookies", comment: "cookie settings option")
     public static let Dont_block_cookies = NSLocalizedString("DontBlockCookies", tableName: "BraveShared", value: "Don't block cookies", comment: "cookie settings option")
@@ -530,12 +416,8 @@ public extension Strings {
     public static let Always_show = NSLocalizedString("AlwaysShow", tableName: "BraveShared", value: "Always show", comment: "tabs bar show/hide option")
     public static let Show_in_landscape_only = NSLocalizedString("ShowInLandscapeOnly", tableName: "BraveShared", value: "Show in landscape only", comment: "tabs bar show/hide option")
     public static let Report_a_bug = NSLocalizedString("ReportABug", tableName: "BraveShared", value: "Report a bug", comment: "Show mail composer to report a bug.")
-    public static let Brave_for_iOS_Feedback = NSLocalizedString("BraveForIOSFeedback", tableName: "BraveShared", value: "Brave for iOS Feedback", comment: "email subject")
-    public static let Email_Body = "\n\n---\nApp & Device Version Information:\n"
     public static let Privacy_Policy = NSLocalizedString("PrivacyPolicy", tableName: "BraveShared", value: "Privacy Policy", comment: "Show Brave Browser Privacy Policy page from the Privacy section in the settings.")
     public static let Terms_of_Use = NSLocalizedString("TermsOfUse", tableName: "BraveShared", value: "Terms of Use", comment: "Show Brave Browser TOS page from the Privacy section in the settings.")
-    public static let Bookmarks_and_History_Panel = NSLocalizedString("BookmarksAndHistoryPanel", tableName: "BraveShared", value: "Bookmarks and History Panel", comment: "Button to show the bookmarks and history panel")
-    public static let Private_Tab_Title = NSLocalizedString("PrivateTabTitle", tableName: "BraveShared", value: "This is a Private Tab", comment: "Private tab title")
     public static let Private_Tab_Body = NSLocalizedString("PrivateTabBody", tableName: "BraveShared", value: "Private Tabs aren't saved in Brave, but they don't make you anonymous online. Sites you visit in a private tab won't show up in your history and their cookies always vanish when you close them — there won't be any trace of them left in Brave. Your mobile carrier (or the owner of the WiFi network or VPN you're connected to) can see which sites you visit and and those sites will learn your public IP address, even in Private Tabs.", comment: "Private tab details")
     public static let Private_Tab_Details = NSLocalizedString("PrivateTabDetails", tableName: "BraveShared", value: """
 Using Private Tabs only changes what Brave does on your device, it doesn't change anyone else's behavior.
@@ -548,13 +430,9 @@ If an employer manages your device, they might also keep track of what you do wi
 """, comment: "Private tab detail text")
     public static let Private_Tab_Link = NSLocalizedString("PrivateTabLink", tableName: "BraveShared", value: "Learn about private tabs.", comment: "Private tab information link")
     public static let Brave_Panel = NSLocalizedString("BravePanel", tableName: "BraveShared", value: "Brave Panel", comment: "Button to show the brave panel")
-    public static let Shields_Down = NSLocalizedString("ShieldsDown", tableName: "BraveShared", value: "Shields Down", comment: "message shown briefly in URL bar")
-    public static let Shields_Up = NSLocalizedString("ShieldsUp", tableName: "BraveShared", value: "Shields Up", comment: "message shown briefly in URL bar")
     public static let Individual_Controls = NSLocalizedString("IndividualControls", tableName: "BraveShared", value: "Individual Controls", comment: "title for per-site shield toggles")
     public static let Blocking_Monitor = NSLocalizedString("BlockingMonitor", tableName: "BraveShared", value: "Blocking Monitor", comment: "title for section showing page blocking statistics")
     public static let Site_shield_settings = NSLocalizedString("SiteShieldSettings", tableName: "BraveShared", value: "Shields", comment: "Brave panel topmost title")
-    public static let Down = NSLocalizedString("Down", tableName: "BraveShared", value: "Down", comment: "brave shield on/off toggle off state")
-    public static let Up = NSLocalizedString("Up", tableName: "BraveShared", value: "Up", comment: "brave shield on/off toggle on state")
     public static let Block_Phishing = NSLocalizedString("BlockPhishing", tableName: "BraveShared", value: "Block Phishing", comment: "Brave panel individual toggle title")
     public static let Ads_and_Trackers = NSLocalizedString("AdsAndTrackers", tableName: "BraveShared", value: "Ads and Trackers", comment: "individual blocking statistic title")
     public static let HTTPS_Upgrades = NSLocalizedString("HTTPSUpgrades", tableName: "BraveShared", value: "HTTPS Upgrades", comment: "individual blocking statistic title")
