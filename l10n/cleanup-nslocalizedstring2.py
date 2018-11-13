@@ -144,17 +144,17 @@ for path, directories, files in os.walk("."):
 
 
 
-os.system('sh ./l10n/LocalizedMatcher.sh')
-
-array = []
-with open('localizedStringLocations.txt', 'r') as f:
-    content = f.read().splitlines()
-    for line in content:
-        array.append([x.strip() for x in line.split(':',2)])
-
-sys.stdout=open("localizedStringLocations.txt","w")
-print (json.dumps(array, indent=1))
-sys.stdout.close()
+#os.system('sh ./l10n/LocalizedMatcher.sh')
+#
+#array = []
+#with open('localizedStringLocations.txt', 'r') as f:
+#    content = f.read().splitlines()
+#    for line in content:
+#        array.append([x.strip() for x in line.split(':',2)])
+#
+#sys.stdout=open("localizedStringLocations.txt","w")
+#print (json.dumps(array, indent=1))
+#sys.stdout.close()
 
 duplicateList = []
 for key, value in duplicate.iteritems():
