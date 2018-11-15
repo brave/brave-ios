@@ -5,6 +5,7 @@
 import UIKit
 import Shared
 import Storage
+import BraveShared
 
 private enum SearchListSection: Int {
     case searchSuggestions
@@ -65,7 +66,8 @@ class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, Loa
     // Cell for the suggestion flow layout. Since heightForHeaderInSection is called *before*
     // cellForRowAtIndexPath, we create the cell to find its height before it's added to the table.
     fileprivate let suggestionCell = SuggestionCell(style: .default, reuseIdentifier: nil)
-
+    fileprivate var suggestionPrompt: SearchSuggestionPromptView?
+    
     static var userAgent: String?
 
     init(forTabType tabType: TabType) {
@@ -159,6 +161,8 @@ class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, Loa
 
             // Reload the footer list of search engines.
             reloadSearchEngines()
+            
+            layoutSuggestionsOptInPrompt()
         }
     }
 
@@ -172,6 +176,54 @@ class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, Loa
         }
 
         return engines!
+    }
+    
+    fileprivate func layoutSuggestionsOptInPrompt() {
+        if tabType.isPrivate || !searchEngines.shouldShowSearchSuggestionsOptIn {
+            // Make sure any pending layouts are drawn so they don't get coupled
+            // with the "slide up" animation below.
+            view.layoutIfNeeded()
+            
+            // Set the prompt to nil so layoutTable() aligns the top of the table
+            // to the top of the view. We still need a reference to the prompt so
+            // we can remove it from the controller after the animation is done.
+            let prompt = suggestionPrompt
+            suggestionPrompt = nil
+            layoutTable()
+            
+            UIView.animate(withDuration: 0.2,
+                           animations: {
+                            self.view.layoutIfNeeded()
+                            prompt?.alpha = 0
+            },
+                           completion: { _ in
+                            prompt?.removeFromSuperview()
+                            return
+            })
+            return
+        }
+        
+        let prompt = SearchSuggestionPromptView() { [unowned self] option in
+            self.searchEngines.shouldShowSearchSuggestions = option
+            self.searchEngines.shouldShowSearchSuggestionsOptIn = false
+            if option {
+                self.querySuggestClient()
+            }
+            self.layoutSuggestionsOptInPrompt()
+            self.reloadSearchEngines()
+        }
+        // Insert behind the tableView so the tableView slides on top of it
+        // when the prompt is dismissed.
+        view.addSubview(prompt)
+        suggestionPrompt = prompt
+        
+        prompt.snp.makeConstraints { make in
+            make.top.equalTo(self.view)
+            make.leading.equalTo(self.view.safeAreaLayoutGuide.snp.leading)
+            make.trailing.equalTo(self.view.safeAreaLayoutGuide.snp.trailing)
+        }
+        
+        layoutTable()
     }
 
     var searchQuery: String = "" {
@@ -187,7 +239,7 @@ class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, Loa
 
     fileprivate func layoutTable() {
         tableView.snp.remakeConstraints { make in
-            make.top.equalTo(self.view.snp.top)
+            make.top.equalTo(self.suggestionPrompt?.snp.bottom ?? self.view.snp.top)
             make.leading.trailing.equalTo(self.view)
             make.bottom.equalTo(self.searchEngineScrollView.snp.top)
         }
@@ -390,12 +442,11 @@ class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, Loa
                 let isBookmark = site.bookmarked ?? false
                 cell.setLines(site.title, detailText: site.url)
                 cell.setRightBadge(isBookmark ? self.bookmarkedBadge : nil)
+                cell.imageView?.contentMode = .scaleAspectFit
                 cell.imageView?.layer.borderColor = SearchViewControllerUX.IconBorderColor.cgColor
                 cell.imageView?.layer.borderWidth = SearchViewControllerUX.IconBorderWidth
-                cell.imageView?.setIcon(site.icon, forURL: site.tileURL, completed: { (color, url) in
+                cell.imageView?.setIcon(site.icon, forURL: site.tileURL, scaledDefaultIconSize: CGSize(width: SearchViewControllerUX.IconSize, height: SearchViewControllerUX.IconSize), completed: { (color, url) in
                     if site.tileURL == url {
-                        cell.imageView?.image = cell.imageView?.image?.createScaled(CGSize(width: SearchViewControllerUX.IconSize, height: SearchViewControllerUX.IconSize))
-                        cell.imageView?.contentMode = .center
                         cell.imageView?.backgroundColor = color
                     }
                 })
