@@ -84,15 +84,10 @@ public class DAU {
     func paramsAndPrefsSetup() -> [URLQueryItem]? {
         var params = [channelParam(), versionParam()]
         
-        /// This is not the same as `firstLaunch` concept, due to DAU delay,
-        /// this may var be `true` on a subsequent launch, if server ping failed.
+        /// First ping preference is set after first successful ping to the server.
         let firstPing = Preferences.DAU.firstPingSuccess.value
-        if !firstPing {
-            log.debug("server ping was not successful yet")
-            return nil
-        }
-        
-        let firstLaunch = firstPing && Preferences.DAU.lastLaunchInfo.value == nil
+        // First launch ping should be send only if first ping was not successful yet.
+        let firstLaunch = !firstPing
         
         // All installs prior to this key existing (e.g. intallWeek == unknown) were set to `defaultWoiDate`
         // Enough time has passed where accounting for installs prior to this DAU improvement is unnecessary
