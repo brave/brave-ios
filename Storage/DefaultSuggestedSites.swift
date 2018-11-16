@@ -140,10 +140,10 @@ open class DefaultSuggestedSites {
 
 
 extension Strings {
-    public static let YoutubeDisplayTitle = "YouTube"
-    public static let AmazonDisplayTitle = "Amazon"
-    public static let WikipediaDisplayTitle = "Wikipedia"
-    public static let TwitterDisplayTitle = "Twitter"
-    public static let RedditDisplayTitle = "Reddit"
-    public static let CoinmarketcapDisplayTitle = "Coinmarketcap"
+    public static let YoutubeDisplayTitle = ""
+    public static let AmazonDisplayTitle = ""
+    public static let WikipediaDisplayTitle = ""
+    public static let TwitterDisplayTitle = ""
+    public static let RedditDisplayTitle = ""
+    public static let CoinmarketcapDisplayTitle = ""
 }
