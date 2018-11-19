@@ -30,6 +30,8 @@ extension Preferences {
         static let lastLaunchInfo = Option<[Int?]?>(key: "dau.last-launch-info", default: nil)
         static let weekOfInstallation = Option<String?>(key: "dau.week-of-installation", default: nil)
         static let firstPingSuccess = Option<Bool>(key: "dau.first-ping", default: false)
+        /// We use this to properly calculate `week` parameter of the DAU ping.
+        static let lastPingFirstMonday = Option<String?>(key: "dau.last-ping-first-monday", default: nil)
     }
     final class URP {
         static let nextCheckDate = Option<TimeInterval?>(key: "urp.next-check-date", default: nil)
@@ -38,6 +40,15 @@ extension Preferences {
         static let downloadId = Option<String?>(key: "urp.referral.download-id", default: nil)
         static let referralCode = Option<String?>(key: "urp.referral.code", default: nil)
         static let referralCodeDeleteDate = Option<TimeInterval?>(key: "urp.referral.delete-date", default: nil)
+    }
+    final class BlockStats {
+        static let adsCount = Option<Int>(key: "stats.adblock", default: 0)
+        static let trackersCount = Option<Int>(key: "stats.tracking", default: 0)
+        static let scriptsCount = Option<Int>(key: "stats.scripts", default: 0)
+        static let imagesCount = Option<Int>(key: "stats.images", default: 0)
+        static let phishingCount = Option<Int>(key: "stats.phishing", default: 0)
+        static let httpsUpgradeCount = Option<Int>(key: "stats.http-upgrade", default: 0)
+        static let fingerprintingCount = Option<Int>(key: "stats.fingerprinting", default: 0)
     }
 }
 
@@ -137,13 +148,22 @@ extension Preferences {
         // DAU
         migrate(keyPrefix: keyPrefix, key: "dau_stat", to: Preferences.DAU.lastLaunchInfo)
         migrate(keyPrefix: keyPrefix, key: "week_of_installation", to: Preferences.DAU.weekOfInstallation)
+        migrate(keyPrefix: keyPrefix, key: "lastPingFirstMondayKey", to: Preferences.DAU.lastPingFirstMonday)
         
+        // URP
         migrate(keyPrefix: keyPrefix, key: "urpDateCheckPrefsKey", to: Preferences.URP.nextCheckDate)
         migrate(keyPrefix: keyPrefix, key: "urpRetryCountdownPrefsKey", to: Preferences.URP.retryCountdown)
         migrate(keyPrefix: keyPrefix, key: "CustomHeaderDataPrefs", to: Preferences.URP.customHeaderData)
         migrate(keyPrefix: keyPrefix, key: "downloadIdPrefsKey", to: Preferences.URP.downloadId)
         migrate(keyPrefix: keyPrefix, key: "referralCodePrefsKey", to: Preferences.URP.referralCode)
         migrate(keyPrefix: keyPrefix, key: "referralCodeDeleteTimePrefsKey", to: Preferences.URP.referralCodeDeleteDate)
+        
+        // Block Stats
+        migrate(keyPrefix: keyPrefix, key: "adblock", to: Preferences.BlockStats.adsCount)
+        migrate(keyPrefix: keyPrefix, key: "tracking_protection", to: Preferences.BlockStats.trackersCount)
+        migrate(keyPrefix: keyPrefix, key: "httpse", to: Preferences.BlockStats.httpsUpgradeCount)
+        migrate(keyPrefix: keyPrefix, key: "fp_protection", to: Preferences.BlockStats.fingerprintingCount)
+        migrate(keyPrefix: keyPrefix, key: "safebrowsing", to: Preferences.BlockStats.phishingCount)
     }
 }
 

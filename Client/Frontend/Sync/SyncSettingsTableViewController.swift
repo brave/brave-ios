@@ -77,8 +77,8 @@ class SyncSettingsTableViewController: UITableViewController {
     
     private func removeDeviceAction() {
         let alert = UIAlertController(title: Strings.SyncRemoveThisDeviceQuestion, message: Strings.SyncRemoveThisDeviceQuestionDesc, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: Strings.Cancel, style: .cancel, handler: nil))
-        alert.addAction(UIAlertAction(title: Strings.Remove, style: .destructive) { action in
+        alert.addAction(UIAlertAction(title: Strings.CancelButtonTitle, style: .cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: Strings.RemoveDevice, style: .destructive) { action in
             Sync.shared.leaveSyncGroup()
             self.navigationController?.popToRootViewController(animated: true)
         })

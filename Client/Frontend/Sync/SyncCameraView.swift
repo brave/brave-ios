@@ -18,7 +18,7 @@ class SyncCameraView: UIView, AVCaptureMetadataOutputObjectsDelegate {
 
     private lazy var openSettingsButton: RoundInterfaceButton = {
         let button = self.createCameraButton()
-        button.setTitle(Strings.Open_Settings, for: .normal)
+        button.setTitle(Strings.OpenPhoneSettingsActionTitle, for: .normal)
         button.addTarget(self, action: #selector(openSettings), for: .touchUpInside)
         return button
     }()

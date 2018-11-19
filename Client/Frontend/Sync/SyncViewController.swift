@@ -27,7 +27,7 @@ class SyncViewController: UIViewController {
         let alert = UIAlertController(title: Strings.SyncNoConnectionTitle,
                                       message: Strings.SyncNoConnectionBody, preferredStyle: .alert)
         
-        let okAction = UIAlertAction(title: Strings.OK, style: .default)
+        let okAction = UIAlertAction(title: Strings.OKString, style: .default)
         alert.addAction(okAction)
         
         present(alert, animated: true)

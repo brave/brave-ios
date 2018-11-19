@@ -136,7 +136,7 @@ class SyncWelcomeViewController: SyncViewController {
                 guard Sync.shared.isInSyncGroup else {
                     addDevice.disableNavigationPrevention()
                     let alert = UIAlertController(title: Strings.SyncUnsuccessful, message: Strings.SyncUnableCreateGroup, preferredStyle: .alert)
-                    alert.addAction(UIAlertAction(title: Strings.OK, style: .default, handler: nil))
+                    alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
                     addDevice.present(alert, animated: true, completion: nil)
                     return
                 }
