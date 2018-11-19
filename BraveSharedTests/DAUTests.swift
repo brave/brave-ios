@@ -106,7 +106,7 @@ class DAUTests: XCTestCase {
         // Make sure second ping after first failed has `first` param equal true
         pingWithDateAndCompare(daily: true, weekly: true, monthly: true, first: true)
         
-        // Should be true after second successful attempt
+        // Should be false after second successful attempt
         XCTAssertFalse(Preferences.DAU.firstPingParam.value)
         
         // Third - succesful attempt
