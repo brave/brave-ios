@@ -351,12 +351,13 @@ public class Sync: JSInjector {
             // Use proper variable and store in defaults
             if lastSuccessfulSync == 0 {
                 // Sync local bookmarks, then proceed with fetching
-                // Pull all local bookmarks and update their order with newly aquired device id.
+                // Pull all local bookmarks and update their order with newly aquired device id and base sync order.
+                let context = DataController.newBackgroundContext()
                 
-                if let updatedBookmarks = bookmarksWithUpdatedOrder() {
-                    // Insane, .map required for mapping obj-c class to Swift,
-                    // in order to use protocol instead of class for array param.
-                    sendSyncRecords(action: .create, records: updatedBookmarks.map { $0 }) { _ in
+                if let updatedBookmarks = bookmarksWithUpdatedOrder(context: context) {
+                    DataController.save(context: context)
+                    
+                    sendSyncRecords(action: .create, records: updatedBookmarks) { _ in
                         startFetching()
                     }
                 }
@@ -368,7 +369,7 @@ public class Sync: JSInjector {
         return ready
     }
     
-    fileprivate func bookmarksWithUpdatedOrder() -> [Bookmark]? {
+    fileprivate func bookmarksWithUpdatedOrder(context: NSManagedObjectContext) -> [Bookmark]? {
         guard let deviceId = Device.currentDevice()?.deviceId?.first else { return [] }
         let getBaseBookmarksOrderFunction = jsContext?.objectForKeyedSubscript("getBaseBookmarksOrder")
         
@@ -377,7 +378,7 @@ public class Sync: JSInjector {
         
         if baseOrder != "undefined" {
             baseSyncOrder = baseOrder
-            return Bookmark.updateBookmarksWithNewSyncOrder()
+            return Bookmark.updateBookmarksWithNewSyncOrder(context: context)
         }
         
         return nil
@@ -426,6 +427,16 @@ extension Sync {
                 return
             }
             
+            if recordType == .bookmark {
+                let rec = records as! [Bookmark]
+                
+                rec.forEach {
+                    print("bxx rec: \($0.title), url: \($0.url)")
+                }
+                
+//                print("bxx records: \(records as! [Bookmark])")
+                print("bxx json : \(json)")
+            }
             /* browser -> webview, sends this to the webview with the data that needs to be synced to the sync server.
              @param {string} categoryName, @param {Array.<Object>} records */
             let evaluate = "callbackList['send-sync-records'](null, '\(recordType.rawValue)',\(json))"
