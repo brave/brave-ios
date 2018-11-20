@@ -427,16 +427,6 @@ extension Sync {
                 return
             }
             
-            if recordType == .bookmark {
-                let rec = records as! [Bookmark]
-                
-                rec.forEach {
-                    print("bxx rec: \($0.title), url: \($0.url)")
-                }
-                
-//                print("bxx records: \(records as! [Bookmark])")
-                print("bxx json : \(json)")
-            }
             /* browser -> webview, sends this to the webview with the data that needs to be synced to the sync server.
              @param {string} categoryName, @param {Array.<Object>} records */
             let evaluate = "callbackList['send-sync-records'](null, '\(recordType.rawValue)',\(json))"
