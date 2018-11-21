@@ -6,6 +6,7 @@ import Foundation
 import WebKit
 import Shared
 import Data
+import BraveShared
 
 private let log = Logger.browserLogger
 
@@ -80,6 +81,15 @@ extension BrowserViewController: WKNavigationDelegate {
 
         if !navigationAction.isAllowed && navigationAction.navigationType != .backForward {
             log.warning("Denying unprivileged request: \(navigationAction.request)")
+            decisionHandler(.cancel)
+            return
+        }
+        
+        if let app = UIApplication.shared.delegate as? AppDelegate,
+            let safeBrowsing = app.browserViewController.safeBrowsing,
+            safeBrowsing.shouldBlock(url) {
+            
+            safeBrowsing.showMalwareWarningPage(forUrl: url, inWebView: webView)
             decisionHandler(.cancel)
             return
         }
