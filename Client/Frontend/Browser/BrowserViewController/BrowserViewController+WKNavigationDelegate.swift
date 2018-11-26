@@ -85,10 +85,7 @@ extension BrowserViewController: WKNavigationDelegate {
             return
         }
         
-        if let app = UIApplication.shared.delegate as? AppDelegate,
-            let safeBrowsing = app.browserViewController.safeBrowsing,
-            safeBrowsing.shouldBlock(url) {
-            
+        if let safeBrowsing = safeBrowsing, safeBrowsing.shouldBlock(url) {
             safeBrowsing.showMalwareWarningPage(forUrl: url, inWebView: webView)
             decisionHandler(.cancel)
             return
