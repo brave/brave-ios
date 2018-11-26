@@ -15,7 +15,7 @@ public class DAU {
     private static let baseUrl = "https://laptop-updates.brave.com/\(apiVersion)/usage/ios?platform=ios"
     
     /// Number of seconds that determins when a user is "active"
-    private let activeUserDuration = 10.0
+    private let pingRefreshDuration = 20.minutes
     
     /// We always use gregorian calendar for DAU pings. This also adds more anonymity to the server call.
     fileprivate static var calendar: NSCalendar { return Calendar(identifier: .gregorian) as NSCalendar }
@@ -38,14 +38,19 @@ public class DAU {
             return false
         }
         
+        // Sending ping immediately
+        sendPingToServerInternal()
+        
+        // Setting up timer to try to send ping after certain amount of time.
+        // This helps in offline mode situations.
         if launchTimer != nil { return false }
         launchTimer =
             Timer.scheduledTimer(
-                timeInterval: activeUserDuration,
+                timeInterval: pingRefreshDuration,
                 target: self,
                 selector: #selector(sendPingToServerInternal),
                 userInfo: nil,
-                repeats: false)
+                repeats: true)
         
         return true
     }
