@@ -360,17 +360,11 @@ extension URL {
 
 extension URL {
     public var isErrorPageURL: Bool {
-        if let host = self.host {
-            return self.scheme == "http" && host == "localhost" && path.contains("/errors/")
-        }
-        return false
+        return scheme == "http" && host == "localhost" && path.contains("/errors/")
     }
     
     public var safeBrowsingErrorURL: Bool {
-        if let host = self.host {
-            return self.scheme == "http" && host == "localhost" && path.contains("/errors/SafeBrowsingError.html")
-        }
-        return false
+        return scheme == "http" && host == "localhost" && path.contains("/errors/")
     }
 
     public var originalURLFromErrorURL: URL? {
