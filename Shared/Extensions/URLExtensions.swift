@@ -364,7 +364,7 @@ extension URL {
     }
     
     public var safeBrowsingErrorURL: Bool {
-        return scheme == "http" && host == "localhost" && path.contains("/errors/")
+        return scheme == "http" && host == "localhost" && path.contains("/errors/SafeBrowsingError.html")
     }
 
     public var originalURLFromErrorURL: URL? {
