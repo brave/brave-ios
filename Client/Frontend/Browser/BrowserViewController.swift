@@ -1989,7 +1989,8 @@ private let schemesAllowedToBeOpenedAsPopups = ["http", "https", "javascript", "
 
 extension BrowserViewController: WKUIDelegate {
     func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
-        guard let parentTab = tabManager[webView] else { return nil }
+        // Fix for #446, when in private mode the WKProcessPoll of the configuration is changed, this leads to a crash for popups ie window.open where the configuration is craeted by parent wkwebview. To handle this for now we are stopping popup when in private mode. The fix is done in guard statement below.
+        guard let parentTab = tabManager[webView], !parentTab.isPrivate else { return nil }
 
         guard navigationAction.isAllowed, shouldRequestBeOpenedAsPopup(navigationAction.request) else {
             print("Denying popup from request: \(navigationAction.request)")
