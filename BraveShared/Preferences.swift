@@ -29,7 +29,17 @@ extension Preferences {
     final class DAU {
         static let lastLaunchInfo = Option<[Int?]?>(key: "dau.last-launch-info", default: nil)
         static let weekOfInstallation = Option<String?>(key: "dau.week-of-installation", default: nil)
-        static let firstPingParam = Option<Bool>(key: "dau.first-ping", default: true)
+        static let firstPingParam: Option<Bool> = {
+            var defaultValue = true
+            // On old codebase we checked existence of `dau_stat` to determine whether it's first server ping.
+            // We need to translate that to use the new `firstPingParam` preference.
+            if Preferences.DAU.lastLaunchInfo.value != nil {
+                defaultValue = false
+            }
+            
+            return Option<Bool>(key: "dau.first-ping", default: defaultValue)
+        }()
+        
         /// We use this to properly calculate `week` parameter of the DAU ping.
         static let lastPingFirstMonday = Option<String?>(key: "dau.last-ping-first-monday", default: nil)
     }
@@ -147,11 +157,6 @@ extension Preferences {
     public class func migrateBraveShared(keyPrefix: String) {
         // DAU
         migrate(keyPrefix: keyPrefix, key: "dau_stat", to: Preferences.DAU.lastLaunchInfo)
-        // On old codebase we checked existence of `dau_stat` to determine whether it's first server ping.
-        // We need to translate that to use the new `firstPingParam` preference.
-        if Preferences.DAU.lastLaunchInfo.value != nil {
-            Preferences.DAU.firstPingParam.value = false
-        }
         migrate(keyPrefix: keyPrefix, key: "week_of_installation", to: Preferences.DAU.weekOfInstallation)
         migrate(keyPrefix: keyPrefix, key: "lastPingFirstMondayKey", to: Preferences.DAU.lastPingFirstMonday)
         
