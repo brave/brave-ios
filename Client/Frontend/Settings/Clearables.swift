@@ -127,9 +127,6 @@ class CacheClearable: Clearable {
             URLCache.shared.removeAllCachedResponses()
             
             var err: Error?
-            /* Please note that this is a hack. If possible please use a public api.
-             Removed Preferences from the list as it used to delete UserDefaults
-             */
             for item in ["Caches", "Cookies", "WebKit"] {
                 do {
                     try deleteLibraryFolderContents(item, validateClearedExceptFor: ["Snapshots"])
