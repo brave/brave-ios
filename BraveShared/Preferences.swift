@@ -147,6 +147,11 @@ extension Preferences {
     public class func migrateBraveShared(keyPrefix: String) {
         // DAU
         migrate(keyPrefix: keyPrefix, key: "dau_stat", to: Preferences.DAU.lastLaunchInfo)
+        // On old codebase we checked existence of `dau_stat` to determine whether it's first server ping.
+        // We need to translate that to use the new `firstPingParam` preference.
+        if Preferences.DAU.lastLaunchInfo.value != nil {
+            Preferences.DAU.firstPingParam.value = false
+        }
         migrate(keyPrefix: keyPrefix, key: "week_of_installation", to: Preferences.DAU.weekOfInstallation)
         migrate(keyPrefix: keyPrefix, key: "lastPingFirstMondayKey", to: Preferences.DAU.lastPingFirstMonday)
         
