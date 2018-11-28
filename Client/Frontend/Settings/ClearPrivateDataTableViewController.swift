@@ -174,6 +174,7 @@ class ClearPrivateDataTableViewController: UITableViewController {
              } else {*/
             ClearPrivateDataTableViewController.clearPrivateData(clear).uponQueue(DispatchQueue.main) { _ in
                 // TODO: add API to avoid add/remove
+                // @Brave-devs: Why is this done in the next line? 
                 self.tabManager.removeTab(self.tabManager.addTab())
             }
             //      }
