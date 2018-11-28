@@ -6,6 +6,7 @@ import Foundation
 import WebKit
 import Shared
 import Data
+import BraveShared
 
 private let log = Logger.browserLogger
 
@@ -83,6 +84,12 @@ extension BrowserViewController: WKNavigationDelegate {
             decisionHandler(.cancel)
             return
         }
+        
+        if let safeBrowsing = safeBrowsing, safeBrowsing.shouldBlock(url) {
+            safeBrowsing.showMalwareWarningPage(forUrl: url, inWebView: webView)
+            decisionHandler(.cancel)
+            return
+        }
 
         // First special case are some schemes that are about Calling. We prompt the user to confirm this action. This
         // gives us the exact same behaviour as Safari.
@@ -152,6 +159,12 @@ extension BrowserViewController: WKNavigationDelegate {
                 // Grab all lists that have valid rules and add/remove them as necessary
                 on.compactMap { $0.rule }.forEach(controller.add)
                 off.compactMap { $0.rule }.forEach(controller.remove)
+              
+                if let tab = tabManager[webView] {
+                    tab.userScriptManager?.isFingerprintingProtectionEnabled = domainForShields.isShieldExpected(.FpProtection)
+                }
+
+                webView.configuration.preferences.javaScriptEnabled = !domainForShields.isShieldExpected(.NoScript)
             }
             
             decisionHandler(.allow)

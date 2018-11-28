@@ -125,12 +125,18 @@ class BrowserViewController: UIViewController {
     let downloadQueue = DownloadQueue()
     
     fileprivate var contentBlockListDeferred: Deferred<((), ())>?
+    
+    // Web filters
+    
+    let safeBrowsing: SafeBrowsing?
 
-    init(profile: Profile, tabManager: TabManager, crashedLastSession: Bool) {
+    init(profile: Profile, tabManager: TabManager, crashedLastSession: Bool,
+         safeBrowsingManager: SafeBrowsing? = SafeBrowsing()) {
         self.profile = profile
         self.tabManager = tabManager
         self.readerModeCache = ReaderMode.cache(for: tabManager.selectedTab)
         self.crashedLastSession = crashedLastSession
+        self.safeBrowsing = safeBrowsingManager
         super.init(nibName: nil, bundle: nil)
         didInit()
     }
@@ -177,7 +183,7 @@ class BrowserViewController: UIViewController {
         Preferences.Privacy.privateBrowsingOnly.observe(from: self)
         Preferences.Privacy.cookieAcceptPolicy.observe(from: self)
         Preferences.General.tabBarVisibility.observe(from: self)
-        Preferences.Shields.fingerprintingProtection.observe(from: self)
+        Preferences.Shields.allShields.forEach { $0.observe(from: self) }
         
         // Lists need to be compiled before attempting tab restoration
         contentBlockListDeferred = ContentBlockerHelper.compileLists()
@@ -1222,6 +1228,8 @@ class BrowserViewController: UIViewController {
     func presentBrowserLockCallout() {
         if isBrowserLockEnabled || Preferences.Popups.browserLock.value { return }
         
+        urlBar.leaveOverlayMode()
+        
         let popup = AlertPopupView(image: #imageLiteral(resourceName: "browser_lock_popup"), title: Strings.Browser_lock_callout_title, message: Strings.Browser_lock_callout_message)
         popup.addButton(title: Strings.Browser_lock_callout_not_now) { () -> PopupViewDismissType in
             Preferences.Popups.browserLock.value = true
@@ -1253,6 +1261,8 @@ class BrowserViewController: UIViewController {
             presentBrowserLockCallout()
             return
         }
+        
+        urlBar.leaveOverlayMode()
         
         let popup = AlertPopupView(image: UIImage(named: "duckduckgo"), title: Strings.DDG_callout_title, message: Strings.DDG_callout_message)
         popup.dismissHandler = { [weak self] in
@@ -1692,6 +1702,15 @@ extension BrowserViewController: TabToolbarDelegate {
             self.present(backForwardViewController, animated: true, completion: nil)
         }
     }
+    
+    func tabToolbarDidSwipeToChangeTabs(_ tabToolbar: TabToolbarProtocol, direction: UISwipeGestureRecognizer.Direction) {
+        let tabs = tabManager.tabsForCurrentMode
+        guard let selectedTab = tabManager.selectedTab, let index = tabs.firstIndex(where: { $0 === selectedTab }) else { return }
+        let newTabIndex = index + (direction == .left ? -1 : 1)
+        if newTabIndex >= 0 && newTabIndex < tabs.count {
+            tabManager.selectTab(tabs[newTabIndex])
+        }
+    }
 }
 
 extension BrowserViewController: TabsBarViewControllerDelegate {
@@ -1765,6 +1784,8 @@ extension BrowserViewController: TabDelegate {
         tab.addContentScript(tab.contentBlocker, name: ContentBlockerHelper.name())
 
         tab.addContentScript(FocusHelper(tab: tab), name: FocusHelper.name())
+        
+        tab.addContentScript(FingerprintingProtection(tab: tab), name: FingerprintingProtection.name())
     }
 
     func tab(_ tab: Tab, willDeleteWebView webView: WKWebView) {
@@ -1980,7 +2001,12 @@ private let schemesAllowedToBeOpenedAsPopups = ["http", "https", "javascript", "
 
 extension BrowserViewController: WKUIDelegate {
     func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
-        guard let parentTab = tabManager[webView] else { return nil }
+        /* Fix for #446, when in private mode the WKProcessPool of the configuration is changed,
+         this leads to a crash for popups ie window.open where the configuration is created by parent wkwebview.
+         To handle this for now we are stopping popup when in private mode.
+         The fix is done in guard statement below.
+         */
+        guard let parentTab = tabManager[webView], !parentTab.isPrivate else { return nil }
 
         guard navigationAction.isAllowed, shouldRequestBeOpenedAsPopup(navigationAction.request) else {
             print("Denying popup from request: \(navigationAction.request)")
@@ -2779,9 +2805,13 @@ extension BrowserViewController: PreferencesObserver {
                 tabManager.addTabAndSelect(nil, isPrivate: isPrivate)
             }
             updateTabsBarVisibility()
-        case Preferences.Shields.fingerprintingProtection.key:
-            // TODO: Update fingerprinting protection based on `Preferences.Shields.fingerprintingProtection` once fingerprinting protection is added back
-            break
+        case Preferences.Shields.blockAdsAndTracking.key,
+             Preferences.Shields.httpsEverywhere.key,
+             Preferences.Shields.blockScripts.key,
+             Preferences.Shields.blockPhishingAndMalware.key,
+             Preferences.Shields.blockImages.key,
+             Preferences.Shields.fingerprintingProtection.key:
+            tabManager.allTabs.forEach { $0.webView?.reload() }
         default:
             log.debug("Received a preference change for an unknown key: \(key) on \(type(of: self))")
             break

@@ -6,6 +6,7 @@ import Foundation
 import WebKit
 import Storage
 import Shared
+import BraveShared
 import SwiftyJSON
 import XCGLogger
 import Data
@@ -208,7 +209,7 @@ class Tab: NSObject {
 
             self.webView = webView
             self.webView?.addObserver(self, forKeyPath: KVOConstants.URL.rawValue, options: .new, context: nil)
-            self.userScriptManager = UserScriptManager(tab: self)
+            self.userScriptManager = UserScriptManager(tab: self, isFingerprintingProtectionEnabled: Preferences.Shields.fingerprintingProtection.value)
             tabDelegate?.tab?(self, didCreateWebView: webView)
         }
     }
@@ -364,6 +365,12 @@ class Tab: NSObject {
 
             // Reload the initial URL to avoid UA specific redirection
             loadRequest(PrivilegedRequest(url: currentItem.initialURL, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 60) as URLRequest)
+            return
+        }
+        
+        // Refreshing error, safe browsing warning pages.
+        if let originalUrlFromErrorUrl = webView?.url?.originalURLFromErrorURL {
+            webView?.load(URLRequest(url: originalUrlFromErrorUrl))
             return
         }
 

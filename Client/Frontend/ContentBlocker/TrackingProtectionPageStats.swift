@@ -13,20 +13,29 @@ struct TPPageStats {
     let adCount: Int
     let trackerCount: Int
     let scriptCount: Int
+    let fingerprintingCount: Int
 
-    var total: Int { return adCount + trackerCount + scriptCount }
+    var total: Int { return adCount + trackerCount + scriptCount + fingerprintingCount }
     
-    init(adCount: Int = 0, trackerCount: Int = 0, scriptCount: Int = 0) {
+    init(adCount: Int = 0, trackerCount: Int = 0, scriptCount: Int = 0, fingerprintingCount: Int = 0) {
         self.adCount = adCount
         self.trackerCount = trackerCount
         self.scriptCount = scriptCount
+        self.fingerprintingCount = fingerprintingCount
+    }
+    
+    func addingFingerprintingBlock() -> TPPageStats {
+        return TPPageStats(adCount: adCount, trackerCount: trackerCount, scriptCount: scriptCount, fingerprintingCount: fingerprintingCount + 1)
     }
 
+    func addingScriptBlock() -> TPPageStats {
+        return TPPageStats(adCount: adCount, trackerCount: trackerCount, scriptCount: scriptCount + 1, fingerprintingCount: fingerprintingCount)
+    }
+    
     func create(byAddingListItem listItem: BlocklistName) -> TPPageStats {
         switch listItem {
-        case .ad: return TPPageStats(adCount: adCount + 1, trackerCount: trackerCount, scriptCount: scriptCount)
-        case .tracker: return TPPageStats(adCount: adCount, trackerCount: trackerCount + 1, scriptCount: scriptCount)
-        case .script: return TPPageStats(adCount: adCount, trackerCount: trackerCount, scriptCount: scriptCount + 1)
+        case .ad: return TPPageStats(adCount: adCount + 1, trackerCount: trackerCount, scriptCount: scriptCount, fingerprintingCount: fingerprintingCount)
+        case .tracker: return TPPageStats(adCount: adCount, trackerCount: trackerCount + 1, scriptCount: scriptCount, fingerprintingCount: fingerprintingCount)
         default:
             break
         }
@@ -58,10 +67,7 @@ class TPStatsBlocklistChecker {
             if let resourceType = resourceType {
                 switch resourceType {
                 case .script:
-                    if enabledLists.contains(.script) {
-                        deferred.fill(.script)
-                        return
-                    }
+                    break
                 case .image:
                     if enabledLists.contains(.image) {
                         deferred.fill(.image)
