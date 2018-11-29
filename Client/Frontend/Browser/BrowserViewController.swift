@@ -1991,8 +1991,9 @@ extension BrowserViewController: TabManagerDelegate {
 
     fileprivate func updateTabCountUsingTabManager(_ tabManager: TabManager, animated: Bool = true) {
         let count = tabManager.tabsForCurrentMode.count
-        toolbar?.updateTabCount(count, animated: animated)
-        urlBar.updateTabCount(count, animated: !urlBar.inOverlayMode)
+        // The window check insures that the view is visible and hence can be animated
+        toolbar?.updateTabCount(count, animated: self.view.window != nil ? animated : false)
+        urlBar.updateTabCount(count, animated: self.view.window != nil ? !urlBar.inOverlayMode : false)
     }
 }
 
