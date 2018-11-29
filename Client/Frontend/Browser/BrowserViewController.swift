@@ -509,7 +509,7 @@ class BrowserViewController: UIViewController {
 
         checkCrashRestoration()
         
-        updateTabCountUsingTabManager(tabManager, animated: false)
+        updateTabCountUsingTabManager(tabManager)
         clipboardBarDisplayHandler?.checkIfShouldDisplayBar()
         favoritesViewController?.updateDuckDuckGoVisibility()
     }
@@ -1989,11 +1989,10 @@ extension BrowserViewController: TabManagerDelegate {
         show(toast: toast, afterWaiting: ButtonToastUX.ToastDelay)
     }
 
-    fileprivate func updateTabCountUsingTabManager(_ tabManager: TabManager, animated: Bool = true) {
+    fileprivate func updateTabCountUsingTabManager(_ tabManager: TabManager) {
         let count = tabManager.tabsForCurrentMode.count
-        // The window check insures that the view is visible and hence can be animated
-        toolbar?.updateTabCount(count, animated: self.view.window != nil ? animated : false)
-        urlBar.updateTabCount(count, animated: self.view.window != nil ? !urlBar.inOverlayMode : false)
+        toolbar?.updateTabCount(count)
+        urlBar.updateTabCount(count)
     }
 }
 
