@@ -85,6 +85,7 @@ class TabsButton: UIButton {
         addSubview(insideButton)
         isAccessibilityElement = true
         accessibilityTraits |= UIAccessibilityTraitButton
+        self.accessibilityLabel = Strings.Show_Tabs
     }
 
     override func updateConstraints() {
@@ -114,7 +115,6 @@ class TabsButton: UIButton {
         let infinity = "\u{221E}"
         let countToBe = (count < 100) ? "\(count)" : infinity
         currentCount = count
-        self.accessibilityLabel = Strings.Show_Tabs
         self.countLabel.text = countToBe
         self.accessibilityValue = countToBe
     }
