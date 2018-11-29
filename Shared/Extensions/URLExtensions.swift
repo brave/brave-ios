@@ -359,16 +359,20 @@ extension URL {
 // Helpers to deal with ErrorPage URLs
 
 extension URL {
+    private var isLocalhost: Bool {
+        return scheme == "http" && host == "localhost"
+    }
+    
     public var isErrorPageURL: Bool {
-        return scheme == "http" && host == "localhost" && path.contains("/errors/")
+        return isLocalhost && path.contains("/errors/")
     }
     
     public var safeBrowsingErrorURL: Bool {
-        return scheme == "http" && host == "localhost" && path.contains("/errors/SafeBrowsingError.html")
+        return isLocalhost && path.contains("/errors/SafeBrowsingError.html")
     }
     
     public var isSessionRestoreURL: Bool {
-        return scheme == "http" && host == "localhost" && path.contains("/about/sessionrestore")
+        return isLocalhost && path.contains("/about/sessionrestore")
     }
 
     public var originalURLFromErrorURL: URL? {
