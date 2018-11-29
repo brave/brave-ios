@@ -138,11 +138,14 @@ class TabsButton: UIButton {
         return button
     }
     
+    var countToBe: String {
+        let infinity = "\u{221E}"
+        let count = currentCount ?? 0
+        return (count < 100) ? "\(count)" : infinity
+    }
+    
     func updateTabCount(_ count: Int, animated: Bool = true) {
         let count = max(count, 1)
-        // Sometimes tabs count state is held in the cloned tabs button.
-        let infinity = "\u{221E}"
-        let countToBe = (count < 100) ? "\(count)" : infinity
 
         // only animate a tab count change if the tab count has actually changed
         if currentCount != count {
@@ -153,7 +156,12 @@ class TabsButton: UIButton {
                 self.clonedTabsButton?.removeFromSuperview()
                 insideButton.layer.removeAllAnimations()
             }
-
+            if !animated {
+                self.accessibilityLabel = Strings.Show_Tabs
+                self.countLabel.text = countToBe
+                self.accessibilityValue = countToBe
+                return
+            }
             // make a 'clone' of the tabs button
             let newTabsButton = clone() as! TabsButton // swiftlint:disable:this force_cast
 
@@ -190,7 +198,10 @@ class TabsButton: UIButton {
                 self.insideButton.layer.opacity = 0
             }
             
-            let completion: (Bool) -> Void = { completed in
+            let completion: (Bool) -> Void = {[weak self] completed in
+                guard let `self` = self else {
+                    return
+                }
                 let noActiveAnimations = self.insideButton.layer.animationKeys()?.isEmpty ?? true
                 if completed || noActiveAnimations {
                     newTabsButton.removeFromSuperview()
@@ -198,10 +209,10 @@ class TabsButton: UIButton {
                     self.insideButton.layer.transform = CATransform3DIdentity
                 }
                 self.accessibilityLabel = Strings.Show_Tabs
-                self.countLabel.text = countToBe
-                self.accessibilityValue = countToBe
+                self.countLabel.text = self.countToBe
+                self.accessibilityValue = self.countToBe
             }
-            UIView.animate(withDuration: animated ? 1.5 : 0, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.0, options: [], animations: animate, completion: completion)
+            UIView.animate(withDuration: 1.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.0, options: [], animations: animate, completion: completion)
         }
     }
     @objc func cloneDidClickTabs() {
