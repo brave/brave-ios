@@ -201,11 +201,7 @@ class TabsButton: UIButton {
                 self.countLabel.text = countToBe
                 self.accessibilityValue = countToBe
             }
-            if animated {
-                UIView.animate(withDuration: 1.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.0, options: [], animations: animate, completion: completion)
-            } else {
-                completion(true)
-            }
+            UIView.animate(withDuration: animated ? 1.5 : 0, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.0, options: [], animations: animate, completion: completion)
         }
     }
     @objc func cloneDidClickTabs() {
