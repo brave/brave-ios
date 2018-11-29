@@ -366,6 +366,10 @@ extension URL {
     public var safeBrowsingErrorURL: Bool {
         return scheme == "http" && host == "localhost" && path.contains("/errors/SafeBrowsingError.html")
     }
+    
+    public var isSessionRestoreURL: Bool {
+        return scheme == "http" && host == "localhost" && path.contains("/about/sessionrestore")
+    }
 
     public var originalURLFromErrorURL: URL? {
         let components = URLComponents(url: self, resolvingAgainstBaseURL: false)
