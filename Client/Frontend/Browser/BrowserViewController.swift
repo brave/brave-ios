@@ -913,7 +913,7 @@ class BrowserViewController: UIViewController {
             
             navigationToolbar.updateForwardStatus(canGoForward)
         case .hasOnlySecureContent:
-            guard let tab = tabManager[webView], tab === tabManager.selectedTab else {
+            guard let tab = tabManager[webView] else {
                 break
             }
             
@@ -921,14 +921,18 @@ class BrowserViewController: UIViewController {
                 tab.contentIsSecure = false
             }
             
-            updateURLBar(forTab: tab)
+            if tab === tabManager.selectedTab {
+                updateURLBar(forTab: tab)
+            }
         case .serverTrust:
-            guard let tab = tabManager[webView], tab === tabManager.selectedTab else {
+            guard let tab = tabManager[webView] else {
                 break
             }
 
             tab.contentIsSecure = false
-            updateURLBar(forTab: tab)
+            if tab === tabManager.selectedTab {
+                updateURLBar(forTab: tab)
+            }
 
             guard let serverTrust = tab.webView?.serverTrust else {
                 break
@@ -943,7 +947,9 @@ class BrowserViewController: UIViewController {
                 }
 
                 DispatchQueue.main.async {
-                    self.updateURLBar(forTab: tab)
+                    if tab === self.tabManager.selectedTab {
+                        self.updateURLBar(forTab: tab)
+                    }
                 }
             }
         default:
