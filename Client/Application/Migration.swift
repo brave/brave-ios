@@ -44,19 +44,18 @@ extension Preferences {
         migrate(key: "search.defaultprivate.name", to: Preferences.Search.defaultPrivateEngineName)
         
         // Privacy
-        let legacyCookieMap: [HTTPCookie.AcceptPolicy] = [.onlyFromMainDocumentDomain, .never, .always]
-        migrate(key: "braveAcceptCookiesPref", to: Preferences.Privacy.cookieAcceptPolicy, transform: { value in
-            // The value stored in 1.6 is actually mapped differently (optionIds -> HTTPCookie.AcceptPolicy) rather
-            // than just use the rawValue of said AcceptPolicy like in 1.7. The mapping is shown in `legacyCookieMap`
-            if value < legacyCookieMap.count {
-                return legacyCookieMap[Int(value)].rawValue
-            }
-            // If for some odd reason we have malformed data, just set the default value
-            return Preferences.Privacy.cookieAcceptPolicy.defaultValue
-        })
-        
         migrate(key: "privateBrowsingAlwaysOn", to: Preferences.Privacy.privateBrowsingOnly)
         migrate(key: "clearprivatedata.toggles", to: Preferences.Privacy.clearPrivateDataToggles)
+        
+        // Make sure to unlock all directories that may have been locked in 1.6 private mode
+        let baseDir = NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true)[0]
+        [baseDir + "/WebKit", baseDir + "/Caches"].forEach {
+            do {
+                try FileManager.default.setAttributes([.posixPermissions: NSNumber(value: 0o755 as Int16)], ofItemAtPath: $0)
+            } catch {
+                log.error("Failed setting the directory attributes for \($0)")
+            }
+        }
         
         // Security
         NSKeyedUnarchiver.setClass(AuthenticationKeychainInfo.self, forClassName: "AuthenticationKeychainInfo")
@@ -78,6 +77,10 @@ extension Preferences {
         
         // BraveShared
         migrateBraveShared(keyPrefix: keyPrefix)
+        
+        // On 1.6 lastLaunchInfo is used to check if it's first app launch or not.
+        // This needs to be translated to our new preference.
+        Preferences.General.isFirstLaunch.value = Preferences.DAU.lastLaunchInfo.value == nil
         
         Preferences.Migration.completed.value = true
     }

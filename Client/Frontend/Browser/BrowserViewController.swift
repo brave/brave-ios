@@ -181,7 +181,6 @@ class BrowserViewController: UIViewController {
         
         // Observe some user preferences
         Preferences.Privacy.privateBrowsingOnly.observe(from: self)
-        Preferences.Privacy.cookieAcceptPolicy.observe(from: self)
         Preferences.General.tabBarVisibility.observe(from: self)
         Preferences.Shields.allShields.forEach { $0.observe(from: self) }
         
@@ -236,7 +235,7 @@ class BrowserViewController: UIViewController {
 
         if let tab = tabManager.selectedTab,
                let webView = tab.webView {
-            updateURLBar(forTab: tab)
+            updateURLBar()
             navigationToolbar.updateBackStatus(webView.canGoBack)
             navigationToolbar.updateForwardStatus(webView.canGoForward)
             urlBar.locationView.loading = tab.loading
@@ -509,7 +508,7 @@ class BrowserViewController: UIViewController {
 
         checkCrashRestoration()
         
-        updateTabCountUsingTabManager(tabManager, animated: false)
+        updateTabCountUsingTabManager(tabManager)
         clipboardBarDisplayHandler?.checkIfShouldDisplayBar()
         favoritesViewController?.updateDuckDuckGoVisibility()
     }
@@ -913,7 +912,7 @@ class BrowserViewController: UIViewController {
             
             navigationToolbar.updateForwardStatus(canGoForward)
         case .hasOnlySecureContent:
-            guard let tab = tabManager[webView], tab === tabManager.selectedTab else {
+            guard let tab = tabManager[webView] else {
                 break
             }
             
@@ -921,14 +920,14 @@ class BrowserViewController: UIViewController {
                 tab.contentIsSecure = false
             }
             
-            updateURLBar(forTab: tab)
+            updateURLBar()
         case .serverTrust:
-            guard let tab = tabManager[webView], tab === tabManager.selectedTab else {
+            guard let tab = tabManager[webView] else {
                 break
             }
 
             tab.contentIsSecure = false
-            updateURLBar(forTab: tab)
+            updateURLBar()
 
             guard let serverTrust = tab.webView?.serverTrust else {
                 break
@@ -943,7 +942,7 @@ class BrowserViewController: UIViewController {
                 }
 
                 DispatchQueue.main.async {
-                    self.updateURLBar(forTab: tab)
+                    self.updateURLBar()
                 }
             }
         default:
@@ -961,7 +960,7 @@ class BrowserViewController: UIViewController {
     }
 
     func updateUIForReaderHomeStateForTab(_ tab: Tab) {
-        updateURLBar(forTab: tab)
+        updateURLBar()
         scrollController.showToolbars(animated: false)
 
         if let url = tab.url {
@@ -978,7 +977,9 @@ class BrowserViewController: UIViewController {
     }
 
     /// Updates the URL bar security, text and button states.
-    fileprivate func updateURLBar(forTab tab: Tab) {
+    fileprivate func updateURLBar() {
+        guard let tab = tabManager.selectedTab else { return }
+        
         urlBar.currentURL = tab.url?.displayURL
         
         urlBar.contentIsSecure = tab.contentIsSecure
@@ -1225,18 +1226,22 @@ class BrowserViewController: UIViewController {
         return KeychainWrapper.sharedAppContainerKeychain.authenticationInfo() != nil
     }
     
+    private var browserLockPopup: AlertPopupView?
+    
     func presentBrowserLockCallout() {
-        if isBrowserLockEnabled || Preferences.Popups.browserLock.value { return }
+        if isBrowserLockEnabled || Preferences.Popups.browserLock.value || browserLockPopup != nil { return }
         
         urlBar.leaveOverlayMode()
         
         let popup = AlertPopupView(image: #imageLiteral(resourceName: "browser_lock_popup"), title: Strings.Browser_lock_callout_title, message: Strings.Browser_lock_callout_message)
         popup.addButton(title: Strings.Browser_lock_callout_not_now) { () -> PopupViewDismissType in
             Preferences.Popups.browserLock.value = true
+            self.browserLockPopup = nil
             return .flyDown
         }
         popup.addDefaultButton(title: Strings.Browser_lock_callout_enable) { [weak self] () -> PopupViewDismissType in
             Preferences.Popups.browserLock.value = true
+            self?.browserLockPopup = nil
             
             let setupPasscodeController = SetupPasscodeViewController()
             let container = UINavigationController(rootViewController: setupPasscodeController)
@@ -1244,12 +1249,17 @@ class BrowserViewController: UIViewController {
             
             return .flyUp
         }
+        browserLockPopup = popup
         popup.showWithType(showType: .flyUp)
     }
     
     // MARK: - DuckDuckGo Callout
     
+    private var duckDuckGoPopup: AlertPopupView?
     func presentDuckDuckGoCallout(force: Bool = false) {
+        // Don't show duplicate popups
+        if duckDuckGoPopup != nil { return }
+        
         // Check to see if its been presented already
         if SearchEngines.shouldShowDuckDuckGoPromo && Preferences.Popups.duckDuckGoPrivateSearch.value && !force {
             presentBrowserLockCallout()
@@ -1270,9 +1280,12 @@ class BrowserViewController: UIViewController {
         }
         popup.addButton(title: Strings.DDG_callout_no) {
             Preferences.Popups.duckDuckGoPrivateSearch.value = true
+            self.duckDuckGoPopup = nil
             return .flyDown
         }
         popup.addDefaultButton(title: Strings.DDG_callout_enable) { [weak self] in
+            self?.duckDuckGoPopup = nil
+            
             if self?.profile == nil {
                 return .flyUp
             }
@@ -1284,6 +1297,7 @@ class BrowserViewController: UIViewController {
             
             return .flyUp
         }
+        duckDuckGoPopup = popup
         popup.showWithType(showType: .flyUp)
     }
 }
@@ -1873,7 +1887,7 @@ extension BrowserViewController: TabManagerDelegate {
         }
 
         if let tab = selected, let webView = tab.webView {
-            updateURLBar(forTab: tab)
+            updateURLBar()
 
             if tab.type != previous?.type {
                 let theme = Theme.of(tab)
@@ -1901,6 +1915,12 @@ extension BrowserViewController: TabManagerDelegate {
 
         if selected?.type != previous?.type {
             updateTabCountUsingTabManager(tabManager)
+        }
+        
+        if PrivateBrowsingManager.shared.isPrivateBrowsing {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                self.presentDuckDuckGoCallout()
+            }
         }
 
         removeAllBars()
@@ -1989,10 +2009,10 @@ extension BrowserViewController: TabManagerDelegate {
         show(toast: toast, afterWaiting: ButtonToastUX.ToastDelay)
     }
 
-    fileprivate func updateTabCountUsingTabManager(_ tabManager: TabManager, animated: Bool = true) {
+    fileprivate func updateTabCountUsingTabManager(_ tabManager: TabManager) {
         let count = tabManager.tabsForCurrentMode.count
-        toolbar?.updateTabCount(count, animated: animated)
-        urlBar.updateTabCount(count, animated: !urlBar.inOverlayMode)
+        toolbar?.updateTabCount(count)
+        urlBar.updateTabCount(count)
     }
 }
 
@@ -2759,10 +2779,8 @@ extension BrowserViewController: HomeMenuControllerDelegate {
             UIPasteboard.general.url = url
         case .share:
             menu.dismiss(animated: true) {
-                guard let url = self.tabManager.selectedTab?.url else { return }
                 self.presentActivityViewController(
                     url,
-                    tab: self.tabManager.selectedTab,
                     sourceView: self.view,
                     sourceRect: self.view.convert(self.urlBar.shareButton.frame, from: self.urlBar.shareButton.superview),
                     arrowDirection: [.up]
@@ -2791,8 +2809,6 @@ extension BrowserViewController: TopSitesDelegate {
 extension BrowserViewController: PreferencesObserver {
     func preferencesDidChange(for key: String) {
         switch key {
-        case Preferences.Privacy.cookieAcceptPolicy.key:
-            HTTPCookieStorage.shared.updateCookieAcceptPolicy(to: HTTPCookie.AcceptPolicy(rawValue: Preferences.Privacy.cookieAcceptPolicy.value))
         case Preferences.General.tabBarVisibility.key:
             updateTabsBarVisibility()
         case Preferences.Privacy.privateBrowsingOnly.key:
