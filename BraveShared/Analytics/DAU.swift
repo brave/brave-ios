@@ -82,7 +82,7 @@ public class DAU {
             // This preference is set for future DAU pings.
             Preferences.DAU.firstPingParam.value = false
             
-            // This preference is used to calculate wheter user used the app in this month and/or day.
+            // This preference is used to calculate whether user used the app in this month and/or day.
             Preferences.DAU.lastLaunchInfo.value = paramsAndPrefs.lastLaunchInfoPreference
             
             Preferences.DAU.lastPingFirstMonday.value = paramsAndPrefs.lastPingFirstMondayPreference
