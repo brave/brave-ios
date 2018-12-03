@@ -780,7 +780,13 @@ class BrowserViewController: UIViewController {
         }
         
         func shouldShowTabBar() -> Bool {
-            let tabCount = tabManager.tabsForCurrentMode.count
+            let tabCount: Int
+            if !PrivateBrowsingManager.shared.isPrivateBrowsing && tabManager.selectedTab?.isPrivate == true {
+                // Entering PBM from normal
+                tabCount = 1
+            } else {
+                tabCount = tabManager.tabsForCurrentMode.count
+            }
             guard let tabBarVisibility = TabBarVisibility(rawValue: Preferences.General.tabBarVisibility.value) else {
                 // This should never happen
                 assertionFailure("Invalid tab bar visibility preference: \(Preferences.General.tabBarVisibility.value).")
@@ -2010,7 +2016,13 @@ extension BrowserViewController: TabManagerDelegate {
     }
 
     fileprivate func updateTabCountUsingTabManager(_ tabManager: TabManager) {
-        let count = tabManager.tabsForCurrentMode.count
+        let count: Int
+        if !PrivateBrowsingManager.shared.isPrivateBrowsing && tabManager.selectedTab?.isPrivate == true {
+            // Entering PBM from normal
+            count = 1
+        } else {
+            count = tabManager.tabsForCurrentMode.count
+        }
         toolbar?.updateTabCount(count)
         urlBar.updateTabCount(count)
     }
