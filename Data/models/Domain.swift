@@ -32,7 +32,7 @@ public final class Domain: NSManagedObject, CRUD {
         super.awakeFromInsert()
     }
 
-    public class func getOrCreateForUrl(_ url: URL, context: NSManagedObjectContext) -> Domain {
+    public class func getOrCreateForUrl(_ url: URL, context: NSManagedObjectContext, save: Bool = true) -> Domain {
         let domainString = url.domainURL.absoluteString
         if let domain = Domain.first(where: NSPredicate(format: "url == %@", domainString), context: context) {
             return domain
@@ -44,9 +44,14 @@ public final class Domain: NSManagedObject, CRUD {
         //  A solution to consider is creating a new background context here, creating, saving, and then re-fetching
         //   that object in the requested context (regardless if it is `viewContext` or not)
         var newDomain: Domain!
-        context.performAndWait {
-            newDomain = Domain(entity: Domain.entity(context), insertInto: context)
-            newDomain.url = domainString
+        // Since most calls are from main queue performandWait has no adavantage.
+//        context.performAndWait {
+//
+//            DataController.save(context: context)
+//        }
+        newDomain = Domain(entity: Domain.entity(context), insertInto: context)
+        newDomain.url = domainString
+        if save {
             DataController.save(context: context)
         }
         return newDomain

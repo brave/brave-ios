@@ -98,3 +98,16 @@ public class DataController: NSObject {
     }
 }
 
+extension NSManagedObjectContext {
+    public func saveContext () {
+        if self.hasChanges {
+            do {
+                try self.save()
+            } catch {
+                let nserror = error as NSError
+                fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
+            }
+        }
+        self.parent?.saveContext()
+    }
+}
