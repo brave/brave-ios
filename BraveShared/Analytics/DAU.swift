@@ -15,7 +15,7 @@ public class DAU {
     private static let baseUrl = "https://laptop-updates.brave.com/\(apiVersion)/usage/ios?platform=ios"
     
     /// Number of seconds that determins when a user is "active"
-    private let pingRefreshDuration = 20.minutes
+    private let pingRefreshDuration = 5.minutes
     
     /// We always use gregorian calendar for DAU pings. This also adds more anonymity to the server call.
     fileprivate static var calendar: NSCalendar { return Calendar(identifier: .gregorian) as NSCalendar }
