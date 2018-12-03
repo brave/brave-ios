@@ -15,7 +15,7 @@ struct FavoritesHelper {
 
     // MARK: - Favorites initialization
     static func addDefaultFavorites() {
-        Bookmark.add(defaults: PreloadedFavorites.getList())
+        Bookmark.add(from: PreloadedFavorites.getList())
     }
 
     static func convertToBookmarks(_ sites: [Site]) {

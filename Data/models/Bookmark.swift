@@ -243,13 +243,13 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
             format: "%K == %@ AND %K == NO", parentFolderKP, parent ?? nilArgumentForPredicate, isFavoriteKP)
     }
     
-    public class func add(defaults: [(url: URL, title: String)]) {
+    public class func add(from list: [(url: URL, title: String)]) {
         let context = DataController.newBackgroundContext()
         context.performAndWait {
-            defaults.forEach { fav in
+            list.forEach { fav in
                 Bookmark.add(url: fav.url, title: fav.title, isFavorite: true, save: false, context: context)
             }
-            context.saveContext()
+            DataController.save(context: context)
         }
     }
     
