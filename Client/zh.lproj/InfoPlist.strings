@@ -1,12 +1,6 @@
 /* (No Comment) */
 "1Password Fill Browser Action" = "1密码填写浏览器操作";
 
-/* Bundle display name */
-"CFBundleDisplayName" = "$(MOZ_BUNDLE_DISPLAY_NAME)";
-
-/* Bundle name */
-"CFBundleName" = "$(MOZ_PRODUCT_NAME)";
-
 /* (No Comment) */
 "NSCameraUsageDescription" = "这可使您拍照和上传照片。";
 

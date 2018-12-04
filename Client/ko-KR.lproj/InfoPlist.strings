@@ -1,12 +1,6 @@
 /* (No Comment) */
 "1Password Fill Browser Action" = "1Password로 브라우저 작업 채우기";
 
-/* Bundle display name */
-"CFBundleDisplayName" = "$(MOZ_BUNDLE_DISPLAY_NAME)";
-
-/* Bundle name */
-"CFBundleName" = "$(MOZ_PRODUCT_NAME)";
-
 /* (No Comment) */
 "NSCameraUsageDescription" = "이렇게 하면 사진을 촬영하고 업로드할 수 있습니다.";
 

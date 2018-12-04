@@ -1,12 +1,6 @@
 /* (No Comment) */
 "1Password Fill Browser Action" = "Ação de preenchimento de senha no navegador do 1Password";
 
-/* Bundle display name */
-"CFBundleDisplayName" = "$(MOZ_BUNDLE_DISPLAY_NAME)";
-
-/* Bundle name */
-"CFBundleName" = "$(MOZ_PRODUCT_NAME)";
-
 /* (No Comment) */
 "NSCameraUsageDescription" = "Isso permite que você tire e carregue fotos.";
 
