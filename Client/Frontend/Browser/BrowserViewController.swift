@@ -2366,7 +2366,6 @@ extension BrowserViewController: ContextMenuHelperDelegate {
             let tabType = currentTab.type
 
             let addTab = { (rURL: URL, isPrivate: Bool) in
-                PrivateBrowsingManager.shared.isPrivateBrowsing = isPrivate
                     let tab = self.tabManager.addTab(URLRequest(url: rURL as URL), afterTab: currentTab, isPrivate: isPrivate)
 
                     // We're not showing the top tabs; show a toast to quick switch to the fresh new tab.
