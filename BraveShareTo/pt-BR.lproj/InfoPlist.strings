@@ -1,6 +1,5 @@
 /* Bundle display name */
 "CFBundleDisplayName" = "Abrir no Brave";
 
-/* Bundle name */
-"CFBundleName" = "$(PRODUCT_NAME)";
+
 
