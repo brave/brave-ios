@@ -418,7 +418,6 @@ class BrowserViewController: UIViewController {
     
     fileprivate func setupTabs() {
         let isPrivate = Preferences.Privacy.privateBrowsingOnly.value
-        let tabs = tabManager.tabsForCurrentMode
         let noTabsAdded = tabManager.tabsForCurrentMode.isEmpty
         
         var tabToSelect: Tab?
@@ -429,7 +428,7 @@ class BrowserViewController: UIViewController {
             // 2. We are in private browsing mode and need to add a new private tab.
             tabToSelect = isPrivate ? tabManager.addTab(isPrivate: true) : tabManager.restoreAllTabs()
         } else {
-            tabToSelect = tabs.last
+            tabToSelect = tabManager.tabsForCurrentMode.last
         }
         
         contentBlockListDeferred?.uponQueue(.main) { _ in
