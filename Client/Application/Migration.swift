@@ -61,8 +61,9 @@ extension Preferences {
         NSKeyedUnarchiver.setClass(AuthenticationKeychainInfo.self, forClassName: "AuthenticationKeychainInfo")
         if let pinLockInfo = KeychainWrapper.standard.object(forKey: "pinLockInfo") as? AuthenticationKeychainInfo {
             //Checks if browserLock was enabled in old app.
-            let isBrowserLockEnabled: Bool = UserDefaults(suiteName: AppInfo.sharedContainerIdentifier)?.bool(forKey: "profile.browserLock") ?? false
-            UserDefaults(suiteName: AppInfo.sharedContainerIdentifier)?.removeObject(forKey: "profile.browserLock")
+            let browserLockKey = "\(keyPrefix)browserLock"
+            let isBrowserLockEnabled = Preferences.defaultContainer.bool(forKey: browserLockKey)
+            Preferences.defaultContainer.removeObject(forKey: browserLockKey)
             if isBrowserLockEnabled {
                 KeychainWrapper.sharedAppContainerKeychain.setAuthenticationInfo(pinLockInfo)
             }
