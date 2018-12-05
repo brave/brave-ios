@@ -98,7 +98,7 @@ platform :ios do
       sdk: "iphoneos",
       clean: true,
       skip_package_ipa: true,
-      xcargs: "-allowProvisioningUpdates BRAVE_API_KEY=\"#{sh("head", "-1", "#{LOCAL_PATH}/brave-api-key")}\"",
+      xcargs: "-allowProvisioningUpdates BRAVE_API_KEY=\"#{sh("head", "-1", "#{ENV['HOME']}/brave-api-key")}\"",
     )
   end
 
