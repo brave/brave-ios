@@ -765,9 +765,6 @@ class TabManager: NSObject {
     fileprivate lazy var restoreTabsInternal: () -> Tab? = {
         let savedTabs = TabMO.getAll()
         if savedTabs.isEmpty { return { nil } }
-        
-        // We never want to restore tabs in PBM, private tabs are never saved to Core Data.
-        if Preferences.Privacy.privateBrowsingOnly.value { return { nil } }
 
         var tabToSelect: Tab?
         for savedTab in savedTabs {
