@@ -25,7 +25,7 @@ public extension KeychainWrapper {
     }
 }
 
-open class AuthenticationKeychainInfo: NSObject, NSSecureCoding {
+open class AuthenticationKeychainInfo: NSObject, NSCoding {
     fileprivate(set) open var passcode: String?
     open var isPasscodeRequiredImmediately: Bool
     fileprivate(set) open var lockOutInterval: TimeInterval?
@@ -42,10 +42,6 @@ open class AuthenticationKeychainInfo: NSObject, NSSecureCoding {
         self.useTouchID = false
     }
 
-    public static var supportsSecureCoding: Bool {
-        return true
-    }
-    
     open func encode(with aCoder: NSCoder) {
         if let lockOutInterval = lockOutInterval, isLocked() {
             let interval = NSNumber(value: lockOutInterval as Double)
@@ -68,7 +64,7 @@ open class AuthenticationKeychainInfo: NSObject, NSSecureCoding {
         if aDecoder.containsValue(forKey: "isPasscodeRequiredImmediately") {
             self.isPasscodeRequiredImmediately = aDecoder.decodeAsBool(forKey: "isPasscodeRequiredImmediately")
         } else if let interval = aDecoder.decodeObject(forKey: "requiredPasscodeInterval") as? NSNumber {
-            self.isPasscodeRequiredImmediately = (interval == 0)
+            self.isPasscodeRequiredImmediately = (interval == 2)
         } else {
             self.isPasscodeRequiredImmediately = true
         }
