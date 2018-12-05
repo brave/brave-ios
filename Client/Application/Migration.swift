@@ -61,6 +61,7 @@ extension Preferences {
         NSKeyedUnarchiver.setClass(AuthenticationKeychainInfo.self, forClassName: "AuthenticationKeychainInfo")
         if let pinLockInfo = KeychainWrapper.standard.object(forKey: "pinLockInfo") as? AuthenticationKeychainInfo {
             KeychainWrapper.sharedAppContainerKeychain.setAuthenticationInfo(pinLockInfo)
+            KeychainWrapper.standard.removeObject(forKey: "pinLockInfo")
         }
         
         // Shields
