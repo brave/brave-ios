@@ -17,43 +17,46 @@ extension Bookmark {
                                                ignoreFavorite: Bool = true) -> [Bookmark]? {
         
         var bookmarksToSend = [Bookmark]()
+        let bookmarkPredicate = allBookmarksOfAGivenLevelPredicate(parent: parentFolder)
+        let predicates = ignoreFavorite ? [bookmarkPredicate] : [NSPredicate(format: "isFavorite == true"), bookmarkPredicate]
         
-        let predicate = ignoreFavorite ? allBookmarksOfAGivenLevelPredicate(parent: parentFolder) : NSPredicate(format: "isFavorite == true")
-        
-        let orderSort = NSSortDescriptor(key: #keyPath(Bookmark.order), ascending: true)
-        let createdSort = NSSortDescriptor(key: #keyPath(Bookmark.created), ascending: false)
-        
-        let sort = [orderSort, createdSort]
-        
-        guard let allBookmarks = all(where: predicate, sortDescriptors: sort, context: context) else {
-            return nil
-        }
-        
-        // Sync ordering starts with 1.
-        var counter = 1
-        
-        for bookmark in allBookmarks where bookmark.syncOrder == nil {
-            
-            if let parent = parentFolder, let syncOrder = parent.syncOrder {
-                let order = syncOrder + ".\(counter)"
-                bookmark.syncOrder = order
-            } else {
-                let order = baseOrder + "\(counter)"
-                bookmark.syncOrder = order
-            }
-            
-            bookmarksToSend.append(bookmark)
-            counter += 1
-            
-            // Calling this method recursively to get ordering for nested bookmarks
-            if bookmark.isFolder {
-                if let updatedNestedBookmarks = updateBookmarksWithNewSyncOrder(parentFolder: bookmark,
-                                                                                context: context) {
-                    bookmarksToSend.append(contentsOf: updatedNestedBookmarks)
+        func updateWithPredicates(predicates: [NSPredicate]) {
+            for predicate in predicates {
+                let orderSort = NSSortDescriptor(key: #keyPath(Bookmark.order), ascending: true)
+                let createdSort = NSSortDescriptor(key: #keyPath(Bookmark.created), ascending: false)
+                
+                let sort = [orderSort, createdSort]
+                
+                guard let allBookmarks = all(where: predicate, sortDescriptors: sort, context: context) else {
+                    continue
+                }
+                
+                // Sync ordering starts with 1.
+                var counter = 1
+                
+                for bookmark in allBookmarks where bookmark.syncOrder == nil {
+                    
+                    if let parent = parentFolder, let syncOrder = parent.syncOrder {
+                        let order = syncOrder + ".\(counter)"
+                        bookmark.syncOrder = order
+                    } else {
+                        let order = baseOrder + "\(counter)"
+                        bookmark.syncOrder = order
+                    }
+                    
+                    bookmarksToSend.append(bookmark)
+                    counter += 1
+                    
+                    // Calling this method recursively to get ordering for nested bookmarks
+                    if bookmark.isFolder {
+                        if let updatedNestedBookmarks = updateBookmarksWithNewSyncOrder(parentFolder: bookmark,
+                                                                                        context: context) {
+                            bookmarksToSend.append(contentsOf: updatedNestedBookmarks)
+                        }
+                    }
                 }
             }
         }
-        
         return bookmarksToSend
     }
     
