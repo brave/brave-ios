@@ -1668,6 +1668,10 @@ extension BrowserViewController: TabToolbarDelegate {
     }
 
     func tabToolbarDidLongPressAddTab(_ tabToolbar: TabToolbarProtocol, button: UIButton) {
+        showAddTabContextMenu(sourceView: toolbar ?? urlBar, button: button)
+    }
+    
+    func showAddTabContextMenu(sourceView: UIView, button: UIButton) {
         let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         alertController.addAction(UIAlertAction(title: Strings.CancelButtonTitle, style: .cancel, handler: nil))
         if !PrivateBrowsingManager.shared.isPrivateBrowsing {
@@ -1681,6 +1685,8 @@ extension BrowserViewController: TabToolbarDelegate {
         alertController.addAction(UIAlertAction(title: Strings.NewTabTitle, style: .default, handler: { [unowned self] _ in
             self.openBlankNewTab(focusLocationField: true, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
         }))
+        alertController.popoverPresentationController?.sourceView = sourceView
+        alertController.popoverPresentationController?.sourceRect = button.frame
         let generator = UIImpactFeedbackGenerator(style: .heavy)
         generator.impactOccurred()
         present(alertController, animated: true)
@@ -1745,6 +1751,10 @@ extension BrowserViewController: TabsBarViewControllerDelegate {
         if tab == tabManager.selectedTab { return }
         urlBar.leaveOverlayMode(didCancel: true)
         tabManager.selectTab(tab)
+    }
+    
+    func tabsBarDidLongPressAddTab(_ tabsBarController: TabsBarViewController, button: UIButton) {
+        showAddTabContextMenu(sourceView: tabsBarController.view, button: button)
     }
 }
 
