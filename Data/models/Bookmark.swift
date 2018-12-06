@@ -307,13 +307,6 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         }
         
         DataController.save(context: frc.managedObjectContext)
-        
-        // I am stumped, I can't find the notification that animation is complete for moving.
-        // If I save while the animation is happening, the rows look screwed up (draw on top of each other).
-        // Adding a delay to let animation complete avoids this problem
-        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(250)) {
-            
-        }
     }
     
     // TODO: Migration syncUUIDS still needs to be solved
