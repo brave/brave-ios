@@ -12,12 +12,13 @@ private let log = Logger.browserLogger
 extension Bookmark {
     /// Sets order for all bookmarks. Needed after user joins sync group for the first time.
     /// Returns an array of bookmarks with updated `syncOrder`.
-    class func updateBookmarksWithNewSyncOrder(parentFolder: Bookmark? = nil,
-                                               context: NSManagedObjectContext) -> [Bookmark]? {
+    public class func updateBookmarksWithNewSyncOrder(parentFolder: Bookmark? = nil,
+                                               context: NSManagedObjectContext,
+                                               ignoreFavorite: Bool = true) -> [Bookmark]? {
         
         var bookmarksToSend = [Bookmark]()
         
-        let predicate = allBookmarksOfAGivenLevelPredicate(parent: parentFolder)
+        let predicate = ignoreFavorite ? allBookmarksOfAGivenLevelPredicate(parent: parentFolder) : NSPredicate(format: "isFavorite == true")
         
         let orderSort = NSSortDescriptor(key: #keyPath(Bookmark.order), ascending: true)
         let createdSort = NSSortDescriptor(key: #keyPath(Bookmark.created), ascending: false)

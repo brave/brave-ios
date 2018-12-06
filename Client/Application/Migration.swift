@@ -22,6 +22,9 @@ extension Preferences {
             return
         }
         
+        // Migration of fav and bookmarks from Older than 1.7
+        updateSyncOrder()
+        
         // Grab the user defaults that Prefs saves too and the key prefix all objects inside it are saved under
         let userDefaults = UserDefaults(suiteName: AppInfo.sharedContainerIdentifier)
         
@@ -101,6 +104,13 @@ extension Preferences {
         migrateShieldOverrides()
         
         Preferences.Migration.completed.value = true
+    }
+    
+    private class func updateSyncOrder() {
+        let context = DataController.newBackgroundContext()
+        if let _ = Bookmark.updateBookmarksWithNewSyncOrder(context: context, ignoreFavorite: false) {
+            DataController.save(context: context)
+        }
     }
     
     private class func migrateShieldOverrides() {
