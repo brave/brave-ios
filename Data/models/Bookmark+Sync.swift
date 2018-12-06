@@ -57,6 +57,7 @@ extension Bookmark {
                 }
             }
         }
+        updateWithPredicates(predicates: predicates)
         return bookmarksToSend
     }
     
