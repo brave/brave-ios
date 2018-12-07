@@ -10,7 +10,7 @@ import BraveShared
 
 private let log = Logger.browserLogger
 
-class BlocklistName: Hashable, CustomStringConvertible, ContentBlocker {
+class BlocklistName: CustomStringConvertible, ContentBlocker {
     
     static let ad = BlocklistName(filename: "block-ads")
     static let tracker = BlocklistName(filename: "block-trackers")
@@ -79,13 +79,5 @@ class BlocklistName: Hashable, CustomStringConvertible, ContentBlocker {
         }
         
         return allCompiledDeferred
-    }
-    
-    public static func == (lhs: BlocklistName, rhs: BlocklistName) -> Bool {
-        return lhs.filename == rhs.filename
-    }
-    
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(filename)
     }
 }
