@@ -241,12 +241,7 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         
         guard let allBookmarks = all(where: predicate, context: context) else { return nil }
         
-        // New bookmarks are sometimes added to context before this method is called.
-        // We need to filter out bookmarks with empty sync orders.
-        let highestOrderBookmark = allBookmarks.max { a, b in
-            
-            return a.order < b.order
-        }
+        let highestOrderBookmark = allBookmarks.max { $0.order < $1.order }
         
         return highestOrderBookmark?.order
     }
