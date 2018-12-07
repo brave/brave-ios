@@ -83,7 +83,7 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         fetchRequest.fetchBatchSize = 20
         
         let orderSort = NSSortDescriptor(key: "order", ascending: true)
-        let createdSort = NSSortDescriptor(key: "created", ascending: true)
+        let createdSort = NSSortDescriptor(key: "created", ascending: false)
         fetchRequest.sortDescriptors = [orderSort, createdSort]
         
         fetchRequest.predicate = forFavorites ?
