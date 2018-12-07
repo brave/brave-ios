@@ -215,10 +215,6 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
             }
         }
         
-        if let maxOrder = Bookmark.maxOrder(parent: parentFolder, forFavorites: bk.isFavorite, context: context) {
-            bk.order = maxOrder + 1
-        }
-        
         if save {
             DataController.save(context: context)
         }
@@ -229,21 +225,6 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         }
         
         return bk
-    }
-    
-    /// Returns the highest order for a bookmark of a given level.
-    private class func maxOrder(parent: Bookmark?,
-                                forFavorites: Bool,
-                                context: NSManagedObjectContext) -> Int16? {
-        
-        let predicate = forFavorites ?
-            NSPredicate(format: "isFavorite == true") : allBookmarksOfAGivenLevelPredicate(parent: parent)
-        
-        guard let allBookmarks = all(where: predicate, context: context) else { return nil }
-        
-        let highestOrderBookmark = allBookmarks.max { $0.order < $1.order }
-        
-        return highestOrderBookmark?.order
     }
     
     class func allBookmarksOfAGivenLevelPredicate(parent: Bookmark?) -> NSPredicate {
