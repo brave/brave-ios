@@ -83,7 +83,7 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         fetchRequest.fetchBatchSize = 20
         
         let orderSort = NSSortDescriptor(key: "order", ascending: true)
-        let createdSort = NSSortDescriptor(key: "created", ascending: false)
+        let createdSort = NSSortDescriptor(key: "created", ascending: true)
         fetchRequest.sortDescriptors = [orderSort, createdSort]
         
         fetchRequest.predicate = forFavorites ?
@@ -215,6 +215,10 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
             }
         }
         
+        if let maxOrder = Bookmark.maxOrder(parent: parentFolder, forFavorites: bk.isFavorite, context: context) {
+            bk.order = maxOrder + 1
+        }
+        
         if save {
             DataController.save(context: context)
         }
@@ -225,6 +229,26 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         }
         
         return bk
+    }
+    
+    /// Returns the highest order for a bookmark of a given level.
+    private class func maxOrder(parent: Bookmark?,
+                                forFavorites: Bool,
+                                context: NSManagedObjectContext) -> Int16? {
+        
+        let predicate = forFavorites ?
+            NSPredicate(format: "isFavorite == true") : allBookmarksOfAGivenLevelPredicate(parent: parent)
+        
+        guard let allBookmarks = all(where: predicate, context: context) else { return nil }
+        
+        // New bookmarks are sometimes added to context before this method is called.
+        // We need to filter out bookmarks with empty sync orders.
+        let highestOrderBookmark = allBookmarks.max { a, b in
+            
+            return a.order < b.order
+        }
+        
+        return highestOrderBookmark?.order
     }
     
     class func allBookmarksOfAGivenLevelPredicate(parent: Bookmark?) -> NSPredicate {
@@ -307,6 +331,40 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         }
         
         DataController.save(context: frc.managedObjectContext)
+    }
+    
+    /// Takes all Bookmarks and Favorites from 1.6 and sets correct order for them.
+    /// 1.6 had few bugs with reordering which we want to avoid, in particular non-reordered bookmarks on 1.6
+    /// all have order set to 0 which makes sorting confusing.
+    /// In migration we take all bookmarks using the same sorting method as on 1.6 and add a proper `order`
+    /// attribute to them. The goal is to have all bookmarks with a proper unique order number set.
+    public class func migrateOrder(parentFolder: Bookmark? = nil,
+                                   forFavorites: Bool,
+                                   context: NSManagedObjectContext = DataController.newBackgroundContext()) {
+        
+        let predicate = forFavorites ?
+            NSPredicate(format: "isFavorite == true") : allBookmarksOfAGivenLevelPredicate(parent: parentFolder)
+        
+        let orderSort = NSSortDescriptor(key: #keyPath(Bookmark.order), ascending: true)
+        let folderSort = NSSortDescriptor(key: #keyPath(Bookmark.isFolder), ascending: false)
+        let createdSort = NSSortDescriptor(key: #keyPath(Bookmark.created), ascending: true)
+        
+        let sort = [orderSort, folderSort, createdSort]
+        
+        guard let allBookmarks = all(where: predicate, sortDescriptors: sort, context: context),
+              !allBookmarks.isEmpty else {
+            return
+        }
+        
+        for (i, bookmark) in allBookmarks.enumerated() {
+            bookmark.order = Int16(i)
+            // Calling this method recursively to get ordering for nested bookmarks
+            if !forFavorites && bookmark.isFolder {
+                migrateOrder(parentFolder: bookmark, forFavorites: forFavorites, context: context)
+            }
+        }
+        
+        DataController.save(context: context)
     }
     
     // TODO: Migration syncUUIDS still needs to be solved
