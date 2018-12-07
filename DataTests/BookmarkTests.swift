@@ -78,9 +78,9 @@ class BookmarkTests: CoreDataTestCase {
         XCTAssertEqual(objects.count, bookmarksToAdd)
         
         // Testing if it sorts correctly
-        XCTAssertEqual(objects.first?.title, "10")
-        XCTAssertEqual(objects[5].title, "5")
-        XCTAssertEqual(objects.last?.title, "1")
+        XCTAssertEqual(objects.first?.title, "1")
+        XCTAssertEqual(objects[5].title, "6")
+        XCTAssertEqual(objects.last?.title, "10")
     }
     
     func testFrcWithParentFolder() {

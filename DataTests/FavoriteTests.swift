@@ -205,7 +205,7 @@ class FavoriteTests: CoreDataTestCase {
         backgroundSaveAndWaitForExpectation {
             Bookmark.add(url: url, title: title, customTitle: customTitle, isFavorite: true)
         }
-        let bookmark = try! DataController.viewContext.fetch(fetchRequest).first!
+        let bookmark = try! DataController.viewContext.fetch(fetchRequest).last!
         XCTAssertTrue(bookmark.isFavorite)
         return bookmark
     }
