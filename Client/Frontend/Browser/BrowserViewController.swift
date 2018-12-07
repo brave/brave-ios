@@ -2917,7 +2917,8 @@ extension BrowserViewController: PreferencesObserver {
              Preferences.Shields.blockScripts.key,
              Preferences.Shields.blockPhishingAndMalware.key,
              Preferences.Shields.blockImages.key,
-             Preferences.Shields.fingerprintingProtection.key:
+             Preferences.Shields.fingerprintingProtection.key,
+             Preferences.Shields.useRegionAdBlock.key:
             tabManager.allTabs.forEach { $0.webView?.reload() }
         case Preferences.Privacy.blockAllCookies.key:
             if Preferences.Privacy.blockAllCookies.value {

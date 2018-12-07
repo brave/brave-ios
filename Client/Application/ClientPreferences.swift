@@ -77,7 +77,7 @@ extension Preferences {
         static let clearPrivateDataToggles = Option<[Bool]>(key: "privacy.clear-data-toggles", default: [])
     }
     final class Shields {
-        static let allShields = [blockAdsAndTracking, httpsEverywhere, blockPhishingAndMalware, blockScripts, fingerprintingProtection, blockImages]
+        static let allShields = [blockAdsAndTracking, httpsEverywhere, blockPhishingAndMalware, blockScripts, fingerprintingProtection, blockImages, useRegionAdBlock]
         
         /// Shields will block ads and tracking if enabled
         static let blockAdsAndTracking = Option<Bool>(key: "shields.block-ads-and-tracking", default: true)
