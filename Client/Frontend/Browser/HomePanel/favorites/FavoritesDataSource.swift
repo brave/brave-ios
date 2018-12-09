@@ -67,9 +67,10 @@ class FavoritesDataSource: NSObject, UICollectionViewDataSource {
         guard let fav = frc?.object(at: indexPath) else { return UICollectionViewCell() }
 
         cell.textLabel.text = fav.displayTitle ?? fav.url
-        cell.imageView.setIcon(fav.domain?.favicon, forURL: URL(string: fav.url ?? ""), scaledDefaultIconSize: CGSize(width: 40, height: 40), completed: { (color, url) in
+        let n: FaviconMO? = nil // Distinguishes which setIcon function is called
+        cell.imageView.setIcon(n, forURL: URL(string: fav.url ?? ""), scaledDefaultIconSize: CGSize(width: 40, height: 40), completed: { (color, url) in
             if fav.url == url?.absoluteString {
-                cell.imageView.backgroundColor = color                
+                cell.imageView.backgroundColor = color
             }
         })
         cell.accessibilityLabel = cell.textLabel.text
