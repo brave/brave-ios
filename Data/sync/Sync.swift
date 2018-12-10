@@ -211,7 +211,7 @@ public class Sync: JSInjector {
         print(#function)
     }
     
-    fileprivate var syncSeed: String? {
+    public var syncSeed: String? {
         get {
             if !UserDefaults.standard.bool(forKey: prefNameSeed) {
                 // This must be true to stay in sync group
