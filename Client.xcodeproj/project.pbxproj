@@ -2272,8 +2272,7 @@
 		0A0D3D2F21A4BC1F00BEE65B /* WebFilters */ = {
 			isa = PBXGroup;
 			children = (
-				0A4319B321B1C4D60041625B /* AdblockStats */,
-				4422D41A21BFCE3900BF1855 /* HttpseStats */,
+				4422D57721C073EE00BF1855 /* ShieldStats */,
 				0A0D3D3721A4BCF100BEE65B /* SafeBrowsing */,
 			);
 			path = WebFilters;
@@ -2328,18 +2327,17 @@
 			path = Sync;
 			sourceTree = "<group>";
 		};
-		0A4319B321B1C4D60041625B /* AdblockStats */ = {
+		0A4319B321B1C4D60041625B /* Adblock */ = {
 			isa = PBXGroup;
 			children = (
 				0A4319B421B1C4E30041625B /* Dependencies */,
 				0A43292F21B1C7F50041625B /* AdBlockStats.swift */,
-				0A43293821B1C8120041625B /* NetworkDataFileLoader.swift */,
 				0A43293A21B1C8D10041625B /* FifoDict.swift */,
 				0A43293D21B1CA910041625B /* ABPFilterLibWrapper.h */,
 				0A43293C21B1CA910041625B /* ABPFilterLibWrapper.mm */,
 				0A83D9E921B7FFD100245EF0 /* ABPFilterParserData.dat */,
 			);
-			path = AdblockStats;
+			path = Adblock;
 			sourceTree = "<group>";
 		};
 		0A4319B421B1C4E30041625B /* Dependencies */ = {
@@ -2771,7 +2769,7 @@
 			path = XCUITests;
 			sourceTree = "<group>";
 		};
-		4422D41A21BFCE3900BF1855 /* HttpseStats */ = {
+		4422D41A21BFCE3900BF1855 /* Httpse */ = {
 			isa = PBXGroup;
 			children = (
 				4422D43C21BFFB4B00BF1855 /* ThirdParty */,
@@ -2780,7 +2778,7 @@
 				4422D42221BFCE9200BF1855 /* HttpsEverywhereStats.swift */,
 				4422D57521C05DE500BF1855 /* httpse.leveldb.tgz */,
 			);
-			path = HttpseStats;
+			path = Httpse;
 			sourceTree = "<group>";
 		};
 		4422D42421BFCF5A00BF1855 /* Cpp */ = {
@@ -3062,6 +3060,16 @@
 				4422D52221BFFB7E00BF1855 /* re2_fuzzer.cc */,
 			);
 			path = fuzzing;
+			sourceTree = "<group>";
+		};
+		4422D57721C073EE00BF1855 /* ShieldStats */ = {
+			isa = PBXGroup;
+			children = (
+				0A4319B321B1C4D60041625B /* Adblock */,
+				4422D41A21BFCE3900BF1855 /* Httpse */,
+				0A43293821B1C8120041625B /* NetworkDataFileLoader.swift */,
+			);
+			path = ShieldStats;
 			sourceTree = "<group>";
 		};
 		5D1DC51420AC9AFA00905E5A /* Data */ = {
@@ -8089,8 +8097,8 @@
 					"$(SRCROOT)",
 					"$(SDKROOT)/usr/include/libxml2",
 					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)/include/**",
-					"$(SRCROOT)/Client/WebFilters/HttpseStats/ThirdParty/leveldb/**",
-					"$(SRCROOT)/Client/WebFilters/HttpseStats/ThirdParty/re2",
+					"$(SRCROOT)/Client/WebFilters/ShieldStats/Httpse/ThirdParty/leveldb/**",
+					"$(SRCROOT)/Client/WebFilters/ShieldStats/Httpse/ThirdParty/re2",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
@@ -8487,8 +8495,8 @@
 					"$(SRCROOT)",
 					"$(SDKROOT)/usr/include/libxml2",
 					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)/include/**",
-					"$(SRCROOT)/Client/WebFilters/HttpseStats/ThirdParty/leveldb/**",
-					"$(SRCROOT)/Client/WebFilters/HttpseStats/ThirdParty/re2",
+					"$(SRCROOT)/Client/WebFilters/ShieldStats/Httpse/ThirdParty/leveldb/**",
+					"$(SRCROOT)/Client/WebFilters/ShieldStats/Httpse/ThirdParty/re2",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
@@ -8891,8 +8899,8 @@
 					"$(SRCROOT)",
 					"$(SDKROOT)/usr/include/libxml2",
 					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)/include/**",
-					"$(SRCROOT)/Client/WebFilters/HttpseStats/ThirdParty/leveldb/**",
-					"$(SRCROOT)/Client/WebFilters/HttpseStats/ThirdParty/re2",
+					"$(SRCROOT)/Client/WebFilters/ShieldStats/Httpse/ThirdParty/leveldb/**",
+					"$(SRCROOT)/Client/WebFilters/ShieldStats/Httpse/ThirdParty/re2",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
@@ -9116,8 +9124,8 @@
 					"$(SRCROOT)",
 					"$(SDKROOT)/usr/include/libxml2",
 					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)/include/**",
-					"$(SRCROOT)/Client/WebFilters/HttpseStats/ThirdParty/leveldb/**",
-					"$(SRCROOT)/Client/WebFilters/HttpseStats/ThirdParty/re2",
+					"$(SRCROOT)/Client/WebFilters/ShieldStats/Httpse/ThirdParty/leveldb/**",
+					"$(SRCROOT)/Client/WebFilters/ShieldStats/Httpse/ThirdParty/re2",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
