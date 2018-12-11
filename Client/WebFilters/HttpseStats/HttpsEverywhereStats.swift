@@ -37,6 +37,15 @@ class HttpsEverywhereStats {
         HttpsEverywhereStats.shared.networkFileLoader.loadLocalData(HttpsEverywhereStats.levelDbFileName, type: "tgz")
     }
     
+    func shouldUpgrade(_ url: URL?) -> Bool {
+        guard let url = url else {
+            log.error("Httpse should block called with empty url")
+            return false
+        }
+        
+        return tryRedirectingUrl(url) != nil
+    }
+    
     func loadDb(dir: String, name: String) {
         let path = dir + "/" + name
         if !FileManager.default.fileExists(atPath: path) {
