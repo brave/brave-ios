@@ -1,15 +1,20 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-//import SQLite
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 import Shared
 
-private let _singleton = HttpsEverywhereStats()
-private let levelDbFileName = "httpse.leveldb"
+private let log = Logger.browserLogger
 
 class HttpsEverywhereStats {
+    static let shared = HttpsEverywhereStats()
+    
     static let kNotificationDataLoaded = "kNotificationDataLoaded"
     static let prefKey = "braveHttpsEverywhere"
+    static let levelDbFileName = "httpse.leveldb"
     static let prefKeyDefaultValue = true
     static let dataVersion = "6.0"
+    
     var isNSPrefEnabled = true
     
     var httpseDb = HttpsEverywhereObjC()
@@ -23,13 +28,13 @@ class HttpsEverywhereStats {
         return loader
     }()
     
-    class var singleton: HttpsEverywhereStats {
-        return _singleton
-    }
-    
     fileprivate init() {
         NotificationCenter.default.addObserver(self, selector: #selector(HttpsEverywhereStats.prefsChanged(_:)), name: UserDefaults.didChangeNotification, object: nil)
         updateEnabledState()
+    }
+    
+    func startLoading() {
+        HttpsEverywhereStats.shared.networkFileLoader.loadLocalData(HttpsEverywhereStats.levelDbFileName, type: "tgz")
     }
     
     func loadDb(dir: String, name: String) {
@@ -43,7 +48,7 @@ class HttpsEverywhereStats {
             do { try FileManager.default.removeItem(atPath: path) } catch {}
         } else {
             NotificationCenter.default.post(name: Notification.Name(rawValue: HttpsEverywhereStats.kNotificationDataLoaded), object: self)
-            print("httpse loaded")
+            log.debug("httpse loaded")
         }
         assert(httpseDb.isLoaded())
     }
@@ -98,16 +103,16 @@ extension HttpsEverywhereStats: NetworkDataFileLoaderDelegate {
         succeed().upon() { _ in
             
             let fm = FileManager.default
-            if fm.fileExists(atPath: dir + "/" + levelDbFileName) {
+            if fm.fileExists(atPath: dir + "/" + HttpsEverywhereStats.levelDbFileName) {
                 do {
-                    try FileManager.default.removeItem(atPath: dir + "/" + levelDbFileName)
+                    try FileManager.default.removeItem(atPath: dir + "/" + HttpsEverywhereStats.levelDbFileName)
                 } catch { NSLog("failed to remove leveldb file before unzip \(error)") }
             }
             
             unzipFile(dir: dir, data: data)
             
             DispatchQueue.main.async {
-                self.loadDb(dir: dir, name: levelDbFileName)
+                self.loadDb(dir: dir, name: HttpsEverywhereStats.levelDbFileName)
             }
         }
     }
@@ -120,7 +125,7 @@ extension HttpsEverywhereStats: NetworkDataFileLoaderDelegate {
     func fileLoaderHasDataFile(_ loader: NetworkDataFileLoader) -> Bool {
         if !httpseDb.isLoaded() {
             let (dir, _) = loader.createAndGetDataDirPath()
-            self.loadDb(dir: dir, name: levelDbFileName)
+            self.loadDb(dir: dir, name: HttpsEverywhereStats.levelDbFileName)
         }
         print("httpse doesn't need to d/l: \(httpseDb.isLoaded())")
         return httpseDb.isLoaded()

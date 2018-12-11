@@ -153,8 +153,8 @@ class NetworkDataFileLoader {
         }
     }
     
-    func loadLocalData () {
-        guard let path = Bundle.main.path(forResource: "ABPFilterParserData", ofType: "dat") else {
+    func loadLocalData(_ name: String, type: String) {
+        guard let path = Bundle.main.path(forResource: name, ofType: type) else {
             log.error("Could not find local adblock data")
             return
         }
