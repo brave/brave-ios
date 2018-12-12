@@ -28,14 +28,10 @@ class HttpsEverywhereStats {
         let dataFile = "httpse-\(HttpsEverywhereStats.dataVersion).leveldb.tgz"
         let loader = NetworkDataFileLoader(url: targetsDataUrl, file: dataFile, localDirName: "https-everywhere-data")
         loader.delegate = self
-        self.runtimeDebugOnlyTestVerifyResourcesLoaded()
         return loader
     }()
     
-    fileprivate init() {
-        NotificationCenter.default.addObserver(self, selector: #selector(HttpsEverywhereStats.prefsChanged(_:)), name: UserDefaults.didChangeNotification, object: nil)
-        updateEnabledState()
-    }
+    fileprivate init() { }
     
     func startLoading() {
         if useLocalLeveldbFile {
@@ -68,19 +64,6 @@ class HttpsEverywhereStats {
             log.debug("httpse loaded")
         }
         assert(httpseDb.isLoaded())
-    }
-    
-    func updateEnabledState() {
-        // synchronize code from this point on.
-        defer { objc_sync_exit(self) }
-        objc_sync_enter(self)
-        
-        // TODO: prefs
-        // isNSPrefEnabled = BraveApp.getPrefs()?.boolForKey(HttpsEverywhereStats.prefKey) ?? true
-    }
-    
-    @objc func prefsChanged(_ info: Notification) {
-        updateEnabledState()
     }
     
     func tryRedirectingUrl(_ url: URL) -> URL? {
@@ -150,43 +133,5 @@ extension HttpsEverywhereStats: NetworkDataFileLoaderDelegate {
     
     func fileLoaderDelegateWillHandleInitialRead(_ loader: NetworkDataFileLoader) -> Bool {
         return true
-    }
-}
-
-// Build in test cases, swift compiler is mangling the test cases in HttpsEverywhereTests.swift and they are failing. The compiler is falsely casting  AnyObjects to XCUIElement, which then breaks the runtime tests, I don't have time to look at this further ATM.
-extension HttpsEverywhereStats {
-    fileprivate func runtimeDebugOnlyTestDomainsRedirected() {
-        #if DEBUG
-        let urls = ["thestar.com", "thestar.com/", "www.thestar.com", "apple.com", "xkcd.com"]
-        for url in urls {
-            guard let unwrappedURL = URL(string: "http://" + url), let _ = HttpsEverywhere.singleton.tryRedirectingUrl(unwrappedURL) else {
-                BraveApp.showErrorAlert(title: "Debug Error", error: "HTTPS-E validation failed on url: \(url)")
-                return
-            }
-        }
-        
-        // TODO: Should combine
-        guard let unwrappedURL = URL(string: "http://www.googleadservices.com/pagead/aclk?sa=L&ai=CD0d/") else {
-            BraveApp.showErrorAlert(title: "Debug Error", error: "HTTPS-E validation failed for url args")
-            return
-        }
-        
-        let url = HttpsEverywhere.singleton.tryRedirectingUrl(unwrappedURL)
-        if url == nil || !(url!.absoluteString.hasSuffix("?sa=L&ai=CD0d/")) {
-            BraveApp.showErrorAlert(title: "Debug Error", error: "HTTPS-E validation failed for url args")
-        }
-        #endif
-    }
-    
-    fileprivate func runtimeDebugOnlyTestVerifyResourcesLoaded() {
-        #if DEBUG
-        postAsyncToMain(10) {
-            if !self.httpseDb.isLoaded() {
-                BraveApp.showErrorAlert(title: "Debug Error", error: "HTTPS-E didn't load")
-            } else {
-                self.runtimeDebugOnlyTestDomainsRedirected()
-            }
-        }
-        #endif
     }
 }
