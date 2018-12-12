@@ -11,11 +11,15 @@ class HttpsEverywhereStats {
     
     static let kNotificationDataLoaded = "kNotificationDataLoaded"
     static let prefKey = "braveHttpsEverywhere"
-    static let levelDbFileName = "httpse.leveldb"
     static let prefKeyDefaultValue = true
     static let dataVersion = "6.0"
     
     var isNSPrefEnabled = true
+    
+    static let levelDbFileName = "httpse.leveldb"
+    
+    /// If set to true, it uses local dat file instead of downloading it from the server.
+    let useLocalLeveldbFile = true
     
     var httpseDb = HttpsEverywhereObjC()
     
@@ -34,7 +38,11 @@ class HttpsEverywhereStats {
     }
     
     func startLoading() {
-        HttpsEverywhereStats.shared.networkFileLoader.loadLocalData(HttpsEverywhereStats.levelDbFileName, type: "tgz")
+        if useLocalLeveldbFile {
+            HttpsEverywhereStats.shared.networkFileLoader.loadLocalData(HttpsEverywhereStats.levelDbFileName, type: "tgz")
+        } else {
+            HttpsEverywhereStats.shared.networkFileLoader.loadData()
+        }
     }
     
     func shouldUpgrade(_ url: URL?) -> Bool {
