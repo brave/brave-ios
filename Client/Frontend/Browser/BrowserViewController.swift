@@ -415,7 +415,7 @@ class BrowserViewController: UIViewController {
         let sync = Sync.shared
         
         #if NO_SYNC
-        if sync.syncSeed == nil { return }
+        if sync.syncSeedArray == nil { return }
         
         sync.leaveSyncGroup()
         
