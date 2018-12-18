@@ -113,6 +113,8 @@
 		27A586E1214C0DDD000CAE3C /* PreferencesTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27A586E0214C0DDD000CAE3C /* PreferencesTest.swift */; };
 		27C461DE211B76500088A441 /* ShieldsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C461DD211B76500088A441 /* ShieldsView.swift */; };
 		27C46201211CD8D20088A441 /* DeferredTestUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = A176323020CF2A6000126F25 /* DeferredTestUtils.swift */; };
+		27C8E51521C960E900F451D6 /* LegacyMappingModel.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 27C8E51421C960E900F451D6 /* LegacyMappingModel.xcmappingmodel */; };
+		27C8E51E21C9617100F451D6 /* TabMOMigrationPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C8E51D21C9617100F451D6 /* TabMOMigrationPolicy.swift */; };
 		27D87C2E2152B50200FB55C6 /* GradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27D87C2D2152B50200FB55C6 /* GradientView.swift */; };
 		27F4439F2135E11200296C58 /* BraveShareTo.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 27F443952135E11200296C58 /* BraveShareTo.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		27F443AD2135E25300296C58 /* ShareToBraveViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27F443AC2135E25300296C58 /* ShareToBraveViewController.swift */; };
@@ -1194,6 +1196,8 @@
 		279C75C021A5B37D001CD1CB /* FingerprintingProtection.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = FingerprintingProtection.js; sourceTree = "<group>"; };
 		27A586E0214C0DDD000CAE3C /* PreferencesTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesTest.swift; sourceTree = "<group>"; };
 		27C461DD211B76500088A441 /* ShieldsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShieldsView.swift; sourceTree = "<group>"; };
+		27C8E51421C960E900F451D6 /* LegacyMappingModel.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = LegacyMappingModel.xcmappingmodel; sourceTree = "<group>"; };
+		27C8E51D21C9617100F451D6 /* TabMOMigrationPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabMOMigrationPolicy.swift; sourceTree = "<group>"; };
 		27D87C2D2152B50200FB55C6 /* GradientView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientView.swift; sourceTree = "<group>"; };
 		27F443952135E11200296C58 /* BraveShareTo.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BraveShareTo.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		27F4439C2135E11200296C58 /* BraveShareToInfo.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = BraveShareToInfo.plist; sourceTree = "<group>"; };
@@ -3123,6 +3127,8 @@
 				5D1DC54A20AE004600905E5A /* History.swift */,
 				5D1DC54B20AE004600905E5A /* Syncable.swift */,
 				5D1DC54C20AE004600905E5A /* Model.xcdatamodeld */,
+				27C8E51421C960E900F451D6 /* LegacyMappingModel.xcmappingmodel */,
+				27C8E51D21C9617100F451D6 /* TabMOMigrationPolicy.swift */,
 			);
 			path = models;
 			sourceTree = "<group>";
@@ -5223,6 +5229,8 @@
 			files = (
 				5D1DC56E20AE005400905E5A /* SyncBookmark.swift in Sources */,
 				5D1DC55A20AE004600905E5A /* FaviconMO.swift in Sources */,
+				27C8E51E21C9617100F451D6 /* TabMOMigrationPolicy.swift in Sources */,
+				27C8E51521C960E900F451D6 /* LegacyMappingModel.xcmappingmodel in Sources */,
 				5D1DC55C20AE004600905E5A /* Device.swift in Sources */,
 				5D1DC56C20AE005400905E5A /* SyncShowCodewords.swift in Sources */,
 				5D1DC55D20AE004600905E5A /* History.swift in Sources */,
