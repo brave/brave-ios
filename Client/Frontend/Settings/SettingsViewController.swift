@@ -196,6 +196,17 @@ class SettingsViewController: TableViewController {
                     self.navigationController?.pushViewController(clearPrivateData, animated: true)
                 },
                 accessory: .disclosureIndicator
+            ),
+            Row(
+                text: "Block all cookies",
+                detailText: "Cross site tracking is disabled all the time.",
+                accessory: .switchToggle(
+                    value: Preferences.Privacy.blockAllCookies.value, {
+                        //Lock/Unlock Cookie Folder
+                        FileManager.default.lockFolders([(.cookie, $0)])
+                        Preferences.Privacy.blockAllCookies.value = $0 }
+                ),
+                uuid: Preferences.Privacy.blockAllCookies.key
             )
         ]
         privacy.rows.append(BoolRow(title: Strings.Private_Browsing_Only, option: Preferences.Privacy.privateBrowsingOnly))
