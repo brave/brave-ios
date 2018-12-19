@@ -198,8 +198,7 @@ class SettingsViewController: TableViewController {
                 accessory: .disclosureIndicator
             ),
             Row(
-                text: "Block all cookies",
-                detailText: "Cross site tracking is disabled all the time.",
+                text: Strings.Block_all_cookies,
                 accessory: .switchToggle(
                     value: Preferences.Privacy.blockAllCookies.value, {
                         //Lock/Unlock Cookie Folder

@@ -186,7 +186,7 @@ class BrowserViewController: UIViewController {
         Preferences.Privacy.privateBrowsingOnly.observe(from: self)
         Preferences.General.tabBarVisibility.observe(from: self)
         Preferences.Shields.allShields.forEach { $0.observe(from: self) }
-        
+        Preferences.Privacy.blockAllCookies.observe(from: self)
         // Lists need to be compiled before attempting tab restoration
         contentBlockListDeferred = ContentBlockerHelper.compileLists()
     }
@@ -2908,7 +2908,8 @@ extension BrowserViewController: PreferencesObserver {
              Preferences.Shields.blockScripts.key,
              Preferences.Shields.blockPhishingAndMalware.key,
              Preferences.Shields.blockImages.key,
-             Preferences.Shields.fingerprintingProtection.key:
+             Preferences.Shields.fingerprintingProtection.key,
+             Preferences.Privacy.blockAllCookies.key:
             tabManager.allTabs.forEach { $0.webView?.reload() }
         default:
             log.debug("Received a preference change for an unknown key: \(key) on \(type(of: self))")
