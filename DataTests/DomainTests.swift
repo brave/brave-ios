@@ -1,4 +1,4 @@
-// This Source Code Form is subject to the terms of the Mozilla Public
+    // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
@@ -18,7 +18,10 @@ class DomainTests: CoreDataTestCase {
         let url2 = URL(string: "http://brave.com")!
         let context = DataController.viewContext
         
-        XCTAssertNotNil(Domain.getOrCreateForUrl(url, context: context))
+        backgroundSaveAndWaitForExpectation {
+            XCTAssertNotNil(Domain.getOrCreateForUrl(url, context: context))
+        }
+        
         XCTAssertEqual(try! DataController.viewContext.count(for: fetchRequest), 1)
         
         // Try to add the same domain again, verify no new object is created
@@ -26,7 +29,9 @@ class DomainTests: CoreDataTestCase {
         XCTAssertEqual(try! DataController.viewContext.count(for: fetchRequest), 1)
         
         // Add another domain, verify that second object is created
-        XCTAssertNotNil(Domain.getOrCreateForUrl(url2, context: context))
+        backgroundSaveAndWaitForExpectation {
+                XCTAssertNotNil(Domain.getOrCreateForUrl(url2, context: context))
+        }
         XCTAssertEqual(try! DataController.viewContext.count(for: fetchRequest), 2)
     }
 

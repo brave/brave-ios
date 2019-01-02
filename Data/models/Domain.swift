@@ -38,19 +38,28 @@ public final class Domain: NSManagedObject, CRUD {
             return domain
         }
         
-        // See #409:
-        //  A larger refactor is probably wanted here.
-        //  This can easily lead to a Domain being created on the `viewContext`
-        //  A solution to consider is creating a new background context here, creating, saving, and then re-fetching
-        //   that object in the requested context (regardless if it is `viewContext` or not)
         var newDomain: Domain!
-        context.performAndWait {
-            newDomain = Domain(entity: Domain.entity(context), insertInto: context)
+        
+        // We want to avoid saving data on view context.
+        // So if new domain is triggered on view context we save it synchronously using new background context,
+        // then the same object is refetched on the view context.
+        let writeContext = context == DataController.viewContext ? DataController.newBackgroundContext() : context
+        
+        writeContext.performAndWait {
+            newDomain = Domain(entity: Domain.entity(writeContext), insertInto: writeContext)
             newDomain.url = domainString
             if save {
-                DataController.save(context: context)
+                DataController.save(context: writeContext)
             }
         }
+        
+        // Refetching only for view context. For all other cases we want to keep this object on the same
+        // context to avoid data errors(for example a Domain can be created while adding a Bookmark,
+        // if Bookmark and Domain would be on different contextes that would cause the app to crash)
+        if context == DataController.viewContext {
+            newDomain = context.object(with: newDomain.objectID) as? Domain
+        }
+        
         return newDomain
     }
 
