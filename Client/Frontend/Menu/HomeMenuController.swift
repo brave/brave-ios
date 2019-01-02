@@ -133,7 +133,6 @@ class HomeMenuController: UIViewController, PopoverContentComponent {
     
     addBookmarkButton.addTarget(self, action: #selector(onClickBookmarksButton), for: .touchUpInside)
     addBookmarkButton.setImage(#imageLiteral(resourceName: "menu-add-bookmark").template, for: .normal)
-    addBookmarkButton.setImage(#imageLiteral(resourceName: "menu-marked-bookmark").template, for: .selected)
     addBookmarkButton.contentEdgeInsets = UIEdgeInsets(top: 5, left: 10, bottom: 5, right: 10)
     addBookmarkButton.accessibilityLabel = Strings.Add_Bookmark
     
@@ -176,11 +175,7 @@ class HomeMenuController: UIViewController, PopoverContentComponent {
     //switch to bookmarks 'tab' in case we're looking at history and tapped the add/remove bookmark button
     onClickPageButton(bookmarksButton)
     
-    if Bookmark.contains(url: url) {
-      Bookmark.remove(forUrl: url)
-    } else {
-      Bookmark.add(url: url, title: tabState.title, parentFolder: bookmarksController.currentBookmarksPanel().currentFolder)
-    }
+    Bookmark.add(url: url, title: tabState.title, parentFolder: bookmarksController.currentBookmarksPanel().currentFolder)
   }
   
   func setupConstraints() {
@@ -256,13 +251,11 @@ class HomeMenuController: UIViewController, PopoverContentComponent {
   func updateBookmarkStatus() {
     guard let url = tabState.url, !url.isLocal else {
       //disable button for homescreen/empty url
-      addBookmarkButton.isSelected = false
       addBookmarkButton.isEnabled = false
       return
     }
     
     addBookmarkButton.isEnabled = true
-    addBookmarkButton.isSelected = Bookmark.contains(url: url)
   }
 }
 

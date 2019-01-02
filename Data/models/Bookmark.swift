@@ -177,7 +177,7 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         
         var bk: Bookmark!
         if let id = root?.objectId, let foundbks = Bookmark.get(syncUUIDs: [id], context: context) as? [Bookmark], let foundBK = foundbks.first {
-            // Found a pre-existing bookmark, cannot add duplicate
+            // Found a pre-existing bookmark with the same sync uuid
             // Turn into 'update' record instead
             bk = foundBK
         } else {
@@ -344,24 +344,6 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         DataController.save(context: context)
     }
     
-    // TODO: Migration syncUUIDS still needs to be solved
-    // Should only ever be used for migration from old db
-    // Always uses worker context
-    class func addForMigration(url: String?, title: String, customTitle: String, parentFolder: Bookmark?, isFolder: Bool?) -> Bookmark? {
-        
-        let site = SyncSite()
-        site.title = title
-        site.customTitle = customTitle
-        site.location = url
-        
-        let bookmark = SyncBookmark()
-        bookmark.isFolder = isFolder
-        // bookmark.parentFolderObjectId = [parentFolder]
-        bookmark.site = site
-        
-        return self.add(rootObject: bookmark, save: true)
-    }
-    
     public func remove(sendToSync: Bool = true) {
         if isFavorite { delete() }
         
@@ -450,14 +432,6 @@ extension Bookmark {
         let predicate = NSPredicate(format: "isFavorite == NO")
         
         return all(where: predicate) ?? []
-    }
-    
-    public class func remove(forUrl url: URL) {
-        let context = DataController.newBackgroundContext()
-        let predicate = isFavoriteOrBookmarkByUrlPredicate(url: url, getFavorites: false)
-        
-        let record = first(where: predicate, context: context)
-        record?.delete()
     }
     
     /// Gets all nested bookmarks recursively.
