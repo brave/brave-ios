@@ -253,19 +253,19 @@ private extension TabScrollingController {
         // produce a ~50px page jumping effect in response to tap navigations.
         let isShownFromHidden = headerTopOffset == -topScrollHeight && headerOffset == 0
 
+        if isShownFromHidden {
+            scrollView.contentOffset = CGPoint(x: initialContentOffset.x, y: initialContentOffset.y + self.topScrollHeight)
+        }
+        self.headerTopOffset = headerOffset
+        self.footerBottomOffset = footerOffset
+        self.urlBar?.updateAlphaForSubviews(alpha)
+        self.tabsBar?.view.alpha = alpha
         let animation: () -> Void = {
-            if isShownFromHidden {
-                scrollView.contentOffset = CGPoint(x: initialContentOffset.x, y: initialContentOffset.y + self.topScrollHeight)
-            }
-            self.headerTopOffset = headerOffset
-            self.footerBottomOffset = footerOffset
-            self.urlBar?.updateAlphaForSubviews(alpha)
-            self.tabsBar?.view.alpha = alpha
             self.header?.superview?.layoutIfNeeded()
         }
 
         if animated {
-            UIView.animate(withDuration: duration, delay: 0, options: .allowUserInteraction, animations: animation, completion: completion)
+            UIView.animate(withDuration: duration, delay: 0, options: [.beginFromCurrentState, .allowUserInteraction], animations: animation, completion: completion)
         } else {
             animation()
             completion?(true)
