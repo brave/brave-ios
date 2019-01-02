@@ -13,8 +13,6 @@ class BraveWebView: WKWebView {
             configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
         }
         
-        // Enables Zoom in website by ignoring their javascript based viewport Scale limits.
-        configuration.ignoresViewportScaleLimits = true
         super.init(frame: frame, configuration: configuration)
     }
     
