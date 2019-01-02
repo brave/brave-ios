@@ -27,7 +27,6 @@ class TabScrollingController: NSObject {
 
         didSet {
             self.scrollView?.panGestureRecognizer.addTarget(self, action: #selector(handlePan))
-            self.scrollView?.panGestureRecognizer.maximumNumberOfTouches = 1
             scrollView?.delegate = self
         }
     }
