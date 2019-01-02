@@ -22,11 +22,12 @@ class TabScrollingController: NSObject {
     weak var tab: Tab? {
         willSet {
             self.scrollView?.delegate = nil
-            self.scrollView?.removeGestureRecognizer(panGesture)
+            self.scrollView?.panGestureRecognizer.removeTarget(self, action: nil)
         }
 
         didSet {
-            self.scrollView?.addGestureRecognizer(panGesture)
+            self.scrollView?.panGestureRecognizer.addTarget(self, action: #selector(handlePan))
+            self.scrollView?.panGestureRecognizer.maximumNumberOfTouches = 1
             scrollView?.delegate = self
         }
     }
@@ -69,13 +70,6 @@ class TabScrollingController: NSObject {
             footer?.superview?.setNeedsLayout()
         }
     }
-
-    fileprivate lazy var panGesture: UIPanGestureRecognizer = {
-        let panGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePan))
-        panGesture.maximumNumberOfTouches = 1
-        panGesture.delegate = self
-        return panGesture
-    }()
 
     fileprivate var scrollView: UIScrollView? { return tab?.webView?.scrollView }
     fileprivate var contentOffset: CGPoint { return scrollView?.contentOffset ?? .zero }
