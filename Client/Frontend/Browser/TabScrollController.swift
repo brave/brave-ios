@@ -53,7 +53,7 @@ class TabScrollingController: NSObject {
 
     fileprivate var headerTopOffset: CGFloat = 0 {
         didSet {
-            headerTopConstraint?.update(offset: headerTopOffset - tabsBarOffset)
+            headerTopConstraint?.update(offset: headerTopOffset)
             header?.superview?.setNeedsLayout()
         }
     }
@@ -257,7 +257,7 @@ private extension TabScrollingController {
             if isShownFromHidden {
                 scrollView.contentOffset = CGPoint(x: initialContentOffset.x, y: initialContentOffset.y + self.topScrollHeight)
             }
-            self.headerTopOffset = headerOffset + self.tabsBarOffset
+            self.headerTopOffset = headerOffset
             self.footerBottomOffset = footerOffset
             self.urlBar?.updateAlphaForSubviews(alpha)
             self.tabsBar?.view.alpha = alpha
