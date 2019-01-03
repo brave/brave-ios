@@ -195,7 +195,7 @@ class TabMOTests: CoreDataTestCase {
     
     @discardableResult private func createAndWait() -> TabMO {
         let uuid = UUID().uuidString
-        
+
         backgroundSaveAndWaitForExpectation {
             _ = TabMO.create(uuidString: uuid)
         }

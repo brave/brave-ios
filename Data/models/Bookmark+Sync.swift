@@ -139,17 +139,17 @@ extension Bookmark {
     }
     
     class func removeSyncOrders() {
-        let context = DataController.newBackgroundContext()
-        let allBookmarks = getAllBookmarks(context: context)
-        
-        allBookmarks.forEach { bookmark in
-            bookmark.syncOrder = nil
-            // TODO: Clear syncUUIDs
-            //            bookmark.syncUUID = nil
+        DataController.performTask { context in
+            let allBookmarks = getAllBookmarks(context: context)
+            
+            allBookmarks.forEach { bookmark in
+                bookmark.syncOrder = nil
+                // TODO: Clear syncUUIDs
+                //            bookmark.syncUUID = nil
+            }
+            
+            Preferences.Sync.baseSyncOrder.reset()
         }
-        
-        DataController.save(context: context)
-        Preferences.Sync.baseSyncOrder.reset()
     }
     
     /// We use a special String-based ordering algorithm for Bookmarks, which can't be sorted

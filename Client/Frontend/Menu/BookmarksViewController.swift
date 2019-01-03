@@ -50,7 +50,7 @@ class BookmarkEditingViewController: FormViewController {
     self.bookmarkIndexPath = indexPath
     
     // get top-level folders
-    folders = Bookmark.getFolders(bookmark: nil, context: DataController.viewContext)
+    folders = Bookmark.getFolders(bookmark: nil)
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -566,10 +566,12 @@ extension BookmarksViewController: NSFetchedResultsControllerDelegate {
   func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
     switch type {
     case .update:
-      guard let indexPath = indexPath, let cell = tableView.cellForRow(at: indexPath) else {
-        return
-      }
-      configureCell(cell, atIndexPath: indexPath)
+        if let indexPath = indexPath, let cell = tableView.cellForRow(at: indexPath) {
+            configureCell(cell, atIndexPath: indexPath)
+        }
+        if let newIndexPath = newIndexPath, let cell = tableView.cellForRow(at: newIndexPath) {
+            configureCell(cell, atIndexPath: newIndexPath)
+        }
     case .insert:
       guard let path = newIndexPath else {
         return

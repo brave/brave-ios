@@ -7,7 +7,7 @@ import CoreData
 @testable import Data
 
 class BookmarkTests: CoreDataTestCase {
-    let fetchRequest = NSFetchRequest<Bookmark>(entityName: String(describing: Bookmark.self))
+    let fetchRequest = NSFetchRequest<Bookmark>(entityName: "Bookmark")
     
     private func entity(for context: NSManagedObjectContext) -> NSEntityDescription {
         return NSEntityDescription.entity(forEntityName: String(describing: Bookmark.self), in: context)!
@@ -78,9 +78,9 @@ class BookmarkTests: CoreDataTestCase {
         XCTAssertEqual(objects.count, bookmarksToAdd)
         
         // Testing if it sorts correctly
-        XCTAssertEqual(objects.first?.title, "10")
-        XCTAssertEqual(objects[5].title, "5")
-        XCTAssertEqual(objects.last?.title, "1")
+        XCTAssertEqual(objects.first?.title, "1")
+        XCTAssertEqual(objects[5].title, "6")
+        XCTAssertEqual(objects.last?.title, "10")
     }
     
     func testFrcWithParentFolder() {
@@ -138,6 +138,18 @@ class BookmarkTests: CoreDataTestCase {
         XCTAssertEqual(result.customTitle, folderName)
         XCTAssert(result.isFolder)
         XCTAssertEqual(result.displayTitle, folderName)
+    }
+    
+    func testMassInsert() {
+        for i in 1...100 {
+            let url = URL(string: "http://brave.com/\(i)")!
+            let title = "Brave\(i)"
+            
+            createAndWait(url: url, title: title)
+        }
+        
+        let count = try! DataController.viewContext.count(for: fetchRequest)
+        XCTAssertEqual(count, 100)
     }
     
     // MARK: - Read
@@ -404,8 +416,9 @@ class BookmarkTests: CoreDataTestCase {
         bookmark.site = site
         
         backgroundSaveAndWaitForExpectation {
-            Bookmark.createResolvedRecord(rootObject: bookmark, save: true,
-                                          context: DataController.newBackgroundContext())
+            DataController.performTask { context in
+                Bookmark.createResolvedRecord(rootObject: bookmark, save: true, context: context)
+            }
         }
         
         XCTAssertEqual(try! DataController.viewContext.count(for: fetchRequest), 1)
@@ -425,7 +438,7 @@ class BookmarkTests: CoreDataTestCase {
         let syncBookmark = SyncBookmark()
         syncBookmark.site = site
         
-        let object = createAndWait(url: url, title: title)
+        var object = createAndWait(url: url, title: title)
         
         let oldCreated = object.created
         let oldLastVisited = object.lastVisited
@@ -433,9 +446,11 @@ class BookmarkTests: CoreDataTestCase {
         XCTAssertNotEqual(object.title, newTitle)
         XCTAssertNotEqual(object.url, newUrl)
         
-        // No CD autosave, see the method internals.
-        object.updateResolvedRecord(syncBookmark)
-        DataController.viewContext.refreshAllObjects()
+        backgroundSaveAndWaitForExpectation {
+            object.updateResolvedRecord(syncBookmark)
+        }
+        
+        object = try! DataController.viewContext.fetch(fetchRequest).first!
         
         XCTAssertEqual(object.title, newTitle)
         XCTAssertEqual(object.url, newUrl)
@@ -468,20 +483,11 @@ class BookmarkTests: CoreDataTestCase {
     func testFrecencyQuery() {
         insertBookmarks(amount: 6)
         
-        let found = Bookmark.frecencyQuery(context: DataController.viewContext, containing: "brave")
+        let found = Bookmark.getByFrecency(query: "brave")
         // Query limit is 5
         XCTAssertEqual(found.count, 5)
         
-        // Changing dates of two bookmarks to be something older than 1 week.
-        // Because we added 6 bookmarks and query limit is 5, the frequency query should return 4 bookmarks.
-        found.first?.lastVisited = Date(timeIntervalSince1970: 1)
-        found.last?.lastVisited = Date(timeIntervalSince1970: 1)
-        DataController.save(context: DataController.viewContext)
-        
-        let found2 = Bookmark.frecencyQuery(context: DataController.viewContext, containing: "brave")
-        XCTAssertEqual(found2.count, 4)
-        
-        let notFound = Bookmark.frecencyQuery(context: DataController.viewContext, containing: "notfound")
+        let notFound = Bookmark.getByFrecency(query: "notfound")
         XCTAssertEqual(notFound.count, 0)
     }
     
@@ -510,7 +516,9 @@ class BookmarkTests: CoreDataTestCase {
                          isFolder: isFolder, isFavorite: isFavorite, syncOrder: syncOrder)
         }
         
-        return try! DataController.viewContext.fetch(fetchRequest).first!
+        let sort = NSSortDescriptor(key: "created", ascending: false)
+        
+        return Bookmark.first(sortDescriptors: [sort])!
     }
     
     private func insertBookmarks(amount: Int, parent: Bookmark? = nil) {
@@ -540,10 +548,12 @@ class BookmarkTests: CoreDataTestCase {
         let destinationObject = frc.object(at: destinationIndexPath)
         
         let sourceOrderBefore = (frc.object(at: sourceIndexPath)).order
-        let destinationOrderBefore = (frc.object(at: destinationIndexPath)).order
         
-        // CD objects we saved before will get updated after this call.
-        Bookmark.reorderBookmarks(frc: frc, sourceIndexPath: sourceIndexPath, destinationIndexPath: destinationIndexPath)
+        // Bookmark reordering actually do a lot of saves now so we have to wait for the context notification.
+        backgroundSaveAndWaitForExpectation {
+            Bookmark.reorderBookmarks(frc: frc, sourceIndexPath: sourceIndexPath, destinationIndexPath: destinationIndexPath)
+        }
+        
         
         // Test order has changed, won't work when swapping bookmarks with order = 0
         if !skipOrderChangeTests {
@@ -557,7 +567,6 @@ class BookmarkTests: CoreDataTestCase {
         // Test awakeFromInsert()
         XCTAssertNotNil(record.created)
         XCTAssertNotNil(record.lastVisited)
-        XCTAssertEqual(record.created, record.lastVisited)
         // Make sure date doesn't point to 1970-01-01
         let initialDate = Date(timeIntervalSince1970: 0)
         XCTAssertNotEqual(record.created, initialDate)

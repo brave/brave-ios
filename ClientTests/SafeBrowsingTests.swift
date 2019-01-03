@@ -4,7 +4,7 @@
 
 import XCTest
 import BraveShared
-import Data
+@testable import Data
 @testable import Client
 
 class SafeBrowsingTests: XCTestCase {
@@ -55,7 +55,7 @@ class SafeBrowsingTests: XCTestCase {
         
         // Brave domain will have safe browsing shield turned off.
         // No need to call getOrCreateForUrl here.
-        Domain.setBraveShield(forUrl: braveUrl, shield: .SafeBrowsing, isOn: false, context: context)
+        Domain.setBraveShield(forUrl: braveUrl, shield: .SafeBrowsing, isOn: false, isPrivateBrowsing: false, context: context)
         
         // example.com will have default value nil which means true
         _ = Domain.getOrCreateForUrl(exampleUrl, context: context)
@@ -65,7 +65,7 @@ class SafeBrowsingTests: XCTestCase {
         XCTAssert(sb.shouldBlock(exampleUrl))
         
         Preferences.Shields.blockPhishingAndMalware.value = false
-        Domain.setBraveShield(forUrl: exampleUrl, shield: .SafeBrowsing, isOn: true, context: context)
+        Domain.setBraveShield(forUrl: exampleUrl, shield: .SafeBrowsing, isOn: true, isPrivateBrowsing: false, context: context)
         
         XCTAssertFalse(sb.shouldBlock(braveUrl))
         XCTAssert(sb.shouldBlock(exampleUrl))

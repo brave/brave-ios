@@ -69,42 +69,53 @@ public final class TabMO: NSManagedObject, CRUD {
         return NSEntityDescription.entity(forEntityName: "TabMO", in: context)!
     }
     
-    /// Creates new tab. If you want to add urls to existing tabs use `update()` method. 
-    public class func create(uuidString: String = UUID().uuidString) -> TabMO {
-        let context = DataController.newBackgroundContext()
-        let tab = TabMO(entity: TabMO.entity(context), insertInto: context)
-        // TODO: replace with logic to create sync uuid then buble up new uuid to browser.
-        tab.syncUUID = uuidString
-        tab.title = Strings.New_Tab
-        DataController.save(context: context)
-        return tab
+    /// Creates new tab and returns its syncUUID. If you want to add urls to existing tabs use `update()` method. 
+    public class func create(uuidString: String = UUID().uuidString) -> String {
+        
+        DataController.performTask { context in
+            let tab = TabMO(entity: TabMO.entity(context), insertInto: context)
+            // TODO: replace with logic to create sync uuid then buble up new uuid to browser.
+            tab.syncUUID = uuidString
+            tab.title = Strings.New_Tab
+        }
+        
+        return uuidString
     }
 
     // Updates existing tab with new data. Usually called when user navigates to a new website for in his existing tab.
-    @discardableResult public class func update(tabData: SavedTab) -> TabMO? {
-        let context = DataController.newBackgroundContext()
-        guard let tab = get(fromId: tabData.id, context: context) else { return nil }
-        
-        if let screenshot = tabData.screenshot {
-            tab.screenshot = UIImageJPEGRepresentation(screenshot, 1)
+    public class func update(tabData: SavedTab) {
+        DataController.performTask { context in
+            guard let tabToUpdate = get(fromId: tabData.id, context: context) else { return }
+            
+            if let screenshot = tabData.screenshot {
+                tabToUpdate.screenshot = UIImageJPEGRepresentation(screenshot, 1)
+            }
+            tabToUpdate.url = tabData.url
+            tabToUpdate.order = tabData.order
+            tabToUpdate.title = tabData.title
+            tabToUpdate.urlHistorySnapshot = tabData.history as NSArray
+            tabToUpdate.urlHistoryCurrentIndex = tabData.historyIndex
+            tabToUpdate.isSelected = tabData.isSelected
         }
-        tab.url = tabData.url
-        tab.order = tabData.order
-        tab.title = tabData.title
-        tab.urlHistorySnapshot = tabData.history as NSArray
-        tab.urlHistoryCurrentIndex = tabData.historyIndex
-        tab.isSelected = tabData.isSelected
-        
-        DataController.save(context: context)
-        
-        return tab
     }
     
     public class func saveScreenshotUUID(_ uuid: UUID?, tabId: String?) {
-        let context = DataController.newBackgroundContext()
-        let tabMO = TabMO.get(fromId: tabId, context: context)
-        tabMO?.screenshotUUID = uuid?.uuidString
-        DataController.save(context: context)
+        DataController.performTask { context in
+            let tabMO = TabMO.get(fromId: tabId, context: context)
+            tabMO?.screenshotUUID = uuid?.uuidString
+        }
+    }
+    
+    public class func saveTabOrder(tabIds: [String]) {
+        DataController.performTask { context in
+            for (i, tabId) in tabIds.enumerated() {
+                guard let managedObject = TabMO.get(fromId: tabId, context: context) else {
+                    log.error("Error: Tab missing managed object")
+                    continue
+                }
+                managedObject.order = Int16(i)
+            }
+        }
     }
 
     public class func getAll() -> [TabMO] {
@@ -112,7 +123,7 @@ public final class TabMO: NSManagedObject, CRUD {
         return all(sortDescriptors: sortDescriptors) ?? []
     }
     
-    public class func get(fromId id: String?, context: NSManagedObjectContext) -> TabMO? {
+    public class func get(fromId id: String?, context: NSManagedObjectContext? = nil) -> TabMO? {
         guard let id = id else { return nil }
         let predicate = NSPredicate(format: "\(#keyPath(TabMO.syncUUID)) == %@", id)
         

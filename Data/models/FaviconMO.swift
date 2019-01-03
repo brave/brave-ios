@@ -26,8 +26,7 @@ public final class FaviconMO: NSManagedObject, CRUD {
     }
 
     public class func add(_ favicon: Favicon, forSiteUrl siteUrl: URL) {
-        let context = DataController.newBackgroundContext()
-        context.perform {
+        DataController.performTask { context in
             var item = FaviconMO.get(forFaviconUrl: favicon.url, context: context)
             if item == nil {
                 item = FaviconMO(entity: FaviconMO.entity(context), insertInto: context)
@@ -36,24 +35,22 @@ public final class FaviconMO: NSManagedObject, CRUD {
             if item?.domain == nil {
                 item!.domain = Domain.getOrCreateForUrl(siteUrl, context: context)
             }
-
+            
             let w = Int16(favicon.width ?? 0)
             let h = Int16(favicon.height ?? 0)
             let t = Int16(favicon.type?.rawValue ?? 0)
-
+            
             if w != item!.width && w > 0 {
                 item!.width = w
             }
-
+            
             if h != item!.height && h > 0 {
                 item!.height = h
             }
-
+            
             if t != item!.type {
                 item!.type = t
             }
-
-            DataController.save(context: context)
         }
     }
 }

@@ -5,8 +5,8 @@
 import Foundation
 import XCTest
 @testable import Client
+@testable import Data
 import BraveShared
-import Data
 import WebKit
 
 class FingerprintProtectionTest: XCTestCase {

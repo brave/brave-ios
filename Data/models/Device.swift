@@ -43,22 +43,22 @@ public final class Device: NSManagedObject, Syncable, CRUD {
     }
     
     public class func add(name: String?, isCurrent: Bool = false) {
-        let context = DataController.newBackgroundContext()
-        
-        let device = Device(entity: Device.entity(context: context), insertInto: context)
-        device.created = Date()
-        device.syncUUID = SyncCrypto.uniqueSerialBytes(count: 16)
-        device.name = name
-        device.isCurrentDevice = isCurrent
-        
-        DataController.save(context: context)
+        DataController.performTask { context in
+            let device = Device(entity: Device.entity(context: context), insertInto: context)
+            device.created = Date()
+            device.syncUUID = SyncCrypto.uniqueSerialBytes(count: 16)
+            device.name = name
+            device.isCurrentDevice = isCurrent
+        }
     }
     
     /// Returns a current device and assings it to a shared variable.
-    public static func currentDevice() -> Device? {
+    public static func currentDevice(context: NSManagedObjectContext? = nil) -> Device? {
         if sharedCurrentDevice == nil {
             let predicate = NSPredicate(format: "isCurrentDevice == true")
-            sharedCurrentDevice = first(where: predicate)
+            sharedCurrentDevice = first(where: predicate, context: context)
+        } else if context != nil, let sharedDevice = sharedCurrentDevice {
+            sharedCurrentDevice = context?.object(with: sharedDevice.objectID) as? Device
         }
         
         return sharedCurrentDevice
@@ -126,14 +126,14 @@ extension Device {
         
         // Due to race conditions, there is a chance that we will get for example a different device name
         // in insert(insead of update). Updating the Device regardless of whether it's already present.
-        device?.updateResolvedRecord(root)
+        device?.updateResolvedRecord(root, context: context)
         
         if save {
             DataController.save(context: context)
         }
     }
     
-    public func updateResolvedRecord(_ record: SyncRecord?) {
+    public func updateResolvedRecord(_ record: SyncRecord?, context: NSManagedObjectContext? = nil) {
         guard let root = record as? SyncDevice else { return }
         self.name = root.name
         self.deviceId = root.deviceId

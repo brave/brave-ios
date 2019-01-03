@@ -55,21 +55,16 @@ public final class History: NSManagedObject, WebsitePresentable, CRUD {
     }
 
     public class func add(_ title: String, url: URL) {
-        let context = DataController.newBackgroundContext()
-        context.perform {
+        DataController.performTask { context in
             var item = History.getExisting(url, context: context)
             if item == nil {
                 item = History(entity: History.entity(context), insertInto: context)
-                item!.domain = Domain.getOrCreateForUrl(url, context: context)
-                item!.url = url.absoluteString
+                item?.domain = Domain.getOrCreateForUrl(url, context: context)
+                item?.url = url.absoluteString
             }
             item?.title = title
             item?.domain?.visits += 1
             item?.visitedOn = Date()
-            // BRAVE TODO:
-//            item?.sectionIdentifier = BraveStrings.Today
-
-            DataController.save(context: context)
         }
     }
 
@@ -108,28 +103,29 @@ public final class History: NSManagedObject, WebsitePresentable, CRUD {
         
         return first(where: predicate, context: context)
     }
+    
+    public class func deleteAll(_ completionOnMain: @escaping () -> Void) {
+        DataController.performTask { context in
+            History.deleteAll(context: context, includesPropertyValues: false)
+            
+            Domain.deleteNonBookmarkedAndClearSiteVisits(context: context) {
+                completionOnMain()
+            }
+        }
+    }
+}
 
-    public class func frecencyQuery(_ context: NSManagedObjectContext, containing: String? = nil) -> [History] {
+extension History: Frecencyable {
+    static func getByFrecency(query: String? = nil,
+                              context: NSManagedObjectContext? = nil) -> [WebsitePresentable] {
         let urlKeyPath = #keyPath(History.url)
-        let visitedOnKeyPath = #keyPath(History.visitedOn) 
-
+        let visitedOnKeyPath = #keyPath(History.visitedOn)
+        
         var predicate = NSPredicate(format: "\(visitedOnKeyPath) > %@", History.ThisWeek as CVarArg)
-        if let query = containing {
+        if let query = query {
             predicate = NSPredicate(format: predicate.predicateFormat + " AND \(urlKeyPath) CONTAINS %@", query)
         }
         
-        return all(where: predicate, fetchLimit: 100) ?? []
+        return all(where: predicate, fetchLimit: 100, context: context) ?? []
     }
-    
-    public class func deleteAll(_ completionOnMain: @escaping () -> Void) {
-        let context = DataController.newBackgroundContext()
-        
-        // No save, save in Domain
-        History.deleteAll(context: context, includesPropertyValues: false, save: false)
-        
-        Domain.deleteNonBookmarkedAndClearSiteVisits(context: context) {
-            completionOnMain()
-        }
-    }
-
 }

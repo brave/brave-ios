@@ -20,7 +20,7 @@ public protocol Syncable: class /* where Self: NSManagedObject */ {
     // The most important difference between these methods and regular CRUD operations is that
     // resolved records from sync should be never sent back to the sync server.
     static func createResolvedRecord(rootObject root: SyncRecord?, save: Bool, context: NSManagedObjectContext)
-    func updateResolvedRecord(_ record: SyncRecord?)
+    func updateResolvedRecord(_ record: SyncRecord?, context: NSManagedObjectContext?)
     func deleteResolvedRecord(save: Bool, context: NSManagedObjectContext?)
 }
 
