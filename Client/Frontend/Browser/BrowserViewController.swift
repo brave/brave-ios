@@ -2136,6 +2136,17 @@ extension BrowserViewController: WKUIDelegate {
     }
 
     func webView(_ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping () -> Void) {
+        let c = CustomAlertController(title: "My Name is Danish Jafri", message: "mesaa \nbsbdhjfbhjsbdf \nbfhbshbdf", preferredStyle: .alert)
+        c.addAction(CustomUIAlertAction(title: "Cancel", style: .cancel, handler: { (action) in
+            print("1")
+        }))
+        c.addAction(CustomUIAlertAction(title: "Save", style: .default, handler: { (action) in
+            print("2")
+        }))
+        c.addTextField(configurationHandler: nil)
+        c.present(in: self, view: webViewContainer, animated: true)
+        completionHandler()
+        return
         let messageAlert = MessageAlert(message: message, frame: frame, completionHandler: completionHandler)
         if shouldDisplayJSAlertForWebView(webView) {
             present(messageAlert.alertController(), animated: true, completion: nil)
