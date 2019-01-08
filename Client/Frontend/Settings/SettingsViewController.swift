@@ -10,6 +10,7 @@ import SwiftKeychainWrapper
 import LocalAuthentication
 import SwiftyJSON
 import Data
+import WebKit
 
 extension TabBarVisibility: RepresentableOptionType {
     public var displayString: String {
@@ -200,10 +201,48 @@ class SettingsViewController: TableViewController {
             Row(
                 text: Strings.Block_all_cookies,
                 accessory: .switchToggle(
-                    value: Preferences.Privacy.blockAllCookies.value, {
-                        //Lock/Unlock Cookie Folder
-                        FileManager.default.lockFolders([(.cookie, $0)])
-                        Preferences.Privacy.blockAllCookies.value = $0 }
+                    value: Preferences.Privacy.blockAllCookies.value, { [unowned self] in
+                        func perform(with status: Bool) {
+                            //Lock/Unlock Cookie Folder
+                            let success = FileManager.default.lockFolders([
+                                (.cookie, status),
+                                (.webSiteData, status)
+                                ])
+                            if success {
+                                Preferences.Privacy.blockAllCookies.value = status
+                            } else {
+                                //Revert the changes. Not handling success here to avoid a loop.
+                                _ = FileManager.default.lockFolders([
+                                    (.cookie, !status),
+                                    (.webSiteData, !status)
+                                    ])
+                                self.undoToggleEvent(section: 1, row: 1)
+                                
+                                // TODO: Throw Alert to user to try again?
+                                let alert = UIAlertController(title: nil, message: Strings.Block_all_cookies_failed_alert_msg, preferredStyle: .alert)
+                                let okAction = UIAlertAction(title: Strings.OKString, style: .default)
+                                alert.addAction(okAction)
+                                self.present(alert, animated: true)
+                            }
+                        }
+                        if $0 {
+                            let status = $0
+                            // THROW ALERT to inform user of the setting
+                            let alert = UIAlertController(title: Strings.Block_all_cookies_alert_title, message: Strings.Block_all_cookies_alert_info, preferredStyle: .alert)
+                            let okAction = UIAlertAction(title: Strings.OKString, style: .default, handler: { (action) in
+                                perform(with: status)
+                            })
+                            alert.addAction(okAction)
+                            
+                            let cancelAction = UIAlertAction(title: Strings.CancelButtonTitle, style: .cancel, handler: { (action) in
+                                self.undoToggleEvent(section: 1, row: 1)
+                            })
+                            alert.addAction(cancelAction)
+                            self.present(alert, animated: true)
+                        } else {
+                            perform(with: $0)
+                        }
+                    }
                 ),
                 uuid: Preferences.Privacy.blockAllCookies.key
             )
@@ -335,4 +374,10 @@ class SettingsViewController: TableViewController {
             ]
         )
     }()
+    
+    func undoToggleEvent(section: Int, row: Int) {
+        if let switchView: UISwitch = self.tableView.cellForRow(at: IndexPath(row: row, section: section))?.accessoryView as? UISwitch {
+            switchView.setOn(!switchView.isOn, animated: true)
+        }
+    }
 }

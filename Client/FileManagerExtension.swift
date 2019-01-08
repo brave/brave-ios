@@ -3,22 +3,28 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
+import Shared
+
+private let log = Logger.browserLogger
 
 public extension FileManager {
     public enum Folder: String {
         case cookie = "/Cookies"
         case webkit = "/WebKit"
         case cache = "/Caches"
+        case webSiteData = "/WebKit/WebsiteData"
     }
     typealias FolderLockObj = (folder: Folder, lock: Bool)
-    public func lockFolders(_ lockObjects: [FolderLockObj]) {
+    public func lockFolders(_ lockObjects: [FolderLockObj]) -> Bool {
         let baseDir = NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true)[0]
         for lockObj in lockObjects {
             do {
                 try self.setAttributes([FileAttributeKey.posixPermissions: (lockObj.lock ? NSNumber(value: 0 as Int16) : NSNumber(value: 0o755 as Int16))], ofItemAtPath: baseDir + lockObj.folder.rawValue)
-            } catch {
-                print(error)
+            } catch let e {
+                log.error("Failed to \(lockObj.lock ? "Lock" : "Unlock") item at path \(lockObj.folder.rawValue) with error: \n\(e)")
+                return false
             }
         }
+        return true
     }
 }
