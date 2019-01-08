@@ -67,7 +67,11 @@ class UserScriptManager {
             log.error("Failed to load cookie control user script")
             return nil
         }
-        return WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+        var alteredSource: String = source
+        let token = UserScriptManager.securityToken.uuidString.replacingOccurrences(of: "-", with: "", options: .literal, range: nil)
+        alteredSource = alteredSource.replacingOccurrences(of: "$<local>", with: "L\(token)", options: .literal, range: nil).replacingOccurrences(of: "$<session>", with: "S\(token)", options: .literal, range: nil).replacingOccurrences(of: "$<cookie>", with: "C\(token)", options: .literal, range: nil)
+        
+        return WKUserScript(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false)
     }()
     
     private func reloadUserScripts() {
