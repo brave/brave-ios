@@ -16,6 +16,7 @@ class BlocklistName: Hashable, CustomStringConvertible, ContentBlocker {
     static let tracker = BlocklistName(filename: "block-trackers")
     static let https = BlocklistName(filename: "upgrade-http")
     static let image = BlocklistName(filename: "block-images")
+    static let blockCookie = BlocklistName(filename: "block-cookies")
     
     static var allLists: Set<BlocklistName> { return [.ad, .tracker, .https, .image] }
     
@@ -64,10 +65,11 @@ class BlocklistName: Hashable, CustomStringConvertible, ContentBlocker {
     
     static func compileAll(ruleStore: WKContentRuleListStore) -> Deferred<Void> {
         let allCompiledDeferred = Deferred<Void>()
-        let allOfThem = BlocklistName.allLists.map {
+        var allOfThem = BlocklistName.allLists.map {
             $0.buildRule(ruleStore: ruleStore)
         }
-        
+        //Compile block-cookie additionally 
+        allOfThem.append(BlocklistName.blockCookie.buildRule(ruleStore: ruleStore))
         all(allOfThem).upon { _ in
             allCompiledDeferred.fill(())
         }
