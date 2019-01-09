@@ -214,6 +214,12 @@ class Tab: NSObject {
         }
     }
     
+    func resetWebView(config: WKWebViewConfiguration) {
+        configuration = config
+        deleteWebView()
+        contentScriptManager.helpers.removeAll()
+    }
+    
     func restore(_ webView: WKWebView, restorationData: SavedTab?) {
         // Pulls restored session data from a previous SavedTab to load into the Tab. If it's nil, a session restore
         // has already been triggered via custom URL, so we use the last request to trigger it again; otherwise,

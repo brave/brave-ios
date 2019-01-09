@@ -71,18 +71,12 @@ class TabManager: NSObject {
 
     // A WKWebViewConfiguration used for normal tabs
     lazy fileprivate var configuration: WKWebViewConfiguration = {
-        let configuration = WKWebViewConfiguration()
-        configuration.processPool = WKProcessPool()
-        configuration.preferences.javaScriptCanOpenWindowsAutomatically = !Preferences.General.blockPopups.value
-        return configuration
+        return TabManager.getNewConfiguration(isPrivate: false)
     }()
 
     // A WKWebViewConfiguration used for private mode tabs
     lazy fileprivate var privateConfiguration: WKWebViewConfiguration = {
-        let configuration = WKWebViewConfiguration()
-        configuration.processPool = WKProcessPool()
-        configuration.preferences.javaScriptCanOpenWindowsAutomatically = !Preferences.General.blockPopups.value
-        return configuration
+        return TabManager.getNewConfiguration(isPrivate: true)
     }()
 
     fileprivate let imageStore: DiskImageStore?
@@ -166,6 +160,29 @@ class TabManager: NSObject {
         assert(Thread.isMainThread)
         return allTabs.filter { $0.type == type }
     }
+    
+    private class func getNewConfiguration(isPrivate: Bool) -> WKWebViewConfiguration {
+        let configuration = WKWebViewConfiguration()
+        configuration.processPool = WKProcessPool()
+        configuration.preferences.javaScriptCanOpenWindowsAutomatically = !Preferences.General.blockPopups.value
+        return configuration
+    }
+    
+    private func resetConfiguration() {
+        configuration = TabManager.getNewConfiguration(isPrivate: false)
+        privateConfiguration = TabManager.getNewConfiguration(isPrivate: true)
+    }
+    
+    func reset() {
+        resetConfiguration()
+        allTabs.filter({$0.webView != nil}).forEach({
+            $0.resetWebView(config: $0.isPrivate ? privateConfiguration : configuration)
+        })
+        selectTab(selectedTab, ignorePrevious: true)
+        if let url = selectedTab?.url {
+            selectedTab?.loadRequest(PrivilegedRequest(url: url) as URLRequest)
+        }
+    }
 
     func getTabFor(_ url: URL) -> Tab? {
         assert(Thread.isMainThread)
@@ -186,11 +203,11 @@ class TabManager: NSObject {
         return nil
     }
 
-    func selectTab(_ tab: Tab?, previous: Tab? = nil) {
+    func selectTab(_ tab: Tab?, previous: Tab? = nil, ignorePrevious: Bool = false) {
         assert(Thread.isMainThread)
         let previous = previous ?? selectedTab
 
-        if previous === tab {
+        if !ignorePrevious && previous === tab {
             return
         }
         // Convert the global mode to private if opening private tab from normal tab/ history/bookmark.

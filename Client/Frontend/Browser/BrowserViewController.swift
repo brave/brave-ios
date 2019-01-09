@@ -2908,9 +2908,14 @@ extension BrowserViewController: PreferencesObserver {
              Preferences.Shields.blockScripts.key,
              Preferences.Shields.blockPhishingAndMalware.key,
              Preferences.Shields.blockImages.key,
-             Preferences.Shields.fingerprintingProtection.key,
-             Preferences.Privacy.blockAllCookies.key:
+             Preferences.Shields.fingerprintingProtection.key:
             tabManager.allTabs.forEach { $0.webView?.reload() }
+        case Preferences.Privacy.blockAllCookies.key:
+            if Preferences.Privacy.blockAllCookies.value {
+                tabManager.reset()
+            } else {
+                tabManager.allTabs.forEach { $0.webView?.reload() }
+            }
         default:
             log.debug("Received a preference change for an unknown key: \(key) on \(type(of: self))")
             break
