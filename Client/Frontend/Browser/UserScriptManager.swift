@@ -68,8 +68,10 @@ class UserScriptManager {
             return nil
         }
         var alteredSource: String = source
-        let token = UserScriptManager.securityToken.uuidString.replacingOccurrences(of: "-", with: "", options: .literal, range: nil)
-        alteredSource = alteredSource.replacingOccurrences(of: "$<local>", with: "L\(token)", options: .literal, range: nil).replacingOccurrences(of: "$<session>", with: "S\(token)", options: .literal, range: nil).replacingOccurrences(of: "$<cookie>", with: "C\(token)", options: .literal, range: nil)
+        let token = UserScriptManager.securityToken.uuidString.replacingOccurrences(of: "-", with: "", options: .literal)
+        alteredSource = alteredSource.replacingOccurrences(of: "$<local>", with: "L\(token)", options: .literal)
+        alteredSource = alteredSource.replacingOccurrences(of: "$<session>", with: "S\(token)", options: .literal)
+        alteredSource = alteredSource.replacingOccurrences(of: "$<cookie>", with: "C\(token)", options: .literal)
         
         return WKUserScript(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false)
     }()

@@ -15,11 +15,11 @@ public extension FileManager {
         case webSiteData = "/WebKit/WebsiteData"
     }
     typealias FolderLockObj = (folder: Folder, lock: Bool)
-    public func lockFolders(_ lockObjects: [FolderLockObj]) -> Bool {
+    public func setFolderAccess(_ lockObjects: [FolderLockObj]) -> Bool {
         let baseDir = NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true)[0]
         for lockObj in lockObjects {
             do {
-                try self.setAttributes([FileAttributeKey.posixPermissions: (lockObj.lock ? NSNumber(value: 0 as Int16) : NSNumber(value: 0o755 as Int16))], ofItemAtPath: baseDir + lockObj.folder.rawValue)
+                try self.setAttributes([.posixPermissions: (lockObj.lock ? NSNumber(value: 0 as Int16) : NSNumber(value: 0o755 as Int16))], ofItemAtPath: baseDir + lockObj.folder.rawValue)
             } catch let e {
                 log.error("Failed to \(lockObj.lock ? "Lock" : "Unlock") item at path \(lockObj.folder.rawValue) with error: \n\(e)")
                 return false

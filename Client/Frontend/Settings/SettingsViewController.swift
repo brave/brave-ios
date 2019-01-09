@@ -202,9 +202,9 @@ class SettingsViewController: TableViewController {
                 text: Strings.Block_all_cookies,
                 accessory: .switchToggle(
                     value: Preferences.Privacy.blockAllCookies.value, { [unowned self] in
-                        func perform(with status: Bool) {
+                        func toggleCookieSetting(with status: Bool) {
                             //Lock/Unlock Cookie Folder
-                            let success = FileManager.default.lockFolders([
+                            let success = FileManager.default.setFolderAccess([
                                 (.cookie, status),
                                 (.webSiteData, status)
                                 ])
@@ -212,16 +212,15 @@ class SettingsViewController: TableViewController {
                                 Preferences.Privacy.blockAllCookies.value = status
                             } else {
                                 //Revert the changes. Not handling success here to avoid a loop.
-                                _ = FileManager.default.lockFolders([
+                                _ = FileManager.default.setFolderAccess([
                                     (.cookie, !status),
                                     (.webSiteData, !status)
                                     ])
-                                self.undoToggleEvent(section: 1, row: 1)
+                                self.undoToggleEvent(section: self.privacySection, rowUUID: Preferences.Privacy.blockAllCookies.key)
                                 
                                 // TODO: Throw Alert to user to try again?
                                 let alert = UIAlertController(title: nil, message: Strings.Block_all_cookies_failed_alert_msg, preferredStyle: .alert)
-                                let okAction = UIAlertAction(title: Strings.OKString, style: .default)
-                                alert.addAction(okAction)
+                                alert.addAction(UIAlertAction(title: Strings.OKString, style: .default))
                                 self.present(alert, animated: true)
                             }
                         }
@@ -230,17 +229,17 @@ class SettingsViewController: TableViewController {
                             // THROW ALERT to inform user of the setting
                             let alert = UIAlertController(title: Strings.Block_all_cookies_alert_title, message: Strings.Block_all_cookies_alert_info, preferredStyle: .alert)
                             let okAction = UIAlertAction(title: Strings.OKString, style: .default, handler: { (action) in
-                                perform(with: status)
+                                toggleCookieSetting(with: status)
                             })
                             alert.addAction(okAction)
                             
                             let cancelAction = UIAlertAction(title: Strings.CancelButtonTitle, style: .cancel, handler: { (action) in
-                                self.undoToggleEvent(section: 1, row: 1)
+                                self.undoToggleEvent(section: self.privacySection, rowUUID: Preferences.Privacy.blockAllCookies.key)
                             })
                             alert.addAction(cancelAction)
                             self.present(alert, animated: true)
                         } else {
-                            perform(with: $0)
+                            toggleCookieSetting(with: $0)
                         }
                     }
                 ),
@@ -375,9 +374,11 @@ class SettingsViewController: TableViewController {
         )
     }()
     
-    func undoToggleEvent(section: Int, row: Int) {
-        if let switchView: UISwitch = self.tableView.cellForRow(at: IndexPath(row: row, section: section))?.accessoryView as? UISwitch {
-            switchView.setOn(!switchView.isOn, animated: true)
+    func undoToggleEvent(section: Section, rowUUID: String) {
+        if let tableSection: Int = sections.firstIndex(of: section), let sectionRow: Int = section.rows.firstIndex(where: {$0.uuid == rowUUID}) {
+            if let switchView: UISwitch = self.tableView.cellForRow(at: IndexPath(row: sectionRow, section: tableSection))?.accessoryView as? UISwitch {
+                switchView.setOn(!switchView.isOn, animated: true)
+            }
         }
     }
 }
