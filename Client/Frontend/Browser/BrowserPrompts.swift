@@ -10,36 +10,14 @@ import Shared
     func promptAlertControllerDidDismiss(_ alertController: JSPromptAlertController)
 }
 
-/// A simple version of UIAlertController that attaches a delegate to the viewDidDisappear method
+/// A simple version of UIViewController (previously- UIAlertController) that attaches a delegate to the viewDidDisappear method
 /// to allow forwarding the event. The reason this is needed for prompts from Javascript is we
 /// need to invoke the completionHandler passed to us from the WKWebView delegate or else
-/// a runtime exception is thrown.
-class JSPromptAlertController: UIAlertController {
+/// a runtime exception is thrown. This new implementation creates a custom Alert that does not block the window and make app prone to JS DOS Attacks such as alerts in loop.
+class JSPromptAlertController: UIViewController {
     var alertInfo: JSAlertInfo?
 
     weak var delegate: JSPromptAlertControllerDelegate?
-
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        delegate?.promptAlertControllerDidDismiss(self)
-    }
-}
-
-open class CustomUIAlertAction: NSObject {
-    
-    var handler: ((CustomUIAlertAction) -> Void)?
-    var style: UIAlertAction.Style!
-    var title: String?
-    
-    init(title: String?, style: UIAlertAction.Style, handler: ((CustomUIAlertAction) -> Void)? = nil) {
-        super.init()
-        self.title = title
-        self.style = style
-        self.handler = handler
-    }
-}
-
-open class CustomAlertController: UIViewController {
     
     private var _title: String?
     private var _message: String?
@@ -63,7 +41,7 @@ open class CustomAlertController: UIViewController {
     
     private lazy var alertView: UIView = {
         let alert: UIView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 10))
-        self._scrollView.addSubview(alert)
+        _scrollView.addSubview(alert)
         alert.backgroundColor = UIColor.white
         alert.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -85,7 +63,7 @@ open class CustomAlertController: UIViewController {
         stack.distribution = .fill
         stack.spacing = 8.0
         stack.axis = .vertical
-        self.alertView.addSubview(stack)
+        alertView.addSubview(stack)
         stack.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             stack.leadingAnchor.constraint(equalTo: alertView.leadingAnchor, constant: 10),
@@ -116,8 +94,9 @@ open class CustomAlertController: UIViewController {
         mainStackView.addArrangedSubview(label)
         return label
     }()
+    
     private var _textFields: [UITextField]?
-    private var _actions: [(UIButton, CustomUIAlertAction)]
+    private var _actions: [(UIButton, JSAlertAction)]
     private lazy var actionStackView: UIStackView! = {
         let stack: UIStackView = UIStackView(arrangedSubviews: [])
         stack.alignment = UIStackViewAlignment.center
@@ -126,26 +105,33 @@ open class CustomAlertController: UIViewController {
         stack.axis = .horizontal
         mainStackView.addArrangedSubview(stack)
         stack.translatesAutoresizingMaskIntoConstraints = false
-//        NSLayoutConstraint.activate([
-//            stack.leadingAnchor.constraint(equalTo: alertView.leadingAnchor, constant: 10),
-//            stack.trailingAnchor.constraint(equalTo: alertView.trailingAnchor, constant: -10),
-//            stack.topAnchor.constraint(equalTo: alertView.topAnchor, constant: 10),
-//            stack.centerYAnchor.constraint(equalTo: alertView.centerYAnchor),
-//            stack.bottomAnchor.constraint(equalTo: alertView.bottomAnchor, constant: -10)
-//            ])
+        //        NSLayoutConstraint.activate([
+        //            stack.leadingAnchor.constraint(equalTo: alertView.leadingAnchor, constant: 10),
+        //            stack.trailingAnchor.constraint(equalTo: alertView.trailingAnchor, constant: -10),
+        //            stack.topAnchor.constraint(equalTo: alertView.topAnchor, constant: 10),
+        //            stack.centerYAnchor.constraint(equalTo: alertView.centerYAnchor),
+        //            stack.bottomAnchor.constraint(equalTo: alertView.bottomAnchor, constant: -10)
+        //            ])
         return stack
     }()
-
+    
+    private var topConstraint: NSLayoutConstraint!
+    private var bottomConstraint: NSLayoutConstraint!
+    private var leadingConstraint: NSLayoutConstraint!
+    private var trailingConstraint: NSLayoutConstraint!
+    
+    private var presentAnimated: Bool = true
+    
     private init() {
-        self._actions = []
+        _actions = []
         super.init(nibName: nil, bundle: nil)
     }
     
     public convenience init(title: String?, message: String?, preferredStyle: UIAlertController.Style) {
         self.init()
-        self._title = title
-        self._message = message
-        self._style = preferredStyle
+        _title = title
+        _message = message
+        _style = preferredStyle
     }
     
     required public init?(coder aDecoder: NSCoder) {
@@ -155,28 +141,39 @@ open class CustomAlertController: UIViewController {
     open override func viewDidLoad() {
         super.viewDidLoad()
         registerForKeyboardNotifications()
-        self.view.backgroundColor = UIColor.gray.withAlphaComponent(0.7)
+        view.backgroundColor = UIColor.gray.withAlphaComponent(0.7)
         _title != nil ? titleLabel.text = _title : nil
         _message != nil ? messageLabel.text = _message : nil
         _scrollView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 64, right: 0)
-        for field in _textFields ?? [] {
-            mainStackView.addArrangedSubview(field)
+        textFields?.forEach(mainStackView.addArrangedSubview(_:))
+        _actions.map({$0.0}).forEach(actionStackView.addArrangedSubview(_:))
+        alertView.sizeToFit()
+        if presentAnimated {
+            alertView.transform = CGAffineTransform(scaleX: 0.01, y: 0.01)
+            alertView.center = _scrollView.center
         }
-        for buttonTuple in _actions {
-            actionStackView.addArrangedSubview(buttonTuple.0)
-        }
-        self.alertView.sizeToFit()
     }
     
-    private var topConstraint: NSLayoutConstraint!
-    private var bottomConstraint: NSLayoutConstraint!
-    private var leadingConstraint: NSLayoutConstraint!
-    private var trailingConstraint: NSLayoutConstraint!
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if presentAnimated {
+            UIView.animate(withDuration: 0.25, delay: 0.0, options: [.curveEaseInOut], animations: {
+                self.alertView.transform = .identity
+                self.alertView.center = self._scrollView.center
+            }, completion: nil)
+        }
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        delegate?.promptAlertControllerDidDismiss(self)
+    }
     
     func present(in controller: UIViewController, view: UIView, animated: Bool) {
         controller.addChildViewController(self)
         self.view.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(self.view)
+        // This will end editing(Dismiss any input view) to show the alert.
         view.endEditing(true)
         
         leadingConstraint = self.view.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0)
@@ -192,40 +189,37 @@ open class CustomAlertController: UIViewController {
             ])
         
         self.didMove(toParentViewController: controller)
+        self.presentAnimated = animated
     }
     
     func registerForKeyboardNotifications() {
-        NotificationCenter.default.addObserver(self, selector: #selector(onKeyboardAppear(_:)), name: NSNotification.Name.UIKeyboardDidShow, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(onKeyboardDisappear(_:)), name: NSNotification.Name.UIKeyboardDidHide, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(onKeyboardAppear(_:)), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(onKeyboardDisappear(_:)), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
     }
     
-    // Don't forget to unregister when done
     deinit {
-        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UIKeyboardDidShow, object: nil)
-        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UIKeyboardDidHide, object: nil)
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UIKeyboardWillShow, object: nil)
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UIKeyboardWillHide, object: nil)
     }
     
     @objc func onKeyboardAppear(_ notification: NSNotification) {
         let info = notification.userInfo!
-        let rect: CGRect = info[UIKeyboardFrameEndUserInfoKey] as! CGRect
-        let kbSize = rect.size
-        
-        let insets = UIEdgeInsetsMake(0, 0, kbSize.height, 0)
-        _scrollView.contentInset = insets
-        _scrollView.scrollIndicatorInsets = insets
-        
-        // If active text field is hidden by keyboard, scroll it so it's visible
-        // Your application might not need or want this behavior.
-//        var aRect = self.view.frame;
-//        aRect.size.height -= kbSize.height;
-//
-//        let activeField: UITextField? = [addressTextView, servicePathTextView, usernameTextView, passwordTextView].first { $0.isFirstResponder }
-//        if let activeField = activeField {
-//            if aRect.contains(activeField.frame.origin) {
-//                let scrollPoint = CGPoint(x: 0, y: activeField.frame.origin.y-kbSize.height)
-//                scrollView.setContentOffset(scrollPoint, animated: true)
-//            }
-//        }
+        if let rect: CGRect = info[UIKeyboardFrameEndUserInfoKey] as? CGRect,
+            let animationDuration = info[UIKeyboardAnimationDurationUserInfoKey] as? TimeInterval {
+            let kbSize = rect.size
+            let animationCurve = UIViewAnimationOptions(rawValue: info[UIKeyboardAnimationCurveUserInfoKey] as? UInt ?? 0)
+            
+            let insets = UIEdgeInsets(top: 0, left: 0, bottom: kbSize.height, right: 0)
+            _scrollView.contentInset = insets
+            _scrollView.scrollIndicatorInsets = insets
+            
+            if let activeTextField: UITextField = _textFields?.filter({$0.isFirstResponder}).first {
+                let textFieldRect: CGRect = mainStackView.convert(activeTextField.frame, to: self._scrollView)
+                UIView.animate(withDuration: animationDuration, delay: 0.0, options: animationCurve, animations: {
+                    self._scrollView.contentOffset = CGPoint(x: self._scrollView.contentOffset.x, y: textFieldRect.origin.y + textFieldRect.height + 20.0 - kbSize.height)
+                }, completion: nil)
+            }
+        }
     }
     
     @objc func onKeyboardDisappear(_ notification: NSNotification) {
@@ -243,7 +237,7 @@ open class CustomAlertController: UIViewController {
         trailingConstraint.constant = 0
     }
     
-    open func addAction(_ action: CustomUIAlertAction) {
+    open func addAction(_ action: JSAlertAction) {
         guard _actions.count < 3 else {
             return
         }
@@ -269,14 +263,14 @@ open class CustomAlertController: UIViewController {
     }
     
     @objc private func actionPerformed(button: UIButton) {
-        if let action: CustomUIAlertAction = _actions.filter({$0.0 === button}).first?.1 {
+        if let action: JSAlertAction = _actions.filter({$0.0 === button}).first?.1 {
             action.handler?(action)
             self.removeFromParentViewController()
             self.view.removeFromSuperview()
         }
     }
-        
-    open var actions: [CustomUIAlertAction] {
+    
+    open var actions: [JSAlertAction] {
         get {
             return _actions.map({$0.1})
         }
@@ -285,6 +279,8 @@ open class CustomAlertController: UIViewController {
     open func addTextField(configurationHandler: ((UITextField) -> Void)? = nil) {
         //Add textfield here
         let textField: UITextField = UITextField(frame: CGRect(x: 0, y: 0, width: 0, height: 30.0))
+        textField.borderStyle = .roundedRect
+        textField.backgroundColor = UIColor.white
         _textFields == nil ? (_textFields = [textField]) : _textFields?.append(textField)
         configurationHandler?(textField)
     }
@@ -293,6 +289,20 @@ open class CustomAlertController: UIViewController {
         get {
             return _textFields
         }
+    }
+}
+
+open class JSAlertAction: NSObject {
+    
+    var handler: ((JSAlertAction) -> Void)?
+    var style: UIAlertAction.Style!
+    var title: String?
+    
+    init(title: String?, style: UIAlertAction.Style, handler: ((JSAlertAction) -> Void)? = nil) {
+        super.init()
+        self.title = title
+        self.style = style
+        self.handler = handler
     }
 }
 
@@ -317,7 +327,7 @@ struct MessageAlert: JSAlertInfo {
         let alertController = JSPromptAlertController(title: titleForJavaScriptPanelInitiatedByFrame(frame),
             message: message,
             preferredStyle: .alert)
-        alertController.addAction(UIAlertAction(title: Strings.OKString, style: .default) { _ in
+        alertController.addAction(JSAlertAction(title: Strings.OKString, style: .default) { _ in
             self.completionHandler()
         })
         alertController.alertInfo = self
@@ -343,10 +353,10 @@ struct ConfirmPanelAlert: JSAlertInfo {
     func alertController() -> JSPromptAlertController {
         // Show JavaScript confirm dialogs.
         let alertController = JSPromptAlertController(title: titleForJavaScriptPanelInitiatedByFrame(frame), message: message, preferredStyle: .alert)
-        alertController.addAction(UIAlertAction(title: Strings.OKString, style: .default) { _ in
+        alertController.addAction(JSAlertAction(title: Strings.OKString, style: .default) { _ in
             self.completionHandler(true)
         })
-        alertController.addAction(UIAlertAction(title: Strings.CancelButtonTitle, style: .cancel) { _ in
+        alertController.addAction(JSAlertAction(title: Strings.CancelButtonTitle, style: .cancel) { _ in
             self.cancel()
         })
         alertController.alertInfo = self
@@ -380,10 +390,10 @@ struct TextInputAlert: JSAlertInfo {
             input = textField
             input.text = self.defaultText
         })
-        alertController.addAction(UIAlertAction(title: Strings.OKString, style: .default) { _ in
+        alertController.addAction(JSAlertAction(title: Strings.OKString, style: .default) { _ in
             self.completionHandler(input.text)
         })
-        alertController.addAction(UIAlertAction(title: Strings.CancelButtonTitle, style: .cancel) { _ in
+        alertController.addAction(JSAlertAction(title: Strings.CancelButtonTitle, style: .cancel) { _ in
             self.cancel()
         })
         alertController.alertInfo = self

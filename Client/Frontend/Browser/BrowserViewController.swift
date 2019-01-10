@@ -2136,20 +2136,11 @@ extension BrowserViewController: WKUIDelegate {
     }
 
     func webView(_ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping () -> Void) {
-        let c = CustomAlertController(title: "My Name is Danish Jafri", message: "mesaa \nbsbdhjfbhjsbdf \nbfhbshbdf", preferredStyle: .alert)
-        c.addAction(CustomUIAlertAction(title: "Cancel", style: .cancel, handler: { (action) in
-            print("1")
-        }))
-        c.addAction(CustomUIAlertAction(title: "Save", style: .default, handler: { (action) in
-            print("2")
-        }))
-        c.addTextField(configurationHandler: nil)
-        c.present(in: self, view: webViewContainer, animated: true)
-        completionHandler()
-        return
+        // Show toolbars so that user is not blocked at alert and thus resort to killing the app.
+        scrollController.showToolbars(animated: false)
         let messageAlert = MessageAlert(message: message, frame: frame, completionHandler: completionHandler)
         if shouldDisplayJSAlertForWebView(webView) {
-            present(messageAlert.alertController(), animated: true, completion: nil)
+            messageAlert.alertController().present(in: self, view: webViewContainer, animated: true)
         } else if let promptingTab = tabManager[webView] {
             promptingTab.queueJavascriptAlertPrompt(messageAlert)
         } else {
@@ -2160,9 +2151,11 @@ extension BrowserViewController: WKUIDelegate {
     }
 
     func webView(_ webView: WKWebView, runJavaScriptConfirmPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping (Bool) -> Void) {
+        // Show toolbars so that user is not blocked at alert and thus resort to killing the app.
+        scrollController.showToolbars(animated: false)
         let confirmAlert = ConfirmPanelAlert(message: message, frame: frame, completionHandler: completionHandler)
         if shouldDisplayJSAlertForWebView(webView) {
-            present(confirmAlert.alertController(), animated: true, completion: nil)
+            confirmAlert.alertController().present(in: self, view: webViewContainer, animated: true)
         } else if let promptingTab = tabManager[webView] {
             promptingTab.queueJavascriptAlertPrompt(confirmAlert)
         } else {
@@ -2171,9 +2164,11 @@ extension BrowserViewController: WKUIDelegate {
     }
 
     func webView(_ webView: WKWebView, runJavaScriptTextInputPanelWithPrompt prompt: String, defaultText: String?, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping (String?) -> Void) {
+        // Show toolbars so that user is not blocked at alert and thus resort to killing the app.
+        scrollController.showToolbars(animated: false)
         let textInputAlert = TextInputAlert(message: prompt, frame: frame, completionHandler: completionHandler, defaultText: defaultText)
         if shouldDisplayJSAlertForWebView(webView) {
-            present(textInputAlert.alertController(), animated: true, completion: nil)
+            textInputAlert.alertController().present(in: self, view: webViewContainer, animated: true)
         } else if let promptingTab = tabManager[webView] {
             promptingTab.queueJavascriptAlertPrompt(textInputAlert)
         } else {
