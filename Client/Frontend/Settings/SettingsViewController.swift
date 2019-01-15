@@ -213,10 +213,10 @@ class SettingsViewController: TableViewController {
                             } else {
                                 //Revert the changes. Not handling success here to avoid a loop.
                                 _ = FileManager.default.setFolderAccess([
-                                    (.cookie, !status),
-                                    (.webSiteData, !status)
+                                    (.cookie, false),
+                                    (.webSiteData, false)
                                     ])
-                                self.undoToggleEvent(section: self.privacySection, rowUUID: Preferences.Privacy.blockAllCookies.key)
+                                self.toggleSwitch(on: false, section: self.privacySection, rowUUID: Preferences.Privacy.blockAllCookies.key)
                                 
                                 // TODO: Throw Alert to user to try again?
                                 let alert = UIAlertController(title: nil, message: Strings.Block_all_cookies_failed_alert_msg, preferredStyle: .alert)
@@ -228,13 +228,13 @@ class SettingsViewController: TableViewController {
                             let status = $0
                             // THROW ALERT to inform user of the setting
                             let alert = UIAlertController(title: Strings.Block_all_cookies_alert_title, message: Strings.Block_all_cookies_alert_info, preferredStyle: .alert)
-                            let okAction = UIAlertAction(title: Strings.OKString, style: .default, handler: { (action) in
+                            let okAction = UIAlertAction(title: Strings.Block_all_cookies_action, style: .destructive, handler: { (action) in
                                 toggleCookieSetting(with: status)
                             })
                             alert.addAction(okAction)
                             
                             let cancelAction = UIAlertAction(title: Strings.CancelButtonTitle, style: .cancel, handler: { (action) in
-                                self.undoToggleEvent(section: self.privacySection, rowUUID: Preferences.Privacy.blockAllCookies.key)
+                                self.toggleSwitch(on: false, section: self.privacySection, rowUUID: Preferences.Privacy.blockAllCookies.key)
                             })
                             alert.addAction(cancelAction)
                             self.present(alert, animated: true)
@@ -374,10 +374,10 @@ class SettingsViewController: TableViewController {
         )
     }()
     
-    func undoToggleEvent(section: Section, rowUUID: String) {
+    func toggleSwitch(on: Bool, section: Section, rowUUID: String) {
         if let tableSection: Int = sections.firstIndex(of: section), let sectionRow: Int = section.rows.firstIndex(where: {$0.uuid == rowUUID}) {
             if let switchView: UISwitch = self.tableView.cellForRow(at: IndexPath(row: sectionRow, section: tableSection))?.accessoryView as? UISwitch {
-                switchView.setOn(!switchView.isOn, animated: true)
+                switchView.setOn(on, animated: true)
             }
         }
     }
