@@ -16,7 +16,10 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
     @NSManaged public var customTitle: String?
     @NSManaged public var url: String?
     @NSManaged public var visits: Int32
+    /// A date of last visit for a given URL, used in url bar search suggestions.
     @NSManaged public var lastVisited: Date?
+    /// A date when of last update of the record. Used in bookmark sorting algorithm.
+    @NSManaged public var lastModified: Date?
     @NSManaged public var created: Date?
     @NSManaged public var order: Int16
     @NSManaged public var tags: [String]?
@@ -65,9 +68,25 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         return Sync.shared.baseSyncOrder ?? "0.0."
     }
     
-    override public func awakeFromInsert() {
-        super.awakeFromInsert()
-        lastVisited = created
+    override public func willSave() {
+        defer { super.willSave() }
+        
+        // willSave() also triggers on deletes.
+        if isDeleted { return }
+
+        let now = Date()
+        // willSave() is prone to recursion so we only modify the object there if lastModified property changed.
+        // See willSave() documentation for more info.
+        if lastModified != now && changedValues()[#keyPath(Bookmark.lastModified)] == nil {
+            lastModified = now
+            print("old order: \(order)")
+            
+            if let calculatedOrder = calculateOrder() {
+                order = calculatedOrder
+                print("calculated order: \(calculatedOrder)")
+                print("sync order: \(syncOrder)")
+            }
+        }
     }
     
     public func asDictionary(deviceId: [Int]?, action: Int?) -> [String: Any] {
@@ -82,8 +101,8 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         fetchRequest.fetchBatchSize = 20
         
         let orderSort = NSSortDescriptor(key: "order", ascending: true)
-        let createdSort = NSSortDescriptor(key: "created", ascending: false)
-        fetchRequest.sortDescriptors = [orderSort, createdSort]
+        let lastModifiedSort = NSSortDescriptor(key: "lastModified", ascending: false) // newer first
+        fetchRequest.sortDescriptors = [orderSort, lastModifiedSort]
         
         fetchRequest.predicate = forFavorites ?
             NSPredicate(format: "isFavorite == YES") : allBookmarksOfAGivenLevelPredicate(parent: parentFolder)
@@ -196,10 +215,19 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         bk.isFavorite = bookmark?.isFavorite ?? bk.isFavorite
         bk.isFolder = bookmark?.isFolder ?? bk.isFolder
         bk.syncUUID = root?.objectId ?? bk.syncUUID ?? SyncCrypto.uniqueSerialBytes(count: 16)
+        bk.syncOrder = root?.syncOrder
         bk.created = root?.syncNativeTimestamp ?? Date()
+        
+        if bk.lastVisited == nil {
+            bk.lastVisited = bk.created
+        }
         
         if let location = site?.location, let url = URL(string: location) {
             bk.domain = Domain.getOrCreateForUrl(url, context: context, save: false)
+        }
+        
+        if bk.syncOrder == nil {
+            bk.newSyncOrder(forFavorites: bk.isFavorite, context: context)
         }
         
         // This also sets up a parent folder
@@ -277,37 +305,128 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         return count > 0
     }
     
-    public class func reorderBookmarks(
-        frc: NSFetchedResultsController<Bookmark>?,
-        sourceIndexPath: IndexPath,
-        destinationIndexPath: IndexPath) {
+    public class func reorderBookmarks(frc: NSFetchedResultsController<Bookmark>?, sourceIndexPath: IndexPath,
+                                       destinationIndexPath: IndexPath) {
         guard let frc = frc else { return }
         
         let dest = frc.object(at: destinationIndexPath)
         let src = frc.object(at: sourceIndexPath)
         
-        if dest === src {
-            return
-        }
+        if dest === src { return }
         
-        // Warning, this could be a bottleneck, grabs ALL the bookmarks in the current folder
-        // But realistically, with a batch size of 20, and most reads around 1ms, a bottleneck here is an edge case.
-        // Optionally: grab the parent folder, and the on a bg thread iterate the bms and update their order. Seems like overkill.
-        var bms = frc.fetchedObjects!
-        bms.remove(at: bms.index(of: src)!)
-        if sourceIndexPath.row > destinationIndexPath.row {
-            // insert before
-            bms.insert(src, at: bms.index(of: dest)!)
+        // Note: sync order is also used for ordering favorites and non synchronized bookmarks.
+        reorderWithSyncOrder(frc: frc, sourceBookmark: src, destinationBookmark: dest,
+                             sourceIndexPath: sourceIndexPath, destinationIndexPath: destinationIndexPath)
+        
+        // DataController.save(context: frc.managedObjectContext)
+        try! frc.managedObjectContext.save()
+        if !src.isFavorite { Sync.shared.sendSyncRecords(action: .update, records: [src]) }
+    }
+    
+    private class func reorderWithSyncOrder(frc: NSFetchedResultsController<Bookmark>,
+                                            sourceBookmark src: Bookmark,
+                                            destinationBookmark dest: Bookmark,
+                                            sourceIndexPath: IndexPath,
+                                            destinationIndexPath: IndexPath) {
+        
+        let isMovingUp = sourceIndexPath.row > destinationIndexPath.row
+        
+        // Depending on drag direction, all other bookmarks are pushed up or down.
+        if isMovingUp {
+            var prev: String?
+            
+            // Bookmark at the top has no previous bookmark.
+            if destinationIndexPath.row > 0 {
+                let index = IndexPath(row: destinationIndexPath.row - 1, section: destinationIndexPath.section)
+                prev = frc.object(at: index).syncOrder
+            }
+            
+            let next = dest.syncOrder
+            src.syncOrder = Sync.shared.getBookmarkOrder(previousOrder: prev, nextOrder: next)
         } else {
-            let end = bms.index(of: dest)! + 1
-            bms.insert(src, at: end)
+            let prev = dest.syncOrder
+            var next: String?
+            
+            // Bookmark at the bottom has no next bookmark.
+            if let objects = frc.fetchedObjects, destinationIndexPath.row + 1 < objects.count {
+                let index = IndexPath(row: destinationIndexPath.row + 1, section: destinationIndexPath.section)
+                next = frc.object(at: index).syncOrder
+            }
+            
+            src.syncOrder = Sync.shared.getBookmarkOrder(previousOrder: prev, nextOrder: next)
+        }
+    }
+    
+    private let syncOrderComparator: (Any, Any) -> ComparisonResult = { obj1, obj2 in
+        guard let s1 = obj1 as? String, let s2 = obj2 as? String else {
+            fatalError()
         }
         
-        for i in 0..<bms.count {
-            bms[i].order = Int16(i)
+        // Split is O(n)
+        var i1 = s1.split(separator: ".").compactMap { Int($0) }
+        var i2 = s2.split(separator: ".").compactMap { Int($0) }
+        
+        // Preventing going out of bounds.
+        let iterationCount = min(i1.count, i2.count)
+        
+        for i in 0..<iterationCount {
+            // We went through all numbers and everything is equal.
+            // Need to check if one of arrays has more numbers because 0.0.1.1 > 0.0.1
+            //
+            // Alternatively, we could append zeros to make int arrays between the two objects
+            // have same length. 0.0.1 vs 0.0.1.2 would convert to 0.0.1.0 vs 0.0.1.2
+            if i1[i] == i2[i] && (iterationCount - 1) == i {
+                if i1.count == i2.count { return .orderedSame }
+                if i1.count > i2.count { return .orderedDescending }
+                if i1.count < i2.count { return .orderedAscending }
+            }
+            
+            if i1[i] == i2[i] && iterationCount != i { // number equal, going through next one
+                continue
+            }
+            
+            if i1[i] > i2[i] { return .orderedDescending }
+            if i1[i] < i2[i] { return .orderedAscending }
+            
         }
         
-        DataController.save(context: frc.managedObjectContext)
+        return .orderedSame
+    }
+    
+    private func calculateOrder() -> Int16? {
+        let predicate = isFavorite ?
+            NSPredicate(format: "isFavorite == true") : Bookmark.allBookmarksOfAGivenLevelPredicate(parent: parentFolder)
+        
+        guard let context = managedObjectContext, let syncOrder = syncOrder else {
+            return nil
+        }
+        
+        context.refreshAllObjects()
+        
+        let orderSort = NSSortDescriptor(key: #keyPath(Bookmark.order), ascending: true)
+        
+        guard let allBookmarks = Bookmark.all(where: predicate, sortDescriptors: [orderSort], context: context),
+                  allBookmarks.count > 1 else {
+                return nil
+        }
+        
+        guard let lastOrder = allBookmarks.last?.order else { return nil }
+        
+        var syncOrders = allBookmarks.compactMap { $0.syncOrder }
+        
+        let isNewRecord = objectID.isTemporaryID
+//        if isNewRecord {
+//            syncOrders.append(syncOrder)
+//        }
+
+        let sortedSyncOrders = (syncOrders as NSArray).sortedArray(comparator: syncOrderComparator) as NSArray
+        let calculatedOrder = sortedSyncOrders.index(of: syncOrder)
+        
+        
+        
+        let result = calculatedOrder >= allBookmarks.count - 1 ? Int(lastOrder) + 1 : calculatedOrder
+        
+        return Int16(result)
     }
     
     /// Takes all Bookmarks and Favorites from 1.6 and sets correct order for them.

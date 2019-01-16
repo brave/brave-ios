@@ -441,6 +441,7 @@ class BookmarksViewController: SiteTableViewController {
         self.present(alert, animated: true, completion: nil)
       } else {
         item.remove()
+        try? item.managedObjectContext?.save()
       }
     })
     

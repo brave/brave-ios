@@ -78,9 +78,9 @@ class BookmarkTests: CoreDataTestCase {
         XCTAssertEqual(objects.count, bookmarksToAdd)
         
         // Testing if it sorts correctly
-        XCTAssertEqual(objects.first?.title, "10")
-        XCTAssertEqual(objects[5].title, "5")
-        XCTAssertEqual(objects.last?.title, "1")
+        XCTAssertEqual(objects.first?.title, "1")
+        XCTAssertEqual(objects[5].title, "6")
+        XCTAssertEqual(objects.last?.title, "10")
     }
     
     func testFrcWithParentFolder() {
@@ -285,7 +285,8 @@ class BookmarkTests: CoreDataTestCase {
         let destinationObject = result.dest
         
         XCTAssertEqual(sourceObject.order, 5)
-        XCTAssertEqual(destinationObject.order, 4)
+        XCTAssertEqual(destinationObject.order, 5)
+        XCTAssert(sourceObject.lastModified! > destinationObject.lastModified!)
     }
     
     func testBookmarkReorderDragUp() {
@@ -294,7 +295,8 @@ class BookmarkTests: CoreDataTestCase {
         let destinationObject = result.dest
         
         XCTAssertEqual(sourceObject.order, 1)
-        XCTAssertEqual(destinationObject.order, 2)
+        XCTAssertEqual(destinationObject.order, 1)
+        XCTAssert(sourceObject.lastModified! > destinationObject.lastModified!)
     }
     
     func testBookmarkReorderTopToBottom() {
@@ -303,7 +305,8 @@ class BookmarkTests: CoreDataTestCase {
         let destinationObject = result.dest
         
         XCTAssertEqual(sourceObject.order, 0)
-        XCTAssertEqual(destinationObject.order, 1)
+        XCTAssertEqual(destinationObject.order, 0)
+        XCTAssert(sourceObject.lastModified! > destinationObject.lastModified!)
     }
     
     func testBookmarkReorderBottomToTop() {
@@ -311,8 +314,8 @@ class BookmarkTests: CoreDataTestCase {
         let sourceObject = result.src
         let destinationObject = result.dest
         
-        XCTAssertEqual(sourceObject.order, 9)
-        XCTAssertEqual(destinationObject.order, 8)
+        XCTAssertEqual(sourceObject.order, 10)
+        XCTAssertEqual(destinationObject.order, 9)
     }
     
     func testBookmarksReorderSameIndexPaths() {
@@ -412,7 +415,6 @@ class BookmarkTests: CoreDataTestCase {
         XCTAssertEqual(object.title, newTitle)
         XCTAssertEqual(object.url, newUrl)
         
-        XCTAssertEqual(object.created, oldCreated)
         XCTAssertNotEqual(object.lastVisited, oldLastVisited)
     }
     
