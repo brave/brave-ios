@@ -79,12 +79,9 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         // See willSave() documentation for more info.
         if lastModified != now && changedValues()[#keyPath(Bookmark.lastModified)] == nil {
             lastModified = now
-            print("old order: \(order)")
             
             if let calculatedOrder = calculateOrder() {
                 order = calculatedOrder
-                print("calculated order: \(calculatedOrder)")
-                print("sync order: \(syncOrder)")
             }
         }
     }
@@ -401,8 +398,6 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
             return nil
         }
         
-        context.refreshAllObjects()
-        
         let orderSort = NSSortDescriptor(key: #keyPath(Bookmark.order), ascending: true)
         
         guard let allBookmarks = Bookmark.all(where: predicate, sortDescriptors: [orderSort], context: context),
@@ -412,17 +407,10 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         
         guard let lastOrder = allBookmarks.last?.order else { return nil }
         
-        var syncOrders = allBookmarks.compactMap { $0.syncOrder }
+        let syncOrders = allBookmarks.compactMap { $0.syncOrder }
         
-        let isNewRecord = objectID.isTemporaryID
-//        if isNewRecord {
-//            syncOrders.append(syncOrder)
-//        }
-
         let sortedSyncOrders = (syncOrders as NSArray).sortedArray(comparator: syncOrderComparator) as NSArray
         let calculatedOrder = sortedSyncOrders.index(of: syncOrder)
-        
-        
         
         let result = calculatedOrder >= allBookmarks.count - 1 ? Int(lastOrder) + 1 : calculatedOrder
         
