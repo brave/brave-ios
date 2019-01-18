@@ -133,8 +133,12 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
             }
         }
         
-        if newSyncOrder != nil {
+        // Checking if syncOrder has changed is imporant here for performance reasons.
+        // Currently to do bookmark sorting right, we have to grab all bookmarks in a given directory
+        // and update their order which is a costly operation.
+        if newSyncOrder != nil && syncOrder != newSyncOrder {
             syncOrder = newSyncOrder
+            Bookmark.setOrderForAllBookmarksOnGivenLevel(parent: parentFolder, forFavorites: isFavorite, context: context)
         }
         
         if save {
@@ -190,6 +194,7 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         bk.isFavorite = bookmark?.isFavorite ?? bk.isFavorite
         bk.isFolder = bookmark?.isFolder ?? bk.isFolder
         bk.syncUUID = root?.objectId ?? bk.syncUUID ?? SyncCrypto.uniqueSerialBytes(count: 16)
+        bk.syncOrder = root?.syncOrder
         bk.created = root?.syncNativeTimestamp ?? Date()
         
         if let location = site?.location, let url = URL(string: location) {
@@ -200,6 +205,13 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         if let newParent = bookmark?.parentFolderObjectId {
             bk.syncParentUUID = newParent
         }
+        
+        if bk.syncOrder == nil {
+            bk.newSyncOrder(forFavorites: bk.isFavorite, context: context)
+        }
+        
+        // This also sets up a parent folder
+        bk.syncParentUUID = bookmark?.parentFolderObjectId ?? bk.syncParentUUID
         
         // For folders that are saved _with_ a syncUUID, there may be child bookmarks
         //  (e.g. sync sent down bookmark before parent folder)
@@ -216,6 +228,8 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
                 }
             }
         }
+        
+        setOrderForAllBookmarksOnGivenLevel(parent: bk.parentFolder, forFavorites: bk.isFavorite, context: context)
         
         if save {
             DataController.save(context: context)
@@ -278,37 +292,67 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         return count > 0
     }
     
-    public class func reorderBookmarks(
-        frc: NSFetchedResultsController<Bookmark>?,
-        sourceIndexPath: IndexPath,
-        destinationIndexPath: IndexPath) {
+    public class func reorderBookmarks(frc: NSFetchedResultsController<Bookmark>?, sourceIndexPath: IndexPath,
+                                       destinationIndexPath: IndexPath) {
         guard let frc = frc else { return }
         
         let dest = frc.object(at: destinationIndexPath)
         let src = frc.object(at: sourceIndexPath)
         
-        if dest === src {
+        if dest === src { return }
+        
+        let context = DataController.newBackgroundContext()
+        // Note: sync order is also used for ordering favorites and non synchronized bookmarks.
+        reorderWithSyncOrder(frc: frc, sourceBookmark: src, destinationBookmark: dest,
+                             sourceIndexPath: sourceIndexPath, destinationIndexPath: destinationIndexPath, context: context)
+        
+        setOrderForAllBookmarksOnGivenLevel(parent: src.parentFolder, forFavorites: src.isFavorite, context: context)
+        
+        DataController.save(context: context)
+        // Updating sync orders is not supported on server side yet, see issue #772 for more details.
+        if !src.isFavorite { Sync.shared.sendSyncRecords(action: .update, records: [src]) }
+    }
+    
+    private class func reorderWithSyncOrder(frc: NSFetchedResultsController<Bookmark>,
+                                            sourceBookmark src: Bookmark,
+                                            destinationBookmark dest: Bookmark,
+                                            sourceIndexPath: IndexPath,
+                                            destinationIndexPath: IndexPath,
+                                            context: NSManagedObjectContext) {
+        
+        guard let srcBgContext = context.object(with: src.objectID) as? Bookmark,
+            let destBgContext = context.object(with: dest.objectID) as? Bookmark else {
             return
         }
         
-        // Warning, this could be a bottleneck, grabs ALL the bookmarks in the current folder
-        // But realistically, with a batch size of 20, and most reads around 1ms, a bottleneck here is an edge case.
-        // Optionally: grab the parent folder, and the on a bg thread iterate the bms and update their order. Seems like overkill.
-        var bms = frc.fetchedObjects!
-        bms.remove(at: bms.index(of: src)!)
-        if sourceIndexPath.row > destinationIndexPath.row {
-            // insert before
-            bms.insert(src, at: bms.index(of: dest)!)
+        let isMovingUp = sourceIndexPath.row > destinationIndexPath.row
+        
+        // Depending on drag direction, all other bookmarks are pushed up or down.
+        if isMovingUp {
+            var prev: String?
+            
+            // Bookmark at the top has no previous bookmark.
+            if destinationIndexPath.row > 0 {
+                let index = IndexPath(row: destinationIndexPath.row - 1, section: destinationIndexPath.section)
+                let objectAtIndexOnBgContext = context.object(with: frc.object(at: index).objectID) as? Bookmark
+                prev = objectAtIndexOnBgContext?.syncOrder
+            }
+            
+            let next = destBgContext.syncOrder
+            srcBgContext.syncOrder = Sync.shared.getBookmarkOrder(previousOrder: prev, nextOrder: next)
         } else {
-            let end = bms.index(of: dest)! + 1
-            bms.insert(src, at: end)
+            let prev = destBgContext.syncOrder
+            var next: String?
+            
+            // Bookmark at the bottom has no next bookmark.
+            if let objects = frc.fetchedObjects, destinationIndexPath.row + 1 < objects.count {
+                let index = IndexPath(row: destinationIndexPath.row + 1, section: destinationIndexPath.section)
+                let objectAtIndexOnBgContext = context.object(with: frc.object(at: index).objectID) as? Bookmark
+                next = objectAtIndexOnBgContext?.syncOrder
+            }
+            
+            srcBgContext.syncOrder = Sync.shared.getBookmarkOrder(previousOrder: prev, nextOrder: next)
         }
-        
-        for i in 0..<bms.count {
-            bms[i].order = Int16(i)
-        }
-        
-        DataController.save(context: frc.managedObjectContext)
     }
     
     /// Takes all Bookmarks and Favorites from 1.6 and sets correct order for them.
