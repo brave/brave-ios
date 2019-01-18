@@ -70,8 +70,8 @@ extension Domain {
         return domain.getBraveShield(shield)
     }
     
-    func setBraveShield(shield: BraveShield, isOn: Bool?,
-                        context: NSManagedObjectContext = DataController.newBackgroundContext()) {
+    private func setBraveShield(shield: BraveShield, isOn: Bool?,
+                                context: NSManagedObjectContext = DataController.newBackgroundContext()) {
         assert(!PrivateBrowsingManager.shared.isPrivateBrowsing,
                "Domain objects should not be modified while in private mode")
         
@@ -88,7 +88,7 @@ extension Domain {
     }
     
     /// Get whether or not a shield override is set for a given shield.
-    func getBraveShield(_ shield: BraveShield) -> Bool? {
+    private func getBraveShield(_ shield: BraveShield) -> Bool? {
         switch shield {
         case .AllOff:
             return self.shield_allOff?.boolValue
@@ -138,7 +138,7 @@ extension Domain {
     }
     
     /// Set the private shield based on `domainURL`
-    class func setPrivateShieldForDomainUrl(_ domainURL: String, shield: BraveShield, isOn: Bool?, context: NSManagedObjectContext) {
+    private class func setPrivateShieldForDomainUrl(_ domainURL: String, shield: BraveShield, isOn: Bool?, context: NSManagedObjectContext) {
         guard let url = URL(string: domainURL) else { return }
         // Remove private mode override if its set to the same value as the Domain's override
         let setting = (isOn == getBraveShield(forUrl: url, shield: shield, context: context) ? nil : isOn)
@@ -157,7 +157,7 @@ extension Domain {
     ///
     /// Assuming no private mode overrides are found, checks if the Domain object exists for this given URL
     /// If it does, use the Domain's shield value, otherwise defualt to the global preference
-    class func getPrivateShieldForDomainUrl(_ domainURL: String, shield: BraveShield, context: NSManagedObjectContext) -> Bool? {
+    private class func getPrivateShieldForDomainUrl(_ domainURL: String, shield: BraveShield, context: NSManagedObjectContext) -> Bool? {
         if let privateModeOverride = PrivateBrowsingShieldOverride.privateModeOverrides[domainURL]?[shield] {
             return privateModeOverride
         }
