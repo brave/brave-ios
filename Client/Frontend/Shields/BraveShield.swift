@@ -72,8 +72,10 @@ extension Domain {
     
     private func setBraveShield(shield: BraveShield, isOn: Bool?,
                                 context: NSManagedObjectContext = DataController.newBackgroundContext()) {
-        assert(!PrivateBrowsingManager.shared.isPrivateBrowsing,
-               "Domain objects should not be modified while in private mode")
+        if PrivateBrowsingManager.shared.isPrivateBrowsing {
+            assertionFailure("Domain objects should not be modified while in private mode")
+            return
+        }
         
         let setting = (isOn == shield.globalPreference ? nil : isOn) as NSNumber?
         switch shield {
