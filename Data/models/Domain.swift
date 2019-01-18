@@ -55,6 +55,11 @@ public final class Domain: NSManagedObject, CRUD {
         // Return the flipped scheme version of `url`
         return Domain.getOrCreateForUrl(url, context: context)
     }
+    
+    public class func getForUrl(_ url: URL, context: NSManagedObjectContext) -> Domain? {
+        let domainString = url.domainURL.absoluteString
+        return Domain.first(where: NSPredicate(format: "url == %@", domainString), context: context)
+    }
 
     public class func getOrCreateForUrl(_ url: URL, context: NSManagedObjectContext, save: Bool = true) -> Domain {
         let domainString = url.domainURL.absoluteString
