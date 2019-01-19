@@ -2179,37 +2179,45 @@ extension BrowserViewController: WKUIDelegate {
     }
 
     func webView(_ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping () -> Void) {
-        let messageAlert = MessageAlert(message: message, frame: frame, completionHandler: completionHandler)
-        if shouldDisplayJSAlertForWebView(webView) {
-            present(messageAlert.alertController(), animated: true, completion: nil)
-        } else if let promptingTab = tabManager[webView] {
-            promptingTab.queueJavascriptAlertPrompt(messageAlert)
-        } else {
-            // This should never happen since an alert needs to come from a web view but just in case call the handler
-            // since not calling it will result in a runtime exception.
+        var messageAlert = MessageAlert(message: message, frame: frame, completionHandler: completionHandler, suppressHandler: nil)
+        handleAlert(webView: webView, alert: &messageAlert) { (val) in
             completionHandler()
         }
     }
 
     func webView(_ webView: WKWebView, runJavaScriptConfirmPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping (Bool) -> Void) {
-        let confirmAlert = ConfirmPanelAlert(message: message, frame: frame, completionHandler: completionHandler)
-        if shouldDisplayJSAlertForWebView(webView) {
-            present(confirmAlert.alertController(), animated: true, completion: nil)
-        } else if let promptingTab = tabManager[webView] {
-            promptingTab.queueJavascriptAlertPrompt(confirmAlert)
-        } else {
-            completionHandler(false)
+        var confirmAlert = ConfirmPanelAlert(message: message, frame: frame, completionHandler: completionHandler)
+        handleAlert(webView: webView, alert: &confirmAlert) { (val) in
+            completionHandler(val as? Bool ?? false)
         }
     }
 
     func webView(_ webView: WKWebView, runJavaScriptTextInputPanelWithPrompt prompt: String, defaultText: String?, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping (String?) -> Void) {
-        let textInputAlert = TextInputAlert(message: prompt, frame: frame, completionHandler: completionHandler, defaultText: defaultText)
-        if shouldDisplayJSAlertForWebView(webView) {
-            present(textInputAlert.alertController(), animated: true, completion: nil)
-        } else if let promptingTab = tabManager[webView] {
-            promptingTab.queueJavascriptAlertPrompt(textInputAlert)
-        } else {
+        var textInputAlert = TextInputAlert(message: prompt, frame: frame, completionHandler: completionHandler, defaultText: defaultText)
+        handleAlert(webView: webView, alert: &textInputAlert) { (val) in
+            completionHandler(val as? String)
+        }
+    }
+    
+    func handleAlert<T: JSAlertInfo>(webView: WKWebView, alert: inout T, completionHandler: @escaping (Any?) -> Void) {
+        guard let promptingTab = tabManager[webView], !promptingTab.blockAllAlerts else {
+            tabManager[webView]?.cancelQueuedAlerts()
             completionHandler(nil)
+            return
+        }
+        promptingTab.alertShownCount += 1
+        alert.suppressHandler = promptingTab.alertShownCount > 1 ? ({ suppress in
+            // Show confirm alert here.
+            promptingTab.blockAllAlerts = suppress
+            suppress ? self.tabManager[webView]?.cancelQueuedAlerts() : nil
+            completionHandler(nil)
+        }) : nil
+        if shouldDisplayJSAlertForWebView(webView) {
+            let controller = alert.alertController()
+            controller.delegate = self
+            present(controller, animated: true, completion: nil)
+        } else {
+            promptingTab.queueJavascriptAlertPrompt(alert)
         }
     }
 

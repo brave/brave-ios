@@ -33,14 +33,17 @@ class JSPromptAlertController: UIAlertController {
  *  of the provided completionHandler to let us generate the UIAlertController when needed.
  */
 protocol JSAlertInfo {
+    typealias SuppressHandler = ((Bool) -> Void)?
     func alertController() -> JSPromptAlertController
     func cancel()
+    var suppressHandler: SuppressHandler {get set}
 }
 
 struct MessageAlert: JSAlertInfo {
     let message: String
     let frame: WKFrameInfo
     let completionHandler: () -> Void
+    var suppressHandler: SuppressHandler
 
     func alertController() -> JSPromptAlertController {
         let alertController = JSPromptAlertController(title: titleForJavaScriptPanelInitiatedByFrame(frame),
@@ -49,6 +52,11 @@ struct MessageAlert: JSAlertInfo {
         alertController.addAction(UIAlertAction(title: Strings.OKString, style: .default) { _ in
             self.completionHandler()
         })
+        if suppressHandler != nil {
+            alertController.addAction(UIAlertAction(title: "Suppress Alerts", style: .default) { _ in
+                self.suppressHandler?(true)
+            })
+        }
         alertController.alertInfo = self
         return alertController
     }
@@ -62,6 +70,7 @@ struct ConfirmPanelAlert: JSAlertInfo {
     let message: String
     let frame: WKFrameInfo
     let completionHandler: (Bool) -> Void
+    var suppressHandler: SuppressHandler
 
     init(message: String, frame: WKFrameInfo, completionHandler: @escaping (Bool) -> Void) {
         self.message = message
@@ -75,6 +84,11 @@ struct ConfirmPanelAlert: JSAlertInfo {
         alertController.addAction(UIAlertAction(title: Strings.OKString, style: .default) { _ in
             self.completionHandler(true)
         })
+        if suppressHandler != nil {
+            alertController.addAction(UIAlertAction(title: "Suppress Alerts", style: .default) { _ in
+                self.suppressHandler?(true)
+            })
+        }
         alertController.addAction(UIAlertAction(title: Strings.CancelButtonTitle, style: .cancel) { _ in
             self.cancel()
         })
@@ -92,6 +106,7 @@ struct TextInputAlert: JSAlertInfo {
     let frame: WKFrameInfo
     let completionHandler: (String?) -> Void
     let defaultText: String?
+    var suppressHandler: SuppressHandler
 
     var input: UITextField!
 
@@ -112,6 +127,11 @@ struct TextInputAlert: JSAlertInfo {
         alertController.addAction(UIAlertAction(title: Strings.OKString, style: .default) { _ in
             self.completionHandler(input.text)
         })
+        if suppressHandler != nil {
+            alertController.addAction(UIAlertAction(title: "Suppress Alerts", style: .default) { _ in
+                self.suppressHandler?(true)
+            })
+        }
         alertController.addAction(UIAlertAction(title: Strings.CancelButtonTitle, style: .cancel) { _ in
             self.cancel()
         })
