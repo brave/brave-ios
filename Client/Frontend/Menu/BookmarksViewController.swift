@@ -624,7 +624,7 @@ extension BookmarksViewController {
   }
   
   private func actionsForFolder(_ folder: Bookmark) -> [UIAlertAction] {
-    let children = Bookmark.getChildren(forFolderUUID: folder.syncUUID, ignoreFolders: true) ?? []
+    let children = Bookmark.getNonFolderChildren(forFolderUUID: folder.syncUUID) ?? []
     
     let urls: [URL] = children.compactMap { b in
       guard let url = b.url else { return nil }
