@@ -67,7 +67,6 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
     
     override public func awakeFromInsert() {
         super.awakeFromInsert()
-        created = Date()
         lastVisited = created
     }
     
@@ -100,6 +99,7 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         update(customTitle: site.customTitle, url: site.location, newSyncOrder: bookmark.syncOrder)
         lastVisited = Date(timeIntervalSince1970: (Double(site.lastAccessedTime ?? 0) / 1000.0))
         syncParentUUID = bookmark.parentFolderObjectId
+        created = record?.syncNativeTimestamp
         // No auto-save, must be handled by caller if desired
     }
     
@@ -196,6 +196,7 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         bk.isFavorite = bookmark?.isFavorite ?? bk.isFavorite
         bk.isFolder = bookmark?.isFolder ?? bk.isFolder
         bk.syncUUID = root?.objectId ?? bk.syncUUID ?? SyncCrypto.uniqueSerialBytes(count: 16)
+        bk.created = root?.syncNativeTimestamp ?? Date()
         
         if let location = site?.location, let url = URL(string: location) {
             bk.domain = Domain.getOrCreateForUrl(url, context: context, save: false)
@@ -360,6 +361,40 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         
         return self.add(rootObject: bookmark, save: true)
     }
+    
+    public func remove(sendToSync: Bool = true) {
+        if isFavorite { delete() }
+        
+        // Before we delete a folder and its children, we need to grab all children bookmarks
+        // and send them to sync with `delete` action.
+        if isFolder && sendToSync {
+            removeFolderAndSendSyncRecords(uuid: syncUUID)
+            return
+        }
+        
+        if sendToSync {
+            Sync.shared.sendSyncRecords(action: .delete, records: [self])
+        }
+        
+        delete()
+    }
+    
+    private func removeFolderAndSendSyncRecords(uuid: [Int]?) {
+        if !isFolder { return }
+        
+        var allBookmarks = [Bookmark]()
+        allBookmarks.append(self)
+        
+        if let allNestedBookmarks = Bookmark.getRecursiveChildren(forFolderUUID: syncUUID) {
+            log.warning("All nested bookmarks of :\(String(describing: title)) folder is nil")
+            
+            allBookmarks.append(contentsOf: allNestedBookmarks)
+        }
+        
+        Sync.shared.sendSyncRecords(action: .delete, records: allBookmarks)
+        
+        delete()
+    }
 }
 
 // TODO: Document well
@@ -423,6 +458,34 @@ extension Bookmark {
         
         let record = first(where: predicate, context: context)
         record?.delete()
+    }
+    
+    /// Gets all nested bookmarks recursively.
+    public static func getRecursiveChildren(forFolderUUID syncUUID: [Int]?,
+                                            context: NSManagedObjectContext = DataController.viewContext) -> [Bookmark]? {
+        guard let searchableUUID = SyncHelpers.syncDisplay(fromUUID: syncUUID) else {
+            return nil
+        }
+        
+        let syncParentDisplayUUIDKeyPath = #keyPath(Bookmark.syncParentDisplayUUID)
+        
+        let predicate = NSPredicate(format: "\(syncParentDisplayUUIDKeyPath) == %@", searchableUUID)
+        
+        var allBookmarks = [Bookmark]()
+        
+        let result = all(where: predicate, context: context)
+        
+        result?.forEach {
+            allBookmarks.append($0)
+            
+            if $0.isFolder {
+                if let nestedBookmarks = getRecursiveChildren(forFolderUUID: $0.syncUUID) {
+                    allBookmarks.append(contentsOf: nestedBookmarks)
+                }
+            }
+        }
+        
+        return allBookmarks
     }
     
     public class func frecencyQuery(context: NSManagedObjectContext, containing: String?) -> [Bookmark] {

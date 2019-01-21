@@ -96,6 +96,10 @@ public class Sync: JSInjector {
     
     fileprivate var fetchTimer: Timer?
     
+    /// If sync initialization fails, we should inform user and remove all partial sync setup that happened.
+    /// Please note that sync initialization also happens on app launch, not only on first connection to Sync.
+    public var syncSetupFailureCallback: (() -> Void)?
+    
     var baseSyncOrder: String? {
         get {
             return UserDefaults.standard.string(forKey: prefBaseOrder)
@@ -113,7 +117,7 @@ public class Sync: JSInjector {
     fileprivate let prefFetchTimestamp = "sync-fetch-timestamp"
     fileprivate let prefBaseOrder = "sync-base-order"
     
-    fileprivate lazy var isDebug: Bool = { return !AppConstants.BuildChannel.isRelease }()
+    fileprivate lazy var isDebug: Bool = { return AppConstants.BuildChannel == .developer }()
     
     fileprivate lazy var serverUrl: String = {
         return isDebug ? "https://sync-staging.brave.com" : "https://sync.brave.com"
@@ -459,12 +463,20 @@ extension Sync {
         guard var fetchedRecords = recordType.fetchedModelType?.syncRecords(recordJSON) else { return }
         
         // Currently only prefs are device related
-        if recordType == .prefs, let data = fetchedRecords as? [SyncDevice] {
+        if recordType == .prefs {
             // Devices have really bad data filtering, so need to manually process more of it
             // Sort to not rely on API - Reverse sort, so unique pulls the `latest` not just the `first`
-            fetchedRecords = data.sorted { device1, device2 in
+            fetchedRecords = fetchedRecords.sorted { device1, device2 in
                 device1.syncTimestamp ?? -1 > device2.syncTimestamp ?? -1 }.unique { $0.objectId ?? [] == $1.objectId ?? [] }
             
+        } else if recordType == .bookmark {
+            // Bookmarks are sorted to have the oldest bookmark to come in first, so it can be added before it's children.
+            fetchedRecords = fetchedRecords.sorted(by: {
+                let firstTimestamp = $0.syncTimestamp ?? 0
+                let secondTimestamp = $1.syncTimestamp ?? 0
+                
+                return firstTimestamp < secondTimestamp
+            })
         }
         
         let context = DataController.newBackgroundContext()
@@ -478,7 +490,7 @@ extension Sync {
             
             var action = SyncActions(rawValue: fetchedRoot.action ?? -1)
             if action == SyncActions.delete {
-                clientRecord?.remove(save: false)
+                clientRecord?.remove(sendToSync: false)
             } else if action == SyncActions.create {
                 
                 if clientRecord != nil {
@@ -551,18 +563,22 @@ extension Sync {
         guard let fetchedRecords = recordType.fetchedModelType?.syncRecords(recordJSON) else { return }
         
         let ids = fetchedRecords.map { $0.objectId }.compactMap { $0 }
-        let localbookmarks = recordType.coredataModelType?.get(syncUUIDs: ids, context: DataController.newBackgroundContext()) as? [Bookmark]
+        let context = DataController.newBackgroundContext()
+        
+        var localbookmarks: [Bookmark]?
+        
+        context.performAndWait {
+            localbookmarks = recordType.coredataModelType?.get(syncUUIDs: ids, context: context) as? [Bookmark]
+        }
         
         var matchedBookmarks = [[Any]]()
+        let deviceId = Device.currentDevice()?.deviceId
+        
         for fetchedBM in fetchedRecords {
-            
-            // TODO: Replace with find(where:) in Swift3
             var localBM: Any = "null"
-            for l in localbookmarks ?? [] {
-                if let localId = l.syncUUID, let fetchedId = fetchedBM.objectId, localId == fetchedId {
-                    localBM = l.asDictionary(deviceId: Device.currentDevice()?.deviceId, action: fetchedBM.action)
-                    break
-                }
+            
+            if let found = localbookmarks?.find({ $0.syncUUID != nil && $0.syncUUID == fetchedBM.objectId }) {
+                localBM = found.asDictionary(deviceId: deviceId, action: fetchedBM.action)
             }
             
             matchedBookmarks.append([fetchedBM.dictionaryRepresentation(), localBM])
@@ -572,7 +588,7 @@ extension Sync {
         
         // TODO: Check if parsing not required
         guard let serializedData = JSONSerialization.jsObject(withNative: matchedBookmarks as AnyObject, escaped: false) else {
-            // Huge error
+            log.error("Critical error: could not serialize data for resolve-sync-records")
             return
         }
         
@@ -616,6 +632,10 @@ extension Sync {
             print("Device Id expected!")
         }
         
+    }
+    
+    func syncSetupError() {
+        syncSetupFailureCallback?()
     }
     
     func getBookmarkOrder(previousOrder: String?, nextOrder: String?) -> String? {
@@ -680,6 +700,8 @@ extension Sync: WKScriptMessageHandler {
             self.isSyncFullyInitialized.deleteSiteSettingsReady = true
         case "delete-sync-category":
             self.isSyncFullyInitialized.deleteCategoryReady = true
+        case "sync-setup-error":
+            self.syncSetupError()
         default:
             print("\(messageName) not handled yet")
         }
