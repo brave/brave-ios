@@ -53,7 +53,7 @@ struct MessageAlert: JSAlertInfo {
             self.completionHandler()
         })
         if suppressHandler != nil {
-            alertController.addAction(UIAlertAction(title: "Suppress Alerts", style: .default) { _ in
+            alertController.addAction(UIAlertAction(title: Strings.SuppressAlertsActionTitle, style: .default) { _ in
                 self.suppressHandler?(true)
             })
         }

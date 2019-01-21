@@ -2206,11 +2206,25 @@ extension BrowserViewController: WKUIDelegate {
             return
         }
         promptingTab.alertShownCount += 1
-        alert.suppressHandler = promptingTab.alertShownCount > 1 ? ({ suppress in
-            // Show confirm alert here.
-            promptingTab.blockAllAlerts = suppress
-            suppress ? self.tabManager[webView]?.cancelQueuedAlerts() : nil
-            completionHandler(nil)
+        alert.suppressHandler = promptingTab.alertShownCount > 1 ? ({[unowned self] suppress in
+            if suppress {
+                func suppressDialogues() {
+                    promptingTab.blockAllAlerts = true
+                    self.tabManager[webView]?.cancelQueuedAlerts()
+                    completionHandler(nil)
+                }
+                // Show confirm alert here.
+                let suppressSheet = UIAlertController(title: nil, message: Strings.SuppressAlertsActionMessage, preferredStyle: .actionSheet)
+                suppressSheet.addAction(UIAlertAction(title: Strings.SuppressAlertsActionTitle, style: .destructive, handler: { (action) in
+                    suppressDialogues()
+                }))
+                suppressSheet.addAction(UIAlertAction(title: Strings.CancelButtonTitle, style: .cancel, handler: { (action) in
+                    completionHandler(nil)
+                }))
+                self.present(suppressSheet, animated: true, completion: nil)
+            } else {
+                completionHandler(nil)
+            }
         }) : nil
         if shouldDisplayJSAlertForWebView(webView) {
             let controller = alert.alertController()
