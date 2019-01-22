@@ -71,12 +71,7 @@ class TabManager: NSObject {
 
     // A WKWebViewConfiguration used for normal tabs
     lazy fileprivate var configuration: WKWebViewConfiguration = {
-        return TabManager.getNewConfiguration(isPrivate: false)
-    }()
-
-    // A WKWebViewConfiguration used for private mode tabs
-    lazy fileprivate var privateConfiguration: WKWebViewConfiguration = {
-        return TabManager.getNewConfiguration(isPrivate: true)
+        return TabManager.getNewConfiguration()
     }()
 
     fileprivate let imageStore: DiskImageStore?
@@ -161,7 +156,7 @@ class TabManager: NSObject {
         return allTabs.filter { $0.type == type }
     }
     
-    private class func getNewConfiguration(isPrivate: Bool) -> WKWebViewConfiguration {
+    private class func getNewConfiguration() -> WKWebViewConfiguration {
         let configuration = WKWebViewConfiguration()
         configuration.processPool = WKProcessPool()
         configuration.preferences.javaScriptCanOpenWindowsAutomatically = !Preferences.General.blockPopups.value
@@ -169,14 +164,13 @@ class TabManager: NSObject {
     }
     
     private func resetConfiguration() {
-        configuration = TabManager.getNewConfiguration(isPrivate: false)
-        privateConfiguration = TabManager.getNewConfiguration(isPrivate: true)
+        configuration = TabManager.getNewConfiguration()
     }
     
     func reset() {
         resetConfiguration()
         allTabs.filter({$0.webView != nil}).forEach({
-            $0.resetWebView(config: $0.isPrivate ? privateConfiguration : configuration)
+            $0.resetWebView(config: configuration)
         })
         selectTab(selectedTab, ignorePrevious: true)
         if let url = selectedTab?.url {

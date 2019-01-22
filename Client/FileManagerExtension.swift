@@ -10,8 +10,6 @@ private let log = Logger.browserLogger
 public extension FileManager {
     public enum Folder: String {
         case cookie = "/Cookies"
-        case webkit = "/WebKit"
-        case cache = "/Caches"
         case webSiteData = "/WebKit/WebsiteData"
     }
     typealias FolderLockObj = (folder: Folder, lock: Bool)
