@@ -667,8 +667,8 @@ class BrowserViewController: UIViewController {
             webViewContainerTopOffset = make.top.equalTo(readerModeBar?.snp.bottom ?? self.header.snp.bottom).constraint
 
             let findInPageHeight = (findInPageBar == nil) ? 0 : UIConstants.ToolbarHeight
-            if let toolbar = self.toolbar {
-                make.bottom.equalTo(toolbar.snp.top).offset(-findInPageHeight)
+            if let footerView = self.footer {
+                make.bottom.equalTo(footerView.snp.top).offset(-findInPageHeight)
             } else {
                 make.bottom.equalTo(self.view).offset(-findInPageHeight)
             }
@@ -694,7 +694,7 @@ class BrowserViewController: UIViewController {
             
             make.left.right.equalTo(self.view)
             if self.homePanelIsInline {
-                make.bottom.equalTo(self.toolbar?.snp.top ?? self.view.snp.bottom)
+                make.bottom.equalTo(self.footer?.snp.top ?? self.view.snp.bottom)
             } else {
                 make.bottom.equalTo(self.view.snp.bottom)
             }
@@ -705,8 +705,8 @@ class BrowserViewController: UIViewController {
             make.width.equalTo(self.view.snp.width)
             if let keyboardHeight = keyboardState?.intersectionHeightForView(self.view), keyboardHeight > 0 {
                 make.bottom.equalTo(self.view).offset(-keyboardHeight)
-            } else if let toolbar = self.toolbar {
-                make.bottom.equalTo(toolbar.snp.top)
+            } else if let footer = self.footer {
+                make.bottom.equalTo(footer.snp.top)
             } else {
                 make.bottom.equalTo(self.view)
             }
@@ -1279,7 +1279,8 @@ class BrowserViewController: UIViewController {
             self.browserLockPopup = nil
             return .flyDown
         }
-        popup.addDefaultButton(title: Strings.Browser_lock_callout_enable) { [weak self] () -> PopupViewDismissType in
+        
+        popup.addButton(title: Strings.Browser_lock_callout_enable, type: .primary) { [weak self] () -> PopupViewDismissType in
             Preferences.Popups.browserLock.value = true
             self?.browserLockPopup = nil
             
@@ -1323,7 +1324,7 @@ class BrowserViewController: UIViewController {
             self.duckDuckGoPopup = nil
             return .flyDown
         }
-        popup.addDefaultButton(title: Strings.DDG_callout_enable) { [weak self] in
+        popup.addButton(title: Strings.DDG_callout_enable, type: .primary) { [weak self] in
             self?.duckDuckGoPopup = nil
             
             if self?.profile == nil {
@@ -1371,7 +1372,15 @@ extension BrowserViewController: SettingsDelegate {
     }
     
     func settingsDidFinish(_ settingsViewController: SettingsViewController) {
-        settingsViewController.dismiss(animated: true)
+        settingsViewController.dismiss(animated: true, completion: {
+            // iPad doesn't receive a viewDidAppear because it displays settings as a floating modal window instead
+            // of a fullscreen overlay.
+            if UIDevice.isIpad && PrivateBrowsingManager.shared.isPrivateBrowsing {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    self.presentDuckDuckGoCallout()
+                }
+            }
+        })
     }
 }
 
