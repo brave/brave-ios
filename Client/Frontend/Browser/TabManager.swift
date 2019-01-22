@@ -321,7 +321,7 @@ class TabManager: NSObject {
         assert(Thread.isMainThread)
 
         // Take the given configuration. Or if it was nil, take our default configuration for the current browsing mode.
-        let configuration: WKWebViewConfiguration = configuration ?? (isPrivate ? privateConfiguration : self.configuration)
+        let configuration: WKWebViewConfiguration = configuration ?? self.configuration
 
         let type: TabType = isPrivate ? .private : .regular
         let tab = Tab(configuration: configuration, type: type)
@@ -1054,7 +1054,6 @@ extension TabManager: PreferencesObserver {
             }
             // The default tab configurations also need to change.
             configuration.preferences.javaScriptCanOpenWindowsAutomatically = allowPopups
-            privateConfiguration.preferences.javaScriptCanOpenWindowsAutomatically = allowPopups
         default:
             break
         }
