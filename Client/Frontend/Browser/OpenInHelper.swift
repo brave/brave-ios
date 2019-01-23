@@ -21,8 +21,13 @@ struct MIMEType {
     static let PlainText = "text/plain"
     static let PNG = "image/png"
     static let WebP = "image/webp"
+    static let xHTML = "application/xhtml+xml"
+    
+    static func kindOfHTML(_ mime: String?) -> Bool {
+        return [MIMEType.HTML, MIMEType.xHTML].contains(mime ?? "")
+    }
 
-    private static let webViewViewableTypes: [String] = [MIMEType.Bitmap, MIMEType.GIF, MIMEType.JPEG, MIMEType.HTML, MIMEType.PDF, MIMEType.PlainText, MIMEType.PNG, MIMEType.WebP]
+    private static let webViewViewableTypes: [String] = [MIMEType.Bitmap, MIMEType.GIF, MIMEType.JPEG, MIMEType.HTML, MIMEType.PDF, MIMEType.PlainText, MIMEType.PNG, MIMEType.WebP, MIMEType.xHTML]
 
     static func canShowInWebView(_ mimeType: String) -> Bool {
         return webViewViewableTypes.contains(mimeType.lowercased())
