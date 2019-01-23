@@ -24,7 +24,6 @@ extension TabBarVisibility: RepresentableOptionType {
 
 /// The same style switch accessory view as in Static framework, except will not be recreated each time the Cell
 /// is configured, since it will be stored as is in `Row.Accessory.view`
-
 private class SwitchAccessoryView: UISwitch {
     typealias ValueChange = (Bool) -> Void
     
