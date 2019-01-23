@@ -26,7 +26,7 @@ extension TabBarVisibility: RepresentableOptionType {
 /// is configured, since it will be stored as is in `Row.Accessory.view`
 
 private class SwitchAccessoryView: UISwitch {
-    fileprivate typealias ValueChange = (Bool) -> Void
+    typealias ValueChange = (Bool) -> Void
     
     init(initialValue: Bool, valueChange: (ValueChange)? = nil) {
         self.valueChange = valueChange

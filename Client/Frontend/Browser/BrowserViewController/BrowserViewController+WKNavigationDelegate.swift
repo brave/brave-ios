@@ -202,7 +202,7 @@ extension BrowserViewController: WKNavigationDelegate {
                 tab.userScriptManager?.isCookieBlockingEnabled = Preferences.Privacy.blockAllCookies.value
             }
             
-            if let rule = BlocklistName.blockCookie.rule {
+            if let rule = BlocklistName.cookie.rule {
                 if Preferences.Privacy.blockAllCookies.value {
                     webView.configuration.userContentController.add(rule)
                 } else {

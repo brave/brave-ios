@@ -1,3 +1,7 @@
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
 // The $<> is used to replace the var name at runtime with a random string.
 
 //Cookie should neither be saved nor accessed (local or session) when user has blocked all cookies.
