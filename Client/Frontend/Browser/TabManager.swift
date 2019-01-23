@@ -172,7 +172,9 @@ class TabManager: NSObject {
         allTabs.filter({$0.webView != nil}).forEach({
             $0.resetWebView(config: configuration)
         })
-        selectTab(selectedTab, ignorePrevious: true)
+        let tab = selectedTab
+        _selectedIndex = -1
+        selectTab(tab)
         if let url = selectedTab?.url {
             selectedTab?.loadRequest(PrivilegedRequest(url: url) as URLRequest)
         }
@@ -197,11 +199,11 @@ class TabManager: NSObject {
         return nil
     }
 
-    func selectTab(_ tab: Tab?, previous: Tab? = nil, ignorePrevious: Bool = false) {
+    func selectTab(_ tab: Tab?, previous: Tab? = nil) {
         assert(Thread.isMainThread)
         let previous = previous ?? selectedTab
 
-        if !ignorePrevious && previous === tab {
+        if previous === tab {
             return
         }
         // Convert the global mode to private if opening private tab from normal tab/ history/bookmark.
