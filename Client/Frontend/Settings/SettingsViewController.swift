@@ -24,8 +24,9 @@ extension TabBarVisibility: RepresentableOptionType {
 
 /// The same style switch accessory view as in Static framework, except will not be recreated each time the Cell
 /// is configured, since it will be stored as is in `Row.Accessory.view`
-fileprivate typealias ValueChange = (Bool) -> Void
+
 private class SwitchAccessoryView: UISwitch {
+    fileprivate typealias ValueChange = (Bool) -> Void
     
     init(initialValue: Bool, valueChange: (ValueChange)? = nil) {
         self.valueChange = valueChange
@@ -46,7 +47,7 @@ private class SwitchAccessoryView: UISwitch {
 }
 
 /// Just creates a switch toggle `Row` which updates a `Preferences.Option<Bool>`
-private func BoolRow(title: String, option: Preferences.Option<Bool>, onValueChange: ValueChange? = nil) -> Row {
+private func BoolRow(title: String, option: Preferences.Option<Bool>, onValueChange: SwitchAccessoryView.ValueChange? = nil) -> Row {
     return Row(
         text: title,
         accessory: .view(SwitchAccessoryView(initialValue: option.value, valueChange: onValueChange ?? { option.value = $0 })),
