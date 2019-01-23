@@ -679,6 +679,9 @@ class BrowserViewController: UIViewController {
         footer.snp.remakeConstraints { make in
             scrollController.footerBottomConstraint = make.bottom.equalTo(self.view.snp.bottom).constraint
             make.leading.trailing.equalTo(self.view)
+            if self.toolbar == nil {
+                make.height.equalTo(0.0)
+            }
         }
 
         urlBar.setNeedsUpdateConstraints()
