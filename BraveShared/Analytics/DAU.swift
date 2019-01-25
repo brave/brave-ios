@@ -1,3 +1,5 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 import Foundation
 import Shared
 import XCGLogger
@@ -5,7 +7,7 @@ import XCGLogger
 private let log = Logger.browserLogger
 
 public class DAU {
-    
+
     /// Default installation date for legacy woi version.
     public static let defaultWoiDate = "2016-01-04"
     
@@ -28,18 +30,17 @@ public class DAU {
     }
     
     // Keeping the task object global to keep record of request state and block duplicate requests.
-    private var task: URLSessionDataTask? = nil
+    private var task: URLSessionDataTask?
     /// Sends ping to server and returns a boolean whether a timer for the server call was scheduled.
     /// A user needs to be active for a certain amount of time before we ping the server.
-    @discardableResult public func sendPingToServer() -> Bool {
+    public func sendPingToServer() {
         if AppConstants.BuildChannel == .developer {
             log.info("Development build detected, no server ping.")
-            return false
+            return
         }
         
         // Sending ping immediately
         sendPingToServerInternal()
-        return true
     }
     
     @objc public func sendPingToServerInternal() {
@@ -49,7 +50,7 @@ public class DAU {
             log.debug("dau task in progress, cannot create new task.")
         }
         
-        guard  let paramsAndPrefs = paramsAndPrefsSetup() else {
+        guard let paramsAndPrefs = paramsAndPrefsSetup() else {
             log.debug("dau, no changes detected, no server ping")
             return
         }
@@ -135,7 +136,7 @@ public class DAU {
             // Must be after setting up the preferences
             weekOfInstallationParam()
         ]
-        
+
         if let referralCode = UserReferralProgram.getReferralCode() {
             params.append(URLQueryItem(name: "ref", value: referralCode))
             UrpLog.log("DAU ping with added ref, params: \(params)")
@@ -163,7 +164,7 @@ public class DAU {
         }
         return URLQueryItem(name: "version", value: version)
     }
-    
+
     /// All app versions for dau pings must be saved in x.x.x format where x are digits.
     static func shouldAppend0(toVersion version: String) -> Bool {
         let correctAppVersionPattern = "^\\d+.\\d+$"
@@ -231,7 +232,7 @@ public class DAU {
             log.error("Could not unwrap calendar components from date")
             return nil
         }
-        
+         
         let weeksMonday = Preferences.DAU.lastPingFirstMonday.value
         // There is no lastPingFirstMondayKey preference set at first launch, meaning the week param should be set to true.
         let isFirstLaunchWeeksMonday = weeksMonday == nil
