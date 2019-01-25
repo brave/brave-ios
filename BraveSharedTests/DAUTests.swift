@@ -12,7 +12,6 @@ class DAUTests: XCTestCase {
         super.setUp()
         
         Preferences.DAU.weekOfInstallation.reset()
-        Preferences.DAU.lastPingFirstMonday.reset()
         Preferences.DAU.lastLaunchInfo.reset()
         Preferences.DAU.firstPingParam.reset()
     }
@@ -75,8 +74,6 @@ class DAUTests: XCTestCase {
         XCTAssertNil(dau.dauStatParams(nil, firstPing: false, channel: .beta))
         XCTAssertNil(dau.dauStatParams(nil, firstPing: false, channel: .release))
         XCTAssertNil(dau.dauStatParams([], firstPing: false, channel: .beta))
-        XCTAssertNil(dau.dauStatParams([1, 2], firstPing: false, channel: .beta))
-        XCTAssertNil(dau.dauStatParams([1, 2, 3, 4], firstPing: false, channel: .beta))
     }
     
     func testFirstLaunch() {
@@ -126,7 +123,6 @@ class DAUTests: XCTestCase {
         
         // These preferences should be set only after a successful ping.
         XCTAssertNil(Preferences.DAU.lastLaunchInfo.value)
-        XCTAssertNil(Preferences.DAU.lastPingFirstMonday.value)
         
         simulatePing(params: params)
         
@@ -275,7 +271,6 @@ class DAUTests: XCTestCase {
         Preferences.DAU.firstPingParam.value = firstPing
         
         Preferences.DAU.lastLaunchInfo.value = params!.lastLaunchInfoPreference
-        Preferences.DAU.lastPingFirstMonday.value = params!.lastPingFirstMondayPreference
     }
     
     private var appVersion: String {
