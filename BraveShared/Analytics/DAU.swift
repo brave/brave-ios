@@ -1,5 +1,3 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-
 import Foundation
 import Shared
 import XCGLogger
@@ -7,7 +5,7 @@ import XCGLogger
 private let log = Logger.browserLogger
 
 public class DAU {
-
+    
     /// Default installation date for legacy woi version.
     public static let defaultWoiDate = "2016-01-04"
     
@@ -20,7 +18,6 @@ public class DAU {
     /// We always use gregorian calendar for DAU pings. This also adds more anonymity to the server call.
     fileprivate static var calendar: NSCalendar { return Calendar(identifier: .gregorian) as NSCalendar }
     
-    private var launchTimer: Timer?
     private let today: Date
     private var todayComponents: DateComponents {
         return DAU.calendar.components([.day, .month, .year, .weekday], from: today)
@@ -30,6 +27,8 @@ public class DAU {
         today = date
     }
     
+    // Keeping the task object global to keep record of request state and block duplicate requests.
+    private var task: URLSessionDataTask? = nil
     /// Sends ping to server and returns a boolean whether a timer for the server call was scheduled.
     /// A user needs to be active for a certain amount of time before we ping the server.
     @discardableResult public func sendPingToServer() -> Bool {
@@ -40,23 +39,17 @@ public class DAU {
         
         // Sending ping immediately
         sendPingToServerInternal()
-        
-        // Setting up timer to try to send ping after certain amount of time.
-        // This helps in offline mode situations.
-        if launchTimer != nil { return false }
-        launchTimer =
-            Timer.scheduledTimer(
-                timeInterval: pingRefreshDuration,
-                target: self,
-                selector: #selector(sendPingToServerInternal),
-                userInfo: nil,
-                repeats: true)
-        
         return true
     }
     
     @objc public func sendPingToServerInternal() {
-        guard let paramsAndPrefs = paramsAndPrefsSetup() else {
+        // mayber add .suspended ?
+        // The logic to check duplicate erequests in paramsAndPrefsSetup() still needs an eye.
+        if task?.state == .running {
+            log.debug("dau task in progress, cannot create new task.")
+        }
+        
+        guard  let paramsAndPrefs = paramsAndPrefsSetup() else {
             log.debug("dau, no changes detected, no server ping")
             return
         }
@@ -72,9 +65,16 @@ public class DAU {
         
         log.debug("send ping to server, url: \(pingRequestUrl)")
         
-        let task = URLSession.shared.dataTask(with: pingRequestUrl) { _, _, error in
+        task = URLSession.shared.dataTask(with: pingRequestUrl) { _, _, error in
             if let e = error {
                 log.error("status update error: \(e)")
+                // scheduling task after duration to incorporate no network.
+                // One edge case here is that if the user crosses the midnight, his previous day DAU might be missed.
+                // Hence a better mechanism would be to record all DAU and sync them to server.
+                DispatchQueue.main.asyncAfter(deadline: .now() + self.pingRefreshDuration, execute: {
+                    self.task = nil
+                    self.sendPingToServerInternal()
+                })
                 return
             }
             
@@ -86,9 +86,18 @@ public class DAU {
             Preferences.DAU.lastLaunchInfo.value = paramsAndPrefs.lastLaunchInfoPreference
             
             Preferences.DAU.lastPingFirstMonday.value = paramsAndPrefs.lastPingFirstMondayPreference
+            
+            // Since once a call is made we need not make another until next day.
+            // Need minor calculation for the seconds to next day below
+            let secondsTillMidnight: Double = Date().secondsUntilTheNextDay
+            // Adding an extra 10 seconds to make sure the user has moved into next day to count as DAU.
+            DispatchQueue.main.asyncAfter(deadline: .now() + secondsTillMidnight + 10, execute: {
+                self.task = nil
+                self.sendPingToServerInternal()
+            })
         }
         
-        task.resume()
+        task?.resume()
     }
     
     /// A helper struct that stores all data from params setup.
@@ -126,7 +135,7 @@ public class DAU {
             // Must be after setting up the preferences
             weekOfInstallationParam()
         ]
-
+        
         if let referralCode = UserReferralProgram.getReferralCode() {
             params.append(URLQueryItem(name: "ref", value: referralCode))
             UrpLog.log("DAU ping with added ref, params: \(params)")
@@ -154,7 +163,7 @@ public class DAU {
         }
         return URLQueryItem(name: "version", value: version)
     }
-
+    
     /// All app versions for dau pings must be saved in x.x.x format where x are digits.
     static func shouldAppend0(toVersion version: String) -> Bool {
         let correctAppVersionPattern = "^\\d+.\\d+$"
@@ -222,7 +231,7 @@ public class DAU {
             log.error("Could not unwrap calendar components from date")
             return nil
         }
-         
+        
         let weeksMonday = Preferences.DAU.lastPingFirstMonday.value
         // There is no lastPingFirstMondayKey preference set at first launch, meaning the week param should be set to true.
         let isFirstLaunchWeeksMonday = weeksMonday == nil
@@ -279,5 +288,14 @@ extension DateComponents {
         }
         
         return "\(mYear)-\(mMonth)-\(mDay)"
+    }
+}
+
+extension Date {
+    var startOfNextDay: Date {
+        return Calendar.current.nextDate(after: self, matching: DateComponents(hour: 0, minute: 0), matchingPolicy: .nextTimePreservingSmallerComponents)!
+    }
+    var secondsUntilTheNextDay: TimeInterval {
+        return startOfNextDay.timeIntervalSince(self)
     }
 }
