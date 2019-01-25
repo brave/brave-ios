@@ -196,8 +196,10 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
             bk.domain = Domain.getOrCreateForUrl(url, context: context, save: false)
         }
         
-        // This also sets up a parent folder
-        bk.syncParentUUID = bookmark?.parentFolderObjectId ?? bk.syncParentUUID
+        // Update parent folder if one exists
+        if let newParent = bookmark?.parentFolderObjectId {
+            bk.syncParentUUID = newParent
+        }
         
         // For folders that are saved _with_ a syncUUID, there may be child bookmarks
         //  (e.g. sync sent down bookmark before parent folder)
@@ -205,8 +207,10 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
             // Find all children and attach them
             if let children = Bookmark.getNonFolderChildren(forFolderUUID: bk.syncUUID) {
                 
-                // TODO: Setup via bk.children property instead
-                children.forEach { $0.syncParentUUID = bk.syncParentUUID }
+                // Re-link all orphaned children
+                children.forEach {
+                    $0.syncParentUUID = bk.syncUUID
+                }
             }
         }
         

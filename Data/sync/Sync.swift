@@ -104,7 +104,7 @@ public class Sync: JSInjector {
     fileprivate lazy var isDebug: Bool = { return AppConstants.BuildChannel == .developer }()
     
     fileprivate lazy var serverUrl: String = {
-        return isDebug ? "https://sync-staging.brave.com" : "https://sync.brave.com"
+        return "https://sync.brave.com"
     }()
     
     fileprivate let apiVersion = 0
@@ -454,7 +454,7 @@ extension Sync {
                 let firstTimestamp = $0.syncTimestamp ?? 0
                 let secondTimestamp = $1.syncTimestamp ?? 0
                 
-                return firstTimestamp < secondTimestamp
+                return firstTimestamp > secondTimestamp
             })
         }
         
