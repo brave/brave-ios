@@ -121,7 +121,7 @@ public class DAU {
         
         // This could lead to an upgraded device having no `woi`, and that's fine
         if firstLaunch {
-            Preferences.DAU.weekOfInstallation.value = today.mondayOfCurrentWeekFormatted ?? DAU.defaultWoiDate
+            Preferences.DAU.weekOfInstallation.value = today?.mondayOfCurrentWeekFormatted ?? DAU.defaultWoiDate
         }
         
         guard let dauStatParams = dauStatParams(firstPing: firstLaunch) else {
@@ -245,16 +245,16 @@ public class DAU {
         
         let lastPingDate = Date(timeIntervalSince1970: TimeInterval(lastPingStat))
         
-        let pings = getPings(forDate: today, lastPingDate: lastPingDate)
-        
-        let daily = pings.contains(.daily)
-        let weekly = pings.contains(.weekly)
-        let monthly = pings.contains(.monthly)
+        let pings = getPings(forDate: today ?? Date(), lastPingDate: lastPingDate)
         
         // No changes, no ping
         if pings.isEmpty {
             return nil
         }
+        
+        let daily = pings.contains(.daily)
+        let weekly = pings.contains(.weekly)
+        let monthly = pings.contains(.monthly)
         
         return dauParams(daily, weekly, monthly)
     }
