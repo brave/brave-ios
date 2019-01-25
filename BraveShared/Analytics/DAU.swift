@@ -121,7 +121,7 @@ public class DAU {
         
         // This could lead to an upgraded device having no `woi`, and that's fine
         if firstLaunch {
-            Preferences.DAU.weekOfInstallation.value = todayComponents.weeksMonday
+            Preferences.DAU.weekOfInstallation.value = today.mondayOfCurrentWeekFormatted ?? DAU.defaultWoiDate
         }
         
         guard let dauStatParams = dauStatParams(firstPing: firstLaunch) else {
@@ -260,41 +260,35 @@ public class DAU {
     }
 }
 
-extension DateComponents {
-    /// Returns date of current week's monday in YYYY-MM-DD format
-    var weeksMonday: String {
-        var isSunday: Bool {
-            guard let weekday = weekday else {
-                log.error("Weekday is nil")
-                return false
-            }
-            return weekday == 1
+extension Date {
+    /// Returns date of current week's monday in YYYY-MM-DD formatted String
+    var mondayOfCurrentWeekFormatted: String? {
+        // We look for a previous monday because Sunday is considered a beggining of a new week using default gregorian calendar.
+        // For example if today is Sunday, the next Monday using Calendar would be the day after Sunday which is wrong.
+        // That's why backward search may sound counter intuitive.
+        guard let monday = self.next(.monday, direction: .backward, considerSelf: true) else { return nil }
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        
+        return dateFormatter.string(from: monday)
+    }
+    
+    private func next(_ weekday: Weekday, direction: Calendar.SearchDirection = .forward, considerSelf: Bool = false) -> Date? {
+        let calendar = DAU.calendar
+        let components = DateComponents(weekday: weekday.rawValue)
+        
+        if considerSelf && calendar.component(.weekday, from: self) == weekday.rawValue {
+            return self
         }
         
-        // Make sure all required date components are set.
-        guard let _ = day, let _ = month, let _ = year, let weekday = weekday else {
-            log.error("Date components are missing")
-            return ""
-        }
-        
-        guard let today = DAU.calendar.date(from: self) else {
-            log.error("Cannot create date from date components")
-            return ""
-        }
-        
-        let dayInSeconds = 60 * 60 * 24
-        // Sunday is first weekday so we need to handle this day differently, can't just substract it.
-        let sundayToMondayDayDifference = 6
-        let dayDifference = isSunday ? sundayToMondayDayDifference : weekday - 2 // -2 because monday is second weekday
-        
-        let monday = Date(timeInterval: -TimeInterval(dayDifference * dayInSeconds), since: today)
-        let mondayComponents = DAU.calendar.dateComponents([.day, .month, .year], from: monday)
-        
-        guard let mYear = mondayComponents.year, let mMonth = mondayComponents.month, let mDay = mondayComponents.day else {
-            log.error("First monday of the week components are nil")
-            return ""
-        }
-        
-        return "\(mYear)-\(mMonth)-\(mDay)"
+        return calendar.nextDate(after: self,
+                                 matching: components,
+                                 matchingPolicy: .nextTime,
+                                 direction: direction)
+    }
+    
+    enum Weekday: Int {
+        case sunday = 1, monday, tuesday, wednesday, thursday, friday, saturday
     }
 }
