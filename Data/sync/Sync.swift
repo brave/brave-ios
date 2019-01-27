@@ -104,7 +104,7 @@ public class Sync: JSInjector {
     fileprivate lazy var isDebug: Bool = { return AppConstants.BuildChannel == .developer }()
     
     fileprivate lazy var serverUrl: String = {
-        return "https://sync.brave.com"
+        return isDebug ? "https://sync-staging.brave.com" : "https://sync.brave.com"
     }()
     
     fileprivate let apiVersion = 0
