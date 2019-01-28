@@ -209,6 +209,9 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
                 // Re-link all orphaned children
                 children.forEach {
                     $0.syncParentUUID = bk.syncUUID
+                    // The setter for syncParentUUID creates the parent/child relationship in CD, however in this specific instance
+                    // the objects have not been written to disk, so cannot be fetched on a different context and the relationship
+                    // will not be properly established. Manual attachment is necessary here during these batch additions.
                     $0.parentFolder = bk
                 }
             }
