@@ -292,6 +292,10 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         return count > 0
     }
     
+    /// Reordering bookmarks has two steps:
+    /// 1. Sets new `syncOrder` for the source(moving) Bookmark
+    /// 2. Recalculates `syncOrder` for all Bookmarks on a given level. This is required because
+    /// we use a special String-based order and algorithg. Simple String comparision doesn't work here.
     public class func reorderBookmarks(frc: NSFetchedResultsController<Bookmark>?, sourceIndexPath: IndexPath,
                                        destinationIndexPath: IndexPath) {
         guard let frc = frc else { return }
@@ -303,8 +307,11 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         
         let context = DataController.newBackgroundContext()
         // Note: sync order is also used for ordering favorites and non synchronized bookmarks.
-        reorderWithSyncOrder(frc: frc, sourceBookmark: src, destinationBookmark: dest,
-                             sourceIndexPath: sourceIndexPath, destinationIndexPath: destinationIndexPath, context: context)
+        updateSyncOrderOfMovedBookmark(frc: frc, sourceBookmark: src,
+                                       destinationBookmark: dest,
+                                       sourceIndexPath: sourceIndexPath,
+                                       destinationIndexPath: destinationIndexPath,
+                                       context: context)
         
         setOrderForAllBookmarksOnGivenLevel(parent: src.parentFolder, forFavorites: src.isFavorite, context: context)
         
@@ -313,46 +320,46 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         if !src.isFavorite { Sync.shared.sendSyncRecords(action: .update, records: [src]) }
     }
     
-    private class func reorderWithSyncOrder(frc: NSFetchedResultsController<Bookmark>,
-                                            sourceBookmark src: Bookmark,
-                                            destinationBookmark dest: Bookmark,
-                                            sourceIndexPath: IndexPath,
-                                            destinationIndexPath: IndexPath,
-                                            context: NSManagedObjectContext) {
+    private class func updateSyncOrderOfMovedBookmark(frc: NSFetchedResultsController<Bookmark>,
+                                                      sourceBookmark src: Bookmark,
+                                                      destinationBookmark dest: Bookmark,
+                                                      sourceIndexPath: IndexPath,
+                                                      destinationIndexPath: IndexPath,
+                                                      context: NSManagedObjectContext) {
         
         guard let srcBgContext = context.object(with: src.objectID) as? Bookmark,
             let destBgContext = context.object(with: dest.objectID) as? Bookmark else {
             return
         }
         
+        // Depending on drag direction, all other bookmarks are pushed up or down.
         let isMovingUp = sourceIndexPath.row > destinationIndexPath.row
         
-        // Depending on drag direction, all other bookmarks are pushed up or down.
+        var previousOrder: String?
+        var nextOrder: String?
+        
         if isMovingUp {
-            var prev: String?
-            
-            // Bookmark at the top has no previous bookmark.
-            if destinationIndexPath.row > 0 {
+            let bookmarkMovedToTop = destinationIndexPath.row == 0
+            // A Bookmark that is moved to top has no previous bookmark.
+            if !bookmarkMovedToTop {
                 let index = IndexPath(row: destinationIndexPath.row - 1, section: destinationIndexPath.section)
                 let objectAtIndexOnBgContext = context.object(with: frc.object(at: index).objectID) as? Bookmark
-                prev = objectAtIndexOnBgContext?.syncOrder
+                previousOrder = objectAtIndexOnBgContext?.syncOrder
             }
             
-            let next = destBgContext.syncOrder
-            srcBgContext.syncOrder = Sync.shared.getBookmarkOrder(previousOrder: prev, nextOrder: next)
+            nextOrder = destBgContext.syncOrder
         } else {
-            let prev = destBgContext.syncOrder
-            var next: String?
+            previousOrder = destBgContext.syncOrder
             
-            // Bookmark at the bottom has no next bookmark.
+            // A Bookmark that is moved to bottom has no next bookmark.
             if let objects = frc.fetchedObjects, destinationIndexPath.row + 1 < objects.count {
                 let index = IndexPath(row: destinationIndexPath.row + 1, section: destinationIndexPath.section)
                 let objectAtIndexOnBgContext = context.object(with: frc.object(at: index).objectID) as? Bookmark
-                next = objectAtIndexOnBgContext?.syncOrder
+                nextOrder = objectAtIndexOnBgContext?.syncOrder
             }
-            
-            srcBgContext.syncOrder = Sync.shared.getBookmarkOrder(previousOrder: prev, nextOrder: next)
         }
+        
+        srcBgContext.syncOrder = Sync.shared.getBookmarkOrder(previousOrder: previousOrder, nextOrder: nextOrder)
     }
     
     /// Takes all Bookmarks and Favorites from 1.6 and sets correct order for them.
@@ -558,5 +565,54 @@ extension Bookmark {
             log.error(error)
         }
         return [Bookmark]()
+    }
+}
+
+extension Bookmark: Comparable {
+    // Please note that for equality check `syncUUID` is used
+    // but for checking if a Bookmark is less/greater than another Bookmark we check using `syncOrder`
+    public static func == (lhs: Bookmark, rhs: Bookmark) -> Bool {
+        return lhs.syncUUID == rhs.syncUUID
+    }
+    
+    public static func < (lhs: Bookmark, rhs: Bookmark) -> Bool {
+        return lhs.compare(rhs) == .orderedAscending
+    }
+    
+    private func compare(_ rhs: Bookmark) -> ComparisonResult {
+        
+        guard let lhsSyncOrder = syncOrder, let rhsSyncOrder = rhs.syncOrder else {
+            log.info("""
+                Wanting to compare bookmark: \(String(describing: displayTitle)) \
+                and \(String(describing: rhs.displayTitle)) but no syncOrder is set \
+                in at least one of them.
+                """)
+            return .orderedSame
+        }
+        
+        // Split is O(n)
+        let lhsSyncOrderBits = lhsSyncOrder.split(separator: ".").compactMap { Int($0) }
+        let rhsSyncOrderBits = rhsSyncOrder.split(separator: ".").compactMap { Int($0) }
+        
+        // Preventing going out of bounds.
+        for i in 0..<min(lhsSyncOrderBits.count, rhsSyncOrderBits.count) {
+            let comparison = lhsSyncOrderBits[i].compare(rhsSyncOrderBits[i])
+            if comparison != .orderedSame { return comparison }
+        }
+        
+        // We went through all numbers and everything is equal.
+        // Need to check if one of arrays has more numbers because 0.0.1.1 > 0.0.1
+        //
+        // Alternatively, we could append zeros to make int arrays between the two objects
+        // have same length. 0.0.1 vs 0.0.1.2 would convert to 0.0.1.0 vs 0.0.1.2
+        return lhsSyncOrderBits.count.compare(rhsSyncOrderBits.count)
+    }
+}
+
+extension Int {
+    func compare(_ against: Int) -> ComparisonResult {
+        if self > against { return .orderedDescending }
+        if self < against { return .orderedAscending }
+        return .orderedSame
     }
 }

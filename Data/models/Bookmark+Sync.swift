@@ -114,55 +114,24 @@ extension Bookmark {
         Preferences.Sync.baseSyncOrder.reset()
     }
     
+    /// We use a special String-based ordering algorithm for Bookmarks, which can't be sorted
+    /// by using NSSortDescriptor.
+    /// Therefore after each change of syncOrder, we recalculate position of all bookmarks on a given level
+    /// and set correct `order` attribute.
+    /// Thanks to this, we can utilize FetchedRequestController to handle changes within table views.
+    /// Unfortunately this approach is not too performant, as each insert and update requires to update
+    /// all other bookmarks on the same level too.
     class func setOrderForAllBookmarksOnGivenLevel(parent: Bookmark?, forFavorites: Bool, context: NSManagedObjectContext) {
         let predicate = forFavorites ?
             NSPredicate(format: "isFavorite == true") : allBookmarksOfAGivenLevelPredicate(parent: parent)
         
-        guard let allBookmarks = all(where: predicate, context: context), !allBookmarks.isEmpty else { return }
+        guard let allBookmarks = all(where: predicate, context: context), allBookmarks.count > 1 else { return }
+        // Bookmark implements custom sorting based on `syncOrder`
+        let sortedBookmarks = allBookmarks.sorted()
         
-        guard let sortedSyncOrders = (allBookmarks as NSArray).sortedArray(comparator: syncOrderComparator) as? [Bookmark] else {
-            return
+        for (updatedOrder, bookmark) in sortedBookmarks.enumerated() {
+            bookmark.order = Int16(updatedOrder)
         }
-        
-        for (order, bookmark) in sortedSyncOrders.enumerated() {
-            bookmark.order = Int16(order)
-        }
-    }
-    
-    static let syncOrderComparator: (Any, Any) -> ComparisonResult = { obj1, obj2 in
-        guard let s1 = obj1 as? Bookmark, let s2 = obj2 as? Bookmark,
-            let order1 = s1.syncOrder, let order2 = s2.syncOrder else {
-                fatalError()
-        }
-        
-        // Split is O(n)
-        var i1 = order1.split(separator: ".").compactMap { Int($0) }
-        var i2 = order2.split(separator: ".").compactMap { Int($0) }
-        
-        // Preventing going out of bounds.
-        let iterationCount = min(i1.count, i2.count)
-        
-        for i in 0..<iterationCount {
-            // We went through all numbers and everything is equal.
-            // Need to check if one of arrays has more numbers because 0.0.1.1 > 0.0.1
-            //
-            // Alternatively, we could append zeros to make int arrays between the two objects
-            // have same length. 0.0.1 vs 0.0.1.2 would convert to 0.0.1.0 vs 0.0.1.2
-            if i1[i] == i2[i] && (iterationCount - 1) == i {
-                if i1.count == i2.count { return .orderedSame }
-                if i1.count > i2.count { return .orderedDescending }
-                if i1.count < i2.count { return .orderedAscending }
-            }
-            
-            if i1[i] == i2[i] && iterationCount != i { // number equal, going through next one
-                continue
-            }
-            
-            if i1[i] > i2[i] { return .orderedDescending }
-            if i1[i] < i2[i] { return .orderedAscending }
-            
-        }
-        
-        return .orderedSame
+        // Saving context is handled outside of this method.
     }
 }
