@@ -71,7 +71,7 @@ class TabManager: NSObject {
 
     // A WKWebViewConfiguration used for normal tabs
     lazy fileprivate var configuration: WKWebViewConfiguration = {
-        return TabManager.getNewConfiguration()
+        return self.getNewConfiguration()
     }()
 
     fileprivate let imageStore: DiskImageStore?
@@ -156,16 +156,17 @@ class TabManager: NSObject {
         return allTabs.filter { $0.type == type }
     }
     
-    private class func getNewConfiguration() -> WKWebViewConfiguration {
+    let urp = UserReferralProgram.shared
+    private func getNewConfiguration() -> WKWebViewConfiguration {
         let configuration = WKWebViewConfiguration()
         configuration.processPool = WKProcessPool()
         configuration.preferences.javaScriptCanOpenWindowsAutomatically = !Preferences.General.blockPopups.value
-        UserReferralProgram.insertCookies(intoStore: configuration.websiteDataStore.httpCookieStore)
+        urp!.insertCookies(intoStore: configuration.websiteDataStore.httpCookieStore)
         return configuration
     }
     
     private func resetConfiguration() {
-        configuration = TabManager.getNewConfiguration()
+        configuration = getNewConfiguration()
     }
     
     func reset() {

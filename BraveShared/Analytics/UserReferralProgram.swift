@@ -220,7 +220,7 @@ public class UserReferralProgram {
     
     /// Checks if a custom header should be added to the request and returns its value and field.
     public class func shouldAddCustomHeader(for request: URLRequest) -> (value: String, field: String)? {
-        guard let customHeaders = UserReferralProgram()?.customHeaders,
+        guard let customHeaders = UserReferralProgram.shared?.customHeaders,
             let hostUrl = request.url?.host else { return nil }
         
         for customHeader in customHeaders {
@@ -238,10 +238,8 @@ public class UserReferralProgram {
         return nil
     }
     
-    public class func insertCookies(intoStore store: WKHTTPCookieStore) {
-        guard let customHeadersDeferred = UserReferralProgram()?.fetchCustomHeaders() else { return }
-        
-        customHeadersDeferred.upon { customHeaders in
+    public func insertCookies(intoStore store: WKHTTPCookieStore) {
+        fetchCustomHeaders().upon { customHeaders in
             var cookies: [HTTPCookie] = []
             customHeaders.forEach { header in
                 let domains = header.domainList.compactMap { URL(string: $0)?.absoluteString }
@@ -257,7 +255,11 @@ public class UserReferralProgram {
                         ])
                 }
             }
-            cookies.forEach { store.setCookie($0) }
+            cookies.forEach {
+                print($0.domain)
+//                store.setCookie($0)
+                
+            }
         }
     }
 }
