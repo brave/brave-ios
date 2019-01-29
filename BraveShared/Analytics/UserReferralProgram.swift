@@ -203,11 +203,11 @@ public class UserReferralProgram {
         for customHeader in customHeaders {
             // There could be an egde case when we would have two domains withing different domain groups, that would
             // cause to return only the first domain-header it approaches.
-            for domain in customHeader.domainList {
-                if hostUrl.contains(domain) {
-                    if let allFields = request.allHTTPHeaderFields, !allFields.keys.contains(customHeader.headerField) {
-                        return (customHeader.headerValue, customHeader.headerField)
-                    }
+            for domain in customHeader.domainList where hostUrl.contains(domain) {
+                // If `domain` is "cookie only", we exclude it from HTTP Headers, and just use cookie approach
+                let cookieOnly = urpCookieOnlyDomains.contains(domain)
+                if !cookieOnly, let allFields = request.allHTTPHeaderFields, !allFields.keys.contains(customHeader.headerField) {
+                    return (customHeader.headerValue, customHeader.headerField)
                 }
             }
         }
