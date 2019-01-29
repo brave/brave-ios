@@ -8,6 +8,8 @@ import Shared
 private let log = Logger.browserLogger
 
 public class UserReferralProgram {
+    
+    private static let urpPartnerDomains: [String] = ["https://coinbase.com", "http://example.com"]
     public static let shared = UserReferralProgram()
     
     private static let apiKeyPlistKey = "API_KEY"
@@ -211,5 +213,47 @@ public class UserReferralProgram {
         }
         
         return nil
+    }
+    
+    public class func loadURPCookies() -> [HTTPCookie] {
+        var cookies: [HTTPCookie] = []
+        for partnerURLString in UserReferralProgram.urpPartnerDomains {
+            if let partnerURL: URL = URL(string: partnerURLString), let cookieDict = UserReferralProgram.customCookiesDict(for: partnerURL) {
+                for (key, value) in cookieDict {
+                    if let cookie: HTTPCookie = HTTPCookie(properties: [
+                        .domain: partnerURL.host!,
+                        .path: "/",
+                        .name: key,
+                        .value: value,
+                        .secure: "TRUE",
+                        .expires: NSDate(timeIntervalSinceNow: 31556926)
+                        ]) {
+                        cookies.append(cookie)
+                    }
+                }
+            }
+        }
+        return cookies
+    }
+    
+    public class func customCookiesDict(for url: URL) -> [String: String]? {
+        guard let customHeadersAsData = Preferences.URP.customHeaderData.value,
+            let customHeaders = (try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(customHeadersAsData)) as? [CustomHeaderData],
+            let hostUrl = url.host else { return nil }
+        var cookieDict: [String: String]?
+        for customHeader in customHeaders {
+            // There could be an egde case when we would have two domains withing different domain groups, that would
+            // cause to return only the first domain-header it approaches.
+            for domain in customHeader.domainList {
+                if hostUrl.contains(domain) {
+                    if cookieDict == nil {
+                        cookieDict = [customHeader.headerField: customHeader.headerValue]
+                    } else {
+                        cookieDict?[customHeader.headerField] = customHeader.headerValue
+                    }
+                }
+            }
+        }
+        return cookieDict
     }
 }

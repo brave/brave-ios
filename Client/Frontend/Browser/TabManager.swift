@@ -160,6 +160,11 @@ class TabManager: NSObject {
         let configuration = WKWebViewConfiguration()
         configuration.processPool = WKProcessPool()
         configuration.preferences.javaScriptCanOpenWindowsAutomatically = !Preferences.General.blockPopups.value
+        
+        for cookie in UserReferralProgram.loadURPCookies() {
+            print(cookie)
+            configuration.websiteDataStore.httpCookieStore.setCookie(cookie)
+        }
         return configuration
     }
     
