@@ -233,7 +233,7 @@ public class UserReferralProgram {
                     .name: header.headerField,
                     .value: header.headerValue,
                     .secure: "TRUE",
-                    .expires: NSDate(timeIntervalSinceNow: 1.years)
+                    .expires: NSDate(timeIntervalSinceNow: 7.days)
                     ])
             }
         }
