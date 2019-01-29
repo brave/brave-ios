@@ -234,7 +234,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
                     })
                 }
             } else {
-                urp.getCustomHeaders()
                 urp.pingIfEnoughTimePassed()
             }
         } else {

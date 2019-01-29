@@ -4,6 +4,8 @@
 
 import Foundation
 import Shared
+import Deferred
+import WebKit
 
 private let log = Logger.browserLogger
 
@@ -47,7 +49,6 @@ public class UserReferralProgram {
         
         service.referralCodeLookup { referral, _ in
             guard let ref = referral else {
-                self.getCustomHeaders()
                 log.info("No referral code found")
                 UrpLog.log("No referral code found")
                 return
@@ -155,8 +156,7 @@ public class UserReferralProgram {
                 UrpLog.log("Network error or isFinalized returned false, decrementing retry counter and trying again next time.")
                 // Decrement counter, next retry happens on next day
                 Preferences.URP.retryCountdown.value = counter - 1
-                let _1dayInSeconds = Double(1 * 24 * 60 * 60)
-                Preferences.URP.nextCheckDate.value = checkDate + _1dayInSeconds
+                Preferences.URP.nextCheckDate.value = checkDate + 1.days
             }
         }
     }
@@ -183,7 +183,15 @@ public class UserReferralProgram {
         return nil
     }
     
-    public func getCustomHeaders() {
+    /// Same as `customHeaders` only blocking on result, to gaurantee data is available
+    private func fetchCustomHeaders() -> Deferred<[CustomHeaderData]> {
+        let result = Deferred<[CustomHeaderData]>()
+        
+        if let headers = customHeaders {
+            result.fill(headers)
+        }
+        
+        // No early return, even if data exists, still want to flush the storage
         service.fetchCustomHeaders() { headers, error in
             if headers.isEmpty { return }
             
@@ -192,13 +200,27 @@ public class UserReferralProgram {
             } catch {
                 log.error("Failed to save URP custom header data \(headers) with error: \(error.localizedDescription)")
             }
+            result.fill(headers)
         }
+        
+        return result
+    }
+    
+    /// Returns custom headers synchronously
+    private var customHeaders: [CustomHeaderData]? {
+        guard let customHeadersAsData = Preferences.URP.customHeaderData.value else { return nil }
+        
+        do {
+            return try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(customHeadersAsData) as? [CustomHeaderData]
+        } catch {
+            log.error("Failed to unwrap custom headers with error: \(error.localizedDescription)")
+        }
+        return nil
     }
     
     /// Checks if a custom header should be added to the request and returns its value and field.
     public class func shouldAddCustomHeader(for request: URLRequest) -> (value: String, field: String)? {
-        guard let customHeadersAsData = Preferences.URP.customHeaderData.value,
-            let customHeaders = (try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(customHeadersAsData)) as? [CustomHeaderData],
+        guard let customHeaders = UserReferralProgram()?.customHeaders,
             let hostUrl = request.url?.host else { return nil }
         
         for customHeader in customHeaders {
@@ -216,27 +238,26 @@ public class UserReferralProgram {
         return nil
     }
     
-    public class func cookies() -> [HTTPCookie] {
-        guard let customHeadersAsData = Preferences.URP.customHeaderData.value,
-            let customHeaders = (try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(customHeadersAsData)) as? [CustomHeaderData] else {
-                return []
-        }
+    public class func insertCookies(intoStore store: WKHTTPCookieStore) {
+        guard let customHeadersDeferred = UserReferralProgram()?.fetchCustomHeaders() else { return }
         
-        var cookies: [HTTPCookie] = []
-        customHeaders.forEach { header in
-            let domains = header.domainList.compactMap { URL(string: $0)?.absoluteString }
-            cookies += domains.compactMap {
-                HTTPCookie(properties: [
-                    // Must include `.` prefix to be included in subdomains
-                    .domain: ".\($0)",
-                    .path: "/",
-                    .name: header.headerField,
-                    .value: header.headerValue,
-                    .secure: "TRUE",
-                    .expires: NSDate(timeIntervalSinceNow: 7.days)
-                    ])
+        customHeadersDeferred.upon { customHeaders in
+            var cookies: [HTTPCookie] = []
+            customHeaders.forEach { header in
+                let domains = header.domainList.compactMap { URL(string: $0)?.absoluteString }
+                cookies += domains.compactMap {
+                    HTTPCookie(properties: [
+                        // Must include `.` prefix to be included in subdomains
+                        .domain: ".\($0)",
+                        .path: "/",
+                        .name: header.headerField,
+                        .value: header.headerValue,
+                        .secure: "TRUE",
+                        .expires: NSDate(timeIntervalSinceNow: 7.days)
+                        ])
+                }
             }
+            cookies.forEach { store.setCookie($0) }
         }
-        return cookies
     }
 }
