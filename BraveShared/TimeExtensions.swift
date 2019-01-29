@@ -20,4 +20,10 @@ extension Int {
     var days: TimeInterval {
         return TimeInterval(self.hours * 24)
     }
+    
+    /// Returns _very_ approximate number of years in seconds
+    /// Only use when duration is not critical
+    var years: TimeInterval {
+        return TimeInterval(self.days * 365)
+    }
 }

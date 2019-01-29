@@ -215,45 +215,27 @@ public class UserReferralProgram {
         return nil
     }
     
-    public class func loadURPCookies() -> [HTTPCookie] {
+    public class func cookies() -> [HTTPCookie] {
+        guard let customHeadersAsData = Preferences.URP.customHeaderData.value,
+            let customHeaders = (try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(customHeadersAsData)) as? [CustomHeaderData] else {
+                return []
+        }
+        
         var cookies: [HTTPCookie] = []
-        for partnerURLString in UserReferralProgram.urpPartnerDomains {
-            if let partnerURL: URL = URL(string: partnerURLString), let cookieDict = UserReferralProgram.customCookiesDict(for: partnerURL) {
-                for (key, value) in cookieDict {
-                    if let cookie: HTTPCookie = HTTPCookie(properties: [
-                        .domain: partnerURL.host!,
-                        .path: "/",
-                        .name: key,
-                        .value: value,
-                        .secure: "TRUE",
-                        .expires: NSDate(timeIntervalSinceNow: 31556926)
-                        ]) {
-                        cookies.append(cookie)
-                    }
-                }
+        customHeaders.forEach { header in
+            let domains = header.domainList.compactMap { URL(string: $0)?.absoluteString }
+            cookies += domains.compactMap {
+                HTTPCookie(properties: [
+                    // Must include `.` prefix to be included in subdomains
+                    .domain: ".\($0)",
+                    .path: "/",
+                    .name: header.headerField,
+                    .value: header.headerValue,
+                    .secure: "TRUE",
+                    .expires: NSDate(timeIntervalSinceNow: 1.years)
+                    ])
             }
         }
         return cookies
-    }
-    
-    public class func customCookiesDict(for url: URL) -> [String: String]? {
-        guard let customHeadersAsData = Preferences.URP.customHeaderData.value,
-            let customHeaders = (try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(customHeadersAsData)) as? [CustomHeaderData],
-            let hostUrl = url.host else { return nil }
-        var cookieDict: [String: String]?
-        for customHeader in customHeaders {
-            // There could be an egde case when we would have two domains withing different domain groups, that would
-            // cause to return only the first domain-header it approaches.
-            for domain in customHeader.domainList {
-                if hostUrl.contains(domain) {
-                    if cookieDict == nil {
-                        cookieDict = [customHeader.headerField: customHeader.headerValue]
-                    } else {
-                        cookieDict?[customHeader.headerField] = customHeader.headerValue
-                    }
-                }
-            }
-        }
-        return cookieDict
     }
 }
