@@ -33,7 +33,7 @@ class CustomHeaderData: NSObject {
                 // Must include `.` prefix to be included in subdomains
                 .domain: ".\($0)",
                 .path: "/",
-                .name: headerField,
+                .name: "__Secure-\(headerField)",
                 .value: headerValue,
                 .secure: "TRUE",
                 .expires: NSDate(timeIntervalSinceNow: 7.days)
