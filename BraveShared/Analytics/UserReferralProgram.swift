@@ -187,9 +187,10 @@ public class UserReferralProgram {
     private func fetchCustomHeaders() -> Deferred<[CustomHeaderData]> {
         let result = Deferred<[CustomHeaderData]>()
         
-        if let headers = customHeaders {
-            result.fill(headers)
-        }
+        //Since we are flushing we dont need to fill early.
+//        if let headers = customHeaders {
+//            result.fill(headers)
+//        }
         
         // No early return, even if data exists, still want to flush the storage
         service.fetchCustomHeaders() { headers, error in
@@ -239,7 +240,7 @@ public class UserReferralProgram {
     }
     
     public func insertCookies(intoStore store: WKHTTPCookieStore) {
-        fetchCustomHeaders().upon { customHeaders in
+        fetchCustomHeaders().uponQueue(.main) { (customHeaders) in
             var cookies: [HTTPCookie] = []
             customHeaders.forEach { header in
                 let domains = header.domainList.compactMap { URL(string: $0)?.absoluteString }
@@ -256,10 +257,11 @@ public class UserReferralProgram {
                 }
             }
             cookies.forEach {
-                print($0.domain)
-//                store.setCookie($0)
-                
+                store.setCookie($0)
             }
+//            store.getAllCookies({ (cookies) in
+//                print(cookies)
+//            })
         }
     }
 }
