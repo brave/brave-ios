@@ -161,12 +161,11 @@ class TabManager: NSObject {
         return allTabs.filter { $0.type == type }
     }
     
-    let urp = UserReferralProgram.shared
     private func getNewConfiguration() -> WKWebViewConfiguration {
         let configuration = WKWebViewConfiguration()
         configuration.processPool = WKProcessPool()
         configuration.preferences.javaScriptCanOpenWindowsAutomatically = !Preferences.General.blockPopups.value
-        urp!.insertCookies(intoStore: configuration.websiteDataStore.httpCookieStore)
+        UserReferralProgram.shared?.insertCookies(intoStore: configuration.websiteDataStore.httpCookieStore)
         return configuration
     }
 
