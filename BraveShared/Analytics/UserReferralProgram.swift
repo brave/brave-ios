@@ -184,13 +184,8 @@ public class UserReferralProgram {
     }
     
     /// Same as `customHeaders` only blocking on result, to gaurantee data is available
-    private func fetchCustomHeaders() -> Deferred<[CustomHeaderData]> {
+    private func fetchNewCustomHeaders() -> Deferred<[CustomHeaderData]> {
         let result = Deferred<[CustomHeaderData]>()
-        
-        //Since we are flushing we dont need to fill early.
-//        if let headers = customHeaders {
-//            result.fill(headers)
-//        }
         
         // No early return, even if data exists, still want to flush the storage
         service.fetchCustomHeaders() { headers, error in
@@ -240,28 +235,16 @@ public class UserReferralProgram {
     }
     
     public func insertCookies(intoStore store: WKHTTPCookieStore) {
-        fetchCustomHeaders().uponQueue(.main) { (customHeaders) in
-            var cookies: [HTTPCookie] = []
-            customHeaders.forEach { header in
-                let domains = header.domainList.compactMap { URL(string: $0)?.absoluteString }
-                cookies += domains.compactMap {
-                    HTTPCookie(properties: [
-                        // Must include `.` prefix to be included in subdomains
-                        .domain: ".\($0)",
-                        .path: "/",
-                        .name: header.headerField,
-                        .value: header.headerValue,
-                        .secure: "TRUE",
-                        .expires: NSDate(timeIntervalSinceNow: 7.days)
-                        ])
-                }
-            }
-            cookies.forEach {
-                store.setCookie($0)
-            }
-//            store.getAllCookies({ (cookies) in
-//                print(cookies)
-//            })
+        assertIsMainThread("Setting up cookies for URP, must happen on main thread")
+        
+        func attachCookies(from headers: [CustomHeaderData]?) {
+            headers?.flatMap { $0.cookies() }.forEach { store.setCookie($0) }
         }
+        
+        // Attach all existing cookies
+        attachCookies(from: customHeaders)
+        
+        // Pull new ones and attach them async
+        fetchNewCustomHeaders().uponQueue(.main, block: attachCookies)
     }
 }
