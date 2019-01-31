@@ -12,7 +12,7 @@ private let log = Logger.browserLogger
 public class UserReferralProgram {
     
     /// Domains must match server HTTP header ones _exactly_
-    private static let urpCookieOnlyDomains: [String] = ["coinbase.com"]
+    private static let urpCookieOnlyDomains = ["coinbase.com"]
     public static let shared = UserReferralProgram()
     
     private static let apiKeyPlistKey = "API_KEY"

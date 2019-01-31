@@ -71,12 +71,12 @@ class TabManager: NSObject {
 
     // A WKWebViewConfiguration used for normal tabs
     lazy fileprivate var configuration: WKWebViewConfiguration = {
-        return self.getNewConfiguration()
+        return getNewConfiguration()
     }()
 
     // A WKWebViewConfiguration used for private mode tabs
     lazy fileprivate var privateConfiguration: WKWebViewConfiguration = {
-        return self.getNewConfiguration()
+        return getNewConfiguration()
     }()
 
     fileprivate let imageStore: DiskImageStore?
