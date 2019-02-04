@@ -260,8 +260,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
             return false
         }
 
-        DispatchQueue.main.async {
-            NavigationPath.handle(nav: routerpath, with: self.browserViewController)
+        if self.browserViewController.viewIfLoaded?.window == nil {
+            // The view has not yet moved to window. Thus the task to open new tab has to be queued.
+            self.browserViewController.taskQueue.append {
+                NavigationPath.handle(nav: routerpath, with: self.browserViewController)
+            }
+        } else {
+            DispatchQueue.main.async {
+                NavigationPath.handle(nav: routerpath, with: self.browserViewController)
+            }
         }
         return true
     }

@@ -56,6 +56,8 @@ class BrowserViewController: UIViewController {
     fileprivate var searchLoader: SearchLoader?
     fileprivate let alertStackView = UIStackView() // All content that appears above the footer should be added to this view. (Find In Page/SnackBars)
     fileprivate var findInPageBar: FindInPageBar?
+    
+    var taskQueue: [()->()] = []
 
     lazy var mailtoLinkHandler: MailtoLinkHandler = MailtoLinkHandler()
 
@@ -452,7 +454,14 @@ class BrowserViewController: UIViewController {
         }
         
         contentBlockListDeferred?.uponQueue(.main) { _ in
-            self.tabManager.selectTab(tabToSelect)
+            if self.taskQueue.isEmpty {
+                self.tabManager.selectTab(tabToSelect)
+            } else {
+                for task in self.taskQueue {
+                    task()
+                }
+                self.taskQueue.removeAll()
+            }
         }
     }
 
