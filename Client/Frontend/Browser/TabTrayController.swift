@@ -963,6 +963,7 @@ fileprivate class EmptyPrivateTabsView: UIView {
         $0.textColor = EmptyPrivateTabsViewUX.TitleColor
         $0.font = EmptyPrivateTabsViewUX.TitleFont
         $0.textAlignment = .center
+        $0.adjustsFontSizeToFitWidth = true
         $0.text = Strings.Private_Browsing
     }
 
