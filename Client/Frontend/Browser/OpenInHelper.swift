@@ -22,10 +22,6 @@ struct MIMEType {
     static let PNG = "image/png"
     static let WebP = "image/webp"
     static let xHTML = "application/xhtml+xml"
-    
-    static func kindOfHTML(_ mime: String?) -> Bool {
-        return [MIMEType.HTML, MIMEType.xHTML].contains(mime ?? "")
-    }
 
     private static let webViewViewableTypes: [String] = [MIMEType.Bitmap, MIMEType.GIF, MIMEType.JPEG, MIMEType.HTML, MIMEType.PDF, MIMEType.PlainText, MIMEType.PNG, MIMEType.WebP, MIMEType.xHTML]
 
@@ -39,6 +35,12 @@ struct MIMEType {
         }
 
         return MIMEType.OctetStream
+    }
+}
+
+extension String {
+    var isKindOfHTML: Bool {
+        return [MIMEType.HTML, MIMEType.xHTML].contains(self)
     }
 }
 
