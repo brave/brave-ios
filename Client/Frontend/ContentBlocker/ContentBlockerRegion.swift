@@ -8,38 +8,38 @@ import Deferred
 import Data
 import BraveShared
 
-class ContentBlockerRegion: ContentBlocker {
-    static let ar = ContentBlockerRegion(localeCode: "ar", filename: "")
-    static let bg = ContentBlockerRegion(localeCode: "bg", filename: "")
-    static let zh = ContentBlockerRegion(localeCode: "zh", filename: "")
-    static let cs = ContentBlockerRegion(localeCode: "cs", filename: "")
-    static let de = ContentBlockerRegion(localeCode: "de", filename: "")
-    static let da = ContentBlockerRegion(localeCode: "da", filename: "")
-    static let et = ContentBlockerRegion(localeCode: "et", filename: "")
-    static let fi = ContentBlockerRegion(localeCode: "fi", filename: "")
-    static let fr = ContentBlockerRegion(localeCode: "fr", filename: "")
-    static let el = ContentBlockerRegion(localeCode: "el", filename: "")
-    static let hu = ContentBlockerRegion(localeCode: "hu", filename: "")
-    static let id = ContentBlockerRegion(localeCode: "id", filename: "")
-    static let hi = ContentBlockerRegion(localeCode: "hi", filename: "")
-    static let fa = ContentBlockerRegion(localeCode: "fa", filename: "")
-    static let `is` = ContentBlockerRegion(localeCode: "is", filename: "")
-    static let he = ContentBlockerRegion(localeCode: "he", filename: "")
-    static let it = ContentBlockerRegion(localeCode: "it", filename: "")
-    static let ja = ContentBlockerRegion(localeCode: "ja", filename: "")
-    static let ko = ContentBlockerRegion(localeCode: "ko", filename: "")
-    static let lt = ContentBlockerRegion(localeCode: "lt", filename: "")
-    static let lv = ContentBlockerRegion(localeCode: "lv", filename: "")
-    static let nl = ContentBlockerRegion(localeCode: "nl", filename: "")
-    static let pl = ContentBlockerRegion(localeCode: "pl", filename: "")
-    static let ru = ContentBlockerRegion(localeCode: "ru", filename: "")
-    static let uk = ContentBlockerRegion(localeCode: "uk", filename: "")
-    static let be = ContentBlockerRegion(localeCode: "be", filename: "")
-    static let es = ContentBlockerRegion(localeCode: "es", filename: "")
-    static let sl = ContentBlockerRegion(localeCode: "sl", filename: "")
-    static let sv = ContentBlockerRegion(localeCode: "sv", filename: "")
-    static let tr = ContentBlockerRegion(localeCode: "tr", filename: "")
-    static let vi = ContentBlockerRegion(localeCode: "vi", filename: "")
+class ContentBlockerRegion: BlocklistName {
+    private static let ar = ContentBlockerRegion(localeCode: "ar", filename: "")
+    private static let bg = ContentBlockerRegion(localeCode: "bg", filename: "")
+    private static let zh = ContentBlockerRegion(localeCode: "zh", filename: "")
+    private static let cs = ContentBlockerRegion(localeCode: "cs", filename: "")
+    private static let de = ContentBlockerRegion(localeCode: "de", filename: "")
+    private static let da = ContentBlockerRegion(localeCode: "da", filename: "")
+    private static let et = ContentBlockerRegion(localeCode: "et", filename: "")
+    private static let fi = ContentBlockerRegion(localeCode: "fi", filename: "")
+    private static let fr = ContentBlockerRegion(localeCode: "fr", filename: "")
+    private static let el = ContentBlockerRegion(localeCode: "el", filename: "")
+    private static let hu = ContentBlockerRegion(localeCode: "hu", filename: "")
+    private static let id = ContentBlockerRegion(localeCode: "id", filename: "")
+    private static let hi = ContentBlockerRegion(localeCode: "hi", filename: "")
+    private static let fa = ContentBlockerRegion(localeCode: "fa", filename: "")
+    private static let `is` = ContentBlockerRegion(localeCode: "is", filename: "")
+    private static let he = ContentBlockerRegion(localeCode: "he", filename: "")
+    private static let it = ContentBlockerRegion(localeCode: "it", filename: "")
+    private static let ja = ContentBlockerRegion(localeCode: "ja", filename: "")
+    private static let ko = ContentBlockerRegion(localeCode: "ko", filename: "")
+    private static let lt = ContentBlockerRegion(localeCode: "lt", filename: "")
+    private static let lv = ContentBlockerRegion(localeCode: "lv", filename: "")
+    private static let nl = ContentBlockerRegion(localeCode: "nl", filename: "")
+    private static let pl = ContentBlockerRegion(localeCode: "pl", filename: "")
+    private static let ru = ContentBlockerRegion(localeCode: "ru", filename: "")
+    private static let uk = ContentBlockerRegion(localeCode: "uk", filename: "")
+    private static let be = ContentBlockerRegion(localeCode: "be", filename: "")
+    private static let es = ContentBlockerRegion(localeCode: "es", filename: "")
+    private static let sl = ContentBlockerRegion(localeCode: "sl", filename: "")
+    private static let sv = ContentBlockerRegion(localeCode: "sv", filename: "")
+    private static let tr = ContentBlockerRegion(localeCode: "tr", filename: "")
+    private static let vi = ContentBlockerRegion(localeCode: "vi", filename: "")
     
     /// Get a `ContentBlockerRegion` for a given locale if one exists for that region
     static func with(localeCode: String) -> ContentBlockerRegion? {
@@ -80,20 +80,9 @@ class ContentBlockerRegion: ContentBlocker {
     }
     
     private let localeCode: String
-    let filename: String
-    
-    var rule: WKContentRuleList?
-    
-    lazy var fileVersionPref: Preferences.Option<String?>? = {
-        return nil
-    }()
-    
-    lazy var fileVersion: String? = {
-        return nil
-    }()
     
     private init(localeCode: String, filename: String) {
         self.localeCode = localeCode
-        self.filename = filename
+        super.init(filename: filename)
     }
 }
