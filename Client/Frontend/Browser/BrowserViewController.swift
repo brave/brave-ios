@@ -127,7 +127,7 @@ class BrowserViewController: UIViewController {
 
     let downloadQueue = DownloadQueue()
     
-    fileprivate var contentBlockListDeferred: Deferred<()>?
+    fileprivate var contentBlockListDeferred: Deferred<[()]>?
     
     // Web filters
     
@@ -188,7 +188,7 @@ class BrowserViewController: UIViewController {
         Preferences.Shields.allShields.forEach { $0.observe(from: self) }
         Preferences.Privacy.blockAllCookies.observe(from: self)
         // Lists need to be compiled before attempting tab restoration
-        contentBlockListDeferred = ContentBlockerHelper.compileLists()
+        contentBlockListDeferred = ContentBlockerHelper.compileLists(locale: Locale.current.languageCode)
     }
 
     override var preferredStatusBarStyle: UIStatusBarStyle {

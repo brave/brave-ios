@@ -46,8 +46,13 @@ class ContentBlockerHelper {
     static let ruleStore: WKContentRuleListStore = WKContentRuleListStore.default()
     weak var tab: Tab?
     
-    static func compileLists() -> Deferred<()> {
-        return BlocklistName.compileAll(ruleStore: ruleStore)
+    static func compileLists(locale: String?) -> Deferred<[()]> {
+        let compileList = BlocklistName.compileAll(ruleStore: ruleStore)
+        if let locale = locale, let regionalBlocker = ContentBlockerRegion.with(localeCode: locale) {
+            let regionList = regionalBlocker.buildRule(ruleStore: ruleStore)
+            return all([regionList, compileList])
+        }
+        return all([compileList])
     }
 
     var isUserEnabled: Bool? {
