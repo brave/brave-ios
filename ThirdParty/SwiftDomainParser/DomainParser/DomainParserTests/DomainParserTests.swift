@@ -26,6 +26,7 @@ class DomainParserTests: XCTestCase {
     func testMeasureParser() {
         self.measure {
             testPSL()
+            testETLD()
         }
     }
     
