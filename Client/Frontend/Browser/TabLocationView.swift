@@ -114,6 +114,7 @@ class TabLocationView: UIView {
         do {
             return try DomainParser()
         } catch {
+            log.error("DomainParser init failed with error: \n \(error)")
             return nil
         }
     }()
@@ -294,9 +295,9 @@ class TabLocationView: UIView {
 
     fileprivate func updateTextWithURL() {
         if let host = url?.host, AppConstants.MOZ_PUNYCODE {
-            urlTextField.text = url?.absoluteString.replacingOccurrences(of: host, with: host.asciiHostToUTF8()).etldValue(parser: parser) ?? ""
+            urlTextField.text = url?.absoluteString.replacingOccurrences(of: host, with: host.asciiHostToUTF8()).etldValue(parser: parser)
         } else {
-            urlTextField.text = url?.absoluteString.etldValue(parser: parser) ?? ""
+            urlTextField.text = url?.absoluteString.etldValue(parser: parser)
         }
     }
 }
@@ -448,13 +449,13 @@ private class DisplayTextField: UITextField {
     }
 }
 
-extension String {
-    func etldValue(parser: DomainParser?) -> String {
-        guard parser != nil else {
+public extension String {
+    public func etldValue(parser: DomainParser?) -> String {
+        guard let `parser` = parser else {
             return self
         }
         if let url: URL = URL(string: self.trimmingCharacters(in: CharacterSet(charactersIn: "/"))), let host: String = url.host {
-            return parser?.parse(host: host)?.domain ?? self
+            return parser.parse(host: host)?.domain ?? self
         }
         return self
     }
