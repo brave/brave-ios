@@ -7,6 +7,7 @@ import Shared
 import Data
 import Deferred
 import BraveShared
+import WebKit
 
 // A base protocol for something that can be cleared.
 protocol Clearable {
@@ -84,26 +85,14 @@ class CookiesClearable: Clearable {
     
     func clear() -> Success {
         UserDefaults.standard.synchronize()
-        
         let result = Deferred<Maybe<()>>()
         // need event loop to run to autorelease UIWebViews fully
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             // Now we wipe the system cookie store (for our app).
-            let storage = HTTPCookieStorage.shared
-            if let cookies = storage.cookies {
-                for cookie in cookies {
-                    storage.deleteCookie(cookie)
-                }
+            WKWebsiteDataStore.default().removeData(ofTypes: [WKWebsiteDataTypeCookies], modifiedSince: Date(timeIntervalSinceReferenceDate: 0)) {
+                UserDefaults.standard.synchronize()
+                result.fill(Maybe<()>(success: ()))
             }
-            UserDefaults.standard.synchronize()
-            
-            // And just to be safe, we also wipe the Cookies directory.
-            do {
-                try deleteLibraryFolderContents("Cookies", validateClearedExceptFor: [])
-            } catch {
-                return result.fill(Maybe<()>(failure: ClearableErrorType(err: error)))
-            }
-            return result.fill(Maybe<()>(success: ()))
         }
         return result
     }
@@ -126,24 +115,14 @@ class CacheClearable: Clearable {
             // Remove the basic cache.
             URLCache.shared.removeAllCachedResponses()
             
-            var err: Error?
-            for item in ["Caches", "Cookies", "WebKit"] {
-                do {
-                    try deleteLibraryFolderContents(item, validateClearedExceptFor: ["Snapshots"])
-                } catch {
-                    err = error
-                }
+            WKWebsiteDataStore.default().removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(), modifiedSince: Date(timeIntervalSinceReferenceDate: 0)) {
+                // Clear image cache
+                ImageCache.shared.clear()
+                
+                // Leave the cache off in the error cases above
+                URLCache.shared.setupBraveDefaults()
+                result.fill(Maybe<()>(success: ()))
             }
-            if let err = err {
-                return result.fill(Maybe<()>(failure: ClearableErrorType(err: err)))
-            }
-            
-            // Clear image cache
-            ImageCache.shared.clear()
-            
-            // Leave the cache off in the error cases above
-            URLCache.shared.setupBraveDefaults()
-            result.fill(Maybe<()>(success: ()))
         }
         
         return result
