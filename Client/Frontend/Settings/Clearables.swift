@@ -36,46 +36,6 @@ struct ClearableErrorType: MaybeErrorType {
     }
 }
 
-// Delete all the contents of a the folder, and verify using validateClearedWithNameContains that critical files are removed (any remaining file must not contain the specified substring(s))
-// Alert the user if these files still exist after clearing.
-// validateClearedWithNameContains can be nil, in which case the check is skipped or pass [] as a special case to verify that
-// the directory is empty.
-private func deleteLibraryFolderContents(_ folder: String, validateClearedExceptFor: [String]?) throws {
-    let manager = FileManager.default
-    let library = manager.urls(for: FileManager.SearchPathDirectory.libraryDirectory, in: .userDomainMask)[0]
-    let dir = library.appendingPathComponent(folder)
-    let contents = try manager.contentsOfDirectory(atPath: dir.path)
-    for content in contents {
-        do {
-            try manager.removeItem(at: dir.appendingPathComponent(content))
-        } catch where ((error as NSError).userInfo[NSUnderlyingErrorKey] as? NSError)?.code == Int(EPERM) {
-            // "Not permitted". We ignore this.
-            // Snapshots directory is an example of a Cache dir that is not permitted on device (but is permitted on simulator)
-        }
-    }
-    
-    #if DEBUG
-    guard let allowedFileNames = validateClearedExceptFor else { return }
-    contents = try manager.contentsOfDirectoryAtPath(dir.path, withFilenamePrefix: "")
-    for content in contents {
-        for name in allowedFileNames {
-            if !content.contains(name) {
-                let alert = UIAlertController(title: "Error clearing data", message: "Item not cleared: \(content)", preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-                UIApplication.shared.keyWindow?.rootViewController?.present(alert, animated: true)
-            }
-        }
-    }
-    #endif
-}
-
-private func deleteLibraryFolder(_ folder: String) throws {
-    let manager = FileManager.default
-    let library = manager.urls(for: FileManager.SearchPathDirectory.libraryDirectory, in: .userDomainMask)[0]
-    let dir = library.appendingPathComponent(folder)
-    try manager.removeItem(at: dir)
-}
-
 // Remove all cookies stored by the site. This includes localStorage, sessionStorage, and WebSQL/IndexedDB.
 class CookiesClearable: Clearable {
     
@@ -116,10 +76,7 @@ class CacheClearable: Clearable {
             URLCache.shared.removeAllCachedResponses()
             
             WKWebsiteDataStore.default().removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(), modifiedSince: Date(timeIntervalSinceReferenceDate: 0)) {
-                // Clear image cache
                 ImageCache.shared.clear()
-                
-                // Leave the cache off in the error cases above
                 URLCache.shared.setupBraveDefaults()
                 result.fill(Maybe<()>(success: ()))
             }

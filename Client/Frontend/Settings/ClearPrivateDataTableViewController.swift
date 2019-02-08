@@ -174,7 +174,7 @@ class ClearPrivateDataTableViewController: UITableViewController {
              } else {*/
             
             // Reset Webkit configuration to remove data from memory
-            if !clear.filter({ $0 is CookiesClearable || $0 is CacheClearable}).isEmpty {
+            if clear.contains(where: { $0 is CookiesClearable || $0 is CacheClearable }) {
                 self.tabManager.resetConfiguration()
             }
             ClearPrivateDataTableViewController.clearPrivateData(clear).uponQueue(DispatchQueue.main) { _ in
