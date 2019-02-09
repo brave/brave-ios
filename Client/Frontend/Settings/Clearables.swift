@@ -70,14 +70,8 @@ class CacheClearable: Clearable {
         let result = Deferred<Maybe<()>>()
         // need event loop to run to autorelease UIWebViews fully
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            URLCache.shared.memoryCapacity = 0
-            URLCache.shared.diskCapacity = 0
-            // Remove the basic cache.
-            URLCache.shared.removeAllCachedResponses()
-            
             WKWebsiteDataStore.default().removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(), modifiedSince: Date(timeIntervalSinceReferenceDate: 0)) {
                 ImageCache.shared.clear()
-                URLCache.shared.setupBraveDefaults()
                 result.fill(Maybe<()>(success: ()))
             }
         }
