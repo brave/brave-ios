@@ -45,7 +45,7 @@ class CustomHeaderData: NSObject {
         var customHeaders: [CustomHeaderData] = []
 
         for (_, object) in json {
-            guard let header = object["headers"].first else { continue }
+            guard let header: (String, JSON) = object["headers"].first, header.0 == "X-Brave-Partner" else { continue }
 
             var domains = [String]()
 
