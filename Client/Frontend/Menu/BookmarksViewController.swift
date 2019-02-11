@@ -565,12 +565,11 @@ extension BookmarksViewController: NSFetchedResultsControllerDelegate {
   func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
     switch type {
     case .update:
-        let update = { (path: IndexPath?) in
-            if let path = path, let cell = self.tableView.cellForRow(at: path) {
-                self.configureCell(cell, atIndexPath: path)
-            }
+        let config = { (path: IndexPath?) in
+            guard let path = path, let cell = self.tableView.cellForRow(at: path) else { return }
+            self.configureCell(cell, atIndexPath: path)
         }
-        [indexPath, newIndexPath].forEach(update)
+        [indexPath, newIndexPath].forEach(config)
     case .insert:
       guard let path = newIndexPath else {
         return
