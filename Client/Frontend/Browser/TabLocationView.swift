@@ -109,15 +109,6 @@ class TabLocationView: UIView {
             }
         }
     }
-    
-    lazy var parser: DomainParser? = {
-        do {
-            return try DomainParser()
-        } catch {
-            log.error("DomainParser init failed with error: \n \(error)")
-            return nil
-        }
-    }()
 
     lazy var placeholder: NSAttributedString = {
         return NSAttributedString(string: Strings.TabToolbarSearchAddressPlaceholderText, attributes: [NSAttributedStringKey.foregroundColor: UIColor.Photon.Grey40])
@@ -294,11 +285,13 @@ class TabLocationView: UIView {
     }
 
     fileprivate func updateTextWithURL() {
-        if let host = url?.host, AppConstants.MOZ_PUNYCODE {
-            urlTextField.text = url?.absoluteString.replacingOccurrences(of: host, with: host.asciiHostToUTF8()).etldValue(parser: parser)
-        } else {
-            urlTextField.text = url?.absoluteString.etldValue(parser: parser)
-        }
+        //Commented code below as AppConstants.MOZ_PUNYCODE is false for release always.
+//        if let host = url?.host, AppConstants.MOZ_PUNYCODE {
+//            urlTextField.text = url?.absoluteString.replacingOccurrences(of: host, with: host.asciiHostToUTF8())
+//        } else {
+//            urlTextField.text = url?.baseDomain
+//        }
+        urlTextField.text = url?.baseDomain ?? ""
     }
 }
 
@@ -446,17 +439,5 @@ private class DisplayTextField: UITextField {
             }
         }
         return rect
-    }
-}
-
-public extension String {
-    public func etldValue(parser: DomainParser?) -> String {
-        guard let `parser` = parser else {
-            return self
-        }
-        if let url: URL = URL(string: self.trimmingCharacters(in: CharacterSet(charactersIn: "/"))), let host: String = url.host {
-            return parser.parse(host: host)?.domain ?? self
-        }
-        return self
     }
 }
