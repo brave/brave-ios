@@ -692,11 +692,7 @@ class BrowserViewController: UIViewController {
             webViewContainerTopOffset = make.top.equalTo(readerModeBar?.snp.bottom ?? self.header.snp.bottom).constraint
             
             make.left.right.equalTo(self.view)
-            if self.homePanelIsInline {
-                make.bottom.equalTo(self.footer.snp.top)
-            } else {
-                make.bottom.equalTo(self.view.snp.bottom)
-            }
+            make.bottom.equalTo(self.footer.snp.top)
         }
 
         alertStackView.snp.remakeConstraints { make in
