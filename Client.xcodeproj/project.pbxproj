@@ -400,18 +400,6 @@
 		595E0EDB21CAD97C00813D49 /* CookieControl.js in Resources */ = {isa = PBXBuildFile; fileRef = 595E0EDA21CAD97C00813D49 /* CookieControl.js */; };
 		595E0EE121CAEF5B00813D49 /* FileManagerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 595E0EE021CAEF5B00813D49 /* FileManagerExtension.swift */; };
 		59871C1921E4D83900316590 /* block-cookies.json in Resources */ = {isa = PBXBuildFile; fileRef = 59871C1821E4D83900316590 /* block-cookies.json */; };
-		5992CB9F220B869400B12C09 /* LICENSE-SDP in Resources */ = {isa = PBXBuildFile; fileRef = 5992CB8C220B869300B12C09 /* LICENSE-SDP */; };
-		5992CBA0220B869400B12C09 /* public_suffix_list.dat in Resources */ = {isa = PBXBuildFile; fileRef = 5992CB8E220B869400B12C09 /* public_suffix_list.dat */; };
-		5992CBA2220B869400B12C09 /* Readme.md in Resources */ = {isa = PBXBuildFile; fileRef = 5992CB91220B869400B12C09 /* Readme.md */; };
-		5992CBA4220B869400B12C09 /* Constant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5992CB96220B869400B12C09 /* Constant.swift */; };
-		5992CBA5220B869400B12C09 /* DomainParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5992CB97220B869400B12C09 /* DomainParser.swift */; };
-		5992CBA6220B869400B12C09 /* DomainParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 5992CB98220B869400B12C09 /* DomainParser.h */; };
-		5992CBA7220B869400B12C09 /* RuleLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5992CB9A220B869400B12C09 /* RuleLabel.swift */; };
-		5992CBA8220B869400B12C09 /* Rule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5992CB9B220B869400B12C09 /* Rule.swift */; };
-		5992CBA9220B869400B12C09 /* RulesParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5992CB9C220B869400B12C09 /* RulesParser.swift */; };
-		5992CBAA220B869400B12C09 /* BasicRulesParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5992CB9D220B869400B12C09 /* BasicRulesParser.swift */; };
-		5992CBAB220B869400B12C09 /* ParsedHost.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5992CB9E220B869400B12C09 /* ParsedHost.swift */; };
-		5992CBAC220B86F800B12C09 /* DomainParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5992CB94220B869400B12C09 /* DomainParserTests.swift */; };
 		59A681BDFC95A19F05E07223 /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59A68CCB63E2A565CB03F832 /* SearchViewController.swift */; };
 		59A68D66379CFA85C4EAF00B /* TwoLineCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59A68B1F857A8638598A63A0 /* TwoLineCell.swift */; };
 		59B6902921B684A700E9388E /* BundleExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59B6902821B684A700E9388E /* BundleExtension.swift */; };
@@ -1520,18 +1508,6 @@
 		595E0EDA21CAD97C00813D49 /* CookieControl.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = CookieControl.js; sourceTree = "<group>"; };
 		595E0EE021CAEF5B00813D49 /* FileManagerExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagerExtension.swift; sourceTree = "<group>"; };
 		59871C1821E4D83900316590 /* block-cookies.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "block-cookies.json"; sourceTree = "<group>"; };
-		5992CB8C220B869300B12C09 /* LICENSE-SDP */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "LICENSE-SDP"; sourceTree = "<group>"; };
-		5992CB8E220B869400B12C09 /* public_suffix_list.dat */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = public_suffix_list.dat; sourceTree = "<group>"; };
-		5992CB91220B869400B12C09 /* Readme.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = Readme.md; sourceTree = "<group>"; };
-		5992CB94220B869400B12C09 /* DomainParserTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DomainParserTests.swift; sourceTree = "<group>"; };
-		5992CB96220B869400B12C09 /* Constant.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constant.swift; sourceTree = "<group>"; };
-		5992CB97220B869400B12C09 /* DomainParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DomainParser.swift; sourceTree = "<group>"; };
-		5992CB98220B869400B12C09 /* DomainParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DomainParser.h; sourceTree = "<group>"; };
-		5992CB9A220B869400B12C09 /* RuleLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RuleLabel.swift; sourceTree = "<group>"; };
-		5992CB9B220B869400B12C09 /* Rule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Rule.swift; sourceTree = "<group>"; };
-		5992CB9C220B869400B12C09 /* RulesParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RulesParser.swift; sourceTree = "<group>"; };
-		5992CB9D220B869400B12C09 /* BasicRulesParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BasicRulesParser.swift; sourceTree = "<group>"; };
-		5992CB9E220B869400B12C09 /* ParsedHost.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParsedHost.swift; sourceTree = "<group>"; };
 		59A68B1F857A8638598A63A0 /* TwoLineCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TwoLineCell.swift; sourceTree = "<group>"; };
 		59A68CCB63E2A565CB03F832 /* SearchViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
 		59B6902821B684A700E9388E /* BundleExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundleExtension.swift; sourceTree = "<group>"; };
@@ -2553,7 +2529,6 @@
 		28CE83EF1A1D246900576538 /* Third-Party Source */ = {
 			isa = PBXGroup;
 			children = (
-				5992CB8B220B869300B12C09 /* SwiftDomainParser */,
 				A1FEEE1F20BF28D900298DA2 /* Then.swift */,
 				E66C5B451BDA81050051AA93 /* Apple */,
 				E659A6091EB7C1D300D7A6AD /* BuddyBuild */,
@@ -3110,66 +3085,6 @@
 				0A43293821B1C8120041625B /* NetworkDataFileLoader.swift */,
 			);
 			path = ShieldStats;
-			sourceTree = "<group>";
-		};
-		5992CB8B220B869300B12C09 /* SwiftDomainParser */ = {
-			isa = PBXGroup;
-			children = (
-				5992CB8C220B869300B12C09 /* LICENSE-SDP */,
-				5992CB8D220B869300B12C09 /* Resources */,
-				5992CB91220B869400B12C09 /* Readme.md */,
-				5992CB92220B869400B12C09 /* DomainParser */,
-			);
-			name = SwiftDomainParser;
-			path = ThirdParty/SwiftDomainParser;
-			sourceTree = "<group>";
-		};
-		5992CB8D220B869300B12C09 /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				5992CB8E220B869400B12C09 /* public_suffix_list.dat */,
-			);
-			path = Resources;
-			sourceTree = "<group>";
-		};
-		5992CB92220B869400B12C09 /* DomainParser */ = {
-			isa = PBXGroup;
-			children = (
-				5992CB93220B869400B12C09 /* DomainParserTests */,
-				5992CB95220B869400B12C09 /* DomainParser */,
-			);
-			path = DomainParser;
-			sourceTree = "<group>";
-		};
-		5992CB93220B869400B12C09 /* DomainParserTests */ = {
-			isa = PBXGroup;
-			children = (
-				5992CB94220B869400B12C09 /* DomainParserTests.swift */,
-			);
-			path = DomainParserTests;
-			sourceTree = "<group>";
-		};
-		5992CB95220B869400B12C09 /* DomainParser */ = {
-			isa = PBXGroup;
-			children = (
-				5992CB96220B869400B12C09 /* Constant.swift */,
-				5992CB97220B869400B12C09 /* DomainParser.swift */,
-				5992CB98220B869400B12C09 /* DomainParser.h */,
-				5992CB99220B869400B12C09 /* Model */,
-				5992CB9C220B869400B12C09 /* RulesParser.swift */,
-				5992CB9D220B869400B12C09 /* BasicRulesParser.swift */,
-				5992CB9E220B869400B12C09 /* ParsedHost.swift */,
-			);
-			path = DomainParser;
-			sourceTree = "<group>";
-		};
-		5992CB99220B869400B12C09 /* Model */ = {
-			isa = PBXGroup;
-			children = (
-				5992CB9A220B869400B12C09 /* RuleLabel.swift */,
-				5992CB9B220B869400B12C09 /* Rule.swift */,
-			);
-			path = Model;
 			sourceTree = "<group>";
 		};
 		5D1DC51420AC9AFA00905E5A /* Data */ = {
@@ -4206,7 +4121,6 @@
 				4422D4D621BFFB7600BF1855 /* iterator.h in Headers */,
 				4422D4D121BFFB7600BF1855 /* c.h in Headers */,
 				4422D4DB21BFFB7600BF1855 /* block_.h in Headers */,
-				5992CBA6220B869400B12C09 /* DomainParser.h in Headers */,
 				4422D50321BFFB7600BF1855 /* snapshot.h in Headers */,
 				4422D4E021BFFB7600BF1855 /* block_builder.h in Headers */,
 				4422D4C521BFFB7600BF1855 /* random.h in Headers */,
@@ -4982,7 +4896,6 @@
 				0BA1E0301B051A07007675AF /* NetError.css in Resources */,
 				59871C1921E4D83900316590 /* block-cookies.json in Resources */,
 				0A83D9F121B7FFD200245EF0 /* ABPFilterParserData.dat in Resources */,
-				5992CB9F220B869400B12C09 /* LICENSE-SDP in Resources */,
 				3BC659491E5BA4AE006D560F /* TopSites in Resources */,
 				E4B7B77E1A793CF20022C5E0 /* FiraSans-SemiBold.ttf in Resources */,
 				F84B220B1A0910F600AAB793 /* Images.xcassets in Resources */,
@@ -5028,7 +4941,6 @@
 				5DE5250E218CE92C000DFAA6 /* block-images.json in Resources */,
 				E4A961381AC06FA50069AD6F /* ReaderViewLoading.html in Resources */,
 				E4ECCDAE1AB131770005E717 /* FiraSans-Medium.ttf in Resources */,
-				5992CBA2220B869400B12C09 /* Readme.md in Resources */,
 				E4424B3C1AC71FB400F44C38 /* FiraSans-Book.ttf in Resources */,
 				5DE52511218CE92C000DFAA6 /* block-trackers.json in Resources */,
 				39A35AED1C0662A3006B9E87 /* SpotlightHelper.js in Resources */,
@@ -5037,7 +4949,6 @@
 				2F44FB2D1A9D5D8500FD20CC /* FiraSans-BoldItalic.ttf in Resources */,
 				D03F8F23200EAC1F003C2224 /* AllFramesAtDocumentStart.js in Resources */,
 				279C75C821A5B37D001CD1CB /* FingerprintingProtection.js in Resources */,
-				5992CBA0220B869400B12C09 /* public_suffix_list.dat in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5518,7 +5429,6 @@
 				0A1E84432190A57F0042F782 /* SyncWelcomeViewController.swift in Sources */,
 				D308E4E41A5306F500842685 /* SearchEngines.swift in Sources */,
 				4422D55121BFFB7E00BF1855 /* set.cc in Sources */,
-				5992CBA5220B869400B12C09 /* DomainParser.swift in Sources */,
 				A13AC72520EC12360040D4BB /* Migration.swift in Sources */,
 				27FD2CAB2146C31C00A5A779 /* RequestDesktopSiteActivity.swift in Sources */,
 				3BCE6D3C1CEB9E4D0080928C /* ThirdPartySearchAlerts.swift in Sources */,
@@ -5528,7 +5438,6 @@
 				4422D4C321BFFB7600BF1855 /* coding.cc in Sources */,
 				595E0EE121CAEF5B00813D49 /* FileManagerExtension.swift in Sources */,
 				C615FAD9212A1E2600A8168C /* WebImageCache.swift in Sources */,
-				5992CBA4220B869400B12C09 /* Constant.swift in Sources */,
 				C615FAED212ACAD200A8168C /* BraveWebView.swift in Sources */,
 				C817B34D1FC609500086018E /* UIScrollViewSwizzled.swift in Sources */,
 				4422D4E221BFFB7600BF1855 /* format.cc in Sources */,
@@ -5562,10 +5471,8 @@
 				E68E7ADE1CAC208A00FDCA76 /* RemovePasscodeViewController.swift in Sources */,
 				D314E7F71A37B98700426A76 /* TabToolbar.swift in Sources */,
 				4422D55321BFFB7E00BF1855 /* parse.cc in Sources */,
-				5992CBAB220B869400B12C09 /* ParsedHost.swift in Sources */,
 				4422D4F421BFFB7600BF1855 /* version_edit.cc in Sources */,
 				EB11A1062044A90E0018F749 /* ContentBlockerHelper+TabContentScript.swift in Sources */,
-				5992CBA8220B869400B12C09 /* Rule.swift in Sources */,
 				3B0943811D6CC4FC004F24E1 /* FilledPageControl.swift in Sources */,
 				C615FADF212A319C00A8168C /* PrivacyProtection.swift in Sources */,
 				FA9293D41D6580E100AC8D33 /* QRCodeViewController.swift in Sources */,
@@ -5654,7 +5561,6 @@
 				E6D8D5E71B569D70009E5A58 /* BrowserTrayAnimators.swift in Sources */,
 				DDA24A431FD84D630098F159 /* DefaultSearchPrefs.swift in Sources */,
 				4422D4B121BFFB7600BF1855 /* bloom.cc in Sources */,
-				5992CBA9220B869400B12C09 /* RulesParser.swift in Sources */,
 				4422D4FD21BFFB7600BF1855 /* dumpfile.cc in Sources */,
 				E65075611E37F77D006961AC /* MenuHelper.swift in Sources */,
 				E63ED7D81BFCD9990097D08E /* LoginTableViewCell.swift in Sources */,
@@ -5710,7 +5616,6 @@
 				4422D56521BFFB7F00BF1855 /* filtered_re2.cc in Sources */,
 				279C756B219DDE3B001CD1CB /* FingerprintingProtection.swift in Sources */,
 				E650755F1E37F756006961AC /* Try.m in Sources */,
-				5992CBAA220B869400B12C09 /* BasicRulesParser.swift in Sources */,
 				3B6889C51D66950E002AC85E /* UIImageColors.swift in Sources */,
 				0A1E84402190A57F0042F782 /* SyncSelectDeviceTypeViewController.swift in Sources */,
 				392ED7E41D0AEF56009D9B62 /* NewTabAccessors.swift in Sources */,
@@ -5731,7 +5636,6 @@
 				0BA1E02E1B046F1E007675AF /* ErrorPageHelper.swift in Sources */,
 				D3A9949C1A3686BD008AD1AC /* BrowserViewController.swift in Sources */,
 				59A681BDFC95A19F05E07223 /* SearchViewController.swift in Sources */,
-				5992CBA7220B869400B12C09 /* RuleLabel.swift in Sources */,
 				A1CDF22B20BDD6B8005C6E58 /* POPExtensions.swift in Sources */,
 				E68E7ADA1CAC207400FDCA76 /* ChangePasscodeViewController.swift in Sources */,
 				E640E85E1C73A45A00C5F072 /* PasscodeEntryViewController.swift in Sources */,
@@ -5794,7 +5698,6 @@
 				27C46201211CD8D20088A441 /* DeferredTestUtils.swift in Sources */,
 				2F44FA1B1A9D426A00FD20CC /* TestHashExtensions.swift in Sources */,
 				D3FA777B1A43B2990010CD32 /* SearchTests.swift in Sources */,
-				5992CBAC220B86F800B12C09 /* DomainParserTests.swift in Sources */,
 				D3BA41681BD82F2200DA5457 /* XCTestCaseExtensions.swift in Sources */,
 				3BFCBF201E04B1C50070C042 /* UIImageViewExtensionsTests.swift in Sources */,
 				E683F0A61E92E0820035D990 /* MockableHistory.swift in Sources */,
