@@ -7,8 +7,8 @@ class CustomHeaderData: NSObject {
     let domainList: [String]
     let headerField: String
     let headerValue: String
-    private static let bravePartnerKey: String = "X-Brave-Partner"
-    private static let securedBravePartnerKey: String = "__Secure-X-Brave-Partner"
+    private static let bravePartnerKey = "X-Brave-Partner"
+    private static let securedBravePartnerKey = "__Secure-\(CustomHeaderData.bravePartnerKey)"
 
     init(domainList: [String], headerKey: String, headerValue: String) {
         self.domainList = domainList
@@ -43,6 +43,7 @@ class CustomHeaderData: NSObject {
             if cookie?.name == CustomHeaderData.securedBravePartnerKey {
                 return cookie
             }
+            assertionFailure("Invalid partner cookie name: \(cookie?.name ?? "Cookie is nil")")
             return nil
         }
     }
