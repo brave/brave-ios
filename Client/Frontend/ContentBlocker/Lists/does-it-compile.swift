@@ -16,7 +16,11 @@ func synchronousCompileList(_ list: String, to ruleStore: WKContentRuleListStore
   group.enter()
   ruleStore.compileContentRuleList(forIdentifier: "list", encodedContentRuleList: list, completionHandler: { list, error in
     if let error = error {
-      result = .failed(error.localizedDescription)
+      if let errorString = (error as NSError).userInfo["NSHelpAnchor"] as? String {
+        result = .failed(errorString)
+      } else {
+        result = .failed(String(describing: error))
+      }
     } else {
       result = .success
     }
