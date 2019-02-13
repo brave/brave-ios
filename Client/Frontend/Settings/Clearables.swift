@@ -75,7 +75,12 @@ class CacheClearable: Clearable {
         let result = Deferred<Maybe<()>>()
         // need event loop to run to autorelease UIWebViews fully
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            WKWebsiteDataStore.default().removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(), modifiedSince: Date(timeIntervalSinceReferenceDate: 0)) {
+            let localStorageClearables: Set<String> = [WKWebsiteDataTypeDiskCache,
+                                                       WKWebsiteDataTypeServiceWorkerRegistrations,
+                                                       WKWebsiteDataTypeOfflineWebApplicationCache,
+                                                       WKWebsiteDataTypeMemoryCache,
+                                                       WKWebsiteDataTypeFetchCache]
+            WKWebsiteDataStore.default().removeData(ofTypes: localStorageClearables, modifiedSince: Date(timeIntervalSinceReferenceDate: 0)) {
                 ImageCache.shared.clear()
                 result.fill(Maybe<()>(success: ()))
             }
