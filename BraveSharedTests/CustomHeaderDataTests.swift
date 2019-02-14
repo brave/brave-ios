@@ -9,10 +9,14 @@ import SwiftyJSON
 class CustomHeaderDataTest: XCTestCase {
     
     //Valid Json from server.
-    var expectedJSON = "[{\"domains\":[\"coinbase.com\",\"api.coinbase.com\"],\"headers\":{\"X-Brave-Partner\":\"coinbase\"},\"cookieNames\":[],\"expiration\":31536000000},{\"domains\":[\"marketwatch.com\",\"barrons.com\"],\"headers\":{\"X-Brave-Partner\":\"dowjones\"},\"cookieNames\":[],\"expiration\":31536000000},{\"domains\":[\"townsquareblogs.com\",\"tasteofcountry.com\",\"ultimateclassicrock.com\",\"xxlmag.com\",\"popcrush.com\"],\"headers\":{\"X-Brave-Partner\":\"townsquare\"},\"cookieNames\":[],\"expiration\":31536000000},{\"domains\":[\"cheddar.com\"],\"headers\":{\"X-Brave-Partner\":\"cheddar\"},\"cookieNames\":[],\"expiration\":31536000000}]"
+    var expectedJSON = """
+[{"domains":["example1.com","api.example1.com"],"headers":{"X-Brave-Partner":"example"},"cookieNames":[],"expiration":31536000000},{"domains":["testing.com","testing1.com"],"headers":{"X-Brave-Partner":"QA"},"cookieNames":[],"expiration":31536000000},{"domains":["xyz.com","abc.com","pqr.com"],"headers":{"X-Brave-Partner":"combinations"},"cookieNames":[],"expiration":31536000000},{"domains":["cookies.co.au"],"headers":{"X-Brave-Partner":"oreo"},"cookieNames":[],"expiration":31536000000}]
+"""
     
     //Invalid partner key
-    var maliciousJSON = "[{\"domains\":[\"coinbase.com\",\"api.coinbase.com\"],\"headers\":{\"Not-X-Brave-Partner\":\"coinbase\"},\"cookieNames\":[],\"expiration\":31536000000},{\"domains\":[\"marketwatch.com\",\"barrons.com\"],\"headers\":{\"Not-X-Brave-Partner\":\"dowjones\"},\"cookieNames\":[],\"expiration\":31536000000},{\"domains\":[\"townsquareblogs.com\",\"tasteofcountry.com\",\"ultimateclassicrock.com\",\"xxlmag.com\",\"popcrush.com\"],\"headers\":{\"Not-X-Brave-Partner\":\"townsquare\"},\"cookieNames\":[],\"expiration\":31536000000},{\"domains\":[\"cheddar.com\"],\"headers\":{\"Not-X-Brave-Partner\":\"cheddar\"},\"cookieNames\":[],\"expiration\":31536000000}]"
+    var maliciousJSON = """
+[{"domains":["example1.com","api.example1.com"],"headers":{"Not-X-Brave-Partner":"example"},"cookieNames":[],"expiration":31536000000},{"domains":["testing.com","testing1.com"],"headers":{"Not-X-Brave-Partner":"QA"},"cookieNames":[],"expiration":31536000000},{"domains":["xyz.com","abc.com","pqr.com"],"headers":{"Not-X-Brave-Partner":"combinations"},"cookieNames":[],"expiration":31536000000},{"domains":["cookies.co.au"],"headers":{"Not-X-Brave-Partner":"oreo"},"cookieNames":[],"expiration":31536000000}]
+"""
     
     
     func testExample() {
@@ -21,9 +25,9 @@ class CustomHeaderDataTest: XCTestCase {
         let expectedHeaders = getCustomHeader(for: expectedJSON)
         let maliciousHeaders = getCustomHeader(for: maliciousJSON)
         //Tests for non empty array of headers from valid json
-        XCTAssertTrue(!expectedHeaders.isEmpty)
+        XCTAssertFalse(expectedHeaders.isEmpty)
         //Tests the non empty array for the correct key
-        XCTAssertTrue(expectedHeaders.filter({$0.headerField != CustomHeaderData.bravePartnerKey}).isEmpty)
+        XCTAssertFalse(expectedHeaders.contains(where: {$0.headerField != CustomHeaderData.bravePartnerKey}))
         //Test for empty array of headers from malicious json
         XCTAssertTrue(maliciousHeaders.isEmpty)
     }
