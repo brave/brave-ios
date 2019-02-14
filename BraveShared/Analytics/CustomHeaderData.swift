@@ -7,7 +7,7 @@ class CustomHeaderData: NSObject {
     let domainList: [String]
     let headerField: String
     let headerValue: String
-    private static let bravePartnerKey = "X-Brave-Partner"
+    static let bravePartnerKey = "X-Brave-Partner"
     private static let securedBravePartnerKey = "__Secure-\(CustomHeaderData.bravePartnerKey)"
 
     init(domainList: [String], headerKey: String, headerValue: String) {
