@@ -15,9 +15,6 @@ class AdBlockStats {
         var lang = AdBlockStats.defaultLocale
     }
     
-    static let prefKey = "braveBlockAdsAndTracking"
-    static let prefKeyDefaultValue = true
-    static let prefKeyUseRegional = "braveAdblockUseRegional"
     static let dataVersion = 4
     
     static let dataVersionPrefKey = "dataVersionPrefKey"
@@ -29,7 +26,6 @@ class AdBlockStats {
     
     private let blockListFileName = "ABPFilterParserData"
     
-    var isNSPrefEnabled = true
     fileprivate var fifoCacheOfUrlsChecked = FifoDict()
     fileprivate var regionToS3FileName = [LocaleCode: String]()
     
@@ -37,17 +33,17 @@ class AdBlockStats {
     fileprivate lazy var abpFilterLibWrappers: [LocaleCode: ABPFilterLibWrapper] = {
         return [AdBlockStats.defaultLocale: ABPFilterLibWrapper()]
     }()
-    var currentLocaleCode: LocaleCode = defaultLocale
+    
+    let currentLocaleCode: LocaleCode
     
     fileprivate var isRegionalAdblockEnabled: Bool { return Preferences.Shields.useRegionAdBlock.value }
     
     fileprivate init() {
-        setDataVersionPreference()
-        updateEnabledState()
-        parseAdblockRegionsFile()
-        
         currentLocaleCode = Locale.current.languageCode ?? AdBlockStats.defaultLocale
         updateRegionalAdblockEnabledState()
+        
+        setDataVersionPreference()
+        parseAdblockRegionsFile()
         
         Preferences.Shields.useRegionAdBlock.observe(from: self)
     }
@@ -126,15 +122,6 @@ class AdBlockStats {
         if Preferences.Shields.useRegionAdBlock.value {
             regionalNetworkLoaders.forEach { $0.value.loadData() }
         }
-    }
-    
-    func isRegionalAdblockPossible() -> (hasRegionalFile: Bool, isDefaultSettingOn: Bool) {
-        return (hasRegionalFile: currentLocaleCode != AdBlockStats.defaultLocale && regionToS3FileName[currentLocaleCode] != nil,
-                isDefaultSettingOn: isRegionalAdblockEnabled)
-    }
-    
-    func updateEnabledState() {
-        isNSPrefEnabled = Preferences.Shields.blockAdsAndTracking.value
     }
     
     fileprivate func updateRegionalAdblockEnabledState() {
