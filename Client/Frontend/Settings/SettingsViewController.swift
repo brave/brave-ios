@@ -230,7 +230,10 @@ class SettingsViewController: TableViewController {
                         (.webSiteData, status)
                         ])
                     if success {
-                        Preferences.Privacy.blockAllCookies.value = status
+                        let completionBlock: (Bool) -> Void = {(_) in
+                            Preferences.Privacy.blockAllCookies.value = status
+                        }
+                        status ? HTTPCookie.saveToDisk(completion: completionBlock) : HTTPCookie.loadFromDisk(completion: completionBlock)
                     } else {
                         //Revert the changes. Not handling success here to avoid a loop.
                         _ = FileManager.default.setFolderAccess([
