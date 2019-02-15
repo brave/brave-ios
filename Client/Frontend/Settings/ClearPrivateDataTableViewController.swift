@@ -178,7 +178,7 @@ class ClearPrivateDataTableViewController: UITableViewController {
                 self.tabManager.resetConfiguration()
                 // Unlock the folders to allow clearing of data.
                 if Preferences.Privacy.blockAllCookies.value {
-                    _ = FileManager.default.setFolderAccess([
+                    FileManager.default.setFolderAccess([
                         (.cookie, false),
                         (.webSiteData, false)
                         ])
@@ -188,14 +188,13 @@ class ClearPrivateDataTableViewController: UITableViewController {
                 // TODO: add API to avoid add/remove
                 //Lock the local storage back if mismatch.
                 if Preferences.Privacy.blockAllCookies.value, !FileManager.default.checkLockedStatus(folder: .cookie) {
-                    _ = FileManager.default.setFolderAccess([
+                    FileManager.default.setFolderAccess([
                         (.cookie, true),
                         (.webSiteData, true)
                         ])
                 }
                 self.tabManager.removeTab(self.tabManager.addTab())
             }
-            //      }
         })
     }
     

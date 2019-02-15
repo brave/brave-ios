@@ -15,13 +15,13 @@ public extension FileManager {
     typealias FolderLockObj = (folder: Folder, lock: Bool)
     
     //Lock a folder using FolderLockObj provided.
-    public func setFolderAccess(_ lockObjects: [FolderLockObj]) -> Bool {
+    @discardableResult public func setFolderAccess(_ lockObjects: [FolderLockObj]) -> Bool {
         let baseDir = NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true)[0]
         for lockObj in lockObjects {
             do {
                 try self.setAttributes([.posixPermissions: (lockObj.lock ? NSNumber(value: 0 as Int16) : NSNumber(value: 0o755 as Int16))], ofItemAtPath: baseDir + lockObj.folder.rawValue)
-            } catch let e {
-                log.error("Failed to \(lockObj.lock ? "Lock" : "Unlock") item at path \(lockObj.folder.rawValue) with error: \n\(e)")
+            } catch {
+                log.error("Failed to \(lockObj.lock ? "Lock" : "Unlock") item at path \(lockObj.folder.rawValue) with error: \n\(error)")
                 return false
             }
         }
@@ -35,8 +35,8 @@ public extension FileManager {
             if let lockValue = try self.attributesOfItem(atPath: baseDir + folder.rawValue)[.posixPermissions] as? NSNumber {
                 return lockValue == NSNumber(value: 0o755 as Int16)
             }
-        } catch let e {
-            log.error("Failed to check lock status on item at path \(folder.rawValue) with error: \n\(e)")
+        } catch {
+            log.error("Failed to check lock status on item at path \(folder.rawValue) with error: \n\(error)")
             return false
         }
         return false
