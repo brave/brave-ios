@@ -227,6 +227,14 @@ extension AdBlockStats: NetworkDataFileLoaderDelegate {
             assertionFailure()
             return false
         }
+        
+        // If the file is already on disk we inject it into adblocker.
+        guard let path = loader.pathToExistingDataOnDisk(),
+            let contents = FileManager.default.contents(atPath: path) else {
+                return false
+        }
+        adblocker.setDataFile(contents)
+        
         return adblocker.hasDataFile()
     }
     
@@ -234,6 +242,7 @@ extension AdBlockStats: NetworkDataFileLoaderDelegate {
         return false
     }
 }
+
 extension AdBlockStats: PreferencesObserver {
     func preferencesDidChange(for key: String) {
         if key == Preferences.Shields.useRegionAdBlock.key {

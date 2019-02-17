@@ -18,6 +18,8 @@ class BlocklistName: CustomStringConvertible, ContentBlocker {
     static let image = BlocklistName(filename: "block-images")
     static let cookie = BlocklistName(filename: "block-cookies")
     
+    /// List of all bundled content blockers.
+    /// Regional lists are downloaded on fly and not included here.
     static var allLists: Set<BlocklistName> { return [.ad, .tracker, .https, .image] }
     
     let filename: String
@@ -46,10 +48,12 @@ class BlocklistName: CustomStringConvertible, ContentBlocker {
     }()
     
     static func blocklists(forDomain domain: Domain, locale: String? = Locale.current.languageCode) -> (on: Set<BlocklistName>, off: Set<BlocklistName>) {
+        let regionalBlocker = ContentBlockerRegion.with(localeCode: locale)
+        
         if domain.shield_allOff == 1 {
             var offList = allLists
             // Make sure to consider the regional list which needs to be disabled as well
-            if let locale = locale, let regionalBlocker = ContentBlockerRegion.with(localeCode: locale) {
+            if let regionalBlocker = regionalBlocker {
                 offList.insert(regionalBlocker)
             }
             return ([], offList)
@@ -60,8 +64,7 @@ class BlocklistName: CustomStringConvertible, ContentBlocker {
         if domain.isShieldExpected(.AdblockAndTp) {
             onList.formUnion([.ad, .tracker])
             
-            if Preferences.Shields.useRegionAdBlock.value, let locale = locale,
-                let regionalBlocker = ContentBlockerRegion.with(localeCode: locale) {
+            if Preferences.Shields.useRegionAdBlock.value, let regionalBlocker = regionalBlocker {
                 onList.insert(regionalBlocker)
             }
         }
@@ -76,8 +79,7 @@ class BlocklistName: CustomStringConvertible, ContentBlocker {
         
         var offList = allLists.subtracting(onList)
         // Make sure to consider the regional list since the user may disable it globally
-        if let locale = locale, let regionalBlocker = ContentBlockerRegion.with(localeCode: locale),
-            !onList.contains(regionalBlocker) {
+        if let regionalBlocker = regionalBlocker, !onList.contains(regionalBlocker) {
             offList.insert(regionalBlocker)
         }
         
@@ -96,5 +98,24 @@ class BlocklistName: CustomStringConvertible, ContentBlocker {
         }
         
         return allCompiledDeferred
+    }
+    
+    func compile(data: Data?, withLoader loader: NetworkDataFileLoader,
+                 ruleStore: WKContentRuleListStore = WKContentRuleListStore.default()) {
+        guard let data = data, let dataString = String(data: data, encoding: .utf8) else {
+            log.error("Could not read data for content blocker compilation.")
+            return
+        }
+        
+        ruleStore.compileContentRuleList(forIdentifier: self.filename, encodedContentRuleList: dataString) { rule, error in
+            if let error = error {
+                // TODO #382: Potential telemetry location
+                log.error("Content blocker '\(self.filename)' errored: \(error.localizedDescription)")
+                assert(false)
+            }
+            assert(rule != nil)
+            
+            self.rule = rule
+        }
     }
 }

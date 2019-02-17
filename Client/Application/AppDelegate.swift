@@ -61,6 +61,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         self.window!.backgroundColor = UIColor.Photon.White100
 
         AdBlockStats.shared.startLoading()
+        if let locale = Locale.current.languageCode {
+            let regionalAdblock = ContentBlockerRegion.with(localeCode: locale)
+            regionalAdblock?.startLoading()
+        }
         HttpsEverywhereStats.shared.startLoading()
         
         // Passcode checking, must happen on immediate launch
