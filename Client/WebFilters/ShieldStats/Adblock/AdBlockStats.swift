@@ -22,7 +22,9 @@ class AdBlockStats {
     
     let adBlockDataFolderName = "abp-data"
     let adBlockRegionFilePath = Bundle.main.path(forResource: "adblock-regions", ofType: "txt")
-    let adBlockDataUrlPath = "https://adblock-data.s3.brave.com/"
+    // let adBlockDataUrlPath = "https://adblock-data.s3.brave.com/"
+    // temporary
+    let adBlockDataUrlPath = "https://github.com/iccub/brave-blocklists-test/raw/master/ios/"
     
     private let blockListFileName = "ABPFilterParserData"
     
@@ -40,10 +42,10 @@ class AdBlockStats {
     
     fileprivate init() {
         currentLocaleCode = Locale.current.languageCode ?? AdBlockStats.defaultLocale
-        updateRegionalAdblockEnabledState()
         
         setDataVersionPreference()
         parseAdblockRegionsFile()
+        updateRegionalAdblockEnabledState()
         
         Preferences.Shields.useRegionAdBlock.observe(from: self)
     }
@@ -102,7 +104,9 @@ class AdBlockStats {
     }
     
     fileprivate func getNetworkLoader(forLocale locale: LocaleCode, name: String) -> AdblockNetworkDataFileLoader {
-        let dataUrl = URL(string: "\(adBlockDataUrlPath)\(AdBlockStats.dataVersion)/\(name).dat")!
+        // let dataUrl = URL(string: "\(adBlockDataUrlPath)\(AdBlockStats.dataVersion)/\(name)-latest.dat")!
+        // temporary
+        let dataUrl = URL(string: "\(adBlockDataUrlPath)/\(name)-latest.dat")!
         let dataFile = "abp-data-\(AdBlockStats.dataVersion)-\(locale).dat"
         let loader = AdblockNetworkDataFileLoader(url: dataUrl, file: dataFile, localDirName: adBlockDataFolderName)
         loader.lang = locale
