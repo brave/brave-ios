@@ -47,6 +47,7 @@
 		0A4B012220D02F26004D4011 /* TabBarCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A4B012120D02F26004D4011 /* TabBarCell.swift */; };
 		0A4B012420D0321A004D4011 /* UX.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A4B012320D0321A004D4011 /* UX.swift */; };
 		0A4BEF5D221AF1910005551A /* AdblockResourceDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A4BEF5C221AF1910005551A /* AdblockResourceDownloader.swift */; };
+		0A4BEF62221B26610005551A /* LocalAdblockResourceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A4BEF61221B26610005551A /* LocalAdblockResourceProtocol.swift */; };
 		0A771D35218C8FDC00336E0D /* Bookmark+Sync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A771D34218C8FDC00336E0D /* Bookmark+Sync.swift */; };
 		0A83D9F121B7FFD200245EF0 /* ABPFilterParserData.dat in Resources */ = {isa = PBXBuildFile; fileRef = 0A83D9E921B7FFD100245EF0 /* ABPFilterParserData.dat */; };
 		0AA4FC392109D685000B173A /* CRUDProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AA4FC382109D685000B173A /* CRUDProtocols.swift */; };
@@ -1132,6 +1133,7 @@
 		0A4B012120D02F26004D4011 /* TabBarCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarCell.swift; sourceTree = "<group>"; };
 		0A4B012320D0321A004D4011 /* UX.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UX.swift; sourceTree = "<group>"; };
 		0A4BEF5C221AF1910005551A /* AdblockResourceDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdblockResourceDownloader.swift; sourceTree = "<group>"; };
+		0A4BEF61221B26610005551A /* LocalAdblockResourceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalAdblockResourceProtocol.swift; sourceTree = "<group>"; };
 		0A6231E32121F761007B429B /* UnitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = UnitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0A771D34218C8FDC00336E0D /* Bookmark+Sync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bookmark+Sync.swift"; sourceTree = "<group>"; };
 		0A83D9E921B7FFD100245EF0 /* ABPFilterParserData.dat */ = {isa = PBXFileReference; lastKnownFileType = file; path = ABPFilterParserData.dat; sourceTree = "<group>"; };
@@ -2291,6 +2293,7 @@
 				4422D57721C073EE00BF1855 /* ShieldStats */,
 				0A0D3D3721A4BCF100BEE65B /* SafeBrowsing */,
 				0A4BEF5C221AF1910005551A /* AdblockResourceDownloader.swift */,
+				0A4BEF61221B26610005551A /* LocalAdblockResourceProtocol.swift */,
 			);
 			path = WebFilters;
 			sourceTree = "<group>";
@@ -5399,6 +5402,7 @@
 				4422D4B921BFFB7600BF1855 /* crc32c.cc in Sources */,
 				E66C5B481BDA81050051AA93 /* UIImage+ImageEffects.m in Sources */,
 				4422D4D721BFFB7600BF1855 /* table.cc in Sources */,
+				0A4BEF62221B26610005551A /* LocalAdblockResourceProtocol.swift in Sources */,
 				E4CD9F6D1A77DD2800318571 /* ReaderModeStyleViewController.swift in Sources */,
 				D0FCF7F51FE45842004A7995 /* UserScriptManager.swift in Sources */,
 				E4A960061ABB9C450069AD6F /* ReaderModeUtils.swift in Sources */,

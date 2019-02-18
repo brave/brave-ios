@@ -6,7 +6,7 @@ import Shared
 
 private let log = Logger.browserLogger
 
-class HttpsEverywhereStats {
+class HttpsEverywhereStats: LocalAdblockResourceProtocol {
     static let shared = HttpsEverywhereStats()
     static let dataVersion = "6.0"
     
@@ -18,22 +18,8 @@ class HttpsEverywhereStats {
     fileprivate init() { }
     
     func startLoading() {
-        loadLocalData(HttpsEverywhereStats.levelDbFileName, type: "tgz")
-    }
-    
-    func loadLocalData(_ name: String, type: String) {
-        guard let path = Bundle.main.path(forResource: name, ofType: type) else {
-            log.error("Could not find local file with name: \(name) and type :\(type)")
-            return
-        }
-        
-        let url = URL(fileURLWithPath: path)
-        
-        do {
-            let data = try Data(contentsOf: url)
+        loadLocalData(name: HttpsEverywhereStats.levelDbFileName, type: "tgz") { data in
             setData(data: data)
-        } catch {
-            log.error(error)
         }
     }
     

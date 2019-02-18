@@ -7,7 +7,7 @@ import Deferred
 
 private let log = Logger.browserLogger
 
-class AdBlockStats {
+class AdBlockStats: LocalAdblockResourceProtocol {
     static let shared = AdBlockStats()
     
     typealias LocaleCode = String
@@ -44,22 +44,8 @@ class AdBlockStats {
     }
     
     func startLoading() {
-        loadLocalData(blockListFileName, type: "dat")
-    }
-    
-    func loadLocalData(_ name: String, type: String) {
-        guard let path = Bundle.main.path(forResource: name, ofType: type) else {
-            log.error("Could not find local file with name: \(name) and type :\(type)")
-            return
-        }
-        
-        let url = URL(fileURLWithPath: path)
-        
-        do {
-            let data = try Data(contentsOf: url)
-            setDataFile(data: data)
-        } catch {
-            log.error(error)
+        loadLocalData(name: blockListFileName, type: "dat") { data in
+            self.setDataFile(data: data, locale: AdBlockStats.defaultLocale)
         }
     }
     
@@ -139,9 +125,9 @@ class AdBlockStats {
         }
     }
     
-    @discardableResult func setDataFile(data: Data) -> Deferred<()> {
+    @discardableResult func setDataFile(data: Data, locale: String? = Locale.current.languageCode) -> Deferred<()> {
         let completion = Deferred<()>()
-        let locale = Locale.current.languageCode!
+        let locale = locale ?? AdBlockStats.defaultLocale
         guard let adblocker = abpFilterLibWrappers[locale] else {
             assertionFailure()
             return completion
