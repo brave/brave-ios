@@ -7,26 +7,6 @@ import Shared
 
 private let log = Logger.browserLogger
 
-enum AdblockResourceType: String {
-    case dat = "dat"
-    case json = "json"
-}
-
-struct AdblockResourceManager {
-    let endpoint: String
-    let folderName: String
-    
-    // temporary
-    // static let defaultEndpoint = "https://adblock-data.s3.brave.com/"
-    private static let defaultEndpoint = "https://github.com/iccub/brave-blocklists-test/raw/master/ios/"
-    private static let defaultFolderName = "abp-data"
-    
-    init(endpoint: String = defaultEndpoint, folderName: String = defaultFolderName) {
-        self.endpoint = endpoint
-        self.folderName = folderName
-    }
-}
-
 protocol AdblockResourceProtocol {
     /// Adblocking consists of two separate files.
     /// A .dat file for counting how many ads are blocked

@@ -100,11 +100,12 @@ class BlocklistName: CustomStringConvertible, ContentBlocker {
         return allCompiledDeferred
     }
     
-    func compile(data: Data?, withLoader loader: NetworkDataFileLoader,
-                 ruleStore: WKContentRuleListStore = WKContentRuleListStore.default()) {
+    func compile(data: Data?,
+                 ruleStore: WKContentRuleListStore = WKContentRuleListStore.default()) -> Deferred<()> {
+        let completion = Deferred<()>()
         guard let data = data, let dataString = String(data: data, encoding: .utf8) else {
             log.error("Could not read data for content blocker compilation.")
-            return
+            return completion
         }
         
         ruleStore.compileContentRuleList(forIdentifier: self.filename, encodedContentRuleList: dataString) { rule, error in
@@ -116,6 +117,9 @@ class BlocklistName: CustomStringConvertible, ContentBlocker {
             assert(rule != nil)
             
             self.rule = rule
+            completion.fill(())
         }
+        
+        return completion
     }
 }

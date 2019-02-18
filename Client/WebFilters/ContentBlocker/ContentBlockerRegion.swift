@@ -45,7 +45,7 @@ extension ContentBlockerRegion: NetworkDataFileLoaderDelegate {
             log.error("Network loader is nil")
             return
         }
-        compile(data: data, withLoader: loader)
+        compile(data: data)
     }
     
     func fileLoaderHasDataFile(_ loader: NetworkDataFileLoader) -> Bool {

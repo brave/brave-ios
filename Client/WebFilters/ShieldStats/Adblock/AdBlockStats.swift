@@ -3,6 +3,7 @@
 import Foundation
 import Shared
 import BraveShared
+import Deferred
 
 private let log = Logger.browserLogger
 
@@ -169,6 +170,21 @@ class AdBlockStats: AdblockResourceProtocol {
 }
 
 extension AdBlockStats: NetworkDataFileLoaderDelegate {
+    
+    func setDataFile(data: Data) -> Deferred<()> {
+        let completion = Deferred<()>()
+        let locale = Locale.current.languageCode!
+        guard let adblocker = abpFilterLibWrappers[locale] else {
+            assertionFailure()
+            return completion
+        }
+        adblocker.setDataFile(data)
+        
+        if adblocker.hasDataFile() {
+            completion.fill(())
+        }
+        return completion
+    }
     
     func fileLoader(_ loader: NetworkDataFileLoader, setDataFile data: Data?) {
         guard let loader = loader as? LocalizedNetworkDataFileLoader, let adblocker = abpFilterLibWrappers[loader.lang] else {
