@@ -10,23 +10,18 @@ import BraveShared
 
 private let log = Logger.browserLogger
 
-class ContentBlockerRegion: BlocklistName {
-    private class RegionalFileLoader: NetworkDataFileLoader {
-        var lang = AdBlockStats.defaultLocale
-    }
+class ContentBlockerRegion: BlocklistName, AdblockResourceProtocol {
+    var resourceType: AdblockResourceType = .json
     
     /// Static content blocker stores rule lists for regional ad blocking.
     private static var regionalContentBlocker: ContentBlockerRegion?
     
-    // let adBlockDataUrlPath = "https://adblock-data.s3.brave.com/"
-    // temporary
-    let adBlockDataUrlPath = "https://github.com/iccub/brave-blocklists-test/raw/master/ios/"
-    let adBlockDataFolderName = "abp-data"
-    
     private let localeCode: String
     
-    private lazy var networkLoader: RegionalFileLoader = {
-        return getNetworkLoader(forLocale: localeCode, name: filename)
+    private lazy var networkLoader: NetworkDataFileLoader? = {
+        let loader = createNetworkLoader(forLocale: localeCode, name: filename)
+        loader?.delegate = self
+        return loader
     }()
     
     private init(localeCode: String, filename: String) {
@@ -38,26 +33,19 @@ class ContentBlockerRegion: BlocklistName {
     
     func startLoading() {
         if Preferences.Shields.useRegionAdBlock.value {
-            networkLoader.loadData()
+            networkLoader?.loadData()
         }
-    }
-    
-    private func getNetworkLoader(forLocale locale: String, name: String) -> RegionalFileLoader {
-        // let dataUrl = URL(string: "\(adBlockDataUrlPath)\(AdBlockStats.dataVersion)/\(name)-latest.dat")!
-        // temporary
-        let dataUrl = URL(string: "\(adBlockDataUrlPath)/\(name).json")!
-        let dataFile = "abp-content-blocker-\(AdBlockStats.dataVersion)-\(locale).json"
-        let loader = RegionalFileLoader(url: dataUrl, file: dataFile, localDirName: adBlockDataFolderName)
-        loader.lang = locale
-        loader.delegate = self
-        return loader
     }
 }
 
 // MARK: - NetworkDataFileLoaderDelegate
 extension ContentBlockerRegion: NetworkDataFileLoaderDelegate {
     func fileLoader(_: NetworkDataFileLoader, setDataFile data: Data?) {
-        compile(data: data, withLoader: networkLoader)
+        guard let loader = networkLoader else {
+            log.error("Network loader is nil")
+            return
+        }
+        compile(data: data, withLoader: loader)
     }
     
     func fileLoaderHasDataFile(_ loader: NetworkDataFileLoader) -> Bool {

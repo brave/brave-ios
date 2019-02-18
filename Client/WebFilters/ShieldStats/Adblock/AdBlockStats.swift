@@ -6,30 +6,23 @@ import BraveShared
 
 private let log = Logger.browserLogger
 
-class AdBlockStats {
+class AdBlockStats: AdblockResourceProtocol {
+    var resourceType: AdblockResourceType = .dat
+    
     static let shared = AdBlockStats()
     
     typealias LocaleCode = String
-    
-    class AdblockNetworkDataFileLoader: NetworkDataFileLoader {
-        var lang = AdBlockStats.defaultLocale
-    }
     
     static let dataVersion = 4
     
     static let dataVersionPrefKey = "dataVersionPrefKey"
     static let defaultLocale = "en"
     
-    let adBlockDataFolderName = "abp-data"
-    // let adBlockDataUrlPath = "https://adblock-data.s3.brave.com/"
-    // temporary
-    let adBlockDataUrlPath = "https://github.com/iccub/brave-blocklists-test/raw/master/ios/"
-    
     private let blockListFileName = "ABPFilterParserData"
     
     fileprivate var fifoCacheOfUrlsChecked = FifoDict()
     
-    fileprivate var regionalNetworkLoaders = [LocaleCode: AdblockNetworkDataFileLoader]()
+    fileprivate var regionalNetworkLoaders = [LocaleCode: LocalizedNetworkDataFileLoader]()
     fileprivate lazy var abpFilterLibWrappers: [LocaleCode: ABPFilterLibWrapper] = {
         return [AdBlockStats.defaultLocale: ABPFilterLibWrapper()]
     }()
@@ -58,12 +51,12 @@ class AdBlockStats {
         }
     }
     
-    private func cleanDatFiles() {
+    private func cleanDatFiles(resourceManager manager: AdblockResourceManager = AdblockResourceManager()) {
         guard let dir = NetworkDataFileLoader.directoryPath else { return }
         
         let fm = FileManager.default
         do {
-            let folderPath = dir + "/\(adBlockDataFolderName)"
+            let folderPath = dir + "/\(manager.folderName)"
             let paths = try fm.contentsOfDirectory(atPath: folderPath)
             for path in paths {
                 try fm.removeItem(atPath: "\(folderPath)/\(path)")
@@ -73,21 +66,11 @@ class AdBlockStats {
         }
     }
     
-    fileprivate func getNetworkLoader(forLocale locale: LocaleCode, name: String) -> AdblockNetworkDataFileLoader {
-        // let dataUrl = URL(string: "\(adBlockDataUrlPath)\(AdBlockStats.dataVersion)/\(name)-latest.dat")!
-        // temporary
-        let dataUrl = URL(string: "\(adBlockDataUrlPath)/\(name)")!
-        let dataFile = "abp-data-\(AdBlockStats.dataVersion)-\(locale).dat"
-        let loader = AdblockNetworkDataFileLoader(url: dataUrl, file: dataFile, localDirName: adBlockDataFolderName)
-        loader.lang = locale
-        loader.delegate = self
-        return loader
-    }
-    
     func startLoading() {
         // General adblock file is prepackaged. Regional files are downloaded from server.
-        let generalAdblockFile = getNetworkLoader(forLocale: AdBlockStats.defaultLocale, name: blockListFileName)
-        generalAdblockFile.loadLocalData(blockListFileName, type: "dat")
+        let generalAdblockFile = createNetworkLoader(forLocale: AdBlockStats.defaultLocale, name: blockListFileName)
+        generalAdblockFile?.delegate = self
+        generalAdblockFile?.loadLocalData(blockListFileName, type: "dat")
 
         loadRegionalResources()
     }
@@ -106,7 +89,10 @@ class AdBlockStats {
             return
         }
         
-        regionalNetworkLoaders[currentLocaleCode] = getNetworkLoader(forLocale: currentLocaleCode, name: fileName)
+        if let regionalLoader = createNetworkLoader(forLocale: currentLocaleCode, name: fileName) {
+            regionalLoader.delegate = self
+            regionalNetworkLoaders[currentLocaleCode] = regionalLoader
+        }
         abpFilterLibWrappers[currentLocaleCode] = ABPFilterLibWrapper()
     }
     
@@ -185,7 +171,7 @@ class AdBlockStats {
 extension AdBlockStats: NetworkDataFileLoaderDelegate {
     
     func fileLoader(_ loader: NetworkDataFileLoader, setDataFile data: Data?) {
-        guard let loader = loader as? AdblockNetworkDataFileLoader, let adblocker = abpFilterLibWrappers[loader.lang] else {
+        guard let loader = loader as? LocalizedNetworkDataFileLoader, let adblocker = abpFilterLibWrappers[loader.lang] else {
             assertionFailure()
             return
         }
@@ -193,7 +179,7 @@ extension AdBlockStats: NetworkDataFileLoaderDelegate {
     }
     
     func fileLoaderHasDataFile(_ loader: NetworkDataFileLoader) -> Bool {
-        guard let loader = loader as? AdblockNetworkDataFileLoader, let adblocker = abpFilterLibWrappers[loader.lang] else {
+        guard let loader = loader as? LocalizedNetworkDataFileLoader, let adblocker = abpFilterLibWrappers[loader.lang] else {
             assertionFailure()
             return false
         }

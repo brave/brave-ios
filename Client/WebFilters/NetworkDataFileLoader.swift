@@ -12,6 +12,10 @@ protocol NetworkDataFileLoaderDelegate: class {
     func fileLoaderDelegateWillHandleInitialRead(_: NetworkDataFileLoader) -> Bool
 }
 
+class LocalizedNetworkDataFileLoader: NetworkDataFileLoader {
+    var lang = AdBlockStats.defaultLocale
+}
+
 class NetworkDataFileLoader {
     let dataUrl: URL
     let dataFile: String
