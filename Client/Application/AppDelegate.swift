@@ -63,10 +63,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         AdBlockStats.shared.startLoading()
         AdblockResourceDownloader.shared.regionalAdblockResourcesSetup()
         
-        if let locale = Locale.current.languageCode {
-            let regionalAdblock = ContentBlockerRegion.with(localeCode: locale)
-            regionalAdblock?.startLoading()
-        }
         HttpsEverywhereStats.shared.startLoading()
         
         // Passcode checking, must happen on immediate launch

@@ -4,6 +4,7 @@
 
 import Foundation
 import Shared
+import Deferred
 
 private let log = Logger.browserLogger
 
@@ -24,5 +25,47 @@ public extension FileManager {
             }
         }
         return true
+    }
+    
+    func getOrCreateDirectory(withName name: String) -> (path: String, created: Bool) {
+        if let dir = NetworkDataFileLoader.directoryPath {
+            let path = dir + "/" + name
+            var wasCreated = false
+            if !FileManager.default.fileExists(atPath: path) {
+                do {
+                    try FileManager.default.createDirectory(atPath: path, withIntermediateDirectories: false, attributes: nil)
+                } catch {
+                    log.error("NetworkDataFileLoader error: \(error)")
+                }
+                wasCreated = true
+            }
+            return (path, wasCreated)
+        } else {
+            log.error("Can't get documents dir.")
+            return ("", false)
+        }
+    }
+    
+    func writeToDiskInFolder(_ data: Data, fileName: String, folderName: String) -> Deferred<()> {
+        let completion = Deferred<()>()
+        let (dir, _) = FileManager.default.getOrCreateDirectory(withName: folderName)
+        
+        let path = dir + "/" + fileName
+        if !((try? data.write(to: URL(fileURLWithPath: path), options: [.atomic])) != nil) { // will overwrite
+            log.error("Failed to write data to \(path)")
+        }
+        
+        addSkipBackupAttributeToItemAtURL(URL(fileURLWithPath: dir, isDirectory: true))
+        
+        completion.fill(())
+        return completion
+    }
+    
+    func addSkipBackupAttributeToItemAtURL(_ url: URL) {
+        do {
+            try (url as NSURL).setResourceValue(true, forKey: URLResourceKey.isExcludedFromBackupKey)
+        } catch {
+            log.error("Error excluding \(url.lastPathComponent) from backup \(error)")
+        }
     }
 }

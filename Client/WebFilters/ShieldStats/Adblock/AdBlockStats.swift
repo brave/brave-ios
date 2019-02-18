@@ -7,9 +7,7 @@ import Deferred
 
 private let log = Logger.browserLogger
 
-class AdBlockStats: AdblockResourceProtocol {
-    var resourceType: AdblockResourceType = .dat
-    
+class AdBlockStats {
     static let shared = AdBlockStats()
     
     typealias LocaleCode = String
@@ -23,7 +21,6 @@ class AdBlockStats: AdblockResourceProtocol {
     
     fileprivate var fifoCacheOfUrlsChecked = FifoDict()
     
-    fileprivate var regionalNetworkLoaders = [LocaleCode: LocalizedNetworkDataFileLoader]()
     fileprivate lazy var abpFilterLibWrappers: [LocaleCode: ABPFilterLibWrapper] = {
         return [AdBlockStats.defaultLocale: ABPFilterLibWrapper()]
     }()
@@ -34,66 +31,40 @@ class AdBlockStats: AdblockResourceProtocol {
     
     fileprivate init() {
         currentLocaleCode = Locale.current.languageCode ?? AdBlockStats.defaultLocale
-        
         setDataVersionPreference()
         updateRegionalAdblockEnabledState()
-        
-        Preferences.Shields.useRegionAdBlock.observe(from: self)
     }
     
-    /// We want to avoid situations in which user still has downloaded old abp data version.
-    /// We remove all abp data after data version is updated, then the newest data is downloaded.
     private func setDataVersionPreference() {
         
         guard let dataVersioPref = Preferences.Shields.adblockStatsDataVersion.value, dataVersioPref == AdBlockStats.dataVersion else {
-            cleanDatFiles()
             Preferences.Shields.adblockStatsDataVersion.value = AdBlockStats.dataVersion
             return
         }
     }
     
-    private func cleanDatFiles(resourceManager manager: AdblockResourceManager = AdblockResourceManager()) {
-        guard let dir = NetworkDataFileLoader.directoryPath else { return }
-        
-        let fm = FileManager.default
-        do {
-            let folderPath = dir + "/\(manager.folderName)"
-            let paths = try fm.contentsOfDirectory(atPath: folderPath)
-            for path in paths {
-                try fm.removeItem(atPath: "\(folderPath)/\(path)")
-            }
-        } catch {
-            log.error(error.localizedDescription)
-        }
-    }
-    
     func startLoading() {
-        // General adblock file is prepackaged. Regional files are downloaded from server.
-        let generalAdblockFile = createNetworkLoader(forLocale: AdBlockStats.defaultLocale, name: blockListFileName)
-        generalAdblockFile?.delegate = self
-        generalAdblockFile?.loadLocalData(blockListFileName, type: "dat")
-
-        loadRegionalResources()
+        loadLocalData(blockListFileName, type: "dat")
     }
     
-    private func loadRegionalResources() {
-        if Preferences.Shields.useRegionAdBlock.value {
-            regionalNetworkLoaders.forEach { $0.value.loadData() }
+    func loadLocalData(_ name: String, type: String) {
+        guard let path = Bundle.main.path(forResource: name, ofType: type) else {
+            log.error("Could not find local file with name: \(name) and type :\(type)")
+            return
+        }
+        
+        let url = URL(fileURLWithPath: path)
+        
+        do {
+            let data = try Data(contentsOf: url)
+            setDataFile(data: data)
+        } catch {
+            log.error(error)
         }
     }
     
     fileprivate func updateRegionalAdblockEnabledState() {
         if currentLocaleCode == AdBlockStats.defaultLocale { return }
-        
-        guard let fileName = ContentBlockerRegion.with(localeCode: currentLocaleCode)?.filename else {
-            log.warning("No custom adblock file for \(self.currentLocaleCode)")
-            return
-        }
-        
-        if let regionalLoader = createNetworkLoader(forLocale: currentLocaleCode, name: fileName) {
-            regionalLoader.delegate = self
-            regionalNetworkLoaders[currentLocaleCode] = regionalLoader
-        }
         abpFilterLibWrappers[currentLocaleCode] = ABPFilterLibWrapper()
     }
     
@@ -167,11 +138,8 @@ class AdBlockStats: AdblockResourceProtocol {
             return url
         }
     }
-}
-
-extension AdBlockStats: NetworkDataFileLoaderDelegate {
     
-    func setDataFile(data: Data) -> Deferred<()> {
+    @discardableResult func setDataFile(data: Data) -> Deferred<()> {
         let completion = Deferred<()>()
         let locale = Locale.current.languageCode!
         guard let adblocker = abpFilterLibWrappers[locale] else {
@@ -184,41 +152,5 @@ extension AdBlockStats: NetworkDataFileLoaderDelegate {
             completion.fill(())
         }
         return completion
-    }
-    
-    func fileLoader(_ loader: NetworkDataFileLoader, setDataFile data: Data?) {
-        guard let loader = loader as? LocalizedNetworkDataFileLoader, let adblocker = abpFilterLibWrappers[loader.lang] else {
-            assertionFailure()
-            return
-        }
-        adblocker.setDataFile(data)
-    }
-    
-    func fileLoaderHasDataFile(_ loader: NetworkDataFileLoader) -> Bool {
-        guard let loader = loader as? LocalizedNetworkDataFileLoader, let adblocker = abpFilterLibWrappers[loader.lang] else {
-            assertionFailure()
-            return false
-        }
-        
-        // If the file is already on disk we inject it into adblocker.
-        guard let path = loader.pathToExistingDataOnDisk(),
-            let contents = FileManager.default.contents(atPath: path) else {
-                return false
-        }
-        adblocker.setDataFile(contents)
-        
-        return adblocker.hasDataFile()
-    }
-    
-    func fileLoaderDelegateWillHandleInitialRead(_ loader: NetworkDataFileLoader) -> Bool {
-        return false
-    }
-}
-
-extension AdBlockStats: PreferencesObserver {
-    func preferencesDidChange(for key: String) {
-        if key == Preferences.Shields.useRegionAdBlock.key {
-            loadRegionalResources()
-        }
     }
 }

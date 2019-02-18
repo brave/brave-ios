@@ -156,20 +156,4 @@ class NetworkDataFileLoader {
             }
         }
     }
-    
-    func loadLocalData(_ name: String, type: String) {
-        guard let path = Bundle.main.path(forResource: name, ofType: type) else {
-            log.error("Could not find local file with name: \(name) and type :\(type)")
-            return
-        }
-        
-        let url = URL(fileURLWithPath: path)
-        
-        do {
-            let data = try Data(contentsOf: url)
-            delegate?.fileLoader(self, setDataFile: data)
-        } catch {
-            log.error(error)
-        }
-    }
 }

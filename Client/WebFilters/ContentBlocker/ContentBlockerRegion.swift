@@ -10,59 +10,15 @@ import BraveShared
 
 private let log = Logger.browserLogger
 
-class ContentBlockerRegion: BlocklistName, AdblockResourceProtocol {
-    var resourceType: AdblockResourceType = .json
-    
+class ContentBlockerRegion: BlocklistName {
     /// Static content blocker stores rule lists for regional ad blocking.
     private static var regionalContentBlocker: ContentBlockerRegion?
     
     private let localeCode: String
     
-    private lazy var networkLoader: NetworkDataFileLoader? = {
-        let loader = createNetworkLoader(forLocale: localeCode, name: filename)
-        loader?.delegate = self
-        return loader
-    }()
-    
     private init(localeCode: String, filename: String) {
         self.localeCode = localeCode
         super.init(filename: filename)
-        
-        Preferences.Shields.useRegionAdBlock.observe(from: self)
-    }
-    
-    func startLoading() {
-        if Preferences.Shields.useRegionAdBlock.value {
-            networkLoader?.loadData()
-        }
-    }
-}
-
-// MARK: - NetworkDataFileLoaderDelegate
-extension ContentBlockerRegion: NetworkDataFileLoaderDelegate {
-    func fileLoader(_: NetworkDataFileLoader, setDataFile data: Data?) {
-        guard let loader = networkLoader else {
-            log.error("Network loader is nil")
-            return
-        }
-        compile(data: data)
-    }
-    
-    func fileLoaderHasDataFile(_ loader: NetworkDataFileLoader) -> Bool {
-        return loader.pathToExistingDataOnDisk() != nil && loader.readDataEtag() != nil
-    }
-    
-    func fileLoaderDelegateWillHandleInitialRead(_: NetworkDataFileLoader) -> Bool {
-        return false
-    }
-}
-
-// MARK: - PreferencesObserver
-extension ContentBlockerRegion: PreferencesObserver {
-    func preferencesDidChange(for key: String) {
-        if key == Preferences.Shields.useRegionAdBlock.key {
-            startLoading()
-        }
     }
 }
 
