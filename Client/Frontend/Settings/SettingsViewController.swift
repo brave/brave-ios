@@ -373,7 +373,7 @@ class SettingsViewController: TableViewController {
                 Row(text: "Region: \(Locale.current.regionCode ?? "--")"),
                 Row(text: "Recompile Content Blockers", selection: { [weak self] in
                     BlocklistName.allLists.forEach { $0.fileVersionPref?.value = nil }
-                    ContentBlockerHelper.compileLists().upon { _ in
+                    ContentBlockerHelper.compileBundledLists().upon { _ in
                         let alert = UIAlertController(title: nil, message: "Recompiled Blockers", preferredStyle: .alert)
                         alert.addAction(UIAlertAction(title: "OK", style: .default))
                         self?.present(alert, animated: true)

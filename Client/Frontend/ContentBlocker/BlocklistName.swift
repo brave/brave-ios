@@ -86,12 +86,12 @@ class BlocklistName: CustomStringConvertible, ContentBlocker {
         return (onList, offList)
     }
     
-    static func compileAll(ruleStore: WKContentRuleListStore) -> Deferred<Void> {
+    static func compileBundledRules(ruleStore: WKContentRuleListStore) -> Deferred<Void> {
         let allCompiledDeferred = Deferred<Void>()
         var allOfThem = BlocklistName.allLists.map {
             $0.buildRule(ruleStore: ruleStore)
         }
-        //Compile block-cookie additionally 
+        // Compile block-cookie additionally
         allOfThem.append(BlocklistName.cookie.buildRule(ruleStore: ruleStore))
         all(allOfThem).upon { _ in
             allCompiledDeferred.fill(())
@@ -111,7 +111,7 @@ class BlocklistName: CustomStringConvertible, ContentBlocker {
             if let error = error {
                 // TODO #382: Potential telemetry location
                 log.error("Content blocker '\(self.filename)' errored: \(error.localizedDescription)")
-                assert(false)
+                assertionFailure()
             }
             assert(rule != nil)
             
