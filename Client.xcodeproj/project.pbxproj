@@ -2287,8 +2287,10 @@
 		0A0D3D2F21A4BC1F00BEE65B /* WebFilters */ = {
 			isa = PBXGroup;
 			children = (
+				EB2A63241F3B49A7004EF8B0 /* ContentBlocker */,
 				4422D57721C073EE00BF1855 /* ShieldStats */,
 				0A0D3D3721A4BCF100BEE65B /* SafeBrowsing */,
+				0A43293821B1C8120041625B /* NetworkDataFileLoader.swift */,
 			);
 			path = WebFilters;
 			sourceTree = "<group>";
@@ -3082,7 +3084,6 @@
 			children = (
 				0A4319B321B1C4D60041625B /* Adblock */,
 				4422D41A21BFCE3900BF1855 /* Httpse */,
-				0A43293821B1C8120041625B /* NetworkDataFileLoader.swift */,
 			);
 			path = ShieldStats;
 			sourceTree = "<group>";
@@ -4022,7 +4023,6 @@
 				392ED7D51D0AEEEE009D9B62 /* Accessors */,
 				E692E3271C46E62D009D1240 /* AuthenticationManager */,
 				D3A994941A368691008AD1AC /* Browser */,
-				EB2A63241F3B49A7004EF8B0 /* ContentBlocker */,
 				7B0B1B9C1C1B69F500DF4AB5 /* Extensions */,
 				A104E190210A380E00D2323E /* Shields */,
 				E63ED8DF1BFD254E0097D08E /* Login Management */,
