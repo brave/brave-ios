@@ -45,7 +45,7 @@ extension AdblockResourceProtocol {
         
         let extensionType = ".\(resourceType.rawValue)"
         
-        guard let resourceUrl = URL(string: endpoint + folderName + extensionType) else {
+        guard let resourceUrl = URL(string: endpoint + name + extensionType) else {
             log.error("Could not parse url for getting an adblocker resource")
             return nil
         }
