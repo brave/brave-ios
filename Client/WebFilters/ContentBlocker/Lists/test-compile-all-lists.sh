@@ -9,12 +9,4 @@ do
   ./does-it-compile.swift "$file"
 done
 
-echo ""
-echo "Testing regional blockers"
-
-for file in Regional/*.json
-do
-  ./does-it-compile.swift "$file"
-done
-
 popd
