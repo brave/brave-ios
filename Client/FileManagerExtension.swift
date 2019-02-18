@@ -28,22 +28,22 @@ public extension FileManager {
     }
     
     func getOrCreateDirectory(withName name: String) -> (path: String, created: Bool) {
-        if let dir = NetworkDataFileLoader.directoryPath {
-            let path = dir + "/" + name
-            var wasCreated = false
-            if !FileManager.default.fileExists(atPath: path) {
-                do {
-                    try FileManager.default.createDirectory(atPath: path, withIntermediateDirectories: false, attributes: nil)
-                } catch {
-                    log.error("NetworkDataFileLoader error: \(error)")
-                }
-                wasCreated = true
-            }
-            return (path, wasCreated)
-        } else {
+        guard let documentDirectory = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first else {
             log.error("Can't get documents dir.")
             return ("", false)
         }
+        
+        let path = documentDirectory + "/" + name
+        var wasCreated = false
+        if !FileManager.default.fileExists(atPath: path) {
+            do {
+                try FileManager.default.createDirectory(atPath: path, withIntermediateDirectories: false, attributes: nil)
+            } catch {
+                log.error("createDirectory error: \(error)")
+            }
+            wasCreated = true
+        }
+        return (path, wasCreated)
     }
     
     func writeToDiskInFolder(_ data: Data, fileName: String, folderName: String) -> Deferred<()> {
