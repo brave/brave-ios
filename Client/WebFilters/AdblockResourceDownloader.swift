@@ -47,6 +47,7 @@ class AdblockResourceDownloader {
     
     private func downloadRegionalAdblockResources() -> Deferred<()> {
         let completion = Deferred<()>()
+        let queue = DispatchQueue(label: "Regional adblock setup")
         
         guard let name = ContentBlockerRegion.with(localeCode: locale)?.filename else { return completion }
         
@@ -63,12 +64,12 @@ class AdblockResourceDownloader {
         let datRequest = downloadResource(atUrl: datResourceUrl, type: .dat)
         let jsonRequest = downloadResource(atUrl: jsonResourceUrl, type: .json)
         
-        all([datRequest, jsonRequest]).upon { resources in
+        all([datRequest, jsonRequest]).uponQueue(queue) { resources in
             guard let jsonResource = resources.first(where: { $0.type == .json }),
                 let contentBlocker = ContentBlockerRegion.with(localeCode: self.locale) else { return }
             let compilationResult = contentBlocker.compile(data: jsonResource.data)
             
-            compilationResult.upon {
+            compilationResult.uponQueue(queue) {
                 var fileSaveCompletions = [Deferred<()>]()
                 let fm = FileManager.default
                 
@@ -78,7 +79,7 @@ class AdblockResourceDownloader {
                                                                       folderName: self.folderName))
                 }
                 
-                all(fileSaveCompletions).upon { _ in
+                all(fileSaveCompletions).uponQueue(queue) { _ in
                     
                     var resourceSetup = [Deferred<()>]()
                     
@@ -93,7 +94,7 @@ class AdblockResourceDownloader {
                         }
                     }
                     
-                    all(resourceSetup).upon { _ in
+                    all(resourceSetup).uponQueue(queue) { _ in
                         completion.fill(())
                     }
                 }
