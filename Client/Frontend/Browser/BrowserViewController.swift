@@ -2923,11 +2923,20 @@ extension BrowserViewController: PreferencesObserver {
             // All `block all cookies` toggle requires a hard reset of Webkit configuration.
             tabManager.reset()
             if !Preferences.Privacy.blockAllCookies.value {
-                tabManager.allTabs.forEach {
-                    if let url: URL = $0.webView?.url {
-                        $0.loadRequest(PrivilegedRequest(url: url) as URLRequest)
+                HTTPCookie.loadFromDisk { (_) in
+                    self.tabManager.reloadSelectedTab()
+                    self.tabManager.allTabs.forEach {
+                        //Creating all webviews since they are deleted in reset.
+                        if $0 != self.tabManager.selectedTab {
+                            $0.createWebview()
+                            if let url: URL = $0.webView?.url {
+                                $0.loadRequest(PrivilegedRequest(url: url) as URLRequest)
+                            }
+                        }
                     }
                 }
+            } else {
+                tabManager.reloadSelectedTab()
             }
         default:
             log.debug("Received a preference change for an unknown key: \(key) on \(type(of: self))")
