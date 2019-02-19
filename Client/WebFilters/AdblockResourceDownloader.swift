@@ -23,8 +23,10 @@ class AdblockResourceDownloader {
     private let session: URLSession
     private let locale: String
     
+    // FIXME: Change to proper url once ready.
     private let endpoint = "https://github.com/iccub/brave-blocklists-test/raw/master/ios/"
     private let folderName = "abp-data"
+    private let queue = DispatchQueue(label: "RegionalAdblockSetup")
     
     init(session: URLSession = URLSession.shared, locale: String? = Locale.current.languageCode) {
         if locale == nil {
@@ -47,7 +49,6 @@ class AdblockResourceDownloader {
     
     private func downloadRegionalAdblockResources() -> Deferred<()> {
         let completion = Deferred<()>()
-        let queue = DispatchQueue(label: "Regional adblock setup")
         
         guard let name = ContentBlockerRegion.with(localeCode: locale)?.filename else { return completion }
         
@@ -63,44 +64,63 @@ class AdblockResourceDownloader {
         
         let datRequest = downloadResource(atUrl: datResourceUrl, type: .dat)
         let jsonRequest = downloadResource(atUrl: jsonResourceUrl, type: .json)
+        let downloadResources = all([datRequest, jsonRequest])
         
-        all([datRequest, jsonRequest]).uponQueue(queue) { resources in
-            guard let jsonResource = resources.first(where: { $0.type == .json }),
-                let contentBlocker = ContentBlockerRegion.with(localeCode: self.locale) else { return }
-            let compilationResult = contentBlocker.compile(data: jsonResource.data)
-            
-            compilationResult.uponQueue(queue) {
-                var fileSaveCompletions = [Deferred<()>]()
-                let fm = FileManager.default
-                
-                resources.forEach {
-                    let fileName = name + ".\($0.type.rawValue)"
-                    fileSaveCompletions.append(fm.writeToDiskInFolder($0.data, fileName: fileName,
-                                                                      folderName: self.folderName))
-                }
-                
-                all(fileSaveCompletions).uponQueue(queue) { _ in
-                    
-                    var resourceSetup = [Deferred<()>]()
-                    
-                    resources.forEach {
-                        switch $0.type {
-                        case .dat:
-                            Preferences.Shields.regionalAdblockDatEtag.value = $0.etag
-                            resourceSetup.append(AdBlockStats.shared.setDataFile(data: $0.data))
-                        case .json:
-                            Preferences.Shields.regionalAdblockJsonEtag.value = $0.etag
-                            // json compilation happens as a first step of regional setup initialization
-                        }
+        let queue = self.queue
+        
+        downloadResources.uponQueue(queue) { resources in
+            // json to content rules compilation happens first, otherwise it makes no sense to proceed further
+            // and overwrite old files that were working before.
+            self.compileContentBlocker(resources: resources)
+                .uponQueue(queue) { _ in self.writeFilesTodisk(resources: resources, name: name)
+                    .uponQueue(queue) { _ in self.setUpFiles(resources: resources, compileJsonRules: false)
+                        .uponQueue(queue) { completion.fill(()) }
                     }
-                    
-                    all(resourceSetup).uponQueue(queue) { _ in
-                        completion.fill(())
-                    }
-                }
             }
         }
         
+        return completion
+    }
+    
+    private func compileContentBlocker(resources: [AdBlockNetworkResource]) -> Deferred<()> {
+        var completion = Deferred<()>()
+        guard let jsonResource = resources.first(where: { $0.type == .json }),
+            let contentBlocker = ContentBlockerRegion.with(localeCode: self.locale) else { return completion }
+        completion = contentBlocker.compile(data: jsonResource.data)
+        return completion
+    }
+    
+    private func writeFilesTodisk(resources: [AdBlockNetworkResource], name: String) -> Deferred<()> {
+        let completion = Deferred<()>()
+        var fileSaveCompletions = [Deferred<()>]()
+        let fm = FileManager.default
+        
+        resources.forEach {
+            let fileName = name + ".\($0.type.rawValue)"
+            fileSaveCompletions.append(fm.writeToDiskInFolder($0.data, fileName: fileName,
+                                                              folderName: self.folderName))
+        }
+        all(fileSaveCompletions).uponQueue(queue) { _ in completion.fill(()) }
+        return completion
+    }
+    
+    private func setUpFiles(resources: [AdBlockNetworkResource], compileJsonRules: Bool) -> Deferred<()> {
+        let completion = Deferred<()>()
+        var resourceSetup = [Deferred<()>]()
+        
+        resources.forEach {
+            switch $0.type {
+            case .dat:
+                Preferences.Shields.regionalAdblockDatEtag.value = $0.etag
+                resourceSetup.append(AdBlockStats.shared.setDataFile(data: $0.data))
+            case .json:
+                Preferences.Shields.regionalAdblockJsonEtag.value = $0.etag
+                if compileJsonRules {
+                    resourceSetup.append(compileContentBlocker(resources: resources))
+                }
+            }
+        }
+        all(resourceSetup).uponQueue(queue) { _ in completion.fill(()) }
         return completion
     }
     
