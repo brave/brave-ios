@@ -60,46 +60,42 @@ class AdblockResourceDownloader {
             return completion
         }
         
-        // Successful setup of regional blocking has 4 steps:
-        // 1. Both .dat and .json files must be downloaded.
-        // 2. Downloaded files needs to be saved to disk and eventually overwrite existing files.
-        // 3. Preferences storing etag values for these files is saved.
-        // 4. Proper configuration, .dat file needs to be added to adblock lib and .json has
-        // to be compiled to content blocker rules.
-        // Each step must be completed before next step is performed.
-        
-        // 1
         let datRequest = downloadResource(atUrl: datResourceUrl, type: .dat)
         let jsonRequest = downloadResource(atUrl: jsonResourceUrl, type: .json)
         
         all([datRequest, jsonRequest]).upon { resources in
-            var fileSaveCompletions = [Deferred<()>]()
-            let fm = FileManager.default
+            guard let jsonResource = resources.first(where: { $0.type == .json }),
+                let contentBlocker = ContentBlockerRegion.with(localeCode: self.locale) else { return }
+            let compilationResult = contentBlocker.compile(data: jsonResource.data)
             
-            resources.forEach { // 2
-                let fileName = name + ".\($0.type.rawValue)"
-                fileSaveCompletions.append(fm.writeToDiskInFolder($0.data, fileName: fileName,
-                                                                  folderName: self.folderName))
-            }
-            
-            all(fileSaveCompletions).upon { _ in
+            compilationResult.upon {
+                var fileSaveCompletions = [Deferred<()>]()
+                let fm = FileManager.default
                 
-                var resourceSetup = [Deferred<()>]()
-                
-                resources.forEach { // 3, 4
-                    switch $0.type {
-                    case .dat:
-                        Preferences.Shields.regionalAdblockDatEtag.value = $0.etag
-                        resourceSetup.append(AdBlockStats.shared.setDataFile(data: $0.data))
-                    case .json:
-                        Preferences.Shields.regionalAdblockJsonEtag.value = $0.etag
-                        guard let contentBlocker = ContentBlockerRegion.with(localeCode: self.locale) else { return }
-                        resourceSetup.append(contentBlocker.compile(data: $0.data))
-                    }
+                resources.forEach {
+                    let fileName = name + ".\($0.type.rawValue)"
+                    fileSaveCompletions.append(fm.writeToDiskInFolder($0.data, fileName: fileName,
+                                                                      folderName: self.folderName))
                 }
                 
-                all(resourceSetup).upon { _ in
-                    completion.fill(())
+                all(fileSaveCompletions).upon { _ in
+                    
+                    var resourceSetup = [Deferred<()>]()
+                    
+                    resources.forEach {
+                        switch $0.type {
+                        case .dat:
+                            Preferences.Shields.regionalAdblockDatEtag.value = $0.etag
+                            resourceSetup.append(AdBlockStats.shared.setDataFile(data: $0.data))
+                        case .json:
+                            Preferences.Shields.regionalAdblockJsonEtag.value = $0.etag
+                            // json compilation happens as a first step of regional setup initialization
+                        }
+                    }
+                    
+                    all(resourceSetup).upon { _ in
+                        completion.fill(())
+                    }
                 }
             }
         }
@@ -126,7 +122,7 @@ class AdblockResourceDownloader {
         }
         
         if checkEtags {
-            // No etag means this is first download of the resource, putting a random string to make sure
+            // No etag means this is a first download of the resource, putting a random string to make sure
             // the resource will be downloaded.
             let requestEtag = etag ?? UUID().uuidString
 
