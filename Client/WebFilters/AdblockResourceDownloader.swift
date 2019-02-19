@@ -34,6 +34,8 @@ class AdblockResourceDownloader {
         }
         self.locale = locale ?? "en"
         self.session = session
+        
+        Preferences.Shields.useRegionAdBlock.observe(from: self)
     }
     
     func regionalAdblockResourcesSetup() {
@@ -184,4 +186,15 @@ class AdblockResourceDownloader {
         
         return completion
     }
+}
+
+extension AdblockResourceDownloader: PreferencesObserver {
+    func preferencesDidChange(for key: String) {
+        let regionalAdblockPref = Preferences.Shields.useRegionAdBlock
+        if key == regionalAdblockPref.key {
+            regionalAdblockResourcesSetup()
+        }
+    }
+    
+    
 }
