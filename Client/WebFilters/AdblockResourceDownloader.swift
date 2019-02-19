@@ -9,12 +9,9 @@ import Deferred
 
 private let log = Logger.browserLogger
 
-enum AdblockResourceType: String {
-    case dat = "dat"
-    case json = "json"
-}
+private enum AdblockResourceType: String { case dat, json }
 
-struct AdBlockNetworkResource {
+private struct AdBlockNetworkResource {
     let data: Data
     let etag: String
     let type: AdblockResourceType
@@ -23,8 +20,8 @@ struct AdBlockNetworkResource {
 class AdblockResourceDownloader {
     static let shared = AdblockResourceDownloader()
     
-    let session: URLSession
-    let locale: String
+    private let session: URLSession
+    private let locale: String
     
     private let endpoint = "https://github.com/iccub/brave-blocklists-test/raw/master/ios/"
     private let folderName = "abp-data"
@@ -48,29 +45,39 @@ class AdblockResourceDownloader {
         }
     }
     
-    func downloadRegionalAdblockResources() -> Deferred<()> {
+    private func downloadRegionalAdblockResources() -> Deferred<()> {
         let completion = Deferred<()>()
         
         guard let name = ContentBlockerRegion.with(localeCode: locale)?.filename else { return completion }
         
         guard let datResourceUrl = URL(string: endpoint + name + ".dat") else {
-            log.error("Could not parse url for getting an adblocker resource")
+            log.error("Could not parse url for getting an adblocker dat resource")
             return completion
         }
         
         guard let jsonResourceUrl = URL(string: endpoint + name + ".json") else {
-            log.error("Could not parse url for getting an adblocker resource")
+            log.error("Could not parse url for getting an adblocker json resource")
             return completion
         }
         
+        // Successful setup of regional blocking has 4 steps:
+        // 1. Both .dat and .json files must be download
+        // 2. Downloaded files needs to be saved to disk and eventually overwrite existing files
+        // 3. Preferences storing etag values for these files is saved
+        // 4. Proper configuration, .dat file needs to be added to adblock lib and .json has
+        // to be compiled to content blocker rules.
+        // Each step must be completed before next step is performed.
+        
+        // 1
         let datRequest = downloadResource(atUrl: datResourceUrl, type: .dat)
         let jsonRequest = downloadResource(atUrl: jsonResourceUrl, type: .json)
+        
         
         all([datRequest, jsonRequest]).upon { resources in
             var fileSaveCompletions = [Deferred<()>]()
             let fm = FileManager.default
             
-            resources.forEach {
+            resources.forEach { // 2
                 let fileName = name + ".\($0.type.rawValue)"
                 fileSaveCompletions.append(fm.writeToDiskInFolder($0.data, fileName: fileName,
                                                                   folderName: self.folderName))
@@ -80,7 +87,7 @@ class AdblockResourceDownloader {
                 
                 var resourceSetup = [Deferred<()>]()
                 
-                resources.forEach {
+                resources.forEach { // 3, 4
                     switch $0.type {
                     case .dat:
                         Preferences.Shields.regionalAdblockDatEtag.value = $0.etag
@@ -106,6 +113,13 @@ class AdblockResourceDownloader {
         
         var request = URLRequest(url: url)
         
+        // Makes the request conditional, returns 304 if Etag value did not change.
+        let ifNoneMatchHeader = "If-None-Match"
+        let fileNotModifiedStatusCode = 304
+        
+        // Identifier for a specific version of a resource for a HTTP request
+        let etagHeader = "Etag"
+        
         var etag: String?
         switch type {
         case .dat: etag = Preferences.Shields.regionalAdblockDatEtag.value
@@ -119,7 +133,7 @@ class AdblockResourceDownloader {
 
             // This cache policy is required to support `If-None-Match` header.
             request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
-            request.addValue(requestEtag, forHTTPHeaderField: "If-None-Match")
+            request.addValue(requestEtag, forHTTPHeaderField: ifNoneMatchHeader)
         }
         
         let task = session.dataTask(with: request, completionHandler: { data, response, error -> Void in
@@ -132,6 +146,7 @@ class AdblockResourceDownloader {
             }
             
             guard let data = data, let response = response as? HTTPURLResponse else {
+                log.error("Failed to unwrap http response or data")
                 return
             }
             
@@ -141,10 +156,11 @@ class AdblockResourceDownloader {
                     Failed to download, status code: \(response.statusCode),\
                     URL:\(String(describing: response.url))
                     """)
-            case 304:
-                log.info("File already exists")
+            case fileNotModifiedStatusCode:
+                log.info("File not modified")
             default:
-                guard let responseEtag = response.allHeaderFields["Etag"] as? String else {
+                guard let responseEtag = response.allHeaderFields[etagHeader] as? String else {
+                    log.error("Could not find Etag header in the response. Headers: \(response.allHeaderFields)")
                     return
                 }
                 completion.fill(AdBlockNetworkResource(data: data, etag: responseEtag, type: type))

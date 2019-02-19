@@ -11,10 +11,6 @@ class AdBlockStats: LocalAdblockResourceProtocol {
     static let shared = AdBlockStats()
     
     typealias LocaleCode = String
-    
-    static let dataVersion = 4
-    
-    static let dataVersionPrefKey = "dataVersionPrefKey"
     static let defaultLocale = "en"
     
     private let blockListFileName = "ABPFilterParserData"
@@ -31,16 +27,7 @@ class AdBlockStats: LocalAdblockResourceProtocol {
     
     fileprivate init() {
         currentLocaleCode = Locale.current.languageCode ?? AdBlockStats.defaultLocale
-        setDataVersionPreference()
         updateRegionalAdblockEnabledState()
-    }
-    
-    private func setDataVersionPreference() {
-        
-        guard let dataVersioPref = Preferences.Shields.adblockStatsDataVersion.value, dataVersioPref == AdBlockStats.dataVersion else {
-            Preferences.Shields.adblockStatsDataVersion.value = AdBlockStats.dataVersion
-            return
-        }
     }
     
     func startLoading() {

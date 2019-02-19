@@ -102,8 +102,6 @@ extension Preferences {
         /// to download a new version.
         static let regionalAdblockJsonEtag =
             Option<String?>(key: "shields.regional-adblock-json-etag", default: nil)
-        /// Version of downloaded data file for adblock stats.
-        static let adblockStatsDataVersion = Option<Int?>(key: "stats.adblock-data-version", default: nil)
     }
 }
 

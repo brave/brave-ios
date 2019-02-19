@@ -73,7 +73,7 @@ extension ContentBlockerRegion {
         guard let regionFileName = fileName else { return nil }
         
         // This handles two cases, regional content blocker is nil,
-        // or locale has changes and the content blocker needs to be reassigned
+        // or locale has changed and the content blocker needs to be reassigned
         if regionalContentBlocker?.localeCode != code {
             regionalContentBlocker = ContentBlockerRegion(localeCode: code, filename: regionFileName)
         }
