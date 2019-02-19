@@ -13,7 +13,7 @@ private enum AdblockResourceType: String { case dat, json }
 
 private struct AdBlockNetworkResource {
     let data: Data
-    let etag: String
+    let etag: String?
     let type: AdblockResourceType
 }
 
@@ -61,9 +61,9 @@ class AdblockResourceDownloader {
         }
         
         // Successful setup of regional blocking has 4 steps:
-        // 1. Both .dat and .json files must be download
-        // 2. Downloaded files needs to be saved to disk and eventually overwrite existing files
-        // 3. Preferences storing etag values for these files is saved
+        // 1. Both .dat and .json files must be downloaded.
+        // 2. Downloaded files needs to be saved to disk and eventually overwrite existing files.
+        // 3. Preferences storing etag values for these files is saved.
         // 4. Proper configuration, .dat file needs to be added to adblock lib and .json has
         // to be compiled to content blocker rules.
         // Each step must be completed before next step is performed.
@@ -71,7 +71,6 @@ class AdblockResourceDownloader {
         // 1
         let datRequest = downloadResource(atUrl: datResourceUrl, type: .dat)
         let jsonRequest = downloadResource(atUrl: jsonResourceUrl, type: .json)
-        
         
         all([datRequest, jsonRequest]).upon { resources in
             var fileSaveCompletions = [Deferred<()>]()
@@ -159,10 +158,8 @@ class AdblockResourceDownloader {
             case fileNotModifiedStatusCode:
                 log.info("File not modified")
             default:
-                guard let responseEtag = response.allHeaderFields[etagHeader] as? String else {
-                    log.error("Could not find Etag header in the response. Headers: \(response.allHeaderFields)")
-                    return
-                }
+                let responseEtag = response.allHeaderFields[etagHeader] as? String
+                assert(checkEtags && responseEtag != nil)
                 completion.fill(AdBlockNetworkResource(data: data, etag: responseEtag, type: type))
             }
         })
