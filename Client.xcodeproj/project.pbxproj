@@ -48,6 +48,10 @@
 		0A4B012420D0321A004D4011 /* UX.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A4B012320D0321A004D4011 /* UX.swift */; };
 		0A4BEF5D221AF1910005551A /* AdblockResourceDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A4BEF5C221AF1910005551A /* AdblockResourceDownloader.swift */; };
 		0A4BEF62221B26610005551A /* LocalAdblockResourceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A4BEF61221B26610005551A /* LocalAdblockResourceProtocol.swift */; };
+		0A4BEFD1221E115B0005551A /* NetworkSessionMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A4BEFCE221E115A0005551A /* NetworkSessionMock.swift */; };
+		0A4BEFD2221E115B0005551A /* NetworkSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A4BEFCF221E115A0005551A /* NetworkSession.swift */; };
+		0A4BEFD3221E115B0005551A /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A4BEFD0221E115B0005551A /* NetworkManager.swift */; };
+		0A4BEFD6221E13830005551A /* ContentBlockerCompilationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A4BEFD5221E13830005551A /* ContentBlockerCompilationTests.swift */; };
 		0A771D35218C8FDC00336E0D /* Bookmark+Sync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A771D34218C8FDC00336E0D /* Bookmark+Sync.swift */; };
 		0A83D9F121B7FFD200245EF0 /* ABPFilterParserData.dat in Resources */ = {isa = PBXBuildFile; fileRef = 0A83D9E921B7FFD100245EF0 /* ABPFilterParserData.dat */; };
 		0AA4FC392109D685000B173A /* CRUDProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AA4FC382109D685000B173A /* CRUDProtocols.swift */; };
@@ -1134,6 +1138,10 @@
 		0A4B012320D0321A004D4011 /* UX.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UX.swift; sourceTree = "<group>"; };
 		0A4BEF5C221AF1910005551A /* AdblockResourceDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdblockResourceDownloader.swift; sourceTree = "<group>"; };
 		0A4BEF61221B26610005551A /* LocalAdblockResourceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalAdblockResourceProtocol.swift; sourceTree = "<group>"; };
+		0A4BEFCE221E115A0005551A /* NetworkSessionMock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkSessionMock.swift; sourceTree = "<group>"; };
+		0A4BEFCF221E115A0005551A /* NetworkSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkSession.swift; sourceTree = "<group>"; };
+		0A4BEFD0221E115B0005551A /* NetworkManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
+		0A4BEFD5221E13830005551A /* ContentBlockerCompilationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBlockerCompilationTests.swift; sourceTree = "<group>"; };
 		0A6231E32121F761007B429B /* UnitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = UnitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0A771D34218C8FDC00336E0D /* Bookmark+Sync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bookmark+Sync.swift"; sourceTree = "<group>"; };
 		0A83D9E921B7FFD100245EF0 /* ABPFilterParserData.dat */ = {isa = PBXFileReference; lastKnownFileType = file; path = ABPFilterParserData.dat; sourceTree = "<group>"; };
@@ -2416,6 +2424,24 @@
 				0A4B012120D02F26004D4011 /* TabBarCell.swift */,
 			);
 			path = TabsBar;
+			sourceTree = "<group>";
+		};
+		0A4BEFCD221E11440005551A /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				0A4BEFD0221E115B0005551A /* NetworkManager.swift */,
+				0A4BEFCF221E115A0005551A /* NetworkSession.swift */,
+				0A4BEFCE221E115A0005551A /* NetworkSessionMock.swift */,
+			);
+			path = Networking;
+			sourceTree = "<group>";
+		};
+		0A4BEFD4221E11810005551A /* WebFilters */ = {
+			isa = PBXGroup;
+			children = (
+				0A4BEFD5221E13830005551A /* ContentBlockerCompilationTests.swift */,
+			);
+			path = WebFilters;
 			sourceTree = "<group>";
 		};
 		0A583F752142BC9B0086B3E7 /* Search */ = {
@@ -3927,6 +3953,7 @@
 				28EADE5C1AFC3A6D007FB2FB /* Extensions */,
 				F84B21F11A0910F600AAB793 /* Frontend */,
 				39A359BD1BFCCE7B006B9E87 /* Helpers */,
+				0A4BEFCD221E11440005551A /* Networking */,
 				0A0D3D2F21A4BC1F00BEE65B /* WebFilters */,
 				E65075551E37F714006961AC /* Utils */,
 				74821FFD1DB6D3AC00EEEA72 /* MailSchemes.plist */,
@@ -3937,6 +3964,7 @@
 		F84B21D61A090F8100AAB793 /* ClientTests */ = {
 			isa = PBXGroup;
 			children = (
+				0A4BEFD4221E11810005551A /* WebFilters */,
 				E696FE501C47F86E00EC007C /* AuthenticatorTests.swift */,
 				F84B21D91A090F8100AAB793 /* ClientTests.swift */,
 				D3D488581ABB54CD00A93597 /* FileAccessorTests.swift */,
@@ -5450,6 +5478,7 @@
 				E65607611C08B4E200534B02 /* SearchInputView.swift in Sources */,
 				0A0D3D6121A596BE00BEE65B /* MalwareList.swift in Sources */,
 				EB2A63341F3B49A7004EF8B0 /* ContentBlockerHelper.swift in Sources */,
+				0A4BEFD1221E115B0005551A /* NetworkSessionMock.swift in Sources */,
 				0A43293B21B1C8D10041625B /* FifoDict.swift in Sources */,
 				FA6B2AC21D41F02D00429414 /* Punycode.swift in Sources */,
 				D301AAEE1A3A55B70078DD1D /* TabTrayController.swift in Sources */,
@@ -5460,6 +5489,7 @@
 				A198E75120C701ED00334C11 /* HistoryViewController.swift in Sources */,
 				D3BE7B461B054F8600641031 /* TestAppDelegate.swift in Sources */,
 				A1F66A7320DD71C400303328 /* SettingsViewController.swift in Sources */,
+				0A4BEFD3221E115B0005551A /* NetworkManager.swift in Sources */,
 				0B62EFD21AD63CD100ACB9CD /* Clearables.swift in Sources */,
 				7482205C1DBAB56300EEEA72 /* MailProviders.swift in Sources */,
 				C40046FA1CF8E0B200B08303 /* BackForwardListAnimator.swift in Sources */,
@@ -5551,6 +5581,7 @@
 				C4F3B29A1CFCF93A00966259 /* ButtonToast.swift in Sources */,
 				D31A0FC71A65D6D000DC8C7E /* SearchSuggestClient.swift in Sources */,
 				4422D4AE21BFFB7600BF1855 /* testutil.cc in Sources */,
+				0A4BEFD2221E115B0005551A /* NetworkSession.swift in Sources */,
 				4422D4F121BFFB7600BF1855 /* c.cc in Sources */,
 				A83E5AB71C1D993D0026D912 /* UIPasteboardExtensions.swift in Sources */,
 				C6B81B8A212D84BD00996084 /* ImageCacheType.swift in Sources */,
@@ -5715,6 +5746,7 @@
 				2F13E79B1AC0C02700D75081 /* StringExtensionsTests.swift in Sources */,
 				2FDB10931A9FBEC5006CF312 /* PrefsTests.swift in Sources */,
 				D8EFFA261FF702A8001D3A09 /* NavigationRouterTests.swift in Sources */,
+				0A4BEFD6221E13830005551A /* ContentBlockerCompilationTests.swift in Sources */,
 				A83E5B1D1C1DA8D80026D912 /* UIPasteboardExtensionsTests.swift in Sources */,
 				D82ED2641FEB3C420059570B /* DefaultSearchPrefsTests.swift in Sources */,
 				E696FE511C47F86E00EC007C /* AuthenticatorTests.swift in Sources */,

@@ -112,7 +112,7 @@ class BlocklistName: CustomStringConvertible, ContentBlocker {
             if let error = error {
                 // TODO #382: Potential telemetry location
                 log.error("Content blocker '\(self.filename)' errored: \(error.localizedDescription)")
-                assertionFailure()
+                return
             }
             assert(rule != nil)
             

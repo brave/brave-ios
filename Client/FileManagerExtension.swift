@@ -35,9 +35,9 @@ public extension FileManager {
         
         let path = documentDirectory + "/" + name
         var wasCreated = false
-        if !FileManager.default.fileExists(atPath: path) {
+        if !fileExists(atPath: path) {
             do {
-                try FileManager.default.createDirectory(atPath: path, withIntermediateDirectories: false, attributes: nil)
+                try createDirectory(atPath: path, withIntermediateDirectories: false, attributes: nil)
             } catch {
                 log.error("createDirectory error: \(error)")
             }
@@ -48,7 +48,7 @@ public extension FileManager {
     
     func writeToDiskInFolder(_ data: Data, fileName: String, folderName: String) -> Deferred<()> {
         let completion = Deferred<()>()
-        let (dir, _) = FileManager.default.getOrCreateDirectory(withName: folderName)
+        let (dir, _) = getOrCreateDirectory(withName: folderName)
         
         let path = dir + "/" + fileName
         if !((try? data.write(to: URL(fileURLWithPath: path), options: [.atomic])) != nil) { // will overwrite
