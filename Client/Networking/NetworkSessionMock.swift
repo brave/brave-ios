@@ -9,11 +9,11 @@ class NetworkSessionMock: NetworkSession {
     var response: URLResponse?
     var error: Error?
     
-    func dataRequest(forUrl url: URL, completion: @escaping NetworkSessionDataResponse) {
+    func dataRequest(with url: URL, completion: @escaping NetworkSessionDataResponse) {
         completion(data, response, error)
     }
     
-    func dataRequest(forUrlRequest urlRequest: URLRequest, completion: @escaping NetworkSessionDataResponse) {
+    func dataRequest(with urlRequest: URLRequest, completion: @escaping NetworkSessionDataResponse) {
         completion(data, response, error)
     }
 }

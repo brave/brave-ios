@@ -52,6 +52,8 @@
 		0A4BEFD2221E115B0005551A /* NetworkSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A4BEFCF221E115A0005551A /* NetworkSession.swift */; };
 		0A4BEFD3221E115B0005551A /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A4BEFD0221E115B0005551A /* NetworkManager.swift */; };
 		0A4BEFD6221E13830005551A /* ContentBlockerCompilationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A4BEFD5221E13830005551A /* ContentBlockerCompilationTests.swift */; };
+		0A4BEFD8221EE78E0005551A /* CachedNetworkResource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A4BEFD7221EE78E0005551A /* CachedNetworkResource.swift */; };
+		0A4BEFDA221EF3360005551A /* NetworkResourceType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A4BEFD9221EF3360005551A /* NetworkResourceType.swift */; };
 		0A771D35218C8FDC00336E0D /* Bookmark+Sync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A771D34218C8FDC00336E0D /* Bookmark+Sync.swift */; };
 		0A83D9F121B7FFD200245EF0 /* ABPFilterParserData.dat in Resources */ = {isa = PBXBuildFile; fileRef = 0A83D9E921B7FFD100245EF0 /* ABPFilterParserData.dat */; };
 		0AA4FC392109D685000B173A /* CRUDProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AA4FC382109D685000B173A /* CRUDProtocols.swift */; };
@@ -1142,6 +1144,8 @@
 		0A4BEFCF221E115A0005551A /* NetworkSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkSession.swift; sourceTree = "<group>"; };
 		0A4BEFD0221E115B0005551A /* NetworkManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
 		0A4BEFD5221E13830005551A /* ContentBlockerCompilationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBlockerCompilationTests.swift; sourceTree = "<group>"; };
+		0A4BEFD7221EE78E0005551A /* CachedNetworkResource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachedNetworkResource.swift; sourceTree = "<group>"; };
+		0A4BEFD9221EF3360005551A /* NetworkResourceType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkResourceType.swift; sourceTree = "<group>"; };
 		0A6231E32121F761007B429B /* UnitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = UnitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0A771D34218C8FDC00336E0D /* Bookmark+Sync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bookmark+Sync.swift"; sourceTree = "<group>"; };
 		0A83D9E921B7FFD100245EF0 /* ABPFilterParserData.dat */ = {isa = PBXFileReference; lastKnownFileType = file; path = ABPFilterParserData.dat; sourceTree = "<group>"; };
@@ -2429,9 +2433,11 @@
 		0A4BEFCD221E11440005551A /* Networking */ = {
 			isa = PBXGroup;
 			children = (
-				0A4BEFD0221E115B0005551A /* NetworkManager.swift */,
 				0A4BEFCF221E115A0005551A /* NetworkSession.swift */,
 				0A4BEFCE221E115A0005551A /* NetworkSessionMock.swift */,
+				0A4BEFD0221E115B0005551A /* NetworkManager.swift */,
+				0A4BEFD7221EE78E0005551A /* CachedNetworkResource.swift */,
+				0A4BEFD9221EF3360005551A /* NetworkResourceType.swift */,
 			);
 			path = Networking;
 			sourceTree = "<group>";
@@ -5427,6 +5433,7 @@
 				4422D56921BFFB7F00BF1855 /* prefilter.cc in Sources */,
 				27F94A3A21909A5900F4FADF /* SearchSuggestionsPromptView.swift in Sources */,
 				C690C208212FF35100E6EEE9 /* WebImageCacheWithNoPrivacyProtectionManager.swift in Sources */,
+				0A4BEFDA221EF3360005551A /* NetworkResourceType.swift in Sources */,
 				4422D4B921BFFB7600BF1855 /* crc32c.cc in Sources */,
 				E66C5B481BDA81050051AA93 /* UIImage+ImageEffects.m in Sources */,
 				4422D4D721BFFB7600BF1855 /* table.cc in Sources */,
@@ -5656,6 +5663,7 @@
 				392ED7E41D0AEF56009D9B62 /* NewTabAccessors.swift in Sources */,
 				4422D50421BFFB7600BF1855 /* memtable.cc in Sources */,
 				D3A9949D1A3686BD008AD1AC /* Tab.swift in Sources */,
+				0A4BEFD8221EE78E0005551A /* CachedNetworkResource.swift in Sources */,
 				A93067E81D0FE18E00C49C6E /* NightModeHelper.swift in Sources */,
 				0A1E84412190A57F0042F782 /* SyncViewController.swift in Sources */,
 				0AADC4C820D2A55A00FDE368 /* FavoritesViewController.swift in Sources */,

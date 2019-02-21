@@ -7,12 +7,12 @@ import Foundation
 typealias NetworkSessionDataResponse = (Data?, URLResponse?, Error?) -> Void
 
 protocol NetworkSession {
-    func dataRequest(forUrl url: URL, completion: @escaping NetworkSessionDataResponse)
-    func dataRequest(forUrlRequest urlRequest: URLRequest, completion: @escaping NetworkSessionDataResponse)
+    func dataRequest(with url: URL, completion: @escaping NetworkSessionDataResponse)
+    func dataRequest(with urlRequest: URLRequest, completion: @escaping NetworkSessionDataResponse)
 }
 
 extension URLSession: NetworkSession {
-    func dataRequest(forUrl url: URL, completion: @escaping NetworkSessionDataResponse) {
+    func dataRequest(with url: URL, completion: @escaping NetworkSessionDataResponse) {
         let task = dataTask(with: url) { data, response, error in
             completion(data, response, error)
         }
@@ -20,7 +20,7 @@ extension URLSession: NetworkSession {
         task.resume()
     }
     
-    func dataRequest(forUrlRequest urlRequest: URLRequest, completion: @escaping NetworkSessionDataResponse) {
+    func dataRequest(with urlRequest: URLRequest, completion: @escaping NetworkSessionDataResponse) {
         let task = dataTask(with: urlRequest) { data, response, error in
             completion(data, response, error)
         }

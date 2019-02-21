@@ -12,15 +12,14 @@ private let log = Logger.browserLogger
 private enum AdblockResourceType: String { case dat, json }
 
 private struct AdBlockNetworkResource {
-    let data: Data
-    let etag: String?
+    let resource: CachedNetworkResource
     let type: AdblockResourceType
 }
 
 class AdblockResourceDownloader {
     static let shared = AdblockResourceDownloader()
     
-    private let session: URLSession
+    private let networkManager: NetworkManager
     private let locale: String
     
     // FIXME: Change to proper url once ready.
@@ -28,12 +27,12 @@ class AdblockResourceDownloader {
     private let folderName = "abp-data"
     private let queue = DispatchQueue(label: "RegionalAdblockSetup")
     
-    init(session: URLSession = URLSession.shared, locale: String? = Locale.current.languageCode) {
+    init(networkManager: NetworkManager = NetworkManager(), locale: String? = Locale.current.languageCode) {
         if locale == nil {
             log.warning("No locale provided, using default one(\"en\")")
         }
         self.locale = locale ?? "en"
-        self.session = session
+        self.networkManager = networkManager
         
         Preferences.Shields.useRegionAdBlock.observe(from: self)
     }
@@ -64,11 +63,22 @@ class AdblockResourceDownloader {
             return completion
         }
         
-        let datRequest = downloadResource(atUrl: datResourceUrl, type: .dat)
-        let jsonRequest = downloadResource(atUrl: jsonResourceUrl, type: .json)
-        let downloadResources = all([datRequest, jsonRequest])
-        
         let queue = self.queue
+        let nm = networkManager
+        
+        let datEtag = Preferences.Shields.regionalAdblockDatEtag.value
+        let datRequest = nm.downloadResource(with: datResourceUrl, resourceType: .cached(etag: datEtag))
+            .mapQueue(queue) { res in
+                AdBlockNetworkResource(resource: res, type: .dat)
+        }
+        
+        let jsonEtag = Preferences.Shields.regionalAdblockJsonEtag.value
+        let jsonRequest = nm.downloadResource(with: jsonResourceUrl, resourceType: .cached(etag: jsonEtag))
+            .mapQueue(queue) { res in
+                AdBlockNetworkResource(resource: res, type: .json)
+        }
+        
+        let downloadResources = all([datRequest, jsonRequest])
         
         downloadResources.uponQueue(queue) { resources in
             // json to content rules compilation happens first, otherwise it makes no sense to proceed further
@@ -88,7 +98,7 @@ class AdblockResourceDownloader {
         var completion = Deferred<()>()
         guard let jsonResource = resources.first(where: { $0.type == .json }),
             let contentBlocker = ContentBlockerRegion.with(localeCode: self.locale) else { return completion }
-        completion = contentBlocker.compile(data: jsonResource.data)
+        completion = contentBlocker.compile(data: jsonResource.resource.data)
         return completion
     }
     
@@ -99,7 +109,7 @@ class AdblockResourceDownloader {
         
         resources.forEach {
             let fileName = name + ".\($0.type.rawValue)"
-            fileSaveCompletions.append(fm.writeToDiskInFolder($0.data, fileName: fileName,
+            fileSaveCompletions.append(fm.writeToDiskInFolder($0.resource.data, fileName: fileName,
                                                               folderName: self.folderName))
         }
         all(fileSaveCompletions).uponQueue(queue) { _ in completion.fill(()) }
@@ -113,77 +123,16 @@ class AdblockResourceDownloader {
         resources.forEach {
             switch $0.type {
             case .dat:
-                Preferences.Shields.regionalAdblockDatEtag.value = $0.etag
-                resourceSetup.append(AdBlockStats.shared.setDataFile(data: $0.data))
+                Preferences.Shields.regionalAdblockDatEtag.value = $0.resource.etag
+                resourceSetup.append(AdBlockStats.shared.setDataFile(data: $0.resource.data))
             case .json:
-                Preferences.Shields.regionalAdblockJsonEtag.value = $0.etag
+                Preferences.Shields.regionalAdblockJsonEtag.value = $0.resource.etag
                 if compileJsonRules {
                     resourceSetup.append(compileContentBlocker(resources: resources))
                 }
             }
         }
         all(resourceSetup).uponQueue(queue) { _ in completion.fill(()) }
-        return completion
-    }
-    
-    private func downloadResource(atUrl url: URL, type: AdblockResourceType, checkEtags: Bool = true) -> Deferred<AdBlockNetworkResource> {
-        var completion = Deferred<AdBlockNetworkResource>()
-        
-        var request = URLRequest(url: url)
-        
-        // Makes the request conditional, returns 304 if Etag value did not change.
-        let ifNoneMatchHeader = "If-None-Match"
-        let fileNotModifiedStatusCode = 304
-        
-        // Identifier for a specific version of a resource for a HTTP request
-        let etagHeader = "Etag"
-        
-        var etag: String?
-        switch type {
-        case .dat: etag = Preferences.Shields.regionalAdblockDatEtag.value
-        case .json: etag = Preferences.Shields.regionalAdblockJsonEtag.value
-        }
-        
-        if checkEtags {
-            // No etag means this is a first download of the resource, putting a random string to make sure
-            // the resource will be downloaded.
-            let requestEtag = etag ?? UUID().uuidString
-
-            // This cache policy is required to support `If-None-Match` header.
-            request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
-            request.addValue(requestEtag, forHTTPHeaderField: ifNoneMatchHeader)
-        }
-        
-        let task = session.dataTask(with: request, completionHandler: { data, response, error -> Void in
-            if let err = error {
-                log.error(err.localizedDescription)
-                DispatchQueue.main.asyncAfter(deadline: .now() + 60) {
-                    completion = self.downloadResource(atUrl: url, type: type)
-                }
-                return
-            }
-            
-            guard let data = data, let response = response as? HTTPURLResponse else {
-                log.error("Failed to unwrap http response or data")
-                return
-            }
-            
-            switch response.statusCode {
-            case 400...499:
-                log.error("""
-                    Failed to download, status code: \(response.statusCode),\
-                    URL:\(String(describing: response.url))
-                    """)
-            case fileNotModifiedStatusCode:
-                log.info("File not modified")
-            default:
-                let responseEtag = response.allHeaderFields[etagHeader] as? String
-                assert(checkEtags && responseEtag != nil)
-                completion.fill(AdBlockNetworkResource(data: data, etag: responseEtag, type: type))
-            }
-        })
-        task.resume()
-        
         return completion
     }
 }
@@ -195,6 +144,4 @@ extension AdblockResourceDownloader: PreferencesObserver {
             regionalAdblockResourcesSetup()
         }
     }
-    
-    
 }
