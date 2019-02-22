@@ -29,7 +29,7 @@ class NetworkManager {
     
     func downloadResource(with url: URL, resourceType: NetworkResourceType,
                           retryTimeout: TimeInterval? = 60) -> Deferred<CachedNetworkResource> {
-        var completion = Deferred<CachedNetworkResource>()
+        let completion = Deferred<CachedNetworkResource>()
         
         var request = URLRequest(url: url)
         
@@ -55,7 +55,9 @@ class NetworkManager {
                 log.error(err.localizedDescription)
                 if let retryTimeout = retryTimeout {
                     DispatchQueue.main.asyncAfter(deadline: .now() + retryTimeout) {
-                        completion = self.downloadResource(with: url, resourceType: resourceType)
+                        self.downloadResource(with: url, resourceType: resourceType, retryTimeout: retryTimeout).upon { resource in
+                            completion.fill(resource)
+                        }
                     }
                 }
                 return
