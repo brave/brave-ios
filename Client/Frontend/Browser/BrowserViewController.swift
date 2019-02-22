@@ -2921,9 +2921,9 @@ extension BrowserViewController: PreferencesObserver {
              Preferences.Shields.useRegionAdBlock.key:
             tabManager.allTabs.forEach { $0.webView?.reload() }
         case Preferences.Privacy.blockAllCookies.key:
-            if Preferences.Privacy.blockAllCookies.value {
-                tabManager.reset()
-            } else {
+            // All `block all cookies` toggle requires a hard reset of Webkit configuration.
+            tabManager.reset()
+            if !Preferences.Privacy.blockAllCookies.value {
                 tabManager.allTabs.forEach {
                     if let url: URL = $0.webView?.url {
                         $0.loadRequest(PrivilegedRequest(url: url) as URLRequest)
