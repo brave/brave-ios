@@ -22,8 +22,7 @@ class AdblockResourceDownloader {
     private let networkManager: NetworkManager
     private let locale: String
     
-    // FIXME: Change to proper url once ready.
-    private let endpoint = "https://github.com/iccub/brave-blocklists-test/raw/master/ios/"
+    private let endpoint = "https://adblock-data.s3.brave.com/ios/"
     private let folderName = "abp-data"
     private let queue = DispatchQueue(label: "RegionalAdblockSetup")
     
