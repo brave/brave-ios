@@ -14,6 +14,7 @@ private enum AdblockResourceType: String { case dat, json }
 private struct AdBlockNetworkResource {
     let resource: CachedNetworkResource
     let type: AdblockResourceType
+    let locale: String
 }
 
 class AdblockResourceDownloader {
@@ -43,12 +44,14 @@ class AdblockResourceDownloader {
         }
         
         guard let name = ContentBlockerRegion.with(localeCode: locale)?.filename else { return }
-        downloadDatJsonResources(withName: name, queueName: "Regional adblock setup").uponQueue(.main) {
+        downloadDatJsonResources(withName: name, locale: locale,
+                                 queueName: "Regional adblock setup").uponQueue(.main) {
             log.debug("Regional blocklists download and setup completed.")
         }
     }
     
-    private func downloadDatJsonResources(withName name: String, queueName: String) -> Deferred<()> {
+    private func downloadDatJsonResources(withName name: String, locale: String,
+                                          queueName: String) -> Deferred<()> {
         let completion = Deferred<()>()
         
         guard let datResourceUrl = URL(string: endpoint + name + ".dat") else {
@@ -67,13 +70,13 @@ class AdblockResourceDownloader {
         let datEtag = fileFromDocumentsAsString(name + ".dat.etag", inFolder: folderName)
         let datRequest = nm.downloadResource(with: datResourceUrl, resourceType: .cached(etag: datEtag))
             .mapQueue(queue) { res in
-                AdBlockNetworkResource(resource: res, type: .dat)
+                AdBlockNetworkResource(resource: res, type: .dat, locale: locale)
         }
         
         let jsonEtag = fileFromDocumentsAsString(name + ".json.etag", inFolder: folderName)
         let jsonRequest = nm.downloadResource(with: jsonResourceUrl, resourceType: .cached(etag: jsonEtag))
             .mapQueue(queue) { res in
-                AdBlockNetworkResource(resource: res, type: .json)
+                AdBlockNetworkResource(resource: res, type: .json, locale: locale)
         }
         
         let downloadResources = all([datRequest, jsonRequest])
@@ -140,7 +143,7 @@ class AdblockResourceDownloader {
         resources.forEach {
             switch $0.type {
             case .dat:
-                resourceSetup.append(AdBlockStats.shared.setDataFile(data: $0.resource.data))
+                resourceSetup.append(AdBlockStats.shared.setDataFile(data: $0.resource.data, locale: $0.locale))
             case .json:
                 if compileJsonRules {
                     resourceSetup.append(compileContentBlocker(resources: resources))
