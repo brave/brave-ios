@@ -8,7 +8,7 @@ import Shared
 
 private let log = Logger.browserLogger
 
-extension HTTPCookie {
+public extension HTTPCookie {
     
     typealias Success = Bool
     class func saveToDisk(_ filename: String = "CookiesData.json", completion: ((Success) -> Void)? = nil) {
