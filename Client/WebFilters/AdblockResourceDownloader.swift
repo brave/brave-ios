@@ -65,13 +65,13 @@ class AdblockResourceDownloader {
         let queue = self.queue
         let nm = networkManager
         
-        let datEtag = Preferences.Shields.regionalAdblockDatEtag.value
+        let datEtag = fileFromDocumentsAsString(name + ".dat.etag", inFolder: folderName)
         let datRequest = nm.downloadResource(with: datResourceUrl, resourceType: .cached(etag: datEtag))
             .mapQueue(queue) { res in
                 AdBlockNetworkResource(resource: res, type: .dat)
         }
         
-        let jsonEtag = Preferences.Shields.regionalAdblockJsonEtag.value
+        let jsonEtag = fileFromDocumentsAsString(name + ".json.etag", inFolder: folderName)
         let jsonRequest = nm.downloadResource(with: jsonResourceUrl, resourceType: .cached(etag: jsonEtag))
             .mapQueue(queue) { res in
                 AdBlockNetworkResource(resource: res, type: .json)
@@ -93,6 +93,18 @@ class AdblockResourceDownloader {
         return completion
     }
     
+    private func fileFromDocumentsAsString(_ name: String, inFolder folder: String) -> String? {
+        guard let documentsDir = FileManager.documentsDirectory else {
+            log.error("Failed to get documents directory")
+            return nil
+        }
+        
+        let dir = documentsDir + "/\(folder)/"
+        guard let data = FileManager.default.contents(atPath: dir + name) else { return nil }
+        
+        return String(data: data, encoding: .utf8)
+    }
+    
     private func compileContentBlocker(resources: [AdBlockNetworkResource]) -> Deferred<()> {
         var completion = Deferred<()>()
         guard let jsonResource = resources.first(where: { $0.type == .json }),
@@ -110,6 +122,13 @@ class AdblockResourceDownloader {
             let fileName = name + ".\($0.type.rawValue)"
             fileSaveCompletions.append(fm.writeToDiskInFolder($0.resource.data, fileName: fileName,
                                                               folderName: self.folderName))
+            
+            if let etag = $0.resource.etag, let data = etag.data(using: .utf8) {
+                let etagFileName = fileName + ".etag"
+                fileSaveCompletions.append(fm.writeToDiskInFolder(data, fileName: etagFileName,
+                                                                  folderName: self.folderName))
+            }
+            
         }
         all(fileSaveCompletions).uponQueue(queue) { _ in completion.fill(()) }
         return completion
@@ -122,10 +141,8 @@ class AdblockResourceDownloader {
         resources.forEach {
             switch $0.type {
             case .dat:
-                Preferences.Shields.regionalAdblockDatEtag.value = $0.resource.etag
                 resourceSetup.append(AdBlockStats.shared.setDataFile(data: $0.resource.data))
             case .json:
-                Preferences.Shields.regionalAdblockJsonEtag.value = $0.resource.etag
                 if compileJsonRules {
                     resourceSetup.append(compileContentBlocker(resources: resources))
                 }

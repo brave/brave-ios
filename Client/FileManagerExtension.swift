@@ -83,4 +83,8 @@ public extension FileManager {
             log.error("Error excluding \(url.lastPathComponent) from backup \(error)")
         }
     }
+    
+    static var documentsDirectory: String? {
+        return NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first
+    }
 }

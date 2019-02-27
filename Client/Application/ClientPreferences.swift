@@ -94,14 +94,6 @@ extension Preferences {
         /// In addition to global adblocking rules, adds custom country based rules.
         /// This setting is enabled by default for all locales.
         static let useRegionAdBlock = Option<Bool>(key: "shields.regional-adblock", default: true)
-        /// HTTP etag value of downloaded .dat file for regional adblocking. Used to determine whether
-        /// to download a new version.
-        static let regionalAdblockDatEtag =
-            Option<String?>(key: "shields.regional-adblock-dat-etag", default: nil)
-        /// HTTP etag value of downloaded .json file for regional content blocking. Used to determine whether
-        /// to download a new version.
-        static let regionalAdblockJsonEtag =
-            Option<String?>(key: "shields.regional-adblock-json-etag", default: nil)
     }
 }
 
