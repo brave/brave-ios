@@ -62,6 +62,25 @@ class AdBlockStats: LocalAdblockResourceProtocol {
         loadLocalData(name: blockListFileName, type: "dat") { data in
             self.setDataFile(data: data, locale: AdBlockStats.defaultLocale, type: .bundled)
         }
+        
+        loadDatFilesFromDocumentsDirectory()
+    }
+    
+    private func loadDatFilesFromDocumentsDirectory() {
+        guard let documentsDir = FileManager.documentsDirectory else { return }
+        let path = documentsDir + "/\(AdblockResourceDownloader.folderName)/"
+
+        let enumerator = FileManager.default.enumerator(atPath: path)
+        let filePaths = enumerator?.allObjects as? [String]
+        let datFilePaths = filePaths?.filter { $0.hasSuffix(".dat") }
+
+        datFilePaths?.forEach {
+            let fileName = URL(fileURLWithPath: $0).deletingPathExtension().lastPathComponent
+            guard let locale = AdblockFilenameMappings.fileNameToLocale(fileName) else { return }
+            
+            guard let data = FileManager.default.contents(atPath: path + $0) else { return }
+            setDataFile(data: data, locale: locale, type: .fromNetwork)
+        }
     }
     
     fileprivate func updateRegionalAdblockEnabledState() {
@@ -149,7 +168,6 @@ class AdBlockStats: LocalAdblockResourceProtocol {
 
         guard let adblocker = adblockStatsResources.first(
             where: { $0.locale == locale && $0.type == type })?.abpWrapper else {
-            assertionFailure()
             return completion
         }
         

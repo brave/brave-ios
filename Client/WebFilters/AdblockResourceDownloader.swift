@@ -24,7 +24,7 @@ class AdblockResourceDownloader {
     private let locale: String
     
     private let endpoint = "https://adblock-data.s3.brave.com/ios/"
-    private let folderName = "abp-data"
+    static let folderName = "abp-data"
     private let queue = DispatchQueue(label: "RegionalAdblockSetup")
     
     init(networkManager: NetworkManager = NetworkManager(), locale: String? = Locale.current.languageCode) {
@@ -119,16 +119,17 @@ class AdblockResourceDownloader {
         let completion = Deferred<()>()
         var fileSaveCompletions = [Deferred<()>]()
         let fm = FileManager.default
+        let folderName = AdblockResourceDownloader.folderName
         
         resources.forEach {
             let fileName = name + ".\($0.type.rawValue)"
             fileSaveCompletions.append(fm.writeToDiskInFolder($0.resource.data, fileName: fileName,
-                                                              folderName: self.folderName))
+                                                              folderName: folderName))
             
             if let etag = $0.resource.etag, let data = etag.data(using: .utf8) {
                 let etagFileName = fileName + ".etag"
                 fileSaveCompletions.append(fm.writeToDiskInFolder(data, fileName: etagFileName,
-                                                                  folderName: self.folderName))
+                                                                  folderName: folderName))
             }
             
         }

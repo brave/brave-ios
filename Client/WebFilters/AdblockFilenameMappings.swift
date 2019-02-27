@@ -51,7 +51,7 @@ struct AdblockFilenameMappings {
     
     static func fileNameToLocale(_ name: String) -> String? {
         var locale: String?
-        switch locale {
+        switch name {
         case FileNames.ar.rawValue: locale = Locales.ar.rawValue
         case FileNames.bg.rawValue: locale = Locales.bg.rawValue
         case FileNames.zh.rawValue: locale = Locales.zh.rawValue
