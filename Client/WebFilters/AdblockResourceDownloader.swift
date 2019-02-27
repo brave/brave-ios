@@ -42,15 +42,14 @@ class AdblockResourceDownloader {
             return
         }
         
-        downloadRegionalAdblockResources().uponQueue(.main) {
+        guard let name = ContentBlockerRegion.with(localeCode: locale)?.filename else { return }
+        downloadDatJsonResources(withName: name, queueName: "Regional adblock setup").uponQueue(.main) {
             log.debug("Regional blocklists download and setup completed.")
         }
     }
     
-    private func downloadRegionalAdblockResources() -> Deferred<()> {
+    private func downloadDatJsonResources(withName name: String, queueName: String) -> Deferred<()> {
         let completion = Deferred<()>()
-        
-        guard let name = ContentBlockerRegion.with(localeCode: locale)?.filename else { return completion }
         
         guard let datResourceUrl = URL(string: endpoint + name + ".dat") else {
             log.error("Could not parse url for getting an adblocker dat resource")
@@ -62,7 +61,7 @@ class AdblockResourceDownloader {
             return completion
         }
         
-        let queue = self.queue
+        let queue = DispatchQueue(label: queueName)
         let nm = networkManager
         
         let datEtag = fileFromDocumentsAsString(name + ".dat.etag", inFolder: folderName)
