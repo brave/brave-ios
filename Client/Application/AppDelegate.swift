@@ -61,8 +61,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         self.window!.backgroundColor = UIColor.Photon.White100
 
         AdBlockStats.shared.startLoading()
-        AdblockResourceDownloader.shared.regionalAdblockResourcesSetup()
-        
+        AdblockResourceDownloader.shared.startLoading()
         HttpsEverywhereStats.shared.startLoading()
         
         // Passcode checking, must happen on immediate launch

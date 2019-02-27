@@ -45,8 +45,9 @@ class AdBlockStats: LocalAdblockResourceProtocol {
     fileprivate var fifoCacheOfUrlsChecked = FifoDict()
     
     fileprivate lazy var adblockStatsResources: Set<AdblockStatsResource> = {
-        let defaultResource = AdblockStatsResource(type: .bundled, locale: AdBlockStats.defaultLocale)
-        return [defaultResource]
+        let generalBundledList = AdblockStatsResource(type: .bundled, locale: AdBlockStats.defaultLocale)
+        let generalListFromNetwork = AdblockStatsResource(type: .fromNetwork, locale: AdBlockStats.defaultLocale)
+        return [generalBundledList, generalListFromNetwork]
     }()
     
     let currentLocaleCode: LocaleCode

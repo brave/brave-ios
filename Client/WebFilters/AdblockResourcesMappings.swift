@@ -123,6 +123,7 @@ fileprivate enum ResourceNames: String {
 }
 
 fileprivate enum Locales: String {
+    case en // English locale is equal to a general adblock file.
     case ar
     case bg
     case zh

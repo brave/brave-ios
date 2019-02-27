@@ -37,6 +37,11 @@ class AdblockResourceDownloader {
         Preferences.Shields.useRegionAdBlock.observe(from: self)
     }
     
+    func startLoading() {
+        AdblockResourceDownloader.shared.regionalAdblockResourcesSetup()
+        AdblockResourceDownloader.shared.generalAdblockResourcesSetup()
+    }
+    
     func regionalAdblockResourcesSetup() {
         if !Preferences.Shields.useRegionAdBlock.value {
             log.debug("Regional adblocking disabled, aborting attempt to download regional resources")
@@ -50,6 +55,14 @@ class AdblockResourceDownloader {
         }
     }
     
+    func generalAdblockResourcesSetup() {
+        let name = AdblockFilenameMappings.generalAdblockName
+        downloadDatJsonResources(withName: name, locale: "en",
+                                 queueName: "General adblock setup").uponQueue(.main) {
+                                    log.debug("General blocklists download and setup completed.")
+        }
+    }
+
     private func downloadDatJsonResources(withName name: String, locale: String,
                                           queueName: String) -> Deferred<()> {
         let completion = Deferred<()>()
