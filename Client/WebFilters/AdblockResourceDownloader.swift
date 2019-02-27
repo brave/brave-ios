@@ -66,6 +66,7 @@ class AdblockResourceDownloader {
         
         let queue = DispatchQueue(label: queueName)
         let nm = networkManager
+        let folderName = AdblockResourceDownloader.folderName
         
         let datEtag = fileFromDocumentsAsString(name + ".dat.etag", inFolder: folderName)
         let datRequest = nm.downloadResource(with: datResourceUrl, resourceType: .cached(etag: datEtag))
