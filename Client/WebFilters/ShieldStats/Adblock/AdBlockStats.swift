@@ -7,6 +7,33 @@ import Deferred
 
 private let log = Logger.browserLogger
 
+/// In the future we might provide two different resources per locale.
+/// A small list, bundled with the application,
+/// and a bigger list downloaded over the internet.
+enum AdblockStatsResourceType { case bundled, fromNetwork }
+
+fileprivate struct AdblockStatsResource: Hashable {
+    let abpWrapper: ABPFilterLibWrapper
+    let type: AdblockStatsResourceType
+    let locale: String
+    
+    init(abpWrapper: ABPFilterLibWrapper = ABPFilterLibWrapper(),
+         type: AdblockStatsResourceType, locale: String) {
+        self.abpWrapper = abpWrapper
+        self.type = type
+        self.locale = locale
+    }
+    
+    static func == (lhs: AdblockStatsResource, rhs: AdblockStatsResource) -> Bool {
+        return lhs.type == rhs.type && lhs.locale == rhs.locale
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(type)
+        hasher.combine(locale)
+    }
+}
+
 class AdBlockStats: LocalAdblockResourceProtocol {
     static let shared = AdBlockStats()
     
@@ -17,8 +44,9 @@ class AdBlockStats: LocalAdblockResourceProtocol {
     
     fileprivate var fifoCacheOfUrlsChecked = FifoDict()
     
-    fileprivate lazy var abpFilterLibWrappers: [LocaleCode: ABPFilterLibWrapper] = {
-        return [AdBlockStats.defaultLocale: ABPFilterLibWrapper()]
+    fileprivate lazy var adblockStatsResources: Set<AdblockStatsResource> = {
+        let defaultResource = AdblockStatsResource(type: .bundled, locale: AdBlockStats.defaultLocale)
+        return [defaultResource]
     }()
     
     let currentLocaleCode: LocaleCode
@@ -32,13 +60,15 @@ class AdBlockStats: LocalAdblockResourceProtocol {
     
     func startLoading() {
         loadLocalData(name: blockListFileName, type: "dat") { data in
-            self.setDataFile(data: data, locale: AdBlockStats.defaultLocale)
+            self.setDataFile(data: data, locale: AdBlockStats.defaultLocale, type: .bundled)
         }
     }
     
     fileprivate func updateRegionalAdblockEnabledState() {
         if currentLocaleCode == AdBlockStats.defaultLocale { return }
-        abpFilterLibWrappers[currentLocaleCode] = ABPFilterLibWrapper()
+        
+        let regionalResource = AdblockStatsResource(type: .fromNetwork, locale: currentLocaleCode)
+        adblockStatsResources.insert(regionalResource)
     }
     
     func shouldBlock(_ request: URLRequest) -> Bool {
@@ -82,23 +112,24 @@ class AdBlockStats: LocalAdblockResourceProtocol {
         var isBlocked = false
         let header = "*/*"
         
-        for (locale, adblocker) in abpFilterLibWrappers {
-            if locale != AdBlockStats.defaultLocale && !isRegionalAdblockEnabled { continue }
+        for adblocker in adblockStatsResources where adblocker.abpWrapper.hasDataFile() {
+            if adblocker.locale != AdBlockStats.defaultLocale && !isRegionalAdblockEnabled { continue }
             
-            isBlocked = adblocker.isBlockedConsideringType(url.absoluteString,
-                                                           mainDocumentUrl: mainDocDomain,
-                                                           acceptHTTPHeader: header)
-          
-            if isBlocked {
-                break
-            }
+            isBlocked = adblocker.abpWrapper.isBlockedConsideringType(url.absoluteString,
+                                                                      mainDocumentUrl: mainDocDomain,
+                                                                      acceptHTTPHeader: header)
+            
+            if isBlocked { break }
         }
+
         fifoCacheOfUrlsChecked.addItem(key, value: isBlocked as AnyObject)
         
         return isBlocked
     }
     
-    // Firefox has uses urls of the form  http://localhost:6571/errors/error.html?url=http%3A//news.google.ca/ to populate the browser history, and load+redirect using GCDWebServer
+    // Firefox has uses urls of the form
+    // http://localhost:6571/errors/error.html?url=http%3A//news.google.ca/
+    // to populate the browser history, and load+redirect using GCDWebServer
     func stripLocalhostWebServer(_ url: String?) -> String {
         guard let url = url else { return "" }
     
@@ -112,13 +143,16 @@ class AdBlockStats: LocalAdblockResourceProtocol {
         }
     }
     
-    @discardableResult func setDataFile(data: Data, locale: String? = Locale.current.languageCode) -> Deferred<()> {
+    @discardableResult func setDataFile(data: Data, locale: String,
+                                        type: AdblockStatsResourceType) -> Deferred<()> {
         let completion = Deferred<()>()
-        let locale = locale ?? AdBlockStats.defaultLocale
-        guard let adblocker = abpFilterLibWrappers[locale] else {
+
+        guard let adblocker = adblockStatsResources.first(
+            where: { $0.locale == locale && $0.type == type })?.abpWrapper else {
             assertionFailure()
             return completion
         }
+        
         adblocker.setDataFile(data)
         
         if adblocker.hasDataFile() {

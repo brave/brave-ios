@@ -143,7 +143,7 @@ class AdblockResourceDownloader {
         resources.forEach {
             switch $0.type {
             case .dat:
-                resourceSetup.append(AdBlockStats.shared.setDataFile(data: $0.resource.data, locale: $0.locale))
+                resourceSetup.append(AdBlockStats.shared.setDataFile(data: $0.resource.data, locale: $0.locale, type: .fromNetwork))
             case .json:
                 if compileJsonRules {
                     resourceSetup.append(compileContentBlocker(resources: resources))
