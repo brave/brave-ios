@@ -48,12 +48,17 @@ class CookiesClearable: Clearable {
         let result = Deferred<Maybe<()>>()
         // need event loop to run to autorelease UIWebViews fully
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            // Now we wipe the system cookie store (for our app).
+            // Clearing cookies clears both cookies and cache.
             let localStorageClearables: Set<String> = [WKWebsiteDataTypeCookies,
                                                        WKWebsiteDataTypeSessionStorage,
                                                        WKWebsiteDataTypeLocalStorage,
                                                        WKWebsiteDataTypeWebSQLDatabases,
-                                                       WKWebsiteDataTypeIndexedDBDatabases]
+                                                       WKWebsiteDataTypeIndexedDBDatabases,
+                                                       WKWebsiteDataTypeDiskCache,
+                                                       WKWebsiteDataTypeServiceWorkerRegistrations,
+                                                       WKWebsiteDataTypeOfflineWebApplicationCache,
+                                                       WKWebsiteDataTypeMemoryCache,
+                                                       WKWebsiteDataTypeFetchCache]
             WKWebsiteDataStore.default().removeData(ofTypes: localStorageClearables, modifiedSince: Date(timeIntervalSinceReferenceDate: 0)) {
                 UserDefaults.standard.synchronize()
                 result.fill(Maybe<()>(success: ()))
