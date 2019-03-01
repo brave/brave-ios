@@ -11,50 +11,6 @@ private let log = Logger.browserLogger
 
 enum FileType: String { case dat, json, tgz }
 
-enum AdblockerType {
-    case general
-    case httpse
-    case regional(locale: String)
-    
-    var locale: String? {
-        switch self {
-        case .regional(let locale): return locale
-        default: return nil
-        }}
-    
-    var associatedFiles: [FileType] {
-        switch self {
-        case .general, .regional: return [.json, .dat]
-        case .httpse: return [.json, .tgz]
-        }
-    }
-    
-    var identifier: String {
-        switch self {
-        case .general: return BlocklistName.adFileName
-        case .httpse: return BlocklistName.httpseFileName
-        case .regional(let locale): return locale
-        }
-    }
-    
-    static func type(fromResource name: String) -> AdblockerType? {
-        switch name {
-        case AdblockResourcesMappings.generalAdblockName:
-            return .general
-        case AdblockResourcesMappings.generalHttpseName:
-            return .httpse
-        default: // Regional lists
-            if let locale = AdblockResourcesMappings.resourceNameToLocale(name) {
-                return .regional(locale: locale)
-            }
-            
-            log.error("No locale was found for resource: \(name)")
-            assertionFailure()
-            return nil
-        }
-    }
-}
-
 private struct AdBlockNetworkResource {
     let resource: CachedNetworkResource
     let fileType: FileType

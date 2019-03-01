@@ -122,7 +122,7 @@ class AdBlockStats: LocalAdblockResourceProtocol {
         let header = "*/*"
         
         for (id, adblocker) in adblockStatsResources where adblocker.hasDataFile() {
-            if id != AdBlockStats.defaultLocale && !isRegionalAdblockEnabled { continue }
+            if id != AdblockerType.general.identifier && !isRegionalAdblockEnabled { continue }
             
             isBlocked = adblocker.isBlockedConsideringType(url.absoluteString,
                                                                       mainDocumentUrl: mainDocDomain,
