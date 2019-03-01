@@ -43,13 +43,13 @@ class AdblockResourceDownloader {
         }
         
         guard let name = ContentBlockerRegion.with(localeCode: locale)?.filename else { return }
-        downloadDatJsonResources(withName: name, type: .regional(locale: locale),
+        downloadResources(withName: name, type: .regional(locale: locale),
                                  queueName: "Regional adblock setup").uponQueue(.main) {
             log.debug("Regional blocklists download and setup completed.")
         }
     }
     
-    private func downloadDatJsonResources(withName name: String, type: AdblockerType,
+    private func downloadResources(withName name: String, type: AdblockerType,
                                           queueName: String) -> Deferred<()> {
         let completion = Deferred<()>()
 
