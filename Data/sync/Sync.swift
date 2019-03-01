@@ -9,7 +9,7 @@ import SwiftKeychainWrapper
 import SwiftyJSON
 import JavaScriptCore
 
-private let log = Logger.browserLogger
+private let log = Logger.braveSyncLogger
 
 /*
  module.exports.categories = {
@@ -313,10 +313,10 @@ public class Sync: JSInjector {
             if lastSyncTimestamp == 0 {
                 // Sync local bookmarks, then proceed with fetching
                 // Pull all local bookmarks and update their order with newly aquired device id and base sync order.
-                DataController.performTask { context in
+                DataController.perform { context in
                     if let updatedBookmarks = self.bookmarksWithUpdatedOrder(context: context) {
                         
-                        self.sendSyncRecords(action: .create, records: updatedBookmarks) { _ in
+                        self.sendSyncRecords(action: .create, records: updatedBookmarks, context: context) { _ in
                             startFetching()
                         }
                     }
@@ -356,7 +356,7 @@ public class Sync: JSInjector {
 extension Sync {
     // TODO: Rename
     func sendSyncRecords<T: Syncable>(action: SyncActions, records: [T],
-                                      context: NSManagedObjectContext? = nil,
+                                      context: NSManagedObjectContext = DataController.viewContext,
                                       completion: ((Error?) -> Void)? = nil) {
         
         // Consider protecting against (isSynced && .create)
@@ -397,7 +397,7 @@ extension Sync {
                 self.webView.evaluateJavaScript(evaluate,
                                                 completionHandler: { (result, error) in
                                                     if let error = error {
-                                                        print(error)
+                                                        log.error(error)
                                                     }
                                                     
                                                     completion?(error)
@@ -458,7 +458,7 @@ extension Sync {
             
         }
         
-        DataController.performTask { context in
+        DataController.perform { context in
             for fetchedRoot in fetchedRecords {
                 
                 guard let fetchedId = fetchedRoot.objectId else { return }
@@ -478,7 +478,7 @@ extension Sync {
                     
                     // TODO: Needs favicon
                     if clientRecord == nil {
-                        _ = recordType.coredataModelType?.createResolvedRecord(rootObject: fetchedRoot, save: false, context: context)
+                        _ = recordType.coredataModelType?.createResolvedRecord(rootObject: fetchedRoot, save: false, context: .existing(context))
                     } else {
                         // TODO: use Switch with `fallthrough`
                         action = .update
@@ -487,11 +487,11 @@ extension Sync {
                 
                 // Handled outside of else block since .create, can modify to an .update
                 if action == .update {
-                    clientRecord?.updateResolvedRecord(fetchedRoot, context: context)
+                    clientRecord?.updateResolvedRecord(fetchedRoot, context: .existing(context))
                 }
             }
         }
-        print("\(fetchedRecords.count) \(recordType.rawValue) processed")
+        log.debug("\(fetchedRecords.count) \(recordType.rawValue) processed")
         
         // Make generic when other record types are supported
         if recordType != .bookmark {
@@ -518,15 +518,15 @@ extension Sync {
     }
     
     func deleteSyncUser(_ data: [String: AnyObject]) {
-        print("not implemented: deleteSyncUser() \(data)")
+        log.warning("not implemented: deleteSyncUser() \(data)")
     }
     
     func deleteSyncCategory(_ data: [String: AnyObject]) {
-        print("not implemented: deleteSyncCategory() \(data)")
+        log.warning("not implemented: deleteSyncCategory() \(data)")
     }
     
     func deleteSyncSiteSettings(_ data: [String: AnyObject]) {
-        print("not implemented: delete sync site settings \(data)")
+        log.warning("not implemented: delete sync site settings \(data)")
     }
     
 }
@@ -544,7 +544,7 @@ extension Sync {
         
         var localbookmarks: [Bookmark]?
         
-        DataController.performTask { context in
+        DataController.perform { context in
             localbookmarks = recordType.coredataModelType?.get(syncUUIDs: ids, context: context) as? [Bookmark]
         
 	        var matchedBookmarks = [[Any]]()
@@ -599,7 +599,7 @@ extension Sync {
             
         } else if syncSeed == nil {
             // Failure
-            print("Seed expected.")
+            log.error("Seed expected.")
         }
         
         // Device Id
@@ -608,7 +608,7 @@ extension Sync {
             Device.currentDevice()?.deviceId = deviceArray.map { $0.intValue }
             DataController.save(context: Device.currentDevice()?.managedObjectContext)
         } else if Device.currentDevice()?.deviceId == nil {
-            print("Device Id expected!")
+            log.error("Device Id expected!")
         }
         
     }
@@ -642,7 +642,7 @@ extension Sync: WKScriptMessageHandler {
         
         // JS execution must be on main thread
         
-        print("😎 \(message.name) \(message.body)")
+        log.debug("😎 \(message.name) \(message.body)")
         
         let syncResponse = SyncResponse(object: message.body as? String ?? "")
         guard let messageName = syncResponse.message else {
@@ -671,7 +671,7 @@ extension Sync: WKScriptMessageHandler {
             self.resolvedSyncRecords(syncResponse)
         case "sync-debug":
             let data = JSON(parseJSON: message.body as? String ?? "")
-            print("---- Sync Debug: \(data)")
+            log.debug("---- Sync Debug: \(data)")
         case "sync-ready":
             self.isSyncFullyInitialized.syncReady = true
         case "fetch-sync-records":
@@ -691,7 +691,7 @@ extension Sync: WKScriptMessageHandler {
         case "sync-setup-error":
             self.syncSetupError()
         default:
-            print("\(messageName) not handled yet")
+            log.debug("\(messageName) not handled yet")
         }
         
         self.checkIsSyncReady()

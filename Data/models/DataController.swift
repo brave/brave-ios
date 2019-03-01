@@ -7,6 +7,17 @@ import XCGLogger
 
 private let log = Logger.browserLogger
 
+/// A helper structure for `DataController.perform()` method
+/// to decide whether a new or existing context should be used
+/// to perform a database write operation.
+enum WriteContext {
+    /// Requests DataController to create new background context for the task.
+    case new
+    /// Requests DataController to use an existing context.
+    /// (To prevent creating multiple contexts per call and mixing threads)
+    case existing(_ context: NSManagedObjectContext)
+}
+
 public class DataController: NSObject {
     private static let databaseName = "Brave.sqlite"
     
@@ -20,35 +31,35 @@ public class DataController: NSObject {
     
     // MARK: - Data framework interface
     
-    static func performTask(context: NSManagedObjectContext? = nil, save: Bool = true,
-                            _ code: @escaping (NSManagedObjectContext) -> Void) {
-        // If context is provided, we only call the code closure.
-        // Queue operation and saving is done in `performTask()` called at higher level when no context is passed.
-        if let context = context {
-            code(context)
-            return
-        }
+    static func perform(context: WriteContext = .new, save: Bool = true,
+                        task: @escaping (NSManagedObjectContext) -> Void) {
         
-        let queue = DataController.shared.operationQueue
-        
-        queue.addOperation({
-            let backgroundContext = DataController.newBackgroundContext()
-            // performAndWait doesn't block main thread because it fires on OperationQueue`s background thread.
-            backgroundContext.performAndWait {
-                code(backgroundContext)
-                
-                if !save { return }
-                
-                do {
-                    if backgroundContext.hasChanges {
+        switch context {
+        case .existing(let existingContext):
+            // If existing context is provided, we only call the code closure.
+            // Queue operation and saving is done in `performTask()`
+            // called at higher level when a `.new` WriteContext is passed.
+            task(existingContext)
+        case .new:
+            let queue = DataController.shared.operationQueue
+            
+            queue.addOperation({
+                let backgroundContext = DataController.newBackgroundContext()
+                // performAndWait doesn't block main thread because it fires on OperationQueue`s background thread.
+                backgroundContext.performAndWait {
+                    task(backgroundContext)
+                    
+                    guard save && backgroundContext.hasChanges else { return }
+                    
+                    do {
                         assert(!Thread.isMainThread)
                         try backgroundContext.save()
+                    } catch {
+                        log.error("performTask save error: \(error)")
                     }
-                } catch {
-                    log.error("performTask save error: \(error)")
                 }
-            }
-        })
+            })
+        }
     }
     
     // Context object also allows us access to all persistent container data if needed.

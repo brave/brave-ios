@@ -29,7 +29,7 @@ extension ContentBlockerHelper: TabContentScript {
             return
         }
         
-        let domain = Domain.getOrCreateForUrl(mainDocumentUrl)
+        let domain = Domain.getOrCreate(forUrl: mainDocumentUrl)
         if let shieldsAllOff = domain.shield_allOff, Bool(truncating: shieldsAllOff) {
             // if domain is "all_off", can just skip
             return

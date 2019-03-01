@@ -48,18 +48,31 @@ public final class History: NSManagedObject, WebsitePresentable, CRUD {
     static let Yesterday = getDate(-1)
     static let ThisWeek = getDate(-7)
     static let ThisMonth = getDate(-31)
-
-    // Currently required, because not `syncable`
-    static func entity(_ context: NSManagedObjectContext) -> NSEntityDescription {
-        return NSEntityDescription.entity(forEntityName: "History", in: context)!
+    
+    // MARK: - Public interface
+    
+    public override func awakeFromFetch() {
+        if sectionIdentifier != nil {
+            return
+        }
+        
+        if visitedOn?.compare(History.Today) == ComparisonResult.orderedDescending {
+            sectionIdentifier = Strings.Today
+        } else if visitedOn?.compare(History.Yesterday) == ComparisonResult.orderedDescending {
+            sectionIdentifier = Strings.Yesterday
+        } else if visitedOn?.compare(History.ThisWeek) == ComparisonResult.orderedDescending {
+            sectionIdentifier = Strings.Last_week
+        } else {
+            sectionIdentifier = Strings.Last_month
+        }
     }
 
     public class func add(_ title: String, url: URL) {
-        DataController.performTask { context in
+        DataController.perform { context in
             var item = History.getExisting(url, context: context)
             if item == nil {
                 item = History(entity: History.entity(context), insertInto: context)
-                item?.domain = Domain.getOrCreateForUrl(url, context: context)
+                item?.domain = Domain.getOrCreateInternal(url, context: context)
                 item?.url = url.absoluteString
             }
             item?.title = title
@@ -80,33 +93,14 @@ public final class History: NSManagedObject, WebsitePresentable, CRUD {
 
         return NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: context, sectionNameKeyPath: "sectionIdentifier", cacheName: nil)
     }
-
-    public override func awakeFromFetch() {
-        if sectionIdentifier != nil {
-            return
-        }
-
-        if visitedOn?.compare(History.Today) == ComparisonResult.orderedDescending {
-            sectionIdentifier = Strings.Today
-        } else if visitedOn?.compare(History.Yesterday) == ComparisonResult.orderedDescending {
-            sectionIdentifier = Strings.Yesterday
-        } else if visitedOn?.compare(History.ThisWeek) == ComparisonResult.orderedDescending {
-            sectionIdentifier = Strings.Last_week
-        } else {
-            sectionIdentifier = Strings.Last_month
-        }
-    }
-
-    class func getExisting(_ url: URL, context: NSManagedObjectContext) -> History? {
-        let urlKeyPath = #keyPath(History.url)
-        let predicate = NSPredicate(format: "\(urlKeyPath) == %@", url.absoluteString)
-        
-        return first(where: predicate, context: context)
-    }
     
+    public func delete() {
+        delete(context: .new)
+    }
+
     public class func deleteAll(_ completionOnMain: @escaping () -> Void) {
-        DataController.performTask { context in
-            History.deleteAll(context: context, includesPropertyValues: false)
+        DataController.perform { context in
+            History.deleteAll(context: .existing(context), includesPropertyValues: false)
             
             Domain.deleteNonBookmarkedAndClearSiteVisits(context: context) {
                 completionOnMain()
@@ -115,9 +109,25 @@ public final class History: NSManagedObject, WebsitePresentable, CRUD {
     }
 }
 
+// MARK: - Internal implementations
+
+extension History {
+    // Currently required, because not `syncable`
+    static func entity(_ context: NSManagedObjectContext) -> NSEntityDescription {
+        return NSEntityDescription.entity(forEntityName: "History", in: context)!
+    }
+    
+    class func getExisting(_ url: URL, context: NSManagedObjectContext) -> History? {
+        let urlKeyPath = #keyPath(History.url)
+        let predicate = NSPredicate(format: "\(urlKeyPath) == %@", url.absoluteString)
+        
+        return first(where: predicate, context: context)
+    }
+}
+
 extension History: Frecencyable {
-    static func getByFrecency(query: String? = nil,
-                              context: NSManagedObjectContext? = nil) -> [WebsitePresentable] {
+    static func byFrecency(query: String? = nil,
+                           context: NSManagedObjectContext = DataController.viewContext) -> [WebsitePresentable] {
         let urlKeyPath = #keyPath(History.url)
         let visitedOnKeyPath = #keyPath(History.visitedOn)
         

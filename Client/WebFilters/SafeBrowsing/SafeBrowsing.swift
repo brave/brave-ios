@@ -29,7 +29,7 @@ class SafeBrowsing {
             return false
         }
         
-        let domain = Domain.getOrCreateForUrl(url)
+        let domain = Domain.getOrCreate(forUrl: url)
         let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
         let isSafeBrowsingEnabled = domain.isShieldExpected(.SafeBrowsing,
                                                             isPrivateBrowsing: isPrivateBrowsing)

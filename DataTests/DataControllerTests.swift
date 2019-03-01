@@ -18,10 +18,9 @@ class DataControllerTests: CoreDataTestCase {
         let viewContext = DataController.viewContext
         XCTAssertEqual(try! viewContext.count(for: fetchRequest), 0)
         
-        DataController.performTask { context in
+        DataController.perform { context in
             XCTAssertEqual(try! context.count(for: self.fetchRequest), 0)
         }
-        
         
         // Checking rest of entities
         let bookmarkFR = NSFetchRequest<NSFetchRequestResult>(entityName: String(describing: Bookmark.self))
@@ -59,7 +58,7 @@ class DataControllerTests: CoreDataTestCase {
     func testSavingBackgroundContext() {
         var result = [Any]()
         backgroundSaveAndWaitForExpectation {
-            DataController.performTask { context in
+            DataController.perform { context in
                 _ = Device(entity: self.entity(for: context), insertInto: context)
                 
                 
@@ -75,7 +74,7 @@ class DataControllerTests: CoreDataTestCase {
     
     func testSaveAndRemove() {
         backgroundSaveAndWaitForExpectation {
-            DataController.performTask { context in
+            DataController.perform { context in
                 _ = Device(entity: self.entity(for: context), insertInto: context)
             }
         }
@@ -93,7 +92,7 @@ class DataControllerTests: CoreDataTestCase {
     }
     
     func testNoChangesContext() {
-        DataController.performTask { context in
+        DataController.perform { context in
             // Do nothing
         }
         

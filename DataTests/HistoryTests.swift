@@ -68,7 +68,7 @@ class HistoryTests: CoreDataTestCase {
         
         _ = createAndWait(title: title, url: url)
         
-        DataController.performTask { context in
+        DataController.perform { context in
             XCTAssertNil(History.getExisting(wrongUrl, context: context))
             XCTAssertNotNil(History.getExisting(url, context: context))
         }
@@ -113,10 +113,10 @@ class HistoryTests: CoreDataTestCase {
         createAndWait(url: URL(string: "https://example.com/page3")!)
         createAndWait(url: URL(string: "https://brave.com")!)
         
-        let found = History.getByFrecency(query: "example")
+        let found = History.byFrecency(query: "example")
         XCTAssertEqual(found.count, 3)
         
-        let notFound = History.getByFrecency(query: "notfound")
+        let notFound = History.byFrecency(query: "notfound")
         XCTAssertEqual(notFound.count, 0)
     }
 

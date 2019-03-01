@@ -207,7 +207,7 @@ class FavoriteTests: CoreDataTestCase {
     @discardableResult
     private func createAndWait(url: URL?, title: String, customTitle: String? = nil) -> Bookmark {
         backgroundSaveAndWaitForExpectation {
-            Bookmark.add(url: url, title: title, customTitle: customTitle, isFavorite: true)
+            Bookmark.addInternal(url: url, title: title, customTitle: customTitle, isFavorite: true)
         }
         let bookmark = try! DataController.viewContext.fetch(fetchRequest).first!
         XCTAssertTrue(bookmark.isFavorite)

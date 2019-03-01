@@ -782,7 +782,7 @@ class TabManager: NSObject {
             tab.url = nil
 
             if let url = URL(string: urlString),
-                let faviconURL = Domain.getOrCreateForUrl(url).favicon?.url {
+                let faviconURL = Domain.getOrCreate(forUrl: url).favicon?.url {
                 let icon = Favicon(url: faviconURL, date: Date())
                 icon.width = 1
                 tab.favicons.append(icon)

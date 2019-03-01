@@ -99,7 +99,7 @@ class BookmarkTests: CoreDataTestCase {
         let objects = frc.fetchedObjects
         
         let bookmarksNotInsideOfFolder = nonNestedBookmarksToAdd + 1 // + 1 for folder
-        let all = Bookmark.getAllBookmarks(context: DataController.viewContext)
+        let all = Bookmark.getAllBookmarks()
         XCTAssertEqual(objects?.count, all.count - bookmarksNotInsideOfFolder)
     }
     
@@ -179,7 +179,7 @@ class BookmarkTests: CoreDataTestCase {
                       color: nil,
                       syncOrder: nil)
         
-        XCTAssertEqual(Bookmark.getChildren(forFolderUUID: folder.syncUUID, includeFolders: false)?.count, nonFolderBookmarksCount)
+        XCTAssertEqual(Bookmark.getChildren(forFolder: folder, includeFolders: false)?.count, nonFolderBookmarksCount)
     }
     
     func testGetTopLevelFolders() {
@@ -193,7 +193,7 @@ class BookmarkTests: CoreDataTestCase {
         createAndWait(url: nil, title: nil, customTitle: "Folder3", parentFolder: folder, isFolder: true)
         
         // 3 folders in total, 2 in root directory
-        XCTAssertEqual(Bookmark.getFolders(bookmark: nil, context: DataController.viewContext).count, 2)
+        XCTAssertEqual(Bookmark.getTopLevelFolders().count, 2)
     }
     
     func testGetAllBookmarks() {
@@ -202,7 +202,7 @@ class BookmarkTests: CoreDataTestCase {
         insertBookmarks(amount: bookmarksCount)
         // Adding a favorite(non-bookmark type of bookmark)
         createAndWait(url: URL(string: "http://brave.com"), title: "Brave", isFavorite: true)
-        XCTAssertEqual(Bookmark.getAllBookmarks(context: context).count, bookmarksCount)
+        XCTAssertEqual(Bookmark.getAllBookmarks().count, bookmarksCount)
     }
     
     // MARK: - Update
@@ -215,7 +215,7 @@ class BookmarkTests: CoreDataTestCase {
         let newCustomTitle = "Example"
         
         let object = createAndWait(url: URL(string: url), title: "title", customTitle: customTitle)
-        XCTAssertEqual(Bookmark.getAllBookmarks(context: context).count, 1)
+        XCTAssertEqual(Bookmark.getAllBookmarks().count, 1)
         
         XCTAssertEqual(object.displayTitle, customTitle)
         XCTAssertEqual(object.url, url)
@@ -243,13 +243,13 @@ class BookmarkTests: CoreDataTestCase {
         let url = "http://brave.com"
                 
         let object = createAndWait(url: URL(string: url), title: "title", customTitle: customTitle)
-        XCTAssertEqual(Bookmark.getAllBookmarks(context: context).count, 1)
+        XCTAssertEqual(Bookmark.getAllBookmarks().count, 1)
         
         object.update(customTitle: customTitle, url: object.url)
         sleep(UInt32(1))
         
         // Make sure not any new record was added to DB
-        XCTAssertEqual(Bookmark.getAllBookmarks(context: context).count, 1)
+        XCTAssertEqual(Bookmark.getAllBookmarks().count, 1)
         
         XCTAssertEqual(object.customTitle, customTitle)
         XCTAssertEqual(object.url, url)
@@ -262,7 +262,7 @@ class BookmarkTests: CoreDataTestCase {
         let badUrl = "   " // Empty spaces cause URL(string:) to return nil
         
         let object = createAndWait(url: URL(string: url), title: "title", customTitle: customTitle)
-        XCTAssertEqual(Bookmark.getAllBookmarks(context: context).count, 1)
+        XCTAssertEqual(Bookmark.getAllBookmarks().count, 1)
         
         XCTAssertNotNil(object.domain)
         
@@ -272,7 +272,7 @@ class BookmarkTests: CoreDataTestCase {
         DataController.viewContext.refreshAllObjects()
         
         // Let's make sure not any new record was added to DB
-        XCTAssertEqual(Bookmark.getAllBookmarks(context: context).count, 1)
+        XCTAssertEqual(Bookmark.getAllBookmarks().count, 1)
         XCTAssertNil(object.domain)
     }
     
@@ -282,7 +282,7 @@ class BookmarkTests: CoreDataTestCase {
         let newCustomTitle = "FolderUpdated"
         
         let object = createAndWait(url: nil, title: nil, customTitle: customTitle, isFolder: true)
-        XCTAssertEqual(Bookmark.getAllBookmarks(context: context).count, 1)
+        XCTAssertEqual(Bookmark.getAllBookmarks().count, 1)
         
         XCTAssertEqual(object.displayTitle, customTitle)
         
@@ -416,8 +416,8 @@ class BookmarkTests: CoreDataTestCase {
         bookmark.site = site
         
         backgroundSaveAndWaitForExpectation {
-            DataController.performTask { context in
-                Bookmark.createResolvedRecord(rootObject: bookmark, save: true, context: context)
+            DataController.perform { context in
+                Bookmark.createResolvedRecord(rootObject: bookmark, save: true, context: .existing(context))
             }
         }
         
@@ -483,11 +483,11 @@ class BookmarkTests: CoreDataTestCase {
     func testFrecencyQuery() {
         insertBookmarks(amount: 6)
         
-        let found = Bookmark.getByFrecency(query: "brave")
+        let found = Bookmark.byFrecency(query: "brave")
         // Query limit is 5
         XCTAssertEqual(found.count, 5)
         
-        let notFound = Bookmark.getByFrecency(query: "notfound")
+        let notFound = Bookmark.byFrecency(query: "notfound")
         XCTAssertEqual(notFound.count, 0)
     }
     
@@ -512,7 +512,7 @@ class BookmarkTests: CoreDataTestCase {
                                parentFolder: Bookmark? = nil, isFolder: Bool = false, isFavorite: Bool = false, color: UIColor? = nil, syncOrder: String? = nil) -> Bookmark {
         
         backgroundSaveAndWaitForExpectation {
-            Bookmark.add(url: url, title: title, customTitle: customTitle, parentFolder: parentFolder,
+            Bookmark.addInternal(url: url, title: title, customTitle: customTitle, parentFolder: parentFolder,
                          isFolder: isFolder, isFavorite: isFavorite, syncOrder: syncOrder)
         }
         

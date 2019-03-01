@@ -12,33 +12,33 @@ private let log = Logger.browserLogger
 // TODO: Creatable, Updateable. Those are not needed at the moment.
 typealias CRUD = Readable & Deletable
 
-public protocol Deletable where Self: NSManagedObject {
-    func delete(context: NSManagedObjectContext?)
-    static func deleteAll(predicate: NSPredicate?, context: NSManagedObjectContext?, includesPropertyValues: Bool)
+protocol Deletable where Self: NSManagedObject {
+    func delete(context: WriteContext)
+    static func deleteAll(predicate: NSPredicate?, context: WriteContext, includesPropertyValues: Bool)
 }
 
-public protocol Readable where Self: NSManagedObject {
-    static func count(predicate: NSPredicate?) -> Int?
-    static func first(where predicate: NSPredicate?, sortDescriptors: [NSSortDescriptor]?, context: NSManagedObjectContext?) -> Self?
+protocol Readable where Self: NSManagedObject {
+    static func count(predicate: NSPredicate?, context: NSManagedObjectContext) -> Int?
+    static func first(where predicate: NSPredicate?, sortDescriptors: [NSSortDescriptor]?, context: NSManagedObjectContext) -> Self?
     static func all(where predicate: NSPredicate?, sortDescriptors: [NSSortDescriptor]?, fetchLimit: Int, 
-                    context: NSManagedObjectContext?) -> [Self]?
+                    context: NSManagedObjectContext) -> [Self]?
 }
 
 // MARK: - Implementations
-public extension Deletable where Self: NSManagedObject {
-    func delete(context: NSManagedObjectContext? = nil) {
+extension Deletable where Self: NSManagedObject {
+    func delete(context: WriteContext = .new) {
         
-        DataController.performTask(context: context) { context in
+        DataController.perform(context: context) { context in
             let objectOnContext = context.object(with: self.objectID)
             context.delete(objectOnContext)
         }
     }
     
     static func deleteAll(predicate: NSPredicate? = nil,
-                          context: NSManagedObjectContext? = nil,
+                          context: WriteContext = .new,
                           includesPropertyValues: Bool = true) {
         
-        DataController.performTask(context: context) { context in
+        DataController.perform(context: context) { context in
             guard let request = getFetchRequest() as? NSFetchRequest<NSFetchRequestResult> else { return }
             request.predicate = predicate
             request.includesPropertyValues = includesPropertyValues
@@ -62,9 +62,9 @@ public extension Deletable where Self: NSManagedObject {
     }
 }
 
-public extension Readable where Self: NSManagedObject { 
-    static func count(predicate: NSPredicate? = nil) -> Int? {
-        let context = DataController.viewContext
+extension Readable where Self: NSManagedObject { 
+    static func count(predicate: NSPredicate? = nil,
+                      context: NSManagedObjectContext = DataController.viewContext) -> Int? {
         let request = getFetchRequest()
         
         request.predicate = predicate
@@ -79,14 +79,14 @@ public extension Readable where Self: NSManagedObject {
     }
     
     static func first(where predicate: NSPredicate? = nil, sortDescriptors: [NSSortDescriptor]? = nil,
-                      context: NSManagedObjectContext? = nil) -> Self? {
-        let context = context ?? DataController.viewContext
+                      context: NSManagedObjectContext = DataController.viewContext) -> Self? {
         return all(where: predicate, sortDescriptors: sortDescriptors, fetchLimit: 1, context: context)?.first
     }
     
-    static func all(where predicate: NSPredicate? = nil, sortDescriptors: [NSSortDescriptor]? = nil, 
-                    fetchLimit: Int = 0, context: NSManagedObjectContext? = nil) -> [Self]? {
-        let context = context ?? DataController.viewContext
+    static func all(where predicate: NSPredicate? = nil,
+                    sortDescriptors: [NSSortDescriptor]? = nil,
+                    fetchLimit: Int = 0,
+                    context: NSManagedObjectContext = DataController.viewContext) -> [Self]? {
         let request = getFetchRequest()
         
         request.predicate = predicate

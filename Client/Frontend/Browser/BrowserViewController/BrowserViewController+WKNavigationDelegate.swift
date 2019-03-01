@@ -158,7 +158,7 @@ extension BrowserViewController: WKNavigationDelegate {
             
             if let urlHost = url.normalizedHost {
                 if let mainDocumentURL = navigationAction.request.mainDocumentURL, url.scheme == "http" {
-                    let domainForShields = Domain.getOrCreateForUrl(mainDocumentURL)
+                    let domainForShields = Domain.getOrCreate(forUrl: mainDocumentURL)
                     let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
                     if domainForShields.isShieldExpected(.HTTPSE, isPrivateBrowsing: isPrivateBrowsing) && HttpsEverywhereStats.shared.shouldUpgrade(url) {
                         // Check if HTTPSE is on and if it is, whether or not this http url would be upgraded
@@ -183,7 +183,7 @@ extension BrowserViewController: WKNavigationDelegate {
                 navigationAction.sourceFrame.isMainFrame || navigationAction.targetFrame?.isMainFrame == true {
                 
                 // Identify specific block lists that need to be applied to the requesting domain
-                let domainForShields = Domain.getOrCreateForUrl(mainDocumentURL)
+                let domainForShields = Domain.getOrCreate(forUrl: mainDocumentURL)
                 let (on, off) = BlocklistName.blocklists(forDomain: domainForShields)
                 let controller = webView.configuration.userContentController
                 

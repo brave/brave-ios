@@ -65,7 +65,7 @@ class _SearchLoader<UnusedA, UnusedB>: Loader<[Site], SearchViewController> {
                 self.inProgress = nil
             }
 
-            let deferred = FrecencyQuery.getSitesByFrecency(containing: query)
+            let deferred = FrecencyQuery.sitesByFrecency(containing: query)
             inProgress = deferred as? Cancellable
 
             deferred.uponQueue(.main) { result in

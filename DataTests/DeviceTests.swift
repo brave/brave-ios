@@ -51,8 +51,8 @@ class DeviceTests: CoreDataTestCase {
     
     func testAddWithSave() {
         backgroundSaveAndWaitForExpectation {
-            DataController.performTask { context in
-                Device.createResolvedRecord(rootObject: nil, save: true, context: context)
+            DataController.perform { context in
+                Device.createResolvedRecord(rootObject: nil, save: true, context: .existing(context))
             }
         }
         
@@ -62,8 +62,8 @@ class DeviceTests: CoreDataTestCase {
     func testUniqueSyncUUID() {
         XCTAssertEqual(try! DataController.viewContext.fetch(fetchRequest).count, 0)
         backgroundSaveAndWaitForExpectation {
-            DataController.performTask { context in
-                Device.createResolvedRecord(rootObject: nil, save: true, context: context)
+            DataController.perform { context in
+                Device.createResolvedRecord(rootObject: nil, save: true, context: .existing(context))
             }
         }
         
@@ -75,8 +75,8 @@ class DeviceTests: CoreDataTestCase {
         root.objectId = device?.syncUUID
         
         backgroundSaveAndWaitForExpectation {
-            DataController.performTask { context in
-                Device.createResolvedRecord(rootObject: root, save: true, context: context)
+            DataController.perform { context in
+                Device.createResolvedRecord(rootObject: root, save: true, context: .existing(context))
             }
         }
         
