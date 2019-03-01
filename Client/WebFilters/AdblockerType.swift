@@ -7,6 +7,8 @@ import Shared
 
 private let log = Logger.browserLogger
 
+enum FileType: String { case dat, json, tgz }
+
 enum AdblockerType {
     case general
     case httpse
@@ -18,10 +20,12 @@ enum AdblockerType {
         default: return nil
         }}
     
-    var associatedFiles: [FileType] {
+    var associatedFiles: [FileType] { return [.json, fileForStatsLibrary] }
+    
+    private var fileForStatsLibrary: FileType {
         switch self {
-        case .general, .regional: return [.json, .dat]
-        case .httpse: return [.json, .tgz]
+        case .general, .regional: return .dat
+        case .httpse: return .tgz
         }
     }
     
@@ -30,6 +34,14 @@ enum AdblockerType {
         case .general: return BlocklistName.adFileName
         case .httpse: return BlocklistName.httpseFileName
         case .regional(let locale): return locale
+        }
+    }
+    
+    var blockListName: BlocklistName? {
+        switch self {
+        case .general: return BlocklistName.ad
+        case .httpse: return BlocklistName.https
+        case .regional(let locale): return ContentBlockerRegion.with(localeCode: locale)
         }
     }
     

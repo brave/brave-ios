@@ -9,8 +9,6 @@ import Deferred
 
 private let log = Logger.browserLogger
 
-enum FileType: String { case dat, json, tgz }
-
 private struct AdBlockNetworkResource {
     let resource: CachedNetworkResource
     let fileType: FileType
@@ -50,7 +48,7 @@ class AdblockResourceDownloader {
     }
     
     private func downloadResources(withName name: String, type: AdblockerType,
-                                          queueName: String) -> Deferred<()> {
+                                   queueName: String) -> Deferred<()> {
         let completion = Deferred<()>()
 
         let queue = DispatchQueue(label: queueName)
@@ -77,7 +75,7 @@ class AdblockResourceDownloader {
         all(completedDownloads).uponQueue(queue) { resources in
             // json to content rules compilation happens first, otherwise it makes no sense to proceed further
             // and overwrite old files that were working before.
-            self.compileContentBlocker(resources: resources)
+            self.compileContentBlocker(resources: resources, queue: queue)
                 .uponQueue(queue) { _ in self.writeFilesTodisk(resources: resources, name: name, queue: queue)
                     .uponQueue(queue) { _ in self.setUpFiles(resources: resources,
                                                              compileJsonRules: false, queue: queue)
@@ -101,11 +99,20 @@ class AdblockResourceDownloader {
         return String(data: data, encoding: .utf8)
     }
     
-    private func compileContentBlocker(resources: [AdBlockNetworkResource]) -> Deferred<()> {
-        var completion = Deferred<()>()
-        guard let jsonResource = resources.first(where: { $0.fileType == .json }),
-            let contentBlocker = ContentBlockerRegion.with(localeCode: self.locale) else { return completion }
-        completion = contentBlocker.compile(data: jsonResource.resource.data)
+    private func compileContentBlocker(resources: [AdBlockNetworkResource],
+                                       queue: DispatchQueue) -> Deferred<()> {
+        let completion = Deferred<()>()
+        
+        let compiledLists = resources.filter { $0.fileType == .json }
+            .map { res -> Deferred<()> in
+                guard let blockList = res.type.blockListName else { return Deferred<()>() }
+                return blockList.compile(data: res.resource.data)
+        }
+        
+        all(compiledLists).uponQueue(queue) { _ in
+            completion.fill(())
+        }
+        
         return completion
     }
     
@@ -142,7 +149,7 @@ class AdblockResourceDownloader {
                                                                      id: $0.type.identifier))
             case .json:
                 if compileJsonRules {
-                    resourceSetup.append(compileContentBlocker(resources: resources))
+                    resourceSetup.append(compileContentBlocker(resources: resources, queue: queue))
                 }
             case .tgz:
                 break // TODO: Add downloadable httpse list
