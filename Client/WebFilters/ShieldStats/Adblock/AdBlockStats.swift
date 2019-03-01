@@ -7,30 +7,21 @@ import Deferred
 
 private let log = Logger.browserLogger
 
-/// In the future we might provide two different resources per locale.
-/// A small list, bundled with the application,
-/// and a bigger list downloaded over the internet.
-enum AdblockStatsResourceType { case bundled, fromNetwork }
-
 fileprivate struct AdblockStatsResource: Hashable {
     let abpWrapper: ABPFilterLibWrapper
-    let type: AdblockStatsResourceType
-    let locale: String
+    let id: String
     
-    init(abpWrapper: ABPFilterLibWrapper = ABPFilterLibWrapper(),
-         type: AdblockStatsResourceType, locale: String) {
+    init(abpWrapper: ABPFilterLibWrapper = ABPFilterLibWrapper(), id: String) {
         self.abpWrapper = abpWrapper
-        self.type = type
-        self.locale = locale
+        self.id = id
     }
     
     static func == (lhs: AdblockStatsResource, rhs: AdblockStatsResource) -> Bool {
-        return lhs.type == rhs.type && lhs.locale == rhs.locale
+        return lhs.id == rhs.id
     }
     
     func hash(into hasher: inout Hasher) {
-        hasher.combine(type)
-        hasher.combine(locale)
+        hasher.combine(id)
     }
 }
 
@@ -45,8 +36,8 @@ class AdBlockStats: LocalAdblockResourceProtocol {
     fileprivate var fifoCacheOfUrlsChecked = FifoDict()
     
     fileprivate lazy var adblockStatsResources: Set<AdblockStatsResource> = {
-        let defaultResource = AdblockStatsResource(type: .bundled, locale: AdBlockStats.defaultLocale)
-        return [defaultResource]
+        let generalAdblocker = AdblockStatsResource(id: AdblockerType.general.identifier)
+        return [generalAdblocker]
     }()
     
     let currentLocaleCode: LocaleCode
@@ -60,7 +51,7 @@ class AdBlockStats: LocalAdblockResourceProtocol {
     
     func startLoading() {
         loadLocalData(name: blockListFileName, type: "dat") { data in
-            self.setDataFile(data: data, locale: AdBlockStats.defaultLocale, type: .bundled)
+            self.setDataFile(data: data, id: AdblockerType.general.identifier)
         }
         
         loadDatFilesFromDocumentsDirectory()
@@ -76,17 +67,17 @@ class AdBlockStats: LocalAdblockResourceProtocol {
 
         datFilePaths?.forEach {
             let fileName = URL(fileURLWithPath: $0).deletingPathExtension().lastPathComponent
-            guard let locale = AdblockResourcesMappings.resourceNameToLocale(fileName) else { return }
+            guard let id = AdblockerType.type(fromResource: fileName)?.identifier else { return }
             
             guard let data = FileManager.default.contents(atPath: path + $0) else { return }
-            setDataFile(data: data, locale: locale, type: .fromNetwork)
+            setDataFile(data: data, id: id)
         }
     }
     
     fileprivate func updateRegionalAdblockEnabledState() {
         if currentLocaleCode == AdBlockStats.defaultLocale { return }
         
-        let regionalResource = AdblockStatsResource(type: .fromNetwork, locale: currentLocaleCode)
+        let regionalResource = AdblockStatsResource(id: currentLocaleCode)
         adblockStatsResources.insert(regionalResource)
     }
     
@@ -132,7 +123,7 @@ class AdBlockStats: LocalAdblockResourceProtocol {
         let header = "*/*"
         
         for adblocker in adblockStatsResources where adblocker.abpWrapper.hasDataFile() {
-            if adblocker.locale != AdBlockStats.defaultLocale && !isRegionalAdblockEnabled { continue }
+            if adblocker.id != AdBlockStats.defaultLocale && !isRegionalAdblockEnabled { continue }
             
             isBlocked = adblocker.abpWrapper.isBlockedConsideringType(url.absoluteString,
                                                                       mainDocumentUrl: mainDocDomain,
@@ -162,12 +153,10 @@ class AdBlockStats: LocalAdblockResourceProtocol {
         }
     }
     
-    @discardableResult func setDataFile(data: Data, locale: String,
-                                        type: AdblockStatsResourceType) -> Deferred<()> {
+    @discardableResult func setDataFile(data: Data, id: String) -> Deferred<()> {
         let completion = Deferred<()>()
 
-        guard let adblocker = adblockStatsResources.first(
-            where: { $0.locale == locale && $0.type == type })?.abpWrapper else {
+        guard let adblocker = adblockStatsResources.first(where: { $0.id == id })?.abpWrapper else {
             return completion
         }
         

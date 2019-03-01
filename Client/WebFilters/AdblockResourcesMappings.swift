@@ -6,6 +6,8 @@ import Foundation
 
 struct AdblockResourcesMappings {
     static let generalAdblockName = "latest"
+    static let generalHttpseName = "httpse"
+    static let defaultLocale = "en"
     
     static func localeToResourceName(_ locale: String) -> String? {
         var resourceName: String?
