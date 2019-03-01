@@ -9,12 +9,39 @@ import Deferred
 
 private let log = Logger.browserLogger
 
-private enum AdblockResourceType: String { case dat, json }
+enum FileType: String { case dat, json, tgz }
+
+enum AdblockerType {
+    case general
+    case httpse
+    case regional(locale: String)
+    
+    var locale: String? {
+        switch self {
+        case .regional(let locale): return locale
+        default: return nil
+        }}
+    
+    var associatedFiles: [FileType] {
+        switch self {
+        case .general, .regional: return [.json, .dat]
+        case .httpse: return [.json, .tgz]
+        }
+    }
+    
+    var identifier: String? {
+        switch self {
+        case .general: return BlocklistName.adFileName
+        case .httpse: return BlocklistName.httpseFileName
+        case .regional(let locale): return AdblockResourcesMappings.localeToResourceName(locale)
+        }
+    }
+}
 
 private struct AdBlockNetworkResource {
     let resource: CachedNetworkResource
-    let type: AdblockResourceType
-    let locale: String
+    let fileType: FileType
+    let type: AdblockerType
 }
 
 class AdblockResourceDownloader {
@@ -44,45 +71,38 @@ class AdblockResourceDownloader {
         }
         
         guard let name = ContentBlockerRegion.with(localeCode: locale)?.filename else { return }
-        downloadDatJsonResources(withName: name, locale: locale,
+        downloadDatJsonResources(withName: name, type: .regional(locale: locale),
                                  queueName: "Regional adblock setup").uponQueue(.main) {
             log.debug("Regional blocklists download and setup completed.")
         }
     }
     
-    private func downloadDatJsonResources(withName name: String, locale: String,
+    private func downloadDatJsonResources(withName name: String, type: AdblockerType,
                                           queueName: String) -> Deferred<()> {
         let completion = Deferred<()>()
-        
-        guard let datResourceUrl = URL(string: endpoint + name + ".dat") else {
-            log.error("Could not parse url for getting an adblocker dat resource")
-            return completion
-        }
-        
-        guard let jsonResourceUrl = URL(string: endpoint + name + ".json") else {
-            log.error("Could not parse url for getting an adblocker json resource")
-            return completion
-        }
-        
+
         let queue = DispatchQueue(label: queueName)
         let nm = networkManager
         let folderName = AdblockResourceDownloader.folderName
         
-        let datEtag = fileFromDocumentsAsString(name + ".dat.etag", inFolder: folderName)
-        let datRequest = nm.downloadResource(with: datResourceUrl, resourceType: .cached(etag: datEtag))
-            .mapQueue(queue) { res in
-                AdBlockNetworkResource(resource: res, type: .dat, locale: locale)
+        let completedDownloads = type.associatedFiles.map { fileType -> Deferred<AdBlockNetworkResource> in
+            let fileExtension = "." + fileType.rawValue
+            let etagExtension = fileExtension + ".etag"
+            
+            guard let url = URL(string: endpoint + name + fileExtension) else {
+                return Deferred<AdBlockNetworkResource>()
+            }
+            
+            let etag = fileFromDocumentsAsString(name + etagExtension, inFolder: folderName)
+            let request = nm.downloadResource(with: url, resourceType: .cached(etag: etag))
+                .mapQueue(queue) { resource in
+                    AdBlockNetworkResource(resource: resource, fileType: fileType, type: type)
+            }
+            
+            return request
         }
         
-        let jsonEtag = fileFromDocumentsAsString(name + ".json.etag", inFolder: folderName)
-        let jsonRequest = nm.downloadResource(with: jsonResourceUrl, resourceType: .cached(etag: jsonEtag))
-            .mapQueue(queue) { res in
-                AdBlockNetworkResource(resource: res, type: .json, locale: locale)
-        }
-        
-        let downloadResources = all([datRequest, jsonRequest])
-        
-        downloadResources.uponQueue(queue) { resources in
+        all(completedDownloads).uponQueue(queue) { resources in
             // json to content rules compilation happens first, otherwise it makes no sense to proceed further
             // and overwrite old files that were working before.
             self.compileContentBlocker(resources: resources)
@@ -110,7 +130,7 @@ class AdblockResourceDownloader {
     
     private func compileContentBlocker(resources: [AdBlockNetworkResource]) -> Deferred<()> {
         var completion = Deferred<()>()
-        guard let jsonResource = resources.first(where: { $0.type == .json }),
+        guard let jsonResource = resources.first(where: { $0.fileType == .json }),
             let contentBlocker = ContentBlockerRegion.with(localeCode: self.locale) else { return completion }
         completion = contentBlocker.compile(data: jsonResource.resource.data)
         return completion
@@ -123,7 +143,7 @@ class AdblockResourceDownloader {
         let folderName = AdblockResourceDownloader.folderName
         
         resources.forEach {
-            let fileName = name + ".\($0.type.rawValue)"
+            let fileName = name + ".\($0.fileType.rawValue)"
             fileSaveCompletions.append(fm.writeToDiskInFolder($0.resource.data, fileName: fileName,
                                                               folderName: folderName))
             
@@ -143,13 +163,17 @@ class AdblockResourceDownloader {
         var resourceSetup = [Deferred<()>]()
         
         resources.forEach {
-            switch $0.type {
+            switch $0.fileType {
             case .dat:
-                resourceSetup.append(AdBlockStats.shared.setDataFile(data: $0.resource.data, locale: $0.locale, type: .fromNetwork))
+                let locale = $0.type.locale ?? "en"
+                resourceSetup.append(AdBlockStats.shared.setDataFile(data: $0.resource.data,
+                                                                     locale: locale, type: .fromNetwork))
             case .json:
                 if compileJsonRules {
                     resourceSetup.append(compileContentBlocker(resources: resources))
                 }
+            case .tgz:
+                break // TODO: Add downloadable httpse list
             }
         }
         all(resourceSetup).uponQueue(queue) { _ in completion.fill(()) }

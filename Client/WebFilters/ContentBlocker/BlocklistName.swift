@@ -12,11 +12,17 @@ private let log = Logger.browserLogger
 
 class BlocklistName: CustomStringConvertible, ContentBlocker {
     
-    static let ad = BlocklistName(filename: "block-ads")
-    static let tracker = BlocklistName(filename: "block-trackers")
-    static let https = BlocklistName(filename: "upgrade-http")
-    static let image = BlocklistName(filename: "block-images")
-    static let cookie = BlocklistName(filename: "block-cookies")
+    static let adFileName = "block-ads"
+    static let trackersFileName = "block-trackers"
+    static let httpseFileName = "upgrade-http"
+    static let imageFileName = "block-images"
+    static let cookieFileName = "block-cookies"
+    
+    static let ad = BlocklistName(filename: adFileName)
+    static let tracker = BlocklistName(filename: trackersFileName)
+    static let https = BlocklistName(filename: httpseFileName)
+    static let image = BlocklistName(filename: imageFileName)
+    static let cookie = BlocklistName(filename: cookieFileName)
     
     /// List of all bundled content blockers.
     /// Regional lists are downloaded on fly and not included here.
