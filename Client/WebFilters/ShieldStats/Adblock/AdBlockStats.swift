@@ -76,7 +76,7 @@ class AdBlockStats: LocalAdblockResourceProtocol {
 
         datFilePaths?.forEach {
             let fileName = URL(fileURLWithPath: $0).deletingPathExtension().lastPathComponent
-            guard let locale = AdblockFilenameMappings.fileNameToLocale(fileName) else { return }
+            guard let locale = AdblockResourcesMappings.resourceNameToLocale(fileName) else { return }
             
             guard let data = FileManager.default.contents(atPath: path + $0) else { return }
             setDataFile(data: data, locale: locale, type: .fromNetwork)

@@ -4,52 +4,52 @@
 
 import Foundation
 
-struct AdblockFilenameMappings {
+struct AdblockResourcesMappings {
     static let generalAdblockName = "latest"
     
-    static func localeToFilename(_ locale: String) -> String? {
-        var fileName: String?
+    static func localeToResourceName(_ locale: String) -> String? {
+        var resourceName: String?
         // ru, uk, be locales have the same file name
         
         switch locale {
-        case Locales.ar.rawValue: fileName = ResourceNames.ar.rawValue
-        case Locales.bg.rawValue: fileName = ResourceNames.bg.rawValue
-        case Locales.zh.rawValue: fileName = ResourceNames.zh.rawValue
-        case Locales.cs.rawValue: fileName = ResourceNames.cs.rawValue
-        case Locales.de.rawValue: fileName = ResourceNames.de.rawValue
-        case Locales.da.rawValue: fileName = ResourceNames.da.rawValue
-        case Locales.et.rawValue: fileName = ResourceNames.et.rawValue
-        case Locales.fi.rawValue: fileName = ResourceNames.fi.rawValue
-        case Locales.fr.rawValue: fileName = ResourceNames.fr.rawValue
-        case Locales.el.rawValue: fileName = ResourceNames.el.rawValue
-        case Locales.hu.rawValue: fileName = ResourceNames.hu.rawValue
-        case Locales.id.rawValue: fileName = ResourceNames.id.rawValue
-        case Locales.hi.rawValue: fileName = ResourceNames.hi.rawValue
-        case Locales.fa.rawValue: fileName = ResourceNames.fa.rawValue
-        case Locales.is.rawValue: fileName = ResourceNames.is.rawValue
-        case Locales.he.rawValue: fileName = ResourceNames.he.rawValue
-        case Locales.it.rawValue: fileName = ResourceNames.it.rawValue
-        case Locales.ja.rawValue: fileName = ResourceNames.ja.rawValue
-        case Locales.ko.rawValue: fileName = ResourceNames.ko.rawValue
-        case Locales.lt.rawValue: fileName = ResourceNames.lt.rawValue
-        case Locales.lv.rawValue: fileName = ResourceNames.lv.rawValue
-        case Locales.nl.rawValue: fileName = ResourceNames.nl.rawValue
-        case Locales.pl.rawValue: fileName = ResourceNames.pl.rawValue
-        case Locales.ru.rawValue: fileName = ResourceNames.ru.rawValue
-        case Locales.uk.rawValue: fileName = ResourceNames.uk.rawValue
-        case Locales.be.rawValue: fileName = ResourceNames.be.rawValue
-        case Locales.es.rawValue: fileName = ResourceNames.es.rawValue
-        case Locales.sl.rawValue: fileName = ResourceNames.sl.rawValue
-        case Locales.sv.rawValue: fileName = ResourceNames.sv.rawValue
-        case Locales.tr.rawValue: fileName = ResourceNames.tr.rawValue
-        case Locales.vi.rawValue: fileName = ResourceNames.vi.rawValue
-        default: fileName = nil
+        case Locales.ar.rawValue: resourceName = ResourceNames.ar.rawValue
+        case Locales.bg.rawValue: resourceName = ResourceNames.bg.rawValue
+        case Locales.zh.rawValue: resourceName = ResourceNames.zh.rawValue
+        case Locales.cs.rawValue: resourceName = ResourceNames.cs.rawValue
+        case Locales.de.rawValue: resourceName = ResourceNames.de.rawValue
+        case Locales.da.rawValue: resourceName = ResourceNames.da.rawValue
+        case Locales.et.rawValue: resourceName = ResourceNames.et.rawValue
+        case Locales.fi.rawValue: resourceName = ResourceNames.fi.rawValue
+        case Locales.fr.rawValue: resourceName = ResourceNames.fr.rawValue
+        case Locales.el.rawValue: resourceName = ResourceNames.el.rawValue
+        case Locales.hu.rawValue: resourceName = ResourceNames.hu.rawValue
+        case Locales.id.rawValue: resourceName = ResourceNames.id.rawValue
+        case Locales.hi.rawValue: resourceName = ResourceNames.hi.rawValue
+        case Locales.fa.rawValue: resourceName = ResourceNames.fa.rawValue
+        case Locales.is.rawValue: resourceName = ResourceNames.is.rawValue
+        case Locales.he.rawValue: resourceName = ResourceNames.he.rawValue
+        case Locales.it.rawValue: resourceName = ResourceNames.it.rawValue
+        case Locales.ja.rawValue: resourceName = ResourceNames.ja.rawValue
+        case Locales.ko.rawValue: resourceName = ResourceNames.ko.rawValue
+        case Locales.lt.rawValue: resourceName = ResourceNames.lt.rawValue
+        case Locales.lv.rawValue: resourceName = ResourceNames.lv.rawValue
+        case Locales.nl.rawValue: resourceName = ResourceNames.nl.rawValue
+        case Locales.pl.rawValue: resourceName = ResourceNames.pl.rawValue
+        case Locales.ru.rawValue: resourceName = ResourceNames.ru.rawValue
+        case Locales.uk.rawValue: resourceName = ResourceNames.uk.rawValue
+        case Locales.be.rawValue: resourceName = ResourceNames.be.rawValue
+        case Locales.es.rawValue: resourceName = ResourceNames.es.rawValue
+        case Locales.sl.rawValue: resourceName = ResourceNames.sl.rawValue
+        case Locales.sv.rawValue: resourceName = ResourceNames.sv.rawValue
+        case Locales.tr.rawValue: resourceName = ResourceNames.tr.rawValue
+        case Locales.vi.rawValue: resourceName = ResourceNames.vi.rawValue
+        default: resourceName = nil
         }
         
-        return fileName
+        return resourceName
     }
     
-    static func fileNameToLocale(_ name: String) -> String? {
+    static func resourceNameToLocale(_ name: String) -> String? {
         var locale: String?
         switch name {
         case ResourceNames.ar.rawValue: locale = Locales.ar.rawValue
