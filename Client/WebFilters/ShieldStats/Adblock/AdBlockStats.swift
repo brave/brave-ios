@@ -35,9 +35,9 @@ class AdBlockStats: LocalAdblockResourceProtocol {
     
     fileprivate var fifoCacheOfUrlsChecked = FifoDict()
     
-    fileprivate lazy var adblockStatsResources: Set<AdblockStatsResource> = {
-        let generalAdblocker = AdblockStatsResource(id: AdblockerType.general.identifier)
-        return [generalAdblocker]
+    fileprivate lazy var adblockStatsResources: [String: ABPFilterLibWrapper] = {
+        let generalAdblocker = [AdblockerType.general.identifier: ABPFilterLibWrapper()]
+        return generalAdblocker
     }()
     
     let currentLocaleCode: LocaleCode
@@ -77,8 +77,7 @@ class AdBlockStats: LocalAdblockResourceProtocol {
     fileprivate func updateRegionalAdblockEnabledState() {
         if currentLocaleCode == AdBlockStats.defaultLocale { return }
         
-        let regionalResource = AdblockStatsResource(id: currentLocaleCode)
-        adblockStatsResources.insert(regionalResource)
+        adblockStatsResources[currentLocaleCode] = ABPFilterLibWrapper()
     }
     
     func shouldBlock(_ request: URLRequest) -> Bool {
@@ -122,10 +121,10 @@ class AdBlockStats: LocalAdblockResourceProtocol {
         var isBlocked = false
         let header = "*/*"
         
-        for adblocker in adblockStatsResources where adblocker.abpWrapper.hasDataFile() {
-            if adblocker.id != AdBlockStats.defaultLocale && !isRegionalAdblockEnabled { continue }
+        for (id, adblocker) in adblockStatsResources where adblocker.hasDataFile() {
+            if id != AdBlockStats.defaultLocale && !isRegionalAdblockEnabled { continue }
             
-            isBlocked = adblocker.abpWrapper.isBlockedConsideringType(url.absoluteString,
+            isBlocked = adblocker.isBlockedConsideringType(url.absoluteString,
                                                                       mainDocumentUrl: mainDocDomain,
                                                                       acceptHTTPHeader: header)
             
@@ -156,9 +155,7 @@ class AdBlockStats: LocalAdblockResourceProtocol {
     @discardableResult func setDataFile(data: Data, id: String) -> Deferred<()> {
         let completion = Deferred<()>()
 
-        guard let adblocker = adblockStatsResources.first(where: { $0.id == id })?.abpWrapper else {
-            return completion
-        }
+        guard let adblocker = adblockStatsResources[id] else { return completion }
         
         adblocker.setDataFile(data)
         
