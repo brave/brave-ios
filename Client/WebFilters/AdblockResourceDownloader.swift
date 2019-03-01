@@ -56,7 +56,7 @@ class AdblockResourceDownloader {
     }
     
     func generalAdblockResourcesSetup() {
-        let name = AdblockFilenameMappings.generalAdblockName
+        let name = AdblockResourcesMappings.generalAdblockName
         downloadDatJsonResources(withName: name, locale: "en",
                                  queueName: "General adblock setup").uponQueue(.main) {
                                     log.debug("General blocklists download and setup completed.")
