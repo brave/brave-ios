@@ -12,37 +12,37 @@ struct AdblockFilenameMappings {
         // ru, uk, be locales have the same file name
         
         switch locale {
-        case Locales.ar.rawValue: fileName = FileNames.ar.rawValue
-        case Locales.bg.rawValue: fileName = FileNames.bg.rawValue
-        case Locales.zh.rawValue: fileName = FileNames.zh.rawValue
-        case Locales.cs.rawValue: fileName = FileNames.cs.rawValue
-        case Locales.de.rawValue: fileName = FileNames.de.rawValue
-        case Locales.da.rawValue: fileName = FileNames.da.rawValue
-        case Locales.et.rawValue: fileName = FileNames.et.rawValue
-        case Locales.fi.rawValue: fileName = FileNames.fi.rawValue
-        case Locales.fr.rawValue: fileName = FileNames.fr.rawValue
-        case Locales.el.rawValue: fileName = FileNames.el.rawValue
-        case Locales.hu.rawValue: fileName = FileNames.hu.rawValue
-        case Locales.id.rawValue: fileName = FileNames.id.rawValue
-        case Locales.hi.rawValue: fileName = FileNames.hi.rawValue
-        case Locales.fa.rawValue: fileName = FileNames.fa.rawValue
-        case Locales.is.rawValue: fileName = FileNames.is.rawValue
-        case Locales.he.rawValue: fileName = FileNames.he.rawValue
-        case Locales.it.rawValue: fileName = FileNames.it.rawValue
-        case Locales.ja.rawValue: fileName = FileNames.ja.rawValue
-        case Locales.ko.rawValue: fileName = FileNames.ko.rawValue
-        case Locales.lt.rawValue: fileName = FileNames.lt.rawValue
-        case Locales.lv.rawValue: fileName = FileNames.lv.rawValue
-        case Locales.nl.rawValue: fileName = FileNames.nl.rawValue
-        case Locales.pl.rawValue: fileName = FileNames.pl.rawValue
-        case Locales.ru.rawValue: fileName = FileNames.ru.rawValue
-        case Locales.uk.rawValue: fileName = FileNames.uk.rawValue
-        case Locales.be.rawValue: fileName = FileNames.be.rawValue
-        case Locales.es.rawValue: fileName = FileNames.es.rawValue
-        case Locales.sl.rawValue: fileName = FileNames.sl.rawValue
-        case Locales.sv.rawValue: fileName = FileNames.sv.rawValue
-        case Locales.tr.rawValue: fileName = FileNames.tr.rawValue
-        case Locales.vi.rawValue: fileName = FileNames.vi.rawValue
+        case Locales.ar.rawValue: fileName = ResourceNames.ar.rawValue
+        case Locales.bg.rawValue: fileName = ResourceNames.bg.rawValue
+        case Locales.zh.rawValue: fileName = ResourceNames.zh.rawValue
+        case Locales.cs.rawValue: fileName = ResourceNames.cs.rawValue
+        case Locales.de.rawValue: fileName = ResourceNames.de.rawValue
+        case Locales.da.rawValue: fileName = ResourceNames.da.rawValue
+        case Locales.et.rawValue: fileName = ResourceNames.et.rawValue
+        case Locales.fi.rawValue: fileName = ResourceNames.fi.rawValue
+        case Locales.fr.rawValue: fileName = ResourceNames.fr.rawValue
+        case Locales.el.rawValue: fileName = ResourceNames.el.rawValue
+        case Locales.hu.rawValue: fileName = ResourceNames.hu.rawValue
+        case Locales.id.rawValue: fileName = ResourceNames.id.rawValue
+        case Locales.hi.rawValue: fileName = ResourceNames.hi.rawValue
+        case Locales.fa.rawValue: fileName = ResourceNames.fa.rawValue
+        case Locales.is.rawValue: fileName = ResourceNames.is.rawValue
+        case Locales.he.rawValue: fileName = ResourceNames.he.rawValue
+        case Locales.it.rawValue: fileName = ResourceNames.it.rawValue
+        case Locales.ja.rawValue: fileName = ResourceNames.ja.rawValue
+        case Locales.ko.rawValue: fileName = ResourceNames.ko.rawValue
+        case Locales.lt.rawValue: fileName = ResourceNames.lt.rawValue
+        case Locales.lv.rawValue: fileName = ResourceNames.lv.rawValue
+        case Locales.nl.rawValue: fileName = ResourceNames.nl.rawValue
+        case Locales.pl.rawValue: fileName = ResourceNames.pl.rawValue
+        case Locales.ru.rawValue: fileName = ResourceNames.ru.rawValue
+        case Locales.uk.rawValue: fileName = ResourceNames.uk.rawValue
+        case Locales.be.rawValue: fileName = ResourceNames.be.rawValue
+        case Locales.es.rawValue: fileName = ResourceNames.es.rawValue
+        case Locales.sl.rawValue: fileName = ResourceNames.sl.rawValue
+        case Locales.sv.rawValue: fileName = ResourceNames.sv.rawValue
+        case Locales.tr.rawValue: fileName = ResourceNames.tr.rawValue
+        case Locales.vi.rawValue: fileName = ResourceNames.vi.rawValue
         default: fileName = nil
         }
         
@@ -52,37 +52,37 @@ struct AdblockFilenameMappings {
     static func fileNameToLocale(_ name: String) -> String? {
         var locale: String?
         switch name {
-        case FileNames.ar.rawValue: locale = Locales.ar.rawValue
-        case FileNames.bg.rawValue: locale = Locales.bg.rawValue
-        case FileNames.zh.rawValue: locale = Locales.zh.rawValue
-        case FileNames.cs.rawValue: locale = Locales.cs.rawValue
-        case FileNames.de.rawValue: locale = Locales.de.rawValue
-        case FileNames.da.rawValue: locale = Locales.da.rawValue
-        case FileNames.et.rawValue: locale = Locales.et.rawValue
-        case FileNames.fi.rawValue: locale = Locales.fi.rawValue
-        case FileNames.fr.rawValue: locale = Locales.fr.rawValue
-        case FileNames.el.rawValue: locale = Locales.el.rawValue
-        case FileNames.hu.rawValue: locale = Locales.hu.rawValue
-        case FileNames.id.rawValue: locale = Locales.id.rawValue
-        case FileNames.hi.rawValue: locale = Locales.hi.rawValue
-        case FileNames.fa.rawValue: locale = Locales.fa.rawValue
-        case FileNames.is.rawValue: locale = Locales.is.rawValue
-        case FileNames.he.rawValue: locale = Locales.he.rawValue
-        case FileNames.it.rawValue: locale = Locales.it.rawValue
-        case FileNames.ja.rawValue: locale = Locales.ja.rawValue
-        case FileNames.ko.rawValue: locale = Locales.ko.rawValue
-        case FileNames.lt.rawValue: locale = Locales.lt.rawValue
-        case FileNames.lv.rawValue: locale = Locales.lv.rawValue
-        case FileNames.nl.rawValue: locale = Locales.nl.rawValue
-        case FileNames.pl.rawValue: locale = Locales.pl.rawValue
-        case FileNames.ru.rawValue: locale = Locales.ru.rawValue
-        case FileNames.uk.rawValue: locale = Locales.uk.rawValue
-        case FileNames.be.rawValue: locale = Locales.be.rawValue
-        case FileNames.es.rawValue: locale = Locales.es.rawValue
-        case FileNames.sl.rawValue: locale = Locales.sl.rawValue
-        case FileNames.sv.rawValue: locale = Locales.sv.rawValue
-        case FileNames.tr.rawValue: locale = Locales.tr.rawValue
-        case FileNames.vi.rawValue: locale = Locales.vi.rawValue
+        case ResourceNames.ar.rawValue: locale = Locales.ar.rawValue
+        case ResourceNames.bg.rawValue: locale = Locales.bg.rawValue
+        case ResourceNames.zh.rawValue: locale = Locales.zh.rawValue
+        case ResourceNames.cs.rawValue: locale = Locales.cs.rawValue
+        case ResourceNames.de.rawValue: locale = Locales.de.rawValue
+        case ResourceNames.da.rawValue: locale = Locales.da.rawValue
+        case ResourceNames.et.rawValue: locale = Locales.et.rawValue
+        case ResourceNames.fi.rawValue: locale = Locales.fi.rawValue
+        case ResourceNames.fr.rawValue: locale = Locales.fr.rawValue
+        case ResourceNames.el.rawValue: locale = Locales.el.rawValue
+        case ResourceNames.hu.rawValue: locale = Locales.hu.rawValue
+        case ResourceNames.id.rawValue: locale = Locales.id.rawValue
+        case ResourceNames.hi.rawValue: locale = Locales.hi.rawValue
+        case ResourceNames.fa.rawValue: locale = Locales.fa.rawValue
+        case ResourceNames.is.rawValue: locale = Locales.is.rawValue
+        case ResourceNames.he.rawValue: locale = Locales.he.rawValue
+        case ResourceNames.it.rawValue: locale = Locales.it.rawValue
+        case ResourceNames.ja.rawValue: locale = Locales.ja.rawValue
+        case ResourceNames.ko.rawValue: locale = Locales.ko.rawValue
+        case ResourceNames.lt.rawValue: locale = Locales.lt.rawValue
+        case ResourceNames.lv.rawValue: locale = Locales.lv.rawValue
+        case ResourceNames.nl.rawValue: locale = Locales.nl.rawValue
+        case ResourceNames.pl.rawValue: locale = Locales.pl.rawValue
+        case ResourceNames.ru.rawValue: locale = Locales.ru.rawValue
+        case ResourceNames.uk.rawValue: locale = Locales.uk.rawValue
+        case ResourceNames.be.rawValue: locale = Locales.be.rawValue
+        case ResourceNames.es.rawValue: locale = Locales.es.rawValue
+        case ResourceNames.sl.rawValue: locale = Locales.sl.rawValue
+        case ResourceNames.sv.rawValue: locale = Locales.sv.rawValue
+        case ResourceNames.tr.rawValue: locale = Locales.tr.rawValue
+        case ResourceNames.vi.rawValue: locale = Locales.vi.rawValue
         default: locale = nil
         }
         
@@ -90,7 +90,7 @@ struct AdblockFilenameMappings {
     }
 }
 
-fileprivate enum FileNames: String {
+fileprivate enum ResourceNames: String {
     case ar = "9FCEECEC-52B4-4487-8E57-8781E82C91D0-latest"
     case bg = "FD176DD1-F9A0-4469-B43E-B1764893DD5C-latest"
     case zh = "11F62B02-9D1F-4263-A7F8-77D2B55D4594-latest"
