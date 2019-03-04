@@ -348,7 +348,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         self.updateAuthenticationInfo()
         
         if let authInfo = KeychainWrapper.sharedAppContainerKeychain.authenticationInfo(), authInfo.isPasscodeRequiredImmediately {
-            authenticator?.promptUserForAuthentication()
+            authenticator?.willEnterForeground()
         }
     }
     
