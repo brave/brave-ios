@@ -66,8 +66,9 @@ class BlocklistName: CustomStringConvertible, ContentBlocker {
         }
         
         var onList = Set<BlocklistName>()
+        let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
         
-        if domain.isShieldExpected(.AdblockAndTp) {
+        if domain.isShieldExpected(.AdblockAndTp, isPrivateBrowsing: isPrivateBrowsing) {
             onList.formUnion([.ad, .tracker])
             
             if Preferences.Shields.useRegionAdBlock.value, let regionalBlocker = regionalBlocker {
@@ -79,7 +80,7 @@ class BlocklistName: CustomStringConvertible, ContentBlocker {
         
         // TODO #159: Setup image shield
         
-        if domain.isShieldExpected(.HTTPSE) {
+        if domain.isShieldExpected(.HTTPSE, isPrivateBrowsing: isPrivateBrowsing) {
             onList.insert(.https)
         }
         
