@@ -76,24 +76,5 @@ extension Preferences {
         /// The toggles states for clear private data screen
         static let clearPrivateDataToggles = Option<[Bool]>(key: "privacy.clear-data-toggles", default: [])
     }
-    final class Shields {
-        static let allShields = [blockAdsAndTracking, httpsEverywhere, blockPhishingAndMalware, blockScripts, fingerprintingProtection, blockImages, useRegionAdBlock]
-        
-        /// Shields will block ads and tracking if enabled
-        static let blockAdsAndTracking = Option<Bool>(key: "shields.block-ads-and-tracking", default: true)
-        /// Websites will be upgraded to HTTPS if a loaded page attempts to use HTTP
-        static let httpsEverywhere = Option<Bool>(key: "shields.https-everywhere", default: true)
-        /// Shields will block websites related to potential phishing and malware
-        static let blockPhishingAndMalware = Option<Bool>(key: "shields.block-phishing-and-malware", default: true)
-        /// Disables JavaScript execution in the browser
-        static let blockScripts = Option<Bool>(key: "shields.block-scripts", default: false)
-        /// Enforces fingerprinting protection on the users session
-        static let fingerprintingProtection = Option<Bool>(key: "shields.fingerprinting-protection", default: false)
-        /// Disables image loading in the browser
-        static let blockImages = Option<Bool>(key: "shields.block-images", default: false)
-        /// In addition to global adblocking rules, adds custom country based rules.
-        /// This setting is enabled by default for all locales.
-        static let useRegionAdBlock = Option<Bool>(key: "shields.regional-adblock", default: true)
-    }
 }
 
