@@ -2918,7 +2918,7 @@ extension BrowserViewController: PreferencesObserver {
              Preferences.Shields.blockPhishingAndMalware.key,
              Preferences.Shields.blockImages.key,
              Preferences.Shields.fingerprintingProtection.key:
-            tabManager.allTabs.forEach { $0.webView?.reload() }
+            tabManager.allTabs.forEach { $0.webView?.reload()}
         case Preferences.Privacy.blockAllCookies.key:
             // All `block all cookies` toggle requires a hard reset of Webkit configuration.
             tabManager.reset()
