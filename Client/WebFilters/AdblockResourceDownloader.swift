@@ -40,30 +40,33 @@ class AdblockResourceDownloader {
             return
         }
         
-        guard let name = ContentBlockerRegion.with(localeCode: locale)?.filename else { return }
-        downloadResources(withName: name, type: .regional(locale: locale),
-                                 queueName: "Regional adblock setup").uponQueue(.main) {
+        downloadResources(type: .regional(locale: locale),
+                          queueName: "Regional adblock setup").uponQueue(.main) {
             log.debug("Regional blocklists download and setup completed.")
         }
     }
     
-    private func downloadResources(withName name: String, type: AdblockerType,
-                                   queueName: String) -> Deferred<()> {
+    private func downloadResources(type: AdblockerType, queueName: String) -> Deferred<()> {
         let completion = Deferred<()>()
 
         let queue = DispatchQueue(label: queueName)
         let nm = networkManager
         let folderName = AdblockResourceDownloader.folderName
+        // name of the file on server
+        let resourceName = type.resourceName
+        // file name of which the file will be saved on disk
+        let fileName = type.identifier
         
         let completedDownloads = type.associatedFiles.map { fileType -> Deferred<AdBlockNetworkResource> in
             let fileExtension = "." + fileType.rawValue
             let etagExtension = fileExtension + ".etag"
             
-            guard let url = URL(string: endpoint + name + fileExtension) else {
+            guard let resourceName = resourceName,
+                let url = URL(string: endpoint + resourceName + fileExtension) else {
                 return Deferred<AdBlockNetworkResource>()
             }
             
-            let etag = fileFromDocumentsAsString(name + etagExtension, inFolder: folderName)
+            let etag = fileFromDocumentsAsString(fileName + etagExtension, inFolder: folderName)
             let request = nm.downloadResource(with: url, resourceType: .cached(etag: etag))
                 .mapQueue(queue) { resource in
                     AdBlockNetworkResource(resource: resource, fileType: fileType, type: type)
@@ -76,7 +79,7 @@ class AdblockResourceDownloader {
             // json to content rules compilation happens first, otherwise it makes no sense to proceed further
             // and overwrite old files that were working before.
             self.compileContentBlocker(resources: resources, queue: queue)
-                .uponQueue(queue) { _ in self.writeFilesTodisk(resources: resources, name: name, queue: queue)
+                .uponQueue(queue) { _ in self.writeFilesTodisk(resources: resources, name: fileName, queue: queue)
                     .uponQueue(queue) { _ in self.setUpFiles(resources: resources,
                                                              compileJsonRules: false, queue: queue)
                         .uponQueue(queue) { completion.fill(()) }

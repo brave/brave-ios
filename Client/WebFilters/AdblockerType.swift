@@ -29,6 +29,7 @@ enum AdblockerType {
         }
     }
     
+    /// A name under which given resource is stored locally in the app.
     var identifier: String {
         switch self {
         case .general: return BlocklistName.adFileName
@@ -37,28 +38,20 @@ enum AdblockerType {
         }
     }
     
+    /// A name under which given resource is stored on server.
+    var resourceName: String? {
+        switch self {
+        case .general: return AdblockResourcesMappings.generalAdblockName
+        case .httpse: return AdblockResourcesMappings.generalHttpseName
+        case .regional(let locale): return ResourceLocale(rawValue: locale)?.resourceName
+        }
+    }
+    
     var blockListName: BlocklistName? {
         switch self {
         case .general: return BlocklistName.ad
         case .httpse: return BlocklistName.https
         case .regional(let locale): return ContentBlockerRegion.with(localeCode: locale)
-        }
-    }
-    
-    static func type(fromResource name: String) -> AdblockerType? {
-        switch name {
-        case AdblockResourcesMappings.generalAdblockName:
-            return .general
-        case AdblockResourcesMappings.generalHttpseName:
-            return .httpse
-        default: // Regional lists
-            if let locale = AdblockResourcesMappings.resourceNameToLocale(name) {
-                return .regional(locale: locale)
-            }
-            
-            log.error("No locale was found for resource: \(name)")
-            assertionFailure()
-            return nil
         }
     }
 }

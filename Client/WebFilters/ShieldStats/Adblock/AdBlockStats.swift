@@ -67,10 +67,9 @@ class AdBlockStats: LocalAdblockResourceProtocol {
 
         datFilePaths?.forEach {
             let fileName = URL(fileURLWithPath: $0).deletingPathExtension().lastPathComponent
-            guard let id = AdblockerType.type(fromResource: fileName)?.identifier else { return }
             
             guard let data = FileManager.default.contents(atPath: path + $0) else { return }
-            setDataFile(data: data, id: id)
+            setDataFile(data: data, id: fileName)
         }
     }
     

@@ -32,7 +32,7 @@ extension ContentBlockerRegion {
             return nil
         }
         
-        guard let regionFileName = AdblockResourcesMappings.localeToResourceName(code) else { return nil }
+        guard let regionFileName = ResourceLocale(rawValue: code)?.resourceName else { return nil }
         
         // This handles two cases, regional content blocker is nil,
         // or locale has changed and the content blocker needs to be reassigned
