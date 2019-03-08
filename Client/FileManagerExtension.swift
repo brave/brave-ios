@@ -42,49 +42,43 @@ public extension FileManager {
         return false
     }
     
-    func getOrCreateDirectory(withName name: String) -> (path: String, created: Bool) {
-        guard let documentDirectory = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first else {
-            log.error("Can't get documents dir.")
-            return ("", false)
-        }
+    func writeToDiskInFolder(_ data: Data, fileName: String, folderName: String) -> Bool {
         
-        let path = documentDirectory + "/" + name
-        var wasCreated = false
-        if !fileExists(atPath: path) {
-            do {
-                try createDirectory(atPath: path, withIntermediateDirectories: false, attributes: nil)
-            } catch {
-                log.error("createDirectory error: \(error)")
-            }
-            wasCreated = true
-        }
-        return (path, wasCreated)
-    }
-    
-    func writeToDiskInFolder(_ data: Data, fileName: String, folderName: String) -> Deferred<()> {
-        let completion = Deferred<()>()
-        let (dir, _) = getOrCreateDirectory(withName: folderName)
+        guard let folderUrl = getOrCreateFolder(name: folderName) else { return false }
         
-        let path = dir + "/" + fileName
-        if !((try? data.write(to: URL(fileURLWithPath: path), options: [.atomic])) != nil) { // will overwrite
-            log.error("Failed to write data to \(path)")
-        }
-        
-        addSkipBackupAttributeToItemAtURL(URL(fileURLWithPath: dir, isDirectory: true))
-        
-        completion.fill(())
-        return completion
-    }
-    
-    func addSkipBackupAttributeToItemAtURL(_ url: URL) {
         do {
-            try (url as NSURL).setResourceValue(true, forKey: URLResourceKey.isExcludedFromBackupKey)
+            let fileUrl = folderUrl.appendingPathComponent(fileName)
+            try data.write(to: fileUrl, options: [.atomic])
         } catch {
-            log.error("Error excluding \(url.lastPathComponent) from backup \(error)")
+            log.error("Failed to write data, error: \(error)")
+            return false
         }
+
+        return true
     }
     
-    static var documentsDirectory: String? {
-        return NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first
+    /// Creates a folder at documents directory and returns its URL.
+    /// If folder already exists, returns its URL as well.
+    func getOrCreateFolder(name: String, excludeFromBackups: Bool = true) -> URL? {
+        guard let documentsDir = urls(for: .documentDirectory, in: .userDomainMask).first else { return nil }
+        
+        var folderDir = documentsDir.appendingPathComponent(name)
+        
+        if fileExists(atPath: folderDir.path) { return folderDir }
+        
+        do {
+            try createDirectory(at: folderDir, withIntermediateDirectories: true, attributes: nil)
+            
+            if excludeFromBackups {
+                var resourceValues = URLResourceValues()
+                resourceValues.isExcludedFromBackup = true
+                try folderDir.setResourceValues(resourceValues)
+            }
+            
+            return folderDir
+        } catch {
+            log.error("Failed to create folder, error: \(error)")
+            return nil
+        }
     }
 }

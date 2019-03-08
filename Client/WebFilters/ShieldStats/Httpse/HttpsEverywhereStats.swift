@@ -55,9 +55,8 @@ class HttpsEverywhereStats: LocalAdblockResourceProtocol {
     }
     
     func setData(data: Data) {
-        let (dir, _) = FileManager.default.getOrCreateDirectory(withName: folderName)
-        
-        unzipAndLoad(dir, data: data)
+        guard let folderUrl = FileManager.default.getOrCreateFolder(name: folderName) else { return }
+        unzipAndLoad(folderUrl.path, data: data)
     }
     
     func unzipAndLoad(_ dir: String, data: Data) {

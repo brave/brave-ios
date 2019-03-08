@@ -58,17 +58,21 @@ class AdBlockStats: LocalAdblockResourceProtocol {
     }
     
     private func loadDatFilesFromDocumentsDirectory() {
-        guard let documentsDir = FileManager.documentsDirectory else { return }
-        let path = documentsDir + "/\(AdblockResourceDownloader.folderName)/"
+        let fm = FileManager.default
 
-        let enumerator = FileManager.default.enumerator(atPath: path)
-        let filePaths = enumerator?.allObjects as? [String]
-        let datFilePaths = filePaths?.filter { $0.hasSuffix(".dat") }
+        guard let folderUrl = fm.getOrCreateFolder(name: AdblockResourceDownloader.folderName) else {
+            log.error("Could not get directory with .dat files")
+            return
+        }
+        
+        let enumerator = fm.enumerator(at: folderUrl, includingPropertiesForKeys: nil)
+        let filePaths = enumerator?.allObjects as? [URL]
+        let datFileUrls = filePaths?.filter { $0.pathExtension == "dat" }
 
-        datFilePaths?.forEach {
-            let fileName = URL(fileURLWithPath: $0).deletingPathExtension().lastPathComponent
+        datFileUrls?.forEach {
+            let fileName = $0.deletingPathExtension().lastPathComponent
             
-            guard let data = FileManager.default.contents(atPath: path + $0) else { return }
+            guard let data = fm.contents(atPath: $0.path) else { return }
             setDataFile(data: data, id: fileName)
         }
     }

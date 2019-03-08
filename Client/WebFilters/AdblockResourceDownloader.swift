@@ -79,10 +79,10 @@ class AdblockResourceDownloader {
             // json to content rules compilation happens first, otherwise it makes no sense to proceed further
             // and overwrite old files that were working before.
             self.compileContentBlocker(resources: resources, queue: queue)
-                .uponQueue(queue) { _ in self.writeFilesTodisk(resources: resources, name: fileName, queue: queue)
-                    .uponQueue(queue) { _ in self.setUpFiles(resources: resources,
-                                                             compileJsonRules: false, queue: queue)
-                        .uponQueue(queue) { completion.fill(()) }
+                .uponQueue(queue) { _ in
+                    if self.writeFilesTodisk(resources: resources, name: fileName, queue: queue) {
+                        self.setUpFiles(resources: resources, compileJsonRules: false, queue: queue)
+                            .uponQueue(queue) { completion.fill(()) }
                     }
             }
         }
@@ -91,13 +91,14 @@ class AdblockResourceDownloader {
     }
     
     private func fileFromDocumentsAsString(_ name: String, inFolder folder: String) -> String? {
-        guard let documentsDir = FileManager.documentsDirectory else {
-            log.error("Failed to get documents directory")
+        guard let folderUrl = FileManager.default.getOrCreateFolder(name: folder) else {
+            log.error("Failed to get folder: \(folder)")
             return nil
         }
         
-        let dir = documentsDir + "/\(folder)/"
-        guard let data = FileManager.default.contents(atPath: dir + name) else { return nil }
+        let fileUrl = folderUrl.appendingPathComponent(name)
+        
+        guard let data = FileManager.default.contents(atPath: fileUrl.path) else { return nil }
         
         return String(data: data, encoding: .utf8)
     }
@@ -119,9 +120,9 @@ class AdblockResourceDownloader {
         return completion
     }
     
-    private func writeFilesTodisk(resources: [AdBlockNetworkResource], name: String, queue: DispatchQueue) -> Deferred<()> {
-        let completion = Deferred<()>()
-        var fileSaveCompletions = [Deferred<()>]()
+    private func writeFilesTodisk(resources: [AdBlockNetworkResource], name: String,
+                                  queue: DispatchQueue) -> Bool {
+        var fileSaveCompletions = [Bool]()
         let fm = FileManager.default
         let folderName = AdblockResourceDownloader.folderName
         
@@ -137,8 +138,9 @@ class AdblockResourceDownloader {
             }
             
         }
-        all(fileSaveCompletions).uponQueue(queue) { _ in completion.fill(()) }
-        return completion
+        
+        // Returning true if all file saves completed succesfully
+        return !fileSaveCompletions.contains(false)
     }
     
     private func setUpFiles(resources: [AdBlockNetworkResource], compileJsonRules: Bool, queue: DispatchQueue) -> Deferred<()> {
