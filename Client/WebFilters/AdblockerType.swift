@@ -32,8 +32,8 @@ enum AdblockerType {
     /// A name under which given resource is stored locally in the app.
     var identifier: String {
         switch self {
-        case .general: return BlocklistName.adFileName
-        case .httpse: return BlocklistName.httpseFileName
+        case .general: return BlocklistName.ad.filename
+        case .httpse: return BlocklistName.https.filename
         case .regional(let locale): return locale
         }
     }
