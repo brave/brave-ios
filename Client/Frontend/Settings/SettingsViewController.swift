@@ -299,7 +299,7 @@ class SettingsViewController: TableViewController {
     }()
     
     private lazy var shieldsSection: Section = {
-        return Section(
+        var shields = Section(
             header: .title(Strings.Brave_Shield_Defaults),
             rows: [
                 BoolRow(title: Strings.Block_Ads_and_Tracking, option: Preferences.Shields.blockAdsAndTracking),
@@ -309,8 +309,10 @@ class SettingsViewController: TableViewController {
                 BoolRow(title: Strings.Fingerprinting_Protection, option: Preferences.Shields.fingerprintingProtection),
             ]
         )
-        // TODO: Add regional adblock
-        // shields.rows.append(BasicBoolRow(title: Strings.Use_regional_adblock, option: Preferences.Shields.useRegionAdBlock))
+        if let locale = Locale.current.languageCode, let _ = ContentBlockerRegion.with(localeCode: locale) {
+            shields.rows.append(BoolRow(title: Strings.Use_regional_adblock, option: Preferences.Shields.useRegionAdBlock))
+        }
+        return shields
     }()
     
     private lazy var supportSection: Section = {
@@ -324,6 +326,15 @@ class SettingsViewController: TableViewController {
                         self.dismiss(animated: true)
                     },
                     cellClass: MultilineButtonCell.self),
+                Row(text: Strings.Rate_Brave,
+                    selection: { [unowned self] in
+                        // Rate Brave
+                        guard let writeReviewURL = URL(string: "https://geo.itunes.apple.com/app/id1052879175?action=write-review")
+                            else { return }
+                        UIApplication.shared.open(writeReviewURL)
+                        self.dismiss(animated: true)
+                    },
+                    cellClass: MultilineValue1Cell.self),
                 Row(text: Strings.Privacy_Policy,
                     selection: { [unowned self] in
                         // Show privacy policy
@@ -373,14 +384,10 @@ class SettingsViewController: TableViewController {
         return Section(
             rows: [
                 Row(text: "Region: \(Locale.current.regionCode ?? "--")"),
-                Row(text: "Recompile Content Blockers", selection: { [weak self] in
-                    BlocklistName.allLists.forEach { $0.fileVersionPref?.value = nil }
-                    ContentBlockerHelper.compileLists().upon {
-                        let alert = UIAlertController(title: nil, message: "Recompiled Blockers", preferredStyle: .alert)
-                        alert.addAction(UIAlertAction(title: "OK", style: .default))
-                        self?.present(alert, animated: true)
-                    }
-                }, cellClass: MultilineButtonCell.self),
+                Row(text: "Adblock Debug", selection: { [weak self] in
+                    let vc = AdblockDebugMenuTableViewController(style: .grouped)
+                    self?.navigationController?.pushViewController(vc, animated: true)
+                }, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self),
                 Row(text: "View URP Logs", selection: {
                     self.navigationController?.pushViewController(UrpLogsViewController(), animated: true)
                 }, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self),

@@ -188,7 +188,7 @@ class BrowserViewController: UIViewController {
         Preferences.Shields.allShields.forEach { $0.observe(from: self) }
         Preferences.Privacy.blockAllCookies.observe(from: self)
         // Lists need to be compiled before attempting tab restoration
-        contentBlockListDeferred = ContentBlockerHelper.compileLists()
+        contentBlockListDeferred = ContentBlockerHelper.compileBundledLists()
     }
 
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -1361,7 +1361,8 @@ extension BrowserViewController: QRCodeViewControllerDelegate {
 
 extension BrowserViewController: SettingsDelegate {
     func settingsOpenURLInNewTab(_ url: URL) {
-        self.openURLInNewTab(url, isPrivileged: false)
+        let forcedPrivate = PrivateBrowsingManager.shared.isPrivateBrowsing
+        self.openURLInNewTab(url, isPrivate: forcedPrivate, isPrivileged: false)
     }
     
     func settingsOpenURLs(_ urls: [URL]) {
@@ -1562,9 +1563,13 @@ extension BrowserViewController: URLBarDelegate {
     }
 
     func urlBar(_ urlBar: URLBarView, didSubmitText text: String) {
+        processAddressBar(text: text, visitType: nil)
+    }
+
+    func processAddressBar(text: String, visitType: VisitType?) {
         if let fixupURL = URIFixup.getURL(text) {
             // The user entered a URL, so use it.
-            finishEditingAndSubmit(fixupURL, visitType: VisitType.typed)
+            finishEditingAndSubmit(fixupURL, visitType: visitType ?? .typed)
             return
         }
 
@@ -1585,7 +1590,7 @@ extension BrowserViewController: URLBarDelegate {
                 urlString.replaceSubrange(range, with: escapedQuery)
 
                 if let url = URL(string: urlString) {
-                    self.finishEditingAndSubmit(url, visitType: VisitType.typed)
+                    self.finishEditingAndSubmit(url, visitType: visitType ?? .typed)
                     return
                 }
             }
@@ -2096,7 +2101,7 @@ extension BrowserViewController: TabManagerDelegate {
 }
 
 /// List of schemes that are allowed to be opened in new tabs.
-private let schemesAllowedToBeOpenedAsPopups = ["http", "https", "javascript", "data", "about"]
+private let schemesAllowedToBeOpenedAsPopups = ["http", "https", "javascript", "about"]
 
 extension BrowserViewController: WKUIDelegate {
     func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
@@ -2892,8 +2897,8 @@ extension BrowserViewController: HomeMenuControllerDelegate {
 
 extension BrowserViewController: TopSitesDelegate {
     
-    func didSelectUrl(url: URL) {
-        finishEditingAndSubmit(url, visitType: .bookmark)
+    func didSelect(input: String) {
+        processAddressBar(text: input, visitType: .bookmark)
     }
     
     func didTapDuckDuckGoCallout() {
@@ -2917,7 +2922,8 @@ extension BrowserViewController: PreferencesObserver {
              Preferences.Shields.blockScripts.key,
              Preferences.Shields.blockPhishingAndMalware.key,
              Preferences.Shields.blockImages.key,
-             Preferences.Shields.fingerprintingProtection.key:
+             Preferences.Shields.fingerprintingProtection.key,
+             Preferences.Shields.useRegionAdBlock.key:
             tabManager.allTabs.forEach { $0.webView?.reload() }
         case Preferences.Privacy.blockAllCookies.key:
             // All `block all cookies` toggle requires a hard reset of Webkit configuration.

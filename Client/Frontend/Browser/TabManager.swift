@@ -332,7 +332,7 @@ class TabManager: NSObject {
         let type: TabType = isPrivate ? .private : .regular
         let tab = Tab(configuration: configuration, type: type)
         if !isPrivate {
-            tab.id = id ?? TabMO.create().syncUUID
+            tab.id = id ?? TabMO.create()
         }
         configureTab(tab, request: request, afterTab: afterTab, flushToDisk: flushToDisk, zombie: zombie, isPrivate: isPrivate)
         return tab
@@ -342,7 +342,7 @@ class TabManager: NSObject {
         assert(Thread.isMainThread)
 
         let tab = Tab(configuration: configuration ?? self.configuration)
-        tab.id = TabMO.create().syncUUID
+        tab.id = TabMO.create()
         
         configureTab(tab, request: request, afterTab: afterTab, flushToDisk: flushToDisk, zombie: zombie)
         return tab
@@ -373,18 +373,8 @@ class TabManager: NSObject {
     }
     
     private func saveTabOrder() {
-        let context = DataController.newBackgroundContext()
-        context.perform {
-            for (i, tab) in self.allTabs.enumerated() {
-                guard let managedObject = TabMO.get(fromId: tab.id, context: context) else { 
-                    log.error("Error: Tab missing managed object")
-                    continue
-                }
-                managedObject.order = Int16(i)
-            }
-            
-            DataController.save(context: context)
-        }
+        let allTabIds = allTabs.compactMap { $0.id }
+        TabMO.saveTabOrder(tabIds: allTabIds)
     }
 
     func configureTab(_ tab: Tab, request: URLRequest?, afterTab parent: Tab? = nil, flushToDisk: Bool, zombie: Bool, isPopup: Bool = false, isPrivate: Bool = false) {
@@ -467,8 +457,6 @@ class TabManager: NSObject {
         
         guard let webView = tab.webView, let order = indexOfWebView(webView) else { return nil }
         
-        let context = DataController.viewContext
-        
         // Ignore session restore data.
         guard let urlString = tab.url?.absoluteString, !urlString.contains("localhost") else { return nil }
         
@@ -493,7 +481,7 @@ class TabManager: NSObject {
             
             log.debug("---stack: \(urls)")
         }
-        if let id = TabMO.get(fromId: tab.id, context: context)?.syncUUID {
+        if let id = TabMO.get(fromId: tab.id)?.syncUUID {
             let displayTitle = tab.displayTitle
             let title = displayTitle != "" ? displayTitle : ""
             
@@ -536,8 +524,7 @@ class TabManager: NSObject {
         let prevCount = count
         allTabs.remove(at: removalIndex)
         
-        let context = DataController.viewContext
-        if let tab = TabMO.get(fromId: tab.id, context: context) {
+        if let tab = TabMO.get(fromId: tab.id) {
             tab.delete()
         }
 
@@ -798,7 +785,7 @@ class TabManager: NSObject {
             tab.url = nil
 
             if let url = URL(string: urlString),
-                let faviconURL = Domain.getOrCreateForUrl(url, context: DataController.viewContext).favicon?.url {
+                let faviconURL = Domain.getOrCreate(forUrl: url).favicon?.url {
                 let icon = Favicon(url: faviconURL, date: Date())
                 icon.width = 1
                 tab.favicons.append(icon)
@@ -838,7 +825,7 @@ class TabManager: NSObject {
     
     func restoreTab(_ tab: Tab) {
         // Tab was created with no active webview or session data. Restore tab data from CD and configure.
-        guard let savedTab = TabMO.get(fromId: tab.id, context: DataController.viewContext) else { return }
+        guard let savedTab = TabMO.get(fromId: tab.id) else { return }
         
         if let history = savedTab.urlHistorySnapshot as? [String], let tabUUID = savedTab.syncUUID, let url = savedTab.url {
             let data = SavedTab(id: tabUUID, title: savedTab.title, url: url, isSelected: savedTab.isSelected, order: savedTab.order, screenshot: nil, history: history, historyIndex: savedTab.urlHistoryCurrentIndex)

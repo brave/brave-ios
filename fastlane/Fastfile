@@ -31,12 +31,12 @@ platform :ios do
 
   desc "Run Unit Tests"
   lane :test do |options|
+    sh("../Client/WebFilters/ContentBlocker/Lists/test-compile-all-lists.sh")
     run_tests(
       scheme: "Fennec",
       device: "iPhone 8",
       code_coverage: true,
       skip_testing: [
-        "DataTests",
         "ClientTests/TabManagerTests/testQueryAddedTabs",
         "ClientTests/TabManagerTests/testQueryAddedPrivateTabs",
         "ClientTests/TabManagerTests/testQueryAddedMixedTabs",
