@@ -5,13 +5,18 @@
 import Foundation
 import WebKit
 import Shared
+import Deferred
 
 private let log = Logger.browserLogger
 
 public extension HTTPCookie {
     
+    static var locallySavedFile: String {
+        return "CookiesData.json"
+    }
+    
     typealias Success = Bool
-    class func saveToDisk(_ filename: String = "CookiesData.json", completion: ((Success) -> Void)? = nil) {
+    class func saveToDisk(_ filename: String = HTTPCookie.locallySavedFile, completion: ((Success) -> Void)? = nil) {
         let cookieStore = WKWebsiteDataStore.default().httpCookieStore
         
         /* For reason unkown the callback to getAllCookies is not called, when the save is done from Settings.
@@ -26,35 +31,39 @@ public extension HTTPCookie {
          */
         WKWebsiteDataStore.default().fetchDataRecords(ofTypes: [WKWebsiteDataTypeCookies]) { (_) in}
         cookieStore.getAllCookies { (cookies) in
-            let baseDir = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0]
-            do {
-                let data = try NSKeyedArchiver.archivedData(withRootObject: cookies, requiringSecureCoding: false)
-                try data.write(to: URL(fileURLWithPath: "\(baseDir)/\(filename)"))
-            } catch {
-                log.error("Failed to write cookies to disk with error: \(error)")
+            if let baseDir = FileManager.documentDirectoryURL {
+                do {
+                    let data = try NSKeyedArchiver.archivedData(withRootObject: cookies, requiringSecureCoding: false)
+                    try data.write(to: baseDir.appendingPathComponent(filename))
+                } catch {
+                    log.error("Failed to write cookies to disk with error: \(error)")
+                    completion?(false)
+                    return
+                }
+                completion?(true)
+            } else {
                 completion?(false)
-                return
             }
-            completion?(true)
         }
     }
     
-    class func loadFromDisk(_ filename: String = "CookiesData.json", completion: ((Success) -> Void)? = nil) {
-        let baseDir = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0]
-        do {
-            let data = try Data(contentsOf: URL(fileURLWithPath: "\(baseDir)/\(filename)"), options: Data.ReadingOptions.alwaysMapped)
-            if let cookies: [HTTPCookie] = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? [HTTPCookie] {
-                HTTPCookie.setCookies(cookies) { (success) in
-                    completion?(success)
+    class func loadFromDisk(_ filename: String = HTTPCookie.locallySavedFile, completion: ((Success) -> Void)? = nil) {
+        if let baseDir = FileManager.documentDirectoryURL {
+            do {
+                let data = try Data(contentsOf: baseDir.appendingPathComponent(filename), options: Data.ReadingOptions.alwaysMapped)
+                if let cookies = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? [HTTPCookie] {
+                    HTTPCookie.setCookies(cookies) { (success) in
+                        completion?(success)
+                        
+                    }
+                } else {
+                    log.error("Failed to load cookies from disk with error: Invalid data type")
                 }
-            } else {
-                log.error("Failed to load cookies from disk with error: Invalid data type")
-                completion?(false)
+            } catch {
+                log.error("Failed to load cookies from disk with error: \(error)")
             }
-        } catch {
-            log.error("Failed to load cookies from disk with error: \(error)")
-            completion?(false)
         }
+        completion?(false)
     }
     
     private class func setCookies(_ cookies: [HTTPCookie], completion: ((Success) -> Void)?) {
@@ -66,19 +75,19 @@ public extension HTTPCookie {
             dispatchGroup.enter()
             cookieStore.setCookie($0, completionHandler: {dispatchGroup.leave()})
         })
-        
         dispatchGroup.notify(queue: .main) {
             completion?(true)
         }
     }
     
     class func deleteLocalCookieFile(_ filename: String = "CookiesData.json") {
-        let baseDir = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0]
-        let url: URL = URL(fileURLWithPath: "\(baseDir)/\(filename)")
-        do {
-            try FileManager.default.removeItem(at: url)
-        } catch {
-            log.error("Failed to delete local cookie file with error: \(error)")
+        if let baseDir = FileManager.documentDirectoryURL {
+            let url: URL = URL(fileURLWithPath: "\(baseDir)/\(filename)")
+            do {
+                try FileManager.default.removeItem(at: url)
+            } catch {
+                log.error("Failed to delete local cookie file with error: \(error)")
+            }
         }
     }
 }

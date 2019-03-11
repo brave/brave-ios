@@ -234,7 +234,7 @@ class SettingsViewController: TableViewController {
                             Preferences.Privacy.blockAllCookies.value = status
                         } else {
                             //Revert the changes. Not handling success here to avoid a loop.
-                            _ = FileManager.default.setFolderAccess([
+                            FileManager.default.setFolderAccess([
                                 (.cookie, false),
                                 (.webSiteData, false)
                                 ])
