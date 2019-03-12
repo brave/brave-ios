@@ -19,13 +19,13 @@ class HttpCookieExtensionTest: XCTestCase {
                                             .secure: "TRUE",
                                             .expires: NSDate(timeIntervalSinceNow: 30)]
         if let cookie = HTTPCookie(properties: properties) {
-            WKWebsiteDataStore.default().fetchDataRecords(ofTypes: [WKWebsiteDataTypeCookies]) { (_) in}
+            WKWebsiteDataStore.default().fetchDataRecords(ofTypes: [WKWebsiteDataTypeCookies]) { _ in}
             WKWebsiteDataStore.default().httpCookieStore.setCookie(cookie) {
-                HTTPCookie.saveToDisk(completion: { (_) in
-                    WKWebsiteDataStore.default().fetchDataRecords(ofTypes: [WKWebsiteDataTypeCookies]) { (_) in}
+                HTTPCookie.saveToDisk(completion: { _ in
+                    WKWebsiteDataStore.default().fetchDataRecords(ofTypes: [WKWebsiteDataTypeCookies]) { _ in}
                     WKWebsiteDataStore.default().httpCookieStore.delete(cookie, completionHandler: {
-                        HTTPCookie.loadFromDisk(completion: { (_) in
-                            WKWebsiteDataStore.default().httpCookieStore.getAllCookies({ (cookies) in
+                        HTTPCookie.loadFromDisk(completion: { _ in
+                            WKWebsiteDataStore.default().httpCookieStore.getAllCookies({ cookies in
                                 if cookies.contains(where: {$0.name == "BraveCookieTest"}) {
                                     expectation.fulfill()
                                 }

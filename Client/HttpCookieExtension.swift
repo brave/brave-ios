@@ -29,39 +29,40 @@ public extension HTTPCookie {
          
          Same applies to setting cookies back below.
          */
-        WKWebsiteDataStore.default().fetchDataRecords(ofTypes: [WKWebsiteDataTypeCookies]) { (_) in}
-        cookieStore.getAllCookies { (cookies) in
-            if let baseDir = FileManager.documentDirectoryURL {
-                do {
-                    let data = try NSKeyedArchiver.archivedData(withRootObject: cookies, requiringSecureCoding: false)
-                    try data.write(to: baseDir.appendingPathComponent(filename))
-                } catch {
-                    log.error("Failed to write cookies to disk with error: \(error)")
-                    completion?(false)
-                    return
-                }
-                completion?(true)
-            } else {
+        WKWebsiteDataStore.default().fetchDataRecords(ofTypes: [WKWebsiteDataTypeCookies]) { _ in}
+        cookieStore.getAllCookies { cookies in
+            guard let baseDir = FileManager.documentDirectoryURL else {
                 completion?(false)
+                return
             }
+            do {
+                let data = try NSKeyedArchiver.archivedData(withRootObject: cookies, requiringSecureCoding: false)
+                try data.write(to: baseDir.appendingPathComponent(filename))
+                completion?(true)
+            } catch {
+                log.error("Failed to write cookies to disk with error: \(error)")
+                completion?(false)
+            }            
         }
     }
     
     class func loadFromDisk(_ filename: String = HTTPCookie.locallySavedFile, completion: ((Success) -> Void)? = nil) {
-        if let baseDir = FileManager.documentDirectoryURL {
-            do {
-                let data = try Data(contentsOf: baseDir.appendingPathComponent(filename), options: Data.ReadingOptions.alwaysMapped)
-                if let cookies = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? [HTTPCookie] {
-                    HTTPCookie.setCookies(cookies) { (success) in
-                        completion?(success)
-                        
-                    }
-                } else {
-                    log.error("Failed to load cookies from disk with error: Invalid data type")
+        guard let baseDir = FileManager.documentDirectoryURL else {
+            completion?(false)
+            return
+        }
+        do {
+            let data = try Data(contentsOf: baseDir.appendingPathComponent(filename), options: Data.ReadingOptions.alwaysMapped)
+            if let cookies = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? [HTTPCookie] {
+                HTTPCookie.setCookies(cookies) { success in
+                    completion?(success)
                 }
-            } catch {
-                log.error("Failed to load cookies from disk with error: \(error)")
+                return
+            } else {
+                log.error("Failed to load cookies from disk with error: Invalid data type")
             }
+        } catch {
+            log.error("Failed to load cookies from disk with error: \(error)")
         }
         completion?(false)
     }
@@ -69,7 +70,7 @@ public extension HTTPCookie {
     private class func setCookies(_ cookies: [HTTPCookie], completion: ((Success) -> Void)?) {
         let cookieStore = WKWebsiteDataStore.default().httpCookieStore
         // For the purpose of the line below read the comment in saveCookies (in this same commit)
-        WKWebsiteDataStore.default().fetchDataRecords(ofTypes: [WKWebsiteDataTypeCookies]) { (_) in}
+        WKWebsiteDataStore.default().fetchDataRecords(ofTypes: [WKWebsiteDataTypeCookies]) { _ in}
         let dispatchGroup = DispatchGroup()
         cookies.forEach({
             dispatchGroup.enter()
@@ -80,14 +81,15 @@ public extension HTTPCookie {
         }
     }
     
-    class func deleteLocalCookieFile(_ filename: String = "CookiesData.json") {
-        if let baseDir = FileManager.documentDirectoryURL {
-            let url: URL = URL(fileURLWithPath: "\(baseDir)/\(filename)")
-            do {
-                try FileManager.default.removeItem(at: url)
-            } catch {
-                log.error("Failed to delete local cookie file with error: \(error)")
-            }
+    class func deleteLocalCookieFile(_ filename: String = HTTPCookie.locallySavedFile) {
+        guard let baseDir = FileManager.documentDirectoryURL else {
+            return
+        }
+        let url = baseDir.appendingPathComponent(filename)
+        do {
+            try FileManager.default.removeItem(at: url)
+        } catch {
+            log.error("Failed to delete local cookie file with error: \(error)")
         }
     }
 }
