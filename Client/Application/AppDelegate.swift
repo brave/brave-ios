@@ -232,9 +232,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
             if isFirstLaunch {
                 urp.referralLookup { url in
                     guard let url = url else { return }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: {
+                    self.browserViewController.taskQueue.append {
                         try? self.browserViewController.openURLInNewTab(url.asURL(), isPrivileged: false)
-                    })
+                    }
                 }
             } else {
                 urp.getCustomHeaders()
