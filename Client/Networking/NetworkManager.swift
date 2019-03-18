@@ -86,4 +86,36 @@ class NetworkManager {
         
         return completion
     }
+    
+    func downloadData(from url: URL, retryTimeout: TimeInterval? = 60) -> Deferred<(Data?, Error?)> {
+        let completion = Deferred<(Data?, Error?)>()
+        let request = URLRequest(url: url)
+        session.dataRequest(with: request) { data, response, error -> Void in
+            if let err = error {
+                log.error(err.localizedDescription)
+                if let retryTimeout = retryTimeout {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + retryTimeout) {
+                        self.downloadData(from: url, retryTimeout: retryTimeout).upon { resource in
+                            completion.fill(resource)
+                        }
+                    }
+                }
+                return
+            }
+            guard let data = data, let response = response as? HTTPURLResponse else {
+                log.error("Failed to unwrap http response or data")
+                completion.fill((nil, "Download failed due to network error"))
+                return
+            }
+            
+            switch response.statusCode {
+            case 200...299:
+                completion.fill((data, nil))
+            default:
+                log.error("Download failed due to network error")
+                completion.fill((nil, "Download failed due to network error"))
+            }
+        }
+        return completion
+    }
 }

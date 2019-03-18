@@ -59,13 +59,14 @@ class BrowserViewController: UIViewController {
 
     lazy var mailtoLinkHandler: MailtoLinkHandler = MailtoLinkHandler()
 
-    lazy fileprivate var customSearchEngineButton: UIButton = {
-        let searchButton = UIButton()
-        searchButton.setImage(#imageLiteral(resourceName: "AddSearch").template, for: [])
-        searchButton.addTarget(self, action: #selector(addCustomSearchEngineForFocusedElement), for: .touchUpInside)
+    lazy fileprivate var customSearchEngineButton: SearchEnigneAddButton = {
+        let searchButton = SearchEnigneAddButton()
+        searchButton.addTarget(self, action: #selector(downloadOpenSearchXML), for: .touchUpInside)
         searchButton.accessibilityIdentifier = "BrowserViewController.customSearchEngineButton"
         return searchButton
     }()
+    
+    fileprivate var openSearchLinkDict: [String: String]?
 
     fileprivate var customSearchBarButton: UIBarButtonItem?
 
@@ -2592,52 +2593,51 @@ extension BrowserViewController: HistoryStateHelperDelegate {
 extension BrowserViewController {
 
     func addCustomSearchButtonToWebView(_ webView: WKWebView) {
-        // For now we're going to just not add the custom search button to the web view
-        // TODO: #586 Re-enable custom search engines button or remove entirely
-        return
-        
-        /*
-        //check if the search engine has already been added.
-        let domain = webView.url?.domainURL.host
-        let matches = self.profile.searchEngines.orderedEngines.filter {$0.shortName == domain}
-        if !matches.isEmpty {
-            self.customSearchEngineButton.tintColor = UIColor.Photon.Grey50
-            self.customSearchEngineButton.isUserInteractionEnabled = false
-        } else {
-            self.customSearchEngineButton.tintColor = UIConstants.SystemBlueColor
-            self.customSearchEngineButton.isUserInteractionEnabled = true
-        }
-
-        /*
-         This is how we access hidden views in the WKContentView
-         Using the public headers we can find the keyboard accessoryView which is not usually available.
-         Specific values here are from the WKContentView headers.
-         https://github.com/JaviSoto/iOS9-Runtime-Headers/blob/master/Frameworks/WebKit.framework/WKContentView.h
-        */
-        guard let webContentView = UIView.findSubViewWithFirstResponder(webView) else {
-            /*
-             In some cases the URL bar can trigger the keyboard notification. In that case the webview isnt the first responder
-             and a search button should not be added.
-             */
-            return
-        }
-
-        guard let input = webContentView.perform(#selector(getter: UIResponder.inputAccessoryView)),
-            let inputView = input.takeUnretainedValue() as? UIInputView,
-            let nextButton = inputView.value(forKey: "_nextItem") as? UIBarButtonItem,
-            let nextButtonView = nextButton.value(forKey: "view") as? UIView else {
-                //failed to find the inputView instead lets use the inputAssistant
-                addCustomSearchButtonToInputAssistant(webContentView)
-                return
+        self.openSearchLinkDict = nil
+        webView.evaluateJavaScript(OpenSearchEngine.fetchOpenSearchLinkScript) { (result, _) in
+            if let dict = (result as? String)?.jsonObject() as? [String: String] {
+                //check if the search engine has already been added.
+                self.openSearchLinkDict = dict
+                let shortName = dict["title"] ?? ""
+                let domain = 
+                let matches = self.profile.searchEngines.orderedEngines.filter {$0.shortName == shortName}
+                if !matches.isEmpty {
+                    self.customSearchEngineButton.state = .disabled
+                } else {
+                    self.customSearchEngineButton.state = .enabled
+                }
+                
+                /*
+                 This is how we access hidden views in the WKContentView
+                 Using the public headers we can find the keyboard accessoryView which is not usually available.
+                 Specific values here are from the WKContentView headers.
+                 https://github.com/JaviSoto/iOS9-Runtime-Headers/blob/master/Frameworks/WebKit.framework/WKContentView.h
+                 */
+                guard let webContentView = UIView.findSubViewWithFirstResponder(webView) else {
+                    /*
+                     In some cases the URL bar can trigger the keyboard notification. In that case the webview isnt the first responder
+                     and a search button should not be added.
+                     */
+                    return
+                }
+                
+                guard let input = webContentView.perform(#selector(getter: UIResponder.inputAccessoryView)),
+                    let inputView = input.takeUnretainedValue() as? UIInputView,
+                    let nextButton = inputView.value(forKey: "_nextItem") as? UIBarButtonItem,
+                    let nextButtonView = nextButton.value(forKey: "view") as? UIView else {
+                        //failed to find the inputView instead lets use the inputAssistant
+                        self.addCustomSearchButtonToInputAssistant(webContentView)
+                        return
+                }
+                inputView.addSubview(self.customSearchEngineButton)
+                self.customSearchEngineButton.snp.remakeConstraints { make in
+                    make.leading.equalTo(nextButtonView.snp.trailing).offset(20)
+                    make.width.equalTo(inputView.snp.height)
+                    make.top.equalTo(nextButtonView.snp.top)
+                    make.height.equalTo(inputView.snp.height)
+                }
             }
-            inputView.addSubview(self.customSearchEngineButton)
-            self.customSearchEngineButton.snp.remakeConstraints { make in
-                make.leading.equalTo(nextButtonView.snp.trailing).offset(20)
-                make.width.equalTo(inputView.snp.height)
-                make.top.equalTo(nextButtonView.snp.top)
-                make.height.equalTo(inputView.snp.height)
-            }
-        */
+        }
     }
 
     /**
@@ -2658,51 +2658,32 @@ extension BrowserViewController {
             log.error("Failed adding custom search button to input assistant: \(String(describing: exception))")
         }
     }
-
-    @objc func addCustomSearchEngineForFocusedElement() {
-        guard let webView = tabManager.selectedTab?.webView else {
+    
+    @objc func downloadOpenSearchXML() {
+        guard let urlString = openSearchLinkDict?["href"], let url = URL(string: urlString) else {
+            let alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
+            self.present(alert, animated: true, completion: nil)
             return
         }
-        webView.evaluateJavaScript("__firefox__.searchQueryForField()") { (result, _) in
-            guard let searchQuery = result as? String, let favicon = self.tabManager.selectedTab!.displayFavicon else {
-                //Javascript responded with an incorrectly formatted message. Show an error.
+        self.customSearchEngineButton.state = .loading
+        OpenSearchXMLDownloader(url: url).uponQueue(.main) { (engine, error) in
+            self.customSearchEngineButton.state = .enabled
+            guard let engine = engine, error == nil else {
                 let alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
                 self.present(alert, animated: true, completion: nil)
                 return
             }
-            self.addSearchEngine(searchQuery, favicon: favicon)
-            self.customSearchEngineButton.tintColor = UIColor.Photon.Grey50
-            self.customSearchEngineButton.isUserInteractionEnabled = false
+            self.addSearchEngine(engine)
         }
     }
 
-    func addSearchEngine(_ searchQuery: String, favicon: Favicon) {
-        guard searchQuery != "",
-            let iconURL = URL(string: favicon.url),
-            let url = URL(string: searchQuery.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlFragmentAllowed)!),
-            let shortName = url.domainURL.host else {
-                let alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
-                self.present(alert, animated: true, completion: nil)
-                return
-        }
-
+    func addSearchEngine(_ engine: OpenSearchEngine) {
         let alert = ThirdPartySearchAlerts.addThirdPartySearchEngine { alert in
-            self.customSearchEngineButton.tintColor = UIColor.Photon.Grey50
-            self.customSearchEngineButton.isUserInteractionEnabled = false
-
-            WebImageCacheManager.shared.load(from: iconURL) { (image, _, _, _, _) in
-                guard let image = image else {
-                    let alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
-                    self.present(alert, animated: true, completion: nil)
-                    return
-                }
-
-                self.profile.searchEngines.addSearchEngine(OpenSearchEngine(engineID: nil, shortName: shortName, image: image, searchTemplate: searchQuery, suggestTemplate: nil, isCustomEngine: true))
-                let Toast = SimpleToast()
-                Toast.showAlertWithText(Strings.ThirdPartySearchEngineAdded, bottomContainer: self.webViewContainer)
-            }
+            self.customSearchEngineButton.state = .disabled
+            self.profile.searchEngines.addSearchEngine(engine)
+            let Toast = SimpleToast()
+            Toast.showAlertWithText(Strings.ThirdPartySearchEngineAdded, bottomContainer: self.webViewContainer)
         }
-
         self.present(alert, animated: true, completion: {})
     }
 }
@@ -2720,12 +2701,7 @@ extension BrowserViewController: KeyboardHelperDelegate {
         guard let webView = tabManager.selectedTab?.webView else {
             return
         }
-        webView.evaluateJavaScript("__firefox__.searchQueryForField()") { (result, _) in
-            guard let _ = result as? String else {
-                return
-            }
-            self.addCustomSearchButtonToWebView(webView)
-        }
+        self.addCustomSearchButtonToWebView(webView)
     }
 
     func keyboardHelper(_ keyboardHelper: KeyboardHelper, keyboardDidShowWithState state: KeyboardState) {

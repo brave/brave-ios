@@ -5,12 +5,22 @@
 import UIKit
 import Shared
 import Fuzi
+import Deferred
 
 private let TypeSearch = "text/html"
 private let TypeSuggest = "application/x-suggestions+json"
+private let TypeSuggest2 = "application/json"
 
 class OpenSearchEngine: NSObject, NSSecureCoding {
     static let PreferredIconSize = 30
+    static let fetchOpenSearchLinkScript = """
+    var link = document.querySelector("link[type='application/opensearchdescription+xml']")
+    var dict = {
+    href : link.getAttribute("href"),
+    title : link.getAttribute("title")
+    };
+    JSON.stringify(dict)
+    """
     
     struct EngineNames {
         static let duckDuckGo = "DuckDuckGo"
@@ -170,7 +180,10 @@ class OpenSearchParser {
             print("Invalid search file")
             return nil
         }
-
+        return parse(data: data, engineID: engineID)
+    }
+    
+    func parse(data: Data, engineID: String, isCustomEngine: Bool = false ) -> OpenSearchEngine? {
         guard let indexer = try? XMLDocument(data: data),
             let docIndexer = indexer.root else {
                 print("Invalid XML document")
@@ -283,7 +296,26 @@ class OpenSearchParser {
             print("Error: Invalid search image data")
             return nil
         }
+        
+        return OpenSearchEngine(engineID: engineID, shortName: shortName, image: uiImage, searchTemplate: searchTemplate, suggestTemplate: suggestTemplate, isCustomEngine: isCustomEngine)
+    }
+}
 
-        return OpenSearchEngine(engineID: engineID, shortName: shortName, image: uiImage, searchTemplate: searchTemplate, suggestTemplate: suggestTemplate, isCustomEngine: false)
+class OpenSearchXMLDownloader: Deferred<(OpenSearchEngine?, Error?)> {
+    
+    init(url: URL) {
+        super.init()
+        let deferred = NetworkManager().downloadData(from: url)
+        deferred.upon { response in
+            guard let data = response.0, response.1 == nil else {
+                self.fill((nil, response.1))
+                return
+            }
+            if let engine = OpenSearchParser(pluginMode: true).parse(data: data, engineID: "", isCustomEngine: true) {
+                self.fill((engine, nil))
+            } else {
+                self.fill((nil, "Failed to parse engine"))
+            }
+        }
     }
 }

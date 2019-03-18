@@ -109,4 +109,15 @@ public extension String {
         addWordsDescriptionBolded.setAttributes(attributes, range: nsRangeOfBoldedText)
         return addWordsDescriptionBolded
     }
+    
+    public func jsonObject() -> Any? {
+        do {
+            if let data = self.data(using: .utf8) {
+                return try JSONSerialization.jsonObject(with: data, options: .mutableContainers)
+            }
+        } catch {}
+        return nil
+    }
 }
+
+extension String: Error {}
