@@ -2598,9 +2598,11 @@ extension BrowserViewController {
             if let dict = (result as? String)?.jsonObject() as? [String: String] {
                 //check if the search engine has already been added.
                 self.openSearchLinkDict = dict
-                let shortName = dict["title"] ?? ""
-                let domain = 
-                let matches = self.profile.searchEngines.orderedEngines.filter {$0.shortName == shortName}
+                // Open Search guidlines requires Title to be same as Short Name but it is not enforced,
+                // thus in case of yahoo.com the title is 'Yahoo Search' and Shortname is 'Yahoo'
+                // This results in mismatch. Adding title field in engine.
+                let title = dict["title"] ?? ""
+                let matches = self.profile.searchEngines.orderedEngines.filter {$0.title == title}
                 if !matches.isEmpty {
                     self.customSearchEngineButton.state = .disabled
                 } else {
@@ -2660,13 +2662,20 @@ extension BrowserViewController {
     }
     
     @objc func downloadOpenSearchXML() {
-        guard let urlString = openSearchLinkDict?["href"], let url = URL(string: urlString) else {
+        guard let urlString = openSearchLinkDict?["href"],
+            let title = openSearchLinkDict?["title"],
+            var url = URL(string: urlString) else {
             let alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
             self.present(alert, animated: true, completion: nil)
             return
         }
+        // Handle relative url
+        if let webViewBaseURL = self.tabManager.selectedTab?.webView?.url?.getBaseURL(), url.host == nil {
+            let component = url.absoluteString.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+            url = webViewBaseURL.appendingPathComponent(component)
+        }
         self.customSearchEngineButton.state = .loading
-        OpenSearchXMLDownloader(url: url).uponQueue(.main) { (engine, error) in
+        OpenSearchXMLDownloader(url: url, title: title).uponQueue(.main) { (engine, error) in
             self.customSearchEngineButton.state = .enabled
             guard let engine = engine, error == nil else {
                 let alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()

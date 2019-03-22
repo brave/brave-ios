@@ -4,6 +4,8 @@
 
 import UIKit
 
+private let log = Logger.browserLogger
+
 public extension String {
     func escape() -> String? {
         // We can't guaruntee that strings have a valid string encoding, as this is an entry point for tainted data,
@@ -113,9 +115,11 @@ public extension String {
     public func jsonObject() -> Any? {
         do {
             if let data = self.data(using: .utf8) {
-                return try JSONSerialization.jsonObject(with: data, options: .mutableContainers)
+                return try JSONSerialization.jsonObject(with: data)
             }
-        } catch {}
+        } catch {
+            log.error(error.localizedDescription)
+        }
         return nil
     }
 }

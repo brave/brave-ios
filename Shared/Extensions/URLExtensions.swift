@@ -82,6 +82,13 @@ extension URL {
         }
         return val
     }
+    
+    public func getBaseURL() -> URL? {
+        guard let scheme = self.scheme, let host = self.host else {
+            return nil
+        }
+        return URL(string: "\(scheme)://\(host)")
+    }
 
     public func getResourceLongLongForKey(_ key: String) -> Int64? {
         return (getResourceValueForKey(key) as? NSNumber)?.int64Value

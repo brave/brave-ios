@@ -13,6 +13,8 @@ private let TypeSuggest2 = "application/json"
 
 class OpenSearchEngine: NSObject, NSSecureCoding {
     static let PreferredIconSize = 30
+    
+    // TODO: Add support for sites with multiple OpeSearch links.
     static let fetchOpenSearchLinkScript = """
     var link = document.querySelector("link[type='application/opensearchdescription+xml']")
     var dict = {
@@ -27,6 +29,7 @@ class OpenSearchEngine: NSObject, NSSecureCoding {
         static let qwant = "Qwant"
     }
     
+    let title: String!
     let shortName: String
     let engineID: String?
     let image: UIImage
@@ -39,13 +42,14 @@ class OpenSearchEngine: NSObject, NSSecureCoding {
 
     fileprivate lazy var searchQueryComponentKey: String? = self.getQueryArgFromTemplate()
 
-    init(engineID: String?, shortName: String, image: UIImage, searchTemplate: String, suggestTemplate: String?, isCustomEngine: Bool) {
+    init(engineID: String?, shortName: String, title: String = "", image: UIImage, searchTemplate: String, suggestTemplate: String?, isCustomEngine: Bool) {
         self.shortName = shortName
         self.image = image
         self.searchTemplate = searchTemplate
         self.suggestTemplate = suggestTemplate
         self.isCustomEngine = isCustomEngine
         self.engineID = engineID
+        self.title = title.isEmpty ? shortName : title
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -64,6 +68,7 @@ class OpenSearchEngine: NSObject, NSSecureCoding {
         self.shortName = shortName
         self.isCustomEngine = isCustomEngine
         self.image = image
+        self.title = aDecoder.decodeObject(forKey: "title") as? String ?? shortName
         self.engineID = aDecoder.decodeObject(forKey: "engineID") as? String
         self.suggestTemplate = nil
     }
@@ -74,6 +79,7 @@ class OpenSearchEngine: NSObject, NSSecureCoding {
         aCoder.encode(isCustomEngine, forKey: "isCustomEngine")
         aCoder.encode(image, forKey: "image")
         aCoder.encode(engineID, forKey: "engineID")
+        aCoder.encode(title, forKey: "title")
     }
 
     static var supportsSecureCoding: Bool {
@@ -175,15 +181,15 @@ class OpenSearchParser {
         self.pluginMode = pluginMode
     }
 
-    func parse(_ file: String, engineID: String) -> OpenSearchEngine? {
+    func parse(_ file: String, engineID: String, title: String = "") -> OpenSearchEngine? {
         guard let data = try? Data(contentsOf: URL(fileURLWithPath: file)) else {
             print("Invalid search file")
             return nil
         }
-        return parse(data: data, engineID: engineID)
+        return parse(data: data, engineID: engineID, title: title)
     }
     
-    func parse(data: Data, engineID: String, isCustomEngine: Bool = false ) -> OpenSearchEngine? {
+    func parse(data: Data, engineID: String, isCustomEngine: Bool = false, title: String = "") -> OpenSearchEngine? {
         guard let indexer = try? XMLDocument(data: data),
             let docIndexer = indexer.root else {
                 print("Invalid XML document")
@@ -297,13 +303,13 @@ class OpenSearchParser {
             return nil
         }
         
-        return OpenSearchEngine(engineID: engineID, shortName: shortName, image: uiImage, searchTemplate: searchTemplate, suggestTemplate: suggestTemplate, isCustomEngine: isCustomEngine)
+        return OpenSearchEngine(engineID: engineID, shortName: shortName, title: title, image: uiImage, searchTemplate: searchTemplate, suggestTemplate: suggestTemplate, isCustomEngine: isCustomEngine)
     }
 }
 
 class OpenSearchXMLDownloader: Deferred<(OpenSearchEngine?, Error?)> {
     
-    init(url: URL) {
+    init(url: URL, title: String) {
         super.init()
         let deferred = NetworkManager().downloadData(from: url)
         deferred.upon { response in
@@ -311,7 +317,7 @@ class OpenSearchXMLDownloader: Deferred<(OpenSearchEngine?, Error?)> {
                 self.fill((nil, response.1))
                 return
             }
-            if let engine = OpenSearchParser(pluginMode: true).parse(data: data, engineID: "", isCustomEngine: true) {
+            if let engine = OpenSearchParser(pluginMode: true).parse(data: data, engineID: "", isCustomEngine: true, title: title) {
                 self.fill((engine, nil))
             } else {
                 self.fill((nil, "Failed to parse engine"))

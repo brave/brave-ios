@@ -33,26 +33,27 @@ class SearchEnigneAddButton: UIView {
             }
         }
     }
-    let searchButton: UIButton!
-    let loadingIndicator: UIActivityIndicatorView = UIActivityIndicatorView(activityIndicatorStyle: .white)
+    private let searchButton: UIButton!
+    private let loadingIndicator: UIActivityIndicatorView = UIActivityIndicatorView(activityIndicatorStyle: .white)
     
     override init(frame: CGRect) {
         self.state = .disabled
         self.searchButton = UIButton()
         searchButton.setImage(#imageLiteral(resourceName: "AddSearch").template, for: [])
         searchButton.accessibilityIdentifier = "BrowserViewController.customSearchEngineButton.searchButton"
+        loadingIndicator.hidesWhenStopped = true
+        loadingIndicator.color = UIColor.Photon.Grey50
         super.init(frame: frame)
         self.addSubview(searchButton)
         self.addSubview(loadingIndicator)
+        self.setConstraints()
     }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func didMoveToSuperview() {
-        super.didMoveToSuperview()
-        //Setup view contraints here
+    private func setConstraints() {
         [self.searchButton!, self.loadingIndicator].forEach({
             $0.snp.makeConstraints { make in
                 make.leading.equalTo(self.snp.leading)
@@ -61,11 +62,9 @@ class SearchEnigneAddButton: UIView {
                 make.bottom.equalTo(self.snp.bottom)
             }
         })
-        self.state = .disabled
     }
     
     func addTarget(_ target: Any?, action: Selector, for controlEvents: UIControl.Event) {
         searchButton.addTarget(target, action: action, for: controlEvents)
     }
-
 }
