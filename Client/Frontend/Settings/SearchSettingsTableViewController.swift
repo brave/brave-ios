@@ -52,6 +52,11 @@ class SearchSettingsTableViewController: UITableViewController {
         tableView.separatorColor = SettingsUX.TableViewSeparatorColor
         tableView.backgroundColor = SettingsUX.TableViewHeaderBackgroundColor
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.tableView.reloadData()
+    }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         var cell: UITableViewCell!
@@ -81,6 +86,12 @@ class SearchSettingsTableViewController: UITableViewController {
         } else {
             // The default engine is not a quick search engine.
             let index = indexPath.item + 1
+            if index == model.orderedEngines.count {
+                cell = UITableViewCell(style: .default, reuseIdentifier: nil)
+                cell.textLabel?.text = "Add Custom Search Engine"
+                cell.editingAccessoryType = .disclosureIndicator
+                return cell
+            }
             engine = model.orderedEngines[index]
             
             cell = UITableViewCell(style: .default, reuseIdentifier: nil)
@@ -97,7 +108,7 @@ class SearchSettingsTableViewController: UITableViewController {
             cell.textLabel?.text = engine.shortName
             cell.textLabel?.adjustsFontSizeToFitWidth = true
             cell.textLabel?.minimumScaleFactor = 0.5
-            cell.imageView?.image = engine.image.createScaled(IconSize)
+            cell.imageView?.image = engine.image?.createScaled(IconSize)
             cell.imageView?.layer.cornerRadius = 4
             cell.imageView?.layer.masksToBounds = true
             cell.selectionStyle = .none
@@ -139,7 +150,11 @@ class SearchSettingsTableViewController: UITableViewController {
         } else {
             // The first engine -- the default engine -- is not shown in the quick search engine list.
             // But the option to add Custom Engine is.
-            return model.orderedEngines.count - 1
+            /*
+             -1 default engine
+             +1 Add Custom Engine
+             */
+            return model.orderedEngines.count
         }
     }
 
@@ -160,6 +175,9 @@ class SearchSettingsTableViewController: UITableViewController {
             searchEnginePicker.delegate = self
             searchEnginePicker.selectedSearchEngineName = model.defaultEngine(forType: .privateMode).shortName
             navigationController?.pushViewController(searchEnginePicker, animated: true)
+        } else if indexPath.section == SectionOrder && indexPath.row == model.orderedEngines.count - 1 {
+            let addCustomSearchController = AddCustomSearchTableViewController(style: .grouped)
+            navigationController?.pushViewController(addCustomSearchController, animated: true)
         }
         return nil
     }

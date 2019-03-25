@@ -216,6 +216,12 @@ public extension Strings {
     public static let SearchSettingSuggestionCellTitle = NSLocalizedString("SearchSettingSuggestionCellTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Show Search Suggestions", comment: "Label for show search suggestions setting.")
 }
 
+// MARK:- AddCustomSearchTableViewController.swift
+public extension Strings {
+    public static let AddSearchEngineNavTitle = NSLocalizedString("AddSearchEngineNavTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Add Search Engine", comment: "Navigation title for add custom search screen.")
+    public static let AddSearchFooterText = NSLocalizedString("AddSearchFooterText", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Write the search url and replace the query with %s.\nFor example: https://youtube.com/search?q=%s \n(If the site supports OpenSearch an option to add automatically will be provided while editing this field.)", comment: "Label explaining how to add search engine.")
+}
+
 // MARK:-  SettingsContentViewController.swift
 public extension Strings {
     public static let SettingsContentLoadErrorMessage = NSLocalizedString("SettingsContentLoadErrorMessage", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Could not load page.", comment: "Error message that is shown in settings when there was a problem loading")

@@ -32,7 +32,7 @@ class OpenSearchEngine: NSObject, NSSecureCoding {
     let title: String!
     let shortName: String
     let engineID: String?
-    let image: UIImage
+    var image: UIImage?
     let isCustomEngine: Bool
     let searchTemplate: String
     fileprivate let suggestTemplate: String?
@@ -42,7 +42,7 @@ class OpenSearchEngine: NSObject, NSSecureCoding {
 
     fileprivate lazy var searchQueryComponentKey: String? = self.getQueryArgFromTemplate()
 
-    init(engineID: String?, shortName: String, title: String = "", image: UIImage, searchTemplate: String, suggestTemplate: String?, isCustomEngine: Bool) {
+    init(engineID: String?, shortName: String, title: String = "", image: UIImage?, searchTemplate: String, suggestTemplate: String?, isCustomEngine: Bool) {
         self.shortName = shortName
         self.image = image
         self.searchTemplate = searchTemplate
@@ -63,7 +63,7 @@ class OpenSearchEngine: NSObject, NSSecureCoding {
                 assertionFailure()
                 return nil
         }
-
+        
         self.searchTemplate = searchTemplate
         self.shortName = shortName
         self.isCustomEngine = isCustomEngine
@@ -292,7 +292,7 @@ class OpenSearchParser {
             }
         }
 
-        let uiImage: UIImage
+        var uiImage: UIImage?
         if let imageElement = largestImageElement,
            let imageURL = URL(string: imageElement.stringValue),
            let imageData = try? Data(contentsOf: imageURL),
@@ -300,7 +300,6 @@ class OpenSearchParser {
             uiImage = image
         } else {
             print("Error: Invalid search image data")
-            return nil
         }
         
         return OpenSearchEngine(engineID: engineID, shortName: shortName, title: title, image: uiImage, searchTemplate: searchTemplate, suggestTemplate: suggestTemplate, isCustomEngine: isCustomEngine)

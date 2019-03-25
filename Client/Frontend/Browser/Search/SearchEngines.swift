@@ -170,6 +170,9 @@ class SearchEngines {
 
     /// Adds an engine to the front of the search engines list.
     func addSearchEngine(_ engine: OpenSearchEngine) {
+        guard orderedEngines.contains(where: {$0.shortName != engine.shortName}) else {
+            return
+        }
         customEngines.append(engine)
         orderedEngines.insert(engine, at: 1)
         saveCustomEngines()

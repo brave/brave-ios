@@ -429,6 +429,7 @@
 		59B6913321B695A400E9388E /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 59B6913121B695A400E9388E /* Localizable.strings */; };
 		59B6913621B695A400E9388E /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 59B6913421B695A400E9388E /* Localizable.strings */; };
 		59B6913921B695A400E9388E /* BraveShared.strings in Resources */ = {isa = PBXBuildFile; fileRef = 59B6913721B695A400E9388E /* BraveShared.strings */; };
+		59B7DD8B22452A810026DF8B /* AddCustomSearchTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59B7DD8A22452A810026DF8B /* AddCustomSearchTableViewController.swift */; };
 		5D1DC51C20AC9AFB00905E5A /* Data.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1DC51320AC9AF900905E5A /* Data.framework */; };
 		5D1DC52520AC9AFB00905E5A /* Data.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D1DC51520AC9AFA00905E5A /* Data.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5D1DC52820AC9AFB00905E5A /* Data.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1DC51320AC9AF900905E5A /* Data.framework */; };
@@ -1736,6 +1737,7 @@
 		59B691F221B6966C00E9388E /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		59B691F321B6966C00E9388E /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		59B691F421B6966C00E9388E /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/BraveShared.strings; sourceTree = "<group>"; };
+		59B7DD8A22452A810026DF8B /* AddCustomSearchTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCustomSearchTableViewController.swift; sourceTree = "<group>"; };
 		5D1DC51320AC9AF900905E5A /* Data.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Data.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5D1DC51520AC9AFA00905E5A /* Data.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Data.h; sourceTree = "<group>"; };
 		5D1DC51620AC9AFA00905E5A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -2634,6 +2636,7 @@
 				D3E8EEE71B97A87A001900FB /* ClearPrivateDataTableViewController.swift */,
 				2F44FCCA1A9E972E00FD20CC /* SearchEnginePicker.swift */,
 				2F44FCC61A9E8CF500FD20CC /* SearchSettingsTableViewController.swift */,
+				59B7DD8A22452A810026DF8B /* AddCustomSearchTableViewController.swift */,
 				74E36D771B71323500D69DA1 /* SettingsContentViewController.swift */,
 				2F44FC711A9E840300FD20CC /* SettingsNavigationController.swift */,
 				2F44FCC41A9E85E900FD20CC /* SettingsTableSectionHeaderFooterView.swift */,
@@ -5554,6 +5557,7 @@
 				C615FADF212A319C00A8168C /* PrivacyProtection.swift in Sources */,
 				FA9293D41D6580E100AC8D33 /* QRCodeViewController.swift in Sources */,
 				E6108FF91C84E91C005D25E8 /* BasePasscodeViewController.swift in Sources */,
+				59B7DD8B22452A810026DF8B /* AddCustomSearchTableViewController.swift in Sources */,
 				39F4C10A2045DB2E00746155 /* FocusHelper.swift in Sources */,
 				E4CD9F2D1A6DC91200318571 /* TabLocationView.swift in Sources */,
 				0BB5B2881AC0A2B90052877D /* SnackBar.swift in Sources */,
