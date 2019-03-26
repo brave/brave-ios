@@ -105,7 +105,7 @@ public extension String {
         // NSMutableAttributedString still uses NSRange, a conversion from Swift's range is required.
         let nsRangeOfBoldedText = NSRange(rangeOfBoldedText, in: self)
         // Make sure we use the same font size for the bolded text.
-        let attributes: [NSAttributedStringKey: Any] = [.font: UIFont.boldSystemFont(ofSize: boldTextSize)]
+        let attributes: [NSAttributedString.Key: Any] = [.font: UIFont.boldSystemFont(ofSize: boldTextSize)]
         addWordsDescriptionBolded.setAttributes(attributes, range: nsRangeOfBoldedText)
         return addWordsDescriptionBolded
     }
