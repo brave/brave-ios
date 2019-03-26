@@ -25,9 +25,18 @@ enum DefaultEngineType: String {
     }
 }
 
-public enum SearchEngineError: String, Error {
-    case duplicate = "Duplicate engine"
-    case invalidQuery = "Invalid search query"
+public enum SearchEngineError: CustomStringConvertible, Error {
+    case duplicate
+    case invalidQuery
+    
+    public var description: String {
+        switch self {
+        case .duplicate:
+            return "Duplicate engine"
+        case .invalidQuery:
+            return "Invalid search query"
+        }
+    }
 }
 
 /**

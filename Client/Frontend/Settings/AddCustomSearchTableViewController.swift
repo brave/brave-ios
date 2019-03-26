@@ -10,12 +10,13 @@ import SnapKit
 import Fuzi
 import Alamofire
 import Storage
+import Deferred
 
 private let log = Logger.browserLogger
 
 class AddCustomSearchTableViewController: UITableViewController {
     
-    private weak var profile = (UIApplication.shared.delegate as? AppDelegate)?.profile
+    private weak var profile: Profile!
     fileprivate var openSearchLinkDict: [String: String]? {
         didSet {
             guard let openSearchLinkDict = openSearchLinkDict else {
@@ -24,7 +25,7 @@ class AddCustomSearchTableViewController: UITableViewController {
                 return
             }
             let title = openSearchLinkDict["title"] ?? ""
-            let matches = self.profile?.searchEngines.orderedEngines.filter {$0.title == title} ?? []
+            let matches = self.profile.searchEngines.orderedEngines.filter {$0.title == title}
             if !matches.isEmpty {
                 showAutoAddSearchButton = false
             } else {
@@ -39,6 +40,7 @@ class AddCustomSearchTableViewController: UITableViewController {
         return spinner
     }()
     
+    fileprivate var successCallback: (() -> Void)?
     fileprivate var favicon: Favicon?
     
     lazy fileprivate var alamofire: SessionManager = {
@@ -81,14 +83,13 @@ class AddCustomSearchTableViewController: UITableViewController {
         }
     }
     
-    fileprivate var schemesAllowed = ["http", "https"]
-    
     override init(style: UITableViewStyle) {
         super.init(style: .grouped)
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        profile = (UIApplication.shared.delegate as! AppDelegate).profile!
         view.addSubview(spinnerView)
         spinnerView.snp.makeConstraints { make in
             make.center.equalTo(self.view.snp.center)
@@ -96,6 +97,8 @@ class AddCustomSearchTableViewController: UITableViewController {
         self.tableView.register(TextInputCell.self, forCellReuseIdentifier: TextInputCell.identifier)
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: Strings.CancelButtonTitle, style: .plain, target: self, action: #selector(cancel))
         self.title = Strings.AddSearchEngineNavTitle
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .save, target: self, action: #selector(self.addCustomSearchEngine))
+        self.navigationItem.rightBarButtonItem?.accessibilityIdentifier = "customEngineSaveButton"
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -129,9 +132,9 @@ class AddCustomSearchTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         switch section {
         case 0:
-            return "URL"
+            return Strings.URL
         default:
-            return "Title"
+            return Strings.Title
         }
     }
     
@@ -157,15 +160,92 @@ class AddCustomSearchTableViewController: UITableViewController {
     }
 }
 
+//Manual add
+extension AddCustomSearchTableViewController {
+    fileprivate func addSearchEngine(_ searchQuery: String, title: String) {
+        spinnerView.startAnimating()
+        
+        let trimmedQuery = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        createEngine(forQuery: trimmedQuery, andName: trimmedTitle).uponQueue(.main) { result in
+            self.spinnerView.stopAnimating()
+            guard let engine = result.successValue else {
+                self.handleError(error: result.failureValue ?? "")
+                self.navigationItem.rightBarButtonItem?.isEnabled = true
+                return
+            }
+            try! self.profile.searchEngines.addSearchEngine(engine)
+            CATransaction.begin() // Use transaction to call callback after animation has been completed
+            CATransaction.setCompletionBlock(self.successCallback)
+            self.cancel()
+            CATransaction.commit()
+        }
+    }
+    
+    func createEngine(forQuery query: String, andName name: String) -> Deferred<Maybe<OpenSearchEngine>> {
+        let deferred = Deferred<Maybe<OpenSearchEngine>>()
+        guard let template = getSearchTemplate(withString: query),
+            let url = URL(string: template.addingPercentEncoding(withAllowedCharacters: .urlFragmentAllowed)!), url.isWebPage() else {
+                deferred.fill(Maybe(failure: SearchEngineError.invalidQuery))
+                return deferred
+        }
+        
+        // ensure we haven't already stored this template
+        guard engineExists(name: name, template: template) == false else {
+            deferred.fill(Maybe(failure: SearchEngineError.duplicate))
+            return deferred
+        }
+        
+        FaviconFetcher.fetchFavImageForURL(forURL: url, profile: profile).uponQueue(.main) { result in
+            let image = result.successValue ?? FaviconFetcher.getDefaultFavicon(url)
+            let engine = OpenSearchEngine(engineID: nil, shortName: name, image: image, searchTemplate: template, suggestTemplate: nil, isCustomEngine: true)
+            
+            //Make sure a valid scheme is used
+            let url = engine.searchURLForQuery("test")
+            let maybe = (url == nil) ? Maybe(failure: SearchEngineError.invalidQuery) : Maybe(success: engine)
+            deferred.fill(maybe)
+        }
+        return deferred
+    }
+    
+    private func engineExists(name: String, template: String) -> Bool {
+        return profile.searchEngines.orderedEngines.contains { (engine) -> Bool in
+            return engine.shortName == name || engine.searchTemplate == template
+        }
+    }
+    
+    func getSearchTemplate(withString query: String) -> String? {
+        let SearchTermComponent = "%s"      //Placeholder in User Entered String
+        let placeholder = "{searchTerms}"   //Placeholder looked for when using Custom Search Engine in OpenSearch.swift
+        if query.contains(SearchTermComponent) {
+            return query.replacingOccurrences(of: SearchTermComponent, with: placeholder)
+        }
+        return nil
+    }
+    
+    @objc func addCustomSearchEngine(_ nav: UINavigationController?) {
+        self.view.endEditing(true)
+        if let title = titleText, !title.isEmpty && !urlText.isEmpty {
+            navigationItem.rightBarButtonItem?.isEnabled = false
+            addSearchEngine(urlText, title: title)
+        } else {
+            let alert = ThirdPartySearchAlerts.fillAllFields()
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
+}
+
 extension AddCustomSearchTableViewController: UITextViewDelegate {
     func textViewDidChange(_ textView: UITextView) {
         // Identify host if possible.
-        if let text = textView.text,
-            let url = URL(string: text),
+        if let text = textView.text?.trimmingCharacters(in: .whitespacesAndNewlines),
+            let url = URL(string: text.addingPercentEncoding(withAllowedCharacters: .urlFragmentAllowed)!),
             url.host != nil,
-            schemesAllowed.contains(url.scheme ?? "") {
+            url.isWebPage() {
             host = url.getBaseURL()
         }
+        self.urlText = textView.text
     }
     
     func textViewDidEndEditing(_ textView: UITextView) {
@@ -188,9 +268,9 @@ extension AddCustomSearchTableViewController: AddSearchEngineAccessoryViewDelega
         if let searchError = error as? SearchEngineError {
             switch searchError {
             case .duplicate:
-                alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
+                alert = ThirdPartySearchAlerts.duplicateCustomEngine()
             case .invalidQuery:
-                alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
+                alert = ThirdPartySearchAlerts.incorrectCustomEngineForm()
             }
         } else {
             alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()

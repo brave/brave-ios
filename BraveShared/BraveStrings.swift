@@ -220,6 +220,7 @@ public extension Strings {
 public extension Strings {
     public static let AddSearchEngineNavTitle = NSLocalizedString("AddSearchEngineNavTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Add Search Engine", comment: "Navigation title for add custom search screen.")
     public static let AddSearchFooterText = NSLocalizedString("AddSearchFooterText", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Write the search url and replace the query with %s.\nFor example: https://youtube.com/search?q=%s \n(If the site supports OpenSearch an option to add automatically will be provided while editing this field.)", comment: "Label explaining how to add search engine.")
+    public static let Title = NSLocalizedString("Title", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Title", comment: "Title/Name of custom search engine")
 }
 
 // MARK:-  SettingsContentViewController.swift

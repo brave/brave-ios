@@ -68,6 +68,11 @@ class ThirdPartySearchAlerts: UIAlertController {
                                  message: Strings.CustomEngineDuplicateErrorMessage)
     }
     
+    static func fillAllFields() -> UIAlertController {
+        return searchAlertWithOK(title: Strings.ThirdPartySearchFailedTitle,
+                                 message: Strings.CustomEngineFillAllFieldsErrorMessage)
+    }
+    
     private static func searchAlertWithOK(title: String, message: String) -> UIAlertController {
         let alert = ThirdPartySearchAlerts(
             title: title,

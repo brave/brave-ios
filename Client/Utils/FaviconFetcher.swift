@@ -170,9 +170,10 @@ open class FaviconFetcher: NSObject, XMLParserDelegate {
                 // SVG is not supported right not
                 if let iconUrl = NSURL(string: href, relativeTo: url as URL), let absoluteString = iconUrl.absoluteString, iconUrl.pathExtension != "svg" {
                     let icon = Favicon(url: absoluteString)
-                    return [icon]
+                    icons = [icon]
                 }
             }
+            if !icons.isEmpty { return icons}
         }
         if icons.isEmpty {
             // If we haven't got any options icons, then use the default at the root of the domain.
