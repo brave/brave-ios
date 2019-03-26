@@ -129,7 +129,6 @@ open class FaviconFetcher: NSObject, XMLParserDelegate {
     // Loads and parses an html document and tries to find any known favicon-type tags for the page
     fileprivate func parseHTMLForFavicons(_ url: URL) -> Deferred<Maybe<[Favicon]>> {
         return fetchDataForURL(url).bind({ result -> Deferred<Maybe<[Favicon]>> in
-            var icons = [Favicon]()
             guard let data = result.successValue, result.isSuccess,
                 let root = try? HTMLDocument(data: data as Data) else {
                     return deferMaybe([])
@@ -147,26 +146,42 @@ open class FaviconFetcher: NSObject, XMLParserDelegate {
             if let url = reloadUrl {
                 return self.parseHTMLForFavicons(url)
             }
-
-            for link in root.xpath("//head//link[contains(@rel, 'icon')]") {
+            let icons = self.getIcons(document: root, url: url)
+            return deferMaybe(icons)
+        })
+    }
+    
+    var faviconAttributes = ["apple-touch-icon",
+                             "apple-touch-icon-precomposed",
+                             "icon",
+                             "fluid-icon",
+                             "shortcut icon",
+                             "Shortcut Icon",
+                             "mask-icon"]
+    
+    func getIcons(document: HTMLDocument, url: URL) -> [Favicon] {
+        var icons = [Favicon]()
+        for attr in faviconAttributes {
+            for link in document.xpath("//head//link[contains(@rel, '\(attr)')]") {
                 guard let href = link["href"] else {
                     continue //Skip the rest of the loop. But don't stop the loop
                 }
-
-                if let iconUrl = NSURL(string: href, relativeTo: url as URL), let absoluteString = iconUrl.absoluteString {
+                
+                // SVG is not supported right not
+                if let iconUrl = NSURL(string: href, relativeTo: url as URL), let absoluteString = iconUrl.absoluteString, iconUrl.pathExtension != "svg" {
                     let icon = Favicon(url: absoluteString)
-                    icons = [icon]
+                    return [icon]
                 }
-
-                // If we haven't got any options icons, then use the default at the root of the domain.
-                if let url = NSURL(string: "/favicon.ico", relativeTo: url as URL), icons.isEmpty, let absoluteString = url.absoluteString {
-                    let icon = Favicon(url: absoluteString)
-                    icons = [icon]
-                }
-
             }
-            return deferMaybe(icons)
-        })
+        }
+        if icons.isEmpty {
+            // If we haven't got any options icons, then use the default at the root of the domain.
+            if let url = NSURL(string: "/favicon.ico", relativeTo: url as URL), icons.isEmpty, let absoluteString = url.absoluteString {
+                let icon = Favicon(url: absoluteString)
+                icons = [icon]
+            }
+        }
+        return icons
     }
 
     func getFavicon(_ siteUrl: URL, icon: Favicon) -> Deferred<Maybe<Favicon>> {

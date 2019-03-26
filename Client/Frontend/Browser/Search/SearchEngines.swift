@@ -25,6 +25,11 @@ enum DefaultEngineType: String {
     }
 }
 
+public enum SearchEngineError: String, Error {
+    case duplicate = "Duplicate engine"
+    case invalidQuery = "Invalid search query"
+}
+
 /**
  * Manage a set of Open Search engines.
  *
@@ -169,9 +174,9 @@ class SearchEngines {
     }
 
     /// Adds an engine to the front of the search engines list.
-    func addSearchEngine(_ engine: OpenSearchEngine) {
-        guard orderedEngines.contains(where: {$0.shortName != engine.shortName}) else {
-            return
+    func addSearchEngine(_ engine: OpenSearchEngine) throws {
+        guard orderedEngines.contains(where: {$0.shortName != engine.shortName && $0.searchTemplate != engine.searchTemplate}) else {
+            throw SearchEngineError.duplicate
         }
         customEngines.append(engine)
         orderedEngines.insert(engine, at: 1)

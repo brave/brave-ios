@@ -2664,20 +2664,27 @@ extension BrowserViewController {
     @objc func downloadOpenSearchXML() {
         guard let urlString = openSearchLinkDict?["href"],
             let title = openSearchLinkDict?["title"],
-            var url = URL(string: urlString) else {
+            var url = URL(string: urlString),
+            let faviconURLString = self.tabManager.selectedTab?.displayFavicon?.url,
+            let iconURL = URL(string: faviconURLString) else {
             let alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
             self.present(alert, animated: true, completion: nil)
             return
         }
         // Handle relative url
         if let webViewBaseURL = self.tabManager.selectedTab?.webView?.url?.getBaseURL(), url.host == nil {
-            let component = url.absoluteString.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
-            url = webViewBaseURL.appendingPathComponent(component)
+            if url.absoluteString.hasPrefix("//"), let _url = URL(string: "\(webViewBaseURL.scheme!):\(url.absoluteString)" ) {
+                url = _url
+            } else if url.absoluteString.hasPrefix("/") {
+                let component: String = url.absoluteString.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+                url = webViewBaseURL.appendingPathComponent(component)
+            }
         }
         self.customSearchEngineButton.state = .loading
-        OpenSearchXMLDownloader(url: url, title: title).uponQueue(.main) { (engine, error) in
+        OpenSearchXMLDownloader(url: url, title: title, imageURL: iconURL).uponQueue(.main) { (engine, error) in
             self.customSearchEngineButton.state = .enabled
             guard let engine = engine, error == nil else {
+                log.error(error!)
                 let alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
                 self.present(alert, animated: true, completion: nil)
                 return
@@ -2689,9 +2696,14 @@ extension BrowserViewController {
     func addSearchEngine(_ engine: OpenSearchEngine) {
         let alert = ThirdPartySearchAlerts.addThirdPartySearchEngine { alert in
             self.customSearchEngineButton.state = .disabled
-            self.profile.searchEngines.addSearchEngine(engine)
-            let Toast = SimpleToast()
-            Toast.showAlertWithText(Strings.ThirdPartySearchEngineAdded, bottomContainer: self.webViewContainer)
+            do {
+                try self.profile.searchEngines.addSearchEngine(engine)
+                let Toast = SimpleToast()
+                Toast.showAlertWithText(Strings.ThirdPartySearchEngineAdded, bottomContainer: self.webViewContainer)
+            } catch {
+                let alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
+                self.present(alert, animated: true, completion: nil)
+            }
         }
         self.present(alert, animated: true, completion: {})
     }

@@ -32,7 +32,7 @@ class OpenSearchEngine: NSObject, NSSecureCoding {
     let title: String!
     let shortName: String
     let engineID: String?
-    var image: UIImage?
+    let image: UIImage
     let isCustomEngine: Bool
     let searchTemplate: String
     fileprivate let suggestTemplate: String?
@@ -42,7 +42,7 @@ class OpenSearchEngine: NSObject, NSSecureCoding {
 
     fileprivate lazy var searchQueryComponentKey: String? = self.getQueryArgFromTemplate()
 
-    init(engineID: String?, shortName: String, title: String = "", image: UIImage?, searchTemplate: String, suggestTemplate: String?, isCustomEngine: Bool) {
+    init(engineID: String?, shortName: String, title: String = "", image: UIImage, searchTemplate: String, suggestTemplate: String?, isCustomEngine: Bool) {
         self.shortName = shortName
         self.image = image
         self.searchTemplate = searchTemplate
@@ -189,7 +189,7 @@ class OpenSearchParser {
         return parse(data: data, engineID: engineID, title: title)
     }
     
-    func parse(data: Data, engineID: String, isCustomEngine: Bool = false, title: String = "") -> OpenSearchEngine? {
+    func parse(data: Data, engineID: String, isCustomEngine: Bool = false, title: String = "", image: UIImage? = nil) -> OpenSearchEngine? {
         guard let indexer = try? XMLDocument(data: data),
             let docIndexer = indexer.root else {
                 print("Invalid XML document")
@@ -292,14 +292,18 @@ class OpenSearchParser {
             }
         }
 
-        var uiImage: UIImage?
-        if let imageElement = largestImageElement,
-           let imageURL = URL(string: imageElement.stringValue),
-           let imageData = try? Data(contentsOf: imageURL),
-           let image = UIImage.imageFromDataThreadSafe(imageData) {
+        let uiImage: UIImage
+        
+        if let image = image {
+            uiImage = image
+        } else if let imageElement = largestImageElement,
+            let imageURL = URL(string: imageElement.stringValue),
+            let imageData = try? Data(contentsOf: imageURL),
+            let image = UIImage.imageFromDataThreadSafe(imageData) {
             uiImage = image
         } else {
             print("Error: Invalid search image data")
+            return nil
         }
         
         return OpenSearchEngine(engineID: engineID, shortName: shortName, title: title, image: uiImage, searchTemplate: searchTemplate, suggestTemplate: suggestTemplate, isCustomEngine: isCustomEngine)
@@ -308,15 +312,26 @@ class OpenSearchParser {
 
 class OpenSearchXMLDownloader: Deferred<(OpenSearchEngine?, Error?)> {
     
-    init(url: URL, title: String) {
+    init(url: URL, title: String, imageURL: URL) {
         super.init()
-        let deferred = NetworkManager().downloadData(from: url)
-        deferred.upon { response in
-            guard let data = response.0, response.1 == nil else {
-                self.fill((nil, response.1))
+        let deferredData = NetworkManager().downloadData(from: url)
+        let deferredImage = Deferred<UIImage?>()
+        let combinedDeferred = deferredData.both(deferredImage)
+        WebImageCacheManager.shared.load(from: imageURL) { image, _, _, _, _ in
+            guard let image = image else {
+                deferredImage.fill(nil)
                 return
             }
-            if let engine = OpenSearchParser(pluginMode: true).parse(data: data, engineID: "", isCustomEngine: true, title: title) {
+            deferredImage.fill(image)
+        }
+        combinedDeferred.upon { response in
+            guard let data = response.0.0,
+                let image = response.1,
+                response.0.1 == nil else {
+                self.fill((nil, "Failed to parse engine"))
+                return
+            }
+            if let engine = OpenSearchParser(pluginMode: true).parse(data: data, engineID: "", isCustomEngine: true, title: title, image: image) {
                 self.fill((engine, nil))
             } else {
                 self.fill((nil, "Failed to parse engine"))

@@ -108,7 +108,7 @@ class SearchSettingsTableViewController: UITableViewController {
             cell.textLabel?.text = engine.shortName
             cell.textLabel?.adjustsFontSizeToFitWidth = true
             cell.textLabel?.minimumScaleFactor = 0.5
-            cell.imageView?.image = engine.image?.createScaled(IconSize)
+            cell.imageView?.image = engine.image.createScaled(IconSize)
             cell.imageView?.layer.cornerRadius = 4
             cell.imageView?.layer.masksToBounds = true
             cell.selectionStyle = .none

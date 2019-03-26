@@ -7,6 +7,9 @@ import Static
 import Shared
 import WebKit
 import SnapKit
+import Fuzi
+import Alamofire
+import Storage
 
 private let log = Logger.browserLogger
 
@@ -17,6 +20,7 @@ class AddCustomSearchTableViewController: UITableViewController {
         didSet {
             guard let openSearchLinkDict = openSearchLinkDict else {
                 showAutoAddSearchButton = false
+                favicon = nil
                 return
             }
             let title = openSearchLinkDict["title"] ?? ""
@@ -28,6 +32,24 @@ class AddCustomSearchTableViewController: UITableViewController {
             }
         }
     }
+    
+    fileprivate lazy var spinnerView: UIActivityIndicatorView = {
+        let spinner = UIActivityIndicatorView(activityIndicatorStyle: .gray)
+        spinner.hidesWhenStopped = true
+        return spinner
+    }()
+    
+    fileprivate var favicon: Favicon?
+    
+    lazy fileprivate var alamofire: SessionManager = {
+        let configuration = URLSessionConfiguration.default
+        var defaultHeaders = SessionManager.default.session.configuration.httpAdditionalHeaders ?? [:]
+        defaultHeaders["User-Agent"] = UserAgent.desktopUserAgent()
+        configuration.httpAdditionalHeaders = defaultHeaders
+        configuration.timeoutIntervalForRequest = 5
+        return SessionManager(configuration: configuration)
+    }()
+    
     private var showAutoAddSearchButton = false {
         didSet {
             manageInputAccessporyView()
@@ -35,25 +57,31 @@ class AddCustomSearchTableViewController: UITableViewController {
     }
     private var urlText = ""
     private var titleText: String?
+    
+    private var loadRequest: Alamofire.DataRequest? {
+        didSet {
+            oldValue?.cancel()
+        }
+    }
     private var host: URL? {
         didSet {
             if let host = host, oldValue != host {
                 var request = URLRequest(url: host)
                 request.timeoutInterval = 10.0
                 manageInputAccessporyView(loading: true)
-                webViewInternal.load(request)
+                loadRequest = alamofire.request(host)
+                loadRequest?.response(queue: DispatchQueue.main) {[weak self] response in
+                    guard let data = response.data, response.error == nil else {
+                        self?.openSearchLinkDict = nil
+                        return
+                    }
+                    self?.loadEngineMeta(from: data, url: host)
+                }
             }
         }
     }
     
     fileprivate var schemesAllowed = ["http", "https"]
-    
-    fileprivate lazy var webViewInternal: WKWebView = {
-        let webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 1, height: 1), configuration: WKWebViewConfiguration())
-        self.view.addSubview(webView)
-        webView.isHidden = true
-        return webView
-    }()
     
     override init(style: UITableViewStyle) {
         super.init(style: .grouped)
@@ -61,8 +89,10 @@ class AddCustomSearchTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        webViewInternal.navigationDelegate = self
-        webViewInternal.customUserAgent = UserAgent.desktopUserAgent()
+        view.addSubview(spinnerView)
+        spinnerView.snp.makeConstraints { make in
+            make.center.equalTo(self.view.snp.center)
+        }
         self.tableView.register(TextInputCell.self, forCellReuseIdentifier: TextInputCell.identifier)
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: Strings.CancelButtonTitle, style: .plain, target: self, action: #selector(cancel))
         self.title = Strings.AddSearchEngineNavTitle
@@ -154,8 +184,18 @@ extension AddCustomSearchTableViewController: UITextViewDelegate {
 
 extension AddCustomSearchTableViewController: AddSearchEngineAccessoryViewDelegate {
     func handleError(error: Error) {
-        log.error(error.localizedDescription)
-        let alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
+        let alert: UIAlertController
+        if let searchError = error as? SearchEngineError {
+            switch searchError {
+            case .duplicate:
+                alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
+            case .invalidQuery:
+                alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
+            }
+        } else {
+            alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
+        }
+        log.error(error)
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -166,21 +206,25 @@ extension AddCustomSearchTableViewController: AddSearchEngineAccessoryViewDelega
     fileprivate func addEngine(sender: AddSearchEngineAccessoryView) {
         guard let urlString = openSearchLinkDict?["href"],
             let title = openSearchLinkDict?["title"],
-            var url = URL(string: urlString) else {
+            var url = URL(string: urlString),
+            let faviconURLString = favicon?.url,
+            let faviconURL = URL(string: faviconURLString) else {
                 handleError(error: "Failed to add Search Engine")
                 return
         }
-        if let webViewBaseURL = webViewInternal.url?.getBaseURL(), url.host == nil {
-            let component = url.absoluteString.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
-            url = webViewBaseURL.appendingPathComponent(component)
+        if let baseURL = host?.getBaseURL(), url.host == nil {
+            if url.absoluteString.hasPrefix("//"), let _url = URL(string: "\(baseURL.scheme!):\(url.absoluteString)" ) {
+                url = _url
+            } else if url.absoluteString.hasPrefix("/") {
+                let component: String = url.absoluteString.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+                url = baseURL.appendingPathComponent(component)
+            }
         }
         sender.addEngineButton.state = .loading
-        OpenSearchXMLDownloader(url: url, title: title).uponQueue(.main) {[weak self] (engine, error) in
+        OpenSearchXMLDownloader(url: url, title: title, imageURL: faviconURL).uponQueue(.main) {[weak self] (engine, error) in
             sender.addEngineButton.state = .enabled
             guard let engine = engine, error == nil else {
-                log.error(error)
-                let alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
-                self?.present(alert, animated: true, completion: nil)
+                self?.handleError(error: error!)
                 return
             }
             self?.addSearchEngine(engine)
@@ -190,12 +234,12 @@ extension AddCustomSearchTableViewController: AddSearchEngineAccessoryViewDelega
     
     func addSearchEngine(_ engine: OpenSearchEngine) {
         let alert = ThirdPartySearchAlerts.addThirdPartySearchEngine { alert in
-            self.profile?.searchEngines.addSearchEngine(engine)
-            let Toast = SimpleToast()
-            Toast.showAlertWithText(Strings.ThirdPartySearchEngineAdded, bottomContainer: self.tableView)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: {
+            do {
+                try self.profile?.searchEngines.addSearchEngine(engine)
                 self.cancel()
-            })
+            } catch {
+                self.handleError(error: error)
+            }
         }
         self.view.endEditing(true)
         self.present(alert, animated: true, completion: {})
@@ -214,27 +258,26 @@ extension AddCustomSearchTableViewController: UITextFieldDelegate {
     }
 }
 
-extension AddCustomSearchTableViewController: WKNavigationDelegate {
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        webView.evaluateJavaScript(OpenSearchEngine.fetchOpenSearchLinkScript) { result, _ in
-            if let dict = (result as? String)?.jsonObject() as? [String: String] {
-                self.openSearchLinkDict = dict
-            } else {
-                self.openSearchLinkDict = nil
-            }
+extension AddCustomSearchTableViewController {
+    
+    func loadEngineMeta(from data: Data, url: URL) {
+        guard let root = try? HTMLDocument(data: data as Data),
+            let dict = getOpenSearchLinkAttr(document: root) else {
+            self.openSearchLinkDict = nil
+            return
         }
+        self.openSearchLinkDict = dict
+        favicon = FaviconFetcher().getIcons(document: root, url: url).first
     }
     
-    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        self.openSearchLinkDict = nil
-    }
-    
-    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-        self.openSearchLinkDict = nil
-    }
-    
-    func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
-        self.openSearchLinkDict = nil
+    func getOpenSearchLinkAttr(document: HTMLDocument) -> [String: String]? {
+        for link in document.xpath("//head//link[contains(@type, 'application/opensearchdescription+xml')]") {
+            guard let href = link["href"], let title = link["title"] else {
+                continue //Skip the rest of the loop. But don't stop the loop
+            }
+            return ["href": href, "title": title]
+        }
+        return nil
     }
 }
 
