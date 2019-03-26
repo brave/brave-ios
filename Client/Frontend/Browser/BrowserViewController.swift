@@ -2523,7 +2523,7 @@ extension BrowserViewController: ContextMenuHelperDelegate {
                 let application = UIApplication.shared
                 var taskId: UIBackgroundTaskIdentifier = UIBackgroundTaskIdentifier(rawValue: 0)
                 taskId = application.beginBackgroundTask (expirationHandler: {
-                    application.endBackgroundTask(convertToUIBackgroundTaskIdentifier(taskId.rawValue))
+                    application.endBackgroundTask(taskId)
                 })
 
                 Alamofire.request(url).validate(statusCode: 200..<300).response { response in
@@ -2534,7 +2534,7 @@ extension BrowserViewController: ContextMenuHelperDelegate {
                         pasteboard.addImageWithData(imageData, forURL: url)
                     }
 
-                    application.endBackgroundTask(convertToUIBackgroundTaskIdentifier(taskId.rawValue))
+                    application.endBackgroundTask(taskId)
                 }
             }
             actionSheetController.addAction(copyAction, accessibilityIdentifier: "linkContextMenu.copyImage")
@@ -2937,7 +2937,3 @@ extension BrowserViewController: PreferencesObserver {
     }
 }
 
-// Helper function inserted by Swift 4.2 migrator.
-fileprivate func convertToUIBackgroundTaskIdentifier(_ input: Int) -> UIBackgroundTaskIdentifier {
-	return UIBackgroundTaskIdentifier(rawValue: input)
-}

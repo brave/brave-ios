@@ -318,7 +318,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         taskId = application.beginBackgroundTask (expirationHandler: {
             print("Running out of background time, but we have a profile shutdown pending.")
             self.shutdownProfileWhenNotActive(application)
-            application.endBackgroundTask(convertToUIBackgroundTaskIdentifier(taskId.rawValue))
+            application.endBackgroundTask(taskId)
         })
 
 //        if profile.hasSyncableAccount() {
@@ -328,7 +328,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
 //            }
 //        } else {
             profile.shutdown()
-            application.endBackgroundTask(convertToUIBackgroundTaskIdentifier(taskId.rawValue))
+            application.endBackgroundTask(taskId)
 //        }
     }
 
@@ -509,9 +509,4 @@ extension AppDelegate: MFMailComposeViewControllerDelegate {
         controller.dismiss(animated: true, completion: nil)
         startApplication(application!, withLaunchOptions: self.launchOptions)
     }
-}
-
-// Helper function inserted by Swift 4.2 migrator.
-fileprivate func convertToUIBackgroundTaskIdentifier(_ input: Int) -> UIBackgroundTaskIdentifier {
-	return UIBackgroundTaskIdentifier(rawValue: input)
 }
