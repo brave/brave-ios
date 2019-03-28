@@ -192,6 +192,15 @@ class BrowserViewController: UIViewController {
         // Lists need to be compiled before attempting tab restoration
         contentBlockListDeferred = ContentBlockerHelper.compileLists()
     }
+    
+    // Use this function to queue a task for after the BVC has loaded and is visible.(After shoing  initial tabs ).
+    func addTask(task: @escaping () -> Void) {
+        if viewIfLoaded?.window == nil {
+            taskQueue.append(task)
+        } else {
+            DispatchQueue.main.async { task() }
+        }
+    }
 
     override var preferredStatusBarStyle: UIStatusBarStyle {
         switch Theme.of(tabManager.selectedTab) {
@@ -439,21 +448,20 @@ class BrowserViewController: UIViewController {
     }
     
     fileprivate func setupTabs() {
-        let isPrivate = Preferences.Privacy.privateBrowsingOnly.value
-        let noTabsAdded = tabManager.tabsForCurrentMode.isEmpty
-        
-        var tabToSelect: Tab?
-        
-        if noTabsAdded {
-            // Two scenarios if there are no tabs in tabmanager:
-            // 1. We have not restored tabs yet, attempt to restore or make a new tab if there is nothing.
-            // 2. We are in private browsing mode and need to add a new private tab.
-            tabToSelect = isPrivate ? tabManager.addTab(isPrivate: true) : tabManager.restoreAllTabs()
-        } else {
-            tabToSelect = tabManager.tabsForCurrentMode.last
-        }
-        
         contentBlockListDeferred?.uponQueue(.main) { _ in
+            let isPrivate = Preferences.Privacy.privateBrowsingOnly.value
+            let noTabsAdded = self.tabManager.tabsForCurrentMode.isEmpty
+            
+            var tabToSelect: Tab?
+            
+            if noTabsAdded {
+                // Two scenarios if there are no tabs in tabmanager:
+                // 1. We have not restored tabs yet, attempt to restore or make a new tab if there is nothing.
+                // 2. We are in private browsing mode and need to add a new private tab.
+                tabToSelect = isPrivate ? self.tabManager.addTab(isPrivate: true) : self.tabManager.restoreAllTabs()
+            } else {
+                tabToSelect = self.tabManager.tabsForCurrentMode.last
+            }
             if self.taskQueue.isEmpty {
                 self.tabManager.selectTab(tabToSelect)
             } else {

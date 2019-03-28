@@ -232,7 +232,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
             if isFirstLaunch {
                 urp.referralLookup { url in
                     guard let url = url else { return }
-                    self.browserViewController.taskQueue.append {
+                    self.browserViewController.addTask {
                         try? self.browserViewController.openURLInNewTab(url.asURL(), isPrivileged: false)
                     }
                 }
@@ -259,16 +259,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         guard let routerpath = NavigationPath(url: url) else {
             return false
         }
-
-        if self.browserViewController.viewIfLoaded?.window == nil {
-            // The view has not yet moved to window. Thus the task to open new tab has to be queued.
-            self.browserViewController.taskQueue.append {
-                NavigationPath.handle(nav: routerpath, with: self.browserViewController)
-            }
-        } else {
-            DispatchQueue.main.async {
-                NavigationPath.handle(nav: routerpath, with: self.browserViewController)
-            }
+        
+        self.browserViewController.addTask {
+            NavigationPath.handle(nav: routerpath, with: self.browserViewController)
         }
         return true
     }
