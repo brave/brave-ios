@@ -1420,7 +1420,8 @@ extension BrowserViewController {
 }
 
 extension BrowserViewController: URLBarDelegate {
-    func showTabTray() {
+    func showTabTray(sender: UIButton?) {
+        sender?.isEnabled = false
         updateFindInPageVisibility(visible: false)
         
         let tabTrayController = TabTrayController(tabManager: tabManager, profile: profile, tabTrayDelegate: self)
@@ -1429,7 +1430,9 @@ extension BrowserViewController: URLBarDelegate {
             screenshotHelper.takeScreenshot(tab)
         }
         
-        navigationController?.pushViewController(tabTrayController, animated: true)
+        navigationController?.pushViewController(viewController: tabTrayController, animated: true, completion: {
+            sender?.isEnabled = true
+        })
         self.tabTrayController = tabTrayController
     }
 
@@ -1469,7 +1472,7 @@ extension BrowserViewController: URLBarDelegate {
     }
 
     func urlBarDidPressTabs(_ urlBar: URLBarView) {
-        showTabTray()
+        showTabTray(sender: urlBar.tabsButton)
     }
 
     func urlBarDidPressReaderMode(_ urlBar: URLBarView) {
@@ -1744,7 +1747,7 @@ extension BrowserViewController: TabToolbarDelegate {
     }
 
     func tabToolbarDidPressTabs(_ tabToolbar: TabToolbarProtocol, button: UIButton) {
-        showTabTray()
+        showTabTray(sender: tabToolbar.tabsButton)
     }
     
     func tabToolbarDidLongPressTabs(_ tabToolbar: TabToolbarProtocol, button: UIButton) {
