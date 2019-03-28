@@ -4,8 +4,15 @@
 
 import UIKit
 import SnapKit
+import BraveShared
 
 class SearchEnigneAddButton: UIView {
+    
+    enum Alignment {
+        case center
+        case left
+        case right
+    }
     
     enum State {
         case loading
@@ -13,11 +20,13 @@ class SearchEnigneAddButton: UIView {
         case disabled
     }
     
+    var loaderAlignment: Alignment = .center
+    
     var state: State {
         didSet {
             switch state {
             case .disabled:
-                self.searchButton.isHidden = false
+                self.searchButton.isHidden = hidesWhenDisabled ? true : false
                 self.loadingIndicator.stopAnimating()
                 self.searchButton.tintColor = UIColor.Photon.Grey50
                 self.searchButton.isUserInteractionEnabled = false
@@ -35,7 +44,7 @@ class SearchEnigneAddButton: UIView {
     }
     private let searchButton: UIButton!
     private let loadingIndicator: UIActivityIndicatorView = UIActivityIndicatorView(activityIndicatorStyle: .white)
-    
+    private var hidesWhenDisabled: Bool = false
     override init(frame: CGRect) {
         self.state = .disabled
         self.searchButton = UIButton()
@@ -44,24 +53,40 @@ class SearchEnigneAddButton: UIView {
         loadingIndicator.hidesWhenStopped = true
         loadingIndicator.color = UIColor.Photon.Grey50
         super.init(frame: frame)
-        self.addSubview(searchButton)
-        self.addSubview(loadingIndicator)
-        self.setConstraints()
+        addSubview(searchButton)
+        addSubview(loadingIndicator)
     }
     
+    convenience init(title: String?, hidesWhenDisabled: Bool) {
+        self.init(frame: CGRect(x: 0, y: 0, width: 44.0, height: 44.0))
+        if let title = title {
+            searchButton.setImage(nil, for: .normal)
+            searchButton.titleLabel?.font = UIFont.systemFont(ofSize: 14)
+            searchButton.setTitle(title, for: .normal)
+            searchButton.setTitleColor(BraveUX.BraveOrange, for: .normal)
+        }
+        self.hidesWhenDisabled = hidesWhenDisabled
+        setConstraints()
+    }
+        
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
     private func setConstraints() {
-        [self.searchButton!, self.loadingIndicator].forEach({
-            $0.snp.makeConstraints { make in
-                make.leading.equalTo(self.snp.leading)
-                make.trailing.equalTo(self.snp.trailing)
-                make.top.equalTo(self.snp.top)
-                make.bottom.equalTo(self.snp.bottom)
+        searchButton.snp.remakeConstraints { make in
+            make.top.bottom.leading.trailing.equalToSuperview()
+        }
+        loadingIndicator.snp.remakeConstraints { make in
+            switch loaderAlignment {
+            case .center:
+                make.center.equalToSuperview()
+            case .left:
+                make.right.equalToSuperview()
+            case .right:
+                make.left.equalToSuperview()
             }
-        })
+        }
     }
     
     func addTarget(_ target: Any?, action: Selector, for controlEvents: UIControl.Event) {

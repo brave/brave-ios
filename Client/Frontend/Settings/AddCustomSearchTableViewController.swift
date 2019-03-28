@@ -54,7 +54,7 @@ class AddCustomSearchTableViewController: UITableViewController {
     
     private var showAutoAddSearchButton = false {
         didSet {
-            manageInputAccessporyView()
+            manageURLHeaderView()
         }
     }
     private var urlText = ""
@@ -65,12 +65,14 @@ class AddCustomSearchTableViewController: UITableViewController {
             oldValue?.cancel()
         }
     }
+    fileprivate var urlHeader: CustomSearchEngineURLHeader!
     private var host: URL? {
         didSet {
             if let host = host, oldValue != host {
                 var request = URLRequest(url: host)
                 request.timeoutInterval = 10.0
-                manageInputAccessporyView(loading: true)
+                showAutoAddSearchButton = false
+                manageURLHeaderView()
                 loadRequest = alamofire.request(host)
                 loadRequest?.response(queue: DispatchQueue.main) {[weak self] response in
                     guard let data = response.data, response.error == nil else {
@@ -90,15 +92,21 @@ class AddCustomSearchTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         profile = (UIApplication.shared.delegate as! AppDelegate).profile!
-        view.addSubview(spinnerView)
-        spinnerView.snp.makeConstraints { make in
-            make.center.equalTo(self.view.snp.center)
-        }
-        self.tableView.register(TextInputCell.self, forCellReuseIdentifier: TextInputCell.identifier)
+        tableView.register(TextInputCell.self, forCellReuseIdentifier: TextInputCell.identifier)
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: Strings.CancelButtonTitle, style: .plain, target: self, action: #selector(cancel))
-        self.title = Strings.AddSearchEngineNavTitle
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .save, target: self, action: #selector(self.addCustomSearchEngine))
-        self.navigationItem.rightBarButtonItem?.accessibilityIdentifier = "customEngineSaveButton"
+        title = Strings.AddSearchEngineNavTitle
+        setSaveButton()
+    }
+    
+    fileprivate func setSaveButton() {
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .save, target: self, action: #selector(self.addCustomSearchEngine))
+        navigationItem.rightBarButtonItem?.accessibilityIdentifier = "customEngineSaveButton"
+    }
+    
+    fileprivate func showNavBarLoader() {
+        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: spinnerView)
+        spinnerView.startAnimating()
+        navigationItem.rightBarButtonItem?.accessibilityIdentifier = "customEngineActivityIndicator"
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -129,15 +137,6 @@ class AddCustomSearchTableViewController: UITableViewController {
         return cell ?? UITableViewCell()
     }
     
-    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        switch section {
-        case 0:
-            return Strings.URL
-        default:
-            return Strings.Title
-        }
-    }
-    
     override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
         switch section {
         case 0:
@@ -147,38 +146,64 @@ class AddCustomSearchTableViewController: UITableViewController {
         }
     }
     
+    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let header = CustomSearchEngineURLHeader(frame: CGRect(x: 0, y: 0, width: 1, height: 44.0))
+        switch section {
+        case 0:
+            header.titleLabel.text = Strings.URL
+            header.delegate = self
+            header.addEngineButton.state = showAutoAddSearchButton ? .enabled : .disabled
+            urlHeader = header
+        default:
+            header.titleLabel.text = Strings.Title
+        }
+        return header
+    }
+    
     @objc fileprivate func cancel() {
         self.navigationController?.popViewController(animated: true)
     }
     
-    private func manageInputAccessporyView(loading: Bool = false) {
-        
-        guard let accessoryView = (tableView.cellForRow(at: IndexPath(row: 0, section: 0 )) as? TextInputCell)?.textview?.inputAccessoryView as? AddSearchEngineAccessoryView else {
-            return
+    private func manageURLHeaderView(loading: Bool = false) {
+        urlHeader.addEngineButton.state = loading ? .loading : showAutoAddSearchButton ? .enabled : .disabled
+    }
+    
+    func handleError(error: Error) {
+        let alert: UIAlertController
+        if let searchError = error as? SearchEngineError {
+            switch searchError {
+            case .duplicate:
+                alert = ThirdPartySearchAlerts.duplicateCustomEngine()
+            case .invalidQuery:
+                alert = ThirdPartySearchAlerts.incorrectCustomEngineForm()
+            }
+        } else {
+            alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
         }
-        accessoryView.addEngineButton.state = loading ? .loading : showAutoAddSearchButton ? .enabled : .disabled
+        log.error(error)
+        present(alert, animated: true, completion: nil)
     }
 }
 
 //Manual add
 extension AddCustomSearchTableViewController {
     fileprivate func addSearchEngine(_ searchQuery: String, title: String) {
-        spinnerView.startAnimating()
+        showNavBarLoader()
         
         let trimmedQuery = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
         let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
         
-        createEngine(forQuery: trimmedQuery, andName: trimmedTitle).uponQueue(.main) { result in
-            self.spinnerView.stopAnimating()
-            guard let engine = result.successValue else {
-                self.handleError(error: result.failureValue ?? "")
-                self.navigationItem.rightBarButtonItem?.isEnabled = true
+        createEngine(forQuery: trimmedQuery, andName: trimmedTitle).uponQueue(.main) {[weak self] result in
+            self?.setSaveButton()
+            guard let weakSelf = self, let engine = result.successValue else {
+                self?.handleError(error: result.failureValue ?? "")
+                self?.navigationItem.rightBarButtonItem?.isEnabled = true
                 return
             }
-            try! self.profile.searchEngines.addSearchEngine(engine)
+            try? weakSelf.profile.searchEngines.addSearchEngine(engine)
             CATransaction.begin() // Use transaction to call callback after animation has been completed
-            CATransaction.setCompletionBlock(self.successCallback)
-            self.cancel()
+            CATransaction.setCompletionBlock(weakSelf.successCallback)
+            weakSelf.cancel()
             CATransaction.commit()
         }
     }
@@ -225,13 +250,13 @@ extension AddCustomSearchTableViewController {
     }
     
     @objc func addCustomSearchEngine(_ nav: UINavigationController?) {
-        self.view.endEditing(true)
+        view.endEditing(true)
         if let title = titleText, !title.isEmpty && !urlText.isEmpty {
             navigationItem.rightBarButtonItem?.isEnabled = false
             addSearchEngine(urlText, title: title)
         } else {
             let alert = ThirdPartySearchAlerts.fillAllFields()
-            self.present(alert, animated: true, completion: nil)
+            present(alert, animated: true, completion: nil)
         }
     }
 }
@@ -245,45 +270,31 @@ extension AddCustomSearchTableViewController: UITextViewDelegate {
             url.isWebPage() {
             host = url.getBaseURL()
         }
-        self.urlText = textView.text
+        urlText = textView.text
     }
     
     func textViewDidEndEditing(_ textView: UITextView) {
         // Hold the test for fututre.
-        self.urlText = textView.text
+        urlText = textView.text
     }
     
     func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
         let accessoryView = AddSearchEngineAccessoryView(frame: CGRect(width: 0, height: 44.0))
         accessoryView.delegate = self
         textView.inputAccessoryView = accessoryView
-        accessoryView.addEngineButton.state = showAutoAddSearchButton ? .enabled : .disabled
         return true
     }
 }
 
 extension AddCustomSearchTableViewController: AddSearchEngineAccessoryViewDelegate {
-    func handleError(error: Error) {
-        let alert: UIAlertController
-        if let searchError = error as? SearchEngineError {
-            switch searchError {
-            case .duplicate:
-                alert = ThirdPartySearchAlerts.duplicateCustomEngine()
-            case .invalidQuery:
-                alert = ThirdPartySearchAlerts.incorrectCustomEngineForm()
-            }
-        } else {
-            alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
-        }
-        log.error(error)
-        self.present(alert, animated: true, completion: nil)
-    }
     
     fileprivate func doneAction(sender: AddSearchEngineAccessoryView) {
-        self.view.endEditing(true)
+        view.endEditing(true)
     }
-    
-    fileprivate func addEngine(sender: AddSearchEngineAccessoryView) {
+}
+
+extension AddCustomSearchTableViewController: CustomSearchEngineURLHeaderDelegate {
+    fileprivate func addEngine(sender: CustomSearchEngineURLHeader) {
         guard let urlString = openSearchLinkDict?["href"],
             let title = openSearchLinkDict?["title"],
             var url = URL(string: urlString),
@@ -308,28 +319,27 @@ extension AddCustomSearchTableViewController: AddSearchEngineAccessoryViewDelega
                 return
             }
             self?.addSearchEngine(engine)
-            sender.addEngineButton.state = .disabled
         }
     }
     
     func addSearchEngine(_ engine: OpenSearchEngine) {
-        let alert = ThirdPartySearchAlerts.addThirdPartySearchEngine { alert in
+        let alert = ThirdPartySearchAlerts.addThirdPartySearchEngine(title: engine.shortName, url: engine.searchTemplate) {[weak self] alert in
             do {
-                try self.profile?.searchEngines.addSearchEngine(engine)
-                self.cancel()
+                try self?.profile?.searchEngines.addSearchEngine(engine)
+                self?.cancel()
             } catch {
-                self.handleError(error: error)
+                self?.handleError(error: error)
             }
         }
-        self.view.endEditing(true)
-        self.present(alert, animated: true, completion: {})
+        view.endEditing(true)
+        present(alert, animated: true, completion: {})
     }
 }
 
 extension AddCustomSearchTableViewController: UITextFieldDelegate {
     func textFieldDidEndEditing(_ textField: UITextField) {
         //hold the text for future.
-        self.titleText = textField.text
+        titleText = textField.text
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
@@ -343,10 +353,10 @@ extension AddCustomSearchTableViewController {
     func loadEngineMeta(from data: Data, url: URL) {
         guard let root = try? HTMLDocument(data: data as Data),
             let dict = getOpenSearchLinkAttr(document: root) else {
-            self.openSearchLinkDict = nil
+            openSearchLinkDict = nil
             return
         }
-        self.openSearchLinkDict = dict
+        openSearchLinkDict = dict
         favicon = FaviconFetcher().getIcons(document: root, url: url).first
     }
     
@@ -383,10 +393,10 @@ class TextInputCell: UITableViewCell {
         case .textField(let delegate):
             textview?.removeFromSuperview()
             textview = nil
-            textfield = UITextField(frame: CGRect(x: 0, y: 0, width: self.contentView.frame.width, height: self.contentView.frame.height))
+            textfield = UITextField(frame: CGRect(x: 0, y: 0, width: contentView.frame.width, height: contentView.frame.height))
             textfield?.translatesAutoresizingMaskIntoConstraints = false
             textfield?.delegate = delegate
-            self.contentView.addSubview(textfield!)
+            contentView.addSubview(textfield!)
             textfield?.snp.makeConstraints({ make in
                 make.leading.equalToSuperview().offset(16)
                 make.trailing.equalToSuperview().inset(-16)
@@ -396,7 +406,7 @@ class TextInputCell: UITableViewCell {
         case .textView(let delegate):
             textfield?.removeFromSuperview()
             textfield = nil
-            textview = UITextView(frame: CGRect(x: 0, y: 0, width: self.contentView.frame.width, height: self.contentView.frame.height))
+            textview = UITextView(frame: CGRect(x: 0, y: 0, width: contentView.frame.width, height: contentView.frame.height))
             textview?.translatesAutoresizingMaskIntoConstraints = false
             textview?.font = UIFont.systemFont(ofSize: 16)
             textview?.delegate = delegate
@@ -413,7 +423,6 @@ class TextInputCell: UITableViewCell {
 
 fileprivate protocol AddSearchEngineAccessoryViewDelegate: AnyObject {
     func doneAction(sender: AddSearchEngineAccessoryView)
-    func addEngine(sender: AddSearchEngineAccessoryView)
 }
 
 fileprivate class AddSearchEngineAccessoryView: UIView {
@@ -428,20 +437,11 @@ fileprivate class AddSearchEngineAccessoryView: UIView {
         return doneButton
     }()
     
-    lazy var addEngineButton: SearchEnigneAddButton = {
-        let searchButton = SearchEnigneAddButton()
-        searchButton.state = .disabled
-        searchButton.addTarget(self, action: #selector(addEngine), for: .touchUpInside)
-        searchButton.accessibilityIdentifier = "AddCustomSearchTableViewController.customSearchEngineButton"
-        return searchButton
-    }()
-    
     override init(frame: CGRect) {
         super.init(frame: frame)
         contentView.backgroundColor = UIColor.white
-        self.addSubview(contentView)
-        self.contentView.addSubview(addEngineButton)
-        self.contentView.addSubview(doneButton)
+        addSubview(contentView)
+        contentView.addSubview(doneButton)
         setConstraints()
     }
     
@@ -450,16 +450,11 @@ fileprivate class AddSearchEngineAccessoryView: UIView {
     }
     
     func setConstraints() {
-        self.contentView.snp.makeConstraints { make in
+        contentView.snp.makeConstraints { make in
             make.leading.trailing.top.bottom.equalToSuperview()
         }
-        self.addEngineButton.snp.makeConstraints { make in
-            make.leading.equalTo(self.contentView.snp.leading).offset(20)
-            make.width.equalTo(self.contentView.snp.height)
-            make.centerY.equalToSuperview()
-            make.height.equalTo(self.contentView.snp.height)
-        }
-        self.doneButton.snp.makeConstraints { make in
+        
+        doneButton.snp.makeConstraints { make in
             make.trailing.equalTo(self.contentView.snp.trailing).inset(20)
             make.centerY.equalToSuperview()
         }
@@ -467,6 +462,54 @@ fileprivate class AddSearchEngineAccessoryView: UIView {
     
     @objc private func done() {
         delegate?.doneAction(sender: self)
+    }
+}
+
+fileprivate protocol CustomSearchEngineURLHeaderDelegate: AnyObject {
+    func addEngine(sender: CustomSearchEngineURLHeader)
+}
+
+fileprivate class CustomSearchEngineURLHeader: UIView {
+    weak var delegate: CustomSearchEngineURLHeaderDelegate?
+    var titleLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.systemFont(ofSize: 14)
+        label.textColor = UIColor.Photon.Grey50
+        return label
+    }()
+    
+    lazy var addEngineButton: SearchEnigneAddButton = {
+        let searchButton = SearchEnigneAddButton(title: "Auto Add", hidesWhenDisabled: true)
+        searchButton.loaderAlignment = .right
+        searchButton.state = .disabled
+        searchButton.addTarget(self, action: #selector(addEngine), for: .touchUpInside)
+        searchButton.accessibilityIdentifier = "AddCustomSearchTableViewController.customSearchEngineButton"
+        return searchButton
+    }()
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        addSubview(titleLabel)
+        addSubview(addEngineButton)
+        setConstraints()
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    func setConstraints() {
+        titleLabel.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(20)
+            make.top.equalToSuperview()
+            make.bottom.equalToSuperview()
+            make.height.equalTo(44.0)
+        }
+        addEngineButton.snp.makeConstraints { make in
+            make.trailing.equalTo(self.snp.trailing).inset(20)
+            make.centerY.equalToSuperview()
+            make.height.equalTo(self.snp.height)
+        }
     }
     
     @objc private func addEngine() {

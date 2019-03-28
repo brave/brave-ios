@@ -22,12 +22,21 @@ class ThirdPartySearchAlerts: UIAlertController {
      - returns: UIAlertController for asking the user to add a search engine
      **/
 
-    static func addThirdPartySearchEngine(_ okayCallback: @escaping (UIAlertAction) -> Void) -> UIAlertController {
+    static func addThirdPartySearchEngine(title: String, url: String, _ okayCallback: @escaping (UIAlertAction) -> Void) -> UIAlertController {
         let alert = ThirdPartySearchAlerts(
             title: Strings.ThirdPartySearchAddTitle,
-            message: Strings.ThirdPartySearchAddMessage,
+            message: "alert",
             preferredStyle: .alert
         )
+        let boldAttr1 = [NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 18)]
+        let boldAttr2 = [NSAttributedStringKey.font: UIFont.systemFont(ofSize: 14)]
+        let attrStr1 = NSMutableAttributedString(string: "\n\(title)\n\(url)\n\n")
+        let attrStr2 = NSMutableAttributedString(string: Strings.ThirdPartySearchAddMessage)
+        
+        attrStr1.setAttributes(boldAttr1, range: NSRange(location: 0, length: attrStr1.length))
+        attrStr2.setAttributes(boldAttr2, range: NSRange(location: 0, length: attrStr2.length))
+        attrStr1.append(attrStr2)
+        alert.setValue(attrStr1, forKey: "attributedMessage")
 
         let noOption = UIAlertAction(
             title: Strings.ThirdPartySearchCancelButton,

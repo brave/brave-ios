@@ -60,7 +60,7 @@ class BrowserViewController: UIViewController {
     lazy var mailtoLinkHandler: MailtoLinkHandler = MailtoLinkHandler()
 
     lazy fileprivate var customSearchEngineButton: SearchEnigneAddButton = {
-        let searchButton = SearchEnigneAddButton()
+        let searchButton = SearchEnigneAddButton(title: nil, hidesWhenDisabled: false)
         searchButton.addTarget(self, action: #selector(downloadOpenSearchXML), for: .touchUpInside)
         searchButton.accessibilityIdentifier = "BrowserViewController.customSearchEngineButton"
         return searchButton
@@ -2694,7 +2694,7 @@ extension BrowserViewController {
     }
 
     func addSearchEngine(_ engine: OpenSearchEngine) {
-        let alert = ThirdPartySearchAlerts.addThirdPartySearchEngine { alert in
+        let alert = ThirdPartySearchAlerts.addThirdPartySearchEngine(title: engine.shortName, url: engine.searchTemplate) { alert in
             self.customSearchEngineButton.state = .disabled
             do {
                 try self.profile.searchEngines.addSearchEngine(engine)

@@ -128,7 +128,7 @@ extension Strings {
 extension Strings {
     public static let ThirdPartySearchEngineAdded = NSLocalizedString("ThirdPartySearchEngineAdded", bundle: Bundle.shared, value: "Added Search engine!", comment: "The success message that appears after a user sucessfully adds a new search engine")
     public static let ThirdPartySearchAddTitle = NSLocalizedString("ThirdPartySearchAddTitle", bundle: Bundle.shared, value: "Add Search Provider?", comment: "The title that asks the user to Add the search provider")
-    public static let ThirdPartySearchAddMessage = NSLocalizedString("ThirdPartySearchAddMessage", bundle: Bundle.shared, value: "The new search engine will appear in the quick search bar.", comment: "The message that asks the user to Add the search provider explaining where the search engine will appear")
+    public static let ThirdPartySearchAddMessage = NSLocalizedString("ThirdPartySearchAddMessage", bundle: Bundle.shared, value: "Once added it will appear in the quick search bar.", comment: "The message that asks the user to Add the search provider explaining where the search engine will appear")
     public static let ThirdPartySearchCancelButton = NSLocalizedString("ThirdPartySearchCancelButton", bundle: Bundle.shared, value: "Cancel", comment: "The cancel button if you do not want to add a search engine.")
     public static let ThirdPartySearchOkayButton = NSLocalizedString("ThirdPartySearchOkayButton", bundle: Bundle.shared, value: "OK", comment: "The confirmation button")
     public static let ThirdPartySearchFailedMessage = NSLocalizedString("ThirdPartySearchFailedMessage", bundle: Bundle.shared, value: "The search provider could not be added.", comment: "A title explaining that we failed to add a search engine")
