@@ -2106,12 +2106,7 @@ private let schemesAllowedToBeOpenedAsPopups = ["http", "https", "javascript", "
 
 extension BrowserViewController: WKUIDelegate {
     func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
-        /* Fix for #446, when in private mode the WKProcessPool of the configuration is changed,
-         this leads to a crash for popups ie window.open where the configuration is created by parent wkwebview.
-         To handle this for now we are stopping popup when in private mode.
-         The fix is done in guard statement below.
-         */
-        guard let parentTab = tabManager[webView], !parentTab.isPrivate else { return nil }
+        guard let parentTab = tabManager[webView] else { return nil }
 
         guard navigationAction.isAllowed, shouldRequestBeOpenedAsPopup(navigationAction.request) else {
             print("Denying popup from request: \(navigationAction.request)")
@@ -2495,7 +2490,8 @@ extension BrowserViewController: ContextMenuHelperDelegate {
             }
             
             let openInNewTabAction = UIAlertAction(title: Strings.OpenImageInNewTabActionTitle, style: .default) { _ in
-                self.tabManager.addTab(URLRequest(url: url), afterTab: self.tabManager.selectedTab)
+                let isPrivate = PrivateBrowsingManager.shared.isPrivateBrowsing
+                self.tabManager.addTab(URLRequest(url: url), afterTab: self.tabManager.selectedTab, isPrivate: isPrivate)
                 self.scrollController.showToolbars(animated: true)
             }
             actionSheetController.addAction(openInNewTabAction, accessibilityIdentifier: "linkContextMenu.openImageInNewTab")

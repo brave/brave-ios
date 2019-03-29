@@ -121,6 +121,9 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
     // MARK: Update
     
     public func update(customTitle: String?, url: String?) {
+        // Title can't be empty, except when coming from Sync
+        let isTitleEmpty = customTitle?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == true
+        if customTitle == nil || isTitleEmpty { return }
         updateInternal(customTitle: customTitle, url: url)
     }
     
@@ -313,10 +316,8 @@ extension Bookmark {
                 return
             }
             
-            if let ct = customTitle, !ct.isEmpty {
-                bookmarkToUpdate.customTitle = ct
-                bookmarkToUpdate.title = ct
-            }
+            bookmarkToUpdate.customTitle = customTitle
+            bookmarkToUpdate.title = customTitle
             
             if let u = url, !u.isEmpty {
                 bookmarkToUpdate.url = url
@@ -469,18 +470,22 @@ extension Bookmark {
         if !isFolder { return }
         
         var allBookmarks = [Bookmark]()
-        allBookmarks.append(self)
         
         DataController.perform { context in
-            if let allNestedBookmarks = Bookmark.getRecursiveChildren(forFolderUUID: self.syncUUID, context: context) {
-                log.warning("All nested bookmarks of :\(String(describing: self.title)) folder is nil")
-                
+            guard let bookmarkOnCorrectContext = context.object(with: self.objectID) as? Bookmark else {
+                return
+            }
+            allBookmarks.append(bookmarkOnCorrectContext)
+            
+            let uuid = bookmarkOnCorrectContext.syncUUID
+            
+            if let allNestedBookmarks = Bookmark.getRecursiveChildren(forFolderUUID: uuid, context: context) {
                 allBookmarks.append(contentsOf: allNestedBookmarks)
             }
             
             Sync.shared.sendSyncRecords(action: .delete, records: allBookmarks)
             
-            self.deleteInternal(context: .existing(context))
+            bookmarkOnCorrectContext.deleteInternal(context: .existing(context))
         }
     }
 }
@@ -502,10 +507,10 @@ extension Bookmark {
     func updateResolvedRecord(_ record: SyncRecord?, context: WriteContext = .new) {
         guard let bookmark = record as? SyncBookmark, let site = bookmark.site else { return }
         title = site.title
+        syncParentUUID = bookmark.parentFolderObjectId
         updateInternal(customTitle: site.customTitle, url: site.location,
                newSyncOrder: bookmark.syncOrder, save: false, sendToSync: false, context: context)
         lastVisited = Date(timeIntervalSince1970: (Double(site.lastAccessedTime ?? 0) / 1000.0))
-        syncParentUUID = bookmark.parentFolderObjectId
         if let recordCreated = record?.syncNativeTimestamp {
             created = recordCreated
         }
