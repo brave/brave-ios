@@ -123,5 +123,3 @@ public extension String {
         return nil
     }
 }
-
-extension String: Error {}
