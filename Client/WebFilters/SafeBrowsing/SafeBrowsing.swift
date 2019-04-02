@@ -28,9 +28,8 @@ class SafeBrowsing {
             log.error("url: \(url) host is nil")
             return false
         }
-        
-        let domain = Domain.getOrCreate(forUrl: url)
         let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
+        let domain = Domain.getOrCreate(forUrl: url, persistent: !isPrivateBrowsing)
         let isSafeBrowsingEnabled = domain.isShieldExpected(.SafeBrowsing,
                                                             isPrivateBrowsing: isPrivateBrowsing)
         let isUrlBlacklisted = domainList.contains(baseDomain)

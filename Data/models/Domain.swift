@@ -25,8 +25,9 @@ public final class Domain: NSManagedObject, CRUD {
     
     // MARK: - Public interface
     
-    public class func getOrCreate(forUrl url: URL) -> Domain {
-        return getOrCreateInternal(url)
+    public class func getOrCreate(forUrl url: URL, persistent: Bool) -> Domain {
+        let context = persistent ? DataController.viewContext : DataController.viewContextInMemory
+        return getOrCreateInternal(url, context: context, save: true)
     }
     
     // MARK: Shields

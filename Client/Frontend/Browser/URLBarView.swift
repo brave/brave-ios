@@ -174,7 +174,8 @@ class URLBarView: UIView {
         // Default on
         var shieldIcon = "shields-menu-icon"
         if let currentURL = currentURL {
-            let domain = Domain.getOrCreate(forUrl: currentURL)
+            let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
+            let domain = Domain.getOrCreate(forUrl: currentURL, persistent: !isPrivateBrowsing)
             if domain.shield_allOff == 1 {
                 shieldIcon = "shields-off-menu-icon"
             }
