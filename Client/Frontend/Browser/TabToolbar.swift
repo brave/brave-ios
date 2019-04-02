@@ -14,6 +14,7 @@ protocol TabToolbarProtocol: class {
     var backButton: ToolbarButton { get }
     var shareButton: ToolbarButton { get }
     var addTabButton: ToolbarButton { get }
+    var menuButton: ToolbarButton { get }
     var actionButtons: [Themeable & UIButton] { get }
 
     func updateBackStatus(_ canGoBack: Bool)
@@ -28,8 +29,9 @@ protocol TabToolbarDelegate: class {
     func tabToolbarDidLongPressBack(_ tabToolbar: TabToolbarProtocol, button: UIButton)
     func tabToolbarDidLongPressForward(_ tabToolbar: TabToolbarProtocol, button: UIButton)
     func tabToolbarDidPressTabs(_ tabToolbar: TabToolbarProtocol, button: UIButton)
+    func tabToolbarDidPressMenu(_ tabToolbar: TabToolbarProtocol, button: UIButton)
     func tabToolbarDidLongPressTabs(_ tabToolbar: TabToolbarProtocol, button: UIButton)
-    func tabToolbarDidPressShare(_ tabToolbar: TabToolbarProtocol, button: UIButton)
+    func tabToolbarDidPressShare()
     func tabToolbarDidPressAddTab(_ tabToolbar: TabToolbarProtocol, button: UIButton)
     func tabToolbarDidLongPressAddTab(_ tabToolbar: TabToolbarProtocol, button: UIButton)
     func tabToolbarDidSwipeToChangeTabs(_ tabToolbar: TabToolbarProtocol, direction: UISwipeGestureRecognizer.Direction)
@@ -71,8 +73,16 @@ open class TabToolbarHelper: NSObject {
         toolbar.addTabButton.accessibilityLabel = Strings.TabToolbarAddTabButtonAccessibilityLabel
         toolbar.addTabButton.addTarget(self, action: #selector(didClickAddTab), for: UIControlEvents.touchUpInside)
         toolbar.addTabButton.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(didLongPressAddTab(_:))))
+        
+        toolbar.menuButton.setImage(#imageLiteral(resourceName: "menu-More-Options").template, for: .normal)
+        toolbar.menuButton.accessibilityLabel = Strings.TabToolbarMenuButtonAccessibilityLabel
+        toolbar.menuButton.addTarget(self, action: #selector(didClickMenu), for: UIControlEvents.touchUpInside)
 
         setTheme(theme: .regular, forButtons: toolbar.actionButtons)
+    }
+    
+    func didClickMenu() {
+        toolbar.tabToolbarDelegate?.tabToolbarDidPressMenu(toolbar, button: toolbar.backButton)
     }
 
     func didClickBack() {
@@ -104,7 +114,7 @@ open class TabToolbarHelper: NSObject {
     }
     
     func didClickShare() {
-        toolbar.tabToolbarDelegate?.tabToolbarDidPressShare(toolbar, button: toolbar.shareButton)
+        toolbar.tabToolbarDelegate?.tabToolbarDidPressShare()
     }
     
     func didClickAddTab() {
@@ -174,13 +184,14 @@ class TabToolbar: UIView {
     let backButton = ToolbarButton()
     let shareButton = ToolbarButton()
     let addTabButton = ToolbarButton()
+    let menuButton = ToolbarButton()
     let actionButtons: [Themeable & UIButton]
 
     var helper: TabToolbarHelper?
     private let contentView = UIStackView()
 
     fileprivate override init(frame: CGRect) {
-        actionButtons = [backButton, forwardButton, shareButton, addTabButton, tabsButton]
+        actionButtons = [backButton, forwardButton, addTabButton, tabsButton, menuButton]
         super.init(frame: frame)
         setupAccessibility()
 

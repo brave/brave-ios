@@ -117,10 +117,11 @@ class BookmarksViewController: SiteTableViewController {
   var isEditingIndividualBookmark: Bool = false
   
   var currentFolder: Bookmark?
-  let tabState: TabState
+    /// Certain bookmark actions are different in private browsing mode.
+    let isPrivateBrowsing: Bool
   
-  init(folder: Bookmark?, tabState: TabState) {
-    self.tabState = tabState
+    init(folder: Bookmark?, isPrivateBrowsing: Bool) {
+    self.isPrivateBrowsing = isPrivateBrowsing
     
     super.init(nibName: nil, bundle: nil)
     
@@ -142,12 +143,6 @@ class BookmarksViewController: SiteTableViewController {
     self.view.backgroundColor = BraveUX.BackgroundColorForSideToolbars
     
     tableView.allowsSelectionDuringEditing = true
-    
-    let navBar = self.navigationController?.navigationBar
-    navBar?.barTintColor = BraveUX.BackgroundColorForSideToolbars
-    navBar?.isTranslucent = false
-    navBar?.titleTextAttributes = [.font: UIFont.systemFont(ofSize: UIConstants.DefaultChromeSize, weight: .medium), .foregroundColor: BraveUX.GreyJ]
-    navBar?.clipsToBounds = true
     
     let width = self.view.bounds.size.width
     let toolbarHeight = CGFloat(44)
@@ -426,7 +421,7 @@ class BookmarksViewController: SiteTableViewController {
         //show editing view for bookmark item
         self.showEditBookmarkController(tableView, indexPath: indexPath)
       } else {
-        let nextController = BookmarksViewController(folder: bookmark, tabState: tabState)
+        let nextController = BookmarksViewController(folder: bookmark, isPrivateBrowsing: isPrivateBrowsing)
         nextController.profile = profile
         nextController.bookmarksDidChange = bookmarksDidChange
         nextController.linkNavigationDelegate = linkNavigationDelegate
@@ -629,7 +624,7 @@ extension BookmarksViewController {
       actionsForFolder(bookmark).forEach { alert.addAction($0) }
     } else {
       alert.title = bookmark.url?.replacingOccurrences(of: "mailto:", with: "").ellipsize(maxLength: ActionSheetTitleMaxLength)
-      actionsForBookmark(bookmark, currentTabIsPrivate: tabState.type.isPrivate).forEach { alert.addAction($0) }
+      actionsForBookmark(bookmark, currentTabIsPrivate: isPrivateBrowsing).forEach { alert.addAction($0) }
     }
     
     let cancelAction = UIAlertAction(title: Strings.CancelButtonTitle, style: .cancel, handler: nil)

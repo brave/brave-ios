@@ -20,10 +20,10 @@ class HistoryViewController: SiteTableViewController {
   fileprivate lazy var emptyStateOverlayView: UIView = self.createEmptyStateOverview()
   var frc: NSFetchedResultsController<History>?
   
-  let tabState: TabState
+    let isPrivateBrowsing: Bool
   
-  init(tabState: TabState) {
-    self.tabState = tabState
+  init(isPrivateBrowsing: Bool) {
+    self.isPrivateBrowsing = isPrivateBrowsing
     
     super.init(nibName: nil, bundle: nil)
     
@@ -224,7 +224,7 @@ extension HistoryViewController {
     let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
     
     alert.title = history.url?.replacingOccurrences(of: "mailto:", with: "").ellipsize(maxLength: ActionSheetTitleMaxLength)
-    actionsForHistory(history, currentTabIsPrivate: tabState.type.isPrivate).forEach { alert.addAction($0) }
+    actionsForHistory(history, currentTabIsPrivate: isPrivateBrowsing).forEach { alert.addAction($0) }
     
     let cancelAction = UIAlertAction(title: Strings.CancelButtonTitle, style: .cancel, handler: nil)
     alert.addAction(cancelAction)

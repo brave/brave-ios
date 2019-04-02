@@ -1679,7 +1679,7 @@ extension BrowserViewController: TabToolbarDelegate {
         tabManager.selectedTab?.goForward()
     }
     
-    func tabToolbarDidPressShare(_ tabToolbar: TabToolbarProtocol, button: UIButton) {
+    func tabToolbarDidPressShare() {
         func share(url: URL) {
             presentActivityViewController(
                 url,
@@ -1705,6 +1705,12 @@ extension BrowserViewController: TabToolbarDelegate {
         } else {
             share(url: url)
         }
+    }
+    
+    func tabToolbarDidPressMenu(_ tabToolbar: TabToolbarProtocol, button: UIButton) {
+        let homePanel = MenuViewController(bvc: self)
+        let popover = PopoverController(contentController: homePanel, contentSizeBehavior: .preferredContentSize)
+        popover.present(from: tabToolbar.menuButton, on: self)
     }
     
     func tabToolbarDidPressAddTab(_ tabToolbar: TabToolbarProtocol, button: UIButton) {

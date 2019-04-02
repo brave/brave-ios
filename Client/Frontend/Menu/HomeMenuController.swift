@@ -83,8 +83,9 @@ class HomeMenuController: UIViewController, PopoverContentComponent {
   init(profile: Profile, tabState: TabState) {
     self.profile = profile
     self.tabState = tabState
-    self.bookmarksController = BookmarksViewController(folder: nil, tabState: tabState)
-    self.historyController = HistoryViewController(tabState: tabState)
+    let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
+    self.bookmarksController = BookmarksViewController(folder: nil, isPrivateBrowsing: isPrivateBrowsing)
+    self.historyController = HistoryViewController(isPrivateBrowsing: isPrivateBrowsing)
     
     super.init(nibName: nil, bundle: nil)
     bookmarksController.profile = profile
