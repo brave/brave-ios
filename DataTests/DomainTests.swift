@@ -17,15 +17,15 @@ class DomainTests: CoreDataTestCase {
         let url = URL(string: "http://example.com")!
         let url2 = URL(string: "http://brave.com")!
         
-        XCTAssertNotNil(Domain.getOrCreate(forUrl: url))
+        XCTAssertNotNil(Domain.getOrCreate(forUrl: url, persistent: true))
         XCTAssertEqual(try! DataController.viewContext.count(for: fetchRequest), 1)
         
         // Try to add the same domain again, verify no new object is created
-        XCTAssertNotNil(Domain.getOrCreate(forUrl: url))
+        XCTAssertNotNil(Domain.getOrCreate(forUrl: url, persistent: true))
         XCTAssertEqual(try! DataController.viewContext.count(for: fetchRequest), 1)
         
         // Add another domain, verify that second object is created
-        XCTAssertNotNil(Domain.getOrCreate(forUrl: url2))
+        XCTAssertNotNil(Domain.getOrCreate(forUrl: url2, persistent: true))
         XCTAssertEqual(try! DataController.viewContext.count(for: fetchRequest), 2)
     }
 

@@ -66,10 +66,8 @@ class ShieldsViewController: UIViewController, PopoverContentComponent {
             // Domain specific overrides after defaults have already been setup
             
             if let domain = domain {
-                let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
                 // site-specific shield has been overridden, update
-                view.toggleSwitch.isOn = domain.isShieldExpected(shield,
-                                                                 isPrivateBrowsing: isPrivateBrowsing)
+                view.toggleSwitch.isOn = domain.isShieldExpected(shield)
                 if shield == .AllOff {
                     // Reverse, as logic is inverted
                     view.toggleSwitch.isOn.toggle()

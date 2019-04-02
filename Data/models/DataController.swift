@@ -12,7 +12,7 @@ private let log = Logger.browserLogger
 /// to perform a database write operation.
 enum WriteContext {
     /// Requests DataController to create new background context for the task.
-    case new
+    case new(_ inMemory: Bool)
     /// Requests DataController to use an existing context.
     /// (To prevent creating multiple contexts per call and mixing threads)
     case existing(_ context: NSManagedObjectContext)
@@ -23,7 +23,7 @@ public class DataController: NSObject {
     
     // MARK: - Public interface
     
-    public static let shared: DataController = DataController()
+    public static var shared: DataController = DataController()
     public static var sharedInMemory: DataController = InMemoryDataController()
     
     public func storeExists() -> Bool {
@@ -32,7 +32,7 @@ public class DataController: NSObject {
     
     // MARK: - Data framework interface
     
-    static func perform(context: WriteContext = .new, save: Bool = true,
+    static func perform(context: WriteContext = .new(false), save: Bool = true,
                         task: @escaping (NSManagedObjectContext) -> Void) {
         
         switch context {
@@ -41,11 +41,11 @@ public class DataController: NSObject {
             // Queue operation and saving is done in `performTask()`
             // called at higher level when a `.new` WriteContext is passed.
             task(existingContext)
-        case .new:
+        case .new(let inMemory):
             let queue = DataController.shared.operationQueue
             
             queue.addOperation({
-                let backgroundContext = DataController.newBackgroundContext()
+                let backgroundContext = inMemory ? DataController.newBackgroundContextInMemory() : DataController.newBackgroundContext()
                 // performAndWait doesn't block main thread because it fires on OperationQueue`s background thread.
                 backgroundContext.performAndWait {
                     task(backgroundContext)
@@ -152,6 +152,12 @@ public class DataController: NSObject {
         // In theory, the merge policy should not matter
         // since all operations happen on a synchronized operation queue.
         // But in case of any bugs it's better to have one, so the app won't crash for users.
+        backgroundContext.mergePolicy = NSMergePolicy.mergeByPropertyStoreTrump
+        return backgroundContext
+    }
+    
+    private static func newBackgroundContextInMemory() -> NSManagedObjectContext {
+        let backgroundContext = DataController.sharedInMemory.container.newBackgroundContext()
         backgroundContext.mergePolicy = NSMergePolicy.mergeByPropertyStoreTrump
         return backgroundContext
     }
