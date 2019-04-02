@@ -46,7 +46,8 @@ class ShieldsViewController: UIViewController, PopoverContentComponent {
     private func updateToggleStatus() {
         var domain: Domain?
         if let url = url {
-            domain = Domain.getOrCreate(forUrl: url)
+            let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
+            domain = Domain.getOrCreate(forUrl: url, persistent: !isPrivateBrowsing)
         }
         
         shieldControlMapping.forEach { shield, view, option in

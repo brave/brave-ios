@@ -23,7 +23,8 @@ public class DataController: NSObject {
     
     // MARK: - Public interface
     
-    public static var shared: DataController = DataController()
+    public static let shared: DataController = DataController()
+    public static var sharedInMemory: DataController = InMemoryDataController()
     
     public func storeExists() -> Bool {
         return FileManager.default.fileExists(atPath: storeURL.path)
@@ -65,6 +66,11 @@ public class DataController: NSObject {
     // Context object also allows us access to all persistent container data if needed.
     static var viewContext: NSManagedObjectContext {
         return DataController.shared.container.viewContext
+    }
+    
+    // Context object also allows us access to all persistent container data if needed.
+    static var viewContextInMemory: NSManagedObjectContext {
+        return DataController.sharedInMemory.container.viewContext
     }
     
     static func save(context: NSManagedObjectContext?) {
