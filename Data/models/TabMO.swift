@@ -127,15 +127,15 @@ public final class TabMO: NSManagedObject, CRUD {
     // MARK: Delete
     
     public func delete() {
-        delete(context: .new)
+        delete(context: .new(false))
     }
     
     public class func deleteAll() {
-        deleteAll(context: .new)
+        deleteAll(context: .new(false))
     }
     
     public class func deleteAllPrivateTabs() {
-        deleteAll(predicate: NSPredicate(format: "isPrivate == true"), context: .new)
+        deleteAll(predicate: NSPredicate(format: "isPrivate == true"), context: .new(false))
     }
 
     }

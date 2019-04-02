@@ -39,8 +39,7 @@ extension ContentBlockerHelper: TabContentScript {
         
         let resourceType = TPStatsResourceType(rawValue: body["resourceType"] ?? "")
         
-        if resourceType == .script && domain.isShieldExpected(.NoScript,
-                                                              isPrivateBrowsing: isPrivateBrowsing) {
+        if resourceType == .script && domain.isShieldExpected(.NoScript) {
             self.stats = self.stats.addingScriptBlock()
             BraveGlobalShieldStats.shared.scripts += 1
             return

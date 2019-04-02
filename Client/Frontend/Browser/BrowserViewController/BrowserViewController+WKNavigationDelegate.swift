@@ -159,7 +159,7 @@ extension BrowserViewController: WKNavigationDelegate {
             if let urlHost = url.normalizedHost {
                 if let mainDocumentURL = navigationAction.request.mainDocumentURL, url.scheme == "http" {
                     let domainForShields = Domain.getOrCreate(forUrl: mainDocumentURL, persistent: !isPrivateBrowsing)
-                    if domainForShields.isShieldExpected(.HTTPSE, isPrivateBrowsing: isPrivateBrowsing) && HttpsEverywhereStats.shared.shouldUpgrade(url) {
+                    if domainForShields.isShieldExpected(.HTTPSE) && HttpsEverywhereStats.shared.shouldUpgrade(url) {
                         // Check if HTTPSE is on and if it is, whether or not this http url would be upgraded
                         pendingHTTPUpgrades[urlHost] = navigationAction.request
                     }
@@ -191,10 +191,10 @@ extension BrowserViewController: WKNavigationDelegate {
                 off.compactMap { $0.rule }.forEach(controller.remove)
               
                 if let tab = tabManager[webView] {
-                    tab.userScriptManager?.isFingerprintingProtectionEnabled = domainForShields.isShieldExpected(.FpProtection, isPrivateBrowsing: isPrivateBrowsing)
+                    tab.userScriptManager?.isFingerprintingProtectionEnabled = domainForShields.isShieldExpected(.FpProtection)
                 }
 
-                webView.configuration.preferences.javaScriptEnabled = !domainForShields.isShieldExpected(.NoScript, isPrivateBrowsing: isPrivateBrowsing)
+                webView.configuration.preferences.javaScriptEnabled = !domainForShields.isShieldExpected(.NoScript)
             }
             
             //Cookie Blocking code below
