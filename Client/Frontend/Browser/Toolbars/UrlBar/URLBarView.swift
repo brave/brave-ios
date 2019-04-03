@@ -45,8 +45,8 @@ protocol URLBarDelegate: class {
 
 class URLBarView: UIView {
     weak var delegate: URLBarDelegate?
-    weak var tabToolbarDelegate: TabToolbarDelegate?
-    var helper: TabToolbarHelper?
+    weak var tabToolbarDelegate: ToolbarDelegate?
+    var helper: ToolbarHelper?
     var isTransitioning: Bool = false {
         didSet {
             if isTransitioning {
@@ -61,7 +61,7 @@ class URLBarView: UIView {
     
     var toolbarIsShowing = false
     
-    fileprivate var locationTextField: ToolbarTextField?
+    fileprivate var locationTextField: UrlBarTextField?
     
     /// Overlay mode is the state where the lock/reader icons are hidden, the home panels are shown,
     /// and the Cancel button is visible (allowing the user to leave overlay mode). Overlay mode
@@ -78,7 +78,7 @@ class URLBarView: UIView {
     }()
     
     lazy var locationContainer: UIView = {
-        let locationContainer = TabLocationContainerView()
+        let locationContainer = LocationContainerView()
         locationContainer.translatesAutoresizingMaskIntoConstraints = false
         locationContainer.backgroundColor = .clear
         return locationContainer
@@ -188,56 +188,47 @@ class URLBarView: UIView {
         commonInit()
     }
     
-    let mainStackView = UIStackView()
-    let navigationStackView = UIStackView()
+    private let mainStackView = UIStackView().then {
+        $0.alignment = .center
+        $0.spacing = 16
+        $0.translatesAutoresizingMaskIntoConstraints = false
+    }
     
-    fileprivate func commonInit() {
+    private let navigationStackView = UIStackView().then {
+        $0.distribution = .fillEqually
+        $0.spacing = 16
+        $0.translatesAutoresizingMaskIntoConstraints = false
+    }
+    
+    private func commonInit() {
         locationContainer.addSubview(locationView)
     
         [scrollToTopButton, line, tabsButton, progressBar, cancelButton].forEach { addSubview($0) }
         addSubview(mainStackView)
         
-        helper = TabToolbarHelper(toolbar: self)
+        helper = ToolbarHelper(toolbar: self)
         setupConstraints()
         
         // Make sure we hide any views that shouldn't be showing in non-overlay mode.
         updateViewsForOverlayModeAndToolbarChanges()
     }
     
-    
-    fileprivate func setupConstraints() {
-        mainStackView.alignment = .center
-        mainStackView.spacing = 16
-        mainStackView.translatesAutoresizingMaskIntoConstraints = false
-        navigationStackView.translatesAutoresizingMaskIntoConstraints = false
+    private func setupConstraints() {
+        // Button won't take unnecessary space and won't shrink
+        [shieldsButton, menuButton, cancelButton, tabsButton, backButton, forwardButton].forEach {
+            $0.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
+            $0.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        }
         
-        shieldsButton.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
-        shieldsButton.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-        menuButton.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
-        menuButton.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-        cancelButton.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
-        cancelButton.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-        tabsButton.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
-        tabsButton.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-        backButton.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
-        backButton.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-        forwardButton.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
-        forwardButton.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-        
+        // Url bar will expand while keeping space for other items on the address bar.
         locationContainer.setContentHuggingPriority(.defaultLow, for: .horizontal)
         
-        navigationStackView.distribution = .fillEqually
-        navigationStackView.spacing = 16
         navigationStackView.addArrangedSubview(backButton)
         navigationStackView.addArrangedSubview(forwardButton)
         
-        mainStackView.addArrangedSubview(navigationStackView)
-        
-        mainStackView.addArrangedSubview(locationContainer)
-        mainStackView.addArrangedSubview(shieldsButton)
-        mainStackView.addArrangedSubview(tabsButton)
-        mainStackView.addArrangedSubview(menuButton)
-        mainStackView.addArrangedSubview(cancelButton)
+        [navigationStackView, locationContainer, shieldsButton, tabsButton, menuButton, cancelButton].forEach {
+            mainStackView.addArrangedSubview($0)
+        }
         
         mainStackView.snp.makeConstraints { make in
             make.top.bottom.equalTo(self)
@@ -266,10 +257,10 @@ class URLBarView: UIView {
         }
     }
     
-    func createLocationTextField() {
+    private func createLocationTextField() {
         guard locationTextField == nil else { return }
         
-        locationTextField = ToolbarTextField()
+        locationTextField = UrlBarTextField()
         
         guard let locationTextField = locationTextField else { return }
         
@@ -300,7 +291,7 @@ class URLBarView: UIView {
         return self.locationTextField?.becomeFirstResponder() ?? false
     }
     
-    func removeLocationTextField() {
+    private func removeLocationTextField() {
         locationTextField?.removeFromSuperview()
         locationTextField = nil
     }
@@ -401,7 +392,7 @@ class URLBarView: UIView {
         delegate?.urlBarDidLeaveOverlayMode(self)
     }
     
-    func updateViewsForOverlayModeAndToolbarChanges() {
+    private func updateViewsForOverlayModeAndToolbarChanges() {
         cancelButton.isHidden = !inOverlayMode
         progressBar.isHidden = inOverlayMode
         navigationStackView.isHidden = !toolbarIsShowing || inOverlayMode
@@ -411,9 +402,7 @@ class URLBarView: UIView {
         locationView.contentView.isHidden = inOverlayMode
     }
     
-    func animateToOverlayState(overlayMode overlay: Bool, didCancel cancel: Bool = false) {
-        layoutIfNeeded()
-        
+    private func animateToOverlayState(overlayMode overlay: Bool, didCancel cancel: Bool = false) {
         inOverlayMode = overlay
         
         if !overlay {
@@ -421,8 +410,7 @@ class URLBarView: UIView {
         }
         
         if inOverlayMode {
-            [progressBar, self.navigationStackView, self.menuButton, self.shieldsButton, self.tabsButton,
-             locationView.contentView].forEach {
+            [progressBar, navigationStackView, menuButton, shieldsButton, tabsButton, locationView.contentView].forEach {
                 $0?.isHidden = true
             }
             
@@ -432,6 +420,8 @@ class URLBarView: UIView {
                 self.updateViewsForOverlayModeAndToolbarChanges()
             }
         }
+        
+        layoutIfNeeded()
     }
     
     func didClickAddTab() {
@@ -455,7 +445,9 @@ class URLBarView: UIView {
     }
 }
 
-extension URLBarView: TabToolbarProtocol {
+// MARK: - ToolbarProtocol
+
+extension URLBarView: ToolbarProtocol {
     
     func updateBackStatus(_ canGoBack: Bool) {
         backButton.isEnabled = canGoBack
@@ -492,6 +484,8 @@ extension URLBarView: TabToolbarProtocol {
         }
     }
 }
+
+// MARK: - TabLocationViewDelegate
 
 extension URLBarView: TabLocationViewDelegate {
     func tabLocationViewDidLongPressReaderMode(_ tabLocationView: TabLocationView) -> Bool {
@@ -538,6 +532,8 @@ extension URLBarView: TabLocationViewDelegate {
     }
 }
 
+// MARK: - AutocompleteTextFieldDelegate
+
 extension URLBarView: AutocompleteTextFieldDelegate {
     func autocompleteTextFieldShouldReturn(_ autocompleteTextField: AutocompleteTextField) -> Bool {
         guard let text = locationTextField?.text else { return true }
@@ -567,6 +563,8 @@ extension URLBarView: AutocompleteTextFieldDelegate {
     }
 }
 
+// MARK: - Themeable
+
 extension URLBarView: Themeable {
     
     func applyTheme(_ theme: Theme) {
@@ -588,101 +586,3 @@ extension URLBarView: Themeable {
     }
 }
 
-// We need a subclass so we can setup the shadows correctly
-// This subclass creates a strong shadow on the URLBar
-class TabLocationContainerView: UIView {
-    
-    private struct LocationContainerUX {
-        static let CornerRadius: CGFloat = 8.0
-    }
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        let layer = self.layer
-        layer.cornerRadius = LocationContainerUX.CornerRadius
-        layer.masksToBounds = true
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-}
-
-class ToolbarTextField: AutocompleteTextField {
-    
-    @objc dynamic var clearButtonTintColor: UIColor? {
-        didSet {
-            // Clear previous tinted image that's cache and ask for a relayout
-            tintedClearImage = nil
-            setNeedsLayout()
-        }
-    }
-    
-    fileprivate var tintedClearImage: UIImage?
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        
-        // Since we're unable to change the tint color of the clear image, we need to iterate through the
-        // subviews, find the clear button, and tint it ourselves. Thanks to Mikael Hellman for the tip:
-        // http://stackoverflow.com/questions/27944781/how-to-change-the-tint-color-of-the-clear-button-on-a-uitextfield
-        for view in subviews as [UIView] {
-            if let button = view as? UIButton {
-                if let image = button.image(for: []) {
-                    if tintedClearImage == nil {
-                        tintedClearImage = tintImage(image, color: clearButtonTintColor)
-                    }
-                    
-                    if button.imageView?.image != tintedClearImage {
-                        button.setImage(tintedClearImage, for: [])
-                    }
-                }
-            }
-        }
-    }
-    
-    fileprivate func tintImage(_ image: UIImage, color: UIColor?) -> UIImage {
-        guard let color = color else { return image }
-        
-        let size = image.size
-        
-        UIGraphicsBeginImageContextWithOptions(size, false, 2)
-        let context = UIGraphicsGetCurrentContext()!
-        image.draw(at: .zero, blendMode: .normal, alpha: 1.0)
-        
-        context.setFillColor(color.cgColor)
-        context.setBlendMode(.sourceIn)
-        context.setAlpha(1.0)
-        
-        let rect = CGRect(size: image.size)
-        context.fill(rect)
-        let tintedImage = UIGraphicsGetImageFromCurrentImageContext()!
-        UIGraphicsEndImageContext()
-        
-        return tintedImage
-    }
-}
-
-extension ToolbarTextField: Themeable {
-    
-    func applyTheme(_ theme: Theme) {
-        switch theme {
-        case .regular:
-            backgroundColor = BraveUX.LocationBarBackgroundColor
-        case .private:
-            backgroundColor = BraveUX.LocationBarBackgroundColor_PrivateMode
-        }
-
-        textColor = UIColor.TextField.TextAndTint.colorFor(theme)
-        clearButtonTintColor = textColor
-        highlightColor = UIColor.TextField.Highlight.colorFor(theme)
-    }
-}

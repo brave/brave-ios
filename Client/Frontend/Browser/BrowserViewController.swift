@@ -49,7 +49,7 @@ class BrowserViewController: UIViewController {
     var readerModeBar: ReaderModeBarView?
     var readerModeCache: ReaderModeCache
     var statusBarOverlay: UIView!
-    fileprivate(set) var toolbar: TabToolbar?
+    fileprivate(set) var toolbar: BottomToolbarView?
     var searchController: SearchViewController?
     fileprivate var screenshotHelper: ScreenshotHelper!
     fileprivate var homePanelIsInline = false
@@ -109,7 +109,7 @@ class BrowserViewController: UIViewController {
     // TODO: weak references?
     var ignoredNavigation = Set<WKNavigation>()
     var typedNavigation = [WKNavigation: VisitType]()
-    var navigationToolbar: TabToolbarProtocol {
+    var navigationToolbar: ToolbarProtocol {
         return toolbar ?? urlBar
     }
     
@@ -221,7 +221,7 @@ class BrowserViewController: UIViewController {
         toolbar = nil
 
         if showToolbar {
-            toolbar = TabToolbar()
+            toolbar = BottomToolbarView()
             footer.addSubview(toolbar!)
             toolbar?.tabToolbarDelegate = self
 
@@ -1657,18 +1657,18 @@ extension BrowserViewController: URLBarDelegate {
     }
 }
 
-extension BrowserViewController: TabToolbarDelegate {
-    func tabToolbarDidPressBack(_ tabToolbar: TabToolbarProtocol, button: UIButton) {
+extension BrowserViewController: ToolbarDelegate {
+    func tabToolbarDidPressBack(_ tabToolbar: ToolbarProtocol, button: UIButton) {
         tabManager.selectedTab?.goBack()
     }
 
-    func tabToolbarDidLongPressBack(_ tabToolbar: TabToolbarProtocol, button: UIButton) {
+    func tabToolbarDidLongPressBack(_ tabToolbar: ToolbarProtocol, button: UIButton) {
         let generator = UIImpactFeedbackGenerator(style: .heavy)
         generator.impactOccurred()
         showBackForwardList()
     }
     
-    func tabToolbarDidPressForward(_ tabToolbar: TabToolbarProtocol, button: UIButton) {
+    func tabToolbarDidPressForward(_ tabToolbar: ToolbarProtocol, button: UIButton) {
         tabManager.selectedTab?.goForward()
     }
     
@@ -1700,17 +1700,17 @@ extension BrowserViewController: TabToolbarDelegate {
         }
     }
     
-    func tabToolbarDidPressMenu(_ tabToolbar: TabToolbarProtocol, button: UIButton) {
+    func tabToolbarDidPressMenu(_ tabToolbar: ToolbarProtocol, button: UIButton) {
         let homePanel = MenuViewController(bvc: self)
         let popover = PopoverController(contentController: homePanel, contentSizeBehavior: .preferredContentSize)
         popover.present(from: tabToolbar.menuButton, on: self)
     }
     
-    func tabToolbarDidPressAddTab(_ tabToolbar: TabToolbarProtocol, button: UIButton) {
+    func tabToolbarDidPressAddTab(_ tabToolbar: ToolbarProtocol, button: UIButton) {
         self.openBlankNewTab(focusLocationField: true, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
     }
 
-    func tabToolbarDidLongPressAddTab(_ tabToolbar: TabToolbarProtocol, button: UIButton) {
+    func tabToolbarDidLongPressAddTab(_ tabToolbar: ToolbarProtocol, button: UIButton) {
         showAddTabContextMenu(sourceView: toolbar ?? urlBar, button: button)
     }
     
@@ -1741,17 +1741,17 @@ extension BrowserViewController: TabToolbarDelegate {
         present(alertController, animated: true)
     }
     
-    func tabToolbarDidLongPressForward(_ tabToolbar: TabToolbarProtocol, button: UIButton) {
+    func tabToolbarDidLongPressForward(_ tabToolbar: ToolbarProtocol, button: UIButton) {
         let generator = UIImpactFeedbackGenerator(style: .heavy)
         generator.impactOccurred()
         showBackForwardList()
     }
 
-    func tabToolbarDidPressTabs(_ tabToolbar: TabToolbarProtocol, button: UIButton) {
+    func tabToolbarDidPressTabs(_ tabToolbar: ToolbarProtocol, button: UIButton) {
         showTabTray()
     }
     
-    func tabToolbarDidLongPressTabs(_ tabToolbar: TabToolbarProtocol, button: UIButton) {
+    func tabToolbarDidLongPressTabs(_ tabToolbar: ToolbarProtocol, button: UIButton) {
         guard self.presentedViewController == nil else {
             return
         }
@@ -1791,7 +1791,7 @@ extension BrowserViewController: TabToolbarDelegate {
         }
     }
     
-    func tabToolbarDidSwipeToChangeTabs(_ tabToolbar: TabToolbarProtocol, direction: UISwipeGestureRecognizer.Direction) {
+    func tabToolbarDidSwipeToChangeTabs(_ tabToolbar: ToolbarProtocol, direction: UISwipeGestureRecognizer.Direction) {
         let tabs = tabManager.tabsForCurrentMode
         guard let selectedTab = tabManager.selectedTab, let index = tabs.firstIndex(where: { $0 === selectedTab }) else { return }
         let newTabIndex = index + (direction == .left ? -1 : 1)
