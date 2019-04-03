@@ -1442,13 +1442,6 @@ extension BrowserViewController: URLBarDelegate {
         tabManager.selectedTab?.reload()
     }
     
-    func urlBarDidPressQRButton(_ urlBar: URLBarView) {
-        let qrCodeViewController = QRCodeViewController()
-        qrCodeViewController.qrCodeDelegate = self
-        let controller = QRCodeNavigationController(rootViewController: qrCodeViewController)
-        self.present(controller, animated: true, completion: nil)
-    }
-    
     func urlBarDidPressStop(_ urlBar: URLBarView) {
         tabManager.selectedTab?.stop()
     }
