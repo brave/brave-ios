@@ -16,7 +16,7 @@ private struct HistoryViewControllerUX {
 }
 
 class HistoryViewController: SiteTableViewController {
-  weak var linkNavigationDelegate: LinkNavigationDelegate?
+  weak var toolbarUrlActionsDelegate: ToolbarUrlActionsDelegate?
   fileprivate lazy var emptyStateOverlayView: UIView = self.createEmptyStateOverview()
   var frc: NSFetchedResultsController<History>?
   
@@ -129,7 +129,7 @@ class HistoryViewController: SiteTableViewController {
     let site = frc?.object(at: indexPath)
     
     if let u = site?.url, let url = URL(string: u) {
-      linkNavigationDelegate?.linkNavigatorDidSelectURL(url: url, visitType: .typed)
+      toolbarUrlActionsDelegate?.select(url: url, visitType: .typed)
     }
     tableView.deselectRow(at: indexPath, animated: true)
   }
@@ -246,24 +246,24 @@ extension HistoryViewController {
     // New Tab
     items.append(UIAlertAction(title: Strings.OpenNewTabButtonTitle, style: .default, handler: { [weak self] _ in
       guard let `self` = self else { return }
-      self.linkNavigationDelegate?.linkNavigatorDidRequestToOpenInNewTab(url, isPrivate: currentTabIsPrivate)
+      self.toolbarUrlActionsDelegate?.openInNewTab(url, isPrivate: currentTabIsPrivate)
     }))
     if !currentTabIsPrivate {
       // New Private Tab
       items.append(UIAlertAction(title: Strings.OpenNewPrivateTabButtonTitle, style: .default, handler: { [weak self] _ in
         guard let `self` = self else { return }
-        self.linkNavigationDelegate?.linkNavigatorDidRequestToOpenInNewTab(url, isPrivate: true)
+        self.toolbarUrlActionsDelegate?.openInNewTab(url, isPrivate: true)
       }))
     }
     // Copy
     items.append(UIAlertAction(title: Strings.CopyLinkActionTitle, style: .default, handler: { [weak self] _ in
       guard let `self` = self else { return }
-      self.linkNavigationDelegate?.linkNavigatorDidRequestToCopyURL(url)
+      self.toolbarUrlActionsDelegate?.copy(url)
     }))
     // Share
     items.append(UIAlertAction(title: Strings.ShareLinkActionTitle, style: .default, handler: { [weak self] _ in
       guard let `self` = self else { return }
-      self.linkNavigationDelegate?.linkNavigatorDidRequestToShareURL(url)
+      self.toolbarUrlActionsDelegate?.share(url)
     }))
     
     return items

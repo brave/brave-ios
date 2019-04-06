@@ -1647,11 +1647,7 @@ extension BrowserViewController: URLBarDelegate {
     }
     
     func urlBarDidTapMenuButton(_ urlBar: URLBarView) {
-        guard let selectedTab = tabManager.selectedTab else { return }
-        
-        let homePanel = HomeMenuController(profile: profile, tabState: selectedTab.tabState)
-        homePanel.preferredContentSize = CGSize(width: PopoverController.preferredPopoverWidth, height: 600.0)
-        homePanel.delegate = self
+        let homePanel = MenuViewController(bvc: self)
         let popover = PopoverController(contentController: homePanel, contentSizeBehavior: .preferredContentSize)
         popover.present(from: urlBar.menuButton, on: self)
     }
@@ -2837,7 +2833,7 @@ extension BrowserViewController: JSPromptAlertControllerDelegate {
 
 extension BrowserViewController: HomeMenuControllerDelegate {
     
-    func menuDidOpenSettings(_ menu: HomeMenuController) {
+    func menuDidOpenSettings(_ menu: UIViewController) {
         menu.dismiss(animated: true) { [weak self] in
             guard let `self` = self else { return }
             let settingsController = SettingsViewController(profile: self.profile, tabManager: self.tabManager)
@@ -2848,14 +2844,14 @@ extension BrowserViewController: HomeMenuControllerDelegate {
         }
     }
     
-    func menuDidSelectURL(_ menu: HomeMenuController, url: URL, visitType: VisitType, action: MenuURLAction) {
+    func menuDidSelectURL(_ menu: UIViewController, url: URL, visitType: VisitType, action: MenuURLAction) {
         switch action {
         case .openInCurrentTab:
-            menu.dismiss(animated: true)
+            //menu.dismiss(animated: true)
             finishEditingAndSubmit(url, visitType: visitType)
             
         case .openInNewTab(let isPrivate):
-            menu.dismiss(animated: true)
+            //menu.dismiss(animated: true)
             
             let tab = self.tabManager.addTab(PrivilegedRequest(url: url) as URLRequest, afterTab: self.tabManager.selectedTab, isPrivate: isPrivate)
             if isPrivate && !PrivateBrowsingManager.shared.isPrivateBrowsing {
@@ -2889,9 +2885,32 @@ extension BrowserViewController: HomeMenuControllerDelegate {
         }
     }
     
-    func menuDidBatchOpenURLs(_ menu: HomeMenuController, urls: [URL]) {
+    func menuDidBatchOpenURLs(_ menu: UIViewController, urls: [URL]) {
         let tabIsPrivate = TabType.of(tabManager.selectedTab).isPrivate
         self.tabManager.addTabsForURLs(urls, zombie: false, isPrivate: tabIsPrivate)
+    }
+}
+
+extension BrowserViewController: ToolbarUrlActionsDelegate {
+    
+    func openInNewTab(_ url: URL, isPrivate: Bool) {
+        menuDidSelectURL(self, url: url, visitType: .unknown, action: .openInNewTab(isPrivate: isPrivate))
+    }
+    
+    func copy(_ url: URL) {
+        menuDidSelectURL(self, url: url, visitType: .unknown, action: .copy)
+    }
+    
+    func share(_ url: URL) {
+        menuDidSelectURL(self, url: url, visitType: .unknown, action: .share)
+    }
+    
+    func batchOpen(_ urls: [URL]) {
+        menuDidBatchOpenURLs(self, urls: urls)
+    }
+    
+    func select(url: URL, visitType: VisitType) {
+        menuDidSelectURL(self, url: url, visitType: visitType, action: .openInCurrentTab)
     }
 }
 

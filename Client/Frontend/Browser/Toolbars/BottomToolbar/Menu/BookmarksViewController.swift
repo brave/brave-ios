@@ -105,7 +105,7 @@ class BookmarksViewController: SiteTableViewController {
   /// Called when the bookmarks are updated via some user input (i.e. Delete, edit, etc.)
   var bookmarksDidChange: (() -> Void)?
   
-  weak var linkNavigationDelegate: LinkNavigationDelegate?
+  weak var toolbarUrlActionsDelegate: ToolbarUrlActionsDelegate?
   
   var bookmarksFRC: NSFetchedResultsController<Bookmark>?
   
@@ -413,7 +413,7 @@ class BookmarksViewController: SiteTableViewController {
         self.showEditBookmarkController(tableView, indexPath: indexPath)
       } else {
         if let url = URL(string: bookmark.url ?? "") {
-          linkNavigationDelegate?.linkNavigatorDidSelectURL(url: url, visitType: .bookmark)
+          toolbarUrlActionsDelegate?.select(url: url, visitType: .bookmark)
         }
       }
     } else {
@@ -424,7 +424,7 @@ class BookmarksViewController: SiteTableViewController {
         let nextController = BookmarksViewController(folder: bookmark, isPrivateBrowsing: isPrivateBrowsing)
         nextController.profile = profile
         nextController.bookmarksDidChange = bookmarksDidChange
-        nextController.linkNavigationDelegate = linkNavigationDelegate
+        nextController.toolbarUrlActionsDelegate = toolbarUrlActionsDelegate
         
         self.navigationController?.pushViewController(nextController, animated: true)
       }
@@ -653,7 +653,7 @@ extension BookmarksViewController {
         title: String(format: Strings.Open_All_Bookmarks, children.count),
         style: .default,
         handler: { [weak self] _ in
-          self?.linkNavigationDelegate?.linkNavigatorDidRequestToBatchOpenURLs(urls)
+          self?.toolbarUrlActionsDelegate?.batchOpen(urls)
         }
       )
     ]
@@ -666,24 +666,24 @@ extension BookmarksViewController {
     // New Tab
     items.append(UIAlertAction(title: Strings.OpenNewTabButtonTitle, style: .default, handler: { [weak self] _ in
       guard let `self` = self else { return }
-      self.linkNavigationDelegate?.linkNavigatorDidRequestToOpenInNewTab(url, isPrivate: currentTabIsPrivate)
+      self.toolbarUrlActionsDelegate?.openInNewTab(url, isPrivate: currentTabIsPrivate)
     }))
     if !currentTabIsPrivate {
       // New Private Tab
       items.append(UIAlertAction(title: Strings.OpenNewPrivateTabButtonTitle, style: .default, handler: { [weak self] _ in
         guard let `self` = self else { return }
-        self.linkNavigationDelegate?.linkNavigatorDidRequestToOpenInNewTab(url, isPrivate: true)
+        self.toolbarUrlActionsDelegate?.openInNewTab(url, isPrivate: true)
       }))
     }
     // Copy
     items.append(UIAlertAction(title: Strings.CopyLinkActionTitle, style: .default, handler: { [weak self] _ in
       guard let `self` = self else { return }
-      self.linkNavigationDelegate?.linkNavigatorDidRequestToCopyURL(url)
+      self.toolbarUrlActionsDelegate?.copy(url)
     }))
     // Share
     items.append(UIAlertAction(title: Strings.ShareLinkActionTitle, style: .default, handler: { [weak self] _ in
       guard let `self` = self else { return }
-      self.linkNavigationDelegate?.linkNavigatorDidRequestToShareURL(url)
+      self.toolbarUrlActionsDelegate?.share(url)
     }))
     
     return items

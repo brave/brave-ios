@@ -3,6 +3,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import UIKit
+import Storage
 
 class MenuViewController: UITableViewController {
     
@@ -70,6 +71,7 @@ class MenuViewController: UITableViewController {
     
     func openBookmarks() {
         let vc = BookmarksViewController(folder: nil, isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing)
+        vc.toolbarUrlActionsDelegate = bvc
         
         let nc = SettingsNavigationController(rootViewController: vc)
         nc.modalPresentationStyle = .formSheet
@@ -83,6 +85,7 @@ class MenuViewController: UITableViewController {
     
     func openHistory() {
         let vc = HistoryViewController(isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing)
+        vc.toolbarUrlActionsDelegate = bvc
         
         let nc = SettingsNavigationController(rootViewController: vc)
         nc.modalPresentationStyle = .formSheet
@@ -136,3 +139,5 @@ extension MenuViewController: PopoverContentComponent {
     var isPanToDismissEnabled: Bool { return false }
 
 }
+
+

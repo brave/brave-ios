@@ -23,20 +23,11 @@ enum MenuURLAction {
 }
 
 protocol HomeMenuControllerDelegate: class {
-  func menuDidOpenSettings(_ menu: HomeMenuController)
+  func menuDidOpenSettings(_ menu: UIViewController)
   /// The user selected a url in one of the menu panels (i.e. bookmarks or history)
-  func menuDidSelectURL(_ menu: HomeMenuController, url: URL, visitType: VisitType, action: MenuURLAction)
+  func menuDidSelectURL(_ menu: UIViewController, url: URL, visitType: VisitType, action: MenuURLAction)
   /// The user tapped "Open All" on a folder
-  func menuDidBatchOpenURLs(_ menu: HomeMenuController, urls: [URL])
-}
-
-protocol LinkNavigationDelegate: class {
-    func linkNavigatorDidRequestToOpenInNewTab(_ url: URL, isPrivate: Bool)
-    func linkNavigatorDidRequestToCopyURL(_ url: URL)
-    func linkNavigatorDidRequestToShareURL(_ url: URL)
-    func linkNavigatorDidRequestToBatchOpenURLs(_ urls: [URL])
-    func linkNavigatorDidSelectURL(url: URL, visitType: VisitType)
-    func linkNavigatorDidSelectURLString(url: String, visitType: VisitType)
+  func menuDidBatchOpenURLs(_ menu: UIViewController, urls: [URL])
 }
 
 class HomeMenuController: UIViewController, PopoverContentComponent {
@@ -91,12 +82,9 @@ class HomeMenuController: UIViewController, PopoverContentComponent {
     bookmarksController.profile = profile
     historyController.profile = profile
     
-    bookmarksController.linkNavigationDelegate = self
     bookmarksController.bookmarksDidChange = { [weak self] in
       self?.updateBookmarkStatus()
     }
-    
-    historyController.linkNavigationDelegate = self
   }
   
   @available(*, unavailable)
@@ -264,45 +252,5 @@ class HomeMenuController: UIViewController, PopoverContentComponent {
     
     addBookmarkButton.isEnabled = true
     addBookmarkButton.isSelected = Bookmark.contains(url: url)
-  }
-}
-
-extension HomeMenuController: LinkNavigationDelegate {
-    
-  func linkNavigatorDidRequestToOpenInNewTab(_ url: URL, isPrivate: Bool) {
-    delegate?.menuDidSelectURL(self, url: url, visitType: .unknown, action: .openInNewTab(isPrivate: isPrivate))
-  }
-  
-  func linkNavigatorDidRequestToCopyURL(_ url: URL) {
-    delegate?.menuDidSelectURL(self, url: url, visitType: .unknown, action: .copy)
-  }
-  
-  func linkNavigatorDidRequestToShareURL(_ url: URL) {
-    delegate?.menuDidSelectURL(self, url: url, visitType: .unknown, action: .share)
-  }
-  
-  func linkNavigatorDidRequestToBatchOpenURLs(_ urls: [URL]) {
-    delegate?.menuDidBatchOpenURLs(self, urls: urls)
-  }
-  
-  func linkNavigatorDidSelectURL(url: URL, visitType: VisitType) {
-    delegate?.menuDidSelectURL(self, url: url, visitType: visitType, action: .openInCurrentTab)
-  }
-  
-  func linkNavigatorDidSelectURLString(url: String, visitType: VisitType) {
-    guard let profile = profile else { return }
-    
-    // If we can't get a real URL out of what should be a URL, we let the user's
-    // default search engine give it a shot.
-    // Typically we'll be in this state if the user has tapped a bookmarked search template
-    // (e.g., "http://foo.com/bar/?query=%s"), and this will get them the same behavior as if
-    // they'd copied and pasted into the URL bar.
-    // See BrowserViewController.urlBar:didSubmitText:.
-    guard let url = URIFixup.getURL(url) ?? profile.searchEngines.defaultEngine().searchURLForQuery(url) else {
-      Logger.browserLogger.warning("Invalid URL, and couldn't generate a search URL for it.")
-      return
-    }
-    
-    return self.linkNavigatorDidSelectURL(url: url, visitType: visitType)
   }
 }
