@@ -15,7 +15,7 @@ class ToolbarButton: UIButton {
         selectedTintColor = tintColor
         unselectedTintColor = tintColor
         disabledTintColor = UIColor.Photon.Grey50
-        imageView?.contentMode = .scaleAspectFit
+        imageView?.contentMode = .scaleAspectFit //exc bad access
     }
     
     required init?(coder aDecoder: NSCoder) {

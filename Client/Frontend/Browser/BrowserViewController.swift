@@ -221,7 +221,7 @@ class BrowserViewController: UIViewController {
         toolbar = nil
 
         if showToolbar {
-            toolbar = BottomToolbarView()
+            toolbar = BottomToolbarView() //exc bad access
             footer.addSubview(toolbar!)
             toolbar?.tabToolbarDelegate = self
 
@@ -2874,14 +2874,12 @@ extension BrowserViewController: HomeMenuControllerDelegate {
         case .copy:
             UIPasteboard.general.url = url
         case .share:
-            menu.dismiss(animated: true) {
-                self.presentActivityViewController(
-                    url,
-                    sourceView: self.view,
-                    sourceRect: self.view.convert(self.urlBar.shareButton.frame, from: self.urlBar.shareButton.superview),
-                    arrowDirection: [.up]
-                )
-            }
+            presentActivityViewController(
+                url,
+                sourceView: self.view,
+                sourceRect: self.view.convert(self.urlBar.shareButton.frame, from: self.urlBar.shareButton.superview),
+                arrowDirection: [.up]
+            )
         }
     }
     

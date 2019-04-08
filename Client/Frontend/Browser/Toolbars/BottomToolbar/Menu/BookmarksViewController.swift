@@ -101,7 +101,7 @@ class BookmarkEditingViewController: FormViewController {
   }
 }
 
-class BookmarksViewController: SiteTableViewController {
+class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtocol {
   /// Called when the bookmarks are updated via some user input (i.e. Delete, edit, etc.)
   var bookmarksDidChange: (() -> Void)?
   
@@ -379,6 +379,37 @@ class BookmarksViewController: SiteTableViewController {
       }
     }
   }
+    
+    @objc private func longPressedCell(_ gesture: UILongPressGestureRecognizer) {
+        guard gesture.state == .began,
+            let cell = gesture.view as? UITableViewCell,
+            let indexPath = tableView.indexPath(for: cell),
+            let bookmark = bookmarksFRC?.object(at: indexPath) else {
+                return
+        }
+        
+        presentLongPressActions(gesture, urlString: bookmark.url, isPrivateBrowsing: isPrivateBrowsing,
+                                customActions: bookmark.isFolder ? folderLongPressActions(bookmark) : nil)
+    }
+    
+    private func folderLongPressActions(_ folder: Bookmark) -> [UIAlertAction] {
+        let children = Bookmark.getChildren(forFolder: folder, includeFolders: false) ?? []
+        
+        let urls: [URL] = children.compactMap { b in
+            guard let url = b.url else { return nil }
+            return URL(string: url)
+        }
+        
+        return [
+            UIAlertAction(
+                title: String(format: Strings.Open_All_Bookmarks, children.count),
+                style: .default,
+                handler: { [weak self] _ in
+                    self?.toolbarUrlActionsDelegate?.batchOpen(urls)
+                }
+            )
+        ]
+    }
   
   override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
     return nil
@@ -606,86 +637,3 @@ extension BookmarksViewController: NSFetchedResultsControllerDelegate {
   }
 }
 
-private let ActionSheetTitleMaxLength = 120
-
-extension BookmarksViewController {
-  
-  @objc private func longPressedCell(_ gesture: UILongPressGestureRecognizer) {
-    guard gesture.state == .began,
-      let cell = gesture.view as? UITableViewCell,
-      let indexPath = tableView.indexPath(for: cell),
-      let bookmark = bookmarksFRC?.object(at: indexPath) else {
-      return
-    }
-    
-    let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-    
-    if bookmark.isFolder {
-      actionsForFolder(bookmark).forEach { alert.addAction($0) }
-    } else {
-      alert.title = bookmark.url?.replacingOccurrences(of: "mailto:", with: "").ellipsize(maxLength: ActionSheetTitleMaxLength)
-      actionsForBookmark(bookmark, currentTabIsPrivate: isPrivateBrowsing).forEach { alert.addAction($0) }
-    }
-    
-    let cancelAction = UIAlertAction(title: Strings.CancelButtonTitle, style: .cancel, handler: nil)
-    alert.addAction(cancelAction)
-    
-    // If we're showing an arrow popup, set the anchor to the long press location.
-    if let popoverPresentationController = alert.popoverPresentationController {
-      popoverPresentationController.sourceView = view
-      popoverPresentationController.sourceRect = CGRect(origin: gesture.location(in: view), size: CGSize(width: 0, height: 16))
-      popoverPresentationController.permittedArrowDirections = .any
-    }
-    
-    present(alert, animated: true)
-  }
-  
-  private func actionsForFolder(_ folder: Bookmark) -> [UIAlertAction] {
-    let children = Bookmark.getChildren(forFolder: folder, includeFolders: false) ?? []
-    
-    let urls: [URL] = children.compactMap { b in
-      guard let url = b.url else { return nil }
-      return URL(string: url)
-    }
-    
-    return [
-      UIAlertAction(
-        title: String(format: Strings.Open_All_Bookmarks, children.count),
-        style: .default,
-        handler: { [weak self] _ in
-          self?.toolbarUrlActionsDelegate?.batchOpen(urls)
-        }
-      )
-    ]
-  }
-  
-  private func actionsForBookmark(_ bookmark: Bookmark, currentTabIsPrivate: Bool) -> [UIAlertAction] {
-    guard let urlString = bookmark.url, let url = URL(string: urlString) else { return [] }
-    
-    var items: [UIAlertAction] = []
-    // New Tab
-    items.append(UIAlertAction(title: Strings.OpenNewTabButtonTitle, style: .default, handler: { [weak self] _ in
-      guard let `self` = self else { return }
-      self.toolbarUrlActionsDelegate?.openInNewTab(url, isPrivate: currentTabIsPrivate)
-    }))
-    if !currentTabIsPrivate {
-      // New Private Tab
-      items.append(UIAlertAction(title: Strings.OpenNewPrivateTabButtonTitle, style: .default, handler: { [weak self] _ in
-        guard let `self` = self else { return }
-        self.toolbarUrlActionsDelegate?.openInNewTab(url, isPrivate: true)
-      }))
-    }
-    // Copy
-    items.append(UIAlertAction(title: Strings.CopyLinkActionTitle, style: .default, handler: { [weak self] _ in
-      guard let `self` = self else { return }
-      self.toolbarUrlActionsDelegate?.copy(url)
-    }))
-    // Share
-    items.append(UIAlertAction(title: Strings.ShareLinkActionTitle, style: .default, handler: { [weak self] _ in
-      guard let `self` = self else { return }
-      self.toolbarUrlActionsDelegate?.share(url)
-    }))
-    
-    return items
-  }
-}
