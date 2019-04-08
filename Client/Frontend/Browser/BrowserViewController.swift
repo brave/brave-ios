@@ -2186,14 +2186,14 @@ extension BrowserViewController: WKUIDelegate {
     }
 
     func webView(_ webView: WKWebView, runJavaScriptConfirmPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping (Bool) -> Void) {
-        var confirmAlert = ConfirmPanelAlert(message: message, frame: frame, completionHandler: completionHandler)
+        var confirmAlert = ConfirmPanelAlert(message: message, frame: frame, completionHandler: completionHandler, suppressHandler: nil)
         handleAlert(webView: webView, alert: &confirmAlert) { (val) in
             completionHandler(val as? Bool ?? false)
         }
     }
 
     func webView(_ webView: WKWebView, runJavaScriptTextInputPanelWithPrompt prompt: String, defaultText: String?, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping (String?) -> Void) {
-        var textInputAlert = TextInputAlert(message: prompt, frame: frame, completionHandler: completionHandler, defaultText: defaultText)
+        var textInputAlert = TextInputAlert(message: prompt, frame: frame, completionHandler: completionHandler, defaultText: defaultText, suppressHandler: nil)
         handleAlert(webView: webView, alert: &textInputAlert) { (val) in
             completionHandler(val as? String)
         }
@@ -2206,7 +2206,7 @@ extension BrowserViewController: WKUIDelegate {
             return
         }
         promptingTab.alertShownCount += 1
-        alert.suppressHandler = promptingTab.alertShownCount > 1 ? ({[unowned self] suppress in
+        var suppressBlock: JSAlertInfo.SuppressHandler = ({[unowned self] suppress in
             if suppress {
                 func suppressDialogues() {
                     promptingTab.blockAllAlerts = true
@@ -2225,7 +2225,8 @@ extension BrowserViewController: WKUIDelegate {
             } else {
                 completionHandler(nil)
             }
-        }) : nil
+        })
+        alert.suppressHandler = promptingTab.alertShownCount > 1 ? suppressBlock : nil
         if shouldDisplayJSAlertForWebView(webView) {
             let controller = alert.alertController()
             controller.delegate = self
