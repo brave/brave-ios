@@ -2831,35 +2831,48 @@ extension BrowserViewController: JSPromptAlertControllerDelegate {
     }
 }
 
-extension BrowserViewController: HomeMenuControllerDelegate {
-    
-    func menuDidOpenSettings(_ menu: UIViewController) {
-        menu.dismiss(animated: true) { [weak self] in
-            guard let `self` = self else { return }
-            let settingsController = SettingsViewController(profile: self.profile, tabManager: self.tabManager)
-            settingsController.settingsDelegate = self
-            let container = SettingsNavigationController(rootViewController: settingsController)
-            container.modalPresentationStyle = .formSheet
-            self.present(container, animated: true)
-        }
+extension BrowserViewController: ToolbarUrlActionsDelegate {
+    /// The types of actions a user can do in the menu given a URL
+    private enum ToolbarURLAction {
+        case openInCurrentTab
+        case openInNewTab(isPrivate: Bool)
+        case copy
+        case share
     }
     
-    func menuDidSelectURL(_ menu: UIViewController, url: URL, visitType: VisitType, action: MenuURLAction) {
+    func openInNewTab(_ url: URL, isPrivate: Bool) {
+        select(url, visitType: .unknown, action: .openInNewTab(isPrivate: isPrivate))
+    }
+    
+    func copy(_ url: URL) {
+        select(url, visitType: .unknown, action: .copy)
+    }
+    
+    func share(_ url: URL) {
+        select(url, visitType: .unknown, action: .share)
+    }
+    
+    func batchOpen(_ urls: [URL]) {
+        let tabIsPrivate = TabType.of(tabManager.selectedTab).isPrivate
+        self.tabManager.addTabsForURLs(urls, zombie: false, isPrivate: tabIsPrivate)
+    }
+    
+    func select(url: URL, visitType: VisitType) {
+        select(url, visitType: visitType, action: .openInCurrentTab)
+    }
+    
+    private func select(_ url: URL, visitType: VisitType, action: ToolbarURLAction) {
         switch action {
         case .openInCurrentTab:
-            //menu.dismiss(animated: true)
             finishEditingAndSubmit(url, visitType: visitType)
-            
         case .openInNewTab(let isPrivate):
-            //menu.dismiss(animated: true)
-            
-            let tab = self.tabManager.addTab(PrivilegedRequest(url: url) as URLRequest, afterTab: self.tabManager.selectedTab, isPrivate: isPrivate)
+            let tab = tabManager.addTab(PrivilegedRequest(url: url) as URLRequest, afterTab: tabManager.selectedTab, isPrivate: isPrivate)
             if isPrivate && !PrivateBrowsingManager.shared.isPrivateBrowsing {
-                self.tabManager.selectTab(tab)
+                tabManager.selectTab(tab)
             } else {
                 // If we are showing toptabs a user can just use the top tab bar
                 // If in overlay mode switching doesnt correctly dismiss the homepanels
-                guard !self.urlBar.inOverlayMode else {
+                guard !urlBar.inOverlayMode else {
                     return
                 }
                 // We're not showing the top tabs; show a toast to quick switch to the fresh new tab.
@@ -2868,47 +2881,18 @@ extension BrowserViewController: HomeMenuControllerDelegate {
                         self.tabManager.selectTab(tab)
                     }
                 })
-                self.show(toast: toast)
+                show(toast: toast)
             }
-            
         case .copy:
             UIPasteboard.general.url = url
         case .share:
             presentActivityViewController(
                 url,
-                sourceView: self.view,
-                sourceRect: self.view.convert(self.urlBar.shareButton.frame, from: self.urlBar.shareButton.superview),
+                sourceView: view,
+                sourceRect: view.convert(urlBar.shareButton.frame, from: urlBar.shareButton.superview),
                 arrowDirection: [.up]
             )
         }
-    }
-    
-    func menuDidBatchOpenURLs(_ menu: UIViewController, urls: [URL]) {
-        let tabIsPrivate = TabType.of(tabManager.selectedTab).isPrivate
-        self.tabManager.addTabsForURLs(urls, zombie: false, isPrivate: tabIsPrivate)
-    }
-}
-
-extension BrowserViewController: ToolbarUrlActionsDelegate {
-    
-    func openInNewTab(_ url: URL, isPrivate: Bool) {
-        menuDidSelectURL(self, url: url, visitType: .unknown, action: .openInNewTab(isPrivate: isPrivate))
-    }
-    
-    func copy(_ url: URL) {
-        menuDidSelectURL(self, url: url, visitType: .unknown, action: .copy)
-    }
-    
-    func share(_ url: URL) {
-        menuDidSelectURL(self, url: url, visitType: .unknown, action: .share)
-    }
-    
-    func batchOpen(_ urls: [URL]) {
-        menuDidBatchOpenURLs(self, urls: urls)
-    }
-    
-    func select(url: URL, visitType: VisitType) {
-        menuDidSelectURL(self, url: url, visitType: visitType, action: .openInCurrentTab)
     }
 }
 
