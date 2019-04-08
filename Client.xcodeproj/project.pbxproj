@@ -60,6 +60,7 @@
 		0A771D35218C8FDC00336E0D /* Bookmark+Sync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A771D34218C8FDC00336E0D /* Bookmark+Sync.swift */; };
 		0A83D9F121B7FFD200245EF0 /* ABPFilterParserData.dat in Resources */ = {isa = PBXBuildFile; fileRef = 0A83D9E921B7FFD100245EF0 /* ABPFilterParserData.dat */; };
 		0A8C6993225BC7B100988715 /* ToolbarUrlActionsProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A8C6992225BC7B100988715 /* ToolbarUrlActionsProtocol.swift */; };
+		0A8C699C225BDDC500988715 /* BookmarkEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A8C699B225BDDC500988715 /* BookmarkEditViewController.swift */; };
 		0AA029F8222E899400D6B535 /* Bookmark+Reorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AA029F7222E899400D6B535 /* Bookmark+Reorder.swift */; };
 		0AA4FC392109D685000B173A /* CRUDProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AA4FC382109D685000B173A /* CRUDProtocols.swift */; };
 		0AAAAC972249174A009A8763 /* SyncAlerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AAAAC962249174A009A8763 /* SyncAlerts.swift */; };
@@ -1178,6 +1179,7 @@
 		0A771D34218C8FDC00336E0D /* Bookmark+Sync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bookmark+Sync.swift"; sourceTree = "<group>"; };
 		0A83D9E921B7FFD100245EF0 /* ABPFilterParserData.dat */ = {isa = PBXFileReference; lastKnownFileType = file; path = ABPFilterParserData.dat; sourceTree = "<group>"; };
 		0A8C6992225BC7B100988715 /* ToolbarUrlActionsProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarUrlActionsProtocol.swift; sourceTree = "<group>"; };
+		0A8C699B225BDDC500988715 /* BookmarkEditViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkEditViewController.swift; sourceTree = "<group>"; };
 		0A9B6A3420E6453400712BC9 /* Model8.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model8.xcdatamodel; sourceTree = "<group>"; };
 		0AA029F7222E899400D6B535 /* Bookmark+Reorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bookmark+Reorder.swift"; sourceTree = "<group>"; };
 		0AA4FC382109D685000B173A /* CRUDProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CRUDProtocols.swift; sourceTree = "<group>"; };
@@ -3429,6 +3431,7 @@
 		7BC7B4571C903A6A0046E9D2 /* Menu */ = {
 			isa = PBXGroup;
 			children = (
+				0A8C699B225BDDC500988715 /* BookmarkEditViewController.swift */,
 				A1AD4BCE20BF3E8C007A6EA1 /* BookmarksViewController.swift */,
 				A198E75020C701ED00334C11 /* HistoryViewController.swift */,
 				44331DBA22521013007E3E93 /* MenuViewController.swift */,
@@ -5774,6 +5777,7 @@
 				E68E7ACB1CAC1D4500FDCA76 /* PagingPasscodeViewController.swift in Sources */,
 				D04D1B92209790B60074B35F /* Toast.swift in Sources */,
 				D34DC8531A16C40C00D49B7B /* Profile.swift in Sources */,
+				0A8C699C225BDDC500988715 /* BookmarkEditViewController.swift in Sources */,
 				4422D4D821BFFB7600BF1855 /* block.cc in Sources */,
 				E65075541E37F6FC006961AC /* DynamicFontHelper.swift in Sources */,
 				4422D55C21BFFB7F00BF1855 /* perl_groups.cc in Sources */,
