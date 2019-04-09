@@ -79,7 +79,7 @@ class SyncAddDeviceViewController: SyncViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        title = pageTitle
+        title = deviceType == .computer ? Strings.SyncAddComputerTitle : Strings.SyncAddTabletOrPhoneTitle
 
         view.addSubview(stackView)
         stackView.snp.makeConstraints { make in
@@ -98,36 +98,43 @@ class SyncAddDeviceViewController: SyncViewController {
         containerView.layer.masksToBounds = true
 
         guard let syncSeed = Sync.shared.syncSeedArray else {
-            // TODO: Pop and error
+            showInitializationError()
             return
         }
+        
+        let syncCrypto = SyncCrypto()
 
-        let qrSyncSeed = SyncCrypto.shared.joinBytes(fromCombinedBytes: syncSeed)
+        let qrSyncSeed = syncCrypto.joinBytes(fromCombinedBytes: syncSeed)
         if qrSyncSeed.isEmpty {
-            // Error
+            showInitializationError()
             return
         }
-
-        SyncCrypto.shared.passphrase(fromBytes: syncSeed) { (words, error) in
-            guard let words = words, error == nil else {
-                return
-            }
-            
-            self.qrCodeView = SyncQRCodeView(data: qrSyncSeed)
-            self.containerView.addSubview(self.qrCodeView!)
-            
-            self.qrCodeView!.snp.makeConstraints { (make) in
+        
+        let words = syncCrypto.passphrase(fromBytes: syncSeed)
+        
+        switch words {
+        case .success(let passphrase):
+            qrCodeView = SyncQRCodeView(data: qrSyncSeed)
+            containerView.addSubview(qrCodeView!)
+            qrCodeView?.snp.makeConstraints { make in
                 make.top.bottom.equalTo(0).inset(22)
                 make.centerX.equalTo(self.containerView)
                 make.size.equalTo(BarcodeSize)
             }
             
-            self.codewordsView.text = words.joined(separator: " ")
-            
-            self.SEL_changeMode()
+            self.codewordsView.text = passphrase.joined(separator: " ")
+        case .failure:
+            showInitializationError()
+            return
         }
         
         self.setupVisuals()
+    }
+    
+    private func showInitializationError() {
+        present(SyncAlerts.initializationError, animated: true) {
+            Sync.shared.leaveSyncGroup()
+        }
     }
     
     func setupVisuals() {
@@ -247,10 +254,17 @@ class SyncAddDeviceViewController: SyncViewController {
         
         titleLabel.text = isFirstIndex ? Strings.SyncAddDeviceScan : Strings.SyncAddDeviceWords
         
-        if deviceType == .mobile {
-            descriptionLabel.text = isFirstIndex ? Strings.SyncAddMobileScanDescription : Strings.SyncAddMobileWordsDescription
-        } else if deviceType == .computer {
-            descriptionLabel.text = isFirstIndex ? Strings.SyncAddComputerScanDescription : Strings.SyncAddComputerWordsDescription
+        if isFirstIndex {
+            descriptionLabel.text = Strings.SyncAddDeviceScanDescription
+        } else {
+            // The button name should be the same as in codewords instructions.
+            let buttonName = Strings.ScanSyncCode
+            let addDeviceWords = String(format: Strings.SyncAddDeviceWordsDescription, buttonName)
+            let fontSize = descriptionLabel.font.pointSize
+            
+            // For codewords instructions copy, we want to bold the button name which needs to be tapped.
+            descriptionLabel.attributedText =
+                addDeviceWords.makePartiallyBoldAttributedString(stringToBold: buttonName, boldTextSize: fontSize)
         }
     }
     

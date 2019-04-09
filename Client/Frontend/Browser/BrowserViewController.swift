@@ -186,9 +186,9 @@ class BrowserViewController: UIViewController {
         Preferences.Privacy.privateBrowsingOnly.observe(from: self)
         Preferences.General.tabBarVisibility.observe(from: self)
         Preferences.Shields.allShields.forEach { $0.observe(from: self) }
-        
+        Preferences.Privacy.blockAllCookies.observe(from: self)
         // Lists need to be compiled before attempting tab restoration
-        contentBlockListDeferred = ContentBlockerHelper.compileLists()
+        contentBlockListDeferred = ContentBlockerHelper.compileBundledLists()
     }
 
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -419,8 +419,6 @@ class BrowserViewController: UIViewController {
         
         #if NO_SYNC
         if sync.syncSeedArray == nil { return }
-        
-        sync.leaveSyncGroup()
         
         let msg = """
             Sync has been disabled, as it will not be included in the next couple of production builds.
@@ -825,7 +823,7 @@ class BrowserViewController: UIViewController {
         let isShowing = !tabsBar.view.isHidden
         let shouldShow = shouldShowTabBar()
         
-        if isShowing != shouldShow {
+        if isShowing != shouldShow && presentedViewController == nil {
             UIView.animate(withDuration: 0.1) {
                 self.tabsBar.view.isHidden = !shouldShow
             }
@@ -881,14 +879,19 @@ class BrowserViewController: UIViewController {
     }
 
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
-        guard let webView = object as? WKWebView, let kp = keyPath, let path = KVOConstants(rawValue: kp) else {
+        guard let webView = object as? WKWebView, let tab = tabManager[webView], let kp = keyPath, let path = KVOConstants(rawValue: kp) else {
             assertionFailure("Unhandled KVO key: \(keyPath ?? "nil")")
             return
         }
         
+        if let helper = tab.getContentScript(name: ContextMenuHelper.name()) as? ContextMenuHelper {
+            // This is zero-cost if already installed. It needs to be checked frequently (hence every event here triggers this function), as when a new tab is created it requires multiple attempts to setup the handler correctly.
+            helper.replaceGestureHandlerIfNeeded()
+        }
+        
         switch path {
         case .estimatedProgress:
-            guard webView == tabManager.selectedTab?.webView,
+            guard tab === tabManager.selectedTab,
                 let progress = change?[.newKey] as? Float else { break }
             if !(webView.url?.isLocalUtility ?? false) {
                 urlBar.updateProgressBar(progress)
@@ -898,7 +901,7 @@ class BrowserViewController: UIViewController {
         case .loading:
             guard let loading = change?[.newKey] as? Bool else { break }
             
-            if webView == tabManager.selectedTab?.webView {
+            if tab === tabManager.selectedTab {
                 urlBar.locationView.loading = loading
                 if !(webView.url?.isLocalUtility ?? false) {
                     if loading && urlBar.currentProgress() < URLBarView.psuedoProgressValue {
@@ -926,8 +929,6 @@ class BrowserViewController: UIViewController {
                 }
             }
         case .title:
-            guard let tab = tabManager[webView] else { break }
-            
             // Ensure that the tab title *actually* changed to prevent repeated calls
             // to navigateInTab(tab:).
             guard let title = (webView.title?.count == 0 ? webView.url?.absoluteString : webView.title) else { break }
@@ -935,13 +936,15 @@ class BrowserViewController: UIViewController {
                 navigateInTab(tab: tab)
             }
         case .canGoBack:
-            guard webView == tabManager.selectedTab?.webView,
-                let canGoBack = change?[.newKey] as? Bool else { break }
+            guard tab === tabManager.selectedTab, let canGoBack = change?[.newKey] as? Bool else {
+                break
+            }
             
             navigationToolbar.updateBackStatus(canGoBack)
         case .canGoForward:
-            guard webView == tabManager.selectedTab?.webView,
-                let canGoForward = change?[.newKey] as? Bool else { break }
+            guard tab === tabManager.selectedTab, let canGoForward = change?[.newKey] as? Bool else {
+                break
+            }
             
             navigationToolbar.updateForwardStatus(canGoForward)
         case .hasOnlySecureContent:
@@ -1272,7 +1275,8 @@ class BrowserViewController: UIViewController {
             self.browserLockPopup = nil
             return .flyDown
         }
-        popup.addDefaultButton(title: Strings.Browser_lock_callout_enable) { [weak self] () -> PopupViewDismissType in
+        
+        popup.addButton(title: Strings.Browser_lock_callout_enable, type: .primary) { [weak self] () -> PopupViewDismissType in
             Preferences.Popups.browserLock.value = true
             self?.browserLockPopup = nil
             
@@ -1316,7 +1320,7 @@ class BrowserViewController: UIViewController {
             self.duckDuckGoPopup = nil
             return .flyDown
         }
-        popup.addDefaultButton(title: Strings.DDG_callout_enable) { [weak self] in
+        popup.addButton(title: Strings.DDG_callout_enable, type: .primary) { [weak self] in
             self?.duckDuckGoPopup = nil
             
             if self?.profile == nil {
@@ -1355,7 +1359,8 @@ extension BrowserViewController: QRCodeViewControllerDelegate {
 
 extension BrowserViewController: SettingsDelegate {
     func settingsOpenURLInNewTab(_ url: URL) {
-        self.openURLInNewTab(url, isPrivileged: false)
+        let forcedPrivate = PrivateBrowsingManager.shared.isPrivateBrowsing
+        self.openURLInNewTab(url, isPrivate: forcedPrivate, isPrivileged: false)
     }
     
     func settingsOpenURLs(_ urls: [URL]) {
@@ -1364,7 +1369,15 @@ extension BrowserViewController: SettingsDelegate {
     }
     
     func settingsDidFinish(_ settingsViewController: SettingsViewController) {
-        settingsViewController.dismiss(animated: true)
+        settingsViewController.dismiss(animated: true, completion: {
+            // iPad doesn't receive a viewDidAppear because it displays settings as a floating modal window instead
+            // of a fullscreen overlay.
+            if UIDevice.isIpad && PrivateBrowsingManager.shared.isPrivateBrowsing {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    self.presentDuckDuckGoCallout()
+                }
+            }
+        })
     }
 }
 
@@ -1548,9 +1561,13 @@ extension BrowserViewController: URLBarDelegate {
     }
 
     func urlBar(_ urlBar: URLBarView, didSubmitText text: String) {
+        processAddressBar(text: text, visitType: nil)
+    }
+
+    func processAddressBar(text: String, visitType: VisitType?) {
         if let fixupURL = URIFixup.getURL(text) {
             // The user entered a URL, so use it.
-            finishEditingAndSubmit(fixupURL, visitType: VisitType.typed)
+            finishEditingAndSubmit(fixupURL, visitType: visitType ?? .typed)
             return
         }
 
@@ -1571,7 +1588,7 @@ extension BrowserViewController: URLBarDelegate {
                 urlString.replaceSubrange(range, with: escapedQuery)
 
                 if let url = URL(string: urlString) {
-                    self.finishEditingAndSubmit(url, visitType: VisitType.typed)
+                    self.finishEditingAndSubmit(url, visitType: visitType ?? .typed)
                     return
                 }
             }
@@ -1982,7 +1999,7 @@ extension BrowserViewController: TabManagerDelegate {
             updateTabCountUsingTabManager(tabManager)
         }
         
-        if PrivateBrowsingManager.shared.isPrivateBrowsing {
+        if PrivateBrowsingManager.shared.isPrivateBrowsing && presentedViewController == nil {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
                 self.presentDuckDuckGoCallout()
             }
@@ -2082,16 +2099,11 @@ extension BrowserViewController: TabManagerDelegate {
 }
 
 /// List of schemes that are allowed to be opened in new tabs.
-private let schemesAllowedToBeOpenedAsPopups = ["http", "https", "javascript", "data", "about"]
+private let schemesAllowedToBeOpenedAsPopups = ["http", "https", "javascript", "about"]
 
 extension BrowserViewController: WKUIDelegate {
     func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
-        /* Fix for #446, when in private mode the WKProcessPool of the configuration is changed,
-         this leads to a crash for popups ie window.open where the configuration is created by parent wkwebview.
-         To handle this for now we are stopping popup when in private mode.
-         The fix is done in guard statement below.
-         */
-        guard let parentTab = tabManager[webView], !parentTab.isPrivate else { return nil }
+        guard let parentTab = tabManager[webView] else { return nil }
 
         guard navigationAction.isAllowed, shouldRequestBeOpenedAsPopup(navigationAction.request) else {
             print("Denying popup from request: \(navigationAction.request)")
@@ -2475,7 +2487,8 @@ extension BrowserViewController: ContextMenuHelperDelegate {
             }
             
             let openInNewTabAction = UIAlertAction(title: Strings.OpenImageInNewTabActionTitle, style: .default) { _ in
-                self.tabManager.addTab(URLRequest(url: url), afterTab: self.tabManager.selectedTab)
+                let isPrivate = PrivateBrowsingManager.shared.isPrivateBrowsing
+                self.tabManager.addTab(URLRequest(url: url), afterTab: self.tabManager.selectedTab, isPrivate: isPrivate)
                 self.scrollController.showToolbars(animated: true)
             }
             actionSheetController.addAction(openInNewTabAction, accessibilityIdentifier: "linkContextMenu.openImageInNewTab")
@@ -2483,8 +2496,10 @@ extension BrowserViewController: ContextMenuHelperDelegate {
             let photoAuthorizeStatus = PHPhotoLibrary.authorizationStatus()
             let saveImageAction = UIAlertAction(title: Strings.SaveImageActionTitle, style: .default) { _ in
                 if photoAuthorizeStatus == .authorized || photoAuthorizeStatus == .notDetermined {
-                    self.getImage(url as URL) {
-                        UIImageWriteToSavedPhotosAlbum($0, self, nil, nil)
+                    self.getData(url) { data in
+                        PHPhotoLibrary.shared().performChanges({
+                            PHAssetCreationRequest.forAsset().addResource(with: .photo, data: data, options: nil)
+                        }, completionHandler: nil)
                     }
                 } else {
                     let accessDenied = UIAlertController(title: Strings.AccessPhotoDeniedAlertTitle, message: Strings.AccessPhotoDeniedAlertMessage, preferredStyle: .alert)
@@ -2543,10 +2558,10 @@ extension BrowserViewController: ContextMenuHelperDelegate {
         self.present(actionSheetController, animated: true, completion: nil)
     }
 
-    fileprivate func getImage(_ url: URL, success: @escaping (UIImage) -> Void) {
+    private func getData(_ url: URL, success: @escaping (Data) -> Void) {
         Alamofire.request(url).validate(statusCode: 200..<300).response { response in
-            if let data = response.data, let image = data.isGIF ? UIImage.imageFromGIFDataThreadSafe(data) : UIImage.imageFromDataThreadSafe(data) {
-                success(image)
+            if let data = response.data {
+                success(data)
             }
         }
     }
@@ -2876,8 +2891,8 @@ extension BrowserViewController: HomeMenuControllerDelegate {
 
 extension BrowserViewController: TopSitesDelegate {
     
-    func didSelectUrl(url: URL) {
-        finishEditingAndSubmit(url, visitType: .bookmark)
+    func didSelect(input: String) {
+        processAddressBar(text: input, visitType: .bookmark)
     }
     
     func didTapDuckDuckGoCallout() {
@@ -2901,8 +2916,19 @@ extension BrowserViewController: PreferencesObserver {
              Preferences.Shields.blockScripts.key,
              Preferences.Shields.blockPhishingAndMalware.key,
              Preferences.Shields.blockImages.key,
-             Preferences.Shields.fingerprintingProtection.key:
+             Preferences.Shields.fingerprintingProtection.key,
+             Preferences.Shields.useRegionAdBlock.key:
             tabManager.allTabs.forEach { $0.webView?.reload() }
+        case Preferences.Privacy.blockAllCookies.key:
+            // All `block all cookies` toggle requires a hard reset of Webkit configuration.
+            tabManager.reset()
+            if !Preferences.Privacy.blockAllCookies.value {
+                tabManager.allTabs.forEach {
+                    if let url: URL = $0.webView?.url {
+                        $0.loadRequest(PrivilegedRequest(url: url) as URLRequest)
+                    }
+                }
+            }
         default:
             log.debug("Received a preference change for an unknown key: \(key) on \(type(of: self))")
             break

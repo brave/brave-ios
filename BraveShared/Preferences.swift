@@ -33,9 +33,6 @@ extension Preferences {
         // We need to translate that to use the new `firstPingParam` preference.
         static let firstPingParam: Option<Bool> =
             Option<Bool>(key: "dau.first-ping", default: Preferences.DAU.lastLaunchInfo.value == nil)
-        
-        /// We use this to properly calculate `week` parameter of the DAU ping.
-        static let lastPingFirstMonday = Option<String?>(key: "dau.last-ping-first-monday", default: nil)
     }
     final class URP {
         static let nextCheckDate = Option<TimeInterval?>(key: "urp.next-check-date", default: nil)
@@ -56,6 +53,29 @@ extension Preferences {
     }
     public final class BlockFileVersion {
         public static let adblock = Option<String?>(key: "blockfile.adblock", default: nil)
+        public static let httpse = Option<String?>(key: "blockfile.httpse", default: nil)
+    }
+    
+    public final class Shields {
+        public static let allShields = [blockAdsAndTracking, httpsEverywhere, blockPhishingAndMalware, blockScripts, fingerprintingProtection, blockImages]
+        
+        /// Shields will block ads and tracking if enabled
+        public static let blockAdsAndTracking = Option<Bool>(key: "shields.block-ads-and-tracking", default: true)
+        /// Websites will be upgraded to HTTPS if a loaded page attempts to use HTTP
+        public static let httpsEverywhere = Option<Bool>(key: "shields.https-everywhere", default: true)
+        /// Shields will block websites related to potential phishing and malware
+        public static let blockPhishingAndMalware = Option<Bool>(key: "shields.block-phishing-and-malware", default: true)
+        /// Disables JavaScript execution in the browser
+        public static let blockScripts = Option<Bool>(key: "shields.block-scripts", default: false)
+        /// Enforces fingerprinting protection on the users session
+        public static let fingerprintingProtection = Option<Bool>(key: "shields.fingerprinting-protection", default: false)
+        /// Disables image loading in the browser
+        public static let blockImages = Option<Bool>(key: "shields.block-images", default: false)
+        /// In addition to global adblocking rules, adds custom country based rules.
+        /// This setting is enabled by default for all locales.
+        public static let useRegionAdBlock = Option<Bool>(key: "shields.regional-adblock", default: true)
+        /// Version of downloaded data file for adblock stats.
+        public static let adblockStatsDataVersion = Option<Int?>(key: "stats.adblock-data-version", default: nil)
     }
 }
 
@@ -159,7 +179,6 @@ extension Preferences {
         // DAU
         migrate(keyPrefix: keyPrefix, key: "dau_stat", to: Preferences.DAU.lastLaunchInfo)
         migrate(keyPrefix: keyPrefix, key: "week_of_installation", to: Preferences.DAU.weekOfInstallation)
-        migrate(keyPrefix: keyPrefix, key: "lastPingFirstMondayKey", to: Preferences.DAU.lastPingFirstMonday)
         
         // URP
         migrate(keyPrefix: keyPrefix, key: "urpDateCheckPrefsKey", to: Preferences.URP.nextCheckDate)

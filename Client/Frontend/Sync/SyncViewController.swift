@@ -3,6 +3,7 @@
 import UIKit
 import Shared
 import BraveShared
+import Data
 
 struct SyncUX {
     static let backgroundColor = UIColor(rgb: 0xF8F8F8)
@@ -21,26 +22,27 @@ class SyncViewController: UIViewController {
         super.viewDidLoad()
 
         view.backgroundColor = SyncUX.backgroundColor
+        NotificationCenter.default.addObserver(self, selector: #selector(didLeaveSyncGroup), name: Sync.Notifications.didLeaveSyncGroup, object: nil)
     }
     
-    func showNoConnectionAlert() {
-        let alert = UIAlertController(title: Strings.SyncNoConnectionTitle,
-                                      message: Strings.SyncNoConnectionBody, preferredStyle: .alert)
-        
-        let okAction = UIAlertAction(title: Strings.OKString, style: .default)
-        alert.addAction(okAction)
-        
-        present(alert, animated: true)
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     /// Perform a block of code only if user has a network connection, shows an error alert otherwise.
     /// Most of sync initialization methods require an internet connection.
     func doIfConnected(code: () -> Void) {
         if !DeviceInfo.hasConnectivity() {
-            showNoConnectionAlert()
+            present(SyncAlerts.noConnection, animated: true)
             return
         }
         
         code()
+    }
+    
+    @objc func didLeaveSyncGroup() {
+        DispatchQueue.main.async { [weak self] in
+            self?.navigationController?.popToRootViewController(animated: true)
+        }
     }
 }

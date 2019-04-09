@@ -151,7 +151,7 @@ extension ShieldsViewController {
             addArrangedSubview(hostLabel)
             addArrangedSubview(statsHeaderLabel)
             setCustomSpacing(15.0, after: statsHeaderLabel)
-            let statViews = [adsTrackersStatView/*, httpsUpgradesStatView*/, scriptsBlockedStatView, fingerprintingStatView]
+            let statViews = [adsTrackersStatView, httpsUpgradesStatView, scriptsBlockedStatView, fingerprintingStatView]
             statViews.forEach {
                 addArrangedSubview($0)
                 if $0 !== statViews.last {
@@ -163,7 +163,7 @@ extension ShieldsViewController {
             addArrangedSubview(settingsDivider)
             addArrangedSubview(settingsHeaderLabel)
             
-            [adsTrackersControl/*, httpsUpgradesControl*/, blockMalwareControl, blockScriptsControl, fingerprintingControl].forEach {
+            [adsTrackersControl, httpsUpgradesControl, blockMalwareControl, blockScriptsControl, fingerprintingControl].forEach {
                 addArrangedSubview($0)
                 setCustomSpacing(18.0, after: $0)
             }
@@ -191,6 +191,7 @@ extension ShieldsViewController {
             let l = UILabel()
             l.font = .systemFont(ofSize: 15.0)
             l.adjustsFontSizeToFitWidth = true
+            l.numberOfLines = 0
             return l
         }()
         /// Create the stat view with a given title and color
