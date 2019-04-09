@@ -45,12 +45,6 @@ class SearchTests: XCTestCase {
         checkInvalidURL("创业咖啡. 中国")
     }
 
-    func testURIFixupPunyCode() {
-        checkValidURL("http://创业咖啡.中国/", afterFixup: "http://xn--vhq70hq9bhxa.xn--fiqs8s/")
-        checkValidURL("创业咖啡.中国", afterFixup: "http://xn--vhq70hq9bhxa.xn--fiqs8s")
-        checkValidURL(" 创业咖啡.中国 ", afterFixup: "http://xn--vhq70hq9bhxa.xn--fiqs8s")
-    }
-
     fileprivate func checkValidURL(_ beforeFixup: String, afterFixup: String) {
         XCTAssertEqual(URIFixup.getURL(beforeFixup)!.absoluteString, afterFixup)
     }

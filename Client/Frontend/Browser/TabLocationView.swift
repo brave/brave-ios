@@ -285,12 +285,6 @@ class TabLocationView: UIView {
     }
 
     fileprivate func updateTextWithURL() {
-        //Commented code below as AppConstants.MOZ_PUNYCODE is false for release always.
-//        if let host = url?.host, AppConstants.MOZ_PUNYCODE {
-//            urlTextField.text = url?.absoluteString.replacingOccurrences(of: host, with: host.asciiHostToUTF8())
-//        } else {
-//            urlTextField.text = url?.baseDomain
-//        }
         urlTextField.text = url?.baseDomain ?? ""
     }
 }
@@ -429,6 +423,9 @@ private class DisplayTextField: UITextField {
         return false
     }
     
+    // This override is done in case the eTLD+1 string overflows the width of textField.
+    // In that case the textRect is adjusted to show right aligned and truncate left.
+    // Since this textField changes with WebView domain change, performance implications are low.
     override func textRect(forBounds bounds: CGRect) -> CGRect {
         var rect: CGRect = super.textRect(forBounds: bounds)
         
