@@ -16,7 +16,7 @@ import Shared
 /// a runtime exception is thrown.
 class JSPromptAlertController: UIAlertController {
     
-    var info: JSAlertInfo!
+    var info: JSAlertInfo?
     var showsCancel: Bool = false
     
     class func newController(title: String?, message: String?, preferredStyle: UIAlertController.Style = .alert, info: JSAlertInfo, showCancel: Bool = true) -> JSPromptAlertController {
@@ -28,14 +28,14 @@ class JSPromptAlertController: UIAlertController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        if info.suppressHandler != nil {
+        if let handler = info?.suppressHandler {
             self.addAction(UIAlertAction(title: Strings.SuppressAlertsActionTitle, style: .default, handler: { _ in
-                self.info.suppressHandler?(true)
+                handler(true)
             }))
         }
         if showsCancel {
             self.addAction(UIAlertAction(title: Strings.CancelButtonTitle, style: .cancel, handler: { _ in
-                self.info.cancel()
+                self.info?.cancel()
             }))
         }
     }
