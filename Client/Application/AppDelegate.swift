@@ -65,6 +65,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         
         HttpsEverywhereStats.shared.startLoading()
         
+        //Moves Coredata sqlite file from Documents dir to application support dir.
+        DataController.shared.migrateToNewPathIfNeeded()
         // Passcode checking, must happen on immediate launch
         if !DataController.shared.storeExists() {
             // Since passcode is stored in keychain it persists between installations.
