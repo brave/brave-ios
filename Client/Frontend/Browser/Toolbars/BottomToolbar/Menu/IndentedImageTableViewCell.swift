@@ -8,7 +8,12 @@ class IndentedImageTableViewCell: UITableViewCell {
     
     let mainStackView = UIStackView().then {
         $0.spacing = 8
-        $0.alignment = .center
+        $0.alignment = .fill
+    }
+    
+    let folderNameStackView = UIStackView().then {
+        $0.axis = .vertical
+        $0.distribution = .equalSpacing
     }
     
     let folderImage = UIImageView().then {
@@ -21,13 +26,33 @@ class IndentedImageTableViewCell: UITableViewCell {
     let folderName = UILabel().then {
         $0.textAlignment = .left
     }
+    
+    var spacerLine: UIView {
+        let view = UIView()
+        view.backgroundColor = .lightGray
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.addConstraint(NSLayoutConstraint(item: view, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 0.5))
+        
+        return view
+    }
 
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
 
         indentationWidth = 20
         mainStackView.addArrangedSubview(folderImage)
-        mainStackView.addArrangedSubview(folderName)
+        
+        let transparentLine = spacerLine
+        transparentLine.backgroundColor = .clear
+        folderNameStackView.addArrangedSubview(transparentLine)
+        folderNameStackView.addArrangedSubview(folderName)
+        folderNameStackView.addArrangedSubview(spacerLine)
+        
+        mainStackView.addArrangedSubview(folderNameStackView)
+        
+        // Hide UITableViewCells separator, a custom one will be used.
+        // This separator inset was problematic to update based on indentation.
+        separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
         
         addSubview(mainStackView)
         
@@ -53,78 +78,6 @@ class IndentedImageTableViewCell: UITableViewCell {
             $0.centerY.equalTo(self)
         }
 
-        print("\(folderName.text!): \(indentation + 36)")
-        var sepInsets = separatorInset
-        sepInsets.left = indentation + 36
-        separatorInset = sepInsets
     }
 
 }
-
-
-// FIXME
-
-/*
-override func layoutSubviews() {
-    // Call super
-    super.layoutSubviews()
-    
-    let indentation = (CGFloat(indentationLevel) * indentationWidth)
-    
-    // Update the separator
-    separatorInset = UIEdgeInsets(top: 0, left: indentation + 15, bottom: 0, right: 0)
-    
-    guard let imageView = imageView else { return }
-    
-    
-    var imageFrame = imageView.frame
-    imageFrame.origin.x += indentation
-    
-    imageView.frame = imageFrame
-    
-    guard let textLabel = textLabel else { return }
-    
-    var textLabelFrame = textLabel.frame
-    //textLabelFrame.origin.x += indentation
-    textLabelFrame.size.width -= imageView.frame.origin.x
-    
-    textLabel.frame = textLabelFrame
-    
-    guard let detailTextLabel = detailTextLabel else { return }
-    var detailTextFrame = detailTextLabel.frame
-    detailTextFrame.origin.x += 40
-    detailTextFrame.size.width  = imageView.frame.origin.x + 60
-    
-    detailTextLabel.frame = detailTextFrame
-    
-    
-    // Update the frame of the image view
-    //        imageView.frame = CGRectMake(self.imageView.frame.origin.x + (self.indentationLevel * self.indentationWidth), self.imageView.frame.origin.y, self.imageView.frame.size.width, self.imageView.frame.size.height);
-    //
-    //        // Update the frame of the text label
-    //        self.textLabel.frame = CGRectMake(self.imageView.frame.origin.x + 40, self.textLabel.frame.origin.y, self.frame.size.width - (self.imageView.frame.origin.x + 60), self.textLabel.frame.size.height);
-    //
-    //        // Update the frame of the subtitle label
-    //        self.detailTextLabel.frame = CGRectMake(self.imageView.frame.origin.x + 40, self.detailTextLabel.frame.origin.y, self.frame.size.width - (self.imageView.frame.origin.x + 60), self.detailTextLabel.frame.size.height);
-    
-    
-    
-    return
-    
-    
-    
-    
-    
-    
-    
-    //        if let imageView = imageView {
-    //            var frame = imageView.frame
-    //            frame.origin.x = indentation + 40
-    //imageView.frame = frame
-    //        }
-    
-    //separatorInset = UIEdgeInsetsMake(0, indentation + 15, 0, 0)
-    
-    
-}
-*/
