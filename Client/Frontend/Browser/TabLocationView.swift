@@ -285,7 +285,8 @@ class TabLocationView: UIView {
     }
 
     fileprivate func updateTextWithURL() {
-        urlTextField.text = url?.baseDomain ?? ""
+        (urlTextField as? DisplayTextField)?.hostString = url?.host ?? ""
+        urlTextField.text = url?.schemelessAbsoluteString.trim("/")
     }
 }
 
@@ -407,8 +408,10 @@ class ReaderModeButton: UIButton {
     }
 }
 
-private class DisplayTextField: UITextField {
+fileprivate class DisplayTextField: UITextField {
     weak var accessibilityActionsSource: AccessibilityActionsSource?
+    fileprivate var hostString: String = ""
+    var pathPadding: CGFloat = 20.0
 
     override var accessibilityCustomActions: [UIAccessibilityCustomAction]? {
         get {
@@ -429,10 +432,10 @@ private class DisplayTextField: UITextField {
     override func textRect(forBounds bounds: CGRect) -> CGRect {
         var rect: CGRect = super.textRect(forBounds: bounds)
         
-        if let size: CGSize = (self.text as NSString?)?.size(withAttributes: [.font: self.font!]) {
+        if let size: CGSize = (self.hostString as NSString?)?.size(withAttributes: [.font: self.font!]) {
             if size.width > self.bounds.width {
-                rect.origin.x = rect.origin.x - (size.width - self.bounds.width)
-                rect.size.width = rect.size.width + (size.width - self.bounds.width)
+                rect.origin.x = rect.origin.x - (size.width + pathPadding - self.bounds.width)
+                rect.size.width = rect.size.width + (size.width + pathPadding - self.bounds.width)
             }
         }
         return rect
