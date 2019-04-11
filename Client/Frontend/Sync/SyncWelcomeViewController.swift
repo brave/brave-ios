@@ -126,6 +126,22 @@ class SyncWelcomeViewController: SyncViewController {
         buttonsStackView.addArrangedSubview(existingUserButton)
         buttonsStackView.addArrangedSubview(newToSyncButton)
         mainStackView.addArrangedSubview(buttonsStackView)
+        
+        handleSyncSetupFailure()
+    }
+    
+    /// Sync setup failure is handled here because it can happen from few places in children VCs(new chain, qr code, codewords)
+    /// This makes all presented Sync View Controllers to dismiss, cleans up any sync setup and shows user a friendly message.
+    private func handleSyncSetupFailure() {
+        let sync = Sync.shared
+        sync.syncSetupFailureCallback = { [weak self] in
+            self?.dismiss(animated: true)
+            sync.leaveSyncGroup()
+            
+            let bvc = (UIApplication.shared.delegate as? AppDelegate)?.browserViewController
+            
+            bvc?.present(SyncAlerts.initializationError, animated: true)
+        }
     }
     
     @objc func newToSyncAction() {
@@ -178,9 +194,9 @@ class SyncWelcomeViewController: SyncViewController {
     }
 
     private func addSyncReadyNotificationObserver(completion: @escaping () -> Void) {
-        NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: NotificationSyncReady),
+        NotificationCenter.default.addObserver(forName: Sync.Notifications.syncReady,
                                                object: nil,
-                                               queue: OperationQueue.main,
+                                               queue: .main,
                                                using: { notification in
                                                 completion()
                                                 // This is a one-time notification, removing it immediately.

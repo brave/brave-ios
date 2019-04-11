@@ -29,6 +29,13 @@ class SyncPairWordsViewController: SyncViewController {
         return button
     }()
     
+    let useCameraButton = UIButton().then {
+        $0.setTitle(Strings.SyncSwitchBackToCameraButton, for: .normal)
+        $0.addTarget(self, action: #selector(useCameraButtonTapped), for: .touchDown)
+        $0.setTitleColor(BraveUX.GreyH, for: .normal)
+        $0.titleLabel?.font = UIFont.systemFont(ofSize: 15, weight: UIFont.Weight.regular)
+    }
+    
     var loadingView: UIView!
     let loadingSpinner = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
     
@@ -64,7 +71,9 @@ class SyncPairWordsViewController: SyncViewController {
         loadingView.backgroundColor = UIColor(white: 0.5, alpha: 0.5)
         loadingView.isHidden = true
         loadingView.addSubview(loadingSpinner)
+        
         view.addSubview(loadingView)
+        view.addSubview(useCameraButton)
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: Strings.Confirm, style: .done, target: self, action: #selector(SEL_done))
         
@@ -106,6 +115,17 @@ class SyncPairWordsViewController: SyncViewController {
         loadingSpinner.snp.makeConstraints { (make) in
             make.center.equalTo(loadingView)
         }
+        
+        useCameraButton.snp.makeConstraints { make in
+            make.top.equalTo(containerView.snp.bottom).offset(16)
+            make.left.equalTo(self.view)
+            make.right.equalTo(self.view)
+            make.centerX.equalTo(self.view)
+        }
+    }
+    
+    @objc func useCameraButtonTapped() {
+        self.navigationController?.popViewController(animated: true)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -161,19 +181,13 @@ class SyncPairWordsViewController: SyncViewController {
             alert()
         })
         
-        SyncCrypto.shared.bytes(fromPassphrase: codes) { (result, error) in
-            if result?.count == 0 || error != nil {
-                var errorText = (error as NSError?)?.userInfo["WKJavaScriptExceptionMessage"] as? String
-                if let er = errorText, er.contains("Invalid word") {
-                    errorText = er + "\n Please recheck spelling"
-                }
-                
-                alert(message: errorText)
-                self.disableNavigationPrevention()
-                return
-            }
-            
-            self.syncHandler?(result)
+        let result = SyncCrypto().bytes(fromPassphrase: codes)
+        switch result {
+        case .success(let bytes):
+            syncHandler?(bytes)
+        case .failure(let error):
+            alert(message: "\(error)")
+            disableNavigationPrevention()
         }
     }
 }

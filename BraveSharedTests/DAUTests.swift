@@ -12,7 +12,6 @@ class DAUTests: XCTestCase {
         super.setUp()
         
         Preferences.DAU.weekOfInstallation.reset()
-        Preferences.DAU.lastPingFirstMonday.reset()
         Preferences.DAU.lastLaunchInfo.reset()
         Preferences.DAU.firstPingParam.reset()
     }
@@ -75,8 +74,6 @@ class DAUTests: XCTestCase {
         XCTAssertNil(dau.dauStatParams(nil, firstPing: false, channel: .beta))
         XCTAssertNil(dau.dauStatParams(nil, firstPing: false, channel: .release))
         XCTAssertNil(dau.dauStatParams([], firstPing: false, channel: .beta))
-        XCTAssertNil(dau.dauStatParams([1, 2], firstPing: false, channel: .beta))
-        XCTAssertNil(dau.dauStatParams([1, 2, 3, 4], firstPing: false, channel: .beta))
     }
     
     func testFirstLaunch() {
@@ -126,7 +123,6 @@ class DAUTests: XCTestCase {
         
         // These preferences should be set only after a successful ping.
         XCTAssertNil(Preferences.DAU.lastLaunchInfo.value)
-        XCTAssertNil(Preferences.DAU.lastPingFirstMonday.value)
         
         simulatePing(params: params)
         
@@ -177,27 +173,46 @@ class DAUTests: XCTestCase {
         pingWithDateAndCompare(dateString: "2019-05-06", daily: true, weekly: true, monthly: false)
     }
     
+    func testNotFullDayPing() {
+        let format = "yyyy-MM-dd, HH:mm"
+        
+        pingWithDateAndCompare(dateString: "2019-12-31, 16:00", daily: true, weekly: true, monthly: true, first: true, dateFormat: format)
+        pingWithDateAndCompare(dateString: "2020-01-01, 02:00", daily: true, weekly: false, monthly: true, dateFormat: format)
+        pingWithDateAndCompare(dateString: "2020-01-01, 04:00", daily: false, weekly: false, monthly: false, dateFormat: format)
+    }
+    
+    func testNotFullDayNoPing() {
+        let format = "yyyy-MM-dd, HH:mm"
+        
+        pingWithDateAndCompare(dateString: "2019-12-31, 16:00", daily: true, weekly: true, monthly: true, first: true, dateFormat: format)
+        pingWithDateAndCompare(dateString: "2019-12-31, 23:00", daily: false, weekly: false, monthly: false, dateFormat: format)
+        pingWithDateAndCompare(dateString: "2020-01-01, 04:00", daily: true, weekly: false, monthly: true, dateFormat: format)
+    }
+    
     func testMondayOfWeek() {
-        let monday = componentsOfDate("2017-11-20")
-        XCTAssertEqual(monday.weeksMonday, "2017-11-20")
+        let monday = dateFrom(string: "2017-11-20")
+        XCTAssertEqual(monday.mondayOfCurrentWeekFormatted, "2017-11-20")
         
-        let tuesday = componentsOfDate("2017-11-21")
-        XCTAssertEqual(tuesday.weeksMonday, "2017-11-20")
+        let tuesday = dateFrom(string: "2017-11-21")
+        XCTAssertEqual(tuesday.mondayOfCurrentWeekFormatted, "2017-11-20")
         
-        let wednesday = componentsOfDate("2017-11-22")
-        XCTAssertEqual(wednesday.weeksMonday, "2017-11-20")
+        let wednesday = dateFrom(string: "2017-11-22")
+        XCTAssertEqual(wednesday.mondayOfCurrentWeekFormatted, "2017-11-20")
         
-        let thursday = componentsOfDate("2017-11-22")
-        XCTAssertEqual(thursday.weeksMonday, "2017-11-20")
+        let thursday = dateFrom(string: "2017-11-22")
+        XCTAssertEqual(thursday.mondayOfCurrentWeekFormatted, "2017-11-20")
         
-        let friday = componentsOfDate("2017-12-01")
-        XCTAssertEqual(friday.weeksMonday, "2017-11-27")
+        let friday = dateFrom(string: "2017-12-01")
+        XCTAssertEqual(friday.mondayOfCurrentWeekFormatted, "2017-11-27")
         
-        let saturday = componentsOfDate("2017-12-02")
-        XCTAssertEqual(saturday.weeksMonday, "2017-11-27")
+        let saturday = dateFrom(string: "2017-12-02")
+        XCTAssertEqual(saturday.mondayOfCurrentWeekFormatted, "2017-11-27")
         
-        let sunday = componentsOfDate("2017-12-03")
-        XCTAssertEqual(sunday.weeksMonday, "2017-11-27")
+        let sunday = dateFrom(string: "2017-12-03")
+        XCTAssertEqual(sunday.mondayOfCurrentWeekFormatted, "2017-11-27")
+        
+        let singleDigitTest = dateFrom(string: "2019-02-09")
+        XCTAssertEqual(singleDigitTest.mondayOfCurrentWeekFormatted, "2019-02-04")
     }
     
     func testNoPingOnDevelopmentBuild() {
@@ -209,9 +224,9 @@ class DAUTests: XCTestCase {
     
     // MARK: Helpers
     
-    private func dateFrom(string: String) -> Date {
+    private func dateFrom(string: String, format: String? = nil) -> Date {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
+        dateFormatter.dateFormat = format ?? "yyyy-MM-dd"
         
         return dateFormatter.date(from: string)!
     }
@@ -228,9 +243,9 @@ class DAUTests: XCTestCase {
     @discardableResult
     private func pingWithDateAndCompare(dateString: String = "2017-11-20", daily: Bool, weekly: Bool,
                                         monthly: Bool, first: Bool = false, woi: String? = nil,
-                                        firstPingPref: Bool = false) -> DAU.ParamsAndPrefs? {
+                                        firstPingPref: Bool = false, dateFormat: String? = nil) -> DAU.ParamsAndPrefs? {
         
-        let date = dateFrom(string: dateString)
+        let date = dateFrom(string: dateString, format: dateFormat)
         let dau = DAU(date: date)
         let params = dau.paramsAndPrefsSetup()
         
@@ -259,7 +274,6 @@ class DAUTests: XCTestCase {
         Preferences.DAU.firstPingParam.value = firstPing
         
         Preferences.DAU.lastLaunchInfo.value = params!.lastLaunchInfoPreference
-        Preferences.DAU.lastPingFirstMonday.value = params!.lastPingFirstMondayPreference
     }
     
     private var appVersion: String {

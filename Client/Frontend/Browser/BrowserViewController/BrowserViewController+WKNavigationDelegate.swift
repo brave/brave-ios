@@ -21,6 +21,14 @@ extension WKNavigationAction {
     }
 }
 
+extension URL {
+    /// Obtain a schemeless absolute string
+    fileprivate var schemelessAbsoluteString: String {
+        guard let scheme = self.scheme else { return absoluteString }
+        return absoluteString.replacingOccurrences(of: "\(scheme)://", with: "")
+    }
+}
+
 extension BrowserViewController: WKNavigationDelegate {
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
         if tabManager.selectedTab?.webView !== webView {
@@ -149,17 +157,10 @@ extension BrowserViewController: WKNavigationDelegate {
             pendingRequests[url.absoluteString] = navigationAction.request
             
             if let urlHost = url.normalizedHost {
-                // If an upgraded https load happens with a host which was upgraded, increase the stats
-                if url.scheme == "https", let _ = pendingHTTPUpgrades.removeValue(forKey: urlHost) {
-                    BraveGlobalShieldStats.shared.httpse += 1
-                    if let stats = self.tabManager[webView]?.contentBlocker.stats {
-                        self.tabManager[webView]?.contentBlocker.stats = stats.create(byAddingListItem: .https)
-                    }
-                }
-                
                 if let mainDocumentURL = navigationAction.request.mainDocumentURL, url.scheme == "http" {
-                    let domainForShields = Domain.getOrCreateForUrl(mainDocumentURL, context: DataController.viewContext)
-                    if domainForShields.isShieldExpected(.HTTPSE) && HttpsEverywhereStats.shared.shouldUpgrade(url) {
+                    let domainForShields = Domain.getOrCreate(forUrl: mainDocumentURL)
+                    let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
+                    if domainForShields.isShieldExpected(.HTTPSE, isPrivateBrowsing: isPrivateBrowsing) && HttpsEverywhereStats.shared.shouldUpgrade(url) {
                         // Check if HTTPSE is on and if it is, whether or not this http url would be upgraded
                         pendingHTTPUpgrades[urlHost] = navigationAction.request
                     }
@@ -177,12 +178,12 @@ extension BrowserViewController: WKNavigationDelegate {
             // request then the page is reloaded with a proper url and adblocking rules are applied.
             if
                 let mainDocumentURL = navigationAction.request.mainDocumentURL,
-                mainDocumentURL == url,
+                mainDocumentURL.schemelessAbsoluteString == url.schemelessAbsoluteString,
                 !url.isSessionRestoreURL,
                 navigationAction.sourceFrame.isMainFrame || navigationAction.targetFrame?.isMainFrame == true {
                 
                 // Identify specific block lists that need to be applied to the requesting domain
-                let domainForShields = Domain.getOrCreateForUrl(mainDocumentURL, context: DataController.viewContext)
+                let domainForShields = Domain.getOrCreate(forUrl: mainDocumentURL)
                 let (on, off) = BlocklistName.blocklists(forDomain: domainForShields)
                 let controller = webView.configuration.userContentController
                 
@@ -190,11 +191,25 @@ extension BrowserViewController: WKNavigationDelegate {
                 on.compactMap { $0.rule }.forEach(controller.add)
                 off.compactMap { $0.rule }.forEach(controller.remove)
               
+                let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
                 if let tab = tabManager[webView] {
-                    tab.userScriptManager?.isFingerprintingProtectionEnabled = domainForShields.isShieldExpected(.FpProtection)
+                    tab.userScriptManager?.isFingerprintingProtectionEnabled = domainForShields.isShieldExpected(.FpProtection, isPrivateBrowsing: isPrivateBrowsing)
                 }
 
-                webView.configuration.preferences.javaScriptEnabled = !domainForShields.isShieldExpected(.NoScript)
+                webView.configuration.preferences.javaScriptEnabled = !domainForShields.isShieldExpected(.NoScript, isPrivateBrowsing: isPrivateBrowsing)
+            }
+            
+            //Cookie Blocking code below
+            if let tab = tabManager[webView] {
+                tab.userScriptManager?.isCookieBlockingEnabled = Preferences.Privacy.blockAllCookies.value
+            }
+            
+            if let rule = BlocklistName.cookie.rule {
+                if Preferences.Privacy.blockAllCookies.value {
+                    webView.configuration.userContentController.add(rule)
+                } else {
+                    webView.configuration.userContentController.remove(rule)
+                }
             }
             
             decisionHandler(.allow)
@@ -222,6 +237,16 @@ extension BrowserViewController: WKNavigationDelegate {
         if let url = responseURL {
             request = pendingRequests.removeValue(forKey: url.absoluteString)
         }
+        
+        if let url = responseURL, let urlHost = responseURL?.normalizedHost {
+            // If an upgraded https load happens with a host which was upgraded, increase the stats
+            if url.scheme == "https", let _ = pendingHTTPUpgrades.removeValue(forKey: urlHost) {
+                BraveGlobalShieldStats.shared.httpse += 1
+                if let stats = self.tabManager[webView]?.contentBlocker.stats {
+                    self.tabManager[webView]?.contentBlocker.stats = stats.create(byAddingListItem: .https)
+                }
+            }
+        }
 
         // We can only show this content in the web view if this URL is not pending
         // download via the context menu.
@@ -242,7 +267,7 @@ extension BrowserViewController: WKNavigationDelegate {
         // If the content type is not HTML, create a temporary document so it can be downloaded and
         // shared to external applications later. Otherwise, clear the old temporary document.
         if let tab = tabManager[webView] {
-            if response.mimeType != MIMEType.HTML, let request = request {
+            if response.mimeType?.isKindOfHTML == false, let request = request {
                 tab.temporaryDocument = TemporaryDocument(preflightResponse: response, request: request)
             } else {
                 tab.temporaryDocument = nil

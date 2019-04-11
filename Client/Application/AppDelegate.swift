@@ -39,6 +39,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
     var receivedURLs: [URL]?
     
     var authenticator: AppAuthenticator?
+    
+    /// Object used to handle server pings
+    let dau = DAU()
 
     @discardableResult func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         //
@@ -58,6 +61,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         self.window!.backgroundColor = UIColor.Photon.White100
 
         AdBlockStats.shared.startLoading()
+        AdblockResourceDownloader.shared.regionalAdblockResourcesSetup()
+        
         HttpsEverywhereStats.shared.startLoading()
         
         // Passcode checking, must happen on immediate launch
@@ -101,7 +106,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
 
         let profile = getProfile(application)
         let profilePrefix = profile.prefs.getBranchPrefix()
-        Preferences.migratePreferences(keyPrefix: profilePrefix)
+        Migration.launchMigrations(keyPrefix: profilePrefix)
 
         if !DebugSettingsBundleOptions.disableLocalWebServer {
             // Set up a web server that serves us static content. Do this early so that it is ready when the UI is presented.
@@ -234,7 +239,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
                     })
                 }
             } else {
-                urp.getCustomHeaders()
                 urp.pingIfEnoughTimePassed()
             }
         } else {
@@ -295,7 +299,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         
         // We try to send DAU ping each time the app goes to foreground to work around network edge cases
         // (offline, bad connection etc.)
-        DAU().sendPingToServer()
+        dau.sendPingToServer()
     }
 
     func applicationDidEnterBackground(_ application: UIApplication) {

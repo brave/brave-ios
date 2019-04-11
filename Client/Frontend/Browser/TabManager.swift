@@ -71,18 +71,7 @@ class TabManager: NSObject {
 
     // A WKWebViewConfiguration used for normal tabs
     lazy fileprivate var configuration: WKWebViewConfiguration = {
-        let configuration = WKWebViewConfiguration()
-        configuration.processPool = WKProcessPool()
-        configuration.preferences.javaScriptCanOpenWindowsAutomatically = !Preferences.General.blockPopups.value
-        return configuration
-    }()
-
-    // A WKWebViewConfiguration used for private mode tabs
-    lazy fileprivate var privateConfiguration: WKWebViewConfiguration = {
-        let configuration = WKWebViewConfiguration()
-        configuration.processPool = WKProcessPool()
-        configuration.preferences.javaScriptCanOpenWindowsAutomatically = !Preferences.General.blockPopups.value
-        return configuration
+        return TabManager.getNewConfiguration()
     }()
 
     fileprivate let imageStore: DiskImageStore?
@@ -165,6 +154,31 @@ class TabManager: NSObject {
     private func tabs(withType type: TabType) -> [Tab] {
         assert(Thread.isMainThread)
         return allTabs.filter { $0.type == type }
+    }
+    
+    private class func getNewConfiguration() -> WKWebViewConfiguration {
+        let configuration = WKWebViewConfiguration()
+        configuration.processPool = WKProcessPool()
+        configuration.preferences.javaScriptCanOpenWindowsAutomatically = !Preferences.General.blockPopups.value
+        UserReferralProgram.shared?.insertCookies(intoStore: configuration.websiteDataStore.httpCookieStore)
+        return configuration
+    }
+    
+    func resetConfiguration() {
+        configuration = TabManager.getNewConfiguration()
+    }
+    
+    func reset() {
+        resetConfiguration()
+        allTabs.filter({$0.webView != nil}).forEach({
+            $0.resetWebView(config: configuration)
+        })
+        let tab = selectedTab
+        _selectedIndex = -1
+        selectTab(tab)
+        if let url = selectedTab?.url {
+            selectedTab?.loadRequest(PrivilegedRequest(url: url) as URLRequest)
+        }
     }
 
     func getTabFor(_ url: URL) -> Tab? {
@@ -310,12 +324,12 @@ class TabManager: NSObject {
         assert(Thread.isMainThread)
 
         // Take the given configuration. Or if it was nil, take our default configuration for the current browsing mode.
-        let configuration: WKWebViewConfiguration = configuration ?? (isPrivate ? privateConfiguration : self.configuration)
+        let configuration: WKWebViewConfiguration = configuration ?? self.configuration
 
         let type: TabType = isPrivate ? .private : .regular
         let tab = Tab(configuration: configuration, type: type)
         if !isPrivate {
-            tab.id = id ?? TabMO.create().syncUUID
+            tab.id = id ?? TabMO.create()
         }
         configureTab(tab, request: request, afterTab: afterTab, flushToDisk: flushToDisk, zombie: zombie, isPrivate: isPrivate)
         return tab
@@ -325,7 +339,7 @@ class TabManager: NSObject {
         assert(Thread.isMainThread)
 
         let tab = Tab(configuration: configuration ?? self.configuration)
-        tab.id = TabMO.create().syncUUID
+        tab.id = TabMO.create()
         
         configureTab(tab, request: request, afterTab: afterTab, flushToDisk: flushToDisk, zombie: zombie)
         return tab
@@ -356,18 +370,8 @@ class TabManager: NSObject {
     }
     
     private func saveTabOrder() {
-        let context = DataController.newBackgroundContext()
-        context.perform {
-            for (i, tab) in self.allTabs.enumerated() {
-                guard let managedObject = TabMO.get(fromId: tab.id, context: context) else { 
-                    log.error("Error: Tab missing managed object")
-                    continue
-                }
-                managedObject.order = Int16(i)
-            }
-            
-            DataController.save(context: context)
-        }
+        let allTabIds = allTabs.compactMap { $0.id }
+        TabMO.saveTabOrder(tabIds: allTabIds)
     }
 
     func configureTab(_ tab: Tab, request: URLRequest?, afterTab parent: Tab? = nil, flushToDisk: Bool, zombie: Bool, isPopup: Bool = false, isPrivate: Bool = false) {
@@ -450,8 +454,6 @@ class TabManager: NSObject {
         
         guard let webView = tab.webView, let order = indexOfWebView(webView) else { return nil }
         
-        let context = DataController.viewContext
-        
         // Ignore session restore data.
         guard let urlString = tab.url?.absoluteString, !urlString.contains("localhost") else { return nil }
         
@@ -476,7 +478,7 @@ class TabManager: NSObject {
             
             log.debug("---stack: \(urls)")
         }
-        if let id = TabMO.get(fromId: tab.id, context: context)?.syncUUID {
+        if let id = TabMO.get(fromId: tab.id)?.syncUUID {
             let displayTitle = tab.displayTitle
             let title = displayTitle != "" ? displayTitle : ""
             
@@ -519,8 +521,7 @@ class TabManager: NSObject {
         let prevCount = count
         allTabs.remove(at: removalIndex)
         
-        let context = DataController.viewContext
-        if let tab = TabMO.get(fromId: tab.id, context: context) {
+        if let tab = TabMO.get(fromId: tab.id) {
             tab.delete()
         }
 
@@ -781,7 +782,7 @@ class TabManager: NSObject {
             tab.url = nil
 
             if let url = URL(string: urlString),
-                let faviconURL = Domain.getOrCreateForUrl(url, context: DataController.viewContext).favicon?.url {
+                let faviconURL = Domain.getOrCreate(forUrl: url).favicon?.url {
                 let icon = Favicon(url: faviconURL, date: Date())
                 icon.width = 1
                 tab.favicons.append(icon)
@@ -821,7 +822,7 @@ class TabManager: NSObject {
     
     func restoreTab(_ tab: Tab) {
         // Tab was created with no active webview or session data. Restore tab data from CD and configure.
-        guard let savedTab = TabMO.get(fromId: tab.id, context: DataController.viewContext) else { return }
+        guard let savedTab = TabMO.get(fromId: tab.id) else { return }
         
         if let history = savedTab.urlHistorySnapshot as? [String], let tabUUID = savedTab.syncUUID, let url = savedTab.url {
             let data = SavedTab(id: tabUUID, title: savedTab.title, url: url, isSelected: savedTab.isSelected, order: savedTab.order, screenshot: nil, history: history, historyIndex: savedTab.urlHistoryCurrentIndex)
@@ -1043,7 +1044,6 @@ extension TabManager: PreferencesObserver {
             }
             // The default tab configurations also need to change.
             configuration.preferences.javaScriptCanOpenWindowsAutomatically = allowPopups
-            privateConfiguration.preferences.javaScriptCanOpenWindowsAutomatically = allowPopups
         default:
             break
         }

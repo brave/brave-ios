@@ -4,10 +4,6 @@ cache:
   directories:
     - Carthage
 
-branches:
-   only:
-     - "development"
-
 install: true
 
 before_install:
