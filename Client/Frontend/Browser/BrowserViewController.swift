@@ -2180,29 +2180,29 @@ extension BrowserViewController: WKUIDelegate {
 
     func webView(_ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping () -> Void) {
         var messageAlert = MessageAlert(message: message, frame: frame, completionHandler: completionHandler, suppressHandler: nil)
-        handleAlert(webView: webView, alert: &messageAlert) { _ in
+        handleAlert(webView: webView, alert: &messageAlert) {
             completionHandler()
         }
     }
 
     func webView(_ webView: WKWebView, runJavaScriptConfirmPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping (Bool) -> Void) {
         var confirmAlert = ConfirmPanelAlert(message: message, frame: frame, completionHandler: completionHandler, suppressHandler: nil)
-        handleAlert(webView: webView, alert: &confirmAlert) { _ in
+        handleAlert(webView: webView, alert: &confirmAlert) {
             completionHandler(false)
         }
     }
 
     func webView(_ webView: WKWebView, runJavaScriptTextInputPanelWithPrompt prompt: String, defaultText: String?, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping (String?) -> Void) {
         var textInputAlert = TextInputAlert(message: prompt, frame: frame, completionHandler: completionHandler, defaultText: defaultText, suppressHandler: nil)
-        handleAlert(webView: webView, alert: &textInputAlert) { _ in
+        handleAlert(webView: webView, alert: &textInputAlert) {
             completionHandler(nil)
         }
     }
     
-    func handleAlert<T: JSAlertInfo>(webView: WKWebView, alert: inout T, completionHandler: @escaping (Any?) -> Void) {
+    func handleAlert<T: JSAlertInfo>(webView: WKWebView, alert: inout T, completionHandler: @escaping () -> Void) {
         guard let promptingTab = tabManager[webView], !promptingTab.blockAllAlerts else {
             tabManager[webView]?.cancelQueuedAlerts()
-            completionHandler(nil)
+            completionHandler()
             return
         }
         promptingTab.alertShownCount += 1
@@ -2211,24 +2211,24 @@ extension BrowserViewController: WKUIDelegate {
                 func suppressDialogues(_: UIAlertAction) {
                     promptingTab.blockAllAlerts = true
                     self.tabManager[webView]?.cancelQueuedAlerts()
-                    completionHandler(nil)
+                    completionHandler()
                 }
                 // Show confirm alert here.
                 let suppressSheet = UIAlertController(title: nil, message: Strings.SuppressAlertsActionMessage, preferredStyle: .actionSheet)
                 suppressSheet.addAction(UIAlertAction(title: Strings.SuppressAlertsActionTitle, style: .destructive, handler: suppressDialogues))
                 suppressSheet.addAction(UIAlertAction(title: Strings.CancelButtonTitle, style: .cancel, handler: { _ in
-                    completionHandler(nil)
+                    completionHandler()
                 }))
-                self.present(suppressSheet, animated: true, completion: nil)
+                self.present(suppressSheet, animated: true)
             } else {
-                completionHandler(nil)
+                completionHandler()
             }
         }
         alert.suppressHandler = promptingTab.alertShownCount > 1 ? suppressBlock : nil
         if shouldDisplayJSAlertForWebView(webView) {
             let controller = alert.alertController()
             controller.delegate = self
-            present(controller, animated: true, completion: nil)
+            present(controller, animated: true)
         } else {
             promptingTab.queueJavascriptAlertPrompt(alert)
         }

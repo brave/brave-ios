@@ -19,11 +19,10 @@ class JSPromptAlertController: UIAlertController {
     var info: JSAlertInfo?
     var showsCancel: Bool = false
     
-    class func newController(title: String?, message: String?, preferredStyle: UIAlertController.Style = .alert, info: JSAlertInfo, showCancel: Bool = true) -> JSPromptAlertController {
-        let controller = JSPromptAlertController(title: title, message: message, preferredStyle: preferredStyle)
-        controller.info = info
-        controller.showsCancel = showCancel
-        return controller
+    convenience init(title: String?, message: String?, preferredStyle: UIAlertController.Style = .alert, info: JSAlertInfo, showCancel: Bool = true) {
+        self.init(title: title, message: message, preferredStyle: preferredStyle)
+        self.info = info
+        self.showsCancel = showCancel
     }
     
     override func viewDidLoad() {
@@ -69,7 +68,7 @@ struct MessageAlert: JSAlertInfo {
     var suppressHandler: SuppressHandler?
 
     func alertController() -> JSPromptAlertController {
-        let alertController = JSPromptAlertController.newController(title: titleForJavaScriptPanelInitiatedByFrame(frame),
+        let alertController = JSPromptAlertController(title: titleForJavaScriptPanelInitiatedByFrame(frame),
                                                                     message: message,
                                                                     info: self,
                                                                     showCancel: false)
@@ -92,7 +91,7 @@ struct ConfirmPanelAlert: JSAlertInfo {
 
     func alertController() -> JSPromptAlertController {
         // Show JavaScript confirm dialogs.
-        let alertController = JSPromptAlertController.newController(title: titleForJavaScriptPanelInitiatedByFrame(frame),
+        let alertController = JSPromptAlertController(title: titleForJavaScriptPanelInitiatedByFrame(frame),
                                                                     message: message,
                                                                     info: self)
         alertController.addAction(UIAlertAction(title: Strings.OKString, style: .default) { _ in
@@ -114,7 +113,7 @@ struct TextInputAlert: JSAlertInfo {
     var suppressHandler: SuppressHandler?
     
     func alertController() -> JSPromptAlertController {
-        let alertController = JSPromptAlertController.newController(title: titleForJavaScriptPanelInitiatedByFrame(frame),
+        let alertController = JSPromptAlertController(title: titleForJavaScriptPanelInitiatedByFrame(frame),
                                                                     message: message,
                                                                     info: self)
         var input: UITextField!
