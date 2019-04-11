@@ -105,6 +105,23 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
                                           sectionNameKeyPath: nil, cacheName: nil)
     }
     
+    public class func foldersFrc() -> NSFetchedResultsController<Bookmark> {
+        let context = DataController.viewContext
+        let fetchRequest = NSFetchRequest<Bookmark>()
+        
+        fetchRequest.entity = entity(context: context)
+        fetchRequest.fetchBatchSize = 20
+        
+        let orderSort = NSSortDescriptor(key: "order", ascending: true)
+        let createdSort = NSSortDescriptor(key: "created", ascending: false)
+        fetchRequest.sortDescriptors = [orderSort, createdSort]
+        
+        fetchRequest.predicate = NSPredicate(format: "isFolder == true")
+        
+        return NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: context,
+                                          sectionNameKeyPath: nil, cacheName: nil)
+    }
+    
     public class func contains(url: URL, getFavorites: Bool = false) -> Bool {
         guard let count = count(forUrl: url, getFavorites: getFavorites) else { return false }
         return count > 0
@@ -439,6 +456,17 @@ extension Bookmark {
         }
         
         return allBookmarks
+    }
+    
+    static func getFoldersRecursively(parentFolder: Bookmark? = nil) -> [Bookmark] {
+        let isFolderKP = #keyPath(Bookmark.isFolder)
+        
+        let predicate = NSPredicate(format: "\(isFolderKP) == true")
+        
+        let orderSort = NSSortDescriptor(key: "order", ascending: true)
+        let createdSort = NSSortDescriptor(key: "created", ascending: false)
+        
+        return all(where: predicate, sortDescriptors: [orderSort, createdSort])!
     }
     
     // MARK: Delete

@@ -8,13 +8,14 @@ import Storage
 class MenuViewController: UITableViewController {
     
     enum MenuButtons: Int {
-        case bookmarks, history, settings, share
+        case bookmarks, history, settings, add, share
         
         var title: String {
             switch self {
             case .bookmarks: return "Bookmarks"
             case .history: return "History"
             case .settings: return "Settings"
+            case .add: return "Add to..."
             case .share: return "Share with..."
             }
         }
@@ -24,12 +25,13 @@ class MenuViewController: UITableViewController {
             case .bookmarks: return #imageLiteral(resourceName: "menu-add-bookmark")
             case .history: return #imageLiteral(resourceName: "menu-history")
             case .settings: return #imageLiteral(resourceName: "menu-settings")
+            case .add: return #imageLiteral(resourceName: "menu-add-bookmark")
             case .share: return #imageLiteral(resourceName: "nav-share")
             }
         }
         
         // TODO: Remove when we can use Swift 4.2/`CaseIterable`
-        static let allCases: [MenuButtons] = [.bookmarks, .history, .settings, .share]
+        static let allCases: [MenuButtons] = [.bookmarks, .history, .settings, .add, .share]
     }
     
     let bvc: BrowserViewController
@@ -62,6 +64,7 @@ class MenuViewController: UITableViewController {
         case MenuButtons.bookmarks.rawValue: openBookmarks()
         case MenuButtons.history.rawValue: openHistory()
         case MenuButtons.settings.rawValue: openSettings()
+        case MenuButtons.add.rawValue: openAddBookmark()
         case MenuButtons.share.rawValue: openShareSheet()
             
         default:
@@ -77,6 +80,22 @@ class MenuViewController: UITableViewController {
         nc.modalPresentationStyle = .formSheet
         
         nc.navigationBar.topItem?.leftBarButtonItem =
+            UIBarButtonItem(barButtonSystemItem: .done, target: nc, action: #selector(SettingsNavigationController.done))
+        
+        dismiss(animated: true)
+        bvc.present(nc, animated: true)
+    }
+    
+    func openAddBookmark() {
+        print("add bookmark")
+        
+        let vc = AddEditBookmarkTableViewController(mode: AddEditBookmarkTableViewController.Mode.addBookmark(title: "title", url: URL(string: "https://brave.com")!))
+        //vc.toolbarUrlActionsDelegate = bvc
+        
+        let nc = SettingsNavigationController(rootViewController: vc)
+        nc.modalPresentationStyle = .formSheet
+        
+        nc.navigationBar.topItem?.rightBarButtonItem =
             UIBarButtonItem(barButtonSystemItem: .done, target: nc, action: #selector(SettingsNavigationController.done))
         
         dismiss(animated: true)
