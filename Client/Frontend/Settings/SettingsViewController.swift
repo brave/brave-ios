@@ -224,8 +224,8 @@ class SettingsViewController: TableViewController {
             ),
             BoolRow(title: Strings.Block_all_cookies, option: Preferences.Privacy.blockAllCookies, onValueChange: { [unowned self] in
                 func toggleCookieSetting(with status: Bool) {
-                    //Lock/Unlock Cookie Folder
-                    let completionBlock: (Bool) -> Void = {(_) in
+                    // Lock/Unlock Cookie Folder
+                    let completionBlock: (Bool) -> Void = { _ in
                         let success = FileManager.default.setFolderAccess([
                             (.cookie, status),
                             (.webSiteData, status)
@@ -246,7 +246,7 @@ class SettingsViewController: TableViewController {
                             self.present(alert, animated: true)
                         }
                     }
-                    //Save cookie to disk before purge for unblock load.
+                    // Save cookie to disk before purge for unblock load.
                     status ? HTTPCookie.saveToDisk(completion: completionBlock) : completionBlock(true)
                 }
                 if $0 {

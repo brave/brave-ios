@@ -21,9 +21,7 @@ public extension FileManager {
     
     //Lock a folder using FolderLockObj provided.
     @discardableResult public func setFolderAccess(_ lockObjects: [FolderLockObj]) -> Bool {
-        guard let baseDir = NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true).first else {
-            return false
-        }
+        guard let baseDir = baseDirectory() else { return false }
         for lockObj in lockObjects {
             do {
                 try self.setAttributes([.posixPermissions: (lockObj.lock ? 0 : 0o755)], ofItemAtPath: baseDir + lockObj.folder.rawValue)
@@ -37,10 +35,7 @@ public extension FileManager {
     
     // Check the locked status of a folder. Returns true for locked.
     public func checkLockedStatus(folder: Folder) -> Bool {
-        guard let baseDir = NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true).first else {
-            //Returning false as this guard is to maintain `explicit` code style
-            return false
-        }
+        guard let baseDir = baseDirectory() else { return false }
         do {
             if let lockValue = try self.attributesOfItem(atPath: baseDir + folder.rawValue)[.posixPermissions] as? NSNumber {
                 return lockValue == 0o755
@@ -89,5 +84,9 @@ public extension FileManager {
             log.error("Failed to create folder, error: \(error)")
             return nil
         }
+    }
+    
+    private func baseDirectory() -> String? {
+         return NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true).first
     }
 }

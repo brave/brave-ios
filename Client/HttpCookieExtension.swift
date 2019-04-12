@@ -74,7 +74,7 @@ public extension HTTPCookie {
         let dispatchGroup = DispatchGroup()
         cookies.forEach({
             dispatchGroup.enter()
-            cookieStore.setCookie($0, completionHandler: {dispatchGroup.leave()})
+            cookieStore.setCookie($0, completionHandler: dispatchGroup.leave)
         })
         dispatchGroup.notify(queue: .main) {
             completion?(true)
