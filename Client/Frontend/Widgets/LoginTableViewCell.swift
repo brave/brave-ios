@@ -120,7 +120,7 @@ class LoginTableViewCell: UITableViewCell {
                 return "\(highlightedLabel.text ?? ""), \(descriptionLabel.text ?? "")"
             }
         }
-        set {
+        set { // swiftlint:disable:this unused_setter_value
             // Ignore sets
         }
     }
