@@ -1647,7 +1647,7 @@ extension BrowserViewController: URLBarDelegate {
     }
     
     func urlBarDidTapMenuButton(_ urlBar: URLBarView) {
-        let homePanel = MenuViewController(bvc: self)
+        let homePanel = MenuViewController(bvc: self, tab: tabManager.selectedTab)
         let popover = PopoverController(contentController: homePanel, contentSizeBehavior: .preferredContentSize)
         popover.present(from: urlBar.menuButton, on: self)
     }
@@ -1697,7 +1697,7 @@ extension BrowserViewController: ToolbarDelegate {
     }
     
     func tabToolbarDidPressMenu(_ tabToolbar: ToolbarProtocol, button: UIButton) {
-        let homePanel = MenuViewController(bvc: self)
+        let homePanel = MenuViewController(bvc: self, tab: tabManager.selectedTab)
         let popover = PopoverController(contentController: homePanel, contentSizeBehavior: .preferredContentSize)
         popover.present(from: tabToolbar.menuButton, on: self)
     }

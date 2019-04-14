@@ -15,90 +15,161 @@ class AddEditBookmarkTableViewController: UITableViewController {
         case editFolder(folder: Bookmark)
     }
     
+    enum Action { case add, edit }
+    
+    enum BookmarkType {
+        case bookmark(title: String, url: URL)
+        case folder(title: String)
+    }
+    
+    enum Location {
+        case favorites
+        case rootLevel
+        case folder(folder: Bookmark)
+        
+        static let favoritesTag = 10
+        static let rootLevelTag = 11
+        static let folderTag = 12
+        
+        var getFolder: Bookmark? {
+            switch self {
+            case .folder(let folder): return folder
+            default: return nil
+            }
+        }
+        
+    }
+    
+    private enum DataSourcePresentationMode {
+        /// Showing currently selected save location.
+        case currentSelection
+        /// Showing a list of folders of which user can save the Bookmark to.
+        case folderHierarchy
+        
+        mutating func toggle() {
+            switch self {
+            case .currentSelection: self = .folderHierarchy
+            case .folderHierarchy: self = .currentSelection
+            }
+        }
+    }
+    
     let frc: NSFetchedResultsController<Bookmark>
     
-    let mode: Mode
+    let action: AddEditBookmarkTableViewController.Action
+    let type: AddEditBookmarkTableViewController.BookmarkType
     
-    init(mode: AddEditBookmarkTableViewController.Mode) {
+    lazy var saveButton: UIBarButtonItem = {
+        let button = UIBarButtonItem()
+        button.target = self
+        button.action = #selector(save)
+        button.title = "Save"
+        
+        return button
+    }()
+    
+    var location: Location
+    
+    lazy var bookmarkDetailsView: BookmarkDetailsView = {
+        let view = BookmarkDetailsView(type: type)
+        return view
+    }()
+    
+    private var presentationMode: DataSourcePresentationMode
+    
+    init(action: AddEditBookmarkTableViewController.Action,
+         type: AddEditBookmarkTableViewController.BookmarkType) {
+        self.action = action
+        self.type = type
+        
         frc = Bookmark.foldersFrc()
-        self.mode = mode
+        location = .rootLevel
+        presentationMode = .currentSelection
         
         super.init(style: .grouped)
-        
-        
     }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
+    var sortedFolders = [IndentedFolder]()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
         
+        navigationController?.navigationBar.topItem?.rightBarButtonItem = saveButton
+
         tableView.rowHeight = 44
-        tableView.cellLayoutMarginsFollowReadableWidth = false
-        
-        let bookmarkDetailsView = BookmarkDetailsView()
-        bookmarkDetailsView.translatesAutoresizingMaskIntoConstraints = false
-        
-        tableView.tableHeaderView = bookmarkDetailsView
-        
-        bookmarkDetailsView.snp.makeConstraints {
-            $0.width.equalTo(self.view)
-            $0.top.equalTo(self.view)
-            $0.centerX.equalTo(self.view)
-        }
-        
         tableView.contentInset = UIEdgeInsets(top: 36, left: 0, bottom: 0, right: 0)
         
-        bookmarkDetailsView.layoutIfNeeded()
-        
-        //tableView.tableFooterView = UIView()
-        
         frc.delegate = self
-        
         try? frc.performFetch()
         sortedFolders = sortFolders()
         
         tableView.reloadData()
-        
-        
     }
-    
-    var allFolders = [Bookmark]()
-    var sortedFolders = [IndentedFolder]()
     
     typealias IndentedFolder = (Bookmark, indentationLevel: Int)
     
-    func sortFolders(parentID: NSManagedObjectID? = nil, indentationLevel: Int = 0) -> [IndentedFolder] {
+    /// Indentation level starts with 0, but this level is designed for arbitrary folders
+    /// (root level bookamrks, favorites)
+    func sortFolders(parentID: NSManagedObjectID? = nil, indentationLevel: Int = 1) -> [IndentedFolder] {
         guard let objects = frc.fetchedObjects else { return [] }
         
-        var s = [IndentedFolder]()
+        var result = [IndentedFolder]()
         
         objects.filter { $0.parentFolder?.objectID == parentID }.forEach {
-            s.append(($0, indentationLevel: indentationLevel))
-            s.append(contentsOf: sortFolders(parentID: $0.objectID, indentationLevel: indentationLevel + 1))
+            result.append(($0, indentationLevel: indentationLevel))
+            result.append(contentsOf: sortFolders(parentID: $0.objectID,
+                                                  indentationLevel: indentationLevel + 1))
         }
      
-        return s
+        return result
     }
     
-    var testToggle = false
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+        if tableView.tableHeaderView != nil { return }
+        
+        let header = bookmarkDetailsView
+        header.delegate = self
+        
+        header.setNeedsUpdateConstraints()
+        header.updateConstraintsIfNeeded()
+        header.frame = CGRect(x: 0, y: 0, width: tableView.bounds.width, height: CGFloat.greatestFiniteMagnitude)
+        var newFrame = header.frame
+        header.setNeedsLayout()
+        header.layoutIfNeeded()
+        let newSize = header.systemLayoutSizeFitting(UILayoutFittingCompressedSize)
+        newFrame.size.height = newSize.height
+        header.frame = newFrame
+        tableView.tableHeaderView = header
+    }
+    
+    @objc func save() {
+        switch location {
+        case .rootLevel:
+            let title = bookmarkDetailsView.titleTextField.text
+            let url = URL(string: bookmarkDetailsView.urlTextField.text!)
+            
+            Bookmark.add(url: url!, title: title)
+        case .favorites: break
+        case .folder(let folder): break
+        }
+        
+        dismiss(animated: true)
+    }
+    
+    var totalCount: Int { return sortedFolders.count + 3 }
 
     // MARK: - Table view data source
     
-    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 16
-    }
-
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return sortedFolders.count
+        switch presentationMode {
+        case .currentSelection: return 1
+        case .folderHierarchy: return sortedFolders.count + 3
+        }
     }
     
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -106,28 +177,104 @@ class AddEditBookmarkTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        testToggle = !testToggle
-        tableView.deselectRow(at: indexPath, animated: true)
+        if presentationMode == .folderHierarchy {
+            guard let tag = tableView.cellForRow(at: indexPath)?.tag else { return }
+            
+            switch tag {
+            case Location.favoritesTag: location = .favorites
+            case Location.rootLevelTag: location = .rootLevel
+            case Location.folderTag:
+                let folder = sortedFolders[indexPath.row - 3].0
+                location = .folder(folder: folder)
+            default: assertionFailure("not supported tag was selected: \(tag)")
+                
+            }
+        }
+        
+        presentationMode.toggle()
+        
+        // This gives us an animation while switching between presentation modes.
+        tableView.reloadSections(IndexSet(integer: 0), with: .automatic)
     }
-
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = IndentedImageTableViewCell()
+    
+    var rootLevelFolderCell: IndentedImageTableViewCell {
+        let cell = IndentedImageTableViewCell().then {
+            $0.folderName.text = "Bookmarks"
+            $0.tag = Location.rootLevelTag
+            if case .rootLevel = location, presentationMode == .folderHierarchy {
+                $0.accessoryType = .checkmark
+            }
+        }
         
-        let indentedFolder = sortedFolders[indexPath.row]
-        
-        cell.folderName.text = indentedFolder.0.displayTitle
-        
-        //cell.textLabel?.text = indentedFolder.0.displayTitle
-        //cell.imageView?.image = #imageLiteral(resourceName: "bookmarks_folder_hollow")
-        cell.indentationLevel = indentedFolder.indentationLevel
-        
-        
-
         return cell
     }
     
-    
+    var favoritesCell: IndentedImageTableViewCell {
+        let cell = IndentedImageTableViewCell(image: #imageLiteral(resourceName: "bookmark"))
+        cell.folderName.text = "Favorites"
+        cell.tag = Location.favoritesTag
+        if case .favorites = location, presentationMode == .folderHierarchy {
+            cell.accessoryType = .checkmark
+        }
+        
+        return cell
+    }
+
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
+        switch presentationMode {
+        case .currentSelection:
+            switch location {
+            case .rootLevel: return rootLevelFolderCell
+            case .favorites: return favoritesCell
+            case .folder(let folder):
+                let cell = IndentedImageTableViewCell()
+                cell.folderName.text = folder.displayTitle
+                cell.tag = Location.folderTag
+                return cell
+            }
+        case .folderHierarchy:
+            let row = indexPath.row
+            
+            if row == 0 {
+                let cell = IndentedImageTableViewCell(image: #imageLiteral(resourceName: "add_tab"))
+                cell.folderName.text = "New Folder"
+                cell.accessoryType = .disclosureIndicator
+                
+                return cell
+            }
+            
+            if row == 1 {
+                return favoritesCell
+            }
+            
+            if row == 2 {
+                return rootLevelFolderCell
+            }
+            
+            let cell = IndentedImageTableViewCell()
+            
+            let indentedFolder = sortedFolders[row - 3]
+            
+            cell.folderName.text = indentedFolder.0.displayTitle
+            cell.indentationLevel = indentedFolder.indentationLevel
+            cell.tag = Location.folderTag
+            
+            if let folder = location.getFolder, folder.objectID == indentedFolder.0.objectID {
+                cell.accessoryType = .checkmark
+            }
+            
+            return cell
+        }
+    }
 }
 
+extension AddEditBookmarkTableViewController: BookmarkDetailsViewDelegate {
+    func correctValues(validationPassed: Bool) {
+        navigationController?.navigationBar.topItem?.rightBarButtonItem?.isEnabled = validationPassed
+    }
+}
+
+// TODO: add frc to see when folders from sync come, do a manual reconfiguration
 extension AddEditBookmarkTableViewController: NSFetchedResultsControllerDelegate {
 }

@@ -4,6 +4,7 @@
 
 import UIKit
 import Storage
+import Shared
 
 class MenuViewController: UITableViewController {
     
@@ -35,9 +36,21 @@ class MenuViewController: UITableViewController {
     }
     
     let bvc: BrowserViewController
+    let tab: Tab?
     
-    init(bvc: BrowserViewController) {
+    lazy var visibleButtons: [MenuButtons] = {
+        let allButtons = MenuButtons.allCases
+        
+        var allWithoutAddButton = allButtons
+        allWithoutAddButton.removeAll { $0 == .add || $0 == .share }
+        
+        guard let url = tab?.url, !url.isLocal else { return allWithoutAddButton }
+        return allButtons
+    }()
+    
+    init(bvc: BrowserViewController, tab: Tab?) {
         self.bvc = bvc
+        self.tab = tab
 
         super.init(nibName: nil, bundle: nil)
     }
@@ -87,16 +100,20 @@ class MenuViewController: UITableViewController {
     }
     
     func openAddBookmark() {
-        print("add bookmark")
         
-        let vc = AddEditBookmarkTableViewController(mode: AddEditBookmarkTableViewController.Mode.addBookmark(title: "title", url: URL(string: "https://brave.com")!))
+        let action = AddEditBookmarkTableViewController.Action.add
+        guard let title = tab?.displayTitle, let url = tab?.url else { return }
+        
+        let type = AddEditBookmarkTableViewController.BookmarkType.bookmark(title: title, url: url)
+        
+        let vc = AddEditBookmarkTableViewController(action: action, type: type)
         //vc.toolbarUrlActionsDelegate = bvc
         
         let nc = SettingsNavigationController(rootViewController: vc)
         nc.modalPresentationStyle = .formSheet
         
-        nc.navigationBar.topItem?.rightBarButtonItem =
-            UIBarButtonItem(barButtonSystemItem: .done, target: nc, action: #selector(SettingsNavigationController.done))
+        nc.navigationBar.topItem?.leftBarButtonItem =
+            UIBarButtonItem(barButtonSystemItem: .cancel, target: nc, action: #selector(SettingsNavigationController.done))
         
         dismiss(animated: true)
         bvc.present(nc, animated: true)
@@ -139,11 +156,11 @@ class MenuViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return MenuButtons.allCases.count
+        return visibleButtons.count
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let button = MenuButtons.allCases[indexPath.row]
+        let button = visibleButtons[indexPath.row]
         let cell = UITableViewCell()
         
         cell.textLabel?.text = button.title
@@ -158,5 +175,3 @@ extension MenuViewController: PopoverContentComponent {
     var isPanToDismissEnabled: Bool { return false }
 
 }
-
-

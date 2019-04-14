@@ -16,7 +16,7 @@ class IndentedImageTableViewCell: UITableViewCell {
         $0.distribution = .equalSpacing
     }
     
-    let folderImage = UIImageView().then {
+    let customImage = UIImageView().then {
         $0.image = #imageLiteral(resourceName: "bookmarks_folder_hollow")
         $0.contentMode = .scaleAspectFit
         $0.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
@@ -35,12 +35,18 @@ class IndentedImageTableViewCell: UITableViewCell {
         
         return view
     }
+    
+    convenience init(image: UIImage) {
+        self.init(style: .default, reuseIdentifier: nil)
+        
+        customImage.image = image
+    }
 
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
 
         indentationWidth = 20
-        mainStackView.addArrangedSubview(folderImage)
+        mainStackView.addArrangedSubview(customImage)
         
         let transparentLine = spacerLine
         transparentLine.backgroundColor = .clear

@@ -5,6 +5,10 @@
 import UIKit
 import SnapKit
 
+protocol BookmarkDetailsViewDelegate: class {
+    func correctValues(validationPassed: Bool)
+}
+
 class BookmarkDetailsView: UIView {
     
     let mainStackView = UIStackView().then {
@@ -32,6 +36,8 @@ class BookmarkDetailsView: UIView {
         $0.placeholder = "Title"
         $0.clearButtonMode = .whileEditing
         $0.translatesAutoresizingMaskIntoConstraints = false
+        
+        $0.tag = 22
     }
     
     let urlTextField = UITextField().then {
@@ -42,6 +48,8 @@ class BookmarkDetailsView: UIView {
         $0.smartDashesType = .no
         $0.clearButtonMode = .whileEditing
         $0.translatesAutoresizingMaskIntoConstraints = false
+        
+        $0.tag = 33
     }
     
     var spacerLine: UIView {
@@ -52,13 +60,11 @@ class BookmarkDetailsView: UIView {
 
         return view
     }
-
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        
-        backgroundColor = .white
-        
-        addSubview(mainStackView)
+    
+    weak var delegate: BookmarkDetailsViewDelegate?
+    
+    convenience init(type: AddEditBookmarkTableViewController.BookmarkType) {
+        self.init(frame: .zero)
         
         mainStackView.addArrangedSubview(spacerLine)
         mainStackView.addArrangedSubview(contentStackView)
@@ -68,27 +74,49 @@ class BookmarkDetailsView: UIView {
         textFieldsStackView.addArrangedSubview(spacerLine)
         textFieldsStackView.addArrangedSubview(urlTextField)
         
-        //urlTextField.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
-        
-        
         contentStackView.addArrangedSubview(faviconImageView)
         contentStackView.addArrangedSubview(textFieldsStackView)
         
         faviconImageView.setContentHuggingPriority(.defaultHigh, for: .horizontal)
         
-        //backgroundColor = .red
+        switch type {
+        case .bookmark(let title, let url):
+            titleTextField.text = title
+            urlTextField.text = url.absoluteString
+        default:
+            break
+        }
         
         mainStackView.snp.makeConstraints {
             $0.edges.equalTo(self)
         }
+    }
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
         
-//        spacerLine.snp.makeConstraints {
-//            $0.height.equalTo(0.3)
-//        }
+        backgroundColor = .white
         
-//        faviconImageView.snp.makeConstraints {
-//            $0.width.equalTo(48)
-//        }
+        addSubview(mainStackView)
+        setupTextFieldTargets()
+    }
+    
+    func setupTextFieldTargets() {
+        [titleTextField, urlTextField].forEach {
+            $0.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
+        }
+    }
+    
+    @objc func textFieldDidChange(_ textField: UITextField) {
+        delegate?.correctValues(validationPassed: correctValues)
+    }
+    
+    var correctValues: Bool {
+        guard let title = titleTextField.text, let url = urlTextField.text else { return false }
+        
+        if title.isEmpty || url.isEmpty { return false }
+        
+        return true
     }
     
     required init?(coder aDecoder: NSCoder) {
