@@ -405,8 +405,17 @@ class BrowserViewController: UIViewController {
         // links into the view from other apps.
         let dropInteraction = UIDropInteraction(delegate: self)
         view.addInteraction(dropInteraction)
-        
+
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(tappingOutOfOverlayMode(_:)))
+        self.view.addGestureRecognizer(tapGesture)
+
         initializeSyncWebView()
+    }
+    
+    @objc func tappingOutOfOverlayMode(_ sender: UITapGestureRecognizer) {
+        if urlBar.inOverlayMode {
+            urlBar.leaveOverlayMode(didCancel: true)
+        }
     }
     
     /// Initialize Sync without connecting. Sync webview needs to be in a "permanent" location
