@@ -4750,6 +4750,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 				de,
@@ -4768,6 +4769,7 @@
 				fr,
 				id,
 				zh,
+				nb,
 			);
 			mainGroup = F84B21B51A090F8100AAB793;
 			productRefGroup = F84B21BF1A090F8100AAB793 /* Products */;
