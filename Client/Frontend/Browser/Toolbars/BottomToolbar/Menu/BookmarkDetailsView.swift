@@ -116,6 +116,9 @@ class BookmarkDetailsView: UIView {
         
         if title.isEmpty || url.isEmpty { return false }
         
+        // Must be valid URL
+        if URL(string: url) == nil { return false }
+        
         return true
     }
     

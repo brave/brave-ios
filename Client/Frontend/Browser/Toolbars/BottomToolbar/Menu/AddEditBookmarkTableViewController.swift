@@ -148,14 +148,19 @@ class AddEditBookmarkTableViewController: UITableViewController {
     }
     
     @objc func save() {
+        guard let title = bookmarkDetailsView.titleTextField.text, let urlString = bookmarkDetailsView.urlTextField.text, let url = URL(string: urlString) else {
+            assertionFailure()
+            dismiss(animated: true)
+            return
+        }
+        
         switch location {
         case .rootLevel:
-            let title = bookmarkDetailsView.titleTextField.text
-            let url = URL(string: bookmarkDetailsView.urlTextField.text!)
-            
-            Bookmark.add(url: url!, title: title)
-        case .favorites: break
-        case .folder(let folder): break
+            Bookmark.add(url: url, title: title)
+        case .favorites:
+            Bookmark.addFavorite(url: url, title: title)
+        case .folder(let folder):
+            Bookmark.add(url: url, title: title, parentFolder: folder)
         }
         
         dismiss(animated: true)
