@@ -9,7 +9,7 @@ protocol BookmarkDetailsViewDelegate: class {
     func correctValues(validationPassed: Bool)
 }
 
-class BookmarkDetailsView: UIView {
+class BookmarkDetailsView: UIView, BookmarkFormFieldsProtocol {
     
     let mainStackView = UIStackView().then {
         $0.axis = .vertical
@@ -40,7 +40,7 @@ class BookmarkDetailsView: UIView {
         $0.tag = 22
     }
     
-    let urlTextField = UITextField().then {
+    let urlTextField: UITextField? = UITextField().then {
         $0.placeholder = "Address"
         $0.keyboardType = .webSearch
         $0.autocorrectionType = .no
@@ -63,8 +63,10 @@ class BookmarkDetailsView: UIView {
     
     weak var delegate: BookmarkDetailsViewDelegate?
     
-    convenience init(type: AddEditBookmarkTableViewController.BookmarkType) {
+    convenience init(title: String, url: URL) {
         self.init(frame: .zero)
+        
+        guard let urlTextField = urlTextField else { fatalError() }
         
         mainStackView.addArrangedSubview(spacerLine)
         mainStackView.addArrangedSubview(contentStackView)
@@ -79,13 +81,8 @@ class BookmarkDetailsView: UIView {
         
         faviconImageView.setContentHuggingPriority(.defaultHigh, for: .horizontal)
         
-        switch type {
-        case .bookmark(let title, let url):
-            titleTextField.text = title
-            urlTextField.text = url.absoluteString
-        default:
-            break
-        }
+        titleTextField.text = title
+        urlTextField.text = url.absoluteString
         
         mainStackView.snp.makeConstraints {
             $0.edges.equalTo(self)
@@ -96,33 +93,22 @@ class BookmarkDetailsView: UIView {
         super.init(frame: frame)
         
         backgroundColor = .white
-        
         addSubview(mainStackView)
+        
         setupTextFieldTargets()
-    }
-    
-    func setupTextFieldTargets() {
-        [titleTextField, urlTextField].forEach {
-            $0.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
-        }
-    }
-    
-    @objc func textFieldDidChange(_ textField: UITextField) {
-        delegate?.correctValues(validationPassed: correctValues)
-    }
-    
-    var correctValues: Bool {
-        guard let title = titleTextField.text, let url = urlTextField.text else { return false }
-        
-        if title.isEmpty || url.isEmpty { return false }
-        
-        // Must be valid URL
-        if URL(string: url) == nil { return false }
-        
-        return true
     }
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
+    }
+    
+    func setupTextFieldTargets() {
+        [titleTextField, urlTextField].forEach {
+            $0?.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
+        }
+    }
+    
+    @objc func textFieldDidChange(_ textField: UITextField) {
+        delegate?.correctValues(validationPassed: validateFields())
     }
 }

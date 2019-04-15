@@ -112,9 +112,8 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         fetchRequest.entity = entity(context: context)
         fetchRequest.fetchBatchSize = 20
         
-        let orderSort = NSSortDescriptor(key: "order", ascending: true)
         let createdSort = NSSortDescriptor(key: "created", ascending: false)
-        fetchRequest.sortDescriptors = [orderSort, createdSort]
+        fetchRequest.sortDescriptors = [createdSort]
         
         fetchRequest.predicate = NSPredicate(format: "isFolder == true")
         
