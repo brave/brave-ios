@@ -31,12 +31,22 @@ platform :ios do
 
   desc "Run Unit Tests"
   lane :test do |options|
+    sh("../Client/WebFilters/ContentBlocker/Lists/test-compile-all-lists.sh")
     run_tests(
       scheme: "Fennec",
       device: "iPhone 8",
       code_coverage: true,
       skip_testing: [
-        "DataTests",
+        "DataTests/BookmarkTests",
+        "DataTests/CRUDProtocolsTests",
+        "DataTests/CoreDataTestCase",
+        "DataTests/DataControllerTests",
+        "DataTests/DeviceTests",
+        "DataTests/DomainTests",
+        "DataTests/FaviconMOTests",
+        "DataTests/HistoryTests",
+        "DataTests/TabMOTests",
+        "DataTests/FavoriteTests",
         "ClientTests/TabManagerTests/testQueryAddedTabs",
         "ClientTests/TabManagerTests/testQueryAddedPrivateTabs",
         "ClientTests/TabManagerTests/testQueryAddedMixedTabs",
@@ -62,8 +72,6 @@ platform :ios do
       cache_builds: true,
       configuration: "Release",
     )
-
-    add_badge(color: "green")
 
     gym(
       scheme: "FirefoxBeta",
@@ -104,17 +112,6 @@ platform :ios do
   end
 
   # Private helper methods ---------------------------------------
-
-  desc "Adds the version/build tag on top of the AppIcon. Takes the following arguments: \"
-  :color              The color of the right area of the badge."
-  private_lane :add_badge do |options|
-    badge(
-      shield: "#{get_client_version_number}-#{get_build_number}-#{options[:color]}",
-      no_badge: true,
-      shield_no_resize: true,
-      shield_gravity: "south",
-    )
-  end
 
   desc "Updates the project's build number to be the next number acceptable by TestFlight. Takes the following arguments:"
   lane :set_build_number do |options|

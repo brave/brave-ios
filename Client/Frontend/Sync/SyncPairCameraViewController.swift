@@ -15,7 +15,7 @@ class SyncPairCameraViewController: SyncViewController {
     var enterWordsButton: RoundInterfaceButton!
     
     var loadingView: UIView!
-    let loadingSpinner = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
+    let loadingSpinner = UIActivityIndicatorView(style: .whiteLarge)
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -43,7 +43,7 @@ class SyncPairCameraViewController: SyncViewController {
         cameraView.scanCallback = { data in
             
             if !DeviceInfo.hasConnectivity() {
-                self.showNoConnectionAlert()
+                self.present(SyncAlerts.noConnection, animated: true)
                 return
             }
             
@@ -51,7 +51,7 @@ class SyncPairCameraViewController: SyncViewController {
 
             // TODO: Functional, but needs some cleanup
             struct Scanner { static var Lock = false }
-            if let bytes = SyncCrypto.shared.splitBytes(fromJoinedBytes: data) {
+            if let bytes = SyncCrypto().splitBytes(fromJoinedBytes: data) {
                 if Scanner.Lock {
                     // Have internal, so camera error does not show
                     return
@@ -59,6 +59,8 @@ class SyncPairCameraViewController: SyncViewController {
                 
                 Scanner.Lock = true
                 self.cameraView.cameraOverlaySucess()
+                // Freezing the camera frame after QR has been scanned.
+                self.cameraView.captureSession?.stopRunning()
                 
                 // Vibrate.
                 AudioServicesPlayAlertSound(SystemSoundID(kSystemSoundID_Vibrate))  

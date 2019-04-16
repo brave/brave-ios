@@ -24,16 +24,7 @@ public final class Device: NSManagedObject, Syncable, CRUD {
     // Device is subtype of prefs 🤢
     public var recordType: SyncRecordType = .prefs
     
-    // Just a facade around the displayId, for easier access and better CD storage
-    var deviceId: [Int]? {
-        get { return SyncHelpers.syncUUID(fromString: deviceDisplayId) }
-        set(value) { deviceDisplayId = SyncHelpers.syncDisplay(fromUUID: value) }
-    }
-    
-    // This should be abstractable
-    public func asDictionary(deviceId: [Int]?, action: Int?) -> [String: Any] {
-        return SyncDevice(record: self, deviceId: deviceId, action: action).dictionaryRepresentation()
-    }
+    // MARK: - Public interface
     
     public static func frc() -> NSFetchedResultsController<Device> {
         let context = DataController.viewContext
@@ -47,52 +38,92 @@ public final class Device: NSManagedObject, Syncable, CRUD {
                                           sectionNameKeyPath: nil, cacheName: nil)
     }
     
-    public static func add(rootObject root: SyncRecord?, save: Bool, sendToSync: Bool, context: NSManagedObjectContext) -> Syncable? {
-        
-        // No guard, let bleed through to allow 'empty' devices (e.g. local)
-        let root = root as? SyncDevice
-        
-        let syncUUID = root?.objectId ?? SyncCrypto.uniqueSerialBytes(count: 16)
-        
-        var device: Device?
-        if let syncDisplayUUID = SyncHelpers.syncDisplay(fromUUID: syncUUID) {
-            // There can't be more than two device with the same syncUUID.
-            // A race condition could sometimes happen while getting two `Sync.resolvedSyncRecords` callbacks at the same time.
-            // Fixing issue #692 should help with it, until then we do a simple guard and disallow adding another device with the same syncUUID.
-            let predicate = NSPredicate(format: "syncDisplayUUID == %@", syncDisplayUUID)
-            device = Device.first(where: predicate, context: context)
-        }
-        
-        if device == nil {
-            device = Device(entity: Device.entity(context: context), insertInto: context)
-            device?.created = root?.syncNativeTimestamp ?? Date()
-            device?.syncUUID = syncUUID
-        }
-        
-        // Due to race conditions, there is a chance that we will get for example a different device name
-        // in insert(insead of update). Updating the Device regardless of whether it's already present.
-        device?.update(syncRecord: root)
-        
-        if save {
-            DataController.save(context: context)
-        }
-        
-        return device
+    public func remove() {
+        removeInternal()
+    }
+}
+
+// MARK: Internal implementations
+
+extension Device {
+    
+    // Just a facade around the displayId, for easier access and better CD storage
+    var deviceId: [Int]? {
+        get { return SyncHelpers.syncUUID(fromString: deviceDisplayId) }
+        set(value) { deviceDisplayId = SyncHelpers.syncDisplay(fromUUID: value) }
     }
     
-    public class func add(name: String?, isCurrent: Bool = false) {
-        let context = DataController.newBackgroundContext()
+    /// Returns a current device and assings it to a shared variable.
+    static func currentDevice(context: NSManagedObjectContext = DataController.viewContext) -> Device? {
+        if sharedCurrentDevice == nil {
+            let predicate = NSPredicate(format: "isCurrentDevice == true")
+            sharedCurrentDevice = first(where: predicate, context: context)
+        } else if let sharedDevice = sharedCurrentDevice {
+            sharedCurrentDevice = context.object(with: sharedDevice.objectID) as? Device
+        }
         
-        let device = Device(entity: Device.entity(context: context), insertInto: context)
-        device.created = Date()
-        device.syncUUID = SyncCrypto.uniqueSerialBytes(count: 16)
-        device.name = name
-        device.isCurrentDevice = isCurrent
-        
-        DataController.save(context: context)
+        return sharedCurrentDevice
     }
     
-    public func update(syncRecord record: SyncRecord?) {
+    class func add(name: String?, isCurrent: Bool = false) {
+        DataController.perform { context in
+            let device = Device(entity: Device.entity(context: context), insertInto: context)
+            device.created = Date()
+            device.syncUUID = SyncCrypto.uniqueSerialBytes(count: 16)
+            device.name = name
+            device.isCurrentDevice = isCurrent
+        }
+    }
+    
+    func removeInternal(save: Bool = true, sendToSync: Bool = true) {
+        guard let context = managedObjectContext else { return }
+        
+        if sendToSync {
+            Sync.shared.sendSyncRecords(action: .delete, records: [self])
+        }
+        
+        if isCurrentDevice {
+            Sync.shared.leaveSyncGroupInternal(sendToSync: false, context: .existing(context))
+        } else {
+            context.delete(self)
+            if save { DataController.save(context: context) }
+        }
+    }
+}
+
+// MARK: - Syncable methods
+extension Device {
+    static func createResolvedRecord(rootObject root: SyncRecord?, save: Bool,
+                                     context: WriteContext) {
+        
+        DataController.perform(context: context, save: save) { context in
+            // No guard, let bleed through to allow 'empty' devices (e.g. local)
+            let root = root as? SyncDevice
+            
+            let syncUUID = root?.objectId ?? SyncCrypto.uniqueSerialBytes(count: 16)
+            
+            var device: Device?
+            if let syncDisplayUUID = SyncHelpers.syncDisplay(fromUUID: syncUUID) {
+                // There can't be more than two device with the same syncUUID.
+                // A race condition could sometimes happen while getting two `Sync.resolvedSyncRecords` callbacks at the same time.
+                // Fixing issue #692 should help with it, until then we do a simple guard and disallow adding another device with the same syncUUID.
+                let predicate = NSPredicate(format: "syncDisplayUUID == %@", syncDisplayUUID)
+                device = Device.first(where: predicate, context: context)
+            }
+            
+            if device == nil {
+                device = Device(entity: Device.entity(context: context), insertInto: context)
+                device?.created = root?.syncNativeTimestamp ?? Date()
+                device?.syncUUID = syncUUID
+            }
+            
+            // Due to race conditions, there is a chance that we will get for example a different device name
+            // in insert(insead of update). Updating the Device regardless of whether it's already present.
+            device?.updateResolvedRecord(root, context: .existing(context))
+        }
+    }
+    
+    func updateResolvedRecord(_ record: SyncRecord?, context: WriteContext = .new) {
         guard let root = record as? SyncDevice else { return }
         self.name = root.name
         self.deviceId = root.deviceId
@@ -101,47 +132,12 @@ public final class Device: NSManagedObject, Syncable, CRUD {
         // No save currently
     }
     
-    /// Returns a current device and assings it to a shared variable.
-    public static func currentDevice() -> Device? {
-        if sharedCurrentDevice == nil {
-            let predicate = NSPredicate(format: "isCurrentDevice == true")
-            sharedCurrentDevice = first(where: predicate)
-        }
-        
-        return sharedCurrentDevice
+    func deleteResolvedRecord(save: Bool, context: NSManagedObjectContext) {
+        removeInternal(save: save, sendToSync: false)
     }
     
-    public func remove(sendToSync: Bool = true) {
-        guard let context = managedObjectContext else { return }
-        
-        if sendToSync {
-            Sync.shared.sendSyncRecords(action: .delete, records: [self])
-        }
-        
-        if isCurrentDevice {
-            Sync.shared.leaveSyncGroup(sendToSync: false)
-        } else {
-            context.delete(self)
-            DataController.save(context: context)
-        }
+    // This should be abstractable
+    func asDictionary(deviceId: [Int]?, action: Int?) -> [String: Any] {
+        return SyncDevice(record: self, deviceId: deviceId, action: action).dictionaryRepresentation()
     }
-    
-    public class func deleteAll() {
-        sharedCurrentDevice = nil
-        Device.deleteAll(includesPropertyValues: false)
-    }
-    
-    // BRAVE TODO:
-    /*
-    public class func deviceSettings(profile: Profile) -> [SyncDeviceSetting]? {
-        // Building settings off of device objects
-        
-        let deviceSettings = Device.all()?.map {
-            // Even if no 'real' title, still want it to show up in list
-            return SyncDeviceSetting(profile: profile, device: $0)
-        }
-        
-        return deviceSettings
-    }
-    */
 }

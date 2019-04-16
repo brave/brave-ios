@@ -122,7 +122,7 @@ class HistoryViewController: SiteTableViewController {
     cell.imageView?.layer.cornerRadius = 6
     cell.imageView?.layer.masksToBounds = true
     
-    cell.imageView?.setIcon(site.domain?.favicon, forURL: URL(string: site.url ?? ""))
+    cell.imageView?.setIconMO(site.domain?.favicon, forURL: URL(string: site.url ?? ""))
   }
   
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -152,8 +152,8 @@ class HistoryViewController: SiteTableViewController {
     return true
   }
   
-  func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-    if editingStyle == UITableViewCellEditingStyle.delete {
+  func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+    if editingStyle == UITableViewCell.EditingStyle.delete {
       if let obj = self.frc?.object(at: indexPath) {
         obj.delete()
       }

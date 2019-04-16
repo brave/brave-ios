@@ -12,8 +12,8 @@ import Data
 
 private let log = Logger.browserLogger
 
-protocol TopSitesDelegate: class {
-    func didSelectUrl(url: URL)
+protocol TopSitesDelegate: AnyObject {
+    func didSelect(input: String)
     func didTapDuckDuckGoCallout()
 }
 
@@ -27,7 +27,7 @@ class FavoritesViewController: UIViewController, Themeable {
     weak var delegate: TopSitesDelegate?
     
     // MARK: - Favorites collection view properties
-    private lazy var collection: UICollectionView = {
+    private (set) internal lazy var collection: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.minimumInteritemSpacing = 0
         layout.minimumLineSpacing = 6
@@ -46,7 +46,7 @@ class FavoritesViewController: UIViewController, Themeable {
         }
         return view
     }()
-    private lazy var dataSource: FavoritesDataSource = { return FavoritesDataSource() }()
+    private let dataSource: FavoritesDataSource
     
     private let braveShieldStatsView = BraveShieldStatsView(frame: CGRect.zero).then {
         $0.autoresizingMask = [.flexibleWidth]
@@ -73,8 +73,9 @@ class FavoritesViewController: UIViewController, Themeable {
     
     private let profile: Profile
     
-    init(profile: Profile) {
+    init(profile: Profile, dataSource: FavoritesDataSource = FavoritesDataSource()) {
         self.profile = profile
+        self.dataSource = dataSource
         
         super.init(nibName: nil, bundle: nil)
         NotificationCenter.default.do {
@@ -148,7 +149,7 @@ class FavoritesViewController: UIViewController, Themeable {
     }
     
     private func updateDuckDuckGoButtonLayout() {
-        let size = ddgButton.systemLayoutSizeFitting(UILayoutFittingExpandedSize)
+        let size = ddgButton.systemLayoutSizeFitting(UIView.layoutFittingExpandedSize)
         ddgButton.frame = CGRect(
             x: ceil((collection.bounds.width - size.width) / 2.0),
             y: collection.contentSize.height + UI.searchEngineCalloutPadding,
@@ -224,7 +225,7 @@ class FavoritesViewController: UIViewController, Themeable {
     
     func updateDuckDuckGoVisibility() {
         let isVisible = shouldShowDuckDuckGoCallout()
-        let heightOfCallout = ddgButton.systemLayoutSizeFitting(UILayoutFittingExpandedSize).height + (UI.searchEngineCalloutPadding * 2.0)
+        let heightOfCallout = ddgButton.systemLayoutSizeFitting(UIView.layoutFittingExpandedSize).height + (UI.searchEngineCalloutPadding * 2.0)
         collection.contentInset.bottom = isVisible ? heightOfCallout : 0
         ddgButton.isHidden = !isVisible
     }
@@ -235,9 +236,9 @@ extension FavoritesViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let fav = dataSource.favoriteBookmark(at: indexPath)
         
-        guard let urlString = fav?.url, let url = URL(string: urlString) else { return }
+        guard let urlString = fav?.url else { return }
         
-        delegate?.didSelectUrl(url: url)
+        delegate?.didSelect(input: urlString)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -296,7 +297,7 @@ extension FavoritesViewController: FavoriteCellDelegate {
         let actionSheet = UIAlertController(title: fav.displayTitle, message: nil, preferredStyle: .actionSheet)
         
         let deleteAction = UIAlertAction(title: Strings.Remove_Favorite, style: .destructive) { _ in
-            fav.remove()
+            fav.delete()
             
             // Remove cached icon.
             if let urlString = fav.url, let url = URL(string: urlString) {
@@ -315,7 +316,7 @@ extension FavoritesViewController: FavoriteCellDelegate {
                                                                  keyboardType2: .URL) { callbackTitle, callbackUrl in
                                                                     if let cTitle = callbackTitle, !cTitle.isEmpty, let cUrl = callbackUrl, !cUrl.isEmpty {
                                                                         if URL(string: cUrl) != nil {
-                                                                            fav.update(customTitle: cTitle, url: cUrl, save: true)
+                                                                            fav.update(customTitle: cTitle, url: cUrl)
                                                                         }
                                                                     }
                                                                     self.dataSource.isEditing = false
