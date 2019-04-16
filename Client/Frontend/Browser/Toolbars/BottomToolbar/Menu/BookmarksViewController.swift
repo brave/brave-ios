@@ -378,7 +378,12 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
       self.isEditingIndividualBookmark = false
     }
     self.isEditingIndividualBookmark = true
-    self.navigationController?.pushViewController(nextController, animated: true)
+    
+    let mode: AddEditBookmarkTableViewController.Mode =
+        item.isFolder ? .editFolder(item) : .editBookmark(item)
+    
+    let vc = AddEditBookmarkTableViewController(mode: mode)
+    self.navigationController?.pushViewController(vc, animated: true)
   }
   
 }

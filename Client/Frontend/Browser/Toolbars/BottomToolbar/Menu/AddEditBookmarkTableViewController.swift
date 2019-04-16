@@ -17,6 +17,29 @@ class AddEditBookmarkTableViewController: UITableViewController {
         case newFolder(title: String)
         case editBookmark(_ bookmark: Bookmark)
         case editFolder(_ folder: Bookmark)
+        
+        var initialLocation: Location {
+            switch self {
+            case .newBookmark(_, _), .newFolder(_):
+                return .rootLevel
+            case .editBookmark(let bookmark):
+                return folderOrRoot(bookmarkOrFolder: bookmark)
+            case .editFolder(let folder):
+                return folderOrRoot(bookmarkOrFolder: folder)
+            }
+        }
+        
+        var folder: Bookmark? {
+            switch self {
+            case .editFolder(let folder): return folder
+            default: return nil
+            }
+        }
+        
+        private func folderOrRoot(bookmarkOrFolder: Bookmark) -> Location {
+            guard let parent = bookmarkOrFolder.parentFolder else { return .rootLevel }
+            return .folder(folder: parent)
+        }
     }
     
     enum Location {
@@ -77,9 +100,9 @@ class AddEditBookmarkTableViewController: UITableViewController {
         case .newFolder(let title):
             return FolderDetailsViewTableViewCell(title: title)
         case .editBookmark(let bookmark):
-            return BookmarkDetailsView(title: bookmark.displayTitle ?? "", url: bookmark.url ?? "")
+            return BookmarkDetailsView(title: bookmark.displayTitle, url: bookmark.url)
         case .editFolder(let folder):
-            return FolderDetailsViewTableViewCell(title: folder.displayTitle ?? "")
+            return FolderDetailsViewTableViewCell(title: folder.displayTitle)
         }
     }()
     
@@ -90,9 +113,9 @@ class AddEditBookmarkTableViewController: UITableViewController {
     init(mode: AddEditBookmarkTableViewController.Mode) {
         self.mode = mode
         
-        frc = Bookmark.foldersFrc()
-        location = .rootLevel
+        location = mode.initialLocation
         presentationMode = .currentSelection
+        frc = Bookmark.foldersFrc(excludedFolder: mode.folder)
         
         super.init(style: .grouped)
     }
@@ -169,7 +192,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
         guard let title = bookmarkDetailsView.titleTextField.text else { return earlyReturn() }
         
         switch mode {
-        case .newBookmark(_, _), .editBookmark(_):
+        case .newBookmark(_, _):
             guard let urlString = bookmarkDetailsView.urlTextField?.text,
                 let url = URL(string: urlString) else {
                     return earlyReturn()
@@ -183,7 +206,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
             case .folder(let folder):
                 Bookmark.add(url: url, title: title, parentFolder: folder)
             }
-        case .newFolder(_), .editFolder(_):
+        case .newFolder(_):
             switch location {
             case .rootLevel:
                 Bookmark.addFolder(title: title)
@@ -194,6 +217,14 @@ class AddEditBookmarkTableViewController: UITableViewController {
             }
             
             delegate?.didSelectFolder()
+        case .editBookmark(let bookmark):
+            guard let urlString = bookmarkDetailsView.urlTextField?.text else {
+                    return earlyReturn()
+            }
+            
+            bookmark.update(customTitle: title, url: urlString)
+        case .editFolder(let folder):
+            folder.update(customTitle: title, url: nil)
         }
         
         if let nc = navigationController, nc.childViewControllers.count > 1 {

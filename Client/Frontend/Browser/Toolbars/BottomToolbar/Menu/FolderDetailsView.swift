@@ -34,14 +34,14 @@ class FolderDetailsViewTableViewCell: UIView, BookmarkFormFieldsProtocol {
     
     weak var delegate: BookmarkDetailsViewDelegate?
     
-    convenience init(title: String) {
+    convenience init(title: String?) {
         self.init(frame: .zero)
         
         mainStackView.addArrangedSubview(spacerLine)
         mainStackView.addArrangedSubview(titleTextField)
         mainStackView.addArrangedSubview(spacerLine)
         
-        titleTextField.text = title
+        titleTextField.text = title ?? "New folder"
         
         mainStackView.snp.makeConstraints {
             $0.edges.equalTo(self)

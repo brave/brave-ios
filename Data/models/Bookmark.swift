@@ -105,7 +105,7 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
                                           sectionNameKeyPath: nil, cacheName: nil)
     }
     
-    public class func foldersFrc() -> NSFetchedResultsController<Bookmark> {
+    public class func foldersFrc(excludedFolder: Bookmark? = nil) -> NSFetchedResultsController<Bookmark> {
         let context = DataController.viewContext
         let fetchRequest = NSFetchRequest<Bookmark>()
         
@@ -115,7 +115,16 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         let createdSort = NSSortDescriptor(key: "created", ascending: false)
         fetchRequest.sortDescriptors = [createdSort]
         
-        fetchRequest.predicate = NSPredicate(format: "isFolder == true")
+        var predicate: NSPredicate?
+        if let excludedFolder = excludedFolder {
+            predicate = NSPredicate(format: "isFolder == true AND SELF != %@", excludedFolder)
+        } else {
+            predicate = NSPredicate(format: "isFolder == true")
+        }
+        
+        fetchRequest.predicate = predicate
+        
+        //"parentFolder == %@"
         
         return NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: context,
                                           sectionNameKeyPath: nil, cacheName: nil)
