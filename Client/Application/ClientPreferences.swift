@@ -5,13 +5,10 @@
 import Foundation
 import BraveShared
 
-enum TabBarVisibility: Int {
+enum TabBarVisibility: Int, CaseIterable {
     case never
     case always
     case landscapeOnly
-    
-    // TODO: Remove when we can use Swift 4.2/`CaseIterable`
-    static let allCases: [TabBarVisibility] = [.never, .always, .landscapeOnly]
 }
 
 // MARK: - Other Preferences
@@ -75,26 +72,6 @@ extension Preferences {
         static let blockAllCookies = Option<Bool>(key: "privacy.block-all-cookies", default: false)
         /// The toggles states for clear private data screen
         static let clearPrivateDataToggles = Option<[Bool]>(key: "privacy.clear-data-toggles", default: [])
-    }
-    final class Shields {
-        static let allShields = [blockAdsAndTracking, httpsEverywhere, blockPhishingAndMalware, blockScripts, fingerprintingProtection, blockImages]
-        
-        /// Shields will block ads and tracking if enabled
-        static let blockAdsAndTracking = Option<Bool>(key: "shields.block-ads-and-tracking", default: true)
-        /// Websites will be upgraded to HTTPS if a loaded page attempts to use HTTP
-        static let httpsEverywhere = Option<Bool>(key: "shields.https-everywhere", default: true)
-        /// Shields will block websites related to potential phishing and malware
-        static let blockPhishingAndMalware = Option<Bool>(key: "shields.block-phishing-and-malware", default: true)
-        /// Disables JavaScript execution in the browser
-        static let blockScripts = Option<Bool>(key: "shields.block-scripts", default: false)
-        /// Enforces fingerprinting protection on the users session
-        static let fingerprintingProtection = Option<Bool>(key: "shields.fingerprinting-protection", default: false)
-        /// Disables image loading in the browser
-        static let blockImages = Option<Bool>(key: "shields.block-images", default: false)
-        ///
-        static let useRegionAdBlock = Option<Bool>(key: "shields.regional-adblock", default: false)
-        /// Version of downloaded data file for adblock stats.
-        static let adblockStatsDataVersion = Option<Int?>(key: "stats.adblock-data-version", default: nil)
     }
 }
 

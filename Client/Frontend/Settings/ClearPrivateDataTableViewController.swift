@@ -30,7 +30,7 @@ class ClearPrivateDataTableViewController: UITableViewController {
         return [
             (HistoryClearable(), true),
             (CacheClearable(), true),
-            (CookiesClearable(), true),
+            (CookiesAndCacheClearable(), true),
             (PasswordsClearable(profile: self.profile), true),
             ]
     }()
@@ -88,7 +88,7 @@ class ClearPrivateDataTableViewController: UITableViewController {
             cell.textLabel?.text = Strings.ClearPrivateData
             cell.textLabel?.textAlignment = .center
             cell.textLabel?.textColor = UIConstants.DestructiveRed
-            cell.accessibilityTraits = UIAccessibilityTraitButton
+            cell.accessibilityTraits = UIAccessibilityTraits.button
             cell.accessibilityIdentifier = "ClearPrivateData"
             clearButton = cell
         }
@@ -174,7 +174,7 @@ class ClearPrivateDataTableViewController: UITableViewController {
              } else {*/
             
             // Reset Webkit configuration to remove data from memory
-            if clear.contains(where: { $0 is CookiesClearable || $0 is CacheClearable }) {
+            if clear.contains(where: { $0 is CookiesAndCacheClearable || $0 is CacheClearable }) {
                 self.tabManager.resetConfiguration()
                 // Unlock the folders to allow clearing of data.
                 if Preferences.Privacy.blockAllCookies.value {

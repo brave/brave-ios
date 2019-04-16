@@ -21,8 +21,9 @@ struct MIMEType {
     static let PlainText = "text/plain"
     static let PNG = "image/png"
     static let WebP = "image/webp"
+    static let xHTML = "application/xhtml+xml"
 
-    private static let webViewViewableTypes: [String] = [MIMEType.Bitmap, MIMEType.GIF, MIMEType.JPEG, MIMEType.HTML, MIMEType.PDF, MIMEType.PlainText, MIMEType.PNG, MIMEType.WebP]
+    private static let webViewViewableTypes: [String] = [MIMEType.Bitmap, MIMEType.GIF, MIMEType.JPEG, MIMEType.HTML, MIMEType.PDF, MIMEType.PlainText, MIMEType.PNG, MIMEType.WebP, MIMEType.xHTML]
 
     static func canShowInWebView(_ mimeType: String) -> Bool {
         return webViewViewableTypes.contains(mimeType.lowercased())
@@ -34,6 +35,12 @@ struct MIMEType {
         }
 
         return MIMEType.OctetStream
+    }
+}
+
+extension String {
+    var isKindOfHTML: Bool {
+        return [MIMEType.HTML, MIMEType.xHTML].contains(self)
     }
 }
 
@@ -85,9 +92,17 @@ class OpenPassBookHelper: NSObject, OpenInHelper {
 
     func open() {
         guard let passData = try? Data(contentsOf: url) else { return }
-        var error: NSError?
-        let pass = PKPass(data: passData, error: &error)
-        if let _ = error {
+        do {
+            let pass = try PKPass(data: passData)
+            let passLibrary = PKPassLibrary()
+            if passLibrary.containsPass(pass) {
+                UIApplication.shared.open(pass.passURL!, options: [:])
+            } else {
+                if let addController = PKAddPassesViewController(pass: pass) {
+                    browserViewController.present(addController, animated: true, completion: nil)
+                }
+            }
+        } catch {
             // display an error
             let alertController = UIAlertController(
                 title: Strings.UnableToAddPassErrorTitle,
@@ -99,13 +114,6 @@ class OpenPassBookHelper: NSObject, OpenInHelper {
                 })
             browserViewController.present(alertController, animated: true, completion: nil)
             return
-        }
-        let passLibrary = PKPassLibrary()
-        if passLibrary.containsPass(pass) {
-            UIApplication.shared.open(pass.passURL!, options: [:])
-        } else {
-            let addController = PKAddPassesViewController(pass: pass)
-            browserViewController.present(addController, animated: true, completion: nil)
         }
     }
 }

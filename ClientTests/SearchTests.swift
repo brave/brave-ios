@@ -43,6 +43,8 @@ class SearchTests: XCTestCase {
         checkInvalidURL("创业咖啡")
         checkInvalidURL("创业咖啡 中国")
         checkInvalidURL("创业咖啡. 中国")
+        checkInvalidURL("data:text/html;base64,SGVsbG8gV29ybGQhCg==")
+        checkInvalidURL("data://https://www.example.com,fake example.com")
     }
 
     func testURIFixupPunyCode() {
@@ -131,7 +133,7 @@ class SearchTests: XCTestCase {
     fileprivate func startMockSuggestServer() -> String {
         let webServer: GCDWebServer = GCDWebServer()
 
-        webServer.addHandler(forMethod: "GET", path: "/", request: GCDWebServerRequest.self) { (request) -> GCDWebServerResponse! in
+        webServer.addHandler(forMethod: "GET", path: "/", request: GCDWebServerRequest.self) { (request) -> GCDWebServerResponse? in
             var suggestions: [String]!
             let query = request.query?["q"] as! String
             switch query {

@@ -49,8 +49,7 @@ class BookmarkEditingViewController: FormViewController {
     self.bookmarksPanel = bookmarksPanel
     self.bookmarkIndexPath = indexPath
     
-    // get top-level folders
-    folders = Bookmark.getFolders(bookmark: nil, context: DataController.viewContext)
+    folders = Bookmark.getTopLevelFolders()
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -176,9 +175,15 @@ class BookmarksViewController: SiteTableViewController {
   override func reloadData() {
     
     do {
+        // Recreate the frc if it was previously removed
+        // (when user navigated into a nested folder for example)
+        if bookmarksFRC == nil {
+            bookmarksFRC = Bookmark.frc(parentFolder: currentFolder)
+            bookmarksFRC?.delegate = self
+        }
       try self.bookmarksFRC?.performFetch()
     } catch let error as NSError {
-      print(error.description)
+      log.error(error.description)
     }
     
     super.reloadData()
@@ -189,6 +194,14 @@ class BookmarksViewController: SiteTableViewController {
     
     reloadData()
   }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        // Make sure to remove fetch results controller when view disappears.
+        // Otherwise, it may result in crash if a user is in a nested folder and
+        // sync changes happen.
+        bookmarksFRC = nil
+    }
   
   func disableTableEditingMode() {
     switchTableEditingMode(true)
@@ -263,7 +276,7 @@ class BookmarksViewController: SiteTableViewController {
   }
   
   func addFolder(titled title: String) {
-    Bookmark.add(url: nil, title: nil, customTitle: title, parentFolder: currentFolder, isFolder: true)
+    Bookmark.addFolder(title: title, parentFolder: currentFolder)
     tableView.setContentOffset(CGPoint.zero, animated: true)
   }
   
@@ -282,7 +295,7 @@ class BookmarksViewController: SiteTableViewController {
   
   func notificationReceived(_ notification: Notification) {
     switch notification.name {
-    case NSNotification.Name.UITextFieldTextDidChange:
+    case UITextField.textDidChangeNotification:
       if let okAction = addBookmarksFolderOkAction, let textField = notification.object as? UITextField {
         okAction.isEnabled = (textField.text?.count ?? 0) > 0
       }
@@ -318,6 +331,12 @@ class BookmarksViewController: SiteTableViewController {
   
   fileprivate func configureCell(_ cell: UITableViewCell, atIndexPath indexPath: IndexPath) {
     
+    // Make sure Bookmark at index path exists,
+    // `frc.object(at:)` crashes otherwise, doesn't fail safely with nil
+    if let objectsCount = bookmarksFRC?.fetchedObjects?.count, indexPath.row >= objectsCount {
+        fatalError("Bookmarks FRC index out of bounds")
+    }
+    
     guard let item = bookmarksFRC?.object(at: indexPath) else { return }
     cell.tag = item.objectID.hashValue
     
@@ -342,7 +361,7 @@ class BookmarksViewController: SiteTableViewController {
         cell.imageView?.layer.borderColor = BraveUX.faviconBorderColor.cgColor
         cell.imageView?.layer.borderWidth = BraveUX.faviconBorderWidth
         // favicon object associated through domain relationship - set from cache or download
-        cell.imageView?.setIcon(item.domain?.favicon, forURL: URL(string: item.url ?? ""))
+        cell.imageView?.setIconMO(item.domain?.favicon, forURL: URL(string: item.url ?? ""))
       }
     }
     
@@ -417,18 +436,18 @@ class BookmarksViewController: SiteTableViewController {
     }
   }
   
-  func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+  func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
     // Intentionally blank. Required to use UITableViewRowActions
   }
   
-  func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCellEditingStyle {
+  func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
     return .delete
   }
   
   func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
     guard let item = bookmarksFRC?.object(at: indexPath) else { return nil }
     
-    let deleteAction = UITableViewRowAction(style: UITableViewRowActionStyle.destructive, title: Strings.Delete,
+    let deleteAction = UITableViewRowAction(style: UITableViewRowAction.Style.destructive, title: Strings.Delete,
                                             handler: { action, indexPath in
       
       if let children = item.children, !children.isEmpty {
@@ -444,7 +463,7 @@ class BookmarksViewController: SiteTableViewController {
       }
     })
     
-    let editAction = UITableViewRowAction(style: UITableViewRowActionStyle.normal, title: Strings.Edit, handler: { (action, indexPath) in
+    let editAction = UITableViewRowAction(style: UITableViewRowAction.Style.normal, title: Strings.Edit, handler: { (action, indexPath) in
       self.showEditBookmarkController(tableView, indexPath: indexPath)
     })
     
@@ -566,10 +585,16 @@ extension BookmarksViewController: NSFetchedResultsControllerDelegate {
   func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
     switch type {
     case .update:
-      guard let indexPath = indexPath, let cell = tableView.cellForRow(at: indexPath) else {
-        return
-      }
-      configureCell(cell, atIndexPath: indexPath)
+        let update = { (path: IndexPath?) in
+            // When Bookmark is moved to another folder, it can be interpreted as update action
+            // (since the object is not deleted but updated to have a different parent Bookmark)
+            // Make sure we are not out of bounds here.
+            if let path = path, let cell = self.tableView.cellForRow(at: path),
+                let fetchedObjectsCount = self.bookmarksFRC?.fetchedObjects?.count, path.row < fetchedObjectsCount {
+                    self.configureCell(cell, atIndexPath: path)
+            }
+        }
+        [indexPath, newIndexPath].forEach(update)
     case .insert:
       guard let path = newIndexPath else {
         return
@@ -621,7 +646,7 @@ extension BookmarksViewController {
   }
   
   private func actionsForFolder(_ folder: Bookmark) -> [UIAlertAction] {
-    let children = Bookmark.getChildren(forFolderUUID: folder.syncUUID, includeFolders: false) ?? []
+    let children = Bookmark.getChildren(forFolder: folder, includeFolders: false) ?? []
     
     let urls: [URL] = children.compactMap { b in
       guard let url = b.url else { return nil }
