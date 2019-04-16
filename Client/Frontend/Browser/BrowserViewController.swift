@@ -57,7 +57,7 @@ class BrowserViewController: UIViewController {
     fileprivate let alertStackView = UIStackView() // All content that appears above the footer should be added to this view. (Find In Page/SnackBars)
     fileprivate var findInPageBar: FindInPageBar?
     
-    var taskQueue: [()->()] = []
+    var loadQueue = DeferredCountable<Void>()
 
     lazy var mailtoLinkHandler: MailtoLinkHandler = MailtoLinkHandler()
 
@@ -191,15 +191,6 @@ class BrowserViewController: UIViewController {
         Preferences.Privacy.blockAllCookies.observe(from: self)
         // Lists need to be compiled before attempting tab restoration
         contentBlockListDeferred = ContentBlockerHelper.compileLists()
-    }
-    
-    // Use this function to queue a task for after the BVC has loaded and is visible.(After shoing  initial tabs ).
-    func addTask(task: @escaping () -> Void) {
-        if viewIfLoaded?.window == nil {
-            taskQueue.append(task)
-        } else {
-            DispatchQueue.main.async { task() }
-        }
     }
 
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -462,13 +453,10 @@ class BrowserViewController: UIViewController {
             } else {
                 tabToSelect = self.tabManager.tabsForCurrentMode.last
             }
-            if self.taskQueue.isEmpty {
+            if self.loadQueue.isEmpty {
                 self.tabManager.selectTab(tabToSelect)
             } else {
-                for task in self.taskQueue {
-                    task()
-                }
-                self.taskQueue.removeAll()
+                self.loadQueue.fill(())
             }
         }
     }
@@ -2944,5 +2932,42 @@ extension BrowserViewController: PreferencesObserver {
             log.debug("Received a preference change for an unknown key: \(key) on \(type(of: self))")
             break
         }
+    }
+}
+
+extension BrowserViewController {
+    func openReferralLink(url: URL) {
+        self.loadQueue.upon {
+            self.openURLInNewTab(url, isPrivileged: false)
+        }
+    }
+    
+    func handleNavigationPath(path: NavigationPath) {
+        self.loadQueue.upon {
+            NavigationPath.handle(nav: path, with: self)
+        }
+    }
+}
+
+//Provides a bool to query if tasks are pending on main queue.
+class DeferredCountable<T> {
+    private var count = 0
+    private var await = Deferred<T>()
+    
+    func upon(_ block: @escaping (T) -> Void) {
+        let executionBlock: (T) -> Void = { [unowned self] _ in
+            self.count -= 1
+            block(self.await.value)
+        }
+        count += 1
+        await.uponQueue(.main, block: executionBlock)
+    }
+    
+    func fill(_ value: T) {
+        await.fill(value)
+    }
+    
+    var isEmpty: Bool {
+        return count == 0
     }
 }
