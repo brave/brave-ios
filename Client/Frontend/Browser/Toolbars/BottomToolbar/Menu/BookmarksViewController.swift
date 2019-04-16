@@ -316,7 +316,9 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         self.showEditBookmarkController(tableView, indexPath: indexPath)
       } else {
         if let url = URL(string: bookmark.url ?? "") {
-          toolbarUrlActionsDelegate?.select(url: url, visitType: .bookmark)
+            dismiss(animated: true) {
+                self.toolbarUrlActionsDelegate?.select(url: url, visitType: .bookmark)
+            }
         }
       }
     } else {
