@@ -408,10 +408,10 @@ class ReaderModeButton: UIButton {
     }
 }
 
-fileprivate class DisplayTextField: UITextField {
+class DisplayTextField: UITextField {
     weak var accessibilityActionsSource: AccessibilityActionsSource?
-    fileprivate var hostString: String = ""
-    var pathPadding: CGFloat = 20.0
+    var hostString: String = ""
+    let pathPadding: CGFloat = 20.0
 
     override var accessibilityCustomActions: [UIAccessibilityCustomAction]? {
         get {
@@ -422,7 +422,7 @@ fileprivate class DisplayTextField: UITextField {
         }
     }
 
-    fileprivate override var canBecomeFirstResponder: Bool {
+    override var canBecomeFirstResponder: Bool {
         return false
     }
     
@@ -435,7 +435,7 @@ fileprivate class DisplayTextField: UITextField {
         if let size: CGSize = (self.hostString as NSString?)?.size(withAttributes: [.font: self.font!]) {
             if size.width > self.bounds.width {
                 rect.origin.x = rect.origin.x - (size.width + pathPadding - self.bounds.width)
-                rect.size.width = rect.size.width + (size.width + pathPadding - self.bounds.width)
+                rect.size.width = size.width + pathPadding
             }
         }
         return rect
