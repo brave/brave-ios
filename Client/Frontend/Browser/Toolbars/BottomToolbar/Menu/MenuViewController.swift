@@ -101,12 +101,11 @@ class MenuViewController: UITableViewController {
     
     func openAddBookmark() {
         
-        let action = AddEditBookmarkTableViewController.Action.add
-        guard let title = tab?.displayTitle, let url = tab?.url else { return }
+        guard let title = tab?.displayTitle, let url = tab?.url?.absoluteString else { return }
         
-        let type = AddEditBookmarkTableViewController.BookmarkType.bookmark(title: title, url: url)
+        let mode = AddEditBookmarkTableViewController.Mode.newBookmark(title: title, url: url)
         
-        let vc = AddEditBookmarkTableViewController(action: action, type: type)
+        let vc = AddEditBookmarkTableViewController(mode: mode)
         //vc.toolbarUrlActionsDelegate = bvc
         
         let nc = SettingsNavigationController(rootViewController: vc)

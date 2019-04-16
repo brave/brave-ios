@@ -13,17 +13,10 @@ protocol AddEditBookmarkDelegate: class {
 class AddEditBookmarkTableViewController: UITableViewController {
     
     enum Mode {
-        case addBookmark(title: String, url: URL)
-        case addFolder(title: String)
-        case editBookmark(bookmark: Bookmark)
-        case editFolder(folder: Bookmark)
-    }
-    
-    enum Action { case add, edit }
-    
-    enum BookmarkType {
-        case bookmark(title: String, url: URL)
-        case folder(title: String)
+        case newBookmark(title: String, url: String)
+        case newFolder(title: String)
+        case editBookmark(_ bookmark: Bookmark)
+        case editFolder(_ folder: Bookmark)
     }
     
     enum Location {
@@ -61,8 +54,10 @@ class AddEditBookmarkTableViewController: UITableViewController {
     
     let frc: NSFetchedResultsController<Bookmark>
     
-    let action: AddEditBookmarkTableViewController.Action
-    let type: AddEditBookmarkTableViewController.BookmarkType
+    //let action: AddEditBookmarkTableViewController.Action
+    //let type: AddEditBookmarkTableViewController.BookmarkType
+    
+    let mode: AddEditBookmarkTableViewController.Mode
     
     lazy var saveButton: UIBarButtonItem = {
         let button = UIBarButtonItem()
@@ -76,11 +71,15 @@ class AddEditBookmarkTableViewController: UITableViewController {
     var location: Location
     
     lazy var bookmarkDetailsView: BookmarkFormFieldsProtocol = {
-        switch type {
-        case .bookmark(let title, let url):
+        switch mode {
+        case .newBookmark(let title, let url):
             return BookmarkDetailsView(title: title, url: url)
-        case .folder(let title):
+        case .newFolder(let title):
             return FolderDetailsViewTableViewCell(title: title)
+        case .editBookmark(let bookmark):
+            return BookmarkDetailsView(title: bookmark.displayTitle ?? "", url: bookmark.url ?? "")
+        case .editFolder(let folder):
+            return FolderDetailsViewTableViewCell(title: folder.displayTitle ?? "")
         }
     }()
     
@@ -88,10 +87,8 @@ class AddEditBookmarkTableViewController: UITableViewController {
     
     weak var delegate: AddEditBookmarkDelegate?
     
-    init(action: AddEditBookmarkTableViewController.Action,
-         type: AddEditBookmarkTableViewController.BookmarkType) {
-        self.action = action
-        self.type = type
+    init(mode: AddEditBookmarkTableViewController.Mode) {
+        self.mode = mode
         
         frc = Bookmark.foldersFrc()
         location = .rootLevel
@@ -171,8 +168,8 @@ class AddEditBookmarkTableViewController: UITableViewController {
         
         guard let title = bookmarkDetailsView.titleTextField.text else { return earlyReturn() }
         
-        switch type {
-        case .bookmark(_, _):
+        switch mode {
+        case .newBookmark(_, _), .editBookmark(_):
             guard let urlString = bookmarkDetailsView.urlTextField?.text,
                 let url = URL(string: urlString) else {
                     return earlyReturn()
@@ -186,7 +183,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
             case .folder(let folder):
                 Bookmark.add(url: url, title: title, parentFolder: folder)
             }
-        case .folder(_):
+        case .newFolder(_), .editFolder(_):
             switch location {
             case .rootLevel:
                 Bookmark.addFolder(title: title)
@@ -209,9 +206,9 @@ class AddEditBookmarkTableViewController: UITableViewController {
     var totalCount: Int { return sortedFolders.count + 3 }
     
     var specialButtonsCount: Int {
-        switch type {
-        case .folder(_): return 1
-        case .bookmark(_): return 3
+        switch mode {
+        case .newFolder(_), .editFolder(_): return 1
+        case .newBookmark(_, _), .editBookmark(_): return 3
         }
     }
 
@@ -251,7 +248,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
     }
     
     func showNewFolderVC() {
-        let vc = AddEditBookmarkTableViewController(action: .add, type: .folder(title: "New folder"))
+        let vc = AddEditBookmarkTableViewController(mode: .newFolder(title: "New folder"))
         vc.delegate = self
         navigationController?.pushViewController(vc, animated: true)
     }
@@ -295,12 +292,12 @@ class AddEditBookmarkTableViewController: UITableViewController {
         case .folderHierarchy:
             let row = indexPath.row
             
-            switch type {
-            case .folder(_):
+            switch mode {
+            case .newFolder(_), .editFolder(_):
                 if row == 0 {
                     return rootLevelFolderCell
                 }
-            case .bookmark(_):
+            case .newBookmark(_), .editBookmark(_):
                 if row == 0 {
                     let cell = IndentedImageTableViewCell(image: #imageLiteral(resourceName: "add_tab"))
                     cell.folderName.text = "New Folder"

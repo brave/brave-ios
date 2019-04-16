@@ -63,7 +63,7 @@ class BookmarkDetailsView: UIView, BookmarkFormFieldsProtocol {
     
     weak var delegate: BookmarkDetailsViewDelegate?
     
-    convenience init(title: String, url: URL) {
+    convenience init(title: String, url: String) {
         self.init(frame: .zero)
         
         guard let urlTextField = urlTextField else { fatalError() }
@@ -82,7 +82,7 @@ class BookmarkDetailsView: UIView, BookmarkFormFieldsProtocol {
         faviconImageView.setContentHuggingPriority(.defaultHigh, for: .horizontal)
         
         titleTextField.text = title
-        urlTextField.text = url.absoluteString
+        urlTextField.text = url
         
         mainStackView.snp.makeConstraints {
             $0.edges.equalTo(self)
