@@ -111,6 +111,11 @@ class SyncSettingsTableViewController: UITableViewController {
         let actionShet = UIAlertController(title: device.name, message: nil, preferredStyle: .actionSheet)
         
         let removeAction = UIAlertAction(title: Strings.SyncRemoveDeviceAction, style: .destructive) { _ in
+            if !DeviceInfo.hasConnectivity() {
+                self.present(SyncAlerts.noConnection, animated: true)
+                return
+            }
+            
             var alertType = DeviceRemovalType.otherDevice
             
             if deviceCount == 1 {
@@ -218,8 +223,8 @@ class SyncSettingsTableViewController: UITableViewController {
     private func configureButtonCell(_ cell: UITableViewCell, buttonIndex: Int) {
         func attributedString(for text: String, color: UIColor) -> NSAttributedString {
             return NSAttributedString(string: text, attributes:
-                [NSAttributedStringKey.foregroundColor: color,
-                 NSAttributedStringKey.font: UIFont.systemFont(ofSize: 17, weight: UIFont.Weight.regular)])
+                [NSAttributedString.Key.foregroundColor: color,
+                 NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17, weight: UIFont.Weight.regular)])
         }
         
         let decoratedText = attributedString(for: Strings.SyncAddAnotherDevice, color: BraveUX.BraveOrange)

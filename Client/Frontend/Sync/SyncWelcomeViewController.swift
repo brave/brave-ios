@@ -140,11 +140,7 @@ class SyncWelcomeViewController: SyncViewController {
             
             let bvc = (UIApplication.shared.delegate as? AppDelegate)?.browserViewController
             
-            let title = Strings.SyncInitErrorTitle
-            let message = Strings.SyncInitErrorMessage
-            let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
-            bvc?.present(alert, animated: true)
+            bvc?.present(SyncAlerts.initializationError, animated: true)
         }
     }
     
@@ -198,9 +194,9 @@ class SyncWelcomeViewController: SyncViewController {
     }
 
     private func addSyncReadyNotificationObserver(completion: @escaping () -> Void) {
-        NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: NotificationSyncReady),
+        NotificationCenter.default.addObserver(forName: Sync.Notifications.syncReady,
                                                object: nil,
-                                               queue: OperationQueue.main,
+                                               queue: .main,
                                                using: { notification in
                                                 completion()
                                                 // This is a one-time notification, removing it immediately.

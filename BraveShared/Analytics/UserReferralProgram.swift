@@ -4,10 +4,15 @@
 
 import Foundation
 import Shared
+import Deferred
+import WebKit
 
 private let log = Logger.browserLogger
 
 public class UserReferralProgram {
+    
+    /// Domains must match server HTTP header ones _exactly_
+    private static let urpCookieOnlyDomains = ["coinbase.com"]
     public static let shared = UserReferralProgram()
     
     private static let apiKeyPlistKey = "API_KEY"
@@ -24,7 +29,7 @@ public class UserReferralProgram {
             return Bundle.main.infoDictionary?[key] as? String
         }
         
-        let host = AppConstants.BuildChannel == .release ? HostUrl.prod : HostUrl.staging
+        let host = AppConstants.BuildChannel == .developer ? HostUrl.staging : HostUrl.prod
         
         guard let apiKey = getPlistString(for: UserReferralProgram.apiKeyPlistKey) else {
                 log.error("Urp init error, failed to get values from Brave.plist.")
@@ -44,7 +49,6 @@ public class UserReferralProgram {
         
         service.referralCodeLookup { referral, _ in
             guard let ref = referral else {
-                self.getCustomHeaders()
                 log.info("No referral code found")
                 UrpLog.log("No referral code found")
                 return
@@ -77,16 +81,14 @@ public class UserReferralProgram {
     }
     
     private func initRetryPingConnection(numberOfTimes: Int32) {
-        let _10minutes: TimeInterval = 10 * 60
-        if AppConstants.BuildChannel == .developer {
-            Preferences.URP.nextCheckDate.value = Date().timeIntervalSince1970 + _10minutes
-        } else {
-            let _30daysInSeconds = Double(30 * 24 * 60 * 60)
+        if AppConstants.BuildChannel.isRelease {
             // Adding some time offset to be extra safe.
-            let offset = Double(1 * 60 * 60)
-            let _30daysFromToday = Date().timeIntervalSince1970 + _30daysInSeconds + offset
-            
+            let offset = 1.hours
+            let _30daysFromToday = Date().timeIntervalSince1970 + 30.days + offset
             Preferences.URP.nextCheckDate.value = _30daysFromToday
+        } else {
+            // For local and beta builds use a short timer
+            Preferences.URP.nextCheckDate.value = Date().timeIntervalSince1970 + 10.minutes
         }
         
         Preferences.URP.retryCountdown.value = Int(numberOfTimes)
@@ -152,8 +154,7 @@ public class UserReferralProgram {
                 UrpLog.log("Network error or isFinalized returned false, decrementing retry counter and trying again next time.")
                 // Decrement counter, next retry happens on next day
                 Preferences.URP.retryCountdown.value = counter - 1
-                let _1dayInSeconds = Double(1 * 24 * 60 * 60)
-                Preferences.URP.nextCheckDate.value = checkDate + _1dayInSeconds
+                Preferences.URP.nextCheckDate.value = checkDate + 1.days
             }
         }
     }
@@ -170,8 +171,7 @@ public class UserReferralProgram {
             // Appending ref code to dau ping if user used installed the app via user referral program.
             if Preferences.URP.referralCodeDeleteDate.value == nil {
                 UrpLog.log("Setting new date for deleting referral code.")
-                let timeToDelete = AppConstants.BuildChannel == .developer ? TimeInterval(20 * 60) : TimeInterval(90 * 24 * 60 * 60)
-                
+                let timeToDelete = AppConstants.BuildChannel.isRelease ? 90.days : 20.minutes
                 Preferences.URP.referralCodeDeleteDate.value = Date().timeIntervalSince1970 + timeToDelete
             }
             
@@ -180,7 +180,11 @@ public class UserReferralProgram {
         return nil
     }
     
-    public func getCustomHeaders() {
+    /// Same as `customHeaders` only blocking on result, to gaurantee data is available
+    private func fetchNewCustomHeaders() -> Deferred<[CustomHeaderData]> {
+        let result = Deferred<[CustomHeaderData]>()
+        
+        // No early return, even if data exists, still want to flush the storage
         service.fetchCustomHeaders() { headers, error in
             if headers.isEmpty { return }
             
@@ -189,27 +193,55 @@ public class UserReferralProgram {
             } catch {
                 log.error("Failed to save URP custom header data \(headers) with error: \(error.localizedDescription)")
             }
+            result.fill(headers)
         }
+        
+        return result
+    }
+    
+    /// Returns custom headers synchronously
+    private var customHeaders: [CustomHeaderData]? {
+        guard let customHeadersAsData = Preferences.URP.customHeaderData.value else { return nil }
+        
+        do {
+            return try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(customHeadersAsData) as? [CustomHeaderData]
+        } catch {
+            log.error("Failed to unwrap custom headers with error: \(error.localizedDescription)")
+        }
+        return nil
     }
     
     /// Checks if a custom header should be added to the request and returns its value and field.
     public class func shouldAddCustomHeader(for request: URLRequest) -> (value: String, field: String)? {
-        guard let customHeadersAsData = Preferences.URP.customHeaderData.value,
-            let customHeaders = (try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(customHeadersAsData)) as? [CustomHeaderData],
+        guard let customHeaders = UserReferralProgram.shared?.customHeaders,
             let hostUrl = request.url?.host else { return nil }
         
         for customHeader in customHeaders {
             // There could be an egde case when we would have two domains withing different domain groups, that would
             // cause to return only the first domain-header it approaches.
-            for domain in customHeader.domainList {
-                if hostUrl.contains(domain) {
-                    if let allFields = request.allHTTPHeaderFields, !allFields.keys.contains(customHeader.headerField) {
-                        return (customHeader.headerValue, customHeader.headerField)
-                    }
+            for domain in customHeader.domainList where hostUrl.contains(domain) {
+                // If `domain` is "cookie only", we exclude it from HTTP Headers, and just use cookie approach
+                let cookieOnly = urpCookieOnlyDomains.contains(domain)
+                if !cookieOnly, let allFields = request.allHTTPHeaderFields, !allFields.keys.contains(customHeader.headerField) {
+                    return (customHeader.headerValue, customHeader.headerField)
                 }
             }
         }
         
         return nil
+    }
+    
+    public func insertCookies(intoStore store: WKHTTPCookieStore) {
+        assertIsMainThread("Setting up cookies for URP, must happen on main thread")
+        
+        func attachCookies(from headers: [CustomHeaderData]?) {
+            headers?.flatMap { $0.cookies() }.forEach { store.setCookie($0) }
+        }
+        
+        // Attach all existing cookies
+        attachCookies(from: customHeaders)
+        
+        // Pull new ones and attach them async
+        fetchNewCustomHeaders().uponQueue(.main, block: attachCookies)
     }
 }
