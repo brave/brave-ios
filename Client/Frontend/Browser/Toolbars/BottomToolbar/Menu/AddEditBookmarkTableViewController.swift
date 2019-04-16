@@ -207,13 +207,20 @@ class AddEditBookmarkTableViewController: UITableViewController {
     }
     
     var totalCount: Int { return sortedFolders.count + 3 }
+    
+    var specialButtonsCount: Int {
+        switch type {
+        case .folder(_): return 1
+        case .bookmark(_): return 3
+        }
+    }
 
     // MARK: - Table view data source
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch presentationMode {
         case .currentSelection: return 1
-        case .folderHierarchy: return sortedFolders.count + 3
+        case .folderHierarchy: return sortedFolders.count + specialButtonsCount
         }
     }
     
@@ -230,7 +237,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
             case Location.rootLevelTag: location = .rootLevel
             case Location.newFolderTag: showNewFolderVC()
             case Location.folderTag:
-                let folder = sortedFolders[indexPath.row - 3].0
+                let folder = sortedFolders[indexPath.row - specialButtonsCount].0
                 location = .folder(folder: folder)
             default: assertionFailure("not supported tag was selected: \(tag)")
                 
@@ -288,26 +295,33 @@ class AddEditBookmarkTableViewController: UITableViewController {
         case .folderHierarchy:
             let row = indexPath.row
             
-            if row == 0 {
-                let cell = IndentedImageTableViewCell(image: #imageLiteral(resourceName: "add_tab"))
-                cell.folderName.text = "New Folder"
-                cell.accessoryType = .disclosureIndicator
-                cell.tag = Location.newFolderTag
+            switch type {
+            case .folder(_):
+                if row == 0 {
+                    return rootLevelFolderCell
+                }
+            case .bookmark(_):
+                if row == 0 {
+                    let cell = IndentedImageTableViewCell(image: #imageLiteral(resourceName: "add_tab"))
+                    cell.folderName.text = "New Folder"
+                    cell.accessoryType = .disclosureIndicator
+                    cell.tag = Location.newFolderTag
+                    
+                    return cell
+                }
                 
-                return cell
-            }
-            
-            if row == 1 {
-                return favoritesCell
-            }
-            
-            if row == 2 {
-                return rootLevelFolderCell
+                if row == 1 {
+                    return favoritesCell
+                }
+                
+                if row == 2 {
+                    return rootLevelFolderCell
+                }
             }
             
             let cell = IndentedImageTableViewCell()
             
-            let indentedFolder = sortedFolders[row - 3]
+            let indentedFolder = sortedFolders[row - specialButtonsCount]
             
             cell.folderName.text = indentedFolder.0.displayTitle
             cell.indentationLevel = indentedFolder.indentationLevel
