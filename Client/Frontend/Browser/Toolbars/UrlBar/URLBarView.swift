@@ -232,8 +232,8 @@ class URLBarView: UIView {
         
         mainStackView.snp.makeConstraints { make in
             make.top.bottom.equalTo(self)
-            make.leading.equalTo(self).inset(URLBarViewUX.Padding)
-            make.trailing.equalTo(self).inset(URLBarViewUX.Padding)
+            make.leading.equalTo(self.safeArea.leading).inset(URLBarViewUX.Padding)
+            make.trailing.equalTo(self.safeArea.trailing).inset(URLBarViewUX.Padding)
         }
         
         line.snp.makeConstraints { make in
