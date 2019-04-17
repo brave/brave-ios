@@ -35,7 +35,7 @@ class FolderDetailsViewTableViewCell: UIView, BookmarkFormFieldsProtocol {
     
     weak var delegate: BookmarkDetailsViewDelegate?
     
-    convenience init(title: String?) {
+    convenience init(title: String?, viewHeight: CGFloat) {
         self.init(frame: .zero)
         
         mainStackView.addArrangedSubview(spacerLine)
@@ -46,6 +46,7 @@ class FolderDetailsViewTableViewCell: UIView, BookmarkFormFieldsProtocol {
         
         mainStackView.snp.makeConstraints {
             $0.edges.equalTo(self)
+            $0.height.equalTo(viewHeight)
         }
     }
     

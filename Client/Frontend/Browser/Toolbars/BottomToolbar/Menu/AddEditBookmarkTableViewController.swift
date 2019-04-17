@@ -13,6 +13,10 @@ protocol AddEditBookmarkDelegate: class {
 
 class AddEditBookmarkTableViewController: UITableViewController {
     
+    struct UX {
+        static let cellHeight: CGFloat = 44
+    }
+    
     enum Mode {
         case newBookmark(title: String, url: String)
         case newFolder(title: String)
@@ -99,11 +103,11 @@ class AddEditBookmarkTableViewController: UITableViewController {
         case .newBookmark(let title, let url):
             return BookmarkDetailsView(title: title, url: url)
         case .newFolder(let title):
-            return FolderDetailsViewTableViewCell(title: title)
+            return FolderDetailsViewTableViewCell(title: title, viewHeight: UX.cellHeight)
         case .editBookmark(let bookmark):
             return BookmarkDetailsView(title: bookmark.displayTitle, url: bookmark.url)
         case .editFolder(let folder):
-            return FolderDetailsViewTableViewCell(title: folder.displayTitle)
+            return FolderDetailsViewTableViewCell(title: folder.displayTitle, viewHeight: UX.cellHeight)
         }
     }()
     
@@ -132,7 +136,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
         
         navigationItem.rightBarButtonItem = saveButton
 
-        tableView.rowHeight = 44
+        tableView.rowHeight = UX.cellHeight
         tableView.contentInset = UIEdgeInsets(top: 36, left: 0, bottom: 0, right: 0)
         
         frc.delegate = self
