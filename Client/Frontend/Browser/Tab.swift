@@ -189,6 +189,8 @@ class Tab: NSObject {
             configuration!.preferences = WKPreferences()
             configuration!.preferences.javaScriptCanOpenWindowsAutomatically = false
             configuration!.allowsInlineMediaPlayback = true
+            // Enables Zoom in website by ignoring their javascript based viewport Scale limits.
+            configuration!.ignoresViewportScaleLimits = true
             let webView = TabWebView(frame: .zero, configuration: configuration!)
             webView.delegate = self
             configuration = nil
@@ -479,6 +481,10 @@ class Tab: NSObject {
         }
         guard let url = self.webView?.url else {
             return
+        }
+        
+        if let helper = contentScriptManager.getContentScript(ContextMenuHelper.name()) as? ContextMenuHelper {
+            helper.replaceWebViewLongPress()
         }
 
         self.urlDidChangeDelegate?.tab(self, urlDidChangeTo: url)

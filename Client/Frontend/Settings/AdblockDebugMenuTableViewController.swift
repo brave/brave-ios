@@ -46,8 +46,7 @@ class AdblockDebugMenuTableViewController: TableViewController {
             """
         
         var section = Section(header: .title("Available lists"), footer: .title(footerNote))
-        guard let store = WKContentRuleListStore.default() else { return completion }
-        
+        let store = ContentBlockerHelper.ruleStore
         var rows = [Row]()
         
         func bundleOrDocumentsData(for name: String) -> Data? {
@@ -118,7 +117,7 @@ class AdblockDebugMenuTableViewController: TableViewController {
 
 fileprivate class ShrinkingSubtitleCell: SubtitleCell {
     
-    override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         textLabel?.adjustsFontSizeToFitWidth = true
         detailTextLabel?.adjustsFontSizeToFitWidth = true
