@@ -60,7 +60,6 @@
 		0A771D35218C8FDC00336E0D /* Bookmark+Sync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A771D34218C8FDC00336E0D /* Bookmark+Sync.swift */; };
 		0A83D9F121B7FFD200245EF0 /* ABPFilterParserData.dat in Resources */ = {isa = PBXBuildFile; fileRef = 0A83D9E921B7FFD100245EF0 /* ABPFilterParserData.dat */; };
 		0A8C6993225BC7B100988715 /* ToolbarUrlActionsProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A8C6992225BC7B100988715 /* ToolbarUrlActionsProtocol.swift */; };
-		0A8C699C225BDDC500988715 /* BookmarkEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A8C699B225BDDC500988715 /* BookmarkEditViewController.swift */; };
 		0A8C69AB225CFCAF00988715 /* AddEditBookmarkTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A8C69AA225CFCAF00988715 /* AddEditBookmarkTableViewController.swift */; };
 		0A8C69B5225DE99700988715 /* BookmarkDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A8C69B4225DE99700988715 /* BookmarkDetailsView.swift */; };
 		0A8C69BE225E350300988715 /* IndentedImageTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A8C69BD225E350300988715 /* IndentedImageTableViewCell.swift */; };
@@ -1184,7 +1183,6 @@
 		0A771D34218C8FDC00336E0D /* Bookmark+Sync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bookmark+Sync.swift"; sourceTree = "<group>"; };
 		0A83D9E921B7FFD100245EF0 /* ABPFilterParserData.dat */ = {isa = PBXFileReference; lastKnownFileType = file; path = ABPFilterParserData.dat; sourceTree = "<group>"; };
 		0A8C6992225BC7B100988715 /* ToolbarUrlActionsProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarUrlActionsProtocol.swift; sourceTree = "<group>"; };
-		0A8C699B225BDDC500988715 /* BookmarkEditViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkEditViewController.swift; sourceTree = "<group>"; };
 		0A8C69AA225CFCAF00988715 /* AddEditBookmarkTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEditBookmarkTableViewController.swift; sourceTree = "<group>"; };
 		0A8C69B4225DE99700988715 /* BookmarkDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkDetailsView.swift; sourceTree = "<group>"; };
 		0A8C69BD225E350300988715 /* IndentedImageTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndentedImageTableViewCell.swift; sourceTree = "<group>"; };
@@ -3441,7 +3439,6 @@
 		7BC7B4571C903A6A0046E9D2 /* Menu */ = {
 			isa = PBXGroup;
 			children = (
-				0A8C699B225BDDC500988715 /* BookmarkEditViewController.swift */,
 				A1AD4BCE20BF3E8C007A6EA1 /* BookmarksViewController.swift */,
 				A198E75020C701ED00334C11 /* HistoryViewController.swift */,
 				44331DBA22521013007E3E93 /* MenuViewController.swift */,
@@ -5798,7 +5795,6 @@
 				D04D1B92209790B60074B35F /* Toast.swift in Sources */,
 				D34DC8531A16C40C00D49B7B /* Profile.swift in Sources */,
 				0A93F1892264C72000A3571B /* BookmarkFormFieldsProtocol.swift in Sources */,
-				0A8C699C225BDDC500988715 /* BookmarkEditViewController.swift in Sources */,
 				4422D4D821BFFB7600BF1855 /* block.cc in Sources */,
 				E65075541E37F6FC006961AC /* DynamicFontHelper.swift in Sources */,
 				4422D55C21BFFB7F00BF1855 /* perl_groups.cc in Sources */,
