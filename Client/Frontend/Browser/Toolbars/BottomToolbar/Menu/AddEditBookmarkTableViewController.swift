@@ -5,6 +5,7 @@
 import UIKit
 import CoreData
 import Data
+import Shared
 
 protocol AddEditBookmarkDelegate: class {
     func didSelectFolder(/*_ folder: Bookmark*/)
@@ -86,7 +87,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
         let button = UIBarButtonItem()
         button.target = self
         button.action = #selector(save)
-        button.title = "Save"
+        button.title = Strings.SaveButtonTitle
         
         return button
     }()
@@ -271,8 +272,15 @@ class AddEditBookmarkTableViewController: UITableViewController {
         }
     }
     
+    override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
+        switch location {
+        case .favorites: return Strings.FavoritesLocationFooterText
+        default: return nil
+        }
+    }
+    
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return "Location"
+        return Strings.EditBookmarkTableLocationHeader
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -298,14 +306,14 @@ class AddEditBookmarkTableViewController: UITableViewController {
     }
     
     func showNewFolderVC() {
-        let vc = AddEditBookmarkTableViewController(mode: .newFolder(title: "New folder"))
+        let vc = AddEditBookmarkTableViewController(mode: .newFolder(title: Strings.NewFolderDefaultName))
         vc.delegate = self
         navigationController?.pushViewController(vc, animated: true)
     }
     
     var rootLevelFolderCell: IndentedImageTableViewCell {
         let cell = IndentedImageTableViewCell().then {
-            $0.folderName.text = "Bookmarks"
+            $0.folderName.text = Strings.BookmarkRootLevelCellTitle
             $0.tag = Location.rootLevelTag
             if case .rootLevel = location, presentationMode == .folderHierarchy {
                 $0.accessoryType = .checkmark
@@ -317,7 +325,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
     
     var favoritesCell: IndentedImageTableViewCell {
         let cell = IndentedImageTableViewCell(image: #imageLiteral(resourceName: "menu-Bookmark"))
-        cell.folderName.text = "Favorites"
+        cell.folderName.text = Strings.FavoritesRootLevelCellTitle
         cell.tag = Location.favoritesTag
         if case .favorites = location, presentationMode == .folderHierarchy {
             cell.accessoryType = .checkmark
@@ -350,7 +358,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
             case .newBookmark(_), .editBookmark(_):
                 if row == 0 {
                     let cell = IndentedImageTableViewCell(image: #imageLiteral(resourceName: "add_tab"))
-                    cell.folderName.text = "New Folder"
+                    cell.folderName.text = Strings.AddFolderActionCellTitle
                     cell.accessoryType = .disclosureIndicator
                     cell.tag = Location.newFolderTag
                     

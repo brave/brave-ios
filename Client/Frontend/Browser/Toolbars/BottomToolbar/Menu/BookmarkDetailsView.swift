@@ -4,6 +4,7 @@
 
 import UIKit
 import SnapKit
+import Shared
 
 protocol BookmarkDetailsViewDelegate: class {
     func correctValues(validationPassed: Bool)
@@ -91,8 +92,8 @@ class BookmarkDetailsView: UIView, BookmarkFormFieldsProtocol {
             faviconImageView.setIcon(nil, forURL: favUrl)
         }
         
-        titleTextField.text = title ?? "New bookmark"
-        urlTextField.text = url ?? "New folder"
+        titleTextField.text = title ?? Strings.NewBookmarkDefaultName
+        urlTextField.text = url ?? Strings.NewFolderDefaultName
         
         mainStackView.snp.makeConstraints {
             $0.edges.equalTo(self)

@@ -3,6 +3,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import UIKit
+import Shared
 
 class FolderDetailsViewTableViewCell: UIView, BookmarkFormFieldsProtocol {
 
@@ -41,7 +42,7 @@ class FolderDetailsViewTableViewCell: UIView, BookmarkFormFieldsProtocol {
         mainStackView.addArrangedSubview(titleTextField)
         mainStackView.addArrangedSubview(spacerLine)
         
-        titleTextField.text = title ?? "New folder"
+        titleTextField.text = title ?? Strings.NewFolderDefaultName
         
         mainStackView.snp.makeConstraints {
             $0.edges.equalTo(self)
