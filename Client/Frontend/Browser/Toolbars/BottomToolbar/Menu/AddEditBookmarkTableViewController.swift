@@ -318,7 +318,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
     }
     
     var rootLevelFolderCell: IndentedImageTableViewCell {
-        let cell = IndentedImageTableViewCell().then {
+        let cell = IndentedImageTableViewCell(image: #imageLiteral(resourceName: "menu_bookmarks")).then {
             $0.folderName.text = Strings.BookmarkRootLevelCellTitle
             $0.tag = Location.rootLevelTag
             if case .rootLevel = location, presentationMode == .folderHierarchy {
@@ -330,7 +330,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
     }
     
     var favoritesCell: IndentedImageTableViewCell {
-        let cell = IndentedImageTableViewCell(image: #imageLiteral(resourceName: "menu-Bookmark"))
+        let cell = IndentedImageTableViewCell(image: #imageLiteral(resourceName: "menu_favorites"))
         cell.folderName.text = Strings.FavoritesRootLevelCellTitle
         cell.tag = Location.favoritesTag
         if case .favorites = location, presentationMode == .folderHierarchy {
@@ -363,7 +363,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
                 }
             case .newBookmark(_), .editBookmark(_):
                 if row == 0 {
-                    let cell = IndentedImageTableViewCell(image: #imageLiteral(resourceName: "add_tab"))
+                    let cell = IndentedImageTableViewCell(image: #imageLiteral(resourceName: "menu_new_folder"))
                     cell.folderName.text = Strings.AddFolderActionCellTitle
                     cell.accessoryType = .disclosureIndicator
                     cell.tag = Location.newFolderTag
@@ -387,6 +387,9 @@ class AddEditBookmarkTableViewController: UITableViewController {
             cell.folderName.text = indentedFolder.0.displayTitle
             cell.indentationLevel = indentedFolder.indentationLevel
             cell.tag = Location.folderTag
+            
+            let hasChildrenFolders = indentedFolder.0.children?.contains(where: { $0.isFolder })
+            cell.customImage.image = hasChildrenFolders == true ? #imageLiteral(resourceName: "menu_folder_open") : #imageLiteral(resourceName: "menu_folder")
             
             if let folder = location.getFolder, folder.objectID == indentedFolder.0.objectID {
                 cell.accessoryType = .checkmark

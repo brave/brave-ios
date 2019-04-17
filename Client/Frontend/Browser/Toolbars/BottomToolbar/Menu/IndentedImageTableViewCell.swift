@@ -17,7 +17,7 @@ class IndentedImageTableViewCell: UITableViewCell {
     }
     
     let customImage = UIImageView().then {
-        $0.image = #imageLiteral(resourceName: "bookmarks_folder_hollow")
+        $0.image = #imageLiteral(resourceName: "shields-menu-icon")
         $0.contentMode = .scaleAspectFit
         $0.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
         $0.setContentHuggingPriority(.defaultHigh, for: .horizontal)
@@ -83,7 +83,5 @@ class IndentedImageTableViewCell: UITableViewCell {
             $0.trailing.equalTo(self).inset(8)
             $0.centerY.equalTo(self)
         }
-
     }
-
 }
