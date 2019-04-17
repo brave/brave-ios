@@ -1667,7 +1667,7 @@ extension BrowserViewController: ToolbarDelegate {
                 url,
                 tab: url.isFileURL ? nil : tabManager.selectedTab,
                 sourceView: view,
-                sourceRect: view.convert(urlBar.shareButton.frame, from: urlBar.shareButton.superview),
+                sourceRect: view.convert(urlBar.menuButton.frame, from: urlBar.menuButton.superview),
                 arrowDirection: [.up]
             )
         }
