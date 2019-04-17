@@ -92,7 +92,7 @@ class MenuViewController: UITableViewController {
         let nc = SettingsNavigationController(rootViewController: vc)
         nc.modalPresentationStyle = .formSheet
         
-        nc.navigationBar.topItem?.leftBarButtonItem =
+        nc.navigationBar.topItem?.rightBarButtonItem =
             UIBarButtonItem(barButtonSystemItem: .done, target: nc, action: #selector(SettingsNavigationController.done))
         
         dismiss(animated: true)
@@ -125,7 +125,7 @@ class MenuViewController: UITableViewController {
         let nc = SettingsNavigationController(rootViewController: vc)
         nc.modalPresentationStyle = .formSheet
         
-        nc.navigationBar.topItem?.leftBarButtonItem =
+        nc.navigationBar.topItem?.rightBarButtonItem =
             UIBarButtonItem(barButtonSystemItem: .done, target: nc, action: #selector(SettingsNavigationController.done))
         
         dismiss(animated: true)
@@ -138,7 +138,7 @@ class MenuViewController: UITableViewController {
         let nc = SettingsNavigationController(rootViewController: vc)
         nc.modalPresentationStyle = .formSheet
         
-        nc.navigationBar.topItem?.leftBarButtonItem =
+        nc.navigationBar.topItem?.rightBarButtonItem =
             UIBarButtonItem(barButtonSystemItem: .done, target: nc, action: #selector(SettingsNavigationController.done))
         
         dismiss(animated: true)

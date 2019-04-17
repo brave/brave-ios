@@ -152,6 +152,17 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         updateInternal(customTitle: customTitle, url: url)
     }
     
+    enum SaveLocation {
+        case keep
+        case new(location: Bookmark?)
+    }
+    
+    public func updateWithNewLocation(customTitle: String?, url: String?, location: Bookmark?) {
+        let isTitleEmpty = customTitle?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == true
+        if customTitle == nil || isTitleEmpty { return }
+        updateInternal(customTitle: customTitle, url: url, location: .new(location: location))
+    }
+    
     public class func migrateBookmarkOrders() {
         DataController.perform { context in
             migrateOrder(forFavorites: true, context: context)
@@ -331,6 +342,7 @@ extension Bookmark {
     
     private func updateInternal(customTitle: String?, url: String?, newSyncOrder: String? = nil,
                                 save: Bool = true, sendToSync: Bool = true,
+                                location: SaveLocation = .keep,
                                 context: WriteContext = .new) {
         
         DataController.perform(context: context) { context in
@@ -353,14 +365,27 @@ extension Bookmark {
                 }
             }
             
-            // Checking if syncOrder has changed is imporant here for performance reasons.
-            // Currently to do bookmark sorting right, we have to grab all bookmarks in a given directory
-            // and update their order which is a costly operation.
-            if newSyncOrder != nil && bookmarkToUpdate.syncOrder != newSyncOrder {
-                bookmarkToUpdate.syncOrder = newSyncOrder
-                Bookmark.setOrderForAllBookmarksOnGivenLevel(parent: bookmarkToUpdate.parentFolder, forFavorites: bookmarkToUpdate.isFavorite, context: context)
+            switch location {
+            case .keep:
+                // Checking if syncOrder has changed is imporant here for performance reasons.
+                // Currently to do bookmark sorting right, we have to grab all bookmarks in a given directory
+                // and update their order which is a costly operation.
+                if newSyncOrder != nil && bookmarkToUpdate.syncOrder != newSyncOrder {
+                    bookmarkToUpdate.syncOrder = newSyncOrder
+                    Bookmark.setOrderForAllBookmarksOnGivenLevel(parent: bookmarkToUpdate.parentFolder, forFavorites: bookmarkToUpdate.isFavorite, context: context)
+                }
+            case .new(let newParent):
+                var parentOnCorrectContext: Bookmark?
+                if let newParent = newParent {
+                    parentOnCorrectContext = context.object(with: newParent.objectID) as? Bookmark
+                }
+                bookmarkToUpdate.parentFolder = parentOnCorrectContext
+                bookmarkToUpdate.newSyncOrder(forFavorites: bookmarkToUpdate.isFavorite, context: context)
+                Bookmark.setOrderForAllBookmarksOnGivenLevel(parent: bookmarkToUpdate.parentFolder,
+                                                             forFavorites: bookmarkToUpdate.isFavorite,
+                                                             context: context)
             }
-            
+             
             if !bookmarkToUpdate.isFavorite && sendToSync {
                 Sync.shared.sendSyncRecords(action: .update, records: [bookmarkToUpdate], context: context)
             }

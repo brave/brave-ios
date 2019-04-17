@@ -218,13 +218,32 @@ class AddEditBookmarkTableViewController: UITableViewController {
             
             delegate?.didSelectFolder()
         case .editBookmark(let bookmark):
-            guard let urlString = bookmarkDetailsView.urlTextField?.text else {
+            guard let urlString = bookmarkDetailsView.urlTextField?.text,
+                let url = URL(string: urlString) else {
                     return earlyReturn()
             }
             
-            bookmark.update(customTitle: title, url: urlString)
+            switch location {
+            case .rootLevel:
+                bookmark.updateWithNewLocation(customTitle: title, url: urlString, location: nil)
+            case .favorites:
+                bookmark.delete()
+                Bookmark.addFavorite(url: url, title: title)
+            case .folder(let folder):
+                bookmark.updateWithNewLocation(customTitle: title, url: urlString, location: folder)
+            }
+            
         case .editFolder(let folder):
-            folder.update(customTitle: title, url: nil)
+            folder.updateWithNewLocation(customTitle: title, url: nil, location: folder)
+            
+            switch location {
+            case .rootLevel:
+                folder.updateWithNewLocation(customTitle: title, url: nil, location: nil)
+            case .favorites:
+                fatalError("Folders can't be saved to favorites")
+            case .folder(let folderSaveLocation):
+                folder.updateWithNewLocation(customTitle: title, url: nil, location: folderSaveLocation)
+            }
         }
         
         if let nc = navigationController, nc.childViewControllers.count > 1 {
@@ -297,7 +316,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
     }
     
     var favoritesCell: IndentedImageTableViewCell {
-        let cell = IndentedImageTableViewCell(image: #imageLiteral(resourceName: "bookmark"))
+        let cell = IndentedImageTableViewCell(image: #imageLiteral(resourceName: "menu-Bookmark"))
         cell.folderName.text = "Favorites"
         cell.tag = Location.favoritesTag
         if case .favorites = location, presentationMode == .folderHierarchy {
