@@ -88,7 +88,7 @@ class BookmarkDetailsView: UIView, BookmarkFormFieldsProtocol {
         faviconImageView.setContentHuggingPriority(.defaultHigh, for: .horizontal)
         
         if let url = url, let favUrl = URL(string: url) {
-            faviconImageView.setIcon(nil, forURL: favUrl)   
+            faviconImageView.setIcon(nil, forURL: favUrl)
         }
         
         titleTextField.text = title ?? "New bookmark"
