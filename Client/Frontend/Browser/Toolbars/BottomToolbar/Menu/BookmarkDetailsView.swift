@@ -25,6 +25,9 @@ class BookmarkDetailsView: UIView, BookmarkFormFieldsProtocol {
     let faviconImageView = UIImageView().then {
         $0.image = #imageLiteral(resourceName: "defaultTopSiteIcon")
         $0.contentMode = .scaleAspectFit
+        $0.snp.makeConstraints {
+            $0.size.equalTo(64)
+        }
     }
     
     let textFieldsStackView = UIStackView().then {
@@ -76,10 +79,17 @@ class BookmarkDetailsView: UIView, BookmarkFormFieldsProtocol {
         textFieldsStackView.addArrangedSubview(spacerLine)
         textFieldsStackView.addArrangedSubview(urlTextField)
         
+        // Adding spacer view with zero width, UIStackView's spacing will take care
+        // about adding a left margin.
+        contentStackView.addArrangedSubview(UIView.spacer(.horizontal, amount: 0))
         contentStackView.addArrangedSubview(faviconImageView)
         contentStackView.addArrangedSubview(textFieldsStackView)
         
         faviconImageView.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        
+        if let url = url, let favUrl = URL(string: url) {
+            faviconImageView.setIcon(nil, forURL: favUrl)   
+        }
         
         titleTextField.text = title ?? "New bookmark"
         urlTextField.text = url ?? "New folder"
