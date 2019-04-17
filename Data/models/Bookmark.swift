@@ -379,6 +379,9 @@ extension Bookmark {
                 if let newParent = newParent {
                     parentOnCorrectContext = context.object(with: newParent.objectID) as? Bookmark
                 }
+                
+                if parentOnCorrectContext === bookmarkToUpdate.parentFolder { return }
+                
                 bookmarkToUpdate.parentFolder = parentOnCorrectContext
                 bookmarkToUpdate.newSyncOrder(forFavorites: bookmarkToUpdate.isFavorite, context: context)
                 Bookmark.setOrderForAllBookmarksOnGivenLevel(parent: bookmarkToUpdate.parentFolder,

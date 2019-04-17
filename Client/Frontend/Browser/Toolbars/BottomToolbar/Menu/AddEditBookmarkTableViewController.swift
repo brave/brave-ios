@@ -140,6 +140,13 @@ class AddEditBookmarkTableViewController: UITableViewController {
         sortedFolders = sortFolders()
         
         tableView.reloadData()
+        
+        switch mode {
+        case .newBookmark(_, _): title = Strings.NewBookmarkTitle
+        case .newFolder(_): title = Strings.NewFolderTitle
+        case .editBookmark(_): title = Strings.EditBookmarkTitle
+        case .editFolder(_): title = Strings.EditFolderTitle
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -235,7 +242,6 @@ class AddEditBookmarkTableViewController: UITableViewController {
             }
             
         case .editFolder(let folder):
-            folder.updateWithNewLocation(customTitle: title, url: nil, location: folder)
             
             switch location {
             case .rootLevel:

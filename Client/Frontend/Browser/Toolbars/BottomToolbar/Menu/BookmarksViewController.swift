@@ -96,7 +96,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
   
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
-    
+    switchTableEditingMode(true)
     reloadData()
   }
     
@@ -372,17 +372,18 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
   
   fileprivate func showEditBookmarkController(_ tableView: UITableView, indexPath: IndexPath) {
     guard let item = bookmarksFRC?.object(at: indexPath), !item.isFavorite else { return }
-    let nextController = BookmarkEditViewController(bookmarksPanel: self, indexPath: indexPath, bookmark: item)
-    
-    nextController.completionBlock = { controller in
-      self.isEditingIndividualBookmark = false
-    }
+//    let nextController = BookmarkEditViewController(bookmarksPanel: self, indexPath: indexPath, bookmark: item)
+//
+//    nextController.completionBlock = { controller in
+//      self.isEditingIndividualBookmark = false
+//    }
     self.isEditingIndividualBookmark = true
     
     let mode: AddEditBookmarkTableViewController.Mode =
         item.isFolder ? .editFolder(item) : .editBookmark(item)
     
     let vc = AddEditBookmarkTableViewController(mode: mode)
+    
     self.navigationController?.pushViewController(vc, animated: true)
   }
   
