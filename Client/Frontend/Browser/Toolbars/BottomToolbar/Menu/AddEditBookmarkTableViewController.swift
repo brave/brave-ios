@@ -64,6 +64,17 @@ class AddEditBookmarkTableViewController: UITableViewController {
             }
         }
         
+        /// Making sure the folder we are saving to still exists.
+        /// This could happen if the folder got deleted by another device in sync chain.
+        var exists: Bool {
+            // Root level and favorites locations are permanent, only custom folder needs to be checked.
+            switch self {
+            case .folder(let folder):
+                return folder.existsInPersistentStore()
+            default:
+                return false
+            }
+        }
     }
     
     private enum DataSourcePresentationMode {
@@ -81,10 +92,6 @@ class AddEditBookmarkTableViewController: UITableViewController {
     }
     
     let frc: NSFetchedResultsController<Bookmark>
-    
-    //let action: AddEditBookmarkTableViewController.Action
-    //let type: AddEditBookmarkTableViewController.BookmarkType
-    
     let mode: AddEditBookmarkTableViewController.Mode
     
     lazy var saveButton: UIBarButtonItem = {
@@ -140,10 +147,6 @@ class AddEditBookmarkTableViewController: UITableViewController {
         tableView.contentInset = UIEdgeInsets(top: 36, left: 0, bottom: 0, right: 0)
         
         frc.delegate = self
-        try? frc.performFetch()
-        sortedFolders = sortFolders()
-        
-        tableView.reloadData()
         
         switch mode {
         case .newBookmark(_, _): title = Strings.NewBookmarkTitle
@@ -155,6 +158,20 @@ class AddEditBookmarkTableViewController: UITableViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        reloadData()
+    }
+    
+    func reloadData() {
+        try? frc.performFetch()
+        sortedFolders = sortFolders()
+        
+        // If the bookmark we save to was deleted, UI needs an update
+        // and a fallback location.
+        if !location.exists {
+            location = .rootLevel
+        }
+        
+        tableView.reloadData()
     }
     
     typealias IndentedFolder = (Bookmark, indentationLevel: Int)
@@ -203,6 +220,10 @@ class AddEditBookmarkTableViewController: UITableViewController {
         
         guard let title = bookmarkDetailsView.titleTextField.text else { return earlyReturn() }
         
+        if !location.exists {
+            location = .rootLevel
+        }
+        
         switch mode {
         case .newBookmark(_, _):
             guard let urlString = bookmarkDetailsView.urlTextField?.text,
@@ -235,6 +256,8 @@ class AddEditBookmarkTableViewController: UITableViewController {
                     return earlyReturn()
             }
             
+            if !bookmark.existsInPersistentStore() { break }
+            
             switch location {
             case .rootLevel:
                 bookmark.updateWithNewLocation(customTitle: title, url: urlString, location: nil)
@@ -246,6 +269,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
             }
             
         case .editFolder(let folder):
+            if !folder.existsInPersistentStore() { break }
             
             switch location {
             case .rootLevel:
@@ -425,9 +449,6 @@ extension AddEditBookmarkTableViewController: NSFetchedResultsControllerDelegate
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         
         // Possible performance bottleneck
-        try? frc.performFetch()
-        sortedFolders = sortFolders()
-        
-        tableView.reloadData()
+        reloadData()
     }
 }

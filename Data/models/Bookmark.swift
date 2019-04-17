@@ -523,7 +523,9 @@ extension Bookmark {
             if isFolder {
                 removeFolderAndSendSyncRecords(uuid: syncUUID)
             } else {
-                Sync.shared.sendSyncRecords(action: .delete, records: [self])
+                DataController.perform(context: context) { context in
+                    Sync.shared.sendSyncRecords(action: .delete, records: [self], context: context)
+                }
             }
         }
         
@@ -547,7 +549,7 @@ extension Bookmark {
                 allBookmarks.append(contentsOf: allNestedBookmarks)
             }
             
-            Sync.shared.sendSyncRecords(action: .delete, records: allBookmarks)
+            Sync.shared.sendSyncRecords(action: .delete, records: allBookmarks, context: context)
             
             bookmarkOnCorrectContext.deleteInternal(context: .existing(context))
         }

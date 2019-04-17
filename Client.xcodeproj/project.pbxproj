@@ -87,6 +87,7 @@
 		0AEFB84922244135007AF600 /* AdblockDebugMenuTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AEFB84822244135007AF600 /* AdblockDebugMenuTableViewController.swift */; };
 		0AEFB8532226D7C5007AF600 /* AdblockResourcesMappings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AEFB8522226D7C5007AF600 /* AdblockResourcesMappings.swift */; };
 		0AEFB88722299E6A007AF600 /* AdblockerType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AEFB88622299E6A007AF600 /* AdblockerType.swift */; };
+		0AF0411B2267C61100EBF982 /* ManagedObjectExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AF0411A2267C61100EBF982 /* ManagedObjectExtensions.swift */; };
 		0AF3B4ED213D8E3300695962 /* CoreDataTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AF3B4E5213D8E3200695962 /* CoreDataTestCase.swift */; };
 		0AF3B4EE213D8E3300695962 /* HistoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AF3B4E6213D8E3200695962 /* HistoryTests.swift */; };
 		0AF3B4EF213D8E3300695962 /* DomainTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AF3B4E7213D8E3200695962 /* DomainTests.swift */; };
@@ -1210,6 +1211,7 @@
 		0AEFB84822244135007AF600 /* AdblockDebugMenuTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdblockDebugMenuTableViewController.swift; sourceTree = "<group>"; };
 		0AEFB8522226D7C5007AF600 /* AdblockResourcesMappings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdblockResourcesMappings.swift; sourceTree = "<group>"; };
 		0AEFB88622299E6A007AF600 /* AdblockerType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdblockerType.swift; sourceTree = "<group>"; };
+		0AF0411A2267C61100EBF982 /* ManagedObjectExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagedObjectExtensions.swift; sourceTree = "<group>"; };
 		0AF3B4E5213D8E3200695962 /* CoreDataTestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataTestCase.swift; sourceTree = "<group>"; };
 		0AF3B4E6213D8E3200695962 /* HistoryTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HistoryTests.swift; sourceTree = "<group>"; };
 		0AF3B4E7213D8E3200695962 /* DomainTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DomainTests.swift; sourceTree = "<group>"; };
@@ -3255,6 +3257,7 @@
 				5D1DC51520AC9AFA00905E5A /* Data.h */,
 				5D1DC51620AC9AFA00905E5A /* Info.plist */,
 				59B6912721B695A400E9388E /* InfoPlist.strings */,
+				0AF0411A2267C61100EBF982 /* ManagedObjectExtensions.swift */,
 			);
 			indentWidth = 4;
 			path = Data;
@@ -5431,6 +5434,7 @@
 				5D1DC57220AE005400905E5A /* JSInjector.swift in Sources */,
 				5D1DC55920AE004600905E5A /* Bookmark.swift in Sources */,
 				5D1DC55B20AE004600905E5A /* Domain.swift in Sources */,
+				0AF0411B2267C61100EBF982 /* ManagedObjectExtensions.swift in Sources */,
 				0AA4FC392109D685000B173A /* CRUDProtocols.swift in Sources */,
 				5D1DC56B20AE005400905E5A /* SyncCrypto.swift in Sources */,
 				5D1DC55F20AE004600905E5A /* Model.xcdatamodeld in Sources */,
