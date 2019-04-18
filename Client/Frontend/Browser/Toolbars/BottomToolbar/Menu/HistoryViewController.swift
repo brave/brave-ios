@@ -43,6 +43,7 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
     frc!.delegate = self
     super.viewDidLoad()
     self.tableView.accessibilityIdentifier = "History List"
+    title = Strings.HistoryScreenTitle
     
     reloadData()
   }

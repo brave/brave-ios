@@ -13,17 +13,17 @@ class MenuViewController: UITableViewController {
         
         var title: String {
             switch self {
-            case .bookmarks: return "Bookmarks"
-            case .history: return "History"
-            case .settings: return "Settings"
-            case .add: return "Add to..."
-            case .share: return "Share with..."
+            case .bookmarks: return Strings.BookmarksMenuItem
+            case .history: return Strings.HistoryMenuItem
+            case .settings: return Strings.SettingsMenuItem
+            case .add: return Strings.AddToMenuItem
+            case .share: return Strings.ShareWithMenuItem
             }
         }
         
         var icon: UIImage {
             switch self {
-            case .bookmarks: return #imageLiteral(resourceName: "menu-add-bookmark")
+            case .bookmarks: return #imageLiteral(resourceName: "menu_bookmarks")
             case .history: return #imageLiteral(resourceName: "menu-history")
             case .settings: return #imageLiteral(resourceName: "menu-settings")
             case .add: return #imageLiteral(resourceName: "menu-add-bookmark")
@@ -62,11 +62,30 @@ class MenuViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        let size = CGSize(width: 200, height: tableView.rect(forSection: 0).height)
+        let topBottomInset: CGFloat = 5
+        
+        tableView.separatorColor = UIColor(white: 0.0, alpha: 0.1)
+        tableView.rowHeight = 45
+        
+        tableView.contentInset = UIEdgeInsets(top: topBottomInset, left: 0, bottom: topBottomInset, right: 0)
+        
+        tableView.showsVerticalScrollIndicator = false
+        
+        // Hide separator line of the last cell.
+        tableView.tableFooterView =
+            UIView(frame: CGRect(x: 0, y: 0, width: tableView.frame.size.width, height: 1))
+        
+        // TODO: Make the background view transparent with alpha 0.6
+        // simple settings its alpha doesn't seem to work.
+        tableView.backgroundColor = #colorLiteral(red: 0.9529411765, green: 0.9529411765, blue: 0.9647058824, alpha: 1)
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        let size = CGSize(width: 200, height: tableView.rect(forSection: 0).height + 10)
         
         preferredContentSize = size
-        tableView.tableFooterView = UIView()
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -165,6 +184,7 @@ class MenuViewController: UITableViewController {
         cell.textLabel?.text = button.title
         cell.imageView?.image = button.icon
         cell.tag = button.rawValue
+        cell.backgroundColor = .clear
         
         return cell
     }

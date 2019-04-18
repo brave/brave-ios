@@ -376,7 +376,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
             case .rootLevel: return rootLevelFolderCell
             case .favorites: return favoritesCell
             case .folder(let folder):
-                let cell = IndentedImageTableViewCell()
+                let cell = IndentedImageTableViewCell(image: #imageLiteral(resourceName: "menu_folder"))
                 cell.folderName.text = folder.displayTitle
                 cell.tag = Location.folderTag
                 return cell
