@@ -221,7 +221,7 @@ class BrowserViewController: UIViewController {
         toolbar = nil
 
         if showToolbar {
-            toolbar = BottomToolbarView() //exc bad access
+            toolbar = BottomToolbarView()
             footer.addSubview(toolbar!)
             toolbar?.tabToolbarDelegate = self
 

@@ -12,81 +12,79 @@ protocol BookmarkDetailsViewDelegate: class {
 
 class BookmarkDetailsView: UIView, BookmarkFormFieldsProtocol {
     
-    let mainStackView = UIStackView().then {
-        $0.axis = .vertical
-        $0.spacing = 8
-    }
+    // MARK: BookmarkFormFieldsProtocol
     
-    let contentStackView = UIStackView().then {
-        $0.spacing = 8
-        $0.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
-        $0.alignment = .center
-    }
-    
-    let faviconImageView = UIImageView().then {
-        $0.image = #imageLiteral(resourceName: "defaultTopSiteIcon")
-        $0.contentMode = .scaleAspectFit
-        $0.snp.makeConstraints {
-            $0.size.equalTo(64)
-        }
-    }
-    
-    let textFieldsStackView = UIStackView().then {
-        $0.axis = .vertical
-        $0.spacing = 8
-    }
+    weak var delegate: BookmarkDetailsViewDelegate?
     
     let titleTextField = UITextField().then {
-        $0.placeholder = "Title"
+        $0.placeholder = Strings.BookmarkTitlePlaceholderText
         $0.clearButtonMode = .whileEditing
         $0.translatesAutoresizingMaskIntoConstraints = false
-        
-        $0.tag = 22
     }
     
     let urlTextField: UITextField? = UITextField().then {
-        $0.placeholder = "Address"
+        $0.placeholder = Strings.BookmarkUrlPlaceholderText
         $0.keyboardType = .webSearch
         $0.autocorrectionType = .no
         $0.autocapitalizationType = .none
         $0.smartDashesType = .no
         $0.clearButtonMode = .whileEditing
         $0.translatesAutoresizingMaskIntoConstraints = false
-        
-        $0.tag = 33
     }
     
-    var spacerLine: UIView {
-        let view = UIView()
-        view.backgroundColor = .lightGray
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.addConstraint(NSLayoutConstraint(item: view, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 0.5))
-
-        return view
+    // MARK: - View setup
+    
+    private struct UX {
+        static let defaultSpacing: CGFloat = 8
+        static let faviconSize: CGFloat = 64
     }
     
-    weak var delegate: BookmarkDetailsViewDelegate?
+    private let mainStackView = UIStackView().then {
+        $0.axis = .vertical
+        $0.spacing = UX.defaultSpacing
+    }
+    
+    private let contentStackView = UIStackView().then {
+        $0.spacing = UX.defaultSpacing
+        $0.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
+        $0.alignment = .center
+    }
+    
+    private let faviconImageView = UIImageView().then {
+        $0.image = #imageLiteral(resourceName: "defaultTopSiteIcon")
+        $0.contentMode = .scaleAspectFit
+        $0.snp.makeConstraints {
+            $0.size.equalTo(UX.faviconSize)
+        }
+    }
+    
+    private let textFieldsStackView = UIStackView().then {
+        $0.axis = .vertical
+        $0.spacing = UX.defaultSpacing
+    }
+    
+    // MARK: - Initialization
     
     convenience init(title: String?, url: String?) {
         self.init(frame: .zero)
         
-        guard let urlTextField = urlTextField else { fatalError() }
+        guard let urlTextField = urlTextField else { fatalError("Url text field must be set up") }
         
-        mainStackView.addArrangedSubview(spacerLine)
-        mainStackView.addArrangedSubview(contentStackView)
-        mainStackView.addArrangedSubview(spacerLine)
+        [UIView.separatorLine, contentStackView, UIView.separatorLine].forEach {
+            mainStackView.addArrangedSubview($0)
+        }
         
-        textFieldsStackView.addArrangedSubview(titleTextField)
-        textFieldsStackView.addArrangedSubview(spacerLine)
-        textFieldsStackView.addArrangedSubview(urlTextField)
-        
+        [titleTextField, UIView.separatorLine, urlTextField].forEach {
+            textFieldsStackView.addArrangedSubview($0)
+        }
+
         // Adding spacer view with zero width, UIStackView's spacing will take care
-        // about adding a left margin.
-        contentStackView.addArrangedSubview(UIView.spacer(.horizontal, amount: 0))
-        contentStackView.addArrangedSubview(faviconImageView)
-        contentStackView.addArrangedSubview(textFieldsStackView)
+        // about adding a left margin to the content stack view.
+        let emptySpacer = UIView.spacer(.horizontal, amount: 0)
         
-        faviconImageView.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        [emptySpacer, faviconImageView, textFieldsStackView].forEach {
+            contentStackView.addArrangedSubview($0)
+        }
         
         if let url = url, let favUrl = URL(string: url) {
             faviconImageView.setIcon(nil, forURL: favUrl)
@@ -109,15 +107,18 @@ class BookmarkDetailsView: UIView, BookmarkFormFieldsProtocol {
         setupTextFieldTargets()
     }
     
+    @available(*, unavailable)
     required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
+        fatalError()
     }
     
-    func setupTextFieldTargets() {
+    private func setupTextFieldTargets() {
         [titleTextField, urlTextField].forEach {
             $0?.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
         }
     }
+    
+    // MARK: - Delegate actions
     
     @objc func textFieldDidChange(_ textField: UITextField) {
         delegate?.correctValues(validationPassed: validateFields())

@@ -2523,6 +2523,19 @@
 			path = Search;
 			sourceTree = "<group>";
 		};
+		0A7B5D5A2268971600AADF22 /* Bookmarks */ = {
+			isa = PBXGroup;
+			children = (
+				0A8C69AA225CFCAF00988715 /* AddEditBookmarkTableViewController.swift */,
+				0A8C69B4225DE99700988715 /* BookmarkDetailsView.swift */,
+				0A93F1882264C72000A3571B /* BookmarkFormFieldsProtocol.swift */,
+				A1AD4BCE20BF3E8C007A6EA1 /* BookmarksViewController.swift */,
+				0A93F17F2264C2D200A3571B /* FolderDetailsView.swift */,
+				0A8C69BD225E350300988715 /* IndentedImageTableViewCell.swift */,
+			);
+			path = Bookmarks;
+			sourceTree = "<group>";
+		};
 		0AADC4BB20D2A4F700FDE368 /* HomePanel */ = {
 			isa = PBXGroup;
 			children = (
@@ -3442,15 +3455,10 @@
 		7BC7B4571C903A6A0046E9D2 /* Menu */ = {
 			isa = PBXGroup;
 			children = (
-				A1AD4BCE20BF3E8C007A6EA1 /* BookmarksViewController.swift */,
+				0A7B5D5A2268971600AADF22 /* Bookmarks */,
 				A198E75020C701ED00334C11 /* HistoryViewController.swift */,
 				44331DBA22521013007E3E93 /* MenuViewController.swift */,
 				0A8C6992225BC7B100988715 /* ToolbarUrlActionsProtocol.swift */,
-				0A8C69AA225CFCAF00988715 /* AddEditBookmarkTableViewController.swift */,
-				0A8C69B4225DE99700988715 /* BookmarkDetailsView.swift */,
-				0A8C69BD225E350300988715 /* IndentedImageTableViewCell.swift */,
-				0A93F17F2264C2D200A3571B /* FolderDetailsView.swift */,
-				0A93F1882264C72000A3571B /* BookmarkFormFieldsProtocol.swift */,
 			);
 			path = Menu;
 			sourceTree = "<group>";
