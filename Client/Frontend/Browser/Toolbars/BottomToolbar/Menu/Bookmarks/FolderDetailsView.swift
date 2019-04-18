@@ -5,7 +5,7 @@
 import UIKit
 import Shared
 
-class FolderDetailsViewTableViewCell: UIView, BookmarkFormFieldsProtocol {
+class FolderDetailsViewTableViewCell: AddEditHeaderView, BookmarkFormFieldsProtocol {
     
     // MARK: BookmarkFormFieldsProtocol
     
@@ -19,11 +19,6 @@ class FolderDetailsViewTableViewCell: UIView, BookmarkFormFieldsProtocol {
         let spacerView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 16))
         $0.leftViewMode = .always
         $0.leftView = spacerView
-    }
-
-    private let mainStackView = UIStackView().then {
-        $0.axis = .vertical
-        $0.spacing = 8
     }
     
     convenience init(title: String?, viewHeight: CGFloat) {
@@ -39,20 +34,8 @@ class FolderDetailsViewTableViewCell: UIView, BookmarkFormFieldsProtocol {
             $0.edges.equalTo(self)
             $0.height.equalTo(viewHeight)
         }
-    }
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        
-        backgroundColor = .white
-        addSubview(mainStackView)
         
         titleTextField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
-    }
-    
-    @available(*, unavailable)
-    required init?(coder aDecoder: NSCoder) {
-        fatalError()
     }
     
     @objc func textFieldDidChange(_ textField: UITextField) {

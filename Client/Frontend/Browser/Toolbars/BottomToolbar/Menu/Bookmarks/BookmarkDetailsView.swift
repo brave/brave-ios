@@ -6,11 +6,7 @@ import UIKit
 import SnapKit
 import Shared
 
-protocol BookmarkDetailsViewDelegate: class {
-    func correctValues(validationPassed: Bool)
-}
-
-class BookmarkDetailsView: UIView, BookmarkFormFieldsProtocol {
+class BookmarkDetailsView: AddEditHeaderView, BookmarkFormFieldsProtocol {
     
     // MARK: BookmarkFormFieldsProtocol
     
@@ -33,16 +29,6 @@ class BookmarkDetailsView: UIView, BookmarkFormFieldsProtocol {
     }
     
     // MARK: - View setup
-    
-    private struct UX {
-        static let defaultSpacing: CGFloat = 8
-        static let faviconSize: CGFloat = 64
-    }
-    
-    private let mainStackView = UIStackView().then {
-        $0.axis = .vertical
-        $0.spacing = UX.defaultSpacing
-    }
     
     private let contentStackView = UIStackView().then {
         $0.spacing = UX.defaultSpacing
@@ -96,20 +82,8 @@ class BookmarkDetailsView: UIView, BookmarkFormFieldsProtocol {
         mainStackView.snp.makeConstraints {
             $0.edges.equalTo(self)
         }
-    }
-
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        
-        backgroundColor = .white
-        addSubview(mainStackView)
         
         setupTextFieldTargets()
-    }
-    
-    @available(*, unavailable)
-    required init?(coder aDecoder: NSCoder) {
-        fatalError()
     }
     
     private func setupTextFieldTargets() {

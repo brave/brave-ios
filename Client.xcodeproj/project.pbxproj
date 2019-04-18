@@ -58,6 +58,7 @@
 		0A4BEFDE221F03C80005551A /* NetworkManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A4BEFDD221F03C80005551A /* NetworkManagerTests.swift */; };
 		0A53F3E721E6560A0086E80C /* InMemoryDataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A53F3E621E6560A0086E80C /* InMemoryDataController.swift */; };
 		0A771D35218C8FDC00336E0D /* Bookmark+Sync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A771D34218C8FDC00336E0D /* Bookmark+Sync.swift */; };
+		0A7B5D6722689C5D00AADF22 /* AddEditHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7B5D6622689C5D00AADF22 /* AddEditHeaderView.swift */; };
 		0A83D9F121B7FFD200245EF0 /* ABPFilterParserData.dat in Resources */ = {isa = PBXBuildFile; fileRef = 0A83D9E921B7FFD100245EF0 /* ABPFilterParserData.dat */; };
 		0A8C6993225BC7B100988715 /* ToolbarUrlActionsProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A8C6992225BC7B100988715 /* ToolbarUrlActionsProtocol.swift */; };
 		0A8C69AB225CFCAF00988715 /* AddEditBookmarkTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A8C69AA225CFCAF00988715 /* AddEditBookmarkTableViewController.swift */; };
@@ -1182,6 +1183,7 @@
 		0A53F3E621E6560A0086E80C /* InMemoryDataController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InMemoryDataController.swift; sourceTree = "<group>"; };
 		0A6231E32121F761007B429B /* UnitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = UnitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0A771D34218C8FDC00336E0D /* Bookmark+Sync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bookmark+Sync.swift"; sourceTree = "<group>"; };
+		0A7B5D6622689C5D00AADF22 /* AddEditHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEditHeaderView.swift; sourceTree = "<group>"; };
 		0A83D9E921B7FFD100245EF0 /* ABPFilterParserData.dat */ = {isa = PBXFileReference; lastKnownFileType = file; path = ABPFilterParserData.dat; sourceTree = "<group>"; };
 		0A8C6992225BC7B100988715 /* ToolbarUrlActionsProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarUrlActionsProtocol.swift; sourceTree = "<group>"; };
 		0A8C69AA225CFCAF00988715 /* AddEditBookmarkTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEditBookmarkTableViewController.swift; sourceTree = "<group>"; };
@@ -2527,10 +2529,11 @@
 			isa = PBXGroup;
 			children = (
 				0A8C69AA225CFCAF00988715 /* AddEditBookmarkTableViewController.swift */,
+				0A7B5D6622689C5D00AADF22 /* AddEditHeaderView.swift */,
 				0A8C69B4225DE99700988715 /* BookmarkDetailsView.swift */,
+				0A93F17F2264C2D200A3571B /* FolderDetailsView.swift */,
 				0A93F1882264C72000A3571B /* BookmarkFormFieldsProtocol.swift */,
 				A1AD4BCE20BF3E8C007A6EA1 /* BookmarksViewController.swift */,
-				0A93F17F2264C2D200A3571B /* FolderDetailsView.swift */,
 				0A8C69BD225E350300988715 /* IndentedImageTableViewCell.swift */,
 			);
 			path = Bookmarks;
@@ -5741,6 +5744,7 @@
 				0A0D3D3921A4BD0600BEE65B /* SafeBrowsing.swift in Sources */,
 				4422D4E821BFFB7600BF1855 /* log_writer.cc in Sources */,
 				F84B22041A0910F600AAB793 /* AppDelegate.swift in Sources */,
+				0A7B5D6722689C5D00AADF22 /* AddEditHeaderView.swift in Sources */,
 				C6B81B81212D6C1100996084 /* NoPrivacyProtection.swift in Sources */,
 				D8C75DF3207584C400BB8AD0 /* UIImageViewAligned.m in Sources */,
 				E653422D1C5944F90039DD9E /* BrowserPrompts.swift in Sources */,
