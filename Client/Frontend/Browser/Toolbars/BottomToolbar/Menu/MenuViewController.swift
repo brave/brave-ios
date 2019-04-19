@@ -122,7 +122,7 @@ class MenuViewController: UITableViewController {
         
         guard let title = tab?.displayTitle, let url = tab?.url?.absoluteString else { return }
         
-        let mode = AddEditBookmarkTableViewController.Mode.newBookmark(title: title, url: url)
+        let mode = BookmarkEditMode.addBookmark(title: title, url: url)
         
         let vc = AddEditBookmarkTableViewController(mode: mode)
         //vc.toolbarUrlActionsDelegate = bvc
