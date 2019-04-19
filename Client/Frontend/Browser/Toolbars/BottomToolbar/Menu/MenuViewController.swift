@@ -8,7 +8,13 @@ import Shared
 
 class MenuViewController: UITableViewController {
     
-    enum MenuButtons: Int {
+    private struct UX {
+        static let rowHeight: CGFloat = 45
+        static let separatorColor = UIColor(white: 0.0, alpha: 0.1)
+        static let topBottomInset: CGFloat = 5
+    }
+    
+    private enum MenuButtons: Int {
         case bookmarks, history, settings, add, share
         
         var title: String {
@@ -35,18 +41,21 @@ class MenuViewController: UITableViewController {
         static let allCases: [MenuButtons] = [.bookmarks, .history, .settings, .add, .share]
     }
     
-    let bvc: BrowserViewController
-    let tab: Tab?
+    private let bvc: BrowserViewController
+    private let tab: Tab?
     
-    lazy var visibleButtons: [MenuButtons] = {
+    private lazy var visibleButtons: [MenuButtons] = {
         let allButtons = MenuButtons.allCases
         
-        var allWithoutAddButton = allButtons
-        allWithoutAddButton.removeAll { $0 == .add || $0 == .share }
+        // Don't show url buttons if there is no url to pick(like on home screen)
+        var allWithoutUrlButtons = allButtons
+        allWithoutUrlButtons.removeAll { $0 == .add || $0 == .share }
         
-        guard let url = tab?.url, !url.isLocal else { return allWithoutAddButton }
+        guard let url = tab?.url, !url.isLocal else { return allWithoutUrlButtons }
         return allButtons
     }()
+    
+    // MARK: - Init
     
     init(bvc: BrowserViewController, tab: Tab?) {
         self.bvc = bvc
@@ -60,14 +69,16 @@ class MenuViewController: UITableViewController {
         fatalError()
     }
     
+    // MARK: - Lifecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        let topBottomInset: CGFloat = 5
         
-        tableView.separatorColor = UIColor(white: 0.0, alpha: 0.1)
-        tableView.rowHeight = 45
+        tableView.separatorColor = UX.separatorColor
+        tableView.rowHeight = UX.rowHeight
         
-        tableView.contentInset = UIEdgeInsets(top: topBottomInset, left: 0, bottom: topBottomInset, right: 0)
+        tableView.contentInset = UIEdgeInsets(top: UX.topBottomInset, left: 0,
+                                              bottom: UX.topBottomInset, right: 0)
         
         tableView.showsVerticalScrollIndicator = false
         
@@ -76,17 +87,18 @@ class MenuViewController: UITableViewController {
             UIView(frame: CGRect(x: 0, y: 0, width: tableView.frame.size.width, height: 1))
         
         // TODO: Make the background view transparent with alpha 0.6
-        // simple settings its alpha doesn't seem to work.
+        // simple setting its alpha doesn't seem to work.
         tableView.backgroundColor = #colorLiteral(red: 0.9529411765, green: 0.9529411765, blue: 0.9647058824, alpha: 1)
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
-        let size = CGSize(width: 200, height: tableView.rect(forSection: 0).height + 10)
-        
+        let size = CGSize(width: 200, height: tableView.rect(forSection: 0).height + UX.topBottomInset * 2)
         preferredContentSize = size
     }
+    
+    // MARK: - Table view data source
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
@@ -104,75 +116,6 @@ class MenuViewController: UITableViewController {
         }
     }
     
-    func openBookmarks() {
-        let vc = BookmarksViewController(folder: nil, isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing)
-        vc.toolbarUrlActionsDelegate = bvc
-        
-        let nc = SettingsNavigationController(rootViewController: vc)
-        nc.modalPresentationStyle = .formSheet
-        
-        nc.navigationBar.topItem?.rightBarButtonItem =
-            UIBarButtonItem(barButtonSystemItem: .done, target: nc, action: #selector(SettingsNavigationController.done))
-        
-        dismiss(animated: true)
-        bvc.present(nc, animated: true)
-    }
-    
-    func openAddBookmark() {
-        
-        guard let title = tab?.displayTitle, let url = tab?.url?.absoluteString else { return }
-        
-        let mode = BookmarkEditMode.addBookmark(title: title, url: url)
-        
-        let vc = AddEditBookmarkTableViewController(mode: mode)
-        //vc.toolbarUrlActionsDelegate = bvc
-        
-        let nc = SettingsNavigationController(rootViewController: vc)
-        nc.modalPresentationStyle = .formSheet
-        
-        nc.navigationBar.topItem?.leftBarButtonItem =
-            UIBarButtonItem(barButtonSystemItem: .cancel, target: nc, action: #selector(SettingsNavigationController.done))
-        
-        dismiss(animated: true)
-        bvc.present(nc, animated: true)
-    }
-    
-    func openHistory() {
-        let vc = HistoryViewController(isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing)
-        vc.toolbarUrlActionsDelegate = bvc
-        
-        let nc = SettingsNavigationController(rootViewController: vc)
-        nc.modalPresentationStyle = .formSheet
-        
-        nc.navigationBar.topItem?.rightBarButtonItem =
-            UIBarButtonItem(barButtonSystemItem: .done, target: nc, action: #selector(SettingsNavigationController.done))
-        
-        dismiss(animated: true)
-        bvc.present(nc, animated: true)
-    }
-    
-    func openSettings() {
-        let vc = SettingsViewController(profile: bvc.profile, tabManager: bvc.tabManager)
-        
-        let nc = SettingsNavigationController(rootViewController: vc)
-        nc.modalPresentationStyle = .formSheet
-        
-        nc.navigationBar.topItem?.rightBarButtonItem =
-            UIBarButtonItem(barButtonSystemItem: .done, target: nc, action: #selector(SettingsNavigationController.done))
-        
-        dismiss(animated: true)
-        bvc.present(nc, animated: true)
-    }
-    
-    func openShareSheet() { 
-        dismiss(animated: true)
-        bvc.tabToolbarDidPressShare()
-    }
-    
-    @objc func dismissView() {
-        dismiss(animated: true)
-    }
-
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return visibleButtons.count
     }
@@ -188,7 +131,67 @@ class MenuViewController: UITableViewController {
         
         return cell
     }
+    
+    // MARK: - Actions
+    
+    private enum DoneButtonPosition { case left, right }
+    private typealias DoneButton = (style: UIBarButtonItem.SystemItem, position: DoneButtonPosition)
+    
+    private func open(_ viewController: UIViewController, doneButton: DoneButton) {
+        let nav = SettingsNavigationController(rootViewController: viewController)
+        nav.modalPresentationStyle = .formSheet
+        
+        let button = UIBarButtonItem(barButtonSystemItem: doneButton.style, target: nav, action: #selector(SettingsNavigationController.done))
+        
+        switch doneButton.position {
+        case .left: nav.navigationBar.topItem?.leftBarButtonItem = button
+        case .right: nav.navigationBar.topItem?.rightBarButtonItem = button
+        }
+        
+        dismiss(animated: true)
+        bvc.present(nav, animated: true)
+    }
+    
+    private func openBookmarks() {
+        let vc = BookmarksViewController(folder: nil, isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing)
+        vc.toolbarUrlActionsDelegate = bvc
+        
+        open(vc, doneButton: DoneButton(style: .done, position: .right))
+    }
+    
+    private func openAddBookmark() {
+        guard let title = tab?.displayTitle, let url = tab?.url?.absoluteString else { return }
+        
+        let mode = BookmarkEditMode.addBookmark(title: title, url: url)
+        let vc = AddEditBookmarkTableViewController(mode: mode)
+        
+        open(vc, doneButton: DoneButton(style: .cancel, position: .left))
+
+    }
+    
+    private func openHistory() {
+        let vc = HistoryViewController(isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing)
+        vc.toolbarUrlActionsDelegate = bvc
+        
+        open(vc, doneButton: DoneButton(style: .done, position: .right))
+    }
+    
+    private func openSettings() {
+        let vc = SettingsViewController(profile: bvc.profile, tabManager: bvc.tabManager)
+        open(vc, doneButton: DoneButton(style: .done, position: .right))
+    }
+    
+    private func openShareSheet() {
+        dismiss(animated: true)
+        bvc.tabToolbarDidPressShare()
+    }
+    
+    @objc func dismissView() {
+        dismiss(animated: true)
+    }
 }
+
+// MARK: - PopoverContentComponent
 
 extension MenuViewController: PopoverContentComponent {
     var isPanToDismissEnabled: Bool { return false }
