@@ -6,7 +6,7 @@ import Foundation
 import Data
 import Shared
 
-/// Bookmark edition has four states.
+/// Bookmark editing has four states.
 /// each state has small differences in presentation as well as business logic.
 enum BookmarkEditMode {
     case addBookmark(title: String, url: String)

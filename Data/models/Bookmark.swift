@@ -349,7 +349,7 @@ extension Bookmark {
             guard let bookmarkToUpdate = context.object(with: self.objectID) as? Bookmark else { return }
             
             // See if there has been any change
-            if bookmarkToUpdate.customTitle == customTitle && bookmarkToUpdate.url == url && bookmarkToUpdate.syncOrder == newSyncOrder {
+            if bookmarkToUpdate.customTitle == customTitle && bookmarkToUpdate.url == url && bookmarkToUpdate.syncOrder == newSyncOrder, case .keep = location {
                 return
             }
             
@@ -492,17 +492,6 @@ extension Bookmark {
         }
         
         return allBookmarks
-    }
-    
-    static func getFoldersRecursively(parentFolder: Bookmark? = nil) -> [Bookmark] {
-        let isFolderKP = #keyPath(Bookmark.isFolder)
-        
-        let predicate = NSPredicate(format: "\(isFolderKP) == true")
-        
-        let orderSort = NSSortDescriptor(key: "order", ascending: true)
-        let createdSort = NSSortDescriptor(key: "created", ascending: false)
-        
-        return all(where: predicate, sortDescriptors: [orderSort, createdSort])!
     }
     
     // MARK: Delete
