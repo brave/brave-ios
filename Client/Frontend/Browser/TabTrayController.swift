@@ -407,7 +407,6 @@ class TabTrayController: UIViewController, Themeable {
 
 // MARK: Selectors
     @objc func didClickDone() {
-        toolbar.doneButton.isEnabled = false
         if tabDataSource.tabs.isEmpty {
             openNewTab()
         } else {

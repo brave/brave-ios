@@ -80,7 +80,7 @@ extension BrowserViewController {
     }
 
     @objc private func showTabTrayKeyCommand() {
-        showTabTray(sender: nil)
+        showTabTray()
     }
 
     @objc private func moveURLCompletionKeyCommand(sender: UIKeyCommand) {
