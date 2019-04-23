@@ -25,6 +25,10 @@ class AddEditHeaderView: UIView {
         
         backgroundColor = .white
         addSubview(mainStackView)
+        
+        mainStackView.snp.makeConstraints {
+            $0.edges.equalTo(self)
+        }
     }
     
     @available(*, unavailable)

@@ -124,8 +124,6 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         
         fetchRequest.predicate = predicate
         
-        //"parentFolder == %@"
-        
         return NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: context,
                                           sectionNameKeyPath: nil, cacheName: nil)
     }
@@ -146,9 +144,7 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
     // MARK: Update
     
     public func update(customTitle: String?, url: String?) {
-        // Title can't be empty, except when coming from Sync
-        let isTitleEmpty = customTitle?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == true
-        if customTitle == nil || isTitleEmpty { return }
+        if !containsCustomTitle { return }
         updateInternal(customTitle: customTitle, url: url)
     }
     
@@ -158,9 +154,14 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
     }
     
     public func updateWithNewLocation(customTitle: String?, url: String?, location: Bookmark?) {
-        let isTitleEmpty = customTitle?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == true
-        if customTitle == nil || isTitleEmpty { return }
+        if !containsCustomTitle { return }
+        
         updateInternal(customTitle: customTitle, url: url, location: .new(location: location))
+    }
+    
+    // Title can't be empty, except when coming from Sync
+    private var containsCustomTitle: Bool {
+        return customTitle?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
     }
     
     public class func migrateBookmarkOrders() {

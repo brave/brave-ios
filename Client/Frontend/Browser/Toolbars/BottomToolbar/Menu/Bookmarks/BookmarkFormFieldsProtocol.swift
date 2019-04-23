@@ -5,9 +5,8 @@
 import Foundation
 import Shared
 
-protocol BookmarkFormFieldsProtocol where Self: UIView {
+protocol BookmarkFormFieldsProtocol: UIView {
     var titleTextField: UITextField { get }
-    /// Nil by default
     var urlTextField: UITextField? { get }
     
     var delegate: BookmarkDetailsViewDelegate? { get set }
@@ -19,18 +18,20 @@ extension BookmarkFormFieldsProtocol {
     var urlTextField: UITextField? { return nil }
     
     func validateFields() -> Bool {
+        let title = titleTextField.text
+
         // Only title field is implemented
         if urlTextField == nil {
-            guard let titleText = titleTextField.text else { return false }
-            return validateTitle(titleText)
+            return validateTitle(title)
         }
         
-        guard let title = titleTextField.text, let url = urlTextField?.text else { return false }
+        guard let url = urlTextField?.text else { return false }
         
         return validateTitle(title) && validateUrl(url)
     }
     
-    private func validateTitle(_ title: String) -> Bool {
+    private func validateTitle(_ title: String?) -> Bool {
+        guard let title = title else { return false }
         return !title.isEmpty
     }
     

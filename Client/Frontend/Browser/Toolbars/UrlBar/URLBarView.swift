@@ -8,7 +8,7 @@ import BraveShared
 import Data
 
 private struct URLBarViewUX {
-    static let LocationLeftPadding: CGFloat = 8
+    static let LocationPadding: CGFloat = 8
     static let Padding: CGFloat = 10
     static let LocationHeight: CGFloat = 34
     static let ButtonHeight: CGFloat = 44
@@ -279,8 +279,8 @@ class URLBarView: UIView {
         locationTextField.attributedPlaceholder = self.locationView.placeholder
         locationContainer.addSubview(locationTextField)
         locationTextField.snp.remakeConstraints { make in
-            let insets = UIEdgeInsets(top: 0, left: URLBarViewUX.LocationLeftPadding,
-                                      bottom: 0, right: URLBarViewUX.LocationLeftPadding)
+            let insets = UIEdgeInsets(top: 0, left: URLBarViewUX.LocationPadding,
+                                      bottom: 0, right: URLBarViewUX.LocationPadding)
             make.edges.equalTo(self.locationView).inset(insets)
         }
         

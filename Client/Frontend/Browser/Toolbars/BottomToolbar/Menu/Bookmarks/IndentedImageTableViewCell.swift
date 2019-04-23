@@ -6,12 +6,12 @@ import UIKit
 
 class IndentedImageTableViewCell: UITableViewCell {
     
-    let mainStackView = UIStackView().then {
+    private let mainStackView = UIStackView().then {
         $0.spacing = 8
         $0.alignment = .fill
     }
     
-    let folderNameStackView = UIStackView().then {
+    private let folderNameStackView = UIStackView().then {
         $0.axis = .vertical
         $0.distribution = .equalSpacing
     }
@@ -27,11 +27,12 @@ class IndentedImageTableViewCell: UITableViewCell {
         $0.textAlignment = .left
     }
     
-    var spacerLine: UIView {
-        let view = UIView()
-        view.backgroundColor = .lightGray
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.addConstraint(NSLayoutConstraint(item: view, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 0.5))
+    private var spacerLine: UIView {
+        let view = UIView().then {
+        $0.backgroundColor = .lightGray
+        $0.translatesAutoresizingMaskIntoConstraints = false
+        $0.addConstraint(NSLayoutConstraint(item: $0, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 0.5))
+        }
         
         return view
     }
@@ -50,9 +51,8 @@ class IndentedImageTableViewCell: UITableViewCell {
         
         let transparentLine = spacerLine
         transparentLine.backgroundColor = .clear
-        folderNameStackView.addArrangedSubview(transparentLine)
-        folderNameStackView.addArrangedSubview(folderName)
-        folderNameStackView.addArrangedSubview(spacerLine)
+        
+        [transparentLine, folderName, spacerLine].forEach(folderNameStackView.addArrangedSubview)
         
         mainStackView.addArrangedSubview(folderNameStackView)
         

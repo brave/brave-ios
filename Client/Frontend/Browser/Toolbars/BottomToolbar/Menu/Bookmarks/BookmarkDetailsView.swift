@@ -20,7 +20,7 @@ class BookmarkDetailsView: AddEditHeaderView, BookmarkFormFieldsProtocol {
     
     let urlTextField: UITextField? = UITextField().then {
         $0.placeholder = Strings.BookmarkUrlPlaceholderText
-        $0.keyboardType = .webSearch
+        $0.keyboardType = .URL
         $0.autocorrectionType = .no
         $0.autocapitalizationType = .none
         $0.smartDashesType = .no
@@ -56,21 +56,18 @@ class BookmarkDetailsView: AddEditHeaderView, BookmarkFormFieldsProtocol {
         
         guard let urlTextField = urlTextField else { fatalError("Url text field must be set up") }
         
-        [UIView.separatorLine, contentStackView, UIView.separatorLine].forEach {
-            mainStackView.addArrangedSubview($0)
-        }
+        [UIView.separatorLine, contentStackView, UIView.separatorLine]
+            .forEach(mainStackView.addArrangedSubview)
         
-        [titleTextField, UIView.separatorLine, urlTextField].forEach {
-            textFieldsStackView.addArrangedSubview($0)
-        }
+        [titleTextField, UIView.separatorLine, urlTextField]
+            .forEach(textFieldsStackView.addArrangedSubview)
 
         // Adding spacer view with zero width, UIStackView's spacing will take care
         // about adding a left margin to the content stack view.
         let emptySpacer = UIView.spacer(.horizontal, amount: 0)
         
-        [emptySpacer, faviconImageView, textFieldsStackView].forEach {
-            contentStackView.addArrangedSubview($0)
-        }
+        [emptySpacer, faviconImageView, textFieldsStackView]
+            .forEach(contentStackView.addArrangedSubview)
         
         if let url = url, let favUrl = URL(string: url) {
             faviconImageView.setIcon(nil, forURL: favUrl)
@@ -78,10 +75,6 @@ class BookmarkDetailsView: AddEditHeaderView, BookmarkFormFieldsProtocol {
         
         titleTextField.text = title ?? Strings.NewBookmarkDefaultName
         urlTextField.text = url ?? Strings.NewFolderDefaultName
-        
-        mainStackView.snp.makeConstraints {
-            $0.edges.equalTo(self)
-        }
         
         setupTextFieldTargets()
     }

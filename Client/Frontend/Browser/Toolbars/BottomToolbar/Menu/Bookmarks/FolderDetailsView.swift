@@ -24,13 +24,12 @@ class FolderDetailsViewTableViewCell: AddEditHeaderView, BookmarkFormFieldsProto
     convenience init(title: String?, viewHeight: CGFloat) {
         self.init(frame: .zero)
         
-        [UIView.separatorLine, titleTextField, UIView.separatorLine].forEach {
-            mainStackView.addArrangedSubview($0)
-        }
+        [UIView.separatorLine, titleTextField, UIView.separatorLine]
+            .forEach(mainStackView.addArrangedSubview)
 
         titleTextField.text = title ?? Strings.NewFolderDefaultName
         
-        mainStackView.snp.makeConstraints {
+        mainStackView.snp.remakeConstraints {
             $0.edges.equalTo(self)
             $0.height.equalTo(viewHeight)
         }

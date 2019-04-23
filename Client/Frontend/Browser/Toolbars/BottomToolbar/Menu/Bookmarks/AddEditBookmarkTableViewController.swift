@@ -35,10 +35,11 @@ class AddEditBookmarkTableViewController: UITableViewController {
     // MARK: - View setup
     
     private lazy var saveButton: UIBarButtonItem = {
-        let button = UIBarButtonItem()
-        button.target = self
-        button.action = #selector(save)
-        button.title = Strings.SaveButtonTitle
+        let button = UIBarButtonItem().then {
+            $0.target = self
+            $0.action = #selector(save)
+            $0.title = Strings.SaveButtonTitle
+        }
         
         return button
     }()

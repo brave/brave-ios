@@ -14,7 +14,7 @@ class MenuViewController: UITableViewController {
         static let topBottomInset: CGFloat = 5
     }
     
-    private enum MenuButtons: Int {
+    private enum MenuButtons: Int, CaseIterable {
         case bookmarks, history, settings, add, share
         
         var title: String {
@@ -36,9 +36,6 @@ class MenuViewController: UITableViewController {
             case .share: return #imageLiteral(resourceName: "nav-share")
             }
         }
-        
-        // TODO: Remove when we can use Swift 4.2/`CaseIterable`
-        static let allCases: [MenuButtons] = [.bookmarks, .history, .settings, .add, .share]
     }
     
     private let bvc: BrowserViewController
@@ -104,15 +101,17 @@ class MenuViewController: UITableViewController {
         
         guard let cell = tableView.cellForRow(at: indexPath) else { return }
         
-        switch cell.tag {
-        case MenuButtons.bookmarks.rawValue: openBookmarks()
-        case MenuButtons.history.rawValue: openHistory()
-        case MenuButtons.settings.rawValue: openSettings()
-        case MenuButtons.add.rawValue: openAddBookmark()
-        case MenuButtons.share.rawValue: openShareSheet()
-            
-        default:
+        guard let button = MenuButtons(rawValue: cell.tag) else {
             assertionFailure("No cell with \(cell.tag) tag.")
+            return
+        }
+        
+        switch button {
+        case .bookmarks: openBookmarks()
+        case .history: openHistory()
+        case .settings: openSettings()
+        case .add: openAddBookmark()
+        case .share: openShareSheet()
         }
     }
     
@@ -148,7 +147,7 @@ class MenuViewController: UITableViewController {
         case .right: nav.navigationBar.topItem?.rightBarButtonItem = button
         }
         
-        dismiss(animated: true)
+        dismissView()
         bvc.present(nav, animated: true)
     }
     
@@ -182,7 +181,7 @@ class MenuViewController: UITableViewController {
     }
     
     private func openShareSheet() {
-        dismiss(animated: true)
+        dismissView()
         bvc.tabToolbarDidPressShare()
     }
     
