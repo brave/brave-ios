@@ -384,6 +384,7 @@ extension Bookmark {
                 if parentOnCorrectContext === bookmarkToUpdate.parentFolder { return }
                 
                 bookmarkToUpdate.parentFolder = parentOnCorrectContext
+                bookmarkToUpdate.syncParentUUID = parentOnCorrectContext?.syncUUID
                 bookmarkToUpdate.newSyncOrder(forFavorites: bookmarkToUpdate.isFavorite, context: context)
                 Bookmark.setOrderForAllBookmarksOnGivenLevel(parent: bookmarkToUpdate.parentFolder,
                                                              forFavorites: bookmarkToUpdate.isFavorite,
