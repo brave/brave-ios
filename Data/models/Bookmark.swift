@@ -144,7 +144,7 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
     // MARK: Update
     
     public func update(customTitle: String?, url: String?) {
-        if !containsCustomTitle { return }
+        if !hasTitle(customTitle) { return }
         updateInternal(customTitle: customTitle, url: url)
     }
     
@@ -154,14 +154,14 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
     }
     
     public func updateWithNewLocation(customTitle: String?, url: String?, location: Bookmark?) {
-        if !containsCustomTitle { return }
+        if !hasTitle(customTitle) { return }
         
         updateInternal(customTitle: customTitle, url: url, location: .new(location: location))
     }
     
     // Title can't be empty, except when coming from Sync
-    private var containsCustomTitle: Bool {
-        return customTitle?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
+    private func hasTitle(_ title: String?) -> Bool {
+        return title?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
     }
     
     public class func migrateBookmarkOrders() {
