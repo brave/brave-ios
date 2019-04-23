@@ -35,16 +35,16 @@ class ToolbarHelper: NSObject {
         
         toolbar.shareButton.setImage(#imageLiteral(resourceName: "nav-share").template, for: .normal)
         toolbar.shareButton.accessibilityLabel = Strings.TabToolbarShareButtonAccessibilityLabel
-        toolbar.shareButton.addTarget(self, action: #selector(didClickShare), for: UIControlEvents.touchUpInside)
+        toolbar.shareButton.addTarget(self, action: #selector(didClickShare), for: UIControl.Event.touchUpInside)
         
         toolbar.addTabButton.setImage(#imageLiteral(resourceName: "add_tab"), for: .normal)
         toolbar.addTabButton.accessibilityLabel = Strings.TabToolbarAddTabButtonAccessibilityLabel
-        toolbar.addTabButton.addTarget(self, action: #selector(didClickAddTab), for: UIControlEvents.touchUpInside)
+        toolbar.addTabButton.addTarget(self, action: #selector(didClickAddTab), for: UIControl.Event.touchUpInside)
         toolbar.addTabButton.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(didLongPressAddTab(_:))))
         
         toolbar.menuButton.setImage(#imageLiteral(resourceName: "menu-More-Options").template, for: .normal)
         toolbar.menuButton.accessibilityLabel = Strings.TabToolbarMenuButtonAccessibilityLabel
-        toolbar.menuButton.addTarget(self, action: #selector(didClickMenu), for: UIControlEvents.touchUpInside)
+        toolbar.menuButton.addTarget(self, action: #selector(didClickMenu), for: UIControl.Event.touchUpInside)
         
         setTheme(theme: .regular, forButtons: toolbar.actionButtons)
     }

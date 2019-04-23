@@ -168,7 +168,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
         var newFrame = header.frame
         header.setNeedsLayout()
         header.layoutIfNeeded()
-        let newSize = header.systemLayoutSizeFitting(UILayoutFittingCompressedSize)
+        let newSize = header.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
         newFrame.size.height = newSize.height
         header.frame = newFrame
         tableView.tableHeaderView = header
@@ -290,7 +290,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
         // If there are two or more children, we don't want to dismiss the whole view controller.
         // Example: we want to add a new folder while adding a bookmark, after adding a new folder
         // navigation should pop back to previous screen with the bookmark we add.
-        if let nc = navigationController, nc.childViewControllers.count > 1 {
+        if let nc = navigationController, nc.children.count > 1 {
             navigationController?.popViewController(animated: true)
         } else {
             dismiss(animated: true)
