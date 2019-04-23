@@ -437,6 +437,8 @@
 		4F514FD41ACD8F2C0022D7EA /* HistoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F514FD31ACD8F2C0022D7EA /* HistoryTests.swift */; };
 		4F97573B1AFA6F37006ECC24 /* readerContent.html in Resources */ = {isa = PBXBuildFile; fileRef = 4F9757391AFA6F37006ECC24 /* readerContent.html */; };
 		55A747171DC46FC400CE1B57 /* HomePageUITest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55A747161DC46FC400CE1B57 /* HomePageUITest.swift */; };
+		592F521E2217327C0078395E /* HttpCookieExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 592F521D2217327B0078395E /* HttpCookieExtension.swift */; };
+		5953AAEF2226E9D800A92DE1 /* HttpCookieExtensionTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5953AAEE2226E9D800A92DE1 /* HttpCookieExtensionTest.swift */; };
 		595E0EDB21CAD97C00813D49 /* CookieControl.js in Resources */ = {isa = PBXBuildFile; fileRef = 595E0EDA21CAD97C00813D49 /* CookieControl.js */; };
 		595E0EE121CAEF5B00813D49 /* FileManagerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 595E0EE021CAEF5B00813D49 /* FileManagerExtension.swift */; };
 		5965CA222215D4A0000B9EC1 /* CustomHeaderDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5965CA212215D4A0000B9EC1 /* CustomHeaderDataTests.swift */; };
@@ -1586,6 +1588,8 @@
 		5929A9F221B6AF03005ECF8D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		5929A9F321B6AF0F005ECF8D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Shared.strings; sourceTree = "<group>"; };
 		5929A9F421B6AF18005ECF8D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		592F521D2217327B0078395E /* HttpCookieExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HttpCookieExtension.swift; sourceTree = "<group>"; };
+		5953AAEE2226E9D800A92DE1 /* HttpCookieExtensionTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HttpCookieExtensionTest.swift; sourceTree = "<group>"; };
 		595E0EDA21CAD97C00813D49 /* CookieControl.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = CookieControl.js; sourceTree = "<group>"; };
 		595E0EE021CAEF5B00813D49 /* FileManagerExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagerExtension.swift; sourceTree = "<group>"; };
 		5965CA212215D4A0000B9EC1 /* CustomHeaderDataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomHeaderDataTests.swift; sourceTree = "<group>"; };
@@ -2711,6 +2715,7 @@
 				A1AD4BE020C082EF007A6EA1 /* UIGestureRecognizerExtensions.swift */,
 				A1AD4BE220C0861D007A6EA1 /* UIBarButtonItemExtensions.swift */,
 				595E0EE021CAEF5B00813D49 /* FileManagerExtension.swift */,
+				592F521D2217327B0078395E /* HttpCookieExtension.swift */,
 			);
 			indentWidth = 4;
 			name = Extensions;
@@ -4146,6 +4151,7 @@
 				D8EFFA251FF702A8001D3A09 /* NavigationRouterTests.swift */,
 				2795274921A890EB00921AA1 /* FingerprintingProtectionTests.swift */,
 				0A4214E821A6EBCF006B8E39 /* SafeBrowsingTests.swift */,
+				5953AAEE2226E9D800A92DE1 /* HttpCookieExtensionTest.swift */,
 			);
 			path = ClientTests;
 			sourceTree = "<group>";
@@ -4747,19 +4753,20 @@
 					};
 					27F443942135E11200296C58 = {
 						CreatedOnToolsVersion = 10.0;
+						LastSwiftMigration = 1010;
 						ProvisioningStyle = Automatic;
 					};
 					288A2D851AB8B3260023ABC3 = {
 						CreatedOnToolsVersion = 6.2;
-						LastSwiftMigration = 0820;
+						LastSwiftMigration = 1010;
 					};
 					2FCAE2191ABB51F800877008 = {
 						CreatedOnToolsVersion = 6.2;
-						LastSwiftMigration = 0820;
+						LastSwiftMigration = 1010;
 					};
 					2FCAE2231ABB51F800877008 = {
 						CreatedOnToolsVersion = 6.2;
-						LastSwiftMigration = 0820;
+						LastSwiftMigration = 1010;
 						TestTargetID = F84B21BD1A090F8100AAB793;
 					};
 					3B43E3CF1D95C48D00BBA9DB = {
@@ -4773,10 +4780,18 @@
 						LastSwiftMigration = 0820;
 						TestTargetID = F84B21BD1A090F8100AAB793;
 					};
+					5D1DC51220AC9AF900905E5A = {
+						LastSwiftMigration = 1010;
+					};
 					5D1DC51A20AC9AFA00905E5A = {
+						LastSwiftMigration = 1010;
 						ProvisioningStyle = Automatic;
 					};
+					5DE7688320B3456C00FF5533 = {
+						LastSwiftMigration = 1010;
+					};
 					5DE7688B20B3456E00FF5533 = {
+						LastSwiftMigration = 1010;
 						ProvisioningStyle = Automatic;
 					};
 					7BEB64401C7345600092C02E = {
@@ -4794,11 +4809,11 @@
 					};
 					E6F9650B1B2F1CF20034B023 = {
 						CreatedOnToolsVersion = 6.3.2;
-						LastSwiftMigration = 0820;
+						LastSwiftMigration = 1010;
 					};
 					F84B21BD1A090F8100AAB793 = {
 						CreatedOnToolsVersion = 6.1;
-						LastSwiftMigration = 0820;
+						LastSwiftMigration = 1010;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
@@ -4820,7 +4835,7 @@
 					};
 					F84B21D21A090F8100AAB793 = {
 						CreatedOnToolsVersion = 6.1;
-						LastSwiftMigration = 0820;
+						LastSwiftMigration = 1010;
 						TestTargetID = F84B21BD1A090F8100AAB793;
 					};
 				};
@@ -5601,6 +5616,7 @@
 				C690C208212FF35100E6EEE9 /* WebImageCacheWithNoPrivacyProtectionManager.swift in Sources */,
 				0A4BEFDA221EF3360005551A /* NetworkResourceType.swift in Sources */,
 				4422D4B921BFFB7600BF1855 /* crc32c.cc in Sources */,
+				592F521E2217327C0078395E /* HttpCookieExtension.swift in Sources */,
 				E66C5B481BDA81050051AA93 /* UIImage+ImageEffects.m in Sources */,
 				4422D4D721BFFB7600BF1855 /* table.cc in Sources */,
 				0A4BEF62221B26610005551A /* LocalAdblockResourceProtocol.swift in Sources */,
@@ -5919,6 +5935,7 @@
 				E4CD9F1D1A6D9C2800318571 /* WebServerTests.swift in Sources */,
 				D3D488591ABB54CD00A93597 /* FileAccessorTests.swift in Sources */,
 				0BA8964B1A250E6500C1010C /* ProfileTest.swift in Sources */,
+				5953AAEF2226E9D800A92DE1 /* HttpCookieExtensionTest.swift in Sources */,
 				03CCC9181AF05E7300DBF30D /* RelativeDatesTests.swift in Sources */,
 				F84B21DA1A090F8100AAB793 /* ClientTests.swift in Sources */,
 				281B2BEA1ADF4D90002917DC /* MockProfile.swift in Sources */,
@@ -6693,7 +6710,7 @@
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Fennec;
@@ -6753,7 +6770,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -6814,7 +6831,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -6875,7 +6892,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -6897,8 +6914,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "$SRCROOT/Shared/Shared-Bridging-Header.h";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Off;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 			};
 			name = Fennec;
 		};
@@ -6923,8 +6939,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "$SRCROOT/Storage/Storage-Bridging-Header.h";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Off;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 			};
 			name = Fennec;
 		};
@@ -6936,8 +6951,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "$(FRAMEWORK_BASE_BUNDLE_ID).$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "$SRCROOT/Storage/Storage-Bridging-Header.h";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Off;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Client.app/Client";
 			};
 			name = Fennec;
@@ -7304,7 +7318,7 @@
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -7371,7 +7385,7 @@
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -7439,7 +7453,7 @@
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -7507,7 +7521,7 @@
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -7577,7 +7591,7 @@
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Client.app/Client";
 			};
@@ -7637,7 +7651,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Client.app/Client";
 				VALIDATE_PRODUCT = YES;
@@ -7698,7 +7712,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Client.app/Client";
 				VALIDATE_PRODUCT = YES;
@@ -7759,7 +7773,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Client.app/Client";
 				VALIDATE_PRODUCT = YES;
@@ -7833,7 +7847,7 @@
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -7899,7 +7913,7 @@
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -7966,7 +7980,7 @@
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -8033,7 +8047,7 @@
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -8103,7 +8117,7 @@
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Client.app/Client";
 			};
@@ -8163,7 +8177,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Client.app/Client";
 				VALIDATE_PRODUCT = YES;
@@ -8224,7 +8238,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Client.app/Client";
 				VALIDATE_PRODUCT = YES;
@@ -8285,7 +8299,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Client.app/Client";
 				VALIDATE_PRODUCT = YES;
@@ -8411,8 +8425,7 @@
 				PRODUCT_MODULE_NAME = Client;
 				PRODUCT_NAME = Client;
 				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/Client-Bridging-Header.h";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Off;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 			};
 			name = Firefox;
 		};
@@ -8430,8 +8443,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "$(BASE_BUNDLE_ID).$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = ClientTests;
-				SWIFT_SWIFT3_OBJC_INFERENCE = Off;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Client.app/Client";
 			};
 			name = Firefox;
@@ -8464,8 +8476,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "$SRCROOT/Shared/Shared-Bridging-Header.h";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Off;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 			};
 			name = Firefox;
 		};
@@ -8490,8 +8501,7 @@
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "$SRCROOT/Storage/Storage-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Off;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 			};
 			name = Firefox;
 		};
@@ -8505,8 +8515,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "$(FRAMEWORK_BASE_BUNDLE_ID).$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "$SRCROOT/Storage/Storage-Bridging-Header.h";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Off;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Client.app/Client";
 			};
 			name = Firefox;
@@ -8825,8 +8834,7 @@
 				PRODUCT_NAME = Client;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = BUDDYBUILD;
 				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/Client-Bridging-Header.h";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Off;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 			};
 			name = Fennec_Enterprise;
 		};
@@ -8846,8 +8854,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "$SRCROOT/Shared/Shared-Bridging-Header.h";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Off;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 			};
 			name = Fennec_Enterprise;
 		};
@@ -8871,8 +8878,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "$SRCROOT/Storage/Storage-Bridging-Header.h";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Off;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 			};
 			name = Fennec_Enterprise;
 		};
@@ -8889,8 +8895,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "$(BASE_BUNDLE_ID).$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = ClientTests;
-				SWIFT_SWIFT3_OBJC_INFERENCE = Off;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Client.app/Client";
 			};
 			name = Fennec_Enterprise;
@@ -8919,8 +8924,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "$(FRAMEWORK_BASE_BUNDLE_ID).$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "$SRCROOT/Storage/Storage-Bridging-Header.h";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Off;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Client.app/Client";
 			};
 			name = Fennec_Enterprise;
@@ -8935,8 +8939,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "$(FRAMEWORK_BASE_BUNDLE_ID).$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "$SRCROOT/Shared/Shared-Bridging-Header.h";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Off;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Client.app/Client";
 			};
 			name = Fennec_Enterprise;
@@ -9081,8 +9084,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "$(FRAMEWORK_BASE_BUNDLE_ID).$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "$SRCROOT/Shared/Shared-Bridging-Header.h";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Off;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Client.app/Client";
 			};
 			name = Fennec;
@@ -9098,8 +9100,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "$(FRAMEWORK_BASE_BUNDLE_ID).$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "$SRCROOT/Shared/Shared-Bridging-Header.h";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Off;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Client.app/Client";
 			};
 			name = Firefox;
@@ -9207,8 +9208,7 @@
 				PRODUCT_MODULE_NAME = Client;
 				PRODUCT_NAME = Client;
 				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/Client-Bridging-Header.h";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Off;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 			};
 			name = FirefoxBeta;
 		};
@@ -9225,8 +9225,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "$(BASE_BUNDLE_ID).$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = ClientTests;
-				SWIFT_SWIFT3_OBJC_INFERENCE = Off;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Client.app/Client";
 			};
 			name = FirefoxBeta;
@@ -9259,8 +9258,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "$SRCROOT/Shared/Shared-Bridging-Header.h";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Off;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 			};
 			name = FirefoxBeta;
 		};
@@ -9285,8 +9283,7 @@
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "$SRCROOT/Storage/Storage-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Off;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 			};
 			name = FirefoxBeta;
 		};
@@ -9300,8 +9297,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "$(FRAMEWORK_BASE_BUNDLE_ID).$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "$SRCROOT/Storage/Storage-Bridging-Header.h";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Off;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Client.app/Client";
 			};
 			name = FirefoxBeta;
@@ -9317,8 +9313,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "$(FRAMEWORK_BASE_BUNDLE_ID).$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "$SRCROOT/Shared/Shared-Bridging-Header.h";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Off;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Client.app/Client";
 			};
 			name = FirefoxBeta;
@@ -9448,8 +9443,7 @@
 				PRODUCT_NAME = Client;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = BUDDYBUILD;
 				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/Client-Bridging-Header.h";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Off;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 			};
 			name = Fennec;
 		};
@@ -9466,8 +9460,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "$(BASE_BUNDLE_ID).$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = ClientTests;
-				SWIFT_SWIFT3_OBJC_INFERENCE = Off;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Client.app/Client";
 			};
 			name = Fennec;
