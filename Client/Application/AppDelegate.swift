@@ -52,7 +52,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         // Then we always set the user default to false. It will be set to true when we the application
         // is backgrounded.
         //
-
+        do {
+            try AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playback, mode: AVAudioSession.Mode.moviePlayback, options: [])
+            try AVAudioSession.sharedInstance().setActive(true)
+        } catch {
+           print(error)
+        }
+        
         // Hold references to willFinishLaunching parameters for delayed app launch
         self.application = application
         self.launchOptions = launchOptions

@@ -199,9 +199,10 @@ extension BrowserViewController: WKNavigationDelegate {
                 webView.configuration.preferences.javaScriptEnabled = !domainForShields.isShieldExpected(.NoScript, isPrivateBrowsing: isPrivateBrowsing)
             }
             
-            //Cookie Blocking code below
+            //Cookie Blocking + Media playback in background code below
             if let tab = tabManager[webView] {
                 tab.userScriptManager?.isCookieBlockingEnabled = Preferences.Privacy.blockAllCookies.value
+                tab.userScriptManager?.isBackgroundMediaEnabled = Preferences.General.allowBackgroundMediaPlayback.value
             }
             
             if let rule = BlocklistName.cookie.rule {

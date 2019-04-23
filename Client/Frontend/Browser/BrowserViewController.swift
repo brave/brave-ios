@@ -187,6 +187,7 @@ class BrowserViewController: UIViewController {
         Preferences.General.tabBarVisibility.observe(from: self)
         Preferences.Shields.allShields.forEach { $0.observe(from: self) }
         Preferences.Privacy.blockAllCookies.observe(from: self)
+        Preferences.General.allowBackgroundMediaPlayback.observe(from: self)
         // Lists need to be compiled before attempting tab restoration
         contentBlockListDeferred = ContentBlockerHelper.compileBundledLists()
     }
@@ -271,6 +272,7 @@ class BrowserViewController: UIViewController {
     }
 
     @objc func appDidEnterBackgroundNotification() {
+        tabManager.tabsForCurrentMode.forEach({$0.appDidEnterBackground()})
         displayedPopoverController?.dismiss(animated: false) {
             self.displayedPopoverController = nil
         }
@@ -1872,6 +1874,8 @@ extension BrowserViewController: TabDelegate {
         tab.addContentScript(FocusHelper(tab: tab), name: FocusHelper.name())
         
         tab.addContentScript(FingerprintingProtection(tab: tab), name: FingerprintingProtection.name())
+        
+        tab.addContentScript(BackgroundMediaPlayback(tab: tab), name: BackgroundMediaPlayback.name())
     }
 
     func tab(_ tab: Tab, willDeleteWebView webView: WKWebView) {
@@ -2918,7 +2922,8 @@ extension BrowserViewController: PreferencesObserver {
              Preferences.Shields.blockPhishingAndMalware.key,
              Preferences.Shields.blockImages.key,
              Preferences.Shields.fingerprintingProtection.key,
-             Preferences.Shields.useRegionAdBlock.key:
+             Preferences.Shields.useRegionAdBlock.key,
+            Preferences.General.allowBackgroundMediaPlayback.key:
             tabManager.allTabs.forEach { $0.webView?.reload() }
         case Preferences.Privacy.blockAllCookies.key:
             // All `block all cookies` toggle requires a hard reset of Webkit configuration.

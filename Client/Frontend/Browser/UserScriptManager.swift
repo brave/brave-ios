@@ -29,10 +29,18 @@ class UserScriptManager {
         }
     }
     
-    init(tab: Tab, isFingerprintingProtectionEnabled: Bool, isCookieBlockingEnabled: Bool) {
+    var isBackgroundMediaEnabled: Bool {
+        didSet {
+            if oldValue == isBackgroundMediaEnabled { return }
+            reloadUserScripts()
+        }
+    }
+    
+    init(tab: Tab, _ isFingerprintingProtectionEnabled: Bool, _ isCookieBlockingEnabled: Bool, _ isBackgroundMediaPlaybackEnabled: Bool) {
         self.tab = tab
         self.isFingerprintingProtectionEnabled = isFingerprintingProtectionEnabled
         self.isCookieBlockingEnabled = isCookieBlockingEnabled
+        self.isBackgroundMediaEnabled = isBackgroundMediaPlaybackEnabled
         reloadUserScripts()
     }
     
@@ -76,12 +84,14 @@ class UserScriptManager {
         return WKUserScript(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false)
     }()
     
-    private let bpUserScript: WKUserScript? = {
+    private lazy var bpUserScript: WKUserScript? = {
         guard let path = Bundle.main.path(forResource: "BackgroundPlay", ofType: "js"), let source: String = try? String(contentsOfFile: path) else {
             log.error("Failed to load cookie control user script")
             return nil
         }
-        return WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+        var alteredSource: String = source
+        alteredSource = alteredSource.replacingOccurrences(of: "$<allowBackgroundPlayback>", with: self.isBackgroundMediaEnabled.description, options: .literal)
+        return WKUserScript(source: alteredSource, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
     }()
     
     private func reloadUserScripts() {
@@ -94,7 +104,9 @@ class UserScriptManager {
             }
             if isCookieBlockingEnabled, let script = cookieControlUserScript {
                 $0.addUserScript(script)
-                $0.addUserScript(bpUserScript!)
+            }
+            if let script = bpUserScript {
+                $0.addUserScript(script)
             }
         }
     }

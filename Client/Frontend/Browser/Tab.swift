@@ -211,7 +211,8 @@ class Tab: NSObject {
 
             self.webView = webView
             self.webView?.addObserver(self, forKeyPath: KVOConstants.URL.rawValue, options: .new, context: nil)
-            self.userScriptManager = UserScriptManager(tab: self, isFingerprintingProtectionEnabled: Preferences.Shields.fingerprintingProtection.value, isCookieBlockingEnabled: Preferences.Privacy.blockAllCookies.value)
+            self.userScriptManager = UserScriptManager(tab: self, Preferences.Shields.fingerprintingProtection.value, Preferences.Privacy.blockAllCookies.value,
+                Preferences.General.allowBackgroundMediaPlayback.value)
             tabDelegate?.tab?(self, didCreateWebView: webView)
         }
     }
@@ -271,6 +272,7 @@ class Tab: NSObject {
     }
 
     deinit {
+        pauseAllMedia()
         deleteWebView()
         contentScriptManager.helpers.removeAll()
     }
@@ -347,6 +349,14 @@ class Tab: NSObject {
 
     func goToBackForwardListItem(_ item: WKBackForwardListItem) {
         _ = webView?.go(to: item)
+    }
+    
+    func pauseAllMedia() {
+        webView?.evaluateJavaScript("pauseAll()", completionHandler: nil)
+    }
+    
+    public func appDidEnterBackground() {
+        webView?.evaluateJavaScript("didEnterBackground()", completionHandler: nil)
     }
 
     @discardableResult func loadRequest(_ request: URLRequest) -> WKNavigation? {
