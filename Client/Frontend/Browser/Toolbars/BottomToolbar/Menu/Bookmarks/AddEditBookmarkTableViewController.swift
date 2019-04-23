@@ -66,7 +66,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
         case addFolder = 12
     }
     
-    let folderCellTag = 13
+    private let folderCellTag = 13
     
     /// Returns a count of how many non-folder cells should be visible(depends on Mode state)
     private var specialButtonsCount: Int {
