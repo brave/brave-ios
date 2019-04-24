@@ -2,7 +2,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-var allowBackgroundPlayback = true;
+var allowBackgroundPlayback = $<allowBackgroundPlayback>;
 var _maskedState = Object.getOwnPropertyDescriptor(Document.prototype, 'visibilityState') ||
     Object.getOwnPropertyDescriptor(HTMLDocument.prototype, 'visibilityState');
 if (_maskedState && _maskedState.configurable) {
@@ -26,8 +26,6 @@ Object.defineProperty(HTMLMediaElement.prototype, 'playing', {
 var videoElements = [];
 
 function pauseAll() {
-     console.log("pauseAll");
-        console.log(videoElements);
     videoElements.forEach(function(item, index, array) {
         item.pause();
     });
@@ -68,20 +66,37 @@ function didEnterBackground() {
 //                          });
 //}
 
-document.querySelectorAll('video').forEach(function(item, index, array) {
-                                           console.log("Adding Listener for video");
+var timer
+
+let origAppend = Node.prototype.appendChild;
+Node.prototype.appendChild = function(n) {
+    if (n.constructor.name == "HTMLVideoElement") {
+        if (timer) { clearTimeout(timer); }
+        timer = setTimeout(searchVideos, 1000);
+    }
+    return origAppend.apply(this, [n]);
+}
+
+
+let origInsert= Node.prototype.insertBefore;
+Node.prototype.insertBefore = function(n1, n2) {
+    if (n1.constructor.name == "HTMLVideoElement") {
+        if (timer) { clearTimeout(timer); }
+        timer = setTimeout(searchVideos, 1000);
+    }
+    return origInsert.apply(this, [n1, n2]);
+}
+
+let searchVideos = function() {
+    document.querySelectorAll('video').forEach(function(item, index, array) {
     item.addEventListener('playing', function() {
-                          console.log("Playing");
         if (!videoElements.includes(this)) {
-                          console.log("Added");
             videoElements.push(this);
         }
     }, false);
 
     item.addEventListener('pause', function() {
-                          console.log("Paused");
-                          console.log(_maskedState.get.call(document));
-        if (_maskedState.get.call(document) == "hidden" && autoRestart && allowBackgroundPlayback) {
+        if (autoRestart && allowBackgroundPlayback) {
             autoRestart = false;
             this.play();
             return;
@@ -92,3 +107,6 @@ document.querySelectorAll('video').forEach(function(item, index, array) {
         }
     }, false);
 });
+}
+searchVideos();
+
