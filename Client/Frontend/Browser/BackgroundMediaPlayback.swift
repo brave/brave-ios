@@ -4,9 +4,9 @@
 
 import Foundation
 import WebKit
-import Data
-import BraveShared
-import MediaPlayer
+import Shared
+
+private let log = Logger.browserLogger
 
 class BackgroundMediaPlayback: TabContentScript {
     fileprivate weak var tab: Tab?
@@ -25,9 +25,10 @@ class BackgroundMediaPlayback: TabContentScript {
     
     func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage) {
         if let response = message.body as? String {
-            print(response)
+            debugPrint(response)
+            log.info(response)
         } else {
-            print(message.body)
+            log.info(message.description)
         }
     }
 }

@@ -439,7 +439,6 @@
 		59B6913321B695A400E9388E /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 59B6913121B695A400E9388E /* Localizable.strings */; };
 		59B6913621B695A400E9388E /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 59B6913421B695A400E9388E /* Localizable.strings */; };
 		59B6913921B695A400E9388E /* BraveShared.strings in Resources */ = {isa = PBXBuildFile; fileRef = 59B6913721B695A400E9388E /* BraveShared.strings */; };
-		59C730FD225EC48200995E16 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 59C730F5225EC48200995E16 /* AVFoundation.framework */; };
 		59C73101225F876F00995E16 /* BackgroundMediaPlayback.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59C73100225F876F00995E16 /* BackgroundMediaPlayback.swift */; };
 		59C7310A225F8BC700995E16 /* BackgroundPlay.js in Resources */ = {isa = PBXBuildFile; fileRef = 59C73109225F8BC700995E16 /* BackgroundPlay.js */; };
 		5D1DC51C20AC9AFB00905E5A /* Data.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1DC51320AC9AF900905E5A /* Data.framework */; };
@@ -2209,7 +2208,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				59C730FD225EC48200995E16 /* AVFoundation.framework in Frameworks */,
 				A1AD4BD120BF3F4D007A6EA1 /* Eureka.framework in Frameworks */,
 				E6231C051B90A472005ABB0D /* libxml2.2.tbd in Frameworks */,
 				E6231C011B90A44F005ABB0D /* libz.tbd in Frameworks */,

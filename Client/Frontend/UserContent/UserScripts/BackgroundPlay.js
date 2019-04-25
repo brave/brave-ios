@@ -60,7 +60,6 @@ if (allowBackgroundPlayback) {
     }
 
     let searchVideos = function() {
-        videoElements = [];
         document.querySelectorAll('video').forEach(function(item, index, array) {
             item.addEventListener('playing', function() {
                 if (!videoElements.includes(this)) {

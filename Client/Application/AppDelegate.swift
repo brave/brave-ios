@@ -56,7 +56,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
             try AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playback, mode: AVAudioSession.Mode.moviePlayback, options: [])
             try AVAudioSession.sharedInstance().setActive(true)
         } catch {
-           print(error)
+           log.error(error)
         }
         
         // Hold references to willFinishLaunching parameters for delayed app launch

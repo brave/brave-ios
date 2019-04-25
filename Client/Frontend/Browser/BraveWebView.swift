@@ -20,4 +20,19 @@ class BraveWebView: WKWebView {
         fatalError()
     }
     
+    deinit {
+        pauseAllMedia()
+    }
+    
+    func pauseAllMedia() {
+        if Thread.isMainThread {
+            self.evaluateJavaScript("pauseAll()", completionHandler: nil)
+        }
+    }
+    
+    public func appDidEnterBackground() {
+        if Thread.isMainThread {
+            self.evaluateJavaScript("didEnterBackground()", completionHandler: nil)
+        }
+    }
 }

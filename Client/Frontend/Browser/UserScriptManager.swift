@@ -89,7 +89,7 @@ class UserScriptManager {
             log.error("Failed to load cookie control user script")
             return nil
         }
-        var alteredSource: String = source
+        var alteredSource = source
         alteredSource = alteredSource.replacingOccurrences(of: "$<allowBackgroundPlayback>", with: self.isBackgroundMediaEnabled.description, options: .literal)
         return WKUserScript(source: alteredSource, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
     }

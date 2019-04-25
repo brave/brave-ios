@@ -186,6 +186,9 @@ class Tab: NSObject {
         if webView == nil {
             assert(configuration != nil, "Create webview can only be called once")
             configuration!.userContentController = WKUserContentController()
+            if Preferences.General.allowBackgroundMediaPlayback.value {
+                configuration!.setValue(true, forKey: "alwaysRunsAtForegroundPriority")
+            }
             configuration!.preferences = WKPreferences()
             configuration!.preferences.javaScriptCanOpenWindowsAutomatically = false
             configuration!.allowsInlineMediaPlayback = true
@@ -265,7 +268,6 @@ class Tab: NSObject {
     
     func deleteWebView() {
         if let webView = webView {
-            pauseAllMedia()
             webView.removeObserver(self, forKeyPath: KVOConstants.URL.rawValue)
             tabDelegate?.tab?(self, willDeleteWebView: webView)
         }
@@ -349,14 +351,6 @@ class Tab: NSObject {
 
     func goToBackForwardListItem(_ item: WKBackForwardListItem) {
         _ = webView?.go(to: item)
-    }
-    
-    func pauseAllMedia() {
-        webView?.evaluateJavaScript("pauseAll()", completionHandler: nil)
-    }
-    
-    public func appDidEnterBackground() {
-        webView?.evaluateJavaScript("didEnterBackground()", completionHandler: nil)
     }
 
     @discardableResult func loadRequest(_ request: URLRequest) -> WKNavigation? {

@@ -272,7 +272,7 @@ class BrowserViewController: UIViewController {
     }
 
     @objc func appDidEnterBackgroundNotification() {
-        tabManager.tabsForCurrentMode.forEach({$0.appDidEnterBackground()})
+        tabManager.tabsForCurrentMode.forEach({$0.webView?.appDidEnterBackground()})
         displayedPopoverController?.dismiss(animated: false) {
             self.displayedPopoverController = nil
         }
