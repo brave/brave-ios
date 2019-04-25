@@ -265,6 +265,7 @@ class Tab: NSObject {
     
     func deleteWebView() {
         if let webView = webView {
+            pauseAllMedia()
             webView.removeObserver(self, forKeyPath: KVOConstants.URL.rawValue)
             tabDelegate?.tab?(self, willDeleteWebView: webView)
         }
@@ -272,7 +273,6 @@ class Tab: NSObject {
     }
 
     deinit {
-        pauseAllMedia()
         deleteWebView()
         contentScriptManager.helpers.removeAll()
     }

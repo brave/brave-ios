@@ -82,8 +82,6 @@ if (allowBackgroundPlayback) {
         });
     }
     searchVideos();
-
-
 }
 
 function pauseAll() {
