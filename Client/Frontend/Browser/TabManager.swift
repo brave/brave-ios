@@ -766,9 +766,14 @@ class TabManager: NSObject {
         imageStore?.clearExcluding(savedUUIDs)
     }
 
-    fileprivate lazy var restoreTabsInternal: () -> Tab? = {
+    fileprivate static var restoreOnceToken = false
+    fileprivate func restoreTabsInternal() -> Tab? {
+        assert(Thread.isMainThread)
+        guard !TabManager.restoreOnceToken else { return nil }
+        
+        TabManager.restoreOnceToken = true
         let savedTabs = TabMO.getAll()
-        if savedTabs.isEmpty { return { nil } }
+        if savedTabs.isEmpty { return nil }
 
         var tabToSelect: Tab?
         for savedTab in savedTabs {
@@ -818,10 +823,10 @@ class TabManager: NSObject {
             // No tab selection, since this is unfamiliar with launch timings (e.g. compiling blocklists)
             
             // Must return inside this `if` to potentially return the conditional fallback
-            return { tabToSelect }
+            return tabToSelect
         }
-        return { nil }
-    }()
+        return nil
+    }
     
     func restoreTab(_ tab: Tab) {
         // Tab was created with no active webview or session data. Restore tab data from CD and configure.
@@ -836,15 +841,15 @@ class TabManager: NSObject {
         }
     }
 
-    lazy var restoreAllTabs: () -> Tab = {
+    func restoreAllTabs() -> Tab {
         isRestoring = true
         let tabToSelect = self.restoreTabsInternal()
         isRestoring = false
         
         // Always make sure there is at least one tab.
         let isPrivate = Preferences.Privacy.privateBrowsingOnly.value
-        return { tabToSelect ?? self.addTab(isPrivate: isPrivate) }
-    }()
+        return tabToSelect ?? self.addTab(isPrivate: isPrivate)
+    }
 
     func restoreDeletedTabs(_ savedTabs: [Tab]) {
         isRestoring = true
