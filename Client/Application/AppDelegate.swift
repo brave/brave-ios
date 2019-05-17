@@ -52,6 +52,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         // Then we always set the user default to false. It will be set to true when we the application
         // is backgrounded.
         //
+        
+        Logger.disableLogging()
 
         // Hold references to willFinishLaunching parameters for delayed app launch
         self.application = application

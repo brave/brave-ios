@@ -469,6 +469,7 @@
 		5D6DDEFE2141B6A1001FF0AE /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6DDEF62141B6A0001FF0AE /* Preferences.swift */; };
 		5D6DDF0021428CF0001FF0AE /* DAUTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6DDEFF21428CF0001FF0AE /* DAUTests.swift */; };
 		5D7001C222249F7B00E576FB /* ShortNameToFileMapping.json in Resources */ = {isa = PBXBuildFile; fileRef = 5D7001BA22249F7A00E576FB /* ShortNameToFileMapping.json */; };
+		5DAB01CE2289ABF700B5B5E4 /* ReaderabilityTest.js in Resources */ = {isa = PBXBuildFile; fileRef = 5DAB01CD2289ABF700B5B5E4 /* ReaderabilityTest.js */; };
 		5DE5250D218CE92C000DFAA6 /* block-ads.json in Resources */ = {isa = PBXBuildFile; fileRef = 5DE52508218CE92B000DFAA6 /* block-ads.json */; };
 		5DE5250E218CE92C000DFAA6 /* block-images.json in Resources */ = {isa = PBXBuildFile; fileRef = 5DE52509218CE92B000DFAA6 /* block-images.json */; };
 		5DE5250F218CE92C000DFAA6 /* upgrade-http.json in Resources */ = {isa = PBXBuildFile; fileRef = 5DE5250A218CE92B000DFAA6 /* upgrade-http.json */; };
@@ -1793,6 +1794,7 @@
 		5D6DDEF62141B6A0001FF0AE /* Preferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
 		5D6DDEFF21428CF0001FF0AE /* DAUTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DAUTests.swift; sourceTree = "<group>"; };
 		5D7001BA22249F7A00E576FB /* ShortNameToFileMapping.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = ShortNameToFileMapping.json; sourceTree = "<group>"; };
+		5DAB01CD2289ABF700B5B5E4 /* ReaderabilityTest.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = ReaderabilityTest.js; sourceTree = "<group>"; };
 		5DE52508218CE92B000DFAA6 /* block-ads.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "block-ads.json"; sourceTree = "<group>"; };
 		5DE52509218CE92B000DFAA6 /* block-images.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "block-images.json"; sourceTree = "<group>"; };
 		5DE5250A218CE92B000DFAA6 /* upgrade-http.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "upgrade-http.json"; sourceTree = "<group>"; };
@@ -2636,6 +2638,7 @@
 		28CE83EF1A1D246900576538 /* Third-Party Source */ = {
 			isa = PBXGroup;
 			children = (
+				5DAB01C5228620F400B5B5E4 /* Readerability */,
 				A1FEEE1F20BF28D900298DA2 /* Then.swift */,
 				E66C5B451BDA81050051AA93 /* Apple */,
 				E659A6091EB7C1D300D7A6AD /* BuddyBuild */,
@@ -3282,6 +3285,15 @@
 				276582662171266900754B2F /* UrpService.swift */,
 			);
 			path = Analytics;
+			sourceTree = "<group>";
+		};
+		5DAB01C5228620F400B5B5E4 /* Readerability */ = {
+			isa = PBXGroup;
+			children = (
+				5DAB01CD2289ABF700B5B5E4 /* ReaderabilityTest.js */,
+			);
+			name = Readerability;
+			path = ThirdParty/Readerability;
 			sourceTree = "<group>";
 		};
 		5DE7688520B3456D00FF5533 /* BraveShared */ = {
@@ -5024,6 +5036,7 @@
 				E4B7B77E1A793CF20022C5E0 /* FiraSans-SemiBold.ttf in Resources */,
 				F84B220B1A0910F600AAB793 /* Images.xcassets in Resources */,
 				595E0EDB21CAD97C00813D49 /* CookieControl.js in Resources */,
+				5DAB01CE2289ABF700B5B5E4 /* ReaderabilityTest.js in Resources */,
 				0A0D3D3C21A4BE6400BEE65B /* adblock-list.txt in Resources */,
 				27658272217130D900754B2F /* GlobalSign_r3.cer in Resources */,
 				5DE5250F218CE92C000DFAA6 /* upgrade-http.json in Resources */,

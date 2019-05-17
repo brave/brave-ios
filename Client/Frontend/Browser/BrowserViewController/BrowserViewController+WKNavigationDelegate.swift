@@ -7,6 +7,7 @@ import WebKit
 import Shared
 import Data
 import BraveShared
+import JavaScriptCore
 
 private let log = Logger.browserLogger
 
@@ -71,6 +72,64 @@ extension BrowserViewController: WKNavigationDelegate {
         }
         return false
     }
+    
+    func checkSpeedReaderable(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        
+        let start = Date()
+        let session = URLSession(configuration: .default)
+        let url = URL(string: "https://www.brutalist-web.design")!
+        session.dataTask(with: url) { (data, response, error) in
+            if let error = error {
+                print(error.localizedDescription)
+            } else if let data = data,
+                let response = response as? HTTPURLResponse,
+                response.statusCode == 200 {
+                
+                /*
+                 
+                 One of the main next steps to get SR operating smoothly will be getting the the DOM string into
+                 a JS document object in order for the JS lib to process correctly.
+                 
+                 This can be handled using one of the below methods (non-exclusive)
+                 -  Creating a WKWebView instances and injecting the Readerability lib into the webview with an
+                        async message handler to retrieve information about the document.
+                    This is basically how Readermode works
+                 
+                 -  Utilize node packages to generate a 'document'.
+                    The main complexity here is regarding JSCore linking/importing.
+                    Unlike node, JSCore needs full source code in order to import deps. This isn't too problematic
+                        for small amounts of needed functions, but requires all "npm"/JS deps to be packaged into
+                         super clean and easily injectable strings. Similar to something like.
+                 
+                 */
+                
+                // How to retrieve DOM as a string
+                let websiteDOM = String(data: data, encoding: .utf8)
+                
+                // Loading in Readability test file
+                let commonJSPath = Bundle.main.path(forResource: "ReaderabilityTest", ofType: "js")!
+                let common = try? String(contentsOfFile: commonJSPath, encoding: String.Encoding.utf8)
+                
+                // Building out the JS environment
+                let context = JSContext()!
+                context.evaluateScript(common)
+                
+                // Calling a function (demonstrating how to call into it
+                let result = context.evaluateScript("triple(3)") as Any
+                print(result)
+                
+                // Used for logging out delay information
+                let url = navigationAction.request.url?.absoluteString ?? ""
+                print("-- Delay on: \(url) :: \(abs(start.timeIntervalSinceNow))")
+                
+                // Make determination about pre-existing request.
+                // if speedReaderable ? .deny : .allow
+                decisionHandler(.allow)
+
+            }
+        }.resume()
+        
+    }
 
     // This is the place where we decide what to do with a new navigation action. There are a number of special schemes
     // and http(s) urls that need to be handled in a different way. All the logic for that is inside this delegate
@@ -81,6 +140,12 @@ extension BrowserViewController: WKNavigationDelegate {
             decisionHandler(.cancel)
             return
         }
+        
+        // Make speed reader check
+        checkSpeedReaderable(webView, decidePolicyFor: navigationAction, decisionHandler: decisionHandler)
+        
+        // For easier testing, just block below execution
+        return
         
         if let customHeader = UserReferralProgram.shouldAddCustomHeader(for: navigationAction.request) {
             decisionHandler(.cancel)
@@ -336,6 +401,9 @@ extension BrowserViewController: WKNavigationDelegate {
                 urlBar.updateProgressBar(1.0)
             }
             tabsBar.reloadDataAndRestoreSelectedTab()
+            
+            let url = webView.url?.absoluteString ?? ""
+            print("-- Total Time: \(url) :: \(abs(self.something[url]?.timeIntervalSinceNow ?? -1))")
         }
     }
 }

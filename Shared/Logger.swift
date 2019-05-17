@@ -28,6 +28,12 @@ public extension Logger {
         logger.newLogWithDate(Date())
         return logger
     }()
+    
+    static func disableLogging() {
+        [syncLogger, browserLogger, braveSyncLogger, keychainLogger, corruptLogger].forEach {
+            $0.outputLevel = .none
+        }
+    }
 
     /**
     Return the log file directory path. If the directory doesn't exist, make sure it exist first before returning the path.
