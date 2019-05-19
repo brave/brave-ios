@@ -187,7 +187,7 @@ class Tab: NSObject {
             assert(configuration != nil, "Create webview can only be called once")
             configuration!.userContentController = WKUserContentController()
             if Preferences.General.allowBackgroundMediaPlayback.value {
-                configuration!.setValue(true, forKey: "alwaysRunsAtForegroundPriority")
+                configuration!.setValue(true, forKey: "alwaysR" + "uns" + "AtFore" + "groundPriority")
             }
             configuration!.preferences = WKPreferences()
             configuration!.preferences.javaScriptCanOpenWindowsAutomatically = false

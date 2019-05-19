@@ -2,7 +2,6 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 var allowBackgroundPlayback = $<allowBackgroundPlayback>;
-
 if (allowBackgroundPlayback) {
     var _maskedState = Object.getOwnPropertyDescriptor(Document.prototype, 'visibilityState') ||
         Object.getOwnPropertyDescriptor(HTMLDocument.prototype, 'visibilityState');
@@ -24,9 +23,8 @@ if (allowBackgroundPlayback) {
         }
     });
 
-    var videoElements = [];
-
     function isTabPlaying() {
+        var videoElements = [].slice.call(_videoInDOM());
         if (videoElements.some(function(vid) {
                 return vid.playing
             })) {
@@ -60,31 +58,24 @@ if (allowBackgroundPlayback) {
     }
 
     let searchVideos = function() {
-        document.querySelectorAll('video').forEach(function(item, index, array) {
-            item.addEventListener('playing', function() {
-                if (!videoElements.includes(this)) {
-                    videoElements.push(this);
-                }
-            }, false);
-
-            item.addEventListener('pause', function() {
-                if (autoRestart && allowBackgroundPlayback) {
-                    autoRestart = false;
-                    this.play();
-                    return;
-                }
-                var index = videoElements.indexOf(this);
-                if (index != -1) {
-                    videoElements.splice(index, 1);
-                }
-            }, false);
+        _videoInDOM().forEach(function(item, index, array) {
+            item.removeEventListener('pause', _videoPaused);
+            item.addEventListener('pause', _videoPaused, false);
         });
+
+    }
+
+    function _videoPaused() {
+        if (autoRestart && allowBackgroundPlayback) {
+            autoRestart = false;
+            this.play();
+        }
     }
     searchVideos();
 }
 
 function pauseAll() {
-    document.querySelectorAll('video').forEach(function(item, index, array) {
+    _videoInDOM().forEach(function(item, index, array) {
         item.pause();
     });
 }
@@ -99,18 +90,6 @@ function didEnterBackground() {
     }
 }
 
-
-
-
-//WIP Mute functions
-//function muteAll() {
-//    videoElements.forEach(function(item, index, array) {
-//        item.muted = true;
-//    });
-//}
-//
-//function unMuteAll() {
-//    videoElements.forEach(function(item, index, array) {
-//                          item.muted = true;
-//                          });
-//}
+function _videoInDOM() {
+    return document.querySelectorAll('video')
+}
