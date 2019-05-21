@@ -8,8 +8,6 @@ import UIKit
 final class PrivacyProtection: PrivacyProtectionProtocol {
 
     var nonPersistent: Bool {
-        let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
-        return isPrivateBrowsing
+        return true
     }
-
 }
