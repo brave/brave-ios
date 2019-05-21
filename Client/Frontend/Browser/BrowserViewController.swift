@@ -2219,6 +2219,11 @@ extension BrowserViewController: WKUIDelegate {
                 suppressSheet.addAction(UIAlertAction(title: Strings.CancelButtonTitle, style: .cancel, handler: { _ in
                     completionHandler()
                 }))
+                if UIDevice.current.userInterfaceIdiom == .pad, let popoverController = suppressSheet.popoverPresentationController {
+                    popoverController.sourceView = self.view
+                    popoverController.sourceRect = CGRect(x: self.view.bounds.midX, y: self.view.bounds.midY, width: 0, height: 0)
+                    popoverController.permittedArrowDirections = []
+                }
                 self.present(suppressSheet, animated: true)
             } else {
                 completionHandler()
