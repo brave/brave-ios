@@ -196,12 +196,7 @@ extension BrowserViewController: WKNavigationDelegate {
                     tab.userScriptManager?.isFingerprintingProtectionEnabled = domainForShields.isShieldExpected(.FpProtection, isPrivateBrowsing: isPrivateBrowsing)
                 }
 
-                webView.configuration.preferences.javaScriptEnabled = !domainForShields.(.NoScript, isPrivateBrowsing: isPrivateBrowsing)
-            }
-            // Reset the block alert bool on new host. 
-            if url.host != webView.url?.host {
-                self.tabManager.selectedTab?.alertShownCount = 0
-                self.tabManager.selectedTab?.blockAllAlerts = false
+                webView.configuration.preferences.javaScriptEnabled = !domainForShields.isShieldExpected(.NoScript, isPrivateBrowsing: isPrivateBrowsing)
             }
             
             //Cookie Blocking code below

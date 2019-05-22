@@ -2199,18 +2199,26 @@ extension BrowserViewController: WKUIDelegate {
         }
     }
     
+    func suppressJSAlerts(webView: WKWebView) {
+        let script = """
+                    window.alert=window.confirm=window.prompt=function(n){},
+                    [].slice.apply(document.querySelectorAll('iframe')).forEach(function(n){if(n.contentWindow != window){n.contentWindow.alert=n.contentWindow.confirm=n.contentWindow.prompt=function(n){}}})
+                    """
+        webView.evaluateJavaScript(script, completionHandler: nil)
+    }
+    
     func handleAlert<T: JSAlertInfo>(webView: WKWebView, alert: inout T, completionHandler: @escaping () -> Void) {
         guard let promptingTab = tabManager[webView], !promptingTab.blockAllAlerts else {
+            suppressJSAlerts(webView: webView)
             tabManager[webView]?.cancelQueuedAlerts()
-            webView.evaluateJavaScript("window.alert = window.confirm = window.prompt = function(e) {}") { _, _ in
-                completionHandler()
-            }
+            completionHandler()
             return
         }
         promptingTab.alertShownCount += 1
         var suppressBlock: JSAlertInfo.SuppressHandler = {[unowned self] suppress in
             if suppress {
                 func suppressDialogues(_: UIAlertAction) {
+                    self.suppressJSAlerts(webView: webView)
                     promptingTab.blockAllAlerts = true
                     self.tabManager[webView]?.cancelQueuedAlerts()
                     completionHandler()
