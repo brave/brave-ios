@@ -2316,6 +2316,41 @@ extension BrowserViewController: WKUIDelegate {
             self.tabManager.removeTab(tab)
         }
     }
+    
+    func webView(_ webView: WKWebView, shouldPreviewElement elementInfo: WKPreviewElementInfo) -> Bool {
+        guard let url = elementInfo.linkURL, !Storage.isIgnoredURL(url) else { return false }
+        return true
+    }
+    
+    func webView(_ webView: WKWebView, commitPreviewingViewController previewingViewController: UIViewController) {
+        guard let previewViewController = previewingViewController as? PreviewViewController,
+            let tab = tabManager.selectedTab,
+            let webView = tab.webView else { return }
+        webView.load(URLRequest(url: previewViewController.url))
+    }
+    
+    func webView(_ webView: WKWebView, previewingViewControllerForElement elementInfo: WKPreviewElementInfo, defaultActions previewActions: [WKPreviewActionItem]) -> UIViewController? {
+        guard let tab = tabManager.selectedTab, let url = elementInfo.linkURL else { return nil }
+        let previewViewController = PreviewViewController(tab: tab, url: url)
+        
+        previewViewController.openURLInNewTab = { url in
+            guard let currentTab = self.tabManager.selectedTab else { return }
+            let tab = self.tabManager.addTab(PrivilegedRequest(url: url) as URLRequest,
+                                             afterTab: self.tabManager.selectedTab,
+                                             isPrivate: currentTab.type.isPrivate)
+            self.tabManager.selectTab(tab)
+        }
+        
+        previewViewController.copyURL = { url in
+            UIPasteboard.general.url = url
+        }
+        
+        previewViewController.shareURL = { url in
+            self.presentActivityViewController(url, sourceView: self.view, sourceRect: self.view.bounds, arrowDirection: .any)
+        }
+        
+        return previewViewController
+    }
 }
 
 extension BrowserViewController: ReaderModeDelegate {
