@@ -29,7 +29,7 @@ class PreviewViewController: UIViewController {
             self.shareURL?(self.url)
         }
         
-        return [ openInNewTabAction, copyAction, shareAction ]
+        return [openInNewTabAction, copyAction, shareAction]
     }
 
     init(tab: Tab, url: URL) {
