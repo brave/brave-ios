@@ -17,15 +17,15 @@ class PreviewViewController: UIViewController {
     private(set) var url: URL
     
     override var previewActionItems: [UIPreviewActionItem] {
-        let openInNewTabAction = UIPreviewAction(title: Strings.OpenNewTabButtonTitle, style: .default) { previewAction, viewController in
+        let openInNewTabAction = UIPreviewAction(title: Strings.OpenNewTabButtonTitle, style: .default) { _, _ in
             self.openURLInNewTab?(self.url)
         }
         
-        let copyAction = UIPreviewAction(title: Strings.CopyLinkActionTitle, style: .default) { previewAction, viewController in
+        let copyAction = UIPreviewAction(title: Strings.CopyLinkActionTitle, style: .default) { _, _ in
             self.copyURL?(self.url)
         }
         
-        let shareAction = UIPreviewAction(title: Strings.ShareLinkActionTitle, style: .default) { previewAction, viewController in
+        let shareAction = UIPreviewAction(title: Strings.ShareLinkActionTitle, style: .default) { _, _ in
             self.shareURL?(self.url)
         }
         
