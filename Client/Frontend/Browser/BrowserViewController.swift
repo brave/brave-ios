@@ -2318,15 +2318,13 @@ extension BrowserViewController: WKUIDelegate {
     }
     
     func webView(_ webView: WKWebView, shouldPreviewElement elementInfo: WKPreviewElementInfo) -> Bool {
-        guard let url = elementInfo.linkURL, !Storage.isIgnoredURL(url) else { return false }
-        return true
+        guard let url = elementInfo.linkURL else { return false }
+        return !Storage.isIgnoredURL(url)
     }
     
     func webView(_ webView: WKWebView, commitPreviewingViewController previewingViewController: UIViewController) {
-        guard let previewViewController = previewingViewController as? PreviewViewController,
-            let tab = tabManager.selectedTab,
-            let webView = tab.webView else { return }
-        webView.load(URLRequest(url: previewViewController.url))
+        guard let previewViewController = previewingViewController as? PreviewViewController else { return }
+        tabManager.selectedTab?.webView?.load(URLRequest(url: previewViewController.url))
     }
     
     func webView(_ webView: WKWebView, previewingViewControllerForElement elementInfo: WKPreviewElementInfo, defaultActions previewActions: [WKPreviewActionItem]) -> UIViewController? {
