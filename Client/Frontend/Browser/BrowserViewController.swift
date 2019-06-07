@@ -2319,7 +2319,7 @@ extension BrowserViewController: WKUIDelegate {
     
     func webView(_ webView: WKWebView, shouldPreviewElement elementInfo: WKPreviewElementInfo) -> Bool {
         guard let url = elementInfo.linkURL else { return false }
-        return !Storage.isIgnoredURL(url)
+        return url.eligibleForPeekAndPop
     }
     
     func webView(_ webView: WKWebView, commitPreviewingViewController previewingViewController: UIViewController) {

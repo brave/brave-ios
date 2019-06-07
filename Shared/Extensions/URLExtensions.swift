@@ -420,6 +420,25 @@ extension URL {
 
 }
 
+// Helpers to deal with Peek and Pop
+extension URL {
+    public var eligibleForPeekAndPop: Bool {
+        let ignoredSchemes = ["about"]
+        
+        guard let scheme = self.scheme else { return false }
+        
+        if let _ = ignoredSchemes.index(of: scheme) {
+            return false
+        }
+        
+        if self.host == "localhost" {
+            return false
+        }
+        
+        return true
+    }
+}
+
 //MARK: Private Helpers
 private extension URL {
     func publicSuffixFromHost( _ host: String, withAdditionalParts additionalPartCount: Int) -> String? {
