@@ -2340,10 +2340,18 @@ extension BrowserViewController: WKUIDelegate {
         }
 
         previewViewController.openURLInNewTab = { url in
-            guard let currentTab = self.tabManager.selectedTab else { return }
+            guard let _ = self.tabManager.selectedTab else { return }
             let tab = self.tabManager.addTab(PrivilegedRequest(url: url) as URLRequest,
                                              afterTab: self.tabManager.selectedTab,
-                                             isPrivate: currentTab.type.isPrivate)
+                                             isPrivate: false)
+            self.tabManager.selectTab(tab)
+        }
+        
+        previewViewController.openURLInNewPrivateTab = { url in
+            guard let _ = self.tabManager.selectedTab else { return }
+            let tab = self.tabManager.addTab(PrivilegedRequest(url: url) as URLRequest,
+                                             afterTab: self.tabManager.selectedTab,
+                                             isPrivate: true)
             self.tabManager.selectTab(tab)
         }
         

@@ -10,6 +10,7 @@ import WebKit
 class PreviewViewController: UIViewController {
     
     var openURLInNewTab: ((URL) -> Void)?
+    var openURLInNewPrivateTab: ((URL) -> Void)?
     var copyURL: ((URL) -> Void)?
     var shareURL: ((URL) -> Void)?
     
@@ -21,6 +22,10 @@ class PreviewViewController: UIViewController {
             self.openURLInNewTab?(self.url)
         }
         
+        let openInNewPrivateTabAction = UIPreviewAction(title: Strings.OpenNewPrivateTabButtonTitle, style: .default) { _, _ in
+            self.openURLInNewPrivateTab?(self.url)
+        }
+        
         let copyAction = UIPreviewAction(title: Strings.CopyLinkActionTitle, style: .default) { _, _ in
             self.copyURL?(self.url)
         }
@@ -29,7 +34,11 @@ class PreviewViewController: UIViewController {
             self.shareURL?(self.url)
         }
         
-        return [openInNewTabAction, copyAction, shareAction]
+        if tab.type.isPrivate {
+            return [openInNewPrivateTabAction, copyAction, shareAction]
+        }
+        
+        return [openInNewTabAction, openInNewPrivateTabAction, copyAction, shareAction]
     }
 
     init(tab: Tab, url: URL) {
