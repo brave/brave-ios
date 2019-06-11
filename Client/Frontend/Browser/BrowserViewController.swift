@@ -2333,6 +2333,12 @@ extension BrowserViewController: WKUIDelegate {
         guard let tab = tabManager.selectedTab, let url = elementInfo.linkURL else { return nil }
         let previewViewController = PreviewViewController(tab: tab, url: url)
         
+        // If the URL is an image resource,
+        // we want to show the image without an empty white space in a preview page.
+        if url.isImageResource, let imageSize = url.imageSize {
+            previewViewController.preferredContentSize = imageSize
+        }
+
         previewViewController.openURLInNewTab = { url in
             guard let currentTab = self.tabManager.selectedTab else { return }
             let tab = self.tabManager.addTab(PrivilegedRequest(url: url) as URLRequest,

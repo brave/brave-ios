@@ -437,6 +437,35 @@ extension URL {
         
         return true
     }
+    
+    public var isImageResource: Bool {
+        return ["jpg", "jpeg", "png", "gif"].contains(pathExtension)
+    }
+    
+    public var imageSize: CGSize? {
+        let imageSourceOptions = [kCGImageSourceShouldCache: false] as CFDictionary
+        guard let imageSource = CGImageSourceCreateWithURL(self as CFURL, imageSourceOptions),
+            let imageProperties = CGImageSourceCopyPropertiesAtIndex(imageSource, 0, imageSourceOptions) as? [AnyHashable: Any],
+            let pixelWidth = imageProperties[kCGImagePropertyPixelWidth as String],
+            let pixelHeight = imageProperties[kCGImagePropertyPixelHeight as String] else {
+                return nil
+        }
+        
+        var width: CGFloat = 0
+        var height: CGFloat = 0
+        
+        // swiftlint:disable force_cast
+        CFNumberGetValue((pixelWidth as! CFNumber), .cgFloatType, &width)
+        
+        // swiftlint:disable force_cast
+        CFNumberGetValue((pixelHeight as! CFNumber), .cgFloatType, &height)
+        
+        guard width > 0, height > 0 else {
+            return nil
+        }
+        
+        return CGSize(width: width, height: height)
+    }
 }
 
 //MARK: Private Helpers
