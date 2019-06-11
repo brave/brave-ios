@@ -16,6 +16,7 @@ protocol TabLocationViewDelegate {
     func tabLocationViewDidTapReaderMode(_ tabLocationView: TabLocationView)
     func tabLocationViewDidBeginDragInteraction(_ tabLocationView: TabLocationView)
     func tabLocationViewDidTapShieldsButton(_ urlBar: TabLocationView)
+    func tabLocationViewDidTapRewardsButton(_ urlBar: TabLocationView)
     
     /// - returns: whether the long-press was handled by the delegate; i.e. return `false` when the conditions for even starting handling long-press were not satisfied
     @discardableResult func tabLocationViewDidLongPressReaderMode(_ tabLocationView: TabLocationView) -> Bool
@@ -155,6 +156,16 @@ class TabLocationView: UIView {
         return button
     }()
     
+    lazy var rewardsButton: ToolbarButton = {
+        let button = ToolbarButton()
+        button.setImage(#imageLiteral(resourceName: "brave_rewards_button"), for: .normal)
+        button.addTarget(self, action: #selector(didClickBraveRewardsButton), for: .touchUpInside)
+        button.imageView?.contentMode = .center
+        button.accessibilityLabel = Strings.Brave_Panel
+        button.accessibilityIdentifier = "urlBar-shieldsButton"
+        return button
+    }()
+    
     lazy var separatorLine: UIView = {
         let line = UIView()
         line.layer.cornerRadius = 2
@@ -176,18 +187,22 @@ class TabLocationView: UIView {
         addGestureRecognizer(longPressRecognizer)
         addGestureRecognizer(tapRecognizer)
         
-        [readerModeButton, separatorLine, shieldsButton].forEach {
+        [readerModeButton, separatorLine, shieldsButton, rewardsButton].forEach {
             $0.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
             $0.setContentHuggingPriority(.defaultHigh, for: .horizontal)
         }
         
-        // Make tappable area bigger than the icon.
-        // This also adds right inset, which when tapped, will open the shields panel.
-        shieldsButton.contentEdgeInsets = UIEdgeInsets(top: 2, left: 4, bottom: 2, right: 13)
+        // Increasing tappable area of buttons, so user won't by mistake tap on address bar.
+        // Creating a stack view for buttons with 0 spacing.
+        // Extra space is added by `contentEdgeInsets`
+        let buttonsStackview = UIStackView(arrangedSubviews: [shieldsButton, rewardsButton])
+        
+        shieldsButton.contentEdgeInsets = UIEdgeInsets(top: 4, left: 8, bottom: 4, right: 7.5)
+        rewardsButton.contentEdgeInsets = UIEdgeInsets(top: 4, left: 7.5, bottom: 4, right: 13)
         
         urlTextField.setContentHuggingPriority(.defaultLow, for: .horizontal)
 
-        let subviews = [lockImageView, urlTextField, readerModeButton, separatorLine, shieldsButton]
+        let subviews = [lockImageView, urlTextField, readerModeButton, separatorLine, buttonsStackview]
         contentView = UIStackView(arrangedSubviews: subviews)
         contentView.distribution = .fill
         contentView.alignment = .center
@@ -196,6 +211,9 @@ class TabLocationView: UIView {
         contentView.insetsLayoutMarginsFromSafeArea = false
         contentView.spacing = 10
         addSubview(contentView)
+        
+        // Reduce spacing after separator to make space for shields button tappable area.
+        contentView.setCustomSpacing(2, after: separatorLine)
 
         contentView.snp.makeConstraints { make in
             make.edges.equalTo(self)
@@ -261,6 +279,10 @@ class TabLocationView: UIView {
     
     @objc func didClickBraveShieldsButton() {
         delegate?.tabLocationViewDidTapShieldsButton(self)
+    }
+    
+    @objc func didClickBraveRewardsButton() {
+        delegate?.tabLocationViewDidTapRewardsButton(self)
     }
 
     fileprivate func updateTextWithURL() {

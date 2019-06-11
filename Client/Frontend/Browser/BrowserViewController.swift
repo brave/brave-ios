@@ -1612,6 +1612,10 @@ extension BrowserViewController: TopToolbarDelegate {
         popover.present(from: topToolbar.locationView.shieldsButton, on: self)
     }
     
+    func topToolbarDidTapBraveRewardsButton(_ topToolbar: TopToolbarView) {
+        // TODO: Add rewards
+    }
+    
     func topToolbarDidTapMenuButton(_ topToolbar: TopToolbarView) {
         let homePanel = MenuViewController(bvc: self, tab: tabManager.selectedTab)
         let popover = PopoverController(contentController: homePanel, contentSizeBehavior: .preferredContentSize)
