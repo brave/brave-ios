@@ -247,6 +247,12 @@ extension BrowserViewController: WKNavigationDelegate {
                 }
             }
         }
+        
+        // U2F code below
+        if let tab = tabManager[webView] {
+            // U2F should only be available in secure contexts
+            tab.userScriptManager?.isU2FEnabled = webView.hasOnlySecureContent
+        }
 
         // We can only show this content in the web view if this URL is not pending
         // download via the context menu.
