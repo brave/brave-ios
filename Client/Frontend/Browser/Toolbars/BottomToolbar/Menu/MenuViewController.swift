@@ -198,6 +198,5 @@ class MenuViewController: UITableViewController {
 // MARK: - PopoverContentComponent
 
 extension MenuViewController: PopoverContentComponent {
-    var isPanToDismissEnabled: Bool { return false }
     var extendEdgeIntoArrow: Bool { return false }
 }
