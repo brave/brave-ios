@@ -522,47 +522,6 @@ extension PopoverController: UIGestureRecognizerDelegate {
     func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         return contentController.isPanToDismissEnabled
     }
-    
-    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-        guard let pan = gestureRecognizer as? UIPanGestureRecognizer else {
-            return false
-        }
-        
-        // Don't allow for pan gesture while table view is in editing mode.
-        // This bug only occurs for bookmarks at nested levels, see issue #687.
-        if let tableView = otherGestureRecognizer.view as? UITableView, tableView.isEditing {
-            gestureRecognizer.cancel()
-            return false
-        }
-        
-        if let scrollView = otherGestureRecognizer.view as? UIScrollView {
-            return false
-            
-            let topInset = scrollView.adjustedContentInset.top
-            let leftInset = scrollView.adjustedContentInset.left
-            
-            let velocity = pan.velocity(in: pan.view)
-            if abs(velocity.y) > abs(velocity.x) {
-                if scrollView.contentOffset.y >= scrollView.contentSize.height - scrollView.frame.size.height && velocity.y < 0 ||
-                    scrollView.contentOffset.y <= -topInset && velocity.y > 0 {
-                    otherGestureRecognizer.cancel()
-                    return true
-                }
-            } else {
-                if let tableView = scrollView as? UITableView, let ds = tableView.dataSource, velocity.x < 0, ds.responds(to: #selector(UITableViewDataSource.tableView(_:commit:forRowAt:))) {
-                    // Fix table view cell actions
-                    pan.cancel()
-                    return false
-                }
-                if scrollView.contentOffset.x >= scrollView.contentSize.width - scrollView.frame.size.width && velocity.x < 0 ||
-                    scrollView.contentOffset.x <= -leftInset && velocity.x > 0 {
-                    otherGestureRecognizer.cancel()
-                    return true
-                }
-            }
-        }
-        return false
-    }
 }
 
 extension PopoverController: UINavigationControllerDelegate {
