@@ -2324,7 +2324,7 @@ extension BrowserViewController: WKUIDelegate {
     
     func webView(_ webView: WKWebView, commitPreviewingViewController previewingViewController: UIViewController) {
         guard let previewViewController = previewingViewController as? PreviewViewController else { return }
-        tabManager.selectedTab?.webView?.load(URLRequest(url: previewViewController.url))
+        tabManager.selectedTab?.loadRequest(URLRequest(url: previewViewController.url))
     }
     
     func webView(_ webView: WKWebView,
