@@ -21,12 +21,12 @@ class SearchSuggestClient {
     fileprivate weak var request: Request?
     fileprivate let userAgent: String
 
-    lazy fileprivate var alamofire: SessionManager = {
+    lazy fileprivate var alamofire: Session = {
         let configuration = URLSessionConfiguration.ephemeral
-        var defaultHeaders = SessionManager.default.session.configuration.httpAdditionalHeaders ?? [:]
+        var defaultHeaders = Session.default.session.configuration.httpAdditionalHeaders ?? [:]
         defaultHeaders["User-Agent"] = self.userAgent
         configuration.httpAdditionalHeaders = defaultHeaders
-        return SessionManager(configuration: configuration)
+        return Session(configuration: configuration)
     }()
 
     init(searchEngine: OpenSearchEngine, userAgent: String) {
@@ -45,7 +45,7 @@ class SearchSuggestClient {
         request = alamofire.request(url!)
             .validate(statusCode: 200..<300)
             .responseJSON { response in
-                if let error = response.result.error {
+                if let error = response.result as? Error {
                     callback(nil, error as NSError?)
                     return
                 }
@@ -53,7 +53,7 @@ class SearchSuggestClient {
                 // The response will be of the following format:
                 //    ["foobar",["foobar","foobar2000 mac","foobar skins",...]]
                 // That is, an array of at least two elements: the search term and an array of suggestions.
-                let array = response.result.value as? NSArray
+                let array = response.result as Any as? NSArray
                 if array?.count ?? 0 < 2 {
                     let error = NSError(domain: SearchSuggestClientErrorDomain, code: SearchSuggestClientErrorInvalidResponse, userInfo: nil)
                     callback(nil, error)
