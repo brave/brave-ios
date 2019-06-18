@@ -54,11 +54,12 @@ extension BrowserViewController: RewardsDataSource {
         return url.host
     }
     
-    func retrieveFavicon(with url: URL, completion: @escaping (UIImage?) -> Void) {
+    func retrieveFavicon(with url: URL, completion: @escaping (FaviconData?) -> Void) {
         let favicon = UIImageView()
         DispatchQueue.main.async {
-            favicon.setIconMO(nil, forURL: url, completed: { (color, url) in
-                completion(favicon.image)
+            favicon.setIconMO(nil, forURL: url, completed: { color, url in
+                guard let image = favicon.image else { return }
+                completion(FaviconData(image: image, backgroundColor: color))
             })
         }
 
