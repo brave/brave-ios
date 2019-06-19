@@ -41,11 +41,15 @@ extension BrowserViewController {
 
 extension BrowserViewController: RewardsUIDelegate {
     func presentBraveRewardsController(_ controller: UIViewController) {
-        
+        self.presentedViewController?.dismiss(animated: true) {
+            self.present(controller, animated: true)
+        }
     }
     
     func loadNewTabWithURL(_ url: URL) {
-        
+        let request = URLRequest(url: url)
+        let isPrivate = PrivateBrowsingManager.shared.isPrivateBrowsing
+        tabManager.addTabAndSelect(request, isPrivate: isPrivate)
     }
 }
 
@@ -62,7 +66,6 @@ extension BrowserViewController: RewardsDataSource {
                 completion(FaviconData(image: image, backgroundColor: color))
             })
         }
-
     }
     
 }
