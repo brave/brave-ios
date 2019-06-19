@@ -44,6 +44,8 @@ struct TabState {
 class Tab: NSObject {
     var id: String?
     
+    let rewardsId: UInt32
+    
     private(set) var type: TabType = .regular
     
     var isPrivate: Bool {
@@ -146,6 +148,7 @@ class Tab: NSObject {
 
     init(configuration: WKWebViewConfiguration, type: TabType = .regular) {
         self.configuration = configuration
+        rewardsId = UInt32.random(in: 0...100_000)
         super.init()
         self.type = type
     }
@@ -273,6 +276,9 @@ class Tab: NSObject {
     deinit {
         deleteWebView()
         contentScriptManager.helpers.removeAll()
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+        let rewards = appDelegate.browserViewController.rewards
+        rewards.reportTabClosed(tabId: rewardsId)
     }
 
     var loading: Bool {
@@ -359,6 +365,22 @@ class Tab: NSObject {
             return webView.load(request)
         }
         return nil
+    }
+    
+    func reportPageLoad() {
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate,
+            let webView = webView, let url = webView.url, !url.isLocal else { return }
+        
+        let getHtmlToStringJSCall = "document.documentElement.outerHTML.toString()"
+        let rewards = appDelegate.browserViewController.rewards
+        let tabId = rewardsId
+        
+        DispatchQueue.main.async {
+            webView.evaluateJavaScript(getHtmlToStringJSCall, completionHandler: { html, _ in
+                guard let htmlString = html as? String else { return }
+                rewards.reportLoadedPage(url: url, tabId: tabId, html: htmlString)
+            })
+        }
     }
 
     func stop() {

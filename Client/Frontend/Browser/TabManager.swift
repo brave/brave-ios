@@ -250,6 +250,16 @@ class TabManager: NSObject {
                 UITextField.appearance().keyboardAppearance = .dark
             }
         }
+        
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate,
+            let newSelectedTab = tab, let previousTab = previous, let newTabUrl = newSelectedTab.url, let previousTabUrl = previousTab.url else { return }
+        let rewards = appDelegate.browserViewController.rewards
+        
+        rewards.reportTabUpdated(Int(previousTab.rewardsId), url: previousTabUrl, isSelected: false,
+                                 isPrivate: previousTab.isPrivate)
+        
+        rewards.reportTabUpdated(Int(newSelectedTab.rewardsId), url: newTabUrl, isSelected: true,
+                                 isPrivate: newSelectedTab.isPrivate)
     }
 
     //Called by other classes to signal that they are entering/exiting private mode
@@ -471,15 +481,15 @@ class TabManager: NSObject {
             let forwardListMap = forwardList.map { $0.url.absoluteString }
             let currentItemString = currentItem.url.absoluteString
             
-            log.debug("backList: \(backListMap)")
-            log.debug("forwardList: \(forwardListMap)")
-            log.debug("currentItem: \(currentItemString)")
+//            log.debug("backList: \(backListMap)")
+//            log.debug("forwardList: \(forwardListMap)")
+//            log.debug("currentItem: \(currentItemString)")
             
             // Business as usual.
             urls = backListMap + [currentItemString] + forwardListMap
             currentPage = -forwardList.count
             
-            log.debug("---stack: \(urls)")
+            //log.debug("---stack: \(urls)")
         }
         if let id = TabMO.get(fromId: tab.id)?.syncUUID {
             let displayTitle = tab.displayTitle
