@@ -135,7 +135,7 @@ class BrowserViewController: UIViewController {
     
     let safeBrowsing: SafeBrowsing?
     
-    let rewards: BraveRewards
+    let rewards: BraveRewards?
 
     init(profile: Profile, tabManager: TabManager, crashedLastSession: Bool,
          safeBrowsingManager: SafeBrowsing? = SafeBrowsing()) {
@@ -144,7 +144,13 @@ class BrowserViewController: UIViewController {
         self.readerModeCache = ReaderMode.cache(for: tabManager.selectedTab)
         self.crashedLastSession = crashedLastSession
         self.safeBrowsing = safeBrowsingManager
+        
+        #if NO_REWARDS
+        rewards = nil
+        #else
         rewards = BraveRewards(configuration: .default)
+        #endif
+
         super.init(nibName: nil, bundle: nil)
         didInit()
     }

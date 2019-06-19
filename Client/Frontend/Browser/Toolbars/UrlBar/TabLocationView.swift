@@ -187,6 +187,19 @@ class TabLocationView: UIView {
         addGestureRecognizer(longPressRecognizer)
         addGestureRecognizer(tapRecognizer)
         
+        #if NO_REWARDS
+        [readerModeButton, separatorLine, shieldsButton].forEach {
+            $0.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
+            $0.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        }
+        
+        // Increasing tappable area of buttons, so user won't by mistake tap on address bar.
+        // Creating a stack view for buttons with 0 spacing.
+        // Extra space is added by `contentEdgeInsets`
+        let buttonsStackview = UIStackView(arrangedSubviews: [shieldsButton])
+        
+        shieldsButton.contentEdgeInsets = UIEdgeInsets(top: 4, left: 7.5, bottom: 4, right: 13)
+        #else
         [readerModeButton, separatorLine, shieldsButton, rewardsButton].forEach {
             $0.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
             $0.setContentHuggingPriority(.defaultHigh, for: .horizontal)
@@ -199,6 +212,7 @@ class TabLocationView: UIView {
         
         shieldsButton.contentEdgeInsets = UIEdgeInsets(top: 4, left: 8, bottom: 4, right: 7.5)
         rewardsButton.contentEdgeInsets = UIEdgeInsets(top: 4, left: 7.5, bottom: 4, right: 13)
+        #endif
         
         urlTextField.setContentHuggingPriority(.defaultLow, for: .horizontal)
 

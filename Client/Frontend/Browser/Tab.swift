@@ -276,8 +276,9 @@ class Tab: NSObject {
     deinit {
         deleteWebView()
         contentScriptManager.helpers.removeAll()
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
-        let rewards = appDelegate.browserViewController.rewards
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate,
+            let rewards = appDelegate.browserViewController.rewards else { return }
+        
         rewards.reportTabClosed(tabId: rewardsId)
     }
 
@@ -369,10 +370,10 @@ class Tab: NSObject {
     
     func reportPageLoad() {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate,
+            let rewards = appDelegate.browserViewController.rewards,
             let webView = webView, let url = webView.url, !url.isLocal else { return }
         
         let getHtmlToStringJSCall = "document.documentElement.outerHTML.toString()"
-        let rewards = appDelegate.browserViewController.rewards
         let tabId = rewardsId
         
         DispatchQueue.main.async {

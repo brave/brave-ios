@@ -24,7 +24,7 @@ extension BrowserViewController {
             UIDevice.current.setValue(value, forKey: "orientation")
         }
         
-        guard let url = tabManager.selectedTab?.url else { return }
+        guard let url = tabManager.selectedTab?.url, let rewards = rewards else { return }
         let braveRewardsPanel = RewardsPanelController(
             rewards,
             url: url,

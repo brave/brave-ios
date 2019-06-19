@@ -252,8 +252,8 @@ class TabManager: NSObject {
         }
         
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate,
+            let rewards = appDelegate.browserViewController.rewards,
             let newSelectedTab = tab, let previousTab = previous, let newTabUrl = newSelectedTab.url, let previousTabUrl = previousTab.url else { return }
-        let rewards = appDelegate.browserViewController.rewards
         
         rewards.reportTabUpdated(Int(previousTab.rewardsId), url: previousTabUrl, isSelected: false,
                                  isPrivate: previousTab.isPrivate)
