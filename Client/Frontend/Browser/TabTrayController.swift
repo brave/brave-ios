@@ -410,7 +410,7 @@ class TabTrayController: UIViewController, Themeable {
         if tabDataSource.tabs.isEmpty {
             openNewTab()
         } else {
-            if TabType.of(tabManager.selectedTab).isPrivate != privateMode {
+            if tabManager.selectedTab == nil || TabType.of(tabManager.selectedTab).isPrivate != privateMode {
                 tabManager.selectTab(tabDataSource.tabs.first!)
             }
             self.navigationController?.popViewController(animated: true)
@@ -527,7 +527,7 @@ class TabTrayController: UIViewController, Themeable {
                 let appDelegate = UIApplication.shared.delegate as? AppDelegate,
                 let bvc = appDelegate.browserViewController {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-                    bvc.urlBar.tabLocationViewDidTapLocation(bvc.urlBar.locationView)
+                    bvc.topToolbar.tabLocationViewDidTapLocation(bvc.topToolbar.locationView)
                 }
             }
 
