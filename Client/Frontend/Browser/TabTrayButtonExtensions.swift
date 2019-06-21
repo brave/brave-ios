@@ -38,7 +38,7 @@ class PrivateModeButton: InsetButton, Themeable {
 extension UIButton {
     static func newTabButton() -> UIButton {
         let newTab = UIButton()
-        newTab.setImage(#imageLiteral(resourceName: "quick_action_new_tab").template, for: .normal)
+        newTab.setImage(#imageLiteral(resourceName: "add-24").template, for: .normal)
         newTab.accessibilityLabel = Strings.TabTrayNewTabButtonAccessibilityLabel
         return newTab
     }

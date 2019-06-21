@@ -51,10 +51,10 @@ class TopToolbarView: UIView, ToolbarProtocol {
     var loading: Bool = false {
         didSet {
             if loading {
-                reloadButton.setImage(#imageLiteral(resourceName: "nav-stop").template, for: .normal)
+                reloadButton.setImage(#imageLiteral(resourceName: "stop-24").template, for: .normal)
                 reloadButton.accessibilityLabel = Strings.TabToolbarStopButtonAccessibilityLabel
             } else {
-                reloadButton.setImage(#imageLiteral(resourceName: "nav-refresh").template, for: .normal)
+                reloadButton.setImage(#imageLiteral(resourceName: "refresh-24").template, for: .normal)
                 reloadButton.accessibilityLabel = Strings.TabToolbarReloadButtonAccessibilityLabel
             }
         }
@@ -152,7 +152,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
     var addTabButton = ToolbarButton()
     lazy var menuButton = ToolbarButton().then {
         $0.contentMode = .center
-        $0.setImage(#imageLiteral(resourceName: "nav-menu").template, for: .normal)
+        $0.setImage(#imageLiteral(resourceName: "menu-24").template, for: .normal)
         $0.accessibilityLabel = Strings.AppMenuButtonAccessibilityLabel
         $0.addTarget(self, action: #selector(didClickMenu), for: .touchUpInside)
         $0.accessibilityIdentifier = "topToolbarView-menuButton"

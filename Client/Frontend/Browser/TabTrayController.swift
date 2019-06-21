@@ -1099,7 +1099,7 @@ class TrayToolbar: UIView {
     fileprivate let toolbarButtonSize = CGSize(width: 44, height: 44)
 
     let addTabButton = UIButton(type: .system).then {
-        $0.setImage(#imageLiteral(resourceName: "add_tab").template, for: .normal)
+        $0.setImage(#imageLiteral(resourceName: "add-24").template, for: .normal)
         $0.accessibilityLabel = Strings.TabTrayAddTabAccessibilityLabel
         $0.accessibilityIdentifier = "TabTrayController.addTabButton"
     }

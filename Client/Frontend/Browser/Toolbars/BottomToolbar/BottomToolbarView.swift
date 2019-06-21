@@ -24,10 +24,10 @@ class BottomToolbarView: UIView, ToolbarProtocol {
     var loading: Bool = false {
         didSet {
             if loading {
-                reloadButton.setImage(#imageLiteral(resourceName: "nav-stop").template, for: .normal)
+                reloadButton.setImage(#imageLiteral(resourceName: "stop-24").template, for: .normal)
                 reloadButton.accessibilityLabel = Strings.TabToolbarStopButtonAccessibilityLabel
             } else {
-                reloadButton.setImage(#imageLiteral(resourceName: "nav-refresh").template, for: .normal)
+                reloadButton.setImage(#imageLiteral(resourceName: "refresh-24").template, for: .normal)
                 reloadButton.accessibilityLabel = Strings.TabToolbarReloadButtonAccessibilityLabel
             }
         }
