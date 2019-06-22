@@ -5,14 +5,15 @@ import Shared
 
 struct WebAuthnRegisterRequest {
     var username: String
-    var userId: String
+    var userID: String
     
-    var rpId: String
+    var rpID: String?
     var rpName: String
     
     var pubKeyAlg: Int
     var residentKey: Bool
     
+    var userVerification: Bool
     var challenge: String
     
     enum CodingKeys: String, CodingKey {
@@ -64,10 +65,10 @@ extension WebAuthnRegisterRequest: Decodable {
         let userDictionary = try publicKeyDictionary.nestedContainer(keyedBy: UserKeys.self, forKey: .user)
         
         username = try userDictionary.decode(String.self, forKey: .name)
-        userId = try userDictionary.decode(String.self, forKey: .id)
+        userID = try userDictionary.decode(String.self, forKey: .id)
         
         let rpDictionary = try publicKeyDictionary.nestedContainer(keyedBy: UserKeys.self, forKey: .rp)
-        rpId = try rpDictionary.decodeIfPresent(String.self, forKey: .id) ?? ""
+        rpID = try rpDictionary.decodeIfPresent(String.self, forKey: .id)
         rpName = try rpDictionary.decode(String.self, forKey: .name)
         
         let pubKeyCredParamsArray = try publicKeyDictionary.decode([PubKeyCredParams].self, forKey: .pubKeyCredParams)
@@ -78,8 +79,10 @@ extension WebAuthnRegisterRequest: Decodable {
         
         if let authenticatorSelection = try publicKeyDictionary.decodeIfPresent(AuthenticatorSelection.self, forKey: .authenticatorSelection) {
             residentKey = authenticatorSelection.requireResidentKey ?? false
+            userVerification = authenticatorSelection.userVerification == "required"
         } else {
             residentKey = false
+            userVerification = false
         }
         
         challenge = try publicKeyDictionary.decode(String.self, forKey: .challenge)

@@ -25,8 +25,8 @@ class U2FTests: XCTestCase {
         do {
             let request =  try JSONDecoder().decode(WebAuthnRegisterRequest.self, from: jsonData)
             XCTAssertEqual(request.username, "Brave demo user", "request username is correct.")
-            XCTAssertEqual(request.userId, "OvQO5490o1w89Op/9dp4w7VvKuLEk5NHcfOnc2ZECtc=", "request user id is correct.")
-            XCTAssertEqual(request.rpId, expectedrpID, "request rp id is correct.")
+            XCTAssertEqual(request.userID, "OvQO5490o1w89Op/9dp4w7VvKuLEk5NHcfOnc2ZECtc=", "request user id is correct.")
+            XCTAssertEqual(request.rpID, expectedrpID, "request rp id is correct.")
             XCTAssertEqual(request.rpName, "Brave", "request rp name is correct.")
             XCTAssertEqual(request.pubKeyAlg, -7, "request pub key alg is correct.")
             XCTAssertFalse(request.residentKey, "request resident key is correct.")
@@ -60,16 +60,21 @@ class U2FTests: XCTestCase {
             return
         }
         
-        let rpIdURLs = [
-            "example.domain",
-            "https://test.example.domain",
+        var rpIdURLs = [
+            "rp.example.domain", // valid
+            "example.domain",    // valid
+            "https://bp.example.domain",
             "https://test.examples.domain.com",
+            "https://test.rp.examples.domain",
+            "https://domain"
         ]
+        
         let tab = Tab(configuration: WKWebViewConfiguration())
         let U2FExtension = U2FExtensions(tab: tab)
-        XCTAssertTrue(U2FExtension.validateRPId(url: currentURL.absoluteString, rpId: rpIdURLs[0]), "rpID URL is valid.")
-        for url in rpIdURLs.dropFirst() {
-            XCTAssertFalse(U2FExtension.validateRPId(url: currentURL.absoluteString, rpId: url), "rpID URLs is invalid.")
+        XCTAssertTrue(U2FExtension.validateRPID(url: currentURL.absoluteString, rpId: rpIdURLs.removeFirst()), "rpID URL is valid.")
+        XCTAssertTrue(U2FExtension.validateRPID(url: currentURL.absoluteString, rpId: rpIdURLs.removeFirst()), "rpID URL is valid.")
+        for url in rpIdURLs {
+            XCTAssertFalse(U2FExtension.validateRPID(url: currentURL.absoluteString, rpId: url), "rpID URLs is invalid.")
         }
     }
 }

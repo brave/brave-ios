@@ -4,9 +4,10 @@
 import Shared
 
 struct WebAuthnAuthenticateRequest {
-    var rpID: String
+    var rpID: String?
     var challenge: String
     var allowCredentials: Array<String> = []
+    var userVerification: Bool
     
     enum RequestKeys: String, CodingKey {
         case publicKey
@@ -17,6 +18,7 @@ struct WebAuthnAuthenticateRequest {
         case challenge
         case allowCredentials
         case authenticatorSelection
+        case userVerification
     }
 }
 
@@ -30,9 +32,10 @@ extension WebAuthnAuthenticateRequest: Decodable {
         let request = try decoder.container(keyedBy: RequestKeys.self)
         let publicKeyDictionary = try request.nestedContainer(keyedBy: PublicKeyDictionaryKeys.self, forKey: .publicKey)
         
-        rpID = try publicKeyDictionary.decode(String.self, forKey: .rpId)
-        
+        rpID = try publicKeyDictionary.decodeIfPresent(String.self, forKey: .rpId)
         challenge = try publicKeyDictionary.decode(String.self, forKey: .challenge)
+        let userVerifcationString = try publicKeyDictionary.decodeIfPresent(String.self, forKey: .userVerification) ?? ""
+        userVerification = userVerifcationString == "required"
         
         let allowCredentialsArray = try publicKeyDictionary.decode([AllowCredentials].self, forKey: .allowCredentials)
     

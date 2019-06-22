@@ -135,7 +135,7 @@ Object.defineProperty($<webauthn>, 'postGet', {
       return;
     }
     if (errorName) {
-      $<webauthn>.reject(new DOMException(errorDescription, errorName))
+      $<webauthn>.reject[handle](new DOMException(errorDescription, errorName))
       return
     }
     response = new $<assert>(authenticatorData, clientDataJSON, signature)

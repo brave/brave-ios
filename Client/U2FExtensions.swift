@@ -109,13 +109,24 @@ class U2FExtensions: NSObject {
         observeKeyUpdates = false
     }
     
-    // rpId should be a registrable domain suffix or equal to the effectiveDomain
-    func validateRPId(url: String, rpId: String) -> Bool {
+    private func validateURL(string: String?) -> Bool {
+        let regEx = "((https|http)://)((\\w|-)+)(([.]|[/])((\\w|-)+))+"
+        let predicate = NSPredicate(format: "SELF MATCHES %@", argumentArray: [regEx])
+        return predicate.evaluate(with: string)
+    }
+    
+    // RPID can be equal or shorter as long as there is still a host.
+    func validateRPID(url: String, rpId: String) -> Bool {
         guard let currentURL = URL(string: url) else {
             return false
         }
         
-        guard let rpIdURL = URL(string: rpId) else {
+        guard let rpIdURL = rpId.hasPrefix("http://") || rpId.hasPrefix("https://") ?  URL(string: rpId) : URL(string: "https://" + rpId) else {
+            return false
+        }
+        
+        // rpID should be valid
+        if !validateURL(string: rpIdURL.absoluteString) {
             return false
         }
         
@@ -123,9 +134,8 @@ class U2FExtensions: NSObject {
             return false
         }
         
-        // in some cases rp id is abc.com, when parsed as URL host is set to nil
         guard let rpIdHost = rpIdURL.host else {
-            return currentURLHost.hasSuffix(rpId)
+            return false
         }
         
         return currentURLHost.hasSuffix(rpIdHost)
@@ -184,17 +194,17 @@ class U2FExtensions: NSObject {
             let rp = YKFFIDO2PublicKeyCredentialRpEntity()
             // If rpId is not present, then set rpId to effectiveDomain
             // https://www.w3.org/TR/webauthn/#GetAssn-DetermineRpId
-            if request.rpId == "" {
-                guard let rpId = self.tab?.webView?.url?.absoluteString else {
+            if let rpId = request.rpID {
+                rp.rpId = rpId
+            } else {
+                guard let rpId = URL(string: url)?.host else {
                     sendFIDO2RegistrationError(handle: handle)
                     return
                 }
                 rp.rpId = rpId
-            } else {
-                rp.rpId = request.rpId
             }
 
-            guard validateRPId(url: url, rpId: rp.rpId) else {
+            guard validateRPID(url: url, rpId: rp.rpId) else {
                 sendFIDO2RegistrationError(handle: handle, errorName: FIDO2ErrorMessages.SecurityError.rawValue)
                 return
             }
@@ -203,7 +213,7 @@ class U2FExtensions: NSObject {
             makeCredentialRequest.rp = rp
             
             let user = YKFFIDO2PublicKeyCredentialUserEntity()
-            guard let userId = Data(base64Encoded: request.userId) else {
+            guard let userId = Data(base64Encoded: request.userID) else {
                 sendFIDO2RegistrationError(handle: handle)
                 return
             }
@@ -215,7 +225,10 @@ class U2FExtensions: NSObject {
             param.alg = request.pubKeyAlg
             makeCredentialRequest.pubKeyCredParams = [param]
             
-            let makeOptions = [YKFKeyFIDO2MakeCredentialRequestOptionRK: request.residentKey]
+            let makeOptions = [
+                YKFKeyFIDO2MakeCredentialRequestOptionRK: request.residentKey,
+                YKFKeyFIDO2MakeCredentialRequestOptionUV: request.userVerification
+            ]
             makeCredentialRequest.options = makeOptions
             
             guard let fido2Service = YubiKitManager.shared.keySession.fido2Service else {
@@ -323,9 +336,17 @@ class U2FExtensions: NSObject {
             }
             let requestId = allowCredential
             
-            getAssertionRequest.rpId = request.rpID
+            if let rpId = request.rpID {
+                getAssertionRequest.rpId = rpId
+            } else {
+                guard let rpId = URL(string: url)?.host else {
+                    sendFIDO2AuthenticationError(handle: handle)
+                    return
+                }
+                getAssertionRequest.rpId = rpId
+            }
             
-            guard validateRPId(url: url, rpId: getAssertionRequest.rpId) else {
+            guard validateRPID(url: url, rpId: getAssertionRequest.rpId) else {
                 sendFIDO2RegistrationError(handle: handle, errorName: FIDO2ErrorMessages.SecurityError.rawValue)
                 return
             }
@@ -335,7 +356,13 @@ class U2FExtensions: NSObject {
                 return
             }
             getAssertionRequest.clientDataHash = clientDataHash
-            getAssertionRequest.options = [YKFKeyFIDO2GetAssertionRequestOptionUP: true]
+            
+            // userPresence is set to the inverse of userVerification
+            // https://www.w3.org/TR/webauthn/#user-verification
+            getAssertionRequest.options = [
+                YKFKeyFIDO2GetAssertionRequestOptionUP: !request.userVerification,
+                YKFKeyFIDO2GetAssertionRequestOptionUV: request.userVerification
+            ]
             
             var allowList = [YKFFIDO2PublicKeyCredentialDescriptor]()
             for credentialId in request.allowCredentials {
@@ -769,7 +796,7 @@ extension U2FExtensions: TabContentScript {
                     let request =  try JSONDecoder().decode(WebAuthnAuthenticateRequest.self, from: jsonData)
                     requestFIDO2Authentication(handle: handle, request: request)
                 } catch let error as NSError {
-                    sendFIDO2RegistrationError(handle: handle, errorDescription: error.localizedDescription)
+                    sendFIDO2AuthenticationError(handle: handle, errorDescription: error.localizedDescription)
                 }
                 
                 return
