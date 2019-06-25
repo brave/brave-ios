@@ -75,22 +75,12 @@ extension ShieldsViewController {
             return label
         }()
         
-        let overviewFooterLabel: UILabel = {
-            let label = UILabel()
-            label.numberOfLines = 0
-            label.font = .systemFont(ofSize: 15.0)
-            label.textColor = .lightGray
-            label.text = Strings.Shields_Overview_Footer
-            return label
-        }()
-        
         override init(frame: CGRect) {
             super.init(frame: frame)
             axis = .vertical
             spacing = 15.0
             
             addArrangedSubview(overviewLabel)
-            addArrangedSubview(overviewFooterLabel)
         }
         
         @available(*, unavailable)
