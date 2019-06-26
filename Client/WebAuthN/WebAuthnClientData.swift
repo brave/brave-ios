@@ -19,12 +19,6 @@ struct WebAuthnClientData {
         case challenge
         case origin
     }
-    
-    init(type: String, challenge: String, origin: String) {
-        self.type = type
-        self.challenge = challenge
-        self.origin = origin
-    }
 }
 
 extension WebAuthnClientData: Encodable {

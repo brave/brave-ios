@@ -6,7 +6,7 @@ import Shared
 struct WebAuthnAuthenticateRequest {
     var rpID: String?
     var challenge: String
-    var allowCredentials: Array<String> = []
+    var allowCredentials: [String] = []
     var userVerification: Bool
     
     enum RequestKeys: String, CodingKey {

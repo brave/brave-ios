@@ -953,7 +953,7 @@ class BrowserViewController: UIViewController {
             guard let tab = tabManager[webView] else {
                 break
             }
-            
+            tab.userScriptManager?.isU2FEnabled = webView.hasOnlySecureContent
             if tab.contentIsSecure && !webView.hasOnlySecureContent {
                 tab.contentIsSecure = false
             }

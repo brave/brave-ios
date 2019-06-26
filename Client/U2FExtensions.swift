@@ -56,6 +56,14 @@ private enum FIDO2ErrorMessages: String {
     case SecurityError = "SecurityError"
 }
 
+private enum U2FMessageType: String {
+    case FIDO2Create = "fido2-create"
+    case FIDO2Get = "fido2-get"
+    case FIDORegister = "fido-register"
+    case FIDOSign = "fido-sign"
+    case FIDOLowLevel = "fido-low-level"
+}
+
 class U2FExtensions: NSObject {
     fileprivate weak var tab: Tab?
     
@@ -166,7 +174,7 @@ class U2FExtensions: NSObject {
         fido2RegHandles.append(handle)
         fido2RegisterRequest[handle] = request
 
-        guard YubiKitManager.shared.keySession.sessionState == .open else {
+        if YubiKitManager.shared.keySession.sessionState != .open {
             return
         }
         
@@ -180,7 +188,8 @@ class U2FExtensions: NSObject {
             return
         }
         
-        let clientData = WebAuthnClientData(type: WebAuthnClientDataType.create.rawValue, challenge: request.challenge, origin: url)
+        let publicKey = request.publicKey
+        let clientData = WebAuthnClientData(type: WebAuthnClientDataType.create.rawValue, challenge: publicKey.challenge, origin: url)
         
         do {
             let clientDataJSON = try JSONEncoder().encode(clientData)
@@ -194,7 +203,7 @@ class U2FExtensions: NSObject {
             let rp = YKFFIDO2PublicKeyCredentialRpEntity()
             // If rpId is not present, then set rpId to effectiveDomain
             // https://www.w3.org/TR/webauthn/#GetAssn-DetermineRpId
-            if let rpId = request.rpID {
+            if let rpId = publicKey.rp.id {
                 rp.rpId = rpId
             } else {
                 guard let rpId = URL(string: url)?.host else {
@@ -209,25 +218,30 @@ class U2FExtensions: NSObject {
                 return
             }
                 
-            rp.rpName = request.rpName
+            rp.rpName = publicKey.rp.name
             makeCredentialRequest.rp = rp
             
             let user = YKFFIDO2PublicKeyCredentialUserEntity()
-            guard let userId = Data(base64Encoded: request.userID) else {
+            guard let userId = Data(base64Encoded: publicKey.user.id) else {
                 sendFIDO2RegistrationError(handle: handle)
                 return
             }
             user.userId = userId
-            user.userName = request.username
+            user.userName = publicKey.user.name
             makeCredentialRequest.user = user
             
             let param = YKFFIDO2PublicKeyCredentialParam()
-            param.alg = request.pubKeyAlg
+            guard let publicKeyCred = publicKey.pubKeyCredParams.first else {
+                sendFIDO2RegistrationError(handle: handle)
+                return
+            }
+            param.alg = publicKeyCred.alg
             makeCredentialRequest.pubKeyCredParams = [param]
             
+            let userVerification = publicKey.authenticatorSelection?.userVerification ?? ""
             let makeOptions = [
-                YKFKeyFIDO2MakeCredentialRequestOptionRK: request.residentKey,
-                YKFKeyFIDO2MakeCredentialRequestOptionUV: request.userVerification
+                YKFKeyFIDO2MakeCredentialRequestOptionRK: publicKey.authenticatorSelection?.requireResidentKey ?? false,
+                YKFKeyFIDO2MakeCredentialRequestOptionUV: userVerification == "required"
             ]
             makeCredentialRequest.options = makeOptions
             
@@ -253,7 +267,7 @@ class U2FExtensions: NSObject {
                 }
                 self.finalizeFIDO2Registration(handle: handle, response: response, clientDataJSON: clientDataJSON.base64EncodedString(), error: nil)
             }
-        } catch let error as NSError {
+        } catch {
             sendFIDO2RegistrationError(handle: handle, errorDescription: error.localizedDescription)
         }
     }
@@ -283,7 +297,6 @@ class U2FExtensions: NSObject {
                     let errorDescription = error?.localizedDescription ?? U2FErrorMessages.ErrorRegistration.rawValue
                     log.error(errorDescription)
                 }
-                return
         }) }
     }
     
@@ -295,7 +308,6 @@ class U2FExtensions: NSObject {
                     let errorDescription = error?.localizedDescription ?? U2FErrorMessages.ErrorRegistration.rawValue
                     log.error(errorDescription)
                 }
-                return
         }) }
     }
     
@@ -313,7 +325,7 @@ class U2FExtensions: NSObject {
         fido2AuthHandles.append(handle)
         fido2AuthRequest[handle] = request
         
-        guard YubiKitManager.shared.keySession.sessionState == .open else {
+        if YubiKitManager.shared.keySession.sessionState != .open {
             return
         }
         
@@ -404,9 +416,8 @@ class U2FExtensions: NSObject {
                 }
                 self.finalizeFIDO2Authentication(handle: handle, response: response, requestId: requestId, clientDataJSON: clientDataJSON, error: nil)
             }
-        } catch let error as NSError {
+        } catch {
             sendFIDO2AuthenticationError(handle: handle, errorDescription: error.localizedDescription)
-            return
         }
     }
     
@@ -428,7 +439,6 @@ class U2FExtensions: NSObject {
                     let errorDescription = error?.localizedDescription ?? U2FErrorMessages.ErrorAuthentication.rawValue
                     log.error(errorDescription)
                 }
-            return
         }) }
     }
     
@@ -440,7 +450,6 @@ class U2FExtensions: NSObject {
                     let errorDescription = error?.localizedDescription ?? U2FErrorMessages.ErrorAuthentication.rawValue
                     log.error(errorDescription)
                 }
-            return
         }) }
     }
     
@@ -464,11 +473,11 @@ class U2FExtensions: NSObject {
     
         fidoRegisterRequest[handle] = request
         
-        if id > -1 {
+        if id >= 0 {
             requestId[handle] = id
         }
 
-        guard YubiKitManager.shared.keySession.sessionState == .open else {
+        if YubiKitManager.shared.keySession.sessionState != .open {
             return
         }
         
@@ -507,14 +516,13 @@ class U2FExtensions: NSObject {
             }
             
             self.cleanupFIDORegistration(handle: handle)
-            if requestId > -1 {
+            if requestId >= 0 {
                 ensureMainThread {
                     self.tab?.webView?.evaluateJavaScript("u2f.postLowLevelRegister(\(requestId), \(true), '\(request.version)', '\(registrationData)', '\(clientData)', \(defaultErrorCode), '')", completionHandler: { _, error in
                         if error != nil {
                             let errorDescription = error?.localizedDescription ?? U2FErrorMessages.ErrorRegistration.rawValue
                             log.error(errorDescription)
                         }
-                    return
                 }) }
                 return
             }
@@ -525,21 +533,19 @@ class U2FExtensions: NSObject {
                         let errorDescription = error?.localizedDescription ?? U2FErrorMessages.ErrorRegistration.rawValue
                         log.error(errorDescription)
                     }
-                return
             }) }
         }
     }
     
     private func sendFIDORegistrationError(handle: Int, requestId: Int, errorCode: U2FErrorCodes, errorMessage: String = Strings.U2FRegistrationError) {
         cleanupFIDORegistration(handle: handle)
-        if requestId > -1 {
+        if requestId >= 0 {
             ensureMainThread {
                 self.tab?.webView?.evaluateJavaScript("u2f.postLowLevelRegister(\(requestId), \(true), '', '', '', \(errorCode.rawValue), '\(errorMessage)')", completionHandler: { _, error in
                     if error != nil {
                         let errorDescription = error?.localizedDescription ?? U2FErrorMessages.ErrorRegistration.rawValue
                         log.error(errorDescription)
                     }
-                return
             }) }
             return
         }
@@ -550,7 +556,6 @@ class U2FExtensions: NSObject {
                     let errorDescription = error?.localizedDescription ?? U2FErrorMessages.ErrorRegistration.rawValue
                     log.error(errorDescription)
                 }
-                return
             }) }
     }
     
@@ -570,11 +575,11 @@ class U2FExtensions: NSObject {
         fidoSignRequests[handle] = keys
         fidoRequests[handle] = keys.count
         
-        if id > -1 {
+        if id >= 0 {
             requestId[handle] = id
         }
 
-        guard YubiKitManager.shared.keySession.sessionState == .open else {
+        if YubiKitManager.shared.keySession.sessionState != .open {
             return
         }
         
@@ -634,14 +639,13 @@ class U2FExtensions: NSObject {
                 self.fidoRequests[handle] = authSuccess
                 
                 self.cleanupFIDOAuthentication(handle: handle)
-                if requestId > -1 {
+                if requestId >= 0 {
                     ensureMainThread {
                         self.tab?.webView?.evaluateJavaScript("u2f.postLowLevelSign(\(requestId), \(true), '\(keyHandle)', '\(signature)', '\(clientData)', \(defaultErrorCode), '')", completionHandler: { _, error in
                             if error != nil {
                                 let errorDescription = error?.localizedDescription ?? U2FErrorMessages.ErrorAuthentication.rawValue
                                 log.error(errorDescription)
                             }
-                        return
                     }) }
                     return
                 }
@@ -652,7 +656,6 @@ class U2FExtensions: NSObject {
                             let errorDescription = error?.localizedDescription ?? U2FErrorMessages.ErrorAuthentication.rawValue
                             log.error(errorDescription)
                         }
-                    return
                 }) }
             }
         }
@@ -661,14 +664,13 @@ class U2FExtensions: NSObject {
     private func sendFIDOAuthenticationError(handle: Int, requestId: Int, errorCode: U2FErrorCodes, errorMessage: String = Strings.U2FAuthenticationError) {
         cleanupFIDOAuthentication(handle: handle)
         
-        if requestId > -1 {
+        if requestId >= 0 {
             ensureMainThread {
                 self.tab?.webView?.evaluateJavaScript("u2f.postLowLevelSign(\(requestId), \(true), '', '', '', \(errorCode.rawValue), '\(errorMessage)')", completionHandler: { _, error in
                     if error != nil {
                         let errorDescription = error?.localizedDescription ?? U2FErrorMessages.ErrorAuthentication.rawValue
                         log.error(errorDescription)
                     }
-                return
             }) }
             return
         }
@@ -679,7 +681,6 @@ class U2FExtensions: NSObject {
                     let errorDescription = error?.localizedDescription ?? U2FErrorMessages.ErrorAuthentication.rawValue
                     log.error(errorDescription)
                 }
-            return
         }) }
     }
     
@@ -769,117 +770,103 @@ extension U2FExtensions: TabContentScript {
                 return
             }
             
-            // FIDO2 is the new webauthn API
-            // https://www.w3.org/TR/webauthn/
-            if name == "fido2-create" {
-                guard let data = body["data"] as? String, let jsonData = data.data(using: String.Encoding.utf8) else {
-                    sendFIDO2RegistrationError(handle: handle)
-                    return
-                }
-                
-                do {
-                    let request =  try JSONDecoder().decode(WebAuthnRegisterRequest.self, from: jsonData)
-                    requestFIDO2Registration(handle: handle, request: request)
-                } catch let error as NSError {
-                    sendFIDO2RegistrationError(handle: handle, errorDescription: error.localizedDescription)
-                }
-                return
-            }
-            
-            if name == "fido2-get" {
-                guard let data = body["data"] as? String, let jsonData = data.data(using: String.Encoding.utf8) else {
-                    sendFIDO2AuthenticationError(handle: handle)
-                    return
-                }
-                
-                do {
-                    let request =  try JSONDecoder().decode(WebAuthnAuthenticateRequest.self, from: jsonData)
-                    requestFIDO2Authentication(handle: handle, request: request)
-                } catch let error as NSError {
-                    sendFIDO2AuthenticationError(handle: handle, errorDescription: error.localizedDescription)
-                }
-                
-                return
-            }
-
-            // High Level FIDO U2F API
-            // https://fidoalliance.org/specs/fido-u2f-v1.0-nfc-bt-amendment-20150514/fido-u2f-javascript-api.html#high-level-javascript-api
-            if name == "fido-register" {
-                guard let appId = body["appId"] as? String, let requests = body["requests"] as? String else {
-                    sendFIDORegistrationError(handle: handle, requestId: -1, errorCode: U2FErrorCodes.bad_request)
-                    return
-                }
-                
-                let jsonData = Data(requests.utf8)
-                let decoder = JSONDecoder()
-                do {
-                    var registerRequests = try decoder.decode([FIDORegisterRequest].self, from: jsonData)
-                    for index in registerRequests.indices {
-                        registerRequests[index].appId = appId
+            switch name {
+                case U2FMessageType.FIDO2Create.rawValue:
+                    // FIDO2 is the new webauthn API
+                    // https://www.w3.org/TR/webauthn/
+                    guard let data = body["data"] as? String, let jsonData = data.data(using: String.Encoding.utf8) else {
+                        sendFIDO2RegistrationError(handle: handle)
+                        return
                     }
-                    requestFIDORegistration(handle: handle, requests: registerRequests, id: -1)
-                } catch let error as NSError {
-                    sendFIDORegistrationError(handle: handle, requestId: -1, errorCode: U2FErrorCodes.bad_request, errorMessage: error.localizedDescription)
-                    return
-                }
-                return
-            }
-            
-            if name == "fido-sign" {
-                guard let appId = body["appId"] as? String, let challenge = body["challenge"] as? String, let keys = body["keys"] as? String else {
-                    sendFIDOAuthenticationError(handle: handle, requestId: -1, errorCode: U2FErrorCodes.bad_request)
-                    return
-                }
-                
-                let jsonData = Data(keys.utf8)
-                let decoder = JSONDecoder()
-                do {
-                    var registeredKeys = try decoder.decode([FIDOSignRequest].self, from: jsonData)
-                    for index in registeredKeys.indices {
-                        registeredKeys[index].challenge = challenge
-                        registeredKeys[index].appId = appId
+                    
+                    do {
+                        let request =  try JSONDecoder().decode(WebAuthnRegisterRequest.self, from: jsonData)
+                        requestFIDO2Registration(handle: handle, request: request)
+                    } catch {
+                        sendFIDO2RegistrationError(handle: handle, errorDescription: error.localizedDescription)
                     }
-                    requestFIDOAuthentication(handle: handle, keys: registeredKeys, id: -1)
-                } catch let error as NSError {
-                    sendFIDOAuthenticationError(handle: handle, requestId: -1, errorCode: U2FErrorCodes.bad_request, errorMessage: error.localizedDescription)
-                    return
-                }
-                return
-            }
-
-            // Low Level FIDO U2F API use message port for interaction
-            // https://fidoalliance.org/specs/fido-u2f-v1.0-nfc-bt-amendment-20150514/fido-u2f-javascript-api.html#low-level-messageport-api
-            if name == "fido-low-level" {
-                guard let data = body["data"] as? String else {
-                    log.error(U2FErrorMessages.Error.rawValue)
-                    return
-                }
-
-                let jsonData = Data(data.utf8)
-                let decoder = JSONDecoder()
-                do {
-                    let lowLevelRequest = try decoder.decode(FIDOLowLevel.self, from: jsonData)
-                    if lowLevelRequest.type == registerRequest {
-                        let request = try decoder.decode(FIDOLowLevelRegisterRequests.self, from: jsonData)
-                        guard let registerRequests = request.registerRequests else {
-                            log.error(Strings.U2FRegistrationError)
-                            return
+                case U2FMessageType.FIDO2Get.rawValue:
+                    guard let data = body["data"] as? String, let jsonData = data.data(using: String.Encoding.utf8) else {
+                        sendFIDO2AuthenticationError(handle: handle)
+                        return
+                    }
+                    
+                    do {
+                        let request =  try JSONDecoder().decode(WebAuthnAuthenticateRequest.self, from: jsonData)
+                        requestFIDO2Authentication(handle: handle, request: request)
+                    } catch {
+                        sendFIDO2AuthenticationError(handle: handle, errorDescription: error.localizedDescription)
+                    }
+                case U2FMessageType.FIDORegister.rawValue:
+                    // High Level FIDO U2F API
+                    // https://fidoalliance.org/specs/fido-u2f-v1.0-nfc-bt-amendment-20150514/fido-u2f-javascript-api.html#high-level-javascript-api
+                    guard let appId = body["appId"] as? String, let requests = body["requests"] as? String else {
+                        sendFIDORegistrationError(handle: handle, requestId: -1, errorCode: U2FErrorCodes.bad_request)
+                        return
+                    }
+                    
+                    let jsonData = Data(requests.utf8)
+                    let decoder = JSONDecoder()
+                    do {
+                        var registerRequests = try decoder.decode([FIDORegisterRequest].self, from: jsonData)
+                        for index in registerRequests.indices {
+                            registerRequests[index].appId = appId
                         }
-                        requestFIDORegistration(handle: handle, requests: registerRequests, id: lowLevelRequest.requestId)
+                        requestFIDORegistration(handle: handle, requests: registerRequests, id: -1)
+                    } catch {
+                        sendFIDORegistrationError(handle: handle, requestId: -1, errorCode: U2FErrorCodes.bad_request, errorMessage: error.localizedDescription)
                     }
-                    if lowLevelRequest.type == signRequest {
-                        let request = try decoder.decode(FIDOLowLevelSignRequests.self, from: jsonData)
-                        guard let signRequests = request.signRequests else {
-                            log.error(Strings.U2FAuthenticationError)
-                            return
+                case U2FMessageType.FIDOSign.rawValue:
+                    guard let appId = body["appId"] as? String, let challenge = body["challenge"] as? String, let keys = body["keys"] as? String else {
+                        sendFIDOAuthenticationError(handle: handle, requestId: -1, errorCode: U2FErrorCodes.bad_request)
+                        return
+                    }
+                    
+                    let jsonData = Data(keys.utf8)
+                    let decoder = JSONDecoder()
+                    do {
+                        var registeredKeys = try decoder.decode([FIDOSignRequest].self, from: jsonData)
+                        for index in registeredKeys.indices {
+                            registeredKeys[index].challenge = challenge
+                            registeredKeys[index].appId = appId
                         }
-                        requestFIDOAuthentication(handle: handle, keys: signRequests, id: lowLevelRequest.requestId)
+                        requestFIDOAuthentication(handle: handle, keys: registeredKeys, id: -1)
+                    } catch {
+                        sendFIDOAuthenticationError(handle: handle, requestId: -1, errorCode: U2FErrorCodes.bad_request, errorMessage: error.localizedDescription)
                     }
-                } catch let error as NSError {
-                    log.error(error.localizedDescription)
-                    return
-                }
-                return
+                case U2FMessageType.FIDOLowLevel.rawValue:
+                    // Low Level FIDO U2F API use message port for interaction
+                    // https://fidoalliance.org/specs/fido-u2f-v1.0-nfc-bt-amendment-20150514/fido-u2f-javascript-api.html#low-level-messageport-api
+                    guard let data = body["data"] as? String else {
+                        log.error(U2FErrorMessages.Error.rawValue)
+                        return
+                    }
+                    
+                    let jsonData = Data(data.utf8)
+                    let decoder = JSONDecoder()
+                    do {
+                        let lowLevelRequest = try decoder.decode(FIDOLowLevel.self, from: jsonData)
+                        if lowLevelRequest.type == registerRequest {
+                            let request = try decoder.decode(FIDOLowLevelRegisterRequests.self, from: jsonData)
+                            guard let registerRequests = request.registerRequests else {
+                                log.error(Strings.U2FRegistrationError)
+                                return
+                            }
+                            requestFIDORegistration(handle: handle, requests: registerRequests, id: lowLevelRequest.requestId)
+                        }
+                        if lowLevelRequest.type == signRequest {
+                            let request = try decoder.decode(FIDOLowLevelSignRequests.self, from: jsonData)
+                            guard let signRequests = request.signRequests else {
+                                log.error(Strings.U2FAuthenticationError)
+                                return
+                            }
+                            requestFIDOAuthentication(handle: handle, keys: signRequests, id: lowLevelRequest.requestId)
+                        }
+                    } catch {
+                        log.error(error.localizedDescription)
+                    }
+                default:
+                    log.error(U2FErrorMessages.Error)
             }
         }
     }

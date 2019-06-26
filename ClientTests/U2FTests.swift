@@ -18,28 +18,37 @@ class U2FTests: XCTestCase {
     func testWebAuthnRegisterRequest() {
         let webAuthnRegisterData = "{\"publicKey\":{\"attestation\":\"direct\",\"authenticatorSelection\":{\"requireResidentKey\":false,\"userVerification\":\"discouraged\"},\"pubKeyCredParams\":[{\"alg\":-7,\"type\":\"public-key\"},{\"alg\":-257,\"type\":\"public-key\"}],\"rp\":{\"id\":\"demo.brave.com\",\"name\":\"Brave\"},\"timeout\":90000,\"challenge\": \"mdMbxTPACurawWFHqkoltSUwDear2OZQVl/uhBNqiaM=\",\"user\":{\"displayName\":\"Brave demo user\",\"name\":\"Brave demo user\",\"id\":\"OvQO5490o1w89Op/9dp4w7VvKuLEk5NHcfOnc2ZECtc=\"},\"excludeCredentials\":[]},\"signal\":{}}"
         guard let jsonData = webAuthnRegisterData.data(using: String.Encoding.utf8) else {
-            XCTFail()
+            XCTFail("Failed parsing webauthn registration data")
             return
         }
         
         do {
             let request =  try JSONDecoder().decode(WebAuthnRegisterRequest.self, from: jsonData)
-            XCTAssertEqual(request.username, "Brave demo user", "request username is correct.")
-            XCTAssertEqual(request.userID, "OvQO5490o1w89Op/9dp4w7VvKuLEk5NHcfOnc2ZECtc=", "request user id is correct.")
-            XCTAssertEqual(request.rpID, expectedrpID, "request rp id is correct.")
-            XCTAssertEqual(request.rpName, "Brave", "request rp name is correct.")
-            XCTAssertEqual(request.pubKeyAlg, -7, "request pub key alg is correct.")
-            XCTAssertFalse(request.residentKey, "request resident key is correct.")
-            XCTAssertEqual(request.challenge, "mdMbxTPACurawWFHqkoltSUwDear2OZQVl/uhBNqiaM=", "request challenge is correct.")
+            let publicKey = request.publicKey
+            XCTAssertEqual(publicKey.user.name, "Brave demo user", "request username is correct.")
+            XCTAssertEqual(publicKey.user.id, "OvQO5490o1w89Op/9dp4w7VvKuLEk5NHcfOnc2ZECtc=", "request user id is correct.")
+            XCTAssertEqual(publicKey.rp.id, expectedrpID, "request rp id is correct.")
+            XCTAssertEqual(publicKey.rp.name, "Brave", "request rp name is correct.")
+            guard let pubKeyCred = publicKey.pubKeyCredParams.first else {
+                XCTFail("Public key parsing failed")
+                return
+            }
+            XCTAssertEqual(pubKeyCred.alg, -7, "request pub key alg is correct.")
+            guard let residentKey = publicKey.authenticatorSelection?.requireResidentKey else {
+                XCTFail("Resident key parsing failed")
+                return
+            }
+            XCTAssertFalse(residentKey, "request resident key is correct.")
+            XCTAssertEqual(publicKey.challenge, "mdMbxTPACurawWFHqkoltSUwDear2OZQVl/uhBNqiaM=", "request challenge is correct.")
         } catch {
-            XCTFail()
+            XCTFail("\(error)")
         }
     }
     
     func testWebAuthnAuthenticateRequest() {
         let webAuthnAuthenticateData = "{\"publicKey\":{\"allowCredentials\":[{\"type\":\"public-key\",\"id\":\"OvQO5490o1w89Op/9dp4w7VvKuLEk5NHcfOnc2ZECtc=\"}],\"rpId\":\"demo.brave.com\",\"timeout\":90000,\"userVerification\":\"discouraged\",\"challenge\":\"mdMbxTPACurawWFHqkoltSUwDear2OZQVl/uhBNqiaM=\"},\"signal\":{}}"
         guard let jsonData = webAuthnAuthenticateData.data(using: String.Encoding.utf8) else {
-            XCTFail()
+            XCTFail("Failed parsing webauthn authentication data")
             return
         }
         
@@ -50,13 +59,13 @@ class U2FTests: XCTestCase {
             XCTAssertEqual(request.allowCredentials.count, 1, "request allowCredential count is correct")
             XCTAssertEqual(request.allowCredentials.first, "OvQO5490o1w89Op/9dp4w7VvKuLEk5NHcfOnc2ZECtc=", "request allowCredential is correct")
         } catch {
-            XCTFail()
+            XCTFail("\(error)")
         }
     }
     
     func testValidateRPId() {
         guard let currentURL = URL(string: "https://rp.example.domain") else {
-            XCTFail()
+            XCTFail("Failed parsing current tab URL")
             return
         }
         

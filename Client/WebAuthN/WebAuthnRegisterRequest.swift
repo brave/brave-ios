@@ -1,90 +1,37 @@
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
-import Shared
 
-struct WebAuthnRegisterRequest {
-    var username: String
-    var userID: String
-    
-    var rpID: String?
-    var rpName: String
-    
-    var pubKeyAlg: Int
-    var residentKey: Bool
-    
-    var userVerification: Bool
-    var challenge: String
-    
-    enum CodingKeys: String, CodingKey {
-        case username
-        case userId
-        case rpId
-        case rpName
-        case pubKeyAlg
-        case residentKey
-    }
-    
-    enum RequestKeys: String, CodingKey {
-        case publicKey
-    }
-    
-    enum PublicKeyDictionaryKeys: String, CodingKey {
-        case user
-        case rp
-        case pubKeyCredParams
-        case challenge
-        case authenticatorSelection
-    }
-    
-    enum UserKeys: String, CodingKey {
-        case name
-        case id
-    }
-
-    enum pubKeyCredParams: String, CodingKey {
-        case alg
-    }
-}
-
-private struct PubKeyCredParams: Codable {
-    var alg: Int
-    var type: String
-}
-
-private struct AuthenticatorSelection: Codable {
-    var requireResidentKey: Bool?
-    var userVerification: String?
-}
-
-extension WebAuthnRegisterRequest: Decodable {
-    init(from decoder: Decoder) throws {
-        let request = try decoder.container(keyedBy: RequestKeys.self)
-        let publicKeyDictionary = try request.nestedContainer(keyedBy: PublicKeyDictionaryKeys.self, forKey: .publicKey)
-       
-        let userDictionary = try publicKeyDictionary.nestedContainer(keyedBy: UserKeys.self, forKey: .user)
-        
-        username = try userDictionary.decode(String.self, forKey: .name)
-        userID = try userDictionary.decode(String.self, forKey: .id)
-        
-        let rpDictionary = try publicKeyDictionary.nestedContainer(keyedBy: UserKeys.self, forKey: .rp)
-        rpID = try rpDictionary.decodeIfPresent(String.self, forKey: .id)
-        rpName = try rpDictionary.decode(String.self, forKey: .name)
-        
-        let pubKeyCredParamsArray = try publicKeyDictionary.decode([PubKeyCredParams].self, forKey: .pubKeyCredParams)
-        let pubKeyCredParam = pubKeyCredParamsArray.first
-        
-        // -7 (ECC) or -257 (RSA)
-        pubKeyAlg = pubKeyCredParam?.alg ?? -7
-        
-        if let authenticatorSelection = try publicKeyDictionary.decodeIfPresent(AuthenticatorSelection.self, forKey: .authenticatorSelection) {
-            residentKey = authenticatorSelection.requireResidentKey ?? false
-            userVerification = authenticatorSelection.userVerification == "required"
-        } else {
-            residentKey = false
-            userVerification = false
+struct WebAuthnRegisterRequest: Decodable {
+    struct PublicKey: Decodable {
+        struct PubKeyCredParams: Decodable {
+            var alg: Int
+            var type: String
         }
         
-        challenge = try publicKeyDictionary.decode(String.self, forKey: .challenge)
+        struct User: Decodable {
+            var displayName: String
+            var name: String
+            var id: String
+        }
+        
+        struct Rp: Decodable {
+            var id: String?
+            var name: String
+        }
+        
+        // This struct itself is optional
+        // If present the two keys may or may not be present
+        struct AuthenticatorSelection: Decodable {
+            var requireResidentKey: Bool?
+            var userVerification: String?
+        }
+        
+        let authenticatorSelection: AuthenticatorSelection?
+        let pubKeyCredParams: [PubKeyCredParams]
+        let user: User
+        let rp: Rp
+        let challenge: String
     }
+    let publicKey: PublicKey
 }
