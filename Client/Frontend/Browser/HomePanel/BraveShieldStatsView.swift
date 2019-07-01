@@ -71,7 +71,6 @@ class BraveShieldStatsView: UIView, Themeable {
     }
     
     @objc private func update() {
-        BraveGlobalShieldStats.shared.httpse = 12345
         adsStatView.stat = (BraveGlobalShieldStats.shared.adblock + BraveGlobalShieldStats.shared.trackingProtection).decimalFormattedString ?? "0"
         httpsStatView.stat = BraveGlobalShieldStats.shared.httpse.decimalFormattedString ?? "0"
         timeStatView.stat = timeSaved
@@ -104,10 +103,12 @@ class BraveShieldStatsView: UIView, Themeable {
                 text = Strings.ShieldsTimeStatsDays
             }
             
+
             if let counterLocaleStr = Int(counter).decimalFormattedString {
                 return counterLocaleStr + text
             } else {
                 return "0" + Strings.ShieldsTimeStatsSeconds     // If decimalFormattedString returns nil, default to "0s"
+
             }
         }
     }
