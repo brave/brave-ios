@@ -71,8 +71,8 @@ class BraveShieldStatsView: UIView, Themeable {
     }
     
     @objc private func update() {
-        adsStatView.stat = "\(BraveGlobalShieldStats.shared.adblock + BraveGlobalShieldStats.shared.trackingProtection)"
-        httpsStatView.stat = "\(BraveGlobalShieldStats.shared.httpse)"
+        adsStatView.stat = toLocaleString(num: BraveGlobalShieldStats.shared.adblock + BraveGlobalShieldStats.shared.trackingProtection)
+        httpsStatView.stat = toLocaleString(num: BraveGlobalShieldStats.shared.httpse)
         timeStatView.stat = timeSaved
     }
     
@@ -103,8 +103,15 @@ class BraveShieldStatsView: UIView, Themeable {
                 text = Strings.ShieldsTimeStatsDays
             }
             
-            return "\(Int(counter))\(text)"
+            return toLocaleString(num: Int(counter)) + text
         }
+    }
+    
+    func toLocaleString(num: Int) -> String {
+        let numberFormatter = NumberFormatter()
+        numberFormatter.numberStyle = NumberFormatter.Style.decimal
+        numberFormatter.locale = NSLocale.current
+        return numberFormatter.string(from: num as NSNumber) ?? ""
     }
 }
 
