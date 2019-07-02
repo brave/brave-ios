@@ -27,6 +27,27 @@ open class RollingFileLogger: XCGLogger {
         self.sizeLimit = sizeLimit
         self.logDirectoryPath = logDirectoryPath
         super.init()
+        
+        if !AppConstants.BuildChannel.isRelease {
+            setUpConsoleLogs()
+        }
+    }
+    
+    // This allows us to read logs straight from Console.app or be gathered via sysdiagnose.
+    private func setUpConsoleLogs() {
+        // Create a destination for the system console log (via NSLog)
+        let systemDestination = AppleSystemLogDestination(identifier: "com.brave.logs")
+        
+        systemDestination.outputLevel = .debug
+        systemDestination.showLogIdentifier = false
+        systemDestination.showFunctionName = true
+        systemDestination.showThreadName = true
+        systemDestination.showLevel = true
+        systemDestination.showFileName = true
+        systemDestination.showLineNumber = true
+        systemDestination.showDate = true
+        
+        add(destination: systemDestination)
     }
 
     /**
