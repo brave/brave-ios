@@ -277,6 +277,8 @@ extension BrowserViewController: WKNavigationDelegate {
         // If none of our helpers are responsible for handling this response,
         // just let the webview handle it as normal.
         decisionHandler(.allow)
+        
+        flushCookiesToTabStorage(for: webView)
     }
 
     func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
@@ -336,6 +338,32 @@ extension BrowserViewController: WKNavigationDelegate {
                 topToolbar.updateProgressBar(1.0)
             }
             tabsBar.reloadDataAndRestoreSelectedTab()
+        }
+        
+        flushCookiesToTabStorage(for: webView)
+    }
+    
+    private func flushCookiesToTabStorage(for webView: WKWebView) {
+        if let tab = tabManager[webView] {
+            let group = DispatchGroup()
+            let tabs = sequence(first: tab, next: { $0.parent }).reversed()
+            var cookies = [[HTTPCookie]](repeating: [], count: tabs.count)
+            
+            for it in tabs.enumerated() {
+                group.enter()
+                it.element.webView?.configuration.websiteDataStore.httpCookieStore.getAllCookies({
+                    cookies[it.offset] = $0
+                    group.leave()
+                })
+            }
+            
+            group.notify(queue: .main) {
+                cookies.flatMap({ $0 }).forEach({
+                    tab.cookieStorage.setCookie($0)
+                })
+                tab.temporaryDocument?.setCookies(tab.cookieStorage.cookies)
+                tab.cookieStorage.cookies?.forEach({ tab.cookieStorage.deleteCookie($0) })
+            }
         }
     }
 }

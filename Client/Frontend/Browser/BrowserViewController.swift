@@ -1879,12 +1879,14 @@ extension BrowserViewController: TabDelegate {
     }
 
     func tab(_ tab: Tab, willDeleteWebView webView: WKWebView) {
-        tab.cancelQueuedAlerts()
-        KVOs.forEach { webView.removeObserver(self, forKeyPath: $0.rawValue) }
-        webView.scrollView.removeObserver(self.scrollController, forKeyPath: KVOConstants.contentSize.rawValue)
-        webView.uiDelegate = nil
-        webView.scrollView.delegate = nil
-        webView.removeFromSuperview()
+        ensureMainThread {
+            tab.cancelQueuedAlerts()
+            KVOs.forEach { webView.removeObserver(self, forKeyPath: $0.rawValue) }
+            webView.scrollView.removeObserver(self.scrollController, forKeyPath: KVOConstants.contentSize.rawValue)
+            webView.uiDelegate = nil
+            webView.scrollView.delegate = nil
+            webView.removeFromSuperview()
+        }
     }
 
     fileprivate func findSnackbar(_ barToFind: SnackBar) -> Int? {
@@ -2128,7 +2130,19 @@ extension BrowserViewController: WKUIDelegate {
         if let currentTab = tabManager.selectedTab {
             screenshotHelper.takeScreenshot(currentTab)
         }
-
+        
+        // Copy the parent's cookies to the child tab
+        // Firefox desktop and chrome desktop work the same way.
+        // Cookies do NOT persist and do NOT get shared across individual tabs.
+        // Cookies are only shared from parent to child (same as Desktop).
+        // Cookies are domain specific and do NOT leak when requested by a different domain.
+        // - Brandon T.
+        parentTab.webView?.configuration.websiteDataStore.httpCookieStore.getAllCookies({
+            $0.forEach({
+                configuration.websiteDataStore.httpCookieStore.setCookie($0, completionHandler: nil)
+            })
+        })
+        
         // If the page uses `window.open()` or `[target="_blank"]`, open the page in a new tab.
         // IMPORTANT!!: WebKit will perform the `URLRequest` automatically!! Attempting to do
         // the request here manually leads to incorrect results!!

@@ -83,6 +83,7 @@ class Tab: NSObject {
     var url: URL?
     var mimeType: String?
     var isEditing: Bool = false
+    let cookieStorage = BATEphemeralCookieStorage()
 
     // When viewing a non-HTML content type in the webview (like a PDF document), this URL will
     // point to a tempfile containing the content so it can be shared to external applications.
