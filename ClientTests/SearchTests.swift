@@ -74,13 +74,13 @@ class SearchTests: XCTestCase {
             "foo@gmail.com.com",
             "foo+100@gmail.com",
             "foo-100@yahoo-test.com",
-            #""foo@gmail.com"#
+            "foo@gmail.com.1a",
+            "foo123@gmail.a"
         ]
         
         let invalidEmails = [
             "foo",
             "foo@.com.my",
-            "foo123@gmail.a",
             "foo123@.com",
             "foo123@.com.com",
             ".foo@foo.com",
@@ -89,16 +89,16 @@ class SearchTests: XCTestCase {
             "foo..2002@gmail.com",
             "foo.@gmail.com",
             "foo@foo@gmail.com",
-            "foo@gmail.com.1a",
+            #""foo@gmail.com"#,
             #""foo@gmail.com""#
         ]
         
         validEmails.forEach({
-            XCTAssertTrue(URIFixup.isValidEmail($0))
+            XCTAssertTrue(URIFixup.isValidEmail($0), "\($0) is not a valid email")
         })
         
         invalidEmails.forEach({
-            XCTAssertFalse(URIFixup.isValidEmail($0))
+            XCTAssertFalse(URIFixup.isValidEmail($0), "\($0) is a valid email")
         })
     }
 

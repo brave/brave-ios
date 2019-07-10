@@ -72,7 +72,7 @@ class URIFixup {
             return false
         }
         
-        let regex =
+        let regexRFC2822 =
             "(?:[a-zA-Z0-9!#$%\\&‘*+/=?\\^_`{|}~-]+(?:\\.[a-zA-Z0-9!#$%\\&'*+/=?\\^_`{|}" +
             "~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\" +
             "x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-" +
@@ -81,7 +81,9 @@ class URIFixup {
             "9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21" +
             "-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])"
         
+        let relaxedRegexRFC2822 = "[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?"
+        
         //return NSPredicate(format: "SELF MATCHES[c] %@", regex).evaluate(with: string)
-        return string.range(of: regex, options: .regularExpression) == string.startIndex..<string.endIndex
+        return string.range(of: regexRFC2822, options: .regularExpression) == string.startIndex..<string.endIndex || string.range(of: relaxedRegexRFC2822, options: .regularExpression) == string.startIndex..<string.endIndex
     }
 }
