@@ -163,9 +163,6 @@
 /* Section title for adbblock, tracking protection, HTTPS-E, and cookies */
 "BraveShieldDefaults" = "Brave 保護機能の既定設定";
 
-/* Brave sync page title */
-"BraveSync" = "Brave 同期 (ベータ)";
-
 /* Sync settings welcome */
 "BraveSyncWelcome" = "はじめに、同期させたいすべてのデバイスにBraveをインストールする必要があります。そして、同期チェーンを開始してすべてのデバイスを安全につなげます。";
 
@@ -191,7 +188,7 @@
 "CancelButtonTitle" = "キャンセル";
 
 /* Button in settings that clears private data for the selected items. Also used as section title in settings panel */
-"ClearPrivateData" = "プライベートデータを消去";
+"ClearPrivateData" = "プライベートデータを消去する";
 
 /* The cancel button when confirming clear private data. */
 "ClearPrivateDataAlertCancelButtonTitle" = "キャンセル";
@@ -214,9 +211,6 @@
 /* No comment provided by engineer. */
 "CloseAllTabsTitle" = "%i 個のタブをすべて閉じる";
 
-/* Code words input help */
-"CodeWordInputHelp" = "入手した同期チェーンのコードワードを入力します。";
-
 /* Code words section title */
 "CodeWords" = "コードワード";
 
@@ -225,6 +219,9 @@
 
 /* Cookie settings option title */
 "CookieControl" = "Cookie コントロール";
+
+/* Settings item for clearing cookies and site data */
+"Cookies" = "クッキーとサイトのデータ";
 
 /* Copied action complete title */
 "Copied" = "コピーしました！";
@@ -344,10 +341,7 @@
 "ErrorPagesVisitOnceButton" = "それでもサイトを訪問";
 
 /* Shields Time Saved Stat */
-"EstTimerSaved" = "保存済みの\n推定時間";
-
-/* Share action title */
-"FindInPage" = "ページ内で見つける";
+"EstTimerSaved" = "節約できた\n時間(推定)";
 
 /* Done button in Find in Page Toolbar. */
 "FindInPageDoneButtonAccessibilityLabel" = "完了";
@@ -437,7 +431,7 @@
 "Name" = "名前";
 
 /* tabs bar show/hide option */
-"NeverShow" = "決して表示しない";
+"NeverShow" = "常に非表示";
 
 /* Title for new folder popup */
 "NewFolder" = "新しいフォルダ";
@@ -505,6 +499,9 @@
 /* Setting to keep app in private mode */
 "PrivateBrowsingOnly" = "プライベートブラウジングのみ";
 
+/* Private tab details */
+"PrivateTabBody" = "プライベートタブは Brave への保存はされませんが、オンライン上で匿名になるわけではありません。プライベートタブで訪問したサイトは履歴には表示されず、サイトを閉じれば Cookie は必ず削除されます。つまりサイトの形跡が Brave に残ることはありません。一方で、プライベートタブを使っても、ご利用の携帯電話会社 (または接続している WiFi ネットワークや VPN の所有者) はあなたが訪問したサイトを確認できるほか、訪問先のサイトもあなたのパブリック IP アドレスを知ることができます。";
+
 /* Private tab detail text */
 "PrivateTabDetails" = "プライベートタブを使うと、Braveのデバイス上での動作は変わりますが、その他の行動は変わりません。\n              \n              あなたのIPアドレスは訪問先のサイトにより追跡され、あなたがいるおよその位置 (都市など) が推測されます。この位置情報の推測は、さらに詳細になる場合もあります。また、サイトはあなたが具体的に伝達したあらゆる内容 (検索語句など) を知ることができます。サイトにログインした場合、サイトにはあなたがそのアカウントの所有者であることが伝わります。プライベートタブを閉じるとことで、Braveはログイン状態を維持するCookieを破棄するため、あなたはログアウトします。\n              \n              あなたをインターネットに接続する者 (ISP) は、あなたのネットワークアクティビティをすべて見ることができます。多くの場合、これはご利用の携帯電話会社になります。WiFiネットワークに接続している場合は、そのネットワークの所有者になります。VPNを使用している場合は、そのVPNの管理者になります。ISPは、あなたがどのサイトを訪問したかを知ることができます。サイトがHTTPSを使っている場合、あなたがそのサイトで何をしたかについてISPの推測能力が限られます。HTTPのみが使用されている場合は、ISPによりあらゆること (検索語句、閲覧したページ、ジャンプしたリンク) がサイトに伝わります。\n              \n              雇用主がデバイスを管理している場合、雇用主もあなたがそのデバイスで行った行動を追跡できる可能性があります。プライベートタブを使ったとしても、訪問先のサイトを隠すことは不可能です。また、そのデバイスにアクセスできる他の人が、あなたのアクティビティをモニタリングするソフトウェアをインストールしている可能性もあります。その場合、プライベートタブを使ってもモニタリングを回避することはできません。";
 
@@ -519,6 +516,9 @@
 
 /* Title for quick-search engines settings section. */
 "QuickSearchEngines" = "クイック検索エンジン";
+
+/* Open the App Store to rate Brave. */
+"RateBrave" = "Braveを評価";
 
 /* Accessibility label for button increasing font size in display settings of reader mode */
 "ReaderModeBiggerFontButtonAccessibilityLabel" = "テキストサイズを大きくする";
@@ -653,10 +653,10 @@
 "Security" = "セキュリティ";
 
 /* Message displayed in the crash dialog above the buttons used to select when sending reports */
-"SendCrashReportAlertMessage" = "クラッシュレポートを送信して Brave の問題修正をサポートしますか？";
+"SendCrashReportAlertMessage" = "Braveが問題を解決できるようにクラッシュレポートを送信しますか？";
 
 /* Title for prompt displayed to user after the app crashes */
-"SendCrashReportAlertTitle" = "失礼！ Brave がクラッシュしました";
+"SendCrashReportAlertTitle" = "申し訳ございません。Brave がクラッシュしました";
 
 /* Used as a button label for crash dialog prompt */
 "SendReportButtonTitle" = "レポートを送信";
@@ -671,7 +671,7 @@
 "ShareLinkActionTitle" = "リンクを共有";
 
 /* shields overview message */
-"ShieldsOverview" = "サイトの保護機能では、訪問したサイトで広告とトラッカーをブロックするタイミングをコントロールすることができます。特定のサイトで広告を表示させたい場合、ここで設定することができます。";
+"ShieldsOverview" = "サイトの保護機能では、サイト毎に広告やトラッカーをブロックするか設定することができます。特定のサイトで広告を表示させたい場合、ここで設定することができます。";
 
 /* shields overview footer message */
 "ShieldsOverviewFooter" = "注意: 一部のサイトでは適切な動作にスクリプトが必要なため、この保護機能はデフォルトでオフになっています。";
@@ -715,9 +715,6 @@
 /* Support section title */
 "Support" = "サポート";
 
-/* Sync settings section title */
-"Sync" = "同期 (ベータ)";
-
 /* Add another device cell button. */
 "SyncAddAnotherDevice" = "別のデバイスを追加";
 
@@ -732,9 +729,6 @@
 
 /* Add device to sync with code words */
 "SyncAddDeviceWords" = "同期コードを入力";
-
-/* Sync add device description */
-"SyncAddMobileWordsDescription" = "デバイスの「設定」パネルで「Brave 同期」へ移動し、「%@」ボタンをタップします。下記の同期チェーンのコードワードを入力します。";
 
 /* Add Tablet or phone title */
 "SyncAddTabletOrPhoneTitle" = "タブレットまたは電話を追加";
@@ -813,9 +807,6 @@
 
 /* Sync to existing device */
 "SyncToDevice" = "デバイスに同期";
-
-/* Sync to existing device description */
-"SyncToDeviceDescription" = "既存の同期済みデバイスを使って「Brave設定」を開き、「デバイスと設定」を選択します。「+」をタップして新しいデバイスを追加し、同期コードを表示します。";
 
 /* Description on popup when setting up a sync group fails */
 "SyncUnableCreateGroup" = "新しい同期グループを作成できません。";
