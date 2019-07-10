@@ -340,6 +340,9 @@
 /* Shields Time Saved Stat */
 "EstTimerSaved" = "Tempo previsto \nper il salvataggio";
 
+/* Share action title */
+"FindInPage" = "Trova nella pagina";
+
 /* Done button in Find in Page Toolbar. */
 "FindInPageDoneButtonAccessibilityLabel" = "Fine";
 
@@ -411,9 +414,6 @@
 
 /* Copy password text selection menu item */
 "MenuItemCopyTitle" = "Copia";
-
-/* Text selection menu item */
-"MenuItemFindInPageTitle" = "Trova nella pagina";
 
 /* Hide password text selection menu item */
 "MenuItemHidePasswordTitle" = "Nascondi";

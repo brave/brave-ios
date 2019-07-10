@@ -340,6 +340,9 @@
 /* Shields Time Saved Stat */
 "EstTimerSaved" = "Tiempo estimado\nahorrado";
 
+/* Share action title */
+"FindInPage" = "Encontrar en la página";
+
 /* Done button in Find in Page Toolbar. */
 "FindInPageDoneButtonAccessibilityLabel" = "Listo";
 
@@ -411,9 +414,6 @@
 
 /* Copy password text selection menu item */
 "MenuItemCopyTitle" = "Copiar";
-
-/* Text selection menu item */
-"MenuItemFindInPageTitle" = "Encontrar en la página";
 
 /* Hide password text selection menu item */
 "MenuItemHidePasswordTitle" = "Ocultar";

@@ -343,6 +343,9 @@
 /* Shields Time Saved Stat */
 "EstTimerSaved" = "節約できた\n時間(推定)";
 
+/* Share action title */
+"FindInPage" = "ページ内で見つける";
+
 /* Done button in Find in Page Toolbar. */
 "FindInPageDoneButtonAccessibilityLabel" = "完了";
 
@@ -414,9 +417,6 @@
 
 /* Copy password text selection menu item */
 "MenuItemCopyTitle" = "コピー";
-
-/* Text selection menu item */
-"MenuItemFindInPageTitle" = "ページ内で見つける";
 
 /* Hide password text selection menu item */
 "MenuItemHidePasswordTitle" = "非表示";

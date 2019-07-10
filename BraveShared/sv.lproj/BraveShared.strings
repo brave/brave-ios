@@ -340,6 +340,9 @@
 /* Shields Time Saved Stat */
 "EstTimerSaved" = "Uppskattad tid\nsparad";
 
+/* Share action title */
+"FindInPage" = "Sök på sidan";
+
 /* Done button in Find in Page Toolbar. */
 "FindInPageDoneButtonAccessibilityLabel" = "Klar";
 
@@ -411,9 +414,6 @@
 
 /* Copy password text selection menu item */
 "MenuItemCopyTitle" = "Kopiera";
-
-/* Text selection menu item */
-"MenuItemFindInPageTitle" = "Sök på sidan";
 
 /* Hide password text selection menu item */
 "MenuItemHidePasswordTitle" = "Dölj";
