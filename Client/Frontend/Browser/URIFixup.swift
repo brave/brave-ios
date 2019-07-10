@@ -68,6 +68,10 @@ class URIFixup {
     /// Checks whether a string is a valid email conforming to RFC 2822.
     /// http://www.cocoawithlove.com/2009/06/verifying-that-string-is-email-address.html
     static func isValidEmail(_ string: String) -> Bool {
+        if string.isEmpty {
+            return false
+        }
+        
         let regex =
             "(?:[a-zA-Z0-9!#$%\\&‘*+/=?\\^_`{|}~-]+(?:\\.[a-zA-Z0-9!#$%\\&'*+/=?\\^_`{|}" +
             "~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\" +
@@ -76,6 +80,8 @@ class URIFixup {
             "]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-" +
             "9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21" +
             "-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])"
-        return NSPredicate(format: "SELF MATCHES[c] %@", regex).evaluate(with: string)
+        
+        //return NSPredicate(format: "SELF MATCHES[c] %@", regex).evaluate(with: string)
+        return string.range(of: regex, options: .regularExpression) == string.startIndex..<string.endIndex
     }
 }
