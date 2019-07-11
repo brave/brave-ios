@@ -341,7 +341,7 @@ extension TabLocationView: TabEventHandler {
     }
 }
 
-private class DisplayTextField: UITextField {
+class DisplayTextField: UITextField {
     weak var accessibilityActionsSource: AccessibilityActionsSource?
     var hostString: String = ""
     let pathPadding: CGFloat = 20.0
