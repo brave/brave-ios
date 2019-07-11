@@ -178,7 +178,7 @@ extension BrowserViewController: WKNavigationDelegate {
             // request then the page is reloaded with a proper url and adblocking rules are applied.
             
             // Can't use mainDocumentURL as it is not reliable and main purpose is to  check that frame url and request url is same where frame is main.
-            var frame: WKFrameInfo? = nil
+            var frame: WKFrameInfo?
             
             // This is to get valid frame (in case of reload source frame is alwyas uninitialized).
             if navigationAction.sourceFrame == nil {
@@ -188,7 +188,7 @@ extension BrowserViewController: WKNavigationDelegate {
             }
             
             // This is done because the there can be a frame with no request
-            if frame?.securityOrigin.protocol == "" {
+            if frame != nil, frame!.securityOrigin.protocol.isEmpty {
                 frame = nil
             }
             
