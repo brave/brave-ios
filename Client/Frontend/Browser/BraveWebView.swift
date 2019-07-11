@@ -7,10 +7,22 @@ import WebKit
 
 class BraveWebView: WKWebView {
     
+    private static var nonPersistentDataStore: WKWebsiteDataStore?
+    private static func sharedNonPersistentDataStore() -> WKWebsiteDataStore {
+        if let dataStore = nonPersistentDataStore {
+            return dataStore
+        }
+        
+        let dataStore = WKWebsiteDataStore.nonPersistent()
+        nonPersistentDataStore = dataStore
+        return dataStore
+    }
+    
     init(frame: CGRect, configuration: WKWebViewConfiguration = WKWebViewConfiguration(), isPrivate: Bool = true) {
         if isPrivate {
-            configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
+            configuration.websiteDataStore = BraveWebView.sharedNonPersistentDataStore()
         } else {
+            BraveWebView.nonPersistentDataStore = nil //switching to normal mode destroys all data-stores
             configuration.websiteDataStore = WKWebsiteDataStore.default()
         }
         

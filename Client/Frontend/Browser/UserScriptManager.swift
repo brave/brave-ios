@@ -119,6 +119,18 @@ class UserScriptManager {
 
         return WKUserScript(source: alteredSource, injectionTime: .atDocumentEnd, forMainFrameOnly: false)
     }()
+    
+    private let resourceDownloadManagerUserScript: WKUserScript? = {
+        guard let path = Bundle.main.path(forResource: "ResourceDownloader", ofType: "js"), let source = try? String(contentsOfFile: path) else {
+            log.error("Failed to load ResourceDownloader.js")
+            return nil
+        }
+        var alteredSource: String = source
+        let token = UserScriptManager.securityToken.uuidString.replacingOccurrences(of: "-", with: "", options: .literal)
+        alteredSource = alteredSource.replacingOccurrences(of: "$<downloadManager>", with: "D\(token)", options: .literal)
+        
+        return WKUserScript(source: alteredSource, injectionTime: .atDocumentEnd, forMainFrameOnly: false)
+    }()
 
     private func reloadUserScripts() {
         tab?.webView?.configuration.userContentController.do {
@@ -137,6 +149,10 @@ class UserScriptManager {
             }
 
             if isU2FEnabled, let script = U2FLowLevelUserScript {
+                $0.addUserScript(script)
+            }
+            
+            if let script = resourceDownloadManagerUserScript {
                 $0.addUserScript(script)
             }
         }
