@@ -48,7 +48,7 @@ class ResourceDownloadManager: TabContentScript {
         do {
             let response = try DownloadedResourceResponse.from(message: message)
             tab?.temporaryDocument?.onDocumentDownloaded(document: response, error: nil)
-        } catch let error {
+        } catch {
             tab?.temporaryDocument?.onDocumentDownloaded(document: nil, error: error)
         }
     }

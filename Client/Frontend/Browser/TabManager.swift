@@ -530,7 +530,7 @@ class TabManager: NSObject {
         if tab.isPrivate {
             // Only when ALL tabs are dead, we clean up.
             // This is because other tabs share the same data-store.
-            if allTabs.filter({ $0.isPrivate }).count <= 1 {
+            if tabsForCurrentMode.count <= 1 {
                 removeAllBrowsingDataForTab(tab)
             }
         }

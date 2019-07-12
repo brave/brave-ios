@@ -126,6 +126,10 @@ class UserScriptManager {
             return nil
         }
         var alteredSource: String = source
+        
+        //Verify that the application itself is making a call to the JS script instead of other scripts on the page.
+        //This variable will be unique amongst scripts loaded in the page.
+        //When the script is called, the token is provided in order to access teh script variable.
         let token = UserScriptManager.securityToken.uuidString.replacingOccurrences(of: "-", with: "", options: .literal)
         alteredSource = alteredSource.replacingOccurrences(of: "$<downloadManager>", with: "D\(token)", options: .literal)
         
