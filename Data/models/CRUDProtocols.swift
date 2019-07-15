@@ -26,7 +26,7 @@ protocol Readable where Self: NSManagedObject {
 
 // MARK: - Implementations
 extension Deletable where Self: NSManagedObject {
-    func delete(context: WriteContext = .new(false)) {
+    func delete(context: WriteContext = .new(inMemory: false)) {
         
         DataController.perform(context: context) { context in
             let objectOnContext = context.object(with: self.objectID)
@@ -35,7 +35,7 @@ extension Deletable where Self: NSManagedObject {
     }
     
     static func deleteAll(predicate: NSPredicate? = nil,
-                          context: WriteContext = .new(false),
+                          context: WriteContext = .new(inMemory: false),
                           includesPropertyValues: Bool = true) {
         
         DataController.perform(context: context) { context in

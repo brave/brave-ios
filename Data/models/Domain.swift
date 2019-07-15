@@ -34,7 +34,7 @@ public final class Domain: NSManagedObject, CRUD {
 
     public class func setBraveShield(forUrl url: URL, shield: BraveShield,
                                      isOn: Bool?, isPrivateBrowsing: Bool) {
-        let _context: WriteContext = isPrivateBrowsing ? .new(true) : .new(false)
+        let _context: WriteContext = isPrivateBrowsing ? .new(inMemory: true) : .new(inMemory: false)
         setBraveShieldInternal(forUrl: url, shield: shield, isOn: isOn, context: _context)
     }
     
@@ -87,7 +87,7 @@ public final class Domain: NSManagedObject, CRUD {
     }
     
     public static func clearInMemoryDomains() {
-        Domain.deleteAll(predicate: nil, context: .new(true))
+        Domain.deleteAll(predicate: nil, context: .new(inMemory: true))
     }
 }
 
@@ -160,7 +160,7 @@ extension Domain {
     
     // MARK: Shields
     
-    class func setBraveShieldInternal(forUrl url: URL, shield: BraveShield, isOn: Bool?, context: WriteContext = .new(false)) {
+    class func setBraveShieldInternal(forUrl url: URL, shield: BraveShield, isOn: Bool?, context: WriteContext = .new(inMemory: false)) {
         DataController.perform(context: context) { context in
             let domain = Domain.getOrCreateInternal(url, context: context)
             domain.setBraveShield(shield: shield, isOn: isOn, context: context)
