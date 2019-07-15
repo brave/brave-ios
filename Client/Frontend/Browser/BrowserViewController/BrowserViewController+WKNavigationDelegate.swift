@@ -160,6 +160,7 @@ extension BrowserViewController: WKNavigationDelegate {
                 if let mainDocumentURL = navigationAction.request.mainDocumentURL, url.scheme == "http" {
                     let domainForShields = Domain.getOrCreate(forUrl: mainDocumentURL)
                     let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
+                    // Loading bad data
                     if domainForShields.isShieldExpected(.HTTPSE, isPrivateBrowsing: isPrivateBrowsing) && HttpsEverywhereStats.shared.shouldUpgrade(url) {
                         // Check if HTTPSE is on and if it is, whether or not this http url would be upgraded
                         pendingHTTPUpgrades[urlHost] = navigationAction.request
