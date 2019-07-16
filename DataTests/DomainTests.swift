@@ -63,10 +63,14 @@ class DomainTests: CoreDataTestCase {
     
     /// Tests non-HTTPSE shields
     func testNormalShieldSettings() {
-        let url = url2HTTPS
         let domain = Domain.getOrCreate(forUrl: url2HTTPS)
-        Domain.setBraveShield(forUrl: url2HTTPS, shield: .SafeBrowsing, isOn: true, isPrivateBrowsing: false)
-        Domain.setBraveShield(forUrl: url2HTTPS, shield: .AdblockAndTp, isOn: false, isPrivateBrowsing: false)
+        backgroundSaveAndWaitForExpectation {
+            Domain.setBraveShield(forUrl: url2HTTPS, shield: .SafeBrowsing, isOn: true, isPrivateBrowsing: false)
+        }
+        
+        backgroundSaveAndWaitForExpectation {
+            Domain.setBraveShield(forUrl: url2HTTPS, shield: .AdblockAndTp, isOn: false, isPrivateBrowsing: false)
+        }
         
         XCTAssertTrue(domain.isShieldExpected(BraveShield.SafeBrowsing, isPrivateBrowsing: false))
         // Not testing via isSheildExpected, since that adds default checks
@@ -79,8 +83,13 @@ class DomainTests: CoreDataTestCase {
         
         // Setting to "new" values
         // Setting to same value
-        Domain.setBraveShield(forUrl: url2HTTPS, shield: .SafeBrowsing, isOn: true, isPrivateBrowsing: false)
-        Domain.setBraveShield(forUrl: url2HTTPS, shield: .AdblockAndTp, isOn: true, isPrivateBrowsing: false)
+        backgroundSaveAndWaitForExpectation {
+            Domain.setBraveShield(forUrl: url2HTTPS, shield: .SafeBrowsing, isOn: true, isPrivateBrowsing: false)
+        }
+        
+        backgroundSaveAndWaitForExpectation {
+            Domain.setBraveShield(forUrl: url2HTTPS, shield: .AdblockAndTp, isOn: true, isPrivateBrowsing: false)
+        }
         
         XCTAssertTrue(domain.isShieldExpected(BraveShield.SafeBrowsing, isPrivateBrowsing: false))
         XCTAssertTrue(domain.isShieldExpected(BraveShield.AdblockAndTp, isPrivateBrowsing: false))
@@ -93,7 +102,9 @@ class DomainTests: CoreDataTestCase {
     /// Testing HTTPSE
     /// if setting an HTTP scheme, that HTTPS is also set
     func testHTTPSEforHTTPsetter() {
-        Domain.setBraveShield(forUrl: url, shield: .HTTPSE, isOn: true, isPrivateBrowsing: false)
+        backgroundSaveAndWaitForExpectation {
+            Domain.setBraveShield(forUrl: url, shield: .HTTPSE, isOn: true, isPrivateBrowsing: false)
+        }
         
         // Should be one for HTTP and one for HTTPS schemes
         XCTAssertEqual(try! DataController.viewContext.count(for: fetchRequest), 2)
@@ -108,7 +119,9 @@ class DomainTests: CoreDataTestCase {
     /// Testing HTTPSE
     /// if setting an HTTPS scheme, that HTTP is also set
     func testHTTPSEforHTTPSsetter() {
-        Domain.setBraveShield(forUrl: url2HTTPS, shield: .HTTPSE, isOn: true, isPrivateBrowsing: false)
+        backgroundSaveAndWaitForExpectation {
+            Domain.setBraveShield(forUrl: url2HTTPS, shield: .HTTPSE, isOn: true, isPrivateBrowsing: false)
+        }
 
         // Should be one for HTTP and one for HTTPS schemes
         XCTAssertEqual(try! DataController.viewContext.count(for: fetchRequest), 2)

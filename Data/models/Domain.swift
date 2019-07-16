@@ -208,7 +208,7 @@ extension Domain {
             
           // HTTPSE must be scheme indepedent or user may get stuck not being able to access the http version
           //  of a website (turning off httpse for an upgraded-https domain does not allow access to http version)
-          self.domainForInverseHttpScheme()?.shield_httpse = setting
+          self.domainForInverseHttpScheme(context: context)?.shield_httpse = setting
         case .SafeBrowsing: shield_safeBrowsing = setting
         case .FpProtection: shield_fpProtection = setting
         case .NoScript: shield_noScript = setting
@@ -267,7 +267,7 @@ extension Domain {
     }
     
     /// Returns `url` but switches the scheme from `http` <-> `https`
-    private func domainForInverseHttpScheme() -> Domain? {
+    private func domainForInverseHttpScheme(context: NSManagedObjectContext) -> Domain? {
         
         guard var urlComponents = self.urlComponents else { return nil }
         
@@ -282,6 +282,6 @@ extension Domain {
         guard let url = urlComponents.url else { return nil }
         
         // Return the flipped scheme version of `url`
-        return Domain.getOrCreate(forUrl: url)
+        return Domain.getOrCreateInternal(url, context: context, save: true)
     }
 }
