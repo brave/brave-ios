@@ -191,19 +191,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
     
     func updateShortcutItems(_ application: UIApplication) {
         let newTabItem = UIMutableApplicationShortcutItem(type: "\(Bundle.main.bundleIdentifier ?? "").NewTab",
-            localizedTitle: NSLocalizedString("ShortcutItemTitleNewTab",
-                                              tableName: "InfoPlist",
-                                              bundle: Bundle.main,
-                                              comment: "New Tab"),
+            localizedTitle: Strings.QuickActionNewTab,
             localizedSubtitle: nil,
             icon: UIApplicationShortcutIcon(templateImageName: "quick_action_new_tab"),
             userInfo: [:])
         
         let privateTabItem = UIMutableApplicationShortcutItem(type: "\(Bundle.main.bundleIdentifier ?? "").NewPrivateTab",
-            localizedTitle: NSLocalizedString("ShortcutItemTitleNewPrivateTab",
-                                              tableName: "InfoPlist",
-                                              bundle: Bundle.main,
-                                              comment: "New Private Tab"),
+            localizedTitle: Strings.QuickActionNewPrivateTab,
             localizedSubtitle: nil,
             icon: UIApplicationShortcutIcon(templateImageName: "quick_action_new_private_tab"),
             userInfo: [:])
