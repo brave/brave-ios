@@ -182,6 +182,16 @@ class BrowserViewController: UIViewController {
         }, completion: { _ in
             self.scrollController.setMinimumZoom()
         })
+        
+        coordinator.animate(alongsideTransition: { context in
+            if let webView = self.tabManager.selectedTab?.webView {
+                webView.frame = self.view.bounds
+            }
+        }, completion: { _ in
+            if let webView = self.tabManager.selectedTab?.webView {
+                webView.frame = self.webViewContainer.bounds
+            }
+        })
     }
 
     override func didReceiveMemoryWarning() {
@@ -275,7 +285,17 @@ class BrowserViewController: UIViewController {
                 self.statusBarOverlay.backgroundColor = self.topToolbar.backgroundColor
                 self.setNeedsStatusBarAppearanceUpdate()
             }
-            }, completion: nil)
+        }, completion: nil)
+        
+        coordinator.animate(alongsideTransition: { context in
+            if let webView = self.tabManager.selectedTab?.webView {
+                webView.frame = self.view.bounds
+            }
+        }, completion: { _ in
+            if let webView = self.tabManager.selectedTab?.webView {
+                webView.frame = self.webViewContainer.bounds
+            }
+        })
     }
 
     func dismissVisibleMenus() {
