@@ -530,7 +530,7 @@ class TabManager: NSObject {
         if tab.isPrivate {
             // Only when ALL tabs are dead, we clean up.
             // This is because other tabs share the same data-store.
-            if tabsForCurrentMode.count <= 1 {
+            if tabs(withType: .private).count <= 1 {
                 removeAllBrowsingDataForTab(tab)
             }
         }
@@ -626,11 +626,7 @@ class TabManager: NSObject {
     }
 
     func removeAllBrowsingDataForTab(_ tab: Tab, completionHandler: @escaping () -> Void = {}) {
-        let dataTypes = Set([WKWebsiteDataTypeCookies,
-                             WKWebsiteDataTypeLocalStorage,
-                             WKWebsiteDataTypeSessionStorage,
-                             WKWebsiteDataTypeWebSQLDatabases,
-                             WKWebsiteDataTypeIndexedDBDatabases])
+        let dataTypes = WKWebsiteDataStore.allWebsiteDataTypes()
         tab.webView?.configuration.websiteDataStore.removeData(ofTypes: dataTypes,
                                                                modifiedSince: Date.distantPast,
                                                                completionHandler: completionHandler)
