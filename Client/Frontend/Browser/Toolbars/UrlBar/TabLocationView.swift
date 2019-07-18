@@ -382,9 +382,11 @@ extension TabLocationView: AccessibilityActionsSource {
 extension TabLocationView: Themeable {
     func applyTheme(_ theme: Theme) {
         switch theme {
-        case .regular:
+        case Theme.regular:
             backgroundColor = BraveUX.LocationBarBackgroundColor
-        case .private:
+        case Theme.private:
+            backgroundColor = BraveUX.LocationBarBackgroundColor_PrivateMode
+        default:
             backgroundColor = BraveUX.LocationBarBackgroundColor_PrivateMode
         }
 

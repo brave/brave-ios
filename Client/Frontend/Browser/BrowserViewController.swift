@@ -209,9 +209,11 @@ class BrowserViewController: UIViewController {
 
     override var preferredStatusBarStyle: UIStatusBarStyle {
         switch Theme.of(tabManager.selectedTab) {
-        case .regular:
+        case Theme.regular:
             return .default
-        case .private:
+        case Theme.private:
+            return .lightContent
+        default:
             return .lightContent
         }
     }

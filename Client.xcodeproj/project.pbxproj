@@ -485,6 +485,9 @@
 		5D24AF8221BA459000F9506A /* BlocklistName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D24AF8121BA459000F9506A /* BlocklistName.swift */; };
 		5D24AF8421BA489A00F9506A /* ContentBlocker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D24AF8321BA489A00F9506A /* ContentBlocker.swift */; };
 		5D24AF9021BA4D7700F9506A /* ContentBlockerRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D24AF8F21BA4D7700F9506A /* ContentBlockerRegion.swift */; };
+		5D26E8A522E117750015D7E9 /* privateTheme.json in Resources */ = {isa = PBXBuildFile; fileRef = 5D26E8A422E117750015D7E9 /* privateTheme.json */; };
+		5D26E8A722E1177B0015D7E9 /* darkTheme.json in Resources */ = {isa = PBXBuildFile; fileRef = 5D26E8A622E1177A0015D7E9 /* darkTheme.json */; };
+		5D26E8A922E117800015D7E9 /* lightTheme.json in Resources */ = {isa = PBXBuildFile; fileRef = 5D26E8A822E1177F0015D7E9 /* lightTheme.json */; };
 		5D6DDEF3214003A6001FF0AE /* DAU.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6DDEE6214003A6001FF0AE /* DAU.swift */; };
 		5D6DDEFE2141B6A1001FF0AE /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6DDEF62141B6A0001FF0AE /* Preferences.swift */; };
 		5D6DDF0021428CF0001FF0AE /* DAUTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6DDEFF21428CF0001FF0AE /* DAUTests.swift */; };
@@ -1846,6 +1849,9 @@
 		5D24AF8121BA459000F9506A /* BlocklistName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlocklistName.swift; sourceTree = "<group>"; };
 		5D24AF8321BA489A00F9506A /* ContentBlocker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBlocker.swift; sourceTree = "<group>"; };
 		5D24AF8F21BA4D7700F9506A /* ContentBlockerRegion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBlockerRegion.swift; sourceTree = "<group>"; };
+		5D26E8A422E117750015D7E9 /* privateTheme.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = privateTheme.json; sourceTree = "<group>"; };
+		5D26E8A622E1177A0015D7E9 /* darkTheme.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = darkTheme.json; sourceTree = "<group>"; };
+		5D26E8A822E1177F0015D7E9 /* lightTheme.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = lightTheme.json; sourceTree = "<group>"; };
 		5D6DDEE6214003A6001FF0AE /* DAU.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DAU.swift; sourceTree = "<group>"; };
 		5D6DDEF62141B6A0001FF0AE /* Preferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
 		5D6DDEFF21428CF0001FF0AE /* DAUTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DAUTests.swift; sourceTree = "<group>"; };
@@ -3355,6 +3361,17 @@
 			path = sync;
 			sourceTree = "<group>";
 		};
+		5D26E89C22E117660015D7E9 /* Themes */ = {
+			isa = PBXGroup;
+			children = (
+				7B3631E91C244FEE00D12AF9 /* Theme.swift */,
+				5D26E8A422E117750015D7E9 /* privateTheme.json */,
+				5D26E8A822E1177F0015D7E9 /* lightTheme.json */,
+				5D26E8A622E1177A0015D7E9 /* darkTheme.json */,
+			);
+			path = Themes;
+			sourceTree = "<group>";
+		};
 		5D6DDEDF214003A6001FF0AE /* Analytics */ = {
 			isa = PBXGroup;
 			children = (
@@ -3660,7 +3677,7 @@
 				E65607601C08B4E200534B02 /* SearchInputView.swift */,
 				E63ED7D71BFCD9990097D08E /* LoginTableViewCell.swift */,
 				C4E3984B1D21F2FD004E89BA /* TabTrayButtonExtensions.swift */,
-				7B3631E91C244FEE00D12AF9 /* Theme.swift */,
+				5D26E89C22E117660015D7E9 /* Themes */,
 				59A68B1F857A8638598A63A0 /* TwoLineCell.swift */,
 				D863C8E31F68BFC20058D95F /* GradientProgressBar.swift */,
 				27D87C2D2152B50200FB55C6 /* GradientView.swift */,
@@ -5139,12 +5156,14 @@
 				3BC659591E5BA505006D560F /* top_sites.json in Resources */,
 				E4B7B7631A793CF20022C5E0 /* CharisSILI.ttf in Resources */,
 				E4CD9F541A71506400318571 /* Reader.html in Resources */,
+				5D26E8A722E1177B0015D7E9 /* darkTheme.json in Resources */,
 				C6345ECB2113B3A000CFB983 /* SearchPlugins in Resources */,
 				F930CDAC227000F200A23FE1 /* U2F.js in Resources */,
 				5D7001C222249F7B00E576FB /* ShortNameToFileMapping.json in Resources */,
 				4422D55921BFFB7F00BF1855 /* unicode.py in Resources */,
 				7B2142FE1E5E055000CDD3FC /* InfoPlist.strings in Resources */,
 				E69922171B94E3EF007C480D /* Licenses.html in Resources */,
+				5D26E8A522E117750015D7E9 /* privateTheme.json in Resources */,
 				E4CD9F5B1A71506C00318571 /* Reader.css in Resources */,
 				D0FCF8061FE4772D004A7995 /* AllFramesAtDocumentEnd.js in Resources */,
 				27658273217130D900754B2F /* DigiCertHighAssurance.cer in Resources */,
@@ -5169,6 +5188,7 @@
 				4422D4AD21BFFB7600BF1855 /* LICENSE in Resources */,
 				E4B7B7641A793CF20022C5E0 /* CharisSILR.ttf in Resources */,
 				4422D56D21BFFB7F00BF1855 /* make_unicode_groups.py in Resources */,
+				5D26E8A922E117800015D7E9 /* lightTheme.json in Resources */,
 				E4B7B7681A793CF20022C5E0 /* FiraSans-Bold.ttf in Resources */,
 				E4B7B7781A793CF20022C5E0 /* FiraSans-Italic.ttf in Resources */,
 				0BA1E00E1B03FB0B007675AF /* NetError.html in Resources */,

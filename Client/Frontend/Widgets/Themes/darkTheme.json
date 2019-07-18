@@ -1,0 +1,38 @@
+{
+  "uuid": "FAIDSFJELWEF2"
+  "title": "Default dark",
+  "url": "www.brave.com",
+  "description": "The standard default dark theme",
+  "thumb": "",
+  "isDark": true,
+  "enabled": true,
+
+  "colors": {
+    "header": "0x000000",
+    "footer": "0x000000",
+    "home": "0x0A0A0A",
+    "addressBar": "0x262626",
+    "border": "0xffffff",
+    "tints": {
+      "home": "0xE7E6E9",
+      "header": "0xE7E6E9",
+      "footer": "0xE7E6E9",
+      "addressBar": "0xE7E6E9"
+    },
+    "transparencies": {
+      "addressBarAlpha": 1.0,
+      "borderAlpha": 0.2,
+    },
+    "stats": {
+      "ads": "0xFA4214",
+      "trackers": "",
+      "httpse": "0x9339D4",
+      "timeSaved": "0xffffff"
+   }
+  },
+  "images": {
+    "header": "",
+    "footer": "",
+    "home": "",
+  }
+}

@@ -106,9 +106,11 @@ class BottomToolbarView: UIView, ToolbarProtocol {
 extension BottomToolbarView: Themeable {
     func applyTheme(_ theme: Theme) {
         switch theme {
-        case .regular:
+        case Theme.regular:
             backgroundColor = BraveUX.ToolbarsBackgroundSolidColor
-        case .private:
+        case Theme.private:
+            backgroundColor = BraveUX.DarkToolbarsBackgroundSolidColor
+        default:
             backgroundColor = BraveUX.DarkToolbarsBackgroundSolidColor
         }
 

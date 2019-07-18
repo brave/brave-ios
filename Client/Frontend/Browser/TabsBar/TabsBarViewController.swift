@@ -334,14 +334,16 @@ extension TabsBarViewController: TabManagerDelegate {
 extension TabsBarViewController: Themeable {
     func applyTheme(_ theme: Theme) {
         switch theme {
-        case .regular:
+        case Theme.regular:
             view.backgroundColor = BraveUX.GreyB
             plusButton.tintColor = BraveUX.GreyI
             bottomLine.backgroundColor = UIColor(white: 0.0, alpha: 0.2)
-        case .private:
+        case Theme.private:
             view.backgroundColor = BraveUX.Black
             plusButton.tintColor = UIColor.white
             bottomLine.backgroundColor = UIColor(white: 1.0, alpha: 0.2)
+        default:
+            break
         }
 
         collectionView.backgroundColor = view.backgroundColor
