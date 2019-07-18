@@ -6,6 +6,7 @@ import XCTest
 import Shared
 import BraveShared
 import Storage
+import Data
 import WebKit
 import ObjectiveC.runtime
 @testable import Client
@@ -93,6 +94,8 @@ class TabSessionTests: XCTestCase {
     override func tearDown() {
         super.tearDown()
         
+        destroyData { }
+        
         tabManager = nil
     }
     
@@ -102,7 +105,14 @@ class TabSessionTests: XCTestCase {
         tabManager.resetProcessPool()
         tabManager.reset()
         
+        
         let group = DispatchGroup()
+        
+        group.enter()
+        History.deleteAll({
+            group.leave()
+        })
+        
         group.enter()
         HTTPCookieStorage.shared.removeCookies(since: .distantPast)
         WKWebsiteDataStore.default().httpCookieStore.getAllCookies({
@@ -112,7 +122,10 @@ class TabSessionTests: XCTestCase {
                     group.leave()
                 })
             })
+            group.leave()
         })
+        
+        group.enter()
         WKWebsiteDataStore.default().removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(),
                                                 modifiedSince: .distantPast,
                                                 completionHandler: {
@@ -191,6 +204,74 @@ class TabSessionTests: XCTestCase {
         }
         wait(for: [dataStoreExpectation, cookieStoreExpectation], timeout: 30.0)
     }
+	
+	func Disabled_NormalTabSessionSharing() {
+		let dataStoreExpectation = XCTestExpectation(description: "dataStorePersistence")
+		let cookieStoreExpectation = XCTestExpectation(description: "cookieStorePersistence")
+		var webViewNavigationAdapter = WebViewNavigationAdapter()
+		
+		destroyData {
+			let urls = ["https://bing.com",
+						"https://google.com",
+						"https://yandex.ru",
+						"https://yahoo.com"]
+			
+			self.tabManager.addTabsForURLs(urls.compactMap({ URL(string: $0) }), zombie: false, isPrivate: false)
+			XCTAssertTrue(self.tabManager.allTabs.count == 4, "Error: Not all Tabs are created equally")
+			
+			let group = DispatchGroup()
+			self.tabManager.allTabs.forEach({
+				XCTAssertNotNil($0.webView, "WebView is not created yet")
+				if $0.webView?.configuration.websiteDataStore.isPersistent == false {
+					XCTFail("Normal Tab is not storing data persistently!")
+				}
+				
+				group.enter()
+			})
+			
+			webViewNavigationAdapter = WebViewNavigationAdapter(didFailListener: { _ in
+				group.leave()
+			}, didFinishListener: {
+				group.leave()
+			})
+			self.tabManager.addNavigationDelegate(webViewNavigationAdapter)
+			
+			group.notify(queue: .main) {
+				// All requests finished loading.. time to check the cookies..
+				let group = DispatchGroup()
+				self.tabManager.allTabs.forEach({
+					group.enter()
+					$0.webView?.configuration.websiteDataStore.fetchDataRecords(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(), completionHandler: { records in
+						XCTAssertFalse(records.isEmpty, "Error: Data Store not shared amongst normal tabs!")
+						
+						let recordNames = Set<String>(records.compactMap({ URL(string: "http://\($0.displayName)")?.host }))
+						let urlNames = Set<String>(urls.compactMap({ URL(string: $0)?.host }))
+						
+						XCTAssertTrue(urlNames.isSubset(of: recordNames), "Data Store records do not match!")
+						group.leave()
+					})
+					
+					group.enter()
+					$0.webView?.configuration.websiteDataStore.httpCookieStore.getAllCookies({ cookies in
+						XCTAssertFalse(cookies.isEmpty, "Error: Cookies not shared amongst normal tabs!")
+						
+						urls.compactMap({ URL(string: $0) }).forEach({
+							let cookiesForURL = HTTPCookie.filter(cookies: cookies, for: $0) ?? []
+							XCTAssertFalse(cookiesForURL.isEmpty, "Cookie Store records do not match!")
+						})
+						
+						group.leave()
+					})
+				})
+				
+				group.notify(queue: .main) {
+					dataStoreExpectation.fulfill()
+					cookieStoreExpectation.fulfill()
+				}
+			}
+		}
+		wait(for: [dataStoreExpectation, cookieStoreExpectation], timeout: 30.0)
+	}
     
     func testPrivateTabNonPersistence() {
         let dataStoreExpectation = XCTestExpectation(description: "dataStorePersistence")
