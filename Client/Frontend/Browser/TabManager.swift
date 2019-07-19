@@ -528,10 +528,18 @@ class TabManager: NSObject {
         }
 
         if tab.isPrivate {
+            //Remove this webview from the shared storage.
+            tab.webView?.removePersistentStore()
+            
             // Only when ALL tabs are dead, we clean up.
             // This is because other tabs share the same data-store.
             if tabs(withType: .private).count <= 1 {
                 removeAllBrowsingDataForTab(tab)
+                
+                //After clearing the very last webview from the storage, give it a blank persistent store
+                //This is the only way to guarantee that the last reference to the shared persistent store
+                //reaches zero and destroys all its data.
+                configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
             }
         }
 

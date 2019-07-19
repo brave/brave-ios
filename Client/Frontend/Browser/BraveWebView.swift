@@ -7,26 +7,23 @@ import WebKit
 
 class BraveWebView: WKWebView {
     
-    private static var nonPersistentDataStore: WKWebsiteDataStore?
-    private static func sharedNonPersistentDataStore() -> WKWebsiteDataStore {
-        if let dataStore = nonPersistentDataStore {
-            return dataStore
-        }
-        
-        let dataStore = WKWebsiteDataStore.nonPersistent()
-        nonPersistentDataStore = dataStore
-        return dataStore
-    }
+    private static let nonPersistentDataStore = ReferenceCountedDataStore()
     
     init(frame: CGRect, configuration: WKWebViewConfiguration = WKWebViewConfiguration(), isPrivate: Bool = true) {
         if isPrivate {
-            configuration.websiteDataStore = BraveWebView.sharedNonPersistentDataStore()
+            configuration.websiteDataStore = BraveWebView.nonPersistentDataStore.getDataStore()
         } else {
-            BraveWebView.nonPersistentDataStore = nil //switching to normal mode destroys all data-stores
+            BraveWebView.nonPersistentDataStore.killDataStore() //switching to normal mode destroys all data-stores
             configuration.websiteDataStore = WKWebsiteDataStore.default()
         }
         
         super.init(frame: frame, configuration: configuration)
+    }
+    
+    func removePersistentStore() {
+        if !self.configuration.websiteDataStore.isPersistent {
+            BraveWebView.nonPersistentDataStore.destroyDataStore()
+        }
     }
     
     @available(*, unavailable)
@@ -34,4 +31,35 @@ class BraveWebView: WKWebView {
         fatalError()
     }
     
+    
+    private class ReferenceCountedDataStore {
+        private var refCount = 0
+        private var dataStore: WKWebsiteDataStore?
+        
+        func getDataStore() -> WKWebsiteDataStore {
+            defer { refCount += 1}
+            
+            if let dataStore = self.dataStore {
+                return dataStore
+            }
+            
+            let dataStore = WKWebsiteDataStore.nonPersistent()
+            self.dataStore = dataStore
+            return dataStore
+        }
+        
+        func destroyDataStore() {
+            refCount -= 1
+            
+            if refCount <= 0 {
+                dataStore = nil
+                refCount = 0
+            }
+        }
+        
+        func killDataStore() {
+            refCount = 0
+            dataStore = nil
+        }
+    }
 }
