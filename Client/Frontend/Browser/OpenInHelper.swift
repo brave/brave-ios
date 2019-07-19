@@ -73,7 +73,32 @@ class DownloadHelper: NSObject, OpenInHelper {
     }
     
     func open() {
-        // When this is re-enabled in the future, present the new UI here
+        guard let host = request.url?.host else {
+            return
+        }
+        
+        let download = HTTPDownload(preflightResponse: preflightResponse, request: request)
+        
+        let expectedSize = download.totalBytesExpected != nil ? ByteCountFormatter.string(fromByteCount: download.totalBytesExpected!, countStyle: .file) : nil
+        
+        // TODO: Proper ui for download prompt.
+        
+        let alert = UIAlertController(title: "download", message: "s", preferredStyle: .actionSheet)
+        
+        let okAction = UIAlertAction(title: "Download", style: .default) { _ in
+            self.browserViewController.downloadQueue.enqueue(download)
+        }
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .destructive)
+        
+        alert.addAction(okAction)
+        alert.addAction(cancelAction)
+        
+        browserViewController.present(alert, animated: true, completion: nil)
+        
+//        let actions = [[filenameItem], [downloadFileItem]]
+        
+//        browserViewController.presentSheetWith(actions: actions, on: browserViewController, from: browserViewController.urlBar, closeButtonTitle: Strings.CancelString, suppressPopover: true)
     }
 }
 
