@@ -95,14 +95,11 @@ class TabSessionTests: XCTestCase {
         super.tearDown()
         
         destroyData { }
-        
         tabManager = nil
     }
     
     private func destroyData(_ completion: @escaping () -> Void) {
         tabManager.removeAll()
-        tabManager.resetConfiguration()
-        tabManager.resetProcessPool()
         tabManager.reset()
         
         
@@ -113,17 +110,7 @@ class TabSessionTests: XCTestCase {
             group.leave()
         })
         
-        group.enter()
         HTTPCookieStorage.shared.removeCookies(since: .distantPast)
-        WKWebsiteDataStore.default().httpCookieStore.getAllCookies({
-            $0.forEach({
-                group.enter()
-                WKWebsiteDataStore.default().httpCookieStore.delete($0, completionHandler: {
-                    group.leave()
-                })
-            })
-            group.leave()
-        })
         
         group.enter()
         WKWebsiteDataStore.default().removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(),
@@ -139,7 +126,6 @@ class TabSessionTests: XCTestCase {
     
     func testPrivateTabSessionSharing() {
         let dataStoreExpectation = XCTestExpectation(description: "dataStorePersistence")
-        let cookieStoreExpectation = XCTestExpectation(description: "cookieStorePersistence")
         var webViewNavigationAdapter = WebViewNavigationAdapter()
         
         destroyData {
@@ -182,32 +168,18 @@ class TabSessionTests: XCTestCase {
                         XCTAssertTrue(urlNames.isSubset(of: recordNames), "Data Store records do not match!")
                         group.leave()
                     })
-                    
-                    group.enter()
-                    $0.webView?.configuration.websiteDataStore.httpCookieStore.getAllCookies({ cookies in
-                        XCTAssertFalse(cookies.isEmpty, "Error: Cookies not shared amongst private tabs!")
-                        
-                        urls.compactMap({ URL(string: $0) }).forEach({
-                            let cookiesForURL = HTTPCookie.filter(cookies: cookies, for: $0) ?? []
-                            XCTAssertFalse(cookiesForURL.isEmpty, "Cookie Store records do not match!")
-                        })
-                        
-                        group.leave()
-                    })
                 })
                 
                 group.notify(queue: .main) {
                     dataStoreExpectation.fulfill()
-                    cookieStoreExpectation.fulfill()
                 }
             }
         }
-        wait(for: [dataStoreExpectation, cookieStoreExpectation], timeout: 30.0)
+        wait(for: [dataStoreExpectation], timeout: 30.0)
     }
 	
-	func Disabled_NormalTabSessionSharing() {
+	func testNormalTabSessionSharing() {
 		let dataStoreExpectation = XCTestExpectation(description: "dataStorePersistence")
-		let cookieStoreExpectation = XCTestExpectation(description: "cookieStorePersistence")
 		var webViewNavigationAdapter = WebViewNavigationAdapter()
 		
 		destroyData {
@@ -250,32 +222,18 @@ class TabSessionTests: XCTestCase {
 						XCTAssertTrue(urlNames.isSubset(of: recordNames), "Data Store records do not match!")
 						group.leave()
 					})
-					
-					group.enter()
-					$0.webView?.configuration.websiteDataStore.httpCookieStore.getAllCookies({ cookies in
-						XCTAssertFalse(cookies.isEmpty, "Error: Cookies not shared amongst normal tabs!")
-						
-						urls.compactMap({ URL(string: $0) }).forEach({
-							let cookiesForURL = HTTPCookie.filter(cookies: cookies, for: $0) ?? []
-							XCTAssertFalse(cookiesForURL.isEmpty, "Cookie Store records do not match!")
-						})
-						
-						group.leave()
-					})
 				})
 				
 				group.notify(queue: .main) {
 					dataStoreExpectation.fulfill()
-					cookieStoreExpectation.fulfill()
 				}
 			}
 		}
-		wait(for: [dataStoreExpectation, cookieStoreExpectation], timeout: 30.0)
+		wait(for: [dataStoreExpectation], timeout: 30.0)
 	}
     
     func testPrivateTabNonPersistence() {
         let dataStoreExpectation = XCTestExpectation(description: "dataStorePersistence")
-        let cookieStoreExpectation = XCTestExpectation(description: "cookieStorePersistence")
         var webViewNavigationAdapter = WebViewNavigationAdapter()
         
         destroyData {
@@ -319,27 +277,19 @@ class TabSessionTests: XCTestCase {
                         XCTAssertTrue(records.filter({ $0.displayName != "localhost" }).isEmpty, "Error: Data Store not cleared when tabs destroyed!")
                         group.leave()
                     })
-                    
-                    group.enter()
-                    $0.webView?.configuration.websiteDataStore.httpCookieStore.getAllCookies({ cookies in
-                        XCTAssertTrue(cookies.isEmpty, "Error: Cookies Store not cleared when tabs destroyed!")
-                        group.leave()
-                    })
                 })
                 
                 group.notify(queue: .main) {
                     dataStoreExpectation.fulfill()
-                    cookieStoreExpectation.fulfill()
                 }
             }
         }
         
-        wait(for: [dataStoreExpectation, cookieStoreExpectation], timeout: 30.0)
+        wait(for: [dataStoreExpectation], timeout: 30.0)
     }
     
     func testTabsPrivateToNormal() {
         let dataStoreExpectation = XCTestExpectation(description: "dataStorePersistence")
-        let cookieStoreExpectation = XCTestExpectation(description: "cookieStorePersistence")
         var webViewNavigationAdapter = WebViewNavigationAdapter()
 
         destroyData {
@@ -408,32 +358,20 @@ class TabSessionTests: XCTestCase {
                             
                             group.leave()
                         })
-                        
-                        group.enter()
-                        $0.webView?.configuration.websiteDataStore.httpCookieStore.getAllCookies({ cookies in
-                            XCTAssertFalse(cookies.isEmpty, "Error: Cookies Store not persistent in normal mode!")
-                            
-                            let cookiesForURL = HTTPCookie.filter(cookies: cookies, for: url) ?? []
-                            XCTAssertTrue(cookiesForURL.isEmpty, "Cookie Store leaking from private tab to normal tab!")
-                            
-                            group.leave()
-                        })
                     })
                     
                     group.notify(queue: .main) {
                         dataStoreExpectation.fulfill()
-                        cookieStoreExpectation.fulfill()
                     }
                 }
             }
         }
         
-        wait(for: [dataStoreExpectation, cookieStoreExpectation], timeout: 30.0)
+        wait(for: [dataStoreExpectation], timeout: 30.0)
     }
     
     func testTabsNormalToPrivate() {
         let dataStoreExpectation = XCTestExpectation(description: "dataStorePersistence")
-        let cookieStoreExpectation = XCTestExpectation(description: "cookieStorePersistence")
         var webViewNavigationAdapter = WebViewNavigationAdapter()
         
         destroyData {
@@ -516,12 +454,11 @@ class TabSessionTests: XCTestCase {
                     
                     group.notify(queue: .main) {
                         dataStoreExpectation.fulfill()
-                        cookieStoreExpectation.fulfill()
                     }
                 }
             }
         }
         
-        wait(for: [dataStoreExpectation, cookieStoreExpectation], timeout: 30.0)
+        wait(for: [dataStoreExpectation], timeout: 30.0)
     }
 }
