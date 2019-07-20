@@ -207,6 +207,7 @@ class TabSessionTests: XCTestCase {
 						"https://hotmail.com"]
 			
 			self.tabManager.addTabsForURLs(urls.compactMap({ URL(string: $0) }), zombie: false, isPrivate: false)
+            self.tabManager.removeTabs(self.tabManager.allTabs.filter({ $0.url?.absoluteString.contains("localhost") ?? false }))
             if self.tabManager.allTabs.count != 4 {
                 XCTFail("Error: Not all Tabs are created equally")
                 return dataStoreExpectation.fulfill()
@@ -219,7 +220,7 @@ class TabSessionTests: XCTestCase {
                     return dataStoreExpectation.fulfill()
                 }
                 
-                if webView.configuration.websiteDataStore.isPersistent == false {
+                if !webView.configuration.websiteDataStore.isPersistent {
                     XCTFail("Normal Tab is not storing data persistently!")
                     return dataStoreExpectation.fulfill()
                 }
@@ -242,6 +243,11 @@ class TabSessionTests: XCTestCase {
                 
 				// All requests finished loading.. time to check the cookies..
 				let group = DispatchGroup()
+                if self.tabManager.allTabs.isEmpty {
+                    XCTFail("Tabs somehow destroyed")
+                    return dataStoreExpectation.fulfill()
+                }
+                
                 for tab in self.tabManager.allTabs {
                     guard let webView = tab.webView else {
                         XCTFail("WebView died unexpectedly")
