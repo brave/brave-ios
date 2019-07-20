@@ -5,7 +5,7 @@
 import Foundation
 import Storage
 import EarlGrey
-@testable import Client
+@testable import Brave
 
 class BrowserTests: KIFTestCase {
     

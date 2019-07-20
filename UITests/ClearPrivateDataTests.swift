@@ -7,7 +7,7 @@ import WebKit
 import UIKit
 import EarlGrey
 import GCDWebServers
-@testable import Client
+@testable import Brave
 
 class ClearPrivateDataTests: KIFTestCase, UITextFieldDelegate {
 

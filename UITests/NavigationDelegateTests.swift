@@ -4,7 +4,7 @@
 
 import Foundation
 import EarlGrey
-@testable import Client
+@testable import Brave
 
 // WKWebView's WKNavigationDelegate is used for custom URL handling
 // such as telephone links, app store links, etc.

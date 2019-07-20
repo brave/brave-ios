@@ -4,7 +4,7 @@
 
 import Foundation
 import EarlGrey
-@testable import Client
+@testable import Brave
 
 class LoginInputTests: KIFTestCase {
     fileprivate var webRoot: String!

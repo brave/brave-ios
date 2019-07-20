@@ -48,7 +48,7 @@ Building the code
     cd brave-ios
     sh ./bootstrap.sh
     ```
-1. Open `Client.xcodeproj` in Xcode.
+1. Open `Brave.xcodeproj` in Xcode.
 1. Build the `Fennec` scheme in Xcode.
 
 ## Contributor guidelines
@@ -84,7 +84,7 @@ Building the code
 ## Code Signing
 
 1. After running the *bootstrap.sh* script in the setup instructions navigate to:
-<br>`Client/Configuration/Local/DevTeam.xcconfig`
+<br>`Brave/Configuration/Local/DevTeam.xcconfig`
 1. Add your *Apple Team ID* in this file:
 <br>`LOCAL_DEVELOPMENT_TEAM = KL8N8XSYF4`
 

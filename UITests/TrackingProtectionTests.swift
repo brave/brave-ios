@@ -5,7 +5,7 @@
 import Foundation
 import Storage
 import EarlGrey
-@testable import Client
+@testable import Brave
 
 func checkIfImageLoaded(url: String, shouldBlockImage: Bool) {
     EarlGrey.selectElement(with: grey_accessibilityID("url")).perform(grey_tap())

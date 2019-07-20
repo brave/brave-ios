@@ -6,7 +6,7 @@ fastlane_version "2.86.0"
 
 default_platform :ios
 
-CONFIG_PATH = "../Client/Configuration"
+CONFIG_PATH = "../Brave/Configuration"
 LOCAL_PATH = "#{CONFIG_PATH}/Local"
 
 platform :ios do
@@ -31,9 +31,9 @@ platform :ios do
 
   desc "Run Unit Tests"
   lane :test do |options|
-    sh("../Client/WebFilters/ContentBlocker/Lists/test-compile-all-lists.sh")
+    sh("../Brave/WebFilters/ContentBlocker/Lists/test-compile-all-lists.sh")
     run_tests(
-      scheme: "Fennec",
+      scheme: "Brave",
       device: "iPhone 8",
       code_coverage: true,
       skip_testing: [
@@ -47,12 +47,12 @@ platform :ios do
         "DataTests/HistoryTests",
         "DataTests/TabMOTests",
         "DataTests/FavoriteTests",
-        "ClientTests/TabManagerTests/testQueryAddedTabs",
-        "ClientTests/TabManagerTests/testQueryAddedPrivateTabs",
-        "ClientTests/TabManagerTests/testQueryAddedMixedTabs",
-        "ClientTests/UIImageViewExtensionsTests/testAsyncSetIcon",
-        "ClientTests/UIImageViewExtensionsTests/testAsyncSetIconFail",
-        "ClientTests/FingerprintProtectionTest/testFingerprintProtection"
+        "BraveTests/TabManagerTests/testQueryAddedTabs",
+        "BraveTests/TabManagerTests/testQueryAddedPrivateTabs",
+        "BraveTests/TabManagerTests/testQueryAddedMixedTabs",
+        "BraveTests/UIImageViewExtensionsTests/testAsyncSetIcon",
+        "BraveTests/UIImageViewExtensionsTests/testAsyncSetIconFail",
+        "BraveTests/FingerprintProtectionTest/testFingerprintProtection"
       ]
     )
   end
@@ -74,7 +74,7 @@ platform :ios do
     )
 
     gym(
-      scheme: "FirefoxBeta",
+      scheme: "Brave Beta",
       output_directory: "./builds/",
       output_name: "#{build_name}.ipa",
       sdk: "iphoneos",
@@ -103,7 +103,7 @@ platform :ios do
     )
 
     gym(
-      scheme: "Firefox",
+      scheme: "Brave Production",
       sdk: "iphoneos",
       clean: true,
       skip_package_ipa: true,
@@ -128,7 +128,7 @@ platform :ios do
     buildId = buildIdFile.attributes['BRAVE_VERSION']
 
     # Traditionally, would pull version number via:
-    # get_version_number(target: "Client")
+    # get_version_number(target: "Brave")
     # This however does not work since we use xcconfigq variables and Fastlane does not seem to parse
     #   these very well (e.g. this returns the literal value: "$(BRAVE_VERSION)")
   end
@@ -140,7 +140,7 @@ platform :ios do
 
   private_lane :clean_icons do
     # Regardless of git flags, always want to forcefully reset icon changes
-    reset_git_repo(files: ["Client/Assets/Images.xcassets/AppIcon*"], force: true)
+    reset_git_repo(files: ["Brave/Assets/Images.xcassets/AppIcon*"], force: true)
   end
 
   override_lane :get_build_number do

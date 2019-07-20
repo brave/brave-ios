@@ -9,7 +9,7 @@ import WebKit
 import SwiftKeychainWrapper
 import Shared
 import EarlGrey
-@testable import Client
+@testable import Brave
 
 let LabelAddressAndSearch = "Address and Search"
 

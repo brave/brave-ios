@@ -63,12 +63,12 @@ excluded: # paths to ignore during linting. Takes precedence over `included`.
   - XCUITests/
   - SyncTests/
   - StorageTests/
-  - ClientTests/
+  - BraveTests/
   - BraveSharedTests/
   - DataTests/
   - fastlane/
   - SharedTests/
-  - Client/Assets/Search/get_supported_locales.swift
+  - Brave/Assets/Search/get_supported_locales.swift
 
 # configurable rules can be customized from this configuration file
 # binary rules can set their severity level

@@ -69,7 +69,7 @@ npm run build:adblock
 # Sets up local configurations from the tracked .template files
 
 # Checking the `Local` Directory
-CONFIG_PATH="Client/Configuration"
+CONFIG_PATH="Brave/Configuration"
 if [ ! -d "$CONFIG_PATH/Local/" ]; then
   echo "Creating 'Local' directory"
 

@@ -11,7 +11,7 @@ swiftlint.lint_files
 
 # Localized Strings check
 changedFiles = (git.added_files + git.modified_files).select{|file| file.end_with?(".swift")}
-changedFiles.select{|file| file != "Client/Frontend/Strings.swift" }.each do |changed_file|
+changedFiles.select{|file| file != "Brave/Frontend/Strings.swift" }.each do |changed_file|
   addedLines = git.diff_for_file(changed_file).patch.lines.select{ |line| line.start_with?("+") }
   if addedLines.select{ |line| line.include?("NSLocalizedString") }.count != 0
     warn("NSLocalizedString should only be added to Strings.swift")
