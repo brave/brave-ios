@@ -76,6 +76,7 @@ private class WebViewNavigationAdapter: NSObject, WKNavigationDelegate {
 
 class TabSessionTests: XCTestCase {
     private var tabManager: TabManager!
+    private let maxTimeout = 60.0
     
     override class func setUp() {
         super.setUp()
@@ -193,7 +194,7 @@ class TabSessionTests: XCTestCase {
                 }
             }
         }
-        wait(for: [dataStoreExpectation], timeout: 30.0)
+        wait(for: [dataStoreExpectation], timeout: maxTimeout)
     }
 	
 	func testNormalTabSessionSharing() {
@@ -202,9 +203,9 @@ class TabSessionTests: XCTestCase {
 		
 		destroyData {
 			let urls = ["https://stackoverflow.com",
-						"https://gmail.com",
-						"https://mail.ru",
-						"https://hotmail.com"]
+						"https://discordapp.com",
+						"https://apple.com",
+						"https://slack.com"]
 			
 			self.tabManager.addTabsForURLs(urls.compactMap({ URL(string: $0) }), zombie: false, isPrivate: false)
             self.tabManager.removeTabs(self.tabManager.allTabs.filter({ $0.url?.absoluteString.contains("localhost") ?? false }))
@@ -271,7 +272,7 @@ class TabSessionTests: XCTestCase {
 				}
 			}
 		}
-		wait(for: [dataStoreExpectation], timeout: 30.0)
+		wait(for: [dataStoreExpectation], timeout: maxTimeout)
 	}
     
     func testPrivateTabNonPersistence() {
@@ -384,7 +385,7 @@ class TabSessionTests: XCTestCase {
             }
         }
         
-        wait(for: [dataStoreExpectation], timeout: 30.0)
+        wait(for: [dataStoreExpectation], timeout: maxTimeout)
     }
     
     func testTabsPrivateToNormal() {
@@ -489,7 +490,7 @@ class TabSessionTests: XCTestCase {
             }
         }
         
-        wait(for: [dataStoreExpectation], timeout: 30.0)
+        wait(for: [dataStoreExpectation], timeout: maxTimeout)
     }
     
     func testTabsNormalToPrivate() {
@@ -593,6 +594,6 @@ class TabSessionTests: XCTestCase {
             }
         }
         
-        wait(for: [dataStoreExpectation], timeout: 30.0)
+        wait(for: [dataStoreExpectation], timeout: maxTimeout)
     }
 }
