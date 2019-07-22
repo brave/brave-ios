@@ -13,6 +13,19 @@ class ShareToBraveViewController: SLComposeServiceViewController {
         return URL(string: "brave://open-url?url=\(url)")
     }
     
+    private func firstURL(in string: String) -> URL? {
+        do {
+            let detector = try NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
+            if let match = detector.firstMatch(in: string, options: [], range: NSRange(location: 0, length: string.count)),
+                let range = Range(match.range, in: string) {
+                return URL(string: String(string[range]))
+            }
+        } catch {
+            return nil
+        }
+        return nil
+    }
+    
     override func configurationItems() -> [Any]! {
         guard let inputItems = extensionContext?.inputItems as? [NSExtensionItem] else {
             return []
@@ -33,19 +46,22 @@ class ShareToBraveViewController: SLComposeServiceViewController {
         }
         
         provider.loadItem(of: provider.isUrl ? kUTTypeURL : kUTTypeText) { item, error in
-            var urlItem: URL!
+            var urlItem: URL?
             
             // We can get urls from other apps as a kUTTypeText type, for example from Apple's mail.app.
             if let text = item as? String {
-                urlItem = URL(string: text)
+                urlItem = self.firstURL(in: text)
             } else if let url = item as? URL {
-                urlItem = url
+                urlItem = self.firstURL(in: url.absoluteString)
             } else {
                 self.cancel()
                 return
             }
             
-            if let braveUrl = urlItem.absoluteString.addingPercentEncoding(withAllowedCharacters: .alphanumerics).flatMap(self.urlScheme) {
+            // Just open the app if we don't find a url. In the future we could
+            // use this entry point to search instead of open a given URL
+            let urlString = urlItem?.absoluteString ?? ""
+            if let braveUrl = urlString.addingPercentEncoding(withAllowedCharacters: .alphanumerics).flatMap(self.urlScheme) {
                 self.handleUrl(braveUrl)
             }
         }
