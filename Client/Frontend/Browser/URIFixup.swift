@@ -17,7 +17,7 @@ class URIFixup {
         // However, we ensure that the scheme is one that is listed in
         // the official URI scheme list, so that other such search phrases
         // like "filetype:" are recognised as searches rather than URLs.
-        if let url = URLComponents(string: escaped)?.url, url.schemeIsValid {
+        if let url = URL(string: escaped), url.schemeIsValid {
             return url
         }
 
@@ -35,7 +35,7 @@ class URIFixup {
 
         // If there is a ".", prepend "http://" and try again. Since this
         // is strictly an "http://" URL, we also require a host.
-        if let url = URLComponents(string: "http://\(escaped)")?.url, url.host != nil {
+        if let url = URL(string: "http://\(escaped)"), url.host != nil {
             return url
         }
 
