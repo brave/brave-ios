@@ -64,6 +64,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         
         HttpsEverywhereStats.shared.startLoading()
         
+        updateShortcutItems(application)
+        
         // Passcode checking, must happen on immediate launch
         if !DataController.shared.storeExists() {
             // Since passcode is stored in keychain it persists between installations.
@@ -186,6 +188,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         self.profile = p
         return p
     }
+    
+    func updateShortcutItems(_ application: UIApplication) {
+        let newTabItem = UIMutableApplicationShortcutItem(type: "\(Bundle.main.bundleIdentifier ?? "").NewTab",
+            localizedTitle: Strings.QuickActionNewTab,
+            localizedSubtitle: nil,
+            icon: UIApplicationShortcutIcon(templateImageName: "quick_action_new_tab"),
+            userInfo: [:])
+        
+        let privateTabItem = UIMutableApplicationShortcutItem(type: "\(Bundle.main.bundleIdentifier ?? "").NewPrivateTab",
+            localizedTitle: Strings.QuickActionNewPrivateTab,
+            localizedSubtitle: nil,
+            icon: UIApplicationShortcutIcon(templateImageName: "quick_action_new_private_tab"),
+            userInfo: [:])
+        
+        application.shortcutItems = Preferences.Privacy.privateBrowsingOnly.value ? [privateTabItem] : [newTabItem, privateTabItem]
+    }
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
@@ -242,7 +260,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
             UrpLog.log("Failed to initialize user referral program")
         }
         
-        AdblockResourceDownloader.shared.regionalAdblockResourcesSetup()
+        AdblockResourceDownloader.shared.startLoading()
 
         UINavigationBar.appearance().tintColor = BraveUX.BraveOrange
       
@@ -342,7 +360,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         self.updateAuthenticationInfo()
         
         if let authInfo = KeychainWrapper.sharedAppContainerKeychain.authenticationInfo(), authInfo.isPasscodeRequiredImmediately {
-            authenticator?.promptUserForAuthentication()
+            authenticator?.willEnterForeground()
         }
     }
     

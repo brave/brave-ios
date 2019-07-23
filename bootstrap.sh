@@ -10,7 +10,10 @@
 # CI services where the Carthage directory can be cached.
 #
 # Use the --force option to force a rebuild of the dependencies.
+# Use the --ci option to use `npm ci` over `npm install`
 #
+
+set -e
 
 missingCommand() {
     echo >&2 "Brave requires the command: \033[1m$1\033[0m\nPlease install it via Homebrew or directly from $2"
@@ -22,10 +25,22 @@ command -v carthage >/dev/null 2>&1 || { missingCommand "carthage" "https://gith
 command -v swiftlint >/dev/null 2>&1 || { missingCommand "swiftlint" "https://github.com/realm/SwiftLint/releases"; }
 command -v npm >/dev/null 2>&1 || { missingCommand "npm" "https://nodejs.org/en/download/"; }
 
-if [ "$1" == "--force" ]; then
+IS_CI_BUILD=0
+
+for i in "$@"
+do
+case $i in
+    -f|--force)
     rm -rf Carthage/*
     rm -rf ~/Library/Caches/org.carthage.CarthageKit
-fi
+    shift
+    ;;
+    --ci)
+    IS_CI_BUILD=1
+    shift
+    ;;
+esac
+done
 
 # Only enable this on the Xcode Server because it times out if it does not
 # get any output for some time while building the dependencies.
@@ -39,7 +54,12 @@ SWIFT_VERSION=4.2 carthage bootstrap $CARTHAGE_VERBOSE --platform ios --color au
 
 # Install Node.js dependencies and build user scripts
 
-npm install
+if [ "$IS_CI_BUILD" = 0 ]; then
+  npm install
+else
+  npm ci
+fi
+
 npm run build
 echo "Building sync"
 npm run build:sync
@@ -64,3 +84,19 @@ do
     && cp -n Local.templates/$CONFIG_FILE Local/$CONFIG_FILE \
   )
 done
+
+# Build Yubikit
+YUBIKIT_DIR=Carthage/Checkouts/yubikit-ios
+YUBIKIT_OUT=ThirdParty/YubiKit
+SRCDIR=$PWD
+
+rm -rf $YUBIKIT_DIR
+rm -rf $YUBIKIT_OUT
+
+git clone -b simulator_release --single-branch --depth 1 https://github.com/jumde/yubikit-ios/ $YUBIKIT_DIR
+
+mkdir -p $SRCDIR/$YUBIKIT_OUT/include
+pushd $YUBIKIT_DIR/YubiKit
+sh build.sh > yubikit.log 2>&1
+cp -r build/release_universal/  $SRCDIR/$YUBIKIT_OUT/
+popd

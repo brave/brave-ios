@@ -10,8 +10,14 @@
 /* Button to add a bookmark */
 "AddBookmark" = "Adicionar favorito";
 
+/* Cell title for add folder action */
+"AddFolderActionCellTitle" = "Nova pasta";
+
 /* Add to favorites share action. */
 "AddToFavorites" = "Adicionar aos favoritos em destaque";
+
+/* Title for adding new bookmark menu item */
+"AddToMenuItem" = "Adicionar a...";
 
 /* individual blocking statistic title */
 "AdsAndTrackers" = "Anúncios e rastreadores";
@@ -154,17 +160,26 @@
 /* Bookmark Info Section Title */
 "BookmarkInfo" = "Informações de favoritos";
 
+/* Title for root level bookmarks cell */
+"BookmarkRootLevelCellTitle" = "Favoritos";
+
 /* title for bookmarks panel */
 "Bookmarks" = "Favoritos";
+
+/* Title for bookmarks menu item */
+"BookmarksMenuItem" = "Favoritos";
+
+/* Placeholder text for adding or editing a bookmark */
+"BookmarkTitlePlaceholderText" = "Nome";
+
+/* Placeholder text for adding or editing a bookmark */
+"BookmarkUrlPlaceholderText" = "Endereço";
 
 /* Button to show the brave panel */
 "BravePanel" = "Painel do Brave";
 
 /* Section title for adbblock, tracking protection, HTTPS-E, and cookies */
 "BraveShieldDefaults" = "Configurações da proteção do Brave";
-
-/* Brave sync page title */
-"BraveSync" = "Sincronizar Brave (beta)";
 
 /* Sync settings welcome */
 "BraveSyncWelcome" = "Para começar, é necessário que o Brave esteja instalado em todos os dispositivos que você pretende sincronizar. Para vincular todos os seus dispositivos com segurança, crie uma cadeia de sincronização.";
@@ -215,7 +230,7 @@
 "CloseAllTabsTitle" = "Fechar todas as %i abas";
 
 /* Code words input help */
-"CodeWordInputHelp" = "Digite as palavras de código da cadeia de sincronização que foram fornecidas.";
+"CodeWordInputHelp" = "Digite no formulário abaixo as palavras de código da cadeia de sincronização que foram fornecidas.";
 
 /* Code words section title */
 "CodeWords" = "Palavras de código";
@@ -225,6 +240,9 @@
 
 /* Cookie settings option title */
 "CookieControl" = "Controle de cookies";
+
+/* Settings item for clearing cookies and site data */
+"Cookies" = "Cookies e dados do site";
 
 /* Copied action complete title */
 "Copied" = "Copiado!";
@@ -304,8 +322,17 @@
 /* Button to edit a bookmark */
 "EditBookmark" = "Editar favorito";
 
+/* Header title for bookmark save location */
+"EditBookmarkTableLocationHeader" = "Local";
+
+/* Title for editing a bookmark */
+"EditBookmarkTitle" = "Editar favorito";
+
 /* Button to edit a favorite */
 "EditFavorite" = "Editar favorito em destaque";
+
+/* Title for editing a folder */
+"EditFolderTitle" = "Editar pasta";
 
 /* Sync enter code words */
 "EnterCodeWords" = "Digite as palavras de código";
@@ -346,17 +373,29 @@
 /* Shields Time Saved Stat */
 "EstTimerSaved" = "Economia de tempo \nestimada";
 
+/* Footer text when user selects to save to favorites when editing a bookmark */
+"FavoritesLocationFooterText" = "Os favoritos em destaque estão localizados na sua tela inicial. Esses favoritos não são sincronizados com outros dispositivos.";
+
+/* Title for favorites cell */
+"FavoritesRootLevelCellTitle" = "Favoritos em destaque";
+
 /* Share action title */
 "FindInPage" = "Encontrar na página";
 
 /* Done button in Find in Page Toolbar. */
 "FindInPageDoneButtonAccessibilityLabel" = "Concluído";
 
+/* Find %@ text in page. */
+"FindInPageFormat" = "Encontrar \"%@\"";
+
 /* Accessibility label for next result button in Find in Page Toolbar. */
 "FindInPageNextResultButtonAccessibilityLabel" = "Próximo resultado na página";
 
 /* Accessibility label for previous result button in Find in Page Toolbar. */
 "FindInPagePreviousResultButtonAccessibilityLabel" = "Resultado anterior na página";
+
+/* Section header for find in page option */
+"FindOnPageSectionHeader" = "Nesta página";
 
 /* individual blocking statistic title */
 "FingerprintingMethods" = "Métodos de impressão digital";
@@ -369,6 +408,12 @@
 
 /* Grand camera access */
 "GrantCameraAccess" = "Ativar câmera";
+
+/* Title for history menu item */
+"HistortMenuItem" = "Histórico";
+
+/* Title for history screen */
+"HistoryScreenTitle" = "Histórico";
 
 /* No comment provided by engineer. */
 "Home" = "Página inicial";
@@ -421,9 +466,6 @@
 /* Copy password text selection menu item */
 "MenuItemCopyTitle" = "Copiar";
 
-/* Text selection menu item */
-"MenuItemFindInPageTitle" = "Encontrar na página";
-
 /* Hide password text selection menu item */
 "MenuItemHidePasswordTitle" = "Ocultar";
 
@@ -439,8 +481,20 @@
 /* tabs bar show/hide option */
 "NeverShow" = "Nunca mostrar";
 
+/* Default name for creating a new bookmark. */
+"NewBookmarkDefaultName" = "Novo favorito";
+
+/* Title for adding new bookmark */
+"NewBookmarkTitle" = "Novo favorito";
+
 /* Title for new folder popup */
 "NewFolder" = "Nova pasta";
+
+/* Default name for creating a new folder. */
+"NewFolderDefaultName" = "Nova pasta";
+
+/* Title for adding new folder */
+"NewFolderTitle" = "Nova pasta";
 
 /* New sync code button title */
 "NewSyncCode" = "Criar uma nova cadeia de sincronização";
@@ -468,6 +522,9 @@
 
 /* See http://mzl.la/1G7uHo7 */
 "OpenPhoneSettingsActionTitle" = "Abrir configurações";
+
+/* Section name for other settings. */
+"OtherSettingsSection" = "Outras configurações";
 
 /* Sync pair device settings section title */
 "Pair" = "Emparelhar";
@@ -505,6 +562,9 @@
 /* Setting to keep app in private mode */
 "PrivateBrowsingOnly" = "Somente navegação privada";
 
+/* Private tab details */
+"PrivateTabBody" = "As Abas privadas não são salvas no Brave, mas elas não garantem navegação anônima on-line. Os sites que você acessar em uma aba privada não serão exibidos no seu histórico, e os cookies deles serão excluídos quando você os fechar (nenhuma informação ficará salva no Brave). Sua operadora de telefonia móvel (ou o proprietário da rede Wi-Fi ou VPN à qual você está conectado) poderá ver quais sites você acessa, e esses sites detectarão seu endereço IP público, mesmo nas Abas privadas.";
+
 /* Private tab detail text */
 "PrivateTabDetails" = "O uso das Abas privadas só muda o que o Brave faz no seu dispositivo. O comportamento das outras partes envolvidas não é alterado.\n\nOs sites sempre detectam seu endereço IP quando você os acessa. Com base nisso, normalmente é possível ter uma ideia geral de onde você está, como sua cidade. Às vezes, essa estimativa de localização pode ser bem mais específica. Os sites também têm acesso a todas as informações que você fornece a eles (por exemplo, termos de pesquisa). Se você fizer login em um site, ele saberá que você é o proprietário dessa conta. Sua sessão será encerrada quando você fechar as Abas privadas, pois o Brave excluirá o cookie que mantém você conectado à conta.\n\nO responsável pela sua conexão com a internet (seu provedor de serviços de internet), que em muitos casos é sua operadora, pode ver toda a sua atividade na rede. Se você está conectado a uma rede Wi-Fi, o provedor é o proprietário dessa rede. Se você está usando uma VPN, o proprietário é quem a mantém em funcionamento. Seu provedor pode ver os sites que você acessa no momento em que isso acontece. Se esses sites usam HTTPS, ele não tem como saber exatamente o que você faz neles. No entanto, se um site só utiliza HTTP, seu provedor pode ver tudo: seus termos de pesquisa, quais páginas você acessa e em quais links você clica.\n\nSe a empresa na qual você trabalha gerencia seu dispositivo, é possível que ela monitore o que você faz com ele. O uso das Abas privadas provavelmente não a impedirá de saber os sites que você acessou. É possível que outra pessoa que tenha acesso ao seu dispositivo tenha instalado um software para monitorar sua atividade; nesse caso, as Abas privadas não poderão proteger você.";
 
@@ -519,6 +579,9 @@
 
 /* Title for quick-search engines settings section. */
 "QuickSearchEngines" = "Mecanismos de pesquisa rápida";
+
+/* Open the App Store to rate Brave. */
+"RateBrave" = "Avaliar o Brave";
 
 /* Accessibility label for button increasing font size in display settings of reader mode */
 "ReaderModeBiggerFontButtonAccessibilityLabel" = "Aumentar o tamanho do texto";
@@ -595,6 +658,12 @@
 /* Restore Tabs Prompt Title */
 "RestoreTabOnCrashAlertTitle" = "É, isso não é nada bom.";
 
+/* Button to show the rewards panel */
+"RewardsPanel" = "Painel do Rewards";
+
+/* Label for the button used to save data */
+"SaveButtonTitle" = "Salvar";
+
 /* Settings item for clearing passwords and login data */
 "SavedLogins" = "Logins salvos";
 
@@ -624,6 +693,9 @@
 
 /* Accessibility hint describing the action performed when a search suggestion is clicked */
 "SearchesForSuggestionButtonAccessibilityText" = "Pesquisa a sugestão";
+
+/* Section header for history and bookmarks option */
+"SearchHistorySectionHeader" = "Histórico e favoritos";
 
 /* Accessibility message e.g. spoken by VoiceOver after the user taps the close button in the search field to clear the search and exit search mode */
 "SearchInputViewClearButtonTitle" = "Limpar pesquisa";
@@ -667,8 +739,14 @@
 /* Error message that is shown in settings when there was a problem loading */
 "SettingsContentLoadErrorMessage" = "Não foi possível carregar a página.";
 
+/* Title for settings menu item */
+"SettingsMenuItem" = "Configurações";
+
 /* Context menu item for sharing a link URL */
 "ShareLinkActionTitle" = "Compartilhar link";
+
+/* Title for sharing url menu item */
+"ShareWithMenuItem" = "Compartilhar com...";
 
 /* shields overview message */
 "ShieldsOverview" = "As Proteções de site permitem que você controle quando anúncios e rastreadores são bloqueados em cada site que você acessa. Se preferir ver anúncios em um site específico, você poderá ativá-los aqui.";
@@ -715,9 +793,6 @@
 /* Support section title */
 "Support" = "Suporte";
 
-/* Sync settings section title */
-"Sync" = "Sincronizar (beta)";
-
 /* Add another device cell button. */
 "SyncAddAnotherDevice" = "Adicionar outro dispositivo";
 
@@ -727,14 +802,11 @@
 /* Add mobile device to sync with scan */
 "SyncAddDeviceScan" = "Ler código QR da cadeia";
 
-/* Sync add device description */
-"SyncAddDeviceScanDescription" = "No seu segundo dispositivo móvel, navegue até a opção \"Sincronizar Brave\" do painel \"Configurações\" e toque no botão \"Ler código de sincronização\". Use sua câmera para ler o código QR abaixo.";
-
 /* Add device to sync with code words */
 "SyncAddDeviceWords" = "Insira o código de sincronização";
 
-/* Sync add device description */
-"SyncAddMobileWordsDescription" = "No seu dispositivo, navegue até a opção \"Sincronizar Brave\" do painel \"Configurações\" e toque no botão \"%@\". Insira as palavras de código da cadeia de sincronização exibidas abaixo.";
+/* Add device to sync with code words navigation title */
+"SyncAddDeviceWordsTitle" = "Inserir palavras de código";
 
 /* Add Tablet or phone title */
 "SyncAddTabletOrPhoneTitle" = "Adicionar um tablet ou smartphone";
@@ -750,12 +822,6 @@
 
 /* Sync you browser settings across devices. */
 "SyncDevices" = "Dispositivos e configurações";
-
-/* Message for sync initialization error alert */
-"SyncInitErrorMessage" = "O Agente de sincronização do Brave está off-line ou inacessível no momento. Tente novamente mais tarde.";
-
-/* Title for sync initialization error alert */
-"SyncInitErrorTitle" = "Erro de comunicação na sincronização do Brave";
 
 /* No internet connection alert body. */
 "SyncNoConnectionBody" = "Verifique sua conexão com a internet e tente novamente.";
@@ -815,7 +881,7 @@
 "SyncToDevice" = "Sincronizar com o dispositivo";
 
 /* Sync to existing device description */
-"SyncToDeviceDescription" = "Usando um dispositivo existente sincronizado, abra as Configurações do Brave e acesse \"Dispositivos e Configurações\". Em seguida, toque em \"+\" para adicionar um novo dispositivo e exibir um código de sincronização.";
+"SyncToDeviceDescription" = "Usando um dispositivo existente sincronizado, abra as Configurações do Brave e acesse Configurações -> Sincronizar. Escolha \"Adicionar dispositivo\" e realize a leitura do código exibido na tela.";
 
 /* Description on popup when setting up a sync group fails */
 "SyncUnableCreateGroup" = "Não foi possível criar um novo grupo de sincronização.";
@@ -852,6 +918,9 @@
 
 /* Accessibility label for the lock icon, which is only present if the connection is secure */
 "TabToolbarLockImageAccessibilityLabel" = "Conexão segura";
+
+/* Accessibility Label for the browser toolbar Menu button */
+"TabToolbarMenuButtonAccessibilityLabel" = "Menu";
 
 /* Accessibility label for the Reader View button */
 "TabToolbarReaderViewButtonAccessibilityLabel" = "Visualização de leitor";

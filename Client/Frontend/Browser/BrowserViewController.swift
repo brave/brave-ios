@@ -17,6 +17,8 @@ import Deferred
 import Data
 import BraveShared
 import SwiftKeychainWrapper
+import BraveRewardsUI
+import BraveRewards
 
 private let log = Logger.browserLogger
 
@@ -55,7 +57,7 @@ class BrowserViewController: UIViewController {
     fileprivate let alertStackView = UIStackView() // All content that appears above the footer should be added to this view. (Find In Page/SnackBars)
     fileprivate var findInPageBar: FindInPageBar?
     
-    var loadQueue = DeferredCountable<Void>()
+    var loadQueue = Deferred<Void>()
 
     lazy var mailtoLinkHandler: MailtoLinkHandler = MailtoLinkHandler()
 
@@ -132,6 +134,8 @@ class BrowserViewController: UIViewController {
     // Web filters
     
     let safeBrowsing: SafeBrowsing?
+    
+    let rewards: BraveRewards?
 
     init(profile: Profile, tabManager: TabManager, crashedLastSession: Bool,
          safeBrowsingManager: SafeBrowsing? = SafeBrowsing()) {
@@ -140,6 +144,14 @@ class BrowserViewController: UIViewController {
         self.readerModeCache = ReaderMode.cache(for: tabManager.selectedTab)
         self.crashedLastSession = crashedLastSession
         self.safeBrowsing = safeBrowsingManager
+        
+        #if NO_REWARDS
+        rewards = nil
+        #else
+        RewardsHelper.configureRewardsLogs()
+        rewards = BraveRewards(configuration: .default)
+        #endif
+
         super.init(nibName: nil, bundle: nil)
         didInit()
     }
@@ -241,7 +253,7 @@ class BrowserViewController: UIViewController {
             updateURLBar()
             navigationToolbar.updateBackStatus(webView.canGoBack)
             navigationToolbar.updateForwardStatus(webView.canGoForward)
-            navigationToolbar.loading = tab.loading
+            topToolbar.locationView.loading = tab.loading
         }
         
         updateTabsBarVisibility()
@@ -436,23 +448,21 @@ class BrowserViewController: UIViewController {
     
     fileprivate func setupTabs() {
         contentBlockListDeferred?.uponQueue(.main) { _ in
-            if self.loadQueue.isEmpty {
-                let isPrivate = Preferences.Privacy.privateBrowsingOnly.value
-                let noTabsAdded = self.tabManager.tabsForCurrentMode.isEmpty
-                
-                var tabToSelect: Tab?
-                
-                if noTabsAdded {
-                    // Two scenarios if there are no tabs in tabmanager:
-                    // 1. We have not restored tabs yet, attempt to restore or make a new tab if there is nothing.
-                    // 2. We are in private browsing mode and need to add a new private tab.
-                    tabToSelect = isPrivate ? self.tabManager.addTab(isPrivate: true) : self.tabManager.restoreAllTabs()
-                } else {
-                    tabToSelect = self.tabManager.tabsForCurrentMode.last
-                }
-                self.tabManager.selectTab(tabToSelect)
+            let isPrivate = Preferences.Privacy.privateBrowsingOnly.value
+            let noTabsAdded = self.tabManager.tabsForCurrentMode.isEmpty
+            
+            var tabToSelect: Tab?
+            
+            if noTabsAdded {
+                // Two scenarios if there are no tabs in tabmanager:
+                // 1. We have not restored tabs yet, attempt to restore or make a new tab if there is nothing.
+                // 2. We are in private browsing mode and need to add a new private tab.
+                tabToSelect = isPrivate ? self.tabManager.addTab(isPrivate: true) : self.tabManager.restoreAllTabs()
+            } else {
+                tabToSelect = self.tabManager.tabsForCurrentMode.last
             }
-            self.loadQueue.fill(())
+            self.tabManager.selectTab(tabToSelect)
+            self.loadQueue.fillIfUnfilled(())
         }
     }
 
@@ -833,6 +843,12 @@ class BrowserViewController: UIViewController {
             tabsBar.view.isHidden = !shouldShow
         }
     }
+    
+    private func updateApplicationShortcuts() {
+        if let delegate = UIApplication.shared.delegate as? AppDelegate {
+            delegate.updateShortcutItems(UIApplication.shared)
+        }
+    }
 
     fileprivate func hideSearchController() {
         if let searchController = searchController {
@@ -904,7 +920,7 @@ class BrowserViewController: UIViewController {
             guard let loading = change?[.newKey] as? Bool else { break }
             
             if tab === tabManager.selectedTab {
-                navigationToolbar.loading = tab.loading
+                topToolbar.locationView.loading = tab.loading
                 if !(webView.url?.isLocalUtility ?? false) {
                     if loading && topToolbar.currentProgress() < TopToolbarView.psuedoProgressValue {
                         topToolbar.updateProgressBar(TopToolbarView.psuedoProgressValue)
@@ -953,7 +969,7 @@ class BrowserViewController: UIViewController {
             guard let tab = tabManager[webView] else {
                 break
             }
-            
+            tab.userScriptManager?.isU2FEnabled = webView.hasOnlySecureContent
             if tab.contentIsSecure && !webView.hasOnlySecureContent {
                 tab.contentIsSecure = false
             }
@@ -1437,6 +1453,34 @@ extension BrowserViewController: TopToolbarDelegate {
         navigationController?.pushViewController(tabTrayController, animated: true)
         self.tabTrayController = tabTrayController
     }
+    
+    func topToolbarDidPressReload(_ topToolbar: TopToolbarView) {
+        tabManager.selectedTab?.reload()
+    }
+    
+    func topToolbarDidPressStop(_ topToolbar: TopToolbarView) {
+        tabManager.selectedTab?.stop()
+    }
+    
+    func topToolbarDidLongPressReloadButton(_ topToolbar: TopToolbarView, from button: UIButton) {
+        guard let tab = tabManager.selectedTab else { return }
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        alert.addAction(UIAlertAction(title: Strings.CancelButtonTitle, style: .cancel, handler: nil))
+        
+        let toggleActionTitle = tab.desktopSite ? Strings.AppMenuViewMobileSiteTitleString : Strings.AppMenuViewDesktopSiteTitleString
+        alert.addAction(UIAlertAction(title: toggleActionTitle, style: .default, handler: { _ in
+            tab.toggleDesktopSite()
+        }))
+        
+        let generator = UIImpactFeedbackGenerator(style: .heavy)
+        generator.impactOccurred()
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            alert.popoverPresentationController?.sourceView = self.view
+            alert.popoverPresentationController?.sourceRect = self.view.convert(button.frame, from: button.superview)
+            alert.popoverPresentationController?.permittedArrowDirections = [.up]
+        }
+        present(alert, animated: true)
+    }
 
     func topToolbarDidPressTabs(_ topToolbar: TopToolbarView) {
         showTabTray()
@@ -1618,6 +1662,10 @@ extension BrowserViewController: TopToolbarDelegate {
         popover.present(from: topToolbar.locationView.shieldsButton, on: self)
     }
     
+    func topToolbarDidTapBraveRewardsButton(_ topToolbar: TopToolbarView) {
+        showBraveRewardsPanel()
+    }
+    
     func topToolbarDidTapMenuButton(_ topToolbar: TopToolbarView) {
         let homePanel = MenuViewController(bvc: self, tab: tabManager.selectedTab)
         let popover = PopoverController(contentController: homePanel, contentSizeBehavior: .preferredContentSize)
@@ -1767,34 +1815,6 @@ extension BrowserViewController: ToolbarDelegate {
             tabManager.selectTab(tabs[newTabIndex])
         }
     }
-    
-    func tabToolbarDidPressReload(_ tabToolbar: ToolbarProtocol, button: UIButton) {
-        tabManager.selectedTab?.reload()
-    }
-    
-    func tabToolbarDidPressStop(_ tabToolbar: ToolbarProtocol, button: UIButton) {
-        tabManager.selectedTab?.stop()
-    }
-    
-    func tabToolbarDidLongPressReload(_ tabToolbar: ToolbarProtocol, button: UIButton) {
-        guard let tab = tabManager.selectedTab else { return }
-        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        alert.addAction(UIAlertAction(title: Strings.CancelButtonTitle, style: .cancel, handler: nil))
-        
-        let toggleActionTitle = tab.desktopSite ? Strings.AppMenuViewMobileSiteTitleString : Strings.AppMenuViewDesktopSiteTitleString
-        alert.addAction(UIAlertAction(title: toggleActionTitle, style: .default, handler: { _ in
-            tab.toggleDesktopSite()
-        }))
-        
-        let generator = UIImpactFeedbackGenerator(style: .heavy)
-        generator.impactOccurred()
-        if UIDevice.current.userInterfaceIdiom == .pad {
-            alert.popoverPresentationController?.sourceView = self.view
-            alert.popoverPresentationController?.sourceRect = self.view.convert(button.frame, from: button.superview)
-            alert.popoverPresentationController?.permittedArrowDirections = [.up]
-        }
-        present(alert, animated: true)
-    }
 }
 
 extension BrowserViewController: TabsBarViewControllerDelegate {
@@ -1874,6 +1894,8 @@ extension BrowserViewController: TabDelegate {
         tab.addContentScript(FocusHelper(tab: tab), name: FocusHelper.name())
         
         tab.addContentScript(FingerprintingProtection(tab: tab), name: FingerprintingProtection.name())
+        
+        tab.addContentScript(U2FExtensions(tab: tab), name: U2FExtensions.name())
     }
 
     func tab(_ tab: Tab, willDeleteWebView webView: WKWebView) {
@@ -1923,6 +1945,10 @@ extension BrowserViewController: TabDelegate {
         updateFindInPageVisibility(visible: true)
         findInPageBar?.text = selection
     }
+    
+    func tab(_ tab: Tab, isVerifiedPublisher verified: Bool) {
+        topToolbar.locationView.rewardsButton.isVerified = verified
+    }
 }
 
 extension BrowserViewController: SearchViewControllerDelegate {
@@ -1945,6 +1971,17 @@ extension BrowserViewController: SearchViewControllerDelegate {
 
     func searchViewController(_ searchViewController: SearchViewController, didHighlightText text: String, search: Bool) {
         self.topToolbar.setLocation(text, search: search)
+    }
+    
+    func searchViewController(_ searchViewController: SearchViewController, shouldFindInPage query: String) {
+        topToolbar.leaveOverlayMode()
+        updateFindInPageVisibility(visible: true)
+        findInPageBar?.text = query
+        
+    }
+    
+    func searchViewControllerAllowFindInPage() -> Bool {
+        return tabManager.selectedTab?.webView?.url?.isAboutHomeURL == false
     }
 }
 
@@ -2017,7 +2054,7 @@ extension BrowserViewController: TabManagerDelegate {
         updateFindInPageVisibility(visible: false, tab: previous)
         updateTabsBarVisibility()
 
-        navigationToolbar.loading = selected?.loading ?? false
+        topToolbar.locationView.loading = selected?.loading ?? false
         navigationToolbar.updateBackStatus(selected?.canGoBack ?? false)
         navigationToolbar.updateForwardStatus(selected?.canGoForward ?? false)
         
@@ -2097,6 +2134,10 @@ extension BrowserViewController: TabManagerDelegate {
         let count = tabManager.tabsForCurrentMode.count
         toolbar?.updateTabCount(count)
         topToolbar.updateTabCount(count)
+    }
+    
+    func tabManager(_ tabManager: TabManager, isVerifiedPublisher verified: Bool) {
+        topToolbar.locationView.rewardsButton.isVerified = verified
     }
 }
 
@@ -2843,6 +2884,7 @@ extension BrowserViewController: ToolbarUrlActionsDelegate {
     }
     
     func openInNewTab(_ url: URL, isPrivate: Bool) {
+        topToolbar.leaveOverlayMode()
         select(url, visitType: .unknown, action: .openInNewTab(isPrivate: isPrivate))
     }
     
@@ -2920,6 +2962,7 @@ extension BrowserViewController: PreferencesObserver {
             PrivateBrowsingManager.shared.isPrivateBrowsing = isPrivate
             setupTabs()
             updateTabsBarVisibility()
+            updateApplicationShortcuts()
         case Preferences.Shields.blockAdsAndTracking.key,
              Preferences.Shields.httpsEverywhere.key,
              Preferences.Shields.blockScripts.key,
@@ -2953,37 +2996,14 @@ extension BrowserViewController: PreferencesObserver {
 
 extension BrowserViewController {
     func openReferralLink(url: URL) {
-        self.loadQueue.upon {
+        self.loadQueue.uponQueue(.main) {
             self.openURLInNewTab(url, isPrivileged: false)
         }
     }
     
     func handleNavigationPath(path: NavigationPath) {
-        self.loadQueue.upon {
+        self.loadQueue.uponQueue(.main) {
             NavigationPath.handle(nav: path, with: self)
         }
-    }
-}
-
-//Provides a bool to query if tasks are pending on main queue.
-class DeferredCountable<T> {
-    private var count = 0
-    private var await = Deferred<T>()
-    
-    func upon(_ block: @escaping (T) -> Void) {
-        let executionBlock: (T) -> Void = { [unowned self] _ in
-            self.count -= 1
-            block(self.await.value)
-        }
-        count += 1
-        await.uponQueue(.main, block: executionBlock)
-    }
-    
-    func fill(_ value: T) {
-        await.fill(value)
-    }
-    
-    var isEmpty: Bool {
-        return count == 0
     }
 }
