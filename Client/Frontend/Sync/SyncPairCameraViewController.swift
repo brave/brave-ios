@@ -15,12 +15,12 @@ class SyncPairCameraViewController: SyncViewController {
     var enterWordsButton: RoundInterfaceButton!
     
     var loadingView: UIView!
-    let loadingSpinner = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
+    let loadingSpinner = UIActivityIndicatorView(style: .whiteLarge)
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        title = Strings.ScanSyncCode
+        title = Strings.Scan
 
         let stackView = UIStackView()
         stackView.axis = .vertical

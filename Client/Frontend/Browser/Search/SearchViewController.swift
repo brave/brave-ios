@@ -7,10 +7,10 @@ import Shared
 import Storage
 import BraveShared
 
-private enum SearchListSection: Int {
+private enum SearchListSection: Int, CaseIterable {
     case searchSuggestions
+    case findInPage
     case bookmarksAndHistory
-    static let Count = 2
 }
 
 private struct SearchViewControllerUX {
@@ -46,6 +46,8 @@ protocol SearchViewControllerDelegate: class {
     func searchViewController(_ searchViewController: SearchViewController, didLongPressSuggestion suggestion: String)
     func presentSearchSettingsController()
     func searchViewController(_ searchViewController: SearchViewController, didHighlightText text: String, search: Bool)
+    func searchViewController(_ searchViewController: SearchViewController, shouldFindInPage query: String)
+    func searchViewControllerAllowFindInPage() -> Bool
 }
 
 class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, LoaderListener {
@@ -95,7 +97,7 @@ class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, Loa
         searchEngineScrollView.layer.shadowColor = SearchViewControllerUX.SearchEngineScrollViewBorderColor
         searchEngineScrollView.clipsToBounds = false
 
-        searchEngineScrollView.decelerationRate = UIScrollViewDecelerationRateFast
+        searchEngineScrollView.decelerationRate = UIScrollView.DecelerationRate.fast
         view.addSubview(searchEngineScrollView)
 
         searchEngineScrollViewContent.layer.backgroundColor = UIColor.clear.cgColor
@@ -402,6 +404,8 @@ class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, Loa
             if let url = URL(string: site.url) {
                 searchDelegate?.searchViewController(self, didSelectURL: url)
             }
+        } else if section == SearchListSection.findInPage {
+            searchDelegate?.searchViewController(self, shouldFindInPage: searchQuery)
         }
     }
 
@@ -420,9 +424,31 @@ class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, Loa
 
         return 0
     }
+    
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        guard let searchSection = SearchListSection(rawValue: section) else { return nil }
+        
+        switch searchSection {
+        case .searchSuggestions: return nil
+        case .findInPage: return Strings.FindOnPageSectionHeader
+        case .bookmarksAndHistory: return Strings.SearchHistorySectionHeader
+        }
+        
+    }
 
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 0
+        guard let searchSection = SearchListSection(rawValue: section) else { return 0 }
+        let headerHeight: CGFloat = 22
+        
+        switch searchSection {
+        case .findInPage:
+            if let sd = searchDelegate, sd.searchViewControllerAllowFindInPage() {
+                return headerHeight
+            }
+            return 0
+        case .bookmarksAndHistory: return data.isEmpty ? 0 : headerHeight
+        default: return 0
+        }
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -432,6 +458,14 @@ class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, Loa
             suggestionCell.imageView?.isAccessibilityElement = true
             suggestionCell.imageView?.accessibilityLabel = String(format: Strings.SearchSuggestionFromFormatText, searchEngines.defaultEngine().shortName)
             return suggestionCell
+            
+        case .findInPage:
+            let cell = TwoLineTableViewCell()
+            cell.textLabel?.text = String(format: Strings.FindInPageFormat, searchQuery)
+            cell.imageView?.image = #imageLiteral(resourceName: "search_bar_find_in_page_icon")
+            cell.imageView?.contentMode = .center
+            
+            return cell
 
         case .bookmarksAndHistory:
             let cell = super.tableView(tableView, cellForRowAt: indexPath)
@@ -459,11 +493,16 @@ class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, Loa
             return searchEngines.shouldShowSearchSuggestions && !searchQuery.looksLikeAURL() && !tabType.isPrivate ? 1 : 0
         case .bookmarksAndHistory:
             return data.count
+        case .findInPage:
+            if let sd = searchDelegate, sd.searchViewControllerAllowFindInPage() {
+                return 1
+            }
+            return 0
         }
     }
 
     func numberOfSections(in tableView: UITableView) -> Int {
-        return SearchListSection.Count
+        return SearchListSection.allCases.count
     }
 
     func tableView(_ tableView: UITableView, didHighlightRowAt indexPath: IndexPath) {
@@ -483,7 +522,7 @@ extension SearchViewController {
         let initialSection = SearchListSection.bookmarksAndHistory.rawValue
         guard let current = tableView.indexPathForSelectedRow else {
             let count = tableView(tableView, numberOfRowsInSection: initialSection)
-            if sender.input == UIKeyInputDownArrow, count > 0 {
+            if sender.input == UIKeyCommand.inputDownArrow, count > 0 {
                 let next = IndexPath(item: 0, section: initialSection)
                 self.tableView(tableView, didHighlightRowAt: next)
                 tableView.selectRow(at: next, animated: false, scrollPosition: .top)
@@ -495,7 +534,7 @@ extension SearchViewController {
         let nextItem: Int
         guard let input = sender.input else { return }
         switch input {
-        case UIKeyInputUpArrow:
+        case UIKeyCommand.inputUpArrow:
             // we're going down, we should check if we've reached the first item in this section.
             if current.item == 0 {
                 // We have, so check if we can decrement the section.
@@ -511,7 +550,7 @@ extension SearchViewController {
                 nextSection = current.section
                 nextItem = current.item - 1
             }
-        case UIKeyInputDownArrow:
+        case UIKeyCommand.inputDownArrow:
             let currentSectionItemsCount = tableView(tableView, numberOfRowsInSection: current.section)
             if current.item == currentSectionItemsCount - 1 {
                 if current.section == tableView.numberOfSections - 1 {
@@ -591,7 +630,7 @@ fileprivate class SuggestionCell: UITableViewCell {
     weak var delegate: SuggestionCellDelegate?
     let container = UIView()
 
-    override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
 
         isAccessibilityElement = false

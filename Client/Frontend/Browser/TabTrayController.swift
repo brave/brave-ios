@@ -333,8 +333,8 @@ class TabTrayController: UIViewController, Themeable {
 
         emptyPrivateTabsView.isHidden = !privateTabsAreEmpty()
 
-        NotificationCenter.default.addObserver(self, selector: #selector(appWillResignActiveNotification), name: .UIApplicationWillResignActive, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(appDidBecomeActiveNotification), name: .UIApplicationDidBecomeActive, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(appWillResignActiveNotification), name: UIApplication.willResignActiveNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(appDidBecomeActiveNotification), name: UIApplication.didBecomeActiveNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(dynamicFontChanged), name: .DynamicFontChanged, object: nil)
         
         applyTheme(privateMode ? .private : .regular)
@@ -410,7 +410,7 @@ class TabTrayController: UIViewController, Themeable {
         if tabDataSource.tabs.isEmpty {
             openNewTab()
         } else {
-            if TabType.of(tabManager.selectedTab).isPrivate != privateMode {
+            if tabManager.selectedTab == nil || TabType.of(tabManager.selectedTab).isPrivate != privateMode {
                 tabManager.selectTab(tabDataSource.tabs.first!)
             }
             self.navigationController?.popViewController(animated: true)
@@ -527,7 +527,7 @@ class TabTrayController: UIViewController, Themeable {
                 let appDelegate = UIApplication.shared.delegate as? AppDelegate,
                 let bvc = appDelegate.browserViewController {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-                    bvc.urlBar.tabLocationViewDidTapLocation(bvc.urlBar.locationView)
+                    bvc.topToolbar.tabLocationViewDidTapLocation(bvc.topToolbar.locationView)
                 }
             }
 
@@ -545,12 +545,19 @@ class TabTrayController: UIViewController, Themeable {
     func updatePrivateModeButtonVisibility() {
         toolbar.privateModeButton.isHidden = Preferences.Privacy.privateBrowsingOnly.value
     }
+    
+    private func updateApplicationShortcuts() {
+        if let delegate = UIApplication.shared.delegate as? AppDelegate {
+            delegate.updateShortcutItems(UIApplication.shared)
+        }
+    }
 }
 
 extension TabTrayController: PreferencesObserver {
     func preferencesDidChange(for key: String) {
         if key == Preferences.Privacy.privateBrowsingOnly.key {
             updatePrivateModeButtonVisibility()
+            updateApplicationShortcuts()
         }
     }
 }
@@ -716,7 +723,7 @@ extension TabTrayController: SwipeAnimatorDelegate {
 
         let tab = tabManager.tabsForCurrentMode[indexPath.item]
         tabManager.removeTab(tab)
-        UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, Strings.TabTrayClosingTabAccessibilityNotificationText)
+        UIAccessibility.post(notification: .announcement, argument: Strings.TabTrayClosingTabAccessibilityNotificationText)
     }
 }
 
@@ -985,6 +992,7 @@ fileprivate class EmptyPrivateTabsView: UIView {
         $0.setTitle(Strings.Private_Tab_Link, for: [])
         $0.setTitleColor(UIConstants.PrivateModeTextHighlightColor, for: [])
         $0.titleLabel?.font = EmptyPrivateTabsViewUX.LearnMoreFont
+        $0.titleLabel?.numberOfLines = 0
     }
 
     let iconImageView = UIImageView(image: #imageLiteral(resourceName: "private_glasses")).then {

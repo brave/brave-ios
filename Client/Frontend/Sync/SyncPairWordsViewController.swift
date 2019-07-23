@@ -37,12 +37,12 @@ class SyncPairWordsViewController: SyncViewController {
     }
     
     var loadingView: UIView!
-    let loadingSpinner = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
+    let loadingSpinner = UIActivityIndicatorView(style: .whiteLarge)
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        title = Strings.SyncAddDeviceWords
+        title = Strings.SyncAddDeviceWordsTitle
         
         scrollView = UIScrollView()
         scrollView.translatesAutoresizingMaskIntoConstraints = false

@@ -26,6 +26,7 @@ protocol TabDelegate {
     func tab(_ tab: Tab, didSelectFindInPageForSelection selection: String)
     @objc optional func tab(_ tab: Tab, didCreateWebView webView: WKWebView)
     @objc optional func tab(_ tab: Tab, willDeleteWebView webView: WKWebView)
+    func tab(_ tab: Tab, isVerifiedPublisher verified: Bool)
 }
 
 @objc
@@ -43,6 +44,8 @@ struct TabState {
 
 class Tab: NSObject {
     var id: String?
+    
+    let rewardsId: UInt32
     
     private(set) var type: TabType = .regular
     
@@ -146,6 +149,7 @@ class Tab: NSObject {
 
     init(configuration: WKWebViewConfiguration, type: TabType = .regular) {
         self.configuration = configuration
+        rewardsId = UInt32.random(in: UInt32.min...UInt32.max)
         super.init()
         self.type = type
     }
@@ -189,7 +193,9 @@ class Tab: NSObject {
             configuration!.preferences = WKPreferences()
             configuration!.preferences.javaScriptCanOpenWindowsAutomatically = false
             configuration!.allowsInlineMediaPlayback = true
-            let webView = TabWebView(frame: .zero, configuration: configuration!)
+            // Enables Zoom in website by ignoring their javascript based viewport Scale limits.
+            configuration!.ignoresViewportScaleLimits = true
+            let webView = TabWebView(frame: .zero, configuration: configuration!, isPrivate: isPrivate)
             webView.delegate = self
             configuration = nil
 
@@ -209,7 +215,7 @@ class Tab: NSObject {
 
             self.webView = webView
             self.webView?.addObserver(self, forKeyPath: KVOConstants.URL.rawValue, options: .new, context: nil)
-            self.userScriptManager = UserScriptManager(tab: self, isFingerprintingProtectionEnabled: Preferences.Shields.fingerprintingProtection.value, isCookieBlockingEnabled: Preferences.Privacy.blockAllCookies.value)
+            self.userScriptManager = UserScriptManager(tab: self, isFingerprintingProtectionEnabled: Preferences.Shields.fingerprintingProtection.value, isCookieBlockingEnabled: Preferences.Privacy.blockAllCookies.value, isU2FEnabled: webView.hasOnlySecureContent)
             tabDelegate?.tab?(self, didCreateWebView: webView)
         }
     }
@@ -271,6 +277,12 @@ class Tab: NSObject {
     deinit {
         deleteWebView()
         contentScriptManager.helpers.removeAll()
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate,
+            let rewards = appDelegate.browserViewController.rewards else { return }
+        
+        if !PrivateBrowsingManager.shared.isPrivateBrowsing {
+            rewards.reportTabClosed(tabId: rewardsId)
+        }
     }
 
     var loading: Bool {
@@ -357,6 +369,27 @@ class Tab: NSObject {
             return webView.load(request)
         }
         return nil
+    }
+    
+    func reportPageLoad() {
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate,
+            let rewards = appDelegate.browserViewController.rewards,
+            let webView = webView,
+            let url = webView.url,
+            !url.isLocal,
+            !PrivateBrowsingManager.shared.isPrivateBrowsing else { return }
+        
+        let getHtmlToStringJSCall = "document.documentElement.outerHTML.toString()"
+        let tabId = rewardsId
+        
+        DispatchQueue.main.async {
+            webView.evaluateJavaScript(getHtmlToStringJSCall, completionHandler: { html, _ in
+                guard let htmlString = html as? String else { return }
+                rewards.reportLoadedPage(url: url, tabId: tabId, html: htmlString) { verified in
+                    self.tabDelegate?.tab(self, isVerifiedPublisher: verified)
+                }
+            })
+        }
     }
 
     func stop() {
@@ -479,6 +512,10 @@ class Tab: NSObject {
         }
         guard let url = self.webView?.url else {
             return
+        }
+        
+        if let helper = contentScriptManager.getContentScript(ContextMenuHelper.name()) as? ContextMenuHelper {
+            helper.replaceWebViewLongPress()
         }
 
         self.urlDidChangeDelegate?.tab(self, urlDidChangeTo: url)

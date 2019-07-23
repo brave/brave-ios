@@ -1,18 +1,19 @@
 language: swift
-osx_image: xcode10.1
+osx_image: xcode10.2
 cache:
   directories:
     - Carthage
+    - $HOME/.npm
 
 install: true
 
 before_install:
   - brew install carthage || true
   - brew install swiftlint || true
-  - gem update fastlane --no-ri --no-rdoc --no-document
+  - gem update fastlane --no-document
 
 before_script:
-  - bash bootstrap.sh
+  - bash bootstrap.sh --ci
 
 script:
   - set -o pipefail
