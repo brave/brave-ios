@@ -52,8 +52,7 @@ extension BrowserViewController: DownloadQueueDelegate {
                 let downloadCompleteToast = ButtonToast(labelText: download.filename, imageName: "check", buttonText: Strings.DownloadsButtonTitle, completion: { buttonPressed in
                     guard buttonPressed else { return }
                     
-                    // TODO: Show our own downloads VC
-                    // self.showLibrary(panel: .downloads)
+                    self.present(DownloadsPanel(profile: self.profile), animated: true, completion: nil)
                 })
                 
                 self.show(toast: downloadCompleteToast, duration: DispatchTimeInterval.seconds(8))

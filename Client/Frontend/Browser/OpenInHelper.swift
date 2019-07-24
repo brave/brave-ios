@@ -73,7 +73,7 @@ class DownloadHelper: NSObject, OpenInHelper {
     }
     
     func open() {
-        guard let host = request.url?.host else {
+        guard let host = request.url?.host, let filename = request.url?.lastPathComponent else {
             return
         }
         
@@ -81,24 +81,22 @@ class DownloadHelper: NSObject, OpenInHelper {
         
         let expectedSize = download.totalBytesExpected != nil ? ByteCountFormatter.string(fromByteCount: download.totalBytesExpected!, countStyle: .file) : nil
         
-        // TODO: Proper ui for download prompt.
+        let title = "\(filename) - \(host)"
         
-        let alert = UIAlertController(title: "download", message: "s", preferredStyle: .actionSheet)
+        let alert = UIAlertController(title: title, message: nil, preferredStyle: .actionSheet)
         
-        let okAction = UIAlertAction(title: "Download", style: .default) { _ in
+        let downloadActionText = Strings.Download + " (\(expectedSize ?? ""))"
+        
+        let okAction = UIAlertAction(title: downloadActionText, style: .default) { _ in
             self.browserViewController.downloadQueue.enqueue(download)
         }
         
-        let cancelAction = UIAlertAction(title: "Cancel", style: .destructive)
+        let cancelAction = UIAlertAction(title: Strings.CancelButtonTitle, style: .cancel)
         
         alert.addAction(okAction)
         alert.addAction(cancelAction)
         
         browserViewController.present(alert, animated: true, completion: nil)
-        
-//        let actions = [[filenameItem], [downloadFileItem]]
-        
-//        browserViewController.presentSheetWith(actions: actions, on: browserViewController, from: browserViewController.urlBar, closeButtonTitle: Strings.CancelString, suppressPopover: true)
     }
 }
 
