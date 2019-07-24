@@ -414,8 +414,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         }
     }
 
-    fileprivate func setUserAgent() {
-        let firefoxUA = UserAgent.defaultUserAgent()
+    func setUserAgent(useCache: Bool = true) {
+//        let firefoxUA = Preferences.General.alwaysRequestDesktopSite.value ?
+//            UserAgent.desktopUserAgent(useCache: useCache) : UserAgent.defaultUserAgent(useCache: useCache)
+        
+        let firefoxUA = UserAgent.defaultUserAgent(useCache: useCache)
 
         // Set the UA for WKWebView (via defaults), the favicon fetcher, and the image loader.
         // This only needs to be done once per runtime. Note that we use defaults here that are

@@ -53,10 +53,10 @@ open class UserAgent {
      * This will typically return quickly, but can require creation of a UIWebView.
      * As a result, it must be called on the UI thread.
      */
-    public static func defaultUserAgent() -> String {
+    public static func defaultUserAgent(useCache: Bool = true) -> String {
         assert(Thread.current.isMainThread, "This method must be called on the main thread.")
 
-        if let firefoxUA = UserAgent.cachedUserAgent(checkiOSVersion: true) {
+        if let firefoxUA = UserAgent.cachedUserAgent(checkiOSVersion: true), useCache {
             return firefoxUA
         }
 
@@ -95,8 +95,8 @@ open class UserAgent {
         return firefoxUA
     }
 
-    public static func desktopUserAgent() -> String {
-        let userAgent = NSMutableString(string: defaultUserAgent())
+    public static func desktopUserAgent(useCache: Bool = true) -> String {
+        let userAgent = NSMutableString(string: defaultUserAgent(useCache: useCache))
 
         // Spoof platform section
         let platformRegex = try? NSRegularExpression(pattern: "\\([^\\)]+\\)", options: [])

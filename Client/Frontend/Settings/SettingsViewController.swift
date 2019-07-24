@@ -167,6 +167,9 @@ class SettingsViewController: TableViewController {
             general.rows.append(row)
         }
         
+        general.rows.append(BoolRow(title: Strings.AlwaysRequestDesktopSite,
+                                    option: Preferences.General.alwaysRequestDesktopSite))
+        
         return general
     }()
     

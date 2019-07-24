@@ -140,11 +140,11 @@ extension BrowserViewController: WKNavigationDelegate {
         // always allow this. Additionally, data URIs are also handled just like normal web pages.
 
         if ["http", "https", "data", "blob", "file"].contains(url.scheme) {
-            if navigationAction.navigationType == .linkActivated {
-                resetSpoofedUserAgentIfRequired(webView, newURL: url)
-            } else if navigationAction.navigationType == .backForward {
-                restoreSpoofedUserAgentIfRequired(webView, newRequest: navigationAction.request)
-            }
+//            if navigationAction.navigationType == .linkActivated {
+//                resetSpoofedUserAgentIfRequired(webView, newURL: url)
+//            } else if navigationAction.navigationType == .backForward {
+//                restoreSpoofedUserAgentIfRequired(webView, newRequest: navigationAction.request)
+//            }
 
             pendingRequests[url.absoluteString] = navigationAction.request
             

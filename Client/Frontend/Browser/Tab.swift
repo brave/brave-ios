@@ -123,7 +123,11 @@ class Tab: NSObject {
 
     /// Whether or not the desktop site was requested with the last request, reload or navigation. Note that this property needs to
     /// be managed by the web view's navigation delegate.
-    var desktopSite: Bool = false
+    var desktopSite: Bool = false {
+        didSet {
+            webView?.customUserAgent = desktopSite ? UserAgent.desktopUserAgent() : nil
+        }
+    }
     
     var readerModeAvailableOrActive: Bool {
         if let readerMode = self.getContentScript(name: "ReaderMode") as? ReaderMode {
@@ -212,6 +216,10 @@ class Tab: NSObject {
             // which allows the content appear beneath the toolbars in the BrowserViewController
             webView.scrollView.layer.masksToBounds = false
             webView.navigationDelegate = navigationDelegate
+            
+            if Preferences.General.alwaysRequestDesktopSite.value {
+                desktopSite = true
+            }
 
             restore(webView, restorationData: self.sessionData?.savedTabData)
 

@@ -201,6 +201,7 @@ class BrowserViewController: UIViewController {
         // Observe some user preferences
         Preferences.Privacy.privateBrowsingOnly.observe(from: self)
         Preferences.General.tabBarVisibility.observe(from: self)
+        Preferences.General.alwaysRequestDesktopSite.observe(from: self)
         Preferences.Shields.allShields.forEach { $0.observe(from: self) }
         Preferences.Privacy.blockAllCookies.observe(from: self)
         // Lists need to be compiled before attempting tab restoration
@@ -1132,7 +1133,11 @@ class BrowserViewController: UIViewController {
     func restoreSpoofedUserAgentIfRequired(_ webView: WKWebView, newRequest: URLRequest) {
         // Restore any non-default UA from the request's header
         let ua = newRequest.value(forHTTPHeaderField: "User-Agent")
-        webView.customUserAgent = ua != UserAgent.defaultUserAgent() ? ua : nil
+        
+        let defaultUA = Preferences.General.alwaysRequestDesktopSite.value ?
+            UserAgent.desktopUserAgent() : UserAgent.defaultUserAgent()
+        
+        webView.customUserAgent = ua != defaultUA ? ua : nil
     }
 
     fileprivate func presentActivityViewController(_ url: URL, tab: Tab? = nil, sourceView: UIView?, sourceRect: CGRect, arrowDirection: UIPopoverArrowDirection) {
@@ -3036,6 +3041,12 @@ extension BrowserViewController: PreferencesObserver {
             } else {
                 tabManager.reloadSelectedTab()
             }
+        case Preferences.General.alwaysRequestDesktopSite.key:
+            tabManager.allTabs.forEach {
+                $0.desktopSite = Preferences.General.alwaysRequestDesktopSite.value
+            }
+            //guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { break }
+            //appDelegate.setUserAgent(useCache: false)
         default:
             log.debug("Received a preference change for an unknown key: \(key) on \(type(of: self))")
             break

@@ -42,6 +42,11 @@ extension Preferences {
         /// Controls how the tab bar should be shown (or not shown)
         static let tabBarVisibility = Option<Int>(key: "general.tab-bar-visiblity", default: TabBarVisibility.always.rawValue)
         
+        static let alwaysRequestDesktopSite = Option<Bool>(key: "general.always-request-desktop-site",
+                                                          default: UIDevice.current.userInterfaceIdiom == .pad)
+        
+        //UIDevice.current.userInterfaceIdiom == .pad
+        
         /// Whether or not a user has enabled Night Mode.
         ///
         /// Currently unused
