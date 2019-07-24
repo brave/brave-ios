@@ -25,6 +25,9 @@ class PasscodeEntryViewController: BasePasscodeViewController {
         passcodePane = PasscodePane(title: nil, passcodeSize: authInfo?.passcode?.count ?? 6)
 
         super.init()
+        
+        passcodePane.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(passcodeCheckSetup)))
+        passcodePane.isUserInteractionEnabled = true
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -44,6 +47,10 @@ class PasscodeEntryViewController: BasePasscodeViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         passcodePane.codeInputView.delegate = self
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         
         passcodeCheckSetup()
     }
