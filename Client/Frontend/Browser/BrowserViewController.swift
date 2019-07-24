@@ -181,8 +181,12 @@ class BrowserViewController: UIViewController {
             }
         }, completion: { _ in
             self.scrollController.setMinimumZoom()
+
+            if let tab = self.tabManager.selectedTab {
+                WindowRenderHelperScript.executeScript(for: tab)
+            }
         })
-        
+
         coordinator.animate(alongsideTransition: { context in
             if let webView = self.tabManager.selectedTab?.webView {
                 webView.frame = self.view.bounds
@@ -285,8 +289,12 @@ class BrowserViewController: UIViewController {
                 self.statusBarOverlay.backgroundColor = self.topToolbar.backgroundColor
                 self.setNeedsStatusBarAppearanceUpdate()
             }
-        }, completion: nil)
-        
+        }, completion: { _ in
+            if let tab = self.tabManager.selectedTab {
+                WindowRenderHelperScript.executeScript(for: tab)
+            }
+        })
+
         coordinator.animate(alongsideTransition: { context in
             if let webView = self.tabManager.selectedTab?.webView {
                 webView.frame = self.view.bounds
@@ -1918,6 +1926,8 @@ extension BrowserViewController: TabDelegate {
         tab.addContentScript(U2FExtensions(tab: tab), name: U2FExtensions.name())
         
         tab.addContentScript(ResourceDownloadManager(tab: tab), name: ResourceDownloadManager.name())
+        
+        tab.addContentScript(WindowRenderHelperScript(tab: tab), name: WindowRenderHelperScript.name())
     }
 
     func tab(_ tab: Tab, willDeleteWebView webView: WKWebView) {
