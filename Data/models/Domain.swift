@@ -23,6 +23,10 @@ public final class Domain: NSManagedObject, CRUD {
     @NSManaged public var historyItems: NSSet?
     @NSManaged public var bookmarks: NSSet?
     
+    private var urlComponents: URLComponents? {
+        return URLComponents(string: url ?? "")
+    }
+    
     // MARK: - Public interface
     
     public class func getOrCreate(forUrl url: URL, persistent: Bool) -> Domain {
@@ -70,7 +74,7 @@ public final class Domain: NSManagedObject, CRUD {
             }
             
             for domain in httpDomains {
-                guard let urlString = domain.url, var urlComponents = URLComponents(string: urlString) else { continue }
+                guard var urlComponents = domain.urlComponents else { continue }
                 urlComponents.scheme = "https"
                 guard let httpsUrl = urlComponents.url?.absoluteString else { continue }
                 if let httpsDomain = Domain.first(where: NSPredicate(format: "url == %@", httpsUrl), context: context) {
@@ -174,7 +178,12 @@ extension Domain {
         switch shield {
         case .AllOff: shield_allOff = setting
         case .AdblockAndTp: shield_adblockAndTp = setting
-        case .HTTPSE: shield_httpse = setting
+        case .HTTPSE:
+          shield_httpse = setting
+            
+          // HTTPSE must be scheme indepedent or user may get stuck not being able to access the http version
+          //  of a website (turning off httpse for an upgraded-https domain does not allow access to http version)
+          self.domainForInverseHttpScheme(context: context)?.shield_httpse = setting
         case .SafeBrowsing: shield_safeBrowsing = setting
         case .FpProtection: shield_fpProtection = setting
         case .NoScript: shield_noScript = setting
@@ -197,5 +206,24 @@ extension Domain {
         case .NoScript:
             return self.shield_noScript?.boolValue
         }
+    }
+    
+    /// Returns `url` but switches the scheme from `http` <-> `https`
+    private func domainForInverseHttpScheme(context: NSManagedObjectContext) -> Domain? {
+        
+        guard var urlComponents = self.urlComponents else { return nil }
+        
+        // Flip the scheme if valid
+        
+        switch urlComponents.scheme {
+        case "http": urlComponents.scheme = "https"
+        case "https": urlComponents.scheme = "http"
+        default: return nil
+        }
+        
+        guard let url = urlComponents.url else { return nil }
+        
+        // Return the flipped scheme version of `url`
+        return Domain.getOrCreateInternal(url, context: context, save: true)
     }
 }
