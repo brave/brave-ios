@@ -18,12 +18,16 @@ var $<windowRenderer> = (function() {
     function addDocumentStateListener() {
         document.addEventListener('readystatechange', event => {
             if (event.target.readyState === "interactive") {
-                postMessage(event.target.readyState);
+                //Used for debugging in Safari development tools to know what the state of the page is.
+                //Not needed while in use because we only care about JSON messages and not state.
+                //postMessage(event.target.readyState);
                 resizeWindow();
             }
 
             if (event.target.readyState === "complete") {
-                postMessage(event.target.readyState);
+                //Used for debugging in Safari development tools to know what the state of the page is.
+                //Not needed while in use because we only care about JSON messages and not state.
+                //postMessage(event.target.readyState);
                 resizeWindow();
             }
         });

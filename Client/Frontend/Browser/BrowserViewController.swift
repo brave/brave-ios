@@ -186,16 +186,6 @@ class BrowserViewController: UIViewController {
                 WindowRenderHelperScript.executeScript(for: tab)
             }
         })
-
-        coordinator.animate(alongsideTransition: { context in
-            if let webView = self.tabManager.selectedTab?.webView {
-                webView.frame = self.view.bounds
-            }
-        }, completion: { _ in
-            if let webView = self.tabManager.selectedTab?.webView {
-                webView.frame = self.webViewContainer.bounds
-            }
-        })
     }
 
     override func didReceiveMemoryWarning() {
@@ -292,16 +282,6 @@ class BrowserViewController: UIViewController {
         }, completion: { _ in
             if let tab = self.tabManager.selectedTab {
                 WindowRenderHelperScript.executeScript(for: tab)
-            }
-        })
-
-        coordinator.animate(alongsideTransition: { context in
-            if let webView = self.tabManager.selectedTab?.webView {
-                webView.frame = self.view.bounds
-            }
-        }, completion: { _ in
-            if let webView = self.tabManager.selectedTab?.webView {
-                webView.frame = self.webViewContainer.bounds
             }
         })
     }
