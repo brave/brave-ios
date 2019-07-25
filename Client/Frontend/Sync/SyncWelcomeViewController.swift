@@ -70,14 +70,14 @@ class SyncWelcomeViewController: SyncViewController {
         return stackView
     }()
 
-    lazy var existingUserButton: RoundInterfaceButton = {
+    lazy var newToSyncButton: RoundInterfaceButton = {
         let button = RoundInterfaceButton(type: .roundedRect)
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle(Strings.ScanSyncCode, for: .normal)
+        button.setTitle(Strings.NewSyncCode, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 17, weight: UIFont.Weight.bold)
         button.setTitleColor(UIColor.white, for: .normal)
         button.backgroundColor = BraveUX.BraveOrange
-        button.addTarget(self, action: #selector(existingUserAction), for: .touchUpInside)
+        button.addTarget(self, action: #selector(newToSyncAction), for: .touchUpInside)
 
         button.snp.makeConstraints { make in
             make.height.equalTo(50)
@@ -86,13 +86,13 @@ class SyncWelcomeViewController: SyncViewController {
         return button
     }()
 
-    lazy var newToSyncButton: RoundInterfaceButton = {
+    lazy var existingUserButton: RoundInterfaceButton = {
         let button = RoundInterfaceButton(type: .roundedRect)
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle(Strings.NewSyncCode, for: .normal)
+        button.setTitle(Strings.ScanSyncCode, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 15, weight: UIFont.Weight.semibold)
         button.setTitleColor(BraveUX.GreyH, for: .normal)
-        button.addTarget(self, action: #selector(newToSyncAction), for: .touchUpInside)
+        button.addTarget(self, action: #selector(existingUserAction), for: .touchUpInside)
         return button
     }()
     
@@ -123,8 +123,8 @@ class SyncWelcomeViewController: SyncViewController {
         textStackView.addArrangedSubview(descriptionStackView)
         mainStackView.addArrangedSubview(textStackView)
 
-        buttonsStackView.addArrangedSubview(existingUserButton)
         buttonsStackView.addArrangedSubview(newToSyncButton)
+        buttonsStackView.addArrangedSubview(existingUserButton)
         mainStackView.addArrangedSubview(buttonsStackView)
         
         handleSyncSetupFailure()

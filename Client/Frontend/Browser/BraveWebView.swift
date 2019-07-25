@@ -7,17 +7,34 @@ import WebKit
 
 class BraveWebView: WKWebView {
     
-    init(frame: CGRect, configuration: WKWebViewConfiguration = WKWebViewConfiguration(), privacyProtection: PrivacyProtectionProtocol = PrivacyProtection()) {
-        if privacyProtection.nonPersistent {
-            configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
+    private static var nonPersistentDataStore: WKWebsiteDataStore?
+    private static func sharedNonPersistentStore() -> WKWebsiteDataStore {
+        if let dataStore = nonPersistentDataStore {
+            return dataStore
+        }
+        
+        let dataStore = WKWebsiteDataStore.nonPersistent()
+        nonPersistentDataStore = dataStore
+        return dataStore
+    }
+    
+    init(frame: CGRect, configuration: WKWebViewConfiguration = WKWebViewConfiguration(), isPrivate: Bool = true) {
+        if isPrivate {
+            configuration.websiteDataStore = BraveWebView.sharedNonPersistentStore()
+        } else {
+            BraveWebView.nonPersistentDataStore = nil
+            configuration.websiteDataStore = WKWebsiteDataStore.default()
         }
         
         super.init(frame: frame, configuration: configuration)
+    }
+    
+    static func removeNonPersistentStore() {
+        BraveWebView.nonPersistentDataStore = nil
     }
     
     @available(*, unavailable)
     required init?(coder aDecoder: NSCoder) {
         fatalError()
     }
-    
 }

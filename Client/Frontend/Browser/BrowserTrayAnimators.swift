@@ -21,14 +21,12 @@ class TrayToBrowserAnimator: NSObject, UIViewControllerAnimatedTransitioning {
 private extension TrayToBrowserAnimator {
     func transitionFromTray(_ tabTray: TabTrayController, toBrowser bvc: BrowserViewController, usingContext transitionContext: UIViewControllerContextTransitioning) {
         let container = transitionContext.containerView
-        guard let selectedTab = bvc.tabManager.selectedTab else { return }
 
         let tabManager = bvc.tabManager
         let displayedTabs = tabManager.tabsForCurrentMode
-        guard let expandFromIndex = displayedTabs.index(of: selectedTab) else { return }
-        guard displayedTabs.index(of: selectedTab) != nil else {
-            transitionContext.completeTransition(false)
-            return
+        
+        guard let selectedTab = bvc.tabManager.selectedTab, let expandFromIndex = displayedTabs.index(of: selectedTab) else {
+            fatalError("No tab selected for transition.")
         }
         bvc.view.frame = transitionContext.finalFrame(for: bvc)
 
@@ -61,7 +59,7 @@ private extension TrayToBrowserAnimator {
 
         let finalFrame = calculateExpandedCellFrameFromBVC(bvc)
         bvc.footer.alpha = shouldDisplayFooterForBVC(bvc) ? 1 : 0
-        bvc.urlBar.isTransitioning = true
+        bvc.topToolbar.isTransitioning = true
 
         // Re-calculate the starting transforms for header/footer views in case we switch orientation
         resetTransformsForViews([bvc.header, bvc.readerModeBar, bvc.footer])
@@ -93,7 +91,7 @@ private extension TrayToBrowserAnimator {
             toggleWebViewVisibility(true, usingTabManager: bvc.tabManager)
             bvc.webViewContainerBackdrop.isHidden = false
             bvc.favoritesViewController?.view.isHidden = false
-            bvc.urlBar.isTransitioning = false
+            bvc.topToolbar.isTransitioning = false
             bvc.updateTabsBarVisibility()
             transitionContext.completeTransition(true)
         })
@@ -117,13 +115,10 @@ private extension BrowserToTrayAnimator {
     func transitionFromBrowser(_ bvc: BrowserViewController, toTabTray tabTray: TabTrayController, usingContext transitionContext: UIViewControllerContextTransitioning) {
 
         let container = transitionContext.containerView
-        guard let selectedTab = bvc.tabManager.selectedTab else { return }
-
         let tabManager = bvc.tabManager
         let displayedTabs = tabManager.tabsForCurrentMode
-        guard let scrollToIndex = displayedTabs.index(of: selectedTab) else {
-            transitionContext.completeTransition(false)
-            return
+        guard let selectedTab = bvc.tabManager.selectedTab, let scrollToIndex = displayedTabs.index(of: selectedTab) else {
+            fatalError("No tab selected for transition.")
         }
 
         tabTray.view.frame = transitionContext.finalFrame(for: tabTray)
@@ -161,7 +156,7 @@ private extension BrowserToTrayAnimator {
         bvc.statusBarOverlay.isHidden = true
         bvc.toggleSnackBarVisibility(show: false)
         toggleWebViewVisibility(false, usingTabManager: bvc.tabManager)
-        bvc.urlBar.isTransitioning = true
+        bvc.topToolbar.isTransitioning = true
 
         // Since we are hiding the collection view and the snapshot API takes the snapshot after the next screen update,
         // the screenshot ends up being blank unless we set the collection view hidden after the screen update happens.
@@ -188,7 +183,7 @@ private extension BrowserToTrayAnimator {
                 
                 transformHeaderFooterForBVC(bvc, toFrame: finalFrame, container: container)
 
-                bvc.urlBar.updateAlphaForSubviews(0)
+                bvc.topToolbar.updateAlphaForSubviews(0)
                 bvc.footer.alpha = 0
                 tabCollectionViewSnapshot.alpha = 1
 
@@ -205,7 +200,7 @@ private extension BrowserToTrayAnimator {
                 bvc.favoritesViewController?.view.isHidden = false
 
                 resetTransformsForViews([bvc.header, bvc.readerModeBar, bvc.footer])
-                bvc.urlBar.isTransitioning = false
+                bvc.topToolbar.isTransitioning = false
                 transitionContext.completeTransition(true)
             })
         }

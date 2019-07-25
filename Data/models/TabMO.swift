@@ -94,7 +94,7 @@ public final class TabMO: NSManagedObject, CRUD {
             guard let tabToUpdate = getInternal(fromId: tabData.id, context: context) else { return }
             
             if let screenshot = tabData.screenshot {
-                tabToUpdate.screenshot = UIImageJPEGRepresentation(screenshot, 1)
+                tabToUpdate.screenshot = screenshot.jpegData(compressionQuality: 1)
             }
             tabToUpdate.url = tabData.url
             tabToUpdate.order = tabData.order
@@ -127,15 +127,15 @@ public final class TabMO: NSManagedObject, CRUD {
     // MARK: Delete
     
     public func delete() {
-        delete(context: .new(false))
+        delete(context: .new(inMemory: false))
     }
     
     public class func deleteAll() {
-        deleteAll(context: .new(false))
+        deleteAll(context: .new(inMemory: false))
     }
     
     public class func deleteAllPrivateTabs() {
-        deleteAll(predicate: NSPredicate(format: "isPrivate == true"), context: .new(false))
+        deleteAll(predicate: NSPredicate(format: "isPrivate == true"), context: .new(inMemory: false))
     }
 
     }

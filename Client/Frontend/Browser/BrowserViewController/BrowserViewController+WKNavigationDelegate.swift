@@ -42,7 +42,7 @@ extension BrowserViewController: WKNavigationDelegate {
         // (orange color) as soon as the page has loaded.
         if let url = webView.url {
             if !url.isReaderModeURL {
-                urlBar.updateReaderModeState(ReaderModeState.unavailable)
+                topToolbar.updateReaderModeState(ReaderModeState.unavailable)
                 hideReaderModeBar(animated: false)
             }
         }
@@ -266,7 +266,7 @@ extension BrowserViewController: WKNavigationDelegate {
         // shared to external applications later. Otherwise, clear the old temporary document.
         if let tab = tabManager[webView] {
             if response.mimeType?.isKindOfHTML == false, let request = request {
-                tab.temporaryDocument = TemporaryDocument(preflightResponse: response, request: request)
+                tab.temporaryDocument = TemporaryDocument(preflightResponse: response, request: request, tab: tab)
             } else {
                 tab.temporaryDocument = nil
             }
@@ -330,8 +330,10 @@ extension BrowserViewController: WKNavigationDelegate {
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         if let tab = tabManager[webView] {
             navigateInTab(tab: tab, to: navigation)
+            tab.reportPageLoad()
+            
             if tab === tabManager.selectedTab {
-                urlBar.updateProgressBar(1.0)
+                topToolbar.updateProgressBar(1.0)
             }
             tabsBar.reloadDataAndRestoreSelectedTab()
         }

@@ -23,6 +23,12 @@ protocol TabManagerDelegate: class {
     func tabManagerDidRestoreTabs(_ tabManager: TabManager)
     func tabManagerDidAddTabs(_ tabManager: TabManager)
     func tabManagerDidRemoveAllTabs(_ tabManager: TabManager, toast: ButtonToast?)
+    
+    func tabManager(_ tabManager: TabManager, isVerifiedPublisher verified: Bool)
+}
+
+extension TabManagerDelegate {
+    func tabManager(_ tabManager: TabManager, isVerifiedPublisher verified: Bool) { }
 }
 
 protocol TabManagerStateDelegate: class {
@@ -173,6 +179,9 @@ class TabManager: NSObject {
         allTabs.filter({$0.webView != nil}).forEach({
             $0.resetWebView(config: configuration)
         })
+    }
+    
+    func reloadSelectedTab() {
         let tab = selectedTab
         _selectedIndex = -1
         selectTab(tab)
@@ -245,6 +254,22 @@ class TabManager: NSObject {
                 UITextField.appearance().keyboardAppearance = .light
             case .private:
                 UITextField.appearance().keyboardAppearance = .dark
+            }
+        }
+        
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate,
+            let rewards = appDelegate.browserViewController.rewards,
+            let newSelectedTab = tab, let previousTab = previous, let newTabUrl = newSelectedTab.url, let previousTabUrl = previousTab.url else { return }
+        
+        if !PrivateBrowsingManager.shared.isPrivateBrowsing {
+            rewards.reportTabUpdated(Int(previousTab.rewardsId), url: previousTabUrl, isSelected: false,
+                                     isPrivate: previousTab.isPrivate) { _ in }
+        
+            rewards.reportTabUpdated(Int(newSelectedTab.rewardsId), url: newTabUrl, isSelected: true,
+                                     isPrivate: newSelectedTab.isPrivate) { verified in
+                                        self.delegates.forEach {
+                                            $0.get()?.tabManager(self, isVerifiedPublisher: verified)
+                                        }
             }
         }
     }
@@ -503,7 +528,18 @@ class TabManager: NSObject {
         }
 
         if tab.isPrivate {
-            removeAllBrowsingDataForTab(tab)
+            // Only when ALL tabs are dead, we clean up.
+            // This is because other tabs share the same data-store.
+            if tabs(withType: .private).count <= 1 {
+                removeAllBrowsingDataForTab(tab)
+                
+                //After clearing the very last webview from the storage, give it a blank persistent store
+                //This is the only way to guarantee that the last reference to the shared persistent store
+                //reaches zero and destroys all its data.
+                
+                BraveWebView.removeNonPersistentStore()
+                configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
+            }
         }
 
         let oldSelectedTab = selectedTab
@@ -597,11 +633,7 @@ class TabManager: NSObject {
     }
 
     func removeAllBrowsingDataForTab(_ tab: Tab, completionHandler: @escaping () -> Void = {}) {
-        let dataTypes = Set([WKWebsiteDataTypeCookies,
-                             WKWebsiteDataTypeLocalStorage,
-                             WKWebsiteDataTypeSessionStorage,
-                             WKWebsiteDataTypeWebSQLDatabases,
-                             WKWebsiteDataTypeIndexedDBDatabases])
+        let dataTypes = WKWebsiteDataStore.allWebsiteDataTypes()
         tab.webView?.configuration.websiteDataStore.removeData(ofTypes: dataTypes,
                                                                modifiedSince: Date.distantPast,
                                                                completionHandler: completionHandler)

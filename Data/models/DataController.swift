@@ -12,7 +12,7 @@ private let log = Logger.browserLogger
 /// to perform a database write operation.
 enum WriteContext {
     /// Requests DataController to create new background context for the task.
-    case new(_ inMemory: Bool)
+    case new(inMemory: Bool)
     /// Requests DataController to use an existing context.
     /// (To prevent creating multiple contexts per call and mixing threads)
     case existing(_ context: NSManagedObjectContext)
@@ -47,7 +47,7 @@ public class DataController: NSObject {
     
     // MARK: - Data framework interface
     
-    static func perform(context: WriteContext = .new(false), save: Bool = true,
+    static func perform(context: WriteContext = .new(inMemory: false), save: Bool = true,
                         task: @escaping (NSManagedObjectContext) -> Void) {
         
         switch context {

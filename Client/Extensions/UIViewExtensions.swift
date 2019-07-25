@@ -87,7 +87,7 @@ extension UIView {
     /// Creates empty view with specified height or width parameter.
     /// Used mainly to make empty space for UIStackView
     /// Note: on iOS 11+ setCustomSpacing(value, after: View) can be used instead.
-    static func spacer(_ direction: UILayoutConstraintAxis, amount: Int) -> UIView {
+    static func spacer(_ direction: NSLayoutConstraint.Axis, amount: Int) -> UIView {
         let spacer = UIView()
         spacer.snp.makeConstraints { make in
             switch direction {
@@ -98,5 +98,18 @@ extension UIView {
             }
         }
         return spacer
+    }
+    
+    /// Returns a line with height of 1pt. Used to imitate a separator line in custom views.
+    static var separatorLine: UIView {
+        let view = UIView().then {
+            $0.backgroundColor = UIColor(white: 0.0, alpha: 0.2)
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            $0.addConstraint(NSLayoutConstraint(item: $0, attribute: .height, relatedBy: .equal,
+                                                toItem: nil, attribute: .notAnAttribute, multiplier: 1,
+                                                constant: 0.5))
+        }
+        
+        return view
     }
 }

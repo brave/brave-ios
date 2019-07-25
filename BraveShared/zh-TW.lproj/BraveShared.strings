@@ -17,12 +17,10 @@
 "AdsAndTrackers" = "廣告和追蹤器";
 
 /* Shields Ads Stat */
-"AdsAndTrackersrBlocked" = "廣告攔截
-和跟踪保護";
+"AdsAndTrackersrBlocked" = "廣告攔截\n和跟踪保護";
 
 /* Shields Ads Stat */
-"AdsrBlocked" = "已封鎖
-廣告";
+"AdsrBlocked" = "已封鎖\n廣告";
 
 /* Used as a button label for crash dialog prompt */
 "AlwaysSendButtonTitle" = "一律傳送";
@@ -165,9 +163,6 @@
 /* Section title for adbblock, tracking protection, HTTPS-E, and cookies */
 "BraveShieldDefaults" = "Brave Shield 預設";
 
-/* Brave sync page title */
-"BraveSync" = "Brave Sync （測試版）";
-
 /* Sync settings welcome */
 "BraveSyncWelcome" = "首先，您需要將 Brave 安裝在您計畫同步的所有裝置中。如要將裝置鏈接一起，請啟用一個同步鏈，用於將所有裝置安全鏈接。";
 
@@ -216,9 +211,6 @@
 /* No comment provided by engineer. */
 "CloseAllTabsTitle" = "關閉全部 %i 個分頁";
 
-/* Code words input help */
-"CodeWordInputHelp" = "輸入同步鏈接代碼詞：";
-
 /* Code words section title */
 "CodeWords" = "代碼詞";
 
@@ -227,9 +219,6 @@
 
 /* Cookie settings option title */
 "CookieControl" = "Cookie 控制項";
-
-/* Settings item for clearing cookies */
-"Cookies" = "Cookie";
 
 /* Copied action complete title */
 "Copied" = "已複製！";
@@ -349,8 +338,7 @@
 "ErrorPagesVisitOnceButton" = "繼續造訪網站";
 
 /* Shields Time Saved Stat */
-"EstTimerSaved" = "預計節省
-時間";
+"EstTimerSaved" = "預計節省\n時間";
 
 /* Share action title */
 "FindInPage" = "在頁面中尋找";
@@ -368,8 +356,7 @@
 "FingerprintingMethods" = "指紋識別法";
 
 /* blocking stat title */
-"FingerprintingnProtection" = "指紋識別
-防護";
+"FingerprintingnProtection" = "指紋識別\n防護";
 
 /* No comment provided by engineer. */
 "FingerprintingProtection" = "指紋識別防護";
@@ -384,8 +371,7 @@
 "HTTPSEverywhere" = "HTTPS Everywhere";
 
 /* Shields Https Stat */
-"HTTPSrUpgrades" = "HTTPS 
-更新";
+"HTTPSrUpgrades" = "HTTPS \n更新";
 
 /* individual blocking statistic title */
 "HTTPSUpgrades" = "HTTPS 更新";
@@ -400,8 +386,7 @@
 "LastWeek" = "上週";
 
 /* DuckDuckGo promotion label. */
-"LearnAboutPrivateSearchrwithDuckDuckGo" = "深入瞭解 
-DuckDuckGo 隱私搜尋";
+"LearnAboutPrivateSearchrwithDuckDuckGo" = "深入瞭解 \nDuckDuckGo 隱私搜尋";
 
 /* Footer label describing when the current login was last modified with the timestamp as the parameter. */
 "LoginDetailLastModifiedCellFormatTitle" = "上次修改的時間：%@";
@@ -429,9 +414,6 @@ DuckDuckGo 隱私搜尋";
 
 /* Copy password text selection menu item */
 "MenuItemCopyTitle" = "複製";
-
-/* Text selection menu item */
-"MenuItemFindInPageTitle" = "在頁面中尋找";
 
 /* Hide password text selection menu item */
 "MenuItemHidePasswordTitle" = "隱藏";
@@ -515,13 +497,7 @@ DuckDuckGo 隱私搜尋";
 "PrivateBrowsingOnly" = "僅限隱私瀏覽";
 
 /* Private tab detail text */
-"PrivateTabDetails" = "使用隱私分頁只會變更 Brave 可在您裝置上執行的作業，無法改變他人行為。
-
-當您造訪網站時，網站能得知您的 IP 位置。根據這項資訊，網站可以大略猜出您的所在位置，通常能知道您所在的城市，有時猜測的位置會更精確。網站也會收集您明確提供的所有內容，像是搜尋內容。當您登入網站時，網站也會知道您是該帳戶的所有人。若關閉隱私分頁，Brave 會捨棄那些協助您保持登入的 Cookie，因此系統依然會將您隨即登出。
-
-提供您網際網路連線的公司 (您的 ISP 業者) 可以查看您在網路上的所有活動。很多時候，這會是您的行動網路業者；如果您使用的是 WiFi 網路，該網路的所有者可以看到您的活動；如果您是使用 VPN 上網，則運作該 VPN 的一方可以看到活動。您的 ISP 業者可以在您造訪網站時，瞭解您瀏覽了哪些網站。如果這些網站使用 HTTPS，ISP 業者只能大略猜測您在網站上的活動；但如果網站僅使用 HTTP，則 ISP 業者可以看到所有活動，包括搜尋內容、讀取的頁面以及追蹤的連結。
-
-如果您的裝置是由雇主所管理，他們可能會追蹤您的裝置使用情形。即使您使用隱私分頁，雇主仍可知道您曾瀏覽過哪些網站。能存取您裝置的其他人士，可能也會安裝軟體以監控您的活動。這類情形下，即使使用隱私分頁，也不會有太大意義。";
+"PrivateTabDetails" = "使用隱私分頁只會變更 Brave 可在您裝置上執行的作業，無法改變他人行為。\n\n當您造訪網站時，網站能得知您的 IP 位置。根據這項資訊，網站可以大略猜出您的所在位置，通常能知道您所在的城市，有時猜測的位置會更精確。網站也會收集您明確提供的所有內容，像是搜尋內容。當您登入網站時，網站也會知道您是該帳戶的所有人。若關閉隱私分頁，Brave 會捨棄那些協助您保持登入的 Cookie，因此系統依然會將您隨即登出。\n\n提供您網際網路連線的公司 (您的 ISP 業者) 可以查看您在網路上的所有活動。很多時候，這會是您的行動網路業者；如果您使用的是 WiFi 網路，該網路的所有者可以看到您的活動；如果您是使用 VPN 上網，則運作該 VPN 的一方可以看到活動。您的 ISP 業者可以在您造訪網站時，瞭解您瀏覽了哪些網站。如果這些網站使用 HTTPS，ISP 業者只能大略猜測您在網站上的活動；但如果網站僅使用 HTTP，則 ISP 業者可以看到所有活動，包括搜尋內容、讀取的頁面以及追蹤的連結。\n\n如果您的裝置是由雇主所管理，他們可能會追蹤您的裝置使用情形。即使您使用隱私分頁，雇主仍可知道您曾瀏覽過哪些網站。能存取您裝置的其他人士，可能也會安裝軟體以監控您的活動。這類情形下，即使使用隱私分頁，也不會有太大意義。";
 
 /* Private tab information link */
 "PrivateTabLink" = "深入瞭解隱私分頁。";
@@ -730,9 +706,6 @@ DuckDuckGo 隱私搜尋";
 /* Support section title */
 "Support" = "支援";
 
-/* Sync settings section title */
-"Sync" = "Sync （測試版）";
-
 /* Add another device cell button. */
 "SyncAddAnotherDevice" = "新增其他裝置";
 
@@ -742,14 +715,8 @@ DuckDuckGo 隱私搜尋";
 /* Add mobile device to sync with scan */
 "SyncAddDeviceScan" = "掃瞄鏈接 QR 碼";
 
-/* Sync add device description */
-"SyncAddDeviceScanDescription" = "在您的第二台行動裝置中，在「設定」面板中瀏覽至「Brave Sync」，然後點選「掃瞄同步代碼」按鈕。使用相機掃瞄下方的 QR 碼。";
-
 /* Add device to sync with code words */
 "SyncAddDeviceWords" = "輸入同步代碼";
-
-/* Sync add device description */
-"SyncAddMobileWordsDescription" = "在您的裝置中，在「設定」面板中瀏覽至「Brave Sync」，然後點選「%@」按鈕。輸入下方顯示的同步鏈接代碼。";
 
 /* Add Tablet or phone title */
 "SyncAddTabletOrPhoneTitle" = "新增平板電腦或電話";
@@ -765,12 +732,6 @@ DuckDuckGo 隱私搜尋";
 
 /* Sync you browser settings across devices. */
 "SyncDevices" = "裝置與設定";
-
-/* Message for sync initialization error alert */
-"SyncInitErrorMessage" = "Brave Sync 代理目前處於離線狀態或無法連接。 請稍後再試。";
-
-/* Title for sync initialization error alert */
-"SyncInitErrorTitle" = "Brave Sync 通信錯誤";
 
 /* No internet connection alert body. */
 "SyncNoConnectionBody" = "請檢查您的網絡連接並重試。";
@@ -828,9 +789,6 @@ DuckDuckGo 隱私搜尋";
 
 /* Sync to existing device */
 "SyncToDevice" = "同步至裝置";
-
-/* Sync to existing device description */
-"SyncToDeviceDescription" = "使用現有的已同步裝置開啟「Brave 設定」並瀏覽至「裝置與設定」，然後輕觸「+」新增裝置並顯示同步代碼。";
 
 /* Description on popup when setting up a sync group fails */
 "SyncUnableCreateGroup" = "無法建立新的同步群組。";
@@ -917,8 +875,7 @@ DuckDuckGo 隱私搜尋";
 "Today" = "今天";
 
 /* Shields Trackers Stat */
-"TrackersrBlocked" = "已封鎖
-追蹤器";
+"TrackersrBlocked" = "已封鎖\n追蹤器";
 
 /* Sync Alert */
 "UnableToConnectDescription" = "無法加入同步群組。請檢查所輸入的詞語，然後再試一次。";
