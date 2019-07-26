@@ -42,6 +42,16 @@ public class DataController: NSObject {
     
     // MARK: - Public interface
     
+    override init() {
+        super.init()
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(onDataProtectionBecameAvailable), name: UIApplication.protectedDataDidBecomeAvailableNotification, object: nil)
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
     public static var shared: DataController = DataController()
     public static var sharedInMemory: DataController = InMemoryDataController()
     
@@ -204,6 +214,7 @@ public class DataController: NSObject {
                 if isProtectedDataAvailable() {
                     try context.save()
                 } else {
+                    markContextChangesPending(context)
                     log.warning("Attempting to save view context when database is protected r/w is not available - DataProtection Enabled")
                 }
             } catch {
@@ -305,5 +316,27 @@ public class DataController: NSObject {
             return UIApplication.shared.isProtectedDataAvailable
         }
     }
+    
+    private static func markContextChangesPending(_ context: NSManagedObjectContext) {
+        if Thread.isMainThread {
+            pendingContextSaves.insert(context)
+        } else {
+            _ = DispatchQueue.main.sync {
+                pendingContextSaves.insert(context)
+            }
+        }
+    }
+    
+    @objc
+    private func onDataProtectionBecameAvailable() {
+        let contexts = DataController.pendingContextSaves
+        DataController.pendingContextSaves.removeAll()
+        
+        contexts.forEach({
+            DataController.save(context: $0)
+        })
+    }
+    
+    private static var pendingContextSaves = Set<NSManagedObjectContext>()
 }
 
