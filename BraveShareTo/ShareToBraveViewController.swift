@@ -5,25 +5,13 @@
 import UIKit
 import Social
 import MobileCoreServices
+import BraveShared
 
 class ShareToBraveViewController: SLComposeServiceViewController {
     
     // TODO: Separate scheme for debug builds, so it can be tested without need to uninstall production app.
     private func urlScheme(for url: String) -> URL? {
         return URL(string: "brave://open-url?url=\(url)")
-    }
-    
-    private func firstURL(in string: String) -> URL? {
-        do {
-            let detector = try NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
-            if let match = detector.firstMatch(in: string, options: [], range: NSRange(location: 0, length: string.count)),
-                let range = Range(match.range, in: string) {
-                return URL(string: String(string[range]))
-            }
-        } catch {
-            return nil
-        }
-        return nil
     }
     
     override func configurationItems() -> [Any]! {
@@ -50,9 +38,9 @@ class ShareToBraveViewController: SLComposeServiceViewController {
             
             // We can get urls from other apps as a kUTTypeText type, for example from Apple's mail.app.
             if let text = item as? String {
-                urlItem = self.firstURL(in: text)
+                urlItem = text.firstURL
             } else if let url = item as? URL {
-                urlItem = self.firstURL(in: url.absoluteString)
+                urlItem = url.absoluteString.firstURL
             } else {
                 self.cancel()
                 return
