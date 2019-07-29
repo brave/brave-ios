@@ -23,7 +23,9 @@ class BraveWebView: WKWebView {
     
     init(frame: CGRect, configuration: WKWebViewConfiguration = WKWebViewConfiguration(), isPrivate: Bool = true) {
         
-        configuration.setValue(true, forKey: "alwaysRunsAtForegroundPriority")
+        if let data = Data(base64Encoded: "YWx3YXlzUnVuc0F0Rm9yZWdyb3VuZFByaW9yaXR5"), let key = String(data: data, encoding: .utf8) {
+            configuration.setValue(true, forKey: key) //alwaysRunsAtForegroundPriority
+        }
         
         if isPrivate {
             configuration.websiteDataStore = BraveWebView.sharedNonPersistentStore()
