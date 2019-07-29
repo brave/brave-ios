@@ -42,7 +42,7 @@ public class DataController: NSObject {
     
     // MARK: - Public interface
     
-    override init() {
+    public override init() {
         super.init()
         
         NotificationCenter.default.addObserver(self, selector: #selector(onDataProtectionBecameAvailable), name: UIApplication.protectedDataDidBecomeAvailableNotification, object: nil)
