@@ -243,6 +243,29 @@ class U2FExtensions: NSObject {
             ]
             makeCredentialRequest.options = makeOptions
             
+            let exclusionList: [Any] = publicKey.excludeCredentials.compactMap({
+                let credentialDescriptor = YKFFIDO2PublicKeyCredentialDescriptor()
+                guard let credentialIdData = Data(base64Encoded: $0.id) else {
+                    return nil
+                }
+                
+                credentialDescriptor.credentialId = credentialIdData
+                credentialDescriptor.credentialType = {
+                    let credType = YKFFIDO2PublicKeyCredentialType()
+                    credType.name = "public-key"
+                    return credType
+                }()
+                
+                return credentialDescriptor
+            })
+            
+            guard exclusionList.count == publicKey.excludeCredentials.count else {
+                sendFIDO2AuthenticationError(handle: handle)
+                return
+            }
+            
+            makeCredentialRequest.excludeList = exclusionList
+            
             guard let fido2Service = YubiKitManager.shared.keySession.fido2Service else {
                 self.sendFIDO2RegistrationError(handle: handle)
                 return
