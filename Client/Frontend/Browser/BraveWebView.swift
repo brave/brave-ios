@@ -6,6 +6,7 @@ import Foundation
 import WebKit
 
 class BraveWebView: WKWebView {
+    private var observer: NSKeyValueObservation?
     
     private static var nonPersistentDataStore: WKWebsiteDataStore?
     private static func sharedNonPersistentStore() -> WKWebsiteDataStore {
@@ -36,5 +37,32 @@ class BraveWebView: WKWebView {
     @available(*, unavailable)
     required init?(coder aDecoder: NSCoder) {
         fatalError()
+    }
+    
+    func resetScrollView() {
+        let scrollViewInfo = ScrollViewInfo(scrollView)
+        observer = self.observe(\BraveWebView.isLoading, options: .new, changeHandler: {[weak self] webView, value in
+            guard let self = self else { return }
+            
+            if value.newValue == false && webView.estimatedProgress >= 1.0 {
+                scrollViewInfo.restore(to: webView.scrollView)
+                self.observer = nil
+            }
+        })
+    }
+    
+    private class ScrollViewInfo {
+        private let zoomScale: CGFloat
+        private let contentOffset: CGPoint
+        
+        init(_ scrollView: UIScrollView) {
+            zoomScale = scrollView.zoomScale
+            contentOffset = scrollView.contentOffset
+        }
+        
+        func restore(to scrollView: UIScrollView) {
+            scrollView.zoomScale = zoomScale
+            scrollView.contentOffset = contentOffset
+        }
     }
 }

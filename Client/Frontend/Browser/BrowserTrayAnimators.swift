@@ -94,6 +94,15 @@ private extension TrayToBrowserAnimator {
             bvc.topToolbar.isTransitioning = false
             bvc.updateTabsBarVisibility()
             transitionContext.completeTransition(true)
+            
+            bvc.tabManager.allTabs.forEach({
+                if $0.temporaryDocument != nil, let webView = $0.webView {
+                    webView.resetScrollView()
+                    if let currentItem = webView.backForwardList.currentItem {
+                        webView.go(to: currentItem)
+                    }
+                }
+            })
         })
     }
 }
