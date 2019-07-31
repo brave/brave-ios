@@ -84,7 +84,6 @@ class BackgroundMediaPlayback: TabContentScript {
     
     func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage) {
         if let response = message.body as? String {
-            debugPrint(response)
             log.info(response)
         } else {
             log.info(message.description)

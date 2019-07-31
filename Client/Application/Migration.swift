@@ -90,7 +90,6 @@ fileprivate extension Preferences {
         migrate(key: "blockPopups", to: Preferences.General.blockPopups)
         migrate(key: "kPrefKeyTabsBarShowPolicy", to: Preferences.General.tabBarVisibility)
         migrate(key: "NightModeStatus", to: Preferences.General.nightMode)
-        migrate(key: "allowBackgroundMediaPlayback", to: Preferences.General.allowBackgroundMediaPlayback)
         
         // Search
         migrate(key: "search.orderedEngineNames", to: Preferences.Search.orderedEngines)
