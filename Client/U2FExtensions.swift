@@ -243,18 +243,16 @@ class U2FExtensions: NSObject {
             ]
             makeCredentialRequest.options = makeOptions
             
-            let exclusionList: [Any] = publicKey.excludeCredentials.compactMap({
+            let exclusionList: [YKFFIDO2PublicKeyCredentialDescriptor] = publicKey.excludeCredentials.compactMap({
                 let credentialDescriptor = YKFFIDO2PublicKeyCredentialDescriptor()
                 guard let credentialIdData = Data(base64Encoded: $0.id) else {
                     return nil
                 }
                 
                 credentialDescriptor.credentialId = credentialIdData
-                credentialDescriptor.credentialType = {
-                    let credType = YKFFIDO2PublicKeyCredentialType()
-                    credType.name = "public-key"
-                    return credType
-                }()
+                credentialDescriptor.credentialType = YKFFIDO2PublicKeyCredentialType().then {
+                    $0.name = "public-key"
+                }
                 
                 return credentialDescriptor
             })
