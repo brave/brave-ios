@@ -94,7 +94,28 @@ private extension TrayToBrowserAnimator {
             bvc.topToolbar.isTransitioning = false
             bvc.updateTabsBarVisibility()
             transitionContext.completeTransition(true)
+            
+            self.WKWebViewPDFNotRenderingBugFix(for: bvc)
         })
+    }
+    
+    /// Fixes a Bug in iOS 12.2 where:
+    /// 1. Have Navigation Controller
+    /// 2. Set a ViewController with a WKWebView as root controller
+    /// 3. Push any other controller
+    /// 4. Dismiss the controller
+    /// 5. Verify that PDF not rendering.
+    /// 6. Present any controller and dismiss it
+    /// 7. Verify PDF re-rendered.
+    /// Note: This only happens when a UINavigationController ".push".
+    ///       It does not happen for `.present`
+    private func WKWebViewPDFNotRenderingBugFix(for controller: UIViewController) {
+        let fakeController = UIViewController()
+        if let navController = controller.navigationController {
+            navController.present(fakeController, animated: false, completion: {
+                fakeController.dismiss(animated: false, completion: nil)
+            })
+        }
     }
 }
 
