@@ -299,7 +299,7 @@ class U2FExtensions: NSObject {
             ]
             makeCredentialRequest.options = makeOptions
             
-            let exclusionList: [YKFFIDO2PublicKeyCredentialDescriptor] = publicKey.excludeCredentials.compactMap({
+            let exclusionList: [YKFFIDO2PublicKeyCredentialDescriptor] = publicKey.excludeCredentials?.compactMap({
                 let credentialDescriptor = YKFFIDO2PublicKeyCredentialDescriptor()
                 guard let credentialIdData = Data(base64Encoded: $0.id) else {
                     return nil
@@ -311,10 +311,10 @@ class U2FExtensions: NSObject {
                 }
                 
                 return credentialDescriptor
-            })
+            }) ?? []
             
-            guard exclusionList.count == publicKey.excludeCredentials.count else {
-                sendFIDO2AuthenticationError(handle: handle)
+            guard (exclusionList.count == 0 && publicKey.excludeCredentials?.count == nil) || (exclusionList.count == publicKey.excludeCredentials?.count) else {
+                sendFIDO2RegistrationError(handle: handle)
                 return
             }
             
