@@ -113,12 +113,18 @@ private extension TrayToBrowserAnimator {
     /// Bug is present in FireFox iOS: https://stackoverflow.com/questions/52735158/wkwebview-shows-gray-background-and-pdf-content-gets-invisible-on-viewcontroller
     /// Although, they solve it differently..
     /// Confirmed by WebKit that it's an iOS bug: https://bugs.webkit.org/show_bug.cgi?id=193281
-    private func WKWebViewPDFNotRenderingBugFix(for controller: UIViewController) {
-        let fakeController = UIViewController()
-        if let navController = controller.navigationController {
-            navController.present(fakeController, animated: false, completion: {
-                fakeController.dismiss(animated: false, completion: nil)
-            })
+    private func WKWebViewPDFNotRenderingBugFix(for controller: BrowserViewController) {
+        guard let mimeType = controller.tabManager.selectedTab?.mimeType, !mimeType.isKindOfHTML else {
+            return
+        }
+        
+        if mimeType.lowercased().contains("pdf") {
+            let fakeController = UIViewController()
+            if let navController = controller.navigationController {
+                navController.present(fakeController, animated: false, completion: {
+                    fakeController.dismiss(animated: false, completion: nil)
+                })
+            }
         }
     }
 }
