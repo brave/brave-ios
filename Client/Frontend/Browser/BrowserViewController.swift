@@ -733,6 +733,7 @@ class BrowserViewController: UIViewController {
             let homePanelController = FavoritesViewController(profile: profile)
             homePanelController.delegate = self
             homePanelController.view.alpha = 0
+            homePanelController.applyTheme(Theme.of(tabManager.selectedTab))
 
             self.favoritesViewController = homePanelController
 

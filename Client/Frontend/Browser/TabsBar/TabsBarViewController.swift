@@ -274,6 +274,7 @@ extension TabsBarViewController: UICollectionViewDataSource {
         
         cell.tabManager = tabManager
         cell.tab = tab
+        cell.titleLabel.text = tab.displayTitle
         cell.currentIndex = indexPath.row
         cell.separatorLineRight.isHidden = (indexPath.row != tabList.count() - 1)
         

@@ -90,17 +90,18 @@ class TabBarCell: UICollectionViewCell {
     
     override var isSelected: Bool {
         didSet(selected) {
+            let theme = Theme.of(tab)
             closeButton.tintColor = PrivateBrowsingManager.shared.isPrivateBrowsing ? UIColor.white : UIColor.black
             if selected {
                 titleLabel.font = UIFont.systemFont(ofSize: 12, weight: UIFont.Weight.semibold)
                 closeButton.isHidden = false
-                titleLabel.textColor = PrivateBrowsingManager.shared.isPrivateBrowsing ? UIColor.white : UIColor.black
-                backgroundColor = PrivateBrowsingManager.shared.isPrivateBrowsing ? BraveUX.DarkToolbarsBackgroundSolidColor : BraveUX.ToolbarsBackgroundSolidColor
+                titleLabel.textColor = theme.colors.tints.header
+                backgroundColor = theme.colors.home
             }
                 // Prevent swipe and release outside- deselects cell.
             else if currentIndex != tabManager?.currentDisplayedIndex {
                 titleLabel.font = UIFont.systemFont(ofSize: 12)
-                titleLabel.textColor = PrivateBrowsingManager.shared.isPrivateBrowsing ? UIColor(white: 1.0, alpha: 0.4) : UIColor(white: 0.0, alpha: 0.4)
+                titleLabel.textColor = theme.colors.tints.header.withAlphaComponent(0.4)
                 closeButton.isHidden = true
                 backgroundColor = .clear
             }
