@@ -278,6 +278,8 @@ class TopToolbarView: UIView, ToolbarProtocol {
         }
     }
     
+    /// Created whenever the location bar on top is selected
+    ///     it is "converted" from static to actual TextField
     private func createLocationTextField() {
         guard locationTextField == nil else { return }
         

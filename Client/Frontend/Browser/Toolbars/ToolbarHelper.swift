@@ -9,6 +9,7 @@ import Shared
 class ToolbarHelper: NSObject {
     let toolbar: ToolbarProtocol
     
+    // TODO: remove
     func setTheme(theme: Theme, forButtons buttons: [Themeable]) {
         buttons.forEach { $0.applyTheme(theme) }
     }

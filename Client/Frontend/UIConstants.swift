@@ -29,6 +29,7 @@ struct BrowserColor {
     }
 }
 
+// Most of these should be removed
 extension UIColor {
     // These are defaults from http://design.firefox.com/photon/visuals/color.html
     struct Defaults {
