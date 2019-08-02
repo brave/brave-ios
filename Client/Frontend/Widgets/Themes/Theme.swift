@@ -22,7 +22,6 @@ extension Themeable {
 
 class Theme: Equatable, Decodable {
 
-    
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: ThemeCodingKeys.self)
         uuid = try container.decode(String.self, forKey: .uuid)
@@ -65,6 +64,7 @@ class Theme: Equatable, Decodable {
             
             stats = try container.decode(Stat.self, forKey: .stats)
             tints = try container.decode(Tint.self, forKey: .tints)
+            transparencies = try container.decode(Transparency.self, forKey: .transparencies)
         }
         
         let header: UIColor
@@ -116,6 +116,12 @@ class Theme: Equatable, Decodable {
             let footer: UIColor
             let addressBar: UIColor
         }
+        
+        let transparencies: Transparency
+        struct Transparency: Decodable {
+            let addressBarAlpha: CGFloat
+            let borderAlpha: CGFloat
+        }
     }
     
     let images: Image
@@ -143,14 +149,7 @@ class Theme: Equatable, Decodable {
 
     /// Returns whether the theme is private or not.
     var isPrivate: Bool {
-        switch self {
-        case Theme.regular:
-            return false
-        case Theme.private:
-            return true
-        default:
-            return true
-        }
+        return self.isDark
     }
     
     /// Returns the theme of the given Tab, if the tab is nil returns a regular theme.
