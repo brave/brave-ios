@@ -87,7 +87,7 @@ class U2FExtensions: NSObject {
     fileprivate static var observationContext = 0
     fileprivate var popup: AlertPopupView
     fileprivate var currentMessageType = U2FMessageType.None
-    fileprivate var currentHandle: Int = -1
+    fileprivate var currentHandle = -1
     
     // Using a property style approch to avoid observing twice.
     private var observeSessionStateUpdates: Bool = false {
@@ -313,7 +313,7 @@ class U2FExtensions: NSObject {
                 return credentialDescriptor
             }) ?? []
             
-            guard (exclusionList.count == 0 && publicKey.excludeCredentials?.count == nil) || (exclusionList.count == publicKey.excludeCredentials?.count) else {
+            guard exclusionList.count == publicKey.excludeCredentials?.count ?? 0 else {
                 sendFIDO2RegistrationError(handle: handle)
                 return
             }
@@ -376,7 +376,7 @@ class U2FExtensions: NSObject {
     
     private func handleMakeCredential(handle: Int, request: WebAuthnRegisterRequest, error: Error?) {
         guard let error = error else {
-            sendFIDO2RegistrationError(handle: handle)
+            log.error("Error should not be nil in handleMakeCredential")
             return
         }
         
@@ -540,7 +540,7 @@ class U2FExtensions: NSObject {
     
     private func handleGetAssertion(handle: Int, request: WebAuthnAuthenticateRequest, error: Error?) {
         guard let error = error else {
-            sendFIDO2AuthenticationError(handle: handle)
+            log.error("Error should not be nil in handleGetAssertion")
             return
         }
         
@@ -619,7 +619,11 @@ class U2FExtensions: NSObject {
                             return
                         }
                         completion(false)
+                        return
                     }
+                } else {
+                    completion(true)
+                    return
                 }
             }
             alert.textFields?.first?.isSecureTextEntry = true
