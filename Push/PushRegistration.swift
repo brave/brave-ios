@@ -6,7 +6,7 @@ import Foundation
 import Shared
 import SwiftyJSON
 
-public class PushRegistration: NSObject, NSCoding {
+public class PushRegistration: NSObject, NSSecureCoding {
     let uaid: String
     let secret: String
     // We don't need to have more than one subscription until WebPush is exposed to content Javascript
@@ -56,12 +56,16 @@ public class PushRegistration: NSObject, NSCoding {
         }
         return PushRegistration(uaid: uaid, secret: secret, subscriptions: [defaultSubscriptionID: defaultSubscription])
     }
+    
+    public static var supportsSecureCoding: Bool {
+        return true
+    }
 }
 
 fileprivate let defaultSubscriptionID = "defaultSubscription"
 /// Small NSCodable class for persisting a channel subscription.
 /// We use NSCoder because we expect it to be stored in the profile.
-public class PushSubscription: NSObject, NSCoding {
+public class PushSubscription: NSObject, NSSecureCoding {
     let channelID: String
     let endpoint: URL
 
@@ -113,6 +117,10 @@ public class PushSubscription: NSObject, NSCoding {
         aCoder.encode(p256dhPrivateKey, forKey: "p256dhPrivateKey")
         aCoder.encode(p256dhPublicKey, forKey: "p256dhPublicKey")
         aCoder.encode(authKey, forKey: "authKey")
+    }
+    
+    public static var supportsSecureCoding: Bool {
+        return true
     }
 }
 

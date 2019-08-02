@@ -68,7 +68,7 @@ class CustomHeaderData: NSObject {
     }
 }
 
-extension CustomHeaderData: NSCoding {
+extension CustomHeaderData: NSSecureCoding {
     struct CodingKeys {
         static let domain = "customHeaderDataDomain"
         static let headerKey = "customHeaderDataHeaderKey"
@@ -79,5 +79,9 @@ extension CustomHeaderData: NSCoding {
         aCoder.encode(domainList, forKey: CodingKeys.domain)
         aCoder.encode(headerField, forKey: CodingKeys.headerKey)
         aCoder.encode(headerValue, forKey: CodingKeys.headerValue)
+    }
+    
+    static var supportsSecureCoding: Bool {
+        return true
     }
 }

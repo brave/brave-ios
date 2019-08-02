@@ -25,7 +25,7 @@ public extension KeychainWrapper {
     }
 }
 
-open class AuthenticationKeychainInfo: NSObject, NSCoding {
+open class AuthenticationKeychainInfo: NSObject, NSSecureCoding {
     fileprivate(set) open var passcode: String?
     open var isPasscodeRequiredImmediately: Bool
     fileprivate(set) open var lockOutInterval: TimeInterval?
@@ -70,6 +70,10 @@ open class AuthenticationKeychainInfo: NSObject, NSCoding {
         } else {
             self.isPasscodeRequiredImmediately = true
         }
+    }
+    
+    public static var supportsSecureCoding: Bool {
+        return true
     }
 }
 

@@ -7,7 +7,7 @@ import Foundation
 import Shared
 import Data
 
-class SessionData: NSObject, NSCoding {
+class SessionData: NSObject, NSSecureCoding {
     let currentPage: Int
     let urls: [URL]
     let lastUsedTime: Timestamp
@@ -62,5 +62,9 @@ class SessionData: NSObject, NSCoding {
         let currentURL = urlStrings[(currentPage < 0 ? max(urlStrings.count-1, 0) : currentPage)]
         
         return SavedTab(id: "InvalidId", title: nil, url: currentURL, isSelected: false, order: -1, screenshot: nil, history: urlStrings, historyIndex: Int16(currentPage))
+    }
+    
+    static var supportsSecureCoding: Bool {
+        return true
     }
 }
