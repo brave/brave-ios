@@ -238,10 +238,43 @@ private extension Theme {
     
     static func privateTheme() -> String {
         return """
-
         {
-        "uniqueKey": "382",
-        "description": "Default private theme"
+        "uuid": "FAIDSFJELWEF3",
+        "title": "Default private",
+        "url": "www.brave.com",
+        "description": "The standard default private theme",
+        "thumbnail": "https://www.google.com",
+        "isDark": true,
+        "enabled": true,
+        
+        "colors": {
+        "header": "0x1B0C32",
+        "footer": "0x1B0C32",
+        "home": "0x210950",
+        "addressBar": "0x3D2742",
+        "border": "0xffffff",
+        "tints": {
+        "home": "0xE7E6E9",
+        "header": "0xE7E6E9",
+        "footer": "0xE7E6E9",
+        "addressBar": "0xE7E6E9"
+        },
+        "transparencies": {
+        "addressBarAlpha": 1.0,
+        "borderAlpha": 0.2,
+        },
+        "stats": {
+        "ads": "0xFA4214",
+        "trackers": "0xFA4214",
+        "httpse": "0x9339D4",
+        "timeSaved": "0xffffff"
+        }
+        },
+        "images": {
+        "header": "https://www.google.com",
+        "footer": "https://www.google.com",
+        "home": "https://www.google.com",
+        }
         }
 
         """
@@ -295,45 +328,3 @@ fileprivate enum ThemeCodingKeys: String, CodingKey {
         case home
     }
 }
-
-/**
- 
- {
- "title": "Rust",
- "url": "", // Creator url
- "description": "", // Any details or information about theme -user facing
- "thumb": "Rust", // Theme manager thumb, can be url/uri
- "isDark": false, // Simple flag for dark or light type themes
- "enabled": true, // Displays in theme manager
- 
- "colors": {
- "header": "0xffffff",
- "footer": "0xffffff",
- "home": "0xffffff",
- "addressBar": "0xE2591F", // address bar bg
- "border": "0xE2591F", // header and footer border color
- "tints": {
- "home": "0xE2591F",
- "header": "0xE2591F", // Icon tint
- "footer": "0xE2591F", // Icon tint
- "addressBar": "0xE2591F" // Inner url bar icon tint and font color
- },
- "transparencies": {
- "addressBarAlpha": 0.2, // address bar bg alpha (allows blending to background)
- "borderAlpha": 0.2, // header and footer border alpha (allows blending)
- },
- "stats": {
- "ads": "0xE2591F", // color for ads label on home screen
- "trackers": "0xE2591F", // color for trackers label on home screen
- "httpse": "0xE2591F", // color for httpse upgrades on home screen
- "timeSaved": "0xE2591F" // color for time saved label on home screen
- }
- },
- "images": {
- "header": "",
- "footer": "",
- "home": "", // Background image can be url/uri
- }
- }
- 
- */
