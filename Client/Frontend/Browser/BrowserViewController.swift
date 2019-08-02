@@ -2876,10 +2876,15 @@ extension BrowserViewController: TabTrayDelegate {
 
 // MARK: Browser Chrome Theming
 extension BrowserViewController: Themeable {
-
+    
+    var themeableChildren: [Themeable?]? {
+        return [topToolbar, toolbar, readerModeBar, tabsBar, favoritesViewController]
+    }
+    
     func applyTheme(_ theme: Theme) {
-        let ui: [Themeable?] = [topToolbar, toolbar, readerModeBar, tabsBar, favoritesViewController]
-        ui.forEach { $0?.applyTheme(theme) }
+        styleChildren(theme: theme)
+        
+        // Maybe just set to clear color?
         statusBarOverlay.backgroundColor = topToolbar.backgroundColor
         setNeedsStatusBarAppearanceUpdate()
     }

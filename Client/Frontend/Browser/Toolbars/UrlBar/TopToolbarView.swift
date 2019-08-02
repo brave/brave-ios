@@ -557,25 +557,20 @@ extension TopToolbarView: AutocompleteTextFieldDelegate {
 // MARK: - Themeable
 
 extension TopToolbarView: Themeable {
+    var themeableChildren: [Themeable?]? {
+        return [locationView, locationTextField] + actionButtons
+    }
     
     func applyTheme(_ theme: Theme) {
-        locationView.applyTheme(theme)
-        locationTextField?.applyTheme(theme)
-        actionButtons.forEach { $0.applyTheme(theme) }
-        tabsButton.applyTheme(theme)
+        styleChildren(theme: theme)
         
         progressBar.setGradientColors(startColor: UIColor.LoadingBar.Start.colorFor(theme), endColor: UIColor.LoadingBar.End.colorFor(theme))
         currentTheme = theme
-        cancelButton.setTitleColor(UIColor.Browser.Tint.colorFor(theme), for: .normal)
-        switch theme {
-        case Theme.regular:
-            backgroundColor = BraveUX.ToolbarsBackgroundSolidColor
-        case Theme.private:
-            backgroundColor = BraveUX.DarkToolbarsBackgroundSolidColor
-        default:
-            backgroundColor = BraveUX.DarkToolbarsBackgroundSolidColor
-        }
-        line.backgroundColor = UIColor.Browser.URLBarDivider.colorFor(theme)
+        cancelButton.setTitleColor(theme.colors.tints.header, for: .normal)
+        
+        backgroundColor = theme.colors.header
+        line.backgroundColor = theme.colors.border
+        line.alpha = theme.colors.transparencies.borderAlpha
     }
 }
 

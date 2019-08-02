@@ -104,16 +104,12 @@ class BottomToolbarView: UIView, ToolbarProtocol {
 // MARK: - Themeable
 
 extension BottomToolbarView: Themeable {
+    var themeableChildren: [Themeable?]? {
+        return actionButtons
+    }
+    
     func applyTheme(_ theme: Theme) {
-        switch theme {
-        case Theme.regular:
-            backgroundColor = BraveUX.ToolbarsBackgroundSolidColor
-        case Theme.private:
-            backgroundColor = BraveUX.DarkToolbarsBackgroundSolidColor
-        default:
-            backgroundColor = BraveUX.DarkToolbarsBackgroundSolidColor
-        }
-
-        helper?.setTheme(theme: theme, forButtons: actionButtons)
+        styleChildren(theme: theme)
+        backgroundColor = theme.colors.footer
     }
 }

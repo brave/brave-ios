@@ -274,7 +274,6 @@ extension TabsBarViewController: UICollectionViewDataSource {
         
         cell.tabManager = tabManager
         cell.tab = tab
-        cell.titleLabel.text = tab.displayTitle
         cell.currentIndex = indexPath.row
         cell.separatorLineRight.isHidden = (indexPath.row != tabList.count() - 1)
         
@@ -333,19 +332,11 @@ extension TabsBarViewController: TabManagerDelegate {
 
 extension TabsBarViewController: Themeable {
     func applyTheme(_ theme: Theme) {
-        switch theme {
-        case Theme.regular:
-            view.backgroundColor = BraveUX.GreyB
-            plusButton.tintColor = BraveUX.GreyI
-            bottomLine.backgroundColor = UIColor(white: 0.0, alpha: 0.2)
-        case Theme.private:
-            view.backgroundColor = BraveUX.Black
-            plusButton.tintColor = UIColor.white
-            bottomLine.backgroundColor = UIColor(white: 1.0, alpha: 0.2)
-        default:
-            break
-        }
-
+        styleChildren(theme: theme)
+        
+        view.backgroundColor = theme.colors.header
+        plusButton.tintColor = theme.colors.tints.header
+        bottomLine.backgroundColor = theme.colors.border.withAlphaComponent(theme.colors.transparencies.borderAlpha)
         collectionView.backgroundColor = view.backgroundColor
     }
 }

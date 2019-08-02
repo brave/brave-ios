@@ -6,17 +6,21 @@ import Foundation
 
 protocol Themeable {
     
-    var themeableChildren: [Themeable]? { get }
+    var themeableChildren: [Themeable?]? { get }
     func applyTheme(_ theme: Theme)
 
 }
 
 extension Themeable {
-    // Should be explicity done on each Themeable view, but doing this to avoid tons of compile errors
-    var themeableChildren: [Themeable]? { return nil }
+    // TODO: Remove, should be explicity done on each Themeable view, but doing this to avoid tons of compile errors
+    var themeableChildren: [Themeable?]? { return nil }
     
     func applyTheme(_ theme: Theme) {
-        self.themeableChildren?.forEach { $0.applyTheme(theme) }
+        styleChildren(theme: theme)
+    }
+    
+    func styleChildren(theme: Theme) {
+        self.themeableChildren?.forEach { $0?.applyTheme(theme) }
     }
 }
 

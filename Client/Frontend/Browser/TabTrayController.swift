@@ -194,6 +194,8 @@ class TabCell: UICollectionViewCell, Themeable {
     }
     
     func applyTheme(_ theme: Theme) {
+        styleChildren(theme: theme)
+        
         backgroundHolder.backgroundColor = theme == .private ? UX.HomePanel.BackgroundColorPBM : UX.HomePanel.BackgroundColor
         screenshotView.backgroundColor = backgroundHolder.backgroundColor
         if theme == .private {
@@ -394,6 +396,8 @@ class TabTrayController: UIViewController, Themeable {
     }
     
     func applyTheme(_ theme: Theme) {
+        styleChildren(theme: theme)
+        
         collectionView?.backgroundColor = TabTrayControllerUX.BackgroundColor.colorFor(theme)
         collectionView?.visibleCells.compactMap({ $0 as? TabCell }).forEach { $0.applyTheme(theme) }
         toolbar.applyTheme(theme)
@@ -1105,7 +1109,7 @@ extension TabTrayController: UIAdaptivePresentationControllerDelegate, UIPopover
 }
 
 // MARK: - Toolbar
-class TrayToolbar: UIView {
+class TrayToolbar: UIView, Themeable {
     fileprivate let toolbarButtonSize = CGSize(width: 44, height: 44)
 
     let addTabButton = UIButton(type: .system).then {
@@ -1160,12 +1164,17 @@ class TrayToolbar: UIView {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    var themeableChildren: [Themeable?]? {
+        return [privateModeButton]
+    }
 
-    fileprivate func applyTheme(_ theme: Theme) {
+    func applyTheme(_ theme: Theme) {
+        styleChildren(theme: theme)
+        
         UIApplication.shared.windows.first?.backgroundColor = TabTrayControllerUX.BackgroundColor.colorFor(theme)
         addTabButton.tintColor = UIColor.TabTray.ToolbarButtonTint.colorFor(theme) // Needs to be changed
         doneButton.tintColor = UIColor.TabTray.ToolbarButtonTint.colorFor(theme)
         backgroundColor = TabTrayControllerUX.BackgroundColor.colorFor(theme)
-        privateModeButton.applyTheme(theme)
     }
 }

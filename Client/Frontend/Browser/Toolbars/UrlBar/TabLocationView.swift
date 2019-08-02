@@ -380,22 +380,22 @@ extension TabLocationView: AccessibilityActionsSource {
 // MARK: - Themeable
 
 extension TabLocationView: Themeable {
+    var themeableChildren: [Themeable?]? {
+        return [reloadButton]
+    }
+    
     func applyTheme(_ theme: Theme) {
-        switch theme {
-        case Theme.regular:
-            backgroundColor = BraveUX.LocationBarBackgroundColor
-        case Theme.private:
-            backgroundColor = BraveUX.LocationBarBackgroundColor_PrivateMode
-        default:
-            backgroundColor = BraveUX.LocationBarBackgroundColor_PrivateMode
-        }
-
-        urlTextField.textColor = UIColor.Browser.Tint.colorFor(theme)
-        readerModeButton.selectedTintColor = UIColor.TextField.ReaderModeButtonSelected.colorFor(theme)
-        readerModeButton.unselectedTintColor = UIColor.TextField.ReaderModeButtonUnselected.colorFor(theme)
+        styleChildren(theme: theme)
         
-        reloadButton.applyTheme(theme)
-        separatorLine.backgroundColor = UIColor.TextField.Separator.colorFor(theme)
+        backgroundColor = theme.colors.addressBar.withAlphaComponent(theme.colors.transparencies.addressBarAlpha)
+        
+        urlTextField.textColor = theme.colors.tints.addressBar
+
+        readerModeButton.unselectedTintColor = theme.colors.tints.header
+        // TODO: Should probably be dealt with better
+        readerModeButton.selectedTintColor = theme.colors.tints.header.withAlphaComponent(0.2)
+
+        separatorLine.backgroundColor = theme.colors.border.withAlphaComponent(theme.colors.transparencies.borderAlpha)
     }
 }
 
