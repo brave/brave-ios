@@ -72,10 +72,6 @@ open class MockProfile: Profile {
 
     public var isShutdown: Bool = false
 
-    public var favicons: Favicons {
-        return self.places
-    }
-
     lazy public var isChinaEdition: Bool = {
         return Locale.current.identifier == "zh_CN"
     }()
