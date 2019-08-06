@@ -15,10 +15,6 @@ extension FileManager {
     }
     public typealias FolderLockObj = (folder: Folder, lock: Bool)
     
-    static var documentDirectoryURL: URL? {
-        return FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
-    }
-    
     //Lock a folder using FolderLockObj provided.
     @discardableResult public func setFolderAccess(_ lockObjects: [FolderLockObj]) -> Bool {
         guard let baseDir = baseDirectory() else { return false }
@@ -99,6 +95,28 @@ extension FileManager {
         
         do {
             try removeItem(at: fileUrl)
+        } catch {
+            log.error(error)
+        }
+    }
+    
+    func moveFile(sourceName: String, sourceLocation: SearchPathDirectory,
+                  destinationName: String, destinationLocation: SearchPathDirectory) {
+        guard let sourceLocation = sourceLocation.url,
+            let destinationLocation = destinationLocation.url else {
+            return
+        }
+        
+        let sourceFileUrl = sourceLocation.appendingPathComponent(sourceName)
+        let destinationFileUrl = destinationLocation.appendingPathComponent(destinationName)
+        
+        if !fileExists(atPath: sourceFileUrl.path) {
+            log.debug("File \(sourceFileUrl) doesn't exist")
+            return
+        }
+        
+        do {
+            try moveItem(at: sourceFileUrl, to: destinationFileUrl)
         } catch {
             log.error(error)
         }

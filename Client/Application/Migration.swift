@@ -31,11 +31,15 @@ class Migration {
     }
     
     /// Adblock files don't have to be moved, they now have a new directory and will be downloaded there.
-    /// Downloads folder was befer used before, it's a leftover from FF.
+    /// Downloads folder was nefer used before, it's a leftover from FF.
     private static func documentsDirectoryCleanup() {
         FileManager.default.removeFolder(withName: "abp-data", location: .documentDirectory)
         FileManager.default.removeFolder(withName: "https-everywhere-data", location: .documentDirectory)
         FileManager.default.removeFolder(withName: "Downloads", location: .documentDirectory)
+        
+        FileManager.default.moveFile(sourceName: "CookiesData.json", sourceLocation: .documentDirectory,
+                                     destinationName: "CookiesData.json",
+                                     destinationLocation: .applicationSupportDirectory)
     }
 }
 
