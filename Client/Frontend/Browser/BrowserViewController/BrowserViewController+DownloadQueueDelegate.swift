@@ -31,11 +31,11 @@ extension BrowserViewController: DownloadQueueDelegate {
         // Otherwise, just add this download to the existing download toast.
         downloadToast.addDownload(download)
     }
-    
+
     func downloadQueue(_ downloadQueue: DownloadQueue, didDownloadCombinedBytes combinedBytesDownloaded: Int64, combinedTotalBytesExpected: Int64?) {
         downloadToast?.combinedBytesDownloaded = combinedBytesDownloaded
     }
-    
+
     func downloadQueue(_ downloadQueue: DownloadQueue, download: Download, didFinishDownloadingTo location: URL) {
         print("didFinishDownloadingTo(): \(location)")
     }

@@ -205,7 +205,7 @@ class DownloadQueue {
             combinedTotalBytesExpected = 0
             lastDownloadError = nil
         }
-        
+
         downloads.append(download)
         download.delegate = self
 
