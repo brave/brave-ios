@@ -46,9 +46,10 @@ extension FileManager {
         return false
     }
     
-    func writeToDiskInFolder(_ data: Data, fileName: String, folderName: String) -> Bool {
+    func writeToDiskInFolder(_ data: Data, fileName: String, folderName: String,
+                             location: SearchPathDirectory = .applicationSupportDirectory) -> Bool {
         
-        guard let folderUrl = getOrCreateFolder(name: folderName) else { return false }
+        guard let folderUrl = getOrCreateFolder(name: folderName, location: location) else { return false }
         
         do {
             let fileUrl = folderUrl.appendingPathComponent(fileName)
@@ -61,10 +62,11 @@ extension FileManager {
         return true
     }
     
-    /// Creates a folder at documents directory and returns its URL.
+    /// Creates a folder at given location and returns its URL.
     /// If folder already exists, returns its URL as well.
-    func getOrCreateFolder(name: String, excludeFromBackups: Bool = true) -> URL? {
-        guard let documentsDir = FileManager.documentDirectoryURL else { return nil }
+    func getOrCreateFolder(name: String, excludeFromBackups: Bool = true,
+                           location: SearchPathDirectory = .applicationSupportDirectory) -> URL? {
+        guard let documentsDir = location.url else { return nil }
         
         var folderDir = documentsDir.appendingPathComponent(name)
         
@@ -86,7 +88,31 @@ extension FileManager {
         }
     }
     
+    func removeFolder(withName name: String, location: SearchPathDirectory) {
+        guard let locationUrl = location.url else { return }
+        let fileUrl = locationUrl.appendingPathComponent(name)
+        
+        if !fileExists(atPath: fileUrl.path) {
+            log.debug("File \(fileUrl) doesn't exist")
+            return
+        }
+        
+        do {
+            try removeItem(at: fileUrl)
+        } catch {
+            log.error(error)
+        }
+    }
+    
     private func baseDirectory() -> String? {
          return NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true).first
+    }
+}
+
+extension FileManager.SearchPathDirectory {
+    
+    /// Returns first url in user domain mask of given search path directory
+    var url: URL? {
+        return FileManager.default.urls(for: self, in: .userDomainMask).first
     }
 }

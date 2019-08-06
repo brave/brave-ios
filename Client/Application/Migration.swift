@@ -18,11 +18,24 @@ class Migration {
             Bookmark.syncOrderMigration()
             Preferences.Migration.syncOrderCompleted.value = true
         }
+        
+        if !Preferences.Migration.documentsDirectoryCleanupCompleted.value {
+            documentsDirectoryCleanup()
+            Preferences.Migration.documentsDirectoryCleanupCompleted.value = true
+        }
     }
     
     static func moveDatabaseToApplicationDirectory() {
         //Moves Coredata sqlite file from Documents dir to application support dir.
         DataController.shared.migrateToNewPathIfNeeded()
+    }
+    
+    /// Adblock files don't have to be moved, they now have a new directory and will be downloaded there.
+    /// Downloads folder was befer used before, it's a leftover from FF.
+    private static func documentsDirectoryCleanup() {
+        FileManager.default.removeFolder(withName: "abp-data", location: .documentDirectory)
+        FileManager.default.removeFolder(withName: "https-everywhere-data", location: .documentDirectory)
+        FileManager.default.removeFolder(withName: "Downloads", location: .documentDirectory)
     }
 }
 
@@ -31,6 +44,11 @@ fileprivate extension Preferences {
     final class Migration {
         static let completed = Option<Bool>(key: "migration.completed", default: false)
         static let syncOrderCompleted = Option<Bool>(key: "migration.sync-order.completed", default: false)
+        /// Old app versions were using documents directory to store app files, database, adblock files.
+        /// These files are now moved to 'Application Support' folder, and documents directory is left
+        /// for user downloaded files.
+        static let documentsDirectoryCleanupCompleted =
+            Option<Bool>(key: "migration.documents-dir-completed", default: false)
     }
     
     /// Migrate the users preferences from prior versions of the app (<2.0)
