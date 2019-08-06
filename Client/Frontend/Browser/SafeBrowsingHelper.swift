@@ -145,7 +145,6 @@ struct SafeBrowsingHelper {
         let cacheDuration: String
     }
     
-    
     struct Request: Codable {
         let client: ClientInfo
         let threatInfo: ThreatInfo
