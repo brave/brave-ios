@@ -143,21 +143,33 @@ extension HTTPDownload: URLSessionTaskDelegate, URLSessionDownloadDelegate {
     }
 }
 
-    private func uniqueDownloadPathForFilename(_ filename: String) throws -> URL {
-        let downloadsPath = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
-
-        let basePath = downloadsPath.appendingPathComponent(filename)
-        let fileExtension = basePath.pathExtension
-        let filenameWithoutExtension = fileExtension.count > 0 ? String(filename.dropLast(fileExtension.count + 1)) : filename
-
-        var proposedPath = basePath
-        var count = 0
-
-        while FileManager.default.fileExists(atPath: proposedPath.path) {
-            count += 1
-
-            let proposedFilenameWithoutExtension = "\(filenameWithoutExtension) (\(count))"
-            proposedPath = downloadsPath.appendingPathComponent(proposedFilenameWithoutExtension).appendingPathExtension(fileExtension)
+class BlobDownload: Download {
+    fileprivate let data: Data
+    
+    init(filename: String, mimeType: String, size: Int64, data: Data) {
+        self.data = data
+        
+        super.init()
+        
+        self.filename = filename
+        self.mimeType = mimeType
+        
+        self.totalBytesExpected = size
+    }
+    
+    override func resume() {
+        // Wait momentarily before continuing here and firing off the delegate
+        // callbacks. Otherwise, these may end up getting called before the
+        // delegate is set up and the UI may never be notified of completion.
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500)) {
+            do {
+                let destination = try self.uniqueDownloadPathForFilename(self.filename)
+                try self.data.write(to: destination)
+                self.isComplete = true
+                self.delegate?.download(self, didFinishDownloadingTo: destination)
+            } catch let error {
+                self.delegate?.download(self, didCompleteWithError: error)
+            }
         }
     }
 }
