@@ -19,7 +19,7 @@ class ShareExtensionHelper: NSObject {
         self.selectedURL = tab?.canonicalURL?.displayURL ?? url
         self.selectedTab = tab
     }
-    
+
     func createActivityViewController(_ completionHandler: @escaping (_ completed: Bool, _ activityType: UIActivity.ActivityType?) -> Void) -> UIActivityViewController {
         var activityItems = [AnyObject]()
 
@@ -38,9 +38,9 @@ class ShareExtensionHelper: NSObject {
             activityItems.append(TitleActivityItemProvider(title: title))
         }
         activityItems.append(self)
-        
+
         let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
-        
+
         // Hide 'Add to Reading List' which currently uses Safari.
         // We would also hide View Later, if possible, but the exclusion list doesn't currently support
         // third-party activity types (rdar://19430419).
@@ -69,7 +69,7 @@ class ShareExtensionHelper: NSObject {
                     self.fillPasswords(logins as [AnyObject])
                 }
             }
-            
+
             completionHandler(completed, activityType)
         }
         return activityViewController

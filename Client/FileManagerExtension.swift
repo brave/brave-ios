@@ -13,7 +13,7 @@ extension FileManager {
         case cookie = "/Cookies"
         case webSiteData = "/WebKit/WebsiteData"
     }
-        
+    
     public typealias FolderLockObj = (folder: Folder, lock: Bool)
     
     //Lock a folder using FolderLockObj provided.

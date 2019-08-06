@@ -123,14 +123,14 @@ extension HTTPDownload: URLSessionTaskDelegate, URLSessionDownloadDelegate {
         
         delegate?.download(self, didCompleteWithError: error)
     }
-    
+
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
         bytesDownloaded = totalBytesWritten
         totalBytesExpected = totalBytesExpectedToWrite
-        
+
         delegate?.download(self, didDownloadBytes: bytesWritten)
     }
-    
+
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         do {
             let destination = try uniqueDownloadPathForFilename(filename)
@@ -183,21 +183,21 @@ protocol DownloadQueueDelegate {
 
 class DownloadQueue {
     var downloads: [Download]
-    
+
     var delegate: DownloadQueueDelegate?
-    
+
     var isEmpty: Bool {
         return downloads.isEmpty
     }
-    
+
     fileprivate var combinedBytesDownloaded: Int64 = 0
     fileprivate var combinedTotalBytesExpected: Int64?
     fileprivate var lastDownloadError: Error?
-    
+
     init() {
         self.downloads = []
     }
-    
+
     func enqueue(_ download: Download) {
         // Clear the download stats if the queue was empty at the start.
         if downloads.isEmpty {
@@ -208,17 +208,17 @@ class DownloadQueue {
         
         downloads.append(download)
         download.delegate = self
-        
+
         if let totalBytesExpected = download.totalBytesExpected, combinedTotalBytesExpected != nil {
             combinedTotalBytesExpected! += totalBytesExpected
         } else {
             combinedTotalBytesExpected = nil
         }
-        
+
         download.resume()
         delegate?.downloadQueue(self, didStartDownload: download)
     }
-    
+
     func cancelAll() {
         for download in downloads where !download.isComplete {
             download.cancel()
@@ -243,30 +243,30 @@ extension DownloadQueue: DownloadDelegate {
         guard let error = error, let index = downloads.firstIndex(of: download) else {
             return
         }
-        
+
         lastDownloadError = error
         downloads.remove(at: index)
-        
+
         if downloads.isEmpty {
             delegate?.downloadQueue(self, didCompleteWithError: lastDownloadError)
         }
     }
-    
+
     func download(_ download: Download, didDownloadBytes bytesDownloaded: Int64) {
         combinedBytesDownloaded += bytesDownloaded
         delegate?.downloadQueue(self, didDownloadCombinedBytes: combinedBytesDownloaded, combinedTotalBytesExpected: combinedTotalBytesExpected)
     }
-    
+
     func download(_ download: Download, didFinishDownloadingTo location: URL) {
         guard let index = downloads.firstIndex(of: download) else {
             return
         }
-        
+
         downloads.remove(at: index)
         delegate?.downloadQueue(self, download: download, didFinishDownloadingTo: location)
-        
+
         NotificationCenter.default.post(name: .FileDidDownload, object: location)
-        
+
         if downloads.isEmpty {
             delegate?.downloadQueue(self, didCompleteWithError: lastDownloadError)
         }
