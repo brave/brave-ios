@@ -3,8 +3,12 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
+import Shared
 
 struct SafeBrowsingHelper {
+    
+    private static let apiKey = "AIzaSyDeglae_dQQyQuRNk1jPq5R5--jBy21H5o"
+    
     /// Types of threats.
     enum ThreatType: String, Codable {
         case unspecified = "THREAT_TYPE_UNSPECIFIED"
@@ -196,8 +200,6 @@ struct SafeBrowsingHelper {
     @discardableResult
     public static func threatMatches(urls: [URL], session: URLSession = .shared, _ completion: @escaping (Response, Error?) -> Void) throws -> URLSessionDataTask {
         
-        let apiKey = "AIzaSyDeglae_dQQyQuRNk1jPq5R5--jBy21H5o"
-        
         let threatTypes: [ThreatType] = [.malware,
                                          .socialEngineering,
                                          .unwantedSoftware,
@@ -206,7 +208,9 @@ struct SafeBrowsingHelper {
         let platformTypes: [PlatformType] = [.any]
         let threatEntryTypes: [ThreatEntryType] = [.url, .exe]
         
-        let clientInfo = ClientInfo(clientId: "com.brave.safebrowsing", clientVersion: "1.0")
+        let clientInfo = ClientInfo(clientId: AppInfo.applicationBundle.bundleIdentifier ?? "com.brave.safebrowsing",
+                                    clientVersion: AppInfo.appVersion)
+        
         let threatInfo = ThreatInfo(threatTypes: threatTypes,
                                     platformTypes: platformTypes,
                                     threatEntryTypes: threatEntryTypes,
@@ -219,17 +223,16 @@ struct SafeBrowsingHelper {
                                   threatInfo: threatInfo)
         
         let request = try { () throws -> URLRequest in
-            guard !apiKey.isEmpty else {
+            guard !SafeBrowsingHelper.apiKey.isEmpty else {
                 throw SafeBrowsingError("Invalid API Key")
             }
             
-            guard let url = URL(string: "https://safebrowsing.googleapis.com/v4/threatMatches:find?key=\(apiKey)") else {
+            guard let url = URL(string: "https://safebrowsing.googleapis.com/v4/threatMatches:find?key=\(SafeBrowsingHelper.apiKey)") else {
                 throw SafeBrowsingError("Invalid Safe-Browsing URL")
             }
             
             var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 30)
             request.httpMethod = "POST"
-            request.setValue("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.87 Safari/537.36", forHTTPHeaderField: "User-Agent")
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             request.setValue("application/json", forHTTPHeaderField: "Accept")
             request.httpBody = try JSONEncoder().encode(requestInfo)
