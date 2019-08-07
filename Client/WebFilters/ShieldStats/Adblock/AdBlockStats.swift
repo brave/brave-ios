@@ -28,26 +28,10 @@ class AdBlockStats: LocalAdblockResourceProtocol {
     }
     
     func startLoading() {
-        parseBundledGeneralBlocklist()
-        loadDatFilesFromDocumentsDirectory()
+        loadDownloadedDatFiles()
     }
     
-    private func parseBundledGeneralBlocklist() {
-        guard let path = Bundle.main.path(forResource: bundledGeneralBlocklist, ofType: "dat") else {
-            log.error("Can't find path for bundled general blocklist")
-            return
-        }
-        let fileUrl = URL(fileURLWithPath: path)
-        
-        do {
-            let data = try Data(contentsOf: fileUrl)
-            generalAdblockEngine.set(data: data)
-        } catch {
-            log.error("Failed to parse bundled general blocklist: \(error)")
-        }
-    }
-    
-    private func loadDatFilesFromDocumentsDirectory() {
+    private func loadDownloadedDatFiles() {
         let fm = FileManager.default
         
         guard let folderUrl = fm.getOrCreateFolder(name: AdblockResourceDownloader.folderName) else {

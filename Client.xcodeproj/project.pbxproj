@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		03CCC9181AF05E7300DBF30D /* RelativeDatesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03CCC9171AF05E7300DBF30D /* RelativeDatesTests.swift */; };
 		0A063D4E22EB2946001CE50B /* ablock_rust_lib.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A063D4B22EB2945001CE50B /* ablock_rust_lib.h */; };
-		0A063D4F22EB2946001CE50B /* ABPFilterParserData.dat in Resources */ = {isa = PBXBuildFile; fileRef = 0A063D4C22EB2946001CE50B /* ABPFilterParserData.dat */; };
 		0A0D3D3921A4BD0600BEE65B /* SafeBrowsing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A0D3D3821A4BD0600BEE65B /* SafeBrowsing.swift */; };
 		0A0D3D3C21A4BE6400BEE65B /* adblock-list.txt in Resources */ = {isa = PBXBuildFile; fileRef = 0A0D3D3B21A4BE6400BEE65B /* adblock-list.txt */; };
 		0A0D3D3E21A4BE6C00BEE65B /* simple_malware.txt in Resources */ = {isa = PBXBuildFile; fileRef = 0A0D3D3D21A4BE6C00BEE65B /* simple_malware.txt */; };
@@ -1143,7 +1142,6 @@
 		03CCC9171AF05E7300DBF30D /* RelativeDatesTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RelativeDatesTests.swift; sourceTree = "<group>"; };
 		0A063D4A22EB2945001CE50B /* libadblock.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libadblock.a; sourceTree = "<group>"; };
 		0A063D4B22EB2945001CE50B /* ablock_rust_lib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ablock_rust_lib.h; sourceTree = "<group>"; };
-		0A063D4C22EB2946001CE50B /* ABPFilterParserData.dat */ = {isa = PBXFileReference; lastKnownFileType = file; path = ABPFilterParserData.dat; sourceTree = "<group>"; };
 		0A0D3D3821A4BD0600BEE65B /* SafeBrowsing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafeBrowsing.swift; sourceTree = "<group>"; };
 		0A0D3D3B21A4BE6400BEE65B /* adblock-list.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "adblock-list.txt"; sourceTree = "<group>"; };
 		0A0D3D3D21A4BE6C00BEE65B /* simple_malware.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = simple_malware.txt; sourceTree = "<group>"; };
@@ -2597,7 +2595,6 @@
 			isa = PBXGroup;
 			children = (
 				0A063D4B22EB2945001CE50B /* ablock_rust_lib.h */,
-				0A063D4C22EB2946001CE50B /* ABPFilterParserData.dat */,
 				0A063D4A22EB2945001CE50B /* libadblock.a */,
 			);
 			path = Resources;
@@ -5152,7 +5149,6 @@
 				D37524871C6E8B5A00A5F6C2 /* topdomains.txt in Resources */,
 				4422D56E21BFFB7F00BF1855 /* make_perl_groups.pl in Resources */,
 				E4B7B7621A793CF20022C5E0 /* CharisSILBI.ttf in Resources */,
-				0A063D4F22EB2946001CE50B /* ABPFilterParserData.dat in Resources */,
 				27658271217130D900754B2F /* GlobalSign_r1.cer in Resources */,
 				39F4C0FA2045D87400746155 /* FocusHelper.js in Resources */,
 				E4B7B7861A793CF20022C5E0 /* FiraSans-UltraLight.ttf in Resources */,
