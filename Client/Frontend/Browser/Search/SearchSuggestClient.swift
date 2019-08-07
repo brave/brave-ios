@@ -45,25 +45,30 @@ class SearchSuggestClient {
         request = alamofire.request(url!)
             .validate(statusCode: 200..<300)
             .responseJSON { response in
-                if let error = response.result as? Error {
+                do {
+                    _ = try response.result.get()
+                } catch {
                     callback(nil, error as NSError?)
-                    return
                 }
+                
+                let responseError = NSError(domain: SearchSuggestClientErrorDomain, code: SearchSuggestClientErrorInvalidResponse, userInfo: nil)
 
                 // The response will be of the following format:
                 //    ["foobar",["foobar","foobar2000 mac","foobar skins",...]]
                 // That is, an array of at least two elements: the search term and an array of suggestions.
-                let array = response.result as Any as? NSArray
-                if array?.count ?? 0 < 2 {
-                    let error = NSError(domain: SearchSuggestClientErrorDomain, code: SearchSuggestClientErrorInvalidResponse, userInfo: nil)
-                    callback(nil, error)
+                guard let array = try? response.result.get() as? NSArray else {
+                    callback(nil, responseError)
+                    return
+                }
+                
+                if array.count < 2 {
+                    callback(nil, responseError)
                     return
                 }
 
-                let suggestions = array?[1] as? [String]
+                let suggestions = array[1] as? [String]
                 if suggestions == nil {
-                    let error = NSError(domain: SearchSuggestClientErrorDomain, code: SearchSuggestClientErrorInvalidResponse, userInfo: nil)
-                    callback(nil, error)
+                    callback(nil, responseError)
                     return
                 }
 
