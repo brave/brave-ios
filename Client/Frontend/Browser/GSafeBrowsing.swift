@@ -38,7 +38,6 @@ enum ResponseType: String, Codable, CaseIterable {
     case fullUpdate = "FULL_UPDATE"
 }
 
-
 struct ClientInfo: Codable {
     let clientId: String
     let clientVersion: String
