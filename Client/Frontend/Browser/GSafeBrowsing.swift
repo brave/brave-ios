@@ -41,6 +41,7 @@ private enum ResponseType: String, Codable, CaseIterable {
 private struct ClientInfo: Codable {
     let clientId: String
     let clientVersion: String
+    let clientStates: [String]
 }
 
 private struct Constraints: Codable {
@@ -216,6 +217,10 @@ private class SafeBrowsingDatabase {
     private var harmfulApplicationThreats = [String]()
     
     private var states = [ThreatType: String]()
+    
+    public func getStates() -> [String] {
+        return states.values.compactMap({ $0.isEmpty ? nil : $0 })
+    }
     
     public func getState(_ threatType: ThreatType) -> String {
         return states[threatType] ?? ""
@@ -395,7 +400,9 @@ public class SafeBrowsingClient {
         let platformTypes: [PlatformType] = [.any]
         let threatEntryTypes: [ThreatEntryType] = [.url, .exe]
         
-        let clientInfo = ClientInfo(clientId: "com.brave.safebrowsing", clientVersion: "1.0")
+        let clientInfo = ClientInfo(clientId: "com.brave.safebrowsing",
+                                    clientVersion: "1.0",
+                                    clientStates: database.getStates())
         
         let threatInfo = ThreatInfo(threatTypes: threatTypes,
                                     platformTypes: platformTypes,
@@ -460,7 +467,9 @@ public class SafeBrowsingClient {
                               constraints: constraints)
         ]
         
-        let clientInfo = ClientInfo(clientId: "com.brave.safebrowsing", clientVersion: "1.0")
+        let clientInfo = ClientInfo(clientId: "com.brave.safebrowsing",
+                                    clientVersion: "1.0",
+                                    clientStates: database.getStates())
         let body = FetchRequest(client: clientInfo, listUpdateRequests: lists)
         
         do {
