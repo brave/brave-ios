@@ -1,5 +1,5 @@
 github "AgileBits/onepassword-app-extension" "bcc4cc97fed9a6e73fa204f2e61138e353cb3ef7"
-github "Alamofire/Alamofire" "5.0.0-beta.4"
+github "Alamofire/Alamofire" "5.0.0-beta.7"
 github "DaveWoodCom/XCGLogger" "7.0.0"
 github "SnapKit/SnapKit" "5.0.1"
 github "SwiftyJSON/SwiftyJSON" "5.0.0"
