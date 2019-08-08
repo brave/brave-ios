@@ -104,17 +104,23 @@ class SafeBrowsingClient {
         do {
             let body = FetchRequest(client: clientInfo, listUpdateRequests: lists)
             let request = try encode(.post, endpoint: .fetch, body: body)
-            executeRequest(request, type: FetchResponse.self) { response, error in
+            executeRequest(request, type: FetchResponse.self) { [weak self] response, error in
+                guard let self = self else { return }
+                
                 if let error = error {
                     return completion(error)
                 }
                 
                 if let response = response {
+                    var didError = false
                     self.database.update(response, completion: {
                         if let error = $0 {
                             log.error("Safe-Browsing: Error Updating Database: \(error)")
+                            didError = true
                         }
                     })
+                    
+                    return completion(didError ? SafeBrowsingError("Safe-Browsing: Error Updating Database") : nil)
                 }
                 
                 completion(nil)
