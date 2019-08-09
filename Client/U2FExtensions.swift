@@ -614,6 +614,8 @@ class U2FExtensions: NSObject {
         }
         
         if tab?.id == currentTabId && (fido2Service.keyState == .touchKey || u2fService.keyState == .YKFKeyU2FServiceKeyStateTouchKey) {
+            let currentURL = self.tab?.url?.host ?? ""
+            popup.updateTitle(title: Strings.touchKeyTitle + currentURL)
             popup.showWithType(showType: .flyUp)
             return
         }
@@ -1090,7 +1092,7 @@ extension Strings {
     public static let U2FAuthenticationError = NSLocalizedString("U2FAuthenticationError", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Error authenticating your security key", comment: "Error handling U2F authentication.") + tryAgain
     
     //Lightning Modals
-    public static let touchKeyTitle = NSLocalizedString("touchKeyTitle", bundle: Bundle.shared, value: "Use the security key", comment: "Title for touch key modal.")
+    public static let touchKeyTitle = NSLocalizedString("touchKeyTitle", bundle: Bundle.shared, value: "Use the security key for ", comment: "Title for touch key modal.")
     public static let touchKeyMessage = NSLocalizedString("touchKeyMessage", bundle: Bundle.shared, value: "Insert your security key and touch it.", comment: "Message for touch key modal.")
     public static let touchKeyCancel = NSLocalizedString("touchKeyCancel", bundle: Bundle.shared, value: "Cancel", comment: "Text for touch key modal button.")
     

@@ -76,6 +76,10 @@ class AlertPopupView: PopupView {
         setDialogColor(color: BraveUX.PopupDialogColorLight)
     }
     
+    func updateTitle(title: String) {
+        titleLabel.text = title
+    }
+    
     func updateSubviews() {
         titleLabel.adjustsFontSizeToFitWidth = false
         messageLabel.adjustsFontSizeToFitWidth = false
