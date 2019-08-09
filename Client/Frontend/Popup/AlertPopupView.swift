@@ -76,7 +76,7 @@ class AlertPopupView: PopupView {
         setDialogColor(color: BraveUX.PopupDialogColorLight)
     }
     
-    func updateTitle(title: String) {
+    func update(title: String) {
         titleLabel.text = title
     }
     

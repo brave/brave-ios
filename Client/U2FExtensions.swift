@@ -141,25 +141,27 @@ class U2FExtensions: NSObject {
         pinVerificationPopup = AlertPopupView(image: #imageLiteral(resourceName: "browser_lock_popup"), title: Strings.pinLabel, message: Strings.pinTitle, inputType: .default, secureInput: true, inputPlaceholder: Strings.pinPlaceholder)
         super.init()
         
-        touchKeyPopup.addButton(title: Strings.keyCancel) { [weak self] in
-            guard let self = self else {
-                return .flyDown
+        let handleCancelButton: () -> PopupViewDismissType = {
+            let handle = self.currentHandle
+            self.cleanupPinVerificationPopup()
+            switch self.currentMessageType {
+            case .FIDO2Create:
+                self.sendFIDO2RegistrationError(handle: handle)
+            case .FIDO2Get:
+                self.sendFIDO2AuthenticationError(handle: handle)
+            case.FIDORegister:
+                self.sendFIDORegistrationError(handle: handle, requestId: self.requestId[handle] ?? -1, errorCode: U2FErrorCodes.other_error)
+            case .FIDOSign:
+                self.sendFIDOAuthenticationError(handle: handle, requestId: self.requestId[handle] ?? -1, errorCode: U2FErrorCodes.other_error)
+            case .FIDOLowLevel, .None:
+                break
             }
-            return self.handleCancelButton()
+            return .flyDown
         }
         
-        insertKeyPopup.addButton(title: Strings.keyCancel) { [weak self] in
-            guard let self = self else {
-                return .flyDown
-            }
-            return self.handleCancelButton()
-        }
         
-        pinVerificationPopup.addButton(title: Strings.keyCancel) { [weak self] in
-            guard let self = self else {
-                return .flyDown
-            }
-            return self.handleCancelButton()
+        [touchKeyPopup, insertKeyPopup, pinVerificationPopup].forEach {
+            $0.addButton(title: Strings.keyCancel, tapped: handleCancelButton)
         }
         
         // Make sure the session is started
@@ -171,24 +173,6 @@ class U2FExtensions: NSObject {
         observeKeyStateUpdates = false
     }
     
-    private func handleCancelButton() -> PopupViewDismissType {
-        let handle = self.currentHandle
-        cleanupPinVerificationPopup()
-        switch self.currentMessageType {
-            case .FIDO2Create:
-                self.sendFIDO2RegistrationError(handle: handle)
-            case .FIDO2Get:
-                self.sendFIDO2AuthenticationError(handle: handle)
-            case.FIDORegister:
-                self.sendFIDORegistrationError(handle: handle, requestId: self.requestId[handle] ?? -1, errorCode: U2FErrorCodes.other_error)
-            case .FIDOSign:
-                self.sendFIDOAuthenticationError(handle: handle, requestId: self.requestId[handle] ?? -1, errorCode: U2FErrorCodes.other_error)
-            case .FIDOLowLevel, .None:
-                break
-        }
-        return .flyDown
-    }
-
     private func validateURL(string: String?) -> Bool {
         let regEx = "((https|http)://)((\\w|-)+)(([.]|[/])((\\w|-)+))+"
         let predicate = NSPredicate(format: "SELF MATCHES %@", argumentArray: [regEx])
@@ -634,7 +618,7 @@ class U2FExtensions: NSObject {
     // This modal is presented when FIDO/FIDO2 APIs are waiting for the security key
     private func presentInsertKeyModal() {
         let currentURL = self.tab?.url?.host ?? ""
-        insertKeyPopup.updateTitle(title: Strings.keyTitle + currentURL)
+        insertKeyPopup.update(title: Strings.keyTitle + currentURL)
         insertKeyPopup.showWithType(showType: .flyUp)
     }
     
@@ -651,7 +635,7 @@ class U2FExtensions: NSObject {
         // The modal should be visible for the tab where the U2F API is active
         if u2fActive && tab?.id == currentTabId && (fido2Service.keyState == .touchKey || u2fService.keyState == .YKFKeyU2FServiceKeyStateTouchKey) {
             let currentURL = self.tab?.url?.host ?? ""
-            touchKeyPopup.updateTitle(title: Strings.keyTitle + currentURL)
+            touchKeyPopup.update(title: Strings.keyTitle + currentURL)
             touchKeyPopup.showWithType(showType: .flyUp)
             return
         }
@@ -671,26 +655,21 @@ class U2FExtensions: NSObject {
     }
     
     private func verifyPin(completion: @escaping (Bool) -> Void) -> PopupViewDismissType {
-        if let pin = pinVerificationPopup.text, !pin.isEmpty {
-            guard let fido2Service = YubiKitManager.shared.keySession.fido2Service else {
-                completion(true)
-                return .flyDown
-            }
-            guard let verifyPinRequest = YKFKeyFIDO2VerifyPinRequest(pin: pin) else {
+        guard
+            let pin = pinVerificationPopup.text, !pin.isEmpty,
+            let fido2Service = YubiKitManager.shared.keySession.fido2Service,
+            let verifyPinRequest = YKFKeyFIDO2VerifyPinRequest(pin: pin) else {
                 completion(true)
                 return .flyDown
             }
             
-            fido2Service.execute(verifyPinRequest) { (error) in
-                guard error == nil else {
-                    completion(true)
-                    return
-                }
-                completion(false)
+        fido2Service.execute(verifyPinRequest) { (error) in
+            guard error == nil else {
+                completion(true)
                 return
             }
-        } else {
-            completion(true)
+            completion(false)
+            return
         }
         return .flyDown
     }
