@@ -60,6 +60,47 @@ class SearchTests: XCTestCase {
         checkInvalidURL(#""创业咖啡.中国"#)
         checkInvalidURL(#""创业咖啡.中国""#)
     }
+    
+    func testEmails() {
+        let validEmails = [
+            "foo@yahoo.com",
+            "foo-100@yahoo.com",
+            "foo.100@yahoo.com",
+            "foo111@foo.com",
+            "foo-100@foo.net",
+            "foo-100@foo.net",
+            "foo.100@foo.com.au",
+            "foo@1.com",
+            "foo@gmail.com.com",
+            "foo+100@gmail.com",
+            "foo-100@yahoo-test.com",
+            #""foo@gmail.com"#
+        ]
+        
+        let invalidEmails = [
+            "foo",
+            "foo@.com.my",
+            "foo123@gmail.a",
+            "foo123@.com",
+            "foo123@.com.com",
+            ".foo@foo.com",
+            "foo()*@gmail.com",
+            "foo@%*.com",
+            "foo..2002@gmail.com",
+            "foo.@gmail.com",
+            "foo@foo@gmail.com",
+            "foo@gmail.com.1a",
+            #""foo@gmail.com""#
+        ]
+        
+        validEmails.forEach({
+            XCTAssertTrue(URIFixup.isValidEmail($0))
+        })
+        
+        invalidEmails.forEach({
+            XCTAssertFalse(URIFixup.isValidEmail($0))
+        })
+    }
 
     fileprivate func checkValidURL(_ beforeFixup: String, afterFixup: String) {
         XCTAssertEqual(URIFixup.getURL(beforeFixup)!.absoluteString, afterFixup)
