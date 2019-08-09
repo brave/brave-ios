@@ -29,9 +29,9 @@ public class PushRegistration: NSObject, NSSecureCoding {
     }
 
     @objc public convenience required init?(coder aDecoder: NSCoder) {
-        guard let uaid = aDecoder.decodeObject(forKey: "uaid") as? String,
-            let secret = aDecoder.decodeObject(forKey: "secret") as? String,
-            let subscriptions = aDecoder.decodeObject(forKey: "subscriptions") as? [String: PushSubscription] else {
+        guard let uaid = aDecoder.decodeObject(of: NSString.self, forKey: "uaid") as String?,
+            let secret = aDecoder.decodeObject(of: NSString.self, forKey: "secret") as String?,
+            let subscriptions = aDecoder.decodeObject(of: NSDictionary.self, forKey: "subscriptions") as [String: PushSubscription]? else {
                 fatalError("Cannot decode registration")
         }
         self.init(uaid: uaid, secret: secret, subscriptions: subscriptions)
@@ -95,12 +95,12 @@ public class PushSubscription: NSObject, NSSecureCoding {
     }
 
     @objc public convenience required init?(coder aDecoder: NSCoder) {
-        guard let channelID = aDecoder.decodeObject(forKey: "channelID") as? String,
-            let urlString = aDecoder.decodeObject(forKey: "endpoint") as? String,
+        guard let channelID = aDecoder.decodeObject(of: NSString.self, forKey: "channelID") as String?,
+            let urlString = aDecoder.decodeObject(of: NSString.self, forKey: "endpoint") as String?,
             let endpoint = URL(string: urlString),
-            let p256dhPrivateKey = aDecoder.decodeObject(forKey: "p256dhPrivateKey") as? String,
-            let p256dhPublicKey = aDecoder.decodeObject(forKey: "p256dhPublicKey") as? String,
-            let authKey = aDecoder.decodeObject(forKey: "authKey") as? String else {
+            let p256dhPrivateKey = aDecoder.decodeObject(of: NSString.self, forKey: "p256dhPrivateKey") as String?,
+            let p256dhPublicKey = aDecoder.decodeObject(of: NSString.self, forKey: "p256dhPublicKey") as String?,
+            let authKey = aDecoder.decodeObject(of: NSString.self, forKey: "authKey") as String? else {
             return nil
         }
 

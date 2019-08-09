@@ -45,9 +45,9 @@ class SessionData: NSObject, NSSecureCoding {
     }
 
     required init?(coder: NSCoder) {
-        self.currentPage = coder.decodeAsInt(forKey: SessionData.Keys.currentPage)
-        self.urls = coder.decodeObject(forKey: "urls") as? [URL] ?? []
-        self.lastUsedTime = coder.decodeAsUInt64(forKey: SessionData.Keys.lastUsedTime)
+        self.currentPage = coder.decodeInteger(forKey: SessionData.Keys.currentPage)
+        self.urls = coder.decodeObject(of: [NSURL.self], forKey: "urls") as? [URL] ?? []
+        self.lastUsedTime = UInt64(coder.decodeInt64(forKey: SessionData.Keys.lastUsedTime))
     }
 
     func encode(with coder: NSCoder) {

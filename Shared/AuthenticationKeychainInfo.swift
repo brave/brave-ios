@@ -55,15 +55,15 @@ open class AuthenticationKeychainInfo: NSObject, NSSecureCoding {
     }
 
     public required init?(coder aDecoder: NSCoder) {
-        if let lockOutInterval = aDecoder.decodeObject(forKey: "lockOutInterval") as? NSNumber {
+        if let lockOutInterval = aDecoder.decodeObject(of: NSNumber.self, forKey: "lockOutInterval") as NSNumber? {
             self.lockOutInterval = lockOutInterval.doubleValue
         }
-        self.passcode = aDecoder.decodeObject(forKey: "passcode") as? String
-        self.failedAttempts = aDecoder.decodeAsInt(forKey: "failedAttempts")
-        self.useTouchID = aDecoder.decodeAsBool(forKey: "useTouchID")
+        self.passcode = aDecoder.decodeObject(of: NSString.self, forKey: "passcode") as String?
+        self.failedAttempts = aDecoder.decodeInteger(forKey: "failedAttempts")
+        self.useTouchID = aDecoder.decodeBool(forKey: "useTouchID")
         if aDecoder.containsValue(forKey: "isPasscodeRequiredImmediately") {
-            self.isPasscodeRequiredImmediately = aDecoder.decodeAsBool(forKey: "isPasscodeRequiredImmediately")
-        } else if let interval = aDecoder.decodeObject(forKey: "requiredPasscodeInterval") as? NSNumber {
+            self.isPasscodeRequiredImmediately = aDecoder.decodeBool(forKey: "isPasscodeRequiredImmediately")
+        } else if let interval = aDecoder.decodeObject(of: NSNumber.self, forKey: "requiredPasscodeInterval") as NSNumber? {
             // This is solely used for 1.6.6 -> 1.7 migration
             //  `requiredPasscodeInterval` is not re-encoded on this object
             self.isPasscodeRequiredImmediately = (interval == 2)
