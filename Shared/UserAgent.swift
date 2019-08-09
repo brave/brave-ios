@@ -59,7 +59,10 @@ open class UserAgent {
         if let firefoxUA = UserAgent.cachedUserAgent(checkiOSVersion: true) {
             return firefoxUA
         }
-        defaults.removeObject(forKey: "UserAgent")
+        // Reset UA
+        var dict = UserDefaults.standard.volatileDomain(forName: UserDefaults.registrationDomain)
+        dict.removeValue(forKey: "UserAgent")
+        UserDefaults.standard.setVolatileDomain(dict, forName: UserDefaults.registrationDomain)
         let currentiOSVersion = UIDevice.current.systemVersion
         defaults.set(currentiOSVersion, forKey: "LastDeviceSystemVersionNumber")
         defaults.set(appVersion, forKey: "LastFirefoxVersionNumber")
