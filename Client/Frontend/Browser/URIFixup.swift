@@ -6,6 +6,22 @@ import Foundation
 import Shared
 
 class URIFixup {
+
+    private static func validateURL(_ url: URL) -> URL? {
+        // Validate the domain to make sure it doesn't have any invalid characters
+        if let host = url.host {
+            guard let decodedASCIIURL = host.replacingOccurrences(of: "+", with: "").removingPercentEncoding else {
+                return nil
+            }
+            
+            if decodedASCIIURL.rangeOfCharacter(from: CharacterSet.URLAllowed.inverted) != nil {
+                return nil
+            }
+        }
+        
+        return url
+    }
+    
     static func getURL(_ entry: String) -> URL? {
         let trimmed = entry.trimmingCharacters(in: .whitespacesAndNewlines)
         guard let escaped = trimmed.addingPercentEncoding(withAllowedCharacters: .URLAllowed) else {
@@ -18,7 +34,7 @@ class URIFixup {
         // the official URI scheme list, so that other such search phrases
         // like "filetype:" are recognised as searches rather than URLs.
         if let url = URL(string: escaped), url.schemeIsValid {
-            return url
+            return validateURL(url)
         }
 
         // If there's no scheme, we're going to prepend "http://". First,
@@ -32,11 +48,9 @@ class URIFixup {
         if trimmed.range(of: " ") != nil {
             return nil
         }
-        
         // A URL is only valid when the URL has a scheme, is not an email, is not quoted.
         // If one of the above conditions is NOT satisfied, the URL is invalid and should be deemed "search terms" search terms instead. Technically, an email is also a valid URL but does not get handled by the DNS server.
         // I'm not sure if the punycoded prior to my if-statement below is correct - Brandon T.
-        //
         // The below if-statement allows us to search emails and quoted strings - brave-ios/issues/1209.
         if isValidEmail(trimmed) {
             return nil
@@ -45,7 +59,7 @@ class URIFixup {
         // If there is a ".", prepend "http://" and try again. Since this
         // is strictly an "http://" URL, we also require a host.
         if let url = URL(string: "http://\(escaped)"), url.host != nil {
-            return url
+            return validateURL(url)
         }
 
         return nil
