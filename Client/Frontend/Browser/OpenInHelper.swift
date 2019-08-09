@@ -96,6 +96,13 @@ class DownloadHelper: NSObject, OpenInHelper {
         alert.addAction(okAction)
         alert.addAction(cancelAction)
         
+        alert.popoverPresentationController?.do {
+            guard let view = browserViewController.view else { return }
+            $0.sourceView = view
+            $0.sourceRect = CGRect(x: view.bounds.midX, y: view.bounds.maxY - 16, width: 0, height: 0)
+            $0.permittedArrowDirections = []
+        }
+        
         browserViewController.present(alert, animated: true, completion: nil)
     }
 }
