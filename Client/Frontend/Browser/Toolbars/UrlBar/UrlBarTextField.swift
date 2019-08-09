@@ -73,9 +73,9 @@ extension UrlBarTextField: Themeable {
     func applyTheme(_ theme: Theme) {
         styleChildren(theme: theme)
         
-        backgroundColor = .yellow
+        backgroundColor = theme.colors.addressBar
         textColor = theme.colors.tints.header
         clearButtonTintColor = textColor
-//        highlightColor = .green
+        highlightColor = textColor!.withAlphaComponent(0.2)
     }
 }
