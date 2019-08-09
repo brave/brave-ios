@@ -9,6 +9,7 @@ class URIFixup {
 
     private static func validateURL(_ url: URL) -> URL? {
         // Validate the domain to make sure it doesn't have any invalid characters
+        // IE: quotes, etc..
         if let host = url.host {
             guard let decodedASCIIURL = host.replacingOccurrences(of: "+", with: "").removingPercentEncoding else {
                 return nil
@@ -48,11 +49,23 @@ class URIFixup {
         if trimmed.range(of: " ") != nil {
             return nil
         }
-        // A URL is only valid when the URL has a scheme, is not an email, is not quoted.
-        // If one of the above conditions is NOT satisfied, the URL is invalid and should be deemed "search terms" search terms instead. Technically, an email is also a valid URL but does not get handled by the DNS server.
-        // I'm not sure if the punycoded prior to my if-statement below is correct - Brandon T.
-        // The below if-statement allows us to search emails and quoted strings - brave-ios/issues/1209.
-        if isValidEmail(trimmed) {
+        
+        // Partially canonicalize the URL and check if it has a "user"..
+        // If it is, it should go to the search engine and not the DNS server..
+        // This behaviour is mimicking SAFARI! It has the safest behaviour so far.
+        //
+        // 1. If the url contains just "user@domain.com", ALL browsers take you to the search engine.
+        // 2. If it's an email with a PATH or QUERY such as "user@domain.com/whatever"
+        //    where "/whatever" is the path or "user@domain.com?something=whatever"
+        //    where "?something=whatever" is the query:
+        //    - Firefox warns you that a site is trying to log you in automatically to the domain.
+        //    - Chrome takes you to the domain (seems like a security flaw).
+        //    - Safari passes on the entire url to the Search Engine just like it does
+        //      without a path or query.
+        if URL(string: trimmed)?.user != nil ||
+            URL(string: escaped)?.user != nil ||
+            URL(string: "http://\(trimmed)")?.user != nil ||
+            URL(string: "http://\(escaped)")?.user != nil {
             return nil
         }
 
@@ -63,27 +76,5 @@ class URIFixup {
         }
 
         return nil
-    }
-    
-    /// Checks whether a string is a valid email conforming to RFC 2822.
-    /// http://www.cocoawithlove.com/2009/06/verifying-that-string-is-email-address.html
-    static func isValidEmail(_ string: String) -> Bool {
-        if string.isEmpty {
-            return false
-        }
-        
-        let regexRFC2822 =
-            "(?:[a-zA-Z0-9!#$%\\&‘*+/=?\\^_`{|}~-]+(?:\\.[a-zA-Z0-9!#$%\\&'*+/=?\\^_`{|}" +
-            "~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\" +
-            "x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-" +
-            "z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5" +
-            "]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-" +
-            "9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21" +
-            "-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])"
-        
-        let relaxedRegexRFC2822 = "[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?"
-        
-        //return NSPredicate(format: "SELF MATCHES[c] %@", regex).evaluate(with: string)
-        return string.range(of: regexRFC2822, options: .regularExpression) == string.startIndex..<string.endIndex || string.range(of: relaxedRegexRFC2822, options: .regularExpression) == string.startIndex..<string.endIndex
     }
 }
