@@ -123,7 +123,7 @@ class Tab: NSObject {
 
     /// Whether or not the desktop site was requested with the last request, reload or navigation. Note that this property needs to
     /// be managed by the web view's navigation delegate.
-    var desktopSite: Bool = false
+    var desktopSite: Bool = UIDevice.isIpad ? true : false
     
     var readerModeAvailableOrActive: Bool {
         if let readerMode = self.getContentScript(name: "ReaderMode") as? ReaderMode {
@@ -399,7 +399,13 @@ class Tab: NSObject {
     }
 
     func reload() {
-        let userAgent: String? = desktopSite ? UserAgent.desktopUserAgent() : nil
+        
+        var userAgent: String?
+        if UIDevice.isIpad && !desktopSite {
+            userAgent = UserAgent.mobileUserAgent()
+        } else if !UIDevice.isIpad && desktopSite {
+            userAgent = UserAgent.desktopUserAgent()
+        }
         if (userAgent ?? "") != webView?.customUserAgent,
            let currentItem = webView?.backForwardList.currentItem {
             webView?.customUserAgent = userAgent

@@ -1277,8 +1277,9 @@ class BrowserViewController: UIViewController {
             }
         }
         
-        // Remember whether or not a desktop site was requested
-        tab.desktopSite = webView.customUserAgent?.isEmpty == false
+        // Remember whether or not a desktop/mobile site was requested
+        let isCustomUserAgentEmpty = webView.customUserAgent?.isEmpty == true
+        tab.desktopSite = isCustomUserAgentEmpty ? UIDevice.isIpad : !UIDevice.isIpad
     }
     
     // MARK: - Browser PIN Callout
