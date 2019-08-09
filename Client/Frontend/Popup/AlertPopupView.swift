@@ -80,6 +80,10 @@ class AlertPopupView: PopupView {
         titleLabel.text = title
     }
     
+    func clearTextField() {
+        textField?.text = nil
+    }
+    
     func updateSubviews() {
         titleLabel.adjustsFontSizeToFitWidth = false
         messageLabel.adjustsFontSizeToFitWidth = false
