@@ -32,6 +32,15 @@ class URIFixup {
         if trimmed.range(of: " ") != nil {
             return nil
         }
+        
+        // A URL is only valid when the URL has a scheme, is not an email, is not quoted.
+        // If one of the above conditions is NOT satisfied, the URL is invalid and should be deemed "search terms" search terms instead. Technically, an email is also a valid URL but does not get handled by the DNS server.
+        // I'm not sure if the punycoded prior to my if-statement below is correct - Brandon T.
+        //
+        // The below if-statement allows us to search emails and quoted strings - brave-ios/issues/1209.
+        if isValidEmail(trimmed) {
+            return nil
+        }
 
         // If there is a ".", prepend "http://" and try again. Since this
         // is strictly an "http://" URL, we also require a host.
@@ -40,5 +49,17 @@ class URIFixup {
         }
 
         return nil
+    }
+    
+    static func isValidEmail(_ string: String) -> Bool {
+        let regex =
+            "(?:[a-zA-Z0-9!#$%\\&‘*+/=?\\^_`{|}~-]+(?:\\.[a-zA-Z0-9!#$%\\&'*+/=?\\^_`{|}" +
+            "~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\" +
+            "x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-" +
+            "z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5" +
+            "]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-" +
+            "9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21" +
+            "-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])"
+        return NSPredicate(format: "SELF MATCHES[c] %@", regex).evaluate(with: string)
     }
 }
