@@ -4,7 +4,6 @@
 
 import AVFoundation
 import UIKit
-import JavaScriptCore
 
 open class UserAgent {
     private static var defaults = UserDefaults(suiteName: AppInfo.sharedContainerIdentifier)!
