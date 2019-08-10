@@ -85,7 +85,7 @@ class MenuViewController: UITableViewController {
         var allWithoutUrlButtons = allButtons
         allWithoutUrlButtons.removeAll { $0 == .add || $0 == .share }
         
-        guard let url = tab?.url, (!url.isLocal || !url.isReaderMode) else {
+        guard let url = tab?.url, (!url.isLocal || url.isReaderModeURL) else {
             return allWithoutUrlButtons
         }
         return allButtons
@@ -203,9 +203,16 @@ class MenuViewController: UITableViewController {
     }
     
     private func openAddBookmark() {
-        guard let title = tab?.displayTitle, let url = tab?.url?.absoluteString else { return }
+        guard let title = tab?.displayTitle, let url = tab?.url else { return }
         
-        let mode = BookmarkEditMode.addBookmark(title: title, url: url)
+        let mode: BookmarkEditMode = {
+            if url.isReaderModeURL, let decodedURL = url.decodeReaderModeURL {
+                return BookmarkEditMode.addBookmark(title: title, url: decodedURL.absoluteString)
+            } else {
+                return BookmarkEditMode.addBookmark(title: title, url: url.absoluteString)
+            }
+        }()
+        
         let vc = AddEditBookmarkTableViewController(mode: mode)
         
         open(vc, doneButton: DoneButton(style: .cancel, position: .left))

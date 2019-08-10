@@ -307,12 +307,6 @@ extension URL {
 
         return host.lowercased() == "localhost" || host == "127.0.0.1"
     }
-    
-    public var isReaderMode: Bool {
-        guard self.isLocal, let firstComponent = self.pathComponents.first else { return false }
-        return firstComponent == "reader-mode"
-        
-    }
 
     public var isIPv6: Bool {
         return host?.contains(":") ?? false
