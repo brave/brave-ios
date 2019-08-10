@@ -59,12 +59,14 @@ class Theme: Equatable, Decodable {
             let homeStr = try container.decode(String.self, forKey: .home)
             let addressBarStr = try container.decode(String.self, forKey: .addressBar)
             let borderStr = try container.decode(String.self, forKey: .border)
+            let accentStr = try container.decode(String.self, forKey: .accent)
 
             header = UIColor(colorString: headerStr)
             footer = UIColor(colorString: footerStr)
             home = UIColor(colorString: homeStr)
             addressBar = UIColor(colorString: addressBarStr)
             border = UIColor(colorString: borderStr)
+            accent = UIColor(colorString: accentStr)
             
             stats = try container.decode(Stat.self, forKey: .stats)
             tints = try container.decode(Tint.self, forKey: .tints)
@@ -76,6 +78,7 @@ class Theme: Equatable, Decodable {
         let home: UIColor
         let addressBar: UIColor
         let border: UIColor
+        let accent: UIColor
         
         let stats: Stat
         struct Stat: Decodable {
@@ -211,6 +214,7 @@ private extension Theme {
         "home": "0xffffff",
         "addressBar": "0xD7D7E0",
         "border": "0x000000",
+        "accent": "0xccdded",
         "tints": {
         "home": "0x434351",
         "header": "0x434351",
@@ -257,6 +261,7 @@ private extension Theme {
         "home": "0x210950",
         "addressBar": "0x3D2742",
         "border": "0xffffff",
+        "accent": "0xcf68ff",
         "tints": {
         "home": "0xE7E6E9",
         "header": "0xE7E6E9",
@@ -301,6 +306,7 @@ fileprivate enum ThemeCodingKeys: String, CodingKey {
         case home
         case addressBar
         case border
+        case accent
         
         case tints
         enum TintCodingKeys: String, CodingKey {
