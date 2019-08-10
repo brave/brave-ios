@@ -42,17 +42,9 @@ extension UIColor {
     }
 
     struct Browser {
-        static let Background = BrowserColor(normal: Photon.Grey10, pbm: Photon.Grey70)
         static let Text = BrowserColor(normal: .white, pbm: Photon.Grey60)
         static let URLBarDivider = BrowserColor(normal: Photon.Grey90A10, pbm: Photon.Grey60)
         static let LocationBarBackground = Photon.Grey30
-        static let Tint = BrowserColor(normal: Photon.Grey80, pbm: Photon.Grey30)
-    }
-
-    struct URLBar {
-        static let Border = BrowserColor(normal: Photon.Grey50, pbm: Photon.Grey80)
-        static let ActiveBorder = BrowserColor(normal: Photon.Blue50A30, pbm: Photon.Grey60)
-        static let Tint = BrowserColor(normal: Photon.Blue50A30, pbm: Photon.Grey10)
     }
 
     struct TextField {
@@ -62,7 +54,6 @@ extension UIColor {
         static let ReaderModeButtonSelected = BrowserColor(normal: Photon.Blue40, pbm: Defaults.MobilePrivatePurple)
         static let ReaderModeButtonUnselected = BrowserColor(normal: Photon.Grey50, pbm: Photon.Grey40)
         static let PageOptionsSelected = ReaderModeButtonSelected
-        static let PageOptionsUnselected = UIColor.Browser.Tint
         static let Separator = BrowserColor(normal: #colorLiteral(red: 0.7333333333, green: 0.7333333333, blue: 0.8039215686, alpha: 1), pbm: Photon.Grey70)
         
     }
@@ -79,7 +70,6 @@ extension UIColor {
     }
 
     struct TabTray {
-        static let Background = Browser.Background
         static let ToolbarButtonTint = BrowserColor(normal: Photon.Grey80, pbm: Photon.Grey30)
     }
 

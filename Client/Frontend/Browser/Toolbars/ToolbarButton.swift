@@ -48,7 +48,7 @@ extension ToolbarButton: Themeable {
         
         selectedTintColor = UIColor.ToolbarButton.SelectedTint.colorFor(theme)
         disabledTintColor = UIColor.ToolbarButton.DisabledTint.colorFor(theme)
-        unselectedTintColor = UIColor.Browser.Tint.colorFor(theme)
+        unselectedTintColor = theme.colors.tints.home
         tintColor = isEnabled ? unselectedTintColor : disabledTintColor
         imageView?.tintColor = tintColor
     }
