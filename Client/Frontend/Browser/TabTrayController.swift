@@ -11,8 +11,8 @@ import BraveShared
 struct TabTrayControllerUX {
     static let CornerRadius = CGFloat(6.0)
     static let DefaultBorderWidth = 1.0 / UIScreen.main.scale
-    static let BackgroundColor = UIColor.TopTabs.Background
-    static let CellBackgroundColor = UIColor.TopTabs.Background
+    static let BackgroundColor = UIColor.Photon.Grey80
+    static let CellBackgroundColor = BackgroundColor
     static let ToolbarFont = UIFont.systemFont(ofSize: 17.0, weight: .medium)
     static let TextBoxHeight = CGFloat(32.0)
     static let FaviconSize = CGFloat(20)
@@ -398,7 +398,7 @@ class TabTrayController: UIViewController, Themeable {
     func applyTheme(_ theme: Theme) {
         styleChildren(theme: theme)
         
-        collectionView?.backgroundColor = TabTrayControllerUX.BackgroundColor.colorFor(theme)
+        collectionView?.backgroundColor = TabTrayControllerUX.BackgroundColor
         collectionView?.visibleCells.compactMap({ $0 as? TabCell }).forEach { $0.applyTheme(theme) }
         toolbar.applyTheme(theme)
     }
@@ -1172,9 +1172,9 @@ class TrayToolbar: UIView, Themeable {
     func applyTheme(_ theme: Theme) {
         styleChildren(theme: theme)
         
-        UIApplication.shared.windows.first?.backgroundColor = TabTrayControllerUX.BackgroundColor.colorFor(theme)
-        addTabButton.tintColor = UIColor.TabTray.ToolbarButtonTint.colorFor(theme) // Needs to be changed
-        doneButton.tintColor = UIColor.TabTray.ToolbarButtonTint.colorFor(theme)
-        backgroundColor = TabTrayControllerUX.BackgroundColor.colorFor(theme)
+        UIApplication.shared.windows.first?.backgroundColor = TabTrayControllerUX.BackgroundColor
+        addTabButton.tintColor = UIColor.TabTray.ToolbarButtonTint
+        doneButton.tintColor = UIColor.TabTray.ToolbarButtonTint
+        backgroundColor = TabTrayControllerUX.BackgroundColor
     }
 }

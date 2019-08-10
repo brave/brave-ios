@@ -566,7 +566,8 @@ extension TopToolbarView: Themeable {
     func applyTheme(_ theme: Theme) {
         styleChildren(theme: theme)
         
-        progressBar.setGradientColors(startColor: UIColor.LoadingBar.Start.colorFor(theme), endColor: UIColor.LoadingBar.End.colorFor(theme))
+        // Currently do not use gradient, hence same start/end color
+        progressBar.setGradientColors(startColor: theme.colors.accent, endColor: theme.colors.accent)
         currentTheme = theme
         cancelButton.setTitleColor(theme.colors.tints.header, for: .normal)
         
