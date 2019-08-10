@@ -85,7 +85,9 @@ class MenuViewController: UITableViewController {
         var allWithoutUrlButtons = allButtons
         allWithoutUrlButtons.removeAll { $0 == .add || $0 == .share }
         
-        guard let url = tab?.url, !url.isLocal else { return allWithoutUrlButtons }
+        guard let url = tab?.url, (!url.isLocal || !url.isReaderMode) else {
+            return allWithoutUrlButtons
+        }
         return allButtons
     }()
     
