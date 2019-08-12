@@ -205,13 +205,9 @@ class MenuViewController: UITableViewController {
     private func openAddBookmark() {
         guard let title = tab?.displayTitle, let url = tab?.url else { return }
         
-        let mode: BookmarkEditMode = {
-            if url.isReaderModeURL, let decodedURL = url.decodeReaderModeURL {
-                return BookmarkEditMode.addBookmark(title: title, url: decodedURL.absoluteString)
-            } else {
-                return BookmarkEditMode.addBookmark(title: title, url: url.absoluteString)
-            }
-        }()
+        let bookmarkUrl = url.decodeReaderModeURL ?? url
+        
+        let mode = BookmarkEditMode.addBookmark(title: title, url: bookmarkUrl.absoluteString)
         
         let vc = AddEditBookmarkTableViewController(mode: mode)
         
