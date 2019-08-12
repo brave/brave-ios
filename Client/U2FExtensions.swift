@@ -85,9 +85,11 @@ class U2FExtensions: NSObject {
     fileprivate var fidoSignRequests: [Int: [FIDOSignRequest]] = [:]
     
     fileprivate static var observationContext = 0
-    fileprivate var touchKeyPopup: AlertPopupView
-    fileprivate var insertKeyPopup: AlertPopupView
-    fileprivate var pinVerificationPopup: AlertPopupView
+    
+    // Popup modals presented to the user in different session or key states
+    fileprivate let touchKeyPopup = AlertPopupView(image: #imageLiteral(resourceName: "browser_lock_popup"), title: Strings.keyTitle, message: Strings.touchKeyMessage)
+    fileprivate let insertKeyPopup = AlertPopupView(image: #imageLiteral(resourceName: "browser_lock_popup"), title: Strings.keyTitle, message: Strings.insertKeyMessage)
+    fileprivate var pinVerificationPopup = AlertPopupView(image: #imageLiteral(resourceName: "browser_lock_popup"), title: Strings.pinLabel, message: Strings.pinTitle, inputType: .default, secureInput: true, inputPlaceholder: Strings.pinPlaceholder)
     
     fileprivate var u2fActive = false
     fileprivate var currentMessageType = U2FMessageType.None
@@ -136,9 +138,6 @@ class U2FExtensions: NSObject {
             observeKeyStateUpdates = true
         }
         
-        touchKeyPopup = AlertPopupView(image: #imageLiteral(resourceName: "browser_lock_popup"), title: Strings.keyTitle, message: Strings.touchKeyMessage)
-        insertKeyPopup = AlertPopupView(image: #imageLiteral(resourceName: "browser_lock_popup"), title: Strings.keyTitle, message: Strings.insertKeyMessage)
-        pinVerificationPopup = AlertPopupView(image: #imageLiteral(resourceName: "browser_lock_popup"), title: Strings.pinLabel, message: Strings.pinTitle, inputType: .default, secureInput: true, inputPlaceholder: Strings.pinPlaceholder)
         super.init()
         
         let handleCancelButton: () -> PopupViewDismissType = {
@@ -645,10 +644,7 @@ class U2FExtensions: NSObject {
     private func handlePinVerificationRequired(completion: @escaping (Bool) -> Void) {
         ensureMainThread {
             self.pinVerificationPopup.addButton(title: Strings.confirmPin) { [weak self] in
-                guard let self = self else {
-                    return .flyDown
-                }
-                return self.verifyPin(completion: completion)
+                self?.verifyPin(completion: completion) ?? .flyDown
             }
             self.pinVerificationPopup.showWithType(showType: .flyUp)
         }
