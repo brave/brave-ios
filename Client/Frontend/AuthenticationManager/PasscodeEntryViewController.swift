@@ -28,6 +28,8 @@ class PasscodeEntryViewController: BasePasscodeViewController {
         
         passcodePane.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(passcodeCheckSetup)))
         passcodePane.isUserInteractionEnabled = true
+        passcodePane.accessibilityLabel = Strings.AuthenticationTouchForKeyboard
+        passcodePane.accessibilityTraits = [.allowsDirectInteraction]
     }
     
     required init?(coder aDecoder: NSCoder) {
