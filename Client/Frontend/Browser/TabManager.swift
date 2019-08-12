@@ -1106,6 +1106,7 @@ extension TabManager: PreferencesObserver {
             let allowsMediaAutoPlay = Preferences.General.mediaAutoPlays.value
             configuration.mediaTypesRequiringUserActionForPlayback = allowsMediaAutoPlay ? [] : .all
             
+            reset()
             reloadSelectedTab()
             for tab in allTabs where tab != selectedTab {
                 tab.createWebview()
