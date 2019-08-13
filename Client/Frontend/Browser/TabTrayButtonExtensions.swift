@@ -6,11 +6,9 @@ import UIKit
 import Shared
 
 class PrivateModeButton: InsetButton, Themeable {
-    var light: Bool = false
-    
     override var isSelected: Bool {
         didSet {
-            backgroundColor = isSelected ? UIColor.Photon.Purple60 : .clear
+            accessibilityValue = isSelected ? Strings.TabPrivateModeToggleAccessibilityValueOn : Strings.TabPrivateModeToggleAccessibilityValueOff
         }
     }
     
@@ -30,10 +28,11 @@ class PrivateModeButton: InsetButton, Themeable {
     func applyTheme(_ theme: Theme) {
         styleChildren(theme: theme)
         
-        setTitleColor(theme.colors.home, for: .normal)
+        setTitleColor(theme.colors.tints.footer, for: .normal)
         imageView?.tintColor = tintColor
         isSelected = theme.isPrivate
-        accessibilityValue = isSelected ? Strings.TabPrivateModeToggleAccessibilityValueOn : Strings.TabPrivateModeToggleAccessibilityValueOff
+        
+        backgroundColor = isSelected ? theme.colors.accent : .clear
     }
 }
 
