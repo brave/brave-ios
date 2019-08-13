@@ -161,7 +161,7 @@ class TabLocationView: UIView {
         return readerModeButton
     }()
     
-    lazy var reloadButton = ToolbarButton().then {
+    lazy var reloadButton = ToolbarButton(top: true).then {
         $0.accessibilityIdentifier = "TabToolbar.stopReloadButton"
         $0.accessibilityLabel = Strings.TabToolbarReloadButtonAccessibilityLabel
         $0.setImage(#imageLiteral(resourceName: "nav-refresh").template, for: .normal)
@@ -172,7 +172,7 @@ class TabLocationView: UIView {
     }
 
     lazy var shieldsButton: ToolbarButton = {
-        let button = ToolbarButton()
+        let button = ToolbarButton(top: true)
         button.setImage(UIImage(imageLiteralResourceName: "shields-menu-icon"), for: .normal)
         button.addTarget(self, action: #selector(didClickBraveShieldsButton), for: .touchUpInside)
         button.imageView?.contentMode = .center

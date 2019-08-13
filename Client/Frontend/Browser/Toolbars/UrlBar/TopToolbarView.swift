@@ -139,11 +139,11 @@ class TopToolbarView: UIView, ToolbarProtocol {
         return button
     }()
 
-    var bookmarkButton = ToolbarButton()
-    var forwardButton = ToolbarButton()
-    var shareButton = ToolbarButton()
-    var addTabButton = ToolbarButton()
-    lazy var menuButton = ToolbarButton().then {
+    var bookmarkButton = ToolbarButton(top: true)
+    var forwardButton = ToolbarButton(top: true)
+    var shareButton = ToolbarButton(top: true)
+    var addTabButton = ToolbarButton(top: true)
+    lazy var menuButton = ToolbarButton(top: true).then { //
         $0.contentMode = .center
         $0.setImage(#imageLiteral(resourceName: "nav-menu").template, for: .normal)
         $0.accessibilityLabel = Strings.AppMenuButtonAccessibilityLabel
@@ -152,7 +152,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
     }
 
     var backButton: ToolbarButton = {
-        let backButton = ToolbarButton()
+        let backButton = ToolbarButton(top: true)
         backButton.accessibilityIdentifier = "TopToolbarView.backButton"
         return backButton
     }()

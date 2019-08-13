@@ -11,11 +11,11 @@ class BottomToolbarView: UIView, ToolbarProtocol {
     weak var tabToolbarDelegate: ToolbarDelegate?
 
     let tabsButton = TabsButton()
-    let forwardButton = ToolbarButton()
-    let backButton = ToolbarButton()
-    let shareButton = ToolbarButton()
-    let addTabButton = ToolbarButton()
-    let menuButton = ToolbarButton()
+    let forwardButton = ToolbarButton(top: false)
+    let backButton = ToolbarButton(top: false)
+    let shareButton = ToolbarButton(top: false)
+    let addTabButton = ToolbarButton(top: false)
+    let menuButton = ToolbarButton(top: false)
     let actionButtons: [Themeable & UIButton]
 
     var helper: ToolbarHelper?
