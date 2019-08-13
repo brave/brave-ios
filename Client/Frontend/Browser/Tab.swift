@@ -200,8 +200,6 @@ class Tab: NSObject {
             }
             // Enables Zoom in website by ignoring their javascript based viewport Scale limits.
             configuration!.ignoresViewportScaleLimits = true
-            // Enables media auto-play based on the current preference setting (default is false)
-            configuration!.mediaTypesRequiringUserActionForPlayback = Preferences.General.mediaAutoPlays.value ? [] : .all
             let webView = TabWebView(frame: .zero, configuration: configuration!, isPrivate: isPrivate)
             webView.delegate = self
             configuration = nil
