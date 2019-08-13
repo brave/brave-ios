@@ -30,7 +30,7 @@ class PrivateModeButton: InsetButton, Themeable {
     func applyTheme(_ theme: Theme) {
         styleChildren(theme: theme)
         
-        setTitleColor(UIColor.TabTray.ToolbarButtonTint, for: .normal)
+        setTitleColor(theme.colors.home, for: .normal)
         imageView?.tintColor = tintColor
         isSelected = theme.isPrivate
         accessibilityValue = isSelected ? Strings.TabPrivateModeToggleAccessibilityValueOn : Strings.TabPrivateModeToggleAccessibilityValueOff

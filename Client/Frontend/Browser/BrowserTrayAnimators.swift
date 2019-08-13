@@ -77,7 +77,7 @@ private extension TrayToBrowserAnimator {
             cell.layer.borderWidth = 0.0
 
             bvc.tabTrayDidDismiss(tabTray)
-            UIApplication.shared.windows.first?.backgroundColor = TabTrayControllerUX.BackgroundColor
+            UIApplication.shared.windows.first?.backgroundColor = tabTray.collectionView.backgroundColor
             tabTray.navigationController?.setNeedsStatusBarAppearanceUpdate()
             tabTray.toolbar.transform = CGAffineTransform(translationX: 0, y: UIConstants.BottomToolbarHeight)
             tabCollectionViewSnapshot.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
@@ -207,7 +207,7 @@ private extension BrowserToTrayAnimator {
                 cell.frame = finalFrame
                 cell.titleBackgroundView.transform = .identity
                 cell.layoutIfNeeded()
-                UIApplication.shared.windows.first?.backgroundColor = TabTrayControllerUX.BackgroundColor
+                UIApplication.shared.windows.first?.backgroundColor = tabTray.collectionView.backgroundColor
                 tabTray.navigationController?.setNeedsStatusBarAppearanceUpdate()
                     
                 cell.layer.borderWidth = TabTrayControllerUX.DefaultBorderWidth
