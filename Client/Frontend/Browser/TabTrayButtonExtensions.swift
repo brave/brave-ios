@@ -48,7 +48,7 @@ extension UIButton {
 
 extension TabsButton {
     static func tabTrayButton() -> TabsButton {
-        let tabsButton = TabsButton()
+        let tabsButton = TabsButton(top: true)
         tabsButton.countLabel.text = "0"
         tabsButton.accessibilityLabel = Strings.Show_Tabs
         return tabsButton
