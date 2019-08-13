@@ -486,7 +486,7 @@ extension String {
     
     public var bookmarkletCodeComponent: String? {
         if self.isBookmarklet {
-            return String(self.dropFirst("javascript:".count))
+            return String(self.dropFirst("javascript:".count)).removingPercentEncoding
         }
         return nil
     }

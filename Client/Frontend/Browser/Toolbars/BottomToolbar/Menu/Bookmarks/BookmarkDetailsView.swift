@@ -94,7 +94,11 @@ class BookmarkDetailsView: AddEditHeaderView, BookmarkFormFieldsProtocol {
     // MARK: - Delegate actions
     
     @objc func textFieldDidChange(_ textField: UITextField) {
-        delegate?.correctValues(validationPassed: validateFields() || validateCodeFields())
+        if textField.text?.isBookmarklet ?? false {
+            delegate?.correctValues(validationPassed: validateCodeFields() && validateFields())
+        } else {
+            delegate?.correctValues(validationPassed: validateCodeFields())
+        }
     }
     
     private func validateTitle(_ title: String?) -> Bool {
@@ -108,6 +112,9 @@ class BookmarkDetailsView: AddEditHeaderView, BookmarkFormFieldsProtocol {
         guard let javascriptCode = urlTextField.text?.bookmarkletCodeComponent else { return false }
         
         // A bookmarklet is considered valid if it's code is valid JS.
+        // Bookmarklets MIGHT invoke some security flaws allowing the user to run arbitrary
+        // JS in the browser.
+        // The JS is only ran within the webpage's context and not ran within the application context.
         if let context = JSContext() {
             context.evaluateScript(javascriptCode)
             if context.exception != nil {

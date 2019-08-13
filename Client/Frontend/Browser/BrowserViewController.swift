@@ -920,7 +920,11 @@ class BrowserViewController: UIViewController {
             
             if let webView = tab.webView, let code = url.bookmarkletCodeComponent {
                 resetSpoofedUserAgentIfRequired(webView, newURL: url)
-                webView.evaluateJavaScript(code, completionHandler: nil)
+                webView.evaluateJavaScript(code, completionHandler: { _, error in
+                    if let error = error {
+                        log.error(error)
+                    }
+                })
             }
         } else {
             topToolbar.currentURL = url
