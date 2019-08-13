@@ -5,6 +5,7 @@
 import XCTest
 import CoreData
 @testable import Data
+@testable import JavaScriptCore
 
 class BookmarkTests: CoreDataTestCase {
     let fetchRequest = NSFetchRequest<Bookmark>(entityName: "Bookmark")
@@ -124,6 +125,20 @@ class BookmarkTests: CoreDataTestCase {
         XCTAssertNil(result.url)
         XCTAssertNil(result.title)
         assertDefaultValues(for: result)
+    }
+    
+    func testValidateBookmarklet() {
+        XCTAssertTrue(validateBookmarklet(title: "Brave", url: "javascript:void(window.close(self))"))
+        XCTAssertTrue(validateBookmarklet(title: "Brave", url: "javascript:window.open('https://brave.com')"))
+        XCTAssertTrue(validateBookmarklet(title: "Brave", url: nil))
+        XCTAssertFalse(validateBookmarklet(title: "Brave", url: "javascript:function(){}"))
+        XCTAssertTrue(validateBookmarklet(title: "Brave", url: "javascript:(function(){})()"))
+        XCTAssertTrue(validateBookmarklet(title: "Brave", url: "javascript:(function(){})"))
+        
+        XCTAssertFalse(validateBookmarklet(title: nil, url: "javascript:window.open('https://brave.com')"))
+        XCTAssertFalse(validateBookmarklet(title: "Brave", url: "javascript:"))
+        XCTAssertFalse(validateBookmarklet(title: "Brave", url: "javascript:%20function(){}"))
+        XCTAssertFalse(validateBookmarklet(title: "Brave", url: "javascript:(function(){)"))
     }
     
     func testCreateFolder() {
@@ -582,5 +597,28 @@ class BookmarkTests: CoreDataTestCase {
         XCTAssertNotNil(record.syncDisplayUUID)
         XCTAssertNotNil(record.children)
         XCTAssert(record.children!.isEmpty)
+    }
+    
+    // Bookmarklet validation
+    private func validateBookmarklet(title: String?, url: String?) -> Bool {
+        func validateTitle(_ title: String?) -> Bool {
+            guard let title = title else { return false }
+            return !title.isEmpty
+        }
+        
+        guard let url = url else { return validateTitle(title) }
+        guard let javascriptCode = url.bookmarkletCodeComponent else { return false }
+        
+        if let context = JSContext() {
+            context.evaluateScript(javascriptCode)
+            if context.exception != nil {
+                if context.exception.description.contains("ReferenceError") {
+                    return validateTitle(title)
+                }
+                return false
+            }
+            return validateTitle(title)
+        }
+        return false
     }
 }
