@@ -392,8 +392,7 @@ extension TabLocationView: Themeable {
         urlTextField.textColor = theme.colors.tints.addressBar
 
         readerModeButton.unselectedTintColor = theme.colors.tints.header
-        // TODO: Should probably be dealt with better
-        readerModeButton.selectedTintColor = theme.colors.tints.header.withAlphaComponent(0.2)
+        readerModeButton.selectedTintColor = theme.colors.accent
 
         separatorLine.backgroundColor = theme.colors.border.withAlphaComponent(theme.colors.transparencies.borderAlpha)
     }
