@@ -1173,7 +1173,7 @@ class TrayToolbar: UIView, Themeable {
         backgroundColor = theme.colors.home
         UIApplication.shared.windows.first?.backgroundColor = backgroundColor
         
-        addTabButton.tintColor = UIColor.TabTray.ToolbarButtonTint
+        addTabButton.tintColor = theme.colors.tints.footer
         doneButton.tintColor = addTabButton.tintColor
         
     }

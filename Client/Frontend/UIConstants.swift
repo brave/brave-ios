@@ -40,10 +40,6 @@ extension UIColor {
         static let PaleBlue = UIColor(rgb: 0xB0D5FB)
         static let LightBeige = UIColor(rgb: 0xf0e6dc)
     }
-
-    struct TabTray {
-        static let ToolbarButtonTint = Photon.Grey50 // Could attempt to use some sort of alpha
-    }
 }
 
 public struct UIConstants {
