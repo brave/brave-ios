@@ -337,7 +337,7 @@ class TabTrayController: UIViewController, Themeable {
         NotificationCenter.default.addObserver(self, selector: #selector(appDidBecomeActiveNotification), name: UIApplication.didBecomeActiveNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(dynamicFontChanged), name: .DynamicFontChanged, object: nil)
         
-        applyTheme(privateMode ? .private : .regular)
+        applyTheme(Theme.of(tabManager.selectedTab))
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -807,7 +807,7 @@ fileprivate class TabManagerDataSource: NSObject, UICollectionViewDataSource {
         }
 
         tabCell.screenshotView.image = tab.screenshot
-        tabCell.applyTheme(PrivateBrowsingManager.shared.isPrivateBrowsing ? .private : .regular)
+        tabCell.applyTheme(Theme.of(tab))
         
         return tabCell
     }
