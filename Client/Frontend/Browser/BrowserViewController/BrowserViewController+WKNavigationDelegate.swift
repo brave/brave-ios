@@ -88,6 +88,15 @@ extension BrowserViewController: WKNavigationDelegate {
             decisionHandler(.allow)
             return
         }
+        
+        if url.scheme == "javascript" && navigationAction.isAllowed {
+            decisionHandler(.cancel)
+            
+            if let code = String(url.absoluteString.dropFirst("javascript:".count)).removingPercentEncoding {
+                webView.evaluateJavaScript(code)
+            }
+            return
+        }
 
         if !navigationAction.isAllowed && navigationAction.navigationType != .backForward {
             log.warning("Denying unprivileged request: \(navigationAction.request)")
