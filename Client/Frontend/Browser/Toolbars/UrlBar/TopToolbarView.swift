@@ -110,11 +110,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
     
     let line = UIView()
     
-    lazy var tabsButton: TabsButton = {
-        let tabsButton = TabsButton.tabTrayButton()
-        tabsButton.accessibilityIdentifier = "TopToolbarView.tabsButton"
-        return tabsButton
-    }()
+    let tabsButton = TabsButton(top: true)
     
     fileprivate lazy var progressBar: GradientProgressBar = {
         let progressBar = GradientProgressBar()
