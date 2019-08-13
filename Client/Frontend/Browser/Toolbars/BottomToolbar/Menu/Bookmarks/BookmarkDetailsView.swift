@@ -126,7 +126,7 @@ class BookmarkDetailsView: AddEditHeaderView, BookmarkFormFieldsProtocol {
         if let context = JSContext() {
             context.evaluateScript(javascriptCode)
             if context.exception != nil {
-                if context.exception.description.contains("Reference Error") {
+                if context.exception.description.contains("ReferenceError") {
                     return validateTitle(title)
                 }
                 return false
