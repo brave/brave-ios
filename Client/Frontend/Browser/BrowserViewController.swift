@@ -1677,9 +1677,7 @@ extension BrowserViewController: TopToolbarDelegate {
     }
     
     func topToolbarDidTapMenuButton(_ topToolbar: TopToolbarView) {
-        let homePanel = MenuViewController(bvc: self, tab: tabManager.selectedTab)
-        let popover = PopoverController(contentController: homePanel, contentSizeBehavior: .preferredContentSize)
-        popover.present(from: topToolbar.menuButton, on: self)
+        tabToolbarDidPressMenu(topToolbar)
     }
 }
 
@@ -1726,9 +1724,11 @@ extension BrowserViewController: ToolbarDelegate {
         }
     }
     
-    func tabToolbarDidPressMenu(_ tabToolbar: ToolbarProtocol, button: UIButton) {
+    func tabToolbarDidPressMenu(_ tabToolbar: ToolbarProtocol) {
         let homePanel = MenuViewController(bvc: self, tab: tabManager.selectedTab)
         let popover = PopoverController(contentController: homePanel, contentSizeBehavior: .preferredContentSize)
+        // Not dynamic, but trivial at this point, given how UI is currently setup
+        popover.color = Theme.of(tabManager.selectedTab).colors.home
         popover.present(from: tabToolbar.menuButton, on: self)
     }
     

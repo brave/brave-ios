@@ -51,7 +51,7 @@ class ToolbarHelper: NSObject {
     }
     
     func didClickMenu() {
-        toolbar.tabToolbarDelegate?.tabToolbarDidPressMenu(toolbar, button: toolbar.backButton)
+        toolbar.tabToolbarDelegate?.tabToolbarDidPressMenu(toolbar)
     }
     
     func didClickBack() {
