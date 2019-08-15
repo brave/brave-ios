@@ -298,6 +298,12 @@ class TabManager: NSObject {
 
     func addPopupForParentTab(_ parentTab: Tab, configuration: WKWebViewConfiguration) -> Tab {
         let popup = Tab(configuration: configuration, type: parentTab.type)
+        if parentTab.isPrivate {
+            // Creating random tab id for private mode, as we don't want to save to database.
+            popup.id = UUID().uuidString
+        } else {
+            popup.id = TabMO.create()
+        }
         configureTab(popup, request: nil, afterTab: parentTab, flushToDisk: true, zombie: false, isPopup: true)
 
         // Wait momentarily before selecting the new tab, otherwise the parent tab
