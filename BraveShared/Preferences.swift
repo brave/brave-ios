@@ -151,6 +151,7 @@ extension Double: UserDefaultsEncodable {}
 extension String: UserDefaultsEncodable {}
 extension URL: UserDefaultsEncodable {}
 extension Data: UserDefaultsEncodable {}
+extension Date: UserDefaultsEncodable {}
 extension Array: UserDefaultsEncodable where Element: UserDefaultsEncodable {}
 extension Dictionary: UserDefaultsEncodable where Key: StringProtocol, Value: UserDefaultsEncodable {}
 

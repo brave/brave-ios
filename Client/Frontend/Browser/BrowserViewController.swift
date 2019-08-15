@@ -19,6 +19,7 @@ import BraveShared
 import SwiftKeychainWrapper
 import BraveRewardsUI
 import BraveRewards
+import StoreKit
 
 private let log = Logger.browserLogger
 
@@ -465,6 +466,11 @@ class BrowserViewController: UIViewController {
         view.addInteraction(dropInteraction)
         
         initializeSyncWebView()
+        
+        //Request Review when the main-queue is free or on the next cycle.
+        DispatchQueue.main.async {
+            self.requestReviewIfNecessary()
+        }
     }
     
     /// Initialize Sync without connecting. Sync webview needs to be in a "permanent" location
@@ -3049,6 +3055,45 @@ extension BrowserViewController {
         self.loadQueue.uponQueue(.main) {
             NavigationPath.handle(nav: path, with: self)
         }
+    }
+    
+    func requestReviewIfNecessary() {
+        #if DEBUG
+        return
+        #endif
+        
+        let launchCount = Preferences.Review.launchCount.value
+        let threshold = Preferences.Review.threshold.value
+        
+        if threshold == 0 {
+            Preferences.Review.threshold.value = 14
+            return
+        }
+        
+        let minimumDaysBetweenReviewRequest = 60
+        var daysSinceLastRequest = 0
+        if let previousRequest = Preferences.Review.lastReviewDate.value {
+            daysSinceLastRequest = Calendar.current.dateComponents([.day], from: previousRequest, to: Date()).day ?? 0
+        } else {
+            daysSinceLastRequest = minimumDaysBetweenReviewRequest
+        }
+        
+        if launchCount <= threshold ||  daysSinceLastRequest < minimumDaysBetweenReviewRequest {
+            return
+        }
+        
+        Preferences.Review.lastReviewDate.value = Date()
+        
+        switch threshold {
+        case 14:
+            Preferences.Review.threshold.value = 41
+        case 41:
+            Preferences.Review.threshold.value = 121
+        default:
+            break
+        }
+        
+        SKStoreReviewController.requestReview()
     }
 }
 
