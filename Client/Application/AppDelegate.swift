@@ -418,7 +418,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         let firefoxUA = UserAgent.defaultUserAgent()
         
         // For iOS 13 and above WKWebpagePreferences.preferredContentMode & applicationNameForUserAgent are used to manage UA.
-        if lessThaniOS13 {
+        if #available(iOS 13.0, *) {
+            //No change required here
+        } else {
             // Set the UA for WKWebView (via defaults), the favicon fetcher, and the image loader.
             // This only needs to be done once per runtime. Note that we use defaults here that are
             // readable from extensions, so they can just use the cached identifier.

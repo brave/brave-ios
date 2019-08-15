@@ -1284,7 +1284,7 @@ class BrowserViewController: UIViewController {
         
         // Remember whether or not a desktop/mobile site was requested
         if #available(iOS 13.0, *) {
-            if let customUA = webView.customUserAgent, customUA.isEmpty == false {
+            if let customUA = webView.customUserAgent, !customUA.isEmpty {
                 tab.desktopSite = UserAgent.isDesktopUA(uaString: customUA)
             } else {
                 tab.desktopSite = Preferences.General.alwaysRequestDesktopSite.value
