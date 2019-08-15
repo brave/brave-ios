@@ -165,6 +165,11 @@ class TabManager: NSObject {
     private class func getNewConfiguration() -> WKWebViewConfiguration {
         let configuration = WKWebViewConfiguration()
         configuration.processPool = WKProcessPool()
+        // Setting the Unique applicationName for the user agent to identify Brave.
+        if #available(iOS 13.0, *) {
+            configuration.applicationNameForUserAgent = Preferences.General.alwaysRequestDesktopSite.value ?
+            UserAgent.desktopUAApplicationName() : UserAgent.mobileUAApplicationName()
+        }
         configuration.preferences.javaScriptCanOpenWindowsAutomatically = !Preferences.General.blockPopups.value
         UserReferralProgram.shared?.insertCookies(intoStore: configuration.websiteDataStore.httpCookieStore)
         return configuration

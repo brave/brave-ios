@@ -202,6 +202,7 @@ class BrowserViewController: UIViewController {
         Preferences.Privacy.privateBrowsingOnly.observe(from: self)
         Preferences.General.tabBarVisibility.observe(from: self)
         Preferences.Shields.allShields.forEach { $0.observe(from: self) }
+        Preferences.General.alwaysRequestDesktopSite.observe(from: self)
         Preferences.Privacy.blockAllCookies.observe(from: self)
         // Lists need to be compiled before attempting tab restoration
         contentBlockListDeferred = ContentBlockerHelper.compileBundledLists()
@@ -1132,7 +1133,11 @@ class BrowserViewController: UIViewController {
     func restoreSpoofedUserAgentIfRequired(_ webView: WKWebView, newRequest: URLRequest) {
         // Restore any non-default UA from the request's header
         let ua = newRequest.value(forHTTPHeaderField: "User-Agent")
-        webView.customUserAgent = ua != UserAgent.defaultUserAgent() ? ua : nil
+        if #available(iOS 13.0, *) {
+            webView.customUserAgent = Preferences.General.alwaysRequestDesktopSite.value == UserAgent.isDesktopUA(uaString: ua ?? "") ? nil : ua
+        } else {
+            webView.customUserAgent = ua != UserAgent.defaultUserAgent() ? ua : nil
+        }
     }
 
     fileprivate func presentActivityViewController(_ url: URL, tab: Tab? = nil, sourceView: UIView?, sourceRect: CGRect, arrowDirection: UIPopoverArrowDirection) {
@@ -1278,8 +1283,15 @@ class BrowserViewController: UIViewController {
         }
         
         // Remember whether or not a desktop/mobile site was requested
-        let isCustomUserAgentEmpty = webView.customUserAgent?.isEmpty == true
-        tab.desktopSite = isCustomUserAgentEmpty ? UIDevice.isIpad : !UIDevice.isIpad
+        if #available(iOS 13.0, *) {
+            if let customUA = webView.customUserAgent, customUA.isEmpty == false {
+                tab.desktopSite = UserAgent.isDesktopUA(uaString: customUA)
+            } else {
+                tab.desktopSite = Preferences.General.alwaysRequestDesktopSite.value
+            }
+        } else {
+            tab.desktopSite = webView.customUserAgent?.isEmpty == false
+        }
     }
     
     // MARK: - Browser PIN Callout
@@ -3055,6 +3067,15 @@ extension BrowserViewController: PreferencesObserver {
         switch key {
         case Preferences.General.tabBarVisibility.key:
             updateTabsBarVisibility()
+        case Preferences.General.alwaysRequestDesktopSite.key:
+            tabManager.reset()
+            self.tabManager.reloadSelectedTab()
+            for tab in self.tabManager.allTabs where tab != self.tabManager.selectedTab {
+                tab.createWebview()
+                if let url = tab.webView?.url {
+                    tab.loadRequest(PrivilegedRequest(url: url) as URLRequest)
+                }
+            }
         case Preferences.Privacy.privateBrowsingOnly.key:
             let isPrivate = Preferences.Privacy.privateBrowsingOnly.value
             switchToPrivacyMode(isPrivate: isPrivate)

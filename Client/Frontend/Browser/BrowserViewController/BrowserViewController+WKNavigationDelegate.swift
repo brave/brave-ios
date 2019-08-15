@@ -64,6 +64,16 @@ extension BrowserViewController: WKNavigationDelegate {
         return false
     }
 
+    // This is the iOS 13 delegate callback which is similar to the delegate below it
+    // except that a WKWebpagePreferences is provided, Setting the type of contentMode loads the site accordingly.
+    @available(iOS 13.0, *)
+    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: WKWebpagePreferences, decisionHandler: @escaping (WKNavigationActionPolicy, WKWebpagePreferences) -> Void) {
+        self.webView(webView, decidePolicyFor: navigationAction) {
+            preferences.preferredContentMode = Preferences.General.alwaysRequestDesktopSite.value ? .desktop :. mobile
+            decisionHandler($0, preferences)
+        }
+    }
+    
     // This is the place where we decide what to do with a new navigation action. There are a number of special schemes
     // and http(s) urls that need to be handled in a different way. All the logic for that is inside this delegate
     // method.

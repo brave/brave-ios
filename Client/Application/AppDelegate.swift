@@ -416,12 +416,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
 
     fileprivate func setUserAgent() {
         let firefoxUA = UserAgent.defaultUserAgent()
-
-        // Set the UA for WKWebView (via defaults), the favicon fetcher, and the image loader.
-        // This only needs to be done once per runtime. Note that we use defaults here that are
-        // readable from extensions, so they can just use the cached identifier.
-        let defaults = UserDefaults(suiteName: AppInfo.sharedContainerIdentifier)!
-        defaults.register(defaults: ["UserAgent": firefoxUA])
+        
+        // For iOS 13 and above WKWebpagePreferences.preferredContentMode & applicationNameForUserAgent are used to manage UA.
+        if lessThaniOS13 {
+            // Set the UA for WKWebView (via defaults), the favicon fetcher, and the image loader.
+            // This only needs to be done once per runtime. Note that we use defaults here that are
+            // readable from extensions, so they can just use the cached identifier.
+            let defaults = UserDefaults(suiteName: AppInfo.sharedContainerIdentifier)!
+            defaults.register(defaults: ["UserAgent": firefoxUA])
+        }
 
         SDWebImageDownloader.shared().setValue(firefoxUA, forHTTPHeaderField: "User-Agent")
 

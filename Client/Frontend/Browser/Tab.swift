@@ -123,7 +123,7 @@ class Tab: NSObject {
 
     /// Whether or not the desktop site was requested with the last request, reload or navigation. Note that this property needs to
     /// be managed by the web view's navigation delegate.
-    var desktopSite: Bool = UIDevice.isIpad ? true : false
+    var desktopSite: Bool = Preferences.General.alwaysRequestDesktopSite.value ? true : false
     
     var readerModeAvailableOrActive: Bool {
         if let readerMode = self.getContentScript(name: "ReaderMode") as? ReaderMode {
@@ -195,6 +195,11 @@ class Tab: NSObject {
             configuration!.preferences = WKPreferences()
             configuration!.preferences.javaScriptCanOpenWindowsAutomatically = false
             configuration!.allowsInlineMediaPlayback = true
+            if #available(iOS 13.0, *) {
+                configuration!.defaultWebpagePreferences = WKWebpagePreferences().then {
+                    $0.preferredContentMode = Preferences.General.alwaysRequestDesktopSite.value ? .desktop : .mobile
+                }
+            }
             // Enables Zoom in website by ignoring their javascript based viewport Scale limits.
             configuration!.ignoresViewportScaleLimits = true
             let webView = TabWebView(frame: .zero, configuration: configuration!, isPrivate: isPrivate)
@@ -401,10 +406,13 @@ class Tab: NSObject {
     func reload() {
         
         var userAgent: String?
-        if UIDevice.isIpad && !desktopSite {
-            userAgent = UserAgent.mobileUserAgent()
-        } else if !UIDevice.isIpad && desktopSite {
-            userAgent = UserAgent.desktopUserAgent()
+        if #available(iOS 13.0, *) {
+            // In case of user initiated toggle of desktop/mobile site, the customUserAgent property is used. This property overrides applicationNameForUserAgent & WebpagePreferences
+            if Preferences.General.alwaysRequestDesktopSite.value != desktopSite {
+                userAgent = desktopSite ? UserAgent.desktopUserAgent() : UserAgent.mobileUserAgent()
+            }
+        } else {
+            userAgent = desktopSite ? UserAgent.desktopUserAgent() : nil
         }
         if (userAgent ?? "") != webView?.customUserAgent,
            let currentItem = webView?.backForwardList.currentItem {

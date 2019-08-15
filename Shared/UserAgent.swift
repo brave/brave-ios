@@ -67,9 +67,6 @@ open class UserAgent {
         defaults.set(appVersion, forKey: "LastFirefoxVersionNumber")
         defaults.set(buildNumber, forKey: "LastFirefoxBuildNumber")
         systemDefaultUA = UIWebView().stringByEvaluatingJavaScript(from: "navigator.userAgent")!
-        if UIDevice.isIpad {
-            return desktopUserAgent()
-        }
         return mobileUserAgent()
     }
     
