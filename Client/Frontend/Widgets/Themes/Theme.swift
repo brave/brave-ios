@@ -176,6 +176,17 @@ class Theme: Equatable, Decodable {
         return PrivateBrowsingManager.shared.isPrivateBrowsing ? .private : .regular
     }
     
+    static func from(id: String) -> Theme? {
+        
+        let themePath = Theme.ThemeDirectory.appendingPathComponent(id).path
+        guard
+            let themeData = FileManager.default.contents(atPath: themePath),
+            let theme = try? JSONDecoder().decode(Theme.self, from: themeData) else {
+                return nil
+        }
+        return theme
+    }
+    
     // Maybe wrap in a `mode` struct, however, most UI will only care about theme.data
     /// Regular browsing.
     static let regular: Theme = {
@@ -187,6 +198,24 @@ class Theme: Equatable, Decodable {
     static let `private`: Theme = {
         let themeData = privateTheme().data(using: String.Encoding.utf8)!
         return try! JSONDecoder().decode(Theme.self, from: themeData)
+    }()
+    
+    static let allThemes: [Theme] = {
+        do {
+            let filenames = try FileManager.default.contentsOfDirectory(at: Theme.ThemeDirectory, includingPropertiesForKeys: [])
+            
+            let final = filenames.filter {
+                $0.pathExtension == "json"
+            }.compactMap {
+                Theme.from(id: $0.lastPathComponent)
+            }.filter {
+                $0.enabled
+            }
+            
+            return final
+        } catch {
+            fatalError("`Themes` directory is not available!")
+        }
     }()
     
     static func == (lhs: Theme, rhs: Theme) -> Bool {
