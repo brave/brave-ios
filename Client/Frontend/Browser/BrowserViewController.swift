@@ -596,6 +596,8 @@ class BrowserViewController: UIViewController {
     }
 
     override func viewDidAppear(_ animated: Bool) {
+        presentOnboardingIntro()
+        
         screenshotHelper.viewIsVisible = true
         screenshotHelper.takePendingScreenshots(tabManager.allTabs)
 
@@ -622,6 +624,16 @@ class BrowserViewController: UIViewController {
                 self.presentDuckDuckGoCallout()
             }
         }
+    }
+    
+    func presentOnboardingIntro() {
+        if Preferences.General.onboardingCompleted.value { return }
+        
+        guard let onboarding = OnboardingNavigationController(profile: profile) else { return }
+        onboarding.onboardingDelegate = self
+        
+        
+        present(onboarding, animated: true)
     }
 
     // THe logic for shouldShowWhatsNewTab is as follows: If we do not have the LatestAppVersionProfileKey in
@@ -3103,5 +3115,12 @@ extension BrowserViewController {
         self.loadQueue.uponQueue(.main) {
             NavigationPath.handle(nav: path, with: self)
         }
+    }
+}
+
+extension BrowserViewController: OnboardingControllerDelegate {
+    func onboardingCompleted(_ onboardingController: OnboardingNavigationController) {
+        Preferences.General.onboardingCompleted.value = true
+        onboardingController.dismiss(animated: true)
     }
 }
