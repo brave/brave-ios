@@ -1296,7 +1296,7 @@ class BrowserViewController: UIViewController {
         
         topToolbar.leaveOverlayMode()
         
-        let popup = AlertPopupView(image: #imageLiteral(resourceName: "browser_lock_popup"), title: Strings.Browser_lock_callout_title, message: Strings.Browser_lock_callout_message)
+        let popup = AlertPopupView(imageView: UIImageView(image: #imageLiteral(resourceName: "browser_lock_popup")), title: Strings.Browser_lock_callout_title, message: Strings.Browser_lock_callout_message)
         popup.addButton(title: Strings.Browser_lock_callout_not_now) { () -> PopupViewDismissType in
             Preferences.Popups.browserLock.value = true
             self.browserLockPopup = nil
@@ -1338,7 +1338,7 @@ class BrowserViewController: UIViewController {
         
         topToolbar.leaveOverlayMode()
         
-        let popup = AlertPopupView(image: UIImage(named: "duckduckgo"), title: Strings.DDG_callout_title, message: Strings.DDG_callout_message)
+        let popup = AlertPopupView(imageView: UIImageView(image: #imageLiteral(resourceName: "duckduckgo")), title: Strings.DDG_callout_title, message: Strings.DDG_callout_message)
         popup.dismissHandler = { [weak self] in
             self?.presentBrowserLockCallout()
         }
@@ -2318,6 +2318,55 @@ extension BrowserViewController: WKUIDelegate {
             self.tabManager.removeTab(tab)
         }
     }
+    
+    func webView(_ webView: WKWebView, shouldPreviewElement elementInfo: WKPreviewElementInfo) -> Bool {
+        guard let url = elementInfo.linkURL else { return false }
+        return url.eligibleForPeekAndPop
+    }
+    
+    func webView(_ webView: WKWebView, commitPreviewingViewController previewingViewController: UIViewController) {
+        guard let previewViewController = previewingViewController as? PreviewViewController else { return }
+        tabManager.selectedTab?.loadRequest(URLRequest(url: previewViewController.url))
+    }
+    
+    func webView(_ webView: WKWebView,
+                 previewingViewControllerForElement elementInfo: WKPreviewElementInfo,
+                 defaultActions previewActions: [WKPreviewActionItem]) -> UIViewController? {
+        guard let tab = tabManager.selectedTab, let url = elementInfo.linkURL else { return nil }
+        let previewViewController = PreviewViewController(tab: tab, url: url)
+        
+        // If the URL is an image resource,
+        // we want to show the image without an empty white space in a preview page.
+        if url.isImageResource, let imageSize = url.imageSize {
+            previewViewController.preferredContentSize = imageSize
+        }
+
+        previewViewController.openURLInNewTab = { url in
+            guard let _ = self.tabManager.selectedTab else { return }
+            let tab = self.tabManager.addTab(PrivilegedRequest(url: url) as URLRequest,
+                                             afterTab: self.tabManager.selectedTab,
+                                             isPrivate: false)
+            self.tabManager.selectTab(tab)
+        }
+        
+        previewViewController.openURLInNewPrivateTab = { url in
+            guard let _ = self.tabManager.selectedTab else { return }
+            let tab = self.tabManager.addTab(PrivilegedRequest(url: url) as URLRequest,
+                                             afterTab: self.tabManager.selectedTab,
+                                             isPrivate: true)
+            self.tabManager.selectTab(tab)
+        }
+        
+        previewViewController.copyURL = { url in
+            UIPasteboard.general.url = url
+        }
+        
+        previewViewController.shareURL = { url in
+            self.presentActivityViewController(url, sourceView: self.view, sourceRect: self.view.bounds, arrowDirection: .any)
+        }
+        
+        return previewViewController
+    }
 }
 
 extension BrowserViewController: ReaderModeDelegate {
@@ -2622,7 +2671,7 @@ extension BrowserViewController: ContextMenuHelperDelegate {
                     application.endBackgroundTask(taskId)
                 })
 
-                Alamofire.request(url).validate(statusCode: 200..<300).response { response in
+                AF.request(url).validate(statusCode: 200..<300).response { response in
                     // Only set the image onto the pasteboard if the pasteboard hasn't changed since
                     // fetching the image; otherwise, in low-bandwidth situations,
                     // we might be overwriting something that the user has subsequently added.
@@ -2655,7 +2704,7 @@ extension BrowserViewController: ContextMenuHelperDelegate {
     }
 
     private func getData(_ url: URL, success: @escaping (Data) -> Void) {
-        Alamofire.request(url).validate(statusCode: 200..<300).response { response in
+        AF.request(url).validate(statusCode: 200..<300).response { response in
             if let data = response.data {
                 success(data)
             }
