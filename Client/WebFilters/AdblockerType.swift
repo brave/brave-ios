@@ -7,17 +7,7 @@ import Shared
 
 private let log = Logger.browserLogger
 
-enum FileType: String {
-    case dat, json, tgz
-    
-    var endpoint: String {
-        switch self {
-        case .dat: return "https://adblock-data.s3.brave.com/4/"
-        case .json: return "https://adblock-data.s3.brave.com/ios/"
-        case .tgz: return "" // Httpse resources are not supported yet.
-        }
-    }
-}
+enum FileType: String { case dat, json, tgz }
 
 enum AdblockerType {
     case general
@@ -49,11 +39,11 @@ enum AdblockerType {
     }
     
     /// A name under which given resource is stored on server.
-    func resourceName(for fileType: FileType) -> String? {
+    var resourceName: String? {
         switch self {
-        case .general: return AdblockResourcesMappings.generalAdblockName(for: fileType)
+        case .general: return AdblockResourcesMappings.generalAdblockName
         case .httpse: return AdblockResourcesMappings.generalHttpseName
-        case .regional(let locale): return ResourceLocale(rawValue: locale)?.resourceName(for: fileType)
+        case .regional(let locale): return ResourceLocale(rawValue: locale)?.resourceName
         }
     }
     
