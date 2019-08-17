@@ -66,7 +66,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
         }
     }
     
-    fileprivate var currentTheme: Theme = .regular
+    fileprivate var currentTheme: Theme?
     
     var toolbarIsShowing = false
     
@@ -303,7 +303,10 @@ class TopToolbarView: UIView, ToolbarProtocol {
             make.edges.equalTo(self.locationView).inset(insets)
         }
         
-        locationTextField.applyTheme(currentTheme)
+        if let theme = currentTheme {
+            // If no theme exists here, then this will be styled after parent calls `applyTheme` at a later point
+            locationTextField.applyTheme(theme)
+        }
     }
     
     override func becomeFirstResponder() -> Bool {
