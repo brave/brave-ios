@@ -8,12 +8,12 @@
     "enabled": true,
     
     "colors": {
-        "header": "0x1B0C32",
-        "footer": "0x1B0C32",
-        "home": "0x210950",
-        "addressBar": "0x3D2742",
+        "header": "0x000000",
+        "footer": "0x000000",
+        "home": "0x0A0A0A",
+        "addressBar": "0x262626",
         "border": "0xffffff",
-        "accent": "0xcf68ff",
+        "accent": "0xff631c",
         "tints": {
             "home": "0xE7E6E9",
             "header": "0xE7E6E9",
@@ -26,7 +26,7 @@
         },
         "stats": {
             "ads": "0xFA4214",
-            "trackers": "0xFA4214",
+            "trackers": "",
             "httpse": "0x9339D4",
             "timeSaved": "0xffffff"
         }
@@ -37,3 +37,4 @@
         "home": "https://www.google.com",
     }
 }
+
