@@ -208,14 +208,18 @@ class BrowserViewController: UIViewController {
     }
 
     override var preferredStatusBarStyle: UIStatusBarStyle {
-        switch Theme.of(tabManager.selectedTab) {
-        case Theme.regular:
-            return .default
-        case Theme.private:
-            return .lightContent
-        default:
+        let isDark = Theme.of(tabManager.selectedTab).isDark
+        if isDark {
             return .lightContent
         }
+        
+        // Light content, so using other status bar options
+        
+        if #available(iOS 13.0, *) {
+            return .darkContent
+        }
+        
+        return .default
     }
 
     func shouldShowFooterForTraitCollection(_ previousTraitCollection: UITraitCollection) -> Bool {
