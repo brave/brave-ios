@@ -200,6 +200,7 @@ class BrowserViewController: UIViewController {
         // Observe some user preferences
         Preferences.Privacy.privateBrowsingOnly.observe(from: self)
         Preferences.General.tabBarVisibility.observe(from: self)
+        Preferences.General.themeNormalMode.observe(from: self)
         Preferences.Shields.allShields.forEach { $0.observe(from: self) }
         Preferences.Privacy.blockAllCookies.observe(from: self)
         // Lists need to be compiled before attempting tab restoration
@@ -2024,6 +2025,8 @@ extension BrowserViewController: TabManagerDelegate {
                 topToolbar.hideProgressBar()
             }
 
+            // TODO: Theme: Maybe check against Theme instead of type??
+            // TODO: Theme: store past theme and block if change unneeded
             if tab.type != previous?.type {
                 let theme = Theme.of(tab)
                 applyTheme(theme)
@@ -2933,7 +2936,7 @@ extension BrowserViewController: Themeable {
     func applyTheme(_ theme: Theme) {
         styleChildren(theme: theme)
         
-        // Maybe just set to clear color?
+        // TODO: Theme: Maybe just set to clear color?
         statusBarOverlay.backgroundColor = topToolbar.backgroundColor
         setNeedsStatusBarAppearanceUpdate()
     }
@@ -3061,6 +3064,8 @@ extension BrowserViewController: PreferencesObserver {
         switch key {
         case Preferences.General.tabBarVisibility.key:
             updateTabsBarVisibility()
+        case Preferences.General.themeNormalMode.key:
+            applyTheme(Theme.of(tabManager.selectedTab))
         case Preferences.Privacy.privateBrowsingOnly.key:
             let isPrivate = Preferences.Privacy.privateBrowsingOnly.value
             switchToPrivacyMode(isPrivate: isPrivate)

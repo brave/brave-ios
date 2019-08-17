@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import Foundation
+import BraveShared
 
 protocol Themeable {
     
@@ -26,28 +27,19 @@ extension Themeable {
 
 class Theme: Equatable, Decodable {
     
-    enum ThemeError: Error {
-        case invalidTheme(id: String)
-    }
-    
     enum DefaultTheme: String, CaseIterable, RepresentableOptionType {
         case system = "Z71ED37E-EC3E-436E-AD5F-B22748306A6B"
         case light = "ACE618A3-D6FC-45A4-94F2-1793C40AE927"
         case dark = "B900A41F-2C02-4664-9DE4-C170956339AC"
         case `private` = "C5CB0D9A-5467-432C-AB35-1A78C55CFB41"
         
-//        let id: String
-//        private init(id: String) {
-//            self.id = id
-//        }
-        
-        // TODO: Remove with `rawValue`
+        // TODO: Theme: Remove with `rawValue`
         var id: String {
             return self.rawValue
         }
         
-        var theme: Theme? {
-           return try? Theme.from(id: self.id)
+        var theme: Theme {
+           return Theme.from(id: self.id)
         }
         
         static var normalThemes: [Theme] {
@@ -58,7 +50,7 @@ class Theme: Equatable, Decodable {
             if self == .system {
                 return "System Theme"
             }
-            return self.theme?.title ?? self.id
+            return self.theme.title
         }
     }
     
@@ -203,20 +195,31 @@ class Theme: Equatable, Decodable {
     /// - parameter tab: An object representing a Tab.
     /// - returns: A Tab theme.
     static func of(_ tab: Tab?) -> Theme {
-        if let tab = tab {
+        guard let tab = tab else {
+            // TODO: Theme: Fix this
+            return PrivateBrowsingManager.shared.isPrivateBrowsing ? .private : .regular
+        }
+        
+        let themeType = { () -> Preferences.Option<String> in
             switch TabType.of(tab) {
             case .regular:
-                return .regular
+                return Preferences.General.themeNormalMode
             case .private:
-                return .private
-
+                return Preferences.General.themePrivateMode
             }
-        }
-        return PrivateBrowsingManager.shared.isPrivateBrowsing ? .private : .regular
+        }()
+        
+        let chosenTheme = DefaultTheme(rawValue: themeType.value)
+        return chosenTheme?.theme ?? DefaultTheme.system.theme
     }
     
     static var themeMemoryBank: [String: Theme] = [:]
-    static func from(id: String) throws -> Theme {
+    static func from(id: String) -> Theme {
+        var id = id
+        if id == DefaultTheme.system.id {
+            // TODO: Pull system default, not 'light' necessarily
+            id = DefaultTheme.light.id
+        }
         
         if let inMemoryTheme = themeMemoryBank[id] {
             return inMemoryTheme
@@ -226,7 +229,8 @@ class Theme: Equatable, Decodable {
         guard
             let themeData = FileManager.default.contents(atPath: themePath),
             let theme = try? JSONDecoder().decode(Theme.self, from: themeData) else {
-                throw ThemeError.invalidTheme(id: id)
+                // TODO: Theme: Maybe throw error, but fallback to `system` / default / light
+                fatalError("Theme file not found for: \(id)... no good")
         }
         
         themeMemoryBank[id] = theme
