@@ -44,7 +44,7 @@ extension Preferences {
         /// Defines the user's normal browsing theme
         /// `system`, follows the current OS display mode
         static let themeNormalMode = Option<String>(key: "general.normal-mode-theme", default: Theme.DefaultTheme.system.id)
-        static let themePrivateMode = Option<String>(key: "general.private-mode-theme", default: "")
+        static let themePrivateMode = Option<String>(key: "general.private-mode-theme", default: "C5CB0D9A-5467-432C-AB35-1A78C55CFB41")
 
         /// Whether or not a user has enabled Night Mode.
         ///
