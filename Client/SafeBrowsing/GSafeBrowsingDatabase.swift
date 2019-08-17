@@ -9,31 +9,47 @@ import Shared
 
 private let log = Logger.browserLogger
 
-extension ThreatHash {
-    func matches(_ hashPrefix: Data) -> Int {
-        guard let hash = hashData else {
-            return 0
-        }
-        
-        var hashLength = hash.count
-        if hash.subdata(in: 0..<4) == hashPrefix.subdata(in: 0..<4) && hashLength <= 4 {
-            return hash.count
-        }
-        
-        if hashLength > hashPrefix.count {
-            hashLength = hashPrefix.count
-        }
-        
-        if hash.isEmpty {
-            return 0
-        }
-        
-        for i in 4..<hashLength {
-            if hash == hashPrefix.subdata(in: 0..<i) {
-                return i
+extension Data {
+    func rawString() -> String {
+        if count > 0 {
+            let hexChars = Array("0123456789ABCDEF".utf8) as [UInt8]
+            return withUnsafeBytes { bytes -> String in
+                var output = [UInt8](repeating: 0, count: bytes.count * 2 + 1)
+                var index: Int = 0
+                for byte in bytes {
+                    let hi  = Int((byte & 0xF0) >> 0x04)
+                    let low = Int(byte & 0x0F)
+                    output[index] = hexChars[hi]
+                    output[index + 1] = hexChars[low]
+                    index += 0x02
+                }
+                return String(cString: &output)
             }
         }
-        return 0
+        return ""
+    }
+}
+
+extension String {
+    func rawData() -> Data {
+        let length = self.count
+        if length & 1 != 0 {
+            return Data()
+        }
+        
+        var data = Data()
+        data.reserveCapacity(length / 2)
+        var index = self.startIndex
+        for _ in 0..<length / 2 {
+            let nextIndex = self.index(index, offsetBy: 2)
+            if let byte = UInt8(self[index..<nextIndex], radix: 16) {
+                data.append(byte)
+            } else {
+                return Data()
+            }
+            index = nextIndex
+        }
+        return data
     }
 }
 
@@ -42,24 +58,28 @@ class SafeBrowsingDatabase {
     var last = Date().timeIntervalSince1970
     
     init() {
-        let threats: NSFetchRequest<Threat> = Threat.fetchRequest()
+//        self.destroy()
+//        self.persistentContainer = self.create()
+        
+        let request: NSFetchRequest<Threat> = Threat.fetchRequest()
         do {
-            let threats = try self.mainContext.fetch(threats)
+            let threats = try self.mainContext.fetch(request)
             try threats.forEach({
-                var hashes = $0.hashes?.compactMap({ ($0 as? ThreatHash)?.hashData })
-                hashes?.sort(by: { $0.lexicographicallyPrecedes($1) })
-                
-                if let checksum = $0.checksum, let hashes = hashes {
-                    if !validate(checksum, hashes) {
+                let hashes = ($0.hashes ?? []).compactMap({ ($0 as? ThreatHash)?.hashData })
+                //hashes.sort(by: { $0.lexicographicallyPrecedes($1) })
+
+                if let checksum = $0.checksum {
+                    if !self.validate(checksum, hashes) {
                         throw SafeBrowsingError("Database Corrupted")
                     }
                 }
             })
+            self.mainContext.reset()
         } catch {
             //Remove everything and re-create the database
             self.destroy()
             self.persistentContainer = self.create()
-            
+
             log.error("Safe-Browsing: \(error)")
         }
     }
@@ -96,9 +116,13 @@ class SafeBrowsingDatabase {
     }
     
     func getState(_ type: ThreatType) -> String {
-        dbLock.lock(); defer { dbLock.unlock() }
-        
         var state = ""
+        let backgroundContext = { () -> NSManagedObjectContext in
+            let context = self.persistentContainer.newBackgroundContext()
+            context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+            return context
+        }()
+        
         backgroundContext.performAndWait {
             let request: NSFetchRequest<Threat> = Threat.fetchRequest()
             request.fetchLimit = 1
@@ -108,36 +132,52 @@ class SafeBrowsingDatabase {
         return state
     }
     
-    func find(_ hash: String) -> [String] {
-        dbLock.lock(); defer { dbLock.unlock() }
-        
-        var hashes = [String]()
-        let data = Data(base64Encoded: hash)!
-        if data.count != Int(CC_SHA256_DIGEST_LENGTH) {
-            return [] //ERROR Hash must be a full hash..
-        }
-        
-        self.backgroundContext.performAndWait {
-            let request: NSFetchRequest<ThreatHash> = ThreatHash.fetchRequest()
-            let threatHashes = (try? backgroundContext.fetch(request)) ?? []
-            
-            for threat in threatHashes {
-                let n = threat.matches(data)
-                if n > 0 {
-                    let hashPrefix = data.subdata(in: 0..<n)
-                    hashes.append(hashPrefix.base64EncodedString())
-                }
+    func find(_ hashes: [String], completion: @escaping ([String]) -> Void) {
+
+        var results = [String]()
+        let group = DispatchGroup()
+
+        hashes.forEach({ hash in
+            group.enter()
+            let data = Data(base64Encoded: hash)!
+            if data.count != Int(CC_SHA256_DIGEST_LENGTH) {
+                return group.leave() //ERROR Hash must be a full hash..
             }
+
+            let backgroundContext = { () -> NSManagedObjectContext in
+                let context = self.persistentContainer.newBackgroundContext()
+                context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+                return context
+            }()
+
+            backgroundContext.perform {
+                let minPrefixLength = 4
+                let prefix = data.subdata(in: 0..<minPrefixLength).rawString()
+
+                let request: NSFetchRequest<ThreatHash> = ThreatHash.fetchRequest()
+
+                let optimizedPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+                    NSPredicate(format: "SELF.%K MATCHES %@", argumentArray: ["hashPrefix", ".{\(minPrefixLength)}"]),
+                    NSPredicate(format: "SELF.%K BEGINSWITH %@", argumentArray: ["hashPrefix", prefix])
+                ])
+
+                let fullLengthPredicate = NSPredicate(format: "SELF.%K LIKE %@", argumentArray: ["hashPrefix", prefix])
+
+                request.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: [optimizedPredicate, fullLengthPredicate])
+
+                let threatHashes = (try? backgroundContext.fetch(request)) ?? []
+                results.append(contentsOf: threatHashes.map({ data.subdata(in: 0..<$0.hashPrefix!.count).base64EncodedString() }))
+
+                group.leave()
+            }
+        })
+
+        group.notify(queue: .global(qos: .background)) {
+            completion(results)
         }
-        
-        return hashes
     }
     
-    func find(_ hashes: [String]) -> [String] {
-        return hashes.flatMap({ self.find($0) })
-    }
-    
-    func update(_ fetchResponse: FetchResponse, completion: (Error?) -> Void) {
+    func update(_ fetchResponse: FetchResponse, completion: @escaping (Error?) -> Void) {
         dbLock.lock(); defer { dbLock.unlock() }
         
         fetchResponse.listUpdateResponses.forEach({ response in
@@ -148,9 +188,9 @@ class SafeBrowsingDatabase {
             switch response.responseType {
             case .partialUpdate:
                 var count = 0
-                backgroundContext.performAndWait {
+                self.backgroundContext.performAndWait {
                     let request: NSFetchRequest<NSFetchRequestResult> = Threat.fetchRequest()
-                    count = (try? backgroundContext.count(for: request)) ?? 0
+                    count = (try? self.backgroundContext.count(for: request)) ?? 0
                 }
                 
                 if count == 0 {
@@ -162,7 +202,8 @@ class SafeBrowsingDatabase {
                     return completion(SafeBrowsingError("Indices to be removed included in a Full Update"))
                 }
                 
-                backgroundContext.performAndWait {
+                self.backgroundContext.performAndWait { [weak self] in
+                    guard let self = self else { return completion(nil) }
                     let request = { () -> NSBatchDeleteRequest in
                         let request: NSFetchRequest<NSFetchRequestResult> = Threat.fetchRequest()
                         request.predicate = NSPredicate(format: "threatType == %@", response.threatType.rawValue)
@@ -172,39 +213,43 @@ class SafeBrowsingDatabase {
                         return deleteRequest
                     }()
                     
-                    if let result = (try? backgroundContext.execute(request)) as? NSBatchDeleteResult {
+                    if let result = (try? self.backgroundContext.execute(request)) as? NSBatchDeleteResult {
                         if let deletedObjects = result.result as? [NSManagedObjectID] {
                             NSManagedObjectContext.mergeChanges(
                                 fromRemoteContextSave: [NSDeletedObjectsKey: deletedObjects],
-                                into: [mainContext, backgroundContext]
+                                into: [self.mainContext, self.backgroundContext]
                             )
                         }
                     } else {
                         let request: NSFetchRequest<Threat> = Threat.fetchRequest()
                         request.predicate = NSPredicate(format: "threatType == %@", response.threatType.rawValue)
                         
-                        (try? backgroundContext.fetch(request))?.forEach({
-                            backgroundContext.delete($0)
+                        (try? self.backgroundContext.fetch(request))?.forEach({
+                            self.backgroundContext.delete($0)
                         })
                     }
                     
-                    saveContext(backgroundContext)
-                    backgroundContext.reset()
+                    self.saveContext(self.backgroundContext)
+                    self.backgroundContext.reset()
                 }
                 
             default:
                 return completion(SafeBrowsingError("Unknown Response Type"))
             }
             
-            backgroundContext.performAndWait {
+            let backgroundContext = { () -> NSManagedObjectContext in
+                let context = self.persistentContainer.newBackgroundContext()
+                context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+                return context
+            }()
+            
+            backgroundContext.performAndWait { [weak self] in
+                guard let self = self else { return }
                 let request: NSFetchRequest<Threat> = Threat.fetchRequest()
                 request.predicate = NSPredicate(format: "threatType == %@", response.threatType.rawValue)
                 request.fetchLimit = 1
                 
-                var threat: Threat! = (try? backgroundContext.fetch(request))?.first
-                if threat == nil {
-                    threat = Threat(context: backgroundContext)
-                }
+                let threat: Threat = (try? backgroundContext.fetch(request))?.first ?? Threat(context: backgroundContext)
                 
                 threat.threatType = response.threatType.rawValue
                 threat.state = response.newClientState
@@ -212,7 +257,7 @@ class SafeBrowsingDatabase {
                 var hashes = (threat.hashes ?? []).compactMap({ ($0 as? ThreatHash)?.hashData })
                 
                 //Hashes must be sorted
-                hashes.sort(by: { $0.lexicographicallyPrecedes($1) })
+                //hashes.sort(by: { $0.lexicographicallyPrecedes($1) })
                 
                 response.removals.forEach({
                     $0.rawIndices?.indices.forEach({
@@ -235,9 +280,7 @@ class SafeBrowsingDatabase {
                         for i in stride(from: 0, to: data.count, by: strideSize) {
                             let startIndex = data.index(data.startIndex, offsetBy: i)
                             let endIndex = data.index(startIndex, offsetBy: strideSize)
-                            
-                            let subData = data.subdata(in: startIndex..<endIndex)
-                            hashes.append(subData)
+                            hashes.append(data.subdata(in: startIndex..<endIndex))
                         }
                     }
                 })
@@ -251,8 +294,9 @@ class SafeBrowsingDatabase {
                     }
                 })
                 
-                threat.hashes = NSSet(array: hashes.map({
+                threat.hashes = NSOrderedSet(array: hashes.map({
                     let hash = ThreatHash(context: backgroundContext)
+                    hash.hashPrefix = $0.rawString()
                     hash.hashData = $0
                     return hash
                 }))
@@ -261,13 +305,12 @@ class SafeBrowsingDatabase {
                     threat.checksum = response.checksum.sha256
                 }
                 
-                if !validate(response.checksum.sha256, hashes) {
+                if !self.validate(response.checksum.sha256, hashes) {
                     backgroundContext.rollback()
                     return completion(SafeBrowsingError("Threat List Checksum Mismatch"))
                 }
                 
-                saveContext(backgroundContext)
-                backgroundContext.reset()
+                self.saveContext(backgroundContext)
             }
         })
     }

@@ -10,8 +10,8 @@ private let log = Logger.browserLogger
 
 class SafeBrowsingClient {
     private static let apiKey = "DUMMY_KEY"
-    private static let maxBandwidth = 2048
-    private static let maxDiskSpace = 4096
+    private static let maxBandwidth = 2048 //Maximum amount of results we can process per threat-type
+    private static let maxDatabaseEntries = 250000 //Maximum amount of entries our database can hold per threat-type
     private static let clientId = AppInfo.baseBundleIdentifier
     private static let version = AppInfo.appVersion
     
@@ -25,49 +25,58 @@ class SafeBrowsingClient {
     }
     
     func find(_ hashes: [String], _ completion: @escaping (_ isSafe: Bool, Error?) -> Void) {
-        let discoveredHashes = database.find(hashes)
-        if discoveredHashes.isEmpty {
-            return completion(true, nil)
-        }
-        
-        let clientInfo = ClientInfo(clientId: SafeBrowsingClient.clientId,
-                                    clientVersion: SafeBrowsingClient.version)
-        
-        let threatTypes: [ThreatType] = [.malware,
-                                         .socialEngineering,
-                                         .unwantedSoftware,
-                                         .potentiallyHarmfulApplication]
-        
-        let platformTypes: [PlatformType] = [.any]
-        let threatEntryTypes: [ThreatEntryType] = [.url, .exe]
-        
-        let threatInfo = ThreatInfo(threatTypes: threatTypes,
-                                    platformTypes: platformTypes,
-                                    threatEntryTypes: threatEntryTypes,
-                                    threatEntries: discoveredHashes.map {
-                                        return ThreatEntry(hash: $0, url: nil, digest: nil)
-                                    }
-        )
-        
-        do {
-            let body = FindRequest(client: clientInfo, threatInfo: threatInfo)
-            let request = try encode(.post, endpoint: .fullHashes, body: body)
-            executeRequest(request, type: FindResponse.self) { response, error in
-                if let error = error {
-                    return completion(false, error)
+        database.find(hashes, completion: { [weak self] discoveredHashes in
+            guard let self = self else { return completion(true, nil) }
+            
+            if discoveredHashes.isEmpty {
+                return DispatchQueue.global(qos: .background).async {
+                    completion(true, nil)
                 }
-                
-                if let response = response {
-                    if !response.matches.isEmpty {
-                        return completion(false, nil)
+            }
+            
+            let clientInfo = ClientInfo(clientId: SafeBrowsingClient.clientId,
+                                        clientVersion: SafeBrowsingClient.version)
+            
+            let threatTypes: [ThreatType] = [.malware,
+                                             .socialEngineering,
+                                             .unwantedSoftware,
+                                             .potentiallyHarmfulApplication]
+            
+            let platformTypes: [PlatformType] = [.any, .ios]
+            let threatEntryTypes: [ThreatEntryType] = [.url, .exe]
+            
+            let threatInfo = ThreatInfo(threatTypes: threatTypes,
+                                        platformTypes: platformTypes,
+                                        threatEntryTypes: threatEntryTypes,
+                                        threatEntries: discoveredHashes.map {
+                                            return ThreatEntry(hash: $0, url: nil, digest: nil)
+                }
+            )
+            
+            do {
+                let body = FindRequest(client: clientInfo, threatInfo: threatInfo)
+                let request = try self.encode(.post, endpoint: .fullHashes, body: body)
+                self.executeRequest(request, type: FindResponse.self) { response, error in
+                    DispatchQueue.global(qos: .background).async {
+                        if let error = error {
+                            return completion(false, error)
+                        }
+                        
+                        if let response = response {
+                            if !response.matches.isEmpty {
+                                return completion(false, nil)
+                            }
+                        }
+                        
+                        completion(true, nil)
                     }
                 }
-                
-                completion(true, nil)
+            } catch {
+                DispatchQueue.global(qos: .background).async {
+                    completion(false, error)
+                }
             }
-        } catch {
-            completion(false, error)
-        }
+        })
     }
     
     func fetch(_ completion: @escaping (Error?) -> Void) {
@@ -75,8 +84,8 @@ class SafeBrowsingClient {
                                     clientVersion: SafeBrowsingClient.version)
         
         let constraints = Constraints(maxUpdateEntries: UInt32(SafeBrowsingClient.maxBandwidth),
-                                      maxDatabaseEntries: UInt32(SafeBrowsingClient.maxDiskSpace),
-                                      region: "US",
+                                      maxDatabaseEntries: UInt32(SafeBrowsingClient.maxDatabaseEntries),
+                                      region: Locale.current.regionCode ?? "US",
                                       supportedCompressions: [.raw],
                                       language: nil,
                                       deviceLocation: nil)
@@ -88,16 +97,22 @@ class SafeBrowsingClient {
                               state: database.getState(.malware),
                               constraints: constraints),
             
+            ListUpdateRequest(threatType: .malware,
+                              platformType: .ios,
+                              threatEntryType: .url,
+                              state: database.getState(.malware),
+                              constraints: constraints),
+            
             ListUpdateRequest(threatType: .socialEngineering,
-                              platformType: .any,
+                              platformType: .ios,
                               threatEntryType: .url,
                               state: database.getState(.socialEngineering),
                               constraints: constraints),
             
-            ListUpdateRequest(threatType: .unwantedSoftware,
-                              platformType: .any,
+            ListUpdateRequest(threatType: .potentiallyHarmfulApplication,
+                              platformType: .ios,
                               threatEntryType: .url,
-                              state: database.getState(.unwantedSoftware),
+                              state: database.getState(.potentiallyHarmfulApplication),
                               constraints: constraints)
         ]
         
@@ -159,7 +174,7 @@ class SafeBrowsingClient {
             }
             
             if let response = response as? HTTPURLResponse {
-                if response.statusCode < 200 || response.statusCode > 299 {
+                if response.statusCode != 200 {
                     do {
                         let error = try JSONDecoder().decode(ResponseError.self, from: data)
                         return completion(nil, SafeBrowsingError(error.message, code: error.code))

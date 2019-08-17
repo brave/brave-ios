@@ -167,17 +167,15 @@ extension BrowserViewController: WKNavigationDelegate {
         if isSafeBrowsingEnabled() {
             var isURLSafe = true //By default, we mark the URL as safe, unless the lookup returns otherwise..
             let semaphore = DispatchSemaphore(value: 0)
-            DispatchQueue.global(qos: .background).async {
-                SafeBrowsingClient.shared.find(url.hashPrefixes()) { isSafe, error in
-                    defer { semaphore.signal() }
-                    
-                    if let error = error {
-                        log.error(error)
-                        return
-                    }
-                    
-                    isURLSafe = isSafe
+            SafeBrowsingClient.shared.find(url.hashPrefixes()) { isSafe, error in
+                defer { semaphore.signal() }
+                
+                if let error = error {
+                    log.error(error)
+                    return
                 }
+                
+                isURLSafe = isSafe
             }
             
             _ = semaphore.wait(timeout: .now() + .seconds(30))

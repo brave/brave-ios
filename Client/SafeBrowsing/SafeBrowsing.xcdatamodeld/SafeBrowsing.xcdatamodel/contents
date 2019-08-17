@@ -4,14 +4,15 @@
         <attribute name="checksum" attributeType="String" syncable="YES"/>
         <attribute name="state" attributeType="String" syncable="YES"/>
         <attribute name="threatType" attributeType="String" syncable="YES"/>
-        <relationship name="hashes" toMany="YES" deletionRule="Cascade" destinationEntity="ThreatHash" inverseName="threat" inverseEntity="ThreatHash" syncable="YES"/>
+        <relationship name="hashes" toMany="YES" deletionRule="Cascade" ordered="YES" destinationEntity="ThreatHash" inverseName="threat" inverseEntity="ThreatHash" syncable="YES"/>
     </entity>
     <entity name="ThreatHash" representedClassName="ThreatHash" syncable="YES" codeGenerationType="class">
         <attribute name="hashData" attributeType="Binary" syncable="YES"/>
+        <attribute name="hashPrefix" attributeType="String" syncable="YES"/>
         <relationship name="threat" maxCount="1" deletionRule="Nullify" destinationEntity="Threat" inverseName="hashes" inverseEntity="Threat" syncable="YES"/>
     </entity>
     <elements>
         <element name="Threat" positionX="-45" positionY="0" width="128" height="105"/>
-        <element name="ThreatHash" positionX="-18" positionY="27" width="128" height="75"/>
+        <element name="ThreatHash" positionX="-18" positionY="27" width="128" height="90"/>
     </elements>
 </model>
