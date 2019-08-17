@@ -194,11 +194,9 @@ class TabCell: UICollectionViewCell, Themeable {
     func applyTheme(_ theme: Theme) {
         styleChildren(theme: theme)
         
-        backgroundHolder.backgroundColor = theme == .private ? UX.HomePanel.BackgroundColorPBM : UX.HomePanel.BackgroundColor
+        backgroundHolder.backgroundColor = theme.colors.home
         screenshotView.backgroundColor = backgroundHolder.backgroundColor
-        if theme == .private {
-            favicon.tintColor = UIColor.Photon.White100
-        }
+        favicon.tintColor = theme.colors.tints.home
     }
 }
 
@@ -228,15 +226,15 @@ class TabTrayController: UIViewController, Themeable {
 
     fileprivate(set) internal var privateMode: Bool = false {
         didSet {
+            // Should be set immediately before other logic executes
             PrivateBrowsingManager.shared.isPrivateBrowsing = privateMode
-            
             tabDataSource.tabs = tabManager.tabsForCurrentMode
             /*
              * This is a little tricky since this menu is one of the only places inside of the appliation
              * that has a state without gauranteeing a tab exists. Most UI elements should use `theme` or at the least
              * the related tab's theme, here this is not possible, so using hardened values 😕😭
              */
-            applyTheme(privateMode ? .private : .regular)
+            applyTheme(Theme.of(nil))
             collectionView?.reloadData()
             setNeedsStatusBarAppearanceUpdate()
         }
@@ -398,12 +396,14 @@ class TabTrayController: UIViewController, Themeable {
         }
     }
     
+    var themeableChildren: [Themeable?]? {
+        let cells = collectionView?.visibleCells.compactMap({ $0 as? TabCell }) ?? []
+        return [toolbar] + cells
+    }
+    
     func applyTheme(_ theme: Theme) {
         styleChildren(theme: theme)
-        
         collectionView?.backgroundColor = theme.colors.home
-        collectionView?.visibleCells.compactMap({ $0 as? TabCell }).forEach { $0.applyTheme(theme) }
-        toolbar.applyTheme(theme)
     }
     
     /// Reset the empty private browsing state (hide the details, unhide the learn more button) if it was changed

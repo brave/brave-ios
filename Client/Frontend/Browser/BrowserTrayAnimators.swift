@@ -344,7 +344,7 @@ private func createTransitionCellFromTab(_ tab: Tab?, withFrame frame: CGRect) -
     } else {
         cell.favicon.image = #imageLiteral(resourceName: "defaultFavicon")
     }
-    cell.applyTheme(PrivateBrowsingManager.shared.isPrivateBrowsing ? .private : .regular)
+    cell.applyTheme(Theme.of(tab))
 
     return cell
 }

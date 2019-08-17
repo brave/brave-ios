@@ -175,10 +175,6 @@ class Theme: Equatable, Decodable {
         let home: URL
     }
     
-    lazy var available: [Theme] = {
-        return [Theme.regular, Theme.private]
-    }()
-    
     /// Textual representation suitable for debugging.
     var debugDescription: String {
         return description
@@ -195,10 +191,14 @@ class Theme: Equatable, Decodable {
     /// - parameter tab: An object representing a Tab.
     /// - returns: A Tab theme.
     static func of(_ tab: Tab?) -> Theme {
-        guard let tab = tab else {
-            // TODO: Theme: Fix this
-            return PrivateBrowsingManager.shared.isPrivateBrowsing ? .private : .regular
-        }
+       guard let tab = tab else {
+           // This is important, used when switching modes when no tab is present
+           // TODO: Theme: unit test
+            let themeBasedOnMode = PrivateBrowsingManager.shared.isPrivateBrowsing
+                ? Preferences.General.themePrivateMode
+                : Preferences.General.themeNormalMode
+            return Theme.from(id: themeBasedOnMode.value)
+       }
         
         let themeType = { () -> Preferences.Option<String> in
             switch TabType.of(tab) {
@@ -237,19 +237,6 @@ class Theme: Equatable, Decodable {
         return theme
     }
     
-    // Maybe wrap in a `mode` struct, however, most UI will only care about theme.data
-    /// Regular browsing.
-    static let regular: Theme = {
-        let themeData = normalTheme().data(using: String.Encoding.utf8)!
-        return try! JSONDecoder().decode(Theme.self, from: themeData)
-    }()
-    
-    /// Private browsing.
-    static let `private`: Theme = {
-        let themeData = privateTheme().data(using: String.Encoding.utf8)!
-        return try! JSONDecoder().decode(Theme.self, from: themeData)
-    }()
-    
     static let allThemes: [Theme] = {
         do {
             let filenames = try FileManager.default.contentsOfDirectory(at: Theme.ThemeDirectory, includingPropertiesForKeys: [])
@@ -259,7 +246,7 @@ class Theme: Equatable, Decodable {
             }.compactMap { fullPath -> Theme? in
                 var path = fullPath.lastPathComponent
                 path.removeLast(5) // Removing JSON extension
-                return try? Theme.from(id: path)
+                return Theme.from(id: path)
             }.filter {
                 $0.enabled
             }
@@ -272,102 +259,6 @@ class Theme: Equatable, Decodable {
     
     static func == (lhs: Theme, rhs: Theme) -> Bool {
         return lhs.uuid == rhs.uuid
-    }
-}
-
-private extension Theme {
-    
-    static func normalTheme() -> String {
-        return """
-        
-        {
-        "uuid": "FAIDSFJELWEF",
-        "title": "Default light",
-        "url": "www.brave.com",
-        "description": "The standard default light theme",
-        "thumbnail": "https://www.google.com",
-        "isDark": false,
-        "enabled": true,
-        
-        "colors": {
-        "header": "0xffffff",
-        "footer": "0xffffff",
-        "home": "0xffffff",
-        "addressBar": "0xD7D7E0",
-        "border": "0x000000",
-        "accent": "0xccdded",
-        "tints": {
-        "home": "0x434351",
-        "header": "0x434351",
-        "footer": "0x434351",
-        "addressBar": "0x434351"
-        },
-        "transparencies": {
-        "addressBarAlpha": 1.0,
-        "borderAlpha": 0.2,
-        },
-        "stats": {
-        "ads": "0xFA4214",
-        "trackers": "0xFA4214",
-        "httpse": "0x9339D4",
-        "timeSaved": "0x222326"
-        }
-        },
-        "images": {
-        "header": "https://www.google.com",
-        "footer": "https://www.google.com",
-        "home": "https://www.google.com",
-        }
-        }
-
-
-        
-        """
-    }
-    
-    static func privateTheme() -> String {
-        return """
-        {
-        "uuid": "FAIDSFJELWEF3",
-        "title": "Default private",
-        "url": "www.brave.com",
-        "description": "The standard default private theme",
-        "thumbnail": "https://www.google.com",
-        "isDark": true,
-        "enabled": true,
-        
-        "colors": {
-        "header": "0x1B0C32",
-        "footer": "0x1B0C32",
-        "home": "0x210950",
-        "addressBar": "0x3D2742",
-        "border": "0xffffff",
-        "accent": "0xcf68ff",
-        "tints": {
-        "home": "0xE7E6E9",
-        "header": "0xE7E6E9",
-        "footer": "0xE7E6E9",
-        "addressBar": "0xE7E6E9"
-        },
-        "transparencies": {
-        "addressBarAlpha": 1.0,
-        "borderAlpha": 0.2,
-        },
-        "stats": {
-        "ads": "0xFA4214",
-        "trackers": "0xFA4214",
-        "httpse": "0x9339D4",
-        "timeSaved": "0xffffff"
-        }
-        },
-        "images": {
-        "header": "https://www.google.com",
-        "footer": "https://www.google.com",
-        "home": "https://www.google.com",
-        }
-        }
-
-        """
     }
 }
 
