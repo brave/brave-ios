@@ -6,6 +6,14 @@
         <attribute name="threatType" attributeType="String" syncable="YES"/>
         <relationship name="hashes" toMany="YES" deletionRule="Cascade" ordered="YES" destinationEntity="ThreatHash" inverseName="threat" inverseEntity="ThreatHash" syncable="YES"/>
     </entity>
+    <entity name="ThreatDatabaseInfo" representedClassName="ThreatDatabaseInfo" syncable="YES" codeGenerationType="class">
+        <attribute name="fetchWaitDuration" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="findWaitDuration" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="lastFetchDate" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="lastFindDate" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="numberOfFetchRetries" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="numberOfFindRetries" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+    </entity>
     <entity name="ThreatHash" representedClassName="ThreatHash" syncable="YES" codeGenerationType="class">
         <attribute name="hashData" attributeType="Binary" syncable="YES"/>
         <attribute name="hashPrefix" attributeType="String" syncable="YES"/>
@@ -14,5 +22,6 @@
     <elements>
         <element name="Threat" positionX="-45" positionY="0" width="128" height="105"/>
         <element name="ThreatHash" positionX="-18" positionY="27" width="128" height="90"/>
+        <element name="ThreatDatabaseInfo" positionX="-27" positionY="45" width="128" height="135"/>
     </elements>
 </model>

@@ -55,14 +55,36 @@ extension String {
 
 class SafeBrowsingDatabase {
     private let dbLock = NSRecursiveLock()
-    var last = Date().timeIntervalSince1970
+    
+    // For fetches
+    private var lastFetchDate = Date.distantPast
+    private var lastFetchWaitDuration: Double = 0.0
+    private var numberOfFetchRetries: Int16 = 0
+    
+    // For finds
+    private var lastFindDate = Date.distantPast
+    private var lastFindWaitDuration: Double = 0.0
+    private var numberOfFindRetries: Int16 = 0
+    
+    private var updateTimer: Timer?
     
     init() {
 //        self.destroy()
 //        self.persistentContainer = self.create()
-        
-        let request: NSFetchRequest<Threat> = Threat.fetchRequest()
         do {
+            let databaseInfoRequest: NSFetchRequest<ThreatDatabaseInfo> = ThreatDatabaseInfo.fetchRequest()
+            databaseInfoRequest.fetchLimit = 1
+            
+            let databaseInfo = try self.mainContext.fetch(databaseInfoRequest)
+            self.lastFetchDate = databaseInfo.first?.lastFetchDate ?? Date.distantPast
+            self.lastFetchWaitDuration = databaseInfo.first?.fetchWaitDuration ?? 0.0
+            self.numberOfFetchRetries = databaseInfo.first?.numberOfFetchRetries ?? 0
+            
+            self.lastFindDate = databaseInfo.first?.lastFindDate ?? Date.distantPast
+            self.lastFindWaitDuration = databaseInfo.first?.findWaitDuration ?? 0.0
+            self.numberOfFindRetries = databaseInfo.first?.numberOfFindRetries ?? 0
+            
+            let request: NSFetchRequest<Threat> = Threat.fetchRequest()
             let threats = try self.mainContext.fetch(request)
             try threats.forEach({
                 let hashes = ($0.hashes ?? []).compactMap({ ($0 as? ThreatHash)?.hashData })
@@ -115,6 +137,44 @@ class SafeBrowsingDatabase {
         }
     }
     
+    func canFind() -> Bool {
+        return Date().timeIntervalSince(self.lastFindDate) >= self.lastFindWaitDuration
+    }
+    
+    func canUpdate() -> Bool {
+        return Date().timeIntervalSince(self.lastFetchDate) >= self.lastFetchWaitDuration
+    }
+    
+    func enterBackoffMode(_ mode: BackoffMode) {
+        if mode == .find {
+            self.numberOfFindRetries += 1
+            let duration = calculateBackoffTime(Double(self.numberOfFindRetries))
+            
+            if duration > 0 {
+                self.lastFindDate = Date()
+                self.lastFindWaitDuration = duration
+                self.updateDatabaseInfo { error in
+                    if let error = error {
+                        log.error(error)
+                    }
+                }
+            }
+        } else if mode == .update {
+            self.numberOfFetchRetries += 1
+            let duration = calculateBackoffTime(Double(self.numberOfFetchRetries))
+            
+            if duration > 0 {
+                self.lastFetchDate = Date()
+                self.lastFetchWaitDuration = duration
+                self.updateDatabaseInfo { error in
+                    if let error = error {
+                        log.error(error)
+                    }
+                }
+            }
+        }
+    }
+    
     func getState(_ type: ThreatType) -> String {
         var state = ""
         let backgroundContext = { () -> NSManagedObjectContext in
@@ -133,7 +193,6 @@ class SafeBrowsingDatabase {
     }
     
     func find(_ hashes: [String], completion: @escaping ([String]) -> Void) {
-
         var results = [String]()
         let group = DispatchGroup()
 
@@ -179,6 +238,11 @@ class SafeBrowsingDatabase {
     
     func update(_ fetchResponse: FetchResponse, completion: @escaping (Error?) -> Void) {
         dbLock.lock(); defer { dbLock.unlock() }
+        
+        self.lastFetchDate = Date()
+        self.lastFetchWaitDuration = Double(fetchResponse.minimumWaitDuration)
+        self.numberOfFetchRetries = 0
+        self.updateDatabaseInfo(completion)
         
         fetchResponse.listUpdateResponses.forEach({ response in
             if response.additions.isEmpty && response.removals.isEmpty {
@@ -313,6 +377,51 @@ class SafeBrowsingDatabase {
                 self.saveContext(backgroundContext)
             }
         })
+    }
+    
+    func scheduleUpdate(onNeedsUpdating: @escaping () -> Void) {
+        updateTimer?.invalidate()
+        updateTimer = Timer.scheduledTimer(withTimeInterval: self.lastFetchWaitDuration, repeats: false) {
+            $0.invalidate()
+            DispatchQueue.main.async {
+                onNeedsUpdating()
+            }
+        }
+    }
+    
+    private func calculateBackoffTime(_ numberOfRetries: Double) -> Double {
+        if numberOfRetries == 0 {
+            return 0.0
+        }
+        
+        var minutes: Double = pow(2.0, numberOfRetries - 1) * 15.0
+        minutes *= Double.random(in: 0...1) + 1
+        return min(minutes, 24 * 60)
+    }
+    
+    private func updateDatabaseInfo(_ completion: (Error?) -> Void) {
+        self.backgroundContext.performAndWait {
+            do {
+                let databaseInfoRequest: NSFetchRequest<ThreatDatabaseInfo> = ThreatDatabaseInfo.fetchRequest()
+                databaseInfoRequest.fetchLimit = 1
+                
+                let databaseInfo = (try self.backgroundContext.fetch(databaseInfoRequest)).first ?? ThreatDatabaseInfo(context: self.backgroundContext)
+                
+                databaseInfo.fetchWaitDuration = self.lastFetchWaitDuration
+                databaseInfo.lastFetchDate = self.lastFetchDate
+                databaseInfo.numberOfFetchRetries = self.numberOfFetchRetries
+                
+                databaseInfo.findWaitDuration = self.lastFindWaitDuration
+                databaseInfo.lastFindDate = self.lastFindDate
+                databaseInfo.numberOfFindRetries = self.numberOfFindRetries
+                
+                self.saveContext(self.backgroundContext)
+                self.backgroundContext.reset()
+                completion(nil)
+            } catch {
+                completion(error)
+            }
+        }
     }
     
     private func hash(_ data: [Data]) -> Data {

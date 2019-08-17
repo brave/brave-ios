@@ -22,6 +22,13 @@ class SafeBrowsingClient {
     public static let shared = SafeBrowsingClient()
     
     private init() {
+        self.database.scheduleUpdate { [weak self] in
+            self?.fetch({
+                if let error = $0 {
+                    log.error(error)
+                }
+            })
+        }
     }
     
     func find(_ hashes: [String], _ completion: @escaping (_ isSafe: Bool, Error?) -> Void) {
@@ -31,6 +38,12 @@ class SafeBrowsingClient {
             if discoveredHashes.isEmpty {
                 return DispatchQueue.global(qos: .background).async {
                     completion(true, nil)
+                }
+            }
+            
+            if !self.database.canFind() {
+                return DispatchQueue.global(qos: .background).async {
+                    completion(false, nil)
                 }
             }
             
@@ -56,7 +69,13 @@ class SafeBrowsingClient {
             do {
                 let body = FindRequest(client: clientInfo, threatInfo: threatInfo)
                 let request = try self.encode(.post, endpoint: .fullHashes, body: body)
-                self.executeRequest(request, type: FindResponse.self) { response, error in
+                self.executeRequest(request, type: FindResponse.self) { [weak self] response, error in
+                    guard let self = self else { return }
+                    
+                    if error != nil {
+                        self.database.enterBackoffMode(.find)
+                    }
+                    
                     DispatchQueue.global(qos: .background).async {
                         if let error = error {
                             return completion(false, error)
@@ -80,6 +99,10 @@ class SafeBrowsingClient {
     }
     
     func fetch(_ completion: @escaping (Error?) -> Void) {
+        if !self.database.canUpdate() {
+            return completion(SafeBrowsingError("Database already up to date"))
+        }
+        
         let clientInfo = ClientInfo(clientId: SafeBrowsingClient.clientId,
                                     clientVersion: SafeBrowsingClient.version)
         
@@ -123,6 +146,7 @@ class SafeBrowsingClient {
                 guard let self = self else { return }
                 
                 if let error = error {
+                    self.database.enterBackoffMode(.update)
                     return completion(error)
                 }
                 
@@ -134,6 +158,10 @@ class SafeBrowsingClient {
                             didError = true
                         }
                     })
+                    
+                    self.database.scheduleUpdate { [weak self] in
+                        self?.fetch(completion)
+                    }
                     
                     return completion(didError ? SafeBrowsingError("Safe-Browsing: Error Updating Database") : nil)
                 }

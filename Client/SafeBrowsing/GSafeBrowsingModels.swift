@@ -153,7 +153,13 @@ struct FetchRequest: Codable {
 
 struct FetchResponse: Codable {
     let listUpdateResponses: [ListUpdateResponse]
-    let minimumWaitDuration: String
+    let minimumWaitDuration: Float
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.listUpdateResponses = try container.decode([ListUpdateResponse].self, forKey: .listUpdateResponses)
+        self.minimumWaitDuration = Float(try container.decode(String.self, forKey: .minimumWaitDuration).replacingOccurrences(of: "s", with: "")) ?? 0.0
+    }
 }
 
 struct FindRequest: Codable {
@@ -205,4 +211,9 @@ struct ResponseError: Codable {
     private enum NestedKeys: String, CodingKey {
         case error
     }
+}
+
+enum BackoffMode {
+    case find
+    case update
 }
