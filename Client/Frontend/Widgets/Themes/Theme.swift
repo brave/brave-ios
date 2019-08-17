@@ -25,6 +25,44 @@ extension Themeable {
 }
 
 class Theme: Equatable, Decodable {
+    
+    enum ThemeError: Error {
+        case invalidTheme(id: String)
+    }
+    
+    enum DefaultTheme: String, CaseIterable, RepresentableOptionType {
+        case system = "Z71ED37E-EC3E-436E-AD5F-B22748306A6B"
+        case light = "ACE618A3-D6FC-45A4-94F2-1793C40AE927"
+        case dark = "B900A41F-2C02-4664-9DE4-C170956339AC"
+        case `private` = "C5CB0D9A-5467-432C-AB35-1A78C55CFB41"
+        
+//        let id: String
+//        private init(id: String) {
+//            self.id = id
+//        }
+        
+        // TODO: Remove with `rawValue`
+        var id: String {
+            return self.rawValue
+        }
+        
+        var theme: Theme? {
+           return try? Theme.from(id: self.id)
+        }
+        
+        static var normalThemes: [Theme] {
+            return [DefaultTheme.light.theme, DefaultTheme.dark.theme].compactMap { $0 }
+        }
+        
+        public var displayString: String {
+            if self == .system {
+                return "System Theme"
+            }
+            return self.theme?.title ?? self.id
+        }
+    }
+    
+    fileprivate static let ThemeDirectory = Bundle.main.resourceURL!.appendingPathComponent("Themes")
 
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: ThemeCodingKeys.self)
@@ -154,6 +192,7 @@ class Theme: Equatable, Decodable {
         return description
     }
 
+    // This should be removed probably
     /// Returns whether the theme is private or not.
     var isPrivate: Bool {
         return self.isDark
@@ -176,14 +215,21 @@ class Theme: Equatable, Decodable {
         return PrivateBrowsingManager.shared.isPrivateBrowsing ? .private : .regular
     }
     
-    static func from(id: String) -> Theme? {
+    static var themeMemoryBank: [String: Theme] = [:]
+    static func from(id: String) throws -> Theme {
         
-        let themePath = Theme.ThemeDirectory.appendingPathComponent(id).path
+        if let inMemoryTheme = themeMemoryBank[id] {
+            return inMemoryTheme
+        }
+        
+        let themePath = Theme.ThemeDirectory.appendingPathComponent(id).appendingPathExtension("json").path
         guard
             let themeData = FileManager.default.contents(atPath: themePath),
             let theme = try? JSONDecoder().decode(Theme.self, from: themeData) else {
-                return nil
+                throw ThemeError.invalidTheme(id: id)
         }
+        
+        themeMemoryBank[id] = theme
         return theme
     }
     
@@ -206,8 +252,10 @@ class Theme: Equatable, Decodable {
             
             let final = filenames.filter {
                 $0.pathExtension == "json"
-            }.compactMap {
-                Theme.from(id: $0.lastPathComponent)
+            }.compactMap { fullPath -> Theme? in
+                var path = fullPath.lastPathComponent
+                path.removeLast(5) // Removing JSON extension
+                return try? Theme.from(id: path)
             }.filter {
                 $0.enabled
             }

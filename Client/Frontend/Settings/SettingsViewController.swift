@@ -142,6 +142,13 @@ class SettingsViewController: TableViewController {
             ]
         )
         
+        // TODO: This can be further abstracted to align with an entire OptionSelectionVC for both tab and theme visibility
+        let reloadCell = { (row: Row, displayString: String) in
+            if let indexPath = self.dataSource.indexPath(rowUUID: row.uuid, sectionUUID: general.uuid) {
+                self.dataSource.sections[indexPath.section].rows[indexPath.row].detailText = displayString
+            }
+        }
+        
         if UIDevice.current.userInterfaceIdiom == .pad {
             general.rows.append(
                 Row(text: Strings.Show_Tabs_Bar, accessory: .switchToggle(value: Preferences.General.tabBarVisibility.value == TabBarVisibility.always.rawValue, { Preferences.General.tabBarVisibility.value = $0 ? TabBarVisibility.always.rawValue : TabBarVisibility.never.rawValue }), cellClass: MultilineValue1Cell.self)
@@ -155,10 +162,7 @@ class SettingsViewController: TableViewController {
                     selectedOption: TabBarVisibility(rawValue: Preferences.General.tabBarVisibility.value),
                     optionChanged: { [unowned self] _, option in
                         Preferences.General.tabBarVisibility.value = option.rawValue
-                        
-                        if let indexPath = self.dataSource.indexPath(rowUUID: row.uuid, sectionUUID: general.uuid) {
-                            self.dataSource.sections[indexPath.section].rows[indexPath.row].detailText = option.displayString
-                        }
+                        reloadCell(row, option.displayString)
                     }
                 )
                 optionsViewController.headerText = Strings.Show_Tabs_Bar
@@ -166,6 +170,24 @@ class SettingsViewController: TableViewController {
             }
             general.rows.append(row)
         }
+        
+        let themeSubtitle = Theme.DefaultTheme(rawValue: Preferences.General.themeNormalMode.value)?.displayString
+        var row = Row(text: Strings.Normal_Mode_Theme, detailText: themeSubtitle, accessory: .disclosureIndicator, cellClass: MultilineSubtitleCell.self)
+        row.selection = { [unowned self] in
+            let optionsViewController = OptionSelectionViewController<Theme.DefaultTheme>(
+                options: Theme.DefaultTheme.allCases,
+                selectedOption: Theme.DefaultTheme(rawValue: Preferences.General.themeNormalMode.value),
+                optionChanged: { [unowned self] _, option in
+                    Preferences.General.themeNormalMode.value = option.rawValue
+                    reloadCell(row, option.displayString)
+                    
+                    // Update theme!
+                }
+            )
+            optionsViewController.headerText = Strings.Normal_Mode_Theme
+            self.navigationController?.pushViewController(optionsViewController, animated: true)
+        }
+        general.rows.append(row)
         
         return general
     }()
