@@ -192,6 +192,42 @@ class SafeBrowsingDatabase {
         return state
     }
     
+    func find(_ hash: String, completion: @escaping (String) -> Void) {
+        let data = Data(base64Encoded: hash)!
+        if data.count != Int(CC_SHA256_DIGEST_LENGTH) {
+            return completion("") //ERROR Hash must be a full hash..
+        }
+        
+        let backgroundContext = { () -> NSManagedObjectContext in
+            let context = self.persistentContainer.newBackgroundContext()
+            context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+            return context
+        }()
+        
+        backgroundContext.perform {
+            let minPrefixLength = 4
+            let prefix = data.subdata(in: 0..<minPrefixLength).rawString()
+            
+            let request: NSFetchRequest<ThreatHash> = ThreatHash.fetchRequest()
+            request.fetchLimit = 1
+            
+            let optimizedPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+                NSPredicate(format: "SELF.%K MATCHES %@", argumentArray: ["hashPrefix", ".{\(minPrefixLength)}"]),
+                NSPredicate(format: "SELF.%K BEGINSWITH %@", argumentArray: ["hashPrefix", prefix])
+                ])
+            
+            let fullLengthPredicate = NSPredicate(format: "SELF.%K LIKE %@", argumentArray: ["hashPrefix", prefix])
+            
+            request.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: [optimizedPredicate, fullLengthPredicate])
+            
+            if let threatHash = (try? backgroundContext.fetch(request))?.first {
+                return completion(data.subdata(in: 0..<threatHash.hashPrefix!.count).base64EncodedString())
+            }
+            
+            completion("")
+        }
+    }
+    
     func find(_ hashes: [String], completion: @escaping ([String]) -> Void) {
         var results = [String]()
         let group = DispatchGroup()

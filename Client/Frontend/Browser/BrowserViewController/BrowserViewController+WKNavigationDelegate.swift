@@ -165,25 +165,34 @@ extension BrowserViewController: WKNavigationDelegate {
         }
         
         if isSafeBrowsingEnabled() {
-            var isURLSafe = true //By default, we mark the URL as safe, unless the lookup returns otherwise..
+            var safeBrowsingResult: SafeBrowsingResult = .safe
             let semaphore = DispatchSemaphore(value: 0)
-            SafeBrowsingClient.shared.find(url.hashPrefixes()) { isSafe, error in
+            SafeBrowsingClient.shared.find(url.hashPrefixes()) { result, error in
                 defer { semaphore.signal() }
                 
                 if let error = error {
                     log.error(error)
+                    safeBrowsingResult = result
                     return
                 }
                 
-                isURLSafe = isSafe
+                safeBrowsingResult = result
             }
             
             _ = semaphore.wait(timeout: .now() + .seconds(30))
             
-            if !isURLSafe {
+            // Three types of results.. "safe", "dangerous", "unknown"
+            // In order not to accidentally block websites due to an error, if it's status is unknown, we should possibly show a different web-page that lets them know we couldn't determine if the page was safe or not..
+            //
+            // For now, we only block for sure when it's dangerous..
+            if safeBrowsingResult == .dangerous {
                 safeBrowsing?.showMalwareWarningPage(forUrl: url, inWebView: webView)
                 decisionHandler(.cancel)
                 return
+            }
+            
+            if safeBrowsingResult == .unknown {
+                //Show something to let the user know we couldn't verify the url.. and to proceed with caution..
             }
         }
 

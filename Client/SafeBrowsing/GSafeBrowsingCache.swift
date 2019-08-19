@@ -4,10 +4,19 @@
 
 import Foundation
 
-private struct ThreatCache: Hashable {
+private struct ThreatCache: Hashable, Equatable {
     var time: TimeInterval
     let hash: String
     let threatType: ThreatType
+    
+    static func == (lhs: ThreatCache, rhs: ThreatCache) -> Bool {
+        return lhs.hash == rhs.hash && lhs.threatType == rhs.threatType
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(hash)
+        hasher.combine(threatType)
+    }
 }
 
 enum SBCacheHitType {
@@ -23,7 +32,7 @@ struct SBCacheResult {
 
 class SafeBrowsingCache {
     private let cacheLock = NSRecursiveLock()
-    private var positiveCache = [String: [ThreatCache]]()
+    private var positiveCache = [String: Set<ThreatCache>]()
     private var negativeCache = [String: TimeInterval]()
     
     func find(_ hash: String) -> SBCacheResult {
@@ -33,7 +42,7 @@ class SafeBrowsingCache {
             var results = [ThreatType]()
             
             for threat in threats {
-                if Date().timeIntervalSince1970 > threat.time  {
+                if Date().timeIntervalSince1970 < threat.time {
                     results.append(threat.threatType)
                 } else {
                     return SBCacheResult(threats: [], cacheResult: .miss)
@@ -47,7 +56,7 @@ class SafeBrowsingCache {
         
         for i in 4..<32 {
             if let result = negativeCache[String(hash.prefix(i))] {
-                if Date().timeIntervalSince1970 > result {
+                if result < Date().timeIntervalSince1970 {
                     return SBCacheResult(threats: [], cacheResult: .negative)
                 }
             }
@@ -64,7 +73,7 @@ class SafeBrowsingCache {
                 return
             }
             
-            if fullHash.count != 32 {
+            if Data(base64Encoded: fullHash)?.count ?? 0 != 32 {
                 return
             }
             
@@ -72,7 +81,7 @@ class SafeBrowsingCache {
                 positiveCache[fullHash] = []
             }
             
-            positiveCache[fullHash]?.append(ThreatCache(time: Date().timeIntervalSince1970 + TimeInterval($0.cacheDuration), hash: fullHash, threatType: $0.threatType))
+            positiveCache[fullHash]?.insert(ThreatCache(time: Date().timeIntervalSince1970 + TimeInterval($0.cacheDuration), hash: fullHash, threatType: $0.threatType))
         })
         
         if let negative = response.negativeCacheDuration?.replacingOccurrences(of: "s", with: ""), let negativeCacheDuration = TimeInterval(negative) {

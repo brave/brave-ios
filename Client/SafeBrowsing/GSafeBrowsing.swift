@@ -8,6 +8,12 @@ import Shared
 
 private let log = Logger.browserLogger
 
+enum SafeBrowsingResult {
+    case safe
+    case dangerous
+    case unknown
+}
+
 class SafeBrowsingClient {
     private static let apiKey = "DUMMY_KEY"
     private static let maxBandwidth = 2048 //Maximum amount of results we can process per threat-type
@@ -18,6 +24,7 @@ class SafeBrowsingClient {
     private let baseURL = "https://safebrowsing.brave.com"
     private let session = URLSession(configuration: .ephemeral)
     private let database = SafeBrowsingDatabase()
+    private let cache = SafeBrowsingCache()
     
     public static let shared = SafeBrowsingClient()
     
@@ -31,20 +38,41 @@ class SafeBrowsingClient {
         }
     }
     
-    func find(_ hashes: [String], _ completion: @escaping (_ isSafe: Bool, Error?) -> Void) {
-        database.find(hashes, completion: { [weak self] discoveredHashes in
-            guard let self = self else { return completion(true, nil) }
-            
-            if discoveredHashes.isEmpty {
-                return DispatchQueue.global(qos: .background).async {
-                    completion(true, nil)
+    func find(_ hashes: [String], _ completion: @escaping (_ isSafe: SafeBrowsingResult, Error?) -> Void) {
+        let group = DispatchGroup()
+        var potentiallyBadHashes = [String]()
+        var definitelyBadHashes = [String]()
+        
+        for fullHash in hashes {
+            group.enter()
+            self.database.find(fullHash) { hash in
+                
+                if hash.isEmpty {
+                    return group.leave()
                 }
+                
+                switch self.cache.find(fullHash).cacheResult {
+                case .positive:
+                    definitelyBadHashes.append(fullHash)
+                    
+                case .negative:
+                    return group.leave()
+                    
+                case .miss:
+                    potentiallyBadHashes.append(hash)
+                }
+                
+                group.leave()
+            }
+        }
+        
+        group.notify(queue: .global(qos: .background)) {
+            if !self.database.canFind() {
+                return completion(potentiallyBadHashes.isEmpty && definitelyBadHashes.isEmpty ? .safe : .dangerous, nil)
             }
             
-            if !self.database.canFind() {
-                return DispatchQueue.global(qos: .background).async {
-                    completion(false, nil)
-                }
+            if potentiallyBadHashes.isEmpty {
+                return completion(definitelyBadHashes.isEmpty ? .safe : .dangerous, nil)
             }
             
             let clientInfo = ClientInfo(clientId: SafeBrowsingClient.clientId,
@@ -61,7 +89,7 @@ class SafeBrowsingClient {
             let threatInfo = ThreatInfo(threatTypes: threatTypes,
                                         platformTypes: platformTypes,
                                         threatEntryTypes: threatEntryTypes,
-                                        threatEntries: discoveredHashes.map {
+                                        threatEntries: potentiallyBadHashes.map {
                                             return ThreatEntry(hash: $0, url: nil, digest: nil)
                 }
             )
@@ -78,24 +106,33 @@ class SafeBrowsingClient {
                     
                     DispatchQueue.global(qos: .background).async {
                         if let error = error {
-                            return completion(false, error)
+                            return completion(definitelyBadHashes.isEmpty ? .unknown : .dangerous, error)
                         }
                         
                         if let response = response {
+                            self.cache.update(body, response)
+                            
                             if !response.matches.isEmpty {
-                                return completion(false, nil)
+                                let positiveResults = response.matches.compactMap({ match -> String? in
+                                    if let hash = match.threat.hash {
+                                        return hashes.contains(hash) ? hash : nil
+                                    }
+                                    return nil
+                                })
+                                
+                                definitelyBadHashes.append(contentsOf: positiveResults)
                             }
+                            return completion(definitelyBadHashes.isEmpty ? .safe : .dangerous, nil)
                         }
-                        
-                        completion(true, nil)
+                        return completion(definitelyBadHashes.isEmpty ? .unknown : .dangerous, nil)
                     }
                 }
             } catch {
                 DispatchQueue.global(qos: .background).async {
-                    completion(false, error)
+                    completion(definitelyBadHashes.isEmpty ? .unknown : .dangerous, error)
                 }
             }
-        })
+        }
     }
     
     func fetch(_ completion: @escaping (Error?) -> Void) {
@@ -168,6 +205,10 @@ class SafeBrowsingClient {
                     
                     self.database.scheduleUpdate { [weak self] in
                         self?.fetch(completion)
+                    }
+                    
+                    if !didError {
+                        self.cache.purge()
                     }
                     
                     return completion(didError ? SafeBrowsingError("Safe-Browsing: Error Updating Database") : nil)
