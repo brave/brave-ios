@@ -68,7 +68,11 @@ class SafeBrowsingClient {
         
         group.notify(queue: .global(qos: .background)) {
             if !self.database.canFind() {
-                return completion(potentiallyBadHashes.isEmpty && definitelyBadHashes.isEmpty ? .safe : .dangerous, nil)
+                if !potentiallyBadHashes.isEmpty {
+                    return completion(.unknown, nil)
+                }
+                
+                return completion(definitelyBadHashes.isEmpty ? .safe : .dangerous, nil)
             }
             
             if potentiallyBadHashes.isEmpty {
