@@ -5,7 +5,7 @@
 import Foundation
 
 private struct ThreatCache: Hashable, Equatable {
-    var time: TimeInterval
+    let expiryDate: TimeInterval
     let hash: String
     let threatType: ThreatType
     
@@ -42,7 +42,7 @@ class SafeBrowsingCache {
             var results = [ThreatType]()
             
             for threat in threats {
-                if Date().timeIntervalSince1970 < threat.time {
+                if Date().timeIntervalSince1970 < threat.expiryDate {
                     results.append(threat.threatType)
                 } else {
                     return SBCacheResult(threats: [], cacheResult: .miss)
@@ -81,7 +81,7 @@ class SafeBrowsingCache {
                 positiveCache[fullHash] = []
             }
             
-            positiveCache[fullHash]?.insert(ThreatCache(time: Date().timeIntervalSince1970 + TimeInterval($0.cacheDuration), hash: fullHash, threatType: $0.threatType))
+            positiveCache[fullHash]?.insert(ThreatCache(expiryDate: Date().timeIntervalSince1970 + TimeInterval($0.cacheDuration), hash: fullHash, threatType: $0.threatType))
         })
         
         if let negative = response.negativeCacheDuration?.replacingOccurrences(of: "s", with: ""), let negativeCacheDuration = TimeInterval(negative) {
@@ -101,7 +101,7 @@ class SafeBrowsingCache {
         
         for (fullHash, threats) in positiveCache {
             for threat in threats {
-                if Date().timeIntervalSince1970 > threat.time {
+                if Date().timeIntervalSince1970 > threat.expiryDate {
                     var shouldDelete = true
                     for i in 4..<32 {
                         if let negativeMatch = negativeCache[String(fullHash.prefix(i))] {
