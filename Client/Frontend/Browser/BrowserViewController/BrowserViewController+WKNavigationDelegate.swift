@@ -185,14 +185,13 @@ extension BrowserViewController: WKNavigationDelegate {
             // In order not to accidentally block websites due to an error, if it's status is unknown, we should possibly show a different web-page that lets them know we couldn't determine if the page was safe or not..
             //
             // For now, we only block for sure when it's dangerous..
+            // According to the spec, unknown is supposed to be treated as safe, no matter what.
+            // However, browsers like Microsoft Edge will let the user know it cannot determine if a URL is safe.
+            // We "could" possibly do the same if the state is unknown.
             if safeBrowsingResult == .dangerous {
                 safeBrowsing?.showMalwareWarningPage(forUrl: url, inWebView: webView)
                 decisionHandler(.cancel)
                 return
-            }
-            
-            if safeBrowsingResult == .unknown {
-                //Show something to let the user know we couldn't verify the url.. and to proceed with caution..
             }
         }
 
