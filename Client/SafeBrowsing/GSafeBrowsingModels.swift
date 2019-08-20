@@ -15,7 +15,7 @@ enum ThreatType: String, Codable, CaseIterable {
 enum PlatformType: String, Codable, CaseIterable {
     case unknown = "PLATFORM_TYPE_UNSPECIFIED"
     case ios = "IOS"
-    case `any` = "ANY_PLATFORM"
+    case any = "ANY_PLATFORM"
     case all = "ALL_PLATFORMS"
 }
 

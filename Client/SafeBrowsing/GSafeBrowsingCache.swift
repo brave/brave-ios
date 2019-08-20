@@ -118,7 +118,7 @@ class SafeBrowsingCache {
                 }
             }
             
-            if positiveCache[fullHash].flatMap({ $0 })?.isEmpty ?? true {
+            if positiveCache[fullHash].flatMap({ $0 })?.isEmpty == true {
                 positiveCache.removeValue(forKey: fullHash)
             }
         }

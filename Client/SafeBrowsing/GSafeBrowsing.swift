@@ -87,7 +87,7 @@ class SafeBrowsingClient {
                                              .unwantedSoftware,
                                              .potentiallyHarmfulApplication]
             
-            let platformTypes: [PlatformType] = [.any, .ios]
+            let platformTypes: [PlatformType] = [.ios]
             let threatEntryTypes: [ThreatEntryType] = [.url, .exe]
             
             let threatInfo = ThreatInfo(threatTypes: threatTypes,
@@ -155,12 +155,6 @@ class SafeBrowsingClient {
                                       deviceLocation: nil)
         
         let lists = [
-            ListUpdateRequest(threatType: .malware,
-                              platformType: .any,
-                              threatEntryType: .url,
-                              state: database.getState(.malware),
-                              constraints: constraints),
-            
             ListUpdateRequest(threatType: .malware,
                               platformType: .ios,
                               threatEntryType: .url,

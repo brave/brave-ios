@@ -69,8 +69,6 @@ class SafeBrowsingDatabase {
     private var updateTimer: Timer?
     
     init() {
-//        self.destroy()
-//        self.persistentContainer = self.create()
         do {
             let databaseInfoRequest: NSFetchRequest<ThreatDatabaseInfo> = ThreatDatabaseInfo.fetchRequest()
             databaseInfoRequest.fetchLimit = 1
@@ -193,7 +191,10 @@ class SafeBrowsingDatabase {
     }
     
     func find(_ hash: String, completion: @escaping (String) -> Void) {
-        let data = Data(base64Encoded: hash)!
+        guard let data = Data(base64Encoded: hash) else {
+            return completion("")
+        }
+        
         if data.count != Int(CC_SHA256_DIGEST_LENGTH) {
             return completion("") //ERROR Hash must be a full hash..
         }
@@ -234,7 +235,10 @@ class SafeBrowsingDatabase {
 
         hashes.forEach({ hash in
             group.enter()
-            let data = Data(base64Encoded: hash)!
+            guard let data = Data(base64Encoded: hash) else {
+                return group.leave()
+            }
+            
             if data.count != Int(CC_SHA256_DIGEST_LENGTH) {
                 return group.leave() //ERROR Hash must be a full hash..
             }
@@ -426,8 +430,8 @@ class SafeBrowsingDatabase {
     }
     
     private func calculateBackoffTime(_ numberOfRetries: Int16) -> Double {
-        let minutes = Double(1 << Int(numberOfRetries - 1)) * (15.0 * 60.0) * Double.random(in: 0...1) + 1
-        return min(minutes, 24 * 60)
+        let minutes = Double(1 << Int(numberOfRetries - 1)) * (15.0 * (Double.random(in: 0...1) + 1))
+        return min(minutes, 24 * 60) * 60
     }
     
     private func updateDatabaseInfo(_ completion: (Error?) -> Void) {
