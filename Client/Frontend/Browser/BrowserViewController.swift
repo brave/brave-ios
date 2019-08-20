@@ -2940,19 +2940,7 @@ extension BrowserViewController: Themeable {
     func applyTheme(_ theme: Theme) {
         styleChildren(theme: theme)
         
-        // `appearance` modifications do not seem to fully reset UI components.
-        UINavigationBar.appearance().tintColor = theme.colors.accent
-        (UISwitch.appearance() as UISwitch).do {
-            $0.tintColor = theme.colors.accent
-            $0.onTintColor = theme.colors.accent
-        }
-        
-        UITableView.appearance().appearanceBackgroundColor = theme.colors.addressBar
-        UITableView.appearance().appearanceSeparatorColor = theme.colors.border.withAlphaComponent(theme.colors.transparencies.borderAlpha)
-        
-        UILabel.appearance(whenContainedInInstancesOf: [UITableViewCell.self]).appearanceTextColor = theme.colors.tints.home
-        
-        UITableViewCell.appearance().backgroundColor = theme.colors.home
+        theme.applyAppearanceProperties()
 
         // TODO: Theme: Maybe just set to clear color?
         statusBarOverlay.backgroundColor = topToolbar.backgroundColor

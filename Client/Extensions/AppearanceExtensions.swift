@@ -4,6 +4,27 @@
 
 import Foundation
 
+extension Theme {
+    func applyAppearanceProperties() {
+        
+        // `appearance` modifications do not seem to fully reset UI components.
+        UINavigationBar.appearance().tintColor = colors.accent
+        (UISwitch.appearance() as UISwitch).do {
+            $0.tintColor = colors.accent
+            $0.onTintColor = colors.accent
+        }
+        
+        UITableView.appearance().appearanceBackgroundColor = colors.addressBar
+        UITableView.appearance().appearanceSeparatorColor = colors.border.withAlphaComponent(colors.transparencies.borderAlpha)
+        UITableViewCell.appearance().tintColor = colors.accent
+        
+        UILabel.appearance(whenContainedInInstancesOf: [UITableViewCell.self]).appearanceTextColor = colors.tints.home
+        
+        UITableViewCell.appearance().backgroundColor = colors.home
+        
+    }
+}
+
 extension UILabel {
     @objc dynamic var appearanceTextColor: UIColor! {
         get { return self.textColor }
