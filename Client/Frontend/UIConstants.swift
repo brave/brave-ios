@@ -42,6 +42,7 @@ extension UIColor {
     }
 }
 
+// TODO: Theme: Delete most of this
 public struct UIConstants {
     static let AboutHomePage = URL(string: "\(WebServer.sharedInstance.base)/about/home/")!
 

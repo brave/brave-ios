@@ -86,8 +86,6 @@ class SettingsViewController: TableViewController {
         self.tabManager = tabManager
         
         super.init(style: .grouped)
-        
-        UITableViewCell.appearance().tintColor = BraveUX.BraveOrange
     }
     
     @available(*, unavailable)
@@ -96,14 +94,15 @@ class SettingsViewController: TableViewController {
     }
     
     override func viewDidLoad() {
-        
         navigationItem.title = Strings.Settings
-        
         tableView.accessibilityIdentifier = "SettingsViewController.tableView"
-        tableView.separatorColor = UIConstants.TableViewSeparatorColor
-        tableView.backgroundColor = UIConstants.TableViewHeaderBackgroundColor
-
         dataSource.sections = sections
+        
+        applyTheme(theme)
+    }
+    
+    private var theme: Theme {
+        Theme.of(tabManager.selectedTab)
     }
     
     private var sections: [Section] {
@@ -180,8 +179,7 @@ class SettingsViewController: TableViewController {
                 optionChanged: { [unowned self] _, option in
                     Preferences.General.themeNormalMode.value = option.rawValue
                     reloadCell(row, option.displayString)
-                    
-                    // Update theme!
+                    self.applyTheme(self.theme)
                 }
             )
             optionsViewController.headerText = Strings.Normal_Mode_Theme
@@ -431,6 +429,17 @@ class SettingsViewController: TableViewController {
                 switchView.setOn(on, animated: true)
             }
         }
+    }
+}
+
+extension TableViewController: Themeable {
+    func applyTheme(_ theme: Theme) {
+        styleChildren(theme: theme)
+        tableView.reloadData()
+
+        // `UINavigationBar`'s `tintColor` set via `apperance()`, not impact
+        // exiting menus, so setting explicitly.
+        navigationController?.navigationBar.tintColor = theme.colors.accent
     }
 }
 

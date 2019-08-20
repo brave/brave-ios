@@ -262,13 +262,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         }
         
         AdblockResourceDownloader.shared.startLoading()
-
-        UINavigationBar.appearance().tintColor = BraveUX.BraveOrange
-      
-        (UISwitch.appearance() as UISwitch).do {
-            $0.tintColor = BraveUX.SwitchTintColor
-            $0.onTintColor = BraveUX.BraveOrange
-        }
       
         return shouldPerformAdditionalDelegateHandling
     }
