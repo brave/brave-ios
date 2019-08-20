@@ -339,5 +339,6 @@ extension TabsBarViewController: Themeable {
         plusButton.tintColor = theme.colors.tints.header
         bottomLine.backgroundColor = theme.colors.border.withAlphaComponent(theme.colors.transparencies.borderAlpha)
         collectionView.backgroundColor = view.backgroundColor
+        collectionView.reloadData()
     }
 }
