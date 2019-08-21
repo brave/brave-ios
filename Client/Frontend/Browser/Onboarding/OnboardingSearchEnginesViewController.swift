@@ -10,6 +10,10 @@ private let log = Logger.browserLogger
 
 class OnboardingSearchEnginesViewController: OnboardingViewController {
     
+    private struct UX {
+        static let spaceBetweenRows: CGFloat = 8
+    }
+    
     let searchEngines: SearchEngines
     
     private var contentView: View {
@@ -38,7 +42,7 @@ class OnboardingSearchEnginesViewController: OnboardingViewController {
     }
     
     @objc override func continueTapped() {
-        guard let selectedRow = contentView.searchEnginesTable.indexPathForSelectedRow?.row,
+        guard let selectedRow = contentView.searchEnginesTable.indexPathForSelectedRow?.section,
             let selectedEngine = searchEngines.orderedEngines[safe: selectedRow]?.shortName else {
                 return
             log.error("Failed to unwrap selected row or selected engine.")
@@ -56,19 +60,35 @@ extension OnboardingSearchEnginesViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return SearchEngineCell.preferredHeight
     }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return UX.spaceBetweenRows
+    }
+    
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let headerView = UIView()
+        headerView.backgroundColor = UIColor.clear
+        return headerView
+    }
 }
 
 extension OnboardingSearchEnginesViewController: UITableViewDataSource {
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    // Sections are used for data instead of rows.
+    // This gives us an easy way to add spacing between each row.
+    func numberOfSections(in tableView: UITableView) -> Int {
         return searchEngines.orderedEngines.count
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 1
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = SearchEngineCell()
         
-        guard let searchEngine = searchEngines.orderedEngines[safe: indexPath.row] else {
-            log.error("Can't find search engine at index: \(indexPath.row)")
+        guard let searchEngine = searchEngines.orderedEngines[safe: indexPath.section] else {
+            log.error("Can't find search engine at index: \(indexPath.section)")
             assertionFailure()
             return cell
         }

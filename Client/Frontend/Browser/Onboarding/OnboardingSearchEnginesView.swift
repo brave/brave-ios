@@ -9,14 +9,15 @@ import BraveShared
 extension OnboardingSearchEnginesViewController {
     
     private struct UX {
-        static let topInset: CGFloat = 64
-        static let contentInset: CGFloat = 16
+        static let topInset: CGFloat = 48
+        static let contentInset: CGFloat = 25
+        static let logoSize: CGFloat = 100
         
         struct SearchEngineCell {
-            static let rowHeight: CGFloat = 64
+            static let rowHeight: CGFloat = 54
             static let imageSize: CGFloat = 32
-            static let cornerRadius: CGFloat = 15
-            static let selectedBackgroundColor = #colorLiteral(red: 0.8431372549, green: 0.8431372549, blue: 0.8965459466, alpha: 1)
+            static let cornerRadius: CGFloat = 8
+            static let selectedBackgroundColor = #colorLiteral(red: 0.9411764706, green: 0.9450980392, blue: 1, alpha: 1)
             static let deselectedBackgroundColor: UIColor = .white
         }
     }
@@ -29,8 +30,9 @@ extension OnboardingSearchEnginesViewController {
             $0.alwaysBounceVertical = false
         }
         
-        let continueButton = CommonViews.primaryButton().then {
-            $0.accessibilityIdentifier = "OnboardingSearchEnginesViewController.ContinueButton"
+        let continueButton = CommonViews.primaryButton(text: Strings.OBSaveButton).then {
+            $0.accessibilityIdentifier = "OnboardingSearchEnginesViewController.SaveButton"
+            $0.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
         }
         
         let skipButton = CommonViews.secondaryButton().then {
@@ -40,7 +42,7 @@ extension OnboardingSearchEnginesViewController {
         private let mainStackView = UIStackView().then {
             $0.axis = .vertical
             $0.alignment = .fill
-            $0.spacing = 16
+            $0.spacing = 20
             $0.translatesAutoresizingMaskIntoConstraints = false
         }
         
@@ -51,21 +53,29 @@ extension OnboardingSearchEnginesViewController {
         private let titleStackView = UIStackView().then { stackView in
             stackView.axis = .vertical
             
-            let titlePrimary = CommonViews.primaryText(Strings.OBSearchEngineTitle)
-            let titleSecondary = CommonViews.secondaryText(Strings.OBSearchEngineDetail)
+            let titlePrimary = CommonViews.primaryText(Strings.OBSearchEngineTitle).then {
+                $0.font = UIFont.systemFont(ofSize: 20, weight: UIFont.Weight.semibold)
+            }
+            
+            let titleSecondary = CommonViews.secondaryText(Strings.OBSearchEngineDetail).then {
+                $0.font = UIFont.systemFont(ofSize: 16, weight: UIFont.Weight.medium)
+            }
             
             [titlePrimary, titleSecondary].forEach(stackView.addArrangedSubview(_:))
         }
         
         private let buttonsStackView = UIStackView().then {
             $0.distribution = .equalCentering
+            $0.alignment = .center
         }
         
         init() {
             super.init(frame: .zero)
             backgroundColor = .white
             
-            [skipButton, continueButton, UIView.spacer(.horizontal, amount: 0)]
+            let spacer = UIView()
+            
+            [skipButton, continueButton, spacer]
                 .forEach(buttonsStackView.addArrangedSubview(_:))
             
             [braveLogo, titleStackView, searchEnginesTable, buttonsStackView]
@@ -79,6 +89,15 @@ extension OnboardingSearchEnginesViewController {
                 $0.leading.equalTo(self.safeArea.leading).inset(UX.contentInset)
                 $0.trailing.equalTo(self.safeArea.trailing).inset(UX.contentInset)
                 $0.bottom.equalTo(self.safeArea.bottom).inset(UX.contentInset)
+            }
+            
+            braveLogo.snp.makeConstraints {
+                $0.height.equalTo(UX.logoSize)
+            }
+            
+            // Make width the same as skip button to make save button always centered.
+            spacer.snp.makeConstraints {
+                $0.width.equalTo(skipButton)
             }
         }
         
@@ -116,6 +135,8 @@ extension OnboardingSearchEnginesViewController {
             
             backgroundColor = selected ?
                 UX.SearchEngineCell.selectedBackgroundColor : UX.SearchEngineCell.deselectedBackgroundColor
+            
+            textLabel?.font = UIFont.systemFont(ofSize: 16, weight: UIFont.Weight.medium)
         }
         
         override func layoutSubviews() {

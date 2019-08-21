@@ -35,7 +35,7 @@ extension OnboardingShieldsViewController {
         
         private let descriptionView = UIView().then {
             $0.backgroundColor = .white
-            $0.layer.cornerRadius = 20
+            $0.layer.cornerRadius = 12
             $0.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         }
         
@@ -66,9 +66,11 @@ extension OnboardingShieldsViewController {
         init() {
             super.init(frame: .zero)
             
+            let spacer = UIView()
+            
             [imageView, descriptionView].forEach(mainStackView.addArrangedSubview(_:))
             
-            [skipButton, continueButton, UIView.spacer(.horizontal, amount: 0)]
+            [skipButton, continueButton, spacer]
                 .forEach(buttonsStackView.addArrangedSubview(_:))
             
             [textStackView, buttonsStackView].forEach(descriptionStackView.addArrangedSubview(_:))
@@ -86,6 +88,11 @@ extension OnboardingShieldsViewController {
             descriptionStackView.snp.makeConstraints {
                 $0.edges.equalToSuperview().inset(UX.descriptionContentInset)
             }
+            
+            // Make width the same as skip button to make continue button always centered.
+            spacer.snp.makeConstraints {
+                $0.width.equalTo(skipButton)
+            }
         }
         
         @available(*, unavailable)
@@ -100,7 +107,7 @@ private extension String {
         if let firstWord = self.components(separatedBy: " ").first {
             if let range = self.range(of: firstWord) {
                 let nsRange = NSRange(range, in: self)
-                let font = UIFont.systemFont(ofSize: font.pointSize, weight: UIFont.Weight.semibold)
+                let font = UIFont.systemFont(ofSize: font.pointSize, weight: UIFont.Weight.bold)
                 
                 mutableDescriptionText.addAttribute(NSAttributedString.Key.font, value: font, range: nsRange)
             }
