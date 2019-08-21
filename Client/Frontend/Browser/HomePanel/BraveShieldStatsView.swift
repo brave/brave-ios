@@ -71,8 +71,9 @@ class BraveShieldStatsView: UIView, Themeable {
     }
     
     @objc private func update() {
-        adsStatView.stat = (BraveGlobalShieldStats.shared.adblock + BraveGlobalShieldStats.shared.trackingProtection).toLocaleString() ?? "0"
-        httpsStatView.stat = BraveGlobalShieldStats.shared.httpse.toLocaleString() ?? "0"
+        BraveGlobalShieldStats.shared.httpse = 12345
+        adsStatView.stat = (BraveGlobalShieldStats.shared.adblock + BraveGlobalShieldStats.shared.trackingProtection).decimalFormattedString ?? "0"
+        httpsStatView.stat = BraveGlobalShieldStats.shared.httpse.decimalFormattedString ?? "0"
         timeStatView.stat = timeSaved
     }
     
@@ -103,10 +104,10 @@ class BraveShieldStatsView: UIView, Themeable {
                 text = Strings.ShieldsTimeStatsDays
             }
             
-            if let counterLocaleStr = Int(counter).toLocaleString() {
+            if let counterLocaleStr = Int(counter).decimalFormattedString {
                 return counterLocaleStr + text
             } else {
-                return "0" + Strings.ShieldsTimeStatsSeconds     // If toLocaleString() returns nil, default to "0s"
+                return "0" + Strings.ShieldsTimeStatsSeconds     // If decimalFormattedString returns nil, default to "0s"
             }
         }
     }
@@ -173,11 +174,11 @@ class StatView: UIView {
 }
 
 
-extension BinaryInteger {
-    func toLocaleString() -> String? {
+fileprivate extension Int {
+    var decimalFormattedString: String? {
         let numberFormatter = NumberFormatter()
         numberFormatter.numberStyle = NumberFormatter.Style.decimal
         numberFormatter.locale = NSLocale.current
-        return numberFormatter.string(from: self as! NSNumber)
+        return numberFormatter.string(from: self as NSNumber)
     }
 }
