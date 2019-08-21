@@ -103,12 +103,10 @@ class BraveShieldStatsView: UIView, Themeable {
                 text = Strings.ShieldsTimeStatsDays
             }
             
-
             if let counterLocaleStr = Int(counter).decimalFormattedString {
                 return counterLocaleStr + text
             } else {
                 return "0" + Strings.ShieldsTimeStatsSeconds     // If decimalFormattedString returns nil, default to "0s"
-
             }
         }
     }
@@ -173,7 +171,6 @@ class StatView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 }
-
 
 fileprivate extension Int {
     var decimalFormattedString: String? {
