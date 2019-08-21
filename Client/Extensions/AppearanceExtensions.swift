@@ -7,16 +7,16 @@ import Foundation
 extension Theme {
     func applyAppearanceProperties() {
         
-        // `appearance` modifications do not seem to fully reset UI components.
-        UINavigationBar.appearance().do {
+        // `appearance` modifications only impact UI items not current visible
+        
+        let bars = [UINavigationBar.appearance(), UIToolbar.appearance()]
+        bars.forEach {
             $0.tintColor = colors.accent
-            $0.backgroundColor = colors.header
+            $0.backgroundColor = colors.footer
         }
         
-        (UISwitch.appearance() as UISwitch).do {
-            $0.tintColor = colors.accent
-            $0.onTintColor = colors.accent
-        }
+        UISwitch.appearance().tintColor = colors.accent
+        UISwitch.appearance().onTintColor = colors.accent
         
         UITableView.appearance().appearanceBackgroundColor = colors.addressBar
         UITableView.appearance().appearanceSeparatorColor = colors.border.withAlphaComponent(colors.transparencies.borderAlpha)
@@ -25,8 +25,6 @@ extension Theme {
         UITableViewCell.appearance().backgroundColor = colors.home
 
         UILabel.appearance(whenContainedInInstancesOf: [UITableViewCell.self]).appearanceTextColor = colors.tints.home
-        
-        
     }
 }
 
