@@ -8,7 +8,11 @@ extension Theme {
     func applyAppearanceProperties() {
         
         // `appearance` modifications do not seem to fully reset UI components.
-        UINavigationBar.appearance().tintColor = colors.accent
+        UINavigationBar.appearance().do {
+            $0.tintColor = colors.accent
+            $0.backgroundColor = colors.header
+        }
+        
         (UISwitch.appearance() as UISwitch).do {
             $0.tintColor = colors.accent
             $0.onTintColor = colors.accent
@@ -16,11 +20,12 @@ extension Theme {
         
         UITableView.appearance().appearanceBackgroundColor = colors.addressBar
         UITableView.appearance().appearanceSeparatorColor = colors.border.withAlphaComponent(colors.transparencies.borderAlpha)
-        UITableViewCell.appearance().tintColor = colors.accent
         
+        UITableViewCell.appearance().tintColor = colors.accent
+        UITableViewCell.appearance().backgroundColor = colors.home
+
         UILabel.appearance(whenContainedInInstancesOf: [UITableViewCell.self]).appearanceTextColor = colors.tints.home
         
-        UITableViewCell.appearance().backgroundColor = colors.home
         
     }
 }

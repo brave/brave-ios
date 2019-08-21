@@ -439,6 +439,7 @@ extension TableViewController: Themeable {
 
         // `UINavigationBar`'s `tintColor` set via `apperance()`, not impact
         // exiting menus, so setting explicitly.
+        navigationController?.navigationBar.backgroundColor = theme.colors.header
         navigationController?.navigationBar.tintColor = theme.colors.accent
     }
 }
