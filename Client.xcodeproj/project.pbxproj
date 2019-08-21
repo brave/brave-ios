@@ -54,6 +54,7 @@
 		0A53F3E721E6560A0086E80C /* InMemoryDataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A53F3E621E6560A0086E80C /* InMemoryDataController.swift */; };
 		0A6112AC230B00E7001BBC45 /* OnboardingNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A6112AB230B00E7001BBC45 /* OnboardingNavigationController.swift */; };
 		0A6112BD230B4306001BBC45 /* OnboardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A6112BC230B4306001BBC45 /* OnboardingViewController.swift */; };
+		0A6E0966230E05BC00AB3F19 /* onboarding-shields.json in Resources */ = {isa = PBXBuildFile; fileRef = 0A6E095E230E05BC00AB3F19 /* onboarding-shields.json */; };
 		0A771D35218C8FDC00336E0D /* Bookmark+Sync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A771D34218C8FDC00336E0D /* Bookmark+Sync.swift */; };
 		0A7B5D6722689C5D00AADF22 /* AddEditHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7B5D6622689C5D00AADF22 /* AddEditHeaderView.swift */; };
 		0A7B5D702269E72C00AADF22 /* BookmarkSaveLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7B5D6F2269E72C00AADF22 /* BookmarkSaveLocation.swift */; };
@@ -1202,6 +1203,7 @@
 		0A6112AB230B00E7001BBC45 /* OnboardingNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingNavigationController.swift; sourceTree = "<group>"; };
 		0A6112BC230B4306001BBC45 /* OnboardingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewController.swift; sourceTree = "<group>"; };
 		0A6231E32121F761007B429B /* UnitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = UnitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		0A6E095E230E05BC00AB3F19 /* onboarding-shields.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "onboarding-shields.json"; sourceTree = "<group>"; };
 		0A771D34218C8FDC00336E0D /* Bookmark+Sync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bookmark+Sync.swift"; sourceTree = "<group>"; };
 		0A7B5D6622689C5D00AADF22 /* AddEditHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEditHeaderView.swift; sourceTree = "<group>"; };
 		0A7B5D6F2269E72C00AADF22 /* BookmarkSaveLocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkSaveLocation.swift; sourceTree = "<group>"; };
@@ -2504,6 +2506,7 @@
 				0A3C789E23056C910022F6D8 /* OnboardingSearchEnginesView.swift */,
 				0A3C78A0230597DA0022F6D8 /* OnboardingShieldsViewController.swift */,
 				0A3C78A2230597F10022F6D8 /* OnboardingShieldsView.swift */,
+				0A6E095E230E05BC00AB3F19 /* onboarding-shields.json */,
 			);
 			path = Onboarding;
 			sourceTree = "<group>";
@@ -5187,6 +5190,7 @@
 				F35B8D2B1D6380EA008E3D61 /* SessionRestore.html in Resources */,
 				5E4845C022DE381200372022 /* WindowRenderHelper.js in Resources */,
 				3BC659591E5BA505006D560F /* top_sites.json in Resources */,
+				0A6E0966230E05BC00AB3F19 /* onboarding-shields.json in Resources */,
 				E4B7B7631A793CF20022C5E0 /* CharisSILI.ttf in Resources */,
 				E4CD9F541A71506400318571 /* Reader.html in Resources */,
 				C6345ECB2113B3A000CFB983 /* SearchPlugins in Resources */,

@@ -5,6 +5,7 @@
 import Foundation
 import Shared
 import BraveShared
+import Lottie
 
 extension OnboardingShieldsViewController {
     
@@ -29,8 +30,11 @@ extension OnboardingShieldsViewController {
             $0.spacing = UX.negativeSpacing
         }
         
-        private let imageView = UIImageView().then {
-            $0.backgroundColor = #colorLiteral(red: 0.1176470588, green: 0.1176470588, blue: 0.1568627451, alpha: 1)
+        let imageView = AnimationView(name: "onboarding-shields").then {
+            $0.contentMode = .scaleAspectFit
+            $0.backgroundColor = #colorLiteral(red: 0.1176470588, green: 0.1254901961, blue: 0.1607843137, alpha: 1)
+            $0.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
+            $0.play()
         }
         
         private let descriptionView = UIView().then {
