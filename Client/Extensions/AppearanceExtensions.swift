@@ -18,18 +18,31 @@ extension Theme {
         UISwitch.appearance().tintColor = colors.accent
         UISwitch.appearance().onTintColor = colors.accent
         
+        // This is a subtle "abuse" of theme colors
+        // In order to properly style things, `addressBar` has been utilized to offer contrast to `home`/`header`, as many of the themes utilize similar colors.
+        // These used colors have been mapped, primarily for table usage, and to understand how table colors relate to each other.
+        // Any change to a single tableView property that currently uses one of these will probably have odd behavior and must be thoroughly tested
+        
+        /// Used as color a table will use as the base (e.g. background)
+        let tablePrimaryColor = colors.header
+        /// Used to augment `tablePrimaryColor` above
+        let tableSecondaryColor = colors.addressBar
+        
         // Will become the color for whatever in the table is .clear
         // In some cases this is the header, footer, cell, or a combination of them.
         // Be careful adjusting colors here, and make sure impact is well known
-        UITableView.appearance().appearanceBackgroundColor = colors.addressBar
+        UITableView.appearance().appearanceBackgroundColor = tablePrimaryColor
         UITableView.appearance().appearanceSeparatorColor = colors.border.withAlphaComponent(colors.transparencies.borderAlpha)
         
         UITableViewCell.appearance().tintColor = colors.accent
-        UITableViewCell.appearance().backgroundColor = colors.home
+        UITableViewCell.appearance().backgroundColor = tableSecondaryColor
 
-        UIView.appearance(whenContainedInInstancesOf: [UITableViewHeaderFooterView.self]).appearanceBackgroundColor = colors.addressBar
+        UIView.appearance(whenContainedInInstancesOf: [UITableViewHeaderFooterView.self]).appearanceBackgroundColor = tablePrimaryColor
         
         UILabel.appearance(whenContainedInInstancesOf: [UITableView.self]).appearanceTextColor = colors.tints.home
+        
+        AddEditHeaderView.appearance().appearanceBackgroundColor = tableSecondaryColor
+        UITextField.appearance().appearanceTextColor = colors.tints.home
     }
 }
 
@@ -51,6 +64,13 @@ extension UIView {
     @objc dynamic var appearanceBackgroundColor: UIColor? {
         get { return self.backgroundColor }
         set {  self.backgroundColor = newValue }
+    }
+}
+
+extension UITextField {
+    @objc dynamic var appearanceTextColor: UIColor? {
+        get { return self.textColor }
+        set {  self.textColor = newValue }
     }
 }
 
