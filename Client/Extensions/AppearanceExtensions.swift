@@ -18,13 +18,18 @@ extension Theme {
         UISwitch.appearance().tintColor = colors.accent
         UISwitch.appearance().onTintColor = colors.accent
         
+        // Will become the color for whatever in the table is .clear
+        // In some cases this is the header, footer, cell, or a combination of them.
+        // Be careful adjusting colors here, and make sure impact is well known
         UITableView.appearance().appearanceBackgroundColor = colors.addressBar
         UITableView.appearance().appearanceSeparatorColor = colors.border.withAlphaComponent(colors.transparencies.borderAlpha)
         
         UITableViewCell.appearance().tintColor = colors.accent
         UITableViewCell.appearance().backgroundColor = colors.home
 
-        UILabel.appearance(whenContainedInInstancesOf: [UITableViewCell.self]).appearanceTextColor = colors.tints.home
+        UIView.appearance(whenContainedInInstancesOf: [UITableViewHeaderFooterView.self]).appearanceBackgroundColor = colors.addressBar
+        
+        UILabel.appearance(whenContainedInInstancesOf: [UITableView.self]).appearanceTextColor = colors.tints.home
     }
 }
 
@@ -36,14 +41,16 @@ extension UILabel {
 }
 
 extension UITableView {
-    @objc dynamic var appearanceBackgroundColor: UIColor? {
-        get { return self.backgroundColor }
-        set {  self.backgroundColor = newValue }
-    }
-    
     @objc dynamic var appearanceSeparatorColor: UIColor? {
         get { return self.separatorColor }
         set {  self.separatorColor = newValue }
+    }
+}
+
+extension UIView {
+    @objc dynamic var appearanceBackgroundColor: UIColor? {
+        get { return self.backgroundColor }
+        set {  self.backgroundColor = newValue }
     }
 }
 
