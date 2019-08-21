@@ -8,7 +8,7 @@ extension Bundle {
     /// Get a string from the info plist dictionary for a given key
     public func infoDictionaryString(forKey key: String) -> String {
         guard let value = object(forInfoDictionaryKey: key) as? String else {
-            if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil {
+            if AppConstants.IsRunningTest {
                 /// Using dummy info dictionary while running tests, without host app set.
                 return "com.brave.tests"
             }
