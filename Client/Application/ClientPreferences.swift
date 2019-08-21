@@ -50,9 +50,9 @@ extension Preferences {
         ///
         /// Currently unused.
         static let showClipboardBar = Option<Bool>(key: "general.show-clipboard-bar", default: false)
-        /// Whether or not user onboarding has completed.
+        /// Whether or not new user onboarding has completed.
         /// User skipping onboarding counts as completed too.
-        static let onboardingCompleted = Option<Bool>(key: "general.onboarding-completed", default: false)
+        static let basicOnboardingCompleted = Option<Bool>(key: "general.basic-onboarding-completed", default: false)
     }
     final class Search {
         /// Whether or not to show suggestions while the user types

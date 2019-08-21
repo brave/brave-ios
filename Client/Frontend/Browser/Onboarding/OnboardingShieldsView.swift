@@ -51,7 +51,7 @@ extension OnboardingShieldsViewController {
             let titleLabel = CommonViews.primaryText(Strings.OBShieldsTitle)
             
             let descriptionLabel = CommonViews.secondaryText("").then {
-                $0.attributedText = Strings.OBShieldsDetail.makeFirstWordBold(with: $0.font)
+                $0.attributedText = Strings.OBShieldsDetail.boldFirstWord(with: $0.font)
             }
             
             [titleLabel, descriptionLabel].forEach {
@@ -101,7 +101,7 @@ extension OnboardingShieldsViewController {
 }
 
 private extension String {
-    func makeFirstWordBold(with font: UIFont) -> NSMutableAttributedString {
+    func boldFirstWord(with font: UIFont) -> NSMutableAttributedString {
         let mutableDescriptionText = NSMutableAttributedString(string: self)
         
         if let firstWord = self.components(separatedBy: " ").first {

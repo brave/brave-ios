@@ -241,6 +241,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         AutocompleteTextField.appearance().semanticContentAttribute = .forceLeftToRight
         
         let isFirstLaunch = Preferences.General.isFirstLaunch.value
+        // New user onboarding shouldn't be shown for existing users.
+        Preferences.General.basicOnboardingCompleted.value = !isFirstLaunch
         Preferences.General.isFirstLaunch.value = false
         
         if isFirstLaunch {

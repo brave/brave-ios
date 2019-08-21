@@ -627,13 +627,14 @@ class BrowserViewController: UIViewController {
     }
     
     func presentOnboardingIntro() {
-        if Preferences.General.onboardingCompleted.value { return }
-        
-        guard let onboarding = OnboardingNavigationController(profile: profile) else { return }
-        onboarding.onboardingDelegate = self
-        
-        
-        present(onboarding, animated: true)
+        if !Preferences.General.basicOnboardingCompleted.value {
+            guard let onboarding = OnboardingNavigationController(profile: profile,
+                                                              onboardingType: .newUser) else { return }
+            onboarding.onboardingDelegate = self
+            present(onboarding, animated: true)
+        } else {
+            // Existing users onboarding TBD
+        }
     }
 
     // THe logic for shouldShowWhatsNewTab is as follows: If we do not have the LatestAppVersionProfileKey in
@@ -3120,7 +3121,12 @@ extension BrowserViewController {
 
 extension BrowserViewController: OnboardingControllerDelegate {
     func onboardingCompleted(_ onboardingController: OnboardingNavigationController) {
-        Preferences.General.onboardingCompleted.value = true
+        switch onboardingController.onboardingType {
+        case .newUser:
+            Preferences.General.basicOnboardingCompleted.value = true
+        default: break
+        }
+        
         onboardingController.dismiss(animated: true)
     }
 }

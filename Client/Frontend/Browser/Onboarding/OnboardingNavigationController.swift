@@ -28,10 +28,25 @@ class OnboardingNavigationController: UINavigationController {
     
     weak var onboardingDelegate: OnboardingControllerDelegate?
     
-    enum Screens: CaseIterable {
+    enum OnboardingType {
+        case newUser
+        case existingUser
+        
+        /// Returns a list of onboarding screens for given type.
+        /// Screens should be sorted in order of which they are presented to the user.
+        fileprivate var screens: [Screens] {
+            switch self {
+            case .newUser: return [.searchEnginePicker, .shieldsInfo, /* .rewardsInfo, .adsInfo */]
+            case .existingUser: return [/* .rewardsInfo, .adsInfo */]
+            }
+        }
+    }
+    
+    fileprivate enum Screens {
         case searchEnginePicker
         case shieldsInfo
         
+        /// Returns new ViewController associated with the screen type
         func viewController(with profile: Profile) -> OnboardingViewController {
             switch self {
             case .searchEnginePicker:
@@ -49,19 +64,19 @@ class OnboardingNavigationController: UINavigationController {
         }
     }
     
-    init?(profile: Profile) {
-        guard let firstScreen = Screens.allCases.first else { return nil }
+    let onboardingType: OnboardingType
+    
+    init?(profile: Profile, onboardingType: OnboardingType) {
+        guard let firstScreen = onboardingType.screens.first else { return nil }
+        self.onboardingType = onboardingType
         
         let firstViewController = firstScreen.viewController(with: profile)
         super.init(rootViewController: firstViewController)
         firstViewController.delegate = self
         
         isNavigationBarHidden = true
-        if UIDevice.current.userInterfaceIdiom == .phone {
-            modalPresentationStyle = .fullScreen
-        } else {
-            modalPresentationStyle = .formSheet
-        }
+        
+        modalPresentationStyle = UIDevice.current.userInterfaceIdiom == .phone ? .fullScreen : .formSheet
         
         if #available(iOS 13.0, *) {
             // Prevent dismissing the modal by swipe
@@ -72,17 +87,13 @@ class OnboardingNavigationController: UINavigationController {
     
     @available(*, unavailable)
     required init(coder: NSCoder) { fatalError() }
-    
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-    }
 }
 
 extension OnboardingNavigationController: Onboardable {
     
     func presentNextScreen(current: OnboardingViewController) {
-        let allScreens = Screens.allCases
-        let index = allScreens.map { $0.type }.firstIndex(where: { $0 == type(of: current) })
+        let allScreens = onboardingType.screens
+        let index = allScreens.firstIndex { $0.type == type(of: current) }
         
         guard let nextIndex = index?.advanced(by: 1),
             let nextScreen = allScreens[safe: nextIndex]?.viewController(with: current.profile) else {
