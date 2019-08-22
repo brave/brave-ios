@@ -437,10 +437,10 @@ extension TableViewController: Themeable {
         styleChildren(theme: theme)
         tableView.reloadData()
 
-        // `UINavigationBar`'s `tintColor` set via `apperance()`, not impact
+        //  View manipulations done via `apperance()` do not impact existing UI, so need to adjust manually
         // exiting menus, so setting explicitly.
-        navigationController?.navigationBar.backgroundColor = theme.colors.header
-        navigationController?.navigationBar.tintColor = theme.colors.accent
+        navigationController?.navigationBar.tintColor = UINavigationBar.appearance().tintColor
+        navigationController?.navigationBar.barTintColor = UINavigationBar.appearance().appearanceBarTintColor
     }
 }
 

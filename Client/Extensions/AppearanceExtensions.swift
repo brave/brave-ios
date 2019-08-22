@@ -9,11 +9,11 @@ extension Theme {
         
         // `appearance` modifications only impact UI items not current visible
         
-        let bars = [UINavigationBar.appearance(), UIToolbar.appearance()]
-        bars.forEach {
-            $0.tintColor = colors.accent
-            $0.backgroundColor = colors.footer
-        }
+        UIToolbar.appearance().tintColor = colors.accent
+        UIToolbar.appearance().backgroundColor = colors.footer
+        
+        UINavigationBar.appearance().tintColor = colors.accent
+        UINavigationBar.appearance().appearanceBarTintColor = colors.header
         
         UISwitch.appearance().tintColor = colors.accent
         UISwitch.appearance().onTintColor = colors.accent
@@ -43,34 +43,62 @@ extension Theme {
         
         AddEditHeaderView.appearance().appearanceBackgroundColor = tableSecondaryColor
         UITextField.appearance().appearanceTextColor = colors.tints.home
+        
+        if #available(iOS 13.0, *) {
+            UIView.appearance().appearanceOverrideUserInterfaceStyle = isDark ? .dark : .light
+        }
     }
 }
 
 extension UILabel {
     @objc dynamic var appearanceTextColor: UIColor! {
         get { return self.textColor }
-        set {  self.textColor = newValue }
+        set { self.textColor = newValue }
     }
 }
 
 extension UITableView {
     @objc dynamic var appearanceSeparatorColor: UIColor? {
         get { return self.separatorColor }
-        set {  self.separatorColor = newValue }
+        set { self.separatorColor = newValue }
     }
 }
 
 extension UIView {
     @objc dynamic var appearanceBackgroundColor: UIColor? {
         get { return self.backgroundColor }
-        set {  self.backgroundColor = newValue }
+        set { self.backgroundColor = newValue }
     }
 }
 
 extension UITextField {
     @objc dynamic var appearanceTextColor: UIColor? {
         get { return self.textColor }
-        set {  self.textColor = newValue }
+        set { self.textColor = newValue }
+    }
+}
+
+extension UIView {
+    @objc dynamic var appearanceOverrideUserInterfaceStyle: UIUserInterfaceStyle {
+        get {
+            if #available(iOS 13.0, *) {
+                return self.overrideUserInterfaceStyle
+            }
+            return .unspecified
+        }
+        set {
+            if #available(iOS 13.0, *) {
+                self.overrideUserInterfaceStyle = newValue
+            }
+            // Ignore
+        }
+    }
+}
+
+extension UINavigationBar {
+    @objc dynamic var appearanceBarTintColor: UIColor? {
+        get { return self.barTintColor }
+        set { self.barTintColor = newValue }
     }
 }
 
