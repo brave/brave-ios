@@ -117,16 +117,8 @@ open class UserAgent {
         return String(userAgent)
     }
     
-    public static func mobileApplicationName() -> String? {
-        return "FxiOS"
-    }
-    
-    public static func desktopApplicationName() -> String? {
-        return nil
-    }
-    
     public static func isDesktopUA(_ userAgent: String?) -> Bool {
-        if let userAgent = userAgent {
+        if let userAgent = userAgent, !userAgent.isEmpty {
             return !userAgent.lowercased().contains("mobile")
         }
         
