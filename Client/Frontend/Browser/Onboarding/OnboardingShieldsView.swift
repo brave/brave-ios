@@ -17,8 +17,8 @@ extension OnboardingShieldsViewController {
     
     class View: UIView {
         
-        let continueButton = CommonViews.primaryButton().then {
-            $0.accessibilityIdentifier = "OnboardingShieldsViewController.ContinueButton"
+        let finishButton = CommonViews.primaryButton(text: Strings.OBFinishButton).then {
+            $0.accessibilityIdentifier = "OnboardingShieldsViewController.FinishButton"
         }
         
         let skipButton = CommonViews.secondaryButton().then {
@@ -71,11 +71,11 @@ extension OnboardingShieldsViewController {
         init() {
             super.init(frame: .zero)
             
-            let spacer = UIView()
-            
             [imageView, descriptionView].forEach(mainStackView.addArrangedSubview(_:))
             
-            [skipButton, continueButton, spacer]
+            [UIView.spacer(.horizontal, amount: 0),
+             finishButton,
+             UIView.spacer(.horizontal, amount: 0)]
                 .forEach(buttonsStackView.addArrangedSubview(_:))
             
             [textStackView, buttonsStackView].forEach(descriptionStackView.addArrangedSubview(_:))
@@ -92,11 +92,6 @@ extension OnboardingShieldsViewController {
             
             descriptionStackView.snp.makeConstraints {
                 $0.edges.equalToSuperview().inset(UX.descriptionContentInset)
-            }
-            
-            // Make width the same as skip button to make continue button always centered.
-            spacer.snp.makeConstraints {
-                $0.width.equalTo(skipButton)
             }
         }
         

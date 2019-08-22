@@ -627,7 +627,7 @@ class BrowserViewController: UIViewController {
     }
     
     func presentOnboardingIntro() {
-        if !Preferences.General.basicOnboardingCompleted.value {
+        if Preferences.General.basicOnboardingCompleted.value != OnboardingState.completed.rawValue {
             guard let onboarding = OnboardingNavigationController(profile: profile,
                                                               onboardingType: .newUser) else { return }
             onboarding.onboardingDelegate = self
@@ -3123,7 +3123,7 @@ extension BrowserViewController: OnboardingControllerDelegate {
     func onboardingCompleted(_ onboardingController: OnboardingNavigationController) {
         switch onboardingController.onboardingType {
         case .newUser:
-            Preferences.General.basicOnboardingCompleted.value = true
+            Preferences.General.basicOnboardingCompleted.value = OnboardingState.completed.rawValue
         default: break
         }
         
