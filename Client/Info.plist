@@ -153,6 +153,6 @@
 		</dict>
 	</array>
     <key>UIFileSharingEnabled</key>
-    <string>YES</string>
+    <true/>
 </dict>
 </plist>
