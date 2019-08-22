@@ -420,8 +420,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         // Set the UA for WKWebView (via defaults), the favicon fetcher, and the image loader.
         // This only needs to be done once per runtime. Note that we use defaults here that are
         // readable from extensions, so they can just use the cached identifier.
-        let defaults = UserDefaults(suiteName: AppInfo.sharedContainerIdentifier)!
-        defaults.register(defaults: ["UserAgent": firefoxUA])
+        
+        if #available(iOS 13.0, *), UIDevice.isIpad {
+            //iOS 13 iPad UA is the same as Safari's..
+        } else {
+            let defaults = UserDefaults(suiteName: AppInfo.sharedContainerIdentifier)!
+            defaults.register(defaults: ["UserAgent": firefoxUA])
+        }
 
         SDWebImageDownloader.shared().setValue(firefoxUA, forHTTPHeaderField: "User-Agent")
 
