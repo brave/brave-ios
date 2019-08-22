@@ -27,7 +27,7 @@ extension Themeable {
 
 class Theme: Equatable, Decodable {
     
-    enum DefaultTheme: String, CaseIterable, RepresentableOptionType {
+    enum DefaultTheme: String, RepresentableOptionType {
         case system = "Z71ED37E-EC3E-436E-AD5F-B22748306A6B"
         case light = "ACE618A3-D6FC-45A4-94F2-1793C40AE927"
         case dark = "B900A41F-2C02-4664-9DE4-C170956339AC"
@@ -42,8 +42,8 @@ class Theme: Equatable, Decodable {
            return Theme.from(id: self.id)
         }
         
-        static var normalThemes: [Theme] {
-            return [DefaultTheme.light.theme, DefaultTheme.dark.theme].compactMap { $0 }
+        static var normalThemesOptions: [DefaultTheme] {
+            return [DefaultTheme.system, DefaultTheme.light, DefaultTheme.dark]
         }
         
         public var displayString: String {
@@ -218,7 +218,7 @@ class Theme: Equatable, Decodable {
         var id = id
         if id == DefaultTheme.system.id {
             // TODO: Pull system default, not 'light' necessarily
-            id = DefaultTheme.light.id
+            id = currentSystemThemeId
         }
         
         if let inMemoryTheme = themeMemoryBank[id] {
@@ -235,6 +235,17 @@ class Theme: Equatable, Decodable {
         
         themeMemoryBank[id] = theme
         return theme
+    }
+    
+    private static var currentSystemThemeId: String {
+        // Should really be based off of preferences, a dark theme and light theme preference
+        
+        let fallback = DefaultTheme.light.id
+        if #available(iOS 13.0, *) {
+            let isDark = UITraitCollection.current.userInterfaceStyle == .dark
+            return isDark ? DefaultTheme.dark.id : fallback
+        }
+        return fallback
     }
     
     static let allThemes: [Theme] = {

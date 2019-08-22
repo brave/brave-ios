@@ -174,7 +174,7 @@ class SettingsViewController: TableViewController {
         var row = Row(text: Strings.Normal_Mode_Theme, detailText: themeSubtitle, accessory: .disclosureIndicator, cellClass: MultilineSubtitleCell.self)
         row.selection = { [unowned self] in
             let optionsViewController = OptionSelectionViewController<Theme.DefaultTheme>(
-                options: Theme.DefaultTheme.allCases,
+                options: Theme.DefaultTheme.normalThemesOptions,
                 selectedOption: Theme.DefaultTheme(rawValue: Preferences.General.themeNormalMode.value),
                 optionChanged: { [unowned self] _, option in
                     Preferences.General.themeNormalMode.value = option.rawValue
