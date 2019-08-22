@@ -91,7 +91,8 @@ class TabBarCell: UICollectionViewCell {
     override var isSelected: Bool {
         didSet(selected) {
             let theme = Theme.of(tab)
-            closeButton.tintColor = PrivateBrowsingManager.shared.isPrivateBrowsing ? UIColor.white : UIColor.black
+            closeButton.tintColor = theme.colors.tints.header
+            
             if selected {
                 titleLabel.font = UIFont.systemFont(ofSize: 12, weight: UIFont.Weight.semibold)
                 closeButton.isHidden = false
