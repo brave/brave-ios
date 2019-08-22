@@ -1511,30 +1511,8 @@ extension BrowserViewController: TopToolbarDelegate {
             return
         }
 
-        // We couldn't build a URL, so check for a matching search keyword.
-        let trimmedText = text.trimmingCharacters(in: .whitespaces)
-        guard let possibleKeywordQuerySeparatorSpace = trimmedText.firstIndex(of: " ") else {
-            submitSearchText(text)
-            return
-        }
-        
-        let possibleKeyword = String(trimmedText[..<possibleKeywordQuerySeparatorSpace])
-        let possibleQuery = String(trimmedText[trimmedText.index(after: possibleKeywordQuerySeparatorSpace)])
-        
-//        profile.bookmarks.getURLForKeywordSearch(possibleKeyword).uponQueue(.main) { result in
-//            if var urlString = result.successValue,
-//                let escapedQuery = possibleQuery.addingPercentEncoding(withAllowedCharacters: NSCharacterSet.urlQueryAllowed),
-//                let range = urlString.range(of: "%s") {
-//                urlString.replaceSubrange(range, with: escapedQuery)
-//                
-//                if let url = URL(string: urlString) {
-//                    self.finishEditingAndSubmit(url, visitType: visitType ?? .typed)
-//                    return
-//                }
-//            }
-//            
-//            self.submitSearchText(text)
-//        }
+        // We couldn't build a URL, so pass it on to the search engine.
+        submitSearchText(text)
     }
 
     fileprivate func submitSearchText(_ text: String) {
