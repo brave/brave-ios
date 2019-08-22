@@ -205,8 +205,10 @@ class TabsBarViewController: UIViewController {
     private func addScrollHint(for side: HintSide, maskLayer: CAGradientLayer) {
         maskLayer.removeFromSuperlayer()
         
-        let barsColor = PrivateBrowsingManager.shared.isPrivateBrowsing ?
-            UX.barsDarkBackgroundSolidColor : UX.barsBackgroundSolidColor
+        guard let barsColor = collectionView.backgroundColor ?? view.backgroundColor else {
+            // If not setup now, will be at some point, and then this can be flushed
+            return
+        }
         let colors = [barsColor.withAlphaComponent(0).cgColor, barsColor.cgColor]
         
         let locations = [0.9, 1.0]
@@ -339,6 +341,8 @@ extension TabsBarViewController: Themeable {
         plusButton.tintColor = theme.colors.tints.header
         bottomLine.backgroundColor = theme.colors.border.withAlphaComponent(theme.colors.transparencies.borderAlpha)
         collectionView.backgroundColor = view.backgroundColor
+        overflowIndicators()
+        
         collectionView.reloadData()
     }
 }
