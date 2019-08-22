@@ -5,6 +5,7 @@
 import Foundation
 import Shared
 import BraveShared
+import pop
 
 extension OnboardingSearchEnginesViewController {
     
@@ -46,8 +47,17 @@ extension OnboardingSearchEnginesViewController {
             $0.translatesAutoresizingMaskIntoConstraints = false
         }
         
-        private let braveLogo = UIImageView(image: #imageLiteral(resourceName: "browser_lock_popup")).then {
-            $0.contentMode = .scaleAspectFit
+        private let braveLogo = UIImageView(image: #imageLiteral(resourceName: "browser_lock_popup")).then { logo in
+            logo.contentMode = .scaleAspectFit
+            
+            POPBasicAnimation(propertyNamed: kPOPLayerTranslationY)?.do {
+                $0.fromValue = -5
+                $0.toValue = 5
+                $0.repeatForever = true
+                $0.autoreverses = true
+                $0.duration = 2
+                logo.layer.pop_add($0, forKey: "translateY")
+            }
         }
         
         private let titleStackView = UIStackView().then { stackView in

@@ -35,6 +35,7 @@ extension OnboardingShieldsViewController {
             $0.backgroundColor = #colorLiteral(red: 0.1176470588, green: 0.1254901961, blue: 0.1607843137, alpha: 1)
             $0.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
             $0.play()
+            $0.loopMode = .loop
         }
         
         private let descriptionView = UIView().then {

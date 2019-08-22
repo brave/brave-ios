@@ -56,7 +56,7 @@ class OnboardingNavigationController: UINavigationController {
             }
         }
         
-        var type: AnyClass {
+        var type: OnboardingViewController.Type {
             switch self {
             case .searchEnginePicker: return OnboardingSearchEnginesViewController.self
             case .shieldsInfo: return OnboardingShieldsViewController.self
