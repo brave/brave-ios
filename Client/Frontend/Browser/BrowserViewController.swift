@@ -1120,7 +1120,7 @@ class BrowserViewController: UIViewController {
             activities.append(requestDesktopSiteActivity)
         }
         
-        let controller = helper.createActivityViewController({ [unowned self] completed, _ in
+        let controller = helper.createActivityViewController { [unowned self] completed, _ in
             // After dismissing, check to see if there were any prompts we queued up
             self.showQueuedAlertIfAvailable()
 
@@ -1129,7 +1129,7 @@ class BrowserViewController: UIViewController {
             // invoked on iOS 10. See Bug 1297768 for additional details.
             self.displayedPopoverController = nil
             self.updateDisplayedPopoverProperties = nil
-        })
+        }
 
         if let popoverPresentationController = controller.popoverPresentationController {
             popoverPresentationController.sourceView = sourceView
