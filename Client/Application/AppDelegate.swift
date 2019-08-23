@@ -421,7 +421,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         // This only needs to be done once per runtime. Note that we use defaults here that are
         // readable from extensions, so they can just use the cached identifier.
         
-        if #available(iOS 13.0, *), UIDevice.isIpad {
+        if #available(iOS 13.0, *) {
             //iOS 13 iPad UA is the same as Safari's..
         } else {
             let defaults = UserDefaults(suiteName: AppInfo.sharedContainerIdentifier)!

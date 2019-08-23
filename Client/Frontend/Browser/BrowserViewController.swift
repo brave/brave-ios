@@ -1097,7 +1097,7 @@ class BrowserViewController: UIViewController {
         if #available(iOS 13.0, *) {
             webView.customUserAgent = Preferences.General.alwaysRequestDesktopSite.value == UserAgent.isDesktopUA(ua) ? nil : ua
         } else {
-            webView.customUserAgent = ua != UserAgent.defaultUserAgent() ? ua : nil
+            webView.customUserAgent = ua == UserAgent.defaultUserAgent() ? nil : ua
         }
     }
 
@@ -2966,12 +2966,6 @@ extension BrowserViewController: PreferencesObserver {
         case Preferences.General.alwaysRequestDesktopSite.key:
             tabManager.reset()
             self.tabManager.reloadSelectedTab()
-            for tab in self.tabManager.allTabs where tab != self.tabManager.selectedTab {
-                tab.createWebview()
-                if let url = tab.webView?.url {
-                    tab.loadRequest(PrivilegedRequest(url: url) as URLRequest)
-                }
-            }
         case Preferences.Shields.blockAdsAndTracking.key,
              Preferences.Shields.httpsEverywhere.key,
              Preferences.Shields.blockScripts.key,
