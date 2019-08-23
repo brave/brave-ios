@@ -1560,7 +1560,6 @@ extension BrowserViewController: TopToolbarDelegate {
     }
     
     func topToolbarDidTapBraveShieldsButton(_ topToolbar: TopToolbarView) {
-        // BRAVE TODO: Use actual instance
         guard let selectedTab = tabManager.selectedTab else { return }
         let shields = ShieldsViewController(tab: selectedTab)
         shields.shieldsSettingsChanged = { [unowned self] _ in
