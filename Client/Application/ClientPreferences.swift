@@ -45,7 +45,8 @@ extension Preferences {
         /// `system`, follows the current OS display mode
         static let themeNormalMode = Option<String>(key: "general.normal-mode-theme", default: Theme.DefaultTheme.system.id)
         static let themePrivateMode = Option<String>(key: "general.private-mode-theme", default: "C5CB0D9A-5467-432C-AB35-1A78C55CFB41")
-
+        /// Sets Desktop UA for iPad by default (iOS 13+ & iPad only)
+        static let alwaysRequestDesktopSite = Option<Bool>(key: "general.always-request-desktop-site", default: UIDevice.isIpad)
         /// Whether or not a user has enabled Night Mode.
         ///
         /// Currently unused
