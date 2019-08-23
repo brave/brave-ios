@@ -8,12 +8,12 @@
     "enabled": true,
     
     "colors": {
-        "header": "0xffffff",
-        "footer": "0xffffff",
-        "home": "0xffffff",
-        "addressBar": "0xD7D7E0",
+        "header": "0xf4f4f4",
+        "footer": "0xf8f8f8",
+        "home": "0xf1f1f1",
+        "addressBar": "0xffffff",
         "border": "0x000000",
-        "accent": "0xccdded",
+        "accent": "0xfb542b",
         "tints": {
             "home": "0x434351",
             "header": "0x434351",
@@ -26,7 +26,7 @@
         },
         "stats": {
             "ads": "0xFA4214",
-            "trackers": "0x1bc760",
+            "trackers": "0x742BC4",
             "httpse": "0x9339D4",
             "timeSaved": "0x222326"
         }
