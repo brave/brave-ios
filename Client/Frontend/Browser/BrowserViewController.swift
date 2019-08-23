@@ -3058,17 +3058,12 @@ extension BrowserViewController {
     }
     
     func requestReviewIfNecessary() {
-        #if DEBUG
-        return
-        #endif
+        if !AppConstants.BuildChannel.isRelease {
+            return
+        }
         
         let launchCount = Preferences.Review.launchCount.value
         let threshold = Preferences.Review.threshold.value
-        
-        if threshold == 0 {
-            Preferences.Review.threshold.value = 14
-            return
-        }
         
         let minimumDaysBetweenReviewRequest = 60
         var daysSinceLastRequest = 0
