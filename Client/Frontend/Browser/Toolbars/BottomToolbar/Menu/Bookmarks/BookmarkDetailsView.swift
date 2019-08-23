@@ -5,6 +5,7 @@
 import UIKit
 import SnapKit
 import Shared
+import JavaScriptCore
 
 class BookmarkDetailsView: AddEditHeaderView, BookmarkFormFieldsProtocol {
     
@@ -20,10 +21,12 @@ class BookmarkDetailsView: AddEditHeaderView, BookmarkFormFieldsProtocol {
     
     let urlTextField: UITextField? = UITextField().then {
         $0.placeholder = Strings.BookmarkUrlPlaceholderText
-        $0.keyboardType = .URL
+        //$0.keyboardType = .URL
         $0.autocorrectionType = .no
         $0.autocapitalizationType = .none
         $0.smartDashesType = .no
+        $0.smartQuotesType = .no
+        $0.smartInsertDeleteType = .no
         $0.clearButtonMode = .whileEditing
         $0.translatesAutoresizingMaskIntoConstraints = false
     }
@@ -69,7 +72,10 @@ class BookmarkDetailsView: AddEditHeaderView, BookmarkFormFieldsProtocol {
         [emptySpacer, faviconImageView, textFieldsStackView]
             .forEach(contentStackView.addArrangedSubview)
         
-        if let url = url, let favUrl = URL(string: url) {
+        var url = url
+        if url?.hasPrefix("javascript:") ?? false {
+            url = url?.removingPercentEncoding
+        } else if let url = url, let favUrl = URL(string: url) {
             faviconImageView.setIcon(nil, forURL: favUrl)
         }
         
@@ -88,6 +94,45 @@ class BookmarkDetailsView: AddEditHeaderView, BookmarkFormFieldsProtocol {
     // MARK: - Delegate actions
     
     @objc func textFieldDidChange(_ textField: UITextField) {
-        delegate?.correctValues(validationPassed: validateFields())
+        delegate?.correctValues(validationPassed: validateFields() || validateCodeFields())
+    }
+    
+    private func validateTitle(_ title: String?) -> Bool {
+        guard let title = title else { return false }
+        return !title.isEmpty
+    }
+    
+    private func validateCodeFields() -> Bool {
+        let uriScheme = "javascript:"
+        
+        let title = titleTextField.text
+        guard let urlTextField = urlTextField else { return validateTitle(title) }
+        guard var javascriptCode = urlTextField.text else { return false }
+        
+        // All bookmarklets must begin with `javascript` URI scheme..
+        if !javascriptCode.hasPrefix(uriScheme) {
+            return false
+        }
+        
+        javascriptCode = String(javascriptCode.dropFirst(uriScheme.count))
+        
+        if javascriptCode.isEmpty {
+            return false
+        }
+        
+        // A bookmarklet is considered valid if it's code is valid JS.
+        // Bookmarklets MIGHT invoke some security flaws allowing the user to run arbitrary
+        // JS in the browser though.
+        if let context = JSContext() {
+            context.evaluateScript(javascriptCode)
+            if context.exception != nil {
+                if context.exception.description.contains("Reference Error") {
+                    return validateTitle(title)
+                }
+                return false
+            }
+            return validateTitle(title)
+        }
+        return false
     }
 }

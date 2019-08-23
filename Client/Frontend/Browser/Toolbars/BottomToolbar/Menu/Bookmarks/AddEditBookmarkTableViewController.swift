@@ -235,9 +235,21 @@ class AddEditBookmarkTableViewController: UITableViewController {
         // Saving and udpating is slightly different for each mode.
         switch mode {
         case .addBookmark(_, _):
-            guard let urlString = bookmarkDetailsView.urlTextField?.text,
-                let url = URL(string: urlString) else {
+            guard let urlString = bookmarkDetailsView.urlTextField?.text else {
+                return earlyReturn()
+            }
+            
+            var url: URL! = URL(string: urlString)
+            if urlString.hasPrefix("javascript:") {
+                guard let escapedURLString = urlString.addingPercentEncoding(withAllowedCharacters: .URLAllowed), let escapedURL = URL(string: escapedURLString) else {
                     return earlyReturn()
+                }
+                
+                url = escapedURL
+            }
+            
+            guard url != nil else {
+                return earlyReturn()
             }
             
             switch saveLocation {
@@ -258,16 +270,28 @@ class AddEditBookmarkTableViewController: UITableViewController {
                 Bookmark.addFolder(title: title, parentFolder: folder)
             }
         case .editBookmark(let bookmark):
-            guard let urlString = bookmarkDetailsView.urlTextField?.text,
-                let url = URL(string: urlString) else {
+            guard let urlString = bookmarkDetailsView.urlTextField?.text else {
+                return earlyReturn()
+            }
+            
+            var url: URL! = URL(string: urlString)
+            if urlString.hasPrefix("javascript:") {
+                guard let escapedURLString = urlString.addingPercentEncoding(withAllowedCharacters: .URLAllowed), let escapedURL = URL(string: escapedURLString) else {
                     return earlyReturn()
+                }
+                
+                url = escapedURL
+            }
+            
+            guard url != nil else {
+                return earlyReturn()
             }
             
             if !bookmark.existsInPersistentStore() { break }
             
             switch saveLocation {
             case .rootLevel:
-                bookmark.updateWithNewLocation(customTitle: title, url: urlString, location: nil)
+                bookmark.updateWithNewLocation(customTitle: title, url: url.absoluteString, location: nil)
             case .favorites:
                 bookmark.delete()
                 Bookmark.addFavorite(url: url, title: title)
