@@ -590,8 +590,12 @@ class BrowserViewController: UIViewController {
     
     func presentOnboardingIntro() {
         if Preferences.General.basicOnboardingCompleted.value != OnboardingState.completed.rawValue {
-            guard let onboarding = OnboardingNavigationController(profile: profile,
-                                                              onboardingType: .newUser) else { return }
+            guard let onboarding = OnboardingNavigationController(
+                profile: profile,
+                onboardingType: .newUser,
+                theme: Theme.of(tabManager.selectedTab)
+                ) else { return }
+            
             onboarding.onboardingDelegate = self
             present(onboarding, animated: true)
         } else {
