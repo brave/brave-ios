@@ -18,7 +18,7 @@ extension Theme {
         UINavigationBar.appearance().tintColor = colors.accent
         UINavigationBar.appearance().appearanceBarTintColor = colors.header
         
-        UISwitch.appearance().tintColor = colors.accent
+//        UISwitch.appearance().tintColor = colors.accent
         UISwitch.appearance().onTintColor = colors.accent
         
         // This is a subtle "abuse" of theme colors
@@ -50,7 +50,12 @@ extension Theme {
         
         if #available(iOS 13.0, *) {
             UIView.appearance().appearanceOverrideUserInterfaceStyle = isDark ? .dark : .light
+        } else {
+            // iOS 12 fixes, many styling items do not work properly in iOS 12
+            UILabel.appearance().appearanceTextColor = colors.tints.home
         }
+        
+        
     }
 }
 
