@@ -43,7 +43,12 @@ class Theme: Equatable, Decodable {
         }
         
         static var normalThemesOptions: [DefaultTheme] {
-            return [DefaultTheme.system, DefaultTheme.light, DefaultTheme.dark]
+            let always = [DefaultTheme.light, DefaultTheme.dark]
+            if #available(iOS 13.0, *) {
+                return [DefaultTheme.system] + always
+            } else {
+                return always
+            }
         }
         
         public var displayString: String {
@@ -51,6 +56,15 @@ class Theme: Equatable, Decodable {
                 return "System Theme"
             }
             return self.theme.title
+        }
+        
+        // Used for preferences
+        static func defaultOSChoice() -> String {
+            if #available(iOS 13.0, *) {
+                return DefaultTheme.system.id
+            } else {
+                return DefaultTheme.light.id
+            }
         }
     }
     

@@ -43,8 +43,8 @@ extension Preferences {
         static let tabBarVisibility = Option<Int>(key: "general.tab-bar-visiblity", default: TabBarVisibility.always.rawValue)
         /// Defines the user's normal browsing theme
         /// `system`, follows the current OS display mode
-        static let themeNormalMode = Option<String>(key: "general.normal-mode-theme", default: Theme.DefaultTheme.system.id)
-        static let themePrivateMode = Option<String>(key: "general.private-mode-theme", default: "C5CB0D9A-5467-432C-AB35-1A78C55CFB41")
+        static let themeNormalMode = Option<String>(key: "general.normal-mode-theme", default: Theme.DefaultTheme.defaultOSChoice())
+        static let themePrivateMode = Option<String>(key: "general.private-mode-theme", default: Theme.DefaultTheme.private.id)
         /// Sets Desktop UA for iPad by default (iOS 13+ & iPad only)
         static let alwaysRequestDesktopSite = Option<Bool>(key: "general.always-request-desktop-site", default: UIDevice.isIpad)
         /// Whether or not a user has enabled Night Mode.
