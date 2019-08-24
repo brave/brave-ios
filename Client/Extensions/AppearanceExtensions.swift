@@ -49,7 +49,8 @@ extension Theme {
         UITextField.appearance().keyboardAppearance = isDark ? .dark : .light
         
         if #available(iOS 13.0, *) {
-            UIView.appearance().appearanceOverrideUserInterfaceStyle = isDark ? .dark : .light
+            // Overrides all views inside of itself
+            UIWindow.appearance().appearanceOverrideUserInterfaceStyle = isDark ? .dark : .light
         } else {
             // iOS 12 fixes, many styling items do not work properly in iOS 12
             UILabel.appearance().appearanceTextColor = colors.tints.home
