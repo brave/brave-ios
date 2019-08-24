@@ -46,6 +46,7 @@ extension Theme {
         
         AddEditHeaderView.appearance().appearanceBackgroundColor = tableSecondaryColor
         UITextField.appearance().appearanceTextColor = colors.tints.home
+        UITextField.appearance().keyboardAppearance = isDark ? .dark : .light
         
         if #available(iOS 13.0, *) {
             UIView.appearance().appearanceOverrideUserInterfaceStyle = isDark ? .dark : .light
