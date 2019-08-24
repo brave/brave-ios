@@ -193,12 +193,6 @@ class Theme: Equatable, Decodable {
     var debugDescription: String {
         return description
     }
-
-    // This should be removed probably
-    /// Returns whether the theme is private or not.
-    var isPrivate: Bool {
-        return self.isDark
-    }
     
     /// Returns the theme of the given Tab, if the tab is nil returns a regular theme.
     ///

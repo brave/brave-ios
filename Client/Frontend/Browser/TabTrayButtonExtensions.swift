@@ -9,6 +9,15 @@ class PrivateModeButton: InsetButton, Themeable {
     override var isSelected: Bool {
         didSet {
             accessibilityValue = isSelected ? Strings.TabPrivateModeToggleAccessibilityValueOn : Strings.TabPrivateModeToggleAccessibilityValueOff
+            backgroundColor = isSelected ? selectedBackgroundColor : .clear
+        }
+    }
+    
+    var selectedBackgroundColor: UIColor? {
+        didSet {
+            if isSelected {
+                backgroundColor = selectedBackgroundColor
+            }
         }
     }
     
@@ -30,9 +39,7 @@ class PrivateModeButton: InsetButton, Themeable {
         
         setTitleColor(theme.colors.tints.footer, for: .normal)
         imageView?.tintColor = tintColor
-        isSelected = theme.isPrivate
-        
-        backgroundColor = isSelected ? theme.colors.accent : .clear
+        selectedBackgroundColor = theme.colors.accent
     }
 }
 

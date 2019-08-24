@@ -6,6 +6,8 @@ import Foundation
 import Shared
 import BraveShared
 
+// TODO: Theme: destroy!
+
 // A browser color represents the color of UI in both Private browsing mode and normal mode
 struct BrowserColor {
     let normalColor: UIColor
@@ -22,10 +24,6 @@ struct BrowserColor {
 
     func color(isPBM: Bool) -> UIColor {
         return isPBM ? PBMColor : normalColor
-    }
-
-    func colorFor(_ theme: Theme) -> UIColor {
-        return color(isPBM: theme.isPrivate)
     }
 }
 
