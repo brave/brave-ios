@@ -4,7 +4,13 @@
 
 "use strict";
 
-if (webkit.messageHandlers.rewardsReporting) {
+const mediaPublisherOrigins = [
+    'https://www.twitch.tv', 'https://m.twitch.tv', 'https://player.twitch.tv',
+    'https://www.youtube.com', 'https://m.youtube.com',
+    'https://vimeo.com',
+]
+
+if (mediaPublisherOrigins.includes(document.location.origin) && webkit.messageHandlers.rewardsReporting) {
     install();
 }
 
