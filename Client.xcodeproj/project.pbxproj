@@ -60,6 +60,7 @@
 		0A7B5D6722689C5D00AADF22 /* AddEditHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7B5D6622689C5D00AADF22 /* AddEditHeaderView.swift */; };
 		0A7B5D702269E72C00AADF22 /* BookmarkSaveLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7B5D6F2269E72C00AADF22 /* BookmarkSaveLocation.swift */; };
 		0A7B5D722269E7AD00AADF22 /* BookmarkEditMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7B5D712269E7AD00AADF22 /* BookmarkEditMode.swift */; };
+		0A82432F2315E8FF00BD5E1C /* libadblock.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A82432E2315E8FF00BD5E1C /* libadblock.a */; };
 		0A8C6993225BC7B100988715 /* ToolbarUrlActionsProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A8C6992225BC7B100988715 /* ToolbarUrlActionsProtocol.swift */; };
 		0A8C69AB225CFCAF00988715 /* AddEditBookmarkTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A8C69AA225CFCAF00988715 /* AddEditBookmarkTableViewController.swift */; };
 		0A8C69B5225DE99700988715 /* BookmarkDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A8C69B4225DE99700988715 /* BookmarkDetailsView.swift */; };
@@ -91,7 +92,6 @@
 		0AD4FEF4223AC32200E00C05 /* JSValueExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AD4FEF3223AC32200E00C05 /* JSValueExtensions.swift */; };
 		0AD4FEFA223BBE5400E00C05 /* SyncCryptoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AD4FEF9223BBE5400E00C05 /* SyncCryptoTests.swift */; };
 		0AD5E9C42200591F00D0D91B /* BraveShield.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AD5E9C32200591F00D0D91B /* BraveShield.swift */; };
-		0AD9F87D22F0421B008B4D95 /* libadblock.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A063D4A22EB2945001CE50B /* libadblock.a */; };
 		0AD9F88122F049E5008B4D95 /* AdblockRustEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AD9F88022F049E5008B4D95 /* AdblockRustEngine.swift */; };
 		0AD9F88E22F05376008B4D95 /* AdblockRustTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AD9F88D22F05376008B4D95 /* AdblockRustTests.swift */; };
 		0AE5C09922CAA01E00DFF3EE /* RewardsButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AE5C09822CAA01E00DFF3EE /* RewardsButton.swift */; };
@@ -150,10 +150,10 @@
 		27658271217130D900754B2F /* GlobalSign_r1.cer in Resources */ = {isa = PBXBuildFile; fileRef = 2765826E217130D900754B2F /* GlobalSign_r1.cer */; };
 		27658272217130D900754B2F /* GlobalSign_r3.cer in Resources */ = {isa = PBXBuildFile; fileRef = 2765826F217130D900754B2F /* GlobalSign_r3.cer */; };
 		27658273217130D900754B2F /* DigiCertHighAssurance.cer in Resources */ = {isa = PBXBuildFile; fileRef = 27658270217130D900754B2F /* DigiCertHighAssurance.cer */; };
+		276E7A3C22F21DBE00939424 /* RewardsReporting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 276E7A3B22F21DBE00939424 /* RewardsReporting.swift */; };
 		2777273722EB43A100F0214C /* StringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2777273622EB43A100F0214C /* StringExtensions.swift */; };
 		2777274022EB44B300F0214C /* StringExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2777273F22EB44B300F0214C /* StringExtensionTests.swift */; };
 		2777275A22EB4C7700F0214C /* BraveShared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DE7688420B3456C00FF5533 /* BraveShared.framework */; };
-		276E7A3C22F21DBE00939424 /* RewardsReporting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 276E7A3B22F21DBE00939424 /* RewardsReporting.swift */; };
 		2795274A21A890EB00921AA1 /* FingerprintingProtectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2795274921A890EB00921AA1 /* FingerprintingProtectionTests.swift */; };
 		2798E01D213EFC3F003EDBB1 /* FavoriteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2798E015213EFC3F003EDBB1 /* FavoriteTests.swift */; };
 		279C756B219DDE3B001CD1CB /* FingerprintingProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279C756A219DDE3B001CD1CB /* FingerprintingProtection.swift */; };
@@ -1147,7 +1147,6 @@
 
 /* Begin PBXFileReference section */
 		03CCC9171AF05E7300DBF30D /* RelativeDatesTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RelativeDatesTests.swift; sourceTree = "<group>"; };
-		0A063D4A22EB2945001CE50B /* libadblock.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libadblock.a; sourceTree = "<group>"; };
 		0A063D4B22EB2945001CE50B /* ablock_rust_lib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ablock_rust_lib.h; sourceTree = "<group>"; };
 		0A0D3D3821A4BD0600BEE65B /* SafeBrowsing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafeBrowsing.swift; sourceTree = "<group>"; };
 		0A0D3D3B21A4BE6400BEE65B /* adblock-list.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "adblock-list.txt"; sourceTree = "<group>"; };
@@ -1203,6 +1202,7 @@
 		0A7B5D6622689C5D00AADF22 /* AddEditHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEditHeaderView.swift; sourceTree = "<group>"; };
 		0A7B5D6F2269E72C00AADF22 /* BookmarkSaveLocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkSaveLocation.swift; sourceTree = "<group>"; };
 		0A7B5D712269E7AD00AADF22 /* BookmarkEditMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkEditMode.swift; sourceTree = "<group>"; };
+		0A82432E2315E8FF00BD5E1C /* libadblock.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libadblock.a; sourceTree = "<group>"; };
 		0A8C6992225BC7B100988715 /* ToolbarUrlActionsProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarUrlActionsProtocol.swift; sourceTree = "<group>"; };
 		0A8C69AA225CFCAF00988715 /* AddEditBookmarkTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEditBookmarkTableViewController.swift; sourceTree = "<group>"; };
 		0A8C69B4225DE99700988715 /* BookmarkDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkDetailsView.swift; sourceTree = "<group>"; };
@@ -1294,10 +1294,10 @@
 		2765826E217130D900754B2F /* GlobalSign_r1.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = GlobalSign_r1.cer; sourceTree = "<group>"; };
 		2765826F217130D900754B2F /* GlobalSign_r3.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = GlobalSign_r3.cer; sourceTree = "<group>"; };
 		27658270217130D900754B2F /* DigiCertHighAssurance.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = DigiCertHighAssurance.cer; sourceTree = "<group>"; };
-		2777273622EB43A100F0214C /* StringExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtensions.swift; sourceTree = "<group>"; };
-		2777273F22EB44B300F0214C /* StringExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtensionTests.swift; sourceTree = "<group>"; };
 		276E7A2E22F21A7700939424 /* RewardsReporting.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = RewardsReporting.js; sourceTree = "<group>"; };
 		276E7A3B22F21DBE00939424 /* RewardsReporting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardsReporting.swift; sourceTree = "<group>"; };
+		2777273622EB43A100F0214C /* StringExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtensions.swift; sourceTree = "<group>"; };
+		2777273F22EB44B300F0214C /* StringExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtensionTests.swift; sourceTree = "<group>"; };
 		2795274921A890EB00921AA1 /* FingerprintingProtectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FingerprintingProtectionTests.swift; sourceTree = "<group>"; };
 		2798E015213EFC3F003EDBB1 /* FavoriteTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FavoriteTests.swift; sourceTree = "<group>"; };
 		279C756A219DDE3B001CD1CB /* FingerprintingProtection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FingerprintingProtection.swift; sourceTree = "<group>"; };
@@ -2283,7 +2283,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0AD9F87D22F0421B008B4D95 /* libadblock.a in Frameworks */,
 				F98E1EA122B6D70E0018AF29 /* libYubiKit.a in Frameworks */,
 				A1AD4BD120BF3F4D007A6EA1 /* Eureka.framework in Frameworks */,
 				E6231C051B90A472005ABB0D /* libxml2.2.tbd in Frameworks */,
@@ -2292,6 +2291,7 @@
 				288A2D9D1AB8B3260023ABC3 /* Shared.framework in Frameworks */,
 				5DE7689920B3456E00FF5533 /* BraveShared.framework in Frameworks */,
 				2FCAE2311ABB51F800877008 /* Storage.framework in Frameworks */,
+				0A82432F2315E8FF00BD5E1C /* libadblock.a in Frameworks */,
 				E4B3348A1BBF23F9004E2BFF /* AdSupport.framework in Frameworks */,
 				7B604F861C494983006EEEC3 /* Alamofire.framework in Frameworks */,
 				A1D841FD20BC405E00BDAFF7 /* pop.framework in Frameworks */,
@@ -2635,7 +2635,7 @@
 			isa = PBXGroup;
 			children = (
 				0A063D4B22EB2945001CE50B /* ablock_rust_lib.h */,
-				0A063D4A22EB2945001CE50B /* libadblock.a */,
+				0A82432E2315E8FF00BD5E1C /* libadblock.a */,
 			);
 			path = Resources;
 			sourceTree = "<group>";

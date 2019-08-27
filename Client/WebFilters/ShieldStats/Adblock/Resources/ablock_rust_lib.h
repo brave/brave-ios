@@ -9,15 +9,15 @@
 typedef struct C_Engine C_Engine;
 
 typedef struct {
-    const char *uuid;
-    const char *url;
-    const char *title;
-    const char *lang;
-    const char *lang2;
-    const char *lang3;
-    const char *support_url;
-    const char *component_id;
-    const char *base64_public_key;
+  const char *uuid;
+  const char *url;
+  const char *title;
+  const char *lang;
+  const char *lang2;
+  const char *lang3;
+  const char *support_url;
+  const char *component_id;
+  const char *base64_public_key;
 } C_FList;
 
 /**
