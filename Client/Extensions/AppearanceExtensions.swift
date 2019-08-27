@@ -48,6 +48,10 @@ extension Theme {
         UITextField.appearance().appearanceTextColor = colors.tints.home
         UITextField.appearance().keyboardAppearance = isDark ? .dark : .light
         
+        // Sync items
+        SyncViewController.SyncView.appearance(whenContainedInInstancesOf: [UINavigationController.self]).appearanceBackgroundColor = colors.home
+        SyncDeviceTypeButton.appearance().appearanceBackgroundColor = colors.addressBar
+        
         if #available(iOS 13.0, *) {
             // Overrides all views inside of itself
             // According to docs, UIWindow override should be enough, but some labels on iOS 13 are still messed up without UIView override as well
@@ -58,8 +62,6 @@ extension Theme {
             // iOS 12 fixes, many styling items do not work properly in iOS 12
             UILabel.appearance().appearanceTextColor = colors.tints.home
         }
-        
-        
     }
 }
 
