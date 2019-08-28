@@ -7,8 +7,8 @@ import Foundation
 struct AdblockResourcesMappings {
     static func generalAdblockName(for fileType: FileType) -> String? {
         switch fileType {
-        case .dat: return "rs-ABPFilterParserData"
-        case .json: return "latest"
+        case .dat: return "combined-included-rs"
+        case .json: return "combined-included"
         default: return nil
         }
     }
@@ -56,10 +56,7 @@ enum ResourceLocale: String {
         case .vi: resourceId = "6A0209AC-9869-4FD6-A9DF-039B4200D52C"
         }
         
-        switch fileType {
-        case .dat: return "rs-" + resourceId
-        case .json: return resourceId + "-latest"
-        case .tgz: return ""
-        }
+        if resourceId.isEmpty { assertionFailure() }
+        return resourceId
     }
 }
