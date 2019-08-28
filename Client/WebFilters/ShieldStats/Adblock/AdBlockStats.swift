@@ -122,6 +122,9 @@ class AdBlockStats: LocalAdblockResourceProtocol {
         
         if engine.set(data: data) {
             log.debug("Adblock file with id: \(id) deserialized successfully")
+            // Clearing the cache or checked urls.
+            // The new list can bring blocked resource that were previously set as not-blocked.
+            fifoCacheOfUrlsChecked = FifoDict()
             completion.fill(())
         } else {
             log.error("Failed to deserialize adblock list with id: \(id)")
