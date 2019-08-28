@@ -45,7 +45,7 @@ enum AdblockerType {
         switch self {
         case .general: return AdblockResourcesMappings.generalAdblockName(for: fileType)
         case .httpse: return AdblockResourcesMappings.generalHttpseName
-        case .regional(let locale): return ResourceLocale(rawValue: locale)?.resourceName(for: fileType)
+        case .regional(let locale): return ResourceLocale(rawValue: locale)?.resourceName
         }
     }
     
