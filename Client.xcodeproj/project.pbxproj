@@ -87,6 +87,7 @@
 		0AD9F88122F049E5008B4D95 /* AdblockRustEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AD9F88022F049E5008B4D95 /* AdblockRustEngine.swift */; };
 		0AD9F88E22F05376008B4D95 /* AdblockRustTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AD9F88D22F05376008B4D95 /* AdblockRustTests.swift */; };
 		0AE5C09922CAA01E00DFF3EE /* RewardsButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AE5C09822CAA01E00DFF3EE /* RewardsButton.swift */; };
+		0AE98DDB2316DA9B00AFDFEF /* ABPFilterParserData.dat in Resources */ = {isa = PBXBuildFile; fileRef = 0AE98DD32316DA9B00AFDFEF /* ABPFilterParserData.dat */; };
 		0AEFB84922244135007AF600 /* AdblockDebugMenuTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AEFB84822244135007AF600 /* AdblockDebugMenuTableViewController.swift */; };
 		0AEFB8532226D7C5007AF600 /* AdblockResourcesMappings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AEFB8522226D7C5007AF600 /* AdblockResourcesMappings.swift */; };
 		0AEFB88722299E6A007AF600 /* AdblockerType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AEFB88622299E6A007AF600 /* AdblockerType.swift */; };
@@ -439,7 +440,6 @@
 		4F97573B1AFA6F37006ECC24 /* readerContent.html in Resources */ = {isa = PBXBuildFile; fileRef = 4F9757391AFA6F37006ECC24 /* readerContent.html */; };
 		55A747171DC46FC400CE1B57 /* HomePageUITest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55A747161DC46FC400CE1B57 /* HomePageUITest.swift */; };
 		592F521E2217327C0078395E /* HttpCookieExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 592F521D2217327B0078395E /* HttpCookieExtension.swift */; };
-		59350AFB22612D95004D7445 /* DisplayTextFieldTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59350AFA22612D95004D7445 /* DisplayTextFieldTest.swift */; };
 		5953AAEF2226E9D800A92DE1 /* HttpCookieExtensionTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5953AAEE2226E9D800A92DE1 /* HttpCookieExtensionTest.swift */; };
 		595E0EDB21CAD97C00813D49 /* CookieControl.js in Resources */ = {isa = PBXBuildFile; fileRef = 595E0EDA21CAD97C00813D49 /* CookieControl.js */; };
 		595E0EE121CAEF5B00813D49 /* FileManagerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 595E0EE021CAEF5B00813D49 /* FileManagerExtension.swift */; };
@@ -509,9 +509,9 @@
 		5DE768B120B4713000FF5533 /* Storage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2FCAE21A1ABB51F800877008 /* Storage.framework */; };
 		5E3477E922D7771700B0D5F8 /* ResourceDownloader.js in Resources */ = {isa = PBXBuildFile; fileRef = 5E3477E822D7771700B0D5F8 /* ResourceDownloader.js */; };
 		5E34781022D7A1D200B0D5F8 /* ResourceDownloadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E34780F22D7A1D200B0D5F8 /* ResourceDownloadManager.swift */; };
-		5E9288CA22DF864C007BE7A6 /* TabSessionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E9288C922DF864C007BE7A6 /* TabSessionTests.swift */; };
 		5E4845C022DE381200372022 /* WindowRenderHelper.js in Resources */ = {isa = PBXBuildFile; fileRef = 5E4845BF22DE381200372022 /* WindowRenderHelper.js */; };
 		5E4845C222DE3DF800372022 /* WindowRenderHelperScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E4845C122DE3DF800372022 /* WindowRenderHelperScript.swift */; };
+		5E9288CA22DF864C007BE7A6 /* TabSessionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E9288C922DF864C007BE7A6 /* TabSessionTests.swift */; };
 		744B0FFE1B4F172E00100422 /* ToolbarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 744B0FFD1B4F172E00100422 /* ToolbarTests.swift */; };
 		744ED5611DBFEB8D00A2B5BE /* MailtoLinkHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 744ED5601DBFEB8D00A2B5BE /* MailtoLinkHandler.swift */; };
 		7479B4EF1C5306A200DF000B /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7479B4ED1C5306A200DF000B /* Reachability.swift */; };
@@ -1224,6 +1224,7 @@
 		0AD9F88022F049E5008B4D95 /* AdblockRustEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdblockRustEngine.swift; sourceTree = "<group>"; };
 		0AD9F88D22F05376008B4D95 /* AdblockRustTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdblockRustTests.swift; sourceTree = "<group>"; };
 		0AE5C09822CAA01E00DFF3EE /* RewardsButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardsButton.swift; sourceTree = "<group>"; };
+		0AE98DD32316DA9B00AFDFEF /* ABPFilterParserData.dat */ = {isa = PBXFileReference; lastKnownFileType = file; path = ABPFilterParserData.dat; sourceTree = "<group>"; };
 		0AEFB84822244135007AF600 /* AdblockDebugMenuTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdblockDebugMenuTableViewController.swift; sourceTree = "<group>"; };
 		0AEFB8522226D7C5007AF600 /* AdblockResourcesMappings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdblockResourcesMappings.swift; sourceTree = "<group>"; };
 		0AEFB88622299E6A007AF600 /* AdblockerType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdblockerType.swift; sourceTree = "<group>"; };
@@ -1600,7 +1601,6 @@
 		5929A9F421B6AF18005ECF8D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		592F521D2217327B0078395E /* HttpCookieExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HttpCookieExtension.swift; sourceTree = "<group>"; };
 		59347A7822E22F2000C38919 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/BraveShared.strings"; sourceTree = "<group>"; };
-		59350AFA22612D95004D7445 /* DisplayTextFieldTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayTextFieldTest.swift; sourceTree = "<group>"; };
 		5953AAEE2226E9D800A92DE1 /* HttpCookieExtensionTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HttpCookieExtensionTest.swift; sourceTree = "<group>"; };
 		595E0EDA21CAD97C00813D49 /* CookieControl.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = CookieControl.js; sourceTree = "<group>"; };
 		595E0EE021CAEF5B00813D49 /* FileManagerExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagerExtension.swift; sourceTree = "<group>"; };
@@ -1869,9 +1869,9 @@
 		5DE768AF20B4601600FF5533 /* UIColorExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIColorExtensions.swift; sourceTree = "<group>"; };
 		5E3477E822D7771700B0D5F8 /* ResourceDownloader.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = ResourceDownloader.js; sourceTree = "<group>"; };
 		5E34780F22D7A1D200B0D5F8 /* ResourceDownloadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceDownloadManager.swift; sourceTree = "<group>"; };
-		5E9288C922DF864C007BE7A6 /* TabSessionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabSessionTests.swift; sourceTree = "<group>"; };
 		5E4845BF22DE381200372022 /* WindowRenderHelper.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = WindowRenderHelper.js; sourceTree = "<group>"; };
 		5E4845C122DE3DF800372022 /* WindowRenderHelperScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowRenderHelperScript.swift; sourceTree = "<group>"; };
+		5E9288C922DF864C007BE7A6 /* TabSessionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabSessionTests.swift; sourceTree = "<group>"; };
 		744B0FFD1B4F172E00100422 /* ToolbarTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ToolbarTests.swift; sourceTree = "<group>"; };
 		744ED5601DBFEB8D00A2B5BE /* MailtoLinkHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MailtoLinkHandler.swift; sourceTree = "<group>"; };
 		7479B4ED1C5306A200DF000B /* Reachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Reachability.swift; path = ThirdParty/Reachability.swift; sourceTree = "<group>"; };
@@ -2607,6 +2607,7 @@
 			children = (
 				0A063D4B22EB2945001CE50B /* ablock_rust_lib.h */,
 				0A063D4A22EB2945001CE50B /* libadblock.a */,
+				0AE98DD32316DA9B00AFDFEF /* ABPFilterParserData.dat */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -3607,7 +3608,6 @@
 				D0C95DF9200EAE5E00E4E51C /* NoImageModeHelper.js */,
 				D0C95E03200FCA8800E4E51C /* ReaderMode.js */,
 				D0006623204728A8009BA6F6 /* TrackingProtectionStats.js */,
-				5E4845BF22DE381200372022 /* WindowRenderHelper.js */,
 			);
 			path = AtDocumentStart;
 			sourceTree = "<group>";
@@ -5173,6 +5173,7 @@
 				D0FCF8081FE4772D004A7995 /* MainFrameAtDocumentStart.js in Resources */,
 				0A0D3D5021A5609600BEE65B /* SafeBrowsingError.html in Resources */,
 				74821FFE1DB6D3AC00EEEA72 /* MailSchemes.plist in Resources */,
+				0AE98DDB2316DA9B00AFDFEF /* ABPFilterParserData.dat in Resources */,
 				4422D57621C05DE600BF1855 /* httpse.leveldb.tgz in Resources */,
 				FA9294011D6584A200AC8D33 /* QRCode.xcassets in Resources */,
 				D308EE561CBF0BF5006843F2 /* CertError.css in Resources */,
