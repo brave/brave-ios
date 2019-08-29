@@ -167,6 +167,10 @@ class SettingsViewController: TableViewController {
             general.rows.append(row)
         }
         
+        general.rows.append(
+            BoolRow(title: Strings.Show_Bookmark_Button_In_Top_Toolbar, option: Preferences.General.bookmarkToolbarVisibility)
+        )
+        
         return general
     }()
     

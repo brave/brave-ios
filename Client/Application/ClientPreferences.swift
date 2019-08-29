@@ -41,6 +41,8 @@ extension Preferences {
         static let blockPopups = Option<Bool>(key: "general.block-popups", default: true)
         /// Controls how the tab bar should be shown (or not shown)
         static let tabBarVisibility = Option<Int>(key: "general.tab-bar-visiblity", default: TabBarVisibility.always.rawValue)
+        /// Specifies whether the bookmark button is present on toolbar
+        static let bookmarkToolbarVisibility = Option<Bool>(key: "general.bookmark-toolbar-visibility", default: false)
         
         /// Whether or not a user has enabled Night Mode.
         ///
