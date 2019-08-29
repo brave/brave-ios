@@ -27,9 +27,9 @@ extension Theme {
         // Any change to a single tableView property that currently uses one of these will probably have odd behavior and must be thoroughly tested
         
         /// Used as color a table will use as the base (e.g. background)
-        let tablePrimaryColor = colors.header
+        let tablePrimaryColor = colors.home
         /// Used to augment `tablePrimaryColor` above
-        let tableSecondaryColor = colors.addressBar
+        let tableSecondaryColor = colors.header
         
         // Will become the color for whatever in the table is .clear
         // In some cases this is the header, footer, cell, or a combination of them.
@@ -50,7 +50,7 @@ extension Theme {
         
         // Sync items
         SyncViewController.SyncView.appearance(whenContainedInInstancesOf: [UINavigationController.self]).appearanceBackgroundColor = colors.home
-        SyncDeviceTypeButton.appearance().appearanceBackgroundColor = colors.addressBar
+        SyncDeviceTypeButton.appearance().appearanceBackgroundColor = colors.header
         
         if #available(iOS 13.0, *) {
             // Overrides all views inside of itself

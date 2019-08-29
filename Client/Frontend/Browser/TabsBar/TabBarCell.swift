@@ -104,7 +104,7 @@ class TabBarCell: UICollectionViewCell {
                 titleLabel.font = UIFont.systemFont(ofSize: 12)
                 titleLabel.textColor = theme.colors.tints.header.withAlphaComponent(0.4)
                 closeButton.isHidden = true
-                backgroundColor = theme.colors.addressBar
+                backgroundColor = theme.colors.header
             }
         }
     }
