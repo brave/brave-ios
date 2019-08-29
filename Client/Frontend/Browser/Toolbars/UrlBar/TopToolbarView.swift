@@ -36,6 +36,7 @@ protocol TopToolbarDelegate: class {
     // Returns either (search query, true) or (url, false).
     func topToolbarDisplayTextForURL(_ url: URL?) -> (String?, Bool)
     func topToolbarDidBeginDragInteraction(_ topToolbar: TopToolbarView)
+    func topToolbarDidTapBookmarkButton(_ topToolbar: TopToolbarView)
     func topToolbarDidTapBraveShieldsButton(_ topToolbar: TopToolbarView)
     func topToolbarDidTapBraveRewardsButton(_ topToolbar: TopToolbarView)
     func topToolbarDidTapMenuButton(_ topToolbar: TopToolbarView)
@@ -138,15 +139,16 @@ class TopToolbarView: UIView, ToolbarProtocol {
         return button
     }()
 
-    var bookmarkButton = ToolbarButton()
+    var bookmarkButton = ToolbarButton().then {
+        $0.setImage(#imageLiteral(resourceName: "menu_bookmarks").template, for: .normal)
+        $0.accessibilityLabel = Strings.BookmarksMenuItem
+        $0.addTarget(self, action: #selector(didClickBookmarkButton), for: .touchUpInside)
+    }
     var forwardButton = ToolbarButton()
     var shareButton = ToolbarButton()
     var addTabButton = ToolbarButton()
     lazy var menuButton = ToolbarButton().then {
         $0.contentMode = .center
-        $0.setImage(#imageLiteral(resourceName: "nav-menu").template, for: .normal)
-        $0.accessibilityLabel = Strings.AppMenuButtonAccessibilityLabel
-        $0.addTarget(self, action: #selector(didClickMenu), for: .touchUpInside)
         $0.accessibilityIdentifier = "topToolbarView-menuButton"
     }
 
@@ -157,7 +159,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
     }()
 
     lazy var actionButtons: [Themeable & UIButton] =
-        [self.shareButton, self.tabsButton,
+        [self.shareButton, self.tabsButton, self.bookmarkButton,
          self.forwardButton, self.backButton, self.menuButton].compactMap { $0 }
     
     /// Update the shields icon based on whether or not shields are enabled for this site
@@ -227,7 +229,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
         navigationStackView.addArrangedSubview(backButton)
         navigationStackView.addArrangedSubview(forwardButton)
         
-        [navigationStackView, locationContainer, tabsButton, menuButton, cancelButton].forEach {
+        [navigationStackView, bookmarkButton, locationContainer, tabsButton, menuButton, cancelButton].forEach {
             mainStackView.addArrangedSubview($0)
         }
         
@@ -434,6 +436,10 @@ class TopToolbarView: UIView, ToolbarProtocol {
     
     @objc func tappedScrollToTopArea() {
         delegate?.topToolbarDidPressScrollToTop(self)
+    }
+    
+    @objc func didClickBookmarkButton() {
+        delegate?.topToolbarDidTapBookmarkButton(self)
     }
     
     @objc func didClickMenu() {
