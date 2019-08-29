@@ -208,6 +208,8 @@ class TopToolbarView: UIView, ToolbarProtocol {
         helper = ToolbarHelper(toolbar: self)
         setupConstraints()
         
+        Preferences.General.bookmarkToolbarVisibility.observe(from: self)
+        
         // Make sure we hide any views that shouldn't be showing in non-overlay mode.
         updateViewsForOverlayModeAndToolbarChanges()
     }
@@ -423,6 +425,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
         menuButton.isHidden = !toolbarIsShowing || inOverlayMode
         tabsButton.isHidden = !toolbarIsShowing || inOverlayMode
         locationView.contentView.isHidden = inOverlayMode
+        bookmarkButton.isHidden = !Preferences.General.bookmarkToolbarVisibility.value
     }
     
     private func animateToOverlayState(overlayMode overlay: Bool, didCancel cancel: Bool = false) {
@@ -470,6 +473,14 @@ class TopToolbarView: UIView, ToolbarProtocol {
     
     @objc func didClickBraveShieldsButton() {
         delegate?.topToolbarDidTapBraveShieldsButton(self)
+    }
+}
+
+// MARK: - PreferencesObserver
+
+extension TopToolbarView: PreferencesObserver {
+    func preferencesDidChange(for key: String) {
+        updateViewsForOverlayModeAndToolbarChanges()
     }
 }
 
