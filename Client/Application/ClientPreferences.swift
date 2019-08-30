@@ -42,7 +42,7 @@ extension Preferences {
         /// Controls how the tab bar should be shown (or not shown)
         static let tabBarVisibility = Option<Int>(key: "general.tab-bar-visiblity", default: TabBarVisibility.always.rawValue)
         /// Specifies whether the bookmark button is present on toolbar
-        static let bookmarkToolbarVisibility = Option<Bool>(key: "general.bookmark-toolbar-visibility", default: false)
+        static let bookmarkToolbarVisibility = Option<Bool>(key: "general.bookmark-toolbar-visibility", default: UIDevice.isIpad)
         /// Sets Desktop UA for iPad by default (iOS 13+ & iPad only)
         static let alwaysRequestDesktopSite = Option<Bool>(key: "general.always-request-desktop-site", default: UIDevice.isIpad)
         
