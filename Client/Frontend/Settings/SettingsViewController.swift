@@ -187,6 +187,9 @@ class SettingsViewController: TableViewController {
             self.navigationController?.pushViewController(optionsViewController, animated: true)
         }
         general.rows.append(row)
+        general.rows.append(
+            BoolRow(title: Strings.Show_Bookmark_Button_In_Top_Toolbar, option: Preferences.General.bookmarkToolbarVisibility)
+        )
         
         if #available(iOS 13.0, *), UIDevice.isIpad {
             general.rows.append(BoolRow(title: Strings.AlwaysRequestDesktopSite,
