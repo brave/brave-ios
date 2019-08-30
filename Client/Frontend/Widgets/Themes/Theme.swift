@@ -4,6 +4,7 @@
 
 import Foundation
 import BraveShared
+import Shared
 
 protocol Themeable {
     
@@ -52,10 +53,17 @@ class Theme: Equatable, Decodable {
         }
         
         public var displayString: String {
-            if self == .system {
-                return "System Theme"
+            // Due to translations needs, titles are hardcoded here, ideally they would be pulled from the
+            //  theme files themselves.
+            
+            switch self {
+            case .system: return Strings.ThemesAutomaticOption
+            case .light: return Strings.ThemesLightOption
+            case .dark: return Strings.ThemesDarkOption
+                
+            // Should not be visible, but making explicit so compiler will capture any `DefaultTheme` modifications
+            case .private: return "<invalid>"
             }
-            return self.theme.title
         }
         
         // Used for preferences

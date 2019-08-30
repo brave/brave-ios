@@ -171,7 +171,7 @@ class SettingsViewController: TableViewController {
         }
         
         let themeSubtitle = Theme.DefaultTheme(rawValue: Preferences.General.themeNormalMode.value)?.displayString
-        var row = Row(text: Strings.Normal_Mode_Theme, detailText: themeSubtitle, accessory: .disclosureIndicator, cellClass: MultilineSubtitleCell.self)
+        var row = Row(text: Strings.ThemesDisplayBrightness, detailText: themeSubtitle, accessory: .disclosureIndicator, cellClass: MultilineSubtitleCell.self)
         row.selection = { [unowned self] in
             let optionsViewController = OptionSelectionViewController<Theme.DefaultTheme>(
                 options: Theme.DefaultTheme.normalThemesOptions,
@@ -182,7 +182,8 @@ class SettingsViewController: TableViewController {
                     self.applyTheme(self.theme)
                 }
             )
-            optionsViewController.headerText = Strings.Normal_Mode_Theme
+            optionsViewController.headerText = Strings.ThemesDisplayBrightness
+            optionsViewController.footerText = Strings.ThemesDisplayBrightnessFooter
             self.navigationController?.pushViewController(optionsViewController, animated: true)
         }
         general.rows.append(row)
