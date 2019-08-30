@@ -77,6 +77,9 @@ class PopoverController: UIViewController {
         }
     }
     
+    /// Allows the presenter to know when the popover was dismissed by some gestural action.
+    var popoverDidDismiss: ((_ popoverController: PopoverController) -> Void)?
+    
     let contentSizeBehavior: ContentSizeBehavior
     
     private var containerViewHeightConstraint: NSLayoutConstraint?
@@ -323,7 +326,7 @@ extension PopoverController {
                 dismiss(animated: true)
                 // Not sure if we want this after dismissal completes or right away. Could always create a
                 // `popoverWillDismiss` to put before and `did` after
-                contentController.popoverDidDismiss(self)
+                popoverDidDismiss?(self)
             }
         }
     }

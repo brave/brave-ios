@@ -26,7 +26,6 @@ protocol TabDelegate {
     func tab(_ tab: Tab, didSelectFindInPageForSelection selection: String)
     @objc optional func tab(_ tab: Tab, didCreateWebView webView: WKWebView)
     @objc optional func tab(_ tab: Tab, willDeleteWebView webView: WKWebView)
-    func tab(_ tab: Tab, isVerifiedPublisher verified: Bool)
 }
 
 @objc
@@ -88,6 +87,7 @@ class Tab: NSObject {
     var url: URL?
     var mimeType: String?
     var isEditing: Bool = false
+    var shouldClassifyLoadsForAds = true
 
     // When viewing a non-HTML content type in the webview (like a PDF document), this URL will
     // point to a tempfile containing the content so it can be shared to external applications.
@@ -151,7 +151,7 @@ class Tab: NSObject {
 
     init(configuration: WKWebViewConfiguration, type: TabType = .regular) {
         self.configuration = configuration
-        rewardsId = UInt32.random(in: UInt32.min...UInt32.max)
+        rewardsId = UInt32.random(in: 1...UInt32.max)
         super.init()
         self.type = type
     }
@@ -374,27 +374,6 @@ class Tab: NSObject {
             return webView.load(request)
         }
         return nil
-    }
-    
-    func reportPageLoad() {
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate,
-            let rewards = appDelegate.browserViewController.rewards,
-            let webView = webView,
-            let url = webView.url,
-            !url.isLocal,
-            !PrivateBrowsingManager.shared.isPrivateBrowsing else { return }
-        
-        let getHtmlToStringJSCall = "document.documentElement.outerHTML.toString()"
-        let tabId = rewardsId
-        
-        DispatchQueue.main.async {
-            webView.evaluateJavaScript(getHtmlToStringJSCall, completionHandler: { html, _ in
-                guard let htmlString = html as? String else { return }
-                rewards.reportLoadedPage(url: url, tabId: tabId, html: htmlString) { verified in
-                    self.tabDelegate?.tab(self, isVerifiedPublisher: verified)
-                }
-            })
-        }
     }
 
     func stop() {
