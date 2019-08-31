@@ -208,7 +208,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
         helper = ToolbarHelper(toolbar: self)
         setupConstraints()
         
-        Preferences.General.bookmarkToolbarVisibility.observe(from: self)
+        Preferences.General.showBookmarkToolbarShortcut.observe(from: self)
         
         // Make sure we hide any views that shouldn't be showing in non-overlay mode.
         updateViewsForOverlayModeAndToolbarChanges()
@@ -425,7 +425,9 @@ class TopToolbarView: UIView, ToolbarProtocol {
         menuButton.isHidden = !toolbarIsShowing || inOverlayMode
         tabsButton.isHidden = !toolbarIsShowing || inOverlayMode
         locationView.contentView.isHidden = inOverlayMode
-        bookmarkButton.isHidden = !Preferences.General.bookmarkToolbarVisibility.value
+        
+        let showBookmarkPref = Preferences.General.showBookmarkToolbarShortcut.value
+        bookmarkButton.isHidden = showBookmarkPref ? !toolbarIsShowing || inOverlayMode : false
     }
     
     private func animateToOverlayState(overlayMode overlay: Bool, didCancel cancel: Bool = false) {
@@ -436,7 +438,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
         }
         
         if inOverlayMode {
-            [progressBar, navigationStackView, menuButton, tabsButton, locationView.contentView].forEach {
+            [progressBar, navigationStackView, bookmarkButton, menuButton, tabsButton, locationView.contentView].forEach {
                 $0?.isHidden = true
             }
             

@@ -168,7 +168,7 @@ class SettingsViewController: TableViewController {
         }
         
         general.rows.append(
-            BoolRow(title: Strings.Show_Bookmark_Button_In_Top_Toolbar, option: Preferences.General.bookmarkToolbarVisibility)
+            BoolRow(title: Strings.Show_Bookmark_Button_In_Top_Toolbar, option: Preferences.General.showBookmarkToolbarShortcut)
         )
         
         if #available(iOS 13.0, *), UIDevice.isIpad {
