@@ -8,8 +8,8 @@
     "enabled": true,
     
     "colors": {
-        "header": "0x222222",
-        "footer": "0x222222",
+        "header": "0x282828",
+        "footer": "0x282828",
         "home": "0x1c1c1c",
         "addressBar": "0x444444",
         "border": "0xffffff",
