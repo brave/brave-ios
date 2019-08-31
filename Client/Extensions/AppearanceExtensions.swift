@@ -52,6 +52,10 @@ extension Theme {
         SyncViewController.SyncView.appearance(whenContainedInInstancesOf: [UINavigationController.self]).appearanceBackgroundColor = colors.home
         SyncDeviceTypeButton.appearance().appearanceBackgroundColor = colors.header
         
+        // Search
+        UIView.appearance(whenContainedInInstancesOf: [SearchViewController.self]).appearanceBackgroundColor = colors.home
+        InsetButton.appearance(whenContainedInInstancesOf: [SearchViewController.self]).appearanceBackgroundColor = .clear
+        
         if #available(iOS 13.0, *) {
             // Overrides all views inside of itself
             // According to docs, UIWindow override should be enough, but some labels on iOS 13 are still messed up without UIView override as well
