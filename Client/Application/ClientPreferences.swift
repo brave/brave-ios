@@ -80,13 +80,5 @@ extension Preferences {
         /// The toggles states for clear private data screen
         static let clearPrivateDataToggles = Option<[Bool]>(key: "privacy.clear-data-toggles", default: [])
     }
-    final class Review {
-        /// Application Launch Count (how many times the application has been launched)
-        static let launchCount = Option<Int>(key: "review.launch-count", default: 0)
-        /// Review Threshold (the total amount of launches needed for the next review to show up)
-        static let threshold = Option<Int>(key: "review.threshold", default: 14)
-        /// Last Review Date
-        static let lastReviewDate = Option<Date?>(key: "review.last-date", default: nil)
-    }
 }
 
