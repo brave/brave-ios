@@ -16,22 +16,19 @@
 /* Add to favorites share action. */
 "AddToFavorites" = "Dodaj do ulubionych";
 
-/* Title for adding new bookmark menu item */
-"AddToMenuItem" = "Dodaj do...";
+/* Title for the button to add a new website bookmark. */
+"AddToMenuItem" = "Dodaj zakładkę";
 
 /* individual blocking statistic title */
 "AdsAndTrackers" = "Reklamy i trackery";
 
-/* Shields Ads Stat */
-"AdsAndTrackersrBlocked" = "Reklamy i śledzenie\nzablokowane";
-
-/* Shields Ads Stat */
-"AdsrBlocked" = "Reklamy\nzablokowane";
+/* Setting to always request the desktop version of a website. */
+"AlwaysRequestDesktopSite" = "Zawsze żądaj wersji komputerowej";
 
 /* Used as a button label for crash dialog prompt */
 "AlwaysSendButtonTitle" = "Zawsze wysyłaj";
 
-/* tabs bar show/hide option */
+/* Setting preference to always show the browser tabs bar. */
 "AlwaysShow" = "Zawsze pokazuj";
 
 /* Label used as a setting item and title of the following screen to change the current passcode */
@@ -124,7 +121,7 @@
 /* No comment provided by engineer. */
 "BlockAdsAndTracking" = "Blokuj reklamy i śledzenie";
 
-/* cookie settings option */
+/* Title for setting to block all website cookies. */
 "BlockAllCookies" = "Blokuj wszystkie pliki cookie";
 
 /* block all cookies settings action title */
@@ -181,6 +178,9 @@
 /* Section title for adbblock, tracking protection, HTTPS-E, and cookies */
 "BraveShieldDefaults" = "Domyślne ustawienia Brave Shield";
 
+/* Sync page title */
+"BraveSync" = "Synchronizuj";
+
 /* Sync settings welcome */
 "BraveSyncWelcome" = "Aby rozpocząć, należy zainstalować oprogramowanie Brave na wszystkich urządzeniach, które planujesz zsynchronizować. Aby je połączyć, rozpocznij łańcuch synchronizacji, który zostanie użyty do bezpiecznego połączenia ze sobą wszystkich urządzeń.";
 
@@ -234,6 +234,12 @@
 
 /* Code words section title */
 "CodeWords" = "Słowa kodowe";
+
+/* Text to choose for downloading a file (example: saving an image to phone) */
+"CommonDownload" = "Pobierz";
+
+/* Text to select sharing something (example: image, video, URL) */
+"CommonShare" = "Udostępnij";
 
 /* No comment provided by engineer. */
 "Confirm" = "Potwierdź";
@@ -316,6 +322,15 @@
 /* Used as a button label for crash dialog prompt */
 "DontSendButtonTitle" = "Nie wysyłaj";
 
+/* Settings item for clearing downloaded files. */
+"DownloadedFiles" = "Pobierane pliki";
+
+/* Title for downloads menu item */
+"DownloadsMenuItem" = "Pobierane";
+
+/* Title for when a user has nothing downloaded onto their device, and the list is empty. */
+"DownloadsPanelEmptyStateTitle" = "W tym miejscu pojawią się pobrane pliki.";
+
 /* No comment provided by engineer. */
 "Edit" = "Edytuj";
 
@@ -370,9 +385,6 @@
 /* Button label to temporarily continue to the site from the certificate error page */
 "ErrorPagesVisitOnceButton" = "Wejdź na stronę mimo to";
 
-/* Shields Time Saved Stat */
-"EstTimerSaved" = "Szacowany czas\nzapisany";
-
 /* Footer text when user selects to save to favorites when editing a bookmark */
 "FavoritesLocationFooterText" = "Ulubione znajdują się na ekranie głównym. Te zakładki nie są synchronizowane z innymi urządzeniami.";
 
@@ -400,9 +412,6 @@
 /* individual blocking statistic title */
 "FingerprintingMethods" = "Metody pobierania odcisków palców";
 
-/* blocking stat title */
-"FingerprintingnProtection" = "Ochrona pobierania\nodcisków palców";
-
 /* No comment provided by engineer. */
 "FingerprintingProtection" = "Ochrona pobierania odcisków palców";
 
@@ -421,9 +430,6 @@
 /* No comment provided by engineer. */
 "HTTPSEverywhere" = "HTTPS w każdym miejscu";
 
-/* Shields Https Stat */
-"HTTPSrUpgrades" = "Uaktualnienia\n HTTPS";
-
 /* individual blocking statistic title */
 "HTTPSUpgrades" = "Aktualizacje HTTPS";
 
@@ -435,9 +441,6 @@
 
 /* History tableview section header */
 "LastWeek" = "W zeszłym tygodniu";
-
-/* DuckDuckGo promotion label. */
-"LearnAboutPrivateSearchrwithDuckDuckGo" = "Dowiedz się więcej o wyszukiwaniu w trybie prywatnym\nz wykorzystaniem DuckDuckGo";
 
 /* Footer label describing when the current login was last modified with the timestamp as the parameter. */
 "LoginDetailLastModifiedCellFormatTitle" = "Ostatnio zmodyfikowano %@";
@@ -478,7 +481,7 @@
 /* Bookmark title / Device name */
 "Name" = "Nazwa";
 
-/* tabs bar show/hide option */
+/* Setting preference to always hide the browser tabs bar. */
 "NeverShow" = "Nigdy nie pokazuj";
 
 /* Default name for creating a new bookmark. */
@@ -563,7 +566,7 @@
 "PrivateBrowsingOnly" = "Przeglądanie wyłącznie w trybie prywatnym";
 
 /* Private tab details */
-"PrivateTabBody" = "Karty w trybie prywatnym nie są zapisywane w przeglądarce Brave, ale nie czyni to Ciebie anonimowym użytkownikiem sieci. Strony odwiedzane w trybie prywatnym nie będą wyświetlane w historii, a pliki cookie zostaną usunięte po zamknięciu stron — w przeglądarce Brave nie pozostanie po nich żaden ślad. Twój operator (lub właściciel użytkowanych przez Ciebie sieci Wi-Fi lub VPN) może zobaczyć odwiedzane przez Ciebie witryny, a na tych witrynach będzie znany Twój publiczny adres IP, nawet podczas korzystania z kart w trybie prywatnym.";
+"PrivateTabBody" = "Karty w trybie prywatnym nie są zapisywane w przeglądarce Brave, ale nie czyni to Ciebie anonimowym użytkownikiem sieci. Strony odwiedzane w trybie prywatnym nie będą wyświetlane w historii, a pliki cookie zostaną usunięte po zamknięciu stron — w przeglądarce Brave nie pozostanie po nich żaden ślad, ale zapisane pliki nie zostaną usunięte.\nTwój operator (lub właściciel użytkowanych przez Ciebie sieci Wi-Fi lub VPN) może zobaczyć odwiedzane przez Ciebie witryny, a na tych witrynach będzie znany Twój publiczny adres IP, nawet podczas korzystania z kart w trybie prywatnym.";
 
 /* Private tab detail text */
 "PrivateTabDetails" = "Używanie kart prywatnych zmienia tylko działanie Brave na Twoim urządzeniu, nie zmieniając zachowań innych.\n\nStrony zawsze poznają Twój adres IP, gdy je odwiedzasz. Na tej podstawie są często w stanie z grubsza odgadnąć Twoją lokalizację – zazwyczaj miasto. Czasem określenie lokalizacji może być znacznie bardziej precyzyjne. Strony mają też informację o wszystkim, co przekaże im użytkownik np. o wyszukiwanych hasłach. W przypadku zalogowania się na stronie, wiadomo, kto jest właścicielem konta. Po zamknięciu kart prywatnych nastąpi wylogowanie, ponieważ Brave usuwa pliki cookie odpowiedzialne za zalogowanie.\n\nKażdy, kto podłącza Cię do Internetu (czyli Twój dostawca) widzi całą Twoją aktywność sieciową. Często jest to Twój dostawca usług telefonii komórkowej. W przypadku podłączenia do sieci Wi-Fi jest to właściciel tej sieci, a jeśli korzystasz z VPN, jest to jego operator. Twój dostawca widzi, jakie strony odwiedzasz. W przypadku korzystania z protokołu HTTPS można tyko zgadywać, co robisz na stronie, ale jeśli używany jest zwykły protokół HTTP to dostawca widzi wszystko: wyszukiwane hasła, czytane strony i klikane łącza.\n\nJeśli Twój pracodawca zarządza Twoim urządzeniem to może też monitorować Twoje korzystanie z niego. Korzystanie z kart prywatnych prawdopodobnie nie ukryje odwiedzanych stron. Ktoś, kto ma dostęp do Twojego urządzenia mógł zainstalować oprogramowanie, które monitoruje Twoją aktywność, a karty prywatne nie chronią przed tym.";
@@ -643,7 +646,7 @@
 /* Button to remove a favorite */
 "RemoveFavorite" = "Usuń z ulubionych";
 
-/* Show mail composer to report a bug. */
+/* Providers the user an email page where they can submit a but report. */
 "ReportABug" = "Zgłoś błąd";
 
 /* Restore Tabs Affirmative Action */
@@ -766,6 +769,18 @@
 /* Time Saved Seconds */
 "ShieldsTimeStatsSeconds" = "s";
 
+/* Quick Action for 3D-Touch on the Application Icon */
+"ShortcutItemTitleNewPrivateTab" = "Nowa karta prywatna";
+
+/* Quick Action for 3D-Touch on the Application Icon */
+"ShortcutItemTitleNewTab" = "Nowa karta";
+
+/* Quick Action for 3D-Touch on the Application Icon */
+"ShortcutItemTitleQRCode" = "Skanuj kod QR";
+
+/* Setting to show a bookmark button on the top level menu that triggers a panel of the user's bookmarks. */
+"ShowBookmarkButtonInTopToolbar" = "Przycisk pokaż zakładki";
+
 /* Button to show the bookmarks list */
 "ShowBookmarks" = "Pokaż zakładki";
 
@@ -775,7 +790,7 @@
 /* Button to show the history list */
 "ShowHistory" = "Pokaż historię";
 
-/* tabs bar show/hide option */
+/* Setting preference to only show the browser tabs bar when the device is in the landscape orientation. */
 "ShowInLandscapeOnly" = "Pokaż tylko w orientacji poziomej";
 
 /* Accessibility Label for the tabs button in the browser toolbar */
@@ -793,6 +808,15 @@
 /* Support section title */
 "Support" = "Wsparcie";
 
+/* Message body of alert that seeks permission from user to suppress future JS alerts */
+"SuppressAlertsActionMessage" = "Zablokuj możliwość tworzenia dodatkowych powiadomień na tej stronie";
+
+/* Title of alert that seeks permission from user to suppress future JS alerts */
+"SuppressAlertsActionTitle" = "Ukryj powiadomienia";
+
+/* Sync settings section title */
+"Sync" = "Synchronizacja";
+
 /* Add another device cell button. */
 "SyncAddAnotherDevice" = "Dodaj kolejne urządzenie";
 
@@ -802,8 +826,14 @@
 /* Add mobile device to sync with scan */
 "SyncAddDeviceScan" = "Skanuj kod QR łańcucha";
 
+/* Sync add device description */
+"SyncAddDeviceScanDescription" = "Na drugim urządzeniu mobilnym przejdź do obszaru Synchronizacja w panelu Ustawienia i dotknij przycisku „Skanuj kod synchronizacji”. Skorzystaj z aparatu, aby zeskanować poniższy kod QR.\n Traktuj ten kod jak hasło. Jeśli ktoś go pozna, będzie mógł odczytać i zmodyfikować synchronizowane dane.";
+
 /* Add device to sync with code words */
 "SyncAddDeviceWords" = "Wpisz kod synchronizacji";
+
+/* Sync add device description */
+"SyncAddDeviceWordsDescription" = "Przejdź na urządzeniu do obszaru Synchronizacja w panelu Ustawienia i dotknij przycisku „%@”. Wprowadź słowa kodowe łańcucha synchronizacji podane poniżej.\n Traktuj ten kod jak hasło. Jeśli ktoś go pozna, będzie mógł odczytać i zmodyfikować synchronizowane dane.";
 
 /* Add device to sync with code words navigation title */
 "SyncAddDeviceWordsTitle" = "Wprowadź słowa kodowe";
@@ -822,6 +852,12 @@
 
 /* Sync you browser settings across devices. */
 "SyncDevices" = "Urządzenia i ustawienia";
+
+/* Message for sync initialization error alert */
+"SyncInitErrorMessage" = "Agent synchronizacji działa obecnie w trybie offline lub jest niedostępny. Spróbuj ponownie później.";
+
+/* Title for sync initialization error alert */
+"SyncInitErrorTitle" = "Błąd komunikacji z synchronizacją";
 
 /* No internet connection alert body. */
 "SyncNoConnectionBody" = "Sprawdź połączenie internetowe i spróbuj ponownie.";
@@ -967,11 +1003,23 @@
 /* Show Brave Browser TOS page from the Privacy section in the settings. */
 "TermsOfUse" = "Warunki użytkowania";
 
+/* Selection to automatically color/style the user interface. */
+"ThemesAutomaticOption" = "Automatyczny";
+
+/* Selection to color/style the user interface with a dark theme */
+"ThemesDarkOption" = "Ciemny";
+
+/* Setting to choose the user interface theme for normal browsing mode, contains choices like 'light' or 'dark' themes */
+"ThemesDisplayBrightness" = "Wyświetlanie i jasność";
+
+/* Text specifying that the above setting does not impact the user interface while they user is in private browsing mode. */
+"ThemesDisplayBrightnessFooter" = "Ustawienia te nie są stosowane w trybie przeglądania prywatnego.";
+
+/* Selection to color/style the user interface with a light theme. */
+"ThemesLightOption" = "Jasny";
+
 /* History tableview section header */
 "Today" = "Dzisiaj";
-
-/* Shields Trackers Stat */
-"TrackersrBlocked" = "Śledzeń\nzablokowano";
 
 /* Sync Alert */
 "UnableToConnectDescription" = "Nie można dołączyć do grupy synchronizacji. Sprawdź wprowadzone słowa i spróbuj ponownie.";
