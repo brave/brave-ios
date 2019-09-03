@@ -237,12 +237,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
             Preferences.General.basicOnboardingCompleted.value =
                 isFirstLaunch ? OnboardingState.unseen.rawValue : OnboardingState.completed.rawValue
         }
-        Preferences.General.isFirstLaunch.value = false
         Preferences.Review.launchCount.value += 1
         
         if isFirstLaunch {
             FavoritesHelper.addDefaultFavorites()
-            profile?.searchEngines.setupDefaultRegionalSearchEngines()
+            profile?.searchEngines.regionalSearchEngineSetup()
         }
         if let urp = UserReferralProgram.shared {
             if isFirstLaunch {
@@ -259,6 +258,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         }
         
         AdblockResourceDownloader.shared.startLoading()
+        Preferences.General.isFirstLaunch.value = false
       
         return shouldPerformAdditionalDelegateHandling
     }
