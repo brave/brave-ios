@@ -13,14 +13,37 @@ function install() {
     webkit.messageHandlers.adsMediaReporting.postMessage(playing);
   }
 
-  let originalPlay = HTMLMediaElement.prototype.play;
-  HTMLMediaElement.prototype.play = function() {
-    this.addEventListener('playing', function() {
-      sendMessage(true)
-    });
-    this.addEventListener('pause', function() {
-      sendMessage(false)
-    });
-    return originalPlay.apply(this, arguments);
+  function checkVideoNode(node) {
+    if (node.constructor.name == "HTMLVideoElement") {
+      hookVideoFunctions();
+    }
   }
+
+  function mediaPaused() {
+    sendMessage(false)
+  }
+
+  function mediaPlaying() {
+    sendMessage(true)
+  }
+
+  function getVideoElements() {
+    return document.querySelectorAll('video')
+  }
+
+  function hookVideoFunctions() {
+    getVideoElements().forEach(function (item) {
+      item.addEventListener('pause', mediaPaused, false);
+      item.addEventListener('playing', mediaPlaying, false);
+    });
+  }
+
+  var observer = new MutationObserver(function (mutations) {
+    mutations.forEach(function (mutation) {
+      mutation.addedNodes.forEach(function (node) {
+        checkVideoNode(node);
+      });
+    });
+  });
+  observer.observe(document, {subtree: true, childList: true });
 }

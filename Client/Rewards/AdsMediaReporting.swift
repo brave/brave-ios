@@ -8,7 +8,7 @@ import BraveRewards
 
 class AdsMediaReporting: TabContentScript {
     let rewards: BraveRewards
-    let tab: Tab
+    weak var tab: Tab?
     
     init(rewards: BraveRewards, tab: Tab) {
         self.rewards = rewards
@@ -25,6 +25,7 @@ class AdsMediaReporting: TabContentScript {
     
     func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage) {
         if let isPlaying = message.body as? Bool, rewards.ledger.isEnabled && rewards.ads.isEnabled {
+            guard let tab = tab else { return }
             if isPlaying {
                 rewards.reportMediaStarted(tabId: tab.rewardsId)
             } else {
