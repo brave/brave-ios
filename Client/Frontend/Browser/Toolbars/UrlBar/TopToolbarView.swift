@@ -140,11 +140,12 @@ class TopToolbarView: UIView, ToolbarProtocol {
         return button
     }()
 
-    var bookmarkButton = ToolbarButton().then {
+    lazy var bookmarkButton = ToolbarButton().then {
         $0.setImage(#imageLiteral(resourceName: "menu_bookmarks").template, for: .normal)
         $0.accessibilityLabel = Strings.BookmarksMenuItem
         $0.addTarget(self, action: #selector(didClickBookmarkButton), for: .touchUpInside)
     }
+    
     var forwardButton = ToolbarButton()
     var shareButton = ToolbarButton()
     var addTabButton = ToolbarButton()
@@ -427,7 +428,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
         locationView.contentView.isHidden = inOverlayMode
         
         let showBookmarkPref = Preferences.General.showBookmarkToolbarShortcut.value
-        bookmarkButton.isHidden = showBookmarkPref ? !toolbarIsShowing || inOverlayMode : false
+        bookmarkButton.isHidden = showBookmarkPref ? inOverlayMode : true
     }
     
     private func animateToOverlayState(overlayMode overlay: Bool, didCancel cancel: Bool = false) {
