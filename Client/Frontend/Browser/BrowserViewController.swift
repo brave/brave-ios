@@ -19,6 +19,7 @@ import BraveShared
 import SwiftKeychainWrapper
 import BraveRewardsUI
 import BraveRewards
+import StoreKit
 
 private let log = Logger.browserLogger
 
@@ -471,6 +472,13 @@ class BrowserViewController: UIViewController {
         view.addInteraction(dropInteraction)
         
         initializeSyncWebView()
+        
+        if AppConstants.BuildChannel.isRelease && AppReview.shouldRequestReview() {
+            // Request Review when the main-queue is free or on the next cycle.
+            DispatchQueue.main.async {
+                SKStoreReviewController.requestReview()
+            }
+        }
     }
     
     /// Initialize Sync without connecting. Sync webview needs to be in a "permanent" location
@@ -1627,6 +1635,21 @@ extension BrowserViewController: TopToolbarDelegate {
         }
         let popover = PopoverController(contentController: shields, contentSizeBehavior: .preferredContentSize)
         popover.present(from: topToolbar.locationView.shieldsButton, on: self)
+    }
+    
+    // TODO: This logic should be fully abstracted away and share logic from current MenuViewController
+    // See: https://github.com/brave/brave-ios/issues/1452
+    func topToolbarDidTapBookmarkButton(_ topToolbar: TopToolbarView) {
+        let vc = BookmarksViewController(folder: nil, isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing)
+        vc.toolbarUrlActionsDelegate = self
+        
+        let nav = SettingsNavigationController(rootViewController: vc)
+        nav.modalPresentationStyle = .formSheet
+        
+        let button = UIBarButtonItem(barButtonSystemItem: .done, target: nav, action: #selector(SettingsNavigationController.done))
+        nav.navigationBar.topItem?.rightBarButtonItem = button
+        
+        present(nav, animated: true)
     }
     
     func topToolbarDidTapBraveRewardsButton(_ topToolbar: TopToolbarView) {

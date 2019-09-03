@@ -252,6 +252,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
                 isFirstLaunch ? OnboardingState.unseen.rawValue : OnboardingState.completed.rawValue
         }
         Preferences.General.isFirstLaunch.value = false
+        Preferences.Review.launchCount.value += 1
         
         if isFirstLaunch {
             FavoritesHelper.addDefaultFavorites()
