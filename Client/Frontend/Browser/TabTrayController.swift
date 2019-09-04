@@ -235,6 +235,7 @@ class TabTrayController: UIViewController, Themeable {
              * the related tab's theme, here this is not possible, so using hardened values 😕😭
              */
             applyTheme(Theme.of(nil))
+            toolbar.privateModeButton.isSelected = privateMode
             collectionView?.reloadData()
             setNeedsStatusBarAppearanceUpdate()
         }
@@ -465,10 +466,9 @@ class TabTrayController: UIViewController, Themeable {
         tabManager.willSwitchTabMode(leavingPBM: privateMode)
         privateMode = !privateMode
         
-        //When we switch from Private => Regular make sure we reset _selectedIndex, fix for bug #888
+        // When we switch from Private => Regular make sure we reset _selectedIndex, fix for bug #888
         tabManager.resetSelectedIndex()
-
-        toolbar.privateModeButton.isSelected = privateMode
+        
         collectionView.layoutSubviews()
 
         let toView: UIView
