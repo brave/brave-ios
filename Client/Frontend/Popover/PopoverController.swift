@@ -100,7 +100,7 @@ class PopoverController: UIViewController {
             navigationController.interactivePopGestureRecognizer?.delegate = self
         }
         
-        self.modalPresentationStyle = .overFullScreen
+        self.modalPresentationStyle = .overCurrentContext
         self.transitioningDelegate = self
     }
     
