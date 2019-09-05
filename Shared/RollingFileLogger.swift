@@ -28,6 +28,8 @@ open class RollingFileLogger: XCGLogger {
         self.logDirectoryPath = logDirectoryPath
         super.init()
         
+        identifier = filenameRoot
+        
         if !AppConstants.BuildChannel.isRelease {
             setUpConsoleLogs()
         }
@@ -39,7 +41,7 @@ open class RollingFileLogger: XCGLogger {
         let systemDestination = AppleSystemLogDestination(identifier: "com.brave.logs")
         
         systemDestination.outputLevel = .debug
-        systemDestination.showLogIdentifier = false
+        systemDestination.showLogIdentifier = true
         systemDestination.showFunctionName = true
         systemDestination.showThreadName = true
         systemDestination.showLevel = true
