@@ -33,7 +33,7 @@ class Theme: Equatable, Decodable {
         case light = "ACE618A3-D6FC-45A4-94F2-1793C40AE927"
         case dark = "B900A41F-2C02-4664-9DE4-C170956339AC"
         case `private` = "C5CB0D9A-5467-432C-AB35-1A78C55CFB41"
-        
+
         // TODO: Theme: Remove with `rawValue`
         var id: String {
             return self.rawValue
@@ -44,17 +44,24 @@ class Theme: Equatable, Decodable {
         }
         
         static var normalThemesOptions: [DefaultTheme] {
-            let always = [DefaultTheme.light, DefaultTheme.dark]
             if #available(iOS 13.0, *) {
-                return [DefaultTheme.system] + always
+                return [DefaultTheme.system, DefaultTheme.light, DefaultTheme.dark]
             } else {
-                return always
+                // iOS 12 .system is treated as .light
+                return [DefaultTheme.system, DefaultTheme.dark]
             }
         }
         
         public var displayString: String {
             // Due to translations needs, titles are hardcoded here, ideally they would be pulled from the
             //  theme files themselves.
+            
+            if #available(iOS 13.0, *) {
+                // continue
+            } else if self == .system {
+                // iOS 12 .system is treated as .light
+                return Strings.ThemesLightOption
+            }
             
             switch self {
             case .system: return Strings.ThemesAutomaticOption
@@ -63,15 +70,6 @@ class Theme: Equatable, Decodable {
                 
             // Should not be visible, but making explicit so compiler will capture any `DefaultTheme` modifications
             case .private: return "<invalid>"
-            }
-        }
-        
-        // Used for preferences
-        static func defaultOSChoice() -> String {
-            if #available(iOS 13.0, *) {
-                return DefaultTheme.system.id
-            } else {
-                return DefaultTheme.light.id
             }
         }
     }
@@ -233,7 +231,6 @@ class Theme: Equatable, Decodable {
     static func from(id: String) -> Theme {
         var id = id
         if id == DefaultTheme.system.id {
-            // TODO: Pull system default, not 'light' necessarily
             id = currentSystemThemeId
         }
         
