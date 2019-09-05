@@ -9,7 +9,6 @@ import Data
 import BraveShared
 
 private let log = Logger.browserLogger
-private let rewardsLog = Logger.rewardsLogger
 
 extension WKNavigationAction {
     /// Allow local requests only if the request is privileged.

@@ -10,9 +10,9 @@ import BraveShared
 import XCGLogger
 import Data
 import CoreData
+import os.log
 
 private let log = Logger.browserLogger
-private let rewardsLog = Logger.rewardsLogger
 
 protocol TabManagerDelegate: class {
     func tabManager(_ tabManager: TabManager, didSelectedTabChange selected: Tab?, previous: Tab?)
@@ -259,13 +259,16 @@ class TabManager: NSObject {
         if !PrivateBrowsingManager.shared.isPrivateBrowsing {
             let previousFaviconURL = URL(string: previousTab.displayFavicon?.url ?? "")
             if previousFaviconURL == nil {
-                rewardsLog.warning("No favicon found in \(previousTab) to report to rewards panel")
+                os_log(.error, log: Logger.rewards, "No favicon found in tab with url %{public}s to report to rewards panel",
+                       previousTab.url?.absoluteString ?? "nil")
+                
             }
             rewards.reportTabUpdated(Int(previousTab.rewardsId), url: previousTabUrl, faviconURL: previousFaviconURL, isSelected: false,
                                      isPrivate: previousTab.isPrivate)
             let faviconURL = URL(string: newSelectedTab.displayFavicon?.url ?? "")
             if faviconURL == nil {
-                rewardsLog.warning("No favicon found in \(newSelectedTab) to report to rewards panel")
+                os_log(.error, log: Logger.rewards, "No favicon found in tab with url %{public}s to report to rewards panel",
+                newSelectedTab.url?.absoluteString ?? "nil")
             }
             rewards.reportTabUpdated(Int(newSelectedTab.rewardsId), url: newTabUrl, faviconURL: faviconURL, isSelected: true,
                                      isPrivate: newSelectedTab.isPrivate)

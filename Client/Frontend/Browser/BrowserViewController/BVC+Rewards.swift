@@ -7,8 +7,7 @@ import BraveRewards
 import BraveRewardsUI
 import Data
 import Shared
-
-private let log = Logger.rewardsLogger
+import os.log
 
 struct RewardsHelper {
     static func configureRewardsLogs(showFileName: Bool = true, showLine: Bool = true) {
@@ -24,17 +23,18 @@ struct RewardsHelper {
             }
             
             let logOutput = extraInfo.isEmpty ? data : "\(extraInfo) \(data)"
+            var logType: OSLogType = .debug
             
             switch logLevel {
-            case .logDebug: log.debug(logOutput)
             // Response and request log levels are ledger-specific.
-            case .logInfo, .logResponse, .logRequest: log.info(logOutput)
-            case .logWarning: log.warning(logOutput)
-            case .logError: log.error(logOutput)
+            case .logDebug, .logResponse, .logRequest: logType = .debug
+            case .logInfo, .logWarning: logType = .info
+            case .logError: logType = .error
             @unknown default:
                 assertionFailure()
-                log.debug(logOutput)
             }
+            
+            os_log(logType, log: Logger.rewards, "%{public}s", logOutput)
         }, withFlush: nil)
     }
 }
@@ -114,7 +114,8 @@ extension Tab {
             guard let htmlString = html as? String else { return }
             let faviconURL = URL(string: self.displayFavicon?.url ?? "")
             if faviconURL == nil {
-                log.warning("No favicon found in \(self) to report to rewards panel")
+                os_log(.error, log: Logger.rewards, "No favicon found in found in tab with url %{public}s to report to rewards panel",
+                       self.url?.absoluteString ?? "nil")
             }
             rewards.reportLoadedPage(url: url, faviconUrl: faviconURL, tabId: self.rewardsId, html: htmlString, shouldClassifyForAds: shouldClassify)
         })
@@ -151,7 +152,8 @@ extension BrowserViewController: RewardsDataSource {
                     completionHandler(htmlString)
                 } else {
                     if let error = error {
-                        log.error("Failed to get page HTML with JavaScript: \(error)")
+                        os_log(.error, log: Logger.rewards, "Failed to get page HTML with JavaScript: %{public}s",
+                               error.localizedDescription)
                     }
                     completionHandler(nil)
                 }

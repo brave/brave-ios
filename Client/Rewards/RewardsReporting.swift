@@ -5,10 +5,8 @@
 import Foundation
 import WebKit
 import BraveRewards
-import XCGLogger
 import Shared
-
-private let log = Logger.rewardsLogger
+import os.log
 
 class RewardsReporting: TabContentScript {
     let rewards: BraveRewards
@@ -64,7 +62,8 @@ class RewardsReporting: TabContentScript {
                 }
             }
         } catch {
-            log.error("Failed to parse message from rewards reporting JS: \(error)")
+            os_log(.error, log: Logger.rewards, "Failed to parse message from rewards reporting JS: %{public}s",
+                error.localizedDescription)
         }
     }
 }

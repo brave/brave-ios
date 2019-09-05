@@ -4,6 +4,7 @@
 
 import Foundation
 import XCGLogger
+import os.log
 
 public struct Logger {}
 
@@ -17,14 +18,6 @@ public extension Logger {
     /// Logger used for recording frontend/browser happenings
     static let browserLogger = RollingFileLogger(filenameRoot: "browser", logDirectoryPath: Logger.logFileDirectoryPath())
     
-    /// Logger used for things recorded on BraveRewards framework.
-    static let rewardsLogger: RollingFileLogger = {
-        let logger = RollingFileLogger(filenameRoot: "rewards", logDirectoryPath: Logger.logFileDirectoryPath())
-        logger.setup(showFunctionName: false, showFileNames: false, showLineNumbers: false)
-        
-        return logger
-    }()
-    
     static let braveSyncLogger = RollingFileLogger(filenameRoot: "bravesync", logDirectoryPath: Logger.logFileDirectoryPath())
 
     /// Logger used for recording interactions with the keychain
@@ -36,6 +29,8 @@ public extension Logger {
         logger.newLogWithDate(Date())
         return logger
     }()
+    
+    static let rewards = OSLog(subsystem: "com.brave.ios.logs", category: "rewards")
 
     /**
     Return the log file directory path. If the directory doesn't exist, make sure it exist first before returning the path.
