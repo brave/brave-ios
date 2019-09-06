@@ -291,7 +291,24 @@ class SettingsViewController: TableViewController {
                 }
             })
         ]
-        privacy.rows.append(BoolRow(title: Strings.Private_Browsing_Only, option: Preferences.Privacy.privateBrowsingOnly))
+        privacy.rows.append(
+            BoolRow(
+                title: Strings.Private_Browsing_Only,
+                option: Preferences.Privacy.privateBrowsingOnly,
+                onValueChange: {
+                    Preferences.Privacy.privateBrowsingOnly.value = $0
+                    
+                    // Need to flush the table, hacky, but works consistenly and well
+                    let superView = self.tableView.superview
+                    self.tableView.removeFromSuperview()
+                    DispatchQueue.main.async {
+                        // Let shield toggle change propagate, otherwise theme may not be set properly
+                        superView?.addSubview(self.tableView)
+                        self.applyTheme(self.theme)
+                    }
+                }
+            )
+        )
         return privacy
     }()
     
