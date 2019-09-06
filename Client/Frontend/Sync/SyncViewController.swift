@@ -44,5 +44,6 @@ class SyncViewController: UIViewController {
         }
     }
     
+    // This is used for `appearance()` usage, so can target sync background views
     class SyncView: UIView {}
 }

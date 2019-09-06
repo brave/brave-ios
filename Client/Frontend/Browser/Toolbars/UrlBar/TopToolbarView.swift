@@ -145,7 +145,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
     var forwardButton = ToolbarButton(top: true)
     var shareButton = ToolbarButton(top: true)
     var addTabButton = ToolbarButton(top: true)
-    lazy var menuButton = ToolbarButton(top: true).then { //
+    lazy var menuButton = ToolbarButton(top: true).then {
         $0.contentMode = .center
         $0.accessibilityIdentifier = "topToolbarView-menuButton"
     }

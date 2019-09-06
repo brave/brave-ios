@@ -6,20 +6,18 @@ import Foundation
 import Shared
 import BraveShared
 
-// Most of these should be removed
 extension UIColor {
     // These are defaults from http://design.firefox.com/photon/visuals/color.html
     struct Defaults {
         static let MobileGreyF = UIColor(rgb: 0x636369)
         static let iOSHighlightBlue = UIColor(rgb: 0xccdded) // This color should exactly match the ios text highlight
-        static let Purple60A30 = UIColor(rgba: 0x8000d74c) // Maybe use this color for private theme??
+        static let Purple60A30 = UIColor(rgba: 0x8000d74c)
         static let MobilePrivatePurple = UIColor(rgb: 0xcf68ff)
         static let PaleBlue = UIColor(rgb: 0xB0D5FB)
         static let LightBeige = UIColor(rgb: 0xf0e6dc)
     }
 }
 
-// TODO: Theme: Delete most of this
 public struct UIConstants {
     static let AboutHomePage = URL(string: "\(WebServer.sharedInstance.base)/about/home/")!
 

@@ -74,8 +74,10 @@ extension UrlBarTextField: Themeable {
         styleChildren(theme: theme)
         
         backgroundColor = theme.colors.addressBar.withAlphaComponent(theme.colors.transparencies.addressBarAlpha)
-        textColor = theme.colors.tints.header
-        clearButtonTintColor = textColor
-        highlightColor = textColor!.withAlphaComponent(0.2)
+        
+        let text = theme.colors.tints.header
+        textColor = text
+        clearButtonTintColor = text
+        highlightColor = text.withAlphaComponent(0.2)
     }
 }

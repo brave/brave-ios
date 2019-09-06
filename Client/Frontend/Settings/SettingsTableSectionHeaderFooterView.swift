@@ -5,7 +5,6 @@
 import Shared
 import UIKit
 
-// TODO: Theme: Remove a bunch of these
 struct SettingsUX {
     static let TableViewHeaderBackgroundColor = UIConstants.AppBackgroundColor
     static let TableViewHeaderTextColor = UIColor.Photon.Grey50

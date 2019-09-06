@@ -141,7 +141,6 @@ class SettingsViewController: TableViewController {
             ]
         )
         
-        // TODO: This can be further abstracted to align with an entire OptionSelectionVC for both tab and theme visibility
         let reloadCell = { (row: Row, displayString: String) in
             if let indexPath = self.dataSource.indexPath(rowUUID: row.uuid, sectionUUID: general.uuid) {
                 self.dataSource.sections[indexPath.section].rows[indexPath.row].detailText = displayString
