@@ -14,7 +14,6 @@ protocol Themeable {
 }
 
 extension Themeable {
-    // TODO: Remove, should be explicity done on each Themeable view, but doing this to avoid tons of compile errors
     var themeableChildren: [Themeable?]? { return nil }
     
     func applyTheme(_ theme: Theme) {
