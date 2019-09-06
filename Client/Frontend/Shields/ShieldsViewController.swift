@@ -144,7 +144,7 @@ class ShieldsViewController: UIViewController, PopoverContentComponent {
     
     override func loadView() {
         view = View()
-        shieldsView.set(theme: Theme.of(tab))
+        shieldsView.applyTheme(Theme.of(tab))
     }
     
     override func viewDidLoad() {

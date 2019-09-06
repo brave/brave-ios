@@ -8,7 +8,7 @@ import BraveShared
 
 extension ShieldsViewController {
     /// The custom loaded view for the `ShieldsViewController`
-    class View: UIView {
+    class View: UIView, Themeable {
         private let scrollView = UIScrollView()
         
         let stackView: UIStackView = {
@@ -63,7 +63,10 @@ extension ShieldsViewController {
             fatalError()
         }
         
-        func set(theme: Theme) {
+        // MARK: - Themeable
+        func applyTheme(_ theme: Theme) {
+            styleChildren(theme: theme)
+            
             backgroundColor = theme.colors.home
             
             // Overview
