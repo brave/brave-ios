@@ -43,8 +43,8 @@ extension Preferences {
         static let tabBarVisibility = Option<Int>(key: "general.tab-bar-visiblity", default: TabBarVisibility.always.rawValue)
         /// Defines the user's normal browsing theme
         /// `system`, follows the current OS display mode
-        static let themeNormalMode = Option<String>(key: "general.normal-mode-theme", default: Theme.DefaultTheme.system.id)
-        static let themePrivateMode = Option<String>(key: "general.private-mode-theme", default: Theme.DefaultTheme.private.id)
+        static let themeNormalMode = Option<String>(key: "general.normal-mode-theme", default: Theme.DefaultTheme.system.rawValue)
+        static let themePrivateMode = Option<String>(key: "general.private-mode-theme", default: Theme.DefaultTheme.private.rawValue)
         /// Specifies whether the bookmark button is present on toolbar
         static let showBookmarkToolbarShortcut = Option<Bool>(key: "general.show-bookmark-toolbar-shortcut", default: UIDevice.isIpad)
         /// Sets Desktop UA for iPad by default (iOS 13+ & iPad only)

@@ -33,14 +33,9 @@ class Theme: Equatable, Decodable {
         case light = "ACE618A3-D6FC-45A4-94F2-1793C40AE927"
         case dark = "B900A41F-2C02-4664-9DE4-C170956339AC"
         case `private` = "C5CB0D9A-5467-432C-AB35-1A78C55CFB41"
-
-        // TODO: Theme: Remove with `rawValue`
-        var id: String {
-            return self.rawValue
-        }
         
         var theme: Theme {
-           return Theme.from(id: self.id)
+           return Theme.from(id: self.rawValue)
         }
         
         static var normalThemesOptions: [DefaultTheme] {
@@ -230,7 +225,7 @@ class Theme: Equatable, Decodable {
     static var themeMemoryBank: [String: Theme] = [:]
     static func from(id: String) -> Theme {
         var id = id
-        if id == DefaultTheme.system.id {
+        if id == DefaultTheme.system.rawValue {
             id = currentSystemThemeId
         }
         
@@ -253,10 +248,10 @@ class Theme: Equatable, Decodable {
     private static var currentSystemThemeId: String {
         // Should really be based off of preferences, a dark theme and light theme preference
         
-        let fallback = DefaultTheme.light.id
+        let fallback = DefaultTheme.light.rawValue
         if #available(iOS 13.0, *) {
             let isDark = UITraitCollection.current.userInterfaceStyle == .dark
-            return isDark ? DefaultTheme.dark.id : fallback
+            return isDark ? DefaultTheme.dark.rawValue : fallback
         }
         return fallback
     }
