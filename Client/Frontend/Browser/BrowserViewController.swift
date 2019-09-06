@@ -2004,11 +2004,9 @@ extension BrowserViewController: TabManagerDelegate {
                 topToolbar.hideProgressBar()
             }
 
-            // TODO: Theme: Maybe check against Theme instead of type??
-            // TODO: Theme: store past theme and block if change unneeded
-            if tab.type != previous?.type {
-                let theme = Theme.of(tab)
-                applyTheme(theme)
+            let newTheme = Theme.of(tab)
+            if previous == nil || newTheme != Theme.of(previous) {
+                applyTheme(newTheme)
             }
 
             readerModeCache = ReaderMode.cache(for: tab)

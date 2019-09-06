@@ -46,8 +46,6 @@ class SettingsTableSectionHeaderFooterView: UITableViewHeaderFooterView {
 
     override init(reuseIdentifier: String?) {
         super.init(reuseIdentifier: reuseIdentifier)
-        backgroundView = UIView()
-        backgroundView?.backgroundColor = .clear
         addSubview(titleLabel)
 
         setupInitialConstraints()
