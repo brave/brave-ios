@@ -229,11 +229,10 @@ class TabTrayController: UIViewController, Themeable {
             // Should be set immediately before other logic executes
             PrivateBrowsingManager.shared.isPrivateBrowsing = privateMode
             tabDataSource.tabs = tabManager.tabsForCurrentMode
-            /*
-             * This is a little tricky since this menu is one of the only places inside of the appliation
-             * that has a state without gauranteeing a tab exists. Most UI elements should use `theme` or at the least
-             * the related tab's theme, here this is not possible, so using hardened values 😕😭
-             */
+            
+            // This is a little tricky since this menu is one of the only places inside of the appliation
+            //  that has a state without gauranteeing a tab exists. Most UI elements should use `theme` or at the least
+            //  the related tab's theme, here this is not possible, so using hardened values 😕😭
             applyTheme(Theme.of(nil))
             toolbar.privateModeButton.isSelected = privateMode
             collectionView?.reloadData()

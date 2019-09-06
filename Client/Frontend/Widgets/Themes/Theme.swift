@@ -9,8 +9,9 @@ import Shared
 protocol Themeable {
     
     var themeableChildren: [Themeable?]? { get }
+    
+    // This method should _always_ call `styleChildren`, regardless of `themableChildren` value.
     func applyTheme(_ theme: Theme)
-
 }
 
 extension Themeable {

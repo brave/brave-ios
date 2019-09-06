@@ -18,7 +18,6 @@ extension Theme {
         UINavigationBar.appearance().tintColor = colors.accent
         UINavigationBar.appearance().appearanceBarTintColor = colors.header
         
-//        UISwitch.appearance().tintColor = colors.accent
         UISwitch.appearance().onTintColor = colors.accent
         
         // This is a subtle "abuse" of theme colors
