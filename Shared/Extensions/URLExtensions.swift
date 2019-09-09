@@ -481,7 +481,9 @@ extension URL {
 extension String {
     public var isBookmarklet: Bool {
         let url = self.lowercased()
-        return url.hasPrefix("javascript:") && !url.hasPrefix("javascript:/")
+        return url.hasPrefix("javascript:") &&
+            !url.hasPrefix("javascript:/") &&
+            !url.dropFirst("javascript:".count).isEmpty
     }
     
     public var bookmarkletCodeComponent: String? {
@@ -494,7 +496,7 @@ extension String {
     }
     
     public var bookmarkletURL: URL? {
-        if let escaped = self.addingPercentEncoding(withAllowedCharacters: .URLAllowed) {
+        if self.isBookmarklet, let escaped = self.addingPercentEncoding(withAllowedCharacters: .URLAllowed) {
             return URL(string: escaped)
         }
         return nil

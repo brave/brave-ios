@@ -5,7 +5,6 @@
 import UIKit
 import SnapKit
 import Shared
-import JavaScriptCore
 
 class BookmarkDetailsView: AddEditHeaderView, BookmarkFormFieldsProtocol {
     
@@ -73,7 +72,7 @@ class BookmarkDetailsView: AddEditHeaderView, BookmarkFormFieldsProtocol {
             .forEach(contentStackView.addArrangedSubview)
         
         var url = url
-        if url?.isBookmarklet ?? false {
+        if url?.isBookmarklet == true {
             url = url?.removingPercentEncoding
         } else if let url = url, let favUrl = URL(string: url) {
             faviconImageView.setIcon(nil, forURL: favUrl)
@@ -94,7 +93,7 @@ class BookmarkDetailsView: AddEditHeaderView, BookmarkFormFieldsProtocol {
     // MARK: - Delegate actions
     
     @objc func textFieldDidChange(_ textField: UITextField) {
-        if textField.text?.isBookmarklet ?? false {
+        if textField.text?.isBookmarklet == true {
             delegate?.correctValues(validationPassed: validateCodeFields() && validateFields())
         } else {
             delegate?.correctValues(validationPassed: validateCodeFields())
@@ -107,24 +106,6 @@ class BookmarkDetailsView: AddEditHeaderView, BookmarkFormFieldsProtocol {
     }
     
     private func validateCodeFields() -> Bool {
-        let title = titleTextField.text
-        guard let urlTextField = urlTextField else { return validateTitle(title) }
-        guard let javascriptCode = urlTextField.text?.bookmarkletCodeComponent else { return false }
-        
-        // A bookmarklet is considered valid if it's code is valid JS.
-        // Bookmarklets MIGHT invoke some security flaws allowing the user to run arbitrary
-        // JS in the browser.
-        // The JS is only ran within the webpage's context and not ran within the application context.
-        if let context = JSContext() {
-            context.evaluateScript(javascriptCode)
-            if context.exception != nil {
-                if context.exception.description.contains("ReferenceError") {
-                    return validateTitle(title)
-                }
-                return false
-            }
-            return validateTitle(title)
-        }
-        return false
+        return BookmarkValidation.validateBookmarklet(title: titleTextField.text, url: urlTextField?.text)
     }
 }
