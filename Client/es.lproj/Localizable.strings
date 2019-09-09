@@ -2,7 +2,7 @@
 "confirmPin" = "Verificar";
 
 /* Message for touch key modal. */
-"insertKeyMessage" = "Introduce tu clave de seguridad para ";
+"insertKeyMessage" = "Introduce tu clave de seguridad de ";
 
 /* Placeholder text for PIN */
 "pinPlaceholder" = "Introduce tu PIN";
@@ -17,5 +17,5 @@
 "touchKeyMessage" = "Pulsa la clave para finalizar la solicitud de";
 
 /* Title when PIN code is being verified. */
-"verificationPending" = "Verificando tu PIN para";
+"verificationPending" = "Verificando tu PIN de";
 
