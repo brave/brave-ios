@@ -73,7 +73,7 @@ class BookmarkDetailsView: AddEditHeaderView, BookmarkFormFieldsProtocol {
             .forEach(contentStackView.addArrangedSubview)
         
         var url = url
-        if url?.hasPrefix("javascript:") ?? false {
+        if url?.isBookmarklet ?? false {
             url = url?.removingPercentEncoding
         } else if let url = url, let favUrl = URL(string: url) {
             faviconImageView.setIcon(nil, forURL: favUrl)
@@ -103,26 +103,11 @@ class BookmarkDetailsView: AddEditHeaderView, BookmarkFormFieldsProtocol {
     }
     
     private func validateCodeFields() -> Bool {
-        let uriScheme = "javascript:"
-        
         let title = titleTextField.text
         guard let urlTextField = urlTextField else { return validateTitle(title) }
-        guard var javascriptCode = urlTextField.text else { return false }
-        
-        // All bookmarklets must begin with `javascript` URI scheme..
-        if !javascriptCode.hasPrefix(uriScheme) {
-            return false
-        }
-        
-        javascriptCode = String(javascriptCode.dropFirst(uriScheme.count))
-        
-        if javascriptCode.isEmpty {
-            return false
-        }
+        guard let javascriptCode = urlTextField.text?.bookmarkletCodeComponent else { return false }
         
         // A bookmarklet is considered valid if it's code is valid JS.
-        // Bookmarklets MIGHT invoke some security flaws allowing the user to run arbitrary
-        // JS in the browser though.
         if let context = JSContext() {
             context.evaluateScript(javascriptCode)
             if context.exception != nil {

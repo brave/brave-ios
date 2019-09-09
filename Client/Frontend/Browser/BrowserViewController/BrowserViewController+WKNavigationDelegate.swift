@@ -89,10 +89,10 @@ extension BrowserViewController: WKNavigationDelegate {
             return
         }
         
-        if url.scheme == "javascript" && navigationAction.isAllowed {
+        if url.isBookmarklet && navigationAction.isAllowed {
             decisionHandler(.cancel)
             
-            if let code = String(url.absoluteString.dropFirst("javascript:".count)).removingPercentEncoding {
+            if let code = url.bookmarkletCodeComponent {
                 webView.evaluateJavaScript(code)
             }
             return

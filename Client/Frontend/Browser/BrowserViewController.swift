@@ -911,18 +911,15 @@ class BrowserViewController: UIViewController {
     }
 
     func finishEditingAndSubmit(_ url: URL, visitType: VisitType) {
-        let javascriptPrefix = "javascript:"
-        if url.absoluteString.hasPrefix(javascriptPrefix) {
+        if url.isBookmarklet {
             topToolbar.leaveOverlayMode()
             
             guard let tab = tabManager.selectedTab else {
                 return
             }
             
-            if let webView = tab.webView, let unescapedURL = url.absoluteString.removingPercentEncoding {
+            if let webView = tab.webView, let code = url.bookmarkletCodeComponent {
                 resetSpoofedUserAgentIfRequired(webView, newURL: url)
-                
-                let code = String(unescapedURL.dropFirst(javascriptPrefix.count))
                 webView.evaluateJavaScript(code, completionHandler: nil)
             }
         } else {

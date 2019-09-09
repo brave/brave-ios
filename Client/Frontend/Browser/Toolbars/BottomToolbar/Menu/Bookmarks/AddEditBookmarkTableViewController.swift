@@ -235,20 +235,8 @@ class AddEditBookmarkTableViewController: UITableViewController {
         // Saving and udpating is slightly different for each mode.
         switch mode {
         case .addBookmark(_, _):
-            guard let urlString = bookmarkDetailsView.urlTextField?.text else {
-                return earlyReturn()
-            }
-            
-            var url: URL! = URL(string: urlString)
-            if urlString.hasPrefix("javascript:") {
-                guard let escapedURLString = urlString.addingPercentEncoding(withAllowedCharacters: .URLAllowed), let escapedURL = URL(string: escapedURLString) else {
-                    return earlyReturn()
-                }
-                
-                url = escapedURL
-            }
-            
-            guard url != nil else {
+            guard let urlString = bookmarkDetailsView.urlTextField?.text,
+                  let url = URL(string: urlString) ?? urlString.bookmarkletURL else {
                 return earlyReturn()
             }
             
@@ -270,21 +258,9 @@ class AddEditBookmarkTableViewController: UITableViewController {
                 Bookmark.addFolder(title: title, parentFolder: folder)
             }
         case .editBookmark(let bookmark):
-            guard let urlString = bookmarkDetailsView.urlTextField?.text else {
-                return earlyReturn()
-            }
-            
-            var url: URL! = URL(string: urlString)
-            if urlString.hasPrefix("javascript:") {
-                guard let escapedURLString = urlString.addingPercentEncoding(withAllowedCharacters: .URLAllowed), let escapedURL = URL(string: escapedURLString) else {
+            guard let urlString = bookmarkDetailsView.urlTextField?.text,
+                let url = URL(string: urlString) ?? urlString.bookmarkletURL else {
                     return earlyReturn()
-                }
-                
-                url = escapedURL
-            }
-            
-            guard url != nil else {
-                return earlyReturn()
             }
             
             if !bookmark.existsInPersistentStore() { break }
