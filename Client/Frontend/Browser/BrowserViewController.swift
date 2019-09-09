@@ -3318,8 +3318,10 @@ extension BrowserViewController: PreferencesObserver {
             setupTabs()
             updateTabsBarVisibility()
             updateApplicationShortcuts()
-            tabManager.removeAll()
-            tabManager.resetConfiguration()
+            if isPrivate { //When PBO is turned ON, we remove all tabs and configurations.
+                tabManager.removeAll()
+                tabManager.resetConfiguration()
+            }
         case Preferences.General.alwaysRequestDesktopSite.key:
             tabManager.reset()
             self.tabManager.reloadSelectedTab()
