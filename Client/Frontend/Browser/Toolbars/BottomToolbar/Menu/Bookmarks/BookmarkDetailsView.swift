@@ -20,7 +20,7 @@ class BookmarkDetailsView: AddEditHeaderView, BookmarkFormFieldsProtocol {
     
     let urlTextField: UITextField? = UITextField().then {
         $0.placeholder = Strings.BookmarkUrlPlaceholderText
-        //$0.keyboardType = .URL
+        $0.keyboardType = .URL
         $0.autocorrectionType = .no
         $0.autocapitalizationType = .none
         $0.smartDashesType = .no
