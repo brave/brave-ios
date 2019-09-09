@@ -134,10 +134,6 @@ public final class TabMO: NSManagedObject, CRUD {
         deleteAll(context: .new(inMemory: false))
     }
     
-    public class func deleteAllNormalTabs() {
-        deleteAll(predicate: NSPredicate(format: "isPrivate != true"), context: .new(inMemory: false))
-    }
-    
     public class func deleteAllPrivateTabs() {
         deleteAll(predicate: NSPredicate(format: "isPrivate == true"), context: .new(inMemory: false))
     }
