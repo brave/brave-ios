@@ -22,6 +22,12 @@
 /* individual blocking statistic title */
 "AdsAndTrackers" = "廣告和追蹤器";
 
+/* Shields Ads Stat */
+"AdsAndTrackersrBlocked" = "已封鎖\n廣告和追蹤器";
+
+/* Shields Ads Stat */
+"AdsrBlocked" = "已封鎖\n廣告";
+
 /* Setting to always request the desktop version of a website. */
 "AlwaysRequestDesktopSite" = "一律請求桌面網站";
 
@@ -81,6 +87,9 @@
 
 /* Title of the dialog used to set a passcode */
 "AuthenticationSetPasscode" = "設定密碼";
+
+/* When the user taps on the passcode pane, the touch gesture recognizer will bring up the keyboard back on the screen when hidden on iPad. */
+"AuthenticationTouchForKeyboard" = "輕觸以啟用鍵盤存取";
 
 /* Label for the Touch ID/Passcode item in Settings */
 "AuthenticationTouchIDPasscodeSetting" = "Touch ID 和密碼";
@@ -385,6 +394,9 @@
 /* Button label to temporarily continue to the site from the certificate error page */
 "ErrorPagesVisitOnceButton" = "繼續造訪網站";
 
+/* Shields Time Saved Stat */
+"EstTimerSaved" = "預計節省\n時間";
+
 /* Footer text when user selects to save to favorites when editing a bookmark */
 "FavoritesLocationFooterText" = "我的最愛位於主畫面。這些書籤與其他裝置不同步。";
 
@@ -412,6 +424,9 @@
 /* individual blocking statistic title */
 "FingerprintingMethods" = "指紋識別法";
 
+/* blocking stat title */
+"FingerprintingnProtection" = "指紋識別\n防護";
+
 /* No comment provided by engineer. */
 "FingerprintingProtection" = "指紋識別防護";
 
@@ -430,6 +445,9 @@
 /* No comment provided by engineer. */
 "HTTPSEverywhere" = "HTTPS Everywhere";
 
+/* Shields Https Stat */
+"HTTPSrUpgrades" = "HTTPS\n升級";
+
 /* individual blocking statistic title */
 "HTTPSUpgrades" = "HTTPS 更新";
 
@@ -441,6 +459,9 @@
 
 /* History tableview section header */
 "LastWeek" = "上週";
+
+/* DuckDuckGo promotion label. */
+"LearnAboutPrivateSearchrwithDuckDuckGo" = "深入瞭解\nDuckDuckGo 隱私搜尋";
 
 /* Footer label describing when the current login was last modified with the timestamp as the parameter. */
 "LoginDetailLastModifiedCellFormatTitle" = "上次修改的時間：%@";
@@ -778,6 +799,9 @@
 /* Quick Action for 3D-Touch on the Application Icon */
 "ShortcutItemTitleQRCode" = "掃描 QR 碼";
 
+/* Setting to show a bookmark button on the top level menu that triggers a panel of the user's bookmarks. */
+"ShowBookmarkButtonInTopToolbar" = "顯示書籤捷徑";
+
 /* Button to show the bookmarks list */
 "ShowBookmarks" = "顯示書籤";
 
@@ -1017,6 +1041,9 @@
 
 /* History tableview section header */
 "Today" = "今天";
+
+/* Shields Trackers Stat */
+"TrackersrBlocked" = "已封鎖\n追蹤器";
 
 /* Sync Alert */
 "UnableToConnectDescription" = "無法加入同步群組。請檢查所輸入的詞語，然後再試一次。";

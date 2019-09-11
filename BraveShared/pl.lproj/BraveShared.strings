@@ -22,6 +22,12 @@
 /* individual blocking statistic title */
 "AdsAndTrackers" = "Reklamy i trackery";
 
+/* Shields Ads Stat */
+"AdsAndTrackersrBlocked" = "Reklamy i śledzenie\nzablokowane";
+
+/* Shields Ads Stat */
+"AdsrBlocked" = "Reklamy\nzablokowane";
+
 /* Setting to always request the desktop version of a website. */
 "AlwaysRequestDesktopSite" = "Zawsze żądaj wersji komputerowej";
 
@@ -81,6 +87,9 @@
 
 /* Title of the dialog used to set a passcode */
 "AuthenticationSetPasscode" = "Ustaw kod dostępu";
+
+/* When the user taps on the passcode pane, the touch gesture recognizer will bring up the keyboard back on the screen when hidden on iPad. */
+"AuthenticationTouchForKeyboard" = "Naciśnij, aby wyświetlić klawiaturę";
 
 /* Label for the Touch ID/Passcode item in Settings */
 "AuthenticationTouchIDPasscodeSetting" = "Touch ID i kod dostępu";
@@ -385,6 +394,9 @@
 /* Button label to temporarily continue to the site from the certificate error page */
 "ErrorPagesVisitOnceButton" = "Wejdź na stronę mimo to";
 
+/* Shields Time Saved Stat */
+"EstTimerSaved" = "Szacowany czas\nzapisany";
+
 /* Footer text when user selects to save to favorites when editing a bookmark */
 "FavoritesLocationFooterText" = "Ulubione znajdują się na ekranie głównym. Te zakładki nie są synchronizowane z innymi urządzeniami.";
 
@@ -412,6 +424,9 @@
 /* individual blocking statistic title */
 "FingerprintingMethods" = "Metody pobierania odcisków palców";
 
+/* blocking stat title */
+"FingerprintingnProtection" = "Ochrona przed\nfingerprintingiem";
+
 /* No comment provided by engineer. */
 "FingerprintingProtection" = "Ochrona pobierania odcisków palców";
 
@@ -430,6 +445,9 @@
 /* No comment provided by engineer. */
 "HTTPSEverywhere" = "HTTPS w każdym miejscu";
 
+/* Shields Https Stat */
+"HTTPSrUpgrades" = "Uaktualnienia\nHTTPS";
+
 /* individual blocking statistic title */
 "HTTPSUpgrades" = "Aktualizacje HTTPS";
 
@@ -441,6 +459,9 @@
 
 /* History tableview section header */
 "LastWeek" = "W zeszłym tygodniu";
+
+/* DuckDuckGo promotion label. */
+"LearnAboutPrivateSearchrwithDuckDuckGo" = "Dowiedz się więcej o wyszukiwaniu w trybie prywatnym\nz wykorzystaniem DuckDuckGo";
 
 /* Footer label describing when the current login was last modified with the timestamp as the parameter. */
 "LoginDetailLastModifiedCellFormatTitle" = "Ostatnio zmodyfikowano %@";
@@ -778,6 +799,9 @@
 /* Quick Action for 3D-Touch on the Application Icon */
 "ShortcutItemTitleQRCode" = "Skanuj kod QR";
 
+/* Setting to show a bookmark button on the top level menu that triggers a panel of the user's bookmarks. */
+"ShowBookmarkButtonInTopToolbar" = "Pokaż przycisk zakładek";
+
 /* Button to show the bookmarks list */
 "ShowBookmarks" = "Pokaż zakładki";
 
@@ -1017,6 +1041,9 @@
 
 /* History tableview section header */
 "Today" = "Dzisiaj";
+
+/* Shields Trackers Stat */
+"TrackersrBlocked" = "Śledzenie\nzablokowane";
 
 /* Sync Alert */
 "UnableToConnectDescription" = "Nie można dołączyć do grupy synchronizacji. Sprawdź wprowadzone słowa i spróbuj ponownie.";

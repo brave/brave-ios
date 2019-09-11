@@ -22,6 +22,12 @@
 /* individual blocking statistic title */
 "AdsAndTrackers" = "Реклама і трекери";
 
+/* Shields Ads Stat */
+"AdsAndTrackersrBlocked" = "Реклами й трекерів\nзаблоковано";
+
+/* Shields Ads Stat */
+"AdsrBlocked" = "Реклами\nзаблоковано";
+
 /* Setting to always request the desktop version of a website. */
 "AlwaysRequestDesktopSite" = "Завжди запитувати версію для настільного комп’ютера";
 
@@ -81,6 +87,9 @@
 
 /* Title of the dialog used to set a passcode */
 "AuthenticationSetPasscode" = "Установлення коду доступу";
+
+/* When the user taps on the passcode pane, the touch gesture recognizer will bring up the keyboard back on the screen when hidden on iPad. */
+"AuthenticationTouchForKeyboard" = "Торкніться, щоб відобразити спеціальні можливості клавіатури";
 
 /* Label for the Touch ID/Passcode item in Settings */
 "AuthenticationTouchIDPasscodeSetting" = "Touch ID і код доступу";
@@ -385,6 +394,9 @@
 /* Button label to temporarily continue to the site from the certificate error page */
 "ErrorPagesVisitOnceButton" = "Все одно перейти до сайту";
 
+/* Shields Time Saved Stat */
+"EstTimerSaved" = "Заощаджено\nчасу (приблизно)";
+
 /* Footer text when user selects to save to favorites when editing a bookmark */
 "FavoritesLocationFooterText" = "Розділ обраного розташовано на головному екрані. Ці закладки не синхронізуються з іншими пристроями.";
 
@@ -412,6 +424,9 @@
 /* individual blocking statistic title */
 "FingerprintingMethods" = "Способи додавання відбитків пальців";
 
+/* blocking stat title */
+"FingerprintingnProtection" = "Захист за допомогою\nвідбитків пальців";
+
 /* No comment provided by engineer. */
 "FingerprintingProtection" = "Захист за допомогою відбитків пальців";
 
@@ -430,6 +445,9 @@
 /* No comment provided by engineer. */
 "HTTPSEverywhere" = "HTTPS усюди";
 
+/* Shields Https Stat */
+"HTTPSrUpgrades" = "Перенаправлення \nHTTPS";
+
 /* individual blocking statistic title */
 "HTTPSUpgrades" = "Оновлення HTTPS";
 
@@ -441,6 +459,9 @@
 
 /* History tableview section header */
 "LastWeek" = "Останній  тиждень";
+
+/* DuckDuckGo promotion label. */
+"LearnAboutPrivateSearchrwithDuckDuckGo" = "Дізнайтеся більше про конфіденційний пошук\nу DuckDuckGo";
 
 /* Footer label describing when the current login was last modified with the timestamp as the parameter. */
 "LoginDetailLastModifiedCellFormatTitle" = "Останні зміни: %@";
@@ -778,6 +799,9 @@
 /* Quick Action for 3D-Touch on the Application Icon */
 "ShortcutItemTitleQRCode" = "Сканувати QR-код";
 
+/* Setting to show a bookmark button on the top level menu that triggers a panel of the user's bookmarks. */
+"ShowBookmarkButtonInTopToolbar" = "Показувати ярлик закладок";
+
 /* Button to show the bookmarks list */
 "ShowBookmarks" = "Показати закладки";
 
@@ -1017,6 +1041,9 @@
 
 /* History tableview section header */
 "Today" = "Сьогодні";
+
+/* Shields Trackers Stat */
+"TrackersrBlocked" = "Трекерів\nзаблоковано";
 
 /* Sync Alert */
 "UnableToConnectDescription" = "Не вдається приєднатися до групи синхронізації. Перевірте правильність введення кодових слів і спробуйте знову.";

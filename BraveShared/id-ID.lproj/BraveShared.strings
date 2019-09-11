@@ -22,6 +22,12 @@
 /* individual blocking statistic title */
 "AdsAndTrackers" = "Iklan dan Pelacak";
 
+/* Shields Ads Stat */
+"AdsAndTrackersrBlocked" = "Iklan & Pelacak \nDiblokir";
+
+/* Shields Ads Stat */
+"AdsrBlocked" = "Iklan \nDiblokir";
+
 /* Setting to always request the desktop version of a website. */
 "AlwaysRequestDesktopSite" = "Selalu Minta Situs Desktop";
 
@@ -81,6 +87,9 @@
 
 /* Title of the dialog used to set a passcode */
 "AuthenticationSetPasscode" = "Atur Kode Akses";
+
+/* When the user taps on the passcode pane, the touch gesture recognizer will bring up the keyboard back on the screen when hidden on iPad. */
+"AuthenticationTouchForKeyboard" = "Ketuk untuk menampilkan aksesibilitas keyboard";
 
 /* Label for the Touch ID/Passcode item in Settings */
 "AuthenticationTouchIDPasscodeSetting" = "Touch ID & Kode Akses";
@@ -385,6 +394,9 @@
 /* Button label to temporarily continue to the site from the certificate error page */
 "ErrorPagesVisitOnceButton" = "Tetap kunjungi situs ";
 
+/* Shields Time Saved Stat */
+"EstTimerSaved" = "Perkiraan Waktu \nDisimpan";
+
 /* Footer text when user selects to save to favorites when editing a bookmark */
 "FavoritesLocationFooterText" = "Favorit ada di layar beranda Anda. Markah ini tidak tersinkronisasi dengan perangkat lain.";
 
@@ -412,6 +424,9 @@
 /* individual blocking statistic title */
 "FingerprintingMethods" = "Metode Sidik Jari";
 
+/* blocking stat title */
+"FingerprintingnProtection" = "Perlindungan\nSidik Jari";
+
 /* No comment provided by engineer. */
 "FingerprintingProtection" = "Perlindungan Sidik Jari";
 
@@ -430,6 +445,9 @@
 /* No comment provided by engineer. */
 "HTTPSEverywhere" = "HTTPS Everywhere";
 
+/* Shields Https Stat */
+"HTTPSrUpgrades" = "Peningkatan \nHTTPS";
+
 /* individual blocking statistic title */
 "HTTPSUpgrades" = "Peningkatan HTTPS";
 
@@ -441,6 +459,9 @@
 
 /* History tableview section header */
 "LastWeek" = "Minggu lalu";
+
+/* DuckDuckGo promotion label. */
+"LearnAboutPrivateSearchrwithDuckDuckGo" = "Pelajari tentang pencarian pribadi \ndengan DuckDuckGo";
 
 /* Footer label describing when the current login was last modified with the timestamp as the parameter. */
 "LoginDetailLastModifiedCellFormatTitle" = "Terakhir dimodifikasi %@";
@@ -778,6 +799,9 @@
 /* Quick Action for 3D-Touch on the Application Icon */
 "ShortcutItemTitleQRCode" = "Pindai Kode QR";
 
+/* Setting to show a bookmark button on the top level menu that triggers a panel of the user's bookmarks. */
+"ShowBookmarkButtonInTopToolbar" = "Tampilkan Tombol Pintas Penanda";
+
 /* Button to show the bookmarks list */
 "ShowBookmarks" = "Tampilkan Markah";
 
@@ -1017,6 +1041,9 @@
 
 /* History tableview section header */
 "Today" = "Hari Ini";
+
+/* Shields Trackers Stat */
+"TrackersrBlocked" = "Pelacak \nDiblokir";
 
 /* Sync Alert */
 "UnableToConnectDescription" = "Tidak dapat bergabung ke grup sinkronisasi. Periksa kata yang dimasukkan, lalu coba lagi.";

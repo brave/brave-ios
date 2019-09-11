@@ -22,6 +22,12 @@
 /* individual blocking statistic title */
 "AdsAndTrackers" = "Annonser og sporingsprogrammer";
 
+/* Shields Ads Stat */
+"AdsAndTrackersrBlocked" = "Annonser og  sporer\nblokkert";
+
+/* Shields Ads Stat */
+"AdsrBlocked" = "Annonser \nblokkert";
+
 /* Setting to always request the desktop version of a website. */
 "AlwaysRequestDesktopSite" = "Be alltid om skrivebordsside";
 
@@ -81,6 +87,9 @@
 
 /* Title of the dialog used to set a passcode */
 "AuthenticationSetPasscode" = "Sett passkode";
+
+/* When the user taps on the passcode pane, the touch gesture recognizer will bring up the keyboard back on the screen when hidden on iPad. */
+"AuthenticationTouchForKeyboard" = "Trykk for å få frem tastaturtilgjengeligheten";
 
 /* Label for the Touch ID/Passcode item in Settings */
 "AuthenticationTouchIDPasscodeSetting" = "Touch ID og passkode";
@@ -385,6 +394,9 @@
 /* Button label to temporarily continue to the site from the certificate error page */
 "ErrorPagesVisitOnceButton" = "Besøk siden allikevel";
 
+/* Shields Time Saved Stat */
+"EstTimerSaved" = "Est. tid\nspart";
+
 /* Footer text when user selects to save to favorites when editing a bookmark */
 "FavoritesLocationFooterText" = "Favoritter er plassert på startskjermen. Disse bokmerkene synkroniseres ikke med andre enheter.";
 
@@ -412,6 +424,9 @@
 /* individual blocking statistic title */
 "FingerprintingMethods" = "Fingeravtrykkmetoder";
 
+/* blocking stat title */
+"FingerprintingnProtection" = "Fingeravtrykk-\nbeskyttelse";
+
 /* No comment provided by engineer. */
 "FingerprintingProtection" = "Fingeravtrykkbeskyttelse";
 
@@ -430,6 +445,9 @@
 /* No comment provided by engineer. */
 "HTTPSEverywhere" = "HTTPS Everywhere";
 
+/* Shields Https Stat */
+"HTTPSrUpgrades" = "HTTPS-\noppgraderinger";
+
 /* individual blocking statistic title */
 "HTTPSUpgrades" = "HTTPS-oppgraderinger";
 
@@ -441,6 +459,9 @@
 
 /* History tableview section header */
 "LastWeek" = "Siste uke";
+
+/* DuckDuckGo promotion label. */
+"LearnAboutPrivateSearchrwithDuckDuckGo" = "Finn ut mer om private søk \nmed DuckDuckGo";
 
 /* Footer label describing when the current login was last modified with the timestamp as the parameter. */
 "LoginDetailLastModifiedCellFormatTitle" = "Sist modifisert %@";
@@ -778,6 +799,9 @@
 /* Quick Action for 3D-Touch on the Application Icon */
 "ShortcutItemTitleQRCode" = "Skann QR-kode";
 
+/* Setting to show a bookmark button on the top level menu that triggers a panel of the user's bookmarks. */
+"ShowBookmarkButtonInTopToolbar" = "Vis snarvei for bokmerkene";
+
 /* Button to show the bookmarks list */
 "ShowBookmarks" = "Vis bokmerker";
 
@@ -1017,6 +1041,9 @@
 
 /* History tableview section header */
 "Today" = "I dag";
+
+/* Shields Trackers Stat */
+"TrackersrBlocked" = "Sporingsprogrammer \nblokkert";
 
 /* Sync Alert */
 "UnableToConnectDescription" = "Kan ikke bli med i synkgruppen. Sjekk ordene du skrev inn, og prøv igjen.";

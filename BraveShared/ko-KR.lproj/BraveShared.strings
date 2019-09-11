@@ -22,6 +22,12 @@
 /* individual blocking statistic title */
 "AdsAndTrackers" = "광고 및 개인정보 트래커";
 
+/* Shields Ads Stat */
+"AdsAndTrackersrBlocked" = "차단된 \n광고 및 트래커";
+
+/* Shields Ads Stat */
+"AdsrBlocked" = "차단된 \n광고";
+
 /* Setting to always request the desktop version of a website. */
 "AlwaysRequestDesktopSite" = "항상 데스크톱 사이트 요청";
 
@@ -81,6 +87,9 @@
 
 /* Title of the dialog used to set a passcode */
 "AuthenticationSetPasscode" = "암호 설정";
+
+/* When the user taps on the passcode pane, the touch gesture recognizer will bring up the keyboard back on the screen when hidden on iPad. */
+"AuthenticationTouchForKeyboard" = "스크린 키보드를 띄우려면 탭";
 
 /* Label for the Touch ID/Passcode item in Settings */
 "AuthenticationTouchIDPasscodeSetting" = "Touch ID 및 암호";
@@ -385,6 +394,9 @@
 /* Button label to temporarily continue to the site from the certificate error page */
 "ErrorPagesVisitOnceButton" = "사이트 방문";
 
+/* Shields Time Saved Stat */
+"EstTimerSaved" = "절약된 \n예상 시간";
+
 /* Footer text when user selects to save to favorites when editing a bookmark */
 "FavoritesLocationFooterText" = "즐겨찾기는 홈 화면에 있습니다. 이 북마크는 다른 기기와 동기화되지 않습니다.";
 
@@ -412,6 +424,9 @@
 /* individual blocking statistic title */
 "FingerprintingMethods" = "디지털 지문 방식";
 
+/* blocking stat title */
+"FingerprintingnProtection" = "지문\n보호";
+
 /* No comment provided by engineer. */
 "FingerprintingProtection" = "디지털 지문 보호";
 
@@ -430,6 +445,9 @@
 /* No comment provided by engineer. */
 "HTTPSEverywhere" = "HTTPS Everywhere";
 
+/* Shields Https Stat */
+"HTTPSrUpgrades" = "HTTPS \n업그레이드";
+
 /* individual blocking statistic title */
 "HTTPSUpgrades" = "HTTPS 업그레이드";
 
@@ -441,6 +459,9 @@
 
 /* History tableview section header */
 "LastWeek" = "지난주";
+
+/* DuckDuckGo promotion label. */
+"LearnAboutPrivateSearchrwithDuckDuckGo" = "DuckDuckGo의 \n비공개 검색에 대해 알아보기";
 
 /* Footer label describing when the current login was last modified with the timestamp as the parameter. */
 "LoginDetailLastModifiedCellFormatTitle" = "최종 수정 %@";
@@ -778,6 +799,9 @@
 /* Quick Action for 3D-Touch on the Application Icon */
 "ShortcutItemTitleQRCode" = "QR 코드 스캔";
 
+/* Setting to show a bookmark button on the top level menu that triggers a panel of the user's bookmarks. */
+"ShowBookmarkButtonInTopToolbar" = "북마크 바로가기 표시";
+
 /* Button to show the bookmarks list */
 "ShowBookmarks" = "북마크 표시";
 
@@ -1017,6 +1041,9 @@
 
 /* History tableview section header */
 "Today" = "오늘";
+
+/* Shields Trackers Stat */
+"TrackersrBlocked" = "차단된 \n트래커";
 
 /* Sync Alert */
 "UnableToConnectDescription" = "동기화 그룹에 연결할 수 없습니다. 입력한 단어를 확인한 후 다시 시도하십시오.";

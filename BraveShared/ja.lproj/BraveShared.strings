@@ -22,6 +22,12 @@
 /* individual blocking statistic title */
 "AdsAndTrackers" = "広告とトラッカー";
 
+/* Shields Ads Stat */
+"AdsAndTrackersrBlocked" = "ブロック済の\n広告・トラッカー";
+
+/* Shields Ads Stat */
+"AdsrBlocked" = "ブロック済の\n広告";
+
 /* Setting to always request the desktop version of a website. */
 "AlwaysRequestDesktopSite" = "常にPCサイトを表示";
 
@@ -81,6 +87,9 @@
 
 /* Title of the dialog used to set a passcode */
 "AuthenticationSetPasscode" = "パスコードを設定";
+
+/* When the user taps on the passcode pane, the touch gesture recognizer will bring up the keyboard back on the screen when hidden on iPad. */
+"AuthenticationTouchForKeyboard" = "タップしてキーボードのアクセシビリティを表示する";
 
 /* Label for the Touch ID/Passcode item in Settings */
 "AuthenticationTouchIDPasscodeSetting" = "Touch ID とパスコード";
@@ -385,6 +394,9 @@
 /* Button label to temporarily continue to the site from the certificate error page */
 "ErrorPagesVisitOnceButton" = "それでもサイトを訪問";
 
+/* Shields Time Saved Stat */
+"EstTimerSaved" = "節約できた\n時間(推定)";
+
 /* Footer text when user selects to save to favorites when editing a bookmark */
 "FavoritesLocationFooterText" = "お気に入りはホームスクリーンに表示されます。お気に入りの項目は他の端末と同期されません。";
 
@@ -412,6 +424,9 @@
 /* individual blocking statistic title */
 "FingerprintingMethods" = "フィンガープリント";
 
+/* blocking stat title */
+"FingerprintingnProtection" = "指紋\n認証";
+
 /* No comment provided by engineer. */
 "FingerprintingProtection" = "フィンガープリント対策";
 
@@ -430,6 +445,9 @@
 /* No comment provided by engineer. */
 "HTTPSEverywhere" = "HTTPS Everywhere";
 
+/* Shields Https Stat */
+"HTTPSrUpgrades" = "HTTPS\nアップグレード";
+
 /* individual blocking statistic title */
 "HTTPSUpgrades" = "HTTPS アップグレード";
 
@@ -441,6 +459,9 @@
 
 /* History tableview section header */
 "LastWeek" = "先週";
+
+/* DuckDuckGo promotion label. */
+"LearnAboutPrivateSearchrwithDuckDuckGo" = "DuckDuckGoのプライベート\n検索について詳しく";
 
 /* Footer label describing when the current login was last modified with the timestamp as the parameter. */
 "LoginDetailLastModifiedCellFormatTitle" = "最終変更 %@";
@@ -778,6 +799,9 @@
 /* Quick Action for 3D-Touch on the Application Icon */
 "ShortcutItemTitleQRCode" = "QRコードをスキャンする";
 
+/* Setting to show a bookmark button on the top level menu that triggers a panel of the user's bookmarks. */
+"ShowBookmarkButtonInTopToolbar" = "ブックマークへのショートカットを表示";
+
 /* Button to show the bookmarks list */
 "ShowBookmarks" = "ブックマークを表示";
 
@@ -1017,6 +1041,9 @@
 
 /* History tableview section header */
 "Today" = "今日";
+
+/* Shields Trackers Stat */
+"TrackersrBlocked" = "ブロック済の\nトラッカー";
 
 /* Sync Alert */
 "UnableToConnectDescription" = "同期グループに参加できませんでした。入力したワードをチェックして、もう一度やり直してください。";
