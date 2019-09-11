@@ -31,7 +31,11 @@ public struct UserAgentBuilder {
     
     var cpuInfo: String {
         let os = ProcessInfo().operatingSystemVersion
-        let osVersion = "\(os.majorVersion)_\(os.minorVersion)"
+        var osVersion = "\(os.majorVersion)_\(os.minorVersion)"
+        
+        if os.patchVersion > 0 {
+            osVersion.append("_\(os.patchVersion)")
+        }
         
         var currentDevice = UIDevice.current.model
         // Only use first part of device name(so "iPod Touch" becomes "iPod")
