@@ -4,6 +4,7 @@
 
 import UIKit
 import Shared
+import pop
 
 private let log = Logger.browserLogger
 
@@ -17,6 +18,12 @@ protocol Onboardable: class {
 
 protocol OnboardingControllerDelegate: class {
     func onboardingCompleted(_ onboardingController: OnboardingNavigationController)
+}
+
+enum OnboardingViewAnimationID: Int {
+    case background = 1
+    case details = 2
+    case detailsContent = 3
 }
 
 class OnboardingNavigationController: UINavigationController {
@@ -87,6 +94,7 @@ class OnboardingNavigationController: UINavigationController {
         firstViewController.delegate = self
         
         isNavigationBarHidden = true
+        self.delegate = self
         
         modalPresentationStyle = UIDevice.current.userInterfaceIdiom == .phone ? .fullScreen : .formSheet
         
@@ -121,6 +129,18 @@ extension OnboardingNavigationController: Onboardable {
     }
 }
 
+extension OnboardingNavigationController: UINavigationControllerDelegate {
+    func navigationController(_ navigationController: UINavigationController, animationControllerFor operation: UINavigationController.Operation, from fromVC: UIViewController, to toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+
+         switch operation {
+         case .push:
+             return CustomAnimator(isPresenting: true)
+         default:
+             return CustomAnimator(isPresenting: false)
+         }
+    }
+}
+
 // Disabling orientation changes
 extension OnboardingNavigationController {
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -137,5 +157,137 @@ extension OnboardingNavigationController {
     
     override var shouldAutorotate: Bool {
         return false
+    }
+}
+
+class CustomAnimator: NSObject, UIViewControllerAnimatedTransitioning {
+    
+    var isPresenting: Bool
+    
+    init(isPresenting: Bool) {
+        self.isPresenting = isPresenting
+    }
+    
+    func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
+        let container = transitionContext.containerView
+        
+        guard let fromView = transitionContext.view(forKey: UITransitionContextViewKey.from) else { return }
+        
+        guard let toView = transitionContext.view(forKey: UITransitionContextViewKey.to) else { return }
+        
+        //Setup
+        fromView.frame = container.bounds
+        toView.frame = container.bounds
+        container.insertSubview(toView, belowSubview: fromView)
+        fromView.layoutIfNeeded()
+        toView.layoutIfNeeded()
+        
+        //Get animatable views
+        let fBackground = fromView.subview(with: OnboardingViewAnimationID.background.rawValue)
+        let fDetails = fromView.subview(with: OnboardingViewAnimationID.details.rawValue)
+        let fDetailsContent = fromView.subview(with: OnboardingViewAnimationID.detailsContent.rawValue)
+        
+        let tBackground = toView.subview(with: OnboardingViewAnimationID.background.rawValue)
+        let tDetails = toView.subview(with: OnboardingViewAnimationID.details.rawValue)
+        let tDetailsContent = toView.subview(with: OnboardingViewAnimationID.detailsContent.rawValue)
+
+        //Setup animation
+        fBackground?.alpha = 1.0
+        fDetails?.alpha = 1.0
+        fDetails?.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+        fDetailsContent?.alpha = 1.0
+        
+        tBackground?.alpha = 0.0
+        tDetails?.alpha = 1.0
+        tDetailsContent?.alpha = 0.0
+        
+        //guard let tDetailsFrame = tDetails?.superview?.convert(tDetails?.frame ?? .zero, to: container) else { return }
+        
+        let inset = UIApplication.shared.keyWindow?.safeAreaInsets.bottom ?? 0.0
+        var fDetailsFrame = (fDetails?.bounds ?? .zero)
+        fDetailsFrame.origin.y = (container.frame.height - container.frame.origin.y) - fDetailsFrame.height
+        fDetailsFrame = fDetailsFrame.offsetBy(dx: 0.0, dy: -inset)
+        
+        var tDetailsFrame = (tDetails?.bounds ?? .zero)
+        tDetailsFrame.origin.y = (container.frame.height - container.frame.origin.y) - tDetailsFrame.height
+        tDetailsFrame = tDetailsFrame.offsetBy(dx: 0.0, dy: -inset)
+
+        //fade contents of white panel
+        POPBasicAnimation(propertyNamed: kPOPLayerOpacity)?.do {
+            $0.fromValue = 1.0
+            $0.toValue = 0.0
+            $0.duration = 0.2
+            $0.beginTime = CACurrentMediaTime()
+            fDetailsContent?.layer.pop_add($0, forKey: "alpha")
+        }
+        
+        POPBasicAnimation(propertyNamed: kPOPLayerOpacity)?.do {
+            $0.fromValue = 1.0
+            $0.toValue = 0.0
+            $0.duration = 0.2
+            fBackground?.layer.pop_add($0, forKey: "alpha")
+        }
+        
+        //resize white background to size on next screen
+        POPBasicAnimation(propertyNamed: kPOPViewFrame)?.do {
+            $0.fromValue = fDetailsFrame
+            $0.toValue = tDetailsFrame
+            $0.duration = 0.3
+            $0.beginTime = CACurrentMediaTime() + 0.1
+            fDetails?.layer.pop_add($0, forKey: "frame")
+        }
+        
+        POPBasicAnimation(propertyNamed: kPOPLayerCornerRadius)?.do {
+            $0.fromValue = fDetails?.layer.cornerRadius ?? 0.0
+            $0.toValue = 12.0
+            $0.duration = 0.3
+            $0.beginTime = CACurrentMediaTime() + 0.1
+            fDetails?.layer.pop_add($0, forKey: "cornerRadius")
+        }
+        
+        //fade in background of next screen and its contents..
+        POPBasicAnimation(propertyNamed: kPOPLayerOpacity)?.do {
+            $0.fromValue = 0.0
+            $0.toValue = 1.0
+            $0.duration = 0.4
+            $0.beginTime = CACurrentMediaTime() + 0.3
+            tBackground?.layer.pop_add($0, forKey: "alpha")
+        }
+        
+        POPBasicAnimation(propertyNamed: kPOPLayerOpacity)?.do {
+            $0.fromValue = 0.0
+            $0.toValue = 1.0
+            $0.duration = 0.4
+            $0.beginTime = CACurrentMediaTime() + 0.3
+            tDetailsContent?.layer.pop_add($0, forKey: "alpha")
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
+            transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
+        }
+    }
+    
+    func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
+        
+        return 0.7
+    }
+}
+
+private extension UIView {
+    func subview(with tag: Int) -> UIView? {
+        if self.tag == tag {
+            return self
+        }
+        
+        for view in self.subviews {
+            if view.tag == tag {
+                return view
+            }
+            
+            if let view = view.subview(with: tag) {
+                return view
+            }
+        }
+        return nil
     }
 }

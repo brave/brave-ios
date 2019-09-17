@@ -14,6 +14,7 @@ extension OnboardingRewardsAgreementViewController {
         static let negativeSpacing: CGFloat = -16
         static let descriptionContentInset: CGFloat = 32
         static let linkColor: UIColor = BraveUX.BraveOrange
+        static let animationContentInset: CGFloat = 50.0
     }
     
     class View: UIView, UITextViewDelegate {
@@ -149,28 +150,50 @@ extension OnboardingRewardsAgreementViewController {
         init() {
             super.init(frame: .zero)
             
-            [imageView, descriptionView].forEach(mainStackView.addArrangedSubview(_:))
+            mainStackView.tag = OnboardingViewAnimationID.details.rawValue
+            descriptionStackView.tag = OnboardingViewAnimationID.detailsContent.rawValue
+            imageView.tag = OnboardingViewAnimationID.background.rawValue
+            
+            let backgroundView = UIImageView().then {
+                $0.backgroundColor = #colorLiteral(red: 0.1176470588, green: 0.1254901961, blue: 0.1607843137, alpha: 1)
+            }
+            
+            addSubview(backgroundView)
+            backgroundView.snp.makeConstraints {
+                $0.edges.equalToSuperview()
+            }
+            
+            addSubview(imageView)
+            addSubview(mainStackView)
+            mainStackView.snp.makeConstraints {
+                $0.leading.equalTo(self.safeArea.leading)
+                $0.trailing.equalTo(self.safeArea.trailing)
+                $0.bottom.equalTo(self.safeArea.bottom)
+            }
+            
+            descriptionView.addSubview(descriptionStackView)
+            descriptionStackView.snp.makeConstraints {
+                $0.edges.equalToSuperview().inset(UX.descriptionContentInset)
+            }
+            
+            [descriptionView].forEach(mainStackView.addArrangedSubview(_:))
 
             [skipButton, agreeButton, UIView.spacer(.horizontal, amount: 0)]
                 .forEach(buttonsStackView.addArrangedSubview(_:))
             
             [textStackView, buttonsStackView].forEach(descriptionStackView.addArrangedSubview(_:))
             
-            addSubview(mainStackView)
-            descriptionView.addSubview(descriptionStackView)
-            
-            mainStackView.snp.makeConstraints {
-                $0.leading.equalTo(self.safeArea.leading)
-                $0.trailing.equalTo(self.safeArea.trailing)
-                $0.bottom.equalTo(self.safeArea.bottom)
-                $0.top.equalTo(self) // extend the view undeneath the safe area/notch
-            }
-            
-            descriptionStackView.snp.makeConstraints {
-                $0.edges.equalToSuperview().inset(UX.descriptionContentInset)
-            }
-            
             descriptionCheckbox.addTarget(self, action: #selector(onTermsAccepted(_:)), for: .touchUpInside)
+        }
+        
+        override func layoutSubviews() {
+            super.layoutSubviews()
+            
+            let size = imageView.intrinsicContentSize
+            let scaleFactor = bounds.width / size.width
+            let newSize = CGSize(width: size.width * scaleFactor, height: size.height * scaleFactor)
+            
+            imageView.frame = CGRect(x: 0.0, y: UX.animationContentInset, width: newSize.width, height: newSize.height)
         }
         
         @available(*, unavailable)

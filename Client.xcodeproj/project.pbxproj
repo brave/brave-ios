@@ -494,6 +494,7 @@
 		5DE768AE20B443E500FF5533 /* JSONSerializationExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DE768AD20B443E500FF5533 /* JSONSerializationExtensions.swift */; };
 		5DE768B020B4601700FF5533 /* UIColorExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DE768AF20B4601600FF5533 /* UIColorExtensions.swift */; };
 		5DE768B120B4713000FF5533 /* Storage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2FCAE21A1ABB51F800877008 /* Storage.framework */; };
+		5E11C40023314D970003C363 /* onboarding-ads.json in Resources */ = {isa = PBXBuildFile; fileRef = 5E11C3FF23314D970003C363 /* onboarding-ads.json */; };
 		5E1D8C67232BE43100BDE662 /* OnboardingRewardsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E1D8C66232BE43100BDE662 /* OnboardingRewardsViewController.swift */; };
 		5E1D8C69232BE47A00BDE662 /* OnboardingRewardsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E1D8C68232BE47A00BDE662 /* OnboardingRewardsView.swift */; };
 		5E1D8C6B232BF95200BDE662 /* OnboardingRewardsAgreementViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E1D8C6A232BF95200BDE662 /* OnboardingRewardsAgreementViewController.swift */; };
@@ -1700,6 +1701,7 @@
 		5DE768AA20B346B700FF5533 /* BraveGlobalShieldStats.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BraveGlobalShieldStats.swift; sourceTree = "<group>"; };
 		5DE768AD20B443E500FF5533 /* JSONSerializationExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONSerializationExtensions.swift; sourceTree = "<group>"; };
 		5DE768AF20B4601600FF5533 /* UIColorExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIColorExtensions.swift; sourceTree = "<group>"; };
+		5E11C3FF23314D970003C363 /* onboarding-ads.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "onboarding-ads.json"; sourceTree = "<group>"; };
 		5E1D8C66232BE43100BDE662 /* OnboardingRewardsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingRewardsViewController.swift; sourceTree = "<group>"; };
 		5E1D8C68232BE47A00BDE662 /* OnboardingRewardsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingRewardsView.swift; sourceTree = "<group>"; };
 		5E1D8C6A232BF95200BDE662 /* OnboardingRewardsAgreementViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingRewardsAgreementViewController.swift; sourceTree = "<group>"; };
@@ -2275,6 +2277,7 @@
 				0A764F30230EE5CA003A1D9B /* OnboardingState.swift */,
 				0A6E095E230E05BC00AB3F19 /* onboarding-shields.json */,
 				5E1D8C6E232C0BDB00BDE662 /* onboarding-rewards.json */,
+				5E11C3FF23314D970003C363 /* onboarding-ads.json */,
 			);
 			path = Onboarding;
 			sourceTree = "<group>";
@@ -4511,6 +4514,7 @@
 				0A0D3D5021A5609600BEE65B /* SafeBrowsingError.html in Resources */,
 				74821FFE1DB6D3AC00EEEA72 /* MailSchemes.plist in Resources */,
 				0AA4AA99231849450009AAEF /* ABPFilterParserData.dat in Resources */,
+				5E11C40023314D970003C363 /* onboarding-ads.json in Resources */,
 				4422D57621C05DE600BF1855 /* httpse.leveldb.tgz in Resources */,
 				FA9294011D6584A200AC8D33 /* QRCode.xcassets in Resources */,
 				D308EE561CBF0BF5006843F2 /* CertError.css in Resources */,

@@ -3,8 +3,9 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
+import UserNotifications
 
-class OnboardingAdsCountdownViewController: OnboardingViewController {
+class OnboardingAdsCountdownViewController: OnboardingViewController, UNUserNotificationCenterDelegate {
     private var contentView: View {
         return view as! View // swiftlint:disable:this force_cast
     }
@@ -16,20 +17,43 @@ class OnboardingAdsCountdownViewController: OnboardingViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            (self.view as! View).countdownView.animate(from: 0.0, to: 1.0, duration: 3.0) // swiftlint:disable:this force_cast
-            
-            var secondsPast = 0
-            Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true, block: { timer in
-                DispatchQueue.main.async {
-                    (self.view as! View).countdownLabel.text = "\(3 - secondsPast)"
-                    secondsPast += 1
-                    
-                    if secondsPast == 3 {
-                        timer.invalidate()
-                    }
-                }
-            })
+        contentView.countdownText = "3"
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        contentView.animate(from: 0.0, to: 1.0, duration: 5.0) { [weak self] in
+            self?.generateNotification()
         }
+    }
+    
+    private func generateNotification() {
+        let center = UNUserNotificationCenter.current()
+        center.delegate = self
+        center.requestAuthorization(options: [.alert, .badge, .sound]) { (granted, error) in
+            if granted {
+                DispatchQueue.main.async {
+                    let content = UNMutableNotificationContent()
+                    content.title = "This is your first Brave ad"
+                    content.body = "Tap here to learn more."
+                    content.sound = .default
+                    
+                    let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1.0, repeats: false)
+                    
+                    let notification = UNNotificationRequest(identifier: UUID().uuidString,
+                                                             content: content,
+                                                             trigger: trigger)
+                    
+                    UNUserNotificationCenter.current().add(notification)
+                }
+            }
+        }
+    }
+    
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        
+        defer { center.delegate = nil }
+        completionHandler([.alert])
     }
 }

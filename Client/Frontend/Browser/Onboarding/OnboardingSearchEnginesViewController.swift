@@ -35,11 +35,12 @@ class OnboardingSearchEnginesViewController: OnboardingViewController {
         contentView.continueButton.addTarget(self, action: #selector(continueTapped), for: .touchDown)
         contentView.skipButton.addTarget(self, action: #selector(skipTapped), for: .touchDown)
         
-        // This is kind of stupid, but for some reason the table's background color will not
-        // go away or be forced to .clear, so just mimicing
         let tablebackground = UIView()
         tablebackground.backgroundColor = contentView.backgroundColor
         contentView.searchEnginesTable.backgroundView = tablebackground
+        
+        contentView.containerView.backgroundColor = contentView.backgroundColor
+        view.backgroundColor = #colorLiteral(red: 0.1176470588, green: 0.1254901961, blue: 0.1607843137, alpha: 1)
     }
     
     @objc override func continueTapped() {

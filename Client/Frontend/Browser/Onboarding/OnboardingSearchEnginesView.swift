@@ -69,24 +69,33 @@ extension OnboardingSearchEnginesViewController {
             $0.alignment = .center
         }
         
+        let containerView = UIView()
+        
         private var logoCenterY: Constraint?
         
         init() {
             super.init(frame: .zero)
             
-            addSubview(braveLogo)
+            containerView.tag = OnboardingViewAnimationID.details.rawValue
+            mainStackView.tag = OnboardingViewAnimationID.detailsContent.rawValue
+            braveLogo.tag = OnboardingViewAnimationID.background.rawValue
             
+            addSubview(containerView)
+            containerView.snp.makeConstraints {
+                $0.edges.equalToSuperview()
+            }
+            
+            containerView.addSubview(braveLogo)
             [titlePrimary, titleSecondary].forEach(titleStackView.addArrangedSubview(_:))
             
             let spacer = UIView()
-            
             [skipButton, continueButton, spacer]
                 .forEach(buttonsStackView.addArrangedSubview(_:))
             
             [titleStackView, searchEnginesTable, buttonsStackView]
                 .forEach(mainStackView.addArrangedSubview(_:))
             
-            addSubview(mainStackView)
+            containerView.addSubview(mainStackView)
             
             braveLogo.snp.makeConstraints {
                 $0.centerX.equalToSuperview()
@@ -96,9 +105,9 @@ extension OnboardingSearchEnginesViewController {
 
             mainStackView.snp.makeConstraints {
                 $0.top.equalTo(braveLogo.snp.bottom).offset(30)
-                $0.leading.equalTo(self.safeArea.leading).inset(UX.contentInset)
-                $0.trailing.equalTo(self.safeArea.trailing).inset(UX.contentInset)
-                $0.bottom.equalTo(self.safeArea.bottom).inset(UX.contentInset)
+                $0.leading.equalTo(containerView.safeArea.leading).inset(UX.contentInset)
+                $0.trailing.equalTo(containerView.safeArea.trailing).inset(UX.contentInset)
+                $0.bottom.equalTo(containerView.safeArea.bottom).inset(UX.contentInset)
             }
             
             // Make width the same as skip button to make save button always centered.

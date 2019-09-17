@@ -14,9 +14,20 @@ extension OnboardingAdsCountdownViewController {
         static let negativeSpacing: CGFloat = -16
         static let descriptionContentInset: CGFloat = 32
         static let linkColor: UIColor = BraveUX.BraveOrange
+        static let animationContentInset: CGFloat = 50.0
     }
     
     class View: UIView {
+        
+        var countdownText: String? {
+            get {
+                countdownView.countdownLayer.string as? String
+            }
+            
+            set {
+                countdownView.countdownLayer.string = newValue as NSString?
+            }
+        }
         
         let finishedButton = CommonViews.primaryButton(text: Strings.OBAgreeButton).then {
             $0.accessibilityIdentifier = "OnboardingRewardsAgreementViewController.AgreeButton"
@@ -33,7 +44,7 @@ extension OnboardingAdsCountdownViewController {
             $0.spacing = UX.negativeSpacing
         }
         
-        let imageView = AnimationView(name: "onboarding-rewards").then {
+        let imageView = AnimationView(name: "onboarding-ads").then {
             $0.contentMode = .scaleAspectFit
             $0.backgroundColor = #colorLiteral(red: 0.1176470588, green: 0.1254901961, blue: 0.1607843137, alpha: 1)
             $0.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
@@ -56,13 +67,7 @@ extension OnboardingAdsCountdownViewController {
             $0.numberOfLines = 0
         }
         
-        let countdownView = AdsCountdownGradientView()
-        
-        let countdownLabel = UILabel().then {
-            $0.font = UIFont.systemFont(ofSize: 54.0)
-            $0.textColor = UIColor(rgb: 0x4F30AB)
-            $0.text = "3"
-        }
+        private let countdownView = AdsCountdownGradientView()
         
         private let buttonsStackView = UIStackView().then {
             $0.distribution = .equalCentering
@@ -76,41 +81,60 @@ extension OnboardingAdsCountdownViewController {
             }
         }
         
+        func animate(from startOffset: CGFloat, to endOffset: CGFloat, duration: CFTimeInterval, completion: (() -> Void)? = nil) {
+            countdownView.animate(from: startOffset, to: endOffset, duration: duration, completion: completion)
+        }
+        
         init() {
             super.init(frame: .zero)
             
-            [imageView, descriptionView].forEach(mainStackView.addArrangedSubview(_:))
+            mainStackView.tag = OnboardingViewAnimationID.details.rawValue
+            descriptionStackView.tag = OnboardingViewAnimationID.detailsContent.rawValue
+            imageView.tag = OnboardingViewAnimationID.background.rawValue
+            
+            let backgroundView = UIImageView().then {
+                $0.backgroundColor = #colorLiteral(red: 0.1176470588, green: 0.1254901961, blue: 0.1607843137, alpha: 1)
+            }
+            
+            addSubview(backgroundView)
+            backgroundView.snp.makeConstraints {
+                $0.edges.equalToSuperview()
+            }
+            
+            addSubview(imageView)
+            addSubview(mainStackView)
+            mainStackView.snp.makeConstraints {
+                $0.leading.equalTo(self.safeArea.leading)
+                $0.trailing.equalTo(self.safeArea.trailing)
+                $0.bottom.equalTo(self.safeArea.bottom)
+            }
+            
+            descriptionView.addSubview(descriptionStackView)
+            descriptionStackView.snp.makeConstraints {
+                $0.edges.equalToSuperview().inset(UX.descriptionContentInset)
+            }
+            
+            [descriptionView].forEach(mainStackView.addArrangedSubview(_:))
 
             [finishedButton, invalidButton, UIView.spacer(.horizontal, amount: 0)]
                 .forEach(buttonsStackView.addArrangedSubview(_:))
             
             [titleLabel, countdownView, buttonsStackView].forEach(descriptionStackView.addArrangedSubview(_:))
             
-            addSubview(mainStackView)
-            descriptionView.addSubview(descriptionStackView)
-            
-            countdownView.addSubview(countdownLabel)
-            
-            mainStackView.snp.makeConstraints {
-                $0.leading.equalTo(self.safeArea.leading)
-                $0.trailing.equalTo(self.safeArea.trailing)
-                $0.bottom.equalTo(self.safeArea.bottom)
-                $0.top.equalTo(self) // extend the view undeneath the safe area/notch
-            }
-            
-            descriptionStackView.snp.makeConstraints {
-                $0.edges.equalToSuperview().inset(UX.descriptionContentInset)
-            }
-            
             countdownView.snp.makeConstraints {
                 $0.width.equalTo(156.0)
                 $0.height.equalTo(156.0)
             }
+        }
+        
+        override func layoutSubviews() {
+            super.layoutSubviews()
             
-            countdownLabel.snp.makeConstraints {
-                $0.centerX.equalTo(countdownView.snp.centerX)
-                $0.centerY.equalTo(countdownView.snp.centerY)
-            }
+            let size = imageView.intrinsicContentSize
+            let scaleFactor = bounds.width / size.width
+            let newSize = CGSize(width: size.width * scaleFactor, height: size.height * scaleFactor)
+            
+            imageView.frame = CGRect(x: 0.0, y: UX.animationContentInset, width: newSize.width, height: newSize.height)
         }
         
         @available(*, unavailable)
@@ -128,6 +152,12 @@ class AdsCountdownGradientView: UIView {
         static let gradientOrange = UIColor(rgb: 0xFA7250)
     }
     
+    fileprivate let countdownLayer = CenteredTextLayer().then {
+        $0.font = UIFont.systemFont(ofSize: 54.0) as CTFont
+        $0.foregroundColor = UX.gradientPurple.cgColor
+        $0.alignmentMode = .center
+    }
+    
     private let gradientLayer = { () -> CAGradientLayer in
         let layer = CAGradientLayer()
         layer.type = .conic
@@ -137,16 +167,6 @@ class AdsCountdownGradientView: UIView {
                         UX.gradientOrange,
                         UX.gradientOrange,
                         UX.gradientOrange].map({ $0.cgColor })
-        
-        layer.startPoint = CGPoint(x: 0.5, y: 0.5)
-        layer.endPoint = CGPoint(x: 0.5, y: 0)
-        return layer
-    }()
-    
-    private let gradientBallLayer = { () -> CAGradientLayer in
-        let layer = CAGradientLayer()
-        layer.type = .conic
-        layer.colors = [UX.gradientPurple, UX.gradientPurple].map({ $0.cgColor })
         
         layer.startPoint = CGPoint(x: 0.5, y: 0.5)
         layer.endPoint = CGPoint(x: 0.5, y: 0)
@@ -177,7 +197,7 @@ class AdsCountdownGradientView: UIView {
     
     private let strokeBallLayer = { () -> CALayer in
         let layer = CALayer()
-        layer.backgroundColor = UIColor.white.cgColor
+        layer.backgroundColor = UX.gradientOrange.cgColor
         layer.shouldRasterize = true
         return layer
     }()
@@ -194,6 +214,23 @@ class AdsCountdownGradientView: UIView {
         let insetBounds = bounds.insetBy(dx: UX.ballRadius * 2.0, dy: UX.ballRadius * 2.0)
         let radius = min(insetBounds.width, insetBounds.height) / 2.0
         return UIBezierPath(arcCenter: center, radius: radius, startAngle: startAngle, endAngle: endAngle, clockwise: true)
+    }
+    
+    private func createCountdownAnimation(duration: CFTimeInterval, startValue: Int, endValue: Int) -> CAKeyframeAnimation {
+        
+        let values = [Int](min(startValue, endValue)...max(startValue, endValue))
+        let keyTimes = [Int](min(startValue, endValue)...max(startValue, endValue)+1)
+
+        let animation = CAKeyframeAnimation(keyPath: "string")
+        animation.calculationMode = .linear
+        animation.duration = duration
+        animation.values = (startValue <= endValue ? values : values.reversed()).compactMap({ String($0) })
+        animation.keyTimes = keyTimes.map({ NSNumber(value: CFTimeInterval($0) / duration) })
+        animation.repeatCount = 0
+        animation.isRemovedOnCompletion = false
+        animation.fillMode = .forwards
+        animation.beginTime = .zero
+        return animation
     }
     
     override init(frame: CGRect) {
@@ -224,19 +261,21 @@ class AdsCountdownGradientView: UIView {
         strokeBallLayer.removeFromSuperlayer()
         strokeBallLayer.frame = CGRect(x: (bounds.origin.x + (bounds.size.width / 2.0)) - UX.ballRadius, y: UX.ballRadius, width: UX.ballRadius * 2.0, height: UX.ballRadius * 2.0)
         strokeBallLayer.cornerRadius = UX.ballRadius
+        layer.addSublayer(strokeBallLayer)
         
-        //Layout gradientBallLayer
-        gradientBallLayer.removeFromSuperlayer()
-        gradientBallLayer.mask = strokeBallLayer
-        gradientBallLayer.frame = bounds
-        layer.addSublayer(gradientBallLayer)
+        //Layout countdownLayer
+        countdownLayer.removeFromSuperlayer()
+        countdownLayer.frame = bounds
+        layer.addSublayer(countdownLayer)
     }
     
     @available(*, unavailable)
     required init(coder: NSCoder) { fatalError() }
     
-    func animate(from startOffset: CGFloat, to endOffset: CGFloat, duration: CFTimeInterval) {
+    func animate(from startOffset: CGFloat, to endOffset: CGFloat, duration: CFTimeInterval, completion: (() -> Void)? = nil) {
         CATransaction.begin()
+        
+        countdownLayer.string = String(Int(duration)) as NSString
         
         let backgroundAnimation = CABasicAnimation(keyPath: "strokeStart")
         backgroundAnimation.duration = duration
@@ -262,37 +301,39 @@ class AdsCountdownGradientView: UIView {
         ballAnimation.fillMode = .forwards
         ballAnimation.timingFunction = CAMediaTimingFunction(name: .linear)
         
-        let gradientAnimationColours = [UX.gradientOrange,
-                                        UX.gradientOrange,
-                                        UX.gradientPink,
-                                        UX.gradientOrange,
-                                        UX.gradientOrange,
-                                        UX.gradientOrange].map({ $0.cgColor })
-        
-        let gradientAnimation = CABasicAnimation(keyPath: "colors")
-        gradientAnimation.duration = duration
-        gradientAnimation.isRemovedOnCompletion = false
-        gradientAnimation.fromValue = gradientLayer.colors
-        gradientAnimation.toValue = gradientAnimationColours
-        gradientAnimation.fillMode = .forwards
-        gradientAnimation.timingFunction = CAMediaTimingFunction(name: .linear)
+        let countdownAnimation = createCountdownAnimation(duration: duration, startValue: Int(duration), endValue: 0)
         
         CATransaction.setCompletionBlock({
             self.strokeLayer.strokeEnd = endOffset
             self.shapeLayer.strokeStart = endOffset
-            self.gradientBallLayer.colors = gradientAnimationColours
+            self.countdownLayer.string = String(Int(0))
             
             self.shapeLayer.removeAnimation(forKey: "backgroundAnimation")
             self.strokeLayer.removeAnimation(forKey: "strokeAnimation")
             self.strokeBallLayer.removeAnimation(forKey: "ballAnimation")
-            self.gradientBallLayer.removeAnimation(forKey: "gradientAnimation")
+            self.countdownLayer.removeAnimation(forKey: "countdownAnimation")
+            
+            completion?()
         })
         
         shapeLayer.add(backgroundAnimation, forKey: "backgroundAnimation")
         strokeLayer.add(strokeAnimation, forKey: "strokeAnimation")
         strokeBallLayer.add(ballAnimation, forKey: "ballAnimation")
-        gradientBallLayer.add(gradientAnimation, forKey: "gradientAnimation")
+        countdownLayer.add(countdownAnimation, forKey: "countdownAnimation")
         
         CATransaction.commit()
+    }
+}
+
+private class CenteredTextLayer: CATextLayer {
+    override func draw(in context: CGContext) {
+        let height = self.bounds.size.height
+        let fontSize = self.fontSize
+        let yDiff = (height - fontSize) / 2 - (fontSize / 10)
+
+        context.saveGState()
+        context.translateBy(x: 0, y: yDiff)
+        super.draw(in: context)
+        context.restoreGState()
     }
 }
