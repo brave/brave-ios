@@ -30,20 +30,16 @@ public class DataController: NSObject {
         return FileManager.default.fileExists(atPath: storeURL.path)
     }
     
-    public func migrateToNewPathIfNeeded() {
+    public func migrateToNewPathIfNeeded() throws {
         func sqliteFiles(from url: URL, dbName: String) throws -> [URL] {
             return try FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: []).filter({$0.lastPathComponent.hasPrefix(dbName)})
         }
-        if FileManager.default.fileExists(atPath: oldStoreURL.path) && !storeExists() {
-            do {
-                try migrationContainer.persistentStoreCoordinator.addPersistentStore(ofType: NSSQLiteStoreType, configurationName: nil, at: oldStoreURL, options: nil)
-                if let oldStore = migrationContainer.persistentStoreCoordinator.persistentStore(for: oldStoreURL) {
-                    try migrationContainer.persistentStoreCoordinator.migratePersistentStore(oldStore, to: storeURL, options: nil, withType: NSSQLiteStoreType)
-                    try migrationContainer.persistentStoreCoordinator.destroyPersistentStore(at: oldStoreURL, ofType: NSSQLiteStoreType, options: nil)
-                    try sqliteFiles(from: oldStoreURL.deletingLastPathComponent(), dbName: DataController.databaseName).forEach(FileManager.default.removeItem)
-                }
-            } catch {
-                log.error(error)
+        if FileManager.default.fileExists(atPath: oldStoreURL.path) {
+            try migrationContainer.persistentStoreCoordinator.addPersistentStore(ofType: NSSQLiteStoreType, configurationName: nil, at: oldStoreURL, options: nil)
+            if let oldStore = migrationContainer.persistentStoreCoordinator.persistentStore(for: oldStoreURL) {
+                try migrationContainer.persistentStoreCoordinator.migratePersistentStore(oldStore, to: storeURL, options: nil, withType: NSSQLiteStoreType)
+                try migrationContainer.persistentStoreCoordinator.destroyPersistentStore(at: oldStoreURL, ofType: NSSQLiteStoreType, options: nil)
+                try sqliteFiles(from: oldStoreURL.deletingLastPathComponent(), dbName: DataController.databaseName).forEach(FileManager.default.removeItem)
             }
         }
     }

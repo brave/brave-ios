@@ -25,9 +25,22 @@ class Migration {
         }
     }
     
+    private static var dbMigrationRetryCount: Int = 0
+    
     static func moveDatabaseToApplicationDirectory() {
         //Moves Coredata sqlite file from Documents dir to application support dir.
-        DataController.shared.migrateToNewPathIfNeeded()
+        if !Preferences.Migration.dbLocationMigrationCompleted.value {
+            do {
+                dbMigrationRetryCount += 1
+                try DataController.shared.migrateToNewPathIfNeeded()
+            } catch {
+                log.error("Database Migration Error: \(error)")
+                if dbMigrationRetryCount < 3 {
+                    moveDatabaseToApplicationDirectory()
+                }
+            }
+            Preferences.Migration.dbLocationMigrationCompleted.value = true
+        }
     }
     
     /// Adblock files don't have to be moved, they now have a new directory and will be downloaded there.
@@ -45,6 +58,7 @@ class Migration {
 fileprivate extension Preferences {
     /// Migration preferences
     final class Migration {
+        static let dbLocationMigrationCompleted = Option<Bool>(key: "migration.db-location.completed", default: false)
         static let completed = Option<Bool>(key: "migration.completed", default: false)
         static let syncOrderCompleted = Option<Bool>(key: "migration.sync-order.completed", default: false)
         /// Old app versions were using documents directory to store app files, database, adblock files.
