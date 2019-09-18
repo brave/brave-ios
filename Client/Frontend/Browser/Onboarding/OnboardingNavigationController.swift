@@ -219,10 +219,6 @@ class CustomAnimator: NSObject, UIViewControllerAnimatedTransitioning {
         tDetails?.alpha = 0.0
         tDetailsContent?.alpha = 0.0
         
-        if !shouldFadeGraphics {
-            tBackground?.alpha = 1.0
-        }
-        
         //guard let tDetailsFrame = tDetails?.superview?.convert(tDetails?.frame ?? .zero, to: container) else { return }
         
         let inset = UIApplication.shared.keyWindow?.safeAreaInsets.bottom ?? 0.0
@@ -233,6 +229,15 @@ class CustomAnimator: NSObject, UIViewControllerAnimatedTransitioning {
         var tDetailsFrame = (tDetails?.bounds ?? .zero)
         tDetailsFrame.origin.y = (container.frame.height - container.frame.origin.y) - tDetailsFrame.height
         tDetailsFrame = tDetailsFrame.offsetBy(dx: 0.0, dy: -inset)
+        
+        //Pause animations..
+        if !shouldFadeGraphics, let fAnimation = fBackground as? AnimationView, let tAnimation = tBackground as? AnimationView {
+            
+            fAnimation.pause()
+            tAnimation.play(fromProgress: fAnimation.currentProgress, toProgress: 1.0)
+            //tAnimation.pause()
+            fAnimation.stop()
+        }
 
         //fade contents of white panel
         POPBasicAnimation(propertyNamed: kPOPLayerOpacity)?.do {
@@ -247,9 +252,14 @@ class CustomAnimator: NSObject, UIViewControllerAnimatedTransitioning {
         }
         
         POPBasicAnimation(propertyNamed: kPOPLayerOpacity)?.do {
-            $0.toValue = 0.0
+            $0.toValue = shouldFadeGraphics ? 0.0 : 1.0
             $0.duration = 0.2
             fBackground?.layer.pop_add($0, forKey: "alpha")
+            $0.completionBlock = { _, _ in
+                if !self.shouldFadeGraphics, let tAnimation = tBackground as? AnimationView {
+                    tAnimation.play()
+                }
+            }
         }
         
         //resize white background to size on next screen
@@ -274,6 +284,12 @@ class CustomAnimator: NSObject, UIViewControllerAnimatedTransitioning {
             $0.duration = 0.4
             $0.beginTime = CACurrentMediaTime() + 0.3
             tBackground?.layer.pop_add($0, forKey: "alpha")
+            
+            if !shouldFadeGraphics {
+                $0.completionBlock = { _, _ in
+                    fBackground?.layer.opacity = 0.0
+                }
+            }
         }
         
         POPBasicAnimation(propertyNamed: kPOPLayerOpacity)?.do {
