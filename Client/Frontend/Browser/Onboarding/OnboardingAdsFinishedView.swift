@@ -84,7 +84,7 @@ extension OnboardingAdsFinishedViewController {
                 $0.edges.equalToSuperview().inset(UX.descriptionContentInset)
             }
             
-            [descriptionView].forEach(mainStackView.addArrangedSubview(_:))
+            mainStackView.addArrangedSubview(descriptionView)
 
             [UIView.spacer(.horizontal, amount: 0),
              finishButton,
