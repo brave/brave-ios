@@ -18,6 +18,10 @@ class OnboardingViewController: UIViewController {
         return theme.isDark
     }
     
+    var themeColour: UIColor {
+        return theme.isDark ? UIColor(rgb: 0x212529) : UIColor(rgb: 0xFFFFFF)
+    }
+    
     init(profile: Profile, theme: Theme) {
         self.profile = profile
         self.theme = theme
@@ -29,7 +33,6 @@ class OnboardingViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = dark ? UIColor(rgb: 0x212529) : UIColor(rgb: 0xFFFFFF)
     }
     
     /// Default behavior to present next onboarding screen.

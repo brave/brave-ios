@@ -23,7 +23,7 @@ class OnboardingSearchEnginesViewController: OnboardingViewController {
     }
     
     override func loadView() {
-        view = View()
+        view = View(theme: theme, themeColour: themeColour)
     }
 
     override func viewDidLoad() {
@@ -36,11 +36,8 @@ class OnboardingSearchEnginesViewController: OnboardingViewController {
         contentView.skipButton.addTarget(self, action: #selector(skipTapped), for: .touchDown)
         
         let tablebackground = UIView()
-        tablebackground.backgroundColor = contentView.backgroundColor
+        tablebackground.backgroundColor = themeColour
         contentView.searchEnginesTable.backgroundView = tablebackground
-        
-        contentView.containerView.backgroundColor = contentView.backgroundColor
-        view.backgroundColor = #colorLiteral(red: 0.1176470588, green: 0.1254901961, blue: 0.1607843137, alpha: 1)
     }
     
     @objc override func continueTapped() {

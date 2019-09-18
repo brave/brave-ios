@@ -95,6 +95,7 @@ class OnboardingNavigationController: UINavigationController {
         
         isNavigationBarHidden = true
         self.delegate = self
+        view.backgroundColor = theme.isDark ? UIColor(rgb: 0x212529) : UIColor(rgb: 0xFFFFFF)
         
         modalPresentationStyle = UIDevice.current.userInterfaceIdiom == .phone ? .fullScreen : .formSheet
         
@@ -103,6 +104,15 @@ class OnboardingNavigationController: UINavigationController {
             isModalInPresentation = true
         }
         preferredContentSize = UX.preferredModalSize
+        
+        let backgroundView = UIImageView().then {
+            $0.backgroundColor = #colorLiteral(red: 0.1176470588, green: 0.1254901961, blue: 0.1607843137, alpha: 1)
+        }
+        
+        view.insertSubview(backgroundView, at: 0)
+        backgroundView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
     }
 }
 
@@ -178,7 +188,7 @@ class CustomAnimator: NSObject, UIViewControllerAnimatedTransitioning {
         //Setup
         fromView.frame = container.bounds
         toView.frame = container.bounds
-        container.insertSubview(toView, belowSubview: fromView)
+        isPresenting ? container.addSubview(toView) : container.insertSubview(toView, belowSubview: fromView)
         fromView.layoutIfNeeded()
         toView.layoutIfNeeded()
         
@@ -198,7 +208,7 @@ class CustomAnimator: NSObject, UIViewControllerAnimatedTransitioning {
         fDetailsContent?.alpha = 1.0
         
         tBackground?.alpha = 0.0
-        tDetails?.alpha = 1.0
+        tDetails?.alpha = 0.0
         tDetailsContent?.alpha = 0.0
         
         //guard let tDetailsFrame = tDetails?.superview?.convert(tDetails?.frame ?? .zero, to: container) else { return }
@@ -219,6 +229,10 @@ class CustomAnimator: NSObject, UIViewControllerAnimatedTransitioning {
             $0.duration = 0.2
             $0.beginTime = CACurrentMediaTime()
             fDetailsContent?.layer.pop_add($0, forKey: "alpha")
+            
+            $0.completionBlock = { _, _ in
+                tDetails?.alpha = 1.0
+            }
         }
         
         POPBasicAnimation(propertyNamed: kPOPLayerOpacity)?.do {

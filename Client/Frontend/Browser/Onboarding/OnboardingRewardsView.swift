@@ -69,28 +69,14 @@ extension OnboardingRewardsViewController {
             $0.distribution = .equalCentering
         }
         
-        override var backgroundColor: UIColor? {
-            didSet {
-                // Needed to support rounding
-                descriptionView.backgroundColor = backgroundColor
-            }
-        }
-        
-        init() {
+        init(theme: Theme, themeColour: UIColor) {
             super.init(frame: .zero)
+            
+            descriptionView.backgroundColor = themeColour
             
             mainStackView.tag = OnboardingViewAnimationID.details.rawValue
             descriptionStackView.tag = OnboardingViewAnimationID.detailsContent.rawValue
             imageView.tag = OnboardingViewAnimationID.background.rawValue
-            
-            let backgroundView = UIImageView().then {
-                $0.backgroundColor = #colorLiteral(red: 0.1176470588, green: 0.1254901961, blue: 0.1607843137, alpha: 1)
-            }
-            
-            addSubview(backgroundView)
-            backgroundView.snp.makeConstraints {
-                $0.edges.equalToSuperview()
-            }
             
             addSubview(imageView)
             addSubview(mainStackView)

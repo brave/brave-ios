@@ -69,13 +69,13 @@ extension OnboardingSearchEnginesViewController {
             $0.alignment = .center
         }
         
-        let containerView = UIView()
-        
         private var logoCenterY: Constraint?
         
-        init() {
+        init(theme: Theme, themeColour: UIColor) {
             super.init(frame: .zero)
             
+            let containerView = UIView()
+            containerView.backgroundColor = themeColour
             containerView.tag = OnboardingViewAnimationID.details.rawValue
             mainStackView.tag = OnboardingViewAnimationID.detailsContent.rawValue
             braveLogo.tag = OnboardingViewAnimationID.background.rawValue

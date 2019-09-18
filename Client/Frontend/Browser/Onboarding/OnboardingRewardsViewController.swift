@@ -10,7 +10,7 @@ class OnboardingRewardsViewController: OnboardingViewController {
     }
     
     override func loadView() {
-        view = View()
+        view = View(theme: theme, themeColour: themeColour)
     }
 
     override func viewDidLoad() {

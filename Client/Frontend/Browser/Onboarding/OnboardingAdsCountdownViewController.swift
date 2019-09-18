@@ -11,7 +11,7 @@ class OnboardingAdsCountdownViewController: OnboardingViewController, UNUserNoti
     }
     
     override func loadView() {
-        view = View()
+        view = View(theme: theme, themeColour: themeColour)
     }
 
     override func viewDidLoad() {
