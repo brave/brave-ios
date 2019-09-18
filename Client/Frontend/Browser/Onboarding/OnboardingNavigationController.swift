@@ -5,6 +5,7 @@
 import UIKit
 import Shared
 import pop
+import Lottie
 
 private let log = Logger.browserLogger
 
@@ -43,7 +44,7 @@ class OnboardingNavigationController: UINavigationController {
         /// Screens should be sorted in order of which they are presented to the user.
         fileprivate var screens: [Screens] {
             switch self {
-            case .newUser: return [.searchEnginePicker, .shieldsInfo, .rewardsInfo, .rewardsAgreement, .adsCountdown /*, .adsInfo */]
+            case .newUser: return [.searchEnginePicker, .shieldsInfo, .rewardsInfo, .rewardsAgreement, .adsCountdown, .adsInfo]
             case .existingUser: return [/* .rewardsInfo, .adsInfo */]
             }
         }
@@ -55,6 +56,7 @@ class OnboardingNavigationController: UINavigationController {
         case rewardsInfo
         case rewardsAgreement
         case adsCountdown
+        case adsInfo
         
         /// Returns new ViewController associated with the screen type
         func viewController(with profile: Profile, theme: Theme) -> OnboardingViewController {
@@ -69,6 +71,8 @@ class OnboardingNavigationController: UINavigationController {
                 return OnboardingRewardsAgreementViewController(profile: profile, theme: theme)
             case .adsCountdown:
                 return OnboardingAdsCountdownViewController(profile: profile, theme: theme)
+            case .adsInfo:
+                return OnboardingAdsFinishedViewController(profile: profile, theme: theme)
             }
         }
         
@@ -79,6 +83,7 @@ class OnboardingNavigationController: UINavigationController {
             case .rewardsInfo: return OnboardingRewardsViewController.self
             case .rewardsAgreement: return OnboardingRewardsAgreementViewController.self
             case .adsCountdown: return OnboardingAdsCountdownViewController.self
+            case .adsInfo: return OnboardingAdsFinishedViewController.self
             }
         }
     }
@@ -95,8 +100,7 @@ class OnboardingNavigationController: UINavigationController {
         
         isNavigationBarHidden = true
         self.delegate = self
-        view.backgroundColor = theme.isDark ? UIColor(rgb: 0x212529) : UIColor(rgb: 0xFFFFFF)
-        
+
         modalPresentationStyle = UIDevice.current.userInterfaceIdiom == .phone ? .fullScreen : .formSheet
         
         if #available(iOS 13.0, *) {
@@ -144,9 +148,11 @@ extension OnboardingNavigationController: UINavigationControllerDelegate {
 
          switch operation {
          case .push:
-             return CustomAnimator(isPresenting: true)
+            let shouldFade = !fromVC.isKind(of: OnboardingRewardsViewController.self)
+            return CustomAnimator(isPresenting: true, shouldFadeGraphics: shouldFade)
          default:
-             return CustomAnimator(isPresenting: false)
+            let shouldFade = !fromVC.isKind(of: OnboardingRewardsAgreementViewController.self)
+             return CustomAnimator(isPresenting: false, shouldFadeGraphics: shouldFade)
          }
     }
 }
@@ -172,10 +178,12 @@ extension OnboardingNavigationController {
 
 class CustomAnimator: NSObject, UIViewControllerAnimatedTransitioning {
     
-    var isPresenting: Bool
+    let isPresenting: Bool
+    let shouldFadeGraphics: Bool
     
-    init(isPresenting: Bool) {
+    init(isPresenting: Bool, shouldFadeGraphics: Bool) {
         self.isPresenting = isPresenting
+        self.shouldFadeGraphics = shouldFadeGraphics
     }
     
     func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
@@ -211,6 +219,10 @@ class CustomAnimator: NSObject, UIViewControllerAnimatedTransitioning {
         tDetails?.alpha = 0.0
         tDetailsContent?.alpha = 0.0
         
+        if !shouldFadeGraphics {
+            tBackground?.alpha = 1.0
+        }
+        
         //guard let tDetailsFrame = tDetails?.superview?.convert(tDetails?.frame ?? .zero, to: container) else { return }
         
         let inset = UIApplication.shared.keyWindow?.safeAreaInsets.bottom ?? 0.0
@@ -224,7 +236,6 @@ class CustomAnimator: NSObject, UIViewControllerAnimatedTransitioning {
 
         //fade contents of white panel
         POPBasicAnimation(propertyNamed: kPOPLayerOpacity)?.do {
-            $0.fromValue = 1.0
             $0.toValue = 0.0
             $0.duration = 0.2
             $0.beginTime = CACurrentMediaTime()
@@ -236,7 +247,6 @@ class CustomAnimator: NSObject, UIViewControllerAnimatedTransitioning {
         }
         
         POPBasicAnimation(propertyNamed: kPOPLayerOpacity)?.do {
-            $0.fromValue = 1.0
             $0.toValue = 0.0
             $0.duration = 0.2
             fBackground?.layer.pop_add($0, forKey: "alpha")
@@ -252,7 +262,6 @@ class CustomAnimator: NSObject, UIViewControllerAnimatedTransitioning {
         }
         
         POPBasicAnimation(propertyNamed: kPOPLayerCornerRadius)?.do {
-            $0.fromValue = fDetails?.layer.cornerRadius ?? 0.0
             $0.toValue = 12.0
             $0.duration = 0.3
             $0.beginTime = CACurrentMediaTime() + 0.1
@@ -261,7 +270,6 @@ class CustomAnimator: NSObject, UIViewControllerAnimatedTransitioning {
         
         //fade in background of next screen and its contents..
         POPBasicAnimation(propertyNamed: kPOPLayerOpacity)?.do {
-            $0.fromValue = 0.0
             $0.toValue = 1.0
             $0.duration = 0.4
             $0.beginTime = CACurrentMediaTime() + 0.3
@@ -269,14 +277,13 @@ class CustomAnimator: NSObject, UIViewControllerAnimatedTransitioning {
         }
         
         POPBasicAnimation(propertyNamed: kPOPLayerOpacity)?.do {
-            $0.fromValue = 0.0
             $0.toValue = 1.0
             $0.duration = 0.4
             $0.beginTime = CACurrentMediaTime() + 0.3
             tDetailsContent?.layer.pop_add($0, forKey: "alpha")
         }
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + self.transitionDuration(using: transitionContext)) {
             transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
         }
     }

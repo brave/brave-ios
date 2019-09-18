@@ -18,12 +18,18 @@ class OnboardingAdsCountdownViewController: OnboardingViewController, UNUserNoti
         super.viewDidLoad()
         
         contentView.countdownText = "3"
+        
+        //On this screen, when you press "Start Browsing", we need to mark all onboarding as complete, therefore we trigger `skip`..
+        contentView.finishedButton.addTarget(self, action: #selector(skipTapped), for: .touchDown)
+        
+        //On this screen, when you press "I didn't see an ad", we need to go to the next screen..
+        contentView.invalidButton.addTarget(self, action: #selector(continueTapped), for: .touchDown)
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        contentView.animate(from: 0.0, to: 1.0, duration: 5.0) { [weak self] in
+        contentView.animate(from: 0.0, to: 1.0, duration: 3.0) { [weak self] in
             self?.generateNotification()
         }
     }
@@ -47,6 +53,8 @@ class OnboardingAdsCountdownViewController: OnboardingViewController, UNUserNoti
                     
                     UNUserNotificationCenter.current().add(notification)
                 }
+            } else {
+                self.contentView.setState(.adConfirmation)
             }
         }
     }
@@ -55,5 +63,9 @@ class OnboardingAdsCountdownViewController: OnboardingViewController, UNUserNoti
         
         defer { center.delegate = nil }
         completionHandler([.alert])
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            self.contentView.setState(.adConfirmation)
+        }
     }
 }

@@ -19,6 +19,11 @@ extension OnboardingAdsCountdownViewController {
     
     class View: UIView {
         
+        enum State {
+            case countdown
+            case adConfirmation
+        }
+        
         var countdownText: String? {
             get {
                 countdownView.countdownLayer.string as? String
@@ -29,14 +34,13 @@ extension OnboardingAdsCountdownViewController {
             }
         }
         
-        let finishedButton = CommonViews.primaryButton(text: Strings.OBAgreeButton).then {
-            $0.accessibilityIdentifier = "OnboardingRewardsAgreementViewController.AgreeButton"
-            $0.backgroundColor = BraveUX.BraveOrange.withAlphaComponent(0.7)
-            $0.isEnabled = false
+        let finishedButton = CommonViews.primaryButton(text: Strings.OBFinishButton).then {
+            $0.accessibilityIdentifier = "OnboardingAdsCountdownViewController.StartBrowsing"
+            $0.backgroundColor = BraveUX.BraveOrange
         }
         
-        let invalidButton = CommonViews.secondaryButton().then {
-            $0.accessibilityIdentifier = "OnboardingRewardsAgreementViewController.SkipButton"
+        let invalidButton = CommonViews.secondaryButton(text: Strings.OBDidntSeeAdButton).then {
+            $0.accessibilityIdentifier = "OnboardingAdsCountdownViewController.DidntSeeAdd"
         }
         
         private let mainStackView = UIStackView().then {
@@ -46,7 +50,6 @@ extension OnboardingAdsCountdownViewController {
         
         let imageView = AnimationView(name: "onboarding-ads").then {
             $0.contentMode = .scaleAspectFit
-            $0.backgroundColor = #colorLiteral(red: 0.1176470588, green: 0.1254901961, blue: 0.1607843137, alpha: 1)
             $0.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
             $0.backgroundBehavior = .pauseAndRestore
             $0.loopMode = .loop
@@ -63,13 +66,15 @@ extension OnboardingAdsCountdownViewController {
             $0.spacing = 32
         }
         
-        private let titleLabel = CommonViews.primaryText(Strings.OBRewardsAgreementTitle).then {
+        private let titleLabel = CommonViews.primaryText(Strings.OBAdsTitle).then {
             $0.numberOfLines = 0
         }
         
         private let countdownView = AdsCountdownGradientView()
         
         private let buttonsStackView = UIStackView().then {
+            $0.axis = .vertical
+            $0.alignment = .center
             $0.distribution = .equalCentering
             $0.isHidden = true
         }
@@ -78,10 +83,27 @@ extension OnboardingAdsCountdownViewController {
             countdownView.animate(from: startOffset, to: endOffset, duration: duration, completion: completion)
         }
         
+        func setState(_ state: State) {
+            switch state {
+            case .countdown:
+                titleLabel.isHidden = false
+                buttonsStackView.isHidden = true
+                countdownView.isHidden = false
+                break
+                
+            case .adConfirmation:
+                titleLabel.isHidden = true
+                buttonsStackView.isHidden = false
+                countdownView.isHidden = true
+                break
+            }
+        }
+        
         init(theme: Theme, themeColour: UIColor) {
             super.init(frame: .zero)
             
             descriptionView.backgroundColor = themeColour
+            countdownView.setTheme(isDark: theme.isDark)
             
             mainStackView.tag = OnboardingViewAnimationID.details.rawValue
             descriptionStackView.tag = OnboardingViewAnimationID.detailsContent.rawValue
@@ -102,7 +124,7 @@ extension OnboardingAdsCountdownViewController {
             
             [descriptionView].forEach(mainStackView.addArrangedSubview(_:))
 
-            [finishedButton, invalidButton, UIView.spacer(.horizontal, amount: 0)]
+            [UIView.spacer(.vertical, amount: 20), finishedButton, UIView.spacer(.vertical, amount: 0), invalidButton]
                 .forEach(buttonsStackView.addArrangedSubview(_:))
             
             [titleLabel, countdownView, buttonsStackView].forEach(descriptionStackView.addArrangedSubview(_:))
@@ -132,28 +154,27 @@ class AdsCountdownGradientView: UIView {
     private struct UX {
         static let strokeThickness: CGFloat = 5.0
         static let ballRadius: CGFloat = 10.0
-        static let backgroundGray = UIColor(rgb: 0xCED4DA)
-        static let gradientPurple = UIColor(rgb: 0x4F30AB)
-        static let gradientPink = UIColor(rgb: 0xFF1893)
-        static let gradientOrange = UIColor(rgb: 0xFA7250)
+        
+        static let backgroundGrayLight = UIColor(rgb: 0xCED4DA)
+        static let backgroundGrayDark = UIColor(rgb: 0x212529)
+        
+        static let gradientPurpleLight = UIColor(rgb: 0x4F30AB)
+        static let gradientPinkLight = UIColor(rgb: 0xFF1893)
+        static let gradientOrangeLight = UIColor(rgb: 0xFA7250)
+        
+        static let gradientPurpleDark = UIColor(rgb: 0xA78AFF)
+        static let gradientPinkDark = UIColor(rgb: 0xFF1893)
+        static let gradientOrangeDark = UIColor(rgb: 0xFA7250)
     }
     
     fileprivate let countdownLayer = CenteredTextLayer().then {
         $0.font = UIFont.systemFont(ofSize: 54.0) as CTFont
-        $0.foregroundColor = UX.gradientPurple.cgColor
         $0.alignmentMode = .center
     }
     
     private let gradientLayer = { () -> CAGradientLayer in
         let layer = CAGradientLayer()
         layer.type = .conic
-        layer.colors = [UX.gradientPurple,
-                        UX.gradientPurple,
-                        UX.gradientPink,
-                        UX.gradientOrange,
-                        UX.gradientOrange,
-                        UX.gradientOrange].map({ $0.cgColor })
-        
         layer.startPoint = CGPoint(x: 0.5, y: 0.5)
         layer.endPoint = CGPoint(x: 0.5, y: 0)
         return layer
@@ -163,7 +184,6 @@ class AdsCountdownGradientView: UIView {
         let layer = CAShapeLayer()
         layer.lineWidth = UX.strokeThickness
         layer.fillColor = nil
-        layer.strokeColor = UX.backgroundGray.cgColor
         layer.shouldRasterize = true
         layer.strokeStart = 0.0
         layer.strokeEnd = 1.0
@@ -183,7 +203,6 @@ class AdsCountdownGradientView: UIView {
     
     private let strokeBallLayer = { () -> CALayer in
         let layer = CALayer()
-        layer.backgroundColor = UX.gradientOrange.cgColor
         layer.shouldRasterize = true
         return layer
     }()
@@ -253,6 +272,32 @@ class AdsCountdownGradientView: UIView {
         countdownLayer.removeFromSuperlayer()
         countdownLayer.frame = bounds
         layer.addSublayer(countdownLayer)
+    }
+    
+    func setTheme(isDark: Bool) {
+        if isDark {
+            gradientLayer.colors = [UX.gradientPurpleDark,
+                                    UX.gradientPurpleDark,
+                                    UX.gradientPinkDark,
+                                    UX.gradientOrangeDark,
+                                    UX.gradientOrangeDark,
+                                    UX.gradientOrangeDark].map({ $0.cgColor })
+            
+            countdownLayer.foregroundColor = UX.gradientPurpleDark.cgColor
+            shapeLayer.strokeColor = UX.backgroundGrayDark.cgColor
+            strokeBallLayer.backgroundColor = UX.gradientOrangeDark.cgColor
+        } else {
+            gradientLayer.colors = [UX.gradientPurpleLight,
+                                    UX.gradientPurpleLight,
+                                    UX.gradientPinkLight,
+                                    UX.gradientOrangeLight,
+                                    UX.gradientOrangeLight,
+                                    UX.gradientOrangeLight].map({ $0.cgColor })
+            
+            countdownLayer.foregroundColor = UX.gradientPurpleLight.cgColor
+            shapeLayer.strokeColor = UX.backgroundGrayLight.cgColor
+            strokeBallLayer.backgroundColor = UX.gradientOrangeLight.cgColor
+        }
     }
     
     @available(*, unavailable)

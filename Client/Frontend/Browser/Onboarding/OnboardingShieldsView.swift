@@ -33,7 +33,6 @@ extension OnboardingShieldsViewController {
         
         let imageView = AnimationView(name: "onboarding-shields").then {
             $0.contentMode = .scaleAspectFit
-            $0.backgroundColor = #colorLiteral(red: 0.1176470588, green: 0.1254901961, blue: 0.1607843137, alpha: 1)
             $0.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
             $0.play()
             $0.loopMode = .loop
@@ -92,10 +91,8 @@ extension OnboardingShieldsViewController {
             
             [descriptionView].forEach(mainStackView.addArrangedSubview(_:))
             
-            [UIView.spacer(.horizontal, amount: 0),
-             continueButton,
-             UIView.spacer(.horizontal, amount: 0)]
-                .forEach(buttonsStackView.addArrangedSubview(_:))
+            [skipButton, continueButton, UIView.spacer(.horizontal, amount: 0)]
+            .forEach(buttonsStackView.addArrangedSubview(_:))
             
             [textStackView, buttonsStackView].forEach(descriptionStackView.addArrangedSubview(_:))
         }

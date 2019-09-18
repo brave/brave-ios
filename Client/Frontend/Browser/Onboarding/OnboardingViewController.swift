@@ -19,7 +19,7 @@ class OnboardingViewController: UIViewController {
     }
     
     var themeColour: UIColor {
-        return theme.isDark ? UIColor(rgb: 0x212529) : UIColor(rgb: 0xFFFFFF)
+        return theme.isDark ? UIColor(rgb: 0x343A40) : UIColor(rgb: 0xFFFFFF)
     }
     
     init(profile: Profile, theme: Theme) {

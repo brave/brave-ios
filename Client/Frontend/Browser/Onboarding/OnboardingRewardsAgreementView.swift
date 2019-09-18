@@ -38,7 +38,6 @@ extension OnboardingRewardsAgreementViewController {
         
         let imageView = AnimationView(name: "onboarding-rewards").then {
             $0.contentMode = .scaleAspectFit
-            $0.backgroundColor = #colorLiteral(red: 0.1176470588, green: 0.1254901961, blue: 0.1607843137, alpha: 1)
             $0.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
             $0.backgroundBehavior = .pauseAndRestore
             $0.loopMode = .loop
@@ -142,6 +141,10 @@ extension OnboardingRewardsAgreementViewController {
         
         init(theme: Theme, themeColour: UIColor) {
             super.init(frame: .zero)
+            
+            if theme.isDark {
+                descriptionCheckbox.setImage(#imageLiteral(resourceName: "checkbox_off_dark"), for: .normal)
+            }
             
             descriptionView.backgroundColor = themeColour
             

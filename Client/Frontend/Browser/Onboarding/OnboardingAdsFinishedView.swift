@@ -7,7 +7,7 @@ import Shared
 import BraveShared
 import Lottie
 
-extension OnboardingRewardsViewController {
+extension OnboardingAdsFinishedViewController {
     
     private struct UX {
         /// A negative spacing is needed to make rounded corners for details view visible.
@@ -18,12 +18,8 @@ extension OnboardingRewardsViewController {
     
     class View: UIView {
         
-        let joinButton = CommonViews.primaryButton(text: Strings.OBJoinButton).then {
-            $0.accessibilityIdentifier = "OnboardingRewardsViewController.JoinButton"
-        }
-        
-        let skipButton = CommonViews.secondaryButton().then {
-            $0.accessibilityIdentifier = "OnboardingRewardsViewController.SkipButton"
+        let finishButton = CommonViews.primaryButton(text: Strings.OBFinishButton).then {
+            $0.accessibilityIdentifier = "OnboardingAdsFinishedViewController.StartBrowsing"
         }
         
         private let mainStackView = UIStackView().then {
@@ -31,12 +27,12 @@ extension OnboardingRewardsViewController {
             $0.spacing = UX.negativeSpacing
         }
         
-        let imageView = AnimationView(name: "onboarding-rewards").then {
+        let imageView = AnimationView(name: "onboarding-ads").then {
             $0.contentMode = .scaleAspectFit
             $0.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
             $0.backgroundBehavior = .pauseAndRestore
-            $0.loopMode = .loop
-            $0.play()
+            $0.loopMode = .playOnce
+            $0.currentProgress = 1.0
         }
         
         private let descriptionView = UIView().then {
@@ -50,18 +46,16 @@ extension OnboardingRewardsViewController {
         }
         
         private let textStackView = UIStackView().then { stackView in
-            stackView.axis = .vertical
+            stackView.axis = .horizontal
             stackView.spacing = 8
             
-            let titleLabel = CommonViews.primaryText(Strings.OBRewardsTitle)
-            
-            let descriptionLabel = CommonViews.secondaryText("").then {
-                $0.attributedText = Strings.OBRewardsDetail.boldWords(with: $0.font, amount: 2)
-            }
-            
-            [titleLabel, descriptionLabel].forEach {
-                stackView.addArrangedSubview($0)
-            }
+            let titleLabel = CommonViews.secondaryText(Strings.OBAdsInfoDescription)
+            [UIView.spacer(.horizontal, amount: 20),
+             titleLabel,
+             UIView.spacer(.horizontal, amount: 20)]
+                .forEach {
+                    stackView.addArrangedSubview($0)
+                }
         }
         
         private let buttonsStackView = UIStackView().then {
@@ -92,7 +86,9 @@ extension OnboardingRewardsViewController {
             
             [descriptionView].forEach(mainStackView.addArrangedSubview(_:))
 
-            [skipButton, joinButton, UIView.spacer(.horizontal, amount: 0)]
+            [UIView.spacer(.horizontal, amount: 0),
+             finishButton,
+             UIView.spacer(.horizontal, amount: 20)]
                 .forEach(buttonsStackView.addArrangedSubview(_:))
             
             [textStackView, buttonsStackView].forEach(descriptionStackView.addArrangedSubview(_:))
@@ -110,23 +106,5 @@ extension OnboardingRewardsViewController {
         
         @available(*, unavailable)
         required init(coder: NSCoder) { fatalError() }
-    }
-}
-
-private extension String {
-    func boldWords(with font: UIFont, amount: Int) -> NSMutableAttributedString {
-        let mutableDescriptionText = NSMutableAttributedString(string: self)
-        
-        let components = self.components(separatedBy: " ")
-        for i in 0..<min(amount, components.count) {
-            if let range = self.range(of: components[i]) {
-                let nsRange = NSRange(range, in: self)
-                let font = UIFont.systemFont(ofSize: font.pointSize, weight: UIFont.Weight.bold)
-                
-                mutableDescriptionText.addAttribute(NSAttributedString.Key.font, value: font, range: nsRange)
-            }
-        }
-        
-        return mutableDescriptionText
     }
 }

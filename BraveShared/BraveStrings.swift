@@ -549,6 +549,7 @@ extension Strings {
     public static let OBFinishButton = NSLocalizedString("OBFinishButton", bundle: Bundle.braveShared, value: "Start browsing", comment: "Button to finish onboarding and start using the app.")
     public static let OBJoinButton = NSLocalizedString("OBJoinButton", bundle: Bundle.braveShared, value: "Start browsing", comment: "Button to join Brave Rewards.")
     public static let OBAgreeButton = NSLocalizedString("OBAgreeButton", bundle: Bundle.braveShared, value: "Agree", comment: "Button to agree to Brave's Terms of Service.")
+    public static let OBDidntSeeAdButton = NSLocalizedString("OBDidntSeeAdButton", bundle: Bundle.braveShared, value: "I didn't see an ad", comment: "Button to show information on how to enable ads")
     public static let OBSearchEngineTitle = NSLocalizedString("OBSearchEngineTitle", bundle: Bundle.braveShared, value: "Welcome to Brave Browser", comment: "Title for search engine onboarding screen")
     public static let OBSearchEngineDetail = NSLocalizedString("OBSearchEngineDetail", bundle: Bundle.braveShared, value: "Select your default search engine", comment: "Detail text for search engine onboarding screen")
     public static let OBShieldsTitle = NSLocalizedString("OBShieldsTitle", bundle: Bundle.braveShared, value: "Brave Shields", comment: "Title for shields onboarding screen")
@@ -558,4 +559,6 @@ extension Strings {
     public static let OBRewardsAgreementTitle = NSLocalizedString("OBRewardsAgreementTitle", bundle: Bundle.braveShared, value: "Agree to the Terms to use Brave Rewards", comment: "Title for rewards agreement onboarding screen")
     public static let OBRewardsAgreementDetail = NSLocalizedString("OBRewardsAgreementDetail", bundle: Bundle.braveShared, value: "I agree to the Brave Rewards", comment: "Detail text for rewards agreement onboarding screen")
     public static let OBRewardsAgreementDetailLink = NSLocalizedString("OBRewardsAgreementDetail", bundle: Bundle.braveShared, value: "Terms of Service", comment: "Detail text for rewards agreement onboarding screen")
+    public static let OBAdsTitle = NSLocalizedString("OBAdsTitle", bundle: Bundle.braveShared, value: "Brave will show your first ad in", comment: "Title for ads onboarding screen")
+    public static let OBAdsInfoDescription = NSLocalizedString("OBAdsInfoDescription", bundle: Bundle.braveShared, value: "To see ads from Brave Rewards, make sure Brave is allowed to show you notifications.", comment: "Title for ads description onboarding screen")
 }
