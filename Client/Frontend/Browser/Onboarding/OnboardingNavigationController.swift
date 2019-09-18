@@ -45,7 +45,7 @@ class OnboardingNavigationController: UINavigationController {
         fileprivate var screens: [Screens] {
             switch self {
             case .newUser: return [.searchEnginePicker, .shieldsInfo, .rewardsInfo, .rewardsAgreement, .adsCountdown, .adsInfo]
-            case .existingUser: return [/* .rewardsInfo, .adsInfo */]
+            case .existingUser: return [.rewardsInfo, .rewardsAgreement, .adsCountdown, .adsInfo]
             }
         }
     }
