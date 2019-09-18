@@ -30,7 +30,7 @@ extension OnboardingAdsCountdownViewController {
             }
             
             set {
-                countdownView.countdownLayer.string = newValue as NSString?
+                countdownView.countdownLayer.string = newValue
             }
         }
         
@@ -122,7 +122,7 @@ extension OnboardingAdsCountdownViewController {
                 $0.edges.equalToSuperview().inset(UX.descriptionContentInset)
             }
             
-            [descriptionView].forEach(mainStackView.addArrangedSubview(_:))
+            mainStackView.addArrangedSubview(descriptionView)
 
             [UIView.spacer(.vertical, amount: 20), finishedButton, UIView.spacer(.vertical, amount: 0), invalidButton]
                 .forEach(buttonsStackView.addArrangedSubview(_:))
@@ -172,40 +172,32 @@ class AdsCountdownGradientView: UIView {
         $0.alignmentMode = .center
     }
     
-    private let gradientLayer = { () -> CAGradientLayer in
-        let layer = CAGradientLayer()
-        layer.type = .conic
-        layer.startPoint = CGPoint(x: 0.5, y: 0.5)
-        layer.endPoint = CGPoint(x: 0.5, y: 0)
-        return layer
-    }()
+    private let gradientLayer = CAGradientLayer().then {
+        $0.type = .conic
+        $0.startPoint = CGPoint(x: 0.5, y: 0.5)
+        $0.endPoint = CGPoint(x: 0.5, y: 0)
+    }
     
-    private let shapeLayer = { () -> CAShapeLayer in
-        let layer = CAShapeLayer()
-        layer.lineWidth = UX.strokeThickness
-        layer.fillColor = nil
-        layer.shouldRasterize = true
-        layer.strokeStart = 0.0
-        layer.strokeEnd = 1.0
-        return layer
-    }()
+    private let shapeLayer = CAShapeLayer().then {
+        $0.lineWidth = UX.strokeThickness
+        $0.fillColor = nil
+        $0.shouldRasterize = true
+        $0.strokeStart = 0.0
+        $0.strokeEnd = 1.0
+    }
     
-    private let strokeLayer = { () -> CAShapeLayer in
-        let layer = CAShapeLayer()
-        layer.lineWidth = UX.strokeThickness
-        layer.fillColor = nil
-        layer.strokeColor = UIColor.white.cgColor
-        layer.shouldRasterize = true
-        layer.strokeStart = 0.0
-        layer.strokeEnd = 0.0
-        return layer
-    }()
+    private let strokeLayer = CAShapeLayer().then {
+        $0.lineWidth = UX.strokeThickness
+        $0.fillColor = nil
+        $0.strokeColor = UIColor.white.cgColor
+        $0.shouldRasterize = true
+        $0.strokeStart = 0.0
+        $0.strokeEnd = 0.0
+    }
     
-    private let strokeBallLayer = { () -> CALayer in
-        let layer = CALayer()
-        layer.shouldRasterize = true
-        return layer
-    }()
+    private let strokeBallLayer = CALayer().then {
+        $0.shouldRasterize = true
+    }
     
     private func createAnimationPath() -> UIBezierPath {
         let DEGREES_TO_RADIANS = { (degrees: CGFloat) -> CGFloat in
@@ -306,7 +298,7 @@ class AdsCountdownGradientView: UIView {
     func animate(from startOffset: CGFloat, to endOffset: CGFloat, duration: CFTimeInterval, completion: (() -> Void)? = nil) {
         CATransaction.begin()
         
-        countdownLayer.string = String(Int(duration)) as NSString
+        countdownLayer.string = String(Int(duration))
         
         let backgroundAnimation = CABasicAnimation(keyPath: "strokeStart")
         backgroundAnimation.duration = duration

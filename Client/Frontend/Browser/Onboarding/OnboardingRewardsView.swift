@@ -90,7 +90,7 @@ extension OnboardingRewardsViewController {
                 $0.edges.equalToSuperview().inset(UX.descriptionContentInset)
             }
             
-            [descriptionView].forEach(mainStackView.addArrangedSubview(_:))
+            mainStackView.addArrangedSubview(descriptionView)
 
             [skipButton, joinButton, UIView.spacer(.horizontal, amount: 0)]
                 .forEach(buttonsStackView.addArrangedSubview(_:))
