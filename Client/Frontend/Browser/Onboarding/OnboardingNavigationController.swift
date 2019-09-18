@@ -6,6 +6,7 @@ import UIKit
 import Shared
 import pop
 import Lottie
+import BraveRewards
 
 private let log = Logger.browserLogger
 
@@ -50,8 +51,8 @@ class OnboardingNavigationController: UINavigationController {
             }
             #else
             switch self {
-            case .newUser: return [.searchEnginePicker, .shieldsInfo, .rewardsInfo, .rewardsAgreement, .adsCountdown, .adsInfo]
-            case .existingUser: return [.rewardsInfo, .rewardsAgreement, .adsCountdown, .adsInfo]
+            case .newUser: return BraveAds.isSupportedRegion(Locale.current.identifier) ? [.searchEnginePicker, .shieldsInfo, .rewardsInfo, .rewardsAgreement, .adsCountdown, .adsInfo] : [.searchEnginePicker, .shieldsInfo]
+            case .existingUser: return BraveAds.isSupportedRegion(Locale.current.identifier) ? [.rewardsInfo, .rewardsAgreement, .adsCountdown, .adsInfo] : []
             }
             #endif
         }
