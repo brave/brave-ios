@@ -247,7 +247,7 @@ class BrowserViewController: UIViewController {
     }
     
     // Display first ad when the user gets back to this controller if they havent seen one before
-    func displayMyFirstAdIfAvailable(_ completion: (() -> Void)? = nil) {
+    func displayMyFirstAdIfAvailable() {
         guard let rewards = rewards, rewards.ledger.isEnabled && rewards.ads.isEnabled else { return }
         if Preferences.Rewards.myFirstAdShown.value { return }
         // Check if ads are eligible

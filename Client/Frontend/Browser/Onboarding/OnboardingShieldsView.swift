@@ -18,9 +18,15 @@ extension OnboardingShieldsViewController {
     
     class View: UIView {
         
+        #if NO_REWARDS
+        let continueButton = CommonViews.primaryButton(text: Strings.OBFinishButton).then {
+            $0.accessibilityIdentifier = "OnboardingShieldsViewController.FinishButton"
+        }
+        #else
         let continueButton = CommonViews.primaryButton(text: Strings.OBContinueButton).then {
             $0.accessibilityIdentifier = "OnboardingShieldsViewController.ContinueButton"
         }
+        #endif
         
         let skipButton = CommonViews.secondaryButton().then {
             $0.accessibilityIdentifier = "OnboardingShieldsViewController.SkipButton"

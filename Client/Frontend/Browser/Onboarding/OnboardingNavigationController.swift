@@ -43,10 +43,17 @@ class OnboardingNavigationController: UINavigationController {
         /// Returns a list of onboarding screens for given type.
         /// Screens should be sorted in order of which they are presented to the user.
         fileprivate var screens: [Screens] {
+            #if NO_REWARDS
+            switch self {
+            case .newUser: return [.searchEnginePicker, .shieldsInfo]
+            case .existingUser: return []
+            }
+            #else
             switch self {
             case .newUser: return [.searchEnginePicker, .shieldsInfo, .rewardsInfo, .rewardsAgreement, .adsCountdown, .adsInfo]
             case .existingUser: return [.rewardsInfo, .rewardsAgreement, .adsCountdown, .adsInfo]
             }
+            #endif
         }
     }
     
