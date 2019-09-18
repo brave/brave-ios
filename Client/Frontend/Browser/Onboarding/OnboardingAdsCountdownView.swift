@@ -79,6 +79,10 @@ extension OnboardingAdsCountdownViewController {
             $0.isHidden = true
         }
         
+        func resetAnimation() {
+            countdownView.reset()
+        }
+        
         func animate(from startOffset: CGFloat, to endOffset: CGFloat, duration: CFTimeInterval, completion: (() -> Void)? = nil) {
             countdownView.animate(from: startOffset, to: endOffset, duration: duration, completion: completion)
         }
@@ -99,12 +103,10 @@ extension OnboardingAdsCountdownViewController {
             }
         }
         
-        init(theme: Theme, themeColour: UIColor) {
+        init(theme: Theme) {
             super.init(frame: .zero)
             
-            descriptionView.backgroundColor = themeColour
-            countdownView.setTheme(isDark: theme.isDark)
-            
+            applyTheme(theme)
             mainStackView.tag = OnboardingViewAnimationID.details.rawValue
             descriptionStackView.tag = OnboardingViewAnimationID.detailsContent.rawValue
             imageView.tag = OnboardingViewAnimationID.background.rawValue
@@ -135,6 +137,12 @@ extension OnboardingAdsCountdownViewController {
             }
         }
         
+        func applyTheme(_ theme: Theme) {
+            descriptionView.backgroundColor = OnboardingViewController.colourForTheme(theme)
+            titleLabel.textColor = theme.isDark ? .white : .black
+            countdownView.setTheme(isDark: theme.isDark)
+        }
+        
         override func layoutSubviews() {
             super.layoutSubviews()
             
@@ -150,7 +158,7 @@ extension OnboardingAdsCountdownViewController {
     }
 }
 
-class AdsCountdownGradientView: UIView {
+class AdsCountdownGradientView: UIView, Themeable {
     private struct UX {
         static let strokeThickness: CGFloat = 5.0
         static let ballRadius: CGFloat = 10.0
@@ -168,6 +176,7 @@ class AdsCountdownGradientView: UIView {
     }
     
     fileprivate let countdownLayer = CenteredTextLayer().then {
+        $0.contentsScale = UIScreen.main.scale
         $0.font = UIFont.systemFont(ofSize: 54.0) as CTFont
         $0.alignmentMode = .center
     }
@@ -294,6 +303,21 @@ class AdsCountdownGradientView: UIView {
     
     @available(*, unavailable)
     required init(coder: NSCoder) { fatalError() }
+    
+    func reset() {
+        shapeLayer.do {
+            $0.strokeStart = 0.0
+            $0.strokeEnd = 1.0
+        }
+        
+        strokeLayer.do {
+            $0.strokeStart = 0.0
+            $0.strokeEnd = 0.0
+        }
+        
+        setNeedsLayout()
+        layoutIfNeeded()
+    }
     
     func animate(from startOffset: CGFloat, to endOffset: CGFloat, duration: CFTimeInterval, completion: (() -> Void)? = nil) {
         CATransaction.begin()

@@ -45,11 +45,12 @@ extension OnboardingAdsFinishedViewController {
             $0.spacing = 32
         }
         
-        private let textStackView = UIStackView().then { stackView in
+        private let titleLabel = CommonViews.secondaryText(Strings.OBAdsInfoDescription)
+        
+        private lazy var textStackView = UIStackView().then { stackView in
             stackView.axis = .horizontal
             stackView.spacing = 8
             
-            let titleLabel = CommonViews.secondaryText(Strings.OBAdsInfoDescription)
             [UIView.spacer(.horizontal, amount: 20),
              titleLabel,
              UIView.spacer(.horizontal, amount: 20)]
@@ -62,11 +63,10 @@ extension OnboardingAdsFinishedViewController {
             $0.distribution = .equalCentering
         }
         
-        init(theme: Theme, themeColour: UIColor) {
+        init(theme: Theme) {
             super.init(frame: .zero)
             
-            descriptionView.backgroundColor = themeColour
-            
+            applyTheme(theme)
             mainStackView.tag = OnboardingViewAnimationID.details.rawValue
             descriptionStackView.tag = OnboardingViewAnimationID.detailsContent.rawValue
             imageView.tag = OnboardingViewAnimationID.background.rawValue
@@ -92,6 +92,11 @@ extension OnboardingAdsFinishedViewController {
                 .forEach(buttonsStackView.addArrangedSubview(_:))
             
             [textStackView, buttonsStackView].forEach(descriptionStackView.addArrangedSubview(_:))
+        }
+        
+        func applyTheme(_ theme: Theme) {
+            descriptionView.backgroundColor = OnboardingViewController.colourForTheme(theme)
+            titleLabel.textColor = theme.isDark ? .white : .black
         }
         
         override func layoutSubviews() {

@@ -69,13 +69,14 @@ extension OnboardingSearchEnginesViewController {
             $0.alignment = .center
         }
         
+        private let containerView = UIView()
+        
         private var logoCenterY: Constraint?
         
-        init(theme: Theme, themeColour: UIColor) {
+        init(theme: Theme) {
             super.init(frame: .zero)
             
-            let containerView = UIView()
-            containerView.backgroundColor = themeColour
+            applyTheme(theme)
             containerView.tag = OnboardingViewAnimationID.details.rawValue
             mainStackView.tag = OnboardingViewAnimationID.detailsContent.rawValue
             braveLogo.tag = OnboardingViewAnimationID.background.rawValue
@@ -128,6 +129,14 @@ extension OnboardingSearchEnginesViewController {
         
         @available(*, unavailable)
         required init(coder: NSCoder) { fatalError() }
+        
+        func applyTheme(_ theme: Theme) {
+            containerView.backgroundColor = OnboardingViewController.colourForTheme(theme)
+            searchEnginesTable.backgroundView?.backgroundColor = OnboardingViewController.colourForTheme(theme)
+            titlePrimary.textColor = theme.isDark ? .white : .black
+            titleSecondary.textColor = theme.isDark ? .white : .black
+            searchEnginesTable.reloadData()
+        }
         
         // MARK: - Animations
         

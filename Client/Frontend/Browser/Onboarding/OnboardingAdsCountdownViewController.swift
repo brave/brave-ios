@@ -8,12 +8,14 @@ import BraveRewardsUI
 
 class OnboardingAdsCountdownViewController: OnboardingViewController, UNUserNotificationCenterDelegate {
     
+    private var countdownDidComplete = false
+    
     private var contentView: View {
         return view as! View // swiftlint:disable:this force_cast
     }
     
     override func loadView() {
-        view = View(theme: theme, themeColour: themeColour)
+        view = View(theme: theme)
     }
 
     override func viewDidLoad() {
@@ -31,8 +33,15 @@ class OnboardingAdsCountdownViewController: OnboardingViewController, UNUserNoti
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
+        if countdownDidComplete {
+            return
+        }
+        
+        contentView.resetAnimation()
         contentView.animate(from: 0.0, to: 1.0, duration: 3.0) { [weak self] in
             guard let self = self else { return }
+            
+            self.countdownDidComplete = true
             
             (UIApplication.shared.delegate as? AppDelegate)?.browserViewController.displayMyFirstAdIfAvailable({
                 self.skipTapped()
@@ -42,5 +51,10 @@ class OnboardingAdsCountdownViewController: OnboardingViewController, UNUserNoti
                 self.contentView.setState(.adConfirmation)
             }
         }
+    }
+    
+    override func applyTheme(_ theme: Theme) {
+        styleChildren(theme: theme)
+        contentView.applyTheme(theme)
     }
 }

@@ -10,7 +10,7 @@ class OnboardingRewardsAgreementViewController: OnboardingViewController {
     }
     
     override func loadView() {
-        view = View(theme: theme, themeColour: themeColour)
+        view = View(theme: theme)
     }
 
     override func viewDidLoad() {
@@ -24,5 +24,10 @@ class OnboardingRewardsAgreementViewController: OnboardingViewController {
             
             self.present(OnboardingWebViewController(), animated: true, completion: nil)
         }
+    }
+    
+    override func applyTheme(_ theme: Theme) {
+        styleChildren(theme: theme)
+        contentView.applyTheme(theme)
     }
 }

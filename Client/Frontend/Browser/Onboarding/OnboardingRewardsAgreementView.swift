@@ -65,68 +65,33 @@ extension OnboardingRewardsAgreementViewController {
             $0.setContentCompressionResistancePriority(.required, for: .horizontal)
         }
         
+        private let titleLabel = CommonViews.primaryText(Strings.OBRewardsAgreementTitle).then {
+            $0.numberOfLines = 0
+        }
+        
+        private lazy var descriptionLabel = UITextView().then {
+            $0.delaysContentTouches = false
+            $0.isEditable = false
+            $0.isScrollEnabled = false
+            $0.isSelectable = true
+            $0.backgroundColor = .clear
+            $0.textDragInteraction?.isEnabled = false
+            $0.textContainerInset = .zero
+            $0.font = UIFont.systemFont(ofSize: 16, weight: UIFont.Weight.regular)
+            $0.delegate = self
+            
+            $0.linkTextAttributes = [
+              .font: $0.font!,
+              .foregroundColor: UX.linkColor,
+              .underlineStyle: 0
+            ]
+            
+            $0.textAlignment = .center
+        }
+        
         private lazy var textStackView = UIStackView().then { stackView in
             stackView.axis = .vertical
             stackView.spacing = 8
-            
-            let titleLabel = CommonViews.primaryText(Strings.OBRewardsAgreementTitle).then {
-                $0.numberOfLines = 0
-            }
-            
-            let descriptionLabel = UITextView().then {
-                $0.delaysContentTouches = false
-                $0.isEditable = false
-                $0.isScrollEnabled = false
-                $0.isSelectable = true
-                $0.backgroundColor = .clear
-                $0.textDragInteraction?.isEnabled = false
-                $0.textContainerInset = .zero
-                $0.font = UIFont.systemFont(ofSize: 16, weight: UIFont.Weight.regular)
-                $0.delegate = self
-                
-                $0.linkTextAttributes = [
-                  .font: $0.font!,
-                  .foregroundColor: UX.linkColor,
-                  .underlineStyle: 0
-                ]
-                
-                $0.textAlignment = .center
-                $0.attributedText = {
-                    let text = NSMutableAttributedString(string: Strings.OBRewardsAgreementDetail, attributes: [
-                        .font: UIFont.systemFont(ofSize: 16, weight: UIFont.Weight.regular),
-                        .foregroundColor: titleLabel.textColor!
-                    ])
-                    
-                    text.append(NSAttributedString(string: " ", attributes: [
-                        .font: UIFont.systemFont(ofSize: 16, weight: UIFont.Weight.regular),
-                        .foregroundColor: titleLabel.textColor!
-                    ]))
-                    
-                    text.append(NSAttributedString(string: Strings.OBRewardsAgreementDetailLink, attributes: [
-                        .font: UIFont.systemFont(ofSize: 16, weight: UIFont.Weight.regular),
-                        .foregroundColor: UX.linkColor,
-                        .link: "brave_terms_of_service"
-                    ]))
-                    
-                    text.append(NSAttributedString(string: ".", attributes: [
-                        .font: UIFont.systemFont(ofSize: 16, weight: UIFont.Weight.regular),
-                        .foregroundColor: titleLabel.textColor!
-                    ]))
-                    
-                    let paragraphStyle = NSMutableParagraphStyle()
-                    paragraphStyle.lineBreakMode = .byWordWrapping
-                    
-                    text.addAttribute(.paragraphStyle, value: paragraphStyle, range: NSRange(location: 0, length: text.length))
-                    
-                    return text
-                }()
-                
-                $0.accessibilityLabel = $0.text
-                $0.accessibilityTraits = [.staticText, .link]
-                $0.accessibilityValue = nil
-                $0.isAccessibilityElement = true
-            }
-            
             let descriptionStackView =  UIStackView(arrangedSubviews: [descriptionLabel, descriptionCheckbox]).then {
                 $0.alignment = .center
                 $0.spacing = 65.0
@@ -139,15 +104,47 @@ extension OnboardingRewardsAgreementViewController {
             $0.distribution = .equalCentering
         }
         
-        init(theme: Theme, themeColour: UIColor) {
+        private func updateDescriptionLabel() {
+            descriptionLabel.attributedText = {
+                let text = NSMutableAttributedString(string: Strings.OBRewardsAgreementDetail, attributes: [
+                    .font: UIFont.systemFont(ofSize: 16, weight: UIFont.Weight.regular),
+                    .foregroundColor: titleLabel.textColor!
+                ])
+                
+                text.append(NSAttributedString(string: " ", attributes: [
+                    .font: UIFont.systemFont(ofSize: 16, weight: UIFont.Weight.regular),
+                    .foregroundColor: titleLabel.textColor!
+                ]))
+                
+                text.append(NSAttributedString(string: Strings.OBRewardsAgreementDetailLink, attributes: [
+                    .font: UIFont.systemFont(ofSize: 16, weight: UIFont.Weight.regular),
+                    .foregroundColor: UX.linkColor,
+                    .link: "brave_terms_of_service"
+                ]))
+                
+                text.append(NSAttributedString(string: ".", attributes: [
+                    .font: UIFont.systemFont(ofSize: 16, weight: UIFont.Weight.regular),
+                    .foregroundColor: titleLabel.textColor!
+                ]))
+                
+                let paragraphStyle = NSMutableParagraphStyle()
+                paragraphStyle.lineBreakMode = .byWordWrapping
+                
+                text.addAttribute(.paragraphStyle, value: paragraphStyle, range: NSRange(location: 0, length: text.length))
+                
+                return text
+            }()
+            
+            descriptionLabel.accessibilityLabel = descriptionLabel.text
+            descriptionLabel.accessibilityTraits = [.staticText, .link]
+            descriptionLabel.accessibilityValue = nil
+            descriptionLabel.isAccessibilityElement = true
+        }
+        
+        init(theme: Theme) {
             super.init(frame: .zero)
             
-            if theme.isDark {
-                descriptionCheckbox.setImage(#imageLiteral(resourceName: "checkbox_off_dark"), for: .normal)
-            }
-            
-            descriptionView.backgroundColor = themeColour
-            
+            applyTheme(theme)
             mainStackView.tag = OnboardingViewAnimationID.details.rawValue
             descriptionStackView.tag = OnboardingViewAnimationID.detailsContent.rawValue
             imageView.tag = OnboardingViewAnimationID.background.rawValue
@@ -173,6 +170,17 @@ extension OnboardingRewardsAgreementViewController {
             [textStackView, buttonsStackView].forEach(descriptionStackView.addArrangedSubview(_:))
             
             descriptionCheckbox.addTarget(self, action: #selector(onTermsAccepted(_:)), for: .touchUpInside)
+        }
+        
+        func applyTheme(_ theme: Theme) {
+            descriptionView.backgroundColor = OnboardingViewController.colourForTheme(theme)
+            titleLabel.textColor = theme.isDark ? .white : .black
+            updateDescriptionLabel()
+            if theme.isDark {
+                descriptionCheckbox.setImage(#imageLiteral(resourceName: "checkbox_off_dark"), for: .normal)
+            } else {
+                descriptionCheckbox.setImage(#imageLiteral(resourceName: "checkbox_off"), for: .normal)
+            }
         }
         
         override func layoutSubviews() {

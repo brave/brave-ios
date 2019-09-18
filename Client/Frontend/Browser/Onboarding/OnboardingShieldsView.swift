@@ -67,11 +67,10 @@ extension OnboardingShieldsViewController {
             $0.distribution = .equalCentering
         }
         
-        init(theme: Theme, themeColour: UIColor) {
+        init(theme: Theme) {
             super.init(frame: .zero)
             
-            descriptionView.backgroundColor = themeColour
-            
+            applyTheme(theme)
             mainStackView.tag = OnboardingViewAnimationID.details.rawValue
             descriptionStackView.tag = OnboardingViewAnimationID.detailsContent.rawValue
             imageView.tag = OnboardingViewAnimationID.background.rawValue
@@ -95,6 +94,15 @@ extension OnboardingShieldsViewController {
             .forEach(buttonsStackView.addArrangedSubview(_:))
             
             [textStackView, buttonsStackView].forEach(descriptionStackView.addArrangedSubview(_:))
+        }
+        
+        func applyTheme(_ theme: Theme) {
+            descriptionView.backgroundColor = OnboardingViewController.colourForTheme(theme)
+            textStackView.arrangedSubviews.forEach({
+                if let label = $0 as? UILabel {
+                    label.textColor = theme.isDark ? .white : .black
+                }
+            })
         }
         
         override func layoutSubviews() {

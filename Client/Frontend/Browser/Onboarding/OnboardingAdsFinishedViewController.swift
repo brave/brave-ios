@@ -10,12 +10,17 @@ class OnboardingAdsFinishedViewController: OnboardingViewController {
     }
     
     override func loadView() {
-        view = View(theme: theme, themeColour: themeColour)
+        view = View(theme: theme)
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
         contentView.finishButton.addTarget(self, action: #selector(continueTapped), for: .touchDown)
+    }
+    
+    override func applyTheme(_ theme: Theme) {
+        styleChildren(theme: theme)
+        contentView.applyTheme(theme)
     }
 }

@@ -49,15 +49,15 @@ extension OnboardingRewardsViewController {
             $0.spacing = 32
         }
         
-        private let textStackView = UIStackView().then { stackView in
+        private let titleLabel = CommonViews.primaryText(Strings.OBRewardsTitle)
+        
+        private let descriptionLabel = CommonViews.secondaryText("").then {
+            $0.attributedText = Strings.OBRewardsDetail.boldWords(with: $0.font, amount: 2)
+        }
+        
+        private lazy var textStackView = UIStackView().then { stackView in
             stackView.axis = .vertical
             stackView.spacing = 8
-            
-            let titleLabel = CommonViews.primaryText(Strings.OBRewardsTitle)
-            
-            let descriptionLabel = CommonViews.secondaryText("").then {
-                $0.attributedText = Strings.OBRewardsDetail.boldWords(with: $0.font, amount: 2)
-            }
             
             [titleLabel, descriptionLabel].forEach {
                 stackView.addArrangedSubview($0)
@@ -68,11 +68,10 @@ extension OnboardingRewardsViewController {
             $0.distribution = .equalCentering
         }
         
-        init(theme: Theme, themeColour: UIColor) {
+        init(theme: Theme) {
             super.init(frame: .zero)
             
-            descriptionView.backgroundColor = themeColour
-            
+            applyTheme(theme)
             mainStackView.tag = OnboardingViewAnimationID.details.rawValue
             descriptionStackView.tag = OnboardingViewAnimationID.detailsContent.rawValue
             imageView.tag = OnboardingViewAnimationID.background.rawValue
@@ -96,6 +95,12 @@ extension OnboardingRewardsViewController {
                 .forEach(buttonsStackView.addArrangedSubview(_:))
             
             [textStackView, buttonsStackView].forEach(descriptionStackView.addArrangedSubview(_:))
+        }
+        
+        func applyTheme(_ theme: Theme) {
+            descriptionView.backgroundColor = OnboardingViewController.colourForTheme(theme)
+            titleLabel.textColor = theme.isDark ? .white : .black
+            descriptionLabel.textColor = theme.isDark ? .white : .black
         }
         
         override func layoutSubviews() {

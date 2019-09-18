@@ -109,7 +109,7 @@ class OnboardingNavigationController: UINavigationController {
         }
         preferredContentSize = UX.preferredModalSize
         
-        let backgroundView = UIImageView().then {
+        let backgroundView = UIView().then {
             $0.backgroundColor = #colorLiteral(red: 0.1176470588, green: 0.1254901961, blue: 0.1607843137, alpha: 1)
         }
         

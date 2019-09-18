@@ -10,7 +10,7 @@ class OnboardingRewardsViewController: OnboardingViewController {
     }
     
     override func loadView() {
-        view = View(theme: theme, themeColour: themeColour)
+        view = View(theme: theme)
     }
 
     override func viewDidLoad() {
@@ -18,5 +18,10 @@ class OnboardingRewardsViewController: OnboardingViewController {
         
         contentView.joinButton.addTarget(self, action: #selector(continueTapped), for: .touchDown)
         contentView.skipButton.addTarget(self, action: #selector(skipTapped), for: .touchDown)
+    }
+    
+    override func applyTheme(_ theme: Theme) {
+        styleChildren(theme: theme)
+        contentView.applyTheme(theme)
     }
 }

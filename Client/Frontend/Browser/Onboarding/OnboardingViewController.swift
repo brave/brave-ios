@@ -7,10 +7,10 @@ import BraveShared
 import Shared
 
 /// A base class to provide common implementations needed for user onboarding screens.
-class OnboardingViewController: UIViewController {
+class OnboardingViewController: UIViewController, Themeable {
     weak var delegate: Onboardable?
     var profile: Profile
-    let theme: Theme
+    var theme: Theme
     
     /// Whether the on-boarding is dark or not, based solely on passed in theme
     ///  Added explicitly to make removal easier in the future if just `theme` is used
@@ -18,8 +18,17 @@ class OnboardingViewController: UIViewController {
         return theme.isDark
     }
     
-    var themeColour: UIColor {
+    static func colourForTheme(_ theme: Theme) -> UIColor {
         return theme.isDark ? UIColor(rgb: 0x343A40) : UIColor(rgb: 0xFFFFFF)
+    }
+    
+    static func getUpdatedTheme() -> Theme {
+        let fallback = Theme.DefaultTheme.light.rawValue
+        if #available(iOS 13.0, *) {
+            let isDark = UITraitCollection.current.userInterfaceStyle == .dark
+            return Theme.from(id: isDark ? Theme.DefaultTheme.dark.rawValue : fallback)
+        }
+        return Theme.from(id: fallback)
     }
     
     init(profile: Profile, theme: Theme) {
@@ -89,5 +98,18 @@ class OnboardingViewController: UIViewController {
             
             return label
         }
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        if #available(iOS 13.0, *) {
+            if UITraitCollection.current.userInterfaceStyle != previousTraitCollection?.userInterfaceStyle {
+                theme = OnboardingViewController.getUpdatedTheme()
+                applyTheme(theme)
+            }
+        }
+    }
+    
+    func applyTheme(_ theme: Theme) {
+        styleChildren(theme: theme)
     }
 }
