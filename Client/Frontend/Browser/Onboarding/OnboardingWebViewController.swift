@@ -4,8 +4,20 @@
 
 import Foundation
 import WebKit
+import Shared
 
-class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
+class OnboardingWebViewController: UIViewController {
+    
+    private let url = URL(string: "https://brave.com/terms-of-use/")
+    
+    private let KVOs: [KVOConstants] = [
+        .loading,
+        .canGoBack,
+        .canGoForward,
+        .URL,
+        .hasOnlySecureContent,
+        .serverTrust
+    ]
     
     private let toolbar = Toolbar().then {
         $0.snp.makeConstraints {
@@ -25,6 +37,10 @@ class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
         return WKWebView(frame: .zero, configuration: configuration)
     }()
     
+    deinit {
+        KVOs.forEach { webView.removeObserver(self, forKeyPath: $0.rawValue) }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -39,13 +55,37 @@ class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
             $0.edges.equalToSuperview()
         }
         
-        webView.navigationDelegate = self
-        webView.load(URLRequest(url: URL(string: "https://brave.com/terms-of-use/")!))
+        KVOs.forEach { webView.addObserver(self, forKeyPath: $0.rawValue, options: .new, context: nil) }
+        
+        webView.load(URLRequest(url: url!))
         
         toolbar.exitButton.addTarget(self, action: #selector(onExit), for: .touchUpInside)
         toolbar.backButton.addTarget(self, action: #selector(onBack), for: .touchUpInside)
         toolbar.forwardButton.addTarget(self, action: #selector(onForward), for: .touchUpInside)
         toolbar.actionButton.addTarget(self, action: #selector(onAction), for: .touchUpInside)
+    }
+    
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
+        guard let webView = object as? WKWebView, let kp = keyPath, let path = KVOConstants(rawValue: kp) else {
+            return
+        }
+
+        switch path {
+        case .URL:
+            if url?.origin == webView.url?.origin {
+                toolbar.urlLabel.text = webView.url?.host
+            }
+        case .canGoBack:
+            updateBackForwardUI()
+        case .canGoForward:
+            updateBackForwardUI()
+        case .hasOnlySecureContent:
+            updateWebPageSecurity()
+        case .serverTrust:
+            updateWebPageSecurity()
+        default:
+            break
+        }
     }
     
     @objc
@@ -57,31 +97,19 @@ class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
     private func onBack() {
         if webView.canGoBack {
             webView.goBack()
-            updateWebPageDomain()
         }
-        
-        toolbar.backButton.isEnabled = webView.canGoBack
-        toolbar.backButton.tintColor = webView.canGoBack ? UX.buttonEnabledColor : UX.buttonDisabledColor
     }
     
     @objc
     private func onForward() {
         if webView.canGoForward {
             webView.goForward()
-            updateWebPageDomain()
         }
-        
-        toolbar.forwardButton.isEnabled = webView.canGoForward
-        toolbar.forwardButton.tintColor = webView.canGoForward ? UX.buttonEnabledColor : UX.buttonDisabledColor
     }
     
     @objc
     private func onAction() {
         print("Access Button Pressed..")
-    }
-    
-    private func updateWebPageDomain() {
-        toolbar.urlLabel.text = webView.url?.host
     }
     
     private func updateWebPageSecurity() {
@@ -110,53 +138,6 @@ class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
 
         toolbar.forwardButton.isEnabled = webView.canGoForward
         toolbar.forwardButton.tintColor = webView.canGoForward ? UX.buttonEnabledColor : UX.buttonDisabledColor
-    }
-    
-    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-        
-        updateBackForwardUI()
-        decisionHandler(.allow)
-    }
-    
-    @available(iOS 13.0, *)
-    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: WKWebpagePreferences, decisionHandler: @escaping (WKNavigationActionPolicy, WKWebpagePreferences) -> Void) {
-        
-        self.webView(webView, decidePolicyFor: navigationAction) { action in
-            decisionHandler(action, preferences)
-        }
-    }
-    
-    func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
-        
-        decisionHandler(.allow)
-    }
-    
-    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-        
-        updateWebPageDomain()
-        updateWebPageSecurity()
-        updateBackForwardUI()
-    }
-    
-    func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-        
-        updateWebPageDomain()
-        updateWebPageSecurity()
-        updateBackForwardUI()
-    }
-    
-    func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
-        updateWebPageSecurity()
-        updateBackForwardUI()
-    }
-    
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        updateBackForwardUI()
-    }
-    
-    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        updateWebPageSecurity()
-        updateBackForwardUI()
     }
 }
 
