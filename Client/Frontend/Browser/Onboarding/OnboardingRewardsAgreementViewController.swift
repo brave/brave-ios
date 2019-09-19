@@ -32,6 +32,10 @@ class OnboardingRewardsAgreementViewController: OnboardingViewController {
     
     @objc
     private func onAgreed() {
+        if loadingView.superview != nil || loadingView.isAnimating {
+            return
+        }
+        
         let titleColour = contentView.agreeButton.titleColor(for: .normal)
         contentView.agreeButton.setTitleColor(.clear, for: .normal)
         contentView.agreeButton.addSubview(loadingView)
@@ -40,10 +44,11 @@ class OnboardingRewardsAgreementViewController: OnboardingViewController {
         }
         
         loadingView.startAnimating()
-        rewards?.ledger.createWallet { [weak self] error in
+        rewards?.ledger.createWalletAndFetchDetails { [weak self] _ in
             guard let self = self else { return }
 
             self.loadingView.stopAnimating()
+            self.loadingView.removeFromSuperview()
             self.contentView.agreeButton.setTitleColor(titleColour, for: .normal)
             self.continueTapped()
         }
