@@ -30,19 +30,50 @@ public class DataController: NSObject {
         return FileManager.default.fileExists(atPath: storeURL.path)
     }
     
-    public func migrateToNewPathIfNeeded() throws {
+    public func migrateToNewPathIfNeeded() {
         enum MigrationError: Error {
             case Store(String)
         }
         
-        if FileManager.default.fileExists(atPath: oldStoreURL.path) && !storeExists() /* TODO: Detect better solution */ {
-            addPersistentStore(for: migrationContainer, store: oldStoreURL)
-            
-            let coordinator = migrationContainer.persistentStoreCoordinator
+        let oldStoreExists: () -> Bool = {
+            FileManager.default.fileExists(atPath: self.oldStoreURL.path)
+        }
+        
+        if !oldStoreExists() {
+            // No data to migrate
+            return
+        }
+        
+        if storeExists() {
+            // Store already exists, do not attempt to overwrite
+            return
+        }
+        
+        //
+        // 1. Upgraded users in good state (use new database)
+        // 1. Upgraded users in bad state (use new database, delete old files?)
+        // 1. Upgrading users (attempt migration, if fail, use old store, if successful delete old files)
+        // 1. New Users (no migration, use new location
+        //
+        
+        addPersistentStore(for: migrationContainer, store: oldStoreURL)
+        let coordinator = migrationContainer.persistentStoreCoordinator
+
+        do {
             guard let oldStore = coordinator.persistentStore(for: oldStoreURL) else {
                 throw MigrationError.Store("Old store unavailable")
             }
             try coordinator.migratePersistentStore(oldStore, to: storeURL, options: nil, withType: NSSQLiteStoreType)
+        } catch {
+            log.error("Document -> Support database migration failed: \(error)")
+            if oldStoreExists() {
+                // Migration failed somehow, and old store is present, so re-pointing the storeURL
+                // TODO: Must be persistent
+                storeURL = oldStoreURL
+            }
+        }
+        
+        do {
             try coordinator.destroyPersistentStore(at: oldStoreURL, ofType: NSSQLiteStoreType, options: nil)
             
             let documentFiles = try FileManager.default.contentsOfDirectory(
@@ -52,8 +83,11 @@ public class DataController: NSObject {
             
             // Delete all Brave.X files
             try documentFiles
-                .filter({$0.lastPathComponent.hasPrefix(DataController.databaseName)})
+                .filter {$0.lastPathComponent.hasPrefix(DataController.databaseName)}
                 .forEach(FileManager.default.removeItem)
+        } catch {
+            log.error("Document -> Support database cleanup failed: \(error)")
+            // Do not re-point store, as the migration was successful, just the clean up failed
         }
     }
     
