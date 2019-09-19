@@ -4,6 +4,7 @@
 
 import Foundation
 import BraveRewards
+import Shared
 
 class OnboardingRewardsAgreementViewController: OnboardingViewController {
 
@@ -44,13 +45,20 @@ class OnboardingRewardsAgreementViewController: OnboardingViewController {
         }
         
         loadingView.startAnimating()
-        rewards?.ledger.createWalletAndFetchDetails { [weak self] _ in
+        rewards?.ledger.createWalletAndFetchDetails { [weak self] success in
             guard let self = self else { return }
 
             self.loadingView.stopAnimating()
             self.loadingView.removeFromSuperview()
             self.contentView.agreeButton.setTitleColor(titleColour, for: .normal)
-            self.continueTapped()
+            
+            if success {
+                self.continueTapped()
+            } else {
+                let alert = UIAlertController(title: Strings.OBErrorTitle, message: Strings.OBErrorDetails, preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: Strings.OBErrorOkay, style: .default, handler: nil))
+                self.present(alert, animated: true, completion: nil)
+            }
         }
     }
     
