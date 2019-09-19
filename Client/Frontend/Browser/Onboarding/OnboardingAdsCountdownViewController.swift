@@ -9,10 +9,6 @@ import BraveShared
 
 class OnboardingAdsCountdownViewController: OnboardingViewController, UNUserNotificationCenterDelegate {
     
-    private var rewards: BraveRewards?
-    private var notificationsHandler: AdsNotificationHandler?
-    private var rewardsObserver: LedgerObserver?
-    private var publisher: PublisherInfo?
     private var timeSinceAnimationStarted: Date?
     
     private var contentView: View {
@@ -25,8 +21,6 @@ class OnboardingAdsCountdownViewController: OnboardingViewController, UNUserNoti
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        setupBraveRewards()
         
         //Countdown timer
         contentView.countdownText = "3"
@@ -53,6 +47,12 @@ class OnboardingAdsCountdownViewController: OnboardingViewController, UNUserNoti
             self.displayMyFirstAdIfAvailable {
                 self.skipTapped()
             }
+            
+            //Do this because I have no idea if the ad shows or not..
+            //I only know if they tapped it..
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                self.contentView.setState(.adConfirmation)
+            }
         }
     }
     
@@ -64,50 +64,7 @@ class OnboardingAdsCountdownViewController: OnboardingViewController, UNUserNoti
 
 extension OnboardingAdsCountdownViewController {
     
-    private func setupBraveRewards() {
-        #if NO_REWARDS
-        rewards = nil
-        rewardsObserver = nil
-        #else
-        RewardsHelper.configureRewardsLogs()
-        rewards = BraveRewards(configuration: .default)
-        rewardsObserver = LedgerObserver(ledger: rewards!.ledger)
-        #endif
-        
-        setupRewardsObservers()
-        
-        if let rewards = rewards {
-            notificationsHandler = AdsNotificationHandler(ads: rewards.ads, presentingController: self)
-            notificationsHandler?.actionOccured = { [weak self] notification, action in
-                guard let self = self else { return }
-                if action == .opened {
-                    self.openURL(url: notification.url)
-                }
-            }
-        }
-    }
-    
-    private func setupRewardsObservers() {
-        guard let rewards = rewards, let observer = rewardsObserver else { return }
-        rewards.ledger.add(observer)
-        observer.fetchedPanelPublisher = { [weak self] publisher, tabId in
-            guard let self = self, self.isViewLoaded else { return }
-            self.publisher = publisher
-        }
-        
-        observer.notificationAdded = { [weak self] _ in
-            guard let self = self, self.isViewLoaded else { return }
-            self.contentView.setState(.adConfirmation)
-        }
-        
-        observer.notificationsRemoved = { [weak self] _ in
-            guard let self = self, self.isViewLoaded else { return }
-            self.contentView.setState(.adConfirmation)
-        }
-    }
-    
     private func displayMyFirstAdIfAvailable(_ completion: (() -> Void)? = nil) {
-        guard let rewards = rewards, rewards.ledger.isEnabled && rewards.ads.isEnabled else { return }
         if Preferences.Rewards.myFirstAdShown.value { return }
 
         if BraveAds.isSupportedRegion(Locale.current.identifier) {

@@ -67,20 +67,20 @@ class OnboardingNavigationController: UINavigationController {
         case adsInfo
         
         /// Returns new ViewController associated with the screen type
-        func viewController(with profile: Profile, theme: Theme) -> OnboardingViewController {
+        func viewController(with profile: Profile, rewards: BraveRewards?, theme: Theme) -> OnboardingViewController {
             switch self {
             case .searchEnginePicker:
-                return OnboardingSearchEnginesViewController(profile: profile, theme: theme)
+                return OnboardingSearchEnginesViewController(profile: profile, rewards: rewards, theme: theme)
             case .shieldsInfo:
-                return OnboardingShieldsViewController(profile: profile, theme: theme)
+                return OnboardingShieldsViewController(profile: profile, rewards: rewards, theme: theme)
             case .rewardsInfo:
-                return OnboardingRewardsViewController(profile: profile, theme: theme)
+                return OnboardingRewardsViewController(profile: profile, rewards: rewards, theme: theme)
             case .rewardsAgreement:
-                return OnboardingRewardsAgreementViewController(profile: profile, theme: theme)
+                return OnboardingRewardsAgreementViewController(profile: profile, rewards: rewards, theme: theme)
             case .adsCountdown:
-                return OnboardingAdsCountdownViewController(profile: profile, theme: theme)
+                return OnboardingAdsCountdownViewController(profile: profile, rewards: rewards, theme: theme)
             case .adsInfo:
-                return OnboardingAdsFinishedViewController(profile: profile, theme: theme)
+                return OnboardingAdsFinishedViewController(profile: profile, rewards: rewards, theme: theme)
             }
         }
         
@@ -98,10 +98,10 @@ class OnboardingNavigationController: UINavigationController {
     
     private(set) var onboardingType: OnboardingType?
     
-    convenience init?(profile: Profile, onboardingType: OnboardingType, theme: Theme) {
+    convenience init?(profile: Profile, onboardingType: OnboardingType, rewards: BraveRewards?, theme: Theme) {
         guard let firstScreen = onboardingType.screens.first else { return nil }
         
-        let firstViewController = firstScreen.viewController(with: profile, theme: theme)
+        let firstViewController = firstScreen.viewController(with: profile, rewards: rewards, theme: theme)
         self.init(rootViewController: firstViewController)
         self.onboardingType = onboardingType
         firstViewController.delegate = self
@@ -135,7 +135,7 @@ extension OnboardingNavigationController: Onboardable {
         let index = allScreens.firstIndex { $0.type == type(of: current) }
         
         guard let nextIndex = index?.advanced(by: 1),
-            let nextScreen = allScreens[safe: nextIndex]?.viewController(with: current.profile, theme: current.theme) else {
+            let nextScreen = allScreens[safe: nextIndex]?.viewController(with: current.profile, rewards: current.rewards, theme: current.theme) else {
                 log.info("Last screen reached, onboarding is complete")
                 onboardingDelegate?.onboardingCompleted(self)
                 return

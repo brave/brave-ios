@@ -5,11 +5,13 @@
 import UIKit
 import BraveShared
 import Shared
+import BraveRewards
 
 /// A base class to provide common implementations needed for user onboarding screens.
 class OnboardingViewController: UIViewController, Themeable {
     weak var delegate: Onboardable?
     var profile: Profile
+    var rewards: BraveRewards?
     var theme: Theme
     
     /// Whether the on-boarding is dark or not, based solely on passed in theme
@@ -31,8 +33,9 @@ class OnboardingViewController: UIViewController, Themeable {
         return Theme.from(id: fallback)
     }
     
-    init(profile: Profile, theme: Theme) {
+    init(profile: Profile, rewards: BraveRewards?, theme: Theme) {
         self.profile = profile
+        self.rewards = rewards
         self.theme = theme
         super.init(nibName: nil, bundle: nil)
     }

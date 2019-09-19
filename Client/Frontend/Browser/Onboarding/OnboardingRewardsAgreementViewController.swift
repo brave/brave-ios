@@ -3,8 +3,12 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
+import BraveRewards
 
 class OnboardingRewardsAgreementViewController: OnboardingViewController {
+
+    private var loadingView = UIActivityIndicatorView(style: .white)
+
     private var contentView: View {
         return view as! View // swiftlint:disable:this force_cast
     }
@@ -16,7 +20,7 @@ class OnboardingRewardsAgreementViewController: OnboardingViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        contentView.agreeButton.addTarget(self, action: #selector(continueTapped), for: .touchDown)
+        contentView.agreeButton.addTarget(self, action: #selector(onAgreed), for: .touchDown)
         contentView.skipButton.addTarget(self, action: #selector(skipTapped), for: .touchDown)
         
         (view as! View).onTermsOfServicePressed = { [weak self] in  // swiftlint:disable:this force_cast
@@ -24,6 +28,32 @@ class OnboardingRewardsAgreementViewController: OnboardingViewController {
             
             self.present(OnboardingWebViewController(), animated: true, completion: nil)
         }
+    }
+    
+    @objc
+    private func onAgreed() {
+        let titleColour = contentView.agreeButton.titleColor(for: .normal)
+        contentView.agreeButton.setTitleColor(.clear, for: .normal)
+        contentView.agreeButton.addSubview(loadingView)
+        loadingView.snp.makeConstraints {
+            $0.center.equalToSuperview()
+        }
+        
+        loadingView.startAnimating()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            self.loadingView.stopAnimating()
+            self.contentView.agreeButton.setTitleColor(titleColour, for: .normal)
+            self.continueTapped()
+        }
+        
+//        rewards?.ledger.createWallet { [weak self] error in
+//            guard let self = self else { return }
+//
+//            self.loadingView.stopAnimating()
+//            self.contentView.agreeButton.setTitleColor(titleColour, for: .normal)
+//            self.continueTapped()
+//        }
     }
     
     override func applyTheme(_ theme: Theme) {

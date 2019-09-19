@@ -673,6 +673,7 @@ class BrowserViewController: UIViewController {
             guard let onboarding = OnboardingNavigationController(
                 profile: profile,
                 onboardingType: .newUser,
+                rewards: rewards,
                 theme: Theme.of(tabManager.selectedTab)
                 ) else { return }
             
