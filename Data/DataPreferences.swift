@@ -5,7 +5,7 @@
 import Foundation
 import BraveShared
 
-extension Preferences {
+public extension Preferences {
     final class Sync {
         /// First two digits of special order for Sync, unified across all platforms.
         /// The first two digits are a platform number and device id.
@@ -21,5 +21,14 @@ extension Preferences {
         /// Real Sync seed is stored in a keychain, although preference name of this option is used for both.
         /// See Sync.syncSeed for more details.
         static let seedName = Option<Bool>(key: "sync.is-sync-seed-set", default: false)
+    }
+    
+    final class Database {
+        
+        /// This is the filepath used for the coredata database
+        /// The preferred directory is Support, although previously database was inside of Document's directory
+        ///     although a migration was attempted in v1.12, it had a unnacceptable failure rate, so some databases might
+        ///     be retained in the old location (Document/), this stores the path to the database that is to be used.
+        public static let documentToSupportDirectoryMigrationComplete = Option<Bool>(key: "database.document-to-support-director-migration-complete", default: false)
     }
 }

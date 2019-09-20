@@ -4,6 +4,7 @@ import UIKit
 import CoreData
 import Shared
 import XCGLogger
+import BraveShared
 
 private let log = Logger.browserLogger
 
@@ -30,54 +31,60 @@ public class DataController: NSObject {
         return FileManager.default.fileExists(atPath: storeURL.path)
     }
     
-    public func migrateToNewPathIfNeeded() {
+    public func migrateToNewPathIfNeeded() throws {
         enum MigrationError: Error {
-            case Store(String)
+            case OldStoreMissing(String)
+            case MigrationFailed(String)
+            case CleanupFailed(String)
         }
         
-        let oldStoreExists: () -> Bool = {
-            FileManager.default.fileExists(atPath: self.oldStoreURL.path)
-        }
-        
-        if !oldStoreExists() {
-            // No data to migrate
-            return
-        }
-        
-        if storeExists() {
-            // Store already exists, do not attempt to overwrite
-            return
-        }
-        
-        //
-        // 1. Upgraded users in good state (use new database)
-        // 1. Upgraded users in bad state (use new database, delete old files?)
-        // 1. Upgrading users (attempt migration, if fail, use old store, if successful delete old files)
+        // This logic must account for 4 different situations:
         // 1. New Users (no migration, use new location
-        //
+        // 2. Upgraded users with successful migration (use new database)
+        // 3. Upgraded users with unsuccessful migrations (use new database, ignore old files)
+        // 4. Upgrading users (attempt migration, if fail, use old store, if successful delete old files)
+        //      - re-attempt migration on every new app version, until they are in #2
         
-        addPersistentStore(for: migrationContainer, store: oldStoreURL)
+        let specificStoreExists: (URL) -> Bool = { url in
+            FileManager.default.fileExists(atPath: url.path)
+        }
+        
+        if !specificStoreExists(oldDocumentStoreURL) || specificStoreExists(supportStoreURL) {
+            // Old store absent, no data to migrate (#1 | #3)
+            // or
+            // New store already exists, do not attempt to overwrite (#2)
+            
+            // Update flag to avoid re-running this logic
+            Preferences.Database.documentToSupportDirectoryMigrationComplete.value = true
+            return
+        }
+        
+        // Going to attempt migration (#4 in some level)
+        
+        addPersistentStore(for: migrationContainer, store: oldDocumentStoreURL)
         let coordinator = migrationContainer.persistentStoreCoordinator
 
-        do {
-            guard let oldStore = coordinator.persistentStore(for: oldStoreURL) else {
-                throw MigrationError.Store("Old store unavailable")
-            }
-            try coordinator.migratePersistentStore(oldStore, to: storeURL, options: nil, withType: NSSQLiteStoreType)
-        } catch {
-            log.error("Document -> Support database migration failed: \(error)")
-            if oldStoreExists() {
-                // Migration failed somehow, and old store is present, so re-pointing the storeURL
-                // TODO: Must be persistent
-                storeURL = oldStoreURL
-            }
+        guard let oldStore = coordinator.persistentStore(for: oldDocumentStoreURL) else {
+            throw MigrationError.OldStoreMissing("Old store unavailable")
         }
         
+        // Attempting actual database migration Document -> Support 🤞
         do {
-            try coordinator.destroyPersistentStore(at: oldStoreURL, ofType: NSSQLiteStoreType, options: nil)
+            try coordinator.migratePersistentStore(oldStore, to: storeURL, options: nil, withType: NSSQLiteStoreType)
+        } catch {
+            throw MigrationError.MigrationFailed("Document -> Support database migration failed: \(error)")
+            // Migration failed somehow, and old store is present. Flag not being updated 😭
+        }
+        
+        // Regardless of cleanup logic, the actual migration was successful, so we're just going for it 🙀😎
+        Preferences.Database.documentToSupportDirectoryMigrationComplete.value = true
+        
+        // Cleanup time 🧹
+        do {
+            try coordinator.destroyPersistentStore(at: oldDocumentStoreURL, ofType: NSSQLiteStoreType, options: nil)
             
             let documentFiles = try FileManager.default.contentsOfDirectory(
-                at: oldStoreURL.deletingPathExtension(),
+                at: oldDocumentStoreURL.deletingPathExtension(),
                 includingPropertiesForKeys: nil,
                 options: [])
             
@@ -86,9 +93,11 @@ public class DataController: NSObject {
                 .filter {$0.lastPathComponent.hasPrefix(DataController.databaseName)}
                 .forEach(FileManager.default.removeItem)
         } catch {
-            log.error("Document -> Support database cleanup failed: \(error)")
+            throw MigrationError.CleanupFailed("Document -> Support database cleanup failed: \(error)")
             // Do not re-point store, as the migration was successful, just the clean up failed
         }
+        
+        // At this point, everything was a pure success 👏
     }
     
     // MARK: - Data framework interface
@@ -168,7 +177,7 @@ public class DataController: NSObject {
     
     // MARK: - Private
     private lazy var migrationContainer: NSPersistentContainer = {
-        return createContainer(store: oldStoreURL)
+        return createContainer(store: oldDocumentStoreURL)
     }()
     
     private lazy var container: NSPersistentContainer = {
@@ -181,14 +190,20 @@ public class DataController: NSObject {
         return queue
     }()
     
-    /// Warning! Please use storeURL. oldStoreURL is for migration purpose only.
-    private lazy var oldStoreURL: URL = {
+    /// Warning! Please use `storeURL`. This is for migration purpose only.
+    private lazy var oldDocumentStoreURL: URL = {
         return createStoreURL(directory: FileManager.SearchPathDirectory.documentDirectory)
     }()
     
-    private lazy var storeURL: URL = {
+    /// Warning! Please use `storeURL`. This is for migration purposes only.
+    private lazy var supportStoreURL: URL = {
         return createStoreURL(directory: FileManager.SearchPathDirectory.applicationSupportDirectory)
     }()
+    
+    var storeURL: URL {
+        let supportDirectory = Preferences.Database.documentToSupportDirectoryMigrationComplete.value
+        return supportDirectory ? supportStoreURL : oldDocumentStoreURL
+    }
     
     private func createContainer(store: URL) -> NSPersistentContainer {
         let modelName = "Model"

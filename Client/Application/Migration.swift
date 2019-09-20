@@ -26,8 +26,16 @@ class Migration {
     }
     
     static func moveDatabaseToApplicationDirectory() {
+        if Preferences.Database.documentToSupportDirectoryMigrationComplete.value {
+            // Migration has been done in some regard, so drop out
+            return
+        }
         // Moves Coredata sqlite file from documents dir to application support dir.
-        DataController.shared.migrateToNewPathIfNeeded()
+        do {
+            try DataController.shared.migrateToNewPathIfNeeded()
+        } catch {
+            log.error(error)
+        }
     }
     
     /// Adblock files don't have to be moved, they now have a new directory and will be downloaded there.
