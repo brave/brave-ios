@@ -62,7 +62,6 @@ class OnboardingWebViewController: UIViewController {
         toolbar.exitButton.addTarget(self, action: #selector(onExit), for: .touchUpInside)
         toolbar.backButton.addTarget(self, action: #selector(onBack), for: .touchUpInside)
         toolbar.forwardButton.addTarget(self, action: #selector(onForward), for: .touchUpInside)
-        toolbar.actionButton.addTarget(self, action: #selector(onAction), for: .touchUpInside)
     }
     
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
@@ -105,11 +104,6 @@ class OnboardingWebViewController: UIViewController {
         if webView.canGoForward {
             webView.goForward()
         }
-    }
-    
-    @objc
-    private func onAction() {
-        print("Access Button Pressed..")
     }
     
     private func updateWebPageSecurity() {
@@ -192,14 +186,6 @@ extension OnboardingWebViewController {
             $0.isEnabled = false
         }
         
-        let actionButton = UIButton().then {
-            $0.setImage(#imageLiteral(resourceName: "onboarding_action_dots").template, for: .normal)
-            $0.contentMode = .scaleAspectFit
-            $0.tintColor = UX.buttonEnabledColor
-            $0.setContentHuggingPriority(.required, for: .horizontal)
-            $0.setContentCompressionResistancePriority(.required, for: .horizontal)
-        }
-        
         private let leftStackview = UIStackView().then {
             $0.spacing = 16.0
             $0.isLayoutMarginsRelativeArrangement = true
@@ -230,7 +216,7 @@ extension OnboardingWebViewController {
             
             [exitButton, backButton].forEach(leftStackview.addArrangedSubview(_:))
             [secureIcon, urlLabel].forEach(middleStackview.addArrangedSubview(_:))
-            [forwardButton, actionButton].forEach(rightStackview.addArrangedSubview(_:))
+            rightStackview.addArrangedSubview(forwardButton)
             
             middleStackview.snp.makeConstraints {
                 $0.centerX.equalTo(self.snp.centerX)
