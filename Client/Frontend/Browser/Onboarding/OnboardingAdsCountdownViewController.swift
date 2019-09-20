@@ -24,19 +24,14 @@ class OnboardingAdsCountdownViewController: OnboardingViewController, UNUserNoti
         
         //Countdown timer
         contentView.countdownText = "3"
-        
-        //On this screen, when you press "Start Browsing", we need to mark all onboarding as complete, therefore we trigger `skip`..
-        contentView.finishedButton.addTarget(self, action: #selector(skipTapped), for: .touchDown)
-        
-        //On this screen, when you press "I didn't see an ad", we need to go to the next screen..
-        contentView.invalidButton.addTarget(self, action: #selector(continueTapped), for: .touchDown)
+        contentView.finishedButton.addTarget(self, action: #selector(continueTapped), for: .touchDown)
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
         if let time = timeSinceAnimationStarted, Date().timeIntervalSince(time) >= 3.0 {
-            self.contentView.setState(.adConfirmation)
+            self.contentView.setState(.finished)
             return
         }
         
@@ -47,7 +42,7 @@ class OnboardingAdsCountdownViewController: OnboardingViewController, UNUserNoti
             self.displayMyFirstAdIfAvailable { action in
                 if action == .timedOut {
                     //User possibly missed the ad.. show them confirmation screen.
-                    self.contentView.setState(.adConfirmation)
+                    self.contentView.setState(.finished)
                 } else {
                     //User saw the ad.. they interacted with it.. onboarding is finished.
                     self.skipTapped()

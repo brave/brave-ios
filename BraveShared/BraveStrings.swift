@@ -560,7 +560,7 @@ extension Strings {
     public static let OBRewardsAgreementDetail = NSLocalizedString("OBRewardsAgreementDetail", bundle: Bundle.braveShared, value: "I agree to the Brave Rewards", comment: "Detail text for rewards agreement onboarding screen")
     public static let OBRewardsAgreementDetailLink = NSLocalizedString("OBRewardsAgreementDetail", bundle: Bundle.braveShared, value: "Terms of Service", comment: "Detail text for rewards agreement onboarding screen")
     public static let OBAdsTitle = NSLocalizedString("OBAdsTitle", bundle: Bundle.braveShared, value: "Brave will show your first ad in", comment: "Title for ads onboarding screen")
-    public static let OBAdsInfoDescription = NSLocalizedString("OBAdsInfoDescription", bundle: Bundle.braveShared, value: "To see ads from Brave Rewards, make sure Brave is allowed to show you notifications.", comment: "Title for ads description onboarding screen")
+    public static let OBCompleteTitle = NSLocalizedString("OBCompleteTitle", bundle: Bundle.braveShared, value: "Now you're ready to go.", comment: "Title for when the user completes onboarding")
     public static let OBErrorTitle = NSLocalizedString("OBErrorTitle", bundle: Bundle.braveShared, value: "Sorry", comment: "A generic error title for onboarding")
     public static let OBErrorDetails = NSLocalizedString("OBErrorDetails", bundle: Bundle.braveShared, value: "Something went wrong while creating your wallet. Please try again", comment: "A generic error body for onboarding")
     public static let OBErrorOkay = NSLocalizedString("OBErrorOkay", bundle: Bundle.braveShared, value: "Okay", comment: "")

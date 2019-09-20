@@ -51,8 +51,8 @@ class OnboardingNavigationController: UINavigationController {
             }
             #else
             switch self {
-            case .newUser: return BraveAds.isSupportedRegion(Locale.current.identifier) ? [.searchEnginePicker, .shieldsInfo, .rewardsInfo, .rewardsAgreement, .adsCountdown, .adsInfo] : [.searchEnginePicker, .shieldsInfo]
-            case .existingUser: return BraveAds.isSupportedRegion(Locale.current.identifier) ? [.rewardsInfo, .rewardsAgreement, .adsCountdown, .adsInfo] : []
+            case .newUser: return BraveAds.isSupportedRegion(Locale.current.identifier) ? [.searchEnginePicker, .shieldsInfo, .rewardsInfo, .rewardsAgreement, .adsCountdown] : [.searchEnginePicker, .shieldsInfo]
+            case .existingUser: return BraveAds.isSupportedRegion(Locale.current.identifier) ? [.rewardsInfo, .rewardsAgreement, .adsCountdown] : []
             }
             #endif
         }
@@ -64,7 +64,6 @@ class OnboardingNavigationController: UINavigationController {
         case rewardsInfo
         case rewardsAgreement
         case adsCountdown
-        case adsInfo
         
         /// Returns new ViewController associated with the screen type
         func viewController(with profile: Profile, rewards: BraveRewards?, theme: Theme) -> OnboardingViewController {
@@ -79,8 +78,6 @@ class OnboardingNavigationController: UINavigationController {
                 return OnboardingRewardsAgreementViewController(profile: profile, rewards: rewards, theme: theme)
             case .adsCountdown:
                 return OnboardingAdsCountdownViewController(profile: profile, rewards: rewards, theme: theme)
-            case .adsInfo:
-                return OnboardingAdsFinishedViewController(profile: profile, rewards: rewards, theme: theme)
             }
         }
         
@@ -91,7 +88,6 @@ class OnboardingNavigationController: UINavigationController {
             case .rewardsInfo: return OnboardingRewardsViewController.self
             case .rewardsAgreement: return OnboardingRewardsAgreementViewController.self
             case .adsCountdown: return OnboardingAdsCountdownViewController.self
-            case .adsInfo: return OnboardingAdsFinishedViewController.self
             }
         }
     }

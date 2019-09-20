@@ -21,7 +21,7 @@ extension OnboardingAdsCountdownViewController {
         
         enum State {
             case countdown
-            case adConfirmation
+            case finished
         }
         
         var countdownText: String? {
@@ -37,10 +37,6 @@ extension OnboardingAdsCountdownViewController {
         let finishedButton = CommonViews.primaryButton(text: Strings.OBFinishButton).then {
             $0.accessibilityIdentifier = "OnboardingAdsCountdownViewController.StartBrowsing"
             $0.backgroundColor = BraveUX.BraveOrange
-        }
-        
-        let invalidButton = CommonViews.secondaryButton(text: Strings.OBDidntSeeAdButton).then {
-            $0.accessibilityIdentifier = "OnboardingAdsCountdownViewController.DidntSeeAdd"
         }
         
         private let mainStackView = UIStackView().then {
@@ -93,12 +89,14 @@ extension OnboardingAdsCountdownViewController {
                 titleLabel.isHidden = false
                 buttonsStackView.isHidden = true
                 countdownView.isHidden = false
+                titleLabel.text = Strings.OBAdsTitle
                 break
                 
-            case .adConfirmation:
-                titleLabel.isHidden = true
+            case .finished:
+                titleLabel.isHidden = false
                 buttonsStackView.isHidden = false
                 countdownView.isHidden = true
+                titleLabel.text = Strings.OBCompleteTitle
                 break
             }
         }
@@ -126,7 +124,9 @@ extension OnboardingAdsCountdownViewController {
             
             mainStackView.addArrangedSubview(descriptionView)
 
-            [UIView.spacer(.vertical, amount: 20), finishedButton, UIView.spacer(.vertical, amount: 0), invalidButton]
+            [UIView.spacer(.vertical, amount: 0),
+             finishedButton,
+             UIView.spacer(.vertical, amount: 20)]
                 .forEach(buttonsStackView.addArrangedSubview(_:))
             
             [titleLabel, countdownView, buttonsStackView].forEach(descriptionStackView.addArrangedSubview(_:))
@@ -182,12 +182,14 @@ class AdsCountdownGradientView: UIView, Themeable {
     }
     
     private let gradientLayer = CAGradientLayer().then {
+        $0.contentsScale = UIScreen.main.scale
         $0.type = .conic
         $0.startPoint = CGPoint(x: 0.5, y: 0.5)
         $0.endPoint = CGPoint(x: 0.5, y: 0)
     }
     
     private let shapeLayer = CAShapeLayer().then {
+        $0.contentsScale = UIScreen.main.scale
         $0.lineWidth = UX.strokeThickness
         $0.fillColor = nil
         $0.shouldRasterize = true
@@ -196,6 +198,7 @@ class AdsCountdownGradientView: UIView, Themeable {
     }
     
     private let strokeLayer = CAShapeLayer().then {
+        $0.contentsScale = UIScreen.main.scale
         $0.lineWidth = UX.strokeThickness
         $0.fillColor = nil
         $0.strokeColor = UIColor.white.cgColor
@@ -206,6 +209,7 @@ class AdsCountdownGradientView: UIView, Themeable {
     
     private let strokeBallLayer = CALayer().then {
         $0.shouldRasterize = true
+        $0.contentsScale = UIScreen.main.scale
     }
     
     private func createAnimationPath() -> UIBezierPath {
