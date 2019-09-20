@@ -26,7 +26,7 @@ class Migration {
     }
     
     static func moveDatabaseToApplicationDirectory() {
-        if Preferences.Database.documentToSupportDirectoryMigrationComplete.value {
+        if Preferences.Database.DocumentToSupportDirectoryMigration.completed.value {
             // Migration has been done in some regard, so drop out
             return
         }

@@ -55,7 +55,7 @@ public class DataController: NSObject {
             // New store already exists, do not attempt to overwrite (#2)
             
             // Update flag to avoid re-running this logic
-            Preferences.Database.documentToSupportDirectoryMigrationComplete.value = true
+            Preferences.Database.DocumentToSupportDirectoryMigration.completed.value = true
             return
         }
         
@@ -77,7 +77,7 @@ public class DataController: NSObject {
         }
         
         // Regardless of cleanup logic, the actual migration was successful, so we're just going for it 🙀😎
-        Preferences.Database.documentToSupportDirectoryMigrationComplete.value = true
+        Preferences.Database.DocumentToSupportDirectoryMigration.completed.value = true
         
         // Cleanup time 🧹
         do {
@@ -201,7 +201,7 @@ public class DataController: NSObject {
     }()
     
     var storeURL: URL {
-        let supportDirectory = Preferences.Database.documentToSupportDirectoryMigrationComplete.value
+        let supportDirectory = Preferences.Database.DocumentToSupportDirectoryMigration.completed.value
         return supportDirectory ? supportStoreURL : oldDocumentStoreURL
     }
     
