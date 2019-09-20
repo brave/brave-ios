@@ -61,7 +61,6 @@ public class DataController: NSObject {
         
         // Going to attempt migration (#4 in some level)
         
-        addPersistentStore(for: migrationContainer, store: oldDocumentStoreURL)
         let coordinator = migrationContainer.persistentStoreCoordinator
 
         guard let oldStore = coordinator.persistentStore(for: oldDocumentStoreURL) else {
