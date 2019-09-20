@@ -103,6 +103,7 @@ public class Sync: JSInjector {
     }
     
     let syncFetchMethod = "fetch-sync-records"
+    let fetchInterval: TimeInterval = 60
     
     fileprivate var fetchTimer: Timer?
     
@@ -315,7 +316,7 @@ public class Sync: JSInjector {
                     self.fetchWrapper()
                     
                     // Fetch timer to run on regular basis
-                    self.fetchTimer = Timer.scheduledTimer(timeInterval: 30.0, target: self, selector: #selector(Sync.fetchWrapper), userInfo: nil, repeats: true)
+                    self.fetchTimer = Timer.scheduledTimer(timeInterval: self.fetchInterval, target: self, selector: #selector(Sync.fetchWrapper), userInfo: nil, repeats: true)
                 }
             }
             
