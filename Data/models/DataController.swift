@@ -86,7 +86,7 @@ public class DataController: NSObject {
             try coordinator.destroyPersistentStore(at: oldDocumentStoreURL, ofType: NSSQLiteStoreType, options: nil)
             
             let documentFiles = try FileManager.default.contentsOfDirectory(
-                at: oldDocumentStoreURL.deletingPathExtension(),
+                at: oldDocumentStoreURL.deletingLastPathComponent(),
                 includingPropertiesForKeys: nil,
                 options: [])
             
