@@ -72,7 +72,7 @@ public class DataController: NSObject {
             let migrationOptions = [
                 NSPersistentStoreFileProtectionKey: true
             ]
-            try coordinator.migratePersistentStore(oldStore, to: storeURL, options: migrationOptions, withType: NSSQLiteStoreType)
+            try coordinator.migratePersistentStore(oldStore, to: supportStoreURL, options: migrationOptions, withType: NSSQLiteStoreType)
         } catch {
             throw MigrationError.MigrationFailed("Document -> Support database migration failed: \(error)")
             // Migration failed somehow, and old store is present. Flag not being updated 😭
