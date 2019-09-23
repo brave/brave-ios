@@ -32,8 +32,8 @@ class OnboardingSearchEnginesViewController: OnboardingViewController {
         contentView.searchEnginesTable.dataSource = self
         contentView.searchEnginesTable.delegate = self
         
-        contentView.continueButton.addTarget(self, action: #selector(continueTapped), for: .touchDown)
-        contentView.skipButton.addTarget(self, action: #selector(skipTapped), for: .touchDown)
+        contentView.continueButton.addTarget(self, action: #selector(continueTapped), for: .touchUpInside)
+        contentView.skipButton.addTarget(self, action: #selector(skipTapped), for: .touchUpInside)
         
         contentView.searchEnginesTable.register(SearchEngineCell.self, forCellReuseIdentifier: String(describing: SearchEngineCell.self))
         

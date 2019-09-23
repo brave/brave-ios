@@ -16,8 +16,8 @@ class OnboardingRewardsViewController: OnboardingViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        contentView.joinButton.addTarget(self, action: #selector(continueTapped), for: .touchDown)
-        contentView.skipButton.addTarget(self, action: #selector(skipTapped), for: .touchDown)
+        contentView.joinButton.addTarget(self, action: #selector(continueTapped), for: .touchUpInside)
+        contentView.skipButton.addTarget(self, action: #selector(skipTapped), for: .touchUpInside)
     }
     
     override func applyTheme(_ theme: Theme) {

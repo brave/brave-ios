@@ -17,8 +17,8 @@ class OnboardingShieldsViewController: OnboardingViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        contentView.continueButton.addTarget(self, action: #selector(continueTapped), for: .touchDown)
-        contentView.skipButton.addTarget(self, action: #selector(skipTapped), for: .touchDown)
+        contentView.continueButton.addTarget(self, action: #selector(continueTapped), for: .touchUpInside)
+        contentView.skipButton.addTarget(self, action: #selector(skipTapped), for: .touchUpInside)
     }
     
     override func applyTheme(_ theme: Theme) {

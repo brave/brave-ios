@@ -183,13 +183,16 @@ class AdsCountdownGradientView: UIView, Themeable {
     
     private let gradientLayer = CAGradientLayer().then {
         $0.contentsScale = UIScreen.main.scale
+        $0.rasterizationScale = UIScreen.main.scale
         $0.type = .conic
         $0.startPoint = CGPoint(x: 0.5, y: 0.5)
         $0.endPoint = CGPoint(x: 0.5, y: 0)
+        $0.shouldRasterize = true
     }
     
     private let shapeLayer = CAShapeLayer().then {
         $0.contentsScale = UIScreen.main.scale
+        $0.rasterizationScale = UIScreen.main.scale
         $0.lineWidth = UX.strokeThickness
         $0.fillColor = nil
         $0.shouldRasterize = true
@@ -199,6 +202,7 @@ class AdsCountdownGradientView: UIView, Themeable {
     
     private let strokeLayer = CAShapeLayer().then {
         $0.contentsScale = UIScreen.main.scale
+        $0.rasterizationScale = UIScreen.main.scale
         $0.lineWidth = UX.strokeThickness
         $0.fillColor = nil
         $0.strokeColor = UIColor.white.cgColor
@@ -208,8 +212,9 @@ class AdsCountdownGradientView: UIView, Themeable {
     }
     
     private let strokeBallLayer = CALayer().then {
-        $0.shouldRasterize = true
+        $0.rasterizationScale = UIScreen.main.scale
         $0.contentsScale = UIScreen.main.scale
+        $0.shouldRasterize = true
     }
     
     private func createAnimationPath() -> UIBezierPath {

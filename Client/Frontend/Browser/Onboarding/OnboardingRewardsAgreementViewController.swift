@@ -21,8 +21,8 @@ class OnboardingRewardsAgreementViewController: OnboardingViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        contentView.agreeButton.addTarget(self, action: #selector(onAgreed), for: .touchDown)
-        contentView.skipButton.addTarget(self, action: #selector(skipTapped), for: .touchDown)
+        contentView.agreeButton.addTarget(self, action: #selector(onAgreed), for: .touchUpInside)
+        contentView.skipButton.addTarget(self, action: #selector(skipTapped), for: .touchUpInside)
         
         (view as! View).onTermsOfServicePressed = { [weak self] in  // swiftlint:disable:this force_cast
             guard let self = self else { return }
@@ -39,6 +39,8 @@ class OnboardingRewardsAgreementViewController: OnboardingViewController {
         
         let titleColour = contentView.agreeButton.titleColor(for: .normal)
         contentView.agreeButton.setTitleColor(.clear, for: .normal)
+        contentView.agreeButton.isUserInteractionEnabled = false
+        contentView.skipButton.isUserInteractionEnabled = false
         contentView.agreeButton.addSubview(loadingView)
         loadingView.snp.makeConstraints {
             $0.center.equalToSuperview()
@@ -51,6 +53,8 @@ class OnboardingRewardsAgreementViewController: OnboardingViewController {
             self.loadingView.stopAnimating()
             self.loadingView.removeFromSuperview()
             self.contentView.agreeButton.setTitleColor(titleColour, for: .normal)
+            self.contentView.agreeButton.isUserInteractionEnabled = true
+            self.contentView.skipButton.isUserInteractionEnabled = true
             
             if success {
                 self.continueTapped()

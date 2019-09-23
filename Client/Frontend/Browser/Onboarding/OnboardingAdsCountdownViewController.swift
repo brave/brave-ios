@@ -24,7 +24,7 @@ class OnboardingAdsCountdownViewController: OnboardingViewController, UNUserNoti
         
         //Countdown timer
         contentView.countdownText = "3"
-        contentView.finishedButton.addTarget(self, action: #selector(continueTapped), for: .touchDown)
+        contentView.finishedButton.addTarget(self, action: #selector(continueTapped), for: .touchUpInside)
     }
     
     override func viewDidAppear(_ animated: Bool) {
