@@ -24,8 +24,8 @@ protocol OnboardingControllerDelegate: class {
 
 enum OnboardingViewAnimationID: Int {
     case background = 1
-    case details = 2
-    case detailsContent = 3
+    case details
+    case detailsContent
 }
 
 class OnboardingNavigationController: UINavigationController {

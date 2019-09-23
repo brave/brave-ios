@@ -38,7 +38,7 @@ class OnboardingSearchEnginesViewController: OnboardingViewController {
         contentView.searchEnginesTable.register(SearchEngineCell.self, forCellReuseIdentifier: String(describing: SearchEngineCell.self))
         
         let tablebackground = UIView()
-        tablebackground.backgroundColor = OnboardingViewController.colourForTheme(theme)
+        tablebackground.backgroundColor = OnboardingViewController.colorForTheme(theme)
         contentView.searchEnginesTable.backgroundView = tablebackground
     }
     

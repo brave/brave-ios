@@ -103,10 +103,10 @@ extension OnboardingShieldsViewController {
         }
         
         func applyTheme(_ theme: Theme) {
-            descriptionView.backgroundColor = OnboardingViewController.colourForTheme(theme)
+            descriptionView.backgroundColor = OnboardingViewController.colorForTheme(theme)
             textStackView.arrangedSubviews.forEach({
                 if let label = $0 as? UILabel {
-                    label.textColor = theme.isDark ? .white : .black
+                    label.appearanceTextColor = theme.colors.tints.home
                 }
             })
         }

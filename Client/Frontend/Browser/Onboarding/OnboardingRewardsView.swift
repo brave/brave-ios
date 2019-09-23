@@ -98,9 +98,9 @@ extension OnboardingRewardsViewController {
         }
         
         func applyTheme(_ theme: Theme) {
-            descriptionView.backgroundColor = OnboardingViewController.colourForTheme(theme)
-            titleLabel.textColor = theme.isDark ? .white : .black
-            descriptionLabel.textColor = theme.isDark ? .white : .black
+            descriptionView.backgroundColor = OnboardingViewController.colorForTheme(theme)
+            titleLabel.appearanceTextColor = theme.colors.tints.home
+            descriptionLabel.appearanceTextColor = theme.colors.tints.home
         }
         
         override func layoutSubviews() {

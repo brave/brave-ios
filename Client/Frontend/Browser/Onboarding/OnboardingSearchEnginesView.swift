@@ -131,10 +131,10 @@ extension OnboardingSearchEnginesViewController {
         required init(coder: NSCoder) { fatalError() }
         
         func applyTheme(_ theme: Theme) {
-            containerView.backgroundColor = OnboardingViewController.colourForTheme(theme)
-            searchEnginesTable.backgroundView?.backgroundColor = OnboardingViewController.colourForTheme(theme)
-            titlePrimary.textColor = theme.isDark ? .white : .black
-            titleSecondary.textColor = theme.isDark ? .white : .black
+            containerView.backgroundColor = OnboardingViewController.colorForTheme(theme)
+            searchEnginesTable.backgroundView?.backgroundColor = OnboardingViewController.colorForTheme(theme)
+            titlePrimary.appearanceTextColor = theme.colors.tints.home
+            titleSecondary.appearanceTextColor = theme.colors.tints.home
             searchEnginesTable.reloadData()
         }
         

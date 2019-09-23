@@ -17,7 +17,7 @@ extension OnboardingRewardsAgreementViewController {
         static let animationContentInset: CGFloat = 50.0
     }
     
-    class View: UIView, UITextViewDelegate {
+    class View: UIView {
         
         var onTermsOfServicePressed: (() -> Void)?
         
@@ -106,14 +106,16 @@ extension OnboardingRewardsAgreementViewController {
         
         private func updateDescriptionLabel() {
             descriptionLabel.attributedText = {
+                let titleLabelColor = titleLabel.textColor ?? .black
+                
                 let text = NSMutableAttributedString(string: Strings.OBRewardsAgreementDetail, attributes: [
                     .font: UIFont.systemFont(ofSize: 16, weight: UIFont.Weight.regular),
-                    .foregroundColor: titleLabel.textColor!
+                    .foregroundColor: titleLabelColor
                 ])
                 
                 text.append(NSAttributedString(string: " ", attributes: [
                     .font: UIFont.systemFont(ofSize: 16, weight: UIFont.Weight.regular),
-                    .foregroundColor: titleLabel.textColor!
+                    .foregroundColor: titleLabelColor
                 ]))
                 
                 text.append(NSAttributedString(string: Strings.OBRewardsAgreementDetailLink, attributes: [
@@ -124,7 +126,7 @@ extension OnboardingRewardsAgreementViewController {
                 
                 text.append(NSAttributedString(string: ".", attributes: [
                     .font: UIFont.systemFont(ofSize: 16, weight: UIFont.Weight.regular),
-                    .foregroundColor: titleLabel.textColor!
+                    .foregroundColor: titleLabelColor
                 ]))
                 
                 let paragraphStyle = NSMutableParagraphStyle()
@@ -173,14 +175,10 @@ extension OnboardingRewardsAgreementViewController {
         }
         
         func applyTheme(_ theme: Theme) {
-            descriptionView.backgroundColor = OnboardingViewController.colourForTheme(theme)
-            titleLabel.textColor = theme.isDark ? .white : .black
+            descriptionView.backgroundColor = OnboardingViewController.colorForTheme(theme)
+            titleLabel.appearanceTextColor = theme.colors.tints.home
             updateDescriptionLabel()
-            if theme.isDark {
-                descriptionCheckbox.setImage(#imageLiteral(resourceName: "checkbox_off_dark"), for: .normal)
-            } else {
-                descriptionCheckbox.setImage(#imageLiteral(resourceName: "checkbox_off"), for: .normal)
-            }
+            descriptionCheckbox.setImage(theme.isDark ? #imageLiteral(resourceName: "checkbox_off_dark") : #imageLiteral(resourceName: "checkbox_off"), for: .normal)
         }
         
         override func layoutSubviews() {
@@ -203,13 +201,15 @@ extension OnboardingRewardsAgreementViewController {
             agreeButton.backgroundColor = button.isSelected ? BraveUX.BraveOrange : BraveUX.BraveOrange.withAlphaComponent(0.7)
             agreeButton.isEnabled = button.isSelected
         }
+    }
+}
+
+extension OnboardingRewardsAgreementViewController.View: UITextViewDelegate {
+    @objc
+    func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
         
-        @objc
-        func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
-            
-            onTermsOfServicePressed?()
-            return false
-        }
+        onTermsOfServicePressed?()
+        return false
     }
 }
 

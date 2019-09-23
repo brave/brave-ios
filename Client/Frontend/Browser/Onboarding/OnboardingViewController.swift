@@ -20,7 +20,7 @@ class OnboardingViewController: UIViewController, Themeable {
         return theme.isDark
     }
     
-    static func colourForTheme(_ theme: Theme) -> UIColor {
+    static func colorForTheme(_ theme: Theme) -> UIColor {
         return theme.isDark ? UIColor(rgb: 0x343A40) : UIColor(rgb: 0xFFFFFF)
     }
     

@@ -15,6 +15,7 @@ extension OnboardingAdsCountdownViewController {
         static let descriptionContentInset: CGFloat = 32
         static let linkColor: UIColor = BraveUX.BraveOrange
         static let animationContentInset: CGFloat = 50.0
+        static let animationContentSize = 156.0
     }
     
     class View: UIView {
@@ -90,14 +91,11 @@ extension OnboardingAdsCountdownViewController {
                 buttonsStackView.isHidden = true
                 countdownView.isHidden = false
                 titleLabel.text = Strings.OBAdsTitle
-                break
-                
             case .finished:
                 titleLabel.isHidden = false
                 buttonsStackView.isHidden = false
                 countdownView.isHidden = true
                 titleLabel.text = Strings.OBCompleteTitle
-                break
             }
         }
         
@@ -132,14 +130,13 @@ extension OnboardingAdsCountdownViewController {
             [titleLabel, countdownView, buttonsStackView].forEach(descriptionStackView.addArrangedSubview(_:))
             
             countdownView.snp.makeConstraints {
-                $0.width.equalTo(156.0)
-                $0.height.equalTo(156.0)
+                $0.size.equalTo(UX.animationContentSize)
             }
         }
         
         func applyTheme(_ theme: Theme) {
-            descriptionView.backgroundColor = OnboardingViewController.colourForTheme(theme)
-            titleLabel.textColor = theme.isDark ? .white : .black
+            descriptionView.backgroundColor = OnboardingViewController.colorForTheme(theme)
+            titleLabel.appearanceTextColor = theme.colors.tints.home
             countdownView.setTheme(isDark: theme.isDark)
         }
         
@@ -256,29 +253,34 @@ class AdsCountdownGradientView: UIView, Themeable {
         super.layoutSubviews()
 
         //Layout shapeLayer
+        
         shapeLayer.removeFromSuperlayer()
         shapeLayer.frame = bounds
         shapeLayer.path = createAnimationPath().cgPath
         layer.addSublayer(shapeLayer)
         
         //Layout strokeLayer
+        
         strokeLayer.removeFromSuperlayer()
         strokeLayer.frame = bounds
         strokeLayer.path = createAnimationPath().cgPath
         
         //Layout gradientLayer
+        
         gradientLayer.removeFromSuperlayer()
         gradientLayer.mask = strokeLayer
         gradientLayer.frame = bounds
         layer.addSublayer(gradientLayer)
         
         //Layout strokeBallLayer
+        
         strokeBallLayer.removeFromSuperlayer()
         strokeBallLayer.frame = CGRect(x: (bounds.origin.x + (bounds.size.width / 2.0)) - UX.ballRadius, y: UX.ballRadius, width: UX.ballRadius * 2.0, height: UX.ballRadius * 2.0)
         strokeBallLayer.cornerRadius = UX.ballRadius
         layer.addSublayer(strokeBallLayer)
         
         //Layout countdownLayer
+        
         countdownLayer.removeFromSuperlayer()
         countdownLayer.frame = bounds
         layer.addSublayer(countdownLayer)

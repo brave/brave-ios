@@ -9,6 +9,10 @@ import BraveShared
 
 class OnboardingAdsCountdownViewController: OnboardingViewController, UNUserNotificationCenterDelegate {
     
+    private struct UX {
+        static let animationTime = 3.0
+    }
+    
     private var timeSinceAnimationStarted: Date?
     
     private var contentView: View {
@@ -23,21 +27,21 @@ class OnboardingAdsCountdownViewController: OnboardingViewController, UNUserNoti
         super.viewDidLoad()
         
         //Countdown timer
-        contentView.countdownText = "3"
+        contentView.countdownText = String(UX.animationTime)
         contentView.finishedButton.addTarget(self, action: #selector(continueTapped), for: .touchUpInside)
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        if let time = timeSinceAnimationStarted, Date().timeIntervalSince(time) >= 3.0 {
+        if let time = timeSinceAnimationStarted, Date().timeIntervalSince(time) >= UX.animationTime {
             self.contentView.setState(.finished)
             return
         }
         
         timeSinceAnimationStarted = Date()
         contentView.resetAnimation()
-        contentView.animate(from: 0.0, to: 1.0, duration: 3.0) { [weak self] in
+        contentView.animate(from: 0.0, to: 1.0, duration: UX.animationTime) { [weak self] in
             guard let self = self else { return }
             self.displayMyFirstAdIfAvailable { action in
                 if action == .timedOut {
