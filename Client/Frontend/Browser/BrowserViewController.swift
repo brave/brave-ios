@@ -681,10 +681,11 @@ class BrowserViewController: UIViewController {
             onboarding.onboardingDelegate = self
             present(onboarding, animated: true)
         } else if BraveAds.isSupportedRegion(Locale.current.identifier) {
+            let isAdsEnabled = rewards?.ads.isEnabled ?? false
             
-            // User has seen onboarding before and ads are supported in their region..
+            // User has seen onboarding before..
             
-            if Preferences.General.basicOnboardingCompleted.value == OnboardingState.completed.rawValue {
+            if (!isAdsEnabled && Preferences.General.basicOnboardingCompleted.value == OnboardingState.completed.rawValue) || (isAdsEnabled && Preferences.General.basicOnboardingCompleted.value == OnboardingState.unseen.rawValue) {
                 guard let onboarding = OnboardingNavigationController(
                     profile: profile,
                     onboardingType: .existingUser,
