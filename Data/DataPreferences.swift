@@ -26,10 +26,8 @@ public extension Preferences {
     final class Database {
         
         public final class DocumentToSupportDirectoryMigration {
-            /// This is the filepath used for the coredata database
-            /// The preferred directory is Support, although previously database was inside of Document's directory
-            ///   although a migration was attempted in v1.12, it had a unnacceptable failure rate, so some databases might
-            ///   be retained in the old location (Document/), this stores the path to the database that is to be used.
+            /// This indicates whether the associated Document -> Support directory migration was / is considered
+            ///     successful or not. Once it is `true`, it should never be set to `false` again.
             public static let completed
                 = Option<Bool>(key: "database.document-to-support-directory-migration.completed", default: false)
             
