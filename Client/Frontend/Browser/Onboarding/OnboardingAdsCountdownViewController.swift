@@ -67,16 +67,14 @@ extension OnboardingAdsCountdownViewController {
         if Preferences.Rewards.myFirstAdShown.value { return }
 
         if BraveAds.isSupportedRegion(Locale.current.identifier) {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                if Preferences.Rewards.myFirstAdShown.value { return }
-                Preferences.Rewards.myFirstAdShown.value = true
-                AdsViewController.displayFirstAd(on: self) { [weak self] action, url  in
-                    if action == .opened {
-                        self?.openURL(url: url)
-                    }
-                    
-                    completion?(action)
+            if Preferences.Rewards.myFirstAdShown.value { return }
+            Preferences.Rewards.myFirstAdShown.value = true
+            AdsViewController.displayFirstAd(on: self) { [weak self] action, url  in
+                if action == .opened {
+                    self?.openURL(url: url)
                 }
+                
+                completion?(action)
             }
         }
     }
