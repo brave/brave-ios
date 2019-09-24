@@ -680,8 +680,21 @@ class BrowserViewController: UIViewController {
             
             onboarding.onboardingDelegate = self
             present(onboarding, animated: true)
-        } else {
-            // Existing users onboarding TBD
+        } else if BraveAds.isSupportedRegion(Locale.current.identifier) {
+            
+            // User has seen onboarding before and ads are supported in their region..
+            
+            if Preferences.General.basicOnboardingCompleted.value == OnboardingState.completed.rawValue {
+                guard let onboarding = OnboardingNavigationController(
+                    profile: profile,
+                    onboardingType: .existingUser,
+                    rewards: rewards,
+                    theme: Theme.of(tabManager.selectedTab)
+                    ) else { return }
+                
+                onboarding.onboardingDelegate = self
+                present(onboarding, animated: true)
+            }
         }
     }
 
