@@ -144,6 +144,16 @@ open class BrowserProfile: Profile {
 
         // Set up our database handles.
         self.loginsDB = BrowserDB(filename: "logins.db", secretKey: BrowserProfile.loginsKey, schema: LoginsSchema(), files: files)
+        
+        // Set security policy on the database
+        do {
+            var databasePath = URL(fileURLWithPath: (try! files.getAndEnsureDirectory())).appendingPathComponent("logins.db")
+            var resourceValues = URLResourceValues()
+            resourceValues.isExcludedFromBackup = true
+            try databasePath.setResourceValues(resourceValues)
+        } catch {
+            log.error("Couldn't exclude logins.db from iTunes Backup")
+        }
 
         if isNewProfile {
             log.info("New profile. Removing old account metadata.")

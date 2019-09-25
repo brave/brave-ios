@@ -193,6 +193,27 @@ public class DataController: NSObject {
         storeDescription.setOption(completeProtection, forKey: NSPersistentStoreFileProtectionKey)
         
         container.persistentStoreDescriptions = [storeDescription]
+
+        // Set the security policy to exclude the database from backup
+        do {
+            var store = store
+            var resourceValues = URLResourceValues()
+            resourceValues.isExcludedFromBackup = true
+            try store.setResourceValues(resourceValues)
+        } catch {
+            log.error("Could not set security policy on url for: \(store)")
+        }
+        
+        // Set the security policy to exclude the ApplicationSupportDirectory from backup
+        var url = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).last
+        
+        do {
+            var resourceValues = URLResourceValues()
+            resourceValues.isExcludedFromBackup = true
+            try url?.setResourceValues(resourceValues)
+        } catch {
+            log.error("Could not set security policy on url for: \(url?.absoluteString ?? "Application Support Directory")")
+        }
     }
     
     // MARK: - Private
