@@ -1025,8 +1025,22 @@
 		0A24F7E2233E8F0F004D2F3A /* package-lock.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "package-lock.json"; sourceTree = "<group>"; };
 		0A24F7E3233E8F0F004D2F3A /* package.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = package.json; sourceTree = "<group>"; };
 		0A24F7E4233E8F0F004D2F3A /* bootstrap.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = bootstrap.sh; sourceTree = "<group>"; };
-		0A24F7EC233E8FE1004D2F3A /* Configuration */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Configuration; path = Client/Configuration; sourceTree = "<group>"; };
 		0A24F7EE233E9129004D2F3A /* Fastfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Fastfile; path = fastlane/Fastfile; sourceTree = "<group>"; };
+		0A24F837233EB5B4004D2F3A /* Firefox.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Firefox.xcconfig; sourceTree = "<group>"; };
+		0A24F838233EB5B4004D2F3A /* Fennec.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Fennec.xcconfig; sourceTree = "<group>"; };
+		0A24F839233EB5B4004D2F3A /* FirefoxBeta.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = FirefoxBeta.xcconfig; sourceTree = "<group>"; };
+		0A24F83A233EB5B4004D2F3A /* Local.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Local.xcconfig; sourceTree = "<group>"; };
+		0A24F83C233EB5B4004D2F3A /* BuildId.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = BuildId.xcconfig; sourceTree = "<group>"; };
+		0A24F83D233EB5B4004D2F3A /* Version.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Version.xcconfig; sourceTree = "<group>"; };
+		0A24F83E233EB5B4004D2F3A /* DevTeam.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DevTeam.xcconfig; sourceTree = "<group>"; };
+		0A24F83F233EB5B4004D2F3A /* BundleId.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = BundleId.xcconfig; sourceTree = "<group>"; };
+		0A24F841233EB5B5004D2F3A /* BuildId.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = BuildId.xcconfig; sourceTree = "<group>"; };
+		0A24F842233EB5B5004D2F3A /* README */ = {isa = PBXFileReference; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
+		0A24F843233EB5B5004D2F3A /* Version.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Version.xcconfig; sourceTree = "<group>"; };
+		0A24F844233EB5B5004D2F3A /* DevTeam.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DevTeam.xcconfig; sourceTree = "<group>"; };
+		0A24F845233EB5B5004D2F3A /* BundleId.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = BundleId.xcconfig; sourceTree = "<group>"; };
+		0A24F846233EB5B5004D2F3A /* Fennec.enterprise.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Fennec.enterprise.xcconfig; sourceTree = "<group>"; };
+		0A24F847233EB5B5004D2F3A /* Base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
 		0A2F921B22146B7700304249 /* FrecencyQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrecencyQuery.swift; sourceTree = "<group>"; };
 		0A38EA7F216532DB00142710 /* CRUDProtocolsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CRUDProtocolsTests.swift; sourceTree = "<group>"; };
 		0A39D56C21930B89008B2772 /* ScriptOpener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScriptOpener.swift; sourceTree = "<group>"; };
@@ -1868,8 +1882,6 @@
 		E4E0BB171AFBC9E4008D6260 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E4E25CCA1CA99E7400D0F088 /* HexExtensionsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HexExtensionsTests.swift; sourceTree = "<group>"; };
 		E4ECCDAD1AB131770005E717 /* FiraSans-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "FiraSans-Medium.ttf"; sourceTree = "<group>"; };
-		E60961861B62B8A700DD640F /* Fennec.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Fennec.xcconfig; path = Configuration/Fennec.xcconfig; sourceTree = "<group>"; };
-		E60961891B62B8C800DD640F /* Firefox.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Firefox.xcconfig; path = Configuration/Firefox.xcconfig; sourceTree = "<group>"; };
 		E6108FF81C84E91C005D25E8 /* BasePasscodeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = BasePasscodeViewController.swift; sourceTree = "<group>"; tabWidth = 4; };
 		E61453BD1B750A1700C3F9D7 /* RollingFileLoggerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RollingFileLoggerTests.swift; sourceTree = "<group>"; };
 		E6231C001B90A44F005ABB0D /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
@@ -1957,14 +1969,12 @@
 		E698FFD91B4AADF40001F623 /* TabScrollController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabScrollController.swift; sourceTree = "<group>"; };
 		E69922121B94E3EF007C480D /* Licenses.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = Licenses.html; sourceTree = "<group>"; };
 		E6D8D5E61B569D70009E5A58 /* BrowserTrayAnimators.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserTrayAnimators.swift; sourceTree = "<group>"; };
-		E6DCC1ED1DCBB6AA00CEC4B7 /* Fennec.enterprise.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Fennec.enterprise.xcconfig; path = Configuration/Fennec.enterprise.xcconfig; sourceTree = "<group>"; };
 		E6F738741EB7A8D300B50143 /* FennecApplication.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FennecApplication.entitlements; sourceTree = "<group>"; };
 		E6F738751EB7A97100B50143 /* FirefoxBetaApplication.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FirefoxBetaApplication.entitlements; sourceTree = "<group>"; };
 		E6F738761EB7A97500B50143 /* FirefoxApplication.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FirefoxApplication.entitlements; sourceTree = "<group>"; };
 		E6F9650C1B2F1CF20034B023 /* SharedTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SharedTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E6F9650F1B2F1CF20034B023 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E6F9653B1B2F1D5D0034B023 /* NSURLExtensionsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSURLExtensionsTests.swift; sourceTree = "<group>"; };
-		E6FCC43C1C40565200DF6113 /* FirefoxBeta.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = FirefoxBeta.xcconfig; path = Configuration/FirefoxBeta.xcconfig; sourceTree = "<group>"; };
 		E6FF6AC91D873CFF0070C294 /* PageMetadata.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PageMetadata.swift; sourceTree = "<group>"; };
 		EB11A1022044A90D0018F749 /* TrackingProtectionPageStats.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrackingProtectionPageStats.swift; sourceTree = "<group>"; };
 		EB11A1032044A90E0018F749 /* ContentBlockerHelper+TabContentScript.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ContentBlockerHelper+TabContentScript.swift"; sourceTree = "<group>"; };
@@ -2185,9 +2195,48 @@
 				0A24F7E2233E8F0F004D2F3A /* package-lock.json */,
 				0A24F7E3233E8F0F004D2F3A /* package.json */,
 				0A24F7EE233E9129004D2F3A /* Fastfile */,
-				0A24F7EC233E8FE1004D2F3A /* Configuration */,
+				0A24F836233EB5B4004D2F3A /* Configuration */,
 			);
 			name = Config;
+			sourceTree = "<group>";
+		};
+		0A24F836233EB5B4004D2F3A /* Configuration */ = {
+			isa = PBXGroup;
+			children = (
+				0A24F837233EB5B4004D2F3A /* Firefox.xcconfig */,
+				0A24F838233EB5B4004D2F3A /* Fennec.xcconfig */,
+				0A24F839233EB5B4004D2F3A /* FirefoxBeta.xcconfig */,
+				0A24F83A233EB5B4004D2F3A /* Local.xcconfig */,
+				0A24F83B233EB5B4004D2F3A /* Local */,
+				0A24F840233EB5B4004D2F3A /* Local.templates */,
+				0A24F846233EB5B5004D2F3A /* Fennec.enterprise.xcconfig */,
+				0A24F847233EB5B5004D2F3A /* Base.xcconfig */,
+			);
+			name = Configuration;
+			path = Client/Configuration;
+			sourceTree = "<group>";
+		};
+		0A24F83B233EB5B4004D2F3A /* Local */ = {
+			isa = PBXGroup;
+			children = (
+				0A24F83C233EB5B4004D2F3A /* BuildId.xcconfig */,
+				0A24F83D233EB5B4004D2F3A /* Version.xcconfig */,
+				0A24F83E233EB5B4004D2F3A /* DevTeam.xcconfig */,
+				0A24F83F233EB5B4004D2F3A /* BundleId.xcconfig */,
+			);
+			path = Local;
+			sourceTree = "<group>";
+		};
+		0A24F840233EB5B4004D2F3A /* Local.templates */ = {
+			isa = PBXGroup;
+			children = (
+				0A24F841233EB5B5004D2F3A /* BuildId.xcconfig */,
+				0A24F842233EB5B5004D2F3A /* README */,
+				0A24F843233EB5B5004D2F3A /* Version.xcconfig */,
+				0A24F844233EB5B5004D2F3A /* DevTeam.xcconfig */,
+				0A24F845233EB5B5004D2F3A /* BundleId.xcconfig */,
+			);
+			path = Local.templates;
 			sourceTree = "<group>";
 		};
 		0A3C789423055AC80022F6D8 /* Onboarding */ = {
@@ -3445,17 +3494,6 @@
 			path = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		E60961841B62B7E100DD640F /* Configuration */ = {
-			isa = PBXGroup;
-			children = (
-				E60961861B62B8A700DD640F /* Fennec.xcconfig */,
-				E6DCC1ED1DCBB6AA00CEC4B7 /* Fennec.enterprise.xcconfig */,
-				E6FCC43C1C40565200DF6113 /* FirefoxBeta.xcconfig */,
-				E60961891B62B8C800DD640F /* Firefox.xcconfig */,
-			);
-			name = Configuration;
-			sourceTree = "<group>";
-		};
 		E63ED8DF1BFD254E0097D08E /* Login Management */ = {
 			isa = PBXGroup;
 			children = (
@@ -3661,7 +3699,6 @@
 				59C8119722D754D4005D5BBC /* BraveShared.strings */,
 				F84B21EB1A0910F600AAB793 /* Assets */,
 				F84B21E41A0910F600AAB793 /* Application */,
-				E60961841B62B7E100DD640F /* Configuration */,
 				E689C6FF1E0C716F008BAADB /* Entitlements */,
 				28EADE5C1AFC3A6D007FB2FB /* Extensions */,
 				F84B21F11A0910F600AAB793 /* Frontend */,
@@ -7058,7 +7095,7 @@
 		};
 		E448FC9D1AEE7A6000869B6C /* Firefox */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E60961891B62B8C800DD640F /* Firefox.xcconfig */;
+			baseConfigurationReference = 0A24F837233EB5B4004D2F3A /* Firefox.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -7271,7 +7308,7 @@
 		};
 		E6DCC2051DCBB6F100CEC4B7 /* Fennec_Enterprise */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E6DCC1ED1DCBB6AA00CEC4B7 /* Fennec.enterprise.xcconfig */;
+			baseConfigurationReference = 0A24F846233EB5B5004D2F3A /* Fennec.enterprise.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -7552,7 +7589,7 @@
 		};
 		E6FCC4291C40562400DF6113 /* FirefoxBeta */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E6FCC43C1C40565200DF6113 /* FirefoxBeta.xcconfig */;
+			baseConfigurationReference = 0A24F839233EB5B4004D2F3A /* FirefoxBeta.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -7783,7 +7820,7 @@
 		};
 		F84B21DB1A090F8100AAB793 /* Fennec */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E60961861B62B8A700DD640F /* Fennec.xcconfig */;
+			baseConfigurationReference = 0A24F838233EB5B4004D2F3A /* Fennec.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ALWAYS_SEARCH_USER_PATHS = NO;
