@@ -2503,7 +2503,6 @@
 		28EADE5C1AFC3A6D007FB2FB /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				F930CDB02270029B00A23FE1 /* WebAuthN */,
 				A1CDF22A20BDD6B8005C6E58 /* POPExtensions.swift */,
 				E650754D1E37F6AE006961AC /* GeometryExtensions.swift */,
 				D83821FF1FC7961D00303C12 /* DispatchQueueExtensions.swift */,
@@ -3706,6 +3705,7 @@
 				39A359BD1BFCCE7B006B9E87 /* Helpers */,
 				0A4BEFCD221E11440005551A /* Networking */,
 				0A0D3D2F21A4BC1F00BEE65B /* WebFilters */,
+				F930CDB02270029B00A23FE1 /* WebAuthN */,
 				E65075551E37F714006961AC /* Utils */,
 				74821FFD1DB6D3AC00EEEA72 /* MailSchemes.plist */,
 			);
