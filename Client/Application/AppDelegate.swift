@@ -77,15 +77,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
             //  literally never use Brave. This bypasses this situation, while not using a modifiable pref.
             KeychainWrapper.sharedAppContainerKeychain.setAuthenticationInfo(nil)
         }
-
-        // Short circuit the app if we want to email logs from the debug menu
-        if DebugSettingsBundleOptions.launchIntoEmailComposer {
-            self.window?.rootViewController = UIViewController()
-            presentEmailComposerWithLogs()
-            return true
-        } else {
-            return startApplication(application, withLaunchOptions: launchOptions)
-        }
+        
+        return startApplication(application, withLaunchOptions: launchOptions)
     }
 
     @discardableResult fileprivate func startApplication(_ application: UIApplication, withLaunchOptions launchOptions: [AnyHashable: Any]?) -> Bool {
@@ -110,11 +103,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         let profile = getProfile(application)
         let profilePrefix = profile.prefs.getBranchPrefix()
         Migration.launchMigrations(keyPrefix: profilePrefix)
-
-        if !DebugSettingsBundleOptions.disableLocalWebServer {
-            // Set up a web server that serves us static content. Do this early so that it is ready when the UI is presented.
-            setUpWebServer(profile)
-        }
+        
+        setUpWebServer(profile)
         
         var imageStore: DiskImageStore?
         do {
@@ -295,10 +285,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         authenticator?.hideBackgroundedBlur()
         
         Preferences.AppState.backgroundedCleanly.value = false
-        
-        guard !DebugSettingsBundleOptions.launchIntoEmailComposer else {
-            return
-        }
 
         if let profile = self.profile {
             profile.reopen()
@@ -432,19 +418,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
             let mailComposeViewController = MFMailComposeViewController()
             mailComposeViewController.mailComposeDelegate = self
             mailComposeViewController.setSubject("Debug Info for iOS client version v\(appVersion) (\(buildNumber))")
-
-            if DebugSettingsBundleOptions.attachLogsToDebugEmail {
-                do {
-                    let logNamesAndData = try Logger.diskLogFilenamesAndData()
-                    logNamesAndData.forEach { nameAndData in
-                        if let data = nameAndData.1 {
-                            mailComposeViewController.addAttachmentData(data, mimeType: "text/plain", fileName: nameAndData.0)
-                        }
-                    }
-                } catch _ {
-                    print("Failed to retrieve logs from device")
-                }
-            }
 
             self.window?.rootViewController?.present(mailComposeViewController, animated: true, completion: nil)
         }
