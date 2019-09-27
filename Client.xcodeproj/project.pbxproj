@@ -3511,7 +3511,7 @@
 				F84B21E51A0910F600AAB793 /* AppDelegate.swift */,
 				D3BE7B451B054F8600641031 /* TestAppDelegate.swift */,
 			);
-			name = Delegates;
+			path = Delegates;
 			sourceTree = "<group>";
 		};
 		E689C6FF1E0C716F008BAADB /* Entitlements */ = {
