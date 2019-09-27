@@ -1190,7 +1190,7 @@
 		28A6CE891AC082E200C1A2D4 /* UtilsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UtilsTests.swift; sourceTree = "<group>"; };
 		28B62ACD1BC745E7004A585A /* Syncable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Syncable.swift; sourceTree = "<group>"; };
 		28C4AB711AD42D4300D9ACE3 /* Clients.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Clients.swift; sourceTree = "<group>"; };
-		28CE83E81A1D206D00576538 /* Client-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "Client-Bridging-Header.h"; path = "../../Client-Bridging-Header.h"; sourceTree = "<group>"; };
+		28CE83E81A1D206D00576538 /* Client-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Client-Bridging-Header.h"; sourceTree = "<group>"; };
 		28EADE381AFC3898007FB2FB /* UIImageViewExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UIImageViewExtensions.swift; path = Extensions/UIImageViewExtensions.swift; sourceTree = "<group>"; };
 		28FDFF0B1C1F725800840F86 /* SeparatorTableCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SeparatorTableCell.swift; sourceTree = "<group>"; };
 		2C49854D206173C800893DAE /* photon-colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "photon-colors.swift"; sourceTree = "<group>"; };
@@ -7168,7 +7168,7 @@
 				);
 				PRODUCT_MODULE_NAME = Client;
 				PRODUCT_NAME = Client;
-				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/Client-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/Client/Application/Client-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Firefox;
@@ -7399,7 +7399,7 @@
 				);
 				PRODUCT_MODULE_NAME = Client;
 				PRODUCT_NAME = Client;
-				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/Client-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/Client/Application/Client-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Fennec_Enterprise;
@@ -7662,7 +7662,7 @@
 				);
 				PRODUCT_MODULE_NAME = Client;
 				PRODUCT_NAME = Client;
-				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/Client-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/Client/Application/Client-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = FirefoxBeta;
@@ -7911,7 +7911,7 @@
 				);
 				PRODUCT_MODULE_NAME = Client;
 				PRODUCT_NAME = Client;
-				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/Client-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/Client/Application/Client-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Fennec;
