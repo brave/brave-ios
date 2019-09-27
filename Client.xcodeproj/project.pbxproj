@@ -28,6 +28,11 @@
 		0A1E84442190A57F0042F782 /* SyncCameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A1E843A2190A57F0042F782 /* SyncCameraView.swift */; };
 		0A1E84452190A57F0042F782 /* SyncPairWordsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A1E843B2190A57F0042F782 /* SyncPairWordsViewController.swift */; };
 		0A1E84462190A57F0042F782 /* SyncAddDeviceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A1E843C2190A57F0042F782 /* SyncAddDeviceViewController.swift */; };
+		0A24F7E5233E8F0F004D2F3A /* Cartfile.resolved in Resources */ = {isa = PBXBuildFile; fileRef = 0A24F7E0233E8F0E004D2F3A /* Cartfile.resolved */; };
+		0A24F7E6233E8F0F004D2F3A /* Cartfile in Resources */ = {isa = PBXBuildFile; fileRef = 0A24F7E1233E8F0E004D2F3A /* Cartfile */; };
+		0A24F7E7233E8F0F004D2F3A /* package-lock.json in Resources */ = {isa = PBXBuildFile; fileRef = 0A24F7E2233E8F0F004D2F3A /* package-lock.json */; };
+		0A24F7E8233E8F0F004D2F3A /* package.json in Resources */ = {isa = PBXBuildFile; fileRef = 0A24F7E3233E8F0F004D2F3A /* package.json */; };
+		0A24F7E9233E8F0F004D2F3A /* bootstrap.sh in Resources */ = {isa = PBXBuildFile; fileRef = 0A24F7E4233E8F0F004D2F3A /* bootstrap.sh */; };
 		0A2F921C22146B7700304249 /* FrecencyQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2F921B22146B7700304249 /* FrecencyQuery.swift */; };
 		0A39D56D21930B89008B2772 /* ScriptOpener.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A39D56C21930B89008B2772 /* ScriptOpener.swift */; };
 		0A3C789D23055C4A0022F6D8 /* OnboardingSearchEnginesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A3C789C23055C4A0022F6D8 /* OnboardingSearchEnginesViewController.swift */; };
@@ -1019,6 +1024,11 @@
 		0A1E843A2190A57F0042F782 /* SyncCameraView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncCameraView.swift; sourceTree = "<group>"; };
 		0A1E843B2190A57F0042F782 /* SyncPairWordsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncPairWordsViewController.swift; sourceTree = "<group>"; };
 		0A1E843C2190A57F0042F782 /* SyncAddDeviceViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncAddDeviceViewController.swift; sourceTree = "<group>"; };
+		0A24F7E0233E8F0E004D2F3A /* Cartfile.resolved */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Cartfile.resolved; sourceTree = "<group>"; };
+		0A24F7E1233E8F0E004D2F3A /* Cartfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Cartfile; sourceTree = "<group>"; };
+		0A24F7E2233E8F0F004D2F3A /* package-lock.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "package-lock.json"; sourceTree = "<group>"; };
+		0A24F7E3233E8F0F004D2F3A /* package.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = package.json; sourceTree = "<group>"; };
+		0A24F7E4233E8F0F004D2F3A /* bootstrap.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = bootstrap.sh; sourceTree = "<group>"; };
 		0A2F921B22146B7700304249 /* FrecencyQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrecencyQuery.swift; sourceTree = "<group>"; };
 		0A38EA7F216532DB00142710 /* CRUDProtocolsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CRUDProtocolsTests.swift; sourceTree = "<group>"; };
 		0A39D56C21930B89008B2772 /* ScriptOpener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScriptOpener.swift; sourceTree = "<group>"; };
@@ -1830,10 +1840,6 @@
 		D8EFFA251FF702A8001D3A09 /* NavigationRouterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationRouterTests.swift; sourceTree = "<group>"; };
 		DD31E0FA1B382B520077078A /* TabPrintPageRenderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabPrintPageRenderer.swift; sourceTree = "<group>"; };
 		DDA24A341FD84D620098F159 /* DefaultSearchPrefs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DefaultSearchPrefs.swift; sourceTree = "<group>"; };
-		E40A18F71EDC73D5006B7F28 /* Fennec.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = Fennec.entitlements; sourceTree = "<group>"; };
-		E40A18F81EDC73D5006B7F28 /* FennecEnterprise.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = FennecEnterprise.entitlements; sourceTree = "<group>"; };
-		E40A18F91EDC73D5006B7F28 /* Firefox.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = Firefox.entitlements; sourceTree = "<group>"; };
-		E40A18FA1EDC73D5006B7F28 /* FirefoxBeta.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = FirefoxBeta.entitlements; sourceTree = "<group>"; };
 		E40FAB0B1A7ABB77009CB80D /* WebServer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebServer.swift; sourceTree = "<group>"; };
 		E4424B3B1AC71FB400F44C38 /* FiraSans-Book.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "FiraSans-Book.ttf"; sourceTree = "<group>"; };
 		E47616C61AB74CA600E7DD25 /* ReaderModeBarView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReaderModeBarView.swift; sourceTree = "<group>"; };
@@ -1954,8 +1960,6 @@
 		E696FE501C47F86E00EC007C /* AuthenticatorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthenticatorTests.swift; sourceTree = "<group>"; };
 		E698FFD91B4AADF40001F623 /* TabScrollController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabScrollController.swift; sourceTree = "<group>"; };
 		E69922121B94E3EF007C480D /* Licenses.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = Licenses.html; sourceTree = "<group>"; };
-		E6C191D41E38F7B7000A213B /* Cartfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Cartfile; sourceTree = "<group>"; };
-		E6C191D51E38F7B7000A213B /* Cartfile.resolved */ = {isa = PBXFileReference; lastKnownFileType = text; path = Cartfile.resolved; sourceTree = "<group>"; };
 		E6D8D5E61B569D70009E5A58 /* BrowserTrayAnimators.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserTrayAnimators.swift; sourceTree = "<group>"; };
 		E6DCC1ED1DCBB6AA00CEC4B7 /* Fennec.enterprise.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Fennec.enterprise.xcconfig; path = Configuration/Fennec.enterprise.xcconfig; sourceTree = "<group>"; };
 		E6F738741EB7A8D300B50143 /* FennecApplication.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FennecApplication.entitlements; sourceTree = "<group>"; };
@@ -2174,6 +2178,18 @@
 				0AAAAC962249174A009A8763 /* SyncAlerts.swift */,
 			);
 			path = Sync;
+			sourceTree = "<group>";
+		};
+		0A24F7DE233E8EF2004D2F3A /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				0A24F7E4233E8F0F004D2F3A /* bootstrap.sh */,
+				0A24F7E1233E8F0E004D2F3A /* Cartfile */,
+				0A24F7E0233E8F0E004D2F3A /* Cartfile.resolved */,
+				0A24F7E2233E8F0F004D2F3A /* package-lock.json */,
+				0A24F7E3233E8F0F004D2F3A /* package.json */,
+			);
+			name = Config;
 			sourceTree = "<group>";
 		};
 		0A3C789423055AC80022F6D8 /* Onboarding */ = {
@@ -3372,17 +3388,6 @@
 			sourceTree = "<group>";
 			tabWidth = 4;
 		};
-		E40A18F61EDC73D5006B7F28 /* Entitlements */ = {
-			isa = PBXGroup;
-			children = (
-				E40A18F71EDC73D5006B7F28 /* Fennec.entitlements */,
-				E40A18F81EDC73D5006B7F28 /* FennecEnterprise.entitlements */,
-				E40A18F91EDC73D5006B7F28 /* Firefox.entitlements */,
-				E40A18FA1EDC73D5006B7F28 /* FirefoxBeta.entitlements */,
-			);
-			path = Entitlements;
-			sourceTree = "<group>";
-		};
 		E4E0BB141AFBC9E4008D6260 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
@@ -3609,11 +3614,9 @@
 		F84B21B51A090F8100AAB793 = {
 			isa = PBXGroup;
 			children = (
-				E6C191D41E38F7B7000A213B /* Cartfile */,
-				E6C191D51E38F7B7000A213B /* Cartfile.resolved */,
+				0A24F7DE233E8EF2004D2F3A /* Config */,
 				F84B21C01A090F8100AAB793 /* Client */,
 				F84B21D61A090F8100AAB793 /* ClientTests */,
-				F8708D1E1A0970990051AB07 /* Extensions */,
 				5D1DC51420AC9AFA00905E5A /* Data */,
 				5D1DC52120AC9AFB00905E5A /* DataTests */,
 				5DE7688520B3456D00FF5533 /* BraveShared */,
@@ -3825,14 +3828,6 @@
 				E4B7B75F1A793CF20022C5E0 /* FiraSans-UltraLight.ttf */,
 			);
 			path = Fonts;
-			sourceTree = "<group>";
-		};
-		F8708D1E1A0970990051AB07 /* Extensions */ = {
-			isa = PBXGroup;
-			children = (
-				E40A18F61EDC73D5006B7F28 /* Entitlements */,
-			);
-			path = Extensions;
 			sourceTree = "<group>";
 		};
 		F930CDB02270029B00A23FE1 /* WebAuthN */ = {
@@ -4426,6 +4421,7 @@
 				0BA1E0301B051A07007675AF /* NetError.css in Resources */,
 				59871C1921E4D83900316590 /* block-cookies.json in Resources */,
 				3BC659491E5BA4AE006D560F /* TopSites in Resources */,
+				0A24F7E8233E8F0F004D2F3A /* package.json in Resources */,
 				E4B7B77E1A793CF20022C5E0 /* FiraSans-SemiBold.ttf in Resources */,
 				F84B220B1A0910F600AAB793 /* Images.xcassets in Resources */,
 				2755AB7D23107BC600F0721F /* AdsReporting.js in Resources */,
@@ -4433,6 +4429,7 @@
 				0A0D3D3C21A4BE6400BEE65B /* adblock-list.txt in Resources */,
 				27658272217130D900754B2F /* GlobalSign_r3.cer in Resources */,
 				5DE5250F218CE92C000DFAA6 /* upgrade-http.json in Resources */,
+				0A24F7E7233E8F0F004D2F3A /* package-lock.json in Resources */,
 				0A0D3D3E21A4BE6C00BEE65B /* simple_malware.txt in Resources */,
 				0AA21E4B2302C4CC00358988 /* webauth_insert_key.json in Resources */,
 				5DE5250D218CE92C000DFAA6 /* block-ads.json in Resources */,
@@ -4446,6 +4443,7 @@
 				F930CDAC227000F200A23FE1 /* U2F.js in Resources */,
 				5D7001C222249F7B00E576FB /* ShortNameToFileMapping.json in Resources */,
 				4422D55921BFFB7F00BF1855 /* unicode.py in Resources */,
+				0A24F7E6233E8F0F004D2F3A /* Cartfile in Resources */,
 				7B2142FE1E5E055000CDD3FC /* InfoPlist.strings in Resources */,
 				E69922171B94E3EF007C480D /* Licenses.html in Resources */,
 				E4CD9F5B1A71506C00318571 /* Reader.css in Resources */,
@@ -4465,6 +4463,7 @@
 				59D4161B232681080087A6E1 /* Localizable.strings in Resources */,
 				D0FCF8081FE4772D004A7995 /* MainFrameAtDocumentStart.js in Resources */,
 				0A0D3D5021A5609600BEE65B /* SafeBrowsingError.html in Resources */,
+				0A24F7E5233E8F0F004D2F3A /* Cartfile.resolved in Resources */,
 				74821FFE1DB6D3AC00EEEA72 /* MailSchemes.plist in Resources */,
 				0AA4AA99231849450009AAEF /* ABPFilterParserData.dat in Resources */,
 				4422D57621C05DE600BF1855 /* httpse.leveldb.tgz in Resources */,
@@ -4487,6 +4486,7 @@
 				39A35AED1C0662A3006B9E87 /* SpotlightHelper.js in Resources */,
 				D0FCF8071FE4772D004A7995 /* MainFrameAtDocumentEnd.js in Resources */,
 				E4D6BEB91A0930EC00F538BD /* LaunchScreen.xib in Resources */,
+				0A24F7E9233E8F0F004D2F3A /* bootstrap.sh in Resources */,
 				2F44FB2D1A9D5D8500FD20CC /* FiraSans-BoldItalic.ttf in Resources */,
 				D03F8F23200EAC1F003C2224 /* AllFramesAtDocumentStart.js in Resources */,
 				0AA21E4A2302C4CC00358988 /* webauth_verify_key.json in Resources */,
