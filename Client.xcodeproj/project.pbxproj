@@ -1989,7 +1989,6 @@
 		E65075C11E37F956006961AC /* ExtensionUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExtensionUtils.swift; sourceTree = "<group>"; };
 		E653422C1C5944F90039DD9E /* BrowserPrompts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserPrompts.swift; sourceTree = "<group>"; };
 		E65607601C08B4E200534B02 /* SearchInputView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchInputView.swift; sourceTree = "<group>"; };
-		E659A60A1EB7C1D300D7A6AD /* BuddyBuildSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = BuddyBuildSDK.framework; sourceTree = "<group>"; };
 		E65D89171C8647420006EA35 /* AppAuthenticator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppAuthenticator.swift; sourceTree = "<group>"; };
 		E660BDD81BB06521009AC090 /* TabsButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabsButton.swift; sourceTree = "<group>"; };
 		E660BE051BB0666D009AC090 /* InnerStrokedView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InnerStrokedView.swift; sourceTree = "<group>"; };
@@ -2483,7 +2482,6 @@
 			children = (
 				A1FEEE1F20BF28D900298DA2 /* Then.swift */,
 				E66C5B451BDA81050051AA93 /* Apple */,
-				E659A6091EB7C1D300D7A6AD /* BuddyBuild */,
 				288A2D7E1AB8B2AD0023ABC3 /* Result */,
 				0B742CC61B32491400EE9264 /* sqlcipher.xcodeproj */,
 				0B1C05D41A798B1F004C78B0 /* UIImageViewAligned */,
@@ -3570,15 +3568,6 @@
 				D3BE7B451B054F8600641031 /* TestAppDelegate.swift */,
 			);
 			name = Delegates;
-			sourceTree = "<group>";
-		};
-		E659A6091EB7C1D300D7A6AD /* BuddyBuild */ = {
-			isa = PBXGroup;
-			children = (
-				E659A60A1EB7C1D300D7A6AD /* BuddyBuildSDK.framework */,
-			);
-			name = BuddyBuild;
-			path = ThirdParty/BuddyBuild;
 			sourceTree = "<group>";
 		};
 		E66C5B451BDA81050051AA93 /* Apple */ = {
@@ -7295,7 +7284,6 @@
 					"$(inherited)",
 					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
-					"$(PROJECT_DIR)/ThirdParty/BuddyBuild",
 					"$(PROJECT_DIR)/Carthage/Checkouts/brave-rewards-ios/lib",
 				);
 				HEADER_SEARCH_PATHS = (
@@ -7511,7 +7499,6 @@
 					"$(inherited)",
 					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
-					"$(PROJECT_DIR)/ThirdParty/BuddyBuild",
 					"$(PROJECT_DIR)/Carthage/Checkouts/brave-rewards-ios/lib",
 				);
 				HEADER_SEARCH_PATHS = (
@@ -7534,8 +7521,6 @@
 					"-ObjC",
 					"-lxml2",
 					"-framework",
-					BuddyBuildSDK,
-					"-framework",
 					AssetsLibrary,
 					"-framework",
 					CoreText,
@@ -7554,7 +7539,6 @@
 				);
 				PRODUCT_MODULE_NAME = Client;
 				PRODUCT_NAME = Client;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = BUDDYBUILD;
 				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/Client-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
@@ -7794,7 +7778,6 @@
 					"$(inherited)",
 					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
-					"$(PROJECT_DIR)/ThirdParty/BuddyBuild",
 					"$(PROJECT_DIR)/Carthage/Checkouts/brave-rewards-ios/lib",
 				);
 				HEADER_SEARCH_PATHS = (
@@ -8028,7 +8011,6 @@
 					"$(inherited)",
 					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
-					"$(PROJECT_DIR)/ThirdParty/BuddyBuild",
 					"$(PROJECT_DIR)/Carthage/Checkouts/brave-rewards-ios/lib",
 				);
 				HEADER_SEARCH_PATHS = (
@@ -8051,8 +8033,6 @@
 					"-ObjC",
 					"-lxml2",
 					"-framework",
-					BuddyBuildSDK,
-					"-framework",
 					AssetsLibrary,
 					"-framework",
 					CoreText,
@@ -8071,7 +8051,6 @@
 				);
 				PRODUCT_MODULE_NAME = Client;
 				PRODUCT_NAME = Client;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = BUDDYBUILD;
 				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/Client-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
