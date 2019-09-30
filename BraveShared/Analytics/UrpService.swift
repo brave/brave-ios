@@ -272,10 +272,11 @@ extension URLSession {
             for item in parameters {
                 if let value = item.value as? String {
                     queryParameters.append(URLQueryItem(name: item.key, value: value))
+                } else {
+                    throw NSError(domain: "com.brave.url.session.build-request", code: -1, userInfo: [
+                        NSLocalizedDescriptionKey: "Invalid Parameter cannot be serialized to query url: \(item.key)"
+                    ])
                 }
-                throw NSError(domain: "com.brave.url.session.build-request", code: -1, userInfo: [
-                    NSLocalizedDescriptionKey: "Invalid Parameter cannot be serialized to query url: \(item.key)"
-                ])
             }
             
             var urlComponents = URLComponents()

@@ -89,17 +89,17 @@ class ClientTests: XCTestCase {
         var request = URLRequest(url: URL(string: "http://\(host):6571/about/license")!)
         var response: HTTPURLResponse?
         
-        let username = WebServer.sharedInstance.credentials.username
-        let password = WebServer.sharedInstance.credentials.password
+        let username = WebServer.sharedInstance.credentials.user ?? ""
+        let password = WebServer.sharedInstance.credentials.password ?? ""
         
-        let credentials = "\(username):\(password)".dataUsingEncoding(NSUTF8StringEncoding)?.base64EncodedString()
+        let credentials = "\(username):\(password)".data(using: .utf8)?.base64EncodedString() ?? ""
 
         request.setValue("Basic \(credentials)", forHTTPHeaderField: "Authorization")
-        
-        URLSession(configuration: .ephemeral).dataTask(with: request) { data, response, error in
-            response = response as? HTTPURLResponse
+
+        URLSession(configuration: .ephemeral).dataTask(with: request) { data, resp, error in
+            response = resp as? HTTPURLResponse
             expectation.fulfill()
-        }
+        }.resume()
 
         waitForExpectations(timeout: 100, handler: nil)
         return response?.statusCode == 200
