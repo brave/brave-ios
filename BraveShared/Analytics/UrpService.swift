@@ -16,6 +16,8 @@ private class PinningCertificateEvaluator: NSObject, URLSessionDelegate {
     private let certificates: [SecCertificate]
     
     init(hosts: [String]) {
+        self.hosts = hosts
+        
         // Load certificates in the main bundle..
         self.certificates = {
             let paths = Set([".cer", ".CER", ".crt", ".CRT", ".der", ".DER"].map {
