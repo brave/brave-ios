@@ -1108,18 +1108,18 @@ class BrowserViewController: UIViewController {
 
     /// Updates the URL bar security, text and button states.
     fileprivate func updateURLBar() {
-        guard let tab = tabManager.selectedTab, let url = tab.url else { return }
-        if url.isLocal {
-            self.topToolbar.locationView.rewardsButton.isVerified = false
-        } else {
+        guard let tab = tabManager.selectedTab else { return }
+        if let url = tab.url, !url.isLocal {
             self.rewards?.ledger.fetchPublisherActivity(from: url, faviconURL: nil, publisherBlob: nil, tabId: UInt64(tab.rewardsId))
+        } else {
+            self.topToolbar.locationView.rewardsButton.isVerified = false
         }
         
-        topToolbar.currentURL = url.displayURL
+        topToolbar.currentURL = tab.url?.displayURL
         
         topToolbar.contentIsSecure = tab.contentIsSecure
         
-        let isPage = url.displayURL?.isWebPage() ?? false
+        let isPage = tab.url?.displayURL?.isWebPage() ?? false
         navigationToolbar.updatePageStatus(isPage)
     }
 
