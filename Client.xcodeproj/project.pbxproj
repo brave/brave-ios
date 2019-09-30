@@ -3126,13 +3126,6 @@
 			path = BraveSharedTests;
 			sourceTree = "<group>";
 		};
-		7B0B1B9C1C1B69F500DF4AB5 /* Extensions */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Extensions;
-			sourceTree = "<group>";
-		};
 		7B604FC11C496005006EEEC3 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -3811,7 +3804,6 @@
 				392ED7D51D0AEEEE009D9B62 /* Accessors */,
 				E692E3271C46E62D009D1240 /* AuthenticationManager */,
 				D3A994941A368691008AD1AC /* Browser */,
-				7B0B1B9C1C1B69F500DF4AB5 /* Extensions */,
 				A104E190210A380E00D2323E /* Shields */,
 				E63ED8DF1BFD254E0097D08E /* Login Management */,
 				F84B21F51A0910F600AAB793 /* Reader */,
