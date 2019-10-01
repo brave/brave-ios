@@ -36,7 +36,7 @@ class OnboardingNavigationController: UINavigationController {
         /// Screens should be sorted in order of which they are presented to the user.
         fileprivate var screens: [Screens] {
             switch self {
-            case .newUser: return [.searchEnginePicker, .shieldsInfo, /* .rewardsInfo, .adsInfo */]
+            case .newUser: return [.searchEnginePicker, .shieldsInfo, .rewardsInfo, .rewardsAgreement, .adsCountdown /*, .adsInfo */]
             case .existingUser: return [/* .rewardsInfo, .adsInfo */]
             }
         }
@@ -45,6 +45,9 @@ class OnboardingNavigationController: UINavigationController {
     fileprivate enum Screens {
         case searchEnginePicker
         case shieldsInfo
+        case rewardsInfo
+        case rewardsAgreement
+        case adsCountdown
         
         /// Returns new ViewController associated with the screen type
         func viewController(with profile: Profile, theme: Theme) -> OnboardingViewController {
@@ -53,6 +56,12 @@ class OnboardingNavigationController: UINavigationController {
                 return OnboardingSearchEnginesViewController(profile: profile, theme: theme)
             case .shieldsInfo:
                 return OnboardingShieldsViewController(profile: profile, theme: theme)
+            case .rewardsInfo:
+                return OnboardingRewardsViewController(profile: profile, theme: theme)
+            case .rewardsAgreement:
+                return OnboardingRewardsAgreementViewController(profile: profile, theme: theme)
+            case .adsCountdown:
+                return OnboardingAdsCountdownViewController(profile: profile, theme: theme)
             }
         }
         
@@ -60,6 +69,9 @@ class OnboardingNavigationController: UINavigationController {
             switch self {
             case .searchEnginePicker: return OnboardingSearchEnginesViewController.self
             case .shieldsInfo: return OnboardingShieldsViewController.self
+            case .rewardsInfo: return OnboardingRewardsViewController.self
+            case .rewardsAgreement: return OnboardingRewardsAgreementViewController.self
+            case .adsCountdown: return OnboardingAdsCountdownViewController.self
             }
         }
     }

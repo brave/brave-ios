@@ -7,7 +7,7 @@ import Shared
 import BraveShared
 import Lottie
 
-extension OnboardingShieldsViewController {
+extension OnboardingRewardsViewController {
     
     private struct UX {
         /// A negative spacing is needed to make rounded corners for details view visible.
@@ -17,12 +17,12 @@ extension OnboardingShieldsViewController {
     
     class View: UIView {
         
-        let continueButton = CommonViews.primaryButton(text: Strings.OBContinueButton).then {
-            $0.accessibilityIdentifier = "OnboardingShieldsViewController.ContinueButton"
+        let joinButton = CommonViews.primaryButton(text: Strings.OBJoinButton).then {
+            $0.accessibilityIdentifier = "OnboardingRewardsViewController.JoinButton"
         }
         
         let skipButton = CommonViews.secondaryButton().then {
-            $0.accessibilityIdentifier = "OnboardingShieldsViewController.SkipButton"
+            $0.accessibilityIdentifier = "OnboardingRewardsViewController.SkipButton"
         }
         
         private let mainStackView = UIStackView().then {
@@ -30,12 +30,13 @@ extension OnboardingShieldsViewController {
             $0.spacing = UX.negativeSpacing
         }
         
-        let imageView = AnimationView(name: "onboarding-shields").then {
+        let imageView = AnimationView(name: "onboarding-rewards").then {
             $0.contentMode = .scaleAspectFit
             $0.backgroundColor = #colorLiteral(red: 0.1176470588, green: 0.1254901961, blue: 0.1607843137, alpha: 1)
             $0.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
-            $0.play()
+            $0.backgroundBehavior = .pauseAndRestore
             $0.loopMode = .loop
+            $0.play()
         }
         
         private let descriptionView = UIView().then {
@@ -52,10 +53,10 @@ extension OnboardingShieldsViewController {
             stackView.axis = .vertical
             stackView.spacing = 8
             
-            let titleLabel = CommonViews.primaryText(Strings.OBShieldsTitle)
+            let titleLabel = CommonViews.primaryText(Strings.OBRewardsTitle)
             
             let descriptionLabel = CommonViews.secondaryText("").then {
-                $0.attributedText = Strings.OBShieldsDetail.boldFirstWord(with: $0.font)
+                $0.attributedText = Strings.OBRewardsDetail.boldWords(with: $0.font, amount: 2)
             }
             
             [titleLabel, descriptionLabel].forEach {
@@ -78,10 +79,8 @@ extension OnboardingShieldsViewController {
             super.init(frame: .zero)
             
             [imageView, descriptionView].forEach(mainStackView.addArrangedSubview(_:))
-            
-            [UIView.spacer(.horizontal, amount: 0),
-             continueButton,
-             UIView.spacer(.horizontal, amount: 0)]
+
+            [skipButton, joinButton, UIView.spacer(.horizontal, amount: 0)]
                 .forEach(buttonsStackView.addArrangedSubview(_:))
             
             [textStackView, buttonsStackView].forEach(descriptionStackView.addArrangedSubview(_:))
@@ -107,11 +106,12 @@ extension OnboardingShieldsViewController {
 }
 
 private extension String {
-    func boldFirstWord(with font: UIFont) -> NSMutableAttributedString {
+    func boldWords(with font: UIFont, amount: Int) -> NSMutableAttributedString {
         let mutableDescriptionText = NSMutableAttributedString(string: self)
         
-        if let firstWord = self.components(separatedBy: " ").first {
-            if let range = self.range(of: firstWord) {
+        let components = self.components(separatedBy: " ")
+        for i in 0..<min(amount, components.count) {
+            if let range = self.range(of: components[i]) {
                 let nsRange = NSRange(range, in: self)
                 let font = UIFont.systemFont(ofSize: font.pointSize, weight: UIFont.Weight.bold)
                 
