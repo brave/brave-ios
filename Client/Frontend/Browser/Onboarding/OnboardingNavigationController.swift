@@ -14,6 +14,8 @@ protocol Onboardable: class {
     /// Show next on boarding screen if possible.
     /// If last screen is currently presenting, the view is dimissed instead(onboarding finished).
     func presentNextScreen(current: OnboardingViewController)
+    /// Show previous on boarding screen if possible.
+    func presentPreviousScreen(current: OnboardingViewController)
     /// Skip all onboarding screens, onboarding is considered as completed.
     func skip()
 }
@@ -142,6 +144,19 @@ extension OnboardingNavigationController: Onboardable {
         pushViewController(nextScreen, animated: true)
     }
     
+    func presentPreviousScreen(current: OnboardingViewController) {
+        guard let allScreens = onboardingType?.screens else { return }
+        let index = allScreens.firstIndex { $0.type == type(of: current) }
+        
+        guard let previousIndex = index?.advanced(by: -1), let previousScreen = viewControllers[previousIndex] as? OnboardingViewController else {
+                log.info("First screen reached")
+                return
+        }
+        previousScreen.delegate = self
+        
+        popToViewController(previousScreen, animated: true)
+    }
+    
     func skip() {
         onboardingDelegate?.onboardingCompleted(self)
     }
@@ -200,7 +215,8 @@ class CustomAnimator: NSObject, UIViewControllerAnimatedTransitioning {
         //Setup
         fromView.frame = container.bounds
         toView.frame = container.bounds
-        isPresenting ? container.addSubview(toView) : container.insertSubview(toView, belowSubview: fromView)
+        //isPresenting ? container.addSubview(toView) : container.insertSubview(toView, belowSubview: fromView)
+        container.addSubview(toView)
         fromView.layoutIfNeeded()
         toView.layoutIfNeeded()
         

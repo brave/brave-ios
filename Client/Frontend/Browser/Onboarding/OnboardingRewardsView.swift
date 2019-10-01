@@ -52,7 +52,7 @@ extension OnboardingRewardsViewController {
         private let titleLabel = CommonViews.primaryText(Strings.OBRewardsTitle)
         
         private let descriptionLabel = CommonViews.secondaryText("").then {
-            $0.attributedText = Strings.OBRewardsDetail.boldWords(with: $0.font, amount: 2)
+            $0.attributedText = Strings.OBRewardsDetail.boldWords(with: $0.font, amount: 1)
         }
         
         private lazy var textStackView = UIStackView().then { stackView in

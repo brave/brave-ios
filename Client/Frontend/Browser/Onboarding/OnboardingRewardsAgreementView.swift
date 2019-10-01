@@ -27,8 +27,8 @@ extension OnboardingRewardsAgreementViewController {
             $0.isEnabled = false
         }
         
-        let skipButton = CommonViews.secondaryButton().then {
-            $0.accessibilityIdentifier = "OnboardingRewardsAgreementViewController.SkipButton"
+        let cancelButton = CommonViews.secondaryButton(text: Strings.CancelButtonTitle).then {
+            $0.accessibilityIdentifier = "OnboardingRewardsAgreementViewController.CancelButton"
         }
         
         private let mainStackView = UIStackView().then {
@@ -166,7 +166,7 @@ extension OnboardingRewardsAgreementViewController {
             
             mainStackView.addArrangedSubview(descriptionView)
 
-            [skipButton, agreeButton, UIView.spacer(.horizontal, amount: 0)]
+            [cancelButton, agreeButton, UIView.spacer(.horizontal, amount: 0)]
                 .forEach(buttonsStackView.addArrangedSubview(_:))
             
             [textStackView, buttonsStackView].forEach(descriptionStackView.addArrangedSubview(_:))

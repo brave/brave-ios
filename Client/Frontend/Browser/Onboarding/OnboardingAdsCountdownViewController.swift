@@ -10,7 +10,7 @@ import BraveShared
 class OnboardingAdsCountdownViewController: OnboardingViewController, UNUserNotificationCenterDelegate {
     
     private struct UX {
-        static let animationTime = 3.0
+        static let animationTime = 5.0
     }
     
     private var timeSinceAnimationStarted: Date?

@@ -53,6 +53,12 @@ class OnboardingViewController: UIViewController, Themeable {
         delegate?.presentNextScreen(current: self)
     }
     
+    /// Default behavior to present previous onboarding screen.
+    /// Override it to add custom behavior.
+    @objc func backTapped() {
+        delegate?.presentPreviousScreen(current: self)
+    }
+    
     /// Default behavior if skip onboarding is tapped.
     /// Override it to add custom behavior.
     @objc func skipTapped() {
