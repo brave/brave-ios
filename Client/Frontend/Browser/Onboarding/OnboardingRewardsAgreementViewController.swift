@@ -57,6 +57,7 @@ class OnboardingRewardsAgreementViewController: OnboardingViewController {
             self.contentView.cancelButton.isUserInteractionEnabled = true
             
             if success {
+                self.rewards?.ledger.isEnabled = true
                 self.continueTapped()
             } else {
                 let alert = UIAlertController(title: Strings.OBErrorTitle, message: Strings.OBErrorDetails, preferredStyle: .alert)

@@ -49,7 +49,7 @@ class OnboardingAdsCountdownViewController: OnboardingViewController, UNUserNoti
                     self.contentView.setState(.finished)
                 } else {
                     //User saw the ad.. they interacted with it.. onboarding is finished.
-                    self.skipTapped()
+                    self.continueTapped()
                 }
             }
         }
@@ -80,6 +80,12 @@ extension OnboardingAdsCountdownViewController {
     }
     
     private func openURL(url: URL) {
-        (UIApplication.shared.delegate as? AppDelegate)?.browserViewController.openInNewTab(url, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
+        guard let tabManager = (UIApplication.shared.delegate as? AppDelegate)?.browserViewController.tabManager else {
+            return
+        }
+        
+        let tab = tabManager.addTab(PrivilegedRequest(url: url) as URLRequest, afterTab: tabManager.selectedTab, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
+        
+        tabManager.selectTab(tab)
     }
 }

@@ -12,4 +12,6 @@ enum OnboardingState: Int {
     case unseen
     /// The user has completed this onboarding.
     case completed
+    /// The user has skipped the onboarding.
+    case skipped
 }

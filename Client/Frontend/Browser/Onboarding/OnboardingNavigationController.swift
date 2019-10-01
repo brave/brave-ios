@@ -22,6 +22,7 @@ protocol Onboardable: class {
 
 protocol OnboardingControllerDelegate: class {
     func onboardingCompleted(_ onboardingController: OnboardingNavigationController)
+    func onboardingSkipped(_ onboardingController: OnboardingNavigationController)
 }
 
 enum OnboardingViewAnimationID: Int {
@@ -158,7 +159,7 @@ extension OnboardingNavigationController: Onboardable {
     }
     
     func skip() {
-        onboardingDelegate?.onboardingCompleted(self)
+        onboardingDelegate?.onboardingSkipped(self)
     }
 }
 

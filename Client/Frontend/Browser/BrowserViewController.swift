@@ -670,7 +670,33 @@ class BrowserViewController: UIViewController {
     }
     
     func presentOnboardingIntro() {
+        if Preferences.General.basicOnboardingCompleted.value == OnboardingState.skipped.rawValue {
+            // The user skipped the onboarding..
+            guard let daysUntilNextPrompt = Preferences.General.basicOnboardingNextOnboardingPrompt.value else {
+                return
+            }
+            
+            // 60 days has passed since the user last saw the onboarding.. it's time to show the onboarding again..
+            if daysUntilNextPrompt <= Date() {
+                guard let onboarding = OnboardingNavigationController(
+                    profile: profile,
+                    onboardingType: .existingUser,
+                    rewards: rewards,
+                    theme: Theme.of(tabManager.selectedTab)
+                    ) else { return }
+                
+                onboarding.onboardingDelegate = self
+                present(onboarding, animated: true)
+                
+                Preferences.General.basicOnboardingNextOnboardingPrompt.value = Date(timeIntervalSinceNow: BrowserViewController.onboardingDaysInterval * 24 * 60 * 60)
+            }
+            
+            return
+        }
+        
         if Preferences.General.basicOnboardingCompleted.value != OnboardingState.completed.rawValue {
+            // The user has never completed the onboarding..
+            
             guard let onboarding = OnboardingNavigationController(
                 profile: profile,
                 onboardingType: .newUser,
@@ -681,10 +707,9 @@ class BrowserViewController: UIViewController {
             onboarding.onboardingDelegate = self
             present(onboarding, animated: true)
         } else if BraveAds.isSupportedRegion(Locale.current.identifier) {
+            // The user has seen onboarding before..
+            
             let isRewardsEnabled = rewards?.ledger.isEnabled == false
-            
-            // User has seen onboarding before..
-            
             if (!isRewardsEnabled && Preferences.General.basicOnboardingCompleted.value == OnboardingState.completed.rawValue) || (isRewardsEnabled && Preferences.General.basicOnboardingCompleted.value == OnboardingState.unseen.rawValue) {
                 guard let onboarding = OnboardingNavigationController(
                     profile: profile,
@@ -3122,9 +3147,19 @@ extension BrowserViewController: OnboardingControllerDelegate {
         switch onboardingController.onboardingType {
         case .newUser:
             Preferences.General.basicOnboardingCompleted.value = OnboardingState.completed.rawValue
+            Preferences.General.basicOnboardingNextOnboardingPrompt.value = nil
         default: break
         }
         
         onboardingController.dismiss(animated: true)
     }
+    
+    func onboardingSkipped(_ onboardingController: OnboardingNavigationController) {
+        Preferences.General.basicOnboardingCompleted.value = OnboardingState.skipped.rawValue
+        Preferences.General.basicOnboardingNextOnboardingPrompt.value = Date(timeIntervalSinceNow: BrowserViewController.onboardingDaysInterval * 24 * 60 * 60)
+        onboardingController.dismiss(animated: true)
+    }
+    
+    // 60 days until the next time the user sees the onboarding..
+    static let onboardingDaysInterval: Double = 60.0
 }
