@@ -42,7 +42,8 @@ class OnboardingNavigationController: UINavigationController {
     
     enum OnboardingType {
         case newUser
-        case existingUser
+        case existingUserRewardsOff
+        case existingUserRewardsOn
         
         /// Returns a list of onboarding screens for given type.
         /// Screens should be sorted in order of which they are presented to the user.
@@ -54,8 +55,9 @@ class OnboardingNavigationController: UINavigationController {
             }
             #else
             switch self {
-            case .newUser: return BraveAds.isSupportedRegion(Locale.current.identifier) ? [.searchEnginePicker, .shieldsInfo, .rewardsInfo, .rewardsAgreement, .adsCountdown] : [.searchEnginePicker, .shieldsInfo]
-            case .existingUser: return BraveAds.isSupportedRegion(Locale.current.identifier) ? [.rewardsInfo, .rewardsAgreement, .adsCountdown] : []
+            case .newUser: return BraveAds.isSupportedRegion(Locale.current.identifier) ? [.searchEnginePicker, .shieldsInfo, .rewardsInfo, .rewardsAgreement, .adsCountdown] : [.searchEnginePicker, .shieldsInfo, .rewardsInfo, .rewardsAgreement]
+            case .existingUserRewardsOff: return BraveAds.isSupportedRegion(Locale.current.identifier) ? [.rewardsInfo, .rewardsAgreement, .adsCountdown] : []
+            case .existingUserRewardsOn: return BraveAds.isSupportedRegion(Locale.current.identifier) ? [.rewardsInfo, .adsCountdown] : []
             }
             #endif
         }

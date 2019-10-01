@@ -3,6 +3,9 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
+import BraveRewards
+import BraveShared
+import Shared
 
 class OnboardingRewardsViewController: OnboardingViewController {
     private var contentView: View {
@@ -15,6 +18,17 @@ class OnboardingRewardsViewController: OnboardingViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        let isRewardsEnabled = rewards?.ledger.isEnabled == true
+        let isAdsRegionSupported = BraveAds.isSupportedRegion(Locale.current.identifier)
+        
+        // The user is not new..
+        if Preferences.General.basicOnboardingProgress.value != OnboardingProgress.none.rawValue || isRewardsEnabled {
+            contentView.updateDetailsText(Strings.OBRewardsDetailInAdRegion, boldWords: 2)
+        } else {
+            // The user is new..
+            contentView.updateDetailsText(isAdsRegionSupported ? Strings.OBRewardsDetailInAdRegion : Strings.OBRewardsDetailOutsideAdRegion, boldWords: isAdsRegionSupported ? 2 : 1)
+        }
         
         contentView.joinButton.addTarget(self, action: #selector(continueTapped), for: .touchUpInside)
         contentView.skipButton.addTarget(self, action: #selector(skipTapped), for: .touchUpInside)

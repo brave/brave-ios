@@ -670,8 +670,13 @@ class BrowserViewController: UIViewController {
     }
     
     func presentOnboardingIntro() {
+        let isRewardsEnabled = rewards?.ledger.isEnabled == true
+        
+        // 1. Existing user.
+        // 2. The user skipped onboarding before.
+        // 3. 60 days have passed since they last saw onboarding.
         if Preferences.General.basicOnboardingCompleted.value == OnboardingState.skipped.rawValue {
-            // The user skipped the onboarding..
+
             guard let daysUntilNextPrompt = Preferences.General.basicOnboardingNextOnboardingPrompt.value else {
                 return
             }
@@ -680,7 +685,7 @@ class BrowserViewController: UIViewController {
             if daysUntilNextPrompt <= Date() {
                 guard let onboarding = OnboardingNavigationController(
                     profile: profile,
-                    onboardingType: .existingUser,
+                    onboardingType: isRewardsEnabled ? .existingUserRewardsOn : .existingUserRewardsOff,
                     rewards: rewards,
                     theme: Theme.of(tabManager.selectedTab)
                     ) else { return }
@@ -694,6 +699,40 @@ class BrowserViewController: UIViewController {
             return
         }
         
+        // 1. Rewards are on/off (existing user)
+        // 2. User hasn't seen the rewards part of the onboarding yet.
+        if Preferences.General.basicOnboardingCompleted.value == OnboardingState.completed.rawValue && Preferences.General.basicOnboardingProgress.value == OnboardingProgress.searchEngine.rawValue {
+            
+            guard let onboarding = OnboardingNavigationController(
+                profile: profile,
+                onboardingType: isRewardsEnabled ? .existingUserRewardsOn : .existingUserRewardsOff,
+                rewards: rewards,
+                theme: Theme.of(tabManager.selectedTab)
+                ) else { return }
+            
+            onboarding.onboardingDelegate = self
+            present(onboarding, animated: true)
+        }
+        
+        // 1. Rewards are on/off (existing user)
+        // 2. Ads are now available
+        // 3. User hasn't seen the ads part of onboarding yet
+        if BraveAds.isSupportedRegion(Locale.current.identifier) && Preferences.General.basicOnboardingCompleted.value == OnboardingState.completed.rawValue && Preferences.General.basicOnboardingProgress.value != OnboardingProgress.ads.rawValue {
+            
+            guard let onboarding = OnboardingNavigationController(
+                profile: profile,
+                onboardingType: isRewardsEnabled ? .existingUserRewardsOn : .existingUserRewardsOff,
+                rewards: rewards,
+                theme: Theme.of(tabManager.selectedTab)
+                ) else { return }
+            
+            onboarding.onboardingDelegate = self
+            present(onboarding, animated: true)
+        }
+        
+        // 1. User is brand new
+        // 2. User hasn't completed onboarding
+        // 3. We don't care how much progress they made. Onboarding is only complete when ALL of it is complete.
         if Preferences.General.basicOnboardingCompleted.value != OnboardingState.completed.rawValue {
             // The user has never completed the onboarding..
             
@@ -706,21 +745,6 @@ class BrowserViewController: UIViewController {
             
             onboarding.onboardingDelegate = self
             present(onboarding, animated: true)
-        } else if BraveAds.isSupportedRegion(Locale.current.identifier) {
-            // The user has seen onboarding before..
-            
-            let isRewardsEnabled = rewards?.ledger.isEnabled == false
-            if (!isRewardsEnabled && Preferences.General.basicOnboardingCompleted.value == OnboardingState.completed.rawValue) || (isRewardsEnabled && Preferences.General.basicOnboardingCompleted.value == OnboardingState.unseen.rawValue) {
-                guard let onboarding = OnboardingNavigationController(
-                    profile: profile,
-                    onboardingType: .existingUser,
-                    rewards: rewards,
-                    theme: Theme.of(tabManager.selectedTab)
-                    ) else { return }
-                
-                onboarding.onboardingDelegate = self
-                present(onboarding, animated: true)
-            }
         }
     }
 

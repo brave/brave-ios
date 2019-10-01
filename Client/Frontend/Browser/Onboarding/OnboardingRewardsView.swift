@@ -5,6 +5,7 @@
 import Foundation
 import Shared
 import BraveShared
+import BraveRewards
 import Lottie
 
 extension OnboardingRewardsViewController {
@@ -52,7 +53,7 @@ extension OnboardingRewardsViewController {
         private let titleLabel = CommonViews.primaryText(Strings.OBRewardsTitle)
         
         private let descriptionLabel = CommonViews.secondaryText("").then {
-            $0.attributedText = Strings.OBRewardsDetail.boldWords(with: $0.font, amount: 1)
+            $0.attributedText = BraveAds.isSupportedRegion(Locale.current.identifier) ?  Strings.OBRewardsDetailInAdRegion.boldWords(with: $0.font, amount: 2) : Strings.OBRewardsDetailOutsideAdRegion.boldWords(with: $0.font, amount: 1)
         }
         
         private lazy var textStackView = UIStackView().then { stackView in
@@ -95,6 +96,10 @@ extension OnboardingRewardsViewController {
                 .forEach(buttonsStackView.addArrangedSubview(_:))
             
             [textStackView, buttonsStackView].forEach(descriptionStackView.addArrangedSubview(_:))
+        }
+        
+        func updateDetailsText(_ text: String, boldWords: Int) {
+            self.descriptionLabel.attributedText = text.boldWords(with: self.descriptionLabel.font, amount: boldWords)
         }
         
         func applyTheme(_ theme: Theme) {

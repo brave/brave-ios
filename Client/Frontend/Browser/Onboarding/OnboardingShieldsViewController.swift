@@ -3,6 +3,8 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import UIKit
+import Shared
+import BraveShared
 
 class OnboardingShieldsViewController: OnboardingViewController {
     
@@ -19,6 +21,12 @@ class OnboardingShieldsViewController: OnboardingViewController {
         
         contentView.continueButton.addTarget(self, action: #selector(continueTapped), for: .touchUpInside)
         contentView.skipButton.addTarget(self, action: #selector(skipTapped), for: .touchUpInside)
+    }
+    
+    override func continueTapped() {
+        Preferences.General.basicOnboardingProgress.value = OnboardingProgress.searchEngine.rawValue
+            
+        super.continueTapped()
     }
     
     override func applyTheme(_ theme: Theme) {

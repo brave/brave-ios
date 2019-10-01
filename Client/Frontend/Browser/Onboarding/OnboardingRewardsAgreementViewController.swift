@@ -3,8 +3,9 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
-import BraveRewards
 import Shared
+import BraveShared
+import BraveRewards
 
 class OnboardingRewardsAgreementViewController: OnboardingViewController {
 
@@ -29,6 +30,12 @@ class OnboardingRewardsAgreementViewController: OnboardingViewController {
             
             self.present(OnboardingWebViewController(), animated: true, completion: nil)
         }
+    }
+    
+    override func continueTapped() {
+        Preferences.General.basicOnboardingProgress.value = OnboardingProgress.rewards.rawValue
+            
+        super.continueTapped()
     }
     
     @objc
@@ -57,7 +64,6 @@ class OnboardingRewardsAgreementViewController: OnboardingViewController {
             self.contentView.cancelButton.isUserInteractionEnabled = true
             
             if success {
-                self.rewards?.ledger.isEnabled = true
                 self.continueTapped()
             } else {
                 let alert = UIAlertController(title: Strings.OBErrorTitle, message: Strings.OBErrorDetails, preferredStyle: .alert)
