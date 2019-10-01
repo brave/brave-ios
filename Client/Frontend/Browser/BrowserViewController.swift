@@ -1110,7 +1110,10 @@ class BrowserViewController: UIViewController {
     fileprivate func updateURLBar() {
         guard let tab = tabManager.selectedTab else { return }
         if let url = tab.url, !url.isLocal {
-            self.rewards?.ledger.fetchPublisherActivity(from: url, faviconURL: nil, publisherBlob: nil, tabId: UInt64(tab.rewardsId))
+            // Notify Rewards of new page load.
+            if let rewards = rewards {
+                tabManager.selectedTab?.reportPageLoad(to: rewards)
+            }
         } else {
             self.topToolbar.locationView.rewardsButton.isVerified = false
         }
