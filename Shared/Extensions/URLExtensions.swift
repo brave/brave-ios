@@ -389,6 +389,14 @@ extension URL {
         }
         return nil
     }
+    
+    public var isMediaSiteURL: Bool {
+        // Don't need to include Github as it does a page load instead of XHR load.
+        guard let domain = self.baseDomain else {
+            return true
+        }
+        return ["youtube", "vimeo", "twitch", "twitter", "reddit"].contains(where: domain.contains)
+    }
 }
 
 // Helpers to deal with About URLs

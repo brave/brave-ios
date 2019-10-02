@@ -1105,13 +1105,16 @@ class BrowserViewController: UIViewController {
             updateInContentHomePanel(url as URL)
         }
     }
-
+    var rewardsXHRLoadURL: URL?
     /// Updates the URL bar security, text and button states.
     fileprivate func updateURLBar() {
         guard let tab = tabManager.selectedTab else { return }
         if let url = tab.url, !url.isLocal {
             // Notify Rewards of new page load.
-            if let rewards = rewards {
+            if let rewards = rewards, let rewardsURL = rewardsXHRLoadURL,
+                url.host == rewardsURL.host,
+                url.isMediaSiteURL {
+                tabManager.selectedTab?.reportPageNaviagtion(to: rewards)
                 tabManager.selectedTab?.reportPageLoad(to: rewards)
             }
         } else {
