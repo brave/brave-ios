@@ -174,7 +174,6 @@
 		2777273722EB43A100F0214C /* StringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2777273622EB43A100F0214C /* StringExtensions.swift */; };
 		2777274022EB44B300F0214C /* StringExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2777273F22EB44B300F0214C /* StringExtensionTests.swift */; };
 		2777275A22EB4C7700F0214C /* BraveShared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DE7688420B3456C00FF5533 /* BraveShared.framework */; };
-		2795274A21A890EB00921AA1 /* FingerprintingProtectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2795274921A890EB00921AA1 /* FingerprintingProtectionTests.swift */; };
 		2798E01D213EFC3F003EDBB1 /* FavoriteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2798E015213EFC3F003EDBB1 /* FavoriteTests.swift */; };
 		279C756B219DDE3B001CD1CB /* FingerprintingProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279C756A219DDE3B001CD1CB /* FingerprintingProtection.swift */; };
 		279C75C821A5B37D001CD1CB /* FingerprintingProtection.js in Resources */ = {isa = PBXBuildFile; fileRef = 279C75C021A5B37D001CD1CB /* FingerprintingProtection.js */; };
@@ -511,7 +510,6 @@
 		5E34781022D7A1D200B0D5F8 /* ResourceDownloadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E34780F22D7A1D200B0D5F8 /* ResourceDownloadManager.swift */; };
 		5E4845C022DE381200372022 /* WindowRenderHelper.js in Resources */ = {isa = PBXBuildFile; fileRef = 5E4845BF22DE381200372022 /* WindowRenderHelper.js */; };
 		5E4845C222DE3DF800372022 /* WindowRenderHelperScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E4845C122DE3DF800372022 /* WindowRenderHelperScript.swift */; };
-		5E9288CA22DF864C007BE7A6 /* TabSessionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E9288C922DF864C007BE7A6 /* TabSessionTests.swift */; };
 		5EAB745C230456F0006055F5 /* BookmarkValidation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EAB745B230456F0006055F5 /* BookmarkValidation.swift */; };
 		5EC594ED232C2C8F00922111 /* OnboardingWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EC594EC232C2C8F00922111 /* OnboardingWebViewController.swift */; };
 		5EC594EF232C68FC00922111 /* OnboardingAdsCountdownViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EC594EE232C68FC00922111 /* OnboardingAdsCountdownViewController.swift */; };
@@ -1201,7 +1199,6 @@
 		276E7A3B22F21DBE00939424 /* RewardsReporting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardsReporting.swift; sourceTree = "<group>"; };
 		2777273622EB43A100F0214C /* StringExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtensions.swift; sourceTree = "<group>"; };
 		2777273F22EB44B300F0214C /* StringExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtensionTests.swift; sourceTree = "<group>"; };
-		2795274921A890EB00921AA1 /* FingerprintingProtectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FingerprintingProtectionTests.swift; sourceTree = "<group>"; };
 		2798E015213EFC3F003EDBB1 /* FavoriteTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FavoriteTests.swift; sourceTree = "<group>"; };
 		279C756A219DDE3B001CD1CB /* FingerprintingProtection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FingerprintingProtection.swift; sourceTree = "<group>"; };
 		279C75C021A5B37D001CD1CB /* FingerprintingProtection.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = FingerprintingProtection.js; sourceTree = "<group>"; };
@@ -1734,7 +1731,6 @@
 		5E34780F22D7A1D200B0D5F8 /* ResourceDownloadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceDownloadManager.swift; sourceTree = "<group>"; };
 		5E4845BF22DE381200372022 /* WindowRenderHelper.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = WindowRenderHelper.js; sourceTree = "<group>"; };
 		5E4845C122DE3DF800372022 /* WindowRenderHelperScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowRenderHelperScript.swift; sourceTree = "<group>"; };
-		5E9288C922DF864C007BE7A6 /* TabSessionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabSessionTests.swift; sourceTree = "<group>"; };
 		5EAB745B230456F0006055F5 /* BookmarkValidation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkValidation.swift; sourceTree = "<group>"; };
 		5EB57D0122FDC0CB00A07325 /* FullscreenHelper.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = FullscreenHelper.js; sourceTree = "<group>"; };
 		5EC594EC232C2C8F00922111 /* OnboardingWebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingWebViewController.swift; sourceTree = "<group>"; };
@@ -3785,12 +3781,10 @@
 				F84B21D71A090F8100AAB793 /* Supporting Files */,
 				39236E711FCC600200A38F1B /* TabEventHandlerTests.swift */,
 				D8EFFA251FF702A8001D3A09 /* NavigationRouterTests.swift */,
-				2795274921A890EB00921AA1 /* FingerprintingProtectionTests.swift */,
 				0A4214E821A6EBCF006B8E39 /* SafeBrowsingTests.swift */,
 				59350AFA22612D95004D7445 /* DisplayTextFieldTest.swift */,
 				5953AAEE2226E9D800A92DE1 /* HttpCookieExtensionTest.swift */,
 				F939FBFD22A596B900D9CD3F /* U2FTests.swift */,
-				5E9288C922DF864C007BE7A6 /* TabSessionTests.swift */,
 				E61453BD1B750A1700C3F9D7 /* RollingFileLoggerTests.swift */,
 			);
 			path = ClientTests;
@@ -5256,9 +5250,7 @@
 				A83E5B1E1C1DAAAA0026D912 /* UIPasteboardExtensions.swift in Sources */,
 				AB1B097A21F2F00400E0DD51 /* FavoritesViewControllerTests.swift in Sources */,
 				0ADCD45F2319799F0078CC67 /* RollingFileLoggerTests.swift in Sources */,
-				2795274A21A890EB00921AA1 /* FingerprintingProtectionTests.swift in Sources */,
 				0BF42D4F1A7CD09600889E28 /* TestFavicons.swift in Sources */,
-				5E9288CA22DF864C007BE7A6 /* TabSessionTests.swift in Sources */,
 				0A4214E921A6EBCF006B8E39 /* SafeBrowsingTests.swift in Sources */,
 				7BBFEE741BB405D900A305AA /* TabManagerTests.swift in Sources */,
 				0A4BEFDE221F03C80005551A /* NetworkManagerTests.swift in Sources */,
