@@ -25,12 +25,8 @@ class OnboardingViewController: UIViewController, Themeable {
     }
     
     static func getUpdatedTheme() -> Theme {
-        let fallback = Theme.DefaultTheme.light.rawValue
-        if #available(iOS 13.0, *) {
-            let isDark = UITraitCollection.current.userInterfaceStyle == .dark
-            return Theme.from(id: isDark ? Theme.DefaultTheme.dark.rawValue : fallback)
-        }
-        return Theme.from(id: fallback)
+        let tabManager = (UIApplication.shared.delegate as? AppDelegate)?.browserViewController.tabManager
+        return Theme.of(tabManager?.selectedTab)
     }
     
     init(profile: Profile, rewards: BraveRewards?, theme: Theme) {
