@@ -42,7 +42,7 @@ public class PinningCertificateEvaluator: NSObject, URLSessionDelegate {
                     
                     try evaluate(serverTrust, forHost: host)
                     return completionHandler(.useCredential, URLCredential(trust: serverTrust))
-                } catch let error {
+                } catch {
                     log.error(error)
                     return completionHandler(.cancelAuthenticationChallenge, nil)
                 }

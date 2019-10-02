@@ -9,9 +9,16 @@ private let log = Logger.browserLogger
 
 extension URLSession {
     @discardableResult
-    public func request(_ url: URL, method: HTTPMethod = .get, parameters: [String: Any], encoding: ParameterEncoding = .query, _ completion: @escaping (Result<Any, Error>) -> Void) -> URLSessionDataTask! {
+    public func request(_ url: URL,
+                        method: HTTPMethod = .get,
+                        parameters: [String: Any],
+                        encoding: ParameterEncoding = .query,
+                        _ completion: @escaping (Result<Any, Error>) -> Void) -> URLSessionDataTask! {
         do {
-            let request = try buildRequest(url, method: method, parameters: parameters, encoding: encoding)
+            let request = try buildRequest(url,
+                                           method: method,
+                                           parameters: parameters,
+                                           encoding: encoding)
             
             let task = self.dataTask(with: request) { data, response, error in
                 if let error = error {
@@ -51,7 +58,11 @@ extension URLSession {
         case query
     }
     
-    private func buildRequest(_ url: URL, method: HTTPMethod, headers: [String: String] = [:], parameters: [String: Any], encoding: ParameterEncoding) throws -> URLRequest {
+    private func buildRequest(_ url: URL,
+                              method: HTTPMethod,
+                              headers: [String: String] = [:],
+                              parameters: [String: Any],
+                              encoding: ParameterEncoding) throws -> URLRequest {
         
         var request = URLRequest(url: url)
         request.httpMethod = method.rawValue
