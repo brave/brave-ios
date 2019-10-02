@@ -255,7 +255,8 @@ class BrowserViewController: UIViewController {
                 if Preferences.Rewards.myFirstAdShown.value { return }
                 Preferences.Rewards.myFirstAdShown.value = true
                 AdsViewController.displayFirstAd(on: self) { [weak self] url in
-                    self?.openInNewTab(url, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
+                    let request = URLRequest(url: url)
+                    self?.tabManager.addTabAndSelect(request, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
                 }
             }
         }
