@@ -390,6 +390,8 @@ extension URL {
         return nil
     }
     
+    // This is a helper function for determining wetherr the url is a Media URL
+    // as handled in Rewards lib.
     public var isMediaSiteURL: Bool {
         // Don't need to include Github as it does a page load instead of XHR load.
         guard let domain = self.baseDomain else {

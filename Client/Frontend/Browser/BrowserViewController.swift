@@ -1105,7 +1105,11 @@ class BrowserViewController: UIViewController {
             updateInContentHomePanel(url as URL)
         }
     }
+    
+    // This variable is used to keep track of current page. It is used to detect internal site navigation
+    // to report internal page load to Rewards lib
     var rewardsXHRLoadURL: URL?
+    
     /// Updates the URL bar security, text and button states.
     fileprivate func updateURLBar() {
         guard let tab = tabManager.selectedTab else { return }
