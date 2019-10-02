@@ -17,7 +17,7 @@ class DAUTests: XCTestCase {
     }
     
     // 7-7-07 at 12noon GMT
-    private let dau = DAU(date: Date(timeIntervalSince1970: 1183809600))
+    private let dau = DAU(date: Date(timeIntervalSince1970: 1183809600), bundleVersion: "1.13")
     
     func testChannelParam() {
         let releaseExpected = URLQueryItem(name: "channel", value: "stable")
@@ -32,10 +32,13 @@ class DAUTests: XCTestCase {
     
     func testVersionParam() {
         var expected = URLQueryItem(name: "version", value: "1.1.0")
-        XCTAssertEqual(dau.versionParam(for: "1.1"), expected)
+        
+        let dau1 = DAU(date: Date(timeIntervalSince1970: 1183809600), bundleVersion: "1.1")
+        XCTAssertEqual(dau1.versionParam, expected)
         
         expected = URLQueryItem(name: "version", value: "1.1.1")
-        XCTAssertEqual(dau.versionParam(for: "1.1.1"), expected)
+        let dau2 = DAU(date: Date(timeIntervalSince1970: 1183809600), bundleVersion: "1.1.1")
+        XCTAssertEqual(dau2.versionParam, expected)
     }
     
     func testShouldAppend0() {
@@ -118,7 +121,7 @@ class DAUTests: XCTestCase {
         XCTAssertNil(Preferences.DAU.weekOfInstallation.value)
         
         // Acting like a first launch so preferences are going to be set up
-        let dauFirstLaunch = DAU(date: date)
+        let dauFirstLaunch = DAU(date: date, bundleVersion: "1.13")
         let params = dauFirstLaunch.paramsAndPrefsSetup()
         
         // These preferences should be set only after a successful ping.
@@ -126,7 +129,7 @@ class DAUTests: XCTestCase {
         
         simulatePing(params: params)
         
-        let dauSecondLaunch = DAU(date: date)
+        let dauSecondLaunch = DAU(date: date, bundleVersion: "1.13")
         
         XCTAssertNotNil(Preferences.DAU.lastLaunchInfo.value)
         XCTAssertNotNil(Preferences.DAU.weekOfInstallation.value)
@@ -151,7 +154,7 @@ class DAUTests: XCTestCase {
     }
     
     func testNonDefaultWoiDefaultConstructor() {
-        let dauFirstLaunch = DAU()
+        let dauFirstLaunch = DAU(bundleVersion: "1.13")
         let params = dauFirstLaunch.paramsAndPrefsSetup()
         XCTAssertFalse(params!.queryParams.contains(URLQueryItem(name: "woi", value: DAU.defaultWoiDate)))
     }
@@ -163,7 +166,7 @@ class DAUTests: XCTestCase {
         XCTAssertNil(Preferences.DAU.weekOfInstallation.value)
         
         // Acting like a first launch so preferences are going to be set up
-        let dauFirstLaunch = DAU(date: date)
+        let dauFirstLaunch = DAU(date: date, bundleVersion: "1.13")
         let params = dauFirstLaunch.paramsAndPrefsSetup()
         
         simulatePing(params: params)
@@ -237,7 +240,7 @@ class DAUTests: XCTestCase {
     func testNoPingOnDevelopmentBuild() {
         XCTAssertTrue(AppConstants.BuildChannel == .developer)
         
-        let dau = DAU()
+        let dau = DAU(bundleVersion: "1.13")
         XCTAssertFalse(dau.sendPingToServer())
     }
     
@@ -266,7 +269,7 @@ class DAUTests: XCTestCase {
                                         firstPingPref: Bool = false, dateFormat: String? = nil) -> DAU.ParamsAndPrefs? {
         
         let date = dateFrom(string: dateString, format: dateFormat)
-        let dau = DAU(date: date)
+        let dau = DAU(date: date, bundleVersion: "1.13")
         let params = dau.paramsAndPrefsSetup()
         
         // All dau stats equal false means no ping is send to server

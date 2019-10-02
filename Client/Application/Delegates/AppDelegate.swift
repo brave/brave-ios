@@ -41,7 +41,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
     var authenticator: AppAuthenticator?
     
     /// Object used to handle server pings
-    let dau = DAU()
+    let dau = DAU(bundleVersion: AppInfo.appVersion)
 
     @discardableResult func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         //

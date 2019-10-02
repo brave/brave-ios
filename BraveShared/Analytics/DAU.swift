@@ -22,14 +22,16 @@ public class DAU {
     
     private var launchTimer: Timer?
     private let today: Date
+    private let bundleVersion: String
     /// Whether a current ping attempt is being made
     private var processingPing = false
     private var todayComponents: DateComponents {
         return DAU.calendar.dateComponents([.day, .month, .year, .weekday], from: today)
     }
     
-    public init(date: Date = Date()) {
+    public init(date: Date = Date(), bundleVersion: String) {
         today = date
+        self.bundleVersion = bundleVersion
     }
     
     /// Sends ping to server and returns a boolean whether a timer for the server call was scheduled.
@@ -110,7 +112,7 @@ public class DAU {
     /// Return params query or nil if no ping should be send to server and also preference values to set
     /// after a succesful ing.
     func paramsAndPrefsSetup() -> ParamsAndPrefs? {
-        var params = [channelParam(), versionParam()]
+        var params = [channelParam(), versionParam]
         
         let firstLaunch = Preferences.DAU.firstPingParam.value
         
@@ -149,8 +151,8 @@ public class DAU {
         return URLQueryItem(name: "channel", value: channel.isRelease ? "stable" : "beta")
     }
     
-    func versionParam(for version: String = AppInfo.appVersion) -> URLQueryItem {
-        var version = version
+    var versionParam: URLQueryItem {
+        var version = bundleVersion
         if DAU.shouldAppend0(toVersion: version) {
             version += ".0"
         }
