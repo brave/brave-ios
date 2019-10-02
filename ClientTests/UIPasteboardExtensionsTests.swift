@@ -12,7 +12,7 @@ class UIPasteboardExtensionsTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        pasteboard = UIPasteboard.withUniqueName()
+        pasteboard = UIPasteboard(name: UIPasteboard.Name(rawValue: "name"), create: true)
     }
 
     override func tearDown() {
