@@ -693,7 +693,7 @@ class BrowserViewController: UIViewController {
                 onboarding.onboardingDelegate = self
                 present(onboarding, animated: true)
                 
-                Preferences.General.basicOnboardingNextOnboardingPrompt.value = Date(timeIntervalSinceNow: BrowserViewController.onboardingDaysInterval * 24 * 60 * 60)
+                Preferences.General.basicOnboardingNextOnboardingPrompt.value = Date(timeIntervalSinceNow: BrowserViewController.onboardingDaysInterval)
             }
             
             return
@@ -701,7 +701,9 @@ class BrowserViewController: UIViewController {
         
         // 1. Rewards are on/off (existing user)
         // 2. User hasn't seen the rewards part of the onboarding yet.
-        if Preferences.General.basicOnboardingCompleted.value == OnboardingState.completed.rawValue && Preferences.General.basicOnboardingProgress.value == OnboardingProgress.searchEngine.rawValue {
+        if (Preferences.General.basicOnboardingCompleted.value == OnboardingState.completed.rawValue)
+            &&
+            (Preferences.General.basicOnboardingProgress.value == OnboardingProgress.searchEngine.rawValue) {
             
             guard let onboarding = OnboardingNavigationController(
                 profile: profile,
@@ -717,7 +719,11 @@ class BrowserViewController: UIViewController {
         // 1. Rewards are on/off (existing user)
         // 2. Ads are now available
         // 3. User hasn't seen the ads part of onboarding yet
-        if BraveAds.isSupportedRegion(Locale.current.identifier) && Preferences.General.basicOnboardingCompleted.value == OnboardingState.completed.rawValue && Preferences.General.basicOnboardingProgress.value != OnboardingProgress.ads.rawValue {
+        if BraveAds.isSupportedRegion(Locale.current.identifier)
+            &&
+            (Preferences.General.basicOnboardingCompleted.value == OnboardingState.completed.rawValue)
+            &&
+            (Preferences.General.basicOnboardingProgress.value != OnboardingProgress.ads.rawValue) {
             
             guard let onboarding = OnboardingNavigationController(
                 profile: profile,
@@ -3180,10 +3186,10 @@ extension BrowserViewController: OnboardingControllerDelegate {
     
     func onboardingSkipped(_ onboardingController: OnboardingNavigationController) {
         Preferences.General.basicOnboardingCompleted.value = OnboardingState.skipped.rawValue
-        Preferences.General.basicOnboardingNextOnboardingPrompt.value = Date(timeIntervalSinceNow: BrowserViewController.onboardingDaysInterval * 24 * 60 * 60)
+        Preferences.General.basicOnboardingNextOnboardingPrompt.value = Date(timeIntervalSinceNow: BrowserViewController.onboardingDaysInterval)
         onboardingController.dismiss(animated: true)
     }
     
     // 60 days until the next time the user sees the onboarding..
-    static let onboardingDaysInterval: Double = 60.0
+    static let onboardingDaysInterval = TimeInterval(60.days)
 }
