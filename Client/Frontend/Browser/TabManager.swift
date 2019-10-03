@@ -769,7 +769,7 @@ class TabManager: NSObject {
     fileprivate static var restoreOnceToken = false
     fileprivate func restoreTabsInternal() -> Tab? {
         assert(Thread.isMainThread)
-        guard !TabManager.restoreOnceToken else { return nil }
+        if TabManager.restoreOnceToken { return nil }
         
         TabManager.restoreOnceToken = true
         let savedTabs = TabMO.getAll()
