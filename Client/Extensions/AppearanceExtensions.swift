@@ -4,6 +4,7 @@
 
 import Foundation
 import BraveShared
+import BraveRewardsUI
 
 extension Theme {
     func applyAppearanceProperties() {
@@ -72,8 +73,13 @@ extension Theme {
             UIView.appearance().appearanceOverrideUserInterfaceStyle = isDark ? .dark : .light
         } else {
             // iOS 12 fixes, many styling items do not work properly in iOS 12
-            UILabel.appearance().appearanceTextColor = colors.tints.home
+            let views = [ShieldsViewController.self, SyncViewController.self,
+                         BrowserViewController.self, BasePasscodeViewController.self]
             
+            views.forEach {
+                UILabel.appearance(whenContainedInInstancesOf: [$0]).appearanceTextColor = colors.tints.home
+            }
+
             // iOS 12 does not allow in-line color overrides :/
             // These UI components are currently non-themed
             // AlertPopupView
@@ -88,7 +94,43 @@ extension Theme {
             UISwitch.appearance().tintColor = #colorLiteral(red: 0.8392156863, green: 0.8392156863, blue: 0.8431372549, alpha: 1)
         }
         
+        // Brave Rewards
+        lightThemeOverridesForRewards()
+        
         (UIApplication.shared.delegate as? AppDelegate)?.window?.backgroundColor = colors.home
+    }
+    
+    // No theming exists for Brave Rewards at the moment, for appearance override, a default light
+    // theme should be used.
+    private func lightThemeOverridesForRewards() {
+        let lightTheme = Theme.from(id: DefaultTheme.light.rawValue)
+        let rewards = RewardsPanelController.self
+        
+        UIWindow.appearance(whenContainedInInstancesOf: [rewards]).appearanceOverrideUserInterfaceStyle = .light
+        UIView.appearance(whenContainedInInstancesOf: [rewards]).appearanceOverrideUserInterfaceStyle = .light
+        
+        UIToolbar.appearance(whenContainedInInstancesOf: [rewards]).tintColor = lightTheme.colors.accent
+        UIToolbar.appearance(whenContainedInInstancesOf: [rewards]).backgroundColor = lightTheme.colors.footer
+        
+        UINavigationBar.appearance(whenContainedInInstancesOf: [rewards]).tintColor = lightTheme.colors.accent
+        UINavigationBar.appearance(whenContainedInInstancesOf: [rewards])
+            .appearanceBarTintColor = lightTheme.colors.header
+        
+        UITableView.appearance(whenContainedInInstancesOf: [rewards])
+            .appearanceBackgroundColor = lightTheme.colors.home
+        UITableView.appearance(whenContainedInInstancesOf: [rewards]).appearanceSeparatorColor =
+            lightTheme.colors.border.withAlphaComponent(colors.transparencies.borderAlpha)
+        
+        UITableViewCell.appearance(whenContainedInInstancesOf: [rewards]).tintColor = lightTheme.colors.accent
+        UITableViewCell.appearance(whenContainedInInstancesOf: [rewards])
+            .backgroundColor = lightTheme.colors.header
+        
+        // Order of views is important here, it reads from right to left.
+        // That means all labels inside of UITableView within Rewards popup use light theme text.
+        //
+        // This is not pefect as it overrides values used in Brave Rewards repo but most if not all cell text
+        // uses one color. This should be good enough until we move rewards-ui into this repo.
+        UILabel.appearance(whenContainedInInstancesOf: [UITableView.self, RewardsPanelController.self]).appearanceTextColor = lightTheme.colors.tints.home
     }
 }
 
