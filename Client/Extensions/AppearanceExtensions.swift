@@ -125,6 +125,9 @@ extension Theme {
         UITableViewCell.appearance(whenContainedInInstancesOf: [rewards])
             .backgroundColor = lightTheme.colors.header
         
+        UILabel.appearance(whenContainedInInstancesOf: [AdView.self, BrowserViewController.self])
+            .appearanceTextColor = lightTheme.colors.tints.home
+        
         // Order of views is important here, it reads from right to left.
         // That means all labels inside of UITableView within Rewards popup use light theme text.
         //
