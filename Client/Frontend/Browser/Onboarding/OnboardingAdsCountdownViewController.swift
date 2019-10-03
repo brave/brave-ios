@@ -86,8 +86,7 @@ extension OnboardingAdsCountdownViewController {
             return
         }
         
-        let tab = tabManager.addTab(PrivilegedRequest(url: url) as URLRequest, afterTab: tabManager.selectedTab, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
-        
-        tabManager.selectTab(tab)
+        let request = URLRequest(url: url)
+        tabManager.addTabAndSelect(request, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
     }
 }
