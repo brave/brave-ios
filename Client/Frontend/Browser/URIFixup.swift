@@ -11,7 +11,7 @@ class URIFixup {
         // Validate the domain to make sure it doesn't have any invalid characters
         // IE: quotes, etc..
         if let host = url.host {
-            guard let decodedASCIIURL = host.replacingOccurrences(of: "+", with: "").removingPercentEncoding else {
+            guard let decodedASCIIURL = host.removingPercentEncoding else {
                 return nil
             }
             
