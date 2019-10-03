@@ -40,20 +40,13 @@ class OnboardingRewardsAgreementViewController: OnboardingViewController {
         }
         
         loadingView.startAnimating()
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+        rewards?.ledger.createWallet { [weak self] error in
+            guard let self = self else { return }
+
             self.loadingView.stopAnimating()
             self.contentView.agreeButton.setTitleColor(titleColour, for: .normal)
             self.continueTapped()
         }
-        
-//        rewards?.ledger.createWallet { [weak self] error in
-//            guard let self = self else { return }
-//
-//            self.loadingView.stopAnimating()
-//            self.contentView.agreeButton.setTitleColor(titleColour, for: .normal)
-//            self.continueTapped()
-//        }
     }
     
     override func applyTheme(_ theme: Theme) {

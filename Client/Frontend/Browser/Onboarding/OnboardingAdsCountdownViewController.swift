@@ -44,14 +44,14 @@ class OnboardingAdsCountdownViewController: OnboardingViewController, UNUserNoti
         contentView.resetAnimation()
         contentView.animate(from: 0.0, to: 1.0, duration: 3.0) { [weak self] in
             guard let self = self else { return }
-            self.displayMyFirstAdIfAvailable {
-                self.skipTapped()
-            }
-            
-            //Do this because I have no idea if the ad shows or not..
-            //I only know if they tapped it..
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                self.contentView.setState(.adConfirmation)
+            self.displayMyFirstAdIfAvailable { action in
+                if action == .timedOut {
+                    //User possibly missed the ad.. show them confirmation screen.
+                    self.contentView.setState(.adConfirmation)
+                } else {
+                    //User saw the ad.. they interacted with it.. onboarding is finished.
+                    self.skipTapped()
+                }
             }
         }
     }
@@ -64,16 +64,19 @@ class OnboardingAdsCountdownViewController: OnboardingViewController, UNUserNoti
 
 extension OnboardingAdsCountdownViewController {
     
-    private func displayMyFirstAdIfAvailable(_ completion: (() -> Void)? = nil) {
+    private func displayMyFirstAdIfAvailable(_ completion: ((AdsNotificationHandler.Action) -> Void)? = nil) {
         if Preferences.Rewards.myFirstAdShown.value { return }
 
         if BraveAds.isSupportedRegion(Locale.current.identifier) {
             DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                 if Preferences.Rewards.myFirstAdShown.value { return }
                 Preferences.Rewards.myFirstAdShown.value = true
-                AdsViewController.displayFirstAd(on: self) { [weak self] url in
-                    self?.openURL(url: url)
-                    completion?()
+                AdsViewController.displayFirstAd(on: self) { [weak self] action, url  in
+                    if action == .opened {
+                        self?.openURL(url: url)
+                    }
+                    
+                    completion?(action)
                 }
             }
         }
