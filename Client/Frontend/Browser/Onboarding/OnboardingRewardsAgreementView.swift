@@ -58,6 +58,7 @@ extension OnboardingRewardsAgreementViewController {
             $0.setImage(#imageLiteral(resourceName: "checkbox_off"), for: .normal)
             $0.setImage(#imageLiteral(resourceName: "checkbox_on"), for: .selected)
             $0.setImage(#imageLiteral(resourceName: "checkbox_on"), for: .highlighted)
+            $0.contentEdgeInsets = UIEdgeInsets(equalInset: 22.0)
             $0.adjustsImageWhenHighlighted = true
             
             $0.contentMode = .scaleAspectFit

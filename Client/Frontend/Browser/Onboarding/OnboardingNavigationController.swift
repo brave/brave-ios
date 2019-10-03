@@ -51,7 +51,7 @@ class OnboardingNavigationController: UINavigationController {
             #if NO_REWARDS
             switch self {
             case .newUser: return [.searchEnginePicker, .shieldsInfo]
-            case .existingUser: return []
+            case .existingUserRewardsOff, .existingUserRewardsOn: return []
             }
             #else
             switch self {
@@ -218,7 +218,6 @@ class CustomAnimator: NSObject, UIViewControllerAnimatedTransitioning {
         //Setup
         fromView.frame = container.bounds
         toView.frame = container.bounds
-        //isPresenting ? container.addSubview(toView) : container.insertSubview(toView, belowSubview: fromView)
         container.addSubview(toView)
         fromView.layoutIfNeeded()
         toView.layoutIfNeeded()
@@ -241,8 +240,6 @@ class CustomAnimator: NSObject, UIViewControllerAnimatedTransitioning {
         tBackground?.alpha = 0.0
         tDetails?.alpha = 0.0
         tDetailsContent?.alpha = 0.0
-        
-        //guard let tDetailsFrame = tDetails?.superview?.convert(tDetails?.frame ?? .zero, to: container) else { return }
         
         let inset = UIApplication.shared.keyWindow?.safeAreaInsets.bottom ?? 0.0
         var fDetailsFrame = (fDetails?.bounds ?? .zero)
