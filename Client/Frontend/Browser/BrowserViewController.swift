@@ -255,9 +255,10 @@ class BrowserViewController: UIViewController {
             DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                 if Preferences.Rewards.myFirstAdShown.value { return }
                 Preferences.Rewards.myFirstAdShown.value = true
-                AdsViewController.displayFirstAd(on: self) { [weak self] action, url in
+                 AdsViewController.displayFirstAd(on: self) { [weak self] action, url in
                     if action == .opened {
-                        self?.openInNewTab(url, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
+                        let request = URLRequest(url: url)
+                        self?.tabManager.addTabAndSelect(request, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
                     }
                 }
             }

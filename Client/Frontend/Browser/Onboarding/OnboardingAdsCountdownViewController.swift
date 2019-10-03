@@ -56,9 +56,7 @@ class OnboardingAdsCountdownViewController: OnboardingViewController, UNUserNoti
     }
     
     override func continueTapped() {
-        Preferences.Rewards.myFirstAdShown.value = true
         Preferences.General.basicOnboardingProgress.value = OnboardingProgress.ads.rawValue
-            
         super.continueTapped()
     }
     
@@ -71,10 +69,8 @@ class OnboardingAdsCountdownViewController: OnboardingViewController, UNUserNoti
 extension OnboardingAdsCountdownViewController {
     
     private func displayMyFirstAdIfAvailable(_ completion: ((AdsNotificationHandler.Action) -> Void)? = nil) {
-        if Preferences.Rewards.myFirstAdShown.value { return }
-
         if BraveAds.isSupportedRegion(Locale.current.identifier) {
-            if Preferences.Rewards.myFirstAdShown.value { return }
+            Preferences.Rewards.myFirstAdShown.value = true
             AdsViewController.displayFirstAd(on: self) { [weak self] action, url  in
                 if action == .opened {
                     self?.openURL(url: url)
