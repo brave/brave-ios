@@ -15,6 +15,7 @@ extension OnboardingRewardsAgreementViewController {
         static let descriptionContentInset: CGFloat = 32
         static let linkColor: UIColor = BraveUX.BraveOrange
         static let animationContentInset: CGFloat = 50.0
+        static let checkboxInsets: CGFloat = -44.0
     }
     
     class View: UIView {
@@ -58,7 +59,6 @@ extension OnboardingRewardsAgreementViewController {
             $0.setImage(#imageLiteral(resourceName: "checkbox_off"), for: .normal)
             $0.setImage(#imageLiteral(resourceName: "checkbox_on"), for: .selected)
             $0.setImage(#imageLiteral(resourceName: "checkbox_on"), for: .highlighted)
-            $0.contentEdgeInsets = UIEdgeInsets(equalInset: 22.0)
             $0.adjustsImageWhenHighlighted = true
             
             $0.contentMode = .scaleAspectFit
@@ -201,6 +201,23 @@ extension OnboardingRewardsAgreementViewController {
             
             agreeButton.backgroundColor = button.isSelected ? BraveUX.BraveOrange : BraveUX.BraveOrange.withAlphaComponent(0.7)
             agreeButton.isEnabled = button.isSelected
+        }
+        
+        override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+            if !descriptionCheckbox.isHidden &&
+                descriptionCheckbox.isUserInteractionEnabled &&
+                descriptionCheckbox.alpha >= 0.01,
+                let frame = descriptionCheckbox.superview?.convert(
+                    descriptionCheckbox.frame,
+                    to: self
+                ) {
+                
+                if frame.inset(by: UIEdgeInsets(equalInset: UX.checkboxInsets)).contains(point) {
+                    return descriptionCheckbox
+                }
+            }
+            
+            return super.hitTest(point, with: event)
         }
     }
 }
