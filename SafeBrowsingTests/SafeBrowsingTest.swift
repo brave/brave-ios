@@ -23,126 +23,70 @@ class SafeBrowsingTest: XCTestCase {
     func testCanonicalizeURL() {
         let expectedCanonicalURLs = [
             "https://testsafebrowsing.appspot.com/s/phishing.html": "https://testsafebrowsing.appspot.com/s/phishing.html",
-            
             "https://testsafebrowsing.appspot.com/s/malware.html": "https://testsafebrowsing.appspot.com/s/malware.html",
-            
             "https://testsafebrowsing.appspot.com/s/malware_in_iframe.html": "https://testsafebrowsing.appspot.com/s/malware_in_iframe.html",
-            
             "https://testsafebrowsing.appspot.com/s/unwanted.html": "https://testsafebrowsing.appspot.com/s/unwanted.html",
-            
             "https://testsafebrowsing.appspot.com/s/image_small.html": "https://testsafebrowsing.appspot.com/s/image_small.html",
-            
             "https://testsafebrowsing.appspot.com/s/image_medium.html": "https://testsafebrowsing.appspot.com/s/image_medium.html",
-            
             "https://testsafebrowsing.appspot.com/s/image_large.html": "https://testsafebrowsing.appspot.com/s/image_large.html",
-            
             "https://testsafebrowsing.appspot.com/s/bad_css.html": "https://testsafebrowsing.appspot.com/s/bad_css.html",
-            
             "https://testsafebrowsing.appspot.com/s/bad_javascript.html": "https://testsafebrowsing.appspot.com/s/bad_javascript.html",
-            
             "https://testsafebrowsing.appspot.com/s/trick_to_bill.html": "https://testsafebrowsing.appspot.com/s/trick_to_bill.html",
-            
             "https://testsafebrowsing.appspot.com/s/content.exe": "https://testsafebrowsing.appspot.com/s/content.exe",
-            
             "https://testsafebrowsing.appspot.com/s/badrep.exe": "https://testsafebrowsing.appspot.com/s/badrep.exe",
-            
             "https://testsafebrowsing.appspot.com/s/unknown.exe": "https://testsafebrowsing.appspot.com/s/unknown.exe",
-            
             "https://testsafebrowsing.appspot.com/s/pua.exe": "https://testsafebrowsing.appspot.com/s/pua.exe",
-            
             "https://testsafebrowsing.appspot.com/apiv4/IOS/MALWARE/URL/": "https://testsafebrowsing.appspot.com/apiv4/IOS/MALWARE/URL/",
-            
             "https://testsafebrowsing.appspot.com/apiv4/IOS/SOCIAL_ENGINEERING/URL/": "https://testsafebrowsing.appspot.com/apiv4/IOS/SOCIAL_ENGINEERING/URL/",
-            
             "https://testsafebrowsing.appspot.com/apiv4/OSX/MALWARE/URL/": "https://testsafebrowsing.appspot.com/apiv4/OSX/MALWARE/URL/",
-            
             "https://testsafebrowsing.appspot.com/apiv4/OSX/SOCIAL_ENGINEERING/URL/": "https://testsafebrowsing.appspot.com/apiv4/OSX/SOCIAL_ENGINEERING/URL/",
-            
             "https://testsafebrowsing.appspot.com/s/notif_pageload.html": "https://testsafebrowsing.appspot.com/s/notif_pageload.html",
-            
             "https://testsafebrowsing.appspot.com/s/geoloc_click.html": "https://testsafebrowsing.appspot.com/s/geoloc_click.html",
-            
             "https://testsafebrowsing.appspot.com/s/notif_geoloc_delay.html": "https://testsafebrowsing.appspot.com/s/notif_geoloc_delay.html",
-            
             "https://testsafebrowsing.appspot.com/s/media_batch.html": "https://testsafebrowsing.appspot.com/s/media_batch.html",
-            
             "https://testsafebrowsing.appspot.com/s/midi_click.html": "https://testsafebrowsing.appspot.com/s/midi_click.html",
-            
             "https://testsafebrowsing.appspot.com/s/bad_login.html": "https://testsafebrowsing.appspot.com/s/bad_login.html",
-            
             "https://testsafebrowsing.appspot.com/s/low_rep_login.html": "https://testsafebrowsing.appspot.com/s/low_rep_login.html",
             
             "http://host/%25%32%35": "http://host/%25",
-            
             "http://host/%25%32%35%25%32%35": "http://host/%25%25",
-            
             "http://host/%2525252525252525": "http://host/%25",
-            
             "http://host/asdf%25%32%35asd": "http://host/asdf%25asd",
-            
             "http://host/%%%25%32%35asd%%": "http://host/%25%25%25asd%25%25",
-            
             "http://www.google.com/": "http://www.google.com/",
-            
             "http://%31%36%38%2e%31%38%38%2e%39%39%2e%32%36/%2E%73%65%63%75%72%65/%77%77%77%2E%65%62%61%79%2E%63%6F%6D/": "http://168.188.99.26/.secure/www.ebay.com/",
-            
             "http://195.127.0.11/uploads/%20%20%20%20/.verify/.eBaysecure=updateuserdataxplimnbqmn-xplmvalidateinfoswqpcmlx=hgplmcx/": "http://195.127.0.11/uploads/%20%20%20%20/.verify/.eBaysecure=updateuserdataxplimnbqmn-xplmvalidateinfoswqpcmlx=hgplmcx/",
-            
-            "http://host%23.com/%257Ea%2521b%2540c%2523d%2524e%25f%255E00%252611%252A22%252833%252944_55%252B": "http://host%23.com/~a!b@c%23d$e%25f^00&11*22(33)44_55+",
-        
+            "http://host%23.com/%257Ea%2521b%2540c%2523d%2524e%25f%255E00%252611%252A22%252833%252944_55%252B": "http://host%23.com/~a!b@c%23d$e%25f^00&11*22(33: ",
             "http://3279880203/blah": "http://195.127.0.11/blah",
-            
             "http://www.google.com/blah/..": "http://www.google.com/",
-            
             "www.google.com/": "http://www.google.com/",
-            
             "www.google.com": "http://www.google.com/",
-            
             "http://www.evil.com/blah#frag": "http://www.evil.com/blah",
-            
             "http://www.GOOgle.com/": "http://www.google.com/",
-            
             "http://www.google.com.../": "http://www.google.com/",
-            
             "http://www.google.com/foo\tbar\rbaz\n2": "http://www.google.com/foobarbaz2",
-            
-            "http://www.google.com/q?": "http://www.google.com/q",
-            
-            "http://www.google.com/q?r?": "http://www.google.com/q",
-            
-            "http://www.google.com/q?r?s": "http://www.google.com/q",
-            
+            "http://www.google.com/q?": "http://www.google.com/q?",
+            "http://www.google.com/q?r?": "http://www.google.com/q?r?",
+            "http://www.google.com/q?r?s": "http://www.google.com/q?r?s",
             "http://evil.com/foo#bar#baz": "http://evil.com/foo",
-            
             "http://evil.com/foo;": "http://evil.com/foo;",
-            
-            "http://evil.com/foo?bar;": "http://evil.com/foo",
-            
+            "http://evil.com/foo?bar;": "http://evil.com/foo?bar;",
             "http://\u{01}\u{80}.com/": "http://%01%80.com/",
-            
             "http://notrailingslash.com": "http://notrailingslash.com/",
-            
             "http://www.gotaport.com:1234/": "http://www.gotaport.com/",
-            
             "  http://www.google.com/  ": "http://www.google.com/",
-            
             "http:// leadingspace.com/": "http://%20leadingspace.com/",
-            
             "http://%20leadingspace.com/": "http://%20leadingspace.com/",
-            
             "%20leadingspace.com/": "http://%20leadingspace.com/",
-            
             "https://www.securesite.com/": "https://www.securesite.com/",
-            
             "http://host.com/ab%23cd": "http://host.com/ab%23cd",
-            
-            "http://host.com//twoslashes?more//slashes": "http://host.com/twoslashes"
+            "http://host.com//twoslashes?more//slashes": "http://host.com/twoslashes?more//slashes"
         ]
         
         for (key, value) in expectedCanonicalURLs {
             if let url = URL(string: key), let expectedURL = URL(string: value) {
-                if url.absoluteString != expectedURL.absoluteString {
-                    XCTFail("Failed to canonicalize URL: \(key) -- Result: \(url.absoluteString) -- Expected: \(expectedURL.absoluteString)")
+                if url.canonicalize().absoluteString != expectedURL.absoluteString {
+                    XCTFail("Failed to canonicalize URL: \(key) -- Result: \(url.canonicalize().absoluteString) -- Expected: \(expectedURL.absoluteString)")
                 }
             }
         }

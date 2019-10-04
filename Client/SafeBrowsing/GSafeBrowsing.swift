@@ -283,6 +283,11 @@ class SafeBrowsingClient {
 extension URL {
     func canonicalize() -> URL {
         var absoluteString = self.absoluteString
+        
+        if !absoluteString.contains("://") {
+            absoluteString = "http://\(absoluteString)"
+        }
+        
         absoluteString = absoluteString.replacingOccurrences(of: "\t", with: "")
         absoluteString = absoluteString.replacingOccurrences(of: "\r", with: "")
         absoluteString = absoluteString.replacingOccurrences(of: "\n", with: "")
@@ -326,6 +331,10 @@ extension URL {
         
         if components.path.isEmpty {
             components.path = "/"
+        }
+        
+        if absoluteString.hasSuffix("/") && !components.path.hasSuffix("/") {
+            components.path += "/"
         }
         
         components.fragment = nil
