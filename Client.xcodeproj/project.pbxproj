@@ -736,7 +736,6 @@
 		5EB57CBF22FC77F200A07325 /* GSafeBrowsingModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EB57CBE22FC77F200A07325 /* GSafeBrowsingModels.swift */; };
 		5EB57CC822FC793100A07325 /* GSafeBrowsingDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EB57CC722FC793100A07325 /* GSafeBrowsingDatabase.swift */; };
 		5EB57CCC22FC7BD000A07325 /* SafeBrowsing.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 5EB57CCA22FC7BD000A07325 /* SafeBrowsing.xcdatamodeld */; };
-		744B0FFE1B4F172E00100422 /* ToolbarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 744B0FFD1B4F172E00100422 /* ToolbarTests.swift */; };
 		744ED5611DBFEB8D00A2B5BE /* MailtoLinkHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 744ED5601DBFEB8D00A2B5BE /* MailtoLinkHandler.swift */; };
 		7479B4EF1C5306A200DF000B /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7479B4ED1C5306A200DF000B /* Reachability.swift */; };
 		74821FFE1DB6D3AC00EEEA72 /* MailSchemes.plist in Resources */ = {isa = PBXBuildFile; fileRef = 74821FFD1DB6D3AC00EEEA72 /* MailSchemes.plist */; };
