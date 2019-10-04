@@ -72,6 +72,9 @@
                <Test
                   Identifier = "NavigationRouterTests/testNavigationPathInPrivateBrowsingOnlyMode()">
                </Test>
+               <Test
+                  Identifier = "SafeBrowsingTest/testCanonicalizeURL()">
+               </Test>
             </SkippedTests>
          </TestableReference>
          <TestableReference
