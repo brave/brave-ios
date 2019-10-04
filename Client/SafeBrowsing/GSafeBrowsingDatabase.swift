@@ -430,7 +430,7 @@ class SafeBrowsingDatabase {
     }
     
     private func calculateBackoffTime(_ numberOfRetries: Int16) -> Double {
-        let minutes = Double(1 << Int(numberOfRetries - 1)) * (15.0 * (Double.random(in: 0...1) + 1))
+        let minutes = Double(1 << Int(numberOfRetries)) * (15.0 * (Double.random(in: 0..<1) + 1))
         return min(minutes, 24 * 60) * 60
     }
     
