@@ -15,7 +15,6 @@
 		0A0D3D5021A5609600BEE65B /* SafeBrowsingError.html in Resources */ = {isa = PBXBuildFile; fileRef = 0A0D3D4821A5609500BEE65B /* SafeBrowsingError.html */; };
 		0A0D3D5221A565C300BEE65B /* SafeBrowsingHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A0D3D5121A565C300BEE65B /* SafeBrowsingHandler.swift */; };
 		0A0D3D6121A596BE00BEE65B /* MalwareList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A0D3D6021A596BE00BEE65B /* MalwareList.swift */; };
-		0A19361823476ABD002E2B81 /* BraveRewards.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 27A6926D2346E5DB00DC0353 /* BraveRewards.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		0A1E842D21909CA70042F782 /* crypto.js in Resources */ = {isa = PBXBuildFile; fileRef = 0A1E842C21909CA70042F782 /* crypto.js */; };
 		0A1E842F21909CBC0042F782 /* bundle.js in Resources */ = {isa = PBXBuildFile; fileRef = 0A1E842E21909CBB0042F782 /* bundle.js */; };
 		0A1E843121909CC40042F782 /* fetch.js in Resources */ = {isa = PBXBuildFile; fileRef = 0A1E843021909CC30042F782 /* fetch.js */; };
@@ -1091,7 +1090,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				0A19361823476ABD002E2B81 /* BraveRewards.framework in Copy Frameworks */,
 				5D1DC52920AC9AFB00905E5A /* Data.framework in Copy Frameworks */,
 				E60138661C89EB7D00DF9756 /* Storage.framework in Copy Frameworks */,
 				5DE7689A20B3456E00FF5533 /* BraveShared.framework in Copy Frameworks */,
@@ -5142,6 +5140,7 @@
 				"$(SRCROOT)/Carthage/Build/iOS/Static.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/OnePasswordExtension.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/Lottie.framework",
+				"$(SRCROOT)/BraveRewards/BraveRewards.framework",
 			);
 			name = "Copy Carthage Dependencies";
 			outputPaths = (
