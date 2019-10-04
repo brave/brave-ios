@@ -3,6 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import UIKit
+import Shared
+import BraveShared
 
 class SettingsTipsSectionView: SettingsSectionView {
   
@@ -46,13 +48,13 @@ class SettingsTipsSectionView: SettingsSectionView {
   }
   
   private let titleLabel = UILabel().then {
-    $0.text = RewardsStrings.SettingsTipsTitle
+    $0.text = Strings.SettingsTipsTitle
     $0.textColor = RewardsBraveUX.tipsTintColor
     $0.font = RewardsSettingsUX.titleFont
   }
   
   private let bodyLabel = UILabel().then {
-    $0.text = RewardsStrings.SettingsTipsBody
+    $0.text = Strings.SettingsTipsBody
     $0.textColor = RewardsSettingsUX.bodyTextColor
     $0.numberOfLines = 0
     $0.font = RewardsSettingsUX.bodyFont

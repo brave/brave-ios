@@ -3,6 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import UIKit
+import Shared
+import BraveShared
 
 class CreateWalletButton: ActionButton {
   
@@ -10,7 +12,7 @@ class CreateWalletButton: ActionButton {
     didSet {
       isLoading = isCreatingWallet
       if isCreatingWallet {
-        setTitle(RewardsStrings.CreatingWallet.uppercased(), for: .normal)
+        setTitle(Strings.CreatingWallet.uppercased(), for: .normal)
         // Make the load start when the new title label is in place (since its animated)
       } else {
         setTitle(titleText, for: .normal)

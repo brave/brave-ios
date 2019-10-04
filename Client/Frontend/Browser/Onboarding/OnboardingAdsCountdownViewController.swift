@@ -4,7 +4,6 @@
 
 import Foundation
 import BraveRewards
-import BraveRewardsUI
 import BraveShared
 
 class OnboardingAdsCountdownViewController: OnboardingViewController, UNUserNotificationCenterDelegate {

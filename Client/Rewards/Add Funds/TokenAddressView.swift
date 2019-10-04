@@ -4,6 +4,8 @@
 
 import UIKit
 import CoreImage
+import Shared
+import BraveShared
 
 class TokenAddressView: UIView {
   
@@ -105,7 +107,7 @@ class TokenAddressView: UIView {
       }),
       .customSpace(15.0),
       .view(UILabel().then {
-        $0.text = RewardsStrings.AddFundsTokenWalletAddress
+        $0.text = Strings.AddFundsTokenWalletAddress
         $0.font = .systemFont(ofSize: 12.0, weight: .medium)
         $0.textColor = RewardsPalette.grey100
       }),
@@ -137,7 +139,7 @@ extension TokenAddressView {
       $0.layer.magnificationFilter = .nearest
     }
     let qrCodeButton = ActionButton(type: .system).then {
-      $0.setTitle(RewardsStrings.AddFundsShowQRCode, for: .normal)
+      $0.setTitle(Strings.AddFundsShowQRCode, for: .normal)
       $0.contentEdgeInsets = UIEdgeInsets(top: 0, left: 15.0, bottom: 0, right: 15.0)
       $0.backgroundColor = RewardsPalette.blurple400
       $0.layer.borderWidth = 0

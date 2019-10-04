@@ -4,6 +4,8 @@
 
 import UIKit
 import BraveRewards
+import Shared
+import BraveShared
 
 class GrantsListViewController: UIViewController {
   
@@ -31,7 +33,7 @@ class GrantsListViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     
-    title = RewardsStrings.Grants
+    title = Strings.Grants
     
     if let grants = ledger.walletInfo?.grants, !grants.isEmpty {
       grants.forEach {

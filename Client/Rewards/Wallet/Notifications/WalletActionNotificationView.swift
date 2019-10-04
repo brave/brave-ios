@@ -3,6 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import UIKit
+import Shared
+import BraveShared
 
 struct WalletActionNotification {
   struct Category {
@@ -12,26 +14,26 @@ struct WalletActionNotification {
     
     static let grant = Category(
       icon: UIImage(imageLiteralResourceName: "icn-grant"),
-      title: RewardsStrings.NotificationTokenGrantTitle,
-      action: RewardsStrings.CLAIM.uppercased()
+      title: Strings.NotificationTokenGrantTitle,
+      action: Strings.CLAIM.uppercased()
     )
     
     static let tipsProcessed = Category(
       icon: UIImage(imageLiteralResourceName: "icn-contribute"),
-      title: RewardsStrings.NotificationRecurringTipTitle,
-      action: RewardsStrings.OK.uppercased()
+      title: Strings.NotificationRecurringTipTitle,
+      action: Strings.OK.uppercased()
     )
     
     static let contribute = Category(
       icon: UIImage(imageLiteralResourceName: "icn-contribute"),
-      title: RewardsStrings.NotificationAutoContributeTitle,
-      action: RewardsStrings.OK.uppercased()
+      title: Strings.NotificationAutoContributeTitle,
+      action: Strings.OK.uppercased()
     )
     
     static let verifiedPublisher = Category(
       icon: UIImage(imageLiteralResourceName: "icn-contribute"),
-      title: RewardsStrings.NotificationPendingContributionTitle,
-      action: RewardsStrings.OK.uppercased()
+      title: Strings.NotificationPendingContributionTitle,
+      action: Strings.OK.uppercased()
     )
   }
   

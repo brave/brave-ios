@@ -3,6 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import UIKit
+import Shared
+import BraveShared
 
 class SettingsAdSectionView: SettingsSectionView {
   
@@ -45,9 +47,9 @@ class SettingsAdSectionView: SettingsSectionView {
       case .supported:
         return nil
       case .unsupportedRegion:
-        return RewardsStrings.AdsUnsupportedRegion
+        return Strings.AdsUnsupportedRegion
       case .unsupportedDevice:
-        return RewardsStrings.AdsUnsupportedDevice
+        return Strings.AdsUnsupportedDevice
       }
     }
   }
@@ -118,13 +120,13 @@ class SettingsAdSectionView: SettingsSectionView {
   }
   
   private let titleLabel = UILabel().then {
-    $0.text = RewardsStrings.SettingsAdsTitle
+    $0.text = Strings.SettingsAdsTitle
     $0.textColor = RewardsBraveUX.adsTintColor
     $0.font = RewardsSettingsUX.titleFont
   }
 
   private let bodyLabel = UILabel().then {
-    $0.text = RewardsStrings.SettingsAdsBody
+    $0.text = Strings.SettingsAdsBody
     $0.textColor = RewardsSettingsUX.bodyTextColor
     $0.numberOfLines = 0
     $0.font = RewardsSettingsUX.bodyFont

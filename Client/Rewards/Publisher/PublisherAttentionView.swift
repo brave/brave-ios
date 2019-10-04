@@ -3,12 +3,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import UIKit
+import Shared
+import BraveShared
 
 class PublisherAttentionView: UIView {
   
   let titleLabel = UILabel().then {
     $0.textColor = RewardsPalette.grey000
-    $0.text = RewardsStrings.Attention
+    $0.text = Strings.Attention
     $0.font = .systemFont(ofSize: 14.0)
   }
   /// Either "X%" or "–"

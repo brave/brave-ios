@@ -4,6 +4,8 @@
 
 import UIKit
 import BraveRewards
+import Shared
+import BraveShared
 
 class RewardsSettingsViewController: UIViewController {
   
@@ -34,7 +36,7 @@ class RewardsSettingsViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     
-    title = RewardsStrings.SettingsTitle
+    title = Strings.SettingsTitle
     
     navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(tappedDone))
     

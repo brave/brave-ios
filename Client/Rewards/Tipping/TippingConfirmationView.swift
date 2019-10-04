@@ -3,6 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import UIKit
+import Shared
+import BraveShared
 
 class TippingConfirmationView: UIView {
   struct UX {
@@ -27,7 +29,7 @@ class TippingConfirmationView: UIView {
   }
   
   let titleLabel = UILabel().then {
-    $0.text = RewardsStrings.TippingConfirmation
+    $0.text = Strings.TippingConfirmation
     $0.textColor = UX.confirmationTextColor
     $0.font = .systemFont(ofSize: 28.0, weight: .bold)
     $0.textAlignment = .center

@@ -3,6 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import UIKit
+import Shared
+import BraveShared
 
 class TippingOption: NSObject {
   var value: BATValue
@@ -104,7 +106,7 @@ class TippingSelectionView: UIView {
   private let titleLabel = UILabel().then {
     $0.textColor = .white
     $0.font = .systemFont(ofSize: 18.0, weight: .bold)
-    $0.text = RewardsStrings.TippingAmountTitle
+    $0.text = Strings.TippingAmountTitle
   }
   
   private let walletBalanceView = WalletBalanceView()
@@ -115,7 +117,7 @@ class TippingSelectionView: UIView {
   }
   
   private let monthlyToggleButton = Button(type: .system).then {
-    $0.setTitle(RewardsStrings.TippingMakeMonthly, for: .normal)
+    $0.setTitle(Strings.TippingMakeMonthly, for: .normal)
     $0.setImage(UIImage(imageLiteralResourceName: "checkbox"), for: .normal)
     $0.imageEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 10)
     $0.titleEdgeInsets = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 0)
@@ -212,7 +214,7 @@ extension TippingSelectionView {
     let titleLabel = UILabel().then {
       $0.textColor = RewardsPalette.blurple700
       $0.font = .systemFont(ofSize: 12.0)
-      $0.text = RewardsStrings.TippingWalletBalanceTitle
+      $0.text = Strings.TippingWalletBalanceTitle
     }
     let valueLabel = UILabel().then {
       $0.textColor = .white

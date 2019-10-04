@@ -4,6 +4,8 @@
 
 import UIKit
 import BraveRewards
+import Shared
+import BraveShared
 
 class AutoContributeSettingsViewController: UIViewController {
   
@@ -107,7 +109,7 @@ extension AutoContributeSettingsViewController: UITableViewDelegate, UITableView
         self.navigationController?.popViewController(animated: true)
       }
       
-      controller.title = RewardsStrings.AutoContributeMonthlyPaymentTitle
+      controller.title = Strings.AutoContributeMonthlyPaymentTitle
       navigationController?.pushViewController(controller, animated: true)
     case .minimumLength:
       let choices = BraveLedger.MinimumVisitDurationOptions.allCases.map { $0.rawValue }
@@ -121,7 +123,7 @@ extension AutoContributeSettingsViewController: UITableViewDelegate, UITableView
           }
           self.navigationController?.popViewController(animated: true)
       }
-      controller.title = RewardsStrings.AutoContributeMinimumLength
+      controller.title = Strings.AutoContributeMinimumLength
       navigationController?.pushViewController(controller, animated: true)
     case .minimumVisits:
       let choices = BraveLedger.MinimumVisitsOptions.allCases.map { $0.rawValue }
@@ -135,7 +137,7 @@ extension AutoContributeSettingsViewController: UITableViewDelegate, UITableView
           }
           self.navigationController?.popViewController(animated: true)
       }
-      controller.title = RewardsStrings.AutoContributeMinimumVisits
+      controller.title = Strings.AutoContributeMinimumVisits
       navigationController?.pushViewController(controller, animated: true)
     default:
       break
@@ -158,22 +160,22 @@ extension AutoContributeSettingsViewController: UITableViewDelegate, UITableView
     cell.accessoryType = row.accessoryType
     switch row {
     case .monthlyPayment:
-      cell.label.text = RewardsStrings.AutoContributeMonthlyPayment
+      cell.label.text = Strings.AutoContributeMonthlyPayment
       if let dollarAmount = ledger.dollarStringForBATAmount(ledger.contributionAmount) {
         cell.accessoryLabel?.text = "\(ledger.contributionAmount) BAT (\(dollarAmount))"
       }
     case .minimumLength:
-      cell.label.text = RewardsStrings.AutoContributeMinimumLengthMessage
+      cell.label.text = Strings.AutoContributeMinimumLengthMessage
       cell.accessoryLabel?.text = BraveLedger.MinimumVisitDurationOptions(rawValue: ledger.minimumVisitDuration)?.displayString
     case .minimumVisits:
-      cell.label.text = RewardsStrings.AutoContributeMinimumVisitsMessage
+      cell.label.text = Strings.AutoContributeMinimumVisitsMessage
       cell.accessoryLabel?.text = BraveLedger.MinimumVisitsOptions(rawValue: ledger.minimumNumberOfVisits)?.displayString
     case .allowUnverifiedContributions:
-      cell.label.text = RewardsStrings.AutoContributeToUnverifiedSites
+      cell.label.text = Strings.AutoContributeToUnverifiedSites
       cell.accessoryView = contentView.allowUnverifiedContributionsSwitch
       cell.selectionStyle = .none
     case .allowVideoContributions:
-      cell.label.text = RewardsStrings.AutoContributeToVideos
+      cell.label.text = Strings.AutoContributeToVideos
       cell.accessoryView = contentView.allowVideoContributionsSwitch
       cell.selectionStyle = .none
     }

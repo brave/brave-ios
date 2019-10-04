@@ -3,6 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import UIKit
+import Shared
+import BraveShared
 
 class TipsSummaryTableCell: UITableViewCell, TableViewReusable {
   
@@ -26,7 +28,7 @@ class TipsSummaryTableCell: UITableViewCell, TableViewReusable {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     
     let totalTipsThisMonthLabel = UILabel().then {
-      $0.text = RewardsStrings.TipsTotalThisMonth
+      $0.text = Strings.TipsTotalThisMonth
       $0.textColor = RewardsPalette.neutral200
       $0.font = .systemFont(ofSize: 14.0, weight: .medium)
       $0.numberOfLines = 0

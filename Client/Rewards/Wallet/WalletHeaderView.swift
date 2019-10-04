@@ -3,6 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import UIKit
+import Shared
+import BraveShared
 
 class WalletHeaderView: UIView {
   
@@ -14,7 +16,7 @@ class WalletHeaderView: UIView {
   private let titleLabel = UILabel().then {
     $0.font = .systemFont(ofSize: 16.0, weight: .medium)
     $0.textColor = UIColor(white: 1.0, alpha: 0.65)
-    $0.text = RewardsStrings.WalletHeaderTitle
+    $0.text = Strings.WalletHeaderTitle
   }
   
   private let altcurrencyContainerView = UIStackView().then {
@@ -42,7 +44,7 @@ class WalletHeaderView: UIView {
     $0.flipImageOrigin = true
     $0.titleLabel?.font = .systemFont(ofSize: 10.0, weight: .semibold)
     $0.setImage(UIImage(imageLiteralResourceName: "right-arrow-small").alwaysTemplate, for: .normal)
-    $0.setTitle(RewardsStrings.WalletHeaderGrants, for: .normal)
+    $0.setTitle(Strings.WalletHeaderGrants, for: .normal)
     $0.setTitleColor(UIColor(white: 1.0, alpha: 0.75), for: .normal)
     $0.titleEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 5.0)
     $0.contentEdgeInsets = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10.0)
@@ -50,7 +52,7 @@ class WalletHeaderView: UIView {
   
   let addFundsButton = UIButton(type: .system).then {
     $0.setTitleColor(UIColor(white: 1.0, alpha: 0.75), for: .normal)
-    $0.setTitle(RewardsStrings.AddFunds, for: .normal)
+    $0.setTitle(Strings.AddFunds, for: .normal)
     $0.setImage(UIImage(imageLiteralResourceName: "wallet-icon").alwaysOriginal, for: .normal)
     $0.imageEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 8.0)
     $0.titleEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: -8.0)
@@ -61,7 +63,7 @@ class WalletHeaderView: UIView {
   
   let settingsButton = UIButton(type: .system).then {
     $0.setTitleColor(UIColor(white: 1.0, alpha: 0.75), for: .normal)
-    $0.setTitle(RewardsStrings.Settings, for: .normal)
+    $0.setTitle(Strings.Settings, for: .normal)
     $0.setImage(UIImage(imageLiteralResourceName: "bat-small").alwaysOriginal, for: .normal)
     $0.imageEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 8.0)
     $0.titleEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: -8.0)

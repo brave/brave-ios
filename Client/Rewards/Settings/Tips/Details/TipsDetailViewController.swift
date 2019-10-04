@@ -4,6 +4,8 @@
 
 import UIKit
 import BraveRewards
+import Shared
+import BraveShared
 
 class TipsDetailViewController: UIViewController {
   private var ledgerObserver: LedgerObserver
@@ -40,7 +42,7 @@ class TipsDetailViewController: UIViewController {
     tipsView.tableView.delegate = self
     tipsView.tableView.dataSource = self
 
-    title = RewardsStrings.Tips
+    title = Strings.Tips
     loadData()
   }
   
@@ -81,11 +83,11 @@ class TipsDetailViewController: UIViewController {
   private let headerView = TableHeaderRowView(
     columns: [
       TableHeaderRowView.Column(
-        title: RewardsStrings.Site.uppercased(),
+        title: Strings.Site.uppercased(),
         width: .percentage(0.7)
       ),
       TableHeaderRowView.Column(
-        title: RewardsStrings.Tokens.uppercased(),
+        title: Strings.Tokens.uppercased(),
         width: .percentage(0.3),
         align: .right
       ),
@@ -168,20 +170,20 @@ extension TipsDetailViewController: UITableViewDataSource, UITableViewDelegate {
       // Next Contribution Row
       let cell = tableView.dequeueReusableCell(for: indexPath) as TableViewCell
       cell.label.font = RewardsSettingsUX.bodyFont
-      cell.label.text = RewardsStrings.AutoContributeNextDate
+      cell.label.text = Strings.AutoContributeNextDate
       cell.accessoryView = nextContributionDateView
       cell.selectionStyle = .none
       return cell
     case .tips:
       if tipsList.isEmpty {
         let cell = tableView.dequeueReusableCell(for: indexPath) as EmptyTableCell
-        cell.label.text = RewardsStrings.EmptyTipsText
+        cell.label.text = Strings.EmptyTipsText
         cell.selectionStyle = .none
         return cell
       }
       let cell = tableView.dequeueReusableCell(for: indexPath) as TipsTableCell
       let tip = tipsList[indexPath.row]
-      let provider = " \(tip.provider.isEmpty ? "" : String(format: RewardsStrings.OnProviderText, tip.providerDisplayString))"
+      let provider = " \(tip.provider.isEmpty ? "" : String(format: Strings.OnProviderText, tip.providerDisplayString))"
       
       let attrName = NSMutableAttributedString(string: tip.name).then {
         $0.append(NSMutableAttributedString(string: provider, attributes: [.font: UIFont.boldSystemFont(ofSize: 14.0),
@@ -194,9 +196,9 @@ extension TipsDetailViewController: UITableViewDataSource, UITableViewDelegate {
       cell.verifiedStatusImageView.isHidden = tip.status != .verified
       switch tip.rewardsCategory {
       case .oneTimeTip:
-        cell.typeNameLabel.text = RewardsStrings.OneTimeText + Date.stringFrom(reconcileStamp: tip.reconcileStamp)
+        cell.typeNameLabel.text = Strings.OneTimeText + Date.stringFrom(reconcileStamp: tip.reconcileStamp)
       case .recurringTip:
-        cell.typeNameLabel.text = RewardsStrings.RecurringText
+        cell.typeNameLabel.text = Strings.RecurringText
       default:
         cell.typeNameLabel.text = ""
       }
@@ -222,7 +224,7 @@ extension TipsDetailViewController: UITableViewDataSource, UITableViewDelegate {
   }
   
   func tableView(_ tableView: UITableView, titleForDeleteConfirmationButtonForRowAt indexPath: IndexPath) -> String? {
-    return RewardsStrings.Remove
+    return Strings.Remove
   }
   
   func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {

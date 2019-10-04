@@ -4,7 +4,6 @@
 
 import Foundation
 import BraveRewards
-import BraveRewardsUI
 import Data
 import Shared
 import BraveShared

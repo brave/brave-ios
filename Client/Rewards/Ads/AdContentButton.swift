@@ -5,6 +5,8 @@
 import UIKit
 import BraveRewards
 import pop
+import Shared
+import BraveShared
 
 /// The main ads view. Mimics a system notification in that it shows an icon, "app name" (always will be "Brave Rewards"), title and body.
 class AdContentButton: UIControl {
@@ -21,7 +23,7 @@ class AdContentButton: UIControl {
   private let appNameLabel = UILabel().then {
     $0.textColor = .black
     $0.font = .systemFont(ofSize: 14.0, weight: .medium)
-    $0.text = RewardsStrings.AdNotificationTitle
+    $0.text = Strings.AdNotificationTitle
   }
   
   private let backgroundView: UIVisualEffectView = {

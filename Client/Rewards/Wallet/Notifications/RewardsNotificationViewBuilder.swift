@@ -4,6 +4,8 @@
 
 import Foundation
 import BraveRewards
+import Shared
+import BraveShared
 
 struct RewardsNotificationViewBuilder {
   
@@ -24,8 +26,8 @@ struct RewardsNotificationViewBuilder {
     return WalletAlertNotificationView(
       notification: WalletAlertNotification(
         category: .error,
-        title: RewardsStrings.NoNetworkTitle,
-        body: RewardsStrings.NoNetworkBody
+        title: Strings.NoNetworkTitle,
+        body: Strings.NoNetworkBody
       )
     )
   }
@@ -34,7 +36,7 @@ struct RewardsNotificationViewBuilder {
     if let result = notification.userInfo["result"] as? Int, let amount = notification.userInfo["amount"] as? String, let batResult = Result(rawValue: result) {
       switch batResult {
       case .ledgerOk:
-        return RewardsNotificationViewBuilder.get(actionNotification: notification, bodyText: String.localizedStringWithFormat(RewardsStrings.NotificationContributeSuccess, amount))
+        return RewardsNotificationViewBuilder.get(actionNotification: notification, bodyText: String.localizedStringWithFormat(Strings.NotificationContributeSuccess, amount))
       default:
         let model = RewardsNotificationViewBuilder.alertModel(contributeResult: batResult)
         return RewardsNotificationViewBuilder.get(alertNotification: notification, model: model)
@@ -48,11 +50,11 @@ struct RewardsNotificationViewBuilder {
   private static func alertModel(contributeResult: Result) -> WalletAlertNotification {
     switch contributeResult {
     case .notEnoughFunds:
-      return WalletAlertNotification(category: .warning, title: nil, body: RewardsStrings.NotificationAutoContributeNotEnoughFundsBody)
+      return WalletAlertNotification(category: .warning, title: nil, body: Strings.NotificationAutoContributeNotEnoughFundsBody)
     case .tipError:
-      return WalletAlertNotification(category: .error, title: RewardsStrings.NotificationErrorTitle, body: RewardsStrings.NotificationContributeTipError)
+      return WalletAlertNotification(category: .error, title: Strings.NotificationErrorTitle, body: Strings.NotificationContributeTipError)
     default:
-      return WalletAlertNotification(category: .error, title: RewardsStrings.NotificationErrorTitle, body: RewardsStrings.NotificationContributeError)
+      return WalletAlertNotification(category: .error, title: Strings.NotificationErrorTitle, body: Strings.NotificationContributeError)
     }
   }
   
@@ -62,17 +64,17 @@ struct RewardsNotificationViewBuilder {
     
     switch actionNotification.kind {
     case .grant:
-      body = RewardsStrings.NotificationGrantNotification
+      body = Strings.NotificationGrantNotification
       category = .grant
     case .grantAds:
-      body = RewardsStrings.NotificationEarningsClaimDefault
+      body = Strings.NotificationEarningsClaimDefault
       category = .grant
     case .tipsProcessed:
-      body = RewardsStrings.NotificationTipsProcessedBody
+      body = Strings.NotificationTipsProcessedBody
       category = .tipsProcessed
     case .verifiedPublisher:
       if let name = actionNotification.userInfo["name"] as? String {
-        body = String.localizedStringWithFormat(RewardsStrings.NotificationVerifiedPublisherBody, name)// publisher name"
+        body = String.localizedStringWithFormat(Strings.NotificationVerifiedPublisherBody, name)// publisher name"
         category = .verifiedPublisher
       } else {
         assertionFailure("Verified publisher notification has invalid userInfo")
@@ -103,11 +105,11 @@ struct RewardsNotificationViewBuilder {
     var title: String?
     switch alertNotification.kind {
     case .insufficientFunds:
-      body = RewardsStrings.NotificationInsufficientFunds
+      body = Strings.NotificationInsufficientFunds
       alertType = .warning
-      title = RewardsStrings.NotificationInsufficientFundsTitle
+      title = Strings.NotificationInsufficientFundsTitle
     case .pendingNotEnoughFunds:
-      body = RewardsStrings.NotificationPendingNotEnoughFunds
+      body = Strings.NotificationPendingNotEnoughFunds
       alertType = .warning
     case .autoContribute:
       guard let model = model else {

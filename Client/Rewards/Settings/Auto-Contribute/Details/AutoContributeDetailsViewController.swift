@@ -4,6 +4,8 @@
 
 import UIKit
 import BraveRewards
+import Shared
+import BraveShared
 
 class AutoContributeDetailViewController: UIViewController {
   private var ledgerObserver: LedgerObserver
@@ -39,7 +41,7 @@ class AutoContributeDetailViewController: UIViewController {
     contentView.tableView.delegate = self
     contentView.tableView.dataSource = self
     
-    title = RewardsStrings.AutoContribute
+    title = Strings.AutoContribute
     
     navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(tappedEditButton))
     
@@ -81,7 +83,7 @@ class AutoContributeDetailViewController: UIViewController {
   }
   
   private func totalSitesAttributedString(from total: Int) -> NSAttributedString {
-    let format = String(format: RewardsStrings.TotalSites, total)
+    let format = String(format: Strings.TotalSites, total)
     let s = NSMutableAttributedString(string: format)
     guard let range = format.range(of: String(total)) else { return s }
     s.addAttribute(.font, value: UIFont.systemFont(ofSize: 14.0, weight: .semibold), range: NSRange(range, in: format))
@@ -91,11 +93,11 @@ class AutoContributeDetailViewController: UIViewController {
   private let headerView = TableHeaderRowView(
     columns: [
       TableHeaderRowView.Column(
-        title: RewardsStrings.Site.uppercased(),
+        title: Strings.Site.uppercased(),
         width: .percentage(0.7)
       ),
       TableHeaderRowView.Column(
-        title: RewardsStrings.Attention.uppercased(),
+        title: Strings.Attention.uppercased(),
         width: .percentage(0.3),
         align: .right
       ),
@@ -192,15 +194,15 @@ extension AutoContributeDetailViewController: UITableViewDataSource, UITableView
             }
             self.navigationController?.popViewController(animated: true)
         }
-        controller.title = RewardsStrings.AutoContributeMonthlyPaymentTitle
+        controller.title = Strings.AutoContributeMonthlyPaymentTitle
         navigationController?.pushViewController(controller, animated: true)
       case SummaryRows.excludedSites.rawValue:
         let numberOfExcludedSites = state.ledger.numberOfExcludedPublishers
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        alert.addAction(UIAlertAction(title: String(format: RewardsStrings.AutoContributeRestoreExcludedSites, numberOfExcludedSites), style: .default, handler: { _ in
+        alert.addAction(UIAlertAction(title: String(format: Strings.AutoContributeRestoreExcludedSites, numberOfExcludedSites), style: .default, handler: { _ in
           self.state.ledger.restoreAllExcludedPublishers()
         }))
-        alert.addAction(UIAlertAction(title: RewardsStrings.Cancel, style: .cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: Strings.Cancel, style: .cancel, handler: nil))
         present(alert, animated: true)
       default:
         break
@@ -255,7 +257,7 @@ extension AutoContributeDetailViewController: UITableViewDataSource, UITableView
   }
   
   func tableView(_ tableView: UITableView, titleForDeleteConfirmationButtonForRowAt indexPath: IndexPath) -> String? {
-    return RewardsStrings.Exclude
+    return Strings.Exclude
   }
   
   func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
@@ -284,27 +286,27 @@ extension AutoContributeDetailViewController: UITableViewDataSource, UITableView
       cell.selectionStyle = .none
       switch row {
       case .settings:
-        cell.label.text = RewardsStrings.Settings
+        cell.label.text = Strings.Settings
         cell.imageView?.image = UIImage(imageLiteralResourceName: "settings").alwaysTemplate
         cell.imageView?.tintColor = RewardsBraveUX.autoContributeTintColor
         cell.accessoryType = .disclosureIndicator
         cell.selectionStyle = .default
       case .monthlyPayment:
-        cell.label.text = RewardsStrings.AutoContributeMonthlyPayment
+        cell.label.text = Strings.AutoContributeMonthlyPayment
         cell.accessoryType = .disclosureIndicator
         if let dollarAmount = state.ledger.dollarStringForBATAmount(state.ledger.contributionAmount) {
           cell.accessoryLabel?.text = "\(state.ledger.contributionAmount) BAT (\(dollarAmount))"
         }
         cell.selectionStyle = .default
       case .nextContribution:
-        cell.label.text = RewardsStrings.AutoContributeNextDate
+        cell.label.text = Strings.AutoContributeNextDate
         cell.accessoryView = nextContributionDateView
       case .supportedSites:
-        cell.label.text = RewardsStrings.AutoContributeSupportedSites
+        cell.label.text = Strings.AutoContributeSupportedSites
         cell.accessoryLabel?.attributedText = totalSitesAttributedString(from: publishers.count)
       case .excludedSites:
         let numberOfExcludedSites = state.ledger.numberOfExcludedPublishers
-        cell.label.text = String(format: RewardsStrings.AutoContributeRestoreExcludedSites, numberOfExcludedSites)
+        cell.label.text = String(format: Strings.AutoContributeRestoreExcludedSites, numberOfExcludedSites)
         cell.label.textColor = RewardsPalette.blurple400
         cell.selectionStyle = .default
       }
@@ -312,7 +314,7 @@ extension AutoContributeDetailViewController: UITableViewDataSource, UITableView
     case .contributions:
       if publishers.isEmpty {
         let cell = tableView.dequeueReusableCell(for: indexPath) as EmptyTableCell
-        cell.label.text = RewardsStrings.EmptyAutoContribution
+        cell.label.text = Strings.EmptyAutoContribution
         return cell
       }
       guard let publisher = publishers[safe: indexPath.row] else {
@@ -330,7 +332,7 @@ extension AutoContributeDetailViewController: UITableViewDataSource, UITableView
       }
       
       cell.verifiedStatusImageView.isHidden = publisher.status != .verified
-      let provider = " \(publisher.provider.isEmpty ? "" : String(format: RewardsStrings.OnProviderText, publisher.providerDisplayString))"
+      let provider = " \(publisher.provider.isEmpty ? "" : String(format: Strings.OnProviderText, publisher.providerDisplayString))"
       let attrName = NSMutableAttributedString(string: publisher.name).then {
         $0.append(NSMutableAttributedString(string: provider, attributes: [.font: UIFont.boldSystemFont(ofSize: 14.0),
                                                                            .foregroundColor: UIColor.gray]))

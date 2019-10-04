@@ -3,12 +3,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import UIKit
+import Shared
+import BraveShared
 
 extension WelcomeViewController {
   
   private class HeaderView: UIView {
     
-    let createWalletButton = CreateWalletButton(titleText: RewardsStrings.LearnMoreCreateWallet1.uppercased()).then {
+    let createWalletButton = CreateWalletButton(titleText: Strings.LearnMoreCreateWallet1.uppercased()).then {
       $0.titleLabel?.font = .systemFont(ofSize: 14.0, weight: .semibold)
       $0.contentEdgeInsets = UIEdgeInsets(top: 8, left: 12, bottom: 8, right: 12)
     }
@@ -17,8 +19,8 @@ extension WelcomeViewController {
       $0.font = .systemFont(ofSize: 12.0)
       $0.textColor = RewardsPalette.grey900
       $0.textAlignment = .center
-      $0.text = RewardsStrings.WelcomeDisclaimerInformation
-      $0.setURLInfo([RewardsStrings.TermsOfServiceURL: "terms", RewardsStrings.PrivacyPolicyURL: "policy"])
+      $0.text = Strings.WelcomeDisclaimerInformation
+      $0.setURLInfo([Strings.TermsOfServiceURL: "terms", Strings.PrivacyPolicyURL: "policy"])
     }
     
     let backgroundView = GradientView.purpleRewardsGradientView()
@@ -43,7 +45,7 @@ extension WelcomeViewController {
           $0.font = .systemFont(ofSize: 28.0, weight: .medium)
           $0.textAlignment = .center
           $0.attributedText = {
-            let title = NSMutableAttributedString(string: RewardsStrings.BraveRewards)
+            let title = NSMutableAttributedString(string: Strings.BraveRewards)
             if let trademarkRange = title.string.range(of: "™") {
               title.addAttributes(
                 [
@@ -61,7 +63,7 @@ extension WelcomeViewController {
           $0.font = .systemFont(ofSize: 22.0)
           $0.textAlignment = .center
           $0.numberOfLines = 0
-          $0.text = RewardsStrings.LearnMoreSubtitle
+          $0.text = Strings.LearnMoreSubtitle
         }),
         .customSpace(15.0),
         .view(UILabel().then {
@@ -69,7 +71,7 @@ extension WelcomeViewController {
           $0.font = .systemFont(ofSize: 16.0)
           $0.textAlignment = .center
           $0.numberOfLines = 0
-          $0.text = RewardsStrings.LearnMoreBody
+          $0.text = Strings.LearnMoreBody
         }),
         .customSpace(25.0),
         .view(createWalletButton),
@@ -77,7 +79,7 @@ extension WelcomeViewController {
         .view(termsOfServiceLabel),
         .customSpace(25.0),
         .view(UILabel().then {
-          $0.text = RewardsStrings.LearnMoreHowItWorks
+          $0.text = Strings.LearnMoreHowItWorks
           $0.textColor = UIColor(white: 1.0, alpha: 0.5)
           $0.textAlignment = .center
           $0.font = .systemFont(ofSize: 16.0)
@@ -179,7 +181,7 @@ extension WelcomeViewController {
   
   class View: UIView {
     
-    let createWalletButton = CreateWalletButton(titleText: RewardsStrings.LearnMoreCreateWallet2.uppercased()).then {
+    let createWalletButton = CreateWalletButton(titleText: Strings.LearnMoreCreateWallet2.uppercased()).then {
       $0.titleLabel?.font = .systemFont(ofSize: 14.0, weight: .semibold)
       $0.contentEdgeInsets = UIEdgeInsets(top: 8, left: 12, bottom: 8, right: 12)
       $0.backgroundColor = RewardsBraveUX.braveOrange
@@ -191,8 +193,8 @@ extension WelcomeViewController {
       $0.textColor = RewardsPalette.grey200
       $0.linkColor = .black
       $0.textAlignment = .center
-      $0.text = RewardsStrings.WelcomeDisclaimerInformation
-      $0.setURLInfo([RewardsStrings.TermsOfServiceURL: "terms", RewardsStrings.PrivacyPolicyURL: "policy"])
+      $0.text = Strings.WelcomeDisclaimerInformation
+      $0.setURLInfo([Strings.TermsOfServiceURL: "terms", Strings.PrivacyPolicyURL: "policy"])
     }
     
     private let headerView = HeaderView()
@@ -237,14 +239,14 @@ extension WelcomeViewController {
       
       contentStackView.addStackViewItems(
         .view(UILabel().then {
-          $0.text = RewardsStrings.LearnMoreWhyTitle
+          $0.text = Strings.LearnMoreWhyTitle
           $0.font = .systemFont(ofSize: 24.0)
           $0.textColor = .black
           $0.numberOfLines = 0
         }),
         .customSpace(10.0),
         .view(UILabel().then {
-          $0.text = RewardsStrings.LearnMoreWhyBody
+          $0.text = Strings.LearnMoreWhyBody
           $0.font = .systemFont(ofSize: 16.0)
           $0.textColor = RewardsPalette.grey200
           $0.numberOfLines = 0
@@ -252,22 +254,22 @@ extension WelcomeViewController {
         .customSpace(20.0),
         .view(FeatureBlockView(
           icon: UIImage(imageLiteralResourceName: "turn-on-rewards"),
-          title: RewardsStrings.LearnMoreTurnOnRewardsTitle,
-          body: RewardsStrings.LearnMoreTurnOnRewardsBody
+          title: Strings.LearnMoreTurnOnRewardsTitle,
+          body: Strings.LearnMoreTurnOnRewardsBody
         )),
         .view(FeatureBlockView(
           icon: UIImage(imageLiteralResourceName: "ads-graphic"),
-          title: RewardsStrings.LearnMoreBraveAdsTitle,
-          body: RewardsStrings.LearnMoreBraveAdsBody
+          title: Strings.LearnMoreBraveAdsTitle,
+          body: Strings.LearnMoreBraveAdsBody
         )),
         .view(FeatureBlockView(
           icon: UIImage(imageLiteralResourceName: "send-tips"),
-          title: RewardsStrings.LearnMoreTipsTitle,
-          body: RewardsStrings.LearnMoreTipsBody
+          title: Strings.LearnMoreTipsTitle,
+          body: Strings.LearnMoreTipsBody
         )),
         .customSpace(40.0),
         .view(UILabel().then {
-          $0.text = RewardsStrings.LearnMoreReady
+          $0.text = Strings.LearnMoreReady
           $0.font = .systemFont(ofSize: 20.0)
           $0.textAlignment = .center
           $0.textColor = RewardsPalette.blurple400

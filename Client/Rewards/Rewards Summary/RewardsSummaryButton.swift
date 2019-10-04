@@ -3,6 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import UIKit
+import Shared
+import BraveShared
 
 //extension RewardsSummaryView {
   class RewardsSummaryViewButton: UIControl {
@@ -13,7 +15,7 @@ import UIKit
     }
     
     let titleLabel = UILabel().then {
-      $0.text = RewardsStrings.SummaryTitle.uppercased()
+      $0.text = Strings.SummaryTitle.uppercased()
       $0.textColor = UX.titleTextColor
       $0.font = .systemFont(ofSize: 14.0, weight: .bold)
     }

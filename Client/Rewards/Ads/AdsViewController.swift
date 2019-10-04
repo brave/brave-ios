@@ -5,6 +5,8 @@
 import UIKit
 import BraveRewards
 import pop
+import Shared
+import BraveShared
 
 public class AdsViewController: UIViewController {
   public typealias ActionHandler = (AdsNotification, AdsNotificationHandler.Action) -> Void
@@ -301,8 +303,8 @@ extension AdsViewController {
     }
     
     let notification = AdsNotification.customAd(
-      title: RewardsStrings.MyFirstAdTitle,
-      body: RewardsStrings.MyFirstAdBody,
+      title: Strings.MyFirstAdTitle,
+      body: Strings.MyFirstAdBody,
       url: URL(string: "https://brave.com/my-first-ad")!
     )
     

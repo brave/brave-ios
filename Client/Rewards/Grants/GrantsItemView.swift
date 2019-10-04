@@ -3,6 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import UIKit
+import Shared
+import BraveShared
 
 class GrantsItemView: SettingsSectionView {
   
@@ -37,7 +39,7 @@ class GrantsItemView: SettingsSectionView {
         $0.font = .systemFont(ofSize: 14.0)
         $0.numberOfLines = 0
         $0.text = String(
-          format: RewardsStrings.GrantListExpiresOn,
+          format: Strings.GrantListExpiresOn,
           dateFormatter.string(from: date)
         )
       }

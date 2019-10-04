@@ -5,6 +5,8 @@
 import Foundation
 import UIKit
 import BraveRewards
+import Shared
+import BraveShared
 
 /// A controller for displaying BATValue options with their equivalent dollar value.
 /// When the user selects an option, the selected index is returned in the completion block.
@@ -22,7 +24,7 @@ class BATValueOptionsSelectionViewController: OptionsSelectionViewController<BAT
   override func viewDidLoad() {
     super.viewDidLoad()
     
-    self.title = RewardsStrings.RecurringTipTitle
+    self.title = Strings.RecurringTipTitle
   }
   
   override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

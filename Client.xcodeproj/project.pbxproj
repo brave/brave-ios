@@ -245,7 +245,6 @@
 		27A692422346DFDE00DC0353 /* WalletAlertNotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27A691D02346DFDD00DC0353 /* WalletAlertNotificationView.swift */; };
 		27A692432346DFDE00DC0353 /* WalletNotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27A691D12346DFDD00DC0353 /* WalletNotificationView.swift */; };
 		27A692442346DFDE00DC0353 /* RewardsNotificationViewBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27A691D22346DFDD00DC0353 /* RewardsNotificationViewBuilder.swift */; };
-		27A692462346DFDE00DC0353 /* RewardsStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27A691D52346DFDD00DC0353 /* RewardsStrings.swift */; };
 		27A692472346DFDE00DC0353 /* AddFundsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27A691D72346DFDD00DC0353 /* AddFundsView.swift */; };
 		27A692482346DFDE00DC0353 /* AddFundsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27A691D82346DFDD00DC0353 /* AddFundsViewController.swift */; };
 		27A692492346DFDE00DC0353 /* TokenAddressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27A691D92346DFDD00DC0353 /* TokenAddressView.swift */; };
@@ -1216,7 +1215,6 @@
 		0AADC4D620D2B03900FDE368 /* BraveShieldStatsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BraveShieldStatsView.swift; sourceTree = "<group>"; };
 		0AB2442B22AA789B00B4D9DD /* ReaderModeButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderModeButton.swift; sourceTree = "<group>"; };
 		0AC0D399233E7CAF0091EFA5 /* ObjcExceptionBridging.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ObjcExceptionBridging.framework; path = Carthage/Build/iOS/ObjcExceptionBridging.framework; sourceTree = "<group>"; };
-		0AC0D39B233E7CC60091EFA5 /* BraveRewards.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = BraveRewards.framework; path = "Carthage/Checkouts/brave-rewards-ios/lib/BraveRewards.framework"; sourceTree = "<group>"; };
 		0AC0D3A9233E86E50091EFA5 /* sqlcipher.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sqlcipher.xcodeproj; sourceTree = "<group>"; };
 		0AC0D3BF233E889D0091EFA5 /* ms */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ms; path = ms.lproj/Storage.strings; sourceTree = "<group>"; };
 		0AC0D3C1233E889D0091EFA5 /* ms */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ms; path = ms.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -1363,7 +1361,6 @@
 		27A691D02346DFDD00DC0353 /* WalletAlertNotificationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WalletAlertNotificationView.swift; sourceTree = "<group>"; };
 		27A691D12346DFDD00DC0353 /* WalletNotificationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WalletNotificationView.swift; sourceTree = "<group>"; };
 		27A691D22346DFDD00DC0353 /* RewardsNotificationViewBuilder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RewardsNotificationViewBuilder.swift; sourceTree = "<group>"; };
-		27A691D52346DFDD00DC0353 /* RewardsStrings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RewardsStrings.swift; sourceTree = "<group>"; };
 		27A691D72346DFDD00DC0353 /* AddFundsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddFundsView.swift; sourceTree = "<group>"; };
 		27A691D82346DFDD00DC0353 /* AddFundsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddFundsViewController.swift; sourceTree = "<group>"; };
 		27A691D92346DFDD00DC0353 /* TokenAddressView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TokenAddressView.swift; sourceTree = "<group>"; };
@@ -2690,7 +2687,6 @@
 				27A691902346DFDC00DC0353 /* Disabled Brave Rewards */,
 				27A691EB2346DFDE00DC0353 /* Extensions */,
 				27A6918A2346DFDC00DC0353 /* Grants */,
-				27A691D42346DFDD00DC0353 /* Localized Strings */,
 				27A691E62346DFDE00DC0353 /* Publisher */,
 				27A6918D2346DFDC00DC0353 /* QA Settings */,
 				27A691DB2346DFDD00DC0353 /* Rewards Summary */,
@@ -2941,14 +2937,6 @@
 				27A691D22346DFDD00DC0353 /* RewardsNotificationViewBuilder.swift */,
 			);
 			path = Notifications;
-			sourceTree = "<group>";
-		};
-		27A691D42346DFDD00DC0353 /* Localized Strings */ = {
-			isa = PBXGroup;
-			children = (
-				27A691D52346DFDD00DC0353 /* RewardsStrings.swift */,
-			);
-			path = "Localized Strings";
 			sourceTree = "<group>";
 		};
 		27A691D62346DFDD00DC0353 /* Add Funds */ = {
@@ -3695,7 +3683,6 @@
 		7B604FC11C496005006EEEC3 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				0AC0D39B233E7CC60091EFA5 /* BraveRewards.framework */,
 				27A6926D2346E5DB00DC0353 /* BraveRewards.framework */,
 				0AC8E23A22A6C56D0064F3FA /* libYubiKit.a */,
 				272FCA98225CF8F00091E645 /* OnePasswordExtension.framework */,
@@ -5732,7 +5719,6 @@
 				D3FEC38D1AC4B42F00494F45 /* AutocompleteTextField.swift in Sources */,
 				F930CDC9227006D600A23FE1 /* WebAuthnRegisterRequest.swift in Sources */,
 				0BD19A671A25309B0084FBA7 /* NSUserDefaultsPrefs.swift in Sources */,
-				27A692462346DFDE00DC0353 /* RewardsStrings.swift in Sources */,
 				4422D4F021BFFB7600BF1855 /* write_batch.cc in Sources */,
 				E68AEDB01B18F81A00133D99 /* SwipeAnimator.swift in Sources */,
 				27A6922A2346DFDE00DC0353 /* WalletSummaryView.swift in Sources */,

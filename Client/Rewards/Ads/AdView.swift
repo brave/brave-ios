@@ -4,10 +4,12 @@
 
 import UIKit
 import pop
+import Shared
+import BraveShared
 
 public class AdView: UIView {
   let adContentButton = AdContentButton()
-  let openSwipeButton = AdSwipeButton(contentType: .text(RewardsStrings.Open, textColor: .white)).then {
+  let openSwipeButton = AdSwipeButton(contentType: .text(Strings.Open, textColor: .white)).then {
     $0.backgroundColor = RewardsPalette.blurple400
   }
   let dislikeSwipeButton = AdSwipeButton(contentType: .image(UIImage(imageLiteralResourceName: "thumbsdown"))).then {

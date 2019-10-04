@@ -3,6 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import UIKit
+import Shared
+import BraveShared
 
 class SettingsAutoContributeSectionView: SettingsSectionView {
   
@@ -58,13 +60,13 @@ class SettingsAutoContributeSectionView: SettingsSectionView {
   }
   
   private let titleLabel = UILabel().then {
-    $0.text = RewardsStrings.SettingsAutoContributeTitle
+    $0.text = Strings.SettingsAutoContributeTitle
     $0.textColor = RewardsBraveUX.autoContributeTintColor
     $0.font = RewardsSettingsUX.titleFont
   }
   
   private let bodyLabel = UILabel().then {
-    $0.text = RewardsStrings.SettingsAutoContributeBody
+    $0.text = Strings.SettingsAutoContributeBody
     $0.textColor = RewardsSettingsUX.bodyTextColor
     $0.numberOfLines = 0
     $0.font = RewardsSettingsUX.bodyFont

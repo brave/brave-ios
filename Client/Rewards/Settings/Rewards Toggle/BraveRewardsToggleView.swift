@@ -3,6 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import UIKit
+import Shared
+import BraveShared
 
 class BraveRewardsToggleView: UIView {
   
@@ -42,7 +44,7 @@ class BraveRewardsToggleView: UIView {
   
   private let titleLabel = UILabel().then {
     $0.textColor = RewardsPalette.grey100
-    $0.text = RewardsStrings.BraveRewards
+    $0.text = Strings.BraveRewards
   }
   
   // MARK: - Accessibility

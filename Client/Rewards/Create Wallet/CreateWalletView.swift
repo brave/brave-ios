@@ -3,14 +3,16 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import UIKit
+import Shared
+import BraveShared
 
 extension CreateWalletViewController {
   class View: UIView {
     
-    let createWalletButton = CreateWalletButton(titleText: RewardsStrings.RewardsOptInJoinTitle.uppercased())
+    let createWalletButton = CreateWalletButton(titleText: Strings.RewardsOptInJoinTitle.uppercased())
     
     let learnMoreButton = UIButton(type: .system).then {
-      $0.setTitle(RewardsStrings.RewardsOptInLearnMore.uppercased(), for: .normal)
+      $0.setTitle(Strings.RewardsOptInLearnMore.uppercased(), for: .normal)
       $0.tintColor = UX.learnMoreTextColor
       $0.titleLabel?.font = .systemFont(ofSize: 14.0, weight: .medium)
     }
@@ -32,7 +34,7 @@ extension CreateWalletViewController {
       $0.textColor = UX.prefixTextColor
       $0.font = .systemFont(ofSize: 16.0)
       $0.textAlignment = .center
-      $0.text = RewardsStrings.RewardsOptInPrefix
+      $0.text = Strings.RewardsOptInPrefix
       $0.numberOfLines = 0
     }
     
@@ -43,7 +45,7 @@ extension CreateWalletViewController {
       $0.font = .systemFont(ofSize: 28.0, weight: .medium)
       $0.textAlignment = .center
       $0.attributedText = {
-        let title = NSMutableAttributedString(string: RewardsStrings.BraveRewards)
+        let title = NSMutableAttributedString(string: Strings.BraveRewards)
         if let trademarkRange = title.string.range(of: "™") {
           title.addAttributes(
             [
@@ -61,7 +63,7 @@ extension CreateWalletViewController {
       $0.textColor = UX.bodyTextColor
       $0.font = .systemFont(ofSize: 16.0)
       $0.textAlignment = .center
-      $0.text = RewardsStrings.RewardsOptInDescription
+      $0.text = Strings.RewardsOptInDescription
       $0.numberOfLines = 0
     }
     
@@ -69,8 +71,8 @@ extension CreateWalletViewController {
       $0.font = .systemFont(ofSize: 12.0)
       $0.textColor = RewardsPalette.grey900
       $0.textAlignment = .center
-      $0.text = RewardsStrings.DisclaimerInformation
-      $0.setURLInfo([RewardsStrings.TermsOfServiceURL: "terms", RewardsStrings.PrivacyPolicyURL: "policy"])
+      $0.text = Strings.DisclaimerInformation
+      $0.setURLInfo([Strings.TermsOfServiceURL: "terms", Strings.PrivacyPolicyURL: "policy"])
     }
     
     override init(frame: CGRect) {

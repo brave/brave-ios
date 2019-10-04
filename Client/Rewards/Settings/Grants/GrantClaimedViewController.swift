@@ -3,6 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import UIKit
+import Shared
+import BraveShared
 
 private let claimGrantDateFormatter = DateFormatter().then {
   $0.dateStyle = .short
@@ -56,7 +58,7 @@ extension GrantClaimedViewController {
     let okButton = ActionButton(type: .system).then {
       $0.backgroundColor = RewardsBraveUX.braveOrange
       $0.layer.borderWidth = 0
-      $0.setTitle(RewardsStrings.OK, for: .normal)
+      $0.setTitle(Strings.OK, for: .normal)
     }
     
     override init(frame: CGRect) {
@@ -79,14 +81,14 @@ extension GrantClaimedViewController {
       let titleLabel = UILabel().then {
         $0.numberOfLines = 0
         $0.textColor = RewardsBraveUX.braveOrange
-        $0.text = RewardsStrings.GrantsClaimedTitle
+        $0.text = Strings.GrantsClaimedTitle
         $0.font = .systemFont(ofSize: 20.0)
         $0.textAlignment = .center
       }
       let subtitleLabel = UILabel().then {
         $0.numberOfLines = 0
         $0.textColor = RewardsSettingsUX.subtitleTextColor
-        $0.text = RewardsStrings.GrantsClaimedSubtitle
+        $0.text = Strings.GrantsClaimedSubtitle
         $0.font = .systemFont(ofSize: 12.0)
         $0.textAlignment = .center
       }
@@ -157,12 +159,12 @@ extension GrantClaimedViewController {
         $0.spacing = 4.0
       }
       let amountTitleLabel = UILabel().then {
-        $0.text = RewardsStrings.GrantsClaimedAmountTitle
+        $0.text = Strings.GrantsClaimedAmountTitle
         $0.textColor = RewardsSettingsUX.subtitleTextColor
         $0.font = .systemFont(ofSize: 13.0)
       }
       let expirdationDateTitleLabel = UILabel().then {
-        $0.text = RewardsStrings.GrantsClaimedExpirationDateTitle
+        $0.text = Strings.GrantsClaimedExpirationDateTitle
         $0.textColor = RewardsSettingsUX.subtitleTextColor
         $0.font = .systemFont(ofSize: 13.0)
       }

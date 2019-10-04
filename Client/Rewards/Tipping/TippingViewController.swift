@@ -4,6 +4,8 @@
 
 import UIKit
 import BraveRewards
+import Shared
+import BraveShared
 
 enum PublisherMediaType: String {
   case youtube
@@ -60,7 +62,7 @@ class TippingViewController: UIViewController, UIViewControllerTransitioningDele
     super.viewDidLoad()
     
     // Not actually visible, but good for accessibility
-    title = RewardsStrings.TippingTitle
+    title = Strings.TippingTitle
     
     tippingView.overviewView.dismissButton.addTarget(self, action: #selector(tappedDismissButton), for: .touchUpInside)
     tippingView.optionSelectionView.sendTipButton.addTarget(self, action: #selector(tappedSendTip), for: .touchUpInside)
@@ -95,8 +97,8 @@ class TippingViewController: UIViewController, UIViewControllerTransitioningDele
     state.ledger.publisherBanner(forId: self.publisherInfo.id) { [weak self] banner in
       guard let self = self, let banner = banner else { return }
       
-      self.tippingView.overviewView.titleLabel.text = banner.title.isEmpty ? RewardsStrings.TippingOverviewTitle : banner.title
-      self.tippingView.overviewView.bodyLabel.text = banner.desc.isEmpty ? RewardsStrings.TippingOverviewBody : banner.desc
+      self.tippingView.overviewView.titleLabel.text = banner.title.isEmpty ? Strings.TippingOverviewTitle : banner.title
+      self.tippingView.overviewView.bodyLabel.text = banner.desc.isEmpty ? Strings.TippingOverviewBody : banner.desc
       
       self.downloadImage(url: banner.background, { image in
         self.tippingView.overviewView.headerView.image = image
@@ -174,7 +176,7 @@ class TippingViewController: UIViewController, UIViewControllerTransitioningDele
       }
       
       let displayConfirmationView = { (recurringDate: String?) in
-        let provider = " \(self.publisherInfo.provider.isEmpty ? "" : String(format: RewardsStrings.OnProviderText, self.publisherInfo.providerDisplayString))"
+        let provider = " \(self.publisherInfo.provider.isEmpty ? "" : String(format: Strings.OnProviderText, self.publisherInfo.providerDisplayString))"
         
         self.tippingView.updateConfirmationInfo(name: "\(self.publisherInfo.name)\(provider)", tipAmount: amount, recurringDate: recurringDate)
         self.tippingView.setTippingConfirmationVisible(true, animated: true)

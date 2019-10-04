@@ -3,6 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import UIKit
+import Shared
+import BraveShared
 
 class SettingsViewDetailsButton: Button {
   
@@ -10,7 +12,7 @@ class SettingsViewDetailsButton: Button {
     super.init(frame: frame)
     
     tintColor = RewardsPalette.purple300
-    setTitle(RewardsStrings.SettingsViewDetails, for: .normal)
+    setTitle(Strings.SettingsViewDetails, for: .normal)
     setTitleColor(RewardsPalette.purple300, for: .normal)
     setImage(UIImage(imageLiteralResourceName: "right-arrow").alwaysTemplate, for: .normal)
     titleLabel?.font = .systemFont(ofSize: 14.0, weight: .medium)

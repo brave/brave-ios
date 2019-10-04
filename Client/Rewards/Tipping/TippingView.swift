@@ -4,6 +4,8 @@
 
 import UIKit
 import BraveRewards
+import Shared
+import BraveShared
 
 extension TippingViewController {
   
@@ -17,9 +19,9 @@ extension TippingViewController {
       
       confirmationView.faviconImageView.image = overviewView.faviconImageView.image
       confirmationView.faviconImageView.backgroundColor = overviewView.faviconImageView.backgroundColor
-      confirmationView.subtitleLabel.text = isMonthly ? RewardsStrings.TippingMonthlyTitle : RewardsStrings.TippingOneTimeTitle
+      confirmationView.subtitleLabel.text = isMonthly ? Strings.TippingMonthlyTitle : Strings.TippingOneTimeTitle
       
-      confirmationView.infoLabel.text = "\(name)\n\(tipAmount) BAT\(isMonthly ? ", \(RewardsStrings.TippingRecurring)" : "")"
+      confirmationView.infoLabel.text = "\(name)\n\(tipAmount) BAT\(isMonthly ? ", \(Strings.TippingRecurring)" : "")"
       
       if isMonthly, let recurringDate = recurringDate {
         confirmationView.monthlyTipLabel.attributedText = {
@@ -28,7 +30,7 @@ extension TippingViewController {
           paragraphStyle.lineBreakMode = .byWordWrapping
           paragraphStyle.lineSpacing = 8.0
           
-          let text = NSMutableAttributedString(string: "\(RewardsStrings.TippingRecurringDetails)\n", attributes: [
+          let text = NSMutableAttributedString(string: "\(Strings.TippingRecurringDetails)\n", attributes: [
             .font: UIFont.systemFont(ofSize: 14.0, weight: .medium),
             .foregroundColor: RewardsPalette.grey600
           ])

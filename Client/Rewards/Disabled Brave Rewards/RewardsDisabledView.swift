@@ -3,6 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import Foundation
+import Shared
+import BraveShared
 
 class RewardsDisabledView: UIView {
   
@@ -77,7 +79,7 @@ extension RewardsDisabledView {
       $0.font = .systemFont(ofSize: 28.0)
       $0.textColor = UX.titleColor
       $0.textAlignment = .center
-      $0.text = RewardsStrings.DisabledTitle
+      $0.text = Strings.DisabledTitle
     }
     
     let subtitleLabel = UILabel().then {
@@ -85,7 +87,7 @@ extension RewardsDisabledView {
       $0.textColor = UX.subtitleColor
       $0.textAlignment = .center
       $0.numberOfLines = 0
-      $0.text = RewardsStrings.DisabledSubtitle
+      $0.text = Strings.DisabledSubtitle
     }
     
     let bodyLabel = UILabel().then {
@@ -93,11 +95,11 @@ extension RewardsDisabledView {
       $0.textColor = UX.bodyColor
       $0.textAlignment = .center
       $0.numberOfLines = 0
-      $0.text = RewardsStrings.DisabledBody
+      $0.text = Strings.DisabledBody
     }
     
     let enableRewardsButton = ActionButton(type: .system).then {
-      $0.setTitle(RewardsStrings.DisabledEnableButton.uppercased(), for: .normal)
+      $0.setTitle(Strings.DisabledEnableButton.uppercased(), for: .normal)
       $0.setImage(UIImage(imageLiteralResourceName: "continue-button-arrow").alwaysOriginal, for: .normal)
       $0.titleLabel?.font = .systemFont(ofSize: 12.0, weight: .semibold)
       $0.tintColor = UX.rewardsButtonTintColor
@@ -110,8 +112,8 @@ extension RewardsDisabledView {
       $0.font = .systemFont(ofSize: 12.0)
       $0.textColor = RewardsPalette.grey100
       $0.textAlignment = .center
-      $0.text = RewardsStrings.DisclaimerInformation
-      $0.setURLInfo([RewardsStrings.TermsOfServiceURL: "terms", RewardsStrings.PrivacyPolicyURL: "policy"])
+      $0.text = Strings.DisclaimerInformation
+      $0.setURLInfo([Strings.TermsOfServiceURL: "terms", Strings.PrivacyPolicyURL: "policy"])
     }
     
     @available(*, unavailable)

@@ -4,6 +4,8 @@
 
 import UIKit
 import BraveRewards
+import Shared
+import BraveShared
 
 class AddFundsViewController: UIViewController {
   
@@ -30,7 +32,7 @@ class AddFundsViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     
-    title = RewardsStrings.AddFundsVCTitle
+    title = Strings.AddFundsVCTitle
     
     navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(tappedDone))
     

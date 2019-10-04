@@ -3,6 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import UIKit
+import Shared
+import BraveShared
 
 /// Displayed when the user does not have enough tokens to complete a tip
 class InsufficientFundsButton: UIControl {
@@ -25,7 +27,7 @@ class InsufficientFundsButton: UIControl {
     $0.textColor = .white
     $0.font = .systemFont(ofSize: 13.0)
     $0.numberOfLines = 0
-    $0.text = RewardsStrings.TippingNotEnoughTokens
+    $0.text = Strings.TippingNotEnoughTokens
     $0.setContentCompressionResistancePriority(.required, for: .horizontal)
   }
   

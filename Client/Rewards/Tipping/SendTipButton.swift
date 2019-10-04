@@ -3,13 +3,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import UIKit
+import Shared
+import BraveShared
 
 class SendTipButton: UIControl {
   
   /// Whether or not the tip is a monthly tip
   var isMonthly: Bool = false {
     didSet {
-      textLabel.text = (isMonthly ? RewardsStrings.TippingSendMonthlyTip : RewardsStrings.TippingSendTip).uppercased()
+      textLabel.text = (isMonthly ? Strings.TippingSendMonthlyTip : Strings.TippingSendTip).uppercased()
     }
   }
   
@@ -25,7 +27,7 @@ class SendTipButton: UIControl {
   private let textLabel = UILabel().then {
     $0.textColor = .white
     $0.font = .systemFont(ofSize: 13.0, weight: .semibold)
-    $0.text = RewardsStrings.TippingSendTip.uppercased()
+    $0.text = Strings.TippingSendTip.uppercased()
   }
   
   @available(*, unavailable)

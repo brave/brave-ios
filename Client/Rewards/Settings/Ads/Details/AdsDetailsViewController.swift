@@ -4,6 +4,8 @@
 
 import UIKit
 import BraveRewards
+import Shared
+import BraveShared
 
 class AdsDetailsViewController: UIViewController {
   
@@ -40,7 +42,7 @@ class AdsDetailsViewController: UIViewController {
     contentView.tableView.delegate = self
     contentView.tableView.dataSource = self
     
-    title = RewardsStrings.SettingsAdsTitle
+    title = Strings.SettingsAdsTitle
     
     fetchAdsDetails()
   }
@@ -56,7 +58,7 @@ class AdsDetailsViewController: UIViewController {
     self.estimatedEarnings = estimatedEarnings
     if let date = nextPaymentDate {
       let formatter = DateFormatter().then {
-        $0.dateFormat = RewardsStrings.AdsPayoutDateFormat
+        $0.dateFormat = Strings.AdsPayoutDateFormat
       }
       nextPaymentDateView.label.text = formatter.string(from: date)
     } else {
@@ -75,11 +77,11 @@ class AdsDetailsViewController: UIViewController {
   private let nextPaymentDateView = LabelAccessoryView()
   
   private let adsPerHourOptions = [
-    RewardsStrings.OneAdPerHour,
-    RewardsStrings.TwoAdsPerHour,
-    RewardsStrings.ThreeAdsPerHour,
-    RewardsStrings.FourAdsPerHour,
-    RewardsStrings.FiveAdsPerHour
+    Strings.OneAdPerHour,
+    Strings.TwoAdsPerHour,
+    Strings.ThreeAdsPerHour,
+    Strings.FourAdsPerHour,
+    Strings.FiveAdsPerHour
   ]
   
   private var adsReceived: Int = 0
@@ -111,7 +113,7 @@ extension AdsDetailsViewController: UITableViewDelegate, UITableViewDataSource {
           }
           self.navigationController?.popViewController(animated: true)
       }
-      controller.title = RewardsStrings.NumberOfAdsPerHourOptionsTitle
+      controller.title = Strings.NumberOfAdsPerHourOptionsTitle
       navigationController?.pushViewController(controller, animated: true)
     }
   }
@@ -132,13 +134,13 @@ extension AdsDetailsViewController: UITableViewDelegate, UITableViewDataSource {
     switch row {
     case .adsPerHour:
       cell.accessoryType = .disclosureIndicator
-      cell.label.text = RewardsStrings.AdsMaxPerHour
+      cell.label.text = Strings.AdsMaxPerHour
       let adsPerHour = state.ads.adsPerHour
       if adsPerHour - 1 < adsPerHourOptions.count {
         cell.accessoryLabel?.text = adsPerHourOptions[adsPerHour - 1]
       }
     case .currentEarnings:
-      cell.label.text = RewardsStrings.AdsEstimatedEarnings
+      cell.label.text = Strings.AdsEstimatedEarnings
       cell.selectionStyle = .none
       cell.accessoryView = BATUSDPairView().then {
         $0.batContainer.amountLabel.text = BATValue(estimatedEarnings).displayString
@@ -146,11 +148,11 @@ extension AdsDetailsViewController: UITableViewDelegate, UITableViewDataSource {
         $0.bounds = CGRect(origin: .zero, size: $0.systemLayoutSizeFitting(UIView.layoutFittingExpandedSize))
       }
     case .nextPayment:
-      cell.label.text = RewardsStrings.NextPaymentDate
+      cell.label.text = Strings.NextPaymentDate
       cell.selectionStyle = .none
       cell.accessoryView = nextPaymentDateView
     case .numberOfAdsReceived:
-      cell.label.text = RewardsStrings.AdNotificationsReceived
+      cell.label.text = Strings.AdNotificationsReceived
       cell.selectionStyle = .none
       cell.accessoryLabel?.text = "\(adsReceived)"
     }

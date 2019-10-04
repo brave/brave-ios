@@ -17,7 +17,6 @@ import Deferred
 import Data
 import BraveShared
 import SwiftKeychainWrapper
-import BraveRewardsUI
 import BraveRewards
 import StoreKit
 

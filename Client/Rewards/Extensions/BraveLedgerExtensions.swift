@@ -4,6 +4,8 @@
 
 import Foundation
 import BraveRewards
+import Shared
+import BraveShared
 
 extension BraveLedger {
   
@@ -59,9 +61,9 @@ extension BraveLedger {
     
     var displayString: String {
       switch self {
-      case .one: return RewardsStrings.MinimumVisitsChoices0
-      case .five: return RewardsStrings.MinimumVisitsChoices1
-      case .ten: return RewardsStrings.MinimumVisitsChoices2
+      case .one: return Strings.MinimumVisitsChoices0
+      case .five: return Strings.MinimumVisitsChoices1
+      case .ten: return Strings.MinimumVisitsChoices2
       }
     }
   }
@@ -74,9 +76,9 @@ extension BraveLedger {
     
     var displayString: String {
       switch self {
-      case .fiveSeconds: return RewardsStrings.MinimumLengthChoices0
-      case .eightSeconds: return RewardsStrings.MinimumLengthChoices1
-      case .oneMinute: return RewardsStrings.MinimumLengthChoices2
+      case .fiveSeconds: return Strings.MinimumLengthChoices0
+      case .eightSeconds: return Strings.MinimumLengthChoices1
+      case .oneMinute: return Strings.MinimumLengthChoices2
       }
     }
   }

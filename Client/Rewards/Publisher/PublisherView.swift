@@ -4,6 +4,8 @@
 
 import UIKit
 import BraveRewards
+import Shared
+import BraveShared
 
 class PublisherView: UIStackView {
   
@@ -14,10 +16,10 @@ class PublisherView: UIStackView {
   func setStatus(_ status: PublisherStatus) {
     if status != .notVerified {
       verificationSymbolImageView.image = UIImage(imageLiteralResourceName: "icn-verify")
-      verifiedLabel.text = RewardsStrings.Verified
+      verifiedLabel.text = Strings.Verified
     } else {
       verificationSymbolImageView.image = UIImage(imageLiteralResourceName: "icn-unverified")
-      verifiedLabel.text = RewardsStrings.NotYetVerified
+      verifiedLabel.text = Strings.NotYetVerified
     }
     // Shows if the publisher is also .connected
     unverifiedDisclaimerView.isHidden = status == .verified
@@ -110,7 +112,7 @@ class PublisherView: UIStackView {
   let checkAgainButton = Button(type: .system).then {
     $0.setTitleColor(RewardsPalette.blue500, for: .normal)
     $0.titleLabel?.font = .systemFont(ofSize: 12.0)
-    $0.setTitle(RewardsStrings.CheckAgain, for: .normal)
+    $0.setTitle(Strings.CheckAgain, for: .normal)
     $0.setContentHuggingPriority(.required, for: .horizontal)
   }
   
@@ -123,8 +125,8 @@ class PublisherView: UIStackView {
     $0.textColor = RewardsPalette.grey200
     $0.font = UIFont.systemFont(ofSize: 12.0)
     $0.textContainerInset = UIEdgeInsets(top: 8.0, left: 8.0, bottom: 8.0, right: 8.0)
-    $0.text = "\(RewardsStrings.UnverifiedPublisherDisclaimer) \(RewardsStrings.DisclaimerLearnMore)"
-    $0.setURLInfo([RewardsStrings.DisclaimerLearnMore: "learn-more"])
+    $0.text = "\(Strings.UnverifiedPublisherDisclaimer) \(Strings.DisclaimerLearnMore)"
+    $0.setURLInfo([Strings.DisclaimerLearnMore: "learn-more"])
     $0.backgroundColor = UIColor(white: 0.0, alpha: 0.04)
     $0.layer.cornerRadius = 4.0
   }

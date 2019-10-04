@@ -3,6 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import UIKit
+import Shared
+import BraveShared
 
 extension AddFundsViewController {
   class View: UIView {
@@ -36,14 +38,14 @@ extension AddFundsViewController {
       let titleLabel = UILabel().then {
         $0.textColor = RewardsSettingsUX.headerTextColor
         $0.font = .systemFont(ofSize: 22.0, weight: .medium)
-        $0.text = RewardsStrings.AddFundsTitle
+        $0.text = Strings.AddFundsTitle
         $0.numberOfLines = 0
       }
       
       let bodyLabel = UILabel().then {
         $0.textColor = RewardsSettingsUX.bodyTextColor
         $0.font = .systemFont(ofSize: 14.0)
-        $0.text = RewardsStrings.AddFundsBody
+        $0.text = Strings.AddFundsBody
         $0.numberOfLines = 0
       }
       
@@ -55,7 +57,7 @@ extension AddFundsViewController {
         $0.backgroundColor = .clear
         $0.textDragInteraction?.isEnabled = false
         $0.textContainerInset = .zero
-        let string = RewardsStrings.AddFundsDisclaimer
+        let string = Strings.AddFundsDisclaimer
         let attributedString = NSMutableAttributedString(string: string, attributes: [
           .paragraphStyle: NSMutableParagraphStyle().then { $0.alignment = .center },
           .font: UIFont.systemFont(ofSize: 12.0),

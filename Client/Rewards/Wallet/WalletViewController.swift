@@ -6,6 +6,8 @@ import UIKit
 import SnapKit
 import BraveRewards
 import Network
+import Shared
+import BraveShared
 
 protocol WalletContentView: AnyObject {
   var innerScrollView: UIScrollView? { get }
@@ -77,7 +79,7 @@ class WalletViewController: UIViewController, RewardsSummaryProtocol {
     super.viewDidLoad()
     
     // Not actually visible from this controller
-    title = RewardsStrings.PanelTitle
+    title = Strings.PanelTitle
     
     if let grants = state.ledger.walletInfo?.grants, !grants.isEmpty {
       walletView.headerView.grantsButton.isHidden = false
@@ -262,7 +264,7 @@ class WalletViewController: UIViewController, RewardsSummaryProtocol {
         return
       }
       
-      let provider = " \(publisher.provider.isEmpty ? "" : String(format: RewardsStrings.OnProviderText, publisher.providerDisplayString))"
+      let provider = " \(publisher.provider.isEmpty ? "" : String(format: Strings.OnProviderText, publisher.providerDisplayString))"
       publisherView.updatePublisherName(publisher.name, provider: provider)
       
       publisherView.setStatus(publisher.status)

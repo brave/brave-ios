@@ -3,6 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import UIKit
+import Shared
+import BraveShared
 
 class PublisherSummaryView: UIView {
   
@@ -13,7 +15,7 @@ class PublisherSummaryView: UIView {
   }
   
   lazy var monthlyTipView = DetailActionableRow().then {
-    $0.textLabel.text = RewardsStrings.TipSiteMonthly
+    $0.textLabel.text = Strings.TipSiteMonthly
   }
   
   private let scrollView = UIScrollView().then {
@@ -33,13 +35,13 @@ class PublisherSummaryView: UIView {
   let publisherView = PublisherView()
   let attentionView = PublisherAttentionView()
   private let autoContributeRow = SwitchRow().then {
-    $0.textLabel.text = RewardsStrings.AutoContributeSwitchLabel
+    $0.textLabel.text = Strings.AutoContributeSwitchLabel
     $0.toggleSwitch.isOn = true
   }
   let tipButton = ActionButton(type: .system).then {
     $0.tintColor = RewardsPalette.blurple400
     $0.titleLabel?.font = .systemFont(ofSize: 14.0, weight: .bold)
-    $0.setTitle(RewardsStrings.PublisherSendTip.uppercased(), for: .normal)
+    $0.setTitle(Strings.PublisherSendTip.uppercased(), for: .normal)
   }
   
   @available(*, unavailable)

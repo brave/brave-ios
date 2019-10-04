@@ -1,6 +1,8 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+import Shared
+import BraveShared
 
 class SettingsWalletSectionView: SettingsSectionView {
   enum ButtonType {
@@ -22,7 +24,7 @@ class SettingsWalletSectionView: SettingsSectionView {
   
   private(set) lazy var addFundsButton = Button(type: .system).then {
     $0.setTitleColor(.white, for: .normal)
-    $0.setTitle(RewardsStrings.AddFunds, for: .normal)
+    $0.setTitle(Strings.AddFunds, for: .normal)
     $0.setImage(UIImage(imageLiteralResourceName: "wallet-icon").alwaysOriginal, for: .normal)
     $0.imageEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 8.0)
     $0.titleEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: -8.0)
@@ -49,7 +51,7 @@ class SettingsWalletSectionView: SettingsSectionView {
   private let titleLabel = UILabel().then {
     $0.font = .systemFont(ofSize: 14.0, weight: .medium)
     $0.textColor = UIColor(white: 1.0, alpha: 0.65)
-    $0.text = RewardsStrings.WalletHeaderTitle
+    $0.text = Strings.WalletHeaderTitle
   }
   
   private let altcurrencyContainerView = UIStackView().then {

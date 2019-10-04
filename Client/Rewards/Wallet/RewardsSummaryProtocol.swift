@@ -4,6 +4,8 @@
 
 import Foundation
 import BraveRewards
+import Shared
+import BraveShared
 
 /// Shared resources for showing summary of all BAT rewards.
 protocol RewardsSummaryProtocol {
@@ -52,11 +54,11 @@ extension RewardsSummaryProtocol {
     ledger.balanceReport(for: activityMonth, year: Int32(now.currentYear)) { balance in
       guard let balance = balance else { return }
       activities = [
-        Activity(balance.grants, title: RewardsStrings.TotalGrantsClaimed, color: RewardsBraveUX.adsTintColor),
-        Activity(balance.earningFromAds, title: RewardsStrings.EarningFromAds, color: RewardsBraveUX.adsTintColor),
-        Activity(balance.autoContribute, title: RewardsStrings.AutoContribute, color: RewardsBraveUX.autoContributeTintColor),
-        Activity(balance.oneTimeDonation, title: RewardsStrings.OneTimeTips, color: RewardsBraveUX.tipsTintColor),
-        Activity(balance.recurringDonation, title: RewardsStrings.MonthlyTips, color: RewardsBraveUX.tipsTintColor)
+        Activity(balance.grants, title: Strings.TotalGrantsClaimed, color: RewardsBraveUX.adsTintColor),
+        Activity(balance.earningFromAds, title: Strings.EarningFromAds, color: RewardsBraveUX.adsTintColor),
+        Activity(balance.autoContribute, title: Strings.AutoContribute, color: RewardsBraveUX.autoContributeTintColor),
+        Activity(balance.oneTimeDonation, title: Strings.OneTimeTips, color: RewardsBraveUX.tipsTintColor),
+        Activity(balance.recurringDonation, title: Strings.MonthlyTips, color: RewardsBraveUX.tipsTintColor)
       ].compactMap { $0 }
     }
     return activities.map {
@@ -76,14 +78,14 @@ extension RewardsSummaryProtocol {
     // Don't show the view if there's no pending contributions.
     if reservedAmount.doubleValue <= 0 { return nil }
     
-    let text = String(format: RewardsStrings.ContributingToUnverifiedSites, reservedAmount.displayString)
+    let text = String(format: Strings.ContributingToUnverifiedSites, reservedAmount.displayString)
     
     return LinkLabel().then {
       $0.textColor = RewardsPalette.grey200
       $0.font = UIFont.systemFont(ofSize: 12.0)
       $0.textContainerInset = UIEdgeInsets(top: 8.0, left: 8.0, bottom: 8.0, right: 8.0)
-      $0.text = "\(text) \(RewardsStrings.DisclaimerLearnMore)"
-      $0.setURLInfo([RewardsStrings.DisclaimerLearnMore: "learn-more"])
+      $0.text = "\(text) \(Strings.DisclaimerLearnMore)"
+      $0.setURLInfo([Strings.DisclaimerLearnMore: "learn-more"])
       $0.backgroundColor = UIColor(white: 0.0, alpha: 0.04)
       $0.layer.cornerRadius = 4.0
     }

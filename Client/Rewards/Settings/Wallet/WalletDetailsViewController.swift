@@ -4,6 +4,8 @@
 
 import UIKit
 import BraveRewards
+import Shared
+import BraveShared
 
 class WalletDetailsViewController: UIViewController, RewardsSummaryProtocol {
   private var ledgerObserver: LedgerObserver
@@ -32,7 +34,7 @@ class WalletDetailsViewController: UIViewController, RewardsSummaryProtocol {
   
   override func viewDidLoad() {
     super.viewDidLoad()
-    title = RewardsStrings.WalletDetailsTitle
+    title = Strings.WalletDetailsTitle
     
     detailsView.walletSection.addFundsButton.addTarget(self, action: #selector(tappedAddFunds), for: .touchUpInside)
     

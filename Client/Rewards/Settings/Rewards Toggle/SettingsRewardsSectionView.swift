@@ -3,6 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import UIKit
+import Shared
+import BraveShared
 
 class SettingsRewardsSectionView: SettingsSectionView {
   
@@ -80,25 +82,25 @@ private class DisabledRewardsLabelsView: UIView {
   let labels = [
     UILabel().then {
       $0.textColor = RewardsSettingsUX.headerTextColor
-      $0.text = RewardsStrings.SettingsDisabledTitle1
+      $0.text = Strings.SettingsDisabledTitle1
       $0.numberOfLines = 0
       $0.font = .systemFont(ofSize: 15.0)
     },
     UILabel().then {
       $0.textColor = RewardsSettingsUX.bodyTextColor
-      $0.text = RewardsStrings.SettingsDisabledBody1
+      $0.text = Strings.SettingsDisabledBody1
       $0.numberOfLines = 0
       $0.font = .systemFont(ofSize: 13.0)
     },
     UILabel().then {
       $0.textColor = RewardsSettingsUX.headerTextColor
-      $0.text = RewardsStrings.SettingsDisabledTitle2
+      $0.text = Strings.SettingsDisabledTitle2
       $0.numberOfLines = 0
       $0.font = .systemFont(ofSize: 15.0)
     },
     UILabel().then {
       $0.textColor = RewardsSettingsUX.bodyTextColor
-      $0.text = RewardsStrings.SettingsDisabledBody2
+      $0.text = Strings.SettingsDisabledBody2
       $0.numberOfLines = 0
       $0.font = .systemFont(ofSize: 13.0)
     },

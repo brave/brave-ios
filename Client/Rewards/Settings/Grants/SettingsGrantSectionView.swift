@@ -3,6 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import UIKit
+import Shared
+import BraveShared
 
 class SettingsGrantSectionView: SettingsSectionView {
   
@@ -22,7 +24,7 @@ class SettingsGrantSectionView: SettingsSectionView {
     $0.backgroundColor = RewardsBraveUX.braveOrange
     $0.tintColor = .white
     $0.titleLabel?.font = .systemFont(ofSize: 13.0, weight: .bold)
-    $0.setTitle(RewardsStrings.SettingsGrantClaimButtonTitle.uppercased(), for: .normal)
+    $0.setTitle(Strings.SettingsGrantClaimButtonTitle.uppercased(), for: .normal)
     $0.contentEdgeInsets = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 15)
     $0.setContentCompressionResistancePriority(.required, for: .horizontal)
     $0.setContentHuggingPriority(.defaultHigh, for: .horizontal)
@@ -37,13 +39,13 @@ class SettingsGrantSectionView: SettingsSectionView {
     case .ads(let amount):
       iconImageView.image = UIImage(imageLiteralResourceName: "icn-ads")
       if let amount = amount {
-        textLabel.text = String(format: RewardsStrings.SettingsAdsGrantText, "\(amount) BAT ")
+        textLabel.text = String(format: Strings.SettingsAdsGrantText, "\(amount) BAT ")
       } else {
-        textLabel.text = RewardsStrings.SettingsAdsGrantText
+        textLabel.text = Strings.SettingsAdsGrantText
       }
     case .ugp:
       iconImageView.image = UIImage(imageLiteralResourceName: "icn-grant")
-      textLabel.text = RewardsStrings.SettingsGrantText
+      textLabel.text = Strings.SettingsGrantText
     }
     
     clippedContentView.addSubview(claimGrantButton)
