@@ -1852,7 +1852,7 @@ extension BrowserViewController: ToolbarDelegate {
             })
             actions.append(newPrivateTabAction)
         }
-        actions.append(UIAlertAction(title: Strings.NewTabTitle, style: .default, handler: { [unowned self] _ in
+        actions.append(UIAlertAction(title: Strings.NewPrivateTabTitle, style: .default, handler: { [unowned self] _ in
             self.openBlankNewTab(focusLocationField: true, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
         }))
         return actions
