@@ -37,7 +37,7 @@ extension WebAuthnAuthenticateRequest: Decodable {
         
         // userPresence is the inverse of userVerification, UP by default is true
         let userVerifcationString = try publicKeyDictionary.decodeIfPresent(String.self, forKey: .userVerification) ?? "discouraged"
-        userPresence = userVerifcationString == "discouraged"
+        userPresence = userVerifcationString != "discouraged"
         
         let allowCredentialsArray = try publicKeyDictionary.decode([AllowCredentials].self, forKey: .allowCredentials)
     
