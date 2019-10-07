@@ -49,10 +49,6 @@ open class UserAgent {
         return nil
     }
 
-    /**
-     * This will typically return quickly, but can require creation of a UIWebView.
-     * As a result, it must be called on the UI thread.
-     */
     public static func defaultUserAgent() -> String {
         assert(Thread.current.isMainThread, "This method must be called on the main thread.")
 
@@ -60,14 +56,12 @@ open class UserAgent {
             return firefoxUA
         }
 
-        let webView = UIWebView()
-
         let currentiOSVersion = UIDevice.current.systemVersion
         defaults.set(currentiOSVersion, forKey: "LastDeviceSystemVersionNumber")
         defaults.set(appVersion, forKey: "LastFirefoxVersionNumber")
         defaults.set(buildNumber, forKey: "LastFirefoxBuildNumber")
 
-        let userAgent = webView.stringByEvaluatingJavaScript(from: "navigator.userAgent")!
+        let userAgent = UserAgentBuilder().build()
 
         // Extract the WebKit version and use it as the Safari version.
         let webKitVersionRegex = try? NSRegularExpression(pattern: "AppleWebKit/([^ ]+) ", options: [])
@@ -104,7 +98,7 @@ open class UserAgent {
             print("Error: Unable to determine platform in UA.")
             return String(userAgent)
         }
-        userAgent.replaceCharacters(in: platformMatch.range, with: "(Macintosh; Intel Mac OS X 10_11_1)")
+        userAgent.replaceCharacters(in: platformMatch.range, with: "(Macintosh; Intel Mac OS X 10_15)")
 
         // Strip mobile section
         let mobileRegex = try? NSRegularExpression(pattern: " FxiOS/[^ ]+ Mobile/[^ ]+", options: [])
@@ -115,5 +109,19 @@ open class UserAgent {
         userAgent.replaceCharacters(in: mobileMatch.range, with: "")
 
         return String(userAgent)
+    }
+    
+    public static func isDesktopUA(_ userAgent: String?) -> Bool {
+        if let userAgent = userAgent, !userAgent.isEmpty {
+            return !userAgent.lowercased().contains("mobile")
+        }
+        
+        //on iOS 13 iPad, we do not require a custom user-agent for Desktop
+        if #available(iOS 13.0, *), UIDevice.isIpad {
+            return true
+        }
+        
+        //However, for iPhone we do..
+        return false
     }
 }

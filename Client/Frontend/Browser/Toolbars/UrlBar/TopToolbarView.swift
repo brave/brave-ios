@@ -9,7 +9,8 @@ import Data
 
 private struct TopToolbarViewUX {
     static let LocationPadding: CGFloat = 8
-    static let Padding: CGFloat = 10
+    static let SmallPadding: CGFloat = 2
+    static let NormalPadding: CGFloat = 10
     static let LocationHeight: CGFloat = 34
     static let ButtonHeight: CGFloat = 44
     static let LocationContentOffset: CGFloat = 8
@@ -18,7 +19,7 @@ private struct TopToolbarViewUX {
     
     static let TabsButtonRotationOffset: CGFloat = 1.5
     static let TabsButtonHeight: CGFloat = 18.0
-    static let ToolbarButtonInsets = UIEdgeInsets(equalInset: Padding)
+    static let ToolbarButtonInsets = UIEdgeInsets(equalInset: NormalPadding)
 }
 
 protocol TopToolbarDelegate: class {
@@ -36,6 +37,7 @@ protocol TopToolbarDelegate: class {
     // Returns either (search query, true) or (url, false).
     func topToolbarDisplayTextForURL(_ url: URL?) -> (String?, Bool)
     func topToolbarDidBeginDragInteraction(_ topToolbar: TopToolbarView)
+    func topToolbarDidTapBookmarkButton(_ topToolbar: TopToolbarView)
     func topToolbarDidTapBraveShieldsButton(_ topToolbar: TopToolbarView)
     func topToolbarDidTapBraveRewardsButton(_ topToolbar: TopToolbarView)
     func topToolbarDidTapMenuButton(_ topToolbar: TopToolbarView)
@@ -65,7 +67,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
         }
     }
     
-    fileprivate var currentTheme: Theme = .regular
+    fileprivate var currentTheme: Theme?
     
     var toolbarIsShowing = false
     
@@ -109,11 +111,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
     
     let line = UIView()
     
-    lazy var tabsButton: TabsButton = {
-        let tabsButton = TabsButton.tabTrayButton()
-        tabsButton.accessibilityIdentifier = "TopToolbarView.tabsButton"
-        return tabsButton
-    }()
+    let tabsButton = TabsButton(top: true)
     
     fileprivate lazy var progressBar: GradientProgressBar = {
         let progressBar = GradientProgressBar()
@@ -138,26 +136,28 @@ class TopToolbarView: UIView, ToolbarProtocol {
         return button
     }()
 
-    var bookmarkButton = ToolbarButton()
-    var forwardButton = ToolbarButton()
-    var shareButton = ToolbarButton()
-    var addTabButton = ToolbarButton()
-    lazy var menuButton = ToolbarButton().then {
+    lazy var bookmarkButton = ToolbarButton(top: true).then {
+        $0.setImage(#imageLiteral(resourceName: "menu_bookmarks").template, for: .normal)
+        $0.accessibilityLabel = Strings.BookmarksMenuItem
+        $0.addTarget(self, action: #selector(didClickBookmarkButton), for: .touchUpInside)
+    }
+    
+    var forwardButton = ToolbarButton(top: true)
+    var shareButton = ToolbarButton(top: true)
+    var addTabButton = ToolbarButton(top: true)
+    lazy var menuButton = ToolbarButton(top: true).then {
         $0.contentMode = .center
-        $0.setImage(#imageLiteral(resourceName: "nav-menu").template, for: .normal)
-        $0.accessibilityLabel = Strings.AppMenuButtonAccessibilityLabel
-        $0.addTarget(self, action: #selector(didClickMenu), for: .touchUpInside)
         $0.accessibilityIdentifier = "topToolbarView-menuButton"
     }
 
     var backButton: ToolbarButton = {
-        let backButton = ToolbarButton()
+        let backButton = ToolbarButton(top: true)
         backButton.accessibilityIdentifier = "TopToolbarView.backButton"
         return backButton
     }()
 
     lazy var actionButtons: [Themeable & UIButton] =
-        [self.shareButton, self.tabsButton,
+        [self.shareButton, self.tabsButton, self.bookmarkButton,
          self.forwardButton, self.backButton, self.menuButton].compactMap { $0 }
     
     /// Update the shields icon based on whether or not shields are enabled for this site
@@ -165,7 +165,8 @@ class TopToolbarView: UIView, ToolbarProtocol {
         // Default on
         var shieldIcon = "shields-menu-icon"
         if let currentURL = currentURL {
-            let domain = Domain.getOrCreate(forUrl: currentURL)
+            let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
+            let domain = Domain.getOrCreate(forUrl: currentURL, persistent: !isPrivateBrowsing)
             if domain.shield_allOff == 1 {
                 shieldIcon = "shields-off-menu-icon"
             }
@@ -186,13 +187,12 @@ class TopToolbarView: UIView, ToolbarProtocol {
     
     private let mainStackView = UIStackView().then {
         $0.alignment = .center
-        $0.spacing = 16
+        $0.spacing = 8
         $0.translatesAutoresizingMaskIntoConstraints = false
     }
     
     private let navigationStackView = UIStackView().then {
         $0.distribution = .fillEqually
-        $0.spacing = 16
         $0.translatesAutoresizingMaskIntoConstraints = false
     }
     
@@ -204,6 +204,8 @@ class TopToolbarView: UIView, ToolbarProtocol {
         
         helper = ToolbarHelper(toolbar: self)
         setupConstraints()
+        
+        Preferences.General.showBookmarkToolbarShortcut.observe(from: self)
         
         // Make sure we hide any views that shouldn't be showing in non-overlay mode.
         updateViewsForOverlayModeAndToolbarChanges()
@@ -226,14 +228,20 @@ class TopToolbarView: UIView, ToolbarProtocol {
         navigationStackView.addArrangedSubview(backButton)
         navigationStackView.addArrangedSubview(forwardButton)
         
-        [navigationStackView, locationContainer, tabsButton, menuButton, cancelButton].forEach {
+        [backButton, forwardButton, bookmarkButton, tabsButton, menuButton].forEach {
+            $0.contentEdgeInsets = UIEdgeInsets(top: 4, left: 8, bottom: 4, right: 8)
+        }
+        
+        [navigationStackView, bookmarkButton, locationContainer, tabsButton, menuButton, cancelButton].forEach {
             mainStackView.addArrangedSubview($0)
         }
         
+        mainStackView.setCustomSpacing(16, after: locationContainer)
+        
         mainStackView.snp.makeConstraints { make in
             make.top.bottom.equalTo(self)
-            make.leading.equalTo(self.safeArea.leading).inset(TopToolbarViewUX.Padding)
-            make.trailing.equalTo(self.safeArea.trailing).inset(TopToolbarViewUX.Padding)
+            make.leading.equalTo(self.safeArea.leading).inset(topToolbarPadding)
+            make.trailing.equalTo(self.safeArea.trailing).inset(topToolbarPadding)
         }
         
         line.snp.makeConstraints { make in
@@ -257,6 +265,22 @@ class TopToolbarView: UIView, ToolbarProtocol {
         }
     }
     
+    private var topToolbarPadding: CGFloat {
+        // The only case where we want small padding is on iPads and iPhones in landscape.
+        // Instead of padding we give extra tap area for buttons on the toolbar.
+        if !inOverlayMode && toolbarIsShowing { return TopToolbarViewUX.SmallPadding }
+        return TopToolbarViewUX.NormalPadding
+    }
+    
+    private func updateMargins() {
+        mainStackView.snp.updateConstraints {
+            $0.leading.equalTo(self.safeArea.leading).inset(topToolbarPadding)
+            $0.trailing.equalTo(self.safeArea.trailing).inset(topToolbarPadding)
+        }
+    }
+    
+    /// Created whenever the location bar on top is selected
+    ///     it is "converted" from static to actual TextField
     private func createLocationTextField() {
         guard locationTextField == nil else { return }
         
@@ -284,7 +308,10 @@ class TopToolbarView: UIView, ToolbarProtocol {
             make.edges.equalTo(self.locationView).inset(insets)
         }
         
-        locationTextField.applyTheme(currentTheme)
+        if let theme = currentTheme {
+            // If no theme exists here, then this will be styled after parent calls `applyTheme` at a later point
+            locationTextField.applyTheme(theme)
+        }
     }
     
     override func becomeFirstResponder() -> Bool {
@@ -301,6 +328,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
     // that can show in either mode.
     func setShowToolbar(_ shouldShow: Bool) {
         toolbarIsShowing = shouldShow
+        updateMargins()
         setNeedsUpdateConstraints()
         // when we transition from portrait to landscape, calling this here causes
         // the constraints to be calculated too early and there are constraint errors
@@ -399,6 +427,9 @@ class TopToolbarView: UIView, ToolbarProtocol {
         menuButton.isHidden = !toolbarIsShowing || inOverlayMode
         tabsButton.isHidden = !toolbarIsShowing || inOverlayMode
         locationView.contentView.isHidden = inOverlayMode
+        
+        let showBookmarkPref = Preferences.General.showBookmarkToolbarShortcut.value
+        bookmarkButton.isHidden = showBookmarkPref ? inOverlayMode : true
     }
     
     private func animateToOverlayState(overlayMode overlay: Bool, didCancel cancel: Bool = false) {
@@ -409,7 +440,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
         }
         
         if inOverlayMode {
-            [progressBar, navigationStackView, menuButton, tabsButton, locationView.contentView].forEach {
+            [progressBar, navigationStackView, bookmarkButton, menuButton, tabsButton, locationView.contentView].forEach {
                 $0?.isHidden = true
             }
             
@@ -420,6 +451,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
             }
         }
         
+        updateMargins()
         layoutIfNeeded()
     }
     
@@ -435,12 +467,24 @@ class TopToolbarView: UIView, ToolbarProtocol {
         delegate?.topToolbarDidPressScrollToTop(self)
     }
     
+    @objc func didClickBookmarkButton() {
+        delegate?.topToolbarDidTapBookmarkButton(self)
+    }
+    
     @objc func didClickMenu() {
         delegate?.topToolbarDidTapMenuButton(self)
     }
     
     @objc func didClickBraveShieldsButton() {
         delegate?.topToolbarDidTapBraveShieldsButton(self)
+    }
+}
+
+// MARK: - PreferencesObserver
+
+extension TopToolbarView: PreferencesObserver {
+    func preferencesDidChange(for key: String) {
+        updateViewsForOverlayModeAndToolbarChanges()
     }
 }
 
@@ -464,7 +508,7 @@ extension TopToolbarView: TabLocationViewDelegate {
         
         var overlayText = locationText
         // Make sure to use the result from topToolbarDisplayTextForURL as it is responsible for extracting out search terms when on a search page
-        if let text = locationText, let url = URL(string: text), let host = url.host, AppConstants.MOZ_PUNYCODE {
+        if let text = locationText, let url = URL(string: text), let host = url.host {
             overlayText = url.absoluteString.replacingOccurrences(of: host, with: host.asciiHostToUTF8())
         }
         enterOverlayMode(overlayText, pasted: false, search: isSearchQuery)
@@ -534,23 +578,21 @@ extension TopToolbarView: AutocompleteTextFieldDelegate {
 // MARK: - Themeable
 
 extension TopToolbarView: Themeable {
+    var themeableChildren: [Themeable?]? {
+        return [locationView, locationTextField] + actionButtons
+    }
     
     func applyTheme(_ theme: Theme) {
-        locationView.applyTheme(theme)
-        locationTextField?.applyTheme(theme)
-        actionButtons.forEach { $0.applyTheme(theme) }
-        tabsButton.applyTheme(theme)
+        styleChildren(theme: theme)
         
-        progressBar.setGradientColors(startColor: UIColor.LoadingBar.Start.colorFor(theme), endColor: UIColor.LoadingBar.End.colorFor(theme))
+        // Currently do not use gradient, hence same start/end color
+        progressBar.setGradientColors(startColor: theme.colors.accent, endColor: theme.colors.accent)
         currentTheme = theme
-        cancelButton.setTitleColor(UIColor.Browser.Tint.colorFor(theme), for: .normal)
-        switch theme {
-        case .regular:
-            backgroundColor = BraveUX.ToolbarsBackgroundSolidColor
-        case .private:
-            backgroundColor = BraveUX.DarkToolbarsBackgroundSolidColor
-        }
-        line.backgroundColor = UIColor.Browser.URLBarDivider.colorFor(theme)
+        cancelButton.setTitleColor(theme.colors.tints.header, for: .normal)
+        
+        backgroundColor = theme.colors.header
+        line.backgroundColor = theme.colors.border
+        line.alpha = theme.colors.transparencies.borderAlpha
     }
 }
 

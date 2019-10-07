@@ -21,8 +21,9 @@ class AdblockResourceDownloader {
     private let networkManager: NetworkManager
     private let locale: String
     
-    private let endpoint = "https://adblock-data.s3.brave.com/ios/"
     static let folderName = "abp-data"
+    
+    static let endpoint = "https://adblock-data.s3.brave.com/iOS13"
     
     init(networkManager: NetworkManager = NetworkManager(), locale: String? = Locale.current.languageCode) {
         if locale == nil {
@@ -64,21 +65,22 @@ class AdblockResourceDownloader {
         let queue = DispatchQueue(label: queueName)
         let nm = networkManager
         let folderName = AdblockResourceDownloader.folderName
-        // name of the file on server
-        let resourceName = type.resourceName
+        
         // file name of which the file will be saved on disk
         let fileName = type.identifier
         
         let completedDownloads = type.associatedFiles.map { fileType -> Deferred<AdBlockNetworkResource> in
-            let fileExtension = "." + fileType.rawValue
+            let fileExtension = fileType.rawValue
             let etagExtension = fileExtension + ".etag"
             
-            guard let resourceName = resourceName,
-                let url = URL(string: endpoint + resourceName + fileExtension) else {
+            guard let resourceName = type.resourceName(for: fileType), var url = type.endpoint else {
                 return Deferred<AdBlockNetworkResource>()
             }
             
-            let etag = fileFromDocumentsAsString(fileName + etagExtension, inFolder: folderName)
+            url.appendPathComponent(resourceName)
+            url.appendPathExtension(fileExtension)
+            
+            let etag = fileFromDocumentsAsString("\(fileName).\(etagExtension)", inFolder: folderName)
             let request = nm.downloadResource(with: url, resourceType: .cached(etag: etag))
                 .mapQueue(queue) { resource in
                     AdBlockNetworkResource(resource: resource, fileType: fileType, type: type)

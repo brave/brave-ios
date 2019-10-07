@@ -69,6 +69,17 @@ class PopoverController: UIViewController {
     /// Whether or not to automatically dismiss the popup when the device orientation changes
     var dismissesOnOrientationChanged = true
     
+    /// Defines the desired color for the entire popup menu
+    /// Child controller may specify their own `backgroundColor`, however arrow/carrot color is also handled here
+    var color: UIColor? {
+        didSet {
+            containerView.color = color
+        }
+    }
+    
+    /// Allows the presenter to know when the popover was dismissed by some gestural action.
+    var popoverDidDismiss: ((_ popoverController: PopoverController) -> Void)?
+    
     let contentSizeBehavior: ContentSizeBehavior
     
     private var containerViewHeightConstraint: NSLayoutConstraint?
@@ -89,7 +100,7 @@ class PopoverController: UIViewController {
             navigationController.interactivePopGestureRecognizer?.delegate = self
         }
         
-        self.modalPresentationStyle = .overFullScreen
+        self.modalPresentationStyle = .overCurrentContext
         self.transitioningDelegate = self
     }
     
@@ -315,7 +326,7 @@ extension PopoverController {
                 dismiss(animated: true)
                 // Not sure if we want this after dismissal completes or right away. Could always create a
                 // `popoverWillDismiss` to put before and `did` after
-                contentController.popoverDidDismiss(self)
+                popoverDidDismiss?(self)
             }
         }
     }
@@ -491,6 +502,8 @@ extension PopoverController: BasicAnimationControllerDelegate {
         }
         
         let oldTransform = containerView.transform
+        let rotationAngle = atan2(oldTransform.b, oldTransform.a)
+        
         containerView.transform = .identity // Reset to get unaltered frame
         let translationDelta = anchorPointDelta(from: popoverContext, popoverRect: containerView.frame)
         containerView.transform = oldTransform // Make sure to animate transform from a possibly altered transform
@@ -498,6 +511,7 @@ extension PopoverController: BasicAnimationControllerDelegate {
         UIView.animate(withDuration: 0.15, delay: 0, options: [.beginFromCurrentState, .allowUserInteraction], animations: {
             self.containerView.transform = CGAffineTransform(translationX: translationDelta.x, y: translationDelta.y)
                 .scaledBy(x: 0.001, y: 0.001)
+                .rotated(by: rotationAngle)
                 .translatedBy(x: -translationDelta.x, y: -translationDelta.y)
         }) { finished in
             context.completeTransition(finished)

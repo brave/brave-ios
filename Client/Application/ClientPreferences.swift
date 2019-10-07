@@ -41,7 +41,14 @@ extension Preferences {
         static let blockPopups = Option<Bool>(key: "general.block-popups", default: true)
         /// Controls how the tab bar should be shown (or not shown)
         static let tabBarVisibility = Option<Int>(key: "general.tab-bar-visiblity", default: TabBarVisibility.always.rawValue)
-        
+        /// Defines the user's normal browsing theme
+        /// `system`, follows the current OS display mode
+        static let themeNormalMode = Option<String>(key: "general.normal-mode-theme", default: Theme.DefaultTheme.system.rawValue)
+        static let themePrivateMode = Option<String>(key: "general.private-mode-theme", default: Theme.DefaultTheme.private.rawValue)
+        /// Specifies whether the bookmark button is present on toolbar
+        static let showBookmarkToolbarShortcut = Option<Bool>(key: "general.show-bookmark-toolbar-shortcut", default: UIDevice.isIpad)
+        /// Sets Desktop UA for iPad by default (iOS 13+ & iPad only)
+        static let alwaysRequestDesktopSite = Option<Bool>(key: "general.always-request-desktop-site", default: UIDevice.isIpad)
         /// Whether or not a user has enabled Night Mode.
         ///
         /// Currently unused
@@ -50,6 +57,17 @@ extension Preferences {
         ///
         /// Currently unused.
         static let showClipboardBar = Option<Bool>(key: "general.show-clipboard-bar", default: false)
+        /// Whether or not new user onboarding has completed.
+        /// User skipping(tapping on skip) onboarding does NOT count as completed.
+        /// If user kills the app before completing onboarding, it should be treated as unfinished.
+        static let basicOnboardingCompleted = Option<Int>(key: "general.basic-onboarding-completed",
+                                                          default: OnboardingState.undetermined.rawValue)
+        /// The time until the next on-boarding shows
+        static let basicOnboardingNextOnboardingPrompt = Option<Date?>(key: "general.basic-onboarding-days",
+                                                                      default: nil)
+        
+        /// The progress the user has made with onboarding
+        static let basicOnboardingProgress = Option<Int>(key: "general.basic-onboarding-progress", default: OnboardingProgress.none.rawValue)
     }
     final class Search {
         /// Whether or not to show suggestions while the user types

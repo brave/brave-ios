@@ -12,6 +12,7 @@ import Data
 import CoreData
 
 private let log = Logger.browserLogger
+private let rewardsLog = Logger.rewardsLogger
 
 protocol TabManagerDelegate: class {
     func tabManager(_ tabManager: TabManager, didSelectedTabChange selected: Tab?, previous: Tab?)
@@ -23,12 +24,6 @@ protocol TabManagerDelegate: class {
     func tabManagerDidRestoreTabs(_ tabManager: TabManager)
     func tabManagerDidAddTabs(_ tabManager: TabManager)
     func tabManagerDidRemoveAllTabs(_ tabManager: TabManager, toast: ButtonToast?)
-    
-    func tabManager(_ tabManager: TabManager, isVerifiedPublisher verified: Bool)
-}
-
-extension TabManagerDelegate {
-    func tabManager(_ tabManager: TabManager, isVerifiedPublisher verified: Bool) { }
 }
 
 protocol TabManagerStateDelegate: class {
@@ -148,7 +143,7 @@ class TabManager: NSObject {
             return nil
         }
         
-        return tabsForCurrentMode.index(of: selectedTab)
+        return tabsForCurrentMode.firstIndex(of: selectedTab)
     }
     
     // What the users sees displayed based on current private browsing mode
@@ -226,7 +221,7 @@ class TabManager: NSObject {
         }
 
         if let tab = tab {
-            _selectedIndex = allTabs.index(of: tab) ?? -1
+            _selectedIndex = allTabs.firstIndex(of: tab) ?? -1
         } else {
             _selectedIndex = -1
         }
@@ -248,13 +243,6 @@ class TabManager: NSObject {
         }
         if let tab = selectedTab {
             TabEvent.post(.didGainFocus, for: tab)
-            
-            switch tab.type {
-            case .regular:
-                UITextField.appearance().keyboardAppearance = .light
-            case .private:
-                UITextField.appearance().keyboardAppearance = .dark
-            }
         }
         
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate,
@@ -262,15 +250,18 @@ class TabManager: NSObject {
             let newSelectedTab = tab, let previousTab = previous, let newTabUrl = newSelectedTab.url, let previousTabUrl = previousTab.url else { return }
         
         if !PrivateBrowsingManager.shared.isPrivateBrowsing {
-            rewards.reportTabUpdated(Int(previousTab.rewardsId), url: previousTabUrl, isSelected: false,
-                                     isPrivate: previousTab.isPrivate) { _ in }
-        
-            rewards.reportTabUpdated(Int(newSelectedTab.rewardsId), url: newTabUrl, isSelected: true,
-                                     isPrivate: newSelectedTab.isPrivate) { verified in
-                                        self.delegates.forEach {
-                                            $0.get()?.tabManager(self, isVerifiedPublisher: verified)
-                                        }
+            let previousFaviconURL = URL(string: previousTab.displayFavicon?.url ?? "")
+            if previousFaviconURL == nil {
+                rewardsLog.warning("No favicon found in \(previousTab) to report to rewards panel")
             }
+            rewards.reportTabUpdated(Int(previousTab.rewardsId), url: previousTabUrl, faviconURL: previousFaviconURL, isSelected: false,
+                                     isPrivate: previousTab.isPrivate)
+            let faviconURL = URL(string: newSelectedTab.displayFavicon?.url ?? "")
+            if faviconURL == nil {
+                rewardsLog.warning("No favicon found in \(newSelectedTab) to report to rewards panel")
+            }
+            rewards.reportTabUpdated(Int(newSelectedTab.rewardsId), url: newTabUrl, faviconURL: faviconURL, isSelected: true,
+                                     isPrivate: newSelectedTab.isPrivate)
         }
     }
 
@@ -283,6 +274,11 @@ class TabManager: NSObject {
         }
     }
 
+    ///Called to turn selectedIndex back to -1
+    func resetSelectedIndex() {
+        _selectedIndex = -1
+    }
+    
     func expireSnackbars() {
         assert(Thread.isMainThread)
 
@@ -353,9 +349,14 @@ class TabManager: NSObject {
 
         let type: TabType = isPrivate ? .private : .regular
         let tab = Tab(configuration: configuration, type: type)
-        if !isPrivate {
+        
+        if isPrivate {
+            // Creating random tab id for private mode, as we don't want to save to database.
+            tab.id = UUID().uuidString
+        } else {
             tab.id = id ?? TabMO.create()
         }
+        
         configureTab(tab, request: request, afterTab: afterTab, flushToDisk: flushToDisk, zombie: zombie, isPrivate: isPrivate)
         return tab
     }
@@ -377,7 +378,7 @@ class TabManager: NSObject {
 
         let toTab = currentTabs[visibleToIndex]
 
-        guard let fromIndex = allTabs.index(of: tab), let toIndex = allTabs.index(of: toTab) else {
+        guard let fromIndex = allTabs.firstIndex(of: tab), let toIndex = allTabs.firstIndex(of: toTab) else {
             return
         }
         
@@ -387,7 +388,7 @@ class TabManager: NSObject {
         let tab = allTabs.remove(at: fromIndex)
         allTabs.insert(tab, at: toIndex)
 
-        if let previouslySelectedTab = previouslySelectedTab, let previousSelectedIndex = allTabs.index(of: previouslySelectedTab) {
+        if let previouslySelectedTab = previouslySelectedTab, let previousSelectedIndex = allTabs.firstIndex(of: previouslySelectedTab) {
             _selectedIndex = previousSelectedIndex
         }
 
@@ -395,6 +396,7 @@ class TabManager: NSObject {
     }
     
     private func saveTabOrder() {
+        if PrivateBrowsingManager.shared.isPrivateBrowsing { return }
         let allTabIds = allTabs.compactMap { $0.id }
         TabMO.saveTabOrder(tabIds: allTabIds)
     }
@@ -406,7 +408,7 @@ class TabManager: NSObject {
 
         if parent == nil || parent?.type != tab.type {
             allTabs.append(tab)
-        } else if let parent = parent, var insertIndex = allTabs.index(of: parent) {
+        } else if let parent = parent, var insertIndex = allTabs.firstIndex(of: parent) {
             insertIndex += 1
             while insertIndex < allTabs.count && allTabs[insertIndex].isDescendentOf(parent) {
                 insertIndex += 1
@@ -467,6 +469,7 @@ class TabManager: NSObject {
     }
     
     func saveTab(_ tab: Tab, saveOrder: Bool = false) {
+        if PrivateBrowsingManager.shared.isPrivateBrowsing { return }
         guard let data = savedTabData(tab: tab) else { return }
         
         TabMO.update(tabData: data)
@@ -522,13 +525,24 @@ class TabManager: NSObject {
         
         hideNetworkActivitySpinner()
 
-        guard let removalIndex = allTabs.index(where: { $0 === tab }) else {
+        guard let removalIndex = allTabs.firstIndex(where: { $0 === tab }) else {
             log.debug("Could not find index of tab to remove")
             return
         }
 
         if tab.isPrivate {
-            removeAllBrowsingDataForTab(tab)
+            // Only when ALL tabs are dead, we clean up.
+            // This is because other tabs share the same data-store.
+            if tabs(withType: .private).count <= 1 {
+                removeAllBrowsingDataForTab(tab)
+                
+                //After clearing the very last webview from the storage, give it a blank persistent store
+                //This is the only way to guarantee that the last reference to the shared persistent store
+                //reaches zero and destroys all its data.
+                
+                BraveWebView.removeNonPersistentStore()
+                configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
+            }
         }
 
         let oldSelectedTab = selectedTab
@@ -540,7 +554,7 @@ class TabManager: NSObject {
 
         var tabIndex: Int = -1
         if let oldTab = oldSelectedTab {
-            tabIndex = currentTabs.index(of: oldTab) ?? -1
+            tabIndex = currentTabs.firstIndex(of: oldTab) ?? -1
         }
 
         let prevCount = count
@@ -556,8 +570,9 @@ class TabManager: NSObject {
         if let oldTab = oldSelectedTab, tab !== oldTab {
             // If it wasn't the selected tab we removed, then keep it like that.
             // It might have changed index, so we look it up again.
-            _selectedIndex = allTabs.index(of: oldTab) ?? -1
+            _selectedIndex = allTabs.firstIndex(of: oldTab) ?? -1
         } else if let parentTab = tab.parent,
+            currentTabs.count > 1,
             let newTab = currentTabs.reduce(currentTabs.first, { currentBestTab, tab2 in
             if let tab1 = currentBestTab, let time1 = tab1.lastExecutedTime {
                 if let time2 = tab2.lastExecutedTime {
@@ -569,7 +584,7 @@ class TabManager: NSObject {
             }
         }), parentTab == newTab, tab !== newTab, newTab.lastExecutedTime != nil {
             // We select the most recently visited tab, only if it is also the parent tab of the closed tab.
-            _selectedIndex = allTabs.index(of: newTab) ?? -1
+            _selectedIndex = allTabs.firstIndex(of: newTab) ?? -1
         } else {
             // By now, we've just removed the selected one, and no previously loaded
             // tabs. So let's load the final one in the tab tray.
@@ -578,7 +593,7 @@ class TabManager: NSObject {
             }
 
             if let currentTab = currentTabs[safe: tabIndex] {
-                _selectedIndex = allTabs.index(of: currentTab) ?? -1
+                _selectedIndex = allTabs.firstIndex(of: currentTab) ?? -1
             } else {
                 _selectedIndex = -1
             }
@@ -617,16 +632,14 @@ class TabManager: NSObject {
                 removeAllBrowsingDataForTab(tab)
             }
         }
+        
+        BraveWebView.removeNonPersistentStore()
 
         allTabs = tabs(withType: .regular)
     }
 
     func removeAllBrowsingDataForTab(_ tab: Tab, completionHandler: @escaping () -> Void = {}) {
-        let dataTypes = Set([WKWebsiteDataTypeCookies,
-                             WKWebsiteDataTypeLocalStorage,
-                             WKWebsiteDataTypeSessionStorage,
-                             WKWebsiteDataTypeWebSQLDatabases,
-                             WKWebsiteDataTypeIndexedDBDatabases])
+        let dataTypes = WKWebsiteDataStore.allWebsiteDataTypes()
         tab.webView?.configuration.websiteDataStore.removeData(ofTypes: dataTypes,
                                                                modifiedSince: Date.distantPast,
                                                                completionHandler: completionHandler)
@@ -638,7 +651,7 @@ class TabManager: NSObject {
         
         // Remove the current tab last to prevent switching tabs while removing tabs
         if let selectedTab = selectedTab {
-            if let selectedIndex = tabsCopy.index(of: selectedTab) {
+            if let selectedIndex = tabsCopy.firstIndex(of: selectedTab) {
                 let removed = tabsCopy.remove(at: selectedIndex)
                 removeTabs(tabsCopy)
                 removeTab(removed)
@@ -805,9 +818,9 @@ class TabManager: NSObject {
 
             // Since this is a restored tab, reset the URL to be loaded as that will be handled by the SessionRestoreHandler
             tab.url = nil
-
+            let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
             if let url = URL(string: urlString),
-                let faviconURL = Domain.getOrCreate(forUrl: url).favicon?.url {
+                let faviconURL = Domain.getOrCreate(forUrl: url, persistent: !isPrivateBrowsing).favicon?.url {
                 let icon = Favicon(url: faviconURL, date: Date())
                 icon.width = 1
                 tab.favicons.append(icon)
@@ -1014,16 +1027,34 @@ class TabManagerNavDelegate: NSObject, WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-            var res = WKNavigationActionPolicy.allow
-            for delegate in delegates {
-                delegate.webView?(webView, decidePolicyFor: navigationAction, decisionHandler: { policy in
-                    if policy == .cancel {
-                        res = policy
-                    }
-                })
-            }
+        var res = WKNavigationActionPolicy.allow
+        for delegate in delegates {
+            delegate.webView?(webView, decidePolicyFor: navigationAction, decisionHandler: { policy in
+                if policy == .cancel {
+                    res = policy
+                }
+            })
+        }
 
-            decisionHandler(res)
+        decisionHandler(res)
+    }
+    
+    @available(iOS 13.0, *)
+    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: WKWebpagePreferences, decisionHandler: @escaping (WKNavigationActionPolicy, WKWebpagePreferences) -> Void) {
+        
+        var res = WKNavigationActionPolicy.allow
+        var pref = preferences
+        for delegate in delegates {
+            delegate.webView?(webView, decidePolicyFor: navigationAction, preferences: preferences, decisionHandler: { policy, preference  in
+                if policy == .cancel {
+                    res = policy
+                }
+                
+                pref = preference
+            })
+        }
+
+        decisionHandler(res, pref)
     }
 
     func webView(_ webView: WKWebView,

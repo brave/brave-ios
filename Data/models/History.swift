@@ -16,7 +16,7 @@ private var ignoredSchemes = ["about"]
 public func isIgnoredURL(_ url: URL) -> Bool {
     guard let scheme = url.scheme else { return false }
 
-    if let _ = ignoredSchemes.index(of: scheme) {
+    if let _ = ignoredSchemes.firstIndex(of: scheme) {
         return true
     }
 
@@ -95,7 +95,7 @@ public final class History: NSManagedObject, WebsitePresentable, CRUD {
     }
     
     public func delete() {
-        delete(context: .new)
+        delete(context: .new(inMemory: false))
     }
 
     public class func deleteAll(_ completionOnMain: @escaping () -> Void) {

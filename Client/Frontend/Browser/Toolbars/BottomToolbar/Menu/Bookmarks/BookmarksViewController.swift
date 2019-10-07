@@ -22,7 +22,6 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     lazy var editBookmarksButton = UIBarButtonItem().then {
         $0.image = #imageLiteral(resourceName: "edit").template
         $0.style = .plain
-        $0.tintColor = BraveUX.LightBlue
         $0.target = self
         $0.action = #selector(onEditBookmarksButton)
     }
@@ -30,7 +29,6 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     lazy var addFolderButton =  UIBarButtonItem().then {
         $0.image = #imageLiteral(resourceName: "bookmarks_newfolder_icon").template
         $0.style = .plain
-        $0.tintColor = BraveUX.LightBlue
         $0.target = self
         $0.action = #selector(onAddBookmarksFolderButton)
     }
@@ -62,11 +60,20 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
   override func viewDidLoad() {
     super.viewDidLoad()
     
-    self.view.backgroundColor = BraveUX.BackgroundColorForSideToolbars
     tableView.allowsSelectionDuringEditing = true
     
     setUpToolbar()
+    updateEditBookmarksButtonStatus()
   }
+    
+    private func updateEditBookmarksButtonStatus() {
+        guard let count = bookmarksFRC?.fetchedObjects?.count else { return }
+        
+        editBookmarksButton.isEnabled = count != 0
+        if tableView.isEditing && count == 0 {
+            disableTableEditingMode()
+        }
+    }
     
     private func setUpToolbar() {
         var padding: UIBarButtonItem { return UIBarButtonItem.fixedSpace(5) }
@@ -75,10 +82,10 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         let items = [padding, addFolderButton, flexibleSpace, editBookmarksButton, padding]
         setToolbarItems(items, animated: true)
         
-        navigationController?.toolbar.do {
-            $0.barTintColor = BraveUX.BackgroundColorForSideToolbars
-            $0.isTranslucent = false
-        }
+//        navigationController?.toolbar.do {
+//            $0.barTintColor = BraveUX.BackgroundColorForSideToolbars
+//            $0.isTranslucent = false
+//        }
     }
   
   override func reloadData() {
@@ -101,8 +108,8 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     navigationController?.setToolbarHidden(false, animated: true)
-    switchTableEditingMode(true)
     reloadData()
+    switchTableEditingMode(true)
   }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -124,6 +131,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     updateEditBookmarksButton(editMode)
     resetCellLongpressGesture(tableView.isEditing)
     
+    editBookmarksButton.isEnabled = bookmarksFRC?.fetchedObjects?.count != 0
     addFolderButton.isEnabled = !editMode
   }
   
@@ -187,6 +195,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         cell.addGestureRecognizer(lp)
       }
       
+      cell.backgroundColor = .clear
       cell.imageView?.contentMode = .scaleAspectFit
       cell.imageView?.image = FaviconFetcher.defaultFavicon
       cell.imageView?.layer.cornerRadius = 6
@@ -208,8 +217,6 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     let fontSize: CGFloat = 14.0
     cell.textLabel?.text = item.displayTitle ?? item.url
     cell.textLabel?.lineBreakMode = .byTruncatingTail
-    
-    cell.contentView.backgroundColor = .white
     
     if !item.isFolder {
       configCell(icon: item.domain?.favicon)
@@ -378,6 +385,7 @@ extension BookmarksViewController: NSFetchedResultsControllerDelegate {
   func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
     tableView.endUpdates()
     bookmarksDidChange?()
+    updateEditBookmarksButtonStatus()
   }
   
   func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
@@ -405,6 +413,9 @@ extension BookmarksViewController: NSFetchedResultsControllerDelegate {
       tableView.deleteRows(at: [indexPath], with: .automatic)
     case .move:
       break
+    @unknown default:
+        assertionFailure()
+        break
     }
   }
 }

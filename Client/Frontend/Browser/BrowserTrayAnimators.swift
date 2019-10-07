@@ -25,7 +25,7 @@ private extension TrayToBrowserAnimator {
         let tabManager = bvc.tabManager
         let displayedTabs = tabManager.tabsForCurrentMode
         
-        guard let selectedTab = bvc.tabManager.selectedTab, let expandFromIndex = displayedTabs.index(of: selectedTab) else {
+        guard let selectedTab = bvc.tabManager.selectedTab, let expandFromIndex = displayedTabs.firstIndex(of: selectedTab) else {
             fatalError("No tab selected for transition.")
         }
         bvc.view.frame = transitionContext.finalFrame(for: bvc)
@@ -77,7 +77,7 @@ private extension TrayToBrowserAnimator {
             cell.layer.borderWidth = 0.0
 
             bvc.tabTrayDidDismiss(tabTray)
-            UIApplication.shared.windows.first?.backgroundColor = TabTrayControllerUX.BackgroundColor.colorFor(tabTray.privateMode ? .private : .regular)
+            UIApplication.shared.windows.first?.backgroundColor = tabTray.collectionView.backgroundColor
             tabTray.navigationController?.setNeedsStatusBarAppearanceUpdate()
             tabTray.toolbar.transform = CGAffineTransform(translationX: 0, y: UIConstants.BottomToolbarHeight)
             tabCollectionViewSnapshot.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
@@ -94,7 +94,38 @@ private extension TrayToBrowserAnimator {
             bvc.topToolbar.isTransitioning = false
             bvc.updateTabsBarVisibility()
             transitionContext.completeTransition(true)
+            
+            self.WKWebViewPDFNotRenderingBugFix(for: bvc)
         })
+    }
+    
+    /// Fixes a Bug in iOS 12.2 where:
+    /// 1. Have Navigation Controller
+    /// 2. Set a ViewController with a WKWebView as root controller
+    /// 3. Push any other controller
+    /// 4. Dismiss the controller
+    /// 5. Verify that PDF not rendering.
+    /// 6. Present any controller and dismiss it
+    /// 7. Verify PDF re-rendered.
+    /// Note: This only happens when a UINavigationController ".push".
+    ///       It does not happen for `.present`
+    
+    /// Bug is present in FireFox iOS: https://stackoverflow.com/questions/52735158/wkwebview-shows-gray-background-and-pdf-content-gets-invisible-on-viewcontroller
+    /// Although, they solve it differently..
+    /// Confirmed by WebKit that it's an iOS bug: https://bugs.webkit.org/show_bug.cgi?id=193281
+    private func WKWebViewPDFNotRenderingBugFix(for controller: BrowserViewController) {
+        guard let mimeType = controller.tabManager.selectedTab?.mimeType, !mimeType.isKindOfHTML else {
+            return
+        }
+        
+        if mimeType.lowercased().contains("pdf") {
+            let fakeController = UIViewController()
+            if let navController = controller.navigationController {
+                navController.present(fakeController, animated: false, completion: {
+                    fakeController.dismiss(animated: false, completion: nil)
+                })
+            }
+        }
     }
 }
 
@@ -117,7 +148,7 @@ private extension BrowserToTrayAnimator {
         let container = transitionContext.containerView
         let tabManager = bvc.tabManager
         let displayedTabs = tabManager.tabsForCurrentMode
-        guard let selectedTab = bvc.tabManager.selectedTab, let scrollToIndex = displayedTabs.index(of: selectedTab) else {
+        guard let selectedTab = bvc.tabManager.selectedTab, let scrollToIndex = displayedTabs.firstIndex(of: selectedTab) else {
             fatalError("No tab selected for transition.")
         }
 
@@ -176,7 +207,7 @@ private extension BrowserToTrayAnimator {
                 cell.frame = finalFrame
                 cell.titleBackgroundView.transform = .identity
                 cell.layoutIfNeeded()
-                UIApplication.shared.windows.first?.backgroundColor = TabTrayControllerUX.BackgroundColor.colorFor(tabTray.privateMode ? .private : .regular)
+                UIApplication.shared.windows.first?.backgroundColor = tabTray.collectionView.backgroundColor
                 tabTray.navigationController?.setNeedsStatusBarAppearanceUpdate()
                     
                 cell.layer.borderWidth = TabTrayControllerUX.DefaultBorderWidth
@@ -313,7 +344,7 @@ private func createTransitionCellFromTab(_ tab: Tab?, withFrame frame: CGRect) -
     } else {
         cell.favicon.image = #imageLiteral(resourceName: "defaultFavicon")
     }
-    cell.applyTheme(PrivateBrowsingManager.shared.isPrivateBrowsing ? .private : .regular)
+    cell.applyTheme(Theme.of(tab))
 
     return cell
 }

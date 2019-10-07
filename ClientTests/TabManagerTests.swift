@@ -3,21 +3,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 @testable import Client
+@testable import Data
 import Shared
 import Storage
 import UIKit
 import WebKit
 import Deferred
-import Data
 import XCTest
-
-open class TabManagerMockProfile: MockProfile {
-    var numberOfTabsStored = 0
-    override public func storeTabs(_ tabs: [RemoteTab]) -> Deferred<Maybe<Int>> {
-        numberOfTabsStored = tabs.count
-        return deferMaybe(tabs.count)
-    }
-}
 
 open class MockTabManagerStateDelegate: TabManagerStateDelegate {
     var numberOfTabsStored = 0
@@ -120,7 +112,7 @@ class TabManagerTests: XCTestCase {
     override func setUp() {
         super.setUp()
         
-        let profile = TabManagerMockProfile()
+        let profile = MockProfile()
         manager = TabManager(prefs: profile.prefs, imageStore: nil)
         PrivateBrowsingManager.shared.isPrivateBrowsing = false
     }

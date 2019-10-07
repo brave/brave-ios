@@ -82,7 +82,6 @@ class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, Loa
     }
 
     override func viewDidLoad() {
-        view.backgroundColor = UIConstants.PanelBackgroundColor
         let blur = UIVisualEffectView(effect: UIBlurEffect(style: .light))
         view.addSubview(blur)
 
@@ -90,7 +89,6 @@ class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, Loa
 
         KeyboardHelper.defaultHelper.addDelegate(self)
 
-        searchEngineScrollView.layer.backgroundColor = SearchViewControllerUX.SearchEngineScrollViewBackgroundColor
         searchEngineScrollView.layer.shadowRadius = 0
         searchEngineScrollView.layer.shadowOpacity = 100
         searchEngineScrollView.layer.shadowOffset = CGSize(width: 0, height: -SearchViewControllerUX.SearchEngineTopBorderWidth)
@@ -306,7 +304,7 @@ class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, Loa
     @objc func didSelectEngine(_ sender: UIButton) {
         // The UIButtons are the same cardinality and order as the array of quick search engines.
         // Subtract 1 from index to account for magnifying glass accessory.
-        guard let index = searchEngineScrollViewContent.subviews.index(of: sender) else {
+        guard let index = searchEngineScrollViewContent.subviews.firstIndex(of: sender) else {
             assertionFailure()
             return
         }
@@ -767,12 +765,10 @@ fileprivate class SuggestionButton: InsetButton {
         super.init(frame: frame)
 
         setTitleColor(UIConstants.HighlightBlue, for: [])
-        setTitleColor(UIColor.Photon.White100, for: .highlighted)
         titleLabel?.font = DynamicFontHelper.defaultHelper.DefaultMediumFont
-        backgroundColor = SearchViewControllerUX.SuggestionBackgroundColor
-        layer.borderColor = SearchViewControllerUX.SuggestionBorderColor.cgColor
         layer.borderWidth = SearchViewControllerUX.SuggestionBorderWidth
         layer.cornerRadius = SearchViewControllerUX.SuggestionCornerRadius
+        layer.borderColor = UIConstants.HighlightBlue.cgColor
         contentEdgeInsets = SearchViewControllerUX.SuggestionInsets
 
         accessibilityHint = Strings.SearchesForSuggestionButtonAccessibilityText
@@ -785,7 +781,7 @@ fileprivate class SuggestionButton: InsetButton {
     @objc
     override var isHighlighted: Bool {
         didSet {
-            backgroundColor = isHighlighted ? UIConstants.HighlightBlue : SearchViewControllerUX.SuggestionBackgroundColor
+            alpha = isHighlighted ? 0.6 : 1.0
         }
     }
 }

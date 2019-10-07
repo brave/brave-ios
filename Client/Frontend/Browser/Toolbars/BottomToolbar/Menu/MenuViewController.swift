@@ -26,7 +26,6 @@ private class MenuCell: UITableViewCell {
             $0.trailing.equalTo(self).inset(12)
             $0.leading.equalTo(iconView.snp.trailing)
         }
-        labelView.textColor = .black
         separatorInset = UIEdgeInsets(top: 0, left: iconLength, bottom: 0, right: 0)
     }
     @available(*, unavailable)
@@ -52,7 +51,7 @@ class MenuViewController: UITableViewController {
     }
     
     private enum MenuButtons: Int, CaseIterable {
-        case settings, history, bookmarks, add, share
+        case settings, history, bookmarks, downloads, add, share
         
         var title: String {
             switch self {
@@ -61,16 +60,18 @@ class MenuViewController: UITableViewController {
             case .settings: return Strings.SettingsMenuItem
             case .add: return Strings.AddToMenuItem
             case .share: return Strings.ShareWithMenuItem
+            case .downloads: return Strings.DownloadsMenuItem
             }
         }
         
         var icon: UIImage {
             switch self {
-            case .bookmarks: return #imageLiteral(resourceName: "menu_bookmarks")
-            case .history: return #imageLiteral(resourceName: "menu-history")
-            case .settings: return #imageLiteral(resourceName: "menu-settings")
-            case .add: return #imageLiteral(resourceName: "menu-add-bookmark")
-            case .share: return #imageLiteral(resourceName: "nav-share")
+            case .bookmarks: return #imageLiteral(resourceName: "menu_bookmarks").template
+            case .history: return #imageLiteral(resourceName: "menu-history").template
+            case .settings: return #imageLiteral(resourceName: "menu-settings").template
+            case .add: return #imageLiteral(resourceName: "menu-add-bookmark").template
+            case .share: return #imageLiteral(resourceName: "nav-share").template
+            case .downloads: return #imageLiteral(resourceName: "menu-downloads").template
             }
         }
     }
@@ -85,7 +86,9 @@ class MenuViewController: UITableViewController {
         var allWithoutUrlButtons = allButtons
         allWithoutUrlButtons.removeAll { $0 == .add || $0 == .share }
         
-        guard let url = tab?.url, !url.isLocal else { return allWithoutUrlButtons }
+        guard let url = tab?.url, (!url.isLocal || url.isReaderModeURL) else {
+            return allWithoutUrlButtons
+        }
         return allButtons
     }()
     
@@ -110,6 +113,7 @@ class MenuViewController: UITableViewController {
         
         tableView.separatorColor = UX.separatorColor
         tableView.rowHeight = UX.rowHeight
+        tableView.backgroundColor = .clear
         
         tableView.contentInset = UIEdgeInsets(top: UX.topBottomInset, left: 0,
                                               bottom: UX.topBottomInset, right: 0)
@@ -120,10 +124,6 @@ class MenuViewController: UITableViewController {
         // Hide separator line of the last cell.
         tableView.tableFooterView =
             UIView(frame: CGRect(x: 0, y: 0, width: tableView.frame.size.width, height: 1))
-        
-        // TODO: Make the background view transparent with alpha 0.6
-        // simple setting its alpha doesn't seem to work.
-        tableView.backgroundColor = #colorLiteral(red: 0.9529411765, green: 0.9529411765, blue: 0.9647058824, alpha: 1)
         
         let size = CGSize(width: 200, height: UIScreen.main.bounds.height)
         
@@ -154,6 +154,7 @@ class MenuViewController: UITableViewController {
         case .settings: openSettings()
         case .add: openAddBookmark()
         case .share: openShareSheet()
+        case .downloads: openDownloads()
         }
     }
     
@@ -167,10 +168,24 @@ class MenuViewController: UITableViewController {
         
         cell.labelView.text = button.title
         cell.iconView.image = button.icon
+        
+        let homeColor = Theme.of(tab).colors.tints.home
+        cell.iconView.tintColor = homeColor.withAlphaComponent(0.6)
+        cell.labelView.textColor = homeColor
         cell.tag = button.rawValue
         cell.backgroundColor = .clear
         
         return cell
+    }
+    
+    override func tableView(_ tableView: UITableView, didHighlightRowAt indexPath: IndexPath) {
+        let cell = tableView.cellForRow(at: indexPath)
+        cell?.contentView.backgroundColor = Theme.of(tab).colors.home.withAlphaComponent(0.5)
+    }
+    
+    override func tableView(_ tableView: UITableView, didUnhighlightRowAt indexPath: IndexPath) {
+        let cell = tableView.cellForRow(at: indexPath)
+        cell?.contentView.backgroundColor = .clear
     }
     
     // MARK: - Actions
@@ -178,9 +193,18 @@ class MenuViewController: UITableViewController {
     private enum DoneButtonPosition { case left, right }
     private typealias DoneButton = (style: UIBarButtonItem.SystemItem, position: DoneButtonPosition)
     
-    private func open(_ viewController: UIViewController, doneButton: DoneButton) {
+    private func open(_ viewController: UIViewController, doneButton: DoneButton,
+                      allowSwipeToDismiss: Bool = true) {
         let nav = SettingsNavigationController(rootViewController: viewController)
-        nav.modalPresentationStyle = .formSheet
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            nav.modalPresentationStyle = .fullScreen
+        } else {
+            nav.modalPresentationStyle = .formSheet
+        }
+        
+        if #available(iOS 13.0, *) {
+            nav.isModalInPresentation = !allowSwipeToDismiss
+        }
         
         let button = UIBarButtonItem(barButtonSystemItem: doneButton.style, target: nav, action: #selector(nav.done))
         
@@ -200,10 +224,19 @@ class MenuViewController: UITableViewController {
         open(vc, doneButton: DoneButton(style: .done, position: .right))
     }
     
-    private func openAddBookmark() {
-        guard let title = tab?.displayTitle, let url = tab?.url?.absoluteString else { return }
+    private func openDownloads() {
+        let vc = DownloadsPanel(profile: bvc.profile)
         
-        let mode = BookmarkEditMode.addBookmark(title: title, url: url)
+        open(vc, doneButton: DoneButton(style: .done, position: .right))
+    }
+    
+    private func openAddBookmark() {
+        guard let title = tab?.displayTitle, let url = tab?.url else { return }
+        
+        let bookmarkUrl = url.decodeReaderModeURL ?? url
+        
+        let mode = BookmarkEditMode.addBookmark(title: title, url: bookmarkUrl.absoluteString)
+        
         let vc = AddEditBookmarkTableViewController(mode: mode)
         
         open(vc, doneButton: DoneButton(style: .cancel, position: .left))
@@ -219,7 +252,9 @@ class MenuViewController: UITableViewController {
     
     private func openSettings() {
         let vc = SettingsViewController(profile: bvc.profile, tabManager: bvc.tabManager)
-        open(vc, doneButton: DoneButton(style: .done, position: .right))
+        vc.settingsDelegate = bvc
+        open(vc, doneButton: DoneButton(style: .done, position: .right),
+             allowSwipeToDismiss: false)
     }
     
     private func openShareSheet() {

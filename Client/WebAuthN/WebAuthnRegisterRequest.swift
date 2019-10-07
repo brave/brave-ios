@@ -2,6 +2,11 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+struct PublicKeyCredentialDescriptor: Decodable {
+    let type: String
+    let id: String
+}
+
 struct WebAuthnRegisterRequest: Decodable {
     struct PublicKey: Decodable {
         struct PubKeyCredParams: Decodable {
@@ -24,7 +29,6 @@ struct WebAuthnRegisterRequest: Decodable {
         // If present the two keys may or may not be present
         struct AuthenticatorSelection: Decodable {
             var requireResidentKey: Bool?
-            var userVerification: String?
         }
         
         let authenticatorSelection: AuthenticatorSelection?
@@ -32,6 +36,7 @@ struct WebAuthnRegisterRequest: Decodable {
         let user: User
         let rp: Rp
         let challenge: String
+        let excludeCredentials: [PublicKeyCredentialDescriptor]?
     }
     let publicKey: PublicKey
 }

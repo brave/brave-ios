@@ -63,8 +63,11 @@ class SearchEngines {
     fileprivate let fileAccessor: FileAccessor
 
     static let defaultRegionSearchEngines = [
-        "DE": OpenSearchEngine.EngineNames.qwant,
-        "FR": OpenSearchEngine.EngineNames.qwant
+        "DE": OpenSearchEngine.EngineNames.duckDuckGo,
+        "FR": OpenSearchEngine.EngineNames.qwant,
+        "AU": OpenSearchEngine.EngineNames.duckDuckGo,
+        "NZ": OpenSearchEngine.EngineNames.duckDuckGo,
+        "IE": OpenSearchEngine.EngineNames.duckDuckGo,
     ]
     
     init(files: FileAccessor) {
@@ -96,8 +99,10 @@ class SearchEngines {
     /// Whether or not we should show DuckDuckGo related promotions based on the users current region
     static var shouldShowDuckDuckGoPromo: Bool {
         // We want to show ddg promo in most cases so guard returns true.
-        guard let region = Locale.current.regionCode else { return true }
-        return !defaultRegionSearchEngines.keys.contains(region)
+        guard let region = Locale.current.regionCode,
+            let searchEngine = defaultRegionSearchEngines[region] else { return true }
+        
+        return searchEngine == OpenSearchEngine.EngineNames.duckDuckGo
     }
 
     func setDefaultEngine(_ engine: String, forType type: DefaultEngineType) {
@@ -177,7 +182,7 @@ class SearchEngines {
             return
         }
 
-        customEngines.remove(at: customEngines.index(of: engine)!)
+        customEngines.remove(at: customEngines.firstIndex(of: engine)!)
         saveCustomEngines()
         orderedEngines = getOrderedEngines()
     }
@@ -292,8 +297,8 @@ class SearchEngines {
         // (if the user changed locales or added a new engine); these engines
         // will be appended to the end of the list.
         return unorderedEngines.sorted { engine1, engine2 in
-            let index1 = orderedEngineNames.index(of: engine1.shortName)
-            let index2 = orderedEngineNames.index(of: engine2.shortName)
+            let index1 = orderedEngineNames.firstIndex(of: engine1.shortName)
+            let index2 = orderedEngineNames.firstIndex(of: engine2.shortName)
 
             if index1 == nil && index2 == nil {
                 return engine1.shortName < engine2.shortName

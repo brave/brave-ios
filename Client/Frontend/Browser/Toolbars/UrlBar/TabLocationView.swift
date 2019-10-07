@@ -126,7 +126,7 @@ class TabLocationView: UIView {
         urlTextField.accessibilityActionsSource = self
         urlTextField.font = UIConstants.DefaultChromeFont
         urlTextField.backgroundColor = .clear
-
+        urlTextField.clipsToBounds = true
         // Remove the default drop interaction from the URL text field so that our
         // custom drop interaction on the BVC can accept dropped URLs.
         if let dropInteraction = urlTextField.textDropInteraction {
@@ -161,7 +161,7 @@ class TabLocationView: UIView {
         return readerModeButton
     }()
     
-    lazy var reloadButton = ToolbarButton().then {
+    lazy var reloadButton = ToolbarButton(top: true).then {
         $0.accessibilityIdentifier = "TabToolbar.stopReloadButton"
         $0.accessibilityLabel = Strings.TabToolbarReloadButtonAccessibilityLabel
         $0.setImage(#imageLiteral(resourceName: "nav-refresh").template, for: .normal)
@@ -172,7 +172,7 @@ class TabLocationView: UIView {
     }
 
     lazy var shieldsButton: ToolbarButton = {
-        let button = ToolbarButton()
+        let button = ToolbarButton(top: true)
         button.setImage(UIImage(imageLiteralResourceName: "shields-menu-icon"), for: .normal)
         button.addTarget(self, action: #selector(didClickBraveShieldsButton), for: .touchUpInside)
         button.imageView?.contentMode = .center
@@ -188,11 +188,9 @@ class TabLocationView: UIView {
         return button
     }()
     
-    lazy var separatorLine: UIView = {
-        let line = UIView()
-        line.layer.cornerRadius = 2
-        return line
-    }()
+    lazy var separatorLine: UIView = CustomSeparatorView(lineSize: .init(width: 1, height: 26), cornerRadius: 2)
+    
+    lazy var tabOptionsStackView = UIStackView()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -208,33 +206,25 @@ class TabLocationView: UIView {
         addGestureRecognizer(longPressRecognizer)
         addGestureRecognizer(tapRecognizer)
         
-        let buttonContentEdgeInsets = UIEdgeInsets(top: 6, left: 6, bottom: 6, right: 6)
+        var optionSubviews = [readerModeButton, reloadButton, separatorLine, shieldsButton]
+        separatorLine.isUserInteractionEnabled = false
         
-        #if NO_REWARDS
-        [readerModeButton, reloadButton, separatorLine, shieldsButton].forEach {
-            $0.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
-            $0.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-        }
-        
-        let buttonsStackview = UIStackView(arrangedSubviews: [shieldsButton])
-        
-        shieldsButton.contentEdgeInsets = buttonContentEdgeInsets
-        #else
-        [readerModeButton, reloadButton, separatorLine, shieldsButton, rewardsButton].forEach {
-            $0.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
-            $0.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-        }
-        
-        let buttonsStackview = UIStackView(arrangedSubviews: [shieldsButton, rewardsButton])
-        
-        shieldsButton.contentEdgeInsets = buttonContentEdgeInsets
-        rewardsButton.contentEdgeInsets = buttonContentEdgeInsets
-        
+        #if !NO_REWARDS
+        optionSubviews.append(rewardsButton)
         #endif
         
+        let buttonContentEdgeInsets = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 5)
+        optionSubviews.forEach {
+            ($0 as? CustomSeparatorView)?.layoutMargins = UIEdgeInsets(top: 0, left: 2, bottom: 0, right: 2)
+            ($0 as? UIButton)?.contentEdgeInsets = buttonContentEdgeInsets
+            $0.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
+            $0.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        }
+        optionSubviews.forEach(tabOptionsStackView.addArrangedSubview)
+        
         urlTextField.setContentHuggingPriority(.defaultLow, for: .horizontal)
-
-        let subviews = [lockImageView, urlTextField, readerModeButton, reloadButton, separatorLine, buttonsStackview]
+        
+        let subviews = [lockImageView, urlTextField, tabOptionsStackView]
         contentView = UIStackView(arrangedSubviews: subviews)
         contentView.distribution = .fill
         contentView.alignment = .center
@@ -242,28 +232,18 @@ class TabLocationView: UIView {
         contentView.isLayoutMarginsRelativeArrangement = true
         contentView.insetsLayoutMarginsFromSafeArea = false
         contentView.spacing = 10
+        contentView.setCustomSpacing(5, after: urlTextField)
+        
+        tabOptionsStackView.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 6)
+        tabOptionsStackView.isLayoutMarginsRelativeArrangement = true
         addSubview(contentView)
         
-        // Reduce spacing after separator to make space for shields button tappable area.
-        contentView.setCustomSpacing(2, after: separatorLine)
-
         contentView.snp.makeConstraints { make in
-            make.leading.top.bottom.equalTo(self)
-            make.trailing.equalTo(self).inset(6)
+            make.leading.trailing.top.bottom.equalTo(self)
         }
         
-        lockImageView.snp.makeConstraints { make in
-            make.height.equalTo(TabLocationViewUX.ButtonSize)
-        }
-        
-        separatorLine.snp.makeConstraints { make in
-            make.width.equalTo(1)
-            make.height.equalTo(26)
-        }
-        
-        readerModeButton.snp.makeConstraints { make in
-            make.size.width.equalTo(TabLocationViewUX.ButtonSize.width)
-            make.size.height.equalTo(TabLocationViewUX.ButtonSize.height)
+        tabOptionsStackView.snp.makeConstraints { make in
+            make.top.bottom.equalTo(contentView)
         }
 
         // Setup UIDragInteraction to handle dragging the location
@@ -341,15 +321,8 @@ class TabLocationView: UIView {
     }
 
     fileprivate func updateTextWithURL() {
-        if let host = url?.host, AppConstants.MOZ_PUNYCODE {
-            urlTextField.text = url?.absoluteString.replacingOccurrences(of: host, with: host.asciiHostToUTF8())
-        } else {
-            urlTextField.text = url?.absoluteString
-        }
-        // remove https:// (the scheme) from the url when displaying
-        if let scheme = url?.scheme, let range = url?.absoluteString.range(of: "\(scheme)://") {
-            urlTextField.text = url?.absoluteString.replacingCharacters(in: range, with: "")
-        }
+        (urlTextField as? DisplayTextField)?.hostString = url?.host ?? ""
+        urlTextField.text = url?.schemelessAbsoluteString.trim("/")
     }
 }
 
@@ -364,6 +337,13 @@ extension TabLocationView: UIGestureRecognizerDelegate {
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldBeRequiredToFailBy otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         // If the longPressRecognizer is active, fail the tap recognizer to avoid conflicts.
         return gestureRecognizer == longPressRecognizer && otherGestureRecognizer == tapRecognizer
+    }
+    
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+        if gestureRecognizer == tapRecognizer && touch.view == tabOptionsStackView {
+            return false
+        }
+        return true
     }
 }
 
@@ -400,20 +380,21 @@ extension TabLocationView: AccessibilityActionsSource {
 // MARK: - Themeable
 
 extension TabLocationView: Themeable {
+    var themeableChildren: [Themeable?]? {
+        return [reloadButton]
+    }
+    
     func applyTheme(_ theme: Theme) {
-        switch theme {
-        case .regular:
-            backgroundColor = BraveUX.LocationBarBackgroundColor
-        case .private:
-            backgroundColor = BraveUX.LocationBarBackgroundColor_PrivateMode
-        }
-
-        urlTextField.textColor = UIColor.Browser.Tint.colorFor(theme)
-        readerModeButton.selectedTintColor = UIColor.TextField.ReaderModeButtonSelected.colorFor(theme)
-        readerModeButton.unselectedTintColor = UIColor.TextField.ReaderModeButtonUnselected.colorFor(theme)
+        styleChildren(theme: theme)
         
-        reloadButton.applyTheme(theme)
-        separatorLine.backgroundColor = UIColor.TextField.Separator.colorFor(theme)
+        backgroundColor = theme.colors.addressBar.withAlphaComponent(theme.colors.transparencies.addressBarAlpha)
+        
+        urlTextField.textColor = theme.colors.tints.addressBar
+
+        readerModeButton.unselectedTintColor = theme.colors.tints.header
+        readerModeButton.selectedTintColor = theme.colors.accent
+
+        separatorLine.backgroundColor = theme.colors.border.withAlphaComponent(theme.colors.transparencies.borderAlpha)
     }
 }
 
@@ -427,8 +408,10 @@ extension TabLocationView: TabEventHandler {
     }
 }
 
-private class DisplayTextField: UITextField {
+class DisplayTextField: UITextField {
     weak var accessibilityActionsSource: AccessibilityActionsSource?
+    var hostString: String = ""
+    let pathPadding: CGFloat = 20.0
 
     override var accessibilityCustomActions: [UIAccessibilityCustomAction]? {
         get {
@@ -439,7 +422,52 @@ private class DisplayTextField: UITextField {
         }
     }
 
-    fileprivate override var canBecomeFirstResponder: Bool {
+    override var canBecomeFirstResponder: Bool {
         return false
+    }
+    
+    // This override is done in case the eTLD+1 string overflows the width of textField.
+    // In that case the textRect is adjusted to show right aligned and truncate left.
+    // Since this textField changes with WebView domain change, performance implications are low.
+    override func textRect(forBounds bounds: CGRect) -> CGRect {
+        var rect: CGRect = super.textRect(forBounds: bounds)
+        
+        if let size: CGSize = (self.hostString as NSString?)?.size(withAttributes: [.font: self.font!]) {
+            if size.width > self.bounds.width {
+                rect.origin.x = rect.origin.x - (size.width + pathPadding - self.bounds.width)
+                rect.size.width = size.width + pathPadding
+            }
+        }
+        return rect
+    }
+}
+
+private class CustomSeparatorView: UIView {
+    
+    private let innerView: UIView
+    init(lineSize: CGSize, cornerRadius: CGFloat = 0) {
+        innerView = UIView(frame: .init(origin: .zero, size: lineSize))
+        super.init(frame: .zero)
+        backgroundColor = .clear
+        innerView.layer.cornerRadius = cornerRadius
+        addSubview(innerView)
+        innerView.snp.makeConstraints {
+            $0.width.height.equalTo(lineSize)
+            $0.centerY.equalTo(self)
+            $0.leading.trailing.equalTo(self.layoutMarginsGuide)
+        }
+    }
+    
+    override var backgroundColor: UIColor? {
+        get {
+            return innerView.backgroundColor
+        }
+        set {
+            innerView.backgroundColor = newValue
+        }
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }

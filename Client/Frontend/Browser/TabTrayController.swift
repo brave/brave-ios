@@ -11,8 +11,6 @@ import BraveShared
 struct TabTrayControllerUX {
     static let CornerRadius = CGFloat(6.0)
     static let DefaultBorderWidth = 1.0 / UIScreen.main.scale
-    static let BackgroundColor = UIColor.TopTabs.Background
-    static let CellBackgroundColor = UIColor.TopTabs.Background
     static let ToolbarFont = UIFont.systemFont(ofSize: 17.0, weight: .medium)
     static let TextBoxHeight = CGFloat(32.0)
     static let FaviconSize = CGFloat(20)
@@ -194,11 +192,13 @@ class TabCell: UICollectionViewCell, Themeable {
     }
     
     func applyTheme(_ theme: Theme) {
-        backgroundHolder.backgroundColor = theme == .private ? UX.HomePanel.BackgroundColorPBM : UX.HomePanel.BackgroundColor
+        styleChildren(theme: theme)
+        
+        // TabCell doesn't use much theming atm, using non-themable values for some views here.
+        titleText.appearanceTextColor = .black
+        backgroundHolder.backgroundColor = theme.colors.home
         screenshotView.backgroundColor = backgroundHolder.backgroundColor
-        if theme == .private {
-            favicon.tintColor = UIColor.Photon.White100
-        }
+        favicon.tintColor = theme.colors.tints.home
     }
 }
 
@@ -228,10 +228,15 @@ class TabTrayController: UIViewController, Themeable {
 
     fileprivate(set) internal var privateMode: Bool = false {
         didSet {
+            // Should be set immediately before other logic executes
             PrivateBrowsingManager.shared.isPrivateBrowsing = privateMode
-            
             tabDataSource.tabs = tabManager.tabsForCurrentMode
-            applyTheme(privateMode ? .private : .regular)
+            
+            // This is a little tricky since this menu is one of the only places inside of the appliation
+            //  that has a state without gauranteeing a tab exists. Most UI elements should use `theme` or at the least
+            //  the related tab's theme, here this is not possible, so using hardened values 😕😭
+            applyTheme(Theme.of(nil))
+            toolbar.privateModeButton.isSelected = privateMode
             collectionView?.reloadData()
             setNeedsStatusBarAppearanceUpdate()
         }
@@ -291,7 +296,7 @@ class TabTrayController: UIViewController, Themeable {
         self.collectionView.reloadData()
     }
 
-// MARK: View Controller Callbacks
+    // MARK: View Controller Callbacks
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -337,7 +342,7 @@ class TabTrayController: UIViewController, Themeable {
         NotificationCenter.default.addObserver(self, selector: #selector(appDidBecomeActiveNotification), name: UIApplication.didBecomeActiveNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(dynamicFontChanged), name: .DynamicFontChanged, object: nil)
         
-        applyTheme(privateMode ? .private : .regular)
+        applyTheme(Theme.of(tabManager.selectedTab))
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -393,10 +398,14 @@ class TabTrayController: UIViewController, Themeable {
         }
     }
     
+    var themeableChildren: [Themeable?]? {
+        let cells = collectionView?.visibleCells.compactMap({ $0 as? TabCell }) ?? []
+        return [toolbar] + cells
+    }
+    
     func applyTheme(_ theme: Theme) {
-        collectionView?.backgroundColor = TabTrayControllerUX.BackgroundColor.colorFor(theme)
-        collectionView?.visibleCells.compactMap({ $0 as? TabCell }).forEach { $0.applyTheme(theme) }
-        toolbar.applyTheme(theme)
+        styleChildren(theme: theme)
+        collectionView?.backgroundColor = theme.colors.home
     }
     
     /// Reset the empty private browsing state (hide the details, unhide the learn more button) if it was changed
@@ -457,8 +466,10 @@ class TabTrayController: UIViewController, Themeable {
         // we clear out all of the private tabs
         tabManager.willSwitchTabMode(leavingPBM: privateMode)
         privateMode = !privateMode
-
-        toolbar.privateModeButton.isSelected = privateMode
+        
+        // When we switch from Private => Regular make sure we reset _selectedIndex, fix for bug #888
+        tabManager.resetSelectedIndex()
+        
         collectionView.layoutSubviews()
 
         let toView: UIView
@@ -608,7 +619,7 @@ extension TabTrayController: TabManagerDelegate {
 
         let updated = [ selected, previous ]
             .compactMap { $0 }
-            .compactMap { tabs.index(of: $0) }
+            .compactMap { tabs.firstIndex(of: $0) }
             .map { IndexPath(item: $0, section: 0) }
 
         assertIsMainThread("Changing selected tab is on main thread")
@@ -631,7 +642,7 @@ extension TabTrayController: TabManagerDelegate {
 
     func tabManager(_ tabManager: TabManager, didAddTab tab: Tab) {
         // Get the index of the added tab from it's set (private or normal)
-        guard let index = tabManager.tabsForCurrentMode.index(of: tab) else { return }
+        guard let index = tabManager.tabsForCurrentMode.firstIndex(of: tab) else { return }
         if !privateTabsAreEmpty() {
             emptyPrivateTabsView.isHidden = true
         }
@@ -802,7 +813,7 @@ fileprivate class TabManagerDataSource: NSObject, UICollectionViewDataSource {
         }
 
         tabCell.screenshotView.image = tab.screenshot
-        tabCell.applyTheme(PrivateBrowsingManager.shared.isPrivateBrowsing ? .private : .regular)
+        tabCell.applyTheme(Theme.of(tab))
         
         return tabCell
     }
@@ -855,7 +866,7 @@ extension TabManagerDataSource: UICollectionViewDragDelegate {
 @available(iOS 11.0, *)
 extension TabManagerDataSource: UICollectionViewDropDelegate {
     func collectionView(_ collectionView: UICollectionView, performDropWith coordinator: UICollectionViewDropCoordinator) {
-        guard isDragging, let destinationIndexPath = coordinator.destinationIndexPath, let dragItem = coordinator.items.first?.dragItem, let tab = dragItem.localObject as? Tab, let sourceIndex = tabs.index(of: tab) else {
+        guard isDragging, let destinationIndexPath = coordinator.destinationIndexPath, let dragItem = coordinator.items.first?.dragItem, let tab = dragItem.localObject as? Tab, let sourceIndex = tabs.firstIndex(of: tab) else {
             return
         }
 
@@ -875,7 +886,7 @@ extension TabManagerDataSource: UICollectionViewDropDelegate {
 
         // If the tab doesn't exist by the time we get here, we must return a
         // `.cancel` operation continuously until `isDragging` can be reset.
-        guard isDragging, tabs.index(of: tab) != nil else {
+        guard isDragging, tabs.firstIndex(of: tab) != nil else {
             isDragging = false
             return UICollectionViewDropProposal(operation: .cancel)
         }
@@ -954,7 +965,8 @@ private struct EmptyPrivateTabsViewUX {
 }
 
 // View we display when there are no private tabs created
-fileprivate class EmptyPrivateTabsView: UIView {
+// Need access for iOS 12 appearance adjustments
+/*fileprivate*/ class EmptyPrivateTabsView: UIView {
     
     let scrollView = UIScrollView().then {
         $0.alwaysBounceVertical = true
@@ -1054,7 +1066,7 @@ extension TabTrayController: TabPeekDelegate {
     }
 
     func tabPeekDidCloseTab(_ tab: Tab) {
-        if let index = self.tabDataSource.tabs.index(of: tab),
+        if let index = self.tabDataSource.tabs.firstIndex(of: tab),
             let cell = self.collectionView?.cellForItem(at: IndexPath(item: index, section: 0)) as? TabCell {
             cell.close()
         }
@@ -1102,7 +1114,7 @@ extension TabTrayController: UIAdaptivePresentationControllerDelegate, UIPopover
 }
 
 // MARK: - Toolbar
-class TrayToolbar: UIView {
+class TrayToolbar: UIView, Themeable {
     fileprivate let toolbarButtonSize = CGSize(width: 44, height: 44)
 
     let addTabButton = UIButton(type: .system).then {
@@ -1157,12 +1169,19 @@ class TrayToolbar: UIView {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    var themeableChildren: [Themeable?]? {
+        return [privateModeButton]
+    }
 
-    fileprivate func applyTheme(_ theme: Theme) {
-        UIApplication.shared.windows.first?.backgroundColor = TabTrayControllerUX.BackgroundColor.colorFor(theme)
-        addTabButton.tintColor = UIColor.TabTray.ToolbarButtonTint.colorFor(theme) // Needs to be changed
-        doneButton.tintColor = UIColor.TabTray.ToolbarButtonTint.colorFor(theme)
-        backgroundColor = TabTrayControllerUX.BackgroundColor.colorFor(theme)
-        privateModeButton.applyTheme(theme)
+    func applyTheme(_ theme: Theme) {
+        styleChildren(theme: theme)
+        
+        backgroundColor = theme.colors.home
+        UIApplication.shared.windows.first?.backgroundColor = backgroundColor
+        
+        addTabButton.tintColor = theme.colors.tints.footer
+        doneButton.tintColor = addTabButton.tintColor
+        
     }
 }

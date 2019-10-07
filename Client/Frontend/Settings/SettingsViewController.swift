@@ -61,8 +61,8 @@ extension DataSource {
     /// Since they are structs we cannot obtain references to them to alter them, we must directly access them
     /// from `sections[x].rows[y]`
     func indexPath(rowUUID: String, sectionUUID: String) -> IndexPath? {
-        guard let section = sections.index(where: { $0.uuid == sectionUUID }),
-            let row = sections[section].rows.index(where: { $0.uuid == rowUUID }) else {
+        guard let section = sections.firstIndex(where: { $0.uuid == sectionUUID }),
+            let row = sections[section].rows.firstIndex(where: { $0.uuid == rowUUID }) else {
                 return nil
         }
         return IndexPath(row: row, section: section)
@@ -86,8 +86,6 @@ class SettingsViewController: TableViewController {
         self.tabManager = tabManager
         
         super.init(style: .grouped)
-        
-        UITableViewCell.appearance().tintColor = BraveUX.BraveOrange
     }
     
     @available(*, unavailable)
@@ -96,19 +94,21 @@ class SettingsViewController: TableViewController {
     }
     
     override func viewDidLoad() {
-        
         navigationItem.title = Strings.Settings
-        
         tableView.accessibilityIdentifier = "SettingsViewController.tableView"
-        tableView.separatorColor = UIConstants.TableViewSeparatorColor
-        tableView.backgroundColor = UIConstants.TableViewHeaderBackgroundColor
-
         dataSource.sections = sections
+        
+        applyTheme(theme)
+    }
+    
+    private var theme: Theme {
+        Theme.of(tabManager.selectedTab)
     }
     
     private var sections: [Section] {
         var list = [Section]()
         list.append(generalSection)
+        list.append(displaySection)
         #if !NO_SYNC
             list.append(syncSection)
         #endif
@@ -142,8 +142,46 @@ class SettingsViewController: TableViewController {
             ]
         )
         
+        if #available(iOS 13.0, *), UIDevice.isIpad {
+            general.rows.append(BoolRow(title: Strings.AlwaysRequestDesktopSite,
+            option: Preferences.General.alwaysRequestDesktopSite))
+        }
+        
+        return general
+    }()
+    
+    private lazy var displaySection: Section = {
+        var display = Section(
+            header: .title(Strings.DisplaySettingsSection),
+            rows: []
+        )
+        
+        let reloadCell = { (row: Row, displayString: String) in
+            if let indexPath = self.dataSource.indexPath(rowUUID: row.uuid, sectionUUID: display.uuid) {
+                self.dataSource.sections[indexPath.section].rows[indexPath.row].detailText = displayString
+            }
+        }
+        
+        let themeSubtitle = Theme.DefaultTheme(rawValue: Preferences.General.themeNormalMode.value)?.displayString
+        var row = Row(text: Strings.ThemesDisplayBrightness, detailText: themeSubtitle, accessory: .disclosureIndicator, cellClass: MultilineSubtitleCell.self)
+        row.selection = { [unowned self] in
+            let optionsViewController = OptionSelectionViewController<Theme.DefaultTheme>(
+                options: Theme.DefaultTheme.normalThemesOptions,
+                selectedOption: Theme.DefaultTheme(rawValue: Preferences.General.themeNormalMode.value),
+                optionChanged: { [unowned self] _, option in
+                    Preferences.General.themeNormalMode.value = option.rawValue
+                    reloadCell(row, option.displayString)
+                    self.applyTheme(self.theme)
+                }
+            )
+            optionsViewController.headerText = Strings.ThemesDisplayBrightness
+            optionsViewController.footerText = Strings.ThemesDisplayBrightnessFooter
+            self.navigationController?.pushViewController(optionsViewController, animated: true)
+        }
+        display.rows.append(row)
+        
         if UIDevice.current.userInterfaceIdiom == .pad {
-            general.rows.append(
+            display.rows.append(
                 Row(text: Strings.Show_Tabs_Bar, accessory: .switchToggle(value: Preferences.General.tabBarVisibility.value == TabBarVisibility.always.rawValue, { Preferences.General.tabBarVisibility.value = $0 ? TabBarVisibility.always.rawValue : TabBarVisibility.never.rawValue }), cellClass: MultilineValue1Cell.self)
             )
         } else {
@@ -155,19 +193,29 @@ class SettingsViewController: TableViewController {
                     selectedOption: TabBarVisibility(rawValue: Preferences.General.tabBarVisibility.value),
                     optionChanged: { [unowned self] _, option in
                         Preferences.General.tabBarVisibility.value = option.rawValue
-                        
-                        if let indexPath = self.dataSource.indexPath(rowUUID: row.uuid, sectionUUID: general.uuid) {
-                            self.dataSource.sections[indexPath.section].rows[indexPath.row].detailText = option.displayString
-                        }
+                        reloadCell(row, option.displayString)
                     }
                 )
                 optionsViewController.headerText = Strings.Show_Tabs_Bar
                 self.navigationController?.pushViewController(optionsViewController, animated: true)
             }
-            general.rows.append(row)
+            display.rows.append(row)
         }
         
-        return general
+        display.rows.append(
+            BoolRow(title: Strings.Show_Bookmark_Button_In_Top_Toolbar, option: Preferences.General.showBookmarkToolbarShortcut)
+        )
+        
+        #if !NO_REWARDS
+        display.rows.append({
+            var row = BoolRow(title: Strings.HideRewardsIcon, option: Preferences.Rewards.hideRewardsIcon)
+            row.detailText = Strings.HideRewardsIconSubtitle
+            row.cellClass = MultilineSubtitleCell.self
+            return row
+        }())
+        #endif
+        
+        return display
     }()
     
     private lazy var syncSection: Section = {
@@ -261,7 +309,24 @@ class SettingsViewController: TableViewController {
                 }
             })
         ]
-        privacy.rows.append(BoolRow(title: Strings.Private_Browsing_Only, option: Preferences.Privacy.privateBrowsingOnly))
+        privacy.rows.append(
+            BoolRow(
+                title: Strings.Private_Browsing_Only,
+                option: Preferences.Privacy.privateBrowsingOnly,
+                onValueChange: {
+                    Preferences.Privacy.privateBrowsingOnly.value = $0
+                    
+                    // Need to flush the table, hacky, but works consistenly and well
+                    let superView = self.tableView.superview
+                    self.tableView.removeFromSuperview()
+                    DispatchQueue.main.async {
+                        // Let shield toggle change propagate, otherwise theme may not be set properly
+                        superView?.addSubview(self.tableView)
+                        self.applyTheme(self.theme)
+                    }
+                }
+            )
+        )
         return privacy
     }()
     
@@ -314,7 +379,6 @@ class SettingsViewController: TableViewController {
             rows: [
                 Row(text: Strings.Report_a_bug,
                     selection: { [unowned self] in
-                        // Report a bug
                         self.settingsDelegate?.settingsOpenURLInNewTab(BraveUX.BraveCommunityURL)
                         self.dismiss(animated: true)
                     },
@@ -413,6 +477,18 @@ class SettingsViewController: TableViewController {
     }
 }
 
+extension TableViewController: Themeable {
+    func applyTheme(_ theme: Theme) {
+        styleChildren(theme: theme)
+        tableView.reloadData()
+
+        //  View manipulations done via `apperance()` do not impact existing UI, so need to adjust manually
+        // exiting menus, so setting explicitly.
+        navigationController?.navigationBar.tintColor = UINavigationBar.appearance().tintColor
+        navigationController?.navigationBar.barTintColor = UINavigationBar.appearance().appearanceBarTintColor
+    }
+}
+
 fileprivate class MultilineButtonCell: ButtonCell {
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -442,6 +518,7 @@ fileprivate class MultilineSubtitleCell: SubtitleCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         textLabel?.numberOfLines = 0
+        detailTextLabel?.numberOfLines = 0
     }
     
     required init?(coder aDecoder: NSCoder) {

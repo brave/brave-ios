@@ -62,6 +62,11 @@ extension String {
         }
         return trimmed
     }
+    
+    //Minimize trimming effort for characterset based on string
+    public func trim(_ charactersInString: String) -> String {
+        return self.trimmingCharacters(in: CharacterSet(charactersIn: charactersInString))
+    }
 
     /// Adds a newline at the closest space from the middle of a string.
     /// Example turning "Mark as Read" into "Mark as\n Read"
@@ -120,6 +125,17 @@ extension String {
         } catch {
             log.error(error.localizedDescription)
         }
-        return nil
+        return 
+    }
+    
+    /*
+     Truncates the string to the specified length number of characters and appends an optional trailing string if longer.
+     - Parameter length: Desired maximum lengths of a string
+     - Parameter trailing: A 'String' that will be appended after the truncation.
+     
+     - Returns: 'String' object.
+     */
+    public func truncate(length: Int, trailing: String = "…") -> String {
+        return (self.count > length) ? self.prefix(length) + trailing : self
     }
 }

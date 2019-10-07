@@ -32,7 +32,8 @@ public final class Device: NSManagedObject, Syncable, CRUD {
         fetchRequest.entity = Device.entity(context: context)
         
         let currentDeviceSort = NSSortDescriptor(key: "isCurrentDevice", ascending: false)
-        fetchRequest.sortDescriptors = [currentDeviceSort]
+        let nameSort = NSSortDescriptor(key: "name", ascending: true)
+        fetchRequest.sortDescriptors = [currentDeviceSort, nameSort]
         
         return NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: context,
                                           sectionNameKeyPath: nil, cacheName: nil)
@@ -123,7 +124,7 @@ extension Device {
         }
     }
     
-    func updateResolvedRecord(_ record: SyncRecord?, context: WriteContext = .new) {
+    func updateResolvedRecord(_ record: SyncRecord?, context: WriteContext = .new(inMemory: false)) {
         guard let root = record as? SyncDevice else { return }
         self.name = root.name
         self.deviceId = root.deviceId

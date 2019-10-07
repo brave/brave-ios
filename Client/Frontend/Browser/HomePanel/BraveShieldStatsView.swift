@@ -8,7 +8,13 @@ import BraveShared
 
 class BraveShieldStatsView: UIView, Themeable {
     func applyTheme(_ theme: Theme) {
-        // BRAVE TODO:
+        styleChildren(theme: theme)
+        
+        let colors = theme.colors.stats
+        adsStatView.color = colors.ads
+        httpsStatView.color = colors.httpse
+        timeStatView.color = colors.timeSaved
+        
     }
     
     fileprivate let millisecondsPerItem: Int = 50
@@ -16,21 +22,18 @@ class BraveShieldStatsView: UIView, Themeable {
     lazy var adsStatView: StatView = {
         let statView = StatView(frame: CGRect.zero)
         statView.title = Strings.ShieldsAdAndTrackerStats
-        statView.color = UX.BraveOrange
         return statView
     }()
 
     lazy var httpsStatView: StatView = {
         let statView = StatView(frame: CGRect.zero)
         statView.title = Strings.ShieldsHttpsStats
-        statView.color = UX.Green
         return statView
     }()
     
     lazy var timeStatView: StatView = {
         let statView = StatView(frame: CGRect.zero)
         statView.title = Strings.ShieldsTimeStats
-        statView.color = PrivateBrowsingManager.shared.isPrivateBrowsing ? UX.GreyA : UX.GreyJ
         return statView
     }()
     
@@ -71,8 +74,8 @@ class BraveShieldStatsView: UIView, Themeable {
     }
     
     @objc private func update() {
-        adsStatView.stat = "\(BraveGlobalShieldStats.shared.adblock + BraveGlobalShieldStats.shared.trackingProtection)"
-        httpsStatView.stat = "\(BraveGlobalShieldStats.shared.httpse)"
+        adsStatView.stat = (BraveGlobalShieldStats.shared.adblock + BraveGlobalShieldStats.shared.trackingProtection).decimalFormattedString ?? "0"
+        httpsStatView.stat = BraveGlobalShieldStats.shared.httpse.decimalFormattedString ?? "0"
         timeStatView.stat = timeSaved
     }
     
@@ -103,7 +106,11 @@ class BraveShieldStatsView: UIView, Themeable {
                 text = Strings.ShieldsTimeStatsDays
             }
             
-            return "\(Int(counter))\(text)"
+            if let counterLocaleStr = Int(counter).decimalFormattedString {
+                return counterLocaleStr + text
+            } else {
+                return "0" + Strings.ShieldsTimeStatsSeconds     // If decimalFormattedString returns nil, default to "0s"
+            }
         }
     }
 }
@@ -111,7 +118,7 @@ class BraveShieldStatsView: UIView, Themeable {
 class StatView: UIView {
     var color: UIColor = UX.GreyJ {
         didSet {
-            statLabel.textColor = color
+            statLabel.appearanceTextColor = color
         }
     }
     
@@ -165,5 +172,14 @@ class StatView: UIView {
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+}
+
+fileprivate extension Int {
+    var decimalFormattedString: String? {
+        let numberFormatter = NumberFormatter()
+        numberFormatter.numberStyle = NumberFormatter.Style.decimal
+        numberFormatter.locale = NSLocale.current
+        return numberFormatter.string(from: self as NSNumber)
     }
 }

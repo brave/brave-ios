@@ -25,24 +25,14 @@ typealias SearchLoader = _SearchLoader<AnyObject, AnyObject>
 class _SearchLoader<UnusedA, UnusedB>: Loader<[Site], SearchViewController> {
     fileprivate let profile: Profile
     fileprivate let topToolbar: TopToolbarView
-    fileprivate let frecentHistory: FrecentHistory
     fileprivate var inProgress: Cancellable?
 
     init(profile: Profile, topToolbar: TopToolbarView) {
         self.profile = profile
         self.topToolbar = topToolbar
-        frecentHistory = profile.history.getFrecentHistory()
 
         super.init()
     }
-
-    fileprivate lazy var topDomains: [String] = {
-        guard let filePath = Bundle.main.path(forResource: "topdomains", ofType: "txt"),
-            let domains = try? String(contentsOfFile: filePath).components(separatedBy: "\n") else {
-                return []
-        }
-        return domains
-    }()
 
     // `weak` usage here allows deferred queue to be the owner. The deferred is always filled and this set to nil,
     // this is defensive against any changes to queue (or cancellation) behaviour in future.
@@ -75,16 +65,15 @@ class _SearchLoader<UnusedA, UnusedB>: Loader<[Site], SearchViewController> {
                 
                 // First, see if the query matches any URLs from the user's search history.
                 self.load(result)
-                for site in result {
-                    if let completion = self.completionForURL(site.url) {
-                        self.topToolbar.setAutocompleteSuggestion(completion)
-                        return
-                    }
+                
+                // If the new search string is not longer than the previous
+                // we don't need to find an autocomplete suggestion.
+                if oldValue.count > self.query.count {
+                    return
                 }
                 
-                // If there are no search history matches, try matching one of the Alexa top domains.
-                for domain in self.topDomains {
-                    if let completion = self.completionForDomain(domain) {
+                for site in result {
+                    if let completion = self.completionForURL(site.url) {
                         self.topToolbar.setAutocompleteSuggestion(completion)
                         return
                     }

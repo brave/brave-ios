@@ -7,7 +7,9 @@ import Shared
 
 private let log = Logger.browserLogger
 
-enum FileType: String { case dat, json, tgz }
+enum FileType: String {
+    case dat, json, tgz
+}
 
 enum AdblockerType {
     case general
@@ -39,12 +41,23 @@ enum AdblockerType {
     }
     
     /// A name under which given resource is stored on server.
-    var resourceName: String? {
+    func resourceName(for fileType: FileType) -> String? {
         switch self {
-        case .general: return AdblockResourcesMappings.generalAdblockName
+        case .general: return AdblockResourcesMappings.generalAdblockName(for: fileType)
         case .httpse: return AdblockResourcesMappings.generalHttpseName
-        case .regional(let locale): return ResourceLocale(rawValue: locale)?.resourceName
+        case .regional(let locale): return ResourceLocale(rawValue: locale)?.resourceName(for: fileType)
         }
+    }
+    
+    /// A name under which given resource is stored on server.
+    var endpoint: URL? {
+        guard var url = URL(string: AdblockResourceDownloader.endpoint) else { return nil }
+        
+        if case .regional = self {
+            url.appendPathComponent("regional")
+        }
+        
+        return url
     }
     
     var blockListName: BlocklistName? {

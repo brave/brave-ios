@@ -95,8 +95,8 @@ class UserScriptManager {
         
         var alteredSource = source
         let token = UserScriptManager.securityToken.uuidString.replacingOccurrences(of: "-", with: "", options: .literal)
-        alteredSource = alteredSource.replacingOccurrences(of: "$<webauthn>", with: "W\(token)", options: .literal)
-        alteredSource = alteredSource.replacingOccurrences(of: "$<u2f>", with: "U\(token)", options: .literal)
+        alteredSource = alteredSource.replacingOccurrences(of: "$<webauthn>", with: "fido2\(token)", options: .literal)
+        alteredSource = alteredSource.replacingOccurrences(of: "$<u2f>", with: "fido\(token)", options: .literal)
         alteredSource = alteredSource.replacingOccurrences(of: "$<pkc>", with: "pkp\(token)", options: .literal)
         alteredSource = alteredSource.replacingOccurrences(of: "$<assert>", with: "assert\(token)", options: .literal)
         alteredSource = alteredSource.replacingOccurrences(of: "$<attest>", with: "attest\(token)", options: .literal)
@@ -119,6 +119,57 @@ class UserScriptManager {
 
         return WKUserScript(source: alteredSource, injectionTime: .atDocumentEnd, forMainFrameOnly: false)
     }()
+    
+    private let resourceDownloadManagerUserScript: WKUserScript? = {
+        guard let path = Bundle.main.path(forResource: "ResourceDownloader", ofType: "js"), let source = try? String(contentsOfFile: path) else {
+            log.error("Failed to load ResourceDownloader.js")
+            return nil
+        }
+        var alteredSource: String = source
+        
+        //Verify that the application itself is making a call to the JS script instead of other scripts on the page.
+        //This variable will be unique amongst scripts loaded in the page.
+        //When the script is called, the token is provided in order to access teh script variable.
+        let token = UserScriptManager.securityToken.uuidString.replacingOccurrences(of: "-", with: "", options: .literal)
+        alteredSource = alteredSource.replacingOccurrences(of: "$<downloadManager>", with: "D\(token)", options: .literal)
+        
+        return WKUserScript(source: alteredSource, injectionTime: .atDocumentEnd, forMainFrameOnly: false)
+    }()
+    
+    private let WindowRenderHelperScript: WKUserScript? = {
+        guard let path = Bundle.main.path(forResource: "WindowRenderHelper", ofType: "js"), let source = try? String(contentsOfFile: path) else {
+            log.error("Failed to load WindowRenderHelper.js")
+            return nil
+        }
+        
+        //Verify that the application itself is making a call to the JS script instead of other scripts on the page.
+        //This variable will be unique amongst scripts loaded in the page.
+        //When the script is called, the token is provided in order to access teh script variable.
+        var alteredSource = source
+        let token = UserScriptManager.securityToken.uuidString.replacingOccurrences(of: "-", with: "", options: .literal)
+        alteredSource = alteredSource.replacingOccurrences(of: "$<windowRenderer>", with: "W\(token)", options: .literal)
+        
+        return WKUserScript(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+    }()
+    
+    private let FullscreenHelperScript: WKUserScript? = {
+        guard let path = Bundle.main.path(forResource: "FullscreenHelper", ofType: "js"), let source = try? String(contentsOfFile: path) else {
+            log.error("Failed to load FullscreenHelper.js")
+            return nil
+        }
+        
+        //Verify that the application itself is making a call to the JS script instead of other scripts on the page.
+        //This variable will be unique amongst scripts loaded in the page.
+        //When the script is called, the token is provided in order to access teh script variable.
+        var alteredSource = source
+        let token = UserScriptManager.securityToken.uuidString.replacingOccurrences(of: "-", with: "", options: .literal)
+        alteredSource = alteredSource.replacingOccurrences(of: "$<possiblySupportedFunctions>", with: "PSF\(token)", options: .literal)
+        alteredSource = alteredSource.replacingOccurrences(of: "$<isFullscreenSupportedNatively>", with: "IFSN\(token)", options: .literal)
+        alteredSource = alteredSource.replacingOccurrences(of: "$<documentHasFullscreenFunctions>", with: "DHFF\(token)", options: .literal)
+        alteredSource = alteredSource.replacingOccurrences(of: "$<videosSupportFullscreen>", with: "VSF\(token)", options: .literal)
+        
+        return WKUserScript(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+    }()
 
     private func reloadUserScripts() {
         tab?.webView?.configuration.userContentController.do {
@@ -137,6 +188,18 @@ class UserScriptManager {
             }
 
             if isU2FEnabled, let script = U2FLowLevelUserScript {
+                $0.addUserScript(script)
+            }
+            
+            if let script = resourceDownloadManagerUserScript {
+                $0.addUserScript(script)
+            }
+            
+            if let script = WindowRenderHelperScript {
+                $0.addUserScript(script)
+            }
+            
+            if let script = FullscreenHelperScript {
                 $0.addUserScript(script)
             }
         }

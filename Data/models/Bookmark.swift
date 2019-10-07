@@ -202,7 +202,7 @@ extension Bookmark {
                            syncOrder: String? = nil,
                            save: Bool = true,
                            sendToSync: Bool = true,
-                           context: WriteContext = .new) {
+                           context: WriteContext = .new(inMemory: false)) {
         
         DataController.perform(context: context) { context in
             let site = SyncSite()
@@ -233,7 +233,7 @@ extension Bookmark {
                               save: Bool = true,
                               sendToSync: Bool = true,
                               parentFolder: Bookmark? = nil,
-                              context: WriteContext = .new) {
+                              context: WriteContext = .new(inMemory: false)) {
         
         DataController.perform(context: context, save: save, task: { context in
             let bookmark = root
@@ -344,18 +344,21 @@ extension Bookmark {
     private func updateInternal(customTitle: String?, url: String?, newSyncOrder: String? = nil,
                                 save: Bool = true, sendToSync: Bool = true,
                                 location: SaveLocation = .keep,
-                                context: WriteContext = .new) {
+                                context: WriteContext = .new(inMemory: false)) {
         
         DataController.perform(context: context) { context in
             guard let bookmarkToUpdate = context.object(with: self.objectID) as? Bookmark else { return }
             
             // See if there has been any change
-            if bookmarkToUpdate.customTitle == customTitle && bookmarkToUpdate.url == url && bookmarkToUpdate.syncOrder == newSyncOrder, case .keep = location {
+            if bookmarkToUpdate.customTitle == customTitle &&
+                bookmarkToUpdate.url == url &&
+                (newSyncOrder == nil || bookmarkToUpdate.syncOrder == newSyncOrder),
+                case .keep = location {
                 return
             }
             
             bookmarkToUpdate.customTitle = customTitle
-            bookmarkToUpdate.title = customTitle
+            bookmarkToUpdate.title = customTitle ?? bookmarkToUpdate.title
             
             if let u = url, !u.isEmpty {
                 bookmarkToUpdate.url = url
@@ -498,7 +501,7 @@ extension Bookmark {
     
     // MARK: Delete
     
-    private func deleteInternal(save: Bool = true, sendToSync: Bool = true, context: WriteContext = .new) {
+    private func deleteInternal(save: Bool = true, sendToSync: Bool = true, context: WriteContext = .new(inMemory: false)) {
         func deleteFromStore(context: WriteContext) {
             DataController.perform(context: context, save: save) { context in
                 let objectOnContext = context.object(with: self.objectID)
@@ -561,17 +564,22 @@ extension Bookmark {
         // As for now, the return value for adding bookmark is never used.
     }
 
-    func updateResolvedRecord(_ record: SyncRecord?, context: WriteContext = .new) {
+    func updateResolvedRecord(_ record: SyncRecord?, context: WriteContext) {
         guard let bookmark = record as? SyncBookmark, let site = bookmark.site else { return }
-        title = site.title
-        syncParentUUID = bookmark.parentFolderObjectId
-        updateInternal(customTitle: site.customTitle, url: site.location,
-               newSyncOrder: bookmark.syncOrder, save: false, sendToSync: false, context: context)
-        lastVisited = Date(timeIntervalSince1970: (Double(site.lastAccessedTime ?? 0) / 1000.0))
-        if let recordCreated = record?.syncNativeTimestamp {
-            created = recordCreated
+        
+        DataController.perform(context: context) { context in
+            guard let bookmarkToUpdate = context.object(with: self.objectID) as? Bookmark else { return }
+            
+            bookmarkToUpdate.title = site.title
+            bookmarkToUpdate.syncParentUUID = bookmark.parentFolderObjectId
+            bookmarkToUpdate.updateInternal(customTitle: site.customTitle, url: site.location,
+                           newSyncOrder: bookmark.syncOrder, save: false, sendToSync: false,
+                           context: .existing(context))
+            bookmarkToUpdate.lastVisited = Date(timeIntervalSince1970: (Double(site.lastAccessedTime ?? 0) / 1000.0))
+            if let recordCreated = record?.syncNativeTimestamp {
+                bookmarkToUpdate.created = recordCreated
+            }
         }
-        // No auto-save, must be handled by caller if desired
     }
     
     func deleteResolvedRecord(save: Bool, context: NSManagedObjectContext) {

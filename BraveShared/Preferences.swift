@@ -42,6 +42,16 @@ extension Preferences {
         static let referralCode = Option<String?>(key: "urp.referral.code", default: nil)
         static let referralCodeDeleteDate = Option<TimeInterval?>(key: "urp.referral.delete-date", default: nil)
     }
+    
+    public final class Review {
+        /// Application Launch Count (how many times the application has been launched)
+        public static let launchCount = Option<Int>(key: "review.launch-count", default: 0)
+        /// Review Threshold (the total amount of launches needed for the next review to show up)
+        static let threshold = Option<Int>(key: "review.threshold", default: AppReview.firstThreshold)
+        /// Last Review Date
+        static let lastReviewDate = Option<Date?>(key: "review.last-date", default: nil)
+    }
+    
     final class BlockStats {
         static let adsCount = Option<Int>(key: "stats.adblock", default: 0)
         static let trackersCount = Option<Int>(key: "stats.tracking", default: 0)
@@ -76,6 +86,11 @@ extension Preferences {
         public static let useRegionAdBlock = Option<Bool>(key: "shields.regional-adblock", default: true)
         /// Version of downloaded data file for adblock stats.
         public static let adblockStatsDataVersion = Option<Int?>(key: "stats.adblock-data-version", default: nil)
+    }
+    
+    public final class Rewards {
+        public static let myFirstAdShown = Option<Bool>(key: "rewards.ads.my-first-ad-shown", default: false)
+        public static let hideRewardsIcon = Option<Bool>(key: "rewards.hide-rewards-icon", default: false)
     }
 }
 
@@ -151,6 +166,7 @@ extension Double: UserDefaultsEncodable {}
 extension String: UserDefaultsEncodable {}
 extension URL: UserDefaultsEncodable {}
 extension Data: UserDefaultsEncodable {}
+extension Date: UserDefaultsEncodable {}
 extension Array: UserDefaultsEncodable where Element: UserDefaultsEncodable {}
 extension Dictionary: UserDefaultsEncodable where Key: StringProtocol, Value: UserDefaultsEncodable {}
 

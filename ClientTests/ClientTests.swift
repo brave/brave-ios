@@ -67,12 +67,30 @@ class ClientTests: XCTestCase {
             "0x7f.0x0.0x0.0x1"
             ].forEach { XCTAssertFalse(hostIsValid($0), "\($0) host should not be valid.") }
     }
+    
+    func testDownloadsFolder() {
+        let path = try? FileManager.default.downloadsPath()
+        XCTAssertNotNil(path)
+        
+        XCTAssert(FileManager.default.fileExists(atPath: path!.path))
+        
+        // Let's pretend user deletes downloads folder via files.app
+        XCTAssertNoThrow(try FileManager.default.removeItem(at: path!))
+        
+        XCTAssertFalse(FileManager.default.fileExists(atPath: path!.path))
+        
+        // Calling downloads path should recreate the deleted folder
+        XCTAssertNoThrow(try FileManager.default.downloadsPath())
+        
+        XCTAssert(FileManager.default.fileExists(atPath: path!.path))
+    }
 
     fileprivate func hostIsValid(_ host: String) -> Bool {
         let expectation = self.expectation(description: "Validate host for \(host)")
         let request = URLRequest(url: URL(string: "http://\(host):6571/about/license")!)
         var response: HTTPURLResponse?
-        Alamofire.request(request).authenticate(usingCredential: WebServer.sharedInstance.credentials).response { (res) -> Void in
+        
+        AF.request(request).authenticate(with: WebServer.sharedInstance.credentials).response { (res) -> Void in
             response = res.response
             expectation.fulfill()
         }

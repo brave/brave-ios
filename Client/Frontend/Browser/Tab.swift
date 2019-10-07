@@ -26,7 +26,6 @@ protocol TabDelegate {
     func tab(_ tab: Tab, didSelectFindInPageForSelection selection: String)
     @objc optional func tab(_ tab: Tab, didCreateWebView webView: WKWebView)
     @objc optional func tab(_ tab: Tab, willDeleteWebView webView: WKWebView)
-    func tab(_ tab: Tab, isVerifiedPublisher verified: Bool)
 }
 
 @objc
@@ -47,6 +46,8 @@ class Tab: NSObject {
     
     let rewardsId: UInt32
     
+    var alertShownCount: Int = 0
+    var blockAllAlerts: Bool = false
     private(set) var type: TabType = .regular
     
     var isPrivate: Bool {
@@ -86,6 +87,7 @@ class Tab: NSObject {
     var url: URL?
     var mimeType: String?
     var isEditing: Bool = false
+    var shouldClassifyLoadsForAds = true
 
     // When viewing a non-HTML content type in the webview (like a PDF document), this URL will
     // point to a tempfile containing the content so it can be shared to external applications.
@@ -121,7 +123,7 @@ class Tab: NSObject {
 
     /// Whether or not the desktop site was requested with the last request, reload or navigation. Note that this property needs to
     /// be managed by the web view's navigation delegate.
-    var desktopSite: Bool = false
+    var desktopSite: Bool = Preferences.General.alwaysRequestDesktopSite.value
     
     var readerModeAvailableOrActive: Bool {
         if let readerMode = self.getContentScript(name: "ReaderMode") as? ReaderMode {
@@ -149,7 +151,7 @@ class Tab: NSObject {
 
     init(configuration: WKWebViewConfiguration, type: TabType = .regular) {
         self.configuration = configuration
-        rewardsId = UInt32.random(in: UInt32.min...UInt32.max)
+        rewardsId = UInt32.random(in: 1...UInt32.max)
         super.init()
         self.type = type
     }
@@ -193,6 +195,9 @@ class Tab: NSObject {
             configuration!.preferences = WKPreferences()
             configuration!.preferences.javaScriptCanOpenWindowsAutomatically = false
             configuration!.allowsInlineMediaPlayback = true
+            if #available(iOS 13.0, *) {
+                configuration!.defaultWebpagePreferences.preferredContentMode = Preferences.General.alwaysRequestDesktopSite.value ? .desktop : .mobile
+            }
             // Enables Zoom in website by ignoring their javascript based viewport Scale limits.
             configuration!.ignoresViewportScaleLimits = true
             let webView = TabWebView(frame: .zero, configuration: configuration!, isPrivate: isPrivate)
@@ -370,34 +375,19 @@ class Tab: NSObject {
         }
         return nil
     }
-    
-    func reportPageLoad() {
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate,
-            let rewards = appDelegate.browserViewController.rewards,
-            let webView = webView,
-            let url = webView.url,
-            !url.isLocal,
-            !PrivateBrowsingManager.shared.isPrivateBrowsing else { return }
-        
-        let getHtmlToStringJSCall = "document.documentElement.outerHTML.toString()"
-        let tabId = rewardsId
-        
-        DispatchQueue.main.async {
-            webView.evaluateJavaScript(getHtmlToStringJSCall, completionHandler: { html, _ in
-                guard let htmlString = html as? String else { return }
-                rewards.reportLoadedPage(url: url, tabId: tabId, html: htmlString) { verified in
-                    self.tabDelegate?.tab(self, isVerifiedPublisher: verified)
-                }
-            })
-        }
-    }
 
     func stop() {
         webView?.stopLoading()
     }
 
     func reload() {
-        let userAgent: String? = desktopSite ? UserAgent.desktopUserAgent() : nil
+        var mobileUA: String?
+        if #available(iOS 13.0, *) {
+            mobileUA = UserAgent.defaultUserAgent()
+        }
+
+        let userAgent: String? = desktopSite ? UserAgent.desktopUserAgent() : mobileUA
+        
         if (userAgent ?? "") != webView?.customUserAgent,
            let currentItem = webView?.backForwardList.currentItem {
             webView?.customUserAgent = userAgent
@@ -460,7 +450,7 @@ class Tab: NSObject {
     }
 
     func removeSnackbar(_ bar: SnackBar) {
-        if let index = bars.index(of: bar) {
+        if let index = bars.firstIndex(of: bar) {
             bars.remove(at: index)
             tabDelegate?.tab(self, didRemoveSnackbar: bar)
         }
@@ -512,10 +502,6 @@ class Tab: NSObject {
         }
         guard let url = self.webView?.url else {
             return
-        }
-        
-        if let helper = contentScriptManager.getContentScript(ContextMenuHelper.name()) as? ContextMenuHelper {
-            helper.replaceWebViewLongPress()
         }
 
         self.urlDidChangeDelegate?.tab(self, urlDidChangeTo: url)

@@ -39,10 +39,9 @@ open class AppInfo {
     /// http requests. It is the base bundle identifier with a "group." prefix.
     public static var sharedContainerIdentifier: String {
         var bundleIdentifier = baseBundleIdentifier
-        if bundleIdentifier == "com.brave.ios.FennecEnterprise" {
-            // Bug 1373726 - Base bundle identifier incorrectly generated for Nightly builds
-            // This can be removed when we are able to fix the app group in the developer portal
-            bundleIdentifier = "com.brave.ios.Fennec.enterprise"
+        if bundleIdentifier == "com.brave.ios.BrowserBeta" {
+            // com.brave.ios.BrowserBeta is taken and can't be used as an app group.
+            bundleIdentifier = "com.brave.ios.BrowserBeta.unique"
         }
         return "group." + bundleIdentifier
     }
