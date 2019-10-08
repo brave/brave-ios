@@ -294,6 +294,18 @@ class SettingsViewController: TableViewController {
                 title: Strings.Private_Browsing_Only,
                 option: Preferences.Privacy.privateBrowsingOnly,
                 onValueChange: { value in
+                    
+                    let applyThemeBlock = { [weak self] in
+                        guard let self = self else { return }
+                        // Need to flush the table, hacky, but works consistenly and well
+                        let superView = self.tableView.superview
+                        self.tableView.removeFromSuperview()
+                        DispatchQueue.main.async {
+                            // Let shield toggle change propagate, otherwise theme may not be set properly
+                            superView?.addSubview(self.tableView)
+                            self.applyTheme(self.theme)
+                        }
+                    }
 
                     if value {
                         let alert = UIAlertController(title: Strings.Private_Browsing_Only, message: Strings.Private_Browsing_Only_Warning, preferredStyle: .alert)
@@ -305,29 +317,13 @@ class SettingsViewController: TableViewController {
 
                         alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: { _ in
                             Preferences.Privacy.privateBrowsingOnly.value = value
-
-                            // Need to flush the table, hacky, but works consistenly and well
-                            let superView = self.tableView.superview
-                            self.tableView.removeFromSuperview()
-                            DispatchQueue.main.async {
-                                // Let shield toggle change propagate, otherwise theme may not be set properly
-                                superView?.addSubview(self.tableView)
-                                self.applyTheme(self.theme)
-                            }                        
+                            applyThemeBlock()
                         }))
 
                         self.present(alert, animated: true, completion: nil)
                     } else {
                         Preferences.Privacy.privateBrowsingOnly.value = value
-
-                        // Need to flush the table, hacky, but works consistenly and well
-                        let superView = self.tableView.superview
-                        self.tableView.removeFromSuperview()
-                        DispatchQueue.main.async {
-                            // Let shield toggle change propagate, otherwise theme may not be set properly
-                            superView?.addSubview(self.tableView)
-                            self.applyTheme(self.theme)
-                        }
+                        applyThemeBlock()
                     }
                 }
             )
