@@ -104,12 +104,6 @@ class SettingsViewController: TableViewController {
         tableView.accessibilityIdentifier = "SettingsViewController.tableView"
         dataSource.sections = sections
         
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(triggerQAMenu))
-        tapGesture.numberOfTapsRequired = 7
-        tapGesture.cancelsTouchesInView = false
-        tapGesture.delaysTouchesEnded = false
-        navigationController?.navigationBar.addGestureRecognizer(tapGesture)
-        
         applyTheme(theme)
     }
     
@@ -119,27 +113,6 @@ class SettingsViewController: TableViewController {
         settings.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(tappedQADone))
         let container = UINavigationController(rootViewController: settings)
         present(container, animated: true)
-    }
-    
-    @objc private func triggerQAMenu() {
-        guard rewards != nil && navigationController?.visibleViewController === self else { return }
-        
-        let alert = UIAlertController(title: "Nothing to see here", message: "What's the secret password", preferredStyle: .alert)
-        alert.addTextField(configurationHandler: {
-            $0.returnKeyType = .go
-            $0.isSecureTextEntry = true
-            $0.autocorrectionType = .no
-            $0.autocapitalizationType = .none
-        })
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-        alert.addAction(UIAlertAction(title: "Submit", style: .default, handler: { [unowned self] action in
-            guard let textField = alert.textFields?.first else { return }
-            let qaPassword = Bundle.main.infoDictionaryString(forKey: "QA_MENU_PW")
-            if !AppConstants.BuildChannel.isRelease || (!qaPassword.isEmpty && textField.text == qaPassword) {
-                self.displayRewardsDebugMenu()
-            }
-        }))
-        self.present(alert, animated: true)
     }
     
     @objc private func tappedQADone() {
