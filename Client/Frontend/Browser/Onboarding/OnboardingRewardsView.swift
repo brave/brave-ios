@@ -19,8 +19,8 @@ extension OnboardingRewardsViewController {
     
     class View: UIView {
         
-        let joinButton = CommonViews.primaryButton(text: Strings.OBJoinButton).then {
-            $0.accessibilityIdentifier = "OnboardingRewardsViewController.JoinButton"
+        let showMeButton = CommonViews.primaryButton(text: Strings.OBShowMeButton).then {
+            $0.accessibilityIdentifier = "OnboardingRewardsViewController.ShowMeButton"
         }
         
         let skipButton = CommonViews.secondaryButton().then {
@@ -92,7 +92,7 @@ extension OnboardingRewardsViewController {
             
             mainStackView.addArrangedSubview(descriptionView)
 
-            [skipButton, joinButton, UIView.spacer(.horizontal, amount: 0)]
+            [skipButton, showMeButton, UIView.spacer(.horizontal, amount: 0)]
                 .forEach(buttonsStackView.addArrangedSubview(_:))
             
             [textStackView, buttonsStackView].forEach(descriptionStackView.addArrangedSubview(_:))
