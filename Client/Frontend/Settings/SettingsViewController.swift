@@ -110,13 +110,7 @@ class SettingsViewController: TableViewController {
     private func displayRewardsDebugMenu() {
         guard let rewards = rewards else { return }
         let settings = QASettingsViewController(rewards: rewards)
-        settings.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(tappedQADone))
-        let container = UINavigationController(rootViewController: settings)
-        present(container, animated: true)
-    }
-    
-    @objc private func tappedQADone() {
-        dismiss(animated: true, completion: nil)
+        navigationController?.pushViewController(settings, animated: true)
     }
     
     private var theme: Theme {
