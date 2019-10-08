@@ -90,6 +90,8 @@
 	<array>
 		<string>org.mozilla.ios.firefox.browsing</string>
 	</array>
+	<key>QA_MENU_PW</key>
+	<string>$(BRAVE_QA_MENU_PW)</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>CharisSILB.ttf</string>

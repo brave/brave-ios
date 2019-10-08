@@ -11,6 +11,8 @@ import LocalAuthentication
 import SwiftyJSON
 import Data
 import WebKit
+import BraveRewards
+import BraveRewardsUI
 
 extension TabBarVisibility: RepresentableOptionType {
     public var displayString: String {
@@ -80,10 +82,12 @@ class SettingsViewController: TableViewController {
     
     private let profile: Profile
     private let tabManager: TabManager
+    private let rewards: BraveRewards?
     
-    init(profile: Profile, tabManager: TabManager) {
+    init(profile: Profile, tabManager: TabManager, rewards: BraveRewards? = nil) {
         self.profile = profile
         self.tabManager = tabManager
+        self.rewards = rewards
         
         super.init(style: .grouped)
     }
@@ -94,11 +98,52 @@ class SettingsViewController: TableViewController {
     }
     
     override func viewDidLoad() {
+        super.viewDidLoad()
+        
         navigationItem.title = Strings.Settings
         tableView.accessibilityIdentifier = "SettingsViewController.tableView"
         dataSource.sections = sections
         
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(triggerQAMenu))
+        tapGesture.numberOfTapsRequired = 7
+        tapGesture.cancelsTouchesInView = false
+        tapGesture.delaysTouchesEnded = false
+        navigationController?.navigationBar.addGestureRecognizer(tapGesture)
+        
         applyTheme(theme)
+    }
+    
+    private func displayRewardsDebugMenu() {
+        guard let rewards = rewards else { return }
+        let settings = QASettingsViewController(rewards: rewards)
+        settings.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(tappedQADone))
+        let container = UINavigationController(rootViewController: settings)
+        present(container, animated: true)
+    }
+    
+    @objc private func triggerQAMenu() {
+        guard rewards != nil && navigationController?.visibleViewController === self else { return }
+        
+        let alert = UIAlertController(title: "Nothing to see here", message: "What's the secret password", preferredStyle: .alert)
+        alert.addTextField(configurationHandler: {
+            $0.returnKeyType = .go
+            $0.isSecureTextEntry = true
+            $0.autocorrectionType = .no
+            $0.autocapitalizationType = .none
+        })
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: "Submit", style: .default, handler: { [unowned self] action in
+            guard let textField = alert.textFields?.first else { return }
+            let qaPassword = Bundle.main.infoDictionaryString(forKey: "QA_MENU_PW")
+            if !AppConstants.BuildChannel.isRelease || (!qaPassword.isEmpty && textField.text == qaPassword) {
+                self.displayRewardsDebugMenu()
+            }
+        }))
+        self.present(alert, animated: true)
+    }
+    
+    @objc private func tappedQADone() {
+        dismiss(animated: true, completion: nil)
     }
     
     private var theme: Theme {
@@ -191,7 +236,7 @@ class SettingsViewController: TableViewController {
                 let optionsViewController = OptionSelectionViewController<TabBarVisibility>(
                     options: TabBarVisibility.allCases,
                     selectedOption: TabBarVisibility(rawValue: Preferences.General.tabBarVisibility.value),
-                    optionChanged: { [unowned self] _, option in
+                    optionChanged: { _, option in
                         Preferences.General.tabBarVisibility.value = option.rawValue
                         reloadCell(row, option.displayString)
                     }
@@ -449,6 +494,9 @@ class SettingsViewController: TableViewController {
                     self.navigationController?.pushViewController(UrpLogsViewController(), animated: true)
                 }, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self),
                 Row(text: "URP Code: \(UserReferralProgram.getReferralCode() ?? "--")"),
+                Row(text: "View Rewards Debug Menu", selection: {
+                    self.displayRewardsDebugMenu()
+                }, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self),
                 Row(text: "Load all QA Links", selection: {
                     let url = URL(string: "https://raw.githubusercontent.com/brave/qa-resources/master/testlinks.json")!
                     let string = try? String(contentsOf: url)
