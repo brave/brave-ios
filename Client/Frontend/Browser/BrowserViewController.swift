@@ -2446,22 +2446,26 @@ extension BrowserViewController: WKUIDelegate {
                 let tabType = currentTab.type
                 
                 if !tabType.isPrivate {
-                    let openNewTabAction = UIAction(title: Strings.OpenNewTabButtonTitle) { _ in
+                    let openNewTabAction = UIAction(title: Strings.OpenNewTabButtonTitle,
+                                                    image: UIImage(systemName: "plus")) { _ in
                         self.addTab(url: url, inPrivateMode: false, currentTab: currentTab)
                     }
+                    
                     openNewTabAction.accessibilityLabel = "linkContextMenu.openInNewTab"
                     
                     actions.append(openNewTabAction)
                 }
                 
-                let openNewPrivateTabAction = UIAction(title: Strings.OpenNewPrivateTabButtonTitle) { _ in
+                let openNewPrivateTabAction = UIAction(title: Strings.OpenNewPrivateTabButtonTitle,
+                                                       image: #imageLiteral(resourceName: "private_glasses").template) { _ in
                     self.addTab(url: url, inPrivateMode: true, currentTab: currentTab)
                 }
                 openNewPrivateTabAction.accessibilityLabel = "linkContextMenu.openInNewPrivateTab"
                 
                 actions.append(openNewPrivateTabAction)
                 
-                let copyAction = UIAction(title: Strings.CopyLinkActionTitle) { _ in
+                let copyAction = UIAction(title: Strings.CopyLinkActionTitle,
+                                          image: UIImage(systemName: "doc.on.doc")) { _ in
                     UIPasteboard.general.url = url
                 }
                 copyAction.accessibilityLabel = "linkContextMenu.copyLink"
@@ -2469,7 +2473,8 @@ extension BrowserViewController: WKUIDelegate {
                 actions.append(copyAction)
                 
                 if let braveWebView = webView as? BraveWebView {
-                    let shareAction = UIAction(title: Strings.ShareLinkActionTitle) { _ in
+                    let shareAction = UIAction(title: Strings.ShareLinkActionTitle,
+                                               image: UIImage(systemName: "square.and.arrow.up")) { _ in
                         let touchPoint = braveWebView.lastHitPoint
                         let touchSize = CGSize(width: 0, height: 16)
                         let touchRect = CGRect(origin: touchPoint, size: touchSize)
