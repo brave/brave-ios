@@ -87,6 +87,9 @@ class PopupView: UIView, UIGestureRecognizerDelegate {
     
     var dialogWidth: CGFloat {
         get {
+            if UIDevice.current.userInterfaceIdiom == .pad {
+                return min((applicationWindow?.bounds.width ?? UIScreen.main.bounds.width) - padding * 2.0, kPopupDialogMaxWidth)
+            }
             return min(UIScreen.main.bounds.width - padding * 2.0, kPopupDialogMaxWidth)
         }
     }
@@ -243,7 +246,11 @@ class PopupView: UIView, UIGestureRecognizerDelegate {
         
         dialogView.removeFromSuperview()
         
-        frame = UIScreen.main.bounds
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            frame = applicationWindow?.bounds ?? UIScreen.main.bounds
+        } else {
+            frame = UIScreen.main.bounds
+        }
         addSubview(dialogView)
         setNeedsLayout()
         layoutIfNeeded()
