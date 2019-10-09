@@ -2494,7 +2494,12 @@ extension BrowserViewController: WKUIDelegate {
             return UIMenu(title: url.absoluteString, children: actions)
         }
         
-        let config = UIContextMenuConfiguration(identifier: nil, previewProvider: nil, actionProvider: actionProvider)
+        // BRAVE FIXME: Tapping on this view should load previewed page.
+        let sf: UIContextMenuContentPreviewProvider = {
+            return SFSafariViewController(url: url)
+        }
+        
+        let config = UIContextMenuConfiguration(identifier: nil, previewProvider: sf, actionProvider: actionProvider)
         
         completionHandler(config)
     }
