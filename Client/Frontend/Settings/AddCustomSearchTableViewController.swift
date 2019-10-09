@@ -35,22 +35,13 @@ class AddCustomSearchTableViewController: UITableViewController {
     }
     
     fileprivate lazy var spinnerView: UIActivityIndicatorView = {
-        let spinner = UIActivityIndicatorView(activityIndicatorStyle: .gray)
+        let spinner = UIActivityIndicatorView(style: .gray)
         spinner.hidesWhenStopped = true
         return spinner
     }()
     
     fileprivate var successCallback: (() -> Void)?
     fileprivate var favicon: Favicon?
-    
-    lazy fileprivate var alamofire: SessionManager = {
-        let configuration = URLSessionConfiguration.default
-        var defaultHeaders = SessionManager.default.session.configuration.httpAdditionalHeaders ?? [:]
-        defaultHeaders["User-Agent"] = UserAgent.desktopUserAgent()
-        configuration.httpAdditionalHeaders = defaultHeaders
-        configuration.timeoutIntervalForRequest = 5
-        return SessionManager(configuration: configuration)
-    }()
     
     private var showAutoAddSearchButton = false {
         didSet {
@@ -73,7 +64,8 @@ class AddCustomSearchTableViewController: UITableViewController {
                 request.timeoutInterval = 10.0
                 showAutoAddSearchButton = false
                 manageURLHeaderView()
-                loadRequest = alamofire.request(host)
+                // TODO: Fix this request
+//                loadRequest = alamofire.request(host)
                 loadRequest?.response(queue: DispatchQueue.main) {[weak self] response in
                     guard let data = response.data, response.error == nil else {
                         self?.openSearchLinkDict = nil
@@ -85,7 +77,7 @@ class AddCustomSearchTableViewController: UITableViewController {
         }
     }
     
-    override init(style: UITableViewStyle) {
+    override init(style: UITableView.Style) {
         super.init(style: .grouped)
     }
     

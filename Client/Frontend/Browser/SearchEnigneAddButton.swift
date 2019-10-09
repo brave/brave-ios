@@ -43,7 +43,7 @@ class SearchEnigneAddButton: UIView {
         }
     }
     private let searchButton: UIButton!
-    private let loadingIndicator: UIActivityIndicatorView = UIActivityIndicatorView(activityIndicatorStyle: .white)
+    private let loadingIndicator: UIActivityIndicatorView = UIActivityIndicatorView(style: .white)
     private var hidesWhenDisabled: Bool = false
     override init(frame: CGRect) {
         self.state = .disabled

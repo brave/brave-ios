@@ -125,7 +125,7 @@ extension String {
         } catch {
             log.error(error.localizedDescription)
         }
-        return 
+        return nil
     }
     
     /*

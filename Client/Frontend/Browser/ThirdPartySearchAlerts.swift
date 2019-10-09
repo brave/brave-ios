@@ -28,8 +28,8 @@ class ThirdPartySearchAlerts: UIAlertController {
             message: "alert",
             preferredStyle: .alert
         )
-        let boldAttr1 = [NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 18)]
-        let boldAttr2 = [NSAttributedStringKey.font: UIFont.systemFont(ofSize: 14)]
+        let boldAttr1 = [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 18)]
+        let boldAttr2 = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 14)]
         let attrStr1 = NSMutableAttributedString(string: "\n\(title)\n\(url)\n\n")
         let attrStr2 = NSMutableAttributedString(string: Strings.ThirdPartySearchAddMessage)
         
