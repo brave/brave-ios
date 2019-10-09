@@ -4,6 +4,10 @@
 
 import UIKit
 import BraveRewards
+import BraveShared
+import Shared
+
+private typealias EnvironmentOverride = Preferences.Rewards.EnvironmentOverride
 
 /// A special QA settings menu that allows them to adjust debug rewards features
 public class QASettingsViewController: UIViewController {
@@ -27,7 +31,9 @@ public class QASettingsViewController: UIViewController {
     
     title = "Rewards QA Settings"
     
-    let scrollView = UIScrollView()
+    let scrollView = UIScrollView().then {
+      $0.alwaysBounceVertical = true
+    }
     
     let stackView = UIStackView().then {
       $0.axis = .vertical
@@ -60,15 +66,20 @@ public class QASettingsViewController: UIViewController {
           BraveAds.isDebug = value
         }
       }),
+      .view(UILabel().then {
+        let isDefaultEnvironmentProd = AppConstants.BuildChannel != .developer
+        $0.text = "Default Environment: \(isDefaultEnvironmentProd ? "Prod" : "Staging")"
+        $0.textColor = Colors.grey200
+        $0.numberOfLines = 0
+        $0.font = .systemFont(ofSize: 14)
+      }),
       .view(EnvironmentRow().then {
-        $0.segmentedControl.selectedSegmentIndex = BraveLedger.isProduction ? 1 : 0
+        $0.segmentedControl.selectedSegmentIndex = Preferences.Rewards.environmentOverride.value
         $0.valueChanged = { value in
-          let isProd = value == 1
-          if BraveLedger.isProduction != isProd {
-            BraveLedger.isProduction = isProd
-            BraveAds.isProduction = isProd
-            self.rewards.reset()
-          }
+          guard let _ = EnvironmentOverride(rawValue: value) else { return }
+          Preferences.Rewards.environmentOverride.value = value
+          self.rewards.reset()
+          self.showResetRewardsAlert()
         }
       }),
       .view(SwitchRow().then {
@@ -117,6 +128,20 @@ public class QASettingsViewController: UIViewController {
   
   @objc private func tappedReset() {
     rewards.reset()
+    showResetRewardsAlert()
+  }
+  
+  private func showResetRewardsAlert() {
+    let alert = UIAlertController(
+      title: nil,
+      message: "Rewards has been reset. Force-quit the app to update the environment",
+      preferredStyle: .alert
+    )
+    alert.addAction(UIAlertAction(title: "Exit Now", style: .destructive, handler: { _ in
+      fatalError()
+    }))
+    alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+    present(alert, animated: true)
   }
 }
 
@@ -128,13 +153,13 @@ private class EnvironmentRow: UIStackView {
   }
   
   let textLabel = UILabel().then {
-    $0.text = "Environment"
+    $0.text = "Environment Override"
     $0.font = .systemFont(ofSize: 14.0)
     $0.textColor = UX.textColor
     $0.numberOfLines = 0
   }
   
-  let segmentedControl = UISegmentedControl(items: ["Staging", "Prod"])
+  let segmentedControl = UISegmentedControl(items: EnvironmentOverride.allCases.map { $0.name })
   
   override init(frame: CGRect) {
     super.init(frame: frame)
