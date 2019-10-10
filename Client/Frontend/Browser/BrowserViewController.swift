@@ -2511,9 +2511,19 @@ extension BrowserViewController: WKUIDelegate {
             return UIMenu(title: url.absoluteString, children: actions)
         }
         
-        let config = UIContextMenuConfiguration(identifier: nil, previewProvider: nil, actionProvider: actionProvider)
+        let linkPreview: UIContextMenuContentPreviewProvider = {
+            return SFSafariViewController(url: url)
+        }
+        
+        let config = UIContextMenuConfiguration(identifier: nil, previewProvider: linkPreview, actionProvider: actionProvider)
         
         completionHandler(config)
+    }
+    
+    @available(iOS 13.0, *)
+    func webView(_ webView: WKWebView, contextMenuForElement elementInfo: WKContextMenuElementInfo, willCommitWithAnimator animator: UIContextMenuInteractionCommitAnimating) {
+        guard let url = elementInfo.linkURL else { return }
+        webView.load(URLRequest(url: url))
     }
     
     fileprivate func addTab(url: URL, inPrivateMode: Bool, currentTab: Tab) {
