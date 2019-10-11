@@ -2517,12 +2517,11 @@ extension BrowserViewController: WKUIDelegate {
                 actions.append(linkPreviewAction)
             }
             
-            let menuTitle = Preferences.General.enableLinkPreview.value ? "" : url.absoluteString
-            return UIMenu(title: menuTitle, children: actions)
+            return UIMenu(title: url.absoluteString, children: actions)
         }
         
         let linkPreview: UIContextMenuContentPreviewProvider = {
-            return SFSafariViewController(url: url)
+            return LinkPreviewViewController(url: url)
         }
         
         let linkPreviewProvider = Preferences.General.enableLinkPreview.value ? linkPreview : nil
