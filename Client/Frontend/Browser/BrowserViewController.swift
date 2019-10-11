@@ -2517,7 +2517,7 @@ extension BrowserViewController: WKUIDelegate {
                 actions.append(linkPreviewAction)
             }
             
-            return UIMenu(title: url.absoluteString, children: actions)
+            return UIMenu(title: url.absoluteString.truncate(length: 100), children: actions)
         }
         
         let linkPreview: UIContextMenuContentPreviewProvider = {
