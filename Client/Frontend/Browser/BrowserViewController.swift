@@ -2505,17 +2505,29 @@ extension BrowserViewController: WKUIDelegate {
                     
                     actions.append(shareAction)
                 }
+                
+                let linkPreview = Preferences.General.enableLinkPreview.value
+                
+                let linkPreviewTitle = linkPreview ?
+                    Strings.HideLinkPreviewsActionTitle : Strings.ShowLinkPreviewsActionTitle
+                let linkPreviewAction = UIAction(title: linkPreviewTitle, image: UIImage(systemName: "eye.fill")) { _ in
+                    Preferences.General.enableLinkPreview.value.toggle()
+                }
             
+                actions.append(linkPreviewAction)
             }
             
-            return UIMenu(title: url.absoluteString, children: actions)
+            let menuTitle = Preferences.General.enableLinkPreview.value ? "" : url.absoluteString
+            return UIMenu(title: menuTitle, children: actions)
         }
         
         let linkPreview: UIContextMenuContentPreviewProvider = {
             return SFSafariViewController(url: url)
         }
         
-        let config = UIContextMenuConfiguration(identifier: nil, previewProvider: linkPreview, actionProvider: actionProvider)
+        let linkPreviewProvider = Preferences.General.enableLinkPreview.value ? linkPreview : nil
+        let config = UIContextMenuConfiguration(identifier: nil, previewProvider: linkPreviewProvider,
+                                                actionProvider: actionProvider)
         
         completionHandler(config)
     }
