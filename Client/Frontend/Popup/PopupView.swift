@@ -85,8 +85,12 @@ class PopupView: UIView, UIGestureRecognizerDelegate {
     var showHandler: (() -> Void)?
     var dismissHandler: (() -> Void)?
     
-    var dialogWidth: CGFloat {
+    var dialogWidth: CGFloat {        
         get {
+            if let superview = self.superview {
+                return min(superview.bounds.width - padding * 2.0, kPopupDialogMaxWidth)
+            }
+            
             if UIDevice.current.userInterfaceIdiom == .pad {
                 return min((applicationWindow?.bounds.width ?? UIScreen.main.bounds.width) - padding * 2.0, kPopupDialogMaxWidth)
             }
