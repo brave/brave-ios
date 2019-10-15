@@ -13,6 +13,7 @@ extension OnboardingRewardsAgreementViewController {
         /// A negative spacing is needed to make rounded corners for details view visible.
         static let negativeSpacing: CGFloat = -16
         static let descriptionContentInset: CGFloat = 32
+        static let descriptionContentBottomInset: CGFloat = 52
         static let linkColor: UIColor = BraveUX.BraveOrange
         static let animationContentInset: CGFloat = 50.0
         static let checkboxInsets: CGFloat = -44.0
@@ -157,12 +158,13 @@ extension OnboardingRewardsAgreementViewController {
             mainStackView.snp.makeConstraints {
                 $0.leading.equalTo(self.safeArea.leading)
                 $0.trailing.equalTo(self.safeArea.trailing)
-                $0.bottom.equalTo(self.safeArea.bottom)
+                $0.bottom.equalTo(snp.bottom)
             }
             
             descriptionView.addSubview(descriptionStackView)
             descriptionStackView.snp.makeConstraints {
-                $0.edges.equalToSuperview().inset(UX.descriptionContentInset)
+                $0.top.leading.trailing.equalToSuperview().inset(UX.descriptionContentInset)
+                $0.bottom.equalToSuperview().inset(UX.descriptionContentBottomInset)
             }
             
             mainStackView.addArrangedSubview(descriptionView)
