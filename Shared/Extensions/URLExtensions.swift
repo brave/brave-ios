@@ -238,6 +238,39 @@ extension URL {
     }
 
     /**
+    * Returns a possible mobile host and the domain, but with the same scheme, and a trailing '/'.
+    *
+    * E.g., https://m.foo.com/bar/baz?noo=abc#123  => https://m.foo.com/
+    * Or https://mobile.foo.com/bar/baz?noo=abc#123 => https://mobile.foo.com/
+    */
+    public var mobileDomainURL: URL {
+        if let normalized = self.normalizedMobileHost {
+            // Use URLComponents instead of URL since the former correctly preserves
+            // brackets for IPv6 hosts, whereas the latter escapes them.
+            var components = URLComponents()
+            components.scheme = self.scheme
+            components.port = self.port
+            components.host = normalized
+            return components.url ?? self
+        }
+        return self
+    }
+    
+    public var normalizedMobileHost: String? {
+        // Use components.host instead of self.host since the former correctly preserves
+        // brackets for IPv6 hosts, whereas the latter strips them.
+        guard let components = URLComponents(url: self, resolvingAgainstBaseURL: false), var host = components.host, host != "" else {
+            return nil
+        }
+
+        if let range = host.range(of: "^(www)\\.", options: .regularExpression) {
+            host.replaceSubrange(range, with: "")
+        }
+
+        return host
+    }
+    
+    /**
      * Returns just the domain, but with the same scheme, and a trailing '/'.
      *
      * E.g., https://m.foo.com/bar/baz?noo=abc#123  => https://foo.com/
@@ -246,7 +279,7 @@ extension URL {
      */
     public var domainURL: URL {
         if let normalized = self.normalizedHost {
-            // Use NSURLComponents instead of NSURL since the former correctly preserves
+            // Use URLComponents instead of URL since the former correctly preserves
             // brackets for IPv6 hosts, whereas the latter escapes them.
             var components = URLComponents()
             components.scheme = self.scheme
