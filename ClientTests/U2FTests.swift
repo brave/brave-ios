@@ -63,15 +63,15 @@ class U2FTests: XCTestCase {
         }
     }
     
-    func testWebAuthnUserPresence() {
+    func testWebAuthnUserVerification() {
         do {
             var payloads = [String]()
-            let presences = ["required", "preferred", "discouraged"]
-            let expected = [true, true, false, true]
+            let verifications = ["required", "preferred", "discouraged"]
+            let expected: [WebAuthnUserVerification] = [.required, .preferred, .discouraged, .preferred]
             
-            // Test expected presences
-            for presence in presences {
-                let payload = "{\"publicKey\":{\"allowCredentials\":[{\"type\":\"public-key\",\"id\":\"OvQO5490o1w89Op/9dp4w7VvKuLEk5NHcfOnc2ZECtc=\"}],\"rpId\":\"demo.brave.com\",\"timeout\":90000,\"userVerification\":\"\(presence)\",\"challenge\":\"mdMbxTPACurawWFHqkoltSUwDear2OZQVl/uhBNqiaM=\"},\"signal\":{}}"
+            // Test expected verifications
+            for verification in verifications {
+                let payload = "{\"publicKey\":{\"allowCredentials\":[{\"type\":\"public-key\",\"id\":\"OvQO5490o1w89Op/9dp4w7VvKuLEk5NHcfOnc2ZECtc=\"}],\"rpId\":\"demo.brave.com\",\"timeout\":90000,\"userVerification\":\"\(verification)\",\"challenge\":\"mdMbxTPACurawWFHqkoltSUwDear2OZQVl/uhBNqiaM=\"},\"signal\":{}}"
                 payloads.append(payload)
             }
             
@@ -86,7 +86,7 @@ class U2FTests: XCTestCase {
                 
                 let request =  try JSONDecoder().decode(WebAuthnAuthenticateRequest.self, from: jsonData)
                 
-                XCTAssertTrue(request.userPresence == expected[i], "request userPresence is correct")
+                XCTAssertTrue(request.userVerification == expected[i], "request userPresence is correct")
             }
         } catch {
             XCTFail("\(error)")
