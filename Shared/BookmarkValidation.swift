@@ -18,8 +18,9 @@ public struct BookmarkValidation {
     
     public static func validateBookmarklet(title: String?, url: String?) -> Bool {
         guard let url = url else { return validateTitle(title) }
+        if !url.isBookmarklet { return false }
         guard let javascriptCode = url.bookmarkletCodeComponent else {
-            return BookmarkValidation.validateTitle(title) && BookmarkValidation.validateUrl(url)
+            return false
         }
         
         // A bookmarklet is considered valid if it's code is valid JS.
