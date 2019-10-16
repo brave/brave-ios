@@ -59,6 +59,8 @@ extension OnboardingRewardsViewController {
         private lazy var textStackView = UIStackView().then { stackView in
             stackView.axis = .vertical
             stackView.spacing = 8
+            stackView.layoutMargins = UIEdgeInsets(top: 0.0, left: 20.0, bottom: 0.0, right: 20.0)
+            stackView.isLayoutMarginsRelativeArrangement = true
             
             [titleLabel, descriptionLabel].forEach {
                 stackView.addArrangedSubview($0)
