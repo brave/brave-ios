@@ -55,9 +55,9 @@ class OnboardingNavigationController: UINavigationController {
             }
             #else
             switch self {
-            case .newUser: return BraveAds.isSupportedRegion(Locale.current.identifier) ? [.searchEnginePicker, .shieldsInfo, .rewardsInfo, .rewardsAgreement, .adsCountdown] : [.searchEnginePicker, .shieldsInfo, .rewardsInfo, .rewardsAgreement]
-            case .existingUserRewardsOff: return BraveAds.isSupportedRegion(Locale.current.identifier) ? [.rewardsInfo, .rewardsAgreement, .adsCountdown] : []
-            case .existingUserRewardsOn: return BraveAds.isSupportedRegion(Locale.current.identifier) ? [.rewardsInfo, .adsCountdown] : []
+            case .newUser: return BraveAds.isCurrentRegionSupported() ? [.searchEnginePicker, .shieldsInfo, .rewardsInfo, .rewardsAgreement, .adsCountdown] : [.searchEnginePicker, .shieldsInfo, .rewardsInfo, .rewardsAgreement]
+            case .existingUserRewardsOff: return BraveAds.isCurrentRegionSupported() ? [.rewardsInfo, .rewardsAgreement, .adsCountdown] : []
+            case .existingUserRewardsOn: return BraveAds.isCurrentRegionSupported() ? [.rewardsInfo, .adsCountdown] : []
             }
             #endif
         }
@@ -241,7 +241,7 @@ class CustomAnimator: NSObject, UIViewControllerAnimatedTransitioning {
         tDetails?.alpha = 0.0
         tDetailsContent?.alpha = 0.0
         
-        let inset = UIApplication.shared.keyWindow?.safeAreaInsets.bottom ?? 0.0
+        let inset: CGFloat = 0.0
         var fDetailsFrame = (fDetails?.bounds ?? .zero)
         fDetailsFrame.origin.y = (container.frame.height - container.frame.origin.y) - fDetailsFrame.height
         fDetailsFrame = fDetailsFrame.offsetBy(dx: 0.0, dy: -inset)

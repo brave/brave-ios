@@ -10,7 +10,6 @@ import Shared
 import Storage
 import SnapKit
 import XCGLogger
-import Alamofire
 import MobileCoreServices
 import SwiftyJSON
 import Deferred
@@ -265,7 +264,7 @@ class BrowserViewController: UIViewController {
         guard let rewards = rewards, rewards.ledger.isEnabled && rewards.ads.isEnabled else { return }
         if Preferences.Rewards.myFirstAdShown.value { return }
         // Check if ads are eligible
-        if BraveAds.isSupportedRegion(Locale.current.identifier) {
+        if BraveAds.isCurrentRegionSupported() {
             DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                 if Preferences.Rewards.myFirstAdShown.value { return }
                 Preferences.Rewards.myFirstAdShown.value = true
@@ -734,7 +733,7 @@ class BrowserViewController: UIViewController {
         // 1. Rewards are on/off (existing user)
         // 2. Ads are now available
         // 3. User hasn't seen the ads part of onboarding yet
-        if BraveAds.isSupportedRegion(Locale.current.identifier)
+        if BraveAds.isCurrentRegionSupported()
             &&
             (Preferences.General.basicOnboardingCompleted.value == OnboardingState.completed.rawValue)
             &&
@@ -2507,15 +2506,36 @@ extension BrowserViewController: WKUIDelegate {
                     
                     actions.append(shareAction)
                 }
+                
+                let linkPreview = Preferences.General.enableLinkPreview.value
+                
+                let linkPreviewTitle = linkPreview ?
+                    Strings.HideLinkPreviewsActionTitle : Strings.ShowLinkPreviewsActionTitle
+                let linkPreviewAction = UIAction(title: linkPreviewTitle, image: UIImage(systemName: "eye.fill")) { _ in
+                    Preferences.General.enableLinkPreview.value.toggle()
+                }
             
+                actions.append(linkPreviewAction)
             }
             
-            return UIMenu(title: url.absoluteString, children: actions)
+            return UIMenu(title: url.absoluteString.truncate(length: 100), children: actions)
         }
         
-        let config = UIContextMenuConfiguration(identifier: nil, previewProvider: nil, actionProvider: actionProvider)
+        let linkPreview: UIContextMenuContentPreviewProvider = {
+            return LinkPreviewViewController(url: url)
+        }
+        
+        let linkPreviewProvider = Preferences.General.enableLinkPreview.value ? linkPreview : nil
+        let config = UIContextMenuConfiguration(identifier: nil, previewProvider: linkPreviewProvider,
+                                                actionProvider: actionProvider)
         
         completionHandler(config)
+    }
+    
+    @available(iOS 13.0, *)
+    func webView(_ webView: WKWebView, contextMenuForElement elementInfo: WKContextMenuElementInfo, willCommitWithAnimator animator: UIContextMenuInteractionCommitAnimating) {
+        guard let url = elementInfo.linkURL else { return }
+        webView.load(URLRequest(url: url))
     }
     
     fileprivate func addTab(url: URL, inPrivateMode: Bool, currentTab: Tab) {
@@ -2817,17 +2837,24 @@ extension BrowserViewController: ContextMenuHelperDelegate {
                 taskId = application.beginBackgroundTask (expirationHandler: {
                     application.endBackgroundTask(taskId)
                 })
-
-                AF.request(url).validate(statusCode: 200..<300).response { response in
+                
+                URLSession(configuration: .default).dataTask(with: url, completionHandler: { data, response, error in
+                    
+                    if let response = response as? HTTPURLResponse {
+                        if !(200..<300).contains(response.statusCode) {
+                            return application.endBackgroundTask(taskId)
+                        }
+                    }
+                    
                     // Only set the image onto the pasteboard if the pasteboard hasn't changed since
                     // fetching the image; otherwise, in low-bandwidth situations,
                     // we might be overwriting something that the user has subsequently added.
-                    if changeCount == pasteboard.changeCount, let imageData = response.data, response.error == nil {
+                    if changeCount == pasteboard.changeCount, let imageData = data, error == nil {
                         pasteboard.addImageWithData(imageData, forURL: url)
                     }
-
+                    
                     application.endBackgroundTask(taskId)
-                }
+                }).resume()
             }
             actionSheetController.addAction(copyAction, accessibilityIdentifier: "linkContextMenu.copyImage")
         }
@@ -2855,11 +2882,17 @@ extension BrowserViewController: ContextMenuHelperDelegate {
     }
 
     private func getData(_ url: URL, success: @escaping (Data) -> Void) {
-        AF.request(url).validate(statusCode: 200..<300).response { response in
-            if let data = response.data {
+        URLSession(configuration: .default).dataTask(with: url) { data, response, _ in
+            if let response = response as? HTTPURLResponse {
+                if !(200..<300).contains(response.statusCode) {
+                    return
+                }
+            }
+            
+            if let data = data {
                 success(data)
             }
-        }
+        }.resume()
     }
 
     func contextMenuHelper(_ contextMenuHelper: ContextMenuHelper, didCancelGestureRecognizer: UIGestureRecognizer) {
