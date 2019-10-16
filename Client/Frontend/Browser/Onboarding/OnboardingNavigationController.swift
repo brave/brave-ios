@@ -55,8 +55,8 @@ class OnboardingNavigationController: UINavigationController {
             }
             #else
             switch self {
-            case .newUser: return BraveAds.isCurrentRegionSupported() ? [.searchEnginePicker, .shieldsInfo, .rewardsInfo, .rewardsAgreement, .adsCountdown] : [.searchEnginePicker, .shieldsInfo, .rewardsInfo, .rewardsAgreement]
-            case .existingUserRewardsOff: return BraveAds.isCurrentRegionSupported() ? [.rewardsInfo, .rewardsAgreement, .adsCountdown] : []
+            case .newUser: return BraveAds.isCurrentRegionSupported() ? [.searchEnginePicker, .shieldsInfo, .rewardsAgreement, .adsCountdown] : [.searchEnginePicker, .shieldsInfo, .rewardsAgreement]
+            case .existingUserRewardsOff: return BraveAds.isCurrentRegionSupported() ? [.rewardsAgreement, .adsCountdown] : []
             case .existingUserRewardsOn: return BraveAds.isCurrentRegionSupported() ? [.rewardsInfo, .adsCountdown] : []
             }
             #endif
@@ -170,11 +170,9 @@ extension OnboardingNavigationController: UINavigationControllerDelegate {
 
          switch operation {
          case .push:
-            let shouldFade = !fromVC.isKind(of: OnboardingRewardsViewController.self)
-            return CustomAnimator(isPresenting: true, shouldFadeGraphics: shouldFade)
+            return CustomAnimator(isPresenting: true, shouldFadeGraphics: false)
          default:
-            let shouldFade = !fromVC.isKind(of: OnboardingRewardsAgreementViewController.self)
-             return CustomAnimator(isPresenting: false, shouldFadeGraphics: shouldFade)
+             return CustomAnimator(isPresenting: false, shouldFadeGraphics: false)
          }
     }
 }

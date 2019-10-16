@@ -19,8 +19,8 @@ extension OnboardingRewardsViewController {
     
     class View: UIView {
         
-        let continueButton = CommonViews.primaryButton(text: Strings.OBJoinButton).then {
-            $0.accessibilityIdentifier = "OnboardingRewardsViewController.OBJoinButton"
+        let continueButton = CommonViews.primaryButton(text: Strings.OBShowMeButton).then {
+            $0.accessibilityIdentifier = "OnboardingRewardsViewController.OBShowMeButton"
         }
         
         let skipButton = CommonViews.secondaryButton().then {

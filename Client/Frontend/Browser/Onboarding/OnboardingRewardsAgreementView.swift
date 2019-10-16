@@ -23,13 +23,13 @@ extension OnboardingRewardsAgreementViewController {
         
         var onTermsOfServicePressed: (() -> Void)?
         
-        let agreeButton = CommonViews.primaryButton(text: Strings.OBAgreeButton).then {
-            $0.accessibilityIdentifier = "OnboardingRewardsAgreementViewController.AgreeButton"
+        let turnOnButton = CommonViews.primaryButton(text: Strings.OBTurnOnButton).then {
+            $0.accessibilityIdentifier = "OnboardingRewardsAgreementViewController.OBTurnOnButton"
             $0.backgroundColor = BraveUX.BraveOrange
         }
         
-        let cancelButton = CommonViews.secondaryButton(text: Strings.CancelButtonTitle).then {
-            $0.accessibilityIdentifier = "OnboardingRewardsAgreementViewController.CancelButton"
+        let skipButton = CommonViews.secondaryButton(text: Strings.OBSkipButton).then {
+            $0.accessibilityIdentifier = "OnboardingRewardsAgreementViewController.OBSkipButton"
         }
         
         private let mainStackView = UIStackView().then {
@@ -139,6 +139,10 @@ extension OnboardingRewardsAgreementViewController {
             descriptionLabel.isAccessibilityElement = true
         }
         
+        func updateSubtitleText(_ text: String, boldWords: Int) {
+            self.subtitleLabel.attributedText = text.boldWords(with: self.subtitleLabel.font, amount: boldWords)
+        }
+        
         init(theme: Theme) {
             super.init(frame: .zero)
             
@@ -160,7 +164,7 @@ extension OnboardingRewardsAgreementViewController {
             
             mainStackView.addArrangedSubview(descriptionView)
 
-            [cancelButton, agreeButton, UIView.spacer(.horizontal, amount: 0)]
+            [skipButton, turnOnButton, UIView.spacer(.horizontal, amount: 0)]
                 .forEach(buttonsStackView.addArrangedSubview(_:))
             
             [textStackView, buttonsStackView].forEach(descriptionStackView.addArrangedSubview(_:))
