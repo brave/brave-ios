@@ -44,7 +44,6 @@ class OnboardingRewardsAgreementViewController: OnboardingViewController {
     }
     
     override func continueTapped() {
-        rewards?.ads.isEnabled = true
         Preferences.General.basicOnboardingProgress.value = OnboardingProgress.rewards.rawValue
             
         super.continueTapped()
