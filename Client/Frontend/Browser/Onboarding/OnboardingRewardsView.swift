@@ -96,6 +96,10 @@ extension OnboardingRewardsViewController {
                 .forEach(buttonsStackView.addArrangedSubview(_:))
             
             [textStackView, buttonsStackView].forEach(descriptionStackView.addArrangedSubview(_:))
+            
+            continueButton.snp.makeConstraints {
+                $0.centerX.equalTo(self.snp.centerX)
+            }
         }
         
         func updateDetailsText(_ text: String, boldWords: Int) {

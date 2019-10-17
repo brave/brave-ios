@@ -168,6 +168,10 @@ extension OnboardingRewardsAgreementViewController {
                 .forEach(buttonsStackView.addArrangedSubview(_:))
             
             [textStackView, buttonsStackView].forEach(descriptionStackView.addArrangedSubview(_:))
+            
+            turnOnButton.snp.makeConstraints {
+                $0.centerX.equalTo(self.snp.centerX)
+            }
         }
         
         func applyTheme(_ theme: Theme) {
