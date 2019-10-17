@@ -40,44 +40,46 @@ class SearchSuggestClient {
         }
 
         request = session.dataTask(with: url!, completionHandler: { data, response, error in
-            if let error = error {
-                return callback(nil, error as NSError?)
-            }
-            
-            let responseError = NSError(domain: SearchSuggestClientErrorDomain, code: SearchSuggestClientErrorInvalidResponse, userInfo: nil)
-            
-            if let response = response as? HTTPURLResponse {
-                if !(200..<300).contains(response.statusCode) {
-                    return callback(nil, responseError)
+            DispatchQueue.main.async {
+                if let error = error {
+                    return callback(nil, error as NSError?)
                 }
-            }
-            
-            guard let data = data else {
-                return callback(nil, responseError)
-            }
-            
-            do {
-                let result = try JSONSerialization.jsonObject(with: data, options: .mutableLeaves)
                 
-                // The response will be of the following format:
-                //    ["foobar",["foobar","foobar2000 mac","foobar skins",...]]
-                // That is, an array of at least two elements: the search term and an array of suggestions.
-                guard let array = result as? NSArray else {
+                let responseError = NSError(domain: SearchSuggestClientErrorDomain, code: SearchSuggestClientErrorInvalidResponse, userInfo: nil)
+                
+                if let response = response as? HTTPURLResponse {
+                    if !(200..<300).contains(response.statusCode) {
+                        return callback(nil, responseError)
+                    }
+                }
+                
+                guard let data = data else {
                     return callback(nil, responseError)
                 }
                 
-                if array.count < 2 {
-                    return callback(nil, responseError)
+                do {
+                    let result = try JSONSerialization.jsonObject(with: data, options: .mutableLeaves)
+                    
+                    // The response will be of the following format:
+                    //    ["foobar",["foobar","foobar2000 mac","foobar skins",...]]
+                    // That is, an array of at least two elements: the search term and an array of suggestions.
+                    guard let array = result as? NSArray else {
+                        return callback(nil, responseError)
+                    }
+                    
+                    if array.count < 2 {
+                        return callback(nil, responseError)
+                    }
+                    
+                    let suggestions = array[1] as? [String]
+                    if suggestions == nil {
+                        return callback(nil, responseError)
+                    }
+                    
+                    callback(suggestions!, nil)
+                } catch {
+                    return callback(nil, error as NSError?)
                 }
-
-                let suggestions = array[1] as? [String]
-                if suggestions == nil {
-                    return callback(nil, responseError)
-                }
-
-                callback(suggestions!, nil)
-            } catch {
-                return callback(nil, error as NSError?)
             }
         })
         request?.resume()
