@@ -66,7 +66,7 @@ class OnboardingNavigationController: UINavigationController {
     fileprivate enum Screens {
         case searchEnginePicker
         case shieldsInfo
-        case rewardsInfo
+        case existingRewards
         case rewardsAgreement
         case adsCountdown
         
@@ -77,7 +77,7 @@ class OnboardingNavigationController: UINavigationController {
                 return OnboardingSearchEnginesViewController(profile: profile, rewards: rewards, theme: theme)
             case .shieldsInfo:
                 return OnboardingShieldsViewController(profile: profile, rewards: rewards, theme: theme)
-            case .rewardsInfo:
+            case .existingRewards:
                 return OnboardingRewardsViewController(profile: profile, rewards: rewards, theme: theme)
             case .rewardsAgreement:
                 return OnboardingRewardsAgreementViewController(profile: profile, rewards: rewards, theme: theme)
@@ -90,7 +90,7 @@ class OnboardingNavigationController: UINavigationController {
             switch self {
             case .searchEnginePicker: return OnboardingSearchEnginesViewController.self
             case .shieldsInfo: return OnboardingShieldsViewController.self
-            case .rewardsInfo: return OnboardingRewardsViewController.self
+            case .existingRewards: return OnboardingRewardsViewController.self
             case .rewardsAgreement: return OnboardingRewardsAgreementViewController.self
             case .adsCountdown: return OnboardingAdsCountdownViewController.self
             }
