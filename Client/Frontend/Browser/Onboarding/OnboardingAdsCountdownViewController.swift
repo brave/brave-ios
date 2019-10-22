@@ -44,8 +44,10 @@ class OnboardingAdsCountdownViewController: OnboardingViewController, UNUserNoti
         contentView.animate(from: 0.0, to: 1.0, duration: UX.animationTime) { [weak self] in
             guard let self = self else { return }
             
-            //Show the confirmation screen no matter what..
-            self.contentView.setState(.finished)
+            //Show the confirmation screen no matter what.. after 1 second delay
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                self.contentView.setState(.finished)
+            }
             
             self.displayMyFirstAdIfAvailable { action in
                 if action == .opened {
