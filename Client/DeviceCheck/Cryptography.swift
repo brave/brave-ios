@@ -33,12 +33,12 @@ public struct CryptographicKey {
   }
   
   /// Returns the private key
-  public func getPrivateKey() -> SecKey {
+  private func getPrivateKey() -> SecKey {
     return key
   }
   
   /// Returns the public key
-  public func getPublicKey() -> SecKey? {
+  private func getPublicKey() -> SecKey? {
     return SecKeyCopyPublicKey(key)
   }
   
