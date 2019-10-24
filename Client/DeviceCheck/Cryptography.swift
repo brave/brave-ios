@@ -32,17 +32,6 @@ public struct CryptographicKey {
     self.keyId = keyId
   }
   
-  /// Returns the public key's SHA-1 fingerprint hex encoded
-  public func getPublicKeySha1FingerPrint() throws -> String? {
-    guard let data = try getPublicKeyAsDER() else {
-      return nil
-    }
-    
-    var hash = [UInt8](repeating: 0, count: Int(CC_SHA1_DIGEST_LENGTH))
-    _ = data.withUnsafeBytes { CC_SHA1($0.baseAddress, CC_LONG(data.count), &hash) }
-    return Data(hash).map({ String(format: "%02x", UInt8($0)) }).joined()
-  }
-  
   /// Returns the public key's SHA-256 fingerprint hex encoded
   public func getPublicKeySha256FingerPrint() throws -> String? {
     guard let data = try getPublicKeyAsDER() else {
