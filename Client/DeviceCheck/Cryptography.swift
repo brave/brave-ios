@@ -212,16 +212,6 @@ public class Cryptography {
                                 secureEnclave: Bool = true,
                                 controlFlags: SecAccessControl? = Cryptography.accessControlFlags) throws -> CryptographicKey? {
     
-    /*
-     // If the key exists and requires biometrics, remove it.
-     // Not needed atm but it might be needed in the future when migrating keys.
-    if keyExists(id: id) && isKeyRequiringBiometrics(id: id) {
-      SecItemDelete([
-        kSecClass: kSecClassKey,
-        kSecAttrApplicationTag: id.data(using: .utf8)!
-      ] as CFDictionary)
-    }*/
-    
     if let key = try getExistingKey(id: id) {
       return key
     }

@@ -358,14 +358,6 @@ private extension DeviceCheckClient {
     urlComponents.host = url.host
     urlComponents.path = url.path
     urlComponents.percentEncodedQuery = query
-    //urlComponents.queryItems = parameters.map({
-    //  URLQueryItem(name: $0.key, value: $0.value)
-    //})
     return urlComponents.url
   }
 }
-
-//Sample Flow:
-//generate Token -> generateEnrollment -> registerDevice
-//getAttestation -> setAttestation (verify it)
-//store token
