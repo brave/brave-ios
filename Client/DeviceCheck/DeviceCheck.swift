@@ -307,6 +307,7 @@ private extension DeviceCheckClient {
     return task
   }
   
+  // Encodes the given `endpoint` into a `URLRequest
   private func encodeRequest(_ endpoint: Request) throws -> URLRequest {
     guard let url = endpoint.url() else {
       throw DeviceCheckError(message: "Invalid URL for Request", code: 400)
@@ -333,31 +334,16 @@ private extension DeviceCheckClient {
 }
 
 private extension DeviceCheckClient {
-  //We have to manually encode the query parameters because the server is NON-RFC compliant!
-  //RFC 3986: https://www.ietf.org/rfc/rfc3986.txt
-  //RFC 3986, section 3.4, page 22, Advises against escaping the `/` & `+` characters.
-  //RFC 7230: https://tools.ietf.org/html/rfc7230#section-2.7.1 specifies which characters are not
-  //  reserved.
-  //RFC 3986                   URI Generic Syntax               January 2005
-  //
-  //
-  //   query       = *( pchar / "/" / "?" )
-  //
-  // The characters slash ("/") and question mark ("?") may represent data
-  // within the query component.
-  //
-  // The server does not accept slashes or spec compliant characters in the query component of the URL
-  // and any character that is NOT one of `-._~`, must be escaped.
+  
+  // Encodes parameters into the query component of the URL
   func encodeQueryURL(url: URL, parameters: [String: String]) -> URL? {
-    let query = parameters.map({
-      "\($0.key)=\($0.value.addingPercentEncoding(withAllowedCharacters: CharacterSet(charactersIn: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~")) ?? $0.value)"
-    }).joined(separator: "&")
-    
     var urlComponents = URLComponents()
     urlComponents.scheme = url.scheme
     urlComponents.host = url.host
     urlComponents.path = url.path
-    urlComponents.percentEncodedQuery = query
+    urlComponents.queryItems = parameters.map({
+      URLQueryItem(name: $0.key, value: $0.value)
+    })
     return urlComponents.url
   }
 }
