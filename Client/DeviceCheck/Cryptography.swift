@@ -15,7 +15,7 @@ public struct CryptographyError: Error {
   //A description of the error
   public let description: String?
   
-  init(code: Int32, description: String? = nil) {
+  init(code: Int32 = -1, description: String? = nil) {
     self.domain = "com.brave.security.cryptography.error"
     self.code = code
     self.description = description
@@ -32,48 +32,33 @@ public struct CryptographicKey {
     self.keyId = keyId
   }
   
-  /// Returns the private key
-  private func getPrivateKey() -> SecKey {
-    return key
-  }
-  
-  /// Returns the public key
-  private func getPublicKey() -> SecKey? {
-    return SecKeyCopyPublicKey(key)
-  }
-  
-  /// Returns the public key in ASN.1 format
-  public func getPublicKeyExternalRepresentation() throws -> Data? {
-    guard let publicKey = getPublicKey() else {
-      throw CryptographyError(code: -1, description: "Cannot retrieve public key")
-    }
-    
-    var error: Unmanaged<CFError>?
-    if let data = SecKeyCopyExternalRepresentation(publicKey, &error) {
-      return data as Data
-    }
-    
-    if let error = error?.takeUnretainedValue() {
-      throw error
-    }
-    
-    return nil
-  }
-    
-  /// Returns the public key in PEM format
-  func getPublicKeyExternalRepresentationAsPEM() throws -> String? {
-    guard let publicKeyRepresentation = try getPublicKeyExternalRepresentation() else {
+  /// Returns the public key's SHA-1 fingerprint hex encoded
+  public func getPublicKeySha1FingerPrint() throws -> String? {
+    guard let data = try getPublicKeyAsDER() else {
       return nil
     }
-
-    //opensource.apple.com/source/security_certtool/security_certtool-55103/src/dumpasn1.cfg
-    //OID = 06 07 2A 86 48 CE 3D 02 01
-    //Comment = ANSI X9.62 public key type
-    //Description = ecPublicKey (1 2 840 10045 2 1)
-    let curveOIDHeader: [UInt8] = [0x30, 0x59, 0x30, 0x13, 0x06, 0x07, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x02, 0x01, 0x06, 0x08, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x03, 0x01, 0x07, 0x03, 0x42, 0x00]
-
-    var data = Data(bytes: curveOIDHeader, count: curveOIDHeader.count)
-    data.append(publicKeyRepresentation)
+    
+    var hash = [UInt8](repeating: 0, count: Int(CC_SHA1_DIGEST_LENGTH))
+    _ = data.withUnsafeBytes { CC_SHA1($0.baseAddress, CC_LONG(data.count), &hash) }
+    return Data(hash).map({ String(format: "%02x", UInt8($0)) }).joined()
+  }
+  
+  /// Returns the public key's SHA-256 fingerprint hex encoded
+  public func getPublicKeySha256FingerPrint() throws -> String? {
+    guard let data = try getPublicKeyAsDER() else {
+      return nil
+    }
+    
+    var hash = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
+    _ = data.withUnsafeBytes { CC_SHA256($0.baseAddress, CC_LONG(data.count), &hash) }
+    return Data(hash).map({ String(format: "%02x", UInt8($0)) }).joined()
+  }
+  
+  /// Returns the public key in PEM format (full ASN.1 DER header encoded)
+  public func getPublicAsPEM() throws -> String? {
+    guard let data = try getPublicKeyAsDER() else {
+      return nil
+    }
     
     let result =
     """
@@ -87,9 +72,13 @@ public struct CryptographicKey {
   /// Deletes the key from the secure-enclave and keychain
   @discardableResult
   public func delete() -> Error? {
+    guard let keyId = keyId.data(using: .utf8) else {
+      return CryptographyError(description: "Invalid KeyId")
+    }
+    
     let error = SecItemDelete([
       kSecClass: kSecClassKey,
-      kSecAttrApplicationTag: keyId.data(using: .utf8)!
+      kSecAttrApplicationTag: keyId
     ] as CFDictionary)
     
     if error == errSecSuccess || error == errSecItemNotFound {
@@ -101,10 +90,14 @@ public struct CryptographicKey {
   
   /// Signs a "message" with the key and returns the signature
   public func sign(message: String) throws -> Data {
+    guard let message = message.data(using: .utf8) else {
+      throw CryptographyError(description: "Cannot Sign Message: Invalid Message")
+    }
+    
     var error: Unmanaged<CFError>?
     let signature = SecKeyCreateSignature(key,
                                           .ecdsaSignatureMessageX962SHA256,
-                                          message.data(using: .utf8)! as CFData,
+                                          message as CFData,
                                           &error)
     
     if let error = error?.takeUnretainedValue() {
@@ -112,10 +105,55 @@ public struct CryptographicKey {
     }
     
     guard let result = signature as Data? else {
-      throw CryptographyError(code: -1, description: "Cannot sign message with cryptographic key.")
+      throw CryptographyError(description: "Cannot sign message with cryptographic key.")
     }
     
     return result
+  }
+  
+  /// Returns the public key in ASN.1 DER format with the full 30-byte TAG header encoding
+  private func getPublicKeyAsDER() throws -> Data? {
+    guard let publicKeyRepresentation = try getPublicKeyExternalRepresentation() else {
+      return nil
+    }
+    
+    //opensource.apple.com/source/security_certtool/security_certtool-55103/src/dumpasn1.cfg
+    //OID = 06 07 2A 86 48 CE 3D 02 01
+    //Comment = ANSI X9.62 public key type
+    //Description = ecPublicKey (1 2 840 10045 2 1)
+    let curveOIDHeader: [UInt8] = [0x30, 0x59, 0x30, 0x13, 0x06, 0x07, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x02, 0x01, 0x06, 0x08, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x03, 0x01, 0x07, 0x03, 0x42, 0x00]
+
+    var data = Data(bytes: curveOIDHeader, count: curveOIDHeader.count)
+    data.append(publicKeyRepresentation)
+    return data
+  }
+  
+  /// Returns the private key
+  private func getPrivateKey() -> SecKey {
+    return key
+  }
+  
+  /// Returns the public key
+  private func getPublicKey() -> SecKey? {
+    return SecKeyCopyPublicKey(key)
+  }
+  
+  /// Returns the public key in ASN.1 format
+  private func getPublicKeyExternalRepresentation() throws -> Data? {
+    guard let publicKey = getPublicKey() else {
+      throw CryptographyError(description: "Cannot retrieve public key")
+    }
+    
+    var error: Unmanaged<CFError>?
+    if let data = SecKeyCopyExternalRepresentation(publicKey, &error) {
+      return data as Data
+    }
+    
+    if let error = error?.takeUnretainedValue() {
+      throw error
+    }
+    
+    return nil
   }
 }
 
@@ -127,9 +165,13 @@ public class Cryptography {
   
   /// Determines if a key exists in the keychain without retrieving it
   public class func keyExists(id: String) -> Bool {
+    guard let keyId = id.data(using: .utf8) else {
+      return false
+    }
+    
     let query: [CFString: Any] = [
       kSecClass: kSecClassKey,
-      kSecAttrApplicationTag: id.data(using: .utf8)!,
+      kSecAttrApplicationTag: keyId,
       kSecMatchLimit: kSecMatchLimitOne,
       kSecReturnRef: kCFBooleanFalse as Any,
       kSecReturnAttributes: kCFBooleanTrue as Any
@@ -138,14 +180,17 @@ public class Cryptography {
     var result: CFTypeRef?
     let error = SecItemCopyMatching(query as CFDictionary, &result)
     return error == errSecSuccess || error == errSecInteractionNotAllowed
-      && result != nil && CFDictionaryGetCount((result! as! CFDictionary)) > 0 //swiftlint:disable:this force_cast
   }
   
   /// Determines if a key requires biometrics to access
   public class func isKeyRequiringBiometrics(id: String) -> Bool {
+    guard let keyId = id.data(using: .utf8) else {
+      return false
+    }
+    
     let query: [CFString: Any] = [
       kSecClass: kSecClassKey,
-      kSecAttrApplicationTag: id.data(using: .utf8)!,
+      kSecAttrApplicationTag: keyId,
       kSecMatchLimit: kSecMatchLimitOne,
       kSecReturnRef: kCFBooleanFalse as Any,
       kSecReturnAttributes: kCFBooleanTrue as Any
@@ -154,20 +199,28 @@ public class Cryptography {
     var result: CFTypeRef?
     let error = SecItemCopyMatching(query as CFDictionary, &result)
     if error == errSecSuccess || error == errSecInteractionNotAllowed {
-      if let result = result as? [String: Any], let accessControl = result[kSecAttrAccessControl as String] as! SecAccessControl? { //swiftlint:disable:this force_cast
-        return String(describing: accessControl).contains("bio") //cbio, pbio (.currentBioSet, .presentBioSet)
+      if let result = result as? [String: Any],
+        let item = result[kSecAttrAccessControl as String] as CFTypeRef?,
+        CFGetTypeID(item) == SecAccessControlGetTypeID() {
+        
+        //cbio, pbio (.currentBioSet, .presentBioSet)
+        let accessControl = item as! SecAccessControl //swiftlint:disable:this force_cast
+        return String(describing: accessControl).contains("bio")
       }
-      return false
     }
-
+    
     return false
   }
   
   /// Retrieves an existing key from the secure-enclave
   public class func getExistingKey(id: String) throws -> CryptographicKey? {
+    guard let keyId = id.data(using: .utf8) else {
+      throw CryptographyError(description: "Invalid Key Id")
+    }
+    
     let query: [CFString: Any] = [
       kSecClass: kSecClassKey,
-      kSecAttrApplicationTag: id.data(using: .utf8)!,
+      kSecAttrApplicationTag: keyId,
       kSecMatchLimit: kSecMatchLimitOne,
       kSecReturnRef: kCFBooleanTrue as Any
     ]
@@ -175,8 +228,8 @@ public class Cryptography {
     var result: CFTypeRef?
     let error = SecItemCopyMatching(query as CFDictionary, &result)
     if error == errSecSuccess || error == errSecDuplicateItem || error == errSecInteractionNotAllowed {
-      if let res = result {
-        return CryptographicKey(key: res as! SecKey, keyId: id) //swiftlint:disable:this force_cast
+      if let result = result, CFGetTypeID(result) == SecKeyGetTypeID() {
+        return CryptographicKey(key: result as! SecKey, keyId: id) //swiftlint:disable:this force_cast
       }
       return nil
     }
@@ -211,6 +264,10 @@ public class Cryptography {
       return key
     }
     
+    guard let keyId = id.data(using: .utf8) else {
+      throw CryptographyError(description: "Invalid Key Id")
+    }
+    
     let attributes: [CFString: Any] = [
       kSecClass: kSecClassKey,
       kSecAttrKeyType: kSecAttrKeyTypeECSECPrimeRandom,
@@ -219,7 +276,7 @@ public class Cryptography {
       kSecAttrTokenID: (secureEnclave ? kSecAttrTokenIDSecureEnclave : nil) as Any,
       kSecPrivateKeyAttrs: [
         kSecAttrIsPermanent: storeInKeychain,
-        kSecAttrApplicationTag: id.data(using: .utf8)!,
+        kSecAttrApplicationTag: keyId,
         kSecAttrAccessControl: (controlFlags ?? nil) as Any
       ]
     ]
@@ -232,7 +289,7 @@ public class Cryptography {
     }
     
     guard let pKey = key else {
-      throw CryptographyError(code: -1, description: "Cannot generate cryptographic key.")
+      throw CryptographyError(description: "Cannot generate cryptographic key.")
     }
     
     return CryptographicKey(key: pKey, keyId: id)

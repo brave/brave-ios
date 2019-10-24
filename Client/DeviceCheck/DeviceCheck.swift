@@ -135,12 +135,12 @@ class DeviceCheckClient {
         throw CryptographyError(code: -1, description: "Unable to retrieve existing private key")
       }
       
-      guard let publicKey = try privateKey.getPublicKeyExternalRepresentationAsPEM() else {
+      guard let publicKey = try privateKey.getPublicKeySha256FingerPrint() else {
         throw CryptographyError(code: -1, description: "Unable to retrieve public key")
       }
       
       let parameters = [
-        "publicKey": publicKey,
+        "publicKeyHash": publicKey,
         "paymentID": paymentId
       ]
       
@@ -203,7 +203,7 @@ class DeviceCheckClient {
         throw CryptographyError(code: -1, description: "Unable to generate private key")
       }
       
-      guard let publicKey = try privateKey.getPublicKeyExternalRepresentationAsPEM() else {
+      guard let publicKey = try privateKey.getPublicAsPEM() else {
         throw CryptographyError(code: -1, description: "Unable to retrieve public key")
       }
       
@@ -253,7 +253,7 @@ private extension DeviceCheckClient {
         return URL(string: "/v1/devicecheck/attestations", relativeTo: DeviceCheckClient.baseURL)
         
       case .setAttestation(let nonce, _):
-        let nonce = nonce.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)!
+        let nonce = nonce.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? nonce
         return URL(string: "/v1/devicecheck/attestations/\(nonce)", relativeTo: DeviceCheckClient.baseURL)
       }
     }
@@ -308,7 +308,11 @@ private extension DeviceCheckClient {
   }
   
   private func encodeRequest(_ endpoint: Request) throws -> URLRequest {
-    var request = URLRequest(url: endpoint.url()!)
+    guard let url = endpoint.url() else {
+      throw DeviceCheckError(message: "Invalid URL for Request", code: 400)
+    }
+    
+    var request = URLRequest(url: url)
     request.httpMethod = endpoint.method().rawValue
     request.setValue("application/json", forHTTPHeaderField: "Accept")
     
@@ -346,7 +350,7 @@ private extension DeviceCheckClient {
   // and any character that is NOT one of `-._~`, must be escaped.
   func encodeQueryURL(url: URL, parameters: [String: String]) -> URL? {
     let query = parameters.map({
-      "\($0.key)=\($0.value.addingPercentEncoding(withAllowedCharacters: CharacterSet(charactersIn: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~"))!)"
+      "\($0.key)=\($0.value.addingPercentEncoding(withAllowedCharacters: CharacterSet(charactersIn: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~")) ?? $0.value)"
     }).joined(separator: "&")
     
     var urlComponents = URLComponents()
