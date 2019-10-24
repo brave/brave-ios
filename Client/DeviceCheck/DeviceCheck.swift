@@ -45,7 +45,7 @@ public struct DeviceCheckRegistration: Codable {
 }
 
 public struct DeviceCheckEnrollment: Codable {
-  // Not sure yet
+  // The payment Id from Brave Rewards in UUIDv4 Format.
   let paymentID: String
   
   // The public key in ASN.1 DER, PEM PKCS#8 Format.
@@ -132,11 +132,11 @@ class DeviceCheckClient {
   public func getAttestation(paymentId: String, _ completion: @escaping (AttestationBlob?, Error?) -> Void) {
     do {
       guard let privateKey = try Cryptography.getExistingKey(id: DeviceCheckClient.privateKeyId) else {
-        throw CryptographyError(code: -1, description: "Unable to retrieve existing private key")
+        throw CryptographyError(description: "Unable to retrieve existing private key")
       }
       
       guard let publicKey = try privateKey.getPublicKeySha256FingerPrint() else {
-        throw CryptographyError(code: -1, description: "Unable to retrieve public key")
+        throw CryptographyError(description: "Unable to retrieve public key")
       }
       
       let parameters = [
@@ -162,7 +162,7 @@ class DeviceCheckClient {
   public func setAttestation(nonce: String, _ completion: @escaping (Error?) -> Void) {
     do {
       guard let privateKey = try Cryptography.getExistingKey(id: DeviceCheckClient.privateKeyId) else {
-        throw CryptographyError(code: -1, description: "Unable to retrieve existing private key")
+        throw CryptographyError(description: "Unable to retrieve existing private key")
       }
       
       let signature = try privateKey.sign(message: nonce).base64EncodedString()
@@ -200,11 +200,11 @@ class DeviceCheckClient {
   public func generateEnrollment(paymentId: String, token: String, _ completion: (DeviceCheckRegistration?, Error?) -> Void) {
     do {
       guard let privateKey = try Cryptography.generateKey(id: DeviceCheckClient.privateKeyId) else {
-        throw CryptographyError(code: -1, description: "Unable to generate private key")
+        throw CryptographyError(description: "Unable to generate private key")
       }
       
       guard let publicKey = try privateKey.getPublicAsPEM() else {
-        throw CryptographyError(code: -1, description: "Unable to retrieve public key")
+        throw CryptographyError(description: "Unable to retrieve public key")
       }
       
       let signature = try privateKey.sign(message: publicKey + token).base64EncodedString()

@@ -165,8 +165,7 @@ public class Cryptography {
       if let result = properties.result as? [String: Any],
         let item = result[kSecAttrAccessControl as String] as CFTypeRef?,
         CFGetTypeID(item) == SecAccessControlGetTypeID() {
-        
-        //cbio, pbio (.currentBioSet, .presentBioSet)
+
         let accessControl = item as! SecAccessControl //swiftlint:disable:this force_cast
         return String(describing: accessControl).contains("bio")
       }
