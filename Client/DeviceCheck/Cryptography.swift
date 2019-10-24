@@ -154,41 +154,15 @@ public class Cryptography {
   
   /// Determines if a key exists in the keychain without retrieving it
   public class func keyExists(id: String) -> Bool {
-    guard let keyId = id.data(using: .utf8) else {
-      return false
-    }
-    
-    let query: [CFString: Any] = [
-      kSecClass: kSecClassKey,
-      kSecAttrApplicationTag: keyId,
-      kSecMatchLimit: kSecMatchLimitOne,
-      kSecReturnRef: kCFBooleanFalse as Any,
-      kSecReturnAttributes: kCFBooleanTrue as Any
-    ]
-    
-    var result: CFTypeRef?
-    let error = SecItemCopyMatching(query as CFDictionary, &result)
-    return error == errSecSuccess || error == errSecInteractionNotAllowed
+    let properties = getKeyProperties(id: id)
+    return properties.status == errSecSuccess || properties.status == errSecInteractionNotAllowed
   }
   
   /// Determines if a key requires biometrics to access
   public class func isKeyRequiringBiometrics(id: String) -> Bool {
-    guard let keyId = id.data(using: .utf8) else {
-      return false
-    }
-    
-    let query: [CFString: Any] = [
-      kSecClass: kSecClassKey,
-      kSecAttrApplicationTag: keyId,
-      kSecMatchLimit: kSecMatchLimitOne,
-      kSecReturnRef: kCFBooleanFalse as Any,
-      kSecReturnAttributes: kCFBooleanTrue as Any
-    ]
-    
-    var result: CFTypeRef?
-    let error = SecItemCopyMatching(query as CFDictionary, &result)
-    if error == errSecSuccess || error == errSecInteractionNotAllowed {
-      if let result = result as? [String: Any],
+    let properties = getKeyProperties(id: id)
+    if properties.status == errSecSuccess || properties.status == errSecInteractionNotAllowed {
+      if let result = properties.result as? [String: Any],
         let item = result[kSecAttrAccessControl as String] as CFTypeRef?,
         CFGetTypeID(item) == SecAccessControlGetTypeID() {
         
@@ -282,5 +256,24 @@ public class Cryptography {
     }
     
     return CryptographicKey(key: pKey, keyId: id)
+  }
+  
+  /// Retrieve a key's properties without retrieving the actual key itself
+  private class func getKeyProperties(id: String) -> (status: OSStatus, result: CFTypeRef?) {
+    guard let keyId = id.data(using: .utf8) else {
+      return (errSecParam, nil)
+    }
+    
+    let query: [CFString: Any] = [
+      kSecClass: kSecClassKey,
+      kSecAttrApplicationTag: keyId,
+      kSecMatchLimit: kSecMatchLimitOne,
+      kSecReturnRef: kCFBooleanFalse as Any,
+      kSecReturnAttributes: kCFBooleanTrue as Any
+    ]
+    
+    var result: CFTypeRef?
+    let error = SecItemCopyMatching(query as CFDictionary, &result)
+    return (error, result)
   }
 }
