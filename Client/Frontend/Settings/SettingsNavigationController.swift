@@ -16,6 +16,13 @@ class SettingsNavigationController: UINavigationController {
     }
 
     override var preferredStatusBarStyle: UIStatusBarStyle {
+        if #available(iOS 13, *) {
+            if self.view.appearanceOverrideUserInterfaceStyle == .light || self.overrideUserInterfaceStyle == .light {
+                return .darkContent
+            } else {
+                return .lightContent
+            }
+        }
         return .default
     }
     
