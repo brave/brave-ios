@@ -239,7 +239,7 @@ class DeviceCheckClient {
 
 private extension DeviceCheckClient {
   // The base URL of the server
-  private static let baseURL = URL(string: "http://reputation-alb-1044480833.us-west-2.elb.amazonaws.com")
+  private static let baseURL = URL(string: "https://reputation.rewards.brave.software")
   
   private enum HttpMethod: String {
     case get
