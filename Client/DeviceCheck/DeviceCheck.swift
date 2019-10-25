@@ -33,7 +33,7 @@ public struct DeviceCheckRegistration: Codable {
   
   public func encode(to encoder: Encoder) throws {
     var container = encoder.container(keyedBy: CodingKeys.self)
-    let data = try JSONEncoder().encode(enrollmentBlob).base64EncodedString()
+    let data = try enrollmentBlob.bsonData().base64EncodedString()
     try container.encode(data, forKey: .enrollmentBlob)
     try container.encode(signature, forKey: .signature)
   }
@@ -53,6 +53,13 @@ public struct DeviceCheckEnrollment: Codable {
   
   // The device check token base64 encoded.
   let deviceToken: String
+  
+  // Encodes this structure as BSON Format (Binary JSON).
+  func bsonData() throws -> Data {
+    let formatter = JSONEncoder()
+    formatter.outputFormatting = .sortedKeys
+    return try formatter.encode(self)
+  }
 }
 
 /// A structure used to respond to a nonce challenge
@@ -83,7 +90,7 @@ public struct AttestationVerifcation: Codable {
   
   public func encode(to encoder: Encoder) throws {
     var container = encoder.container(keyedBy: CodingKeys.self)
-    let data = try JSONEncoder().encode(attestationBlob).base64EncodedString()
+    let data = try attestationBlob.bsonData().base64EncodedString()
     try container.encode(data, forKey: .attestationBlob)
     try container.encode(signature, forKey: .signature)
   }
@@ -97,6 +104,13 @@ public struct AttestationVerifcation: Codable {
 public struct AttestationBlob: Codable {
   // The nonce is a UUIDv4 string
   let nonce: String
+  
+  // Encodes this structure as BSON Format (Binary JSON).
+  func bsonData() throws -> Data {
+    let formatter = JSONEncoder()
+    formatter.outputFormatting = .sortedKeys
+    return try formatter.encode(self)
+  }
 }
 
 class DeviceCheckClient {
@@ -165,8 +179,9 @@ class DeviceCheckClient {
         throw CryptographyError(description: "Unable to retrieve existing private key")
       }
       
-      let signature = try privateKey.sign(message: nonce).base64EncodedString()
-      let verification = AttestationVerifcation(attestationBlob: AttestationBlob(nonce: nonce),
+      let attestation = AttestationBlob(nonce: nonce)
+      let signature = try privateKey.sign(message: try attestation.bsonData()).base64EncodedString()
+      let verification = AttestationVerifcation(attestationBlob: attestation,
                                                 signature: signature)
       
       try executeRequest(.setAttestation(nonce, verification)) { (result: Result<Data, Error>) in
@@ -207,13 +222,14 @@ class DeviceCheckClient {
         throw CryptographyError(description: "Unable to retrieve public key")
       }
       
-      let signature = try privateKey.sign(message: publicKey + token).base64EncodedString()
+      let enrollment = DeviceCheckEnrollment(paymentID: paymentId,
+                                             publicKey: publicKey,
+                                             deviceToken: token)
+
+      let signature = try privateKey.sign(message: enrollment.bsonData()).base64EncodedString()
       
-      let enrollmentBlob = DeviceCheckEnrollment(paymentID: paymentId,
-                                                       publicKey: publicKey,
-                                                       deviceToken: token)
-      let registration = DeviceCheckRegistration(enrollmentBlob: enrollmentBlob,
-                                                       signature: signature)
+      let registration = DeviceCheckRegistration(enrollmentBlob: enrollment,
+                                                 signature: signature)      
       completion(registration, nil)
     } catch {
       completion(nil, error)
@@ -345,5 +361,107 @@ private extension DeviceCheckClient {
       URLQueryItem(name: $0.key, value: $0.value)
     })
     return urlComponents.url
+  }
+}
+
+class DeviceCheckExample {
+  private let client = DeviceCheckClient()
+  private var token = ""
+  private let paymentId = UUID().uuidString //This comes from Brave Rewards..
+  private var completion: ((_ error: Error?) -> Void)?
+  
+  // Starts the device check flow with the server
+  func startHandshake(_ completion: @escaping (Error?) -> Void) {
+    self.completion = completion
+    self.generateToken()
+  }
+
+  deinit { self.completion = nil }
+  
+  // Generates a device check token using the iOS Apple APIs.
+  // I do not store this token anywhere atm.
+  private func generateToken() {
+    client.generateToken { [weak self] token, error in
+      guard let self = self else { return }
+      
+      if let error = error {
+        self.completion?(error)
+        return
+      }
+      
+      self.token = token
+      self.generateEnrollment()
+    }
+  }
+  
+  // Generates an enrollment structure using the token and making a call to the server.
+  private func generateEnrollment() {
+    if token.isEmpty {
+      self.completion?("Invalid Device Check Token")
+      return
+    }
+    
+    client.generateEnrollment(paymentId: paymentId, token: token) { [weak self] registration, error in
+      guard let self = self else { return }
+      
+      if let error = error {
+        self.completion?(error)
+        return
+      }
+      
+      self.registerDevice(registration)
+    }
+  }
+  
+  // Registers the device with the server
+  private func registerDevice(_ registration: DeviceCheckRegistration?) {
+    guard let registration = registration else {
+      self.completion?("Error registering device - Unknown Reason")
+      return
+    }
+    
+    client.registerDevice(enrollment: registration) { [weak self] error in
+      guard let self = self else { return }
+      
+      if let error = error {
+        self.completion?(error)
+        return
+      }
+      
+      self.getAttestation()
+    }
+  }
+  
+  // Retrieves a challenge-nonce from the server
+  private func getAttestation() {
+    client.getAttestation(paymentId: paymentId) { [weak self] attestation, error in
+      guard let self = self else { return }
+      
+      if let error = error {
+        self.completion?(error)
+        return
+      }
+      
+      self.setAttestation(attestation)
+    }
+  }
+  
+  // Responds to the challenge and sends it to the server.
+  private func setAttestation(_ attestation: AttestationBlob?) {
+    guard let attestation = attestation else {
+      self.completion?("Error retrieving attestation - Unknown Reason")
+      return
+    }
+    
+    client.setAttestation(nonce: attestation.nonce) { [weak self] error in
+      guard let self = self else { return }
+      
+      if let error = error {
+        self.completion?(error)
+        return
+      }
+      
+      self.completion?(nil)
+    }
   }
 }

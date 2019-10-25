@@ -77,12 +77,8 @@ public struct CryptographicKey {
     return CryptographyError(code: error)
   }
   
-  /// Signs a "message" with the key and returns the signature
-  public func sign(message: String) throws -> Data {
-    guard let message = message.data(using: .utf8) else {
-      throw CryptographyError(description: "Cannot Sign Message: Invalid Message")
-    }
-    
+  /// Signs "message" with the key and returns the signature
+  public func sign(message: Data) throws -> Data {
     var error: Unmanaged<CFError>?
     let signature = SecKeyCreateSignature(key,
                                           .ecdsaSignatureMessageX962SHA256,
@@ -95,6 +91,31 @@ public struct CryptographicKey {
     
     guard let result = signature as Data? else {
       throw CryptographyError(description: "Cannot sign message with cryptographic key.")
+    }
+    
+    return result
+  }
+  
+  /// Signs a "message" with the key and returns the signature
+  public func sign(message: String) throws -> Data {
+    guard let message = message.data(using: .utf8) else {
+      throw CryptographyError(description: "Cannot Sign Message: Invalid Message")
+    }
+    
+    return try sign(message: message)
+  }
+  
+  /// Verifies the signature of "message" with the public key
+  public func verify(message: Data, signature: Data) throws -> Bool {
+    guard let publicKey = getPublicKey() else {
+      throw CryptographyError(description: "Cannot retrieve public key")
+    }
+    
+    var error: Unmanaged<CFError>?
+    let result = SecKeyVerifySignature(publicKey, .ecdsaSignatureMessageX962SHA256, message as CFData, signature as CFData, &error)
+    
+    if let error = error?.takeUnretainedValue() {
+      throw error as Error
     }
     
     return result
