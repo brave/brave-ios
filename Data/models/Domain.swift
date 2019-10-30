@@ -4,6 +4,9 @@ import UIKit
 import CoreData
 import Foundation
 import BraveShared
+import Shared
+
+private let log = Logger.browserLogger
 
 public final class Domain: NSManagedObject, CRUD {
     
@@ -31,7 +34,7 @@ public final class Domain: NSManagedObject, CRUD {
     
     public class func getOrCreate(forUrl url: URL, persistent: Bool) -> Domain {
         let context = persistent ? DataController.viewContext : DataController.viewContextInMemory
-        return getOrCreateInternal(url, context: context, save: true)
+        return getOrCreateInternal(url, context: context, save: true, persistent: persistent)
     }
     
     // MARK: Shields
@@ -105,26 +108,39 @@ extension Domain {
     
     class func getOrCreateInternal(_ url: URL,
                                    context: NSManagedObjectContext = DataController.viewContext,
-                                   save: Bool = true) -> Domain {
+                                   save: Bool = true,
+                                   persistent: Bool = true) -> Domain {
         let domainString = url.domainURL.absoluteString
         if let domain = Domain.first(where: NSPredicate(format: "url == %@", domainString), context: context) {
             return domain
         }
-        
-        // See #409:
-        //  A larger refactor is probably wanted here.
-        //  This can easily lead to a Domain being created on the `viewContext`
-        //  A solution to consider is creating a new background context here, creating, saving, and then re-fetching
-        //   that object in the requested context (regardless if it is `viewContext` or not)
+
         var newDomain: Domain!
-        context.performAndWait {
-            newDomain = Domain(entity: Domain.entity(context), insertInto: context)
+        
+        // Background context to use if main thread context was passed.
+        // Domains in private mode are saved to in-memory store.
+        let bgContext = persistent ? DataController.newBackgroundContext() : DataController.newBackgroundContextInMemory()
+        
+        let writeContext = context.concurrencyType == .mainQueueConcurrencyType ? bgContext : context
+        
+        writeContext.performAndWait {
+            newDomain = Domain(entity: Domain.entity(writeContext), insertInto: writeContext)
             newDomain.url = domainString
-            if save {
-                DataController.save(context: context)
+            if save && writeContext.hasChanges {
+                do {
+                    try writeContext.save()
+                } catch {
+                    log.error("Domain save error: \(error)")
+                }
             }
         }
-        return newDomain
+        
+        guard let domainOnCorrectContext = context.object(with: newDomain.objectID) as? Domain else {
+            assertionFailure("Could not retrieve domain on correct context")
+            return newDomain
+        }
+        
+        return domainOnCorrectContext
     }
     
     class func deleteNonBookmarkedAndClearSiteVisits(context: NSManagedObjectContext,
@@ -166,7 +182,8 @@ extension Domain {
     
     class func setBraveShieldInternal(forUrl url: URL, shield: BraveShield, isOn: Bool?, context: WriteContext = .new(inMemory: false)) {
         DataController.perform(context: context) { context in
-            let domain = Domain.getOrCreateInternal(url, context: context)
+            // Not saving here, save happens in `perform` method.
+            let domain = Domain.getOrCreateInternal(url, context: context, save: false, persistent: true)
             domain.setBraveShield(shield: shield, isOn: isOn, context: context)
         }
     }
@@ -223,7 +240,8 @@ extension Domain {
         
         guard let url = urlComponents.url else { return nil }
         
-        // Return the flipped scheme version of `url`
-        return Domain.getOrCreateInternal(url, context: context, save: true)
+        // Return the flipped scheme version of `url`.
+        // Not saving here, save happens in at higher level in `perform` method.
+        return Domain.getOrCreateInternal(url, context: context, save: false, persistent: true)
     }
 }

@@ -363,7 +363,8 @@ extension Bookmark {
             if let u = url, !u.isEmpty {
                 bookmarkToUpdate.url = url
                 if let theURL = URL(string: u) {
-                    bookmarkToUpdate.domain = Domain.getOrCreateInternal(theURL, context: context)
+                    bookmarkToUpdate.domain =
+                        Domain.getOrCreateInternal(theURL, context: context, save: false, persistent: true)
                 } else {
                     bookmarkToUpdate.domain = nil
                 }
