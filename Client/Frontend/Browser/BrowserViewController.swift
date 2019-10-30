@@ -867,15 +867,14 @@ class BrowserViewController: UIViewController {
         // Setup the bottom toolbar
         toolbar?.snp.remakeConstraints { make in
             make.edges.equalTo(self.footer)
-            make.height.equalTo(UIConstants.BottomToolbarHeight)
         }
 
         footer.snp.remakeConstraints { make in
             scrollController.footerBottomConstraint = make.bottom.equalTo(self.view.snp.bottom).constraint
             make.leading.trailing.equalTo(self.view)
-            if self.toolbar == nil {
-                make.height.equalTo(0.0)
-            }
+            
+            let height = self.toolbar == nil ? 0.0 : UIConstants.BottomToolbarHeight
+            make.height.equalTo(height)
         }
 
         topToolbar.setNeedsUpdateConstraints()
