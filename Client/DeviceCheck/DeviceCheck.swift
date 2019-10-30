@@ -155,7 +155,7 @@ class DeviceCheckClient {
       
       let parameters = [
         "publicKeyHash": publicKey,
-        "paymentID": paymentId
+        "paymentId": paymentId
       ]
       
       try executeRequest(.getAttestation(parameters)) { (result: Result<AttestationBlob, Error>) in
@@ -255,7 +255,7 @@ private extension DeviceCheckClient {
     func method() -> HttpMethod {
       switch self {
       case .register: return .post
-      case .getAttestation: return .get
+      case .getAttestation: return .post
       case .setAttestation: return .put
       }
     }
@@ -336,10 +336,12 @@ private extension DeviceCheckClient {
     switch endpoint {
     case .register(let parameters):
       request.httpBody = try JSONEncoder().encode(parameters)
+      print(String(data: request.httpBody!, encoding: .utf8)!)
       request.setValue("application/json", forHTTPHeaderField: "Content-Type")
       
     case .getAttestation(let parameters):
-      request.url = encodeQueryURL(url: request.url!, parameters: parameters)
+      request.httpBody = try JSONEncoder().encode(parameters)
+      request.setValue("application/json", forHTTPHeaderField: "Content-Type")
       
     case .setAttestation(_, let parameters):
       request.httpBody = try JSONEncoder().encode(parameters)
