@@ -158,8 +158,6 @@ class DeviceCheckClient {
         "paymentId": paymentId
       ]
       
-      print(parameters)
-      
       try executeRequest(.getAttestation(parameters)) { (result: Result<AttestationBlob, Error>) in
         switch result {
         case .success(let blob):
@@ -338,7 +336,6 @@ private extension DeviceCheckClient {
     switch endpoint {
     case .register(let parameters):
       request.httpBody = try JSONEncoder().encode(parameters)
-      print(String(data: request.httpBody!, encoding: .utf8)!)
       request.setValue("application/json", forHTTPHeaderField: "Content-Type")
       
     case .getAttestation(let parameters):
