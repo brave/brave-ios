@@ -44,9 +44,6 @@ open class AppInfo {
         if bundleIdentifier == "com.brave.ios.BrowserBeta" {
             // com.brave.ios.BrowserBeta is taken and can't be used as an app group.
             bundleIdentifier = "com.brave.ios.BrowserBeta.unique"
-        // Internal beta
-        } else if bundleIdentifier == "com.brave.ios.browser.beta" {
-            bundleIdentifier = "com.brave.ios.browser.beta.unique"
         }
         return "group." + bundleIdentifier
     }
