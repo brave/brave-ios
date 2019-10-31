@@ -18,8 +18,22 @@ public enum AppBuildChannel: String {
         switch self {
         case .release, .beta:
             return true
-        case .developer, .enterprise:
+        case .enterprise, .developer:
             return false
+        }
+    }
+    
+    public var serverChannelParam: String {
+        switch self {
+        case .release:
+            return "release"
+        case .beta:
+            return "beta"
+         case .enterprise:
+             // This is designed to follow desktop platform
+            return "developer"
+        case .developer:
+            return "invalid"
         }
     }
 }

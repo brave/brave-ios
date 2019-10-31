@@ -20,16 +20,16 @@ class DAUTests: XCTestCase {
     private let dau = DAU(date: Date(timeIntervalSince1970: 1183809600))
     
     func testChannelParam() {
-        let releaseExpected = URLQueryItem(name: "channel", value: "stable")
+        let releaseExpected = URLQueryItem(name: "channel", value: "release")
         XCTAssertEqual(dau.channelParam(for: .release), releaseExpected)
         
-        let externalBetaExpected = URLQueryItem(name: "channel", value: "stable")
+        let externalBetaExpected = URLQueryItem(name: "channel", value: "beta")
         XCTAssertEqual(dau.channelParam(for: .beta), externalBetaExpected)
         
-        let internalBetaExpected = URLQueryItem(name: "channel", value: "beta")
+        let internalBetaExpected = URLQueryItem(name: "channel", value: "developer")
         XCTAssertEqual(dau.channelParam(for: .enterprise), internalBetaExpected)
         
-        let devExpected = URLQueryItem(name: "channel", value: "beta")
+        let devExpected = URLQueryItem(name: "channel", value: "invalid")
         XCTAssertEqual(dau.channelParam(for: .developer), devExpected)
     }
     
