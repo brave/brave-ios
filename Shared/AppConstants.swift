@@ -7,10 +7,19 @@ import UIKit
 public enum AppBuildChannel: String {
     case release = "release"
     case beta = "beta"
+    case enterprise = "enterprise"
     case developer = "developer"
     
     public var isRelease: Bool {
-        return self == .release
+        // Using switch to force a return definition for each enum value
+        // Simply using `return [.release, .beta].includes(self)` could lead to easily missing a definition
+        //  if enum is ever expanded
+        switch self {
+        case .release, .beta:
+            return true
+        case .developer, .enterprise:
+            return false
+        }
     }
 }
 
@@ -35,6 +44,8 @@ public struct AppConstants {
             return AppBuildChannel.release
         #elseif MOZ_CHANNEL_BETA
             return AppBuildChannel.beta
+        #elseif MOZ_CHANNEL_ENTERPRISE
+            return AppBuildChannel.enterprise
         #elseif MOZ_CHANNEL_FENNEC
             return AppBuildChannel.developer
         #endif
