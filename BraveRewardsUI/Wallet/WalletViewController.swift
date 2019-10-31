@@ -79,11 +79,12 @@ class WalletViewController: UIViewController, RewardsSummaryProtocol {
     // Not actually visible from this controller
     title = Strings.PanelTitle
     
-    if let grants = state.ledger.walletInfo?.grants, !grants.isEmpty {
-      walletView.headerView.grantsButton.isHidden = false
-    } else {
+    // FIXME: When this API is back with support for promotions, uncomment
+//    if let grants = state.ledger.walletInfo?.grants, !grants.isEmpty {
+//      walletView.headerView.grantsButton.isHidden = false
+//    } else {
       walletView.headerView.grantsButton.isHidden = true
-    }
+//    }
     
     navigationController?.setNavigationBarHidden(true, animated: false)
     
@@ -319,22 +320,24 @@ class WalletViewController: UIViewController, RewardsSummaryProtocol {
   // MARK: - Actions
   
   @objc private func tappedClaimGrantButton(_ sender: ActionButton) {
+    guard let promotion = state.ledger.pendingPromotions.first else { return }
     sender.loaderView = LoaderView(size: .small)
     sender.loaderPlacement = .replacesContent
     sender.isLoading = true
-    ledgerObserver.grantClaimed = { [weak self] grant in
-      guard let self = self, let grantAmount = BATValue(probi: grant.probi)?.displayString else { return }
+    state.ledger.claimPromotion(promotion) { success in
       sender.isLoading = false
+      if !success {
+        // Show error?
+        return
+      }
+      let grantAmount = BATValue(promotion.approximateValue).displayString
       let claimedVC = GrantClaimedViewController(
         grantAmount: grantAmount,
-        expirationDate: Date(timeIntervalSince1970: TimeInterval(grant.expiryTime))
+        expirationDate: Date(timeIntervalSince1970: TimeInterval(promotion.expiresAt))
       )
       self.present(claimedVC, animated: true) {
         self.tappedNotificationClose()
       }
-    }
-    if let grant = state.ledger.pendingGrants.first {
-      state.ledger.solveGrantCaptch(withPromotionId: grant.promotionId, solution: "")
     }
   }
   

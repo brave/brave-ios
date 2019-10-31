@@ -117,6 +117,48 @@ extension BraveLedger {
       })
     }
   }
+  
+  private var paymentId: String? {
+    var id: String?
+    rewardsInternalInfo { info in
+      id = info?.paymentId
+    }
+    return id
+  }
+  
+  public func claimPromotion(_ promotion: Promotion, completion: @escaping (_ success: Bool) -> Void) {
+    guard let paymentId = self.paymentId else { return }
+    let deviceCheck = DeviceCheckClient(environment: BraveLedger.environment)
+    deviceCheck.generateAttestation(paymentId: paymentId) { (attestation, error) in
+      guard let attestation = attestation else {
+        completion(false)
+        return
+      }
+      self.claimPromotion(attestation.publicKeyHash) { result, noonce in
+        if result != .ledgerOk {
+          // Show error?
+          completion(false)
+          return
+        }
+        
+        deviceCheck.generateAttestationVerification(nonce: noonce) { verification, error in
+          guard let verification = verification else {
+            completion(false)
+            return
+          }
+          
+          let solution = PromotionSolution()
+          solution.noonce = noonce
+          solution.signature = verification.signature
+          solution.blob = verification.attestationBlob.nonce
+          
+          self.attestPromotion(promotion.id, solution: solution) { promotion in
+            completion(promotion != nil)
+          }
+        }
+      }
+    }
+  }
 }
 
 extension PublisherInfo {

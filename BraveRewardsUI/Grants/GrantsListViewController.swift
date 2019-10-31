@@ -33,6 +33,8 @@ class GrantsListViewController: UIViewController {
     
     title = Strings.Grants
     
+    // FIXME: When this API is back with support for promotions, uncomment
+    /*
     if let grants = ledger.walletInfo?.grants, !grants.isEmpty {
       grants.forEach {
         if let value = BATValue(probi: $0.probi) {
@@ -46,6 +48,7 @@ class GrantsListViewController: UIViewController {
         }
       }
     }
+    */
   }
 }
 

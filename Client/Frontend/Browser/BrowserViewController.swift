@@ -174,6 +174,7 @@ class BrowserViewController: UIViewController {
         }
         rewards = BraveRewards(configuration: configuration)
         rewardsObserver = LedgerObserver(ledger: rewards!.ledger)
+        deviceCheckClient = DeviceCheckClient(environment: configuration.environment)
         #endif
 
         super.init(nibName: nil, bundle: nil)
@@ -252,9 +253,48 @@ class BrowserViewController: UIViewController {
         }
     }
     
+    let deviceCheckClient: DeviceCheckClient
+    
+    private func setupDeviceCheckEnrollment() {
+        guard let rewards = rewards else { return }
+        
+        // Enroll in DeviceCheck
+        self.deviceCheckClient.generateToken { [weak self] (token, error) in
+            guard let self = self else { return }
+            if let error = error {
+                log.error("Failed to generate DeviceCheck token: \(error)")
+                return
+            }
+            var paymentId: String = ""
+            rewards.ledger.rewardsInternalInfo { info in
+                if let info = info {
+                    paymentId = info.paymentId
+                }
+            }
+            self.deviceCheckClient.generateEnrollment(paymentId: paymentId, token: token) { registration, error in
+                if let error = error {
+                    log.error("Failed to enroll in DeviceCheck: \(error)")
+                    return
+                }
+                guard let registration = registration else { return }
+                self.deviceCheckClient.registerDevice(enrollment: registration) { error in
+                    if let error = error {
+                        log.error("Failed to register device with mobile attestation server: \(error)")
+                        return
+                    }
+                }
+            }
+        }
+    }
+    
     private func setupRewardsObservers() {
         guard let rewards = rewards, let observer = rewardsObserver else { return }
         rewards.ledger.add(observer)
+        observer.walletInitalized = { [weak self] result in
+            if result == .walletCreated {
+                self?.setupDeviceCheckEnrollment()
+            }
+        }
         observer.fetchedPanelPublisher = { [weak self] publisher, tabId in
             guard let self = self, self.isViewLoaded, let tab = self.tabManager.selectedTab, tab.rewardsId == tabId else { return }
             self.publisher = publisher
