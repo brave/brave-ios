@@ -10,7 +10,8 @@ public enum AppBuildChannel: String {
     case enterprise = "enterprise"
     case developer = "developer"
     
-    public var isRelease: Bool {
+    /// Whether this release channel is used/seen by external users (app store or testers)
+    public var isPublic: Bool {
         // Using switch to force a return definition for each enum value
         // Simply using `return [.release, .beta].includes(self)` could lead to easily missing a definition
         //  if enum is ever expanded

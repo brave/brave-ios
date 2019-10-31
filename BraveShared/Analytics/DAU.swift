@@ -146,7 +146,7 @@ public class DAU {
     }
     
     func channelParam(for channel: AppBuildChannel = AppConstants.BuildChannel) -> URLQueryItem {
-        return URLQueryItem(name: "channel", value: channel.isRelease ? "stable" : "beta")
+        return URLQueryItem(name: "channel", value: channel.isPublic ? "stable" : "beta")
     }
     
     func versionParam(for version: String = AppInfo.appVersion) -> URLQueryItem {
