@@ -3,7 +3,6 @@
 import Foundation
 import Shared
 import CoreData
-import SwiftyJSON
 
 private let log = Logger.braveSyncLogger
 
@@ -107,9 +106,5 @@ class SyncHelpers {
     /// DisplayUUID -> UUID
     static func syncUUID(fromString string: String?) -> [Int]? {
         return string?.components(separatedBy: ",").compactMap { Int($0) }
-    }
-    
-    static func syncUUID(fromJSON json: JSON?) -> [Int]? {
-        return json?.array?.compactMap { $0.int }
     }
 }

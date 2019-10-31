@@ -2,16 +2,15 @@
 
 import Foundation
 import Shared
-import SwiftyJSON
 
 final class SyncBookmark: SyncRecord {
     
     // MARK: Declaration for string constants to be used to decode and also serialize.
-    fileprivate struct SerializationKeys {
-        static let isFolder = "isFolder"
-        static let parentFolderObjectId = "parentFolderObjectId"
-        static let site = "site"
-        static let syncOrder = "order"
+    private enum SerializationKeys: String, CodingKey {
+        case isFolder
+        case parentFolderObjectId
+        case site
+        case syncOrder
     }
     
     // MARK: Properties
@@ -22,15 +21,7 @@ final class SyncBookmark: SyncRecord {
     var syncOrder: String?
     
     convenience init() {
-        self.init(json: nil)
-    }
-    
-    /// Initiates the instance based on the object.
-    ///
-    /// - parameter object: The object of either Dictionary or Array kind that was passed.
-    /// - returns: An initialized instance of the class.
-    convenience init(object: [String: AnyObject]) {
-        self.init(json: JSON(object))
+        self.init(object: [:])
     }
     
     required init(record: Syncable?, deviceId: [Int]?, action: Int?) {
@@ -57,19 +48,16 @@ final class SyncBookmark: SyncRecord {
         syncOrder = bm?.syncOrder
     }
     
-    /// Initiates the instance based on the JSON that was passed.
-    ///
-    /// - parameter json: JSON object from SwiftyJSON.
-    required init(json: JSON?) {
-        super.init(json: json)
+    required init(object: [String: AnyObject]) {
+        super.init(object: object)
         
         guard let objectData = self.objectData else { return }
         
-        let bookmark = json?[objectData.rawValue]
-        isFolder = bookmark?[SerializationKeys.isFolder].bool
-        syncOrder = bookmark?[SerializationKeys.syncOrder].string
-        if let items = bookmark?[SerializationKeys.parentFolderObjectId].array { parentFolderObjectId = items.map { $0.intValue } }
-        site = SyncSite(json: bookmark?[SerializationKeys.site])
+        let bookmark = object[objectData.rawValue]
+        isFolder = bookmark?[SerializationKeys.isFolder.rawValue] as? Bool
+        syncOrder = bookmark?[SerializationKeys.syncOrder.rawValue] as? String
+        parentFolderObjectId = bookmark?[SerializationKeys.parentFolderObjectId.rawValue] as? [Int]
+        site = SyncSite(object: bookmark?[SerializationKeys.site.rawValue] as? [String: AnyObject] ?? [:])
     }
     
     /// Generates description of the object in the form of a NSDictionary.
@@ -80,10 +68,10 @@ final class SyncBookmark: SyncRecord {
         
         // Create nested bookmark dictionary
         var bookmarkDict = [String: Any]()
-        bookmarkDict[SerializationKeys.isFolder] = isFolder
-        bookmarkDict[SerializationKeys.syncOrder] = syncOrder
-        if let value = parentFolderObjectId { bookmarkDict[SerializationKeys.parentFolderObjectId] = value }
-        if let value = site { bookmarkDict[SerializationKeys.site] = value.dictionaryRepresentation() }
+        bookmarkDict[SerializationKeys.isFolder.rawValue] = isFolder
+        bookmarkDict[SerializationKeys.syncOrder.rawValue] = syncOrder
+        if let value = parentFolderObjectId { bookmarkDict[SerializationKeys.parentFolderObjectId.rawValue] = value }
+        if let value = site { bookmarkDict[SerializationKeys.site.rawValue] = value.dictionaryRepresentation() }
         
         // Fetch parent, and assign bookmark
         var dictionary = super.dictionaryRepresentation()

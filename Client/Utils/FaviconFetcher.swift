@@ -8,11 +8,39 @@ import XCGLogger
 import Deferred
 import SDWebImage
 import Fuzi
-import SwiftyJSON
 import class Data.FaviconMO 
 
 private let log = Logger.browserLogger
 private let queue = DispatchQueue(label: "FaviconFetcher", attributes: DispatchQueue.Attributes.concurrent)
+
+private struct TopSite: Decodable {
+    let title: String
+    let url: String?
+    let urls: [String]?
+    let imageUrl: String
+    let backgroundColor: UIColor
+    let domain: String
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        title = try container.decode(String.self, forKey: .title)
+        url = try container.decodeIfPresent(String.self, forKey: .url)
+        urls = try container.decodeIfPresent([String].self, forKey: .urls)
+        imageUrl = try container.decode(String.self, forKey: .imageUrl)
+        let colourString = try container.decode(String.self, forKey: .backgroundColor).replacingOccurrences(of: "#", with: "").lowercased()
+        backgroundColor = colourString == "fff" ? UIColor.white : UIColor(colorString: colourString)
+        domain = try container.decode(String.self, forKey: .domain)
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case title
+        case url
+        case urls
+        case imageUrl = "image_url"
+        case backgroundColor = "background_color"
+        case domain
+    }
+}
 
 class FaviconFetcherErrorType: MaybeErrorType {
     let description: String
@@ -270,21 +298,13 @@ open class FaviconFetcher: NSObject, XMLParserDelegate {
         }
         do {
             let file = try Data(contentsOf: URL(fileURLWithPath: filePath))
-            let json = JSON(file)
+            let topSites = try JSONDecoder().decode([TopSite].self, from: file)
             var icons: [String: (color: UIColor, url: String)] = [:]
-            json.forEach({
-                guard let url = $0.1["domain"].string, let color = $0.1["background_color"].string?.lowercased(),
-                    var path = $0.1["image_url"].string else {
-                    return
-                }
-                path = path.replacingOccurrences(of: ".png", with: "")
+            topSites.forEach({
+                let path = $0.imageUrl.replacingOccurrences(of: ".png", with: "")
                 let filePath = Bundle.main.path(forResource: "TopSites/" + path, ofType: "png")
                 if let filePath = filePath {
-                    if color == "#fff" {
-                        icons[url] = (UIColor.white, filePath)
-                    } else {
-                        icons[url] = (UIColor(colorString: color.replacingOccurrences(of: "#", with: "")), filePath)
-                    }
+                    icons[$0.domain] = ($0.backgroundColor, filePath)
                 }
             })
             return icons

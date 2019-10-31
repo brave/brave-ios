@@ -2,13 +2,12 @@
 
 import UIKit
 import Shared
-import SwiftyJSON
 
 class SyncDevice: SyncRecord {
     
     // MARK: Declaration for string constants to be used to decode and also serialize.
-    private struct SerializationKeys {
-        static let name = "name"
+    private enum SerializationKeys: String, CodingKey {
+        case name
     }
     
     // MARK: Properties
@@ -24,10 +23,10 @@ class SyncDevice: SyncRecord {
         self.objectData = nil
     }
     
-    required init(json: JSON?) {
-        super.init(json: json)
-
-        self.name = json?[SyncObjectDataType.Device.rawValue][SerializationKeys.name].string
+    required public init(object: [String : AnyObject]) {
+        super.init(object: object)
+        
+        self.name = object[SyncObjectDataType.Device.rawValue]?[SerializationKeys.name.rawValue] as? String
 
         // Preference
         self.objectData = nil
@@ -42,7 +41,7 @@ class SyncDevice: SyncRecord {
         
         // Device specific
         var deviceDict = [String: Any]()
-        if let value = self.name { deviceDict[SerializationKeys.name] = value }
+        if let value = self.name { deviceDict[SerializationKeys.name.rawValue] = value }
 
         var dictionary = super.dictionaryRepresentation()
         dictionary[SyncObjectDataType.Device.rawValue] = deviceDict

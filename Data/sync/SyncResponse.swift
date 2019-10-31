@@ -2,7 +2,6 @@
 
 import Foundation
 import Shared
-import SwiftyJSON
 
 /*
  * Due to sync's 'callbacks' running through the same function, parameters are reused
@@ -20,39 +19,32 @@ typealias SyncDefaultResponseType = SyncRecord
 final class SyncResponse {
     
     // MARK: Declaration for string constants to be used to decode and also serialize.
-    fileprivate struct SerializationKeys {
-        static let arg2 = "arg2"
-        static let message = "message"
-        static let arg1 = "arg1"
-        static let arg3 = "arg3"
-        static let arg4 = "arg4" // isTruncated
+    private enum SerializationKeys: String, CodingKey {
+        case arg2
+        case message
+        case arg1
+        case arg3
+        case arg4 // isTruncated
     }
     
     // MARK: Properties
     // TODO: rename this property
-    var rootElements: JSON? // arg2
+    var rootElements: [[String: Any]]? // arg2
     var message: String?
     var arg1: String?
     var lastFetchedTimestamp: Int? // arg3
     var isTruncated: Bool? // arg4
     
-    /// Initiates the instance based on the object.
-    ///
-    /// - parameter object: The object of either Dictionary or Array kind that was passed.
-    /// - returns: An initialized instance of the class.
-    convenience init(object: String) {
-        self.init(json: JSON(parseJSON: object))
-    }
-    
-    /// Initiates the instance based on the JSON that was passed.
-    ///
-    /// - parameter json: JSON object from SwiftyJSON.
-    required init(json: JSON?) {
-        rootElements = json?[SerializationKeys.arg2]
+    required init(object: String) {
+        guard let data = object.data(using: .utf8), let object = try? JSONSerialization.jsonObject(with: data, options: .mutableLeaves) as? [String: Any] else {
+            return
+        }
         
-        message = json?[SerializationKeys.message].string
-        arg1 = json?[SerializationKeys.arg1].string
-        lastFetchedTimestamp = json?[SerializationKeys.arg3].int
-        isTruncated = json?[SerializationKeys.arg4].bool
+        rootElements = object[SerializationKeys.arg2.rawValue] as? [[String: Any]]
+        
+        message = object[SerializationKeys.message.rawValue] as? String
+        arg1 = object[SerializationKeys.arg1.rawValue] as? String
+        lastFetchedTimestamp = object[SerializationKeys.arg3.rawValue] as? Int
+        isTruncated = object[SerializationKeys.arg4.rawValue] as? Bool
     }
 }

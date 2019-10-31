@@ -4,7 +4,6 @@
 
 import XCTest
 @testable import BraveShared
-import SwiftyJSON
 
 class CustomHeaderDataTest: XCTestCase {
     
@@ -33,8 +32,7 @@ class CustomHeaderDataTest: XCTestCase {
     }
     
     func getCustomHeader(for jsonString: String) -> [CustomHeaderData] {
-        let json = JSON(parseJSON: jsonString)
-        return CustomHeaderData.customHeaders(from: json)
+        return CustomHeaderData.customHeaders(from: jsonString.data(using: .utf8)!)
     }
 }
 

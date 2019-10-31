@@ -2,11 +2,10 @@
 
 import Foundation
 import Shared
-import SwiftyJSON
 
 private let log = Logger.browserLogger
 
-struct ReferralData {
+struct ReferralData: Codable {
 
     let downloadId: String
     let referralCode: String
@@ -26,20 +25,21 @@ struct ReferralData {
         self.customHeaders = customHeaders
     }
 
-    init?(json: JSON) {
-        guard let downloadId = json["download_id"].string, let code = json["referral_code"].string else {
-            log.error("Failed to unwrap json to Referral struct.")
-            UrpLog.log("Failed to unwrap json to Referral struct. \(json)")
-            return nil
-        }
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        downloadId = try container.decode(String.self, forKey: .downloadId)
+        referralCode = try container.decode(String.self, forKey: .referralCode)
+        offerPage = try container.decode(String.self, forKey: .offerPage)
 
-        self.downloadId = downloadId
-        self.referralCode = code
-        self.offerPage = json["offer_page_url"].string
-
-        var headers = [CustomHeaderData]()
-        headers.append(contentsOf: CustomHeaderData.customHeaders(from: json["headers"]))
-
-        self.customHeaders = headers.count > 0 ? headers : nil
+        let headers = try container.decode([String: String].self, forKey: .customHeaders)
+        let customHeaders = try CustomHeaderData.customHeaders(from: JSONSerialization.data(withJSONObject: headers, options: .init(rawValue: 0)))
+        self.customHeaders = headers.count > 0 ? customHeaders : nil
+    }
+    
+    private enum CodingKeys: String, CodingKey {
+        case downloadId = "download_id"
+        case offerPage = "offer_page_url"
+        case referralCode = "referral_code"
+        case customHeaders = "headers"
     }
 }

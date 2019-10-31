@@ -6,7 +6,6 @@ import Shared
 import BraveShared
 import CoreData
 import SwiftKeychainWrapper
-import SwiftyJSON
 import JavaScriptCore
 
 private let log = Logger.braveSyncLogger
@@ -55,7 +54,7 @@ public enum SyncRecordType: String {
     }
 }
 
-public enum SyncObjectDataType: String {
+public enum SyncObjectDataType: String, Codable, CodingKey {
     case Bookmark = "bookmark"
     case Prefs = "preference" // Remove
     
@@ -603,10 +602,15 @@ extension Sync {
     }
     
     // Only called when the server has info for client to save
-    func saveInitData(_ data: JSON) {
+    func saveInitData(_ json: String) {
+        guard let data = json.data(using: .utf8), let json = try? JSONSerialization.jsonObject(with: data, options: .init(rawValue: 0)) as? [String: Any] else {
+            log.error("saveInitData(_ json: String): Cannot Decode JSON")
+            return
+        }
+        
         // Sync Seed
-        if let seedJSON = data["arg1"].array {
-            let seed = seedJSON.compactMap({ $0.int })
+        if let seedJSON = json["arg1"] as? [Any] {
+            let seed = seedJSON.compactMap({ $0 as? Int })
             
             // TODO: Move to constant
             if seed.count < Sync.seedByteLength {
@@ -622,9 +626,9 @@ extension Sync {
         }
         
         // Device Id
-        if let deviceArray = data["arg2"].array, deviceArray.count > 0 {
+        if let deviceArray = json["arg2"] as? [Any], !deviceArray.isEmpty {
             // TODO: Just don't set, if bad, allow sync to recover on next init
-            Device.currentDevice()?.deviceId = deviceArray.map { $0.intValue }
+            Device.currentDevice()?.deviceId = deviceArray.compactMap({ $0 as? Int })
             DataController.save(context: Device.currentDevice()?.managedObjectContext)
         } else if Device.currentDevice()?.deviceId == nil {
             log.error("Device Id expected!")
@@ -678,8 +682,7 @@ extension Sync: WKScriptMessageHandler {
         case "save-init-data" :
             // A bit hacky, but this method's data is not very uniform
             // (e.g. arg2 is [Int])
-            let data = JSON(parseJSON: message.body as? String ?? "")
-            self.saveInitData(data)
+            self.saveInitData(message.body as? String ?? "{}")
             // We clear current sync order after joining a new sync group.
             // syncOrder algorithm is also used for local ordering, even if we are not connected to sync group.
             // After joining a new sync group, new sync order with proper device id must be used.
@@ -689,8 +692,14 @@ extension Sync: WKScriptMessageHandler {
         case "resolved-sync-records":
             self.resolvedSyncRecords(syncResponse)
         case "sync-debug":
-            let data = JSON(parseJSON: message.body as? String ?? "")
-            log.debug("---- Sync Debug: \(data)")
+            let message = message.body as? String ?? "{}"
+            
+            if let data = message.data(using: .utf8),
+                let json = try? JSONSerialization.jsonObject(with: data, options: .init(rawValue: 0)) {
+                log.debug("---- Sync Debug: \(json)")
+            } else {
+                log.debug("---- Sync Debug: \(message)")
+            }
         case "sync-ready":
             self.isSyncFullyInitialized.syncReady = true
         case "fetch-sync-records":

@@ -5,7 +5,6 @@
 import Foundation
 import Deferred
 import Shared
-import SwiftyJSON
 
 open class BraveGlobalShieldStats {
     public static let shared = BraveGlobalShieldStats()

@@ -8,7 +8,6 @@ import BraveShared
 import Static
 import SwiftKeychainWrapper
 import LocalAuthentication
-import SwiftyJSON
 import Data
 import WebKit
 import BraveRewards
@@ -474,8 +473,9 @@ class SettingsViewController: TableViewController {
                 }, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self),
                 Row(text: "Load all QA Links", selection: {
                     let url = URL(string: "https://raw.githubusercontent.com/brave/qa-resources/master/testlinks.json")!
-                    let string = try? String(contentsOf: url)
-                    let urls = JSON(parseJSON: string!)["links"].arrayValue.compactMap { URL(string: $0.stringValue) }
+                    let data = try? Data(contentsOf: url)
+                    let json = (try? JSONSerialization.jsonObject(with: data!, options: .init(rawValue: 0)) as? [String: Any]) ?? [:]
+                    let urls = (json["links"] as? [String])?.compactMap({ URL(string: $0) }) ?? []
                     self.settingsDelegate?.settingsOpenURLs(urls)
                     self.dismiss(animated: true)
                 }, cellClass: MultilineButtonCell.self),

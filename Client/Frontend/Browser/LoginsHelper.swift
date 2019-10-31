@@ -9,7 +9,6 @@ import Storage
 import XCGLogger
 import WebKit
 import Deferred
-import SwiftyJSON
 
 private let log = Logger.browserLogger
 
@@ -209,8 +208,9 @@ class LoginsHelper: TabContentScript {
                 jsonObj["logins"] = cursor.map { $0!.toDict() }
             }
 
-            let json = JSON(jsonObj)
-            let src = "window.__firefox__.logins.inject(\(json.stringValue()!))"
+            let json = try? String(data: JSONSerialization.data(withJSONObject: jsonObj, options: .init(rawValue: 0)), encoding: .utf8)
+            
+            let src = "window.__firefox__.logins.inject(\(json ?? "{}"))"
             self.tab?.webView?.evaluateJavaScript(src, completionHandler: { (obj, err) -> Void in
             })
         }
