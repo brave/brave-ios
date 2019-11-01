@@ -163,92 +163,14 @@ public class QASettingsViewController: TableViewController {
         header: .title("Attestation Data"),
         rows: [
           Row(text: "Generate Token", selection: {
-            let client = DeviceCheckClient(environment: BraveLedger.environment)
-            client.generateToken { (token, error) in
-              if let error = error {
-                self.displayCopyAlert(title: "Generate Token", message: "\(error)")
-                return
-              }
-              self.showActivityForJSONString(token)
-            }
-          }, cellClass: ButtonCell.self),
-          Row(text: "Generate Enrolment", selection: {
-            let client = DeviceCheckClient(environment: BraveLedger.environment)
-            client.generateToken { (token, error) in
-              if let error = error {
-                self.displayCopyAlert(title: "Generate Token", message: "\(error)")
-                return
-              }
-              guard let paymentId = self.rewards.ledger.paymentId else {
-                self.displayAlert(message: "Enable Rewards first")
-                return
-              }
-              client.generateEnrollment(paymentId: paymentId, token: token) { registration, error in
-                if let error = error {
-                  self.displayCopyAlert(title: "Generate Enrollment", message: "\(error)")
-                  return
-                }
-                guard let registration = registration else { return }
-                client.registerDevice(enrollment: registration) { error in
-                  if let error = error {
-                    self.displayCopyAlert(title: "Register Device", message: "\(error)")
-                    return
-                  }
-                  if let data = try? JSONEncoder().encode(registration), let json = String(data: data, encoding: .utf8) {
-                    self.showActivityForJSONString(json)
-                  }
-                }
-              }
-            }
-          }, cellClass: ButtonCell.self),
-          Row(text: "Generate Attestation", selection: {
-            guard let paymentId = self.rewards.ledger.paymentId else {
-              self.displayAlert(message: "Enable Rewards first")
+            guard let paymentId = self.rewards.ledger.paymentId, !paymentId.isEmpty else {
+              self.displayAlert(message: "Enable Rewards First")
               return
             }
-            let client = DeviceCheckClient(environment: BraveLedger.environment)
-            client.generateAttestation(paymentId: paymentId) { (attestation, error) in
-              if let error = error {
-                self.displayCopyAlert(title: "Generate Attestation", message: "\(error)")
-                return
-              }
-              if let attestation = attestation {
-                if let data = try? JSONEncoder().encode(attestation), let json = String(data: data, encoding: .utf8) {
-                  self.showActivityForJSONString(json)
-                }
-                client.getAttestation(attestation: attestation) { (blob, error) in
-                  if let error = error {
-                    self.displayCopyAlert(title: "Get Attestation", message: "\(error)")
-                  }
-                  if let blob = blob {
-                    self.attestationNoonce = blob.nonce
-                    if let data = try? JSONEncoder().encode(attestation), let json = String(data: data, encoding: .utf8) {
-                      self.showActivityForJSONString(json)
-                    }
-                  }
-                }
-              }
-            }
-          }, cellClass: ButtonCell.self),
-          Row(text: "Generate Verification with Noonce", selection: {
-            if self.attestationNoonce.isEmpty {
-              self.displayAlert(message: "Get Attestation First")
-              return
-            }
-            let client = DeviceCheckClient(environment: BraveLedger.environment)
-            client.generateAttestationVerification(nonce: self.attestationNoonce) { (verification, error) in
-              if let error = error {
-                self.displayCopyAlert(title: "Generate Attestation Verification", message: "\(error)")
-                return
-              }
-              if let verification = verification {
-                client.setAttestation(nonce: self.attestationNoonce, verification: verification) { (error) in
-                  if let error = error {
-                    self.displayCopyAlert(title: "Set Attestation", message: "\(error)")
-                  }
-                }
-              }
-            }
+            
+            let debugController = QAAttestationDebugViewController(paymentId: paymentId)
+            self.navigationController?.pushViewController(debugController, animated: true)
+            
           }, cellClass: ButtonCell.self)
         ]
       ),
