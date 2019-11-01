@@ -5,6 +5,7 @@
 import Foundation
 import UIKit
 import BraveRewards
+import MobileCoreServices
 
 class QAAttestationDebugViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource, UITextViewDelegate {
   
@@ -182,12 +183,38 @@ class QAAttestationDebugViewController: UIViewController, UIPickerViewDelegate, 
   
   @objc
   private func onCopyAll(_ button: UIBarButtonItem) {
-    let pasteboard = UIPasteboard.general
-    pasteboard.strings = []
+    let attributedText = NSMutableAttributedString()
+      
+    if !payloadView.text.isEmpty {
+      attributedText.append(NSAttributedString(string: "Payload:\n", attributes: [.foregroundColor: UIColor.blue, .font: UIFont.systemFont(ofSize: 14.0)]))
+      attributedText.append(NSAttributedString(string: payloadView.text + "\n\n", attributes: [.font: UIFont.systemFont(ofSize: 10.0)]))
+    }
     
-    [requestView, responseView, payloadView].forEach({
-      pasteboard.strings?.append($0.text)
-    })
+    if !requestView.text.isEmpty {
+      attributedText.append(NSAttributedString(string: "Request:\n", attributes: [.foregroundColor: UIColor.blue, .font: UIFont.systemFont(ofSize: 14.0)]))
+      attributedText.append(NSAttributedString(string: requestView.text + "\n\n", attributes: [.font: UIFont.systemFont(ofSize: 10.0)]))
+    }
+    
+    if !responseView.text.isEmpty {
+      attributedText.append(NSAttributedString(string: "Response:\n", attributes: [.foregroundColor: UIColor.blue, .font: UIFont.systemFont(ofSize: 14.0)]))
+      attributedText.append(NSAttributedString(string: responseView.text + "\n\n", attributes: [.font: UIFont.systemFont(ofSize: 10.0)]))
+    }
+    
+    let pasteboard = UIPasteboard.general
+    pasteboard.set(attributedString: attributedText) { error in
+      if error != nil {
+        pasteboard.string = """
+        Payload:
+        \(payloadView.text ?? "{}")
+        
+        Request:
+        \(requestView.text ?? "{}")
+        
+        Response:
+        \(responseView.text ?? "{}")
+        """
+      }
+    }
     
     resetViews()
   }
@@ -235,24 +262,24 @@ class QAAttestationDebugViewController: UIViewController, UIPickerViewDelegate, 
         
       default: fatalError()
       }
-    }
-    
-    switch row {
-    case 0:
-      resetViews()
-      setLoading(true)
-      self.generateToken({ [weak self] _ in
-        self?.setLoading(false)
-      })
-      
-    case 1:
-      resetViews()
-      setLoading(true)
-      self.registerDevice({ [weak self] in
-        self?.setLoading(false)
-      })
-      
-    default: fatalError()
+    } else {
+      switch row {
+      case 0:
+        resetViews()
+        setLoading(true)
+        self.generateToken({ [weak self] _ in
+          self?.setLoading(false)
+        })
+        
+      case 1:
+        resetViews()
+        setLoading(true)
+        self.registerDevice({ [weak self] in
+          self?.setLoading(false)
+        })
+        
+      default: fatalError()
+      }
     }
   }
   
@@ -331,9 +358,9 @@ class QAAttestationDebugViewController: UIViewController, UIPickerViewDelegate, 
   // MARK: - Other
   
   private func resetViews() {
-    requestView.text = isEnrolled ? "Already Enrolled" : ""
+    requestView.text = ""
     responseView.text = ""
-    payloadView.text = ""
+    payloadView.text = isEnrolled ? "Already Enrolled" : ""
   }
   
   private func setLoading(_ loading: Bool) {
@@ -486,5 +513,19 @@ class QAAttestationDebugViewController: UIViewController, UIPickerViewDelegate, 
     
     let data = (try? encoder.encode(model)) ?? Data()
     return String(data: data, encoding: .utf8)
+  }
+}
+
+private extension UIPasteboard {
+  func set(attributedString: NSAttributedString, _ completion: (Error?) -> Void) {
+    do {
+      let range = NSRange(location: 0, length: attributedString.length)
+      let attributes = [NSAttributedString.DocumentAttributeKey.documentType: NSAttributedString.DocumentType.rtf]
+      let rtf = try attributedString.data(from: range, documentAttributes: attributes)
+      self.setData(rtf, forPasteboardType: kUTTypeRTF as String)
+      completion(nil)
+    } catch {
+      completion(error)
+    }
   }
 }
