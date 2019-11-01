@@ -117,7 +117,7 @@ class DefaultSearchPrefs {
         let engineList = locales.compactMap({
             self.locales[$0]
         }).compactMap({
-            $0.regions?[region]?.visibleDefaultEngines ?? $0.searchDefault?.visibleDefaultEngines
+            $0.regions?[region]?.visibleDefaultEngines ?? $0.regions?["default"]?.visibleDefaultEngines
         }).last?.compactMap({ $0 })
 
         // If the engineList is empty then go ahead and use the default

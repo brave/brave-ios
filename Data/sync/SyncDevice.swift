@@ -23,7 +23,7 @@ class SyncDevice: SyncRecord {
         self.objectData = nil
     }
     
-    required public init(object: [String : AnyObject]) {
+    required public init(object: [String: AnyObject]) {
         super.init(object: object)
         
         self.name = object[SyncObjectDataType.Device.rawValue]?[SerializationKeys.name.rawValue] as? String
