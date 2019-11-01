@@ -184,47 +184,11 @@ public class QASettingsViewController: TableViewController {
     ]
   }
   
-  private var attestationNoonce: String = ""
-  
-  private func displayCopyAlert(title: String? = nil, message: String) {
-    DispatchQueue.main.async {
-      let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-      alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
-      alert.addAction(UIAlertAction(title: "Copy", style: .default, handler: { action in
-        UIPasteboard.general.string = message
-      }))
-      self.present(alert, animated: true, completion: nil)
-    }
-  }
-  
-  private func displayCopyRequestCompletionAlert(title: String? = nil, message: String, requestData: String? = nil) {
-    DispatchQueue.main.async {
-      let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-      alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
-      alert.addAction(UIAlertAction(title: "Copy", style: .default, handler: { action in
-        UIPasteboard.general.string = message
-      }))
-      if let requestData = requestData {
-        alert.addAction(UIAlertAction(title: "Send Request Data", style: .default, handler: { action in
-          self.showActivityForJSONString(requestData)
-        }))
-      }
-      self.present(alert, animated: true, completion: nil)
-    }
-  }
-  
   private func displayAlert(title: String? = nil, message: String) {
     DispatchQueue.main.async {
       let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
       alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
       self.present(alert, animated: true, completion: nil)
-    }
-  }
-  
-  private func showActivityForJSONString(_ json: String) {
-    DispatchQueue.main.async {
-      let activity = UIActivityViewController(activityItems: [json], applicationActivities: nil)
-      self.present(activity, animated: true)
     }
   }
   
