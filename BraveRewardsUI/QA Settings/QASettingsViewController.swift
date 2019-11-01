@@ -162,7 +162,7 @@ public class QASettingsViewController: TableViewController {
       Section(
         header: .title("Attestation Data"),
         rows: [
-          Row(text: "Generate Token", selection: {
+          Row(text: "Device Check Debugger", selection: {
             guard let paymentId = self.rewards.ledger.paymentId, !paymentId.isEmpty else {
               self.displayAlert(message: "Enable Rewards First")
               return
