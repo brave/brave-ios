@@ -160,6 +160,21 @@ public class QASettingsViewController: TableViewController {
         ]
       ),
       Section(
+        header: .title("Attestation Data"),
+        rows: [
+          Row(text: "Generate Token", selection: {
+            guard let paymentId = self.rewards.ledger.paymentId, !paymentId.isEmpty else {
+              self.displayAlert(message: "Enable Rewards First")
+              return
+            }
+            
+            let debugController = QAAttestationDebugViewController(paymentId: paymentId)
+            self.navigationController?.pushViewController(debugController, animated: true)
+            
+          }, cellClass: ButtonCell.self)
+        ]
+      ),
+      Section(
         rows: [
           Row(text: "Reset Rewards", selection: {
             self.tappedReset()
