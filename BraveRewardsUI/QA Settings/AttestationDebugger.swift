@@ -37,7 +37,7 @@ class QAAttestationDebugViewController: UIViewController, UIPickerViewDelegate, 
   }
   
   private let payloadLabel = UILabel().then {
-    $0.text = "Payload: "
+    $0.text = "Device Token: "
     $0.textColor = .blue
     $0.font = UIFont.boldSystemFont(ofSize: 14.0)
   }
@@ -108,6 +108,10 @@ class QAAttestationDebugViewController: UIViewController, UIPickerViewDelegate, 
   override func viewDidLoad() {
     super.viewDidLoad()
     
+    title = "Device Check Debugger"
+    navigationItem.backBarButtonItem = UIBarButtonItem(title: "Back", style: .plain, target: nil, action: nil)
+    navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Copy All", style: .plain, target: self, action: #selector(onCopyAll(_:)))
+    
     view.backgroundColor = UIColor(hex: 0xF6F6F6)
     view.addSubview(stackView)
     view.addSubview(pickerView)
@@ -175,6 +179,18 @@ class QAAttestationDebugViewController: UIViewController, UIPickerViewDelegate, 
   }
   
   // MARK: - Actions
+  
+  @objc
+  private func onCopyAll(_ button: UIBarButtonItem) {
+    let pasteboard = UIPasteboard.general
+    pasteboard.strings = []
+    
+    [requestView, responseView, payloadView].forEach({
+      pasteboard.strings?.append($0.text)
+    })
+    
+    resetViews()
+  }
   
   @objc
   private func onChooseButton(_ button: UIButton) {
@@ -315,7 +331,7 @@ class QAAttestationDebugViewController: UIViewController, UIPickerViewDelegate, 
   // MARK: - Other
   
   private func resetViews() {
-    requestView.text = ""
+    requestView.text = isEnrolled ? "Already Enrolled" : ""
     responseView.text = ""
     payloadView.text = ""
   }
