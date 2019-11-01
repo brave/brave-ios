@@ -160,6 +160,99 @@ public class QASettingsViewController: TableViewController {
         ]
       ),
       Section(
+        header: .title("Attestation Data"),
+        rows: [
+          Row(text: "Generate Token", selection: {
+            let client = DeviceCheckClient(environment: BraveLedger.environment)
+            client.generateToken { (token, error) in
+              if let error = error {
+                self.displayCopyAlert(title: "Generate Token", message: "\(error)")
+                return
+              }
+              self.showActivityForJSONString(token)
+            }
+          }, cellClass: ButtonCell.self),
+          Row(text: "Generate Enrolment", selection: {
+            let client = DeviceCheckClient(environment: BraveLedger.environment)
+            client.generateToken { (token, error) in
+              if let error = error {
+                self.displayCopyAlert(title: "Generate Token", message: "\(error)")
+                return
+              }
+              guard let paymentId = self.rewards.ledger.paymentId else {
+                self.displayAlert(message: "Enable Rewards first")
+                return
+              }
+              client.generateEnrollment(paymentId: paymentId, token: token) { registration, error in
+                if let error = error {
+                  self.displayCopyAlert(title: "Generate Enrollment", message: "\(error)")
+                  return
+                }
+                guard let registration = registration else { return }
+                client.registerDevice(enrollment: registration) { error in
+                  if let error = error {
+                    self.displayCopyAlert(title: "Register Device", message: "\(error)")
+                    return
+                  }
+                  if let data = try? JSONEncoder().encode(registration), let json = String(data: data, encoding: .utf8) {
+                    self.showActivityForJSONString(json)
+                  }
+                }
+              }
+            }
+          }, cellClass: ButtonCell.self),
+          Row(text: "Generate Attestation", selection: {
+            guard let paymentId = self.rewards.ledger.paymentId else {
+              self.displayAlert(message: "Enable Rewards first")
+              return
+            }
+            let client = DeviceCheckClient(environment: BraveLedger.environment)
+            client.generateAttestation(paymentId: paymentId) { (attestation, error) in
+              if let error = error {
+                self.displayCopyAlert(title: "Generate Attestation", message: "\(error)")
+                return
+              }
+              if let attestation = attestation {
+                if let data = try? JSONEncoder().encode(attestation), let json = String(data: data, encoding: .utf8) {
+                  self.showActivityForJSONString(json)
+                }
+                client.getAttestation(attestation: attestation) { (blob, error) in
+                  if let error = error {
+                    self.displayCopyAlert(title: "Get Attestation", message: "\(error)")
+                  }
+                  if let blob = blob {
+                    self.attestationNoonce = blob.nonce
+                    if let data = try? JSONEncoder().encode(attestation), let json = String(data: data, encoding: .utf8) {
+                      self.showActivityForJSONString(json)
+                    }
+                  }
+                }
+              }
+            }
+          }, cellClass: ButtonCell.self),
+          Row(text: "Generate Verification with Noonce", selection: {
+            if self.attestationNoonce.isEmpty {
+              self.displayAlert(message: "Get Attestation First")
+              return
+            }
+            let client = DeviceCheckClient(environment: BraveLedger.environment)
+            client.generateAttestationVerification(nonce: self.attestationNoonce) { (verification, error) in
+              if let error = error {
+                self.displayCopyAlert(title: "Generate Attestation Verification", message: "\(error)")
+                return
+              }
+              if let verification = verification {
+                client.setAttestation(nonce: self.attestationNoonce, verification: verification) { (error) in
+                  if let error = error {
+                    self.displayCopyAlert(title: "Set Attestation", message: "\(error)")
+                  }
+                }
+              }
+            }
+          }, cellClass: ButtonCell.self)
+        ]
+      ),
+      Section(
         rows: [
           Row(text: "Reset Rewards", selection: {
             self.tappedReset()
@@ -167,6 +260,50 @@ public class QASettingsViewController: TableViewController {
         ]
       )
     ]
+  }
+  
+  private var attestationNoonce: String = ""
+  
+  private func displayCopyAlert(title: String? = nil, message: String) {
+    DispatchQueue.main.async {
+      let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+      alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+      alert.addAction(UIAlertAction(title: "Copy", style: .default, handler: { action in
+        UIPasteboard.general.string = message
+      }))
+      self.present(alert, animated: true, completion: nil)
+    }
+  }
+  
+  private func displayCopyRequestCompletionAlert(title: String? = nil, message: String, requestData: String? = nil) {
+    DispatchQueue.main.async {
+      let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+      alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+      alert.addAction(UIAlertAction(title: "Copy", style: .default, handler: { action in
+        UIPasteboard.general.string = message
+      }))
+      if let requestData = requestData {
+        alert.addAction(UIAlertAction(title: "Send Request Data", style: .default, handler: { action in
+          self.showActivityForJSONString(requestData)
+        }))
+      }
+      self.present(alert, animated: true, completion: nil)
+    }
+  }
+  
+  private func displayAlert(title: String? = nil, message: String) {
+    DispatchQueue.main.async {
+      let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+      alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+      self.present(alert, animated: true, completion: nil)
+    }
+  }
+  
+  private func showActivityForJSONString(_ json: String) {
+    DispatchQueue.main.async {
+      let activity = UIActivityViewController(activityItems: [json], applicationActivities: nil)
+      self.present(activity, animated: true)
+    }
   }
   
   @objc private func tappedRestoreWallet() {

@@ -118,7 +118,7 @@ extension BraveLedger {
     }
   }
   
-  private var paymentId: String? {
+  var paymentId: String? {
     var id: String?
     rewardsInternalInfo { info in
       id = info?.paymentId
