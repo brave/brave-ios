@@ -116,6 +116,7 @@ class QAAttestationDebugViewController: UIViewController, UIPickerViewDelegate, 
     view.backgroundColor = UIColor(hex: 0xF6F6F6)
     view.addSubview(stackView)
     view.addSubview(pickerView)
+    view.addSubview(loadingView)
     
     stackView.snp.makeConstraints {
       $0.edges.equalTo(view.safeAreaLayoutGuide)
@@ -159,7 +160,9 @@ class QAAttestationDebugViewController: UIViewController, UIPickerViewDelegate, 
       $0.height.equalTo(45.0)
     }
     
-    view.addSubview(loadingView)
+    loadingView.snp.makeConstraints {
+      $0.center.equalTo(view.center)
+    }
     
     // Logic
     pickerView.delegate = self
@@ -177,6 +180,8 @@ class QAAttestationDebugViewController: UIViewController, UIPickerViewDelegate, 
     pickerView.reloadAllComponents()
     view.isUserInteractionEnabled = true
     loadingView.stopAnimating()
+    
+    resetViews()
   }
   
   // MARK: - Actions
@@ -508,8 +513,7 @@ class QAAttestationDebugViewController: UIViewController, UIPickerViewDelegate, 
   
   private func modelToString<T>(_ model: T) -> String? where T: Encodable {
     let encoder = JSONEncoder()
-    encoder.outputFormatting = .prettyPrinted
-    encoder.outputFormatting = .sortedKeys
+    encoder.outputFormatting = [.sortedKeys, .prettyPrinted]
     
     let data = (try? encoder.encode(model)) ?? Data()
     return String(data: data, encoding: .utf8)
