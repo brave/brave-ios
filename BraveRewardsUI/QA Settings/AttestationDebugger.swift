@@ -191,7 +191,7 @@ class QAAttestationDebugViewController: UIViewController, UIPickerViewDelegate, 
     let attributedText = NSMutableAttributedString()
       
     if !payloadView.text.isEmpty {
-      attributedText.append(NSAttributedString(string: "Payload:\n", attributes: [.foregroundColor: UIColor.blue, .font: UIFont.systemFont(ofSize: 14.0)]))
+      attributedText.append(NSAttributedString(string: "Device Token:\n", attributes: [.foregroundColor: UIColor.blue, .font: UIFont.systemFont(ofSize: 14.0)]))
       attributedText.append(NSAttributedString(string: payloadView.text + "\n\n", attributes: [.font: UIFont.systemFont(ofSize: 10.0)]))
     }
     
@@ -209,7 +209,7 @@ class QAAttestationDebugViewController: UIViewController, UIPickerViewDelegate, 
     pasteboard.set(attributedString: attributedText) { error in
       if error != nil {
         pasteboard.string = """
-        Payload:
+        Device Token:
         \(payloadView.text ?? "{}")
         
         Request:
