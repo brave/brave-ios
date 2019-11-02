@@ -72,7 +72,6 @@ extension OnboardingShieldsViewController {
         }
         
         private let buttonsStackView = UIStackView().then {
-            $0.distribution = .equalCentering
             $0.axis = .vertical
             $0.alignment = .center
             $0.spacing = 15.0
