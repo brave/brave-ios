@@ -97,6 +97,9 @@ extension OnboardingRewardsAgreementViewController {
         
         private let buttonsStackView = UIStackView().then {
             $0.distribution = .equalCentering
+            $0.axis = .vertical
+            $0.alignment = .center
+            $0.spacing = 15.0
         }
         
         private func updateDescriptionLabel() {
@@ -165,13 +168,17 @@ extension OnboardingRewardsAgreementViewController {
             
             mainStackView.addArrangedSubview(descriptionView)
 
-            [skipButton, turnOnButton, UIView.spacer(.horizontal, amount: 0)]
+            [turnOnButton, skipButton]
                 .forEach(buttonsStackView.addArrangedSubview(_:))
             
             [textStackView, buttonsStackView].forEach(descriptionStackView.addArrangedSubview(_:))
             
             turnOnButton.snp.makeConstraints {
                 $0.centerX.equalTo(self.snp.centerX)
+            }
+            
+            skipButton.snp.makeConstraints {
+                $0.width.equalTo(turnOnButton.snp.width)
             }
         }
         

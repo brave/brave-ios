@@ -66,7 +66,9 @@ extension OnboardingSearchEnginesViewController {
         
         private let buttonsStackView = UIStackView().then {
             $0.distribution = .equalCentering
+            $0.axis = .vertical
             $0.alignment = .center
+            $0.spacing = 15.0
         }
         
         private let containerView = UIView()
@@ -89,8 +91,7 @@ extension OnboardingSearchEnginesViewController {
             containerView.addSubview(braveLogo)
             [titlePrimary, titleSecondary].forEach(titleStackView.addArrangedSubview(_:))
             
-            let spacer = UIView()
-            [skipButton, continueButton, spacer]
+            [continueButton, skipButton]
                 .forEach(buttonsStackView.addArrangedSubview(_:))
             
             [titleStackView, searchEnginesTable, buttonsStackView]
@@ -111,11 +112,6 @@ extension OnboardingSearchEnginesViewController {
                 $0.bottom.equalTo(containerView.safeArea.bottom).inset(UX.contentInset)
             }
             
-            // Make width the same as skip button to make save button always centered.
-            spacer.snp.makeConstraints {
-                $0.width.equalTo(skipButton)
-            }
-            
             // Hiding views in prepration to animations.
             // Alpha is used instead of `isHidden` to make the views participate in auto-layout.
             [titlePrimary, titleSecondary, searchEnginesTable, buttonsStackView].forEach {
@@ -124,6 +120,10 @@ extension OnboardingSearchEnginesViewController {
             
             continueButton.snp.makeConstraints {
                 $0.centerX.equalTo(self.snp.centerX)
+            }
+            
+            skipButton.snp.makeConstraints {
+                $0.width.equalTo(continueButton.snp.width)
             }
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
