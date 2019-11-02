@@ -322,9 +322,11 @@ class WalletViewController: UIViewController, RewardsSummaryProtocol {
     sender.loaderView = LoaderView(size: .small)
     sender.loaderPlacement = .replacesContent
     sender.isLoading = true
+    sender.isEnabled = false
     ledgerObserver.grantClaimed = { [weak self] grant in
       guard let self = self, let grantAmount = BATValue(probi: grant.probi)?.displayString else { return }
       sender.isLoading = false
+      sender.isEnabled = true
       let claimedVC = GrantClaimedViewController(
         grantAmount: grantAmount,
         expirationDate: Date(timeIntervalSince1970: TimeInterval(grant.expiryTime))
