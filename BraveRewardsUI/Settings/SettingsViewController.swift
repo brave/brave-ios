@@ -52,16 +52,29 @@ class SettingsViewController: UIViewController {
           type = .ugp
         }
         let section = SettingsGrantSectionView(type: type)
+        
         section.claimGrantTapped = { [weak self] section in
           guard let self = self else { return }
-          // FIXME: Remove fake values
-          let controller = GrantClaimedViewController(grantAmount: "30.0 BAT", expirationDate: Date().addingTimeInterval(30*24*60*60))
-          let container = PopoverNavigationController(rootViewController: controller)
+          let claimButton = section.claimGrantButton
+          claimButton.isLoading = true
+          claimButton.isEnabled = false
           
-          section.claimGrantButton.isLoading = true
-          DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-            self?.present(container, animated: true)
-            section.claimGrantButton.isLoading = false
+          self.ledgerObserver.grantClaimed = { [weak self] grant in
+            guard let self = self, let grantAmount = BATValue(probi: grant.probi)?.displayString else { return }
+            
+            claimButton.isLoading = false
+            claimButton.isEnabled = true
+            
+            let claimedVC = GrantClaimedViewController(
+              grantAmount: grantAmount,
+              expirationDate: Date(timeIntervalSince1970: TimeInterval(grant.expiryTime))
+            )
+            let container = PopoverNavigationController(rootViewController: claimedVC)
+            self.present(container, animated: true)
+          }
+          
+          if let grant = self.state.ledger.pendingGrants.first {
+            self.state.ledger.solveGrantCaptch(withPromotionId: grant.promotionId, solution: "")
           }
         }
         return section
