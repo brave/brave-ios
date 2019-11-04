@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14492.1" systemVersion="18G84" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Threat" representedClassName="Threat" syncable="YES" codeGenerationType="class">
+        <attribute name="checksum" attributeType="String" syncable="YES"/>
+        <attribute name="state" attributeType="String" syncable="YES"/>
+        <attribute name="threatType" attributeType="String" syncable="YES"/>
+        <relationship name="hashes" toMany="YES" deletionRule="Cascade" destinationEntity="ThreatHash" inverseName="threat" inverseEntity="ThreatHash" syncable="YES"/>
+    </entity>
+    <entity name="ThreatHash" representedClassName="ThreatHash" syncable="YES" codeGenerationType="class">
+        <attribute name="hashData" attributeType="Binary" syncable="YES"/>
+        <relationship name="threat" maxCount="1" deletionRule="Nullify" destinationEntity="Threat" inverseName="hashes" inverseEntity="Threat" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="Threat" positionX="-45" positionY="0" width="128" height="105"/>
+        <element name="ThreatHash" positionX="-18" positionY="27" width="128" height="75"/>
+    </elements>
+</model>
