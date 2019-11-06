@@ -6,6 +6,7 @@ import Foundation
 import DeviceCheck
 import BraveRewards
 import BraveShared
+import Shared
 
 private let log = Logger.browserLogger
 
