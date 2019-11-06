@@ -1550,6 +1550,11 @@ class BrowserViewController: UIViewController {
     
     private var duckDuckGoPopup: AlertPopupView?
     func presentDuckDuckGoCallout(force: Bool = false) {
+        // Don't show when onboarding is showing
+        if let presentedViewController = self.presentedViewController, presentedViewController.isKind(of: OnboardingNavigationController.self) {
+            return
+        }
+        
         // Don't show duplicate popups
         if duckDuckGoPopup != nil { return }
         
@@ -3406,13 +3411,28 @@ extension BrowserViewController: OnboardingControllerDelegate {
         }
         #endif
         
-        onboardingController.dismiss(animated: true)
+        // Present private browsing prompt if necessary when onboarding has been completed
+        onboardingController.dismiss(animated: true) {
+            if PrivateBrowsingManager.shared.isPrivateBrowsing && self.presentedViewController == nil {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                    self.presentDuckDuckGoCallout()
+                }
+            }
+        }
     }
     
     func onboardingSkipped(_ onboardingController: OnboardingNavigationController) {
         Preferences.General.basicOnboardingCompleted.value = OnboardingState.skipped.rawValue
         Preferences.General.basicOnboardingNextOnboardingPrompt.value = Date(timeIntervalSinceNow: BrowserViewController.onboardingDaysInterval)
-        onboardingController.dismiss(animated: true)
+        
+        // Present private browsing prompt if necessary when onboarding has been skipped
+        onboardingController.dismiss(animated: true) {
+            if PrivateBrowsingManager.shared.isPrivateBrowsing && self.presentedViewController == nil {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                    self.presentDuckDuckGoCallout()
+                }
+            }
+        }
     }
     
     // 60 days until the next time the user sees the onboarding..
