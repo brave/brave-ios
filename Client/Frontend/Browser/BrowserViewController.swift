@@ -2254,11 +2254,7 @@ extension BrowserViewController: TabManagerDelegate {
             updateTabCountUsingTabManager(tabManager)
         }
         
-        if PrivateBrowsingManager.shared.isPrivateBrowsing && presentedViewController == nil {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                self.presentDuckDuckGoCallout()
-            }
-        }
+        self.presentDuckDuckGoCalloutIfNeeded()
 
         removeAllBars()
         if let bars = selected?.bars {
@@ -3413,11 +3409,7 @@ extension BrowserViewController: OnboardingControllerDelegate {
         
         // Present private browsing prompt if necessary when onboarding has been completed
         onboardingController.dismiss(animated: true) {
-            if PrivateBrowsingManager.shared.isPrivateBrowsing && self.presentedViewController == nil {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                    self.presentDuckDuckGoCallout()
-                }
-            }
+            self.presentDuckDuckGoCalloutIfNeeded()
         }
     }
     
@@ -3427,10 +3419,14 @@ extension BrowserViewController: OnboardingControllerDelegate {
         
         // Present private browsing prompt if necessary when onboarding has been skipped
         onboardingController.dismiss(animated: true) {
-            if PrivateBrowsingManager.shared.isPrivateBrowsing && self.presentedViewController == nil {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                    self.presentDuckDuckGoCallout()
-                }
+            self.presentDuckDuckGoCalloutIfNeeded()
+        }
+    }
+    
+    private func presentDuckDuckGoCalloutIfNeeded() {
+        if PrivateBrowsingManager.shared.isPrivateBrowsing && self.presentedViewController == nil {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                self.presentDuckDuckGoCallout()
             }
         }
     }
