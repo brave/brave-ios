@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/brave/brave-ios.svg?branch=development)](https://travis-ci.org/brave/brave-ios)
 
-Brave for iOS 🦁
+Brave for iOS 🦁test
 ===============
 
 Download on the [App Store](https://itunes.apple.com/app/brave-web-browser/id1052879175?mt=8).
