@@ -41,9 +41,14 @@ public class AdsViewController: UIViewController {
       $0.leading.greaterThanOrEqualTo(view).inset(8)
       $0.trailing.lessThanOrEqualTo(view).inset(8)
       $0.centerX.equalTo(view)
-      $0.width.equalTo(view).priority(.high)
       $0.top.equalTo(view.safeAreaLayoutGuide.snp.top)
       $0.top.greaterThanOrEqualTo(view).offset(4) // Makes sure in landscape its at least 4px from the top
+      
+      if UIDevice.current.userInterfaceIdiom == .pad {
+        $0.width.equalTo(max(view.bounds.width, view.bounds.height) * 0.40).priority(.high)
+      } else {
+        $0.width.equalTo(view).priority(.high)
+      }
     }
     view.layoutIfNeeded()
     
@@ -310,13 +315,7 @@ extension AdsViewController {
     
     window.addSubview(adsViewController.view)
     adsViewController.view.snp.makeConstraints {
-      $0.edges.top.bottom.equalToSuperview()
-      
-      if UIDevice.current.userInterfaceIdiom == .pad {
-        $0.edges.width.equalTo(max(window.bounds.width, window.bounds.height)).multipliedBy(0.40)
-      } else {
-        $0.edges.width.equalTo(400.0).priority(.high)
-      }
+      $0.edges.equalTo(window.safeAreaLayoutGuide.snp.edges)
     }
     
     let notification = AdsNotification.customAd(
