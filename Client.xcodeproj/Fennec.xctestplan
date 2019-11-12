@@ -38,6 +38,7 @@
       }
     },
     {
+      "parallelizable" : true,
       "target" : {
         "containerPath" : "container:Client.xcodeproj",
         "identifier" : "E6F9650B1B2F1CF20034B023",
@@ -45,6 +46,7 @@
       }
     },
     {
+      "parallelizable" : true,
       "target" : {
         "containerPath" : "container:Client.xcodeproj",
         "identifier" : "5D1DC51A20AC9AFA00905E5A",
@@ -52,6 +54,7 @@
       }
     },
     {
+      "parallelizable" : true,
       "skippedTests" : [
         "CertificatePinningTest\/testSelfSignedRootAllowed()",
         "CertificatePinningTest\/testSelfSignedRootAllowed2()"
@@ -63,6 +66,7 @@
       }
     },
     {
+      "parallelizable" : true,
       "skippedTests" : [
         "TestSQLiteLogins",
         "TestSQLiteLoginsPerf",
@@ -75,6 +79,7 @@
       }
     },
     {
+      "parallelizable" : true,
       "target" : {
         "containerPath" : "container:Client.xcodeproj",
         "identifier" : "271DEC20234CC75F009DAC37",
