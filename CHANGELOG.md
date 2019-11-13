@@ -11,7 +11,7 @@
  - Fixed readability of website/tab names in dark mode. ([#1551](https://github.com/brave/brave-ios/issues/1551))
  - Fixed button border visibility under Brave Shields when using the light theme. ([#1548](https://github.com/brave/brave-ios/issues/1548))
  - Fixed missing long press context menu on image search results. ([#1547](https://github.com/brave/brave-ios/issues/1547))
- - Fixed "Download Cancelled" not visible afyter cancelling a download under iOS 12. ([#1516](https://github.com/brave/brave-ios/issues/1516))
+ - Fixed "Download Cancelled" not visible after cancelling a download under iOS 12. ([#1516](https://github.com/brave/brave-ios/issues/1516))
  - Removed "www" from the URL bar. ([#1533](https://github.com/brave/brave-ios/issues/1533))
  - Removed Alexa top sites recommendations from showing up as search suggestions. ([#868](https://github.com/brave/brave-ios/issues/868))
  - Removed URL autocomplete while editing an existing URL. ([#807](https://github.com/brave/brave-ios/issues/807))
