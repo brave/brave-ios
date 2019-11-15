@@ -1265,7 +1265,13 @@ class BrowserViewController: UIViewController {
             guard let serverTrust = tab.webView?.serverTrust else {
                 break
             }
-
+            
+            let policies = [
+                SecPolicyCreateBasicX509(),
+                SecPolicyCreateSSL(true, tab.webView?.url?.host as CFString?)
+            ]
+            
+            SecTrustSetPolicies(serverTrust, policies as CFTypeRef)
             SecTrustEvaluateAsync(serverTrust, DispatchQueue.global()) { _, secTrustResult in
                 switch secTrustResult {
                 case .proceed, .unspecified:

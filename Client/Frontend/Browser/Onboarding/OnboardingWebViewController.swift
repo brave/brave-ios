@@ -6,7 +6,7 @@ import Foundation
 import WebKit
 import Shared
 
-class OnboardingWebViewController: UIViewController {
+class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
     
     private let url = URL(string: "https://brave.com/terms-of-use/")
     
@@ -58,6 +58,7 @@ class OnboardingWebViewController: UIViewController {
         
         KVOs.forEach { webView.addObserver(self, forKeyPath: $0.rawValue, options: .new, context: nil) }
         
+        webView.navigationDelegate = self
         webView.load(URLRequest(url: url!))
         
         toolbar.exitButton.addTarget(self, action: #selector(onExit), for: .touchUpInside)
@@ -111,10 +112,14 @@ class OnboardingWebViewController: UIViewController {
         if let trust = webView.serverTrust {
             toolbar.secureIcon.isHidden = false
             
+            let x509 = SecPolicyCreateBasicX509()
+            let sslPolicy = SecPolicyCreateSSL(true, (webView.url?.host ?? "") as CFString)
+            SecTrustSetPolicies(trust, [x509, sslPolicy] as CFTypeRef)
+            
             var result: SecTrustResultType = .invalid
             SecTrustEvaluate(trust, &result)
             
-            if result == .proceed || result == .unspecified {
+            if (result == .proceed || result == .unspecified) && webView.hasOnlySecureContent {
                 toolbar.secureIcon.tintColor = UX.secureWebPageColor
                 toolbar.urlLabel.textColor = UX.secureWebPageColor
             } else {
@@ -133,6 +138,15 @@ class OnboardingWebViewController: UIViewController {
 
         toolbar.forwardButton.isEnabled = webView.canGoForward
         toolbar.forwardButton.tintColor = webView.canGoForward ? UX.buttonEnabledColor : UX.buttonDisabledColor
+    }
+    
+    func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        
+        if let trust = challenge.protectionSpace.serverTrust {
+            return completionHandler(.useCredential, URLCredential(trust: trust))
+        }
+        
+        return completionHandler(.performDefaultHandling, nil)
     }
 }
 
