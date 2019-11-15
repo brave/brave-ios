@@ -45,7 +45,8 @@ public class AdsViewController: UIViewController {
       $0.top.greaterThanOrEqualTo(view).offset(4) // Makes sure in landscape its at least 4px from the top
       
       if UIDevice.current.userInterfaceIdiom == .pad {
-        $0.width.equalTo(max(view.bounds.width, view.bounds.height) * 0.40).priority(.high)
+        let isWidthLarger = UIScreen.main.bounds.width > UIScreen.main.bounds.height
+        $0.width.equalTo(isWidthLarger ? view.snp.width : view.snp.height).multipliedBy(0.40).priority(.high)
       } else {
         $0.width.equalTo(view).priority(.high)
       }
