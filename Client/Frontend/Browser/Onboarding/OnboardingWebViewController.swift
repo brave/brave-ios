@@ -112,9 +112,12 @@ class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
         if let trust = webView.serverTrust {
             toolbar.secureIcon.isHidden = false
             
-            let x509 = SecPolicyCreateBasicX509()
-            let sslPolicy = SecPolicyCreateSSL(true, (webView.url?.host ?? "") as CFString)
-            SecTrustSetPolicies(trust, [x509, sslPolicy] as CFTypeRef)
+            let policies = [
+                SecPolicyCreateBasicX509(),
+                SecPolicyCreateSSL(true, webView.url?.host as CFString?)
+            ]
+            
+            SecTrustSetPolicies(trust, policies as CFTypeRef)
             
             var result: SecTrustResultType = .invalid
             SecTrustEvaluate(trust, &result)

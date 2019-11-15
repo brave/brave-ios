@@ -1260,9 +1260,9 @@ class BrowserViewController: UIViewController {
             }
 
             tab.contentIsSecure = false
-            topToolbar.contentIsSecure = tab.contentIsSecure
-
+            
             guard let serverTrust = tab.webView?.serverTrust else {
+                topToolbar.contentIsSecure = tab.contentIsSecure
                 break
             }
             
