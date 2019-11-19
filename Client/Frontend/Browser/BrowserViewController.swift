@@ -1262,9 +1262,18 @@ class BrowserViewController: UIViewController {
             tab.secureContentState = .insecure
             
             guard let serverTrust = tab.webView?.serverTrust else {
-                if tab.webView?.url?.isLocal == true {
-                    tab.secureContentState = .unknown
-                    topToolbar.secureContentState = .unknown
+                if let url = tab.webView?.url {
+                    if url.isAboutHomeURL || url.isAboutURL {
+                        tab.secureContentState = .secure
+                        topToolbar.secureContentState = .secure
+                    } else if url.isErrorPageURL {
+                        topToolbar.secureContentState = tab.secureContentState
+                    } else if url.isReaderModeURL || url.isLocal {
+                        tab.secureContentState = .unknown
+                        topToolbar.secureContentState = .unknown
+                    } else {
+                        topToolbar.secureContentState = tab.secureContentState
+                    }
                 } else {
                     topToolbar.secureContentState = tab.secureContentState
                 }
