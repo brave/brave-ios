@@ -195,7 +195,9 @@ extension OnboardingRewardsAgreementViewController {
             let scaleFactor = bounds.width / size.width
             let newSize = CGSize(width: size.width * scaleFactor, height: size.height * scaleFactor)
             
-            imageView.frame = CGRect(x: 0.0, y: UX.animationContentInset, width: newSize.width, height: newSize.height)
+            // Design wants LESS offset on iPhone 8 than on iPhone X
+            let offset = self.safeAreaInsets.top > 30 ? 0 : -UX.animationContentInset
+            imageView.frame = CGRect(x: 0.0, y: UX.animationContentInset + offset, width: newSize.width, height: newSize.height)
         }
         
         @available(*, unavailable)
