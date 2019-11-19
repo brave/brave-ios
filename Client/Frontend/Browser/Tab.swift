@@ -35,6 +35,7 @@ protocol URLChangeDelegate {
 }
 
 enum TabSecureContentState {
+    case localHost
     case secure
     case insecure
     case unknown
