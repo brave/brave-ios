@@ -5,6 +5,7 @@
 import Foundation
 import AVFoundation
 import Shared
+import BraveShared
 import WebKit
 
 private let log = Logger.browserLogger
@@ -67,7 +68,7 @@ class BackgroundMediaHandler {
 }
 
 class BackgroundMediaPlayback: TabContentScript {
-    fileprivate weak var tab: Tab?
+    private weak var tab: Tab?
     
     init(tab: Tab) {
         self.tab = tab
@@ -88,5 +89,22 @@ class BackgroundMediaPlayback: TabContentScript {
         } else {
             log.info(message.description)
         }
+    }
+    
+    static func pauseAllMedia(for webview: WKWebView) {
+        let token = UserScriptManager.securityToken.uuidString.replacingOccurrences(of: "-", with: "", options: .literal)
+        webview.evaluateJavaScript("BMPC\(token).pauseAllVideos()", completionHandler: nil)
+    }
+    
+    static func didEnterBackround(for webview: WKWebView) {
+        let token = UserScriptManager.securityToken.uuidString.replacingOccurrences(of: "-", with: "", options: .literal)
+        webview.evaluateJavaScript("BMPC\(token).didEnterBackground()", completionHandler: nil)
+    }
+    
+    static func setMediaBackgroundPlayback(for webview: WKWebView) {
+        let isBackgroundPlaybackEnabled = Preferences.General.allowBackgroundMediaPlayback.value
+        
+        let token = UserScriptManager.securityToken.uuidString.replacingOccurrences(of: "-", with: "", options: .literal)
+        webview.evaluateJavaScript("BMPC\(token).setBackgroundMediaPlayback(\(isBackgroundPlaybackEnabled));", completionHandler: nil)
     }
 }

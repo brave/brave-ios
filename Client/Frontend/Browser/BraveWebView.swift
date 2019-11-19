@@ -48,11 +48,10 @@ class BraveWebView: WKWebView {
         pauseAllMedia()
     }
     
-    func pauseAllMedia() {
+    private func pauseAllMedia() {
         ensureMainThread {
-            self.evaluateJavaScript("pauseAll()", completionHandler: nil)
-            
-            if let mediaHandler = (UIApplication.shared.delete as? AppDelegate)?.backgroundMediaHandler {
+            BackgroundMediaPlayback.pauseAllMedia(for: self)
+            if let mediaHandler = (UIApplication.shared.delegate as? AppDelegate)?.backgroundMediaHandler {
                 mediaHandler.deactivateBackgroundPlayback()
             }
         }
@@ -60,11 +59,11 @@ class BraveWebView: WKWebView {
     
     func appDidEnterBackground() {
         ensureMainThread {
-            if let mediaHandler = (UIApplication.shared.delete as? AppDelegate)?.backgroundMediaHandler {
+            if let mediaHandler = (UIApplication.shared.delegate as? AppDelegate)?.backgroundMediaHandler {
                 mediaHandler.activateBackgroundPlayback()
             }
-            
-            self.evaluateJavaScript("didEnterBackground()", completionHandler: nil)
+            BackgroundMediaPlayback.setMediaBackgroundPlayback(for: self)
+            BackgroundMediaPlayback.didEnterBackround(for: self)
         }
     }
     

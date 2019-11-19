@@ -117,7 +117,8 @@ class SettingsViewController: TableViewController {
                     self.navigationController?.pushViewController(viewController, animated: true)
                 }, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self),
                 BoolRow(title: Strings.Save_Logins, option: Preferences.General.saveLogins),
-                BoolRow(title: Strings.Block_Popups, option: Preferences.General.blockPopups)
+                BoolRow(title: Strings.Block_Popups, option: Preferences.General.blockPopups),
+                BoolRow(title: Strings.AllowBackgroundMediaPlayback, option: Preferences.General.allowBackgroundMediaPlayback)
             ]
         )
         
