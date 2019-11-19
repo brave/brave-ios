@@ -389,7 +389,7 @@ class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, Loa
     }
 
     func loader(dataLoaded data: [Site]) {
-        self.data = data
+        self.data = data.count == 5 ? data : Array(data.dropFirst(5))
         tableView.reloadData()
     }
 
@@ -488,7 +488,7 @@ class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, Loa
         case .searchSuggestions:
             return searchEngines.shouldShowSearchSuggestions && !searchQuery.looksLikeAURL() && !tabType.isPrivate ? 1 : 0
         case .bookmarksAndHistory:
-            return min(data.count, 5)
+            return data.count
         case .findInPage:
             if let sd = searchDelegate, sd.searchViewControllerAllowFindInPage() {
                 return 1
