@@ -9,6 +9,7 @@ import XCGLogger
 import Storage
 import Deferred
 import Data
+import SnapKit
 
 private let log = Logger.browserLogger
 
@@ -24,6 +25,7 @@ class FavoritesViewController: UIViewController, Themeable {
         static let searchEngineCalloutPadding: CGFloat = 30.0
     }
     
+    fileprivate var credit: (name: String, url: String?)?
     weak var delegate: TopSitesDelegate?
     
     // MARK: - Favorites collection view properties
@@ -104,6 +106,9 @@ class FavoritesViewController: UIViewController, Themeable {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.clipsToBounds = true
+        
+        credit = setupBackgroundImage()
         
         let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongGesture(gesture:)))
         collection.addGestureRecognizer(longPressGesture)
@@ -161,6 +166,7 @@ class FavoritesViewController: UIViewController, Themeable {
         switch gesture.state {
         case .began:
             guard let selectedIndexPath = collection.indexPathForItem(at: gesture.location(in: collection)) else {
+                handleLongGestureForBackground(gesture: gesture)
                 break
             }
             
@@ -173,6 +179,25 @@ class FavoritesViewController: UIViewController, Themeable {
         default:
             collection.cancelInteractiveMovement()
         }
+    }
+    
+    /// Handles long press gesture for background credit
+    func handleLongGestureForBackground(gesture: UILongPressGestureRecognizer) {
+        if gesture.state != .began {
+            return
+        }
+        
+        let alert = UIAlertController(title: credit?.name, message: credit?.url ?? "", preferredStyle: .actionSheet)
+        
+        if let creditURL = credit?.url {
+            alert.addAction(UIAlertAction(title: "Open Website", style: .default) { [weak self] _ in
+                self?.delegate?.didSelect(input: creditURL)
+            })
+        }
+        
+        alert.addAction(UIAlertAction(title: "Close", style: .default, handler: nil))
+        
+        present(alert, animated: true, completion: nil)
     }
     
     // MARK: - Constraints setup
@@ -214,6 +239,124 @@ class FavoritesViewController: UIViewController, Themeable {
         super.traitCollectionDidChange(previousTraitCollection)
         
         collection.collectionViewLayout.invalidateLayout()
+    }
+    
+    private func setupBackgroundImage() -> (name: String, url: String?)? {
+        guard let background = randomBackground() else {
+            return nil
+        }
+        
+        let image = background.image
+        
+        let imageAspectRatio = image.size.width / image.size.height
+        let imageView = UIImageView(image: image)
+        
+        imageView.contentMode = UIImageView.ContentMode.scaleAspectFit
+        view.addSubview(imageView)
+        
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.snp.makeConstraints {
+            
+            // Determines the height of the content
+            // `999` priority is required for landscape, since top/bottom constraints no longer the most important
+            //   using `high` is not enough either.
+            $0.top.bottom.equalToSuperview().priority(ConstraintPriority(999))
+            
+            // In portrait `top`/`bottom` is enough, however, when switching to landscape, those constraints
+            //  don't force centering, so this is used as a stronger constraint to center in landscape/portrait
+            $0.centerY.equalToSuperview()
+            
+            // Width of the image view is determined by the forced height constraint and the literal image ratio
+            $0.width.equalTo(imageView.snp.height).multipliedBy(imageAspectRatio)
+            
+            // These are required constraints to avoid a bad center pushing the image out of view.
+            // if a center of `-100` or `100000` is specified, these override to keep entire background covered by image.
+            // The left side cannot exceed `0` (or superview's left side), otherwise whitespace will be shown on left.
+            $0.left.lessThanOrEqualToSuperview()
+            
+            // the right side cannot drop under `width` (or superview's right side), otherwise whitespace will be shown on right.
+            $0.right.greaterThanOrEqualToSuperview()
+            
+            // If for some reason the image cannot fill full width (e.g. not a landscape image), then these constraints
+            //  will fail. A constraint will be broken, since cannot keep both left and right side's pinned
+            //  (due to the width multiplier being < 1
+            
+            // Center point of image is not center point of view.
+            // Take `0` for example, if specying `0`, setting centerX to 0, it is not attempting to place the left
+            //  side of the image to the middle (e.g. left justifying), it is instead trying to move the image view's
+            //  center to `0`, shifting the image _to_ the left, and making more of the image's right side visible.
+            // Therefore specifying `0` should take the imageView's left and pinning it to view's center
+            
+            // So basically the movement needs to be "inverted"
+            
+            // Need to calculate the sizing difference between `image` and `imageView` to determine the pixel difference ratio
+            let sizeRatio = imageView.superview!.frame.size.width / image.size.width
+            // See above for negation, image and imageView function as inverses, so need to negate
+            let imageOffset = -background.center
+            // Image number is given in pixels, must convert to points using screen
+            let screenScale = UIScreen.main.scale
+            let imageViewOffset = sizeRatio * imageOffset * screenScale
+            
+            // Using `high` priority so that it will not be applied / broken  if out-of-bounds
+            $0.left.equalTo(view.snp.centerX).offset(imageViewOffset).priority(ConstraintPriority.high)
+        }
+        
+        view.layer.addSublayer(gradientOverlay())
+        return background.credit
+    }
+    
+    private func randomBackground() -> (image: UIImage, center: CGFloat, credit: (name: String, url: String?))? {
+        guard let filePath = Bundle.main.path(forResource: "ntp-data", ofType: "json") else {
+            Logger.browserLogger.error("Failed to get bundle path for \"ntp-data.json\"")
+            return nil
+        }
+        
+        do {
+            let fileData = try Data(contentsOf: URL(fileURLWithPath: filePath))
+            let json = try JSONSerialization.jsonObject(with: fileData, options: []) as? [[String: Any]] ?? []
+            
+            if json.count == 0 { return nil }
+            
+            let randomBackgroundIndex = Int.random(in: 0..<json.count)
+            let backgroundJSON = json[randomBackgroundIndex]
+            
+            let center = backgroundJSON["center"] as? CGFloat ?? 0
+            
+            guard
+                let imageName = backgroundJSON["image"] as? String,
+                let image = UIImage(named: imageName) else {
+                    return nil
+            }
+            
+            guard
+                let credit = backgroundJSON["credit"] as? [String: String],
+                let name = credit["name"] else {
+                    return nil
+            }
+
+            return (image, center, (name, credit["url"]))
+        } catch {
+            return nil
+        }
+    }
+    
+    fileprivate func gradientOverlay() -> CAGradientLayer {
+        
+        // Fades from half-black to transparent
+        let colorTop = UIColor(white: 0.0, alpha: 0.5).cgColor
+        let colorBottom = UIColor(white: 0.0, alpha: 0.0).cgColor
+        
+        let gl = CAGradientLayer()
+        gl.colors = [colorTop, colorBottom]
+        
+        // Only covers to third of the screen
+        gl.locations = [0.0, 0.33]
+        
+        // Making a squrare to handle rotation events
+        let maxSide = max(view.bounds.height, view.bounds.width)
+        gl.frame = CGRect(size: CGSize(width: maxSide, height: maxSide))
+        
+        return gl
     }
     
     // MARK: DuckDuckGo
