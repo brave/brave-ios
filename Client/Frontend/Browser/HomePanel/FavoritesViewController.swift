@@ -22,7 +22,7 @@ class FavoritesViewController: UIViewController, Themeable {
     private struct UI {
         static let statsHeight: CGFloat = 110.0
         static let statsBottomMargin: CGFloat = 5
-        static let searchEngineCalloutPadding: CGFloat = 30.0
+        static let searchEngineCalloutPadding: CGFloat = 120.0
     }
     
     fileprivate var credit: (name: String, url: String?)?
@@ -54,6 +54,13 @@ class FavoritesViewController: UIViewController, Themeable {
         $0.autoresizingMask = [.flexibleWidth]
     }
     
+    private let favoritesOverflowButton = RoundInterfaceButton(type: .system).then {
+        $0.setTitle("Show More", for: .normal)
+        $0.setTitleColor(.white, for: .normal)
+        $0.titleLabel?.font = UIFont.systemFont(ofSize: 12.0, weight: .medium)
+        $0.backgroundColor = UIColor(white: 1.0, alpha: 1/3)
+    }
+    
     private let ddgLogo = UIImageView(image: #imageLiteral(resourceName: "duckduckgo"))
     
     private let ddgLabel = UILabel().then {
@@ -63,8 +70,9 @@ class FavoritesViewController: UIViewController, Themeable {
         $0.text = Strings.DDG_promotion
     }
     
-    private lazy var ddgButton = UIControl().then {
+    private lazy var ddgButton = RoundInterfaceButton().then {
         $0.addTarget(self, action: #selector(showDDGCallout), for: .touchUpInside)
+        $0.backgroundColor = UIColor(white: 0.0, alpha: 0.5)
     }
     
     @objc private func showDDGCallout() {
@@ -129,6 +137,7 @@ class FavoritesViewController: UIViewController, Themeable {
         braveShieldStatsView.frame = statsViewFrame
         
         collection.addSubview(braveShieldStatsView)
+        collection.addSubview(favoritesOverflowButton)
         collection.addSubview(ddgButton)
         
         ddgButton.addSubview(ddgLogo)
@@ -213,10 +222,18 @@ class FavoritesViewController: UIViewController, Themeable {
         }
         
         ddgLabel.snp.makeConstraints { make in
-            make.top.right.bottom.equalTo(0)
+            make.top.bottom.equalTo(0)
+            make.right.equalToSuperview().offset(-5)
             make.left.equalTo(self.ddgLogo.snp.right).offset(5)
             make.width.equalTo(180)
             make.centerY.equalTo(self.ddgLogo)
+        }
+        
+        favoritesOverflowButton.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.bottom.equalTo(ddgButton.snp.top).offset(-90)
+            $0.height.equalTo(24)
+            $0.width.equalTo(84)
         }
     }
     
@@ -239,6 +256,9 @@ class FavoritesViewController: UIViewController, Themeable {
         super.traitCollectionDidChange(previousTraitCollection)
         
         collection.collectionViewLayout.invalidateLayout()
+        // Reload number of cells mainly for trait change.
+        // Not entirely sure why this is even required though with an invalidated layout.
+        collection.reloadData()
     }
     
     private func setupBackgroundImage() -> (name: String, url: String?)? {
@@ -390,7 +410,7 @@ extension FavoritesViewController: UICollectionViewDelegateFlowLayout {
         let width = collection.frame.width
         let padding: CGFloat = traitCollection.horizontalSizeClass == .compact ? 6 : 20
         
-        let cellWidth = floor(width - padding) / CGFloat(columnsPerRow)
+        let cellWidth = floor(width - padding) / CGFloat(dataSource.columnsPerRow)
         // The tile's height is determined the aspect ratio of the thumbnails width. We also take into account
         // some padding between the title and the image.
         let cellHeight = floor(cellWidth / (CGFloat(FavoriteCell.imageAspectRatio) - 0.1))
@@ -401,36 +421,6 @@ extension FavoritesViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         guard let favoriteCell = cell as? FavoriteCell else { return }
         favoriteCell.delegate = self
-    }
-    
-    fileprivate var columnsPerRow: Int {
-        let size = collection.bounds.size
-        let traitCollection = collection.traitCollection
-        var cols = 0
-        if traitCollection.horizontalSizeClass == .compact {
-            // Landscape iPhone
-            if traitCollection.verticalSizeClass == .compact {
-                cols = 5
-            }
-                // Split screen iPad width
-            else if size.widthLargerOrEqualThanHalfIPad() {
-                cols = 4
-            }
-                // iPhone portrait
-            else {
-                cols = 3
-            }
-        } else {
-            // Portrait iPad
-            if size.height > size.width {
-                cols = 4
-            }
-                // Landscape iPad
-            else {
-                cols = 5
-            }
-        }
-        return cols + 1
     }
 }
 

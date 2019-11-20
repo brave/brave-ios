@@ -37,6 +37,45 @@ class FavoritesDataSource: NSObject, UICollectionViewDataSource {
         }
     }
     
+    /// The number of times that each row contains
+    var columnsPerRow: Int {
+        guard let size = collectionView?.bounds.size,
+            let traitCollection = collectionView?.traitCollection else {
+                return 0
+        }
+        
+        var cols = 0
+        if traitCollection.horizontalSizeClass == .compact {
+            // Landscape iPhone
+            if traitCollection.verticalSizeClass == .compact {
+                cols = 5
+            }
+                // Split screen iPad width
+            else if size.widthLargerOrEqualThanHalfIPad() {
+                cols = 4
+            }
+                // iPhone portrait
+            else {
+                cols = 3
+            }
+        } else {
+            // Portrait iPad
+            if size.height > size.width {
+                cols = 4
+            }
+                // Landscape iPad
+            else {
+                cols = 5
+            }
+        }
+        return cols + 1
+    }
+    
+    /// If there are more favorites than are being shown
+    var hasOverflow: Bool {
+        return true
+    }
+    
     func refetch() {
         try? frc?.performFetch()
     }
@@ -48,7 +87,7 @@ class FavoritesDataSource: NSObject, UICollectionViewDataSource {
     }
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return frc?.fetchedObjects?.count ?? 0
+        return min(columnsPerRow, frc?.fetchedObjects?.count ?? 0)
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
