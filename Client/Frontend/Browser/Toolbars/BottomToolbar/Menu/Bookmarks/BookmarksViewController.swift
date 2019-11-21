@@ -13,11 +13,11 @@ private let log = Logger.browserLogger
 
 class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtocol {
   /// Called when the bookmarks are updated via some user input (i.e. Delete, edit, etc.)
-  var bookmarksDidChange: (() -> Void)?
+    var bookmarksDidChange: (() -> Void)?
   
-  weak var toolbarUrlActionsDelegate: ToolbarUrlActionsDelegate?
+    weak var toolbarUrlActionsDelegate: ToolbarUrlActionsDelegate?
   
-  var bookmarksFRC: NSFetchedResultsController<Bookmark>?
+    var bookmarksFRC: NSFetchedResultsController<Bookmark>?
   
     lazy var editBookmarksButton = UIBarButtonItem().then {
         $0.image = #imageLiteral(resourceName: "edit").template
@@ -32,39 +32,39 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         $0.target = self
         $0.action = #selector(onAddBookmarksFolderButton)
     }
-  weak var addBookmarksFolderOkAction: UIAlertAction?
+    weak var addBookmarksFolderOkAction: UIAlertAction?
+    
+    var isEditingIndividualBookmark: Bool = false
   
-  var isEditingIndividualBookmark: Bool = false
-  
-  var currentFolder: Bookmark?
+    var currentFolder: Bookmark?
     /// Certain bookmark actions are different in private browsing mode.
     let isPrivateBrowsing: Bool
   
     init(folder: Bookmark?, isPrivateBrowsing: Bool) {
-    self.isPrivateBrowsing = isPrivateBrowsing
-    
-    super.init(nibName: nil, bundle: nil)
-    
-    self.currentFolder = folder
-    self.title = folder?.displayTitle ?? Strings.Bookmarks
-    self.bookmarksFRC = Bookmark.frc(parentFolder: folder)
-    self.bookmarksFRC?.delegate = self
-    
-    // FIXME: NotificationMainThreadContextSignificantlyChanged is gone
-  }
+        self.isPrivateBrowsing = isPrivateBrowsing
+        
+        super.init(nibName: nil, bundle: nil)
+        
+        self.currentFolder = folder
+        self.title = folder?.displayTitle ?? Strings.Bookmarks
+        self.bookmarksFRC = Bookmark.frc(parentFolder: folder)
+        self.bookmarksFRC?.delegate = self
+        
+        // FIXME: NotificationMainThreadContextSignificantlyChanged is gone
+    }
   
-  required init?(coder aDecoder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
-  }
-  
-  override func viewDidLoad() {
-    super.viewDidLoad()
-    
-    tableView.allowsSelectionDuringEditing = true
-    
-    setUpToolbar()
-    updateEditBookmarksButtonStatus()
-  }
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        tableView.allowsSelectionDuringEditing = true
+
+        setUpToolbar()
+        updateEditBookmarksButtonStatus()
+    }
     
     private func updateEditBookmarksButtonStatus() {
         guard let count = bookmarksFRC?.fetchedObjects?.count else { return }
