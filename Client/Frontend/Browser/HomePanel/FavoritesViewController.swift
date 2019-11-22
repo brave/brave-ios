@@ -16,6 +16,7 @@ private let log = Logger.browserLogger
 protocol TopSitesDelegate: AnyObject {
     func didSelect(input: String)
     func didTapDuckDuckGoCallout()
+    func didTapShowMoreFavorites()
 }
 
 class FavoritesViewController: UIViewController, Themeable {
@@ -54,11 +55,12 @@ class FavoritesViewController: UIViewController, Themeable {
         $0.autoresizingMask = [.flexibleWidth]
     }
     
-    private let favoritesOverflowButton = RoundInterfaceButton(type: .system).then {
+    private lazy var favoritesOverflowButton = RoundInterfaceButton(type: .system).then {
         $0.setTitle("Show More", for: .normal)
         $0.setTitleColor(.white, for: .normal)
         $0.titleLabel?.font = UIFont.systemFont(ofSize: 12.0, weight: .medium)
         $0.backgroundColor = UIColor(white: 1.0, alpha: 1/3)
+        $0.addTarget(self, action: #selector(showFavorites), for: .touchUpInside)
     }
     
     private let ddgLogo = UIImageView(image: #imageLiteral(resourceName: "duckduckgo"))
@@ -77,6 +79,10 @@ class FavoritesViewController: UIViewController, Themeable {
     
     @objc private func showDDGCallout() {
         delegate?.didTapDuckDuckGoCallout()
+    }
+    
+    @objc private func showFavorites() {
+        delegate?.didTapShowMoreFavorites()
     }
     
     // MARK: - Init/lifecycle
@@ -151,6 +157,13 @@ class FavoritesViewController: UIViewController, Themeable {
         updateDuckDuckGoVisibility()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        // Need to reload data after modals are closed for potential orientation change
+        // e.g. if in landscape, open portrait modal, close, the layout attempt to access an invalid indexpath
+         collection.reloadData()
+    }
+    
     private var collectionContentSizeObservation: NSKeyValueObservation?
     
     override func viewDidLayoutSubviews() {
@@ -158,6 +171,8 @@ class FavoritesViewController: UIViewController, Themeable {
         
         // This makes collection view layout to recalculate its cell size.
         collection.collectionViewLayout.invalidateLayout()
+        favoritesOverflowButton.isHidden = !dataSource.hasOverflow
+        collection.reloadData()
     }
     
     private func updateDuckDuckGoButtonLayout() {
@@ -256,9 +271,6 @@ class FavoritesViewController: UIViewController, Themeable {
         super.traitCollectionDidChange(previousTraitCollection)
         
         collection.collectionViewLayout.invalidateLayout()
-        // Reload number of cells mainly for trait change.
-        // Not entirely sure why this is even required though with an invalidated layout.
-        collection.reloadData()
     }
     
     private func setupBackgroundImage() -> (name: String, url: String?)? {

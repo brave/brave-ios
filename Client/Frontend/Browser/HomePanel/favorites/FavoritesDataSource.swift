@@ -73,7 +73,7 @@ class FavoritesDataSource: NSObject, UICollectionViewDataSource {
     
     /// If there are more favorites than are being shown
     var hasOverflow: Bool {
-        return true
+        return columnsPerRow < frc?.fetchedObjects?.count ?? 0
     }
     
     func refetch() {

@@ -52,6 +52,16 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         
         // FIXME: NotificationMainThreadContextSignificantlyChanged is gone
     }
+    
+    convenience init(showFavorites: Bool, isPrivateBrowsing: Bool) {
+        self.init(folder: nil, isPrivateBrowsing: isPrivateBrowsing)
+        
+        if showFavorites {
+            self.title = "Favorites"
+            self.bookmarksFRC = Bookmark.frc(forFavorites: true, parentFolder: nil)
+            self.bookmarksFRC?.delegate = self
+        }
+    }
   
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
