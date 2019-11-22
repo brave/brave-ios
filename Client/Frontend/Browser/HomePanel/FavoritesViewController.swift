@@ -221,14 +221,18 @@ class FavoritesViewController: UIViewController, Themeable {
             return
         }
         
-        let alert = UIAlertController(title: credit?.name, message: credit?.url ?? "", preferredStyle: .actionSheet)
+        let alert = UIAlertController(title: credit?.name, message: nil, preferredStyle: .actionSheet)
         
-        if let creditURL = credit?.url {
+        if let creditWebsite = credit?.url, let creditURL = URL(string: creditWebsite) {
             alert.addAction(UIAlertAction(title: "Open Website", style: .default) { [weak self] _ in
-                self?.delegate?.didSelect(input: creditURL)
+                self?.delegate?.didSelect(input: creditWebsite)
             })
+            alert.message = "View on " + creditURL.hostSLD
         }
         
+        alert.popoverPresentationController?.sourceView = view
+        alert.popoverPresentationController?.sourceRect = CGRect(origin: view.center, size: .zero)
+        alert.popoverPresentationController?.permittedArrowDirections = [.down, .up]
         alert.addAction(UIAlertAction(title: "Close", style: .default, handler: nil))
         
         present(alert, animated: true, completion: nil)
