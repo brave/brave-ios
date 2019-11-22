@@ -87,6 +87,8 @@ class FavoritesViewController: UIViewController, Themeable {
     
     // MARK: - Init/lifecycle
     
+    private var backgroundImage: (view: UIImageView, center: CGFloat, portraitCenterConstraint: Constraint)?
+    
     private let profile: Profile
     
     init(profile: Profile, dataSource: FavoritesDataSource = FavoritesDataSource()) {
@@ -173,6 +175,14 @@ class FavoritesViewController: UIViewController, Themeable {
         collection.collectionViewLayout.invalidateLayout()
         favoritesOverflowButton.isHidden = !dataSource.hasOverflow
         collection.reloadData()
+        
+        if let backgroundImage = backgroundImage, let image = backgroundImage.view.image {
+            // Need to calculate the sizing difference between `image` and `imageView` to determine the pixel difference ratio
+            let sizeRatio = backgroundImage.view.frame.size.width / image.size.width
+            // See above for negation, image and imageView function as inverses, so need to negate
+            let imageViewOffset = sizeRatio * backgroundImage.center
+            backgroundImage.portraitCenterConstraint.update(offset: imageViewOffset)
+        }
     }
     
     private func updateDuckDuckGoButtonLayout() {
@@ -317,20 +327,17 @@ class FavoritesViewController: UIViewController, Themeable {
             // Take `0` for example, if specying `0`, setting centerX to 0, it is not attempting to place the left
             //  side of the image to the middle (e.g. left justifying), it is instead trying to move the image view's
             //  center to `0`, shifting the image _to_ the left, and making more of the image's right side visible.
-            // Therefore specifying `0` should take the imageView's left and pinning it to view's center
+            // Therefore specifying `0` should take the imageView's left and pinning it to view's center.
             
             // So basically the movement needs to be "inverted"
             
-            // Need to calculate the sizing difference between `image` and `imageView` to determine the pixel difference ratio
-            let sizeRatio = imageView.superview!.frame.size.width / image.size.width
-            // See above for negation, image and imageView function as inverses, so need to negate
-            let imageOffset = -background.center
-            // Image number is given in pixels, must convert to points using screen
-            let screenScale = UIScreen.main.scale
-            let imageViewOffset = sizeRatio * imageOffset * screenScale
+            let imageCenter = -background.center
+            // Using `high` priority so that it will not be applied / broken  if out-of-bounds.
+            // Offset updated / calculated during view layout as views are not setup yet.
+            let backgroundConstraint = $0.left.equalTo(view.snp.centerX).priority(ConstraintPriority.high).constraint
             
-            // Using `high` priority so that it will not be applied / broken  if out-of-bounds
-            $0.left.equalTo(view.snp.centerX).offset(imageViewOffset).priority(ConstraintPriority.high)
+            self.backgroundImage = (imageView, imageCenter, backgroundConstraint)
+            
         }
         
         view.layer.addSublayer(gradientOverlay())
@@ -349,7 +356,7 @@ class FavoritesViewController: UIViewController, Themeable {
             
             if json.count == 0 { return nil }
             
-            let randomBackgroundIndex = Int.random(in: 0..<json.count)
+            let randomBackgroundIndex = 11 // Int.random(in: 0..<json.count)
             let backgroundJSON = json[randomBackgroundIndex]
             
             let center = backgroundJSON["center"] as? CGFloat ?? 0
