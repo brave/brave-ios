@@ -5,7 +5,6 @@
 import UIKit
 import Shared
 import BraveShared
-import XCGLogger
 import Storage
 import Deferred
 import Data
@@ -26,7 +25,6 @@ class FavoritesViewController: UIViewController, Themeable {
         static let searchEngineCalloutPadding: CGFloat = 120.0
     }
     
-    fileprivate var credit: (name: String, url: String?)?
     weak var delegate: TopSitesDelegate?
     
     // MARK: - Favorites collection view properties
@@ -87,7 +85,8 @@ class FavoritesViewController: UIViewController, Themeable {
     
     // MARK: - Init/lifecycle
     
-    private var backgroundImage: (view: UIImageView, center: CGFloat, portraitCenterConstraint: Constraint)?
+    private var backgroundViewInfo: (imageView: UIImageView, portraitCenterConstraint: Constraint)?
+    private let backgroundImage = BackgroundImage()
     
     private let profile: Profile
     
@@ -124,7 +123,7 @@ class FavoritesViewController: UIViewController, Themeable {
         super.viewDidLoad()
         view.clipsToBounds = true
         
-        credit = setupBackgroundImage()
+        setupBackgroundImage()
         
         let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongGesture(gesture:)))
         collection.addGestureRecognizer(longPressGesture)
@@ -176,12 +175,19 @@ class FavoritesViewController: UIViewController, Themeable {
         favoritesOverflowButton.isHidden = !dataSource.hasOverflow
         collection.reloadData()
         
-        if let backgroundImage = backgroundImage, let image = backgroundImage.view.image {
+        if let backgroundImageView = backgroundViewInfo?.imageView, let image = backgroundImageView.image {
             // Need to calculate the sizing difference between `image` and `imageView` to determine the pixel difference ratio
-            let sizeRatio = backgroundImage.view.frame.size.width / image.size.width
-            // See above for negation, image and imageView function as inverses, so need to negate
-            let imageViewOffset = sizeRatio * backgroundImage.center
-            backgroundImage.portraitCenterConstraint.update(offset: imageViewOffset)
+            let sizeRatio = backgroundImageView.frame.size.width / image.size.width
+            
+            // Center point of image is not center point of view.
+            // Take `0` for example, if specying `0`, setting centerX to 0, it is not attempting to place the left
+            //  side of the image to the middle (e.g. left justifying), it is instead trying to move the image view's
+            //  center to `0`, shifting the image _to_ the left, and making more of the image's right side visible.
+            // Therefore specifying `0` should take the imageView's left and pinning it to view's center.
+            
+            // So basically the movement needs to be "inverted" (hence negation)
+            let imageViewOffset = sizeRatio * -(backgroundImage.info?.center ?? 0)
+            backgroundViewInfo?.portraitCenterConstraint.update(offset: imageViewOffset)
         }
     }
     
@@ -221,9 +227,14 @@ class FavoritesViewController: UIViewController, Themeable {
             return
         }
         
-        let alert = UIAlertController(title: credit?.name, message: nil, preferredStyle: .actionSheet)
+        guard let credit = backgroundImage.info?.credit else {
+            // No gesture action of no credit available
+            return
+        }
         
-        if let creditWebsite = credit?.url, let creditURL = URL(string: creditWebsite) {
+        let alert = UIAlertController(title: credit.name, message: nil, preferredStyle: .actionSheet)
+        
+        if let creditWebsite = credit.url, let creditURL = URL(string: creditWebsite) {
             alert.addAction(UIAlertAction(title: "Open Website", style: .default) { [weak self] _ in
                 self?.delegate?.didSelect(input: creditWebsite)
             })
@@ -287,13 +298,12 @@ class FavoritesViewController: UIViewController, Themeable {
         collection.collectionViewLayout.invalidateLayout()
     }
     
-    private func setupBackgroundImage() -> (name: String, url: String?)? {
-        guard let background = randomBackground() else {
-            return nil
+    private func setupBackgroundImage() {
+        guard let background = backgroundImage.info else {
+            return
         }
         
         let image = background.image
-        
         let imageAspectRatio = image.size.width / image.size.height
         let imageView = UIImageView(image: image)
         
@@ -327,60 +337,13 @@ class FavoritesViewController: UIViewController, Themeable {
             //  will fail. A constraint will be broken, since cannot keep both left and right side's pinned
             //  (due to the width multiplier being < 1
             
-            // Center point of image is not center point of view.
-            // Take `0` for example, if specying `0`, setting centerX to 0, it is not attempting to place the left
-            //  side of the image to the middle (e.g. left justifying), it is instead trying to move the image view's
-            //  center to `0`, shifting the image _to_ the left, and making more of the image's right side visible.
-            // Therefore specifying `0` should take the imageView's left and pinning it to view's center.
-            
-            // So basically the movement needs to be "inverted"
-            
-            let imageCenter = -background.center
             // Using `high` priority so that it will not be applied / broken  if out-of-bounds.
             // Offset updated / calculated during view layout as views are not setup yet.
             let backgroundConstraint = $0.left.equalTo(view.snp.centerX).priority(ConstraintPriority.high).constraint
-            
-            self.backgroundImage = (imageView, imageCenter, backgroundConstraint)
-            
+            self.backgroundViewInfo = (imageView, backgroundConstraint)
         }
         
         view.layer.addSublayer(gradientOverlay())
-        return background.credit
-    }
-    
-    private func randomBackground() -> (image: UIImage, center: CGFloat, credit: (name: String, url: String?))? {
-        guard let filePath = Bundle.main.path(forResource: "ntp-data", ofType: "json") else {
-            Logger.browserLogger.error("Failed to get bundle path for \"ntp-data.json\"")
-            return nil
-        }
-        
-        do {
-            let fileData = try Data(contentsOf: URL(fileURLWithPath: filePath))
-            let json = try JSONSerialization.jsonObject(with: fileData, options: []) as? [[String: Any]] ?? []
-            
-            if json.count == 0 { return nil }
-            
-            let randomBackgroundIndex = 11 // Int.random(in: 0..<json.count)
-            let backgroundJSON = json[randomBackgroundIndex]
-            
-            let center = backgroundJSON["center"] as? CGFloat ?? 0
-            
-            guard
-                let imageName = backgroundJSON["image"] as? String,
-                let image = UIImage(named: imageName) else {
-                    return nil
-            }
-            
-            guard
-                let credit = backgroundJSON["credit"] as? [String: String],
-                let name = credit["name"] else {
-                    return nil
-            }
-
-            return (image, center, (name, credit["url"]))
-        } catch {
-            return nil
-        }
     }
     
     fileprivate func gradientOverlay() -> CAGradientLayer {
