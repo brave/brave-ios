@@ -131,8 +131,7 @@ class FavoriteCell: UICollectionViewCell {
         editButton.isHidden = true
         backgroundColor = UIColor.clear
         textLabel.font = DynamicFontHelper.defaultHelper.DefaultSmallFont
-        textLabel.textColor = 
-            PrivateBrowsingManager.shared.isPrivateBrowsing ? UX.Favorites.cellLabelColorPrivate : UX.Favorites.cellLabelColorNormal
+        textLabel.textColor = .white
         imageView.backgroundColor = UIColor.clear
         imageView.image = nil
     }

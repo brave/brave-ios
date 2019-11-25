@@ -53,12 +53,22 @@ class FavoritesViewController: UIViewController, Themeable {
         $0.autoresizingMask = [.flexibleWidth]
     }
     
-    private lazy var favoritesOverflowButton = RoundInterfaceButton(type: .system).then {
-        $0.setTitle(Strings.NewTabPageShowMoreFavorites, for: .normal)
-        $0.setTitleColor(.white, for: .normal)
-        $0.titleLabel?.font = UIFont.systemFont(ofSize: 12.0, weight: .medium)
-        $0.backgroundColor = UIColor(white: 1.0, alpha: 1/3)
-        $0.addTarget(self, action: #selector(showFavorites), for: .touchUpInside)
+    private lazy var favoritesOverflowButton = RoundInterfaceView().then {
+        let blur = UIVisualEffectView(effect: UIBlurEffect(style: .light))
+        let button = RoundInterfaceButton(type: .system).then {
+            $0.setTitle(Strings.NewTabPageShowMoreFavorites, for: .normal)
+            $0.setTitleColor(.white, for: .normal)
+            $0.titleLabel?.font = UIFont.systemFont(ofSize: 12.0, weight: .medium)
+            $0.addTarget(self, action: #selector(showFavorites), for: .touchUpInside)
+        }
+        
+        $0.clipsToBounds = true
+        
+        $0.addSubview(blur)
+        $0.addSubview(button)
+        
+        blur.snp.makeConstraints { $0.edges.equalToSuperview() }
+        button.snp.makeConstraints { $0.edges.equalToSuperview() }
     }
     
     private let ddgLogo = UIImageView(image: #imageLiteral(resourceName: "duckduckgo"))
