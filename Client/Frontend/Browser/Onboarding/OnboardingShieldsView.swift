@@ -98,13 +98,13 @@ extension OnboardingShieldsViewController {
             
             mainStackView.addArrangedSubview(descriptionView)
             
-            [UIView.spacer(.horizontal, amount: 0), skipButton, continueButton, UIView.spacer(.horizontal, amount: 0)]
+            [skipButton, continueButton]
                 .forEach(buttonsStackView.addArrangedSubview(_:))
             
             [textStackView, buttonsStackView].forEach(descriptionStackView.addArrangedSubview(_:))
             
             skipButton.snp.makeConstraints {
-                $0.width.equalTo(continueButton.snp.width)
+                $0.width.equalTo(continueButton.snp.width).priority(.low)
             }
         }
         

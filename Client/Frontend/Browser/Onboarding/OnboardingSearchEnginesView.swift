@@ -118,7 +118,7 @@ extension OnboardingSearchEnginesViewController {
             }
             
             skipButton.snp.makeConstraints {
-                $0.width.equalTo(continueButton.snp.width)
+                $0.width.equalTo(continueButton.snp.width).priority(.low)
             }
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
