@@ -612,6 +612,7 @@
 		5D5374B723887E7400A2B587 /* ntp-sponsored.json in Resources */ = {isa = PBXBuildFile; fileRef = 5D5374B623887E7400A2B587 /* ntp-sponsored.json */; };
 		5D5374B923887E7D00A2B587 /* EAFF_JA_soccer_Background_final.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 5D5374B823887E7D00A2B587 /* EAFF_JA_soccer_Background_final.jpg */; };
 		5D5374BB238895B100A2B587 /* BackgroundImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D5374BA238895B100A2B587 /* BackgroundImage.swift */; };
+		5D5E2361238C386B00AD6FBD /* NewTabPageTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D5E2360238C386B00AD6FBD /* NewTabPageTableViewController.swift */; };
 		5D6DDEF3214003A6001FF0AE /* DAU.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6DDEE6214003A6001FF0AE /* DAU.swift */; };
 		5D6DDEFE2141B6A1001FF0AE /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6DDEF62141B6A0001FF0AE /* Preferences.swift */; };
 		5D6DDF0021428CF0001FF0AE /* DAUTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6DDEFF21428CF0001FF0AE /* DAUTests.swift */; };
@@ -2045,6 +2046,7 @@
 		5D5374B623887E7400A2B587 /* ntp-sponsored.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "ntp-sponsored.json"; sourceTree = "<group>"; };
 		5D5374B823887E7D00A2B587 /* EAFF_JA_soccer_Background_final.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = EAFF_JA_soccer_Background_final.jpg; sourceTree = "<group>"; };
 		5D5374BA238895B100A2B587 /* BackgroundImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundImage.swift; sourceTree = "<group>"; };
+		5D5E2360238C386B00AD6FBD /* NewTabPageTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageTableViewController.swift; sourceTree = "<group>"; };
 		5D6DDEE6214003A6001FF0AE /* DAU.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DAU.swift; sourceTree = "<group>"; };
 		5D6DDEF62141B6A0001FF0AE /* Preferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
 		5D6DDEFF21428CF0001FF0AE /* DAUTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DAUTests.swift; sourceTree = "<group>"; };
@@ -3353,6 +3355,7 @@
 				2F44FC711A9E840300FD20CC /* SettingsNavigationController.swift */,
 				2F44FCC41A9E85E900FD20CC /* SettingsTableSectionHeaderFooterView.swift */,
 				A1F66A7220DD71C400303328 /* SettingsViewController.swift */,
+				5D5E2360238C386B00AD6FBD /* NewTabPageTableViewController.swift */,
 				A1CA29C320E1746A00CB9126 /* OptionSelectionViewController.swift */,
 				A16DC67E20E585D90069C8E1 /* PasscodeSettingsViewController.swift */,
 				0AEFB84822244135007AF600 /* AdblockDebugMenuTableViewController.swift */,
@@ -6000,6 +6003,7 @@
 				592F521E2217327C0078395E /* HttpCookieExtension.swift in Sources */,
 				4422D4D721BFFB7600BF1855 /* table.cc in Sources */,
 				0A4BEF62221B26610005551A /* LocalAdblockResourceProtocol.swift in Sources */,
+				5D5E2361238C386B00AD6FBD /* NewTabPageTableViewController.swift in Sources */,
 				E4CD9F6D1A77DD2800318571 /* ReaderModeStyleViewController.swift in Sources */,
 				D0FCF7F51FE45842004A7995 /* UserScriptManager.swift in Sources */,
 				E4A960061ABB9C450069AD6F /* ReaderModeUtils.swift in Sources */,

@@ -54,7 +54,7 @@ class FavoritesViewController: UIViewController, Themeable {
     }
     
     private lazy var favoritesOverflowButton = RoundInterfaceButton(type: .system).then {
-        $0.setTitle("Show More", for: .normal)
+        $0.setTitle(Strings.NewTabPageShowMoreFavorites, for: .normal)
         $0.setTitleColor(.white, for: .normal)
         $0.titleLabel?.font = UIFont.systemFont(ofSize: 12.0, weight: .medium)
         $0.backgroundColor = UIColor(white: 1.0, alpha: 1/3)
@@ -235,16 +235,16 @@ class FavoritesViewController: UIViewController, Themeable {
         let alert = UIAlertController(title: credit.name, message: nil, preferredStyle: .actionSheet)
         
         if let creditWebsite = credit.url, let creditURL = URL(string: creditWebsite) {
-            alert.addAction(UIAlertAction(title: "Open Website", style: .default) { [weak self] _ in
+            alert.addAction(UIAlertAction(title: Strings.OpenWebsite, style: .default) { [weak self] _ in
                 self?.delegate?.didSelect(input: creditWebsite)
             })
-            alert.message = "View on " + creditURL.hostSLD
+            alert.message = String(format: Strings.ViewOn, creditURL.hostSLD)
         }
         
         alert.popoverPresentationController?.sourceView = view
         alert.popoverPresentationController?.sourceRect = CGRect(origin: view.center, size: .zero)
         alert.popoverPresentationController?.permittedArrowDirections = [.down, .up]
-        alert.addAction(UIAlertAction(title: "Close", style: .default, handler: nil))
+        alert.addAction(UIAlertAction(title: Strings.Close, style: .default, handler: nil))
         
         present(alert, animated: true, completion: nil)
     }

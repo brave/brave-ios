@@ -96,5 +96,11 @@ extension Preferences {
         /// The toggles states for clear private data screen
         static let clearPrivateDataToggles = Option<[Bool]>(key: "privacy.clear-data-toggles", default: [])
     }
+    final class NewTabPage {
+        /// Whether bookmark image are enabled / shown
+        static let backgroundImages = Option<Bool>(key: "privacy.private-only", default: true)
+        /// Whether sponsored images are included into the background image rotation
+        static let backgroundSponsoredImages = Option<Bool>(key: "privacy.block-all-cookies", default: true)
+    }
 }
 

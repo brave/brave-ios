@@ -453,6 +453,15 @@ extension Strings {
     public static let DeleteBookmarksFolderAlertTitle = NSLocalizedString("DeleteBookmarksFolderAlertTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Delete Folder?", comment: "Title for the alert shown when the user tries to delete a bookmarks folder")
     public static let DeleteBookmarksFolderAlertMessage = NSLocalizedString("DeleteBookmarksFolderAlertMessage", tableName: "BraveShared", bundle: Bundle.braveShared, value: "This will delete all folders and bookmarks inside. Are you sure you want to continue?", comment: "Message for the alert shown when the user tries to delete a bookmarks folder")
     public static let YesDeleteButtonTitle = NSLocalizedString("YesDeleteButtonTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Yes, Delete", comment: "Button title to confirm the deletion of a bookmarks folder")
+    
+    public static let Close = NSLocalizedString("Close", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Close", comment: "Button title to close a menu.")
+    public static let OpenWebsite = NSLocalizedString("OpenWebsite", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Open Website", comment: "Button title to that opens a website.")
+    public static let ViewOn = NSLocalizedString("ViewOn", tableName: "BraveShared", bundle: Bundle.braveShared, value: "View on %@", comment: "Label that says where to view an item. '%@' is a placeholder and will include things like 'Instagram', 'unsplash'. The full label will look like 'View  on Instagram'.")
+    public static let NewTabPageSettingsTitle = NSLocalizedString("NewTabPageSettingsTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "New Tab Page", comment: "Title on settings page to adjust the primary home screen functionality.")
+    public static let NewTabPageSettingsBackgroundImages = NSLocalizedString("NewTabPageSettingsBackgroundImages", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Show Background Images", comment: "A setting to enable or disable background images on the main screen.")
+    public static let NewTabPageSettingsSponsoredImages = NSLocalizedString("NewTabPageSettingsSponsoredImages", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Show Sponsored Images", comment: "A setting to enable or disable sponsored images from showing on the main screen.")
+    public static let NewTabPageShowMoreFavorites = NSLocalizedString("NewTabPageShowMoreFavorites", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Show More", comment: "A button title to show more bookmarks, that opens a new menu.")
+
 }
 
 extension Strings {
