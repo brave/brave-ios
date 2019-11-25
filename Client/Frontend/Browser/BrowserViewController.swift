@@ -1266,17 +1266,17 @@ class BrowserViewController: UIViewController {
                     if url.isAboutHomeURL || url.isAboutURL {
                         tab.secureContentState = .localHost
                         topToolbar.secureContentState = .localHost
-                    } else if url.isErrorPageURL {
-                        topToolbar.secureContentState = tab.secureContentState
-                    } else if url.isReaderModeURL || url.isLocal {
+                        break
+                    }
+                    
+                    if url.isReaderModeURL || url.isLocal {
                         tab.secureContentState = .unknown
                         topToolbar.secureContentState = .unknown
-                    } else {
-                        topToolbar.secureContentState = tab.secureContentState
+                        break
                     }
-                } else {
-                    topToolbar.secureContentState = tab.secureContentState
                 }
+                
+                topToolbar.secureContentState = tab.secureContentState
                 break
             }
             

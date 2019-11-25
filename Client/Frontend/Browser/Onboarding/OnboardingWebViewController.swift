@@ -9,6 +9,8 @@ import Shared
 class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
     
     private let url = URL(string: "https://brave.com/terms-of-use/")
+    private var helpers = [String: TabContentScript]()
+    private var profile: Profile
     
     private let KVOs: [KVOConstants] = [
         .loading,
@@ -22,12 +24,11 @@ class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
     private let toolbar = Toolbar().then {
         $0.snp.makeConstraints {
             $0.height.greaterThanOrEqualTo(45.0)
-            //$0.height.equalTo(45.0)
         }
     }
     
     private let webView = { () -> WKWebView in
-       let configuration: WKWebViewConfiguration = {
+        let configuration: WKWebViewConfiguration = {
             let configuration = WKWebViewConfiguration()
             configuration.processPool = WKProcessPool()
             configuration.preferences.javaScriptCanOpenWindowsAutomatically = false
@@ -40,6 +41,15 @@ class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
     
     deinit {
         KVOs.forEach { webView.removeObserver(self, forKeyPath: $0.rawValue) }
+    }
+    
+    init(profile: Profile) {
+        self.profile = profile
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     override func viewDidLoad() {
@@ -59,11 +69,17 @@ class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
         KVOs.forEach { webView.addObserver(self, forKeyPath: $0.rawValue, options: .new, context: nil) }
         
         webView.navigationDelegate = self
-        webView.load(URLRequest(url: url!))
+        setupScripts()
+        webView.load(PrivilegedRequest(url: url!) as URLRequest)
         
         toolbar.exitButton.addTarget(self, action: #selector(onExit), for: .touchUpInside)
         toolbar.backButton.addTarget(self, action: #selector(onBack), for: .touchUpInside)
         toolbar.forwardButton.addTarget(self, action: #selector(onForward), for: .touchUpInside)
+    }
+    
+    private func setupScripts() {
+        let errorHelper = ErrorPageHelper()
+        addScript(errorHelper, for: ErrorPageHelper.name())
     }
     
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
@@ -143,13 +159,60 @@ class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
         toolbar.forwardButton.tintColor = webView.canGoForward ? UX.buttonEnabledColor : UX.buttonDisabledColor
     }
     
-    func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
         
-        if let trust = challenge.protectionSpace.serverTrust {
+        let error = error as NSError
+        if error.domain == "WebKitErrorDomain" && error.code == 102 {
+            return
+        }
+
+        if error.code == WKError.webContentProcessTerminated.rawValue && error.domain == "WebKitErrorDomain" {
+            webView.reload()
+            return
+        }
+
+        if error.code == Int(CFNetworkErrors.cfurlErrorCancelled.rawValue) {
+            return
+        }
+
+        if let url = error.userInfo[NSURLErrorFailingURLErrorKey] as? URL {
+            ErrorPageHelper().showPage(error, forUrl: url, inWebView: webView)
+        }
+    }
+    
+    func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        if challenge.protectionSpace.host == "localhost" && challenge.protectionSpace.port == Int(WebServer.sharedInstance.server.port) {
+            return completionHandler(.useCredential, WebServer.sharedInstance.credentials)
+        }
+        
+        let origin = "\(challenge.protectionSpace.host):\(challenge.protectionSpace.port)"
+        if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust,
+            let trust = challenge.protectionSpace.serverTrust,
+            let cert = SecTrustGetCertificateAtIndex(trust, 0), profile.certStore.containsCertificate(cert, forOrigin: origin) {
             return completionHandler(.useCredential, URLCredential(trust: trust))
         }
         
-        return completionHandler(.performDefaultHandling, nil)
+        completionHandler(.performDefaultHandling, nil)
+    }
+}
+
+extension OnboardingWebViewController: WKScriptMessageHandler {
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        
+        for helper in helpers.values {
+            if let scriptMessageHandlerName = helper.scriptMessageHandlerName(),
+                scriptMessageHandlerName == message.name {
+                return helper.userContentController(userContentController, didReceiveScriptMessage: message)
+            }
+        }
+    }
+    
+    private func addScript(_ helper: TabContentScript, for name: String) {
+        helpers[name] = helper
+        
+        if let scriptMessageHandlerName = helper.scriptMessageHandlerName() {
+            webView.configuration.userContentController.add(self, name: scriptMessageHandlerName)
+        }
     }
 }
 
