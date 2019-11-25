@@ -16,28 +16,51 @@ class BackgroundImage {
     // Data is static to avoid duplicate loads
     
     let info: Background?
-    let hasSponsor: Bool
+    static var hasSponsor: Bool { sponsors?.count ?? 0 > 0 }
+    static var sponsors: [(image: String, center: CGFloat)]?
     
-    init() {
+    init(sponsoredFilePath: String = "ntp-sponsored") {
         
-        let sponsor: Bool = {
-            guard let json = BackgroundImage.loadImageJSON(sponsored: true),
-                let region = NSLocale.current.regionCode else {
-                return false
-            }
-                
-            let allRegionsWithSponsoredImages = json.compactMap { item in
-                item["regions"] as? [String]
-            }.reduce([], +)
-            
-            return allRegionsWithSponsoredImages.contains(region)
-        }()
+        if BackgroundImage.sponsors == nil {
+            BackgroundImage.sponsors = BackgroundImage.generateSponsoredData()
+        }
         
-        self.hasSponsor = sponsor
-        self.info = BackgroundImage.randomBackground(hasSponsor: sponsor)
+        self.info = BackgroundImage.randomBackground()
     }
     
-    private static func randomBackground(hasSponsor: Bool) -> Background? {
+    private static func generateSponsoredData() -> [(image: String, center: CGFloat)] {
+        guard let json = BackgroundImage.loadImageJSON(sponsored: true),
+            let region = NSLocale.current.regionCode else {
+                return []
+        }
+        
+        let dateFormatter = DateFormatter().then {
+            $0.locale = Locale(identifier: "en_US_POSIX")
+            $0.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZZ"
+            $0.calendar = Calendar(identifier: .gregorian)
+        }
+        
+        let today = Date()
+        // Filter down to only regional supported items
+        let regionals = json.filter { ($0["regions"] as? [String])?.contains(region) == true }
+        
+        // Filter down to sponsors that fit the date requirements
+        let live = regionals.filter { item in
+            guard let dates = item["dates"] as? [String: String],
+                let start = dateFormatter.date(from: dates["start"] ?? ""),
+                let end = dateFormatter.date(from: dates["end"] ?? "") else { return false }
+            
+            return today > start && today < end
+        }
+        
+        return live.compactMap { item in
+            guard let image = item["image"] as? String,
+                let center = item["center"] as? CGFloat else { return nil }
+            return (image, center)
+        }
+    }
+    
+    private static func randomBackground() -> Background? {
         // Determine what type of background to display
         let sponsorshipShowRate = 4 // e.g. 4 == 25%
         let useSponsor = hasSponsor && Int.random(in: 0..<sponsorshipShowRate) == 0
