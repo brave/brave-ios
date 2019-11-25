@@ -8,28 +8,37 @@ import Shared
 class BackgroundImage {
     
     struct Background {
-        let image: UIImage
+        let imageFileName: String
         let center: CGFloat
         let credit: (name: String, url: String?)?
+        
+        lazy var image: UIImage? = {
+            return UIImage(named: imageFileName)
+        }()
     }
 
     // Data is static to avoid duplicate loads
     
     let info: Background?
     static var hasSponsor: Bool { sponsors?.count ?? 0 > 0 }
-    static var sponsors: [(image: String, center: CGFloat)]?
+    private static var sponsors: [Background]?
+    private static var standardBackgrounds: [Background]?
     
-    init(sponsoredFilePath: String = "ntp-sponsored") {
+    init(sponsoredFilePath: String = "ntp-sponsored", backgroundFilePath: String = "ntp-data") {
         
         if BackgroundImage.sponsors == nil {
-            BackgroundImage.sponsors = BackgroundImage.generateSponsoredData()
+            BackgroundImage.sponsors = BackgroundImage.generateSponsoredData(file: sponsoredFilePath)
+        }
+        
+        if BackgroundImage.standardBackgrounds == nil {
+            BackgroundImage.standardBackgrounds = BackgroundImage.generateStandardData(file: backgroundFilePath)
         }
         
         self.info = BackgroundImage.randomBackground()
     }
     
-    private static func generateSponsoredData() -> [(image: String, center: CGFloat)] {
-        guard let json = BackgroundImage.loadImageJSON(sponsored: true),
+    private static func generateSponsoredData(file: String) -> [Background] {
+        guard let json = BackgroundImage.loadImageJSON(file: file),
             let region = NSLocale.current.regionCode else {
                 return []
         }
@@ -48,15 +57,32 @@ class BackgroundImage {
         let live = regionals.filter { item in
             guard let dates = item["dates"] as? [String: String],
                 let start = dateFormatter.date(from: dates["start"] ?? ""),
-                let end = dateFormatter.date(from: dates["end"] ?? "") else { return false }
+                let end = dateFormatter.date(from: dates["end"] ?? "") else {
+                    return false
+            }
             
             return today > start && today < end
         }
         
-        return live.compactMap { item in
+        return generateBackgroundData(data: live)
+    }
+    
+    private static func generateStandardData(file: String) -> [Background] {
+        guard let json = BackgroundImage.loadImageJSON(file: file) else { return [] }
+        return generateBackgroundData(data: json)
+    }
+    
+    private static func generateBackgroundData(data: [[String: Any]]) -> [Background] {
+        return data.compactMap { item in
             guard let image = item["image"] as? String,
                 let center = item["center"] as? CGFloat else { return nil }
-            return (image, center)
+            
+            if let credit = item["credit"] as? [String: String],
+                let name = credit["name"] {
+                return Background(imageFileName: image, center: center, credit: (name, credit["url"]))
+            }
+            
+            return Background(imageFileName: image, center: center, credit: nil)
         }
     }
     
@@ -64,35 +90,15 @@ class BackgroundImage {
         // Determine what type of background to display
         let sponsorshipShowRate = 4 // e.g. 4 == 25%
         let useSponsor = hasSponsor && Int.random(in: 0..<sponsorshipShowRate) == 0
+        guard let dataSet = useSponsor ? sponsors : standardBackgrounds else { return nil }
+        if dataSet.count == 0 { return nil }
         
-        guard let json = BackgroundImage.loadImageJSON(sponsored: useSponsor) else { return nil }
-        if json.count == 0 { return nil }
-        
-        // Not idea, as this requires loading the file each time to find a background, but not much to avoid this
-        //  as this VC is re-created often, and some 'parent' would need to own the datasource for these contents
-        //  if/when a larger NTP refactor takes place, this should be pulled out to avoid duplication.
-        
-        let randomBackgroundIndex = 11 // Int.random(in: 0..<json.count)
-        let backgroundJSON = json[randomBackgroundIndex]
-        let center = backgroundJSON["center"] as? CGFloat ?? 0
-        
-        guard
-            let imageName = backgroundJSON["image"] as? String,
-            let image = UIImage(named: imageName) else {
-                return nil
-        }
-        
-        if let credit = backgroundJSON["credit"] as? [String: String],
-            let name = credit["name"] {
-            return Background(image: image, center: center, credit: (name, credit["url"]))
-        }
-        
-        return Background(image: image, center: center, credit: nil)
+        let randomBackgroundIndex = Int.random(in: 0..<dataSet.count)
+        return dataSet[randomBackgroundIndex]
     }
     
-    private static func loadImageJSON(sponsored: Bool) -> [[String: Any]]? {
-        let resource = "ntp-" + (sponsored ? "sponsored" : "data")
-        guard let filePath = Bundle.main.path(forResource: resource, ofType: "json") else {
+    private static func loadImageJSON(file: String) -> [[String: Any]]? {
+        guard let filePath = Bundle.main.path(forResource: file, ofType: "json") else {
             return nil
         }
         
@@ -101,7 +107,7 @@ class BackgroundImage {
             let json = try JSONSerialization.jsonObject(with: fileData, options: []) as? [[String: Any]]
             return json
         } catch {
-            Logger.browserLogger.error("Failed to get bundle path for \"ntp-data.json\"")
+            Logger.browserLogger.error("Failed to get bundle path for \(file)")
         }
         
         return nil

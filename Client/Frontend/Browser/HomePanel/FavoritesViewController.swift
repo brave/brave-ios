@@ -299,11 +299,11 @@ class FavoritesViewController: UIViewController, Themeable {
     }
     
     private func setupBackgroundImage() {
-        guard let background = backgroundImage.info else {
+        guard var background = backgroundImage.info,
+            let image = background.image else {
             return
         }
         
-        let image = background.image
         let imageAspectRatio = image.size.width / image.size.height
         let imageView = UIImageView(image: image)
         
