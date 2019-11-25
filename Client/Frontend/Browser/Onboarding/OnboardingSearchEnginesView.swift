@@ -65,7 +65,7 @@ extension OnboardingSearchEnginesViewController {
         }
         
         private let buttonsStackView = UIStackView().then {
-            $0.axis = .vertical
+            $0.axis = .horizontal
             $0.alignment = .center
             $0.spacing = 15.0
         }
@@ -90,7 +90,7 @@ extension OnboardingSearchEnginesViewController {
             containerView.addSubview(braveLogo)
             [titlePrimary, titleSecondary].forEach(titleStackView.addArrangedSubview(_:))
             
-            [continueButton, skipButton]
+            [skipButton, continueButton]
                 .forEach(buttonsStackView.addArrangedSubview(_:))
             
             [titleStackView, searchEnginesTable, buttonsStackView]
@@ -115,10 +115,6 @@ extension OnboardingSearchEnginesViewController {
             // Alpha is used instead of `isHidden` to make the views participate in auto-layout.
             [titlePrimary, titleSecondary, searchEnginesTable, buttonsStackView].forEach {
                 $0.alpha = CGFloat.leastNormalMagnitude
-            }
-            
-            continueButton.snp.makeConstraints {
-                $0.centerX.equalTo(self.snp.centerX)
             }
             
             skipButton.snp.makeConstraints {

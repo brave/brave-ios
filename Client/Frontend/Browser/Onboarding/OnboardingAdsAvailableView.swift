@@ -69,7 +69,7 @@ extension OnboardingAdsAvailableController {
         }
         
         private let buttonsStackView = UIStackView().then {
-            $0.axis = .vertical
+            $0.axis = .horizontal
             $0.alignment = .center
             $0.spacing = 15.0
         }
@@ -95,14 +95,10 @@ extension OnboardingAdsAvailableController {
             
             mainStackView.addArrangedSubview(descriptionView)
 
-            [continueButton, skipButton]
+            [UIView.spacer(.horizontal, amount: 0), skipButton, continueButton, UIView.spacer(.horizontal, amount: 0)]
                 .forEach(buttonsStackView.addArrangedSubview(_:))
             
             [textStackView, buttonsStackView].forEach(descriptionStackView.addArrangedSubview(_:))
-            
-            continueButton.snp.makeConstraints {
-                $0.centerX.equalTo(self.snp.centerX)
-            }
             
             skipButton.snp.makeConstraints {
                 $0.width.equalTo(continueButton.snp.width)
