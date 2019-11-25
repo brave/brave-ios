@@ -2,10 +2,13 @@
   {
     "image": "EAFF_JA_soccer_Background_final.jpg",
     "center": 1280,
-    "credit": null,
+    "credit": {
+      "name": "EAFF 2019",
+      "url": "https://eaff.com/competitions/eaff2019/"
+    },
     "dates": {
       "start": "2019-12-02T00:00:13+09:00",
-      "end": "2019-18-22T00:00:00+09:00"
+      "end": "2019-12-18T00:00:00+09:00"
     },
     "regions": [
       "JP",
@@ -24,8 +27,7 @@
       "BD",
       "BT",
       "NP",
-      "UZ",
-      "NZ"
+      "UZ"
     ]
   }
 ]
