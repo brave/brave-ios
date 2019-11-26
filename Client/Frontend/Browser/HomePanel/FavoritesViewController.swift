@@ -172,7 +172,7 @@ class FavoritesViewController: UIViewController, Themeable {
         super.viewWillAppear(animated)
         // Need to reload data after modals are closed for potential orientation change
         // e.g. if in landscape, open portrait modal, close, the layout attempt to access an invalid indexpath
-         collection.reloadData()
+        collection.reloadData()
     }
     
     private var collectionContentSizeObservation: NSKeyValueObservation?
@@ -183,7 +183,7 @@ class FavoritesViewController: UIViewController, Themeable {
         // This makes collection view layout to recalculate its cell size.
         collection.collectionViewLayout.invalidateLayout()
         favoritesOverflowButton.isHidden = !dataSource.hasOverflow
-        collection.reloadData()
+        collection.reloadSections(IndexSet(arrayLiteral: 0))
         
         if let backgroundImageView = backgroundViewInfo?.imageView, let image = backgroundImageView.image {
             // Need to calculate the sizing difference between `image` and `imageView` to determine the pixel difference ratio
