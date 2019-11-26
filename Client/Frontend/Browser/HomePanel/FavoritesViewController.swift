@@ -332,7 +332,8 @@ class FavoritesViewController: UIViewController, Themeable {
             
             // Determines the height of the content
             // `999` priority is required for landscape, since top/bottom constraints no longer the most important
-            //   using `high` is not enough either.
+            //    using `1000` / `required` would cause constraint conflicts (with `centerY` in landscape), and
+            //    using `high` is not enough either.
             $0.top.bottom.equalToSuperview().priority(ConstraintPriority(999))
             
             // In portrait `top`/`bottom` is enough, however, when switching to landscape, those constraints
