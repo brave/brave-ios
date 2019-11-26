@@ -44,11 +44,10 @@ class OnboardingSearchEnginesViewController: OnboardingViewController {
         // This selection should only ever happen once.
         // We initially select the default search engine's cell
         DispatchQueue.main.async {
-            for searchEngine in self.searchEngines.orderedEngines.enumerated() {
-                if searchEngine.element == self.searchEngines.defaultEngine() {
-                    let indexPath = IndexPath(row: searchEngine.offset, section: 0)
-                    self.contentView.searchEnginesTable.selectRow(at: indexPath, animated: true, scrollPosition: .none)
-                }
+            for searchEngine in self.searchEngines.orderedEngines.enumerated() where
+                searchEngine.element == self.searchEngines.defaultEngine() {
+                let indexPath = IndexPath(row: searchEngine.offset, section: 0)
+                self.contentView.searchEnginesTable.selectRow(at: indexPath, animated: true, scrollPosition: .none)
             }
         }
     }
