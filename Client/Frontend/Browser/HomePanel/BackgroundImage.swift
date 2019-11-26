@@ -4,6 +4,7 @@
 
 import UIKit
 import Shared
+import BraveShared
 
 class BackgroundImage {
     
@@ -119,5 +120,12 @@ class BackgroundImage {
         }
         
         return nil
+    }
+    
+    /// This is a temp work around to address the weird settings requirements for the initial sponsored immage
+    ///     support in these super specific regions, as it is also to ignore if a sponsored item is actually available.
+    static var showSponsoredSetting: Bool {
+        let regions = ["JP", "CN", "KR", "KP", "TW", "MN", "MO", "GU", "MP", "SG", "IN", "PK", "MV", "BD", "BT", "NP", "UZ"]
+        return regions.contains(NSLocale.current.regionCode ?? "")
     }
 }

@@ -20,31 +20,39 @@ class NewTabPageTableViewController: TableViewController {
     }
     
     private lazy var section: Section = {
-        return Section(
-            rows: [
-                BoolRow(title: Strings.NewTabPageSettingsBackgroundImages, option: Preferences.NewTabPage.backgroundImages, onValueChange: {
-                    newValue in
-                    // Since overriding, does not auto-adjust this setting.
-                    Preferences.NewTabPage.backgroundImages.value = newValue
-                    
-                    // If turning off normal background images, turn of sponsored images as well.
-                    Preferences.NewTabPage.backgroundSponsoredImages.value = newValue
-                    
-                    if !newValue {
-                        // Updating the underlying preference does not dynamically update the visuals unfortuantely.
-                        // Updating manually. Only update if disabling.
-                        self.sponsoredSwitch?.isOn = newValue
-                    }
-                    
-                    // Need to update every time.
-                    self.sponsoredSwitch?.isEnabled = newValue
-                }),
-                BoolRow(title: Strings.NewTabPageSettingsSponsoredImages, option: Preferences.NewTabPage.backgroundSponsoredImages)
-            ]
-        )
+        var rows = [
+            BoolRow(title: Strings.NewTabPageSettingsBackgroundImages, option: Preferences.NewTabPage.backgroundImages, onValueChange: {
+                newValue in
+                // Since overriding, does not auto-adjust this setting.
+                Preferences.NewTabPage.backgroundImages.value = newValue
+                
+                // If turning off normal background images, turn of sponsored images as well.
+                Preferences.NewTabPage.backgroundSponsoredImages.value = newValue
+                
+                if !newValue {
+                    // Updating the underlying preference does not dynamically update the visuals unfortuantely.
+                    // Updating manually. Only update if disabling.
+                    self.sponsoredSwitch?.isOn = newValue
+                }
+                
+                // Need to update every time.
+                self.sponsoredSwitch?.isEnabled = newValue
+            })
+        ]
+        
+        if BackgroundImage.showSponsoredSetting {
+            rows.append(BoolRow(title: Strings.NewTabPageSettingsSponsoredImages, option: Preferences.NewTabPage.backgroundSponsoredImages))
+        }
+        
+        return Section(rows: rows)
     }()
     
     private var sponsoredSwitch: UISwitch? {
+        // Currently sponsored image is region specific, so if not visible, block access
+        if self.section.rows.count < 2 {
+            return nil
+        }
+        
         // A bit of a weird work around, but enables accessing and adjusting the sponsored image switch directly.
         return self.section.rows.last?.accessory.view as? SwitchAccessoryView
     }
