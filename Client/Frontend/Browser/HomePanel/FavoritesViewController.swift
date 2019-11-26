@@ -96,7 +96,7 @@ class FavoritesViewController: UIViewController, Themeable {
     // MARK: - Init/lifecycle
     
     private var backgroundViewInfo: (imageView: UIImageView, portraitCenterConstraint: Constraint)?
-    private let backgroundImage = BackgroundImage()
+    private var backgroundImage = BackgroundImage()
     
     private let profile: Profile
     
@@ -164,6 +164,10 @@ class FavoritesViewController: UIViewController, Themeable {
         
         makeConstraints()
         
+        Preferences.NewTabPage.backgroundImages.observe(from: self)
+        Preferences.NewTabPage.backgroundSponsoredImages.observe(from: self)
+        
+        // Doens't this get called twice?
         collectionContentSizeObservation = collection.observe(\.contentSize, options: [.new, .initial]) { [weak self] _, _ in
             self?.updateDuckDuckGoButtonLayout()
         }
@@ -320,7 +324,8 @@ class FavoritesViewController: UIViewController, Themeable {
         let imageView = UIImageView(image: image)
         
         imageView.contentMode = UIImageView.ContentMode.scaleAspectFit
-        view.addSubview(imageView)
+        // Make sure it goes to the back
+        view.insertSubview(imageView, at: 0)
         
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.snp.makeConstraints {
@@ -354,6 +359,16 @@ class FavoritesViewController: UIViewController, Themeable {
             let backgroundConstraint = $0.left.equalTo(view.snp.centerX).priority(ConstraintPriority.high).constraint
             self.backgroundViewInfo = (imageView, backgroundConstraint)
         }
+    }
+    
+    fileprivate func resetBackground() {
+        self.backgroundViewInfo?.imageView.removeFromSuperview()
+        self.backgroundViewInfo = nil
+        
+        // Flush background logic, this handles preference adjustments for us, so will update necessary, needed info.
+        backgroundImage = BackgroundImage()
+        
+        setupBackgroundImage()
     }
     
     fileprivate func gradientOverlay() -> CAGradientLayer {
@@ -472,6 +487,12 @@ extension FavoritesViewController: FavoriteCellDelegate {
                 self.dataSource.isEditing = false
             }
         }
+    }
+}
+
+extension FavoritesViewController: PreferencesObserver {
+    func preferencesDidChange(for key: String) {
+        self.resetBackground()
     }
 }
 
