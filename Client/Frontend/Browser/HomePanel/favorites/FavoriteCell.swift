@@ -34,7 +34,7 @@ class FavoriteCell: UICollectionViewCell {
     let textLabel = UILabel().then {
         $0.setContentHuggingPriority(UILayoutPriority.defaultHigh, for: NSLayoutConstraint.Axis.vertical)
         $0.font = DynamicFontHelper.defaultHelper.DefaultSmallFont
-        $0.textColor = .white
+        $0.appearanceTextColor = .white
         $0.textAlignment = UI.labelAlignment
         $0.lineBreakMode = NSLineBreakMode.byWordWrapping
         $0.numberOfLines = 2

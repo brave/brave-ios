@@ -57,7 +57,7 @@ class FavoritesViewController: UIViewController, Themeable {
         let blur = UIVisualEffectView(effect: UIBlurEffect(style: .light))
         let button = RoundInterfaceButton(type: .system).then {
             $0.setTitle(Strings.NewTabPageShowMoreFavorites, for: .normal)
-            $0.setTitleColor(.white, for: .normal)
+            $0.appearanceTextColor = .white
             $0.titleLabel?.font = UIFont.systemFont(ofSize: 12.0, weight: .medium)
             $0.addTarget(self, action: #selector(showFavorites), for: .touchUpInside)
         }
