@@ -55,7 +55,7 @@ class FavoritesViewController: UIViewController, Themeable {
     
     private lazy var favoritesOverflowButton = RoundInterfaceView().then {
         let blur = UIVisualEffectView(effect: UIBlurEffect(style: .light))
-        let button = RoundInterfaceButton(type: .system).then {
+        let button = UIButton(type: .system).then {
             $0.setTitle(Strings.NewTabPageShowMoreFavorites, for: .normal)
             $0.appearanceTextColor = .white
             $0.titleLabel?.font = UIFont.systemFont(ofSize: 12.0, weight: .medium)
@@ -80,9 +80,18 @@ class FavoritesViewController: UIViewController, Themeable {
         $0.text = Strings.DDG_promotion
     }
     
-    private lazy var ddgButton = RoundInterfaceButton().then {
-        $0.addTarget(self, action: #selector(showDDGCallout), for: .touchUpInside)
-        $0.backgroundColor = UIColor(white: 0.0, alpha: 0.5)
+    private lazy var ddgButton = RoundInterfaceView().then {
+        let blur = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
+        let actualButton = UIButton(type: .system).then {
+            $0.addTarget(self, action: #selector(showDDGCallout), for: .touchUpInside)
+        }
+        $0.clipsToBounds = true
+        
+        $0.addSubview(blur)
+        $0.addSubview(actualButton)
+        
+        blur.snp.makeConstraints { $0.edges.equalToSuperview() }
+        actualButton.snp.makeConstraints { $0.edges.equalToSuperview() }
     }
     
     @objc private func showDDGCallout() {
