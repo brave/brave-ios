@@ -14,19 +14,17 @@ private let log = Logger.browserLogger
 class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtocol {
   /// Called when the bookmarks are updated via some user input (i.e. Delete, edit, etc.)
     var bookmarksDidChange: (() -> Void)?
-  
     weak var toolbarUrlActionsDelegate: ToolbarUrlActionsDelegate?
-  
     var bookmarksFRC: NSFetchedResultsController<Bookmark>?
   
-    lazy var editBookmarksButton = UIBarButtonItem().then {
+    lazy var editBookmarksButton: UIBarButtonItem? = UIBarButtonItem().then {
         $0.image = #imageLiteral(resourceName: "edit").template
         $0.style = .plain
         $0.target = self
         $0.action = #selector(onEditBookmarksButton)
     }
     
-    lazy var addFolderButton =  UIBarButtonItem().then {
+    lazy var addFolderButton: UIBarButtonItem? = UIBarButtonItem().then {
         $0.image = #imageLiteral(resourceName: "bookmarks_newfolder_icon").template
         $0.style = .plain
         $0.target = self
@@ -57,9 +55,11 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         self.init(folder: nil, isPrivateBrowsing: isPrivateBrowsing)
         
         if showFavorites {
-            self.title = "Favorites"
-            self.bookmarksFRC = Bookmark.frc(forFavorites: true, parentFolder: nil)
-            self.bookmarksFRC?.delegate = self
+            title = Strings.FavoritesRootLevelCellTitle
+            bookmarksFRC = Bookmark.frc(forFavorites: true, parentFolder: nil)
+            bookmarksFRC?.delegate = self
+            editBookmarksButton = nil
+            addFolderButton = nil
         }
     }
   
@@ -79,7 +79,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     private func updateEditBookmarksButtonStatus() {
         guard let count = bookmarksFRC?.fetchedObjects?.count else { return }
         
-        editBookmarksButton.isEnabled = count != 0
+        editBookmarksButton?.isEnabled = count != 0
         if tableView.isEditing && count == 0 {
             disableTableEditingMode()
         }
@@ -89,7 +89,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         var padding: UIBarButtonItem { return UIBarButtonItem.fixedSpace(5) }
         let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
         
-        let items = [padding, addFolderButton, flexibleSpace, editBookmarksButton, padding]
+        let items = [padding, addFolderButton, flexibleSpace, editBookmarksButton, padding].compactMap { $0 }
         setToolbarItems(items, animated: true)
     }
   
@@ -136,13 +136,13 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     updateEditBookmarksButton(editMode)
     resetCellLongpressGesture(tableView.isEditing)
     
-    editBookmarksButton.isEnabled = bookmarksFRC?.fetchedObjects?.count != 0
-    addFolderButton.isEnabled = !editMode
+    editBookmarksButton?.isEnabled = bookmarksFRC?.fetchedObjects?.count != 0
+    addFolderButton?.isEnabled = !editMode
   }
   
   func updateEditBookmarksButton(_ tableIsEditing: Bool) {
-    self.editBookmarksButton.title = tableIsEditing ? Strings.Done : Strings.Edit
-    self.editBookmarksButton.style = tableIsEditing ? .done : .plain
+    self.editBookmarksButton?.title = tableIsEditing ? Strings.Done : Strings.Edit
+    self.editBookmarksButton?.style = tableIsEditing ? .done : .plain
   }
   
   func resetCellLongpressGesture(_ editing: Bool) {
@@ -299,7 +299,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     if !bookmark.isFolder {
       if tableView.isEditing {
         //show editing view for bookmark item
-        self.showEditBookmarkController(tableView, indexPath: indexPath)
+        self.showEditBookmarkController(bookmark: bookmark)
       } else {
         if let url = URL(string: bookmark.url ?? "") {
             dismiss(animated: true) {
@@ -310,7 +310,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     } else {
       if tableView.isEditing {
         //show editing view for bookmark item
-        self.showEditBookmarkController(tableView, indexPath: indexPath)
+        self.showEditBookmarkController(bookmark: bookmark)
       } else {
         let nextController = BookmarksViewController(folder: bookmark, isPrivateBrowsing: isPrivateBrowsing)
         nextController.profile = profile
@@ -363,23 +363,20 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     })
     
     let editAction = UITableViewRowAction(style: UITableViewRowAction.Style.normal, title: Strings.Edit, handler: { (action, indexPath) in
-      self.showEditBookmarkController(tableView, indexPath: indexPath)
+        self.showEditBookmarkController(bookmark: item)
     })
     
     return [deleteAction, editAction]
   }
   
-  fileprivate func showEditBookmarkController(_ tableView: UITableView, indexPath: IndexPath) {
-    guard let item = bookmarksFRC?.object(at: indexPath), !item.isFavorite else { return }
-
-    self.isEditingIndividualBookmark = true
+    fileprivate func showEditBookmarkController(bookmark: Bookmark) {
+        if bookmark.isFavorite { return }
+        self.isEditingIndividualBookmark = true
     
-    let mode: BookmarkEditMode = item.isFolder ? .editFolder(item) : .editBookmark(item)
-    
-    let vc = AddEditBookmarkTableViewController(mode: mode)    
-    self.navigationController?.pushViewController(vc, animated: true)
-  }
-  
+        let mode: BookmarkEditMode = bookmark.isFolder ? .editFolder(bookmark) : .editBookmark(bookmark)
+        let vc = AddEditBookmarkTableViewController(mode: mode)
+        self.navigationController?.pushViewController(vc, animated: true)
+    }
 }
 
 extension BookmarksViewController: NSFetchedResultsControllerDelegate {
