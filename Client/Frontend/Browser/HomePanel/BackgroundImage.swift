@@ -20,6 +20,8 @@ class BackgroundImage {
 
     // Data is static to avoid duplicate loads
     
+    private static let sponsorshipShowRate = 4 // e.g. 4 == 25% or "every 4th image"
+    
     let info: Background?
     static var hasSponsor: Bool { sponsors?.count ?? 0 > 0 }
     private static var sponsors: [Background]?
@@ -97,13 +99,12 @@ class BackgroundImage {
     
     private static func randomBackground() -> Background? {
         // Determine what type of background to display
-        let sponsorshipShowRate = 4 // e.g. 4 == 25%
         let useSponsor = hasSponsor && Int.random(in: 0..<sponsorshipShowRate) == 0
         guard let dataSet = useSponsor ? sponsors : standardBackgrounds else { return nil }
-        if dataSet.count == 0 { return nil }
+        if dataSet.isEmpty { return nil }
         
         let randomBackgroundIndex = Int.random(in: 0..<dataSet.count)
-        return dataSet[randomBackgroundIndex]
+        return dataSet[safe: randomBackgroundIndex]
     }
     
     private static func loadImageJSON(file: String) -> [[String: Any]]? {
