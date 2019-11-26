@@ -20,12 +20,25 @@ class BackgroundImage {
 
     // Data is static to avoid duplicate loads
     
+    /// This is the number of backgrounds that must appear before a background can be repeated.
+    /// So if background `3` is shown, it cannot be shown until this many backgrounds are shown, then `3` can be shown again.
+    /// This does not apply to sponsored images.
+    /// This is reset on each launch, so `3` can be shown again if app is removed from memory.
+    /// This number _must_ be less than the number of backgrounds!
+    private static let numberOfDuplicateAvoidance = 6
     private static let sponsorshipShowRate = 4 // e.g. 4 == 25% or "every 4th image"
     
     let info: Background?
     static var hasSponsor: Bool { sponsors?.count ?? 0 > 0 }
     private static var sponsors: [Background]?
     private static var standardBackgrounds: [Background]?
+    
+    // This is used to prevent the same handful of backgrounds from being shown.
+    //  It will track the last N pictures that have been shown and prevent them from being shown
+    //  until they are 'old' and dropped from this array.
+    // Currently only supports normal backgrounds, as sponsored images are not supposed to be duplicate.
+    // This can 'easily' be adjusted to support both sets by switching to String, and using filePath to identify uniqueness.
+    private static var lastBackgroundChoices = [Int]()
     
     init(sponsoredFilePath: String = "ntp-sponsored", backgroundFilePath: String = "ntp-data") {
         
@@ -103,7 +116,26 @@ class BackgroundImage {
         guard let dataSet = useSponsor ? sponsors : standardBackgrounds else { return nil }
         if dataSet.isEmpty { return nil }
         
-        let randomBackgroundIndex = Int.random(in: 0..<dataSet.count)
+        let availableRange = 0..<dataSet.count
+        var randomBackgroundIndex = Int.random(in: availableRange)
+        if !useSponsor {
+            /// This takes all indeces and filters out ones that were shown recently
+            let availableBackgroundIndeces = availableRange.filter {
+                !lastBackgroundChoices.contains($0)
+            }
+            // Chooses a new random index to use from the available indeces
+            // -1 will result in a `nil` return
+            randomBackgroundIndex = availableBackgroundIndeces.randomElement() ?? -1
+            assert(randomBackgroundIndex >= 0, "randomBackgroundIndex was nil, this is terrible.")
+            
+            // This index is now added to 'past' tracking list to prevent duplicates
+            lastBackgroundChoices.append(randomBackgroundIndex)
+            // Trimming to fixed length to release older backgrounds
+            lastBackgroundChoices = lastBackgroundChoices.suffix(numberOfDuplicateAvoidance)
+        }
+        
+        // Item is returned based on our random index.
+        // Could generally use `randomElement()`, but for non-sponsored images, certain indeces are ignored.
         return dataSet[safe: randomBackgroundIndex]
     }
     
