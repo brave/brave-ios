@@ -110,7 +110,7 @@ class FavoritesViewController: UIViewController, Themeable {
                            name: Notification.Name.TopSitesConversion, object: nil)
             $0.addObserver(self, selector: #selector(privateBrowsingModeChanged), 
                            name: Notification.Name.PrivacyModeChanged, object: nil)
-        }   
+        }
     }
     
     @objc func existingUserTopSitesConversion() {
@@ -134,6 +134,8 @@ class FavoritesViewController: UIViewController, Themeable {
         view.clipsToBounds = true
         
         setupBackgroundImage()
+        // Setup gradient regardless of background image, can internalize to setup background image if only wanted for images.
+        view.layer.addSublayer(gradientOverlay())
         
         let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongGesture(gesture:)))
         collection.addGestureRecognizer(longPressGesture)
@@ -352,8 +354,6 @@ class FavoritesViewController: UIViewController, Themeable {
             let backgroundConstraint = $0.left.equalTo(view.snp.centerX).priority(ConstraintPriority.high).constraint
             self.backgroundViewInfo = (imageView, backgroundConstraint)
         }
-        
-        view.layer.addSublayer(gradientOverlay())
     }
     
     fileprivate func gradientOverlay() -> CAGradientLayer {
