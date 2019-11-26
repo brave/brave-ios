@@ -98,9 +98,9 @@ extension Preferences {
     }
     final class NewTabPage {
         /// Whether bookmark image are enabled / shown
-        static let backgroundImages = Option<Bool>(key: "privacy.private-only", default: true)
+        static let backgroundImages = Option<Bool>(key: "newtabpage.background-images", default: true)
         /// Whether sponsored images are included into the background image rotation
-        static let backgroundSponsoredImages = Option<Bool>(key: "privacy.block-all-cookies", default: true)
+        static let backgroundSponsoredImages = Option<Bool>(key: "newtabpage-background-sponsored-images", default: true)
     }
 }
 
