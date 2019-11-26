@@ -11,6 +11,9 @@ class NewTabPageTableViewController: TableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        // Hides unnecessary empty rows
+        tableView.tableFooterView = UIView()
+        
         navigationItem.title = Strings.NewTabPageSettingsTitle
         tableView.accessibilityIdentifier = "NewTabPageSettings.tableView"
         dataSource.sections = [section]
