@@ -1331,12 +1331,13 @@ class BrowserViewController: UIViewController {
         }
     }
 
-    func openBlankNewTab(focusLocationField: Bool, isPrivate: Bool = false, searchFor searchText: String? = nil) {
+    func openBlankNewTab(attemptLocationFieldFocus: Bool, isPrivate: Bool = false, searchFor searchText: String? = nil) {
         popToBVC()
         openURLInNewTab(nil, isPrivate: isPrivate, isPrivileged: true)
         let freshTab = tabManager.selectedTab
         
-        if focusLocationField {
+        // Focus field only if requested and background images are not supported
+        if attemptLocationFieldFocus && !Preferences.NewTabPage.backgroundImages.value {
             DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(300)) {
                 // Without a delay, the text field fails to become first responder
                 // Check that the newly created tab is still selected.
@@ -1616,12 +1617,12 @@ extension BrowserViewController: ClipboardBarDisplayHandlerDelegate {
 
 extension BrowserViewController: QRCodeViewControllerDelegate {
     func didScanQRCodeWithURL(_ url: URL) {
-        openBlankNewTab(focusLocationField: false)
+        openBlankNewTab(attemptLocationFieldFocus: false)
         finishEditingAndSubmit(url, visitType: VisitType.typed)
     }
 
     func didScanQRCodeWithText(_ text: String) {
-        openBlankNewTab(focusLocationField: false)
+        openBlankNewTab(attemptLocationFieldFocus: false)
         submitSearchText(text)
     }
 }
@@ -1937,7 +1938,7 @@ extension BrowserViewController: ToolbarDelegate {
     }
     
     func tabToolbarDidPressAddTab(_ tabToolbar: ToolbarProtocol, button: UIButton) {
-        self.openBlankNewTab(focusLocationField: true, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
+        self.openBlankNewTab(attemptLocationFieldFocus: true, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
     }
 
     func tabToolbarDidLongPressAddTab(_ tabToolbar: ToolbarProtocol, button: UIButton) {
@@ -1950,13 +1951,13 @@ extension BrowserViewController: ToolbarDelegate {
             let newPrivateTabAction = UIAlertAction(title: Strings.NewPrivateTabTitle, style: .default, handler: { [unowned self] _ in
                 // BRAVE TODO: Add check for DuckDuckGo popup (and based on 1.6, whether the browser lock is enabled?)
                 // before focusing on the url bar
-                self.openBlankNewTab(focusLocationField: true, isPrivate: true)
+                self.openBlankNewTab(attemptLocationFieldFocus: true, isPrivate: true)
             })
             actions.append(newPrivateTabAction)
         }
         let bottomActionTitle = PrivateBrowsingManager.shared.isPrivateBrowsing ? Strings.NewPrivateTabTitle : Strings.NewTabTitle
         actions.append(UIAlertAction(title: bottomActionTitle, style: .default, handler: { [unowned self] _ in
-            self.openBlankNewTab(focusLocationField: true, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
+            self.openBlankNewTab(attemptLocationFieldFocus: true, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
         }))
         return actions
     }
