@@ -21,10 +21,12 @@ extension OnboardingAdsAvailableController {
         
         let continueButton = CommonViews.primaryButton(text: Strings.OBTurnOnButton).then {
             $0.accessibilityIdentifier = "OnboardingRewardsViewController.OBTurnOnButton"
+            $0.titleLabel?.minimumScaleFactor = 0.75
         }
         
         let skipButton = CommonViews.secondaryButton().then {
             $0.accessibilityIdentifier = "OnboardingRewardsViewController.SkipButton"
+            $0.titleLabel?.minimumScaleFactor = 0.75
         }
         
         private let mainStackView = UIStackView().then {

@@ -37,6 +37,7 @@ extension OnboardingAdsCountdownViewController {
         
         let finishedButton = CommonViews.primaryButton(text: Strings.OBFinishButton).then {
             $0.accessibilityIdentifier = "OnboardingAdsCountdownViewController.StartBrowsing"
+            $0.titleLabel?.minimumScaleFactor = 0.75
             $0.backgroundColor = BraveUX.BraveOrange
             $0.isExclusiveTouch = true
         }

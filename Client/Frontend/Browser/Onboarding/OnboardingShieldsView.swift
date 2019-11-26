@@ -21,15 +21,18 @@ extension OnboardingShieldsViewController {
         #if NO_REWARDS
         let continueButton = CommonViews.primaryButton(text: Strings.OBFinishButton).then {
             $0.accessibilityIdentifier = "OnboardingShieldsViewController.FinishButton"
+            $0.titleLabel?.minimumScaleFactor = 0.75
         }
         #else
         let continueButton = CommonViews.primaryButton(text: Strings.OBContinueButton).then {
             $0.accessibilityIdentifier = "OnboardingShieldsViewController.ContinueButton"
+            $0.titleLabel?.minimumScaleFactor = 0.75
         }
         #endif
         
         let skipButton = CommonViews.secondaryButton().then {
             $0.accessibilityIdentifier = "OnboardingShieldsViewController.SkipButton"
+            $0.titleLabel?.minimumScaleFactor = 0.75
         }
         
         private let mainStackView = UIStackView().then {
