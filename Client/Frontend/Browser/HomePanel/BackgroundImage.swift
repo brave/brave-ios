@@ -26,12 +26,20 @@ class BackgroundImage {
     
     init(sponsoredFilePath: String = "ntp-sponsored", backgroundFilePath: String = "ntp-data") {
         
-        if BackgroundImage.sponsors == nil {
-            BackgroundImage.sponsors = BackgroundImage.generateSponsoredData(file: sponsoredFilePath)
+        if !Preferences.NewTabPage.backgroundImages.value {
+            // Do absolutely nothing
+            self.info = nil
+            return
         }
         
+        // Setting up normal backgrounds
         if BackgroundImage.standardBackgrounds == nil {
             BackgroundImage.standardBackgrounds = BackgroundImage.generateStandardData(file: backgroundFilePath)
+        }
+        
+        // Setting up sponsored backgrounds
+        if BackgroundImage.sponsors == nil && Preferences.NewTabPage.backgroundSponsoredImages.value {
+            BackgroundImage.sponsors = BackgroundImage.generateSponsoredData(file: sponsoredFilePath)
         }
         
         self.info = BackgroundImage.randomBackground()
