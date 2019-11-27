@@ -153,6 +153,10 @@ class FavoritesViewController: UIViewController, Themeable {
         collection.dataSource = dataSource
         dataSource.collectionView = collection
         
+        dataSource.favoriteDeletedHandler = { [weak self] in
+            self?.favoritesOverflowButton.isHidden = self?.dataSource.hasOverflow == false
+        }
+        
         // Could setup as section header but would need to use flow layout,
         // Auto-layout subview within collection doesn't work properly,
         // Quick-and-dirty layout here.
