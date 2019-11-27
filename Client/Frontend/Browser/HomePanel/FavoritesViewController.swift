@@ -394,8 +394,8 @@ class FavoritesViewController: UIViewController, Themeable {
         let gl = CAGradientLayer()
         gl.colors = [colorTop, colorBottom]
         
-        // Only covers to third of the screen
-        gl.locations = [0.0, 0.33]
+        // Gradient cover percentage
+        gl.locations = [0.0, 0.5]
         
         // Making a squrare to handle rotation events
         let maxSide = max(view.bounds.height, view.bounds.width)
