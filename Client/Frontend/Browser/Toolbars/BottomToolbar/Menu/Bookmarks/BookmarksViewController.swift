@@ -37,30 +37,33 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     var currentFolder: Bookmark?
     /// Certain bookmark actions are different in private browsing mode.
     let isPrivateBrowsing: Bool
+    
+    let mode: Mode
+    
+    enum Mode {
+        // Set nil for root level bookmarks.
+        case bookmarks(inFolder: Bookmark?)
+        case favorites
+    }
   
-    init(folder: Bookmark?, isPrivateBrowsing: Bool) {
+    init(mode: Mode, isPrivateBrowsing: Bool) {
         self.isPrivateBrowsing = isPrivateBrowsing
+        self.mode = mode
         
         super.init(nibName: nil, bundle: nil)
         
-        self.currentFolder = folder
-        self.title = folder?.displayTitle ?? Strings.Bookmarks
-        self.bookmarksFRC = Bookmark.frc(parentFolder: folder)
-        self.bookmarksFRC?.delegate = self
-        
-        // FIXME: NotificationMainThreadContextSignificantlyChanged is gone
-    }
-    
-    convenience init(showFavorites: Bool, isPrivateBrowsing: Bool) {
-        self.init(folder: nil, isPrivateBrowsing: isPrivateBrowsing)
-        
-        if showFavorites {
+        switch mode {
+        case .bookmarks(let folder):
+            self.currentFolder = folder
+            self.title = folder?.displayTitle ?? Strings.Bookmarks
+            self.bookmarksFRC = Bookmark.frc(parentFolder: folder)
+        case .favorites:
             title = Strings.FavoritesRootLevelCellTitle
             bookmarksFRC = Bookmark.frc(forFavorites: true, parentFolder: nil)
-            bookmarksFRC?.delegate = self
-            editBookmarksButton = nil
             addFolderButton = nil
         }
+        
+        self.bookmarksFRC?.delegate = self
     }
   
     required init?(coder aDecoder: NSCoder) {
@@ -99,7 +102,12 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         // Recreate the frc if it was previously removed
         // (when user navigated into a nested folder for example)
         if bookmarksFRC == nil {
-            bookmarksFRC = Bookmark.frc(parentFolder: currentFolder)
+            switch mode {
+            case .bookmarks(_):
+                bookmarksFRC = Bookmark.frc(parentFolder: currentFolder)
+            case .favorites:
+                bookmarksFRC = Bookmark.frc(forFavorites: true, parentFolder: nil)
+            }
             bookmarksFRC?.delegate = self
         }
       try self.bookmarksFRC?.performFetch()
@@ -285,12 +293,6 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     return indexPath
   }
   
-  func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-    guard let bookmark = bookmarksFRC?.object(at: indexPath) else { return false }
-    
-    return !bookmark.isFavorite
-  }
-  
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     tableView.deselectRow(at: indexPath, animated: false)
     
@@ -312,7 +314,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         //show editing view for bookmark item
         self.showEditBookmarkController(bookmark: bookmark)
       } else {
-        let nextController = BookmarksViewController(folder: bookmark, isPrivateBrowsing: isPrivateBrowsing)
+        let nextController = BookmarksViewController(mode: .bookmarks(inFolder: bookmark), isPrivateBrowsing: isPrivateBrowsing)
         nextController.profile = profile
         nextController.bookmarksDidChange = bookmarksDidChange
         nextController.toolbarUrlActionsDelegate = toolbarUrlActionsDelegate
@@ -370,12 +372,21 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
   }
   
     fileprivate func showEditBookmarkController(bookmark: Bookmark) {
-        if bookmark.isFavorite { return }
         self.isEditingIndividualBookmark = true
     
-        let mode: BookmarkEditMode = bookmark.isFolder ? .editFolder(bookmark) : .editBookmark(bookmark)
-        let vc = AddEditBookmarkTableViewController(mode: mode)
-        self.navigationController?.pushViewController(vc, animated: true)
+        var mode: BookmarkEditMode?
+        if bookmark.isFolder {
+            mode = .editFolder(bookmark)
+        } else if bookmark.isFavorite {
+            mode = .editFavorite(bookmark)
+        } else {
+            mode = .editBookmark(bookmark)
+        }
+        
+        if let mode = mode {
+            let vc = AddEditBookmarkTableViewController(mode: mode)
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
     }
 }
 

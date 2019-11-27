@@ -1865,7 +1865,10 @@ extension BrowserViewController: TopToolbarDelegate {
     // TODO: This logic should be fully abstracted away and share logic from current MenuViewController
     // See: https://github.com/brave/brave-ios/issues/1452
     func topToolbarDidTapBookmarkButton(_ topToolbar: TopToolbarView?, favorites: Bool) {
-        let vc = BookmarksViewController(showFavorites: favorites, isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing)
+        let mode: BookmarksViewController.Mode = favorites ? .favorites : .bookmarks(inFolder: nil)
+        
+        let vc = BookmarksViewController(mode: mode,
+                                         isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing)
         vc.toolbarUrlActionsDelegate = self
         
         let nav = SettingsNavigationController(rootViewController: vc)
