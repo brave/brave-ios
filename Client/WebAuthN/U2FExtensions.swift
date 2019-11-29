@@ -78,21 +78,21 @@ class U2FExtensions: NSObject {
     
     // There can be multiple Registration/Authentication requests at any time
     // We use handles to keep track of different requests
-    fileprivate var fido2RegHandles: [Int] = []
-    fileprivate var fido2AuthHandles: [Int] = []
-    fileprivate var fidoRegHandles: [Int] = []
-    fileprivate var fidoSignHandles: [Int] = []
+    private var fido2RegHandles: [Int] = []
+    private var fido2AuthHandles: [Int] = []
+    private var fidoRegHandles: [Int] = []
+    private var fidoSignHandles: [Int] = []
     
-    fileprivate var requestId: [Int: Int] = [:]
-    fileprivate var fidoRequests: [Int: Int] = [:]
+    private var requestId: [Int: Int] = [:]
+    private var fidoRequests: [Int: Int] = [:]
     
-    fileprivate var fido2RegisterRequest: [Int: WebAuthnRegisterRequest] = [:]
-    fileprivate var fido2AuthRequest: [Int: WebAuthnAuthenticateRequest] = [:]
+    private var fido2RegisterRequest: [Int: WebAuthnRegisterRequest] = [:]
+    private var fido2AuthRequest: [Int: WebAuthnAuthenticateRequest] = [:]
     
-    fileprivate var fidoRegisterRequest: [Int: FIDORegisterRequest] = [:]
-    fileprivate var fidoSignRequests: [Int: [FIDOSignRequest]] = [:]
+    private var fidoRegisterRequest: [Int: FIDORegisterRequest] = [:]
+    private var fidoSignRequests: [Int: [FIDOSignRequest]] = [:]
     
-    fileprivate static var observationContext = 0
+    private static var observationContext = 0
     
     private var nfcSesionStateObservation: NSKeyValueObservation?
     private var sceneObserver: SceneObserver?
@@ -100,21 +100,21 @@ class U2FExtensions: NSObject {
     // Popup modals presented to the user in different session or key states
     
     /// Show when user has to touch his auth key
-    fileprivate let touchKeyPopup = AlertPopupView(imageView: lottieAnimation(for: "webauth_touch_key"),
+    private let touchKeyPopup = AlertPopupView(imageView: lottieAnimation(for: "webauth_touch_key"),
                                                    title: Strings.touchKeyMessage, message: "", titleWeight: .semibold, titleSize: 21)
     
     /// Show when user's key hasn't been inserted yet
-    fileprivate let insertKeyPopup = AlertPopupView(imageView: lottieAnimation(for: "webauth_insert_key"),
+    private let insertKeyPopup = AlertPopupView(imageView: lottieAnimation(for: "webauth_insert_key"),
                                                     title: Strings.insertKeyMessage, message: "", titleWeight: .semibold, titleSize: 21)
  
     /// Show to enter key's pin
-    fileprivate let pinVerificationPopup = AlertPopupView(imageView: UIImageView(image: #imageLiteral(resourceName: "enter_pin")),
+    private let pinVerificationPopup = AlertPopupView(imageView: UIImageView(image: #imageLiteral(resourceName: "enter_pin")),
                                                           title: Strings.pinTitle, message: "",
                                                           inputType: .default, secureInput: true,
                                                           inputPlaceholder: Strings.pinPlaceholder, titleWeight: .semibold, titleSize: 21)
     
     /// Show when key's pin authentication is pending
-    fileprivate let verificationPendingPopup =
+    private let verificationPendingPopup =
         AlertPopupView(imageView: lottieAnimation(for: "webauth_verify_key"),
                        title: Strings.verificationPending, message: "", titleWeight: .semibold, titleSize: 21)
     
@@ -129,8 +129,8 @@ class U2FExtensions: NSObject {
         return animationView
     }
     
-    fileprivate var u2fActive = false
-    fileprivate var nfcActive = false { // To track if nfc session was cancelled by the user
+    private var u2fActive = false
+    private var nfcActive = false { // To track if nfc session was cancelled by the user
         didSet {
             if oldValue == nfcActive {
                 return
@@ -141,12 +141,12 @@ class U2FExtensions: NSObject {
         }
     }
     
-    fileprivate var currentMessageType = U2FMessageType.None
-    fileprivate var currentHandle = -1
-    fileprivate var currentTabId = ""
+    private var currentMessageType = U2FMessageType.None
+    private var currentHandle = -1
+    private var currentTabId = ""
     
-    fileprivate var accessorySessionStateObservation: NSKeyValueObservation?
-    fileprivate var nfcSessionStateObservation: NSKeyValueObservation?
+    private var accessorySessionStateObservation: NSKeyValueObservation?
+    private var nfcSessionStateObservation: NSKeyValueObservation?
     
     // Using a property style approch to avoid observing twice.
     private var observeSessionStateUpdates: Bool = false {
