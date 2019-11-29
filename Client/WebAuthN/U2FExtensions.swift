@@ -130,7 +130,17 @@ class U2FExtensions: NSObject {
     }
     
     fileprivate var u2fActive = false
-    fileprivate var nfcActive = false // To track if nfc session was cancelled by the user
+    fileprivate var nfcActive = false { // To track if nfc session was cancelled by the user
+        didSet {
+            if oldValue == nfcActive {
+                return
+            }
+            if !nfcActive, #available(iOS 13.0, *) {
+                YubiKitManager.shared.nfcSession.stopIso7816Session()
+            }
+        }
+    }
+    
     fileprivate var currentMessageType = U2FMessageType.None
     fileprivate var currentHandle = -1
     fileprivate var currentTabId = ""
@@ -152,11 +162,15 @@ class U2FExtensions: NSObject {
             if observeSessionStateUpdates {
                 accessorySessionStateObservation = accessorySession.observe(\.sessionState, changeHandler: { [weak self] session, change in
                     ensureMainThread {
-                        self?.observeSessionStateUpdates = false
-                        if session.sessionState != .closed {
-                            self?.keyType = .accessory
+                        guard let self = self else {
+                            log.error(U2FErrorMessages.Error.rawValue)
+                            return
                         }
-                        self?.handleSessionStateChange()
+                        self.observeSessionStateUpdates = false
+                        if session.sessionState != .closed {
+                            self.keyType = .accessory
+                        }
+                        self.handleSessionStateChange()
                     }
                 })
             } else {
@@ -431,7 +445,7 @@ class U2FExtensions: NSObject {
             
             makeCredentialRequest.excludeList = exclusionList
             
-            executeKeyRequestWith { [weak self] in
+            executeKeyRequest { [weak self] in
                 guard let self = self else {
                     return
                 }
@@ -445,7 +459,7 @@ class U2FExtensions: NSObject {
                         log.error(U2FErrorMessages.ErrorRegistration.rawValue)
                         return
                     }
-                    guard error == nil else {
+                    if error != nil {
                         self.handleMakeCredential(handle: handle, request: request, error: error)
                         return
                     }
@@ -462,7 +476,7 @@ class U2FExtensions: NSObject {
                             return
                         }
                         
-                        self.sceneObserver = SceneObserver(sceneActivationClosure: {  [weak self] in
+                        self.sceneObserver = SceneObserver(sceneActivationClosure: { [weak self] in
                             guard let self = self else {
                                 return
                             }
@@ -471,7 +485,7 @@ class U2FExtensions: NSObject {
                         })
 
                         // Stop the session to dismiss the Core NFC system UI.
-                        YubiKitManager.shared.nfcSession.stopIso7816Session()
+                        self.nfcActive = false
                     }
                 }
             }
@@ -481,7 +495,7 @@ class U2FExtensions: NSObject {
     }
     
     private func finalizeFIDO2Registration(handle: Int, response: YKFKeyFIDO2MakeCredentialResponse, clientDataJSON: String, error: NSErrorPointer) {
-        guard error == nil else {
+        if error != nil {
             let errorDescription = error?.pointee?.localizedDescription ?? Strings.U2FRegistrationError
             sendFIDO2RegistrationError(handle: handle, errorDescription: errorDescription)
             return
@@ -531,7 +545,7 @@ class U2FExtensions: NSObject {
             guard let self = self else {
                 return
             }
-            self.handlePinVerificationRequired { [weak self] (error) in
+            self.handlePinVerificationRequired { [weak self] error in
                 guard let self = self else {
                     return
                 }
@@ -556,8 +570,8 @@ class U2FExtensions: NSObject {
                 return
             }
             
-            YubiKitManager.shared.nfcSession.stopIso7816Session()
-            self.sceneObserver = SceneObserver(sceneActivationClosure: {  [weak self] in
+            self.nfcActive = false
+            self.sceneObserver = SceneObserver(sceneActivationClosure: { [weak self] in
                 guard let self = self else {
                     return
                 }
@@ -657,7 +671,7 @@ class U2FExtensions: NSObject {
                 getAssertionRequest.allowList = allowList
             }
 
-            executeKeyRequestWith { [weak self] in
+            executeKeyRequest { [weak self] in
                 guard let self = self else {
                     return
                 }
@@ -671,7 +685,7 @@ class U2FExtensions: NSObject {
                         log.error(U2FErrorMessages.ErrorAuthentication.rawValue)
                         return
                     }
-                    guard error == nil else {
+                    if error != nil {
                         self.handleGetAssertion(handle: handle, request: request, error: error)
                         return
                     }
@@ -689,7 +703,7 @@ class U2FExtensions: NSObject {
                             return
                         }
                         
-                        self.sceneObserver = SceneObserver(sceneActivationClosure: {  [weak self] in
+                        self.sceneObserver = SceneObserver(sceneActivationClosure: { [weak self] in
                             guard let self = self else {
                                 return
                             }
@@ -698,7 +712,7 @@ class U2FExtensions: NSObject {
                         })
 
                         // Stop the session to dismiss the Core NFC system UI.
-                        YubiKitManager.shared.nfcSession.stopIso7816Session()
+                        self.nfcActive = false
                     }
                 }
             }
@@ -708,7 +722,7 @@ class U2FExtensions: NSObject {
     }
     
     private func finalizeFIDO2Authentication(handle: Int, response: YKFKeyFIDO2GetAssertionResponse, clientDataJSON: Data, error: NSErrorPointer) {
-        guard error == nil else {
+        if error != nil {
             let errorDescription = error?.pointee?.localizedDescription ?? Strings.U2FAuthenticationError
             sendFIDO2AuthenticationError(handle: handle, errorDescription: errorDescription)
             return
@@ -753,7 +767,7 @@ class U2FExtensions: NSObject {
             guard let self = self else {
                 return
             }
-            self.handlePinVerificationRequired { [weak self] (error) in
+            self.handlePinVerificationRequired { [weak self] error in
                 guard let self = self else {
                     return
                 }
@@ -778,11 +792,11 @@ class U2FExtensions: NSObject {
             }
             
             // In case of NFC stop the session to allow the user to input the PIN (the NFC system action sheet blocks any interaction).
-            YubiKitManager.shared.nfcSession.stopIso7816Session()
+            nfcActive = false
             
             // Observe the scene activation to detect when the Core NFC system UI goes away.
             // For more details about this solution check the comments on SceneObserver.
-            self.sceneObserver = SceneObserver(sceneActivationClosure: {  [weak self] in
+            self.sceneObserver = SceneObserver(sceneActivationClosure: { [weak self] in
                 guard let self = self else {
                     return
                 }
@@ -845,13 +859,17 @@ class U2FExtensions: NSObject {
         ensureMainThread {
             let currentURL = self.tab?.url?.host ?? ""
             self.pinVerificationPopup.addButton(title: Strings.confirmPin, type: .primary) { [weak self] in
+                guard let self = self else {
+                    completion(false)
+                    return .flyDown
+                }
                 // Only show Verification UI for accessory since Core NFC UI
                 // is displayed on top of it
-                if self?.keyType == .accessory {
-                    self?.verificationPendingPopup.update(title: Strings.verificationPending + currentURL)
-                    self?.verificationPendingPopup.showWithType(showType: .flyUp)
+                if self.keyType == .accessory {
+                    self.verificationPendingPopup.update(title: Strings.verificationPending + currentURL)
+                    self.verificationPendingPopup.showWithType(showType: .flyUp)
                 }
-                return self?.verifyPin(completion: completion) ?? .flyDown
+                return self.verifyPin(completion: completion) ?? .flyDown
             }
             self.pinVerificationPopup.showWithType(showType: .flyUp)
         }
@@ -865,7 +883,7 @@ class U2FExtensions: NSObject {
                 return .flyDown
             }
         self.cleanupPinVerificationPopup()
-        self.executeKeyRequestWith { [weak self] in
+        self.executeKeyRequest { [weak self] in
             guard let self = self else {
                 return
             }
@@ -874,13 +892,12 @@ class U2FExtensions: NSObject {
                 return
             }
             
-            fido2Service.execute(verifyPinRequest) { (error) in
-                guard error == nil else {
+            fido2Service.execute(verifyPinRequest) { error in
+                if error != nil {
                     completion(true)
                     return
                 }
                 completion(false)
-                return
             }
         }
         return .flyDown
@@ -933,7 +950,7 @@ class U2FExtensions: NSObject {
             sendFIDORegistrationError(handle: handle, requestId: requestId, errorCode: U2FErrorCodes.bad_request)
             return
         }
-        executeKeyRequestWith { [weak self] in
+        executeKeyRequest { [weak self] in
             guard let self = self else {
                 return
             }
@@ -949,16 +966,13 @@ class U2FExtensions: NSObject {
                     return
                 }
                 
-                guard error == nil else {
+                if error != nil {
                     let errorMessage = error?.localizedDescription ?? Strings.U2FRegistrationError
                     self.sendFIDORegistrationError(handle: handle, requestId: requestId, errorCode: U2FErrorCodes.other_error, errorMessage: errorMessage)
                     return
                 }
-                guard let clientData = response?.clientData.websafeBase64String() else {
-                    self.sendFIDORegistrationError(handle: handle, requestId: requestId, errorCode: U2FErrorCodes.other_error)
-                    return
-                }
-                guard let registrationData = response?.registrationData.websafeBase64String() else {
+                guard let clientData = response?.clientData.websafeBase64String(),
+                    let registrationData = response?.registrationData.websafeBase64String() else {
                     self.sendFIDORegistrationError(handle: handle, requestId: requestId, errorCode: U2FErrorCodes.other_error)
                     return
                 }
@@ -971,7 +985,7 @@ class U2FExtensions: NSObject {
                         return
                     }
 
-                    self.sceneObserver = SceneObserver(sceneActivationClosure: {  [weak self] in
+                    self.sceneObserver = SceneObserver(sceneActivationClosure: { [weak self] in
                         guard let self = self else {
                             return
                         }
@@ -980,7 +994,7 @@ class U2FExtensions: NSObject {
                     })
 
                     // Stop the session to dismiss the Core NFC system UI.
-                    YubiKitManager.shared.nfcSession.stopIso7816Session()
+                    self.nfcActive = false
                 }
             }
         }
@@ -1076,7 +1090,7 @@ class U2FExtensions: NSObject {
                 return
             }
             
-            executeKeyRequestWith { [weak self] in
+            executeKeyRequest { [weak self] in
                 guard let self = self else {
                     return
                 }
@@ -1095,22 +1109,17 @@ class U2FExtensions: NSObject {
                     count -= 1
                     self.fidoRequests[handle] = count
                     
-                    guard error == nil else {
+                    if error != nil {
                         if count == 0 {
                             let errorMessage = error?.localizedDescription ?? Strings.U2FAuthenticationError
                             self.sendFIDOAuthenticationError(handle: handle, requestId: requestId, errorCode: U2FErrorCodes.other_error, errorMessage: errorMessage)
                         }
                         return
                     }
-                    guard let keyHandle = response?.keyHandle else {
-                        self.sendFIDOAuthenticationError(handle: handle, requestId: requestId, errorCode: U2FErrorCodes.other_error)
-                        return
-                    }
-                    guard let signature = response?.signature.websafeBase64String() else {
-                        self.sendFIDOAuthenticationError(handle: handle, requestId: requestId, errorCode: U2FErrorCodes.other_error)
-                        return
-                    }
-                    guard let clientData = response?.clientData.websafeBase64String() else {
+                    guard let keyHandle = response?.keyHandle,
+                    let signature = response?.signature.websafeBase64String(),
+                    let clientData = response?.clientData.websafeBase64String()
+                    else {
                         self.sendFIDOAuthenticationError(handle: handle, requestId: requestId, errorCode: U2FErrorCodes.other_error)
                         return
                     }
@@ -1119,11 +1128,11 @@ class U2FExtensions: NSObject {
                         self.finalizeFIDOAuthentication(requestId: requestId, handle: handle, keyHandle: keyHandle, signature: signature, clientData: clientData)
                     } else {
                         guard #available(iOS 13.0, *) else {
-                            self.sendFIDORegistrationError(handle: handle, requestId: requestId, errorCode: U2FErrorCodes.other_error)
+                            self.sendFIDOAuthenticationError(handle: handle, requestId: requestId, errorCode: U2FErrorCodes.other_error)
                             return
                         }
 
-                        self.sceneObserver = SceneObserver(sceneActivationClosure: {  [weak self] in
+                        self.sceneObserver = SceneObserver(sceneActivationClosure: { [weak self] in
                             guard let self = self else {
                                 return
                             }
@@ -1132,7 +1141,7 @@ class U2FExtensions: NSObject {
                         })
 
                         // Stop the session to dismiss the Core NFC system UI.
-                        YubiKitManager.shared.nfcSession.stopIso7816Session()
+                        self.nfcActive = false
                     }
                     self.fidoRequests[handle] = authSuccess
                 }
@@ -1196,7 +1205,7 @@ class U2FExtensions: NSObject {
         cleanup()
     }
     
-    private func executeKeyRequestWith(execution: @escaping () -> Void) {
+    private func executeKeyRequest(execution: @escaping () -> Void) {
         if keyType == .accessory {
             // Execute the request right away.
             execution()
@@ -1223,20 +1232,25 @@ class U2FExtensions: NSObject {
             
             // Execute the request after the key(tag) is connected.
             nfcSesionStateObservation = nfcSession.observe(\.iso7816SessionState, changeHandler: { [weak self] session, change in
-                if session.iso7816SessionState == .open {
-                    execution()
-                    self?.nfcActive = false
-                    self?.nfcSesionStateObservation = nil // remove the observation
+                guard let self = self else {
+                    log.error(U2FErrorMessages.Error.rawValue)
+                    return
                 }
                 
-                if self?.nfcActive ?? false, session.iso7816SessionState == .closed {
+                if session.iso7816SessionState == .open {
+                    execution()
+                    self.nfcSesionStateObservation = nil // remove the observation
+                    return
+                }
+                
+                if self.nfcActive, session.iso7816SessionState == .closed {
                     // Session invalidated by user error is triggered for many cases
                     // and is not a consistent way to track when user explicitly clicked
                     // cancel. So we track for instances when nfcState is set to closed
                     // without calling stopIso7816session
-                    self?.sendJSError()
-                    self?.nfcActive = false
-                    self?.nfcSesionStateObservation = nil // remove the observation
+                    self.sendJSError()
+                    self.nfcActive = false
+                    self.nfcSesionStateObservation = nil // remove the observation
                 }
             })
         }
@@ -1253,7 +1267,6 @@ class U2FExtensions: NSObject {
             if accessoryState == .open {
                 if nfcActive, #available(iOS 13.0, *) {
                     nfcActive = false
-                    YubiKitManager.shared.nfcSession.stopIso7816Session()
                 }
                 keyType = .accessory
             }

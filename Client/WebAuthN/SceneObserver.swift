@@ -27,7 +27,7 @@ class SceneObserver: NSObject {
     private var sceneActivationClosure: () -> Void
     
     // MARK: - Object lifecycle
-    
+    @available(iOS 13.0, *)
     init(sceneActivationClosure: @escaping () -> Void) {
         self.window = SceneObserver.applicationWindow
         self.sceneActivationClosure = sceneActivationClosure
