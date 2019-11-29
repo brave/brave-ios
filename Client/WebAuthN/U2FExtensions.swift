@@ -201,29 +201,25 @@ class U2FExtensions: NSObject {
     
     /// Returns the service associated with the desired session.
     private var keyFido2Service: YKFKeyFIDO2ServiceProtocol? {
-        get {
-            if keyType == .accessory {
-                return YubiKitManager.shared.accessorySession.fido2Service
-            } else {
-                if #available(iOS 13.0, *) {
-                    return YubiKitManager.shared.nfcSession.fido2Service
-                }
+        if keyType == .accessory {
+            return YubiKitManager.shared.accessorySession.fido2Service
+        } else {
+            if #available(iOS 13.0, *) {
+                return YubiKitManager.shared.nfcSession.fido2Service
             }
-            return nil
         }
+        return nil
     }
     
     private var keyU2fService: YKFKeyU2FServiceProtocol? {
-        get {
-            if keyType == .accessory {
-                return YubiKitManager.shared.accessorySession.u2fService
-            } else {
-                if #available(iOS 13.0, *) {
-                    return YubiKitManager.shared.nfcSession.u2fService
-                }
+        if keyType == .accessory {
+            return YubiKitManager.shared.accessorySession.u2fService
+        } else {
+            if #available(iOS 13.0, *) {
+                return YubiKitManager.shared.nfcSession.u2fService
             }
-            return nil
         }
+        return nil
     }
 
     init(tab: Tab) {
