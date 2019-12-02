@@ -460,6 +460,7 @@ extension Strings {
     public static let NewTabPageSettingsTitle = NSLocalizedString("NewTabPageSettingsTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "New Tab Page", comment: "Title on settings page to adjust the primary home screen functionality.")
     public static let NewTabPageSettingsBackgroundImages = NSLocalizedString("NewTabPageSettingsBackgroundImages", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Show Background Images", comment: "A setting to enable or disable background images on the main screen.")
     public static let NewTabPageSettingsSponsoredImages = NSLocalizedString("NewTabPageSettingsSponsoredImages", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Show Sponsored Images", comment: "A setting to enable or disable sponsored images from showing on the main screen.")
+    public static let NewTabPageSettingsAutoOpenKeyboard = NSLocalizedString("NewTabPageSettingsAutoOpenKeyboard", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Auto Open Keyboard", comment: "A setting to enable or disable the device's keyboard from opening automatically when creating a new tab.")
     public static let NewTabPageShowMoreFavorites = NSLocalizedString("NewTabPageShowMoreFavorites", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Show More", comment: "A button title to show more bookmarks, that opens a new menu.")
 
 }

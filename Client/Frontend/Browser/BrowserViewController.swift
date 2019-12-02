@@ -1337,7 +1337,7 @@ class BrowserViewController: UIViewController {
         let freshTab = tabManager.selectedTab
         
         // Focus field only if requested and background images are not supported
-        if attemptLocationFieldFocus && !Preferences.NewTabPage.backgroundImages.value {
+        if attemptLocationFieldFocus && Preferences.NewTabPage.autoOpenKeyboard.value {
             DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(300)) {
                 // Without a delay, the text field fails to become first responder
                 // Check that the newly created tab is still selected.
