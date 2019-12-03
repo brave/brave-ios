@@ -71,6 +71,30 @@ class FavoritesViewController: UIViewController, Themeable {
         button.snp.makeConstraints { $0.edges.equalToSuperview() }
     }
     
+    // Needs to be own variable in order to dynamically set title contents
+    private let imageCreditInternalButton = UIButton(type: .system).then {
+        $0.appearanceTextColor = .white
+        $0.titleLabel?.font = UIFont.systemFont(ofSize: 12.0, weight: .medium)
+        $0.addTarget(self, action: #selector(showImageCredit), for: .touchUpInside)
+    }
+    
+    private lazy var imageCreditButton = UIView().then {
+        let blur = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
+        $0.clipsToBounds = true
+        $0.layer.cornerRadius = 4
+        
+        $0.addSubview(blur)
+        $0.addSubview(imageCreditInternalButton)
+        
+        blur.snp.makeConstraints { $0.edges.equalToSuperview() }
+        imageCreditInternalButton.snp.makeConstraints {
+            $0.top.bottom.equalToSuperview()
+            let padding = 10
+            $0.left.equalToSuperview().offset(padding)
+            $0.right.equalToSuperview().inset(padding)
+        }
+    }
+    
     private let ddgLogo = UIImageView(image: #imageLiteral(resourceName: "duckduckgo"))
     
     private let ddgLabel = UILabel().then {
@@ -171,6 +195,7 @@ class FavoritesViewController: UIViewController, Themeable {
         collection.addSubview(braveShieldStatsView)
         collection.addSubview(favoritesOverflowButton)
         collection.addSubview(ddgButton)
+        collection.addSubview(imageCreditButton)
         
         ddgButton.addSubview(ddgLogo)
         ddgButton.addSubview(ddgLabel)
@@ -255,7 +280,10 @@ class FavoritesViewController: UIViewController, Themeable {
         if gesture.state != .began {
             return
         }
-        
+        showImageCredit()
+    }
+    
+    @objc fileprivate func showImageCredit() {
         guard let credit = backgroundImage.info?.credit else {
             // No gesture action of no credit available
             return
@@ -304,6 +332,15 @@ class FavoritesViewController: UIViewController, Themeable {
             $0.height.equalTo(24)
             $0.width.equalTo(84)
         }
+        
+        imageCreditButton.snp.makeConstraints {
+            let borderPadding = 20
+            $0.bottom.equalTo(self.view.snp.bottom).inset(borderPadding)
+            $0.left.equalToSuperview().offset(borderPadding)
+            $0.height.equalTo(24)
+            // Width and therefore, right constraint is determined by the actual button inside of this view
+            //  button is resized from text content, and this superview is pinned to that width.
+        }
     }
     
     // MARK: - Private browsing modde
@@ -327,12 +364,24 @@ class FavoritesViewController: UIViewController, Themeable {
         collection.collectionViewLayout.invalidateLayout()
     }
     
+    private func setupImageCredit() {
+        guard let name = backgroundImage.info?.credit?.name else {
+            imageCreditInternalButton.isHidden = true
+            return
+        }
+        
+        imageCreditInternalButton.isHidden = false
+        let photoByText = String(format: Strings.PhotoBy, name)
+        imageCreditInternalButton.setTitle(photoByText, for: .normal)
+    }
+    
     private func setupBackgroundImage() {
         guard var background = backgroundImage.info,
             let image = background.image else {
             return
         }
         
+        setupImageCredit()
         let imageAspectRatio = image.size.width / image.size.height
         let imageView = UIImageView(image: image)
         
