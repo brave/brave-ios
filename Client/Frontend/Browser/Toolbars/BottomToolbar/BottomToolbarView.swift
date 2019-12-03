@@ -38,11 +38,15 @@ class BottomToolbarView: UIView, ToolbarProtocol {
         addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(didSwipeToolbar(_:))))
     }
     
-    var isSearchButtonEnabled: Bool = false {
+    private var isSearchButtonEnabled: Bool = false {
         didSet {
             addTabButton.isHidden = isSearchButtonEnabled
             searchButton.isHidden = !addTabButton.isHidden
         }
+    }
+    
+    func setSearchButtonState(url: URL?) {
+        isSearchButtonEnabled = url?.isAboutHomeURL ?? false
     }
 
     override func updateConstraints() {

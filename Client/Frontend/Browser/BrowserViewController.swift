@@ -334,6 +334,7 @@ class BrowserViewController: UIViewController {
 
         if showToolbar {
             toolbar = BottomToolbarView()
+            toolbar?.setSearchButtonState(url: tabManager.selectedTab?.url)
             footer.addSubview(toolbar!)
             toolbar?.tabToolbarDelegate = self
 
@@ -1475,7 +1476,7 @@ class BrowserViewController: UIViewController {
 
         if let url = webView.url {
             // Whether to show search icon or + icon
-            self.toolbar?.isSearchButtonEnabled = url.isAboutHomeURL
+            toolbar?.setSearchButtonState(url: url)
             
             if !url.isErrorPageURL, !url.isAboutHomeURL, !url.isFileURL {
                 // Fire the readability check. This is here and not in the pageShow event handler in ReaderMode.js anymore
@@ -2235,7 +2236,8 @@ extension BrowserViewController: TabManagerDelegate {
             wv.accessibilityIdentifier = nil
             wv.removeFromSuperview()
         }
-
+        
+        toolbar?.setSearchButtonState(url: selected?.url)
         if let tab = selected, let webView = tab.webView {
             updateURLBar()
             
