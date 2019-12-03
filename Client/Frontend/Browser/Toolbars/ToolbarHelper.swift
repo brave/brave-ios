@@ -32,6 +32,10 @@ class ToolbarHelper: NSObject {
         toolbar.addTabButton.addTarget(self, action: #selector(didClickAddTab), for: UIControl.Event.touchUpInside)
         toolbar.addTabButton.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(didLongPressAddTab(_:))))
         
+        toolbar.searchButton.setImage(#imageLiteral(resourceName: "ntp-search"), for: .normal)
+        toolbar.searchButton.accessibilityLabel = Strings.TabToolbarAddTabButtonAccessibilityLabel
+        toolbar.searchButton.addTarget(self, action: #selector(didClickSearch), for: UIControl.Event.touchUpInside)
+
         toolbar.menuButton.setImage(#imageLiteral(resourceName: "menu_more").template, for: .normal)
         toolbar.menuButton.accessibilityLabel = Strings.TabToolbarMenuButtonAccessibilityLabel
         toolbar.menuButton.addTarget(self, action: #selector(didClickMenu), for: UIControl.Event.touchUpInside)
@@ -81,6 +85,10 @@ class ToolbarHelper: NSObject {
     
     func didClickAddTab() {
         toolbar.tabToolbarDelegate?.tabToolbarDidPressAddTab(toolbar, button: toolbar.shareButton)
+    }
+    
+    func didClickSearch() {
+        toolbar.tabToolbarDelegate?.tabToolbarDidPressSearch(toolbar, button: toolbar.searchButton)
     }
     
     func didLongPressAddTab(_ longPress: UILongPressGestureRecognizer) {

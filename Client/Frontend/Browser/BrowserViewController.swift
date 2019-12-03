@@ -1327,7 +1327,7 @@ class BrowserViewController: UIViewController {
         switchToPrivacyMode(isPrivate: isPrivate)
         _ = tabManager.addTabAndSelect(request, isPrivate: isPrivate)
         if url == nil && NewTabAccessors.getNewTabPage() == .blankPage {
-            topToolbar.tabLocationViewDidTapLocation(topToolbar.locationView)
+            focusLocationField()
         }
     }
 
@@ -1343,7 +1343,7 @@ class BrowserViewController: UIViewController {
                 // Check that the newly created tab is still selected.
                 // This let's the user spam the Cmd+T button without lots of responder changes.
                 guard freshTab == self.tabManager.selectedTab else { return }
-                self.topToolbar.tabLocationViewDidTapLocation(self.topToolbar.locationView)
+                self.focusLocationField()
                 if let text = searchText {
                     self.topToolbar.setLocation(text, search: true)
                 }
@@ -1474,6 +1474,9 @@ class BrowserViewController: UIViewController {
         }
 
         if let url = webView.url {
+            // Whether to show search icon or + icon
+            self.toolbar?.isSearchButtonEnabled = url.isAboutHomeURL
+            
             if !url.isErrorPageURL, !url.isAboutHomeURL, !url.isFileURL {
                 // Fire the readability check. This is here and not in the pageShow event handler in ReaderMode.js anymore
                 // because that event wil not always fire due to unreliable page caching. This will either let us know that
@@ -1520,6 +1523,10 @@ class BrowserViewController: UIViewController {
                 tab.desktopSite = Preferences.General.alwaysRequestDesktopSite.value
             }
         }
+    }
+    
+    private func focusLocationField() {
+        topToolbar.tabLocationViewDidTapLocation(topToolbar.locationView)
     }
     
     // MARK: - Browser PIN Callout
@@ -1891,6 +1898,10 @@ extension BrowserViewController: TopToolbarDelegate {
 }
 
 extension BrowserViewController: ToolbarDelegate {
+    func tabToolbarDidPressSearch(_ tabToolbar: ToolbarProtocol, button: UIButton) {
+        focusLocationField()
+    }
+    
     func tabToolbarDidPressBack(_ tabToolbar: ToolbarProtocol, button: UIButton) {
         tabManager.selectedTab?.goBack()
     }
