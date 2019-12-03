@@ -67,6 +67,10 @@ public final class Domain: NSManagedObject, CRUD {
         setBraveShieldInternal(forUrl: url, shield: shield, isOn: isOn, context: _context)
     }
     
+    public func isAllShieldsOff() -> Bool {
+        return Bool(truncating: shield_allOff ?? NSNumber(value: 0))
+    }
+    
     /// Whether or not a given shield should be enabled based on domain exceptions and the users global preference
     public func isShieldExpected(_ shield: BraveShield) -> Bool {
         switch shield {
