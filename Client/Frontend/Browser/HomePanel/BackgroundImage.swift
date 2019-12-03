@@ -11,6 +11,7 @@ class BackgroundImage {
     struct Background {
         let imageFileName: String
         let center: CGFloat
+        let isSponsored: Bool
         let credit: (name: String, url: String?)?
         
         lazy var image: UIImage? = {
@@ -88,25 +89,25 @@ class BackgroundImage {
             return today > start && today < end
         }
         
-        return generateBackgroundData(data: live)
+        return generateBackgroundData(data: live, isSponsored: true)
     }
     
     private static func generateStandardData(file: String) -> [Background] {
         guard let json = BackgroundImage.loadImageJSON(file: file) else { return [] }
-        return generateBackgroundData(data: json)
+        return generateBackgroundData(data: json, isSponsored: false)
     }
     
-    private static func generateBackgroundData(data: [[String: Any]]) -> [Background] {
+    private static func generateBackgroundData(data: [[String: Any]], isSponsored: Bool) -> [Background] {
         return data.compactMap { item in
             guard let image = item["image"] as? String,
                 let center = item["center"] as? CGFloat else { return nil }
             
             if let credit = item["credit"] as? [String: String],
                 let name = credit["name"] {
-                return Background(imageFileName: image, center: center, credit: (name, credit["url"]))
+                return Background(imageFileName: image, center: center, isSponsored: isSponsored, credit: (name, credit["url"]))
             }
             
-            return Background(imageFileName: image, center: center, credit: nil)
+            return Background(imageFileName: image, center: center, isSponsored: isSponsored, credit: nil)
         }
     }
     

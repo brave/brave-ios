@@ -365,12 +365,14 @@ class FavoritesViewController: UIViewController, Themeable {
     }
     
     private func setupImageCredit() {
-        guard let name = backgroundImage.info?.credit?.name else {
-            imageCreditInternalButton.isHidden = true
-            return
+        var hideImageCredit = true
+        defer {
+            imageCreditButton.isHidden = hideImageCredit
         }
         
-        imageCreditInternalButton.isHidden = false
+        guard let info = backgroundImage.info, let name = info.credit?.name else { return }
+        
+        hideImageCredit = info.isSponsored
         let photoByText = String(format: Strings.PhotoBy, name)
         imageCreditInternalButton.setTitle(photoByText, for: .normal)
     }
