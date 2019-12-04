@@ -173,6 +173,13 @@ class FavoritesViewController: UIViewController, Themeable {
         let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongGesture(gesture:)))
         collection.addGestureRecognizer(longPressGesture)
         
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTapGesture(gesture:)))
+        // Adding a clear background for tap gestures, otherwise impossible to tap other buttons / icons on NTP
+        let background = UIView()
+        background.backgroundColor = .clear
+        background.addGestureRecognizer(tapGesture)
+        collection.backgroundView = background
+        
         view.addSubview(collection)
         collection.dataSource = dataSource
         dataSource.collectionView = collection
@@ -272,6 +279,13 @@ class FavoritesViewController: UIViewController, Themeable {
             collection.endInteractiveMovement()
         default:
             collection.cancelInteractiveMovement()
+        }
+    }
+    
+    @objc func handleTapGesture(gesture: UITapGestureRecognizer) {
+        // Tap gesture only actionable with sponsored images.
+        if backgroundImage.info?.isSponsored == true && gesture.state == .ended {
+            showImageCredit()
         }
     }
     
