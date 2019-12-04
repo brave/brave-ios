@@ -225,8 +225,6 @@ extension BrowserViewController: WKNavigationDelegate {
                     domainForShields.isAllShieldsOff()
                     ||
                     !domainForShields.isShieldExpected(.NoScript)
-                
-                print(webView.configuration.preferences.javaScriptEnabled)
             }
             
             //Cookie Blocking code below
