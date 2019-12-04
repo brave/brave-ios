@@ -284,7 +284,7 @@ class FavoritesViewController: UIViewController, Themeable {
     
     @objc func handleTapGesture(gesture: UITapGestureRecognizer) {
         // Tap gesture only actionable with sponsored images.
-        if backgroundImage.info?.isSponsored == true && gesture.state == .ended {
+        if gesture.state == .ended && backgroundImage.info?.isSponsored == true {
             showImageCredit()
         }
     }

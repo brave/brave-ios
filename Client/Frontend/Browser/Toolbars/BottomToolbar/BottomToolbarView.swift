@@ -46,7 +46,7 @@ class BottomToolbarView: UIView, ToolbarProtocol {
     }
     
     func setSearchButtonState(url: URL?) {
-        isSearchButtonEnabled = url?.isAboutHomeURL ?? false
+        isSearchButtonEnabled = url?.isAboutHomeURL == true
     }
 
     override func updateConstraints() {
