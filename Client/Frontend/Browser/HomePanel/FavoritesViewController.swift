@@ -72,7 +72,7 @@ class FavoritesViewController: UIViewController, Themeable {
     }
     
     // Needs to be own variable in order to dynamically set title contents
-    private let imageCreditInternalButton = UIButton(type: .system).then {
+    private lazy var imageCreditInternalButton = UIButton(type: .system).then {
         $0.appearanceTextColor = .white
         $0.titleLabel?.font = UIFont.systemFont(ofSize: 12.0, weight: .medium)
         $0.addTarget(self, action: #selector(showImageCredit), for: .touchUpInside)
