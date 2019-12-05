@@ -307,7 +307,7 @@ class FavoritesViewController: UIViewController, Themeable {
         let alert = UIAlertController(title: credit.name, message: nil, preferredStyle: .actionSheet)
         
         if let creditWebsite = credit.url, let creditURL = URL(string: creditWebsite) {
-            let websiteTitle = String(format: Strings.ViewOn, creditURL.hostSLD.capitalized)
+            let websiteTitle = String(format: Strings.ViewOn, creditURL.hostSLD.capitalizeFirstLetter)
             alert.addAction(UIAlertAction(title: websiteTitle, style: .default) { [weak self] _ in
                 self?.delegate?.didSelect(input: creditWebsite)
             })
