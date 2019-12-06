@@ -21,7 +21,8 @@ class SafeBrowsingClient {
     private static let clientId = AppInfo.baseBundleIdentifier
     private static let version = AppInfo.appVersion
     
-    private let baseURL = "https://safebrowsing.brave.com"
+    private let userAgent = UserAgent.defaultUserAgent()
+    private let baseURL = "https://safebrowsing-ios.brave.com" //"https://safebrowsing.brave.com"
     private let session = URLSession(configuration: .ephemeral)
     private let database = SafeBrowsingDatabase()
     private let cache = SafeBrowsingCache()
@@ -231,6 +232,7 @@ class SafeBrowsingClient {
         request.httpMethod = method.rawValue
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.setValue(self.userAgent, forHTTPHeaderField: "User-Agent")
         request.httpBody = try JSONEncoder().encode(body)
         
         return request
