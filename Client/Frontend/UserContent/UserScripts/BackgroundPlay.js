@@ -18,7 +18,7 @@ var $<backgroundMediaPlaybackController> = (function() {
             if (_maskedState && _maskedState.configurable) {
                 Object.defineProperty(document, 'visibilityState', {
                     get: function () {
-                        if (enabled) {
+                        if (isBackgroundPlayEnabled) {
                             return "visible";
                         }
                         return _maskedState.get.call(document);
