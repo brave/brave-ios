@@ -2863,16 +2863,22 @@ extension BrowserViewController: ContextMenuHelperDelegate {
     @objc
     private func image(image: UIImage, didFinishSavingwithError error: NSError?, contextInfo: UnsafeRawPointer?) {
         
-        if error != nil {
-            let accessDenied = UIAlertController(title: Strings.AccessPhotoDeniedAlertTitle, message: Strings.AccessPhotoDeniedAlertMessage, preferredStyle: .alert)
-            let dismissAction = UIAlertAction(title: Strings.CancelButtonTitle, style: .default, handler: nil)
-            accessDenied.addAction(dismissAction)
-            let settingsAction = UIAlertAction(title: Strings.OpenPhoneSettingsActionTitle, style: .default ) { _ in
-                UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!, options: [:])
-            }
-            accessDenied.addAction(settingsAction)
-            self.present(accessDenied, animated: true, completion: nil)
+        if error == nil {
+            return
         }
+        
+        guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
+            return
+        }
+        
+        let accessDenied = UIAlertController(title: Strings.AccessPhotoDeniedAlertTitle, message: Strings.AccessPhotoDeniedAlertMessage, preferredStyle: .alert)
+        let dismissAction = UIAlertAction(title: Strings.CancelButtonTitle, style: .default, handler: nil)
+        accessDenied.addAction(dismissAction)
+        let settingsAction = UIAlertAction(title: Strings.OpenPhoneSettingsActionTitle, style: .default ) { _ in
+            UIApplication.shared.open(settingsUrl, options: [:])
+        }
+        accessDenied.addAction(settingsAction)
+        self.present(accessDenied, animated: true, completion: nil)
     }
     
     func contextMenuHelper(_ contextMenuHelper: ContextMenuHelper, didLongPressElements elements: ContextMenuHelper.Elements, gestureRecognizer: UIGestureRecognizer) {
