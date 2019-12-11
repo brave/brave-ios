@@ -127,6 +127,7 @@ private class UserWalletSummarySectionView: SettingsSectionView {
   }
   
   let nameLabel = UILabel().then {
+    $0.appearanceTextColor = .black
     $0.font = .systemFont(ofSize: 15.0)
   }
   
