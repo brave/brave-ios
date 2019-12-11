@@ -52,6 +52,7 @@ internal extension Strings {
   static let AddFundsTitle = NSLocalizedString("BraveRewardsAddFundsTitle", bundle: Bundle.RewardsUI, value: "Send cryptocurrency from your external account to your Brave Rewards wallet.", comment: "")
   static let NotificationAutoContributeTitle = NSLocalizedString("BraveRewardsNotificationAutoContributeTitle", bundle: Bundle.RewardsUI, value: "Auto-Contribute", comment: "")
   static let AddFunds = NSLocalizedString("BraveRewardsAddFunds", bundle: Bundle.RewardsUI, value: "Add Funds", comment: "")
+  static let WithdrawFunds = NSLocalizedString("BraveRewardsWithdrawFunds", bundle: Bundle.RewardsUI, value: "Withdraw Funds", comment: "")
   static let EmptyTipsText = NSLocalizedString("BraveRewardsEmptyTipsText", bundle: Bundle.RewardsUI, value: "Have you tipped your favorite content creator today?", comment: "")
   static let Settings = NSLocalizedString("BraveRewardsSettings", bundle: Bundle.RewardsUI, value: "Settings", comment: "")
   static let AutoContributeMinimumVisits = NSLocalizedString("BraveRewardsAutoContributeMinimumVisits", bundle: Bundle.RewardsUI, value: "Minimum Visits", comment: "")

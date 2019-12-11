@@ -70,24 +70,24 @@ class WalletHeaderView: UIView {
     $0.contentEdgeInsets = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10.0)
   }
   
-  let addFundsButton = UIButton(type: .system).then {
-    $0.appearanceTextColor = UIColor(white: 1.0, alpha: 0.75)
+  let addFundsButton = Button(type: .system).then {
+    $0.appearanceTintColor = UIColor(white: 1.0, alpha: 0.75)
     $0.setTitle(Strings.AddFunds, for: .normal)
-    $0.setImage(UIImage(frameworkResourceNamed: "wallet-icon").alwaysOriginal, for: .normal)
-    $0.imageEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 8.0)
-    $0.titleEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: -8.0)
-    $0.contentEdgeInsets = UIEdgeInsets(top: 0, left: 5.0, bottom: 0, right: 5.0)
+    $0.setImage(UIImage(frameworkResourceNamed: "add-funds-icon").alwaysTemplate, for: .normal)
+    $0.imageEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 8)
+    $0.titleEdgeInsets = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 0)
+    $0.contentEdgeInsets = UIEdgeInsets(top: 10, left: 5.0, bottom: 10, right: 5.0)
     $0.titleLabel?.font = .systemFont(ofSize: 14.0)
     $0.setContentCompressionResistancePriority(.required, for: .horizontal)
     $0.isHidden = true
   }
   
-  let settingsButton = UIButton(type: .system).then {
+  let settingsButton = Button(type: .system).then {
     $0.appearanceTextColor = UIColor(white: 1.0, alpha: 0.75)
     $0.setTitle(Strings.Settings, for: .normal)
     $0.setImage(UIImage(frameworkResourceNamed: "bat-small").alwaysOriginal, for: .normal)
     $0.imageEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 8.0)
-    $0.titleEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: -8.0)
+    $0.titleEdgeInsets = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 0)
     $0.contentEdgeInsets = UIEdgeInsets(top: 10.0, left: 5.0, bottom: 10.0, right: 5.0)
     $0.titleLabel?.font = .systemFont(ofSize: 14.0)
     $0.setContentCompressionResistancePriority(.required, for: .horizontal)

@@ -15,5 +15,5 @@ typedef NS_ENUM(NSInteger, BATLogLevel) {
 
 typedef NSString *BATExternalWalletType NS_STRING_ENUM;
 
-BATExternalWalletType const BATExternalWalletTypeUphold = @"uphold";
+static BATExternalWalletType const BATExternalWalletTypeUphold = @"uphold";
 
