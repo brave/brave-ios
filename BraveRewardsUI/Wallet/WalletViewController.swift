@@ -681,6 +681,9 @@ extension WalletViewController {
       guard let self = self, publisherKey == self.publisher?.id else { return }
       self.fetchPublisherActivity()
     }
+    ledgerObserver.externalWalletAuthorized = { [weak self] _ in
+      self?.updateWalletHeader()
+    }
     ledgerObserver.balanceReportUpdated = { [weak self] in
       guard let self = self, self.isViewLoaded else {
         return

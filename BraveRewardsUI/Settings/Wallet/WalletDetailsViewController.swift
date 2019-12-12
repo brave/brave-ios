@@ -17,13 +17,7 @@ class WalletDetailsViewController: UIViewController, RewardsSummaryProtocol {
     state.ledger.add(ledgerObserver)
     super.init(nibName: nil, bundle: nil)
     setupLedgerObservers()
-    if Preferences.Rewards.isUsingBAP.value == false {
-      state.ledger.externalWallet(forType: .uphold) { [weak self] wallet in
-        guard let self = self else { return }
-        self.userWallet = wallet
-        self.reloadWalletState()
-      }
-    }
+    reloadUserWallet()
   }
 
   @available(*, unavailable)
@@ -39,7 +33,16 @@ class WalletDetailsViewController: UIViewController, RewardsSummaryProtocol {
     return view as! View // swiftlint:disable:this force_cast
   }
   
-  private func reloadWalletState() {
+  private func reloadUserWallet() {
+    if Preferences.Rewards.isUsingBAP.value == true { return }
+    state.ledger.externalWallet(forType: .uphold) { [weak self] wallet in
+      guard let self = self else { return }
+      self.userWallet = wallet
+      self.updateWalletStateUI()
+    }
+  }
+  
+  private func updateWalletStateUI() {
     guard let wallet = userWallet, isViewLoaded else { return }
     detailsView.walletSection.setButtonType(
       wallet.status == .verified ? .manageFunds : .none,
@@ -59,7 +62,7 @@ class WalletDetailsViewController: UIViewController, RewardsSummaryProtocol {
     
     detailsView.walletSection.addFundsButton.addTarget(self, action: #selector(tappedAddFunds), for: .touchUpInside)
     detailsView.walletSection.withdrawFundsButton.addTarget(self, action: #selector(tappedWithdrawFunds), for: .touchUpInside)
-    reloadWalletState()
+    updateWalletStateUI()
     
     detailsView.activityView.monthYearLabel.text = summaryPeriod
     detailsView.activityView.rows = summaryRows
@@ -119,6 +122,9 @@ class WalletDetailsViewController: UIViewController, RewardsSummaryProtocol {
           })
         })
       })
+    }
+    ledgerObserver.externalWalletAuthorized = { [weak self] _ in
+      self?.reloadUserWallet()
     }
   }
 }
