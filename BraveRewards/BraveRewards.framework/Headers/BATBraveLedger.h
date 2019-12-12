@@ -20,6 +20,10 @@ extern NSString * const BATBraveLedgerErrorDomain NS_SWIFT_NAME(BraveLedgerError
 
 extern NSNotificationName const BATBraveLedgerNotificationAdded NS_SWIFT_NAME(BraveLedger.NotificationAdded);
 
+typedef NSString *BATBraveGeneralLedgerNotificationID NS_SWIFT_NAME(GeneralLedgerNotificationID) NS_STRING_ENUM;
+extern BATBraveGeneralLedgerNotificationID const BATBraveGeneralLedgerNotificationIDWalletNowVerified;
+extern BATBraveGeneralLedgerNotificationID const BATBraveGeneralLedgerNotificationIDWalletDisconnected;
+
 NS_SWIFT_NAME(BraveLedger)
 @interface BATBraveLedger : NSObject
 

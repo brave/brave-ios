@@ -287,5 +287,9 @@ internal extension Strings {
   static let UserWalletDetailsAccountButtonTitle = NSLocalizedString("UserWalletDetailsAccountButtonTitle", bundle: Bundle.RewardsUI, value: "Go to my Uphold account", comment: "")
   static let UserWalletDetailsCompleteVerificationButtonTitle = NSLocalizedString("UserWalletDetailsCompleteVerificationButtonTitle", bundle: Bundle.RewardsUI, value: "Complete wallet verification", comment: "")
   static let UserWalletDetailsDisconnectButtonTitle = NSLocalizedString("UserWalletDetailsDisconnectButtonTitle", bundle: Bundle.RewardsUI, value: "Disconnect from Brave Rewards", comment: "")
+  static let UserWalletNotificationWalletDisconnectedTitle = NSLocalizedString("UserWalletNotificationWalletDisconnectedTitle", bundle: Bundle.RewardsUI, value: "Uh oh. Your wallet is unreachable.", comment: "The message you receive when your user wallet is unreachable/disconnected")
+  static let UserWalletNotificationWalletDisconnectedBody = NSLocalizedString("UserWalletNotificationWalletDisconnectedBody", bundle: Bundle.RewardsUI, value: "No worries. This can happen for a variety of security reasons. Reconnecting your wallet will solve this issue.", comment: "The message you receive when your user wallet is unreachable/disconnected")
+  static let UserWalletNotificationNowVerifiedTitle = NSLocalizedString("UserWalletNotificationNowVerifiedTitle", bundle: Bundle.RewardsUI, value: "Your wallet is verified!", comment: "The message you receive when your user wallet has been verified")
+  static let UserWalletNotificationNowVerifiedBody = NSLocalizedString("UserWalletNotificationNowVerifiedBody", bundle: Bundle.RewardsUI, value: "Congrats! Your %@ wallet was successfully verified and ready to add and withdraw funds.", comment: "The message you receive when your user wallet has been verified (%@ = The user wallet name, such as \"Uphold\")")
 }
 
