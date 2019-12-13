@@ -27,6 +27,17 @@ class FavoritesViewController: UIViewController, Themeable {
     
     weak var delegate: TopSitesDelegate?
     
+    private lazy var scrollView = UIScrollView(frame: CGRect.zero).then {
+        $0.alwaysBounceVertical = false
+        $0.alwaysBounceHorizontal = true
+        $0.isPagingEnabled = true
+        $0.isDirectionalLockEnabled = true
+        $0.showsHorizontalScrollIndicator = false
+        $0.showsVerticalScrollIndicator = false
+    }
+    
+    private lazy var widgetsView = WidgetsView()
+    
     // MARK: - Favorites collection view properties
     private (set) internal lazy var collection: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -39,8 +50,7 @@ class FavoritesViewController: UIViewController, Themeable {
         
             let cellIdentifier = FavoriteCell.identifier
             $0.register(FavoriteCell.self, forCellWithReuseIdentifier: cellIdentifier)
-            $0.keyboardDismissMode = .onDrag
-            $0.alwaysBounceVertical = true
+            $0.alwaysBounceVertical = false
             $0.accessibilityIdentifier = "Top Sites View"
             // Entire site panel, including the stats view insets
             $0.contentInset = UIEdgeInsets(top: UI.statsHeight, left: 0, bottom: 0, right: 0)
@@ -171,6 +181,8 @@ class FavoritesViewController: UIViewController, Themeable {
         // Setup gradient regardless of background image, can internalize to setup background image if only wanted for images.
         view.layer.addSublayer(gradientOverlay())
         
+        view.addSubview(scrollView)
+        
         let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongGesture(gesture:)))
         collection.addGestureRecognizer(longPressGesture)
         
@@ -181,7 +193,7 @@ class FavoritesViewController: UIViewController, Themeable {
         background.addGestureRecognizer(tapGesture)
         collection.backgroundView = background
         
-        view.addSubview(collection)
+        scrollView.addSubview(collection)
         collection.dataSource = dataSource
         dataSource.collectionView = collection
         
@@ -208,6 +220,8 @@ class FavoritesViewController: UIViewController, Themeable {
         ddgButton.addSubview(ddgLogo)
         ddgButton.addSubview(ddgLabel)
         
+        scrollView.addSubview(widgetsView)
+        
         makeConstraints()
         
         Preferences.NewTabPage.backgroundImages.observe(from: self)
@@ -233,9 +247,11 @@ class FavoritesViewController: UIViewController, Themeable {
         super.viewDidLayoutSubviews()
         
         // This makes collection view layout to recalculate its cell size.
-        collection.collectionViewLayout.invalidateLayout()
+//        collection.collectionViewLayout.invalidateLayout()
         favoritesOverflowButton.isHidden = !dataSource.hasOverflow
         collection.reloadSections(IndexSet(arrayLiteral: 0))
+        
+        scrollView.contentSize = CGSize(width: view.frame.width * 2, height: view.frame.height)
         
         if let backgroundImageView = backgroundViewInfo?.imageView, let image = backgroundImageView.image {
             // Need to calculate the sizing difference between `image` and `imageView` to determine the pixel difference ratio
@@ -323,22 +339,34 @@ class FavoritesViewController: UIViewController, Themeable {
     
     // MARK: - Constraints setup
     fileprivate func makeConstraints() {
-        collection.snp.makeConstraints { make in
-            make.left.right.equalTo(self.view.safeAreaLayoutGuide)
-            make.top.bottom.equalTo(self.view)
+        scrollView.snp.makeConstraints {
+            $0.edges.equalTo(self.view)
         }
         
-        ddgLogo.snp.makeConstraints { make in
-            make.top.left.bottom.equalTo(0)
-            make.size.equalTo(38)
+        collection.snp.makeConstraints {
+            $0.top.left.equalTo(0)
+            $0.width.equalTo(self.view)
+            $0.height.equalTo(self.view)
         }
         
-        ddgLabel.snp.makeConstraints { make in
-            make.top.bottom.equalTo(0)
-            make.right.equalToSuperview().offset(-5)
-            make.left.equalTo(self.ddgLogo.snp.right).offset(5)
-            make.width.equalTo(180)
-            make.centerY.equalTo(self.ddgLogo)
+        widgetsView.snp.makeConstraints {
+            $0.top.right.equalTo(0)
+            $0.left.equalTo(collection.snp.right)
+            $0.width.equalTo(self.view)
+            $0.height.equalTo(self.view)
+        }
+        
+        ddgLogo.snp.makeConstraints {
+            $0.top.left.bottom.equalTo(0)
+            $0.size.equalTo(38)
+        }
+        
+        ddgLabel.snp.makeConstraints {
+            $0.top.bottom.equalTo(0)
+            $0.right.equalToSuperview().offset(-5)
+            $0.left.equalTo(self.ddgLogo.snp.right).offset(5)
+            $0.width.equalTo(180)
+            $0.centerY.equalTo(self.ddgLogo)
         }
         
         favoritesOverflowButton.snp.makeConstraints {
