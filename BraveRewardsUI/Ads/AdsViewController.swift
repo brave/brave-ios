@@ -85,8 +85,8 @@ public class AdsViewController: UIViewController {
     super.viewWillLayoutSubviews()
     
     if UIDevice.current.userInterfaceIdiom == .pad {
-      let isWidthLarger = view.bounds.width > view.bounds.height
-      widthAnchor?.constant = isWidthLarger ? view.bounds.width * 0.40 : view.bounds.height * 0.40
+      let constant = max(view.bounds.width, view.bounds.height) * 0.40
+      widthAnchor?.constant = ceil(constant * UIScreen.main.scale) / UIScreen.main.scale
     }
   }
   
