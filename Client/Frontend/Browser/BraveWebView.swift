@@ -22,6 +22,9 @@ class BraveWebView: WKWebView {
     }
     
     init(frame: CGRect, configuration: WKWebViewConfiguration = WKWebViewConfiguration(), isPrivate: Bool = true) {
+        
+        configuration.setValue(true, forKey: "alwaysRunsAtForegroundPriority")
+        
         if isPrivate {
             configuration.websiteDataStore = BraveWebView.sharedNonPersistentStore()
         } else {
@@ -39,6 +42,30 @@ class BraveWebView: WKWebView {
     @available(*, unavailable)
     required init?(coder aDecoder: NSCoder) {
         fatalError()
+    }
+    
+    deinit {
+        pauseAllMedia()
+    }
+    
+    func pauseAllMedia() {
+        ensureMainThread {
+            self.evaluateJavaScript("pauseAll()", completionHandler: nil)
+            
+            if let mediaHandler = (UIApplication.shared.delete as? AppDelegate)?.backgroundMediaHandler {
+                mediaHandler.deactivateBackgroundPlayback()
+            }
+        }
+    }
+    
+    func appDidEnterBackground() {
+        ensureMainThread {
+            if let mediaHandler = (UIApplication.shared.delete as? AppDelegate)?.backgroundMediaHandler {
+                mediaHandler.activateBackgroundPlayback()
+            }
+            
+            self.evaluateJavaScript("didEnterBackground()", completionHandler: nil)
+        }
     }
     
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {

@@ -399,6 +399,7 @@ class BrowserViewController: UIViewController {
     }
 
     @objc func appDidEnterBackgroundNotification() {
+        tabManager.tabsForCurrentMode.forEach({ $0.webView?.appDidEnterBackground() })
         displayedPopoverController?.dismiss(animated: false) {
             self.updateDisplayedPopoverProperties = nil
             self.displayedPopoverController = nil
@@ -2140,6 +2141,7 @@ extension BrowserViewController: TabDelegate {
         
         tab.addContentScript(RewardsReporting(rewards: rewards, tab: tab), name: RewardsReporting.name())
         tab.addContentScript(AdsMediaReporting(rewards: rewards, tab: tab), name: AdsMediaReporting.name())
+        tab.addContentScript(BackgroundMediaPlayback(tab: tab), name: BackgroundMediaPlayback.name())
     }
 
     func tab(_ tab: Tab, willDeleteWebView webView: WKWebView) {
