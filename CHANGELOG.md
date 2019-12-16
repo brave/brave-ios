@@ -3,7 +3,7 @@
 ## [1.14.2](https://github.com/brave/brave-ios/releases/tag/v1.14.2)
  
   - Added support for NFC authentication. ([#1609](https://github.com/brave/brave-ios/issues/1609))
-  - Restore lost bookmarks and favorites during 1.12 migration experencied by a subset of users. ([#2015](https://github.com/brave/brave-ios/issues/2015))
+  - Restore lost bookmarks and favorites during 1.12 migration experienced by a subset of users. ([#2015](https://github.com/brave/brave-ios/issues/2015))
 
 ## [1.14.1](https://github.com/brave/brave-ios/releases/tag/v1.14.1)
 
