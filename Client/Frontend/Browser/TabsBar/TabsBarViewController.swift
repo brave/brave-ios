@@ -106,6 +106,18 @@ class TabsBarViewController: UIViewController {
         updateData()
     }
     
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        let offset = Float(collectionView.contentOffset.x)
+        let startFade = Float(30)
+        leftOverflowIndicator.opacity = min(1, offset / startFade)
+        
+        // all the way scrolled right
+        let offsetFromRight = collectionView.contentSize.width - CGFloat(offset) - collectionView.frame.width
+        rightOverflowIndicator.opacity = min(1, Float(offsetFromRight) / startFade)
+    }
+    
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
