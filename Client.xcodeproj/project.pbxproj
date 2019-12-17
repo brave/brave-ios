@@ -672,6 +672,7 @@
 		5EC594ED232C2C8F00922111 /* OnboardingWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EC594EC232C2C8F00922111 /* OnboardingWebViewController.swift */; };
 		5EC594EF232C68FC00922111 /* OnboardingAdsCountdownViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EC594EE232C68FC00922111 /* OnboardingAdsCountdownViewController.swift */; };
 		5EC594F1232C697200922111 /* OnboardingAdsCountdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EC594F0232C697200922111 /* OnboardingAdsCountdownView.swift */; };
+		5ECB611123A8168F00ED06B1 /* PDFViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ECB611023A8168F00ED06B1 /* PDFViewer.swift */; };
 		5EE5918123A290E000E8E8DE /* CoreNFC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F926647A234D4EF400359492 /* CoreNFC.framework */; };
 		5EEB25DE234E667700279091 /* CertificatePinningTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EEB25DD234E667700279091 /* CertificatePinningTest.swift */; };
 		744ED5611DBFEB8D00A2B5BE /* MailtoLinkHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 744ED5601DBFEB8D00A2B5BE /* MailtoLinkHandler.swift */; };
@@ -2107,6 +2108,7 @@
 		5EC594EC232C2C8F00922111 /* OnboardingWebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingWebViewController.swift; sourceTree = "<group>"; };
 		5EC594EE232C68FC00922111 /* OnboardingAdsCountdownViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingAdsCountdownViewController.swift; sourceTree = "<group>"; };
 		5EC594F0232C697200922111 /* OnboardingAdsCountdownView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingAdsCountdownView.swift; sourceTree = "<group>"; };
+		5ECB611023A8168F00ED06B1 /* PDFViewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFViewer.swift; sourceTree = "<group>"; };
 		5EEB25DD234E667700279091 /* CertificatePinningTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CertificatePinningTest.swift; sourceTree = "<group>"; };
 		610967E5236B41C9000F10EA /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = zh.lproj/Localizable.strings; sourceTree = "<group>"; };
 		6117A72C236B41D000921BFB /* zh-TW */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-TW"; path = "zh-TW.lproj/Localizable.strings"; sourceTree = "<group>"; };
@@ -4327,6 +4329,7 @@
 				5E34780F22D7A1D200B0D5F8 /* ResourceDownloadManager.swift */,
 				5E4845C122DE3DF800372022 /* WindowRenderHelperScript.swift */,
 				0A19365323508756002E2B81 /* LinkPreviewViewController.swift */,
+				5ECB611023A8168F00ED06B1 /* PDFViewer.swift */,
 			);
 			indentWidth = 4;
 			path = Browser;
@@ -6056,6 +6059,7 @@
 				3BCE6D3C1CEB9E4D0080928C /* ThirdPartySearchAlerts.swift in Sources */,
 				4422D55A21BFFB7F00BF1855 /* regexp.cc in Sources */,
 				0A7B5D722269E7AD00AADF22 /* BookmarkEditMode.swift in Sources */,
+				5ECB611123A8168F00ED06B1 /* PDFViewer.swift in Sources */,
 				4422D4DC21BFFB7600BF1855 /* block_builder.cc in Sources */,
 				0BF0DB941A8545800039F300 /* TopToolbarView.swift in Sources */,
 				4422D4C321BFFB7600BF1855 /* coding.cc in Sources */,
