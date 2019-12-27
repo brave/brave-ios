@@ -4038,6 +4038,13 @@
 			path = expired.badssl.com;
 			sourceTree = "<group>";
 		};
+		5ECCE69D23B6919900A0193D /* SafeBrowsingPages */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = SafeBrowsingPages;
+			sourceTree = "<group>";
+		};
 		7B604FC11C496005006EEEC3 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -4606,6 +4613,7 @@
 		F84B21C01A090F8100AAB793 /* Client */ = {
 			isa = PBXGroup;
 			children = (
+				5ECCE69D23B6919900A0193D /* SafeBrowsingPages */,
 				5E856FE3235E08010094E113 /* DeviceCheck */,
 				7B2142FC1E5E055000CDD3FC /* InfoPlist.strings */,
 				F84B22431A09165600AAB793 /* Info.plist */,

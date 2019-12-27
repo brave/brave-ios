@@ -1,0 +1,88 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name='viewport' content='initial-scale=1, viewport-fit=cover'>
+    <title>Safe Browsing</title>
+    <style>
+        .post {
+            padding-top: max(36px, env(safe-area-inset-top));
+            padding-bottom: max(36px, env(safe-area-inset-bottom));
+            padding-left: max(36px, env(safe-area-inset-left));
+            padding-right: max(36px, env(safe-area-inset-right));
+        }
+
+        .background {
+            background-color: white;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            flex-direction: column;
+            align-content: flex-start;
+        }
+
+        .title {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            font-weight: 500;
+            font-size: 20px;
+            color: #5E6175;
+        }
+
+        .warninginfo {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            font-weight: 400;
+            font-size: 14px;
+            color: #525252;
+        }
+
+        ul {
+            list-style: none;
+            position: relative;
+        }
+
+        li {
+            margin-left: -25px;
+        }
+
+        ul li::before {
+            content: '•';
+            position: absolute;
+            left: 0pt;
+            font-size: 12pt;
+        }
+    </style>
+</head>
+
+<body class="background">
+    <div class="container post">
+        <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient x1=".643%" y1="49.357%" x2="99.357%" y2="49.357%" id="a">
+                    <stop stop-color="#392DD1" offset="0%" />
+                    <stop stop-color="#A91B78" offset="100%" />
+                </linearGradient>
+            </defs>
+            <g fill="none" fill-rule="evenodd">
+                <path d="M0 0h64v64H0z" />
+                <path
+                    d="M28.016 12A18.052 18.052 0 0144.38 22.376c8.684.359 15.62 7.46 15.62 16.181 0 8-5.615 13.818-12.766 13.818H14.875C8.153 52.375 3 48.665 3 42.013c0-4.869 2.775-9.204 6.986-11.338-.012-.25-.018-.502-.018-.753C9.968 20.019 18.053 12 28.016 12zm0 4.75c-7.348 0-13.298 5.9-13.298 13.172 0 .616.053 1.228.16 1.878a2.375 2.375 0 01-1.605 2.64C10 35.512 7.75 38.55 7.75 42.013c0 3.63 2.754 5.612 7.125 5.612h32.36c4.488 0 8.015-3.655 8.015-9.068 0-6.318-5.17-11.445-11.56-11.445-.194 0-.4.013-.616.037a2.375 2.375 0 01-2.508-1.568c-1.856-5.248-6.853-8.831-12.55-8.831zm3.484 19c2.458 0 4.6.536 6.406 1.438 1.134.567 1.93 1.165 2.398 1.633a2.375 2.375 0 11-3.358 3.358c.003.003-.062-.053-.191-.15a6.393 6.393 0 00-.973-.592c-1.164-.582-2.584-.937-4.282-.937s-3.118.355-4.282.937a6.393 6.393 0 00-.973.592c-.13.097-.194.153-.19.15a2.375 2.375 0 11-3.36-3.358c.469-.468 1.265-1.066 2.4-1.633 1.804-.902 3.947-1.438 6.405-1.438zm-4.75-7.125a2.375 2.375 0 110 4.75 2.375 2.375 0 010-4.75zm9.5 0a2.375 2.375 0 110 4.75 2.375 2.375 0 010-4.75z"
+                    fill="url(#a)" />
+            </g>
+        </svg>
+
+        <p class="title">
+            No Internet
+        </p>
+
+        <p class="warninginfo">
+            Try:
+            <ul class="warninginfo">
+                <li>Checking the network cables, modem, and router</li>
+                <li>Reconnecting to Wi-Fi</li>
+            </ul>
+            <br /><br /><br />
+            <span class="warninginfo">ERR_INTERNET_DISCONNECTED</span>
+            <br /><br />
+        </p>
+    </div>
+</body>
