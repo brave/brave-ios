@@ -10,7 +10,7 @@ private let log = Logger.browserLogger
 
 enum SafeBrowsingResult {
     case safe
-    case dangerous
+    case dangerous(ThreatType)
     case unknown
 }
 
@@ -22,7 +22,7 @@ class SafeBrowsingClient {
     private static let version = AppInfo.appVersion
     
     private let userAgent = UserAgent.defaultUserAgent()
-    private let baseURL = "https://safebrowsing-ios.brave.com" //"https://safebrowsing.brave.com"
+    private let baseURL = "https://safebrowsing.brave.com" //"https://safebrowsing-ios.brave.com"
     private let session = URLSession(configuration: .ephemeral)
     private let database = SafeBrowsingDatabase()
     private let cache = SafeBrowsingCache()
@@ -41,8 +41,8 @@ class SafeBrowsingClient {
     
     func find(_ hashes: [String], _ completion: @escaping (_ isSafe: SafeBrowsingResult, Error?) -> Void) {
         let group = DispatchGroup()
-        var potentiallyBadHashes = [String]()
-        var definitelyBadHashes = [String]()
+        var potentiallyBadHashes = [String: [ThreatType]]()
+        var definitelyBadHashes = [String: [ThreatType]]()
         
         for fullHash in hashes {
             group.enter()
@@ -52,15 +52,24 @@ class SafeBrowsingClient {
                     return group.leave()
                 }
                 
-                switch self.cache.find(fullHash).cacheResult {
+                let result = self.cache.find(fullHash)
+                switch result.cacheResult {
                 case .positive:
-                    definitelyBadHashes.append(fullHash)
+                    if var threats = definitelyBadHashes[fullHash] {
+                        threats.append(contentsOf: result.threats)
+                    } else {
+                        definitelyBadHashes.updateValue(result.threats, forKey: fullHash)
+                    }
                     
                 case .negative:
                     return group.leave()
                     
                 case .miss:
-                    potentiallyBadHashes.append(hash)
+                    if var threats = potentiallyBadHashes[hash] {
+                        threats.append(contentsOf: result.threats)
+                    } else {
+                        potentiallyBadHashes.updateValue(result.threats, forKey: hash)
+                    }
                 }
                 
                 group.leave()
@@ -73,11 +82,11 @@ class SafeBrowsingClient {
                     return completion(.unknown, nil)
                 }
                 
-                return completion(definitelyBadHashes.isEmpty ? .safe : .dangerous, nil)
+                return completion(definitelyBadHashes.isEmpty ? .safe : self.classify(hashes: definitelyBadHashes), nil)
             }
             
             if potentiallyBadHashes.isEmpty {
-                return completion(definitelyBadHashes.isEmpty ? .safe : .dangerous, nil)
+                return completion(definitelyBadHashes.isEmpty ? .safe : self.classify(hashes: definitelyBadHashes), nil)
             }
             
             let clientInfo = ClientInfo(clientId: SafeBrowsingClient.clientId,
@@ -95,7 +104,7 @@ class SafeBrowsingClient {
                                         platformTypes: platformTypes,
                                         threatEntryTypes: threatEntryTypes,
                                         threatEntries: potentiallyBadHashes.map {
-                                            return ThreatEntry(hash: $0, url: nil, digest: nil)
+                                            return ThreatEntry(hash: $0.key, url: nil, digest: nil)
                 }
             )
             
@@ -111,30 +120,32 @@ class SafeBrowsingClient {
                     
                     DispatchQueue.global(qos: .background).async {
                         if let error = error {
-                            return completion(definitelyBadHashes.isEmpty ? .unknown : .dangerous, error)
+                            return completion(definitelyBadHashes.isEmpty ? .unknown : self.classify(hashes: definitelyBadHashes), error)
                         }
                         
                         if let response = response {
                             self.cache.update(body, response)
                             
                             if !response.matches.isEmpty {
-                                let positiveResults = response.matches.compactMap({ match -> String? in
-                                    if let hash = match.threat.hash {
-                                        return hashes.contains(hash) ? hash : nil
+                                //Positive Results
+                                response.matches.forEach({ match in
+                                    if let hash = match.threat.hash, hashes.contains(hash) {
+                                        if var threats = definitelyBadHashes[hash] {
+                                            threats.append(match.threatType)
+                                        } else {
+                                            definitelyBadHashes.updateValue([match.threatType], forKey: hash)
+                                        }
                                     }
-                                    return nil
                                 })
-                                
-                                definitelyBadHashes.append(contentsOf: positiveResults)
                             }
-                            return completion(definitelyBadHashes.isEmpty ? .safe : .dangerous, nil)
+                            return completion(definitelyBadHashes.isEmpty ? .safe : self.classify(hashes: definitelyBadHashes), nil)
                         }
-                        return completion(definitelyBadHashes.isEmpty ? .unknown : .dangerous, nil)
+                        return completion(definitelyBadHashes.isEmpty ? .unknown : self.classify(hashes: definitelyBadHashes), nil)
                     }
                 }
             } catch {
                 DispatchQueue.global(qos: .background).async {
-                    completion(definitelyBadHashes.isEmpty ? .unknown : .dangerous, error)
+                    completion(definitelyBadHashes.isEmpty ? .unknown : self.classify(hashes: definitelyBadHashes), error)
                 }
             }
         }
@@ -218,6 +229,42 @@ class SafeBrowsingClient {
         } catch {
             completion(error)
         }
+    }
+    
+    private func classify(hashes: [String: [ThreatType]]) -> SafeBrowsingResult {
+        var isUnspecified = false
+        var isMalware = false
+        var isSocialEngineering = false
+        var isUnwantedSoftware = false
+        var isPotentiallyHarmful = false
+        
+        //Short Circuit Classification of Threats
+        hashes.values.flatMap({ $0 }).forEach({
+            isUnspecified = isUnspecified || $0 == .unspecified
+            isMalware = isMalware || $0 == .malware
+            isSocialEngineering = isSocialEngineering || $0 == .socialEngineering
+            isUnwantedSoftware = isUnwantedSoftware || $0 == .unwantedSoftware
+            isPotentiallyHarmful = isPotentiallyHarmful || $0 == .potentiallyHarmfulApplication
+        })
+        
+        //Return the order of highest severity first..
+        if isMalware {
+            return .dangerous(.malware)
+        }
+        
+        if isSocialEngineering {
+            return .dangerous(.socialEngineering)
+        }
+        
+        if isUnwantedSoftware {
+            return .dangerous(.unwantedSoftware)
+        }
+        
+        if isPotentiallyHarmful {
+            return .dangerous(.potentiallyHarmfulApplication)
+        }
+        
+        return .dangerous(.unspecified)
     }
     
     private func encode<T>(_ method: RequestType, endpoint: Endpoint, body: T) throws -> URLRequest where T: Encodable {
