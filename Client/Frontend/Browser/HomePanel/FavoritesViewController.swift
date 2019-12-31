@@ -205,7 +205,7 @@ class FavoritesViewController: UIViewController, Themeable {
         collection.addSubview(braveShieldStatsView)
         collection.addSubview(favoritesOverflowButton)
         collection.addSubview(ddgButton)
-        collection.addSubview(imageCreditButton)
+        view.addSubview(imageCreditButton)
         
         ddgButton.addSubview(ddgLogo)
         ddgButton.addSubview(ddgLabel)
