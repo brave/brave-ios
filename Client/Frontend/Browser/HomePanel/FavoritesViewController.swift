@@ -231,6 +231,10 @@ class FavoritesViewController: UIViewController, Themeable {
     
     private var collectionContentSizeObservation: NSKeyValueObservation?
     
+    override func viewWillLayoutSubviews() {
+        updateConstraints()
+    }
+    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
@@ -377,8 +381,30 @@ class FavoritesViewController: UIViewController, Themeable {
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
-        
+
+        updateConstraints()
         collection.collectionViewLayout.invalidateLayout()
+    }
+    
+    private func updateConstraints() {
+        let isIpad = UIDevice.isIpad
+        let isLandscape = view.frame.width > view.frame.height
+        
+        var right: ConstraintRelatableTarget = self.view.safeAreaLayoutGuide
+        var left: ConstraintRelatableTarget = self.view.safeAreaLayoutGuide
+        if isLandscape {
+            if isIpad {
+                right = self.view.snp.centerX
+            } else {
+                left = self.view.snp.centerX
+            }
+        }
+        
+        collection.snp.remakeConstraints { make in
+            make.right.equalTo(right)
+            make.left.equalTo(left)
+            make.top.bottom.equalTo(self.view)
+        }
     }
     
     private func setupImageCredit() {
