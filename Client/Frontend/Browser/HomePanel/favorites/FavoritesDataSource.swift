@@ -41,36 +41,12 @@ class FavoritesDataSource: NSObject, UICollectionViewDataSource {
     
     /// The number of times that each row contains
     var columnsPerRow: Int {
-        guard let size = collectionView?.bounds.size,
-            let traitCollection = collectionView?.traitCollection else {
-                return 0
+        guard let traitCollection = collectionView?.traitCollection else {
+            return 0
         }
         
-        var cols = 0
-        if traitCollection.horizontalSizeClass == .compact {
-            // Landscape iPhone
-            if traitCollection.verticalSizeClass == .compact {
-                cols = 5
-            }
-                // Split screen iPad width
-            else if size.widthLargerOrEqualThanHalfIPad() {
-                cols = 4
-            }
-                // iPhone portrait
-            else {
-                cols = 3
-            }
-        } else {
-            // Portrait iPad
-            if size.height > size.width {
-                cols = 4
-            }
-                // Landscape iPad
-            else {
-                cols = 5
-            }
-        }
-        return cols + 1
+        let cols = traitCollection.horizontalSizeClass == .compact ? 4 : 6
+        return cols
     }
     
     /// If there are more favorites than are being shown
