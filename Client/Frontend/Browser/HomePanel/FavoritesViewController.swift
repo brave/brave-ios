@@ -189,6 +189,8 @@ class FavoritesViewController: UIViewController, Themeable {
             self?.favoritesOverflowButton.isHidden = self?.dataSource.hasOverflow == false
         }
         
+        collection.bounces = false
+        
         // Could setup as section header but would need to use flow layout,
         // Auto-layout subview within collection doesn't work properly,
         // Quick-and-dirty layout here.
