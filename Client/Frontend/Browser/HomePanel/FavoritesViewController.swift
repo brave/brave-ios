@@ -578,10 +578,3 @@ extension FavoritesViewController: PreferencesObserver {
         self.resetBackground()
     }
 }
-
-extension CGSize {
-    public func widthLargerOrEqualThanHalfIPad() -> Bool {
-        let halfIPadSize: CGFloat = 507
-        return width >= halfIPadSize
-    }
-}
