@@ -45,10 +45,7 @@ class NewTabPageTableViewController: TableViewController {
             })
         ]
         
-        if BackgroundImage.showSponsoredSetting {
-            rows.append(sponsoredRow)
-        }
-        
+        rows.append(sponsoredRow)
         rows.append(BoolRow(title: Strings.NewTabPageSettingsAutoOpenKeyboard, option: Preferences.NewTabPage.autoOpenKeyboard))
         return Section(rows: rows)
     }()
