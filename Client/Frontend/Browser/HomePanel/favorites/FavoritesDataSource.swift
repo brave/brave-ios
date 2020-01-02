@@ -5,6 +5,7 @@ import Storage
 import CoreData
 import Shared
 import Data
+import BraveShared
 
 private let log = Logger.browserLogger
 
@@ -51,7 +52,8 @@ class FavoritesDataSource: NSObject, UICollectionViewDataSource {
     
     /// If there are more favorites than are being shown
     var hasOverflow: Bool {
-        return columnsPerRow < frc?.fetchedObjects?.count ?? 0
+        let showAll = !Preferences.NewTabPage.backgroundImages.value
+        return !showAll && columnsPerRow < frc?.fetchedObjects?.count ?? 0
     }
     
     func refetch() {
@@ -65,7 +67,13 @@ class FavoritesDataSource: NSObject, UICollectionViewDataSource {
     }
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return min(columnsPerRow, frc?.fetchedObjects?.count ?? 0)
+        if hasOverflow {
+            return columnsPerRow
+        }
+        
+        // No overflow so just show them all (generally either not enough items to overflow one row or no background images.
+        let allItems = frc?.fetchedObjects?.count ?? 0
+        return allItems
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
