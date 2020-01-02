@@ -42,7 +42,7 @@ class SettingsAutoContributeSectionView: SettingsSectionView {
   
   let viewDetailsButton = SettingsViewDetailsButton(type: .system)
   private let disabledView = DisabledSettingGraphicView(
-    image: UIImage(frameworkResourceNamed: "turn-on-rewards"),
+    image: UIImage(frameworkResourceNamed: "ac-disabled-icon"),
     text: Strings.DisabledAutoContributeMessage
   ).then {
     $0.isHidden = true

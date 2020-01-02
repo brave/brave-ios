@@ -9,7 +9,7 @@ class DisabledSettingGraphicView: UIStackView {
   init(image: UIImage, text: String) {
     super.init(frame: .zero)
     
-    spacing = 10
+    spacing = 15
     alignment = .center
     layoutMargins = UIEdgeInsets(top: 15, left: 15, bottom: 15, right: 15)
     isLayoutMarginsRelativeArrangement = true

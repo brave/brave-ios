@@ -87,7 +87,7 @@ class SettingsAdSectionView: SettingsSectionView {
   
   let viewDetailsButton = SettingsViewDetailsButton(type: .system)
   private let disabledView = DisabledSettingGraphicView(
-    image: UIImage(frameworkResourceNamed: "ads-graphic"),
+    image: UIImage(frameworkResourceNamed: "ads-disabled-icon"),
     text: Strings.DisabledAdsMessage
   ).then {
     $0.isHidden = true
