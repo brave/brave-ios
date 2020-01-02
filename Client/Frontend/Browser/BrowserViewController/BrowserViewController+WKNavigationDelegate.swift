@@ -7,6 +7,7 @@ import WebKit
 import Shared
 import Data
 import BraveShared
+import BraveRewards
 
 private let log = Logger.browserLogger
 private let rewardsLog = Logger.rewardsLogger
@@ -180,12 +181,18 @@ extension BrowserViewController: WKNavigationDelegate {
                             titleWeight: .semibold,
                             titleSize: 18.0
                         )
+                        popup.addButton(title: Strings.UserWalletBATNotAllowedLearnMore, type: .link, fontSize: 14.0) { () -> PopupViewDismissType in
+                            if let tab = self.tabManager[webView], let url = URL(string: "https://uphold.com/en/brave/support") {
+                                tab.loadRequest(URLRequest(url: url))
+                            }
+                            return .flyDown
+                        }
                         popup.addButton(title: Strings.UserWalletCloseButtonTitle, type: .primary, fontSize: 14.0) { () -> PopupViewDismissType in
                             return .flyDown
                         }
                         popup.showWithType(showType: .flyUp)
                     default:
-                        // Uphold account doesn't support BAT...
+                        // Some other issue occured with authorization
                         let popup = AlertPopupView(
                             imageView: nil,
                             title: Strings.UserWalletGenericErrorTitle,
@@ -193,15 +200,10 @@ extension BrowserViewController: WKNavigationDelegate {
                             titleWeight: .semibold,
                             titleSize: 18.0
                         )
-                        popup.addButton(title: Strings.UserWalletRetryPopupTitle, type: .primary, fontSize: 14.0) { () -> PopupViewDismissType in
-                            self.rewards.ledger.externalWallet(forType: .uphold) { wallet in
-                                guard let wallet = wallet, let tab = self.tabManager[webView], let url = URL(string: wallet.verifyUrl) else { return }
-                                tab.loadRequest(URLRequest(url: url))
-                            }
+                        popup.addButton(title: Strings.UserWalletCloseButtonTitle, type: .primary, fontSize: 14.0) { () -> PopupViewDismissType in
                             return .flyDown
                         }
                         popup.showWithType(showType: .flyUp)
-                        break
                     }
             }
         }

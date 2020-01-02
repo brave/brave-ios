@@ -10,7 +10,7 @@ final class UserWalletDetailsViewController: UIViewController {
   private let state: RewardsState
   private let wallet: ExternalWallet
   
-  var disconnectedWalletHandler: () -> Void
+  private var disconnectedWalletHandler: () -> Void
   
   init(state: RewardsState, wallet: ExternalWallet, disconnectedWalletHandler: @escaping () -> Void) {
     self.state = state
