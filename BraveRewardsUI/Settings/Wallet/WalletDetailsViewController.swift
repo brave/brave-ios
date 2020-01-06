@@ -34,8 +34,6 @@ class WalletDetailsViewController: UIViewController, RewardsSummaryProtocol {
     super.viewDidLoad()
     title = Strings.WalletDetailsTitle
     
-    detailsView.walletSection.addFundsButton.addTarget(self, action: #selector(tappedAddFunds), for: .touchUpInside)
-    
     detailsView.walletSection.setWalletBalance(
       state.ledger.balanceString,
       crypto: Strings.WalletBalanceType,
@@ -58,12 +56,6 @@ class WalletDetailsViewController: UIViewController, RewardsSummaryProtocol {
   }
   
   // MARK: - Actions
-  
-  @objc private func tappedAddFunds() {
-    let controller = AddFundsViewController(state: state)
-    let container = PopoverNavigationController(rootViewController: controller)
-    present(container, animated: true)
-  }
   
   func setupLedgerObservers() {
     ledgerObserver.fetchedBalance = { [weak self] in

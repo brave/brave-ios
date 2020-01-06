@@ -100,6 +100,10 @@ extension BrowserViewController: WKNavigationDelegate {
     // This is the place where we decide what to do with a new navigation action. There are a number of special schemes
     // and http(s) urls that need to be handled in a different way. All the logic for that is inside this delegate
     // method.
+    
+    fileprivate func isUpholdOAuthAuthorization(_ url: URL) -> Bool {
+        return url.scheme == "rewards" && url.host == "uphold"
+    }
 
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         guard let url = navigationAction.request.url else {
@@ -140,6 +144,66 @@ extension BrowserViewController: WKNavigationDelegate {
             safeBrowsing.showMalwareWarningPage(forUrl: url, inWebView: webView)
             decisionHandler(.cancel)
             return
+        }
+        
+        if isUpholdOAuthAuthorization(url) {
+            decisionHandler(.cancel)
+            guard let queryItems = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems else {
+                return
+            }
+            var items: [String: String] = [:]
+            for query in queryItems {
+                items[query.name] = query.value
+            }
+            rewards.ledger.authorizeExternalWallet(
+                ofType: .uphold,
+                queryItems: items) { result, redirectURL in
+                    switch result {
+                    case .ledgerOk:
+                        if let tab = self.tabManager[webView] {
+                            if let redirectURL = redirectURL {
+                                // Requires verification
+                                let request = URLRequest(url: redirectURL)
+                                tab.loadRequest(request)
+                            } else {
+                                // Done
+                                self.tabManager.removeTab(tab)
+                                self.showBraveRewardsPanel()
+                            }
+                        }
+                    case .batNotAllowed:
+                        // Uphold account doesn't support BAT...
+                        let popup = AlertPopupView(
+                            imageView: nil,
+                            title: Strings.UserWalletBATNotAllowedTitle,
+                            message: Strings.UserWalletBATNotAllowedMessage,
+                            titleWeight: .semibold,
+                            titleSize: 18.0
+                        )
+                        popup.addButton(title: Strings.UserWalletCloseButtonTitle, type: .primary, fontSize: 14.0) { () -> PopupViewDismissType in
+                            return .flyDown
+                        }
+                        popup.showWithType(showType: .flyUp)
+                    default:
+                        // Uphold account doesn't support BAT...
+                        let popup = AlertPopupView(
+                            imageView: nil,
+                            title: Strings.UserWalletGenericErrorTitle,
+                            message: Strings.UserWalletGenericErrorMessage,
+                            titleWeight: .semibold,
+                            titleSize: 18.0
+                        )
+                        popup.addButton(title: Strings.UserWalletRetryPopupTitle, type: .primary, fontSize: 14.0) { () -> PopupViewDismissType in
+                            self.rewards.ledger.externalWallet(forType: .uphold) { wallet in
+                                guard let wallet = wallet, let tab = self.tabManager[webView], let url = URL(string: wallet.verifyUrl) else { return }
+                                tab.loadRequest(URLRequest(url: url))
+                            }
+                            return .flyDown
+                        }
+                        popup.showWithType(showType: .flyUp)
+                        break
+                    }
+            }
         }
 
         // First special case are some schemes that are about Calling. We prompt the user to confirm this action. This

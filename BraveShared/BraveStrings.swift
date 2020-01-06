@@ -609,3 +609,13 @@ extension Strings {
     public static let RestoredBookmarksFolderName = NSLocalizedString("RestoredBookmarksFolderName", bundle: Bundle.braveShared, value: "Restored Bookmarks", comment: "Name of folder where restored bookmarks are retrieved")
     public static let RestoredFavoritesFolderName = NSLocalizedString("RestoredFavoritesFolderName", bundle: Bundle.braveShared, value: "Restored Favorites", comment: "Name of folder where restored favorites are retrieved")
 }
+
+// MARK: - User Wallet
+extension Strings {
+    public static let UserWalletBATNotAllowedTitle = NSLocalizedString("UserWalletDetailsDisconnectButtonTitle", bundle: Bundle.braveShared, value: "Error creating Brave Browser BAT card", comment: "")
+    public static let UserWalletBATNotAllowedMessage = NSLocalizedString("UserWalletBATNotAllowedMessage", bundle: Bundle.braveShared, value: "BAT is not currently supported in your region.", comment: "")
+    public static let UserWalletCloseButtonTitle = NSLocalizedString("UserWalletCloseButtonTitle", bundle: Bundle.braveShared, value: "Close", comment: "")
+    public static let UserWalletGenericErrorTitle = NSLocalizedString("UserWalletGenericErrorTitle", bundle: Bundle.braveShared, value: "Error creating Brave Browser BAT card", comment: "")
+    public static let UserWalletGenericErrorMessage = NSLocalizedString("UserWalletGenericErrorMessage", bundle: Bundle.braveShared, value: "BAT is not currently supported in your region.", comment: "")
+    public static let UserWalletRetryPopupTitle = NSLocalizedString("UserWalletClosePopupTitle", bundle: Bundle.braveShared, value: "Close", comment: "")
+}

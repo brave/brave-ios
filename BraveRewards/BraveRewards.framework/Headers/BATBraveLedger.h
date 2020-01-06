@@ -94,6 +94,18 @@ NS_SWIFT_NAME(BraveLedger)
 /// Returns reserved amount of pending contributions to publishers.
 @property (nonatomic, readonly) double reservedAmount;
 
+#pragma mark - User Wallets
+
+- (void)externalWalletForType:(BATExternalWalletType)walletType
+                   completion:(void (^)(BATExternalWallet * _Nullable wallet))completion;
+
+- (void)disconnectWalletOfType:(BATExternalWalletType)walletType
+                    completion:(nullable void (^)(BATResult result))completion;
+
+- (void)authorizeExternalWalletOfType:(BATExternalWalletType)walletType
+                           queryItems:(NSDictionary<NSString *, NSString *> *)queryItems
+                           completion:(void (^)(BATResult result, NSURL * _Nullable redirectURL))completion;
+
 #pragma mark - Publishers
 
 @property (nonatomic, readonly, getter=isLoadingPublisherList) BOOL loadingPublisherList;

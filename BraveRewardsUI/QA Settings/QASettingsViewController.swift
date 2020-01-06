@@ -177,6 +177,14 @@ public class QASettingsViewController: TableViewController {
         ]
       ),
       Section(
+        header: .title("User Wallet"),
+        rows: [
+          Row(text: "Show Uphold Onboarding", selection: {
+            self.present(VerifyUserWalletViewController({}), animated: true)
+          }, cellClass: ButtonCell.self)
+        ]
+      ),
+      Section(
         rows: [
           Row(text: "Share Rewards Database", selection: {
             self.tappedShareRewardsDatabase()
