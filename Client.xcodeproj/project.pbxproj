@@ -596,6 +596,10 @@
 		5D24AF8221BA459000F9506A /* BlocklistName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D24AF8121BA459000F9506A /* BlocklistName.swift */; };
 		5D24AF8421BA489A00F9506A /* ContentBlocker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D24AF8321BA489A00F9506A /* ContentBlocker.swift */; };
 		5D24AF9021BA4D7700F9506A /* ContentBlockerRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D24AF8F21BA4D7700F9506A /* ContentBlockerRegion.swift */; };
+		5D42BC5923BFE99900FBD773 /* branded-2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 5D42BC5523BFE99800FBD773 /* branded-2.jpg */; };
+		5D42BC5A23BFE99900FBD773 /* branded-1.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 5D42BC5723BFE99800FBD773 /* branded-1.jpg */; };
+		5D42BC5B23BFE99900FBD773 /* branded-3.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 5D42BC5823BFE99800FBD773 /* branded-3.jpg */; };
+		5D42BC5D23BFF5CB00FBD773 /* logo.png in Resources */ = {isa = PBXBuildFile; fileRef = 5D42BC5C23BFF5CB00FBD773 /* logo.png */; };
 		5D53749C23846FFC00A2B587 /* anton-repponen.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 5D53748D23846FFA00A2B587 /* anton-repponen.jpg */; };
 		5D53749D23846FFC00A2B587 /* dc-cavalleri.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 5D53748E23846FFA00A2B587 /* dc-cavalleri.jpg */; };
 		5D53749E23846FFC00A2B587 /* louis-kim.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 5D53748F23846FFA00A2B587 /* louis-kim.jpg */; };
@@ -612,7 +616,6 @@
 		5D5374A923846FFC00A2B587 /* matt-palmer.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 5D53749A23846FFC00A2B587 /* matt-palmer.jpg */; };
 		5D5374AA23846FFC00A2B587 /* andy-mai.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 5D53749B23846FFC00A2B587 /* andy-mai.jpg */; };
 		5D5374B723887E7400A2B587 /* ntp-sponsored.json in Resources */ = {isa = PBXBuildFile; fileRef = 5D5374B623887E7400A2B587 /* ntp-sponsored.json */; };
-		5D5374B923887E7D00A2B587 /* EAFF_JA_soccer_Background_final.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 5D5374B823887E7D00A2B587 /* EAFF_JA_soccer_Background_final.jpg */; };
 		5D5374BB238895B100A2B587 /* BackgroundImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D5374BA238895B100A2B587 /* BackgroundImage.swift */; };
 		5D5E2361238C386B00AD6FBD /* NewTabPageTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D5E2360238C386B00AD6FBD /* NewTabPageTableViewController.swift */; };
 		5D6DDEF3214003A6001FF0AE /* DAU.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6DDEE6214003A6001FF0AE /* DAU.swift */; };
@@ -2034,6 +2037,10 @@
 		5D24AF8121BA459000F9506A /* BlocklistName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlocklistName.swift; sourceTree = "<group>"; };
 		5D24AF8321BA489A00F9506A /* ContentBlocker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBlocker.swift; sourceTree = "<group>"; };
 		5D24AF8F21BA4D7700F9506A /* ContentBlockerRegion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBlockerRegion.swift; sourceTree = "<group>"; };
+		5D42BC5523BFE99800FBD773 /* branded-2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "branded-2.jpg"; sourceTree = "<group>"; };
+		5D42BC5723BFE99800FBD773 /* branded-1.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "branded-1.jpg"; sourceTree = "<group>"; };
+		5D42BC5823BFE99800FBD773 /* branded-3.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "branded-3.jpg"; sourceTree = "<group>"; };
+		5D42BC5C23BFF5CB00FBD773 /* logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = logo.png; sourceTree = "<group>"; };
 		5D53748D23846FFA00A2B587 /* anton-repponen.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "anton-repponen.jpg"; sourceTree = "<group>"; };
 		5D53748E23846FFA00A2B587 /* dc-cavalleri.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "dc-cavalleri.jpg"; sourceTree = "<group>"; };
 		5D53748F23846FFA00A2B587 /* louis-kim.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "louis-kim.jpg"; sourceTree = "<group>"; };
@@ -2050,7 +2057,6 @@
 		5D53749A23846FFC00A2B587 /* matt-palmer.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "matt-palmer.jpg"; sourceTree = "<group>"; };
 		5D53749B23846FFC00A2B587 /* andy-mai.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "andy-mai.jpg"; sourceTree = "<group>"; };
 		5D5374B623887E7400A2B587 /* ntp-sponsored.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "ntp-sponsored.json"; sourceTree = "<group>"; };
-		5D5374B823887E7D00A2B587 /* EAFF_JA_soccer_Background_final.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = EAFF_JA_soccer_Background_final.jpg; sourceTree = "<group>"; };
 		5D5374BA238895B100A2B587 /* BackgroundImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundImage.swift; sourceTree = "<group>"; };
 		5D5E2360238C386B00AD6FBD /* NewTabPageTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageTableViewController.swift; sourceTree = "<group>"; };
 		5D6DDEE6214003A6001FF0AE /* DAU.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DAU.swift; sourceTree = "<group>"; };
@@ -3913,7 +3919,10 @@
 		5D5374B42388733A00A2B587 /* NTO_Sponsored */ = {
 			isa = PBXGroup;
 			children = (
-				5D5374B823887E7D00A2B587 /* EAFF_JA_soccer_Background_final.jpg */,
+				5D42BC5C23BFF5CB00FBD773 /* logo.png */,
+				5D42BC5723BFE99800FBD773 /* branded-1.jpg */,
+				5D42BC5523BFE99800FBD773 /* branded-2.jpg */,
+				5D42BC5823BFE99800FBD773 /* branded-3.jpg */,
 			);
 			path = NTO_Sponsored;
 			sourceTree = "<group>";
@@ -5468,7 +5477,7 @@
 				E4CD9F541A71506400318571 /* Reader.html in Resources */,
 				C6345ECB2113B3A000CFB983 /* SearchPlugins in Resources */,
 				F930CDAC227000F200A23FE1 /* U2F.js in Resources */,
-				5D5374B923887E7D00A2B587 /* EAFF_JA_soccer_Background_final.jpg in Resources */,
+				5D42BC5923BFE99900FBD773 /* branded-2.jpg in Resources */,
 				5D7001C222249F7B00E576FB /* ShortNameToFileMapping.json in Resources */,
 				4422D55921BFFB7F00BF1855 /* unicode.py in Resources */,
 				7B2142FE1E5E055000CDD3FC /* InfoPlist.strings in Resources */,
@@ -5491,9 +5500,11 @@
 				E4B7B7791A793CF20022C5E0 /* FiraSans-Light.ttf in Resources */,
 				5E3477E922D7771700B0D5F8 /* ResourceDownloader.js in Resources */,
 				F99505FF22937E3900CC6543 /* U2F-low-level.js in Resources */,
+				5D42BC5D23BFF5CB00FBD773 /* logo.png in Resources */,
 				59D4161B232681080087A6E1 /* Localizable.strings in Resources */,
 				D0FCF8081FE4772D004A7995 /* MainFrameAtDocumentStart.js in Resources */,
 				0A0D3D5021A5609600BEE65B /* SafeBrowsingError.html in Resources */,
+				5D42BC5B23BFE99900FBD773 /* branded-3.jpg in Resources */,
 				5D5374A623846FFC00A2B587 /* oliwier gesla.jpg in Resources */,
 				74821FFE1DB6D3AC00EEEA72 /* MailSchemes.plist in Resources */,
 				5EC1DDBC2356883800CA4028 /* onboarding-shields.json in Resources */,
@@ -5521,6 +5532,7 @@
 				E4424B3C1AC71FB400F44C38 /* FiraSans-Book.ttf in Resources */,
 				5D5374A423846FFC00A2B587 /* will_christiansen_ice.jpg in Resources */,
 				5D53749F23846FFC00A2B587 /* Svalbard_Jerol_Soibam.jpeg in Resources */,
+				5D42BC5A23BFE99900FBD773 /* branded-1.jpg in Resources */,
 				0AA21E4C2302C4CC00358988 /* webauth_touch_key.json in Resources */,
 				5D5374A023846FFC00A2B587 /* joe-gardner.jpg in Resources */,
 				5D5374A123846FFC00A2B587 /* xavier-balderas-cejudo.jpg in Resources */,

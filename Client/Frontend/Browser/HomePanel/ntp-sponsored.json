@@ -1,33 +1,44 @@
 [
   {
-    "image": "EAFF_JA_soccer_Background_final.jpg",
-    "center": 1280,
-    "credit": {
-      "name": "EAFF 2019",
-      "url": "https://EAFF.com/competitions/eaff2019/"
-    },
-    "dates": {
-      "start": "2019-11-25T00:00:13+09:00",
-      "end": "2019-12-18T00:00:00+09:00"
-    },
-    "regions": [
-      "JP",
-      "CN",
-      "KR",
-      "KP",
-      "TW",
-      "MN",
-      "MO",
-      "GU",
-      "MP",
-      "SG",
-      "IN",
-      "PK",
-      "MV",
-      "BD",
-      "BT",
-      "NP",
-      "UZ"
-    ]
+    "wallpapers": [
+      {
+        "image": "branded-1.jpg",
+        "focalPoint": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "image": "branded-2.jpg",
+        "focalPoint": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "image": "branded-3.jpg",
+        "focalPoint": {
+          "x": 0,
+          "y": 0
+        }
+      }
+    ],
+    "logo": {
+      "image": "logo.png",
+      "alt": "Technikke - for music lovers",
+      "comapnyName": "Technikke",
+      "destinationUrl": "https://EAFF.com/competitions/eaff2019/",
+      "regions": {
+        "invalid": {
+          "image": "",
+          "alt": "string",
+          "destinationUrl": "logo_url"
+        }
+      },
+      "dates": {
+        "start": "2019-11-25T00:00:13+09:00",
+        "end": "2020-12-18T00:00:00+09:00"
+      }
+    }
   }
 ]
