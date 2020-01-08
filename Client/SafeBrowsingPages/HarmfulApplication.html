@@ -10,7 +10,103 @@
         }
 
         .background {
-            background-color: #BE032D;
+            background-color: rgb(190, 3, 45);
+        }
+
+        .icon {
+            width: 64px;
+            height: 64px;
+        }
+
+        .title {
+            color: rgb(250, 251, 251);
+            font-size: 20px;
+            font-family: SFProDisplay-Medium;
+            font-weight: 500;
+            letter-spacing: 0.01px;
+            line-height: 28px;
+        }
+
+        .description {
+            color: rgb(245, 247, 255);
+            font-size: 14px;
+            font-family: SFProText-Regular;
+            font-weight: normal;
+            letter-spacing: 0px;
+            line-height: 19px;
+        }
+
+        .navigationButtons {
+            display: flex;
+        }
+
+        .leftNavButton {
+            background-repeat: no-repeat;
+            background: transparent;
+            border: none;
+            height: 44px;
+            margin-left: -20px;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        @media (max-width: 320px) {
+            .leftNavButton {
+                background-repeat: no-repeat;
+                background: transparent;
+                border: none;
+                height: 44px;
+                margin-left: -20px;
+                padding-left: 20px;
+                padding-right: 3px;
+            }
+        }
+
+        .leftNavButtonTitle {
+            color: rgb(248, 249, 250);
+            font-size: 16px;
+            font-family: SFProText-Semibold;
+            font-weight: 600;
+            line-height: 16px;
+
+            cursor: pointer;
+            overflow: hidden;
+            outline: none;
+        }
+
+        .rightNavButton {
+            background: transparent;
+            border-radius: 100px;
+            background-repeat: no-repeat;
+            border: 1px solid rgb(194, 196, 207);
+            height: 44px;
+            margin-right: 0px;
+            padding-left: 20px;
+            padding-right: 20px;
+            margin-left: auto;
+        }
+
+        .rightNavButtonTitle {
+            color: rgb(255, 255, 255);
+            font-size: 16px;
+            font-family: SFProText-Semibold;
+            font-weight: 600;
+            text-align: center;
+            line-height: 16px;
+
+            cursor: pointer;
+            overflow: hidden;
+            outline: none;
+        }
+
+        .moreDetails {
+            color: rgb(245, 247, 255);
+            font-family: SFProText-Medium;
+            font-size: 14px;
+            font-weight: 500;
+            height: 133px;
+            letter-spacing: 0px;
+            line-height: 19px;
         }
 
         .container {
@@ -20,69 +116,8 @@
             align-content: flex-start;
         }
 
-        .title {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-            font-weight: 500;
-            font-size: 20px;
-            color: white;
-        }
-
-        .warninginfo {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-            font-weight: 400;
-            font-size: 14px;
-            color: white;
-        }
-
-        .detailstitle {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-            font-weight: 600;
-            font-size: 14px;
-            color: white;
-            border: none;
-            padding: 0px 5px 0px 0px;
-            text-align: left;
-            text-decoration: none;
-            display: inline-block;
-            margin: 5px 0px;
-
-            background-color: transparent;
-            background-repeat: no-repeat;
-            border: none;
-            cursor: pointer;
-            overflow: hidden;
-            outline: none;
-        }
-
-        .safetybutton {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-            font-weight: 600;
-            font-size: 14px;
-            background-color: transparent;
-            border: 1px solid white;
-            color: white;
-            padding: 10px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            margin: 4px 30px;
-            border-radius: 20px;
-            cursor: pointer;
-            outline: none;
-        }
-
-        .detailsbody {
-            font: normal normal 700 12px /1.2 courier;
-            color: white;
-        }
-
         .hidden {
             display: none;
-        }
-
-        .options {
-            display: flex;
-            flex-direction: row;
         }
 
         i {
@@ -123,7 +158,7 @@
         function backToSafety() {
             webkit.messageHandlers.InterstitialPageHandler.postMessage("go_back");
         }
-    
+
         function proceedUnsafe() {
             webkit.messageHandlers.InterstitialPageHandler.postMessage("proceed_unsafe");
         }
@@ -132,8 +167,8 @@
 
 <body class="background">
     <div class="container post">
-        <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
-            <g fill="white">
+        <svg class="icon" xmlns="http://www.w3.org/2000/svg">
+            <g fill="rgb(250, 251, 251)">
                 <path
                     d="M58.584 59.167H5.414a2.423 2.423 0 01-2.116-3.589L29.86 7.158c.848-1.544 3.385-1.544 4.232 0l26.355 48.045a2.42 2.42 0 01-1.862 3.964zM31.975 13.35L9.498 54.325h44.954L31.975 13.35zm0 11.922a2.418 2.418 0 012.416 2.421V39.8a2.42 2.42 0 01-2.416 2.421 2.417 2.417 0 01-2.413-2.421V27.694a2.416 2.416 0 012.413-2.42zm1.721 20.069c.434.46.7 1.09.7 1.72 0 .63-.266 1.258-.724 1.718a2.437 2.437 0 01-1.69.703 2.486 2.486 0 01-1.714-.703 2.433 2.433 0 01-.702-1.718c0-.63.242-1.26.702-1.72.891-.896 2.535-.896 3.428 0z" />
             </g>
@@ -143,26 +178,26 @@
             Harmful site ahead
         </p>
 
-        <p class="warninginfo">
+        <p class="description">
             Attackers on testsafebrowsing.appspot.com may trick you into doing something dangerous like installing
             software ore revealing your personal information (for example, passwords, phone numbers, or credit cards).
-            <a class="warninginfo" href="https://support.google.com/chrome/answer/99020">Learn more</a>
+            <a class="description" href="https://support.google.com/chrome/answer/99020">Learn more</a>
             <br /><br /><br />
             NET::ERR_CERT_DATE_INVALID
             <br /><br />
         </p>
 
-        <div class="options">
-            <button class="detailstitle" onclick="toggleDetails();">More details <i id="arrow"
+        <div class="navigationButtons">
+            <button class="leftNavButton leftNavButtonTitle" onclick="toggleDetails();">More details <i id="arrow"
                     class="arrow down"></i></button>
-            <button class="safetybutton" onclick="backToSafety();">Back to safety</button>
+            <button class="rightNavButton rightNavButtonTitle" onclick="backToSafety();">Back to safety</button>
         </div>
 
-        <p id="details" class="detailsbody hidden">
+        <p id="details" class="moreDetails hidden">
             Brave Safe Browsing recently detected phishing on testsafebrowsing.appspot.com. Phishing sites pretend to be
             other websites to trick you.
             <br /><br />
-            You can report a detection problem or, if you understand the risks to your security, <a class="detailsbody"
+            You can report a detection problem or, if you understand the risks to your security, <a class="moreDetails"
                 href="#" onclick='return proceedUnsafe()'>visit this
                 unsafe
                 site</a>.

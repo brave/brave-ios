@@ -3,14 +3,37 @@
     <title>Safe Browsing</title>
     <style>
         .post {
-            padding-top: max(36px, env(safe-area-inset-top));
-            padding-bottom: max(36px, env(safe-area-inset-bottom));
-            padding-left: max(36px, env(safe-area-inset-left));
-            padding-right: max(36px, env(safe-area-inset-right));
+            padding-top: max(25px, env(safe-area-inset-top));
+            padding-bottom: max(25px, env(safe-area-inset-bottom));
+            padding-left: max(25px, env(safe-area-inset-left));
+            padding-right: max(25px, env(safe-area-inset-right));
         }
 
         .background {
             background-color: white;
+        }
+
+        .icon {
+            width: 64px;
+            height: 64px;
+        }
+
+        .title {
+            color: rgb(94, 97, 117);
+            font-size: 20px;
+            font-family: SFProDisplay-Medium;
+            font-weight: 500;
+            letter-spacing: 0.01px;
+            line-height: 28px;
+        }
+
+        .description {
+            color: rgb(82, 82, 82);
+            font-size: 14px;
+            font-family: SFProText-Regular;
+            font-weight: normal;
+            letter-spacing: 0px;
+            line-height: 19px;
         }
 
         .container {
@@ -19,26 +42,12 @@
             flex-direction: column;
             align-content: flex-start;
         }
-
-        .title {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-            font-weight: 500;
-            font-size: 20px;
-            color: #5E6175;
-        }
-
-        .warninginfo {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-            font-weight: 400;
-            font-size: 14px;
-            color: #525252;
-        }
     </style>
 </head>
 
 <body class="background">
     <div class="container post">
-        <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+        <svg class="icon" xmlns="http://www.w3.org/2000/svg">
             <defs>
                 <linearGradient x1=".643%" y1="49.357%" x2="99.357%" y2="49.357%" id="a">
                     <stop stop-color="#392DD1" offset="0%" />
@@ -57,7 +66,7 @@
             This site can't be reached
         </p>
 
-        <p class="warninginfo">
+        <p class="description">
             The webpage at chrome://0.0.1.148/ might be temporarily down or it may have moved permanently to a new web
             address.
             <br /><br /><br />
