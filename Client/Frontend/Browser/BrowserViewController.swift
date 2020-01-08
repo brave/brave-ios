@@ -2139,6 +2139,10 @@ extension BrowserViewController: TabDelegate {
         
         tab.addContentScript(RewardsReporting(rewards: rewards, tab: tab), name: RewardsReporting.name())
         tab.addContentScript(AdsMediaReporting(rewards: rewards, tab: tab), name: AdsMediaReporting.name())
+        
+        let interstitialPageHandler = InterstitialPageHandler(tab: tab)
+        tab.interstitialPageHandler = interstitialPageHandler
+        tab.addContentScript(interstitialPageHandler, name: InterstitialPageHandler.name())
     }
 
     func tab(_ tab: Tab, willDeleteWebView webView: WKWebView) {

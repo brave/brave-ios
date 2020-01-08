@@ -3,10 +3,10 @@
     <title>Safe Browsing</title>
     <style>
         .post {
-            padding-top: max(36px, env(safe-area-inset-top));
-            padding-bottom: max(36px, env(safe-area-inset-bottom));
-            padding-left: max(36px, env(safe-area-inset-left));
-            padding-right: max(36px, env(safe-area-inset-right));
+            padding-top: max(25px, env(safe-area-inset-top));
+            padding-bottom: max(25px, env(safe-area-inset-bottom));
+            padding-left: max(25px, env(safe-area-inset-left));
+            padding-right: max(25px, env(safe-area-inset-right));
         }
 
         .background {
@@ -65,7 +65,7 @@
             text-align: center;
             text-decoration: none;
             display: inline-block;
-            margin: 4px 50px;
+            margin: 4px 30px;
             border-radius: 20px;
             cursor: pointer;
             outline: none;
@@ -121,7 +121,11 @@
         }
 
         function backToSafety() {
-
+            webkit.messageHandlers.InterstitialPageHandler.postMessage("go_back");
+        }
+    
+        function proceedUnsafe() {
+            webkit.messageHandlers.InterstitialPageHandler.postMessage("proceed_unsafe");
         }
     </script>
 </head>
@@ -159,7 +163,7 @@
             other websites to trick you.
             <br /><br />
             You can report a detection problem or, if you understand the risks to your security, <a class="detailsbody"
-                href="">visit this
+                href="#" onclick='return proceedUnsafe()'>visit this
                 unsafe
                 site</a>.
         </p>

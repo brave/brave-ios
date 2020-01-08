@@ -3,10 +3,10 @@
     <title>Safe Browsing</title>
     <style>
         .post {
-            padding-top: max(36px, env(safe-area-inset-top));
-            padding-bottom: max(36px, env(safe-area-inset-bottom));
-            padding-left: max(36px, env(safe-area-inset-left));
-            padding-right: max(36px, env(safe-area-inset-right));
+            padding-top: max(25px, env(safe-area-inset-top));
+            padding-bottom: max(25px, env(safe-area-inset-bottom));
+            padding-left: max(25px, env(safe-area-inset-left));
+            padding-right: max(25px, env(safe-area-inset-right));
         }
 
         .background {
@@ -167,7 +167,8 @@
             computer's operating system. This may be caused by a misconfiguration or an attacker trying to intercept
             your connection.
             <br /><br />
-            Proceed to example.com (unsafe)
+            <a class="detailsbody"
+            href="#" onclick='return proceedUnsafe()'>Proceed to example.com (unsafe)</a>.
         </p>
     </div>
 </body>

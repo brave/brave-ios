@@ -646,6 +646,15 @@
 		5E0FCD212342526700AC831E /* FullscreenHelper.js in Resources */ = {isa = PBXBuildFile; fileRef = 5EB57D0122FDC0CB00A07325 /* FullscreenHelper.js */; };
 		5E0FCD23234253DC00AC831E /* CertificatePinning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E0FCD22234253DC00AC831E /* CertificatePinning.swift */; };
 		5E0FCD252342544C00AC831E /* URLSession+Requests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E0FCD242342544C00AC831E /* URLSession+Requests.swift */; };
+		5E27B26E23BA67420091232F /* HarmfulApplication.html in Resources */ = {isa = PBXBuildFile; fileRef = 5E27B26523BA67410091232F /* HarmfulApplication.html */; };
+		5E27B26F23BA67420091232F /* Fake.html in Resources */ = {isa = PBXBuildFile; fileRef = 5E27B26723BA67410091232F /* Fake.html */; };
+		5E27B27023BA67420091232F /* Malware.html in Resources */ = {isa = PBXBuildFile; fileRef = 5E27B26823BA67410091232F /* Malware.html */; };
+		5E27B27123BA67420091232F /* MITM.html in Resources */ = {isa = PBXBuildFile; fileRef = 5E27B26923BA67410091232F /* MITM.html */; };
+		5E27B27223BA67420091232F /* Phishing.html in Resources */ = {isa = PBXBuildFile; fileRef = 5E27B26A23BA67410091232F /* Phishing.html */; };
+		5E27B27323BA67420091232F /* Fraud.html in Resources */ = {isa = PBXBuildFile; fileRef = 5E27B26B23BA67410091232F /* Fraud.html */; };
+		5E27B27423BA67420091232F /* 404.html in Resources */ = {isa = PBXBuildFile; fileRef = 5E27B26C23BA67420091232F /* 404.html */; };
+		5E27B27523BA67420091232F /* NetworkFailure.html in Resources */ = {isa = PBXBuildFile; fileRef = 5E27B26D23BA67420091232F /* NetworkFailure.html */; };
+		5E27B27723BA7ED80091232F /* InterstitialPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E27B27623BA7ED80091232F /* InterstitialPage.swift */; };
 		5E3477E922D7771700B0D5F8 /* ResourceDownloader.js in Resources */ = {isa = PBXBuildFile; fileRef = 5E3477E822D7771700B0D5F8 /* ResourceDownloader.js */; };
 		5E34781022D7A1D200B0D5F8 /* ResourceDownloadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E34780F22D7A1D200B0D5F8 /* ResourceDownloadManager.swift */; };
 		5E46C371234FACC600ACA8C1 /* root.cer in Resources */ = {isa = PBXBuildFile; fileRef = 5E46C36D234FACC600ACA8C1 /* root.cer */; };
@@ -670,6 +679,10 @@
 		5EA84390234F802C00076A91 /* expired.badssl.com-intermediate-ca-2.cer in Resources */ = {isa = PBXBuildFile; fileRef = 5EA8438C234F802C00076A91 /* expired.badssl.com-intermediate-ca-2.cer */; };
 		5EA84391234F802C00076A91 /* expired.badssl.com-leaf.cer in Resources */ = {isa = PBXBuildFile; fileRef = 5EA8438D234F802C00076A91 /* expired.badssl.com-leaf.cer */; };
 		5EAB745C230456F0006055F5 /* BookmarkValidation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EAB745B230456F0006055F5 /* BookmarkValidation.swift */; };
+		5EB57C2622FB1B3700A07325 /* GSafeBrowsing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EB57C2522FB1B3700A07325 /* GSafeBrowsing.swift */; };
+		5EB57CBF22FC77F200A07325 /* GSafeBrowsingModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EB57CBE22FC77F200A07325 /* GSafeBrowsingModels.swift */; };
+		5EB57CC822FC793100A07325 /* GSafeBrowsingDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EB57CC722FC793100A07325 /* GSafeBrowsingDatabase.swift */; };
+		5EB57CCC22FC7BD000A07325 /* SafeBrowsing.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 5EB57CCA22FC7BD000A07325 /* SafeBrowsing.xcdatamodeld */; };
 		5EC1DDBC2356883800CA4028 /* onboarding-shields.json in Resources */ = {isa = PBXBuildFile; fileRef = 0A6E095E230E05BC00AB3F19 /* onboarding-shields.json */; };
 		5EC1DDBD2356888000CA4028 /* onboarding-rewards.json in Resources */ = {isa = PBXBuildFile; fileRef = 5E1D8C6E232C0BDB00BDE662 /* onboarding-rewards.json */; };
 		5EC1DDBE2356892900CA4028 /* onboarding-ads.json in Resources */ = {isa = PBXBuildFile; fileRef = 5E11C3FF23314D970003C363 /* onboarding-ads.json */; };
@@ -2090,6 +2103,15 @@
 		5E1D8C6A232BF95200BDE662 /* OnboardingRewardsAgreementViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingRewardsAgreementViewController.swift; sourceTree = "<group>"; };
 		5E1D8C6C232BF9C200BDE662 /* OnboardingRewardsAgreementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingRewardsAgreementView.swift; sourceTree = "<group>"; };
 		5E1D8C6E232C0BDB00BDE662 /* onboarding-rewards.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "onboarding-rewards.json"; sourceTree = "<group>"; };
+		5E27B26523BA67410091232F /* HarmfulApplication.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = HarmfulApplication.html; sourceTree = "<group>"; };
+		5E27B26723BA67410091232F /* Fake.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = Fake.html; sourceTree = "<group>"; };
+		5E27B26823BA67410091232F /* Malware.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = Malware.html; sourceTree = "<group>"; };
+		5E27B26923BA67410091232F /* MITM.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = MITM.html; sourceTree = "<group>"; };
+		5E27B26A23BA67410091232F /* Phishing.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = Phishing.html; sourceTree = "<group>"; };
+		5E27B26B23BA67410091232F /* Fraud.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = Fraud.html; sourceTree = "<group>"; };
+		5E27B26C23BA67420091232F /* 404.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = 404.html; sourceTree = "<group>"; };
+		5E27B26D23BA67420091232F /* NetworkFailure.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = NetworkFailure.html; sourceTree = "<group>"; };
+		5E27B27623BA7ED80091232F /* InterstitialPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterstitialPage.swift; sourceTree = "<group>"; };
 		5E3477E822D7771700B0D5F8 /* ResourceDownloader.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = ResourceDownloader.js; sourceTree = "<group>"; };
 		5E34780F22D7A1D200B0D5F8 /* ResourceDownloadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceDownloadManager.swift; sourceTree = "<group>"; };
 		5E46C36D234FACC600ACA8C1 /* root.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = root.cer; sourceTree = "<group>"; };
@@ -2110,6 +2132,10 @@
 		5EA8438C234F802C00076A91 /* expired.badssl.com-intermediate-ca-2.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = "expired.badssl.com-intermediate-ca-2.cer"; sourceTree = "<group>"; };
 		5EA8438D234F802C00076A91 /* expired.badssl.com-leaf.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = "expired.badssl.com-leaf.cer"; sourceTree = "<group>"; };
 		5EAB745B230456F0006055F5 /* BookmarkValidation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkValidation.swift; sourceTree = "<group>"; };
+		5EB57C2522FB1B3700A07325 /* GSafeBrowsing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GSafeBrowsing.swift; sourceTree = "<group>"; };
+		5EB57CBE22FC77F200A07325 /* GSafeBrowsingModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GSafeBrowsingModels.swift; sourceTree = "<group>"; };
+		5EB57CC722FC793100A07325 /* GSafeBrowsingDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GSafeBrowsingDatabase.swift; sourceTree = "<group>"; };
+		5EB57CCB22FC7BD000A07325 /* SafeBrowsing.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SafeBrowsing.xcdatamodel; sourceTree = "<group>"; };
 		5EB57D0122FDC0CB00A07325 /* FullscreenHelper.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = FullscreenHelper.js; sourceTree = "<group>"; };
 		5EC594EC232C2C8F00922111 /* OnboardingWebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingWebViewController.swift; sourceTree = "<group>"; };
 		5EC594EE232C68FC00922111 /* OnboardingAdsCountdownViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingAdsCountdownViewController.swift; sourceTree = "<group>"; };
@@ -4041,6 +4067,15 @@
 		5ECCE69D23B6919900A0193D /* SafeBrowsingPages */ = {
 			isa = PBXGroup;
 			children = (
+				5E27B26C23BA67420091232F /* 404.html */,
+				5E27B26D23BA67420091232F /* NetworkFailure.html */,
+				5E27B26723BA67410091232F /* Fake.html */,
+				5E27B26B23BA67410091232F /* Fraud.html */,
+				5E27B26523BA67410091232F /* HarmfulApplication.html */,
+				5E27B26823BA67410091232F /* Malware.html */,
+				5E27B26923BA67410091232F /* MITM.html */,
+				5E27B26A23BA67410091232F /* Phishing.html */,
+				5E27B27623BA7ED80091232F /* InterstitialPage.swift */,
 			);
 			path = SafeBrowsingPages;
 			sourceTree = "<group>";
@@ -4613,7 +4648,6 @@
 		F84B21C01A090F8100AAB793 /* Client */ = {
 			isa = PBXGroup;
 			children = (
-				5ECCE69D23B6919900A0193D /* SafeBrowsingPages */,
 				5E856FE3235E08010094E113 /* DeviceCheck */,
 				7B2142FC1E5E055000CDD3FC /* InfoPlist.strings */,
 				F84B22431A09165600AAB793 /* Info.plist */,
@@ -4627,6 +4661,8 @@
 				276E7A3A22F21DAB00939424 /* Rewards */,
 				39A359BD1BFCCE7B006B9E87 /* Helpers */,
 				0A4BEFCD221E11440005551A /* Networking */,
+				5EB57CC922FC7B9B00A07325 /* SafeBrowsing */,
+				5ECCE69D23B6919900A0193D /* SafeBrowsingPages */,
 				0A0D3D2F21A4BC1F00BEE65B /* WebFilters */,
 				F930CDB02270029B00A23FE1 /* WebAuthN */,
 				E65075551E37F714006961AC /* Utils */,
@@ -5479,6 +5515,7 @@
 				F35B8D2B1D6380EA008E3D61 /* SessionRestore.html in Resources */,
 				5E4845C022DE381200372022 /* WindowRenderHelper.js in Resources */,
 				3BC659591E5BA505006D560F /* top_sites.json in Resources */,
+				5E27B27523BA67420091232F /* NetworkFailure.html in Resources */,
 				E4B7B7631A793CF20022C5E0 /* CharisSILI.ttf in Resources */,
 				E4CD9F541A71506400318571 /* Reader.html in Resources */,
 				C6345ECB2113B3A000CFB983 /* SearchPlugins in Resources */,
@@ -5487,6 +5524,7 @@
 				5D7001C222249F7B00E576FB /* ShortNameToFileMapping.json in Resources */,
 				4422D55921BFFB7F00BF1855 /* unicode.py in Resources */,
 				7B2142FE1E5E055000CDD3FC /* InfoPlist.strings in Resources */,
+				5E27B27223BA67420091232F /* Phishing.html in Resources */,
 				E69922171B94E3EF007C480D /* Licenses.html in Resources */,
 				5D5374A223846FFC00A2B587 /* anders-jilden.jpg in Resources */,
 				E4CD9F5B1A71506C00318571 /* Reader.css in Resources */,
@@ -5502,14 +5540,17 @@
 				39F4C0FA2045D87400746155 /* FocusHelper.js in Resources */,
 				E4B7B7861A793CF20022C5E0 /* FiraSans-UltraLight.ttf in Resources */,
 				E4B7B77D1A793CF20022C5E0 /* FiraSans-Regular.ttf in Resources */,
+				5E27B27123BA67420091232F /* MITM.html in Resources */,
 				4422D55221BFFB7E00BF1855 /* make_unicode_casefold.py in Resources */,
 				E4B7B7791A793CF20022C5E0 /* FiraSans-Light.ttf in Resources */,
 				5E3477E922D7771700B0D5F8 /* ResourceDownloader.js in Resources */,
 				F99505FF22937E3900CC6543 /* U2F-low-level.js in Resources */,
+				5E27B27423BA67420091232F /* 404.html in Resources */,
 				59D4161B232681080087A6E1 /* Localizable.strings in Resources */,
 				D0FCF8081FE4772D004A7995 /* MainFrameAtDocumentStart.js in Resources */,
 				0A0D3D5021A5609600BEE65B /* SafeBrowsingError.html in Resources */,
 				5D5374A623846FFC00A2B587 /* oliwier gesla.jpg in Resources */,
+				5E27B26F23BA67420091232F /* Fake.html in Resources */,
 				74821FFE1DB6D3AC00EEEA72 /* MailSchemes.plist in Resources */,
 				5EC1DDBC2356883800CA4028 /* onboarding-shields.json in Resources */,
 				5D53749C23846FFC00A2B587 /* anton-repponen.jpg in Resources */,
@@ -5519,16 +5560,19 @@
 				FA9294011D6584A200AC8D33 /* QRCode.xcassets in Resources */,
 				D308EE561CBF0BF5006843F2 /* CertError.css in Resources */,
 				4422D4AD21BFFB7600BF1855 /* LICENSE in Resources */,
+				5E27B27323BA67420091232F /* Fraud.html in Resources */,
 				5D5374AA23846FFC00A2B587 /* andy-mai.jpg in Resources */,
 				E4B7B7641A793CF20022C5E0 /* CharisSILR.ttf in Resources */,
 				5D21AE082303B70E00B30D97 /* Themes in Resources */,
 				4422D56D21BFFB7F00BF1855 /* make_unicode_groups.py in Resources */,
+				5E27B27023BA67420091232F /* Malware.html in Resources */,
 				E4B7B7681A793CF20022C5E0 /* FiraSans-Bold.ttf in Resources */,
 				E4B7B7781A793CF20022C5E0 /* FiraSans-Italic.ttf in Resources */,
 				5D53749D23846FFC00A2B587 /* dc-cavalleri.jpg in Resources */,
 				5EC1DDBD2356888000CA4028 /* onboarding-rewards.json in Resources */,
 				0BA1E00E1B03FB0B007675AF /* NetError.html in Resources */,
 				5DE5250E218CE92C000DFAA6 /* block-images.json in Resources */,
+				5E27B26E23BA67420091232F /* HarmfulApplication.html in Resources */,
 				5D5374A823846FFC00A2B587 /* annie-spratt.jpg in Resources */,
 				E4A961381AC06FA50069AD6F /* ReaderViewLoading.html in Resources */,
 				59C8119922D754D4005D5BBC /* BraveShared.strings in Resources */,
@@ -6271,6 +6315,7 @@
 				4422D4F021BFFB7600BF1855 /* write_batch.cc in Sources */,
 				E68AEDB01B18F81A00133D99 /* SwipeAnimator.swift in Sources */,
 				0AEFB8532226D7C5007AF600 /* AdblockResourcesMappings.swift in Sources */,
+				5E27B27723BA7ED80091232F /* InterstitialPage.swift in Sources */,
 				3BF56D271CDBBE1F00AC4D75 /* SimpleToast.swift in Sources */,
 				D31F95E91AC226CB005C9F3B /* ScreenshotHelper.swift in Sources */,
 				28EADE5D1AFC3A78007FB2FB /* UIImageViewExtensions.swift in Sources */,

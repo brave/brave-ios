@@ -3,10 +3,10 @@
     <title>Safe Browsing</title>
     <style>
         .post {
-            padding-top: max(36px, env(safe-area-inset-top));
-            padding-bottom: max(36px, env(safe-area-inset-bottom));
-            padding-left: max(36px, env(safe-area-inset-left));
-            padding-right: max(36px, env(safe-area-inset-right));
+            padding-top: max(25px, env(safe-area-inset-top));
+            padding-bottom: max(25px, env(safe-area-inset-bottom));
+            padding-left: max(25px, env(safe-area-inset-left));
+            padding-right: max(25px, env(safe-area-inset-right));
         }
 
         .background {
@@ -89,12 +89,12 @@
         }
     </style>
     <script>
-        function proceedbutton() {
-
+        function backToSafety() {
+            webkit.messageHandlers.InterstitialPageHandler.postMessage("go_back");
         }
 
-        function backToSafety() {
-
+        function proceedUnsafe() {
+            webkit.messageHandlers.InterstitialPageHandler.postMessage("proceed_unsafe");
         }
     </script>
 </head>
@@ -126,7 +126,7 @@
         </p>
 
         <div class="options">
-            <button class="proceedbutton" onclick="proceed();">Proceed</button>
+            <button class="proceedbutton" onclick="proceedUnsafe();">Proceed</button>
             <button class="safetybutton" onclick="backToSafety();">Go back</button>
         </div>
     </div>
