@@ -22,7 +22,7 @@ class SafeBrowsingClient {
     private static let version = AppInfo.appVersion
     
     private let userAgent = UserAgent.defaultUserAgent()
-    private let baseURL = "https://safebrowsing.brave.com" //"https://safebrowsing-ios.brave.com"
+    private let baseURL = "https://safebrowsing.brave.com"
     private let session = URLSession(configuration: .ephemeral)
     private let database = SafeBrowsingDatabase()
     private let cache = SafeBrowsingCache()
