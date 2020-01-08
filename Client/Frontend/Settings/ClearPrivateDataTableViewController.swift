@@ -212,9 +212,7 @@ class ClearPrivateDataTableViewController: UITableViewController {
             self.clearButtonEnabled = false
             
             let shouldReloadTabs = self.clearables.contains { item in
-                return item.clearable is HistoryClearable ||
-                    item.clearable is CacheClearable ||
-                    item.clearable is CookiesAndCacheClearable
+                return item.clearable is CacheClearable || item.clearable is CookiesAndCacheClearable
             }
             
             if shouldReloadTabs {
