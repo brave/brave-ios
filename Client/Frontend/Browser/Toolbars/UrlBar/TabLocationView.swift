@@ -79,11 +79,9 @@ class TabLocationView: UIView {
         switch secureContentState {
         case .localHost:
             lockImageView.isHidden = true
-        case .secure:
-            lockImageView.tintColor = #colorLiteral(red: 0.3764705882, green: 0.3843137255, blue: 0.4, alpha: 1)
         case .insecure:
             lockImageView.tintColor = .red
-        case .unknown:
+        case .secure, .unknown:
             lockImageView.tintColor = #colorLiteral(red: 0.3764705882, green: 0.3843137255, blue: 0.4, alpha: 1)
         }
     }
