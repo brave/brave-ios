@@ -109,13 +109,7 @@ class TabsBarViewController: UIViewController {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
-        let offset = Float(collectionView.contentOffset.x)
-        let startFade = Float(30)
-        leftOverflowIndicator.opacity = min(1, offset / startFade)
-        
-        // all the way scrolled right
-        let offsetFromRight = collectionView.contentSize.width - CGFloat(offset) - collectionView.frame.width
-        rightOverflowIndicator.opacity = min(1, Float(offsetFromRight) / startFade)
+        updateOverflowIndicatorsLayout()
     }
     
     deinit {
@@ -199,10 +193,7 @@ class TabsBarViewController: UIViewController {
         return max(overflow, 0)
     }
     
-    fileprivate func overflowIndicators() {
-        addScrollHint(for: .leftSide, maskLayer: leftOverflowIndicator)
-        addScrollHint(for: .rightSide, maskLayer: rightOverflowIndicator)
-        
+    private func updateOverflowIndicatorsLayout() {
         let offset = Float(collectionView.contentOffset.x)
         let startFade = Float(30)
         leftOverflowIndicator.opacity = min(1, offset / startFade)
@@ -210,6 +201,12 @@ class TabsBarViewController: UIViewController {
         // all the way scrolled right
         let offsetFromRight = collectionView.contentSize.width - CGFloat(offset) - collectionView.frame.width
         rightOverflowIndicator.opacity = min(1, Float(offsetFromRight) / startFade)
+    }
+    
+    fileprivate func overflowIndicators() {
+        addScrollHint(for: .leftSide, maskLayer: leftOverflowIndicator)
+        addScrollHint(for: .rightSide, maskLayer: rightOverflowIndicator)
+        updateOverflowIndicatorsLayout()
     }
     
     private enum HintSide { case leftSide, rightSide }
