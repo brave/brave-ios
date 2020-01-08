@@ -210,7 +210,9 @@ class ClearPrivateDataTableViewController: UITableViewController {
         let clearAction = UIAlertAction(title: Strings.ClearPrivateData, style: .destructive) { (_) in
             Preferences.Privacy.clearPrivateDataToggles.value = self.toggles
             self.clearButtonEnabled = false
-            self.tabManager.removeAll()
+            
+            self.tabManager.allTabs.forEach({ $0.reload() })
+            
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
                 if !self.gotNotificationDeathOfAllWebViews {
                     self.allWebViewsKilled()
