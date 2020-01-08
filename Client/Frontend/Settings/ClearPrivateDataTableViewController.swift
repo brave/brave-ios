@@ -211,7 +211,15 @@ class ClearPrivateDataTableViewController: UITableViewController {
             Preferences.Privacy.clearPrivateDataToggles.value = self.toggles
             self.clearButtonEnabled = false
             
-            self.tabManager.allTabs.forEach({ $0.reload() })
+            let shouldReloadTabs = self.clearables.contains { item in
+                return item.clearable is HistoryClearable ||
+                    item.clearable is CacheClearable ||
+                    item.clearable is CookiesAndCacheClearable
+            }
+            
+            if shouldReloadTabs {
+                self.tabManager.allTabs.forEach({ $0.reload() })
+            }
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
                 if !self.gotNotificationDeathOfAllWebViews {
