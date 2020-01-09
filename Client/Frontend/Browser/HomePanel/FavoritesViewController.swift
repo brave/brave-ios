@@ -247,7 +247,7 @@ class FavoritesViewController: UIViewController, Themeable {
             // Therefore specifying `0` should take the imageView's left and pinning it to view's center.
             
             // So basically the movement needs to be "inverted" (hence negation)
-            let imageViewOffset = sizeRatio * -(backgroundImage.info?.center ?? 0)
+            let imageViewOffset = sizeRatio * -(backgroundImage.info?.focalPoint?.x ?? 0)
             backgroundViewInfo?.portraitCenterConstraint.update(offset: imageViewOffset)
         }
     }
@@ -399,7 +399,7 @@ class FavoritesViewController: UIViewController, Themeable {
     
     private func setupBackgroundImage() {
         guard var background = backgroundImage.info,
-            let image = background.image else {
+            let image = background.imageLiteral else {
                 imageCreditButton.isHidden = true
                 return
         }

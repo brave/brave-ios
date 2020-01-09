@@ -8,15 +8,52 @@ import BraveShared
 
 class BackgroundImage {
     
-    struct Background {
-        let imageFileName: String
-        let center: CGFloat
-        let isSponsored: Bool
-        let credit: (name: String, url: String?)?
+    struct Background: Decodable {
+        let image: String
+        /// Required instead of `CGPoint` due to x/y being optionals
+        let focalPoint: FocalPoint?
+        // TODO: Probably need to re-enable _somehow_
+//        let isSponsored: Bool
+        let credit: Credit?
         
-        lazy var image: UIImage? = {
-            return UIImage(named: imageFileName)
+        struct Credit: Decodable {
+            let name: String
+            let url: String?
+        }
+        
+        struct FocalPoint: Decodable {
+            let x: CGFloat?
+            let y: CGFloat?
+        }
+        
+        lazy var imageLiteral: UIImage? = {
+            return UIImage(named: image)
         }()
+    }
+    
+    struct Sponsor: Decodable {
+        let wallpapers: [Background]
+        let logo: Logo
+        let dates: Dates
+        
+        struct Logo: Decodable {
+            let image: String
+            let alt: String
+            let companyName: String
+            let destinationUrl: String
+            let regions: [String: Region]
+            
+            struct Region: Decodable {
+                let image: String
+                let alt: String
+                let destinationUrl: String
+            }
+        }
+        
+        struct Dates: Decodable {
+            let start: String
+            let end: String
+        }
     }
 
     // Data is static to avoid duplicate loads
@@ -29,94 +66,46 @@ class BackgroundImage {
     private static let numberOfDuplicateAvoidance = 6
     private static let sponsorshipShowRate = 4 // e.g. 4 == 25% or "every 4th image"
     
-    let info: Background?
-    static var hasSponsor: Bool { sponsors?.count ?? 0 > 0 }
-    private static var sponsors: [Background]?
-    private static var standardBackgrounds: [Background]?
+    // TODO: Make setter private?
+    var info: Background?
+    private lazy var sponsor: Sponsor? = {
+        let sponsoredFilePath = "ntp-sponsored"
+        guard let sponsoredData = self.loadData(file: sponsoredFilePath) else { return nil }
+        // TODO: Wrap
+        let sponsor = try? JSONDecoder().decode(Sponsor.self, from: sponsoredData)
+        // Only set a sponsor if there are valid backgrounds
+        return sponsor?.wallpapers.isEmpty == true ? nil : sponsor
+    }()
+    
+    private lazy var standardBackgrounds: [Background] = {
+        let backgroundFilePath = "ntp-data"
+        guard let backgroundData = self.loadData(file: backgroundFilePath) else { return [] }
+        // TODO: Wrap
+        let backgrounds = try? JSONDecoder().decode([Background].self, from: backgroundData)
+        return backgrounds ?? []
+    }()
     
     // This is used to prevent the same handful of backgrounds from being shown.
     //  It will track the last N pictures that have been shown and prevent them from being shown
     //  until they are 'old' and dropped from this array.
     // Currently only supports normal backgrounds, as sponsored images are not supposed to be duplicate.
     // This can 'easily' be adjusted to support both sets by switching to String, and using filePath to identify uniqueness.
-    private static var lastBackgroundChoices = [Int]()
+    private var lastBackgroundChoices = [Int]()
     
-    init(sponsoredFilePath: String = "ntp-sponsored", backgroundFilePath: String = "ntp-data") {
-        
+    init() {
         if !Preferences.NewTabPage.backgroundImages.value {
-            // Do absolutely nothing
-            self.info = nil
             return
         }
         
-        // Setting up normal backgrounds
-        if BackgroundImage.standardBackgrounds == nil {
-            BackgroundImage.standardBackgrounds = BackgroundImage.generateStandardData(file: backgroundFilePath)
-        }
-        
-        // Setting up sponsored backgrounds
-        if BackgroundImage.sponsors == nil && Preferences.NewTabPage.backgroundSponsoredImages.value {
-            BackgroundImage.sponsors = BackgroundImage.generateSponsoredData(file: sponsoredFilePath)
-        }
-        
-        self.info = BackgroundImage.randomBackground()
+        self.info = randomBackground()
     }
     
-    private static func generateSponsoredData(file: String) -> [Background] {
-        guard let json = BackgroundImage.loadImageJSON(file: file),
-            let region = NSLocale.current.regionCode else {
-                return []
-        }
-        
-        let dateFormatter = DateFormatter().then {
-            $0.locale = Locale(identifier: "en_US_POSIX")
-            $0.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZZ"
-            $0.calendar = Calendar(identifier: .gregorian)
-        }
-        
-        let today = Date()
-        // Filter down to only regional supported items
-        let regionals = json.filter { ($0["regions"] as? [String])?.contains(region) == true }
-        
-        // Filter down to sponsors that fit the date requirements
-        let live = regionals.filter { item in
-            guard let dates = item["dates"] as? [String: String],
-                let start = dateFormatter.date(from: dates["start"] ?? ""),
-                let end = dateFormatter.date(from: dates["end"] ?? "") else {
-                    return false
-            }
-            
-            return today > start && today < end
-        }
-        
-        return generateBackgroundData(data: live, isSponsored: true)
-    }
-    
-    private static func generateStandardData(file: String) -> [Background] {
-        guard let json = BackgroundImage.loadImageJSON(file: file) else { return [] }
-        return generateBackgroundData(data: json, isSponsored: false)
-    }
-    
-    private static func generateBackgroundData(data: [[String: Any]], isSponsored: Bool) -> [Background] {
-        return data.compactMap { item in
-            guard let image = item["image"] as? String,
-                let center = item["center"] as? CGFloat else { return nil }
-            
-            if let credit = item["credit"] as? [String: String],
-                let name = credit["name"] {
-                return Background(imageFileName: image, center: center, isSponsored: isSponsored, credit: (name, credit["url"]))
-            }
-            
-            return Background(imageFileName: image, center: center, isSponsored: isSponsored, credit: nil)
-        }
-    }
-    
-    private static func randomBackground() -> Background? {
+    private func randomBackground() -> Background? {
         // Determine what type of background to display
         let useSponsor = Preferences.NewTabPage.backgroundSponsoredImages.value
-            && hasSponsor
-            && Int.random(in: 0..<sponsorshipShowRate) == 0
-        guard let dataSet = useSponsor ? sponsors : standardBackgrounds else { return nil }
+            && sponsor != nil
+            && Int.random(in: 0..<BackgroundImage.sponsorshipShowRate) == 0
+        guard let dataSet = useSponsor ? sponsor?.wallpapers : standardBackgrounds else { return nil }
         if dataSet.isEmpty { return nil }
         
         let availableRange = 0..<dataSet.count
@@ -134,7 +123,7 @@ class BackgroundImage {
             // This index is now added to 'past' tracking list to prevent duplicates
             lastBackgroundChoices.append(randomBackgroundIndex)
             // Trimming to fixed length to release older backgrounds
-            lastBackgroundChoices = lastBackgroundChoices.suffix(numberOfDuplicateAvoidance)
+            lastBackgroundChoices = lastBackgroundChoices.suffix(BackgroundImage.numberOfDuplicateAvoidance)
         }
         
         // Item is returned based on our random index.
@@ -142,15 +131,14 @@ class BackgroundImage {
         return dataSet[safe: randomBackgroundIndex]
     }
     
-    private static func loadImageJSON(file: String) -> [[String: Any]]? {
+    private func loadData(file: String) -> Data? {
         guard let filePath = Bundle.main.path(forResource: file, ofType: "json") else {
             return nil
         }
         
         do {
-            let fileData = try Data(contentsOf: URL(fileURLWithPath: filePath))
-            let json = try JSONSerialization.jsonObject(with: fileData, options: []) as? [[String: Any]]
-            return json
+            let backgroundData = try Data(contentsOf: URL(fileURLWithPath: filePath))
+            return backgroundData
         } catch {
             Logger.browserLogger.error("Failed to get bundle path for \(file)")
         }
