@@ -172,6 +172,7 @@ class ClearPrivateDataTableViewController: UITableViewController {
             
             // Reset Webkit configuration to remove data from memory
             if clear.contains(where: { $0 is CookiesAndCacheClearable || $0 is CacheClearable }) {
+                self.tabManager.removeAll()
                 self.tabManager.resetConfiguration()
                 // Unlock the folders to allow clearing of data.
                 if Preferences.Privacy.blockAllCookies.value {
@@ -210,7 +211,6 @@ class ClearPrivateDataTableViewController: UITableViewController {
         let clearAction = UIAlertAction(title: Strings.ClearPrivateData, style: .destructive) { (_) in
             Preferences.Privacy.clearPrivateDataToggles.value = self.toggles
             self.clearButtonEnabled = false
-            self.tabManager.removeAll()
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
                 if !self.gotNotificationDeathOfAllWebViews {
                     self.allWebViewsKilled()
