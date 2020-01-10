@@ -21,7 +21,7 @@
         .title {
             color: rgb(250, 251, 251);
             font-size: 20px;
-            font-family: SFProDisplay-Medium;
+            font-family: SFProDisplay-Medium, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             font-weight: 500;
             letter-spacing: 0.01px;
             line-height: 28px;
@@ -30,7 +30,7 @@
         .description {
             color: rgb(245, 247, 255);
             font-size: 14px;
-            font-family: SFProText-Regular;
+            font-family: SFProText-Regular, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             font-weight: normal;
             letter-spacing: 0px;
             line-height: 19px;
@@ -65,7 +65,7 @@
         .leftNavButtonTitle {
             color: rgb(248, 249, 250);
             font-size: 16px;
-            font-family: SFProText-Semibold;
+            font-family: SFProText-Semibold, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             font-weight: 600;
             line-height: 16px;
 
@@ -89,7 +89,7 @@
         .rightNavButtonTitle {
             color: rgb(255, 255, 255);
             font-size: 16px;
-            font-family: SFProText-Semibold;
+            font-family: SFProText-Semibold, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             font-weight: 600;
             text-align: center;
             line-height: 16px;
@@ -101,7 +101,7 @@
 
         .moreDetails {
             color: rgb(245, 247, 255);
-            font-family: SFProText-Medium;
+            font-family: SFProText-Medium, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             font-size: 14px;
             font-weight: 500;
             height: 133px;
@@ -141,6 +141,19 @@
             -webkit-transform: rotate(45deg);
             margin-bottom: 2px;
         }
+
+        /** Center the content for iPads **/
+        @media (min-width: 600px) and (min-height: 600px) {
+            .content {
+                margin: 0;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                max-width: 650px;
+                -ms-transform: translate(-50%, -50%);
+                transform: translate(-50%, -50%);
+            }
+        }
     </style>
     <script>
         function toggleDetails() {
@@ -165,7 +178,7 @@
     </script>
 </head>
 
-<body class="background">
+<body class="background content">
     <div class="container post">
         <svg class="icon" xmlns="http://www.w3.org/2000/svg">
             <g fill="rgb(250, 251, 251)">
@@ -192,7 +205,8 @@
         </div>
 
         <p id="details" class="moreDetails hidden">
-            Brave Safe Browsing recently detected phishing on testsafebrowsing.appspot.com. Phishing sites pretend to be
+            Google Safe Browsing recently detected phishing on testsafebrowsing.appspot.com. Phishing sites pretend to
+            be
             other websites to trick you.
             <br /><br />
             You can report a detection problem or, if you understand the risks to your security, <a class="moreDetails"
