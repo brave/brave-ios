@@ -122,18 +122,3 @@ extension PasscodeEntryViewController: PasscodeInputViewDelegate {
     }
 }
 
-#if canImport(SwiftUI) && MOZ_CHANNEL_FENNEC
-import SwiftUI
-@available(iOS 13, *)
-struct PasscodeEntryPreview: PreviewProvider {
-    static var previews: some View {
-        UIViewControllerPreview {
-            let v = PasscodeEntryViewController()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: {
-                v.displayError(String.localizedStringWithFormat(Strings.AuthenticationMaximumAttemptsReached, 2))
-            })
-            return v
-        }
-    }
-}
-#endif
