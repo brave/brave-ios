@@ -46,7 +46,7 @@ class BasePasscodeViewController: UIViewController {
 
 // MARK: - Error Helpers
 extension BasePasscodeViewController {
-    public func displayError(_ text: String) {
+    fileprivate func displayError(_ text: String) {
         errorToast?.removeFromSuperview()
         errorToast = {
             let toast = ErrorToast()
