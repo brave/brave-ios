@@ -110,13 +110,7 @@ open class UserAgent {
         if let userAgent = userAgent, !userAgent.isEmpty {
             return !userAgent.lowercased().contains("mobile")
         }
-        
-        //on iOS 13 iPad, we do not require a custom user-agent for Desktop
-        if #available(iOS 13.0, *), UIDevice.isIpad {
-            return true
-        }
-        
-        //However, for iPhone we do..
+
         return false
     }
 }

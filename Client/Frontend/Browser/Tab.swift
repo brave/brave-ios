@@ -195,9 +195,6 @@ class Tab: NSObject {
             configuration!.preferences = WKPreferences()
             configuration!.preferences.javaScriptCanOpenWindowsAutomatically = false
             configuration!.allowsInlineMediaPlayback = true
-            if #available(iOS 13.0, *) {
-                configuration!.defaultWebpagePreferences.preferredContentMode = Preferences.General.alwaysRequestDesktopSite.value ? .desktop : .mobile
-            }
             // Enables Zoom in website by ignoring their javascript based viewport Scale limits.
             configuration!.ignoresViewportScaleLimits = true
             let webView = TabWebView(frame: .zero, configuration: configuration!, isPrivate: isPrivate)
@@ -219,6 +216,10 @@ class Tab: NSObject {
             // which allows the content appear beneath the toolbars in the BrowserViewController
             webView.scrollView.layer.masksToBounds = false
             webView.navigationDelegate = navigationDelegate
+            
+            if #available(iOS 13, *), UIDevice.isIpad {
+                webView.customUserAgent = Preferences.General.alwaysRequestDesktopSite.value ? UserAgent.desktopUserAgent() : UserAgent.defaultUserAgent()
+            }
 
             restore(webView, restorationData: self.sessionData?.savedTabData)
 
@@ -386,12 +387,7 @@ class Tab: NSObject {
     }
 
     func reload() {
-        var mobileUA: String?
-        if #available(iOS 13.0, *) {
-            mobileUA = UserAgent.defaultUserAgent()
-        }
-
-        let userAgent: String? = desktopSite ? UserAgent.desktopUserAgent() : mobileUA
+        let userAgent: String? = desktopSite ? UserAgent.desktopUserAgent() : UserAgent.defaultUserAgent()
         
         if (userAgent ?? "") != webView?.customUserAgent,
            let currentItem = webView?.backForwardList.currentItem {

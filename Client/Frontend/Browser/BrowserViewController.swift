@@ -1399,6 +1399,12 @@ class BrowserViewController: UIViewController {
         // Reset the UA when a different domain is being loaded
         if webView.url?.host != newURL.host {
             webView.customUserAgent = nil
+            
+            //iOS 13 - iPad Only.. Does NOT read the User-Agent from `UserDefaults`!!
+            //So setting it to nil, NEVER actually sets the default UA.
+            if #available(iOS 13, *), UIDevice.isIpad {
+                webView.customUserAgent = Preferences.General.alwaysRequestDesktopSite.value ? UserAgent.desktopUserAgent() : UserAgent.defaultUserAgent()
+            }
         }
     }
 
@@ -1407,7 +1413,7 @@ class BrowserViewController: UIViewController {
         let ua = newRequest.value(forHTTPHeaderField: "User-Agent")
         
         if #available(iOS 13.0, *) {
-            webView.customUserAgent = Preferences.General.alwaysRequestDesktopSite.value == UserAgent.isDesktopUA(ua) ? nil : ua
+            webView.customUserAgent = Preferences.General.alwaysRequestDesktopSite.value == UserAgent.isDesktopUA(ua) ? UserAgent.desktopUserAgent() : ua
         } else {
             webView.customUserAgent = ua == UserAgent.defaultUserAgent() ? nil : ua
         }
