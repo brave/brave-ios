@@ -130,13 +130,14 @@ class FavoritesViewController: UIViewController, Themeable {
     // MARK: - Init/lifecycle
     
     private var backgroundViewInfo: (imageView: UIImageView, portraitCenterConstraint: Constraint)?
-    private var backgroundImage = BackgroundImage()
+    private var background: BackgroundImage.Background?
     
     private let profile: Profile
     
-    init(profile: Profile, dataSource: FavoritesDataSource = FavoritesDataSource()) {
+    init(profile: Profile, background: BackgroundImage.Background?, dataSource: FavoritesDataSource = FavoritesDataSource()) {
         self.profile = profile
         self.dataSource = dataSource
+        self.background = background
         
         super.init(nibName: nil, bundle: nil)
         NotificationCenter.default.do {
@@ -247,7 +248,7 @@ class FavoritesViewController: UIViewController, Themeable {
             // Therefore specifying `0` should take the imageView's left and pinning it to view's center.
             
             // So basically the movement needs to be "inverted" (hence negation)
-            let imageViewOffset = sizeRatio * -(backgroundImage.info?.focalPoint?.x ?? 0)
+            let imageViewOffset = sizeRatio * -(background?.focalPoint?.x ?? 0)
             backgroundViewInfo?.portraitCenterConstraint.update(offset: imageViewOffset)
         }
     }
@@ -282,7 +283,7 @@ class FavoritesViewController: UIViewController, Themeable {
     }
     
     @objc fileprivate func showImageCredit() {
-        guard let credit = backgroundImage.info?.credit else {
+        guard let credit = background?.credit else {
             // No gesture action of no credit available
             return
         }
@@ -390,16 +391,17 @@ class FavoritesViewController: UIViewController, Themeable {
             imageCreditButton.isHidden = hideImageCredit
         }
         
-        guard let info = backgroundImage.info, let name = info.credit?.name else { return }
+        guard let name = background?.credit?.name else { return }
         
-        hideImageCredit = info.isSponsored
+        // TODO: Re-enable
+//        hideImageCredit = info.isSponsored
         let photoByText = String(format: Strings.PhotoBy, name)
         imageCreditInternalButton.setTitle(photoByText, for: .normal)
     }
     
+    // TODO: combine with reset?
     private func setupBackgroundImage() {
-        guard var background = backgroundImage.info,
-            let image = background.imageLiteral else {
+        guard var image = background?.imageLiteral else {
                 imageCreditButton.isHidden = true
                 return
         }
@@ -450,9 +452,6 @@ class FavoritesViewController: UIViewController, Themeable {
     fileprivate func resetBackground() {
         self.backgroundViewInfo?.imageView.removeFromSuperview()
         self.backgroundViewInfo = nil
-        
-        // Flush background logic, this handles preference adjustments for us, so will update necessary, needed info.
-        backgroundImage = BackgroundImage()
         
         setupBackgroundImage()
     }

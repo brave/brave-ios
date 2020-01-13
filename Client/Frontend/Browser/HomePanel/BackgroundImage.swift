@@ -66,8 +66,6 @@ class BackgroundImage {
     private static let numberOfDuplicateAvoidance = 6
     private static let sponsorshipShowRate = 4 // e.g. 4 == 25% or "every 4th image"
     
-    // TODO: Make setter private?
-    var info: Background?
     private lazy var sponsor: Sponsor? = {
         let sponsoredFilePath = "ntp-sponsored"
         guard let sponsoredData = self.loadData(file: sponsoredFilePath) else { return nil }
@@ -92,15 +90,7 @@ class BackgroundImage {
     // This can 'easily' be adjusted to support both sets by switching to String, and using filePath to identify uniqueness.
     private var lastBackgroundChoices = [Int]()
     
-    init() {
-        if !Preferences.NewTabPage.backgroundImages.value {
-            return
-        }
-        
-        self.info = randomBackground()
-    }
-    
-    private func randomBackground() -> Background? {
+    func randomBackground() -> Background? {
         // Determine what type of background to display
         let useSponsor = Preferences.NewTabPage.backgroundSponsoredImages.value
             && sponsor != nil
