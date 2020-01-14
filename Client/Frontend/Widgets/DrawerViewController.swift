@@ -51,7 +51,6 @@ public class DrawerViewController: UIViewController {
 
     fileprivate var yPosition: CGFloat = DrawerViewControllerUX.DrawerTopStop {
         didSet {
-            print("bxxs: \(yPosition)")
             let maxY = view.frame.maxY
             
             let h = self.view.frame.maxY - self.childViewHeight
@@ -98,9 +97,6 @@ public class DrawerViewController: UIViewController {
         backgroundOverlayView.backgroundColor = .black
         backgroundOverlayView.alpha = 0
         view.addSubview(backgroundOverlayView)
-
-        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(didRecognizeTapGesture))
-        backgroundOverlayView.addGestureRecognizer(tapGestureRecognizer)
         
         drawerView.backgroundColor = .white
 
@@ -108,7 +104,6 @@ public class DrawerViewController: UIViewController {
         view.addSubview(drawerView)
 
         let panGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(didRecognizePanGesture))
-        panGestureRecognizer.delegate = self
         drawerView.addGestureRecognizer(panGestureRecognizer)
 
         handleView.backgroundColor = .black
@@ -187,24 +182,23 @@ public class DrawerViewController: UIViewController {
 
         close()
     }
-
+    
     @objc fileprivate func didRecognizePanGesture(_ gestureRecognizer: UIPanGestureRecognizer) {
 
         let translation = gestureRecognizer.translation(in: drawerView)
         yPosition += translation.y
-        print(translation.y)
         gestureRecognizer.setTranslation(CGPoint.zero, in: drawerView)
 
-        guard gestureRecognizer.state == .ended else {
-            return
-        }
+        if gestureRecognizer.state != .ended { return }
 
         let velocity = gestureRecognizer.velocity(in: drawerView).y
         let landingYPosition = yPosition + velocity / 10
         let nextYPosition: CGFloat
         let duration: TimeInterval
-
-        if landingYPosition > view.frame.maxY / 2 {
+        
+        let bottomHalfOfChildView = view.frame.height - (childViewHeight / 2)
+        
+        if landingYPosition > bottomHalfOfChildView {
             nextYPosition = view.frame.maxY
             duration = 0.25
         } else {
@@ -227,8 +221,6 @@ public class DrawerViewController: UIViewController {
         isOpen = true
 
         UIView.animate(withDuration: 0.25) {
-            // proper position
-            // self.yPosition = DrawerViewControllerUX.DrawerTopStop
             self.yPosition = self.view.frame.maxY - self.childViewHeight
         }
     }
@@ -245,17 +237,3 @@ public class DrawerViewController: UIViewController {
     }
 }
 
-extension DrawerViewController: Themeable {
-    func applyTheme(_ theme: Theme) {
-        // todo
-    }
-}
-
-extension DrawerViewController: UIGestureRecognizerDelegate {
-    public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
-        // Don't recognize touches for the pan gesture
-        // if they occurred on a `UITableView*` view.
-        let description = touch.view?.description ?? ""
-        return !description.starts(with: "<UITableView") && !description.starts(with: "<UITextField")
-    }
-}
