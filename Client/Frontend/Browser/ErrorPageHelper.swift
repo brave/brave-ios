@@ -280,6 +280,40 @@ class ErrorPageHelper {
         components.queryItems = queryItems
         webView.load(PrivilegedRequest(url: components.url!) as URLRequest)
     }
+    
+    public static func certificateError(for url: URL) -> Int {
+        if url.isErrorPageURL {
+            let query = url.getQuery()
+            
+            let cfErrors: [CFNetworkErrors] = [
+                .cfurlErrorSecureConnectionFailed,
+                .cfurlErrorServerCertificateHasBadDate,
+                .cfurlErrorServerCertificateUntrusted,
+                .cfurlErrorServerCertificateHasUnknownRoot,
+                .cfurlErrorServerCertificateNotYetValid,
+                .cfurlErrorClientCertificateRejected,
+                .cfurlErrorClientCertificateRequired
+            ]
+            
+            guard let code = query["code"], let errCode = Int(code) else {
+                return 0
+            }
+            
+            if let code = CFNetworkErrors(rawValue: Int32(errCode)), cfErrors.contains(code) {
+                return errCode
+            }
+            
+            if ErrorPageHelper.CertErrors.contains(errCode) {
+                return errCode
+            }
+            
+            if let _ = ErrorPageHelper.CertErrorCodes[errCode] {
+                return errCode
+            }
+            return 0
+        }
+        return 0
+    }
 }
 
 extension ErrorPageHelper: TabContentScript {
