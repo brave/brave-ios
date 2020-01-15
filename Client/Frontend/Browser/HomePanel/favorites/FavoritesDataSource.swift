@@ -41,11 +41,23 @@ class FavoritesDataSource: NSObject, UICollectionViewDataSource {
     
     /// The number of times that each row contains
     var columnsPerRow: Int {
-        guard let traitCollection = collectionView?.traitCollection else {
+        guard let collection = collectionView else {
             return 0
         }
         
-        let cols = traitCollection.horizontalSizeClass == .compact ? 4 : 6
+        /// Two considerations:
+        /// 1. icon size minimum
+        /// 2. trait collection
+        
+        let icons = (less: 4, more: 6)
+        let minIconPoints = 80 as CGFloat
+        
+        // If icons fall below a certain size, then use less icons.
+        if (collection.frame.width / CGFloat(icons.more)) < minIconPoints {
+            return icons.less
+        }
+        
+        let cols = collection.traitCollection.horizontalSizeClass == .compact ? icons.less : icons.more
         return cols
     }
     
