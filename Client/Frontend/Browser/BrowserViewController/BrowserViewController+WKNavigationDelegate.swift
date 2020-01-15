@@ -7,6 +7,7 @@ import WebKit
 import Shared
 import Data
 import BraveShared
+import BraveRewards
 
 private let log = Logger.browserLogger
 private let rewardsLog = Logger.rewardsLogger
@@ -32,16 +33,22 @@ extension URL {
 
 extension BrowserViewController {
     fileprivate func handleExternalURL(_ url: URL, openedURLCompletionHandler: ((Bool) -> Void)? = nil) {
-        let alertController = UIAlertController(
-            title: Strings.OpenExternalAppURLTitle,
-            message: String(format: Strings.OpenExternalAppURLMessage, url.relativeString),
-            preferredStyle: .alert
+        self.view.endEditing(true)
+        let popup = AlertPopupView(
+            imageView: nil,
+            title: Strings.openExternalAppURLTitle,
+            message: String(format: Strings.openExternalAppURLMessage, url.relativeString),
+            titleWeight: .semibold,
+            titleSize: 21
         )
-        alertController.addAction(UIAlertAction(title: Strings.OpenExternalAppURLDontAllow, style: .cancel))
-        alertController.addAction(UIAlertAction(title: Strings.OpenExternalAppURLAllow, style: .default) { result in
+        popup.addButton(title: Strings.openExternalAppURLDontAllow, fontSize: 16) { () -> PopupViewDismissType in
+            return .flyDown
+        }
+        popup.addButton(title: Strings.openExternalAppURLAllow, type: .primary, fontSize: 16) { () -> PopupViewDismissType in
             UIApplication.shared.open(url, options: [:], completionHandler: openedURLCompletionHandler)
-        })
-        self.present(alertController, animated: true)
+            return .flyDown
+        }
+        popup.showWithType(showType: .flyUp)
     }
 }
 
@@ -94,6 +101,10 @@ extension BrowserViewController: WKNavigationDelegate {
     // This is the place where we decide what to do with a new navigation action. There are a number of special schemes
     // and http(s) urls that need to be handled in a different way. All the logic for that is inside this delegate
     // method.
+    
+    fileprivate func isUpholdOAuthAuthorization(_ url: URL) -> Bool {
+        return url.scheme == "rewards" && url.host == "uphold"
+    }
 
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         guard let url = navigationAction.request.url else {
@@ -133,6 +144,19 @@ extension BrowserViewController: WKNavigationDelegate {
         if let safeBrowsing = safeBrowsing, safeBrowsing.shouldBlock(url) {
             safeBrowsing.showMalwareWarningPage(forUrl: url, inWebView: webView)
             decisionHandler(.cancel)
+            return
+        }
+        
+        if isUpholdOAuthAuthorization(url) {
+            decisionHandler(.cancel)
+            guard let tab = tabManager[webView], let queryItems = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems else {
+                return
+            }
+            var items: [String: String] = [:]
+            for query in queryItems {
+                items[query.name] = query.value
+            }
+            authorizeUpholdWallet(from: tab, queryItems: items)
             return
         }
 
@@ -182,7 +206,7 @@ extension BrowserViewController: WKNavigationDelegate {
             if let urlHost = url.normalizedHost() {
                 if let mainDocumentURL = navigationAction.request.mainDocumentURL, url.scheme == "http" {
                     let domainForShields = Domain.getOrCreate(forUrl: mainDocumentURL, persistent: !isPrivateBrowsing)
-                    if domainForShields.isShieldExpected(.HTTPSE) && HttpsEverywhereStats.shared.shouldUpgrade(url) {
+                    if domainForShields.isShieldExpected(.HTTPSE, considerAllShieldsOption: true) && HttpsEverywhereStats.shared.shouldUpgrade(url) {
                         // Check if HTTPSE is on and if it is, whether or not this http url would be upgraded
                         pendingHTTPUpgrades[urlHost] = navigationAction.request
                     }
@@ -214,10 +238,11 @@ extension BrowserViewController: WKNavigationDelegate {
                 off.compactMap { $0.rule }.forEach(controller.remove)
               
                 if let tab = tabManager[webView] {
-                    tab.userScriptManager?.isFingerprintingProtectionEnabled = domainForShields.isShieldExpected(.FpProtection)
+                    tab.userScriptManager?.isFingerprintingProtectionEnabled =
+                        domainForShields.isShieldExpected(.FpProtection, considerAllShieldsOption: true)
                 }
 
-                webView.configuration.preferences.javaScriptEnabled = !domainForShields.isShieldExpected(.NoScript)
+                webView.configuration.preferences.javaScriptEnabled = !domainForShields.isShieldExpected(.NoScript, considerAllShieldsOption: true)
             }
             
             //Cookie Blocking code below
@@ -245,7 +270,7 @@ extension BrowserViewController: WKNavigationDelegate {
         if navigationAction.navigationType == .linkActivated {
             handleExternalURL(url) { didOpenURL in
                 if !didOpenURL {
-                    let alert = UIAlertController(title: Strings.UnableToOpenURLErrorTitle, message: Strings.UnableToOpenURLError, preferredStyle: .alert)
+                    let alert = UIAlertController(title: Strings.unableToOpenURLErrorTitle, message: Strings.unableToOpenURLError, preferredStyle: .alert)
                     alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
                     self.present(alert, animated: true, completion: nil)
                 }

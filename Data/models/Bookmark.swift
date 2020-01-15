@@ -531,7 +531,8 @@ extension Bookmark {
                 removeFolderAndSendSyncRecords(uuid: syncUUID)
             } else {
                 DataController.perform(context: context) { context in
-                    Sync.shared.sendSyncRecords(action: .delete, records: [self], context: context)
+                    guard let objectOnContext = context.object(with: self.objectID) as? Bookmark else { return }
+                    Sync.shared.sendSyncRecords(action: .delete, records: [objectOnContext], context: context)
                 }
             }
         }
@@ -653,7 +654,7 @@ extension Bookmark: Frecencyable {
         fetchRequest.fetchLimit = 5
         fetchRequest.entity = Bookmark.entity(context: context)
         
-        var predicate = NSPredicate(format: "lastVisited > %@", History.ThisWeek as CVarArg)
+        var predicate = NSPredicate(format: "lastVisited > %@", History.thisWeek as CVarArg)
         if let query = query {
             predicate = NSPredicate(format: predicate.predicateFormat + " AND url CONTAINS %@", query)
         }
