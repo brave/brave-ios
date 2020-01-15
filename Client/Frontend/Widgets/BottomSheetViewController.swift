@@ -5,6 +5,9 @@
 import Foundation
 import SnapKit
 
+/// Presents a sheet with a child view controller of choice.
+/// On iPhones it presents as a bottom drawer style.
+/// On iPads it presents as a popup at center of the screen.
 class BottomSheetViewController: UIViewController {
     
     private struct UX {
@@ -24,7 +27,6 @@ class BottomSheetViewController: UIViewController {
 
     private let contentView = UIView().then {
         $0.layer.cornerRadius = 12
-        $0.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
     }
     
     private let backgroundOverlayView = UIView().then {
@@ -51,24 +53,36 @@ class BottomSheetViewController: UIViewController {
     /// Controls height of the content view.
     private var yPosition: CGFloat = 0 {
         didSet {
+            let maxY = view.frame.maxY
+            
+            func update() {
+                // Update dark blur, the more of content view go away the less dark it is.
+                backgroundOverlayView.alpha = (maxY - yPosition) / maxY
+                // Update the position of content view.
+                // At the moment only pulling below initial content view height is supported.
+                contentViewTopConstraint?.update(offset: yPosition)
+                view.layoutIfNeeded()
+            }
+            
             if oldValue == yPosition { return }
             
-            let maxY = view.frame.maxY
+            // All vertical position manipulation on iPads happens programatically,
+            // no need to check for Y position limits.
+            if showAsPopup {
+                update()
+                return
+            }
+            
             let initialY = initialDrawerYPosition
 
             // Only move the view if dragged below initial level.
             if yPosition <= initialY {
                 yPosition = initialY
-            } else if yPosition > maxY { // Dragged all way down, removing the view.
+            } else if yPosition > maxY { // Dragged all way down, remove the view.
                 yPosition = maxY
             }
             
-            // Update dark blur, the more of content view go away the less dark it is.
-            backgroundOverlayView.alpha = (maxY - yPosition) / maxY / 2
-            // Update the position of content view.
-            // At the moment only pulling below initial content view height is supported.
-            contentViewTopConstraint?.update(offset: yPosition)
-            view.layoutIfNeeded()
+            update()
         }
     }
     
@@ -77,7 +91,13 @@ class BottomSheetViewController: UIViewController {
     }
     
     private var initialDrawerYPosition: CGFloat {
-        view.frame.height - childViewHeight
+        let h = (view.frame.height / 2) - (childViewHeight / 2)
+        
+        return showAsPopup ? h : view.frame.height - childViewHeight
+    }
+    
+    private var showAsPopup: Bool {
+        traitCollection.userInterfaceIdiom == .pad && traitCollection.horizontalSizeClass == .regular
     }
     
     // MARK: - Lifecycle
@@ -119,7 +139,6 @@ class BottomSheetViewController: UIViewController {
     
     override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
-        
         updateDrawerViewConstraints()
     }
     
@@ -154,13 +173,19 @@ class BottomSheetViewController: UIViewController {
     }
     
     private func updateDrawerViewConstraints() {
+        let allCorners: CACornerMask = [.layerMinXMinYCorner, .layerMaxXMinYCorner,
+                          .layerMinXMaxYCorner, .layerMaxXMaxYCorner]
+        
+        let onlyTopCorners: CACornerMask = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+        contentView.layer.maskedCorners = showAsPopup ? allCorners : onlyTopCorners
+        
+        handleView.isHidden = showAsPopup
         
         // Do not remake drawer view constraints if yPosition was set already.
         if yPosition == initialDrawerYPosition { return }
         
         contentView.snp.remakeConstraints {
-            if UIApplication.shared.statusBarOrientation.isLandscape {
-                // Landscape is centered capped at certain width.
+            if showAsPopup || UIApplication.shared.statusBarOrientation.isLandscape {
                 $0.centerX.equalToSuperview()
                 $0.width.equalTo(maxHorizontalWidth)
             } else {
@@ -187,6 +212,8 @@ class BottomSheetViewController: UIViewController {
     // MARK: - Animations
     
     @objc fileprivate func didRecognizePanGesture(_ gestureRecognizer: UIPanGestureRecognizer) {
+        // The view shouldn't be draggable on iPads
+        if showAsPopup { return }
 
         let translation = gestureRecognizer.translation(in: contentView)
         yPosition += translation.y
