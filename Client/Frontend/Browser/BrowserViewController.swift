@@ -1698,6 +1698,19 @@ extension BrowserViewController: TopToolbarDelegate {
     
     func topToolbarDidPressReload(_ topToolbar: TopToolbarView) {
         tabManager.selectedTab?.reload()
+        
+        let source = GetPaidForBrandedImageViewController()
+        
+        let height = source.view.systemLayoutSizeFitting(UIView.layoutFittingExpandedSize).height
+        source.preferredContentSize = CGSize(width: view.frame.width, height: height)
+        let drawerVC = BottomSheetViewController(childViewController: source)
+        
+        addChild(drawerVC)
+        view.addSubview(drawerVC.view)
+        drawerVC.view.snp.remakeConstraints {
+            $0.right.top.left.equalToSuperview()
+            $0.bottom.equalTo(view.safeArea.bottom)
+        }
     }
     
     func topToolbarDidPressStop(_ topToolbar: TopToolbarView) {
@@ -1965,34 +1978,6 @@ extension BrowserViewController: ToolbarDelegate {
     
     func tabToolbarDidPressAddTab(_ tabToolbar: ToolbarProtocol, button: UIButton) {
         self.openBlankNewTab(attemptLocationFieldFocus: true, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
-        
-        let source = GetPaidForBrandedImageViewController()
-        
-        let size = CGSize(width: UIScreen.main.bounds.height, height: UIScreen.main.bounds.height)
-
-        let size2 = source.view.systemLayoutSizeFitting(
-            size,
-            withHorizontalFittingPriority: .required,
-            verticalFittingPriority: .fittingSizeLevel
-        )
-//
-//        source.preferredContentSize = source.view.systemLayoutSizeFitting(
-//            size,
-//            withHorizontalFittingPriority: .required,
-//            verticalFittingPriority: .fittingSizeLevel
-//        )
-        
-        let height = source.view.systemLayoutSizeFitting(UIView.layoutFittingExpandedSize).height
-        source.preferredContentSize = CGSize(width: view.frame.width, height: height)
-        let drawerVC = DrawerViewController(childViewController: source)
-        
-        addChild(drawerVC)
-        view.addSubview(drawerVC.view)
-        drawerVC.view.snp.remakeConstraints {
-            $0.right.top.left.equalToSuperview()
-            // the view is slightly below the frame so the view can be dragged up a bit
-            $0.bottom.equalToSuperview().offset(24)
-        }
     }
 
     func tabToolbarDidLongPressAddTab(_ tabToolbar: ToolbarProtocol, button: UIButton) {
