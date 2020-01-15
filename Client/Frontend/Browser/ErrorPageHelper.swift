@@ -307,7 +307,7 @@ class ErrorPageHelper {
                 return errCode
             }
             
-            if let _ = ErrorPageHelper.CertErrorCodes[errCode] {
+            if ErrorPageHelper.CertErrorCodes[errCode] != nil {
                 return errCode
             }
             return 0
