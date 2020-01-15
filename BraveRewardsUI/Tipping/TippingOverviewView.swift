@@ -46,6 +46,10 @@ class TippingOverviewView: UIView {
   
   let socialStackView = UIStackView().then {
     $0.spacing = 20.0
+    // Hide these icons until a later date (ref: https://github.com/brave/brave-ios/issues/2147) when we
+    // can make the icons actual buttons that lead to their social media sites (ref:
+    // https://github.com/brave/brave-ios/issues/1712)
+    $0.isHidden = true
   }
   
   private let bodyStackView = UIStackView().then {
@@ -57,22 +61,22 @@ class TippingOverviewView: UIView {
     $0.appearanceTextColor = Colors.grey200
     $0.font = UIFont.systemFont(ofSize: 12.0)
     $0.textContainerInset = UIEdgeInsets(top: 8.0, left: 8.0, bottom: 8.0, right: 8.0)
-    $0.text = "\(Strings.TippingUnverifiedDisclaimer) \(Strings.DisclaimerLearnMore)"
-    $0.setURLInfo([Strings.DisclaimerLearnMore: "learn-more"])
+    $0.text = "\(Strings.tippingUnverifiedDisclaimer) \(Strings.disclaimerLearnMore)"
+    $0.setURLInfo([Strings.disclaimerLearnMore: "learn-more"])
     $0.backgroundColor = .white
     $0.layer.cornerRadius = 4.0
     $0.isHidden = true
   }
   
   let titleLabel = UILabel().then {
-    $0.text = Strings.TippingOverviewTitle
+    $0.text = Strings.tippingOverviewTitle
     $0.appearanceTextColor = UX.titleColor
     $0.font = .systemFont(ofSize: 23.0, weight: .semibold)
     $0.numberOfLines = 0
   }
   
   let bodyLabel = UILabel().then {
-    $0.text = Strings.TippingOverviewBody 
+    $0.text = Strings.tippingOverviewBody 
     $0.appearanceTextColor = UX.bodyColor
     $0.font = .systemFont(ofSize: 17.0)
     $0.numberOfLines = 0

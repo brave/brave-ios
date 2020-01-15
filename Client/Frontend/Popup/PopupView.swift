@@ -52,16 +52,26 @@ class PopupView: UIView, UIGestureRecognizerDelegate {
         case primary
         case secondary
         case destructive
+        case link
         
-        var color: UIColor {
+        var backgroundColor: UIColor {
             switch self {
             case .primary:
-                return BraveUX.Blue
+                return BraveUX.blue
             case .secondary:
-                return BraveUX.GreyE
+                return BraveUX.greyE
             case .destructive:
-                return BraveUX.Red
+                return BraveUX.red
+            case .link:
+                return .clear
             }
+        }
+        
+        var titleColor: UIColor {
+            if self == .link {
+                return BraveUX.blue
+            }
+            return .white
         }
     }
     
@@ -130,7 +140,7 @@ class PopupView: UIView, UIGestureRecognizerDelegate {
         
         overlayView = UIView(frame: bounds)
         overlayView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        overlayView.backgroundColor = BraveUX.GreyJ
+        overlayView.backgroundColor = BraveUX.greyJ
         overlayView.alpha = kPopupBackgroundAlpha
         overlayView.addGestureRecognizer(touchRecognizer)
         addSubview(overlayView)
@@ -189,9 +199,9 @@ class PopupView: UIView, UIGestureRecognizerDelegate {
                     button!.titleLabel!.font = buttonData.font
                     button!.titleLabel!.adjustsFontSizeToFitWidth = true
                     button!.layer.cornerRadius = buttonFrame.height / 2.0 //kPopupDialogButtonRadius
-                    button!.backgroundColor = buttonData.type.color
+                    button!.backgroundColor = buttonData.type.backgroundColor
                     button!.setTitle(buttonData.title, for: .normal)
-                    button!.setTitleColor(UIColor.white, for: .normal)
+                    button!.setTitleColor(buttonData.type.titleColor, for: .normal)
                     button!.addTarget(self, action: #selector(dialogButtonTapped(button:)), for: .touchUpInside)
                     buttonData.button = button
                     dialogButtonsContainer.addSubview(button!)

@@ -55,7 +55,8 @@ extension BrowserViewController {
         if !isViewLoaded { return }
         self.topToolbar.locationView.rewardsButton.isHidden = (!rewards.ledger.isEnabled && Preferences.Rewards.hideRewardsIcon.value) || PrivateBrowsingManager.shared.isPrivateBrowsing
         let isVerifiedBadgeVisible = self.publisher?.status == .verified || self.publisher?.status == .connected
-        self.topToolbar.locationView.rewardsButton.isVerified = isVerifiedBadgeVisible
+        let isLocal = self.tabManager.selectedTab?.url?.isLocal == true
+        self.topToolbar.locationView.rewardsButton.isVerified = !isLocal && isVerifiedBadgeVisible
         self.topToolbar.locationView.rewardsButton.notificationCount = self.rewards.ledger.notifications.count
         self.topToolbar.locationView.rewardsButton.forceShowBadge = !Preferences.Rewards.panelOpened.value
     }
@@ -94,6 +95,60 @@ extension BrowserViewController {
         rewards.ledger.selectedTabId = 0
         // Fetch new promotions
         rewards.ledger.fetchPromotions(nil)
+    }
+    
+    func authorizeUpholdWallet(from tab: Tab, queryItems items: [String: String]) {
+        rewards.ledger.authorizeExternalWallet(
+            ofType: .uphold,
+            queryItems: items) { result, redirectURL in
+                switch result {
+                case .ledgerOk:
+                    // Fetch the wallet
+                    self.rewards.ledger.fetchExternalWallet(forType: .uphold) { _ in
+                        if let redirectURL = redirectURL {
+                            // Requires verification
+                            let request = URLRequest(url: redirectURL)
+                            tab.loadRequest(request)
+                        } else {
+                            // Done
+                            self.tabManager.removeTab(tab)
+                            self.showBraveRewardsPanel()
+                        }
+                    }
+                case .batNotAllowed:
+                    // Uphold account doesn't support BAT...
+                    let popup = AlertPopupView(
+                        imageView: nil,
+                        title: Strings.userWalletBATNotAllowedTitle,
+                        message: Strings.userWalletBATNotAllowedMessage,
+                        titleWeight: .semibold,
+                        titleSize: 18.0
+                    )
+                    popup.addButton(title: Strings.userWalletBATNotAllowedLearnMore, type: .link, fontSize: 14.0) { () -> PopupViewDismissType in
+                        if let url = URL(string: "https://uphold.com/en/brave/support") {
+                            tab.loadRequest(URLRequest(url: url))
+                        }
+                        return .flyDown
+                    }
+                    popup.addButton(title: Strings.userWalletCloseButtonTitle, type: .primary, fontSize: 14.0) { () -> PopupViewDismissType in
+                        return .flyDown
+                    }
+                    popup.showWithType(showType: .flyUp)
+                default:
+                    // Some other issue occured with authorization
+                    let popup = AlertPopupView(
+                        imageView: nil,
+                        title: Strings.userWalletGenericErrorTitle,
+                        message: Strings.userWalletGenericErrorMessage,
+                        titleWeight: .semibold,
+                        titleSize: 18.0
+                    )
+                    popup.addButton(title: Strings.userWalletCloseButtonTitle, type: .primary, fontSize: 14.0) { () -> PopupViewDismissType in
+                        return .flyDown
+                    }
+                    popup.showWithType(showType: .flyUp)
+                }
+        }
     }
 }
 
