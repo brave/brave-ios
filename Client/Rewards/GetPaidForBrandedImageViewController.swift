@@ -17,6 +17,7 @@ class GetPaidForBrandedImageViewController: UIViewController {
     
     let body = UILabel().then {
         $0.text = "Get paid to see this background image. Turn on Brave Rewards to claim your share."
+        $0.appearanceTextColor = .black
         
         $0.font = UIFont.systemFont(ofSize: 14, weight: .medium)
         
@@ -30,6 +31,7 @@ class GetPaidForBrandedImageViewController: UIViewController {
         By turning on Rewards, you agree to the Terms of Service. You can also choose \
         to hide sponsored images.
         """
+        $0.appearanceTextColor = .black
         
         $0.font = UIFont.systemFont(ofSize: 12, weight: .regular)
         
@@ -52,6 +54,7 @@ class GetPaidForBrandedImageViewController: UIViewController {
         
         let title = UILabel().then {
             $0.text = "Brave Rewards"
+            $0.appearanceTextColor = .black
             $0.font = UIFont.systemFont(ofSize: 20, weight: .semibold)
         }
         
