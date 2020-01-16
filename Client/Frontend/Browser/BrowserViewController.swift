@@ -1718,7 +1718,7 @@ extension BrowserViewController: TopToolbarDelegate {
     }
     
     func showTranslucentViewController() {
-        let source = BrandedImageCallout.YouAreGettingPaidNonBlockingViewController()
+        let source = BrandedImageCallout.GetPaidForBrandedImageNonBlockingViewController()
         let drawerVC = TranslucentBottomSheet(childViewController: source)
 
         addChild(drawerVC)
