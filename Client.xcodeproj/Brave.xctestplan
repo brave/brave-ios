@@ -29,7 +29,8 @@
   "testTargets" : [
     {
       "skippedTests" : [
-        "NavigationRouterTests\/testNavigationPathInPrivateBrowsingOnlyMode()"
+        "NavigationRouterTests\/testNavigationPathInPrivateBrowsingOnlyMode()",
+        "SafeBrowsingTest\/testCanonicalizeURL()"
       ],
       "target" : {
         "containerPath" : "container:Client.xcodeproj",
