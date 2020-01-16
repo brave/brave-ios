@@ -1700,13 +1700,13 @@ extension BrowserViewController: TopToolbarDelegate {
         tabManager.selectedTab?.reload()
         
         
-        // showBottomSheetViewController()
+         showBottomSheetViewController()
         
-        showTranslucentViewController()
+        // showTranslucentViewController()
     }
     
     func showBottomSheetViewController() {
-        let source = GetPaidForBrandedImageViewController()
+        let source = BrandedImageCallout.YouAreGettingPaidViewController()
         let drawerVC = BottomSheetViewController(childViewController: source)
 
         addChild(drawerVC)

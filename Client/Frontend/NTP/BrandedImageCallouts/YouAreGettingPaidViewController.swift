@@ -7,7 +7,7 @@ import Shared
 import BraveShared
 
 extension BrandedImageCallout {
-    class SupportWebCreatorsWithTokensView: UIViewController {
+    class YouAreGettingPaidViewController: UIViewController {
         
         private let viewHelper = BrandedImageCallout.CommonViews.self
         
@@ -18,10 +18,10 @@ extension BrandedImageCallout {
         }
         
         let body = UILabel().then {
-            $0.text = "You can support web creators with tokens."
-            $0.appearanceTextColor = .white
+            $0.text = "You're getting paid to see this background image."
+            $0.appearanceTextColor = .black
             
-            $0.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
+            $0.font = UIFont.systemFont(ofSize: 14, weight: .medium)
             
             $0.numberOfLines = 0
             $0.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
@@ -29,10 +29,13 @@ extension BrandedImageCallout {
         }
         
         let body2 = UILabel().then {
-            $0.text = "Earn tokens by viewing privacy-respecting ads."
-            $0.appearanceTextColor = .white
+            $0.text = """
+            Learn more about sponsored images in Brave Rewards. You can also choose \
+            to hide sponsored images.
+            """
+            $0.appearanceTextColor = .black
             
-            $0.font = UIFont.systemFont(ofSize: 14, weight: .regular)
+            $0.font = UIFont.systemFont(ofSize: 12, weight: .regular)
             
             $0.numberOfLines = 0
             $0.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 313), for: .vertical)
@@ -40,22 +43,19 @@ extension BrandedImageCallout {
         }
         
         override func viewDidLoad() {
-            let headerStackView = viewHelper.rewardsLogoHeader(textColor: .white, textSize: 16).then {
+            
+            let headerStackView = viewHelper.rewardsLogoHeader(textColor: .black, textSize: 20).then {
                 $0.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 311), for: .vertical)
             }
             
-            let buttonStackView = viewHelper.primaryButton(text: "Turn on Brave Ads", showMoneyImage: true)
-            
-            [headerStackView, body, body2, buttonStackView].forEach(mainStackView.addArrangedSubview(_:))
-            
-            mainStackView.setCustomSpacing(0, after: body)
+            [headerStackView, body, body2].forEach(mainStackView.addArrangedSubview(_:))
             
             view.addSubview(mainStackView)
             
             mainStackView.snp.remakeConstraints {
                 $0.top.equalToSuperview().inset(28)
                 $0.left.right.equalToSuperview().inset(16)
-                $0.bottom.equalToSuperview().inset(16)
+                $0.bottom.equalToSuperview().inset(48)
             }
         }
         

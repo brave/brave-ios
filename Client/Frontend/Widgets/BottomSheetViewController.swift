@@ -87,7 +87,7 @@ class BottomSheetViewController: UIViewController {
     }
     
     private var childViewHeight: CGFloat {
-        childViewController.preferredContentSize.height + 24
+        childViewController.preferredContentSize.height
     }
     
     private var initialDrawerYPosition: CGFloat {
