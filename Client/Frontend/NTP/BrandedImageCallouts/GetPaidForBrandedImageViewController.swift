@@ -5,6 +5,7 @@
 import UIKit
 import Shared
 import BraveShared
+import BraveRewardsUI
 
 extension BrandedImageCallout {
     class GetPaidForBrandedImageViewController: UIViewController {
@@ -28,18 +29,17 @@ extension BrandedImageCallout {
             $0.lineBreakMode = .byWordWrapping
         }
         
-        let tos = UILabel().then {
-            $0.text = """
-            By turning on Rewards, you agree to the Terms of Service. You can also choose \
-            to hide sponsored images.
-            """
+        let tos = LinkLabel().then {
+            $0.font = .systemFont(ofSize: 12.0)
             $0.appearanceTextColor = .black
+            $0.linkColor = BraveUX.braveOrange
+            $0.text = "You can also choose to hide sponsored images."
             
-            $0.font = UIFont.systemFont(ofSize: 12, weight: .regular)
-            
-            $0.numberOfLines = 0
             $0.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 313), for: .vertical)
-            $0.lineBreakMode = .byWordWrapping
+            $0.setURLInfo(["hide sponsored images": "terms"])
+            
+            $0.textContainerInset = UIEdgeInsets.zero
+            $0.textContainer.lineFragmentPadding = 0
         }
         
         override func viewDidLoad() {
@@ -59,10 +59,16 @@ extension BrandedImageCallout {
                 $0.left.right.equalToSuperview().inset(16)
                 $0.bottom.equalToSuperview().inset(48)
             }
+            
+            let size = tos.sizeThatFits(CGSize(width: view.frame.width - 32, height: CGFloat.infinity))
+            
+            tos.snp.remakeConstraints {
+                $0.height.equalTo(size.height)
+            }
         }
         
         override func viewDidLayoutSubviews() {
-            [body, tos].forEach {
+            [body].forEach {
                 $0.preferredMaxLayoutWidth = view.frame.width - 32
             }
         }
