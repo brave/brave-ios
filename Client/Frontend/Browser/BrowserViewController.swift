@@ -1699,17 +1699,27 @@ extension BrowserViewController: TopToolbarDelegate {
     func topToolbarDidPressReload(_ topToolbar: TopToolbarView) {
         tabManager.selectedTab?.reload()
         
-        let source = GetPaidForBrandedImageViewController()
+        let source = SupportWebCreatorsWithTokensView()
         
         let height = source.view.systemLayoutSizeFitting(UIView.layoutFittingExpandedSize).height
         source.preferredContentSize = CGSize(width: view.frame.width, height: height)
-        let drawerVC = BottomSheetViewController(childViewController: source)
+//        let drawerVC = BottomSheetViewController(childViewController: source)
+//
+//        addChild(drawerVC)
+//        view.addSubview(drawerVC.view)
+//        drawerVC.view.snp.remakeConstraints {
+//            $0.right.top.left.equalToSuperview()
+//            $0.bottom.equalTo(view.safeArea.bottom).inset(footer.frame.height)
+//        }
+        
+        
+        let drawerVC = TranslucentBottomSheet(childViewController: source)
         
         addChild(drawerVC)
         view.addSubview(drawerVC.view)
         drawerVC.view.snp.remakeConstraints {
-            $0.right.top.left.equalToSuperview()
-            $0.bottom.equalTo(view.safeArea.bottom)
+            $0.right.left.equalToSuperview()
+            $0.bottom.equalTo(footer.snp.top)
         }
     }
     

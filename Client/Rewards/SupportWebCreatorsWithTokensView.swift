@@ -6,7 +6,7 @@ import UIKit
 import Shared
 import BraveShared
 
-class GetPaidForBrandedImageViewController: UIViewController {
+class SupportWebCreatorsWithTokensView: UIViewController {
     
     let mainStackView = UIStackView().then {
         $0.axis = .vertical
@@ -15,24 +15,21 @@ class GetPaidForBrandedImageViewController: UIViewController {
     }
     
     let body = UILabel().then {
-        $0.text = "Get paid to see this background image. Turn on Brave Rewards to claim your share."
-        $0.appearanceTextColor = .black
+        $0.text = "You can support web creators with tokens."
+        $0.appearanceTextColor = .white
         
-        $0.font = UIFont.systemFont(ofSize: 14, weight: .medium)
+        $0.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
         
         $0.numberOfLines = 0
         $0.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
         $0.lineBreakMode = .byWordWrapping
     }
     
-    let tos = UILabel().then {
-        $0.text = """
-        By turning on Rewards, you agree to the Terms of Service. You can also choose \
-        to hide sponsored images.
-        """
-        $0.appearanceTextColor = .black
+    let body2 = UILabel().then {
+        $0.text = "Earn tokens by viewing privacy-respecting ads."
+        $0.appearanceTextColor = .white
         
-        $0.font = UIFont.systemFont(ofSize: 12, weight: .regular)
+        $0.font = UIFont.systemFont(ofSize: 14, weight: .regular)
         
         $0.numberOfLines = 0
         $0.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 313), for: .vertical)
@@ -53,8 +50,8 @@ class GetPaidForBrandedImageViewController: UIViewController {
         
         let title = UILabel().then {
             $0.text = "Brave Rewards"
-            $0.appearanceTextColor = .black
-            $0.font = UIFont.systemFont(ofSize: 20, weight: .semibold)
+            $0.appearanceTextColor = .white
+            $0.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
         }
         
         [imageView, title].forEach(headerStackView.addArrangedSubview(_:))
@@ -62,7 +59,7 @@ class GetPaidForBrandedImageViewController: UIViewController {
         headerStackView.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 311), for: .vertical)
         
         let turnOnRewards = RoundInterfaceButton().then {
-            $0.setTitle("Turn on Rewards", for: .normal)
+            $0.setTitle("Turn on Brave Ads", for: .normal)
             $0.appearanceTextColor = .white
             $0.backgroundColor = BraveUX.blurple400
             $0.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
@@ -80,19 +77,21 @@ class GetPaidForBrandedImageViewController: UIViewController {
         
         buttonStackView.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
         
-        [headerStackView, body, tos, buttonStackView].forEach(mainStackView.addArrangedSubview(_:))
+        [headerStackView, body, body2, buttonStackView].forEach(mainStackView.addArrangedSubview(_:))
+        
+        mainStackView.setCustomSpacing(0, after: body)
         
         view.addSubview(mainStackView)
         
         mainStackView.snp.remakeConstraints {
             $0.top.equalToSuperview().inset(28)
             $0.left.right.equalToSuperview().inset(16)
-            $0.bottom.equalToSuperview().inset(48)
+            $0.bottom.equalToSuperview().inset(16)
         }
     }
     
     override func viewDidLayoutSubviews() {
-        [body, tos].forEach {
+        [body, body2].forEach {
             $0.preferredMaxLayoutWidth = view.frame.width - 32
         }
     }
