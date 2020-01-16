@@ -101,10 +101,9 @@ class BottomSheetViewController: UIViewController {
     }
     
     // MARK: - Lifecycle
-//
+
     init(childViewController: UIViewController) {
         self.childViewController = childViewController
-        
         super.init(nibName: nil, bundle: nil)
     }
 

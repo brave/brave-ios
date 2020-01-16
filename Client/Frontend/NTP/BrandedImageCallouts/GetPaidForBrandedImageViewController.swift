@@ -43,28 +43,11 @@ class GetPaidForBrandedImageViewController: UIViewController {
     
     override func viewDidLoad() {
         
-        let headerStackView = viewHelper.rewardsLogoHeader(textColor: .black, textSize: 20)
-        
-        headerStackView.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 311), for: .vertical)
-        
-        let turnOnRewards = RoundInterfaceButton().then {
-            $0.setTitle("Turn on Rewards", for: .normal)
-            $0.appearanceTextColor = .white
-            $0.backgroundColor = BraveUX.blurple400
-            $0.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
-            $0.contentEdgeInsets = UIEdgeInsets(top: 12, left: 25, bottom: 12, right: 25)
-            $0.setImage(#imageLiteral(resourceName: "turn_rewards_on_money_icon"), for: .normal)
-            $0.imageEdgeInsets = UIEdgeInsets(top: 0, left: -10, bottom: 0, right: 0)
+        let headerStackView = viewHelper.rewardsLogoHeader(textColor: .black, textSize: 20).then {
+            $0.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 311), for: .vertical)
         }
         
-        let buttonStackView = UIStackView(arrangedSubviews:
-            [UIView.spacer(.horizontal, amount: 0),
-             turnOnRewards,
-             UIView.spacer(.horizontal, amount: 0)]).then {
-                $0.distribution = .equalSpacing
-        }
-        
-        buttonStackView.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
+        let buttonStackView = viewHelper.primaryButton(text: "Turn on Rewards", showMoneyImage: true)
         
         [headerStackView, body, tos, buttonStackView].forEach(mainStackView.addArrangedSubview(_:))
         

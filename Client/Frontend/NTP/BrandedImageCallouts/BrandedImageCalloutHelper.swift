@@ -3,6 +3,8 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import UIKit
+import Shared
+import BraveShared
 
 struct BrandedImageCalloutHelper {
     struct CommonViews {
@@ -26,6 +28,31 @@ struct BrandedImageCalloutHelper {
             [imageView, title].forEach(headerStackView.addArrangedSubview(_:))
             
             return headerStackView
+        }
+        
+        static func primaryButton(text: String, showMoneyImage: Bool) -> UIStackView {
+            let turnOnRewards = RoundInterfaceButton().then {
+                $0.setTitle(text, for: .normal)
+                $0.appearanceTextColor = .white
+                $0.backgroundColor = BraveUX.blurple400
+                $0.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
+                $0.contentEdgeInsets = UIEdgeInsets(top: 12, left: 25, bottom: 12, right: 25)
+                if showMoneyImage {
+                    $0.setImage(#imageLiteral(resourceName: "turn_rewards_on_money_icon"), for: .normal)
+                    $0.imageEdgeInsets = UIEdgeInsets(top: 0, left: -10, bottom: 0, right: 0)
+                }
+            }
+            
+            let buttonStackView = UIStackView(arrangedSubviews:
+                [UIView.spacer(.horizontal, amount: 0),
+                 turnOnRewards,
+                 UIView.spacer(.horizontal, amount: 0)]).then {
+                    $0.distribution = .equalSpacing
+            }
+            
+            buttonStackView.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
+            
+            return buttonStackView
         }
     }
 }

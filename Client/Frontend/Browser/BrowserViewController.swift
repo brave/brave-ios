@@ -1699,6 +1699,13 @@ extension BrowserViewController: TopToolbarDelegate {
     func topToolbarDidPressReload(_ topToolbar: TopToolbarView) {
         tabManager.selectedTab?.reload()
         
+        
+        // showBottomSheetViewController()
+        
+        showTranslucentViewController()
+    }
+    
+    func showBottomSheetViewController() {
         let source = GetPaidForBrandedImageViewController()
         let drawerVC = BottomSheetViewController(childViewController: source)
 
@@ -1708,16 +1715,18 @@ extension BrowserViewController: TopToolbarDelegate {
             $0.right.top.left.equalToSuperview()
             $0.bottom.equalTo(view.safeArea.bottom)
         }
-        
-        
-//        let drawerVC = TranslucentBottomSheet(childViewController: source)
-//
-//        addChild(drawerVC)
-//        view.addSubview(drawerVC.view)
-//        drawerVC.view.snp.remakeConstraints {
-//            $0.right.left.equalToSuperview()
-//            $0.bottom.equalTo(footer.snp.top)
-//        }
+    }
+    
+    func showTranslucentViewController() {
+        let source = SupportWebCreatorsWithTokensView()
+        let drawerVC = TranslucentBottomSheet(childViewController: source)
+
+        addChild(drawerVC)
+        view.addSubview(drawerVC.view)
+        drawerVC.view.snp.remakeConstraints {
+            $0.right.left.equalToSuperview()
+            $0.bottom.equalTo(footer.snp.top)
+        }
     }
     
     func topToolbarDidPressStop(_ topToolbar: TopToolbarView) {
