@@ -1706,7 +1706,7 @@ extension BrowserViewController: TopToolbarDelegate {
     }
     
     func showBottomSheetViewController() {
-        let source = BrandedImageCallout.GetPaidForBrandedImageViewController()
+        let source = BrandedImageCallout.GetPaidForBrandedImageRewardsOffViewController()
         let drawerVC = BottomSheetViewController(childViewController: source)
 
         addChild(drawerVC)
