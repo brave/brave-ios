@@ -149,7 +149,9 @@ class BottomSheetViewController: UIViewController {
     
     private func makeConstraints() {
         backgroundOverlayView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            let bottomInset = parent?.view.safeAreaInsets.bottom ?? 0
+            make.leading.trailing.top.equalToSuperview()
+            make.bottom.equalToSuperview().offset(bottomInset)
         }
         
         childViewController.view.snp.remakeConstraints {
