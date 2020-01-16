@@ -6,7 +6,7 @@ import UIKit
 import Shared
 import BraveShared
 
-struct BrandedImageCalloutHelper {
+struct BrandedImageCallout {
     struct CommonViews {
         static func rewardsLogoHeader(textColor: UIColor, textSize: CGFloat) -> UIStackView {
             let headerStackView = UIStackView().then {

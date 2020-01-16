@@ -8,7 +8,7 @@ import BraveShared
 
 class GetPaidForBrandedImageViewController: UIViewController {
     
-    private let viewHelper = BrandedImageCalloutHelper.CommonViews.self
+    private let viewHelper = BrandedImageCallout.CommonViews.self
     
     let mainStackView = UIStackView().then {
         $0.axis = .vertical
