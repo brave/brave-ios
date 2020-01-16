@@ -46,7 +46,8 @@ extension BrandedImageCallout {
                 $0.bottom.equalToSuperview().inset(24)
             }
             
-            let size = body.sizeThatFits(CGSize(width: view.frame.width - 32, height: CGFloat.infinity))
+            let width = min(view.frame.width - 32, 400)
+            let size = body.sizeThatFits(CGSize(width: width, height: CGFloat.infinity))
             
             body.snp.remakeConstraints {
                 $0.height.equalTo(size.height)
