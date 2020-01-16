@@ -66,6 +66,7 @@
 		0A7B5D722269E7AD00AADF22 /* BookmarkEditMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7B5D712269E7AD00AADF22 /* BookmarkEditMode.swift */; };
 		0A7F238923CF852E005E39FC /* TranslucentBottomSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7F238823CF852E005E39FC /* TranslucentBottomSheet.swift */; };
 		0A7F238C23CF88AB005E39FC /* SupportWebCreatorsWithTokensView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7F238B23CF88AB005E39FC /* SupportWebCreatorsWithTokensView.swift */; };
+		0A7F239023D08886005E39FC /* BrandedImageCalloutHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7F238F23D08886005E39FC /* BrandedImageCalloutHelper.swift */; };
 		0A8C6993225BC7B100988715 /* ToolbarUrlActionsProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A8C6992225BC7B100988715 /* ToolbarUrlActionsProtocol.swift */; };
 		0A8C69AB225CFCAF00988715 /* AddEditBookmarkTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A8C69AA225CFCAF00988715 /* AddEditBookmarkTableViewController.swift */; };
 		0A8C69B5225DE99700988715 /* BookmarkDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A8C69B4225DE99700988715 /* BookmarkDetailsView.swift */; };
@@ -1309,6 +1310,7 @@
 		0A7B5D712269E7AD00AADF22 /* BookmarkEditMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkEditMode.swift; sourceTree = "<group>"; };
 		0A7F238823CF852E005E39FC /* TranslucentBottomSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslucentBottomSheet.swift; sourceTree = "<group>"; };
 		0A7F238B23CF88AB005E39FC /* SupportWebCreatorsWithTokensView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportWebCreatorsWithTokensView.swift; sourceTree = "<group>"; };
+		0A7F238F23D08886005E39FC /* BrandedImageCalloutHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandedImageCalloutHelper.swift; sourceTree = "<group>"; };
 		0A86268423571F3300FD4C11 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Storage.strings; sourceTree = "<group>"; };
 		0A8C6992225BC7B100988715 /* ToolbarUrlActionsProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarUrlActionsProtocol.swift; sourceTree = "<group>"; };
 		0A8C69AA225CFCAF00988715 /* AddEditBookmarkTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEditBookmarkTableViewController.swift; sourceTree = "<group>"; };
@@ -2777,6 +2779,24 @@
 			path = Bookmarks;
 			sourceTree = "<group>";
 		};
+		0A7F238D23D0859B005E39FC /* NTP */ = {
+			isa = PBXGroup;
+			children = (
+				0A7F238E23D0862F005E39FC /* BrandedImageCallouts */,
+			);
+			path = NTP;
+			sourceTree = "<group>";
+		};
+		0A7F238E23D0862F005E39FC /* BrandedImageCallouts */ = {
+			isa = PBXGroup;
+			children = (
+				0A7F238F23D08886005E39FC /* BrandedImageCalloutHelper.swift */,
+				0AEF16C823CDFDC100158AD9 /* GetPaidForBrandedImageViewController.swift */,
+				0A7F238B23CF88AB005E39FC /* SupportWebCreatorsWithTokensView.swift */,
+			);
+			path = BrandedImageCallouts;
+			sourceTree = "<group>";
+		};
 		0AA21E4D2302C94800358988 /* Lottie_Assets */ = {
 			isa = PBXGroup;
 			children = (
@@ -3268,8 +3288,6 @@
 			children = (
 				2755AB8523107DBD00F0721F /* AdsMediaReporting.swift */,
 				276E7A3B22F21DBE00939424 /* RewardsReporting.swift */,
-				0AEF16C823CDFDC100158AD9 /* GetPaidForBrandedImageViewController.swift */,
-				0A7F238B23CF88AB005E39FC /* SupportWebCreatorsWithTokensView.swift */,
 			);
 			path = Rewards;
 			sourceTree = "<group>";
@@ -4728,6 +4746,7 @@
 				D3A994941A368691008AD1AC /* Browser */,
 				A104E190210A380E00D2323E /* Shields */,
 				E63ED8DF1BFD254E0097D08E /* Login Management */,
+				0A7F238D23D0859B005E39FC /* NTP */,
 				F84B21F51A0910F600AAB793 /* Reader */,
 				2F44FC551A9E83E200FD20CC /* Settings */,
 				D3972BF01C22412B00035B87 /* Share */,
@@ -6050,6 +6069,7 @@
 				D3C3696E1CC6B78800348A61 /* LocalRequestHelper.swift in Sources */,
 				27C461DE211B76500088A441 /* ShieldsView.swift in Sources */,
 				E4B423DD1ABA0318007E66C8 /* ReaderModeHandlers.swift in Sources */,
+				0A7F239023D08886005E39FC /* BrandedImageCalloutHelper.swift in Sources */,
 				4422D4DA21BFFB7600BF1855 /* iterator.cc in Sources */,
 				4422D4AF21BFFB7600BF1855 /* status.cc in Sources */,
 				4422D4EA21BFFB7600BF1855 /* db_impl.cc in Sources */,

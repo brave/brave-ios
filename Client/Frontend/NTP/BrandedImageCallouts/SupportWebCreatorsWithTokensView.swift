@@ -8,6 +8,8 @@ import BraveShared
 
 class SupportWebCreatorsWithTokensView: UIViewController {
     
+    private let viewHelper = BrandedImageCalloutHelper.CommonViews.self
+    
     let mainStackView = UIStackView().then {
         $0.axis = .vertical
         $0.translatesAutoresizingMaskIntoConstraints = false
@@ -37,24 +39,7 @@ class SupportWebCreatorsWithTokensView: UIViewController {
     }
     
     override func viewDidLoad() {
-        
-        let headerStackView = UIStackView().then {
-            $0.spacing = 10
-        }
-        
-        let imageView = UIImageView(image: #imageLiteral(resourceName: "brave_rewards_button_enabled")).then {
-            $0.snp.makeConstraints {
-                $0.size.equalTo(24)
-            }
-        }
-        
-        let title = UILabel().then {
-            $0.text = "Brave Rewards"
-            $0.appearanceTextColor = .white
-            $0.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
-        }
-        
-        [imageView, title].forEach(headerStackView.addArrangedSubview(_:))
+        let headerStackView = viewHelper.rewardsLogoHeader(textColor: .white, textSize: 16)
         
         headerStackView.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 311), for: .vertical)
         

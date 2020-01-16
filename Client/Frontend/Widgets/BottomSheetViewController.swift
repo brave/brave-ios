@@ -104,7 +104,7 @@ class BottomSheetViewController: UIViewController {
 //
     init(childViewController: UIViewController) {
         self.childViewController = childViewController
-
+        
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -113,6 +113,10 @@ class BottomSheetViewController: UIViewController {
 
     override public func viewDidLoad() {
         super.viewDidLoad()
+        
+        let height = self.childViewController.view?
+            .systemLayoutSizeFitting(UIView.layoutFittingExpandedSize).height ?? 0
+        childViewController.preferredContentSize = CGSize(width: view.frame.width, height: height)
 
         view.addSubview(backgroundOverlayView)
         view.addSubview(contentView)
