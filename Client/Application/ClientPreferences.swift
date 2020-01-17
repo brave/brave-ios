@@ -103,6 +103,10 @@ extension Preferences {
         static let backgroundSponsoredImages = Option<Bool>(key: "newtabpage.background-sponsored-images", default: true)
         /// Whether the iOS keyboard auto-opens on a NTP or not
         static let autoOpenKeyboard = Option<Bool>(key: "newtabpage.auto-open-keyboard", default: false)
+        
+        /// Whether the callout to use branded image was shown.
+        static let brandedImageShowed = Option<Bool>(key: "newtabpage.branded-image-callout-showed",
+                                                     default: false)
     }
 }
 

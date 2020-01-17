@@ -12,7 +12,7 @@ import SnapKit
 
 private let log = Logger.browserLogger
 
-protocol TopSitesDelegate: AnyObject {
+protocol FavoritesDelegate: AnyObject {
     func didSelect(input: String)
     func didTapDuckDuckGoCallout()
     func didTapShowMoreFavorites()
@@ -25,7 +25,7 @@ class FavoritesViewController: UIViewController, Themeable {
         static let searchEngineCalloutPadding: CGFloat = 120.0
     }
     
-    weak var delegate: TopSitesDelegate?
+    weak var delegate: FavoritesDelegate?
     
     // MARK: - Favorites collection view properties
     private (set) internal lazy var collection: UICollectionView = {
@@ -134,9 +134,19 @@ class FavoritesViewController: UIViewController, Themeable {
     
     private let profile: Profile
     
-    init(profile: Profile, dataSource: FavoritesDataSource = FavoritesDataSource()) {
+    /// Whether the view was called from tapping on address bar or not.
+    private let fromOverlay: Bool
+    
+    var brandedImageState: BrandedImageCalloutState? {
+        didSet {
+            showBrandedImageCallout()
+        }
+    }
+    
+    init(profile: Profile, dataSource: FavoritesDataSource = FavoritesDataSource(), fromOverlay: Bool) {
         self.profile = profile
         self.dataSource = dataSource
+        self.fromOverlay = fromOverlay
         
         super.init(nibName: nil, bundle: nil)
         NotificationCenter.default.do {
@@ -213,6 +223,21 @@ class FavoritesViewController: UIViewController, Themeable {
             self?.updateDuckDuckGoButtonLayout()
         }
         updateDuckDuckGoVisibility()
+        
+        //showTranslucentViewController()
+    }
+    
+    private func showBrandedImageCallout() {
+        if fromOverlay { return }
+        guard let source = brandedImageState?.initialViewController else { return }
+        let drawerVC = TranslucentBottomSheet(childViewController: source)
+
+        addChild(drawerVC)
+        view.addSubview(drawerVC.view)
+        drawerVC.view.snp.remakeConstraints {
+            $0.right.left.equalToSuperview()
+            $0.bottom.equalTo(view)
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {

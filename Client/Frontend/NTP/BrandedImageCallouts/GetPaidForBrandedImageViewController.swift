@@ -48,7 +48,7 @@ extension BrandedImageCallout {
                 $0.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 311), for: .vertical)
             }
             
-            let buttonStackView = viewHelper.primaryButton(text: "Turn on Rewards", showMoneyImage: true)
+            let buttonStackView = viewHelper.primaryButton(text: "Turn on Brave Ads", showMoneyImage: true)
             
             [headerStackView, body, tos, buttonStackView].forEach(mainStackView.addArrangedSubview(_:))
             

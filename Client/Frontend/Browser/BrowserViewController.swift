@@ -939,10 +939,13 @@ class BrowserViewController: UIViewController {
         homePanelIsInline = inline
 
         if favoritesViewController == nil {
-            let homePanelController = FavoritesViewController(profile: profile)
+            let homePanelController = FavoritesViewController(profile: profile, fromOverlay: !inline)
             homePanelController.delegate = self
             homePanelController.view.alpha = 0
             homePanelController.applyTheme(Theme.of(tabManager.selectedTab))
+            
+            //homePanelController.brandedImageState = ntpBrandedImageState
+            homePanelController.brandedImageState = .gettingPaidAlready
 
             self.favoritesViewController = homePanelController
 
@@ -966,6 +969,19 @@ class BrowserViewController: UIViewController {
             }
         })
         view.setNeedsUpdateConstraints()
+    }
+    
+    private var ntpBrandedImageState: BrandedImageCalloutState {
+        let wasCalloutShowed = Preferences.NewTabPage.brandedImageShowed.value
+        let rewardsEnabled = rewards.ledger.isEnabled
+        let adsEnabled = rewards.ads.isEnabled
+        let isSponsoredImage = true // todo fix
+        BrandedImageCalloutState.getState(wasCalloutShowedOnce: wasCalloutShowed,
+                                          rewardsEnabled: rewardsEnabled,
+                                          adsEnabled: adsEnabled,
+                                          isSponsoredImage: isSponsoredImage)
+        
+        return .dontShow
     }
 
     fileprivate func hideHomePanelController() {
@@ -1700,7 +1716,7 @@ extension BrowserViewController: TopToolbarDelegate {
         tabManager.selectedTab?.reload()
         
         
-         showBottomSheetViewController()
+         //showBottomSheetViewController()
         
 //         showTranslucentViewController()
     }
@@ -3372,7 +3388,7 @@ extension BrowserViewController: ToolbarUrlActionsDelegate {
     }
 }
 
-extension BrowserViewController: TopSitesDelegate {
+extension BrowserViewController: FavoritesDelegate {
     
     func didSelect(input: String) {
         processAddressBar(text: input, visitType: .bookmark)

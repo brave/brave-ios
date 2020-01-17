@@ -121,7 +121,7 @@ class MockFavoritesDataSource: FavoritesDataSource {
     }
 }
 
-class MockTopSitesDelegate: TopSitesDelegate {
+class MockTopSitesDelegate: FavoritesDelegate {
 
     var didSelectInputString = false
     var didTapCallout = false
