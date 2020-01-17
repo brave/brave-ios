@@ -46,6 +46,10 @@ extension BrandedImageCallout {
                 $0.left.right.equalToSuperview().inset(16)
                 $0.bottom.equalToSuperview().inset(24)
             }
+            
+            body.onLinkedTapped = { _ in
+                self.learnMoreHandler?()
+            }
         }
     }
 }

@@ -945,7 +945,7 @@ class BrowserViewController: UIViewController {
             homePanelController.applyTheme(Theme.of(tabManager.selectedTab))
             
 //            homePanelController.brandedImageState = ntpBrandedImageState
-            homePanelController.brandedImageState = .gettingPaidAlready
+            homePanelController.brandedImageState = .getPaidTurnRewardsOn
 
             self.favoritesViewController = homePanelController
 

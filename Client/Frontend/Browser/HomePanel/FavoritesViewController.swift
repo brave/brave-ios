@@ -238,8 +238,8 @@ class FavoritesViewController: UIViewController, Themeable {
         }
         
         drawerVC.learnMoreHandler = {
+            drawerVC.close(immediately: true)
             self.delegate?.openBrandedImageCallout(state: self.brandedImageState)
-            drawerVC.close()
         }
 
         addChild(drawerVC)
