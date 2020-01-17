@@ -8,15 +8,9 @@ import BraveShared
 import BraveRewardsUI
 
 extension BrandedImageCallout {
-    class YouAreGettingPaidViewController: UIViewController {
+    class YouAreGettingPaidViewController: BottomSheetViewController {
         
         private let viewHelper = BrandedImageCallout.CommonViews.self
-        
-        let mainStackView = UIStackView().then {
-            $0.axis = .vertical
-            $0.translatesAutoresizingMaskIntoConstraints = false
-            $0.spacing = 16
-        }
         
         let body = UILabel().then {
             $0.text = "You're getting paid to see this background image."

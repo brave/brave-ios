@@ -66,7 +66,7 @@ enum BrandedImageCalloutState {
     
     /// The view controller that shows after user taps on 'Learn more' button if the current state supports it.
     /// Returns nil if no view controller should be present or there's no button to tap.
-    var learnMoreViewController: UIViewController? {
+    var learnMoreViewController: BottomSheetViewController? {
         let helper = BrandedImageCallout.self
         
         switch self {

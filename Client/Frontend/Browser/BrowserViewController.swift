@@ -1723,15 +1723,15 @@ extension BrowserViewController: TopToolbarDelegate {
     }
     
     func showBottomSheetViewController() {
-        let source = BrandedImageCallout.YouAreGettingPaidViewController()
-        let drawerVC = BottomSheetViewController(childViewController: source)
-
-        addChild(drawerVC)
-        view.addSubview(drawerVC.view)
-        drawerVC.view.snp.remakeConstraints {
-            $0.right.top.left.equalToSuperview()
-            $0.bottom.equalTo(view.safeArea.bottom)
-        }
+//        let source = BrandedImageCallout.YouAreGettingPaidViewController()
+//        let drawerVC = BottomSheetViewController(childViewController: source)
+//
+//        addChild(drawerVC)
+//        view.addSubview(drawerVC.view)
+//        drawerVC.view.snp.remakeConstraints {
+//            $0.right.top.left.equalToSuperview()
+//            $0.bottom.equalTo(view.safeArea.bottom)
+//        }
     }
     
 //    func showTranslucentViewController() {
@@ -3405,14 +3405,12 @@ extension BrowserViewController: FavoritesDelegate {
     
     func openBrandedImageCallout(state: BrandedImageCalloutState?) {
         guard let destinationVC = state?.learnMoreViewController else { return }
-        
-        let drawerVC = BottomSheetViewController(childViewController: destinationVC)
 
-        addChild(drawerVC)
-        view.addSubview(drawerVC.view)
-        drawerVC.view.snp.remakeConstraints {
+        addChild(destinationVC)
+        view.addSubview(destinationVC.view)
+        destinationVC.view.snp.remakeConstraints {
             $0.right.top.left.equalToSuperview()
-            $0.bottom.equalTo(view.safeArea.bottom)
+            $0.bottom.equalTo(view)
         }
     }
 }

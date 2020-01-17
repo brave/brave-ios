@@ -61,7 +61,6 @@ struct BrandedImageCallout {
                 $0.appearanceTextColor = .black
                 $0.backgroundColor = .clear
                 $0.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
-                $0.contentEdgeInsets = UIEdgeInsets(top: 12, left: 25, bottom: 12, right: 25)
                 if showMoneyImage {
                     $0.setImage(#imageLiteral(resourceName: "turn_rewards_on_money_icon"), for: .normal)
                     $0.imageEdgeInsets = UIEdgeInsets(top: 0, left: -10, bottom: 0, right: 0)
