@@ -2803,6 +2803,7 @@
 		0A7F238E23D0862F005E39FC /* BrandedImageCallouts */ = {
 			isa = PBXGroup;
 			children = (
+				0AEF16C523CDE4B800158AD9 /* BottomSheetViewController.swift */,
 				0A7F238F23D08886005E39FC /* BrandedImageCallout.swift */,
 				0AEF16C823CDFDC100158AD9 /* GetPaidForBrandedImageViewController.swift */,
 				0A27AB9C23D0DDED00194921 /* GetPaidForBrandedImageNonBlockingViewController.swift */,
@@ -4267,7 +4268,6 @@
 		D38A1BEB1A9FA2CA00F6A386 /* Widgets */ = {
 			isa = PBXGroup;
 			children = (
-				0AEF16C523CDE4B800158AD9 /* BottomSheetViewController.swift */,
 				D3FEC38C1AC4B42F00494F45 /* AutocompleteTextField.swift */,
 				E6927EBF1C7B6FB800D03F75 /* ErrorToast.swift */,
 				E660BE051BB0666D009AC090 /* InnerStrokedView.swift */,

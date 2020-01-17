@@ -45,6 +45,7 @@ extension BrandedImageCallout {
         }
         
         override func viewDidLoad() {
+            super.viewDidLoad()
             
             let headerStackView = viewHelper.rewardsLogoHeader(textColor: .black, textSize: 20).then {
                 $0.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 311), for: .vertical)
@@ -57,7 +58,7 @@ extension BrandedImageCallout {
             mainStackView.snp.remakeConstraints {
                 $0.top.equalToSuperview().inset(28)
                 $0.left.right.equalToSuperview().inset(16)
-                $0.bottom.equalToSuperview().inset(48)
+                $0.bottom.equalToSuperview().inset(64)
             }
             
             let width = min(view.frame.width - 32, 400)
