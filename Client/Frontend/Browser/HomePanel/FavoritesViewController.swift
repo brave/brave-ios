@@ -16,6 +16,7 @@ protocol FavoritesDelegate: AnyObject {
     func didSelect(input: String)
     func didTapDuckDuckGoCallout()
     func didTapShowMoreFavorites()
+    func openBrandedImageCallout(state: BrandedImageCalloutState?)
 }
 
 class FavoritesViewController: UIViewController, Themeable {
@@ -234,6 +235,11 @@ class FavoritesViewController: UIViewController, Themeable {
         drawerVC.closeHandler = {
             Preferences.NewTabPage.brandedImageShowed.value = true
             self.brandedImageState = .dontShow
+        }
+        
+        drawerVC.learnMoreHandler = {
+            self.delegate?.openBrandedImageCallout(state: self.brandedImageState)
+            drawerVC.close()
         }
 
         addChild(drawerVC)

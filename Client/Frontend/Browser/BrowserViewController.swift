@@ -1717,13 +1717,13 @@ extension BrowserViewController: TopToolbarDelegate {
         tabManager.selectedTab?.reload()
         
         
-         //showBottomSheetViewController()
+         showBottomSheetViewController()
         
 //         showTranslucentViewController()
     }
     
     func showBottomSheetViewController() {
-        let source = BrandedImageCallout.GetPaidForBrandedImageRewardsOffViewController()
+        let source = BrandedImageCallout.YouAreGettingPaidViewController()
         let drawerVC = BottomSheetViewController(childViewController: source)
 
         addChild(drawerVC)
@@ -3401,6 +3401,19 @@ extension BrowserViewController: FavoritesDelegate {
     
     func didTapShowMoreFavorites() {
         topToolbarDidTapBookmarkButton(nil, favorites: true)
+    }
+    
+    func openBrandedImageCallout(state: BrandedImageCalloutState?) {
+        guard let destinationVC = state?.learnMoreViewController else { return }
+        
+        let drawerVC = BottomSheetViewController(childViewController: destinationVC)
+
+        addChild(drawerVC)
+        view.addSubview(drawerVC.view)
+        drawerVC.view.snp.remakeConstraints {
+            $0.right.top.left.equalToSuperview()
+            $0.bottom.equalTo(view.safeArea.bottom)
+        }
     }
 }
 

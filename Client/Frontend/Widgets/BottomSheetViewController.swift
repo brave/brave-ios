@@ -263,6 +263,7 @@ class BottomSheetViewController: UIViewController {
         UIView.animate(withDuration: animationDuration, animations: {
             self.yPosition = self.view.frame.maxY
         }) { _ in
+            
             self.view.removeFromSuperview()
             self.removeFromParent()
         }

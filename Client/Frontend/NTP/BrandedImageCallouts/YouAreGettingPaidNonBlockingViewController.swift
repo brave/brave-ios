@@ -41,6 +41,10 @@ extension BrandedImageCallout {
             
             view.addSubview(mainStackView)
             
+            body.onLinkedTapped = { _ in
+                self.learnMoreHandler?()
+            }
+            
             mainStackView.snp.remakeConstraints {
                 $0.top.equalToSuperview().inset(28)
                 $0.left.right.equalToSuperview().inset(16)
