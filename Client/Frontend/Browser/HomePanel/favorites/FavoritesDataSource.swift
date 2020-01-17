@@ -50,7 +50,7 @@ class FavoritesDataSource: NSObject, UICollectionViewDataSource {
         /// 2. trait collection
         
         let icons = (less: 4, more: 6)
-        let minIconPoints = 80 as CGFloat
+        let minIconPoints: CGFloat = 80
         
         // If icons fall below a certain size, then use less icons.
         if (collection.frame.width / CGFloat(icons.more)) < minIconPoints {
