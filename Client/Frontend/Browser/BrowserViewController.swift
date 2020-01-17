@@ -944,7 +944,7 @@ class BrowserViewController: UIViewController {
             homePanelController.view.alpha = 0
             homePanelController.applyTheme(Theme.of(tabManager.selectedTab))
             
-            //homePanelController.brandedImageState = ntpBrandedImageState
+//            homePanelController.brandedImageState = ntpBrandedImageState
             homePanelController.brandedImageState = .gettingPaidAlready
 
             self.favoritesViewController = homePanelController
@@ -972,16 +972,17 @@ class BrowserViewController: UIViewController {
     }
     
     private var ntpBrandedImageState: BrandedImageCalloutState {
-        let wasCalloutShowed = Preferences.NewTabPage.brandedImageShowed.value
         let rewardsEnabled = rewards.ledger.isEnabled
         let adsEnabled = rewards.ads.isEnabled
-        let isSponsoredImage = true // todo fix
-        BrandedImageCalloutState.getState(wasCalloutShowedOnce: wasCalloutShowed,
-                                          rewardsEnabled: rewardsEnabled,
-                                          adsEnabled: adsEnabled,
-                                          isSponsoredImage: isSponsoredImage)
         
-        return .dontShow
+        let adsAvailableInRegion = BraveAds.isCurrentLocaleSupported()
+        let isSponsoredImage = true // todo fix
+        let state = BrandedImageCalloutState.getState(rewardsEnabled: rewardsEnabled,
+                                                      adsEnabled: adsEnabled,
+                                                      adsAvailableInRegion: adsAvailableInRegion,
+                                                      isSponsoredImage: isSponsoredImage)
+        
+        return state
     }
 
     fileprivate func hideHomePanelController() {
@@ -1733,17 +1734,17 @@ extension BrowserViewController: TopToolbarDelegate {
         }
     }
     
-    func showTranslucentViewController() {
-        let source = BrandedImageCallout.GetPaidForBrandedImageViewController()
-        let drawerVC = TranslucentBottomSheet(childViewController: source)
-
-        addChild(drawerVC)
-        view.addSubview(drawerVC.view)
-        drawerVC.view.snp.remakeConstraints {
-            $0.right.left.equalToSuperview()
-            $0.bottom.equalTo(footer.snp.top)
-        }
-    }
+//    func showTranslucentViewController() {
+//        let source = BrandedImageCallout.GetPaidForBrandedImageViewController()
+//        let drawerVC = TranslucentBottomSheet(childViewController: source)
+//
+//        addChild(drawerVC)
+//        view.addSubview(drawerVC.view)
+//        drawerVC.view.snp.remakeConstraints {
+//            $0.right.left.equalToSuperview()
+//            $0.bottom.equalTo(footer.snp.top)
+//        }
+//    }
     
     func topToolbarDidPressStop(_ topToolbar: TopToolbarView) {
         tabManager.selectedTab?.stop()

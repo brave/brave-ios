@@ -229,8 +229,12 @@ class FavoritesViewController: UIViewController, Themeable {
     
     private func showBrandedImageCallout() {
         if fromOverlay { return }
-        guard let source = brandedImageState?.initialViewController else { return }
-        let drawerVC = TranslucentBottomSheet(childViewController: source)
+        guard let drawerVC = brandedImageState?.initialViewController else { return }
+        
+        drawerVC.closeHandler = {
+            Preferences.NewTabPage.brandedImageShowed.value = true
+            self.brandedImageState = .dontShow
+        }
 
         addChild(drawerVC)
         view.addSubview(drawerVC.view)

@@ -7,7 +7,7 @@ import Shared
 import BraveShared
 
 extension BrandedImageCallout {
-    class SupportWebCreatorsWithTokensView: UIViewController {
+    class SupportWebCreatorsWithTokensView: TranslucentBottomSheet {
         
         private let viewHelper = BrandedImageCallout.CommonViews.self
         
@@ -40,6 +40,8 @@ extension BrandedImageCallout {
         }
         
         override func viewDidLoad() {
+            super.viewDidLoad()
+            
             let headerStackView = viewHelper.rewardsLogoHeader(textColor: .white, textSize: 16).then {
                 $0.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 311), for: .vertical)
             }
@@ -56,12 +58,6 @@ extension BrandedImageCallout {
                 $0.top.equalToSuperview().inset(28)
                 $0.left.right.equalToSuperview().inset(16)
                 $0.bottom.equalToSuperview().inset(16)
-            }
-        }
-        
-        override func viewDidLayoutSubviews() {
-            [body, body2].forEach {
-                $0.preferredMaxLayoutWidth = view.frame.width - 32
             }
         }
     }

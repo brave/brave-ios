@@ -7,9 +7,10 @@ import Shared
 import BraveShared
 
 class TranslucentBottomSheet: UIViewController {
-    let childViewController: UIViewController
-    
     private let animationDuration: TimeInterval = 0.25
+    
+    var closeHandler: (() -> Void)?
+    var learnMoreHandler: (() -> Void)?
     
     private let closeButton = UIButton().then {
         // todo: update icon
@@ -18,9 +19,7 @@ class TranslucentBottomSheet: UIViewController {
         $0.appearanceTintColor = .white
     }
     
-    init(childViewController: UIViewController) {
-        self.childViewController = childViewController
-
+    init() {
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -37,9 +36,6 @@ class TranslucentBottomSheet: UIViewController {
         overlayView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
-        
-        addChild(childViewController)
-        view.addSubview(childViewController.view)
         
         view.addSubview(closeButton)
         view.alpha = CGFloat.leastNormalMagnitude
@@ -64,10 +60,6 @@ class TranslucentBottomSheet: UIViewController {
             
             $0.size.equalTo(26)
         }
-        
-        childViewController.view.snp.makeConstraints {
-            $0.edges.equalTo(view.safeAreaLayoutGuide)
-        }
     }
     
     @objc func closeView() {
@@ -78,6 +70,7 @@ class TranslucentBottomSheet: UIViewController {
         UIView.animate(withDuration: animationDuration, animations: {
             self.view.alpha = CGFloat.leastNormalMagnitude
         }) { _ in
+            self.closeHandler?()
             self.view.removeFromSuperview()
             self.removeFromParent()
         }

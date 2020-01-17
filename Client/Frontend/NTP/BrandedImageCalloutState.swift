@@ -3,6 +3,8 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
+import Shared
+import BraveShared
 
 enum BrandedImageCalloutState {
     
@@ -19,15 +21,19 @@ enum BrandedImageCalloutState {
     
     // todo: consider adding enums for image type and ads status(on/off/unavailible)
     
-    static func getState(wasCalloutShowedOnce: Bool, rewardsEnabled: Bool, adsEnabled: Bool,
+    static func getState(rewardsEnabled: Bool, adsEnabled: Bool, adsAvailableInRegion: Bool,
                          isSponsoredImage: Bool) -> BrandedImageCalloutState {
         
+        let wasCalloutShowed = Preferences.NewTabPage.brandedImageShowed.value
+        
         // If any of those callouts were shown once, we skip showing any other state.
-        if wasCalloutShowedOnce { return .dontShow }
+        if wasCalloutShowed { return .dontShow }
         
         if !rewardsEnabled && isSponsoredImage { return .getPaidTurnRewardsOn }
         
         if rewardsEnabled {
+            if !adsAvailableInRegion { return .dontShow }
+            
             if adsEnabled && isSponsoredImage { return .gettingPaidAlready }
             
             if !adsEnabled && isSponsoredImage { return .getPaidTurnAdsOn }
@@ -41,9 +47,9 @@ enum BrandedImageCalloutState {
     
     /// The initial view controller that is shown to user.
     /// Returns nil of no view controller should be presented
-    var initialViewController: UIViewController? {
+    var initialViewController: TranslucentBottomSheet? {
         let helper = BrandedImageCallout.self
-        
+                
         switch self {
         case .getPaidTurnRewardsOn:
             return helper.GetPaidForBrandedImageNonBlockingViewController()

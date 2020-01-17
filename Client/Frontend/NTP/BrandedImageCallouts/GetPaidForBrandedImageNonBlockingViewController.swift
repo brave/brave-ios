@@ -8,7 +8,7 @@ import BraveShared
 import BraveRewardsUI
 
 extension BrandedImageCallout {
-    class GetPaidForBrandedImageNonBlockingViewController: UIViewController {
+    class GetPaidForBrandedImageNonBlockingViewController: TranslucentBottomSheet {
         
         private let viewHelper = BrandedImageCallout.CommonViews.self
         
@@ -31,6 +31,7 @@ extension BrandedImageCallout {
         }
         
         override func viewDidLoad() {
+            super.viewDidLoad()
             
             let headerStackView = viewHelper.rewardsLogoHeader(textColor: .white, textSize: 20).then {
                 $0.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 311), for: .vertical)
@@ -44,13 +45,6 @@ extension BrandedImageCallout {
                 $0.top.equalToSuperview().inset(28)
                 $0.left.right.equalToSuperview().inset(16)
                 $0.bottom.equalToSuperview().inset(24)
-            }
-            
-            let width = min(view.frame.width - 32, 400)
-            let size = body.sizeThatFits(CGSize(width: width, height: CGFloat.infinity))
-            
-            body.snp.remakeConstraints {
-                $0.height.equalTo(size.height)
             }
         }
     }
