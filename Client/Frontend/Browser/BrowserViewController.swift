@@ -58,7 +58,7 @@ class BrowserViewController: UIViewController {
     fileprivate var findInPageBar: FindInPageBar?
     
     // Single data source used for all favorites vcs
-    fileprivate let backgroundDataSource = BackgroundImage()
+    fileprivate let backgroundDataSource = NewTabPageBackgroundDataSource()
     
     var loadQueue = Deferred<Void>()
 

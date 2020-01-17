@@ -130,11 +130,11 @@ class FavoritesViewController: UIViewController, Themeable {
     // MARK: - Init/lifecycle
     
     private var backgroundViewInfo: (imageView: UIImageView, portraitCenterConstraint: Constraint)?
-    private var background: BackgroundImage.Background?
+    private var background: NewTabPageBackgroundDataSource.Background?
     
     private let profile: Profile
     
-    init(profile: Profile, background: BackgroundImage.Background?, dataSource: FavoritesDataSource = FavoritesDataSource()) {
+    init(profile: Profile, background: NewTabPageBackgroundDataSource.Background?, dataSource: FavoritesDataSource = FavoritesDataSource()) {
         self.profile = profile
         self.dataSource = dataSource
         self.background = background
@@ -402,8 +402,8 @@ class FavoritesViewController: UIViewController, Themeable {
     // TODO: combine with reset?
     private func setupBackgroundImage() {
         guard var image = background?.imageLiteral else {
-                imageCreditButton.isHidden = true
-                return
+            imageCreditButton.isHidden = true
+            return
         }
         
         setupImageCredit()

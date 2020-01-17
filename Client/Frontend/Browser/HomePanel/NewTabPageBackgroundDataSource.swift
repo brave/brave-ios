@@ -6,7 +6,7 @@ import UIKit
 import Shared
 import BraveShared
 
-class BackgroundImage {
+class NewTabPageBackgroundDataSource {
     
     struct Background: Decodable {
         let image: String
@@ -94,7 +94,7 @@ class BackgroundImage {
         // Determine what type of background to display
         let useSponsor = Preferences.NewTabPage.backgroundSponsoredImages.value
             && sponsor != nil
-            && Int.random(in: 0..<BackgroundImage.sponsorshipShowRate) == 0
+            && Int.random(in: 0..<NewTabPageBackgroundDataSource.sponsorshipShowRate) == 0
         guard let dataSet = useSponsor ? sponsor?.wallpapers : standardBackgrounds else { return nil }
         if dataSet.isEmpty { return nil }
         
@@ -113,7 +113,7 @@ class BackgroundImage {
             // This index is now added to 'past' tracking list to prevent duplicates
             lastBackgroundChoices.append(randomBackgroundIndex)
             // Trimming to fixed length to release older backgrounds
-            lastBackgroundChoices = lastBackgroundChoices.suffix(BackgroundImage.numberOfDuplicateAvoidance)
+            lastBackgroundChoices = lastBackgroundChoices.suffix(NewTabPageBackgroundDataSource.numberOfDuplicateAvoidance)
         }
         
         // Item is returned based on our random index.
