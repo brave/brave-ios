@@ -940,7 +940,7 @@ class BrowserViewController: UIViewController {
         homePanelIsInline = inline
 
         if favoritesViewController == nil {
-            let homePanelController = FavoritesViewController(profile: profile, background: backgroundDataSource.randomBackground())
+            let homePanelController = FavoritesViewController(profile: profile, background: backgroundDataSource.newBackground())
             homePanelController.delegate = self
             homePanelController.view.alpha = 0
             homePanelController.applyTheme(Theme.of(tabManager.selectedTab))

@@ -90,7 +90,7 @@ class NewTabPageBackgroundDataSource {
     // This can 'easily' be adjusted to support both sets by switching to String, and using filePath to identify uniqueness.
     private var lastBackgroundChoices = [Int]()
     
-    func randomBackground() -> Background? {
+    func newBackground() -> Background? {
         // Determine what type of background to display
         let useSponsor = Preferences.NewTabPage.backgroundSponsoredImages.value
             && sponsor != nil
