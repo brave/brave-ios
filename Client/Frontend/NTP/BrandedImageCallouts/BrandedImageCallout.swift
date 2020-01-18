@@ -30,8 +30,8 @@ struct BrandedImageCallout {
             return headerStackView
         }
         
-        static func primaryButton(text: String, showMoneyImage: Bool) -> UIStackView {
-            let turnOnRewards = RoundInterfaceButton().then {
+        static func primaryButton(text: String, showMoneyImage: Bool) -> UIButton {
+            let button = RoundInterfaceButton().then {
                 $0.setTitle(text, for: .normal)
                 $0.appearanceTextColor = .white
                 $0.backgroundColor = BraveUX.blurple400
@@ -43,20 +43,11 @@ struct BrandedImageCallout {
                 }
             }
             
-            let buttonStackView = UIStackView(arrangedSubviews:
-                [UIView.spacer(.horizontal, amount: 0),
-                 turnOnRewards,
-                 UIView.spacer(.horizontal, amount: 0)]).then {
-                    $0.distribution = .equalSpacing
-            }
-            
-            buttonStackView.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
-            
-            return buttonStackView
+            return button
         }
         
-        static func secondaryButton(text: String, showMoneyImage: Bool) -> UIStackView {
-            let turnOnRewards = RoundInterfaceButton().then {
+        static func secondaryButton(text: String, showMoneyImage: Bool) -> UIButton {
+            let button = RoundInterfaceButton().then {
                 $0.setTitle(text, for: .normal)
                 $0.appearanceTextColor = .black
                 $0.backgroundColor = .clear
@@ -67,16 +58,20 @@ struct BrandedImageCallout {
                 }
             }
             
-            let buttonStackView = UIStackView(arrangedSubviews:
+            return button
+        }
+        
+        static func centeredView(_ view: UIView) -> UIStackView {
+            let stackView = UIStackView(arrangedSubviews:
                 [UIView.spacer(.horizontal, amount: 0),
-                 turnOnRewards,
+                 view,
                  UIView.spacer(.horizontal, amount: 0)]).then {
                     $0.distribution = .equalSpacing
             }
             
-            buttonStackView.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
+            stackView.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
             
-            return buttonStackView
+            return stackView
         }
     }
 }

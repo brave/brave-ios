@@ -49,9 +49,10 @@ extension BrandedImageCallout {
                 $0.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 311), for: .vertical)
             }
             
-            let buttonStackView = viewHelper.primaryButton(text: "Turn on Brave Ads", showMoneyImage: true)
+            let turnOnAdsButton = viewHelper.primaryButton(text: "Turn on Brave Ads", showMoneyImage: true)
+            let turnOnAdsStackView = viewHelper.centeredView(turnOnAdsButton)
             
-            [headerStackView, body, tos, buttonStackView].forEach(mainStackView.addArrangedSubview(_:))
+            [headerStackView, body, tos, turnOnAdsStackView].forEach(mainStackView.addArrangedSubview(_:))
             
             contentView.addSubview(mainStackView)
             
@@ -59,7 +60,7 @@ extension BrandedImageCallout {
                 $0.top.equalToSuperview().inset(28)
                 $0.left.right.equalToSuperview().inset(16)
                 $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(28)
-            }   
+            }
         }
     }
 }

@@ -44,9 +44,10 @@ extension BrandedImageCallout {
                 $0.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 311), for: .vertical)
             }
             
-            let buttonStackView = viewHelper.primaryButton(text: "Claim my rewards", showMoneyImage: true)
+            let claimRewardsButton = viewHelper.primaryButton(text: "Claim my rewards", showMoneyImage: true)
+            let claimRewardsStackView = viewHelper.centeredView(claimRewardsButton)
             
-            [headerStackView, body, buttonStackView].forEach(mainStackView.addArrangedSubview(_:))
+            [headerStackView, body, claimRewardsStackView].forEach(mainStackView.addArrangedSubview(_:))
             view.addSubview(mainStackView)
 
             mainStackView.snp.remakeConstraints {

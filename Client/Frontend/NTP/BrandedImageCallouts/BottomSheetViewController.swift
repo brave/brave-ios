@@ -236,7 +236,7 @@ class BottomSheetViewController: UIViewController {
         close()
     }
 
-    private func close() {
+    func close() {
         UIView.animate(withDuration: animationDuration, animations: {
             self.yPosition = self.view.frame.maxY
         }) { _ in

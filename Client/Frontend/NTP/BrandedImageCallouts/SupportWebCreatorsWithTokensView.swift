@@ -46,9 +46,10 @@ extension BrandedImageCallout {
                 $0.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 311), for: .vertical)
             }
             
-            let buttonStackView = viewHelper.primaryButton(text: "Turn on Brave Ads", showMoneyImage: true)
+            let turnOnAdsButton = viewHelper.primaryButton(text: "Turn on Brave Ads", showMoneyImage: true)
+            let turnOnAdsStackView = viewHelper.centeredView(turnOnAdsButton)
             
-            [headerStackView, body, body2, buttonStackView].forEach(mainStackView.addArrangedSubview(_:))
+            [headerStackView, body, body2, turnOnAdsStackView].forEach(mainStackView.addArrangedSubview(_:))
             
             mainStackView.setCustomSpacing(0, after: body)
             
