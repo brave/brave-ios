@@ -7,7 +7,7 @@ import Shared
 import BraveShared
 
 extension BrandedImageCallout {
-    class ClaimRewardsViewController: UIViewController {
+    class ClaimRewardsViewController: TranslucentBottomSheet {
         
         private let viewHelper = BrandedImageCallout.CommonViews.self
         
@@ -38,6 +38,8 @@ extension BrandedImageCallout {
         }
         
         override func viewDidLoad() {
+            super.viewDidLoad()
+            
             view.backgroundColor = UIColor(patternImage: #imageLiteral(resourceName: "confetti").withAlpha(0.75)!)
             
             let headerStackView = viewHelper.rewardsLogoHeader(textColor: .white, textSize: 16).then {
@@ -52,14 +54,8 @@ extension BrandedImageCallout {
 
             mainStackView.snp.remakeConstraints {
                 $0.top.equalToSuperview().inset(28)
-                $0.left.right.equalToSuperview().inset(16)
-                $0.bottom.equalToSuperview().inset(16)
-            }
-        }
-        
-        override func viewDidLayoutSubviews() {
-            [body].forEach {
-                $0.preferredMaxLayoutWidth = view.frame.width - 32
+                $0.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(16)
+                $0.bottom.equalToSuperview().inset(24)
             }
         }
     }
