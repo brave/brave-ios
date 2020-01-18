@@ -13,8 +13,6 @@ class TranslucentBottomSheet: UIViewController {
     var learnMoreHandler: (() -> Void)?
     
     private let closeButton = UIButton().then {
-        // todo: update icon
-        $0.addTarget(self, action: #selector(closeView), for: .touchUpInside)
         $0.setImage(#imageLiteral(resourceName: "close_translucent_popup").template, for: .normal)
         $0.appearanceTintColor = .white
     }
@@ -31,13 +29,14 @@ class TranslucentBottomSheet: UIViewController {
             $0.backgroundColor = .black
             $0.alpha = 0.85
         }
-        view.addSubview(overlayView)
+        view.insertSubview(overlayView, at: 0)
         
         overlayView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
         
         view.addSubview(closeButton)
+        closeButton.addTarget(self, action: #selector(closeView), for: .touchUpInside)
         view.alpha = CGFloat.leastNormalMagnitude
         
         view.bounds = CGRect(size: preferredContentSize)

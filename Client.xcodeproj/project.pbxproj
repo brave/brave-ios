@@ -2796,6 +2796,7 @@
 		0A7F238D23D0859B005E39FC /* NTP */ = {
 			isa = PBXGroup;
 			children = (
+				0AFC8F9D23D3762A00941895 /* NTPNotificationViewController.swift */,
 				0A7F238E23D0862F005E39FC /* BrandedImageCallouts */,
 				0A27ABA023D1B9C400194921 /* BrandedImageCalloutState.swift */,
 			);
@@ -2815,7 +2816,6 @@
 				0A7F238B23CF88AB005E39FC /* SupportWebCreatorsWithTokensView.swift */,
 				0A27AB9323D0A13200194921 /* ClaimRewardsViewController.swift */,
 				0AFC8F9423D1DF6500941895 /* TranslucentBottomSheet.swift */,
-				0AFC8F9D23D3762A00941895 /* NTPNotificationViewController.swift */,
 			);
 			path = BrandedImageCallouts;
 			sourceTree = "<group>";

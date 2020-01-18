@@ -1727,36 +1727,7 @@ extension BrowserViewController: TopToolbarDelegate {
     
     func topToolbarDidPressReload(_ topToolbar: TopToolbarView) {
         tabManager.selectedTab?.reload()
-        
-        
-         showBottomSheetViewController()
-        
-//         showTranslucentViewController()
     }
-    
-    func showBottomSheetViewController() {
-//        let source = BrandedImageCallout.YouAreGettingPaidViewController()
-//        let drawerVC = BottomSheetViewController(childViewController: source)
-//
-//        addChild(drawerVC)
-//        view.addSubview(drawerVC.view)
-//        drawerVC.view.snp.remakeConstraints {
-//            $0.right.top.left.equalToSuperview()
-//            $0.bottom.equalTo(view.safeArea.bottom)
-//        }
-    }
-    
-//    func showTranslucentViewController() {
-//        let source = BrandedImageCallout.GetPaidForBrandedImageViewController()
-//        let drawerVC = TranslucentBottomSheet(childViewController: source)
-//
-//        addChild(drawerVC)
-//        view.addSubview(drawerVC.view)
-//        drawerVC.view.snp.remakeConstraints {
-//            $0.right.left.equalToSuperview()
-//            $0.bottom.equalTo(footer.snp.top)
-//        }
-//    }
     
     func topToolbarDidPressStop(_ topToolbar: TopToolbarView) {
         tabManager.selectedTab?.stop()
