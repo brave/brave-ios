@@ -172,6 +172,9 @@ class FavoritesViewController: UIViewController, Themeable {
             $0.removeObserver(self, name: .topSitesConversion, object: nil)
             $0.removeObserver(self, name: .privacyModeChanged, object: nil)
         }
+        
+        // Navigating away from NTP counts the current notification as showed.
+        Preferences.NewTabPage.brandedImageShowed.value = true
     }
     
     override func viewDidLoad() {
