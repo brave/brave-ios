@@ -56,7 +56,7 @@ class TranslucentBottomSheet: UIViewController {
     private func makeConstraints() {
         closeButton.snp.remakeConstraints {
             $0.top.equalToSuperview().inset(10)
-            $0.right.equalToSuperview().inset(7)
+            $0.trailing.equalTo(view.safeAreaLayoutGuide).inset(7)
             
             $0.size.equalTo(26)
         }

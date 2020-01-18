@@ -57,7 +57,7 @@ extension BrandedImageCallout {
             
             mainStackView.snp.remakeConstraints {
                 $0.top.equalToSuperview().inset(28)
-                $0.left.right.equalToSuperview().inset(16)
+                $0.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(16)
                 $0.bottom.equalToSuperview().inset(16)
             }
         }

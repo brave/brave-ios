@@ -224,8 +224,6 @@ class FavoritesViewController: UIViewController, Themeable {
             self?.updateDuckDuckGoButtonLayout()
         }
         updateDuckDuckGoVisibility()
-        
-        //showTranslucentViewController()
     }
     
     private func showBrandedImageCallout() {
