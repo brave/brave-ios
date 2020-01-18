@@ -36,7 +36,7 @@ extension BrandedImageCallout {
             $0.text = "You can also choose to hide sponsored images."
             
             $0.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 313), for: .vertical)
-            $0.setURLInfo(["hide sponsored images": "terms"])
+            $0.setURLInfo(["hide sponsored images": "hide-sponsored-images"])
             
             $0.textContainerInset = UIEdgeInsets.zero
             $0.textContainer.lineFragmentPadding = 0
@@ -52,7 +52,16 @@ extension BrandedImageCallout {
             let turnOnAdsButton = viewHelper.primaryButton(text: "Turn on Brave Ads", showMoneyImage: true)
             let turnOnAdsStackView = viewHelper.centeredView(turnOnAdsButton)
             
+            turnOnAdsButton.addTarget(self, action: #selector(turnAdsOnTapped), for: .touchDown)
+            
             [headerStackView, body, tos, turnOnAdsStackView].forEach(mainStackView.addArrangedSubview(_:))
+            
+            tos.onLinkedTapped = { action in
+                if action.absoluteString == "hide-sponsored-images" {
+                    Preferences.NewTabPage.backgroundSponsoredImages.value = false
+                    self.close()
+                }
+            }
             
             contentView.addSubview(mainStackView)
             
@@ -61,6 +70,14 @@ extension BrandedImageCallout {
                 $0.left.right.equalToSuperview().inset(16)
                 $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(28)
             }
+        }
+        
+        @objc func turnAdsOnTapped() {
+            guard let rewards = (UIApplication.shared.delegate as? AppDelegate)?
+            .browserViewController.rewards else { return }
+            
+            rewards.ads.isEnabled = true
+            close()
         }
     }
 }
