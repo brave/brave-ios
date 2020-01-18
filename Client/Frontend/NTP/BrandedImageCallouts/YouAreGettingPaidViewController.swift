@@ -12,6 +12,12 @@ extension BrandedImageCallout {
         
         private let viewHelper = BrandedImageCallout.CommonViews.self
         
+        let mainStackView = UIStackView().then {
+            $0.axis = .vertical
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            $0.spacing = 16
+        }
+        
         let body = UILabel().then {
             $0.text = "You're getting paid to see this background image."
             $0.appearanceTextColor = .black
@@ -47,24 +53,13 @@ extension BrandedImageCallout {
             
             [headerStackView, body, body2].forEach(mainStackView.addArrangedSubview(_:))
             
-            view.addSubview(mainStackView)
+            contentView.addSubview(mainStackView)
             
             mainStackView.snp.remakeConstraints {
                 $0.top.equalToSuperview().inset(28)
                 $0.left.right.equalToSuperview().inset(16)
-                $0.bottom.equalToSuperview().inset(64)
+                $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(28)
             }
-            
-            let width = min(view.frame.width - 32, 400)
-            let size = body.sizeThatFits(CGSize(width: width, height: CGFloat.infinity))
-            
-            body.snp.remakeConstraints {
-                $0.height.equalTo(size.height)
-            }
-        }
-        
-        override func viewDidLayoutSubviews() {
-            body.preferredMaxLayoutWidth = view.frame.width - 32
         }
     }
 }

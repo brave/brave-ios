@@ -12,6 +12,12 @@ extension BrandedImageCallout {
         
         private let viewHelper = BrandedImageCallout.CommonViews.self
         
+        let mainStackView = UIStackView().then {
+            $0.axis = .vertical
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            $0.spacing = 16
+        }
+        
         let body = UILabel().then {
             $0.text = "Get paid to see this background image. Turn on Brave Rewards to claim your share."
             $0.appearanceTextColor = .black
@@ -47,26 +53,13 @@ extension BrandedImageCallout {
             
             [headerStackView, body, tos, buttonStackView].forEach(mainStackView.addArrangedSubview(_:))
             
-            view.addSubview(mainStackView)
+            contentView.addSubview(mainStackView)
             
             mainStackView.snp.remakeConstraints {
                 $0.top.equalToSuperview().inset(28)
                 $0.left.right.equalToSuperview().inset(16)
-                $0.bottom.equalToSuperview().inset(48)
-            }
-            
-            let width = min(view.frame.width - 32, 400)
-            let size = tos.sizeThatFits(CGSize(width: width, height: CGFloat.infinity))
-            
-            tos.snp.remakeConstraints {
-                $0.height.equalTo(size.height)
-            }
-        }
-        
-        override func viewDidLayoutSubviews() {
-            [body].forEach {
-                $0.preferredMaxLayoutWidth = view.frame.width - 32
-            }
+                $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(28)
+            }   
         }
     }
 }

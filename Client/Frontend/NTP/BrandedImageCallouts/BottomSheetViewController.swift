@@ -24,12 +24,6 @@ class BottomSheetViewController: UIViewController {
     //let childViewController: UIViewController
     
     // MARK: - Views
-    
-    let mainStackView = UIStackView().then {
-        $0.axis = .vertical
-        $0.translatesAutoresizingMaskIntoConstraints = false
-        $0.spacing = 16
-    }
 
     let contentView = UIView().then {
         $0.layer.cornerRadius = 12
@@ -46,15 +40,11 @@ class BottomSheetViewController: UIViewController {
     }
     
     private let closeButton = UIButton().then {
-        $0.addTarget(self, action: #selector(closeView), for: .touchUpInside)
         $0.setImage(#imageLiteral(resourceName: "close_popup").template, for: .normal)
         $0.appearanceTintColor = .lightGray
     }
     
     // MARK: - Constraint properties
-    
-    /// The top constraint is kept so the content view can be dragged.
-    private var contentViewTopConstraint: Constraint?
 
     /// Controls height of the content view.
     private var yPosition: CGFloat = 0 {
@@ -64,16 +54,11 @@ class BottomSheetViewController: UIViewController {
             func update() {
                 // Update dark blur, the more of content view go away the less dark it is.
                 backgroundOverlayView.alpha = (maxY - yPosition) / maxY
-                // Update the position of content view.
-                // At the moment only pulling below initial content view height is supported.
-                contentViewTopConstraint?.update(offset: yPosition)
-                let newFrame = contentView.frame
-                //print("bxx new: \(yPosition)")
                 
+                let newFrame = contentView.frame
                 contentView.frame = CGRect(x: newFrame.minX, y: yPosition, width: newFrame.width, height: newFrame.height)
                 view.layoutIfNeeded()
             }   
-            
             
             if oldValue == yPosition { return }
             
@@ -97,16 +82,12 @@ class BottomSheetViewController: UIViewController {
         }
     }
     
-    private var childViewHeight: CGFloat {
-        contentView.frame.height
-    }
-    
     private var initialDrawerYPosition: CGFloat {
-        let h = (view.frame.height / 2) - (childViewHeight / 2)
+        let popupY = (view.frame.height / 2) - (contentView.frame.height / 2)
         
-        let height = view.frame.maxY - contentView.frame.height
+        let regularY = view.frame.maxY - contentView.frame.height
         
-        return showAsPopup ? h : height
+        return showAsPopup ? popupY : regularY
     }
     
     private var showAsPopup: Bool {
@@ -124,9 +105,6 @@ class BottomSheetViewController: UIViewController {
 
     override public func viewDidLoad() {
         super.viewDidLoad()
-        
-//        let height = contentView.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize).height
-//        preferredContentSize = CGSize(width: view.frame.width, height: height)
 
         view.addSubview(backgroundOverlayView)
         view.addSubview(contentView)
@@ -140,13 +118,21 @@ class BottomSheetViewController: UIViewController {
         
         contentView.addSubview(closeButton)
         
+        closeButton.addTarget(self, action: #selector(closeView), for: .touchUpInside)
+        contentView.isHidden = true
+        
         makeConstraints()
-        yPosition = view.frame.maxY
     }
 
     override public func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         show()
+    }
+    
+    override func viewDidLayoutSubviews() {
+        yPosition = contentView.isHidden ? view.frame.maxY : initialDrawerYPosition
+        
+        updateDrawerViewConstraints()
     }
     
     override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -162,12 +148,6 @@ class BottomSheetViewController: UIViewController {
             make.leading.trailing.top.equalToSuperview()
             make.bottom.equalToSuperview().offset(bottomInset)
         }
-        
-//        view.snp.remakeConstraints {
-//            $0.top.equalTo(contentView).offset(UX.HandleMargin)
-//            $0.width.equalTo(contentView)
-//            $0.centerX.equalTo(contentView)
-//        }
         
         handleView.snp.remakeConstraints {
             $0.width.equalTo(UX.HandleWidth)
@@ -195,18 +175,17 @@ class BottomSheetViewController: UIViewController {
         
         handleView.isHidden = showAsPopup
         
-        yPosition = initialDrawerYPosition
+        // Don't remake constraints if not needed.
+        if yPosition == initialDrawerYPosition { return }
         
         contentView.snp.remakeConstraints {
-            if showAsPopup {
-                $0.centerX.centerY.equalToSuperview()
-                $0.width.equalTo(maxHorizontalWidth)
-            } else if UIApplication.shared.statusBarOrientation.isLandscape {
+            if showAsPopup || UIApplication.shared.statusBarOrientation.isLandscape {
                 $0.bottom.equalToSuperview()
                 $0.centerX.equalToSuperview()
                 $0.width.equalTo(maxHorizontalWidth)
             } else {
-                $0.leading.trailing.bottom.equalToSuperview()
+                $0.leading.trailing.equalToSuperview()
+                $0.bottom.equalToSuperview()
             }
         }
     }
@@ -227,7 +206,7 @@ class BottomSheetViewController: UIViewController {
         let landingYPosition = yPosition + velocity / 10
         let nextYPosition: CGFloat
         
-        let bottomHalfOfChildView = view.frame.height - (childViewHeight / 2)
+        let bottomHalfOfChildView = view.frame.height - (contentView.frame.height / 2)
         
         if landingYPosition > bottomHalfOfChildView {
             nextYPosition = view.frame.maxY
@@ -247,6 +226,7 @@ class BottomSheetViewController: UIViewController {
     }
 
     private func show() {
+        contentView.isHidden = false
         UIView.animate(withDuration: animationDuration) {
             self.yPosition = self.initialDrawerYPosition
         }

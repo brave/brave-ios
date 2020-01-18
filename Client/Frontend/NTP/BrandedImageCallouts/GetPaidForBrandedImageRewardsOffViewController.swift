@@ -12,6 +12,12 @@ extension BrandedImageCallout {
         
         private let viewHelper = BrandedImageCallout.CommonViews.self
         
+        let mainStackView = UIStackView().then {
+            $0.axis = .vertical
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            $0.spacing = 16
+        }
+        
         let body = UILabel().then {
             $0.text = "Get paid to see this background image. Turn on Brave Rewards to claim your share."
             $0.appearanceTextColor = .black
@@ -59,8 +65,6 @@ extension BrandedImageCallout {
                 $0.left.right.equalToSuperview().inset(16)
                 $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(28)
             }
-            
-            
         }
     }
 }
