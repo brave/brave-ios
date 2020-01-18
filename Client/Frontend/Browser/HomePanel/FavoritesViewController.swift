@@ -230,12 +230,13 @@ class FavoritesViewController: UIViewController, Themeable {
         if fromOverlay { return }
         guard let drawerVC = brandedImageState?.initialViewController else { return }
         
-        drawerVC.closeHandler = {
+        drawerVC.closeHandler = { [weak self] in
             Preferences.NewTabPage.brandedImageShowed.value = true
-            self.brandedImageState = .dontShow
+            self?.brandedImageState = .dontShow
         }
         
-        drawerVC.learnMoreHandler = {
+        drawerVC.learnMoreHandler = { [weak self] in
+            guard let self = self else { return }
             drawerVC.close(immediately: true)
             self.delegate?.openBrandedImageCallout(state: self.brandedImageState)
         }
