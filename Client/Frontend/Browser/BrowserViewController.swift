@@ -446,9 +446,21 @@ class BrowserViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        NotificationCenter.default.addObserver(self, selector: #selector(appWillResignActiveNotification), name: UIApplication.willResignActiveNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(appDidBecomeActiveNotification), name: UIApplication.didBecomeActiveNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(appDidEnterBackgroundNotification), name: UIApplication.didEnterBackgroundNotification, object: nil)
+        NotificationCenter.default.do {
+            $0.addObserver(self, selector: #selector(appWillResignActiveNotification),
+                           name: UIApplication.willResignActiveNotification, object: nil)
+            $0.addObserver(self, selector: #selector(appDidBecomeActiveNotification),
+                           name: UIApplication.didBecomeActiveNotification, object: nil)
+            $0.addObserver(self, selector: #selector(appDidEnterBackgroundNotification),
+                           name: UIApplication.didEnterBackgroundNotification, object: nil)
+            $0.addObserver(self, selector: #selector(rewardsSettingToggled),
+                           name: .rewardsToggled, object: nil)
+            $0.addObserver(self, selector: #selector(adsSettingToggled),
+                           name: .adsToggled, object: nil)
+            
+        }
+        
+        
         KeyboardHelper.defaultHelper.addDelegate(self)
 
         webViewContainerBackdrop = UIView()

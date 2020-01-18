@@ -4,6 +4,7 @@
 
 import UIKit
 import BraveRewards
+import Shared
 
 class SettingsViewController: UIViewController {
   
@@ -129,11 +130,13 @@ class SettingsViewController: UIViewController {
   @objc private func rewardsSwitchValueChanged() {
     state.ledger.isEnabled = settingsView.rewardsToggleSection.toggleSwitch.isOn
     updateVisualStateOfSections(animated: true)
+    NotificationCenter.default.post(name: .rewardsToggled, object: nil)
   }
   
   @objc private func adsToggleValueChanged() {
     state.ads.isEnabled = settingsView.adsSection.toggleSwitch.isOn
     updateVisualStateOfSections(animated: true)
+    NotificationCenter.default.post(name: .adsToggled, object: nil)
   }
   
   @objc private func autoContributeToggleValueChanged() {
