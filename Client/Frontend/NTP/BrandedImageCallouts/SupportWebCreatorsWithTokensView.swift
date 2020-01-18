@@ -55,11 +55,21 @@ extension BrandedImageCallout {
             
             view.addSubview(mainStackView)
             
+            turnOnAdsButton.addTarget(self, action: #selector(turnAdsOn), for: .touchDown)
+            
             mainStackView.snp.remakeConstraints {
                 $0.top.equalToSuperview().inset(28)
                 $0.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(16)
                 $0.bottom.equalToSuperview().inset(16)
             }
+        }
+        
+        @objc func turnAdsOn() {
+            guard let rewards = (UIApplication.shared.delegate as? AppDelegate)?
+                .browserViewController.rewards else { return }
+            
+            rewards.ads.isEnabled = true
+            close()
         }
     }
 }

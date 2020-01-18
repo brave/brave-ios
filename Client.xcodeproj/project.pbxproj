@@ -147,6 +147,7 @@
 		0AF52D06237B19CB00BFAB56 /* BytesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AF52D05237B19CB00BFAB56 /* BytesTests.swift */; };
 		0AF684622191D6470079EC77 /* bookmark_util.js in Resources */ = {isa = PBXBuildFile; fileRef = 0AF6845A2191D6470079EC77 /* bookmark_util.js */; };
 		0AFC8F9523D1DF6500941895 /* TranslucentBottomSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AFC8F9423D1DF6500941895 /* TranslucentBottomSheet.swift */; };
+		0AFC8F9E23D3762B00941895 /* NTPNotificationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AFC8F9D23D3762A00941895 /* NTPNotificationViewController.swift */; };
 		0B3E7D951B27A7CE00E2E84D /* AboutHomeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B3E7D931B27A7CE00E2E84D /* AboutHomeHandler.swift */; };
 		0B54BD191B698B7C004C822C /* SuggestedSites.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B54BD181B698B7C004C822C /* SuggestedSites.swift */; };
 		0B62EFD21AD63CD100ACB9CD /* Clearables.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B62EFD11AD63CD100ACB9CD /* Clearables.swift */; };
@@ -1396,6 +1397,7 @@
 		0AF6845A2191D6470079EC77 /* bookmark_util.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = bookmark_util.js; sourceTree = "<group>"; };
 		0AF89E5A23571EE80074E1EF /* id-ID */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "id-ID"; path = "id-ID.lproj/Storage.strings"; sourceTree = "<group>"; };
 		0AFC8F9423D1DF6500941895 /* TranslucentBottomSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslucentBottomSheet.swift; sourceTree = "<group>"; };
+		0AFC8F9D23D3762A00941895 /* NTPNotificationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NTPNotificationViewController.swift; sourceTree = "<group>"; };
 		0B3E7D931B27A7CE00E2E84D /* AboutHomeHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutHomeHandler.swift; sourceTree = "<group>"; };
 		0B3E7DB91B27AB4C00E2E84D /* MockLogins.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = MockLogins.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		0B54BD181B698B7C004C822C /* SuggestedSites.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SuggestedSites.swift; sourceTree = "<group>"; };
@@ -2813,6 +2815,7 @@
 				0A7F238B23CF88AB005E39FC /* SupportWebCreatorsWithTokensView.swift */,
 				0A27AB9323D0A13200194921 /* ClaimRewardsViewController.swift */,
 				0AFC8F9423D1DF6500941895 /* TranslucentBottomSheet.swift */,
+				0AFC8F9D23D3762A00941895 /* NTPNotificationViewController.swift */,
 			);
 			path = BrandedImageCallouts;
 			sourceTree = "<group>";
@@ -6157,6 +6160,7 @@
 				0BB5B2881AC0A2B90052877D /* SnackBar.swift in Sources */,
 				7BEFC6801BFF68C30059C952 /* QuickActions.swift in Sources */,
 				0A0D3D5221A565C300BEE65B /* SafeBrowsingHandler.swift in Sources */,
+				0AFC8F9E23D3762B00941895 /* NTPNotificationViewController.swift in Sources */,
 				D0C95E36200FDC5500E4E51C /* MetadataParserHelper.swift in Sources */,
 				4422D55B21BFFB7F00BF1855 /* onepass.cc in Sources */,
 				0A3C78A1230597DA0022F6D8 /* OnboardingShieldsViewController.swift in Sources */,

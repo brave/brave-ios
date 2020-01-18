@@ -74,7 +74,7 @@ extension BrandedImageCallout {
         
         @objc func turnAdsOnTapped() {
             guard let rewards = (UIApplication.shared.delegate as? AppDelegate)?
-            .browserViewController.rewards else { return }
+                .browserViewController.rewards else { return }
             
             rewards.ads.isEnabled = true
             close()
