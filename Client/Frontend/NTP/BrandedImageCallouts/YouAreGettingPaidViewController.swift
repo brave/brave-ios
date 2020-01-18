@@ -38,7 +38,7 @@ extension BrandedImageCallout {
             to hide sponsored images.
             """
             $0.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
-            $0.setURLInfo(["Learn more": "terms", "hide sponsored images": "policy"])
+            $0.setURLInfo(["Learn more": "sponsored-images", "hide sponsored images": "hide-sponsored-images"])
             
             $0.textContainerInset = UIEdgeInsets.zero
             $0.textContainer.lineFragmentPadding = 0
@@ -54,6 +54,17 @@ extension BrandedImageCallout {
             [headerStackView, body, body2].forEach(mainStackView.addArrangedSubview(_:))
             
             contentView.addSubview(mainStackView)
+            
+            body2.onLinkedTapped = { action in
+                if action.absoluteString == "sponsored-images" {
+                    guard let url = URL(string: "https://brave.com/brave-rewards/") else { return }
+                    self.linkHandler?(url)
+                    self.close()
+                } else if action.absoluteString == "hide-sponsored-images" {
+                    Preferences.NewTabPage.backgroundSponsoredImages.value = false
+                    self.close()
+                }
+            }
             
             mainStackView.snp.remakeConstraints {
                 $0.top.equalToSuperview().inset(28)

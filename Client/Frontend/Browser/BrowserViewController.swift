@@ -945,7 +945,7 @@ class BrowserViewController: UIViewController {
             homePanelController.applyTheme(Theme.of(tabManager.selectedTab))
             
 //            homePanelController.brandedImageState = ntpBrandedImageState
-            homePanelController.brandedImageState = .getPaidTurnAdsOn
+            homePanelController.brandedImageState = .gettingPaidAlready
 
             self.favoritesViewController = homePanelController
 
@@ -3405,6 +3405,10 @@ extension BrowserViewController: FavoritesDelegate {
     
     func openBrandedImageCallout(state: BrandedImageCalloutState?) {
         guard let destinationVC = state?.learnMoreViewController else { return }
+        
+        destinationVC.linkHandler = { url in
+            self.tabManager.selectedTab?.loadRequest(PrivilegedRequest(url: url) as URLRequest)
+        }
 
         addChild(destinationVC)
         view.addSubview(destinationVC.view)

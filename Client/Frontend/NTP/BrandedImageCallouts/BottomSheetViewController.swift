@@ -94,6 +94,8 @@ class BottomSheetViewController: UIViewController {
         traitCollection.userInterfaceIdiom == .pad && traitCollection.horizontalSizeClass == .regular
     }
     
+    var linkHandler: ((URL) -> Void)?
+    
     // MARK: - Lifecycle
 
     init() {
