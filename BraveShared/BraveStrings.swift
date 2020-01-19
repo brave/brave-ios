@@ -619,3 +619,8 @@ extension Strings {
     public static let userWalletGenericErrorTitle = NSLocalizedString("UserWalletGenericErrorTitle", bundle: Bundle.braveShared, value: "Sorry, something went wrong", comment: "")
     public static let userWalletGenericErrorMessage = NSLocalizedString("UserWalletGenericErrorMessage", bundle: Bundle.braveShared, value: "There was a problem logging into your Uphold account. Please try again", comment: "")
 }
+
+// MARK: - New tab page
+extension Strings {
+    public static let ntp_ = NSLocalizedString("UserWalletDetailsDisconnectButtonTitle", bundle: Bundle.braveShared, value: "Region not supported", comment: "")
+}

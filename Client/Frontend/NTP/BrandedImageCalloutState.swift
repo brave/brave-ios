@@ -45,24 +45,5 @@ enum BrandedImageCalloutState {
         
         return .dontShow
         
-    }
-    
-    /// The view controller that shows after user taps on 'Learn more' button if the current state supports it.
-    /// Returns nil if no view controller should be present or there's no button to tap.
-    var learnMoreViewController: BottomSheetViewController? {
-        let helper = BrandedImageCallout.self
-        
-        switch self {
-        case .getPaidTurnRewardsOn:
-            return helper.GetPaidForBrandedImageRewardsOffViewController()
-        case .getPaidTurnAdsOn:
-            return helper.GetPaidForBrandedImageViewController()
-        case .youCanGetPaidTurnAdsOn:
-            return nil
-        case .gettingPaidAlready:
-            return helper.YouAreGettingPaidViewController()
-        case .dontShow:
-            return nil
-        }
-    }
+    }    
 }

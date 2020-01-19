@@ -33,8 +33,6 @@
 		0A1E84462190A57F0042F782 /* SyncAddDeviceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A1E843C2190A57F0042F782 /* SyncAddDeviceViewController.swift */; };
 		0A24F7F0233E9136004D2F3A /* ObjcExceptionBridging.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 0AC0D399233E7CAF0091EFA5 /* ObjcExceptionBridging.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		0A27AB9423D0A13200194921 /* ClaimRewardsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A27AB9323D0A13200194921 /* ClaimRewardsViewController.swift */; };
-		0A27AB9623D0B19F00194921 /* YouAreGettingPaidViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A27AB9523D0B19F00194921 /* YouAreGettingPaidViewController.swift */; };
-		0A27AB9F23D0E4EF00194921 /* GetPaidForBrandedImageRewardsOffViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A27AB9E23D0E4EF00194921 /* GetPaidForBrandedImageRewardsOffViewController.swift */; };
 		0A27ABA123D1B9C400194921 /* BrandedImageCalloutState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A27ABA023D1B9C400194921 /* BrandedImageCalloutState.swift */; };
 		0A2F921C22146B7700304249 /* FrecencyQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2F921B22146B7700304249 /* FrecencyQuery.swift */; };
 		0A39D56D21930B89008B2772 /* ScriptOpener.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A39D56C21930B89008B2772 /* ScriptOpener.swift */; };
@@ -127,7 +125,6 @@
 		0ADCD45F2319799F0078CC67 /* RollingFileLoggerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E61453BD1B750A1700C3F9D7 /* RollingFileLoggerTests.swift */; };
 		0AE5C09922CAA01E00DFF3EE /* RewardsButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AE5C09822CAA01E00DFF3EE /* RewardsButton.swift */; };
 		0AEF16C723CDE4B800158AD9 /* BottomSheetViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AEF16C523CDE4B800158AD9 /* BottomSheetViewController.swift */; };
-		0AEF16C923CDFDC100158AD9 /* GetPaidForBrandedImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AEF16C823CDFDC100158AD9 /* GetPaidForBrandedImageViewController.swift */; };
 		0AEF99A922E22C5E00294C76 /* DownloadsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AEF99A822E22C5E00294C76 /* DownloadsViewController.swift */; };
 		0AEF99B222E22D2200294C76 /* DateGroupedTableData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AEF99B122E22D2200294C76 /* DateGroupedTableData.swift */; };
 		0AEFB84922244135007AF600 /* AdblockDebugMenuTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AEFB84822244135007AF600 /* AdblockDebugMenuTableViewController.swift */; };
@@ -1274,8 +1271,6 @@
 		0A24F846233EB5B5004D2F3A /* Fennec.enterprise.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Fennec.enterprise.xcconfig; sourceTree = "<group>"; };
 		0A24F847233EB5B5004D2F3A /* Base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
 		0A27AB9323D0A13200194921 /* ClaimRewardsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaimRewardsViewController.swift; sourceTree = "<group>"; };
-		0A27AB9523D0B19F00194921 /* YouAreGettingPaidViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YouAreGettingPaidViewController.swift; sourceTree = "<group>"; };
-		0A27AB9E23D0E4EF00194921 /* GetPaidForBrandedImageRewardsOffViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetPaidForBrandedImageRewardsOffViewController.swift; sourceTree = "<group>"; };
 		0A27ABA023D1B9C400194921 /* BrandedImageCalloutState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandedImageCalloutState.swift; sourceTree = "<group>"; };
 		0A2D5DF623571F02001ED889 /* ko-KR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "ko-KR"; path = "ko-KR.lproj/Storage.strings"; sourceTree = "<group>"; };
 		0A2F921B22146B7700304249 /* FrecencyQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrecencyQuery.swift; sourceTree = "<group>"; };
@@ -1374,7 +1369,6 @@
 		0AE5C09822CAA01E00DFF3EE /* RewardsButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardsButton.swift; sourceTree = "<group>"; };
 		0AE885BC23571EE1006951A8 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Storage.strings; sourceTree = "<group>"; };
 		0AEF16C523CDE4B800158AD9 /* BottomSheetViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BottomSheetViewController.swift; sourceTree = "<group>"; };
-		0AEF16C823CDFDC100158AD9 /* GetPaidForBrandedImageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetPaidForBrandedImageViewController.swift; sourceTree = "<group>"; };
 		0AEF99A822E22C5E00294C76 /* DownloadsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadsViewController.swift; sourceTree = "<group>"; };
 		0AEF99B122E22D2200294C76 /* DateGroupedTableData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateGroupedTableData.swift; sourceTree = "<group>"; };
 		0AEFB84822244135007AF600 /* AdblockDebugMenuTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdblockDebugMenuTableViewController.swift; sourceTree = "<group>"; };
@@ -2805,9 +2799,6 @@
 			children = (
 				0AEF16C523CDE4B800158AD9 /* BottomSheetViewController.swift */,
 				0A7F238F23D08886005E39FC /* BrandedImageCallout.swift */,
-				0AEF16C823CDFDC100158AD9 /* GetPaidForBrandedImageViewController.swift */,
-				0A27AB9E23D0E4EF00194921 /* GetPaidForBrandedImageRewardsOffViewController.swift */,
-				0A27AB9523D0B19F00194921 /* YouAreGettingPaidViewController.swift */,
 				0A27AB9323D0A13200194921 /* ClaimRewardsViewController.swift */,
 				0AFC8F9423D1DF6500941895 /* TranslucentBottomSheet.swift */,
 			);
@@ -6113,7 +6104,6 @@
 				4422D50B21BFFB7600BF1855 /* memenv.cc in Sources */,
 				E65607611C08B4E200534B02 /* SearchInputView.swift in Sources */,
 				0A0D3D6121A596BE00BEE65B /* MalwareList.swift in Sources */,
-				0A27AB9F23D0E4EF00194921 /* GetPaidForBrandedImageRewardsOffViewController.swift in Sources */,
 				EB2A63341F3B49A7004EF8B0 /* ContentBlockerHelper.swift in Sources */,
 				0A4BEFD1221E115B0005551A /* NetworkSessionMock.swift in Sources */,
 				0A43293B21B1C8D10041625B /* FifoDict.swift in Sources */,
@@ -6352,7 +6342,6 @@
 				4422D54621BFFB7E00BF1855 /* rune.cc in Sources */,
 				EB11A1052044A90E0018F749 /* TrackingProtectionPageStats.swift in Sources */,
 				0A93F1802264C2D200A3571B /* FolderDetailsView.swift in Sources */,
-				0A27AB9623D0B19F00194921 /* YouAreGettingPaidViewController.swift in Sources */,
 				E633E2DA1C21EAF8001FFF6C /* LoginDetailViewController.swift in Sources */,
 				E65D89181C8647420006EA35 /* AppAuthenticator.swift in Sources */,
 				28FDFF0C1C1F725800840F86 /* SeparatorTableCell.swift in Sources */,
@@ -6389,7 +6378,6 @@
 				A1AD4BE320C0861D007A6EA1 /* UIBarButtonItemExtensions.swift in Sources */,
 				C6D267522136800100465DFA /* PrivateBrowsingManager.swift in Sources */,
 				27D87C2E2152B50200FB55C6 /* GradientView.swift in Sources */,
-				0AEF16C923CDFDC100158AD9 /* GetPaidForBrandedImageViewController.swift in Sources */,
 				0A4B012220D02F26004D4011 /* TabBarCell.swift in Sources */,
 				27FD2CAC2146C31C00A5A779 /* FindInPageActivity.swift in Sources */,
 			);
