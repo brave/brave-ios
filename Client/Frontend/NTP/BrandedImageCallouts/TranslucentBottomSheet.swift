@@ -6,11 +6,11 @@ import UIKit
 import Shared
 import BraveShared
 
+/// A view controller that provides translucent background overlay for its contents and a close button in top right corner.
 class TranslucentBottomSheet: UIViewController {
     private let animationDuration: TimeInterval = 0.25
     
     var closeHandler: (() -> Void)?
-    var learnMoreHandler: (() -> Void)?
     
     private let closeButton = UIButton().then {
         $0.setImage(#imageLiteral(resourceName: "close_translucent_popup").template, for: .normal)
@@ -37,9 +37,8 @@ class TranslucentBottomSheet: UIViewController {
         
         view.addSubview(closeButton)
         closeButton.addTarget(self, action: #selector(closeView), for: .touchUpInside)
-        view.alpha = CGFloat.leastNormalMagnitude
         
-        view.bounds = CGRect(size: preferredContentSize)
+        view.alpha = CGFloat.leastNormalMagnitude
         
         makeConstraints()
     }
@@ -56,7 +55,6 @@ class TranslucentBottomSheet: UIViewController {
         closeButton.snp.remakeConstraints {
             $0.top.equalToSuperview().inset(10)
             $0.trailing.equalTo(view.safeAreaLayoutGuide).inset(7)
-            
             $0.size.equalTo(26)
         }
     }
@@ -70,9 +68,9 @@ class TranslucentBottomSheet: UIViewController {
         UIView.animate(withDuration: duration, animations: {
             self.view.alpha = CGFloat.leastNormalMagnitude
         }) { _ in
-            self.closeHandler?()
             self.view.removeFromSuperview()
             self.removeFromParent()
+            self.closeHandler?()
         }
     }
 }

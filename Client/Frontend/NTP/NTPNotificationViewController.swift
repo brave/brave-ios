@@ -8,11 +8,12 @@ import BraveShared
 import BraveRewardsUI
 
 class NTPNotificationViewController: TranslucentBottomSheet {
-    private let viewHelper = BrandedImageCallout.CommonViews.self
     
     var headerText: String?
     var bodyText: String?
     var primaryButtonConfig: (text: String, showCoinIcon: Bool, action: (() -> Void))?
+    
+    var learnMoreHandler: (() -> Void)?
     
     private let mainStackView = UIStackView().then {
         $0.axis = .vertical
@@ -76,7 +77,7 @@ class NTPNotificationViewController: TranslucentBottomSheet {
     
     var primaryButtonTapped: (() -> Void)?
     
-    init(state: BrandedImageCalloutState) {
+    init?(state: BrandedImageCalloutState) {
         self.state = state
         super.init()
         
@@ -104,7 +105,7 @@ class NTPNotificationViewController: TranslucentBottomSheet {
                 self.learnMoreHandler?()
             }
         case .dontShow:
-            break
+            return nil
         }
     }
     
@@ -142,8 +143,7 @@ class NTPNotificationViewController: TranslucentBottomSheet {
         
         mainStackView.snp.remakeConstraints {
             $0.top.equalToSuperview().inset(28)
-            $0.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(16)
-            $0.bottom.equalToSuperview().inset(16)
+            $0.leading.trailing.bottom.equalTo(view.safeAreaLayoutGuide).inset(16)
         }
         
         primaryButton.addTarget(self, action: #selector(primaryButtonAction), for: .touchDown)

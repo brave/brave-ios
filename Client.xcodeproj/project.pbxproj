@@ -34,8 +34,6 @@
 		0A24F7F0233E9136004D2F3A /* ObjcExceptionBridging.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 0AC0D399233E7CAF0091EFA5 /* ObjcExceptionBridging.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		0A27AB9423D0A13200194921 /* ClaimRewardsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A27AB9323D0A13200194921 /* ClaimRewardsViewController.swift */; };
 		0A27AB9623D0B19F00194921 /* YouAreGettingPaidViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A27AB9523D0B19F00194921 /* YouAreGettingPaidViewController.swift */; };
-		0A27AB9A23D0DB2400194921 /* YouAreGettingPaidNonBlockingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A27AB9923D0DB2400194921 /* YouAreGettingPaidNonBlockingViewController.swift */; };
-		0A27AB9D23D0DDED00194921 /* GetPaidForBrandedImageNonBlockingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A27AB9C23D0DDED00194921 /* GetPaidForBrandedImageNonBlockingViewController.swift */; };
 		0A27AB9F23D0E4EF00194921 /* GetPaidForBrandedImageRewardsOffViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A27AB9E23D0E4EF00194921 /* GetPaidForBrandedImageRewardsOffViewController.swift */; };
 		0A27ABA123D1B9C400194921 /* BrandedImageCalloutState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A27ABA023D1B9C400194921 /* BrandedImageCalloutState.swift */; };
 		0A2F921C22146B7700304249 /* FrecencyQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2F921B22146B7700304249 /* FrecencyQuery.swift */; };
@@ -70,7 +68,6 @@
 		0A7B5D6722689C5D00AADF22 /* AddEditHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7B5D6622689C5D00AADF22 /* AddEditHeaderView.swift */; };
 		0A7B5D702269E72C00AADF22 /* BookmarkSaveLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7B5D6F2269E72C00AADF22 /* BookmarkSaveLocation.swift */; };
 		0A7B5D722269E7AD00AADF22 /* BookmarkEditMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7B5D712269E7AD00AADF22 /* BookmarkEditMode.swift */; };
-		0A7F238C23CF88AB005E39FC /* SupportWebCreatorsWithTokensView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7F238B23CF88AB005E39FC /* SupportWebCreatorsWithTokensView.swift */; };
 		0A7F239023D08886005E39FC /* BrandedImageCallout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7F238F23D08886005E39FC /* BrandedImageCallout.swift */; };
 		0A8C6993225BC7B100988715 /* ToolbarUrlActionsProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A8C6992225BC7B100988715 /* ToolbarUrlActionsProtocol.swift */; };
 		0A8C69AB225CFCAF00988715 /* AddEditBookmarkTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A8C69AA225CFCAF00988715 /* AddEditBookmarkTableViewController.swift */; };
@@ -1277,8 +1274,6 @@
 		0A24F847233EB5B5004D2F3A /* Base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
 		0A27AB9323D0A13200194921 /* ClaimRewardsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaimRewardsViewController.swift; sourceTree = "<group>"; };
 		0A27AB9523D0B19F00194921 /* YouAreGettingPaidViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YouAreGettingPaidViewController.swift; sourceTree = "<group>"; };
-		0A27AB9923D0DB2400194921 /* YouAreGettingPaidNonBlockingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YouAreGettingPaidNonBlockingViewController.swift; sourceTree = "<group>"; };
-		0A27AB9C23D0DDED00194921 /* GetPaidForBrandedImageNonBlockingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetPaidForBrandedImageNonBlockingViewController.swift; sourceTree = "<group>"; };
 		0A27AB9E23D0E4EF00194921 /* GetPaidForBrandedImageRewardsOffViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetPaidForBrandedImageRewardsOffViewController.swift; sourceTree = "<group>"; };
 		0A27ABA023D1B9C400194921 /* BrandedImageCalloutState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandedImageCalloutState.swift; sourceTree = "<group>"; };
 		0A2D5DF623571F02001ED889 /* ko-KR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "ko-KR"; path = "ko-KR.lproj/Storage.strings"; sourceTree = "<group>"; };
@@ -1321,7 +1316,6 @@
 		0A7B5D6622689C5D00AADF22 /* AddEditHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEditHeaderView.swift; sourceTree = "<group>"; };
 		0A7B5D6F2269E72C00AADF22 /* BookmarkSaveLocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkSaveLocation.swift; sourceTree = "<group>"; };
 		0A7B5D712269E7AD00AADF22 /* BookmarkEditMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkEditMode.swift; sourceTree = "<group>"; };
-		0A7F238B23CF88AB005E39FC /* SupportWebCreatorsWithTokensView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportWebCreatorsWithTokensView.swift; sourceTree = "<group>"; };
 		0A7F238F23D08886005E39FC /* BrandedImageCallout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandedImageCallout.swift; sourceTree = "<group>"; };
 		0A86268423571F3300FD4C11 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Storage.strings; sourceTree = "<group>"; };
 		0A8C6992225BC7B100988715 /* ToolbarUrlActionsProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarUrlActionsProtocol.swift; sourceTree = "<group>"; };
@@ -2809,11 +2803,8 @@
 				0AEF16C523CDE4B800158AD9 /* BottomSheetViewController.swift */,
 				0A7F238F23D08886005E39FC /* BrandedImageCallout.swift */,
 				0AEF16C823CDFDC100158AD9 /* GetPaidForBrandedImageViewController.swift */,
-				0A27AB9C23D0DDED00194921 /* GetPaidForBrandedImageNonBlockingViewController.swift */,
 				0A27AB9E23D0E4EF00194921 /* GetPaidForBrandedImageRewardsOffViewController.swift */,
-				0A27AB9923D0DB2400194921 /* YouAreGettingPaidNonBlockingViewController.swift */,
 				0A27AB9523D0B19F00194921 /* YouAreGettingPaidViewController.swift */,
-				0A7F238B23CF88AB005E39FC /* SupportWebCreatorsWithTokensView.swift */,
 				0A27AB9323D0A13200194921 /* ClaimRewardsViewController.swift */,
 				0AFC8F9423D1DF6500941895 /* TranslucentBottomSheet.swift */,
 			);
@@ -6133,7 +6124,6 @@
 				D3BE7B461B054F8600641031 /* TestAppDelegate.swift in Sources */,
 				0A91598922B834CE00CCC119 /* BVC+Rewards.swift in Sources */,
 				A1F66A7320DD71C400303328 /* SettingsViewController.swift in Sources */,
-				0A27AB9A23D0DB2400194921 /* YouAreGettingPaidNonBlockingViewController.swift in Sources */,
 				0A4BEFD3221E115B0005551A /* NetworkManager.swift in Sources */,
 				0B62EFD21AD63CD100ACB9CD /* Clearables.swift in Sources */,
 				7482205C1DBAB56300EEEA72 /* MailProviders.swift in Sources */,
@@ -6277,7 +6267,6 @@
 				44331DD8225521B6007E3E93 /* UrlBarTextField.swift in Sources */,
 				A9072B801D07B34100459960 /* NoImageModeHelper.swift in Sources */,
 				4422D4EB21BFFB7600BF1855 /* filename.cc in Sources */,
-				0A27AB9D23D0DDED00194921 /* GetPaidForBrandedImageNonBlockingViewController.swift in Sources */,
 				44331DDA22552313007E3E93 /* LocationContainerView.swift in Sources */,
 				2718780A216526240006036E /* PopupView.swift in Sources */,
 				4422D4C221BFFB7600BF1855 /* comparator.cc in Sources */,
@@ -6319,7 +6308,6 @@
 				E650755F1E37F756006961AC /* Try.m in Sources */,
 				0A3C789D23055C4A0022F6D8 /* OnboardingSearchEnginesViewController.swift in Sources */,
 				3B6889C51D66950E002AC85E /* UIImageColors.swift in Sources */,
-				0A7F238C23CF88AB005E39FC /* SupportWebCreatorsWithTokensView.swift in Sources */,
 				0A1E84402190A57F0042F782 /* SyncSelectDeviceTypeViewController.swift in Sources */,
 				392ED7E41D0AEF56009D9B62 /* NewTabAccessors.swift in Sources */,
 				276E7A3C22F21DBE00939424 /* RewardsReporting.swift in Sources */,

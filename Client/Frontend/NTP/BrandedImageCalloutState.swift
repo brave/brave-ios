@@ -47,25 +47,6 @@ enum BrandedImageCalloutState {
         
     }
     
-    /// The initial view controller that is shown to user.
-    /// Returns nil of no view controller should be presented
-    var initialViewController: TranslucentBottomSheet? {
-        let helper = BrandedImageCallout.self
-                
-        switch self {
-        case .getPaidTurnRewardsOn:
-            return helper.GetPaidForBrandedImageNonBlockingViewController()
-        case .getPaidTurnAdsOn:
-            return helper.GetPaidForBrandedImageNonBlockingViewController()
-        case .youCanGetPaidTurnAdsOn:
-            return helper.SupportWebCreatorsWithTokensView()
-        case .gettingPaidAlready:
-            return helper.YouAreGettingPaidNonBlockingViewController()
-        case .dontShow:
-            return nil
-        }
-    }
-    
     /// The view controller that shows after user taps on 'Learn more' button if the current state supports it.
     /// Returns nil if no view controller should be present or there's no button to tap.
     var learnMoreViewController: BottomSheetViewController? {

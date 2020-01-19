@@ -231,22 +231,23 @@ class FavoritesViewController: UIViewController, Themeable {
     
     private func showBrandedImageCallout() {
         if fromOverlay { return }
-        guard let drawerVC = brandedImageState?.initialViewController else { return }
+        guard let state = brandedImageState,
+            let vc = NTPNotificationViewController(state: state) else { return }
         
-        drawerVC.closeHandler = { [weak self] in
+        vc.closeHandler = { [weak self] in
             Preferences.NewTabPage.brandedImageShowed.value = true
             self?.brandedImageState = .dontShow
         }
         
-        drawerVC.learnMoreHandler = { [weak self] in
+        vc.learnMoreHandler = { [weak self] in
             guard let self = self else { return }
-            drawerVC.close(immediately: true)
+            vc.close(immediately: true)
             self.delegate?.openBrandedImageCallout(state: self.brandedImageState)
         }
 
-        addChild(drawerVC)
-        view.addSubview(drawerVC.view)
-        drawerVC.view.snp.remakeConstraints {
+        addChild(vc)
+        view.addSubview(vc.view)
+        vc.view.snp.remakeConstraints {
             $0.right.left.equalToSuperview()
             $0.bottom.equalTo(view)
         }
