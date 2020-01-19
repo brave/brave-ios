@@ -37,7 +37,6 @@ class NTPNotificationViewController: TranslucentBottomSheet {
         }
         
         [imageView, title].forEach($0.addArrangedSubview(_:))
-
     }
     
     lazy var header = UILabel().then {
@@ -74,8 +73,6 @@ class NTPNotificationViewController: TranslucentBottomSheet {
     }
     
     let state: BrandedImageCalloutState
-    
-    var primaryButtonTapped: (() -> Void)?
     
     init?(state: BrandedImageCalloutState) {
         self.state = state
@@ -131,8 +128,9 @@ class NTPNotificationViewController: TranslucentBottomSheet {
             }
             
             stackView.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
-            
             views.append(stackView)
+            
+            primaryButton.addTarget(self, action: #selector(primaryButtonAction), for: .touchDown)
         }
         
         views.forEach(mainStackView.addArrangedSubview(_:))
@@ -145,8 +143,6 @@ class NTPNotificationViewController: TranslucentBottomSheet {
             $0.top.equalToSuperview().inset(28)
             $0.leading.trailing.bottom.equalTo(view.safeAreaLayoutGuide).inset(16)
         }
-        
-        primaryButton.addTarget(self, action: #selector(primaryButtonAction), for: .touchDown)
     }
     
     @objc func primaryButtonAction() {

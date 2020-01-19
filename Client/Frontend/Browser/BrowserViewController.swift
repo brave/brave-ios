@@ -3387,15 +3387,15 @@ extension BrowserViewController: FavoritesDelegate {
     }
     
     func openBrandedImageCallout(state: BrandedImageCalloutState?) {
-        guard let destinationVC = state?.learnMoreViewController else { return }
+        guard let state = state, let vc = NTPLearnMoreViewController(state: state) else { return }
         
-        destinationVC.linkHandler = { [weak self] url in
+        vc.linkHandler = { [weak self] url in
             self?.tabManager.selectedTab?.loadRequest(PrivilegedRequest(url: url) as URLRequest)
         }
 
-        addChild(destinationVC)
-        view.addSubview(destinationVC.view)
-        destinationVC.view.snp.remakeConstraints {
+        addChild(vc)
+        view.addSubview(vc.view)
+        vc.view.snp.remakeConstraints {
             $0.right.top.left.equalToSuperview()
             $0.bottom.equalTo(view)
         }

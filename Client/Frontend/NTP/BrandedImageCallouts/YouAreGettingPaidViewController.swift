@@ -58,7 +58,7 @@ extension BrandedImageCallout {
             body2.onLinkedTapped = { action in
                 if action.absoluteString == "sponsored-images" {
                     guard let url = URL(string: "https://brave.com/brave-rewards/") else { return }
-                    self.linkHandler?(url)
+                    //self.linkHandler?(url)
                     self.close()
                 } else if action.absoluteString == "hide-sponsored-images" {
                     Preferences.NewTabPage.backgroundSponsoredImages.value = false

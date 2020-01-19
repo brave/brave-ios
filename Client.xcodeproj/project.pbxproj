@@ -60,6 +60,7 @@
 		0A4BEFDA221EF3360005551A /* NetworkResourceType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A4BEFD9221EF3360005551A /* NetworkResourceType.swift */; };
 		0A4BEFDE221F03C80005551A /* NetworkManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A4BEFDD221F03C80005551A /* NetworkManagerTests.swift */; };
 		0A53F3E721E6560A0086E80C /* InMemoryDataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A53F3E621E6560A0086E80C /* InMemoryDataController.swift */; };
+		0A5CBD3423D4677100362CC8 /* NTPLearnMoreViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A5CBD3323D4677100362CC8 /* NTPLearnMoreViewController.swift */; };
 		0A6112AC230B00E7001BBC45 /* OnboardingNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A6112AB230B00E7001BBC45 /* OnboardingNavigationController.swift */; };
 		0A6112BD230B4306001BBC45 /* OnboardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A6112BC230B4306001BBC45 /* OnboardingViewController.swift */; };
 		0A62A355238C6F3E008902E3 /* Bookmark+Restoration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A62A354238C6F3E008902E3 /* Bookmark+Restoration.swift */; };
@@ -1304,6 +1305,7 @@
 		0A529EBB23571F1800DDAFDD /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/Storage.strings; sourceTree = "<group>"; };
 		0A53F3E621E6560A0086E80C /* InMemoryDataController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InMemoryDataController.swift; sourceTree = "<group>"; };
 		0A5922F32357863000959DD1 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		0A5CBD3323D4677100362CC8 /* NTPLearnMoreViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NTPLearnMoreViewController.swift; sourceTree = "<group>"; };
 		0A60A1882358AF9E00953CA8 /* Fennec.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; name = Fennec.xctestplan; path = Client.xcodeproj/Fennec.xctestplan; sourceTree = "<group>"; };
 		0A6112AB230B00E7001BBC45 /* OnboardingNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingNavigationController.swift; sourceTree = "<group>"; };
 		0A6112BC230B4306001BBC45 /* OnboardingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewController.swift; sourceTree = "<group>"; };
@@ -2791,6 +2793,7 @@
 			isa = PBXGroup;
 			children = (
 				0AFC8F9D23D3762A00941895 /* NTPNotificationViewController.swift */,
+				0A5CBD3323D4677100362CC8 /* NTPLearnMoreViewController.swift */,
 				0A7F238E23D0862F005E39FC /* BrandedImageCallouts */,
 				0A27ABA023D1B9C400194921 /* BrandedImageCalloutState.swift */,
 			);
@@ -6196,6 +6199,7 @@
 				4422D56221BFFB7F00BF1855 /* dfa.cc in Sources */,
 				A1AD4BE120C082EF007A6EA1 /* UIGestureRecognizerExtensions.swift in Sources */,
 				282DA4731A68C1E700A406E2 /* OpenSearch.swift in Sources */,
+				0A5CBD3423D4677100362CC8 /* NTPLearnMoreViewController.swift in Sources */,
 				5E612A8C234B7FC1007D12B5 /* OnboardingAdsAvailableController.swift in Sources */,
 				F35B8D2F1D638408008E3D61 /* SessionRestoreHandler.swift in Sources */,
 				4422D4C621BFFB7600BF1855 /* env_posix.cc in Sources */,
