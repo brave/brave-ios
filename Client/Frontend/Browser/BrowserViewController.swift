@@ -3387,7 +3387,9 @@ extension BrowserViewController: FavoritesDelegate {
     }
     
     func openBrandedImageCallout(state: BrandedImageCalloutState?) {
-        guard let state = state, let vc = NTPLearnMoreViewController(state: state) else { return }
+        guard let state = state, state.hasDetailViewController else { return }
+        
+        let vc = NTPLearnMoreViewController(state: state)
         
         vc.linkHandler = { [weak self] url in
             self?.tabManager.selectedTab?.loadRequest(PrivilegedRequest(url: url) as URLRequest)

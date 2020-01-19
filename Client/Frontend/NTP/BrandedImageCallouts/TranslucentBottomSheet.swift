@@ -68,9 +68,10 @@ class TranslucentBottomSheet: UIViewController {
         UIView.animate(withDuration: duration, animations: {
             self.view.alpha = CGFloat.leastNormalMagnitude
         }) { _ in
+            self.closeHandler?()
             self.view.removeFromSuperview()
             self.removeFromParent()
-            self.closeHandler?()
+            
         }
     }
 }

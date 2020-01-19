@@ -44,6 +44,13 @@ enum BrandedImageCalloutState {
         }
         
         return .dontShow
-        
-    }    
+    }
+    
+    /// Not all initial views have a followup view, this computed property tracks it.
+    var hasDetailViewController: Bool {
+        switch self {
+        case .getPaidTurnRewardsOn, .getPaidTurnAdsOn, .gettingPaidAlready: return true
+        case .dontShow, .youCanGetPaidTurnAdsOn: return false
+        }
+    }
 }
