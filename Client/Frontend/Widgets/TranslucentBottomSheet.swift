@@ -20,10 +20,6 @@ class TranslucentBottomSheet: UIViewController {
     init() {
         super.init(nibName: nil, bundle: nil)
     }
-    
-    deinit {
-        print("essa2")
-    }
 
     @available(*, unavailable)
     required init?(coder aDecoder: NSCoder) { fatalError() }

@@ -235,10 +235,6 @@ class BottomSheetViewController: UIViewController {
     @objc private func closeView() {
         close()
     }
-    
-    deinit {
-        print("essa1")
-    }
 
     func close() {
         UIView.animate(withDuration: animationDuration, animations: {
