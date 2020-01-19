@@ -33,7 +33,7 @@ class NTPLearnMoreViewController: BottomSheetViewController {
         }
         
         let title = UILabel().then {
-            $0.text = "Brave Rewards"
+            $0.text = Strings.braveRewardsTitle
             $0.appearanceTextColor = .black
             $0.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
         }
@@ -92,15 +92,21 @@ class NTPLearnMoreViewController: BottomSheetViewController {
         
         switch state {
         case .getPaidTurnRewardsOn:
-            headerText = "Get paid to see this background image. Turn on Brave Rewards to claim your share."
+            headerText = Strings.NTP.getPaidForThisImageTurnRewards
             
-            bodyText = "By turning Rewards, you agree to the Terms of Service. You can also choose to hide sponsored images."
-            body.setURLInfo(["Terms of Service": "tos", "hide sponsored images": "hide-sponsored-images"])
+            let tos = Strings.termsOfServiceURL
+            let tosPart = String(format: Strings.NTP.turnRewardsTos, tos)
+            
+            let hideImages = Strings.NTP.hideSponsoredImages
+            let hideImagesPart = String(format: Strings.NTP.chooseToHideSponsoredImages, hideImages)
+            
+            let fullBodyText = "\(tosPart) \(hideImagesPart)"
+            
+            bodyText = fullBodyText
+            body.setURLInfo([tos: "tos", hideImages: "hide-sponsored-images"])
             body.onLinkedTapped = { action in
-                var urlString = ""
-                
                 if action.absoluteString == "tos" {
-                    urlString = "https://www.brave.com/terms_of_use"
+                    let urlString = "https://www.brave.com/terms_of_use"
                     guard let url = URL(string: urlString) else { return }
                     self.showSFSafariViewController(url: url)
                 } else if action.absoluteString == "hide-sponsored-images" {
@@ -109,7 +115,7 @@ class NTPLearnMoreViewController: BottomSheetViewController {
                 }
             }
             
-            primaryButtonConfig = (text: "Turn on Rewards", showCoinIcon: false, action: {
+            primaryButtonConfig = (text: Strings.NTP.turnOnBraveRewards, showCoinIcon: false, action: {
                 guard let rewards = (UIApplication.shared.delegate as? AppDelegate)?
                     .browserViewController.rewards else { return }
                 
@@ -117,14 +123,17 @@ class NTPLearnMoreViewController: BottomSheetViewController {
                 self.close()
             })
             
-            secondaryButtonConfig = (text: "Learn more", action: {
+            secondaryButtonConfig = (text: Strings.disclaimerLearnMore, action: {
                 guard let url = URL(string: "https://brave.com/brave-rewards/") else { return }
                 self.showSFSafariViewController(url: url)
             })
         case .getPaidTurnAdsOn:
-            headerText = "Get paid to see this background image. Turn on Brave Rewards to claim your share."
-            bodyText = "You can also choose to hide sponsored images."
-            body.setURLInfo(["hide sponsored images": "hide-sponsored-images"])
+            headerText = Strings.NTP.getPaidForThisImageTurnAds
+            
+            let hideImages = Strings.NTP.hideSponsoredImages
+            let hideImagesPart = String(format: Strings.NTP.chooseToHideSponsoredImages, hideImages)
+            bodyText = hideImagesPart
+            body.setURLInfo([hideImages: "hide-sponsored-images"])
             body.onLinkedTapped = { action in
                 if action.absoluteString == "hide-sponsored-images" {
                     Preferences.NewTabPage.backgroundSponsoredImages.value = false
@@ -132,7 +141,7 @@ class NTPLearnMoreViewController: BottomSheetViewController {
                 }
             }
             
-            primaryButtonConfig = (text: "Turn on Brave Ads", showCoinIcon: true, action: {
+            primaryButtonConfig = (text: Strings.NTP.turnOnBraveAds, showCoinIcon: true, action: {
                 guard let rewards = (UIApplication.shared.delegate as? AppDelegate)?
                     .browserViewController.rewards else { return }
                 
@@ -141,10 +150,17 @@ class NTPLearnMoreViewController: BottomSheetViewController {
             })
             
         case .gettingPaidAlready:
-            headerText = "You're getting paid to see this background image."
+            headerText = Strings.NTP.youArePaidToSeeThisImage
             
-            bodyText = "Learn more about sponsored images in Brave Rewards. You can also choose to hide sponsored images."
-            body.setURLInfo(["Learn more": "sponsored-images", "hide sponsored images": "hide-sponsored-images"])
+            let learnMore = Strings.disclaimerLearnMore
+            let learnMorePart = String(format: Strings.NTP.learnMoreAboutBrandedImages, learnMore)
+            
+            let hideImages = Strings.NTP.hideSponsoredImages
+            let hideImagesPart = String(format: Strings.NTP.chooseToHideSponsoredImages, hideImages)
+            
+            bodyText = "\(learnMorePart) \(hideImagesPart)"
+
+            body.setURLInfo([learnMore: "sponsored-images", hideImages: "hide-sponsored-images"])
             body.onLinkedTapped = { action in
                 if action.absoluteString == "sponsored-images" {
                     guard let url = URL(string: "https://brave.com/brave-rewards/") else { return }

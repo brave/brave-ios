@@ -31,7 +31,7 @@ class NTPNotificationViewController: TranslucentBottomSheet {
         }
         
         let title = UILabel().then {
-            $0.text = "Brave Rewards"
+            $0.text = Strings.braveRewardsTitle
             $0.appearanceTextColor = .white
             $0.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
         }
@@ -81,23 +81,23 @@ class NTPNotificationViewController: TranslucentBottomSheet {
         // todo fill remaining states, possibly extract somewhere
         switch state {
         case .getPaidTurnRewardsOn, .getPaidTurnAdsOn:
-            bodyText = "Get paid to see this background image.\nLearn more"
-            body.setURLInfo(["Learn more": "terms"])
+            bodyText = "\(Strings.NTP.getPaidToSeeThisImage)\n\(Strings.disclaimerLearnMore)"
+            body.setURLInfo([Strings.disclaimerLearnMore: "learn-more"])
             body.onLinkedTapped = { _ in
                 self.learnMoreHandler?()
             }
         case .youCanGetPaidTurnAdsOn:
-            headerText = "You can support web creators with tokens."
-            bodyText = "Earn tokens by viewing privacy-respecting ads."
-            primaryButtonConfig = (text: "Turn on Brave Ads", showCoinIcon: true, action: {
+            headerText = Strings.NTP.supportWebCreatorsWithTokens
+            bodyText = Strings.NTP.earnTokensByViewingAds
+            primaryButtonConfig = (text: Strings.NTP.turnOnBraveAds, showCoinIcon: true, action: {
                 guard let rewards = (UIApplication.shared.delegate as? AppDelegate)?
                     .browserViewController.rewards else { return }
                 
                 rewards.ads.isEnabled = true
             })
         case .gettingPaidAlready:
-            bodyText = "You're getting paid to see this background image.\nLearn more"
-            body.setURLInfo(["Learn more": "terms"])
+            bodyText = "\(Strings.NTP.youArePaidToSeeThisImage)\n\(Strings.disclaimerLearnMore)"
+            body.setURLInfo([Strings.disclaimerLearnMore: "learn-more"])
             body.onLinkedTapped = { _ in
                 self.learnMoreHandler?()
             }

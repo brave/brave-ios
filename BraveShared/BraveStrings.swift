@@ -622,5 +622,63 @@ extension Strings {
 
 // MARK: - New tab page
 extension Strings {
-    public static let ntp_ = NSLocalizedString("UserWalletDetailsDisconnectButtonTitle", bundle: Bundle.braveShared, value: "Region not supported", comment: "")
+    public struct NTP {
+        public static let getPaidToSeeThisImage =
+            NSL("ntp.getPaidToSeeThisImage",
+                value: "Get paid to see this background image.",
+                comment: "")
+        public static let supportWebCreatorsWithTokens =
+            NSL("ntp.supportWebCreatorsWithTokens",
+                value: "You can support web creators with tokens.",
+                comment: "")
+        public static let earnTokensByViewingAds =
+            NSL("ntp.earnTokensByViewingAds",
+                value: "Earn tokens by viewing privacy-respecting ads.",
+                comment: "")
+        public static let youArePaidToSeeThisImage =
+            NSL("ntp.youArePaidToSeeThisImage",
+                value: "You're getting paid to see this background image.",
+                comment: "")
+        public static let turnOnBraveAds =
+            NSL("ntp.turnOnBraveAds",
+                value: "Turn on Brave Ads",
+                comment: "")
+        public static let turnOnBraveRewards =
+            NSL("ntp.turnOnBraveRewards",
+                value: "Turn on Rewards",
+                comment: "")
+        public static let getPaidForThisImageTurnRewards =
+            NSL("ntp.getPaidForThisImageTurnRewards",
+                value: "Get paid to see this background image. Turn on Brave Rewards to claim your share.",
+                comment: "")
+        public static let getPaidForThisImageTurnAds =
+            NSL("ntp.getPaidForThisImageTurnAds",
+                value: "Get paid to see this background image. Turn on Brave Ads to claim your share.",
+                comment: "")
+        public static let turnRewardsTos =
+            NSL("ntp.turnRewardsTos",
+                value: "By turning Rewards, you agree to the %@.",
+                comment: "The placeholder says 'Terms of Service'. So full sentence goes like: 'By turnin Rewards, you agree to the Terms of Service'.")
+        public static let chooseToHideSponsoredImages =
+            NSL("ntp.chooseToHideSponsoredImages",
+                value: "You can also choose to %@.",
+                comment: "The placeholder says 'hide sponsored images'. So full sentence goes like: 'You can also choose to hide sponsored images.'")
+        public static let hideSponsoredImages =
+            NSL("ntp.hideSponsoredImages",
+                value: "hide sponsored images",
+                comment: "This sentence is not capitalized on purpose, it is a part of a bigger sentence which goes like this: 'You can also choose to hide sponsored images.'")
+        public static let learnMoreAboutBrandedImages =
+            NSL("ntp.learnMoreAboutBrandedImages",
+                value: "%@ about sponsored images in Brave Rewards",
+                comment: "The placeholder says 'Learn more'. So full sentence goes like: 'Learn more about sponsored images in Brave Rewards.'")
+    }
+    
+}
+
+/// NSLocalizedString wrapper to reduce line length of those strings.
+fileprivate func NSL(_ key: String, value: String, comment: String) -> String {
+    return NSLocalizedString(key,
+                             bundle: Bundle.braveShared,
+                             value: value,
+                             comment: comment)
 }
