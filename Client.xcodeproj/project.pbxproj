@@ -15,6 +15,7 @@
 		0A0D3D5021A5609600BEE65B /* SafeBrowsingError.html in Resources */ = {isa = PBXBuildFile; fileRef = 0A0D3D4821A5609500BEE65B /* SafeBrowsingError.html */; };
 		0A0D3D5221A565C300BEE65B /* SafeBrowsingHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A0D3D5121A565C300BEE65B /* SafeBrowsingHandler.swift */; };
 		0A0D3D6121A596BE00BEE65B /* MalwareList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A0D3D6021A596BE00BEE65B /* MalwareList.swift */; };
+		0A16E2D723D4E1FB00B0BF94 /* ClaimRewardsNTPNotificationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A16E2D623D4E1FB00B0BF94 /* ClaimRewardsNTPNotificationViewController.swift */; };
 		0A19362F234D44DB002E2B81 /* AppearanceAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A19362E234D44DB002E2B81 /* AppearanceAttributes.swift */; };
 		0A19365423508756002E2B81 /* LinkPreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A19365323508756002E2B81 /* LinkPreviewViewController.swift */; };
 		0A1CBCFD23571EFA004DA73F /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 0A1CBCFB23571EFA004DA73F /* Localizable.strings */; };
@@ -1232,6 +1233,7 @@
 		0A0D3D4821A5609500BEE65B /* SafeBrowsingError.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = SafeBrowsingError.html; sourceTree = "<group>"; };
 		0A0D3D5121A565C300BEE65B /* SafeBrowsingHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafeBrowsingHandler.swift; sourceTree = "<group>"; };
 		0A0D3D6021A596BE00BEE65B /* MalwareList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MalwareList.swift; sourceTree = "<group>"; };
+		0A16E2D623D4E1FB00B0BF94 /* ClaimRewardsNTPNotificationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaimRewardsNTPNotificationViewController.swift; sourceTree = "<group>"; };
 		0A19362E234D44DB002E2B81 /* AppearanceAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearanceAttributes.swift; sourceTree = "<group>"; };
 		0A19365323508756002E2B81 /* LinkPreviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkPreviewViewController.swift; sourceTree = "<group>"; };
 		0A1CBCFC23571EFA004DA73F /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -2790,6 +2792,7 @@
 			children = (
 				0AFC8F9D23D3762A00941895 /* NTPNotificationViewController.swift */,
 				0A5CBD3323D4677100362CC8 /* NTPLearnMoreViewController.swift */,
+				0A16E2D623D4E1FB00B0BF94 /* ClaimRewardsNTPNotificationViewController.swift */,
 				0A7F238E23D0862F005E39FC /* BrandedImageCallouts */,
 				0A27ABA023D1B9C400194921 /* BrandedImageCalloutState.swift */,
 				0A5CBD3723D4905D00362CC8 /* NTPNotificationView.swift */,
@@ -2800,10 +2803,8 @@
 		0A7F238E23D0862F005E39FC /* BrandedImageCallouts */ = {
 			isa = PBXGroup;
 			children = (
-				0AEF16C523CDE4B800158AD9 /* BottomSheetViewController.swift */,
 				0A7F238F23D08886005E39FC /* BrandedImageCallout.swift */,
 				0A27AB9323D0A13200194921 /* ClaimRewardsViewController.swift */,
-				0AFC8F9423D1DF6500941895 /* TranslucentBottomSheet.swift */,
 			);
 			path = BrandedImageCallouts;
 			sourceTree = "<group>";
@@ -4259,6 +4260,8 @@
 		D38A1BEB1A9FA2CA00F6A386 /* Widgets */ = {
 			isa = PBXGroup;
 			children = (
+				0AEF16C523CDE4B800158AD9 /* BottomSheetViewController.swift */,
+				0AFC8F9423D1DF6500941895 /* TranslucentBottomSheet.swift */,
 				D3FEC38C1AC4B42F00494F45 /* AutocompleteTextField.swift */,
 				E6927EBF1C7B6FB800D03F75 /* ErrorToast.swift */,
 				E660BE051BB0666D009AC090 /* InnerStrokedView.swift */,
@@ -6181,6 +6184,7 @@
 				C4EFEECF1CEBB6F2009762A4 /* BackForwardTableViewCell.swift in Sources */,
 				2C49854E206173C800893DAE /* photon-colors.swift in Sources */,
 				E689C7301E0C7617008BAADB /* NSAttributedStringExtensions.swift in Sources */,
+				0A16E2D723D4E1FB00B0BF94 /* ClaimRewardsNTPNotificationViewController.swift in Sources */,
 				D0C95E0E200FD3B200E4E51C /* PrintHelper.swift in Sources */,
 				4422D55821BFFB7F00BF1855 /* unicode_casefold.cc in Sources */,
 				C6620BBB213BCEC6009FE75A /* TabType.swift in Sources */,

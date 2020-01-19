@@ -238,6 +238,8 @@ class BrowserViewController: UIViewController {
             }
         }
         
+        Preferences.NewTabPage.attemptToShowClaimRewardsNotification.value = true
+        
         notificationsHandler = AdsNotificationHandler(ads: rewards.ads, presentingController: self)
         notificationsHandler?.canShowNotifications = { [weak self] in
             guard let self = self else { return false }
@@ -955,9 +957,6 @@ class BrowserViewController: UIViewController {
             homePanelController.delegate = self
             homePanelController.view.alpha = 0
             homePanelController.applyTheme(Theme.of(tabManager.selectedTab))
-            
-//            homePanelController.brandedImageState = ntpBrandedImageState
-            homePanelController.brandedImageState = .gettingPaidAlready
 
             self.favoritesViewController = homePanelController
 
@@ -983,20 +982,6 @@ class BrowserViewController: UIViewController {
         view.setNeedsUpdateConstraints()
     }
     
-    private var ntpBrandedImageState: BrandedImageCalloutState {
-        let rewardsEnabled = rewards.ledger.isEnabled
-        let adsEnabled = rewards.ads.isEnabled
-        
-        let adsAvailableInRegion = BraveAds.isCurrentLocaleSupported()
-        let isSponsoredImage = true // todo fix
-        let state = BrandedImageCalloutState.getState(rewardsEnabled: rewardsEnabled,
-                                                      adsEnabled: adsEnabled,
-                                                      adsAvailableInRegion: adsAvailableInRegion,
-                                                      isSponsoredImage: isSponsoredImage)
-        
-        return state
-    }
-
     fileprivate func hideHomePanelController() {
         if let controller = favoritesViewController {
             self.favoritesViewController = nil

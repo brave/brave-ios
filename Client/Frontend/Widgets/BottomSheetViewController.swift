@@ -103,7 +103,7 @@ class BottomSheetViewController: UIViewController {
     @available(*, unavailable)
     required init?(coder aDecoder: NSCoder) { fatalError() }
 
-    override public func viewDidLoad() {
+    override func viewDidLoad() {
         super.viewDidLoad()
 
         view.addSubview(backgroundOverlayView)
@@ -124,7 +124,7 @@ class BottomSheetViewController: UIViewController {
         makeConstraints()
     }
 
-    override public func viewDidAppear(_ animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         show()
     }
@@ -135,7 +135,7 @@ class BottomSheetViewController: UIViewController {
         updateDrawerViewConstraints()
     }
     
-    override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         updateDrawerViewConstraints()
     }
@@ -192,7 +192,7 @@ class BottomSheetViewController: UIViewController {
     
     // MARK: - Animations
     
-    @objc fileprivate func didRecognizePanGesture(_ gestureRecognizer: UIPanGestureRecognizer) {
+    @objc private func didRecognizePanGesture(_ gestureRecognizer: UIPanGestureRecognizer) {
         // The view shouldn't be draggable on iPads
         if showAsPopup { return }
 
@@ -232,8 +232,12 @@ class BottomSheetViewController: UIViewController {
         }
     }
     
-    @objc func closeView() {
+    @objc private func closeView() {
         close()
+    }
+    
+    deinit {
+        print("essa1")
     }
 
     func close() {

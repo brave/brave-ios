@@ -2,7 +2,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import Foundation
+import UIKit
 import Shared
 import BraveShared
 import BraveRewardsUI
@@ -16,6 +16,7 @@ class NTPNotificationViewController: TranslucentBottomSheet {
     init?(state: BrandedImageCalloutState) {
         self.state = state
         super.init()
+        
         if state == .dontShow { return nil }
     }
     
@@ -26,18 +27,20 @@ class NTPNotificationViewController: TranslucentBottomSheet {
             assertionFailure()
             return
         }
-        mainView.setCustomSpacing(0, after: mainView.header)
-        mainView.body.font = .systemFont(ofSize: 14.0)
         
         view.addSubview(mainView)
-        
         mainView.snp.remakeConstraints {
             $0.top.equalToSuperview().inset(28)
             $0.leading.trailing.bottom.equalTo(view.safeAreaLayoutGuide).inset(16)
         }
     }
     
-    func createViewFromState() -> NTPNotificationView? {
+    override func close(immediately: Bool = false) {
+        Preferences.NewTabPage.brandedImageShowed.value = true
+        super.close(immediately: immediately)
+    }
+    
+    private func createViewFromState() -> NTPNotificationView? {
         var config = NTPNotificationViewConfig(textColor: .white)
         
         switch state {
@@ -48,6 +51,7 @@ class NTPNotificationViewController: TranslucentBottomSheet {
                     urlInfo: [learnMore: "learn-more"],
                     action: { [weak self] action in
                         self?.learnMoreHandler?()
+                        self?.close()
                 })
             
         case .youCanGetPaidTurnAdsOn:

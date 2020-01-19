@@ -20,6 +20,10 @@ class TranslucentBottomSheet: UIViewController {
     init() {
         super.init(nibName: nil, bundle: nil)
     }
+    
+    deinit {
+        print("essa2")
+    }
 
     @available(*, unavailable)
     required init?(coder aDecoder: NSCoder) { fatalError() }
@@ -59,7 +63,7 @@ class TranslucentBottomSheet: UIViewController {
         }
     }
     
-    @objc func closeView() {
+    @objc private func closeView() {
         close()
     }
 

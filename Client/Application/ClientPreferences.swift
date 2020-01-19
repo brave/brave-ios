@@ -107,6 +107,12 @@ extension Preferences {
         /// Whether the callout to use branded image was shown.
         static let brandedImageShowed = Option<Bool>(key: "newtabpage.branded-image-callout-showed",
                                                      default: false)
+        
+        /// When true, a notification on new tab page will be shown that an ad grant can be claimed(if rewards and grant are available).
+        /// This value is reseted on each app launch,
+        /// The goal is to show the claim grant notification only once per app session if still available.
+        static let attemptToShowClaimRewardsNotification =
+            Option<Bool>(key: "newtabpage.show-grant-notification", default: true)
     }
 }
 

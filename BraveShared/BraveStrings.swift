@@ -671,6 +671,18 @@ extension Strings {
             NSL("ntp.learnMoreAboutBrandedImages",
                 value: "%@ about sponsored images in Brave Rewards",
                 comment: "The placeholder says 'Learn more'. So full sentence goes like: 'Learn more about sponsored images in Brave Rewards.'")
+        public static let goodJob =
+            NSL("ntp.goodJob",
+                value: "Way to go!",
+                comment: "The context is to praise the user that they did a good job, to keep it up. It is used in full sentence like: 'Way to go! You earned 40 BAT last month.'")
+        public static let earningsReport =
+            NSL("ntp.earningsReport",
+                value: "You earned %@ last month from viewing privacy-respecting ads.",
+                comment: "Placeholder example: 'You earned 42 BAT last month from viewing privacy-respecting ads.'")
+        public static let claimRewards =
+            NSL("ntp.claimRewards",
+                value: "Claim my rewards",
+                comment: "")
     }
     
 }

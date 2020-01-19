@@ -6,7 +6,7 @@ import BraveShared
 
 public struct Strings {
   /// "BAT" or "BAT Points" depending on the region
-  static var BAT: String {
+  public static var BAT: String {
     return Preferences.Rewards.isUsingBAP.value == true ? "BAP" : "BAT"
   }
 }

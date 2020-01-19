@@ -19,17 +19,13 @@ enum BrandedImageCalloutState {
     /// Don't show any callout
     case dontShow
     
-    // todo: consider adding enums for image type and ads status(on/off/unavailible)
-    
     static func getState(rewardsEnabled: Bool, adsEnabled: Bool, adsAvailableInRegion: Bool,
                          isSponsoredImage: Bool) -> BrandedImageCalloutState {
-        
-        // If any of those callouts were shown once, we skip showing any other state.
+                
+        // If any of remaining callouts were shown once, we skip showing any other state.
         let wasCalloutShowed = Preferences.NewTabPage.brandedImageShowed.value
         
-        let isPrivateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
-        
-        if wasCalloutShowed || isPrivateMode { return .dontShow }
+        if wasCalloutShowed { return .dontShow }
         
         if !rewardsEnabled && isSponsoredImage { return .getPaidTurnRewardsOn }
         
