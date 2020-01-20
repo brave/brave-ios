@@ -19,4 +19,6 @@
 
 #import "ablock_rust_lib.h"
 
+#import "libarchive.h"
+
 #endif
