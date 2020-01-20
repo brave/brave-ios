@@ -50,7 +50,8 @@ class ClaimRewardsNTPNotificationViewController: TranslucentBottomSheet {
         
         guard let rewards = (UIApplication.shared.delegate as? AppDelegate)?
             .browserViewController.rewards,
-            let promo = rewards.ledger.pendingPromotions.first else {
+            let promo = rewards.ledger.pendingPromotions.first,
+            promo.type == .ads else {
                 return nil
         }
         

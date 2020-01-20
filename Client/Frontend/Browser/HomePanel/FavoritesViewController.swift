@@ -258,7 +258,7 @@ class FavoritesViewController: UIViewController, Themeable {
         
         let showClaimRewards = Preferences.NewTabPage.attemptToShowClaimRewardsNotification.value
             && rewardsEnabled
-            && rewards.ledger.pendingPromotions.first != nil
+            && rewards.ledger.pendingPromotions.first?.type == .ads
         
         if showClaimRewards { return .claimRewards }
         
