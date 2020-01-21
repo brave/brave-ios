@@ -3386,8 +3386,7 @@ extension BrowserViewController: FavoritesDelegate {
         addChild(vc)
         view.addSubview(vc.view)
         vc.view.snp.remakeConstraints {
-            $0.right.top.left.equalToSuperview()
-            $0.bottom.equalTo(view)
+            $0.right.top.bottom.leading.equalToSuperview()
         }
     }
 }

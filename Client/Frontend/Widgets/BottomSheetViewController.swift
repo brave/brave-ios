@@ -95,6 +95,11 @@ class BottomSheetViewController: UIViewController {
         traitCollection.userInterfaceIdiom == .pad && traitCollection.horizontalSizeClass == .regular
     }
     
+    private var isLandscapePhone: Bool {
+        traitCollection.userInterfaceIdiom == .phone && UIApplication.shared.statusBarOrientation.isLandscape
+    }
+    
+    
     // MARK: - Lifecycle
 
     init() {
@@ -152,14 +157,11 @@ class BottomSheetViewController: UIViewController {
         if yPosition == initialDrawerYPosition { return }
         
         contentView.snp.remakeConstraints {
-            if showAsPopup || (traitCollection.userInterfaceIdiom == .phone
-            && UIApplication.shared.statusBarOrientation.isLandscape) {
-                $0.bottom.equalToSuperview()
-                $0.centerX.equalToSuperview()
+            if showAsPopup || isLandscapePhone {
+                $0.bottom.centerX.equalToSuperview()
                 $0.width.equalTo(maxHorizontalWidth)
             } else {
-                $0.leading.trailing.equalToSuperview()
-                $0.bottom.equalToSuperview()
+                $0.leading.trailing.bottom.equalToSuperview()
             }
         }
         
