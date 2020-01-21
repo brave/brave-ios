@@ -147,12 +147,15 @@ class FavoritesViewController: UIViewController, Themeable {
         case claimRewards
     }
     
-    var ntpNotificationShowing = false
+    private var ntpNotificationShowing = false
+    private var rewards: BraveRewards?
     
-    init(profile: Profile, dataSource: FavoritesDataSource = FavoritesDataSource(), fromOverlay: Bool) {
+    init(profile: Profile, dataSource: FavoritesDataSource = FavoritesDataSource(), fromOverlay: Bool,
+         rewards: BraveRewards?) {
         self.profile = profile
         self.dataSource = dataSource
         self.fromOverlay = fromOverlay
+        self.rewards = rewards
         
         super.init(nibName: nil, bundle: nil)
         NotificationCenter.default.do {
@@ -279,9 +282,11 @@ class FavoritesViewController: UIViewController, Themeable {
     private func showNTPNotification(for type: NTPNotificationType) {
         var vc: UIViewController?
         
+        guard let rewards = rewards else { return }
+        
         switch type {
         case .brandedImages(let state):
-            guard let notificationVC = NTPNotificationViewController(state: state) else { return }
+            guard let notificationVC = NTPNotificationViewController(state: state, rewards: rewards) else { return }
             
             notificationVC.closeHandler = { [weak self] in
                 self?.ntpNotificationShowing = false
@@ -295,7 +300,7 @@ class FavoritesViewController: UIViewController, Themeable {
         case .claimRewards:
             if !Preferences.NewTabPage.attemptToShowClaimRewardsNotification.value { return }
             
-            let claimRewardsVC = ClaimRewardsNTPNotificationViewController()
+            let claimRewardsVC = ClaimRewardsNTPNotificationViewController(rewards: rewards)
             claimRewardsVC.closeHandler = { [weak self] in
                 Preferences.NewTabPage.attemptToShowClaimRewardsNotification.value = false
                 self?.ntpNotificationShowing = false

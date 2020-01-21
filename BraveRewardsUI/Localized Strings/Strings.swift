@@ -4,14 +4,14 @@
 
 import BraveShared
 
-public struct Strings {
+internal struct Strings {
   /// "BAT" or "BAT Points" depending on the region
-  public static var BAT: String {
+  static var BAT: String {
     return Preferences.Rewards.isUsingBAP.value == true ? "BAP" : "BAT"
   }
 }
 
-public extension Strings {
+internal extension Strings {
   static var walletBalanceType: String {
     if Preferences.Rewards.isUsingBAP.value == true {
       return NSLocalizedString("BATPoints", bundle: .rewardsUI, value: "BAT Points", comment: "")
@@ -52,7 +52,7 @@ public extension Strings {
   static let addFunds = NSLocalizedString("BraveRewardsAddFunds", bundle: .rewardsUI, value: "Add Funds", comment: "")
   static let withdrawFunds = NSLocalizedString("BraveRewardsWithdrawFunds", bundle: .rewardsUI, value: "Withdraw Funds", comment: "")
   static let emptyTipsText = NSLocalizedString("BraveRewardsEmptyTipsText", bundle: .rewardsUI, value: "Have you tipped your favorite content creator today?", comment: "")
-  static let braveRewardsSettings = NSLocalizedString("BraveRewardsSettings", bundle: .rewardsUI,
+  static let settings = NSLocalizedString("BraveRewardsSettings", bundle: .rewardsUI,
                                                       value: "Settings", comment: "")
   static let autoContributeMinimumVisits = NSLocalizedString("BraveRewardsAutoContributeMinimumVisits", bundle: .rewardsUI, value: "Minimum Visits", comment: "")
   static let addFundsShowQRCode = NSLocalizedString("BraveRewardsAddFundsShowQRCode", bundle: .rewardsUI, value: "Show QR Code", comment: "")

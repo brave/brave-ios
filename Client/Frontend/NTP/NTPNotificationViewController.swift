@@ -6,6 +6,7 @@ import UIKit
 import Shared
 import BraveShared
 import BraveRewardsUI
+import BraveRewards
 
 class NTPNotificationViewController: TranslucentBottomSheet {
     
@@ -13,8 +14,11 @@ class NTPNotificationViewController: TranslucentBottomSheet {
     
     var learnMoreHandler: (() -> Void)?
     
-    init?(state: BrandedImageCalloutState) {
+    private var rewards: BraveRewards?
+    
+    init?(state: BrandedImageCalloutState, rewards: BraveRewards?) {
         self.state = state
+        self.rewards = rewards
         super.init()
         
         if state == .dontShow { return nil }
@@ -45,7 +49,7 @@ class NTPNotificationViewController: TranslucentBottomSheet {
         
         switch state {
         case .getPaidTurnRewardsOn, .getPaidTurnAdsOn:
-            let learnMore = Strings.disclaimerLearnMore
+            let learnMore = Strings.learnMore
             config.bodyText =
                 (text: "\(Strings.NTP.getPaidToSeeThisImage)\n\(learnMore)",
                     urlInfo: [learnMore: "learn-more"],
@@ -62,14 +66,13 @@ class NTPNotificationViewController: TranslucentBottomSheet {
                 (text: Strings.NTP.turnOnBraveAds,
                  showCoinIcon: true,
                  action: { [weak self] in
-                    guard let rewards = (UIApplication.shared.delegate as? AppDelegate)?
-                        .browserViewController.rewards else { return }
+                    guard let rewards = self?.rewards else { return }
                     
                     rewards.ads.isEnabled = true
                     self?.close()
                 })
         case .gettingPaidAlready:
-            let learnMore = Strings.disclaimerLearnMore
+            let learnMore = Strings.learnMore
             
             config.bodyText =
                 (text: "\(Strings.NTP.youArePaidToSeeThisImage)\n\(learnMore)",

@@ -6,6 +6,7 @@ import UIKit
 import Shared
 import BraveShared
 import BraveRewardsUI
+import BraveRewards
 import SafariServices
 
 /// A view controller that is presented after user taps on 'Learn more' on one of `NTPNotificationViewController` views.
@@ -15,7 +16,9 @@ class NTPLearnMoreViewController: BottomSheetViewController {
     
     var linkHandler: ((URL) -> Void)?
     
-    init(state: BrandedImageCalloutState) {
+    private var rewards: BraveRewards?
+    
+    init(state: BrandedImageCalloutState, rewards: BraveRewards?) {
         self.state = state
         super.init()
     }
@@ -43,7 +46,7 @@ class NTPLearnMoreViewController: BottomSheetViewController {
         case .getPaidTurnRewardsOn:
             config.headerText = Strings.NTP.getPaidForThisImageTurnRewards
             
-            let tos = Strings.termsOfServiceURL
+            let tos = Strings.termsOfService
             let tosPart = String(format: Strings.NTP.turnRewardsTos, tos)
             
             let hideImages = Strings.NTP.hideSponsoredImages
@@ -69,15 +72,14 @@ class NTPLearnMoreViewController: BottomSheetViewController {
                 (text: Strings.NTP.turnOnBraveRewards,
                  showCoinIcon: false,
                  action: { [weak self] in
-                    guard let rewards = (UIApplication.shared.delegate as? AppDelegate)?
-                        .browserViewController.rewards else { return }
+                    guard let rewards = self?.rewards else { return }
                     
                     rewards.ledger.createWalletAndFetchDetails { _ in }
                     self?.close()
                 })
             
             config.secondaryButtonConfig =
-                (text: Strings.disclaimerLearnMore,
+                (text: Strings.learnMore,
                  action: { [weak self] in
                     guard let url = URL(string: "https://brave.com/brave-rewards/") else { return }
                     self?.showSFSafariViewController(url: url)
@@ -102,8 +104,7 @@ class NTPLearnMoreViewController: BottomSheetViewController {
                 (text: Strings.NTP.turnOnBraveAds,
                  showCoinIcon: true,
                  action: { [weak self] in
-                    guard let rewards = (UIApplication.shared.delegate as? AppDelegate)?
-                        .browserViewController.rewards else { return }
+                    guard let rewards = self?.rewards else { return }
                     
                     rewards.ads.isEnabled = true
                     self?.close()
@@ -112,7 +113,7 @@ class NTPLearnMoreViewController: BottomSheetViewController {
         case .gettingPaidAlready:
             config.headerText = Strings.NTP.youArePaidToSeeThisImage
             
-            let learnMore = Strings.disclaimerLearnMore
+            let learnMore = Strings.learnMore
             let learnMorePart = String(format: Strings.NTP.learnMoreAboutBrandedImages, learnMore)
             
             let hideImages = Strings.NTP.hideSponsoredImages

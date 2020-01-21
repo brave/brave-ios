@@ -18,7 +18,7 @@ class FavoritesViewControllerTests: XCTestCase {
 
         delegate = MockTopSitesDelegate()
         dataSource = MockFavoritesDataSource()
-        vc = FavoritesViewController(profile: MockProfile(), dataSource: dataSource, fromOverlay: false)
+        vc = FavoritesViewController(profile: MockProfile(), dataSource: dataSource, fromOverlay: false, rewards: nil)
         vc.delegate = delegate
         collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: UICollectionViewFlowLayout())
     }
@@ -34,7 +34,7 @@ class FavoritesViewControllerTests: XCTestCase {
 
     func testFavoritesViewControllerLoadsView() {
         let viewController = FavoritesViewController(profile: MockProfile(),
-                                                     dataSource: MockFavoritesDataSource(), fromOverlay: false)
+                                                     dataSource: MockFavoritesDataSource(), fromOverlay: false, rewards: nil)
         XCTAssertNotNil(viewController.view, "Unable to load view")
         XCTAssertNotNil(viewController.view.subviews.first { $0 is UICollectionView }, "`UICollectionView` missing from `FavoritesViewController` view.")
         XCTAssertNil(viewController.delegate)

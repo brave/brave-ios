@@ -6,8 +6,16 @@ import UIKit
 import Shared
 import BraveShared
 import BraveRewardsUI
+import BraveRewards
 
 class ClaimRewardsNTPNotificationViewController: TranslucentBottomSheet {
+    
+    private let rewards: BraveRewards
+    
+    init(rewards: BraveRewards) {
+        self.rewards = rewards
+        super.init()
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -48,11 +56,8 @@ class ClaimRewardsNTPNotificationViewController: TranslucentBottomSheet {
     private var mainView: NTPNotificationView? {
         var config = NTPNotificationViewConfig(textColor: .white)
         
-        guard let rewards = (UIApplication.shared.delegate as? AppDelegate)?
-            .browserViewController.rewards,
-            let promo = rewards.ledger.pendingPromotions.first,
-            promo.type == .ads else {
-                return nil
+        guard let promo = (rewards.ledger.pendingPromotions.filter { $0.type == .ads }.first) else {
+            return nil
         }
         
         let goodJob = Strings.NTP.goodJob
@@ -72,10 +77,10 @@ class ClaimRewardsNTPNotificationViewController: TranslucentBottomSheet {
              action: { [weak self] in
                 Preferences.NewTabPage.attemptToShowClaimRewardsNotification.value = false
                 
-                rewards.ledger.claimPromotion(promo) { [weak self] success in
+                self?.rewards.ledger.claimPromotion(promo) { [weak self] success in
                     if !success {
                         let alert = UIAlertController(title: Strings.genericErrorTitle, message: Strings.genericErrorBody, preferredStyle: .alert)
-                        alert.addAction(UIAlertAction(title: Strings.ok, style: .default, handler: nil))
+                        alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
                         self?.present(alert, animated: true)
                     }
                 }

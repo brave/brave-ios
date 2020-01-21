@@ -278,6 +278,9 @@ class BrowserViewController: UIViewController {
             guard let self = self, self.isViewLoaded else { return }
             self.updateRewardsButtonState()
         }
+        rewardsObserver.rewardsEnabledStateUpdated = { [weak self] _ in
+            self?.resetNTPNotification()
+        }
     }
     
     // Display first ad when the user gets back to this controller if they havent seen one before
@@ -455,9 +458,7 @@ class BrowserViewController: UIViewController {
                            name: UIApplication.didBecomeActiveNotification, object: nil)
             $0.addObserver(self, selector: #selector(appDidEnterBackgroundNotification),
                            name: UIApplication.didEnterBackgroundNotification, object: nil)
-            $0.addObserver(self, selector: #selector(rewardsSettingToggled),
-                           name: .rewardsToggled, object: nil)
-            $0.addObserver(self, selector: #selector(adsSettingToggled),
+            $0.addObserver(self, selector: #selector(resetNTPNotification),
                            name: .adsToggled, object: nil)
             
         }
@@ -953,7 +954,9 @@ class BrowserViewController: UIViewController {
         homePanelIsInline = inline
 
         if favoritesViewController == nil {
-            let homePanelController = FavoritesViewController(profile: profile, fromOverlay: !inline)
+            let homePanelController = FavoritesViewController(profile: profile,
+                                                              fromOverlay: !inline,
+                                                              rewards: rewards)
             homePanelController.delegate = self
             homePanelController.view.alpha = 0
             homePanelController.applyTheme(Theme.of(tabManager.selectedTab))
@@ -3374,7 +3377,7 @@ extension BrowserViewController: FavoritesDelegate {
     func openBrandedImageCallout(state: BrandedImageCalloutState?) {
         guard let state = state, state.hasDetailViewController else { return }
         
-        let vc = NTPLearnMoreViewController(state: state)
+        let vc = NTPLearnMoreViewController(state: state, rewards: rewards)
         
         vc.linkHandler = { [weak self] url in
             self?.tabManager.selectedTab?.loadRequest(PrivilegedRequest(url: url) as URLRequest)

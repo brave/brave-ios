@@ -151,12 +151,7 @@ extension BrowserViewController {
         }
     }
     
-    // Note: at the moment the toggle value does not matter, the same code is run regardless of its state.
-    @objc func rewardsSettingToggled() {
-        Preferences.NewTabPage.brandedImageShowed.value = false
-    }
-    
-    @objc func adsSettingToggled() {
+    @objc func resetNTPNotification() {
         Preferences.NewTabPage.brandedImageShowed.value = false
     }
 }

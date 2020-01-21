@@ -286,7 +286,7 @@ extension AutoContributeDetailViewController: UITableViewDataSource, UITableView
       cell.selectionStyle = .none
       switch row {
       case .settings:
-        cell.label.text = Strings.braveRewardsSettings
+        cell.label.text = Strings.settings
         cell.imageView?.image = UIImage(frameworkResourceNamed: "settings").alwaysTemplate
         cell.imageView?.tintColor = BraveUX.autoContributeTintColor
         cell.accessoryType = .disclosureIndicator

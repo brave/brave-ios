@@ -11,9 +11,9 @@ import SnapKit
 class BottomSheetViewController: UIViewController {
     
     private struct UX {
-        static let HandleWidth: CGFloat = 35
-        static let HandleHeight: CGFloat = 5
-        static let HandleMargin: CGFloat = 20
+        static let handleWidth: CGFloat = 35
+        static let handleHeight: CGFloat = 5
+        static let handleMargin: CGFloat = 20
     }
     
     /// For landscape orientation the content view isn't full width.
@@ -36,7 +36,7 @@ class BottomSheetViewController: UIViewController {
     private let handleView = UIView().then {
         $0.backgroundColor = .black
         $0.alpha = 0.25
-        $0.layer.cornerRadius = UX.HandleHeight / 2
+        $0.layer.cornerRadius = UX.handleHeight / 2
     }
     
     private let closeButton = UIButton().then {
@@ -52,6 +52,7 @@ class BottomSheetViewController: UIViewController {
             let maxY = view.frame.maxY
             
             func update() {
+                if maxY <= 0 { return }
                 // Update dark blur, the more of content view go away the less dark it is.
                 backgroundOverlayView.alpha = (maxY - yPosition) / maxY
                 
@@ -83,7 +84,7 @@ class BottomSheetViewController: UIViewController {
     }
     
     private var initialDrawerYPosition: CGFloat {
-        let popupY = (view.frame.height / 2) - (contentView.frame.height / 2)
+        let popupY = ceil((view.frame.height / 2) - (contentView.frame.height / 2))
         
         let regularY = view.frame.maxY - contentView.frame.height
         
@@ -111,7 +112,7 @@ class BottomSheetViewController: UIViewController {
         
         contentView.backgroundColor = .white
 
-        let panGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(didRecognizePanGesture))
+        let panGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture))
         contentView.addGestureRecognizer(panGestureRecognizer)
 
         contentView.addSubview(handleView)
@@ -131,42 +132,14 @@ class BottomSheetViewController: UIViewController {
     
     override func viewDidLayoutSubviews() {
         yPosition = contentView.isHidden ? view.frame.maxY : initialDrawerYPosition
-        
-        updateDrawerViewConstraints()
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
-        updateDrawerViewConstraints()
+        view.setNeedsUpdateConstraints()
     }
     
-    // MARK: - Constraints setup
-    
-    private func makeConstraints() {
-        backgroundOverlayView.snp.makeConstraints { make in
-            let bottomInset = parent?.view.safeAreaInsets.bottom ?? 0
-            make.leading.trailing.top.equalToSuperview()
-            make.bottom.equalToSuperview().offset(bottomInset)
-        }
-        
-        handleView.snp.remakeConstraints {
-            $0.width.equalTo(UX.HandleWidth)
-            $0.height.equalTo(UX.HandleHeight)
-
-            $0.centerX.equalTo(contentView)
-            $0.top.equalTo(contentView).offset((UX.HandleMargin - UX.HandleHeight) / 2)
-        }
-        
-        closeButton.snp.makeConstraints {
-            $0.top.equalToSuperview().inset(10)
-            $0.right.equalToSuperview().inset(7)
-            $0.size.equalTo(26)
-        }
-        
-        updateDrawerViewConstraints()
-    }
-    
-    private func updateDrawerViewConstraints() {
+    override func updateViewConstraints() {
         let allCorners: CACornerMask = [.layerMinXMinYCorner, .layerMaxXMinYCorner,
                           .layerMinXMaxYCorner, .layerMaxXMaxYCorner]
         
@@ -188,27 +161,57 @@ class BottomSheetViewController: UIViewController {
                 $0.bottom.equalToSuperview()
             }
         }
+        
+        super.updateViewConstraints()
+    }
+    
+    // MARK: - Constraints setup
+    
+    private func makeConstraints() {
+        backgroundOverlayView.snp.makeConstraints {
+            let bottomInset = parent?.view.safeAreaInsets.bottom ?? 0
+            $0.leading.trailing.top.equalToSuperview()
+            $0.bottom.equalToSuperview().offset(bottomInset)
+        }
+        
+        handleView.snp.remakeConstraints {
+            $0.width.equalTo(UX.handleWidth)
+            $0.height.equalTo(UX.handleHeight)
+
+            $0.centerX.equalTo(contentView)
+            $0.top.equalTo(contentView).offset((UX.handleMargin - UX.handleHeight) / 2)
+        }
+        
+        closeButton.snp.makeConstraints {
+            $0.top.equalToSuperview().inset(10)
+            $0.right.equalToSuperview().inset(7)
+            $0.size.equalTo(26)
+        }
     }
     
     // MARK: - Animations
     
-    @objc private func didRecognizePanGesture(_ gestureRecognizer: UIPanGestureRecognizer) {
+    @objc private func handlePanGesture(_ pan: UIPanGestureRecognizer) {
         // The view shouldn't be draggable on iPads
         if showAsPopup { return }
 
-        let translation = gestureRecognizer.translation(in: contentView)
+        let translation = pan.translation(in: contentView)
         yPosition += translation.y
-        gestureRecognizer.setTranslation(CGPoint.zero, in: contentView)
+        pan.setTranslation(CGPoint.zero, in: contentView)
 
-        if gestureRecognizer.state != .ended { return }
-
-        let velocity = gestureRecognizer.velocity(in: contentView).y
-        let landingYPosition = yPosition + velocity / 10
+        if pan.state != .ended { return }
+        
+        let projectedVelocity = project(initialVelocity: pan.velocity(in: contentView).y,
+                                        decelerationRate: UIScrollView.DecelerationRate.normal.rawValue)
+        
         let nextYPosition: CGFloat
         
         let bottomHalfOfChildView = view.frame.height - (contentView.frame.height / 2)
+        let pannedPastHalfOfViewHeight = yPosition > bottomHalfOfChildView
         
-        if landingYPosition > bottomHalfOfChildView {
+        let closeByVelocity = projectedVelocity + yPosition > contentView.frame.maxY
+        
+        if pannedPastHalfOfViewHeight || closeByVelocity {
             nextYPosition = view.frame.maxY
         } else {
             nextYPosition = 0
@@ -243,6 +246,11 @@ class BottomSheetViewController: UIViewController {
             self.view.removeFromSuperview()
             self.removeFromParent()
         }
+    }
+    
+    // Distance travelled after decelerating to zero velocity at a constant rate (credit: a WWDC video)
+    private func project(initialVelocity: CGFloat, decelerationRate: CGFloat) -> CGFloat {
+      return (initialVelocity / 1000.0) * decelerationRate / (1.0 - decelerationRate)
     }
 }
 
