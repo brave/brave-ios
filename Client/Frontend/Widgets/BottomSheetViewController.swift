@@ -152,7 +152,8 @@ class BottomSheetViewController: UIViewController {
         if yPosition == initialDrawerYPosition { return }
         
         contentView.snp.remakeConstraints {
-            if showAsPopup || UIApplication.shared.statusBarOrientation.isLandscape {
+            if showAsPopup || (traitCollection.userInterfaceIdiom == .phone
+            && UIApplication.shared.statusBarOrientation.isLandscape) {
                 $0.bottom.equalToSuperview()
                 $0.centerX.equalToSuperview()
                 $0.width.equalTo(maxHorizontalWidth)

@@ -25,15 +25,12 @@ class TranslucentBottomSheet: UIViewController {
     required init?(coder aDecoder: NSCoder) { fatalError() }
     
     override func viewDidLoad() {
-        let overlayView = UIView().then {
-            $0.backgroundColor = .black
-            $0.alpha = 0.85
+        let blurEffectView = UIVisualEffectView(effect: UIBlurEffect(style: UIBlurEffect.Style.dark)).then {
+            $0.frame = view.bounds
+            $0.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         }
-        view.insertSubview(overlayView, at: 0)
         
-        overlayView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-        }
+        view.addSubview(blurEffectView)
         
         view.addSubview(closeButton)
         closeButton.addTarget(self, action: #selector(closeView), for: .touchUpInside)

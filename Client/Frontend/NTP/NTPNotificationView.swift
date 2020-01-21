@@ -61,22 +61,24 @@ class NTPNotificationView: UIStackView {
         $0.textContainer.lineFragmentPadding = 0
     }
     
-    lazy var primaryButton = RoundInterfaceButton().then {
+    lazy var primaryButton = RoundInterfaceButton(type: .system).then {
         $0.setTitle(config.primaryButtonConfig?.text, for: .normal)
         $0.appearanceTextColor = .white
         $0.backgroundColor = BraveUX.blurple400
         $0.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
         $0.contentEdgeInsets = UIEdgeInsets(top: 12, left: 25, bottom: 12, right: 25)
+        $0.tintColor = .white
         if config.primaryButtonConfig?.showCoinIcon == true {
             $0.setImage(#imageLiteral(resourceName: "turn_rewards_on_money_icon"), for: .normal)
             $0.imageEdgeInsets = UIEdgeInsets(top: 0, left: -10, bottom: 0, right: 0)
         }
     }
     
-    lazy var secondaryButton = RoundInterfaceButton().then {
+    lazy var secondaryButton = RoundInterfaceButton(type: .system).then {
         $0.setTitle(config.secondaryButtonConfig?.text, for: .normal)
         $0.appearanceTextColor = config.textColor
         $0.backgroundColor = .clear
+        $0.tintColor = .white
         $0.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
     }
     
@@ -114,7 +116,7 @@ class NTPNotificationView: UIStackView {
             stackView.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
             views.append(stackView)
             
-            primaryButton.addTarget(self, action: #selector(primaryButtonAction), for: .touchDown)
+            primaryButton.addTarget(self, action: #selector(primaryButtonAction), for: .touchUpInside)
         }
         
         if config.secondaryButtonConfig != nil {
@@ -128,7 +130,7 @@ class NTPNotificationView: UIStackView {
             stackView.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
             views.append(stackView)
             
-            secondaryButton.addTarget(self, action: #selector(secondaryButtonAction), for: .touchDown)
+            secondaryButton.addTarget(self, action: #selector(secondaryButtonAction), for: .touchUpInside)
         }
         
         views.forEach(addArrangedSubview(_:))
