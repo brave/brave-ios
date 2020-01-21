@@ -32,6 +32,8 @@ class NTPNotificationViewController: TranslucentBottomSheet {
             return
         }
         
+        mainView.setCustomSpacing(0, after: mainView.header)
+        
         view.addSubview(mainView)
         mainView.snp.remakeConstraints {
             $0.top.equalToSuperview().inset(28)
