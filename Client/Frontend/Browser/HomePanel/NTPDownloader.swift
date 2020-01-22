@@ -29,11 +29,6 @@ struct NTPItemInfo: Codable {
     let wallpapers: [NTPWallpaper]
 }
 
-struct CacheResponse {
-    let statusCode: Int
-    let etag: String
-}
-
 class NTPDownloader {
     private static let etagFile = "crc.etag"
     private static let metadataFile = "photo.json"
@@ -49,30 +44,30 @@ class NTPDownloader {
         self.isZipped = isZipped
     }
     
-    func update() {
+    func getNTPInfo(_ completion: @escaping (NTPItemInfo?) -> Void) {
         // Download the NTP Info to a temporary directory
         self.download { [weak self] url, cacheInfo, error in
             guard let self = self else { return }
             
             if let error = error {
                 logger.error(error)
-                return
+                return completion(self.loadNTPInfo())
             }
             
             guard let url = url else {
                 logger.error(error)
-                return
+                return completion(self.loadNTPInfo())
             }
             
             if let cacheInfo = cacheInfo, cacheInfo.statusCode == 304 {
                 logger.debug("NTPDownloader Cache is still valid")
-                return
+                return completion(self.loadNTPInfo())
             }
             
             //Move contents of `url` directory
             //to somewhere more permanent where we'll load the images from..
             guard let supportDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
-                return
+                return completion(self.loadNTPInfo())
             }
  
             do {
@@ -87,10 +82,47 @@ class NTPDownloader {
                 if let cacheInfo = cacheInfo {
                     self.setETag(cacheInfo.etag)
                 }
+                
+                completion(self.loadNTPInfo())
             } catch {
                 logger.error(error)
+                completion(self.loadNTPInfo())
             }
         }
+    }
+    
+    private func loadNTPInfo() -> NTPItemInfo? {
+        guard let supportDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
+            return nil
+        }
+        
+        let downloadsURL = supportDirectory.appendingPathComponent(NTPDownloader.ntpDownloadsFolder)
+        let metaDataURL = downloadsURL.appendingPathComponent(NTPDownloader.metadataFile)
+        
+        if !FileManager.default.fileExists(atPath: metaDataURL.path) {
+            return nil
+        }
+        
+        do {
+            let metadata = try Data(contentsOf: metaDataURL)
+            let itemInfo = try JSONDecoder().decode(NTPItemInfo.self, from: metadata)
+            
+            let logo = NTPLogo(imageUrl: metaDataURL.appendingPathComponent(itemInfo.logo.imageUrl).path,
+                               alt: itemInfo.logo.alt,
+                               companyName: itemInfo.logo.companyName,
+                               destinationUrl: itemInfo.logo.destinationUrl)
+            
+            let wallpapers = itemInfo.wallpapers.map({
+                return NTPWallpaper(imageUrl: metaDataURL.appendingPathComponent($0.imageUrl).path,
+                                    focalPoint: $0.focalPoint)
+            })
+            
+            return NTPItemInfo(logo: logo, wallpapers: wallpapers)
+        } catch {
+            logger.error(error)
+        }
+        
+        return nil
     }
     
     private func getETag() -> String? {
@@ -337,5 +369,10 @@ class NTPDownloader {
         } catch {
             completion(nil, error)
         }
+    }
+    
+    private struct CacheResponse {
+        let statusCode: Int
+        let etag: String
     }
 }
