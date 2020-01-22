@@ -29,7 +29,13 @@ struct NTPItemInfo: Codable {
     let wallpapers: [NTPWallpaper]
 }
 
+struct CacheResponse {
+    let statusCode: Int
+    let etag: String
+}
+
 class NTPDownloader {
+    private static let etagFile = "crc.etag"
     private static let metadataFile = "photo.json"
     private static let ntpDownloadsFolder = "NTPDownloads"
     private static let baseURL = "https://brave-ntp-crx-input-dev.s3-us-west-2.amazonaws.com/"
@@ -45,7 +51,9 @@ class NTPDownloader {
     
     func update() {
         // Download the NTP Info to a temporary directory
-        self.download { url, error in
+        self.download { [weak self] url, cacheInfo, error in
+            guard let self = self else { return }
+            
             if let error = error {
                 logger.error(error)
                 return
@@ -53,6 +61,11 @@ class NTPDownloader {
             
             guard let url = url else {
                 logger.error(error)
+                return
+            }
+            
+            if let cacheInfo = cacheInfo, cacheInfo.statusCode == 304 {
+                logger.debug("NTPDownloader Cache is still valid")
                 return
             }
             
@@ -64,53 +77,131 @@ class NTPDownloader {
  
             do {
                 let downloadsURL = supportDirectory.appendingPathComponent(NTPDownloader.ntpDownloadsFolder)
-                if FileManager.default.fileExists(atPath: downloadsURL.absoluteString) {
+                if FileManager.default.fileExists(atPath: downloadsURL.path) {
                     try FileManager.default.removeItem(at: downloadsURL)
                 }
                 
                 try FileManager.default.moveItem(at: url, to: downloadsURL)
+                
+                //Store the ETag
+                if let cacheInfo = cacheInfo {
+                    self.setETag(cacheInfo.etag)
+                }
             } catch {
                 logger.error(error)
             }
         }
     }
     
-    private func download(_ completion: @escaping (URL?, Error?) -> Void) {
+    private func getETag() -> String? {
+        guard let supportDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
+            return nil
+        }
+        
+        let downloadsURL = supportDirectory.appendingPathComponent(NTPDownloader.ntpDownloadsFolder)
+        if !FileManager.default.fileExists(atPath: downloadsURL.path) {
+            return nil
+        }
+        
+        let etagURL = downloadsURL.appendingPathComponent(NTPDownloader.etagFile)
+        if !FileManager.default.fileExists(atPath: etagURL.path) {
+            return nil
+        }
+        
+        return try? String(contentsOfFile: etagURL.path, encoding: .utf8)
+    }
+    
+    private func setETag(_ etag: String) {
+        guard let supportDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
+            logger.error("Cannot find Support Directory for writing NTPDownloader ETag")
+            return
+        }
+        
+        let downloadsURL = supportDirectory.appendingPathComponent(NTPDownloader.ntpDownloadsFolder)
+        
+        do {
+            try FileManager.default.createDirectory(at: downloadsURL, withIntermediateDirectories: true, attributes: nil)
+        } catch {
+            logger.error("NTPDownloader: \(error)")
+            return
+        }
+        
+        let etagURL = downloadsURL.appendingPathComponent(NTPDownloader.etagFile)
+        
+        do {
+            let etag = etag.replacingOccurrences(of: "\"", with: "")
+            try etag.write(to: etagURL, atomically: true, encoding: .utf8)
+        } catch {
+            logger.error("NTPDownloader: \(error)")
+        }
+    }
+    
+    private func removeETag() throws {
+        guard let supportDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
+            logger.error("Cannot find Support Directory for writing NTPDownloader ETag")
+            return
+        }
+        
+        let downloadsURL = supportDirectory.appendingPathComponent(NTPDownloader.ntpDownloadsFolder)
+        let etagURL = downloadsURL.appendingPathComponent(NTPDownloader.etagFile)
+        
+        if FileManager.default.fileExists(atPath: etagURL.path) {
+            try FileManager.default.removeItem(at: etagURL)
+        }
+    }
+    
+    private func download(_ completion: @escaping (URL?, CacheResponse?, Error?) -> Void) {
         if self.isZipped {
-            self.download(path: nil) { [weak self] data, error in
+            self.download(path: nil, etag: self.getETag()) { [weak self] data, cacheInfo, error in
                 guard let self = self else { return }
                 
                 if let error = error {
-                    return completion(nil, error)
+                    return completion(nil, nil, error)
+                }
+                
+                if let cacheInfo = cacheInfo {
+                    if cacheInfo.statusCode == 304 {
+                        let tempDirectory = FileManager.default.temporaryDirectory
+                        let directory = tempDirectory.appendingPathComponent(NTPDownloader.ntpDownloadsFolder)
+                        return completion(directory, cacheInfo, nil)
+                    }
                 }
                 
                 guard let data = data else {
-                    return completion(nil, "Invalid \(NTPDownloader.metadataFile) for NTP Download")
+                    return completion(nil, nil, "Invalid \(NTPDownloader.metadataFile) for NTP Download")
                 }
                 
                 self.unzip(data: data) { url, error in
-                    completion(url, error)
+                    completion(url, cacheInfo, error)
                 }
             }
         } else {
-            self.download(path: NTPDownloader.metadataFile) {[weak self] data, error in
+            self.download(path: NTPDownloader.metadataFile, etag: self.getETag()) { [weak self] data, cacheInfo, error in
                 guard let self = self else { return }
                 
                 if let error = error {
-                    return completion(nil, error)
+                    return completion(nil, nil, error)
+                }
+                
+                if let cacheInfo = cacheInfo {
+                    if cacheInfo.statusCode == 304 {
+                        let tempDirectory = FileManager.default.temporaryDirectory
+                        let directory = tempDirectory.appendingPathComponent(NTPDownloader.ntpDownloadsFolder)
+                        return completion(directory, cacheInfo, nil)
+                    }
                 }
                 
                 guard let data = data else {
-                    return completion(nil, "Invalid \(NTPDownloader.metadataFile) for NTP Download")
+                    return completion(nil, nil, "Invalid \(NTPDownloader.metadataFile) for NTP Download")
                 }
                 
                 do {
                     let item = try JSONDecoder().decode(NTPItemInfo.self, from: data)
                     self.unzip(item: item) { url, error in
-                        completion(url, error)
+                        completion(url, cacheInfo, error)
                     }
                 } catch {
-                    completion(nil, error)
+                    completion(nil, nil, error)
                 }
             }
         }
@@ -143,31 +234,49 @@ class NTPDownloader {
     
     //MARK: - Download & Unzipping
     
+    private func parseETagResponseInfo(_ response: HTTPURLResponse) -> CacheResponse {
+        if let etag = response.allHeaderFields["Etag"] as? String {
+            return CacheResponse(statusCode: response.statusCode, etag: etag)
+        }
+        
+        if let etag = response.allHeaderFields["ETag"] as? String {
+            return CacheResponse(statusCode: response.statusCode, etag: etag)
+        }
+        
+        return CacheResponse(statusCode: response.statusCode, etag: "")
+    }
+    
     // Downloads the item at the specified url relative to the BASE_URL
-    private func download(path: String?, _ completion: @escaping (Data?, Error?) -> Void) {
+    private func download(path: String?, etag: String?, _ completion: @escaping (Data?, CacheResponse?, Error?) -> Void) {
         guard var url = self.getBaseURL() else {
-            return completion(nil, nil)
+            return completion(nil, nil, nil)
         }
         
         if let path = path {
             url = url.appendingPathComponent(path)
         }
         
-        let request = URLRequest(url: url)
-        URLSession(configuration: .ephemeral).dataRequest(with: request) { data, response, error in
+        var request = URLRequest(url: url)
+        if let etag = etag {
+            request.setValue(etag, forHTTPHeaderField: "If-None-Match")
+        }
+        
+        URLSession(configuration: .ephemeral).dataRequest(with: request) { [weak self] data, response, error in
+            guard let self = self else { return }
+            
             if let error = error {
-                return completion(nil, error)
+                return completion(nil, nil, error)
             }
             
             guard let response = response as? HTTPURLResponse else {
-                return completion(nil, "Response is not an HTTP Response")
+                return completion(nil, nil, "Response is not an HTTP Response")
             }
             
-            if response.statusCode < 200 || response.statusCode > 299 {
-                return completion(nil, "Invalid Response Code: \(response.statusCode)")
+            if response.statusCode != 304 && (response.statusCode < 200 || response.statusCode > 299) {
+                completion(nil, nil, "Invalid Response Status Code: \(response.statusCode)")
             }
             
-            completion(data, nil)
+            completion(data, self.parseETagResponseInfo(response), nil)
         }
     }
     
@@ -178,9 +287,7 @@ class NTPDownloader {
         
         do {
             try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true, attributes: nil)
-        
-            let destination = directory.absoluteString.replacingOccurrences(of: "file://", with: "")
-            try Unzip.unpack_archive(data: data, to: destination)
+            try Unzip.unpack_archive(data: data, to: directory.path)
             completion(directory, nil)
         } catch {
             completion(nil, error)
@@ -202,7 +309,7 @@ class NTPDownloader {
             
             for itemURL in urls {
                 group.enter()
-                self.download(path: itemURL) { data, err in
+                self.download(path: itemURL, etag: nil) { data, _, err in
                     if let err = err {
                         error = err
                         return group.leave()

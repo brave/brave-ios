@@ -37,7 +37,7 @@ class Unzip {
                 throw "Invalid Zip Entry Name"
             }
             
-            let toPath = path.appendingPathComponent(entryName).absoluteString
+            let toPath = path.appendingPathComponent(entryName).path
             if !FileManager.default.createFile(atPath: toPath, contents: Data(), attributes: nil) {
                 throw "Cannot Create Zip Entry File"
             }
@@ -99,7 +99,7 @@ class Unzip {
                 throw "Invalid Zip Entry Name"
             }
             
-            let toPath = path.appendingPathComponent(entryName).absoluteString
+            let toPath = path.appendingPathComponent(entryName).path
             if !FileManager.default.createFile(atPath: toPath, contents: Data(), attributes: nil) {
                 throw "Cannot Create Zip Entry File"
             }

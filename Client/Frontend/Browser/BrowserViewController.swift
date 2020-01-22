@@ -443,6 +443,8 @@ class BrowserViewController: UIViewController {
         // Re-show toolbar which might have been hidden during scrolling (prior to app moving into the background)
         scrollController.showToolbars(animated: false)
     }
+    
+    let downloader = NTPDownloader(isZipped: false)
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -552,6 +554,8 @@ class BrowserViewController: UIViewController {
         Bookmark.restore_1_12_Bookmarks() {
             log.info("Bookmarks from old database were successfully restored")
         }
+        
+        downloader.update()
     }
     
     /// Initialize Sync without connecting. Sync webview needs to be in a "permanent" location
