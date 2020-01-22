@@ -4,9 +4,9 @@
 
 import BraveShared
 
-internal struct Strings {
+public struct Strings {
   /// "BAT" or "BAT Points" depending on the region
-  static var BAT: String {
+  public static var BAT: String {
     if Preferences.Rewards.isUsingBAP.value == true {
       return "BAP"
     }

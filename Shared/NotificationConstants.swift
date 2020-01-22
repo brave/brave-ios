@@ -54,4 +54,7 @@ extension Notification.Name {
     
     public static let PrivacyModeChanged = Notification.Name("PrivacyModeChanged")
     public static let TopSitesConversion = Notification.Name("TopSitesConversion")
+
+    // MARK: - Rewards
+    public static let adsToggled = Notification.Name("adsToggled")
 }

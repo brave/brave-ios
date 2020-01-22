@@ -95,6 +95,10 @@ extension BrowserViewController {
         // Fetch new promotions
         rewards.ledger.fetchPromotions(nil)
     }
+    
+    @objc func resetNTPNotification() {
+        Preferences.NewTabPage.brandedImageShowed.value = false
+    }
 }
 
 extension BrowserViewController: RewardsUIDelegate {
