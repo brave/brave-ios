@@ -6,6 +6,7 @@ import UIKit
 import SnapKit
 import BraveRewards
 import Network
+import BraveShared
 
 protocol WalletContentView: AnyObject {
   var innerScrollView: UIScrollView? { get }
@@ -228,7 +229,11 @@ class WalletViewController: UIViewController, RewardsSummaryProtocol {
         let updateStates = {
           publisherView.setCheckAgainIsLoading(false)
           publisherView.checkAgainButton.isHidden = true
-          publisherView.setStatus(status)
+          publisherView.setStatus(
+            status,
+            externalWalletStatus: self.state.ledger.upholdWalletStatus,
+            hasBraveFunds: self.state.ledger.walletContainsBraveFunds
+          )
         }
 
         // Create an artificial delay so user sees something is happening
@@ -281,14 +286,22 @@ class WalletViewController: UIViewController, RewardsSummaryProtocol {
       
       guard let publisher = publisher else {
         publisherView.updatePublisherName(state.dataSource?.displayString(for: state.url) ?? "", provider: "")
-        publisherView.setStatus(.notVerified)
+        publisherView.setStatus(
+          .notVerified,
+          externalWalletStatus: state.ledger.upholdWalletStatus,
+          hasBraveFunds: state.ledger.walletContainsBraveFunds
+        )
         return
       }
       
       let provider = " \(publisher.provider.isEmpty ? "" : String(format: Strings.OnProviderText, publisher.providerDisplayString))"
       publisherView.updatePublisherName(publisher.name, provider: provider)
       
-      publisherView.setStatus(publisher.status)
+      publisherView.setStatus(
+        publisher.status,
+        externalWalletStatus: state.ledger.upholdWalletStatus,
+        hasBraveFunds: state.ledger.walletContainsBraveFunds
+      )
       publisherView.checkAgainButton.isHidden = publisher.status != .notVerified
       
       self.publisherSummaryView.setAutoContribute(enabled:
@@ -580,6 +593,23 @@ extension WalletViewController {
       crypto: Strings.WalletBalanceType,
       dollarValue: state.ledger.usdBalanceString
     )
+    if let publisher = publisher {
+      publisherSummaryView.publisherView.setStatus(
+        publisher.status,
+        externalWalletStatus: self.state.ledger.upholdWalletStatus,
+        hasBraveFunds: self.state.ledger.walletContainsBraveFunds
+      )
+    }
+  }
+  
+  /// Fetch an updated external wallet from ledger if the user isn't in JP
+  func updateExternalWallet() {
+    if Preferences.Rewards.isUsingBAP.value == true { return }
+    
+    // If we can show Uphold, grab verification status of the wallet
+    state.ledger.fetchExternalWallet(forType: .uphold) { _ in
+      self.updateWalletHeader()
+    }
   }
   
   func setupLedgerObservers() {
