@@ -7,16 +7,30 @@ import Shared
 
 private let logger = Logger.browserLogger
 
+struct NTPFocalPoint: Codable {
+    let x: Int
+    let y: Int
+}
+
+struct NTPLogo: Codable {
+    let imageUrl: String
+    let alt: String
+    let companyName: String
+    let destinationUrl: URL
+}
+
+struct NTPWallpaper: Codable {
+    let imageUrl: String
+    let focalPoint: NTPFocalPoint?
+}
+
 struct NTPItemInfo: Codable {
-    let logoImageUrl: String
-    let logoAltText: String
-    let logoDestinationUrl: URL
-    let logoCompanyName: String
-    let wallpaperImageUrls: [String]
+    let logo: NTPLogo
+    let wallpapers: [NTPWallpaper]
 }
 
 class NTPDownloader {
-    private static let metadataFile = "photos.json"
+    private static let metadataFile = "photo.json"
     private static let ntpDownloadsFolder = "NTPDownloads"
     private static let baseURL = "https://brave-ntp-crx-input-dev.s3-us-west-2.amazonaws.com/"
     
@@ -61,7 +75,7 @@ class NTPDownloader {
         }
     }
     
-    func download(_ completion: @escaping (URL?, Error?) -> Void) {
+    private func download(_ completion: @escaping (URL?, Error?) -> Void) {
         if self.isZipped {
             self.download(path: nil) { [weak self] data, error in
                 guard let self = self else { return }
@@ -87,7 +101,7 @@ class NTPDownloader {
                 }
                 
                 guard let data = data else {
-                    return completion(nil, "Invalid Photos.json for NTP Download")
+                    return completion(nil, "Invalid \(NTPDownloader.metadataFile) for NTP Download")
                 }
                 
                 do {
@@ -184,7 +198,7 @@ class NTPDownloader {
             
             var error: Error?
             let group = DispatchGroup()
-            let urls = [item.logoImageUrl] + item.wallpaperImageUrls
+            let urls = [item.logo.imageUrl] + item.wallpapers.map({ $0.imageUrl })
             
             for itemURL in urls {
                 group.enter()
