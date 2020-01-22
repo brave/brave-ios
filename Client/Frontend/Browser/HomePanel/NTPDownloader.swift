@@ -3,6 +3,9 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
+import Shared
+
+private let logger = Logger.browserLogger
 
 struct NTPItemInfo: Codable {
     let logoImageUrl: String
@@ -13,14 +16,16 @@ struct NTPItemInfo: Codable {
 }
 
 class NTPDownloader {
-    private static let BASE_URL = "https://brave-ntp-crx-input-dev.s3-us-west-2.amazonaws.com/"
+    private static let metadataFile = "photos.json"
+    private static let ntpDownloadsFolder = "NTPDownloads"
+    private static let baseURL = "https://brave-ntp-crx-input-dev.s3-us-west-2.amazonaws.com/"
     
     private let isZipped: Bool
     private let defaultLocale = "US"
     private let supportedLocales: [String] = []
     private let currentLocale = Locale.current.regionCode
     
-    init(isZipped: Bool = false) {
+    init(isZipped: Bool) {
         self.isZipped = isZipped
     }
     
@@ -28,12 +33,12 @@ class NTPDownloader {
         // Download the NTP Info to a temporary directory
         self.download { url, error in
             if let error = error {
-                print(error)
+                logger.error(error)
                 return
             }
             
             guard let url = url else {
-                print(error)
+                logger.error(error)
                 return
             }
             
@@ -44,14 +49,14 @@ class NTPDownloader {
             }
  
             do {
-                let downloadsURL = supportDirectory.appendingPathComponent("NTPDownloads")
+                let downloadsURL = supportDirectory.appendingPathComponent(NTPDownloader.ntpDownloadsFolder)
                 if FileManager.default.fileExists(atPath: downloadsURL.absoluteString) {
                     try FileManager.default.removeItem(at: downloadsURL)
                 }
                 
                 try FileManager.default.moveItem(at: url, to: downloadsURL)
             } catch {
-                print(error)
+                logger.error(error)
             }
         }
     }
@@ -66,7 +71,7 @@ class NTPDownloader {
                 }
                 
                 guard let data = data else {
-                    return completion(nil, "Invalid Photos.json for NTP Download")
+                    return completion(nil, "Invalid \(NTPDownloader.metadataFile) for NTP Download")
                 }
                 
                 self.unzip(data: data) { url, error in
@@ -74,7 +79,7 @@ class NTPDownloader {
                 }
             }
         } else {
-            self.download(path: "photo.json") {[weak self] data, error in
+            self.download(path: NTPDownloader.metadataFile) {[weak self] data, error in
                 guard let self = self else { return }
                 
                 if let error = error {
@@ -98,7 +103,7 @@ class NTPDownloader {
     }
     
     private func getBaseURL() -> URL? {
-        guard let url = URL(string: NTPDownloader.BASE_URL) else {
+        guard let url = URL(string: NTPDownloader.baseURL) else {
             return nil
         }
         
@@ -141,11 +146,11 @@ class NTPDownloader {
             }
             
             guard let response = response as? HTTPURLResponse else {
-                return completion(nil, error)
+                return completion(nil, "Response is not an HTTP Response")
             }
             
             if response.statusCode < 200 || response.statusCode > 299 {
-                return completion(nil, nil)
+                return completion(nil, "Invalid Response Code: \(response.statusCode)")
             }
             
             completion(data, nil)
@@ -155,7 +160,7 @@ class NTPDownloader {
     // Unzips Data to the temporary directory and returns a URL to the directory
     private func unzip(data: Data, _ completion: @escaping (URL?, Error?) -> Void) {
         let tempDirectory = FileManager.default.temporaryDirectory
-        let directory = tempDirectory.appendingPathComponent("NTPDownloads")
+        let directory = tempDirectory.appendingPathComponent(NTPDownloader.ntpDownloadsFolder)
         
         do {
             try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true, attributes: nil)
@@ -172,7 +177,7 @@ class NTPDownloader {
     // and returning the URL to the directory
     private func unzip(item: NTPItemInfo, _ completion: @escaping (URL?, Error?) -> Void) {
         let tempDirectory = FileManager.default.temporaryDirectory
-        let directory = tempDirectory.appendingPathComponent("NTPDownloads")
+        let directory = tempDirectory.appendingPathComponent(NTPDownloader.ntpDownloadsFolder)
         
         do {
             try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true, attributes: nil)

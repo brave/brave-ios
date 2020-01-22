@@ -5,10 +5,15 @@
 import Foundation
 
 class Unzip {
-    public static func unpack_archive(data: Data, to path: String) throws {
+    private static let zipChunkSize = 512
+    
+    public static func unpack_archive(data: Data, to toPath: String) throws {
+        guard let path = URL(string: toPath) else {
+            throw "Invalid Destination Path: \(toPath)"
+        }
+        
         var data = data
         let count = data.count
-        let path = URL(string: path)!
         let archive = archive_read_new()
         archive_read_support_format_all(archive)
         archive_read_support_compression_all(archive)
@@ -55,7 +60,10 @@ class Unzip {
     }
 
     public static func unpack_archive(from fromPath: String, to toPath: String) throws {
-        let path = URL(string: toPath)!
+        guard let path = URL(string: toPath) else {
+            throw "Invalid Destination Path: \(toPath)"
+        }
+        
         let archive = archive_read_new()
         archive_read_support_format_all(archive)
         archive_read_support_compression_all(archive)
@@ -71,7 +79,7 @@ class Unzip {
             throw error
         }
         
-        if archive_read_open_fd(archive, archiveHandle.fileDescriptor, 512) != ARCHIVE_OK {
+        if archive_read_open_fd(archive, archiveHandle.fileDescriptor, Unzip.zipChunkSize) != ARCHIVE_OK {
             archiveHandle.closeFile()
             throw String(cString: archive_error_string(archive), encoding: .utf8) ?? "Unknown Error Reading Archive at Path: \(fromPath)"
         }
