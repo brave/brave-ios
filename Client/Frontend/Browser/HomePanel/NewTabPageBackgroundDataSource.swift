@@ -21,6 +21,7 @@ class NewTabPageBackgroundDataSource {
             let url: String?
         }
         
+        // TODO: Make optional
         struct FocalPoint: Decodable {
             let x: CGFloat?
             let y: CGFloat?
@@ -34,25 +35,12 @@ class NewTabPageBackgroundDataSource {
     struct Sponsor: Decodable {
         let wallpapers: [Background]
         let logo: Logo
-        let dates: Dates
         
         struct Logo: Decodable {
             let image: String
             let alt: String
             let companyName: String
             let destinationUrl: String
-            let regions: [String: Region]
-            
-            struct Region: Decodable {
-                let image: String
-                let alt: String
-                let destinationUrl: String
-            }
-        }
-        
-        struct Dates: Decodable {
-            let start: String
-            let end: String
         }
     }
 
@@ -64,15 +52,38 @@ class NewTabPageBackgroundDataSource {
     /// This is reset on each launch, so `3` can be shown again if app is removed from memory.
     /// This number _must_ be less than the number of backgrounds!
     private static let numberOfDuplicateAvoidance = 6
-    private static let sponsorshipShowRate = 4 // e.g. 4 == 25% or "every 4th image"
+    /// The number of images in a sponsorship rotation.
+    ///     i.e. This number will be repeated before a new sponsorship is shown.
+    ///          If sposnored image is shown as Nth image, this number of normal images will be shown before Nth is reached again.
+    private static let sponsorshipShowRate = 4
+    /// On this value, a sponsored image will be shown.
+    private static let sponsorshipShowValue = 2
     
+    /// The counter that indicates what background should be shown, this is used to determine when a new
+    ///     sponsored image should be shown. (`1` means, first image in cycle N, should be shown).
+    /// One example, if rotation is every 4 images, but sponsored image should be shown as 2nd image, then this will
+    ///     be reset back to `1` after reaching `4`, and when the value is `2`, a sponsored image will be shown.
+    // This can be easily converted to a preference to persist
+    private var backgroundRotationCounter = 1
+    
+    /// The `index` for the next sponsored image to show.
+    ///     e.g. if `0` it should show the `0th` sponsored image _when a sponsored image should be shown_
+    /// This does _not_ impact _when_ a sponsored image is shown, but rather _what_ sponsored image is shown.
+    /// The maximum of this value is undetermined, as that depends on how many images exist in the current sponsorship.
+    // This can be easily converted to a preference to persist
+    private var sponsoredBackgroundRotationIndex = 0
+
     private lazy var sponsor: Sponsor? = {
         let sponsoredFilePath = "ntp-sponsored"
         guard let sponsoredData = self.loadData(file: sponsoredFilePath) else { return nil }
         // TODO: Wrap
-        let sponsor = try? JSONDecoder().decode(Sponsor.self, from: sponsoredData)
-        // Only set a sponsor if there are valid backgrounds
-        return sponsor?.wallpapers.isEmpty == true ? nil : sponsor
+        do {
+            let sponsor = try JSONDecoder().decode(Sponsor.self, from: sponsoredData)
+            return sponsor.wallpapers.isEmpty == true ? nil : sponsor
+        } catch {
+            // Only set a sponsor if there are valid backgrounds
+            return nil
+        }
     }()
     
     private lazy var standardBackgrounds: [Background] = {
@@ -91,34 +102,53 @@ class NewTabPageBackgroundDataSource {
     private var lastBackgroundChoices = [Int]()
     
     func newBackground() -> Background? {
-        // Determine what type of background to display
-        let useSponsor = Preferences.NewTabPage.backgroundSponsoredImages.value
-            && sponsor != nil
-            && Int.random(in: 0..<NewTabPageBackgroundDataSource.sponsorshipShowRate) == 0
-        guard let dataSet = useSponsor ? sponsor?.wallpapers : standardBackgrounds else { return nil }
-        if dataSet.isEmpty { return nil }
+        // Identifying the background array to use
+        let (backgroundSet, useSponsor) = { () -> ([NewTabPageBackgroundDataSource.Background], Bool) in
+            // Determine what type of background to display
+            let attemptSponsored = Preferences.NewTabPage.backgroundSponsoredImages.value
+                && backgroundRotationCounter == NewTabPageBackgroundDataSource.sponsorshipShowValue
+            
+            if let sponsoredWallpapers = sponsor?.wallpapers, attemptSponsored {
+                sponsoredBackgroundRotationIndex += 1
+                // Force a max, and wrap back down if it is hit.
+                sponsoredBackgroundRotationIndex %= sponsoredWallpapers.count
+                return (sponsoredWallpapers, true)
+            }
+            return (standardBackgrounds, false)
+        }()
         
-        let availableRange = 0..<dataSet.count
-        var randomBackgroundIndex = Int.random(in: availableRange)
-        if !useSponsor {
-            /// This takes all indeces and filters out ones that were shown recently
+        if backgroundSet.isEmpty { return nil }
+        
+        // Choosing the actual index / item to use
+        let backgroundIndex = { () -> Int in
+            if useSponsor {
+                return self.sponsoredBackgroundRotationIndex
+            }
+            
+            let availableRange = 0..<backgroundSet.count
+            // This takes all indeces and filters out ones that were shown recently
             let availableBackgroundIndeces = availableRange.filter {
-                !lastBackgroundChoices.contains($0)
+                !self.lastBackgroundChoices.contains($0)
             }
             // Chooses a new random index to use from the available indeces
             // -1 will result in a `nil` return
-            randomBackgroundIndex = availableBackgroundIndeces.randomElement() ?? -1
-            assert(randomBackgroundIndex >= 0, "randomBackgroundIndex was nil, this is terrible.")
+            let chosenIndex = availableBackgroundIndeces.randomElement() ?? -1
+            assert(chosenIndex >= 0, "randomBackgroundIndex was nil, this is terrible.")
             
             // This index is now added to 'past' tracking list to prevent duplicates
-            lastBackgroundChoices.append(randomBackgroundIndex)
+            self.lastBackgroundChoices.append(chosenIndex)
             // Trimming to fixed length to release older backgrounds
-            lastBackgroundChoices = lastBackgroundChoices.suffix(NewTabPageBackgroundDataSource.numberOfDuplicateAvoidance)
-        }
+            self.lastBackgroundChoices = self.lastBackgroundChoices.suffix(NewTabPageBackgroundDataSource.numberOfDuplicateAvoidance)
+            return chosenIndex
+        }()
         
-        // Item is returned based on our random index.
-        // Could generally use `randomElement()`, but for non-sponsored images, certain indeces are ignored.
-        return dataSet[safe: randomBackgroundIndex]
+        // Force back to `0` if at end
+        backgroundRotationCounter %= NewTabPageBackgroundDataSource.sponsorshipShowRate
+        // Increment regardless, this is a counter, not an index, so smallest should be `1`
+        backgroundRotationCounter += 1
+        
+        // Item is returned based on our special index.
+        return backgroundSet[safe: backgroundIndex]
     }
     
     private func loadData(file: String) -> Data? {

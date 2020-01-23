@@ -1,5 +1,5 @@
-[
-  {
+
+{
     "wallpapers": [
       {
         "image": "branded-1.jpg",
@@ -26,7 +26,7 @@
     "logo": {
       "image": "logo.png",
       "alt": "Technikke - for music lovers",
-      "comapnyName": "Technikke",
+      "companyName": "Technikke",
       "destinationUrl": "https://EAFF.com/competitions/eaff2019/",
       "regions": {
         "invalid": {
@@ -35,10 +35,6 @@
           "destinationUrl": "logo_url"
         }
       }
-    },
-    "dates": {
-      "start": "2019-11-25T00:00:13+09:00",
-      "end": "2020-12-18T00:00:00+09:00"
     }
-  }
-]
+}
+
