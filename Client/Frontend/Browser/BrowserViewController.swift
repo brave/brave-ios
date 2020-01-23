@@ -241,6 +241,8 @@ class BrowserViewController: UIViewController {
             }
         }
         
+        Preferences.NewTabPage.attemptToShowClaimRewardsNotification.value = true
+        
         notificationsHandler = AdsNotificationHandler(ads: rewards.ads, presentingController: self)
         notificationsHandler?.canShowNotifications = { [weak self] in
             guard let self = self else { return false }
@@ -278,6 +280,9 @@ class BrowserViewController: UIViewController {
         rewardsObserver.notificationsRemoved = { [weak self] _ in
             guard let self = self, self.isViewLoaded else { return }
             self.updateRewardsButtonState()
+        }
+        rewardsObserver.rewardsEnabledStateUpdated = { [weak self] _ in
+            self?.resetNTPNotification()
         }
     }
     
@@ -449,9 +454,19 @@ class BrowserViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        NotificationCenter.default.addObserver(self, selector: #selector(appWillResignActiveNotification), name: UIApplication.willResignActiveNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(appDidBecomeActiveNotification), name: UIApplication.didBecomeActiveNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(appDidEnterBackgroundNotification), name: UIApplication.didEnterBackgroundNotification, object: nil)
+        NotificationCenter.default.do {
+            $0.addObserver(self, selector: #selector(appWillResignActiveNotification),
+                           name: UIApplication.willResignActiveNotification, object: nil)
+            $0.addObserver(self, selector: #selector(appDidBecomeActiveNotification),
+                           name: UIApplication.didBecomeActiveNotification, object: nil)
+            $0.addObserver(self, selector: #selector(appDidEnterBackgroundNotification),
+                           name: UIApplication.didEnterBackgroundNotification, object: nil)
+            $0.addObserver(self, selector: #selector(resetNTPNotification),
+                           name: .adsToggled, object: nil)
+            
+        }
+        
+        
         KeyboardHelper.defaultHelper.addDelegate(self)
 
         webViewContainerBackdrop = UIView()
@@ -578,8 +593,10 @@ class BrowserViewController: UIViewController {
         present(alert, animated: true, completion: nil)
         #endif
         
-        sync.webView.alpha = 0.01
-        UIApplication.shared.keyWindow?.insertSubview(Sync.shared.webView, at: 0)
+        DispatchQueue.main.async {
+            sync.webView.alpha = 0.01
+            UIApplication.shared.keyWindow?.insertSubview(Sync.shared.webView, at: 0)
+        }
     }
     
     fileprivate func setupTabs() {
@@ -940,7 +957,10 @@ class BrowserViewController: UIViewController {
         homePanelIsInline = inline
 
         if favoritesViewController == nil {
-            let homePanelController = FavoritesViewController(profile: profile, background: backgroundDataSource.newBackground())
+            let homePanelController = FavoritesViewController(profile: profile,
+                                                              fromOverlay: !inline,
+                                                              rewards: rewards,
+                                                              background: backgroundDataSource.newBackground())
             homePanelController.delegate = self
             homePanelController.view.alpha = 0
             homePanelController.applyTheme(Theme.of(tabManager.selectedTab))
@@ -968,7 +988,7 @@ class BrowserViewController: UIViewController {
         })
         view.setNeedsUpdateConstraints()
     }
-
+    
     fileprivate func hideHomePanelController() {
         if let controller = favoritesViewController {
             self.favoritesViewController = nil
@@ -3344,7 +3364,7 @@ extension BrowserViewController: ToolbarUrlActionsDelegate {
     }
 }
 
-extension BrowserViewController: TopSitesDelegate {
+extension BrowserViewController: FavoritesDelegate {
     
     func didSelect(input: String) {
         processAddressBar(text: input, visitType: .bookmark)
@@ -3356,6 +3376,22 @@ extension BrowserViewController: TopSitesDelegate {
     
     func didTapShowMoreFavorites() {
         topToolbarDidTapBookmarkButton(nil, favorites: true)
+    }
+    
+    func openBrandedImageCallout(state: BrandedImageCalloutState?) {
+        guard let state = state, state.hasDetailViewController else { return }
+        
+        let vc = NTPLearnMoreViewController(state: state, rewards: rewards)
+        
+        vc.linkHandler = { [weak self] url in
+            self?.tabManager.selectedTab?.loadRequest(PrivilegedRequest(url: url) as URLRequest)
+        }
+
+        addChild(vc)
+        view.addSubview(vc.view)
+        vc.view.snp.remakeConstraints {
+            $0.right.top.bottom.leading.equalToSuperview()
+        }
     }
 }
 

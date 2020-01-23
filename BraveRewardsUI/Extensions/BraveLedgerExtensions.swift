@@ -11,10 +11,60 @@ private let log = Logger.rewardsLogger
 
 extension BraveLedger {
   
+  // MARK: - Auto-Contribute Publisher Helpers
+  
+  var supportedPublishersFilter: ActivityInfoFilter {
+    let sort = ActivityInfoFilterOrderPair().then {
+      $0.propertyName = "percent"
+      $0.ascending = false
+    }
+    let filter = ActivityInfoFilter().then {
+      $0.id = ""
+      $0.excluded = .filterAllExceptExcluded
+      $0.percent = 1 //exclude 0% sites.
+      $0.orderBy = [sort]
+      $0.nonVerified = self.allowUnverifiedPublishers
+      $0.reconcileStamp = self.autoContributeProps.reconcileStamp
+    }
+    return filter
+  }
+  
+  var excludedPublishersFilter: ActivityInfoFilter {
+    return ActivityInfoFilter().then {
+      $0.id = ""
+      $0.excluded = .filterExcluded
+      $0.nonVerified = self.allowUnverifiedPublishers
+      $0.reconcileStamp = self.autoContributeProps.reconcileStamp
+    }
+  }
+  
+  // MARK: - External Wallet Helpers
+  
+  var walletBalances: [WalletType: Double] {
+    guard let wallets = balance?.wallets else { return [:] }
+    var balances: [WalletType: Double] = [:]
+    for wallet in wallets {
+      balances[WalletType(rawValue: wallet.key)] = wallet.value.doubleValue
+    }
+    return balances
+  }
+  
+  var walletContainsBraveFunds: Bool {
+    let balances = walletBalances
+    return (balances[.anonymous] ?? 0) > 0 || (balances[.unblindedTokens] ?? 0) > 0
+  }
+  
+  var upholdWalletStatus: WalletStatus {
+    guard let userWallet = externalWallets[.uphold] else { return .notConnected }
+    return userWallet.status
+  }
+  
   /// The total balance or 0 if the balance hasn't been loaded yet
   fileprivate var balanceTotal: Double {
     return balance?.total ?? 0
   }
+  
+  // MARK: - Balance and Currency Helpers
   
   /// Get the current BAT wallet balance for display
   var balanceString: String { return BATValue(balanceTotal).displayString }

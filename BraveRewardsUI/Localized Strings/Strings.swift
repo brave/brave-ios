@@ -52,7 +52,8 @@ internal extension Strings {
   static let addFunds = NSLocalizedString("BraveRewardsAddFunds", bundle: .rewardsUI, value: "Add Funds", comment: "")
   static let withdrawFunds = NSLocalizedString("BraveRewardsWithdrawFunds", bundle: .rewardsUI, value: "Withdraw Funds", comment: "")
   static let emptyTipsText = NSLocalizedString("BraveRewardsEmptyTipsText", bundle: .rewardsUI, value: "Have you tipped your favorite content creator today?", comment: "")
-  static let settings = NSLocalizedString("BraveRewardsSettings", bundle: .rewardsUI, value: "Settings", comment: "")
+  static let settings = NSLocalizedString("BraveRewardsSettings", bundle: .rewardsUI,
+                                                      value: "Settings", comment: "")
   static let autoContributeMinimumVisits = NSLocalizedString("BraveRewardsAutoContributeMinimumVisits", bundle: .rewardsUI, value: "Minimum Visits", comment: "")
   static let addFundsShowQRCode = NSLocalizedString("BraveRewardsAddFundsShowQRCode", bundle: .rewardsUI, value: "Show QR Code", comment: "")
   static let rewardsOptInPrefix = NSLocalizedString("RewardsOptInPrefix", bundle: .rewardsUI, value: "Get ready to experience the next Internet.", comment: "")
@@ -88,6 +89,7 @@ internal extension Strings {
   static let emptyWalletTitle = NSLocalizedString("BraveRewardsEmptyWalletTitle", bundle: .rewardsUI, value: "Your wallet is ready for action.", comment: "")
   static let recurringTipTitle = NSLocalizedString("BraveRewardsRecurringTipTitle", bundle: .rewardsUI, value: "Recurring tip", comment: "")
   static let unverifiedPublisherDisclaimer = NSLocalizedString("BraveRewardsUnverifiedPublisherDisclaimer", bundle: .rewardsUI, value: "This creator has not yet signed up to receive contributions from Brave users. Any tips you send will remain in your wallet until they verify.", comment: "")
+  static let connectedPublisherDisclaimer = NSLocalizedString("BraveRewardsConnectedPublisherDisclaimer", bundle: .rewardsUI, value: "This Brave Verified Creator has not yet configured their account to receive contributions from Brave Users. Any tips you send will remain in your wallet until they complete this process.", comment: "")
   static let settingsGrantClaimButtonTitle = NSLocalizedString("BraveRewardsSettingsGrantClaimButtonTitle", bundle: .rewardsUI, value: "Claim", comment: "")
   static let autoContributeMinimumLength = NSLocalizedString("BraveRewardsAutoContributeMinimumLength", bundle: .rewardsUI, value: "Minimum Page Time", comment: "")
   static let autoContributeMinimumVisitsMessage = NSLocalizedString("BraveRewardsAutoContributeMinimumVisitsMessage", bundle: .rewardsUI, value: "Minimum visits for publisher relevancy", comment: "")
@@ -156,6 +158,7 @@ internal extension Strings {
   static let learnMoreCreateWallet1 = NSLocalizedString("BraveRewardsLearnMoreCreateWallet1", bundle: .rewardsUI, value: "Yes, I'm In!", comment: "")
   static let learnMoreBraveAdsTitle = NSLocalizedString("BraveRewardsLearnMoreBraveAdsTitle", bundle: .rewardsUI, value: "Ads", comment: "")
   static let tippingUnverifiedDisclaimer = NSLocalizedString("BraveRewardsTippingUnverifiedDisclaimer", bundle: .rewardsUI, value: "NOTE: This creator has not yet signed up to receive contributions from Brave users. Your browser will keep trying to contribute until they verify, or until 90 days have passed.", comment: "")
+  static let tippingNotConnectedDisclaimer = NSLocalizedString("BraveRewardsTippingNotConnectedDisclaimer", bundle: .rewardsUI, value: "NOTE: This Brave Verified Creator has not yet signed up to receive contributions from Brave users. Your browser will keep trying to contribute until they verify, or until 90 days have passed.", comment: "")
   static let settingsTipsBody = NSLocalizedString("BraveRewardsSettingsTipsBody", bundle: .rewardsUI, value: "Tip content creators directly as you browse. You can also set up recurring monthly tips so you can support sites continuously.", comment: "")
   static let cancel = NSLocalizedString("Cancel", bundle: .rewardsUI, value: "Cancel", comment: "")
   static let disabledSubtitle = NSLocalizedString("BraveRewardsDisabledSubtitle", bundle: .rewardsUI, value: "Get Rewarded for Browsing!", comment: "")
@@ -288,5 +291,9 @@ internal extension Strings {
   static let userWalletNotificationWalletDisconnectedBody = NSLocalizedString("UserWalletNotificationWalletDisconnectedBody", bundle: .rewardsUI, value: "No worries. This can happen for a variety of security reasons. Reconnecting your wallet will solve this issue.", comment: "The message you receive when your user wallet is unreachable/disconnected")
   static let userWalletNotificationNowVerifiedTitle = NSLocalizedString("UserWalletNotificationNowVerifiedTitle", bundle: .rewardsUI, value: "Your wallet is verified!", comment: "The message you receive when your user wallet has been verified")
   static let userWalletNotificationNowVerifiedBody = NSLocalizedString("UserWalletNotificationNowVerifiedBody", bundle: .rewardsUI, value: "Congrats! Your %@ wallet was successfully verified and ready to add and withdraw funds.", comment: "The message you receive when your user wallet has been verified (%@ = The user wallet name, such as \"Uphold\")")
+  static let exclusionListTitle = NSLocalizedString("ExclusionListTitle", bundle: .rewardsUI, value: "Excluded sites", comment: "The title of the screen that shows a list of excluded sites for Auto-Contribute")
+  static let restoreAllSitesToolbarButtonTitle = NSLocalizedString("ExclusionListRestoreAllButton", bundle: .rewardsUI, value: "Restore All Sites", comment: "The button that restores all excluded publishers while on the Auto-Contribute excluson list")
+  static let restore = NSLocalizedString("ExclusionListRestore", bundle: .rewardsUI, value: "Restore", comment: "The swipe-to-delete title when restoring a single item in the Auto-Contribute exclusion list")
+  static let emptyExclusionList = NSLocalizedString("EmptyExclusionList", bundle: .rewardsUI, value: "No publishers excluded", comment: "The copy the user sees when they are viewing an empty Auto-Contribute exclusion list.")
 }
 
