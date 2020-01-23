@@ -98,6 +98,7 @@ extension BrowserViewController {
     
     @objc func resetNTPNotification() {
         Preferences.NewTabPage.brandedImageShowed.value = false
+        Preferences.NewTabPage.atleastOneNTPNotificationWasShowed.value = false
     }
 }
 
