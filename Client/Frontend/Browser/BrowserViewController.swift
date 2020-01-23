@@ -444,7 +444,7 @@ class BrowserViewController: UIViewController {
         scrollController.showToolbars(animated: false)
     }
     
-    let downloader = NTPDownloader(isZipped: false)
+    let downloader = NTPDownloader()
 
     override func viewDidLoad() {
         super.viewDidLoad()

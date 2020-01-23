@@ -658,11 +658,9 @@
 		5E612A8F234B7FCA007D12B5 /* OnboardingRewardsAgreementViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E1D8C6A232BF95200BDE662 /* OnboardingRewardsAgreementViewController.swift */; };
 		5E612A90234B7FCD007D12B5 /* OnboardingRewardsAgreementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E1D8C6C232BF9C200BDE662 /* OnboardingRewardsAgreementView.swift */; };
 		5E6683A923D61CF7005B3A6C /* NTPDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E6683A823D61CF7005B3A6C /* NTPDownloader.swift */; };
-		5E73705523D22E24003CC67C /* Unzip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E73705423D22E24003CC67C /* Unzip.swift */; };
 		5E77F9A8236B362800E1649C /* DeviceCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E856FE7235E083B0094E113 /* DeviceCheck.swift */; };
 		5E77F9AA236B362E00E1649C /* Cryptography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E856FE5235E08110094E113 /* Cryptography.swift */; };
 		5E77F9DD236BB68700E1649C /* AttestationDebugger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E77F9DC236BB68700E1649C /* AttestationDebugger.swift */; };
-		5E8CD8DE23D5E36000548FC0 /* libarchive.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E8CD8DD23D5E36000548FC0 /* libarchive.h */; };
 		5E8CD8E123D5E3DA00548FC0 /* libarchive.2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E8CD8E023D5E3D100548FC0 /* libarchive.2.tbd */; };
 		5E9288CA22DF864C007BE7A6 /* TabSessionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E9288C922DF864C007BE7A6 /* TabSessionTests.swift */; };
 		5EA8438E234F802C00076A91 /* expired.badssl.com-root-ca.cer in Resources */ = {isa = PBXBuildFile; fileRef = 5EA84389234F802C00076A91 /* expired.badssl.com-root-ca.cer */; };
@@ -2098,11 +2096,9 @@
 		5E4845BF22DE381200372022 /* WindowRenderHelper.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = WindowRenderHelper.js; sourceTree = "<group>"; };
 		5E4845C122DE3DF800372022 /* WindowRenderHelperScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowRenderHelperScript.swift; sourceTree = "<group>"; };
 		5E6683A823D61CF7005B3A6C /* NTPDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NTPDownloader.swift; sourceTree = "<group>"; };
-		5E73705423D22E24003CC67C /* Unzip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Unzip.swift; sourceTree = "<group>"; };
 		5E77F9DC236BB68700E1649C /* AttestationDebugger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttestationDebugger.swift; sourceTree = "<group>"; };
 		5E856FE5235E08110094E113 /* Cryptography.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = Cryptography.swift; sourceTree = "<group>"; tabWidth = 2; };
 		5E856FE7235E083B0094E113 /* DeviceCheck.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = DeviceCheck.swift; sourceTree = "<group>"; tabWidth = 2; };
-		5E8CD8DD23D5E36000548FC0 /* libarchive.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libarchive.h; sourceTree = "<group>"; };
 		5E8CD8E023D5E3D100548FC0 /* libarchive.2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libarchive.2.tbd; path = usr/lib/libarchive.2.tbd; sourceTree = SDKROOT; };
 		5E9288C922DF864C007BE7A6 /* TabSessionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabSessionTests.swift; sourceTree = "<group>"; };
 		5EA84389234F802C00076A91 /* expired.badssl.com-root-ca.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = "expired.badssl.com-root-ca.cer"; sourceTree = "<group>"; };
@@ -2799,9 +2795,7 @@
 				5DB474F0237F4CC9007B7652 /* ntp-data.json */,
 				5D5374B42388733A00A2B587 /* NTO_Sponsored */,
 				5DB474CE237F4BE9007B7652 /* NTP_Images */,
-				5E73705423D22E24003CC67C /* Unzip.swift */,
 				5E6683A823D61CF7005B3A6C /* NTPDownloader.swift */,
-				5E8CD8DD23D5E36000548FC0 /* libarchive.h */,
 			);
 			path = HomePanel;
 			sourceTree = "<group>";
@@ -4800,7 +4794,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				4422D50821BFFB7600BF1855 /* port_posix.h in Headers */,
-				5E8CD8DE23D5E36000548FC0 /* libarchive.h in Headers */,
 				4422D4CD21BFFB7600BF1855 /* cache.h in Headers */,
 				4422D50621BFFB7600BF1855 /* port.h in Headers */,
 				4422D4C421BFFB7600BF1855 /* hash.h in Headers */,
@@ -6126,7 +6119,6 @@
 				D0C95EF6201A55A800E4E51C /* BrowserViewController+UIDropInteractionDelegate.swift in Sources */,
 				44331DD622551E15007E3E93 /* ToolbarProtocols.swift in Sources */,
 				0A1E84422190A57F0042F782 /* SyncPairCameraViewController.swift in Sources */,
-				5E73705523D22E24003CC67C /* Unzip.swift in Sources */,
 				44331DDC22561F34007E3E93 /* ToolbarUrlActionsDelegate.swift in Sources */,
 				4422D43721BFD29E00BF1855 /* NSData+GZIP.m in Sources */,
 				D31CF65C1CC1959A001D0BD0 /* PrivilegedRequest.swift in Sources */,

@@ -35,14 +35,9 @@ class NTPDownloader {
     private static let ntpDownloadsFolder = "NTPDownloads"
     private static let baseURL = "https://brave-ntp-crx-input-dev.s3-us-west-2.amazonaws.com/"
     
-    private let isZipped: Bool
     private let defaultLocale = "US"
     private let supportedLocales: [String] = []
     private let currentLocale = Locale.current.regionCode
-    
-    init(isZipped: Bool) {
-        self.isZipped = isZipped
-    }
     
     func getNTPInfo(_ completion: @escaping (NTPItemInfo?) -> Void) {
         // Download the NTP Info to a temporary directory
@@ -176,54 +171,32 @@ class NTPDownloader {
     }
     
     private func downloadMetadata(_ completion: @escaping (URL?, CacheResponse?, NTPError?) -> Void) {
-        if self.isZipped {
-            self.download(path: nil, etag: self.getETag()) { [weak self] data, cacheInfo, error in
-                guard let self = self else { return }
-                
-                if let error = error {
-                    return completion(nil, nil, .metadataError(error))
-                }
-                
-                if let cacheInfo = cacheInfo, cacheInfo.statusCode == 304 {
-                    return completion(nil, cacheInfo, nil)
-                }
-                
-                guard let data = data else {
-                    return completion(nil, nil, .metadataError("Invalid \(NTPDownloader.metadataFile) for NTP Download"))
-                }
-                
-                self.unzip(data: data) { url, error in
+        self.download(path: NTPDownloader.metadataFile, etag: self.getETag()) { [weak self] data, cacheInfo, error in
+            guard let self = self else { return }
+            
+            if let error = error {
+                return completion(nil, nil, .metadataError(error))
+            }
+            
+            if let cacheInfo = cacheInfo, cacheInfo.statusCode == 304 {
+                return completion(nil, cacheInfo, nil)
+            }
+            
+            guard let data = data else {
+                return completion(nil, nil, .metadataError("Invalid \(NTPDownloader.metadataFile) for NTP Download"))
+            }
+            
+            if self.isCampaignEnded(data: data) {
+                return completion(nil, nil, .campaignEnded)
+            }
+            
+            do {
+                let item = try JSONDecoder().decode(NTPItemInfo.self, from: data)
+                self.unpackMetadata(item: item) { url, error in
                     completion(url, cacheInfo, error)
                 }
-            }
-        } else {
-            self.download(path: NTPDownloader.metadataFile, etag: self.getETag()) { [weak self] data, cacheInfo, error in
-                guard let self = self else { return }
-                
-                if let error = error {
-                    return completion(nil, nil, .metadataError(error))
-                }
-                
-                if let cacheInfo = cacheInfo, cacheInfo.statusCode == 304 {
-                    return completion(nil, cacheInfo, nil)
-                }
-                
-                guard let data = data else {
-                    return completion(nil, nil, .metadataError("Invalid \(NTPDownloader.metadataFile) for NTP Download"))
-                }
-                
-                if self.isCampaignEnded(data: data) {
-                    return completion(nil, nil, .campaignEnded)
-                }
-                
-                do {
-                    let item = try JSONDecoder().decode(NTPItemInfo.self, from: data)
-                    self.unzip(item: item) { url, error in
-                        completion(url, cacheInfo, error)
-                    }
-                } catch {
-                    completion(nil, nil, .unzipError(error))
-                }
+            } catch {
+                completion(nil, nil, .unpackError(error))
             }
         }
     }
@@ -231,11 +204,6 @@ class NTPDownloader {
     private func getBaseURL() -> URL? {
         guard let url = URL(string: NTPDownloader.baseURL) else {
             return nil
-        }
-        
-        if self.isZipped {
-            return url.appendingPathComponent(getSupportedLocale())
-                      .appendingPathExtension("zip")
         }
         
         return url.appendingPathComponent(getSupportedLocale())
@@ -253,7 +221,7 @@ class NTPDownloader {
         return self.defaultLocale
     }
     
-    //MARK: - Download & Unzipping
+    //MARK: - Download & Unpacking
     
     private func parseETagResponseInfo(_ response: HTTPURLResponse) -> CacheResponse {
         if let etag = response.allHeaderFields["Etag"] as? String {
@@ -301,23 +269,9 @@ class NTPDownloader {
         }
     }
     
-    // Unzips Data to the temporary directory and returns a URL to the directory
-    private func unzip(data: Data, _ completion: @escaping (URL?, NTPError?) -> Void) {
-        let tempDirectory = FileManager.default.temporaryDirectory
-        let directory = tempDirectory.appendingPathComponent(NTPDownloader.ntpDownloadsFolder)
-        
-        do {
-            try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true, attributes: nil)
-            try Unzip.unpack_archive(data: data, to: directory.path)
-            completion(directory, nil)
-        } catch {
-            completion(nil, .unzipError(error))
-        }
-    }
-    
-    // Unzips NTPItemInfo by downloading all of its assets to a temporary directory
+    // Unpacks NTPItemInfo by downloading all of its assets to a temporary directory
     // and returning the URL to the directory
-    private func unzip(item: NTPItemInfo, _ completion: @escaping (URL?, NTPError?) -> Void) {
+    private func unpackMetadata(item: NTPItemInfo, _ completion: @escaping (URL?, NTPError?) -> Void) {
         let tempDirectory = FileManager.default.temporaryDirectory
         let directory = tempDirectory.appendingPathComponent(NTPDownloader.ntpDownloadsFolder)
         
@@ -357,13 +311,13 @@ class NTPDownloader {
             
             group.notify(queue: .main) {
                 if let error = error {
-                    return completion(nil, .unzipError(error))
+                    return completion(nil, .unpackError(error))
                 }
                 
                 completion(directory, nil)
             }
         } catch {
-            completion(nil, .unzipError(error))
+            completion(nil, .unpackError(error))
         }
     }
     
@@ -395,7 +349,7 @@ class NTPDownloader {
     private enum NTPError: Error {
         case campaignEnded
         case metadataError(Error)
-        case unzipError(Error)
+        case unpackError(Error)
         case loadingError(Error)
         
         func underlyingError() -> Error? {
@@ -404,7 +358,7 @@ class NTPDownloader {
                 return nil
                 
             case .metadataError(let error),
-                 .unzipError(let error),
+                 .unpackError(let error),
                  .loadingError(let error):
                 return error
             }
