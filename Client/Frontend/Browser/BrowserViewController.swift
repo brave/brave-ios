@@ -555,7 +555,9 @@ class BrowserViewController: UIViewController {
             log.info("Bookmarks from old database were successfully restored")
         }
         
-        downloader.update()
+        downloader.getNTPInfo { info in
+            print(info)
+        }
     }
     
     /// Initialize Sync without connecting. Sync webview needs to be in a "permanent" location

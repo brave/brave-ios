@@ -46,15 +46,20 @@ class NTPDownloader {
     
     func getNTPInfo(_ completion: @escaping (NTPItemInfo?) -> Void) {
         // Download the NTP Info to a temporary directory
-        self.download { [weak self] url, cacheInfo, error in
+        self.downloadMetadata { [weak self] url, cacheInfo, error in
             guard let self = self else { return }
             
-            if let error = error {
-                logger.error(error)
-                return completion(self.loadNTPInfo())
+            if case .campaignEnded = error {
+                do {
+                    try self.removeCampaign()
+                } catch {
+                    logger.error(error)
+                }
+                
+                return completion(nil)
             }
             
-            guard let url = url else {
+            if let error = error?.underlyingError() {
                 logger.error(error)
                 return completion(self.loadNTPInfo())
             }
@@ -64,19 +69,21 @@ class NTPDownloader {
                 return completion(self.loadNTPInfo())
             }
             
-            //Move contents of `url` directory
-            //to somewhere more permanent where we'll load the images from..
-            guard let supportDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
+            guard let url = url else {
+                logger.error("Invalid NTP Temporary Downloads URL")
                 return completion(self.loadNTPInfo())
             }
+            
+            //Move contents of `url` directory
+            //to somewhere more permanent where we'll load the images from..
  
             do {
-                let downloadsURL = supportDirectory.appendingPathComponent(NTPDownloader.ntpDownloadsFolder)
-                if FileManager.default.fileExists(atPath: downloadsURL.path) {
-                    try FileManager.default.removeItem(at: downloadsURL)
+                let downloadsFolderURL = try self.ntpDownloadsURL()
+                if FileManager.default.fileExists(atPath: downloadsFolderURL.path) {
+                    try FileManager.default.removeItem(at: downloadsFolderURL)
                 }
                 
-                try FileManager.default.moveItem(at: url, to: downloadsURL)
+                try FileManager.default.moveItem(at: url, to: downloadsFolderURL)
                 
                 //Store the ETag
                 if let cacheInfo = cacheInfo {
@@ -92,30 +99,31 @@ class NTPDownloader {
     }
     
     private func loadNTPInfo() -> NTPItemInfo? {
-        guard let supportDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
-            return nil
-        }
-        
-        let downloadsURL = supportDirectory.appendingPathComponent(NTPDownloader.ntpDownloadsFolder)
-        let metaDataURL = downloadsURL.appendingPathComponent(NTPDownloader.metadataFile)
-        
-        if !FileManager.default.fileExists(atPath: metaDataURL.path) {
-            return nil
-        }
         
         do {
-            let metadata = try Data(contentsOf: metaDataURL)
+            let metadataFileURL = try self.ntpMetadataFileURL()
+            if !FileManager.default.fileExists(atPath: metadataFileURL.path) {
+                return nil
+            }
+            
+            let metadata = try Data(contentsOf: metadataFileURL)
+            if self.isCampaignEnded(data: metadata) {
+                try self.removeCampaign()
+                return nil
+            }
+            
+            let downloadsFolderURL = try self.ntpDownloadsURL()
             let itemInfo = try JSONDecoder().decode(NTPItemInfo.self, from: metadata)
             
-            let logo = NTPLogo(imageUrl: metaDataURL.appendingPathComponent(itemInfo.logo.imageUrl).path,
+            let logo = NTPLogo(imageUrl: downloadsFolderURL.appendingPathComponent(itemInfo.logo.imageUrl).path,
                                alt: itemInfo.logo.alt,
                                companyName: itemInfo.logo.companyName,
                                destinationUrl: itemInfo.logo.destinationUrl)
             
-            let wallpapers = itemInfo.wallpapers.map({
-                return NTPWallpaper(imageUrl: metaDataURL.appendingPathComponent($0.imageUrl).path,
-                                    focalPoint: $0.focalPoint)
-            })
+            let wallpapers = itemInfo.wallpapers.map {
+                NTPWallpaper(imageUrl: downloadsFolderURL.appendingPathComponent($0.imageUrl).path,
+                             focalPoint: $0.focalPoint)
+            }
             
             return NTPItemInfo(logo: logo, wallpapers: wallpapers)
         } catch {
@@ -126,81 +134,62 @@ class NTPDownloader {
     }
     
     private func getETag() -> String? {
-        guard let supportDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
+        do {
+            let etagFileURL = try self.ntpETagFileURL()
+            if !FileManager.default.fileExists(atPath: etagFileURL.path) {
+                return nil
+            }
+            
+            return try? String(contentsOfFile: etagFileURL.path, encoding: .utf8)
+        } catch {
+            logger.error(error)
             return nil
         }
-        
-        let downloadsURL = supportDirectory.appendingPathComponent(NTPDownloader.ntpDownloadsFolder)
-        if !FileManager.default.fileExists(atPath: downloadsURL.path) {
-            return nil
-        }
-        
-        let etagURL = downloadsURL.appendingPathComponent(NTPDownloader.etagFile)
-        if !FileManager.default.fileExists(atPath: etagURL.path) {
-            return nil
-        }
-        
-        return try? String(contentsOfFile: etagURL.path, encoding: .utf8)
     }
     
     private func setETag(_ etag: String) {
-        guard let supportDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
-            logger.error("Cannot find Support Directory for writing NTPDownloader ETag")
-            return
-        }
-        
-        let downloadsURL = supportDirectory.appendingPathComponent(NTPDownloader.ntpDownloadsFolder)
-        
         do {
-            try FileManager.default.createDirectory(at: downloadsURL, withIntermediateDirectories: true, attributes: nil)
-        } catch {
-            logger.error("NTPDownloader: \(error)")
-            return
-        }
-        
-        let etagURL = downloadsURL.appendingPathComponent(NTPDownloader.etagFile)
-        
-        do {
+            let downloadsFolderURL = try self.ntpDownloadsURL()
+            try FileManager.default.createDirectory(at: downloadsFolderURL, withIntermediateDirectories: true, attributes: nil)
+            
+            let etagFileURL = try self.ntpETagFileURL()
             let etag = etag.replacingOccurrences(of: "\"", with: "")
-            try etag.write(to: etagURL, atomically: true, encoding: .utf8)
+            try etag.write(to: etagFileURL, atomically: true, encoding: .utf8)
         } catch {
-            logger.error("NTPDownloader: \(error)")
+            logger.error(error)
         }
     }
     
     private func removeETag() throws {
-        guard let supportDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
-            logger.error("Cannot find Support Directory for writing NTPDownloader ETag")
-            return
-        }
-        
-        let downloadsURL = supportDirectory.appendingPathComponent(NTPDownloader.ntpDownloadsFolder)
-        let etagURL = downloadsURL.appendingPathComponent(NTPDownloader.etagFile)
-        
-        if FileManager.default.fileExists(atPath: etagURL.path) {
-            try FileManager.default.removeItem(at: etagURL)
+        let etagFileURL = try self.ntpETagFileURL()
+        if FileManager.default.fileExists(atPath: etagFileURL.path) {
+            try FileManager.default.removeItem(at: etagFileURL)
         }
     }
     
-    private func download(_ completion: @escaping (URL?, CacheResponse?, Error?) -> Void) {
+    private func removeCampaign() throws {
+        try self.removeETag()
+        let downloadsFolderURL = try self.ntpDownloadsURL()
+        if FileManager.default.fileExists(atPath: downloadsFolderURL.path) {
+            try FileManager.default.removeItem(at: downloadsFolderURL)
+        }
+    }
+    
+    private func downloadMetadata(_ completion: @escaping (URL?, CacheResponse?, NTPError?) -> Void) {
         if self.isZipped {
             self.download(path: nil, etag: self.getETag()) { [weak self] data, cacheInfo, error in
                 guard let self = self else { return }
                 
                 if let error = error {
-                    return completion(nil, nil, error)
+                    return completion(nil, nil, .metadataError(error))
                 }
                 
-                if let cacheInfo = cacheInfo {
-                    if cacheInfo.statusCode == 304 {
-                        let tempDirectory = FileManager.default.temporaryDirectory
-                        let directory = tempDirectory.appendingPathComponent(NTPDownloader.ntpDownloadsFolder)
-                        return completion(directory, cacheInfo, nil)
-                    }
+                if let cacheInfo = cacheInfo, cacheInfo.statusCode == 304 {
+                    return completion(nil, cacheInfo, nil)
                 }
                 
                 guard let data = data else {
-                    return completion(nil, nil, "Invalid \(NTPDownloader.metadataFile) for NTP Download")
+                    return completion(nil, nil, .metadataError("Invalid \(NTPDownloader.metadataFile) for NTP Download"))
                 }
                 
                 self.unzip(data: data) { url, error in
@@ -212,19 +201,19 @@ class NTPDownloader {
                 guard let self = self else { return }
                 
                 if let error = error {
-                    return completion(nil, nil, error)
+                    return completion(nil, nil, .metadataError(error))
                 }
                 
-                if let cacheInfo = cacheInfo {
-                    if cacheInfo.statusCode == 304 {
-                        let tempDirectory = FileManager.default.temporaryDirectory
-                        let directory = tempDirectory.appendingPathComponent(NTPDownloader.ntpDownloadsFolder)
-                        return completion(directory, cacheInfo, nil)
-                    }
+                if let cacheInfo = cacheInfo, cacheInfo.statusCode == 304 {
+                    return completion(nil, cacheInfo, nil)
                 }
                 
                 guard let data = data else {
-                    return completion(nil, nil, "Invalid \(NTPDownloader.metadataFile) for NTP Download")
+                    return completion(nil, nil, .metadataError("Invalid \(NTPDownloader.metadataFile) for NTP Download"))
+                }
+                
+                if self.isCampaignEnded(data: data) {
+                    return completion(nil, nil, .campaignEnded)
                 }
                 
                 do {
@@ -233,7 +222,7 @@ class NTPDownloader {
                         completion(url, cacheInfo, error)
                     }
                 } catch {
-                    completion(nil, nil, error)
+                    completion(nil, nil, .unzipError(error))
                 }
             }
         }
@@ -278,7 +267,7 @@ class NTPDownloader {
         return CacheResponse(statusCode: response.statusCode, etag: "")
     }
     
-    // Downloads the item at the specified url relative to the BASE_URL
+    // Downloads the item at the specified url relative to the baseUrl
     private func download(path: String?, etag: String?, _ completion: @escaping (Data?, CacheResponse?, Error?) -> Void) {
         guard var url = self.getBaseURL() else {
             return completion(nil, nil, nil)
@@ -313,7 +302,7 @@ class NTPDownloader {
     }
     
     // Unzips Data to the temporary directory and returns a URL to the directory
-    private func unzip(data: Data, _ completion: @escaping (URL?, Error?) -> Void) {
+    private func unzip(data: Data, _ completion: @escaping (URL?, NTPError?) -> Void) {
         let tempDirectory = FileManager.default.temporaryDirectory
         let directory = tempDirectory.appendingPathComponent(NTPDownloader.ntpDownloadsFolder)
         
@@ -322,22 +311,25 @@ class NTPDownloader {
             try Unzip.unpack_archive(data: data, to: directory.path)
             completion(directory, nil)
         } catch {
-            completion(nil, error)
+            completion(nil, .unzipError(error))
         }
     }
     
     // Unzips NTPItemInfo by downloading all of its assets to a temporary directory
     // and returning the URL to the directory
-    private func unzip(item: NTPItemInfo, _ completion: @escaping (URL?, Error?) -> Void) {
+    private func unzip(item: NTPItemInfo, _ completion: @escaping (URL?, NTPError?) -> Void) {
         let tempDirectory = FileManager.default.temporaryDirectory
         let directory = tempDirectory.appendingPathComponent(NTPDownloader.ntpDownloadsFolder)
         
         do {
             try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true, attributes: nil)
+
+            let metadataFileURL = directory.appendingPathComponent(NTPDownloader.metadataFile)
+            try JSONEncoder().encode(item).write(to: metadataFileURL, options: .atomic)
             
             var error: Error?
             let group = DispatchGroup()
-            let urls = [item.logo.imageUrl] + item.wallpapers.map({ $0.imageUrl })
+            let urls = [item.logo.imageUrl] + item.wallpapers.map { $0.imageUrl }
             
             for itemURL in urls {
                 group.enter()
@@ -364,15 +356,58 @@ class NTPDownloader {
             }
             
             group.notify(queue: .main) {
-                completion(error == nil ? directory : nil, error)
+                if let error = error {
+                    return completion(nil, .unzipError(error))
+                }
+                
+                completion(directory, nil)
             }
         } catch {
-            completion(nil, error)
+            completion(nil, .unzipError(error))
         }
+    }
+    
+    private func ntpETagFileURL() throws -> URL {
+        return try self.ntpDownloadsURL().appendingPathComponent(NTPDownloader.etagFile)
+    }
+    
+    private func ntpMetadataFileURL() throws -> URL {
+        return try self.ntpDownloadsURL().appendingPathComponent(NTPDownloader.metadataFile)
+    }
+    
+    private func ntpDownloadsURL() throws -> URL {
+        guard let supportDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
+            throw "NTPDownloader - Cannot find Support Directory"
+        }
+        
+        return supportDirectory.appendingPathComponent(NTPDownloader.ntpDownloadsFolder)
+    }
+    
+    private func isCampaignEnded(data: Data) -> Bool {
+        return data.count <= 5 || String(data: data, encoding: .utf8) == "{\n}\n"
     }
     
     private struct CacheResponse {
         let statusCode: Int
         let etag: String
+    }
+    
+    private enum NTPError: Error {
+        case campaignEnded
+        case metadataError(Error)
+        case unzipError(Error)
+        case loadingError(Error)
+        
+        func underlyingError() -> Error? {
+            switch self {
+            case .campaignEnded:
+                return nil
+                
+            case .metadataError(let error),
+                 .unzipError(let error),
+                 .loadingError(let error):
+                return error
+            }
+        }
     }
 }
