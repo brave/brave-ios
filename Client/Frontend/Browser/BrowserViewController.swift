@@ -960,7 +960,7 @@ class BrowserViewController: UIViewController {
             let homePanelController = FavoritesViewController(profile: profile,
                                                               fromOverlay: !inline,
                                                               rewards: rewards,
-                                                              background: backgroundDataSource.newBackground())
+                                                              backgroundDataSource: backgroundDataSource)
             homePanelController.delegate = self
             homePanelController.view.alpha = 0
             homePanelController.applyTheme(Theme.of(tabManager.selectedTab))

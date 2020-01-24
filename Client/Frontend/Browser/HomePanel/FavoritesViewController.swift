@@ -50,7 +50,8 @@ class FavoritesViewController: UIViewController, Themeable {
         return view
     }()
     private let dataSource: FavoritesDataSource
-    
+    private let backgroundDataSource: NewTabPageBackgroundDataSource
+
     private let braveShieldStatsView = BraveShieldStatsView(frame: CGRect.zero).then {
         $0.autoresizingMask = [.flexibleWidth]
     }
@@ -157,12 +158,12 @@ class FavoritesViewController: UIViewController, Themeable {
     private var rewards: BraveRewards?
     
     init(profile: Profile, dataSource: FavoritesDataSource = FavoritesDataSource(), fromOverlay: Bool,
-         rewards: BraveRewards?, background: (NewTabPageBackgroundDataSource.Background, NewTabPageBackgroundDataSource.Sponsor?)?) {
+         rewards: BraveRewards?, backgroundDataSource: NewTabPageBackgroundDataSource) {
         self.profile = profile
         self.dataSource = dataSource
         self.fromOverlay = fromOverlay
         self.rewards = rewards
-        self.background = background
+        self.backgroundDataSource = backgroundDataSource
         
         super.init(nibName: nil, bundle: nil)
         NotificationCenter.default.do {
@@ -198,7 +199,7 @@ class FavoritesViewController: UIViewController, Themeable {
         super.viewDidLoad()
         view.clipsToBounds = true
         
-        setupBackgroundImage()
+        resetBackgroundImage()
         // Setup gradient regardless of background image, can internalize to setup background image if only wanted for images.
         view.layer.addSublayer(gradientOverlay())
         
@@ -467,9 +468,10 @@ class FavoritesViewController: UIViewController, Themeable {
         }
     }
     
-    // MARK: - Private browsing modde
+    // MARK: - Private browsing mode
     @objc func privateBrowsingModeChanged() {
         updateDuckDuckGoVisibility()
+        resetBackgroundImage()
     }
     
     var themeableChildren: [Themeable?]? {
@@ -535,8 +537,15 @@ class FavoritesViewController: UIViewController, Themeable {
         imageCreditInternalButton.setTitle(photoByText, for: .normal)
     }
     
-    // TODO: combine with reset?
-    private func setupBackgroundImage() {
+    private func resetBackgroundImage() {
+        
+        // RESET BACKGROUND
+        self.backgroundViewInfo?.imageView.removeFromSuperview()
+        self.backgroundViewInfo = nil
+        
+        self.background = backgroundDataSource.newBackground()
+        //
+        
         guard let image = background?.wallpaper.imageLiteral else {
             imageCreditButton.isHidden = true
             return
@@ -588,13 +597,6 @@ class FavoritesViewController: UIViewController, Themeable {
             let portraitCenterConstraint = $0.left.equalTo(view.snp.centerX).priority(ConstraintPriority.high).constraint
             self.backgroundViewInfo = (imageView, portraitCenterConstraint, landscapeCenterConstraint)
         }
-    }
-    
-    fileprivate func resetBackground() {
-        self.backgroundViewInfo?.imageView.removeFromSuperview()
-        self.backgroundViewInfo = nil
-        
-        setupBackgroundImage()
     }
     
     fileprivate func gradientOverlay() -> CAGradientLayer {
@@ -718,6 +720,6 @@ extension FavoritesViewController: FavoriteCellDelegate {
 
 extension FavoritesViewController: PreferencesObserver {
     func preferencesDidChange(for key: String) {
-        self.resetBackground()
+        self.resetBackgroundImage()
     }
 }
