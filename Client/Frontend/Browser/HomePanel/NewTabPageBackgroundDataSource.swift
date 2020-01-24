@@ -81,7 +81,7 @@ class NewTabPageBackgroundDataSource {
     private lazy var sponsor: Sponsor? = {
         let sponsoredFilePath = "ntp-sponsored"
         guard let sponsoredData = self.loadData(file: sponsoredFilePath) else { return nil }
-        // TODO: Wrap
+        
         do {
             let sponsor = try JSONDecoder().decode(Sponsor.self, from: sponsoredData)
             return sponsor.wallpapers.isEmpty ? nil : sponsor
@@ -94,9 +94,12 @@ class NewTabPageBackgroundDataSource {
     private lazy var standardBackgrounds: [Background] = {
         let backgroundFilePath = "ntp-data"
         guard let backgroundData = self.loadData(file: backgroundFilePath) else { return [] }
-        // TODO: Wrap
-        let backgrounds = try? JSONDecoder().decode([Background].self, from: backgroundData)
-        return backgrounds ?? []
+        
+        do {
+            return try JSONDecoder().decode([Background].self, from: backgroundData)
+        } catch {
+            return []
+        }
     }()
     
     // This is used to prevent the same handful of backgrounds from being shown.
