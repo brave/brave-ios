@@ -4,6 +4,7 @@
 
 import Foundation
 import Shared
+import BraveShared
 
 private let logger = Logger.browserLogger
 
@@ -29,6 +30,10 @@ struct NTPItemInfo: Codable {
     let wallpapers: [NTPWallpaper]
 }
 
+protocol NTPDownloaderDelegate: class {
+    func onNTPUpdated(ntpInfo: NTPItemInfo?)
+}
+
 class NTPDownloader {
     private static let etagFile = "crc.etag"
     private static let metadataFile = "photo.json"
@@ -39,7 +44,39 @@ class NTPDownloader {
     private let supportedLocales: [String] = []
     private let currentLocale = Locale.current.regionCode
     
-    func getNTPInfo(_ completion: @escaping (NTPItemInfo?) -> Void) {
+    private var timer: Timer?
+    private var backgroundObserver: NSObjectProtocol?
+    private var foregroundObserver: NSObjectProtocol?
+    
+    public static let shared = NTPDownloader()
+    
+    public weak var delegate: NTPDownloaderDelegate? {
+        didSet {
+            self.notifyObservers()
+        }
+    }
+    
+    private init() {
+        
+    }
+    
+    deinit {
+        self.removeObservers()
+    }
+    
+    private func getNTPInfo(_ completion: @escaping (NTPItemInfo?) -> Void) {
+        //Load from cache because the time since the last fetch hasn't expired yet..
+        if let nextDate = Preferences.NTP.ntpCheckDate.value,
+            Date().timeIntervalSince1970 - nextDate < 0 {
+            
+            if self.timer == nil {
+                let relativeTime = abs(Date().timeIntervalSince1970 - nextDate)
+                self.scheduleObservers(relativeTime: relativeTime)
+            }
+            
+            return completion(self.loadNTPInfo())
+        }
+        
         // Download the NTP Info to a temporary directory
         self.downloadMetadata { [weak self] url, cacheInfo, error in
             guard let self = self else { return }
@@ -53,6 +90,9 @@ class NTPDownloader {
                 
                 return completion(nil)
             }
+            
+            //Start the timer no matter what..
+            self.startNTPTimer()
             
             if let error = error?.underlyingError() {
                 logger.error(error)
@@ -93,8 +133,64 @@ class NTPDownloader {
         }
     }
     
-    private func loadNTPInfo() -> NTPItemInfo? {
+    private func notifyObservers() {
+        self.getNTPInfo { [weak self] item in
+            self?.delegate?.onNTPUpdated(ntpInfo: item)
+        }
+    }
+    
+    private func startNTPTimer() {
+        let baseTime = 5.0 * 60.0 * 60.0  //5 hours base time
+        let minVariance = 1.10            //10% variance
+        let maxVariance = 1.14            //14% variance
+        let relativeTime = baseTime * Double.random(in: ClosedRange<Double>(uncheckedBounds: (lower: minVariance, upper: maxVariance)))
         
+        Preferences.NTP.ntpCheckDate.value = Date().timeIntervalSince1970 + relativeTime
+        self.scheduleObservers(relativeTime: relativeTime)
+    }
+    
+    private func removeObservers() {
+        self.timer?.invalidate()
+        
+        if let backgroundObserver = self.backgroundObserver {
+            NotificationCenter.default.removeObserver(backgroundObserver)
+        }
+        
+        if let foregroundObserver = self.foregroundObserver {
+            NotificationCenter.default.removeObserver(foregroundObserver)
+        }
+    }
+    
+    private func scheduleObservers(relativeTime: TimeInterval) {
+        self.removeObservers()
+        self.timer = Timer.scheduledTimer(withTimeInterval: relativeTime, repeats: true) { [weak self] _ in
+            self?.notifyObservers()
+        }
+        
+        self.backgroundObserver = NotificationCenter.default.addObserver(forName: UIApplication.willResignActiveNotification, object: nil, queue: .main) { [weak self] _ in
+            guard let self = self else { return }
+            self.timer?.invalidate()
+            self.timer = nil
+        }
+        
+        self.foregroundObserver = NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: .main) { [weak self] _ in
+            guard let self = self else { return }
+            
+            self.timer?.invalidate()
+            self.timer = nil
+            
+            if let nextDate = Preferences.NTP.ntpCheckDate.value {
+                let relativeTime = abs(Date().timeIntervalSince1970 - nextDate)
+                self.timer = Timer.scheduledTimer(withTimeInterval: relativeTime, repeats: true) { [weak self] _ in
+                    self?.notifyObservers()
+                }
+            } else {
+                self.startNTPTimer()
+            }
+        }
+    }
+    
+    private func loadNTPInfo() -> NTPItemInfo? {
         do {
             let metadataFileURL = try self.ntpMetadataFileURL()
             if !FileManager.default.fileExists(atPath: metadataFileURL.path) {
@@ -163,6 +259,9 @@ class NTPDownloader {
     }
     
     private func removeCampaign() throws {
+        Preferences.NTP.ntpCheckDate.value = nil
+        self.removeObservers()
+        
         try self.removeETag()
         let downloadsFolderURL = try self.ntpDownloadsURL()
         if FileManager.default.fileExists(atPath: downloadsFolderURL.path) {
