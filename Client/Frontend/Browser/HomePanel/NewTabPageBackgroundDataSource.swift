@@ -117,9 +117,6 @@ class NewTabPageBackgroundDataSource {
                 && !PrivateBrowsingManager.shared.isPrivateBrowsing
             
             if let sponsoredWallpapers = sponsor?.wallpapers, attemptSponsored {
-                sponsoredBackgroundRotationIndex += 1
-                // Force a max, and wrap back down if it is hit.
-                sponsoredBackgroundRotationIndex %= sponsoredWallpapers.count
                 return (sponsoredWallpapers, true)
             }
             return (standardBackgrounds, false)
@@ -130,7 +127,12 @@ class NewTabPageBackgroundDataSource {
         // Choosing the actual index / item to use
         let backgroundIndex = { () -> Int in
             if useSponsor {
-                return self.sponsoredBackgroundRotationIndex
+                defer {
+                    sponsoredBackgroundRotationIndex += 1
+                    // Force a max, and wrap back down if it is hit.
+                    sponsoredBackgroundRotationIndex %= backgroundSet.count
+                }
+                return sponsoredBackgroundRotationIndex
             }
             
             let availableRange = 0..<backgroundSet.count
