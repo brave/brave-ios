@@ -356,6 +356,9 @@ class FavoritesViewController: UIViewController, Themeable {
             // Need to calculate the sizing difference between `image` and `imageView` to determine the pixel difference ratio
             let sizeRatio = backgroundImageView.frame.size.width / image.size.width
             let focal = background?.wallpaper.focalPoint
+            // Center as fallback
+            let x = focal?.x ?? image.size.width / 2
+            let y = focal?.y ?? image.size.height / 2
             let portrait = view.frame.height > view.frame.width
             
             // Center point of image is not center point of view.
@@ -366,11 +369,11 @@ class FavoritesViewController: UIViewController, Themeable {
             
             // So basically the movement needs to be "inverted" (hence negation)
             // In landscape, left / right are pegged to superview
-            let imageViewOffset = portrait ? sizeRatio * -(focal?.x ?? 0) : 0
+            let imageViewOffset = portrait ? sizeRatio * -x : 0
             backgroundViewInfo?.portraitCenterConstraint.update(offset: imageViewOffset)
             
             // If potrait, top / bottom are just pegged to superview
-            let inset = portrait ? 0 : sizeRatio * -(focal?.y ?? 0)
+            let inset = portrait ? 0 : sizeRatio * -y
             backgroundViewInfo?.landscapeCenterConstraint.update(offset: inset)
         }
     }
