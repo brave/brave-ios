@@ -1,40 +1,27 @@
-
 {
-    "wallpapers": [
-      {
-        "image": "branded-1.jpg",
-        "focalPoint": {
-          "x": 0,
-          "y": 0
-        }
-      },
-      {
-        "image": "branded-2.jpg",
-        "focalPoint": {
-          "x": 0,
-          "y": 0
-        }
-      },
-      {
-        "image": "branded-3.jpg",
-        "focalPoint": {
-          "x": 0,
-          "y": 0
-        }
+  "wallpapers": [
+    {
+      "image": "background-1.jpg",
+      "focalPoint": {
+        "x": 3988,
+        "y": 2049
       }
-    ],
-    "logo": {
-      "image": "logo.png",
-      "alt": "Technikke - for music lovers",
-      "companyName": "Technikke",
-      "destinationUrl": "https://EAFF.com/competitions/eaff2019/",
-      "regions": {
-        "invalid": {
-          "image": "",
-          "alt": "string",
-          "destinationUrl": "logo_url"
-        }
+    },
+    {
+      "image": "background-2.jpg",
+      "focalPoint": {
+        "x": 5233,
+        "y": 3464
       }
+    },
+    {
+      "image": "background-3.jpg"
     }
+  ],
+  "logo": {
+    "image": "logo.png",
+    "alt": "Technikke: For music lovers",
+    "companyName": "Technikke",
+    "destinationUrl": "https://www.brave.com/?from-sponsored-image-demo"
+  }
 }
-
