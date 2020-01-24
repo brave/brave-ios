@@ -107,6 +107,8 @@ class NewTabPageBackgroundDataSource {
     private var lastBackgroundChoices = [Int]()
     
     func newBackground() -> (Background, Sponsor?)? {
+        if !Preferences.NewTabPage.backgroundImages.value { return nil }
+        
         // Identifying the background array to use
         let (backgroundSet, useSponsor) = { () -> ([NewTabPageBackgroundDataSource.Background], Bool) in
             // Determine what type of background to display
