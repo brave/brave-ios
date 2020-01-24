@@ -277,16 +277,14 @@ class FavoritesViewController: UIViewController, Themeable {
         
         let adsAvailableInRegion = BraveAds.isCurrentLocaleSupported()
         
-        // Don't show notifications if background images are disabled.
-        // TODO: Re-enable
-//        guard let bgImageInfo = background.info else { return nil }
+        if !Preferences.NewTabPage.backgroundImages.value { return nil }
         
-        let deleteThis = true
+        let isSponsoredImage = background?.sponsor != nil
         let state = BrandedImageCalloutState
             .getState(rewardsEnabled: rewardsEnabled,
                       adsEnabled: adsEnabled,
                       adsAvailableInRegion: adsAvailableInRegion,
-                      isSponsoredImage: deleteThis)
+                      isSponsoredImage: isSponsoredImage)
         
         return .brandedImages(state: state)
     }
