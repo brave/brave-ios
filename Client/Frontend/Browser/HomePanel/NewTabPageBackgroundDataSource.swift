@@ -10,10 +10,11 @@ class NewTabPageBackgroundDataSource {
     
     struct Background: Decodable {
         let image: String
+        
         /// Required instead of `CGPoint` due to x/y being optionals
         let focalPoint: FocalPoint?
-        // TODO: Probably need to re-enable _somehow_
-//        let isSponsored: Bool
+        
+        /// Only available for normal wallpapers, not for sponsored images
         let credit: Credit?
         
         struct Credit: Decodable {
@@ -34,13 +35,17 @@ class NewTabPageBackgroundDataSource {
     
     struct Sponsor: Decodable {
         let wallpapers: [Background]
-        let logo: Logo
+        var logo: Logo
         
         struct Logo: Decodable {
             let image: String
             let alt: String
             let companyName: String
             let destinationUrl: String
+            
+            lazy var imageLiteral: UIImage? = {
+                return UIImage(named: image)
+            }()
         }
     }
 
@@ -101,7 +106,7 @@ class NewTabPageBackgroundDataSource {
     // This can 'easily' be adjusted to support both sets by switching to String, and using filePath to identify uniqueness.
     private var lastBackgroundChoices = [Int]()
     
-    func newBackground() -> Background? {
+    func newBackground() -> (Background, Sponsor?)? {
         // Identifying the background array to use
         let (backgroundSet, useSponsor) = { () -> ([NewTabPageBackgroundDataSource.Background], Bool) in
             // Determine what type of background to display
@@ -133,8 +138,9 @@ class NewTabPageBackgroundDataSource {
             // Chooses a new random index to use from the available indeces
             // -1 will result in a `nil` return
             let chosenIndex = availableBackgroundIndeces.randomElement() ?? -1
-            assert(chosenIndex >= 0, "randomBackgroundIndex was nil, this is terrible.")
-            
+            assert(chosenIndex >= 0, "NTP index was nil, this is terrible.")
+            assert(chosenIndex < backgroundSet.count, "NTP index is too large, BAD!")
+
             // This index is now added to 'past' tracking list to prevent duplicates
             self.lastBackgroundChoices.append(chosenIndex)
             // Trimming to fixed length to release older backgrounds
@@ -148,7 +154,8 @@ class NewTabPageBackgroundDataSource {
         backgroundRotationCounter += 1
         
         // Item is returned based on our special index.
-        return backgroundSet[safe: backgroundIndex]
+        
+        return (backgroundSet[backgroundIndex], useSponsor ? sponsor : nil)
     }
     
     private func loadData(file: String) -> Data? {

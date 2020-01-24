@@ -98,6 +98,10 @@ class FavoritesViewController: UIViewController, Themeable {
         }
     }
     
+    private lazy var imageSponsorButton = UIImageView().then {
+        $0.image = background?.sponsor?.logo.imageLiteral
+    }
+    
     private let ddgLogo = UIImageView(image: #imageLiteral(resourceName: "duckduckgo"))
     
     private let ddgLabel = UILabel().then {
@@ -132,7 +136,7 @@ class FavoritesViewController: UIViewController, Themeable {
     // MARK: - Init/lifecycle
     
     private var backgroundViewInfo: (imageView: UIImageView, portraitCenterConstraint: Constraint)?
-    private var background: NewTabPageBackgroundDataSource.Background?
+    private var background: (wallpaper: NewTabPageBackgroundDataSource.Background, sponsor: NewTabPageBackgroundDataSource.Sponsor?)?
     
     private let profile: Profile
     
@@ -151,7 +155,7 @@ class FavoritesViewController: UIViewController, Themeable {
     private var rewards: BraveRewards?
     
     init(profile: Profile, dataSource: FavoritesDataSource = FavoritesDataSource(), fromOverlay: Bool,
-         rewards: BraveRewards?, background: NewTabPageBackgroundDataSource.Background?) {
+         rewards: BraveRewards?, background: (NewTabPageBackgroundDataSource.Background, NewTabPageBackgroundDataSource.Sponsor?)?) {
         self.profile = profile
         self.dataSource = dataSource
         self.fromOverlay = fromOverlay
@@ -222,6 +226,7 @@ class FavoritesViewController: UIViewController, Themeable {
         collection.addSubview(favoritesOverflowButton)
         collection.addSubview(ddgButton)
         view.addSubview(imageCreditButton)
+        view.addSubview(imageSponsorButton)
         
         ddgButton.addSubview(ddgLogo)
         ddgButton.addSubview(ddgLabel)
@@ -355,7 +360,7 @@ class FavoritesViewController: UIViewController, Themeable {
             // Therefore specifying `0` should take the imageView's left and pinning it to view's center.
             
             // So basically the movement needs to be "inverted" (hence negation)
-            let imageViewOffset = sizeRatio * -(background?.focalPoint?.x ?? 0)
+            let imageViewOffset = sizeRatio * -(background?.wallpaper.focalPoint?.x ?? 0)
             backgroundViewInfo?.portraitCenterConstraint.update(offset: imageViewOffset)
         }
     }
@@ -390,7 +395,7 @@ class FavoritesViewController: UIViewController, Themeable {
     }
     
     @objc fileprivate func showImageCredit() {
-        guard let credit = background?.credit else {
+        guard let credit = background?.wallpaper.credit else {
             // No gesture action of no credit available
             return
         }
@@ -414,11 +419,6 @@ class FavoritesViewController: UIViewController, Themeable {
     
     // MARK: - Constraints setup
     fileprivate func makeConstraints() {
-        collection.snp.makeConstraints { make in
-            make.left.right.equalTo(self.view.safeAreaLayoutGuide)
-            make.top.bottom.equalTo(self.view)
-        }
-        
         ddgLogo.snp.makeConstraints { make in
             make.top.left.bottom.equalTo(0)
             make.size.equalTo(38)
@@ -472,16 +472,16 @@ class FavoritesViewController: UIViewController, Themeable {
     }
     
     private func updateConstraints() {
-        let isIpad = UIDevice.isIpad
+        let isIphone = UIDevice.isPhone
         let isLandscape = view.frame.width > view.frame.height
         
         var right: ConstraintRelatableTarget = self.view.safeAreaLayoutGuide
         var left: ConstraintRelatableTarget = self.view.safeAreaLayoutGuide
         if isLandscape {
-            if isIpad {
-                right = self.view.snp.centerX
-            } else {
+            if isIphone {
                 left = self.view.snp.centerX
+            } else {
+                right = self.view.snp.centerX
             }
         }
         
@@ -489,6 +489,18 @@ class FavoritesViewController: UIViewController, Themeable {
             make.right.equalTo(right)
             make.left.equalTo(left)
             make.top.bottom.equalTo(self.view)
+        }
+        
+        imageSponsorButton.snp.remakeConstraints {
+            let parent = imageSponsorButton.superview!
+            $0.height.width.equalTo(170)
+            $0.bottom.equalTo(parent.safeArea.bottom).inset(10)
+            
+            if isLandscape && isIphone {
+                $0.left.equalTo(parent.safeArea.left).offset(20)
+            } else {
+                $0.centerX.equalToSuperview()
+            }
         }
     }
     
@@ -498,17 +510,17 @@ class FavoritesViewController: UIViewController, Themeable {
             imageCreditButton.isHidden = hideImageCredit
         }
         
-        guard let name = background?.credit?.name else { return }
+        guard let name = background?.wallpaper.credit?.name else { return }
         
         // TODO: Re-enable
-//        hideImageCredit = info.isSponsored
+        hideImageCredit = background?.sponsor != nil
         let photoByText = String(format: Strings.photoBy, name)
         imageCreditInternalButton.setTitle(photoByText, for: .normal)
     }
     
     // TODO: combine with reset?
     private func setupBackgroundImage() {
-        guard var image = background?.imageLiteral else {
+        guard let image = background?.wallpaper.imageLiteral else {
             imageCreditButton.isHidden = true
             return
         }
