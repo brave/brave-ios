@@ -527,12 +527,11 @@ class FavoritesViewController: UIViewController, Themeable {
         }
         
         imageSponsorButton.snp.remakeConstraints {
-            let parent = imageSponsorButton.superview!
-            $0.height.width.equalTo(170)
-            $0.bottom.equalTo(parent.safeArea.bottom).inset(10)
+            $0.size.equalTo(170)
+            $0.bottom.equalTo(view.safeArea.bottom).inset(10)
             
             if isLandscape && isIphone {
-                $0.left.equalTo(parent.safeArea.left).offset(20)
+                $0.left.equalTo(view.safeArea.left).offset(20)
             } else {
                 $0.centerX.equalToSuperview()
             }
@@ -584,7 +583,7 @@ class FavoritesViewController: UIViewController, Themeable {
             // the right side cannot drop under `width` (or superview's right side), otherwise whitespace will be shown on right.
             $0.right.greaterThanOrEqualToSuperview()
             
-            // Same as left / right above but necessary for landscape y centering (to prevent overflow
+            // Same as left / right above but necessary for landscape y centering (to prevent overflow)
             $0.top.lessThanOrEqualToSuperview()
             $0.bottom.greaterThanOrEqualToSuperview()
 

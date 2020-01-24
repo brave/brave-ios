@@ -84,7 +84,7 @@ class NewTabPageBackgroundDataSource {
         // TODO: Wrap
         do {
             let sponsor = try JSONDecoder().decode(Sponsor.self, from: sponsoredData)
-            return sponsor.wallpapers.isEmpty == true ? nil : sponsor
+            return sponsor.wallpapers.isEmpty ? nil : sponsor
         } catch {
             // Only set a sponsor if there are valid backgrounds
             return nil
