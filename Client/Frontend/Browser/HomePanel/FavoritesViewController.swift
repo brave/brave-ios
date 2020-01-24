@@ -98,8 +98,10 @@ class FavoritesViewController: UIViewController, Themeable {
         }
     }
     
-    private lazy var imageSponsorButton = UIImageView().then {
-        $0.image = background?.sponsor?.logo.imageLiteral
+    private lazy var imageSponsorButton = UIButton().then {
+        $0.setImage(background?.sponsor?.logo.imageLiteral, for: .normal)
+        $0.adjustsImageWhenHighlighted = false
+        $0.addTarget(self, action: #selector(showSponsoredSite), for: .touchUpInside)
     }
     
     private let ddgLogo = UIImageView(image: #imageLiteral(resourceName: "duckduckgo"))
@@ -415,6 +417,11 @@ class FavoritesViewController: UIViewController, Themeable {
         alert.addAction(UIAlertAction(title: Strings.close, style: .cancel, handler: nil))
         
         present(alert, animated: true, completion: nil)
+    }
+    
+    @objc private func showSponsoredSite() {
+        guard let url = background?.sponsor?.logo.destinationUrl else { return }
+        delegate?.didSelect(input: url)
     }
     
     // MARK: - Constraints setup
