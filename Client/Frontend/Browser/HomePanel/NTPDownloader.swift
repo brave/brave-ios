@@ -47,17 +47,11 @@ class NTPDownloader {
     private var timer: Timer?
     private var backgroundObserver: NSObjectProtocol?
     private var foregroundObserver: NSObjectProtocol?
-    
-    public static let shared = NTPDownloader()
-    
-    public weak var delegate: NTPDownloaderDelegate? {
+
+    weak var delegate: NTPDownloaderDelegate? {
         didSet {
             self.notifyObservers()
         }
-    }
-    
-    private init() {
-        
     }
     
     deinit {
@@ -140,7 +134,7 @@ class NTPDownloader {
     }
     
     private func startNTPTimer() {
-        let baseTime = 5.0 * 60.0 * 60.0  //5 hours base time
+        let baseTime = 5.hours
         let minVariance = 1.10            //10% variance
         let maxVariance = 1.14            //14% variance
         let relativeTime = baseTime * Double.random(in: ClosedRange<Double>(uncheckedBounds: (lower: minVariance, upper: maxVariance)))

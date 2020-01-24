@@ -552,10 +552,6 @@ class BrowserViewController: UIViewController {
         Bookmark.restore_1_12_Bookmarks() {
             log.info("Bookmarks from old database were successfully restored")
         }
-        
-        
-        //Sample Usage of NTPDownloader
-        NTPDownloader.shared.delegate = self
     }
     
     /// Initialize Sync without connecting. Sync webview needs to be in a "permanent" location
@@ -3501,11 +3497,4 @@ extension BrowserViewController: OnboardingControllerDelegate {
     
     // 60 days until the next time the user sees the onboarding..
     static let onboardingDaysInterval = TimeInterval(60.days)
-}
-
-//Sample Usage of NTPDownloader
-extension BrowserViewController: NTPDownloaderDelegate {
-    func onNTPUpdated(ntpInfo: NTPItemInfo?) {
-        print(ntpInfo)
-    }
 }
