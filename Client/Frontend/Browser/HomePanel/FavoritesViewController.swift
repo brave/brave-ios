@@ -512,7 +512,6 @@ class FavoritesViewController: UIViewController, Themeable {
         
         guard let name = background?.wallpaper.credit?.name else { return }
         
-        // TODO: Re-enable
         hideImageCredit = background?.sponsor != nil
         let photoByText = String(format: Strings.photoBy, name)
         imageCreditInternalButton.setTitle(photoByText, for: .normal)
