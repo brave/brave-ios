@@ -100,7 +100,6 @@ class FavoritesViewController: UIViewController, Themeable {
     }
     
     private lazy var imageSponsorButton = UIButton().then {
-        $0.setImage(background?.sponsor?.logo.imageLiteral, for: .normal)
         $0.adjustsImageWhenHighlighted = false
         $0.addTarget(self, action: #selector(showSponsoredSite), for: .touchUpInside)
     }
@@ -139,7 +138,23 @@ class FavoritesViewController: UIViewController, Themeable {
     // MARK: - Init/lifecycle
     
     private var backgroundViewInfo: (imageView: UIImageView, portraitCenterConstraint: Constraint, landscapeCenterConstraint: Constraint)?
-    private var background: (wallpaper: NewTabPageBackgroundDataSource.Background, sponsor: NewTabPageBackgroundDataSource.Sponsor?)?
+    private var background: (wallpaper: NewTabPageBackgroundDataSource.Background, sponsor: NewTabPageBackgroundDataSource.Sponsor?)? {
+        didSet {
+            let noSponsor = background?.sponsor == nil
+            
+            // Image Sponsor
+            imageSponsorButton.setImage(background?.sponsor?.logo.imageLiteral, for: .normal)
+            imageSponsorButton.isHidden = noSponsor
+            
+            // Image Credit
+            imageCreditButton.isHidden = true
+            if noSponsor, let name = background?.wallpaper.credit?.name {
+                let photoByText = String(format: Strings.photoBy, name)
+                imageCreditInternalButton.setTitle(photoByText, for: .normal)
+                imageCreditButton.isHidden = false
+            }
+        }
+    }
     
     private let profile: Profile
     
@@ -524,19 +539,6 @@ class FavoritesViewController: UIViewController, Themeable {
         }
     }
     
-    private func setupImageCredit() {
-        var hideImageCredit = true
-        defer {
-            imageCreditButton.isHidden = hideImageCredit
-        }
-        
-        guard let name = background?.wallpaper.credit?.name else { return }
-        
-        hideImageCredit = background?.sponsor != nil
-        let photoByText = String(format: Strings.photoBy, name)
-        imageCreditInternalButton.setTitle(photoByText, for: .normal)
-    }
-    
     private func resetBackgroundImage() {
         
         // RESET BACKGROUND
@@ -547,11 +549,9 @@ class FavoritesViewController: UIViewController, Themeable {
         //
         
         guard let image = background?.wallpaper.imageLiteral else {
-            imageCreditButton.isHidden = true
             return
         }
         
-        setupImageCredit()
         let imageAspectRatio = image.size.width / image.size.height
         let imageView = UIImageView(image: image)
         
