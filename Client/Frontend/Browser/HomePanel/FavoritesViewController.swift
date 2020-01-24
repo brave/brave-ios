@@ -50,7 +50,7 @@ class FavoritesViewController: UIViewController, Themeable {
         return view
     }()
     private let dataSource: FavoritesDataSource
-    private let backgroundDataSource: NewTabPageBackgroundDataSource
+    private let backgroundDataSource: NewTabPageBackgroundDataSource?
 
     private let braveShieldStatsView = BraveShieldStatsView(frame: CGRect.zero).then {
         $0.autoresizingMask = [.flexibleWidth]
@@ -173,7 +173,7 @@ class FavoritesViewController: UIViewController, Themeable {
     private var rewards: BraveRewards?
     
     init(profile: Profile, dataSource: FavoritesDataSource = FavoritesDataSource(), fromOverlay: Bool,
-         rewards: BraveRewards?, backgroundDataSource: NewTabPageBackgroundDataSource) {
+         rewards: BraveRewards?, backgroundDataSource: NewTabPageBackgroundDataSource?) {
         self.profile = profile
         self.dataSource = dataSource
         self.fromOverlay = fromOverlay
@@ -544,7 +544,7 @@ class FavoritesViewController: UIViewController, Themeable {
         self.backgroundViewInfo?.imageView.removeFromSuperview()
         self.backgroundViewInfo = nil
         
-        self.background = backgroundDataSource.newBackground()
+        self.background = backgroundDataSource?.newBackground()
         //
         
         guard let image = background?.wallpaper.imageLiteral else {
@@ -602,13 +602,14 @@ class FavoritesViewController: UIViewController, Themeable {
         
         // Fades from half-black to transparent
         let colorTop = UIColor(white: 0.0, alpha: 0.5).cgColor
-        let colorBottom = UIColor(white: 0.0, alpha: 0.0).cgColor
+        let colorMid = UIColor(white: 0.0, alpha: 0.0).cgColor
+        let colorBottom = UIColor(white: 0.0, alpha: 0.3).cgColor
         
         let gl = CAGradientLayer()
-        gl.colors = [colorTop, colorBottom]
+        gl.colors = [colorTop, colorMid, colorBottom]
         
         // Gradient cover percentage
-        gl.locations = [0.0, 0.5]
+        gl.locations = [0.0, 0.5, 0.8]
         
         // Making a squrare to handle rotation events
         let maxSide = max(view.bounds.height, view.bounds.width)
