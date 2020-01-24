@@ -112,6 +112,7 @@ class NewTabPageBackgroundDataSource {
             // Determine what type of background to display
             let attemptSponsored = Preferences.NewTabPage.backgroundSponsoredImages.value
                 && backgroundRotationCounter == NewTabPageBackgroundDataSource.sponsorshipShowValue
+                && !PrivateBrowsingManager.shared.isPrivateBrowsing
             
             if let sponsoredWallpapers = sponsor?.wallpapers, attemptSponsored {
                 sponsoredBackgroundRotationIndex += 1
