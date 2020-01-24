@@ -137,7 +137,7 @@ class FavoritesViewController: UIViewController, Themeable {
     
     // MARK: - Init/lifecycle
     
-    private var backgroundViewInfo: (imageView: UIImageView, portraitCenterConstraint: Constraint)?
+    private var backgroundViewInfo: (imageView: UIImageView, portraitCenterConstraint: Constraint, landscapeCenterConstraint: Constraint)?
     private var background: (wallpaper: NewTabPageBackgroundDataSource.Background, sponsor: NewTabPageBackgroundDataSource.Sponsor?)?
     
     private let profile: Profile
@@ -355,6 +355,8 @@ class FavoritesViewController: UIViewController, Themeable {
         if let backgroundImageView = backgroundViewInfo?.imageView, let image = backgroundImageView.image {
             // Need to calculate the sizing difference between `image` and `imageView` to determine the pixel difference ratio
             let sizeRatio = backgroundImageView.frame.size.width / image.size.width
+            let focal = background?.wallpaper.focalPoint
+            let portrait = view.frame.height > view.frame.width
             
             // Center point of image is not center point of view.
             // Take `0` for example, if specying `0`, setting centerX to 0, it is not attempting to place the left
@@ -363,8 +365,13 @@ class FavoritesViewController: UIViewController, Themeable {
             // Therefore specifying `0` should take the imageView's left and pinning it to view's center.
             
             // So basically the movement needs to be "inverted" (hence negation)
-            let imageViewOffset = sizeRatio * -(background?.wallpaper.focalPoint?.x ?? 0)
+            // In landscape, left / right are pegged to superview
+            let imageViewOffset = portrait ? sizeRatio * -(focal?.x ?? 0) : 0
             backgroundViewInfo?.portraitCenterConstraint.update(offset: imageViewOffset)
+            
+            // If potrait, top / bottom are just pegged to superview
+            let inset = portrait ? 0 : sizeRatio * -(focal?.y ?? 0)
+            backgroundViewInfo?.landscapeCenterConstraint.update(offset: inset)
         }
     }
     
@@ -547,11 +554,12 @@ class FavoritesViewController: UIViewController, Themeable {
             // `999` priority is required for landscape, since top/bottom constraints no longer the most important
             //    using `1000` / `required` would cause constraint conflicts (with `centerY` in landscape), and
             //    using `high` is not enough either.
-            $0.top.bottom.equalToSuperview().priority(ConstraintPriority(999))
-            
+            $0.bottom.equalToSuperview().priority(ConstraintPriority(999))
+            $0.top.equalToSuperview().priority(ConstraintPriority(999))
+
             // In portrait `top`/`bottom` is enough, however, when switching to landscape, those constraints
             //  don't force centering, so this is used as a stronger constraint to center in landscape/portrait
-            $0.centerY.equalToSuperview()
+            let landscapeCenterConstraint = $0.top.equalTo(view.snp.centerY).priority(ConstraintPriority.high).constraint
             
             // Width of the image view is determined by the forced height constraint and the literal image ratio
             $0.width.equalTo(imageView.snp.height).multipliedBy(imageAspectRatio)
@@ -564,14 +572,18 @@ class FavoritesViewController: UIViewController, Themeable {
             // the right side cannot drop under `width` (or superview's right side), otherwise whitespace will be shown on right.
             $0.right.greaterThanOrEqualToSuperview()
             
+            // Same as left / right above but necessary for landscape y centering (to prevent overflow
+            $0.top.lessThanOrEqualToSuperview()
+            $0.bottom.greaterThanOrEqualToSuperview()
+
             // If for some reason the image cannot fill full width (e.g. not a landscape image), then these constraints
             //  will fail. A constraint will be broken, since cannot keep both left and right side's pinned
             //  (due to the width multiplier being < 1
             
             // Using `high` priority so that it will not be applied / broken  if out-of-bounds.
             // Offset updated / calculated during view layout as views are not setup yet.
-            let backgroundConstraint = $0.left.equalTo(view.snp.centerX).priority(ConstraintPriority.high).constraint
-            self.backgroundViewInfo = (imageView, backgroundConstraint)
+            let portraitCenterConstraint = $0.left.equalTo(view.snp.centerX).priority(ConstraintPriority.high).constraint
+            self.backgroundViewInfo = (imageView, portraitCenterConstraint, landscapeCenterConstraint)
         }
     }
     
