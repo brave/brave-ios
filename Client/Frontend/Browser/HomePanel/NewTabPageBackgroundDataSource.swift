@@ -5,6 +5,7 @@
 import UIKit
 import Shared
 import BraveShared
+import BraveRewards
 
 class NewTabPageBackgroundDataSource {
     
@@ -118,6 +119,7 @@ class NewTabPageBackgroundDataSource {
             let attemptSponsored = Preferences.NewTabPage.backgroundSponsoredImages.value
                 && backgroundRotationCounter == NewTabPageBackgroundDataSource.sponsorshipShowValue
                 && !PrivateBrowsingManager.shared.isPrivateBrowsing
+                && BraveAds.isCurrentLocaleSupported()
             
             if let sponsoredWallpapers = sponsor?.wallpapers, attemptSponsored {
                 return (sponsoredWallpapers, true)

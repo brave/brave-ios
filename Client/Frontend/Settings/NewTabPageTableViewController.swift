@@ -6,6 +6,7 @@ import Foundation
 import Static
 import BraveShared
 import Shared
+import BraveRewards
 
 class NewTabPageTableViewController: TableViewController {
     let sponsoredRow = Row.boolRow(title: Strings.newTabPageSettingsSponsoredImages, option: Preferences.NewTabPage.backgroundSponsoredImages)
@@ -42,7 +43,9 @@ class NewTabPageTableViewController: TableViewController {
             })
         ]
         
-        rows.append(sponsoredRow)        
+        if BraveAds.isCurrentLocaleSupported() {
+            rows.append(sponsoredRow)
+        }
         rows.append(.boolRow(title: Strings.newTabPageSettingsAutoOpenKeyboard,
                              option: Preferences.NewTabPage.autoOpenKeyboard))
         return Section(rows: rows)
