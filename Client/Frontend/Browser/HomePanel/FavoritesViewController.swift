@@ -338,9 +338,12 @@ class FavoritesViewController: UIViewController, Themeable {
         
         guard let viewController = vc else { return }
 
-        ntpNotificationShowing = true
-        addChild(viewController)
-        view.addSubview(viewController.view)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+            guard let self = self else { return }
+            self.ntpNotificationShowing = true
+            self.addChild(viewController)
+            self.view.addSubview(viewController.view)
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
