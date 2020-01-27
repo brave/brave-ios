@@ -338,12 +338,11 @@ class FavoritesViewController: UIViewController, Themeable {
         
         guard let viewController = vc else { return }
 
-        ntpNotificationShowing = true
-        addChild(viewController)
-        view.addSubview(viewController.view)
-        viewController.view.snp.remakeConstraints {
-            $0.right.left.equalToSuperview()
-            $0.bottom.equalTo(view)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+            guard let self = self else { return }
+            self.ntpNotificationShowing = true
+            self.addChild(viewController)
+            self.view.addSubview(viewController.view)
         }
     }
     

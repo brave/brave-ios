@@ -8,7 +8,7 @@ import BraveShared
 
 /// A view controller that provides translucent background overlay for its contents and a close button in top right corner.
 class TranslucentBottomSheet: UIViewController {
-    private let animationDuration: TimeInterval = 1
+    private let animationDuration: TimeInterval = 0.25
     
     var closeHandler: (() -> Void)?
     
