@@ -118,12 +118,11 @@ class NTPDownloader {
                 if let cacheInfo = cacheInfo {
                     self.setETag(cacheInfo.etag)
                 }
-                
-                completion(self.loadNTPInfo())
             } catch {
                 logger.error(error)
-                completion(self.loadNTPInfo())
             }
+            
+            completion(self.loadNTPInfo())
         }
     }
     
