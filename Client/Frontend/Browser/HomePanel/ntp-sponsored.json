@@ -1,27 +1,21 @@
 {
-  "wallpapers": [
-    {
-      "image": "background-1.jpg",
-      "focalPoint": {
-        "x": 3988,
-        "y": 2049
-      }
+    "logo": {
+        "imageUrl": "logo.png",
+        "alt": "Technikke: For music lovers",
+        "companyName": "Technikke",
+        "destinationUrl": "https://www.brave.com/?from-sponsored-image-demo"
     },
-    {
-      "image": "background-2.jpg",
-      "focalPoint": {
-        "x": 5233,
-        "y": 3464
-      }
-    },
-    {
-      "image": "background-3.jpg"
-    }
-  ],
-  "logo": {
-    "image": "logo.png",
-    "alt": "Technikke: For music lovers",
-    "companyName": "Technikke",
-    "destinationUrl": "https://www.brave.com/?from-sponsored-image-demo"
-  }
+    "wallpapers": [
+        {
+            "imageUrl": "background-1.jpg",
+            "focalPoint": { "x": 3988, "y": 2049}
+        },
+        {
+            "imageUrl": "background-2.jpg",
+            "focalPoint": { "x": 5233, "y": 3464}
+        },
+        {
+            "imageUrl": "background-3.jpg"
+        }
+    ]
 }

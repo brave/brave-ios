@@ -1,6 +1,6 @@
 [
   {
-    "image": "anders-jilden.jpg",
+    "imageUrl": "anders-jilden.jpg",
     "focalPoint": {
       "x": 1200,
       "y": null
@@ -11,7 +11,7 @@
     }
   },
   {
-    "image": "andreas-gucklhorn.jpg",
+    "imageUrl": "andreas-gucklhorn.jpg",
     "focalPoint": {
       "x": 1160,
       "y": null
@@ -22,7 +22,7 @@
     }
   },
   {
-    "image": "andy-mai.jpg",
+    "imageUrl": "andy-mai.jpg",
     "focalPoint": {
       "x": 988,
       "y": null
@@ -33,7 +33,7 @@
     }
   },
   {
-    "image": "annie-spratt.jpg",
+    "imageUrl": "annie-spratt.jpg",
     "focalPoint": {
       "x": 682,
       "y": null
@@ -44,7 +44,7 @@
     }
   },
   {
-    "image": "anton-repponen.jpg",
+    "imageUrl": "anton-repponen.jpg",
     "focalPoint": {
       "x": 2185,
       "y": null
@@ -55,7 +55,7 @@
     }
   },
   {
-    "image": "ben-karpinski.jpg",
+    "imageUrl": "ben-karpinski.jpg",
     "focalPoint": {
       "x": 815,
       "y": null
@@ -66,7 +66,7 @@
     }
   },
   {
-    "image": "dc-cavalleri.jpg",
+    "imageUrl": "dc-cavalleri.jpg",
     "focalPoint": {
       "x": 480,
       "y": null
@@ -77,7 +77,7 @@
     }
   },
   {
-    "image": "joe-gardner.jpg",
+    "imageUrl": "joe-gardner.jpg",
     "focalPoint": {
       "x": 1277,
       "y": null
@@ -88,7 +88,7 @@
     }
   },
   {
-    "image": "louis-kim.jpg",
+    "imageUrl": "louis-kim.jpg",
     "focalPoint": {
       "x": 300,
       "y": null
@@ -99,7 +99,7 @@
     }
   },
   {
-    "image": "matt-palmer.jpg",
+    "imageUrl": "matt-palmer.jpg",
     "focalPoint": {
       "x": 1205,
       "y": null
@@ -110,7 +110,7 @@
     }
   },
   {
-    "image": "oliwier gesla.jpg",
+    "imageUrl": "oliwier gesla.jpg",
     "focalPoint": {
       "x": 780,
       "y": null
@@ -121,7 +121,7 @@
     }
   },
   {
-    "image": "Svalbard_Jerol_Soibam.jpeg",
+    "imageUrl": "Svalbard_Jerol_Soibam.jpeg",
     "focalPoint": {
       "x": 1280,
       "y": null
@@ -132,7 +132,7 @@
     }
   },
   {
-    "image": "will_christiansen_glacier_peak.jpg",
+    "imageUrl": "will_christiansen_glacier_peak.jpg",
     "focalPoint": {
       "x": 1630,
       "y": null
@@ -143,7 +143,7 @@
     }
   },
   {
-    "image": "will_christiansen_ice.jpg",
+    "imageUrl": "will_christiansen_ice.jpg",
     "focalPoint": {
       "x": 1330,
       "y": null
@@ -154,7 +154,7 @@
     }
   },
   {
-    "image": "xavier-balderas-cejudo.jpg",
+    "imageUrl": "xavier-balderas-cejudo.jpg",
     "focalPoint": {
       "x": 1975,
       "y": null

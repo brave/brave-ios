@@ -10,7 +10,7 @@ import BraveRewards
 class NewTabPageBackgroundDataSource {
     
     struct Background: Decodable {
-        let image: String
+        let imageUrl: String
         
         /// Required instead of `CGPoint` due to x/y being optionals
         let focalPoint: FocalPoint?
@@ -30,7 +30,7 @@ class NewTabPageBackgroundDataSource {
         }
         
         lazy var imageLiteral: UIImage? = {
-            return UIImage(named: image)
+            return UIImage(named: imageUrl)
         }()
     }
     
@@ -39,13 +39,13 @@ class NewTabPageBackgroundDataSource {
         var logo: Logo
         
         struct Logo: Decodable {
-            let image: String
+            let imageUrl: String
             let alt: String
             let companyName: String
             let destinationUrl: String
             
             lazy var imageLiteral: UIImage? = {
-                return UIImage(named: image)
+                return UIImage(named: imageUrl)
             }()
         }
     }
