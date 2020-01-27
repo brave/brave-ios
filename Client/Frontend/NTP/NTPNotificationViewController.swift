@@ -107,6 +107,7 @@ class NTPNotificationViewController: TranslucentBottomSheet {
                     urlInfo: [learnMore: "learn-more"],
                     action: { [weak self] action in
                         self?.learnMoreHandler?()
+                        self?.close()
                 })
         case .dontShow:
             return nil
