@@ -9,7 +9,7 @@ import BraveRewards
 
 class NewTabPageBackgroundDataSource {
     
-    struct Background: Decodable {
+    struct Background: Codable {
         let imageUrl: String
         
         /// Required instead of `CGPoint` due to x/y being optionals
@@ -18,13 +18,13 @@ class NewTabPageBackgroundDataSource {
         /// Only available for normal wallpapers, not for sponsored images
         let credit: Credit?
         
-        struct Credit: Decodable {
+        struct Credit: Codable {
             let name: String
             let url: String?
         }
         
         // TODO: Make optional
-        struct FocalPoint: Decodable {
+        struct FocalPoint: Codable {
             let x: CGFloat?
             let y: CGFloat?
         }
@@ -34,11 +34,11 @@ class NewTabPageBackgroundDataSource {
         }()
     }
     
-    struct Sponsor: Decodable {
+    struct Sponsor: Codable {
         let wallpapers: [Background]
         var logo: Logo
         
-        struct Logo: Decodable {
+        struct Logo: Codable {
             let imageUrl: String
             let alt: String
             let companyName: String
