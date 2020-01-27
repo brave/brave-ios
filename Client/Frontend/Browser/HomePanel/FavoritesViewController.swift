@@ -341,10 +341,6 @@ class FavoritesViewController: UIViewController, Themeable {
         ntpNotificationShowing = true
         addChild(viewController)
         view.addSubview(viewController.view)
-        viewController.view.snp.remakeConstraints {
-            $0.right.left.equalToSuperview()
-            $0.bottom.equalTo(view)
-        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
