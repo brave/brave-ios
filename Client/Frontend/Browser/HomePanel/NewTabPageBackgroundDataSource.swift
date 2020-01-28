@@ -23,7 +23,6 @@ class NewTabPageBackgroundDataSource {
             let url: String?
         }
         
-        // TODO: Make optional
         struct FocalPoint: Codable {
             let x: CGFloat?
             let y: CGFloat?
