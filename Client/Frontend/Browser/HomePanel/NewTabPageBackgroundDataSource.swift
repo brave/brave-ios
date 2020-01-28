@@ -79,17 +79,15 @@ class NewTabPageBackgroundDataSource {
     // This can be easily converted to a preference to persist
     private var sponsoredBackgroundRotationIndex = 0
 
+    private lazy var downloader = NTPDownloader()
     private lazy var sponsor: Sponsor? = {
-        let sponsoredFilePath = "ntp-sponsored"
-        guard let sponsoredData = self.loadData(file: sponsoredFilePath) else { return nil }
-        
-        do {
-            let sponsor = try JSONDecoder().decode(Sponsor.self, from: sponsoredData)
-            return sponsor.wallpapers.isEmpty ? nil : sponsor
-        } catch {
-            // Only set a sponsor if there are valid backgrounds
-            return nil
+        // This will either be filled on init, or lazily whenever it is needed
+        if downloader.delegate == nil {
+            // Assigning delegate will fill this object at a later point
+            downloader.delegate = self
         }
+        // Always return `nil`, since it is filled by `downloader` delegation.
+        return nil
     }()
     
     private lazy var standardBackgrounds: [Background] = {
@@ -102,6 +100,14 @@ class NewTabPageBackgroundDataSource {
             return []
         }
     }()
+    
+    init() {
+        if Preferences.NewTabPage.backgroundSponsoredImages.value
+            && BraveAds.isCurrentLocaleSupported() {
+            downloader.delegate = self
+        }
+        
+    }
     
     // This is used to prevent the same handful of backgrounds from being shown.
     //  It will track the last N pictures that have been shown and prevent them from being shown
@@ -121,7 +127,8 @@ class NewTabPageBackgroundDataSource {
                 && !PrivateBrowsingManager.shared.isPrivateBrowsing
                 && BraveAds.isCurrentLocaleSupported()
             
-            if let sponsoredWallpapers = sponsor?.wallpapers, attemptSponsored {
+            // Sponsor is lazy-loaded so only want to access it if needed.
+            if attemptSponsored, let sponsoredWallpapers = sponsor?.wallpapers {
                 return (sponsoredWallpapers, true)
             }
             return (standardBackgrounds, false)
@@ -181,5 +188,11 @@ class NewTabPageBackgroundDataSource {
         }
         
         return nil
+    }
+}
+
+extension NewTabPageBackgroundDataSource: NTPDownloaderDelegate {
+    func onNTPUpdated(ntpInfo: NewTabPageBackgroundDataSource.Sponsor?) {
+        sponsor = ntpInfo
     }
 }
