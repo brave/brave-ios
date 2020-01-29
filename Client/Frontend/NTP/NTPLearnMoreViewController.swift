@@ -77,6 +77,7 @@ class NTPLearnMoreViewController: BottomSheetViewController {
                     
                     if rewards.ledger.isWalletCreated {
                         rewards.ledger.isEnabled = true
+                        rewards.ads.isEnabled = true
                     } else {
                         rewards.ledger.createWalletAndFetchDetails { _ in }
                     }
