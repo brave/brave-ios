@@ -303,11 +303,11 @@ class ErrorPageHelper {
                 return errCode
             }
             
-            if ErrorPageHelper.CertErrors.contains(errCode) {
+            if ErrorPageHelper.certErrors.contains(errCode) {
                 return errCode
             }
             
-            if ErrorPageHelper.CertErrorCodes[errCode] != nil {
+            if ErrorPageHelper.certErrorCodes[errCode] != nil {
                 return errCode
             }
             return 0
