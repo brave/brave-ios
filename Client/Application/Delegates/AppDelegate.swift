@@ -62,6 +62,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         SceneObserver.setupApplication(window: self.window!)
 
         AdBlockStats.shared.startLoading()
+        Preferences.NTP.ntpCheckDate.value = nil
         HttpsEverywhereStats.shared.startLoading()
         
         updateShortcutItems(application)
