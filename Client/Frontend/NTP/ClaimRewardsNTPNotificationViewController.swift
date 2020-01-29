@@ -72,7 +72,7 @@ class ClaimRewardsNTPNotificationViewController: TranslucentBottomSheet {
         guard let mainView = mainView else { return }
         
         mainView.snp.remakeConstraints {
-            $0.leading.trailing.bottom.top.equalTo(view.safeAreaLayoutGuide).inset(16)
+            $0.edges.equalTo(view.safeAreaLayoutGuide).inset(16)
         }
     }
     
