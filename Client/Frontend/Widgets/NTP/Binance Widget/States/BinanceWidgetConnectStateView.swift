@@ -9,6 +9,7 @@ import SnapKit
 
 protocol BinanceWidgetConnectStateViewDelegate {
     func tapGenerate(view: WidgetStateView)
+    func didCompleteTextEntryWith(apijKey: String, privateKey: String)
 }
 
 class BinanceWidgetConnectStateView: WidgetStateView {
@@ -41,6 +42,7 @@ class BinanceWidgetConnectStateView: WidgetStateView {
         apiKeyInput.textColor = .black
         apiKeyInput.font = UIFont.systemFont(ofSize: 14, weight: .regular)
         apiKeyInput.isSecureTextEntry = true
+        apiKeyInput.delegate = self
         addSubview(apiKeyInput)
         
         let privateLeftView = UIImageView(image: UIImage(named: "key-lock-icon"))
@@ -52,6 +54,7 @@ class BinanceWidgetConnectStateView: WidgetStateView {
         privateKeyInput.textColor = .black
         privateKeyInput.font = UIFont.systemFont(ofSize: 14, weight: .regular)
         privateKeyInput.isSecureTextEntry = true
+        privateKeyInput.delegate = self
         addSubview(privateKeyInput)
         
         generateKeyButton.setTitle("Generate new key", for: .normal)
@@ -108,5 +111,14 @@ class BinanceWidgetConnectStateView: WidgetStateView {
     
     @objc func tapGenerate() {
         delegate?.tapGenerate(view: self)
+    }
+}
+
+extension BinanceWidgetConnectStateView: UITextFieldDelegate {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        guard let apiKeyInputText = apiKeyInput.text, let privateKeyInputText = privateKeyInput.text else { return false }
+        delegate?.didCompleteTextEntryWith(apijKey: apiKeyInputText, privateKey: privateKeyInputText)
+        textField.resignFirstResponder()
+        return true
     }
 }

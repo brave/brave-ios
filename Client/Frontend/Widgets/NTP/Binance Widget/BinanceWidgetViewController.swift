@@ -89,12 +89,23 @@ extension BinanceWidgetViewController: BinanceWidgetInitialStateViewDelegate {
 }
 
 extension BinanceWidgetViewController: BinanceWidgetConnectStateViewDelegate {
-    func tapGenerate(view: WidgetStateView) {
-        // Remove this
+    func didCompleteTextEntryWith(apijKey: String, privateKey: String) {
         let view = BinanceWidgetAccountStateView()
         view.delegate = self
         showView(view)
     }
+    
+    func tapGenerate(view: WidgetStateView) {
+        guard let tabManager = (UIApplication.shared.delegate as? AppDelegate)?.browserViewController.tabManager else {
+            return
+        }
+        
+        guard let url = URL(string: "https://www.binance.com/en/register") else { return }
+        
+        let request = URLRequest(url: url)
+        tabManager.addTabAndSelect(request, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
+    }
+
 }
 
 extension BinanceWidgetViewController: BinanceWidgetAccountStateViewDelegate {
@@ -109,11 +120,25 @@ extension BinanceWidgetViewController: BinanceWidgetAccountStateViewDelegate {
     }
     
     func tapDeposit(view: WidgetStateView) {
+        guard let tabManager = (UIApplication.shared.delegate as? AppDelegate)?.browserViewController.tabManager else {
+            return
+        }
         
+        guard let url = URL(string: "https://binance.com") else { return }
+        
+        let request = URLRequest(url: url)
+        tabManager.addTabAndSelect(request, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
     }
     
     func tapTrade(view: WidgetStateView) {
+        guard let tabManager = (UIApplication.shared.delegate as? AppDelegate)?.browserViewController.tabManager else {
+            return
+        }
         
+        guard let url = URL(string: "https://binance.com") else { return }
+        
+        let request = URLRequest(url: url)
+        tabManager.addTabAndSelect(request, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
     }
 }
 

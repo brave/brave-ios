@@ -22,9 +22,9 @@ class BinanceWidgetAccountStateView: WidgetStateView {
     private let disconnectButton = UIButton()
     private let descriptionLabel = UILabel()
     private let visibilityButton = UIButton()
-    private let balanceLabel = UILabel()
-    private let btcLabel = UILabel()
-    private let valueLabel = UILabel()
+    private let balanceLabel = UILabel() //AnimatedBlurLabel()
+    private let btcLabel = UILabel() //AnimatedBlurLabel()
+    private let valueLabel = UILabel() //AnimatedBlurLabel()
     private let depositButton = UIButton()
     private let tradeButton = UIButton()
     
@@ -75,6 +75,15 @@ class BinanceWidgetAccountStateView: WidgetStateView {
         valueLabel.font = UIFont.systemFont(ofSize: 14, weight: .regular)
         valueLabel.numberOfLines = 1
         addSubview(valueLabel)
+        
+//        balanceLabel.animationDuration = 1.0
+//        balanceLabel.blurRadius = 30.0
+//
+//        btcLabel.animationDuration = 1.0
+//        btcLabel.blurRadius = 30.0
+//
+//        valueLabel.animationDuration = 1.0
+//        valueLabel.blurRadius = 30.0
         
         depositButton.setImage(UIImage(named: "deposit"), for: .normal)
         depositButton.imageEdgeInsets = UIEdgeInsets(top: 10, left: -15, bottom: 10, right: 0)

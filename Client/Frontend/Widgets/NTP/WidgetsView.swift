@@ -26,7 +26,8 @@ class WidgetsView: UIScrollView {
         addSubview(stackView)
         
         stackView.snp.makeConstraints {
-            $0.center.equalToSuperview()
+            $0.topMargin.equalTo(40)
+            $0.centerX.equalToSuperview()
         }
         
         binanceWidget.delegate = self
@@ -44,7 +45,7 @@ extension WidgetsView: WidgetViewControllerDelegate {
     func shouldHideWidget<Widget>(widget: Widget) where Widget: WidgetViewController {
         if widget.isKind(of: BinanceWidgetViewController.self) {
             // close messaging for binance widget
-            // widget.isHidden = true
+            widget.isHidden = true
         }
     }
 }

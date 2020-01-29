@@ -34,6 +34,45 @@ class FavoritesViewController: UIViewController, Themeable {
         $0.isDirectionalLockEnabled = true
         $0.showsHorizontalScrollIndicator = false
         $0.showsVerticalScrollIndicator = false
+        $0.delegate = self
+    }
+    
+    private lazy var nextPageButton = UIView().then {
+        let blur = UIVisualEffectView(effect: UIBlurEffect(style: .light))
+        let button = UIButton(type: .system).then {
+            $0.setImage(UIImage(named: "next_page")?.withRenderingMode(.alwaysTemplate), for: .normal)
+            $0.tintColor = .white
+            $0.addTarget(self, action: #selector(nextPage), for: .touchUpInside)
+        }
+        
+        $0.clipsToBounds = true
+        $0.layer.maskedCorners = [.layerMinXMinYCorner, .layerMinXMaxYCorner]
+        $0.layer.cornerRadius = 10
+        
+        $0.addSubview(blur)
+        $0.addSubview(button)
+        
+        blur.snp.makeConstraints { $0.edges.equalToSuperview() }
+        button.snp.makeConstraints { $0.edges.equalToSuperview() }
+    }
+    
+    private lazy var previousPageButton = UIView().then {
+        let blur = UIVisualEffectView(effect: UIBlurEffect(style: .light))
+        let button = UIButton(type: .system).then {
+            $0.setImage(UIImage(named: "previous_page")?.withRenderingMode(.alwaysTemplate), for: .normal)
+            $0.tintColor = .white
+            $0.addTarget(self, action: #selector(previousPage), for: .touchUpInside)
+        }
+        
+        $0.clipsToBounds = true
+        $0.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMaxXMaxYCorner]
+        $0.layer.cornerRadius = 10
+        
+        $0.addSubview(blur)
+        $0.addSubview(button)
+        
+        blur.snp.makeConstraints { $0.edges.equalToSuperview() }
+        button.snp.makeConstraints { $0.edges.equalToSuperview() }
     }
     
     private lazy var widgetsView = WidgetsView()
@@ -50,7 +89,7 @@ class FavoritesViewController: UIViewController, Themeable {
         
             let cellIdentifier = FavoriteCell.identifier
             $0.register(FavoriteCell.self, forCellWithReuseIdentifier: cellIdentifier)
-            $0.alwaysBounceVertical = false
+            $0.alwaysBounceVertical = true
             $0.accessibilityIdentifier = "Top Sites View"
             // Entire site panel, including the stats view insets
             $0.contentInset = UIEdgeInsets(top: UI.statsHeight, left: 0, bottom: 0, right: 0)
@@ -137,6 +176,14 @@ class FavoritesViewController: UIViewController, Themeable {
         delegate?.didTapShowMoreFavorites()
     }
     
+    @objc private func nextPage() {
+        scrollView.scrollRectToVisible(CGRect(x: view.frame.maxX, y: 0, width: view.frame.width, height: 1), animated: true)
+    }
+    
+    @objc private func previousPage() {
+        scrollView.scrollRectToVisible(CGRect(x: 0, y: 0, width: 1, height: 1), animated: true)
+    }
+    
     // MARK: - Init/lifecycle
     
     private var backgroundViewInfo: (imageView: UIImageView, portraitCenterConstraint: Constraint)?
@@ -221,6 +268,11 @@ class FavoritesViewController: UIViewController, Themeable {
         ddgButton.addSubview(ddgLabel)
         
         scrollView.addSubview(widgetsView)
+        
+        previousPageButton.alpha = 0
+        
+        view.addSubview(nextPageButton)
+        view.addSubview(previousPageButton)
         
         makeConstraints()
         
@@ -384,6 +436,20 @@ class FavoritesViewController: UIViewController, Themeable {
             // Width and therefore, right constraint is determined by the actual button inside of this view
             //  button is resized from text content, and this superview is pinned to that width.
         }
+        
+        nextPageButton.snp.makeConstraints {
+            $0.centerY.equalToSuperview()
+            $0.right.equalToSuperview()
+            $0.width.equalTo(20)
+            $0.height.equalTo(130)
+        }
+        
+        previousPageButton.snp.makeConstraints {
+            $0.centerY.equalToSuperview()
+            $0.left.equalToSuperview()
+            $0.width.equalTo(20)
+            $0.height.equalTo(130)
+        }
     }
     
     // MARK: - Private browsing modde
@@ -513,6 +579,36 @@ class FavoritesViewController: UIViewController, Themeable {
         let heightOfCallout = ddgButton.systemLayoutSizeFitting(UIView.layoutFittingExpandedSize).height + (UI.searchEngineCalloutPadding * 2.0)
         collection.contentInset.bottom = isVisible ? heightOfCallout : 0
         ddgButton.isHidden = !isVisible
+    }
+}
+
+extension FavoritesViewController: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let pos = scrollView.contentOffset.x
+        
+        if pos > 0 {
+            UIView.animate(withDuration: 0.1) {
+                self.nextPageButton.alpha = 0
+            }
+        } else {
+            UIView.animate(withDuration: 0.3) {
+                self.nextPageButton.alpha = 1
+            }
+        }
+        
+        if pos >= view.frame.width {
+            UIView.animate(withDuration: 0.3) {
+                self.previousPageButton.alpha = 1
+            }
+        } else {
+            UIView.animate(withDuration: 0.1) {
+                self.previousPageButton.alpha = 0
+            }
+        }
+    }
+    
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        
     }
 }
 
