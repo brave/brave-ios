@@ -598,7 +598,7 @@ class BrowserViewController: UIViewController {
         #endif
         
         DispatchQueue.main.async {
-            sync.webView.alpha = 0.01
+            sync.webView.alpha = CGFloat.leastNormalMagnitude
             UIApplication.shared.keyWindow?.insertSubview(Sync.shared.webView, at: 0)
         }
     }
