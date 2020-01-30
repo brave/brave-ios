@@ -29,7 +29,7 @@ class NewTabPageBackgroundDataSource {
         }
         
         lazy var imageLiteral: UIImage? = {
-            return UIImage(named: imageUrl)
+            return UIImage(contentsOfFile: imageUrl)
         }()
     }
     
@@ -44,7 +44,7 @@ class NewTabPageBackgroundDataSource {
             let destinationUrl: String
             
             lazy var imageLiteral: UIImage? = {
-                return UIImage(named: imageUrl)
+                return UIImage(contentsOfFile: imageUrl)
             }()
         }
     }
