@@ -8,6 +8,7 @@ public struct UserAgentBuilder {
     struct UAVersions {
         let safariVersion: String
         let webkitVersion: String
+        let iOSVersion: String
     }
     
     struct OSVersionMap {
@@ -18,9 +19,13 @@ public struct UserAgentBuilder {
     
     public init() {}
     
-    public func build(appendSafariVersion: Bool = false) -> String {
+    public func build(appendSafariVersion: Bool = false, appendiOSVersion: Bool = false) -> String {
         let uaVersions = webkitVersion
         var ua = "Mozilla/5.0 (\(cpuInfo)) AppleWebKit/\(uaVersions.webkitVersion) (KHTML, like Gecko) Mobile/\(kernelVersion)"
+        
+        if appendiOSVersion {
+            ua += " Version/\(uaVersions.iOSVersion)"
+        }
         
         if appendSafariVersion {
             ua += " Safari/\(uaVersions.safariVersion)"
@@ -51,7 +56,8 @@ public struct UserAgentBuilder {
     var webkitVersion: UAVersions {
         let _12_0 = OSVersionMap(majorVersion: 12, minorVersion: 0,
                               uaVersions: UAVersions(safariVersion: "605.1",
-                                                     webkitVersion: "605.1.15"))
+                                                     webkitVersion: "605.1.15",
+                                                     iOSVersion: iOSVersion))
         
         var uaVersions: UAVersions?
         
@@ -80,5 +86,9 @@ public struct UserAgentBuilder {
     var kernelVersion: String {
         // Kernel version is frozen for iOS 11.3 and later.
         return "15E148"
+    }
+    
+    var iOSVersion: String {
+        return UIDevice.current.systemVersion
     }
 }
