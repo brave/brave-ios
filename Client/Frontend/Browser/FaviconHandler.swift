@@ -10,7 +10,7 @@ import Deferred
 import class Data.FaviconMO
 
 class FaviconHandler {
-    static let MaximumFaviconSize = 1 * 1024 * 1024 // 1 MiB file size limit
+    static let maximumFaviconSize = 1 * 1024 * 1024 // 1 MiB file size limit
 
     private var tabObservers: TabObservers!
     private let backgroundQueue = OperationQueue()
@@ -28,14 +28,14 @@ class FaviconHandler {
             return deferMaybe(FaviconError())
         }
 
-        let deferred = Deferred<Maybe<(Favicon, Data?)>>()
+        let deferred = Deferred<Maybe<(Favicon, Data?)>>(value: nil, defaultQueue: .main)
 
         var imageOperation: SDWebImageOperation?
 
         let webImageCache = WebImageCacheManager.shared
 
         let onProgress: ImageCacheProgress = { receivedSize, expectedSize, _ in
-            if receivedSize >= FaviconHandler.MaximumFaviconSize || expectedSize > FaviconHandler.MaximumFaviconSize {
+            if receivedSize >= FaviconHandler.maximumFaviconSize || expectedSize > FaviconHandler.maximumFaviconSize {
                 imageOperation?.cancel()
             }
         }

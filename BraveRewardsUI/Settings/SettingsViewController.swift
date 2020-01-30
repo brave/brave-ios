@@ -4,6 +4,7 @@
 
 import UIKit
 import BraveRewards
+import Shared
 
 class SettingsViewController: UIViewController {
   
@@ -34,7 +35,7 @@ class SettingsViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     
-    title = Strings.SettingsTitle
+    title = Strings.settingsTitle
     
     navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(tappedDone))
     
@@ -44,15 +45,12 @@ class SettingsViewController: UIViewController {
     
     settingsView.do {
       $0.rewardsToggleSection.toggleSwitch.addTarget(self, action: #selector(rewardsSwitchValueChanged), for: .valueChanged)
-      $0.walletSection.viewDetailsButton.addTarget(self, action: #selector(tappedWalletViewDetails), for: .touchUpInside)
       $0.adsSection.viewDetailsButton.addTarget(self, action: #selector(tappedAdsViewDetails), for: .touchUpInside)
       $0.adsSection.toggleSwitch.addTarget(self, action: #selector(adsToggleValueChanged), for: .valueChanged)
+      $0.monthlyTipsSection.viewDetailsButton.addTarget(self, action: #selector(tappedMonthlyTipsViewDetails), for: .touchUpInside)
       $0.tipsSection.viewDetailsButton.addTarget(self, action: #selector(tappedTipsViewDetails), for: .touchUpInside)
       $0.autoContributeSection.viewDetailsButton.addTarget(self, action: #selector(tappedAutoContributeViewDetails), for: .touchUpInside)
       $0.autoContributeSection.toggleSwitch.addTarget(self, action: #selector(autoContributeToggleValueChanged), for: .valueChanged)
-      
-      let dollarString = state.ledger.dollarStringForBATAmount(state.ledger.balance?.total ?? 0) ?? ""
-      $0.walletSection.setWalletBalance(state.ledger.balanceString, crypto: Strings.WalletBalanceType, dollarValue: dollarString)
       
       if !BraveAds.isCurrentLocaleSupported() {
          $0.adsSection.status = .unsupportedRegion
@@ -118,8 +116,8 @@ class SettingsViewController: UIViewController {
     navigationController?.pushViewController(controller, animated: true)
   }
   
-  @objc private func tappedWalletViewDetails() {
-    let controller = WalletDetailsViewController(state: state)
+  @objc private func tappedMonthlyTipsViewDetails() {
+    let controller = MonthlyTipsDetailViewController(state: state)
     controller.preferredContentSize = preferredContentSize
     navigationController?.pushViewController(controller, animated: true)
   }
@@ -139,11 +137,13 @@ class SettingsViewController: UIViewController {
   @objc private func rewardsSwitchValueChanged() {
     state.ledger.isEnabled = settingsView.rewardsToggleSection.toggleSwitch.isOn
     updateVisualStateOfSections(animated: true)
+    NotificationCenter.default.post(name: .adsOrRewardsToggledInSettings, object: nil)
   }
   
   @objc private func adsToggleValueChanged() {
     state.ads.isEnabled = settingsView.adsSection.toggleSwitch.isOn
     updateVisualStateOfSections(animated: true)
+    NotificationCenter.default.post(name: .adsOrRewardsToggledInSettings, object: nil)
   }
   
   @objc private func autoContributeToggleValueChanged() {
@@ -152,14 +152,6 @@ class SettingsViewController: UIViewController {
   }
   
   func setupLedgerObservers() {
-    ledgerObserver.fetchedBalance = { [weak self] in
-      guard let self = self else { return }
-      self.settingsView.walletSection.setWalletBalance(
-        self.state.ledger.balanceString,
-        crypto: Strings.WalletBalanceType,
-        dollarValue: self.state.ledger.usdBalanceString
-      )
-    }
     ledgerObserver.promotionsAdded = { [weak self] _ in
       self?.updateGrantsSection()
     }
@@ -174,8 +166,8 @@ class SettingsViewController: UIViewController {
       guard let self = self else { return }
       section.claimGrantButton.isLoading = false
       if !success {
-        let alert = UIAlertController(title: Strings.GenericErrorTitle, message: Strings.GenericErrorBody, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: Strings.OK, style: .default, handler: nil))
+        let alert = UIAlertController(title: Strings.genericErrorTitle, message: Strings.genericErrorBody, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: Strings.ok, style: .default, handler: nil))
         self.present(alert, animated: true)
         return
       }

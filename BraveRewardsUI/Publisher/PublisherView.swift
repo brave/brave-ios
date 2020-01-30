@@ -11,16 +11,28 @@ class PublisherView: UIStackView {
     verifiedLabelStackView.isHidden = hidden
   }
   
-  func setStatus(_ status: PublisherStatus) {
+  func setStatus(_ status: PublisherStatus, externalWalletStatus: WalletStatus, hasBraveFunds: Bool) {
     if status != .notVerified {
       verificationSymbolImageView.image = UIImage(frameworkResourceNamed: "icn-verify")
-      verifiedLabel.text = Strings.Verified
+      verifiedLabel.text = Strings.verified
     } else {
       verificationSymbolImageView.image = UIImage(frameworkResourceNamed: "icn-unverified")
-      verifiedLabel.text = Strings.NotYetVerified
+      verifiedLabel.text = Strings.notYetVerified
     }
-    // Shows if the publisher is also .connected
-    unverifiedDisclaimerView.isHidden = status == .verified
+    if hasBraveFunds {
+      // Use that balance first, therefore not showing any differently
+      unverifiedDisclaimerView.isHidden = status != .notVerified
+    } else {
+      if externalWalletStatus == .notConnected {
+        unverifiedDisclaimerView.isHidden = status != .notVerified
+      } else {
+        unverifiedDisclaimerView.isHidden = status == .verified
+        if status == .connected {
+          unverifiedDisclaimerView.text = "\(Strings.connectedPublisherDisclaimer) \(Strings.disclaimerLearnMore)"
+          unverifiedDisclaimerView.setURLInfo([Strings.disclaimerLearnMore: "learn-more"])
+        }
+      }
+    }
   }
   
   func updatePublisherName(_ name: String, provider: String) {
@@ -110,7 +122,7 @@ class PublisherView: UIStackView {
   let checkAgainButton = Button(type: .system).then {
     $0.appearanceTextColor = Colors.blue500
     $0.titleLabel?.font = .systemFont(ofSize: 12.0)
-    $0.setTitle(Strings.CheckAgain, for: .normal)
+    $0.setTitle(Strings.checkAgain, for: .normal)
     $0.setContentHuggingPriority(.required, for: .horizontal)
   }
   
@@ -123,8 +135,8 @@ class PublisherView: UIStackView {
     $0.appearanceTextColor = Colors.grey200
     $0.font = UIFont.systemFont(ofSize: 12.0)
     $0.textContainerInset = UIEdgeInsets(top: 8.0, left: 8.0, bottom: 8.0, right: 8.0)
-    $0.text = "\(Strings.UnverifiedPublisherDisclaimer) \(Strings.DisclaimerLearnMore)"
-    $0.setURLInfo([Strings.DisclaimerLearnMore: "learn-more"])
+    $0.text = "\(Strings.unverifiedPublisherDisclaimer) \(Strings.disclaimerLearnMore)"
+    $0.setURLInfo([Strings.disclaimerLearnMore: "learn-more"])
     $0.backgroundColor = UIColor(white: 0.0, alpha: 0.04)
     $0.layer.cornerRadius = 4.0
   }

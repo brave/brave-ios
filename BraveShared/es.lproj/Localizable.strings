@@ -88,8 +88,32 @@
 /* Skip button to skip onboarding and start using the app. */
 "OnboardingSkipButton" = "Omitir";
 
+/* Name of folder where restored bookmarks are retrieved */
+"RestoredBookmarksFolderName" = "Marcadores restaurados";
+
+/* Name of folder where restored favorites are retrieved */
+"RestoredFavoritesFolderName" = "Favoritos restaurados";
+
 /* Prompt shown before enabling provider search queries */
 "Turn on search suggestions?" = "¿Activar las sugerencias de búsqueda?";
+
+/* No comment provided by engineer. */
+"UserWalletBATNotAllowedLearnMore" = "Más información";
+
+/* No comment provided by engineer. */
+"UserWalletBATNotAllowedMessage" = "Actualmente, la región a la que pertenece la ubicación en la que has abierto tu cuenta no admite BAT. Vuelve a comprobarlo más adelante para ver si ha cambiado.";
+
+/* No comment provided by engineer. */
+"UserWalletCloseButtonTitle" = "Cerrar";
+
+/* No comment provided by engineer. */
+"UserWalletDetailsDisconnectButtonTitle" = "Región no compatible";
+
+/* No comment provided by engineer. */
+"UserWalletGenericErrorMessage" = "Ha ocurrido un problema al iniciar sesión en tu cuenta de Uphold. Inténtalo de nuevo.";
+
+/* No comment provided by engineer. */
+"UserWalletGenericErrorTitle" = "Lo sentimos, algo salió mal";
 
 /* For search suggestions prompt. This string should be short so it fits nicely on the prompt row. */
 "Yes" = "Sí";

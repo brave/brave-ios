@@ -10,6 +10,7 @@ import pop
 
 public class AdsViewController: UIViewController {
   public typealias ActionHandler = (AdsNotification, AdsNotificationHandler.Action) -> Void
+  private var widthAnchor: NSLayoutConstraint?
   
   private struct DisplayedAd {
     let ad: AdsNotification
@@ -44,13 +45,17 @@ public class AdsViewController: UIViewController {
       $0.top.equalTo(view.safeAreaLayoutGuide.snp.top)
       $0.top.greaterThanOrEqualTo(view).offset(4) // Makes sure in landscape its at least 4px from the top
       
-      if UIDevice.current.userInterfaceIdiom == .pad {
-        let isWidthLarger = UIScreen.main.bounds.width > UIScreen.main.bounds.height
-        $0.width.equalTo(isWidthLarger ? view.snp.width : view.snp.height).multipliedBy(0.40).priority(.high)
-      } else {
+      if UIDevice.current.userInterfaceIdiom != .pad {
         $0.width.equalTo(view).priority(.high)
       }
     }
+    
+    if UIDevice.current.userInterfaceIdiom == .pad {
+      widthAnchor = adView.widthAnchor.constraint(equalToConstant: 0.0)
+      widthAnchor?.priority = .defaultHigh
+      widthAnchor?.isActive = true
+    }
+    
     view.layoutIfNeeded()
     
     animateIn(adView: adView)
@@ -74,6 +79,15 @@ public class AdsViewController: UIViewController {
     swipePanGesture.name = swipeGestureName
     swipePanGesture.delegate = self
     adView.addGestureRecognizer(swipePanGesture)
+  }
+  
+  public override func viewWillLayoutSubviews() {
+    super.viewWillLayoutSubviews()
+    
+    if UIDevice.current.userInterfaceIdiom == .pad {
+      let constant = max(view.bounds.width, view.bounds.height) * 0.40
+      widthAnchor?.constant = ceil(constant * UIScreen.main.scale) / UIScreen.main.scale
+    }
   }
   
   public func hide(adView: AdView) {
@@ -104,7 +118,7 @@ public class AdsViewController: UIViewController {
       timer.invalidate()
     }
     var dismissInterval = automaticDismissalInterval
-    if !AppConstants.BuildChannel.isPublic, let override = Preferences.Rewards.adsDurationOverride.value, override > 0 {
+    if !AppConstants.buildChannel.isPublic, let override = Preferences.Rewards.adsDurationOverride.value, override > 0 {
       dismissInterval = TimeInterval(override)
     }
     dismissTimers[adView] = Timer.scheduledTimer(withTimeInterval: dismissInterval, repeats: false, block: { [weak self] _ in
@@ -320,8 +334,8 @@ extension AdsViewController {
     }
     
     let notification = AdsNotification.customAd(
-      title: Strings.MyFirstAdTitle,
-      body: Strings.MyFirstAdBody,
+      title: Strings.myFirstAdTitle,
+      body: Strings.myFirstAdBody,
       url: URL(string: "https://brave.com/my-first-ad")!
     )
     

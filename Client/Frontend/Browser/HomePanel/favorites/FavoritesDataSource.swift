@@ -5,6 +5,7 @@ import Storage
 import CoreData
 import Shared
 import Data
+import BraveShared
 
 private let log = Logger.browserLogger
 
@@ -20,7 +21,7 @@ class FavoritesDataSource: NSObject, UICollectionViewDataSource {
                 // We need to post notification here to inform all cells to show the edit button.
                 // collectionView.reloadData() can't be used, it stops InteractiveMovementForItem,
                 // requiring user to long press again if he wants to reorder a tile.
-                let name = isEditing ? Notification.Name.ThumbnailEditOn : Notification.Name.ThumbnailEditOff
+                let name = isEditing ? Notification.Name.thumbnailEditOn : Notification.Name.thumbnailEditOff
                 NotificationCenter.default.post(name: name, object: nil)
             }
         }
@@ -41,41 +42,30 @@ class FavoritesDataSource: NSObject, UICollectionViewDataSource {
     
     /// The number of times that each row contains
     var columnsPerRow: Int {
-        guard let size = collectionView?.bounds.size,
-            let traitCollection = collectionView?.traitCollection else {
-                return 0
+        guard let collection = collectionView else {
+            return 0
         }
         
-        var cols = 0
-        if traitCollection.horizontalSizeClass == .compact {
-            // Landscape iPhone
-            if traitCollection.verticalSizeClass == .compact {
-                cols = 5
-            }
-                // Split screen iPad width
-            else if size.widthLargerOrEqualThanHalfIPad() {
-                cols = 4
-            }
-                // iPhone portrait
-            else {
-                cols = 3
-            }
-        } else {
-            // Portrait iPad
-            if size.height > size.width {
-                cols = 4
-            }
-                // Landscape iPad
-            else {
-                cols = 5
-            }
+        /// Two considerations:
+        /// 1. icon size minimum
+        /// 2. trait collection
+        
+        let icons = (less: 4, more: 6)
+        let minIconPoints: CGFloat = 80
+        
+        // If icons fall below a certain size, then use less icons.
+        if (collection.frame.width / CGFloat(icons.more)) < minIconPoints {
+            return icons.less
         }
-        return cols + 1
+        
+        let cols = collection.traitCollection.horizontalSizeClass == .compact ? icons.less : icons.more
+        return cols
     }
     
     /// If there are more favorites than are being shown
     var hasOverflow: Bool {
-        return columnsPerRow < frc?.fetchedObjects?.count ?? 0
+        let showAll = !Preferences.NewTabPage.backgroundImages.value
+        return !showAll && columnsPerRow < frc?.fetchedObjects?.count ?? 0
     }
     
     func refetch() {
@@ -89,7 +79,13 @@ class FavoritesDataSource: NSObject, UICollectionViewDataSource {
     }
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return min(columnsPerRow, frc?.fetchedObjects?.count ?? 0)
+        if hasOverflow {
+            return columnsPerRow
+        }
+        
+        // No overflow so just show them all (generally either not enough items to overflow one row or no background images.
+        let allItems = frc?.fetchedObjects?.count ?? 0
+        return allItems
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {

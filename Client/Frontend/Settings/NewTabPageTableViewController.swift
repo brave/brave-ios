@@ -6,9 +6,10 @@ import Foundation
 import Static
 import BraveShared
 import Shared
+import BraveRewards
 
 class NewTabPageTableViewController: TableViewController {
-    let sponsoredRow = BoolRow(title: Strings.NewTabPageSettingsSponsoredImages, option: Preferences.NewTabPage.backgroundSponsoredImages)
+    let sponsoredRow = Row.boolRow(title: Strings.newTabPageSettingsSponsoredImages, option: Preferences.NewTabPage.backgroundSponsoredImages)
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -16,7 +17,7 @@ class NewTabPageTableViewController: TableViewController {
         // Hides unnecessary empty rows
         tableView.tableFooterView = UIView()
         
-        navigationItem.title = Strings.NewTabPageSettingsTitle
+        navigationItem.title = Strings.newTabPageSettingsTitle
         tableView.accessibilityIdentifier = "NewTabPageSettings.tableView"
         dataSource.sections = [section]
         
@@ -26,7 +27,7 @@ class NewTabPageTableViewController: TableViewController {
     
     private lazy var section: Section = {
         var rows = [
-            BoolRow(title: Strings.NewTabPageSettingsBackgroundImages, option: Preferences.NewTabPage.backgroundImages, onValueChange: {
+            Row.boolRow(title: Strings.newTabPageSettingsBackgroundImages, option: Preferences.NewTabPage.backgroundImages, onValueChange: {
                 newValue in
                 // Since overriding, does not auto-adjust this setting.
                 Preferences.NewTabPage.backgroundImages.value = newValue
@@ -34,22 +35,19 @@ class NewTabPageTableViewController: TableViewController {
                 // If turning off normal background images, turn of sponsored images as well.
                 Preferences.NewTabPage.backgroundSponsoredImages.value = newValue
                 
-                if !newValue {
-                    // Updating the underlying preference does not dynamically update the visuals unfortuantely.
-                    // Updating manually. Only update if disabling.
-                    self.sponsoredSwitch?.isOn = newValue
-                }
+                // Update sponsored switch to both on/off to follow background images.
+                self.sponsoredSwitch?.isOn = newValue
                 
                 // Need to update every time.
                 self.sponsoredSwitch?.isEnabled = newValue
             })
         ]
         
-        if BackgroundImage.showSponsoredSetting {
+        if BraveAds.isCurrentLocaleSupported() {
             rows.append(sponsoredRow)
         }
-        
-        rows.append(BoolRow(title: Strings.NewTabPageSettingsAutoOpenKeyboard, option: Preferences.NewTabPage.autoOpenKeyboard))
+        rows.append(.boolRow(title: Strings.newTabPageSettingsAutoOpenKeyboard,
+                             option: Preferences.NewTabPage.autoOpenKeyboard))
         return Section(rows: rows)
     }()
     
