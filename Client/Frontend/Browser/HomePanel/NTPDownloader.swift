@@ -19,9 +19,10 @@ class NTPDownloader {
     private static let ntpDownloadsFolder = "NTPDownloads"
     private static let baseURL = { () -> String in
         switch BraveLedger.environment {
-        case .production: return "https://brave-ntp-crx-input.s3-us-west-2.amazonaws.com/"
-        case .development: return "https://brave-ntp-crx-input-dev.s3-us-west-2.amazonaws.com/"
-        default: return "https://brave-ntp-crx-input.s3-us-west-2.amazonaws.com/"
+        case .production: return "https://mobile-data.s3.brave.com/"
+        case .staging, .development: return "https://brave-ntp-crx-input-dev.s3-us-west-2.amazonaws.com/"
+        @unknown default:
+            return "https://mobile-data.s3.brave.com/"
         }
     }()
     
