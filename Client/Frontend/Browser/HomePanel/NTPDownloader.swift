@@ -109,7 +109,7 @@ class NTPDownloader {
     }
     
     private func startNTPTimer() {
-        let baseTime = 5.hours
+        let baseTime = AppConstants.BuildChannel.isPublic ? 5.hours : 10.minutes
         let minVariance = 1.10            //10% variance
         let maxVariance = 1.14            //14% variance
         let relativeTime = baseTime * Double.random(in: ClosedRange<Double>(uncheckedBounds: (lower: minVariance, upper: maxVariance)))
