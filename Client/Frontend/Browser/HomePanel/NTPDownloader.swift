@@ -5,6 +5,7 @@
 import Foundation
 import Shared
 import BraveShared
+import BraveRewards
 
 private let logger = Logger.browserLogger
 
@@ -16,7 +17,13 @@ class NTPDownloader {
     private static let etagFile = "crc.etag"
     private static let metadataFile = "photo.json"
     private static let ntpDownloadsFolder = "NTPDownloads"
-    private static let baseURL = "https://brave-ntp-crx-input-dev.s3-us-west-2.amazonaws.com/"
+    private static let baseURL = { () -> String in
+        switch BraveLedger.environment {
+        case .production: return "https://brave-ntp-crx-input.s3-us-west-2.amazonaws.com/"
+        case .development: return "https://brave-ntp-crx-input-dev.s3-us-west-2.amazonaws.com/"
+        default: return "https://brave-ntp-crx-input.s3-us-west-2.amazonaws.com/"
+        }
+    }()
     
     private var timer: Timer?
     private var backgroundObserver: NSObjectProtocol?
