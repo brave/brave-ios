@@ -148,13 +148,17 @@ class NTPDownloader {
             self.timer?.invalidate()
             self.timer = nil
             
-            if let nextDate = Preferences.NTP.ntpCheckDate.value {
+            //If the time hasn't passed yet, reschedule the timer with the relative time..
+            if let nextDate = Preferences.NTP.ntpCheckDate.value,
+                Date().timeIntervalSince1970 - nextDate < 0 {
+                
                 let relativeTime = abs(Date().timeIntervalSince1970 - nextDate)
                 self.timer = Timer.scheduledTimer(withTimeInterval: relativeTime, repeats: true) { [weak self] _ in
                     self?.notifyObservers()
                 }
             } else {
-                self.startNTPTimer()
+                //Else the time has already passed so download the new data, reschedule the timers and notify the observers
+                self.notifyObservers()
             }
         }
     }
