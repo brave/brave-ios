@@ -143,7 +143,7 @@ class FavoritesViewController: UIViewController, Themeable {
             let noSponsor = background?.sponsor == nil
             
             // Image Sponsor
-            imageSponsorButton.setImage(background?.sponsor?.logo.imageLiteral, for: .normal)
+            imageSponsorButton.setImage(background?.sponsor?.logo.image, for: .normal)
             imageSponsorButton.isHidden = noSponsor
             
             // Image Credit
@@ -550,7 +550,7 @@ class FavoritesViewController: UIViewController, Themeable {
         self.background = backgroundDataSource?.newBackground()
         //
         
-        guard let image = background?.wallpaper.imageLiteral else {
+        guard let image = background?.wallpaper.image else {
             return
         }
         

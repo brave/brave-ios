@@ -21,6 +21,13 @@ class NewTabPageBackgroundDataSource {
         /// Whether the background is a packaged resource or a remote one, impacts how it should be loaded
         let packaged: Bool?
         
+        init(imageUrl: String, focalPoint: FocalPoint?) {
+            self.imageUrl = imageUrl
+            self.focalPoint = focalPoint
+            self.credit = nil
+            self.packaged = nil
+        }
+        
         struct Credit: Codable {
             let name: String
             let url: String?
@@ -31,10 +38,9 @@ class NewTabPageBackgroundDataSource {
             let y: CGFloat?
         }
         
-        lazy var imageLiteral: UIImage? = {
+        lazy var image: UIImage? = {
             // Remote resources are downloaded files, so must be loaded differently
-            let image = packaged == true ? UIImage(named: imageUrl) : UIImage(contentsOfFile: imageUrl)
-            return image
+            packaged == true ? UIImage(named: imageUrl) : UIImage(contentsOfFile: imageUrl)
         }()
     }
     
@@ -48,8 +54,8 @@ class NewTabPageBackgroundDataSource {
             let companyName: String
             let destinationUrl: String
             
-            lazy var imageLiteral: UIImage? = {
-                return UIImage(contentsOfFile: imageUrl)
+            lazy var image: UIImage? = {
+                UIImage(contentsOfFile: imageUrl)
             }()
         }
     }

@@ -196,9 +196,7 @@ class NTPDownloader {
             let wallpapers = itemInfo.wallpapers.map {
                 NewTabPageBackgroundDataSource.Background(
                     imageUrl: downloadsFolderURL.appendingPathComponent($0.imageUrl).path,
-                    focalPoint: $0.focalPoint,
-                    credit: nil,
-                    packaged: false)
+                    focalPoint: $0.focalPoint)
             }
             
             return NewTabPageBackgroundDataSource.Sponsor(wallpapers: wallpapers, logo: logo)
