@@ -7,7 +7,7 @@ import Shared
 import BraveShared
 import BraveRewards
 
-class NewTabPageBackgroundDataSource {
+class NTPBackgroundDataSource {
     
     struct Background: Codable {
         let imageUrl: String
@@ -122,10 +122,10 @@ class NewTabPageBackgroundDataSource {
         if !Preferences.NewTabPage.backgroundImages.value { return nil }
         
         // Identifying the background array to use
-        let (backgroundSet, useSponsor) = { () -> ([NewTabPageBackgroundDataSource.Background], Bool) in
+        let (backgroundSet, useSponsor) = { () -> ([NTPBackgroundDataSource.Background], Bool) in
             // Determine what type of background to display
             let attemptSponsored = Preferences.NewTabPage.backgroundSponsoredImages.value
-                && backgroundRotationCounter == NewTabPageBackgroundDataSource.sponsorshipShowValue
+                && backgroundRotationCounter == NTPBackgroundDataSource.sponsorshipShowValue
                 && !PrivateBrowsingManager.shared.isPrivateBrowsing
             
             // Sponsor is lazy-loaded so only want to access it if needed.
@@ -162,12 +162,12 @@ class NewTabPageBackgroundDataSource {
             // This index is now added to 'past' tracking list to prevent duplicates
             self.lastBackgroundChoices.append(chosenIndex)
             // Trimming to fixed length to release older backgrounds
-            self.lastBackgroundChoices = self.lastBackgroundChoices.suffix(NewTabPageBackgroundDataSource.numberOfDuplicateAvoidance)
+            self.lastBackgroundChoices = self.lastBackgroundChoices.suffix(NTPBackgroundDataSource.numberOfDuplicateAvoidance)
             return chosenIndex
         }()
         
         // Force back to `0` if at end
-        backgroundRotationCounter %= NewTabPageBackgroundDataSource.sponsorshipShowRate
+        backgroundRotationCounter %= NTPBackgroundDataSource.sponsorshipShowRate
         // Increment regardless, this is a counter, not an index, so smallest should be `1`
         backgroundRotationCounter += 1
         
@@ -192,13 +192,13 @@ class NewTabPageBackgroundDataSource {
     }
 }
 
-extension NewTabPageBackgroundDataSource: NTPDownloaderDelegate {
-    func onNTPUpdated(ntpInfo: NewTabPageBackgroundDataSource.Sponsor?) {
+extension NTPBackgroundDataSource: NTPDownloaderDelegate {
+    func onNTPUpdated(ntpInfo: NTPBackgroundDataSource.Sponsor?) {
         sponsor = ntpInfo
     }
 }
 
-extension NewTabPageBackgroundDataSource: PreferencesObserver {
+extension NTPBackgroundDataSource: PreferencesObserver {
     func preferencesDidChange(for key: String) {
         let sponsoredPref = Preferences.NewTabPage.backgroundSponsoredImages
         if sponsoredPref.key == key {

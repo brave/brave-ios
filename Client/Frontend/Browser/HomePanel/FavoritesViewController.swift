@@ -50,7 +50,7 @@ class FavoritesViewController: UIViewController, Themeable {
         return view
     }()
     private let dataSource: FavoritesDataSource
-    private let backgroundDataSource: NewTabPageBackgroundDataSource?
+    private let backgroundDataSource: NTPBackgroundDataSource?
 
     private let braveShieldStatsView = BraveShieldStatsView(frame: CGRect.zero).then {
         $0.autoresizingMask = [.flexibleWidth]
@@ -138,7 +138,7 @@ class FavoritesViewController: UIViewController, Themeable {
     // MARK: - Init/lifecycle
     
     private var backgroundViewInfo: (imageView: UIImageView, portraitCenterConstraint: Constraint, landscapeCenterConstraint: Constraint)?
-    private var background: (wallpaper: NewTabPageBackgroundDataSource.Background, sponsor: NewTabPageBackgroundDataSource.Sponsor?)? {
+    private var background: (wallpaper: NTPBackgroundDataSource.Background, sponsor: NTPBackgroundDataSource.Sponsor?)? {
         didSet {
             let noSponsor = background?.sponsor == nil
             
@@ -173,7 +173,7 @@ class FavoritesViewController: UIViewController, Themeable {
     private var rewards: BraveRewards?
     
     init(profile: Profile, dataSource: FavoritesDataSource = FavoritesDataSource(), fromOverlay: Bool,
-         rewards: BraveRewards?, backgroundDataSource: NewTabPageBackgroundDataSource?) {
+         rewards: BraveRewards?, backgroundDataSource: NTPBackgroundDataSource?) {
         self.profile = profile
         self.dataSource = dataSource
         self.fromOverlay = fromOverlay
