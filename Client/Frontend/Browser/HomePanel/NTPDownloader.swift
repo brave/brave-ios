@@ -59,19 +59,17 @@ class NTPDownloader {
         self.downloadMetadata { [weak self] url, cacheInfo, error in
             guard let self = self else { return }
             
+            //Start the timer no matter what..
+            self.startNTPTimer()
+            
             if case .campaignEnded = error {
                 do {
                     try self.removeCampaign()
                 } catch {
                     logger.error(error)
                 }
-                
-                self.startNTPTimer()
                 return completion(nil)
             }
-            
-            //Start the timer no matter what..
-            self.startNTPTimer()
             
             if let error = error?.underlyingError() {
                 logger.error(error)
@@ -243,9 +241,6 @@ class NTPDownloader {
     }
     
     func removeCampaign() throws {
-        Preferences.NTP.ntpCheckDate.value = nil
-        self.removeObservers()
-        
         try self.removeETag()
         let downloadsFolderURL = try self.ntpDownloadsURL()
         if FileManager.default.fileExists(atPath: downloadsFolderURL.path) {
