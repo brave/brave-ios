@@ -1699,6 +1699,12 @@ extension BrowserViewController: SettingsDelegate {
             }
         })
     }
+    
+    func settingsOpenRewardsSettings(_ settingsViewController: SettingsViewController) {
+        settingsViewController.dismiss(animated: true, completion: {
+            self.showBraveRewardsPanel(initialPage: .settings)
+        })
+    }
 }
 
 extension BrowserViewController: PresentingModalViewControllerDelegate {
