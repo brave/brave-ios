@@ -66,6 +66,7 @@ class NTPDownloader {
                     logger.error(error)
                 }
                 
+                self.startNTPTimer()
                 return completion(nil)
             }
             
