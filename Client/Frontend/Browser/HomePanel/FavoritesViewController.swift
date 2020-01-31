@@ -307,8 +307,8 @@ class FavoritesViewController: UIViewController, Themeable {
         collection.addSubview(braveShieldStatsView)
         collection.addSubview(favoritesOverflowButton)
         collection.addSubview(ddgButton)
-        scrollView.addSubview(imageCreditButton)
-        scrollView.addSubview(imageSponsorButton)
+        collectionContainer.addSubview(imageCreditButton)
+        collectionContainer.addSubview(imageSponsorButton)
         
         ddgButton.addSubview(ddgLogo)
         ddgButton.addSubview(ddgLabel)
@@ -532,19 +532,20 @@ class FavoritesViewController: UIViewController, Themeable {
         }
         
         collectionContainer.snp.makeConstraints {
-            $0.left.top.bottom.equalTo(0)
-            $0.width.equalTo(self.view)
+            $0.left.top.equalTo(0)
+            $0.width.equalTo(self.view.safeAreaLayoutGuide)
+            $0.height.equalTo(self.view.safeAreaLayoutGuide)
         }
         
         collection.snp.makeConstraints {
             $0.top.left.equalTo(0)
-            $0.width.equalTo(self.view)
-            $0.height.equalTo(self.view)
+            $0.width.equalTo(collectionContainer)
+            $0.height.equalTo(collectionContainer)
         }
         
         widgetsView.snp.makeConstraints {
             $0.top.right.equalTo(0)
-            $0.left.equalTo(collectionContainer.snp.right)
+            $0.left.equalTo(self.view.frame.width)
             $0.width.equalTo(self.view)
             $0.height.equalTo(self.view)
         }
@@ -614,36 +615,52 @@ class FavoritesViewController: UIViewController, Themeable {
 
         updateConstraints()
         collection.collectionViewLayout.invalidateLayout()
+        
+        // scrollview offset is off by safe area inset, doesn't want to reset alone.
+//        if scrollView.contentOffset.x < 0 {
+            scrollView.scrollRectToVisible(self.collectionContainer.frame, animated: true)
+//        }
     }
     
     private func updateConstraints() {
         let isIphone = UIDevice.isPhone
         let isLandscape = view.frame.width > view.frame.height
         
-        var right: ConstraintRelatableTarget = self.view.safeAreaLayoutGuide
-        var left: ConstraintRelatableTarget = self.view.safeAreaLayoutGuide
+        var right: ConstraintRelatableTarget = self.collectionContainer
+        var left: ConstraintRelatableTarget = self.collectionContainer
         if isLandscape {
             if isIphone {
-                left = self.view.snp.centerX
+                left = self.collectionContainer.snp.centerX
             } else {
-                right = self.view.snp.centerX
+                right = self.collectionContainer.snp.centerX
             }
         }
 
-        collection.snp.remakeConstraints { make in
-            make.right.equalTo(right)
-            make.left.equalTo(left)
-            make.top.bottom.equalTo(self.view)
+        collection.snp.remakeConstraints {
+            $0.right.equalTo(right)
+            $0.left.equalTo(left)
+            $0.top.equalTo(0)
+            if !isLandscape {
+                $0.width.equalTo(collectionContainer)
+            }
+            $0.height.equalTo(collectionContainer)
+        }
+        
+        widgetsView.snp.remakeConstraints {
+            $0.top.right.equalTo(0)
+            $0.left.equalTo(self.view.frame.width)
+            $0.width.equalTo(self.view)
+            $0.height.equalTo(self.view)
         }
         
         imageSponsorButton.snp.remakeConstraints {
             $0.size.equalTo(170)
-            $0.bottom.equalTo(view.safeArea.bottom).inset(10)
+            $0.bottom.equalTo(collectionContainer).inset(10)
             
             if isLandscape && isIphone {
-                $0.left.equalTo(view.safeArea.left).offset(20)
+                $0.left.equalTo(collectionContainer).offset(20)
             } else {
-                $0.centerX.equalToSuperview()
+                $0.centerX.equalTo(collectionContainer)
             }
         }
     }
