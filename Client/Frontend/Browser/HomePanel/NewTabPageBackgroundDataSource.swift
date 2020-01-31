@@ -18,6 +18,9 @@ class NewTabPageBackgroundDataSource {
         /// Only available for normal wallpapers, not for sponsored images
         let credit: Credit?
         
+        /// Whether the background is a packaged resource or a remote one, impacts how it should be loaded
+        let packaged: Bool?
+        
         struct Credit: Codable {
             let name: String
             let url: String?
@@ -29,7 +32,9 @@ class NewTabPageBackgroundDataSource {
         }
         
         lazy var imageLiteral: UIImage? = {
-            return UIImage(contentsOfFile: imageUrl)
+            // Remote resources are downloaded files, so must be loaded differently
+            let image = packaged == true ? UIImage(named: imageUrl) : UIImage(contentsOfFile: imageUrl)
+            return image
         }()
     }
     
