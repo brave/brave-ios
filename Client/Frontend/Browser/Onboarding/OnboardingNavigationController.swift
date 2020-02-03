@@ -40,6 +40,14 @@ class OnboardingNavigationController: UINavigationController {
     
     weak var onboardingDelegate: OnboardingControllerDelegate?
     
+    static var isAdsOnboardingAvailable: Bool {
+        #if ADS_DISABLED
+        return false
+        #else
+        return BraveAds.isCurrentLocaleSupported()
+        #endif
+    }
+    
     enum OnboardingType {
         case newUser
         case existingUserRewardsOff
@@ -55,9 +63,9 @@ class OnboardingNavigationController: UINavigationController {
             }
             #else
             switch self {
-            case .newUser: return BraveAds.isCurrentLocaleSupported() ? [.searchEnginePicker, .shieldsInfo, .rewardsAgreement, .adsCountdown] : [.searchEnginePicker, .shieldsInfo, .rewardsAgreement]
-            case .existingUserRewardsOff: return BraveAds.isCurrentLocaleSupported() ? [.rewardsAgreement, .adsCountdown] : [.rewardsAgreement]
-            case .existingUserRewardsOn: return BraveAds.isCurrentLocaleSupported() ? [.existingRewardsTurnOnAds, .adsCountdown] : []
+            case .newUser: return OnboardingNavigationController.isAdsOnboardingAvailable ? [.searchEnginePicker, .shieldsInfo, .rewardsAgreement, .adsCountdown] : [.searchEnginePicker, .shieldsInfo, .rewardsAgreement]
+            case .existingUserRewardsOff: return OnboardingNavigationController.isAdsOnboardingAvailable ? [.rewardsAgreement, .adsCountdown] : [.rewardsAgreement]
+            case .existingUserRewardsOn: return OnboardingNavigationController.isAdsOnboardingAvailable ? [.existingRewardsTurnOnAds, .adsCountdown] : []
             }
             #endif
         }

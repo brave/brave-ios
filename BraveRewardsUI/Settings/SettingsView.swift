@@ -35,7 +35,9 @@ extension SettingsViewController {
       scrollView.addSubview(stackView)
       stackView.addArrangedSubview(rewardsToggleSection)
       stackView.addArrangedSubview(walletSection)
+      #if !ADS_DISABLED
       stackView.addArrangedSubview(adsSection)
+      #endif
       stackView.addArrangedSubview(autoContributeSection)
       stackView.addArrangedSubview(tipsSection)
       

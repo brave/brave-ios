@@ -245,9 +245,13 @@ class BrowserViewController: UIViewController {
         
         notificationsHandler = AdsNotificationHandler(ads: rewards.ads, presentingController: self)
         notificationsHandler?.canShowNotifications = { [weak self] in
+            #if ADS_DISABLED
+            return false
+            #else
             guard let self = self else { return false }
             return !PrivateBrowsingManager.shared.isPrivateBrowsing &&
                 !self.topToolbar.inOverlayMode
+            #endif
         }
         notificationsHandler?.actionOccured = { [weak self] notification, action in
             guard let self = self else { return }
@@ -292,6 +296,7 @@ class BrowserViewController: UIViewController {
     
     // Display first ad when the user gets back to this controller if they havent seen one before
     func displayMyFirstAdIfAvailable() {
+        #if !ADS_DISABLED
         if !rewards.ledger.isEnabled || !rewards.ads.isEnabled { return }
         if Preferences.Rewards.myFirstAdShown.value { return }
         // Check if ads are eligible
@@ -307,6 +312,7 @@ class BrowserViewController: UIViewController {
                 }
             }
         }
+        #endif
     }
 
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -746,14 +752,14 @@ class BrowserViewController: UIViewController {
         // 2. User already completed onboarding.
         if Preferences.General.basicOnboardingCompleted.value == OnboardingState.completed.rawValue {
             // The user has ads in their region and they completed all onboarding.
-            if BraveAds.isCurrentLocaleSupported()
+            if OnboardingNavigationController.isAdsOnboardingAvailable
                 &&
                 Preferences.General.basicOnboardingProgress.value == OnboardingProgress.ads.rawValue {
                 return
             }
             
             // The user doesn't have ads in their region and they've completed rewards.
-            if !BraveAds.isCurrentLocaleSupported()
+            if !OnboardingNavigationController.isAdsOnboardingAvailable
                 &&
                 Preferences.General.basicOnboardingProgress.value == OnboardingProgress.rewards.rawValue {
                 return
@@ -829,7 +835,7 @@ class BrowserViewController: UIViewController {
         // 1. Rewards are on/off (existing user)
         // 2. Ads are now available
         // 3. User hasn't seen the ads part of onboarding yet
-        if BraveAds.isCurrentLocaleSupported()
+        if OnboardingNavigationController.isAdsOnboardingAvailable
             &&
             (Preferences.General.basicOnboardingCompleted.value == OnboardingState.completed.rawValue)
             &&
@@ -3486,19 +3492,19 @@ extension BrowserViewController: OnboardingControllerDelegate {
         #else
         switch onboardingController.onboardingType {
         case .newUser:
-            if BraveAds.isCurrentLocaleSupported() {
+            if OnboardingNavigationController.isAdsOnboardingAvailable {
                 Preferences.General.basicOnboardingProgress.value = OnboardingProgress.ads.rawValue
             } else {
                 Preferences.General.basicOnboardingProgress.value = OnboardingProgress.rewards.rawValue
             }
             
         case .existingUserRewardsOff:
-            if BraveAds.isCurrentLocaleSupported() {
+            if OnboardingNavigationController.isAdsOnboardingAvailable {
                 Preferences.General.basicOnboardingProgress.value = OnboardingProgress.ads.rawValue
             }
             
         case .existingUserRewardsOn:
-            if BraveAds.isCurrentLocaleSupported() {
+            if OnboardingNavigationController.isAdsOnboardingAvailable {
                 Preferences.General.basicOnboardingProgress.value = OnboardingProgress.ads.rawValue
             }
             
