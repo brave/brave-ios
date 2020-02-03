@@ -266,11 +266,13 @@ class FavoritesViewController: UIViewController, Themeable {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
+        #if !ADS_DISABLED
         guard let notificationType = ntpNotificationToShow else {
             return
         }
         
         showNTPNotification(for: notificationType)
+        #endif
     }
     
     /// Returns nil if not applicable or no notification should be shown.
