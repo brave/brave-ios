@@ -20,7 +20,7 @@ class OnboardingRewardsAgreementViewController: OnboardingViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let isAdsRegionSupported = BraveAds.isCurrentLocaleSupported()
+        let isAdsRegionSupported = OnboardingNavigationController.isAdsOnboardingAvailable
         
         let adSupportedRegionText = Preferences.Rewards.isUsingBAP.value == true ? Strings.OBRewardsDetailInAdRegionJapan : Strings.OBRewardsDetailInAdRegion
         contentView.updateSubtitleText(isAdsRegionSupported ? adSupportedRegionText : Strings.OBRewardsDetailOutsideAdRegion, boldWords: isAdsRegionSupported ? 2 : 1)

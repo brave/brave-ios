@@ -72,7 +72,7 @@ class OnboardingAdsCountdownViewController: OnboardingViewController, UNUserNoti
 extension OnboardingAdsCountdownViewController {
     
     private func displayMyFirstAdIfAvailable(_ completion: ((AdsNotificationHandler.Action) -> Void)? = nil) {
-        if BraveAds.isCurrentLocaleSupported() {
+        if OnboardingNavigationController.isAdsOnboardingAvailable {
             Preferences.Rewards.myFirstAdShown.value = true
             AdsViewController.displayFirstAd(on: self) { [weak self] action, url  in
                 if action == .opened {
