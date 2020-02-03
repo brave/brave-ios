@@ -296,6 +296,7 @@ class BrowserViewController: UIViewController {
     
     // Display first ad when the user gets back to this controller if they havent seen one before
     func displayMyFirstAdIfAvailable() {
+        #if !ADS_DISABLED
         if !rewards.ledger.isEnabled || !rewards.ads.isEnabled { return }
         if Preferences.Rewards.myFirstAdShown.value { return }
         // Check if ads are eligible
@@ -311,6 +312,7 @@ class BrowserViewController: UIViewController {
                 }
             }
         }
+        #endif
     }
 
     override var preferredStatusBarStyle: UIStatusBarStyle {
