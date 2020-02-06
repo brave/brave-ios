@@ -191,7 +191,9 @@ extension BrowserViewController: WKNavigationDelegate {
         // always allow this. Additionally, data URIs are also handled just like normal web pages.
 
         if ["http", "https", "data", "blob", "file"].contains(url.scheme) {
-            tabManager[webView]?.updateUserAgent(webView, newURL: url)
+            if navigationAction.targetFrame?.isMainFrame == true {
+                tabManager[webView]?.updateUserAgent(webView, newURL: url)
+            }
 
             pendingRequests[url.absoluteString] = navigationAction.request
             
