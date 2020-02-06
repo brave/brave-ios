@@ -34,7 +34,7 @@ class UserAgentBuilderTests: XCTestCase {
         """
         Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15) \
         AppleWebKit/605.1.15 (KHTML, like Gecko) \
-        Version/13.0.5 \
+        Version/13.1 \
         Safari/605.1.15
         """
         
@@ -122,7 +122,7 @@ class UserAgentBuilderTests: XCTestCase {
         """
         Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15) \
         AppleWebKit/605.1.15 (KHTML, like Gecko) \
-        Version/13.0.5 \
+        Version/13.1 \
         Safari/605.1.15
         """
         
@@ -167,7 +167,7 @@ class UserAgentBuilderTests: XCTestCase {
         let ios13_5_1 = OperatingSystemVersion(majorVersion: 13, minorVersion: 5, patchVersion: 1)
         let iPhone_safari_13_5_1_UA = """
         Mozilla/5.0 (iPhone; CPU iPhone OS 13_5_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) \
-        Version/13.0.5 \
+        Version/13.1 \
         Mobile/15E148 \
         Safari/604.1
         """
@@ -179,7 +179,7 @@ class UserAgentBuilderTests: XCTestCase {
         // MARK: - iPad iOS 13, non existent version(13.5.1)
         let iPad_safari_13_5_1_UA = """
         Mozilla/5.0 (iPad; CPU OS 13_5_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) \
-        Version/13.0.5 \
+        Version/13.1 \
         Mobile/15E148 \
         Safari/604.1
         """
