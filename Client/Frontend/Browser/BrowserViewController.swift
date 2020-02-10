@@ -172,6 +172,12 @@ class BrowserViewController: UIViewController {
             }
         }
         rewards = BraveRewards(configuration: configuration)
+        if !BraveRewards.isAvailable {
+            // Disable rewards services in case previous user already enabled
+            // rewards in previous build
+            rewards.ledger.isEnabled = false
+            rewards.ads.isEnabled = false
+        }
         rewardsObserver = LedgerObserver(ledger: rewards.ledger)
         deviceCheckClient = DeviceCheckClient(environment: configuration.environment)
 
@@ -1114,13 +1120,19 @@ class BrowserViewController: UIViewController {
                 return
             }
             
-            if let webView = tab.webView, let code = url.bookmarkletCodeComponent {
-                resetSpoofedUserAgentIfRequired(webView, newURL: url)
-                webView.evaluateJavaScript(code, completionHandler: { _, error in
-                    if let error = error {
-                        log.error(error)
-                    }
-                })
+            //Another Fix for: https://github.com/brave/brave-ios/pull/2296
+            //Disable any sort of privileged execution contexts
+            //IE: The user must explicitly type OR must explicitly tap a bookmark they have saved.
+            //Block all other contexts such as redirects, downloads, embed, linked, etc..
+            if visitType == .typed || visitType == .bookmark {
+                if let webView = tab.webView, let code = url.bookmarkletCodeComponent {
+                    resetSpoofedUserAgentIfRequired(webView, newURL: url)
+                    webView.evaluateJavaScript(code, completionHandler: { _, error in
+                        if let error = error {
+                            log.error(error)
+                        }
+                    })
+                }
             }
         } else {
             topToolbar.currentURL = url
@@ -1693,6 +1705,12 @@ extension BrowserViewController: SettingsDelegate {
             }
         })
     }
+    
+    func settingsOpenRewardsSettings(_ settingsViewController: SettingsViewController) {
+        settingsViewController.dismiss(animated: true, completion: {
+            self.showBraveRewardsPanel(initialPage: .settings)
+        })
+    }
 }
 
 extension BrowserViewController: PresentingModalViewControllerDelegate {
@@ -2136,9 +2154,6 @@ extension BrowserViewController: TabDelegate {
 
         let customSearchHelper = CustomSearchHelper(tab: tab)
         tab.addContentScript(customSearchHelper, name: CustomSearchHelper.name())
-
-        let nightModeHelper = NightModeHelper(tab: tab)
-        tab.addContentScript(nightModeHelper, name: NightModeHelper.name())
 
         // XXX: Bug 1390200 - Disable NSUserActivity/CoreSpotlight temporarily
         // let spotlightHelper = SpotlightHelper(tab: tab)
@@ -3472,40 +3487,40 @@ extension BrowserViewController: OnboardingControllerDelegate {
         Preferences.General.basicOnboardingCompleted.value = OnboardingState.completed.rawValue
         Preferences.General.basicOnboardingNextOnboardingPrompt.value = nil
         
-        #if NO_REWARDS
-        switch onboardingController.onboardingType {
-        case .newUser:
-            Preferences.General.basicOnboardingProgress.value = OnboardingProgress.searchEngine.rawValue
-            
-        case .existingUserRewardsOff, .existingUserRewardsOn:
-            break
-            
-        default:
-            break
+        if BraveRewards.isAvailable {
+            switch onboardingController.onboardingType {
+            case .newUser:
+                if BraveAds.isCurrentLocaleSupported() {
+                    Preferences.General.basicOnboardingProgress.value = OnboardingProgress.ads.rawValue
+                } else {
+                    Preferences.General.basicOnboardingProgress.value = OnboardingProgress.rewards.rawValue
+                }
+                
+            case .existingUserRewardsOff:
+                if BraveAds.isCurrentLocaleSupported() {
+                    Preferences.General.basicOnboardingProgress.value = OnboardingProgress.ads.rawValue
+                }
+                
+            case .existingUserRewardsOn:
+                if BraveAds.isCurrentLocaleSupported() {
+                    Preferences.General.basicOnboardingProgress.value = OnboardingProgress.ads.rawValue
+                }
+                
+            default:
+                break
+            }
+        } else {
+            switch onboardingController.onboardingType {
+            case .newUser:
+                Preferences.General.basicOnboardingProgress.value = OnboardingProgress.searchEngine.rawValue
+                
+            case .existingUserRewardsOff, .existingUserRewardsOn:
+                break
+                
+            default:
+                break
+            }
         }
-        #else
-        switch onboardingController.onboardingType {
-        case .newUser:
-            if BraveAds.isCurrentLocaleSupported() {
-                Preferences.General.basicOnboardingProgress.value = OnboardingProgress.ads.rawValue
-            } else {
-                Preferences.General.basicOnboardingProgress.value = OnboardingProgress.rewards.rawValue
-            }
-            
-        case .existingUserRewardsOff:
-            if BraveAds.isCurrentLocaleSupported() {
-                Preferences.General.basicOnboardingProgress.value = OnboardingProgress.ads.rawValue
-            }
-            
-        case .existingUserRewardsOn:
-            if BraveAds.isCurrentLocaleSupported() {
-                Preferences.General.basicOnboardingProgress.value = OnboardingProgress.ads.rawValue
-            }
-            
-        default:
-            break
-        }
-        #endif
         
         // Present private browsing prompt if necessary when onboarding has been completed
         onboardingController.dismiss(animated: true) {

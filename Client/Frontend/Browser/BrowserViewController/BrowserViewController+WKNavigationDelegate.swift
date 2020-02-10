@@ -126,12 +126,8 @@ extension BrowserViewController: WKNavigationDelegate {
             return
         }
         
-        if url.isBookmarklet && navigationAction.isAllowed {
+        if url.isBookmarklet {
             decisionHandler(.cancel)
-            
-            if let code = url.bookmarkletCodeComponent {
-                webView.evaluateJavaScript(code)
-            }
             return
         }
 
@@ -147,6 +143,7 @@ extension BrowserViewController: WKNavigationDelegate {
             return
         }
         
+        #if !NO_USER_WALLETS
         if isUpholdOAuthAuthorization(url) {
             decisionHandler(.cancel)
             guard let tab = tabManager[webView], let queryItems = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems else {
@@ -159,6 +156,7 @@ extension BrowserViewController: WKNavigationDelegate {
             authorizeUpholdWallet(from: tab, queryItems: items)
             return
         }
+        #endif
 
         // First special case are some schemes that are about Calling. We prompt the user to confirm this action. This
         // gives us the exact same behaviour as Safari.

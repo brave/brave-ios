@@ -85,11 +85,6 @@ class WalletViewController: UIViewController, RewardsSummaryProtocol {
     navigationController?.setNavigationBarHidden(true, animated: false)
     
     rewardsSummaryView.rewardsSummaryButton.addTarget(self, action: #selector(tappedRewardsSummaryButton), for: .touchUpInside)
-    if !disclaimerLabels.isEmpty {
-      rewardsSummaryView.disclaimerView = WalletDisclaimerView().then {
-        $0.labels = disclaimerLabels
-      }
-    }
     
     walletView.headerView.addFundsButton.addTarget(self, action: #selector(tappedAddFunds), for: .touchUpInside)
     walletView.headerView.settingsButton.addTarget(self, action: #selector(tappedSettings), for: .touchUpInside)
@@ -100,6 +95,7 @@ class WalletViewController: UIViewController, RewardsSummaryProtocol {
     walletView.headerView.verifiedUserWalletButton.addTarget(self, action: #selector(tappedVerifiedUserWalletButton), for: .touchUpInside)
     walletView.headerView.setUserWalletStatus(.hidden) // Hidden by default
     
+    updatePendingContributionsState()
     updateWalletHeader()
     updateWalletState()
     updateExternalWallet()
@@ -184,6 +180,16 @@ class WalletViewController: UIViewController, RewardsSummaryProtocol {
   
   // MARK: -
   
+  func updatePendingContributionsState() {
+    if disclaimerLabels.isEmpty {
+      rewardsSummaryView.disclaimerView = nil
+    } else {
+      rewardsSummaryView.disclaimerView = WalletDisclaimerView().then {
+        $0.labels = disclaimerLabels
+      }
+    }
+  }
+  
   func updateWalletState() {
     state.ledger.fetchBalance { balance in
       if balance == nil && self.state.ledger.balance == nil {
@@ -219,9 +225,17 @@ class WalletViewController: UIViewController, RewardsSummaryProtocol {
     }
     
     walletView.rewardsSummaryView?.disclaimerView?.labels.forEach {
-      $0.onLinkedTapped = { [weak self] _ in
-        guard let self = self, let url = URL(string: DisclaimerLinks.unclaimedFundsURL) else { return }
-        self.state.delegate?.loadNewTabWithURL(url)
+      $0.onLinkedTapped = { [weak self] link in
+        guard let self = self, let disclaimerLink = RewardsSummaryLink(rawValue: link.absoluteString) else { return }
+        switch disclaimerLink {
+        case .learnMore:
+          if let url = URL(string: DisclaimerLinks.unclaimedFundsURL) {
+            self.state.delegate?.loadNewTabWithURL(url)
+          }
+        case .showPendingContributions:
+          let pending = PendingContributionListController(state: self.state)
+          self.navigationController?.pushViewController(pending, animated: true)
+        }
       }
     }
     
@@ -641,6 +655,15 @@ extension WalletViewController {
       crypto: Strings.walletBalanceType,
       dollarValue: state.ledger.usdBalanceString
     )
+    #if NO_USER_WALLETS
+    if let publisher = publisher {
+      publisherSummaryView.publisherView.setStatus(
+        publisher.status,
+        externalWalletStatus: .notConnected,
+        hasBraveFunds: false
+      )
+    }
+    #else
     if let publisher = publisher {
       publisherSummaryView.publisherView.setStatus(
         publisher.status,
@@ -665,16 +688,19 @@ extension WalletViewController {
       }
       self.walletView.headerView.addFundsButton.isHidden = wallet.status != .verified
     }
+    #endif
   }
   
   /// Fetch an updated external wallet from ledger if the user isn't in JP
   func updateExternalWallet() {
+    #if !NO_USER_WALLETS
     if Preferences.Rewards.isUsingBAP.value == true { return }
     
     // If we can show Uphold, grab verification status of the wallet
     state.ledger.fetchExternalWallet(forType: .uphold) { _ in
       self.updateWalletHeader()
     }
+    #endif
   }
   
   func setupLedgerObservers() {
@@ -726,6 +752,12 @@ extension WalletViewController {
           })
         })
       })
+    }
+    ledgerObserver.pendingContributionAdded = { [weak self] _ in
+      self?.updatePendingContributionsState()
+    }
+    ledgerObserver.pendingContributionsRemoved = { [weak self] _ in
+      self?.updatePendingContributionsState()
     }
   }
 }
