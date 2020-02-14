@@ -167,13 +167,7 @@ extension BrowserViewController: WKNavigationDelegate {
         #endif
         
         if !navigationAction.isInterstitial {
-            let isSafeBrowsingEnabled = { () -> Bool in
-                let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
-                let domain = Domain.getOrCreate(forUrl: url, persistent: !isPrivateBrowsing)
-                return domain.isShieldExpected(.SafeBrowsing, considerAllShieldsOption: true)
-            }
-            
-            if BraveShield.SafeBrowsing.globalPreference {
+            if BraveShield.GoogleSafeBrowsing.globalPreference {
                 var safeBrowsingResult: SafeBrowsingResult = .safe
                 let semaphore = DispatchSemaphore(value: 0)
                 SafeBrowsingClient.shared.find(url.hashPrefixes()) { result, error in

@@ -81,6 +81,8 @@ extension Preferences {
         public static let httpsEverywhere = Option<Bool>(key: "shields.https-everywhere", default: true)
         /// Shields will block websites related to potential phishing and malware
         public static let blockPhishingAndMalware = Option<Bool>(key: "shields.block-phishing-and-malware", default: true)
+        /// Enable Google Safe Browsing
+        public static let googleSafeBrowsing = Option<Bool>(key: "shields.google-safe-browsing", default: true)
         /// Disables JavaScript execution in the browser
         public static let blockScripts = Option<Bool>(key: "shields.block-scripts", default: false)
         /// Enforces fingerprinting protection on the users session

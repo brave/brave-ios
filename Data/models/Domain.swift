@@ -89,6 +89,9 @@ public final class Domain: NSManagedObject, CRUD {
                 return self.shield_fpProtection?.boolValue ?? Preferences.Shields.fingerprintingProtection.value
             case .NoScript:
                 return self.shield_noScript?.boolValue ?? Preferences.Shields.blockScripts.value
+            case .GoogleSafeBrowsing:
+                log.error("Google Safe Browsing is NOT a shield")
+                return Preferences.Shields.googleSafeBrowsing.value
             }
         }
         
@@ -238,6 +241,9 @@ extension Domain {
         case .SafeBrowsing: shield_safeBrowsing = setting
         case .FpProtection: shield_fpProtection = setting
         case .NoScript: shield_noScript = setting
+        case .GoogleSafeBrowsing:
+            log.error("Google Safe Browsing is NOT a shield")
+            break
         }
     }
     
@@ -256,6 +262,9 @@ extension Domain {
             return self.shield_fpProtection?.boolValue
         case .NoScript:
             return self.shield_noScript?.boolValue
+        case .GoogleSafeBrowsing:
+            log.error("Google Safe Browsing is NOT a shield")
+            return false
         }
     }
     

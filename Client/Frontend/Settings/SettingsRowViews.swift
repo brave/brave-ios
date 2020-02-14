@@ -39,6 +39,17 @@ extension Row {
             uuid: option.key
         )
     }
+    
+    /// Creates a switch toggle `Row` which updates a `Preferences.Option<Bool>`
+    static func boolRow(title: String, detailText: String, option: Preferences.Option<Bool>, onValueChange: SwitchAccessoryView.ValueChange? = nil) -> Row {
+        return Row(
+            text: title,
+            detailText: detailText,
+            accessory: .view(SwitchAccessoryView(initialValue: option.value, valueChange: onValueChange ?? { option.value = $0 })),
+            cellClass: MultilineSubtitleCell.self,
+            uuid: option.key
+        )
+    }
 }
 
 class MultilineButtonCell: ButtonCell {
