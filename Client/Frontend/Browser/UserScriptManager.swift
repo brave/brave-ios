@@ -106,6 +106,22 @@ class UserScriptManager {
         return WKUserScript(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false)
     }()
     
+    // U2FUserScript is injected at document start to avoid overriding the low-level
+    // FIDO legacy sign and register APIs that have different arguments
+    private let PaymentRequestUserScript: WKUserScript? = {
+        log.error("Loading PaymentRequestUserScript")
+        guard let path = Bundle.main.path(forResource: "PaymentRequest", ofType: "js"), let source = try? String(contentsOfFile: path) else {
+            log.error("Failed to load PaymentRequest.js")
+            return nil
+        }
+        
+        var alteredSource = source
+        let token = UserScriptManager.securityToken.uuidString.replacingOccurrences(of: "-", with: "", options: .literal)
+        alteredSource = alteredSource.replacingOccurrences(of: "$<paymentreq>", with: "PaymentRequest\(token)", options: .literal)
+        
+        return WKUserScript(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+    }()
+    
     // U2FLowLevelUserScript is injected at documentEnd to override the message channels
     // with hooks that plug into the Yubico API
     private let U2FLowLevelUserScript: WKUserScript? = {
@@ -200,6 +216,10 @@ class UserScriptManager {
             }
             
             if let script = FullscreenHelperScript {
+                $0.addUserScript(script)
+            }
+            
+            if let script = PaymentRequestUserScript {
                 $0.addUserScript(script)
             }
         }
