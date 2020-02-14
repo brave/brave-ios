@@ -188,16 +188,17 @@ extension BrowserViewController: WKNavigationDelegate {
                     safeBrowsingResult = result
                 }
                 
-                _ = semaphore.wait(timeout: .now() + .seconds(30))
+                if semaphore.wait(timeout: .now() + .seconds(10)) == .success {
                 
-                // Three types of results.. "safe", "dangerous", "unknown"
-                // We currently only block `dangerous` pages as per the spec.
-                // Unknown results must be considered safe.
-                if case .dangerous(let threatType) = safeBrowsingResult {
-                    tabManager.tabForWebView(webView)?.interstitialPageHandler?.showSafeBrowsingPage(url: url, for: webView, threatType: threatType, completion: { policy in
-                        decisionHandler(policy)
-                    })
-                    return
+                    // Three types of results.. "safe", "dangerous", "unknown"
+                    // We currently only block `dangerous` pages as per the spec.
+                    // Unknown results must be considered safe.
+                    if case .dangerous(let threatType) = safeBrowsingResult {
+                        tabManager.tabForWebView(webView)?.interstitialPageHandler?.showSafeBrowsingPage(url: url, for: webView, threatType: threatType, completion: { policy in
+                            decisionHandler(policy)
+                        })
+                        return
+                    }
                 }
             }
         }

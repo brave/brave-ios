@@ -22,7 +22,9 @@ class SafeBrowsingClient {
     private static let clientId = AppInfo.baseBundleIdentifier
     private static let version = AppInfo.appVersion
     
-    private let userAgent = UserAgent.defaultUserAgent()
+    //This user-agent is only used for communicating with Brave's proxy server so that it knows iOS is making the request.
+    //Therefore, we don't care if the user is in Desktop mode or not.
+    private let userAgent = UserAgent.mobile
     private let baseURL = "https://safebrowsing.brave.com"
     private let session = URLSession(configuration: .ephemeral)
     private let database = SafeBrowsingDatabase()
