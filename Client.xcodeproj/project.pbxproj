@@ -732,6 +732,8 @@
 		5EC594F1232C697200922111 /* OnboardingAdsCountdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EC594F0232C697200922111 /* OnboardingAdsCountdownView.swift */; };
 		5EE5918123A290E000E8E8DE /* CoreNFC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F926647A234D4EF400359492 /* CoreNFC.framework */; };
 		5EEB25DE234E667700279091 /* CertificatePinningTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EEB25DD234E667700279091 /* CertificatePinningTest.swift */; };
+		5EB57C2622FB1B3700A07325 /* GSafeBrowsing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EB57C2522FB1B3700A07325 /* GSafeBrowsing.swift */; };
+		744B0FFE1B4F172E00100422 /* ToolbarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 744B0FFD1B4F172E00100422 /* ToolbarTests.swift */; };
 		744ED5611DBFEB8D00A2B5BE /* MailtoLinkHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 744ED5601DBFEB8D00A2B5BE /* MailtoLinkHandler.swift */; };
 		7479B4EF1C5306A200DF000B /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7479B4ED1C5306A200DF000B /* Reachability.swift */; };
 		74821FFE1DB6D3AC00EEEA72 /* MailSchemes.plist in Resources */ = {isa = PBXBuildFile; fileRef = 74821FFD1DB6D3AC00EEEA72 /* MailSchemes.plist */; };
@@ -2239,6 +2241,7 @@
 		5EC594EE232C68FC00922111 /* OnboardingAdsCountdownViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingAdsCountdownViewController.swift; sourceTree = "<group>"; };
 		5EC594F0232C697200922111 /* OnboardingAdsCountdownView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingAdsCountdownView.swift; sourceTree = "<group>"; };
 		5EEB25DD234E667700279091 /* CertificatePinningTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CertificatePinningTest.swift; sourceTree = "<group>"; };
+		5EB57C2522FB1B3700A07325 /* GSafeBrowsing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GSafeBrowsing.swift; sourceTree = "<group>"; };
 		610967E5236B41C9000F10EA /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = zh.lproj/Localizable.strings; sourceTree = "<group>"; };
 		6117A72C236B41D000921BFB /* zh-TW */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-TW"; path = "zh-TW.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		6129BC4D236B417A004CAD4D /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -4658,6 +4661,7 @@
 				5E4845C122DE3DF800372022 /* WindowRenderHelperScript.swift */,
 				0A19365323508756002E2B81 /* LinkPreviewViewController.swift */,
 				0A66550923E9D9750047EF2A /* UserAgent.swift */,
+				5EB57C2522FB1B3700A07325 /* GSafeBrowsing.swift */,
 			);
 			indentWidth = 4;
 			path = Browser;
@@ -6632,6 +6636,7 @@
 				0A19365423508756002E2B81 /* LinkPreviewViewController.swift in Sources */,
 				E65075611E37F77D006961AC /* MenuHelper.swift in Sources */,
 				E63ED7D81BFCD9990097D08E /* LoginTableViewCell.swift in Sources */,
+				5EB57C2622FB1B3700A07325 /* GSafeBrowsing.swift in Sources */,
 				C615FACF2129FBD000A8168C /* ImageCacheProtocol.swift in Sources */,
 				4422D4BB21BFFB7600BF1855 /* cache.cc in Sources */,
 				39455F771FC83F430088A22C /* TabEventHandler.swift in Sources */,
