@@ -106,8 +106,8 @@ class UserScriptManager {
         return WKUserScript(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false)
     }()
     
-    // U2FUserScript is injected at document start to avoid overriding the low-level
-    // FIDO legacy sign and register APIs that have different arguments
+    // PaymentRequestUserScript is injected at document start to handle
+    // requests to payment APIs
     private let PaymentRequestUserScript: WKUserScript? = {
         log.error("Loading PaymentRequestUserScript")
         guard let path = Bundle.main.path(forResource: "PaymentRequest", ofType: "js"), let source = try? String(contentsOfFile: path) else {

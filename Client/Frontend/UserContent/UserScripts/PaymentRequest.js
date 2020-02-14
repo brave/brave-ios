@@ -1,14 +1,22 @@
 class $<paymentreq> {
-  constructor () {
+  constructor (supportedInstruments, details) {
+      this.supportedInstruments = JSON.stringify(supportedInstruments)
+      this.details = JSON.stringify(details)
   }
 
   canMakePayment() {
     return true;
   }
-    
-    show() {
-        webkit.messageHandlers.U2F.postMessage({ name: 'payment-request-show', data: 'data'})
-    }
+
+  show() {
+    const supportedInstruments = this.supportedInstruments
+    const details = this.details
+    return new Promise(
+      function (resolve, reject) {
+        webkit.messageHandlers.PaymentRequest.postMessage({ name: 'payment-request-show', supportedInstruments: supportedInstruments, details: details })
+      }
+    )
+  }
 }
 
 Object.defineProperty(window, 'PaymentRequest', {

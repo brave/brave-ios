@@ -6,14 +6,25 @@ import Data
 import Shared
 import WebKit
 
+private let log = Logger.browserLogger
+
+let popup = PaymentHandlerPopupView(imageView: UIImageView(image: #imageLiteral(resourceName: "browser_lock_popup")), title: Strings.paymentRequestTitle, message: "")
+
 class PaymentRequestExtension: NSObject {
     fileprivate weak var tab: Tab?
     
     init(tab: Tab) {
         self.tab = tab
+        popup.addButton(title: Strings.paymentRequestPay) { () -> PopupViewDismissType in
+            return .flyDown
+        }
+        popup.addButton(title: Strings.paymentRequestCancel) { () -> PopupViewDismissType in
+            return .flyDown
+        }
+
     }
 }
-// MARK: - TabContentScript
+
 extension PaymentRequestExtension: TabContentScript {
     static func name() -> String {
         return "PaymentRequest"
@@ -25,9 +36,18 @@ extension PaymentRequestExtension: TabContentScript {
     
     func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage) {
         if message.name == "PaymentRequest", let body = message.body as? NSDictionary {
-        guard let name = body["name"] as? String, let handle = body["handle"] as? Int else {
-            log.error("Received!")
-            return
+            guard let name = body["name"] as? String, let supportedInstruments = body["supportedInstruments"] as? String, let details = body["details"] as? String else {
+                return
+            }
+            if (name == "payment-request-show") {
+                popup.showWithType(showType: .flyUp)
+            }
         }
     }
+}
+
+extension Strings {
+    public static let paymentRequestTitle = NSLocalizedString("paymentRequestTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Review your payment", comment: "Title for Brave Payments")
+    public static let paymentRequestPay = NSLocalizedString("paymentRequestPay", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Pay", comment: "Pay button on Payment Request screen")
+    public static let paymentRequestCancel = NSLocalizedString("paymentRequestCancel", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Cancel", comment: "Canceel button on Payment Request screen")
 }
