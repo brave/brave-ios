@@ -157,6 +157,37 @@ extension BrowserViewController: WKNavigationDelegate {
             return
         }
         #endif
+        
+        let isSafeBrowsingEnabled = { () -> Bool in
+            let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
+            let domain = Domain.getOrCreate(forUrl: url, persistent: !isPrivateBrowsing)
+            return domain.isShieldExpected(.SafeBrowsing)
+        }
+        
+        if isSafeBrowsingEnabled() {
+            var isURLSafe = true //By default, we mark the URL as safe, unless the lookup returns otherwise..
+            let semaphore = DispatchSemaphore(value: 0)
+            DispatchQueue.global(qos: .background).async {
+                SafeBrowsingClient.shared.find(url.hashPrefixes()) { isSafe, error in
+                    defer { semaphore.signal() }
+                    
+                    if let error = error {
+                        log.error(error)
+                        return
+                    }
+                    
+                    isURLSafe = isSafe
+                }
+            }
+            
+            _ = semaphore.wait(timeout: .now() + .seconds(30))
+            
+            if !isURLSafe {
+                safeBrowsing?.showMalwareWarningPage(forUrl: url, inWebView: webView)
+                decisionHandler(.cancel)
+                return
+            }
+        }
 
         // First special case are some schemes that are about Calling. We prompt the user to confirm this action. This
         // gives us the exact same behaviour as Safari.

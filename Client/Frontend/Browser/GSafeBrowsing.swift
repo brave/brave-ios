@@ -5,7 +5,7 @@
 import Foundation
 import CommonCrypto
 
-enum ThreatType: String, Codable, CaseIterable {
+private enum ThreatType: String, Codable, CaseIterable {
     case unspecified = "THREAT_TYPE_UNSPECIFIED"
     case malware = "MALWARE"
     case socialEngineering = "SOCIAL_ENGINEERING"
@@ -13,37 +13,37 @@ enum ThreatType: String, Codable, CaseIterable {
     case potentiallyHarmfulApplication = "POTENTIALLY_HARMFUL_APPLICATION"
 }
 
-enum PlatformType: String, Codable, CaseIterable {
+private enum PlatformType: String, Codable, CaseIterable {
     case unknown = "PLATFORM_TYPE_UNSPECIFIED"
     case ios = "IOS"
     case `any` = "ANY_PLATFORM"
     case all = "ALL_PLATFORMS"
 }
 
-enum ThreatEntryType: String, Codable, CaseIterable {
+private enum ThreatEntryType: String, Codable, CaseIterable {
     case unspecified = "THREAT_ENTRY_TYPE_UNSPECIFIED"
     case url = "URL"
     case exe = "EXECUTABLE"
 }
 
-enum CompressionType: String, Codable, CaseIterable {
+private enum CompressionType: String, Codable, CaseIterable {
     case unspecified = "COMPRESSION_TYPE_UNSPECIFIED"
     case raw = "RAW"
     case rice = "RICE"
 }
 
-enum ResponseType: String, Codable, CaseIterable {
+private enum ResponseType: String, Codable, CaseIterable {
     case unspecified = "RESPONSE_TYPE_UNSPECIFIED"
     case partialUpdate = "PARTIAL_UPDATE"
     case fullUpdate = "FULL_UPDATE"
 }
 
-struct ClientInfo: Codable {
+private struct ClientInfo: Codable {
     let clientId: String
     let clientVersion: String
 }
 
-struct Constraints: Codable {
+private struct Constraints: Codable {
     let maxUpdateEntries: UInt32?
     let maxDatabaseEntries: UInt32?
     let region: String
@@ -52,7 +52,7 @@ struct Constraints: Codable {
     let deviceLocation: String?
 }
 
-struct ListUpdateRequest: Codable {
+private struct ListUpdateRequest: Codable {
     let threatType: ThreatType
     let platformType: PlatformType
     let threatEntryType: ThreatEntryType
@@ -60,23 +60,23 @@ struct ListUpdateRequest: Codable {
     let constraints: Constraints
 }
 
-struct RawHashes: Codable {
+private struct RawHashes: Codable {
     let prefixSize: UInt8
     let rawHashes: String
 }
 
-struct RawIndices: Codable {
+private struct RawIndices: Codable {
     let indices: [UInt32]
 }
 
-struct RiceDeltaEncoding: Codable {
+private struct RiceDeltaEncoding: Codable {
     let firstValue: String
     let riceParameter: UInt8
     let numEntries: UInt32
     let encodedData: String
 }
 
-struct ThreatEntrySet: Codable {
+private struct ThreatEntrySet: Codable {
     let compressionType: CompressionType
     let rawHashes: RawHashes
     let rawIndices: RawIndices?
@@ -84,25 +84,25 @@ struct ThreatEntrySet: Codable {
     let riceIndices: RiceDeltaEncoding?
 }
 
-struct ThreatEntry: Codable {
+private struct ThreatEntry: Codable {
     let hash: String?
     let url: String?
     let digest: String?
 }
 
-struct ThreatInfo: Codable {
+private struct ThreatInfo: Codable {
     let threatTypes: [ThreatType]
     let platformTypes: [PlatformType]
     let threatEntryTypes: [ThreatEntryType]
     let threatEntries: [ThreatEntry]
 }
 
-struct MetadataEntry: Codable {
+private struct MetadataEntry: Codable {
     let key: String
     let value: String
 }
 
-struct ThreatEntryMetadata: Codable {
+private struct ThreatEntryMetadata: Codable {
     let entries: [MetadataEntry]
     
     init(from decoder: Decoder) throws {
@@ -111,7 +111,7 @@ struct ThreatEntryMetadata: Codable {
     }
 }
 
-struct ThreatMatch: Codable {
+private struct ThreatMatch: Codable {
     let threatType: ThreatType
     let platformType: PlatformType
     let threatEntryType: ThreatEntryType
@@ -120,11 +120,11 @@ struct ThreatMatch: Codable {
     let cacheDuration: String
 }
 
-struct Checksum: Codable {
+private struct Checksum: Codable {
     let sha256: String
 }
 
-struct ListUpdateResponse: Codable {
+private struct ListUpdateResponse: Codable {
     let threatType: ThreatType
     let threatEntryType: ThreatEntryType
     let platformType: PlatformType
@@ -147,22 +147,22 @@ struct ListUpdateResponse: Codable {
     }
 }
 
-struct FetchRequest: Codable {
+private struct FetchRequest: Codable {
     let client: ClientInfo
     let listUpdateRequests: [ListUpdateRequest]
 }
 
-struct FetchResponse: Codable {
+private struct FetchResponse: Codable {
     let listUpdateResponses: [ListUpdateResponse]
     let minimumWaitDuration: String
 }
 
-struct FindRequest: Codable {
+private struct FindRequest: Codable {
     let client: ClientInfo
     let threatInfo: ThreatInfo
 }
 
-struct FindResponse: Codable {
+private struct FindResponse: Codable {
     let matches: [ThreatMatch]
     let negativeCacheDuration: String
     
@@ -178,20 +178,7 @@ struct FindResponse: Codable {
     }
 }
 
-class SafeBrowsingError: NSError {
-    public init(_ message: String, code: Int = -1) {
-        super.init(domain: "SafeBrowsingError", code: code, userInfo: [
-            NSLocalizedDescriptionKey: message,
-            NSLocalizedFailureErrorKey: message
-        ])
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError()
-    }
-}
-
-struct ResponseError: Codable {
+private struct ResponseError: Codable {
     let code: Int
     let message: String
     
@@ -205,6 +192,19 @@ struct ResponseError: Codable {
     
     private enum NestedKeys: String, CodingKey {
         case error
+    }
+}
+
+class SafeBrowsingError: NSError {
+    public init(_ message: String, code: Int = -1) {
+        super.init(domain: "SafeBrowsingError", code: code, userInfo: [
+            NSLocalizedDescriptionKey: message,
+            NSLocalizedFailureErrorKey: message
+        ])
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError()
     }
 }
 
@@ -225,7 +225,7 @@ private class SafeBrowsingDatabase {
         states[threatType] = state
     }
     
-    var isEmpty: Bool {
+    public var isEmpty: Bool {
         return unspecifiedThreats.isEmpty &&
             malwareThreats.isEmpty &&
             unwantedSoftwareThreats.isEmpty &&
@@ -367,13 +367,15 @@ private class SafeBrowsingDatabase {
     }
 }
 
-class SafeBrowsingClient {
+public class SafeBrowsingClient {
     private static let apiKey = "DUMMY_KEY"
     private let baseURL = "https://safebrowsing.brave.com"
     private let session = URLSession(configuration: .ephemeral)
     private let database = SafeBrowsingDatabase()
     
-    func find(_ hashes: [String], _ completion: @escaping (_ isSafe: Bool, Error?) -> Void) throws {
+    public static let shared = SafeBrowsingClient()
+    
+    public func find(_ hashes: [String], _ completion: @escaping (_ isSafe: Bool, Error?) -> Void) {
         var discoveredHashes = hashes.flatMap({ database.findHashes($0) })
         if discoveredHashes.isEmpty && !database.isEmpty {
             return completion(true, nil)
@@ -406,23 +408,27 @@ class SafeBrowsingClient {
         let body = FindRequest(client: clientInfo,
                                threatInfo: threatInfo)
         
-        let request = try encode(.post, endpoint: .fullHashes, body: body)
-        executeRequest(request, type: FindResponse.self) { response, error in
-            if let error = error {
-                return completion(false, error)
-            }
-            
-            if let response = response {
-                if !response.matches.isEmpty {
-                    return completion(false, nil)
+        do {
+            let request = try encode(.post, endpoint: .fullHashes, body: body)
+            executeRequest(request, type: FindResponse.self) { response, error in
+                if let error = error {
+                    return completion(false, error)
                 }
+                
+                if let response = response {
+                    if !response.matches.isEmpty {
+                        return completion(false, nil)
+                    }
+                }
+                
+                completion(true, nil)
             }
-            
-            completion(true, nil)
+        } catch {
+            completion(false, error)
         }
     }
     
-    func fetch(_ completion: @escaping (Error?) -> Void) throws {
+    public func fetch(_ completion: @escaping (Error?) -> Void) {
         // Create some constraints
         let constraints = Constraints(maxUpdateEntries: 2048, //limit bandwidth
             maxDatabaseEntries: 4096, //limit disk space
@@ -457,45 +463,49 @@ class SafeBrowsingClient {
         let clientInfo = ClientInfo(clientId: "com.brave.safebrowsing", clientVersion: "1.0")
         let body = FetchRequest(client: clientInfo, listUpdateRequests: lists)
         
-        let request = try encode(.post, endpoint: .fetch, body: body)
-        executeRequest(request, type: FetchResponse.self) { response, error in
-            if let error = error {
-                return completion(error)
-            }
-            
-            if let response = response {
-                response.listUpdateResponses.forEach({
-                    self.database.setState($0.newClientState, $0.threatType)
-                    
-                    if $0.responseType == .fullUpdate {
-                        self.database.removeAll($0.threatType)
-                    }
-                })
+        do {
+            let request = try encode(.post, endpoint: .fetch, body: body)
+            executeRequest(request, type: FetchResponse.self) { response, error in
+                if let error = error {
+                    return completion(error)
+                }
                 
-                response.listUpdateResponses.forEach({ update in
-                    update.additions.forEach({
-                        if let hash = Data(base64Encoded: $0.rawHashes.rawHashes) {
-                            let strideSize = Int($0.rawHashes.prefixSize)
-                            
-                            for i in stride(from: 0, to: hash.count, by: strideSize) {
-                                let startIndex = hash.index(hash.startIndex, offsetBy: i)
-                                let endIndex = hash.index(startIndex, offsetBy: strideSize)
-                                
-                                let subData = hash.subdata(in: startIndex..<endIndex)
-                                self.database.add(subData.base64EncodedString(), update.threatType)
-                            }
+                if let response = response {
+                    response.listUpdateResponses.forEach({
+                        self.database.setState($0.newClientState, $0.threatType)
+                        
+                        if $0.responseType == .fullUpdate {
+                            self.database.removeAll($0.threatType)
                         }
                     })
                     
-                    update.removals.forEach({
-                        $0.rawIndices?.indices.reversed().forEach({
-                            self.database.remove(index: Int($0), update.threatType)
+                    response.listUpdateResponses.forEach({ update in
+                        update.additions.forEach({
+                            if let hash = Data(base64Encoded: $0.rawHashes.rawHashes) {
+                                let strideSize = Int($0.rawHashes.prefixSize)
+                                
+                                for i in stride(from: 0, to: hash.count, by: strideSize) {
+                                    let startIndex = hash.index(hash.startIndex, offsetBy: i)
+                                    let endIndex = hash.index(startIndex, offsetBy: strideSize)
+                                    
+                                    let subData = hash.subdata(in: startIndex..<endIndex)
+                                    self.database.add(subData.base64EncodedString(), update.threatType)
+                                }
+                            }
+                        })
+                        
+                        update.removals.forEach({
+                            $0.rawIndices?.indices.reversed().forEach({
+                                self.database.remove(index: Int($0), update.threatType)
+                            })
                         })
                     })
-                })
+                }
+                
+                completion(nil)
             }
-            
-            completion(nil)
+        } catch {
+            completion(error)
         }
     }
     
@@ -666,7 +676,7 @@ extension URL {
 }
 
 extension URL {
-    func hashPrefixes(lengthInBytes: Int) -> [String] {
+    public func hashPrefixes(lengthInBytes: Int = 4) -> [String] {
         let hash = { (string: String) -> Data in
             if let data = string.data(using: String.Encoding.utf8) {
                 let digestLength = Int(CC_SHA256_DIGEST_LENGTH)
