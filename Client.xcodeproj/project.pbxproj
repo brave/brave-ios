@@ -977,6 +977,8 @@
 		F9B23EE223F61173000EB3D8 /* PaymentRequest.js in Resources */ = {isa = PBXBuildFile; fileRef = F9B23EE123F61173000EB3D8 /* PaymentRequest.js */; };
 		F9B23EE523F613E8000EB3D8 /* PaymentRequestExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B23EE423F613E8000EB3D8 /* PaymentRequestExtension.swift */; };
 		F9B23EE723F71D93000EB3D8 /* PaymentHandlerPopupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B23EE623F71D92000EB3D8 /* PaymentHandlerPopupView.swift */; };
+		F9B23EE923F73FB2000EB3D8 /* PaymentRequestDetailsHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B23EE823F73FB2000EB3D8 /* PaymentRequestDetailsHandler.swift */; };
+		F9B23EEB23F74AF8000EB3D8 /* PaymentRequestSupportedInstrumentsHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B23EEA23F74AF8000EB3D8 /* PaymentRequestSupportedInstrumentsHandler.swift */; };
 		F9C6B7D623886EF8003F7D16 /* SceneObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C6B7D523886EF8003F7D16 /* SceneObserver.swift */; };
 		FA6B2AC21D41F02D00429414 /* Punycode.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA6B2AC11D41F02D00429414 /* Punycode.swift */; };
 		FA9293D41D6580E100AC8D33 /* QRCodeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA9293D31D6580E100AC8D33 /* QRCodeViewController.swift */; };
@@ -2469,6 +2471,8 @@
 		F9B23EE123F61173000EB3D8 /* PaymentRequest.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = PaymentRequest.js; sourceTree = "<group>"; };
 		F9B23EE423F613E8000EB3D8 /* PaymentRequestExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentRequestExtension.swift; sourceTree = "<group>"; };
 		F9B23EE623F71D92000EB3D8 /* PaymentHandlerPopupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentHandlerPopupView.swift; sourceTree = "<group>"; };
+		F9B23EE823F73FB2000EB3D8 /* PaymentRequestDetailsHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentRequestDetailsHandler.swift; sourceTree = "<group>"; };
+		F9B23EEA23F74AF8000EB3D8 /* PaymentRequestSupportedInstrumentsHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentRequestSupportedInstrumentsHandler.swift; sourceTree = "<group>"; };
 		F9C6B7D523886EF8003F7D16 /* SceneObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneObserver.swift; sourceTree = "<group>"; };
 		FA6B2AC11D41F02D00429414 /* Punycode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Punycode.swift; sourceTree = "<group>"; };
 		FA9293D31D6580E100AC8D33 /* QRCodeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QRCodeViewController.swift; sourceTree = "<group>"; };
@@ -4896,6 +4900,8 @@
 			isa = PBXGroup;
 			children = (
 				F9B23EE423F613E8000EB3D8 /* PaymentRequestExtension.swift */,
+				F9B23EE823F73FB2000EB3D8 /* PaymentRequestDetailsHandler.swift */,
+				F9B23EEA23F74AF8000EB3D8 /* PaymentRequestSupportedInstrumentsHandler.swift */,
 			);
 			path = PaymentRequest;
 			sourceTree = "<group>";
@@ -6293,6 +6299,7 @@
 				2F44FCC71A9E8CF500FD20CC /* SearchSettingsTableViewController.swift in Sources */,
 				39A359E41BFCCE94006B9E87 /* UserActivityHandler.swift in Sources */,
 				E698FFDA1B4AADF40001F623 /* TabScrollController.swift in Sources */,
+				F9B23EE923F73FB2000EB3D8 /* PaymentRequestDetailsHandler.swift in Sources */,
 				44331DD422551CC0007E3E93 /* ToolbarHelper.swift in Sources */,
 				D34510881ACF415700EC27F0 /* SearchLoader.swift in Sources */,
 				E65075521E37F6D1006961AC /* UIViewExtensions.swift in Sources */,
@@ -6387,6 +6394,7 @@
 				0BD19A671A25309B0084FBA7 /* NSUserDefaultsPrefs.swift in Sources */,
 				4422D4F021BFFB7600BF1855 /* write_batch.cc in Sources */,
 				E68AEDB01B18F81A00133D99 /* SwipeAnimator.swift in Sources */,
+				F9B23EEB23F74AF8000EB3D8 /* PaymentRequestSupportedInstrumentsHandler.swift in Sources */,
 				0AEFB8532226D7C5007AF600 /* AdblockResourcesMappings.swift in Sources */,
 				0A66550A23E9D9750047EF2A /* UserAgent.swift in Sources */,
 				3BF56D271CDBBE1F00AC4D75 /* SimpleToast.swift in Sources */,

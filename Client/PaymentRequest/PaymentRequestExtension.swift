@@ -39,7 +39,31 @@ extension PaymentRequestExtension: TabContentScript {
             guard let name = body["name"] as? String, let supportedInstruments = body["supportedInstruments"] as? String, let details = body["details"] as? String else {
                 return
             }
-            if (name == "payment-request-show") {
+            if name == "payment-request-show" {
+                do {
+                    guard let detailsData = details.data(using: String.Encoding.utf8), let supportedInstrumentsData = supportedInstruments.data(using: String.Encoding.utf8) else {
+                        log.error("Error parsing data")
+                        return
+                    }
+                    let d = try JSONDecoder().decode(PaymentRequestDetailsHandler.self, from: detailsData)
+                    
+                    let si =  try JSONDecoder().decode([PaymentRequestSupportedInstrumentsHandler].self, from: supportedInstrumentsData)
+                    
+                    log.info("Success!")
+                } catch DecodingError.dataCorrupted(let context) {
+                    log.error(context)
+                } catch DecodingError.keyNotFound(let key, let context) {
+                    log.info(context.debugDescription)
+                    log.info(context.codingPath)
+                } catch DecodingError.valueNotFound(let value, let context) {
+                    log.info(context.debugDescription)
+                    log.info(context.codingPath)
+                } catch DecodingError.typeMismatch(let type, let context) {
+                    log.info(context.debugDescription)
+                    log.info(context.codingPath)
+                } catch {
+                    log.info(error)
+                }
                 popup.showWithType(showType: .flyUp)
             }
         }
