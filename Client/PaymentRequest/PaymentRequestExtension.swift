@@ -42,6 +42,9 @@ extension PaymentRequestExtension: TabContentScript {
             }
             if name == "payment-request-show" {
                 do {
+                    popup.clearDisplayItems()
+                    popup.addTotalLabel(message: "")
+                    
                     guard let detailsData = details.data(using: String.Encoding.utf8), let supportedInstrumentsData = supportedInstruments.data(using: String.Encoding.utf8) else {
                         log.error("Error parsing data")
                         return
@@ -51,9 +54,11 @@ extension PaymentRequestExtension: TabContentScript {
                     let supportedInstruments =  try JSONDecoder().decode([PaymentRequestSupportedInstrumentsHandler].self, from: supportedInstrumentsData)
                     
                     for item in details.displayItems {
-                        popup.addDisplayItemLabel(message: item.label + "\n")
+                        popup.addDisplayItemLabel(message: item.label + ":  " + item.amount.value + " " + item.amount.currency + "\n")
                         log.info(item.label)
                     }
+                    
+                    popup.addTotalLabel(message: details.total.label + ":  " + details.total.amount.value + " " + details.total.amount.currency + "\n")
 
                     log.info("Success!")
                 } catch {
