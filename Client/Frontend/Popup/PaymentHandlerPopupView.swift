@@ -4,6 +4,7 @@
 
 import UIKit
 import BraveShared
+import Shared
 import Lottie
 
 class PaymentHandlerPopupView: PopupView {
@@ -12,6 +13,8 @@ class PaymentHandlerPopupView: PopupView {
     fileprivate var messageLabel: UILabel!
     fileprivate var containerView: UIView!
     fileprivate var textField: UITextField?
+    fileprivate var displayItemTitle: UILabel!
+    fileprivate var displayItems = [UILabel]()
     
     var text: String? {
         return textField?.text
@@ -53,6 +56,14 @@ class PaymentHandlerPopupView: PopupView {
         messageLabel.numberOfLines = 0
         containerView.addSubview(messageLabel)
         
+        displayItemTitle = UILabel(frame: CGRect.zero)
+        displayItemTitle.textColor = BraveUX.greyH
+        displayItemTitle.textAlignment = .center
+        displayItemTitle.font = UIFont.systemFont(ofSize: 13, weight: UIFont.Weight.bold)
+        displayItemTitle.text = Strings.orderSummary
+        displayItemTitle.numberOfLines = 0
+        containerView.addSubview(displayItemTitle)
+        
         if let inputType = inputType {
             textField = UITextField(frame: CGRect.zero).then {
                 $0.keyboardType = inputType
@@ -76,6 +87,26 @@ class PaymentHandlerPopupView: PopupView {
         setStyle(popupStyle: .dialog)
         setDialogColor(color: BraveUX.popupDialogColorLight)
     }
+            
+    func addDisplayItemLabel(message: String) {
+        let displayItem = UILabel(frame: CGRect.zero)
+        displayItem.textColor = BraveUX.greyH
+        displayItem.textAlignment = .left
+        displayItem.font = UIFont.systemFont(ofSize: 12, weight: UIFont.Weight.regular)
+        displayItem.text = message
+        displayItem.numberOfLines = 0
+        
+        containerView.addSubview(displayItem)
+        displayItems.append(displayItem)
+        
+        /*let separator = UIView(frame: CGRect(x: 0, y: 100, width: 320, height: 1.0))
+        separator.layer.borderWidth = 1.0
+        separator.layer.borderColor = UIColor.black.cgColor
+        separator.backgroundColor = UIConstants.borderColor
+        containerView.addSubview(separator)*/
+        
+        updateSubviews()
+    }
     
     func update(title: String) {
         titleLabel.text = title
@@ -88,6 +119,11 @@ class PaymentHandlerPopupView: PopupView {
     func updateSubviews() {
         titleLabel.adjustsFontSizeToFitWidth = false
         messageLabel.adjustsFontSizeToFitWidth = false
+        displayItemTitle.adjustsFontSizeToFitWidth = false
+        
+        for label in displayItems {
+            label.adjustsFontSizeToFitWidth = false
+        }
 
         updateSubviews(resizePercentage: 1.0)
         
@@ -99,6 +135,10 @@ class PaymentHandlerPopupView: PopupView {
             let resizePercentage = desiredHeight / containerView.frame.height
             titleLabel.adjustsFontSizeToFitWidth = true
             messageLabel.adjustsFontSizeToFitWidth = true
+            displayItemTitle.adjustsFontSizeToFitWidth = true
+            for label in displayItems {
+                label.adjustsFontSizeToFitWidth = true
+            }
             updateSubviews(resizePercentage: resizePercentage)
         }
         
@@ -136,8 +176,28 @@ class PaymentHandlerPopupView: PopupView {
         messageLabelFrame.origin.y = rint(titleLabelFrame.maxY + kPadding * 1.5 / 2.0 * resizePercentage)
         messageLabel.frame = messageLabelFrame
         
+        var displayItemTitleSize: CGSize = displayItemTitle.sizeThatFits(CGSize(width: width - kPadding * 4.0, height: CGFloat.greatestFiniteMagnitude))
+        displayItemTitleSize.height = displayItemTitleSize.height * resizePercentage
+        var displayItemTitleFrame: CGRect = displayItemTitle.frame
+        displayItemTitleFrame.size = displayItemTitleSize
+        displayItemTitleFrame.origin.x = kPadding
+        displayItemTitleFrame.origin.y = rint(messageLabelFrame.maxY + kPadding * 1.5 / 2.0 * resizePercentage)
+        displayItemTitle.frame = displayItemTitleFrame
+        
+        var previouslabelFrame = displayItemTitleFrame
+        for label in displayItems {
+            var labelSize: CGSize = label.sizeThatFits(CGSize(width: width - kPadding * 4.0, height: CGFloat.greatestFiniteMagnitude))
+            labelSize.height = labelSize.height * resizePercentage
+            var labelFrame: CGRect = label.frame
+            labelFrame.size = labelSize
+            labelFrame.origin.x = kPadding
+            labelFrame.origin.y = rint(previouslabelFrame.maxY + kPadding/8.0)
+            label.frame = labelFrame
+            previouslabelFrame = labelFrame
+        }
+        
         var textFieldFrame = textField?.frame ?? CGRect.zero
-        var maxY = messageLabel.text?.isEmpty == true ? titleLabelFrame.maxY : messageLabelFrame.maxY
+        var maxY =  previouslabelFrame.maxY
         if let textField = textField {
             textFieldFrame.size.width = width - kPadding * 2
             textFieldFrame.size.height = 35
@@ -175,4 +235,8 @@ extension PaymentHandlerPopupView: UITextFieldDelegate {
         textField.resignFirstResponder()
         return true
     }
+}
+
+extension Strings {
+    public static let orderSummary = NSLocalizedString("orderSummary", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Order Summary", comment: "Title for display items")
 }

@@ -8,7 +8,7 @@ import WebKit
 
 private let log = Logger.browserLogger
 
-let popup = PaymentHandlerPopupView(imageView: UIImageView(image: #imageLiteral(resourceName: "browser_lock_popup")), title: Strings.paymentRequestTitle, message: "")
+let popup = PaymentHandlerPopupView(imageView: nil, title: Strings.paymentRequestTitle, message: "")
 
 class PaymentRequestExtension: NSObject {
     fileprivate weak var tab: Tab?
@@ -18,6 +18,7 @@ class PaymentRequestExtension: NSObject {
         popup.addButton(title: Strings.paymentRequestPay) { () -> PopupViewDismissType in
             return .flyDown
         }
+        
         popup.addButton(title: Strings.paymentRequestCancel) { () -> PopupViewDismissType in
             return .flyDown
         }
@@ -45,22 +46,16 @@ extension PaymentRequestExtension: TabContentScript {
                         log.error("Error parsing data")
                         return
                     }
-                    let d = try JSONDecoder().decode(PaymentRequestDetailsHandler.self, from: detailsData)
+                    let details = try JSONDecoder().decode(PaymentRequestDetailsHandler.self, from: detailsData)
                     
-                    let si =  try JSONDecoder().decode([PaymentRequestSupportedInstrumentsHandler].self, from: supportedInstrumentsData)
+                    let supportedInstruments =  try JSONDecoder().decode([PaymentRequestSupportedInstrumentsHandler].self, from: supportedInstrumentsData)
                     
+                    for item in details.displayItems {
+                        popup.addDisplayItemLabel(message: item.label + "\n")
+                        log.info(item.label)
+                    }
+
                     log.info("Success!")
-                } catch DecodingError.dataCorrupted(let context) {
-                    log.error(context)
-                } catch DecodingError.keyNotFound(let key, let context) {
-                    log.info(context.debugDescription)
-                    log.info(context.codingPath)
-                } catch DecodingError.valueNotFound(let value, let context) {
-                    log.info(context.debugDescription)
-                    log.info(context.codingPath)
-                } catch DecodingError.typeMismatch(let type, let context) {
-                    log.info(context.debugDescription)
-                    log.info(context.codingPath)
                 } catch {
                     log.info(error)
                 }
