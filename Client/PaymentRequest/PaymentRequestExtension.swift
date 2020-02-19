@@ -15,14 +15,6 @@ class PaymentRequestExtension: NSObject {
     
     init(tab: Tab) {
         self.tab = tab
-        popup.addButton(title: Strings.paymentRequestPay) { () -> PopupViewDismissType in
-            return .flyDown
-        }
-        
-        popup.addButton(title: Strings.paymentRequestCancel) { () -> PopupViewDismissType in
-            return .flyDown
-        }
-
     }
 }
 
@@ -43,6 +35,7 @@ extension PaymentRequestExtension: TabContentScript {
             if name == "payment-request-show" {
                 do {
                     popup.clearDisplayItems()
+                    popup.removeAllButtons()
                     popup.addTotalLabel(message: "")
                     
                     guard let detailsData = details.data(using: String.Encoding.utf8), let supportedInstrumentsData = supportedInstruments.data(using: String.Encoding.utf8) else {
@@ -59,7 +52,24 @@ extension PaymentRequestExtension: TabContentScript {
                     }
                     
                     popup.addTotalLabel(message: details.total.label + ":  " + details.total.amount.value + " " + details.total.amount.currency + "\n")
-
+                    
+                    popup.addButton(title: Strings.paymentRequestPay) { [weak self] in
+                        guard let self = self else {
+                            return .flyDown
+                        }
+                        ensureMainThread {
+                            self.tab?.webView?.evaluateJavaScript("paymentreq_postCreate('Hello World!')", completionHandler: { _, error in
+                                if error != nil {
+                                    log.error(error)
+                                }
+                        }) }
+                        return .flyDown
+                    }
+                    
+                    popup.addButton(title: Strings.paymentRequestCancel) { () -> PopupViewDismissType in
+                        return .flyDown
+                    }
+                    
                     log.info("Success!")
                 } catch {
                     log.info(error)

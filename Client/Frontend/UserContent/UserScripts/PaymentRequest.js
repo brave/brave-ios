@@ -1,3 +1,13 @@
+paymentreq_reject = {}
+paymentreq_resolve = {}
+
+Object.defineProperty(window, 'paymentreq_postCreate', {
+  value:
+    function (response) {
+      paymentreq_resolve(response)
+    }
+})
+
 class $<paymentreq> {
   constructor (supportedInstruments, details) {
       this.supportedInstruments = JSON.stringify(supportedInstruments)
@@ -13,6 +23,8 @@ class $<paymentreq> {
     const details = this.details
     return new Promise(
       function (resolve, reject) {
+        paymentreq_resolve = resolve
+        paymentreq_reject = reject
         webkit.messageHandlers.PaymentRequest.postMessage({ name: 'payment-request-show', supportedInstruments: supportedInstruments, details: details })
       }
     )
