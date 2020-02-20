@@ -12,6 +12,7 @@ let popup = PaymentHandlerPopupView(imageView: nil, title: Strings.paymentReques
 
 class PaymentRequestExtension: NSObject {
     fileprivate weak var tab: Tab?
+    fileprivate var response = ""
     
     init(tab: Tab) {
         self.tab = tab
@@ -57,12 +58,34 @@ extension PaymentRequestExtension: TabContentScript {
                         guard let self = self else {
                             return .flyDown
                         }
-                        ensureMainThread {
-                            self.tab?.webView?.evaluateJavaScript("paymentreq_postCreate('Hello World!')", completionHandler: { _, error in
-                                if error != nil {
-                                    log.error(error)
+                        guard let rewards = self.tab?.rewards, let publisher = self.tab?.publisher, let amount = Double(details.total.amount.value) else {
+                            return .flyDown
+                        }
+                        
+                        rewards.ledger.tipPublisherDirectly(publisher, amount: amount, currency: "BAT") { _ in
+                          // TODO: Handle started tip process
+                            self.response = """
+                                {
+                                  "requestId": "a62c29b3-f840-47cd-b895-4573d3190227",
+                                  "methodName": "bat",
+                                  "details": {
+                                    "transaction_id": "bcbbd947-346d-439f-96b4-101bbd966675",
+                                    "message": "Payment for Brave T-Shirt!"
+                                  }
                                 }
-                        }) }
+                            """
+                            
+                            ensureMainThread {
+                               
+                                let trimmed = self.response.removingNewlines()
+                                self.tab?.webView?.evaluateJavaScript("paymentreq_postCreate('\(trimmed)')", completionHandler: { _, error in
+                                    if error != nil {
+                                        log.error(error)
+                                    }
+                            }) }
+                        }
+                        
+                        
                         return .flyDown
                     }
                     
@@ -77,6 +100,12 @@ extension PaymentRequestExtension: TabContentScript {
                 popup.showWithType(showType: .flyUp)
             }
         }
+    }
+}
+
+extension String {
+    func removingNewlines() -> String {
+        return components(separatedBy: .newlines).joined()
     }
 }
 

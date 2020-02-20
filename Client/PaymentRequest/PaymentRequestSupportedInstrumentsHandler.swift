@@ -7,5 +7,5 @@ struct SupportedInstrumentsData: Decodable {
 }
 struct PaymentRequestSupportedInstrumentsHandler: Decodable {
     let supportedMethods: String
-    let data: SupportedInstrumentsData
+    let data: SupportedInstrumentsData?
 }

@@ -6,6 +6,7 @@ import Foundation
 import WebKit
 import Storage
 import Shared
+import BraveRewards
 import BraveShared
 import SwiftyJSON
 import XCGLogger
@@ -76,7 +77,9 @@ class Tab: NSObject {
     var mimeType: String?
     var isEditing: Bool = false
     var shouldClassifyLoadsForAds = true
-
+    var rewards: BraveRewards?
+    var publisher: PublisherInfo?
+ 
     // When viewing a non-HTML content type in the webview (like a PDF document), this URL will
     // point to a tempfile containing the content so it can be shared to external applications.
     var temporaryDocument: TemporaryDocument?
@@ -214,6 +217,9 @@ class Tab: NSObject {
             self.userScriptManager = UserScriptManager(tab: self, isFingerprintingProtectionEnabled: Preferences.Shields.fingerprintingProtection.value, isCookieBlockingEnabled: Preferences.Privacy.blockAllCookies.value, isU2FEnabled: webView.hasOnlySecureContent)
             tabDelegate?.tab?(self, didCreateWebView: webView)
         }
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+        
+        rewards = appDelegate.browserViewController.rewards
     }
     
     func resetWebView(config: WKWebViewConfiguration) {
@@ -275,10 +281,9 @@ class Tab: NSObject {
     deinit {
         deleteWebView()
         contentScriptManager.helpers.removeAll()
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
-        
-        let rewards = appDelegate.browserViewController.rewards
-        
+        guard let rewards = self.rewards else {
+            return
+        }
         if !PrivateBrowsingManager.shared.isPrivateBrowsing {
             rewards.reportTabClosed(tabId: rewardsId)
         }
