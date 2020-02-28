@@ -17,14 +17,15 @@ extension NTPLearnMoreViewController {
         let buttonType: NTPButtonType?
         let tosText: Bool
         let learnMoreButtonText: String
+        var headerBodySpacing: CGFloat?
     }
     
     class NTPLearnMoreContentView: UIStackView {
         
         weak var delegate: NTPLearnMoreViewDelegate?
         
-        let looseSpacing: CGFloat = 16
-        let tightSpacing: CGFloat = 8
+        private let looseSpacing: CGFloat = 16
+        private let tightSpacing: CGFloat = 8
         
         private lazy var titleStackView = UIStackView().then {
             $0.spacing = 10
@@ -54,6 +55,10 @@ extension NTPLearnMoreViewController {
         private func updateSpacing(amount: CGFloat) {
             spacing = amount
             contentStackView.spacing = amount
+            
+            if let customHeaderSpacing = config.headerBodySpacing {
+                contentStackView.setCustomSpacing(customHeaderSpacing, after: header)
+            }
         }
         
         let contentStackView = UIStackView().then { stackView in
@@ -76,9 +81,11 @@ extension NTPLearnMoreViewController {
             $0.setContentCompressionResistancePriority(.required, for: .vertical)
         }
         
+        private let tosString = Strings.termsOfService.withNonBreakingSpace
+        
         private lazy var tos = detailLinkLabel(with:
-            String(format: Strings.NTP.turnRewardsTos, Strings.termsOfService)).then {
-                $0.setURLInfo([Strings.termsOfService: "tos"])
+            String(format: Strings.NTP.turnRewardsTos, tosString)).then {
+                $0.setURLInfo([tosString: "tos"])
         }
         
         private lazy var primaryButton = RoundInterfaceButton(type: .system).then {
@@ -95,6 +102,7 @@ extension NTPLearnMoreViewController {
             }
             
             $0.setTitle(title, for: .normal)
+            $0.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
             $0.appearanceTextColor = .white
             $0.backgroundColor = BraveUX.blurple400
             $0.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
@@ -121,7 +129,7 @@ extension NTPLearnMoreViewController {
             stackView.axis = .vertical
             stackView.spacing = 8
             
-            [separator(), learnMoreButton, separator(), hideSponsoredImageButton]
+            [separator(), learnMoreButton, separator(), hideSponsoredImageButton, separator()]
                 .forEach(stackView.addArrangedSubview(_:))
         }
         

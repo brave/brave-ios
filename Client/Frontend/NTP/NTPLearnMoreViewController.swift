@@ -75,7 +75,8 @@ class NTPLearnMoreViewController: BottomSheetViewController {
                 headerText: Strings.NTP.youArePaidToSeeThisImage,
                 buttonType: nil,
                 tosText: false,
-                learnMoreButtonText: Strings.NTP.learnMoreAboutSI)
+                learnMoreButtonText: Strings.NTP.learnMoreAboutSI,
+                headerBodySpacing: 8)
         case .dontShow, .youCanGetPaidTurnAdsOn:
             assertionFailure()
             return nil
