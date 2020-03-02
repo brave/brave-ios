@@ -574,6 +574,22 @@ extension Strings {
     public static let themesAutomaticOption = NSLocalizedString("ThemesAutomaticOption", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Automatic", comment: "Selection to automatically color/style the user interface.")
     public static let themesLightOption = NSLocalizedString("ThemesLightOption", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Light", comment: "Selection to color/style the user interface with a light theme.")
     public static let themesDarkOption = NSLocalizedString("ThemesDarkOption", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Dark", comment: "Selection to color/style the user interface with a dark theme")
+    public static let themesSettings =
+        NSLocalizedString("themesSettings", tableName: "BraveShared", bundle: .braveShared,
+                          value: "Themes",
+                          comment: "Name for app theme settings")
+    public static let defaultThemeName =
+        NSLocalizedString("defaultThemeName", tableName: "BraveShared", bundle: .braveShared,
+                          value: "Brave default",
+                          comment: "Name for default Brave theme.")
+    public static let themeQRCodeShareTitle =
+        NSLocalizedString("themeQRCodeShareTitle", tableName: "BraveShared", bundle: .braveShared,
+                          value: "Share Brave with your friends!",
+                          comment: "Title for QR popup encouraging users to share the code with their friends.")
+    public static let themeQRCodeShareButton =
+        NSLocalizedString("themeQRCodeShareButton", tableName: "BraveShared", bundle: .braveShared,
+                          value: "Share...",
+                          comment: "Text for button to share referral's QR code.")
 }
 
 // MARK: - Quick Actions
