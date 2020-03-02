@@ -6,11 +6,11 @@ import XCTest
 @testable import Data
 @testable import Client
 
-class FavoritesViewControllerTests: XCTestCase {
+class HomeViewControllerTests: XCTestCase {
 
     var dataSource: MockFavoritesDataSource!
     var delegate: MockTopSitesDelegate!
-    var vc: FavoritesViewController!
+    var vc: HomeViewController!
     var collectionView: UICollectionView!
 
     override func setUp() {
@@ -18,7 +18,7 @@ class FavoritesViewControllerTests: XCTestCase {
 
         delegate = MockTopSitesDelegate()
         dataSource = MockFavoritesDataSource()
-        vc = FavoritesViewController(profile: MockProfile(), dataSource: dataSource, fromOverlay: false, rewards: nil, backgroundDataSource: nil)
+        vc = HomeViewController(profile: MockProfile(), dataSource: dataSource, fromOverlay: false, rewards: nil, backgroundDataSource: nil)
         vc.delegate = delegate
         collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: UICollectionViewFlowLayout())
     }
@@ -32,15 +32,15 @@ class FavoritesViewControllerTests: XCTestCase {
         super.tearDown()
     }
 
-    func testFavoritesViewControllerLoadsView() {
+    func testHomeViewControllerLoadsView() {
         let viewController =
-            FavoritesViewController(profile: MockProfile(),
+            HomeViewController(profile: MockProfile(),
                                     dataSource: MockFavoritesDataSource(),
                                     fromOverlay: false,
                                     rewards: nil,
                                     backgroundDataSource: nil)
         XCTAssertNotNil(viewController.view, "Unable to load view")
-        XCTAssertNotNil(viewController.view.subviews.first { $0 is UICollectionView }, "`UICollectionView` missing from `FavoritesViewController` view.")
+        XCTAssertNotNil(viewController.view.subviews.first { $0 is UICollectionView }, "`UICollectionView` missing from `HomeViewController` view.")
         XCTAssertNil(viewController.delegate)
     }
 

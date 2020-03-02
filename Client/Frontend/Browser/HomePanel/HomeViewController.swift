@@ -20,7 +20,7 @@ protocol FavoritesDelegate: AnyObject {
     func openBrandedImageCallout(state: BrandedImageCalloutState?)
 }
 
-class FavoritesViewController: UIViewController, Themeable {
+class HomeViewController: UIViewController, Themeable {
     private struct UI {
         static let statsHeight: CGFloat = 110.0
         static let statsBottomMargin: CGFloat = 5
@@ -275,7 +275,7 @@ class FavoritesViewController: UIViewController, Themeable {
     }
     
     /// Returns nil if not applicable or no notification should be shown.
-    private var ntpNotificationToShow: FavoritesViewController.NTPNotificationType? {
+    private var ntpNotificationToShow: HomeViewController.NTPNotificationType? {
         if fromOverlay || PrivateBrowsingManager.shared.isPrivateBrowsing || ntpNotificationShowing {
             return nil
         }
@@ -642,7 +642,7 @@ class FavoritesViewController: UIViewController, Themeable {
 }
 
 // MARK: - Delegates
-extension FavoritesViewController: UICollectionViewDelegateFlowLayout {
+extension HomeViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let fav = dataSource.favoriteBookmark(at: indexPath)
         
@@ -669,7 +669,7 @@ extension FavoritesViewController: UICollectionViewDelegateFlowLayout {
     }
 }
 
-extension FavoritesViewController: FavoriteCellDelegate {
+extension HomeViewController: FavoriteCellDelegate {
     func editFavorite(_ favoriteCell: FavoriteCell) {
         guard let indexPath = collection.indexPath(for: favoriteCell),
             let fav = dataSource.frc?.fetchedObjects?[indexPath.item] else { return }
@@ -724,7 +724,7 @@ extension FavoritesViewController: FavoriteCellDelegate {
     }
 }
 
-extension FavoritesViewController: PreferencesObserver {
+extension HomeViewController: PreferencesObserver {
     func preferencesDidChange(for key: String) {
         self.resetBackgroundImage()
     }
