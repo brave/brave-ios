@@ -23,7 +23,7 @@ class BraveGetUA: TabContentScript {
     }
 
     func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage) {
-        // Scream, Cry, Run
+        // 🙀 😭 🏃‍♀️💨
     }
 
     static var isActivated: Bool {
