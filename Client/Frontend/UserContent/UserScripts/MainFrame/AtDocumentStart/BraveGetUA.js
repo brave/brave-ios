@@ -5,18 +5,9 @@
 
 'use strict'
 
-function getUserAgent () {
-  return {
-    brand: {
-      brand: 'Brave'
-    }
-  }
-}
-
-Object.defineProperty(navigator, 'getUserAgent', {
+Object.defineProperty(navigator, 'brave', {
   enumerable: false,
   configurable: false,
   writable: false,
-  value: getUserAgent
+  value: Object.freeze({ isBrave: () => new Promise(res => res(true)) })
 })
-
