@@ -327,7 +327,7 @@ class HomeViewController: UIViewController, Themeable {
                       adsAvailableInRegion: adsAvailableInRegion,
                       isSponsoredImage: isSponsoredImage)
         
-        return .brandedImages(state: .getPaidTurnRewardsOn)
+        return .brandedImages(state: state)
     }
     
     private func showNTPNotification(for type: NTPNotificationType) {
