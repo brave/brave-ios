@@ -36,6 +36,9 @@ class NTPNotificationViewController: TranslucentBottomSheet {
         
         self.mainView = mainView
         
+        view.layer.cornerRadius = 4
+        view.layer.masksToBounds = true
+        
         mainView.setCustomSpacing(0, after: mainView.header)
         view.addSubview(mainView)
         view.bringSubviewToFront(closeButton)
@@ -46,13 +49,13 @@ class NTPNotificationViewController: TranslucentBottomSheet {
         
         view.snp.remakeConstraints {
             if isPortraitPhone {
-                $0.right.left.equalToSuperview()
+                $0.right.left.equalToSuperview().inset(20)
             } else {
-                let width = min(view.frame.width, 400)
+                let width = min(view.frame.width - 40, 400)
                 $0.width.equalTo(width)
                 $0.centerX.equalToSuperview()
             }
-            $0.bottom.equalToSuperview()
+            $0.bottom.equalToSuperview().inset(40)
         }
     }
     

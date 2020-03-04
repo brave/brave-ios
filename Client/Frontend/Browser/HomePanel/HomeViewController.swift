@@ -31,7 +31,7 @@ class HomeViewController: UIViewController, Themeable {
     weak var delegate: FavoritesDelegate?
     
     // MARK: - Favorites collection view properties
-    private (set) internal lazy var collection: UICollectionView = {
+    private (set) internal lazy var favoritesCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.minimumInteritemSpacing = 0
         layout.minimumLineSpacing = 6
@@ -52,6 +52,22 @@ class HomeViewController: UIViewController, Themeable {
     }()
     private let dataSource: FavoritesDataSource
     private let backgroundDataSource: NTPBackgroundDataSource?
+    
+    private let braveTodayDelegate = BraveToday()
+    private (set) internal lazy var feedTableView = UITableView().then {
+        $0.bounces = true
+        $0.delegate = braveTodayDelegate
+        $0.dataSource = braveTodayDelegate
+        $0.register(TodayCell.self, forCellReuseIdentifier: "TodayCell")
+        $0.isScrollEnabled = true
+        $0.showsVerticalScrollIndicator = true
+        $0.separatorStyle = .singleLine
+        $0.backgroundColor = .clear
+        $0.tableFooterView = UIView()
+        $0.cellLayoutMarginsFollowReadableWidth = true
+        $0.accessibilityIdentifier = "Saved"
+        $0.keyboardDismissMode = .onDrag
+    }
 
     private let braveShieldStatsView = BraveShieldStatsView(frame: CGRect.zero).then {
         $0.autoresizingMask = [.flexibleWidth]
@@ -59,6 +75,7 @@ class HomeViewController: UIViewController, Themeable {
     
     private lazy var favoritesOverflowButton = RoundInterfaceView().then {
         let blur = UIVisualEffectView(effect: UIBlurEffect(style: .light))
+        blur.contentView.backgroundColor = UIColor.black.withAlphaComponent(0.35)
         let button = UIButton(type: .system).then {
             $0.setTitle(Strings.newTabPageShowMoreFavorites, for: .normal)
             $0.appearanceTextColor = .white
@@ -84,7 +101,7 @@ class HomeViewController: UIViewController, Themeable {
     
     private lazy var imageCreditButton = UIView().then {
         let blur = UIVisualEffectView(effect: UIBlurEffect(style: .light))
-        blur.contentView.backgroundColor = UIColor.black.withAlphaComponent(0.4)
+        blur.contentView.backgroundColor = UIColor.black.withAlphaComponent(0.35)
         $0.clipsToBounds = true
         $0.layer.cornerRadius = 4
         
@@ -104,6 +121,8 @@ class HomeViewController: UIViewController, Themeable {
         $0.adjustsImageWhenHighlighted = false
         $0.addTarget(self, action: #selector(showSponsoredSite), for: .touchUpInside)
     }
+    
+    private var todayCardView = TodayCardView()
     
     private let ddgLogo = UIImageView(image: #imageLiteral(resourceName: "duckduckgo"))
     
@@ -192,7 +211,7 @@ class HomeViewController: UIViewController, Themeable {
     
     @objc func existingUserTopSitesConversion() {
         dataSource.refetch()
-        collection.reloadData()
+        favoritesCollectionView.reloadData()
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -220,17 +239,20 @@ class HomeViewController: UIViewController, Themeable {
         view.layer.addSublayer(gradientOverlay())
         
         let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongGesture(gesture:)))
-        collection.addGestureRecognizer(longPressGesture)
+        favoritesCollectionView.addGestureRecognizer(longPressGesture)
         
-        view.addSubview(collection)
-        collection.dataSource = dataSource
-        dataSource.collectionView = collection
+        let swipeGesture = UIPanGestureRecognizer(target: self, action: #selector(handleSwipeGesture(gesture:)))
+        favoritesCollectionView.addGestureRecognizer(swipeGesture)
+        
+        view.addSubview(favoritesCollectionView)
+        favoritesCollectionView.dataSource = dataSource
+        dataSource.collectionView = favoritesCollectionView
         
         dataSource.favoriteUpdatedHandler = { [weak self] in
             self?.favoritesOverflowButton.isHidden = self?.dataSource.hasOverflow == false
         }
         
-        collection.bounces = false
+        favoritesCollectionView.bounces = false
         
         // Could setup as section header but would need to use flow layout,
         // Auto-layout subview within collection doesn't work properly,
@@ -239,18 +261,20 @@ class HomeViewController: UIViewController, Themeable {
         statsViewFrame.origin.x = 20
         // Offset the stats view from the inset set above
         statsViewFrame.origin.y = -(UI.statsHeight + UI.statsBottomMargin)
-        statsViewFrame.size.width = collection.frame.width - statsViewFrame.minX * 2
+        statsViewFrame.size.width = favoritesCollectionView.frame.width - statsViewFrame.minX * 2
         statsViewFrame.size.height = UI.statsHeight
         braveShieldStatsView.frame = statsViewFrame
         
-        collection.addSubview(braveShieldStatsView)
-        collection.addSubview(favoritesOverflowButton)
-        collection.addSubview(ddgButton)
+        favoritesCollectionView.addSubview(braveShieldStatsView)
+        favoritesCollectionView.addSubview(favoritesOverflowButton)
+        favoritesCollectionView.addSubview(ddgButton)
         view.addSubview(imageCreditButton)
         view.addSubview(imageSponsorButton)
         
         ddgButton.addSubview(ddgLogo)
         ddgButton.addSubview(ddgLabel)
+        
+        view.addSubview(todayCardView)
         
         makeConstraints()
         
@@ -258,7 +282,7 @@ class HomeViewController: UIViewController, Themeable {
         Preferences.NewTabPage.backgroundSponsoredImages.observe(from: self)
         
         // Doens't this get called twice?
-        collectionContentSizeObservation = collection.observe(\.contentSize, options: [.new, .initial]) { [weak self] _, _ in
+        collectionContentSizeObservation = favoritesCollectionView.observe(\.contentSize, options: [.new, .initial]) { [weak self] _, _ in
             self?.updateDuckDuckGoButtonLayout()
         }
         updateDuckDuckGoVisibility()
@@ -355,7 +379,7 @@ class HomeViewController: UIViewController, Themeable {
         super.viewWillAppear(animated)
         // Need to reload data after modals are closed for potential orientation change
         // e.g. if in landscape, open portrait modal, close, the layout attempt to access an invalid indexpath
-        collection.reloadData()
+        favoritesCollectionView.reloadData()
     }
     
     private var collectionContentSizeObservation: NSKeyValueObservation?
@@ -368,9 +392,9 @@ class HomeViewController: UIViewController, Themeable {
         super.viewDidLayoutSubviews()
         
         // This makes collection view layout to recalculate its cell size.
-        collection.collectionViewLayout.invalidateLayout()
+        favoritesCollectionView.collectionViewLayout.invalidateLayout()
         favoritesOverflowButton.isHidden = !dataSource.hasOverflow
-        collection.reloadSections(IndexSet(arrayLiteral: 0))
+        favoritesCollectionView.reloadSections(IndexSet(arrayLiteral: 0))
         
         if let backgroundImageView = backgroundViewInfo?.imageView, let image = backgroundImageView.image {
             // Need to calculate the sizing difference between `image` and `imageView` to determine the pixel difference ratio
@@ -401,8 +425,8 @@ class HomeViewController: UIViewController, Themeable {
     private func updateDuckDuckGoButtonLayout() {
         let size = ddgButton.systemLayoutSizeFitting(UIView.layoutFittingExpandedSize)
         ddgButton.frame = CGRect(
-            x: ceil((collection.bounds.width - size.width) / 2.0),
-            y: collection.contentSize.height + UI.searchEngineCalloutPadding,
+            x: ceil((favoritesCollectionView.bounds.width - size.width) / 2.0),
+            y: favoritesCollectionView.contentSize.height + UI.searchEngineCalloutPadding,
             width: size.width,
             height: size.height
         )
@@ -412,19 +436,44 @@ class HomeViewController: UIViewController, Themeable {
     @objc func handleLongGesture(gesture: UILongPressGestureRecognizer) {
         switch gesture.state {
         case .began:
-            guard let selectedIndexPath = collection.indexPathForItem(at: gesture.location(in: collection)) else {
+            guard let selectedIndexPath = favoritesCollectionView.indexPathForItem(at: gesture.location(in: favoritesCollectionView)) else {
                 break
             }
             
             dataSource.isEditing = true
-            collection.beginInteractiveMovementForItem(at: selectedIndexPath)
+            favoritesCollectionView.beginInteractiveMovementForItem(at: selectedIndexPath)
         case .changed:
-            collection.updateInteractiveMovementTargetPosition(gesture.location(in: gesture.view!))
+            favoritesCollectionView.updateInteractiveMovementTargetPosition(gesture.location(in: gesture.view!))
         case .ended:
-            collection.endInteractiveMovement()
+            favoritesCollectionView.endInteractiveMovement()
         default:
-            collection.cancelInteractiveMovement()
+            favoritesCollectionView.cancelInteractiveMovement()
         }
+    }
+    
+    /// Handles swipe gesture for Brave Today
+    @objc func handleSwipeGesture(gesture: UIPanGestureRecognizer) {
+        switch gesture.state {
+        case .began:
+            showBraveTodayOnboarding()
+        case .changed:
+            return
+        case .ended:
+            return
+        default:
+            return
+        }
+    }
+    
+    fileprivate func showBraveTodayOnboarding() {
+        let todayOnboarding = BraveTodayOnboardingPopupView() { completed in
+            if completed {
+                
+            } else {
+                
+            }
+        }
+        todayOnboarding.showWithType(showType: .normal)
     }
     
     @objc fileprivate func showImageCredit() {
@@ -481,11 +530,18 @@ class HomeViewController: UIViewController, Themeable {
         
         imageCreditButton.snp.makeConstraints {
             let borderPadding = 20
-            $0.bottom.equalTo(self.view.snp.bottom).inset(borderPadding)
+            $0.bottom.equalTo(todayCardView.snp.top).inset(-borderPadding)
             $0.left.equalToSuperview().offset(borderPadding)
             $0.height.equalTo(24)
             // Width and therefore, right constraint is determined by the actual button inside of this view
             //  button is resized from text content, and this superview is pinned to that width.
+        }
+        
+        todayCardView.snp.makeConstraints {
+            $0.centerX.equalTo(self.view)
+            $0.width.equalTo(UIScreen.main.bounds.width - 40)
+            $0.height.equalTo(200)
+            $0.bottom.equalTo(self.view).offset(170)
         }
     }
     
@@ -509,7 +565,7 @@ class HomeViewController: UIViewController, Themeable {
         super.traitCollectionDidChange(previousTraitCollection)
 
         updateConstraints()
-        collection.collectionViewLayout.invalidateLayout()
+        favoritesCollectionView.collectionViewLayout.invalidateLayout()
     }
     
     private func updateConstraints() {
@@ -526,7 +582,7 @@ class HomeViewController: UIViewController, Themeable {
             }
         }
         
-        collection.snp.remakeConstraints { make in
+        favoritesCollectionView.snp.remakeConstraints { make in
             make.right.equalTo(right)
             make.left.equalTo(left)
             make.top.bottom.equalTo(self.view)
@@ -534,7 +590,7 @@ class HomeViewController: UIViewController, Themeable {
         
         imageSponsorButton.snp.remakeConstraints {
             $0.size.equalTo(170)
-            $0.bottom.equalTo(view.safeArea.bottom).inset(10)
+            $0.bottom.equalTo(todayCardView.snp.top).inset(-10)
             
             if isLandscape && isIphone {
                 $0.left.equalTo(view.safeArea.left).offset(20)
@@ -636,7 +692,7 @@ class HomeViewController: UIViewController, Themeable {
     func updateDuckDuckGoVisibility() {
         let isVisible = shouldShowDuckDuckGoCallout()
         let heightOfCallout = ddgButton.systemLayoutSizeFitting(UIView.layoutFittingExpandedSize).height + (UI.searchEngineCalloutPadding * 2.0)
-        collection.contentInset.bottom = isVisible ? heightOfCallout : 0
+        favoritesCollectionView.contentInset.bottom = isVisible ? heightOfCallout : 0
         ddgButton.isHidden = !isVisible
     }
 }
@@ -652,7 +708,7 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let width = collection.frame.width
+        let width = favoritesCollectionView.frame.width
         let padding: CGFloat = traitCollection.horizontalSizeClass == .compact ? 6 : 20
         
         let cellWidth = floor(width - padding) / CGFloat(dataSource.columnsPerRow)
@@ -671,7 +727,7 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
 
 extension HomeViewController: FavoriteCellDelegate {
     func editFavorite(_ favoriteCell: FavoriteCell) {
-        guard let indexPath = collection.indexPath(for: favoriteCell),
+        guard let indexPath = favoritesCollectionView.indexPath(for: favoriteCell),
             let fav = dataSource.frc?.fetchedObjects?[indexPath.item] else { return }
         
         let actionSheet = UIAlertController(title: fav.displayTitle, message: nil, preferredStyle: .actionSheet)

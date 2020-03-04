@@ -117,6 +117,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         DataController.shared.lazyInitialization()
         setUpWebServer(profile)
         
+        // Brave today needs browser profile
+        BraveToday.shared.register(profile: BrowserProfile(localName: "profile"))
+        
         var imageStore: DiskImageStore?
         do {
             imageStore = try DiskImageStore(files: profile.files, namespace: "TabManagerScreenshots", quality: UIConstants.screenshotQuality)

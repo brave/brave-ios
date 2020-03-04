@@ -105,7 +105,7 @@ class PopupView: UIView, UIGestureRecognizerDelegate {
         }
     }
     
-    var dialogView: UIView!
+    var dialogView: UIVisualEffectView!
     var overlayView: UIView!
     var contentView: UIView!
     
@@ -148,10 +148,10 @@ class PopupView: UIView, UIGestureRecognizerDelegate {
         dialogButtonsContainer = UIView(frame: CGRect.zero)
         dialogButtonsContainer.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         
-        dialogView = UIView(frame: CGRect.zero)
+        dialogView = UIVisualEffectView(effect: UIBlurEffect(style: .extraLight))
         dialogView.clipsToBounds = true
         dialogView.autoresizingMask = [.flexibleWidth, .flexibleTopMargin, .flexibleBottomMargin]
-        dialogView.backgroundColor = UIColor.white
+        dialogView.contentView.backgroundColor = UIColor.white
         
         setStyle(popupStyle: .dialog)
         
@@ -211,7 +211,7 @@ class PopupView: UIView, UIGestureRecognizerDelegate {
                 buttonFrame.origin.x += buttonFrame.size.width + kPopupDialogButtonSpacing
             }
             
-            dialogView.addSubview(dialogButtonsContainer)
+            dialogView.contentView.addSubview(dialogButtonsContainer)
         }
     }
     
@@ -285,7 +285,7 @@ class PopupView: UIView, UIGestureRecognizerDelegate {
             // For subclasses.
             willShowWithType(showType: showType)
             
-            UIView.animate(withDuration: 0.4, delay: 0, usingSpringWithDamping: 0.85, initialSpringVelocity: 0, options: [], animations: {
+            UIView.animate(withDuration: 0.2, delay: 0.0, options: [.beginFromCurrentState, .curveEaseInOut], animations: {
                 self.dialogView.frame = finalFrame
             }, completion: nil)
         } else if showType == .flyDown {
@@ -296,8 +296,21 @@ class PopupView: UIView, UIGestureRecognizerDelegate {
             
             willShowWithType(showType: showType)
             
-            UIView.animate(withDuration: 0.4, delay: 0, usingSpringWithDamping: 0.85, initialSpringVelocity: 0, options: [], animations: {
+            UIView.animate(withDuration: 0.2, delay: 0.0, options: [.beginFromCurrentState, .curveEaseInOut], animations: {
                 self.dialogView.frame = finalFrame
+            }, completion: nil)
+        } else if showType == .normal {
+            let finalFrame: CGRect = dialogView.frame
+            var startFrame: CGRect = dialogView.frame
+            startFrame.origin.y = startFrame.origin.y + 30
+            dialogView.frame = startFrame
+            dialogView.alpha = 0
+            
+            willShowWithType(showType: showType)
+            
+            UIView.animate(withDuration: 0.5, delay: 0.0, usingSpringWithDamping: 2.0, initialSpringVelocity: 7.0, options: [.beginFromCurrentState, .curveEaseInOut], animations: {
+                self.dialogView.frame = finalFrame
+                self.dialogView.alpha = 1
             }, completion: nil)
         }
         
@@ -313,6 +326,10 @@ class PopupView: UIView, UIGestureRecognizerDelegate {
         
         delegate?.popupViewDidShow(self)
         setNeedsLayout()
+        
+        let impactFeedbackgenerator = UIImpactFeedbackGenerator(style: .light)
+        impactFeedbackgenerator.prepare()
+        impactFeedbackgenerator.impactOccurred()
     }
     
     func dismiss() {
@@ -442,7 +459,7 @@ class PopupView: UIView, UIGestureRecognizerDelegate {
     }
     
     func setDialogColor(color: UIColor) {
-        dialogView.backgroundColor = color
+        dialogView.contentView.backgroundColor = color
     }
     
     func setOverlayColor(color: UIColor, animate: Bool) {
@@ -459,7 +476,7 @@ class PopupView: UIView, UIGestureRecognizerDelegate {
         contentView?.removeFromSuperview()
         contentView = view
         contentView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        dialogView.addSubview(contentView)
+        dialogView.contentView.addSubview(contentView)
         setNeedsLayout()
     }
     

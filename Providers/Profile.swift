@@ -93,9 +93,24 @@ open class BrowserProfile: Profile {
     internal let files: FileAccessor
 
     let loginsDB: BrowserDB
+    let feedDB: BrowserDB
 
     private static var loginsKey: String? {
         let key = "sqlcipher.key.logins.db"
+        let keychain = KeychainWrapper.sharedAppContainerKeychain
+        keychain.ensureStringItemAccessibility(.afterFirstUnlock, forKey: key)
+        if keychain.hasValue(forKey: key) {
+            return keychain.string(forKey: key)
+        }
+
+        let Length: UInt = 256
+        let secret = Bytes.generateRandomBytes(Length).base64EncodedString
+        keychain.set(secret, forKey: key, withAccessibility: .afterFirstUnlock)
+        return secret
+    }
+    
+    private static var feedKey: String? {
+        let key = "sqlcipher.key.feed.db"
         let keychain = KeychainWrapper.sharedAppContainerKeychain
         keychain.ensureStringItemAccessibility(.afterFirstUnlock, forKey: key)
         if keychain.hasValue(forKey: key) {
@@ -144,6 +159,7 @@ open class BrowserProfile: Profile {
 
         // Set up our database handles.
         self.loginsDB = BrowserDB(filename: "logins.db", secretKey: BrowserProfile.loginsKey, schema: LoginsSchema(), files: files)
+        self.feedDB = BrowserDB(filename: "feed.db", secretKey: BrowserProfile.feedKey, schema: LoginsSchema(), files: files)
 
         if isNewProfile {
             log.info("New profile. Removing old account metadata.")
@@ -161,6 +177,7 @@ open class BrowserProfile: Profile {
         isShutdown = false
         
         loginsDB.reopenIfClosed()
+        feedDB.reopenIfClosed()
     }
 
     func shutdown() {
@@ -168,6 +185,7 @@ open class BrowserProfile: Profile {
         isShutdown = true
         
         loginsDB.forceClose()
+        feedDB.forceClose()
     }
     
     deinit {
