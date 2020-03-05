@@ -31,6 +31,7 @@ class HomeViewController: UIViewController, Themeable {
     weak var delegate: FavoritesDelegate?
     
     // MARK: - Favorites collection view properties
+    
     private (set) internal lazy var favoritesCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.minimumInteritemSpacing = 0
@@ -50,27 +51,12 @@ class HomeViewController: UIViewController, Themeable {
         }
         return view
     }()
+    
     private let dataSource: FavoritesDataSource
     private let backgroundDataSource: NTPBackgroundDataSource?
     
-    private let braveTodayDelegate = BraveToday()
-    private (set) internal lazy var feedTableView = BraveTodayFeedTable(frame: .zero, style: .plain).then {
-        $0.bounces = true
-        $0.register(TodayCell.self, forCellReuseIdentifier: "TodayCell")
-        $0.isScrollEnabled = false
-        $0.showsVerticalScrollIndicator = false
-        $0.separatorStyle = .none
-        $0.backgroundColor = .clear
-        $0.tableFooterView = UIView()
-        $0.cellLayoutMarginsFollowReadableWidth = true
-        $0.accessibilityIdentifier = "Saved"
-        $0.sectionHeaderHeight = 0
-        $0.sectionFooterHeight = 0
-        
-        if #available(iOS 13.0, *) {
-            $0.automaticallyAdjustsScrollIndicatorInsets = false
-        }
-    }
+    private let braveTodayDelegate = BraveToday.shared
+    private (set) internal var feedView = BraveTodayFeedView(frame: .zero, style: .plain)
 
     private let braveShieldStatsView = BraveShieldStatsView(frame: CGRect.zero).then {
         $0.autoresizingMask = [.flexibleWidth]
@@ -254,10 +240,9 @@ class HomeViewController: UIViewController, Themeable {
             
             let todaySwipeGesture = UIPanGestureRecognizer(target: self, action: #selector(handleTodayPanGesture(gesture:)))
             todaySwipeGesture.delegate = self
-            feedTableView.addGestureRecognizer(todaySwipeGesture)
+            feedView.addGestureRecognizer(todaySwipeGesture)
         }
         
-        feedTableView.addSubview(favoritesCollectionView)
         favoritesCollectionView.dataSource = dataSource
         dataSource.collectionView = favoritesCollectionView
         
@@ -281,16 +266,20 @@ class HomeViewController: UIViewController, Themeable {
         favoritesCollectionView.addSubview(braveShieldStatsView)
         favoritesCollectionView.addSubview(favoritesOverflowButton)
         favoritesCollectionView.addSubview(ddgButton)
-        feedTableView.addSubview(imageCreditButton)
-        feedTableView.addSubview(imageSponsorButton)
+        feedView.addSubview(imageCreditButton)
+        feedView.addSubview(imageSponsorButton)
         
         ddgButton.addSubview(ddgLogo)
         ddgButton.addSubview(ddgLabel)
         
         // TODO: only show if Brave Today hasn't been loaded / enabled.
-        feedTableView.addSubview(todayCardView)
+        feedView.addSubview(favoritesCollectionView)
+        feedView.addSubview(todayCardView)
         
-        view.addSubview(feedTableView)
+        view.addSubview(feedView)
+        
+        feedView.delegate = self
+        feedView.dataSource = braveTodayDelegate
         
         makeConstraints()
         
@@ -304,6 +293,15 @@ class HomeViewController: UIViewController, Themeable {
         updateDuckDuckGoVisibility()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        // Need to reload data after modals are closed for potential orientation change
+        // e.g. if in landscape, open portrait modal, close, the layout attempt to access an invalid indexpath
+        favoritesCollectionView.reloadData()
+        
+        updateConstraints()
+    }
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
@@ -312,10 +310,6 @@ class HomeViewController: UIViewController, Themeable {
         }
         
         showNTPNotification(for: notificationType)
-        
-        feedTableView.delegate = self
-        feedTableView.dataSource = braveTodayDelegate
-        feedTableView.isScrollEnabled = true
     }
     
     /// Returns nil if not applicable or no notification should be shown.
@@ -393,15 +387,6 @@ class HomeViewController: UIViewController, Themeable {
             self.addChild(viewController)
             self.view.addSubview(viewController.view)
         }
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        // Need to reload data after modals are closed for potential orientation change
-        // e.g. if in landscape, open portrait modal, close, the layout attempt to access an invalid indexpath
-        favoritesCollectionView.reloadData()
-        
-        updateConstraints()
     }
     
     private var collectionContentSizeObservation: NSKeyValueObservation?
@@ -497,14 +482,18 @@ class HomeViewController: UIViewController, Themeable {
     fileprivate func showBraveTodayOnboarding() {
         todayOnboarding.completionHandler = { completed in
             if completed {
-                BraveToday.shared.loadFeedData() { [weak self] completed in
+                BraveToday.shared.loadFeedData() { [weak self] in
                     if completed {
                         BraveToday.shared.isEnabled = true
-                        DispatchQueue.main.async {
-                            self?.feedTableView.reloadData()
-                            
-                            // Adjust insets to allow for table scroll
-                            self?.updateConstraints()
+                        
+                        BraveToday.shared.generateFeed() {
+                            DispatchQueue.main.async {
+                                self?.todayCardView.isHidden = true
+                                self?.feedView.reloadData()
+                                
+                                // Adjust insets to allow for table scroll
+                                self?.updateConstraints()
+                            }
                         }
                     } else {
                         
@@ -577,13 +566,13 @@ class HomeViewController: UIViewController, Themeable {
         }
         
         todayCardView.snp.makeConstraints {
-            $0.centerX.equalTo(self.feedTableView)
+            $0.centerX.equalTo(self.feedView)
             $0.width.equalTo(min(UIScreen.main.bounds.width - 40, 420))
             $0.height.equalTo(200)
-            $0.bottom.equalTo(self.feedTableView).offset(170)
+            $0.bottom.equalTo(self.feedView).offset(170)
         }
         
-        feedTableView.snp.makeConstraints {
+        feedView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
     }
@@ -643,22 +632,23 @@ class HomeViewController: UIViewController, Themeable {
         }
         
         todayCardView.snp.remakeConstraints {
-            $0.centerX.equalTo(self.feedTableView)
+            $0.centerX.equalTo(self.feedView)
             $0.width.equalTo(min(UIScreen.main.bounds.width - 40, 460))
             $0.height.equalTo(200)
-            $0.bottom.equalTo(self.feedTableView).offset(170)
+            $0.bottom.equalTo(self.feedView).offset(210)
         }
         
-        feedTableView.snp.remakeConstraints {
+        feedView.snp.remakeConstraints {
             $0.edges.equalToSuperview()
         }
         
-        feedTableView.contentInset = UIEdgeInsets(top: view.frame.height, left: 0, bottom: 0, right: 0)
-        
         if !BraveToday.shared.isEnabled {
-            feedTableView.contentSize = CGSize(width: view.frame.width, height: 0)
+            feedView.contentSize = CGSize(width: view.frame.width, height: 0)
+            feedView.contentInset = UIEdgeInsets(top: view.frame.height - 40, left: 0, bottom: 0, right: 0)
         } else {
-            feedTableView.contentSize = CGSize(width: view.frame.width, height: 200)
+            // Peeking loaded content.
+            feedView.contentInset = UIEdgeInsets(top: view.frame.height - 40, left: 0, bottom: 0, right: 0)
+            feedView.layoutSubviews()
         }
     }
     
@@ -856,6 +846,17 @@ extension HomeViewController: PreferencesObserver {
 
 extension HomeViewController: UITableViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        
+        // Only care about feed scroll position, ignore favorites scrollview
+        if scrollView.isDescendant(of: feedView) {
+            let scrollOffset = scrollView.contentOffset.y + view.frame.height - 40
+            
+            imageCreditButton.alpha = alphaAt(scrollOffset, cap: 60)
+            imageSponsorButton.alpha = alphaAt(scrollOffset, cap: 80)
+            favoritesCollectionView.alpha = alphaAt(scrollOffset, cap: view.frame.height - 200)
+        }
+    }
+    
+    func alphaAt(_ value: CGFloat, cap: CGFloat) -> CGFloat {
+        return max(min(((cap - value) / cap * 100) / 100, 1), 0)
     }
 }

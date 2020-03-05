@@ -599,6 +599,7 @@
 		5CB4932F241159CF000D8440 /* SponsorData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB4932E241159CF000D8440 /* SponsorData.swift */; };
 		5CB4933124116B9C000D8440 /* TestSQLiteFeed.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CB4933024116B9C000D8440 /* TestSQLiteFeed.m */; };
 		5CB4933324116BC5000D8440 /* TestFeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB4933224116BC5000D8440 /* TestFeed.swift */; };
+		5CB493352411B117000D8440 /* BraveTodayFeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB493342411B117000D8440 /* BraveTodayFeedView.swift */; };
 		5D1DC51C20AC9AFB00905E5A /* Data.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1DC51320AC9AF900905E5A /* Data.framework */; };
 		5D1DC52520AC9AFB00905E5A /* Data.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D1DC51520AC9AFA00905E5A /* Data.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5D1DC52820AC9AFB00905E5A /* Data.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1DC51320AC9AF900905E5A /* Data.framework */; };
@@ -2060,6 +2061,7 @@
 		5CB4932E241159CF000D8440 /* SponsorData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SponsorData.swift; sourceTree = "<group>"; };
 		5CB4933024116B9C000D8440 /* TestSQLiteFeed.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestSQLiteFeed.m; sourceTree = "<group>"; };
 		5CB4933224116BC5000D8440 /* TestFeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestFeed.swift; sourceTree = "<group>"; };
+		5CB493342411B117000D8440 /* BraveTodayFeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveTodayFeedView.swift; sourceTree = "<group>"; };
 		5D1DC51320AC9AF900905E5A /* Data.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Data.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5D1DC51520AC9AFA00905E5A /* Data.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Data.h; sourceTree = "<group>"; };
 		5D1DC51620AC9AFA00905E5A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -3943,6 +3945,7 @@
 			children = (
 				5C1CBEA9240ECE1D009DC11D /* BraveTodayOnboardingPopupView.swift */,
 				5C90585C240EFD2B0015F7B9 /* BraveTodayManager.swift */,
+				5CB493342411B117000D8440 /* BraveTodayFeedView.swift */,
 				5C1CBEA7240CDDFA009DC11D /* TodayCardView.swift */,
 				5C90586424101E660015F7B9 /* TodayCell.swift */,
 				5CB4932E241159CF000D8440 /* SponsorData.swift */,
@@ -6426,6 +6429,7 @@
 				0A43293021B1C7F50041625B /* AdBlockStats.swift in Sources */,
 				F930CDAE2270015C00A23FE1 /* U2FExtensions.swift in Sources */,
 				E65075571E37F714006961AC /* FaviconFetcher.swift in Sources */,
+				5CB493352411B117000D8440 /* BraveTodayFeedView.swift in Sources */,
 				0AEFB88722299E6A007AF600 /* AdblockerType.swift in Sources */,
 				D863C8F21F68BFC20058D95F /* GradientProgressBar.swift in Sources */,
 				D3C744CD1A687D6C004CE85D /* URIFixup.swift in Sources */,

@@ -31,13 +31,13 @@ class TodayCardContainerView: UIView {
     }
 }
 
-enum TodayCardType {
-    case topNews
-    case horizontalList
-    case verticalList
-    case headlineLarge
-    case headlineSmall
-    case publisher
+enum TodayCardType: CGFloat {
+    case topNews = 400
+    case horizontalList = 300
+    case verticalList = 330
+    case headlineLarge = 430
+    case headlineSmall = 200
+    case sponsor = 130
 }
 
 struct TodayCard {

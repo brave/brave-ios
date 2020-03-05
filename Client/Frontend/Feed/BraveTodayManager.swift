@@ -26,15 +26,13 @@ class BraveToday: NSObject {
     
     func register(profile: BrowserProfile?) {
         self.profile = profile
-        
-//        clearAll()
     }
     
     func clearAll() {
         _ = profile?.feed.deleteAllRecords()
     }
     
-    func loadFeedData(completion: @escaping (Bool) -> Void) {
+    func loadFeedData(completion: @escaping () -> Void) {
         func dateFromStringConverter(date: String) -> Date? {
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ssZ"
@@ -51,20 +49,50 @@ class BraveToday: NSObject {
                     publishTime = date.toTimestamp()
                 }
                 
-//                debugPrint("publishTime: \(publishTime), feedSource: \(item.feedSource ?? ""), url: \(item.url ?? ""), img: \(item.img ?? ""), title: \(item.title ?? ""), description: \(item.description ?? "")")
-                
                 let data = self?.profile?.feed.createRecord(publishTime: publishTime, feedSource: item.feedSource ?? "", url: item.url ?? "", img: item.img ?? "", title: item.title ?? "", description: item.description ?? "").value
-                debugPrint(data?.successValue)
+                if data?.isFailure == true {
+                    debugPrint(item)
+                    debugPrint(data?.failureValue ?? "")
+                }
             }
             
-            // TODO: Append new data to feed
-            guard let feedItems = self?.profile?.feed.getAvailableRecords().value.successValue else {
-                completion(false)
-                return
-            }
-            
-            completion(true)
+            completion()
         }
+    }
+    
+    // Can be called more than once per session
+    // Manages to populate the in memory feed layout based on
+    // simple filtering. TODO: add more complex filters and layouts
+    
+    func generateFeed(completion: @escaping () -> Void) {
+        guard let feedItems = profile?.feed.getRecords(session: sessionId, limit: 40).value.successValue else {
+            completion()
+            return
+        }
+        
+        var usedIds: [Int] = []
+        
+        // v0.1 - add all items as large headline types
+        for item in feedItems {
+            let card = TodayCard(type: .headlineLarge, items: [item], sponsorData: nil)
+            let feedRow = FeedRow(cards: [card])
+            feed.append(feedRow)
+            usedIds.append(item.id)
+        }
+        
+        // Update all used db records with latest session id
+        // We should always update the records if loaded into in-memory feed.
+        // This prevents feed duplicates from appearing.
+        let data = profile?.feed.updateRecords(usedIds, session: sessionId).value
+        if data?.isFailure == true {
+            debugPrint(data?.failureValue ?? "")
+        }
+        
+        completion()
+    }
+    
+    func feedCount() -> Int {
+        return feed.count
     }
     
     private func requestFeed(completion: @escaping ([FeedData]?) -> Void) {
@@ -108,5 +136,3 @@ extension BraveToday: UITableViewDataSource {
         return cell
     }
 }
-
-class BraveTodayFeedTable: UITableView {}

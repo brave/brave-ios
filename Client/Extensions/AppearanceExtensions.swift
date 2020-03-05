@@ -37,7 +37,7 @@ extension Theme {
         // In some cases this is the header, footer, cell, or a combination of them.
         // Be careful adjusting colors here, and make sure impact is well known
         UITableView.appearance().appearanceBackgroundColor = tablePrimaryColor
-        BraveTodayFeedTable.appearance().appearanceBackgroundColor = .clear
+        BraveTodayFeedView.appearance().appearanceBackgroundColor = .clear
         UITableView.appearance().appearanceSeparatorColor = colors.border.withAlphaComponent(colors.transparencies.borderAlpha)
         
         UITableViewCell.appearance().tintColor = colors.accent
