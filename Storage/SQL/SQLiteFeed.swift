@@ -50,7 +50,7 @@ extension SQLiteFeed: Feed {
 
     public func createRecord(publishTime: Timestamp, feedSource: String, url: String, img: String, title: String, description: String) -> Deferred<Maybe<FeedItem>> {
         return db.transaction { connection -> FeedItem in
-            let insertSQL = "INSERT OR REPLACE INTO items (publish_time, feed_source, link, img, title, description) VALUES (?, ?, ?, ?, ?, ?)"
+            let insertSQL = "INSERT OR REPLACE INTO items (publish_time, feed_source, url, img, title, description) VALUES (?, ?, ?, ?, ?, ?)"
             let insertArgs: Args = [publishTime, feedSource, url, img, title, description]
             let lastInsertedRowID = connection.lastInsertedRowID
 
@@ -75,7 +75,7 @@ extension SQLiteFeed: Feed {
     }
 
     public func getRecordWithURL(_ url: String) -> Deferred<Maybe<FeedItem>> {
-        let sql = "SELECT \(allColumns) FROM items WHERE link = ? LIMIT 1"
+        let sql = "SELECT \(allColumns) FROM items WHERE url = ? LIMIT 1"
         let args: Args = [url]
         return db.runQuery(sql, args: args, factory: SQLiteFeed.FeedItemFactory) >>== { cursor in
             let items = cursor.asArray()

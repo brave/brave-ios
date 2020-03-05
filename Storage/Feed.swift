@@ -53,12 +53,12 @@ public struct FeedItem: Equatable {
 }
 
 public struct FeedData: Decodable {
-    public let publishTime: Timestamp
-    public let feedSource: String
-    public let url: String
-    public let img: String
-    public let title: String
-    public let description: String
+    public let publishTime: String?
+    public let feedSource: String?
+    public let url: String?
+    public let img: String?
+    public let title: String?
+    public let description: String?
     
     enum CodingKeys: String, CodingKey {
         case publishTime = "publish_time"

@@ -24,9 +24,6 @@ class BraveToday: NSObject {
     
     func register(profile: BrowserProfile?) {
         self.profile = profile
-        
-        // TODO: remove
-        clearAll()
     }
     
     func clearAll() {
@@ -43,7 +40,13 @@ class BraveToday: NSObject {
         requestFeed { [weak self] data in
             guard let data = data else { return }
             for item in data {
-                self?.profile?.feed.createRecord(publishTime: item.publishTime, feedSource: item.feedSource, url: item.url, img: item.img, title: item.title, description: item.description)
+                // Only unique URL will save successfully
+                var publishTime: Timestamp = 0
+                if let dateString = item.publishTime, let date = dateFromStringConverter(date: dateString) {
+                    publishTime = date.toTimestamp()
+                }
+                guard let data = self?.profile?.feed.createRecord(publishTime: publishTime, feedSource: item.feedSource ?? "", url: item.url ?? "", img: item.img ?? "", title: item.title ?? "", description: item.description ?? "").value.successValue else { continue }
+                debugPrint(data)
             }
         }
     }
@@ -60,21 +63,11 @@ class BraveToday: NSObject {
                 print(error!.localizedDescription)
                 return
             }
-            
-            if let response = response as? HTTPURLResponse {
-                debugPrint(response.allHeaderFields)
-                if let encoding = response.allHeaderFields["Content-Encoding"] as? String {
-                    print(encoding)
-                    print(encoding == "gzip")
-                }
-            }
 
             guard let data = data else { return }
-            debugPrint(data)
+            
             do {
                 let feed = try JSONDecoder().decode([FeedData].self, from: data)
-                print(feed)
-                
                 completion(feed)
             } catch {
                 print(error.localizedDescription)

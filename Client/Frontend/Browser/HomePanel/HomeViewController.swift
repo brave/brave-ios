@@ -403,7 +403,7 @@ class HomeViewController: UIViewController, Themeable {
 //    override func viewWillLayoutSubviews() {
 //        updateConstraints()
 //    }
-//    
+//
 //    override func viewDidLayoutSubviews() {
 //        super.viewDidLayoutSubviews()
 //
@@ -708,6 +708,12 @@ class HomeViewController: UIViewController, Themeable {
     }
 }
 
+extension HomeViewController: UIGestureRecognizerDelegate {
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return true
+    }
+}
+
 // MARK: - Delegates
 extension HomeViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
@@ -798,10 +804,10 @@ extension HomeViewController: PreferencesObserver {
 }
 
 extension HomeViewController: UITableViewDelegate {
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        debugPrint(scrollView.contentOffset.y + view.frame.height)
-        if scrollView.contentOffset.y + view.frame.height > 30 {
-            showBraveTodayOnboarding()
-        }
-    }
+//    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+//        debugPrint(scrollView.contentOffset.y + view.frame.height)
+//        if scrollView.contentOffset.y + view.frame.height > 30 {
+//            showBraveTodayOnboarding()
+//        }
+//    }
 }

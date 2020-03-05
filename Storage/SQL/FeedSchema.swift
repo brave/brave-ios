@@ -25,7 +25,7 @@ open class FeedSchema: Schema {
             id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
             publish_time INTEGER NOT NULL,
             feed_source TEXT NOT NULL,
-            url TEXT NOT NULL,
+            url TEXT NOT NULL UNIQUE,
             img TEXT NOT NULL,
             title TEXT NOT NULL,
             description TEXT NOT NULL,
