@@ -17,16 +17,21 @@ open class FeedSchema: Schema {
     public var version: Int { return FeedSchema.DefaultVersion }
 
     public init() {}
+    
+    // session_displayed UUID of current feed session.
 
     let itemsTableCreate = """
         CREATE TABLE IF NOT EXISTS items (
             id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-            last_modified INTEGER,
-            url TEXT NOT NULL UNIQUE,
+            publish_time INTEGER NOT NULL,
+            feed_source TEXT NOT NULL,
+            url TEXT NOT NULL,
+            img TEXT NOT NULL,
             title TEXT NOT NULL,
-            added_by TEXT NOT NULL,
-            archived INTEGER NOT NULL DEFAULT (0),
-            favorite INTEGER NOT NULL DEFAULT (0),
+            description TEXT NOT NULL,
+            session_displayed TEXT NOT NULL,
+            removed INTEGER NOT NULL DEFAULT (0),
+            liked INTEGER NOT NULL DEFAULT (0),
             unread INTEGER NOT NULL DEFAULT (1)
         )
         """

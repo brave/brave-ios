@@ -159,7 +159,7 @@ open class BrowserProfile: Profile {
 
         // Set up our database handles.
         self.loginsDB = BrowserDB(filename: "logins.db", secretKey: BrowserProfile.loginsKey, schema: LoginsSchema(), files: files)
-        self.feedDB = BrowserDB(filename: "feed.db", secretKey: BrowserProfile.feedKey, schema: LoginsSchema(), files: files)
+        self.feedDB = BrowserDB(filename: "feed.db", secretKey: BrowserProfile.feedKey, schema: FeedSchema(), files: files)
 
         if isNewProfile {
             log.info("New profile. Removing old account metadata.")
@@ -222,5 +222,9 @@ open class BrowserProfile: Profile {
 
     lazy var logins: BrowserLogins & SyncableLogins & ResettableSyncStorage = {
         return SQLiteLogins(db: self.loginsDB)
+    }()
+    
+    lazy var feed: Feed = {
+        return SQLiteFeed(db: self.feedDB)
     }()
 }

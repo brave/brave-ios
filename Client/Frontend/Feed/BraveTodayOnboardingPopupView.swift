@@ -18,7 +18,9 @@ class BraveTodayOnboardingStep1View: UIView {
         
         autoresizingMask = [.flexibleWidth]
         
-        addSubview(UIImageView(frame: .zero))
+        let dialogImage = UIImageView(image: UIImage(named: "placeholder_graphic_brave_today"))
+        addSubview(dialogImage)
+        self.dialogImage = dialogImage
        
         titleLabel = UILabel(frame: CGRect.zero)
         titleLabel.textColor = .white
@@ -82,7 +84,9 @@ class BraveTodayOnboardingPopupView: PopupView {
     
     fileprivate var onboardingStep: OnboardingStep = .step1
     
-    fileprivate var completed: ((Bool) -> Void)!
+    var completionHandler: ((Bool) -> Void)?
+    
+    var isShown = false
     
     enum OnboardingStep {
         case step1
@@ -93,10 +97,12 @@ class BraveTodayOnboardingPopupView: PopupView {
     fileprivate let kAlertPopupScreenFraction: CGFloat = 0.8
     fileprivate let kPadding: CGFloat = 20.0
     
-    init(completed: @escaping (Bool) -> Void) {
+    init(completed: ((Bool) -> Void)? = nil) {
         super.init(frame: CGRect.zero)
         
-        self.completed = completed
+        if completed != nil {
+            completionHandler = completed
+        }
         
         overlayDismisses = false
         defaultShowType = .normal
@@ -114,7 +120,7 @@ class BraveTodayOnboardingPopupView: PopupView {
         }
         
         addButton(title: "Continue", type: .primary, fontSize: 16) { () -> PopupViewDismissType in
-            self.completed(true)
+            self.completionHandler?(true)
             return .normal
         }
     }
@@ -137,6 +143,18 @@ class BraveTodayOnboardingPopupView: PopupView {
     }
     
     override func showWithType(showType: PopupViewShowType) {
+        guard !isShown else { return }
+        
         super.showWithType(showType: showType)
+        
+        isShown = true
+    }
+    
+    override func dismissWithType(dismissType: PopupViewDismissType) {
+        guard isShown else { return }
+        
+        super.dismissWithType(dismissType: dismissType)
+        
+        isShown = false
     }
 }

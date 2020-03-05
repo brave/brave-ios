@@ -23,7 +23,7 @@ class TodayCardContainerView: UIView {
     }
     
     override func layoutSubviews() {
-        let roundPath = UIBezierPath(roundedRect: bounds, byRoundingCorners: [.topLeft, .topRight, .bottomLeft, .bottomRight], cornerRadii: CGSize(width: 8, height: 8))
+        let roundPath = UIBezierPath(roundedRect: bounds, byRoundingCorners: [.topLeft, .topRight, .bottomLeft, .bottomRight], cornerRadii: CGSize(width: 12, height: 12))
         let maskLayer = CAShapeLayer()
         maskLayer.path = roundPath.cgPath
         blurView.layer.mask = maskLayer
@@ -31,6 +31,7 @@ class TodayCardContainerView: UIView {
 }
 
 enum TodayCardType {
+    case topNews
     case horizontalList
     case verticalList
     case headlineLarge

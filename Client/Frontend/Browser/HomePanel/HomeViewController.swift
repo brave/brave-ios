@@ -54,19 +54,21 @@ class HomeViewController: UIViewController, Themeable {
     private let backgroundDataSource: NTPBackgroundDataSource?
     
     private let braveTodayDelegate = BraveToday()
-    private (set) internal lazy var feedTableView = UITableView().then {
+    private (set) internal lazy var feedTableView = BraveTodayFeedTable().then {
         $0.bounces = true
-        $0.delegate = braveTodayDelegate
-        $0.dataSource = braveTodayDelegate
         $0.register(TodayCell.self, forCellReuseIdentifier: "TodayCell")
-        $0.isScrollEnabled = true
-        $0.showsVerticalScrollIndicator = true
-        $0.separatorStyle = .singleLine
+        $0.isScrollEnabled = false
+        $0.showsVerticalScrollIndicator = true //TODO: set to false
+        $0.separatorStyle = .none
         $0.backgroundColor = .clear
         $0.tableFooterView = UIView()
         $0.cellLayoutMarginsFollowReadableWidth = true
         $0.accessibilityIdentifier = "Saved"
         $0.keyboardDismissMode = .onDrag
+        
+        if #available(iOS 13.0, *) {
+            $0.automaticallyAdjustsScrollIndicatorInsets = false
+        }
     }
 
     private let braveShieldStatsView = BraveShieldStatsView(frame: CGRect.zero).then {
@@ -123,6 +125,8 @@ class HomeViewController: UIViewController, Themeable {
     }
     
     private var todayCardView = TodayCardView()
+    
+    private let todayOnboarding = BraveTodayOnboardingPopupView()
     
     private let ddgLogo = UIImageView(image: #imageLiteral(resourceName: "duckduckgo"))
     
@@ -241,8 +245,10 @@ class HomeViewController: UIViewController, Themeable {
         let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongGesture(gesture:)))
         favoritesCollectionView.addGestureRecognizer(longPressGesture)
         
-        let swipeGesture = UIPanGestureRecognizer(target: self, action: #selector(handleSwipeGesture(gesture:)))
-        favoritesCollectionView.addGestureRecognizer(swipeGesture)
+        let todayTapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTodayTapGesture(gesture:)))
+        todayTapGesture.numberOfTouchesRequired = 1
+        todayTapGesture.numberOfTapsRequired = 1
+        todayCardView.addGestureRecognizer(todayTapGesture)
         
         view.addSubview(favoritesCollectionView)
         favoritesCollectionView.dataSource = dataSource
@@ -274,7 +280,10 @@ class HomeViewController: UIViewController, Themeable {
         ddgButton.addSubview(ddgLogo)
         ddgButton.addSubview(ddgLabel)
         
-        view.addSubview(todayCardView)
+        // TODO: only show if Brave Today hasn't been loaded / enabled.
+        feedTableView.addSubview(todayCardView)
+        
+        view.addSubview(feedTableView)
         
         makeConstraints()
         
@@ -296,6 +305,10 @@ class HomeViewController: UIViewController, Themeable {
         }
         
         showNTPNotification(for: notificationType)
+        
+        feedTableView.delegate = self
+        feedTableView.dataSource = braveTodayDelegate
+        feedTableView.isScrollEnabled = true
     }
     
     /// Returns nil if not applicable or no notification should be shown.
@@ -375,52 +388,55 @@ class HomeViewController: UIViewController, Themeable {
         }
     }
     
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         // Need to reload data after modals are closed for potential orientation change
         // e.g. if in landscape, open portrait modal, close, the layout attempt to access an invalid indexpath
         favoritesCollectionView.reloadData()
+        
+        updateConstraints()
     }
     
     private var collectionContentSizeObservation: NSKeyValueObservation?
     
-    override func viewWillLayoutSubviews() {
-        updateConstraints()
-    }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        
-        // This makes collection view layout to recalculate its cell size.
-        favoritesCollectionView.collectionViewLayout.invalidateLayout()
-        favoritesOverflowButton.isHidden = !dataSource.hasOverflow
-        favoritesCollectionView.reloadSections(IndexSet(arrayLiteral: 0))
-        
-        if let backgroundImageView = backgroundViewInfo?.imageView, let image = backgroundImageView.image {
-            // Need to calculate the sizing difference between `image` and `imageView` to determine the pixel difference ratio
-            let sizeRatio = backgroundImageView.frame.size.width / image.size.width
-            let focal = background?.wallpaper.focalPoint
-            // Center as fallback
-            let x = focal?.x ?? image.size.width / 2
-            let y = focal?.y ?? image.size.height / 2
-            let portrait = view.frame.height > view.frame.width
-            
-            // Center point of image is not center point of view.
-            // Take `0` for example, if specying `0`, setting centerX to 0, it is not attempting to place the left
-            //  side of the image to the middle (e.g. left justifying), it is instead trying to move the image view's
-            //  center to `0`, shifting the image _to_ the left, and making more of the image's right side visible.
-            // Therefore specifying `0` should take the imageView's left and pinning it to view's center.
-            
-            // So basically the movement needs to be "inverted" (hence negation)
-            // In landscape, left / right are pegged to superview
-            let imageViewOffset = portrait ? sizeRatio * -x : 0
-            backgroundViewInfo?.portraitCenterConstraint.update(offset: imageViewOffset)
-            
-            // If potrait, top / bottom are just pegged to superview
-            let inset = portrait ? 0 : sizeRatio * -y
-            backgroundViewInfo?.landscapeCenterConstraint.update(offset: inset)
-        }
-    }
+//    override func viewWillLayoutSubviews() {
+//        updateConstraints()
+//    }
+//    
+//    override func viewDidLayoutSubviews() {
+//        super.viewDidLayoutSubviews()
+//
+//        // This makes collection view layout to recalculate its cell size.
+//        favoritesCollectionView.collectionViewLayout.invalidateLayout()
+//        favoritesOverflowButton.isHidden = !dataSource.hasOverflow
+//        favoritesCollectionView.reloadSections(IndexSet(arrayLiteral: 0))
+//
+//        if let backgroundImageView = backgroundViewInfo?.imageView, let image = backgroundImageView.image {
+//            // Need to calculate the sizing difference between `image` and `imageView` to determine the pixel difference ratio
+//            let sizeRatio = backgroundImageView.frame.size.width / image.size.width
+//            let focal = background?.wallpaper.focalPoint
+//            // Center as fallback
+//            let x = focal?.x ?? image.size.width / 2
+//            let y = focal?.y ?? image.size.height / 2
+//            let portrait = view.frame.height > view.frame.width
+//
+//            // Center point of image is not center point of view.
+//            // Take `0` for example, if specying `0`, setting centerX to 0, it is not attempting to place the left
+//            //  side of the image to the middle (e.g. left justifying), it is instead trying to move the image view's
+//            //  center to `0`, shifting the image _to_ the left, and making more of the image's right side visible.
+//            // Therefore specifying `0` should take the imageView's left and pinning it to view's center.
+//
+//            // So basically the movement needs to be "inverted" (hence negation)
+//            // In landscape, left / right are pegged to superview
+//            let imageViewOffset = portrait ? sizeRatio * -x : 0
+//            backgroundViewInfo?.portraitCenterConstraint.update(offset: imageViewOffset)
+//
+//            // If potrait, top / bottom are just pegged to superview
+//            let inset = portrait ? 0 : sizeRatio * -y
+//            backgroundViewInfo?.landscapeCenterConstraint.update(offset: inset)
+//        }
+//    }
     
     private func updateDuckDuckGoButtonLayout() {
         let size = ddgButton.systemLayoutSizeFitting(UIView.layoutFittingExpandedSize)
@@ -451,26 +467,14 @@ class HomeViewController: UIViewController, Themeable {
         }
     }
     
-    /// Handles swipe gesture for Brave Today
-    @objc func handleSwipeGesture(gesture: UIPanGestureRecognizer) {
-        switch gesture.state {
-        case .began:
-            showBraveTodayOnboarding()
-        case .changed:
-            return
-        case .ended:
-            return
-        default:
-            return
-        }
+    @objc func handleTodayTapGesture(gesture: UITapGestureRecognizer) {
+        showBraveTodayOnboarding()
     }
     
     fileprivate func showBraveTodayOnboarding() {
-        let todayOnboarding = BraveTodayOnboardingPopupView() { completed in
+        todayOnboarding.completionHandler = { completed in
             if completed {
-                
-            } else {
-                
+                BraveToday.shared.loadFeedData()
             }
         }
         todayOnboarding.showWithType(showType: .normal)
@@ -530,7 +534,7 @@ class HomeViewController: UIViewController, Themeable {
         
         imageCreditButton.snp.makeConstraints {
             let borderPadding = 20
-            $0.bottom.equalTo(todayCardView.snp.top).inset(-borderPadding)
+            $0.bottom.equalTo(self.view).inset(-borderPadding + 60)
             $0.left.equalToSuperview().offset(borderPadding)
             $0.height.equalTo(24)
             // Width and therefore, right constraint is determined by the actual button inside of this view
@@ -538,10 +542,14 @@ class HomeViewController: UIViewController, Themeable {
         }
         
         todayCardView.snp.makeConstraints {
-            $0.centerX.equalTo(self.view)
-            $0.width.equalTo(UIScreen.main.bounds.width - 40)
+            $0.centerX.equalTo(self.feedTableView)
+            $0.width.equalTo(min(UIScreen.main.bounds.width - 40, 420))
             $0.height.equalTo(200)
-            $0.bottom.equalTo(self.view).offset(170)
+            $0.bottom.equalTo(self.feedTableView).offset(170)
+        }
+        
+        feedTableView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
         }
     }
     
@@ -598,6 +606,9 @@ class HomeViewController: UIViewController, Themeable {
                 $0.centerX.equalToSuperview()
             }
         }
+        
+        feedTableView.contentInset = UIEdgeInsets(top: view.frame.height, left: 0, bottom: 0, right: 0)
+        feedTableView.contentSize = CGSize(width: view.frame.width, height: view.frame.height) // TODO: Change once onboarded.
     }
     
     private func resetBackgroundImage() {
@@ -783,5 +794,14 @@ extension HomeViewController: FavoriteCellDelegate {
 extension HomeViewController: PreferencesObserver {
     func preferencesDidChange(for key: String) {
         self.resetBackgroundImage()
+    }
+}
+
+extension HomeViewController: UITableViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        debugPrint(scrollView.contentOffset.y + view.frame.height)
+        if scrollView.contentOffset.y + view.frame.height > 30 {
+            showBraveTodayOnboarding()
+        }
     }
 }
