@@ -255,7 +255,7 @@ class HomeViewController: UIViewController, Themeable {
         todaySwipeGesture.delegate = self
         feedTableView.addGestureRecognizer(todaySwipeGesture)
         
-        view.addSubview(favoritesCollectionView)
+        feedTableView.addSubview(favoritesCollectionView)
         favoritesCollectionView.dataSource = dataSource
         dataSource.collectionView = favoritesCollectionView
         
@@ -279,8 +279,8 @@ class HomeViewController: UIViewController, Themeable {
         favoritesCollectionView.addSubview(braveShieldStatsView)
         favoritesCollectionView.addSubview(favoritesOverflowButton)
         favoritesCollectionView.addSubview(ddgButton)
-        view.addSubview(imageCreditButton)
-        view.addSubview(imageSponsorButton)
+        feedTableView.addSubview(imageCreditButton)
+        feedTableView.addSubview(imageSponsorButton)
         
         ddgButton.addSubview(ddgLogo)
         ddgButton.addSubview(ddgLabel)
