@@ -3,6 +3,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
+import Storage
 
 class TodayCardContainerView: UIView {
     private let blurView = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
@@ -36,13 +37,15 @@ enum TodayCardType {
     case verticalList
     case headlineLarge
     case headlineSmall
+    case publisher
 }
 
 struct TodayCard {
     let type: TodayCardType
-//    struct Data {
-//        let
-//    }
+    let items: [FeedItem] // Data that lives within an individual card design.
+    
+    // Special Data
+    let sponsorData: SponsorData?
 }
 
 class TodayCardView: TodayCardContainerView {

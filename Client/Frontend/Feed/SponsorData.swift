@@ -2,16 +2,14 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-class TodayCell: UITableViewCell {
-    var data: FeedRow?
-    
-    func setData(data: FeedRow) {
-        prepare()
-        
-        self.data = data
-    }
-    
-    private func prepare() {
-        
-    }
+import Foundation
+
+struct SponsorData {
+    let name: String
+    let url: String
+    let largeLogo: String
+    let smallLogo: String
+    let mediaUrl: String
+    let isVideo: Bool
+    let isGif: Bool
 }

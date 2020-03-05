@@ -58,7 +58,7 @@ class HomeViewController: UIViewController, Themeable {
         $0.bounces = true
         $0.register(TodayCell.self, forCellReuseIdentifier: "TodayCell")
         $0.isScrollEnabled = false
-        $0.showsVerticalScrollIndicator = true //TODO: set to false
+        $0.showsVerticalScrollIndicator = false
         $0.separatorStyle = .none
         $0.backgroundColor = .clear
         $0.tableFooterView = UIView()
@@ -246,14 +246,16 @@ class HomeViewController: UIViewController, Themeable {
         let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongGesture(gesture:)))
         favoritesCollectionView.addGestureRecognizer(longPressGesture)
         
-        let todayTapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTodayTapGesture(gesture:)))
-        todayTapGesture.numberOfTouchesRequired = 1
-        todayTapGesture.numberOfTapsRequired = 1
-        todayCardView.addGestureRecognizer(todayTapGesture)
-        
-        let todaySwipeGesture = UIPanGestureRecognizer(target: self, action: #selector(handleTodayPanGesture(gesture:)))
-        todaySwipeGesture.delegate = self
-        feedTableView.addGestureRecognizer(todaySwipeGesture)
+        if !BraveToday.shared.isEnabled {
+            let todayTapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTodayTapGesture(gesture:)))
+            todayTapGesture.numberOfTouchesRequired = 1
+            todayTapGesture.numberOfTapsRequired = 1
+            todayCardView.addGestureRecognizer(todayTapGesture)
+            
+            let todaySwipeGesture = UIPanGestureRecognizer(target: self, action: #selector(handleTodayPanGesture(gesture:)))
+            todaySwipeGesture.delegate = self
+            feedTableView.addGestureRecognizer(todaySwipeGesture)
+        }
         
         feedTableView.addSubview(favoritesCollectionView)
         favoritesCollectionView.dataSource = dataSource
@@ -477,6 +479,8 @@ class HomeViewController: UIViewController, Themeable {
     
     private var todayPanStart: CGPoint = .zero
     @objc func handleTodayPanGesture(gesture: UIPanGestureRecognizer) {
+        guard BraveToday.shared.isEnabled == false else { return }
+        
         let point = gesture.location(in: view)
         switch gesture.state {
         case .began:
@@ -493,10 +497,17 @@ class HomeViewController: UIViewController, Themeable {
     fileprivate func showBraveTodayOnboarding() {
         todayOnboarding.completionHandler = { completed in
             if completed {
-                BraveToday.shared.isEnabled = true
-                BraveToday.shared.loadFeedData() { [weak self] in
-                    DispatchQueue.main.async {
-                        self?.feedTableView.reloadData()
+                BraveToday.shared.loadFeedData() { [weak self] completed in
+                    if completed {
+                        BraveToday.shared.isEnabled = true
+                        DispatchQueue.main.async {
+                            self?.feedTableView.reloadData()
+                            
+                            // Adjust insets to allow for table scroll
+                            self?.updateConstraints()
+                        }
+                    } else {
+                        
                     }
                 }
             }
@@ -631,12 +642,24 @@ class HomeViewController: UIViewController, Themeable {
             }
         }
         
+        todayCardView.snp.remakeConstraints {
+            $0.centerX.equalTo(self.feedTableView)
+            $0.width.equalTo(min(UIScreen.main.bounds.width - 40, 460))
+            $0.height.equalTo(200)
+            $0.bottom.equalTo(self.feedTableView).offset(170)
+        }
+        
         feedTableView.snp.remakeConstraints {
             $0.edges.equalToSuperview()
         }
         
         feedTableView.contentInset = UIEdgeInsets(top: view.frame.height, left: 0, bottom: 0, right: 0)
-        feedTableView.contentSize = CGSize(width: view.frame.width, height: 0) // TODO: Change once onboarded.
+        
+        if !BraveToday.shared.isEnabled {
+            feedTableView.contentSize = CGSize(width: view.frame.width, height: 0)
+        } else {
+            feedTableView.contentSize = CGSize(width: view.frame.width, height: 200)
+        }
     }
     
     private func resetBackgroundImage() {

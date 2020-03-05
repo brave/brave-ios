@@ -7,26 +7,18 @@ import Storage
 import SwiftKeychainWrapper
 import Deferred
 
-class FeedObject: NSObject {
-    var items: [FeedItem]
-    var cardType: TodayCardType
-    
-    init(items: [FeedItem], cardType: TodayCardType) {
-        self.items = items
-        self.cardType = cardType
-    }
+struct FeedRow {
+    var cards: [TodayCard]
 }
 
 class BraveToday: NSObject {
     static let shared = BraveToday()
     private weak var profile: BrowserProfile?
     
-    // session
-    // feed state
-    
     var isEnabled = false
     
-    fileprivate var feed: [FeedObject] = []
+    fileprivate let sessionId = UUID().uuidString
+    fileprivate var feed: [FeedRow] = []
     
     override init() {
         super.init()
@@ -40,7 +32,7 @@ class BraveToday: NSObject {
         _ = profile?.feed.deleteAllRecords()
     }
     
-    func loadFeedData(completion: @escaping () -> Void) {
+    func loadFeedData(completion: @escaping (Bool) -> Void) {
         func dateFromStringConverter(date: String) -> Date? {
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
@@ -60,16 +52,23 @@ class BraveToday: NSObject {
             }
             
             // TODO: Append new data to feed
+            guard let feedItems = self?.profile?.feed.getAvailableRecords().value.successValue else {
+                completion(false)
+                return
+            }
             
-            completion()
+            
+            
+            completion(true)
         }
     }
     
     private func requestFeed(completion: @escaping ([FeedData]?) -> Void) {
-        let urlString = "https://sjc.rapidpacket.com/~xtat/bt/latest.json"
-        guard let url = URL(string: urlString) else { return }
+        guard let url = URL(string: "https://sjc.rapidpacket.com/~xtat/bt/latest.json") else { return }
+        
         var request = URLRequest(url: url)
         request.addValue("gzip", forHTTPHeaderField: "Accept-Encoding")
+        
         let session = URLSession.shared
 
         session.dataTask(with: request) {data, response, error in
@@ -79,7 +78,6 @@ class BraveToday: NSObject {
             }
 
             guard let data = data else { return }
-            
             do {
                 let feed = try JSONDecoder().decode([FeedData].self, from: data)
                 completion(feed)
@@ -101,17 +99,9 @@ extension BraveToday: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "TodayCell", for: indexPath) as UITableViewCell
-        let item: FeedObject = feed[indexPath.row]
-        (cell as? TodayCell)?.setData(feedObject: item)
+        let item: FeedRow = feed[indexPath.row]
+        (cell as? TodayCell)?.setData(data: item)
         return cell
-    }
-    
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 0
-    }
-    
-    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        return 0
     }
 }
 
