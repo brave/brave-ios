@@ -115,13 +115,4 @@ extension BraveToday: UITableViewDataSource {
     }
 }
 
-extension BraveToday: UITableViewDelegate {
-//    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-//        debugPrint(scrollView.contentOffset.y + view.frame.height)
-//        if scrollView.contentOffset.y + view.frame.height > 30 {
-//            showBraveTodayOnboarding()
-//        }
-//    }
-}
-
 class BraveTodayFeedTable: UITableView {}

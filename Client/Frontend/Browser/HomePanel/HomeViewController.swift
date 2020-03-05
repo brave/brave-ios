@@ -64,7 +64,6 @@ class HomeViewController: UIViewController, Themeable {
         $0.tableFooterView = UIView()
         $0.cellLayoutMarginsFollowReadableWidth = true
         $0.accessibilityIdentifier = "Saved"
-        $0.keyboardDismissMode = .onDrag
         $0.sectionHeaderHeight = 0
         $0.sectionFooterHeight = 0
         
@@ -252,6 +251,10 @@ class HomeViewController: UIViewController, Themeable {
         todayTapGesture.numberOfTapsRequired = 1
         todayCardView.addGestureRecognizer(todayTapGesture)
         
+        let todaySwipeGesture = UIPanGestureRecognizer(target: self, action: #selector(handleTodayPanGesture(gesture:)))
+        todaySwipeGesture.delegate = self
+        feedTableView.addGestureRecognizer(todaySwipeGesture)
+        
         view.addSubview(favoritesCollectionView)
         favoritesCollectionView.dataSource = dataSource
         dataSource.collectionView = favoritesCollectionView
@@ -308,7 +311,7 @@ class HomeViewController: UIViewController, Themeable {
         
         showNTPNotification(for: notificationType)
         
-        feedTableView.delegate = braveTodayDelegate
+        feedTableView.delegate = self
         feedTableView.dataSource = braveTodayDelegate
         feedTableView.isScrollEnabled = true
     }
@@ -390,7 +393,6 @@ class HomeViewController: UIViewController, Themeable {
         }
     }
     
-    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         // Need to reload data after modals are closed for potential orientation change
@@ -402,9 +404,9 @@ class HomeViewController: UIViewController, Themeable {
     
     private var collectionContentSizeObservation: NSKeyValueObservation?
     
-//    override func viewWillLayoutSubviews() {
-//        updateConstraints()
-//    }
+    override func viewWillLayoutSubviews() {
+        updateConstraints()
+    }
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
@@ -473,12 +475,29 @@ class HomeViewController: UIViewController, Themeable {
         showBraveTodayOnboarding()
     }
     
+    private var todayPanStart: CGPoint = .zero
+    @objc func handleTodayPanGesture(gesture: UIPanGestureRecognizer) {
+        let point = gesture.location(in: view)
+        switch gesture.state {
+        case .began:
+            todayPanStart = point
+        case .changed:
+            if point.y < todayPanStart.y - 80 {
+                showBraveTodayOnboarding()
+            }
+        default:
+            break
+        }
+    }
+    
     fileprivate func showBraveTodayOnboarding() {
         todayOnboarding.completionHandler = { completed in
             if completed {
                 BraveToday.shared.isEnabled = true
                 BraveToday.shared.loadFeedData() { [weak self] in
-                    self?.feedTableView.reloadData()
+                    DispatchQueue.main.async {
+                        self?.feedTableView.reloadData()
+                    }
                 }
             }
         }
@@ -612,8 +631,12 @@ class HomeViewController: UIViewController, Themeable {
             }
         }
         
+        feedTableView.snp.remakeConstraints {
+            $0.edges.equalToSuperview()
+        }
+        
         feedTableView.contentInset = UIEdgeInsets(top: view.frame.height, left: 0, bottom: 0, right: 0)
-        feedTableView.contentSize = CGSize(width: view.frame.width, height: view.frame.height) // TODO: Change once onboarded.
+        feedTableView.contentSize = CGSize(width: view.frame.width, height: 0) // TODO: Change once onboarded.
     }
     
     private func resetBackgroundImage() {
@@ -805,5 +828,11 @@ extension HomeViewController: FavoriteCellDelegate {
 extension HomeViewController: PreferencesObserver {
     func preferencesDidChange(for key: String) {
         self.resetBackgroundImage()
+    }
+}
+
+extension HomeViewController: UITableViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        
     }
 }
