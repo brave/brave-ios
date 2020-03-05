@@ -50,8 +50,8 @@ extension SQLiteFeed: Feed {
 
     public func createRecord(publishTime: Timestamp, feedSource: String, url: String, img: String, title: String, description: String) -> Deferred<Maybe<FeedItem>> {
         return db.transaction { connection -> FeedItem in
-            let insertSQL = "INSERT OR REPLACE INTO items (publish_time, feed_source, url, img, title, description) VALUES (?, ?, ?, ?, ?, ?)"
-            let insertArgs: Args = [publishTime, feedSource, url, img, title, description]
+            let insertSQL = "INSERT OR REPLACE INTO items (publish_time, feed_source, url, img, title, description, session_displayed) VALUES (?, ?, ?, ?, ?, ?, ?)"
+            let insertArgs: Args = [publishTime, feedSource, url, img, title, description, ""]
             let lastInsertedRowID = connection.lastInsertedRowID
 
             try connection.executeChange(insertSQL, withArgs: insertArgs)

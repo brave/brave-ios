@@ -13,7 +13,7 @@ struct FeedRow {
 
 class BraveToday: NSObject {
     static let shared = BraveToday()
-    private weak var profile: BrowserProfile?
+    private var profile: BrowserProfile?
     
     var isEnabled = false
     
@@ -26,6 +26,8 @@ class BraveToday: NSObject {
     
     func register(profile: BrowserProfile?) {
         self.profile = profile
+        
+//        clearAll()
     }
     
     func clearAll() {
@@ -35,7 +37,7 @@ class BraveToday: NSObject {
     func loadFeedData(completion: @escaping (Bool) -> Void) {
         func dateFromStringConverter(date: String) -> Date? {
             let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+            dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ssZ"
             return dateFormatter.date(from: date)
         }
         
@@ -44,11 +46,15 @@ class BraveToday: NSObject {
             for item in data {
                 // Only unique URL will save successfully
                 var publishTime: Timestamp = 0
-                if let dateString = item.publishTime, let date = dateFromStringConverter(date: dateString) {
+                if let dateString = item.publishTime {
+                    guard let date = dateFromStringConverter(date: dateString) else { break }
                     publishTime = date.toTimestamp()
                 }
-                guard let data = self?.profile?.feed.createRecord(publishTime: publishTime, feedSource: item.feedSource ?? "", url: item.url ?? "", img: item.img ?? "", title: item.title ?? "", description: item.description ?? "").value.successValue else { continue }
-                debugPrint(data)
+                
+//                debugPrint("publishTime: \(publishTime), feedSource: \(item.feedSource ?? ""), url: \(item.url ?? ""), img: \(item.img ?? ""), title: \(item.title ?? ""), description: \(item.description ?? "")")
+                
+                let data = self?.profile?.feed.createRecord(publishTime: publishTime, feedSource: item.feedSource ?? "", url: item.url ?? "", img: item.img ?? "", title: item.title ?? "", description: item.description ?? "").value
+                debugPrint(data?.successValue)
             }
             
             // TODO: Append new data to feed
@@ -56,8 +62,6 @@ class BraveToday: NSObject {
                 completion(false)
                 return
             }
-            
-            
             
             completion(true)
         }
