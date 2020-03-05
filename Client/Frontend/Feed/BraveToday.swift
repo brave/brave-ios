@@ -7,9 +7,15 @@ import Storage
 import SwiftKeychainWrapper
 import Deferred
 
-#if MOZ_TARGET_CLIENT
-    import SwiftyJSON
-#endif
+class FeedObject: NSObject {
+    var items: [FeedItem]
+    var cardType: TodayCardType
+    
+    init(items: [FeedItem], cardType: TodayCardType) {
+        self.items = items
+        self.cardType = cardType
+    }
+}
 
 class BraveToday: NSObject {
     static let shared = BraveToday()
@@ -17,6 +23,10 @@ class BraveToday: NSObject {
     
     // session
     // feed state
+    
+    var isEnabled = false
+    
+    fileprivate var feed: [FeedObject] = []
     
     override init() {
         super.init()
@@ -30,7 +40,7 @@ class BraveToday: NSObject {
         _ = profile?.feed.deleteAllRecords()
     }
     
-    func loadFeedData() {
+    func loadFeedData(completion: @escaping () -> Void) {
         func dateFromStringConverter(date: String) -> Date? {
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
@@ -48,6 +58,10 @@ class BraveToday: NSObject {
                 guard let data = self?.profile?.feed.createRecord(publishTime: publishTime, feedSource: item.feedSource ?? "", url: item.url ?? "", img: item.img ?? "", title: item.title ?? "", description: item.description ?? "").value.successValue else { continue }
                 debugPrint(data)
             }
+            
+            // TODO: Append new data to feed
+            
+            completion()
         }
     }
     
@@ -76,17 +90,38 @@ class BraveToday: NSObject {
     }
 }
 
-extension BraveToday: UITableViewDelegate, UITableViewDataSource {
+extension BraveToday: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 0
+        return isEnabled ? feed.count : 0
+    }
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 1
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "TodayCell", for: indexPath) as UITableViewCell
-        
+        let item: FeedObject = feed[indexPath.row]
+        (cell as? TodayCell)?.setData(feedObject: item)
         return cell
     }
     
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 0
+    }
+    
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return 0
+    }
+}
+
+extension BraveToday: UITableViewDelegate {
+//    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+//        debugPrint(scrollView.contentOffset.y + view.frame.height)
+//        if scrollView.contentOffset.y + view.frame.height > 30 {
+//            showBraveTodayOnboarding()
+//        }
+//    }
 }
 
 class BraveTodayFeedTable: UITableView {}

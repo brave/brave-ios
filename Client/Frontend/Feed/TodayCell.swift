@@ -3,5 +3,15 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 class TodayCell: UITableViewCell {
+    var data: FeedObject?
     
+    func setData(feedObject: FeedObject) {
+        prepare()
+        
+        data = feedObject
+    }
+    
+    private func prepare() {
+        
+    }
 }

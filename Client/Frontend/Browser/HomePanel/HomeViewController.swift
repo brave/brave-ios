@@ -54,7 +54,7 @@ class HomeViewController: UIViewController, Themeable {
     private let backgroundDataSource: NTPBackgroundDataSource?
     
     private let braveTodayDelegate = BraveToday()
-    private (set) internal lazy var feedTableView = BraveTodayFeedTable().then {
+    private (set) internal lazy var feedTableView = BraveTodayFeedTable(frame: .zero, style: .plain).then {
         $0.bounces = true
         $0.register(TodayCell.self, forCellReuseIdentifier: "TodayCell")
         $0.isScrollEnabled = false
@@ -65,6 +65,8 @@ class HomeViewController: UIViewController, Themeable {
         $0.cellLayoutMarginsFollowReadableWidth = true
         $0.accessibilityIdentifier = "Saved"
         $0.keyboardDismissMode = .onDrag
+        $0.sectionHeaderHeight = 0
+        $0.sectionFooterHeight = 0
         
         if #available(iOS 13.0, *) {
             $0.automaticallyAdjustsScrollIndicatorInsets = false
@@ -306,7 +308,7 @@ class HomeViewController: UIViewController, Themeable {
         
         showNTPNotification(for: notificationType)
         
-        feedTableView.delegate = self
+        feedTableView.delegate = braveTodayDelegate
         feedTableView.dataSource = braveTodayDelegate
         feedTableView.isScrollEnabled = true
     }
@@ -403,40 +405,40 @@ class HomeViewController: UIViewController, Themeable {
 //    override func viewWillLayoutSubviews() {
 //        updateConstraints()
 //    }
-//
-//    override func viewDidLayoutSubviews() {
-//        super.viewDidLayoutSubviews()
-//
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+
 //        // This makes collection view layout to recalculate its cell size.
 //        favoritesCollectionView.collectionViewLayout.invalidateLayout()
 //        favoritesOverflowButton.isHidden = !dataSource.hasOverflow
 //        favoritesCollectionView.reloadSections(IndexSet(arrayLiteral: 0))
-//
-//        if let backgroundImageView = backgroundViewInfo?.imageView, let image = backgroundImageView.image {
-//            // Need to calculate the sizing difference between `image` and `imageView` to determine the pixel difference ratio
-//            let sizeRatio = backgroundImageView.frame.size.width / image.size.width
-//            let focal = background?.wallpaper.focalPoint
-//            // Center as fallback
-//            let x = focal?.x ?? image.size.width / 2
-//            let y = focal?.y ?? image.size.height / 2
-//            let portrait = view.frame.height > view.frame.width
-//
-//            // Center point of image is not center point of view.
-//            // Take `0` for example, if specying `0`, setting centerX to 0, it is not attempting to place the left
-//            //  side of the image to the middle (e.g. left justifying), it is instead trying to move the image view's
-//            //  center to `0`, shifting the image _to_ the left, and making more of the image's right side visible.
-//            // Therefore specifying `0` should take the imageView's left and pinning it to view's center.
-//
-//            // So basically the movement needs to be "inverted" (hence negation)
-//            // In landscape, left / right are pegged to superview
-//            let imageViewOffset = portrait ? sizeRatio * -x : 0
-//            backgroundViewInfo?.portraitCenterConstraint.update(offset: imageViewOffset)
-//
-//            // If potrait, top / bottom are just pegged to superview
-//            let inset = portrait ? 0 : sizeRatio * -y
-//            backgroundViewInfo?.landscapeCenterConstraint.update(offset: inset)
-//        }
-//    }
+
+        if let backgroundImageView = backgroundViewInfo?.imageView, let image = backgroundImageView.image {
+            // Need to calculate the sizing difference between `image` and `imageView` to determine the pixel difference ratio
+            let sizeRatio = backgroundImageView.frame.size.width / image.size.width
+            let focal = background?.wallpaper.focalPoint
+            // Center as fallback
+            let x = focal?.x ?? image.size.width / 2
+            let y = focal?.y ?? image.size.height / 2
+            let portrait = view.frame.height > view.frame.width
+
+            // Center point of image is not center point of view.
+            // Take `0` for example, if specying `0`, setting centerX to 0, it is not attempting to place the left
+            //  side of the image to the middle (e.g. left justifying), it is instead trying to move the image view's
+            //  center to `0`, shifting the image _to_ the left, and making more of the image's right side visible.
+            // Therefore specifying `0` should take the imageView's left and pinning it to view's center.
+
+            // So basically the movement needs to be "inverted" (hence negation)
+            // In landscape, left / right are pegged to superview
+            let imageViewOffset = portrait ? sizeRatio * -x : 0
+            backgroundViewInfo?.portraitCenterConstraint.update(offset: imageViewOffset)
+
+            // If potrait, top / bottom are just pegged to superview
+            let inset = portrait ? 0 : sizeRatio * -y
+            backgroundViewInfo?.landscapeCenterConstraint.update(offset: inset)
+        }
+    }
     
     private func updateDuckDuckGoButtonLayout() {
         let size = ddgButton.systemLayoutSizeFitting(UIView.layoutFittingExpandedSize)
@@ -474,7 +476,10 @@ class HomeViewController: UIViewController, Themeable {
     fileprivate func showBraveTodayOnboarding() {
         todayOnboarding.completionHandler = { completed in
             if completed {
-                BraveToday.shared.loadFeedData()
+                BraveToday.shared.isEnabled = true
+                BraveToday.shared.loadFeedData() { [weak self] in
+                    self?.feedTableView.reloadData()
+                }
             }
         }
         todayOnboarding.showWithType(showType: .normal)
@@ -801,13 +806,4 @@ extension HomeViewController: PreferencesObserver {
     func preferencesDidChange(for key: String) {
         self.resetBackgroundImage()
     }
-}
-
-extension HomeViewController: UITableViewDelegate {
-//    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-//        debugPrint(scrollView.contentOffset.y + view.frame.height)
-//        if scrollView.contentOffset.y + view.frame.height > 30 {
-//            showBraveTodayOnboarding()
-//        }
-//    }
 }
