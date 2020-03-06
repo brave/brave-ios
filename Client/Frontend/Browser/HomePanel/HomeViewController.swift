@@ -183,6 +183,8 @@ class HomeViewController: UIViewController, Themeable {
     private var ntpNotificationShowing = false
     private var rewards: BraveRewards?
     
+    private var collectionContentSizeObservation: NSKeyValueObservation?
+    
     init(profile: Profile, dataSource: FavoritesDataSource = FavoritesDataSource(), fromOverlay: Bool,
          rewards: BraveRewards?, backgroundDataSource: NTPBackgroundDataSource?) {
         self.profile = profile
@@ -198,11 +200,6 @@ class HomeViewController: UIViewController, Themeable {
             $0.addObserver(self, selector: #selector(privateBrowsingModeChanged), 
                            name: .privacyModeChanged, object: nil)
         }
-    }
-    
-    @objc func existingUserTopSitesConversion() {
-        dataSource.refetch()
-        favoritesCollectionView.reloadData()
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -276,6 +273,9 @@ class HomeViewController: UIViewController, Themeable {
         feedView.addSubview(favoritesCollectionView)
         feedView.addSubview(todayCardView)
         
+        // Onboarded should hide
+        todayCardView.isHidden = BraveToday.shared.isEnabled
+        
         view.addSubview(feedView)
         
         feedView.delegate = self
@@ -300,6 +300,18 @@ class HomeViewController: UIViewController, Themeable {
         favoritesCollectionView.reloadData()
         
         updateConstraints()
+        
+        feedView.reloadData()
+        
+        UIView.animate(
+            withDuration: 0.3, delay: 0,
+            usingSpringWithDamping: 1,
+            initialSpringVelocity: 4,
+            options: .allowUserInteraction,
+            animations: {
+                self.feedView.contentOffset = CGPoint(x: 0, y: -(self.view.frame.height - 40))
+                self.feedView.layoutIfNeeded()
+        }, completion: nil)
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -310,6 +322,154 @@ class HomeViewController: UIViewController, Themeable {
         }
         
         showNTPNotification(for: notificationType)
+    }
+    
+    override func viewWillLayoutSubviews() {
+        updateConstraints()
+    }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+
+//        // This makes collection view layout to recalculate its cell size.
+//        favoritesCollectionView.collectionViewLayout.invalidateLayout()
+//        favoritesOverflowButton.isHidden = !dataSource.hasOverflow
+//        favoritesCollectionView.reloadSections(IndexSet(arrayLiteral: 0))
+
+        if let backgroundImageView = backgroundViewInfo?.imageView, let image = backgroundImageView.image {
+            // Need to calculate the sizing difference between `image` and `imageView` to determine the pixel difference ratio
+            let sizeRatio = backgroundImageView.frame.size.width / image.size.width
+            let focal = background?.wallpaper.focalPoint
+            // Center as fallback
+            let x = focal?.x ?? image.size.width / 2
+            let y = focal?.y ?? image.size.height / 2
+            let portrait = view.frame.height > view.frame.width
+
+            // Center point of image is not center point of view.
+            // Take `0` for example, if specying `0`, setting centerX to 0, it is not attempting to place the left
+            //  side of the image to the middle (e.g. left justifying), it is instead trying to move the image view's
+            //  center to `0`, shifting the image _to_ the left, and making more of the image's right side visible.
+            // Therefore specifying `0` should take the imageView's left and pinning it to view's center.
+
+            // So basically the movement needs to be "inverted" (hence negation)
+            // In landscape, left / right are pegged to superview
+            let imageViewOffset = portrait ? sizeRatio * -x : 0
+            backgroundViewInfo?.portraitCenterConstraint.update(offset: imageViewOffset)
+
+            // If potrait, top / bottom are just pegged to superview
+            let inset = portrait ? 0 : sizeRatio * -y
+            backgroundViewInfo?.landscapeCenterConstraint.update(offset: inset)
+        }
+    }
+    
+    // MARK: - Constraints setup
+    fileprivate func makeConstraints() {
+        ddgLogo.snp.makeConstraints { make in
+            make.top.left.greaterThanOrEqualTo(UI.ddgButtonPadding)
+            make.centerY.equalToSuperview()
+            make.size.equalTo(38)
+        }
+        
+        ddgLabel.snp.makeConstraints { make in
+            make.right.equalToSuperview().offset(-UI.ddgButtonPadding)
+            make.left.equalTo(self.ddgLogo.snp.right).offset(5)
+            make.width.equalTo(180)
+            make.centerY.equalTo(self.ddgLogo)
+        }
+        
+        favoritesOverflowButton.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.bottom.equalTo(ddgButton.snp.top).offset(-90)
+            $0.height.equalTo(24)
+            $0.width.equalTo(84)
+        }
+        
+        imageCreditButton.snp.makeConstraints {
+            let borderPadding = 20
+            $0.bottom.equalTo(self.view).inset(-borderPadding + 60)
+            $0.left.equalToSuperview().offset(borderPadding)
+            $0.height.equalTo(24)
+            // Width and therefore, right constraint is determined by the actual button inside of this view
+            //  button is resized from text content, and this superview is pinned to that width.
+        }
+        
+        todayCardView.snp.makeConstraints {
+            $0.centerX.equalTo(self.feedView)
+            $0.width.equalTo(min(UIScreen.main.bounds.width - 40, 420))
+            $0.height.equalTo(200)
+            $0.bottom.equalTo(self.feedView).offset(170)
+        }
+        
+        feedView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+
+        updateConstraints()
+        
+        favoritesCollectionView.collectionViewLayout.invalidateLayout()
+        feedView.reloadData()
+        feedView.layoutSubviews()
+    }
+    
+    private func updateConstraints() {
+        let isIphone = UIDevice.isPhone
+        let isLandscape = view.frame.width > view.frame.height
+        
+        var right: ConstraintRelatableTarget = self.view.safeAreaLayoutGuide
+        var left: ConstraintRelatableTarget = self.view.safeAreaLayoutGuide
+        if isLandscape {
+            if isIphone {
+                left = self.view.snp.centerX
+            } else {
+                right = self.view.snp.centerX
+            }
+        }
+        
+        favoritesCollectionView.snp.remakeConstraints { make in
+            make.right.equalTo(right)
+            make.left.equalTo(left)
+            make.top.bottom.equalTo(self.view)
+        }
+        
+        imageSponsorButton.snp.remakeConstraints {
+            $0.size.equalTo(170)
+            $0.bottom.equalTo(todayCardView.snp.top).inset(-10)
+            
+            if isLandscape && isIphone {
+                $0.left.equalTo(view.safeArea.left).offset(20)
+            } else {
+                $0.centerX.equalToSuperview()
+            }
+        }
+        
+        todayCardView.snp.remakeConstraints {
+            $0.centerX.equalTo(self.feedView)
+            $0.width.equalTo(min(UIScreen.main.bounds.width - 40, 460))
+            $0.height.equalTo(200)
+            $0.bottom.equalTo(self.feedView).offset(210)
+        }
+        
+        feedView.snp.remakeConstraints {
+            $0.edges.equalToSuperview()
+        }
+        
+        if !BraveToday.shared.isEnabled {
+            feedView.contentSize = CGSize(width: view.frame.width, height: 0)
+            feedView.contentInset = UIEdgeInsets(top: view.frame.height - 40, left: 0, bottom: 0, right: 0)
+        } else {
+            // Peeking loaded content.
+            feedView.contentInset = UIEdgeInsets(top: view.frame.height - 40, left: 0, bottom: 0, right: 0)
+            feedView.layoutSubviews()
+        }
+    }
+    
+    @objc func existingUserTopSitesConversion() {
+        dataSource.refetch()
+        favoritesCollectionView.reloadData()
     }
     
     /// Returns nil if not applicable or no notification should be shown.
@@ -389,46 +549,6 @@ class HomeViewController: UIViewController, Themeable {
         }
     }
     
-    private var collectionContentSizeObservation: NSKeyValueObservation?
-    
-    override func viewWillLayoutSubviews() {
-        updateConstraints()
-    }
-
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-
-//        // This makes collection view layout to recalculate its cell size.
-//        favoritesCollectionView.collectionViewLayout.invalidateLayout()
-//        favoritesOverflowButton.isHidden = !dataSource.hasOverflow
-//        favoritesCollectionView.reloadSections(IndexSet(arrayLiteral: 0))
-
-        if let backgroundImageView = backgroundViewInfo?.imageView, let image = backgroundImageView.image {
-            // Need to calculate the sizing difference between `image` and `imageView` to determine the pixel difference ratio
-            let sizeRatio = backgroundImageView.frame.size.width / image.size.width
-            let focal = background?.wallpaper.focalPoint
-            // Center as fallback
-            let x = focal?.x ?? image.size.width / 2
-            let y = focal?.y ?? image.size.height / 2
-            let portrait = view.frame.height > view.frame.width
-
-            // Center point of image is not center point of view.
-            // Take `0` for example, if specying `0`, setting centerX to 0, it is not attempting to place the left
-            //  side of the image to the middle (e.g. left justifying), it is instead trying to move the image view's
-            //  center to `0`, shifting the image _to_ the left, and making more of the image's right side visible.
-            // Therefore specifying `0` should take the imageView's left and pinning it to view's center.
-
-            // So basically the movement needs to be "inverted" (hence negation)
-            // In landscape, left / right are pegged to superview
-            let imageViewOffset = portrait ? sizeRatio * -x : 0
-            backgroundViewInfo?.portraitCenterConstraint.update(offset: imageViewOffset)
-
-            // If potrait, top / bottom are just pegged to superview
-            let inset = portrait ? 0 : sizeRatio * -y
-            backgroundViewInfo?.landscapeCenterConstraint.update(offset: inset)
-        }
-    }
-    
     private func updateDuckDuckGoButtonLayout() {
         let size = ddgButton.systemLayoutSizeFitting(UIView.layoutFittingExpandedSize)
         ddgButton.frame = CGRect(
@@ -482,21 +602,16 @@ class HomeViewController: UIViewController, Themeable {
     fileprivate func showBraveTodayOnboarding() {
         todayOnboarding.completionHandler = { completed in
             if completed {
+                BraveToday.shared.isEnabled = true
                 BraveToday.shared.loadFeedData() { [weak self] in
-                    if completed {
-                        BraveToday.shared.isEnabled = true
-                        
-                        BraveToday.shared.generateFeed() {
-                            DispatchQueue.main.async {
-                                self?.todayCardView.isHidden = true
-                                self?.feedView.reloadData()
-                                
-                                // Adjust insets to allow for table scroll
-                                self?.updateConstraints()
-                            }
+                    BraveToday.shared.generateFeed() {
+                        DispatchQueue.main.async {
+                            self?.todayCardView.isHidden = true
+                            self?.feedView.reloadData()
+                            
+                            // Adjust insets to allow for table scroll
+                            self?.updateConstraints()
                         }
-                    } else {
-                        
                     }
                 }
             }
@@ -534,49 +649,6 @@ class HomeViewController: UIViewController, Themeable {
         delegate?.didSelect(input: url)
     }
     
-    // MARK: - Constraints setup
-    fileprivate func makeConstraints() {
-        ddgLogo.snp.makeConstraints { make in
-            make.top.left.greaterThanOrEqualTo(UI.ddgButtonPadding)
-            make.centerY.equalToSuperview()
-            make.size.equalTo(38)
-        }
-        
-        ddgLabel.snp.makeConstraints { make in
-            make.right.equalToSuperview().offset(-UI.ddgButtonPadding)
-            make.left.equalTo(self.ddgLogo.snp.right).offset(5)
-            make.width.equalTo(180)
-            make.centerY.equalTo(self.ddgLogo)
-        }
-        
-        favoritesOverflowButton.snp.makeConstraints {
-            $0.centerX.equalToSuperview()
-            $0.bottom.equalTo(ddgButton.snp.top).offset(-90)
-            $0.height.equalTo(24)
-            $0.width.equalTo(84)
-        }
-        
-        imageCreditButton.snp.makeConstraints {
-            let borderPadding = 20
-            $0.bottom.equalTo(self.view).inset(-borderPadding + 60)
-            $0.left.equalToSuperview().offset(borderPadding)
-            $0.height.equalTo(24)
-            // Width and therefore, right constraint is determined by the actual button inside of this view
-            //  button is resized from text content, and this superview is pinned to that width.
-        }
-        
-        todayCardView.snp.makeConstraints {
-            $0.centerX.equalTo(self.feedView)
-            $0.width.equalTo(min(UIScreen.main.bounds.width - 40, 420))
-            $0.height.equalTo(200)
-            $0.bottom.equalTo(self.feedView).offset(170)
-        }
-        
-        feedView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-        }
-    }
-    
     // MARK: - Private browsing mode
     @objc func privateBrowsingModeChanged() {
         updateDuckDuckGoVisibility()
@@ -591,65 +663,6 @@ class HomeViewController: UIViewController, Themeable {
         styleChildren(theme: theme)
        
         view.backgroundColor = theme.colors.home
-    }
-    
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-
-        updateConstraints()
-        favoritesCollectionView.collectionViewLayout.invalidateLayout()
-    }
-    
-    private func updateConstraints() {
-        let isIphone = UIDevice.isPhone
-        let isLandscape = view.frame.width > view.frame.height
-        
-        var right: ConstraintRelatableTarget = self.view.safeAreaLayoutGuide
-        var left: ConstraintRelatableTarget = self.view.safeAreaLayoutGuide
-        if isLandscape {
-            if isIphone {
-                left = self.view.snp.centerX
-            } else {
-                right = self.view.snp.centerX
-            }
-        }
-        
-        favoritesCollectionView.snp.remakeConstraints { make in
-            make.right.equalTo(right)
-            make.left.equalTo(left)
-            make.top.bottom.equalTo(self.view)
-        }
-        
-        imageSponsorButton.snp.remakeConstraints {
-            $0.size.equalTo(170)
-            $0.bottom.equalTo(todayCardView.snp.top).inset(-10)
-            
-            if isLandscape && isIphone {
-                $0.left.equalTo(view.safeArea.left).offset(20)
-            } else {
-                $0.centerX.equalToSuperview()
-            }
-        }
-        
-        todayCardView.snp.remakeConstraints {
-            $0.centerX.equalTo(self.feedView)
-            $0.width.equalTo(min(UIScreen.main.bounds.width - 40, 460))
-            $0.height.equalTo(200)
-            $0.bottom.equalTo(self.feedView).offset(210)
-        }
-        
-        feedView.snp.remakeConstraints {
-            $0.edges.equalToSuperview()
-        }
-        
-        if !BraveToday.shared.isEnabled {
-            feedView.contentSize = CGSize(width: view.frame.width, height: 0)
-            feedView.contentInset = UIEdgeInsets(top: view.frame.height - 40, left: 0, bottom: 0, right: 0)
-        } else {
-            // Peeking loaded content.
-            feedView.contentInset = UIEdgeInsets(top: view.frame.height - 40, left: 0, bottom: 0, right: 0)
-            feedView.layoutSubviews()
-        }
     }
     
     private func resetBackgroundImage() {
@@ -848,15 +861,17 @@ extension HomeViewController: UITableViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         // Only care about feed scroll position, ignore favorites scrollview
         if scrollView.isDescendant(of: feedView) {
+            debugPrint(scrollView.contentOffset.y)
             let scrollOffset = scrollView.contentOffset.y + view.frame.height - 40
             
-            imageCreditButton.alpha = alphaAt(scrollOffset, cap: 60)
-            imageSponsorButton.alpha = alphaAt(scrollOffset, cap: 80)
-            favoritesCollectionView.alpha = alphaAt(scrollOffset, cap: view.frame.height - 200)
+            imageCreditButton.alpha = alphaAt(scrollOffset, distance: 30)
+            imageSponsorButton.alpha = alphaAt(scrollOffset, distance: 50)
+            favoritesCollectionView.alpha = alphaAt(scrollOffset - view.frame.height / 3, distance: view.frame.height / 4) // starts fading 1/3 up
+            backgroundViewInfo?.imageView.alpha = max(alphaAt(scrollOffset - view.frame.height / 2, distance: view.frame.height), 0.2) // starts fading 1/2 up and limit
         }
     }
     
-    func alphaAt(_ value: CGFloat, cap: CGFloat) -> CGFloat {
-        return max(min(((cap - value) / cap * 100) / 100, 1), 0)
+    func alphaAt(_ value: CGFloat, distance: CGFloat) -> CGFloat {
+        return max(min(((distance - value) / distance * 100) / 100, 1), 0)
     }
 }

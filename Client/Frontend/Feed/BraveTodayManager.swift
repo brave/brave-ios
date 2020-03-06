@@ -72,9 +72,11 @@ class BraveToday: NSObject {
         
         var usedIds: [Int] = []
         
+        
+        
         // v0.1 - add all items as large headline types
         for item in feedItems {
-            let card = TodayCard(type: .headlineLarge, items: [item], sponsorData: nil)
+            let card = TodayCard(type: .headlineLarge, items: [item], sponsorData: nil, mainTitle: "")
             let feedRow = FeedRow(cards: [card])
             feed.append(feedRow)
             usedIds.append(item.id)

@@ -6,10 +6,13 @@ import Foundation
 
 class TodayCell: UITableViewCell {
     var data: FeedRow?
+    let containerView = UIView()
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
                     
+        contentView.addSubview(containerView)
+        
         prepare()
     }
     
@@ -19,10 +22,18 @@ class TodayCell: UITableViewCell {
         
     private func prepare() {
         backgroundColor = .clear
+        
+        containerView.snp.remakeConstraints {
+            $0.width.equalTo(min(UIScreen.main.bounds.width, 460))
+            $0.centerX.equalToSuperview()
+            $0.top.bottom.equalTo(0)
+        }
     }
     
     override func layoutSubviews() {
         super.layoutSubviews()
+        prepare()
+        
     }
     
     override func setSelected(_ selected: Bool, animated: Bool) {
@@ -47,13 +58,13 @@ class TodayCell: UITableViewCell {
         self.data = data
         
         if data.cards.count == 1, let card = data.cards.first {
-            contentView.subviews.forEach { $0.removeFromSuperview() }
+            containerView.subviews.forEach { $0.removeFromSuperview() }
             
-            let cardView = TodayCardView()
-            contentView.addSubview(cardView)
+            let cardView = TodayCardView(data: card)
+            containerView.addSubview(cardView)
             
             cardView.snp.makeConstraints {
-                $0.left.right.equalTo(contentView).inset(20)
+                $0.left.right.equalTo(containerView).inset(20)
                 $0.top.equalTo(10)
                 $0.bottom.equalTo(0)
                 $0.height.equalTo(card.type.rawValue)

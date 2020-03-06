@@ -19,6 +19,9 @@ class BraveTodayFeedView: UITableView {
         sectionHeaderHeight = 0
         sectionFooterHeight = 0
         
+        let footer = UIView(frame: CGRect(width: UIScreen.main.bounds.width, height: 20))
+        tableFooterView = footer
+        
         if #available(iOS 13.0, *) {
             automaticallyAdjustsScrollIndicatorInsets = false
         }

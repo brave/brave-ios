@@ -4,9 +4,11 @@
 
 import Foundation
 import Storage
+import Kingfisher
 
 class TodayCardContainerView: UIView {
-    private let blurView = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
+    fileprivate let blurView = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -32,7 +34,6 @@ class TodayCardContainerView: UIView {
 }
 
 enum TodayCardType: CGFloat {
-    case topNews = 400
     case horizontalList = 300
     case verticalList = 330
     case headlineLarge = 430
@@ -46,20 +47,223 @@ struct TodayCard {
     
     // Special Data
     let sponsorData: SponsorData?
+    let mainTitle: String?
 }
 
 class TodayCardView: TodayCardContainerView {
+    var data: TodayCard?
+    
+    var cardTitleLabel: UILabel?
+    var imageView: UIImageView?
+    
     convenience init(data: TodayCard) {
         self.init(frame: .zero)
+        self.data = data
         
+        prepare()
     }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func prepare() {
+        if let data = data {
+            
+            if data.mainTitle?.isEmpty == false {
+                let cardTitleLabel = UILabel()
+                blurView.contentView.addSubview(cardTitleLabel)
+                
+                self.cardTitleLabel = cardTitleLabel
+                self.cardTitleLabel?.snp.makeConstraints {
+                    $0.top.equalTo(5)
+                    $0.left.right.equalTo(5)
+                }
+            }
+            
+            switch data.type {
+            case .horizontalList:
+                generateHorizontalListLayout()
+            case .verticalList:
+                generateVerticalListLayout()
+            case .headlineLarge:
+                generateHeadlineLargeLayout()
+            case .headlineSmall:
+                generateHeadlineSmallLayout()
+            case .sponsor:
+                generateSponsorLayout()
+            }
+        }
+    }
+    
+    private func generateHorizontalListLayout() {
+        
+    }
+    
+    private func generateVerticalListLayout() {
+        
+    }
+    
+    private func generateHeadlineLargeLayout() {
+        guard let item = data?.items.first else { return }
+        
+        let contentView = TodayCardContentView(data: item, layout: .verticalLarge)
+        blurView.contentView.addSubview(contentView)
+        
+        contentView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+    }
+    
+    private func generateHeadlineSmallLayout() {
+        
+    }
+    
+    private func generateSponsorLayout() {
+        let imageView = UIImageView()
+        blurView.contentView.addSubview(imageView)
+        
+        self.imageView = imageView
+        self.imageView?.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+    }
+}
+
+// Used for all types except publisher
+enum TodayCardContentLayout {
+    case verticalLarge
+    case verticalSmall
+    case horizontal // fills vertical lists w/ or w/out image
+}
+
+class TodayCardContentView: UIView {
+    var data: FeedItem!
+    var layout: TodayCardContentLayout!
+    
+    private var imageView: UIImageView?
+    private var headlineLabel: UILabel?
+    private var timeAgoLabel: UILabel?
+    private var publisherLabel: UILabel?
+    private var publisherLogo: UIImageView?
+    private var optionsButton: UIButton?
+    
+    required convenience init(data: FeedItem, layout: TodayCardContentLayout) {
+        self.init(frame: .zero)
+        self.data = data
+        self.layout = layout
+        
+        prepare()
+    }
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func prepare() {
+        switch layout {
+        case .verticalLarge:
+            layoutVerticalLarge()
+        case .verticalSmall:
+            layoutVerticalSmall()
+        case .horizontal:
+            layoutHorizontal()
+        default:
+            break
+        }
+    }
+    
+    private func layoutVerticalLarge() {
+        let imageView = UIImageView()
+        imageView.backgroundColor = UIColor(rgb: 0xBCBCBC).withAlphaComponent(0.2)
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        addSubview(imageView)
+            
+        self.imageView = imageView
+        self.imageView?.snp.makeConstraints {
+            $0.top.left.right.equalTo(0)
+            $0.height.equalTo(270)
+        }
+        
+        let headlineLabel = UILabel()
+        headlineLabel.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
+        headlineLabel.textColor = .white
+        headlineLabel.numberOfLines = 2
+        headlineLabel.lineBreakMode = .byTruncatingTail
+        headlineLabel.text = data.title
+        addSubview(headlineLabel)
+        
+        self.headlineLabel = headlineLabel
+        self.headlineLabel?.snp.makeConstraints {
+            $0.top.equalTo(imageView.snp.bottom).offset(12)
+            $0.left.right.equalToSuperview().inset(20)
+        }
+        
+        let timeAgoLabel = UILabel()
+        timeAgoLabel.font = UIFont.systemFont(ofSize: 11, weight: .semibold)
+        timeAgoLabel.textColor = UIColor.white.withAlphaComponent(0.6)
+        timeAgoLabel.numberOfLines = 1
+        timeAgoLabel.text = Date.fromTimestamp(data.publishTime).toRelativeTimeString()
+        addSubview(timeAgoLabel)
+        
+        self.timeAgoLabel = timeAgoLabel
+        self.timeAgoLabel?.snp.makeConstraints {
+            $0.top.equalTo(headlineLabel.snp.bottom).offset(4)
+            $0.left.right.equalToSuperview().inset(20)
+        }
+        
+        let publisherLabel = UILabel()
+        publisherLabel.font = UIFont.systemFont(ofSize: 13, weight: .bold)
+        publisherLabel.textColor = .white
+        publisherLabel.numberOfLines = 1
+        publisherLabel.text = data.feedSource
+        addSubview(publisherLabel)
+        
+        self.publisherLabel = publisherLabel
+        self.publisherLabel?.snp.makeConstraints {
+            $0.bottom.equalToSuperview().inset(15)
+            $0.left.right.equalToSuperview().inset(20)
+        }
+        
+        layoutSubviews()
+        loadImage(urlString: data.img)
+    }
+    
+    private func layoutVerticalSmall() {
+        
+    }
+    
+    private func layoutHorizontal() {
+        
+    }
+    
+    private func loadImage(urlString: String) {
+        guard let imageView = imageView, urlString.isEmpty == false else { return }
+        
+        let url = URL(string: urlString)
+        imageView.kf.indicatorType = .activity
+        imageView.kf.setImage(
+            with: url,
+            placeholder: nil,
+            options: [
+                .transition(.fade(1)),
+                .cacheOriginalImage
+            ]) { result in
+            switch result {
+            case .success(let value):
+                print("Task done for: \(value.source.url?.absoluteString ?? "")")
+            case .failure(let error):
+                print("Job failed: \(error.localizedDescription)")
+            }
+        }
     }
 }
