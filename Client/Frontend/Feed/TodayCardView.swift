@@ -40,7 +40,8 @@ enum TodayCardType: CGFloat {
     case verticalListNumbered = 420
     case headlineLarge = 410
     case headlineSmall = 260
-    case sponsor = 140
+    case adSmall = 140
+    case adLarge = 380
 }
 
 struct TodayCard {
@@ -100,18 +101,95 @@ class TodayCardView: TodayCardContainerView {
                 generateHeadlineLargeLayout()
             case .headlineSmall:
                 generateHeadlineSmallLayout()
-            case .sponsor:
-                generateSponsorLayout()
+            case .adSmall:
+                generateAdSmallLayout()
+            case .adLarge:
+                generateAdLargeLayout()
             }
         }
     }
     
     private func generateHorizontalListLayout() {
+        let titleLabel = UILabel()
+        titleLabel.font = UIFont.systemFont(ofSize: 21, weight: .bold)
+        titleLabel.textColor = .white
+        titleLabel.numberOfLines = 1
+        titleLabel.lineBreakMode = .byTruncatingTail
+        titleLabel.text = data?.mainTitle
+        blurView.contentView.addSubview(titleLabel)
         
+        titleLabel.snp.makeConstraints {
+            $0.top.equalTo(20)
+            $0.left.right.equalToSuperview().inset(20)
+        }
+        
+        if let item = data?.items[0] {
+            let contentView = TodayCardContentView(data: item, layout: .verticalSmallInset)
+            blurView.contentView.addSubview(contentView)
+            
+            contentView.snp.makeConstraints {
+                $0.left.equalToSuperview().inset(20)
+                $0.width.equalToSuperview().inset(10).multipliedBy(0.33).priority(999)
+                $0.top.equalTo(titleLabel.snp.bottom).offset(20)
+            }
+        }
+        
+        if let item = data?.items[1] {
+            let contentView = TodayCardContentView(data: item, layout: .verticalSmallInset)
+            blurView.contentView.addSubview(contentView)
+            
+            contentView.snp.makeConstraints {
+                $0.centerX.equalToSuperview()
+                $0.width.equalToSuperview().inset(10).multipliedBy(0.33).priority(999)
+                $0.top.equalTo(titleLabel.snp.bottom).offset(20)
+            }
+        }
+        
+        if let item = data?.items[2] {
+            let contentView = TodayCardContentView(data: item, layout: .verticalSmallInset)
+            blurView.contentView.addSubview(contentView)
+            
+            contentView.snp.makeConstraints {
+                $0.right.equalToSuperview().inset(20)
+                $0.width.equalToSuperview().inset(10).multipliedBy(0.33).priority(999)
+                $0.top.equalTo(titleLabel.snp.bottom).offset(20)
+            }
+        }
     }
     
     private func generateVerticalListLayout() {
+        if let item = data?.items[0] {
+            let contentView = TodayCardContentView(data: item, layout: .horizontal)
+            blurView.contentView.addSubview(contentView)
+            
+            contentView.snp.makeConstraints {
+                $0.top.equalTo(20)
+                $0.left.right.equalToSuperview().inset(20)
+                $0.height.equalToSuperview().inset(10).multipliedBy(0.33).priority(999)
+            }
+        }
         
+        if let item = data?.items[1] {
+            let contentView = TodayCardContentView(data: item, layout: .horizontal)
+            blurView.contentView.addSubview(contentView)
+            
+            contentView.snp.makeConstraints {
+                $0.centerY.equalToSuperview()
+                $0.left.right.equalToSuperview().inset(20)
+                $0.height.equalToSuperview().inset(10).multipliedBy(0.33).priority(999)
+            }
+        }
+        
+        if let item = data?.items[2] {
+            let contentView = TodayCardContentView(data: item, layout: .horizontal)
+            blurView.contentView.addSubview(contentView)
+            
+            contentView.snp.makeConstraints {
+                $0.bottom.equalToSuperview().inset(20)
+                $0.left.right.equalToSuperview().inset(20)
+                $0.height.equalToSuperview().inset(10).multipliedBy(0.33).priority(999)
+            }
+        }
     }
     
     private func generateVerticalListBrandedLayout() {
@@ -144,7 +222,17 @@ class TodayCardView: TodayCardContainerView {
         }
     }
     
-    private func generateSponsorLayout() {
+    private func generateAdSmallLayout() {
+        let imageView = UIImageView()
+        blurView.contentView.addSubview(imageView)
+        
+        self.imageView = imageView
+        self.imageView?.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+    }
+    
+    private func generateAdLargeLayout() {
         let imageView = UIImageView()
         blurView.contentView.addSubview(imageView)
         
@@ -320,26 +408,27 @@ class TodayCardContentView: UIView {
         imageView.backgroundColor = UIColor(rgb: 0xBCBCBC).withAlphaComponent(0.2)
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
+        imageView.layer.cornerRadius = 4
         addSubview(imageView)
             
         imageView.snp.makeConstraints {
             $0.top.left.right.equalTo(0)
-            $0.height.equalTo(270)
+            $0.height.equalTo(98)
         }
         
         self.imageView = imageView
         
         let headlineLabel = UILabel()
-        headlineLabel.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
+        headlineLabel.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
         headlineLabel.textColor = .white
-        headlineLabel.numberOfLines = 2
+        headlineLabel.numberOfLines = 5
         headlineLabel.lineBreakMode = .byTruncatingTail
         headlineLabel.text = data.title
         addSubview(headlineLabel)
         
         headlineLabel.snp.makeConstraints {
             $0.top.equalTo(imageView.snp.bottom).offset(12)
-            $0.left.right.equalToSuperview().inset(20)
+            $0.left.right.equalTo(0)
         }
         
         let timeAgoLabel = UILabel()
@@ -351,19 +440,7 @@ class TodayCardContentView: UIView {
         
         timeAgoLabel.snp.makeConstraints {
             $0.top.equalTo(headlineLabel.snp.bottom).offset(4)
-            $0.left.right.equalToSuperview().inset(20)
-        }
-        
-        let publisherLabel = UILabel()
-        publisherLabel.font = UIFont.systemFont(ofSize: 13, weight: .bold)
-        publisherLabel.textColor = .white
-        publisherLabel.numberOfLines = 1
-        publisherLabel.text = data.feedSource
-        addSubview(publisherLabel)
-        
-        publisherLabel.snp.makeConstraints {
-            $0.bottom.equalToSuperview().inset(15)
-            $0.left.right.equalToSuperview().inset(20)
+            $0.left.right.equalTo(0)
         }
         
         layoutSubviews()
@@ -375,38 +452,23 @@ class TodayCardContentView: UIView {
         imageView.backgroundColor = UIColor(rgb: 0xBCBCBC).withAlphaComponent(0.2)
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
+        imageView.layer.cornerRadius = 4
         addSubview(imageView)
             
         imageView.snp.makeConstraints {
-            $0.top.left.right.equalTo(0)
-            $0.height.equalTo(270)
+            $0.right.top.bottom.equalTo(0)
+            $0.size.equalTo(98)
         }
         
         self.imageView = imageView
         
-        let headlineLabel = UILabel()
-        headlineLabel.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
-        headlineLabel.textColor = .white
-        headlineLabel.numberOfLines = 2
-        headlineLabel.lineBreakMode = .byTruncatingTail
-        headlineLabel.text = data.title
-        addSubview(headlineLabel)
+        let textContainer = UIView()
+        addSubview(textContainer)
         
-        headlineLabel.snp.makeConstraints {
-            $0.top.equalTo(imageView.snp.bottom).offset(12)
-            $0.left.right.equalToSuperview().inset(20)
-        }
-        
-        let timeAgoLabel = UILabel()
-        timeAgoLabel.font = UIFont.systemFont(ofSize: 11, weight: .semibold)
-        timeAgoLabel.textColor = UIColor.white.withAlphaComponent(0.6)
-        timeAgoLabel.numberOfLines = 1
-        timeAgoLabel.text = Date.fromTimestamp(data.publishTime).toRelativeTimeString()
-        addSubview(timeAgoLabel)
-        
-        timeAgoLabel.snp.makeConstraints {
-            $0.top.equalTo(headlineLabel.snp.bottom).offset(4)
-            $0.left.right.equalToSuperview().inset(20)
+        textContainer.snp.makeConstraints {
+            $0.left.equalTo(0)
+            $0.right.equalTo(imageView.snp.left).inset(-20)
+            $0.centerY.equalTo(imageView)
         }
         
         let publisherLabel = UILabel()
@@ -414,15 +476,45 @@ class TodayCardContentView: UIView {
         publisherLabel.textColor = .white
         publisherLabel.numberOfLines = 1
         publisherLabel.text = data.feedSource
-        addSubview(publisherLabel)
+        textContainer.addSubview(publisherLabel)
         
         publisherLabel.snp.makeConstraints {
-            $0.bottom.equalToSuperview().inset(15)
-            $0.left.right.equalToSuperview().inset(20)
+            $0.top.equalTo(0)
+            $0.left.right.equalTo(0)
+        }
+        
+        let headlineLabel = UILabel()
+        headlineLabel.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
+        headlineLabel.textColor = .white
+        headlineLabel.numberOfLines = 3
+        headlineLabel.lineBreakMode = .byTruncatingTail
+        headlineLabel.text = data.title
+        textContainer.addSubview(headlineLabel)
+        
+        headlineLabel.snp.makeConstraints {
+            $0.top.equalTo(publisherLabel.snp.bottom).offset(6)
+            $0.left.right.equalTo(0)
+        }
+        
+        let timeAgoLabel = UILabel()
+        timeAgoLabel.font = UIFont.systemFont(ofSize: 11, weight: .semibold)
+        timeAgoLabel.textColor = UIColor.white.withAlphaComponent(0.6)
+        timeAgoLabel.numberOfLines = 1
+        timeAgoLabel.text = Date.fromTimestamp(data.publishTime).toRelativeTimeString()
+        textContainer.addSubview(timeAgoLabel)
+        
+        timeAgoLabel.snp.makeConstraints {
+            $0.top.equalTo(headlineLabel.snp.bottom).offset(4)
+            $0.left.right.bottom.equalTo(0)
         }
         
         layoutSubviews()
-        loadImage(urlString: data.img)
+        
+        if data.img.isEmpty == false {
+            loadImage(urlString: data.img)
+        } else {
+            imageView.alpha = 0
+        }
     }
     
     private func loadImage(urlString: String) {

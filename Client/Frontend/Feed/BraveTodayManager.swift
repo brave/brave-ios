@@ -96,6 +96,10 @@ class BraveToday: NSObject {
     func feedCount() -> Int {
         return feed?.items.count ?? 0
     }
+    
+    func getMore() {
+        feed?.compose()
+    }
 }
 
 extension BraveToday: UITableViewDataSource {

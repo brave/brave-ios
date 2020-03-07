@@ -42,28 +42,74 @@ class FeedComposer: NSObject {
 //            usedIds.append(item.id)
 //        }
         
-        // v0.2 - add all items as small headline types
+//        // v0.2 - add all items as small headline types
+//        var i = 0
+//        while i < feedItems.count {
+//            let item = feedItems[i]
+//            usedIds.append(item.id)
+//
+//            let card = TodayCard(type: .headlineSmall, items: [item], sponsorData: nil, mainTitle: "")
+//            var cards: [TodayCard] = [card]
+//
+//            if i + 1 < feedItems.count {
+//                i = i + 1
+//
+//                let item = feedItems[i]
+//                let card = TodayCard(type: .headlineSmall, items: [item], sponsorData: nil, mainTitle: "")
+//                cards.append(card)
+//                usedIds.append(item.id)
+//            }
+//
+//            let feedRow = FeedRow(cards: cards)
+//
+//            items.append(feedRow)
+//            i = i + 1
+//        }
+        
+        // v0.3 - add all items as horizontal list
         var i = 0
         while i < feedItems.count {
-            let item = feedItems[i]
-            usedIds.append(item.id)
+            if i + 2 < feedItems.count {
+                let card = TodayCard(type: .verticalList, items: [feedItems[i], feedItems[i+1], feedItems[i+2]], sponsorData: nil, mainTitle: "Top Deals")
+                let feedRow = FeedRow(cards: [card])
 
-            let card = TodayCard(type: .headlineSmall, items: [item], sponsorData: nil, mainTitle: "")
-            var cards: [TodayCard] = [card]
-
-            if i + 1 < feedItems.count {
-                i = i + 1
-
+                items.append(feedRow)
+                
+                usedIds.append(feedItems[i].id)
+                usedIds.append(feedItems[i+1].id)
+                usedIds.append(feedItems[i+2].id)
+                
+                i = i + 3
+            } else if i + 1 < feedItems.count {
                 let item = feedItems[i]
-                let card = TodayCard(type: .headlineSmall, items: [item], sponsorData: nil, mainTitle: "")
-                cards.append(card)
                 usedIds.append(item.id)
+    
+                let card = TodayCard(type: .headlineSmall, items: [item], sponsorData: nil, mainTitle: "")
+                var cards: [TodayCard] = [card]
+    
+                if i + 1 < feedItems.count {
+                    i = i + 1
+    
+                    let item = feedItems[i]
+                    let card = TodayCard(type: .headlineSmall, items: [item], sponsorData: nil, mainTitle: "")
+                    cards.append(card)
+                    usedIds.append(item.id)
+                }
+    
+                let feedRow = FeedRow(cards: cards)
+    
+                items.append(feedRow)
+                i = i + 1
+            } else {
+                let item = feedItems[i]
+                let card = TodayCard(type: .headlineLarge, items: [item], sponsorData: nil, mainTitle: "")
+                let feedRow = FeedRow(cards: [card])
+    
+                items.append(feedRow)
+                usedIds.append(item.id)
+                
+                i = i + 1
             }
-
-            let feedRow = FeedRow(cards: cards)
-
-            items.append(feedRow)
-            i = i + 1
         }
         
         // Update all used db records with latest session id

@@ -45,7 +45,7 @@ extension Theme {
 
         UIView.appearance(whenContainedInInstancesOf: [UITableViewHeaderFooterView.self]).appearanceBackgroundColor = tablePrimaryColor
         
-        UILabel.appearance(whenContainedInInstancesOf: [SettingsViewController.self, BookmarksViewController.self]).appearanceTextColor = colors.tints.home
+        UILabel.appearance(whenContainedInInstancesOf: [SettingsViewController.self, BookmarksViewController.self, SiteTableViewController.self]).appearanceTextColor = colors.tints.home
         
         AddEditHeaderView.appearance().appearanceBackgroundColor = tableSecondaryColor
         UITextField.appearance().appearanceTextColor = colors.tints.home

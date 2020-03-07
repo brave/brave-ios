@@ -884,10 +884,25 @@ extension HomeViewController: UITableViewDelegate {
             } else {
                 favoritesCollectionView.alpha = alphaAt(scrollOffset - view.frame.height / 2, distance: 100)
             }
+            
+            debugPrint("scrollOffset: \(scrollOffset), contentSize: \(scrollView.contentSize.height)")
         }
     }
     
     func alphaAt(_ value: CGFloat, distance: CGFloat) -> CGFloat {
         return max(min(((distance - value) / distance * 100) / 100, 1), 0)
+    }
+    
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        
+        let countBefore = BraveToday.shared.feedCount()
+        if indexPath.row == countBefore - 5 {
+            BraveToday.shared.getMore()
+            DispatchQueue.main.async {
+                if BraveToday.shared.feedCount() > countBefore {
+                    tableView.reloadData()
+                }
+            }
+        }
     }
 }
