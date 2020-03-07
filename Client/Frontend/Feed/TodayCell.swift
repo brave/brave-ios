@@ -27,6 +27,22 @@ class TodayCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        if selected {
+
+        } else {
+            
+        }
+    }
+    
+    override func setHighlighted(_ highlighted: Bool, animated: Bool) {
+        if highlighted {
+            
+        } else {
+            
+        }
+    }
+    
     func setData(data: FeedRow) {
         self.data = data
         

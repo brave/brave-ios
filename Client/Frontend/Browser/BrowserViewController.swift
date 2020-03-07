@@ -57,6 +57,9 @@ class BrowserViewController: UIViewController {
     fileprivate let alertStackView = UIStackView() // All content that appears above the footer should be added to this view. (Find In Page/SnackBars)
     fileprivate var findInPageBar: FindInPageBar?
     
+    // Restore State for HomeViewController [Tab.id : State values]
+    fileprivate var homeRestoreStateTabMap: [String: HomeRestoreState] = [:]
+    
     // Single data source used for all favorites vcs
     fileprivate let backgroundDataSource = NTPBackgroundDataSource()
     
@@ -981,6 +984,11 @@ class BrowserViewController: UIViewController {
             addChild(homePanelController)
             view.addSubview(homePanelController.view)
             homePanelController.didMove(toParent: self)
+            
+            // Restores state of homeVC that was connected to current tab.
+            if let tabId = tabManager.selectedTab?.id, let state = homeRestoreStateTabMap[tabId] {
+                self.homeViewController?.restoreState(state: state)
+            }
         }
         guard let homePanelController = self.homeViewController else {
             assertionFailure("homePanelController is still nil after assignment.")
@@ -1017,6 +1025,12 @@ class BrowserViewController: UIViewController {
                     self.showReaderModeBar(animated: false)
                 }
             })
+        }
+    }
+    
+    func saveHomeStateInTab(_ tab: Tab) {
+        if let tabId = tab.id, let homeVC = self.homeViewController {
+            homeRestoreStateTabMap[tabId] = homeVC.getState()
         }
     }
 
@@ -2282,6 +2296,11 @@ extension BrowserViewController: TabManagerDelegate {
         } else {
             topToolbar.updateReaderModeState(ReaderModeState.unavailable)
         }
+        
+        // Save Home State for previous tab (since it will be removed)
+        if let previous = previous {
+            saveHomeStateInTab(previous)
+        }
 
         updateInContentHomePanel(selected?.url as URL?)
         
@@ -2301,6 +2320,7 @@ extension BrowserViewController: TabManagerDelegate {
     }
 
     func tabManager(_ tabManager: TabManager, willAddTab tab: Tab) {
+        
     }
 
     func tabManager(_ tabManager: TabManager, didAddTab tab: Tab) {
@@ -2326,6 +2346,10 @@ extension BrowserViewController: TabManagerDelegate {
         updateTabsBarVisibility()
         
         rewards.reportTabClosed(tabId: tab.rewardsId)
+        
+        if let tabId = tab.id {
+            homeRestoreStateTabMap[tabId] = nil
+        }
     }
 
     func tabManagerDidAddTabs(_ tabManager: TabManager) {

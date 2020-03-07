@@ -20,6 +20,10 @@ protocol FavoritesDelegate: AnyObject {
     func openBrandedImageCallout(state: BrandedImageCalloutState?)
 }
 
+class HomeRestoreState: NSObject {
+    var feedScrollPosition: CGFloat = 0
+}
+
 class HomeViewController: UIViewController, Themeable {
     private struct UI {
         static let statsHeight: CGFloat = 110.0
@@ -54,8 +58,7 @@ class HomeViewController: UIViewController, Themeable {
     
     private let dataSource: FavoritesDataSource
     private let backgroundDataSource: NTPBackgroundDataSource?
-    
-    private let braveTodayDelegate = BraveToday.shared
+
     private (set) internal var feedView = BraveTodayFeedView(frame: .zero, style: .plain)
 
     private let braveShieldStatsView = BraveShieldStatsView(frame: CGRect.zero).then {
@@ -155,6 +158,7 @@ class HomeViewController: UIViewController, Themeable {
             
             // Image Sponsor
             imageSponsorButton.setImage(background?.sponsor?.logo.image, for: .normal)
+            imageSponsorButton.imageView?.contentMode = .scaleAspectFit
             imageSponsorButton.isHidden = noSponsor
             
             // Image Credit
@@ -168,6 +172,12 @@ class HomeViewController: UIViewController, Themeable {
     }
     
     private let profile: Profile
+    
+    // Kind of hacky but allows you to restore home variables
+    // Since home instance is destroyed, we restore based on tab.
+    // States map is saved in BVC, based on [parentTabId: restoreState] == state
+    var restoreState: HomeRestoreState?
+    var parentTabId: String?
     
     /// Whether the view was called from tapping on address bar or not.
     private let fromOverlay: Bool
@@ -238,27 +248,14 @@ class HomeViewController: UIViewController, Themeable {
         let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongGesture(gesture:)))
         favoritesCollectionView.addGestureRecognizer(longPressGesture)
         
-        BraveToday.shared.isEnabled = true
-        BraveToday.shared.loadFeed() { [weak self] in
-            DispatchQueue.main.async {
-                self?.todayCardView.isHidden = true
-                self?.feedView.reloadData()
-                
-                // Adjust insets to allow for table scroll
-                self?.updateConstraints()
-            }
-        }
+        let todayTapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTodayTapGesture(gesture:)))
+        todayTapGesture.numberOfTouchesRequired = 1
+        todayTapGesture.numberOfTapsRequired = 1
+        todayCardView.addGestureRecognizer(todayTapGesture)
         
-        if !BraveToday.shared.isEnabled {
-            let todayTapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTodayTapGesture(gesture:)))
-            todayTapGesture.numberOfTouchesRequired = 1
-            todayTapGesture.numberOfTapsRequired = 1
-            todayCardView.addGestureRecognizer(todayTapGesture)
-            
-            let todaySwipeGesture = UIPanGestureRecognizer(target: self, action: #selector(handleTodayPanGesture(gesture:)))
-            todaySwipeGesture.delegate = self
-            feedView.addGestureRecognizer(todaySwipeGesture)
-        }
+        let todaySwipeGesture = UIPanGestureRecognizer(target: self, action: #selector(handleTodayPanGesture(gesture:)))
+        todaySwipeGesture.delegate = self
+        feedView.addGestureRecognizer(todaySwipeGesture)
         
         favoritesCollectionView.dataSource = dataSource
         dataSource.collectionView = favoritesCollectionView
@@ -293,13 +290,10 @@ class HomeViewController: UIViewController, Themeable {
         feedView.addSubview(favoritesCollectionView)
         feedView.addSubview(todayCardView)
         
-        // Onboarded should hide
-        todayCardView.isHidden = BraveToday.shared.isEnabled
-        
         view.addSubview(feedView)
         
         feedView.delegate = self
-        feedView.dataSource = braveTodayDelegate
+        feedView.dataSource = self
         
         makeConstraints()
         
@@ -318,8 +312,7 @@ class HomeViewController: UIViewController, Themeable {
         // Need to reload data after modals are closed for potential orientation change
         // e.g. if in landscape, open portrait modal, close, the layout attempt to access an invalid indexpath
         favoritesCollectionView.reloadData()
-        
-        updateConstraints()
+        feedView.reloadData()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -330,6 +323,21 @@ class HomeViewController: UIViewController, Themeable {
         }
         
         showNTPNotification(for: notificationType)
+        
+        // TODO: Remove
+        BraveToday.shared.isEnabled = true
+        
+        if BraveToday.shared.isEnabled && BraveToday.shared.feedCount() == 0 {
+            BraveToday.shared.loadFeed() { [weak self] in
+                DispatchQueue.main.async {
+                    self?.todayCardView.isHidden = true
+                    self?.feedView.reloadData()
+                    
+                    // Adjust insets to allow for table scroll
+                    self?.updateConstraints()
+                }
+            }
+        }
     }
     
     /// Returns nil if not applicable or no notification should be shown.
@@ -449,6 +457,31 @@ class HomeViewController: UIViewController, Themeable {
         }
     }
     
+    fileprivate func updateFeedViewInsets() {
+        if !BraveToday.shared.isEnabled {
+            feedView.contentSize = CGSize(width: view.frame.width, height: 0)
+            feedView.contentInset = UIEdgeInsets(top: view.frame.height - 40, left: 0, bottom: 0, right: 0)
+        } else {
+            if BraveToday.shared.feedCount() > 0 {
+                todayCardView.isHidden = true
+            }
+            
+            // Peeking loaded content.
+            feedView.contentInset = UIEdgeInsets(top: view.frame.height - 40, left: 0, bottom: 0, right: 0)
+            
+            if let state = restoreState {
+                DispatchQueue.main.async {
+                    self.feedView.setContentOffset(CGPoint(x: 0, y: state.feedScrollPosition), animated: false)
+                    self.updateScrollStyling(state.feedScrollPosition)
+                }
+            } else {
+                let startOffset = -(feedView.frame.height - 30)
+                feedView.setContentOffset(CGPoint(x: 0, y: startOffset), animated: false)
+                updateScrollStyling(startOffset)
+            }
+        }
+    }
+    
     // MARK: - Constraints setup
     fileprivate func makeConstraints() {
         ddgLogo.snp.makeConstraints { make in
@@ -499,16 +532,6 @@ class HomeViewController: UIViewController, Themeable {
         
         favoritesCollectionView.collectionViewLayout.invalidateLayout()
         feedView.reloadData()
-        
-        UIView.animate(
-            withDuration: 0.3, delay: 0,
-            usingSpringWithDamping: 1,
-            initialSpringVelocity: 4,
-            options: .allowUserInteraction,
-            animations: {
-                self.feedView.contentOffset = CGPoint(x: 0, y: -(self.view.frame.height - 40))
-                self.feedView.layoutIfNeeded()
-        }, completion: nil)
     }
     
     private func updateConstraints() {
@@ -532,7 +555,9 @@ class HomeViewController: UIViewController, Themeable {
         
         imageSponsorButton.snp.remakeConstraints {
             $0.size.equalTo(170)
-            $0.bottom.equalTo(todayCardView.snp.top).inset(-10)
+            
+            let borderPadding = 20
+            $0.bottom.equalTo(self.view).inset(-borderPadding + 60)
             
             if isLandscape && isIphone {
                 $0.left.equalTo(view.safeArea.left).offset(20)
@@ -552,14 +577,7 @@ class HomeViewController: UIViewController, Themeable {
             $0.edges.equalToSuperview()
         }
         
-        if !BraveToday.shared.isEnabled {
-            feedView.contentSize = CGSize(width: view.frame.width, height: 0)
-            feedView.contentInset = UIEdgeInsets(top: view.frame.height - 40, left: 0, bottom: 0, right: 0)
-        } else {
-            // Peeking loaded content.
-            feedView.contentInset = UIEdgeInsets(top: view.frame.height - 40, left: 0, bottom: 0, right: 0)
-            feedView.layoutSubviews()
-        }
+        updateFeedViewInsets()
     }
     
     private func updateDuckDuckGoButtonLayout() {
@@ -592,6 +610,8 @@ class HomeViewController: UIViewController, Themeable {
     }
     
     @objc func handleTodayTapGesture(gesture: UITapGestureRecognizer) {
+        guard BraveToday.shared.isEnabled == false else { return }
+        
         showBraveTodayOnboarding()
     }
     
@@ -771,6 +791,38 @@ class HomeViewController: UIViewController, Themeable {
         favoritesCollectionView.contentInset.bottom = isVisible ? heightOfCallout : 0
         ddgButton.isHidden = !isVisible
     }
+    
+    fileprivate func updateScrollStyling(_ scrollOffset: CGFloat) {
+        let scrollOffset = scrollOffset + view.frame.height - 40
+        
+        imageCreditButton.alpha = alphaAt(scrollOffset, distance: 30)
+        imageSponsorButton.alpha = alphaAt(scrollOffset, distance: 50)
+        backgroundViewInfo?.imageView.alpha = max(alphaAt(scrollOffset - view.frame.height / 2, distance: view.frame.height), 0.2) // starts fading 1/2 up and limit
+        
+        if isLandscape {
+            favoritesCollectionView.alpha = alphaAt(scrollOffset, distance: view.frame.height / 4)
+        } else {
+            favoritesCollectionView.alpha = alphaAt(scrollOffset - view.frame.height / 2, distance: 100)
+        }
+    }
+    
+    private func alphaAt(_ value: CGFloat, distance: CGFloat) -> CGFloat {
+        return max(min(((distance - value) / distance * 100) / 100, 1), 0)
+    }
+    
+    func getState() -> HomeRestoreState {
+        let state = HomeRestoreState()
+        debugPrint(feedView.contentOffset.y)
+        state.feedScrollPosition = feedView.contentOffset.y
+        
+        debugPrint("Restore State -- Saved :\(state.feedScrollPosition)")
+        return state
+    }
+    
+    func restoreState(state: HomeRestoreState) {
+        restoreState = state
+        debugPrint("Restore State -- Restored :\(state.feedScrollPosition)")
+    }
 }
 
 extension HomeViewController: UIGestureRecognizerDelegate {
@@ -869,32 +921,23 @@ extension HomeViewController: PreferencesObserver {
     }
 }
 
-extension HomeViewController: UITableViewDelegate {
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        // Only care about feed scroll position, ignore favorites scrollview
-        if scrollView.isDescendant(of: feedView) {
-            let scrollOffset = scrollView.contentOffset.y + view.frame.height - 40
-            
-            imageCreditButton.alpha = alphaAt(scrollOffset, distance: 30)
-            imageSponsorButton.alpha = alphaAt(scrollOffset, distance: 50)
-            backgroundViewInfo?.imageView.alpha = max(alphaAt(scrollOffset - view.frame.height / 2, distance: view.frame.height), 0.2) // starts fading 1/2 up and limit
-            
-            if isLandscape {
-                favoritesCollectionView.alpha = alphaAt(scrollOffset, distance: view.frame.height / 4)
-            } else {
-                favoritesCollectionView.alpha = alphaAt(scrollOffset - view.frame.height / 2, distance: 100)
-            }
-            
-            debugPrint("scrollOffset: \(scrollOffset), contentSize: \(scrollView.contentSize.height)")
-        }
+extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return BraveToday.shared.isEnabled ? BraveToday.shared.feedCount() : 0
     }
     
-    func alphaAt(_ value: CGFloat, distance: CGFloat) -> CGFloat {
-        return max(min(((distance - value) / distance * 100) / 100, 1), 0)
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 1
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "TodayCell", for: indexPath) as UITableViewCell
+        let item: FeedRow = BraveToday.shared.feedItems()[indexPath.row]
+        (cell as? TodayCell)?.setData(data: item)
+        return cell
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        
         let countBefore = BraveToday.shared.feedCount()
         if indexPath.row == countBefore - 5 {
             BraveToday.shared.getMore()
@@ -903,6 +946,15 @@ extension HomeViewController: UITableViewDelegate {
                     tableView.reloadData()
                 }
             }
+        }
+    }
+}
+
+extension HomeViewController: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        // Only care about feed scroll position, ignore favorites scrollview
+        if scrollView.isDescendant(of: feedView) {
+            updateScrollStyling(scrollView.contentOffset.y)
         }
     }
 }

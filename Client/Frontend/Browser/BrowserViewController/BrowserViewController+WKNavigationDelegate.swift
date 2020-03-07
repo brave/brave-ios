@@ -57,6 +57,11 @@ extension BrowserViewController: WKNavigationDelegate {
         if tabManager.selectedTab?.webView !== webView {
             return
         }
+        
+        if let tab = tabManager.selectedTab, self.homeViewController != nil {
+            // Save Home State for current tab (since it will be removed)
+            saveHomeStateInTab(tab)
+        }
 
         updateFindInPageVisibility(visible: false)
 

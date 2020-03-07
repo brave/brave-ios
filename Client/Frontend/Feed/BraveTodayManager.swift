@@ -97,27 +97,11 @@ class BraveToday: NSObject {
         return feed?.items.count ?? 0
     }
     
+    func feedItems() -> [FeedRow] {
+        return feed?.items ?? []
+    }
+    
     func getMore() {
         feed?.compose()
-    }
-}
-
-extension BraveToday: UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        guard let feed = feed else { return 0 }
-        return isEnabled ? feed.items.count : 0
-    }
-    
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "TodayCell", for: indexPath) as UITableViewCell
-        if let feed = feed {
-            let item: FeedRow = feed.items[indexPath.row]
-            (cell as? TodayCell)?.setData(data: item)
-        }
-        return cell
     }
 }
