@@ -602,6 +602,7 @@
 		5CB493352411B117000D8440 /* BraveTodayFeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB493342411B117000D8440 /* BraveTodayFeedView.swift */; };
 		5CF1F9BB241220A900D16A84 /* Kingfisher.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CF1F9BA241220A900D16A84 /* Kingfisher.framework */; };
 		5CF1F9BC241220AA00D16A84 /* Kingfisher.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 5CF1F9BA241220A900D16A84 /* Kingfisher.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		5CF1F9BE2412E6BE00D16A84 /* FeedComposer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CF1F9BD2412E6BE00D16A84 /* FeedComposer.swift */; };
 		5D1DC51C20AC9AFB00905E5A /* Data.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1DC51320AC9AF900905E5A /* Data.framework */; };
 		5D1DC52520AC9AFB00905E5A /* Data.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D1DC51520AC9AFA00905E5A /* Data.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5D1DC52820AC9AFB00905E5A /* Data.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1DC51320AC9AF900905E5A /* Data.framework */; };
@@ -2066,6 +2067,7 @@
 		5CB4933224116BC5000D8440 /* TestFeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestFeed.swift; sourceTree = "<group>"; };
 		5CB493342411B117000D8440 /* BraveTodayFeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveTodayFeedView.swift; sourceTree = "<group>"; };
 		5CF1F9BA241220A900D16A84 /* Kingfisher.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Kingfisher.framework; path = Carthage/Build/iOS/Kingfisher.framework; sourceTree = "<group>"; };
+		5CF1F9BD2412E6BE00D16A84 /* FeedComposer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedComposer.swift; sourceTree = "<group>"; };
 		5D1DC51320AC9AF900905E5A /* Data.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Data.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5D1DC51520AC9AFA00905E5A /* Data.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Data.h; sourceTree = "<group>"; };
 		5D1DC51620AC9AFA00905E5A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -3949,6 +3951,7 @@
 			isa = PBXGroup;
 			children = (
 				5C1CBEA9240ECE1D009DC11D /* BraveTodayOnboardingPopupView.swift */,
+				5CF1F9BD2412E6BE00D16A84 /* FeedComposer.swift */,
 				5C90585C240EFD2B0015F7B9 /* BraveTodayManager.swift */,
 				5CB493342411B117000D8440 /* BraveTodayFeedView.swift */,
 				5C1CBEA7240CDDFA009DC11D /* TodayCardView.swift */,
@@ -4730,13 +4733,13 @@
 		F84B21C01A090F8100AAB793 /* Client */ = {
 			isa = PBXGroup;
 			children = (
-				5E856FE3235E08010094E113 /* DeviceCheck */,
-				7B2142FC1E5E055000CDD3FC /* InfoPlist.strings */,
 				F84B22431A09165600AAB793 /* Info.plist */,
+				7B2142FC1E5E055000CDD3FC /* InfoPlist.strings */,
 				59D41619232681080087A6E1 /* Localizable.strings */,
 				59C8119722D754D4005D5BBC /* BraveShared.strings */,
 				F84B21EB1A0910F600AAB793 /* Assets */,
 				F84B21E41A0910F600AAB793 /* Application */,
+				5E856FE3235E08010094E113 /* DeviceCheck */,
 				E689C6FF1E0C716F008BAADB /* Entitlements */,
 				28EADE5C1AFC3A6D007FB2FB /* Extensions */,
 				F84B21F11A0910F600AAB793 /* Frontend */,
@@ -6471,6 +6474,7 @@
 				D3972BF31C22412B00035B87 /* ShareExtensionHelper.swift in Sources */,
 				F35B8D2D1D6383E9008E3D61 /* SessionRestoreHelper.swift in Sources */,
 				744ED5611DBFEB8D00A2B5BE /* MailtoLinkHandler.swift in Sources */,
+				5CF1F9BE2412E6BE00D16A84 /* FeedComposer.swift in Sources */,
 				D04D1B862097859B0074B35F /* DownloadToast.swift in Sources */,
 				4422D4F721BFFB7600BF1855 /* dbformat.cc in Sources */,
 				7B844E3D1BBDDB9D00E733A2 /* ChevronView.swift in Sources */,

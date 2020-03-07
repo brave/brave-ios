@@ -172,6 +172,12 @@ class HomeViewController: UIViewController, Themeable {
     /// Whether the view was called from tapping on address bar or not.
     private let fromOverlay: Bool
     
+    private var isLandscape: Bool {
+        get {
+            return view.frame.width > view.frame.height
+        }
+    }
+    
     /// Different types of notifications can be presented to users.
     enum NTPNotificationType {
         /// Notification to inform the user about branded images program.
@@ -231,6 +237,17 @@ class HomeViewController: UIViewController, Themeable {
         
         let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongGesture(gesture:)))
         favoritesCollectionView.addGestureRecognizer(longPressGesture)
+        
+        BraveToday.shared.isEnabled = true
+        BraveToday.shared.loadFeed() { [weak self] in
+            DispatchQueue.main.async {
+                self?.todayCardView.isHidden = true
+                self?.feedView.reloadData()
+                
+                // Adjust insets to allow for table scroll
+                self?.updateConstraints()
+            }
+        }
         
         if !BraveToday.shared.isEnabled {
             let todayTapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTodayTapGesture(gesture:)))
@@ -496,7 +513,6 @@ class HomeViewController: UIViewController, Themeable {
     
     private func updateConstraints() {
         let isIphone = UIDevice.isPhone
-        let isLandscape = view.frame.width > view.frame.height
         
         var right: ConstraintRelatableTarget = self.view.safeAreaLayoutGuide
         var left: ConstraintRelatableTarget = self.view.safeAreaLayoutGuide
@@ -600,15 +616,13 @@ class HomeViewController: UIViewController, Themeable {
         todayOnboarding.completionHandler = { completed in
             if completed {
                 BraveToday.shared.isEnabled = true
-                BraveToday.shared.loadFeedData() { [weak self] in
-                    BraveToday.shared.generateFeed() {
-                        DispatchQueue.main.async {
-                            self?.todayCardView.isHidden = true
-                            self?.feedView.reloadData()
-                            
-                            // Adjust insets to allow for table scroll
-                            self?.updateConstraints()
-                        }
+                BraveToday.shared.loadFeed() { [weak self] in
+                    DispatchQueue.main.async {
+                        self?.todayCardView.isHidden = true
+                        self?.feedView.reloadData()
+                        
+                        // Adjust insets to allow for table scroll
+                        self?.updateConstraints()
                     }
                 }
             }
@@ -814,7 +828,8 @@ extension HomeViewController: FavoriteCellDelegate {
         let editAction = UIAlertAction(title: Strings.editFavorite, style: .default) { _ in
             guard let title = fav.displayTitle, let urlString = fav.url else { return }
             
-            let editPopup = UIAlertController.userTextInputAlert(title: Strings.editBookmark, message: urlString,
+            let editPopup = UIAlertController.userTextInputAlert(title: Strings.editBookmark,
+                                                                 message: urlString,
                                                                  startingText: title, startingText2: fav.url,
                                                                  placeholder2: urlString,
                                                                  keyboardType2: .URL) { callbackTitle, callbackUrl in
@@ -858,13 +873,17 @@ extension HomeViewController: UITableViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         // Only care about feed scroll position, ignore favorites scrollview
         if scrollView.isDescendant(of: feedView) {
-            debugPrint(scrollView.contentOffset.y)
             let scrollOffset = scrollView.contentOffset.y + view.frame.height - 40
             
             imageCreditButton.alpha = alphaAt(scrollOffset, distance: 30)
             imageSponsorButton.alpha = alphaAt(scrollOffset, distance: 50)
-            favoritesCollectionView.alpha = alphaAt(scrollOffset - view.frame.height / 3, distance: view.frame.height / 4) // starts fading 1/3 up
             backgroundViewInfo?.imageView.alpha = max(alphaAt(scrollOffset - view.frame.height / 2, distance: view.frame.height), 0.2) // starts fading 1/2 up and limit
+            
+            if isLandscape {
+                favoritesCollectionView.alpha = alphaAt(scrollOffset, distance: view.frame.height / 4)
+            } else {
+                favoritesCollectionView.alpha = alphaAt(scrollOffset - view.frame.height / 2, distance: 100)
+            }
         }
     }
     
