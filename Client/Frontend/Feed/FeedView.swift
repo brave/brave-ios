@@ -2,12 +2,12 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-class BraveTodayFeedView: UITableView {
+class FeedView: UITableView {
     override init(frame: CGRect, style: UITableView.Style) {
         super.init(frame: frame, style: style)
         
         bounces = true
-        register(TodayCell.self, forCellReuseIdentifier: "TodayCell")
+        register(FeedCell.self, forCellReuseIdentifier: "FeedCell")
         isScrollEnabled = true
         showsVerticalScrollIndicator = false
         separatorStyle = .none

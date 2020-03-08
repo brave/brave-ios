@@ -6,7 +6,7 @@ import Foundation
 import Storage
 
 struct FeedRow {
-    var cards: [TodayCard]
+    var cards: [FeedCard]
 }
 
 class FeedComposer: NSObject {
@@ -74,7 +74,7 @@ class FeedComposer: NSObject {
         var i = 0
         while i < feedItems.count {
             if i + 2 < feedItems.count {
-                let card = TodayCard(type: .horizontalList, items: [feedItems[i], feedItems[i+1], feedItems[i+2]], sponsorData: nil, mainTitle: "Top Deals")
+                let card = FeedCard(type: .horizontalList, items: [feedItems[i], feedItems[i+1], feedItems[i+2]], sponsorData: nil, mainTitle: "Top Deals")
                 let feedRow = FeedRow(cards: [card])
 
                 items.append(feedRow)
@@ -88,14 +88,14 @@ class FeedComposer: NSObject {
                 let item = feedItems[i]
                 usedIds.append(item.id)
 
-                let card = TodayCard(type: .headlineSmall, items: [item], sponsorData: nil, mainTitle: "")
-                var cards: [TodayCard] = [card]
+                let card = FeedCard(type: .headlineSmall, items: [item], sponsorData: nil, mainTitle: "")
+                var cards: [FeedCard] = [card]
 
                 if i + 1 < feedItems.count {
                     i = i + 1
 
                     let item = feedItems[i]
-                    let card = TodayCard(type: .headlineSmall, items: [item], sponsorData: nil, mainTitle: "")
+                    let card = FeedCard(type: .headlineSmall, items: [item], sponsorData: nil, mainTitle: "")
                     cards.append(card)
                     usedIds.append(item.id)
                 }
@@ -106,7 +106,7 @@ class FeedComposer: NSObject {
                 i = i + 1
             } else {
                 let item = feedItems[i]
-                let card = TodayCard(type: .headlineLarge, items: [item], sponsorData: nil, mainTitle: "")
+                let card = FeedCard(type: .headlineLarge, items: [item], sponsorData: nil, mainTitle: "")
                 let feedRow = FeedRow(cards: [card])
 
                 items.append(feedRow)

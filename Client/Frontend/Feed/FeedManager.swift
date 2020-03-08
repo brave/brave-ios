@@ -7,8 +7,8 @@ import Storage
 import SwiftKeychainWrapper
 import Deferred
 
-class BraveToday: NSObject {
-    static let shared = BraveToday()
+class FeedManager: NSObject {
+    static let shared = FeedManager()
     private var profile: BrowserProfile?
     
     var isEnabled = false

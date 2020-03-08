@@ -7,7 +7,7 @@ import Storage
 import Kingfisher
 import pop
 
-class TodayCardContainerView: UIView {
+class FeedCardContainerView: UIView {
     fileprivate let blurView = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
     
     override init(frame: CGRect) {
@@ -34,7 +34,7 @@ class TodayCardContainerView: UIView {
     }
 }
 
-enum TodayCardType: CGFloat {
+enum FeedCardType: CGFloat {
     case horizontalList = 350
     case verticalList = 360
     case verticalListBranded = 440
@@ -45,22 +45,22 @@ enum TodayCardType: CGFloat {
     case adLarge = 380
 }
 
-struct TodayCard {
-    let type: TodayCardType
+struct FeedCard {
+    let type: FeedCardType
     let items: [FeedItem] // Data that lives within an individual card design.
     
     // Special Data
-    let sponsorData: SponsorData?
+    let sponsorData: FeedSponsorData?
     let mainTitle: String?
 }
 
-class TodayCardView: TodayCardContainerView {
-    var data: TodayCard?
+class FeedCardView: FeedCardContainerView {
+    var data: FeedCard?
     
     var cardTitleLabel: UILabel?
     var imageView: UIImageView?
     
-    convenience init(data: TodayCard) {
+    convenience init(data: FeedCard) {
         self.init(frame: .zero)
         self.data = data
         
@@ -125,7 +125,7 @@ class TodayCardView: TodayCardContainerView {
         }
         
         if let item = data?.items[0] {
-            let contentView = TodayCardContentView(data: item, layout: .verticalSmallInset, delegate: self)
+            let contentView = FeedCardContentView(data: item, layout: .verticalSmallInset, delegate: self)
             blurView.contentView.addSubview(contentView)
             
             contentView.snp.makeConstraints {
@@ -136,7 +136,7 @@ class TodayCardView: TodayCardContainerView {
         }
         
         if let item = data?.items[1] {
-            let contentView = TodayCardContentView(data: item, layout: .verticalSmallInset, delegate: self)
+            let contentView = FeedCardContentView(data: item, layout: .verticalSmallInset, delegate: self)
             blurView.contentView.addSubview(contentView)
             
             contentView.snp.makeConstraints {
@@ -147,7 +147,7 @@ class TodayCardView: TodayCardContainerView {
         }
         
         if let item = data?.items[2] {
-            let contentView = TodayCardContentView(data: item, layout: .verticalSmallInset, delegate: self)
+            let contentView = FeedCardContentView(data: item, layout: .verticalSmallInset, delegate: self)
             blurView.contentView.addSubview(contentView)
             
             contentView.snp.makeConstraints {
@@ -160,7 +160,7 @@ class TodayCardView: TodayCardContainerView {
     
     private func generateVerticalListLayout() {
         if let item = data?.items[0] {
-            let contentView = TodayCardContentView(data: item, layout: .horizontal, delegate: self)
+            let contentView = FeedCardContentView(data: item, layout: .horizontal, delegate: self)
             blurView.contentView.addSubview(contentView)
             
             contentView.snp.makeConstraints {
@@ -171,7 +171,7 @@ class TodayCardView: TodayCardContainerView {
         }
         
         if let item = data?.items[1] {
-            let contentView = TodayCardContentView(data: item, layout: .horizontal, delegate: self)
+            let contentView = FeedCardContentView(data: item, layout: .horizontal, delegate: self)
             blurView.contentView.addSubview(contentView)
             
             contentView.snp.makeConstraints {
@@ -182,7 +182,7 @@ class TodayCardView: TodayCardContainerView {
         }
         
         if let item = data?.items[2] {
-            let contentView = TodayCardContentView(data: item, layout: .horizontal, delegate: self)
+            let contentView = FeedCardContentView(data: item, layout: .horizontal, delegate: self)
             blurView.contentView.addSubview(contentView)
             
             contentView.snp.makeConstraints {
@@ -197,7 +197,7 @@ class TodayCardView: TodayCardContainerView {
         // TODO: needs work
         
         if let item = data?.items[0] {
-            let contentView = TodayCardContentView(data: item, layout: .horizontal, delegate: self)
+            let contentView = FeedCardContentView(data: item, layout: .horizontal, delegate: self)
             blurView.contentView.addSubview(contentView)
             
             contentView.snp.makeConstraints {
@@ -208,7 +208,7 @@ class TodayCardView: TodayCardContainerView {
         }
         
         if let item = data?.items[1] {
-            let contentView = TodayCardContentView(data: item, layout: .horizontal, delegate: self)
+            let contentView = FeedCardContentView(data: item, layout: .horizontal, delegate: self)
             blurView.contentView.addSubview(contentView)
             
             contentView.snp.makeConstraints {
@@ -219,7 +219,7 @@ class TodayCardView: TodayCardContainerView {
         }
         
         if let item = data?.items[2] {
-            let contentView = TodayCardContentView(data: item, layout: .horizontal, delegate: self)
+            let contentView = FeedCardContentView(data: item, layout: .horizontal, delegate: self)
             blurView.contentView.addSubview(contentView)
             
             contentView.snp.makeConstraints {
@@ -234,7 +234,7 @@ class TodayCardView: TodayCardContainerView {
         // TODO: needs work
         
         if let item = data?.items[0] {
-            let contentView = TodayCardContentView(data: item, layout: .horizontal, delegate: self)
+            let contentView = FeedCardContentView(data: item, layout: .horizontal, delegate: self)
             blurView.contentView.addSubview(contentView)
             
             contentView.snp.makeConstraints {
@@ -245,7 +245,7 @@ class TodayCardView: TodayCardContainerView {
         }
         
         if let item = data?.items[1] {
-            let contentView = TodayCardContentView(data: item, layout: .horizontal, delegate: self)
+            let contentView = FeedCardContentView(data: item, layout: .horizontal, delegate: self)
             blurView.contentView.addSubview(contentView)
             
             contentView.snp.makeConstraints {
@@ -256,7 +256,7 @@ class TodayCardView: TodayCardContainerView {
         }
         
         if let item = data?.items[2] {
-            let contentView = TodayCardContentView(data: item, layout: .horizontal, delegate: self)
+            let contentView = FeedCardContentView(data: item, layout: .horizontal, delegate: self)
             blurView.contentView.addSubview(contentView)
             
             contentView.snp.makeConstraints {
@@ -270,7 +270,7 @@ class TodayCardView: TodayCardContainerView {
     private func generateHeadlineLargeLayout() {
         guard let item = data?.items.first else { return }
         
-        let contentView = TodayCardContentView(data: item, layout: .verticalLarge, delegate: self)
+        let contentView = FeedCardContentView(data: item, layout: .verticalLarge, delegate: self)
         blurView.contentView.addSubview(contentView)
         
         contentView.snp.makeConstraints {
@@ -281,7 +281,7 @@ class TodayCardView: TodayCardContainerView {
     private func generateHeadlineSmallLayout() {
         guard let item = data?.items.first else { return }
         
-        let contentView = TodayCardContentView(data: item, layout: .verticalSmall, delegate: self)
+        let contentView = FeedCardContentView(data: item, layout: .verticalSmall, delegate: self)
         blurView.contentView.addSubview(contentView)
         
         contentView.snp.makeConstraints {
@@ -292,7 +292,7 @@ class TodayCardView: TodayCardContainerView {
     private func generateAdSmallLayout() {
         guard let item = data?.items.first else { return }
         
-        let contentView = TodayCardContentView(data: item, layout: .image, delegate: self)
+        let contentView = FeedCardContentView(data: item, layout: .image, delegate: self)
         blurView.contentView.addSubview(contentView)
         
         contentView.snp.makeConstraints {
@@ -303,7 +303,7 @@ class TodayCardView: TodayCardContainerView {
     private func generateAdLargeLayout() {
         guard let item = data?.items.first else { return }
         
-        let contentView = TodayCardContentView(data: item, layout: .image, delegate: self)
+        let contentView = FeedCardContentView(data: item, layout: .image, delegate: self)
         blurView.contentView.addSubview(contentView)
         
         contentView.snp.makeConstraints {
@@ -317,19 +317,127 @@ class TodayCardView: TodayCardContainerView {
             anim.autoreverses = true
             anim.springBounciness = 4
             anim.springSpeed = 20
-            anim.repeatCount = 1
             layer.pop_add(anim, forKey: "size")
+        }
+    }
+    
+    fileprivate func depress(layer: CALayer) {
+        if let anim = POPSpringAnimation(propertyNamed: kPOPLayerScaleXY) {
+            anim.toValue = NSValue(cgSize: CGSize(width: 0.95, height: 0.95))
+            anim.springBounciness = 4
+            anim.springSpeed = 20
+            layer.pop_add(anim, forKey: "size")
+        }
+    }
+    
+    fileprivate func restore(layer: CALayer) {
+        if let anim = POPSpringAnimation(propertyNamed: kPOPLayerScaleXY) {
+            anim.toValue = NSValue(cgSize: CGSize(width: 1, height: 1))
+            anim.springBounciness = 4
+            anim.springSpeed = 20
+            layer.pop_add(anim, forKey: "size")
+        }
+    }
+    
+    fileprivate func hide(view: UIView) {
+        if let anim = POPBasicAnimation(propertyNamed: kPOPViewAlpha) {
+            anim.toValue = 0
+            anim.duration = 0.5
+            view.pop_add(anim, forKey: "alpha")
         }
     }
 }
 
-extension TodayCardView: TodayCardContentDelegate {
-    func didTapCardContentView(view: TodayCardContentView, target: TodayCardAnimationTarget) {
+extension FeedCardView: FeedCardContentDelegate {
+    func didTapCardContentView(view: FeedCardContentView, target: FeedCardAnimationTarget) {
         switch target {
         case .card:
             bounceOnLayer(layer: self.layer)
         case .content:
             bounceOnLayer(layer: view.layer)
+        }
+        
+        guard let tabManager = (UIApplication.shared.delegate as? AppDelegate)?.browserViewController.tabManager else {
+            return
+        }
+        
+        guard let url = URL(string: view.data.url) else { return }
+        
+        let request = URLRequest(url: url)
+        if let tab = tabManager.selectedTab {
+            tab.loadRequest(request)
+        }
+        
+        let impactFeedbackgenerator = UIImpactFeedbackGenerator(style: .light)
+        impactFeedbackgenerator.prepare()
+        impactFeedbackgenerator.impactOccurred()
+    }
+    
+    func didLongPressCardContentView(view: FeedCardContentView, target: FeedCardAnimationTarget) {
+        let optionMenu = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        let openInNewTab = UIAlertAction(title: "Open in New Tab", style: .default) { alert in
+            guard let tabManager = (UIApplication.shared.delegate as? AppDelegate)?.browserViewController.tabManager else {
+                return
+            }
+            
+            guard let url = URL(string: view.data.url) else { return }
+            
+            let request = URLRequest(url: url)
+            tabManager.addTabAndSelect(request, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
+        }
+        optionMenu.addAction(openInNewTab)
+        
+        if PrivateBrowsingManager.shared.isPrivateBrowsing == false {
+            let openInPrivateTab = UIAlertAction(title: "Open in Private Tab", style: .default) { alert in
+                guard let tabManager = (UIApplication.shared.delegate as? AppDelegate)?.browserViewController.tabManager else {
+                    return
+                }
+                
+                guard let url = URL(string: view.data.url) else { return }
+                
+                let request = URLRequest(url: url)
+                tabManager.addTabAndSelect(request, isPrivate: true)
+            }
+            optionMenu.addAction(openInPrivateTab)
+        }
+        
+        let hideContent = UIAlertAction(title: "Hide Content", style: .destructive) { alert in
+            switch target {
+            case .card:
+                self.hide(view: self)
+            case .content:
+                self.hide(view: view)
+            }
+        }
+        optionMenu.addAction(hideContent)
+        
+        let hideAllPublisherContent = UIAlertAction(title: "Hide All From Publisher", style: .destructive) { alert in
+            
+        }
+        optionMenu.addAction(hideAllPublisherContent)
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { alert in
+            switch target {
+            case .card:
+                self.restore(layer: self.layer)
+            case .content:
+                self.restore(layer: view.layer)
+            }
+        }
+        optionMenu.addAction(cancelAction)
+        
+        // Must handle iPad interface separately, as it does not implement action sheets
+        let iPadAlert = optionMenu.popoverPresentationController
+        iPadAlert?.sourceView = view
+        iPadAlert?.sourceRect = view.bounds
+        
+        window?.rootViewController?.present(optionMenu, animated: true, completion: nil)
+        
+        switch target {
+        case .card:
+            depress(layer: self.layer)
+        case .content:
+            depress(layer: view.layer)
         }
         
         let impactFeedbackgenerator = UIImpactFeedbackGenerator(style: .light)
@@ -338,13 +446,13 @@ extension TodayCardView: TodayCardContentDelegate {
     }
 }
 
-enum TodayCardAnimationTarget {
+enum FeedCardAnimationTarget {
     case card
     case content
 }
 
 // Used for all types except publisher
-enum TodayCardContentLayout {
+enum FeedCardContentLayout {
     case verticalLarge
     case verticalSmall
     case verticalSmallInset // used for horizontal lists
@@ -352,18 +460,19 @@ enum TodayCardContentLayout {
     case image // ads
 }
 
-protocol TodayCardContentDelegate {
-    func didTapCardContentView(view: TodayCardContentView, target: TodayCardAnimationTarget)
+protocol FeedCardContentDelegate {
+    func didTapCardContentView(view: FeedCardContentView, target: FeedCardAnimationTarget)
+    func didLongPressCardContentView(view: FeedCardContentView, target: FeedCardAnimationTarget)
 }
 
-class TodayCardContentView: UIView {
+class FeedCardContentView: UIView {
     var data: FeedItem!
-    var layout: TodayCardContentLayout!
-    var delegate: TodayCardContentDelegate?
+    var layout: FeedCardContentLayout!
+    var delegate: FeedCardContentDelegate?
     
     private var imageView: UIImageView?
     
-    required convenience init(data: FeedItem, layout: TodayCardContentLayout, delegate: TodayCardContentDelegate?) {
+    required convenience init(data: FeedItem, layout: FeedCardContentLayout, delegate: FeedCardContentDelegate?) {
         self.init(frame: .zero)
         self.data = data
         self.layout = layout
@@ -400,20 +509,14 @@ class TodayCardContentView: UIView {
         tap.numberOfTouchesRequired = 1
         tap.numberOfTapsRequired = 1
         addGestureRecognizer(tap)
+        
+        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(longPress(gesture:)))
+        longPress.minimumPressDuration = 0.2
+        longPress.numberOfTouchesRequired = 1
+        addGestureRecognizer(longPress)
     }
     
     @objc func tapped() {
-        guard let tabManager = (UIApplication.shared.delegate as? AppDelegate)?.browserViewController.tabManager else {
-            return
-        }
-        
-        guard let url = URL(string: data.url) else { return }
-        
-        let request = URLRequest(url: url)
-        if let tab = tabManager.selectedTab {
-            tab.loadRequest(request)
-        }
-        
         switch layout {
         case .verticalLarge, .verticalSmall, .image:
             delegate?.didTapCardContentView(view: self, target: .card)
@@ -421,6 +524,19 @@ class TodayCardContentView: UIView {
             delegate?.didTapCardContentView(view: self, target: .content)
         default:
             break
+        }
+    }
+    
+    @objc func longPress(gesture: UILongPressGestureRecognizer) {
+        if gesture.state == .began {
+            switch layout {
+            case .verticalLarge, .verticalSmall, .image:
+                delegate?.didLongPressCardContentView(view: self, target: .card)
+            case .verticalSmallInset, .horizontal:
+                delegate?.didLongPressCardContentView(view: self, target: .content)
+            default:
+                break
+            }
         }
     }
     

@@ -4,7 +4,7 @@
 
 import Foundation
 
-struct SponsorData {
+struct FeedSponsorData {
     let name: String
     let url: String
     let largeLogo: String

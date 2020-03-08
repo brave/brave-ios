@@ -118,7 +118,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         setUpWebServer(profile)
         
         // Brave today needs browser profile
-        BraveToday.shared.register(profile: BrowserProfile(localName: "profile"))
+        FeedManager.shared.register(profile: BrowserProfile(localName: "profile"))
         
         var imageStore: DiskImageStore?
         do {

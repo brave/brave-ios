@@ -4,7 +4,7 @@
 
 import Foundation
 
-class TodayCell: UITableViewCell {
+class FeedCell: UITableViewCell {
     var data: FeedRow?
     let containerView = UIView()
     
@@ -54,7 +54,7 @@ class TodayCell: UITableViewCell {
         // 1 card takes up entire width
         // 2 two cards side-by-side
         if data.cards.count == 1, let card = data.cards.first {
-            let cardView = TodayCardView(data: card)
+            let cardView = FeedCardView(data: card)
             containerView.addSubview(cardView)
             
             cardView.snp.makeConstraints {
@@ -65,7 +65,7 @@ class TodayCell: UITableViewCell {
             }
         } else {
             let card1 = data.cards[0]
-            let cardView1 = TodayCardView(data: card1)
+            let cardView1 = FeedCardView(data: card1)
             containerView.addSubview(cardView1)
             
             cardView1.snp.makeConstraints {
@@ -77,7 +77,7 @@ class TodayCell: UITableViewCell {
             }
             
             let card2 = data.cards[1]
-            let cardView2 = TodayCardView(data: card2)
+            let cardView2 = FeedCardView(data: card2)
             containerView.addSubview(cardView2)
             
             cardView2.snp.makeConstraints {

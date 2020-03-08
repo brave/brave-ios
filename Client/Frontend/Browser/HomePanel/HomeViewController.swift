@@ -59,7 +59,7 @@ class HomeViewController: UIViewController, Themeable {
     private let dataSource: FavoritesDataSource
     private let backgroundDataSource: NTPBackgroundDataSource?
 
-    private (set) internal var feedView = BraveTodayFeedView(frame: .zero, style: .plain)
+    private (set) internal var feedView = FeedView(frame: .zero, style: .plain)
 
     private let braveShieldStatsView = BraveShieldStatsView(frame: CGRect.zero).then {
         $0.autoresizingMask = [.flexibleWidth]
@@ -114,7 +114,7 @@ class HomeViewController: UIViewController, Themeable {
         $0.addTarget(self, action: #selector(showSponsoredSite), for: .touchUpInside)
     }
     
-    private var todayCardView = TodayCardView()
+    private var todayCardView = FeedCardView()
     
     private let todayOnboarding = BraveTodayOnboardingPopupView()
     
@@ -325,10 +325,10 @@ class HomeViewController: UIViewController, Themeable {
         showNTPNotification(for: notificationType)
         
         // TODO: Remove
-        BraveToday.shared.isEnabled = true
+        FeedManager.shared.isEnabled = true
         
-        if BraveToday.shared.isEnabled && BraveToday.shared.feedCount() == 0 {
-            BraveToday.shared.loadFeed() { [weak self] in
+        if FeedManager.shared.isEnabled && FeedManager.shared.feedCount() == 0 {
+            FeedManager.shared.loadFeed() { [weak self] in
                 DispatchQueue.main.async {
                     self?.todayCardView.isHidden = true
                     self?.feedView.reloadData()
@@ -458,11 +458,11 @@ class HomeViewController: UIViewController, Themeable {
     }
     
     fileprivate func updateFeedViewInsets() {
-        if !BraveToday.shared.isEnabled {
+        if !FeedManager.shared.isEnabled {
             feedView.contentSize = CGSize(width: view.frame.width, height: 0)
             feedView.contentInset = UIEdgeInsets(top: view.frame.height - 40, left: 0, bottom: 0, right: 0)
         } else {
-            if BraveToday.shared.feedCount() > 0 {
+            if FeedManager.shared.feedCount() > 0 {
                 todayCardView.isHidden = true
             }
             
@@ -610,14 +610,14 @@ class HomeViewController: UIViewController, Themeable {
     }
     
     @objc func handleTodayTapGesture(gesture: UITapGestureRecognizer) {
-        guard BraveToday.shared.isEnabled == false else { return }
+        guard FeedManager.shared.isEnabled == false else { return }
         
         showBraveTodayOnboarding()
     }
     
     private var todayPanStart: CGPoint = .zero
     @objc func handleTodayPanGesture(gesture: UIPanGestureRecognizer) {
-        guard BraveToday.shared.isEnabled == false else { return }
+        guard FeedManager.shared.isEnabled == false else { return }
         
         let point = gesture.location(in: view)
         switch gesture.state {
@@ -635,8 +635,8 @@ class HomeViewController: UIViewController, Themeable {
     fileprivate func showBraveTodayOnboarding() {
         todayOnboarding.completionHandler = { completed in
             if completed {
-                BraveToday.shared.isEnabled = true
-                BraveToday.shared.loadFeed() { [weak self] in
+                FeedManager.shared.isEnabled = true
+                FeedManager.shared.loadFeed() { [weak self] in
                     DispatchQueue.main.async {
                         self?.todayCardView.isHidden = true
                         self?.feedView.reloadData()
@@ -920,7 +920,7 @@ extension HomeViewController: PreferencesObserver {
 
 extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return BraveToday.shared.isEnabled ? BraveToday.shared.feedCount() : 0
+        return FeedManager.shared.isEnabled ? FeedManager.shared.feedCount() : 0
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -928,18 +928,18 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "TodayCell", for: indexPath) as UITableViewCell
-        let item: FeedRow = BraveToday.shared.feedItems()[indexPath.row]
-        (cell as? TodayCell)?.setData(data: item)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "FeedCell", for: indexPath) as UITableViewCell
+        let item: FeedRow = FeedManager.shared.feedItems()[indexPath.row]
+        (cell as? FeedCell)?.setData(data: item)
         return cell
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        let countBefore = BraveToday.shared.feedCount()
+        let countBefore = FeedManager.shared.feedCount()
         if indexPath.row == countBefore - 5 {
-            BraveToday.shared.getMore()
+            FeedManager.shared.getMore()
             DispatchQueue.main.async {
-                if BraveToday.shared.feedCount() > countBefore {
+                if FeedManager.shared.feedCount() > countBefore {
                     tableView.reloadData()
                 }
             }
