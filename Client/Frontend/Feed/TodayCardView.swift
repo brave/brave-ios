@@ -193,11 +193,77 @@ class TodayCardView: TodayCardContainerView {
     }
     
     private func generateVerticalListBrandedLayout() {
+        // TODO: needs work
         
+        if let item = data?.items[0] {
+            let contentView = TodayCardContentView(data: item, layout: .horizontal)
+            blurView.contentView.addSubview(contentView)
+            
+            contentView.snp.makeConstraints {
+                $0.top.equalTo(20)
+                $0.left.right.equalToSuperview().inset(20)
+                $0.height.equalToSuperview().inset(10).multipliedBy(0.33).priority(999)
+            }
+        }
+        
+        if let item = data?.items[1] {
+            let contentView = TodayCardContentView(data: item, layout: .horizontal)
+            blurView.contentView.addSubview(contentView)
+            
+            contentView.snp.makeConstraints {
+                $0.centerY.equalToSuperview()
+                $0.left.right.equalToSuperview().inset(20)
+                $0.height.equalToSuperview().inset(10).multipliedBy(0.33).priority(999)
+            }
+        }
+        
+        if let item = data?.items[2] {
+            let contentView = TodayCardContentView(data: item, layout: .horizontal)
+            blurView.contentView.addSubview(contentView)
+            
+            contentView.snp.makeConstraints {
+                $0.bottom.equalToSuperview().inset(20)
+                $0.left.right.equalToSuperview().inset(20)
+                $0.height.equalToSuperview().inset(10).multipliedBy(0.33).priority(999)
+            }
+        }
     }
     
     private func generateVerticalListNumberedLayout() {
+        // TODO: needs work
         
+        if let item = data?.items[0] {
+            let contentView = TodayCardContentView(data: item, layout: .horizontal)
+            blurView.contentView.addSubview(contentView)
+            
+            contentView.snp.makeConstraints {
+                $0.top.equalTo(20)
+                $0.left.right.equalToSuperview().inset(20)
+                $0.height.equalToSuperview().inset(10).multipliedBy(0.33).priority(999)
+            }
+        }
+        
+        if let item = data?.items[1] {
+            let contentView = TodayCardContentView(data: item, layout: .horizontal)
+            blurView.contentView.addSubview(contentView)
+            
+            contentView.snp.makeConstraints {
+                $0.centerY.equalToSuperview()
+                $0.left.right.equalToSuperview().inset(20)
+                $0.height.equalToSuperview().inset(10).multipliedBy(0.33).priority(999)
+            }
+        }
+        
+        if let item = data?.items[2] {
+            let contentView = TodayCardContentView(data: item, layout: .horizontal)
+            blurView.contentView.addSubview(contentView)
+            
+            contentView.snp.makeConstraints {
+                $0.bottom.equalToSuperview().inset(20)
+                $0.left.right.equalToSuperview().inset(20)
+                $0.height.equalToSuperview().inset(10).multipliedBy(0.33).priority(999)
+            }
+        }
     }
     
     private func generateHeadlineLargeLayout() {
@@ -223,21 +289,23 @@ class TodayCardView: TodayCardContainerView {
     }
     
     private func generateAdSmallLayout() {
-        let imageView = UIImageView()
-        blurView.contentView.addSubview(imageView)
+        guard let item = data?.items.first else { return }
         
-        self.imageView = imageView
-        self.imageView?.snp.makeConstraints {
+        let contentView = TodayCardContentView(data: item, layout: .image)
+        blurView.contentView.addSubview(contentView)
+        
+        contentView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
     }
     
     private func generateAdLargeLayout() {
-        let imageView = UIImageView()
-        blurView.contentView.addSubview(imageView)
+        guard let item = data?.items.first else { return }
         
-        self.imageView = imageView
-        self.imageView?.snp.makeConstraints {
+        let contentView = TodayCardContentView(data: item, layout: .image)
+        blurView.contentView.addSubview(contentView)
+        
+        contentView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
     }
@@ -249,6 +317,7 @@ enum TodayCardContentLayout {
     case verticalSmall
     case verticalSmallInset // used for horizontal lists
     case horizontal // fills vertical lists w/ or w/out image
+    case image // ads
 }
 
 class TodayCardContentView: UIView {
@@ -288,6 +357,8 @@ class TodayCardContentView: UIView {
             layoutVerticalSmallInset()
         case .horizontal:
             layoutHorizontal()
+        case .image:
+            layoutImage()
         default:
             break
         }
@@ -517,23 +588,47 @@ class TodayCardContentView: UIView {
         }
     }
     
+    private func layoutImage() {
+        let imageView = UIImageView()
+        imageView.backgroundColor = UIColor(rgb: 0xBCBCBC).withAlphaComponent(0.2)
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        imageView.layer.cornerRadius = 4
+        addSubview(imageView)
+            
+        imageView.snp.makeConstraints {
+            $0.top.left.right.equalTo(0)
+            $0.height.equalTo(98)
+        }
+        
+        self.imageView = imageView
+        
+        layoutSubviews()
+        loadImage(urlString: data.img)
+    }
+    
     private func loadImage(urlString: String) {
         guard let imageView = imageView, urlString.isEmpty == false else { return }
         
         let url = URL(string: urlString)
-        imageView.kf.indicatorType = .activity
-        imageView.kf.setImage(
-            with: url,
-            placeholder: nil,
-            options: [
-                .transition(.fade(1)),
-                .cacheOriginalImage
-            ]) { result in
-            switch result {
-            case .success(let value):
-                print("Task done for: \(value.source.url?.absoluteString ?? "")")
-            case .failure(let error):
-                print("Job failed: \(error.localizedDescription)")
+        
+        if url?.pathExtension == "gif" {
+            imageView.image = UIImage.gifImageWithURL(urlString)
+        } else {
+            imageView.kf.indicatorType = .activity
+            imageView.kf.setImage(
+                with: url,
+                placeholder: nil,
+                options: [
+                    .transition(.fade(1)),
+                    .cacheOriginalImage
+                ]) { result in
+                switch result {
+                case .success(let value):
+                    print("Task done for: \(value.source.url?.absoluteString ?? "")")
+                case .failure(let error):
+                    print("Job failed: \(error.localizedDescription)")
+                }
             }
         }
     }

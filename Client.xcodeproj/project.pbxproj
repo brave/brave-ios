@@ -603,6 +603,7 @@
 		5CF1F9BB241220A900D16A84 /* Kingfisher.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CF1F9BA241220A900D16A84 /* Kingfisher.framework */; };
 		5CF1F9BC241220AA00D16A84 /* Kingfisher.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 5CF1F9BA241220A900D16A84 /* Kingfisher.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5CF1F9BE2412E6BE00D16A84 /* FeedComposer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CF1F9BD2412E6BE00D16A84 /* FeedComposer.swift */; };
+		5CF1F9C02414BC5100D16A84 /* iOSDevCenters+GIF.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CF1F9BF2414BC5100D16A84 /* iOSDevCenters+GIF.swift */; };
 		5D1DC51C20AC9AFB00905E5A /* Data.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1DC51320AC9AF900905E5A /* Data.framework */; };
 		5D1DC52520AC9AFB00905E5A /* Data.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D1DC51520AC9AFA00905E5A /* Data.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5D1DC52820AC9AFB00905E5A /* Data.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1DC51320AC9AF900905E5A /* Data.framework */; };
@@ -2068,6 +2069,7 @@
 		5CB493342411B117000D8440 /* BraveTodayFeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveTodayFeedView.swift; sourceTree = "<group>"; };
 		5CF1F9BA241220A900D16A84 /* Kingfisher.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Kingfisher.framework; path = Carthage/Build/iOS/Kingfisher.framework; sourceTree = "<group>"; };
 		5CF1F9BD2412E6BE00D16A84 /* FeedComposer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedComposer.swift; sourceTree = "<group>"; };
+		5CF1F9BF2414BC5100D16A84 /* iOSDevCenters+GIF.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "iOSDevCenters+GIF.swift"; sourceTree = "<group>"; };
 		5D1DC51320AC9AF900905E5A /* Data.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Data.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5D1DC51520AC9AFA00905E5A /* Data.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Data.h; sourceTree = "<group>"; };
 		5D1DC51620AC9AFA00905E5A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -3957,6 +3959,7 @@
 				5C1CBEA7240CDDFA009DC11D /* TodayCardView.swift */,
 				5C90586424101E660015F7B9 /* TodayCell.swift */,
 				5CB4932E241159CF000D8440 /* SponsorData.swift */,
+				5CF1F9BF2414BC5100D16A84 /* iOSDevCenters+GIF.swift */,
 			);
 			path = Feed;
 			sourceTree = "<group>";
@@ -6310,6 +6313,7 @@
 				282DA4731A68C1E700A406E2 /* OpenSearch.swift in Sources */,
 				0A5CBD3423D4677100362CC8 /* NTPLearnMoreViewController.swift in Sources */,
 				5E612A8C234B7FC1007D12B5 /* OnboardingAdsAvailableController.swift in Sources */,
+				5CF1F9C02414BC5100D16A84 /* iOSDevCenters+GIF.swift in Sources */,
 				F35B8D2F1D638408008E3D61 /* SessionRestoreHandler.swift in Sources */,
 				4422D4C621BFFB7600BF1855 /* env_posix.cc in Sources */,
 				E63ED8E11BFD25580097D08E /* LoginListViewController.swift in Sources */,
