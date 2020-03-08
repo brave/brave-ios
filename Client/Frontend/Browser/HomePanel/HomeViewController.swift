@@ -814,14 +814,11 @@ class HomeViewController: UIViewController, Themeable {
         let state = HomeRestoreState()
         debugPrint(feedView.contentOffset.y)
         state.feedScrollPosition = feedView.contentOffset.y
-        
-        debugPrint("Restore State -- Saved :\(state.feedScrollPosition)")
         return state
     }
     
     func restoreState(state: HomeRestoreState) {
         restoreState = state
-        debugPrint("Restore State -- Restored :\(state.feedScrollPosition)")
     }
 }
 

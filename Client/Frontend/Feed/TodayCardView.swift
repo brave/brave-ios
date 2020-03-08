@@ -5,6 +5,7 @@
 import Foundation
 import Storage
 import Kingfisher
+import pop
 
 class TodayCardContainerView: UIView {
     fileprivate let blurView = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
@@ -124,7 +125,7 @@ class TodayCardView: TodayCardContainerView {
         }
         
         if let item = data?.items[0] {
-            let contentView = TodayCardContentView(data: item, layout: .verticalSmallInset)
+            let contentView = TodayCardContentView(data: item, layout: .verticalSmallInset, delegate: self)
             blurView.contentView.addSubview(contentView)
             
             contentView.snp.makeConstraints {
@@ -135,7 +136,7 @@ class TodayCardView: TodayCardContainerView {
         }
         
         if let item = data?.items[1] {
-            let contentView = TodayCardContentView(data: item, layout: .verticalSmallInset)
+            let contentView = TodayCardContentView(data: item, layout: .verticalSmallInset, delegate: self)
             blurView.contentView.addSubview(contentView)
             
             contentView.snp.makeConstraints {
@@ -146,7 +147,7 @@ class TodayCardView: TodayCardContainerView {
         }
         
         if let item = data?.items[2] {
-            let contentView = TodayCardContentView(data: item, layout: .verticalSmallInset)
+            let contentView = TodayCardContentView(data: item, layout: .verticalSmallInset, delegate: self)
             blurView.contentView.addSubview(contentView)
             
             contentView.snp.makeConstraints {
@@ -159,7 +160,7 @@ class TodayCardView: TodayCardContainerView {
     
     private func generateVerticalListLayout() {
         if let item = data?.items[0] {
-            let contentView = TodayCardContentView(data: item, layout: .horizontal)
+            let contentView = TodayCardContentView(data: item, layout: .horizontal, delegate: self)
             blurView.contentView.addSubview(contentView)
             
             contentView.snp.makeConstraints {
@@ -170,7 +171,7 @@ class TodayCardView: TodayCardContainerView {
         }
         
         if let item = data?.items[1] {
-            let contentView = TodayCardContentView(data: item, layout: .horizontal)
+            let contentView = TodayCardContentView(data: item, layout: .horizontal, delegate: self)
             blurView.contentView.addSubview(contentView)
             
             contentView.snp.makeConstraints {
@@ -181,7 +182,7 @@ class TodayCardView: TodayCardContainerView {
         }
         
         if let item = data?.items[2] {
-            let contentView = TodayCardContentView(data: item, layout: .horizontal)
+            let contentView = TodayCardContentView(data: item, layout: .horizontal, delegate: self)
             blurView.contentView.addSubview(contentView)
             
             contentView.snp.makeConstraints {
@@ -196,7 +197,7 @@ class TodayCardView: TodayCardContainerView {
         // TODO: needs work
         
         if let item = data?.items[0] {
-            let contentView = TodayCardContentView(data: item, layout: .horizontal)
+            let contentView = TodayCardContentView(data: item, layout: .horizontal, delegate: self)
             blurView.contentView.addSubview(contentView)
             
             contentView.snp.makeConstraints {
@@ -207,7 +208,7 @@ class TodayCardView: TodayCardContainerView {
         }
         
         if let item = data?.items[1] {
-            let contentView = TodayCardContentView(data: item, layout: .horizontal)
+            let contentView = TodayCardContentView(data: item, layout: .horizontal, delegate: self)
             blurView.contentView.addSubview(contentView)
             
             contentView.snp.makeConstraints {
@@ -218,7 +219,7 @@ class TodayCardView: TodayCardContainerView {
         }
         
         if let item = data?.items[2] {
-            let contentView = TodayCardContentView(data: item, layout: .horizontal)
+            let contentView = TodayCardContentView(data: item, layout: .horizontal, delegate: self)
             blurView.contentView.addSubview(contentView)
             
             contentView.snp.makeConstraints {
@@ -233,7 +234,7 @@ class TodayCardView: TodayCardContainerView {
         // TODO: needs work
         
         if let item = data?.items[0] {
-            let contentView = TodayCardContentView(data: item, layout: .horizontal)
+            let contentView = TodayCardContentView(data: item, layout: .horizontal, delegate: self)
             blurView.contentView.addSubview(contentView)
             
             contentView.snp.makeConstraints {
@@ -244,7 +245,7 @@ class TodayCardView: TodayCardContainerView {
         }
         
         if let item = data?.items[1] {
-            let contentView = TodayCardContentView(data: item, layout: .horizontal)
+            let contentView = TodayCardContentView(data: item, layout: .horizontal, delegate: self)
             blurView.contentView.addSubview(contentView)
             
             contentView.snp.makeConstraints {
@@ -255,7 +256,7 @@ class TodayCardView: TodayCardContainerView {
         }
         
         if let item = data?.items[2] {
-            let contentView = TodayCardContentView(data: item, layout: .horizontal)
+            let contentView = TodayCardContentView(data: item, layout: .horizontal, delegate: self)
             blurView.contentView.addSubview(contentView)
             
             contentView.snp.makeConstraints {
@@ -269,7 +270,7 @@ class TodayCardView: TodayCardContainerView {
     private func generateHeadlineLargeLayout() {
         guard let item = data?.items.first else { return }
         
-        let contentView = TodayCardContentView(data: item, layout: .verticalLarge)
+        let contentView = TodayCardContentView(data: item, layout: .verticalLarge, delegate: self)
         blurView.contentView.addSubview(contentView)
         
         contentView.snp.makeConstraints {
@@ -280,7 +281,7 @@ class TodayCardView: TodayCardContainerView {
     private func generateHeadlineSmallLayout() {
         guard let item = data?.items.first else { return }
         
-        let contentView = TodayCardContentView(data: item, layout: .verticalSmall)
+        let contentView = TodayCardContentView(data: item, layout: .verticalSmall, delegate: self)
         blurView.contentView.addSubview(contentView)
         
         contentView.snp.makeConstraints {
@@ -291,7 +292,7 @@ class TodayCardView: TodayCardContainerView {
     private func generateAdSmallLayout() {
         guard let item = data?.items.first else { return }
         
-        let contentView = TodayCardContentView(data: item, layout: .image)
+        let contentView = TodayCardContentView(data: item, layout: .image, delegate: self)
         blurView.contentView.addSubview(contentView)
         
         contentView.snp.makeConstraints {
@@ -302,13 +303,44 @@ class TodayCardView: TodayCardContainerView {
     private func generateAdLargeLayout() {
         guard let item = data?.items.first else { return }
         
-        let contentView = TodayCardContentView(data: item, layout: .image)
+        let contentView = TodayCardContentView(data: item, layout: .image, delegate: self)
         blurView.contentView.addSubview(contentView)
         
         contentView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
     }
+    
+    fileprivate func bounceOnLayer(layer: CALayer) {
+        if let anim = POPSpringAnimation(propertyNamed: kPOPLayerScaleXY) {
+            anim.toValue = NSValue(cgSize: CGSize(width: 0.95, height: 0.95))
+            anim.autoreverses = true
+            anim.springBounciness = 4
+            anim.springSpeed = 20
+            anim.repeatCount = 1
+            layer.pop_add(anim, forKey: "size")
+        }
+    }
+}
+
+extension TodayCardView: TodayCardContentDelegate {
+    func didTapCardContentView(view: TodayCardContentView, target: TodayCardAnimationTarget) {
+        switch target {
+        case .card:
+            bounceOnLayer(layer: self.layer)
+        case .content:
+            bounceOnLayer(layer: view.layer)
+        }
+        
+        let impactFeedbackgenerator = UIImpactFeedbackGenerator(style: .light)
+        impactFeedbackgenerator.prepare()
+        impactFeedbackgenerator.impactOccurred()
+    }
+}
+
+enum TodayCardAnimationTarget {
+    case card
+    case content
 }
 
 // Used for all types except publisher
@@ -320,21 +352,22 @@ enum TodayCardContentLayout {
     case image // ads
 }
 
+protocol TodayCardContentDelegate {
+    func didTapCardContentView(view: TodayCardContentView, target: TodayCardAnimationTarget)
+}
+
 class TodayCardContentView: UIView {
     var data: FeedItem!
     var layout: TodayCardContentLayout!
+    var delegate: TodayCardContentDelegate?
     
     private var imageView: UIImageView?
-//    private var headlineLabel: UILabel?
-//    private var timeAgoLabel: UILabel?
-//    private var publisherLabel: UILabel?
-//    private var publisherLogo: UIImageView?
-//    private var optionsButton: UIButton?
     
-    required convenience init(data: FeedItem, layout: TodayCardContentLayout) {
+    required convenience init(data: FeedItem, layout: TodayCardContentLayout, delegate: TodayCardContentDelegate?) {
         self.init(frame: .zero)
         self.data = data
         self.layout = layout
+        self.delegate = delegate
         
         prepare()
     }
@@ -359,6 +392,33 @@ class TodayCardContentView: UIView {
             layoutHorizontal()
         case .image:
             layoutImage()
+        default:
+            break
+        }
+        
+        let tap = UITapGestureRecognizer(target: self, action: #selector(tapped))
+        tap.numberOfTouchesRequired = 1
+        tap.numberOfTapsRequired = 1
+        addGestureRecognizer(tap)
+    }
+    
+    @objc func tapped() {
+        guard let tabManager = (UIApplication.shared.delegate as? AppDelegate)?.browserViewController.tabManager else {
+            return
+        }
+        
+        guard let url = URL(string: data.url) else { return }
+        
+        let request = URLRequest(url: url)
+        if let tab = tabManager.selectedTab {
+            tab.loadRequest(request)
+        }
+        
+        switch layout {
+        case .verticalLarge, .verticalSmall, .image:
+            delegate?.didTapCardContentView(view: self, target: .card)
+        case .verticalSmallInset, .horizontal:
+            delegate?.didTapCardContentView(view: self, target: .content)
         default:
             break
         }
@@ -407,7 +467,7 @@ class TodayCardContentView: UIView {
         publisherLabel.font = UIFont.systemFont(ofSize: 13, weight: .bold)
         publisherLabel.textColor = .white
         publisherLabel.numberOfLines = 1
-        publisherLabel.text = data.feedSource
+        publisherLabel.text = data.publisherName
         addSubview(publisherLabel)
         
         publisherLabel.snp.makeConstraints {
@@ -462,7 +522,7 @@ class TodayCardContentView: UIView {
         publisherLabel.font = UIFont.systemFont(ofSize: 13, weight: .bold)
         publisherLabel.textColor = .white
         publisherLabel.numberOfLines = 1
-        publisherLabel.text = data.feedSource
+        publisherLabel.text = data.publisherName
         addSubview(publisherLabel)
         
         publisherLabel.snp.makeConstraints {
@@ -512,6 +572,7 @@ class TodayCardContentView: UIView {
         timeAgoLabel.snp.makeConstraints {
             $0.top.equalTo(headlineLabel.snp.bottom).offset(4)
             $0.left.right.equalTo(0)
+            $0.bottom.equalTo(0)
         }
         
         layoutSubviews()
@@ -546,7 +607,7 @@ class TodayCardContentView: UIView {
         publisherLabel.font = UIFont.systemFont(ofSize: 13, weight: .bold)
         publisherLabel.textColor = .white
         publisherLabel.numberOfLines = 1
-        publisherLabel.text = data.feedSource
+        publisherLabel.text = data.publisherName
         textContainer.addSubview(publisherLabel)
         
         publisherLabel.snp.makeConstraints {
@@ -597,8 +658,7 @@ class TodayCardContentView: UIView {
         addSubview(imageView)
             
         imageView.snp.makeConstraints {
-            $0.top.left.right.equalTo(0)
-            $0.height.equalTo(98)
+            $0.edges.equalToSuperview()
         }
         
         self.imageView = imageView

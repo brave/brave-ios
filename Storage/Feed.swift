@@ -18,7 +18,7 @@ public protocol Feed {
     func getAvailableRecords() -> Deferred<Maybe<[FeedItem]>>
     @discardableResult func deleteRecord(_ record: FeedItem) -> Success
     func deleteAllRecords() -> Success
-    @discardableResult func createRecord(publishTime: Timestamp, feedSource: String, url: String, img: String, title: String, description: String) -> Deferred<Maybe<FeedItem>>
+    @discardableResult func createRecord(publishTime: Timestamp, feedSource: String, url: String, domain: String, img: String, title: String, description: String, contentType: String, publisherId: String, publisherName: String) -> Deferred<Maybe<FeedItem>>
     func getRecords(session: String, limit: Int) -> Deferred<Maybe<[FeedItem]>>
     func getRecords(session: String, publisher: String, limit: Int) -> Deferred<Maybe<[FeedItem]>>
     func getRecordWithURL(_ url: String) -> Deferred<Maybe<FeedItem>>
@@ -32,23 +32,31 @@ public struct FeedItem: Equatable {
     public let publishTime: Timestamp
     public let feedSource: String
     public let url: String
+    public let domain: String
     public let img: String
     public let title: String
     public let description: String
+    public let contentType: String
+    public let publisherId: String
+    public let publisherName: String
     public let sessionDisplayed: String
     public let removed: Bool
     public let liked: Bool
     public let unread: Bool
 
     /// Initializer for when a record is loaded from a database row
-    public init(id: Int = 0, publishTime: Timestamp, feedSource: String, url: String, img: String, title: String, description: String, sessionDisplayed: String = "", removed: Bool = false, liked: Bool = false, unread: Bool = true) {
+    public init(id: Int = 0, publishTime: Timestamp, feedSource: String, url: String, domain: String, img: String, title: String, description: String, contentType: String, publisherId: String, publisherName: String, sessionDisplayed: String = "", removed: Bool = false, liked: Bool = false, unread: Bool = true) {
         self.id = id
         self.publishTime = publishTime
         self.feedSource = feedSource
         self.url = url
+        self.domain = domain
         self.img = img
         self.title = title
         self.description = description
+        self.contentType = contentType
+        self.publisherId = publisherId
+        self.publisherName = publisherName
         self.sessionDisplayed = sessionDisplayed
         self.removed = removed
         self.liked = liked
@@ -60,17 +68,25 @@ public struct FeedData: Decodable {
     public let publishTime: String?
     public let feedSource: String?
     public let url: String?
+    public let domain: String?
     public let img: String?
     public let title: String?
     public let description: String?
+    public let contentType: String?
+    public let publisherId: String?
+    public let publisherName: String?
     
     enum CodingKeys: String, CodingKey {
         case publishTime = "publish_time"
         case feedSource = "feed_source"
         case url
+        case domain
         case img
         case title
         case description
+        case contentType = "content_type"
+        case publisherId = "publisher_id"
+        case publisherName = "publisher_name"
     }
 }
 
@@ -79,9 +95,13 @@ public func ==(lhs: FeedItem, rhs: FeedItem) -> Bool {
         && lhs.publishTime == rhs.publishTime
         && lhs.feedSource == rhs.feedSource
         && lhs.url == rhs.url
+        && lhs.domain == rhs.domain
         && lhs.img == rhs.img
         && lhs.title == rhs.title
         && lhs.description == rhs.description
+        && lhs.contentType == rhs.contentType
+        && lhs.publisherId == rhs.publisherId
+        && lhs.publisherName == rhs.publisherName
         && lhs.sessionDisplayed == rhs.sessionDisplayed
         && lhs.removed == rhs.removed
         && lhs.liked == rhs.liked

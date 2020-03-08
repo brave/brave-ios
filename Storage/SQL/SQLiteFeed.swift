@@ -22,7 +22,7 @@ class FeedStorageError: MaybeErrorType {
 open class SQLiteFeed {
     let db: BrowserDB
 
-    let allColumns = ["id", "publish_time", "feed_source", "url", "img", "title", "description", "session_displayed", "removed", "liked", "unread"].joined(separator: ",")
+    let allColumns = ["id", "publish_time", "feed_source", "url", "domain", "img", "title", "description", "content_type", "publisher_id", "publisher_name", "session_displayed", "removed", "liked", "unread"].joined(separator: ",")
 
     required public init(db: BrowserDB) {
         self.db = db
@@ -48,10 +48,10 @@ extension SQLiteFeed: Feed {
         return db.run(sql)
     }
 
-    public func createRecord(publishTime: Timestamp, feedSource: String, url: String, img: String, title: String, description: String) -> Deferred<Maybe<FeedItem>> {
+    public func createRecord(publishTime: Timestamp, feedSource: String, url: String, domain: String, img: String, title: String, description: String, contentType: String, publisherId: String, publisherName: String) -> Deferred<Maybe<FeedItem>> {
         return db.transaction { connection -> FeedItem in
-            let insertSQL = "INSERT OR REPLACE INTO items (publish_time, feed_source, url, img, title, description, session_displayed) VALUES (?, ?, ?, ?, ?, ?, ?)"
-            let insertArgs: Args = [publishTime, feedSource, url, img, title, description, ""]
+            let insertSQL = "INSERT OR REPLACE INTO items (publish_time, feed_source, url, domain, img, title, description, content_type, publisher_id, publisher_name, session_displayed) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+            let insertArgs: Args = [publishTime, feedSource, url, domain, img, title, description, contentType, publisherId, publisherName, ""]
             let lastInsertedRowID = connection.lastInsertedRowID
 
             try connection.executeChange(insertSQL, withArgs: insertArgs)
@@ -170,13 +170,17 @@ extension SQLiteFeed: Feed {
         let publishTime = row.getTimestamp("publish_time")!
         let feedSource = row["feed_source"] as! String
         let url = row["url"] as! String
+        let domain = row["domain"] as! String
         let img = row["img"] as! String
         let title = row["title"] as! String
         let description = row["description"] as! String
+        let contentType = row["content_type"] as! String
+        let publisherId = row["publisher_id"] as! String
+        let publisherName = row["publisher_name"] as! String
         let sessionDisplayed = row["session_displayed"] as! String
         let removed = row.getBoolean("removed")
         let liked = row.getBoolean("liked")
         let unread = row.getBoolean("unread")
-        return FeedItem(id: id, publishTime: publishTime, feedSource: feedSource, url: url, img: img, title: title, description: description, sessionDisplayed: sessionDisplayed, removed: removed, liked: liked, unread: unread)
+        return FeedItem(id: id, publishTime: publishTime, feedSource: feedSource, url: url, domain: domain, img: img, title: title, description: description, contentType: contentType, publisherId: publisherId, publisherName: publisherName, sessionDisplayed: sessionDisplayed, removed: removed, liked: liked, unread: unread)
     }
 }

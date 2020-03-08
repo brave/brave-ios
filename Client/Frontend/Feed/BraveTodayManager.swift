@@ -58,9 +58,13 @@ class BraveToday: NSObject {
             let data = self.profile?.feed.createRecord(publishTime: publishTime,
                                                         feedSource: item.feedSource ?? "",
                                                         url: item.url ?? "",
+                                                        domain: item.domain ?? "",
                                                         img: item.img ?? "",
                                                         title: item.title ?? "",
-                                                        description: item.description ?? "").value
+                                                        description: item.description ?? "",
+                                                        contentType: item.contentType ?? "",
+                                                        publisherId: item.publisherId ?? "",
+                                                        publisherName: item.publisherName ?? "").value
             
             if data?.isFailure == true {
                 debugPrint(item)
