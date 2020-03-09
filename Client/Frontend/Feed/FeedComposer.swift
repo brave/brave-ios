@@ -90,7 +90,7 @@ class FeedComposer: NSObject {
         var i = 0
         while i < feedItems.count {
             if i + 2 < feedItems.count {
-                let card = FeedCard(type: .horizontalList, items: [feedItems[i], feedItems[i+1], feedItems[i+2]], specialData: nil)
+                let card = FeedCard(type: .verticalList, items: [feedItems[i], feedItems[i+1], feedItems[i+2]], specialData: nil)
                 let feedRow = FeedRow(cards: [card])
 
                 items.append(feedRow)

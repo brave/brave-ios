@@ -292,7 +292,7 @@ class HomeViewController: UIViewController, Themeable {
         
         view.addSubview(feedView)
         
-        feedView.delegate = self
+        feedView.delegate = FeedManager.shared
         feedView.dataSource = FeedManager.shared
         
         FeedManager.shared.delegate = self
@@ -920,23 +920,16 @@ extension HomeViewController: PreferencesObserver {
     }
 }
 
-extension HomeViewController: UITableViewDelegate {
-    
-}
-
-extension HomeViewController: UIScrollViewDelegate {
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        // Only care about feed scroll position, ignore favorites scrollview
-        if scrollView.isDescendant(of: feedView) {
-            updateScrollStyling(scrollView.contentOffset.y)
-        }
-    }
-}
-
 extension HomeViewController: FeedManagerDelegate {
     func shouldReload() {
         DispatchQueue.main.async {
             self.feedView.reloadData()
+        }
+    }
+    
+    func didScroll(scrollView: UIScrollView) {
+        if scrollView.isDescendant(of: feedView) {
+            updateScrollStyling(scrollView.contentOffset.y)
         }
     }
 }

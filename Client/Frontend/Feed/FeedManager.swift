@@ -9,6 +9,7 @@ import Deferred
 
 protocol FeedManagerDelegate {
     func shouldReload()
+    func didScroll(scrollView: UIScrollView)
 }
 
 class FeedManager: NSObject {
@@ -121,7 +122,7 @@ class FeedManager: NSObject {
     }
 }
 
-extension FeedManager: UITableViewDataSource {
+extension FeedManager: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return isEnabled ? feedCount() : 0
     }
@@ -148,6 +149,12 @@ extension FeedManager: UITableViewDataSource {
                 }
             }
         }
+    }
+}
+
+extension FeedManager: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        delegate?.didScroll(scrollView: scrollView)
     }
 }
 
