@@ -45,17 +45,49 @@ enum FeedCardType: CGFloat {
     case adLarge = 380
 }
 
-struct FeedCard {
-    let type: FeedCardType
-    let items: [FeedItem] // Data that lives within an individual card design.
+enum FeedCardAnimationTarget {
+    case card
+    case content
+}
+
+// Used for all types except publisher
+enum FeedCardContentLayout {
+    case verticalLarge
+    case verticalSmall
+    case verticalSmallInset // used for horizontal lists
+    case horizontal // fills vertical lists w/ or w/out image
+    case image // ads
+}
+
+struct FeedCardSpecialData {
+    let title: String?
+    let logo: String?
+    let publisher: String?
+}
+
+class FeedCard: NSObject {
+    var type: FeedCardType!
+    var items: [FeedItem] = [] // Data that lives within content view
+    var specialData: FeedCardSpecialData? // Data that lives outside of content view
     
-    // Special Data
-    let sponsorData: FeedSponsorData?
-    let mainTitle: String?
+    required convenience init(type: FeedCardType, items: [FeedItem], specialData: FeedCardSpecialData?) {
+        self.init()
+        
+        self.type = type
+        self.items = items
+        self.specialData = specialData
+    }
+}
+
+protocol FeedCardViewDelegate {
+    func shouldRemoveContent(id: Int)
+    func shouldRemovePublisherContent(publisherId: String)
 }
 
 class FeedCardView: FeedCardContainerView {
     var data: FeedCard?
+    
+    var delegate: FeedCardViewDelegate?
     
     var cardTitleLabel: UILabel?
     var imageView: UIImageView?
@@ -78,13 +110,28 @@ class FeedCardView: FeedCardContainerView {
     private func prepare() {
         if let data = data {
             
-            if data.mainTitle?.isEmpty == false {
+            if let cardTitle = data.specialData?.title {
                 let cardTitleLabel = UILabel()
+                cardTitleLabel.font = UIFont.systemFont(ofSize: 21, weight: .bold)
+                cardTitleLabel.textColor = .white
+                cardTitleLabel.numberOfLines = 1
+                cardTitleLabel.lineBreakMode = .byTruncatingTail
+                cardTitleLabel.text = cardTitle
                 blurView.contentView.addSubview(cardTitleLabel)
                 
                 self.cardTitleLabel = cardTitleLabel
                 self.cardTitleLabel?.snp.makeConstraints {
                     $0.top.equalTo(5)
+                    $0.left.right.equalTo(5)
+                }
+            } else {
+                let cardTitleLabel = UILabel()
+                blurView.contentView.addSubview(cardTitleLabel)
+                
+                self.cardTitleLabel = cardTitleLabel
+                self.cardTitleLabel?.snp.makeConstraints {
+                    $0.top.equalTo(0)
+                    $0.height.equalTo(0)
                     $0.left.right.equalTo(5)
                 }
             }
@@ -106,23 +153,14 @@ class FeedCardView: FeedCardContainerView {
                 generateAdSmallLayout()
             case .adLarge:
                 generateAdLargeLayout()
+            default:
+                break
             }
         }
     }
     
     private func generateHorizontalListLayout() {
-        let titleLabel = UILabel()
-        titleLabel.font = UIFont.systemFont(ofSize: 21, weight: .bold)
-        titleLabel.textColor = .white
-        titleLabel.numberOfLines = 1
-        titleLabel.lineBreakMode = .byTruncatingTail
-        titleLabel.text = data?.mainTitle
-        blurView.contentView.addSubview(titleLabel)
-        
-        titleLabel.snp.makeConstraints {
-            $0.top.equalTo(20)
-            $0.left.right.equalToSuperview().inset(20)
-        }
+        guard let titleLabel = self.cardTitleLabel else { return }
         
         if let item = data?.items[0] {
             let contentView = FeedCardContentView(data: item, layout: .verticalSmallInset, delegate: self)
@@ -408,11 +446,13 @@ extension FeedCardView: FeedCardContentDelegate {
             case .content:
                 self.hide(view: view)
             }
+            
+            self.delegate?.shouldRemoveContent(id: view.data.id)
         }
         optionMenu.addAction(hideContent)
         
         let hideAllPublisherContent = UIAlertAction(title: "Hide All From Publisher", style: .destructive) { alert in
-            
+            self.delegate?.shouldRemovePublisherContent(publisherId: view.data.publisherId)
         }
         optionMenu.addAction(hideAllPublisherContent)
         
@@ -444,20 +484,6 @@ extension FeedCardView: FeedCardContentDelegate {
         impactFeedbackgenerator.prepare()
         impactFeedbackgenerator.impactOccurred()
     }
-}
-
-enum FeedCardAnimationTarget {
-    case card
-    case content
-}
-
-// Used for all types except publisher
-enum FeedCardContentLayout {
-    case verticalLarge
-    case verticalSmall
-    case verticalSmallInset // used for horizontal lists
-    case horizontal // fills vertical lists w/ or w/out image
-    case image // ads
 }
 
 protocol FeedCardContentDelegate {

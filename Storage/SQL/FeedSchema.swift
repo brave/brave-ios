@@ -33,6 +33,7 @@ open class FeedSchema: Schema {
             content_type TEXT NOT NULL,
             publisher_id TEXT NOT NULL,
             publisher_name TEXT NOT NULL,
+            publisher_logo TEXT NOT NULL,
             session_displayed TEXT NOT NULL,
             removed INTEGER NOT NULL DEFAULT (0),
             liked INTEGER NOT NULL DEFAULT (0),

@@ -7,9 +7,15 @@ import Storage
 import SwiftKeychainWrapper
 import Deferred
 
+protocol FeedManagerDelegate {
+    func shouldReload()
+}
+
 class FeedManager: NSObject {
     static let shared = FeedManager()
     private var profile: BrowserProfile?
+    
+    var delegate: FeedManagerDelegate?
     
     var isEnabled = false
     
@@ -64,7 +70,8 @@ class FeedManager: NSObject {
                                                         description: item.description ?? "",
                                                         contentType: item.contentType ?? "",
                                                         publisherId: item.publisherId ?? "",
-                                                        publisherName: item.publisherName ?? "").value
+                                                        publisherName: item.publisherName ?? "",
+                                                        publisherLogo: item.publisherLogo ?? "").value
             
             if data?.isFailure == true {
                 debugPrint(item)
@@ -107,5 +114,51 @@ class FeedManager: NSObject {
     
     func getMore() {
         feed?.compose()
+    }
+    
+    func getOne() -> FeedItem? {
+        return feed?.getOne()
+    }
+}
+
+extension FeedManager: UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return isEnabled ? feedCount() : 0
+    }
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 1
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "FeedCell", for: indexPath) as UITableViewCell
+        let item: FeedRow = feedItems()[indexPath.row]
+        (cell as? FeedCell)?.setData(data: item)
+        (cell as? FeedCell)?.delegate = self
+        return cell
+    }
+    
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        let countBefore = feedCount()
+        if indexPath.row == countBefore - 5 {
+            getMore()
+            DispatchQueue.main.async {
+                if self.feedCount() > countBefore {
+                    tableView.reloadData()
+                }
+            }
+        }
+    }
+}
+
+extension FeedManager: FeedCellDelegate {
+    func shouldRemoveContent(id: Int) {
+        profile?.feed.remove(id)
+    }
+    
+    func shouldRemovePublisherContent(publisherId: String) {
+        profile?.feed.remove(publisherId)
+        feed?.reset()
+        delegate?.shouldReload()
     }
 }

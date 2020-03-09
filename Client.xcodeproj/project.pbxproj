@@ -596,14 +596,12 @@
 		5C90586524101E660015F7B9 /* FeedCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C90586424101E660015F7B9 /* FeedCell.swift */; };
 		5C90586824103FF80015F7B9 /* SQLiteFeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C90586724103FF80015F7B9 /* SQLiteFeed.swift */; };
 		5C90586B241040450015F7B9 /* Feed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C90586A241040450015F7B9 /* Feed.swift */; };
-		5CB4932F241159CF000D8440 /* FeedSponsorData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB4932E241159CF000D8440 /* FeedSponsorData.swift */; };
 		5CB4933124116B9C000D8440 /* TestSQLiteFeed.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CB4933024116B9C000D8440 /* TestSQLiteFeed.m */; };
 		5CB4933324116BC5000D8440 /* TestFeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB4933224116BC5000D8440 /* TestFeed.swift */; };
 		5CB493352411B117000D8440 /* FeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB493342411B117000D8440 /* FeedView.swift */; };
 		5CF1F9BB241220A900D16A84 /* Kingfisher.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CF1F9BA241220A900D16A84 /* Kingfisher.framework */; };
 		5CF1F9BC241220AA00D16A84 /* Kingfisher.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 5CF1F9BA241220A900D16A84 /* Kingfisher.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5CF1F9BE2412E6BE00D16A84 /* FeedComposer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CF1F9BD2412E6BE00D16A84 /* FeedComposer.swift */; };
-		5CF1F9C02414BC5100D16A84 /* iOSDevCenters+GIF.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CF1F9BF2414BC5100D16A84 /* iOSDevCenters+GIF.swift */; };
 		5CF1F9C22415982700D16A84 /* FeedMediaLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CF1F9C12415982700D16A84 /* FeedMediaLoader.swift */; };
 		5D1DC51C20AC9AFB00905E5A /* Data.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1DC51320AC9AF900905E5A /* Data.framework */; };
 		5D1DC52520AC9AFB00905E5A /* Data.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D1DC51520AC9AFA00905E5A /* Data.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -2064,14 +2062,15 @@
 		5C90586424101E660015F7B9 /* FeedCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedCell.swift; sourceTree = "<group>"; };
 		5C90586724103FF80015F7B9 /* SQLiteFeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SQLiteFeed.swift; sourceTree = "<group>"; };
 		5C90586A241040450015F7B9 /* Feed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Feed.swift; sourceTree = "<group>"; };
-		5CB4932E241159CF000D8440 /* FeedSponsorData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedSponsorData.swift; sourceTree = "<group>"; };
 		5CB4933024116B9C000D8440 /* TestSQLiteFeed.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestSQLiteFeed.m; sourceTree = "<group>"; };
 		5CB4933224116BC5000D8440 /* TestFeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestFeed.swift; sourceTree = "<group>"; };
 		5CB493342411B117000D8440 /* FeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedView.swift; sourceTree = "<group>"; };
 		5CF1F9BA241220A900D16A84 /* Kingfisher.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Kingfisher.framework; path = Carthage/Build/iOS/Kingfisher.framework; sourceTree = "<group>"; };
 		5CF1F9BD2412E6BE00D16A84 /* FeedComposer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedComposer.swift; sourceTree = "<group>"; };
-		5CF1F9BF2414BC5100D16A84 /* iOSDevCenters+GIF.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "iOSDevCenters+GIF.swift"; sourceTree = "<group>"; };
 		5CF1F9C12415982700D16A84 /* FeedMediaLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedMediaLoader.swift; sourceTree = "<group>"; };
+		5CF1F9C52415B3A000D16A84 /* WebP.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebP.framework; path = ThirdParty/WebP.framework; sourceTree = "<group>"; };
+		5CF1F9C82415BB4400D16A84 /* WebP.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebP.framework; path = Carthage/Build/iOS/WebP.framework; sourceTree = "<group>"; };
+		5CF1F9CB2415BE0100D16A84 /* libwebp.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libwebp.framework; path = Carthage/Build/iOS/libwebp.framework; sourceTree = "<group>"; };
 		5D1DC51320AC9AF900905E5A /* Data.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Data.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5D1DC51520AC9AFA00905E5A /* Data.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Data.h; sourceTree = "<group>"; };
 		5D1DC51620AC9AFA00905E5A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -3955,14 +3954,12 @@
 			isa = PBXGroup;
 			children = (
 				5C1CBEA9240ECE1D009DC11D /* BraveTodayOnboardingPopupView.swift */,
-				5CF1F9BD2412E6BE00D16A84 /* FeedComposer.swift */,
 				5CF1F9C12415982700D16A84 /* FeedMediaLoader.swift */,
 				5C90585C240EFD2B0015F7B9 /* FeedManager.swift */,
+				5CF1F9BD2412E6BE00D16A84 /* FeedComposer.swift */,
 				5CB493342411B117000D8440 /* FeedView.swift */,
 				5C1CBEA7240CDDFA009DC11D /* FeedCardView.swift */,
 				5C90586424101E660015F7B9 /* FeedCell.swift */,
-				5CB4932E241159CF000D8440 /* FeedSponsorData.swift */,
-				5CF1F9BF2414BC5100D16A84 /* iOSDevCenters+GIF.swift */,
 			);
 			path = Feed;
 			sourceTree = "<group>";
@@ -4168,6 +4165,9 @@
 		7B604FC11C496005006EEEC3 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				5CF1F9CB2415BE0100D16A84 /* libwebp.framework */,
+				5CF1F9C52415B3A000D16A84 /* WebP.framework */,
+				5CF1F9C82415BB4400D16A84 /* WebP.framework */,
 				5CF1F9BA241220A900D16A84 /* Kingfisher.framework */,
 				5E8CD8E023D5E3D100548FC0 /* libarchive.2.tbd */,
 				27AC169623834510004BE19C /* UserNotifications.framework */,
@@ -6316,7 +6316,6 @@
 				282DA4731A68C1E700A406E2 /* OpenSearch.swift in Sources */,
 				0A5CBD3423D4677100362CC8 /* NTPLearnMoreViewController.swift in Sources */,
 				5E612A8C234B7FC1007D12B5 /* OnboardingAdsAvailableController.swift in Sources */,
-				5CF1F9C02414BC5100D16A84 /* iOSDevCenters+GIF.swift in Sources */,
 				F35B8D2F1D638408008E3D61 /* SessionRestoreHandler.swift in Sources */,
 				4422D4C621BFFB7600BF1855 /* env_posix.cc in Sources */,
 				E63ED8E11BFD25580097D08E /* LoginListViewController.swift in Sources */,
@@ -6453,7 +6452,6 @@
 				5E612A90234B7FCD007D12B5 /* OnboardingRewardsAgreementView.swift in Sources */,
 				4422D56A21BFFB7F00BF1855 /* simplify.cc in Sources */,
 				5EC594F1232C697200922111 /* OnboardingAdsCountdownView.swift in Sources */,
-				5CB4932F241159CF000D8440 /* FeedSponsorData.swift in Sources */,
 				A134B88A20DA98BB00A581D0 /* ClientPreferences.swift in Sources */,
 				D3BE7B261B054D4400641031 /* main.swift in Sources */,
 				5CF1F9C22415982700D16A84 /* FeedMediaLoader.swift in Sources */,
@@ -9226,6 +9224,7 @@
 					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
 					"$(PROJECT_DIR)/BraveRewards",
+					"$(PROJECT_DIR)/ThirdParty",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -9453,6 +9452,7 @@
 					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
 					"$(PROJECT_DIR)/BraveRewards",
+					"$(PROJECT_DIR)/ThirdParty",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -9743,6 +9743,7 @@
 					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
 					"$(PROJECT_DIR)/BraveRewards",
+					"$(PROJECT_DIR)/ThirdParty",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -9987,6 +9988,7 @@
 					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
 					"$(PROJECT_DIR)/BraveRewards",
+					"$(PROJECT_DIR)/ThirdParty",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",

@@ -22,7 +22,7 @@ class FeedStorageError: MaybeErrorType {
 open class SQLiteFeed {
     let db: BrowserDB
 
-    let allColumns = ["id", "publish_time", "feed_source", "url", "domain", "img", "title", "description", "content_type", "publisher_id", "publisher_name", "session_displayed", "removed", "liked", "unread"].joined(separator: ",")
+    let allColumns = ["id", "publish_time", "feed_source", "url", "domain", "img", "title", "description", "content_type", "publisher_id", "publisher_name", "publisher_logo", "session_displayed", "removed", "liked", "unread"].joined(separator: ",")
 
     required public init(db: BrowserDB) {
         self.db = db
@@ -48,10 +48,10 @@ extension SQLiteFeed: Feed {
         return db.run(sql)
     }
 
-    public func createRecord(publishTime: Timestamp, feedSource: String, url: String, domain: String, img: String, title: String, description: String, contentType: String, publisherId: String, publisherName: String) -> Deferred<Maybe<FeedItem>> {
+    public func createRecord(publishTime: Timestamp, feedSource: String, url: String, domain: String, img: String, title: String, description: String, contentType: String, publisherId: String, publisherName: String, publisherLogo: String) -> Deferred<Maybe<FeedItem>> {
         return db.transaction { connection -> FeedItem in
-            let insertSQL = "INSERT OR REPLACE INTO items (publish_time, feed_source, url, domain, img, title, description, content_type, publisher_id, publisher_name, session_displayed) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-            let insertArgs: Args = [publishTime, feedSource, url, domain, img, title, description, contentType, publisherId, publisherName, ""]
+            let insertSQL = "INSERT OR REPLACE INTO items (publish_time, feed_source, url, domain, img, title, description, content_type, publisher_id, publisher_name, publisher_logo, session_displayed) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+            let insertArgs: Args = [publishTime, feedSource, url, domain, img, title, description, contentType, publisherId, publisherName, publisherLogo, ""]
             let lastInsertedRowID = connection.lastInsertedRowID
 
             try connection.executeChange(insertSQL, withArgs: insertArgs)
@@ -144,26 +144,38 @@ extension SQLiteFeed: Feed {
         }
     }
     
-    public func updateRecord(_ id: Int, read: Bool) -> Deferred<Maybe<FeedItem>> {
-           return db.transaction { connection -> FeedItem in
-               let updateSQL = "UPDATE items SET unread = ? WHERE id = ?"
-               let updateArgs: Args = [!read, id]
+    public func markAsRead(_ id: Int, read: Bool) -> Deferred<Maybe<FeedItem>> {
+       return db.transaction { connection -> FeedItem in
+           let updateSQL = "UPDATE items SET unread = ? WHERE id = ?"
+           let updateArgs: Args = [!read, id]
 
-               try connection.executeChange(updateSQL, withArgs: updateArgs)
+           try connection.executeChange(updateSQL, withArgs: updateArgs)
 
-               let querySQL = "SELECT \(self.allColumns) FROM items WHERE id = ? LIMIT 1"
-               let queryArgs: Args = [id]
+           let querySQL = "SELECT \(self.allColumns) FROM items WHERE id = ? LIMIT 1"
+           let queryArgs: Args = [id]
 
-               let cursor = connection.executeQuery(querySQL, factory: SQLiteFeed.FeedItemFactory, withArgs: queryArgs)
+           let cursor = connection.executeQuery(querySQL, factory: SQLiteFeed.FeedItemFactory, withArgs: queryArgs)
 
-               let items = cursor.asArray()
-               if let item = items.first {
-                   return item
-               } else {
-                   throw FeedStorageError("Unable to get updated FeedItem")
-               }
+           let items = cursor.asArray()
+           if let item = items.first {
+               return item
+           } else {
+               throw FeedStorageError("Unable to get updated FeedItem")
            }
-       }
+        }
+    }
+    
+    public func remove(_ id: Int) -> Success {
+        let sql = "UPDATE items SET removed = 1 WHERE id = ?"
+        let args: Args = [id]
+        return db.run(sql, withArgs: args)
+    }
+    
+    public func remove(_ publisherId: String) -> Success {
+        let sql = "UPDATE items SET removed = 1 WHERE publisher_id = ?"
+        let args: Args = [publisherId]
+        return db.run(sql, withArgs: args)
+    }
 
     fileprivate class func FeedItemFactory(_ row: SDRow) -> FeedItem {
         let id = row["id"] as! Int
@@ -177,10 +189,11 @@ extension SQLiteFeed: Feed {
         let contentType = row["content_type"] as! String
         let publisherId = row["publisher_id"] as! String
         let publisherName = row["publisher_name"] as! String
+        let publisherLogo = row["publisher_logo"] as! String
         let sessionDisplayed = row["session_displayed"] as! String
         let removed = row.getBoolean("removed")
         let liked = row.getBoolean("liked")
         let unread = row.getBoolean("unread")
-        return FeedItem(id: id, publishTime: publishTime, feedSource: feedSource, url: url, domain: domain, img: img, title: title, description: description, contentType: contentType, publisherId: publisherId, publisherName: publisherName, sessionDisplayed: sessionDisplayed, removed: removed, liked: liked, unread: unread)
+        return FeedItem(id: id, publishTime: publishTime, feedSource: feedSource, url: url, domain: domain, img: img, title: title, description: description, contentType: contentType, publisherId: publisherId, publisherName: publisherName, publisherLogo: publisherLogo, sessionDisplayed: sessionDisplayed, removed: removed, liked: liked, unread: unread)
     }
 }

@@ -293,7 +293,9 @@ class HomeViewController: UIViewController, Themeable {
         view.addSubview(feedView)
         
         feedView.delegate = self
-        feedView.dataSource = self
+        feedView.dataSource = FeedManager.shared
+        
+        FeedManager.shared.delegate = self
         
         makeConstraints()
         
@@ -425,7 +427,6 @@ class HomeViewController: UIViewController, Themeable {
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-
 //        // This makes collection view layout to recalculate its cell size.
 //        favoritesCollectionView.collectionViewLayout.invalidateLayout()
 //        favoritesOverflowButton.isHidden = !dataSource.hasOverflow
@@ -797,6 +798,7 @@ class HomeViewController: UIViewController, Themeable {
         
         imageCreditButton.alpha = alphaAt(scrollOffset, distance: 30)
         imageSponsorButton.alpha = alphaAt(scrollOffset, distance: 50)
+        ddgButton.alpha = alphaAt((scrollOffset - 80), distance: 90)
         backgroundViewInfo?.imageView.alpha = max(alphaAt(scrollOffset - view.frame.height / 2, distance: view.frame.height), 0.2) // starts fading 1/2 up and limit
         
         if isLandscape {
@@ -918,33 +920,8 @@ extension HomeViewController: PreferencesObserver {
     }
 }
 
-extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return FeedManager.shared.isEnabled ? FeedManager.shared.feedCount() : 0
-    }
+extension HomeViewController: UITableViewDelegate {
     
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "FeedCell", for: indexPath) as UITableViewCell
-        let item: FeedRow = FeedManager.shared.feedItems()[indexPath.row]
-        (cell as? FeedCell)?.setData(data: item)
-        return cell
-    }
-    
-    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        let countBefore = FeedManager.shared.feedCount()
-        if indexPath.row == countBefore - 5 {
-            FeedManager.shared.getMore()
-            DispatchQueue.main.async {
-                if FeedManager.shared.feedCount() > countBefore {
-                    tableView.reloadData()
-                }
-            }
-        }
-    }
 }
 
 extension HomeViewController: UIScrollViewDelegate {
@@ -952,6 +929,14 @@ extension HomeViewController: UIScrollViewDelegate {
         // Only care about feed scroll position, ignore favorites scrollview
         if scrollView.isDescendant(of: feedView) {
             updateScrollStyling(scrollView.contentOffset.y)
+        }
+    }
+}
+
+extension HomeViewController: FeedManagerDelegate {
+    func shouldReload() {
+        DispatchQueue.main.async {
+            self.feedView.reloadData()
         }
     }
 }

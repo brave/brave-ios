@@ -1,4 +1,5 @@
 github "DaveWoodCom/XCGLogger" "7.0.0"
+github "SDWebImage/libwebp-Xcode" "86c1b5d567ed548da861486b54e1f8f068a3cef7"
 github "Sidetalker/onepassword-app-extension" "68a9d932a6373ca045984fbf4fb9a25aee43284c"
 github "SnapKit/SnapKit" "5.0.1"
 github "SwiftyJSON/SwiftyJSON" "5.0.0"
