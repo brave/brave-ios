@@ -74,16 +74,26 @@ extension SQLiteFeed: Feed {
         }
     }
     
-    public func getRecords(session: String, limit: Int) -> Deferred<Maybe<[FeedItem]>> {
-        let sql = "SELECT \(allColumns) FROM items WHERE session_displayed != ? AND removed = 0 ORDER BY publish_time DESC LIMIT ?"
+    public func getRecords(session: String, limit: Int, requiresImage: Bool) -> Deferred<Maybe<[FeedItem]>> {
+        var sql = ""
+        if requiresImage {
+            sql = "SELECT \(allColumns) FROM items WHERE session_displayed != ? AND removed = 0 AND img > '' ORDER BY publish_time DESC LIMIT ?"
+        } else {
+            sql = "SELECT \(allColumns) FROM items WHERE session_displayed != ? AND removed = 0 ORDER BY publish_time DESC LIMIT ?"
+        }
         let args: Args = [session, limit]
         return db.runQuery(sql, args: args, factory: SQLiteFeed.FeedItemFactory) >>== { cursor in
             return deferMaybe(cursor.asArray())
         }
     }
     
-    public func getRecords(session: String, publisher: String, limit: Int) -> Deferred<Maybe<[FeedItem]>> {
-        let sql = "SELECT \(allColumns) FROM items WHERE session_displayed != ? AND feed_source = ? AND removed = 0 ORDER BY publish_time DESC LIMIT ?"
+    public func getRecords(session: String, publisher: String, limit: Int, requiresImage: Bool) -> Deferred<Maybe<[FeedItem]>> {
+        var sql = ""
+        if requiresImage {
+            sql = "SELECT \(allColumns) FROM items WHERE session_displayed != ? AND publisher_id = ? AND removed = 0 AND img > '' ORDER BY publish_time DESC LIMIT ?"
+        } else {
+            sql = "SELECT \(allColumns) FROM items WHERE session_displayed != ? AND publisher_id = ? AND removed = 0 ORDER BY publish_time DESC LIMIT ?"
+        }
         let args: Args = [session, publisher, limit]
         return db.runQuery(sql, args: args, factory: SQLiteFeed.FeedItemFactory) >>== { cursor in
             return deferMaybe(cursor.asArray())

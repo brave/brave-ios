@@ -19,8 +19,8 @@ public protocol Feed {
     @discardableResult func deleteRecord(_ record: FeedItem) -> Success
     func deleteAllRecords() -> Success
     @discardableResult func createRecord(publishTime: Timestamp, feedSource: String, url: String, domain: String, img: String, title: String, description: String, contentType: String, publisherId: String, publisherName: String, publisherLogo: String) -> Deferred<Maybe<FeedItem>>
-    func getRecords(session: String, limit: Int) -> Deferred<Maybe<[FeedItem]>>
-    func getRecords(session: String, publisher: String, limit: Int) -> Deferred<Maybe<[FeedItem]>>
+    func getRecords(session: String, limit: Int, requiresImage: Bool) -> Deferred<Maybe<[FeedItem]>>
+    func getRecords(session: String, publisher: String, limit: Int, requiresImage: Bool) -> Deferred<Maybe<[FeedItem]>>
     func getRecordWithURL(_ url: String) -> Deferred<Maybe<FeedItem>>
     @discardableResult func updateRecord(_ id: Int, session: String) -> Deferred<Maybe<FeedItem>>
     @discardableResult func updateRecords(_ id: [Int], session: String) -> Deferred<Maybe<FeedItem>>

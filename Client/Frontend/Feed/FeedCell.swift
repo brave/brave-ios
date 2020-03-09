@@ -129,11 +129,6 @@ extension FeedCell: FeedCardViewDelegate {
         guard let data = data, data.cards.count-1 >= cardNumber else { return nil }
         
         let card = data.cards[cardNumber].items
-        for (index, value) in card.enumerated() {
-            if id == value.id {
-                return index
-            }
-        }
-        return nil
+        return card.firstIndex(where: { $0.id == id })
     }
 }

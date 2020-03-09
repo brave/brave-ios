@@ -165,7 +165,11 @@ extension FeedManager: FeedCellDelegate {
     
     func shouldRemovePublisherContent(publisherId: String) {
         profile?.feed.remove(publisherId)
-        feed?.reset()
-        delegate?.shouldReload()
+        // These calls are too destructive to UX
+        // When new pages of content are loaded the same publisher will be excluded.
+        // And all future loads of feed.
+        
+//        feed?.reset()
+//        delegate?.shouldReload()
     }
 }

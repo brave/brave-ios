@@ -121,8 +121,8 @@ class FeedCardView: FeedCardContainerView {
                 
                 self.cardTitleLabel = cardTitleLabel
                 self.cardTitleLabel?.snp.makeConstraints {
-                    $0.top.equalTo(5)
-                    $0.left.right.equalTo(5)
+                    $0.top.equalTo(25)
+                    $0.left.right.equalTo(20)
                 }
             } else {
                 let cardTitleLabel = UILabel()
@@ -194,6 +194,20 @@ class FeedCardView: FeedCardContainerView {
                 $0.top.equalTo(titleLabel.snp.bottom).offset(20)
             }
         }
+        
+        if let logo = data?.specialData?.logo {
+            let imageView = UIImageView()
+            imageView.contentMode = .scaleAspectFit
+            blurView.contentView.addSubview(imageView)
+            
+            self.imageView = imageView
+            self.imageView?.snp.makeConstraints {
+                $0.bottom.equalTo(15)
+                $0.size.equalTo(CGSize(width: 75, height: 46))
+            }
+            
+            loadImage(urlString: logo)
+        }
     }
     
     private func generateVerticalListLayout() {
@@ -229,77 +243,207 @@ class FeedCardView: FeedCardContainerView {
                 $0.height.equalToSuperview().inset(10).multipliedBy(0.33).priority(999)
             }
         }
+        
+        if let logo = data?.specialData?.logo {
+            let imageView = UIImageView()
+            imageView.contentMode = .scaleAspectFit
+            blurView.contentView.addSubview(imageView)
+            
+            self.imageView = imageView
+            self.imageView?.snp.makeConstraints {
+                $0.bottom.equalTo(15)
+                $0.left.equalTo(15)
+                $0.size.equalTo(CGSize(width: 75, height: 46))
+            }
+            
+            loadImage(urlString: logo)
+        }
     }
     
     private func generateVerticalListBrandedLayout() {
-        // TODO: needs work
+        guard let titleLabel = cardTitleLabel else { return }
         
+        var content1 = UIView()
         if let item = data?.items[0] {
-            let contentView = FeedCardContentView(data: item, layout: .horizontal, delegate: self)
+            let contentView = FeedCardContentView(data: item, layout: .horizontal, hidePublisher: true, delegate: self)
+            content1 = contentView
             blurView.contentView.addSubview(contentView)
             
             contentView.snp.makeConstraints {
-                $0.top.equalTo(20)
+                $0.top.equalTo(titleLabel.snp.bottom).offset(15)
                 $0.left.right.equalToSuperview().inset(20)
                 $0.height.equalToSuperview().inset(10).multipliedBy(0.33).priority(999)
             }
         }
         
+        var content2 = UIView()
         if let item = data?.items[1] {
-            let contentView = FeedCardContentView(data: item, layout: .horizontal, delegate: self)
+            let contentView = FeedCardContentView(data: item, layout: .horizontal, hidePublisher: true, delegate: self)
+            content2 = contentView
             blurView.contentView.addSubview(contentView)
             
             contentView.snp.makeConstraints {
-                $0.centerY.equalToSuperview()
+                $0.top.equalTo(content1.snp.bottom).offset(10)
                 $0.left.right.equalToSuperview().inset(20)
                 $0.height.equalToSuperview().inset(10).multipliedBy(0.33).priority(999)
             }
         }
         
         if let item = data?.items[2] {
-            let contentView = FeedCardContentView(data: item, layout: .horizontal, delegate: self)
+            let contentView = FeedCardContentView(data: item, layout: .horizontal, hidePublisher: true, delegate: self)
             blurView.contentView.addSubview(contentView)
             
             contentView.snp.makeConstraints {
-                $0.bottom.equalToSuperview().inset(20)
+                $0.top.equalTo(content2.snp.bottom).offset(10)
                 $0.left.right.equalToSuperview().inset(20)
                 $0.height.equalToSuperview().inset(10).multipliedBy(0.33).priority(999)
             }
+        }
+        
+        if let logo = data?.specialData?.logo {
+            let imageView = UIImageView()
+            imageView.contentMode = .scaleAspectFit
+            blurView.contentView.addSubview(imageView)
+            
+            self.imageView = imageView
+            self.imageView?.snp.makeConstraints {
+                $0.bottom.equalToSuperview().inset(15)
+                $0.left.equalTo(20)
+                $0.size.equalTo(CGSize(width: 90, height: 40))
+            }
+            
+            loadImage(urlString: logo)
         }
     }
     
     private func generateVerticalListNumberedLayout() {
         // TODO: needs work
         
+        if let logo = data?.specialData?.logo {
+            let imageView = UIImageView()
+            imageView.contentMode = .scaleAspectFit
+            blurView.contentView.addSubview(imageView)
+            
+            self.imageView = imageView
+            self.imageView?.snp.makeConstraints {
+                $0.top.equalTo(20)
+                $0.left.equalTo(36)
+                $0.size.equalTo(CGSize(width: 75, height: 46))
+            }
+            
+            loadImage(urlString: logo)
+        } else {
+            let imageView = UIImageView()
+            blurView.contentView.addSubview(imageView)
+            
+            self.imageView = imageView
+            self.imageView?.snp.makeConstraints {
+                $0.top.equalTo(15)
+                $0.size.equalTo(0)
+            }
+        }
+        
+        guard let imageView = self.imageView else { return }
+        
+        var content1 = UIView()
         if let item = data?.items[0] {
-            let contentView = FeedCardContentView(data: item, layout: .horizontal, delegate: self)
-            blurView.contentView.addSubview(contentView)
+            let containerView = UIView()
+            blurView.contentView.addSubview(containerView)
+            content1 = containerView
+            
+            let numberLabel = UILabel()
+            numberLabel.font = UIFont.systemFont(ofSize: 16, weight: .bold)
+            numberLabel.textColor = UIColor.white.withAlphaComponent(0.4)
+            numberLabel.numberOfLines = 1
+            numberLabel.text = "1"
+            containerView.addSubview(numberLabel)
+            
+            let contentView = FeedCardContentView(data: item, layout: .horizontal, hidePublisher: true, delegate: self)
+            containerView.addSubview(contentView)
+            
+            numberLabel.snp.makeConstraints {
+                $0.centerY.equalToSuperview()
+                $0.left.equalTo(0)
+            }
             
             contentView.snp.makeConstraints {
-                $0.top.equalTo(20)
-                $0.left.right.equalToSuperview().inset(20)
+                $0.top.bottom.equalTo(0)
+                $0.left.equalTo(28)
+                $0.right.equalTo(0)
+            }
+            
+            containerView.snp.makeConstraints {
+                $0.top.equalTo(imageView.snp.bottom).offset(10)
+                $0.left.equalToSuperview().offset(23)
+                $0.right.equalToSuperview().inset(10)
                 $0.height.equalToSuperview().inset(10).multipliedBy(0.33).priority(999)
             }
         }
         
+        var content2 = UIView()
         if let item = data?.items[1] {
-            let contentView = FeedCardContentView(data: item, layout: .horizontal, delegate: self)
-            blurView.contentView.addSubview(contentView)
+            let containerView = UIView()
+            blurView.contentView.addSubview(containerView)
+            content2 = containerView
+            
+            let numberLabel = UILabel()
+            numberLabel.font = UIFont.systemFont(ofSize: 16, weight: .bold)
+            numberLabel.textColor = UIColor.white.withAlphaComponent(0.4)
+            numberLabel.numberOfLines = 1
+            numberLabel.text = "2"
+            containerView.addSubview(numberLabel)
+            
+            let contentView = FeedCardContentView(data: item, layout: .horizontal, hidePublisher: true, delegate: self)
+            containerView.addSubview(contentView)
+            
+            numberLabel.snp.makeConstraints {
+                $0.centerY.equalToSuperview()
+                $0.left.equalTo(0)
+            }
             
             contentView.snp.makeConstraints {
-                $0.centerY.equalToSuperview()
-                $0.left.right.equalToSuperview().inset(20)
+                $0.top.bottom.equalTo(0)
+                $0.left.equalTo(28)
+                $0.right.equalTo(0)
+            }
+            
+            containerView.snp.makeConstraints {
+                $0.top.equalTo(content1.snp.bottom).offset(10)
+                $0.left.equalToSuperview().offset(23)
+                $0.right.equalToSuperview().inset(10)
                 $0.height.equalToSuperview().inset(10).multipliedBy(0.33).priority(999)
             }
         }
         
         if let item = data?.items[2] {
-            let contentView = FeedCardContentView(data: item, layout: .horizontal, delegate: self)
-            blurView.contentView.addSubview(contentView)
+            let containerView = UIView()
+            blurView.contentView.addSubview(containerView)
+            
+            let numberLabel = UILabel()
+            numberLabel.font = UIFont.systemFont(ofSize: 16, weight: .bold)
+            numberLabel.textColor = UIColor.white.withAlphaComponent(0.4)
+            numberLabel.numberOfLines = 1
+            numberLabel.text = "3"
+            containerView.addSubview(numberLabel)
+            
+            let contentView = FeedCardContentView(data: item, layout: .horizontal, hidePublisher: true, delegate: self)
+            containerView.addSubview(contentView)
+            
+            numberLabel.snp.makeConstraints {
+                $0.centerY.equalToSuperview()
+                $0.left.equalTo(0)
+            }
             
             contentView.snp.makeConstraints {
-                $0.bottom.equalToSuperview().inset(20)
-                $0.left.right.equalToSuperview().inset(20)
+                $0.top.bottom.equalTo(0)
+                $0.left.equalTo(28)
+                $0.right.equalTo(0)
+            }
+            
+            containerView.snp.makeConstraints {
+                $0.top.equalTo(content2.snp.bottom).offset(10)
+                $0.left.equalToSuperview().offset(23)
+                $0.right.equalToSuperview().inset(10)
                 $0.height.equalToSuperview().inset(10).multipliedBy(0.33).priority(999)
             }
         }
@@ -336,6 +480,20 @@ class FeedCardView: FeedCardContainerView {
         contentView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
+        
+        if let logo = data?.specialData?.logo {
+            let imageView = UIImageView()
+            imageView.contentMode = .scaleAspectFit
+            blurView.contentView.addSubview(imageView)
+            
+            self.imageView = imageView
+            self.imageView?.snp.makeConstraints {
+                $0.center.equalToSuperview()
+                $0.size.equalTo(CGSize(width: 120, height: 80))
+            }
+            
+            loadImage(urlString: logo)
+        }
     }
     
     private func generateAdLargeLayout() {
@@ -346,6 +504,42 @@ class FeedCardView: FeedCardContainerView {
         
         contentView.snp.makeConstraints {
             $0.edges.equalToSuperview()
+        }
+        
+        if let logo = data?.specialData?.logo {
+            let imageView = UIImageView()
+            imageView.contentMode = .scaleAspectFit
+            blurView.contentView.addSubview(imageView)
+
+            self.imageView = imageView
+            self.imageView?.snp.makeConstraints {
+               $0.bottom.equalTo(15)
+               $0.left.equalTo(15)
+               $0.size.equalTo(CGSize(width: 120, height: 80))
+            }
+
+            loadImage(urlString: logo)
+        }
+    }
+    
+    private func loadImage(urlString: String) {
+        guard let imageView = imageView, urlString.isEmpty == false else { return }
+        
+        let url = URL(string: urlString)
+        imageView.kf.indicatorType = .activity
+        imageView.kf.setImage(
+            with: url,
+            placeholder: nil,
+            options: [
+                .transition(.fade(1)),
+                .cacheOriginalImage
+            ]) { result in
+            switch result {
+            case .success(let value):
+                print("Task done for: \(value.source.url?.absoluteString ?? "")")
+            case .failure(let error):
+                print("Job failed: \(error.localizedDescription)")
+            }
         }
     }
     
@@ -495,13 +689,15 @@ class FeedCardContentView: UIView {
     var data: FeedItem!
     var layout: FeedCardContentLayout!
     var delegate: FeedCardContentDelegate?
+    var hidePublisher = false
     
     private var imageView: UIImageView?
     
-    required convenience init(data: FeedItem, layout: FeedCardContentLayout, delegate: FeedCardContentDelegate?) {
+    required convenience init(data: FeedItem, layout: FeedCardContentLayout, hidePublisher: Bool? = false, delegate: FeedCardContentDelegate?) {
         self.init(frame: .zero)
         self.data = data
         self.layout = layout
+        self.hidePublisher = hidePublisher ?? false
         self.delegate = delegate
         
         prepare()
@@ -605,20 +801,34 @@ class FeedCardContentView: UIView {
             $0.left.right.equalToSuperview().inset(20)
         }
         
-        let publisherLabel = UILabel()
-        publisherLabel.font = UIFont.systemFont(ofSize: 13, weight: .bold)
-        publisherLabel.textColor = .white
-        publisherLabel.numberOfLines = 1
-        publisherLabel.text = data.publisherName
-        addSubview(publisherLabel)
-        
-        publisherLabel.snp.makeConstraints {
-            $0.bottom.equalToSuperview().inset(15)
-            $0.left.right.equalToSuperview().inset(20)
-        }
+//        if data.publisherLogo.isEmpty == false {
+//            let imageView = UIImageView()
+//            imageView.contentMode = .scaleAspectFit
+//            addSubview(imageView)
+//
+//            imageView.snp.makeConstraints {
+//                $0.bottom.equalToSuperview().inset(10)
+//                $0.left.equalTo(20)
+//                $0.size.equalTo(CGSize(width: 80, height: 25))
+//            }
+//
+//            loadImage(urlString: data.publisherLogo, imageView: imageView)
+//        } else {
+            let publisherLabel = UILabel()
+            publisherLabel.font = UIFont.systemFont(ofSize: 13, weight: .bold)
+            publisherLabel.textColor = .white
+            publisherLabel.numberOfLines = 1
+            publisherLabel.text = data.publisherName
+            addSubview(publisherLabel)
+            
+            publisherLabel.snp.makeConstraints {
+                $0.bottom.equalToSuperview().inset(15)
+                $0.left.right.equalToSuperview().inset(20)
+            }
+//        }
         
         layoutSubviews()
-        loadImage(urlString: data.img)
+        loadImage(urlString: data.img, imageView: imageView)
     }
     
     private func layoutVerticalSmall() {
@@ -660,20 +870,34 @@ class FeedCardContentView: UIView {
             $0.left.right.equalToSuperview().inset(12)
         }
         
-        let publisherLabel = UILabel()
-        publisherLabel.font = UIFont.systemFont(ofSize: 13, weight: .bold)
-        publisherLabel.textColor = .white
-        publisherLabel.numberOfLines = 1
-        publisherLabel.text = data.publisherName
-        addSubview(publisherLabel)
-        
-        publisherLabel.snp.makeConstraints {
-            $0.bottom.equalToSuperview().inset(12)
-            $0.left.right.equalToSuperview().inset(12)
-        }
+//        if data.publisherLogo.isEmpty == false {
+//            let imageView = UIImageView()
+//            imageView.contentMode = .scaleAspectFit
+//            addSubview(imageView)
+//
+//            imageView.snp.makeConstraints {
+//                $0.bottom.equalToSuperview().inset(15)
+//                $0.left.equalTo(0)
+//                $0.size.equalTo(CGSize(width: 75, height: 46))
+//            }
+//
+//            loadImage(urlString: data.publisherLogo, imageView: imageView)
+//        } else {
+            let publisherLabel = UILabel()
+            publisherLabel.font = UIFont.systemFont(ofSize: 13, weight: .bold)
+            publisherLabel.textColor = .white
+            publisherLabel.numberOfLines = 1
+            publisherLabel.text = data.publisherName
+            addSubview(publisherLabel)
+            
+            publisherLabel.snp.makeConstraints {
+                $0.bottom.equalToSuperview().inset(15)
+                $0.left.right.equalToSuperview().inset(20)
+            }
+//        }
         
         layoutSubviews()
-        loadImage(urlString: data.img)
+        loadImage(urlString: data.img, imageView: imageView)
     }
     
     private func layoutVerticalSmallInset() {
@@ -718,7 +942,7 @@ class FeedCardContentView: UIView {
         }
         
         layoutSubviews()
-        loadImage(urlString: data.img)
+        loadImage(urlString: data.img, imageView: imageView)
     }
     
     private func layoutHorizontal() {
@@ -728,10 +952,11 @@ class FeedCardContentView: UIView {
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = 4
         addSubview(imageView)
-            
+        
         imageView.snp.makeConstraints {
             $0.right.top.bottom.equalTo(0)
-            $0.size.equalTo(98)
+            $0.width.equalTo(data.img.isEmpty ? 0 : 98)
+            $0.height.equalTo(98)
         }
         
         self.imageView = imageView
@@ -750,11 +975,14 @@ class FeedCardContentView: UIView {
         publisherLabel.textColor = .white
         publisherLabel.numberOfLines = 1
         publisherLabel.text = data.publisherName
-        textContainer.addSubview(publisherLabel)
         
-        publisherLabel.snp.makeConstraints {
-            $0.top.equalTo(0)
-            $0.left.right.equalTo(0)
+        if hidePublisher == false {
+            textContainer.addSubview(publisherLabel)
+            
+            publisherLabel.snp.makeConstraints {
+                $0.top.equalTo(0)
+                $0.left.right.equalTo(0)
+            }
         }
         
         let headlineLabel = UILabel()
@@ -766,7 +994,11 @@ class FeedCardContentView: UIView {
         textContainer.addSubview(headlineLabel)
         
         headlineLabel.snp.makeConstraints {
-            $0.top.equalTo(publisherLabel.snp.bottom).offset(6)
+            if hidePublisher == false {
+                $0.top.equalTo(publisherLabel.snp.bottom).offset(6)
+            } else {
+                $0.top.equalTo(0)
+            }
             $0.left.right.equalTo(0)
         }
         
@@ -785,7 +1017,7 @@ class FeedCardContentView: UIView {
         layoutSubviews()
         
         if data.img.isEmpty == false {
-            loadImage(urlString: data.img)
+            loadImage(urlString: data.img, imageView: imageView)
         } else {
             imageView.alpha = 0
         }
@@ -806,11 +1038,12 @@ class FeedCardContentView: UIView {
         self.imageView = imageView
         
         layoutSubviews()
-        loadImage(urlString: data.img)
+        loadImage(urlString: data.img, imageView: imageView)
     }
     
-    private func loadImage(urlString: String) {
-        guard let imageView = imageView, urlString.isEmpty == false else { return }
+    // TODO: move to media loader
+    private func loadImage(urlString: String, imageView: UIImageView) {
+        guard urlString.isEmpty == false else { return }
         
         let url = URL(string: urlString)
         
