@@ -39,7 +39,7 @@ enum FeedCardType: CGFloat {
     case verticalList = 390
     case verticalListBranded = 440
     case verticalListNumbered = 420
-    case headlineLarge = 430
+    case headlineLarge = 418
     case headlineSmall = 260
     case adSmall = 140
     case adLarge = 380
