@@ -53,6 +53,9 @@ extension Preferences {
         /// Controls whether or not media auto-plays
         static let mediaAutoPlays = Option<Bool>(key: "general.media-auto-plays", default: false)
         
+        static let isBraveTodayEnabled = Option<Bool>(key: "general.brave-today-enabled", default: false)
+        static let isBraveTodayHidden = Option<Bool>(key: "general.brave-today-hidden", default: false)
+        
         /// Whether or not to show the clipboard bar when the user has a URL in their pasteboard on launch
         ///
         /// Currently unused.

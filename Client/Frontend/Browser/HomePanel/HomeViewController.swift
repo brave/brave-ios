@@ -120,6 +120,8 @@ class HomeViewController: UIViewController, Themeable {
     
     private let ddgLogo = UIImageView(image: #imageLiteral(resourceName: "duckduckgo"))
     
+    private let braveTodayHeader = BraveTodayHeader(frame: .zero)
+    
     private let ddgLabel = UILabel().then {
         $0.numberOfLines = 0
         $0.textColor = BraveUX.greyD
@@ -297,6 +299,9 @@ class HomeViewController: UIViewController, Themeable {
         
         FeedManager.shared.delegate = self
         
+        view.addSubview(braveTodayHeader)
+        braveTodayHeader.alpha = 0
+        
         makeConstraints()
         
         Preferences.NewTabPage.backgroundImages.observe(from: self)
@@ -326,8 +331,7 @@ class HomeViewController: UIViewController, Themeable {
         
         showNTPNotification(for: notificationType)
         
-        // TODO: Remove
-        FeedManager.shared.isEnabled = true
+        FeedManager.shared.isEnabled = Preferences.General.isBraveTodayEnabled.value
         
         if FeedManager.shared.isEnabled && FeedManager.shared.feedCount() == 0 {
             FeedManager.shared.loadFeed() { [weak self] in
@@ -467,24 +471,29 @@ class HomeViewController: UIViewController, Themeable {
                 todayCardView.isHidden = true
             }
             
-            // Peeking loaded content.
-            feedView.contentInset = UIEdgeInsets(top: view.frame.height - 40, left: 0, bottom: 0, right: 0)
-            
             if let state = restoreState {
-                DispatchQueue.main.async {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    // Peeking loaded content.
+                    self.feedView.contentInset = UIEdgeInsets(top: self.view.frame.height - 40, left: 0, bottom: 0, right: 0)
                     self.feedView.setContentOffset(CGPoint(x: 0, y: state.feedScrollPosition), animated: false)
                     self.updateScrollStyling(state.feedScrollPosition)
                 }
             } else {
-                let startOffset = -(feedView.frame.height - 30)
-                feedView.setContentOffset(CGPoint(x: 0, y: startOffset), animated: false)
-                updateScrollStyling(startOffset)
+                // Peeking loaded content.
+                feedView.contentInset = UIEdgeInsets(top: view.frame.height - 40, left: 0, bottom: 0, right: 0)
+                feedView.setContentOffset(CGPoint(x: 0, y: -(feedView.frame.height - 30)), animated: false)
+                updateScrollStyling(-(feedView.frame.height - 30))
             }
         }
     }
     
     // MARK: - Constraints setup
     fileprivate func makeConstraints() {
+        braveTodayHeader.snp.makeConstraints {
+            $0.top.left.right.equalToSuperview()
+            $0.height.equalTo(47)
+        }
+        
         ddgLogo.snp.makeConstraints { make in
             make.top.left.greaterThanOrEqualTo(UI.ddgButtonPadding)
             make.centerY.equalToSuperview()
@@ -636,6 +645,7 @@ class HomeViewController: UIViewController, Themeable {
     fileprivate func showBraveTodayOnboarding() {
         todayOnboarding.completionHandler = { completed in
             if completed {
+                Preferences.General.isBraveTodayEnabled.value = true
                 FeedManager.shared.isEnabled = true
                 FeedManager.shared.loadFeed() { [weak self] in
                     DispatchQueue.main.async {
@@ -799,7 +809,8 @@ class HomeViewController: UIViewController, Themeable {
         imageCreditButton.alpha = alphaAt(scrollOffset, distance: 30)
         imageSponsorButton.alpha = alphaAt(scrollOffset, distance: 50)
         ddgButton.alpha = alphaAt((scrollOffset - 80), distance: 90)
-        backgroundViewInfo?.imageView.alpha = max(alphaAt(scrollOffset - view.frame.height / 2, distance: view.frame.height), 0.2) // starts fading 1/2 up and limit
+        backgroundViewInfo?.imageView.alpha = max(alphaAt(scrollOffset - view.frame.height / 2, distance: view.frame.height), 0.6) // starts fading 1/2 up and limit
+        braveTodayHeader.alpha = min((scrollOffset - (view.frame.height - 45)) / 60, 1)
         
         if isLandscape {
             favoritesCollectionView.alpha = alphaAt(scrollOffset, distance: view.frame.height / 4)

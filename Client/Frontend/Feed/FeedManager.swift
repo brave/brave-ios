@@ -41,15 +41,24 @@ class FeedManager: NSObject {
         requestFeedData { [weak self] data in
             guard let data = data else { return }
             self?.saveFeedData(data: data)
-            self?.feed?.compose()
-            completion()
+            self?.feed?.compose() {
+                completion()
+            }
         }
     }
     
     private func saveFeedData(data: [FeedData]) {
         func dateFromStringConverter(date: String) -> Date? {
             let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ssZ"
+            dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss+00:00"
+            return dateFormatter.date(from: date)
+        }
+        
+        // First format may fail since some dates are weird and have milliseconds in string.
+        // Basically a fallback Parse. We're working on standardizing these in the meantime.
+        func dateFromStringWithMillisecondsConverter(date: String) -> Date? {
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss.S+00:00"
             return dateFormatter.date(from: date)
         }
         
@@ -58,7 +67,10 @@ class FeedManager: NSObject {
             var publishTime: Timestamp = 0
             
             if let dateString = item.publishTime {
-                guard let date = dateFromStringConverter(date: dateString) else { break }
+                guard let date = dateFromStringConverter(date: dateString) ?? dateFromStringWithMillisecondsConverter(date: dateString) else {
+                    debugPrint(dateString)
+                    continue
+                }
                 publishTime = date.toTimestamp()
             }
             
@@ -113,12 +125,12 @@ class FeedManager: NSObject {
         return feed?.items ?? []
     }
     
-    func getMore() {
-        feed?.compose()
+    func getMore(completion: (() -> Void)?) {
+        feed?.compose(completion: completion)
     }
     
-    func getOne() -> FeedItem? {
-        return feed?.getOne()
+    func getOne(publisher: String) -> FeedItem? {
+        return feed?.getOne(publisher: publisher)
     }
 }
 
@@ -142,10 +154,11 @@ extension FeedManager: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         let countBefore = feedCount()
         if indexPath.row == countBefore - 5 {
-            getMore()
-            DispatchQueue.main.async {
-                if self.feedCount() > countBefore {
-                    tableView.reloadData()
+            getMore() {
+                DispatchQueue.main.async {
+                    if self.feedCount() > countBefore {
+                        tableView.reloadData()
+                    }
                 }
             }
         }

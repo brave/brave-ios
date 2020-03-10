@@ -106,14 +106,19 @@ extension FeedCell: FeedCardViewDelegate {
         
         guard let data = data else { return }
         
+        // TODO: Simplify
         if let index = findCardWithId(cardNumber: 0, id: id) {
+            let old = data.cards[0].items[index]
+            
             // Remove from card 1 item, grab new, rebuild cell
-            if let newItem = FeedManager.shared.getOne() {
+            if let newItem = FeedManager.shared.getOne(publisher: old.publisherId) {
                 data.cards[0].items[index] = newItem
             }
         } else if let index = findCardWithId(cardNumber: 1, id: id) {
+            let old = data.cards[0].items[index]
+            
             // Remove card 2 item, grab new, rebuild cell
-            if let newItem = FeedManager.shared.getOne() {
+            if let newItem = FeedManager.shared.getOne(publisher: old.publisherId) {
                 data.cards[1].items[index] = newItem
             }
         }

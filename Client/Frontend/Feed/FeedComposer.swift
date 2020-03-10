@@ -26,11 +26,11 @@ class FeedComposer: NSObject {
     func reset() {
         sessionId = UUID().uuidString
         items = []
-        compose()
+        compose(completion: nil)
     }
     
-    func getOne() -> FeedItem? {
-        guard let feedItem = profile.feed.getRecords(session: sessionId, limit: 1, requiresImage: true).value.successValue?.first else { return nil }
+    func getOne(publisher: String) -> FeedItem? {
+        guard let feedItem = profile.feed.getRecords(session: sessionId, publisher: publisher, limit: 1, requiresImage: false, contentType: .any).value.successValue?.first else { return nil }
         
         let data = profile.feed.updateRecords([feedItem.id], session: sessionId).value
         if data.isFailure == true {
@@ -43,179 +43,284 @@ class FeedComposer: NSObject {
     // Can be called more than once per session
     // Manages to populate the in memory feed layout based on
     // simple filtering. TODO: add more complex filters and layouts
-    func compose() {
-        var tempFeed: [FeedRow] = []
-        var usedIds: [Int] = []
-        
-//        var textOnlyMap: [String: FeedItem] = [:]
-//        var generalMap: [String: FeedItem] = [:]
-        
-        // Get Digg Card
-        if let items = profile.feed.getRecords(session: sessionId, publisher: "digg", limit: 3, requiresImage: false).value.successValue, items.count == 3 {
-            var specialData: FeedCardSpecialData?
-            if let item = items.first, item.publisherLogo.isEmpty == false {
-                specialData = FeedCardSpecialData(title: nil, logo: item.publisherLogo, publisher: item.publisherName)
+    func compose(completion: (() -> Void)?) {
+        DispatchQueue.global().async { [weak self] in
+            guard let sessionId = self?.sessionId else { return }
+            
+            var tempFeed: [FeedRow] = []
+            var usedIds: [Int] = []
+            
+            //
+            //
+            // Get Digg Card
+            
+            if Int.random(in: 0 ... 3) == 1, let items = self?.profile.feed.getRecords(session: sessionId, publisher: "digg", limit: 3, requiresImage: false, contentType: .any).value.successValue, items.count == 3 {
+                var specialData: FeedCardSpecialData?
+                if let item = items.first, item.publisherLogo.isEmpty == false {
+                    specialData = FeedCardSpecialData(title: nil, logo: item.publisherLogo, publisher: item.publisherName)
+                }
+                
+                // Build card
+                let card = FeedCard(type: .verticalListNumbered, items: items, specialData: specialData)
+                tempFeed.append(FeedRow(cards: [card]))
+                
+                // Mark used items with current sessionId
+                for item in items {
+                    usedIds.append(item.id)
+                }
             }
             
-            // Build card
-            let card = FeedCard(type: .verticalListNumbered, items: items, specialData: specialData)
-            tempFeed.append(FeedRow(cards: [card]))
-            
-            // Mark used items with current sessionId
-            for item in items {
-                usedIds.append(item.id)
+            //
+            //
+            // Get Amazon Card
+            if Int.random(in: 0 ... 2) == 1, let items = self?.profile.feed.getRecords(session: sessionId, publisher: "amazon", limit: 3, requiresImage: false, contentType: .product).value.successValue, items.count > 0 {
+                var specialData: FeedCardSpecialData?
+                if let item = items.first, item.publisherLogo.isEmpty == false {
+                    specialData = FeedCardSpecialData(title: "Amazon Deals", logo: item.publisherLogo, publisher: item.publisherName)
+                }
+                
+                // Build card
+                let card = FeedCard(type: .horizontalList, items: items, specialData: specialData)
+                tempFeed.append(FeedRow(cards: [card]))
+                
+                // Mark used items with current sessionId
+                for item in items {
+                    usedIds.append(item.id)
+                }
             }
+            
+            //
+            //
+            // Get New Egg Card
+            if Int.random(in: 0 ... 3) == 1, let items = self?.profile.feed.getRecords(session: sessionId, publisher: "newegg", limit: 3, requiresImage: false, contentType: .product).value.successValue, items.count > 0 {
+                var specialData: FeedCardSpecialData?
+                if let item = items.first, item.publisherLogo.isEmpty == false {
+                    specialData = FeedCardSpecialData(title: "Deals", logo: item.publisherLogo, publisher: item.publisherName)
+                }
+                
+                // Build card
+                let card = FeedCard(type: .horizontalList, items: items, specialData: specialData)
+                tempFeed.append(FeedRow(cards: [card]))
+                
+                // Mark used items with current sessionId
+                for item in items {
+                    usedIds.append(item.id)
+                }
+            }
+            
+            //
+            //
+            // Get BuzzFeed Card
+            if Int.random(in: 0 ... 10) == 9, let items = self?.profile.feed.getRecords(session: sessionId, publisher: "buzzfeed", limit: 3, requiresImage: false, contentType: .article).value.successValue, items.count > 0 {
+                var specialData: FeedCardSpecialData?
+                if let item = items.first, item.publisherLogo.isEmpty == false {
+                    specialData = FeedCardSpecialData(title: "Latest Buzz", logo: item.publisherLogo, publisher: item.publisherName)
+                }
+                
+                // Build card
+                let card = FeedCard(type: .verticalListBranded, items: items, specialData: specialData)
+                tempFeed.append(FeedRow(cards: [card]))
+                
+                // Mark used items with current sessionId
+                for item in items {
+                    usedIds.append(item.id)
+                }
+            }
+            
+            //
+            //
+            // Get Technology Labeled Card
+            if Int.random(in: 0 ... 3) == 1, let items = self?.profile.feed.getRecords(session: sessionId, publisher: "mashable", limit: 3, requiresImage: false, contentType: .article).value.successValue, items.count > 0 {
+                var specialData: FeedCardSpecialData?
+                if let item = items.first, item.publisherLogo.isEmpty == false {
+                    specialData = FeedCardSpecialData(title: "Technology", logo: item.publisherLogo, publisher: item.publisherName)
+                }
+                
+                // Build card
+                let card = FeedCard(type: .verticalListBranded, items: items, specialData: specialData)
+                tempFeed.append(FeedRow(cards: [card]))
+                
+                // Mark used items with current sessionId
+                for item in items {
+                    usedIds.append(item.id)
+                }
+            }
+            
+            //
+            //
+            // Get Science Labeled Card
+            if Int.random(in: 0 ... 6) == 1, let items = self?.profile.feed.getRecords(session: sessionId, publisher: "popsci", limit: 3, requiresImage: false, contentType: .article).value.successValue, items.count > 0 {
+                var specialData: FeedCardSpecialData?
+                if let item = items.first, item.publisherLogo.isEmpty == false {
+                    specialData = FeedCardSpecialData(title: nil, logo: item.publisherLogo, publisher: item.publisherName)
+                }
+                
+                // Build card
+                let card = FeedCard(type: .verticalListNumbered, items: items, specialData: specialData)
+                tempFeed.append(FeedRow(cards: [card]))
+                
+                // Mark used items with current sessionId
+                for item in items {
+                    usedIds.append(item.id)
+                }
+            }
+            
+            //
+            //
+            // Get Science Labeled Card
+            if Int.random(in: 0 ... 3) == 1, let items = self?.profile.feed.getRecords(session: sessionId, publisher: "wired", limit: 3, requiresImage: false, contentType: .article).value.successValue, items.count > 0 {
+                var specialData: FeedCardSpecialData?
+                if let item = items.first, item.publisherLogo.isEmpty == false {
+                    specialData = FeedCardSpecialData(title: "Wired News", logo: item.publisherLogo, publisher: item.publisherName)
+                }
+                
+                // Build card
+                let card = FeedCard(type: .verticalListBranded, items: items, specialData: specialData)
+                tempFeed.append(FeedRow(cards: [card]))
+                
+                // Mark used items with current sessionId
+                for item in items {
+                    usedIds.append(item.id)
+                }
+            }
+            
+            //
+            //
+            // End of publisher specific cards.
+            // Need to update rows so we don't pull the same data again further down.
+            _ = self?.profile.feed.updateRecords(usedIds, session: sessionId).value
+            usedIds = []
+            
+            //
+            //
+            // Get Small Headline Rows
+            if let items = self?.profile.feed.getRecords(session: sessionId, limit: 8, requiresImage: true, contentType: .article).value.successValue {
+                var i = 0
+                while i < items.count {
+                    let item = items[i]
+                    usedIds.append(item.id)
+        
+                    let card = FeedCard(type: .headlineSmall, items: [item], specialData: nil)
+                    var cards: [FeedCard] = [card]
+        
+                    if i + 1 < items.count {
+                        i = i + 1
+        
+                        let item = items[i]
+                        let card = FeedCard(type: .headlineSmall, items: [item], specialData: nil)
+                        cards.append(card)
+                        usedIds.append(item.id)
+                    }
+        
+                    let feedRow = FeedRow(cards: cards)
+        
+                    tempFeed.append(feedRow)
+                    i = i + 1
+                }
+                
+                // Need to update rows so we don't pull the same data again further down.
+                _ = self?.profile.feed.updateRecords(usedIds, session: sessionId).value
+                usedIds = []
+            }
+            
+            //
+            //
+            // Get Large Headline Cards
+            if let items = self?.profile.feed.getRecords(session: sessionId, limit: 4, requiresImage: true, contentType: .article).value.successValue {
+                for i in 0..<items.count {
+                    let item = items[i]
+                    let card = FeedCard(type: .headlineLarge, items: [item], specialData: nil)
+                    let feedRow = FeedRow(cards: [card])
+
+                    tempFeed.append(feedRow)
+                    usedIds.append(item.id)
+                }
+                
+                // Need to update rows so we don't pull the same data again further down.
+                _ = self?.profile.feed.updateRecords(usedIds, session: sessionId).value
+                usedIds = []
+            }
+            
+            //
+            //
+            // Get mixed news in vertical lists -- these should contain images since we could fallback to headline cards.
+            if Int.random(in: 0 ... 2) == 1, let items = self?.profile.feed.getRecords(session: sessionId, limit: 3, requiresImage: true, contentType: .article).value.successValue {
+                var i = 0
+                while i < items.count {
+                    if i + 2 < items.count {
+                        let card = FeedCard(type: .verticalList, items: [items[i], items[i+1], items[i+2]], specialData: nil)
+                        let feedRow = FeedRow(cards: [card])
+
+                        tempFeed.append(feedRow)
+
+                        usedIds.append(items[i].id)
+                        usedIds.append(items[i+1].id)
+                        usedIds.append(items[i+2].id)
+
+                        i = i + 3
+                    } else if i + 1 < items.count {
+                        // Fallback to 2 small cards if only 2 left.
+                        let item = items[i]
+                        usedIds.append(item.id)
+
+                        let card = FeedCard(type: .headlineSmall, items: [item], specialData: nil)
+                        var cards: [FeedCard] = [card]
+
+                        if i + 1 < items.count {
+                            i = i + 1
+
+                            let item = items[i]
+                            let card = FeedCard(type: .headlineSmall, items: [item], specialData: nil)
+                            cards.append(card)
+                            usedIds.append(item.id)
+                        }
+
+                        let feedRow = FeedRow(cards: cards)
+
+                        tempFeed.append(feedRow)
+                        i = i + 1
+                    } else {
+                        // Fallback to large headline if 1 left
+                        let item = items[i]
+                        let card = FeedCard(type: .headlineLarge, items: [item], specialData: nil)
+                        let feedRow = FeedRow(cards: [card])
+
+                        tempFeed.append(feedRow)
+                        usedIds.append(item.id)
+
+                        i = i + 1
+                    }
+                }
+                
+                // Need to update rows so we don't pull the same data again further down.
+                _ = self?.profile.feed.updateRecords(usedIds, session: sessionId).value
+                usedIds = []
+            }
+            
+            //
+            //
+            // Get sponsored lists
+            
+            //
+            //
+            // Now suffle the list
+            tempFeed.shuffle()
+            
+            //
+            //
+            // Prepend sponsor banner if feed count is 0
+            
+            //
+            //
+            // Append to feed == all done
+            for row in tempFeed {
+                self?.items.append(row)
+            }
+            
+            //
+            //
+            // All Done.
+            completion?()
         }
-        
-        // Get Amazon Card
-        if let items = profile.feed.getRecords(session: sessionId, publisher: "amazon", limit: 3, requiresImage: true).value.successValue, items.count > 0 {
-            var specialData: FeedCardSpecialData?
-            if let item = items.first, item.publisherLogo.isEmpty == false {
-                specialData = FeedCardSpecialData(title: "Top Deals", logo: item.publisherLogo, publisher: item.publisherName)
-            }
-            
-            // Build card
-            let card = FeedCard(type: .horizontalList, items: items, specialData: specialData)
-            tempFeed.append(FeedRow(cards: [card]))
-            
-            // Mark used items with current sessionId
-            for item in items {
-                usedIds.append(item.id)
-            }
-        }
-        
-        // Get BuzzFeed Card
-        if let items = profile.feed.getRecords(session: sessionId, publisher: "buzzfeed", limit: 3, requiresImage: false).value.successValue, items.count > 0 {
-            var specialData: FeedCardSpecialData?
-            if let item = items.first, item.publisherLogo.isEmpty == false {
-                specialData = FeedCardSpecialData(title: "Latest Buzz", logo: item.publisherLogo, publisher: item.publisherName)
-            }
-            
-            // Build card
-            let card = FeedCard(type: .verticalListBranded, items: items, specialData: specialData)
-            tempFeed.append(FeedRow(cards: [card]))
-            
-            // Mark used items with current sessionId
-            for item in items {
-                usedIds.append(item.id)
-            }
-        }
-        
-        let data = profile.feed.updateRecords(usedIds, session: sessionId).value
-        if data.isFailure == true {
-            debugPrint(data.failureValue ?? "")
-        }
-        
-        // Get Sponsor Banner
-        
-        // Get Top News Labeled Card
-        
-        // Get Featured News
-        
-        // Get Small Headline Rows
-        
-        // Get Large Headline Cards
-        
-        // Get mixed news in vertical lists
-        
-        // Get sponsored lists
-        
-        // Now suffle the list
-        tempFeed.shuffle()
-        
-        // Prepend sponsor banner if feed count is 0
-        
-        // Append to feed == all done
-        for row in tempFeed {
-            items.append(row)
-        }
-        
-        // v0.1 - add all items as large headline types
-//        for i in 0..<feedItems.count {
-//            let item = feedItems[i]
-//            let card = FeedCard(type: .headlineLarge, items: [item], specialData: nil)
-//            let feedRow = FeedRow(cards: [card])
-//
-//            items.append(feedRow)
-//            usedIds.append(item.id)
-//        }
-        
-//        // v0.2 - add all items as small headline types
-//        var i = 0
-//        while i < feedItems.count {
-//            let item = feedItems[i]
-//            usedIds.append(item.id)
-//
-//            let card = TodayCard(type: .headlineSmall, items: [item], sponsorData: nil, mainTitle: "")
-//            var cards: [TodayCard] = [card]
-//
-//            if i + 1 < feedItems.count {
-//                i = i + 1
-//
-//                let item = feedItems[i]
-//                let card = TodayCard(type: .headlineSmall, items: [item], sponsorData: nil, mainTitle: "")
-//                cards.append(card)
-//                usedIds.append(item.id)
-//            }
-//
-//            let feedRow = FeedRow(cards: cards)
-//
-//            items.append(feedRow)
-//            i = i + 1
-//        }
-        
-//        // v0.3 - add all items as horizontal list
-//        var i = 0
-//        while i < feedItems.count {
-//            if i + 2 < feedItems.count {
-//                let card = FeedCard(type: .verticalList, items: [feedItems[i], feedItems[i+1], feedItems[i+2]], specialData: nil)
-//                let feedRow = FeedRow(cards: [card])
-//
-//                items.append(feedRow)
-//
-//                usedIds.append(feedItems[i].id)
-//                usedIds.append(feedItems[i+1].id)
-//                usedIds.append(feedItems[i+2].id)
-//
-//                i = i + 3
-//            } else if i + 1 < feedItems.count {
-//                let item = feedItems[i]
-//                usedIds.append(item.id)
-//
-//                let card = FeedCard(type: .headlineSmall, items: [item], specialData: nil)
-//                var cards: [FeedCard] = [card]
-//
-//                if i + 1 < feedItems.count {
-//                    i = i + 1
-//
-//                    let item = feedItems[i]
-//                    let card = FeedCard(type: .headlineSmall, items: [item], specialData: nil)
-//                    cards.append(card)
-//                    usedIds.append(item.id)
-//                }
-//
-//                let feedRow = FeedRow(cards: cards)
-//
-//                items.append(feedRow)
-//                i = i + 1
-//            } else {
-//                let item = feedItems[i]
-//                let card = FeedCard(type: .headlineLarge, items: [item], specialData: nil)
-//                let feedRow = FeedRow(cards: [card])
-//
-//                items.append(feedRow)
-//                usedIds.append(item.id)
-//
-//                i = i + 1
-//            }
-//        }
-        
-//        // Update all used db records with latest session id
-//        // We should always update the records if loaded into in-memory feed.
-//        // This prevents feed duplicates from appearing.
-//        let data = profile.feed.updateRecords(usedIds, session: sessionId).value
-//        if data.isFailure == true {
-//            debugPrint(data.failureValue ?? "")
-//        }
     }
 }

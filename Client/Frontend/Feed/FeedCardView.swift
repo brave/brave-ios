@@ -18,7 +18,7 @@ class FeedCardContainerView: UIView {
             $0.edges.equalTo(self)
         }
         
-        blurView.contentView.backgroundColor = UIColor.white.withAlphaComponent(0.2)
+        blurView.contentView.backgroundColor = UIColor.white.withAlphaComponent(0.17)
         blurView.layer.masksToBounds = true
     }
     
@@ -36,7 +36,7 @@ class FeedCardContainerView: UIView {
 
 enum FeedCardType: CGFloat {
     case horizontalList = 350
-    case verticalList = 360
+    case verticalList = 390
     case verticalListBranded = 440
     case verticalListNumbered = 420
     case headlineLarge = 410
@@ -202,8 +202,9 @@ class FeedCardView: FeedCardContainerView {
             
             self.imageView = imageView
             self.imageView?.snp.makeConstraints {
-                $0.bottom.equalTo(15)
-                $0.size.equalTo(CGSize(width: 75, height: 46))
+                $0.bottom.equalToSuperview().inset(20)
+                $0.left.equalTo(20)
+                $0.size.equalTo(CGSize(width: 173, height: 20))
             }
             
             loadImage(urlString: logo)
@@ -251,7 +252,7 @@ class FeedCardView: FeedCardContainerView {
             
             self.imageView = imageView
             self.imageView?.snp.makeConstraints {
-                $0.bottom.equalTo(15)
+                $0.bottom.equalTo(20)
                 $0.left.equalTo(15)
                 $0.size.equalTo(CGSize(width: 75, height: 46))
             }
@@ -307,9 +308,9 @@ class FeedCardView: FeedCardContainerView {
             
             self.imageView = imageView
             self.imageView?.snp.makeConstraints {
-                $0.bottom.equalToSuperview().inset(15)
+                $0.bottom.equalToSuperview().inset(20)
                 $0.left.equalTo(20)
-                $0.size.equalTo(CGSize(width: 90, height: 40))
+                $0.size.equalTo(CGSize(width: 173, height: 20))
             }
             
             loadImage(urlString: logo)
@@ -326,9 +327,9 @@ class FeedCardView: FeedCardContainerView {
             
             self.imageView = imageView
             self.imageView?.snp.makeConstraints {
-                $0.top.equalTo(20)
+                $0.top.equalTo(30)
                 $0.left.equalTo(36)
-                $0.size.equalTo(CGSize(width: 75, height: 46))
+                $0.size.equalTo(CGSize(width: 242.2, height: 28))
             }
             
             loadImage(urlString: logo)
@@ -338,7 +339,7 @@ class FeedCardView: FeedCardContainerView {
             
             self.imageView = imageView
             self.imageView?.snp.makeConstraints {
-                $0.top.equalTo(15)
+                $0.top.equalTo(30)
                 $0.size.equalTo(0)
             }
         }
@@ -373,7 +374,7 @@ class FeedCardView: FeedCardContainerView {
             }
             
             containerView.snp.makeConstraints {
-                $0.top.equalTo(imageView.snp.bottom).offset(10)
+                $0.top.equalTo(imageView.snp.bottom).offset(20)
                 $0.left.equalToSuperview().offset(23)
                 $0.right.equalToSuperview().inset(10)
                 $0.height.equalToSuperview().inset(10).multipliedBy(0.33).priority(999)
@@ -647,6 +648,13 @@ extension FeedCardView: FeedCardContentDelegate {
         
         let hideAllPublisherContent = UIAlertAction(title: "Hide All From Publisher", style: .destructive) { alert in
             self.delegate?.shouldRemovePublisherContent(publisherId: view.data.publisherId)
+            
+            switch target {
+            case .card:
+                self.restore(layer: self.layer)
+            case .content:
+                self.restore(layer: view.layer)
+            }
         }
         optionMenu.addAction(hideAllPublisherContent)
         
@@ -801,19 +809,19 @@ class FeedCardContentView: UIView {
             $0.left.right.equalToSuperview().inset(20)
         }
         
-//        if data.publisherLogo.isEmpty == false {
-//            let imageView = UIImageView()
-//            imageView.contentMode = .scaleAspectFit
-//            addSubview(imageView)
-//
-//            imageView.snp.makeConstraints {
-//                $0.bottom.equalToSuperview().inset(10)
-//                $0.left.equalTo(20)
-//                $0.size.equalTo(CGSize(width: 80, height: 25))
-//            }
-//
-//            loadImage(urlString: data.publisherLogo, imageView: imageView)
-//        } else {
+        if data.publisherLogo.isEmpty == false {
+            let imageView = UIImageView()
+            imageView.contentMode = .scaleAspectFit
+            addSubview(imageView)
+
+            imageView.snp.makeConstraints {
+                $0.bottom.equalToSuperview().inset(20)
+                $0.left.equalTo(20)
+                $0.size.equalTo(CGSize(width: 173, height: 20))
+            }
+
+            loadImage(urlString: data.publisherLogo, imageView: imageView)
+        } else {
             let publisherLabel = UILabel()
             publisherLabel.font = UIFont.systemFont(ofSize: 13, weight: .bold)
             publisherLabel.textColor = .white
@@ -825,7 +833,7 @@ class FeedCardContentView: UIView {
                 $0.bottom.equalToSuperview().inset(15)
                 $0.left.right.equalToSuperview().inset(20)
             }
-//        }
+        }
         
         layoutSubviews()
         loadImage(urlString: data.img, imageView: imageView)
@@ -870,19 +878,19 @@ class FeedCardContentView: UIView {
             $0.left.right.equalToSuperview().inset(12)
         }
         
-//        if data.publisherLogo.isEmpty == false {
-//            let imageView = UIImageView()
-//            imageView.contentMode = .scaleAspectFit
-//            addSubview(imageView)
-//
-//            imageView.snp.makeConstraints {
-//                $0.bottom.equalToSuperview().inset(15)
-//                $0.left.equalTo(0)
-//                $0.size.equalTo(CGSize(width: 75, height: 46))
-//            }
-//
-//            loadImage(urlString: data.publisherLogo, imageView: imageView)
-//        } else {
+        if data.publisherLogo.isEmpty == false {
+            let imageView = UIImageView()
+            imageView.contentMode = .scaleAspectFit
+            addSubview(imageView)
+
+            imageView.snp.makeConstraints {
+                $0.bottom.equalToSuperview().inset(15)
+                $0.left.equalTo(12)
+                $0.size.equalTo(CGSize(width: 112.45, height: 13))
+            }
+
+            loadImage(urlString: data.publisherLogo, imageView: imageView)
+        } else {
             let publisherLabel = UILabel()
             publisherLabel.font = UIFont.systemFont(ofSize: 13, weight: .bold)
             publisherLabel.textColor = .white
@@ -892,9 +900,9 @@ class FeedCardContentView: UIView {
             
             publisherLabel.snp.makeConstraints {
                 $0.bottom.equalToSuperview().inset(15)
-                $0.left.right.equalToSuperview().inset(20)
+                $0.left.right.equalToSuperview().inset(12)
             }
-//        }
+        }
         
         layoutSubviews()
         loadImage(urlString: data.img, imageView: imageView)
@@ -986,7 +994,7 @@ class FeedCardContentView: UIView {
         }
         
         let headlineLabel = UILabel()
-        headlineLabel.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
+        headlineLabel.font = UIFont.systemFont(ofSize: hidePublisher ? 16 : 14, weight: .semibold)
         headlineLabel.textColor = .white
         headlineLabel.numberOfLines = 3
         headlineLabel.lineBreakMode = .byTruncatingTail

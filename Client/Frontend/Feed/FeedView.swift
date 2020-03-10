@@ -31,3 +31,42 @@ class FeedView: UITableView {
         fatalError("init(coder:) has not been implemented")
     }
 }
+
+class BraveTodayHeader: UIView {
+    private let blurView: UIVisualEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
+    private let titleLabel: UILabel = UILabel()
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        
+        addSubview(blurView)
+        
+        titleLabel.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
+        titleLabel.textColor = .white
+        titleLabel.numberOfLines = 1
+        titleLabel.text = "Brave Today"
+        addSubview(titleLabel)
+        
+        let line = UIView()
+        line.backgroundColor = UIColor.black.withAlphaComponent(0.9)
+        addSubview(line)
+        
+        blurView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+
+        titleLabel.snp.makeConstraints {
+            $0.left.equalTo(safeAreaLayoutGuide).offset(20)
+            $0.centerY.equalToSuperview()
+        }
+        
+        line.snp.makeConstraints {
+            $0.left.right.bottom.equalToSuperview()
+            $0.height.equalTo(1)
+        }
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}

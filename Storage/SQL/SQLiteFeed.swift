@@ -50,7 +50,7 @@ extension SQLiteFeed: Feed {
 
     public func createRecord(publishTime: Timestamp, feedSource: String, url: String, domain: String, img: String, title: String, description: String, contentType: String, publisherId: String, publisherName: String, publisherLogo: String) -> Deferred<Maybe<FeedItem>> {
         return db.transaction { connection -> FeedItem in
-            let insertSQL = "INSERT OR REPLACE INTO items (publish_time, feed_source, url, domain, img, title, description, content_type, publisher_id, publisher_name, publisher_logo, session_displayed) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+            let insertSQL = "INSERT INTO items (publish_time, feed_source, url, domain, img, title, description, content_type, publisher_id, publisher_name, publisher_logo, session_displayed) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
             let insertArgs: Args = [publishTime, feedSource, url, domain, img, title, description, contentType, publisherId, publisherName, publisherLogo, ""]
             let lastInsertedRowID = connection.lastInsertedRowID
 
@@ -69,31 +69,43 @@ extension SQLiteFeed: Feed {
             if let item = items.first {
                 return item
             } else {
-                throw FeedStorageError("Unable to get inserted ReadingListItem")
+                throw FeedStorageError("Unable to get inserted FeedItem")
             }
         }
     }
     
-    public func getRecords(session: String, limit: Int, requiresImage: Bool) -> Deferred<Maybe<[FeedItem]>> {
-        var sql = ""
+    public func getRecords(session: String, limit: Int, requiresImage: Bool, contentType: FeedContentType) -> Deferred<Maybe<[FeedItem]>> {
+        var sql = "SELECT \(allColumns) FROM items WHERE session_displayed != ? AND removed = 0"
+        
         if requiresImage {
-            sql = "SELECT \(allColumns) FROM items WHERE session_displayed != ? AND removed = 0 AND img > '' ORDER BY publish_time DESC LIMIT ?"
-        } else {
-            sql = "SELECT \(allColumns) FROM items WHERE session_displayed != ? AND removed = 0 ORDER BY publish_time DESC LIMIT ?"
+            sql = sql + " AND img != ''"
         }
+        
+        if contentType != .any {
+            sql = sql + " AND content_type = '\(contentType.rawValue)'"
+        }
+        
+        sql = sql + " ORDER BY publish_time DESC LIMIT ?"
+        
         let args: Args = [session, limit]
         return db.runQuery(sql, args: args, factory: SQLiteFeed.FeedItemFactory) >>== { cursor in
             return deferMaybe(cursor.asArray())
         }
     }
     
-    public func getRecords(session: String, publisher: String, limit: Int, requiresImage: Bool) -> Deferred<Maybe<[FeedItem]>> {
-        var sql = ""
+    public func getRecords(session: String, publisher: String, limit: Int, requiresImage: Bool, contentType: FeedContentType) -> Deferred<Maybe<[FeedItem]>> {
+        var sql = "SELECT \(allColumns) FROM items WHERE session_displayed != ? AND publisher_id = ? AND removed = 0"
+        
         if requiresImage {
-            sql = "SELECT \(allColumns) FROM items WHERE session_displayed != ? AND publisher_id = ? AND removed = 0 AND img > '' ORDER BY publish_time DESC LIMIT ?"
-        } else {
-            sql = "SELECT \(allColumns) FROM items WHERE session_displayed != ? AND publisher_id = ? AND removed = 0 ORDER BY publish_time DESC LIMIT ?"
+            sql = sql + " AND img != ''"
         }
+        
+        if contentType != .any {
+            sql = sql + " AND content_type = '\(contentType.rawValue)'"
+        }
+        
+        sql = sql + " ORDER BY publish_time DESC LIMIT ?"
+        
         let args: Args = [session, publisher, limit]
         return db.runQuery(sql, args: args, factory: SQLiteFeed.FeedItemFactory) >>== { cursor in
             return deferMaybe(cursor.asArray())
