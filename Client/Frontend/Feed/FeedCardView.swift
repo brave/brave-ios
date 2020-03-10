@@ -39,7 +39,7 @@ enum FeedCardType: CGFloat {
     case verticalList = 390
     case verticalListBranded = 440
     case verticalListNumbered = 420
-    case headlineLarge = 410
+    case headlineLarge = 430
     case headlineSmall = 260
     case adSmall = 140
     case adLarge = 380
@@ -978,18 +978,34 @@ class FeedCardContentView: UIView {
             $0.centerY.equalTo(imageView)
         }
         
-        let publisherLabel = UILabel()
-        publisherLabel.font = UIFont.systemFont(ofSize: 13, weight: .bold)
-        publisherLabel.textColor = .white
-        publisherLabel.numberOfLines = 1
-        publisherLabel.text = data.publisherName
-        
-        if hidePublisher == false {
-            textContainer.addSubview(publisherLabel)
+        if data.publisherLogo.isEmpty == false {
+            let imageView = UIImageView()
+            imageView.contentMode = .scaleAspectFit
+            if hidePublisher == false {
+                textContainer.addSubview(imageView)
+                
+                imageView.snp.makeConstraints {
+                    $0.top.equalTo(0)
+                    $0.left.equalTo(0)
+                    $0.size.equalTo(CGSize(width: 112.45, height: 13))
+                }
+                
+                loadImage(urlString: data.publisherLogo, imageView: imageView)
+            }
+        } else {
+            let publisherLabel = UILabel()
+            publisherLabel.font = UIFont.systemFont(ofSize: 13, weight: .bold)
+            publisherLabel.textColor = .white
+            publisherLabel.numberOfLines = 1
+            publisherLabel.text = data.publisherName
             
-            publisherLabel.snp.makeConstraints {
-                $0.top.equalTo(0)
-                $0.left.right.equalTo(0)
+            if hidePublisher == false {
+                textContainer.addSubview(publisherLabel)
+                
+                publisherLabel.snp.makeConstraints {
+                    $0.top.equalTo(0)
+                    $0.left.right.equalTo(0)
+                }
             }
         }
         
@@ -1003,7 +1019,7 @@ class FeedCardContentView: UIView {
         
         headlineLabel.snp.makeConstraints {
             if hidePublisher == false {
-                $0.top.equalTo(publisherLabel.snp.bottom).offset(6)
+                $0.top.equalTo(19)
             } else {
                 $0.top.equalTo(0)
             }
