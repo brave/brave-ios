@@ -603,6 +603,7 @@
 		5CF1F9BC241220AA00D16A84 /* Kingfisher.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 5CF1F9BA241220A900D16A84 /* Kingfisher.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5CF1F9BE2412E6BE00D16A84 /* FeedComposer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CF1F9BD2412E6BE00D16A84 /* FeedComposer.swift */; };
 		5CF1F9C22415982700D16A84 /* FeedMediaLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CF1F9C12415982700D16A84 /* FeedMediaLoader.swift */; };
+		5CF1F9D1241807A400D16A84 /* BraveTodaySourcesPopupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CF1F9D0241807A400D16A84 /* BraveTodaySourcesPopupView.swift */; };
 		5D1DC51C20AC9AFB00905E5A /* Data.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1DC51320AC9AF900905E5A /* Data.framework */; };
 		5D1DC52520AC9AFB00905E5A /* Data.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D1DC51520AC9AFA00905E5A /* Data.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5D1DC52820AC9AFB00905E5A /* Data.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1DC51320AC9AF900905E5A /* Data.framework */; };
@@ -2071,6 +2072,7 @@
 		5CF1F9C52415B3A000D16A84 /* WebP.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebP.framework; path = ThirdParty/WebP.framework; sourceTree = "<group>"; };
 		5CF1F9C82415BB4400D16A84 /* WebP.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebP.framework; path = Carthage/Build/iOS/WebP.framework; sourceTree = "<group>"; };
 		5CF1F9CB2415BE0100D16A84 /* libwebp.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libwebp.framework; path = Carthage/Build/iOS/libwebp.framework; sourceTree = "<group>"; };
+		5CF1F9D0241807A400D16A84 /* BraveTodaySourcesPopupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveTodaySourcesPopupView.swift; sourceTree = "<group>"; };
 		5D1DC51320AC9AF900905E5A /* Data.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Data.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5D1DC51520AC9AFA00905E5A /* Data.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Data.h; sourceTree = "<group>"; };
 		5D1DC51620AC9AFA00905E5A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -3954,6 +3956,7 @@
 			isa = PBXGroup;
 			children = (
 				5C1CBEA9240ECE1D009DC11D /* BraveTodayOnboardingPopupView.swift */,
+				5CF1F9D0241807A400D16A84 /* BraveTodaySourcesPopupView.swift */,
 				5CF1F9C12415982700D16A84 /* FeedMediaLoader.swift */,
 				5C90585C240EFD2B0015F7B9 /* FeedManager.swift */,
 				5CF1F9BD2412E6BE00D16A84 /* FeedComposer.swift */,
@@ -6277,6 +6280,7 @@
 				44331DD622551E15007E3E93 /* ToolbarProtocols.swift in Sources */,
 				0A1E84422190A57F0042F782 /* SyncPairCameraViewController.swift in Sources */,
 				44331DDC22561F34007E3E93 /* ToolbarUrlActionsDelegate.swift in Sources */,
+				5CF1F9D1241807A400D16A84 /* BraveTodaySourcesPopupView.swift in Sources */,
 				4422D43721BFD29E00BF1855 /* NSData+GZIP.m in Sources */,
 				D31CF65C1CC1959A001D0BD0 /* PrivilegedRequest.swift in Sources */,
 				0A764F31230EE5CA003A1D9B /* OnboardingState.swift in Sources */,

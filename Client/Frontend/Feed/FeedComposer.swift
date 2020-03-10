@@ -73,7 +73,7 @@ class FeedComposer: NSObject {
             //
             //
             // Get Amazon Card
-            if Int.random(in: 0 ... 2) == 1, let items = self?.profile.feed.getRecords(session: sessionId, publisher: "amazon", limit: 3, requiresImage: false, contentType: .product).value.successValue, items.count > 0 {
+            if Int.random(in: 0 ... 2) == 1, let items = self?.profile.feed.getRecords(session: sessionId, publisher: "amazon", limit: 3, requiresImage: false, contentType: .product).value.successValue, items.count == 3 {
                 var specialData: FeedCardSpecialData?
                 if let item = items.first, item.publisherLogo.isEmpty == false {
                     specialData = FeedCardSpecialData(title: "Amazon Deals", logo: item.publisherLogo, publisher: item.publisherName)
@@ -92,7 +92,7 @@ class FeedComposer: NSObject {
             //
             //
             // Get New Egg Card
-            if Int.random(in: 0 ... 3) == 1, let items = self?.profile.feed.getRecords(session: sessionId, publisher: "newegg", limit: 3, requiresImage: false, contentType: .product).value.successValue, items.count > 0 {
+            if Int.random(in: 0 ... 3) == 1, let items = self?.profile.feed.getRecords(session: sessionId, publisher: "newegg", limit: 3, requiresImage: false, contentType: .product).value.successValue, items.count == 3 {
                 var specialData: FeedCardSpecialData?
                 if let item = items.first, item.publisherLogo.isEmpty == false {
                     specialData = FeedCardSpecialData(title: "Deals", logo: item.publisherLogo, publisher: item.publisherName)
@@ -111,7 +111,7 @@ class FeedComposer: NSObject {
             //
             //
             // Get BuzzFeed Card
-            if Int.random(in: 0 ... 10) == 9, let items = self?.profile.feed.getRecords(session: sessionId, publisher: "buzzfeed", limit: 3, requiresImage: false, contentType: .article).value.successValue, items.count > 0 {
+            if Int.random(in: 0 ... 10) == 1, let items = self?.profile.feed.getRecords(session: sessionId, publisher: "buzzfeed", limit: 3, requiresImage: false, contentType: .article).value.successValue, items.count == 3 {
                 var specialData: FeedCardSpecialData?
                 if let item = items.first, item.publisherLogo.isEmpty == false {
                     specialData = FeedCardSpecialData(title: "Latest Buzz", logo: item.publisherLogo, publisher: item.publisherName)
@@ -130,7 +130,7 @@ class FeedComposer: NSObject {
             //
             //
             // Get Technology Labeled Card
-            if Int.random(in: 0 ... 3) == 1, let items = self?.profile.feed.getRecords(session: sessionId, publisher: "mashable", limit: 3, requiresImage: false, contentType: .article).value.successValue, items.count > 0 {
+            if Int.random(in: 0 ... 3) == 1, let items = self?.profile.feed.getRecords(session: sessionId, publisher: "mashable", limit: 3, requiresImage: false, contentType: .article).value.successValue, items.count == 3 {
                 var specialData: FeedCardSpecialData?
                 if let item = items.first, item.publisherLogo.isEmpty == false {
                     specialData = FeedCardSpecialData(title: "Technology", logo: item.publisherLogo, publisher: item.publisherName)
@@ -149,7 +149,7 @@ class FeedComposer: NSObject {
             //
             //
             // Get Science Labeled Card
-            if Int.random(in: 0 ... 6) == 1, let items = self?.profile.feed.getRecords(session: sessionId, publisher: "popsci", limit: 3, requiresImage: false, contentType: .article).value.successValue, items.count > 0 {
+            if Int.random(in: 0 ... 6) == 1, let items = self?.profile.feed.getRecords(session: sessionId, publisher: "popsci", limit: 3, requiresImage: false, contentType: .article).value.successValue, items.count == 3 {
                 var specialData: FeedCardSpecialData?
                 if let item = items.first, item.publisherLogo.isEmpty == false {
                     specialData = FeedCardSpecialData(title: nil, logo: item.publisherLogo, publisher: item.publisherName)
@@ -168,7 +168,7 @@ class FeedComposer: NSObject {
             //
             //
             // Get Science Labeled Card
-            if Int.random(in: 0 ... 3) == 1, let items = self?.profile.feed.getRecords(session: sessionId, publisher: "wired", limit: 3, requiresImage: false, contentType: .article).value.successValue, items.count > 0 {
+            if Int.random(in: 0 ... 3) == 1, let items = self?.profile.feed.getRecords(session: sessionId, publisher: "wired", limit: 3, requiresImage: false, contentType: .article).value.successValue, items.count == 3 {
                 var specialData: FeedCardSpecialData?
                 if let item = items.first, item.publisherLogo.isEmpty == false {
                     specialData = FeedCardSpecialData(title: "Wired News", logo: item.publisherLogo, publisher: item.publisherName)
