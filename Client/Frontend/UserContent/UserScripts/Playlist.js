@@ -6,9 +6,10 @@ function notifyNode(node) {
     }
     
     window.webkit.messageHandlers.playlistManager.postMessage({
-                                                                  "title": node.title,
-                                                                  "mediaSource": node.src,
-                                                                  "pageURL": window.location.href
+                                                                  "name": node.title,
+                                                                  "src": node.src,
+                                                                  "pageSrc": window.location.href,
+                                                                  "pageTitle": document.title
                                                                   });
 }
 
@@ -53,7 +54,7 @@ function observePage() {
             observeNode(node);
             notifyNode(node);
         });
-    }, 1000);
+    }, 500);
     
     var timeout = setTimeout(function() {
         clearInterval(interval);
