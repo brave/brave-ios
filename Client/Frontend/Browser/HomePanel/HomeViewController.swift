@@ -958,7 +958,9 @@ extension HomeViewController: BraveTodayHeaderDelegate {
     func didTapSettings() {
         let popup = BraveTodaySourcesPopupView { completed in
             FeedManager.shared.getMore { [weak self] in
-                self?.feedView.reloadData()
+               DispatchQueue.main.async {
+                    self?.feedView.reloadData()
+                }
             }
         }
         popup.showWithType(showType: .normal)
