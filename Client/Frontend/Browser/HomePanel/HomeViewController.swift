@@ -282,7 +282,6 @@ class HomeViewController: UIViewController, Themeable {
         favoritesCollectionView.addSubview(braveShieldStatsView)
         favoritesCollectionView.addSubview(favoritesOverflowButton)
         favoritesCollectionView.addSubview(ddgButton)
-        feedView.addSubview(imageSponsorButton)
         
         ddgButton.addSubview(ddgLogo)
         ddgButton.addSubview(ddgLabel)
@@ -294,6 +293,7 @@ class HomeViewController: UIViewController, Themeable {
         view.addSubview(feedView)
         
         view.addSubview(imageCreditButton)
+        view.addSubview(imageSponsorButton)
         
         feedView.delegate = FeedManager.shared
         feedView.dataSource = FeedManager.shared

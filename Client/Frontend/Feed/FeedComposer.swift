@@ -350,7 +350,7 @@ class FeedComposer: NSObject {
             //
             //
             // Prepend sponsor banner if feed count is 0
-            if self?.items.count == 0 {
+            if self?.items.count == 0 && tempFeed.count > 0 {
                 let item = FeedItem(id: 0, publishTime: 0, feedSource: "billabong.com", url: "https://www.billabong.com/mens/", domain: "billabong.com", img: "https://images.unsplash.com/photo-1529029411565-e04366ee3cc6?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80", title: "Billabong", description: "", contentType: "ad", publisherId: "billabong", publisherName: "Billabong", publisherLogo: "https://logo-logos.com/wp-content/uploads/2016/10/Billabong_logo.png", sessionDisplayed: "", removed: false, liked: false, unread: true)
                 let specialData = FeedCardSpecialData(title: nil, logo: "https://logo-logos.com/wp-content/uploads/2016/10/Billabong_logo.png", publisher: "Billabong")
                 let card = FeedCard(type: .adSmall, items: [item], specialData: specialData)
