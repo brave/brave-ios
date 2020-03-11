@@ -174,7 +174,7 @@ extension BraveTodaySourcesPopupView: PubSourceCellDelegate {
             publishers[index] = PublisherItem(id: data.id, publisherId: data.publisherId, publisherName: data.publisherName, publisherLogo: data.publisherLogo, show: value)
         }
         
-        FeedManager.shared.db?.updatePublisherRecord(data.id, show: value)
+        FeedManager.shared.db?.updatePublisherRecord(data.publisherId, show: value)
     }
 }
 

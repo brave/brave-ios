@@ -39,7 +39,7 @@ public protocol Feed {
     func getAvailablePublisherRecords() -> Deferred<Maybe<[PublisherItem]>>
     func deleteAllPublisherRecords() -> Success
     @discardableResult func createPublishersRecord(publisherId: String, publisherName: String, publisherLogo: String, show: Bool) -> Deferred<Maybe<PublisherItem>>
-    @discardableResult func updatePublisherRecord(_ id: Int, show: Bool) -> Deferred<Maybe<PublisherItem>>
+    @discardableResult func updatePublisherRecord(_ publisherId: String, show: Bool) -> Deferred<Maybe<PublisherItem>>
 }
 
 public struct FeedItem: Equatable {

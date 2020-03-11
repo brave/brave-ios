@@ -261,15 +261,15 @@ extension SQLiteFeed: Feed {
         }
     }
     
-    public func updatePublisherRecord(_ id: Int, show: Bool) -> Deferred<Maybe<PublisherItem>> {
+    public func updatePublisherRecord(_ publisherId: String, show: Bool) -> Deferred<Maybe<PublisherItem>> {
         return db.transaction { connection -> PublisherItem in
-           let updateSQL = "UPDATE sources SET show = ? WHERE id = ?"
-           let updateArgs: Args = [show, id]
+           let updateSQL = "UPDATE sources SET show = ? WHERE publisher_id = ?"
+           let updateArgs: Args = [show, publisherId]
 
            try connection.executeChange(updateSQL, withArgs: updateArgs)
 
-           let querySQL = "SELECT \(self.allPublisherColumns) FROM sources WHERE id = ? LIMIT 1"
-           let queryArgs: Args = [id]
+           let querySQL = "SELECT \(self.allPublisherColumns) FROM sources WHERE publisher_id = ? LIMIT 1"
+           let queryArgs: Args = [publisherId]
 
            let cursor = connection.executeQuery(querySQL, factory: SQLiteFeed.PublisherItemFactory, withArgs: queryArgs)
 

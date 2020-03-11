@@ -217,11 +217,12 @@ extension FeedManager: UIScrollViewDelegate {
 
 extension FeedManager: FeedCellDelegate {
     func shouldRemoveContent(id: Int) {
-        profile?.feed.removeFeedRecord(id)
+        db?.removeFeedRecord(id)
     }
     
     func shouldRemovePublisherContent(publisherId: String) {
-        profile?.feed.removeFeedRecord(publisherId)
+        db?.updatePublisherRecord(publisherId, show: false)
+        
         // These calls are too destructive to UX
         // When new pages of content are loaded the same publisher will be excluded.
         // And all future loads of feed.
