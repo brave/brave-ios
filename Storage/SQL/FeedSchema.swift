@@ -11,7 +11,7 @@ private let AllTables: [String] = ["items"]
 private let log = Logger.syncLogger
 
 open class FeedSchema: Schema {
-    static let DefaultVersion = 1
+    static let DefaultVersion = 2
 
     public var name: String { return "FEED" }
     public var version: Int { return FeedSchema.DefaultVersion }
