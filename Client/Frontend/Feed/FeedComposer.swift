@@ -73,7 +73,7 @@ class FeedComposer: NSObject {
             //
             //
             // Get Amazon Card
-            if Int.random(in: 0 ... 2) == 1, let items = self?.profile.feed.getFeedRecords(session: sessionId, publisher: "amazon", limit: 3, requiresImage: false, contentType: .product).value.successValue, items.count == 3 {
+            if Int.random(in: 0 ... 4) == 1, let items = self?.profile.feed.getFeedRecords(session: sessionId, publisher: "amazon", limit: 3, requiresImage: false, contentType: .product).value.successValue, items.count == 3 {
                 var specialData: FeedCardSpecialData?
                 if let item = items.first, item.publisherLogo.isEmpty == false {
                     specialData = FeedCardSpecialData(title: "Amazon Deals", logo: item.publisherLogo, publisher: item.publisherName)
@@ -305,6 +305,47 @@ class FeedComposer: NSObject {
             //
             // Now suffle the list
             tempFeed.shuffle()
+            
+            //
+            //
+            // Get Amazon Card *** want this one in second ***
+            if let items = self?.profile.feed.getFeedRecords(session: sessionId, publisher: "amazon", limit: 3, requiresImage: false, contentType: .product).value.successValue, items.count == 3 {
+                var specialData: FeedCardSpecialData?
+                if let item = items.first, item.publisherLogo.isEmpty == false {
+                    specialData = FeedCardSpecialData(title: "Amazon Deals", logo: item.publisherLogo, publisher: item.publisherName)
+                }
+                
+                // Build card
+                let card = FeedCard(type: .horizontalList, items: items, specialData: specialData)
+                tempFeed.insert(FeedRow(cards: [card]), at: 0)
+                
+                // Mark used items with current sessionId
+                for item in items {
+                    usedIds.append(item.id)
+                }
+                
+                // Need to update rows so we don't pull the same data again further down.
+                _ = self?.profile.feed.updateFeedRecords(usedIds, session: sessionId).value
+                usedIds = []
+            }
+            
+            //
+            //
+            // Get Large Headline Cards  *** want this one in first ***
+            if let items = self?.profile.feed.getFeedRecords(session: sessionId, limit: 1, requiresImage: true, contentType: .article).value.successValue {
+                for i in 0..<items.count {
+                    let item = items[i]
+                    let card = FeedCard(type: .headlineLarge, items: [item], specialData: nil)
+                    let feedRow = FeedRow(cards: [card])
+
+                    tempFeed.insert(feedRow, at: 0)
+                    usedIds.append(item.id)
+                }
+                
+                // Need to update rows so we don't pull the same data again further down.
+                _ = self?.profile.feed.updateFeedRecords(usedIds, session: sessionId).value
+                usedIds = []
+            }
             
             //
             //

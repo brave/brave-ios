@@ -338,7 +338,10 @@ class HomeViewController: UIViewController, Themeable {
         if FeedManager.shared.isEnabled && FeedManager.shared.feedCount() == 0 {
             FeedManager.shared.loadFeed() { [weak self] in
                 DispatchQueue.main.async {
-                    self?.todayCardView.isHidden = true
+                    if FeedManager.shared.feedCount() > 0 {
+                        self?.todayCardView.isHidden = true
+                    }
+                    
                     self?.feedView.reloadData()
                     
                     // Adjust insets to allow for table scroll
@@ -619,7 +622,9 @@ class HomeViewController: UIViewController, Themeable {
     }
     
     @objc func handleTodayTapGesture(gesture: UITapGestureRecognizer) {
-        guard FeedManager.shared.isEnabled == false else { return }
+        if FeedManager.shared.isEnabled && FeedManager.shared.feedCount() > 0 {
+            return
+        }
         
         showBraveTodayOnboarding()
     }
@@ -642,22 +647,27 @@ class HomeViewController: UIViewController, Themeable {
     }
     
     fileprivate func showBraveTodayOnboarding() {
-        todayOnboarding.completionHandler = { completed in
-            if completed {
-                Preferences.General.isBraveTodayEnabled.value = true
-                FeedManager.shared.isEnabled = true
-                FeedManager.shared.loadFeed() { [weak self] in
-                    DispatchQueue.main.async {
-                        self?.todayCardView.isHidden = true
-                        self?.feedView.reloadData()
-                        
-                        // Adjust insets to allow for table scroll
-                        self?.updateConstraints()
+        if FeedManager.shared.isEnabled == true {
+            // It's possible that the user disabled all feed sources. This is a way back in.
+            didTapSettings()
+        } else {
+            todayOnboarding.completionHandler = { completed in
+                if completed {
+                    Preferences.General.isBraveTodayEnabled.value = true
+                    FeedManager.shared.isEnabled = true
+                    FeedManager.shared.loadFeed() { [weak self] in
+                        DispatchQueue.main.async {
+                            self?.todayCardView.isHidden = true
+                            self?.feedView.reloadData()
+                            
+                            // Adjust insets to allow for table scroll
+                            self?.updateConstraints()
+                        }
                     }
                 }
             }
+            todayOnboarding.showWithType(showType: .normal)
         }
-        todayOnboarding.showWithType(showType: .normal)
     }
     
     @objc fileprivate func showImageCredit() {
@@ -947,8 +957,9 @@ extension HomeViewController: FeedManagerDelegate {
 extension HomeViewController: BraveTodayHeaderDelegate {
     func didTapSettings() {
         let popup = BraveTodaySourcesPopupView { completed in
-            // Refresh feed
-            
+            FeedManager.shared.getMore { [weak self] in
+                self?.feedView.reloadData()
+            }
         }
         popup.showWithType(showType: .normal)
     }
