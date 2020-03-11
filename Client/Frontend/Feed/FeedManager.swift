@@ -14,7 +14,7 @@ protocol FeedManagerDelegate {
 
 class FeedManager: NSObject {
     static let shared = FeedManager()
-    private var profile: BrowserProfile?
+    private (set) var profile: BrowserProfile?
     
     var delegate: FeedManagerDelegate?
     
@@ -26,6 +26,10 @@ class FeedManager: NSObject {
         super.init()
     }
     
+    var db: Feed? {
+        return profile?.feed
+    }
+    
     func register(profile: BrowserProfile?) {
         self.profile = profile
         
@@ -34,15 +38,19 @@ class FeedManager: NSObject {
     }
     
     func clearAll() {
-        _ = profile?.feed.deleteAllRecords()
+        _ = profile?.feed.deleteAllFeedRecords()
     }
     
     func loadFeed(completion: @escaping () -> Void) {
         requestFeedData { [weak self] data in
             guard let data = data else { return }
             self?.saveFeedData(data: data)
-            self?.feed?.compose() {
-                completion()
+            self?.requestPublishers() { completed in
+                if completed {
+                    self?.feed?.compose() {
+                        completion()
+                    }
+                }
             }
         }
     }
@@ -74,17 +82,17 @@ class FeedManager: NSObject {
                 publishTime = date.toTimestamp()
             }
             
-            let data = self.profile?.feed.createRecord(publishTime: publishTime,
-                                                        feedSource: item.feedSource ?? "",
-                                                        url: item.url ?? "",
-                                                        domain: item.domain ?? "",
-                                                        img: item.img ?? "",
-                                                        title: item.title ?? "",
-                                                        description: item.description ?? "",
-                                                        contentType: item.contentType ?? "",
-                                                        publisherId: item.publisherId ?? "",
-                                                        publisherName: item.publisherName ?? "",
-                                                        publisherLogo: item.publisherLogo ?? "").value
+            let data = self.profile?.feed.createFeedRecord(publishTime: publishTime,
+                                                           feedSource: item.feedSource ?? "",
+                                                           url: item.url ?? "",
+                                                           domain: item.domain ?? "",
+                                                           img: item.img ?? "",
+                                                           title: item.title ?? "",
+                                                           description: item.description ?? "",
+                                                           contentType: item.contentType ?? "",
+                                                           publisherId: item.publisherId ?? "",
+                                                           publisherName: item.publisherName ?? "",
+                                                           publisherLogo: item.publisherLogo ?? "").value
             
             if data?.isFailure == true {
                 debugPrint(item)
@@ -113,6 +121,42 @@ class FeedManager: NSObject {
                 completion(feed)
             } catch {
                 print(error.localizedDescription)
+            }
+        }.resume()
+    }
+    
+    private func requestPublishers(completion: @escaping (Bool) -> Void) {
+        guard let url = URL(string: "http://sjc.rapidpacket.com/~xtat/bt/sources.json") else { return }
+        
+        var request = URLRequest(url: url)
+        request.addValue("gzip", forHTTPHeaderField: "Accept-Encoding")
+        
+        let session = URLSession.shared
+
+        session.dataTask(with: request) {data, response, error in
+            if error != nil {
+                print(error!.localizedDescription)
+                return
+            }
+
+            guard let data = data else { return }
+            do {
+                let publishers = try JSONDecoder().decode([PublisherData].self, from: data)
+                
+                for publisher in publishers {
+                    let result = FeedManager.shared.db?.createPublishersRecord(publisherId: publisher.publisherId ?? "", publisherName: publisher.publisherName ?? "", publisherLogo: publisher.publisherLogo ?? "", show: publisher.show ?? false).value
+
+                    if result?.isFailure == true {
+                        debugPrint(publisher)
+                        debugPrint(result?.failureValue ?? "")
+                    }
+                }
+                
+                completion(true)
+            } catch {
+                print(error.localizedDescription)
+                
+                completion(false)
             }
         }.resume()
     }
@@ -173,11 +217,11 @@ extension FeedManager: UIScrollViewDelegate {
 
 extension FeedManager: FeedCellDelegate {
     func shouldRemoveContent(id: Int) {
-        profile?.feed.remove(id)
+        profile?.feed.removeFeedRecord(id)
     }
     
     func shouldRemovePublisherContent(publisherId: String) {
-        profile?.feed.remove(publisherId)
+        profile?.feed.removeFeedRecord(publisherId)
         // These calls are too destructive to UX
         // When new pages of content are loaded the same publisher will be excluded.
         // And all future loads of feed.

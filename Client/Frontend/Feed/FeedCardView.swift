@@ -38,7 +38,7 @@ enum FeedCardType: CGFloat {
     case horizontalList = 350
     case verticalList = 390
     case verticalListBranded = 440
-    case verticalListNumbered = 420
+    case verticalListNumbered = 375
     case headlineLarge = 418
     case headlineSmall = 260
     case adSmall = 140
@@ -377,7 +377,7 @@ class FeedCardView: FeedCardContainerView {
                 $0.top.equalTo(imageView.snp.bottom).offset(20)
                 $0.left.equalToSuperview().offset(23)
                 $0.right.equalToSuperview().inset(10)
-                $0.height.equalToSuperview().inset(10).multipliedBy(0.33).priority(999)
+                $0.height.equalToSuperview().inset(10).multipliedBy(0.28).priority(999)
             }
         }
         
@@ -412,7 +412,7 @@ class FeedCardView: FeedCardContainerView {
                 $0.top.equalTo(content1.snp.bottom).offset(10)
                 $0.left.equalToSuperview().offset(23)
                 $0.right.equalToSuperview().inset(10)
-                $0.height.equalToSuperview().inset(10).multipliedBy(0.33).priority(999)
+                $0.height.equalToSuperview().inset(10).multipliedBy(0.28).priority(999)
             }
         }
         
@@ -445,7 +445,7 @@ class FeedCardView: FeedCardContainerView {
                 $0.top.equalTo(content2.snp.bottom).offset(10)
                 $0.left.equalToSuperview().offset(23)
                 $0.right.equalToSuperview().inset(10)
-                $0.height.equalToSuperview().inset(10).multipliedBy(0.33).priority(999)
+                $0.height.equalToSuperview().inset(10).multipliedBy(0.28).priority(999)
             }
         }
     }
@@ -646,7 +646,7 @@ extension FeedCardView: FeedCardContentDelegate {
         }
         optionMenu.addAction(hideContent)
         
-        let hideAllPublisherContent = UIAlertAction(title: "Hide All From Publisher", style: .destructive) { alert in
+        let hideAllPublisherContent = UIAlertAction(title: "Block \(view.data.publisherName) Content", style: .destructive) { alert in
             self.delegate?.shouldRemovePublisherContent(publisherId: view.data.publisherId)
             
             switch target {

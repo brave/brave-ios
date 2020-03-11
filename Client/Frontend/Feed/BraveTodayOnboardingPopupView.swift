@@ -35,7 +35,7 @@ class BraveTodayOnboardingStep1View: UIView {
         messageLabel.textColor = .white
         messageLabel.textAlignment = .center
         messageLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        messageLabel.text = "New content, taylored privately to your interests, delivered daily."
+        messageLabel.text = "New content, tailored privately to your interests, updated every hour."
         messageLabel.numberOfLines = 0
         messageLabel.adjustsFontSizeToFitWidth = false
         addSubview(messageLabel)
@@ -117,6 +117,8 @@ class BraveTodayOnboardingPopupView: PopupView {
         
         if #available(iOS 13.0, *) {
             dialogView.effect = UIBlurEffect(style: .systemThinMaterialDark)
+        } else {
+            dialogView.effect = UIBlurEffect(style: .dark)
         }
         
         addButton(title: "Continue", type: .primary, fontSize: 16) { () -> PopupViewDismissType in

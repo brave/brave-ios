@@ -21,18 +21,25 @@ public enum FeedContentType: String {
 }
 
 public protocol Feed {
-    func getAvailableRecords() -> Deferred<Maybe<[FeedItem]>>
-    @discardableResult func deleteRecord(_ record: FeedItem) -> Success
-    func deleteAllRecords() -> Success
-    @discardableResult func createRecord(publishTime: Timestamp, feedSource: String, url: String, domain: String, img: String, title: String, description: String, contentType: String, publisherId: String, publisherName: String, publisherLogo: String) -> Deferred<Maybe<FeedItem>>
-    func getRecords(session: String, limit: Int, requiresImage: Bool, contentType: FeedContentType) -> Deferred<Maybe<[FeedItem]>>
-    func getRecords(session: String, publisher: String, limit: Int, requiresImage: Bool, contentType: FeedContentType) -> Deferred<Maybe<[FeedItem]>>
-    func getRecordWithURL(_ url: String) -> Deferred<Maybe<FeedItem>>
-    @discardableResult func updateRecord(_ id: Int, session: String) -> Deferred<Maybe<FeedItem>>
-    @discardableResult func updateRecords(_ id: [Int], session: String) -> Deferred<Maybe<FeedItem>>
-    @discardableResult func markAsRead(_ id: Int, read: Bool) -> Deferred<Maybe<FeedItem>>
-    @discardableResult func remove(_ id: Int) -> Success
-    @discardableResult func remove(_ publisherId: String) -> Success
+    // Feed Records
+    func getAvailableFeedRecords() -> Deferred<Maybe<[FeedItem]>>
+    @discardableResult func deleteFeedRecord(_ record: FeedItem) -> Success
+    func deleteAllFeedRecords() -> Success
+    @discardableResult func createFeedRecord(publishTime: Timestamp, feedSource: String, url: String, domain: String, img: String, title: String, description: String, contentType: String, publisherId: String, publisherName: String, publisherLogo: String) -> Deferred<Maybe<FeedItem>>
+    func getFeedRecords(session: String, limit: Int, requiresImage: Bool, contentType: FeedContentType) -> Deferred<Maybe<[FeedItem]>>
+    func getFeedRecords(session: String, publisher: String, limit: Int, requiresImage: Bool, contentType: FeedContentType) -> Deferred<Maybe<[FeedItem]>>
+    func getFeedRecordWithURL(_ url: String) -> Deferred<Maybe<FeedItem>>
+    @discardableResult func updateFeedRecord(_ id: Int, session: String) -> Deferred<Maybe<FeedItem>>
+    @discardableResult func updateFeedRecords(_ id: [Int], session: String) -> Deferred<Maybe<FeedItem>>
+    @discardableResult func markFeedRecordAsRead(_ id: Int, read: Bool) -> Deferred<Maybe<FeedItem>>
+    @discardableResult func removeFeedRecord(_ id: Int) -> Success
+    @discardableResult func removeFeedRecord(_ publisherId: String) -> Success
+    
+    // Publisher Records
+    func getAvailablePublisherRecords() -> Deferred<Maybe<[PublisherItem]>>
+    func deleteAllPublisherRecords() -> Success
+    @discardableResult func createPublishersRecord(publisherId: String, publisherName: String, publisherLogo: String, show: Bool) -> Deferred<Maybe<PublisherItem>>
+    @discardableResult func updatePublisherRecord(_ id: Int, show: Bool) -> Deferred<Maybe<PublisherItem>>
 }
 
 public struct FeedItem: Equatable {
@@ -119,4 +126,43 @@ public func ==(lhs: FeedItem, rhs: FeedItem) -> Bool {
         && lhs.removed == rhs.removed
         && lhs.liked == rhs.liked
         && lhs.unread == rhs.unread
+}
+
+public struct PublisherItem: Equatable {
+    public let id: Int
+    public let publisherId: String
+    public let publisherName: String
+    public let publisherLogo: String
+    public let show: Bool
+
+    /// Initializer for when a record is loaded from a database row
+    public init(id: Int = 0, publisherId: String, publisherName: String, publisherLogo: String, show: Bool = true) {
+        self.id = id
+        self.publisherId = publisherId
+        self.publisherName = publisherName
+        self.publisherLogo = publisherLogo
+        self.show = show
+    }
+}
+
+public struct PublisherData: Decodable {
+    public let publisherId: String?
+    public let publisherName: String?
+    public let publisherLogo: String?
+    public let show: Bool?
+    
+    enum CodingKeys: String, CodingKey {
+        case publisherId = "publisher_id"
+        case publisherName = "publisher_name"
+        case publisherLogo = "publisher_logo"
+        case show = "default"
+    }
+}
+
+public func ==(lhs: PublisherItem, rhs: PublisherItem) -> Bool {
+    return lhs.id == rhs.id
+        && lhs.publisherId == rhs.publisherId
+        && lhs.publisherName == rhs.publisherName
+        && lhs.publisherLogo == rhs.publisherLogo
+        && lhs.show == rhs.show
 }

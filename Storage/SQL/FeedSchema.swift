@@ -40,9 +40,19 @@ open class FeedSchema: Schema {
             unread INTEGER NOT NULL DEFAULT (1)
         )
         """
+    
+    let sourcesTableCreate = """
+        CREATE TABLE IF NOT EXISTS sources (
+            id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+            publisher_id TEXT NOT NULL UNIQUE,
+            publisher_name TEXT NOT NULL,
+            publisher_logo TEXT NOT NULL,
+            show INTEGER NOT NULL DEFAULT (0)
+        )
+        """
 
     public func create(_ db: SQLiteDBConnection) -> Bool {
-        return self.run(db, queries: [itemsTableCreate])
+        return self.run(db, queries: [itemsTableCreate, sourcesTableCreate])
     }
 
     public func update(_ db: SQLiteDBConnection, from: Int) -> Bool {
@@ -54,7 +64,7 @@ open class FeedSchema: Schema {
 
         if from < 1 && to >= 1 {
             log.debug("Updating Feed database schema from \(from) to \(to).")
-            return self.run(db, queries: [itemsTableCreate])
+            return self.run(db, queries: [itemsTableCreate, sourcesTableCreate])
         }
 
         log.debug("Dropping and re-creating Feed database schema from \(from) to \(to).")

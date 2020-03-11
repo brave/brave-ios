@@ -282,7 +282,6 @@ class HomeViewController: UIViewController, Themeable {
         favoritesCollectionView.addSubview(braveShieldStatsView)
         favoritesCollectionView.addSubview(favoritesOverflowButton)
         favoritesCollectionView.addSubview(ddgButton)
-        feedView.addSubview(imageCreditButton)
         feedView.addSubview(imageSponsorButton)
         
         ddgButton.addSubview(ddgLogo)
@@ -294,6 +293,8 @@ class HomeViewController: UIViewController, Themeable {
         
         view.addSubview(feedView)
         
+        view.addSubview(imageCreditButton)
+        
         feedView.delegate = FeedManager.shared
         feedView.dataSource = FeedManager.shared
         
@@ -301,6 +302,7 @@ class HomeViewController: UIViewController, Themeable {
         
         view.addSubview(braveTodayHeader)
         braveTodayHeader.alpha = 0
+        braveTodayHeader.delegate = self
         
         makeConstraints()
         
@@ -472,12 +474,9 @@ class HomeViewController: UIViewController, Themeable {
             }
             
             if let state = restoreState {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    // Peeking loaded content.
-                    self.feedView.contentInset = UIEdgeInsets(top: self.view.frame.height - 40, left: 0, bottom: 0, right: 0)
-                    self.feedView.setContentOffset(CGPoint(x: 0, y: state.feedScrollPosition), animated: false)
-                    self.updateScrollStyling(state.feedScrollPosition)
-                }
+                feedView.contentInset = UIEdgeInsets(top: self.view.frame.height - 40, left: 0, bottom: 0, right: 0)
+                feedView.setContentOffset(CGPoint(x: 0, y: state.feedScrollPosition), animated: false)
+                updateScrollStyling(state.feedScrollPosition)
             } else {
                 // Peeking loaded content.
                 feedView.contentInset = UIEdgeInsets(top: view.frame.height - 40, left: 0, bottom: 0, right: 0)
@@ -942,5 +941,15 @@ extension HomeViewController: FeedManagerDelegate {
         if scrollView.isDescendant(of: feedView) {
             updateScrollStyling(scrollView.contentOffset.y)
         }
+    }
+}
+
+extension HomeViewController: BraveTodayHeaderDelegate {
+    func didTapSettings() {
+        let popup = BraveTodaySourcesPopupView { completed in
+            // Refresh feed
+            
+        }
+        popup.showWithType(showType: .normal)
     }
 }

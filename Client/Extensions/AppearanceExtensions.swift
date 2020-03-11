@@ -38,6 +38,8 @@ extension Theme {
         // Be careful adjusting colors here, and make sure impact is well known
         UITableView.appearance().appearanceBackgroundColor = tablePrimaryColor
         FeedView.appearance().appearanceBackgroundColor = .clear
+        UITableView.appearance(whenContainedInInstancesOf: [BraveTodaySourcesPopupView.self]).appearanceBackgroundColor = .clear
+        
         UITableView.appearance().appearanceSeparatorColor = colors.border.withAlphaComponent(colors.transparencies.borderAlpha)
         
         UITableViewCell.appearance().tintColor = colors.accent
