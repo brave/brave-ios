@@ -964,7 +964,7 @@ class FeedCardContentView: UIView {
         imageView.snp.makeConstraints {
             $0.right.top.bottom.equalTo(0)
             $0.width.equalTo(data.img.isEmpty ? 0 : 98)
-            $0.height.equalTo(98)
+            $0.height.equalTo(data.img.isEmpty ? 80 : 98)
         }
         
         self.imageView = imageView
@@ -975,7 +975,7 @@ class FeedCardContentView: UIView {
         textContainer.snp.makeConstraints {
             $0.left.equalTo(0)
             $0.right.equalTo(imageView.snp.left).inset(-20)
-            $0.centerY.equalTo(imageView)
+            $0.centerY.equalToSuperview()
         }
         
         if data.publisherLogo.isEmpty == false {
