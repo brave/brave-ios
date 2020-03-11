@@ -600,7 +600,6 @@
 		5CB4933324116BC5000D8440 /* TestFeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB4933224116BC5000D8440 /* TestFeed.swift */; };
 		5CB493352411B117000D8440 /* FeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB493342411B117000D8440 /* FeedView.swift */; };
 		5CF1F9BB241220A900D16A84 /* Kingfisher.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CF1F9BA241220A900D16A84 /* Kingfisher.framework */; };
-		5CF1F9BC241220AA00D16A84 /* Kingfisher.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 5CF1F9BA241220A900D16A84 /* Kingfisher.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5CF1F9BE2412E6BE00D16A84 /* FeedComposer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CF1F9BD2412E6BE00D16A84 /* FeedComposer.swift */; };
 		5CF1F9C22415982700D16A84 /* FeedMediaLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CF1F9C12415982700D16A84 /* FeedMediaLoader.swift */; };
 		5CF1F9D1241807A400D16A84 /* BraveTodaySourcesPopupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CF1F9D0241807A400D16A84 /* BraveTodaySourcesPopupView.swift */; };
@@ -1230,7 +1229,6 @@
 				E60138661C89EB7D00DF9756 /* Storage.framework in Copy Frameworks */,
 				5DE7689A20B3456E00FF5533 /* BraveShared.framework in Copy Frameworks */,
 				271DEC2F234CC760009DAC37 /* BraveRewardsUI.framework in Copy Frameworks */,
-				5CF1F9BC241220AA00D16A84 /* Kingfisher.framework in Copy Frameworks */,
 				E60138651C89EB7600DF9756 /* Shared.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
@@ -5751,6 +5749,7 @@
 				"$(SRCROOT)/Carthage/Build/iOS/OnePasswordExtension.framework",
 				"$(SRCROOT)/BraveRewards/BraveRewards.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/Lottie.framework",
+				"$(SRCROOT)/Carthage/Build/iOS/Kingfisher.framework",
 			);
 			name = "Copy Carthage Dependencies";
 			outputPaths = (
