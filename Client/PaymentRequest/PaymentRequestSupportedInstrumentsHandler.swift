@@ -3,7 +3,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 struct SupportedInstrumentsData: Decodable {
     let supportedNetworks: [String]
-    let supportedTypes: [String]
+    let supportedTypes: [String]?
 }
 struct PaymentRequestSupportedInstrumentsHandler: Decodable {
     let supportedMethods: String

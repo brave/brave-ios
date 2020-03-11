@@ -30,16 +30,13 @@ extension PaymentRequestExtension: TabContentScript {
     
     func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage) {
         if message.name == "PaymentRequest", let body = message.body as? NSDictionary {
-            guard let name = body["name"] as? String, let supportedInstruments = body["supportedInstruments"] as? String, let details = body["details"] as? String else {
-                return
-            }
-            if name == "payment-request-show" {
-                do {
-                    popup.clearDisplayItems()
-                    popup.removeAllButtons()
-                    popup.addTotalLabel(message: "")
+            do {
+                let messageData = try JSONSerialization.data(withJSONObject: body, options: [])
+                let body = try JSONDecoder().decode(PaymentRequestBodyHandler.self, from: messageData)
+                if body.name == "payment-request-show" {
+                    popup.initPaymentUI()
                     
-                    guard let detailsData = details.data(using: String.Encoding.utf8), let supportedInstrumentsData = supportedInstruments.data(using: String.Encoding.utf8) else {
+                    guard let detailsData = body.details.data(using: String.Encoding.utf8), let supportedInstrumentsData = body.supportedInstruments.data(using: String.Encoding.utf8) else {
                         log.error("Error parsing data")
                         return
                     }
@@ -70,35 +67,46 @@ extension PaymentRequestExtension: TabContentScript {
                                   "methodName": "bat",
                                   "details": {
                                     "transaction_id": "bcbbd947-346d-439f-96b4-101bbd966675",
-                                    "message": "Payment for Brave T-Shirt!"
+                                    "message": "Payment for Ethiopian Coffee!"
                                   }
                                 }
                             """
                             
-                            ensureMainThread {
-                               
+                            ensureMainThread {                               
                                 let trimmed = self.response.removingNewlines()
-                                self.tab?.webView?.evaluateJavaScript("paymentreq_postCreate('\(trimmed)')", completionHandler: { _, error in
+                                self.tab?.webView?.evaluateJavaScript("paymentreq_postCreate('\(trimmed)', false)", completionHandler: { _, error in
                                     if error != nil {
                                         log.error(error)
                                     }
-                            }) }
+                                    })
+                            }
                         }
-                        
                         
                         return .flyDown
                     }
                     
-                    popup.addButton(title: Strings.paymentRequestCancel) { () -> PopupViewDismissType in
+                    popup.addButton(title: Strings.paymentRequestCancel) { [weak self] in
+                        guard let self = self else {
+                            return .flyDown
+                        }
+                        
+                        ensureMainThread {
+                            self.tab?.webView?.evaluateJavaScript("paymentreq_postCreate('', true)", completionHandler: { _, error in
+                                    if error != nil {
+                                        log.error(error)
+                                    }
+                                })
+                        }
+                        
                         return .flyDown
                     }
                     
                     log.info("Success!")
-                } catch {
-                    log.info(error)
                 }
-                popup.showWithType(showType: .flyUp)
+            } catch {
+                log.info(error)
             }
+            popup.showWithType(showType: .flyUp)
         }
     }
 }

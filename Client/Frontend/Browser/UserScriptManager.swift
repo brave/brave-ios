@@ -37,11 +37,20 @@ class UserScriptManager {
         }
     }
     
-    init(tab: Tab, isFingerprintingProtectionEnabled: Bool, isCookieBlockingEnabled: Bool, isU2FEnabled: Bool) {
+    // Whether or not the PaymentRequest APIs should be exposed
+    var isPaymentRequestEnabled: Bool {
+        didSet {
+            if oldValue == isPaymentRequestEnabled { return }
+            reloadUserScripts()
+        }
+    }
+    
+    init(tab: Tab, isFingerprintingProtectionEnabled: Bool, isCookieBlockingEnabled: Bool, isU2FEnabled: Bool, isPaymentRequestEnabled: Bool) {
         self.tab = tab
         self.isFingerprintingProtectionEnabled = isFingerprintingProtectionEnabled
         self.isCookieBlockingEnabled = isCookieBlockingEnabled
         self.isU2FEnabled = isU2FEnabled
+        self.isPaymentRequestEnabled = isPaymentRequestEnabled
         reloadUserScripts()
     }
     
@@ -109,7 +118,6 @@ class UserScriptManager {
     // PaymentRequestUserScript is injected at document start to handle
     // requests to payment APIs
     private let PaymentRequestUserScript: WKUserScript? = {
-        log.error("Loading PaymentRequestUserScript")
         guard let path = Bundle.main.path(forResource: "PaymentRequest", ofType: "js"), let source = try? String(contentsOfFile: path) else {
             log.error("Failed to load PaymentRequest.js")
             return nil
@@ -219,7 +227,7 @@ class UserScriptManager {
                 $0.addUserScript(script)
             }
             
-            if let script = PaymentRequestUserScript {
+            if isPaymentRequestEnabled, let script = PaymentRequestUserScript {
                 $0.addUserScript(script)
             }
         }

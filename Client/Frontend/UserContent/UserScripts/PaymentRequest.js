@@ -3,8 +3,18 @@ paymentreq_resolve = {}
 
 Object.defineProperty(window, 'paymentreq_postCreate', {
   value:
-    function (response) {
+    function (response, error) {
+                      if (error) {
+                      paymentreq_reject('Error!');
+                      }
       paymentreq_resolve(response)
+    }
+})
+
+Object.defineProperty(window, 'paymentreq_log', {
+  value:
+    function (log) {
+      console.log(log)
     }
 })
 

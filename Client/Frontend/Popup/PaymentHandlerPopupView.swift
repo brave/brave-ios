@@ -42,7 +42,7 @@ class PaymentHandlerPopupView: PopupView {
             dialogImage = imageView
         }
         
-        titleLabel = UILabel(frame: CGRect.zero)
+        titleLabel = UILabel()
         titleLabel.textColor = BraveUX.greyJ
         titleLabel.textAlignment = .center
         titleLabel.font = UIFont.systemFont(ofSize: titleSize, weight: titleWeight)
@@ -53,7 +53,7 @@ class PaymentHandlerPopupView: PopupView {
         messageLabel = UILabel(frame: CGRect.zero)
         messageLabel.textColor = BraveUX.greyH
         messageLabel.textAlignment = .center
-        messageLabel.font = UIFont.systemFont(ofSize: 15, weight: UIFont.Weight.regular)
+        messageLabel.font = UIFont.systemFont(ofSize: 15)
         messageLabel.text = message
         messageLabel.numberOfLines = 0
         containerView.addSubview(messageLabel)
@@ -126,7 +126,16 @@ class PaymentHandlerPopupView: PopupView {
         updateSubviews()
     }
     
+    func initPaymentUI() {
+        clearDisplayItems()
+        totalItem.removeFromSuperview()
+        removeAllButtons()
+    }
+    
     func clearDisplayItems() {
+        for element in displayItems {
+            element.removeFromSuperview()
+        }
         displayItems.removeAll()
     }
     
@@ -138,16 +147,13 @@ class PaymentHandlerPopupView: PopupView {
         textField?.text = nil
     }
     
+    func updateFontAdjustments(adjustsFontSizeToFitWidth: Bool) {
+        let labels = [titleLabel, messageLabel, displayItemTitle, totalItemTitle] + displayItems
+        labels.forEach({ $0?.adjustsFontSizeToFitWidth = adjustsFontSizeToFitWidth })
+    }
+    
     func updateSubviews() {
-        titleLabel.adjustsFontSizeToFitWidth = false
-        messageLabel.adjustsFontSizeToFitWidth = false
-        displayItemTitle.adjustsFontSizeToFitWidth = false
-        totalItemTitle.adjustsFontSizeToFitWidth = false
-        
-        for label in displayItems {
-            label.adjustsFontSizeToFitWidth = false
-        }
-
+        updateFontAdjustments(adjustsFontSizeToFitWidth: false)
         updateSubviews(resizePercentage: 1.0)
         
         let paddingHeight = padding * 3.0
@@ -156,13 +162,7 @@ class PaymentHandlerPopupView: PopupView {
         
         if containerView.frame.height > desiredHeight {
             let resizePercentage = desiredHeight / containerView.frame.height
-            titleLabel.adjustsFontSizeToFitWidth = true
-            messageLabel.adjustsFontSizeToFitWidth = true
-            displayItemTitle.adjustsFontSizeToFitWidth = true
-            totalItemTitle.adjustsFontSizeToFitWidth = true
-            for label in displayItems {
-                label.adjustsFontSizeToFitWidth = true
-            }
+            updateFontAdjustments(adjustsFontSizeToFitWidth: true)
             updateSubviews(resizePercentage: resizePercentage)
         }
         
@@ -184,7 +184,7 @@ class PaymentHandlerPopupView: PopupView {
             dialogImage.frame = imageFrame
         }
         
-        var titleLabelSize: CGSize = titleLabel.sizeThatFits(CGSize(width: width - kPadding * 3.0, height: CGFloat.greatestFiniteMagnitude))
+        var titleLabelSize: CGSize = titleLabel.sizeThatFits(CGSize(width: width - kPadding * 3.0, height: .greatestFiniteMagnitude))
         titleLabelSize.height = titleLabelSize.height * resizePercentage
         var titleLabelFrame: CGRect = titleLabel.frame
         titleLabelFrame.size = titleLabelSize

@@ -1248,6 +1248,7 @@ class BrowserViewController: UIViewController {
                 break
             }
             tab.userScriptManager?.isU2FEnabled = webView.hasOnlySecureContent
+            tab.userScriptManager?.isPaymentRequestEnabled = webView.hasOnlySecureContent
             if tab.contentIsSecure && !webView.hasOnlySecureContent {
                 tab.contentIsSecure = false
             }

@@ -972,6 +972,7 @@
 		F930CDD12270F09000A23FE1 /* WebAuthnAuthenticateRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F930CDD02270F09000A23FE1 /* WebAuthnAuthenticateRequest.swift */; };
 		F930CDD72270F14300A23FE1 /* WebAuthnUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = F930CDD62270F14300A23FE1 /* WebAuthnUtils.swift */; };
 		F939FBFE22A596B900D9CD3F /* U2FTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F939FBFD22A596B900D9CD3F /* U2FTests.swift */; };
+		F9616E6B240EE43F00667C2D /* PaymentRequestBodyHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9616E6A240EE43F00667C2D /* PaymentRequestBodyHandler.swift */; };
 		F98E1EA122B6D70E0018AF29 /* libYubiKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AC8E23A22A6C56D0064F3FA /* libYubiKit.a */; };
 		F99505FF22937E3900CC6543 /* U2F-low-level.js in Resources */ = {isa = PBXBuildFile; fileRef = F99505FE22937E3900CC6543 /* U2F-low-level.js */; };
 		F9B23EE223F61173000EB3D8 /* PaymentRequest.js in Resources */ = {isa = PBXBuildFile; fileRef = F9B23EE123F61173000EB3D8 /* PaymentRequest.js */; };
@@ -2467,6 +2468,7 @@
 		F930CDD02270F09000A23FE1 /* WebAuthnAuthenticateRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebAuthnAuthenticateRequest.swift; sourceTree = "<group>"; };
 		F930CDD62270F14300A23FE1 /* WebAuthnUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebAuthnUtils.swift; sourceTree = "<group>"; };
 		F939FBFD22A596B900D9CD3F /* U2FTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = U2FTests.swift; sourceTree = "<group>"; };
+		F9616E6A240EE43F00667C2D /* PaymentRequestBodyHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentRequestBodyHandler.swift; sourceTree = "<group>"; };
 		F99505FE22937E3900CC6543 /* U2F-low-level.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "U2F-low-level.js"; sourceTree = "<group>"; };
 		F9B23EE123F61173000EB3D8 /* PaymentRequest.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = PaymentRequest.js; sourceTree = "<group>"; };
 		F9B23EE423F613E8000EB3D8 /* PaymentRequestExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentRequestExtension.swift; sourceTree = "<group>"; };
@@ -4902,6 +4904,7 @@
 				F9B23EE423F613E8000EB3D8 /* PaymentRequestExtension.swift */,
 				F9B23EE823F73FB2000EB3D8 /* PaymentRequestDetailsHandler.swift */,
 				F9B23EEA23F74AF8000EB3D8 /* PaymentRequestSupportedInstrumentsHandler.swift */,
+				F9616E6A240EE43F00667C2D /* PaymentRequestBodyHandler.swift */,
 			);
 			path = PaymentRequest;
 			sourceTree = "<group>";
@@ -6437,6 +6440,7 @@
 				0A8C6993225BC7B100988715 /* ToolbarUrlActionsProtocol.swift in Sources */,
 				A1CDF22B20BDD6B8005C6E58 /* POPExtensions.swift in Sources */,
 				0AFC8F9523D1DF6500941895 /* TranslucentBottomSheet.swift in Sources */,
+				F9616E6B240EE43F00667C2D /* PaymentRequestBodyHandler.swift in Sources */,
 				E68E7ADA1CAC207400FDCA76 /* ChangePasscodeViewController.swift in Sources */,
 				E640E85E1C73A45A00C5F072 /* PasscodeEntryViewController.swift in Sources */,
 				4422D4BF21BFFB7600BF1855 /* logging.cc in Sources */,

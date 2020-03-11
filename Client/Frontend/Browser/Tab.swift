@@ -77,7 +77,6 @@ class Tab: NSObject {
     var mimeType: String?
     var isEditing: Bool = false
     var shouldClassifyLoadsForAds = true
-    var rewards: BraveRewards?
     var publisher: PublisherInfo?
  
     // When viewing a non-HTML content type in the webview (like a PDF document), this URL will
@@ -86,6 +85,13 @@ class Tab: NSObject {
 
     fileprivate var _noImageMode = false
 
+    var rewards: BraveRewards? {
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+            return nil
+        }
+        
+        return appDelegate.browserViewController.rewards
+    }
     /// Returns true if this tab's URL is known, and it's longer than we want to store.
     var urlIsTooLong: Bool {
         guard let url = self.url else {
@@ -214,12 +220,10 @@ class Tab: NSObject {
 
             self.webView = webView
             self.webView?.addObserver(self, forKeyPath: KVOConstants.URL.rawValue, options: .new, context: nil)
-            self.userScriptManager = UserScriptManager(tab: self, isFingerprintingProtectionEnabled: Preferences.Shields.fingerprintingProtection.value, isCookieBlockingEnabled: Preferences.Privacy.blockAllCookies.value, isU2FEnabled: webView.hasOnlySecureContent)
+            self.userScriptManager = UserScriptManager(tab: self, isFingerprintingProtectionEnabled: Preferences.Shields.fingerprintingProtection.value, isCookieBlockingEnabled: Preferences.Privacy.blockAllCookies.value, isU2FEnabled: webView.hasOnlySecureContent,
+                isPaymentRequestEnabled: webView.hasOnlySecureContent)
             tabDelegate?.tab?(self, didCreateWebView: webView)
         }
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
-        
-        rewards = appDelegate.browserViewController.rewards
     }
     
     func resetWebView(config: WKWebViewConfiguration) {
