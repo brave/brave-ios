@@ -1,17 +1,19 @@
-paymentreq_reject = {}
-paymentreq_resolve = {}
+Object.defineProperty(window, '$<paymentreqcallback>', {
+  value: {}
+});
 
-Object.defineProperty(window, 'paymentreq_postCreate', {
+Object.defineProperty($<paymentreqcallback>, 'paymentreq_postCreate', {
   value:
-    function (response, error) {
-                      if (error) {
-                      paymentreq_reject('Error!');
-                      }
-      paymentreq_resolve(response)
+    function (response, errorName, errorMessage) {
+      if (errorName.length == 0) {
+        $<paymentreqcallback>.resolve(response);
+        return;
+      }
+      $<paymentreqcallback>.reject(new DOMException(errorMessage, errorName));
     }
 })
 
-Object.defineProperty(window, 'paymentreq_log', {
+Object.defineProperty($<paymentreqcallback>, 'paymentreq_log', {
   value:
     function (log) {
       console.log(log)
@@ -33,8 +35,8 @@ class $<paymentreq> {
     const details = this.details
     return new Promise(
       function (resolve, reject) {
-        paymentreq_resolve = resolve
-        paymentreq_reject = reject
+        $<paymentreqcallback>.resolve = resolve
+        $<paymentreqcallback>.reject = reject
         webkit.messageHandlers.PaymentRequest.postMessage({ name: 'payment-request-show', supportedInstruments: supportedInstruments, details: details })
       }
     )

@@ -10,11 +10,14 @@ private let log = Logger.browserLogger
 
 let popup = PaymentHandlerPopupView(imageView: nil, title: Strings.paymentRequestTitle, message: "")
 
+
 class PaymentRequestExtension: NSObject {
     fileprivate weak var tab: Tab?
     fileprivate var response = ""
+    fileprivate var token: String
     
     init(tab: Tab) {
+        token = UserScriptManager.securityToken.uuidString.replacingOccurrences(of: "-", with: "", options: .literal)
         self.tab = tab
     }
 }
@@ -26,6 +29,16 @@ extension PaymentRequestExtension: TabContentScript {
     
     func scriptMessageHandlerName() -> String? {
         return "PaymentRequest"
+    }
+    
+    func sendPaymentRequestError(errorName: String, errorMessage: String) {
+        ensureMainThread {
+            self.tab?.webView?.evaluateJavaScript("PaymentRequestCallback\(self.token).paymentreq_postCreate('', '\(errorName)', '\(errorMessage)')", completionHandler: { _, error in
+                    if error != nil {
+                        log.error(error)
+                    }
+                })
+        }
     }
     
     func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage) {
@@ -40,9 +53,15 @@ extension PaymentRequestExtension: TabContentScript {
                         log.error("Error parsing data")
                         return
                     }
+                    
                     let details = try JSONDecoder().decode(PaymentRequestDetailsHandler.self, from: detailsData)
                     
                     let supportedInstruments =  try JSONDecoder().decode([PaymentRequestSupportedInstrumentsHandler].self, from: supportedInstrumentsData)
+                    
+                    guard supportedInstruments.contains(where: {$0.supportedMethods == "bat"}) else {
+                        sendPaymentRequestError(errorName: Strings.notSupportedErrorName, errorMessage: Strings.unsupportedInstrumentMessage)
+                        return
+                    }
                     
                     for item in details.displayItems {
                         popup.addDisplayItemLabel(message: item.label + ":  " + item.amount.value + " " + item.amount.currency + "\n")
@@ -74,10 +93,10 @@ extension PaymentRequestExtension: TabContentScript {
                             
                             ensureMainThread {                               
                                 let trimmed = self.response.removingNewlines()
-                                self.tab?.webView?.evaluateJavaScript("paymentreq_postCreate('\(trimmed)', false)", completionHandler: { _, error in
-                                    if error != nil {
-                                        log.error(error)
-                                    }
+                                self.tab?.webView?.evaluateJavaScript("PaymentRequestCallback\(self.token).paymentreq_postCreate('\(trimmed)', '', '')", completionHandler: { _, error in
+                                        if error != nil {
+                                            log.error(error)
+                                        }
                                     })
                             }
                         }
@@ -91,11 +110,7 @@ extension PaymentRequestExtension: TabContentScript {
                         }
                         
                         ensureMainThread {
-                            self.tab?.webView?.evaluateJavaScript("paymentreq_postCreate('', true)", completionHandler: { _, error in
-                                    if error != nil {
-                                        log.error(error)
-                                    }
-                                })
+                            self.sendPaymentRequestError(errorName: Strings.abortErrorName, errorMessage: Strings.userCancelledMessage)
                         }
                         
                         return .flyDown
@@ -121,4 +136,11 @@ extension Strings {
     public static let paymentRequestTitle = NSLocalizedString("paymentRequestTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Review your payment", comment: "Title for Brave Payments")
     public static let paymentRequestPay = NSLocalizedString("paymentRequestPay", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Pay", comment: "Pay button on Payment Request screen")
     public static let paymentRequestCancel = NSLocalizedString("paymentRequestCancel", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Cancel", comment: "Canceel button on Payment Request screen")
+    
+    //Errors
+    public static let notSupportedErrorName = NSLocalizedString("notSupportedErrorName", tableName: "BraveShared", bundle: Bundle.braveShared, value: "NotSupportedError", comment: "DOMException for NotSupportedError")
+    public static let abortErrorName = NSLocalizedString("abortErrorName", tableName: "BraveShared", bundle: Bundle.braveShared, value: "AbortError", comment: "DOMException for AbortError")
+    
+    public static let unsupportedInstrumentMessage = NSLocalizedString("unsupportedInstrumentMessage", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Unsupported payment instruments", comment: "DOMException for NotSupportedError")
+    public static let userCancelledMessage = NSLocalizedString("userCancelledMessage", tableName: "BraveShared", bundle: Bundle.braveShared, value: "User cancelled", comment: "DOMException for AbortError")
 }

@@ -34,7 +34,7 @@ class PaymentHandlerPopupView: PopupView {
         defaultDismissType = .noAnimation
         presentsOverWindow = true
         
-        containerView = UIView(frame: CGRect.zero)
+        containerView = UIView()
         containerView.autoresizingMask = [.flexibleWidth]
         
         if let imageView = imageView {
@@ -50,7 +50,7 @@ class PaymentHandlerPopupView: PopupView {
         titleLabel.numberOfLines = 0
         containerView.addSubview(titleLabel)
         
-        messageLabel = UILabel(frame: CGRect.zero)
+        messageLabel = UILabel()
         messageLabel.textColor = BraveUX.greyH
         messageLabel.textAlignment = .center
         messageLabel.font = UIFont.systemFont(ofSize: 15)
@@ -58,7 +58,7 @@ class PaymentHandlerPopupView: PopupView {
         messageLabel.numberOfLines = 0
         containerView.addSubview(messageLabel)
         
-        displayItemTitle = UILabel(frame: CGRect.zero)
+        displayItemTitle = UILabel()
         displayItemTitle.textColor = BraveUX.greyH
         displayItemTitle.textAlignment = .left
         displayItemTitle.font = UIFont.systemFont(ofSize: 13, weight: UIFont.Weight.bold)
@@ -66,7 +66,7 @@ class PaymentHandlerPopupView: PopupView {
         displayItemTitle.numberOfLines = 0
         containerView.addSubview(displayItemTitle)
         
-        totalItemTitle = UILabel(frame: CGRect.zero)
+        totalItemTitle = UILabel()
         totalItemTitle.textColor = BraveUX.greyH
         totalItemTitle.textAlignment = .left
         totalItemTitle.font = UIFont.systemFont(ofSize: 13, weight: UIFont.Weight.bold)
@@ -77,7 +77,7 @@ class PaymentHandlerPopupView: PopupView {
         addTotalLabel(message: "")
         
         if let inputType = inputType {
-            textField = UITextField(frame: CGRect.zero).then {
+            textField = UITextField().then {
                 $0.keyboardType = inputType
                 $0.textColor = .black
                 $0.placeholder = inputPlaceholder ?? ""
@@ -101,10 +101,10 @@ class PaymentHandlerPopupView: PopupView {
     }
             
     func addDisplayItemLabel(message: String) {
-        let displayItem = UILabel(frame: CGRect.zero)
+        let displayItem = UILabel()
         displayItem.textColor = BraveUX.greyH
         displayItem.textAlignment = .left
-        displayItem.font = UIFont.systemFont(ofSize: 12, weight: UIFont.Weight.regular)
+        displayItem.font = UIFont.systemFont(ofSize: 12)
         displayItem.text = message
         displayItem.numberOfLines = 0
         
@@ -115,10 +115,10 @@ class PaymentHandlerPopupView: PopupView {
     }
     
     func addTotalLabel(message: String) {
-        totalItem = UILabel(frame: CGRect.zero)
+        totalItem = UILabel()
         totalItem.textColor = BraveUX.greyH
         totalItem.textAlignment = .left
-        totalItem.font = UIFont.systemFont(ofSize: 12, weight: UIFont.Weight.regular)
+        totalItem.font = UIFont.systemFont(ofSize: 12)
         totalItem.text = message
         totalItem.numberOfLines = 0
         
@@ -192,7 +192,7 @@ class PaymentHandlerPopupView: PopupView {
         titleLabelFrame.origin.y = imageFrame.maxY + kPadding * resizePercentage
         titleLabel.frame = titleLabelFrame
         
-        var messageLabelSize: CGSize = messageLabel.sizeThatFits(CGSize(width: width - kPadding * 4.0, height: CGFloat.greatestFiniteMagnitude))
+        var messageLabelSize: CGSize = messageLabel.sizeThatFits(CGSize(width: width - kPadding * 4.0, height: .greatestFiniteMagnitude))
         messageLabelSize.height = messageLabelSize.height * resizePercentage
         var messageLabelFrame: CGRect = messageLabel.frame
         messageLabelFrame.size = messageLabelSize
@@ -200,7 +200,7 @@ class PaymentHandlerPopupView: PopupView {
         messageLabelFrame.origin.y = rint(titleLabelFrame.maxY + kPadding * 1.5 / 2.0 * resizePercentage)
         messageLabel.frame = messageLabelFrame
         
-        var displayItemTitleSize: CGSize = displayItemTitle.sizeThatFits(CGSize(width: width - kPadding * 4.0, height: CGFloat.greatestFiniteMagnitude))
+        var displayItemTitleSize: CGSize = displayItemTitle.sizeThatFits(CGSize(width: width - kPadding * 4.0, height: .greatestFiniteMagnitude))
         displayItemTitleSize.height = displayItemTitleSize.height * resizePercentage * 2
         var displayItemTitleFrame: CGRect = displayItemTitle.frame
         displayItemTitleFrame.size = displayItemTitleSize
@@ -210,7 +210,7 @@ class PaymentHandlerPopupView: PopupView {
         
         var previouslabelFrame = displayItemTitleFrame
         for label in displayItems {
-            var labelSize: CGSize = label.sizeThatFits(CGSize(width: width, height: CGFloat.greatestFiniteMagnitude))
+            var labelSize: CGSize = label.sizeThatFits(CGSize(width: width, height: .greatestFiniteMagnitude))
             labelSize.height = labelSize.height * resizePercentage
             var labelFrame: CGRect = label.frame
             labelFrame.size = labelSize
@@ -220,7 +220,7 @@ class PaymentHandlerPopupView: PopupView {
             previouslabelFrame = labelFrame
         }
         
-        var totalItemTitleSize: CGSize = totalItemTitle.sizeThatFits(CGSize(width: width - kPadding * 4.0, height: CGFloat.greatestFiniteMagnitude))
+        var totalItemTitleSize: CGSize = totalItemTitle.sizeThatFits(CGSize(width: width - kPadding * 4.0, height: .greatestFiniteMagnitude))
         totalItemTitleSize.height = totalItemTitleSize.height * resizePercentage * 2
         var totalItemTitleFrame: CGRect = totalItemTitle.frame
         totalItemTitleFrame.size = totalItemTitleSize
@@ -228,7 +228,7 @@ class PaymentHandlerPopupView: PopupView {
         totalItemTitleFrame.origin.y = previouslabelFrame.maxY
         totalItemTitle.frame = totalItemTitleFrame
         
-        var totalItemSize: CGSize = totalItem.sizeThatFits(CGSize(width: width - kPadding * 4.0, height: CGFloat.greatestFiniteMagnitude))
+        var totalItemSize: CGSize = totalItem.sizeThatFits(CGSize(width: width - kPadding * 4.0, height: .greatestFiniteMagnitude))
         totalItemSize.height = totalItemSize.height * resizePercentage
         var totalItemFrame: CGRect = totalItem.frame
         totalItemFrame.size = totalItemSize
