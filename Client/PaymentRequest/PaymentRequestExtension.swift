@@ -10,7 +10,6 @@ private let log = Logger.browserLogger
 
 let popup = PaymentHandlerPopupView(imageView: nil, title: Strings.paymentRequestTitle, message: "")
 
-
 class PaymentRequestExtension: NSObject {
     fileprivate weak var tab: Tab?
     fileprivate var response = ""
@@ -64,7 +63,7 @@ extension PaymentRequestExtension: TabContentScript {
                     }
                     
                     for item in details.displayItems {
-                        popup.addDisplayItemLabel(message: item.label + ":  " + item.amount.value + " " + item.amount.currency + "\n")
+                        popup.addDisplayItemLabel(message: "\(item.label): \(item.amount.value) \(item.amount.currency)\n")
                         log.info(item.label)
                     }
                     
