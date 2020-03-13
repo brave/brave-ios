@@ -13,16 +13,9 @@ Object.defineProperty($<paymentreqcallback>, 'paymentreq_postCreate', {
     }
 })
 
-Object.defineProperty($<paymentreqcallback>, 'paymentreq_log', {
-  value:
-    function (log) {
-      console.log(log)
-    }
-})
-
 class $<paymentreq> {
-  constructor (supportedInstruments, details) {
-      this.supportedInstruments = JSON.stringify(supportedInstruments)
+  constructor (methodData, details) {
+      this.methodData = JSON.stringify(methodData)
       this.details = JSON.stringify(details)
   }
 
@@ -31,13 +24,13 @@ class $<paymentreq> {
   }
 
   show() {
-    const supportedInstruments = this.supportedInstruments
+    const methodData = this.methodData
     const details = this.details
     return new Promise(
       function (resolve, reject) {
         $<paymentreqcallback>.resolve = resolve
         $<paymentreqcallback>.reject = reject
-        webkit.messageHandlers.PaymentRequest.postMessage({ name: 'payment-request-show', supportedInstruments: supportedInstruments, details: details })
+        webkit.messageHandlers.PaymentRequest.postMessage({ name: 'payment-request-show', methodData: methodData, details: details })
       }
     )
   }

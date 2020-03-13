@@ -16,6 +16,11 @@ class PaymentRequestExtension: NSObject {
     fileprivate var response = ""
     fileprivate var token: String
     
+    fileprivate enum PaymentRequestErrors: String {
+        case NotSupportedError = "NotSupportedError"
+        case AbortError = "AbortError"
+    }
+    
     init(tab: Tab) {
         token = UserScriptManager.securityToken.uuidString.replacingOccurrences(of: "-", with: "", options: .literal)
         self.tab = tab
@@ -28,101 +33,92 @@ extension PaymentRequestExtension: TabContentScript {
     }
     
     func scriptMessageHandlerName() -> String? {
-        return "PaymentRequest"
+        return PaymentRequestExtension.name()
     }
     
     func sendPaymentRequestError(errorName: String, errorMessage: String) {
         ensureMainThread {
-            self.tab?.webView?.evaluateJavaScript("PaymentRequestCallback\(self.token).paymentreq_postCreate('', '\(errorName)', '\(errorMessage)')", completionHandler: { _, error in
+            self.tab?.webView?.evaluateJavaScript("PaymentRequestCallback\(self.token).paymentreq_postCreate('', '\(errorName)', '\(errorMessage)')") { _, error in
                     if error != nil {
                         log.error(error)
                     }
-                })
+                }
         }
     }
     
     func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage) {
-        if message.name == "PaymentRequest", let body = message.body as? NSDictionary {
-            do {
-                let messageData = try JSONSerialization.data(withJSONObject: body, options: [])
-                let body = try JSONDecoder().decode(PaymentRequestBodyParser.self, from: messageData)
-                if body.name == "payment-request-show" {
-                    popup.initPaymentUI()
-                    
-                    guard let detailsData = body.details.data(using: String.Encoding.utf8), let supportedInstrumentsData = body.supportedInstruments.data(using: String.Encoding.utf8) else {
-                        log.error("Error parsing data")
-                        return
-                    }
-                    
-                    let details = try JSONDecoder().decode(PaymentRequestDetailsParser.self, from: detailsData)
-                    
-                    let supportedInstruments =  try JSONDecoder().decode([PaymentRequestSupportedInstrumentsParser].self, from: supportedInstrumentsData)
-                    
-                    guard supportedInstruments.contains(where: {$0.supportedMethods == "bat"}) else {
-                        sendPaymentRequestError(errorName: Strings.notSupportedErrorName, errorMessage: Strings.unsupportedInstrumentMessage)
-                        return
-                    }
-                    
-                    for item in details.displayItems {
-                        popup.addDisplayItemLabel(message: "\(item.label): \(item.amount.value) \(item.amount.currency)\n")
-                        log.info(item.label)
-                    }
-                    
-                    popup.addTotalLabel(message: details.total.label + ":  " + details.total.amount.value + " " + details.total.amount.currency + "\n")
-                    
-                    popup.addButton(title: Strings.paymentRequestPay) { [weak self] in
-                        guard let self = self else {
-                            return .flyDown
-                        }
-                        guard let rewards = self.tab?.rewards, let publisher = self.tab?.publisher, let amount = Double(details.total.amount.value) else {
-                            return .flyDown
-                        }
-                        
-                        rewards.ledger.tipPublisherDirectly(publisher, amount: amount, currency: "BAT") { _ in
-                          // TODO: Handle started tip process
-                            self.response = """
-                                {
-                                  "requestId": "a62c29b3-f840-47cd-b895-4573d3190227",
-                                  "methodName": "bat",
-                                  "details": {
-                                    "transaction_id": "bcbbd947-346d-439f-96b4-101bbd966675",
-                                    "message": "Payment for Ethiopian Coffee!"
-                                  }
-                                }
-                            """
-                            
-                            ensureMainThread {                               
-                                let trimmed = self.response.removingNewlines()
-                                self.tab?.webView?.evaluateJavaScript("PaymentRequestCallback\(self.token).paymentreq_postCreate('\(trimmed)', '', '')", completionHandler: { _, error in
-                                        if error != nil {
-                                            log.error(error)
-                                        }
-                                    })
-                            }
-                        }
-                        
-                        return .flyDown
-                    }
-                    
-                    popup.addButton(title: Strings.paymentRequestCancel) { [weak self] in
-                        guard let self = self else {
-                            return .flyDown
-                        }
-                        
-                        ensureMainThread {
-                            self.sendPaymentRequestError(errorName: Strings.abortErrorName, errorMessage: Strings.userCancelledMessage)
-                        }
-                        
-                        return .flyDown
-                    }
-                    
-                    log.info("Success!")
+        guard message.name == "PaymentRequest", let body = message.body as? NSDictionary else { return }
+        
+        do {
+            let messageData = try JSONSerialization.data(withJSONObject: body, options: [])
+            let body = try JSONDecoder().decode(PaymentRequestBody.self, from: messageData)
+            if body.name != "payment-request-show" {
+                return
+            }
+            popup.initPaymentUI()
+            
+            guard body.methodData.contains(where: {$0.supportedMethods == "bat"}) else {
+                sendPaymentRequestError(errorName: PaymentRequestErrors.NotSupportedError.rawValue, errorMessage: Strings.unsupportedInstrumentMessage)
+                return
+            }
+            
+            for item in body.details.displayItems {
+                popup.addDisplayItemLabel(message: "\(item.label): \(item.amount.value) \(item.amount.currency)\n")
+                log.info(item.label)
+            }
+            
+            popup.addTotalLabel(message: "\(body.details.total.label):  \(body.details.total.amount.value) \(body.details.total.amount.currency)\n")
+            
+            popup.addButton(title: Strings.paymentRequestPay) { [weak self] in
+                guard let self = self else {
+                    return .flyDown
                 }
-            } catch {
-                log.info(error)
+                guard let rewards = self.tab?.rewards, let publisher = self.tab?.publisher, let amount = Double(body.details.total.amount.value) else {
+                    return .flyDown
+                }
+                
+                // To-Do: Replace tipping code with SKU APIs - https://github.com/brave/brave-ios/issues/2383
+                rewards.ledger.tipPublisherDirectly(publisher, amount: amount, currency: "BAT") { _ in
+                    self.response = """
+                        {
+                          "requestId": "a62c29b3-f840-47cd-b895-4573d3190227",
+                          "methodName": "bat",
+                          "details": {
+                            "transaction_id": "bcbbd947-346d-439f-96b4-101bbd966675",
+                            "message": "Payment for Ethiopian Coffee!"
+                          }
+                        }
+                    """
+                    
+                    ensureMainThread {
+                        let trimmed = self.response.removingNewlines()
+                        self.tab?.webView?.evaluateJavaScript("PaymentRequestCallback\(self.token).paymentreq_postCreate('\(trimmed)', '', '')") { _, error in
+                                if error != nil {
+                                    log.error(error)
+                                }
+                            }
+                    }
+                }
+                
+                return .flyDown
+            }
+            
+            popup.addButton(title: Strings.paymentRequestCancel) { [weak self] in
+                guard let self = self else {
+                    return .flyDown
+                }
+                
+                ensureMainThread {
+                    self.sendPaymentRequestError(errorName: PaymentRequestErrors.AbortError.rawValue, errorMessage: Strings.userCancelledMessage)
+                }
+                
+                return .flyDown
             }
             popup.showWithType(showType: .flyUp)
+        } catch {
+            log.error(error)
         }
+            
     }
 }
 
@@ -133,14 +129,11 @@ extension String {
 }
 
 extension Strings {
-    public static let paymentRequestTitle = NSLocalizedString("paymentRequestTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Review your payment", comment: "Title for Brave Payments")
-    public static let paymentRequestPay = NSLocalizedString("paymentRequestPay", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Pay", comment: "Pay button on Payment Request screen")
-    public static let paymentRequestCancel = NSLocalizedString("paymentRequestCancel", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Cancel", comment: "Canceel button on Payment Request screen")
+    public static let paymentRequestTitle = NSLocalizedString("paymentRequestTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Review your payment", comment: "Title for Payment Request modal that shows the user what items are being purchased.")
+    public static let paymentRequestPay = NSLocalizedString("paymentRequestPay", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Pay", comment: "Text for the Pay button on Payment Request modal that shows the order summary")
+    public static let paymentRequestCancel = NSLocalizedString("paymentRequestCancel", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Cancel", comment: "Text for the Cancel button on Payment Request modal that shows the order summary")
     
     //Errors
-    public static let notSupportedErrorName = NSLocalizedString("notSupportedErrorName", tableName: "BraveShared", bundle: Bundle.braveShared, value: "NotSupportedError", comment: "DOMException for NotSupportedError")
-    public static let abortErrorName = NSLocalizedString("abortErrorName", tableName: "BraveShared", bundle: Bundle.braveShared, value: "AbortError", comment: "DOMException for AbortError")
-    
-    public static let unsupportedInstrumentMessage = NSLocalizedString("unsupportedInstrumentMessage", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Unsupported payment instruments", comment: "DOMException for NotSupportedError")
-    public static let userCancelledMessage = NSLocalizedString("userCancelledMessage", tableName: "BraveShared", bundle: Bundle.braveShared, value: "User cancelled", comment: "DOMException for AbortError")
+    public static let unsupportedInstrumentMessage = NSLocalizedString("unsupportedInstrumentMessage", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Unsupported payment instruments", comment: "Error message if list of Payment Instruments doesn't include BAT")
+    public static let userCancelledMessage = NSLocalizedString("userCancelledMessage", tableName: "BraveShared", bundle: Bundle.braveShared, value: "User cancelled", comment: "Error message if the payment workflow is canceled by the user")
 }

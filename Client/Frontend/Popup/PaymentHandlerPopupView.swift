@@ -278,7 +278,7 @@ extension PaymentHandlerPopupView: UITextFieldDelegate {
 }
 
 extension Strings {
-    public static let orderSummary = NSLocalizedString("orderSummary", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Order Summary", comment: "Title for display items")
+    public static let orderSummary = NSLocalizedString("orderSummary", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Order Summary", comment: "Title for an online order summary to show the user what items are being purchased.")
     
-     public static let total = NSLocalizedString("total", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Total", comment: "Title for total")
+     public static let total = NSLocalizedString("total", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Total", comment: "Title that shows the total cost of an online order form.")
 }
