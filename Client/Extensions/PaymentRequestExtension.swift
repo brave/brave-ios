@@ -51,7 +51,7 @@ extension PaymentRequestExtension: TabContentScript {
         
         do {
             let messageData = try JSONSerialization.data(withJSONObject: body, options: [])
-            let body = try JSONDecoder().decode(PaymentRequestBody.self, from: messageData)
+            let body = try JSONDecoder().decode(PaymentRequest.self, from: messageData)
             if body.name != "payment-request-show" {
                 return
             }

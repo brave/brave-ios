@@ -2,8 +2,8 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-struct PaymentRequestBody: Decodable {
-    struct PaymentRequestMethodData: Decodable {
+struct PaymentRequest: Decodable {
+    struct MethodData: Decodable {
         struct SupportedInstrumentsData: Decodable {
             let supportedNetworks: [String]
             let supportedTypes: [String]?
@@ -13,7 +13,7 @@ struct PaymentRequestBody: Decodable {
         let data: SupportedInstrumentsData?
     }
     
-    struct PaymentRequestDetails: Decodable {
+    struct Details: Decodable {
         struct Item: Decodable {
             let label: String
             let amount: Amount
@@ -31,10 +31,10 @@ struct PaymentRequestBody: Decodable {
     let name: String
     
     // PaymentRequest methodData and details: https://developer.mozilla.org/en-US/docs/Web/API/PaymentRequest/PaymentRequest
-    let methodData: [PaymentRequestMethodData]
-    let details: PaymentRequestDetails
+    let methodData: [MethodData]
+    let details: Details
     
-    enum PaymentKeys: String, CodingKey {
+    private enum PaymentKeys: String, CodingKey {
         case name, methodData, details
     }
     
@@ -44,8 +44,8 @@ struct PaymentRequestBody: Decodable {
         let detailsString = try values.decode(String.self, forKey: .details)
     
         name = try values.decode(String.self, forKey: .name)
-        methodData = try JSONDecoder().decode([PaymentRequestMethodData].self, from: methodDataString.data(using: String.Encoding.utf8) ?? Data())
-        details = try JSONDecoder().decode(PaymentRequestDetails.self, from: detailsString.data(using: String.Encoding.utf8) ?? Data())
+        methodData = try JSONDecoder().decode([MethodData].self, from: methodDataString.data(using: String.Encoding.utf8) ?? Data())
+        details = try JSONDecoder().decode(Details.self, from: detailsString.data(using: String.Encoding.utf8) ?? Data())
        
     }
 }
