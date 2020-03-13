@@ -2,6 +2,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import BraveShared
 import Data
 import Shared
 import WebKit
@@ -44,7 +45,7 @@ extension PaymentRequestExtension: TabContentScript {
         if message.name == "PaymentRequest", let body = message.body as? NSDictionary {
             do {
                 let messageData = try JSONSerialization.data(withJSONObject: body, options: [])
-                let body = try JSONDecoder().decode(PaymentRequestBodyHandler.self, from: messageData)
+                let body = try JSONDecoder().decode(PaymentRequestBodyParser.self, from: messageData)
                 if body.name == "payment-request-show" {
                     popup.initPaymentUI()
                     
@@ -53,9 +54,9 @@ extension PaymentRequestExtension: TabContentScript {
                         return
                     }
                     
-                    let details = try JSONDecoder().decode(PaymentRequestDetailsHandler.self, from: detailsData)
+                    let details = try JSONDecoder().decode(PaymentRequestDetailsParser.self, from: detailsData)
                     
-                    let supportedInstruments =  try JSONDecoder().decode([PaymentRequestSupportedInstrumentsHandler].self, from: supportedInstrumentsData)
+                    let supportedInstruments =  try JSONDecoder().decode([PaymentRequestSupportedInstrumentsParser].self, from: supportedInstrumentsData)
                     
                     guard supportedInstruments.contains(where: {$0.supportedMethods == "bat"}) else {
                         sendPaymentRequestError(errorName: Strings.notSupportedErrorName, errorMessage: Strings.unsupportedInstrumentMessage)
