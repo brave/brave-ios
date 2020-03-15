@@ -179,7 +179,6 @@ class HomeViewController: UIViewController, Themeable {
     // Since home instance is destroyed, we restore based on tab.
     // States map is saved in BVC, based on [parentTabId: restoreState] == state
     var restoreState: HomeRestoreState?
-    var parentTabId: String?
     
     /// Whether the view was called from tapping on address bar or not.
     private let fromOverlay: Bool
@@ -474,6 +473,10 @@ class HomeViewController: UIViewController, Themeable {
         } else {
             if FeedManager.shared.feedCount() > 0 {
                 todayCardView.isHidden = true
+                
+                if feedView.contentSize.height < view.frame.height - FeedCardType.adSmall.rawValue {
+                    feedView.contentSize = CGSize(width: view.frame.width, height: view.frame.height - FeedCardType.adSmall.rawValue)
+                }
             }
             
             if let state = restoreState {

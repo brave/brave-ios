@@ -15,7 +15,6 @@ class FeedView: UITableView {
         tableFooterView = UIView()
         cellLayoutMarginsFollowReadableWidth = true
         accessibilityIdentifier = "Feed"
-        estimatedRowHeight = 100
         sectionHeaderHeight = 0
         sectionFooterHeight = 0
         
@@ -29,6 +28,10 @@ class FeedView: UITableView {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func reloadData() {
+        super.reloadData()
     }
 }
 

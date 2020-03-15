@@ -129,6 +129,44 @@ class FeedComposer: NSObject {
             
             //
             //
+            // Get Yahoo! Sports Card
+            if Int.random(in: 0 ... 3) == 1, let items = self?.profile.feed.getFeedRecords(session: sessionId, publisher: "yahoo_sports", limit: 3, requiresImage: false, contentType: .article).value.successValue, items.count == 3 {
+                var specialData: FeedCardSpecialData?
+                if let item = items.first, item.publisherLogo.isEmpty == false {
+                    specialData = FeedCardSpecialData(title: "Sports", logo: item.publisherLogo, publisher: item.publisherName)
+                }
+                
+                // Build card
+                let card = FeedCard(type: .verticalListBranded, items: items, specialData: specialData)
+                tempFeed.append(FeedRow(cards: [card]))
+                
+                // Mark used items with current sessionId
+                for item in items {
+                    usedIds.append(item.id)
+                }
+            }
+            
+            //
+            //
+            // Get Yahoo? Finance Card
+            if Int.random(in: 0 ... 3) == 1, let items = self?.profile.feed.getFeedRecords(session: sessionId, publisher: "yahoo_finance", limit: 3, requiresImage: false, contentType: .article).value.successValue, items.count == 3 {
+                var specialData: FeedCardSpecialData?
+                if let item = items.first, item.publisherLogo.isEmpty == false {
+                    specialData = FeedCardSpecialData(title: "Finance", logo: item.publisherLogo, publisher: item.publisherName)
+                }
+                
+                // Build card
+                let card = FeedCard(type: .verticalListBranded, items: items, specialData: specialData)
+                tempFeed.append(FeedRow(cards: [card]))
+                
+                // Mark used items with current sessionId
+                for item in items {
+                    usedIds.append(item.id)
+                }
+            }
+            
+            //
+            //
             // Get Technology Labeled Card
             if Int.random(in: 0 ... 3) == 1, let items = self?.profile.feed.getFeedRecords(session: sessionId, publisher: "mashable", limit: 3, requiresImage: false, contentType: .article).value.successValue, items.count == 3 {
                 var specialData: FeedCardSpecialData?
@@ -167,7 +205,7 @@ class FeedComposer: NSObject {
             
             //
             //
-            // Get Science Labeled Card
+            // Get Wired News Labeled Card
             if Int.random(in: 0 ... 3) == 1, let items = self?.profile.feed.getFeedRecords(session: sessionId, publisher: "wired", limit: 3, requiresImage: false, contentType: .article).value.successValue, items.count == 3 {
                 var specialData: FeedCardSpecialData?
                 if let item = items.first, item.publisherLogo.isEmpty == false {
@@ -323,10 +361,6 @@ class FeedComposer: NSObject {
                 for item in items {
                     usedIds.append(item.id)
                 }
-                
-                // Need to update rows so we don't pull the same data again further down.
-                _ = self?.profile.feed.updateFeedRecords(usedIds, session: sessionId).value
-                usedIds = []
             }
             
             //
@@ -341,17 +375,17 @@ class FeedComposer: NSObject {
                     tempFeed.insert(feedRow, at: 0)
                     usedIds.append(item.id)
                 }
-                
-                // Need to update rows so we don't pull the same data again further down.
-                _ = self?.profile.feed.updateFeedRecords(usedIds, session: sessionId).value
-                usedIds = []
             }
+            
+            // Need to update rows so we don't pull the same data again further down.
+            _ = self?.profile.feed.updateFeedRecords(usedIds, session: sessionId).value
+            usedIds = []
             
             //
             //
             // Prepend sponsor banner if feed count is 0
             if self?.items.count == 0 && tempFeed.count > 0 {
-                let item = FeedItem(id: 0, publishTime: 0, feedSource: "billabong.com", url: "https://www.billabong.com/mens/", domain: "billabong.com", img: "https://images.unsplash.com/photo-1529029411565-e04366ee3cc6?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80", title: "Billabong", description: "", contentType: "ad", publisherId: "billabong", publisherName: "Billabong", publisherLogo: "https://logo-logos.com/wp-content/uploads/2016/10/Billabong_logo.png", sessionDisplayed: "", removed: false, liked: false, unread: true)
+                let item = FeedItem(id: 0, publishTime: 0, feedSource: "billabong.com", url: "https://www.billabong.com/mens/", domain: "billabong.com", img: "https://images.unsplash.com/photo-1502680390469-be75c86b636f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1350&q=80", title: "Billabong", description: "", contentType: "ad", publisherId: "billabong", publisherName: "Billabong", publisherLogo: "https://logo-logos.com/wp-content/uploads/2016/10/Billabong_logo.png", sessionDisplayed: "", removed: false, liked: false, unread: true)
                 let specialData = FeedCardSpecialData(title: nil, logo: "https://logo-logos.com/wp-content/uploads/2016/10/Billabong_logo.png", publisher: "Billabong")
                 let card = FeedCard(type: .adSmall, items: [item], specialData: specialData)
                 let feedRow = FeedRow(cards: [card])
