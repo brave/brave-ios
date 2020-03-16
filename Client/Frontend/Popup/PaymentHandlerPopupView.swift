@@ -7,6 +7,7 @@ import BraveShared
 import Shared
 import Lottie
 
+// To-Do: Remove this file when UI work for SKUs is completed: https://github.com/brave/brave-ios/issues/2383
 class PaymentHandlerPopupView: PopupView {
     fileprivate var dialogImage: UIView?
     fileprivate var titleLabel: UILabel!
