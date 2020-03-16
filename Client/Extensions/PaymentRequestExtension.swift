@@ -2,6 +2,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import BraveRewards
 import BraveShared
 import Data
 import Shared
@@ -13,6 +14,7 @@ let popup = PaymentHandlerPopupView(imageView: nil, title: Strings.paymentReques
 
 class PaymentRequestExtension: NSObject {
     fileprivate weak var tab: Tab?
+    fileprivate weak var rewards: BraveRewards?
     fileprivate var response = ""
     fileprivate var token: String
     
@@ -21,9 +23,10 @@ class PaymentRequestExtension: NSObject {
         case AbortError = "AbortError"
     }
     
-    init(tab: Tab) {
+    init(rewards: BraveRewards, tab: Tab) {
         token = UserScriptManager.securityToken.uuidString.replacingOccurrences(of: "-", with: "", options: .literal)
         self.tab = tab
+        self.rewards = rewards
     }
 }
 
@@ -47,7 +50,7 @@ extension PaymentRequestExtension: TabContentScript {
     }
     
     func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage) {
-        guard message.name == "PaymentRequest", let body = message.body as? NSDictionary else { return }
+        guard message.name == PaymentRequestExtension.name(), let body = message.body as? NSDictionary else { return }
         
         do {
             let messageData = try JSONSerialization.data(withJSONObject: body, options: [])
@@ -73,7 +76,7 @@ extension PaymentRequestExtension: TabContentScript {
                 guard let self = self else {
                     return .flyDown
                 }
-                guard let rewards = self.tab?.rewards, let publisher = self.tab?.publisher, let amount = Double(body.details.total.amount.value) else {
+                guard let rewards = self.rewards, let publisher = self.tab?.publisher, let amount = Double(body.details.total.amount.value) else {
                     return .flyDown
                 }
                 
@@ -91,7 +94,7 @@ extension PaymentRequestExtension: TabContentScript {
                     """
                     
                     ensureMainThread {
-                        let trimmed = self.response.removingNewlines()
+                        let trimmed = self.response.components(separatedBy: .newlines).joined()
                         self.tab?.webView?.evaluateJavaScript("PaymentRequestCallback\(self.token).paymentreq_postCreate('\(trimmed)', '', '')") { _, error in
                                 if error != nil {
                                     log.error(error)
