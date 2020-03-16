@@ -125,12 +125,6 @@ extension PaymentRequestExtension: TabContentScript {
     }
 }
 
-extension String {
-    func removingNewlines() -> String {
-        return components(separatedBy: .newlines).joined()
-    }
-}
-
 extension Strings {
     public static let paymentRequestTitle = NSLocalizedString("paymentRequestTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Review your payment", comment: "Title for Payment Request modal that shows the user what items are being purchased.")
     public static let paymentRequestPay = NSLocalizedString("paymentRequestPay", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Pay", comment: "Text for the Pay button on Payment Request modal that shows the order summary")
