@@ -129,27 +129,8 @@ class FeedComposer: NSObject {
             
             //
             //
-            // Get Yahoo! Sports Card
-            if Int.random(in: 0 ... 3) == 1, let items = self?.profile.feed.getFeedRecords(session: sessionId, publisher: "yahoo_sports", limit: 3, requiresImage: false, contentType: .article).value.successValue, items.count == 3 {
-                var specialData: FeedCardSpecialData?
-                if let item = items.first, item.publisherLogo.isEmpty == false {
-                    specialData = FeedCardSpecialData(title: "Sports", logo: item.publisherLogo, publisher: item.publisherName)
-                }
-                
-                // Build card
-                let card = FeedCard(type: .verticalListBranded, items: items, specialData: specialData)
-                tempFeed.append(FeedRow(cards: [card]))
-                
-                // Mark used items with current sessionId
-                for item in items {
-                    usedIds.append(item.id)
-                }
-            }
-            
-            //
-            //
             // Get Yahoo? Finance Card
-            if Int.random(in: 0 ... 3) == 1, let items = self?.profile.feed.getFeedRecords(session: sessionId, publisher: "yahoo_finance", limit: 3, requiresImage: false, contentType: .article).value.successValue, items.count == 3 {
+            if Int.random(in: 0 ... 5) == 1, let items = self?.profile.feed.getFeedRecords(session: sessionId, publisher: "yahoo_finance", limit: 3, requiresImage: false, contentType: .article).value.successValue, items.count == 3 {
                 var specialData: FeedCardSpecialData?
                 if let item = items.first, item.publisherLogo.isEmpty == false {
                     specialData = FeedCardSpecialData(title: "Finance", logo: item.publisherLogo, publisher: item.publisherName)
