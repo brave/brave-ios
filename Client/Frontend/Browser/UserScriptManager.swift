@@ -228,9 +228,11 @@ class UserScriptManager {
                 $0.addUserScript(script)
             }
             
+            #if !NO_SKUS
             if isPaymentRequestEnabled, let script = PaymentRequestUserScript {
                 $0.addUserScript(script)
             }
+            #endif
         }
     }
 }
