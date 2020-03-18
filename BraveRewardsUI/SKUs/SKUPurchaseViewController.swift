@@ -4,17 +4,28 @@
 
 import UIKit
 import BraveRewards
+import BraveShared
 
 public class SKUPurchaseViewController: UIViewController, UIViewControllerTransitioningDelegate {
   
   private let rewards: BraveRewards
-  private let amount: Double
+  private let publisher: PublisherInfo
+  private let request: PaymentRequest
   private let ledgerObserver: LedgerObserver
   private var openBraveTermsOfSale: () -> Void
+  private let responseHandler: (_ response: PaymentRequestResponse) -> Void
   
-  public init(rewards: BraveRewards, amount: Double, openBraveTermsOfSale: @escaping () -> Void) {
+  public init(
+    rewards: BraveRewards,
+    publisher: PublisherInfo,
+    request: PaymentRequest,
+    responseHandler: @escaping (_ response: PaymentRequestResponse) -> Void,
+    openBraveTermsOfSale: @escaping () -> Void
+  ) {
     self.rewards = rewards
-    self.amount = amount
+    self.publisher = publisher
+    self.request = request
+    self.responseHandler = responseHandler
     self.openBraveTermsOfSale = openBraveTermsOfSale
     self.ledgerObserver = LedgerObserver(ledger: rewards.ledger)
     
@@ -50,40 +61,61 @@ public class SKUPurchaseViewController: UIViewController, UIViewControllerTransi
     
     title = Strings.SKUPurchaseTitle
     
+    purchaseView.detailView.itemDetailValueLabel.text = request.details.total.label
+    purchaseView.detailView.orderAmountLabels.amountLabel.text = request.details.total.amount.value
+    
     purchaseView.detailView.dismissButton.addTarget(self, action: #selector(tappedDismissButton), for: .touchUpInside)
     purchaseView.gesturalDismissExecuted = { [unowned self] in
-      self.dismiss(animated: true)
+      self.tappedDismissButton()
     }
     purchaseView.buyButton.buyButton.addTarget(self, action: #selector(tappedBuyButton), for: .touchUpInside)
     purchaseView.buyButton.disclaimerLabel.onLinkedTapped = { [weak self] _ in
       self?.openBraveTermsOfSale()
     }
     
-    updateInsufficentBalanceState()
+    updateViewForBalance()
   }
   
   func setupLedgerObserver() {
     ledgerObserver.fetchedBalance = { [weak self] in
-      self?.updateInsufficentBalanceState()
+      self?.updateViewForBalance()
     }
   }
   
   @objc private func tappedDismissButton() {
+    if purchaseView.viewState == .overview {
+      responseHandler(.cancelled)
+    }
     dismiss(animated: true)
   }
   
   @objc private func tappedBuyButton() {
+    guard let amount = Double(request.details.total.amount.value) else { return }
     // Start order transactions
     purchaseView.viewState = .processing
+    // TODO: Support changing view state during animation (currently crashes 😱)
     DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-      self.purchaseView.viewState = .complete
+      // TODO: Remove this tip when we integrate with shared libs (https://github.com/brave/brave-ios/issues/2383)
+      self.rewards.ledger.tipPublisherDirectly(self.publisher, amount: amount, currency: "BAT") { result in
+        self.purchaseView.viewState = .complete
+        self.responseHandler(.completed("""
+                        {
+                          "requestId": "a62c29b3-f840-47cd-b895-4573d3190227",
+                          "methodName": "bat",
+                          "details": {
+                            "transaction_id": "bcbbd947-346d-439f-96b4-101bbd966675",
+                            "message": "Payment for Ethiopian Coffee!"
+                          }
+                        }
+                    """))
+      }
     }
   }
   
-  private func updateInsufficentBalanceState() {
-    guard isViewLoaded, let balance = rewards.ledger.balance else { return }
-    let insufficientFunds = balance.total < amount
-    purchaseView.isShowingInsufficientFundsView = insufficientFunds
+  private func updateViewForBalance() {
+    guard isViewLoaded, let balance = rewards.ledger.balance, let amount = Double(request.details.total.amount.value) else { return }
+    purchaseView.detailView.balanceView.amountLabels.amountLabel.text = "\(balance.total)"
+    purchaseView.isShowingInsufficientFundsView = balance.total < amount
   }
   
   // MARK: -

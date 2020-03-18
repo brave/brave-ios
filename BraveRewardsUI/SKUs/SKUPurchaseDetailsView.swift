@@ -50,8 +50,6 @@ class SKUPurchaseDetailsView: UIView {
   }
   
   let itemDetailValueLabel = UILabel().then {
-    // TODO: Remove this fake data
-    $0.text = "Title of the selected item long title long long title wrapped into second line"
     $0.font = .systemFont(ofSize: 15.0)
     $0.appearanceTextColor = UX.bodyColor
     $0.numberOfLines = 0
@@ -65,7 +63,6 @@ class SKUPurchaseDetailsView: UIView {
   
   let orderAmountLabels = CurrencyContainerView(
     amountLabelConfig: {
-      $0.text = "45.0" // TODO: Remove this fake data
       $0.font = .systemFont(ofSize: 22.0, weight: .semibold)
       $0.appearanceTextColor = Colors.grey000
     },
@@ -210,7 +207,6 @@ class SKUPurchaseWalletBalanceView: UIView {
   
   let amountLabels = CurrencyContainerView(
     amountLabelConfig: {
-      $0.text = "17.0" // TODO: Remove this fake data
       $0.font = .systemFont(ofSize: 18.0, weight: .medium)
       $0.appearanceTextColor = Colors.grey000
     },

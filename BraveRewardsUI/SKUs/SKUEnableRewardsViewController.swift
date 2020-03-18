@@ -10,9 +10,11 @@ import BraveRewards
 public class SKUEnableRewardsViewController: UIViewController, UIViewControllerTransitioningDelegate {
   
   private let rewards: BraveRewards
+  private let termsURLTapped: () -> Void
   
-  public init(rewards: BraveRewards) {
+  public init(rewards: BraveRewards, termsURLTapped: @escaping () -> Void) {
     self.rewards = rewards
+    self.termsURLTapped = termsURLTapped
     super.init(nibName: nil, bundle: nil)
     
     modalPresentationStyle = .overCurrentContext
@@ -40,6 +42,9 @@ public class SKUEnableRewardsViewController: UIViewController, UIViewControllerT
     
     enableRewardsView.backgroundView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(tappedBackground)))
     enableRewardsView.enableRewardsButton.addTarget(self, action: #selector(tappedEnableRewards), for: .touchUpInside)
+    enableRewardsView.termsLabel.onLinkedTapped = { [weak self] _ in
+      self?.termsURLTapped()
+    }
   }
   
   @objc private func tappedBackground() {
