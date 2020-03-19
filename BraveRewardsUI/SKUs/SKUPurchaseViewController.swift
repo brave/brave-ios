@@ -61,7 +61,7 @@ public class SKUPurchaseViewController: UIViewController, UIViewControllerTransi
     
     title = Strings.SKUPurchaseTitle
     
-    purchaseView.detailView.itemDetailValueLabel.text = request.details.total.label
+    purchaseView.detailView.itemDetailValueLabel.text = request.details.displayItems.map { $0.label }.joined(separator: ", ")
     purchaseView.detailView.orderAmountLabels.amountLabel.text = request.details.total.amount.value
     
     purchaseView.detailView.dismissButton.addTarget(self, action: #selector(tappedDismissButton), for: .touchUpInside)
