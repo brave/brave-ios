@@ -102,7 +102,7 @@ extension SKUEnableRewardsViewController: BasicAnimationControllerDelegate {
       self.enableRewardsView.backgroundView.alpha = 0.0
     }
     UIView.animate(withDuration: 0.35, delay: 0, usingSpringWithDamping: 1000, initialSpringVelocity: 0, options: [.beginFromCurrentState], animations: {
-      self.enableRewardsView.containerView.transform = CGAffineTransform(translationX: 0, y: self.view.bounds.height - self.enableRewardsView.containerView.bounds.height)
+      self.enableRewardsView.containerView.transform = CGAffineTransform(translationX: 0, y: self.view.bounds.height - self.enableRewardsView.containerView.frame.minY)
     }) { _ in
       self.view.removeFromSuperview()
       context.completeTransition(true)
