@@ -150,7 +150,11 @@ public class SKUPurchaseView: UIView {
       if isShowingInsufficientFundsView {
         ci.bottom = 0
       } else {
-        ci.bottom = buyButton.systemLayoutSizeFitting(CGSize(width: bounds.size.width, height: 0), withHorizontalFittingPriority: .required, verticalFittingPriority: .fittingSizeLevel).height
+        ci.bottom = buyButton.systemLayoutSizeFitting(
+          CGSize(width: bounds.size.width, height: 0),
+          withHorizontalFittingPriority: .required,
+          verticalFittingPriority: .fittingSizeLevel
+        ).height
       }
       detailView.scrollView.contentInset = ci
     }
@@ -233,7 +237,7 @@ extension SKUPurchaseView: BasicAnimationControllerDelegate {
         self.detailView.transform = .identity
         self.buyButton.transform = .identity
       }
-    }, completion: nil)
+    })
     context.completeTransition(true)
   }
   func animateDismissal(context: UIViewControllerContextTransitioning) {
@@ -301,7 +305,7 @@ extension SKUPurchaseView: UIScrollViewDelegate {
         }, completion: { _ in
           UIView.animate(withDuration: 0.2, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0, options: [.beginFromCurrentState], animations: {
             self.detailView.dismissButton.transform = .identity
-          }, completion: nil)
+          })
         })
         
         UIImpactFeedbackGenerator(style: .medium).bzzt()

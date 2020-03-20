@@ -12,7 +12,7 @@ class SKUPurchaseButtonView: UIView {
       UIView.animate(withDuration: 0.25, delay: 0, options: [.beginFromCurrentState], animations: {
         self.layer.shadowOpacity = self.backgroundVisible ? 0.3 : 0.0
         self.backgroundView.alpha = self.backgroundVisible ? 1.0 : 0.0
-      }, completion: { _ in })
+      })
     }
   }
   

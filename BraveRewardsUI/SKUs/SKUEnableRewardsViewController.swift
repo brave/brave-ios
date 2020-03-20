@@ -169,10 +169,10 @@ public class SKUEnableRewardsView: UIView {
       $0.edges.equalTo(self)
     }
     containerView.snp.makeConstraints {
-      $0.top.greaterThanOrEqualTo(self).inset(20)
-      $0.bottom.lessThanOrEqualTo(self).inset(20)
-      $0.leading.trailing.equalTo(self).inset(20)
-      $0.centerY.equalTo(self)
+      $0.top.leading.greaterThanOrEqualTo(self).inset(20)
+      $0.bottom.trailing.lessThanOrEqualTo(self).inset(20)
+      $0.center.equalTo(self)
+      $0.width.lessThanOrEqualTo(400)
     }
     stackView.snp.makeConstraints {
       $0.edges.equalToSuperview().inset(25)

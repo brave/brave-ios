@@ -165,6 +165,11 @@ extension BrowserViewController {
     // MARK: - SKUS
     
     func paymentRequested(_ request: PaymentRequest, _ completionHandler: @escaping (_ response: PaymentRequestResponse) -> Void) {
+        if UIDevice.current.userInterfaceIdiom != .pad && UIApplication.shared.statusBarOrientation.isLandscape {
+            let value = UIInterfaceOrientation.portrait.rawValue
+            UIDevice.current.setValue(value, forKey: "orientation")
+        }
+        
         if !rewards.ledger.isEnabled {
             let enableRewards = SKUEnableRewardsViewController(
                 rewards: rewards,

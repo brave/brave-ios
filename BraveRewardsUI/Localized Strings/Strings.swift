@@ -322,6 +322,6 @@ internal extension Strings {
   static let SKUEnableRewardsBody = NSLocalizedString("SKUEnableRewardsBody", bundle: .rewardsUI, value: "To purchase this item, you need to earn tokens. Turn on Brave Rewards to earn.", comment: "")
   static let SKUEnableRewardsButtonTitle = NSLocalizedString("SKUEnableRewardsButtonTitle", bundle: .rewardsUI, value: "Enable Brave Rewards", comment: "")
   static let SKUEnableRewardsDisclaimer = NSLocalizedString("SKUEnableRewardsDisclaimer", bundle: .rewardsUI, value: "By tapping Enable Brave Rewards, you agree to Brave Reward’s Terms of Service.", comment: "")
-  static let SKUEnableRewardsDisclaimerLink = NSLocalizedString("SKUEnableRewardsDisclaimer", bundle: .rewardsUI, value: "Terms of Service.", comment: "The hyperlinked portion of the copy: 'By tapping Enable Brave Rewards, you agree to Brave Reward’s Terms of Service.'")
+  static let SKUEnableRewardsDisclaimerLink = NSLocalizedString("SKUEnableRewardsDisclaimerLink", bundle: .rewardsUI, value: "Terms of Service.", comment: "The hyperlinked portion of the copy: 'By tapping Enable Brave Rewards, you agree to Brave Reward’s Terms of Service.'")
 }
 
