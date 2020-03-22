@@ -258,6 +258,30 @@ extension BrowserViewController: WKNavigationDelegate {
                 self.tabManager.selectedTab?.alertShownCount = 0
                 self.tabManager.selectedTab?.blockAllAlerts = false
             }
+            
+            // Prevents synthetically activated links such as: CVE-2017-7089
+            if ["data", "blob", "file"].contains(url.scheme) {
+                if let clickType = navigationAction.value(forKey: "syntheticClickType") as? Int {
+                    if clickType == 0 {
+                        decisionHandler(.cancel)
+                        return
+                    }
+                }
+                
+                //Fallback.. Asks the user whether or not the url should be opened.. but only for `data`
+                if navigationAction.navigationType == .linkActivated && url.scheme == "data" {
+                    handleExternalURL(url) { didOpenURL in
+                        if !didOpenURL {
+                            let alert = UIAlertController(title: Strings.unableToOpenURLErrorTitle, message: Strings.unableToOpenURLError, preferredStyle: .alert)
+                            alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
+                            self.present(alert, animated: true, completion: nil)
+                        }
+                    }
+                    decisionHandler(.cancel)
+                    return
+                }
+            }
+            
             decisionHandler(.allow)
             return
         }
