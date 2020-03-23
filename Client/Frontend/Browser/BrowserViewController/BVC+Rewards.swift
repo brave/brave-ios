@@ -180,6 +180,7 @@ extension BrowserViewController {
                 }
             )
             present(enableRewards, animated: true)
+            completionHandler(.cancelled)
             return
         }
         
