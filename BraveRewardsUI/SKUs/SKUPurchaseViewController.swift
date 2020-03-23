@@ -62,7 +62,7 @@ public class SKUPurchaseViewController: UIViewController, UIViewControllerTransi
     title = Strings.SKUPurchaseTitle
     
     purchaseView.detailView.itemDetailValueLabel.text = request.details.displayItems.map { $0.label }.joined(separator: ", ")
-    purchaseView.detailView.orderAmountLabels.amountLabel.text = request.details.total.amount.value
+    purchaseView.detailView.orderAmountLabels.batContainer.amountLabel.text = request.details.total.amount.value
     
     purchaseView.detailView.dismissButton.addTarget(self, action: #selector(tappedDismissButton), for: .touchUpInside)
     purchaseView.gesturalDismissExecuted = { [unowned self] in
@@ -114,7 +114,9 @@ public class SKUPurchaseViewController: UIViewController, UIViewControllerTransi
   
   private func updateViewForBalance() {
     guard isViewLoaded, let balance = rewards.ledger.balance, let amount = Double(request.details.total.amount.value) else { return }
-    purchaseView.detailView.balanceView.amountLabels.amountLabel.text = "\(balance.total)"
+    purchaseView.detailView.orderAmountLabels.usdContainer.amountLabel.text = rewards.ledger.dollarStringForBATAmount(request.details.total.amount.value, includeCurrencyCode: false)
+    purchaseView.detailView.balanceView.amountLabels.batContainer.amountLabel.text = "\(balance.total)"
+    purchaseView.detailView.balanceView.amountLabels.usdContainer.amountLabel.text = rewards.ledger.dollarStringForBATAmount(balance.total, includeCurrencyCode: false)
     purchaseView.isShowingInsufficientFundsView = balance.total < amount
   }
   

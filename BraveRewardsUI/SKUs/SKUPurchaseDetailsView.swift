@@ -61,15 +61,19 @@ class SKUPurchaseDetailsView: UIView {
     $0.appearanceTextColor = UX.titleColor
   }
   
-  let orderAmountLabels = CurrencyContainerView(
-    amountLabelConfig: {
+  let orderAmountLabels = BATUSDPairView(
+    batAmountConfig: {
       $0.font = .systemFont(ofSize: 22.0, weight: .semibold)
       $0.appearanceTextColor = Colors.grey000
     },
-    kindLabelConfig: {
+    batKindConfig: {
       $0.text = Strings.BAT
       $0.font = .systemFont(ofSize: 18.0)
       $0.appearanceTextColor = Colors.grey000
+    },
+    usdConfig: {
+      $0.font = .systemFont(ofSize: 16.0)
+      $0.appearanceTextColor = Colors.grey200
     }
   )
   
@@ -205,15 +209,19 @@ class SKUPurchaseDetailsView: UIView {
 
 class SKUPurchaseWalletBalanceView: UIView {
   
-  let amountLabels = CurrencyContainerView(
-    amountLabelConfig: {
+  let amountLabels = BATUSDPairView(
+    batAmountConfig: {
       $0.font = .systemFont(ofSize: 18.0, weight: .medium)
       $0.appearanceTextColor = Colors.grey000
     },
-    kindLabelConfig: {
+    batKindConfig: {
       $0.text = Strings.BAT
       $0.font = .systemFont(ofSize: 16.0)
       $0.appearanceTextColor = Colors.grey000
+    },
+    usdConfig: {
+      $0.font = .systemFont(ofSize: 14.0)
+      $0.appearanceTextColor = Colors.grey200
     }
   )
   
