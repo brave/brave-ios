@@ -262,6 +262,13 @@ extension BrowserViewController: WKNavigationDelegate {
             // Prevents synthetically activated links such as: CVE-2017-7089
             if ["data", "blob", "file"].contains(url.scheme) {
                 if let clickType = navigationAction.value(forKey: "syntheticClickType") as? Int {
+                    //A click is synthetic if its value is 0 (aka WKSyntheticClickTypeNoTap).
+                    /*switch (syntheticClickType) {
+                    case WebKit::WebMouseEvent::OneFingerTap:
+                        return WKSyntheticClickTypeOneFingerTap;
+                    case WebKit::WebMouseEvent::TwoFingerTap:
+                        return WKSyntheticClickTypeTwoFingerTap;
+                    }*/
                     if clickType == 0 {
                         decisionHandler(.cancel)
                         return
