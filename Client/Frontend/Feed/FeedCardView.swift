@@ -35,7 +35,7 @@ class FeedCardContainerView: UIView {
 }
 
 enum FeedCardType: CGFloat {
-    case horizontalList = 350
+    case horizontalList = 330
     case verticalList = 390
     case verticalListBranded = 440
     case verticalListNumbered = 375
@@ -359,7 +359,7 @@ class FeedCardView: FeedCardContainerView {
             numberLabel.text = "1"
             containerView.addSubview(numberLabel)
             
-            let contentView = FeedCardContentView(data: item, layout: .horizontal, hidePublisher: true, delegate: self)
+            let contentView = FeedCardContentView(data: item, layout: .horizontal, hidePublisher: true, hideImage: true, delegate: self)
             containerView.addSubview(contentView)
             
             numberLabel.snp.makeConstraints {
@@ -394,7 +394,7 @@ class FeedCardView: FeedCardContainerView {
             numberLabel.text = "2"
             containerView.addSubview(numberLabel)
             
-            let contentView = FeedCardContentView(data: item, layout: .horizontal, hidePublisher: true, delegate: self)
+            let contentView = FeedCardContentView(data: item, layout: .horizontal, hidePublisher: true, hideImage: true, delegate: self)
             containerView.addSubview(contentView)
             
             numberLabel.snp.makeConstraints {
@@ -427,7 +427,7 @@ class FeedCardView: FeedCardContainerView {
             numberLabel.text = "3"
             containerView.addSubview(numberLabel)
             
-            let contentView = FeedCardContentView(data: item, layout: .horizontal, hidePublisher: true, delegate: self)
+            let contentView = FeedCardContentView(data: item, layout: .horizontal, hidePublisher: true, hideImage: true, delegate: self)
             containerView.addSubview(contentView)
             
             numberLabel.snp.makeConstraints {
@@ -698,14 +698,16 @@ class FeedCardContentView: UIView {
     var layout: FeedCardContentLayout!
     var delegate: FeedCardContentDelegate?
     var hidePublisher = false
+    var hideImage = false
     
     private var imageView: UIImageView?
     
-    required convenience init(data: FeedItem, layout: FeedCardContentLayout, hidePublisher: Bool? = false, delegate: FeedCardContentDelegate?) {
+    required convenience init(data: FeedItem, layout: FeedCardContentLayout, hidePublisher: Bool? = false, hideImage: Bool? = false, delegate: FeedCardContentDelegate?) {
         self.init(frame: .zero)
         self.data = data
         self.layout = layout
         self.hidePublisher = hidePublisher ?? false
+        self.hideImage = hideImage ?? false
         self.delegate = delegate
         
         prepare()
@@ -934,20 +936,21 @@ class FeedCardContentView: UIView {
         headlineLabel.snp.makeConstraints {
             $0.top.equalTo(imageView.snp.bottom).offset(12)
             $0.left.right.equalTo(0)
-        }
-        
-        let timeAgoLabel = UILabel()
-        timeAgoLabel.font = UIFont.systemFont(ofSize: 11, weight: .semibold)
-        timeAgoLabel.textColor = UIColor.white.withAlphaComponent(0.6)
-        timeAgoLabel.numberOfLines = 1
-        timeAgoLabel.text = Date.fromTimestamp(data.publishTime).toRelativeTimeString()
-        addSubview(timeAgoLabel)
-        
-        timeAgoLabel.snp.makeConstraints {
-            $0.top.equalTo(headlineLabel.snp.bottom).offset(4)
-            $0.left.right.equalTo(0)
             $0.bottom.equalTo(0)
         }
+        
+//        let timeAgoLabel = UILabel()
+//        timeAgoLabel.font = UIFont.systemFont(ofSize: 11, weight: .semibold)
+//        timeAgoLabel.textColor = UIColor.white.withAlphaComponent(0.6)
+//        timeAgoLabel.numberOfLines = 1
+//        timeAgoLabel.text = Date.fromTimestamp(data.publishTime).toRelativeTimeString()
+//        addSubview(timeAgoLabel)
+//
+//        timeAgoLabel.snp.makeConstraints {
+//            $0.top.equalTo(headlineLabel.snp.bottom).offset(4)
+//            $0.left.right.equalTo(0)
+//            $0.bottom.equalTo(0)
+//        }
         
         layoutSubviews()
         loadImage(urlString: data.img, imageView: imageView)
@@ -963,8 +966,8 @@ class FeedCardContentView: UIView {
         
         imageView.snp.makeConstraints {
             $0.right.top.bottom.equalTo(0)
-            $0.width.equalTo(data.img.isEmpty ? 0 : 98)
-            $0.height.equalTo(data.img.isEmpty ? 80 : 98)
+            $0.width.equalTo(data.img.isEmpty || self.hideImage ? 0 : 98)
+            $0.height.equalTo(data.img.isEmpty || self.hideImage  ? 80 : 98)
         }
         
         self.imageView = imageView

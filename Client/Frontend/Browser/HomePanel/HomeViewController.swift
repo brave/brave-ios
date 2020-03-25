@@ -822,7 +822,7 @@ class HomeViewController: UIViewController, Themeable {
         imageSponsorButton.alpha = alphaAt(scrollOffset, distance: 50)
         ddgButton.alpha = alphaAt((scrollOffset - 80), distance: 90)
         backgroundViewInfo?.imageView.alpha = max(alphaAt(scrollOffset - view.frame.height / 2, distance: view.frame.height), 0.6) // starts fading 1/2 up and limit
-        braveTodayHeader.alpha = min((scrollOffset - (view.frame.height - 45)) / 60, 1)
+        braveTodayHeader.alpha = min((scrollOffset - (view.frame.height * 0.75)) / 80, 1)
         
         if isLandscape {
             favoritesCollectionView.alpha = alphaAt(scrollOffset, distance: view.frame.height / 4)

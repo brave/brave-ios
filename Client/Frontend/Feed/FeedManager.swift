@@ -102,7 +102,7 @@ class FeedManager: NSObject {
     }
     
     private func requestFeedData(completion: @escaping ([FeedData]?) -> Void) {
-        guard let url = URL(string: "https://sjc.rapidpacket.com/~xtat/bt/latest.json") else { return }
+        guard let url = URL(string: "https://nlbtest.rapidpacket.com/latest.json") else { return }
         
         var request = URLRequest(url: url)
         request.addValue("gzip", forHTTPHeaderField: "Accept-Encoding")
@@ -126,7 +126,7 @@ class FeedManager: NSObject {
     }
     
     private func requestPublishers(completion: @escaping (Bool) -> Void) {
-        guard let url = URL(string: "http://sjc.rapidpacket.com/~xtat/bt/sources.json") else { return }
+        guard let url = URL(string: "https://nlbtest.rapidpacket.com/sources.json") else { return }
         
         var request = URLRequest(url: url)
         request.addValue("gzip", forHTTPHeaderField: "Accept-Encoding")
