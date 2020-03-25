@@ -80,7 +80,7 @@ extension PaymentRequestExtension: TabContentScript {
             }
             
             // Sum of individual items does not match the total
-            guard Double(body.details.total.amount.value) == body.details.displayItems.map({(Double($0.amount.value) ?? 0 )}).reduce(0, +) else {
+            guard Double(body.details.total.amount.value) == body.details.displayItems.compactMap({(Double($0.amount.value) )}).reduce(0, +) else {
                 sendPaymentRequestError(errorName: PaymentRequestErrors.rangeError.rawValue, errorMessage: Strings.invalidDetailsMessage)
                 return
             }
