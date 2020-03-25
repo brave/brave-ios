@@ -12,9 +12,11 @@ extension PlaylistItem {
         return NSFetchRequest<PlaylistItem>(entityName: "PlaylistItem")
     }
 
-    @NSManaged public var title: String
-    @NSManaged public var pageURL: String
+    @NSManaged public var pageTitle: String
+    @NSManaged public var pageSrc: String
+    @NSManaged public var name: String
     @NSManaged public var dateAdded: Date
-    @NSManaged public var blob: Data
+    @NSManaged public var cachedData: Data
+    @NSManaged public var duration: Float
 
 }

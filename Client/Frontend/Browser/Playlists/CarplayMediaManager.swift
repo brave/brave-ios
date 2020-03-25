@@ -11,43 +11,28 @@ import WebKit
 class CarplayMediaManager: NSObject {
     private var contentManager: MPPlayableContentManager
     private var player: AVPlayer
-    private var playableItems: [PlaylistInfo]
-    private let webView = WKWebView(frame: .zero, configuration: WKWebViewConfiguration().then {
-        $0.processPool = WKProcessPool()
-        
-        let script: WKUserScript? = {
-            guard let path = Bundle.main.path(forResource: "Playlist", ofType: "js"), let source = try? String(contentsOfFile: path) else {
-                return nil
-            }
-            
-            var alteredSource = source
-            let token = UserScriptManager.securityToken.uuidString.replacingOccurrences(of: "-", with: "", options: .literal)
-            alteredSource = alteredSource.replacingOccurrences(of: "$<videosSupportFullscreen>", with: "VSF\(token)", options: .literal)
-            
-            return WKUserScript(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false)
-        }()
-        
-        if let script = script {
-            $0.userContentController.addUserScript(script)
-        }
-    })
+    private var playlistItems = [PlaylistInfo]()
+    private var cacheLoader = PlaylistCacheLoader()
+    private var webLoader = PlaylistWebLoader(handler: { _ in })
+    private var currentStation: PlaylistInfo?
     
     public static let shared = CarplayMediaManager()
     
     private override init() {
         contentManager = MPPlayableContentManager.shared()
-        playableItems = []
+        playlistItems = []
         player = AVPlayer()
-        
-//        do {
-//            try AVAudioSession.sharedInstance().setCategory(.playback, options: .mixWithOthers)
-//            try AVAudioSession.sharedInstance().setActive(true, options: .notifyOthersOnDeactivation)
-//            UIApplication.shared.beginReceivingRemoteControlEvents()
-//        } catch {
-//            print(error)
-//        }
 
         super.init()
+        
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback, options: .duckOthers)
+            try AVAudioSession.sharedInstance().setActive(true, options: .notifyOthersOnDeactivation)
+        } catch {
+            print(error)
+        }
+        
+        UIApplication.shared.beginReceivingRemoteControlEvents()
         
         MPRemoteCommandCenter.shared().pauseCommand.addTarget { [weak self] _ in
             self?.player.pause()
@@ -85,12 +70,10 @@ class CarplayMediaManager: NSObject {
             MPMediaItemPropertyArtist: "Play"
         ]
 
-        webView.navigationDelegate = self
-        webView.configuration.userContentController.add(self, name: "playlistManager")
-        UIApplication.shared.keyWindow?.insertSubview(webView, at: 0)
+        player.addObserver(self, forKeyPath: "rate", options: .new, context: nil)
         contentManager.delegate = self
         contentManager.dataSource = self
-        self.updatePlayableItems()
+        self.updateItems()
         
         DispatchQueue.main.async {
             self.contentManager.beginUpdates()
@@ -106,69 +89,109 @@ class CarplayMediaManager: NSObject {
         }
     }
     
-    public func updatePlayableItems() {
-        playableItems = Playlist.shared.getItems()
+    public func updateItems() {
+        playlistItems = Playlist.shared.getItems()
         contentManager.reloadData()
     }
     
     private var completion: ((Error?) -> Void)?
-    private var currentStation: PlaylistInfo?
-}
-
-extension CarplayMediaManager: MPPlayableContentDelegate, WKScriptMessageHandler, WKNavigationDelegate {
     
-    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        
-        guard let completion = completion, let station = currentStation else {
-            return
-        }
-        
-        do {
-            guard let item = try PlaylistInfo.from(message: message) else { return }
-            if !item.mediaSource.isEmpty {
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
+        if keyPath == "rate" {
+            //completion?(player.status == .readyToPlay ? "Error attempting to play media" : nil)
+            completion?(nil)
+            completion = nil
+            
+            MPNowPlayingInfoCenter.default().nowPlayingInfo = [:]
+            
+            if let station = self.currentStation {
+                contentManager.nowPlayingIdentifiers = [station.name]
+                
                 MPNowPlayingInfoCenter.default().nowPlayingInfo = [
                     MPNowPlayingInfoPropertyMediaType: "Audio",
-                    MPMediaItemPropertyTitle: item.title,
-                    MPMediaItemPropertyArtist: item.mediaSource,
-                    MPNowPlayingInfoPropertyIsLiveStream: true,
-                    MPNowPlayingInfoPropertyAssetURL: URL(string: item.mediaSource)!
+                    MPMediaItemPropertyTitle: station.name,
+                    MPMediaItemPropertyArtist: station.pageSrc
                 ]
-                
-                if #available(iOS 13.0, *) {
-                    MPNowPlayingInfoCenter.default().playbackState = .playing
-                }
-                
-                self.player.replaceCurrentItem(with: AVPlayerItem(url: URL(string: item.mediaSource)!))
-                self.player.play()
-                completion(nil)
             }
-        } catch {
-            print(error)
+        }
+    }
+}
+
+extension CarplayMediaManager: MPPlayableContentDelegate {
+    
+    private func load(url: URL, resourceDelegate: AVAssetResourceLoaderDelegate?) {
+        let asset = AVURLAsset(url: url)
+        
+        if let delegate = resourceDelegate {
+            asset.resourceLoader.setDelegate(delegate, queue: .main)
         }
         
-        DispatchQueue.main.async {
-            self.webView.loadHTMLString("<html><body>PlayList</body></html>", baseURL: nil)
+        if let currentItem = player.currentItem, currentItem.asset.isKind(of: AVURLAsset.self) && player.status == .readyToPlay {
+            if let asset = currentItem.asset as? AVURLAsset, asset.url.absoluteString == url.absoluteString {
+                player.pause()
+                player.play()
+                return
+            }
+        }
+        
+        asset.loadValuesAsynchronously(forKeys: ["playable", "tracks", "duration"]) { [weak self] in
+            guard let self = self else { return }
+            DispatchQueue.main.async {
+                let item = AVPlayerItem(asset: asset)
+                self.player.replaceCurrentItem(with: item)
+                self.player.play()
+            }
         }
     }
     
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        
+    private func displayLoadingResourceError() {
+        let alert = UIAlertController(title: "Sorry", message: "There was a problem loading the resource!", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Okay", style: .default, handler: nil))
+        //self.present(alert, animated: true, completion: nil)
     }
     
     func playableContentManager(_ contentManager: MPPlayableContentManager, initiatePlaybackOfContentItemAt indexPath: IndexPath, completionHandler: @escaping (Error?) -> Void) {
         
         DispatchQueue.main.async {
             self.currentStation = nil
-            self.completion = nil
             
             if indexPath.count == 2 {
-                let station = self.playableItems[indexPath[1]]
+                let station = self.playlistItems[indexPath[1]]
                 self.currentStation = station
-                self.completion = completionHandler
                 
-                var request = URLRequest(url: URL(string: station.mediaSource)!)
-                request.httpMethod = "GET"
-                self.webView.load(request)
+                let item = self.playlistItems[indexPath.row]
+                let cache = Playlist.shared.getCache(item: item)
+                if cache.isEmpty {
+                    if let url = URL(string: item.src) {
+                        self.completion = completionHandler
+                        self.load(url: url, resourceDelegate: nil)
+                    } else {
+                        self.webLoader.removeFromSuperview()
+                        self.webLoader = PlaylistWebLoader(handler: { [weak self] item in
+                            guard let self = self else { return }
+                            if let item = item, let url = URL(string: item.src) {
+                                self.completion = completionHandler
+                                self.load(url: url, resourceDelegate: nil)
+                            } else {
+                                completionHandler("Error Attempting to load Media")
+                                self.displayLoadingResourceError()
+                            }
+                        })
+                        
+                        if let url = URL(string: item.pageSrc) {
+                            UIApplication.shared.keyWindow?.insertSubview(self.webLoader, at: 0)
+                            self.webLoader.frame = CGRect(width: 100.0, height: 100.0)
+                            self.webLoader.load(url: url)
+                        } else {
+                            completionHandler("Error Attempting to load Media")
+                            self.displayLoadingResourceError()
+                        }
+                    }
+                } else {
+                    self.completion = completionHandler
+                    self.cacheLoader = PlaylistCacheLoader(cacheData: cache)
+                    self.load(url: URL(string: "brave-ios://local-media-resource")!, resourceDelegate: self.cacheLoader)
+                }
             } else {
                 completionHandler(nil)
             }
@@ -200,7 +223,7 @@ extension CarplayMediaManager: MPPlayableContentDataSource {
         if indexPath.indices.count == 0 {
             return 1  //1 Tab.
         }
-        return playableItems.count
+        return playlistItems.count
     }
     
     func childItemsDisplayPlaybackProgress(at indexPath: IndexPath) -> Bool {
@@ -222,19 +245,19 @@ extension CarplayMediaManager: MPPlayableContentDataSource {
             return item
         }
         
-        if indexPath.count == 2, indexPath.item < playableItems.count {
+        if indexPath.count == 2, indexPath.item < playlistItems.count {
             // Stations section
-            let station = playableItems[indexPath.item]
-            let item = MPContentItem(identifier: "\(station.title)")
-            item.title = station.title
-            item.subtitle = station.mediaSource
+            let station = playlistItems[indexPath.item]
+            let item = MPContentItem(identifier: "\(station.name)")
+            item.title = station.pageTitle
+            item.subtitle = station.pageSrc
             item.isPlayable = true
             item.isStreamingContent = true
             
             // Get the station image from http or local
-            if station.mediaSource.contains("http") {
+            if station.src.contains("http") {
                 //Download the image..
-                let image: UIImage? = thumbnailForURL(station.mediaSource) ?? #imageLiteral(resourceName: "browser_lock_popup")
+                let image: UIImage? = thumbnailForURL(station.src) ?? #imageLiteral(resourceName: "browser_lock_popup")
                 DispatchQueue.main.async {
                     guard let image = image else { return }
                     item.artwork = MPMediaItemArtwork(boundsSize: image.size, requestHandler: { _ -> UIImage in

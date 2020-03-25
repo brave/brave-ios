@@ -13,19 +13,25 @@ class Playlist {
     static let shared = Playlist()
     private let dbLock = NSRecursiveLock()
     
-    func addItem(item: PlaylistInfo) {
+    func addItem(item: PlaylistInfo, completion: @escaping () -> Void) {
         if !self.itemExists(item: item) {
             self.backgroundContext.perform { [weak self] in
                 guard let self = self else { return }
 
                 let playlistItem = PlaylistItem(context: self.backgroundContext)
-                playlistItem.title = item.title
-                playlistItem.pageURL = item.pageURL
+                playlistItem.name = item.name
+                playlistItem.pageTitle = item.pageTitle
+                playlistItem.pageSrc = item.pageSrc
                 playlistItem.dateAdded = Date()
-                playlistItem.blob = Data()
+                playlistItem.cachedData = Data()
+                playlistItem.duration = item.duration
                 
-                try? self.backgroundContext.save()
+                self.saveContext(self.backgroundContext)
+                
+                completion()
             }
+        } else {
+            completion()
         }
     }
     
@@ -43,13 +49,20 @@ class Playlist {
     func getItems() -> [PlaylistInfo] {
         let request: NSFetchRequest<PlaylistItem> = PlaylistItem.fetchRequest()
         return (try? self.mainContext.fetch(request))?.map({
-            return PlaylistInfo(title: $0.title, mediaSource: $0.pageURL)
+            return PlaylistInfo(name: $0.name, src: "", pageSrc: $0.pageSrc, pageTitle: $0.pageTitle, duration: $0.duration)
         }) ?? []
+    }
+    
+    func getCache(item: PlaylistInfo) -> Data {
+        let request: NSFetchRequest<PlaylistItem> = PlaylistItem.fetchRequest()
+        request.predicate = NSPredicate(format: "pageSrc == %@", item.pageSrc)
+        request.fetchLimit = 1
+        return (try? self.mainContext.fetch(request))?.first?.cachedData ?? Data()
     }
     
     func itemExists(item: PlaylistInfo) -> Bool {
         let request: NSFetchRequest<PlaylistItem> = PlaylistItem.fetchRequest()
-        request.predicate = NSPredicate(format: "pageURL == %@", item.pageURL)
+        request.predicate = NSPredicate(format: "pageSrc == %@", item.pageSrc)
         return ((try? self.mainContext.count(for: request)) ?? 0) > 0
     }
     
@@ -57,7 +70,6 @@ class Playlist {
         let request: NSFetchRequest<PlaylistItem> = PlaylistItem.fetchRequest()
         return (try? self.mainContext.count(for: request)) ?? 0
     }
-    
     
     private init() {
         self.mainContext.reset()

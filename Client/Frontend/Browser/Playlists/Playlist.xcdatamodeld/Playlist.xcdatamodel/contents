@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="15508" systemVersion="19B88" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="15702" systemVersion="19D76" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="PlaylistItem" representedClassName="PlaylistItem" syncable="YES" codeGenerationType="class">
-        <attribute name="blob" attributeType="Binary"/>
+        <attribute name="cachedData" attributeType="Binary"/>
         <attribute name="dateAdded" attributeType="Date" usesScalarValueType="NO"/>
-        <attribute name="pageURL" attributeType="String"/>
-        <attribute name="title" attributeType="String"/>
+        <attribute name="duration" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="name" attributeType="String"/>
+        <attribute name="pageSrc" attributeType="String"/>
+        <attribute name="pageTitle" optional="YES" attributeType="String"/>
     </entity>
     <elements>
-        <element name="PlaylistItem" positionX="-63" positionY="-18" width="128" height="103"/>
+        <element name="PlaylistItem" positionX="-63" positionY="-18" width="128" height="133"/>
     </elements>
 </model>

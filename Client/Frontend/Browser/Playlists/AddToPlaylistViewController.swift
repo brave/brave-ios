@@ -27,7 +27,19 @@ class AddToPlaylistViewController: UIViewController {
     }
     
     private var tableView = UITableView(frame: .zero, style: .grouped)
+    private var footerButton = UIButton().then {
+        $0.setTitle("Add Item(s) to Playlist", for: .normal)
+        $0.backgroundColor = #colorLiteral(red: 0, green: 0.6666666667, blue: 1, alpha: 1)
+        $0.titleLabel?.font = .systemFont(ofSize: 14.0, weight: .medium)
+        $0.isHidden = true
+    }
+    private var footerStackView = UIStackView().then {
+        $0.axis = .vertical
+    }
+    
     private var playlistItems = [PlaylistInfo]()
+    private var checkedItems = [Bool]()
+    private var isSelectingAll = true
     
     init(tabManager: TabManager) {
         self.tabManager = tabManager
@@ -71,7 +83,9 @@ class AddToPlaylistViewController: UIViewController {
         view.addSubview(tableView)
         view.addSubview(stackView)
         view.addSubview(separator)
+        view.addSubview(footerStackView)
         stackView.addArrangedSubview(infoLabel)
+        footerStackView.addArrangedSubview(footerButton)
         
         stackView.snp.makeConstraints {
             $0.leading.trailing.top.equalTo(view.safeAreaLayoutGuide)
@@ -88,6 +102,11 @@ class AddToPlaylistViewController: UIViewController {
             $0.edges.equalTo(view.safeArea.edges)
         }
         
+        footerStackView.snp.makeConstraints {
+            $0.left.right.bottom.equalTo(view.safeAreaLayoutGuide)
+            $0.height.equalTo(42.0)
+        }
+        
         //tableView.contentInsetAdjustmentBehavior = .never
         tableView.contentInset = UIEdgeInsets(top: 50.0, left: 0.0, bottom: 0.0, right: 0.0)
         tableView.contentOffset = CGPoint(x: 0.0, y: -50.0)
@@ -98,15 +117,56 @@ class AddToPlaylistViewController: UIViewController {
                 self.updateItems()
             }.bind(to: self)
         })
+        
+        footerButton.addTarget(self, action: #selector(onAddItemsToPlaylist(_:)), for: .touchUpInside)
     }
     
     private func updateItems() {
         playlistItems = tabManager.tabsForCurrentMode.map({ $0.playlistItems }).flatMap({ $0.value })
+        checkedItems = [Bool](repeating: false, count: playlistItems.count)
+        footerButton.isHidden = true
     }
     
     @objc
     private func onSelectAll(_ button: UIBarButtonItem) {
+        for i in 0..<checkedItems.count {
+            checkedItems[i] = isSelectingAll
+        }
         
+        if isSelectingAll {
+            footerButton.isHidden = false
+            footerButton.setTitle("Add \(playlistItems.count) Item(s) to Playlist", for: .normal)
+        } else {
+            footerButton.isHidden = true
+            footerButton.setTitle("Add Item(s) to Playlist", for: .normal)
+        }
+        
+        isSelectingAll.toggle()
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: isSelectingAll ? "Select All" : "Deselect All", style: .plain, target: self, action: #selector(onSelectAll(_:)))
+        tableView.reloadData()
+    }
+    
+    @objc
+    private func onAddItemsToPlaylist(_ button: UIButton) {
+        let group = DispatchGroup()
+        
+        playlistItems.forEach({
+            group.enter()
+            Playlist.shared.addItem(item: $0, completion: {
+                group.leave()
+            })
+        })
+        
+        group.notify(queue: .main) {
+            self.tabManager.tabsForCurrentMode.forEach({
+                $0.playlistItems.value.removeAll(where: {
+                    Playlist.shared.itemExists(item: $0)
+                })
+            })
+            
+            let playlistController = PlaylistViewController(tabManager: self.tabManager)
+            self.present(playlistController, animated: true, completion: nil)
+        }
     }
 }
 
@@ -132,14 +192,17 @@ extension AddToPlaylistViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         
+        let item = self.playlistItems[indexPath.row]
+        
         cell.selectionStyle = .none
-        cell.indicatorIcon.image = #imageLiteral(resourceName: "videoThumbSlider").template
-        cell.indicatorIcon.tintColor = #colorLiteral(red: 0, green: 0.6666666667, blue: 1, alpha: 1)
         cell.thumbnailView.image = #imageLiteral(resourceName: "shields-menu-icon")
-        cell.titleLabel.text = "Welcome to Brave Video Player"
-        cell.detailLabel.text = "22 mins"
+        cell.titleLabel.text = item.name
+        cell.detailLabel.text = String(format: "%.2f mins", item.duration / 60.0)
         cell.contentView.backgroundColor = .clear
         cell.backgroundColor = .clear
+        
+        cell.thumbnailView.setFavicon(forSite: .init(url: item.pageSrc, title: item.pageTitle))
+        cell.checkedIcon.isHidden = !checkedItems[indexPath.row]
         
         return cell
     }
@@ -152,16 +215,17 @@ extension AddToPlaylistViewController: UITableViewDataSource {
 extension AddToPlaylistViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let item = self.playlistItems[indexPath.row]
+        checkedItems[indexPath.row].toggle()
+        tableView.reloadRows(at: [indexPath], with: .automatic)
         
+        let countOfCheckedItems = checkedItems.filter({ $0 }).count
+        footerButton.isHidden = countOfCheckedItems == 0
+        footerButton.setTitle("Add \(countOfCheckedItems) Item(s) to Playlist", for: .normal)
     }
 }
 
 private class PlaylistSelectionCell: UITableViewCell {
-    public let indicatorIcon = UIImageView().then {
-        $0.contentMode = .scaleAspectFit
-    }
-    
+
     public let thumbnailView = UIImageView().then {
         $0.contentMode = .scaleAspectFit
         $0.layer.cornerRadius = 5.0
@@ -190,6 +254,14 @@ private class PlaylistSelectionCell: UITableViewCell {
         $0.axis = .vertical
     }
     
+    let checkedIcon = UIImageView().then {
+        $0.contentMode = .scaleAspectFit
+        $0.image = #imageLiteral(resourceName: "check").scale(toSize: CGSize(width: 20.0, height: 20.0)).template
+        $0.transform = CGAffineTransform(rotationAngle: 10 * .pi / 180.0)
+        $0.tintColor = .white
+        $0.isHidden = true
+    }
+    
     private let separator = UIView().then {
         $0.backgroundColor = #colorLiteral(red: 0.5176470588, green: 0.5411764706, blue: 0.568627451, alpha: 1)
     }
@@ -203,15 +275,11 @@ private class PlaylistSelectionCell: UITableViewCell {
         
         contentView.addSubview(iconStackView)
         contentView.addSubview(infoStackView)
-        iconStackView.addArrangedSubview(indicatorIcon)
         iconStackView.addArrangedSubview(thumbnailView)
         infoStackView.addArrangedSubview(titleLabel)
         infoStackView.addArrangedSubview(detailLabel)
+        contentView.addSubview(checkedIcon)
         contentView.addSubview(separator)
-        
-        indicatorIcon.snp.makeConstraints {
-            $0.width.height.equalTo(12.0)
-        }
         
         thumbnailView.snp.makeConstraints {
             $0.width.height.equalTo(30.0)
@@ -225,9 +293,14 @@ private class PlaylistSelectionCell: UITableViewCell {
         
         infoStackView.snp.makeConstraints {
             $0.left.equalTo(iconStackView.snp.right).offset(15.0)
-            $0.right.equalToSuperview().offset(-15.0)
             $0.top.equalToSuperview().offset(5.0)
             $0.bottom.equalToSuperview().offset(-5.0)
+        }
+        
+        checkedIcon.snp.makeConstraints {
+            $0.left.greaterThanOrEqualTo(infoStackView.snp.right).offset(15.0)
+            $0.right.equalToSuperview().offset(-15.0)
+            $0.centerY.equalToSuperview()
         }
         
         separator.snp.makeConstraints {

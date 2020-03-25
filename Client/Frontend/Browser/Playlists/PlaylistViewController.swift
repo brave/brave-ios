@@ -313,7 +313,7 @@ private class VideoView: UIView, VideoTrackerBarDelegate {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
+
         //Setup
         self.backgroundColor = .black
         self.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onOverlayTapped(_:))).then {
@@ -568,9 +568,13 @@ private class VideoView: UIView, VideoTrackerBarDelegate {
         player.replaceCurrentItem(with: nil)
     }
     
-    public func load(url: URL) {
+    public func load(url: URL, resourceDelegate: AVAssetResourceLoaderDelegate?) {
         thumbnailView.isHidden = false
-        let asset = AVAsset(url: url)
+        let asset = AVURLAsset(url: url)
+        
+        if let delegate = resourceDelegate {
+            asset.resourceLoader.setDelegate(delegate, queue: .main)
+        }
         
         if let currentItem = player.currentItem, currentItem.asset.isKind(of: AVURLAsset.self) && player.status == .readyToPlay {
             if let asset = currentItem.asset as? AVURLAsset, asset.url.absoluteString == url.absoluteString {
@@ -594,6 +598,7 @@ private class VideoView: UIView, VideoTrackerBarDelegate {
                 let endTime = CMTimeConvertScale(item.asset.duration, timescale: self.player.currentTime().timescale, method: .roundHalfAwayFromZero)
                 self.trackBar.setTimeRange(currentTime: item.currentTime(), endTime: endTime)
                 self.thumbnailView.isHidden = true
+                self.play()
             }
         }
     }
@@ -613,12 +618,19 @@ class PlaylistViewController: UIViewController {
         $0.textAlignment = .center
         $0.appearanceTextColor = .white
         $0.numberOfLines = 0
-        $0.text = "Hello Brave Welcome to blah blah blah.."
+        $0.text = "Playlist"
     }
     
     private let playerView = VideoView()
     private var tableView = UITableView(frame: .zero, style: .grouped)
     private var playlistItems = [PlaylistInfo]()
+    private var cacheLoader = PlaylistCacheLoader()
+    private var webLoader = PlaylistWebLoader(handler: { _ in })
+    private var currentItem = 0
+    private let activityIndicator = UIActivityIndicatorView(style: .white).then {
+        $0.isHidden = true
+        $0.hidesWhenStopped = true
+    }
     
     init(tabManager: TabManager) {
         self.tabManager = tabManager
@@ -629,15 +641,31 @@ class PlaylistViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    deinit {
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback, options: [.allowAirPlay, .allowBluetooth, .duckOthers])
+            try AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+        } catch {
+            print(error)
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
     
+        navigationController?.presentationController?.delegate = self
         navigationController?.navigationBar.tintColor = #colorLiteral(red: 0, green: 0.6666666667, blue: 1, alpha: 1)
         navigationController?.navigationBar.isTranslucent = false
         navigationController?.navigationBar.barTintColor = #colorLiteral(red: 0.231372549, green: 0.2431372549, blue: 0.3137254902, alpha: 1)
         navigationController?.navigationBar.appearanceBarTintColor = #colorLiteral(red: 0.231372549, green: 0.2431372549, blue: 0.3137254902, alpha: 1)
         navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
         navigationController?.navigationBar.shadowImage = UIImage()
+        
+        navigationItem.titleView = UIImageView(image: #imageLiteral(resourceName: "browser_lock_popup")).then {
+            $0.contentMode = .scaleAspectFit
+        }
+        
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Clear All", style: .plain, target: nil, action: nil)
         
         view.backgroundColor = #colorLiteral(red: 0.231372549, green: 0.2431372549, blue: 0.3137254902, alpha: 1)
         
@@ -654,6 +682,7 @@ class PlaylistViewController: UIViewController {
         view.addSubview(tableView)
         view.addSubview(stackView)
         view.addSubview(playerView)
+        playerView.addSubview(activityIndicator)
         stackView.addArrangedSubview(infoLabel)
         
         stackView.snp.makeConstraints {
@@ -665,6 +694,10 @@ class PlaylistViewController: UIViewController {
             $0.top.equalTo(stackView.snp.bottom)
             $0.leading.trailing.equalToSuperview()
             $0.height.equalTo(0.60 * view.bounds.width)
+        }
+        
+        activityIndicator.snp.makeConstraints {
+            $0.center.equalToSuperview()
         }
         
         tableView.snp.makeConstraints {
@@ -681,15 +714,26 @@ class PlaylistViewController: UIViewController {
                 self.updateItems()
             }.bind(to: self)
         })
+        
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback, options: [.allowAirPlay, .allowBluetooth, .duckOthers])
+            try AVAudioSession.sharedInstance().setActive(true, options: .notifyOthersOnDeactivation)
+        } catch {
+            print(error)
+        }
     }
     
     private func updateItems() {
-        playlistItems = tabManager.tabsForCurrentMode.map({ $0.playlistItems }).flatMap({ $0.value })
-        playlistItems.forEach({
-            Playlist.shared.addItem(item: $0)
-        })
+        playlistItems = Playlist.shared.getItems()
+        CarplayMediaManager.shared.updateItems()
         
-        CarplayMediaManager.shared.updatePlayableItems()
+        self.tableView(tableView, didSelectRowAt: IndexPath(row: 0, section: 0))
+    }
+}
+
+extension PlaylistViewController: UIAdaptivePresentationControllerDelegate {
+    func adaptivePresentationStyle(for controller: UIPresentationController, traitCollection: UITraitCollection) -> UIModalPresentationStyle {
+        return .fullScreen
     }
 }
 
@@ -715,14 +759,22 @@ extension PlaylistViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         
+        let item = self.playlistItems[indexPath.row]
+        
         cell.selectionStyle = .none
         cell.indicatorIcon.image = #imageLiteral(resourceName: "videoThumbSlider").template
         cell.indicatorIcon.tintColor = #colorLiteral(red: 0, green: 0.6666666667, blue: 1, alpha: 1)
         cell.thumbnailView.image = #imageLiteral(resourceName: "shields-menu-icon")
-        cell.titleLabel.text = "Welcome to Brave Video Player"
-        cell.detailLabel.text = "22 mins"
+        cell.titleLabel.text = item.name
+        cell.detailLabel.text = String(format: "%.2f mins", item.duration / 60.0)
         cell.contentView.backgroundColor = .clear
         cell.backgroundColor = .clear
+        cell.thumbnailView.setFavicon(forSite: .init(url: item.pageSrc, title: item.pageTitle))
+        
+        if indexPath.row == currentItem {
+            cell.indicatorIcon.image = #imageLiteral(resourceName: "videoPlayingIndicator")
+            cell.indicatorIcon.tintColor = .clear
+        }
         
         return cell
     }
@@ -735,8 +787,58 @@ extension PlaylistViewController: UITableViewDataSource {
 extension PlaylistViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        activityIndicator.startAnimating()
+        activityIndicator.isHidden = false
+        currentItem = indexPath.row
         let item = self.playlistItems[indexPath.row]
-        self.playerView.load(url: URL(string: item.src)!)
+        let cache = Playlist.shared.getCache(item: item)
+        
+        infoLabel.text = item.name
+        if let cell = tableView.cellForRow(at: indexPath) as? PlaylistCell, let image = cell.thumbnailView.image {
+            (navigationItem.titleView as? UIImageView)?.image = image
+        } else {
+            (navigationItem.titleView as? UIImageView)?.setFavicon(forSite: .init(url: item.pageSrc, title: item.pageTitle), onCompletion: { [weak self] _, _ in
+                guard let self = self else { return }
+                self.navigationItem.titleView?.backgroundColor = .clear
+                self.navigationItem.titleView?.tintColor = .white
+            })
+        }
+        
+        if cache.isEmpty {
+            if let url = URL(string: item.src) {
+                self.playerView.load(url: url, resourceDelegate: nil)
+                self.activityIndicator.stopAnimating()
+            } else {
+                webLoader = PlaylistWebLoader(handler: { [weak self] item in
+                    guard let self = self else { return }
+                    if let item = item, let url = URL(string: item.src) {
+                        self.playerView.load(url: url, resourceDelegate: nil)
+                        self.activityIndicator.stopAnimating()
+                    } else {
+                        self.activityIndicator.stopAnimating()
+                        self.displayLoadingResourceError()
+                    }
+                })
+                
+                if let url = URL(string: item.pageSrc) {
+                    webLoader.load(url: url)
+                } else {
+                    self.displayLoadingResourceError()
+                }
+            }
+        } else {
+            self.cacheLoader = PlaylistCacheLoader(cacheData: cache)
+            self.playerView.load(url: URL(string: "brave-ios://local-media-resource")!, resourceDelegate: self.cacheLoader)
+        }
+        
+        tableView.reloadData()
+    }
+    
+    private func displayLoadingResourceError() {
+        let alert = UIAlertController(title: "Sorry", message: "There was a problem loading the resource!", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Okay", style: .default, handler: nil))
+        self.present(alert, animated: true, completion: nil)
     }
 }
 

@@ -684,6 +684,8 @@
 		5E0FCD23234253DC00AC831E /* CertificatePinning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E0FCD22234253DC00AC831E /* CertificatePinning.swift */; };
 		5E0FCD252342544C00AC831E /* URLSession+Requests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E0FCD242342544C00AC831E /* URLSession+Requests.swift */; };
 		5E22D0792418C9170005D8C5 /* AddToPlaylistViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E22D0782418C9170005D8C5 /* AddToPlaylistViewController.swift */; };
+		5E22D0812418DBEF0005D8C5 /* PlaylistManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E22D07F2418DBEE0005D8C5 /* PlaylistManager.swift */; };
+		5E2DF91D24194779000A8943 /* PlaylistCacheLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E2DF91C24194779000A8943 /* PlaylistCacheLoader.swift */; };
 		5E3477E922D7771700B0D5F8 /* ResourceDownloader.js in Resources */ = {isa = PBXBuildFile; fileRef = 5E3477E822D7771700B0D5F8 /* ResourceDownloader.js */; };
 		5E34781022D7A1D200B0D5F8 /* ResourceDownloadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E34780F22D7A1D200B0D5F8 /* ResourceDownloadManager.swift */; };
 		5E46C371234FACC600ACA8C1 /* root.cer in Resources */ = {isa = PBXBuildFile; fileRef = 5E46C36D234FACC600ACA8C1 /* root.cer */; };
@@ -701,7 +703,6 @@
 		5E612A90234B7FCD007D12B5 /* OnboardingRewardsAgreementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E1D8C6C232BF9C200BDE662 /* OnboardingRewardsAgreementView.swift */; };
 		5E6683A923D61CF7005B3A6C /* NTPDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E6683A823D61CF7005B3A6C /* NTPDownloader.swift */; };
 		5E6B9A3D239573D100E6720C /* Playlist.js in Resources */ = {isa = PBXBuildFile; fileRef = 5E6B9A3C239573D100E6720C /* Playlist.js */; };
-		5E6B9A402395752300E6720C /* PlaylistManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E6B9A3F2395752300E6720C /* PlaylistManager.swift */; };
 		5E6B9A4223957DB800E6720C /* PlaylistViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E6B9A4123957DB800E6720C /* PlaylistViewController.swift */; };
 		5E77F9A8236B362800E1649C /* DeviceCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E856FE7235E083B0094E113 /* DeviceCheck.swift */; };
 		5E77F9AA236B362E00E1649C /* Cryptography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E856FE5235E08110094E113 /* Cryptography.swift */; };
@@ -2193,6 +2194,8 @@
 		5E1D8C6C232BF9C200BDE662 /* OnboardingRewardsAgreementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingRewardsAgreementView.swift; sourceTree = "<group>"; };
 		5E1D8C6E232C0BDB00BDE662 /* onboarding-rewards.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "onboarding-rewards.json"; sourceTree = "<group>"; };
 		5E22D0782418C9170005D8C5 /* AddToPlaylistViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddToPlaylistViewController.swift; sourceTree = "<group>"; };
+		5E22D07F2418DBEE0005D8C5 /* PlaylistManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PlaylistManager.swift; path = Client/Frontend/Browser/PlaylistManager.swift; sourceTree = SOURCE_ROOT; };
+		5E2DF91C24194779000A8943 /* PlaylistCacheLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistCacheLoader.swift; sourceTree = "<group>"; };
 		5E3477E822D7771700B0D5F8 /* ResourceDownloader.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = ResourceDownloader.js; sourceTree = "<group>"; };
 		5E34780F22D7A1D200B0D5F8 /* ResourceDownloadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceDownloadManager.swift; sourceTree = "<group>"; };
 		5E46C36D234FACC600ACA8C1 /* root.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = root.cer; sourceTree = "<group>"; };
@@ -2206,7 +2209,6 @@
 		5E4845C122DE3DF800372022 /* WindowRenderHelperScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowRenderHelperScript.swift; sourceTree = "<group>"; };
 		5E6683A823D61CF7005B3A6C /* NTPDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NTPDownloader.swift; sourceTree = "<group>"; };
 		5E6B9A3C239573D100E6720C /* Playlist.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = Playlist.js; sourceTree = "<group>"; };
-		5E6B9A3F2395752300E6720C /* PlaylistManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistManager.swift; sourceTree = "<group>"; };
 		5E6B9A4123957DB800E6720C /* PlaylistViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistViewController.swift; sourceTree = "<group>"; };
 		5E77F9DC236BB68700E1649C /* AttestationDebugger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttestationDebugger.swift; sourceTree = "<group>"; };
 		5E856FE5235E08110094E113 /* Cryptography.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = Cryptography.swift; sourceTree = "<group>"; tabWidth = 2; };
@@ -4269,11 +4271,14 @@
 		5E8B486723983BCA0075A4EF /* Playlists */ = {
 			isa = PBXGroup;
 			children = (
-				5ED3F38D239AD9A30048CE56 /* PlaylistItem+CoreDataClass.swift */,
-				5ED3F38E239AD9A30048CE56 /* PlaylistItem+CoreDataProperties.swift */,
-				5E6B9A3F2395752300E6720C /* PlaylistManager.swift */,
+				5E22D0782418C9170005D8C5 /* AddToPlaylistViewController.swift */,
+				5E6B9A4123957DB800E6720C /* PlaylistViewController.swift */,
+				5E22D07F2418DBEE0005D8C5 /* PlaylistManager.swift */,
 				5E8B486823983BFC0075A4EF /* CarplayMediaManager.swift */,
 				5ED3F387239AD7EC0048CE56 /* Playlist.swift */,
+				5ED3F38D239AD9A30048CE56 /* PlaylistItem+CoreDataClass.swift */,
+				5ED3F38E239AD9A30048CE56 /* PlaylistItem+CoreDataProperties.swift */,
+				5E2DF91C24194779000A8943 /* PlaylistCacheLoader.swift */,
 				5ED3F38A239AD89D0048CE56 /* Playlist.xcdatamodeld */,
 			);
 			path = Playlists;
@@ -4605,8 +4610,6 @@
 				5E4845C122DE3DF800372022 /* WindowRenderHelperScript.swift */,
 				0A19365323508756002E2B81 /* LinkPreviewViewController.swift */,
 				0A66550923E9D9750047EF2A /* UserAgent.swift */,
-				5E6B9A4123957DB800E6720C /* PlaylistViewController.swift */,
-				5E22D0782418C9170005D8C5 /* AddToPlaylistViewController.swift */,
 			);
 			indentWidth = 4;
 			path = Browser;
@@ -6592,6 +6595,7 @@
 				5E6B9A402395752300E6720C /* PlaylistManager.swift in Sources */,
 				0AB2442C22AA789B00B4D9DD /* ReaderModeButton.swift in Sources */,
 				4422D55E21BFFB7F00BF1855 /* mimics_pcre.cc in Sources */,
+				5E2DF91D24194779000A8943 /* PlaylistCacheLoader.swift in Sources */,
 				0A6112AC230B00E7001BBC45 /* OnboardingNavigationController.swift in Sources */,
 				4422D57321BFFB7F00BF1855 /* stringpiece.cc in Sources */,
 				27187808216526090006036E /* AlertPopupView.swift in Sources */,
@@ -6664,6 +6668,7 @@
 				E4A961181AC041C40069AD6F /* ReadabilityService.swift in Sources */,
 				5E612A90234B7FCD007D12B5 /* OnboardingRewardsAgreementView.swift in Sources */,
 				4422D56A21BFFB7F00BF1855 /* simplify.cc in Sources */,
+				5E22D0812418DBEF0005D8C5 /* PlaylistManager.swift in Sources */,
 				5EC594F1232C697200922111 /* OnboardingAdsCountdownView.swift in Sources */,
 				A134B88A20DA98BB00A581D0 /* ClientPreferences.swift in Sources */,
 				D3BE7B261B054D4400641031 /* main.swift in Sources */,

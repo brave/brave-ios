@@ -9,7 +9,8 @@ function notifyNode(node) {
                                                                   "name": node.title,
                                                                   "src": node.src,
                                                                   "pageSrc": window.location.href,
-                                                                  "pageTitle": document.title
+                                                                  "pageTitle": document.title,
+                                                                  "duration": node.duration !== node.duration ? 0.0 : node.duration
                                                                   });
 }
 
@@ -20,6 +21,10 @@ function observeNode(node) {
         });
         node.observer.observe(node, { attributes: true, attributeFilter: ["src"] });
         notifyNode(node);
+        
+        node.addEventListener('loadedmetadata', function() {
+            notifyNode(node);
+        });
     }
 }
 
@@ -42,11 +47,26 @@ function getAllVideoElements() {
     return document.querySelectorAll('video');
 }
 
+function onReady(fn) {
+    if (document.readyState === "complete" || document.readyState === "interactive") {
+        setTimeout(fn, 1);
+    } else {
+        document.addEventListener("DOMContentLoaded", fn);
+    }
+}
+
 //TODO: Modify to not use mutation observers
 //TODO: Modify to not use intervals
 //^ Fix all of the above using a node.add and node.insert hook instead.
 function observePage() {
     observeDocument(document);
+    
+//    onReady(function() {
+//        getAllVideoElements().forEach(function(node) {
+//            observeNode(node);
+//            notifyNode(node);
+//        });
+//    });
     
     // Timeinterval is needed for DailyMotion as their DOM is bad
     var interval = setInterval(function(){
@@ -54,12 +74,12 @@ function observePage() {
             observeNode(node);
             notifyNode(node);
         });
-    }, 500);
+    }, 1000);
     
     var timeout = setTimeout(function() {
         clearInterval(interval);
         clearTimeout(timeout);
-    }, 5000);
+    }, 10000);
 }
 
 observePage();

@@ -52,6 +52,12 @@ public class Observable<T> {
         }
     }
     
+    public func refresh() {
+        subscribers.forEach({
+            $0.0(value, value)
+        })
+    }
+    
     @discardableResult
     public func observe(_ observer: @escaping Observer) -> Disposable {
         let disposable = DisposableReference({ [weak self] in self?.removeObserver($0) })
@@ -74,6 +80,15 @@ struct PlaylistInfo: Decodable {
     let src: String
     let pageSrc: String
     let pageTitle: String
+    var duration: Float
+    
+    init(name: String, src: String, pageSrc: String, pageTitle: String, duration: Float) {
+        self.name = name
+        self.src = src
+        self.pageSrc = pageSrc
+        self.pageTitle = pageTitle
+        self.duration = duration
+    }
     
     static func from(message: WKScriptMessage) throws -> PlaylistInfo? {
         if !JSONSerialization.isValidJSONObject(message.body) {
@@ -90,6 +105,7 @@ struct PlaylistInfo: Decodable {
         self.src = (try? container.decode(String.self, forKey: .src)) ?? ""
         self.pageSrc = (try? container.decode(String.self, forKey: .pageSrc)) ?? ""
         self.pageTitle = (try? container.decode(String.self, forKey: .pageTitle)) ?? ""
+        self.duration = (try? container.decode(Float.self, forKey: .duration)) ?? 0.0
     }
     
     private enum CodingKeys: String, CodingKey {
@@ -97,6 +113,7 @@ struct PlaylistInfo: Decodable {
         case src
         case pageSrc
         case pageTitle
+        case duration
     }
 }
 
@@ -119,10 +136,16 @@ class PlaylistManager: TabContentScript {
         
         do {
             guard let item = try PlaylistInfo.from(message: message) else { return }
-            
-            if tab?.playlistItems.value.contains(where: { $0.pageSrc == item.pageSrc }) == false {
-                if !item.src.isEmpty {
-                    tab?.playlistItems.value.append(item)
+            if !Playlist.shared.itemExists(item: item) {
+                if let items = tab?.playlistItems, let index = items.value.firstIndex(where: { $0.pageSrc == item.pageSrc }) {
+                    if items.value[index].duration < 0.01 {
+                        items.value[index].duration = item.duration
+                        items.refresh()
+                    }
+                } else {
+                    if !item.src.isEmpty {
+                        tab?.playlistItems.value.append(item)
+                    }
                 }
             }
         } catch {
