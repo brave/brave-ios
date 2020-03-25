@@ -1,3 +1,4 @@
+const $<paymentreq>_CLOSED = "closed";
 const $<paymentreq>_CREATED = "created";
 const $<paymentreq>_INTERACTIVE = "interactive";
 
