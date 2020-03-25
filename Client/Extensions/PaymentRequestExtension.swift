@@ -78,7 +78,7 @@ extension PaymentRequestExtension: TabContentScript {
             }
             
             // Sum of individual items does not match the total
-            guard Int(body.details.total.amount.value) == body.details.displayItems.map({(Int($0.amount.value) ?? 0 )}).reduce(0, +) else {
+            guard Double(body.details.total.amount.value) == body.details.displayItems.map({(Double($0.amount.value) ?? 0 )}).reduce(0, +) else {
                 sendPaymentRequestError(errorName: PaymentRequestErrors.RangeError.rawValue, errorMessage: Strings.unsupportedInstrumentMessage)
                 return
             }
