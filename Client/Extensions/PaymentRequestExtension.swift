@@ -23,6 +23,8 @@ class PaymentRequestExtension: NSObject {
     fileprivate enum PaymentRequestErrors: String {
         case NotSupportedError = "NotSupportedError"
         case AbortError = "AbortError"
+        case TypeError = "TypeError"
+        case RangeError = "RangeError"
     }
     
     private let paymentRequested: PaymentRequestHandler
@@ -69,6 +71,18 @@ extension PaymentRequestExtension: TabContentScript {
                 return
             }
             
+            // All currencies should match
+            guard body.details.displayItems.map({$0.amount.currency}).allSatisfy({ $0 == body.details.total.amount.currency }) else {
+                sendPaymentRequestError(errorName: PaymentRequestErrors.TypeError.rawValue, errorMessage: Strings.invalidDetailsMessage)
+                return
+            }
+            
+            // Sum of individual items does not match the total
+            guard Int(body.details.total.amount.value) == body.details.displayItems.map({(Int($0.amount.value) ?? 0 )}).reduce(0, +) else {
+                sendPaymentRequestError(errorName: PaymentRequestErrors.RangeError.rawValue, errorMessage: Strings.unsupportedInstrumentMessage)
+                return
+            }
+
             paymentRequested(body) { response in
                 switch response {
                 case .cancelled:
@@ -87,7 +101,8 @@ extension PaymentRequestExtension: TabContentScript {
                 }
             }
         } catch {
-            log.error(error)
+            sendPaymentRequestError(errorName: PaymentRequestErrors.TypeError.rawValue, errorMessage: Strings.invalidDetailsMessage)
+            return
         }
             
     }
@@ -97,4 +112,5 @@ extension Strings {
     //Errors
     public static let unsupportedInstrumentMessage = NSLocalizedString("unsupportedInstrumentMessage", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Unsupported payment instruments", comment: "Error message if list of Payment Instruments doesn't include BAT")
     public static let userCancelledMessage = NSLocalizedString("userCancelledMessage", tableName: "BraveShared", bundle: Bundle.braveShared, value: "User cancelled", comment: "Error message if the payment workflow is canceled by the user")
+    public static let invalidDetailsMessage = NSLocalizedString("invalidDetailsMessage", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Invalid details in payment request", comment: "Error message if details don't have the right type or values")
 }
