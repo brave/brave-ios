@@ -36,6 +36,12 @@ function observeDocument(node) {
                     if (node.constructor.name == "HTMLVideoElement") {
                         observeNode(node);
                     }
+                    else if (node.constructor.name == "HTMLAudioElement") {
+                        observeNode(node);
+                    }
+                    else if (node.constructor.name == "HTMLMediaElement") {
+                        console.log("DETECTED MEDIA ELEMENT: " + node.constructor.name);
+                    }
                 });
             });
         });
@@ -45,6 +51,10 @@ function observeDocument(node) {
 
 function getAllVideoElements() {
     return document.querySelectorAll('video');
+}
+
+function getAllAudioElements() {
+    return document.querySelectorAll('audio');
 }
 
 function onReady(fn) {
@@ -71,6 +81,11 @@ function observePage() {
     // Timeinterval is needed for DailyMotion as their DOM is bad
     var interval = setInterval(function(){
         getAllVideoElements().forEach(function(node) {
+            observeNode(node);
+            notifyNode(node);
+        });
+        
+        getAllAudioElements().forEach(function(node) {
             observeNode(node);
             notifyNode(node);
         });
