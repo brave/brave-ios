@@ -197,6 +197,19 @@ class UserScriptManager {
         
         return WKUserScript(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false)
     }()
+    
+    private let PlaylistHelperScript: WKUserScript? = {
+        guard let path = Bundle.main.path(forResource: "Playlist", ofType: "js"), let source = try? String(contentsOfFile: path) else {
+            log.error("Failed to load Playlist.js")
+            return nil
+        }
+        
+        var alteredSource = source
+        let token = UserScriptManager.securityToken.uuidString.replacingOccurrences(of: "-", with: "", options: .literal)
+        alteredSource = alteredSource.replacingOccurrences(of: "$<videosSupportFullscreen>", with: "VSF\(token)", options: .literal)
+        
+        return WKUserScript(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: true)
+    }()
 
     private func reloadUserScripts() {
         tab?.webView?.configuration.userContentController.do {
@@ -227,6 +240,10 @@ class UserScriptManager {
             }
             
             if let script = FullscreenHelperScript {
+                $0.addUserScript(script)
+            }
+            
+            if let script = PlaylistHelperScript {
                 $0.addUserScript(script)
             }
             

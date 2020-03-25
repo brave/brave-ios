@@ -142,6 +142,8 @@ class Tab: NSObject {
     /// Any time a tab tries to make requests to display a Javascript Alert and we are not the active
     /// tab instance, queue it for later until we become foregrounded.
     fileprivate var alertQueue = [JSAlertInfo]()
+    
+    var playlistItems = Observable<[PlaylistInfo]>([])
 
     init(configuration: WKWebViewConfiguration, type: TabType = .regular) {
         self.configuration = configuration
