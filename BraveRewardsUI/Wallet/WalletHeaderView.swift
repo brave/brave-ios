@@ -83,7 +83,7 @@ class WalletHeaderView: UIView {
     $0.isHidden = true
   }
   
-  let settingsButton = Button(type: .system).then {
+  let settingsButton = ActionButton(type: .system).then {
     $0.appearanceTextColor = UIColor(white: 1.0, alpha: 0.75)
     $0.setTitle(Strings.settings, for: .normal)
     $0.setImage(UIImage(frameworkResourceNamed: "bat-small").alwaysOriginal, for: .normal)
