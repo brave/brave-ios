@@ -1,15 +1,17 @@
 {
   "images" : [
     {
+      "filename" : "Layer 1-1.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "skip.png",
+      "filename" : "Layer 1@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
+      "filename" : "Layer 1@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

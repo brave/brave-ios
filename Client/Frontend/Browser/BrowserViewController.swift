@@ -50,6 +50,8 @@ class BrowserViewController: UIViewController {
     var readerModeBar: ReaderModeBarView?
     var readerModeCache: ReaderModeCache
     var statusBarOverlay: UIView!
+    var nowPlayingBar: NowPlayingBar!
+    private var nowPlayingItem: PlaylistInfo?
     fileprivate(set) var toolbar: BottomToolbarView?
     var searchController: SearchViewController?
     fileprivate var screenshotHelper: ScreenshotHelper!
@@ -486,6 +488,11 @@ class BrowserViewController: UIViewController {
 
         webViewContainer = UIView()
         view.addSubview(webViewContainer)
+        
+        nowPlayingBar = NowPlayingBar()
+        nowPlayingBar.delegate = self
+        nowPlayingBar.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(nowPlayingBar)
 
         // Temporary work around for covering the non-clipped web view content
         statusBarOverlay = UIView()
@@ -649,11 +656,14 @@ class BrowserViewController: UIViewController {
             make.edges.equalTo(webViewContainer)
         }
         
+        nowPlayingBar.snp.makeConstraints { make in
+            make.left.right.bottom.equalTo(webViewContainer)
+        }
+        
         topTouchArea.snp.makeConstraints { make in
             make.top.left.right.equalTo(self.view)
             make.height.equalTo(BrowserViewControllerUX.showHeaderTapAreaHeight)
         }
-
     }
 
     override func viewDidLayoutSubviews() {
@@ -2124,6 +2134,11 @@ extension BrowserViewController: TabDelegate {
         #if !NO_SKUS
         tab.addContentScript(PaymentRequestExtension(rewards: rewards, tab: tab, paymentRequested: self.paymentRequested), name: PaymentRequestExtension.name())
         #endif
+        
+        tab.playlistItems.observe { [weak self] _, _ in
+            guard let self = self else { return }
+            self.onUpdateNowPlaying(tab: tab)
+        }.bind(to: tab)
     }
 
     func tab(_ tab: Tab, willDeleteWebView webView: WKWebView) {
@@ -3497,4 +3512,39 @@ extension BrowserViewController: OnboardingControllerDelegate {
     
     // 60 days until the next time the user sees the onboarding..
     static let onboardingDaysInterval = TimeInterval(60.days)
+}
+
+extension BrowserViewController: NowPlayingBarDelegate {
+    func onAddToPlaylist() {
+        let controller = PlaylistMultipleSelectionController(tabManager: self.tabManager)
+        self.present(controller, animated: true, completion: nil)
+    }
+    
+    func onExpand() {
+        
+    }
+    
+    func onExit() {
+        self.presentedViewController?.dismiss(animated: true, completion: nil)
+    }
+    
+    func onUpdateNowPlaying(tab: Tab) {
+        let items = tab.playlistItems.value
+        if items.isEmpty {
+            if Playlist.shared.currentlyPlayingInfo != nil {
+                nowPlayingBar.state = .nowPlaying
+                nowPlayingBar.isHidden = false
+            } else {
+                nowPlayingBar.isHidden = true
+            }
+        } else {
+            nowPlayingBar.isHidden = false
+            
+            if Playlist.shared.currentlyPlayingInfo != nil {
+                nowPlayingBar.state = .addNowPlaying
+            } else {
+                nowPlayingBar.state = .add
+            }
+        }
+    }
 }

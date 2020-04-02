@@ -13,6 +13,8 @@ class Playlist {
     static let shared = Playlist()
     private let dbLock = NSRecursiveLock()
     
+    public var currentlyPlayingInfo: PlaylistInfo?
+    
     func addItem(item: PlaylistInfo, completion: @escaping () -> Void) {
         if !self.itemExists(item: item) {
             self.backgroundContext.perform { [weak self] in

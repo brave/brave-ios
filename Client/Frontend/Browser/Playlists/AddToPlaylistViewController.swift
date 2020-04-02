@@ -224,7 +224,7 @@ extension AddToPlaylistViewController: UITableViewDelegate {
     }
 }
 
-private class PlaylistSelectionCell: UITableViewCell {
+public class PlaylistSelectionCell: UITableViewCell {
 
     public let thumbnailView = UIImageView().then {
         $0.contentMode = .scaleAspectFit
@@ -314,7 +314,7 @@ private class PlaylistSelectionCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override public var layoutMargins: UIEdgeInsets {
+    public override var layoutMargins: UIEdgeInsets {
         get {
             return .zero
         }
@@ -324,7 +324,7 @@ private class PlaylistSelectionCell: UITableViewCell {
         }
     }
     
-    override var separatorInset: UIEdgeInsets {
+    public override var separatorInset: UIEdgeInsets {
         get {
             return UIEdgeInsets(top: 0, left: self.titleLabel.frame.origin.x, bottom: 0, right: 0)
         }

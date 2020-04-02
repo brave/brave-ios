@@ -113,6 +113,7 @@ class PlaylistWebLoader: UIView, WKScriptMessageHandler, WKNavigationDelegate {
         }
         
         webView.navigationDelegate = self
+        webView.configuration.mediaTypesRequiringUserActionForPlayback = []
         webView.configuration.userContentController.add(self, name: "playlistManager")
     }
     

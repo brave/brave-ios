@@ -1,17 +1,18 @@
-
 function notifyNode(node) {
     var name = node.title;
-    if (name == null || name === undefined || name == "") {
+    if (name == null || typeof name == 'undefined' || name == "") {
         name = document.title;
     }
     
-    window.webkit.messageHandlers.playlistManager.postMessage({
-                                                                  "name": node.title,
-                                                                  "src": node.src,
-                                                                  "pageSrc": window.location.href,
-                                                                  "pageTitle": document.title,
-                                                                  "duration": node.duration !== node.duration ? 0.0 : node.duration
-                                                                  });
+    if (node.src != "") {
+        window.webkit.messageHandlers.playlistManager.postMessage({
+                                                                      "name": name,
+                                                                      "src": node.src,
+                                                                      "pageSrc": window.location.href,
+                                                                      "pageTitle": document.title,
+                                                                      "duration": node.duration !== node.duration ? 0.0 : node.duration
+                                                                      });
+    }
 }
 
 function observeNode(node) {
@@ -39,14 +40,24 @@ function observeDocument(node) {
                     else if (node.constructor.name == "HTMLAudioElement") {
                         observeNode(node);
                     }
-                    else if (node.constructor.name == "HTMLMediaElement") {
-                        console.log("DETECTED MEDIA ELEMENT: " + node.constructor.name);
-                    }
                 });
             });
         });
         node.observer.observe(node, { subtree: true, childList: true });
     }
+}
+
+function observeDynamicElements(node) {
+    var original = node.createElement;
+    node.createElement = function (tag) {
+        if (tag === 'audio' || tag === 'video') {
+            var result = original.call(node, tag);
+            observeNode(result);
+            notifyNode(result);
+            return result;
+        }
+        return original.call(node, tag);
+    };
 }
 
 function getAllVideoElements() {
@@ -70,6 +81,7 @@ function onReady(fn) {
 //^ Fix all of the above using a node.add and node.insert hook instead.
 function observePage() {
     observeDocument(document);
+    observeDynamicElements(document);
     
 //    onReady(function() {
 //        getAllVideoElements().forEach(function(node) {
