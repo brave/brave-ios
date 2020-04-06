@@ -19,6 +19,7 @@ import BraveRewardsUI
 import BraveRewards
 import StoreKit
 import SafariServices
+import BraveUI
 
 private let log = Logger.browserLogger
 
@@ -57,7 +58,7 @@ class BrowserViewController: UIViewController {
     fileprivate var findInPageBar: FindInPageBar?
     
     // Single data source used for all favorites vcs
-    fileprivate let backgroundDataSource = NewTabPageBackgroundDataSource()
+    fileprivate let backgroundDataSource = NTPBackgroundDataSource()
     
     var loadQueue = Deferred<Void>()
 
@@ -171,6 +172,12 @@ class BrowserViewController: UIViewController {
             }
         }
         rewards = BraveRewards(configuration: configuration)
+        if !BraveRewards.isAvailable {
+            // Disable rewards services in case previous user already enabled
+            // rewards in previous build
+            rewards.ledger.isEnabled = false
+            rewards.ads.isEnabled = false
+        }
         rewardsObserver = LedgerObserver(ledger: rewards.ledger)
         deviceCheckClient = DeviceCheckClient(environment: configuration.environment)
 
@@ -251,7 +258,7 @@ class BrowserViewController: UIViewController {
         notificationsHandler?.actionOccured = { [weak self] notification, action in
             guard let self = self else { return }
             if action == .opened {
-                let request = URLRequest(url: notification.url)
+                let request = URLRequest(url: notification.targetURL)
                 self.tabManager.addTabAndSelect(request, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
             }
         }
@@ -285,7 +292,6 @@ class BrowserViewController: UIViewController {
             self.updateRewardsButtonState()
         }
         rewardsObserver.rewardsEnabledStateUpdated = { [weak self] _ in
-            self?.resetNTPNotification()
             self?.updateRewardsButtonState()
         }
     }
@@ -466,10 +472,9 @@ class BrowserViewController: UIViewController {
             $0.addObserver(self, selector: #selector(appDidEnterBackgroundNotification),
                            name: UIApplication.didEnterBackgroundNotification, object: nil)
             $0.addObserver(self, selector: #selector(resetNTPNotification),
-                           name: .adsToggled, object: nil)
+                           name: .adsOrRewardsToggledInSettings, object: nil)
             
         }
-        
         
         KeyboardHelper.defaultHelper.addDelegate(self)
 
@@ -556,6 +561,8 @@ class BrowserViewController: UIViewController {
         setupConstraints()
         
         updateRewardsButtonState()
+        
+        applyTheme(Theme.of(tabManager.selectedTab))
 
         // Setup UIDropInteraction to handle dragging and dropping
         // links into the view from other apps.
@@ -598,7 +605,7 @@ class BrowserViewController: UIViewController {
         #endif
         
         DispatchQueue.main.async {
-            sync.webView.alpha = 0.01
+            sync.webView.alpha = CGFloat.leastNormalMagnitude
             UIApplication.shared.keyWindow?.insertSubview(Sync.shared.webView, at: 0)
         }
     }
@@ -690,7 +697,7 @@ class BrowserViewController: UIViewController {
 
     fileprivate func showRestoreTabsAlert() {
         guard canRestoreTabs() else {
-            self.tabManager.addTabAndSelect()
+            self.tabManager.addTabAndSelect(isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
             return
         }
         let alert = UIAlertController.restoreTabsAlert(
@@ -699,7 +706,7 @@ class BrowserViewController: UIViewController {
             },
             noCallback: { _ in
                 TabMO.deleteAll()
-                self.tabManager.addTabAndSelect()
+                self.tabManager.addTabAndSelect(isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
             }
         )
         self.present(alert, animated: true, completion: nil)
@@ -1114,13 +1121,18 @@ class BrowserViewController: UIViewController {
                 return
             }
             
-            if let webView = tab.webView, let code = url.bookmarkletCodeComponent {
-                resetSpoofedUserAgentIfRequired(webView, newURL: url)
-                webView.evaluateJavaScript(code, completionHandler: { _, error in
-                    if let error = error {
-                        log.error(error)
-                    }
-                })
+            //Another Fix for: https://github.com/brave/brave-ios/pull/2296
+            //Disable any sort of privileged execution contexts
+            //IE: The user must explicitly type OR must explicitly tap a bookmark they have saved.
+            //Block all other contexts such as redirects, downloads, embed, linked, etc..
+            if visitType == .typed || visitType == .bookmark {
+                if let webView = tab.webView, let code = url.bookmarkletCodeComponent {
+                    webView.evaluateJavaScript(code, completionHandler: { _, error in
+                        if let error = error {
+                            log.error(error)
+                        }
+                    })
+                }
             }
         } else {
             topToolbar.currentURL = url
@@ -1128,10 +1140,6 @@ class BrowserViewController: UIViewController {
 
             guard let tab = tabManager.selectedTab else {
                 return
-            }
-
-            if let webView = tab.webView {
-                resetSpoofedUserAgentIfRequired(webView, newURL: url)
             }
 
             tab.loadRequest(PrivilegedRequest(url: url) as URLRequest)
@@ -1239,6 +1247,7 @@ class BrowserViewController: UIViewController {
                 break
             }
             tab.userScriptManager?.isU2FEnabled = webView.hasOnlySecureContent
+            tab.userScriptManager?.isPaymentRequestEnabled = webView.hasOnlySecureContent
             if tab.contentIsSecure && !webView.hasOnlySecureContent {
                 tab.contentIsSecure = false
             }
@@ -1393,26 +1402,6 @@ class BrowserViewController: UIViewController {
         }
     }
 
-    // MARK: User Agent Spoofing
-
-    func resetSpoofedUserAgentIfRequired(_ webView: WKWebView, newURL: URL) {
-        // Reset the UA when a different domain is being loaded
-        if webView.url?.host != newURL.host {
-            webView.customUserAgent = nil
-        }
-    }
-
-    func restoreSpoofedUserAgentIfRequired(_ webView: WKWebView, newRequest: URLRequest) {
-        // Restore any non-default UA from the request's header
-        let ua = newRequest.value(forHTTPHeaderField: "User-Agent")
-        
-        if #available(iOS 13.0, *) {
-            webView.customUserAgent = Preferences.General.alwaysRequestDesktopSite.value == UserAgent.isDesktopUA(ua) ? nil : ua
-        } else {
-            webView.customUserAgent = ua == UserAgent.defaultUserAgent() ? nil : ua
-        }
-    }
-
     fileprivate func presentActivityViewController(_ url: URL, tab: Tab? = nil, sourceView: UIView?, sourceRect: CGRect, arrowDirection: UIPopoverArrowDirection) {
         let helper = ShareExtensionHelper(url: url, tab: tab)
         
@@ -1421,7 +1410,7 @@ class BrowserViewController: UIViewController {
         }
         
         let requestDesktopSiteActivity = RequestDesktopSiteActivity(tab: tab) { [weak tab] in
-            tab?.toggleDesktopSite()
+            tab?.switchUserAgent()
         }
         
         var activities: [UIActivity] = [findInPageActivity]
@@ -1549,15 +1538,6 @@ class BrowserViewController: UIViewController {
                 }
             }
         }
-        
-        // Remember whether or not a desktop site was requested
-        tab.desktopSite = UserAgent.isDesktopUA(webView.customUserAgent)
-        
-        if #available(iOS 13.0, *), UIDevice.isIpad {
-            if webView.customUserAgent?.isEmpty == true {
-                tab.desktopSite = Preferences.General.alwaysRequestDesktopSite.value
-            }
-        }
     }
     
     private func focusLocationField() {
@@ -1573,32 +1553,6 @@ class BrowserViewController: UIViewController {
     
     private var browserLockPopup: AlertPopupView?
     
-    func presentBrowserLockCallout() {
-        if isBrowserLockEnabled || Preferences.Popups.browserLock.value || browserLockPopup != nil { return }
-        
-        topToolbar.leaveOverlayMode()
-        
-        let popup = AlertPopupView(imageView: UIImageView(image: #imageLiteral(resourceName: "browser_lock_popup")), title: Strings.browserLockCalloutTitle, message: Strings.browserLockCalloutMessage)
-        popup.addButton(title: Strings.browserLockCalloutNotNow) { () -> PopupViewDismissType in
-            Preferences.Popups.browserLock.value = true
-            self.browserLockPopup = nil
-            return .flyDown
-        }
-        
-        popup.addButton(title: Strings.browserLockCalloutEnable, type: .primary) { [weak self] () -> PopupViewDismissType in
-            Preferences.Popups.browserLock.value = true
-            self?.browserLockPopup = nil
-            
-            let setupPasscodeController = SetupPasscodeViewController()
-            let container = UINavigationController(rootViewController: setupPasscodeController)
-            self?.present(container, animated: true)
-            
-            return .flyUp
-        }
-        browserLockPopup = popup
-        popup.showWithType(showType: .flyUp)
-    }
-    
     // MARK: - DuckDuckGo Callout
     
     private var duckDuckGoPopup: AlertPopupView?
@@ -1613,22 +1567,18 @@ class BrowserViewController: UIViewController {
         
         // Check to see if its been presented already
         if !SearchEngines.shouldShowDuckDuckGoPromo || (Preferences.Popups.duckDuckGoPrivateSearch.value && !force) {
-            presentBrowserLockCallout()
             return
         }
-        
+
         // Do not show ddg popup if user already chose it for private browsing.
         if profile.searchEngines.defaultEngine(forType: .privateMode).shortName == OpenSearchEngine.EngineNames.duckDuckGo {
-            presentBrowserLockCallout()
             return
         }
         
         topToolbar.leaveOverlayMode()
         
         let popup = AlertPopupView(imageView: UIImageView(image: #imageLiteral(resourceName: "duckduckgo")), title: Strings.DDGCalloutTitle, message: Strings.DDGCalloutMessage)
-        popup.dismissHandler = { [weak self] in
-            self?.presentBrowserLockCallout()
-        }
+        
         popup.addButton(title: Strings.DDGCalloutNo) {
             Preferences.Popups.duckDuckGoPrivateSearch.value = true
             self.duckDuckGoPopup = nil
@@ -1693,6 +1643,12 @@ extension BrowserViewController: SettingsDelegate {
             }
         })
     }
+    
+    func settingsOpenRewardsSettings(_ settingsViewController: SettingsViewController) {
+        settingsViewController.dismiss(animated: true, completion: {
+            self.showBraveRewardsPanel(initialPage: .settings)
+        })
+    }
 }
 
 extension BrowserViewController: PresentingModalViewControllerDelegate {
@@ -1734,13 +1690,13 @@ extension BrowserViewController: TopToolbarDelegate {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil))
         
-        let toggleActionTitle = tab.desktopSite ? Strings.appMenuViewMobileSiteTitleString : Strings.appMenuViewDesktopSiteTitleString
+        let toggleActionTitle = tab.isDesktopSite == true ?
+            Strings.appMenuViewMobileSiteTitleString : Strings.appMenuViewDesktopSiteTitleString
         alert.addAction(UIAlertAction(title: toggleActionTitle, style: .default, handler: { _ in
-            tab.toggleDesktopSite()
+            tab.switchUserAgent()
         }))
         
-        let generator = UIImpactFeedbackGenerator(style: .heavy)
-        generator.impactOccurred()
+        UIImpactFeedbackGenerator(style: .heavy).bzzt()
         if UIDevice.current.userInterfaceIdiom == .pad {
             alert.popoverPresentationController?.sourceView = self.view
             alert.popoverPresentationController?.sourceRect = self.view.convert(button.frame, from: button.superview)
@@ -1943,8 +1899,7 @@ extension BrowserViewController: ToolbarDelegate {
     }
 
     func tabToolbarDidLongPressBack(_ tabToolbar: ToolbarProtocol, button: UIButton) {
-        let generator = UIImpactFeedbackGenerator(style: .heavy)
-        generator.impactOccurred()
+        UIImpactFeedbackGenerator(style: .heavy).bzzt()
         showBackForwardList()
     }
     
@@ -2019,14 +1974,12 @@ extension BrowserViewController: ToolbarDelegate {
         addTabAlertActions().forEach(alertController.addAction)
         alertController.popoverPresentationController?.sourceView = sourceView
         alertController.popoverPresentationController?.sourceRect = button.frame
-        let generator = UIImpactFeedbackGenerator(style: .heavy)
-        generator.impactOccurred()
+        UIImpactFeedbackGenerator(style: .heavy).bzzt()
         present(alertController, animated: true)
     }
     
     func tabToolbarDidLongPressForward(_ tabToolbar: ToolbarProtocol, button: UIButton) {
-        let generator = UIImpactFeedbackGenerator(style: .heavy)
-        generator.impactOccurred()
+        UIImpactFeedbackGenerator(style: .heavy).bzzt()
         showBackForwardList()
     }
 
@@ -2058,8 +2011,7 @@ extension BrowserViewController: ToolbarDelegate {
         controller.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil), accessibilityIdentifier: "toolbarTabButtonLongPress.cancel")
         controller.popoverPresentationController?.sourceView = toolbar ?? topToolbar
         controller.popoverPresentationController?.sourceRect = button.frame
-        let generator = UIImpactFeedbackGenerator(style: .heavy)
-        generator.impactOccurred()
+        UIImpactFeedbackGenerator(style: .heavy).bzzt()
         present(controller, animated: true, completion: nil)
     }
 
@@ -2142,9 +2094,6 @@ extension BrowserViewController: TabDelegate {
         let customSearchHelper = CustomSearchHelper(tab: tab)
         tab.addContentScript(customSearchHelper, name: CustomSearchHelper.name())
 
-        let nightModeHelper = NightModeHelper(tab: tab)
-        tab.addContentScript(nightModeHelper, name: NightModeHelper.name())
-
         // XXX: Bug 1390200 - Disable NSUserActivity/CoreSpotlight temporarily
         // let spotlightHelper = SpotlightHelper(tab: tab)
         // tab.addHelper(spotlightHelper, name: SpotlightHelper.name())
@@ -2158,6 +2107,8 @@ extension BrowserViewController: TabDelegate {
         
         tab.addContentScript(FingerprintingProtection(tab: tab), name: FingerprintingProtection.name())
         
+        tab.addContentScript(BraveGetUA(tab: tab), name: BraveGetUA.name())
+
         tab.addContentScript(U2FExtensions(tab: tab), name: U2FExtensions.name())
         
         tab.addContentScript(ResourceDownloadManager(tab: tab), name: ResourceDownloadManager.name())
@@ -2166,6 +2117,10 @@ extension BrowserViewController: TabDelegate {
         
         tab.addContentScript(RewardsReporting(rewards: rewards, tab: tab), name: RewardsReporting.name())
         tab.addContentScript(AdsMediaReporting(rewards: rewards, tab: tab), name: AdsMediaReporting.name())
+        
+        #if !NO_SKUS
+        tab.addContentScript(PaymentRequestExtension(rewards: rewards, tab: tab, paymentRequested: self.paymentRequested), name: PaymentRequestExtension.name())
+        #endif
     }
 
     func tab(_ tab: Tab, willDeleteWebView webView: WKWebView) {
@@ -3257,6 +3212,7 @@ extension BrowserViewController: Themeable {
         
         theme.applyAppearanceProperties()
 
+        view.backgroundColor = theme.colors.home
         statusBarOverlay.backgroundColor = topToolbar.backgroundColor
         setNeedsStatusBarAppearanceUpdate()
     }
@@ -3477,40 +3433,40 @@ extension BrowserViewController: OnboardingControllerDelegate {
         Preferences.General.basicOnboardingCompleted.value = OnboardingState.completed.rawValue
         Preferences.General.basicOnboardingNextOnboardingPrompt.value = nil
         
-        #if NO_REWARDS
-        switch onboardingController.onboardingType {
-        case .newUser:
-            Preferences.General.basicOnboardingProgress.value = OnboardingProgress.searchEngine.rawValue
-            
-        case .existingUserRewardsOff, .existingUserRewardsOn:
-            break
-            
-        default:
-            break
+        if BraveRewards.isAvailable {
+            switch onboardingController.onboardingType {
+            case .newUser:
+                if BraveAds.isCurrentLocaleSupported() {
+                    Preferences.General.basicOnboardingProgress.value = OnboardingProgress.ads.rawValue
+                } else {
+                    Preferences.General.basicOnboardingProgress.value = OnboardingProgress.rewards.rawValue
+                }
+                
+            case .existingUserRewardsOff:
+                if BraveAds.isCurrentLocaleSupported() {
+                    Preferences.General.basicOnboardingProgress.value = OnboardingProgress.ads.rawValue
+                }
+                
+            case .existingUserRewardsOn:
+                if BraveAds.isCurrentLocaleSupported() {
+                    Preferences.General.basicOnboardingProgress.value = OnboardingProgress.ads.rawValue
+                }
+                
+            default:
+                break
+            }
+        } else {
+            switch onboardingController.onboardingType {
+            case .newUser:
+                Preferences.General.basicOnboardingProgress.value = OnboardingProgress.searchEngine.rawValue
+                
+            case .existingUserRewardsOff, .existingUserRewardsOn:
+                break
+                
+            default:
+                break
+            }
         }
-        #else
-        switch onboardingController.onboardingType {
-        case .newUser:
-            if BraveAds.isCurrentLocaleSupported() {
-                Preferences.General.basicOnboardingProgress.value = OnboardingProgress.ads.rawValue
-            } else {
-                Preferences.General.basicOnboardingProgress.value = OnboardingProgress.rewards.rawValue
-            }
-            
-        case .existingUserRewardsOff:
-            if BraveAds.isCurrentLocaleSupported() {
-                Preferences.General.basicOnboardingProgress.value = OnboardingProgress.ads.rawValue
-            }
-            
-        case .existingUserRewardsOn:
-            if BraveAds.isCurrentLocaleSupported() {
-                Preferences.General.basicOnboardingProgress.value = OnboardingProgress.ads.rawValue
-            }
-            
-        default:
-            break
-        }
-        #endif
         
         // Present private browsing prompt if necessary when onboarding has been completed
         onboardingController.dismiss(animated: true) {

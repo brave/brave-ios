@@ -33,7 +33,7 @@ platform :ios do
   lane :test do |options|
     sh("../Client/WebFilters/ContentBlocker/Lists/test-compile-all-lists.sh")
     run_tests(
-      scheme: "Fennec",
+      scheme: "Debug",
       device: "iPhone 8",
       code_coverage: true,
       skip_testing: [
@@ -45,17 +45,23 @@ platform :ios do
         "ClientTests/FingerprintProtectionTest/testFingerprintProtection",
         "ClientTests/TabSessionTests",
         "ClientTests/ContentBlockerTests",
-        "ClientTests/ClientTests/testUserAgent",
         "DataTests/DeviceTests",
         "DataTests/DomainTests/testAllShieldsOff"
       ]
+    )
+
+    run_tests(
+      scheme: "Debug",
+      device: "iPad Pro (9.7-inch)",
+      code_coverage: true,
+      xcargs: "-testPlan Brave_iPad"
     )
   end
 
   desc "Creates a Brave Beta Release build for TestFlight."
   lane :beta do |options|
     overrideParams = {
-      scheme: "FirefoxBeta",
+      scheme: "Beta",
       export_method: "development",
     }
     testflight_build({overrideParams: overrideParams})
@@ -65,7 +71,7 @@ platform :ios do
   lane :internal do |options|
 
     overrideParams = {
-      scheme: "Fennec_Enterprise",
+      scheme: "Dev",
       export_method: "development",
     }
     testflight_build({overrideParams: overrideParams})
@@ -74,7 +80,7 @@ platform :ios do
   desc "Create an archive to be uploaded to the App Store"
   lane :release do |options|
     overrideParams = {
-      scheme: "Firefox",
+      scheme: "Release",
     }
     testflight_build({overrideParams: overrideParams})
   end

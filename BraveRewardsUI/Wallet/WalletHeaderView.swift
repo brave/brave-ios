@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import UIKit
+import BraveUI
 
 enum UserWalletStatus {
   /// The user should not see anything user wallet related. This shows the old
@@ -71,6 +72,7 @@ class WalletHeaderView: UIView {
   }
   
   let addFundsButton = Button(type: .system).then {
+    $0.appearanceTintColor = UIColor(white: 1.0, alpha: 0.75)
     $0.appearanceTextColor = UIColor(white: 1.0, alpha: 0.75)
     $0.setTitle(Strings.addFunds, for: .normal)
     $0.setImage(UIImage(frameworkResourceNamed: "add-funds-icon").alwaysTemplate, for: .normal)

@@ -104,7 +104,7 @@
 "BraveRewardsAutoContributeSupportedSites" = "Sitios compatibles";
 
 /* No comment provided by engineer. */
-"BraveRewardsAutoContributeToUnverifiedSites" = "Permitir la contribución a sitios web no verificados";
+"BraveRewardsAutoContributeToUnverifiedSites" = "Mostrar sitios web no verificados en la lista";
 
 /* No comment provided by engineer. */
 "BraveRewardsAutoContributeToVideos" = "Permitir la contribución a vídeos";
@@ -245,6 +245,12 @@
 "BraveRewardsMinimumVisitsChoices2" = "10 visitas";
 
 /* No comment provided by engineer. */
+"BraveRewardsMonthlyContributionsTotalThisMonth" = "Total de contribuciones de este mes";
+
+/* No comment provided by engineer. */
+"BraveRewardsMonthlyTippingNextDate" = "Fecha de la siguiente contribución mensual";
+
+/* No comment provided by engineer. */
 "BraveRewardsMonthlyTips" = "Propinas mensuales";
 
 /* No comment provided by engineer. */
@@ -353,6 +359,15 @@
 "BraveRewardsSettingsGrantTextJapan" = "Hay una concesión de puntos gratuitos disponible.";
 
 /* No comment provided by engineer. */
+"BraveRewardsSettingsMonthlyTipsBody" = "Fije las contribuciones mensuales periódicas para apoyar sitios web de forma continua.";
+
+/* No comment provided by engineer. */
+"BraveRewardsSettingsMonthlyTipsTitle" = "Contribuciones mensuales";
+
+/* No comment provided by engineer. */
+"BraveRewardsSettingsTipsBody" = "Envíe propinas a los creadores de contenido directamente mientras navega usando el panel de recompensas.";
+
+/* No comment provided by engineer. */
 "BraveRewardsSettingsTipsTitle" = "Propinas";
 
 /* No comment provided by engineer. */
@@ -360,6 +375,9 @@
 
 /* No comment provided by engineer. */
 "BraveRewardsSettingsViewDetails" = "Ver detalles";
+
+/* No comment provided by engineer. */
+"BraveRewardsShowAllPendingContributions" = "Mostrar todas las contribuciones pendientes";
 
 /* No comment provided by engineer. */
 "BraveRewardsSite" = "Sitio";
@@ -481,6 +499,12 @@
 /* Message that is displayed when user disables auto-contribute */
 "DisabledAutoContributeMessage" = "Recompensa a los creadores por ese contenido que tanto te gusta. Tu pago mensual se distribuye entre todos los sitios que visitas.";
 
+/* Message that is displayed on monthly contribution section when user disables rewards */
+"DisabledMonthlyContributionMessage" = "Tus contribuciones mensuales se enviarán de 30 en 30 días.";
+
+/* Message that is displayed on tips section when user disables rewards */
+"DisabledTipsMessage" = "Da propinas al momento según vayas encontrando gemas. Si te gusta, compártelo con los demás con un breve tuit.";
+
 /* No comment provided by engineer. */
 "DisclaimerInformation" = "Al hacer clic en \"Unirse a Brave Rewards\", indica que ha leído y está de acuerdo con las Condiciones de uso y la Política de privacidad.";
 
@@ -495,6 +519,12 @@
 
 /* The title of the screen that shows a list of excluded sites for Auto-Contribute */
 "ExclusionListTitle" = "Sitios excluidos";
+
+/* No comment provided by engineer. */
+"LedgerDatabaseMigrationFailedBody" = "Ha ocurrido un problema al cargar tu información de Brave Rewards. Se volverán a enviar los detalles relacionados con la actividad de tus recompensas.\n\nPara cualquier duda o pregunta, ponte en contacto con support@brave.com";
+
+/* No comment provided by engineer. */
+"LedgerInitializationFailedTitle" = "Lo sentimos, algo salió mal…";
 
 /* No comment provided by engineer. */
 "MyFirstAdBody" = "Toque aquí para obtener más información.";
@@ -563,6 +593,27 @@
 "OnProviderText" = "en %@";
 
 /* No comment provided by engineer. */
+"PendingContributionDetailAmount" = "Importe";
+
+/* No comment provided by engineer. */
+"PendingContributionDetailPendingUntil" = "Pendiente hasta";
+
+/* The button that removes a specific pending contributions while on viewing said contributions details */
+"PendingContributionDetailRemove" = "Eliminar contribución pendiente";
+
+/* No comment provided by engineer. */
+"PendingContributionDetailType" = "Tipo";
+
+/* The button that removes all pending contributions while on the Pending Contributions list */
+"PendingContributionListRemoveAllButton" = "Eliminar todos los sitios";
+
+/* The button that removes the selected pending contributions while on the Pending Contributions list */
+"PendingContributionListRemoveSelected" = "Eliminar selección";
+
+/* The title of the screen that shows a list of the users pending contributions */
+"PendingContributionsTitle" = "Contribuciones pendientes";
+
+/* No comment provided by engineer. */
 "PrivacyPolicyURL" = "Política de privacidad";
 
 /* Text describing the type of contribution */
@@ -582,6 +633,51 @@
 
 /* No comment provided by engineer. */
 "RewardsOptInPrefix" = "Prepárese para disfrutar del próximo modelo de Internet.";
+
+/* No comment provided by engineer. */
+"SKUEnableRewardsBody" = "Para comprar este artículo, tienes que ganar tokens. Activa Brave Rewards para empezar a ganar.";
+
+/* No comment provided by engineer. */
+"SKUEnableRewardsButtonTitle" = "Activar Brave Rewards";
+
+/* No comment provided by engineer. */
+"SKUEnableRewardsDisclaimer" = "Al pulsar \"Activar Brave Rewards\", aceptas las Condiciones de uso de Brave Rewards.";
+
+/* The hyperlinked portion of the copy: 'By tapping Enable Brave Rewards, you agree to Brave Reward’s Terms of Service.' */
+"SKUEnableRewardsDisclaimerLink" = "Condiciones de uso.";
+
+/* No comment provided by engineer. */
+"SKUEnableRewardsTitle" = "Activa Brave Rewards para continuar.";
+
+/* '%@' becomes 'BAT' or 'BAP' based on region */
+"SKUPurchaseBuyWithBAT" = "Comprar con %@";
+
+/* No comment provided by engineer. */
+"SKUPurchaseCompletedBody" = "Disfruta de tu compra.";
+
+/* No comment provided by engineer. */
+"SKUPurchaseCompletedTitle" = "¡Listo!";
+
+/* First '%@' becomes 'Buy with BAT' or 'Buy with BAP' based on region. Second '%@' becomes 'Brave’s Terms of Sale' */
+"SKUPurchaseDisclaimerInformation" = "Al hacer clic en \"%1$@\", aceptas %2$@.";
+
+/* Should be the same text as shown */
+"SKUPurchaseDisclaimerInformationLink" = "las Condiciones de venta de Brave";
+
+/* '%@' becomes 'BAT' or 'BAP' based on region' */
+"SKUPurchaseInsufficientFunds" = "No tienes suficientes %@ para hacer esta compra.";
+
+/* No comment provided by engineer. */
+"SKUPurchaseItemSelected" = "Artículo seleccionado";
+
+/* No comment provided by engineer. */
+"SKUPurchaseOrderTotal" = "Total del pedido";
+
+/* No comment provided by engineer. */
+"SKUPurchaseProcessing" = "Se está procesando tu pago…";
+
+/* No comment provided by engineer. */
+"SKUPurchaseTitle" = "Confirmar compra";
 
 /* No comment provided by engineer. */
 "TermsOfServiceURL" = "Condiciones de uso";

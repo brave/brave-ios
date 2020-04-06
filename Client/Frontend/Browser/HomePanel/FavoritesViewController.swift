@@ -25,6 +25,7 @@ class FavoritesViewController: UIViewController, Themeable {
         static let statsHeight: CGFloat = 110.0
         static let statsBottomMargin: CGFloat = 5
         static let searchEngineCalloutPadding: CGFloat = 120.0
+        static let ddgButtonPadding: CGFloat = 12
     }
     
     weak var delegate: FavoritesDelegate?
@@ -50,7 +51,7 @@ class FavoritesViewController: UIViewController, Themeable {
         return view
     }()
     private let dataSource: FavoritesDataSource
-    private let backgroundDataSource: NewTabPageBackgroundDataSource?
+    private let backgroundDataSource: NTPBackgroundDataSource?
 
     private let braveShieldStatsView = BraveShieldStatsView(frame: CGRect.zero).then {
         $0.autoresizingMask = [.flexibleWidth]
@@ -109,7 +110,7 @@ class FavoritesViewController: UIViewController, Themeable {
     private let ddgLabel = UILabel().then {
         $0.numberOfLines = 0
         $0.textColor = BraveUX.greyD
-        $0.font = UIFont.systemFont(ofSize: 14, weight: UIFont.Weight.regular)
+        $0.font = UIFont.systemFont(ofSize: 13, weight: UIFont.Weight.bold)
         $0.text = Strings.DDGPromotion
     }
     
@@ -138,12 +139,12 @@ class FavoritesViewController: UIViewController, Themeable {
     // MARK: - Init/lifecycle
     
     private var backgroundViewInfo: (imageView: UIImageView, portraitCenterConstraint: Constraint, landscapeCenterConstraint: Constraint)?
-    private var background: (wallpaper: NewTabPageBackgroundDataSource.Background, sponsor: NewTabPageBackgroundDataSource.Sponsor?)? {
+    private var background: (wallpaper: NTPBackgroundDataSource.Background, sponsor: NTPBackgroundDataSource.Sponsor?)? {
         didSet {
             let noSponsor = background?.sponsor == nil
             
             // Image Sponsor
-            imageSponsorButton.setImage(background?.sponsor?.logo.imageLiteral, for: .normal)
+            imageSponsorButton.setImage(background?.sponsor?.logo.image, for: .normal)
             imageSponsorButton.isHidden = noSponsor
             
             // Image Credit
@@ -173,7 +174,7 @@ class FavoritesViewController: UIViewController, Themeable {
     private var rewards: BraveRewards?
     
     init(profile: Profile, dataSource: FavoritesDataSource = FavoritesDataSource(), fromOverlay: Bool,
-         rewards: BraveRewards?, backgroundDataSource: NewTabPageBackgroundDataSource?) {
+         rewards: BraveRewards?, backgroundDataSource: NTPBackgroundDataSource?) {
         self.profile = profile
         self.dataSource = dataSource
         self.fromOverlay = fromOverlay
@@ -225,7 +226,7 @@ class FavoritesViewController: UIViewController, Themeable {
         collection.dataSource = dataSource
         dataSource.collectionView = collection
         
-        dataSource.favoriteDeletedHandler = { [weak self] in
+        dataSource.favoriteUpdatedHandler = { [weak self] in
             self?.favoritesOverflowButton.isHidden = self?.dataSource.hasOverflow == false
         }
         
@@ -323,7 +324,6 @@ class FavoritesViewController: UIViewController, Themeable {
             }
             
             vc = notificationVC
-            Preferences.NewTabPage.atleastOneNTPNotificationWasShowed.value = true
         case .claimRewards:
             if !Preferences.NewTabPage.attemptToShowClaimRewardsNotification.value { return }
             
@@ -340,6 +340,11 @@ class FavoritesViewController: UIViewController, Themeable {
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
             guard let self = self else { return }
+            
+            if case .brandedImages = type {
+                Preferences.NewTabPage.atleastOneNTPNotificationWasShowed.value = true
+            }
+            
             self.ntpNotificationShowing = true
             self.addChild(viewController)
             self.view.addSubview(viewController.view)
@@ -442,24 +447,26 @@ class FavoritesViewController: UIViewController, Themeable {
         alert.popoverPresentationController?.permittedArrowDirections = [.down, .up]
         alert.addAction(UIAlertAction(title: Strings.close, style: .cancel, handler: nil))
         
+        UIImpactFeedbackGenerator(style: .medium).bzzt()
         present(alert, animated: true, completion: nil)
     }
     
     @objc private func showSponsoredSite() {
         guard let url = background?.sponsor?.logo.destinationUrl else { return }
+        UIImpactFeedbackGenerator(style: .medium).bzzt()
         delegate?.didSelect(input: url)
     }
     
     // MARK: - Constraints setup
     fileprivate func makeConstraints() {
         ddgLogo.snp.makeConstraints { make in
-            make.top.left.bottom.equalTo(0)
+            make.top.left.greaterThanOrEqualTo(UI.ddgButtonPadding)
+            make.centerY.equalToSuperview()
             make.size.equalTo(38)
         }
         
         ddgLabel.snp.makeConstraints { make in
-            make.top.bottom.equalTo(0)
-            make.right.equalToSuperview().offset(-5)
+            make.right.equalToSuperview().offset(-UI.ddgButtonPadding)
             make.left.equalTo(self.ddgLogo.snp.right).offset(5)
             make.width.equalTo(180)
             make.centerY.equalTo(self.ddgLogo)
@@ -546,7 +553,7 @@ class FavoritesViewController: UIViewController, Themeable {
         self.background = backgroundDataSource?.newBackground()
         //
         
-        guard let image = background?.wallpaper.imageLiteral else {
+        guard let image = background?.wallpaper.image else {
             return
         }
         

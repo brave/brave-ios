@@ -33,8 +33,8 @@ public class AdsViewController: UIViewController {
   
   public func display(ad: AdsNotification, handler: @escaping ActionHandler, animatedOut: @escaping () -> Void) {
     let adView = AdView()
-    adView.adContentButton.titleLabel.text = ad.advertiser
-    adView.adContentButton.bodyLabel.text = ad.text
+    adView.adContentButton.titleLabel.text = ad.title
+    adView.adContentButton.bodyLabel.text = ad.body
     
     view.addSubview(adView)
     
@@ -227,9 +227,7 @@ public class AdsViewController: UIViewController {
 //      }
 //      adView.openSwipeButton.isHighlighted = tx > actionTriggerThreshold
       if tx < -actionTriggerThreshold && !adView.dislikeSwipeButton.isHighlighted {
-        let impact = UIImpactFeedbackGenerator(style: .medium)
-        impact.prepare()
-        impact.impactOccurred()
+        UIImpactFeedbackGenerator(style: .medium).bzzt()
       }
       adView.dislikeSwipeButton.isHighlighted = tx < -actionTriggerThreshold
       adView.adContentButton.transform.tx = min(0, tx)
@@ -340,7 +338,7 @@ extension AdsViewController {
     )
     
     adsViewController.display(ad: notification, handler: { (notification, action) in
-      completion(action, notification.url)
+      completion(action, notification.targetURL)
     }, animatedOut: {
       adsViewController.view.removeFromSuperview()
     })

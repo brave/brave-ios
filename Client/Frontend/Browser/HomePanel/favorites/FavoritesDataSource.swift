@@ -13,7 +13,7 @@ class FavoritesDataSource: NSObject, UICollectionViewDataSource {
     var frc: NSFetchedResultsController<Bookmark>?
     weak var collectionView: UICollectionView?
     
-    var favoriteDeletedHandler: (() -> Void)?
+    var favoriteUpdatedHandler: (() -> Void)?
 
     var isEditing: Bool = false {
         didSet {
@@ -118,13 +118,24 @@ class FavoritesDataSource: NSObject, UICollectionViewDataSource {
 }
 
 extension FavoritesDataSource: NSFetchedResultsControllerDelegate {
+    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        // Workaround for http://www.openradar.me/15262692
+        // At the same time when preloaded favorites are created we show the onboarding screen to users.
+        // This can cause the app to crash.
+        collectionView?.numberOfItems(inSection: 0)
+    }
+    
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
 
         switch type {
         case .insert:
-            if let indexPath = newIndexPath {
+            // Do not insert to collection view if full row is already taken,
+            // otherwise it crashes with inconsistency exception.
+            if let indexPath = newIndexPath, indexPath.row < columnsPerRow {
                 collectionView?.insertItems(at: [indexPath])
             }
+            
+            favoriteUpdatedHandler?()
         case .delete:
             // Not all favorites must be visible at the time, so we can't just call `deleteItems` here.
             // Example:
@@ -133,7 +144,7 @@ extension FavoritesDataSource: NSFetchedResultsControllerDelegate {
             // Favorites from places 3 and 4 are moved back to 2 and 3
             // a new, previously hidden favorite item is now shown at position 4.
             collectionView?.reloadData()
-            favoriteDeletedHandler?()
+            favoriteUpdatedHandler?()
         case .update:
             if let indexPath = indexPath, let cell = collectionView?.cellForItem(at: indexPath) as? FavoriteCell {
                 configureCell(cell: cell, at: indexPath)

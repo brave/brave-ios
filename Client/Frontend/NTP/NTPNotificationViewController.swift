@@ -38,6 +38,7 @@ class NTPNotificationViewController: TranslucentBottomSheet {
         
         mainView.setCustomSpacing(0, after: mainView.header)
         view.addSubview(mainView)
+        view.bringSubviewToFront(closeButton)
     }
     
     override func viewDidLayoutSubviews() {

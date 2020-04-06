@@ -126,12 +126,8 @@ extension BrowserViewController: WKNavigationDelegate {
             return
         }
         
-        if url.isBookmarklet && navigationAction.isAllowed {
+        if url.isBookmarklet {
             decisionHandler(.cancel)
-            
-            if let code = url.bookmarkletCodeComponent {
-                webView.evaluateJavaScript(code)
-            }
             return
         }
 
@@ -147,6 +143,7 @@ extension BrowserViewController: WKNavigationDelegate {
             return
         }
         
+        #if !NO_USER_WALLETS
         if isUpholdOAuthAuthorization(url) {
             decisionHandler(.cancel)
             guard let tab = tabManager[webView], let queryItems = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems else {
@@ -159,6 +156,7 @@ extension BrowserViewController: WKNavigationDelegate {
             authorizeUpholdWallet(from: tab, queryItems: items)
             return
         }
+        #endif
 
         // First special case are some schemes that are about Calling. We prompt the user to confirm this action. This
         // gives us the exact same behaviour as Safari.
@@ -195,10 +193,8 @@ extension BrowserViewController: WKNavigationDelegate {
         // always allow this. Additionally, data URIs are also handled just like normal web pages.
 
         if ["http", "https", "data", "blob", "file"].contains(url.scheme) {
-            if navigationAction.navigationType == .linkActivated {
-                resetSpoofedUserAgentIfRequired(webView, newURL: url)
-            } else if navigationAction.navigationType == .backForward {
-                restoreSpoofedUserAgentIfRequired(webView, newRequest: navigationAction.request)
+            if navigationAction.targetFrame?.isMainFrame == true {
+                tabManager[webView]?.updateUserAgent(webView, newURL: url)
             }
 
             pendingRequests[url.absoluteString] = navigationAction.request
@@ -359,7 +355,6 @@ extension BrowserViewController: WKNavigationDelegate {
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: WKWebpagePreferences, decisionHandler: @escaping (WKNavigationActionPolicy, WKWebpagePreferences) -> Void) {
         
         self.webView(webView, decidePolicyFor: navigationAction) {
-            preferences.preferredContentMode = Preferences.General.alwaysRequestDesktopSite.value ? .desktop : .mobile
             decisionHandler($0, preferences)
         }
     }

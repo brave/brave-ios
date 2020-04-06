@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import UIKit
+import BraveUI
 
 /// A table cell subclass which rids the default textLabel/detailTextLabel so that they may be
 /// properly laid out via AutoLayout
@@ -31,14 +32,13 @@ class TableViewCell: UITableViewCell, TableViewReusable {
     }
     
     switch style {
-    case .default:
+    case .default, .subtitle, .value2:
       accessoryLabel = nil
     case .value1:
       accessoryLabel = UILabel().then {
         $0.setContentCompressionResistancePriority(.required, for: .horizontal)
+        $0.appearanceTextColor = Colors.grey800
       }
-    case .subtitle, .value2:
-      fallthrough
     @unknown default:
       fatalError("Currently not supported")
     }

@@ -323,6 +323,7 @@ extension Strings {
     public static let walletCreationDate = NSLocalizedString("WalletCreationDate", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Wallet Creation Date", comment: "The date your wallet was created")
     public static let copyWalletSupportInfo = NSLocalizedString("CopyWalletSupportInfo", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Copy Support Info", comment: "Copy rewards internals info for support")
     public static let settingsLicenses = NSLocalizedString("SettingsLicenses", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Licenses", comment: "Row name for licenses.")
+    public static let openBraveRewardsSettings = NSLocalizedString("OpenBraveRewardsSettings", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Open Brave Rewards Settings", comment: "Button title for opening the Brave Rewards panel to settings")
 }
 
 // MARK:- Error pages.
@@ -355,9 +356,9 @@ extension Strings {
     public static let syncToDevice = NSLocalizedString("SyncToDevice", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Sync to device", comment: "Sync to existing device")
     public static let syncToDeviceDescription = NSLocalizedString("SyncToDeviceDescription", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Using existing synced device open Brave Settings and navigate to Settings -> Sync. Choose \"Add Device\" and scan the code displayed on the screen.", comment: "Sync to existing device description")
     
-    public static let syncAddDeviceScanDescription = NSLocalizedString("SyncAddDeviceScanDescription", tableName: "BraveShared", bundle: Bundle.braveShared, value: "On your second mobile device, navigate to Sync in the Settings panel and tap the button \"Scan Sync Code\". Use your camera to scan the QR Code below.\n\n Treat this code like a password. If someone gets ahold of it, they can read and modify your synced data.", comment: "Sync add device description")
+    public static let syncAddDeviceScanDescription = NSLocalizedString("SyncAddDeviceScanDescription", tableName: "BraveShared", bundle: Bundle.braveShared, value: "On your second mobile device, navigate to Sync in the Settings panel and tap the button \"Scan Sync Code\". Use your camera to scan the QR Code below.\n\n Treat this code like a password. If someone gets hold of it, they can read and modify your synced data.", comment: "Sync add device description")
     public static let syncSwitchBackToCameraButton = NSLocalizedString("SyncSwitchBackToCameraButton", tableName: "BraveShared", bundle: Bundle.braveShared, value: "I'll use my camera...", comment: "Switch back to camera button")
-    public static let syncAddDeviceWordsDescription = NSLocalizedString("SyncAddDeviceWordsDescription", tableName: "BraveShared", bundle: Bundle.braveShared, value: "On your device, navigate to Sync in the Settings panel and tap the button \"%@\". Enter the sync chain code words shown below.\n\n Treat this code like a password. If someone gets ahold of it, they can read and modify your synced data.", comment: "Sync add device description")
+    public static let syncAddDeviceWordsDescription = NSLocalizedString("SyncAddDeviceWordsDescription", tableName: "BraveShared", bundle: Bundle.braveShared, value: "On your device, navigate to Sync in the Settings panel and tap the button \"%@\". Enter the sync chain code words shown below.\n\n Treat this code like a password. If someone gets hold of it, they can read and modify your synced data.", comment: "Sync add device description")
     public static let syncNoConnectionTitle = NSLocalizedString("SyncNoConnectionTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Can't connect to sync", comment: "No internet connection alert title.")
     public static let syncNoConnectionBody = NSLocalizedString("SyncNoConnectionBody", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Check your internet connection and try again.", comment: "No internet connection alert body.")
     public static let enterCodeWords = NSLocalizedString("EnterCodeWords", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Enter code words", comment: "Sync enter code words")
@@ -642,7 +643,7 @@ extension Strings {
             NSLocalizedString("ntp.getPaidToSeeThisImage",
                 tableName: "BraveShared",
                 bundle: .braveShared,
-                value: "Get paid to see this background image.",
+                value: "Earn tokens for viewing this image.",
                 comment: "")
         public static let supportWebCreatorsWithTokens =
             NSLocalizedString("ntp.supportWebCreatorsWithTokens",
@@ -660,7 +661,7 @@ extension Strings {
             NSLocalizedString("ntp.youArePaidToSeeThisImage",
                 tableName: "BraveShared",
                 bundle: .braveShared,
-                value: "You're getting paid to see this background image.",
+                value: "You're earning tokens for viewing this image.",
                 comment: "")
         public static let turnOnBraveAds =
             NSLocalizedString("ntp.turnOnBraveAds",
@@ -672,44 +673,38 @@ extension Strings {
             NSLocalizedString("ntp.turnOnBraveRewards",
                 tableName: "BraveShared",
                 bundle: .braveShared,
-                value: "Turn on Rewards",
+                value: "Turn on Brave Rewards",
                 comment: "")
         public static let getPaidForThisImageTurnRewards =
             NSLocalizedString("ntp.getPaidForThisImageTurnRewards",
                 tableName: "BraveShared",
                 bundle: .braveShared,
-                value: "Get paid to see this background image. Turn on Brave Rewards to claim your share.",
+                value: "Earn tokens for viewing this image. Turn on Brave Rewards to claim your share.",
                 comment: "")
         public static let getPaidForThisImageTurnAds =
             NSLocalizedString("ntp.getPaidForThisImageTurnAds",
                 tableName: "BraveShared",
                 bundle: .braveShared,
-                value: "Get paid to see this background image. Turn on Brave Ads to claim your share.",
+                value: "Earn tokens for viewing this image. Turn on Brave Ads to claim your share.",
                 comment: "")
         public static let turnRewardsTos =
             NSLocalizedString("ntp.turnRewardsTos",
                 tableName: "BraveShared",
                 bundle: .braveShared,
                 value: "By turning on Rewards, you agree to the %@.",
-                comment: "The placeholder says 'Terms of Service'. So full sentence goes like: 'By turnin Rewards, you agree to the Terms of Service'.")
-        public static let chooseToHideSponsoredImages =
-            NSLocalizedString("ntp.chooseToHideSponsoredImages",
-                tableName: "BraveShared",
-                bundle: .braveShared,
-                value: "You can also choose to %@.",
-                comment: "The placeholder says 'hide sponsored images'. So full sentence goes like: 'You can also choose to hide sponsored images.'")
+                comment: "The placeholder says 'Terms of Service'. So full sentence goes like: 'By turning Rewards, you agree to the Terms of Service'.")
         public static let hideSponsoredImages =
             NSLocalizedString("ntp.hideSponsoredImages",
                 tableName: "BraveShared",
                 bundle: .braveShared,
-                value: "hide sponsored images",
-                comment: "This sentence is not capitalized on purpose, it is a part of a bigger sentence which goes like this: 'You can also choose to hide sponsored images.'")
+                value: "Hide sponsored images",
+                comment: "")
         public static let learnMoreAboutBrandedImages =
             NSLocalizedString("ntp.learnMoreAboutBrandedImages",
                 tableName: "BraveShared",
                 bundle: .braveShared,
-                value: "%@ about sponsored images in Brave Rewards",
-                comment: "The placeholder says 'Learn more'. So full sentence goes like: 'Learn more about sponsored images in Brave Rewards.'")
+                value: "For every sponsored image you view, you receive 70% of the revenue in tokens. With Brave Ads, you're always in control of the ads you see.",
+                comment: "")
         public static let goodJob =
             NSLocalizedString("ntp.goodJob",
                 tableName: "BraveShared",
@@ -728,7 +723,45 @@ extension Strings {
                 bundle: .braveShared,
                 value: "Claim my rewards",
                 comment: "")
+
+        public static let learnMoreAboutRewards =
+            NSLocalizedString("ntp.learnMoreAboutRewards",
+                    tableName: "BraveShared",
+                    bundle: .braveShared,
+                    value: "Learn more about Brave Rewards",
+                    comment: "")
+
+        public static let learnMoreAboutSI =
+            NSLocalizedString("ntp.learnMoreAboutSI",
+                    tableName: "BraveShared",
+                    bundle: .braveShared,
+                    value: "Learn more about sponsored images",
+                    comment: "")
     }
     
 }
 
+// MARK: - Popover Views
+extension Strings {
+    public struct Popover {
+        public static let closeContextMenu = NSLocalizedString("PopoverDefaultClose", bundle: Bundle.braveShared, value: "Close Context Menu", comment: "Description for closing a popover menu that is displayed.")
+        public static let closeShieldsMenu = NSLocalizedString("PopoverShieldsMenuClose", bundle: Bundle.braveShared, value: "Close Shields Menu", comment: "Description for closing the `Brave Shields` popover menu that is displayed.")
+    }
+}
+
+// MARK: - Shields
+extension Strings {
+    public static let braveShieldsStatusTitle = NSLocalizedString("BraveShieldsStatusTitle", bundle: Bundle.braveShared, value: "Brave Shields", comment: "Context: 'Brave Shields Up' or 'Brave Shields Down'")
+    public static let braveShieldsStatusValueUp = NSLocalizedString("BraveShieldsStatusValueUp", bundle: Bundle.braveShared, value: "Up", comment: "Context: The 'Up' in 'Brave Shields Up'")
+    public static let braveShieldsStatusValueDown = NSLocalizedString("BraveShieldsStatusValueDown", bundle: Bundle.braveShared, value: "Down", comment: "Context: The 'Down' in 'Brave Shields Down'")
+    public static let braveShieldsBlockedCountLabel = NSLocalizedString("BraveShieldsBlockedCountLabel", bundle: Bundle.braveShared, value: "Ads and other creepy things blocked", comment: "The number of ads and trackers blocked will be next to this")
+    public static let braveShieldsBlockedInfoButtonAccessibilityLabel = NSLocalizedString("BraveShieldsBlockedInfoButtonAccessibilityLabel", bundle: Bundle.braveShared, value: "Learn more", comment: "What the screen reader will read out when the user has VoiceOver on and taps on the question-mark info button on the shields panel")
+    public static let braveShieldsSiteBroken = NSLocalizedString("BraveShieldsSiteBroken", bundle: Bundle.braveShared, value: "If this site appears broken, try Shields down", comment: "")
+    public static let braveShieldsAdvancedControls = NSLocalizedString("BraveShieldsAdvancedControls", bundle: Bundle.braveShared, value: "Advanced controls", comment: "")
+    public static let aboutBraveShieldsTitle = NSLocalizedString("AboutBraveShields", bundle: Bundle.braveShared, value: "About Brave Shields", comment: "The title of the screen explaining Brave Shields")
+    public static let aboutBraveShieldsBody = NSLocalizedString("AboutBraveShields", bundle: Bundle.braveShared, value: "Sites often include cookies and scripts which try to identify you and your device. They want to work out who you are and follow you across the web — tracking what you do on every site.\n\nBrave blocks these things so that you can browse without being followed around.", comment: "The body of the screen explaining Brave Shields")
+    public static let shieldsDownDisclaimer = NSLocalizedString("ShieldsDownDisclaimer", bundle: Bundle.braveShared, value: "You're browsing this site without Brave's privacy protections. Does it not work right with Shields up?", comment: "")
+    public static let reportABrokenSite = NSLocalizedString("ReportABrokenSite", bundle: Bundle.braveShared, value: "Report a broken site", comment: "")
+    public static let braveShieldsGlobalControls = NSLocalizedString("BraveShieldsGlobalControls", bundle: Bundle.braveShared, value: "Global Controls", comment: "")
+    public static let braveShieldsGlobalChangeButton = NSLocalizedString("BraveShieldsGlobalChangeButton", bundle: Bundle.braveShared, value: "Change global Shields defaults", comment: "")
+}

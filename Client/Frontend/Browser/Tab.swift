@@ -6,6 +6,7 @@ import Foundation
 import WebKit
 import Storage
 import Shared
+import BraveRewards
 import BraveShared
 import XCGLogger
 import Data
@@ -32,14 +33,6 @@ protocol URLChangeDelegate {
     func tab(_ tab: Tab, urlDidChangeTo url: URL)
 }
 
-struct TabState {
-    var type: TabType = .regular
-    var desktopSite: Bool = false
-    var url: URL?
-    var title: String?
-    var favicon: Favicon?
-}
-
 class Tab: NSObject {
     var id: String?
     
@@ -54,10 +47,6 @@ class Tab: NSObject {
     }
     
     var contentIsSecure = false
-    
-    var tabState: TabState {
-        return TabState(type: type, desktopSite: desktopSite, url: url, title: displayTitle, favicon: displayFavicon)
-    }
 
     // PageMetadata is derived from the page content itself, and as such lags behind the
     // rest of the tab.
@@ -87,7 +76,7 @@ class Tab: NSObject {
     var mimeType: String?
     var isEditing: Bool = false
     var shouldClassifyLoadsForAds = true
-
+ 
     // When viewing a non-HTML content type in the webview (like a PDF document), this URL will
     // point to a tempfile containing the content so it can be shared to external applications.
     var temporaryDocument: TemporaryDocument?
@@ -120,9 +109,14 @@ class Tab: NSObject {
     /// The last title shown by this tab. Used by the tab tray to show titles for zombie tabs.
     var lastTitle: String?
 
-    /// Whether or not the desktop site was requested with the last request, reload or navigation. Note that this property needs to
-    /// be managed by the web view's navigation delegate.
-    var desktopSite: Bool = Preferences.General.alwaysRequestDesktopSite.value
+    var isDesktopSite: Bool {
+        webView?.customUserAgent?.lowercased().contains("mobile") == false
+    }
+    
+    /// In-memory dictionary of websites that were explicitly set to use either desktop or mobile user agent.
+    /// Key is url's base domain, value is desktop mode on or off.
+    /// Each tab has separate list of website overrides.
+    private var userAgentOverrides: [String: Bool] = [:]
     
     var readerModeAvailableOrActive: Bool {
         if let readerMode = self.getContentScript(name: "ReaderMode") as? ReaderMode {
@@ -194,9 +188,6 @@ class Tab: NSObject {
             configuration!.preferences = WKPreferences()
             configuration!.preferences.javaScriptCanOpenWindowsAutomatically = false
             configuration!.allowsInlineMediaPlayback = true
-            if #available(iOS 13.0, *) {
-                configuration!.defaultWebpagePreferences.preferredContentMode = Preferences.General.alwaysRequestDesktopSite.value ? .desktop : .mobile
-            }
             // Enables Zoom in website by ignoring their javascript based viewport Scale limits.
             configuration!.ignoresViewportScaleLimits = true
             let webView = TabWebView(frame: .zero, configuration: configuration!, isPrivate: isPrivate)
@@ -211,9 +202,6 @@ class Tab: NSObject {
                 webView.allowsLinkPreview = false
             }
 
-            // Night mode enables this by toggling WKWebView.isOpaque, otherwise this has no effect.
-            webView.backgroundColor = .black
-
             // Turning off masking allows the web content to flow outside of the scrollView's frame
             // which allows the content appear beneath the toolbars in the BrowserViewController
             webView.scrollView.layer.masksToBounds = false
@@ -223,7 +211,12 @@ class Tab: NSObject {
 
             self.webView = webView
             self.webView?.addObserver(self, forKeyPath: KVOConstants.URL.rawValue, options: .new, context: nil)
-            self.userScriptManager = UserScriptManager(tab: self, isFingerprintingProtectionEnabled: Preferences.Shields.fingerprintingProtection.value, isCookieBlockingEnabled: Preferences.Privacy.blockAllCookies.value, isU2FEnabled: webView.hasOnlySecureContent)
+            self.userScriptManager = UserScriptManager(
+                tab: self,
+                isFingerprintingProtectionEnabled: Preferences.Shields.fingerprintingProtection.value,
+                isCookieBlockingEnabled: Preferences.Privacy.blockAllCookies.value,
+                isU2FEnabled: webView.hasOnlySecureContent,
+                isPaymentRequestEnabled: webView.hasOnlySecureContent)
             tabDelegate?.tab?(self, didCreateWebView: webView)
         }
     }
@@ -275,6 +268,8 @@ class Tab: NSObject {
     }
     
     func deleteWebView() {
+        contentScriptManager.uninstall(from: self)
+        
         if let webView = webView {
             webView.removeObserver(self, forKeyPath: KVOConstants.URL.rawValue)
             tabDelegate?.tab?(self, willDeleteWebView: webView)
@@ -288,7 +283,6 @@ class Tab: NSObject {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
         
         let rewards = appDelegate.browserViewController.rewards
-        
         if !PrivateBrowsingManager.shared.isPrivateBrowsing {
             rewards.reportTabClosed(tabId: rewardsId)
         }
@@ -385,21 +379,11 @@ class Tab: NSObject {
     }
 
     func reload() {
-        var mobileUA: String?
-        if #available(iOS 13.0, *) {
-            mobileUA = UserAgent.defaultUserAgent()
-        }
-
-        let userAgent: String? = desktopSite ? UserAgent.desktopUserAgent() : mobileUA
-        
-        if (userAgent ?? "") != webView?.customUserAgent,
-           let currentItem = webView?.backForwardList.currentItem {
-            webView?.customUserAgent = userAgent
-
-            // Reload the initial URL to avoid UA specific redirection
-            loadRequest(PrivilegedRequest(url: currentItem.initialURL, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 60) as URLRequest)
-            return
-        }
+        // Clear the user agent before further navigation.
+        // Proper User Agent setting happens in BVC's WKNavigationDelegate.
+        // This prevents a bug with back-forward list, going back or forward and reloading the tab
+        // loaded wrong user agent.
+        webView?.customUserAgent = nil
         
         // Refreshing error, safe browsing warning pages.
         if let originalUrlFromErrorUrl = webView?.url?.originalURLFromErrorURL {
@@ -416,6 +400,13 @@ class Tab: NSObject {
             log.debug("restoring webView from scratch")
             restore(webView, restorationData: sessionData?.savedTabData)
         }
+    }
+    
+    func updateUserAgent(_ webView: WKWebView, newURL: URL) {
+        guard let baseDomain = newURL.baseDomain else { return }
+        
+        let desktopMode = userAgentOverrides[baseDomain] ?? UserAgent.shouldUseDesktopMode
+        webView.customUserAgent = desktopMode ? UserAgent.desktop : UserAgent.mobile
     }
 
     func addContentScript(_ helper: TabContentScript, name: String) {
@@ -477,8 +468,18 @@ class Tab: NSObject {
         }
     }
 
-    func toggleDesktopSite() {
-        desktopSite = !desktopSite
+    /// Switches user agent Desktop -> Mobile or Mobile -> Desktop.
+    func switchUserAgent() {
+        if let urlString = webView?.url?.baseDomain {
+            // The website was changed once already, need to flip the override.
+            if let siteOverride = userAgentOverrides[urlString] {
+                userAgentOverrides[urlString] = !siteOverride
+            } else {
+                // First time switch, adding the basedomain to dictionary with flipped value.
+                userAgentOverrides[urlString] = !UserAgent.shouldUseDesktopMode
+            }
+        }
+        
         reload()
     }
 
@@ -515,13 +516,6 @@ class Tab: NSObject {
         return sequence(first: parent) { $0?.parent }.contains { $0 == ancestor }
     }
 
-    func setNightMode(_ enabled: Bool) {
-        webView?.evaluateJavaScript("window.__firefox__.NightMode.setEnabled(\(enabled))", completionHandler: nil)
-        // For WKWebView background color to take effect, isOpaque must be false, which is counter-intuitive. Default is true.
-        // The color is previously set to black in the webview init
-        webView?.isOpaque = !enabled
-    }
-
     func injectUserScriptWith(fileName: String, type: String = "js", injectionTime: WKUserScriptInjectionTime = .atDocumentEnd, mainFrameOnly: Bool = true) {
         guard let webView = self.webView else {
             return
@@ -552,6 +546,14 @@ extension Tab: TabWebViewDelegate {
 
 private class TabContentScriptManager: NSObject, WKScriptMessageHandler {
     fileprivate var helpers = [String: TabContentScript]()
+    
+    func uninstall(from tab: Tab) {
+        helpers.forEach {
+            if let name = $0.value.scriptMessageHandlerName() {
+                tab.webView?.configuration.userContentController.removeScriptMessageHandler(forName: name)
+            }
+        }
+    }
 
     @objc func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         for helper in helpers.values {
@@ -637,4 +639,3 @@ class TabWebViewMenuHelper: UIView {
         }
     }
 }
-

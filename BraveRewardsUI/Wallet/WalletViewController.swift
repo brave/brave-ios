@@ -7,6 +7,7 @@ import SnapKit
 import BraveRewards
 import Network
 import BraveShared
+import BraveUI
 
 protocol WalletContentView: AnyObject {
   var innerScrollView: UIScrollView? { get }
@@ -17,7 +18,7 @@ class WalletViewController: UIViewController, RewardsSummaryProtocol {
   private let networkMonitor = NWPathMonitor()
   let state: RewardsState
   let ledgerObserver: LedgerObserver
-  weak var currentNotification: RewardsNotification?
+  var currentNotification: RewardsNotification?
   private var recurringTipAmount: Double = 0.0
   private var publisher: PublisherInfo?
   
@@ -85,11 +86,6 @@ class WalletViewController: UIViewController, RewardsSummaryProtocol {
     navigationController?.setNavigationBarHidden(true, animated: false)
     
     rewardsSummaryView.rewardsSummaryButton.addTarget(self, action: #selector(tappedRewardsSummaryButton), for: .touchUpInside)
-    if !disclaimerLabels.isEmpty {
-      rewardsSummaryView.disclaimerView = WalletDisclaimerView().then {
-        $0.labels = disclaimerLabels
-      }
-    }
     
     walletView.headerView.addFundsButton.addTarget(self, action: #selector(tappedAddFunds), for: .touchUpInside)
     walletView.headerView.settingsButton.addTarget(self, action: #selector(tappedSettings), for: .touchUpInside)
@@ -100,6 +96,7 @@ class WalletViewController: UIViewController, RewardsSummaryProtocol {
     walletView.headerView.verifiedUserWalletButton.addTarget(self, action: #selector(tappedVerifiedUserWalletButton), for: .touchUpInside)
     walletView.headerView.setUserWalletStatus(.hidden) // Hidden by default
     
+    updatePendingContributionsState()
     updateWalletHeader()
     updateWalletState()
     updateExternalWallet()
@@ -110,8 +107,9 @@ class WalletViewController: UIViewController, RewardsSummaryProtocol {
     reloadUIState()
     setupPublisherView(publisherSummaryView)
     view.layoutIfNeeded()
-    startNotificationObserver()
     startNetworkObserver()
+    
+    NotificationCenter.default.addObserver(self, selector: #selector(notificationAdded(_:)), name: BraveLedger.NotificationAdded, object: nil)
   }
   
   override func viewWillAppear(_ animated: Bool) {
@@ -184,6 +182,33 @@ class WalletViewController: UIViewController, RewardsSummaryProtocol {
   
   // MARK: -
   
+  func updatePendingContributionsState() {
+    state.ledger.pendingContributionsTotal(completion: { amount in
+      let labels = self.disclaimerLabels(for: amount)
+      if labels.isEmpty {
+        self.rewardsSummaryView.disclaimerView = nil
+      } else {
+        self.rewardsSummaryView.disclaimerView = WalletDisclaimerView().then {
+          $0.labels = labels
+          $0.labels.forEach { label in
+            label.onLinkedTapped = { [weak self] link in
+              guard let self = self, let disclaimerLink = RewardsSummaryLink(rawValue: link.absoluteString) else { return }
+              switch disclaimerLink {
+              case .learnMore:
+                if let url = URL(string: DisclaimerLinks.unclaimedFundsURL) {
+                  self.state.delegate?.loadNewTabWithURL(url)
+                }
+              case .showPendingContributions:
+                let pending = PendingContributionListController(state: self.state)
+                self.navigationController?.pushViewController(pending, animated: true)
+              }
+            }
+          }
+        }
+      }
+    })
+  }
+  
   func updateWalletState() {
     state.ledger.fetchBalance { balance in
       if balance == nil && self.state.ledger.balance == nil {
@@ -216,13 +241,6 @@ class WalletViewController: UIViewController, RewardsSummaryProtocol {
     publisherView.learnMoreTapped = { [weak self] in
       guard let self = self, let url = URL(string: DisclaimerLinks.unclaimedFundsURL) else { return }
       self.state.delegate?.loadNewTabWithURL(url)
-    }
-    
-    walletView.rewardsSummaryView?.disclaimerView?.labels.forEach {
-      $0.onLinkedTapped = { [weak self] _ in
-        guard let self = self, let url = URL(string: DisclaimerLinks.unclaimedFundsURL) else { return }
-        self.state.delegate?.loadNewTabWithURL(url)
-      }
     }
     
     publisherView.onCheckAgainTapped = { [weak self] in
@@ -318,10 +336,8 @@ class WalletViewController: UIViewController, RewardsSummaryProtocol {
       self.state.ledger.listRecurringTips { [weak self] in
         guard let self = self, let recurringTip = $0.first(where: { $0.id == publisher.id && $0.rewardsCategory == .recurringTip }) else { return }
         
-        guard let contributionAmount = recurringTip.contributions.first?.value else { return }
-        
-        self.recurringTipAmount = contributionAmount
-        self.publisherSummaryView.monthlyTipView.batValueView.amountLabel.text = "\(Int(contributionAmount))"
+        self.recurringTipAmount = recurringTip.weight
+        self.publisherSummaryView.monthlyTipView.batValueView.amountLabel.text = "\(Int(recurringTip.weight))"
         self.publisherSummaryView.monthlyTipView.isHidden = false
       }
     }
@@ -332,7 +348,7 @@ class WalletViewController: UIViewController, RewardsSummaryProtocol {
       if isLocal {
         rewardsSummaryView.rewardsSummaryButton.isEnabled = false
         
-        self.view.backgroundColor = Colors.blurple800
+        self.view.backgroundColor = Colors.blurple100
         walletView.contentView = rewardsSummaryView
         
         rewardsSummaryView.rewardsSummaryButton.snp.remakeConstraints {
@@ -472,7 +488,7 @@ class WalletViewController: UIViewController, RewardsSummaryProtocol {
       if isExpanding {
         contentView?.alpha = 0.0
         self.rewardsSummaryView.monthYearLabel.alpha = 1.0
-        self.view.backgroundColor = Colors.blurple800
+        self.view.backgroundColor = Colors.blurple100
       } else {
         contentView?.alpha = 1.0
         self.rewardsSummaryView.monthYearLabel.alpha = 0.0
@@ -573,13 +589,6 @@ extension WalletViewController {
 
 extension WalletViewController {
   
-  func startNotificationObserver() {
-    // Stopping as a precaution
-    // Add observer
-    NotificationCenter.default.addObserver(self, selector: #selector(notificationAdded(_:)), name: BraveLedger.NotificationAdded, object: nil)
-    loadNextNotification()
-  }
-  
   @objc private func notificationAdded(_ notification: Notification) {
     // TODO: Filter notification?
     // LoadNext if there is no current notification
@@ -641,6 +650,15 @@ extension WalletViewController {
       crypto: Strings.walletBalanceType,
       dollarValue: state.ledger.usdBalanceString
     )
+    #if NO_USER_WALLETS
+    if let publisher = publisher {
+      publisherSummaryView.publisherView.setStatus(
+        publisher.status,
+        externalWalletStatus: .notConnected,
+        hasBraveFunds: false
+      )
+    }
+    #else
     if let publisher = publisher {
       publisherSummaryView.publisherView.setStatus(
         publisher.status,
@@ -665,25 +683,25 @@ extension WalletViewController {
       }
       self.walletView.headerView.addFundsButton.isHidden = wallet.status != .verified
     }
+    #endif
   }
   
   /// Fetch an updated external wallet from ledger if the user isn't in JP
   func updateExternalWallet() {
+    #if !NO_USER_WALLETS
     if Preferences.Rewards.isUsingBAP.value == true { return }
     
     // If we can show Uphold, grab verification status of the wallet
     state.ledger.fetchExternalWallet(forType: .uphold) { _ in
       self.updateWalletHeader()
     }
+    #endif
   }
   
   func setupLedgerObservers() {
     ledgerObserver.fetchedPanelPublisher = { [weak self] publisher, tabId in
       guard let self = self, self.state.tabId == tabId else { return }
       self.publisher = publisher
-      if let activity = self.state.ledger.currentActivityInfo(withPublisherId: publisher.id) {
-        self.publisher?.percent = activity.percent
-      }
       self.reloadPublisherDetails()
     }
     ledgerObserver.finishedPromotionsAdded = { [weak self] promotions in
@@ -726,6 +744,12 @@ extension WalletViewController {
           })
         })
       })
+    }
+    ledgerObserver.pendingContributionAdded = { [weak self] in
+      self?.updatePendingContributionsState()
+    }
+    ledgerObserver.pendingContributionsRemoved = { [weak self] _ in
+      self?.updatePendingContributionsState()
     }
   }
 }

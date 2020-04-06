@@ -4,6 +4,7 @@
 
 import UIKit
 import BraveRewards
+import BraveUI
 
 class AutoContributeDetailViewController: UIViewController {
   private var ledgerObserver: LedgerObserver
@@ -83,7 +84,11 @@ class AutoContributeDetailViewController: UIViewController {
       self.publishersCount = UInt(pubs.count)
       self.contentView.tableView.reloadData()
     }
-    excludedPublishersCount = state.ledger.numberOfExcludedPublishers
+    let excludedFilter = state.ledger.excludedPublishersFilter
+    state.ledger.listActivityInfo(fromStart: 0, limit: 0, filter: excludedFilter) { pubs in
+      self.excludedPublishersCount = UInt(pubs.count)
+      self.contentView.tableView.reloadData()
+    }
     contentView.tableView.reloadData()
   }
   
@@ -268,7 +273,6 @@ extension AutoContributeDetailViewController: UITableViewDataSource, UITableView
       cell.label.font = SettingsUX.bodyFont
       cell.label.appearanceTextColor = .black
       cell.label.numberOfLines = 0
-      cell.accessoryLabel?.appearanceTextColor = Colors.grey100
       cell.accessoryLabel?.font = SettingsUX.bodyFont
       cell.accessoryType = .none
       cell.selectionStyle = .none
@@ -293,7 +297,6 @@ extension AutoContributeDetailViewController: UITableViewDataSource, UITableView
       cell.label.font = SettingsUX.bodyFont
       cell.label.appearanceTextColor = .black
       cell.label.numberOfLines = 0
-      cell.accessoryLabel?.appearanceTextColor = Colors.grey100
       cell.accessoryLabel?.font = UIFont.monospacedDigitSystemFont(ofSize: 14.0, weight: .semibold)
       cell.accessoryType = .disclosureIndicator
       cell.selectionStyle = .default
@@ -313,7 +316,6 @@ extension AutoContributeDetailViewController: UITableViewDataSource, UITableView
       cell.label.font = SettingsUX.bodyFont
       cell.label.numberOfLines = 0
       cell.label.lineBreakMode = .byWordWrapping
-      cell.accessoryLabel?.appearanceTextColor = Colors.grey100
       cell.accessoryLabel?.font = SettingsUX.bodyFont
       cell.accessoryType = row.accessoryType
       switch row {

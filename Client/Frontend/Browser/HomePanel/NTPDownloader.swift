@@ -5,22 +5,26 @@
 import Foundation
 import Shared
 import BraveShared
+import BraveRewards
 
 private let logger = Logger.browserLogger
 
 protocol NTPDownloaderDelegate: class {
-    func onNTPUpdated(ntpInfo: NewTabPageBackgroundDataSource.Sponsor?)
+    func onNTPUpdated(ntpInfo: NTPBackgroundDataSource.Sponsor?)
 }
 
 class NTPDownloader {
     private static let etagFile = "crc.etag"
     private static let metadataFile = "photo.json"
     private static let ntpDownloadsFolder = "NTPDownloads"
-    private static let baseURL = "https://brave-ntp-crx-input-dev.s3-us-west-2.amazonaws.com/"
-    
-    private let defaultLocale = "US"
-    private let supportedLocales: [String] = []
-    private let currentLocale = Locale.current.regionCode
+    private static let baseURL = { () -> String in
+        switch BraveLedger.environment {
+        case .production: return "https://mobile-data.s3.brave.com/"
+        case .staging, .development: return "https://brave-ntp-crx-input-dev.s3-us-west-2.amazonaws.com/"
+        @unknown default:
+            return "https://mobile-data.s3.brave.com/"
+        }
+    }()
     
     private var timer: Timer?
     private var backgroundObserver: NSObjectProtocol?
@@ -28,7 +32,9 @@ class NTPDownloader {
 
     weak var delegate: NTPDownloaderDelegate? {
         didSet {
-            self.notifyObservers()
+            if delegate != nil {
+                self.notifyObservers()
+            }
         }
     }
     
@@ -36,7 +42,7 @@ class NTPDownloader {
         self.removeObservers()
     }
     
-    private func getNTPInfo(_ completion: @escaping (NewTabPageBackgroundDataSource.Sponsor?) -> Void) {
+    private func getNTPInfo(_ completion: @escaping (NTPBackgroundDataSource.Sponsor?) -> Void) {
         //Load from cache because the time since the last fetch hasn't expired yet..
         if let nextDate = Preferences.NTP.ntpCheckDate.value,
             Date().timeIntervalSince1970 - nextDate < 0 {
@@ -53,18 +59,17 @@ class NTPDownloader {
         self.downloadMetadata { [weak self] url, cacheInfo, error in
             guard let self = self else { return }
             
+            //Start the timer no matter what..
+            self.startNTPTimer()
+            
             if case .campaignEnded = error {
                 do {
                     try self.removeCampaign()
                 } catch {
                     logger.error(error)
                 }
-                
                 return completion(nil)
             }
-            
-            //Start the timer no matter what..
-            self.startNTPTimer()
             
             if let error = error?.underlyingError() {
                 logger.error(error)
@@ -150,18 +155,22 @@ class NTPDownloader {
             self.timer?.invalidate()
             self.timer = nil
             
-            if let nextDate = Preferences.NTP.ntpCheckDate.value {
+            //If the time hasn't passed yet, reschedule the timer with the relative time..
+            if let nextDate = Preferences.NTP.ntpCheckDate.value,
+                Date().timeIntervalSince1970 - nextDate < 0 {
+                
                 let relativeTime = abs(Date().timeIntervalSince1970 - nextDate)
                 self.timer = Timer.scheduledTimer(withTimeInterval: relativeTime, repeats: true) { [weak self] _ in
                     self?.notifyObservers()
                 }
             } else {
-                self.startNTPTimer()
+                //Else the time has already passed so download the new data, reschedule the timers and notify the observers
+                self.notifyObservers()
             }
         }
     }
     
-    private func loadNTPInfo() -> NewTabPageBackgroundDataSource.Sponsor? {
+    private func loadNTPInfo() -> NTPBackgroundDataSource.Sponsor? {
         do {
             let metadataFileURL = try self.ntpMetadataFileURL()
             if !FileManager.default.fileExists(atPath: metadataFileURL.path) {
@@ -175,22 +184,21 @@ class NTPDownloader {
             }
             
             let downloadsFolderURL = try self.ntpDownloadsURL()
-            let itemInfo = try JSONDecoder().decode(NewTabPageBackgroundDataSource.Sponsor.self, from: metadata)
+            let itemInfo = try JSONDecoder().decode(NTPBackgroundDataSource.Sponsor.self, from: metadata)
             
-            let logo = NewTabPageBackgroundDataSource.Sponsor.Logo(
+            let logo = NTPBackgroundDataSource.Sponsor.Logo(
                 imageUrl: downloadsFolderURL.appendingPathComponent(itemInfo.logo.imageUrl).path,
                 alt: itemInfo.logo.alt,
                 companyName: itemInfo.logo.companyName,
                 destinationUrl: itemInfo.logo.destinationUrl)
             
             let wallpapers = itemInfo.wallpapers.map {
-                NewTabPageBackgroundDataSource.Background(
+                NTPBackgroundDataSource.Background(
                     imageUrl: downloadsFolderURL.appendingPathComponent($0.imageUrl).path,
-                    focalPoint: $0.focalPoint,
-                    credit: nil)
+                    focalPoint: $0.focalPoint)
             }
             
-            return NewTabPageBackgroundDataSource.Sponsor(wallpapers: wallpapers, logo: logo)
+            return NTPBackgroundDataSource.Sponsor(wallpapers: wallpapers, logo: logo)
         } catch {
             logger.error(error)
         }
@@ -232,10 +240,7 @@ class NTPDownloader {
         }
     }
     
-    private func removeCampaign() throws {
-        Preferences.NTP.ntpCheckDate.value = nil
-        self.removeObservers()
-        
+    func removeCampaign() throws {
         try self.removeETag()
         let downloadsFolderURL = try self.ntpDownloadsURL()
         if FileManager.default.fileExists(atPath: downloadsFolderURL.path) {
@@ -264,7 +269,7 @@ class NTPDownloader {
             }
             
             do {
-                let item = try JSONDecoder().decode(NewTabPageBackgroundDataSource.Sponsor.self, from: data)
+                let item = try JSONDecoder().decode(NTPBackgroundDataSource.Sponsor.self, from: data)
                 self.unpackMetadata(item: item) { url, error in
                     completion(url, cacheInfo, error)
                 }
@@ -275,23 +280,11 @@ class NTPDownloader {
     }
     
     private func getBaseURL() -> URL? {
-        guard let url = URL(string: NTPDownloader.baseURL) else {
+        guard let url = URL(string: NTPDownloader.baseURL), let region = Locale.current.regionCode else {
             return nil
         }
         
-        return url.appendingPathComponent(getSupportedLocale())
-    }
-    
-    private func getSupportedLocale() -> String {
-        guard let region = Locale.current.regionCode else {
-            return self.defaultLocale
-        }
-        
-        if supportedLocales.contains(region) {
-            return region
-        }
-        
-        return self.defaultLocale
+        return url.appendingPathComponent(region)
     }
     
     //MARK: - Download & Unpacking
@@ -327,15 +320,18 @@ class NTPDownloader {
             guard let self = self else { return }
             
             if let error = error {
-                return completion(nil, nil, error)
+                completion(nil, nil, error)
+                return
             }
             
             guard let response = response as? HTTPURLResponse else {
-                return completion(nil, nil, "Response is not an HTTP Response")
+                completion(nil, nil, "Response is not an HTTP Response")
+                return
             }
             
             if response.statusCode != 304 && (response.statusCode < 200 || response.statusCode > 299) {
                 completion(nil, nil, "Invalid Response Status Code: \(response.statusCode)")
+                return
             }
             
             completion(data, self.parseETagResponseInfo(response), nil)
@@ -344,7 +340,7 @@ class NTPDownloader {
     
     // Unpacks NTPItemInfo by downloading all of its assets to a temporary directory
     // and returning the URL to the directory
-    private func unpackMetadata(item: NewTabPageBackgroundDataSource.Sponsor, _ completion: @escaping (URL?, NTPError?) -> Void) {
+    private func unpackMetadata(item: NTPBackgroundDataSource.Sponsor, _ completion: @escaping (URL?, NTPError?) -> Void) {
         let tempDirectory = FileManager.default.temporaryDirectory
         let directory = tempDirectory.appendingPathComponent(NTPDownloader.ntpDownloadsFolder)
         
@@ -363,12 +359,14 @@ class NTPDownloader {
                 self.download(path: itemURL, etag: nil) { data, _, err in
                     if let err = err {
                         error = err
-                        return group.leave()
+                        group.leave()
+                        return
                     }
                     
                     guard let data = data else {
                         error = "No Data Available for NTP-Download: \(itemURL)"
-                        return group.leave()
+                        group.leave()
+                        return
                     }
                     
                     do {
