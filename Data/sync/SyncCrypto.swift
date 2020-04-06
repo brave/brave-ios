@@ -4,7 +4,6 @@ import UIKit
 import WebKit
 import Shared
 import BraveShared
-import SwiftyJSON
 import JavaScriptCore
 
 private let log = Logger.browserLogger

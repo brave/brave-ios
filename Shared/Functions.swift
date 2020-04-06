@@ -1,7 +1,6 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-import SwiftyJSON
 
 // Pipelining.
 precedencegroup PipelinePrecedence {
@@ -210,14 +209,6 @@ public func findOneValue<K, V>(_ map: [K: V], f: (V) -> Bool) -> V? {
         }
     }
     return nil
-}
-
-/**
- * Take a JSON array, returning the String elements as an array.
- * It's usually convenient for this to accept an optional.
- */
-public func jsonsToStrings(_ arr: [JSON]?) -> [String]? {
-    return arr?.compactMap { $0.stringValue }
 }
 
 // Encapsulate a callback in a way that we can use it with NSTimer.

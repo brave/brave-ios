@@ -4,7 +4,6 @@
 
 import Shared
 import Deferred
-import SwiftyJSON
 
 public struct SyncCommand: Equatable {
     public let value: String
@@ -42,7 +41,8 @@ public struct SyncCommand: Equatable {
             "command": "displayURI",
             "args": [shareItem.url, sender, shareItem.title ?? ""]
         ]
-        return SyncCommand(value: JSON(jsonObj).stringValue()!)
+        let json = try? String(data: JSONSerialization.data(withJSONObject: jsonObj, options: .init(rawValue: 0)), encoding: .utf8)
+        return SyncCommand(value: json ?? "{}")
     }
 
     public func withClientGUID(_ clientGUID: String?) -> SyncCommand {

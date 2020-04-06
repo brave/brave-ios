@@ -5,7 +5,6 @@
 import UIKit
 import Shared
 import Deferred
-import SwiftyJSON
 
 private let log = Logger.syncLogger
 
@@ -337,11 +336,11 @@ public struct BookmarkMirrorItem: Equatable {
         return self.children == nil && rhs.children == nil
     }
 
-    public func asJSON() -> JSON {
+    public func asJSON() -> [String: Any] {
         return self.asJSONWithChildren(self.children)
     }
 
-    public func asJSONWithChildren(_ children: [GUID]?) -> JSON {
+    public func asJSONWithChildren(_ children: [GUID]?) -> [String: Any] {
         var out: [String: Any] = [:]
 
         out["id"] = BookmarkRoots.translateOutgoingRootGUID(self.guid)
@@ -355,7 +354,7 @@ public struct BookmarkMirrorItem: Equatable {
 
         if self.isDeleted {
             out["deleted"] = true
-            return JSON(out)
+            return out
         }
 
         out["dateAdded"] = self.dateAdded
@@ -371,9 +370,10 @@ public struct BookmarkMirrorItem: Equatable {
             take("title", self.title)
             take("bmkUri", self.bookmarkURI)
             take("description", self.description)
-            if let tags = self.tags {
-                let tagsJSON = JSON(parseJSON: tags)
-                if let tagsArray = tagsJSON.array, tagsArray.every({ $0.type == SwiftyJSON.Type.string }) {
+            if let tags = self.tags,
+                let data = tags.data(using: .utf8),
+                let tagsArray = try? JSONSerialization.jsonObject(with: data, options: .init(rawValue: 0)) as? [Any] {
+                if tagsArray.every({ $0 is String }) {
                     out["tags"] = tagsArray
                 } else {
                     out["tags"] = []
@@ -431,7 +431,7 @@ public struct BookmarkMirrorItem: Equatable {
             preconditionFailure("DynamicContainer not supported.")
         }
 
-        return JSON(out)
+        return out
     }
 
     // The places root is a folder but has no parentName.

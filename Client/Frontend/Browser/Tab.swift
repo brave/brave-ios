@@ -8,7 +8,6 @@ import Storage
 import Shared
 import BraveRewards
 import BraveShared
-import SwiftyJSON
 import XCGLogger
 import Data
 
@@ -253,7 +252,7 @@ class Tab: NSObject {
             jsonDict[SessionData.Keys.history] = updatedURLs as AnyObject
             jsonDict[SessionData.Keys.currentPage] = Int(currentPage) as AnyObject
             
-            guard let escapedJSON = JSON(jsonDict).rawString()?.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed) else {
+            guard let escapedJSON = try? String(data: JSONSerialization.data(withJSONObject: jsonDict, options: .init(rawValue: 0)), encoding: .utf8)?.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed) else {
                 return
             }
             

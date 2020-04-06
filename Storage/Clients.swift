@@ -3,7 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import Shared
-import SwiftyJSON
 
 public struct RemoteClient: Equatable {
     public let guid: GUID?
@@ -22,21 +21,21 @@ public struct RemoteClient: Equatable {
     let formfactor: String?
     let device: String?
 
-    // Requires a valid ClientPayload (: CleartextPayloadJSON: JSON).
-    public init(json: JSON, modified: Timestamp) {
-        self.guid = json["id"].string
+    // Requires a valid ClientPayload (: CleartextPayloadJSON: [String: Any]).
+    public init(json: [String: Any], modified: Timestamp) {
+        self.guid = json["id"] as? String
         self.modified = modified
-        self.name = json["name"].stringValue
-        self.type = json["type"].string
+        self.name = json["name"] as? String ?? ""
+        self.type = json["type"] as? String
 
-        self.version = json["version"].string
-        self.protocols = jsonsToStrings(json["protocols"].array)
-        self.os = json["os"].string
-        self.appPackage = json["appPackage"].string
-        self.application = json["application"].string
-        self.formfactor = json["formfactor"].string
-        self.device = json["device"].string
-        self.fxaDeviceId = json["fxaDeviceId"].string
+        self.version = json["version"] as? String
+        self.protocols = json["protocols"] as? [String]
+        self.os = json["os"] as? String
+        self.appPackage = json["appPackage"] as? String
+        self.application = json["application"] as? String
+        self.formfactor = json["formfactor"] as? String
+        self.device = json["device"] as? String
+        self.fxaDeviceId = json["fxaDeviceId"] as? String
     }
 
     public init(guid: GUID?, name: String, modified: Timestamp, type: String?, formfactor: String?, os: String?, version: String?, fxaDeviceId: String?) {

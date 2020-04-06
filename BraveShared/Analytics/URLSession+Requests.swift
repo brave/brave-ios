@@ -13,7 +13,7 @@ extension URLSession {
                         method: HTTPMethod = .get,
                         parameters: [String: Any],
                         encoding: ParameterEncoding = .query,
-                        _ completion: @escaping (Result<Any, Error>) -> Void) -> URLSessionDataTask! {
+                        _ completion: @escaping (Result<Data, Error>) -> Void) -> URLSessionDataTask! {
         do {
             let request = try buildRequest(url,
                                            method: method,
@@ -29,11 +29,7 @@ extension URLSession {
                     return completion(.failure(NSError(domain: "com.brave.url.session.build-request", code: -1, userInfo: [NSLocalizedDescriptionKey: "No data returned from the server"])))
                 }
                 
-                do {
-                    completion(.success(try JSONSerialization.jsonObject(with: data, options: .mutableLeaves)))
-                } catch {
-                    completion(.failure(error))
-                }
+                completion(.success(data))
             }
             task.resume()
             return task
