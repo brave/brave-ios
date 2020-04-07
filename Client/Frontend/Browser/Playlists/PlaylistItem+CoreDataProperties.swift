@@ -1,0 +1,20 @@
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+//
+
+import Foundation
+import CoreData
+
+extension PlaylistItem {
+
+    @nonobjc public class func fetchRequest() -> NSFetchRequest<PlaylistItem> {
+        return NSFetchRequest<PlaylistItem>(entityName: "PlaylistItem")
+    }
+
+    @NSManaged public var title: String
+    @NSManaged public var pageURL: String
+    @NSManaged public var dateAdded: Date
+    @NSManaged public var blob: Data
+
+}

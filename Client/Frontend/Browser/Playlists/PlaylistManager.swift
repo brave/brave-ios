@@ -70,8 +70,10 @@ public class Observable<T> {
 }
 
 struct PlaylistInfo: Decodable {
-    let name: String
-    let src: String
+    let title: String
+    let mediaSource: String
+    let pageURL: String
+    let date: Date
     
     static func from(message: WKScriptMessage) throws -> PlaylistInfo? {
         if !JSONSerialization.isValidJSONObject(message.body) {
@@ -82,15 +84,25 @@ struct PlaylistInfo: Decodable {
         return try JSONDecoder().decode(PlaylistInfo.self, from: data)
     }
     
+    init(title: String, mediaSource: String) {
+        self.title = title
+        self.mediaSource = mediaSource
+        self.pageURL = ""
+        self.date = Date()
+    }
+    
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.name = (try? container.decode(String.self, forKey: .name)) ?? ""
-        self.src = (try? container.decode(String.self, forKey: .src)) ?? ""
+        self.title = (try? container.decode(String.self, forKey: .title)) ?? ""
+        self.mediaSource = (try? container.decode(String.self, forKey: .mediaSource)) ?? ""
+        self.pageURL = (try? container.decode(String.self, forKey: .pageURL)) ?? ""
+        self.date = Date()
     }
     
     private enum CodingKeys: String, CodingKey {
-        case name
-        case src
+        case title
+        case mediaSource
+        case pageURL
     }
 }
 
@@ -113,8 +125,8 @@ class PlaylistManager: TabContentScript {
         
         do {
             guard let item = try PlaylistInfo.from(message: message) else { return }
-            if tab?.playlistItems.value.contains(where: { $0.src == item.src }) == false {
-                if !item.src.isEmpty {
+            if tab?.playlistItems.value.contains(where: { $0.mediaSource == item.mediaSource }) == false {
+                if !item.mediaSource.isEmpty {
                     tab?.playlistItems.value.append(item)
                 }
             }

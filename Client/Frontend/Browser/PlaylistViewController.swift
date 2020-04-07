@@ -44,6 +44,11 @@ class PlaylistViewController: UIViewController {
     
     private func updateItems() {
         playlistItems = tabManager.tabsForCurrentMode.map({ $0.playlistItems }).flatMap({ $0.value })
+        playlistItems.forEach({
+            Playlist.shared.addItem(item: $0)
+        })
+        
+        CarplayMediaManager.shared.updatePlayableItems()
     }
     
     var player: AVPlayer?
@@ -68,7 +73,7 @@ extension PlaylistViewController: UITableViewDataSource {
         }
         
         cell.selectionStyle = .none
-        cell.titleLabel.text = playlistItems[indexPath.row].name
+        cell.titleLabel.text = playlistItems[indexPath.row].title
         cell.playButton.setTitle("Play", for: .normal)
         cell.playButton.tag = indexPath.row
         cell.playButton.addTarget(self, action: #selector(onPlay(_:)), for: .touchUpInside)
@@ -78,7 +83,7 @@ extension PlaylistViewController: UITableViewDataSource {
     @objc
     private func onPlay(_ button: UIButton) {
         let item = self.playlistItems[button.tag]
-        let player = AVPlayer(url: URL(string: item.src)!)
+        let player = AVPlayer(url: URL(string: item.mediaSource)!)
         
         do {
             try AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback, options: [.duckOthers])
@@ -112,12 +117,13 @@ private class PlaylistCell: UITableViewCell {
     
     let titleLabel = UILabel().then {
         $0.font = UIFont.systemFont(ofSize: 12.0, weight: .medium)
-        $0.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        $0.setContentHuggingPriority(.defaultHigh, for: .horizontal)
     }
     
     let playButton = UIButton().then {
         $0.setTitleColor(.blue, for: .normal)
         $0.setContentHuggingPriority(.required, for: .horizontal)
+        $0.setContentCompressionResistancePriority(.required, for: .horizontal)
     }
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {

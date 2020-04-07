@@ -1,8 +1,14 @@
 
 function notifyNode(node) {
+    var name = node.title;
+    if (name == null || name === undefined || name == "") {
+        name = document.title;
+    }
+    
     window.webkit.messageHandlers.playlistManager.postMessage({
-                                                                  "name": node.title,
-                                                                  "src": node.src
+                                                                  "title": node.title,
+                                                                  "mediaSource": node.src,
+                                                                  "pageURL": window.location.href
                                                                   });
 }
 
