@@ -80,13 +80,15 @@ struct PlaylistInfo: Decodable {
     let src: String
     let pageSrc: String
     let pageTitle: String
+    let mimeType: String
     var duration: Float
     
-    init(name: String, src: String, pageSrc: String, pageTitle: String, duration: Float) {
+    init(name: String, src: String, pageSrc: String, pageTitle: String, mimeType: String, duration: Float) {
         self.name = name
         self.src = src
         self.pageSrc = pageSrc
         self.pageTitle = pageTitle
+        self.mimeType = mimeType
         self.duration = duration
     }
     
@@ -105,6 +107,7 @@ struct PlaylistInfo: Decodable {
         self.src = (try? container.decode(String.self, forKey: .src)) ?? ""
         self.pageSrc = (try? container.decode(String.self, forKey: .pageSrc)) ?? ""
         self.pageTitle = (try? container.decode(String.self, forKey: .pageTitle)) ?? ""
+        self.mimeType = (try? container.decode(String.self, forKey: .mimeType)) ?? ""
         self.duration = (try? container.decode(Float.self, forKey: .duration)) ?? 0.0
     }
     
@@ -113,6 +116,7 @@ struct PlaylistInfo: Decodable {
         case src
         case pageSrc
         case pageTitle
+        case mimeType
         case duration
     }
 }

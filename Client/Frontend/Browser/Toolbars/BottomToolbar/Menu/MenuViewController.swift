@@ -247,8 +247,15 @@ class MenuViewController: UITableViewController {
     }
     
     private func addPlaylists() {
-        let vc = AddToPlaylistViewController(tabManager: bvc.tabManager)
-        open(vc, doneButton: DoneButton(style: .cancel, position: .left))
+        let items = bvc.tabManager.selectedTab?.playlistItems.value ?? []
+        
+        if items.count > 1 {
+            let vc = PlaylistMultipleSelectionController(tabManager: bvc.tabManager)
+            open(vc, doneButton: DoneButton(style: .cancel, position: .left))
+        } else {
+            let vc = PlaylistViewController(tabManager: bvc.tabManager)
+            open(vc, doneButton: DoneButton(style: .cancel, position: .left))
+        }
     }
     
     private func openAddBookmark() {

@@ -35,28 +35,18 @@ function observeNode(node) {
         node.observer = new MutationObserver(function (mutations) {
             notifyNode(node);
             
-            mutations.forEach((mutation) => {
-                if (mutation.type === 'childList') {
-                    mutation.addedNodes.forEach((child) => {
-                        if (child.constructor.name === 'HTMLSourceElement') {
-                            notifyNodeSource(node, child.src, child.type);
-                        }
-                    });
-                }
-            });
-            
-//            mutations.forEach(function(mutation) {
+//            mutations.forEach((mutation) => {
 //                if (mutation.type === 'childList') {
-//                    mutation.addedNodes.forEach(function(child) {
-//                        if (child instanceof HTMLSourceElement) {
-//                            notifyNodeSource(node, child.src);
+//                    mutation.addedNodes.forEach((child) => {
+//                        if (child.constructor.name === 'HTMLSourceElement') {
+//                            notifyNodeSource(node, child.src, child.type);
 //                        }
 //                    });
 //                }
 //            });
         });
         node.observer.observe(node, { attributes: true, attributeFilter: ["src"] });
-        node.observer.observe(node, { childList: true });
+        //node.observer.observe(node, { childList: true });
         notifyNode(node);
         
         node.addEventListener('loadedmetadata', function() {

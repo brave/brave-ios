@@ -65,7 +65,7 @@ class PlaylistMultipleSelectionController: UIViewController {
         
         playlistItems.forEach({
             group.enter()
-            Playlist.shared.addItem(item: $0, completion: {
+            Playlist.shared.addItem(item: $0, cachedData: nil, completion: {
                 group.leave()
             })
         })

@@ -15,7 +15,7 @@ class Playlist {
     
     public var currentlyPlayingInfo: PlaylistInfo?
     
-    func addItem(item: PlaylistInfo, completion: @escaping () -> Void) {
+    func addItem(item: PlaylistInfo, cachedData: Data?, completion: @escaping () -> Void) {
         if !self.itemExists(item: item) {
             self.backgroundContext.perform { [weak self] in
                 guard let self = self else { return }
@@ -25,11 +25,12 @@ class Playlist {
                 playlistItem.pageTitle = item.pageTitle
                 playlistItem.pageSrc = item.pageSrc
                 playlistItem.dateAdded = Date()
-                playlistItem.cachedData = (try? Data(contentsOf: URL(string: item.src)!)) ?? Data()
+                playlistItem.cachedData = cachedData ?? Data()
                 playlistItem.duration = item.duration
+                playlistItem.mimeType = item.mimeType
+                playlistItem.mediaSrc = item.src
                 
                 self.saveContext(self.backgroundContext)
-                
                 completion()
             }
         } else {
@@ -80,7 +81,7 @@ class Playlist {
     func getItems() -> [PlaylistInfo] {
         let request: NSFetchRequest<PlaylistItem> = PlaylistItem.fetchRequest()
         return (try? self.mainContext.fetch(request))?.map({
-            return PlaylistInfo(name: $0.name, src: "", pageSrc: $0.pageSrc, pageTitle: $0.pageTitle, duration: $0.duration)
+            return PlaylistInfo(name: $0.name, src: $0.mediaSrc, pageSrc: $0.pageSrc, pageTitle: $0.pageTitle, mimeType: $0.mimeType, duration: $0.duration)
         }) ?? []
     }
     
@@ -89,6 +90,15 @@ class Playlist {
         request.predicate = NSPredicate(format: "pageSrc == %@", item.pageSrc)
         request.fetchLimit = 1
         return (try? self.mainContext.fetch(request))?.first?.cachedData ?? Data()
+    }
+    
+    func updateCache(item: PlaylistInfo, cachedData: Data) {
+        let request: NSFetchRequest<PlaylistItem> = PlaylistItem.fetchRequest()
+        request.predicate = NSPredicate(format: "pageSrc == %@", item.pageSrc)
+        request.fetchLimit = 1
+        
+        (try? self.mainContext.fetch(request))?.first?.cachedData = cachedData
+        self.saveContext(self.mainContext)
     }
     
     func itemExists(item: PlaylistInfo) -> Bool {

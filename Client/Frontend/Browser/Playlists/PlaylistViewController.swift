@@ -223,7 +223,7 @@ extension PlaylistViewController: UITableViewDataSource {
     @objc
     private func onAddItem(_ button: UIButton) {
         if let item = self.itemToBeAdded {
-            Playlist.shared.addItem(item: item) { [weak self] in
+            Playlist.shared.addItem(item: item, cachedData: nil) { [weak self] in
                 guard let self = self else { return }
                 DispatchQueue.main.async {
                     self.itemToBeAdded = nil
@@ -237,6 +237,63 @@ extension PlaylistViewController: UITableViewDataSource {
 }
 
 extension PlaylistViewController: UITableViewDelegate {
+    
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        
+        if playlistItems.isEmpty {
+            return nil
+        }
+        
+        let currentItem = playlistItems[indexPath.row]
+        let itemURL = URL(string: currentItem.src)
+        let cache = Playlist.shared.getCache(item: currentItem)
+        let downloadedItemTitle = cache.isEmpty ? "Download" : "Clear"
+        
+        let cacheAction = UIContextualAction(style: .normal, title: downloadedItemTitle, handler: { [weak self] (action, view, completionHandler) in
+            guard let self = self else { return }
+            
+            if cache.isEmpty {
+                URLSession(configuration: .ephemeral).dataTask(with: itemURL!) { [weak self] data, response, error in
+                    guard let self = self else { return }
+                    DispatchQueue.main.async {
+                        if let error = error {
+                            let alert = UIAlertController(title: "Notice", message: "Sorry, there was a problem downloading that item", preferredStyle: .alert)
+                            alert.addAction(UIAlertAction(title: "Okay", style: .default, handler: nil))
+                            self.present(alert, animated: true, completion: nil)
+                            print(error)
+                            completionHandler(false)
+                            return
+                        }
+                        
+                        action.image = #imageLiteral(resourceName: "nowPlayingCheckmark")
+                        action.backgroundColor = #colorLiteral(red: 0.04830913347, green: 0.5589390887, blue: 0, alpha: 1)
+                        
+                        self.currentItem = -1
+                        //currentItem.mimeType = response?.mimeType
+                        Playlist.shared.updateCache(item: currentItem, cachedData: data ?? Data())
+                        completionHandler(true)
+                    }
+                }.resume()
+            } else {
+                Playlist.shared.updateCache(item: currentItem, cachedData: Data())
+                completionHandler(true)
+            }
+        })
+        
+        let deleteAction = UIContextualAction(style: .normal, title: "Remove", handler: { [weak self] (action, view, completionHandler) in
+            guard let self = self else { return }
+            let item = self.playlistItems[indexPath.row]
+            self.playlistItems.remove(at: indexPath.row)
+            Playlist.shared.removeItem(item: item)
+            self.tableView.deleteRows(at: [indexPath], with: .fade)
+            completionHandler(true)
+        })
+
+        cacheAction.image = #imageLiteral(resourceName: "emptyDownloads")
+        cacheAction.backgroundColor = #colorLiteral(red: 0.2196078449, green: 0.007843137719, blue: 0.8549019694, alpha: 1)
+        deleteAction.backgroundColor = #colorLiteral(red: 0.812063769, green: 0.04556301224, blue: 0, alpha: 1)
+        return UISwipeActionsConfiguration(actions: [deleteAction, cacheAction])
+    }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.row < self.playlistItems.count {

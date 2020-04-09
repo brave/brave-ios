@@ -18,5 +18,6 @@ extension PlaylistItem {
     @NSManaged public var dateAdded: Date
     @NSManaged public var cachedData: Data
     @NSManaged public var duration: Float
-
+    @NSManaged public var mimeType: String
+    @NSManaged public var mediaSrc: String
 }
