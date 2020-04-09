@@ -151,6 +151,8 @@ class PlaylistManager: TabContentScript {
                         tab?.playlistItems.value.append(item)
                     }
                 }
+            } else {
+                tab?.existingPlaylistItems.value.append(item)
             }
         } catch {
             print(error)

@@ -234,6 +234,12 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         $0.isUserInteractionEnabled = true
     }
     
+    private let particleView = PlaylistParticleEmitter().then {
+        $0.isHidden = false
+        $0.contentMode = .scaleAspectFit
+        $0.clipsToBounds = true
+    }
+    
     private let overlayView = UIImageView().then {
         $0.contentMode = .scaleAspectFit
         $0.isUserInteractionEnabled = true
@@ -254,7 +260,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     
     private let playPauseButton = UIButton().then {
         $0.imageView?.contentMode = .scaleAspectFit
-        $0.setImage(#imageLiteral(resourceName: "videoPlay"), for: .normal)
+        $0.setImage(#imageLiteral(resourceName: "videoPlay").scale(toSize: CGSize(width: 22.0, height: 22.0)), for: .normal)
         $0.tintColor = .white
     }
     
@@ -333,6 +339,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         //Layout
         self.addSubview(trackBarBackground)
         self.addSubview(thumbnailView)
+        self.addSubview(particleView)
         self.addSubview(overlayView)
         self.addSubview(playControlsStackView)
         self.addSubview(castButton)
@@ -348,6 +355,10 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         }
         
         thumbnailView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+        
+        particleView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
         
@@ -577,12 +588,30 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     }
     
     private func showOverlays(_ show: Bool, except: [UIView] = [], display: [UIView] = []) {
-        UIView.animate(withDuration: 1.0, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 1.0, options: .curveEaseInOut, animations: {
+        var except = except
+        var display = display
+        
+        if !isVideoAvailable() {
+            //if the overlay is showing, hide the particle view.. else show it..
+            except.append(particleView)
+            
+            if !show {
+                display.append(particleView)
+            }
+        } else {
+            if show {
+                except.append(particleView)
+            }
+        }
+        
+        UIView.animate(withDuration: 1.0, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 1.0, options: [.curveEaseInOut, .allowUserInteraction], animations: {
             self.subviews.forEach({
                 if !except.contains($0) {
                     $0.alpha = show ? 1.0 : 0.0
                 } else if display.contains($0) {
                     $0.alpha = 1.0
+                } else {
+                    $0.alpha = 0.0
                 }
             })
         })
@@ -591,26 +620,30 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     public func play() {
         if !isPlaying {
             isPlaying.toggle()
-            playPauseButton.setImage(#imageLiteral(resourceName: "videoPause"), for: .normal)
+            playPauseButton.setImage(#imageLiteral(resourceName: "videoPause").scale(toSize: CGSize(width: 22.0, height: 22.0)), for: .normal)
             player.play()
             
             showOverlays(false)
+        } else {
+            showOverlays(isOverlayDisplayed)
         }
     }
     
     public func pause() {
         if isPlaying {
             isPlaying.toggle()
-            playPauseButton.setImage(#imageLiteral(resourceName: "videoPlay"), for: .normal)
+            playPauseButton.setImage(#imageLiteral(resourceName: "videoPlay").scale(toSize: CGSize(width: 22.0, height: 22.0)), for: .normal)
             player.pause()
             
             showOverlays(true)
+        } else {
+            showOverlays(isOverlayDisplayed)
         }
     }
     
     public func stop() {
         isPlaying = false
-        playPauseButton.setImage(#imageLiteral(resourceName: "videoPlay"), for: .normal)
+        playPauseButton.setImage(#imageLiteral(resourceName: "videoPlay").scale(toSize: CGSize(width: 44, height: 44)), for: .normal)
         player.pause()
         
         showOverlays(true)
@@ -634,8 +667,8 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
                 thumbnailView.isHidden = true
                 
                 if isPlaying {
-                    player.pause()
-                    player.play()
+                    self.pause()
+                    self.play()
                 }
                 
                 return
@@ -654,5 +687,13 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
                 self.play()
             }
         }
+    }
+    
+    private func isAudioAvailable() -> Bool {
+        return self.player.currentItem?.asset.tracks.filter({ $0.mediaType == .audio }).isEmpty == false
+    }
+
+    private func isVideoAvailable() -> Bool {
+        return self.player.currentItem?.asset.tracks.filter({ $0.mediaType == .video }).isEmpty == false
     }
 }

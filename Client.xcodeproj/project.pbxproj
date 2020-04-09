@@ -698,6 +698,7 @@
 		5E46C37C234FB9A700ACA8C1 /* self-signed.cer in Resources */ = {isa = PBXBuildFile; fileRef = 5E46C37B234FB9A700ACA8C1 /* self-signed.cer */; };
 		5E4845C022DE381200372022 /* WindowRenderHelper.js in Resources */ = {isa = PBXBuildFile; fileRef = 5E4845BF22DE381200372022 /* WindowRenderHelper.js */; };
 		5E4845C222DE3DF800372022 /* WindowRenderHelperScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E4845C122DE3DF800372022 /* WindowRenderHelperScript.swift */; };
+		5E5780B0243FA98F005D4EB1 /* PlaylistParticleEmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E5780AF243FA98F005D4EB1 /* PlaylistParticleEmitter.swift */; };
 		5E612A8C234B7FC1007D12B5 /* OnboardingAdsAvailableController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E1D8C66232BE43100BDE662 /* OnboardingAdsAvailableController.swift */; };
 		5E612A8E234B7FC8007D12B5 /* OnboardingAdsAvailableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E1D8C68232BE47A00BDE662 /* OnboardingAdsAvailableView.swift */; };
 		5E612A8F234B7FCA007D12B5 /* OnboardingRewardsAgreementViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E1D8C6A232BF95200BDE662 /* OnboardingRewardsAgreementViewController.swift */; };
@@ -2212,6 +2213,7 @@
 		5E46C37B234FB9A700ACA8C1 /* self-signed.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = "self-signed.cer"; sourceTree = "<group>"; };
 		5E4845BF22DE381200372022 /* WindowRenderHelper.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = WindowRenderHelper.js; sourceTree = "<group>"; };
 		5E4845C122DE3DF800372022 /* WindowRenderHelperScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowRenderHelperScript.swift; sourceTree = "<group>"; };
+		5E5780AF243FA98F005D4EB1 /* PlaylistParticleEmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistParticleEmitter.swift; sourceTree = "<group>"; };
 		5E6683A823D61CF7005B3A6C /* NTPDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NTPDownloader.swift; sourceTree = "<group>"; };
 		5E66CCB72432588B0076BA78 /* VideoPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPlayer.swift; sourceTree = "<group>"; };
 		5E66CCBA243259390076BA78 /* PlaylistNowPlayingBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistNowPlayingBar.swift; sourceTree = "<group>"; };
@@ -4292,6 +4294,7 @@
 				5E66CCBA243259390076BA78 /* PlaylistNowPlayingBar.swift */,
 				5E66CCBC24336D2D0076BA78 /* PlaylistMultipleSelectionController.swift */,
 				5E3B876D243F0D79009BA5F5 /* DataURIParser.swift */,
+				5E5780AF243FA98F005D4EB1 /* PlaylistParticleEmitter.swift */,
 			);
 			path = Playlists;
 			sourceTree = "<group>";
@@ -6408,6 +6411,7 @@
 				E4A960061ABB9C450069AD6F /* ReaderModeUtils.swift in Sources */,
 				0A1E843E2190A57F0042F782 /* SyncCodewordsView.swift in Sources */,
 				E68F36981EA694000048CF44 /* PanelDataObservers.swift in Sources */,
+				5E5780B0243FA98F005D4EB1 /* PlaylistParticleEmitter.swift in Sources */,
 				0A3C789F23056C910022F6D8 /* OnboardingSearchEnginesView.swift in Sources */,
 				31ADB5DA1E58CEC300E87909 /* ClipboardBarDisplayHandler.swift in Sources */,
 				0A4B012020D02EC4004D4011 /* TabsBarViewController.swift in Sources */,

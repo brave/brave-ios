@@ -489,9 +489,19 @@ class BrowserViewController: UIViewController {
         webViewContainer = UIView()
         view.addSubview(webViewContainer)
         
-        nowPlayingBar = NowPlayingBar()
-        nowPlayingBar.delegate = self
-        nowPlayingBar.translatesAutoresizingMaskIntoConstraints = false
+        nowPlayingBar = NowPlayingBar().then {
+            $0.isHidden = true
+            $0.delegate = self
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            
+            Playlist.shared.currentlyPlayingInfo.observe { [weak self] _, _ in
+                guard let self = self else { return }
+                if let tab = self.tabManager.selectedTab {
+                    self.onUpdateNowPlaying(tab: tab)
+                }
+                
+            }.bind(to: $0)
+        }
         view.addSubview(nowPlayingBar)
 
         // Temporary work around for covering the non-clipped web view content
@@ -3529,26 +3539,53 @@ extension BrowserViewController: NowPlayingBarDelegate {
     }
     
     func onExpand() {
-        
+        let controller = UINavigationController(rootViewController: PlaylistViewController(tabManager: self.tabManager))
+        self.present(controller, animated: true, completion: nil)
     }
     
     func onExit() {
-        self.presentedViewController?.dismiss(animated: true, completion: nil)
+        if self.presentedViewController == nil {
+            nowPlayingBar.isHidden = true
+        } else {
+            if let tab = self.tabManager.selectedTab {
+                self.onUpdateNowPlaying(tab: tab)
+            } else {
+                nowPlayingBar.isHidden = true
+            }
+            
+            self.presentedViewController?.dismiss(animated: true, completion: nil)
+        }
     }
     
     func onUpdateNowPlaying(tab: Tab) {
         let items = tab.playlistItems.value
         if items.isEmpty {
-            if Playlist.shared.currentlyPlayingInfo != nil {
+            if Playlist.shared.currentlyPlayingInfo.value != nil {
                 nowPlayingBar.state = .nowPlaying
                 nowPlayingBar.isHidden = false
             } else {
                 nowPlayingBar.isHidden = true
             }
+        } else if items.count == 1 {
+            nowPlayingBar.isHidden = false
+            
+            if Playlist.shared.itemExists(item: items[0]) {
+                if Playlist.shared.currentlyPlayingInfo.value != nil {
+                    nowPlayingBar.state = .addedNowPlaying
+                } else {
+                    nowPlayingBar.state = .existing
+                }
+            } else {
+                if Playlist.shared.currentlyPlayingInfo.value != nil {
+                    nowPlayingBar.state = .addNowPlaying
+                } else {
+                    nowPlayingBar.state = .add
+                }
+            }
         } else {
             nowPlayingBar.isHidden = false
             
-            if Playlist.shared.currentlyPlayingInfo != nil {
+            if Playlist.shared.currentlyPlayingInfo.value != nil {
                 nowPlayingBar.state = .addNowPlaying
             } else {
                 nowPlayingBar.state = .add

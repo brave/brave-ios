@@ -14,7 +14,6 @@ protocol NowPlayingBarDelegate: class {
 enum NowPlayingBarState {
     case add
     case existing
-    case addFirstSeen
     case addNowPlaying
     case addedNowPlaying
     case nowPlaying
@@ -39,9 +38,10 @@ class NowPlayingBar: UIView {
     
     private let mediaInfoStackView = UIStackView().then {
         $0.axis = .vertical
-        $0.distribution = .fillEqually
         $0.isLayoutMarginsRelativeArrangement = true
-        $0.layoutMargins = UIEdgeInsets(top: 10.0, left: 0.0, bottom: 10.0, right: 5.0)
+        $0.layoutMargins = UIEdgeInsets(top: 5.0, left: 0.0, bottom: 5.0, right: 5.0)
+        $0.setContentHuggingPriority(.required, for: .vertical)
+        $0.setContentCompressionResistancePriority(.required, for: .vertical)
     }
     
     private let buttonStackView = UIStackView().then {
@@ -73,7 +73,8 @@ class NowPlayingBar: UIView {
     private let mediaTitleLabel = UILabel().then {
         $0.textColor = .white
         $0.appearanceTextColor = .white
-        $0.font = .systemFont(ofSize: 11.0, weight: .medium)
+        $0.lineBreakMode = .byTruncatingTail
+        $0.font = .systemFont(ofSize: 12.0, weight: .medium)
     }
     
     private let mediaSubtitleLabel = UILabel().then {
@@ -112,7 +113,7 @@ class NowPlayingBar: UIView {
         }
         
         buttonStackView.snp.makeConstraints {
-            $0.left.greaterThanOrEqualTo(mediaInfoStackView.snp.right).offset(25.0)
+            $0.left.greaterThanOrEqualTo(infoStackView.snp.right).offset(25.0)
             $0.right.top.bottom.equalToSuperview()
         }
         
@@ -134,6 +135,10 @@ class NowPlayingBar: UIView {
             $0.numberOfTapsRequired = 1
         })
         
+        Playlist.shared.currentlyPlayingInfo.observe({ [weak self] _, _ in
+            self?.refreshUI()
+        }).bind(to: self)
+        
         refreshUI()
     }
     
@@ -151,8 +156,8 @@ class NowPlayingBar: UIView {
     }
     
     private func refreshUI() {
-        mediaTitleLabel.text = Playlist.shared.currentlyPlayingInfo?.name
-        mediaSubtitleLabel.text = URL(string: Playlist.shared.currentlyPlayingInfo?.src ?? "")?.baseDomain
+        mediaTitleLabel.text = Playlist.shared.currentlyPlayingInfo.value?.name
+        mediaSubtitleLabel.text = URL(string: Playlist.shared.currentlyPlayingInfo.value?.src ?? "")?.baseDomain
         
         setupButtons()
         
@@ -166,12 +171,6 @@ class NowPlayingBar: UIView {
         case .existing:
             iconView.image = #imageLiteral(resourceName: "nowPlayingCheckmark")
             titleLabel.text = "In Playlist"
-            titleLabel.isHidden = false
-            mediaInfoStackView.isHidden = true
-        
-        case .addFirstSeen:
-            iconView.image = #imageLiteral(resourceName: "playlistsAdd")
-            titleLabel.text = "Add to playlist"
             titleLabel.isHidden = false
             mediaInfoStackView.isHidden = true
             
@@ -206,16 +205,10 @@ class NowPlayingBar: UIView {
             infoStackView.addArrangedSubview(mediaInfoStackView)
         }
         
-        if state == .addFirstSeen {
-            infoStackView.addArrangedSubview(titleLabel)
-            infoStackView.addArrangedSubview(mediaInfoStackView)
-            buttonStackView.addArrangedSubview(createSeparator())
-            buttonStackView.addArrangedSubview(soundBarButton)
-        }
-        
         if state == .addNowPlaying || state == .addedNowPlaying {
             infoStackView.addArrangedSubview(createSeparator())
             infoStackView.addArrangedSubview(soundBarButton)
+            infoStackView.addArrangedSubview(mediaInfoStackView)
             
             soundBarButton.snp.remakeConstraints {
                 $0.width.equalTo(20.0)
@@ -223,7 +216,7 @@ class NowPlayingBar: UIView {
         }
         
         if state == .nowPlaying {
-            
+            infoStackView.addArrangedSubview(mediaInfoStackView)
         }
         
         buttonStackView.addArrangedSubview(createSeparator())
@@ -236,7 +229,7 @@ class NowPlayingBar: UIView {
     
     @objc
     private func onAddToPlaylist(_ gestureRecognizer: UIGestureRecognizer) {
-        if state == .add || state == .addFirstSeen || state == .addNowPlaying {
+        if state == .add || state == .addNowPlaying {
             delegate?.onAddToPlaylist()
         } else {
             delegate?.onExpand()

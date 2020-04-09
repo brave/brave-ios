@@ -127,7 +127,18 @@ class PlaylistViewController: UIViewController {
         //Fetch items from the database
         playlistItems = Playlist.shared.getItems()
         CarplayMediaManager.shared.updateItems()
-        self.tableView(tableView, didSelectRowAt: IndexPath(row: 0, section: 0))
+        
+        currentItem = -1
+        for (index, item) in playlistItems.enumerated() {
+            if Playlist.shared.currentlyPlayingInfo.value?.pageSrc == item.pageSrc {
+                currentItem = index
+                break
+            }
+        }
+        
+        if currentItem != -1 {
+            self.tableView(tableView, didSelectRowAt: IndexPath(row: self.currentItem, section: 0))
+        }
     }
     
     @objc
@@ -211,7 +222,7 @@ extension PlaylistViewController: UITableViewDataSource {
                 $0.titleLabel.text = item.name
                 $0.detailLabel.text = URL(string: item.pageSrc)?.baseDomain
                 $0.addButton.isHidden = false
-            } else if currentItem != -1 {
+            } else if currentItem != -1 && currentItem < playlistItems.count {
                 $0.titleLabel.text = playlistItems[currentItem].name
                 $0.detailLabel.text = URL(string: playlistItems[currentItem].pageSrc)?.baseDomain
                 $0.addButton.isHidden = true
@@ -266,17 +277,21 @@ extension PlaylistViewController: UITableViewDelegate {
                         }
                         
                         action.image = #imageLiteral(resourceName: "nowPlayingCheckmark")
-                        action.backgroundColor = #colorLiteral(red: 0.04830913347, green: 0.5589390887, blue: 0, alpha: 1)
+                        action.backgroundColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
                         
                         self.currentItem = -1
+                        Playlist.shared.currentlyPlayingInfo.value = nil
                         //currentItem.mimeType = response?.mimeType
                         Playlist.shared.updateCache(item: currentItem, cachedData: data ?? Data())
                         completionHandler(true)
+                        
+                        self.tableView.reloadData()
                     }
                 }.resume()
             } else {
                 Playlist.shared.updateCache(item: currentItem, cachedData: Data())
                 completionHandler(true)
+                self.tableView.reloadData()
             }
         })
         
@@ -286,11 +301,14 @@ extension PlaylistViewController: UITableViewDelegate {
             self.playlistItems.remove(at: indexPath.row)
             Playlist.shared.removeItem(item: item)
             self.tableView.deleteRows(at: [indexPath], with: .fade)
+            
+            self.currentItem = -1
             completionHandler(true)
+            self.tableView.reloadData()
         })
 
         cacheAction.image = #imageLiteral(resourceName: "emptyDownloads")
-        cacheAction.backgroundColor = #colorLiteral(red: 0.2196078449, green: 0.007843137719, blue: 0.8549019694, alpha: 1)
+        cacheAction.backgroundColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
         deleteAction.backgroundColor = #colorLiteral(red: 0.812063769, green: 0.04556301224, blue: 0, alpha: 1)
         return UISwipeActionsConfiguration(actions: [deleteAction, cacheAction])
     }
@@ -300,6 +318,7 @@ extension PlaylistViewController: UITableViewDelegate {
             activityIndicator.startAnimating()
             activityIndicator.isHidden = false
             currentItem = indexPath.row
+            Playlist.shared.currentlyPlayingInfo.value = self.playlistItems[currentItem]
             let item = self.playlistItems[indexPath.row]
             let cache = Playlist.shared.getCache(item: item)
             
@@ -392,6 +411,7 @@ private class PlaylistItemPlayingView: UIView {
     private let stackView = UIStackView().then {
         $0.axis = .horizontal
         $0.alignment = .center
+        $0.spacing = 15.0
     }
     
     override init(frame: CGRect) {

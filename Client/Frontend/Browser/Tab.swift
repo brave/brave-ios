@@ -144,6 +144,7 @@ class Tab: NSObject {
     fileprivate var alertQueue = [JSAlertInfo]()
     
     var playlistItems = Observable<[PlaylistInfo]>([])
+    var existingPlaylistItems = Observable<[PlaylistInfo]>([])
 
     init(configuration: WKWebViewConfiguration, type: TabType = .regular) {
         self.configuration = configuration
