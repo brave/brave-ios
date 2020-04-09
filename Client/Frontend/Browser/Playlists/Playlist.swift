@@ -25,7 +25,7 @@ class Playlist {
                 playlistItem.pageTitle = item.pageTitle
                 playlistItem.pageSrc = item.pageSrc
                 playlistItem.dateAdded = Date()
-                playlistItem.cachedData = Data()
+                playlistItem.cachedData = (try? Data(contentsOf: URL(string: item.src)!)) ?? Data()
                 playlistItem.duration = item.duration
                 
                 self.saveContext(self.backgroundContext)
@@ -39,13 +39,42 @@ class Playlist {
     
     func removeItem(item: PlaylistInfo) {
         if !self.itemExists(item: item) {
-            self.backgroundContext.perform { [weak self] in
+            self.backgroundContext.performAndWait { [weak self] in
                 guard let self = self else { return }
+                let request = { () -> NSBatchDeleteRequest in
+                    let request: NSFetchRequest<NSFetchRequestResult> = PlaylistItem.fetchRequest()
+                    request.predicate = NSPredicate(format: "pageSrc == %@", item.pageSrc)
+                    
+                    let deleteRequest = NSBatchDeleteRequest(fetchRequest: request)
+                    deleteRequest.resultType = .resultTypeObjectIDs
+                    return deleteRequest
+                }()
                 
-                let hash = PlaylistItem(context: self.backgroundContext)
+                if let result = (try? self.backgroundContext.execute(request)) as? NSBatchDeleteResult {
+                    if let deletedObjects = result.result as? [NSManagedObjectID] {
+                        NSManagedObjectContext.mergeChanges(
+                            fromRemoteContextSave: [NSDeletedObjectsKey: deletedObjects],
+                            into: [self.mainContext, self.backgroundContext]
+                        )
+                    }
+                } else {
+                    let request: NSFetchRequest<PlaylistItem> = PlaylistItem.fetchRequest()
+                    request.predicate = NSPredicate(format: "pageSrc == %@", item.pageSrc)
+                    
+                    (try? self.backgroundContext.fetch(request))?.forEach({
+                        self.backgroundContext.delete($0)
+                    })
+                }
                 
+                self.saveContext(self.backgroundContext)
+                self.backgroundContext.reset()
             }
         }
+    }
+    
+    func removeAll() {
+        self.destroy()
+        self.persistentContainer = self.create()
     }
     
     func getItems() -> [PlaylistInfo] {

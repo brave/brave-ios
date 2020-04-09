@@ -3516,8 +3516,16 @@ extension BrowserViewController: OnboardingControllerDelegate {
 
 extension BrowserViewController: NowPlayingBarDelegate {
     func onAddToPlaylist() {
-        let controller = PlaylistMultipleSelectionController(tabManager: self.tabManager)
-        self.present(controller, animated: true, completion: nil)
+        if let tab = tabManager.selectedTab {
+            let items = tab.playlistItems.value
+            if items.count > 1 {
+                let controller = PlaylistMultipleSelectionController(tabManager: self.tabManager)
+                self.present(controller, animated: true, completion: nil)
+            } else {
+                let controller = UINavigationController(rootViewController: PlaylistViewController(tabManager: self.tabManager))
+                self.present(controller, animated: true, completion: nil)
+            }
+        }
     }
     
     func onExpand() {

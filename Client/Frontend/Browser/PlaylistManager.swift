@@ -137,7 +137,7 @@ class PlaylistManager: TabContentScript {
         do {
             guard let item = try PlaylistInfo.from(message: message) else { return }
             if !Playlist.shared.itemExists(item: item) {
-                if let items = tab?.playlistItems, let index = items.value.firstIndex(where: { $0.pageSrc == item.pageSrc }) {
+                if let items = tab?.playlistItems, let index = items.value.firstIndex(where: { $0.src == item.src }) {
                     if items.value[index].duration < 0.01 {
                         items.value[index].duration = item.duration
                         items.refresh()

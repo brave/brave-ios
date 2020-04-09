@@ -1,26 +1,62 @@
-function notifyNode(node) {
+function notifyNodeSource(node, src, mimeType) {
     var name = node.title;
     if (name == null || typeof name == 'undefined' || name == "") {
         name = document.title;
     }
     
-    if (node.src != "") {
+    if (mimeType == null || typeof mimeType == 'undefined' || mimeType == "") {
+        if (node.constructor.name == 'HTMLVideoElement') {
+            mimeType = 'video';
+        }
+        
+        if (node.constructor.name == 'HTMLAudioElement') {
+            mimeType = 'audio';
+        }
+    }
+    
+    if (src != "") {
         window.webkit.messageHandlers.playlistManager.postMessage({
                                                                       "name": name,
-                                                                      "src": node.src,
+                                                                      "src": src,
                                                                       "pageSrc": window.location.href,
                                                                       "pageTitle": document.title,
+                                                                      "mimeType": mimeType,
                                                                       "duration": node.duration !== node.duration ? 0.0 : node.duration
                                                                       });
     }
+}
+
+function notifyNode(node) {
+    notifyNodeSource(node, node.src, node.type);
 }
 
 function observeNode(node) {
     if (node.observer == null || node.observer === undefined) {
         node.observer = new MutationObserver(function (mutations) {
             notifyNode(node);
+            
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'childList') {
+                    mutation.addedNodes.forEach((child) => {
+                        if (child.constructor.name === 'HTMLSourceElement') {
+                            notifyNodeSource(node, child.src, child.type);
+                        }
+                    });
+                }
+            });
+            
+//            mutations.forEach(function(mutation) {
+//                if (mutation.type === 'childList') {
+//                    mutation.addedNodes.forEach(function(child) {
+//                        if (child instanceof HTMLSourceElement) {
+//                            notifyNodeSource(node, child.src);
+//                        }
+//                    });
+//                }
+//            });
         });
         node.observer.observe(node, { attributes: true, attributeFilter: ["src"] });
+        node.observer.observe(node, { childList: true });
         notifyNode(node);
         
         node.addEventListener('loadedmetadata', function() {
@@ -40,6 +76,11 @@ function observeDocument(node) {
                     else if (node.constructor.name == "HTMLAudioElement") {
                         observeNode(node);
                     }
+//                    else if (node.constructor.name == "HTMLSourceElement") {
+//                        if (node.parentNode.constructor.name == "HTMLVideoElement") {
+//                            console.log('Found Child');
+//                        }
+//                    }
                 });
             });
         });

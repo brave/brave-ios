@@ -8,14 +8,8 @@ import BraveShared
 import AVKit
 import AVFoundation
 
-
 class PlaylistViewController: UIViewController {
     private var tabManager: TabManager
-    
-    private let stackView = UIStackView().then {
-        $0.isLayoutMarginsRelativeArrangement = true
-        $0.layoutMargins = UIEdgeInsets(top: 5.0, left: 20.0, bottom: 5.0, right: 20.0)
-    }
     
     private let infoLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 12.0, weight: .regular)
@@ -29,9 +23,10 @@ class PlaylistViewController: UIViewController {
     private let playerView = VideoView()
     private var tableView = UITableView(frame: .zero, style: .grouped)
     private var playlistItems = [PlaylistInfo]()
+    private var itemToBeAdded: PlaylistInfo?
     private var cacheLoader = PlaylistCacheLoader()
     private var webLoader = PlaylistWebLoader(handler: { _ in })
-    private var currentItem = 0
+    private var currentItem = -1
     private let activityIndicator = UIActivityIndicatorView(style: .white).then {
         $0.isHidden = true
         $0.hidesWhenStopped = true
@@ -58,19 +53,20 @@ class PlaylistViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
     
+        self.title = "Playlist"
+        navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
+        UILabel.appearance(whenContainedInInstancesOf: [UINavigationBar.self]).appearanceTextColor = .white
+        
         navigationController?.presentationController?.delegate = self
-        navigationController?.navigationBar.tintColor = #colorLiteral(red: 0, green: 0.6666666667, blue: 1, alpha: 1)
+        navigationController?.navigationBar.tintColor = .white
         navigationController?.navigationBar.isTranslucent = false
         navigationController?.navigationBar.barTintColor = #colorLiteral(red: 0.231372549, green: 0.2431372549, blue: 0.3137254902, alpha: 1)
         navigationController?.navigationBar.appearanceBarTintColor = #colorLiteral(red: 0.231372549, green: 0.2431372549, blue: 0.3137254902, alpha: 1)
         navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
         navigationController?.navigationBar.shadowImage = UIImage()
         
-        navigationItem.titleView = UIImageView(image: #imageLiteral(resourceName: "browser_lock_popup")).then {
-            $0.contentMode = .scaleAspectFit
-        }
-        
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Clear All", style: .plain, target: nil, action: nil)
+        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Clear All", style: .plain, target: self, action: #selector(onClearAll(_:)))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "close_popup"), style: .done, target: self, action: #selector(onExit(_:)))
         
         view.backgroundColor = #colorLiteral(red: 0.231372549, green: 0.2431372549, blue: 0.3137254902, alpha: 1)
         
@@ -85,18 +81,11 @@ class PlaylistViewController: UIViewController {
         tableView.delegate = self
         
         view.addSubview(tableView)
-        view.addSubview(stackView)
         view.addSubview(playerView)
         playerView.addSubview(activityIndicator)
-        stackView.addArrangedSubview(infoLabel)
-        
-        stackView.snp.makeConstraints {
-            $0.leading.trailing.top.equalTo(view.safeAreaLayoutGuide)
-            $0.height.equalTo(40.0)
-        }
         
         playerView.snp.makeConstraints {
-            $0.top.equalTo(stackView.snp.bottom)
+            $0.top.equalTo(view.safeArea.top)
             $0.leading.trailing.equalToSuperview()
             $0.height.equalTo(0.60 * view.bounds.width)
         }
@@ -110,8 +99,8 @@ class PlaylistViewController: UIViewController {
         }
         
         //tableView.contentInsetAdjustmentBehavior = .never
-        tableView.contentInset = UIEdgeInsets(top: (0.60 * view.bounds.width) + 40.0, left: 0.0, bottom: 0.0, right: 0.0)
-        tableView.contentOffset = CGPoint(x: 0.0, y: (-0.60 * view.bounds.width) - 40.0)
+        tableView.contentInset = UIEdgeInsets(top: 0.60 * view.bounds.width, left: 0.0, bottom: 0.0, right: 0.0)
+        tableView.contentOffset = CGPoint(x: 0.0, y: -0.60 * view.bounds.width)
         
         tabManager.tabsForCurrentMode.forEach({
             $0.playlistItems.observe { [weak self] _, _ in
@@ -129,10 +118,35 @@ class PlaylistViewController: UIViewController {
     }
     
     private func updateItems() {
+        //Only add items from the current tab
+        itemToBeAdded = tabManager.selectedTab?.playlistItems.value.first
+        
+        //Add items from all tabs
+        //itemsToBeAdded = tabManager.tabsForCurrentMode.map({ $0.playlistItems }).flatMap({ $0.value })
+        
+        //Fetch items from the database
         playlistItems = Playlist.shared.getItems()
         CarplayMediaManager.shared.updateItems()
-        
         self.tableView(tableView, didSelectRowAt: IndexPath(row: 0, section: 0))
+    }
+    
+    @objc
+    private func onClearAll(_ button: UIBarButtonItem) {
+        let alert = UIAlertController(title: "Warning", message: "Are you sure you want to remove all items from your playlist?", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: "Okay", style: .default, handler: { _ in
+            self.playlistItems = []
+            Playlist.shared.removeAll()
+            
+            self.dismiss(animated: true, completion: nil)
+        }))
+        
+        self.present(alert, animated: true, completion: nil)
+    }
+    
+    @objc
+    private func onExit(_ button: UIBarButtonItem) {
+        self.dismiss(animated: true, completion: nil)
     }
 }
 
@@ -152,11 +166,18 @@ extension PlaylistViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 45.0
+        return 50.0
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 45.0
+        if itemToBeAdded != nil {
+            return 84.0
+        }
+        
+        if currentItem != -1 {
+            return 50.0
+        }
+        return .leastNormalMagnitude
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -169,9 +190,9 @@ extension PlaylistViewController: UITableViewDataSource {
         cell.selectionStyle = .none
         cell.indicatorIcon.image = #imageLiteral(resourceName: "videoThumbSlider").template
         cell.indicatorIcon.tintColor = #colorLiteral(red: 0, green: 0.6666666667, blue: 1, alpha: 1)
-        cell.thumbnailView.image = #imageLiteral(resourceName: "shields-menu-icon")
+        cell.thumbnailView.image = #imageLiteral(resourceName: "menu-NoImageMode")
         cell.titleLabel.text = item.name
-        cell.detailLabel.text = String(format: "%.2f mins", item.duration / 60.0)
+        cell.detailLabel.text = URL(string: item.pageSrc)?.baseDomain ?? item.pageSrc //String(format: "%.2f mins", item.duration / 60.0)
         cell.contentView.backgroundColor = .clear
         cell.backgroundColor = .clear
         cell.thumbnailView.setFavicon(forSite: .init(url: item.pageSrc, title: item.pageTitle))
@@ -185,56 +206,81 @@ extension PlaylistViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        return PlaylistHeader()
+        return PlaylistItemPlayingView().then {
+            if let item = self.itemToBeAdded {
+                $0.titleLabel.text = item.name
+                $0.detailLabel.text = URL(string: item.pageSrc)?.baseDomain
+                $0.addButton.isHidden = false
+            } else if currentItem != -1 {
+                $0.titleLabel.text = playlistItems[currentItem].name
+                $0.detailLabel.text = URL(string: playlistItems[currentItem].pageSrc)?.baseDomain
+                $0.addButton.isHidden = true
+            }
+            $0.addButton.addTarget(self, action: #selector(onAddItem(_:)), for: .touchUpInside)
+        }
+    }
+    
+    @objc
+    private func onAddItem(_ button: UIButton) {
+        if let item = self.itemToBeAdded {
+            Playlist.shared.addItem(item: item) { [weak self] in
+                guard let self = self else { return }
+                DispatchQueue.main.async {
+                    self.itemToBeAdded = nil
+                    self.playlistItems = Playlist.shared.getItems()
+                    CarplayMediaManager.shared.updateItems()
+                    self.tableView.reloadData()
+                }
+            }
+        }
     }
 }
 
 extension PlaylistViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
-        activityIndicator.startAnimating()
-        activityIndicator.isHidden = false
-        currentItem = indexPath.row
-        let item = self.playlistItems[indexPath.row]
-        let cache = Playlist.shared.getCache(item: item)
-        
-        infoLabel.text = item.name
-        if let cell = tableView.cellForRow(at: indexPath) as? PlaylistCell, let image = cell.thumbnailView.image {
-            (navigationItem.titleView as? UIImageView)?.image = image
-        } else {
-            (navigationItem.titleView as? UIImageView)?.setFavicon(forSite: .init(url: item.pageSrc, title: item.pageTitle), onCompletion: { [weak self] _, _ in
-                guard let self = self else { return }
-                self.navigationItem.titleView?.backgroundColor = .clear
-                self.navigationItem.titleView?.tintColor = .white
-            })
-        }
-        
-        if cache.isEmpty {
-            if let url = URL(string: item.src) {
-                self.playerView.load(url: url, resourceDelegate: nil)
-                self.activityIndicator.stopAnimating()
-            } else {
-                webLoader = PlaylistWebLoader(handler: { [weak self] item in
-                    guard let self = self else { return }
-                    if let item = item, let url = URL(string: item.src) {
-                        self.playerView.load(url: url, resourceDelegate: nil)
-                        self.activityIndicator.stopAnimating()
+        if indexPath.row < self.playlistItems.count {
+            activityIndicator.startAnimating()
+            activityIndicator.isHidden = false
+            currentItem = indexPath.row
+            let item = self.playlistItems[indexPath.row]
+            let cache = Playlist.shared.getCache(item: item)
+            
+            infoLabel.text = item.name
+            
+            if cache.isEmpty {
+                if let url = URL(string: item.src) {
+                    self.playerView.load(url: url, resourceDelegate: nil)
+                    self.activityIndicator.stopAnimating()
+                } else {
+                    webLoader = PlaylistWebLoader(handler: { [weak self] item in
+                        guard let self = self else { return }
+                        if let item = item, let url = URL(string: item.src) {
+                            self.playerView.load(url: url, resourceDelegate: nil)
+                            self.activityIndicator.stopAnimating()
+                        } else {
+                            self.activityIndicator.stopAnimating()
+                            self.displayLoadingResourceError()
+                        }
+                    })
+                    
+                    if let url = URL(string: item.pageSrc) {
+                        webLoader.load(url: url)
                     } else {
-                        self.activityIndicator.stopAnimating()
                         self.displayLoadingResourceError()
                     }
-                })
-                
-                if let url = URL(string: item.pageSrc) {
-                    webLoader.load(url: url)
-                } else {
-                    self.displayLoadingResourceError()
                 }
+            } else {
+//                let directory = NSTemporaryDirectory()
+//                let fileName = "foo.m4v"
+//                let fullURL = NSURL.fileURL(withPathComponents: [directory, fileName])!
+//
+//                try? cache.write(to: fullURL, options: .atomicWrite)
+                
+                self.cacheLoader = PlaylistCacheLoader(cacheData: cache)
+                let url = URL(string: "brave-media-ios://local-media-resource?time=\(Date().timeIntervalSince1970)")!
+                self.playerView.load(url: url, resourceDelegate: self.cacheLoader)
             }
-        } else {
-            self.cacheLoader = PlaylistCacheLoader(cacheData: cache)
-            self.playerView.load(url: URL(string: "brave-ios://local-media-resource")!, resourceDelegate: self.cacheLoader)
         }
         
         tableView.reloadData()
@@ -247,56 +293,68 @@ extension PlaylistViewController: UITableViewDelegate {
     }
 }
 
-private class PlaylistHeader: UIView {
+private class PlaylistItemPlayingView: UIView {
     
-    private let titleLabel = UILabel().then {
-        $0.font = .systemFont(ofSize: 17.0, weight: .bold)
+    public let titleLabel = UILabel().then {
         $0.textColor = .white
         $0.appearanceTextColor = .white
-        $0.text = "Playlist"
+        $0.font = .systemFont(ofSize: 14.0, weight: .medium)
     }
     
-    private let sortButton = UIButton().then {
-        $0.setTitle("Sort by Most Recent ", for: .normal)
-        $0.setTitleColor(#colorLiteral(red: 0, green: 0.6666666667, blue: 1, alpha: 1), for: .normal)
-        $0.titleLabel?.font = .systemFont(ofSize: 14.0, weight: .regular)
-        $0.setImage(#imageLiteral(resourceName: "find_next").scale(toSize: CGSize(width: 12, height: 8)).template, for: .normal)
-        $0.imageView?.tintColor = #colorLiteral(red: 0, green: 0.6666666667, blue: 1, alpha: 1)
+    public let detailLabel = UILabel().then {
+        $0.textColor = #colorLiteral(red: 0.5176470588, green: 0.5411764706, blue: 0.568627451, alpha: 1)
+        $0.appearanceTextColor = #colorLiteral(red: 0.5176470588, green: 0.5411764706, blue: 0.568627451, alpha: 1)
+        $0.font = .systemFont(ofSize: 12.0, weight: .regular)
+    }
+    
+    public let addButton = UIButton().then {
+        let image = #imageLiteral(resourceName: "playlistsAdd")
+        $0.setTitle("Add", for: .normal)
+        $0.setImage(image, for: .normal)
+        $0.imageEdgeInsets = UIEdgeInsets(top: 0.0, left: 10 - image.size.width, bottom: 0.0, right: 0.0)
+        $0.titleEdgeInsets = UIEdgeInsets(top: 0.0, left: 0, bottom: 0.0, right: 0.0)
+        $0.contentEdgeInsets = UIEdgeInsets(top: 8.0, left: 20.0, bottom: 8.0, right: 20.0)
+        $0.contentHorizontalAlignment = .left
         $0.imageView?.contentMode = .scaleAspectFit
+        $0.setContentHuggingPriority(.required, for: .horizontal)
+        $0.setContentCompressionResistancePriority(.required, for: .horizontal)
         
-        $0.transform = CGAffineTransform(scaleX: -1.0, y: 1.0)
-        $0.titleLabel?.transform = CGAffineTransform(scaleX: -1.0, y: 1.0)
-        $0.imageView?.transform = CGAffineTransform(scaleX: -1.0, y: 1.0)
+        $0.setTitleColor(.white, for: .normal)
+        $0.titleLabel?.appearanceTextColor = .white
+        $0.titleLabel?.font = .systemFont(ofSize: 12.0, weight: .semibold)
+        $0.layer.borderColor = UIColor.white.withAlphaComponent(0.5).cgColor
+        $0.layer.borderWidth = 1.0
+        $0.layer.cornerRadius = 18.0
     }
     
-    private let separator = UIView().then {
-        $0.backgroundColor = #colorLiteral(red: 0.5176470588, green: 0.5411764706, blue: 0.568627451, alpha: 1)
+    private let infoStackView = UIStackView().then {
+        $0.axis = .vertical
+        $0.spacing = 5.0
+    }
+    
+    private let stackView = UIStackView().then {
+        $0.axis = .horizontal
+        $0.alignment = .center
     }
     
     override init(frame: CGRect) {
+        
         super.init(frame: frame)
         
-        addSubview(titleLabel)
-        addSubview(sortButton)
-        addSubview(separator)
+        self.preservesSuperviewLayoutMargins = false
+        self.backgroundColor = #colorLiteral(red: 0.05098039216, green: 0.2862745098, blue: 0.4823529412, alpha: 1)
         
-        titleLabel.snp.makeConstraints {
+        self.addSubview(stackView)
+        stackView.addArrangedSubview(infoStackView)
+        stackView.addArrangedSubview(addButton)
+        infoStackView.addArrangedSubview(titleLabel)
+        infoStackView.addArrangedSubview(detailLabel)
+
+        stackView.snp.makeConstraints {
             $0.left.equalToSuperview().offset(15.0)
-            $0.top.equalToSuperview().offset(5.0)
-            $0.bottom.equalToSuperview().offset(-15.0)
-        }
-        
-        sortButton.snp.makeConstraints {
-            $0.left.greaterThanOrEqualTo(titleLabel.snp.right).offset(15.0)
             $0.right.equalToSuperview().offset(-15.0)
             $0.top.equalToSuperview().offset(5.0)
-            $0.bottom.equalToSuperview().offset(-15.0)
-        }
-        
-        separator.snp.makeConstraints {
-            $0.left.equalToSuperview().offset(87.0)
-            $0.right.bottom.equalToSuperview()
-            $0.height.equalTo(1.0 / UIScreen.main.scale)
+            $0.bottom.equalToSuperview().offset(-5.0)
         }
     }
     
@@ -395,6 +453,7 @@ private class PlaylistCell: UITableViewCell {
         }
 
         set (newValue) {
+            _ = newValue
             super.layoutMargins = .zero
         }
     }
@@ -405,6 +464,7 @@ private class PlaylistCell: UITableViewCell {
         }
         
         set (newValue) {
+            _ = newValue
             super.separatorInset = UIEdgeInsets(top: 0, left: self.titleLabel.frame.origin.x, bottom: 0, right: 0)
         }
     }

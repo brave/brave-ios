@@ -7,54 +7,152 @@ import AVFoundation
 import WebKit
 import MobileCoreServices
 
+private class MimeTypeDetector {
+    private(set) var mimeType: String = ""
+    private(set) var fileExtension: String = ""
+    
+    init(data: Data) {
+        let bytes = [UInt8](data)
+        
+        if scan(data: bytes, header: [0x1A, 0x45, 0xDF, 0xA3]) {
+            mimeType = "video/webm"
+            fileExtension = "webm"
+            return
+        }
+        
+        if scan(data: bytes, header: [0x4F, 0x67, 0x67, 0x53]) {
+            mimeType = "application/ogg"
+            fileExtension = "ogg"
+            return
+        }
+        
+        if scan(data: bytes, header: [0x52, 0x49, 0x46, 0x46]) {
+            if [UInt8](data.subdata(in: 4..<5))[0] == 57 {
+                mimeType = "audio/x-wav"
+                fileExtension = "wav"
+            } else {
+                mimeType = "video/x-msvideo"
+                fileExtension = "avi"
+            }
+            return
+        }
+        
+        if scan(data: bytes, header: [0xFF, 0xFB]) || scan(data: bytes, header: [0x49, 0x44, 0x33]) {
+            mimeType = "audio/mpeg"
+            fileExtension = "mp4"
+            return
+        }
+        
+        if scan(data: bytes, header: [0x49, 0x44, 0x33]) {
+            mimeType = "audio/mpeg"
+            fileExtension = "mp4"
+            return
+        }
+        
+        if scan(data: bytes, header: [0x66, 0x4C, 0x61, 0x43]) {
+            mimeType = "audio/flac"
+            fileExtension = "flac"
+            return
+        }
+        
+        if scan(data: [UInt8](bytes[4..<bytes.count]), header: [0x66, 0x74, 0x79, 0x70, 0x4D, 0x53, 0x4E, 0x56]) {
+            mimeType = "video/mp4"
+            fileExtension = "mp4"
+            return
+        }
+        
+        if scan(data: [UInt8](bytes[4..<bytes.count]), header: [0x66, 0x74, 0x79, 0x70, 0x69, 0x73, 0x6F, 0x6D]) {
+            mimeType = "video/mp4"
+            fileExtension = "mp4"
+            return
+        }
+        
+        if scan(data: [UInt8](bytes[4..<bytes.count]), header: [0x66, 0x74, 0x79, 0x70, 0x6D, 0x70, 0x34, 0x32]) {
+            mimeType = "video/mp4"
+            fileExtension = "mp4"
+            return
+        }
+        
+        mimeType = "application/x-mpegURL"
+        fileExtension = "mpg"
+    }
+    
+    private func scan(data: [UInt8], header: [UInt8]) -> Bool {
+        if data.count < header.count {
+            return false
+        }
+        
+        for i in 0..<header.count {
+            if data[i] != header[i] {
+                return false
+            }
+        }
+        return true
+    }
+}
+
 class PlaylistCacheLoader: NSObject, AVAssetResourceLoaderDelegate, URLSessionTaskDelegate {
     
-    private lazy var session = URLSession(configuration: .ephemeral, delegate: self, delegateQueue: .main)
-    private var requests = [URL: AVAssetResourceLoadingRequest]()
-    private var tasks = [URL: URLSessionDataTask]()
+    //private lazy var session = URLSession(configuration: .ephemeral, delegate: self, delegateQueue: .main)
+    private var requests = Set<AVAssetResourceLoadingRequest>()
     private var cacheData = Data()
+    private(set) var mimeType = String()
     
     override init() {
         super.init()
     }
     
-    init(cacheData: Data) {
-        self.cacheData = cacheData
+    init(cacheData: Data, mimeType: String? = nil) {
         super.init()
+        
+        self.cacheData = cacheData
+        self.mimeType = mimeType ?? MimeTypeDetector(data: cacheData).mimeType
     }
     
     func resourceLoader(_ resourceLoader: AVAssetResourceLoader, shouldWaitForLoadingOfRequestedResource loadingRequest: AVAssetResourceLoadingRequest) -> Bool {
-        
-        if let url = loadingRequest.request.url {
-            if !cacheData.isEmpty {
-                loadingRequest.dataRequest?.respond(with: cacheData)
-                loadingRequest.finishLoading()
-                return true
-            }
-            
-            let cache = Playlist.shared.getCache(item: PlaylistInfo(name: "", src: url.absoluteString, pageSrc: url.absoluteString, pageTitle: "", duration: 0.0))
-            if !cache.isEmpty {
-                loadingRequest.dataRequest?.respond(with: cache)
-                loadingRequest.finishLoading()
-                return true
-            }
-            
-            requests.updateValue(loadingRequest, forKey: url)
-            let task = session.dataTask(with: loadingRequest.request)
-            tasks.updateValue(task, forKey: url)
-            task.resume()
-            return true
-        }
-
-        return false
+        requests.insert(loadingRequest)
+        processPendingRequests()
+        return true
     }
     
-    private func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
-        completionHandler(.allow)
+    func resourceLoader(_ resourceLoader: AVAssetResourceLoader, didCancel loadingRequest: AVAssetResourceLoadingRequest) {
+        requests.remove(loadingRequest)
+    }
+
+    func processPendingRequests() {
+        let requestsFulfilled = Set<AVAssetResourceLoadingRequest>(requests.compactMap {
+            $0.contentInformationRequest?.contentType = self.mimeType
+            $0.contentInformationRequest?.contentLength = Int64(self.cacheData.count)
+            $0.contentInformationRequest?.isByteRangeAccessSupported = true
+            
+            if self.haveEnoughDataToFulfillRequest($0.dataRequest!) {
+                $0.finishLoading()
+                return $0
+            }
+            return nil
+        })
+        
+        _ = requestsFulfilled.map { self.requests.remove($0) }
+
+    }
+    
+    func haveEnoughDataToFulfillRequest(_ dataRequest: AVAssetResourceLoadingDataRequest) -> Bool {
+        let requestedOffset = Int(dataRequest.requestedOffset)
+        let currentOffset = Int(dataRequest.currentOffset)
+        let requestedLength = dataRequest.requestedLength
+        
+        if currentOffset <= cacheData.count {
+            let bytesToRespond = min(cacheData.count - currentOffset, requestedLength)
+            let data = cacheData.subdata(in: Range(uncheckedBounds: (currentOffset, currentOffset + bytesToRespond)))
+            dataRequest.respond(with: data)
+            return cacheData.count >= requestedLength + requestedOffset
+        }
+        
+        return false
     }
 
     private func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
-        if let request = dataTask.originalRequest, let url = request.url, let dataRequest = requests[url]?.dataRequest {
+        /*if let request = dataTask.originalRequest, let url = request.url, let dataRequest = requests[url]?.dataRequest {
             let neededData = dataRequest.requestedLength - Int(dataRequest.currentOffset)
             if data.count >= neededData {
                 if let contentInformationRequest = requests[url]?.contentInformationRequest, let mimeType = dataTask.response?.mimeType {
@@ -71,13 +169,7 @@ class PlaylistCacheLoader: NSObject, AVAssetResourceLoaderDelegate, URLSessionTa
             } else {
                 dataRequest.respond(with: data)
             }
-        }
-    }
-    
-    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-        if let request = task.originalRequest, let url = request.url, let dataRequest = requests[url] {
-            dataRequest.finishLoading(with: error)
-        }
+        }*/
     }
 }
 

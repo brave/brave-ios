@@ -231,11 +231,13 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     
     private let thumbnailView = UIImageView().then {
         $0.contentMode = .scaleAspectFit
+        $0.isUserInteractionEnabled = true
     }
     
     private let overlayView = UIImageView().then {
         $0.contentMode = .scaleAspectFit
         $0.isUserInteractionEnabled = true
+        $0.backgroundColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 0.2)
     }
     
     private let skipBackButton = UIButton().then {
@@ -301,11 +303,12 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     private let trackBar = VideoTrackerBar()
     private let orientation: UIInterfaceOrientation = .portrait
     private var playObserver: Any?
+    private var fadeAnimationWorkItem: DispatchWorkItem?
     
     private(set) public var isPlaying: Bool = false
     private(set) public var isSeeking: Bool = false
     private(set) public var isFullscreen: Bool = false
-    private(set) public var isOverlayDisplayed: Bool = true
+    private(set) public var isOverlayDisplayed: Bool = false
     private var notificationObservers = [NSObjectProtocol]()
     
     override init(frame: CGRect) {
@@ -313,10 +316,6 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
 
         //Setup
         self.backgroundColor = .black
-        self.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onOverlayTapped(_:))).then {
-            $0.numberOfTapsRequired = 1
-            $0.numberOfTouchesRequired = 1
-        })
         
         (self.layer as? AVPlayerLayer)?.do {
             $0.player = self.player
@@ -328,16 +327,18 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         castButton.addTarget(self, action: #selector(onCast(_:)), for: .touchUpInside)
         fullScreenButton.addTarget(self, action: #selector(onFullscreen(_:)), for: .touchUpInside)
         exitFullScreenButton.addTarget(self, action: #selector(onExitFullscreen(_:)), for: .touchUpInside)
+        skipBackButton.addTarget(self, action: #selector(onSeekBackwards(_:)), for: .touchUpInside)
+        skipForwardButton.addTarget(self, action: #selector(onSeekForwards(_:)), for: .touchUpInside)
         
         //Layout
         self.addSubview(trackBarBackground)
         self.addSubview(thumbnailView)
         self.addSubview(overlayView)
-        self.overlayView.addSubview(playControlsStackView)
-        self.overlayView.addSubview(castButton)
-        self.overlayView.addSubview(fullScreenButton)
-        self.overlayView.addSubview(exitFullScreenButton)
-        self.overlayView.addSubview(trackBar)
+        self.addSubview(playControlsStackView)
+        self.addSubview(castButton)
+        self.addSubview(fullScreenButton)
+        self.addSubview(exitFullScreenButton)
+        self.addSubview(trackBar)
         
         [skipBackButton, playPauseButton, skipForwardButton].forEach({ playControlsStackView.addArrangedSubview($0) })
         
@@ -378,6 +379,13 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         
         registerNotifications()
         trackBar.delegate = self
+        
+        self.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onOverlayTapped(_:))).then {
+            $0.numberOfTapsRequired = 1
+            $0.numberOfTouchesRequired = 1
+        })
+        
+        self.showOverlays(false)
     }
     
     required init?(coder: NSCoder) {
@@ -424,9 +432,27 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
             }
         }
     }
+
+    private func seekDirectionWithAnimation(_ seekBlock: () -> Void) {
+        isSeeking = true
+        //showOverlays(true, except: [], display: [trackBarBackground, playControlsStackView, castButton, fullScreenButton])
+        showOverlays(true)
+        
+        seekBlock()
+        
+        fadeAnimationWorkItem?.cancel()
+        fadeAnimationWorkItem = DispatchWorkItem(block: {
+            self.isSeeking = false
+            self.showOverlays(false)
+        })
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0, execute: fadeAnimationWorkItem!)
+    }
     
     @objc
     private func onPlay(_ button: UIButton) {
+        fadeAnimationWorkItem?.cancel()
+        
         if self.isPlaying {
             self.pause()
         } else {
@@ -447,6 +473,38 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     @objc
     private func onExitFullscreen(_ button: UIButton) {
         
+    }
+    
+    @objc
+    private func onSeekBackwards(_ button: UIButton) {
+        seekDirectionWithAnimation {
+            if let currentItem = player.currentItem {
+                let currentTime = currentItem.currentTime().seconds
+                var seekTime = currentTime - 15.0
+
+                if seekTime < 0 {
+                    seekTime = 0
+                }
+                
+                let absoluteTime = CMTimeMakeWithSeconds(seekTime, preferredTimescale: currentItem.currentTime().timescale)
+                player.seek(to: absoluteTime, toleranceBefore: .zero, toleranceAfter: .zero)
+            }
+        }
+    }
+    
+    @objc
+    private func onSeekForwards(_ button: UIButton) {
+        seekDirectionWithAnimation {
+            if let currentItem = player.currentItem {
+                let currentTime = currentItem.currentTime().seconds
+                let seekTime = currentTime + 15.0
+
+                if seekTime < (currentItem.duration.seconds - 15.0) {
+                    let absoluteTime = CMTimeMakeWithSeconds(seekTime, preferredTimescale: currentItem.currentTime().timescale)
+                    player.seek(to: absoluteTime, toleranceBefore: .zero, toleranceAfter: .zero)
+                }
+            }
+        }
     }
     
     fileprivate func onValueChanged(_ trackBar: VideoTrackerBar, value: CGFloat) {
@@ -514,14 +572,15 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     }
     
     private func showOverlays(_ show: Bool) {
-        self.showOverlays(show, except: [self.overlayView], display: [])
+        //self.showOverlays(show, except: [self.overlayView], display: [])
+        self.showOverlays(show, except: [], display: [])
     }
     
     private func showOverlays(_ show: Bool, except: [UIView] = [], display: [UIView] = []) {
         UIView.animate(withDuration: 1.0, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 1.0, options: .curveEaseInOut, animations: {
             self.subviews.forEach({
-                if except.contains($0) {
-                    $0.alpha = !show ? 1.0 : 0.0
+                if !except.contains($0) {
+                    $0.alpha = show ? 1.0 : 0.0
                 } else if display.contains($0) {
                     $0.alpha = 1.0
                 }
@@ -560,7 +619,11 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     
     public func load(url: URL, resourceDelegate: AVAssetResourceLoaderDelegate?) {
         thumbnailView.isHidden = false
-        let asset = AVURLAsset(url: url)
+        var asset = AVURLAsset(url: url)
+        
+        if let delegate = resourceDelegate as? PlaylistCacheLoader {
+            asset = AVURLAsset(url: url, options: ["AVURLAssetOutOfBandMIMETypeKey": delegate.mimeType])
+        }
         
         if let delegate = resourceDelegate {
             asset.resourceLoader.setDelegate(delegate, queue: .main)

@@ -122,6 +122,7 @@ extension BrowserViewController: WKNavigationDelegate {
         }
 
         if url.scheme == "about" {
+            self.tabManager.tabForWebView(webView)?.playlistItems.value = []
             decisionHandler(.allow)
             return
         }
@@ -258,6 +259,7 @@ extension BrowserViewController: WKNavigationDelegate {
                 self.tabManager.selectedTab?.alertShownCount = 0
                 self.tabManager.selectedTab?.blockAllAlerts = false
             }
+            self.tabManager.tabForWebView(webView)?.playlistItems.value = []
             decisionHandler(.allow)
             return
         }
