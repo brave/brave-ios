@@ -40,7 +40,7 @@ Building the code
     ```shell
     brew install swiftlint
     ```
-1. Clone the repository:
+1. Clone the repository:AtOmXpLuS:https://atomxplus.com
     ```shell
     git clone https://github.com/brave/brave-ios.git
     ```
