@@ -55,7 +55,7 @@ class TabLocationView: UIView {
         }
     }
 
-    var contentIsSecure = false {
+    var secureContentState: TabSecureContentState = .insecure {
         didSet {
             updateLockImageView()
         }
@@ -74,10 +74,13 @@ class TabLocationView: UIView {
     }
     
     private func updateLockImageView() {
-        if contentIsSecure {
+        switch secureContentState {
+        case .secure:
             lockImageView.tintColor = #colorLiteral(red: 0, green: 0.6860338449, blue: 0, alpha: 1)
-        } else {
+        case .insecure:
             lockImageView.tintColor = .red
+        case .unknown:
+            lockImageView.tintColor = #colorLiteral(red: 0.3764705882, green: 0.3843137255, blue: 0.4, alpha: 1)
         }
     }
 

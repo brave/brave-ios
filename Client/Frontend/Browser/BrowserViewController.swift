@@ -1249,20 +1249,25 @@ class BrowserViewController: UIViewController {
             }
             tab.userScriptManager?.isU2FEnabled = webView.hasOnlySecureContent
             tab.userScriptManager?.isPaymentRequestEnabled = webView.hasOnlySecureContent
-            if tab.contentIsSecure && !webView.hasOnlySecureContent {
-                tab.contentIsSecure = false
+            if tab.secureContentState == .secure && !webView.hasOnlySecureContent {
+                tab.secureContentState = .insecure
             }
             
-            topToolbar.contentIsSecure = tab.contentIsSecure
+            topToolbar.secureContentState = tab.secureContentState
         case .serverTrust:
             guard let tab = tabManager[webView] else {
                 break
             }
 
-            tab.contentIsSecure = false
+            tab.secureContentState = .insecure
             
             guard let serverTrust = tab.webView?.serverTrust else {
-                topToolbar.contentIsSecure = tab.contentIsSecure
+                if tab.webView?.url?.isLocal == true {
+                    tab.secureContentState = .unknown
+                    topToolbar.secureContentState = .unknown
+                } else {
+                    topToolbar.secureContentState = tab.secureContentState
+                }
                 break
             }
             
@@ -1275,9 +1280,9 @@ class BrowserViewController: UIViewController {
             SecTrustEvaluateAsync(serverTrust, DispatchQueue.global()) { _, secTrustResult in
                 switch secTrustResult {
                 case .proceed, .unspecified:
-                    tab.contentIsSecure = true
+                    tab.secureContentState = .secure
                 default:
-                    tab.contentIsSecure = false
+                    tab.secureContentState = .insecure
                 }
 
                 DispatchQueue.main.async {
@@ -1335,8 +1340,7 @@ class BrowserViewController: UIViewController {
         updateRewardsButtonState()
         
         topToolbar.currentURL = tab.url?.displayURL
-        
-        topToolbar.contentIsSecure = tab.contentIsSecure
+        topToolbar.secureContentState = tab.secureContentState
         
         let isPage = tab.url?.displayURL?.isWebPage() ?? false
         navigationToolbar.updatePageStatus(isPage)
