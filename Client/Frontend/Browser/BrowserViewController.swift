@@ -2149,6 +2149,11 @@ extension BrowserViewController: TabDelegate {
             guard let self = self else { return }
             self.onUpdateNowPlaying(tab: tab)
         }.bind(to: tab)
+        
+        tab.existingPlaylistItems.observe { [weak self] _, _ in
+           guard let self = self else { return }
+           self.onUpdateNowPlaying(tab: tab)
+       }.bind(to: tab)
     }
 
     func tab(_ tab: Tab, willDeleteWebView webView: WKWebView) {
@@ -3558,7 +3563,7 @@ extension BrowserViewController: NowPlayingBarDelegate {
     }
     
     func onUpdateNowPlaying(tab: Tab) {
-        let items = tab.playlistItems.value
+        let items = tab.playlistItems.value + tab.existingPlaylistItems.value
         if items.isEmpty {
             if Playlist.shared.currentlyPlayingInfo.value != nil {
                 nowPlayingBar.state = .nowPlaying

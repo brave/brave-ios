@@ -10,18 +10,17 @@ import WebKit
 
 class CarplayMediaManager: NSObject {
     private var contentManager: MPPlayableContentManager
-    private var player: AVPlayer
     private var playlistItems = [PlaylistInfo]()
     private var cacheLoader = PlaylistCacheLoader()
     private var webLoader = PlaylistWebLoader(handler: { _ in })
     private var currentStation: PlaylistInfo?
+    public let playerView = VideoView()
     
     public static let shared = CarplayMediaManager()
     
     private override init() {
         contentManager = MPPlayableContentManager.shared()
         playlistItems = []
-        player = AVPlayer()
 
         super.init()
         
@@ -35,12 +34,12 @@ class CarplayMediaManager: NSObject {
         UIApplication.shared.beginReceivingRemoteControlEvents()
         
         MPRemoteCommandCenter.shared().pauseCommand.addTarget { [weak self] _ in
-            self?.player.pause()
+            self?.playerView.pause()
             return .success
         }
         
         MPRemoteCommandCenter.shared().playCommand.addTarget { [weak self] _ in
-            self?.player.play()
+            self?.playerView.play()
             return .success
         }
         
@@ -70,7 +69,7 @@ class CarplayMediaManager: NSObject {
             MPMediaItemPropertyArtist: "Play"
         ]
 
-        player.addObserver(self, forKeyPath: "rate", options: .new, context: nil)
+        playerView.addObserver(self, forKeyPath: "rate", options: .new, context: nil)
         contentManager.delegate = self
         contentManager.dataSource = self
         self.updateItems()
@@ -119,31 +118,6 @@ class CarplayMediaManager: NSObject {
 
 extension CarplayMediaManager: MPPlayableContentDelegate {
     
-    private func load(url: URL, resourceDelegate: AVAssetResourceLoaderDelegate?) {
-        let asset = AVURLAsset(url: url)
-        
-        if let delegate = resourceDelegate {
-            asset.resourceLoader.setDelegate(delegate, queue: .main)
-        }
-        
-        if let currentItem = player.currentItem, currentItem.asset.isKind(of: AVURLAsset.self) && player.status == .readyToPlay {
-            if let asset = currentItem.asset as? AVURLAsset, asset.url.absoluteString == url.absoluteString {
-                player.pause()
-                player.play()
-                return
-            }
-        }
-        
-        asset.loadValuesAsynchronously(forKeys: ["playable", "tracks", "duration"]) { [weak self] in
-            guard let self = self else { return }
-            DispatchQueue.main.async {
-                let item = AVPlayerItem(asset: asset)
-                self.player.replaceCurrentItem(with: item)
-                self.player.play()
-            }
-        }
-    }
-    
     private func displayLoadingResourceError() {
         let alert = UIAlertController(title: "Sorry", message: "There was a problem loading the resource!", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Okay", style: .default, handler: nil))
@@ -163,34 +137,27 @@ extension CarplayMediaManager: MPPlayableContentDelegate {
                 let cache = Playlist.shared.getCache(item: item)
                 if cache.isEmpty {
                     if let url = URL(string: item.src) {
-                        self.completion = completionHandler
-                        self.load(url: url, resourceDelegate: nil)
+                        self.playerView.load(url: url, resourceDelegate: nil)
                     } else {
-                        self.webLoader.removeFromSuperview()
                         self.webLoader = PlaylistWebLoader(handler: { [weak self] item in
                             guard let self = self else { return }
                             if let item = item, let url = URL(string: item.src) {
-                                self.completion = completionHandler
-                                self.load(url: url, resourceDelegate: nil)
+                                self.playerView.load(url: url, resourceDelegate: nil)
                             } else {
-                                completionHandler("Error Attempting to load Media")
                                 self.displayLoadingResourceError()
                             }
                         })
                         
                         if let url = URL(string: item.pageSrc) {
-                            UIApplication.shared.keyWindow?.insertSubview(self.webLoader, at: 0)
-                            self.webLoader.frame = CGRect(width: 100.0, height: 100.0)
                             self.webLoader.load(url: url)
                         } else {
-                            completionHandler("Error Attempting to load Media")
                             self.displayLoadingResourceError()
                         }
                     }
                 } else {
-                    self.completion = completionHandler
                     self.cacheLoader = PlaylistCacheLoader(cacheData: cache)
-                    self.load(url: URL(string: "brave-ios://local-media-resource")!, resourceDelegate: self.cacheLoader)
+                    let url = URL(string: "brave-media-ios://local-media-resource?time=\(Date().timeIntervalSince1970)")!
+                    self.playerView.load(url: url, resourceDelegate: self.cacheLoader)
                 }
             } else {
                 completionHandler(nil)

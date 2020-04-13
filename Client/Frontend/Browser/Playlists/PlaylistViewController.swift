@@ -20,7 +20,7 @@ class PlaylistViewController: UIViewController {
         $0.text = "Playlist"
     }
     
-    private let playerView = VideoView()
+    private let playerView = CarplayMediaManager.shared.playerView
     private var tableView = UITableView(frame: .zero, style: .grouped)
     private var playlistItems = [PlaylistInfo]()
     private var itemToBeAdded: PlaylistInfo?
@@ -39,15 +39,6 @@ class PlaylistViewController: UIViewController {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    deinit {
-        do {
-            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback, options: [.allowAirPlay, .allowBluetooth, .duckOthers])
-            try AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
-        } catch {
-            print(error)
-        }
     }
     
     override func viewDidLoad() {
@@ -109,12 +100,11 @@ class PlaylistViewController: UIViewController {
             }.bind(to: self)
         })
         
-        do {
-            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback, options: [.allowAirPlay, .allowBluetooth, .duckOthers])
-            try AVAudioSession.sharedInstance().setActive(true, options: .notifyOthersOnDeactivation)
-        } catch {
-            print(error)
-        }
+        Playlist.shared.currentlyPlayingInfo.observe({ [weak self] _, _ in
+            guard let self = self else { return }
+            self.currentItem = self.playlistItems.firstIndex(where: { $0.pageSrc == Playlist.shared.currentlyPlayingInfo.value?.pageSrc }) ?? -1
+            self.tableView.reloadData()
+        }).bind(to: self)
     }
     
     private func updateItems() {
@@ -128,15 +118,9 @@ class PlaylistViewController: UIViewController {
         playlistItems = Playlist.shared.getItems()
         CarplayMediaManager.shared.updateItems()
         
-        currentItem = -1
-        for (index, item) in playlistItems.enumerated() {
-            if Playlist.shared.currentlyPlayingInfo.value?.pageSrc == item.pageSrc {
-                currentItem = index
-                break
-            }
-        }
+        currentItem = playlistItems.firstIndex(where: { $0.pageSrc == Playlist.shared.currentlyPlayingInfo.value?.pageSrc }) ?? -1
         
-        if currentItem != -1 {
+        if currentItem != -1 && !playerView.isPlaying {
             self.tableView(tableView, didSelectRowAt: IndexPath(row: self.currentItem, section: 0))
         }
     }
@@ -148,6 +132,7 @@ class PlaylistViewController: UIViewController {
         alert.addAction(UIAlertAction(title: "Okay", style: .default, handler: { _ in
             self.playlistItems = []
             Playlist.shared.removeAll()
+            Playlist.shared.currentlyPlayingInfo.value = nil
             
             self.dismiss(animated: true, completion: nil)
         }))
@@ -347,15 +332,10 @@ extension PlaylistViewController: UITableViewDelegate {
                     }
                 }
             } else {
-//                let directory = NSTemporaryDirectory()
-//                let fileName = "foo.m4v"
-//                let fullURL = NSURL.fileURL(withPathComponents: [directory, fileName])!
-//
-//                try? cache.write(to: fullURL, options: .atomicWrite)
-                
                 self.cacheLoader = PlaylistCacheLoader(cacheData: cache)
                 let url = URL(string: "brave-media-ios://local-media-resource?time=\(Date().timeIntervalSince1970)")!
                 self.playerView.load(url: url, resourceDelegate: self.cacheLoader)
+                self.activityIndicator.stopAnimating()
             }
         }
         

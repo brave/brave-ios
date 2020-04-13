@@ -319,6 +319,13 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback, options: [.allowAirPlay, .allowBluetooth, .duckOthers])
+            try AVAudioSession.sharedInstance().setActive(true, options: .notifyOthersOnDeactivation)
+        } catch {
+            print(error)
+        }
 
         //Setup
         self.backgroundColor = .black
@@ -404,6 +411,13 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     }
     
     deinit {
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback, options: [.allowAirPlay, .allowBluetooth, .duckOthers])
+            try AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+        } catch {
+            print(error)
+        }
+        
         if let observer = self.playObserver {
             player.removeTimeObserver(observer)
         }
@@ -446,7 +460,6 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
 
     private func seekDirectionWithAnimation(_ seekBlock: () -> Void) {
         isSeeking = true
-        //showOverlays(true, except: [], display: [trackBarBackground, playControlsStackView, castButton, fullScreenButton])
         showOverlays(true)
         
         seekBlock()
