@@ -865,7 +865,7 @@ class U2FExtensions: NSObject {
                     self.verificationPendingPopup.update(title: Strings.verificationPending + currentURL)
                     self.verificationPendingPopup.showWithType(showType: .flyUp)
                 }
-                return self.verifyPin(completion: completion) ?? .flyDown
+                return self.verifyPin(completion: completion) 
             }
             self.pinVerificationPopup.showWithType(showType: .flyUp)
         }

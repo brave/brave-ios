@@ -37,7 +37,6 @@ class MetadataParserHelper: TabEventHandler {
             }
 
             guard let dict = result as? [String: Any],
-                let pageURL = tab.url?.displayURL,
                 let pageMetadata = PageMetadata.fromDictionary(dict) else {
                     log.debug("Page contains no metadata!")
                     return

@@ -118,20 +118,20 @@ extension NTPLearnMoreViewController {
         }
         
         private lazy var buttonsStackView = UIStackView().then { stackView in
-            func separator() -> UIView {
-                UIView().then {
-                    $0.backgroundColor = UIColor(white: 0.8, alpha: 1.0)
-                    $0.snp.makeConstraints { v in
-                        v.height.equalTo(1)
-                    }
-                }
-            }
-            
             stackView.axis = .vertical
             stackView.spacing = 8
             
             [separator(), learnMoreButton, separator(), hideSponsoredImageButton, separator()]
                 .forEach(stackView.addArrangedSubview(_:))
+        }
+        
+        private func separator() -> UIView {
+            UIView().then {
+                $0.backgroundColor = UIColor(white: 0.8, alpha: 1.0)
+                $0.snp.makeConstraints { v in
+                    v.height.equalTo(1)
+                }
+            }
         }
         
         private let learnMoreButton = secondaryButton(title: nil).then {

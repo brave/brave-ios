@@ -40,11 +40,6 @@ class _SearchLoader<UnusedA, UnusedB>: Loader<[Site], SearchViewController> {
 
     var query: String = "" {
         didSet {
-            guard let profile = self.profile as? BrowserProfile else {
-                assertionFailure("nil profile")
-                return
-            }
-
             if query.isEmpty {
                 load([])
                 return
