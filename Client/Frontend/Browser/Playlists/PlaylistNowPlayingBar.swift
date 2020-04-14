@@ -157,7 +157,7 @@ class NowPlayingBar: UIView {
     
     private func refreshUI() {
         mediaTitleLabel.text = Playlist.shared.currentlyPlayingInfo.value?.name
-        mediaSubtitleLabel.text = URL(string: Playlist.shared.currentlyPlayingInfo.value?.src ?? "")?.baseDomain
+        mediaSubtitleLabel.text = URL(string: Playlist.shared.currentlyPlayingInfo.value?.pageSrc ?? "")?.baseDomain ?? Playlist.shared.currentlyPlayingInfo.value?.pageSrc
         
         setupButtons()
         
@@ -180,7 +180,7 @@ class NowPlayingBar: UIView {
             mediaInfoStackView.isHidden = false
             
         case .addedNowPlaying:
-            iconView.image = #imageLiteral(resourceName: "check")
+            iconView.image = #imageLiteral(resourceName: "nowPlayingCheckmark")
             titleLabel.isHidden = true
             mediaInfoStackView.isHidden = false
             

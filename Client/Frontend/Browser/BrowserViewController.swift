@@ -2149,11 +2149,6 @@ extension BrowserViewController: TabDelegate {
             guard let self = self else { return }
             self.onUpdateNowPlaying(tab: tab)
         }.bind(to: tab)
-        
-        tab.existingPlaylistItems.observe { [weak self] _, _ in
-           guard let self = self else { return }
-           self.onUpdateNowPlaying(tab: tab)
-       }.bind(to: tab)
     }
 
     func tab(_ tab: Tab, willDeleteWebView webView: WKWebView) {
@@ -3563,31 +3558,27 @@ extension BrowserViewController: NowPlayingBarDelegate {
     }
     
     func onUpdateNowPlaying(tab: Tab) {
-        let items = tab.playlistItems.value + tab.existingPlaylistItems.value
-        if items.isEmpty {
+        
+        let newItems = tab.playlistItems.value.filter({ !Playlist.shared.itemExists(item: $0) })
+        let existingItems = tab.playlistItems.value.filter({ Playlist.shared.itemExists(item: $0) })
+        
+        //Items for this tab already exist in the playlist..
+        if !existingItems.isEmpty {
+            nowPlayingBar.isHidden = false
+            
+            if Playlist.shared.currentlyPlayingInfo.value != nil {
+                nowPlayingBar.state = .addedNowPlaying
+            } else {
+                nowPlayingBar.state = .existing
+            }
+        } else if newItems.isEmpty { //No playlist items found on the page..
             if Playlist.shared.currentlyPlayingInfo.value != nil {
                 nowPlayingBar.state = .nowPlaying
                 nowPlayingBar.isHidden = false
             } else {
                 nowPlayingBar.isHidden = true
             }
-        } else if items.count == 1 {
-            nowPlayingBar.isHidden = false
-            
-            if Playlist.shared.itemExists(item: items[0]) {
-                if Playlist.shared.currentlyPlayingInfo.value != nil {
-                    nowPlayingBar.state = .addedNowPlaying
-                } else {
-                    nowPlayingBar.state = .existing
-                }
-            } else {
-                if Playlist.shared.currentlyPlayingInfo.value != nil {
-                    nowPlayingBar.state = .addNowPlaying
-                } else {
-                    nowPlayingBar.state = .add
-                }
-            }
-        } else {
+        } else if !newItems.isEmpty {
             nowPlayingBar.isHidden = false
             
             if Playlist.shared.currentlyPlayingInfo.value != nil {

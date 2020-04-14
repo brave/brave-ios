@@ -141,8 +141,8 @@ class PlaylistManager: TabContentScript {
         do {
             guard let item = try PlaylistInfo.from(message: message) else { return }
             
-            //Update playlist with new items..
             if !Playlist.shared.itemExists(item: item) {
+                //Update playlist existing items..
                 if let items = tab?.playlistItems, let index = items.value.firstIndex(where: { $0.src == item.src }) {
                     if items.value[index].duration < 0.01 {
                         items.value[index].duration = item.duration
@@ -154,16 +154,9 @@ class PlaylistManager: TabContentScript {
                     }
                 }
             } else {
-                //Update playlist with existing items..
-                if let items = tab?.existingPlaylistItems, let index = items.value.firstIndex(where: { $0.src == item.src }) {
-                    if items.value[index].duration < 0.01 {
-                        items.value[index].duration = item.duration
-                        items.refresh()
-                    }
-                } else {
-                    if !item.src.isEmpty {
-                        tab?.existingPlaylistItems.value.append(item)
-                    }
+                //Update playlist with new items..
+                if !item.src.isEmpty, tab?.playlistItems.value.contains(where: { $0.src == item.src }) != true {
+                    tab?.playlistItems.value.append(item)
                 }
             }
         } catch {

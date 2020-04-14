@@ -5,8 +5,11 @@
 import Foundation
 import UIKit
 import BraveShared
+import Shared
 import AVKit
 import AVFoundation
+
+private let log = Logger.browserLogger
 
 private class VideoSliderBar: UIControl {
     public var trackerInsets = UIEdgeInsets(top: 0.0, left: 5.0, bottom: 0.0, right: 5.0)
@@ -223,8 +226,18 @@ private class VideoTrackerBar: UIView {
     }
 }
 
+
+protocol VideoViewDelegate: class {
+    func onPreviousTrack()
+    func onNextTrack()
+    func onFullScreen()
+}
+
 public class VideoView: UIView, VideoTrackerBarDelegate {
-    private let player = AVPlayer(playerItem: nil).then {
+    
+    weak var delegate: VideoViewDelegate?
+    
+    public let player = AVPlayer(playerItem: nil).then {
         $0.seek(to: .zero)
         $0.actionAtItemEnd = .none
     }
@@ -321,10 +334,10 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         super.init(frame: frame)
         
         do {
-            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback, options: [.allowAirPlay, .allowBluetooth, .duckOthers])
-            try AVAudioSession.sharedInstance().setActive(true, options: .notifyOthersOnDeactivation)
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, policy: .longFormAudio)
+            try AVAudioSession.sharedInstance().setActive(true, options: [])
         } catch {
-            print(error)
+            log.error(error)
         }
 
         //Setup
@@ -342,6 +355,8 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         exitFullScreenButton.addTarget(self, action: #selector(onExitFullscreen(_:)), for: .touchUpInside)
         skipBackButton.addTarget(self, action: #selector(onSeekBackwards(_:)), for: .touchUpInside)
         skipForwardButton.addTarget(self, action: #selector(onSeekForwards(_:)), for: .touchUpInside)
+        skipBackButton.addTarget(self, action: #selector(onSeekPrevious(_:event:)), for: .touchDownRepeat)
+        skipForwardButton.addTarget(self, action: #selector(onSeekNext(_:event:)), for: .touchDownRepeat)
         
         //Layout
         self.addSubview(trackBarBackground)
@@ -412,7 +427,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     
     deinit {
         do {
-            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback, options: [.allowAirPlay, .allowBluetooth, .duckOthers])
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, policy: .longForm, options: [.allowAirPlay, .allowBluetooth, .duckOthers])
             try AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
         } catch {
             print(error)
@@ -491,7 +506,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     
     @objc
     private func onFullscreen(_ button: UIButton) {
-        
+        self.delegate?.onFullScreen()
     }
     
     @objc
@@ -502,32 +517,28 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     @objc
     private func onSeekBackwards(_ button: UIButton) {
         seekDirectionWithAnimation {
-            if let currentItem = player.currentItem {
-                let currentTime = currentItem.currentTime().seconds
-                var seekTime = currentTime - 15.0
-
-                if seekTime < 0 {
-                    seekTime = 0
-                }
-                
-                let absoluteTime = CMTimeMakeWithSeconds(seekTime, preferredTimescale: currentItem.currentTime().timescale)
-                player.seek(to: absoluteTime, toleranceBefore: .zero, toleranceAfter: .zero)
-            }
+            self.seekBackwards()
         }
     }
     
     @objc
     private func onSeekForwards(_ button: UIButton) {
         seekDirectionWithAnimation {
-            if let currentItem = player.currentItem {
-                let currentTime = currentItem.currentTime().seconds
-                let seekTime = currentTime + 15.0
-
-                if seekTime < (currentItem.duration.seconds - 15.0) {
-                    let absoluteTime = CMTimeMakeWithSeconds(seekTime, preferredTimescale: currentItem.currentTime().timescale)
-                    player.seek(to: absoluteTime, toleranceBefore: .zero, toleranceAfter: .zero)
-                }
-            }
+            self.seekForwards()
+        }
+    }
+    
+    @objc
+    private func onSeekPrevious(_ button: UIButton, event: UIEvent) {
+        if let tapCount = event.allTouches?.first?.tapCount, tapCount >= 2 {
+            self.delegate?.onPreviousTrack()
+        }
+    }
+    
+    @objc
+    private func onSeekNext(_ button: UIButton, event: UIEvent) {
+        if let tapCount = event.allTouches?.first?.tapCount, tapCount >= 2 {
+            self.delegate?.onNextTrack()
         }
     }
     
@@ -558,6 +569,16 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     }
     
     private func registerNotifications() {
+        notificationObservers.append(NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: .main) { [weak self] _ in
+            guard let self = self else { return }
+            (self.layer as? AVPlayerLayer)?.player = nil
+        })
+        
+        notificationObservers.append(NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: .main) { [weak self] _ in
+            guard let self = self else { return }
+            (self.layer as? AVPlayerLayer)?.player = self.player
+        })
+        
         notificationObservers.append(NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: self.player.currentItem, queue: .main) { [weak self] _ in
             guard let self = self, let currentItem = self.player.currentItem else { return }
             
@@ -573,6 +594,8 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
             self.isPlaying = false
             self.playPauseButton.isEnabled = true
             self.showOverlays(true)
+            
+            self.next()
             
             if self.isFullscreen {
                 self.onFullscreen(self.fullScreenButton)
@@ -656,11 +679,61 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     
     public func stop() {
         isPlaying = false
-        playPauseButton.setImage(#imageLiteral(resourceName: "videoPlay").scale(toSize: CGSize(width: 44, height: 44)), for: .normal)
+        playPauseButton.setImage(#imageLiteral(resourceName: "videoPlay").scale(toSize: CGSize(width: 22.0, height: 22.0)), for: .normal)
         player.pause()
         
         showOverlays(true)
         player.replaceCurrentItem(with: nil)
+    }
+    
+    public func seek(to time: Double) {
+        if let currentItem = player.currentItem {
+            var seekTime = time
+            if seekTime < 0.0 {
+                seekTime = 0.0
+            }
+            
+            if seekTime >= currentItem.duration.seconds {
+                seekTime = currentItem.duration.seconds
+            }
+            
+            let absoluteTime = CMTimeMakeWithSeconds(seekTime, preferredTimescale: currentItem.currentTime().timescale)
+            player.seek(to: absoluteTime, toleranceBefore: .zero, toleranceAfter: .zero)
+        }
+    }
+    
+    public func seekBackwards() {
+        if let currentItem = player.currentItem {
+            let currentTime = currentItem.currentTime().seconds
+            var seekTime = currentTime - 15.0
+
+            if seekTime < 0 {
+                seekTime = 0
+            }
+            
+            let absoluteTime = CMTimeMakeWithSeconds(seekTime, preferredTimescale: currentItem.currentTime().timescale)
+            player.seek(to: absoluteTime, toleranceBefore: .zero, toleranceAfter: .zero)
+        }
+    }
+    
+    public func seekForwards() {
+        if let currentItem = player.currentItem {
+            let currentTime = currentItem.currentTime().seconds
+            let seekTime = currentTime + 15.0
+
+            if seekTime < (currentItem.duration.seconds - 15.0) {
+                let absoluteTime = CMTimeMakeWithSeconds(seekTime, preferredTimescale: currentItem.currentTime().timescale)
+                player.seek(to: absoluteTime, toleranceBefore: .zero, toleranceAfter: .zero)
+            }
+        }
+    }
+    
+    public func previous() {
+        self.delegate?.onPreviousTrack()
+    }
+    
+    public func next() {
+        self.delegate?.onNextTrack()
     }
     
     public func load(url: URL, resourceDelegate: AVAssetResourceLoaderDelegate?) {
@@ -703,10 +776,20 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     }
     
     private func isAudioAvailable() -> Bool {
-        return self.player.currentItem?.asset.tracks.filter({ $0.mediaType == .audio }).isEmpty == false
+        if let tracks = self.player.currentItem?.asset.tracks {
+            return tracks.filter({ $0.mediaType == .audio }).isEmpty == false
+        }
+        return false
     }
 
     private func isVideoAvailable() -> Bool {
-        return self.player.currentItem?.asset.tracks.filter({ $0.mediaType == .video }).isEmpty == false
+        if let tracks = self.player.currentItem?.asset.tracks {
+            return tracks.isEmpty || tracks.filter({ $0.mediaType == .video }).isEmpty == false
+        }
+        
+        //We do this because for m3u8 HLS streams,
+        //tracks may not always be available and the particle effect will show even on videos..
+        //It's best to assume this type of media is a video stream.
+        return true
     }
 }

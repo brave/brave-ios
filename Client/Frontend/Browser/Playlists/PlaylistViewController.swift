@@ -5,8 +5,11 @@
 import Foundation
 import UIKit
 import BraveShared
+import Shared
 import AVKit
 import AVFoundation
+
+private let log = Logger.browserLogger
 
 class PlaylistViewController: UIViewController {
     private var tabManager: TabManager
@@ -92,7 +95,7 @@ class PlaylistViewController: UIViewController {
         //tableView.contentInsetAdjustmentBehavior = .never
         tableView.contentInset = UIEdgeInsets(top: 0.60 * view.bounds.width, left: 0.0, bottom: 0.0, right: 0.0)
         tableView.contentOffset = CGPoint(x: 0.0, y: -0.60 * view.bounds.width)
-        
+
         tabManager.tabsForCurrentMode.forEach({
             $0.playlistItems.observe { [weak self] _, _ in
                 guard let self = self else { return }
@@ -109,10 +112,7 @@ class PlaylistViewController: UIViewController {
     
     private func updateItems() {
         //Only add items from the current tab
-        itemToBeAdded = tabManager.selectedTab?.playlistItems.value.first
-        
-        //Add items from all tabs
-        //itemsToBeAdded = tabManager.tabsForCurrentMode.map({ $0.playlistItems }).flatMap({ $0.value })
+        itemToBeAdded = tabManager.selectedTab?.playlistItems.value.first(where: { !Playlist.shared.itemExists(item: $0) })
         
         //Fetch items from the database
         playlistItems = Playlist.shared.getItems()
@@ -126,6 +126,23 @@ class PlaylistViewController: UIViewController {
     }
     
     @objc
+    private func onAddItem(_ button: UIButton) {
+        if let item = self.itemToBeAdded {
+            Playlist.shared.addItem(item: item, cachedData: nil) { [weak self] in
+                DispatchQueue.main.async {
+                    guard let self = self else { return }
+                    self.itemToBeAdded = nil
+                    self.playlistItems = Playlist.shared.getItems()
+                    CarplayMediaManager.shared.updateItems()
+                    self.tableView.reloadData()
+                    
+                    self.tabManager.allTabs.forEach({ $0.playlistItems.refresh() })
+                }
+            }
+        }
+    }
+    
+    @objc
     private func onClearAll(_ button: UIBarButtonItem) {
         let alert = UIAlertController(title: "Warning", message: "Are you sure you want to remove all items from your playlist?", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
@@ -133,7 +150,7 @@ class PlaylistViewController: UIViewController {
             self.playlistItems = []
             Playlist.shared.removeAll()
             Playlist.shared.currentlyPlayingInfo.value = nil
-            
+            self.tabManager.allTabs.forEach({ $0.playlistItems.refresh() })
             self.dismiss(animated: true, completion: nil)
         }))
         
@@ -215,21 +232,6 @@ extension PlaylistViewController: UITableViewDataSource {
             $0.addButton.addTarget(self, action: #selector(onAddItem(_:)), for: .touchUpInside)
         }
     }
-    
-    @objc
-    private func onAddItem(_ button: UIButton) {
-        if let item = self.itemToBeAdded {
-            Playlist.shared.addItem(item: item, cachedData: nil) { [weak self] in
-                guard let self = self else { return }
-                DispatchQueue.main.async {
-                    self.itemToBeAdded = nil
-                    self.playlistItems = Playlist.shared.getItems()
-                    CarplayMediaManager.shared.updateItems()
-                    self.tableView.reloadData()
-                }
-            }
-        }
-    }
 }
 
 extension PlaylistViewController: UITableViewDelegate {
@@ -287,13 +289,20 @@ extension PlaylistViewController: UITableViewDelegate {
             Playlist.shared.removeItem(item: item)
             self.tableView.deleteRows(at: [indexPath], with: .fade)
             
-            self.currentItem = -1
+            if self.currentItem == indexPath.row {
+                self.currentItem = -1
+                Playlist.shared.currentlyPlayingInfo.value = nil
+                self.playerView.stop()
+            }
+            
             completionHandler(true)
             self.tableView.reloadData()
+            
+            self.tabManager.allTabs.forEach({ $0.playlistItems.refresh() })
         })
 
-        cacheAction.image = #imageLiteral(resourceName: "emptyDownloads")
-        cacheAction.backgroundColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
+        cacheAction.image = cache.isEmpty ? #imageLiteral(resourceName: "menu-downloads") : #imageLiteral(resourceName: "nowPlayingCheckmark")
+        cacheAction.backgroundColor = cache.isEmpty ? #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1) : #colorLiteral(red: 0.501960814, green: 0.501960814, blue: 0.501960814, alpha: 1)
         deleteAction.backgroundColor = #colorLiteral(red: 0.812063769, green: 0.04556301224, blue: 0, alpha: 1)
         return UISwipeActionsConfiguration(actions: [deleteAction, cacheAction])
     }
@@ -303,39 +312,17 @@ extension PlaylistViewController: UITableViewDelegate {
             activityIndicator.startAnimating()
             activityIndicator.isHidden = false
             currentItem = indexPath.row
-            Playlist.shared.currentlyPlayingInfo.value = self.playlistItems[currentItem]
+            
             let item = self.playlistItems[indexPath.row]
-            let cache = Playlist.shared.getCache(item: item)
-            
             infoLabel.text = item.name
-            
-            if cache.isEmpty {
-                if let url = URL(string: item.src) {
-                    self.playerView.load(url: url, resourceDelegate: nil)
-                    self.activityIndicator.stopAnimating()
-                } else {
-                    webLoader = PlaylistWebLoader(handler: { [weak self] item in
-                        guard let self = self else { return }
-                        if let item = item, let url = URL(string: item.src) {
-                            self.playerView.load(url: url, resourceDelegate: nil)
-                            self.activityIndicator.stopAnimating()
-                        } else {
-                            self.activityIndicator.stopAnimating()
-                            self.displayLoadingResourceError()
-                        }
-                    })
-                    
-                    if let url = URL(string: item.pageSrc) {
-                        webLoader.load(url: url)
-                    } else {
-                        self.displayLoadingResourceError()
-                    }
-                }
-            } else {
-                self.cacheLoader = PlaylistCacheLoader(cacheData: cache)
-                let url = URL(string: "brave-media-ios://local-media-resource?time=\(Date().timeIntervalSince1970)")!
-                self.playerView.load(url: url, resourceDelegate: self.cacheLoader)
+            CarplayMediaManager.shared.loadMediaItem(item) { [weak self] error in
+                guard let self = self else { return }
                 self.activityIndicator.stopAnimating()
+                
+                if let error = error {
+                    log.error(error)
+                    self.displayLoadingResourceError()
+                }
             }
         }
         

@@ -15,6 +15,24 @@ class Playlist {
     
     public var currentlyPlayingInfo = Observable<PlaylistInfo?>(nil)
     
+    func updateItem(mediaSrc: String, item: PlaylistInfo, completion: @escaping () -> Void) {
+        if self.itemExists(item: item) {
+            self.backgroundContext.perform {
+                let request: NSFetchRequest<PlaylistItem> = PlaylistItem.fetchRequest()
+                request.predicate = NSPredicate(format: "mediaSrc == %@", mediaSrc)
+                
+                (try? self.backgroundContext.fetch(request))?.forEach({
+                    $0.mediaSrc = item.src
+                })
+                
+                self.saveContext(self.backgroundContext)
+                completion()
+            }
+        } else {
+            self.addItem(item: item, cachedData: nil, completion: completion)
+        }
+    }
+    
     func addItem(item: PlaylistInfo, cachedData: Data?, completion: @escaping () -> Void) {
         if !self.itemExists(item: item) {
             self.backgroundContext.perform { [weak self] in
@@ -39,7 +57,7 @@ class Playlist {
     }
     
     func removeItem(item: PlaylistInfo) {
-        if !self.itemExists(item: item) {
+        if self.itemExists(item: item) {
             self.backgroundContext.performAndWait { [weak self] in
                 guard let self = self else { return }
                 let request = { () -> NSBatchDeleteRequest in
