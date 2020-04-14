@@ -17,11 +17,16 @@ class AdblockRustEngine {
         let thirdPartyRequest = requestHost != sourceHost
         
         var emptyPointer: UnsafeMutablePointer<Int8>?
+        var match = false
         
-        return engine_match(engine, requestUrl, requestHost,
-                                 sourceHost, thirdPartyRequest, "script",
-                                 &explicitCancel, &savedFromException,
-                                 UnsafeMutablePointer(mutating: &emptyPointer))
+        withUnsafeMutablePointer(to: &emptyPointer) {
+            match = engine_match(engine, requestUrl, requestHost,
+            sourceHost, thirdPartyRequest, "script",
+            &explicitCancel, &savedFromException,
+            UnsafeMutablePointer(mutating: $0))
+        }
+        
+        return match
     }
     
     @discardableResult func set(data: Data) -> Bool {
