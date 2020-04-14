@@ -263,9 +263,6 @@ extension PlaylistViewController: UITableViewDelegate {
                             return
                         }
                         
-                        action.image = #imageLiteral(resourceName: "nowPlayingCheckmark")
-                        action.backgroundColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
-                        
                         self.currentItem = -1
                         Playlist.shared.currentlyPlayingInfo.value = nil
                         //currentItem.mimeType = response?.mimeType
@@ -292,6 +289,7 @@ extension PlaylistViewController: UITableViewDelegate {
             if self.currentItem == indexPath.row {
                 self.currentItem = -1
                 Playlist.shared.currentlyPlayingInfo.value = nil
+                self.activityIndicator.stopAnimating()
                 self.playerView.stop()
             }
             
@@ -302,7 +300,7 @@ extension PlaylistViewController: UITableViewDelegate {
         })
 
         cacheAction.image = cache.isEmpty ? #imageLiteral(resourceName: "menu-downloads") : #imageLiteral(resourceName: "nowPlayingCheckmark")
-        cacheAction.backgroundColor = cache.isEmpty ? #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1) : #colorLiteral(red: 0.501960814, green: 0.501960814, blue: 0.501960814, alpha: 1)
+        cacheAction.backgroundColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
         deleteAction.backgroundColor = #colorLiteral(red: 0.812063769, green: 0.04556301224, blue: 0, alpha: 1)
         return UISwipeActionsConfiguration(actions: [deleteAction, cacheAction])
     }
