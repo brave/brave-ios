@@ -107,7 +107,8 @@ class NTPDataSource {
         let (backgroundSet, backgroundType, strategy) = {
             () -> ([NTPBackground], BackgroundType, ImageRotationStrategy) in
             
-            if let theme = customTheme, let refCode = theme.refCode,
+            if let theme = customTheme,
+                let refCode = theme.refCode,
                 Preferences.NewTabPage.selectedCustomTheme.value != nil {
                 return (theme.wallpapers, .withQRCode(refCode), .randomOrderAvoidDuplicates)
             }
@@ -117,9 +118,9 @@ class NTPDataSource {
                     && backgroundRotationCounter == NTPDataSource.sponsorshipShowValue
                     && !PrivateBrowsingManager.shared.isPrivateBrowsing
                 
-                return attemptSponsored ?
-                    (sponsor.wallpapers, .withBrandLogo(sponsor.logo), .sponsoredRotation)
-                    : (standardBackgrounds, .regular, .randomOrderAvoidDuplicates)
+                if attemptSponsored {
+                    return (sponsor.wallpapers, .withBrandLogo(sponsor.logo), .sponsoredRotation)
+                }
             }
             
             return (standardBackgrounds, .regular, .randomOrderAvoidDuplicates)
