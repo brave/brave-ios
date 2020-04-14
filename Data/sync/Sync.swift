@@ -389,8 +389,10 @@ extension Sync {
             return
         }
         
-        if recordType == .bookmark && baseSyncOrder == nil {
+        // Don't send local base sync order bookmarks by mistake, should never happen at this point.
+        if recordType == .bookmark && baseSyncOrder.starts(with: "0.0") {
             log.error("Base sync order is nil.")
+            assertionFailure()
             completion?(nil)
             return
         }
