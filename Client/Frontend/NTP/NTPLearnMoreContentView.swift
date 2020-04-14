@@ -121,17 +121,17 @@ extension NTPLearnMoreViewController {
             stackView.axis = .vertical
             stackView.spacing = 8
             
-            [separator(), learnMoreButton, separator(), hideSponsoredImageButton, separator()]
-                .forEach(stackView.addArrangedSubview(_:))
-        }
-        
-        private func separator() -> UIView {
-            UIView().then {
-                $0.backgroundColor = UIColor(white: 0.8, alpha: 1.0)
-                $0.snp.makeConstraints { v in
-                    v.height.equalTo(1)
+            func separator() -> UIView {
+                return UIView().then {
+                    $0.backgroundColor = UIColor(white: 0.8, alpha: 1.0)
+                    $0.snp.makeConstraints { v in
+                        v.height.equalTo(1)
+                    }
                 }
             }
+            
+            [separator(), learnMoreButton, separator(), hideSponsoredImageButton, separator()]
+                .forEach(stackView.addArrangedSubview(_:))
         }
         
         private let learnMoreButton = secondaryButton(title: nil).then {
