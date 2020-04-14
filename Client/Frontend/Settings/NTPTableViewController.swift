@@ -46,8 +46,6 @@ class NTPTableViewController: TableViewController {
         if BraveAds.isCurrentLocaleSupported() {
             rows.append(sponsoredRow)
         }
-        rows.append(.boolRow(title: Strings.newTabPageSettingsAutoOpenKeyboard,
-                             option: Preferences.NewTabPage.autoOpenKeyboard))
         return Section(rows: rows)
     }()
     

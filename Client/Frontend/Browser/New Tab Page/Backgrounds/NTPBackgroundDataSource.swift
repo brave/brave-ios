@@ -7,9 +7,11 @@ import Shared
 import BraveShared
 import BraveRewards
 
+typealias NTPBackground = (wallpaper: NTPBackgroundDataSource.Background, sponsor: NTPBackgroundDataSource.Sponsor?)
+
 class NTPBackgroundDataSource {
     
-    struct Background: Codable {
+    class Background: Codable {
         let imageUrl: String
         
         /// Required instead of `CGPoint` due to x/y being optionals
@@ -44,9 +46,14 @@ class NTPBackgroundDataSource {
         }()
     }
     
-    struct Sponsor: Codable {
+    class Sponsor: Codable {
         let wallpapers: [Background]
         var logo: Logo
+        
+        init(wallpapers: [Background], logo: Logo) {
+            self.wallpapers = wallpapers
+            self.logo = logo
+        }
         
         struct Logo: Codable {
             let imageUrl: String
@@ -118,7 +125,7 @@ class NTPBackgroundDataSource {
     // This can 'easily' be adjusted to support both sets by switching to String, and using filePath to identify uniqueness.
     private var lastBackgroundChoices = [Int]()
     
-    func newBackground() -> (Background, Sponsor?)? {
+    func newBackground() -> NTPBackground? {
         if !Preferences.NewTabPage.backgroundImages.value { return nil }
         
         // Identifying the background array to use

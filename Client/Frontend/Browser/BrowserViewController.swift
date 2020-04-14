@@ -42,7 +42,8 @@ private struct BrowserViewControllerUX {
 }
 
 class BrowserViewController: UIViewController {
-    var favoritesViewController: FavoritesViewController?
+//    var favoritesViewController: FavoritesViewController?
+    var favoritesViewController: NewTabPageViewController?
     var webViewContainer: UIView!
     var topToolbar: TopToolbarView!
     var tabsBar: TabsBarViewController!
@@ -680,7 +681,7 @@ class BrowserViewController: UIViewController {
         
         updateTabCountUsingTabManager(tabManager)
         clipboardBarDisplayHandler?.checkIfShouldDisplayBar()
-        favoritesViewController?.updateDuckDuckGoVisibility()
+//        favoritesViewController?.updateDuckDuckGoVisibility()
         
         if let tabId = tabManager.selectedTab?.rewardsId, rewards.ledger.selectedTabId == 0 {
             rewards.ledger.selectedTabId = tabId
@@ -969,13 +970,18 @@ class BrowserViewController: UIViewController {
         homePanelIsInline = inline
 
         if favoritesViewController == nil {
-            let homePanelController = FavoritesViewController(profile: profile,
-                                                              fromOverlay: !inline,
-                                                              rewards: rewards,
-                                                              backgroundDataSource: backgroundDataSource)
+            let homePanelController = NewTabPageViewController(tab: tabManager.selectedTab!,
+                                                               profile: profile,
+                                                               backgroundDataSource: backgroundDataSource,
+                                                               rewards: rewards)
             homePanelController.delegate = self
-            homePanelController.view.alpha = 0
-            homePanelController.applyTheme(Theme.of(tabManager.selectedTab))
+//            let homePanelController = FavoritesViewController(profile: profile,
+//                                                              fromOverlay: !inline,
+//                                                              rewards: rewards,
+//                                                              backgroundDataSource: backgroundDataSource)
+//            homePanelController.delegate = self
+//            homePanelController.view.alpha = 0
+//            homePanelController.applyTheme(Theme.of(tabManager.selectedTab))
 
             self.favoritesViewController = homePanelController
 
@@ -1405,7 +1411,7 @@ class BrowserViewController: UIViewController {
         let freshTab = tabManager.selectedTab
         
         // Focus field only if requested and background images are not supported
-        if attemptLocationFieldFocus && Preferences.NewTabPage.autoOpenKeyboard.value {
+        if attemptLocationFieldFocus {
             DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(300)) {
                 // Without a delay, the text field fails to become first responder
                 // Check that the newly created tab is still selected.
@@ -1922,6 +1928,10 @@ extension BrowserViewController: ToolbarDelegate {
         topToolbar.tabLocationViewDidTapLocation(topToolbar.locationView)
     }
     
+    @objc func closeTemp() {
+        dismiss(animated: true)
+    }
+    
     func tabToolbarDidPressBack(_ tabToolbar: ToolbarProtocol, button: UIButton) {
         tabManager.selectedTab?.goBack()
     }
@@ -2317,20 +2327,6 @@ extension BrowserViewController: TabManagerDelegate {
         }
 
         updateInContentHomePanel(selected?.url as URL?)
-        
-        // Kind of a goofy work around for specific edge-case
-        // If creating a new tab from the tab tray, the focus behavior is kind of weird.
-        // Also, due to the significant time required before url focus (closing tab tray, creating tab, selecting)
-        //   the time delay here is pretty significant, hence a check inside to prevent highlighting the url bar
-        //   if the user navigated to a new tab.
-        if Preferences.NewTabPage.autoOpenKeyboard.value {
-            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(800)) {
-                // Only highlight location bar if still on a NTP.
-                if tabManager.selectedTab?.url?.isAboutHomeURL == true {
-                    self.focusLocationField()
-                }
-            }
-        }
     }
 
     func tabManager(_ tabManager: TabManager, willAddTab tab: Tab) {
@@ -3349,6 +3345,27 @@ extension BrowserViewController: ToolbarUrlActionsDelegate {
                 arrowDirection: [.up]
             )
         }
+    }
+}
+
+extension BrowserViewController: NewTabPageDelegate {
+    func navigateToInput(_ input: String, inNewTab: Bool, switchingToPrivateMode: Bool) {
+        let isPrivate = PrivateBrowsingManager.shared.isPrivateBrowsing || switchingToPrivateMode
+        if inNewTab {
+            tabManager.addTabAndSelect(isPrivate: isPrivate)
+        }
+        processAddressBar(text: input, visitType: .bookmark)
+    }
+    
+    func focusURLBar() {
+        focusLocationField()
+    }
+    
+    func tappedDuckDuckGoCallout() {
+        presentDuckDuckGoCallout(force: true)
+    }
+    
+    func brandedImageCalloutActioned(_ state: BrandedImageCalloutState) {
     }
 }
 

@@ -183,16 +183,9 @@ class FavoritesViewController: UIViewController, Themeable {
         
         super.init(nibName: nil, bundle: nil)
         NotificationCenter.default.do {
-            $0.addObserver(self, selector: #selector(existingUserTopSitesConversion), 
-                           name: .topSitesConversion, object: nil)
             $0.addObserver(self, selector: #selector(privateBrowsingModeChanged), 
                            name: .privacyModeChanged, object: nil)
         }
-    }
-    
-    @objc func existingUserTopSitesConversion() {
-        dataSource.refetch()
-        collection.reloadData()
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -201,7 +194,6 @@ class FavoritesViewController: UIViewController, Themeable {
     
     deinit {
         NotificationCenter.default.do {
-            $0.removeObserver(self, name: .topSitesConversion, object: nil)
             $0.removeObserver(self, name: .privacyModeChanged, object: nil)
         }
         

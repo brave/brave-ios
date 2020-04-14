@@ -44,6 +44,9 @@ class FavoriteCell: UICollectionViewCell {
         $0.contentMode = .scaleAspectFit
         $0.clipsToBounds = true
         $0.layer.cornerRadius = UI.cornerRadius
+        if #available(iOS 13.0, *) {
+            $0.layer.cornerCurve = .continuous
+        }
         $0.layer.borderColor = BraveUX.faviconBorderColor.cgColor
         $0.layer.borderWidth = BraveUX.faviconBorderWidth
         $0.layer.minificationFilter = CALayerContentsFilter.trilinear
@@ -67,12 +70,19 @@ class FavoriteCell: UICollectionViewCell {
         $0.layer.masksToBounds = true
     }
     
-    override var isSelected: Bool {
-        didSet { updateSelectedHighlightedState() }
+    override var isHighlighted: Bool {
+        didSet {
+            UIView.animate(withDuration: 0.25, delay: 0, options: [.beginFromCurrentState], animations: {
+                self.imageView.alpha = self.isHighlighted ? 0.7 : 1.0
+            })
+        }
     }
     
-    override var isHighlighted: Bool {
-        didSet { updateSelectedHighlightedState() }
+    let stackView = UIStackView().then {
+        $0.axis = .vertical
+        $0.spacing = 8
+        $0.alignment = .center
+        $0.isUserInteractionEnabled = false
     }
     
     override init(frame: CGRect) {
@@ -83,29 +93,29 @@ class FavoriteCell: UICollectionViewCell {
         
         isAccessibilityElement = true
         
-        contentView.addSubview(imageView)
-        contentView.addSubview(textLabel)
-        contentView.addSubview(editButton)
+        contentView.addSubview(stackView)
+        stackView.addArrangedSubview(imageView)
+        stackView.addArrangedSubview(textLabel)
         
-        textLabel.snp.remakeConstraints { make in
-            // TODO: relook at insets
-            make.left.right.equalTo(self.contentView).inset(UI.labelInsets)
-            make.top.equalTo(imageView.snp.bottom).offset(5)
+        imageView.snp.makeConstraints {
+            $0.height.equalTo(imageView.snp.width)
+            $0.leading.trailing.equalToSuperview().inset(12)
         }
-        
-        imageView.snp.remakeConstraints { make in
-            make.top.equalTo(self.contentView).inset(8)
-            make.right.left.equalTo(self.contentView).inset(16)
-            make.height.equalTo(imageView.snp.width)
+        stackView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
         }
         
         // Prevents the textLabel from getting squished in relation to other view priorities.
-        textLabel.setContentCompressionResistancePriority(UILayoutPriority.defaultHigh, for: NSLayoutConstraint.Axis.vertical)
+        textLabel.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
         
         editButton.addTarget(self, action: #selector(editButtonTapped), for: .touchUpInside)
         
         NotificationCenter.default.addObserver(self, selector: #selector(showEditMode), name: .thumbnailEditOn, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(hideEditMode), name: .thumbnailEditOff, object: nil)
+        
+        if #available(iOS 13.4, *) {
+            addInteraction(UIPointerInteraction(delegate: self))
+        }
     }
     
     deinit {
@@ -169,5 +179,19 @@ class FavoriteCell: UICollectionViewCell {
                 self.editButton.isHidden = true
             }
         })
+    }
+    
+    override func preferredLayoutAttributesFitting(_ layoutAttributes: UICollectionViewLayoutAttributes) -> UICollectionViewLayoutAttributes {
+        let attributes = super.preferredLayoutAttributesFitting(layoutAttributes)
+        attributes.size = stackView.systemLayoutSizeFitting(layoutAttributes.size, withHorizontalFittingPriority: .required, verticalFittingPriority: .fittingSizeLevel)
+        return attributes
+    }
+}
+
+@available(iOS 13.4, *)
+extension FavoriteCell: UIPointerInteractionDelegate {
+    func pointerInteraction(_ interaction: UIPointerInteraction, styleFor region: UIPointerRegion) -> UIPointerStyle? {
+        let preview = UITargetedPreview(view: imageView)
+        return UIPointerStyle(effect: .highlight(preview))
     }
 }
