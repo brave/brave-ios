@@ -261,15 +261,7 @@ extension BrowserViewController: WKNavigationDelegate {
             
             // Prevents synthetically activated links such as: CVE-2017-7089
             //Follow desktop
-            /*
-            User explicitly entering/pasting “data:…” into the address bar
-            Opening all plain text data files
-            Opening “data:image/*” in top-level window, unless it’s “data:image/svg+xml”
-            Opening “data:application/pdf” and “data:application/json”
-            Downloading a data: URL, e.g. ‘save-link-as’ of “data:…”
- 
-            https://blog.mozilla.org/security/2017/11/27/blocking-top-level-navigations-data-urls-firefox-59/
-            */
+            //https://blog.mozilla.org/security/2017/11/27/blocking-top-level-navigations-data-urls-firefox-59
             
             if url.scheme == "data" {
                 do {
