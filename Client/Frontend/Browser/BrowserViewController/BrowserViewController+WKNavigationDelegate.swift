@@ -261,9 +261,54 @@ extension BrowserViewController: WKNavigationDelegate {
             
             // Prevents synthetically activated links such as: CVE-2017-7089
             //Follow desktop
+            /*
+            User explicitly entering/pasting “data:…” into the address bar
+            Opening all plain text data files
+            Opening “data:image/*” in top-level window, unless it’s “data:image/svg+xml”
+            Opening “data:application/pdf” and “data:application/json”
+            Downloading a data: URL, e.g. ‘save-link-as’ of “data:…”
+ 
+            https://blog.mozilla.org/security/2017/11/27/blocking-top-level-navigations-data-urls-firefox-59/
+            */
+            
             if url.scheme == "data" {
-                decisionHandler(.cancel)
-                return
+                do {
+                    //A click is synthetic if its value is 0 (aka WKSyntheticClickTypeNoTap).
+                    //Or if its navigationType is "other".
+                    if let clickType = navigationAction.value(forKey: "syntheticClickType") as? Int, clickType == 0 || navigationAction.navigationType == .other {
+                        /*case WebKit::WebMouseEvent::OneFingerTap:
+                            return WKSyntheticClickTypeOneFingerTap;
+                        case WebKit::WebMouseEvent::TwoFingerTap:
+                            return WKSyntheticClickTypeTwoFingerTap;
+                        }*/
+                        return decisionHandler(.cancel)
+                    }
+                    
+                    let allowedMimeTypes = ["image", "text/json",
+                                            "text/plain", "text/css",
+                                            "audio", "video",
+                                            "application",
+                                            "application/pdf", "application/json"]
+                    
+                    let blockedMimeTypes = ["image/svg+xml", "text/html",
+                                            "text/xhtml", "text/xml",
+                                            "application/xhtml", "application/html",
+                                            "application/xml"
+                    ]
+                    
+                    let URIInfo = try DataURIParser(uri: url.absoluteString)
+                    if blockedMimeTypes.contains(URIInfo.mediaType) {
+                        return decisionHandler(.cancel)
+                    }
+                    
+                    if allowedMimeTypes.contains(URIInfo.mediaType) {
+                        return decisionHandler(.allow)
+                    }
+                    
+                    return decisionHandler(.cancel)
+                } catch {
+                    return
+                }
             }
             
             decisionHandler(.allow)
