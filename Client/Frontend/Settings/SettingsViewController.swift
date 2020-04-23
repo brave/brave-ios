@@ -49,7 +49,6 @@ protocol SettingsDelegate: class {
     func settingsOpenURLs(_ urls: [URL])
     func settingsDidFinish(_ settingsViewController: SettingsViewController)
     func settingsOpenRewardsSettings(_ settingsViewController: SettingsViewController)
-    func settingsDidChangeTheme(themeID: String?)
 }
 
 class SettingsViewController: TableViewController {
@@ -143,20 +142,23 @@ class SettingsViewController: TableViewController {
             rows: []
         )
         
-        display.rows.append(Row(text: Strings.themesSettings, selection: { [weak self] in
-            let vc = ThemesSettingsViewController(style: .grouped)
-            vc.themeApplied = { [weak self] in
-                guard let self = self else { return }
-                self.applyTheme(self.theme)
-            }
-            
-            vc.themeChanged = { [weak self] themeId in
-                self?.settingsDelegate?.settingsDidChangeTheme(themeID: themeId)
-            }
-            
-            self?.navigationController?.pushViewController(vc, animated: true)
-        }, accessory: .disclosureIndicator,
-           cellClass: MultilineValue1Cell.self))
+        let themeSubtitle = Theme.DefaultTheme(rawValue: Preferences.General.themeNormalMode.value)?.displayString
+        var row = Row(text: Strings.themesDisplayBrightness, detailText: themeSubtitle, accessory: .disclosureIndicator, cellClass: MultilineSubtitleCell.self)
+        row.selection = { [unowned self] in
+            let optionsViewController = OptionSelectionViewController<Theme.DefaultTheme>(
+                options: Theme.DefaultTheme.normalThemesOptions,
+                selectedOption: Theme.DefaultTheme(rawValue: Preferences.General.themeNormalMode.value),
+                optionChanged: { [unowned self] _, option in
+                    Preferences.General.themeNormalMode.value = option.rawValue
+                    self.dataSource.reloadCell(row: row, section: display, displayText: option.displayString)
+                    self.applyTheme(self.theme)
+                }
+            )
+            optionsViewController.headerText = Strings.themesDisplayBrightness
+            optionsViewController.footerText = Strings.themesDisplayBrightnessFooter
+            self.navigationController?.pushViewController(optionsViewController, animated: true)
+        }
+        display.rows.append(row)
         
         display.rows.append(Row(text: Strings.NTP.settingsTitle,
             selection: { [unowned self] in
