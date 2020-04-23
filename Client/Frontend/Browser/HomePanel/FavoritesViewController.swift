@@ -61,7 +61,7 @@ class FavoritesViewController: UIViewController, Themeable {
     private lazy var favoritesOverflowButton = RoundInterfaceView().then {
         let blur = UIVisualEffectView(effect: UIBlurEffect(style: .light))
         let button = UIButton(type: .system).then {
-            $0.setTitle(Strings.newTabPageShowMoreFavorites, for: .normal)
+            $0.setTitle(Strings.NTP.showMoreFavorites, for: .normal)
             $0.appearanceTextColor = .white
             $0.titleLabel?.font = UIFont.systemFont(ofSize: 12.0, weight: .medium)
             $0.addTarget(self, action: #selector(showFavorites), for: .touchUpInside)

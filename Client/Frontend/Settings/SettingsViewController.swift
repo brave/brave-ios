@@ -36,6 +36,12 @@ extension DataSource {
         }
         return IndexPath(row: row, section: section)
     }
+    
+    func reloadCell(row: Row, section: Section, displayText: String) {
+        if let indexPath = indexPath(rowUUID: row.uuid, sectionUUID: section.uuid) {
+            sections[indexPath.section].rows[indexPath.row].detailText = displayText
+        }
+    }
 }
 
 protocol SettingsDelegate: class {
@@ -137,12 +143,6 @@ class SettingsViewController: TableViewController {
             rows: []
         )
         
-        let reloadCell = { (row: Row, displayString: String) in
-            if let indexPath = self.dataSource.indexPath(rowUUID: row.uuid, sectionUUID: display.uuid) {
-                self.dataSource.sections[indexPath.section].rows[indexPath.row].detailText = displayString
-            }
-        }
-        
         display.rows.append(Row(text: Strings.themesSettings, selection: { [weak self] in
             let vc = ThemesSettingsViewController(style: .grouped)
             vc.themeApplied = { [weak self] in
@@ -158,7 +158,7 @@ class SettingsViewController: TableViewController {
         }, accessory: .disclosureIndicator,
            cellClass: MultilineValue1Cell.self))
         
-        display.rows.append(Row(text: Strings.newTabPageSettingsTitle,
+        display.rows.append(Row(text: Strings.NTP.settingsTitle,
             selection: { [unowned self] in
                 self.navigationController?.pushViewController(NTPTableViewController(), animated: true)
             },
@@ -179,7 +179,7 @@ class SettingsViewController: TableViewController {
                     selectedOption: TabBarVisibility(rawValue: Preferences.General.tabBarVisibility.value),
                     optionChanged: { _, option in
                         Preferences.General.tabBarVisibility.value = option.rawValue
-                        reloadCell(row, option.displayString)
+                        self.dataSource.reloadCell(row: row, section: display, displayText: option.displayString)
                     }
                 )
                 optionsViewController.headerText = Strings.showTabsBar
