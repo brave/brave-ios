@@ -289,6 +289,7 @@ class FavoritesViewController: UIViewController, Themeable {
         
         Preferences.NewTabPage.backgroundImages.observe(from: self)
         Preferences.NewTabPage.backgroundSponsoredImages.observe(from: self)
+        Preferences.NewTabPage.selectedCustomTheme.observe(from: self)
         
         // Doens't this get called twice?
         collectionContentSizeObservation = collection.observe(\.contentSize, options: [.new, .initial]) { [weak self] _, _ in

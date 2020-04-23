@@ -144,9 +144,12 @@ class NTPDataSource {
                 let availableBackgroundIndeces = availableRange.filter {
                     !self.lastBackgroundChoices.contains($0)
                 }
+                // Due to how many display modes currently exist, the background avoidance counter may get utilized on a smaller subset.
+                // This can be repro by swapping between normal backgrounds and a super referrer, where all available indeces get squeezed out, resulting in an empty set.
+                // To avoid issues, first fallback results in full set.
+                
                 // Chooses a new random index to use from the available indeces
-                // -1 will result in a `nil` return
-                let chosenIndex = availableBackgroundIndeces.randomElement() ?? -1
+                let chosenIndex = availableBackgroundIndeces.randomElement() ?? availableRange.randomElement() ?? -1
                 assert(chosenIndex >= 0, "NTP index was nil, this is terrible.")
                 assert(chosenIndex < backgroundSet.count, "NTP index is too large, BAD!")
                 
