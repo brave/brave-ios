@@ -118,6 +118,8 @@ class NewTabPageViewController: UIViewController, Themeable {
             StatsSectionProvider(),
             FavoritesSectionProvider(action: { [weak self] bookmark, action in
                 self?.handleBookmarkAction(bookmark: bookmark, action: action)
+            }, legacyLongPressAction: { [weak self] alertController in
+                self?.present(alertController, animated: true)
             }),
             FavoritesOverflowSectionProvider(action: { [weak self] in
                 self?.delegate?.focusURLBar()

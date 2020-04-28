@@ -110,9 +110,6 @@ class FavoritesDataSource: NSObject, UICollectionViewDataSource {
             }
         })
         cell.accessibilityLabel = cell.textLabel.text
-
-        cell.toggleEditButton(isEditing)
-        
         return cell
     }
 }

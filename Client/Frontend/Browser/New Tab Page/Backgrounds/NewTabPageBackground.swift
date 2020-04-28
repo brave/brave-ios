@@ -9,10 +9,10 @@ import BraveUI
 
 /// The current background for a given New Tab Page.
 ///
-/// This class is responsable for providing the background image for 1 new tab
-/// page, and altering this based on changes from outside of the NTP such as
-/// the user changing Private Mode or disabling the background images prefs
-/// while the user is currently viewing a New Tab Page.
+/// This class is responsable for providing the background image for a new tab
+/// page, and altering said background based on changes from outside of the NTP
+/// such as the user changing Private Mode or disabling the background images
+/// prefs while the user is currently viewing a New Tab Page.
 class NewTabPageBackground: PreferencesObserver {
     /// The source of new tab page backgrounds
     private let dataSource: NTPBackgroundDataSource

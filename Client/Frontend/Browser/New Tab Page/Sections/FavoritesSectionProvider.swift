@@ -19,11 +19,15 @@ enum BookmarksAction {
 class FavoritesSectionProvider: NSObject, NTPObservableSectionProvider {
     var sectionDidChange: (() -> Void)?
     var action: (Bookmark, BookmarksAction) -> Void
+    var legacyLongPressAction: (UIAlertController) -> Void
     
     private var frc: NSFetchedResultsController<Bookmark>
     
-    init(action: @escaping (Bookmark, BookmarksAction) -> Void) {
+    init(action: @escaping (Bookmark, BookmarksAction) -> Void,
+         legacyLongPressAction: @escaping (UIAlertController) -> Void) {
         self.action = action
+        self.legacyLongPressAction = legacyLongPressAction
+        
         frc = Bookmark.frc(forFavorites: true, parentFolder: nil)
         super.init()
         frc.fetchRequest.fetchLimit = 6
@@ -73,7 +77,35 @@ class FavoritesSectionProvider: NSObject, NTPObservableSectionProvider {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         // swiftlint:disable:next force_cast
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FavoriteCell.identifier, for: indexPath) as! FavoriteCell
-        return configureCell(cell: cell, at: indexPath)
+        let fav = frc.object(at: IndexPath(item: indexPath.item, section: 0))
+        cell.textLabel.text = fav.displayTitle ?? fav.url
+        cell.imageView.setIconMO(nil, forURL: URL(string: fav.url ?? ""), scaledDefaultIconSize: CGSize(width: 40, height: 40), completed: { (color, url) in
+            if fav.url == url?.absoluteString {
+                cell.imageView.backgroundColor = color
+            }
+        })
+        cell.accessibilityLabel = cell.textLabel.text
+        cell.longPressed = { [weak self] cell in
+            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+            
+            let edit = UIAlertAction(title: Strings.editBookmark, style: .default) { (action) in
+                self?.action(fav, .edited)
+            }
+            let delete = UIAlertAction(title: Strings.removeFavorite, style: .destructive) { (action) in
+                fav.delete()
+            }
+            
+            alert.addAction(edit)
+            alert.addAction(delete)
+            
+            alert.popoverPresentationController?.sourceView = cell
+            alert.popoverPresentationController?.permittedArrowDirections = [.down, .up]
+            alert.addAction(UIAlertAction(title: Strings.close, style: .cancel, handler: nil))
+            
+            UIImpactFeedbackGenerator(style: .medium).bzzt()
+            self?.legacyLongPressAction(alert)
+        }
+        return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -134,22 +166,6 @@ class FavoritesSectionProvider: NSObject, NTPObservableSectionProvider {
                 return nil
         }
         return UITargetedPreview(view: cell.imageView)
-    }
-    
-    @discardableResult
-    fileprivate func configureCell(cell: FavoriteCell, at indexPath: IndexPath) -> UICollectionViewCell {
-        let fav = frc.object(at: IndexPath(item: indexPath.item, section: 0))
-        
-        cell.textLabel.text = fav.displayTitle ?? fav.url
-        cell.imageView.setIconMO(nil, forURL: URL(string: fav.url ?? ""), scaledDefaultIconSize: CGSize(width: 40, height: 40), completed: { (color, url) in
-            if fav.url == url?.absoluteString {
-                cell.imageView.backgroundColor = color
-            }
-        })
-        cell.accessibilityLabel = cell.textLabel.text
-        //        cell.toggleEditButton(isEditing)
-        
-        return cell
     }
 }
 

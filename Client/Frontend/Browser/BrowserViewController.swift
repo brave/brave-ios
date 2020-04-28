@@ -1928,10 +1928,6 @@ extension BrowserViewController: ToolbarDelegate {
         topToolbar.tabLocationViewDidTapLocation(topToolbar.locationView)
     }
     
-    @objc func closeTemp() {
-        dismiss(animated: true)
-    }
-    
     func tabToolbarDidPressBack(_ tabToolbar: ToolbarProtocol, button: UIButton) {
         tabManager.selectedTab?.goBack()
     }

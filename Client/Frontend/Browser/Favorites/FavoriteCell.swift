@@ -31,6 +31,8 @@ class FavoriteCell: UICollectionViewCell {
     var imageInsets: UIEdgeInsets = UIEdgeInsets.zero
     var cellInsets: UIEdgeInsets = UIEdgeInsets.zero
     
+    var longPressed: ((FavoriteCell) -> Void)?
+    
     let textLabel = UILabel().then {
         $0.setContentHuggingPriority(UILayoutPriority.defaultHigh, for: NSLayoutConstraint.Axis.vertical)
         $0.font = DynamicFontHelper.defaultHelper.DefaultSmallFont
@@ -51,23 +53,6 @@ class FavoriteCell: UICollectionViewCell {
         $0.layer.borderWidth = BraveUX.faviconBorderWidth
         $0.layer.minificationFilter = CALayerContentsFilter.trilinear
         $0.layer.magnificationFilter = CALayerContentsFilter.nearest
-    }
-    
-    let editButton = UIButton().then {
-        $0.isExclusiveTouch = true
-        let removeButtonImage = #imageLiteral(resourceName: "edit-small").template
-        $0.setImage(removeButtonImage, for: .normal)
-        $0.accessibilityLabel = Strings.editBookmark
-        $0.isHidden = true
-        $0.backgroundColor = UX.greyC
-        $0.tintColor = UX.greyI
-        $0.frame.size = CGSize(width: 28, height: 28)
-        let xOffset: CGFloat = 5
-        let buttonCenterX = floor($0.bounds.width/2) + xOffset
-        let buttonCenterY = floor($0.bounds.height/2)
-        $0.center = CGPoint(x: buttonCenterX, y: buttonCenterY)
-        $0.layer.cornerRadius = $0.bounds.width/2
-        $0.layer.masksToBounds = true
     }
     
     override var isHighlighted: Bool {
@@ -108,13 +93,14 @@ class FavoriteCell: UICollectionViewCell {
         // Prevents the textLabel from getting squished in relation to other view priorities.
         textLabel.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
         
-        editButton.addTarget(self, action: #selector(editButtonTapped), for: .touchUpInside)
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(showEditMode), name: .thumbnailEditOn, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(hideEditMode), name: .thumbnailEditOff, object: nil)
-        
         if #available(iOS 13.4, *) {
             addInteraction(UIPointerInteraction(delegate: self))
+        }
+        
+        if #available(iOS 13.0, *) { } else {
+            // iOS 12 long-press support
+            let longPress = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(_:)))
+            addGestureRecognizer(longPress)
         }
     }
     
@@ -123,21 +109,12 @@ class FavoriteCell: UICollectionViewCell {
         NotificationCenter.default.removeObserver(self, name: .thumbnailEditOff, object: nil)
     }
     
-    @objc func showEditMode() {
-        toggleEditButton(true)
-    }
-    
-    @objc func hideEditMode() {
-        toggleEditButton(false)
-    }
-    
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        editButton.isHidden = true
         backgroundColor = UIColor.clear
         imageView.backgroundColor = UIColor.clear
         imageView.image = nil
@@ -151,34 +128,10 @@ class FavoriteCell: UICollectionViewCell {
         self.imageView.alpha = activated ? activatedAlpha : disactivatedAlpha
     }
     
-    @objc func editButtonTapped() {
-        delegate?.editFavorite(self)
-    }
-    
-    func toggleEditButton(_ show: Bool) {
-        // Only toggle if we change state
-        if editButton.isHidden != show {
-            return
+    @objc private func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
+        if gesture.state == .began {
+            longPressed?(self)
         }
-        
-        if show {
-            editButton.isHidden = false
-        }
-        
-        let scaleTransform = CGAffineTransform(scaleX: 0.01, y: 0.01)
-        editButton.transform = show ? scaleTransform : CGAffineTransform.identity
-        UIView.animate(withDuration: UI.editButtonAnimationDuration,
-                       delay: 0,
-                       usingSpringWithDamping: UI.editButtonAnimationDamping,
-                       initialSpringVelocity: 0,
-                       options: UIView.AnimationOptions.allowUserInteraction,
-                       animations: {
-                        self.editButton.transform = show ? CGAffineTransform.identity : scaleTransform
-        }, completion: { _ in
-            if !show {
-                self.editButton.isHidden = true
-            }
-        })
     }
     
     override func preferredLayoutAttributesFitting(_ layoutAttributes: UICollectionViewLayoutAttributes) -> UICollectionViewLayoutAttributes {
