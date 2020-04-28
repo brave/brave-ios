@@ -66,7 +66,7 @@ class NTPTableViewController: TableViewController {
     
     private func moreSetting(section: Section) -> Row {
         var row = Row(
-            text: Strings.NTP.settingsMore,
+            text: Strings.NTP.settingsBackgroundImageSubMenu,
             detailText: selectedItem().displayString,
             accessory: .disclosureIndicator,
             cellClass: MultilineSubtitleCell.self)
@@ -89,7 +89,7 @@ class NTPTableViewController: TableViewController {
                     self.dataSource.reloadCell(row: row, section: section, displayText: option.displayString)
                 }
             )
-            optionsViewController.navigationItem.title = Strings.NTP.settingsMore
+            optionsViewController.navigationItem.title = Strings.NTP.settingsBackgroundImageSubMenu
             self.navigationController?.pushViewController(optionsViewController, animated: true)
         }
         return row
