@@ -21,7 +21,9 @@ struct NTPSponsor: Codable, NTPBackgroundProtocol, NTPThemeable {
 }
 
 /// A background image that can be showed on new tab page.
-struct NTPBackground: Codable {
+/// A class instead of a struct since it includes a mutating property (`image`). If a struct this will lead to any `willSet` / `didSet`
+///     observers being called again, since the struct instance will have been mutated.
+class NTPBackground: Codable {
     let imageUrl: String
     
     /// Required instead of `CGPoint` due to x/y being optionals
