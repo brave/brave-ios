@@ -157,25 +157,25 @@ class FavoritesViewController: UIViewController, Themeable {
     private var backgroundViewInfo: (imageView: UIImageView, portraitCenterConstraint: Constraint, landscapeCenterConstraint: Constraint)?
     private var background: (wallpaper: NTPBackground, backgroundType: NTPDataSource.BackgroundType)? {
         didSet {
+            // Setup defaults
+            var hideQR = true
+            var hideImageCredit = true
+            var hideSponsor = true
             
             switch background?.backgroundType {
             case .regular, .none:
                 if let name = background?.wallpaper.credit?.name {
                     let photoByText = String(format: Strings.photoBy, name)
                     imageCreditInternalButton.setTitle(photoByText, for: .normal)
-                    imageCreditButton.isHidden = false
+                    hideImageCredit = false
                 }
             case .withBrandLogo(let logo):
-                imageCreditButton.isHidden = true
                 if var logo = logo {
                     imageSponsorButton.setImage(logo.image, for: .normal)
-                    imageSponsorButton.isHidden = false
+                    hideSponsor = false
                 }
-                shareWithQRButton.isHidden = true
             case .withQRCode(let code):
-                imageCreditButton.isHidden = true
-                imageSponsorButton.isHidden = true
-                shareWithQRButton.isHidden = false
+                hideQR = false
                 shareWithQRButton.qrButtonTapped = { [weak self] in
                     let referralQueryParam = [URLQueryItem(name: "ref", value: code)]
                     
@@ -186,6 +186,10 @@ class FavoritesViewController: UIViewController, Themeable {
                     self?.delegate?.didTapQRButton(url: url)
                 }
             }
+            
+            shareWithQRButton.isHidden = hideQR
+            imageCreditButton.isHidden = hideImageCredit
+            imageSponsorButton.isHidden = hideSponsor
         }
     }
     
