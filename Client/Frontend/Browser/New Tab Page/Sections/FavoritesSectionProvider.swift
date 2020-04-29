@@ -41,7 +41,7 @@ class FavoritesSectionProvider: NSObject, NTPObservableSectionProvider {
     }
     
     /// The number of times that each row contains
-    func numberOfItems(in collectionView: UICollectionView, availableWidth: CGFloat) -> Int {
+    static func numberOfItems(in collectionView: UICollectionView, availableWidth: CGFloat) -> Int {
         /// Two considerations:
         /// 1. icon size minimum
         /// 2. trait collection
@@ -71,7 +71,7 @@ class FavoritesSectionProvider: NSObject, NTPObservableSectionProvider {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         let fetchedCount = frc.fetchedObjects?.count ?? 0
-        return min(fetchedCount, numberOfItems(in: collectionView, availableWidth: fittingSizeForCollectionView(collectionView, section: section).width))
+        return min(fetchedCount, Self.numberOfItems(in: collectionView, availableWidth: fittingSizeForCollectionView(collectionView, section: section).width))
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -85,7 +85,7 @@ class FavoritesSectionProvider: NSObject, NTPObservableSectionProvider {
             }
         })
         cell.accessibilityLabel = cell.textLabel.text
-        cell.longPressed = { [weak self] cell in
+        cell.longPressHandler = { [weak self] cell in
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
             
             let edit = UIAlertAction(title: Strings.editBookmark, style: .default) { (action) in
@@ -110,7 +110,7 @@ class FavoritesSectionProvider: NSObject, NTPObservableSectionProvider {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let width = fittingSizeForCollectionView(collectionView, section: indexPath.section).width
-        let cellWidth = width / CGFloat(numberOfItems(in: collectionView, availableWidth: width))
+        let cellWidth = width / CGFloat(Self.numberOfItems(in: collectionView, availableWidth: width))
         // The tile's height is determined the aspect ratio of the thumbnails width. We also take into account
         // some padding between the title and the image.
         let scale = 1.0 / UIScreen.main.scale
@@ -125,20 +125,20 @@ class FavoritesSectionProvider: NSObject, NTPObservableSectionProvider {
     @available(iOS 13.0, *)
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
         guard let favourite = frc.fetchedObjects?[indexPath.item] else { return nil }
-        return UIContextMenuConfiguration(identifier: indexPath as NSCopying, previewProvider: nil) { (elemenst) -> UIMenu? in
-            let openInNewTab = UIAction(title: Strings.openNewTabButtonTitle, image: nil, identifier: nil, discoverabilityTitle: nil) { (action) in
+        return UIContextMenuConfiguration(identifier: indexPath as NSCopying, previewProvider: nil) { _ -> UIMenu? in
+            let openInNewTab = UIAction(title: Strings.openNewTabButtonTitle, image: nil, identifier: nil, discoverabilityTitle: nil) { _ in
                 self.action(favourite, .opened(inNewTab: true, switchingToPrivateMode: false))
             }
-            let edit = UIAction(title: Strings.editBookmark, image: nil, identifier: nil, discoverabilityTitle: nil) { (action) in
+            let edit = UIAction(title: Strings.editBookmark, image: nil, identifier: nil, discoverabilityTitle: nil) { _ in
                 self.action(favourite, .edited)
             }
-            let delete = UIAction(title: Strings.removeFavorite, image: nil, identifier: nil, discoverabilityTitle: nil, attributes: .destructive) { (action) in
+            let delete = UIAction(title: Strings.removeFavorite, image: nil, identifier: nil, discoverabilityTitle: nil, attributes: .destructive) { _ in
                 favourite.delete()
             }
             
             var urlChildren: [UIAction] = [openInNewTab]
             if !PrivateBrowsingManager.shared.isPrivateBrowsing {
-                let openInNewPrivateTab = UIAction(title: Strings.openNewPrivateTabButtonTitle, image: nil, identifier: nil, discoverabilityTitle: nil) { (action) in
+                let openInNewPrivateTab = UIAction(title: Strings.openNewPrivateTabButtonTitle, image: nil, identifier: nil, discoverabilityTitle: nil) { _ in
                     self.action(favourite, .opened(inNewTab: true, switchingToPrivateMode: true))
                 }
                 urlChildren.append(openInNewPrivateTab)

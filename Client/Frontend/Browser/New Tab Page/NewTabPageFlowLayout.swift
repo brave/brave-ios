@@ -44,19 +44,25 @@ class NewTabPageFlowLayout: UICollectionViewFlowLayout {
         if estimatedItemSize == UICollectionViewFlowLayout.automaticSize {
             let indexPath = attribute.indexPath
             if collectionView.numberOfItems(inSection: indexPath.section) == 1 {
+                // Obtain section inset/spacing to lay out each cell properly
                 let sectionInset: UIEdgeInsets
                 let minimumInteritemSpacing: CGFloat
                 if let flowLayoutDelegate = collectionView.delegate as? UICollectionViewDelegateFlowLayout {
+                    // If the layout has a delegate to obtain section specific
+                    // info, grab that
                     sectionInset = flowLayoutDelegate.collectionView?(collectionView, layout: self, insetForSectionAt: indexPath.section) ?? self.sectionInset
                     minimumInteritemSpacing = flowLayoutDelegate.collectionView?(collectionView, layout: self, minimumInteritemSpacingForSectionAt: indexPath.section) ?? self.minimumInteritemSpacing
                 } else {
+                    // Otherwise default to the global values defined on the
+                    // layout itself
                     sectionInset = self.sectionInset
                     minimumInteritemSpacing = self.minimumInteritemSpacing
                 }
-
+                // Layout the first item in the secton to far-left
                 if attribute.indexPath.item == 0 {
                     attribute.frame.origin.x = sectionInset.left
                 } else {
+                    // Otherwise layout based on previous item's origin
                     if let previousItemAttribute = layoutAttributesForItem(at: IndexPath(item: indexPath.item - 1, section: indexPath.section)) {
                         attribute.frame.origin.x = previousItemAttribute.frame.maxX + minimumInteritemSpacing
                     }
@@ -79,11 +85,9 @@ class NewTabPageFlowLayout: UICollectionViewFlowLayout {
         guard let attributes = super.layoutAttributesForElements(in: rect) else {
                 return nil
         }
-        attributes.forEach {
-            if $0.representedElementCategory == .cell {
-                if let frame = self.layoutAttributesForItem(at: $0.indexPath)?.frame {
-                    $0.frame = frame
-                }
+        for attribute in attributes where attribute.representedElementCategory == .cell {
+            if let frame = self.layoutAttributesForItem(at: attribute.indexPath)?.frame {
+                attribute.frame = frame
             }
         }
         return attributes

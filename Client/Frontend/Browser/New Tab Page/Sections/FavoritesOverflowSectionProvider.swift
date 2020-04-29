@@ -63,23 +63,6 @@ class FavoritesOverflowCell: NewTabCollectionViewCell<FavoritesOverflowButton> {
 class FavoritesOverflowSectionProvider: NSObject, NTPSectionProvider {
     let action: () -> Void
     
-    func numberOfItems(in collectionView: UICollectionView, availableWidth: CGFloat) -> Int {
-        /// Two considerations:
-        /// 1. icon size minimum
-        /// 2. trait collection
-        
-        let icons = (less: 4, more: 6)
-        let minIconPoints: CGFloat = 80
-        
-        // If icons fall below a certain size, then use less icons.
-        if (availableWidth / CGFloat(icons.more)) < minIconPoints {
-            return icons.less
-        }
-        
-        let cols = collectionView.traitCollection.horizontalSizeClass == .compact ? icons.less : icons.more
-        return cols
-    }
-    
     private var frc: NSFetchedResultsController<Bookmark>
     private var count: Int = 0
     
@@ -101,7 +84,7 @@ class FavoritesOverflowSectionProvider: NSObject, NTPSectionProvider {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         let width = fittingSizeForCollectionView(collectionView, section: section).width
-        return count > numberOfItems(in: collectionView, availableWidth: width) ? 1 : 0
+        return count > FavoritesSectionProvider.numberOfItems(in: collectionView, availableWidth: width) ? 1 : 0
     }
     func registerCells(to collectionView: UICollectionView) {
         collectionView.register(FavoritesOverflowCell.self)
