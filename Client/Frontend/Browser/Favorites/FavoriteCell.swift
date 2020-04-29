@@ -18,12 +18,8 @@ class FavoriteCell: UICollectionViewCell {
     private struct UI {
         /// Ratio of width:height of the thumbnail image.
         static let cornerRadius: CGFloat = 8
-        
+        static let spacing: CGFloat = 8
         static let labelAlignment: NSTextAlignment = .center
-        static let labelInsets = UIEdgeInsets(top: 0, left: 3, bottom: 2, right: 3)
-        
-        static let editButtonAnimationDuration: TimeInterval = 0.4
-        static let editButtonAnimationDamping: CGFloat = 0.6
     }
     
     weak var delegate: FavoriteCellDelegate?
@@ -68,7 +64,7 @@ class FavoriteCell: UICollectionViewCell {
     
     let stackView = UIStackView().then {
         $0.axis = .vertical
-        $0.spacing = 8
+        $0.spacing = UI.spacing
         $0.alignment = .center
         $0.isUserInteractionEnabled = false
     }
@@ -90,7 +86,8 @@ class FavoriteCell: UICollectionViewCell {
             $0.leading.trailing.equalToSuperview().inset(12)
         }
         stackView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+            $0.top.leading.trailing.equalToSuperview()
+            $0.bottom.lessThanOrEqualToSuperview()
         }
         
         // Prevents the textLabel from getting squished in relation to other view priorities.
@@ -142,6 +139,12 @@ class FavoriteCell: UICollectionViewCell {
         let attributes = super.preferredLayoutAttributesFitting(layoutAttributes)
         attributes.size = stackView.systemLayoutSizeFitting(layoutAttributes.size, withHorizontalFittingPriority: .required, verticalFittingPriority: .fittingSizeLevel)
         return attributes
+    }
+    
+    static func height(forWidth width: CGFloat) -> CGFloat {
+        let imageHeight = (width - 24)
+        let labelHeight = (DynamicFontHelper.defaultHelper.DefaultSmallFont.lineHeight * 2)
+        return ceil(imageHeight + UI.spacing + labelHeight)
     }
 }
 
