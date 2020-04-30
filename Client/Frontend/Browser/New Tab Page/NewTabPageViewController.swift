@@ -75,6 +75,7 @@ protocol NewTabPageDelegate: AnyObject {
     func navigateToInput(_ input: String, inNewTab: Bool, switchingToPrivateMode: Bool)
     func tappedDuckDuckGoCallout()
     func brandedImageCalloutActioned(_ state: BrandedImageCalloutState)
+    func tappedQRCodeButton(url: URL)
 }
 
 /// The new tab page. Shows users a variety of information, including stats and
@@ -92,24 +93,17 @@ class NewTabPageViewController: UIViewController, Themeable {
     
     private var background: NewTabPageBackground
     private let backgroundView = NewTabPageBackgroundView()
-    private lazy var imageCreditSection = BackgroundImageCreditSectionProvider(background: background.currentBackground, action: { [weak self] control in
-        self?.presentImageCredit(control)
-    })
+    private let backgroundButtonsView = NewTabPageBackgroundButtonsView()
     
     private let notifications: NewTabPageNotifications
     
-    private let sponsorButton = SpringButton()
-    private let sponsorImageView = UIImageView().then {
-        $0.contentMode = .scaleAspectFit
-    }
-    
     init(tab: Tab,
          profile: Profile,
-         backgroundDataSource: NTPBackgroundDataSource,
+         dataSource: NTPDataSource,
          rewards: BraveRewards) {
         self.tab = tab
         self.rewards = rewards
-        background = NewTabPageBackground(dataSource: backgroundDataSource)
+        background = NewTabPageBackground(dataSource: dataSource)
         notifications = NewTabPageNotifications(rewards: rewards)
         collectionView = NewTabCollectionView(frame: .zero, collectionViewLayout: layout)
         super.init(nibName: nil, bundle: nil)
@@ -127,9 +121,7 @@ class NewTabPageViewController: UIViewController, Themeable {
             DuckDuckGoCalloutSectionProvider(profile: profile, action: { [weak self] in
                 self?.delegate?.tappedDuckDuckGoCallout()
             }),
-            imageCreditSection
         ]
-        layout.imageCreditSection = sections.firstIndex(where: { $0 is BackgroundImageCreditSectionProvider })
         sections.enumerated().forEach { (index, provider) in
             provider.registerCells(to: collectionView)
             if let observableProvider = provider as? NTPObservableSectionProvider {
@@ -142,7 +134,6 @@ class NewTabPageViewController: UIViewController, Themeable {
                 }
             }
         }
-        collectionView.alwaysBounceVertical = true
         collectionView.delegate = self
         collectionView.dataSource = self
         applyTheme(Theme.of(tab))
@@ -160,10 +151,14 @@ class NewTabPageViewController: UIViewController, Themeable {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        sponsorButton.addTarget(self, action: #selector(tappedSponsorButton), for: .touchUpInside)
-        
         view.addSubview(backgroundView)
         view.addSubview(collectionView)
+        
+        collectionView.backgroundView = backgroundButtonsView
+        
+        backgroundButtonsView.tappedActiveButton = { [weak self] sender in
+            self?.tappedActiveBackgroundButton(sender)
+        }
         
         setupBackgroundImage()
         backgroundView.snp.makeConstraints {
@@ -172,16 +167,6 @@ class NewTabPageViewController: UIViewController, Themeable {
         collectionView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
-        
-        collectionView.insertSubview(sponsorButton, at: 0)
-        
-        sponsorButton.addSubview(sponsorImageView)
-        
-        sponsorImageView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-        }
-        
-        updateSponsorImageConstraints()
     }
     
     override func viewDidLayoutSubviews() {
@@ -218,27 +203,10 @@ class NewTabPageViewController: UIViewController, Themeable {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         
-        updateSponsorImageConstraints()
         if #available(iOS 13.0, *) {
             if UITraitCollection.current.userInterfaceStyle != previousTraitCollection?.userInterfaceStyle {
                 // Reload UI
                 applyTheme(Theme.of(tab))
-            }
-        }
-    }
-    
-    func updateSponsorImageConstraints() {
-        let isIphone = UIDevice.isPhone
-        let isLandscape = view.frame.width > view.frame.height
-        
-        sponsorButton.snp.remakeConstraints {
-            $0.size.equalTo(170)
-            $0.bottom.equalTo(view.safeArea.bottom).inset(10)
-            
-            if isLandscape && isIphone {
-                $0.left.equalTo(view.safeArea.left).offset(20)
-            } else {
-                $0.centerX.equalToSuperview()
             }
         }
     }
@@ -269,11 +237,26 @@ class NewTabPageViewController: UIViewController, Themeable {
     func setupBackgroundImage() {
         collectionView.reloadData()
         
-        imageCreditSection.background = background.currentBackground
+        if let backgroundType = background.currentBackground?.type {
+            switch backgroundType {
+            case .regular:
+                if let name = background.currentBackground?.wallpaper.credit?.name {
+                    backgroundButtonsView.activeButton = .imageCredit(name)
+                } else {
+                    backgroundButtonsView.activeButton = .none
+                }
+            case .withBrandLogo(let logo):
+                guard let logo = logo else { break }
+                backgroundButtonsView.activeButton = .brandLogo(logo)
+            case .withQRCode(_):
+                backgroundButtonsView.activeButton = .QRCode
+            }
+        } else {
+            backgroundButtonsView.activeButton = .none
+        }
+        
         backgroundView.gradientView.isHidden = background.backgroundImage == nil
         backgroundView.imageView.image = background.backgroundImage
-        sponsorImageView.image = background.sponsorLogoImage
-        sponsorButton.isEnabled = background.currentBackground?.sponsor != nil
         
         guard let image = backgroundView.imageView.image else {
             return
@@ -330,9 +313,14 @@ class NewTabPageViewController: UIViewController, Themeable {
             return
         }
         
+        var isShowingSponseredImage = false
+        if case .withBrandLogo(let logo) = background.currentBackground?.type, logo != nil {
+            isShowingSponseredImage = true
+        }
+        
         guard let notification = notifications.notificationToShow(
             isShowingBackgroundImage: background.currentBackground != nil,
-            isShowingSponseredImage: background.currentBackground?.sponsor != nil
+            isShowingSponseredImage: isShowingSponseredImage
             ) else {
                 return
         }
@@ -387,10 +375,32 @@ class NewTabPageViewController: UIViewController, Themeable {
         }
     }
     
-    @objc private func tappedSponsorButton() {
-        guard let url = background.currentBackground?.sponsor?.logo.destinationUrl else { return }
+    private func tappedActiveBackgroundButton(_ sender: UIControl) {
+        guard let background = background.currentBackground else { return }
+        switch background.type {
+        case .regular:
+            presentImageCredit(sender)
+        case .withBrandLogo(let logo):
+            guard let logo = logo else { break }
+            tappedSponsorButton(logo)
+        case .withQRCode(let code):
+            tappedQRCode(code)
+        }
+    }
+    
+    private func tappedSponsorButton(_ logo: NTPLogo) {
         UIImpactFeedbackGenerator(style: .medium).bzzt()
-        delegate?.navigateToInput(url, inNewTab: false, switchingToPrivateMode: false)
+        delegate?.navigateToInput(logo.destinationUrl, inNewTab: false, switchingToPrivateMode: false)
+    }
+    
+    private func tappedQRCode(_ code: String) {
+        let referralQueryParam = [URLQueryItem(name: "ref", value: code)]
+        
+        var baseUrl = URLComponents(string: "https://brave.com/")
+        baseUrl?.queryItems = referralQueryParam
+        
+        guard let url = baseUrl?.url else { return }
+        delegate?.tappedQRCodeButton(url: url)
     }
     
     private func handleBookmarkAction(bookmark: Bookmark, action: BookmarksAction) {
@@ -418,7 +428,7 @@ class NewTabPageViewController: UIViewController, Themeable {
         }
     }
     
-    @objc private func presentImageCredit(_ button: UIControl) {
+    private func presentImageCredit(_ button: UIControl) {
         guard let credit = background.currentBackground?.wallpaper.credit else { return }
         
         let alert = UIAlertController(title: credit.name, message: nil, preferredStyle: .actionSheet)
@@ -521,7 +531,8 @@ extension NewTabPageViewController {
             
             backgroundColor = .clear
             delaysContentTouches = false
-            contentInsetAdjustmentBehavior = .always
+            alwaysBounceVertical = true
+            showsHorizontalScrollIndicator = false
         }
         @available(*, unavailable)
         required init(coder: NSCoder) {

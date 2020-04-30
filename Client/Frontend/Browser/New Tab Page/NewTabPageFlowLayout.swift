@@ -8,17 +8,8 @@ import Foundation
 /// The new tab page collection view layout
 ///
 /// Handles correcting center-aligned single items in a flow layout while using
-/// automatic sizing cells as well as laying out specific outliers in the
-/// collection view.
+/// automatic sizing cells
 class NewTabPageFlowLayout: UICollectionViewFlowLayout {
-    /// The section belonging to the image credit provider
-    ///
-    /// This section lays out special: bottom-left regardless other items in
-    /// the collection view.
-    ///
-    /// This may need to change in the future
-    var imageCreditSection: Int?
-    
     override init() {
         super.init()
         estimatedItemSize = Self.automaticSize
@@ -68,14 +59,6 @@ class NewTabPageFlowLayout: UICollectionViewFlowLayout {
                     }
                 }
             }
-        }
-
-        // Lays out bottom-left regardless
-        if let imageCreditSection = imageCreditSection, indexPath.section == imageCreditSection {
-            var r = attribute.frame
-            r.origin.y = collectionView.frame.height - collectionView.safeAreaInsets.bottom - attribute.size.height - 16
-            r.origin.x = 16
-            attribute.frame = r
         }
 
         return attribute

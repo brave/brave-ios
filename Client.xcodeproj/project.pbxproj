@@ -276,6 +276,11 @@
 		27353FF2235F4E7300E42EBB /* WalletDisclaimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27353FF1235F4E7300E42EBB /* WalletDisclaimerView.swift */; };
 		273EB3A72422AB24002A8AAF /* PaymentRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9616E6A240EE43F00667C2D /* PaymentRequest.swift */; };
 		27448522245A1A1C001920B5 /* NewFavoritesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27448521245A1A1C001920B5 /* NewFavoritesViewController.swift */; };
+		27448532245B5EC2001920B5 /* CustomTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2744852F245B5EC2001920B5 /* CustomTheme.swift */; };
+		27448533245B5EC2001920B5 /* NTPDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27448530245B5EC2001920B5 /* NTPDataSource.swift */; };
+		27448534245B5EC2001920B5 /* NTPModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27448531245B5EC2001920B5 /* NTPModels.swift */; };
+		27448536245B608E001920B5 /* QRCodePopupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27448535245B608E001920B5 /* QRCodePopupView.swift */; };
+		27448538245B67B2001920B5 /* NewTabPageBackgroundButtonsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27448537245B67B2001920B5 /* NewTabPageBackgroundButtonsView.swift */; };
 		2744D6CB239EDB1A00A89EBB /* DisconnectedUserWalletButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2744D6CA239EDB1A00A89EBB /* DisconnectedUserWalletButton.swift */; };
 		2744D6CE239EDCBC00A89EBB /* VerifyUserWalletButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2744D6CD239EDCBC00A89EBB /* VerifyUserWalletButton.swift */; };
 		2744D6D0239EF10B00A89EBB /* UserWalletDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2744D6CF239EF10B00A89EBB /* UserWalletDetailsViewController.swift */; };
@@ -357,7 +362,6 @@
 		27FA2D69234E3222004D5D2D /* Shared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288A2D861AB8B3260023ABC3 /* Shared.framework */; };
 		27FCA8E02447708300A8CA48 /* FavoritesSectionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FCA8DF2447708300A8CA48 /* FavoritesSectionProvider.swift */; };
 		27FCA8E3244770AB00A8CA48 /* FavoritesOverflowSectionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FCA8E2244770AB00A8CA48 /* FavoritesOverflowSectionProvider.swift */; };
-		27FCA8E52447916400A8CA48 /* BackgroundImageCreditSectionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FCA8E42447916400A8CA48 /* BackgroundImageCreditSectionProvider.swift */; };
 		27FCA8E72447BCFE00A8CA48 /* DuckDuckGoCalloutSectionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FCA8E62447BCFE00A8CA48 /* DuckDuckGoCalloutSectionProvider.swift */; };
 		27FD2CAB2146C31C00A5A779 /* RequestDesktopSiteActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FD2CA12146C31C00A5A779 /* RequestDesktopSiteActivity.swift */; };
 		27FD2CAC2146C31C00A5A779 /* FindInPageActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FD2CA92146C31C00A5A779 /* FindInPageActivity.swift */; };
@@ -666,7 +670,6 @@
 		5D5374A823846FFC00A2B587 /* annie-spratt.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 5D53749923846FFC00A2B587 /* annie-spratt.jpg */; };
 		5D5374A923846FFC00A2B587 /* matt-palmer.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 5D53749A23846FFC00A2B587 /* matt-palmer.jpg */; };
 		5D5374AA23846FFC00A2B587 /* andy-mai.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 5D53749B23846FFC00A2B587 /* andy-mai.jpg */; };
-		5D5374BB238895B100A2B587 /* NTPBackgroundDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D5374BA238895B100A2B587 /* NTPBackgroundDataSource.swift */; };
 		5D5E2361238C386B00AD6FBD /* NTPTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D5E2360238C386B00AD6FBD /* NTPTableViewController.swift */; };
 		5D6DDEF3214003A6001FF0AE /* DAU.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6DDEE6214003A6001FF0AE /* DAU.swift */; };
 		5D6DDEFE2141B6A1001FF0AE /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6DDEF62141B6A0001FF0AE /* Preferences.swift */; };
@@ -1605,6 +1608,11 @@
 		27325A6824105FF100790DC6 /* SKUPurchaseButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKUPurchaseButtonView.swift; sourceTree = "<group>"; };
 		27353FF1235F4E7300E42EBB /* WalletDisclaimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletDisclaimerView.swift; sourceTree = "<group>"; };
 		27448521245A1A1C001920B5 /* NewFavoritesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewFavoritesViewController.swift; sourceTree = "<group>"; };
+		2744852F245B5EC2001920B5 /* CustomTheme.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CustomTheme.swift; path = Client/Frontend/Browser/HomePanel/CustomTheme.swift; sourceTree = SOURCE_ROOT; };
+		27448530245B5EC2001920B5 /* NTPDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NTPDataSource.swift; path = Client/Frontend/Browser/HomePanel/NTPDataSource.swift; sourceTree = SOURCE_ROOT; };
+		27448531245B5EC2001920B5 /* NTPModels.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NTPModels.swift; path = Client/Frontend/Browser/HomePanel/NTPModels.swift; sourceTree = SOURCE_ROOT; };
+		27448535245B608E001920B5 /* QRCodePopupView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QRCodePopupView.swift; sourceTree = "<group>"; };
+		27448537245B67B2001920B5 /* NewTabPageBackgroundButtonsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageBackgroundButtonsView.swift; sourceTree = "<group>"; };
 		2744D6CA239EDB1A00A89EBB /* DisconnectedUserWalletButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisconnectedUserWalletButton.swift; sourceTree = "<group>"; };
 		2744D6CD239EDCBC00A89EBB /* VerifyUserWalletButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerifyUserWalletButton.swift; sourceTree = "<group>"; };
 		2744D6CF239EF10B00A89EBB /* UserWalletDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserWalletDetailsViewController.swift; sourceTree = "<group>"; };
@@ -1670,7 +1678,6 @@
 		27FA2D4F234CC9FB004D5D2D /* BraveRewards.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = BraveRewards.framework; sourceTree = "<group>"; };
 		27FCA8DF2447708300A8CA48 /* FavoritesSectionProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesSectionProvider.swift; sourceTree = "<group>"; };
 		27FCA8E2244770AB00A8CA48 /* FavoritesOverflowSectionProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesOverflowSectionProvider.swift; sourceTree = "<group>"; };
-		27FCA8E42447916400A8CA48 /* BackgroundImageCreditSectionProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundImageCreditSectionProvider.swift; sourceTree = "<group>"; };
 		27FCA8E62447BCFE00A8CA48 /* DuckDuckGoCalloutSectionProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckDuckGoCalloutSectionProvider.swift; sourceTree = "<group>"; };
 		27FD2CA12146C31C00A5A779 /* RequestDesktopSiteActivity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RequestDesktopSiteActivity.swift; sourceTree = "<group>"; };
 		27FD2CA92146C31C00A5A779 /* FindInPageActivity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FindInPageActivity.swift; sourceTree = "<group>"; };
@@ -2176,7 +2183,6 @@
 		5D53749923846FFC00A2B587 /* annie-spratt.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "annie-spratt.jpg"; sourceTree = "<group>"; };
 		5D53749A23846FFC00A2B587 /* matt-palmer.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "matt-palmer.jpg"; sourceTree = "<group>"; };
 		5D53749B23846FFC00A2B587 /* andy-mai.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "andy-mai.jpg"; sourceTree = "<group>"; };
-		5D5374BA238895B100A2B587 /* NTPBackgroundDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NTPBackgroundDataSource.swift; sourceTree = "<group>"; };
 		5D5E2360238C386B00AD6FBD /* NTPTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NTPTableViewController.swift; sourceTree = "<group>"; };
 		5D6DDEE6214003A6001FF0AE /* DAU.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DAU.swift; sourceTree = "<group>"; };
 		5D6DDEF62141B6A0001FF0AE /* Preferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
@@ -3021,6 +3027,7 @@
 			children = (
 				27187809216526240006036E /* PopupView.swift */,
 				27187807216526090006036E /* AlertPopupView.swift */,
+				27448535245B608E001920B5 /* QRCodePopupView.swift */,
 			);
 			path = Popup;
 			sourceTree = "<group>";
@@ -3369,8 +3376,11 @@
 				27201F072458B84D00C19DD1 /* Assets */,
 				27201EFD24539B5500C19DD1 /* NewTabPageBackground.swift */,
 				27201F012458879700C19DD1 /* NewTabPageBackgroundView.swift */,
-				5D5374BA238895B100A2B587 /* NTPBackgroundDataSource.swift */,
+				27448537245B67B2001920B5 /* NewTabPageBackgroundButtonsView.swift */,
 				5E6683A823D61CF7005B3A6C /* NTPDownloader.swift */,
+				2744852F245B5EC2001920B5 /* CustomTheme.swift */,
+				27448530245B5EC2001920B5 /* NTPDataSource.swift */,
+				27448531245B5EC2001920B5 /* NTPModels.swift */,
 			);
 			path = Backgrounds;
 			sourceTree = "<group>";
@@ -3457,7 +3467,6 @@
 				276A790F24476FD200AC9446 /* StatsSectionProvider.swift */,
 				27FCA8DF2447708300A8CA48 /* FavoritesSectionProvider.swift */,
 				27FCA8E2244770AB00A8CA48 /* FavoritesOverflowSectionProvider.swift */,
-				27FCA8E42447916400A8CA48 /* BackgroundImageCreditSectionProvider.swift */,
 				27FCA8E62447BCFE00A8CA48 /* DuckDuckGoCalloutSectionProvider.swift */,
 			);
 			path = Sections;
@@ -6496,6 +6505,7 @@
 				0B62EFD21AD63CD100ACB9CD /* Clearables.swift in Sources */,
 				27EB6020244607DA00265C1B /* NewTabPageViewController.swift in Sources */,
 				7482205C1DBAB56300EEEA72 /* MailProviders.swift in Sources */,
+				27448532245B5EC2001920B5 /* CustomTheme.swift in Sources */,
 				C40046FA1CF8E0B200B08303 /* BackForwardListAnimator.swift in Sources */,
 				DD31E0FB1B382B520077078A /* TabPrintPageRenderer.swift in Sources */,
 				E4CD9E911A6897FB00318571 /* ReaderMode.swift in Sources */,
@@ -6513,6 +6523,7 @@
 				EB11A1062044A90E0018F749 /* ContentBlockerHelper+TabContentScript.swift in Sources */,
 				2755AB8623107DBD00F0721F /* AdsMediaReporting.swift in Sources */,
 				FA9293D41D6580E100AC8D33 /* QRCodeViewController.swift in Sources */,
+				27448533245B5EC2001920B5 /* NTPDataSource.swift in Sources */,
 				E6108FF91C84E91C005D25E8 /* BasePasscodeViewController.swift in Sources */,
 				39F4C10A2045DB2E00746155 /* FocusHelper.swift in Sources */,
 				E4CD9F2D1A6DC91200318571 /* TabLocationView.swift in Sources */,
@@ -6576,9 +6587,11 @@
 				39A359E41BFCCE94006B9E87 /* UserActivityHandler.swift in Sources */,
 				27201F0424589B9800C19DD1 /* NewTabPageNotifications.swift in Sources */,
 				E698FFDA1B4AADF40001F623 /* TabScrollController.swift in Sources */,
+				27448534245B5EC2001920B5 /* NTPModels.swift in Sources */,
 				44331DD422551CC0007E3E93 /* ToolbarHelper.swift in Sources */,
 				D34510881ACF415700EC27F0 /* SearchLoader.swift in Sources */,
 				E65075521E37F6D1006961AC /* UIViewExtensions.swift in Sources */,
+				27448538245B67B2001920B5 /* NewTabPageBackgroundButtonsView.swift in Sources */,
 				C8F457A81F1FD75A000CB895 /* BrowserViewController+WKNavigationDelegate.swift in Sources */,
 				5E612A8F234B7FCA007D12B5 /* OnboardingRewardsAgreementViewController.swift in Sources */,
 				E6927EC01C7B6FB800D03F75 /* ErrorToast.swift in Sources */,
@@ -6587,7 +6600,6 @@
 				4422D4E821BFFB7600BF1855 /* log_writer.cc in Sources */,
 				F84B22041A0910F600AAB793 /* AppDelegate.swift in Sources */,
 				0A7B5D6722689C5D00AADF22 /* AddEditHeaderView.swift in Sources */,
-				27FCA8E52447916400A8CA48 /* BackgroundImageCreditSectionProvider.swift in Sources */,
 				F930CDD12270F09000A23FE1 /* WebAuthnAuthenticateRequest.swift in Sources */,
 				D8C75DF3207584C400BB8AD0 /* UIImageViewAligned.m in Sources */,
 				E653422D1C5944F90039DD9E /* BrowserPrompts.swift in Sources */,
@@ -6645,11 +6657,11 @@
 				4422D4C221BFFB7600BF1855 /* comparator.cc in Sources */,
 				0A1E84452190A57F0042F782 /* SyncPairWordsViewController.swift in Sources */,
 				4422D4DF21BFFB7600BF1855 /* table_builder.cc in Sources */,
+				27448536245B608E001920B5 /* QRCodePopupView.swift in Sources */,
 				0AADC4D420D2A6A200FDE368 /* FavoritesDataSource.swift in Sources */,
 				4422D50121BFFB7600BF1855 /* repair.cc in Sources */,
 				E660BDD91BB06521009AC090 /* TabsButton.swift in Sources */,
 				4422D55721BFFB7F00BF1855 /* unicode_groups.cc in Sources */,
-				5D5374BB238895B100A2B587 /* NTPBackgroundDataSource.swift in Sources */,
 				4422D55421BFFB7E00BF1855 /* re2_fuzzer.cc in Sources */,
 				2F44FCCB1A9E972E00FD20CC /* SearchEnginePicker.swift in Sources */,
 				C6B81B8C212D989200996084 /* ImageCacheOptions.swift in Sources */,

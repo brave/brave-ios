@@ -15,9 +15,9 @@ import BraveUI
 /// prefs while the user is currently viewing a New Tab Page.
 class NewTabPageBackground: PreferencesObserver {
     /// The source of new tab page backgrounds
-    private let dataSource: NTPBackgroundDataSource
+    private let dataSource: NTPDataSource
     /// The current background image & possibly sponsor
-    private(set) var currentBackground: NTPBackground? {
+    private(set) var currentBackground: (wallpaper: NTPBackground, type: NTPDataSource.BackgroundType)? {
         didSet {
             changed?()
         }
@@ -28,13 +28,16 @@ class NewTabPageBackground: PreferencesObserver {
     }
     /// The sponsors logo if available
     var sponsorLogoImage: UIImage? {
-        currentBackground?.sponsor?.logo.image
+        if case .withBrandLogo(let logo) = currentBackground?.type {
+            return logo?.image
+        }
+        return nil
     }
     /// A block called when the current background image/sponsored logo changes
     /// while the New Tab Page is active
     var changed: (() -> Void)?
     /// Create a background holder given a source of all NTP background images
-    init(dataSource: NTPBackgroundDataSource) {
+    init(dataSource: NTPDataSource) {
         self.dataSource = dataSource
         self.currentBackground = dataSource.newBackground()
         

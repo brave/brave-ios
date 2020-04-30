@@ -1054,7 +1054,7 @@ class BrowserViewController: UIViewController {
         if newTabPageController == nil {
             let homePanelController = NewTabPageViewController(tab: tabManager.selectedTab!,
                                                                profile: profile,
-                                                               backgroundDataSource: backgroundDataSource,
+                                                               dataSource: backgroundDataSource,
                                                                rewards: rewards)
             homePanelController.delegate = self
 //            let homePanelController = FavoritesViewController(profile: profile,
@@ -3449,6 +3449,32 @@ extension BrowserViewController: NewTabPageDelegate {
     }
     
     func brandedImageCalloutActioned(_ state: BrandedImageCalloutState) {
+        guard state.hasDetailViewController else { return }
+        
+        let vc = NTPLearnMoreViewController(state: state, rewards: rewards)
+        
+        vc.linkHandler = { [weak self] url in
+            self?.tabManager.selectedTab?.loadRequest(PrivilegedRequest(url: url) as URLRequest)
+        }
+        
+        addChild(vc)
+        view.addSubview(vc.view)
+        vc.view.snp.remakeConstraints {
+            $0.right.top.bottom.leading.equalToSuperview()
+        }
+    }
+    
+    func tappedQRCodeButton(url: URL) {
+        let qrPopup = QRCodePopupView(url: url)
+        qrPopup.showWithType(showType: .flyUp)
+        qrPopup.qrCodeShareHandler = { [weak self] url in
+            guard let self = self else { return }
+            
+            let viewRect = CGRect(origin: self.view.center, size: .zero)
+            
+            self.presentActivityViewController(url, sourceView: self.view, sourceRect: viewRect,
+                                               arrowDirection: .any)
+        }
     }
 }
 
