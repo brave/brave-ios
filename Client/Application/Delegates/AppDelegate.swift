@@ -261,12 +261,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         if let urp = UserReferralProgram.shared {
             if isFirstLaunch {
                 urp.referralLookup { referralCode, offerUrl in
-                    // TEST CODE
-                    Preferences.URP.referralCode.value = "TECHNIK"
-                    var TEST_CODE_REFERRAL: String? = "TECHNIK"
-                    
-                    //if let code = referralCode {
-                    if let code = TEST_CODE_REFERRAL {
+                    if let code = referralCode {
                         let retryTime = AppConstants.buildChannel.isPublic ? 1.days : 10.minutes
                         let retryDeadline = Date() + retryTime
                         
