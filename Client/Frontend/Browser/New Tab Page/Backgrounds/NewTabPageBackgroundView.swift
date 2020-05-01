@@ -38,9 +38,6 @@ class NewTabPageBackgroundView: UIView, Themeable {
         addSubview(imageView)
         addSubview(gradientView)
         
-        imageView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-        }
         gradientView.snp.makeConstraints {
             $0.top.leading.trailing.equalToSuperview()
             $0.height.greaterThanOrEqualTo(700)

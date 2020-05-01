@@ -174,6 +174,9 @@ class NewTabPageViewController: UIViewController, Themeable {
         
         collectionView.reloadData()
         
+        // Make sure that imageView has a frame calculated before we attempt
+        // to use it.
+        backgroundView.imageView.layoutIfNeeded()
         if let image = backgroundView.imageView.image {
             // Need to calculate the sizing difference between `image` and `imageView` to determine the pixel difference ratio
             let sizeRatio = backgroundView.imageView.frame.size.width / image.size.width
@@ -259,6 +262,8 @@ class NewTabPageViewController: UIViewController, Themeable {
         backgroundView.imageView.image = background.backgroundImage
         
         guard let image = backgroundView.imageView.image else {
+            backgroundView.imageView.snp.removeConstraints()
+            backgroundView.imageConstraints = nil
             return
         }
         
@@ -276,7 +281,7 @@ class NewTabPageViewController: UIViewController, Themeable {
             
             // In portrait `top`/`bottom` is enough, however, when switching to landscape, those constraints
             //  don't force centering, so this is used as a stronger constraint to center in landscape/portrait
-            let landscapeCenterConstraint = $0.top.equalTo(view.snp.centerY).priority(ConstraintPriority.high).constraint
+            let landscapeCenterConstraint = $0.top.equalTo(view.snp.centerY).priority(.high).constraint
             
             // Width of the image view is determined by the forced height constraint and the literal image ratio
             $0.width.equalTo(imageView.snp.height).multipliedBy(imageAspectRatio)
@@ -299,7 +304,7 @@ class NewTabPageViewController: UIViewController, Themeable {
             
             // Using `high` priority so that it will not be applied / broken  if out-of-bounds.
             // Offset updated / calculated during view layout as views are not setup yet.
-            let portraitCenterConstraint = $0.left.equalTo(view.snp.centerX).priority(ConstraintPriority.high).constraint
+            let portraitCenterConstraint = $0.left.equalTo(view.snp.centerX).priority(.high).constraint
             self.backgroundView.imageConstraints = (portraitCenterConstraint, landscapeCenterConstraint)
         }
     }
