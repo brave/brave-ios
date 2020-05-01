@@ -1313,11 +1313,11 @@ class BrowserViewController: UIViewController {
                 break
             }
 
-            tab.secureContentState = .insecure
+            tab.secureContentState = .unknown
             
             guard let serverTrust = tab.webView?.serverTrust else {
-                if let url = tab.webView?.url {
-                    if url.isAboutHomeURL || url.isAboutURL {
+                if let url = tab.webView?.url ?? tab.url {
+                    if url.isAboutHomeURL || url.isAboutURL || url.scheme == "about" {
                         tab.secureContentState = .localHost
                         if tabManager.selectedTab === tab {
                             topToolbar.secureContentState = .localHost
@@ -1342,6 +1342,12 @@ class BrowserViewController: UIViewController {
                         }
                         break
                     }
+                    
+                    //All our checks failed, we show the page as insecure
+                    tab.secureContentState = .insecure
+                } else {
+                    //When there is no URL, it's likely a new tab.
+                    tab.secureContentState = .localHost
                 }
                 
                 if tabManager.selectedTab === tab {
