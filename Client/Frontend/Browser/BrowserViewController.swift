@@ -1305,7 +1305,9 @@ class BrowserViewController: UIViewController {
                 tab.secureContentState = .insecure
             }
             
-            topToolbar.secureContentState = tab.secureContentState
+            if tabManager.selectedTab === tab {
+                topToolbar.secureContentState = tab.secureContentState
+            }
         case .serverTrust:
             guard let tab = tabManager[webView] else {
                 break
@@ -1336,7 +1338,9 @@ class BrowserViewController: UIViewController {
                     }
                 }
                 
-                topToolbar.secureContentState = tab.secureContentState
+                if tabManager.selectedTab === tab {
+                    topToolbar.secureContentState = tab.secureContentState
+                }
                 break
             }
             
@@ -1409,7 +1413,9 @@ class BrowserViewController: UIViewController {
         updateRewardsButtonState()
         
         topToolbar.currentURL = tab.url?.displayURL
-        topToolbar.secureContentState = tab.secureContentState
+        if tabManager.selectedTab === tab {
+            topToolbar.secureContentState = tab.secureContentState
+        }
         
         let isPage = tab.url?.displayURL?.isWebPage() ?? false
         navigationToolbar.updatePageStatus(isPage)
