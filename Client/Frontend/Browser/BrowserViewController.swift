@@ -1319,21 +1319,27 @@ class BrowserViewController: UIViewController {
                 if let url = tab.webView?.url {
                     if url.isAboutHomeURL || url.isAboutURL {
                         tab.secureContentState = .localHost
-                        topToolbar.secureContentState = .localHost
+                        if tabManager.selectedTab === tab {
+                            topToolbar.secureContentState = .localHost
+                        }
                         break
                     }
                     
                     if url.isErrorPageURL {
                         if ErrorPageHelper.certificateError(for: url) != 0 {
                             tab.secureContentState = .insecure
-                            topToolbar.secureContentState = .insecure
+                            if tabManager.selectedTab === tab {
+                                topToolbar.secureContentState = .insecure
+                            }
                             break
                         }
                     }
                     
                     if url.isReaderModeURL || url.isLocal {
                         tab.secureContentState = .unknown
-                        topToolbar.secureContentState = .unknown
+                        if tabManager.selectedTab === tab {
+                            topToolbar.secureContentState = .unknown
+                        }
                         break
                     }
                 }
