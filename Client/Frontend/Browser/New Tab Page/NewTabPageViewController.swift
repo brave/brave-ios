@@ -122,18 +122,6 @@ class NewTabPageViewController: UIViewController, Themeable {
                 self?.delegate?.tappedDuckDuckGoCallout()
             }),
         ]
-        sections.enumerated().forEach { (index, provider) in
-            provider.registerCells(to: collectionView)
-            if let observableProvider = provider as? NTPObservableSectionProvider {
-                observableProvider.sectionDidChange = {
-                    DispatchQueue.main.async {
-                        UIView.performWithoutAnimation {
-                            self.collectionView.reloadSections(IndexSet(integer: index))
-                        }
-                    }
-                }
-            }
-        }
         collectionView.delegate = self
         collectionView.dataSource = self
         applyTheme(Theme.of(tab))
@@ -166,6 +154,19 @@ class NewTabPageViewController: UIViewController, Themeable {
         }
         collectionView.snp.makeConstraints {
             $0.edges.equalToSuperview()
+        }
+        
+        sections.enumerated().forEach { (index, provider) in
+            provider.registerCells(to: collectionView)
+            if let observableProvider = provider as? NTPObservableSectionProvider {
+                observableProvider.sectionDidChange = {
+                    DispatchQueue.main.async {
+                        UIView.performWithoutAnimation {
+                            self.collectionView.reloadSections(IndexSet(integer: index))
+                        }
+                    }
+                }
+            }
         }
     }
     
