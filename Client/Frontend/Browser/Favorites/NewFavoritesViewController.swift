@@ -90,6 +90,7 @@ class NewFavoritesViewController: UIViewController, Themeable {
         collectionView.dragDelegate = self
         collectionView.dropDelegate = self
         collectionView.dragInteractionEnabled = true
+        collectionView.keyboardDismissMode = .interactive
     }
     
     override func viewDidLayoutSubviews() {
@@ -204,7 +205,7 @@ extension NewFavoritesViewController: UICollectionViewDataSource, UICollectionVi
         cell.textLabel.text = fav.displayTitle ?? fav.url
         cell.textLabel.appearanceTextColor = nil
         cell.imageView.image = nil
-        cell.imageView.setIconMO(fav.domain?.favicon, forURL: URL(string: fav.url ?? ""), scaledDefaultIconSize: CGSize(width: 40, height: 40), completed: { (color, url) in
+        cell.imageView.setIconMO(nil, forURL: URL(string: fav.url ?? ""), scaledDefaultIconSize: CGSize(width: 40, height: 40), completed: { (color, url) in
             if fav.url == url?.absoluteString {
                 cell.imageView.backgroundColor = color
             }
