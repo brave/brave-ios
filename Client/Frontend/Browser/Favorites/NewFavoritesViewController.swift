@@ -28,9 +28,6 @@ private class FavoritesHeaderView: UICollectionReusableView {
     required init(coder: NSCoder) {
         fatalError()
     }
-//    func applyTheme(_ theme: Theme) {
-//        label.textColor = theme.
-//    }
 }
 
 class NewFavoritesViewController: UIViewController, Themeable {
@@ -56,11 +53,6 @@ class NewFavoritesViewController: UIViewController, Themeable {
         collectionView.register(FavoriteCell.self, forCellWithReuseIdentifier: FavoriteCell.identifier)
         collectionView.register(FavoritesHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "header")
         
-        collectionView.dataSource = self
-        collectionView.delegate = self
-        collectionView.alwaysBounceVertical = true
-        collectionView.contentInset = UIEdgeInsets(top: 24, left: 0, bottom: 0, right: 0)
-        
         frc.delegate = self
         
         KeyboardHelper.defaultHelper.addDelegate(self)
@@ -80,17 +72,34 @@ class NewFavoritesViewController: UIViewController, Themeable {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        collectionView.backgroundColor = .clear
-        
         view.addSubview(backgroundView)
         view.addSubview(collectionView)
+        
         backgroundView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
         collectionView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
+        
+        collectionView.alwaysBounceVertical = true
+        collectionView.contentInset = UIEdgeInsets(top: 24, left: 0, bottom: 0, right: 0)
+        collectionView.backgroundColor = .clear
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        collectionView.dragDelegate = self
+        collectionView.dropDelegate = self
+        collectionView.dragInteractionEnabled = true
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
         calculateAppropriateGrid()
+        
+        if let state = KeyboardHelper.defaultHelper.currentState {
+            updateKeyboardInset(state, animated: false)
+        }
     }
     
     func applyTheme(_ theme: Theme) {
@@ -106,16 +115,6 @@ class NewFavoritesViewController: UIViewController, Themeable {
         collectionView.contentInset = collectionView.contentInset.with {
             $0.left = self.view.readableContentGuide.layoutFrame.minX
             $0.right = self.view.readableContentGuide.layoutFrame.minX
-        }
-    }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        
-        calculateAppropriateGrid()
-        
-        if let state = KeyboardHelper.defaultHelper.currentState {
-            updateKeyboardInset(state, animated: false)
         }
     }
     
@@ -151,6 +150,7 @@ class NewFavoritesViewController: UIViewController, Themeable {
 // MARK: - KeyboardHelperDelegate
 extension NewFavoritesViewController: KeyboardHelperDelegate {
     func updateKeyboardInset(_ state: KeyboardState, animated: Bool = true) {
+        if collectionView.bounds.size == .zero { return }
         let keyboardHeight = state.intersectionHeightForView(self.view) - view.safeAreaInsets.bottom
         UIView.animate(withDuration: animated ? state.animationDuration : 0.0, animations: {
             if animated {
@@ -192,9 +192,7 @@ extension NewFavoritesViewController: UICollectionViewDataSource, UICollectionVi
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         if kind == UICollectionView.elementKindSectionHeader {
-            let view = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "header", for: indexPath)
-//            view.layoutMargins = UIEdgeInsets(top: 0, left: self.view.readableContentGuide.layoutFrame.minX, bottom: 0, right: self.view.readableContentGuide.layoutFrame.minX)
-            return view
+            return collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "header", for: indexPath)
         }
         return UICollectionReusableView()
     }
@@ -205,7 +203,8 @@ extension NewFavoritesViewController: UICollectionViewDataSource, UICollectionVi
         let fav = frc.object(at: IndexPath(item: indexPath.item, section: 0))
         cell.textLabel.text = fav.displayTitle ?? fav.url
         cell.textLabel.appearanceTextColor = nil
-        cell.imageView.setIconMO(nil, forURL: URL(string: fav.url ?? ""), scaledDefaultIconSize: CGSize(width: 40, height: 40), completed: { (color, url) in
+        cell.imageView.image = nil
+        cell.imageView.setIconMO(fav.domain?.favicon, forURL: URL(string: fav.url ?? ""), scaledDefaultIconSize: CGSize(width: 40, height: 40), completed: { (color, url) in
             if fav.url == url?.absoluteString {
                 cell.imageView.backgroundColor = color
             }
@@ -239,35 +238,39 @@ extension NewFavoritesViewController: UICollectionViewDataSource, UICollectionVi
         return CGSize(width: collectionView.bounds.width, height: 32)
     }
     
-//    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-////        return UIEdgeInsets(top: 12, left: self.view.readableContentGuide.layoutFrame.minX, bottom: 12, right: self.view.readableContentGuide.layoutFrame.minX)
-//    }
+    func collectionView(_ collectionView: UICollectionView, canMoveItemAt indexPath: IndexPath) -> Bool {
+        return true
+    }
     
-    @available(iOS 13.0, *)
+    func collectionView(_ collectionView: UICollectionView, moveItemAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+        Bookmark.reorderBookmarks(frc: frc, sourceIndexPath: sourceIndexPath, destinationIndexPath: destinationIndexPath)
+    }
+    
+    @available(iOS 13, *)
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
-        guard let favourite = frc.fetchedObjects?[indexPath.item] else { return nil }
+        guard let bookmark = frc.fetchedObjects?[indexPath.item] else { return nil }
         return UIContextMenuConfiguration(identifier: indexPath as NSCopying, previewProvider: nil) { _ -> UIMenu? in
             let openInNewTab = UIAction(title: Strings.openNewTabButtonTitle, image: nil, identifier: nil, discoverabilityTitle: nil) { _ in
-                self.action(favourite, .opened(inNewTab: true, switchingToPrivateMode: false))
+                self.action(bookmark, .opened(inNewTab: true, switchingToPrivateMode: false))
             }
             let edit = UIAction(title: Strings.editBookmark, image: nil, identifier: nil, discoverabilityTitle: nil) { _ in
-                self.action(favourite, .edited)
+                self.action(bookmark, .edited)
             }
             let delete = UIAction(title: Strings.removeFavorite, image: nil, identifier: nil, discoverabilityTitle: nil, attributes: .destructive) { _ in
-                favourite.delete()
+                bookmark.delete()
             }
             
             var urlChildren: [UIAction] = [openInNewTab]
             if !PrivateBrowsingManager.shared.isPrivateBrowsing {
                 let openInNewPrivateTab = UIAction(title: Strings.openNewPrivateTabButtonTitle, image: nil, identifier: nil, discoverabilityTitle: nil) { _ in
-                    self.action(favourite, .opened(inNewTab: true, switchingToPrivateMode: true))
+                    self.action(bookmark, .opened(inNewTab: true, switchingToPrivateMode: true))
                 }
                 urlChildren.append(openInNewPrivateTab)
             }
             
             let urlMenu = UIMenu(title: "", options: .displayInline, children: urlChildren)
             let favMenu = UIMenu(title: "", options: .displayInline, children: [edit, delete])
-            return UIMenu(title: favourite.title ?? favourite.url ?? "", identifier: nil, children: [urlMenu, favMenu])
+            return UIMenu(title: bookmark.title ?? bookmark.url ?? "", identifier: nil, children: [urlMenu, favMenu])
         }
     }
     
@@ -287,6 +290,65 @@ extension NewFavoritesViewController: UICollectionViewDataSource, UICollectionVi
                 return nil
         }
         return UITargetedPreview(view: cell.imageView)
+    }
+}
+
+// MARK: - UICollectionViewDragDelegate & UICollectionViewDropDelegate
+extension NewFavoritesViewController: UICollectionViewDragDelegate, UICollectionViewDropDelegate {
+    func collectionView(_ collectionView: UICollectionView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
+        let bookmark = frc.object(at: indexPath)
+        let itemProvider = NSItemProvider(object: "\(indexPath)" as NSString)
+        let dragItem = UIDragItem(itemProvider: itemProvider)
+        dragItem.previewProvider = { () -> UIDragPreview? in
+            guard let cell = collectionView.cellForItem(at: indexPath) as? FavoriteCell else {
+                    return nil
+            }
+            return UIDragPreview(view: cell.imageView)
+        }
+        dragItem.localObject = bookmark
+        return [dragItem]
+    }
+    
+//    func collectionView(_ collectionView: UICollectionView, itemsForAddingTo session: UIDragSession, at indexPath: IndexPath, point: CGPoint) -> [UIDragItem] {
+//        let bookmark = frc.object(at: indexPath)
+//        let itemProvider = NSItemProvider(object: "\(indexPath)" as NSString)
+//        let dragItem = UIDragItem(itemProvider: itemProvider)
+//        dragItem.localObject = bookmark
+//        return [dragItem]
+//    }
+    
+    func collectionView(_ collectionView: UICollectionView, performDropWith coordinator: UICollectionViewDropCoordinator) {
+        guard let sourceIndexPath = coordinator.items.first?.sourceIndexPath else { return }
+        let destinationIndexPath: IndexPath
+        if let indexPath = coordinator.destinationIndexPath {
+            destinationIndexPath = indexPath
+        } else {
+            let section = collectionView.numberOfSections - 1
+            let row = collectionView.numberOfItems(inSection: section)
+            destinationIndexPath = IndexPath(row: row, section: section)
+        }
+        
+        switch coordinator.proposal.operation {
+        case .move:
+            collectionView.performBatchUpdates({
+                Bookmark.reorderBookmarks(frc: frc, sourceIndexPath: sourceIndexPath, destinationIndexPath: destinationIndexPath)
+                try? frc.performFetch()
+                collectionView.moveItem(at: sourceIndexPath, to: destinationIndexPath)
+            })
+        case .copy:
+            break
+        default: return
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, dropSessionDidUpdate session: UIDropSession, withDestinationIndexPath destinationIndexPath: IndexPath?) -> UICollectionViewDropProposal {
+        .init(operation: .move, intent: .insertAtDestinationIndexPath)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, dropPreviewParametersForItemAt indexPath: IndexPath) -> UIDragPreviewParameters? {
+        let params = UIDragPreviewParameters()
+        params.backgroundColor = .clear
+        return params
     }
 }
 
