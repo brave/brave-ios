@@ -531,6 +531,8 @@ class BrowserViewController: UIViewController {
         }
         
         KeyboardHelper.defaultHelper.addDelegate(self)
+        
+        view.addLayoutGuide(pageOverlayLayoutGuide)
 
         webViewContainerBackdrop = UIView()
         webViewContainerBackdrop.backgroundColor = UIColor.Photon.grey50
@@ -970,6 +972,8 @@ class BrowserViewController: UIViewController {
         }
         statusBarOverlay.isHidden = false
     }
+    
+    let pageOverlayLayoutGuide = UILayoutGuide()
 
     override func updateViewConstraints() {
         webViewContainer.snp.remakeConstraints { make in
@@ -990,15 +994,9 @@ class BrowserViewController: UIViewController {
         
         // Remake constraints even if we're already showing the home controller.
         // The home controller may change sizes if we tap the URL bar while on about:home.
-        newTabPageController?.view.snp.remakeConstraints { make in
+        pageOverlayLayoutGuide.snp.remakeConstraints { make in
             webViewContainerTopOffset = make.top.equalTo(readerModeBar?.snp.bottom ?? self.header.snp.bottom).constraint
             
-            make.left.right.equalTo(self.view)
-            make.bottom.equalTo(self.footer.snp.top)
-        }
-        
-        favoritesController?.view.snp.remakeConstraints { make in
-            make.top.equalTo(readerModeBar?.snp.bottom ?? self.header.snp.bottom)
             make.left.right.equalTo(self.view)
             make.bottom.equalTo(self.footer.snp.top)
         }
@@ -1027,7 +1025,8 @@ class BrowserViewController: UIViewController {
     private var favoritesController: NewFavoritesViewController?
     private func displayFavoritesController() {
         if favoritesController == nil {
-            let favoritesController = NewFavoritesViewController { (bookmark, action) in
+            let favoritesController = NewFavoritesViewController { [weak self] bookmark, action in
+                self?.handleBookmarkAction(bookmark: bookmark, action: action)
             }
             favoritesController.applyTheme(Theme.of(tabManager.selectedTab))
             self.favoritesController = favoritesController
@@ -1035,19 +1034,61 @@ class BrowserViewController: UIViewController {
             addChild(favoritesController)
             view.addSubview(favoritesController.view)
             favoritesController.didMove(toParent: self)
+            
+            favoritesController.view.snp.makeConstraints {
+                $0.edges.equalTo(pageOverlayLayoutGuide)
+            }
         }
         guard let favoritesController = favoritesController else { return }
-        view.bringSubviewToFront(favoritesController.view)
-        UIView.animate(withDuration: 0.2, animations: { () -> Void in
+        favoritesController.view.alpha = 0.0
+        let animator = UIViewPropertyAnimator(duration: 0.2, dampingRatio: 1.0) {
             favoritesController.view.alpha = 1
-        }, completion: { finished in
-            if finished {
-                self.webViewContainer.accessibilityElementsHidden = true
+        }
+        animator.addCompletion { _ in
+            self.webViewContainer.accessibilityElementsHidden = true
+            UIAccessibility.post(notification: .screenChanged, argument: nil)
+        }
+        animator.startAnimation()
+    }
+    
+    private func hideFavoritesController() {
+        if let controller = favoritesController {
+            self.favoritesController = nil
+            UIView.animate(withDuration: 0.1, delay: 0, options: [.beginFromCurrentState], animations: {
+                controller.view.alpha = 0.0
+            }, completion: { _ in
+                controller.willMove(toParent: nil)
+                controller.view.removeFromSuperview()
+                controller.removeFromParent()
+                self.webViewContainer.accessibilityElementsHidden = false
                 UIAccessibility.post(notification: .screenChanged, argument: nil)
+            })
+        }
+    }
+    
+    private func handleBookmarkAction(bookmark: Bookmark, action: BookmarksAction) {
+        guard let url = bookmark.url else { return }
+        switch action {
+        case .opened(let inNewTab, let switchingToPrivateMode):
+            navigateToInput(
+                url,
+                inNewTab: inNewTab,
+                switchingToPrivateMode: switchingToPrivateMode
+            )
+        case .edited:
+            guard let title = bookmark.displayTitle, let urlString = bookmark.url else { return }
+            let editPopup = UIAlertController.userTextInputAlert(title: Strings.editBookmark, message: urlString,
+                                                                 startingText: title, startingText2: bookmark.url,
+                                                                 placeholder2: urlString,
+                                                                 keyboardType2: .URL) { callbackTitle, callbackUrl in
+                                                                    if let cTitle = callbackTitle, !cTitle.isEmpty, let cUrl = callbackUrl, !cUrl.isEmpty {
+                                                                        if URL(string: cUrl) != nil {
+                                                                            bookmark.update(customTitle: cTitle, url: cUrl)
+                                                                        }
+                                                                    }
             }
-        })
-        view.setNeedsUpdateConstraints()
-        favoritesController.view.layoutIfNeeded()
+            self.present(editPopup, animated: true)
+        }
     }
 
     fileprivate func showHomePanelController() {
@@ -1070,6 +1111,10 @@ class BrowserViewController: UIViewController {
             addChild(homePanelController)
             view.addSubview(homePanelController.view)
             homePanelController.didMove(toParent: self)
+            
+            homePanelController.view.snp.makeConstraints {
+                $0.edges.equalTo(pageOverlayLayoutGuide)
+            }
         }
         guard let homePanelController = self.newTabPageController else {
             assertionFailure("homePanelController is still nil after assignment.")
@@ -1086,7 +1131,6 @@ class BrowserViewController: UIViewController {
                 UIAccessibility.post(notification: .screenChanged, argument: nil)
             }
         })
-        view.setNeedsUpdateConstraints()
     }
     
     fileprivate func hideHomePanelController() {
@@ -1146,7 +1190,6 @@ class BrowserViewController: UIViewController {
         }
 
         newTabPageController?.view?.isHidden = true
-        favoritesController?.view?.isHidden = true
 
         searchController!.didMove(toParent: self)
     }
@@ -1199,7 +1242,6 @@ class BrowserViewController: UIViewController {
             searchController.removeFromParent()
             self.searchController = nil
             newTabPageController?.view?.isHidden = false
-            favoritesController?.view?.isHidden = false
             searchLoader = nil
         }
     }
@@ -1958,9 +2000,7 @@ extension BrowserViewController: TopToolbarDelegate {
 
     func topToolbarDidLeaveOverlayMode(_ topToolbar: TopToolbarView) {
         hideSearchController()
-        UIView.animate(withDuration: 0.1, delay: 0, options: [.beginFromCurrentState], animations: {
-            self.favoritesController?.view.alpha = 0.0
-        })
+        hideFavoritesController()
         updateInContentHomePanel(tabManager.selectedTab?.url as URL?)
     }
 
