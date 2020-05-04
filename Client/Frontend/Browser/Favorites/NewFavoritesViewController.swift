@@ -258,7 +258,11 @@ extension NewFavoritesViewController: UICollectionViewDataSource, UICollectionVi
                 self.action(bookmark, .edited)
             }
             let delete = UIAction(title: Strings.removeFavorite, image: nil, identifier: nil, discoverabilityTitle: nil, attributes: .destructive) { _ in
-                bookmark.delete()
+                // Wait until the menu dismisses before deleting it so user can
+                // see the interaction
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    bookmark.delete()
+                }
             }
             
             var urlChildren: [UIAction] = [openInNewTab]
@@ -310,14 +314,6 @@ extension NewFavoritesViewController: UICollectionViewDragDelegate, UICollection
         return [dragItem]
     }
     
-//    func collectionView(_ collectionView: UICollectionView, itemsForAddingTo session: UIDragSession, at indexPath: IndexPath, point: CGPoint) -> [UIDragItem] {
-//        let bookmark = frc.object(at: indexPath)
-//        let itemProvider = NSItemProvider(object: "\(indexPath)" as NSString)
-//        let dragItem = UIDragItem(itemProvider: itemProvider)
-//        dragItem.localObject = bookmark
-//        return [dragItem]
-//    }
-    
     func collectionView(_ collectionView: UICollectionView, performDropWith coordinator: UICollectionViewDropCoordinator) {
         guard let sourceIndexPath = coordinator.items.first?.sourceIndexPath else { return }
         let destinationIndexPath: IndexPath
@@ -331,11 +327,10 @@ extension NewFavoritesViewController: UICollectionViewDragDelegate, UICollection
         
         switch coordinator.proposal.operation {
         case .move:
-            collectionView.performBatchUpdates({
-                Bookmark.reorderBookmarks(frc: frc, sourceIndexPath: sourceIndexPath, destinationIndexPath: destinationIndexPath)
-                try? frc.performFetch()
-                collectionView.moveItem(at: sourceIndexPath, to: destinationIndexPath)
-            })
+            Bookmark.reorderBookmarks(frc: frc, sourceIndexPath: sourceIndexPath, destinationIndexPath: destinationIndexPath) {
+                guard let item = coordinator.items.first else { return }
+                coordinator.drop(item.dragItem, toItemAt: destinationIndexPath)
+            }
         case .copy:
             break
         default: return
@@ -343,12 +338,27 @@ extension NewFavoritesViewController: UICollectionViewDragDelegate, UICollection
     }
     
     func collectionView(_ collectionView: UICollectionView, dropSessionDidUpdate session: UIDropSession, withDestinationIndexPath destinationIndexPath: IndexPath?) -> UICollectionViewDropProposal {
-        .init(operation: .move, intent: .insertAtDestinationIndexPath)
+        if frc.fetchedObjects?.count == 1 {
+            return .init(operation: .cancel)
+        }
+        return .init(operation: .move, intent: .insertAtDestinationIndexPath)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, dragPreviewParametersForItemAt indexPath: IndexPath) -> UIDragPreviewParameters? {
+        let params = UIDragPreviewParameters()
+        params.backgroundColor = .clear
+        if let cell = collectionView.cellForItem(at: indexPath) as? FavoriteCell {
+            params.visiblePath = UIBezierPath(roundedRect: cell.imageView.frame, cornerRadius: 8)
+        }
+        return params
     }
     
     func collectionView(_ collectionView: UICollectionView, dropPreviewParametersForItemAt indexPath: IndexPath) -> UIDragPreviewParameters? {
         let params = UIDragPreviewParameters()
         params.backgroundColor = .clear
+        if let cell = collectionView.cellForItem(at: indexPath) as? FavoriteCell {
+            params.visiblePath = UIBezierPath(roundedRect: cell.imageView.frame, cornerRadius: 8)
+        }
         return params
     }
 }
@@ -356,6 +366,27 @@ extension NewFavoritesViewController: UICollectionViewDragDelegate, UICollection
 // MARK: - NSFetchedResultsControllerDelegate
 extension NewFavoritesViewController: NSFetchedResultsControllerDelegate {
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        collectionView.reloadData()
+        switch type {
+        case .insert:
+            if let indexPath = indexPath {
+                collectionView.insertItems(at: [indexPath])
+            }
+        case .delete:
+            if let indexPath = indexPath {
+                collectionView.deleteItems(at: [indexPath])
+            }
+        case .update:
+            if let indexPath = indexPath {
+                collectionView.reloadItems(at: [indexPath])
+            }
+            if let newIndexPath = newIndexPath, newIndexPath != indexPath {
+                collectionView.reloadItems(at: [newIndexPath])
+            }
+        case .move:
+            break
+        @unknown default:
+            assertionFailure()
+            break
+        }
     }
 }

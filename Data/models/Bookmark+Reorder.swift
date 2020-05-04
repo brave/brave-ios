@@ -16,7 +16,8 @@ extension Bookmark {
     /// 2. Recalculates `syncOrder` for all Bookmarks on a given level. This is required because
     /// we use a special String-based order and algorithg. Simple String comparision doesn't work here.
     public class func reorderBookmarks(frc: NSFetchedResultsController<Bookmark>?, sourceIndexPath: IndexPath,
-                                       destinationIndexPath: IndexPath) {
+                                       destinationIndexPath: IndexPath,
+                                       completion: (() -> Void)? = nil) {
         guard let frc = frc else { return }
         
         let dest = frc.object(at: destinationIndexPath)
@@ -107,6 +108,10 @@ extension Bookmark {
                                                      forFavorites: srcBookmark.isFavorite, context: context)
             if !srcBookmark.isFavorite {
                 Sync.shared.sendSyncRecords(action: .update, records: [srcBookmark])
+            }
+            
+            DispatchQueue.main.async {
+                completion?()
             }
         }
     }
