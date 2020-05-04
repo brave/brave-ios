@@ -110,12 +110,10 @@ class FavoritesSectionProvider: NSObject, NTPObservableSectionProvider {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let width = fittingSizeForCollectionView(collectionView, section: indexPath.section).width
-        let cellWidth = width / CGFloat(Self.numberOfItems(in: collectionView, availableWidth: width))
-        // The tile's height is determined the aspect ratio of the thumbnails width. We also take into account
-        // some padding between the title and the image.
         let scale = 1.0 / UIScreen.main.scale
-        return CGSize(width: (scale * (cellWidth / scale)).rounded(.down),
-                      height: 1000)
+        let cellWidth = (scale * (width / CGFloat(Self.numberOfItems(in: collectionView, availableWidth: width)) / scale)).rounded(.down)
+        return CGSize(width: cellWidth,
+                      height: FavoriteCell.height(forWidth: cellWidth))
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {

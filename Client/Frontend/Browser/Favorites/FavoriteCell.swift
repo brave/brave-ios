@@ -136,9 +136,8 @@ class FavoriteCell: UICollectionViewCell {
     }
     
     override func preferredLayoutAttributesFitting(_ layoutAttributes: UICollectionViewLayoutAttributes) -> UICollectionViewLayoutAttributes {
-        let attributes = super.preferredLayoutAttributesFitting(layoutAttributes)
-        attributes.size = stackView.systemLayoutSizeFitting(layoutAttributes.size, withHorizontalFittingPriority: .required, verticalFittingPriority: .fittingSizeLevel)
-        return attributes
+        // Size of cells are determined outside of cell
+        return layoutAttributes
     }
     
     static func height(forWidth width: CGFloat) -> CGFloat {
