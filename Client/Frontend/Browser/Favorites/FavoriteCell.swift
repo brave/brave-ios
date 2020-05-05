@@ -72,9 +72,6 @@ class FavoriteCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        layer.shouldRasterize = true
-        layer.rasterizationScale = UIScreen.main.scale
-        
         isAccessibilityElement = true
         
         contentView.addSubview(stackView)

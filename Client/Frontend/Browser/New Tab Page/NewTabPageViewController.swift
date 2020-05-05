@@ -88,7 +88,7 @@ class NewTabPageViewController: UIViewController, Themeable {
     
     private let layout = NewTabPageFlowLayout()
     private let collectionView: NewTabCollectionView
-    private let tab: Tab
+    private weak var tab: Tab?
     private let rewards: BraveRewards
     
     private var background: NewTabPageBackground

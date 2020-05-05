@@ -107,7 +107,7 @@ class NewFavoritesViewController: UIViewController, Themeable {
         let blurStyle: UIBlurEffect.Style = theme.isDark ? .dark : .extraLight
         backgroundView.effect = UIBlurEffect(style: blurStyle)
         backgroundView.contentView.backgroundColor = theme.colors.home.withAlphaComponent(0.5)
-        collectionView.reloadItems(at: collectionView.indexPathsForVisibleItems)
+        collectionView.reloadSections(IndexSet(integer: 0))
     }
     
     override func viewWillLayoutSubviews() {
@@ -252,10 +252,14 @@ extension NewFavoritesViewController: UICollectionViewDataSource, UICollectionVi
         guard let bookmark = frc.fetchedObjects?[indexPath.item] else { return nil }
         return UIContextMenuConfiguration(identifier: indexPath as NSCopying, previewProvider: nil) { _ -> UIMenu? in
             let openInNewTab = UIAction(title: Strings.openNewTabButtonTitle, image: nil, identifier: nil, discoverabilityTitle: nil) { _ in
-                self.action(bookmark, .opened(inNewTab: true, switchingToPrivateMode: false))
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    self.action(bookmark, .opened(inNewTab: true, switchingToPrivateMode: false))
+                }
             }
             let edit = UIAction(title: Strings.editBookmark, image: nil, identifier: nil, discoverabilityTitle: nil) { _ in
-                self.action(bookmark, .edited)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    self.action(bookmark, .edited)
+                }
             }
             let delete = UIAction(title: Strings.removeFavorite, image: nil, identifier: nil, discoverabilityTitle: nil, attributes: .destructive) { _ in
                 // Wait until the menu dismisses before deleting it so user can
@@ -322,7 +326,7 @@ extension NewFavoritesViewController: UICollectionViewDragDelegate, UICollection
         } else {
             let section = collectionView.numberOfSections - 1
             let row = collectionView.numberOfItems(inSection: section)
-            destinationIndexPath = IndexPath(row: row, section: section)
+            destinationIndexPath = IndexPath(row: row - 1, section: section)
         }
         
         switch coordinator.proposal.operation {

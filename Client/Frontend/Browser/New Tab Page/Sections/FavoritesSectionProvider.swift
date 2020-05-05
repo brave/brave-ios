@@ -125,13 +125,19 @@ class FavoritesSectionProvider: NSObject, NTPObservableSectionProvider {
         guard let favourite = frc.fetchedObjects?[indexPath.item] else { return nil }
         return UIContextMenuConfiguration(identifier: indexPath as NSCopying, previewProvider: nil) { _ -> UIMenu? in
             let openInNewTab = UIAction(title: Strings.openNewTabButtonTitle, image: nil, identifier: nil, discoverabilityTitle: nil) { _ in
-                self.action(favourite, .opened(inNewTab: true, switchingToPrivateMode: false))
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    self.action(favourite, .opened(inNewTab: true, switchingToPrivateMode: false))
+                }
             }
             let edit = UIAction(title: Strings.editBookmark, image: nil, identifier: nil, discoverabilityTitle: nil) { _ in
-                self.action(favourite, .edited)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    self.action(favourite, .edited)
+                }
             }
             let delete = UIAction(title: Strings.removeFavorite, image: nil, identifier: nil, discoverabilityTitle: nil, attributes: .destructive) { _ in
-                favourite.delete()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    favourite.delete()
+                }
             }
             
             var urlChildren: [UIAction] = [openInNewTab]
