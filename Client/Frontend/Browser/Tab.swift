@@ -360,6 +360,7 @@ class Tab: NSObject {
     }
 
     var displayFavicon: Favicon? {
+        if url?.isAboutHomeURL == true { return nil }
         return favicons.max { $0.width! < $1.width! }
     }
 
