@@ -1017,11 +1017,11 @@ class BrowserViewController: UIViewController {
         super.updateViewConstraints()
     }
     
-    private(set) var favoritesController: NewFavoritesViewController?
+    private(set) var favoritesController: FavoritesViewController?
     
     private func displayFavoritesController() {
         if favoritesController == nil {
-            let favoritesController = NewFavoritesViewController { [weak self] bookmark, action in
+            let favoritesController = FavoritesViewController { [weak self] bookmark, action in
                 self?.handleBookmarkAction(bookmark: bookmark, action: action)
             }
             favoritesController.applyTheme(Theme.of(tabManager.selectedTab))

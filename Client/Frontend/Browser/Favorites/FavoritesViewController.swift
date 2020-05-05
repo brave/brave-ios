@@ -30,7 +30,7 @@ private class FavoritesHeaderView: UICollectionReusableView {
     }
 }
 
-class NewFavoritesViewController: UIViewController, Themeable {
+class FavoritesViewController: UIViewController, Themeable {
     
     var action: (Bookmark, BookmarksAction) -> Void
     
@@ -149,7 +149,7 @@ class NewFavoritesViewController: UIViewController, Themeable {
 }
 
 // MARK: - KeyboardHelperDelegate
-extension NewFavoritesViewController: KeyboardHelperDelegate {
+extension FavoritesViewController: KeyboardHelperDelegate {
     func updateKeyboardInset(_ state: KeyboardState, animated: Bool = true) {
         if collectionView.bounds.size == .zero { return }
         let keyboardHeight = state.intersectionHeightForView(self.view) - view.safeAreaInsets.bottom
@@ -179,7 +179,7 @@ extension NewFavoritesViewController: KeyboardHelperDelegate {
 }
 
 // MARK: - UICollectionViewDataSource & UICollectionViewDelegateFlowLayout
-extension NewFavoritesViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+extension FavoritesViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return frc.fetchedObjects?.count ?? 0
     }
@@ -303,7 +303,7 @@ extension NewFavoritesViewController: UICollectionViewDataSource, UICollectionVi
 }
 
 // MARK: - UICollectionViewDragDelegate & UICollectionViewDropDelegate
-extension NewFavoritesViewController: UICollectionViewDragDelegate, UICollectionViewDropDelegate {
+extension FavoritesViewController: UICollectionViewDragDelegate, UICollectionViewDropDelegate {
     func collectionView(_ collectionView: UICollectionView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
         let bookmark = frc.object(at: indexPath)
         let itemProvider = NSItemProvider(object: "\(indexPath)" as NSString)
@@ -368,7 +368,7 @@ extension NewFavoritesViewController: UICollectionViewDragDelegate, UICollection
 }
 
 // MARK: - NSFetchedResultsControllerDelegate
-extension NewFavoritesViewController: NSFetchedResultsControllerDelegate {
+extension FavoritesViewController: NSFetchedResultsControllerDelegate {
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         switch type {
         case .insert:
