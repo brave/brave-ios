@@ -153,7 +153,6 @@ extension FavoritesDataSource: NSFetchedResultsControllerDelegate {
             break
         @unknown default:
             assertionFailure()
-            break
         }
     }
 }

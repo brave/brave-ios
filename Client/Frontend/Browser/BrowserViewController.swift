@@ -1568,7 +1568,7 @@ class BrowserViewController: UIViewController {
             // We don't allow to have 2 same favorites.
             if !FavoritesHelper.isAlreadyAdded(url) {
                 let addToFavoritesActivity = AddToFavoritesActivity() { [weak tab] in
-                    FavoritesHelper.add(url: url, title: tab?.displayTitle, color: nil)
+                    FavoritesHelper.add(url: url, title: tab?.displayTitle)
                 }
                 activities.append(addToFavoritesActivity)
             }
@@ -3506,50 +3506,6 @@ extension BrowserViewController: NewTabPageDelegate {
             
             self.presentActivityViewController(url, sourceView: self.view, sourceRect: viewRect,
                                                arrowDirection: .any)
-        }
-    }
-}
-
-extension BrowserViewController: FavoritesDelegate {
-    
-    func didSelect(input: String) {
-        processAddressBar(text: input, visitType: .bookmark)
-    }
-    
-    func didTapDuckDuckGoCallout() {
-        presentDuckDuckGoCallout(force: true)
-    }
-    
-    func didTapShowMoreFavorites() {
-        topToolbarDidTapBookmarkButton(nil, favorites: true)
-    }
-
-    func didTapQRButton(url: URL) {
-        let qrPopup = QRCodePopupView(url: url)
-        qrPopup.showWithType(showType: .flyUp)
-        qrPopup.qrCodeShareHandler = { [weak self] url in
-            guard let self = self else { return }
-            
-            let viewRect = CGRect(origin: self.view.center, size: .zero)
-            
-            self.presentActivityViewController(url, sourceView: self.view, sourceRect: viewRect,
-                                                arrowDirection: .any)
-        }
-    }
-
-    func openBrandedImageCallout(state: BrandedImageCalloutState?) {
-        guard let state = state, state.hasDetailViewController else { return }
-        
-        let vc = NTPLearnMoreViewController(state: state, rewards: rewards)
-        
-        vc.linkHandler = { [weak self] url in
-            self?.tabManager.selectedTab?.loadRequest(PrivilegedRequest(url: url) as URLRequest)
-        }
-
-        addChild(vc)
-        view.addSubview(vc.view)
-        vc.view.snp.remakeConstraints {
-            $0.right.top.bottom.leading.equalToSuperview()
         }
     }
 }

@@ -207,11 +207,10 @@ class NewTabPageViewController: UIViewController, Themeable {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         
-        if #available(iOS 13.0, *) {
-            if UITraitCollection.current.userInterfaceStyle != previousTraitCollection?.userInterfaceStyle {
-                // Reload UI
-                applyTheme(Theme.of(tab))
-            }
+        if #available(iOS 13.0, *),
+            UITraitCollection.current.userInterfaceStyle != previousTraitCollection?.userInterfaceStyle {
+            // Reload UI
+            applyTheme(Theme.of(tab))
         }
     }
     
@@ -424,10 +423,12 @@ class NewTabPageViewController: UIViewController, Themeable {
                                                                  startingText: title, startingText2: bookmark.url,
                                                                  placeholder2: urlString,
                                                                  keyboardType2: .URL) { callbackTitle, callbackUrl in
-                                                                    if let cTitle = callbackTitle, !cTitle.isEmpty, let cUrl = callbackUrl, !cUrl.isEmpty {
-                                                                        if URL(string: cUrl) != nil {
-                                                                            bookmark.update(customTitle: cTitle, url: cUrl)
-                                                                        }
+                                                                    if let cTitle = callbackTitle,
+                                                                        !cTitle.isEmpty,
+                                                                        let cUrl = callbackUrl,
+                                                                        !cUrl.isEmpty,
+                                                                        URL(string: cUrl) != nil {
+                                                                        bookmark.update(customTitle: cTitle, url: cUrl)
                                                                     }
             }
             self.present(editPopup, animated: true)

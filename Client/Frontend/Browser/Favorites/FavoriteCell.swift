@@ -118,14 +118,6 @@ class FavoriteCell: UICollectionViewCell {
         imageView.image = nil
     }
     
-    private func updateSelectedHighlightedState() {
-        let activatedAlpha: CGFloat = 0.7
-        let disactivatedAlpha: CGFloat = 1.0
-        
-        let activated = isSelected || isHighlighted
-        self.imageView.alpha = activated ? activatedAlpha : disactivatedAlpha
-    }
-    
     @objc private func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
         if gesture.state == .began {
             longPressHandler?(self)

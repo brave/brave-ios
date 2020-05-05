@@ -205,7 +205,7 @@ extension NewFavoritesViewController: UICollectionViewDataSource, UICollectionVi
         cell.textLabel.text = fav.displayTitle ?? fav.url
         cell.textLabel.appearanceTextColor = nil
         cell.imageView.image = nil
-        cell.imageView.setIconMO(nil, forURL: URL(string: fav.url ?? ""), scaledDefaultIconSize: CGSize(width: 40, height: 40), completed: { (color, url) in
+        cell.imageView.setIconMO(fav.domain?.favicon, forURL: URL(string: fav.url ?? ""), scaledDefaultIconSize: CGSize(width: 40, height: 40), completed: { (color, url) in
             if fav.url == url?.absoluteString {
                 cell.imageView.backgroundColor = color
             }
@@ -390,7 +390,6 @@ extension NewFavoritesViewController: NSFetchedResultsControllerDelegate {
             break
         @unknown default:
             assertionFailure()
-            break
         }
     }
 }
