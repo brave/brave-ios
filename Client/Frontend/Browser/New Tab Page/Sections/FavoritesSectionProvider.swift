@@ -40,22 +40,30 @@ class FavoritesSectionProvider: NSObject, NTPObservableSectionProvider {
         }
     }
     
+    static var defaultIconSize = CGSize(width: 82, height: FavoriteCell.height(forWidth: 82))
+    static var largerIconSize = CGSize(width: 100, height: FavoriteCell.height(forWidth: 100))
+    
     /// The number of times that each row contains
     static func numberOfItems(in collectionView: UICollectionView, availableWidth: CGFloat) -> Int {
         /// Two considerations:
         /// 1. icon size minimum
         /// 2. trait collection
+        /// 3. orientation ("is landscape")
+        let icons = (min: 4, max: 6)
+        let defaultWidth: CGFloat = defaultIconSize.width
+        let fittingNumber: Int
         
-        let icons = (less: 4, more: 6)
-        let minIconPoints: CGFloat = 80
-        
-        // If icons fall below a certain size, then use less icons.
-        if (availableWidth / CGFloat(icons.more)) < minIconPoints {
-            return icons.less
+        if collectionView.traitCollection.horizontalSizeClass == .regular {
+            if collectionView.frame.width > collectionView.frame.height {
+                fittingNumber = Int(floor(availableWidth / defaultWidth))
+            } else {
+                fittingNumber = Int(floor(availableWidth / largerIconSize.width))
+            }
+        } else {
+            fittingNumber = Int(floor(availableWidth / defaultWidth))
         }
         
-        let cols = collectionView.traitCollection.horizontalSizeClass == .compact ? icons.less : icons.more
-        return cols
+        return max(icons.min, min(icons.max, fittingNumber))
     }
     
     func registerCells(to collectionView: UICollectionView) {
@@ -108,16 +116,43 @@ class FavoritesSectionProvider: NSObject, NTPObservableSectionProvider {
         return cell
     }
     
+    private func itemSize(collectionView: UICollectionView, section: Int) -> CGSize {
+        let width = fittingSizeForCollectionView(collectionView, section: section).width
+        var size = Self.defaultIconSize
+        
+        let minimumNumberOfColumns = Self.numberOfItems(in: collectionView, availableWidth: width)
+        let minWidth = floor(width / CGFloat(minimumNumberOfColumns))
+        if minWidth < size.width {
+            // If the default icon size is too large, make it slightly smaller
+            // to fit at least 4 icons
+            size = CGSize(width: floor(width / 4.0), height: FavoriteCell.height(forWidth: floor(width / 4.0)))
+        } else if collectionView.traitCollection.horizontalSizeClass == .regular {
+            // If we're on regular horizontal size class and the computed size
+            // of the icon is larger than `largerIconSize`, use `largerIconSize`
+            if width / CGFloat(minimumNumberOfColumns) > Self.largerIconSize.width {
+                size = Self.largerIconSize
+            }
+        }
+        return size
+    }
+ 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let width = fittingSizeForCollectionView(collectionView, section: indexPath.section).width
-        let scale = 1.0 / UIScreen.main.scale
-        let cellWidth = (scale * (width / CGFloat(Self.numberOfItems(in: collectionView, availableWidth: width)) / scale)).rounded(.down)
-        return CGSize(width: cellWidth,
-                      height: FavoriteCell.height(forWidth: cellWidth))
+        return itemSize(collectionView: collectionView, section: indexPath.section)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        return UIEdgeInsets(top: 6, left: 12, bottom: 6, right: 12)
+        let isLandscape = collectionView.frame.width > collectionView.frame.height
+        // Adjust the left-side padding a bit for portrait iPad
+        let inset = isLandscape ? 12 : collectionView.readableContentGuide.layoutFrame.origin.x
+        return UIEdgeInsets(top: 6, left: inset, bottom: 6, right: inset)
+    }
+        
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        let width = fittingSizeForCollectionView(collectionView, section: section).width
+        let size = itemSize(collectionView: collectionView, section: section)
+        let numberOfItems = Self.numberOfItems(in: collectionView, availableWidth: width)
+        
+        return floor((width - (size.width * CGFloat(numberOfItems))) / (CGFloat(numberOfItems) - 1))
     }
     
     @available(iOS 13.0, *)
