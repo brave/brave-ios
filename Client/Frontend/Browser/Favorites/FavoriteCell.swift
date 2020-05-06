@@ -140,6 +140,6 @@ class FavoriteCell: UICollectionViewCell {
 extension FavoriteCell: UIPointerInteractionDelegate {
     func pointerInteraction(_ interaction: UIPointerInteraction, styleFor region: UIPointerRegion) -> UIPointerStyle? {
         let preview = UITargetedPreview(view: imageView)
-        return UIPointerStyle(effect: .highlight(preview))
+        return UIPointerStyle(effect: .lift(preview))
     }
 }
