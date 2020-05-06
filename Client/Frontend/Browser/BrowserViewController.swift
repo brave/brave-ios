@@ -1103,7 +1103,16 @@ class BrowserViewController: UIViewController {
             return
         }
         
+        if let activeController = activeNewTabPageViewController, ntpController != activeController {
+            // Remove active controller first
+            activeController.willMove(toParent: nil)
+            activeController.removeFromParent()
+            activeController.view.removeFromSuperview()
+        }
+        
         if ntpController.parent == nil {
+            activeNewTabPageViewController = ntpController
+            
             addChild(ntpController)
             view.addSubview(ntpController.view)
             ntpController.didMove(toParent: self)
@@ -1126,8 +1135,10 @@ class BrowserViewController: UIViewController {
         }
     }
     
-    fileprivate func hideHomePanelController(_ controller: NewTabPageViewController?) {
-        if let controller = controller {
+    private weak var activeNewTabPageViewController: NewTabPageViewController?
+    
+    fileprivate func hideHomePanelController() {
+        if let controller = activeNewTabPageViewController {
             UIView.animate(withDuration: 0.2, animations: {
                 controller.view.alpha = 0.0
             }, completion: { finished in
@@ -1148,13 +1159,13 @@ class BrowserViewController: UIViewController {
     fileprivate func updateInContentHomePanel(_ url: URL?) {
         if !topToolbar.inOverlayMode {
             guard let url = url else {
-                hideHomePanelController(tabManager.selectedTab?.newTabPageViewController)
+                hideHomePanelController()
                 return
             }
             if url.isAboutHomeURL && !url.isErrorPageURL {
                 showHomePanelController()
             } else if !url.isLocalUtility || url.isReaderModeURL || url.isErrorPageURL {
-                hideHomePanelController(tabManager.selectedTab?.newTabPageViewController)
+                hideHomePanelController()
             }
         }
     }
@@ -2365,8 +2376,6 @@ extension BrowserViewController: TabManagerDelegate {
             wv.accessibilityIdentifier = nil
             wv.removeFromSuperview()
         }
-        
-        hideHomePanelController(previous?.newTabPageViewController)
         
         toolbar?.setSearchButtonState(url: selected?.url)
         if let tab = selected, let webView = tab.webView {
