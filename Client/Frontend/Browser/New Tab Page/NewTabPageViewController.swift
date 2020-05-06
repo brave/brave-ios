@@ -159,10 +159,10 @@ class NewTabPageViewController: UIViewController, Themeable {
         sections.enumerated().forEach { (index, provider) in
             provider.registerCells(to: collectionView)
             if let observableProvider = provider as? NTPObservableSectionProvider {
-                observableProvider.sectionDidChange = {
+                observableProvider.sectionDidChange = { [weak self] in
                     DispatchQueue.main.async {
                         UIView.performWithoutAnimation {
-                            self.collectionView.reloadSections(IndexSet(integer: index))
+                            self?.collectionView.reloadSections(IndexSet(integer: index))
                         }
                     }
                 }
