@@ -1032,7 +1032,8 @@ class BrowserViewController: UIViewController {
             favoritesController.didMove(toParent: self)
             
             favoritesController.view.snp.makeConstraints {
-                $0.edges.equalTo(pageOverlayLayoutGuide)
+                $0.top.leading.trailing.equalTo(pageOverlayLayoutGuide)
+                $0.bottom.equalTo(view)
             }
         }
         guard let favoritesController = favoritesController else { return }
