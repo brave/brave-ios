@@ -41,18 +41,12 @@ class NewTabPageBackground: PreferencesObserver {
         self.dataSource = dataSource
         self.currentBackground = dataSource.newBackground()
         
-        NotificationCenter.default.addObserver(self, selector: #selector(privateModeChanged), name: .privacyModeChanged, object: nil)
-        
         Preferences.NewTabPage.backgroundImages.observe(from: self)
         Preferences.NewTabPage.backgroundSponsoredImages.observe(from: self)
     }
     
     deinit {
         NotificationCenter.default.removeObserver(self)
-    }
-    
-    @objc private func privateModeChanged() {
-        self.currentBackground = dataSource.newBackground()
     }
     
     private var timer: Timer?
