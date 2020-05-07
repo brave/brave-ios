@@ -40,9 +40,11 @@ class TabScrollingController: NSObject {
     weak var footer: UIView?
     weak var topToolbar: TopToolbarView?
     weak var tabsBar: TabsBarViewController?
+    weak var nowPlayingBar: NowPlayingBar?
     weak var snackBars: UIView?
 
     var footerBottomConstraint: Constraint?
+    var nowPlayingBottomConstraint: Constraint?
     var headerTopConstraint: Constraint?
     var toolbarsShowing: Bool { return headerTopOffset == 0 }
 
@@ -66,6 +68,7 @@ class TabScrollingController: NSObject {
     fileprivate var footerBottomOffset: CGFloat = 0 {
         didSet {
             footerBottomConstraint?.update(offset: footerBottomOffset)
+            nowPlayingBottomConstraint?.update(offset: footerBottomOffset - 8)
             footer?.superview?.setNeedsLayout()
         }
     }

@@ -985,17 +985,18 @@ class TabManagerNavDelegate: NSObject, WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-            let authenticatingDelegates = delegates.filter { wv in
-                return wv.responds(to: #selector(webView(_:didReceive:completionHandler:)))
-            }
+        
+        let authenticatingDelegates = delegates.filter { wv in
+            return wv.responds(to: #selector(webView(_:didReceive:completionHandler:)))
+        }
 
-            guard let firstAuthenticatingDelegate = authenticatingDelegates.first else {
-                return completionHandler(.performDefaultHandling, nil)
-            }
+        guard let firstAuthenticatingDelegate = authenticatingDelegates.first else {
+            return completionHandler(.performDefaultHandling, nil)
+        }
 
-            firstAuthenticatingDelegate.webView?(webView, didReceive: challenge) { (disposition, credential) in
-                completionHandler(disposition, credential)
-            }
+        firstAuthenticatingDelegate.webView?(webView, didReceive: challenge) { (disposition, credential) in
+            completionHandler(disposition, credential)
+        }
     }
 
     func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {

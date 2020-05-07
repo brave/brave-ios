@@ -29,6 +29,8 @@ class NowPlayingBar: UIView {
         }
     }
     
+    private let backgroundBlurView = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
+    
     private let infoStackView = UIStackView().then {
         $0.axis = .horizontal
         $0.spacing = 15.0
@@ -57,11 +59,13 @@ class NowPlayingBar: UIView {
         $0.contentMode = .scaleAspectFit
         $0.layer.masksToBounds = true
         $0.layer.cornerRadius = 5.0
+        $0.tintColor = .white
     }
     
     private let soundBarButton = UIButton().then {
-        $0.setImage(#imageLiteral(resourceName: "videoPlayingIndicator"), for: .normal)
+        $0.setImage(#imageLiteral(resourceName: "videoPlayingIndicator").withRenderingMode(.alwaysTemplate), for: .normal)
         $0.imageView?.contentMode = .scaleAspectFit
+        $0.tintColor = .white
     }
     
     private let titleLabel = UILabel().then {
@@ -84,19 +88,23 @@ class NowPlayingBar: UIView {
     }
     
     private let expandButton = UIButton().then {
-        $0.setImage(#imageLiteral(resourceName: "nowPlayingExpand"), for: .normal)
+        $0.setImage(#imageLiteral(resourceName: "nowPlayingExpand").withRenderingMode(.alwaysTemplate), for: .normal)
         $0.imageView?.contentMode = .scaleAspectFit
+        $0.tintColor = UIColor.white
     }
     
     private let closeButton = UIButton().then {
-        $0.setImage(#imageLiteral(resourceName: "nowPlayingExit"), for: .normal)
+        $0.setImage(#imageLiteral(resourceName: "nowPlayingExit").withRenderingMode(.alwaysTemplate), for: .normal)
         $0.imageView?.contentMode = .scaleAspectFit
+        $0.tintColor = .white
     }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        backgroundColor = #colorLiteral(red: 0.4352941176, green: 0.4352941176, blue: 0.4352941176, alpha: 1)
+        backgroundBlurView.contentView.backgroundColor = UIColor(white: 1.0, alpha: 0.4)
+        
+        addSubview(backgroundBlurView)
         
         infoStackView.addArrangedSubview(iconView)
         infoStackView.addArrangedSubview(titleLabel)
@@ -107,6 +115,10 @@ class NowPlayingBar: UIView {
         
         addSubview(infoStackView)
         addSubview(buttonStackView)
+        
+        backgroundBlurView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
         
         infoStackView.snp.makeConstraints {
             $0.left.top.bottom.equalToSuperview()
@@ -146,6 +158,13 @@ class NowPlayingBar: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func layoutSubviews() {
+        let roundPath = UIBezierPath(roundedRect: bounds, byRoundingCorners: [.topLeft, .topRight, .bottomLeft, .bottomRight], cornerRadii: CGSize(width: 8, height: 8))
+        let maskLayer = CAShapeLayer()
+        maskLayer.path = roundPath.cgPath
+        layer.mask = maskLayer
+    }
+    
     private func createSeparator() -> UIView {
         return UIView().then {
             $0.backgroundColor = #colorLiteral(red: 0.537254902, green: 0.5411764706, blue: 0.537254902, alpha: 1)
@@ -163,7 +182,8 @@ class NowPlayingBar: UIView {
         
         switch state {
         case .add:
-            iconView.image = #imageLiteral(resourceName: "playlistsAdd")
+            iconView.image = #imageLiteral(resourceName: "playlistsAdd").withRenderingMode(.alwaysTemplate)
+            iconView.tintColor = .white
             titleLabel.text = "Add to playlist"
             titleLabel.isHidden = false
             mediaInfoStackView.isHidden = true
@@ -175,7 +195,8 @@ class NowPlayingBar: UIView {
             mediaInfoStackView.isHidden = true
             
         case .addNowPlaying:
-            iconView.image = #imageLiteral(resourceName: "playlistsAdd")
+            iconView.image = #imageLiteral(resourceName: "playlistsAdd").withRenderingMode(.alwaysTemplate)
+            iconView.tintColor = .white
             titleLabel.isHidden = true
             mediaInfoStackView.isHidden = false
             
@@ -219,9 +240,7 @@ class NowPlayingBar: UIView {
             infoStackView.addArrangedSubview(mediaInfoStackView)
         }
         
-        buttonStackView.addArrangedSubview(createSeparator())
         buttonStackView.addArrangedSubview(expandButton)
-        buttonStackView.addArrangedSubview(createSeparator())
         buttonStackView.addArrangedSubview(closeButton)
     }
     
@@ -229,7 +248,7 @@ class NowPlayingBar: UIView {
     
     @objc
     private func onAddToPlaylist(_ gestureRecognizer: UIGestureRecognizer) {
-        if state == .add || state == .addNowPlaying {
+        if state == .add {
             delegate?.onAddToPlaylist()
         } else {
             delegate?.onExpand()

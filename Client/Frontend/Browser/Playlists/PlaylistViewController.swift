@@ -265,6 +265,7 @@ extension PlaylistViewController: UITableViewDelegate {
                         
                         self.currentItem = -1
                         Playlist.shared.currentlyPlayingInfo.value = nil
+                        
                         //currentItem.mimeType = response?.mimeType
                         Playlist.shared.updateCache(item: currentItem, cachedData: data ?? Data())
                         completionHandler(true)
