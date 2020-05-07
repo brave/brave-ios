@@ -181,7 +181,6 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
   }
   
   func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-    // Using the same reorder logic as in FavoritesDataSource
     Bookmark.reorderBookmarks(frc: bookmarksFRC, sourceIndexPath: sourceIndexPath, destinationIndexPath: destinationIndexPath)
   }
   

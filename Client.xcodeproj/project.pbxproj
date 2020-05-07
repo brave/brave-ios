@@ -92,7 +92,6 @@
 		0AAAACAD22491CC7009A8763 /* ErrorExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AAAACAC22491CC7009A8763 /* ErrorExtensions.swift */; };
 		0AADC4CA20D2A66E00FDE368 /* FavoriteCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AADC4C920D2A66E00FDE368 /* FavoriteCell.swift */; };
 		0AADC4D220D2A6A200FDE368 /* FavoritesHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AADC4CE20D2A6A200FDE368 /* FavoritesHelper.swift */; };
-		0AADC4D420D2A6A200FDE368 /* FavoritesDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AADC4D020D2A6A200FDE368 /* FavoritesDataSource.swift */; };
 		0AADC4D520D2A6A200FDE368 /* PreloadedFavorites.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AADC4D120D2A6A200FDE368 /* PreloadedFavorites.swift */; };
 		0AB2442C22AA789B00B4D9DD /* ReaderModeButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AB2442B22AA789B00B4D9DD /* ReaderModeButton.swift */; };
 		0AB7FCDC235DED0B00F1D9F5 /* NumberExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AB7FCDB235DED0B00F1D9F5 /* NumberExtensions.swift */; };
@@ -789,7 +788,6 @@
 		A83E5B1D1C1DA8D80026D912 /* UIPasteboardExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A83E5B1C1C1DA8D80026D912 /* UIPasteboardExtensionsTests.swift */; };
 		A83E5B1E1C1DAAAA0026D912 /* UIPasteboardExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A83E5AB61C1D993D0026D912 /* UIPasteboardExtensions.swift */; };
 		A9072B801D07B34100459960 /* NoImageModeHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9072B7F1D07B34100459960 /* NoImageModeHelper.swift */; };
-		AB1B097A21F2F00400E0DD51 /* FavoritesViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1B097921F2F00400E0DD51 /* FavoritesViewControllerTests.swift */; };
 		C400467C1CF4E43E00B08303 /* BackForwardListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C400467B1CF4E43E00B08303 /* BackForwardListViewController.swift */; };
 		C40046FA1CF8E0B200B08303 /* BackForwardListAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C40046F91CF8E0B200B08303 /* BackForwardListAnimator.swift */; };
 		C4E3984C1D21F2FD004E89BA /* TabTrayButtonExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E3984B1D21F2FD004E89BA /* TabTrayButtonExtensions.swift */; };
@@ -1418,7 +1416,6 @@
 		0AAAACAC22491CC7009A8763 /* ErrorExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorExtensions.swift; sourceTree = "<group>"; };
 		0AADC4C920D2A66E00FDE368 /* FavoriteCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteCell.swift; sourceTree = "<group>"; };
 		0AADC4CE20D2A6A200FDE368 /* FavoritesHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FavoritesHelper.swift; sourceTree = "<group>"; };
-		0AADC4D020D2A6A200FDE368 /* FavoritesDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FavoritesDataSource.swift; sourceTree = "<group>"; };
 		0AADC4D120D2A6A200FDE368 /* PreloadedFavorites.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreloadedFavorites.swift; sourceTree = "<group>"; };
 		0AB2442B22AA789B00B4D9DD /* ReaderModeButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderModeButton.swift; sourceTree = "<group>"; };
 		0AB70C6A23571F4C00E9C2C8 /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = zh.lproj/Storage.strings; sourceTree = "<group>"; };
@@ -2311,7 +2308,6 @@
 		A83E5B191C1DA8BF0026D912 /* image.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = image.png; sourceTree = "<group>"; };
 		A83E5B1C1C1DA8D80026D912 /* UIPasteboardExtensionsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIPasteboardExtensionsTests.swift; sourceTree = "<group>"; };
 		A9072B7F1D07B34100459960 /* NoImageModeHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NoImageModeHelper.swift; sourceTree = "<group>"; };
-		AB1B097921F2F00400E0DD51 /* FavoritesViewControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesViewControllerTests.swift; sourceTree = "<group>"; };
 		C400467B1CF4E43E00B08303 /* BackForwardListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BackForwardListViewController.swift; sourceTree = "<group>"; };
 		C40046F91CF8E0B200B08303 /* BackForwardListAnimator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BackForwardListAnimator.swift; sourceTree = "<group>"; };
 		C4E3984B1D21F2FD004E89BA /* TabTrayButtonExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TabTrayButtonExtensions.swift; path = ../Browser/TabTrayButtonExtensions.swift; sourceTree = "<group>"; };
@@ -2928,7 +2924,6 @@
 			children = (
 				27448521245A1A1C001920B5 /* FavoritesViewController.swift */,
 				0AADC4CE20D2A6A200FDE368 /* FavoritesHelper.swift */,
-				0AADC4D020D2A6A200FDE368 /* FavoritesDataSource.swift */,
 				0AADC4D120D2A6A200FDE368 /* PreloadedFavorites.swift */,
 				0AADC4C920D2A66E00FDE368 /* FavoriteCell.swift */,
 			);
@@ -4954,7 +4949,6 @@
 				E696FE501C47F86E00EC007C /* AuthenticatorTests.swift */,
 				F84B21D91A090F8100AAB793 /* ClientTests.swift */,
 				D3D488581ABB54CD00A93597 /* FileAccessorTests.swift */,
-				AB1B097921F2F00400E0DD51 /* FavoritesViewControllerTests.swift */,
 				281B2BE91ADF4D90002917DC /* MockProfile.swift */,
 				E683F0A51E92E0820035D990 /* MockableHistory.swift */,
 				0A4BEFDD221F03C80005551A /* NetworkManagerTests.swift */,
@@ -6655,7 +6649,6 @@
 				0A1E84452190A57F0042F782 /* SyncPairWordsViewController.swift in Sources */,
 				4422D4DF21BFFB7600BF1855 /* table_builder.cc in Sources */,
 				27448536245B608E001920B5 /* QRCodePopupView.swift in Sources */,
-				0AADC4D420D2A6A200FDE368 /* FavoritesDataSource.swift in Sources */,
 				4422D50121BFFB7600BF1855 /* repair.cc in Sources */,
 				E660BDD91BB06521009AC090 /* TabsButton.swift in Sources */,
 				4422D55721BFFB7F00BF1855 /* unicode_groups.cc in Sources */,
@@ -6793,7 +6786,6 @@
 				3BFCBF201E04B1C50070C042 /* UIImageViewExtensionsTests.swift in Sources */,
 				E683F0A61E92E0820035D990 /* MockableHistory.swift in Sources */,
 				A83E5B1E1C1DAAAA0026D912 /* UIPasteboardExtensions.swift in Sources */,
-				AB1B097A21F2F00400E0DD51 /* FavoritesViewControllerTests.swift in Sources */,
 				0ADCD45F2319799F0078CC67 /* RollingFileLoggerTests.swift in Sources */,
 				2795274A21A890EB00921AA1 /* FingerprintingProtectionTests.swift in Sources */,
 				0BF42D4F1A7CD09600889E28 /* TestFavicons.swift in Sources */,
