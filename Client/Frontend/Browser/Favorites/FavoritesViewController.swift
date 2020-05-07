@@ -146,6 +146,8 @@ class FavoritesViewController: UIViewController, Themeable {
         layout.itemSize = itemSize
         layout.invalidateLayout()
     }
+    
+    private var frcOperations: [BlockOperation] = []
 }
 
 // MARK: - KeyboardHelperDelegate
@@ -369,27 +371,49 @@ extension FavoritesViewController: UICollectionViewDragDelegate, UICollectionVie
 
 // MARK: - NSFetchedResultsControllerDelegate
 extension FavoritesViewController: NSFetchedResultsControllerDelegate {
+    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        frcOperations.removeAll()
+    }
+    
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         switch type {
         case .insert:
-            if let indexPath = indexPath {
-                collectionView.insertItems(at: [indexPath])
+            if let newIndexPath = newIndexPath {
+                frcOperations.append(BlockOperation { [weak self] in
+                    self?.collectionView.insertItems(at: [newIndexPath])
+                })
             }
         case .delete:
             if let indexPath = indexPath {
-                collectionView.deleteItems(at: [indexPath])
+                frcOperations.append(BlockOperation { [weak self] in
+                    self?.collectionView.deleteItems(at: [indexPath])
+                })
             }
         case .update:
             if let indexPath = indexPath {
-                collectionView.reloadItems(at: [indexPath])
+                frcOperations.append(BlockOperation { [weak self] in
+                    self?.collectionView.reloadItems(at: [indexPath])
+                })
             }
             if let newIndexPath = newIndexPath, newIndexPath != indexPath {
-                collectionView.reloadItems(at: [newIndexPath])
+                frcOperations.append(BlockOperation { [weak self] in
+                    self?.collectionView.reloadItems(at: [newIndexPath])
+                })
             }
         case .move:
             break
         @unknown default:
             assertionFailure()
         }
+    }
+    
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        collectionView.performBatchUpdates({
+            self.frcOperations.forEach {
+                $0.start()
+            }
+        }, completion: { _ in
+            self.frcOperations.removeAll()
+        })
     }
 }
