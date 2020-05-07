@@ -168,8 +168,44 @@ class AutocompleteTextField: UITextField, UITextFieldDelegate {
     // Since the text has changed, remove the completion here, and textDidChange will fire the callback to
     // get the new autocompletion.
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        lastReplacement = string
+        let (sanitizedString, wasSanitized) = sanitize(input: string, existing: textField.text, range: range)
+        
+        // Update with the newly entered string, not the final result,
+        //  just want to make sure any bad prefixes were stripped
+        self.lastReplacement = sanitizedString
+        
+        if wasSanitized {
+            // The string was sanitized, so cannot do naive / default text adjustment, must do manually
+            
+            guard let existing = textField.text, let sRange = Range(range, in: existing) else {
+                // Something [unlikely] failed, do full replacement
+                textField.text = sanitizedString
+                return false
+            }
+            
+            var userString = string
+            userString.replaceSubrange(sRange, with: sanitizedString)
+            textField.text = userString
+            return false
+        }
+        
         return true
+    }
+    
+    /// This takes user input, and removes any strings that are determined potentially malicious.
+    /// Returns the string to use, and whether any necessary adjustments were made
+    private func sanitize(input string: String, existing: String?, range: NSRange) -> (String, Bool) {
+        // Convert to array of bad prefixes if there are more
+        let badPrefix = "javascript:"
+        
+        if !string.hasPrefix(badPrefix) {
+            return (string, false)
+        }
+        
+        // Remove any bad prefixes
+        var string = string
+        string.removeFirst(badPrefix.count)
+        return (string, true)
     }
 
     func setAutocompleteSuggestion(_ suggestion: String?) {
