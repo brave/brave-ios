@@ -41,18 +41,7 @@ class FavoriteCell: UICollectionViewCell {
         $0.numberOfLines = 2
     }
     
-    let imageView = UIImageView().then {
-        $0.contentMode = .scaleAspectFit
-        $0.clipsToBounds = true
-        $0.layer.cornerRadius = UI.cornerRadius
-        if #available(iOS 13.0, *) {
-            $0.layer.cornerCurve = .continuous
-        }
-        $0.layer.borderColor = BraveUX.faviconBorderColor.cgColor
-        $0.layer.borderWidth = BraveUX.faviconBorderWidth
-        $0.layer.minificationFilter = CALayerContentsFilter.trilinear
-        $0.layer.magnificationFilter = CALayerContentsFilter.nearest
-    }
+    let imageView = LargeFaviconView()
     
     override var isHighlighted: Bool {
         didSet {
@@ -114,8 +103,7 @@ class FavoriteCell: UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         backgroundColor = UIColor.clear
-        imageView.backgroundColor = UIColor.clear
-        imageView.image = nil
+        imageView.domain = nil
     }
     
     @objc private func handleLongPress(_ gesture: UILongPressGestureRecognizer) {

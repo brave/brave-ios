@@ -20,7 +20,7 @@ class BackForwardTableViewCell: UITableViewCell {
     }
     
     lazy var faviconView: UIImageView = {
-        let faviconView = UIImageView(image: FaviconFetcher.defaultFavicon)
+        let faviconView = UIImageView(image: NewFaviconFetcher.defaultFaviconImage)
         faviconView.backgroundColor = UIColor.Photon.white100
         faviconView.layer.cornerRadius = 6
         faviconView.layer.borderWidth = 0.5
@@ -52,17 +52,18 @@ class BackForwardTableViewCell: UITableViewCell {
     var site: Site? {
         didSet {
             if let s = site {
-                faviconView.setFavicon(forSite: s, onCompletion: { [weak self] (color, url) in
-                    if s.tileURL.isLocal {
-                        self?.faviconView.image = #imageLiteral(resourceName: "faviconFox")
-                        self?.faviconView.image = self?.faviconView.image?.createScaled(CGSize(width: BackForwardViewCellUX.iconSize, height: BackForwardViewCellUX.iconSize))
-                        self?.faviconView.backgroundColor = UIColor.Photon.white100
-                        return
-                    }
-                    
-                    self?.faviconView.image = self?.faviconView.image?.createScaled(CGSize(width: BackForwardViewCellUX.iconSize, height: BackForwardViewCellUX.iconSize))
-                    self?.faviconView.backgroundColor = color == .clear ? .white : color
-                })
+                faviconView.loadFavicon(for: s.tileURL, kind: .favicon)
+//                faviconView.setFavicon(forSite: s, onCompletion: { [weak self] (color, url) in
+//                    if s.tileURL.isLocal {
+//                        self?.faviconView.image = #imageLiteral(resourceName: "faviconFox")
+//                        self?.faviconView.image = self?.faviconView.image?.createScaled(CGSize(width: BackForwardViewCellUX.iconSize, height: BackForwardViewCellUX.iconSize))
+//                        self?.faviconView.backgroundColor = UIColor.Photon.white100
+//                        return
+//                    }
+//
+//                    self?.faviconView.image = self?.faviconView.image?.createScaled(CGSize(width: BackForwardViewCellUX.iconSize, height: BackForwardViewCellUX.iconSize))
+//                    self?.faviconView.backgroundColor = color == .clear ? .white : color
+//                })
                 var title = s.title
                 if title.isEmpty {
                     title = s.url

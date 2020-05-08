@@ -87,11 +87,18 @@ class FavoritesSectionProvider: NSObject, NTPObservableSectionProvider {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FavoriteCell.identifier, for: indexPath) as! FavoriteCell
         let fav = frc.object(at: IndexPath(item: indexPath.item, section: 0))
         cell.textLabel.text = fav.displayTitle ?? fav.url
-        cell.imageView.setIconMO(fav.domain?.favicon, forURL: URL(string: fav.url ?? ""), scaledDefaultIconSize: CGSize(width: 40, height: 40), completed: { (color, url) in
-            if fav.url == url?.absoluteString {
-                cell.imageView.backgroundColor = color
-            }
-        })
+        if let url = fav.url?.asURL {
+            // All favorites should have domain's, but it was noticed at one
+            // point that this wasn't the case, so for future bug-tracking
+            // assert if its not found.
+            assert(fav.domain != nil, "Domain should exist for all favorites")
+            // The domain for the favorite is required for pulling cached
+            // favicon info. Since all favorites should have persisted
+            // Domain's, we leave `persistent` as true
+            let domain = fav.domain ?? Domain.getOrCreate(forUrl: url, persistent: true)
+            cell.imageView.monogramFallbackCharacter = fav.title?.first?.uppercased()
+            cell.imageView.domain = domain
+        }
         cell.accessibilityLabel = cell.textLabel.text
         cell.longPressHandler = { [weak self] cell in
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)

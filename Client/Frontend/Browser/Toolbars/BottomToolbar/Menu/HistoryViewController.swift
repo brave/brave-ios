@@ -117,13 +117,16 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
     cell.setLines(site.title, detailText: site.url)
     
     cell.imageView?.contentMode = .scaleAspectFit
-    cell.imageView?.image = FaviconFetcher.defaultFavicon
+    cell.imageView?.image = NewFaviconFetcher.defaultFaviconImage
     cell.imageView?.layer.borderColor = BraveUX.faviconBorderColor.cgColor
     cell.imageView?.layer.borderWidth = BraveUX.faviconBorderWidth
     cell.imageView?.layer.cornerRadius = 6
     cell.imageView?.layer.masksToBounds = true
-    
-    cell.imageView?.setIconMO(site.domain?.favicon, forURL: URL(string: site.url ?? ""))
+    if let url = site.domain?.url?.asURL {
+        cell.imageView?.loadFavicon(for: url, kind: .favicon)
+    } else {
+        cell.imageView?.image = NewFaviconFetcher.defaultFaviconImage
+    }
   }
   
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

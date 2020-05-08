@@ -208,7 +208,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
       
       cell.backgroundColor = .clear
       cell.imageView?.contentMode = .scaleAspectFit
-      cell.imageView?.image = FaviconFetcher.defaultFavicon
+      cell.imageView?.image = NewFaviconFetcher.defaultFaviconImage
       cell.imageView?.layer.cornerRadius = 6
       cell.imageView?.layer.masksToBounds = true
       
@@ -221,7 +221,11 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         cell.imageView?.layer.borderColor = BraveUX.faviconBorderColor.cgColor
         cell.imageView?.layer.borderWidth = BraveUX.faviconBorderWidth
         // favicon object associated through domain relationship - set from cache or download
-        cell.imageView?.setIconMO(item.domain?.favicon, forURL: URL(string: item.url ?? ""))
+        if let url = item.domain?.url?.asURL {
+            cell.imageView?.loadFavicon(for: url, kind: .favicon, domain: item.domain)
+        } else {
+            cell.imageView?.image = NewFaviconFetcher.defaultFaviconImage
+        }
       }
     }
     
