@@ -261,7 +261,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         
         if let urp = UserReferralProgram.shared {
             if isFirstLaunch {
-                let refCode = UserReferralProgram.sanitize(input: UIPasteboard.general.string) 
+                let refCode = UserReferralProgram.sanitize(input: UIPasteboard.general.string)
+                if refCode != nil { UIPasteboard.general.clearPasteboard() }
+                
                 urp.referralLookup(refCode: refCode) { referralCode, offerUrl in
                     if let code = referralCode {
                         let retryTime = AppConstants.buildChannel.isPublic ? 1.days : 10.minutes
