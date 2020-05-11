@@ -45,13 +45,14 @@ public class UserReferralProgram {
     }
     
     /// Looks for referral and returns its landing page if possible.
-    public func referralLookup(refCode: String?, completion: @escaping (String?) -> Void) {
+    public func referralLookup(refCode: String?, completion: @escaping (_ refCode: String?, _ offerUrl: String?) -> Void) {
         UrpLog.log("first run referral lookup")
         
         let referralBlock: (ReferralData?, UrpError?) -> Void = { referral, _ in
             guard let ref = referral else {
                 log.info("No referral code found")
                 UrpLog.log("No referral code found")
+                completion(nil, nil)
                 return
             }
             
@@ -64,7 +65,7 @@ public class UserReferralProgram {
                     }
                 }
                 
-                completion(ref.offerPage)
+                completion(ref.referralCode, ref.offerPage)
                 UrpLog.log("Extended referral code found, opening landing page: \(ref.offerPage ?? "404")")
                 // We do not want to persist referral data for extended URPs
                 return
@@ -77,7 +78,7 @@ public class UserReferralProgram {
             // In case of network errors or getting `isFinalized = false`, we retry the api call.
             self.initRetryPingConnection(numberOfTimes: 30)
             
-            completion(nil)
+            completion(ref.referralCode, nil)
         }
         
         if let refCode = refCode {

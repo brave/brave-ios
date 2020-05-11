@@ -256,21 +256,31 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         Preferences.Review.launchCount.value += 1
         
         if isFirstLaunch {
-            FavoritesHelper.addDefaultFavorites()
             profile?.searchEngines.regionalSearchEngineSetup()
         }
         
         if let urp = UserReferralProgram.shared {
             if isFirstLaunch {
-                let refCode = UserReferralProgram.sanitize(input: UIPasteboard.general.string)
-                
-                // This should be called each time, since if have 
-                urp.referralLookup(refCode: refCode) { url in
-                    guard let url = url?.asURL else { return }
+                let refCode = UserReferralProgram.sanitize(input: UIPasteboard.general.string) 
+                urp.referralLookup(refCode: refCode) { referralCode, offerUrl in
+                    if let code = referralCode {
+                        let retryTime = AppConstants.buildChannel.isPublic ? 1.days : 10.minutes
+                        let retryDeadline = Date() + retryTime
+                        
+                        Preferences.NewTabPage.superReferrerThemeRetryDeadline.value = retryDeadline
+                        
+                        self.browserViewController.backgroundDataSource
+                            .fetchSpecificResource(.superReferral(code: code))
+                    } else {
+                        self.browserViewController.backgroundDataSource.startFetching()
+                    }
+                    
+                    guard let url = offerUrl?.asURL else { return }
                     self.browserViewController.openReferralLink(url: url)
                 }
             } else {
                 urp.pingIfEnoughTimePassed()
+                browserViewController.backgroundDataSource.startFetching()
             }
         } else {
             log.error("Failed to initialize user referral program")
