@@ -259,9 +259,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
             FavoritesHelper.addDefaultFavorites()
             profile?.searchEngines.regionalSearchEngineSetup()
         }
+        
         if let urp = UserReferralProgram.shared {
             if isFirstLaunch {
-                urp.referralLookup { url in
+                let refCode = UserReferralProgram.sanitize(input: UIPasteboard.general.string)
+                
+                // This should be called each time, since if have 
+                urp.referralLookup(refCode: refCode) { url in
                     guard let url = url?.asURL else { return }
                     self.browserViewController.openReferralLink(url: url)
                 }

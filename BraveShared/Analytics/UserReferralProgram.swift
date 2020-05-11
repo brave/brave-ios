@@ -16,6 +16,7 @@ public class UserReferralProgram {
     public static let shared = UserReferralProgram()
     
     private static let apiKeyPlistKey = "API_KEY"
+    private static let clipboardPrefix = "F83AB73F-9852-4F01-ABA8-7830B8825993"
     
     struct HostUrl {
         static let staging = "https://brave-laptop-updates-staging.herokuapp.com"
@@ -44,7 +45,7 @@ public class UserReferralProgram {
     }
     
     /// Looks for referral and returns its landing page if possible.
-    public func referralLookup(completion: @escaping (String?) -> Void) {
+    public func referralLookup(refCode: String?, completion: @escaping (String?) -> Void) {
         UrpLog.log("first run referral lookup")
         
         let referralBlock: (ReferralData?, UrpError?) -> Void = { referral, _ in
@@ -77,6 +78,10 @@ public class UserReferralProgram {
             self.initRetryPingConnection(numberOfTimes: 30)
             
             completion(nil)
+        }
+        
+        if let refCode = refCode {
+            Preferences.URP.referralCode.value = refCode
         }
         
         service.referralCodeLookup(refCode: UserReferralProgram.getReferralCode(), completion: referralBlock)
@@ -180,6 +185,19 @@ public class UserReferralProgram {
             return referralCode
         }
         return nil
+    }
+    
+    /// Passing string, attempts to derive a ref code from it.
+    /// Uses very strict matching.
+    /// Returns the sanitized code, or nil if no code was found
+    public class func sanitize(input: String?) -> String? {
+        guard var input = input, input.hasPrefix(self.clipboardPrefix) else { return nil }
+        
+        input.removeFirst(self.clipboardPrefix.count + 1)
+        // Add any other potential validation here, e.g. validating the actual ref code string
+        
+        if input.isEmpty { return nil }
+        return input
     }
     
     /// Same as `customHeaders` only blocking on result, to gaurantee data is available
