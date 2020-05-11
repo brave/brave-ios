@@ -13,8 +13,12 @@ enum UrpError {
 
 /// Api endpoints for user referral program.
 struct UrpService {
-    private static let apiKeyParam = "api_key"
-    private static let downLoadIdKeyParam = "download_id"
+    private struct ParamKeys {
+        static let api = "api_key"
+        static let referralCode = "referral_code"
+        static let platform = "platform"
+        static let downLoadId = "download_id"
+    }
 
     let host: String
     private let apiKey: String
@@ -33,16 +37,24 @@ struct UrpService {
         sessionManager = URLSession(configuration: .default, delegate: certificateEvaluator, delegateQueue: .main)
     }
 
-    func referralCodeLookup(completion: @escaping (ReferralData?, UrpError?) -> Void) {
+    func referralCodeLookup(refCode: String?, completion: @escaping (ReferralData?, UrpError?) -> Void) {
         guard var endPoint = URL(string: host) else {
             completion(nil, .endpointError)
             UrpLog.log("Host not a url: \(host)")
             return
         }
-        endPoint.appendPathComponent("promo/initialize/ua")
-
-        let params = [UrpService.apiKeyParam: apiKey]
-
+        
+        var params = [UrpService.ParamKeys.api: apiKey]
+            
+        var lastPathComponent = "ua"
+        if let refCode = refCode {
+            params[UrpService.ParamKeys.referralCode] = refCode
+            params[UrpService.ParamKeys.platform] = "ios"
+            lastPathComponent = "nonua"
+        }
+        
+        endPoint.appendPathComponent("promo/initialize/\(lastPathComponent)")
+        
         sessionManager.urpApiRequest(endPoint: endPoint, params: params) { response in
             switch response {
             case .success(let data):
@@ -70,8 +82,8 @@ struct UrpService {
         endPoint.appendPathComponent("promo/activity")
 
         let params = [
-            UrpService.apiKeyParam: apiKey,
-            UrpService.downLoadIdKeyParam: downloadId
+            UrpService.ParamKeys.api: apiKey,
+            UrpService.ParamKeys.downLoadId: downloadId
         ]
 
         sessionManager.urpApiRequest(endPoint: endPoint, params: params) { response in
@@ -95,7 +107,7 @@ struct UrpService {
         }
         endPoint.appendPathComponent("promo/custom-headers")
 
-        let params = [UrpService.apiKeyParam: apiKey]
+        let params = [UrpService.ParamKeys.api: apiKey]
 
         sessionManager.request(endPoint, parameters: params) { response in
             switch response {

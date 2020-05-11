@@ -47,7 +47,7 @@ public class UserReferralProgram {
     public func referralLookup(completion: @escaping (String?) -> Void) {
         UrpLog.log("first run referral lookup")
         
-        service.referralCodeLookup { referral, _ in
+        let referralBlock: (ReferralData?, UrpError?) -> Void = { referral, _ in
             guard let ref = referral else {
                 log.info("No referral code found")
                 UrpLog.log("No referral code found")
@@ -78,6 +78,8 @@ public class UserReferralProgram {
             
             completion(nil)
         }
+        
+        service.referralCodeLookup(refCode: UserReferralProgram.getReferralCode(), completion: referralBlock)
     }
     
     private func initRetryPingConnection(numberOfTimes: Int32) {
