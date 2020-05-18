@@ -82,6 +82,8 @@ public class UserReferralProgram {
         }
         
         if let refCode = refCode {
+            // This is also potentially set after server network request,
+            //  esp important for binaries that require server ref code retrieval.
             Preferences.URP.referralCode.value = refCode
         }
         
@@ -194,11 +196,11 @@ public class UserReferralProgram {
     public class func sanitize(input: String?) -> String? {
         guard var input = input, input.hasPrefix(self.clipboardPrefix) else { return nil }
         
+        // +1 to strip off `:` that proceeds the defined prefix
         input.removeFirst(self.clipboardPrefix.count + 1)
         // Add any other potential validation here, e.g. validating the actual ref code string
         
-        if input.isEmpty { return nil }
-        return input
+        return input.isEmpty ? nil : input
     }
     
     /// Same as `customHeaders` only blocking on result, to gaurantee data is available
