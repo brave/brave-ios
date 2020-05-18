@@ -74,7 +74,7 @@ typedef NS_ENUM(NSInteger, BATResult) {
   BATResultAcTableEmpty = 14,
   BATResultNotEnoughFunds = 15,
   BATResultTipError = 16,
-  BATResultCorruptedWallet = 17,
+  BATResultCorruptedData = 17,
   BATResultGrantAlreadyClaimed = 18,
   BATResultContributionAmountTooLow = 19,
   BATResultVerifiedPublisher = 20,
@@ -90,6 +90,7 @@ typedef NS_ENUM(NSInteger, BATResult) {
   BATResultRetryShort = 30,
   BATResultRetryLong = 31,
   BATResultContinue = 32,
+  BATResultInProgress = 33,
 } NS_SWIFT_NAME(Result);
 
 
@@ -180,6 +181,7 @@ typedef NS_ENUM(NSInteger, BATPromotionStatus) {
   BATPromotionStatusAttested = 1,
   BATPromotionStatusFinished = 4,
   BATPromotionStatusOver = 5,
+  BATPromotionStatusCorrupted = 6,
 } NS_SWIFT_NAME(PromotionStatus);
 
 
@@ -211,6 +213,7 @@ typedef NS_ENUM(NSInteger, BATCredsBatchStatus) {
   BATCredsBatchStatusClaimed = 2,
   BATCredsBatchStatusSigned = 3,
   BATCredsBatchStatusFinished = 4,
+  BATCredsBatchStatusCorrupted = 5,
 } NS_SWIFT_NAME(CredsBatchStatus);
 
 
