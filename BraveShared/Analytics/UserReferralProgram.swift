@@ -194,13 +194,28 @@ public class UserReferralProgram {
     /// Uses very strict matching.
     /// Returns the sanitized code, or nil if no code was found
     public class func sanitize(input: String?) -> String? {
-        guard var input = input, input.hasPrefix(self.clipboardPrefix) else { return nil }
+        guard var code = input, code.hasPrefix(self.clipboardPrefix) else { return nil }
         
         // +1 to strip off `:` that proceeds the defined prefix
-        input.removeFirst(self.clipboardPrefix.count + 1)
+        code.removeFirst(self.clipboardPrefix.count + 1)
         // Add any other potential validation here, e.g. validating the actual ref code string
         
-        return input.isEmpty ? nil : input
+        if code.count != 6 { return nil }
+        let letters = code.prefix(3)
+        let numbers = code.suffix(3)
+        
+        // Cannot use `isLetters` or `isUppercase` b/inc Æ and the like
+        let validLetters = letters.allSatisfy(("A"..."Z").contains)
+        
+        // Cannot use `isNumber` b/inc 万 and the like
+        let validNumbers = numbers.allSatisfy(("0"..."9").contains)
+        
+        // Both conditions must be met
+        return validLetters && validNumbers ? code : nil
+        
+        // Regex solution
+//        let valid = code.range(of: #"\b[A-Z]{3}[0-9]{3}\b"#, options: .regularExpression) != nil // true
+
     }
     
     /// Same as `customHeaders` only blocking on result, to gaurantee data is available
