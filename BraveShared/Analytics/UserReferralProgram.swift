@@ -198,8 +198,6 @@ public class UserReferralProgram {
         
         // +1 to strip off `:` that proceeds the defined prefix
         input.removeFirst(self.clipboardPrefix.count + 1)
-        // Add any other potential validation here, e.g. validating the actual ref code string
-        
         let valid = input.range(of: #"\b[A-Z]{3}[0-9]{3}\b"#, options: .regularExpression) != nil // true
 
         // Both conditions must be met
