@@ -52,8 +52,7 @@ struct UrpService {
             params[UrpService.ParamKeys.platform] = "ios"
             lastPathComponent = "nonua"
         }
-        
-        endPoint.appendPathComponent("promo/initialize/\(lastPathComponent)")
+        endPoint.append(pathComponents: "promo", "initialize", lastPathComponent)
         
         sessionManager.urpApiRequest(endPoint: endPoint, params: params) { response in
             switch response {
@@ -79,7 +78,7 @@ struct UrpService {
             completion(nil, .endpointError)
             return
         }
-        endPoint.appendPathComponent("promo/activity")
+        endPoint.append(pathComponents: "promo", "activity")
 
         let params = [
             UrpService.ParamKeys.api: apiKey,
@@ -105,7 +104,7 @@ struct UrpService {
             completion([], .endpointError)
             return
         }
-        endPoint.appendPathComponent("promo/custom-headers")
+        endPoint.append(pathComponents: "promo", "custom-headers")
 
         let params = [UrpService.ParamKeys.api: apiKey]
 
