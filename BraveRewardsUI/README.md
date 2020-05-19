@@ -5,6 +5,6 @@ A UI framework for consuming Brave Rewards. The core logic around BraveRewards r
 The latest BraveRewards.framework was built on:
 
 ```
-brave-browser/fa8c9a4f483e847b931496e4275db6c0aa38c0ae
-brave-core/0ea57ed082c67bba40b112b328cb88df9e1f13e7
+brave-browser/0d23cf11ec5dab650d71c3957b3f982d2bef3600
+brave-core/3c96998389af5f49483481ddbe8deba08ff300fa
 ```
