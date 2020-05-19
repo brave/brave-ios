@@ -1135,7 +1135,7 @@ class BrowserViewController: UIViewController {
         }
     }
     
-    private weak var activeNewTabPageViewController: NewTabPageViewController?
+    private(set) weak var activeNewTabPageViewController: NewTabPageViewController?
     
     fileprivate func hideHomePanelController() {
         if let controller = activeNewTabPageViewController {
@@ -3379,7 +3379,6 @@ extension BrowserViewController: Themeable {
         
         styleChildren(theme: theme)
 
-        view.backgroundColor = theme.colors.home
         statusBarOverlay.backgroundColor = topToolbar.backgroundColor
         setNeedsStatusBarAppearanceUpdate()
     }

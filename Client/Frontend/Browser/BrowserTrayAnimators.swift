@@ -37,7 +37,8 @@ private extension TrayToBrowserAnimator {
         // Hide browser components
         bvc.toggleSnackBarVisibility(show: false)
         toggleWebViewVisibility(false, usingTabManager: bvc.tabManager)
-        bvc.tabManager.selectedTab?.newTabPageViewController?.view.isHidden = true
+        bvc.activeNewTabPageViewController?.view.isHidden = true
+        selectedTab.newTabPageViewController?.view.isHidden = true
         bvc.webViewContainerBackdrop.isHidden = true
         bvc.statusBarOverlay.isHidden = false
         if let url = selectedTab.url, !url.isReaderModeURL {
@@ -94,7 +95,7 @@ private extension TrayToBrowserAnimator {
             bvc.toggleSnackBarVisibility(show: true)
             toggleWebViewVisibility(true, usingTabManager: bvc.tabManager)
             bvc.webViewContainerBackdrop.isHidden = false
-            bvc.tabManager.selectedTab?.newTabPageViewController?.view.isHidden = false
+            selectedTab.newTabPageViewController?.view.isHidden = false
             bvc.topToolbar.isTransitioning = false
             bvc.updateTabsBarVisibility()
             transitionContext.completeTransition(true)
