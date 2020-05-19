@@ -801,7 +801,13 @@ fileprivate class TabManagerDataSource: NSObject, UICollectionViewDataSource {
         tabCell.isAccessibilityElement = true
         tabCell.accessibilityHint = Strings.tabTrayCellCloseAccessibilityHint
 
-        if let url = tab.url, !url.isLocal {
+        // Tab may not be restored and so may not include a tab URL yet...
+        if let favicon = tab.displayFavicon, let url = favicon.url.asURL {
+            WebImageCacheManager.shared.load(from: url, completion: { image, _, _, _, loadedURL in
+                guard url == loadedURL else { return }
+                tabCell.favicon.image = image ?? NewFaviconFetcher.defaultFaviconImage
+            })
+        } else if let url = tab.url, !url.isLocal {
             tabCell.favicon.loadFavicon(for: url, kind: .favicon)
         } else {
             tabCell.favicon.image = #imageLiteral(resourceName: "defaultFavicon")

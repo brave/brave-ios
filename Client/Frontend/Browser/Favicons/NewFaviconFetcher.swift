@@ -226,10 +226,6 @@ class NewFaviconFetcher {
         if let favicon = domain.favicon, let urlString = favicon.url, let url = URL(string: urlString) {
             // Verify that the favicon we have on file is what we want to pull
             // If not, we will just default to monogram to avoid blurry images
-            //
-            // FIXME: Maybe determine this based on rank. I.e. If we want a
-            // regular icon, but we only have a large icon, this is fine and
-            // should return that icon.
             if faviconOnFileMatchesFetchKind(favicon) {
                 downloadIcon(url: url) { [weak self] image in
                     guard let self = self else { return }
@@ -369,11 +365,13 @@ class NewFaviconFetcher {
     /// Determines if the downloaded image should be padded because its edges
     /// are for the most part transparent
     private func isIconBackgroundTransparentAroundEdges(_ icon: UIImage, completion: @escaping (_ isTransparent: Bool) -> Void) {
-        guard let cgImage = icon.cgImage else {
-            completion(false)
-            return
-        }
         DispatchQueue.global(qos: .utility).async {
+            guard let cgImage = icon.createScaled(CGSize(width: 48, height: 48)).cgImage else {
+                DispatchQueue.main.async {
+                    completion(false)
+                }
+                return
+            }
             let alphaInfo = cgImage.alphaInfo
             let hasAlphaChannel = alphaInfo == .first || alphaInfo == .last ||
                 alphaInfo == .premultipliedFirst || alphaInfo == .premultipliedLast
