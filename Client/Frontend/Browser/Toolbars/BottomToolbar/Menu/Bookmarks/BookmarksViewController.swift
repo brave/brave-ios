@@ -222,7 +222,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         cell.imageView?.layer.borderWidth = BraveUX.faviconBorderWidth
         // favicon object associated through domain relationship - set from cache or download
         if let url = item.domain?.url?.asURL {
-            cell.imageView?.loadFavicon(for: url, kind: .favicon, domain: item.domain)
+            cell.imageView?.loadFavicon(for: url, domain: item.domain, fallbackMonogramCharacter: item.title?.first?.uppercased())
         } else {
             cell.imageView?.image = NewFaviconFetcher.defaultFaviconImage
         }

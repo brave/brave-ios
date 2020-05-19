@@ -422,21 +422,52 @@ class NewFaviconFetcher {
     }
 }
 
-private var AssociatedObjectHandle: UInt8 = 0
-
 extension UIImageView {
     
     private var faviconFetcher: NewFaviconFetcher? {
-        get { objc_getAssociatedObject(self, &AssociatedObjectHandle) as? NewFaviconFetcher }
-        set { objc_setAssociatedObject(self, &AssociatedObjectHandle, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC) }
+        get { objc_getAssociatedObject(self, #function) as? NewFaviconFetcher }
+        set { objc_setAssociatedObject(self, #function, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC) }
     }
     
-    func loadFavicon(for siteURL: URL, kind: NewFaviconFetcher.Kind, domain: Domain? = nil) {
-        faviconFetcher = NewFaviconFetcher(siteURL: siteURL, kind: kind, domain: domain)
+    private var monogramLabel: UILabel? {
+        get { objc_getAssociatedObject(self, #function) as? UILabel }
+        set { objc_setAssociatedObject(self, #function, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC) }
+    }
+    
+    /// Load the favicon from a site URL directly into a `UIImageView`. If no
+    /// favicon is found, a monogram will be used where the letter is determined
+    /// based on `fallbackMonogramCharacter` or the site URL.
+    ///
+    /// This method will only attempt to fetch a small favicon for a site.
+    /// Do not use this method if you need to ensure that a large apple-touch
+    /// icon is used.
+    func loadFavicon(for siteURL: URL, domain: Domain? = nil, fallbackMonogramCharacter: String? = nil) {
+        faviconFetcher = NewFaviconFetcher(siteURL: siteURL, kind: .favicon, domain: domain)
         faviconFetcher?.load { [weak self] attributes in
             guard let self = self else { return }
-            self.image = attributes.image ?? NewFaviconFetcher.defaultFaviconImage
-            self.backgroundColor = attributes.backgroundColor ?? .white
+            if let image = attributes.image {
+                self.image = image
+                self.monogramLabel?.removeFromSuperview()
+            } else {
+                // Monogram favicon attributes
+                let label = self.monogramLabel ?? UILabel().then {
+                    $0.appearanceTextColor = .white
+                    $0.minimumScaleFactor = 0.5
+                }
+                label.text = fallbackMonogramCharacter ??
+                    siteURL.baseDomain?.first?.uppercased() ??
+                    siteURL.host?.first?.uppercased()
+                self.addSubview(label)
+                label.snp.makeConstraints {
+                    $0.center.equalToSuperview()
+                    $0.leading.top.greaterThanOrEqualToSuperview()
+                    $0.bottom.trailing.lessThanOrEqualToSuperview()
+                }
+                self.image = nil
+                self.monogramLabel = label
+                self.backgroundColor = attributes.backgroundColor
+                
+            }
             self.contentMode = attributes.contentMode
         }
     }

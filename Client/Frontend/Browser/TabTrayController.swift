@@ -792,6 +792,7 @@ fileprivate class TabManagerDataSource: NSObject, UICollectionViewDataSource {
         let tab = tabs[indexPath.item]
 
         tabCell.titleText.text = tab.displayTitle
+        tabCell.favicon.image = #imageLiteral(resourceName: "defaultFavicon")
 
         if !tab.displayTitle.isEmpty {
             tabCell.accessibilityLabel = tab.displayTitle
@@ -808,7 +809,7 @@ fileprivate class TabManagerDataSource: NSObject, UICollectionViewDataSource {
                 tabCell.favicon.image = image ?? NewFaviconFetcher.defaultFaviconImage
             })
         } else if let url = tab.url, !url.isLocal {
-            tabCell.favicon.loadFavicon(for: url, kind: .favicon)
+            tabCell.favicon.loadFavicon(for: url)
         } else {
             tabCell.favicon.image = #imageLiteral(resourceName: "defaultFavicon")
         }

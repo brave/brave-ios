@@ -56,7 +56,7 @@ class BackForwardTableViewCell: UITableViewCell {
                     faviconView.backgroundColor = .white
                     faviconView.image = NewFaviconFetcher.defaultFaviconImage
                 } else {
-                    faviconView.loadFavicon(for: s.tileURL, kind: .favicon)
+                    faviconView.loadFavicon(for: s.tileURL)
                 }
                 var title = s.title
                 if title.isEmpty {

@@ -123,7 +123,7 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
     cell.imageView?.layer.cornerRadius = 6
     cell.imageView?.layer.masksToBounds = true
     if let url = site.domain?.url?.asURL {
-        cell.imageView?.loadFavicon(for: url, kind: .favicon)
+        cell.imageView?.loadFavicon(for: url)
     } else {
         cell.imageView?.image = NewFaviconFetcher.defaultFaviconImage
     }
