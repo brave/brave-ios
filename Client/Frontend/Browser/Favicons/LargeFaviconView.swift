@@ -14,7 +14,9 @@ class LargeFaviconView: UIView {
             if let domain = domain, let url = domain.url?.asURL, !url.absoluteString.isEmpty {
                 // Use the base domain's first character, but if that isn't valid
                 // use the favorites title as the monogram instead
-                monogramFallbackLabel.text = url.baseDomain?.first?.uppercased() ?? monogramFallbackCharacter
+                monogramFallbackLabel.text = url.baseDomain?.first?.uppercased() ??
+                    monogramFallbackCharacter ??
+                    url.host?.first?.uppercased()
                 // Setup the favicon fetcher to pull a large icon for the given
                 // domain
                 fetcher = FaviconFetcher(siteURL: url, kind: .largeIcon, domain: domain)

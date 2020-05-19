@@ -454,8 +454,8 @@ extension UIImageView {
                     $0.appearanceTextColor = .white
                     $0.minimumScaleFactor = 0.5
                 }
-                label.text = fallbackMonogramCharacter ??
-                    siteURL.baseDomain?.first?.uppercased() ??
+                label.text = siteURL.baseDomain?.first?.uppercased() ??
+                    fallbackMonogramCharacter ??
                     siteURL.host?.first?.uppercased()
                 self.addSubview(label)
                 label.snp.makeConstraints {
