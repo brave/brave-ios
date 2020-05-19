@@ -14,7 +14,7 @@ import SDWebImage
 private let log = Logger.browserLogger
 
 /// Handles obtaining favicons for URLs from local files, database or internet
-class NewFaviconFetcher {
+class FaviconFetcher {
     /// The size requirement for the favicon
     enum Kind {
         /// Load favicons marked as `apple-touch-icon`.
@@ -48,7 +48,7 @@ class NewFaviconFetcher {
     private let session: URLSession = {
         let configuration = URLSessionConfiguration.default
         configuration.timeoutIntervalForRequest = 5
-        if let userAgent = NewFaviconFetcher.htmlParsingUserAgent {
+        if let userAgent = FaviconFetcher.htmlParsingUserAgent {
             configuration.httpAdditionalHeaders = ["User-Agent": userAgent]
         }
         return URLSession(configuration: configuration, delegate: nil, delegateQueue: .main)
@@ -424,8 +424,8 @@ class NewFaviconFetcher {
 
 extension UIImageView {
     
-    private var faviconFetcher: NewFaviconFetcher? {
-        get { objc_getAssociatedObject(self, #function) as? NewFaviconFetcher }
+    private var faviconFetcher: FaviconFetcher? {
+        get { objc_getAssociatedObject(self, #function) as? FaviconFetcher }
         set { objc_setAssociatedObject(self, #function, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC) }
     }
     
@@ -442,7 +442,7 @@ extension UIImageView {
     /// Do not use this method if you need to ensure that a large apple-touch
     /// icon is used.
     func loadFavicon(for siteURL: URL, domain: Domain? = nil, fallbackMonogramCharacter: String? = nil) {
-        faviconFetcher = NewFaviconFetcher(siteURL: siteURL, kind: .favicon, domain: domain)
+        faviconFetcher = FaviconFetcher(siteURL: siteURL, kind: .favicon, domain: domain)
         faviconFetcher?.load { [weak self] attributes in
             guard let self = self else { return }
             if let image = attributes.image {

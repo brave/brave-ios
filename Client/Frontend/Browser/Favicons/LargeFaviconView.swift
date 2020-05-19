@@ -17,7 +17,7 @@ class LargeFaviconView: UIView {
                 monogramFallbackLabel.text = url.baseDomain?.first?.uppercased() ?? monogramFallbackCharacter
                 // Setup the favicon fetcher to pull a large icon for the given
                 // domain
-                fetcher = NewFaviconFetcher(siteURL: url, kind: .largeIcon, domain: domain)
+                fetcher = FaviconFetcher(siteURL: url, kind: .largeIcon, domain: domain)
                 fetcher?.load { [weak self] attributes in
                     guard let self = self, self.domain?.url?.asURL == url else { return }
                     self.monogramFallbackLabel.isHidden = attributes.image != nil
@@ -46,7 +46,7 @@ class LargeFaviconView: UIView {
         }
     }
     
-    private var fetcher: NewFaviconFetcher?
+    private var fetcher: FaviconFetcher?
     
     let imageView = UIImageView().then {
         $0.contentMode = .scaleAspectFit

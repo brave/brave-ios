@@ -806,7 +806,7 @@ fileprivate class TabManagerDataSource: NSObject, UICollectionViewDataSource {
         if let favicon = tab.displayFavicon, let url = favicon.url.asURL {
             WebImageCacheManager.shared.load(from: url, completion: { image, _, _, _, loadedURL in
                 guard url == loadedURL else { return }
-                tabCell.favicon.image = image ?? NewFaviconFetcher.defaultFaviconImage
+                tabCell.favicon.image = image ?? FaviconFetcher.defaultFaviconImage
             })
         } else if let url = tab.url, !url.isLocal {
             tabCell.favicon.loadFavicon(for: url)

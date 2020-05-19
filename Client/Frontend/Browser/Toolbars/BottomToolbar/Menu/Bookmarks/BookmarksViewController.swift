@@ -208,7 +208,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
       
       cell.backgroundColor = .clear
       cell.imageView?.contentMode = .scaleAspectFit
-      cell.imageView?.image = NewFaviconFetcher.defaultFaviconImage
+      cell.imageView?.image = FaviconFetcher.defaultFaviconImage
       cell.imageView?.layer.cornerRadius = 6
       cell.imageView?.layer.masksToBounds = true
       
@@ -224,7 +224,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         if let url = item.domain?.url?.asURL {
             cell.imageView?.loadFavicon(for: url, domain: item.domain, fallbackMonogramCharacter: item.title?.first?.uppercased())
         } else {
-            cell.imageView?.image = NewFaviconFetcher.defaultFaviconImage
+            cell.imageView?.image = FaviconFetcher.defaultFaviconImage
         }
       }
     }

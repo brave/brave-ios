@@ -20,7 +20,7 @@ class BackForwardTableViewCell: UITableViewCell {
     }
     
     lazy var faviconView: UIImageView = {
-        let faviconView = UIImageView(image: NewFaviconFetcher.defaultFaviconImage)
+        let faviconView = UIImageView(image: FaviconFetcher.defaultFaviconImage)
         faviconView.backgroundColor = UIColor.Photon.white100
         faviconView.layer.cornerRadius = 6
         faviconView.layer.borderWidth = 0.5
@@ -54,7 +54,7 @@ class BackForwardTableViewCell: UITableViewCell {
             if let s = site {
                 if s.tileURL.isLocal {
                     faviconView.backgroundColor = .white
-                    faviconView.image = NewFaviconFetcher.defaultFaviconImage
+                    faviconView.image = FaviconFetcher.defaultFaviconImage
                 } else {
                     faviconView.loadFavicon(for: s.tileURL)
                 }

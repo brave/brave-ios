@@ -117,7 +117,7 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
     cell.setLines(site.title, detailText: site.url)
     
     cell.imageView?.contentMode = .scaleAspectFit
-    cell.imageView?.image = NewFaviconFetcher.defaultFaviconImage
+    cell.imageView?.image = FaviconFetcher.defaultFaviconImage
     cell.imageView?.layer.borderColor = BraveUX.faviconBorderColor.cgColor
     cell.imageView?.layer.borderWidth = BraveUX.faviconBorderWidth
     cell.imageView?.layer.cornerRadius = 6
@@ -125,7 +125,7 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
     if let url = site.domain?.url?.asURL {
         cell.imageView?.loadFavicon(for: url)
     } else {
-        cell.imageView?.image = NewFaviconFetcher.defaultFaviconImage
+        cell.imageView?.image = FaviconFetcher.defaultFaviconImage
     }
   }
   
