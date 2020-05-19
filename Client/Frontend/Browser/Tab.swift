@@ -88,7 +88,13 @@ class Tab: NSObject {
     /// The tabs new tab page controller.
     ///
     /// Should be setup in BVC then assigned here for future use.
-    var newTabPageViewController: NewTabPageViewController?
+    var newTabPageViewController: NewTabPageViewController? {
+        willSet {
+            if newValue == nil {
+                deleteNewTabPageController()
+            }
+        }
+    }
     
     private func deleteNewTabPageController() {
         guard let controller = newTabPageViewController, controller.parent != nil else { return }

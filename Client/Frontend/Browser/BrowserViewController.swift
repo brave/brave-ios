@@ -219,6 +219,10 @@ class BrowserViewController: UIViewController {
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
+        
+        for tab in tabManager.tabsForCurrentMode where tab.id != tabManager.selectedTab?.id {
+            tab.newTabPageViewController = nil
+        }
     }
 
     fileprivate func didInit() {
