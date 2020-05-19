@@ -52,18 +52,12 @@ class BackForwardTableViewCell: UITableViewCell {
     var site: Site? {
         didSet {
             if let s = site {
-                faviconView.loadFavicon(for: s.tileURL, kind: .favicon)
-//                faviconView.setFavicon(forSite: s, onCompletion: { [weak self] (color, url) in
-//                    if s.tileURL.isLocal {
-//                        self?.faviconView.image = #imageLiteral(resourceName: "faviconFox")
-//                        self?.faviconView.image = self?.faviconView.image?.createScaled(CGSize(width: BackForwardViewCellUX.iconSize, height: BackForwardViewCellUX.iconSize))
-//                        self?.faviconView.backgroundColor = UIColor.Photon.white100
-//                        return
-//                    }
-//
-//                    self?.faviconView.image = self?.faviconView.image?.createScaled(CGSize(width: BackForwardViewCellUX.iconSize, height: BackForwardViewCellUX.iconSize))
-//                    self?.faviconView.backgroundColor = color == .clear ? .white : color
-//                })
+                if s.tileURL.isLocal {
+                    faviconView.backgroundColor = .white
+                    faviconView.image = NewFaviconFetcher.defaultFaviconImage
+                } else {
+                    faviconView.loadFavicon(for: s.tileURL, kind: .favicon)
+                }
                 var title = s.title
                 if title.isEmpty {
                     title = s.url
