@@ -78,19 +78,19 @@ class FaviconFetcher {
             IconType(rawValue: Int(favicon.type))?.isPreferredTo(kind.iconType) == true
     }
     
-    func load(_ completion: @escaping (FaviconAttributes) -> Void) {
+    func load(_ completion: @escaping (URL, FaviconAttributes) -> Void) {
         // Priority order for favicons:
         //   1. User installed icons (via using custom theme for example)
         //   2. Icons bundled in the app
         //   3. Fetched favicon from the website given the size requirement
         //   4. Default letter + background color
         if let icon = customIcon {
-            completion(icon)
+            completion(url, icon)
             return
         }
         let matchesFetchKind = faviconOnFileMatchesFetchKind(domain.favicon)
         if let icon = bundledIcon, domain.favicon == nil || !matchesFetchKind {
-            completion(icon)
+            completion(url, icon)
             return
         }
         fetchIcon(completion)
@@ -221,7 +221,7 @@ class FaviconFetcher {
         }
     }
     
-    private func fetchIcon(_ completion: @escaping (FaviconAttributes) -> Void) {
+    private func fetchIcon(_ completion: @escaping (URL, FaviconAttributes) -> Void) {
         // Attempt to find favicon cached for the given Domain
         if let favicon = domain.favicon, let urlString = favicon.url, let url = URL(string: urlString) {
             // Verify that the favicon we have on file is what we want to pull
@@ -231,14 +231,14 @@ class FaviconFetcher {
                     guard let self = self else { return }
                     if let image = image {
                         self.isIconBackgroundTransparentAroundEdges(image) { isTransparent in
-                            completion(FaviconAttributes(image: image, includePadding: isTransparent))
+                            completion(self.url, FaviconAttributes(image: image, includePadding: isTransparent))
                         }
                     } else {
-                        completion(self.monogramFavicon)
+                        completion(self.url, self.monogramFavicon)
                     }
                 }
             } else {
-                completion(self.monogramFavicon)
+                completion(self.url, self.monogramFavicon)
             }
             return
         }
@@ -253,16 +253,16 @@ class FaviconFetcher {
             // `largeIcon` requests will not use it so we can at least return
             // monogram icon attributes immediately
             if let parsedFavicon = Self.attributesForHTMLCache[self.url] {
-                completion(parsedFavicon)
+                completion(self.url, parsedFavicon)
             } else {
                 parseHTMLForFavicons(for: url) { [weak self] attributes in
                     guard let self = self else { return }
                     Self.attributesForHTMLCache[self.url] = attributes
-                    completion(attributes)
+                    completion(self.url, attributes)
                 }
             }
         } else {
-            completion(self.monogramFavicon)
+            completion(self.url, self.monogramFavicon)
         }
     }
     
@@ -422,16 +422,21 @@ class FaviconFetcher {
     }
 }
 
+private struct AssociatedObjectKeys {
+    static var faviconFetcher: Int = 0
+    static var monogramLabel: Int = 0
+}
+
 extension UIImageView {
     
     private var faviconFetcher: FaviconFetcher? {
-        get { objc_getAssociatedObject(self, #function) as? FaviconFetcher }
-        set { objc_setAssociatedObject(self, #function, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC) }
+        get { objc_getAssociatedObject(self, &AssociatedObjectKeys.faviconFetcher) as? FaviconFetcher }
+        set { objc_setAssociatedObject(self, &AssociatedObjectKeys.faviconFetcher, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC) }
     }
     
     private var monogramLabel: UILabel? {
-        get { objc_getAssociatedObject(self, #function) as? UILabel }
-        set { objc_setAssociatedObject(self, #function, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC) }
+        get { objc_getAssociatedObject(self, &AssociatedObjectKeys.monogramLabel) as? UILabel }
+        set { objc_setAssociatedObject(self, &AssociatedObjectKeys.monogramLabel, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC) }
     }
     
     /// Load the favicon from a site URL directly into a `UIImageView`. If no
@@ -442,9 +447,10 @@ extension UIImageView {
     /// Do not use this method if you need to ensure that a large apple-touch
     /// icon is used.
     func loadFavicon(for siteURL: URL, domain: Domain? = nil, fallbackMonogramCharacter: String? = nil) {
+        monogramLabel?.removeFromSuperview()
         faviconFetcher = FaviconFetcher(siteURL: siteURL, kind: .favicon, domain: domain)
-        faviconFetcher?.load { [weak self] attributes in
-            guard let self = self else { return }
+        faviconFetcher?.load { [weak self] url, attributes in
+            guard let self = self, url == siteURL else { return }
             if let image = attributes.image {
                 self.image = image
                 self.monogramLabel?.removeFromSuperview()
@@ -452,6 +458,7 @@ extension UIImageView {
                 // Monogram favicon attributes
                 let label = self.monogramLabel ?? UILabel().then {
                     $0.appearanceTextColor = .white
+                    $0.appearanceBackgroundColor = .clear
                     $0.minimumScaleFactor = 0.5
                 }
                 label.text = siteURL.baseDomain?.first?.uppercased() ??
@@ -463,11 +470,10 @@ extension UIImageView {
                     $0.leading.top.greaterThanOrEqualToSuperview()
                     $0.bottom.trailing.lessThanOrEqualToSuperview()
                 }
-                self.image = nil
+                self.image = UIImage()
                 self.monogramLabel = label
-                self.backgroundColor = attributes.backgroundColor
-                
             }
+            self.backgroundColor = attributes.backgroundColor
             self.contentMode = attributes.contentMode
         }
     }
