@@ -237,8 +237,30 @@ class NewTabPageViewController: UIViewController, Themeable {
     
     // MARK: - Background
     
+    /// Hide any visible sponsored image notification if the current background
+    /// is no longer a sponsored image. If the visible notification is not
+    /// for sponsored images, this does nothing.
+    private func hideVisibleSponsoredImageNotification() {
+        if case .brandedImages = visibleNotification {
+            guard let background = background.currentBackground else {
+                hideNotification()
+                return
+            }
+            switch background.type {
+            case .regular, .withQRCode:
+                hideNotification()
+            case .withBrandLogo:
+                // Current background is still a sponsored image so it can stay
+                // visible
+                break
+            }
+        }
+    }
+    
     func setupBackgroundImage() {
         collectionView.reloadData()
+        
+        hideVisibleSponsoredImageNotification()
         
         if let backgroundType = background.currentBackground?.type {
             switch backgroundType {
@@ -311,10 +333,14 @@ class NewTabPageViewController: UIViewController, Themeable {
     
     // MARK: - Notifications
     
-    private var ntpNotificationShowing = false
+    private var notificationController: UIViewController?
+    private var visibleNotification: NewTabPageNotifications.NotificationType?
+    private var notificationShowing: Bool {
+        notificationController?.parent != nil
+    }
     
     private func presentNotification() {
-        if PrivateBrowsingManager.shared.isPrivateBrowsing || ntpNotificationShowing {
+        if PrivateBrowsingManager.shared.isPrivateBrowsing || notificationShowing {
             return
         }
         
@@ -337,7 +363,7 @@ class NewTabPageViewController: UIViewController, Themeable {
             guard let notificationVC = NTPNotificationViewController(state: state, rewards: rewards) else { return }
             
             notificationVC.closeHandler = { [weak self] in
-                self?.ntpNotificationShowing = false
+                self?.notificationController = nil
             }
             
             notificationVC.learnMoreHandler = { [weak self] in
@@ -351,13 +377,15 @@ class NewTabPageViewController: UIViewController, Themeable {
             let claimRewardsVC = ClaimRewardsNTPNotificationViewController(rewards: rewards)
             claimRewardsVC.closeHandler = { [weak self] in
                 Preferences.NewTabPage.attemptToShowClaimRewardsNotification.value = false
-                self?.ntpNotificationShowing = false
+                self?.notificationController = nil
             }
             
             vc = claimRewardsVC
         }
         
         guard let viewController = vc else { return }
+        notificationController = viewController
+        visibleNotification = notification
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
             guard let self = self else { return }
@@ -366,10 +394,17 @@ class NewTabPageViewController: UIViewController, Themeable {
                 Preferences.NewTabPage.atleastOneNTPNotificationWasShowed.value = true
             }
             
-            self.ntpNotificationShowing = true
             self.addChild(viewController)
             self.view.addSubview(viewController.view)
         }
+    }
+    
+    private func hideNotification() {
+        guard let controller = notificationController else { return }
+        controller.willMove(toParent: nil)
+        controller.removeFromParent()
+        controller.view.removeFromSuperview()
+        notificationController = nil
     }
     
     // MARK: - Actions
