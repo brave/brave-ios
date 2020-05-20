@@ -98,7 +98,11 @@ class FaviconFetcher {
     
     // MARK: - Custom Icons
     
-    private var customIcon: FaviconAttributes? {
+    /// Icon attributes for any custom icon overrides
+    ///
+    /// If the app does not contain a custom icon for the site provided `nil`
+    /// will be returned
+    var customIcon: FaviconAttributes? {
         guard let folder = FileManager.default.getOrCreateFolder(name: NTPDownloader.faviconOverridesDirectory),
             let baseDomain = url.baseDomain else {
                 return nil
@@ -127,7 +131,11 @@ class FaviconFetcher {
     
     // MARK: - Bundled Icons
     
-    private var bundledIcon: FaviconAttributes? {
+    /// Icon attributes for icons that are bundled in the app by default.
+    ///
+    /// If the app does not contain the icon for the site provided `nil` will be
+    /// returned
+    var bundledIcon: FaviconAttributes? {
         // Problem: Sites like amazon exist with .ca/.de and many other tlds.
         // Solution: They are stored in the default icons list as "amazon" instead of "amazon.com" this allows us to have favicons for every tld."
         // Here, If the site is in the multiRegionDomain array look it up via its second level domain (amazon) instead of its baseDomain (amazon.com)
@@ -446,7 +454,10 @@ extension UIImageView {
     /// This method will only attempt to fetch a small favicon for a site.
     /// Do not use this method if you need to ensure that a large apple-touch
     /// icon is used.
-    func loadFavicon(for siteURL: URL, domain: Domain? = nil, fallbackMonogramCharacter: String? = nil) {
+    func loadFavicon(for siteURL: URL,
+                     domain: Domain? = nil,
+                     fallbackMonogramCharacter: String? = nil,
+                     completion: (() -> Void)? = nil) {
         monogramLabel?.removeFromSuperview()
         faviconFetcher = FaviconFetcher(siteURL: siteURL, kind: .favicon, domain: domain)
         faviconFetcher?.load { [weak self] url, attributes in
@@ -475,6 +486,7 @@ extension UIImageView {
             }
             self.backgroundColor = attributes.backgroundColor
             self.contentMode = attributes.contentMode
+            completion?()
         }
     }
 }
