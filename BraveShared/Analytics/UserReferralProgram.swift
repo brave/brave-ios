@@ -87,6 +87,8 @@ public class UserReferralProgram {
             Preferences.URP.referralCode.value = refCode
         }
         
+        // Since ref-code method may not be repeatable (e.g. clipboard was cleared), this should be retrieved from prefs,
+        //  and not use the passed in referral code.
         service.referralCodeLookup(refCode: UserReferralProgram.getReferralCode(), completion: referralBlock)
     }
     
@@ -198,7 +200,7 @@ public class UserReferralProgram {
         
         // +1 to strip off `:` that proceeds the defined prefix
         input.removeFirst(self.clipboardPrefix.count + 1)
-        let valid = input.range(of: #"\b[A-Z]{3}[0-9]{3}\b"#, options: .regularExpression) != nil // true
+        let valid = input.range(of: #"\b[A-Z]{3}[0-9]{3}\b"#, options: .regularExpression) != nil
 
         // Both conditions must be met
         return valid ? input : nil
