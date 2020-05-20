@@ -196,7 +196,11 @@ public class UserReferralProgram {
     /// Uses very strict matching.
     /// Returns the sanitized code, or nil if no code was found
     public class func sanitize(input: String?) -> String? {
-        guard var input = input, input.hasPrefix(self.clipboardPrefix) else { return nil }
+        guard
+            var input = input,
+            input.hasPrefix(self.clipboardPrefix),
+            input.count > self.clipboardPrefix.count
+            else { return nil }
         
         // +1 to strip off `:` that proceeds the defined prefix
         input.removeFirst(self.clipboardPrefix.count + 1)

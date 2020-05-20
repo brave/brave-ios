@@ -56,6 +56,9 @@ class UserReferralProgramTests: XCTestCase {
         
         response = UserReferralProgram.sanitize(input: "\(UserReferralProgramTests.clipboardPrefix):")
         XCTAssertNil(response)
+        
+        response = UserReferralProgram.sanitize(input: "\(UserReferralProgramTests.clipboardPrefix)")
+        XCTAssertNil(response)
     }
     
     func testNoSpacer() throws {
