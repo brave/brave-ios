@@ -88,14 +88,13 @@ class NewTabPageBackgroundButtonsView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        let isIphone = UIDevice.isPhone
         let isLandscape = frame.width > frame.height
         
         sponsorLogoButton.snp.remakeConstraints {
             $0.size.equalTo(170)
             $0.bottom.equalTo(safeArea.bottom).inset(10)
             
-            if isLandscape && isIphone {
+            if isLandscape {
                 $0.left.equalTo(safeArea.left).offset(20)
             } else {
                 $0.centerX.equalToSuperview()
@@ -106,7 +105,7 @@ class NewTabPageBackgroundButtonsView: UIView {
             $0.size.equalTo(48)
             $0.bottom.equalTo(safeArea.bottom).inset(24)
             
-            if isLandscape && isIphone {
+            if isLandscape {
                 $0.left.equalTo(safeArea.left).offset(48)
             } else {
                 $0.centerX.equalToSuperview()
