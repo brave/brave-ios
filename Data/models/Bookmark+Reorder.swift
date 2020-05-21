@@ -15,9 +15,12 @@ extension Bookmark {
     /// 1. Sets new `syncOrder` for the source(moving) Bookmark
     /// 2. Recalculates `syncOrder` for all Bookmarks on a given level. This is required because
     /// we use a special String-based order and algorithg. Simple String comparision doesn't work here.
+    ///
+    /// Passing in `isInteractiveDragReorder` will force the write to happen on
+    /// the main view context. Defaults to `false`
     public class func reorderBookmarks(frc: NSFetchedResultsController<Bookmark>?, sourceIndexPath: IndexPath,
                                        destinationIndexPath: IndexPath,
-                                       completion: (() -> Void)? = nil) {
+                                       isInteractiveDragReorder: Bool = false) {
         guard let frc = frc else { return }
         
         let dest = frc.object(at: destinationIndexPath)
@@ -40,7 +43,10 @@ extension Bookmark {
                                             return
         }
         
-        DataController.perform { context in
+        let context: WriteContext = isInteractiveDragReorder ?
+            .existing(DataController.viewContext) :
+            .new(inMemory: false)
+        DataController.perform(context: context) { context in
             // To get reordering right, 3 Bookmark objects are needed:
             
             // 1. Source Bookmark - A Bookmark that we are moving with a drag operation
@@ -110,8 +116,13 @@ extension Bookmark {
                 Sync.shared.sendSyncRecords(action: .update, records: [srcBookmark])
             }
             
-            DispatchQueue.main.async {
-                completion?()
+            if isInteractiveDragReorder && context.hasChanges {
+                do {
+                    assert(Thread.isMainThread)
+                    try context.save()
+                } catch {
+                    log.error("performTask save error: \(error)")
+                }
             }
         }
     }

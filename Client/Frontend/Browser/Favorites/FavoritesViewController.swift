@@ -339,10 +339,16 @@ extension FavoritesViewController: UICollectionViewDragDelegate, UICollectionVie
         
         switch coordinator.proposal.operation {
         case .move:
-            Bookmark.reorderBookmarks(frc: frc, sourceIndexPath: sourceIndexPath, destinationIndexPath: destinationIndexPath) {
-                guard let item = coordinator.items.first else { return }
-                coordinator.drop(item.dragItem, toItemAt: destinationIndexPath)
-            }
+            guard let item = coordinator.items.first else { return }
+            coordinator.drop(item.dragItem, toItemAt: destinationIndexPath)
+            Bookmark.reorderBookmarks(
+                frc: frc,
+                sourceIndexPath: sourceIndexPath,
+                destinationIndexPath: destinationIndexPath,
+                isInteractiveDragReorder: true
+            )
+            try? frc.performFetch()
+            collectionView.moveItem(at: sourceIndexPath, to: destinationIndexPath)
         case .copy:
             break
         default: return
@@ -378,10 +384,12 @@ extension FavoritesViewController: UICollectionViewDragDelegate, UICollectionVie
 // MARK: - NSFetchedResultsControllerDelegate
 extension FavoritesViewController: NSFetchedResultsControllerDelegate {
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        if collectionView.hasActiveDrag || collectionView.hasActiveDrop { return }
         frcOperations.removeAll()
     }
     
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+        if collectionView.hasActiveDrag || collectionView.hasActiveDrop { return }
         switch type {
         case .insert:
             if let newIndexPath = newIndexPath {
@@ -414,6 +422,7 @@ extension FavoritesViewController: NSFetchedResultsControllerDelegate {
     }
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        if collectionView.hasActiveDrag || collectionView.hasActiveDrop { return }
         collectionView.performBatchUpdates({
             self.frcOperations.forEach {
                 $0.start()
