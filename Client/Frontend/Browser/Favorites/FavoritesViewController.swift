@@ -420,6 +420,7 @@ extension FavoritesViewController: NSFetchedResultsControllerDelegate {
             }
         }, completion: { _ in
             self.frcOperations.removeAll()
+            self.collectionView.reloadData()
         })
     }
 }
