@@ -30,6 +30,7 @@ public class UserReferralProgram {
             return Bundle.main.infoDictionary?[key] as? String
         }
         
+        // This should _probably_ correspond to the baseUrl for NTPDownloader
         let host = AppConstants.buildChannel == .developer ? HostUrl.staging : HostUrl.prod
         
         guard let apiKey = getPlistString(for: UserReferralProgram.apiKeyPlistKey)?.trimmingCharacters(in: .whitespacesAndNewlines) else {
