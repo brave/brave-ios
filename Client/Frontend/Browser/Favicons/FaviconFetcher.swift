@@ -191,7 +191,7 @@ class FaviconFetcher {
      
     // MARK: - Fetched Icons
     
-    private func downloadIcon(url: URL, completion: @escaping (UIImage?) -> Void) {
+    private func downloadIcon(url: URL, addingToDatabase: Bool, completion: @escaping (UIImage?) -> Void) {
         // Fetch favicon directly
         var imageOperation: SDWebImageOperation?
         
@@ -208,7 +208,9 @@ class FaviconFetcher {
             if let image = image {
                 favicon.width = Int(image.size.width)
                 favicon.height = Int(image.size.height)
-                FaviconMO.add(favicon, forSiteUrl: self.url)
+                if addingToDatabase && !PrivateBrowsingManager.shared.isPrivateBrowsing {
+                    FaviconMO.add(favicon, forSiteUrl: self.url)
+                }
                 
                 DispatchQueue.main.async {
                     completion(image)
@@ -235,7 +237,7 @@ class FaviconFetcher {
             // Verify that the favicon we have on file is what we want to pull
             // If not, we will just default to monogram to avoid blurry images
             if faviconOnFileMatchesFetchKind(favicon) {
-                downloadIcon(url: url) { [weak self] image in
+                downloadIcon(url: url, addingToDatabase: false) { [weak self] image in
                     guard let self = self else { return }
                     if let image = image {
                         self.isIconBackgroundTransparentAroundEdges(image) { isTransparent in
@@ -336,7 +338,7 @@ class FaviconFetcher {
                 return
             }
             
-            self.downloadIcon(url: faviconURL) { [weak self] image in
+            self.downloadIcon(url: faviconURL, addingToDatabase: true) { [weak self] image in
                 guard let self = self else { return }
                 DispatchQueue.main.async {
                     if let image = image {
