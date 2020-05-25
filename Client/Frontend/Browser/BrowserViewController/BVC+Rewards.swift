@@ -257,13 +257,8 @@ extension BrowserViewController: RewardsDataSource {
         return url.host
     }
     
-    func retrieveFavicon(for pageURL: URL, faviconURL: URL?, completion: @escaping (FaviconData?) -> Void) {
-//        let favicon = faviconURL.map { Favicon(url: $0.absoluteString, date: Date(), type: .icon) }
-//        let fetcher = NewFaviconFetcher(siteURL: pageURL, kind: .largeIcon)
-//        fetcher.load { attributes in
-//            completion(FaviconData(image: attributes.image, backgroundColor: attributes.backgroundColor))
-//        }
-        completion(nil)
+    func retrieveFavicon(for pageURL: URL, on imageView: UIImageView) {
+        imageView.loadFavicon(for: pageURL)
     }
     
     func pageHTML(for tabId: UInt64, completionHandler: @escaping (String?) -> Void) {

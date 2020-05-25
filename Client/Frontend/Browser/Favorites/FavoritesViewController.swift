@@ -340,7 +340,7 @@ extension FavoritesViewController: UICollectionViewDragDelegate, UICollectionVie
         switch coordinator.proposal.operation {
         case .move:
             guard let item = coordinator.items.first else { return }
-            coordinator.drop(item.dragItem, toItemAt: destinationIndexPath)
+            _ = coordinator.drop(item.dragItem, toItemAt: destinationIndexPath)
             Bookmark.reorderBookmarks(
                 frc: frc,
                 sourceIndexPath: sourceIndexPath,
