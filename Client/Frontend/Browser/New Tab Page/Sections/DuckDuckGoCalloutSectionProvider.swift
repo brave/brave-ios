@@ -105,17 +105,21 @@ class DuckDuckGoCalloutSectionProvider: NSObject, NTPObservableSectionProvider {
     func registerCells(to collectionView: UICollectionView) {
         collectionView.register(DuckDuckGoCalloutCell.self)
     }
+    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(for: indexPath) as DuckDuckGoCalloutCell
         cell.view.addTarget(self, action: #selector(tappedButton), for: .touchUpInside)
         return cell
     }
+    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return fittingSizeForCollectionView(collectionView, section: indexPath.section)
     }
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return isShowingCallout ? 1 : 0
     }
+    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         if !isShowingCallout {
             return .zero

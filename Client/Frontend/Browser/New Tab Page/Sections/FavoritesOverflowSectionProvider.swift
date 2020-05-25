@@ -86,17 +86,21 @@ class FavoritesOverflowSectionProvider: NSObject, NTPSectionProvider {
         let width = fittingSizeForCollectionView(collectionView, section: section).width
         return count > FavoritesSectionProvider.numberOfItems(in: collectionView, availableWidth: width) ? 1 : 0
     }
+    
     func registerCells(to collectionView: UICollectionView) {
         collectionView.register(FavoritesOverflowCell.self)
     }
+    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(for: indexPath) as FavoritesOverflowCell
         cell.view.addTarget(self, action: #selector(tappedButton), for: .touchUpInside)
         return cell
     }
+    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return fittingSizeForCollectionView(collectionView, section: indexPath.section)
     }
+    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         return UIEdgeInsets(top: 20, left: 0, bottom: 0, right: 0)
     }
