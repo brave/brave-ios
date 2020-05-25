@@ -379,6 +379,10 @@ extension FavoritesViewController: UICollectionViewDragDelegate, UICollectionVie
         }
         return params
     }
+    
+    func collectionView(_ collectionView: UICollectionView, dragSessionIsRestrictedToDraggingApplication session: UIDragSession) -> Bool {
+        return true
+    }
 }
 
 // MARK: - NSFetchedResultsControllerDelegate
