@@ -78,13 +78,17 @@ class FaviconFetcher {
             IconType(rawValue: Int(favicon.type))?.isPreferredTo(kind.iconType) == true
     }
     
-    /// Begin the search for a favicon for the site.
+    /// Begin the search for a favicon for the site. `completion` will always
+    /// be called on the main thread.
+    ///
+    /// Priority order for favicons:
+    ///     1. User installed icons (via using custom theme for example)
+    ///     2. Icons bundled in the app
+    ///     3. Fetched favicon from the website given the size requirement.
+    ///        For large icons, if no favicon is found, `siteURL` will be
+    ///        downloaded and parsed for a favicon.
+    ///     4. Monogram (letter + background color)
     func load(_ completion: @escaping (URL, FaviconAttributes) -> Void) {
-        // Priority order for favicons:
-        //   1. User installed icons (via using custom theme for example)
-        //   2. Icons bundled in the app
-        //   3. Fetched favicon from the website given the size requirement
-        //   4. Default letter + background color
         if let icon = customIcon {
             completion(url, icon)
             return
@@ -365,6 +369,20 @@ class FaviconFetcher {
         )
     }
     
+    /// Obtain the letter which will be used for monogram favicons based one of
+    /// the following (in order):
+    ///     1. The `baseDomain`'s first character (i.e. www.amazon.co.uk becomes
+    ///        amazon.co.uk, which then gets a
+    ///     2. The fallback character provided (for special cases such as
+    ///        Bookmarks which have a title and we will use the first character
+    ///        of that title)
+    ///     3. The URL's `host`'s first character (i.e. `http://192.168.1.1`)
+    ///        will return the letter `1`
+    ///     4. The URL's `absoluteString`'s first character. Highly unlikely
+    ///        this would be used. Basically only if a user specifically edits
+    ///        a bookmark and changes the URL to say "https:Test" or something.
+    ///        In that case, `T` would be used
+    ///     5. If all of these cases fail we simply return the letter `W`
     static func monogramLetter(for url: URL, fallbackCharacter: Character?) -> String {
         guard let finalFallback = url.absoluteString.first else {
             return "W"
