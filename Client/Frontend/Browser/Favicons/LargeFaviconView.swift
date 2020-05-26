@@ -50,11 +50,11 @@ class LargeFaviconView: UIView {
     
     private var fetcher: FaviconFetcher?
     
-    let imageView = UIImageView().then {
+    private let imageView = UIImageView().then {
         $0.contentMode = .scaleAspectFit
     }
     
-    let monogramFallbackLabel = UILabel().then {
+    private let monogramFallbackLabel = UILabel().then {
         $0.appearanceTextColor = .white
         $0.isHidden = true
     }

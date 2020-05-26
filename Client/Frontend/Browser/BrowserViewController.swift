@@ -744,7 +744,6 @@ class BrowserViewController: UIViewController {
         
         updateTabCountUsingTabManager(tabManager)
         clipboardBarDisplayHandler?.checkIfShouldDisplayBar()
-//        favoritesViewController?.updateDuckDuckGoVisibility()
         
         if let tabId = tabManager.selectedTab?.rewardsId, rewards.ledger.selectedTabId == 0 {
             rewards.ledger.selectedTabId = tabId
@@ -982,7 +981,8 @@ class BrowserViewController: UIViewController {
         statusBarOverlay.isHidden = false
     }
     
-    let pageOverlayLayoutGuide = UILayoutGuide()
+    /// A layout guide defining where the favorites and NTP overlay are placed
+    private let pageOverlayLayoutGuide = UILayoutGuide()
 
     override func updateViewConstraints() {
         webViewContainer.snp.remakeConstraints { make in
@@ -1063,18 +1063,17 @@ class BrowserViewController: UIViewController {
     }
     
     private func hideFavoritesController() {
-        if let controller = favoritesController {
-            self.favoritesController = nil
-            UIView.animate(withDuration: 0.1, delay: 0, options: [.beginFromCurrentState], animations: {
-                controller.view.alpha = 0.0
-            }, completion: { _ in
-                controller.willMove(toParent: nil)
-                controller.view.removeFromSuperview()
-                controller.removeFromParent()
-                self.webViewContainer.accessibilityElementsHidden = false
-                UIAccessibility.post(notification: .screenChanged, argument: nil)
-            })
-        }
+        guard let controller = favoritesController else { return }
+        self.favoritesController = nil
+        UIView.animate(withDuration: 0.1, delay: 0, options: [.beginFromCurrentState], animations: {
+            controller.view.alpha = 0.0
+        }, completion: { _ in
+            controller.willMove(toParent: nil)
+            controller.view.removeFromSuperview()
+            controller.removeFromParent()
+            self.webViewContainer.accessibilityElementsHidden = false
+            UIAccessibility.post(notification: .screenChanged, argument: nil)
+        })
     }
     
     private func handleBookmarkAction(bookmark: Bookmark, action: BookmarksAction) {
@@ -1102,7 +1101,7 @@ class BrowserViewController: UIViewController {
         }
     }
 
-    fileprivate func showHomePanelController() {
+    fileprivate func showNewTabPageController() {
         guard let selectedTab = tabManager.selectedTab else { return }
         if selectedTab.newTabPageViewController == nil {
             let ntpController = NewTabPageViewController(tab: selectedTab,
@@ -1138,7 +1137,7 @@ class BrowserViewController: UIViewController {
             
             // We have to run this animation, even if the view is already showing because there may be a hide animation running
             // and we want to be sure to override its results.
-            UIView.animate(withDuration: 0.2, animations: { () -> Void in
+            UIView.animate(withDuration: 0.2, animations: {
                 ntpController.view.alpha = 1
             }, completion: { finished in
                 if finished {
@@ -1151,35 +1150,34 @@ class BrowserViewController: UIViewController {
     
     private(set) weak var activeNewTabPageViewController: NewTabPageViewController?
     
-    fileprivate func hideHomePanelController() {
-        if let controller = activeNewTabPageViewController {
-            UIView.animate(withDuration: 0.2, animations: {
-                controller.view.alpha = 0.0
-            }, completion: { finished in
-                controller.willMove(toParent: nil)
-                controller.view.removeFromSuperview()
-                controller.removeFromParent()
-                self.webViewContainer.accessibilityElementsHidden = false
-                UIAccessibility.post(notification: .screenChanged, argument: nil)
-                
-                // Refresh the reading view toolbar since the article record may have changed
-                if let readerMode = self.tabManager.selectedTab?.getContentScript(name: ReaderMode.name()) as? ReaderMode, readerMode.state == .active {
-                    self.showReaderModeBar(animated: false)
-                }
-            })
-        }
+    fileprivate func hideActiveNewTabPageController() {
+        guard let controller = activeNewTabPageViewController else { return }
+        UIView.animate(withDuration: 0.2, animations: {
+            controller.view.alpha = 0.0
+        }, completion: { finished in
+            controller.willMove(toParent: nil)
+            controller.view.removeFromSuperview()
+            controller.removeFromParent()
+            self.webViewContainer.accessibilityElementsHidden = false
+            UIAccessibility.post(notification: .screenChanged, argument: nil)
+            
+            // Refresh the reading view toolbar since the article record may have changed
+            if let readerMode = self.tabManager.selectedTab?.getContentScript(name: ReaderMode.name()) as? ReaderMode, readerMode.state == .active {
+                self.showReaderModeBar(animated: false)
+            }
+        })
     }
 
     fileprivate func updateInContentHomePanel(_ url: URL?) {
         if !topToolbar.inOverlayMode {
             guard let url = url else {
-                hideHomePanelController()
+                hideActiveNewTabPageController()
                 return
             }
             if url.isAboutHomeURL && !url.isErrorPageURL {
-                showHomePanelController()
+                showNewTabPageController()
             } else if !url.isLocalUtility || url.isReaderModeURL || url.isErrorPageURL {
-                hideHomePanelController()
+                hideActiveNewTabPageController()
             }
         }
     }

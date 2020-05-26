@@ -78,6 +78,7 @@ class FaviconFetcher {
             IconType(rawValue: Int(favicon.type))?.isPreferredTo(kind.iconType) == true
     }
     
+    /// Begin the search for a favicon for the site.
     func load(_ completion: @escaping (URL, FaviconAttributes) -> Void) {
         // Priority order for favicons:
         //   1. User installed icons (via using custom theme for example)
@@ -93,7 +94,11 @@ class FaviconFetcher {
             completion(url, icon)
             return
         }
-        fetchIcon(completion)
+        fetchIcon { url, attributes in
+            DispatchQueue.main.async {
+                completion(url, attributes)
+            }
+        }
     }
     
     // MARK: - Custom Icons
@@ -212,16 +217,12 @@ class FaviconFetcher {
                     FaviconMO.add(favicon, forSiteUrl: self.url)
                 }
                 
-                DispatchQueue.main.async {
-                    completion(image)
-                }
+                completion(image)
             } else {
                 favicon.width = 0
                 favicon.height = 0
                 
-                DispatchQueue.main.async {
-                    completion(nil)
-                }
+                completion(nil)
             }
         }
         
@@ -288,9 +289,7 @@ class FaviconFetcher {
         let pageTask = session.dataTask(with: url) { [weak self] (data, response, error) in
             guard let self = self else { return }
             guard let data = data, error == nil, let root = try? HTMLDocument(data: data) else {
-                DispatchQueue.main.async {
-                    completion(self.monogramFavicon)
-                }
+                completion(self.monogramFavicon)
                 return
             }
             // Ensure page is reloaded to final landing page before looking for
@@ -332,20 +331,16 @@ class FaviconFetcher {
             }
             
             guard let favicon = icon, let faviconURL = URL(string: favicon.url) else {
-                DispatchQueue.main.async {
-                    completion(self.monogramFavicon)
-                }
+                completion(self.monogramFavicon)
                 return
             }
             
             self.downloadIcon(url: faviconURL, addingToDatabase: true) { [weak self] image in
                 guard let self = self else { return }
-                DispatchQueue.main.async {
-                    if let image = image {
-                        completion(FaviconAttributes(image: image))
-                    } else {
-                        completion(self.monogramFavicon)
-                    }
+                if let image = image {
+                    completion(FaviconAttributes(image: image))
+                } else {
+                    completion(self.monogramFavicon)
                 }
             }
         }
@@ -377,16 +372,13 @@ class FaviconFetcher {
     private func isIconBackgroundTransparentAroundEdges(_ icon: UIImage, completion: @escaping (_ isTransparent: Bool) -> Void) {
         DispatchQueue.global(qos: .utility).async {
             guard let cgImage = icon.createScaled(CGSize(width: 48, height: 48)).cgImage else {
-                DispatchQueue.main.async {
-                    completion(false)
-                }
+                completion(false)
                 return
             }
             let alphaInfo = cgImage.alphaInfo
             let hasAlphaChannel = alphaInfo == .first || alphaInfo == .last ||
                 alphaInfo == .premultipliedFirst || alphaInfo == .premultipliedLast
-            if hasAlphaChannel {
-                let dataProvider = cgImage.dataProvider!
+            if hasAlphaChannel, let dataProvider = cgImage.dataProvider {
                 let length = CFDataGetLength(dataProvider.data)
                 // Sample the image edges to determine if it has tranparent pixels
                 if let data = CFDataGetBytePtr(dataProvider.data) {
@@ -419,14 +411,10 @@ class FaviconFetcher {
                     for y in 1..<Int(icon.size.height)-1 {
                         updateScore(x: Int(icon.size.width), y: y)
                     }
-                    DispatchQueue.main.async {
-                        completion(score > 0)
-                    }
+                    completion(score > 0)
                 }
             } else {
-                DispatchQueue.main.async {
-                    completion(false)
-                }
+                completion(false)
             }
         }
     }
@@ -439,11 +427,21 @@ private struct AssociatedObjectKeys {
 
 extension UIImageView {
     
+    /// The associated favicon fetcher for a UIImageView to ensure we don't
+    /// immediately cancel the FaviconFetcher load when the function call goes
+    /// out of scope.
+    ///
+    /// Must use objc associated objects because we are extending UIKit in an
+    /// extension
     private var faviconFetcher: FaviconFetcher? {
         get { objc_getAssociatedObject(self, &AssociatedObjectKeys.faviconFetcher) as? FaviconFetcher }
         set { objc_setAssociatedObject(self, &AssociatedObjectKeys.faviconFetcher, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC) }
     }
     
+    /// The monogram label for default favicons.
+    ///
+    /// Must use objc associated objects because we are extending UIKit in an
+    /// extension.
     private var monogramLabel: UILabel? {
         get { objc_getAssociatedObject(self, &AssociatedObjectKeys.monogramLabel) as? UILabel }
         set { objc_setAssociatedObject(self, &AssociatedObjectKeys.monogramLabel, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC) }

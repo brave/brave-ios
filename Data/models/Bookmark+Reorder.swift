@@ -43,6 +43,12 @@ extension Bookmark {
                                             return
         }
         
+        // If we're doing an interactive drag reorder then we want to make sure
+        // to do the reorder on main queue so the underlying dataset & FRC is
+        // updated immediately so the animation does not glitch out on drop.
+        //
+        // Doing it on a background thread will cause the favorites overlay
+        // to temporarely show the old items and require a full-table refresh
         let context: WriteContext = isInteractiveDragReorder ?
             .existing(DataController.viewContext) :
             .new(inMemory: false)
