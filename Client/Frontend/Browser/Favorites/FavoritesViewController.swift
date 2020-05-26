@@ -205,7 +205,6 @@ extension FavoritesViewController: UICollectionViewDataSource, UICollectionViewD
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FavoriteCell.identifier, for: indexPath) as! FavoriteCell
         let fav = frc.object(at: IndexPath(item: indexPath.item, section: 0))
         cell.textLabel.text = fav.displayTitle ?? fav.url
-        cell.textLabel.appearanceTextColor = nil
         if let url = fav.url?.asURL {
             // All favorites should have domain's, but it was noticed at one
             // point that this wasn't the case, so for future bug-tracking
