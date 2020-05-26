@@ -47,10 +47,17 @@ public class UserReferralProgram {
     
     /// Looks for referral and returns its landing page if possible.
     public func referralLookup(refCode: String?, completion: @escaping (_ refCode: String?, _ offerUrl: String?) -> Void) {
-        Preferences.URP.referralLookupOutstanding.value = false
         UrpLog.log("first run referral lookup")
         
-        let referralBlock: (ReferralData?, UrpError?) -> Void = { referral, _ in
+        let referralBlock: (ReferralData?, UrpError?) -> Void = { referral, error in
+            if error == BraveShared.UrpError.endpointError {
+                UrpLog.log("URP look up had endpoint error, will retry on next launch.")
+                return
+            }
+            
+            // Connection "succeeded"
+            
+            Preferences.URP.referralLookupOutstanding.value = false
             guard let ref = referral else {
                 log.info("No referral code found")
                 UrpLog.log("No referral code found")
