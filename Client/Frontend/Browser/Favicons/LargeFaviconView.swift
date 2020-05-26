@@ -14,9 +14,10 @@ class LargeFaviconView: UIView {
             if let domain = domain, let url = domain.url?.asURL, !url.absoluteString.isEmpty {
                 // Use the base domain's first character, but if that isn't valid
                 // use the favorites title as the monogram instead
-                monogramFallbackLabel.text = url.baseDomain?.first?.uppercased() ??
-                    monogramFallbackCharacter ??
-                    url.host?.first?.uppercased()
+                monogramFallbackLabel.text = FaviconFetcher.monogramLetter(
+                    for: url,
+                    fallbackCharacter: monogramFallbackCharacter
+                )
                 // Setup the favicon fetcher to pull a large icon for the given
                 // domain
                 fetcher = FaviconFetcher(siteURL: url, kind: .largeIcon, domain: domain)
@@ -40,10 +41,10 @@ class LargeFaviconView: UIView {
     
     /// The character that should be displayed if none can be assumed from
     /// `domain`.
-    var monogramFallbackCharacter: String? {
+    var monogramFallbackCharacter: Character? {
         didSet {
             if monogramFallbackLabel.text == nil {
-                monogramFallbackLabel.text = monogramFallbackCharacter
+                monogramFallbackLabel.text = monogramFallbackCharacter?.uppercased()
             }
         }
     }

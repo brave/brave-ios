@@ -365,6 +365,16 @@ class FaviconFetcher {
         )
     }
     
+    static func monogramLetter(for url: URL, fallbackCharacter: Character?) -> String {
+        guard let finalFallback = url.absoluteString.first else {
+            return "W"
+        }
+        return (url.baseDomain?.first ??
+            fallbackCharacter ??
+            url.host?.first ??
+            finalFallback).uppercased()
+    }
+    
     // MARK: - Misc
     
     /// Determines if the downloaded image should be padded because its edges
@@ -456,7 +466,7 @@ extension UIImageView {
     /// icon is used.
     func loadFavicon(for siteURL: URL,
                      domain: Domain? = nil,
-                     fallbackMonogramCharacter: String? = nil,
+                     fallbackMonogramCharacter: Character? = nil,
                      completion: (() -> Void)? = nil) {
         monogramLabel?.removeFromSuperview()
         faviconFetcher = FaviconFetcher(siteURL: siteURL, kind: .favicon, domain: domain)
@@ -472,9 +482,10 @@ extension UIImageView {
                     $0.appearanceBackgroundColor = .clear
                     $0.minimumScaleFactor = 0.5
                 }
-                label.text = siteURL.baseDomain?.first?.uppercased() ??
-                    fallbackMonogramCharacter ??
-                    siteURL.host?.first?.uppercased()
+                label.text = FaviconFetcher.monogramLetter(
+                    for: siteURL,
+                    fallbackCharacter: fallbackMonogramCharacter
+                )
                 self.addSubview(label)
                 label.snp.makeConstraints {
                     $0.center.equalToSuperview()
