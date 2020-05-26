@@ -460,8 +460,8 @@ extension UIImageView {
                      completion: (() -> Void)? = nil) {
         monogramLabel?.removeFromSuperview()
         faviconFetcher = FaviconFetcher(siteURL: siteURL, kind: .favicon, domain: domain)
-        faviconFetcher?.load { [weak self] url, attributes in
-            guard let self = self, url == siteURL else { return }
+        faviconFetcher?.load { [weak self] _, attributes in
+            guard let self = self else { return }
             if let image = attributes.image {
                 self.image = image
                 self.monogramLabel?.removeFromSuperview()
