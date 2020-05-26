@@ -73,6 +73,7 @@ protocol NTPObservableSectionProvider: NTPSectionProvider {
 protocol NewTabPageDelegate: AnyObject {
     func focusURLBar()
     func navigateToInput(_ input: String, inNewTab: Bool, switchingToPrivateMode: Bool)
+    func handleBookmarkAction(bookmark: Bookmark, action: BookmarksAction)
     func tappedDuckDuckGoCallout()
     func brandedImageCalloutActioned(_ state: BrandedImageCalloutState)
     func tappedQRCodeButton(url: URL)
@@ -444,30 +445,7 @@ class NewTabPageViewController: UIViewController, Themeable {
     }
     
     private func handleBookmarkAction(bookmark: Bookmark, action: BookmarksAction) {
-        guard let url = bookmark.url else { return }
-        switch action {
-        case .opened(let inNewTab, let switchingToPrivateMode):
-            delegate?.navigateToInput(
-                url,
-                inNewTab: inNewTab,
-                switchingToPrivateMode: switchingToPrivateMode
-            )
-        case .edited:
-            guard let title = bookmark.displayTitle, let urlString = bookmark.url else { return }
-            let editPopup = UIAlertController.userTextInputAlert(title: Strings.editBookmark, message: urlString,
-                                                                 startingText: title, startingText2: bookmark.url,
-                                                                 placeholder2: urlString,
-                                                                 keyboardType2: .URL) { callbackTitle, callbackUrl in
-                                                                    if let cTitle = callbackTitle,
-                                                                        !cTitle.isEmpty,
-                                                                        let cUrl = callbackUrl,
-                                                                        !cUrl.isEmpty,
-                                                                        URL(string: cUrl) != nil {
-                                                                        bookmark.update(customTitle: cTitle, url: cUrl)
-                                                                    }
-            }
-            self.present(editPopup, animated: true)
-        }
+        delegate?.handleBookmarkAction(bookmark: bookmark, action: action)
     }
     
     private func presentImageCredit(_ button: UIControl) {
