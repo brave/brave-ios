@@ -124,6 +124,6 @@ class DuckDuckGoCalloutSectionProvider: NSObject, NTPObservableSectionProvider {
         if !isShowingCallout {
             return .zero
         }
-        return UIEdgeInsets(top: 120.0, left: 16, bottom: 16, right: 16)
+        return UIEdgeInsets(top: 60.0, left: 16, bottom: 16, right: 16)
     }
 }
