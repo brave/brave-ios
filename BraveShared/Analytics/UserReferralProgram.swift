@@ -23,6 +23,13 @@ public class UserReferralProgram {
         static let prod = "https://laptop-updates.brave.com"
     }
     
+    // In case of network problems when looking for referrral code
+    // we retry the call few times while the app is still alive.
+    private var referralLookupRetryTimer: Timer?
+    private var referralLookupCurrentCount = 0
+    private let referralLookupRetryMaxCount = 10
+    private let referralLookupRetryTimeInterval = AppConstants.buildChannel.isPublic ? 3.minutes : 1.minutes
+    
     let service: UrpService
     
     public init?() {
@@ -49,9 +56,25 @@ public class UserReferralProgram {
     public func referralLookup(refCode: String?, completion: @escaping (_ refCode: String?, _ offerUrl: String?) -> Void) {
         UrpLog.log("first run referral lookup")
         
-        let referralBlock: (ReferralData?, UrpError?) -> Void = { referral, error in
+        let referralBlock: (ReferralData?, UrpError?) -> Void = { [weak self] referral, error in
+            guard let self = self else { return }
+            
             if error == BraveShared.UrpError.endpointError {
                 UrpLog.log("URP look up had endpoint error, will retry on next launch.")
+                self.referralLookupRetryTimer?.invalidate()
+                self.referralLookupRetryTimer = nil
+                
+                // Hit max retry attempts.
+                if self.referralLookupCurrentCount > self.referralLookupRetryMaxCount { return }
+                
+                self.referralLookupCurrentCount += 1
+                self.referralLookupRetryTimer =
+                    Timer.scheduledTimer(withTimeInterval: self.referralLookupRetryTimeInterval,
+                                         repeats: true) { [weak self] _ in
+                        self?.referralLookup(refCode: refCode) { refCode, offerUrl in
+                            completion(refCode, offerUrl)
+                        }
+                }
                 return
             }
             
@@ -82,6 +105,9 @@ public class UserReferralProgram {
             
             Preferences.URP.downloadId.value = ref.downloadId
             Preferences.URP.referralCode.value = ref.referralCode
+            
+            self.referralLookupRetryTimer?.invalidate()
+            self.referralLookupRetryTimer = nil
             
             UrpLog.log("Found referral: downloadId: \(ref.downloadId), code: \(ref.referralCode)")
             // In case of network errors or getting `isFinalized = false`, we retry the api call.
