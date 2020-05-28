@@ -802,6 +802,8 @@ fileprivate class TabManagerDataSource: NSObject, UICollectionViewDataSource {
         tabCell.isAccessibilityElement = true
         tabCell.accessibilityHint = Strings.tabTrayCellCloseAccessibilityHint
 
+        tabCell.favicon.clearMonogramFavicon()
+        
         // Tab may not be restored and so may not include a tab URL yet...
         if let favicon = tab.displayFavicon, let url = favicon.url.asURL {
             WebImageCacheManager.shared.load(from: url, completion: { image, _, _, _, loadedURL in

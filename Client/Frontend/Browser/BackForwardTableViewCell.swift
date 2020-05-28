@@ -55,6 +55,7 @@ class BackForwardTableViewCell: UITableViewCell {
                 if s.tileURL.isLocal {
                     faviconView.backgroundColor = .white
                     faviconView.image = FaviconFetcher.defaultFaviconImage
+                    faviconView.clearMonogramFavicon()
                 } else {
                     faviconView.loadFavicon(for: s.tileURL)
                 }

@@ -217,7 +217,6 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         cell.imageView?.image = image
         cell.imageView?.contentMode = .center
         cell.imageView?.layer.borderWidth = 0.0
-        cell.imageView?.backgroundColor = .clear
         cell.imageView?.clearMonogramFavicon()
       } else {
         cell.imageView?.layer.borderColor = BraveUX.faviconBorderColor.cgColor
@@ -226,6 +225,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         if let url = item.domain?.url?.asURL {
             cell.imageView?.loadFavicon(for: url, domain: item.domain, fallbackMonogramCharacter: item.title?.first)
         } else {
+            cell.imageView?.clearMonogramFavicon()
             cell.imageView?.image = FaviconFetcher.defaultFaviconImage
         }
       }

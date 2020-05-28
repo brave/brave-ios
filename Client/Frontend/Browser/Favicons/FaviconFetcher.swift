@@ -478,8 +478,11 @@ extension UIImageView {
     /// Removes any monogram labels that may have been added to the image in the
     /// past
     func clearMonogramFavicon() {
-        monogramLabel?.removeFromSuperview()
-        monogramLabel = nil
+        if let label = monogramLabel, label.superview != nil {
+            monogramLabel?.removeFromSuperview()
+            monogramLabel = nil
+            backgroundColor = nil
+        }
     }
     
     /// Load the favicon from a site URL directly into a `UIImageView`. If no

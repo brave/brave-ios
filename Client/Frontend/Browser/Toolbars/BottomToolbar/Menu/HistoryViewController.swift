@@ -125,6 +125,7 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
     if let url = site.domain?.url?.asURL {
         cell.imageView?.loadFavicon(for: url)
     } else {
+        cell.imageView?.clearMonogramFavicon()
         cell.imageView?.image = FaviconFetcher.defaultFaviconImage
     }
   }
