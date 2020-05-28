@@ -475,6 +475,13 @@ extension UIImageView {
         set { objc_setAssociatedObject(self, &AssociatedObjectKeys.monogramLabel, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC) }
     }
     
+    /// Removes any monogram labels that may have been added to the image in the
+    /// past
+    func clearMonogramFavicon() {
+        monogramLabel?.removeFromSuperview()
+        monogramLabel = nil
+    }
+    
     /// Load the favicon from a site URL directly into a `UIImageView`. If no
     /// favicon is found, a monogram will be used where the letter is determined
     /// based on `fallbackMonogramCharacter` or the site URL.

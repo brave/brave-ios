@@ -217,6 +217,8 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         cell.imageView?.image = image
         cell.imageView?.contentMode = .center
         cell.imageView?.layer.borderWidth = 0.0
+        cell.imageView?.backgroundColor = .clear
+        cell.imageView?.clearMonogramFavicon()
       } else {
         cell.imageView?.layer.borderColor = BraveUX.faviconBorderColor.cgColor
         cell.imageView?.layer.borderWidth = BraveUX.faviconBorderWidth
