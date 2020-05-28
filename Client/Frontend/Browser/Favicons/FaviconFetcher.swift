@@ -496,13 +496,12 @@ extension UIImageView {
                      domain: Domain? = nil,
                      fallbackMonogramCharacter: Character? = nil,
                      completion: (() -> Void)? = nil) {
-        monogramLabel?.removeFromSuperview()
+        clearMonogramFavicon()
         faviconFetcher = FaviconFetcher(siteURL: siteURL, kind: .favicon, domain: domain)
         faviconFetcher?.load { [weak self] _, attributes in
             guard let self = self else { return }
             if let image = attributes.image {
                 self.image = image
-                self.monogramLabel?.removeFromSuperview()
             } else {
                 // Monogram favicon attributes
                 let label = self.monogramLabel ?? UILabel().then {
