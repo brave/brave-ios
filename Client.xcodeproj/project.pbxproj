@@ -722,6 +722,11 @@
 		5E612A8F234B7FCA007D12B5 /* OnboardingRewardsAgreementViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E1D8C6A232BF95200BDE662 /* OnboardingRewardsAgreementViewController.swift */; };
 		5E612A90234B7FCD007D12B5 /* OnboardingRewardsAgreementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E1D8C6C232BF9C200BDE662 /* OnboardingRewardsAgreementView.swift */; };
 		5E6683A923D61CF7005B3A6C /* NTPDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E6683A823D61CF7005B3A6C /* NTPDownloader.swift */; };
+		5E667FD023C90BA000931DEC /* GSafeBrowsingDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E667FCA23C90BA000931DEC /* GSafeBrowsingDatabase.swift */; };
+		5E667FD123C90BA000931DEC /* GSafeBrowsingModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E667FCB23C90BA000931DEC /* GSafeBrowsingModels.swift */; };
+		5E667FD223C90BA000931DEC /* GSafeBrowsingCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E667FCC23C90BA000931DEC /* GSafeBrowsingCache.swift */; };
+		5E667FD323C90BA000931DEC /* SafeBrowsing.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 5E667FCD23C90BA000931DEC /* SafeBrowsing.xcdatamodeld */; };
+		5E667FD423C90BA000931DEC /* GSafeBrowsing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E667FCF23C90BA000931DEC /* GSafeBrowsing.swift */; };
 		5E77F9A8236B362800E1649C /* DeviceCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E856FE7235E083B0094E113 /* DeviceCheck.swift */; };
 		5E77F9AA236B362E00E1649C /* Cryptography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E856FE5235E08110094E113 /* Cryptography.swift */; };
 		5E77F9DD236BB68700E1649C /* AttestationDebugger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E77F9DC236BB68700E1649C /* AttestationDebugger.swift */; };
@@ -817,7 +822,6 @@
 		C8611C8E1F71904C00C3DE7D /* DiskImageStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3BF8CBC1B7472FA0007AFE6 /* DiskImageStoreTests.swift */; };
 		C8F457A81F1FD75A000CB895 /* BrowserViewController+WKNavigationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F457A71F1FD75A000CB895 /* BrowserViewController+WKNavigationDelegate.swift */; };
 		C8F457AA1F1FDD9B000CB895 /* BrowserViewController+KeyCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F457A91F1FDD9B000CB895 /* BrowserViewController+KeyCommands.swift */; };
-		CAE0DB32230AF8E6007BBDF1 /* GSafeBrowsingCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAE0DB31230AF8E6007BBDF1 /* GSafeBrowsingCache.swift */; };
 		CAE0DB4A230C8942007BBDF1 /* SafeBrowsingTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAE0DB44230C8791007BBDF1 /* SafeBrowsingTest.swift */; };
 		CE7F11941F3CEEC800ABFC0B /* RemoteDevices.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE7F115E1F3CCEF900ABFC0B /* RemoteDevices.swift */; };
 		D018F93E1F44A71A0098F8CA /* Schema.swift in Sources */ = {isa = PBXBuildFile; fileRef = D018F93D1F44A7190098F8CA /* Schema.swift */; };
@@ -2242,6 +2246,11 @@
 		5E4845BF22DE381200372022 /* WindowRenderHelper.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = WindowRenderHelper.js; sourceTree = "<group>"; };
 		5E4845C122DE3DF800372022 /* WindowRenderHelperScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowRenderHelperScript.swift; sourceTree = "<group>"; };
 		5E6683A823D61CF7005B3A6C /* NTPDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NTPDownloader.swift; sourceTree = "<group>"; };
+		5E667FCA23C90BA000931DEC /* GSafeBrowsingDatabase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GSafeBrowsingDatabase.swift; sourceTree = "<group>"; };
+		5E667FCB23C90BA000931DEC /* GSafeBrowsingModels.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GSafeBrowsingModels.swift; sourceTree = "<group>"; };
+		5E667FCC23C90BA000931DEC /* GSafeBrowsingCache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GSafeBrowsingCache.swift; sourceTree = "<group>"; };
+		5E667FCE23C90BA000931DEC /* SafeBrowsing.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SafeBrowsing.xcdatamodel; sourceTree = "<group>"; };
+		5E667FCF23C90BA000931DEC /* GSafeBrowsing.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GSafeBrowsing.swift; sourceTree = "<group>"; };
 		5E77F9DC236BB68700E1649C /* AttestationDebugger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttestationDebugger.swift; sourceTree = "<group>"; };
 		5E856FE5235E08110094E113 /* Cryptography.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = Cryptography.swift; sourceTree = "<group>"; tabWidth = 2; };
 		5E856FE7235E083B0094E113 /* DeviceCheck.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = DeviceCheck.swift; sourceTree = "<group>"; tabWidth = 2; };
@@ -4343,6 +4352,26 @@
 			path = BraveSharedTests;
 			sourceTree = "<group>";
 		};
+		5E667FC723C90B8500931DEC /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				CAE0DB31230AF8E6007BBDF1 /* GSafeBrowsingCache.swift */,
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
+		5E667FC923C90BA000931DEC /* SafeBrowsing */ = {
+			isa = PBXGroup;
+			children = (
+				5E667FCA23C90BA000931DEC /* GSafeBrowsingDatabase.swift */,
+				5E667FCB23C90BA000931DEC /* GSafeBrowsingModels.swift */,
+				5E667FCC23C90BA000931DEC /* GSafeBrowsingCache.swift */,
+				5E667FCD23C90BA000931DEC /* SafeBrowsing.xcdatamodeld */,
+				5E667FCF23C90BA000931DEC /* GSafeBrowsing.swift */,
+			);
+			path = SafeBrowsing;
+			sourceTree = "<group>";
+		};
 		5E856FE3235E08010094E113 /* DeviceCheck */ = {
 			isa = PBXGroup;
 			children = (
@@ -4376,18 +4405,6 @@
 				5EA84389234F802C00076A91 /* expired.badssl.com-root-ca.cer */,
 			);
 			path = expired.badssl.com;
-			sourceTree = "<group>";
-		};
-		5EB57CC922FC7B9B00A07325 /* SafeBrowsing */ = {
-			isa = PBXGroup;
-			children = (
-				5EB57C2522FB1B3700A07325 /* GSafeBrowsing.swift */,
-				5EB57CBE22FC77F200A07325 /* GSafeBrowsingModels.swift */,
-				CAE0DB31230AF8E6007BBDF1 /* GSafeBrowsingCache.swift */,
-				5EB57CC722FC793100A07325 /* GSafeBrowsingDatabase.swift */,
-				5EB57CCA22FC7BD000A07325 /* SafeBrowsing.xcdatamodeld */,
-			);
-			path = SafeBrowsing;
 			sourceTree = "<group>";
 		};
 		5ECCE69D23B6919900A0193D /* SafeBrowsingPages */ = {
@@ -4959,6 +4976,7 @@
 				2FCAE22A1ABB51F800877008 /* StorageTests */,
 				5DE7689220B3456E00FF5533 /* BraveSharedTests */,
 				28CE83EF1A1D246900576538 /* ThirdParty */,
+				5E667FC723C90B8500931DEC /* Recovered References */,
 			);
 			indentWidth = 4;
 			sourceTree = "<group>";
@@ -5002,6 +5020,7 @@
 				276E7A3A22F21DAB00939424 /* Rewards */,
 				39A359BD1BFCCE7B006B9E87 /* Helpers */,
 				0A4BEFCD221E11440005551A /* Networking */,
+				5E667FC923C90BA000931DEC /* SafeBrowsing */,
 				5ECCE69D23B6919900A0193D /* SafeBrowsingPages */,
 				0A0D3D2F21A4BC1F00BEE65B /* WebFilters */,
 				F930CDB02270029B00A23FE1 /* WebAuthN */,
@@ -6491,6 +6510,7 @@
 				7B3631EA1C244FEE00D12AF9 /* Theme.swift in Sources */,
 				0A1E843F2190A57F0042F782 /* SyncQRCodeView.swift in Sources */,
 				4422D56921BFFB7F00BF1855 /* prefilter.cc in Sources */,
+				5E667FD123C90BA000931DEC /* GSafeBrowsingModels.swift in Sources */,
 				5E4845C222DE3DF800372022 /* WindowRenderHelperScript.swift in Sources */,
 				27F94A3A21909A5900F4FADF /* SearchSuggestionsPromptView.swift in Sources */,
 				C690C208212FF35100E6EEE9 /* WebImageCacheWithNoPrivacyProtectionManager.swift in Sources */,
@@ -6510,7 +6530,6 @@
 				31ADB5DA1E58CEC300E87909 /* ClipboardBarDisplayHandler.swift in Sources */,
 				0A4B012020D02EC4004D4011 /* TabsBarViewController.swift in Sources */,
 				4422D4D921BFFB7600BF1855 /* merger.cc in Sources */,
-				5EB57CBF22FC77F200A07325 /* GSafeBrowsingModels.swift in Sources */,
 				4422D4EF21BFFB7600BF1855 /* log_reader.cc in Sources */,
 				4422D4E621BFFB7600BF1855 /* two_level_iterator.cc in Sources */,
 				27FCA8E72447BCFE00A8CA48 /* DuckDuckGoCalloutSectionProvider.swift in Sources */,
@@ -6562,7 +6581,6 @@
 				0A43293B21B1C8D10041625B /* FifoDict.swift in Sources */,
 				FA6B2AC21D41F02D00429414 /* Punycode.swift in Sources */,
 				D301AAEE1A3A55B70078DD1D /* TabTrayController.swift in Sources */,
-				5EB57CCC22FC7BD000A07325 /* SafeBrowsing.xcdatamodeld in Sources */,
 				0A7B5D702269E72C00AADF22 /* BookmarkSaveLocation.swift in Sources */,
 				0B3E7D951B27A7CE00E2E84D /* AboutHomeHandler.swift in Sources */,
 				0AADC4CA20D2A66E00FDE368 /* FavoriteCell.swift in Sources */,
@@ -6675,6 +6693,7 @@
 				D8C75DF3207584C400BB8AD0 /* UIImageViewAligned.m in Sources */,
 				E653422D1C5944F90039DD9E /* BrowserPrompts.swift in Sources */,
 				4422D43621BFD29E00BF1855 /* NSFileManager+Tar.m in Sources */,
+				5E667FD223C90BA000931DEC /* GSafeBrowsingCache.swift in Sources */,
 				39DD030D1CD53E1900BC09B3 /* HomePageHelper.swift in Sources */,
 				C4F3B29A1CFCF93A00966259 /* ButtonToast.swift in Sources */,
 				D31A0FC71A65D6D000DC8C7E /* SearchSuggestClient.swift in Sources */,
@@ -6700,7 +6719,6 @@
 				0A19365423508756002E2B81 /* LinkPreviewViewController.swift in Sources */,
 				E65075611E37F77D006961AC /* MenuHelper.swift in Sources */,
 				E63ED7D81BFCD9990097D08E /* LoginTableViewCell.swift in Sources */,
-				5EB57C2622FB1B3700A07325 /* GSafeBrowsing.swift in Sources */,
 				C615FACF2129FBD000A8168C /* ImageCacheProtocol.swift in Sources */,
 				4422D4BB21BFFB7600BF1855 /* cache.cc in Sources */,
 				39455F771FC83F430088A22C /* TabEventHandler.swift in Sources */,
@@ -6793,6 +6811,7 @@
 				0BA1E02E1B046F1E007675AF /* ErrorPageHelper.swift in Sources */,
 				D3A9949C1A3686BD008AD1AC /* BrowserViewController.swift in Sources */,
 				59A681BDFC95A19F05E07223 /* SearchViewController.swift in Sources */,
+				5E667FD023C90BA000931DEC /* GSafeBrowsingDatabase.swift in Sources */,
 				0A8C6993225BC7B100988715 /* ToolbarUrlActionsProtocol.swift in Sources */,
 				0AFC8F9523D1DF6500941895 /* TranslucentBottomSheet.swift in Sources */,
 				E68E7ADA1CAC207400FDCA76 /* ChangePasscodeViewController.swift in Sources */,
@@ -6813,6 +6832,7 @@
 				D3972BF31C22412B00035B87 /* ShareExtensionHelper.swift in Sources */,
 				F35B8D2D1D6383E9008E3D61 /* SessionRestoreHelper.swift in Sources */,
 				744ED5611DBFEB8D00A2B5BE /* MailtoLinkHandler.swift in Sources */,
+				5E667FD423C90BA000931DEC /* GSafeBrowsing.swift in Sources */,
 				D04D1B862097859B0074B35F /* DownloadToast.swift in Sources */,
 				4422D4F721BFFB7600BF1855 /* dbformat.cc in Sources */,
 				7B844E3D1BBDDB9D00E733A2 /* ChevronView.swift in Sources */,
@@ -6837,8 +6857,8 @@
 				4422D56621BFFB7F00BF1855 /* tostring.cc in Sources */,
 				2727369B24A65F650096DCB9 /* UIActionExtensions.swift in Sources */,
 				4422D54821BFFB7E00BF1855 /* pcre.cc in Sources */,
+				5E667FD323C90BA000931DEC /* SafeBrowsing.xcdatamodeld in Sources */,
 				C8F457AA1F1FDD9B000CB895 /* BrowserViewController+KeyCommands.swift in Sources */,
-				5EB57CC822FC793100A07325 /* GSafeBrowsingDatabase.swift in Sources */,
 				E40FAB0C1A7ABB77009CB80D /* WebServer.swift in Sources */,
 				4422D54C21BFFB7E00BF1855 /* strutil.cc in Sources */,
 				59A68D66379CFA85C4EAF00B /* TwoLineCell.swift in Sources */,
@@ -10900,12 +10920,12 @@
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
 		};
-		5EB57CCA22FC7BD000A07325 /* SafeBrowsing.xcdatamodeld */ = {
+		5E667FCD23C90BA000931DEC /* SafeBrowsing.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
-				5EB57CCB22FC7BD000A07325 /* SafeBrowsing.xcdatamodel */,
+				5E667FCE23C90BA000931DEC /* SafeBrowsing.xcdatamodel */,
 			);
-			currentVersion = 5EB57CCB22FC7BD000A07325 /* SafeBrowsing.xcdatamodel */;
+			currentVersion = 5E667FCE23C90BA000931DEC /* SafeBrowsing.xcdatamodel */;
 			path = SafeBrowsing.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

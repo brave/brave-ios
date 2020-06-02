@@ -169,7 +169,7 @@ extension BrowserViewController: WKNavigationDelegate {
         let isSafeBrowsingEnabled = { () -> Bool in
             let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
             let domain = Domain.getOrCreate(forUrl: url, persistent: !isPrivateBrowsing)
-            return domain.isShieldExpected(.SafeBrowsing)
+            return domain.isShieldExpected(.SafeBrowsing, considerAllShieldsOption: true)
         }
         
         if !navigationAction.isInterstitial {
