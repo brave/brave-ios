@@ -106,6 +106,8 @@ class Tab: NSObject {
     // When viewing a non-HTML content type in the webview (like a PDF document), this URL will
     // point to a tempfile containing the content so it can be shared to external applications.
     var temporaryDocument: TemporaryDocument?
+    
+    var interstitialPageHandler: InterstitialPageHandler?
 
     fileprivate var _noImageMode = false
 
