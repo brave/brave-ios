@@ -485,7 +485,7 @@ extension Strings {
     public static let blockAdsAndTracking = NSLocalizedString("BlockAdsAndTracking", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Block Ads & Tracking", comment: "")
     public static let HTTPSEverywhere = NSLocalizedString("HTTPSEverywhere", tableName: "BraveShared", bundle: Bundle.braveShared, value: "HTTPS Everywhere", comment: "")
     public static let blockPhishingAndMalware = NSLocalizedString("BlockPhishingAndMalware", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Block Phishing and Malware", comment: "")
-    public static let googleSafeBrowsing = NSLocalizedString("GoogleSafBrowsing", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Block phishing & malware", comment: "")
+    public static let googleSafeBrowsing = NSLocalizedString("GoogleSafBrowsing", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Block phishing/malware", comment: "")
     public static let googleSafeBrowsingDescription = NSLocalizedString("GoogleSafBrowsingDescription", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Sends obfuscated URLs of some pages to Brave to check against the Google Safe Browsing service.", comment: "")
     public static let blockScripts = NSLocalizedString("BlockScripts", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Block Scripts", comment: "")
     public static let fingerprintingProtection = NSLocalizedString("FingerprintingProtection", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Fingerprinting Protection", comment: "")

@@ -7,6 +7,7 @@ import Foundation
 import WebKit
 import Shared
 import GCDWebServers
+import BraveShared
 
 private let log = Logger.browserLogger
 
@@ -66,7 +67,7 @@ extension InterstitialPageHandler {
                     return GCDWebServerResponse(statusCode: 404)
                 }
                 
-                return InterstitialPageHandler.responseForType(url: url, threatType: type)
+                return InterstitialPageHandler.responseForType(url: url, threatType: .unwantedSoftware)
             })
         }
         
@@ -84,92 +85,94 @@ extension InterstitialPageHandler {
     private static func responseForType(url: URL, threatType: ThreatType) -> GCDWebServerResponse? {
         let host = url.host ?? url.absoluteString
         let escapedURL = url.absoluteString.addingPercentEncoding(withAllowedCharacters: .URLAllowed) ?? url.absoluteString
-        
+
         switch threatType {
         case .unspecified:
             let asset = Bundle.main.path(forResource: "MITM", ofType: "html")
             let variables = [
-                "tab_title": "SafeBrowsing",
-                "page_header": "Your connection is not private",
-                "error_description": "Attackers might be trying to steal your information from \(host) (for example, passwords, messages, or credit cards). ",
-                "learn_more": "Learn more",
-                "more_details": "More details",
-                "back_to_safety": "Back to safety",
-                "error_detection": "This server could not prove that it is \(host); its security certificate is not trusted by your device's operating system. This may be caused by a misconfiguration or an attacker trying to intercept your connection.",
-                "visit_unsafe": "Proceed to \(host) (unsafe)"
+                "tab_title": Strings.safeBrowsingTabTitle,
+                "page_header": Strings.safeBrowsingUnknownPageHeader,
+                "error_description": String(format: Strings.safeBrowsingUnknownErrorDescription, "\(host)"),
+                "learn_more": Strings.safeBrowsingSharedLearnMore,
+                "more_details": Strings.safeBrowsingSharedMoreDetails,
+                "back_to_safety": Strings.safeBrowsingSharedBackToSafety,
+                "error_detection": String(format: Strings.safeBrowsingUnknownErrorDetection, "\(host)"),
+                "visit_unsafe": String(format: Strings.safeBrowsingUnknownVisitUnsafe, "\(host)")
             ]
             return buildResponse(asset: asset, variables: variables)
             
         case .malware:
             let asset = Bundle.main.path(forResource: "Malware", ofType: "html")
             let variables = [
-                "tab_title": "Safe Browsing",
-                "page_header": "The site ahead contains malware",
-                "error_description": "Attackers currently on \(host) might attempt to install dangerous programs on your Mac that steal or delete your information (for example, photos, passwords, messages, and credit cards).",
-                "learn_more": "Learn more",
-                "more_details": "More details",
-                "back_to_safety": "Back to safety",
-                "error_detection": "Google Safe Browsing recently detected malware on \(host).\nWebsites that are normally safe are sometimes infected with malware.",
-                "risk_1": "If you understand the risks to your security, you may",
-                "visit_unsafe": "visit this unsafe site",
-                "risk_2": "before the dangerous programs have been removed."
+                "tab_title": Strings.safeBrowsingTabTitle,
+                "page_header": Strings.safeBrowsingMalwarePageHeader,
+                "error_description": String(format: Strings.safeBrowsingMalwareErrorDescription, "\(host)"),
+                "learn_more": Strings.safeBrowsingSharedLearnMore,
+                "more_details": Strings.safeBrowsingSharedMoreDetails,
+                "back_to_safety": Strings.safeBrowsingSharedBackToSafety,
+                "error_detection": String(format: Strings.safeBrowsingMalwareErrorDetection, "\(host)"),
+                "risk_1": Strings.safeBrowsingMalwareRisks1,
+                "visit_unsafe": Strings.safeBrowsingMalwareVisitUnsafe,
+                "risk_2": Strings.safeBrowsingMalwareRisks2
             ]
             return buildResponse(asset: asset, variables: variables)
             
         case .socialEngineering:
             let asset = Bundle.main.path(forResource: "Phishing", ofType: "html")
             let variables = [
-                "tab_title": "Safe Browsing",
-                "page_header": "Deceptive site ahead",
-                "error_description": "Attackers on \(host) may trick you into doing something dangerous like installing software or revealing your personal information (for example, passwords, phone numbers, or credit cards).",
-                "learn_more": "Learn more",
-                "more_details": "More details",
-                "back_to_safety": "Back to safety",
-                "error_detection_1": "Google Safe Browsing recently",
+                "tab_title": Strings.safeBrowsingTabTitle,
+                "page_header": Strings.safeBrowsingPhishingPageHeader,
+                "error_description": String(format: Strings.safeBrowsingPhishingErrorDescription, "\(host)"),
+                "learn_more": Strings.safeBrowsingSharedLearnMore,
+                "more_details": Strings.safeBrowsingSharedMoreDetails,
+                "back_to_safety": Strings.safeBrowsingSharedBackToSafety,
+                "error_detection_1": Strings.safeBrowsingPhishingErrorDetection1,
                 "transparency_report": "https://transparencyreport.google.com/safe-browsing/search?url=\(escapedURL)",
-                "detected_problem": "detected phishing",
-                "error_detection_2": "on \(host).\nPhishing sites pretend to be other websites to trick you.",
-                "report_problem": "You can",
+                "detected_problem": Strings.safeBrowsingPhishingErrorDetectionProblem,
+                "error_detection_2": String(format: Strings.safeBrowsingPhishingErrorDetection2, "\(host)"),
+                "report_problem": Strings.safeBrowsingPhishingReportProblem,
                 "report_problem_url": "https://safebrowsing.google.com/safebrowsing/report_error/?url=\(escapedURL)",
-                "report_problem_text": "report a detection problem",
-                "risk_1": "or, if you understand the risks to your security,",
-                "risk_2": "visit this unsafe site"
+                "report_problem_text": Strings.safeBrowsingPhishingReportProblemText,
+                "risk_1": Strings.safeBrowsingPhishingRisks1,
+                "risk_2": Strings.safeBrowsingPhishingVisitUnsafe
             ]
             return buildResponse(asset: asset, variables: variables)
             
         case .unwantedSoftware:
             let asset = Bundle.main.path(forResource: "UnwantedSoftware", ofType: "html")
             let variables = [
-                "tab_title": "Safe Browsing",
-                "page_header": "Harmful site ahead",
-                "error_description": "Attackers on \(host) might attempt to trick you into installing programs that harm your browsing experience (for example, by changing your homepage or showing extra ads on sites you visit).",
-                "learn_more": "Learn more",
-                "more_details": "More details",
-                "back_to_safety": "Back to safety",
-                "error_detection": "Google Safe Browsing recently detected phishing on \(host).\nPhishing sites pretend to be other websites to trick you.",
-                "report_problem": "You can",
-                "report_problem_url": "https://safebrowsing.google.com/safebrowsing/report_error/?url=\(escapedURL)",
-                "report_problem_text": "report a detection problem",
-                "risk_1": "or, if you understand the risks to your security,",
-                "risk_2": "visit this unsafe site"
+                "tab_title": Strings.safeBrowsingTabTitle,
+                "page_header": Strings.safeBrowsingUnwantedSoftwarePageHeader,
+                "error_description": String(format: Strings.safeBrowsingUnwantedSoftwareErrorDescription, "\(host)"),
+                "learn_more": Strings.safeBrowsingSharedLearnMore,
+                "more_details": Strings.safeBrowsingSharedMoreDetails,
+                "back_to_safety": Strings.safeBrowsingSharedBackToSafety,
+                "error_detection": Strings.safeBrowsingUnwantedSoftwareErrorDetection,
+                "error_detection_link_text": Strings.safeBrowsingUnwantedSoftwareErrorDetectionLinkText,
+                "error_detection_url": "https://transparencyreport.google.com/safe-browsing/search?url=\(escapedURL)",
+                "error_description_page": String(format: Strings.safeBrowsingUnwantedSoftwareErrorDetectionPage, "\(host)"),
+                "risk_1": Strings.safeBrowsingUnwantedSoftwareRisks1,
+                "visit_unsafe": Strings.safeBrowsingUnwantedSoftwareVisitUnsafe,
+                "risk_2": Strings.safeBrowsingUnwantedSoftwareRisks2
             ]
             return buildResponse(asset: asset, variables: variables)
             
         case .potentiallyHarmfulApplication:
             let asset = Bundle.main.path(forResource: "HarmfulApplication", ofType: "html")
             let variables = [
-                "tab_title": "Safe Browsing",
-                "page_header": "Harmful site ahead",
-                "error_description": "Attackers on \(host) might attempt to trick you into installing programs that harm your browsing experience (for example, by changing your homepage or showing extra ads on sites you visit).",
-                "learn_more": "Learn more",
-                "more_details": "More details",
-                "back_to_safety": "Back to safety",
-                "error_detection": "Google Safe Browsing recently detected phishing on \(host).\nPhishing sites pretend to be other websites to trick you.",
-                "report_problem": "You can",
-                "report_problem_url": "https://safebrowsing.google.com/safebrowsing/report_error/?url=\(escapedURL)",
-                "report_problem_text": "report a detection problem",
-                "risk_1": "or, if you understand the risks to your security,",
-                "risk_2": "visit this unsafe site"
+                "tab_title": Strings.safeBrowsingTabTitle,
+                "page_header": Strings.safeBrowsingHarmfulApplicationPageHeader,
+                "error_description": Strings.safeBrowsingHarmfulApplicationErrorDescription,
+                "learn_more": Strings.safeBrowsingSharedLearnMore,
+                "more_details": Strings.safeBrowsingSharedMoreDetails,
+                "back_to_safety": Strings.safeBrowsingSharedBackToSafety,
+                "error_detection": Strings.safeBrowsingHarmfulApplicationErrorDetection,
+                "error_detection_link_text": Strings.safeBrowsingHarmfulApplicationErrorDetectionLinkText,
+                "error_detection_url": "https://transparencyreport.google.com/safe-browsing/search?url=\(escapedURL)",
+                "error_description_page": String(format: Strings.safeBrowsingHarmfulApplicationErrorDetectionPage, "\(host)"),
+                "risk_1": Strings.safeBrowsingHarmfulApplicationRisks1,
+                "visit_unsafe": Strings.safeBrowsingHarmfulApplicationVisitUnsafe,
+                "risk_2": Strings.safeBrowsingHarmfulApplicationRisks2
             ]
             return buildResponse(asset: asset, variables: variables)
         }

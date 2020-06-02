@@ -361,9 +361,6 @@ class SafeBrowsingDatabase {
                 
                 var hashes = (threat.hashes ?? []).compactMap({ ($0 as? ThreatHash)?.hashData })
                 
-                //Hashes must be sorted
-                //hashes.sort(by: { $0.lexicographicallyPrecedes($1) })
-                
                 response.removals.forEach({
                     $0.rawIndices?.indices.forEach({
                         if Int($0) > 0 && Int($0) < hashes.count {

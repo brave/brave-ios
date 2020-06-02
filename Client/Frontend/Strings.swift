@@ -222,3 +222,58 @@ extension Strings {
     public static let switchToPBMKeyCodeTitle = NSLocalizedString("SwitchToPBMKeyCodeTitle", bundle: Bundle.shared, value: "Private Browsing Mode", comment: "Hardware shortcut switch to the private browsing tab or tab tray. Shown in the Discoverability overlay when the hardware Command Key is held down.")
     public static let switchToNonPBMKeyCodeTitle = NSLocalizedString("SwitchToNonPBMKeyCodeTitle", bundle: Bundle.shared, value: "Normal Browsing Mode", comment: "Hardware shortcut for non-private tab or tab. Shown in the Discoverability overlay when the hardware Command Key is held down.")
 }
+
+// Safe Browsing Strings
+extension Strings {
+    //Shared
+    public static let safeBrowsingTabTitle = NSLocalizedString("SafeBrowsingTabTitle", bundle: Bundle.shared, value: "SafeBrowsing", comment: "SafeBrowsing")
+    public static let safeBrowsingSharedLearnMore = NSLocalizedString("LearnMore", bundle: Bundle.shared, value: "Learn more", comment: "Learn More Text")
+    public static let safeBrowsingSharedMoreDetails = NSLocalizedString("MoreDetails", bundle: Bundle.shared, value: "More details", comment: "More details")
+    public static let safeBrowsingSharedBackToSafety = NSLocalizedString("BackToSafety", bundle: Bundle.shared, value: "Back to safety", comment: "Back to safety Link")
+    
+    //Unknown
+    public static let safeBrowsingUnknownPageHeader = NSLocalizedString("SafeBrowsingUnknownPageHeader", bundle: Bundle.shared, value: "Your connection is not private", comment: "Page header")
+    public static let safeBrowsingUnknownErrorDescription = NSLocalizedString("SafeBrowsingUnknownErrorDescription", bundle: Bundle.shared, value: "Attackers might be trying to steal your information from %@ (for example, passwords, messages, or credit cards).", comment: "Error Description")
+    public static let safeBrowsingUnknownErrorDetection = NSLocalizedString("SafeBrowsingUnknownErrorDetection", bundle: Bundle.shared, value: "This server could not prove that it is %@; its security certificate is not trusted by your device's operating system. This may be caused by a misconfiguration or an attacker trying to intercept your connection.", comment: "Error Detection")
+    public static let safeBrowsingUnknownVisitUnsafe = NSLocalizedString("SafeBrowsingUnknownVisitUnsafe", bundle: Bundle.shared, value: "Proceed to %@ (unsafe)", comment: "Visit Anyway")
+    
+    //Malware
+    public static let safeBrowsingMalwarePageHeader = NSLocalizedString("SafeBrowsingMalwarePageHeader", bundle: Bundle.shared, value: "The site ahead contains malware", comment: "Page header")
+    public static let safeBrowsingMalwareErrorDescription = NSLocalizedString("SafeBrowsingMalwareErrorDescription", bundle: Bundle.shared, value: "Attackers currently on %@ might attempt to install dangerous programs on your Mac that steal or delete your information (for example, photos, passwords, messages, and credit cards).", comment: "Error Description")
+    public static let safeBrowsingMalwareErrorDetection = NSLocalizedString("SafeBrowsingMalwareErrorDetection", bundle: Bundle.shared, value: "Google Safe Browsing recently detected malware on %@.\nWebsites that are normally safe are sometimes infected with malware.", comment: "Error Detection")
+    public static let safeBrowsingMalwareRisks1 = NSLocalizedString("SafeBrowsingMalwareRisk_1", bundle: Bundle.shared, value: "If you understand the risks to your security, you may", comment: "Risk")
+    public static let safeBrowsingMalwareVisitUnsafe = NSLocalizedString("SafeBrowsingMalwareVisitUnsafe", bundle: Bundle.shared, value: "visit this unsafe site", comment: "Risk")
+    public static let safeBrowsingMalwareRisks2 = NSLocalizedString("SafeBrowsingMalwareRisk_2", bundle: Bundle.shared, value: "before the dangerous programs have been removed.", comment: "Risk")
+    
+    //Social Engineering
+    public static let safeBrowsingPhishingPageHeader = NSLocalizedString("SafeBrowsingPhishingPageHeader", bundle: Bundle.shared, value: "Deceptive site ahead", comment: "Page header")
+    public static let safeBrowsingPhishingErrorDescription = NSLocalizedString("SafeBrowsingPhishingErrorDescription", bundle: Bundle.shared, value: "Attackers on %@ may trick you into doing something dangerous like installing software or revealing your personal information (for example, passwords, phone numbers, or credit cards).", comment: "Error Description")
+    public static let safeBrowsingPhishingErrorDetection1 = NSLocalizedString("SafeBrowsingPhishingErrorDetection1", bundle: Bundle.shared, value: "Google Safe Browsing recently", comment: "Error Detection 1")
+    public static let safeBrowsingPhishingErrorDetectionProblem = NSLocalizedString("SafeBrowsingPhishingErrorDetectionProblem", bundle: Bundle.shared, value: "detected phishing", comment: "Error Detection Problem")
+    public static let safeBrowsingPhishingErrorDetection2 = NSLocalizedString("SafeBrowsingPhishingErrorDetection2", bundle: Bundle.shared, value: "on %@.\nPhishing sites pretend to be other websites to trick you.", comment: "Error Detection 2")
+    public static let safeBrowsingPhishingReportProblem = NSLocalizedString("SafeBrowsingPhishingReportProblem", bundle: Bundle.shared, value: "You can", comment: "Report A Problem")
+    public static let safeBrowsingPhishingReportProblemText = NSLocalizedString("SafeBrowsingPhishingReportProblemText", bundle: Bundle.shared, value: "report a detection problem", comment: "Report A Problem Link")
+    
+    public static let safeBrowsingPhishingRisks1 = NSLocalizedString("SafeBrowsingPhishingRisks_1", bundle: Bundle.shared, value: "or, if you understand the risks to your security,", comment: "Risk")
+    public static let safeBrowsingPhishingVisitUnsafe = NSLocalizedString("SafeBrowsingPhishingVisitUnsafe", bundle: Bundle.shared, value: "visit this unsafe site", comment: "Risk")
+    
+    //Unwanted Software
+    public static let safeBrowsingUnwantedSoftwarePageHeader = NSLocalizedString("SafeBrowsingUnwantedSoftwarePageHeader", bundle: Bundle.shared, value: "Harmful site ahead", comment: "Page header")
+    public static let safeBrowsingUnwantedSoftwareErrorDescription = NSLocalizedString("SafeBrowsingUnwantedSoftwareErrorDescription", bundle: Bundle.shared, value: "Attackers on %@ might attempt to trick you into installing programs that harm your browsing experience (for example, by changing your homepage or showing extra ads on sites you visit).", comment: "Error Description")
+    public static let safeBrowsingUnwantedSoftwareErrorDetection = NSLocalizedString("safeBrowsingUnwantedSoftwareErrorDetection", bundle: Bundle.shared, value: "Google Safe Browsing recently", comment: "Error Detection")
+    public static let safeBrowsingUnwantedSoftwareErrorDetectionLinkText = NSLocalizedString("SafeBrowsingUnwantedSoftwareErrorDetectionText", bundle: Bundle.shared, value: "found harmful programs", comment: "Error Detection Link Text")
+    public static let safeBrowsingUnwantedSoftwareErrorDetectionPage = NSLocalizedString("SafeBrowsingUnwantedSoftwareErrorDetectionPage", bundle: Bundle.shared, value: "on %@.", comment: "Error Detection Link")
+    public static let safeBrowsingUnwantedSoftwareRisks1 = NSLocalizedString("SafeBrowsingUnwantedSoftwareRisk_2", bundle: Bundle.shared, value: "If you understand the risks to your security, you may", comment: "Risk")
+    public static let safeBrowsingUnwantedSoftwareVisitUnsafe = NSLocalizedString("SafeBrowsingUnwantedSoftwareVisitUnsafe", bundle: Bundle.shared, value: "visit this site", comment: "Risk")
+    public static let safeBrowsingUnwantedSoftwareRisks2 = NSLocalizedString("SafeBrowsingUnwantedSoftwareRisk_2", bundle: Bundle.shared, value: "before the harmful programs have been removed.", comment: "Risk")
+    
+    //Potentially Harmful Application
+    public static let safeBrowsingHarmfulApplicationPageHeader = NSLocalizedString("SafeBrowsingHarmfulApplicationPageHeader", bundle: Bundle.shared, value: "Harmful site ahead", comment: "Page header")
+    public static let safeBrowsingHarmfulApplicationErrorDescription = NSLocalizedString("SafeBrowsingHarmfulApplicationErrorDescription", bundle: Bundle.shared, value: "Google Safe Browing blocked this page because it might try to install dangerous apps that steal or delete your information (for example, photos, passwords, messages and credit cards).", comment: "Error Description")
+    public static let safeBrowsingHarmfulApplicationErrorDetection = NSLocalizedString("safeBrowsingHarmfulApplicationErrorDetection", bundle: Bundle.shared, value: "Google Safe Browsing recently", comment: "Error Detection")
+    public static let safeBrowsingHarmfulApplicationErrorDetectionLinkText = NSLocalizedString("SafeBrowsingHarmfulApplicationErrorDetectionText", bundle: Bundle.shared, value: "detected harmful applications", comment: "Error Detection Link Text")
+    public static let safeBrowsingHarmfulApplicationErrorDetectionPage = NSLocalizedString("SafeBrowsingHarmfulApplicationErrorDetectionPage", bundle: Bundle.shared, value: "on %@.", comment: "Error Detection Link")
+    public static let safeBrowsingHarmfulApplicationRisks1 = NSLocalizedString("SafeBrowsingHarmfulApplicationRisk_2", bundle: Bundle.shared, value: "If you understand the risks to your security, you may", comment: "Risk")
+    public static let safeBrowsingHarmfulApplicationVisitUnsafe = NSLocalizedString("SafeBrowsingHarmfulApplicationVisitUnsafe", bundle: Bundle.shared, value: "visit this site", comment: "Risk")
+    public static let safeBrowsingHarmfulApplicationRisks2 = NSLocalizedString("SafeBrowsingHarmfulApplicationRisk_2", bundle: Bundle.shared, value: "before the dangerous applications have been removed.", comment: "Risk")
+}
