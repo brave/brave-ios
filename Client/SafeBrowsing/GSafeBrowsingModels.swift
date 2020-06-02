@@ -116,7 +116,17 @@ struct ThreatMatch: Codable {
     let threatEntryType: ThreatEntryType
     let threat: ThreatEntry
     let threatEntryMetadata: ThreatEntryMetadata?
-    let cacheDuration: String
+    let cacheDuration: Float
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.threatType = try container.decode(ThreatType.self, forKey: .threatType)
+        self.platformType = try container.decode(PlatformType.self, forKey: .platformType)
+        self.threatEntryType = try container.decode(ThreatEntryType.self, forKey: .threatEntryType)
+        self.threat = try container.decode(ThreatEntry.self, forKey: .threat)
+        self.threatEntryMetadata = try container.decode(ThreatEntryMetadata.self, forKey: .threatEntryMetadata)
+        self.cacheDuration = Float(try container.decode(String.self, forKey: .cacheDuration).replacingOccurrences(of: "s", with: "")) ?? 0.0
+    }
 }
 
 struct Checksum: Codable {
@@ -169,17 +179,12 @@ struct FindRequest: Codable {
 
 struct FindResponse: Codable {
     let matches: [ThreatMatch]
-    let negativeCacheDuration: String
-    
-    init() {
-        matches = []
-        negativeCacheDuration = "0s"
-    }
+    let negativeCacheDuration: String?
     
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.matches = try container.decodeIfPresent([ThreatMatch].self, forKey: .matches) ?? []
-        self.negativeCacheDuration = try container.decodeIfPresent(String.self, forKey: .negativeCacheDuration) ?? "0s"
+        self.negativeCacheDuration = try container.decodeIfPresent(String.self, forKey: .negativeCacheDuration)
     }
 }
 

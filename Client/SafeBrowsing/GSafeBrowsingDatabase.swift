@@ -147,8 +147,8 @@ class SafeBrowsingDatabase {
     
     func enterBackoffMode(_ mode: BackoffMode) {
         if mode == .find {
+            let duration = calculateBackoffTime(self.numberOfFindRetries)
             self.numberOfFindRetries += 1
-            let duration = calculateBackoffTime(Double(self.numberOfFindRetries))
             
             if duration > 0 {
                 self.lastFindDate = Date()
@@ -160,8 +160,8 @@ class SafeBrowsingDatabase {
                 }
             }
         } else if mode == .update {
+            let duration = calculateBackoffTime(self.numberOfFetchRetries)
             self.numberOfFetchRetries += 1
-            let duration = calculateBackoffTime(Double(self.numberOfFetchRetries))
             
             if duration > 0 {
                 self.lastFetchDate = Date()
@@ -389,13 +389,8 @@ class SafeBrowsingDatabase {
         }
     }
     
-    private func calculateBackoffTime(_ numberOfRetries: Double) -> Double {
-        if numberOfRetries == 0 {
-            return 0.0
-        }
-        
-        var minutes: Double = pow(2.0, numberOfRetries - 1) * 15.0
-        minutes *= Double.random(in: 0...1) + 1
+    private func calculateBackoffTime(_ numberOfRetries: Int16) -> Double {
+        let minutes = Double(1 << Int(numberOfRetries - 1)) * (15.0 * 60.0) * Double.random(in: 0...1) + 1
         return min(minutes, 24 * 60)
     }
     

@@ -147,6 +147,13 @@ class SafeBrowsingClient {
                 
                 if let error = error {
                     self.database.enterBackoffMode(.update)
+                    self.database.scheduleUpdate { [weak self] in
+                        self?.fetch({
+                            if let error = $0 {
+                                log.error(error)
+                            }
+                        })
+                    }
                     return completion(error)
                 }
                 
