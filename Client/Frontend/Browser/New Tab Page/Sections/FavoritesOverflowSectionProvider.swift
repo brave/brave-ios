@@ -60,22 +60,19 @@ class FavoritesOverflowCell: NewTabCollectionViewCell<FavoritesOverflowButton> {
     }
 }
 
-class FavoritesOverflowSectionProvider: NSObject, NTPSectionProvider {
+class FavoritesOverflowSectionProvider: NSObject, NTPObservableSectionProvider {
     let action: () -> Void
+    var sectionDidChange: (() -> Void)?
     
     private var frc: NSFetchedResultsController<Bookmark>
-    private var count: Int = 0
     
     init(action: @escaping () -> Void) {
         self.action = action
         frc = Bookmark.frc(forFavorites: true, parentFolder: nil)
+        frc.fetchRequest.fetchLimit = 6
         super.init()
-        
-        do {
-            count = try frc.managedObjectContext.count(for: frc.fetchRequest)
-        } catch {
-            log.error("Favorites fetch error")
-        }
+        try? frc.performFetch()
+        frc.delegate = self
     }
     
     @objc private func tappedButton() {
@@ -84,6 +81,7 @@ class FavoritesOverflowSectionProvider: NSObject, NTPSectionProvider {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         let width = fittingSizeForCollectionView(collectionView, section: section).width
+        let count = frc.fetchedObjects?.count ?? 0
         return count > FavoritesSectionProvider.numberOfItems(in: collectionView, availableWidth: width) ? 1 : 0
     }
     
@@ -103,5 +101,11 @@ class FavoritesOverflowSectionProvider: NSObject, NTPSectionProvider {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         return UIEdgeInsets(top: 20, left: 0, bottom: 0, right: 0)
+    }
+}
+
+extension FavoritesOverflowSectionProvider: NSFetchedResultsControllerDelegate {
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        sectionDidChange?()
     }
 }

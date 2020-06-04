@@ -161,10 +161,8 @@ class NewTabPageViewController: UIViewController, Themeable {
             provider.registerCells(to: collectionView)
             if let observableProvider = provider as? NTPObservableSectionProvider {
                 observableProvider.sectionDidChange = { [weak self] in
-                    DispatchQueue.main.async {
-                        UIView.performWithoutAnimation {
-                            self?.collectionView.reloadSections(IndexSet(integer: index))
-                        }
+                    UIView.performWithoutAnimation {
+                        self?.collectionView.reloadSections(IndexSet(integer: index))
                     }
                 }
             }
