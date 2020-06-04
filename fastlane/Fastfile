@@ -95,6 +95,41 @@ platform :ios do
     defaultParams = gym_params()
     gym(defaultParams.merge!(options[:overrideParams]))
   end
+  
+  desc "All enterprise releases use this as the foundation"
+  lane :enterprise do |options|
+    set_build_number(options)
+
+    carthage(
+      platform: "iOS",
+      cache_builds: true,
+      configuration: "Release",
+    )
+
+    build_app(
+      scheme: "Ent",
+      clean: true,
+      output_directory: "build",
+      export_options: {
+        method: "enterprise",
+        provisioningProfiles: { 
+          "com.brave.ios.enterprise.Browser" => "BraveEnt",
+          "com.brave.ios.enterprise.Browser.BraveShareTo" => "Ent-ShareTo"
+        }
+      },
+      xcargs: "-allowProvisioningUpdates BRAVE_API_KEY=\"#{sh("head", "-1", "#{ENV['HOME']}/.brave-api-key")}\""
+    )
+
+    appcenter_upload(
+      api_token: ENV["APPCENTER_API_TOKEN"],
+      owner_name: ENV["APPCENTER_OWNER_NAME"],
+      owner_type: "organization",
+      app_name: ENV["APPCENTER_APP_NAME"],
+      file: "./build/Client.ipa",
+      dsym: "./build/Client.app.dSYM.zip",
+      notify_testers: false
+    )
+  end
 
   # Private helper methods ---------------------------------------
 
