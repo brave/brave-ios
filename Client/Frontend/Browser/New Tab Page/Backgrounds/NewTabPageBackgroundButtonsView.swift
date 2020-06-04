@@ -7,6 +7,7 @@ import UIKit
 import BraveUI
 import BraveShared
 import Shared
+import SnapKit
 
 /// The background view of new tab page which will hold static elements such as
 /// the image credit, brand logos or the share by QR code button
@@ -65,10 +66,25 @@ class NewTabPageBackgroundButtonsView: UIView {
         $0.isHidden = true
     }
     
+    /// The parent safe area insets (since UICollectionView doesn't feed down
+    /// proper `safeAreaInsets` when the `contentInsetAdjustmentBehavior` is set
+    /// to `always`)
+    var collectionViewSafeAreaInsets: UIEdgeInsets = .zero {
+        didSet {
+            safeAreaInsetsConstraint?.update(inset: collectionViewSafeAreaInsets)
+        }
+    }
+    private var safeAreaInsetsConstraint: Constraint?
+    private let collectionViewSafeAreaLayoutGuide = UILayoutGuide()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         
         backgroundColor = .clear
+        addLayoutGuide(collectionViewSafeAreaLayoutGuide)
+        collectionViewSafeAreaLayoutGuide.snp.makeConstraints {
+            self.safeAreaInsetsConstraint = $0.edges.equalTo(self).constraint
+        }
         
         for button in [imageCreditButton, sponsorLogoButton, qrCodeButton] {
             addSubview(button)
@@ -76,7 +92,7 @@ class NewTabPageBackgroundButtonsView: UIView {
         }
         
         imageCreditButton.snp.makeConstraints {
-            $0.bottom.leading.equalTo(safeAreaLayoutGuide).inset(16)
+            $0.bottom.leading.equalTo(collectionViewSafeAreaLayoutGuide).inset(16)
         }
     }
     
@@ -92,10 +108,10 @@ class NewTabPageBackgroundButtonsView: UIView {
         
         sponsorLogoButton.snp.remakeConstraints {
             $0.size.equalTo(170)
-            $0.bottom.equalTo(safeArea.bottom).inset(10)
+            $0.bottom.equalTo(collectionViewSafeAreaLayoutGuide.snp.bottom).inset(10)
             
             if isLandscape {
-                $0.left.equalTo(safeArea.left).offset(20)
+                $0.left.equalTo(collectionViewSafeAreaLayoutGuide.snp.left).offset(20)
             } else {
                 $0.centerX.equalToSuperview()
             }
@@ -103,10 +119,10 @@ class NewTabPageBackgroundButtonsView: UIView {
         
         qrCodeButton.snp.remakeConstraints {
             $0.size.equalTo(48)
-            $0.bottom.equalTo(safeArea.bottom).inset(24)
+            $0.bottom.equalTo(collectionViewSafeAreaLayoutGuide.snp.bottom).inset(24)
             
             if isLandscape {
-                $0.left.equalTo(safeArea.left).offset(48)
+                $0.left.equalTo(collectionViewSafeAreaLayoutGuide.snp.left).offset(48)
             } else {
                 $0.centerX.equalToSuperview()
             }

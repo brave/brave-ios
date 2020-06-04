@@ -236,6 +236,12 @@ class NewTabPageViewController: UIViewController, Themeable {
         presentNotification()
     }
     
+    override func viewSafeAreaInsetsDidChange() {
+        super.viewSafeAreaInsetsDidChange()
+        
+        backgroundButtonsView.collectionViewSafeAreaInsets = view.safeAreaInsets
+    }
+    
     // MARK: - Background
     
     /// Hide any visible sponsored image notification if the current background
@@ -553,6 +559,8 @@ extension NewTabPageViewController {
             delaysContentTouches = false
             alwaysBounceVertical = true
             showsHorizontalScrollIndicator = false
+            // Needed for some reason, as its not setting safe area insets while in landscape
+            contentInsetAdjustmentBehavior = .always
         }
         @available(*, unavailable)
         required init(coder: NSCoder) {
