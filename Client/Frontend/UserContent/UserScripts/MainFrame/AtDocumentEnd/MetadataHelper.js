@@ -18,7 +18,8 @@ function MetadataWrapper() {
     ];
     customRuleSets.largeIcon = {
       rules: [
-        ['link[rel="apple-touch-icon"]', element => element.getAttribute('href')]
+        ['link[rel="apple-touch-icon"]', element => element.getAttribute('href')],
+        ['link[rel="apple-touch-icon-precomposed"]', element => element.getAttribute('href')]
       ],
       defaultValue: null,
       scorers: [
@@ -38,6 +39,7 @@ function MetadataWrapper() {
               return 1.0 - (Math.abs(sizeMulti - goal)) / goal;
             }
           }
+          return 0.01
         }
       ],
       processors: customRuleSets.icon.processors
