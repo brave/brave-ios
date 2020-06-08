@@ -211,6 +211,10 @@ extension URL {
         if self.isErrorPageURL {
             return originalURLFromErrorURL?.displayURL
         }
+        
+        if self.isInterstitialURL {
+            return originalURLFromErrorURL?.displayURL
+        }
 
         if !self.isAboutURL {
             return self.havingRemovedAuthorisationComponents()
@@ -399,6 +403,10 @@ extension URL {
         return isLocalhost && path.contains("/errors/SafeBrowsingError.html")
     }
     
+    public var isInterstitialURL: Bool {
+        return isLocalhost && path.contains("/interstitial/")
+    }
+    
     public var isSessionRestoreURL: Bool {
         return isLocalhost && path.contains("/about/sessionrestore")
     }
@@ -425,7 +433,7 @@ extension URL {
 // Helpers to deal with About URLs
 extension URL {
     public var isAboutHomeURL: Bool {
-        if let urlString = self.getQuery()["url"]?.unescape(), isErrorPageURL {
+        if let urlString = self.getQuery()["url"]?.unescape(), isErrorPageURL, isInterstitialURL {
             let url = URL(string: urlString) ?? self
             return url.aboutComponent == "home"
         }

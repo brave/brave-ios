@@ -737,6 +737,7 @@
 		5EA84390234F802C00076A91 /* expired.badssl.com-intermediate-ca-2.cer in Resources */ = {isa = PBXBuildFile; fileRef = 5EA8438C234F802C00076A91 /* expired.badssl.com-intermediate-ca-2.cer */; };
 		5EA84391234F802C00076A91 /* expired.badssl.com-leaf.cer in Resources */ = {isa = PBXBuildFile; fileRef = 5EA8438D234F802C00076A91 /* expired.badssl.com-leaf.cer */; };
 		5EAB745C230456F0006055F5 /* BookmarkValidation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EAB745B230456F0006055F5 /* BookmarkValidation.swift */; };
+		5EB09C9523CE67BC00986694 /* UnwantedSoftware.html in Resources */ = {isa = PBXBuildFile; fileRef = 5EB09C9423CE67BC00986694 /* UnwantedSoftware.html */; };
 		5EC1DDBC2356883800CA4028 /* onboarding-shields.json in Resources */ = {isa = PBXBuildFile; fileRef = 0A6E095E230E05BC00AB3F19 /* onboarding-shields.json */; };
 		5EC1DDBD2356888000CA4028 /* onboarding-rewards.json in Resources */ = {isa = PBXBuildFile; fileRef = 5E1D8C6E232C0BDB00BDE662 /* onboarding-rewards.json */; };
 		5EC1DDBE2356892900CA4028 /* onboarding-ads.json in Resources */ = {isa = PBXBuildFile; fileRef = 5E11C3FF23314D970003C363 /* onboarding-ads.json */; };
@@ -2261,6 +2262,7 @@
 		5EA8438C234F802C00076A91 /* expired.badssl.com-intermediate-ca-2.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = "expired.badssl.com-intermediate-ca-2.cer"; sourceTree = "<group>"; };
 		5EA8438D234F802C00076A91 /* expired.badssl.com-leaf.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = "expired.badssl.com-leaf.cer"; sourceTree = "<group>"; };
 		5EAB745B230456F0006055F5 /* BookmarkValidation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkValidation.swift; sourceTree = "<group>"; };
+		5EB09C9423CE67BC00986694 /* UnwantedSoftware.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = UnwantedSoftware.html; sourceTree = "<group>"; };
 		5EB57D0122FDC0CB00A07325 /* FullscreenHelper.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = FullscreenHelper.js; sourceTree = "<group>"; };
 		5EC594EC232C2C8F00922111 /* OnboardingWebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingWebViewController.swift; sourceTree = "<group>"; };
 		5EC594EE232C68FC00922111 /* OnboardingAdsCountdownViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingAdsCountdownViewController.swift; sourceTree = "<group>"; };
@@ -4413,10 +4415,11 @@
 				5E27B26C23BA67420091232F /* 404.html */,
 				5E27B26D23BA67420091232F /* NetworkFailure.html */,
 				5E27B26B23BA67410091232F /* Fraud.html */,
-				5E27B26523BA67410091232F /* HarmfulApplication.html */,
-				5E27B26823BA67410091232F /* Malware.html */,
 				5E27B26923BA67410091232F /* MITM.html */,
+				5E27B26823BA67410091232F /* Malware.html */,
 				5E27B26A23BA67410091232F /* Phishing.html */,
+				5EB09C9423CE67BC00986694 /* UnwantedSoftware.html */,
+				5E27B26523BA67410091232F /* HarmfulApplication.html */,
 				5E27B27623BA7ED80091232F /* InterstitialPage.swift */,
 			);
 			path = SafeBrowsingPages;
@@ -5909,6 +5912,7 @@
 				5D5374A523846FFC00A2B587 /* ben-karpinski.jpg in Resources */,
 				0BA1E0301B051A07007675AF /* NetError.css in Resources */,
 				59871C1921E4D83900316590 /* block-cookies.json in Resources */,
+				5EB09C9523CE67BC00986694 /* UnwantedSoftware.html in Resources */,
 				3BC659491E5BA4AE006D560F /* TopSites in Resources */,
 				E4B7B77E1A793CF20022C5E0 /* FiraSans-SemiBold.ttf in Resources */,
 				F84B220B1A0910F600AAB793 /* Images.xcassets in Resources */,

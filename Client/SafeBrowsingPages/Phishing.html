@@ -1,6 +1,13 @@
+<!--
+Copyright (c) 2020 The Brave Authors. All rights reserved.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this file,
+You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
 <head>
     <meta name='viewport' content='initial-scale=1, viewport-fit=cover'>
-    <title>Safe Browsing</title>
+    <title>%tab_title%</title>
     <style>
         .post {
             padding-top: max(25px, env(safe-area-inset-top));
@@ -188,29 +195,26 @@
         </svg>
 
         <p class="title">
-            Deceptive site ahead
+            %page_header%
         </p>
 
         <p class="description">
-            Attackers on testsafebrowsing.appspot.com may trick you into doing something dangerous like installing
-            software or revealing your personal information (for example, passwords, phone numbers, or credit cards).
-            <a class="description" href="https://support.google.com/chrome/answer/99020">Learn more</a>
+            %error_description%
+            <a class="description" href="https://support.google.com/chrome/answer/99020">%learn_more%</a>
             <br /><br />
         </p>
 
         <div class="navigationButtons">
-            <button class="leftNavButton leftNavButtonTitle" onclick="toggleDetails();">More details <i id="arrow"
+            <button class="leftNavButton leftNavButtonTitle" onclick="toggleDetails();">%more_details% <i id="arrow"
                     class="arrow down"></i></button>
-            <button class="rightNavButton rightNavButtonTitle" onclick="backToSafety();">Back to safety</button>
+            <button class="rightNavButton rightNavButtonTitle" onclick="backToSafety();">%back_to_safety%</button>
         </div>
 
         <p id="details" class="moreDetails hidden">
-            Google Safe Browsing recently detected phishing on testsafebrowsing.appspot.com. Phishing sites pretend to
-            be
-            other websites to trick you.
+            %error_detection_1% <a class="moreDetails" href="%transparency_report%">%detected_problem%</a> %error_detection_2%
             <br /><br />
-            You can report a detection problem or, if you understand the risks to your security, <a class="moreDetails"
-                href="#" onclick='return proceedUnsafe()'>visit this unsafe site</a>.
+            %report_problem% <a class="moreDetails" href="%report_problem_url%">%report_problem_text%</a> %risk_1% <a class="moreDetails"
+                href="#" onclick='return proceedUnsafe()'>%risk_2%</a>.
         </p>
     </div>
 </body>

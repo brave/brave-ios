@@ -1,6 +1,13 @@
+<!--
+Copyright (c) 2020 The Brave Authors. All rights reserved.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this file,
+You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
 <head>
     <meta name='viewport' content='initial-scale=1, viewport-fit=cover'>
-    <title>Safe Browsing</title>
+    <title>%tab_title%</title>
     <style>
         .post {
             padding-top: max(25px, env(safe-area-inset-top));
@@ -192,30 +199,26 @@
         </svg>
 
         <p class="title">
-            Your connection is not private
+            %page_header%
         </p>
 
         <p class="description">
-            Attackers might be trying to steal your information from expired.badssl.com (for example, passwords,
-            messages, or credit cards). <a class="description"
-                href="https://support.google.com/chrome/answer/99020">Learn more</a>
+            %error_description% <a class="description" href="https://support.google.com/chrome/answer/99020">%learn_more%</a>
             <br /><br /><br />
             NET::ERR_CERT_DATE_INVALID
             <br /><br />
         </p>
 
         <div class="navigationButtons">
-            <button class="leftNavButton leftNavButtonTitle" onclick="toggleDetails();">More details <i id="arrow"
+            <button class="leftNavButton leftNavButtonTitle" onclick="toggleDetails();">%more_details% <i id="arrow"
                     class="arrow down"></i></button>
-            <button class="rightNavButton rightNavButtonTitle" onclick="backToSafety();">Back to safety</button>
+            <button class="rightNavButton rightNavButtonTitle" onclick="backToSafety();">%back_to_safety%</button>
         </div>
 
         <p id="details" class="moreDetails hidden">
-            This server could not prove that it is www.example.com; its security certificate is not trusted by your
-            device's operating system. This may be caused by a misconfiguration or an attacker trying to intercept
-            your connection.
+            %error_detection%
             <br /><br />
-            <a class="moreDetails" href="#" onclick='return proceedUnsafe()'>Proceed to example.com (unsafe)</a>.
+            <a class="moreDetails" href="#" onclick='return proceedUnsafe()'>%visit_unsafe%</a>.
         </p>
     </div>
 </body>

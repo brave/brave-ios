@@ -19,6 +19,10 @@ class ShieldsViewController: UIViewController, PopoverContentComponent {
             return _url.originalURLFromErrorURL
         }
         
+        if _url.isInterstitialURL {
+            return _url.originalURLFromErrorURL
+        }
+        
         return _url
     }()
     
