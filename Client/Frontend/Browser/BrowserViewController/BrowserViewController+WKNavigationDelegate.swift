@@ -113,82 +113,15 @@ extension BrowserViewController: WKNavigationDelegate {
     fileprivate func isUpholdOAuthAuthorization(_ url: URL) -> Bool {
         return url.scheme == "rewards" && url.host == "uphold"
     }
-
-    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+    
+    
+    private func handleNavigation(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: (WKNavigationActionPolicy) -> Void) {
+        
         guard let url = navigationAction.request.url else {
             decisionHandler(.cancel)
             return
         }
         
-        if let customHeader = UserReferralProgram.shouldAddCustomHeader(for: navigationAction.request) {
-            decisionHandler(.cancel)
-            var newRequest = navigationAction.request
-            UrpLog.log("Adding custom header: [\(customHeader.field): \(customHeader.value)] for domain: \(newRequest.url?.absoluteString ?? "404")")
-            newRequest.addValue(customHeader.value, forHTTPHeaderField: customHeader.field)
-            webView.load(newRequest)
-            return
-        }
-
-        if url.scheme == "about" {
-            decisionHandler(.allow)
-            return
-        }
-        
-        if url.isBookmarklet {
-            decisionHandler(.cancel)
-            return
-        }
-
-        if !navigationAction.isAllowed && navigationAction.navigationType != .backForward {
-            log.warning("Denying unprivileged request: \(navigationAction.request)")
-            decisionHandler(.cancel)
-            return
-        }
-        
-        #if !NO_USER_WALLETS
-        if isUpholdOAuthAuthorization(url) {
-            decisionHandler(.cancel)
-            guard let tab = tabManager[webView], let queryItems = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems else {
-                return
-            }
-            var items: [String: String] = [:]
-            for query in queryItems {
-                items[query.name] = query.value
-            }
-            authorizeUpholdWallet(from: tab, queryItems: items)
-            return
-        }
-        #endif
-        
-        if !navigationAction.isInterstitial && Preferences.Shields.googleSafeBrowsing.value {
-            var safeBrowsingResult: SafeBrowsingResult = .safe
-            let semaphore = DispatchSemaphore(value: 0)
-            SafeBrowsingClient.shared.find(url.hashPrefixes()) { result, error in
-                defer { semaphore.signal() }
-                
-                if let error = error {
-                    log.error(error)
-                    safeBrowsingResult = result
-                    return
-                }
-                
-                safeBrowsingResult = result
-            }
-            
-            if semaphore.wait(timeout: .now() + .seconds(10)) == .success {
-            
-                // Three types of results.. "safe", "dangerous", "unknown"
-                // We currently only block `dangerous` pages as per the spec.
-                // Unknown results must be considered safe.
-                if case .dangerous(let threatType) = safeBrowsingResult {
-                    tabManager.tabForWebView(webView)?.interstitialPageHandler?.showSafeBrowsingPage(url: url, for: webView, threatType: threatType, completion: { policy in
-                        decisionHandler(policy)
-                    })
-                    return
-                }
-            }
-        }
-
         // First special case are some schemes that are about Calling. We prompt the user to confirm this action. This
         // gives us the exact same behaviour as Safari.
         if url.scheme == "tel" || url.scheme == "facetime" || url.scheme == "facetime-audio" {
@@ -284,7 +217,7 @@ extension BrowserViewController: WKNavigationDelegate {
                     webView.configuration.userContentController.remove(rule)
                 }
             }
-            // Reset the block alert bool on new host. 
+            // Reset the block alert bool on new host.
             if let newHost: String = url.host, let oldHost: String = webView.url?.host, newHost != oldHost {
                 self.tabManager.selectedTab?.alertShownCount = 0
                 self.tabManager.selectedTab?.blockAllAlerts = false
@@ -304,6 +237,87 @@ extension BrowserViewController: WKNavigationDelegate {
             }
         }
         decisionHandler(.cancel)
+    }
+
+    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        guard let url = navigationAction.request.url else {
+            decisionHandler(.cancel)
+            return
+        }
+        
+        if let customHeader = UserReferralProgram.shouldAddCustomHeader(for: navigationAction.request) {
+            decisionHandler(.cancel)
+            var newRequest = navigationAction.request
+            UrpLog.log("Adding custom header: [\(customHeader.field): \(customHeader.value)] for domain: \(newRequest.url?.absoluteString ?? "404")")
+            newRequest.addValue(customHeader.value, forHTTPHeaderField: customHeader.field)
+            webView.load(newRequest)
+            return
+        }
+
+        if url.scheme == "about" {
+            decisionHandler(.allow)
+            return
+        }
+        
+        if url.isBookmarklet {
+            decisionHandler(.cancel)
+            return
+        }
+
+        if !navigationAction.isAllowed && navigationAction.navigationType != .backForward {
+            log.warning("Denying unprivileged request: \(navigationAction.request)")
+            decisionHandler(.cancel)
+            return
+        }
+        
+        #if !NO_USER_WALLETS
+        if isUpholdOAuthAuthorization(url) {
+            decisionHandler(.cancel)
+            guard let tab = tabManager[webView], let queryItems = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems else {
+                return
+            }
+            var items: [String: String] = [:]
+            for query in queryItems {
+                items[query.name] = query.value
+            }
+            authorizeUpholdWallet(from: tab, queryItems: items)
+            return
+        }
+        #endif
+        
+        if !navigationAction.isInterstitial && Preferences.Shields.googleSafeBrowsing.value {
+            var safeBrowsingResult: SafeBrowsingResult = .safe
+            let group = DispatchGroup()
+            group.enter()
+            SafeBrowsingClient.shared.find(url.hashPrefixes()) { result, error in
+                defer { group.leave() }
+                if let error = error {
+                    log.error(error)
+                    safeBrowsingResult = result
+                    return
+                }
+                
+                safeBrowsingResult = result
+            }
+            
+            group.notify(queue: .main) {
+                // Three types of results.. "safe", "dangerous", "unknown"
+                // We currently only block `dangerous` pages as per the spec.
+                // Unknown results must be considered safe.
+                if case .dangerous(let threatType) = safeBrowsingResult {
+                    self.tabManager.tabForWebView(webView)?.interstitialPageHandler?.showSafeBrowsingPage(url: url, for: webView, threatType: threatType, completion: { policy in
+                        decisionHandler(policy)
+                    })
+                } else {
+                    //The url/page/ip is not a threat, so handle navigation like normal.
+                    self.handleNavigation(webView, decidePolicyFor: navigationAction, decisionHandler: decisionHandler)
+                }
+            }
+            return
+        } else {
+            //Safe-Browsing is disabled, so just handle navigation like normal.
+            handleNavigation(webView, decidePolicyFor: navigationAction, decisionHandler: decisionHandler)
+        }
     }
 
     func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
