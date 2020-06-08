@@ -342,7 +342,7 @@ class SettingsViewController: TableViewController {
             )
         )
         privacy.rows.append(
-            .boolRow(
+            .boolRowWithSubtitle(
                 title: Strings.googleSafeBrowsing,
                 detailText: Strings.googleSafeBrowsingDescription,
                 option: Preferences.Shields.googleSafeBrowsing

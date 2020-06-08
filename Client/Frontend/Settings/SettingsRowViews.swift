@@ -41,7 +41,7 @@ extension Row {
     }
     
     /// Creates a switch toggle `Row` which updates a `Preferences.Option<Bool>`
-    static func boolRow(title: String, detailText: String, option: Preferences.Option<Bool>, onValueChange: SwitchAccessoryView.ValueChange? = nil) -> Row {
+    static func boolRowWithSubtitle(title: String, detailText: String, option: Preferences.Option<Bool>, onValueChange: SwitchAccessoryView.ValueChange? = nil) -> Row {
         return Row(
             text: title,
             detailText: detailText,
