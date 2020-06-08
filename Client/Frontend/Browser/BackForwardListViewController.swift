@@ -93,7 +93,7 @@ class BackForwardListViewController: UIViewController, UITableViewDataSource, UI
         let items = bfList.forwardList.reversed() + [bfList.currentItem].compactMap({$0}) + bfList.backList.reversed()
         
         //error url's are OK as they are used to populate history on session restore.
-        listData = items.filter({return !($0.url.isLocal && ($0.url.originalURLFromErrorURL?.isLocal ?? true)) || $0.url.isAboutHomeURL})
+        listData = items.filter({return !($0.url.isLocal && ($0.url.originalURLFromErrorURL?.isLocal ?? true)) || $0.url.isAboutHomeURL || $0.url.isInterstitialURL})
     }
     
     func loadSites(_ bfList: WKBackForwardList) {
@@ -210,7 +210,7 @@ class BackForwardListViewController: UIViewController, UITableViewDataSource, UI
         cell.connectingBackwards = indexPath.item != listData.count-1
         cell.connectingForwards = indexPath.item != 0
 
-        guard let url = urlString, !item.url.isAboutHomeURL else {
+        guard let url = urlString, !item.url.isAboutHomeURL, !item.url.isInterstitialURL else {
             cell.site = Site(url: item.url.absoluteString, title: Strings.home)
             return cell
         }

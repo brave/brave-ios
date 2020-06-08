@@ -433,7 +433,7 @@ extension URL {
 // Helpers to deal with About URLs
 extension URL {
     public var isAboutHomeURL: Bool {
-        if let urlString = self.getQuery()["url"]?.unescape(), isErrorPageURL, isInterstitialURL {
+        if let urlString = self.getQuery()["url"]?.unescape(), isErrorPageURL {
             let url = URL(string: urlString) ?? self
             return url.aboutComponent == "home"
         }

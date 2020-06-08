@@ -1380,7 +1380,7 @@ class BrowserViewController: UIViewController {
             
             guard let serverTrust = tab.webView?.serverTrust else {
                 if let url = tab.webView?.url ?? tab.url {
-                    if url.isAboutHomeURL || url.isAboutURL || url.scheme == "about" {
+                    if url.isAboutHomeURL || url.isAboutURL || url.scheme == "about" || url.isInterstitialURL {
                         tab.secureContentState = .localHost
                         if tabManager.selectedTab === tab {
                             topToolbar.secureContentState = .localHost
@@ -2369,7 +2369,8 @@ extension BrowserViewController: SearchViewControllerDelegate {
     }
     
     func searchViewControllerAllowFindInPage() -> Bool {
-        return tabManager.selectedTab?.webView?.url?.isAboutHomeURL == false
+        let url = tabManager.selectedTab?.webView?.url
+        return url?.isAboutHomeURL == false && url?.isInterstitialURL == false
     }
 }
 
