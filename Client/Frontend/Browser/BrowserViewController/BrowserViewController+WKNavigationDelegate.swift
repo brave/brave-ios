@@ -160,33 +160,31 @@ extension BrowserViewController: WKNavigationDelegate {
         }
         #endif
         
-        if !navigationAction.isInterstitial {
-            if Preferences.Shields.googleSafeBrowsing.value {
-                var safeBrowsingResult: SafeBrowsingResult = .safe
-                let semaphore = DispatchSemaphore(value: 0)
-                SafeBrowsingClient.shared.find(url.hashPrefixes()) { result, error in
-                    defer { semaphore.signal() }
-                    
-                    if let error = error {
-                        log.error(error)
-                        safeBrowsingResult = result
-                        return
-                    }
-                    
+        if !navigationAction.isInterstitial && Preferences.Shields.googleSafeBrowsing.value {
+            var safeBrowsingResult: SafeBrowsingResult = .safe
+            let semaphore = DispatchSemaphore(value: 0)
+            SafeBrowsingClient.shared.find(url.hashPrefixes()) { result, error in
+                defer { semaphore.signal() }
+                
+                if let error = error {
+                    log.error(error)
                     safeBrowsingResult = result
+                    return
                 }
                 
-                if semaphore.wait(timeout: .now() + .seconds(10)) == .success {
-                
-                    // Three types of results.. "safe", "dangerous", "unknown"
-                    // We currently only block `dangerous` pages as per the spec.
-                    // Unknown results must be considered safe.
-                    if case .dangerous(let threatType) = safeBrowsingResult {
-                        tabManager.tabForWebView(webView)?.interstitialPageHandler?.showSafeBrowsingPage(url: url, for: webView, threatType: threatType, completion: { policy in
-                            decisionHandler(policy)
-                        })
-                        return
-                    }
+                safeBrowsingResult = result
+            }
+            
+            if semaphore.wait(timeout: .now() + .seconds(10)) == .success {
+            
+                // Three types of results.. "safe", "dangerous", "unknown"
+                // We currently only block `dangerous` pages as per the spec.
+                // Unknown results must be considered safe.
+                if case .dangerous(let threatType) = safeBrowsingResult {
+                    tabManager.tabForWebView(webView)?.interstitialPageHandler?.showSafeBrowsingPage(url: url, for: webView, threatType: threatType, completion: { policy in
+                        decisionHandler(policy)
+                    })
+                    return
                 }
             }
         }

@@ -299,14 +299,12 @@ class SafeBrowsingClient {
                 return completion(nil, SafeBrowsingError("Invalid Server Response: No Data"))
             }
             
-            if let response = response as? HTTPURLResponse {
-                if response.statusCode != 200 {
-                    do {
-                        let error = try JSONDecoder().decode(ResponseError.self, from: data)
-                        return completion(nil, SafeBrowsingError(error.message, code: error.code))
-                    } catch {
-                        return completion(nil, error)
-                    }
+            if let response = response as? HTTPURLResponse, response.statusCode != 200 {
+                do {
+                    let error = try JSONDecoder().decode(ResponseError.self, from: data)
+                    return completion(nil, SafeBrowsingError(error.message, code: error.code))
+                } catch {
+                    return completion(nil, error)
                 }
             }
             
