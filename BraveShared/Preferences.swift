@@ -73,14 +73,12 @@ extension Preferences {
     }
     
     public final class Shields {
-        public static let allShields = [blockAdsAndTracking, httpsEverywhere, blockPhishingAndMalware, blockScripts, fingerprintingProtection, blockImages]
+        public static let allShields = [blockAdsAndTracking, httpsEverywhere, blockScripts, fingerprintingProtection, blockImages]
         
         /// Shields will block ads and tracking if enabled
         public static let blockAdsAndTracking = Option<Bool>(key: "shields.block-ads-and-tracking", default: true)
         /// Websites will be upgraded to HTTPS if a loaded page attempts to use HTTP
         public static let httpsEverywhere = Option<Bool>(key: "shields.https-everywhere", default: true)
-        /// Shields will block websites related to potential phishing and malware
-        public static let blockPhishingAndMalware = Option<Bool>(key: "shields.block-phishing-and-malware", default: true)
         /// Enable Google Safe Browsing
         public static let googleSafeBrowsing = Option<Bool>(key: "shields.google-safe-browsing", default: true)
         /// Disables JavaScript execution in the browser

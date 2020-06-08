@@ -136,20 +136,16 @@ class BrowserViewController: UIViewController {
     
     // Web filters
     
-    let safeBrowsing: SafeBrowsing?
-    
     let rewards: BraveRewards
     let rewardsObserver: LedgerObserver
     private var notificationsHandler: AdsNotificationHandler?
     private(set) var publisher: PublisherInfo?
 
-    init(profile: Profile, tabManager: TabManager, crashedLastSession: Bool,
-         safeBrowsingManager: SafeBrowsing? = SafeBrowsing()) {
+    init(profile: Profile, tabManager: TabManager, crashedLastSession: Bool) {
         self.profile = profile
         self.tabManager = tabManager
         self.readerModeCache = ReaderMode.cache(for: tabManager.selectedTab)
         self.crashedLastSession = crashedLastSession
-        self.safeBrowsing = safeBrowsingManager
         
         RewardsHelper.configureRewardsLogs()
         let configuration: BraveRewardsConfiguration
@@ -3586,7 +3582,6 @@ extension BrowserViewController: PreferencesObserver {
         case Preferences.Shields.blockAdsAndTracking.key,
              Preferences.Shields.httpsEverywhere.key,
              Preferences.Shields.blockScripts.key,
-             Preferences.Shields.blockPhishingAndMalware.key,
              Preferences.Shields.googleSafeBrowsing.key,
              Preferences.Shields.blockImages.key,
              Preferences.Shields.fingerprintingProtection.key,

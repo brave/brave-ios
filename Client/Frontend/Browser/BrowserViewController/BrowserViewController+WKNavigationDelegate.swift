@@ -145,12 +145,6 @@ extension BrowserViewController: WKNavigationDelegate {
             return
         }
         
-        if let safeBrowsing = safeBrowsing, safeBrowsing.shouldBlock(url) {
-            safeBrowsing.showMalwareWarningPage(forUrl: url, inWebView: webView)
-            decisionHandler(.cancel)
-            return
-        }
-        
         #if !NO_USER_WALLETS
         if isUpholdOAuthAuthorization(url) {
             decisionHandler(.cancel)
@@ -167,7 +161,7 @@ extension BrowserViewController: WKNavigationDelegate {
         #endif
         
         if !navigationAction.isInterstitial {
-            if BraveShield.GoogleSafeBrowsing.globalPreference {
+            if Preferences.Shields.googleSafeBrowsing.value {
                 var safeBrowsingResult: SafeBrowsingResult = .safe
                 let semaphore = DispatchSemaphore(value: 0)
                 SafeBrowsingClient.shared.find(url.hashPrefixes()) { result, error in

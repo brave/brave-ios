@@ -383,7 +383,6 @@ class SettingsViewController: TableViewController {
             rows: [
                 .boolRow(title: Strings.blockAdsAndTracking, option: Preferences.Shields.blockAdsAndTracking),
                 .boolRow(title: Strings.HTTPSEverywhere, option: Preferences.Shields.httpsEverywhere),
-                .boolRow(title: Strings.blockPhishingAndMalware, option: Preferences.Shields.blockPhishingAndMalware),
                 .boolRow(title: Strings.blockScripts, option: Preferences.Shields.blockScripts),
                 .boolRow(title: Strings.fingerprintingProtection, option: Preferences.Shields.fingerprintingProtection)
             ]
