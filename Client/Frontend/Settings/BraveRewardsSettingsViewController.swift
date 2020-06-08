@@ -89,8 +89,6 @@ class BraveRewardsSettingsViewController: TableViewController {
                                 Enrollment State: \(DeviceCheckClient.isDeviceEnrolled() ? "Enrolled" : "Not enrolled")
                                 Key Info Seed: \(info.isKeyInfoSeedValid ? "Valid" : "Invalid")
                                 Wallet Payment ID: \(info.paymentId)
-                                Persona ID: \(info.personaId)
-                                User ID: \(info.userId)
                                 Wallet created: \(walletCreatedDate)
                                 """
                                 if info.currentReconciles.count > 0 {
