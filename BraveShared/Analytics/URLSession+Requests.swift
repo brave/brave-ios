@@ -22,11 +22,13 @@ extension URLSession {
             
             let task = self.dataTask(with: request) { data, response, error in
                 if let error = error {
-                    return completion(.failure(error))
+                    completion(.failure(error))
+                    return
                 }
                 
                 guard let data = data else {
-                    return completion(.failure(NSError(domain: "com.brave.url.session.build-request", code: -1, userInfo: [NSLocalizedDescriptionKey: "No data returned from the server"])))
+                    completion(.failure(NSError(domain: "com.brave.url.session.build-request", code: -1, userInfo: [NSLocalizedDescriptionKey: "No data returned from the server"])))
+                    return
                 }
                 
                 do {

@@ -82,14 +82,17 @@ class SafeBrowsingClient {
         group.notify(queue: .global(qos: .background)) {
             if !self.database.canFind() {
                 if !potentiallyBadHashes.isEmpty {
-                    return completion(.unknown, nil)
+                    completion(.unknown, nil)
+                    return
                 }
                 
-                return completion(definitelyBadHashes.isEmpty ? .safe : self.classify(hashes: definitelyBadHashes), nil)
+                completion(definitelyBadHashes.isEmpty ? .safe : self.classify(hashes: definitelyBadHashes), nil)
+                return
             }
             
             if potentiallyBadHashes.isEmpty {
-                return completion(definitelyBadHashes.isEmpty ? .safe : self.classify(hashes: definitelyBadHashes), nil)
+                completion(definitelyBadHashes.isEmpty ? .safe : self.classify(hashes: definitelyBadHashes), nil)
+                return
             }
             
             let clientInfo = ClientInfo(clientId: SafeBrowsingClient.clientId,
@@ -123,7 +126,8 @@ class SafeBrowsingClient {
                     
                     DispatchQueue.global(qos: .background).async {
                         if let error = error {
-                            return completion(definitelyBadHashes.isEmpty ? .unknown : self.classify(hashes: definitelyBadHashes), error)
+                            completion(definitelyBadHashes.isEmpty ? .unknown : self.classify(hashes: definitelyBadHashes), error)
+                            return
                         }
                         
                         if let response = response {
@@ -141,9 +145,11 @@ class SafeBrowsingClient {
                                     }
                                 })
                             }
-                            return completion(definitelyBadHashes.isEmpty ? .safe : self.classify(hashes: definitelyBadHashes), nil)
+                            completion(definitelyBadHashes.isEmpty ? .safe : self.classify(hashes: definitelyBadHashes), nil)
+                            return
                         }
-                        return completion(definitelyBadHashes.isEmpty ? .unknown : self.classify(hashes: definitelyBadHashes), nil)
+                        completion(definitelyBadHashes.isEmpty ? .unknown : self.classify(hashes: definitelyBadHashes), nil)
+                        return
                     }
                 }
             } catch {
@@ -156,7 +162,8 @@ class SafeBrowsingClient {
     
     func fetch(_ completion: @escaping (Error?) -> Void) {
         if !self.database.canUpdate() {
-            return completion(SafeBrowsingError("Database already up to date"))
+            completion(SafeBrowsingError("Database already up to date"))
+            return
         }
         
         let clientInfo = ClientInfo(clientId: SafeBrowsingClient.clientId,
@@ -204,7 +211,8 @@ class SafeBrowsingClient {
                             }
                         })
                     }
-                    return completion(error)
+                    completion(error)
+                    return
                 }
                 
                 if let response = response {
@@ -224,7 +232,8 @@ class SafeBrowsingClient {
                         self.cache.purge()
                     }
                     
-                    return completion(didError ? SafeBrowsingError("Safe-Browsing: Error Updating Database") : nil)
+                    completion(didError ? SafeBrowsingError("Safe-Browsing: Error Updating Database") : nil)
+                    return
                 }
                 
                 completion(nil)
@@ -292,19 +301,23 @@ class SafeBrowsingClient {
     private func executeRequest<T>(_ request: URLRequest, type: T.Type, completion: @escaping (T?, Error?) -> Void) -> URLSessionDataTask where T: Decodable {
         let task = session.dataTask(with: request) { data, response, error in
             if let error = error {
-                return completion(nil, error)
+                completion(nil, error)
+                return
             }
             
             guard let data = data else {
-                return completion(nil, SafeBrowsingError("Invalid Server Response: No Data"))
+                completion(nil, SafeBrowsingError("Invalid Server Response: No Data"))
+                return
             }
             
             if let response = response as? HTTPURLResponse, response.statusCode != 200 {
                 do {
                     let error = try JSONDecoder().decode(ResponseError.self, from: data)
-                    return completion(nil, SafeBrowsingError(error.message, code: error.code))
+                    completion(nil, SafeBrowsingError(error.message, code: error.code))
+                    return
                 } catch {
-                    return completion(nil, error)
+                    completion(nil, error)
+                    return
                 }
             }
             

@@ -193,11 +193,13 @@ class SafeBrowsingDatabase {
     
     func find(_ hash: String, completion: @escaping (String) -> Void) {
         guard let data = Data(base64Encoded: hash) else {
-            return completion("")
+            completion("")
+            return
         }
         
         if data.count != Int(CC_SHA256_DIGEST_LENGTH) {
-            return completion("") //ERROR Hash must be a full hash..
+            completion("") //ERROR Hash must be a full hash..
+            return
         }
         
         let backgroundContext = { () -> NSManagedObjectContext in
@@ -223,7 +225,8 @@ class SafeBrowsingDatabase {
             request.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: [optimizedPredicate, fullLengthPredicate])
             
             if let threatHash = (try? backgroundContext.fetch(request))?.first {
-                return completion(data.subdata(in: 0..<threatHash.hashPrefix!.count).base64EncodedString())
+                completion(data.subdata(in: 0..<threatHash.hashPrefix!.count).base64EncodedString())
+                return
             }
             
             completion("")
@@ -287,7 +290,8 @@ class SafeBrowsingDatabase {
         
         fetchResponse.listUpdateResponses.forEach({ response in
             if response.additions.isEmpty && response.removals.isEmpty {
-                return completion(nil) //Nothing to update
+                completion(nil) //Nothing to update
+                return
             }
             
             switch response.responseType {
@@ -299,16 +303,21 @@ class SafeBrowsingDatabase {
                 }
                 
                 if count == 0 {
-                    return completion(SafeBrowsingError("Partial Update received for non-existent table"))
+                    completion(SafeBrowsingError("Partial Update received for non-existent table"))
+                    return
                 }
                 
             case .fullUpdate:
                 if !response.removals.isEmpty {
-                    return completion(SafeBrowsingError("Indices to be removed included in a Full Update"))
+                    completion(SafeBrowsingError("Indices to be removed included in a Full Update"))
+                    return
                 }
                 
                 self.backgroundContext.performAndWait { [weak self] in
-                    guard let self = self else { return completion(nil) }
+                    guard let self = self else {
+                        completion(nil)
+                        return
+                    }
                     let request = { () -> NSBatchDeleteRequest in
                         let request: NSFetchRequest<NSFetchRequestResult> = Threat.fetchRequest()
                         request.predicate = NSPredicate(format: "threatType == %@", response.threatType.rawValue)
@@ -339,7 +348,8 @@ class SafeBrowsingDatabase {
                 }
                 
             default:
-                return completion(SafeBrowsingError("Unknown Response Type"))
+                completion(SafeBrowsingError("Unknown Response Type"))
+                return
             }
             
             let backgroundContext = { () -> NSManagedObjectContext in
@@ -409,7 +419,8 @@ class SafeBrowsingDatabase {
                 
                 if !self.validate(response.checksum.sha256, hashes) {
                     backgroundContext.rollback()
-                    return completion(SafeBrowsingError("Threat List Checksum Mismatch"))
+                    completion(SafeBrowsingError("Threat List Checksum Mismatch"))
+                    return
                 }
                 
                 self.saveContext(backgroundContext)

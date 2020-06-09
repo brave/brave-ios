@@ -167,7 +167,8 @@ public class DeviceCheckClient {
     do {
       try executeRequest(.register(enrollment)) { (result: Swift.Result<Data, Error>) in
         if case .failure(let error) = result {
-          return completion(error)
+          completion(error)
+          return
         }
         
         Preferences.Rewards.didEnrollDeviceCheck.value = true
@@ -200,7 +201,8 @@ public class DeviceCheckClient {
     do {
       try executeRequest(.setAttestation(nonce, verification)) { (result: Swift.Result<Data, Error>) in
         if case .failure(let error) = result {
-          return completion(error)
+          completion(error)
+          return
         }
         
         completion(nil)
@@ -216,11 +218,13 @@ public class DeviceCheckClient {
   public func generateToken(_ completion: @escaping (String, Error?) -> Void) {
         DCDevice.current.generateToken { data, error in
           if let error = error {
-            return completion("", error)
+            completion("", error)
+            return
           }
           
           guard let deviceCheckToken = data?.base64EncodedString() else {
-            return completion("", error)
+            completion("", error)
+            return
           }
           
           completion(deviceCheckToken, nil)
@@ -347,35 +351,41 @@ private extension DeviceCheckClient {
     let task = URLSession(configuration: .ephemeral, delegate: nil, delegateQueue: .main).dataTask(with: request) { data, response, error in
       
       if let error = error {
-        return completion(.failure(error))
+        completion(.failure(error))
+        return
       }
       
       if let data = data, let error = try? JSONDecoder().decode(DeviceCheckError.self, from: data) {
-        return completion(.failure(error))
+        completion(.failure(error))
+        return
       }
       
       if let response = response as? HTTPURLResponse {
         if response.statusCode < 200 || response.statusCode > 299 {
-          return completion(.failure(
+          completion(.failure(
             DeviceCheckError(message: "Validation Failed: Invalid Response Code", code: response.statusCode)
             )
           )
+          return
         }
       }
       
       guard let data = data else {
-        return completion(.failure(
+        completion(.failure(
           DeviceCheckError(message: "Validation Failed: Empty Server Response", code: 500)
           )
         )
+        return
       }
       
       if T.self == Data.self {
-        return completion(.success(data as! T)) //swiftlint:disable:this force_cast
+        completion(.success(data as! T)) //swiftlint:disable:this force_cast
+        return
       }
       
       if T.self == String.self {
-        return completion(.success(String(data: data, encoding: .utf8) as! T)) //swiftlint:disable:this force_cast
+        completion(.success(String(data: data, encoding: .utf8) as! T)) //swiftlint:disable:this force_cast
+        return
       }
       
       do {

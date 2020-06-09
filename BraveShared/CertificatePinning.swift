@@ -51,15 +51,19 @@ public class PinningCertificateEvaluator: NSObject, URLSessionDelegate {
                     }
                     
                     try evaluate(serverTrust, forHost: host)
-                    return completionHandler(.useCredential, URLCredential(trust: serverTrust))
+                    completionHandler(.useCredential, URLCredential(trust: serverTrust))
+                    return
                 } catch {
                     log.error(error)
-                    return completionHandler(.cancelAuthenticationChallenge, nil)
+                    completionHandler(.cancelAuthenticationChallenge, nil)
+                    return
                 }
             }
-            return completionHandler(.cancelAuthenticationChallenge, nil)
+            completionHandler(.cancelAuthenticationChallenge, nil)
+            return
         }
-        return completionHandler(.performDefaultHandling, nil)
+        completionHandler(.performDefaultHandling, nil)
+        return
     }
     
     private func canPinHost(_ host: String) -> Bool {
