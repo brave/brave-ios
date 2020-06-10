@@ -77,39 +77,39 @@ extension SafeBrowsing {
                 let databaseInfoRequest: NSFetchRequest<ThreatDatabaseInfo> = ThreatDatabaseInfo.fetchRequest()
                 databaseInfoRequest.fetchLimit = 1
                 
-                let databaseInfo = try self.mainContext.fetch(databaseInfoRequest)
-                self.lastFetchDate = databaseInfo.first?.lastFetchDate ?? Date.distantPast
-                self.lastFetchWaitDuration = databaseInfo.first?.fetchWaitDuration ?? 0.0
-                self.numberOfFetchRetries = databaseInfo.first?.numberOfFetchRetries ?? 0
+                let databaseInfo = try mainContext.fetch(databaseInfoRequest)
+                lastFetchDate = databaseInfo.first?.lastFetchDate ?? Date.distantPast
+                lastFetchWaitDuration = databaseInfo.first?.fetchWaitDuration ?? 0.0
+                numberOfFetchRetries = databaseInfo.first?.numberOfFetchRetries ?? 0
                 
-                self.lastFindDate = databaseInfo.first?.lastFindDate ?? Date.distantPast
-                self.lastFindWaitDuration = databaseInfo.first?.findWaitDuration ?? 0.0
-                self.numberOfFindRetries = databaseInfo.first?.numberOfFindRetries ?? 0
+                lastFindDate = databaseInfo.first?.lastFindDate ?? Date.distantPast
+                lastFindWaitDuration = databaseInfo.first?.findWaitDuration ?? 0.0
+                numberOfFindRetries = databaseInfo.first?.numberOfFindRetries ?? 0
                 
                 let request: NSFetchRequest<Threat> = Threat.fetchRequest()
-                let threats = try self.mainContext.fetch(request)
+                let threats = try mainContext.fetch(request)
                 try threats.forEach {
                     let hashes = ($0.hashes ?? []).compactMap { ($0 as? ThreatHash)?.hashData }
                     //hashes.sort(by: { $0.lexicographicallyPrecedes($1) })
 
                     if let checksum = $0.checksum {
-                        if !self.validate(checksum, hashes) {
+                        if !validate(checksum, hashes) {
                             throw SafeBrowsingError("Database Corrupted")
                         }
                     }
                 }
-                self.mainContext.reset()
+                mainContext.reset()
             } catch {
                 //Remove everything and re-create the database
-                self.destroy()
-                self.persistentContainer = self.create()
+                destroy()
+                persistentContainer = create()
 
                 log.error("Safe-Browsing: \(error)")
             }
         }
         
         private lazy var persistentContainer: NSPersistentContainer = {
-            return self.create()
+            return create()
         }()
         
         private lazy var backgroundContext: NSManagedObjectContext = {
@@ -140,35 +140,35 @@ extension SafeBrowsing {
         }
         
         func canFind() -> Bool {
-            return Date().timeIntervalSince(self.lastFindDate) >= self.lastFindWaitDuration
+            return Date().timeIntervalSince(lastFindDate) >= lastFindWaitDuration
         }
         
         func canUpdate() -> Bool {
-            return Date().timeIntervalSince(self.lastFetchDate) >= self.lastFetchWaitDuration
+            return Date().timeIntervalSince(lastFetchDate) >= lastFetchWaitDuration
         }
         
         func enterBackoffMode(_ mode: BackoffMode) {
             if mode == .find {
-                let duration = calculateBackoffTime(self.numberOfFindRetries)
-                self.numberOfFindRetries += 1
+                let duration = calculateBackoffTime(numberOfFindRetries)
+                numberOfFindRetries += 1
                 
                 if duration > 0 {
-                    self.lastFindDate = Date()
-                    self.lastFindWaitDuration = duration
-                    self.updateDatabaseInfo { error in
+                    lastFindDate = Date()
+                    lastFindWaitDuration = duration
+                    updateDatabaseInfo { error in
                         if let error = error {
                             log.error(error)
                         }
                     }
                 }
             } else if mode == .update {
-                let duration = calculateBackoffTime(self.numberOfFetchRetries)
-                self.numberOfFetchRetries += 1
+                let duration = calculateBackoffTime(numberOfFetchRetries)
+                numberOfFetchRetries += 1
                 
                 if duration > 0 {
-                    self.lastFetchDate = Date()
-                    self.lastFetchWaitDuration = duration
-                    self.updateDatabaseInfo { error in
+                    lastFetchDate = Date()
+                    lastFetchWaitDuration = duration
+                    updateDatabaseInfo { error in
                         if let error = error {
                             log.error(error)
                         }
@@ -288,10 +288,10 @@ extension SafeBrowsing {
         func update(_ fetchResponse: FetchResponse, completion: @escaping (Error?) -> Void) {
             dbLock.lock(); defer { dbLock.unlock() }
             
-            self.lastFetchDate = Date()
-            self.lastFetchWaitDuration = Double(fetchResponse.minimumWaitDuration)
-            self.numberOfFetchRetries = 0
-            self.updateDatabaseInfo(completion)
+            lastFetchDate = Date()
+            lastFetchWaitDuration = Double(fetchResponse.minimumWaitDuration)
+            numberOfFetchRetries = 0
+            updateDatabaseInfo(completion)
             
             fetchResponse.listUpdateResponses.forEach { response in
                 if response.additions.isEmpty && response.removals.isEmpty {
@@ -435,7 +435,7 @@ extension SafeBrowsing {
         
         func scheduleUpdate(onNeedsUpdating: @escaping () -> Void) {
             updateTimer?.invalidate()
-            updateTimer = Timer.scheduledTimer(withTimeInterval: self.lastFetchWaitDuration, repeats: false) {
+            updateTimer = Timer.scheduledTimer(withTimeInterval: lastFetchWaitDuration, repeats: false) {
                 $0.invalidate()
                 DispatchQueue.main.async {
                     onNeedsUpdating()
@@ -449,7 +449,7 @@ extension SafeBrowsing {
         }
         
         private func updateDatabaseInfo(_ completion: (Error?) -> Void) {
-            self.backgroundContext.performAndWait {
+            backgroundContext.performAndWait {
                 do {
                     let databaseInfoRequest: NSFetchRequest<ThreatDatabaseInfo> = ThreatDatabaseInfo.fetchRequest()
                     databaseInfoRequest.fetchLimit = 1
@@ -489,7 +489,7 @@ extension SafeBrowsing {
         }
         
         private func validate(_ checksum: String, _ hashes: [Data]) -> Bool {
-            return checksum == self.hash(hashes).base64EncodedString()
+            return checksum == hash(hashes).base64EncodedString()
         }
         
         // MARK: - CoreData Stack

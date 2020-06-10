@@ -34,7 +34,7 @@ extension SafeBrowsing {
         public static let shared = SafeBrowsingClient()
         
         private init() {
-            self.database.scheduleUpdate { [weak self] in
+            database.scheduleUpdate { [weak self] in
                 self?.fetch {
                     if let error = $0 {
                         log.error(error)
@@ -162,7 +162,7 @@ extension SafeBrowsing {
         }
         
         func fetch(_ completion: @escaping (Error?) -> Void) {
-            if !self.database.canUpdate() {
+            if !database.canUpdate() {
                 completion(SafeBrowsingError("Database already up to date"))
                 return
             }
@@ -252,7 +252,7 @@ extension SafeBrowsing {
             var isPotentiallyHarmful = false
             
             //Short Circuit Classification of Threats
-            hashes.values.flatMap { $0 }.forEach {
+            hashes.values.flatMap({ $0 }).forEach {
                 isUnspecified = isUnspecified || $0 == .unspecified
                 isMalware = isMalware || $0 == .malware
                 isSocialEngineering = isSocialEngineering || $0 == .socialEngineering
@@ -292,7 +292,7 @@ extension SafeBrowsing {
             request.httpMethod = method.rawValue
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             request.setValue("application/json", forHTTPHeaderField: "Accept")
-            request.setValue(self.userAgent, forHTTPHeaderField: "User-Agent")
+            request.setValue(userAgent, forHTTPHeaderField: "User-Agent")
             request.httpBody = try JSONEncoder().encode(body)
             
             return request
@@ -399,13 +399,13 @@ extension SafeBrowsing {
     private static func isValidIPAddress(string: String) -> Bool {
         //IPv6
         var sin6 = sockaddr_in6()
-        if string.withCString { cstring in inet_pton(AF_INET6, cstring, &sin6.sin6_addr) } == 1 {
+        if string.withCString({ cstring in inet_pton(AF_INET6, cstring, &sin6.sin6_addr) }) == 1 {
             return true
         }
         
         //IPv4
         var sin = sockaddr_in()
-        if string.withCString { cstring in inet_pton(AF_INET, cstring, &sin.sin_addr) } == 1 {
+        if string.withCString({ cstring in inet_pton(AF_INET, cstring, &sin.sin_addr) }) == 1 {
             return true
         }
 
@@ -502,7 +502,7 @@ extension SafeBrowsing {
             }()
         }
         
-        if var path = URL(string: absoluteString)?.pathComponents.map { $0.removingPercentEncoding ?? $0 } {
+        if var path = URL(string: absoluteString)?.pathComponents.map({ $0.removingPercentEncoding ?? $0 }) {
             components.path = {
                 for i in 0..<path.count where path[i] == ".." {
                     path[i] = ""
