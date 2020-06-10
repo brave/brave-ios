@@ -32,9 +32,15 @@ class InterstitialPageHandler: TabContentScript {
             .potentiallyHarmfulApplication: "HarmfulApplication"
         ]
         
-        var components = URLComponents(string: WebServer.sharedInstance.base + "/interstitial/\(pages[threatType]!).html")!
+        let page = pages[threatType] ?? "MITM"
+        var components = URLComponents(string: WebServer.sharedInstance.base + "/interstitial/\(page).html")!
         components.queryItems = [URLQueryItem(name: "url", value: url.absoluteString)]
-        webView.load(PrivilegedRequest(url: components.url!) as URLRequest)
+        
+        if let url = components.url {
+            webView.load(PrivilegedRequest(url: url) as URLRequest)
+        } else {
+            fatalError("Invalid URL")
+        }
     }
     
     func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage) {
@@ -45,8 +51,6 @@ class InterstitialPageHandler: TabContentScript {
             tab?.goBack()
         } else if message == "proceed_unsafe" {
             tab?.webView?.load(InterstitialRequest(url: url!) as URLRequest)
-        } else {
-            
         }
     }
     

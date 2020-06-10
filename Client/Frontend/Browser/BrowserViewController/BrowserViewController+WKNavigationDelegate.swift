@@ -303,11 +303,13 @@ extension BrowserViewController: WKNavigationDelegate {
                 // Three types of results.. "safe", "dangerous", "unknown"
                 // We currently only block `dangerous` pages as per the spec.
                 // Unknown results must be considered safe.
-                if case .dangerous(let threatType) = safeBrowsingResult {
+                switch safeBrowsingResult {
+                case .dangerous(let threatType):
                     self.tabManager.tabForWebView(webView)?.interstitialPageHandler?.showSafeBrowsingPage(url: url, for: webView, threatType: threatType, completion: { policy in
                         decisionHandler(policy)
                     })
-                } else {
+                    
+                default:
                     //The url/page/ip is not a threat, so handle navigation like normal.
                     self.handleNavigation(webView, decidePolicyFor: navigationAction, decisionHandler: decisionHandler)
                 }
