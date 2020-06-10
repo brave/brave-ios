@@ -226,10 +226,10 @@ extension Strings {
 // Safe Browsing Strings
 extension Strings {
     //Shared
-    public static let safeBrowsingTabTitle = NSLocalizedString("SafeBrowsingTabTitle", bundle: Bundle.shared, value: "SafeBrowsing", comment: "SafeBrowsing")
-    public static let safeBrowsingSharedLearnMore = NSLocalizedString("LearnMore", bundle: Bundle.shared, value: "Learn more", comment: "Learn More Text")
-    public static let safeBrowsingSharedMoreDetails = NSLocalizedString("MoreDetails", bundle: Bundle.shared, value: "More details", comment: "More details")
-    public static let safeBrowsingSharedBackToSafety = NSLocalizedString("BackToSafety", bundle: Bundle.shared, value: "Back to safety", comment: "Back to safety Link")
+    public static let safeBrowsingTabTitle = NSLocalizedString("SBSafeBrowsingTabTitle", bundle: Bundle.shared, value: "SafeBrowsing", comment: "SafeBrowsing")
+    public static let safeBrowsingSharedLearnMore = NSLocalizedString("SBLearnMore", bundle: Bundle.shared, value: "Learn more", comment: "Learn More Text")
+    public static let safeBrowsingSharedMoreDetails = NSLocalizedString("SBMoreDetails", bundle: Bundle.shared, value: "More details", comment: "More details")
+    public static let safeBrowsingSharedBackToSafety = NSLocalizedString("SBBackToSafety", bundle: Bundle.shared, value: "Back to safety", comment: "Back to safety Link")
     
     //Unknown
     public static let safeBrowsingUnknownPageHeader = NSLocalizedString("SafeBrowsingUnknownPageHeader", bundle: Bundle.shared, value: "Your connection is not private", comment: "Page header")
@@ -263,7 +263,7 @@ extension Strings {
     public static let safeBrowsingUnwantedSoftwareErrorDetection = NSLocalizedString("safeBrowsingUnwantedSoftwareErrorDetection", bundle: Bundle.shared, value: "Google Safe Browsing recently", comment: "Error Detection")
     public static let safeBrowsingUnwantedSoftwareErrorDetectionLinkText = NSLocalizedString("SafeBrowsingUnwantedSoftwareErrorDetectionText", bundle: Bundle.shared, value: "found harmful programs", comment: "Error Detection Link Text")
     public static let safeBrowsingUnwantedSoftwareErrorDetectionPage = NSLocalizedString("SafeBrowsingUnwantedSoftwareErrorDetectionPage", bundle: Bundle.shared, value: "on %@.", comment: "Error Detection Link")
-    public static let safeBrowsingUnwantedSoftwareRisks1 = NSLocalizedString("SafeBrowsingUnwantedSoftwareRisk_2", bundle: Bundle.shared, value: "If you understand the risks to your security, you may", comment: "Risk")
+    public static let safeBrowsingUnwantedSoftwareRisks1 = NSLocalizedString("SafeBrowsingUnwantedSoftwareRisk_1", bundle: Bundle.shared, value: "If you understand the risks to your security, you may", comment: "Risk")
     public static let safeBrowsingUnwantedSoftwareVisitUnsafe = NSLocalizedString("SafeBrowsingUnwantedSoftwareVisitUnsafe", bundle: Bundle.shared, value: "visit this site", comment: "Risk")
     public static let safeBrowsingUnwantedSoftwareRisks2 = NSLocalizedString("SafeBrowsingUnwantedSoftwareRisk_2", bundle: Bundle.shared, value: "before the harmful programs have been removed.", comment: "Risk")
     
@@ -273,7 +273,7 @@ extension Strings {
     public static let safeBrowsingHarmfulApplicationErrorDetection = NSLocalizedString("safeBrowsingHarmfulApplicationErrorDetection", bundle: Bundle.shared, value: "Google Safe Browsing recently", comment: "Error Detection")
     public static let safeBrowsingHarmfulApplicationErrorDetectionLinkText = NSLocalizedString("SafeBrowsingHarmfulApplicationErrorDetectionText", bundle: Bundle.shared, value: "detected harmful applications", comment: "Error Detection Link Text")
     public static let safeBrowsingHarmfulApplicationErrorDetectionPage = NSLocalizedString("SafeBrowsingHarmfulApplicationErrorDetectionPage", bundle: Bundle.shared, value: "on %@.", comment: "Error Detection Link")
-    public static let safeBrowsingHarmfulApplicationRisks1 = NSLocalizedString("SafeBrowsingHarmfulApplicationRisk_2", bundle: Bundle.shared, value: "If you understand the risks to your security, you may", comment: "Risk")
+    public static let safeBrowsingHarmfulApplicationRisks1 = NSLocalizedString("SafeBrowsingHarmfulApplicationRisk_1", bundle: Bundle.shared, value: "If you understand the risks to your security, you may", comment: "Risk")
     public static let safeBrowsingHarmfulApplicationVisitUnsafe = NSLocalizedString("SafeBrowsingHarmfulApplicationVisitUnsafe", bundle: Bundle.shared, value: "visit this site", comment: "Risk")
     public static let safeBrowsingHarmfulApplicationRisks2 = NSLocalizedString("SafeBrowsingHarmfulApplicationRisk_2", bundle: Bundle.shared, value: "before the dangerous applications have been removed.", comment: "Risk")
 }

@@ -16,9 +16,8 @@ class SafeBrowsingTest: XCTestCase {
     override func tearDown() {
         
     }
-    
-    //Disabled until we add support for canonicalizing IP addresses.. Otherwise the test will fail..
-    //However, WKWebView automatically canonicalized URLs for us anyway.. and this is our hashPrefixes and everything works..
+
+    //WKWebView automatically canonicalized URLs for us anyway.. and this is our hashPrefixes and everything works..
     //So not sure if we even need a canonicalization test tbh..
     func testCanonicalizeURL() {
         let expectedCanonicalURLs = [
@@ -85,8 +84,8 @@ class SafeBrowsingTest: XCTestCase {
         
         for (key, value) in expectedCanonicalURLs {
             if let url = URL(string: key), let expectedURL = URL(string: value) {
-                if url.canonicalize().absoluteString != expectedURL.absoluteString {
-                    XCTFail("Failed to canonicalize URL: \(key) -- Result: \(url.canonicalize().absoluteString) -- Expected: \(expectedURL.absoluteString)")
+                if SafeBrowsing.canonicalize(url: url).absoluteString != expectedURL.absoluteString {
+                    XCTFail("Failed to canonicalize URL: \(key) -- Result: \(SafeBrowsing.canonicalize(url: url).absoluteString) -- Expected: \(expectedURL.absoluteString)")
                 }
             }
         }
@@ -375,7 +374,7 @@ class SafeBrowsingTest: XCTestCase {
         
         for (key, value) in expectedHashes {
             if let url = URL(string: key) {
-                let calculatedHashes = Set<String>(url.hashPrefixes())
+                let calculatedHashes = Set<String>(SafeBrowsing.hashPrefixes(url))
                 let expectedHashes = Set<String>(value)
                 
                 if expectedHashes.isDisjoint(with: calculatedHashes) {

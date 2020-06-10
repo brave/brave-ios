@@ -24,7 +24,7 @@ extension WKNavigationAction {
     
     var isInterstitial: Bool {
         guard let url = request.url else {
-            return true
+            return false
         }
 
         return !url.isLocal && request.isInterstitial
@@ -113,7 +113,6 @@ extension BrowserViewController: WKNavigationDelegate {
     fileprivate func isUpholdOAuthAuthorization(_ url: URL) -> Bool {
         return url.scheme == "rewards" && url.host == "uphold"
     }
-    
     
     private func handleNavigation(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: (WKNavigationActionPolicy) -> Void) {
         
@@ -286,18 +285,18 @@ extension BrowserViewController: WKNavigationDelegate {
         #endif
         
         if !navigationAction.isInterstitial && Preferences.Shields.googleSafeBrowsing.value {
-            var safeBrowsingResult: SafeBrowsingResult = .safe
+            var safeBrowsingResult: SafeBrowsing.SafeBrowsingResult = .safe
             let group = DispatchGroup()
             group.enter()
-            SafeBrowsingClient.shared.find(url.hashPrefixes()) { result, error in
-                defer { group.leave() }
+            SafeBrowsing.SafeBrowsingClient.shared.find(SafeBrowsing.hashPrefixes(url)) { result, error in
+                defer {
+                    safeBrowsingResult = result
+                    group.leave()
+                }
                 if let error = error {
                     log.error(error)
-                    safeBrowsingResult = result
                     return
                 }
-                
-                safeBrowsingResult = result
             }
             
             group.notify(queue: .main) {
@@ -313,7 +312,6 @@ extension BrowserViewController: WKNavigationDelegate {
                     self.handleNavigation(webView, decidePolicyFor: navigationAction, decisionHandler: decisionHandler)
                 }
             }
-            return
         } else {
             //Safe-Browsing is disabled, so just handle navigation like normal.
             handleNavigation(webView, decidePolicyFor: navigationAction, decisionHandler: decisionHandler)

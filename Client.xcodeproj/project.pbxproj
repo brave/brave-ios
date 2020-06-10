@@ -716,7 +716,7 @@
 		5E612A90234B7FCD007D12B5 /* OnboardingRewardsAgreementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E1D8C6C232BF9C200BDE662 /* OnboardingRewardsAgreementView.swift */; };
 		5E667FD023C90BA000931DEC /* GSafeBrowsingDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E667FCA23C90BA000931DEC /* GSafeBrowsingDatabase.swift */; };
 		5E667FD123C90BA000931DEC /* GSafeBrowsingModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E667FCB23C90BA000931DEC /* GSafeBrowsingModels.swift */; };
-		5E667FD223C90BA000931DEC /* GSafeBrowsingCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E667FCC23C90BA000931DEC /* GSafeBrowsingCache.swift */; };
+		5E667FD223C90BA000931DEC /* GSafeBrowsing+Cache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E667FCC23C90BA000931DEC /* GSafeBrowsing+Cache.swift */; };
 		5E667FD323C90BA000931DEC /* SafeBrowsing.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 5E667FCD23C90BA000931DEC /* SafeBrowsing.xcdatamodeld */; };
 		5E667FD423C90BA000931DEC /* GSafeBrowsing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E667FCF23C90BA000931DEC /* GSafeBrowsing.swift */; };
 		5E6683A923D61CF7005B3A6C /* NTPDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E6683A823D61CF7005B3A6C /* NTPDownloader.swift */; };
@@ -2234,7 +2234,7 @@
 		5E4845C122DE3DF800372022 /* WindowRenderHelperScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowRenderHelperScript.swift; sourceTree = "<group>"; };
 		5E667FCA23C90BA000931DEC /* GSafeBrowsingDatabase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GSafeBrowsingDatabase.swift; sourceTree = "<group>"; };
 		5E667FCB23C90BA000931DEC /* GSafeBrowsingModels.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GSafeBrowsingModels.swift; sourceTree = "<group>"; };
-		5E667FCC23C90BA000931DEC /* GSafeBrowsingCache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GSafeBrowsingCache.swift; sourceTree = "<group>"; };
+		5E667FCC23C90BA000931DEC /* GSafeBrowsing+Cache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "GSafeBrowsing+Cache.swift"; sourceTree = "<group>"; };
 		5E667FCE23C90BA000931DEC /* SafeBrowsing.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SafeBrowsing.xcdatamodel; sourceTree = "<group>"; };
 		5E667FCF23C90BA000931DEC /* GSafeBrowsing.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GSafeBrowsing.swift; sourceTree = "<group>"; };
 		5E6683A823D61CF7005B3A6C /* NTPDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NTPDownloader.swift; sourceTree = "<group>"; };
@@ -2728,20 +2728,12 @@
 			children = (
 				EB2A63241F3B49A7004EF8B0 /* ContentBlocker */,
 				4422D57721C073EE00BF1855 /* ShieldStats */,
-				0A0D3D3721A4BCF100BEE65B /* SafeBrowsing */,
 				0A4BEF5C221AF1910005551A /* AdblockResourceDownloader.swift */,
 				0A4BEF61221B26610005551A /* LocalAdblockResourceProtocol.swift */,
 				0AEFB8522226D7C5007AF600 /* AdblockResourcesMappings.swift */,
 				0AEFB88622299E6A007AF600 /* AdblockerType.swift */,
 			);
 			path = WebFilters;
-			sourceTree = "<group>";
-		};
-		0A0D3D3721A4BCF100BEE65B /* SafeBrowsing */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = SafeBrowsing;
 			sourceTree = "<group>";
 		};
 		0A1E8413219094100042F782 /* Dependencies */ = {
@@ -4339,9 +4331,9 @@
 			children = (
 				5E667FCA23C90BA000931DEC /* GSafeBrowsingDatabase.swift */,
 				5E667FCB23C90BA000931DEC /* GSafeBrowsingModels.swift */,
-				5E667FCC23C90BA000931DEC /* GSafeBrowsingCache.swift */,
 				5E667FCD23C90BA000931DEC /* SafeBrowsing.xcdatamodeld */,
 				5E667FCF23C90BA000931DEC /* GSafeBrowsing.swift */,
+				5E667FCC23C90BA000931DEC /* GSafeBrowsing+Cache.swift */,
 			);
 			path = SafeBrowsing;
 			sourceTree = "<group>";
@@ -6660,7 +6652,7 @@
 				D8C75DF3207584C400BB8AD0 /* UIImageViewAligned.m in Sources */,
 				E653422D1C5944F90039DD9E /* BrowserPrompts.swift in Sources */,
 				4422D43621BFD29E00BF1855 /* NSFileManager+Tar.m in Sources */,
-				5E667FD223C90BA000931DEC /* GSafeBrowsingCache.swift in Sources */,
+				5E667FD223C90BA000931DEC /* GSafeBrowsing+Cache.swift in Sources */,
 				39DD030D1CD53E1900BC09B3 /* HomePageHelper.swift in Sources */,
 				C4F3B29A1CFCF93A00966259 /* ButtonToast.swift in Sources */,
 				D31A0FC71A65D6D000DC8C7E /* SearchSuggestClient.swift in Sources */,

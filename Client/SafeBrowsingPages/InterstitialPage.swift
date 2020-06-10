@@ -20,11 +20,11 @@ class InterstitialPageHandler: TabContentScript {
         self.tab = tab
     }
     
-    func showSafeBrowsingPage(url: URL, for webView: WKWebView, threatType: ThreatType, completion: @escaping (WKNavigationActionPolicy) -> Void) {
+    func showSafeBrowsingPage(url: URL, for webView: WKWebView, threatType: SafeBrowsing.ThreatType, completion: @escaping (WKNavigationActionPolicy) -> Void) {
         completion(.cancel)
         self.url = url
         
-        let pages: [ThreatType: String] = [
+        let pages: [SafeBrowsing.ThreatType: String] = [
             .unspecified: "MITM",
             .malware: "Malware",
             .socialEngineering: "Phishing",
@@ -61,7 +61,7 @@ class InterstitialPageHandler: TabContentScript {
 
 extension InterstitialPageHandler {
     static func register(_ webServer: WebServer) {
-        let registerHandler = { (type: ThreatType, page: String) in
+        let registerHandler = { (type: SafeBrowsing.ThreatType, page: String) in
             webServer.registerHandlerForMethod("GET", module: "interstitial", resource: page, handler: { (request) -> GCDWebServerResponse? in
                 guard let url = request?.url.originalURLFromErrorURL else {
                     return GCDWebServerResponse(statusCode: 404)
@@ -82,7 +82,7 @@ extension InterstitialPageHandler {
         registerHandler(.potentiallyHarmfulApplication, "HarmfulApplication.html")
     }
     
-    private static func responseForType(url: URL, threatType: ThreatType) -> GCDWebServerResponse? {
+    private static func responseForType(url: URL, threatType: SafeBrowsing.ThreatType) -> GCDWebServerResponse? {
         let host = url.host ?? url.absoluteString
         let escapedURL = url.absoluteString.addingPercentEncoding(withAllowedCharacters: .URLAllowed) ?? url.absoluteString
 
