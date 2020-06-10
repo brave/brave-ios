@@ -344,7 +344,18 @@ extension SafeBrowsing {
         }
     }
     
+    /// iOS URL and URLComponents conform to RFC-1808 URL spec.
+    /// However, iOS is not only out-dated, but it is NOT fully spec compliant.
+    /// `https://evil.com/foo;` is a VALID URL and when escaped, it should be `https://evil.com/foo;`
+    /// However, iOS encodes the `;` (semi-colon) character (a reserved character for path delimiter) which is WRONG..
+    /// iOS `URL` and `URLComponents` encodes it as `https://evil.com/foo%3B` (this is wrong)
+    /// Every other framework that conforms to RFC-3986 will NOT escape the path (this is correct).
     private static func specURLEscape(url: URL) -> URL {
+        
+        //Recursively unescape all escape sequences in the URL.
+        //`http://host.com/%2525252525` will unescape to `http://host.com/%     `
+        //1024 is the maximum stack depth for decoding chosen by me..
+        //otherwise we will be infinitely decoding/unescaping since the `% ` is still found in the URL path.
         let unescape = { (url: String) -> String in
             var url = url
             for _ in 0..<1024 {
@@ -366,6 +377,12 @@ extension SafeBrowsing {
             var buffer = [UInt8]()
             let characters = Array(normalizedURL.utf8)
             
+            //Escapes a URL as per spec.
+            //Same reasoning as above where URLComponents is wrong.
+            //0x20 = space (ascii table)
+            //0x7E = DEL (ascii table)
+            //0x23 = #
+            //0x25 = %
             for c in characters {
                 if c < 0x20 || c > 0x7F || c == 0x20 || c == 0x23 || c == 0x25 {
                     buffer.append(contentsOf: Array(String(format: "%%%02x", c).utf8))
@@ -395,18 +412,23 @@ extension SafeBrowsing {
         return false
     }
 
+    //Converts an IPAddress from any valid format into IPv4's standard dotted notation.
+    //IPAddresses can be decimal, hex, octal, and standard dotted notation format.
     private static func parseIPAddress(host: String) -> String {
         var host = host
         while host.hasSuffix(" ") {
             host.removeLast()
         }
         
+        //Valid IP address regex.
+        //IPv4 can be in standard dot notation, hex notation, octal notation, decimal notation.
+        //IPv6 will have `[]` in the host.
         if host.range(of: #"^(?i)((?:0x[0-9a-f]+|[0-9\.])+)$"#, options: .regularExpression) == nil {
             return host
         }
         
         let parts = host.split(separator: ".")
-        if parts.count > 4 {
+        if parts.count > 4 { //IP addresses can have up to 4 octaves for 32-bit IPv4.
             return host
         }
         
@@ -418,8 +440,8 @@ extension SafeBrowsing {
             if var component = UInt32(string) {
                 var result = [String](repeating: "", count: components)
                 for i in stride(from: components, to: 0, by: -1) {
-                    result[i - 1] = String(Int(component) & 0xFF)
-                    component = component >> 8
+                    result[i - 1] = String(Int(component) & 0xFF) //Clamp to 255 each octave.
+                    component = component >> 8 //Shift to the next octave
                 }
                 return result.joined(separator: ".")
             }
@@ -509,6 +531,8 @@ extension SafeBrowsing {
 
         if let hostName = url.host?.replacingOccurrences(of: "\(url.scheme ?? "")://", with: "") {
             var isIPAddress = false
+            
+            //If the host is IPv6, parse the IP by dropping the container prefix and suffix.
             if hostName.hasPrefix("[") && hostName.hasSuffix("]") {
                 var newHost = hostName
                 newHost.removeFirst()

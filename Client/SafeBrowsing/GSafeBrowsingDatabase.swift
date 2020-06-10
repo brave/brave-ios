@@ -11,6 +11,7 @@ import Shared
 private let log = Logger.browserLogger
 
 extension Data {
+    //Converts `Data` to a upper-case hex string array of bytes.
     func rawString() -> String {
         if count > 0 {
             let hexChars = Array("0123456789ABCDEF".utf8) as [UInt8]
@@ -32,6 +33,7 @@ extension Data {
 }
 
 extension String {
+    //Converts a hex string back into an array of bytes.
     func rawData() -> Data {
         let length = self.count
         if length & 1 != 0 {
