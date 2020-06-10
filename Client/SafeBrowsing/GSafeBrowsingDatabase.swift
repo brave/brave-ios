@@ -88,8 +88,8 @@ extension SafeBrowsing {
                 
                 let request: NSFetchRequest<Threat> = Threat.fetchRequest()
                 let threats = try self.mainContext.fetch(request)
-                try threats.forEach({
-                    let hashes = ($0.hashes ?? []).compactMap({ ($0 as? ThreatHash)?.hashData })
+                try threats.forEach {
+                    let hashes = ($0.hashes ?? []).compactMap { ($0 as? ThreatHash)?.hashData }
                     //hashes.sort(by: { $0.lexicographicallyPrecedes($1) })
 
                     if let checksum = $0.checksum {
@@ -97,7 +97,7 @@ extension SafeBrowsing {
                             throw SafeBrowsingError("Database Corrupted")
                         }
                     }
-                })
+                }
                 self.mainContext.reset()
             } catch {
                 //Remove everything and re-create the database
@@ -240,7 +240,7 @@ extension SafeBrowsing {
             var results = [String]()
             let group = DispatchGroup()
 
-            hashes.forEach({ hash in
+            hashes.forEach { hash in
                 group.enter()
                 guard let data = Data(base64Encoded: hash) else {
                     return group.leave()
@@ -272,11 +272,13 @@ extension SafeBrowsing {
                     request.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: [optimizedPredicate, fullLengthPredicate])
 
                     let threatHashes = (try? backgroundContext.fetch(request)) ?? []
-                    results.append(contentsOf: threatHashes.map({ data.subdata(in: 0..<$0.hashPrefix!.count).base64EncodedString() }))
+                    results.append(contentsOf: threatHashes.map {
+                        data.subdata(in: 0..<$0.hashPrefix!.count).base64EncodedString()
+                    })
 
                     group.leave()
                 }
-            })
+            }
 
             group.notify(queue: .global(qos: .background)) {
                 completion(results)
@@ -291,7 +293,7 @@ extension SafeBrowsing {
             self.numberOfFetchRetries = 0
             self.updateDatabaseInfo(completion)
             
-            fetchResponse.listUpdateResponses.forEach({ response in
+            fetchResponse.listUpdateResponses.forEach { response in
                 if response.additions.isEmpty && response.removals.isEmpty {
                     completion(nil) //Nothing to update
                     return
@@ -341,9 +343,9 @@ extension SafeBrowsing {
                             let request: NSFetchRequest<Threat> = Threat.fetchRequest()
                             request.predicate = NSPredicate(format: "threatType == %@", response.threatType.rawValue)
                             
-                            (try? self.backgroundContext.fetch(request))?.forEach({
+                            (try? self.backgroundContext.fetch(request))?.forEach {
                                 self.backgroundContext.delete($0)
-                            })
+                            }
                         }
                         
                         self.saveContext(self.backgroundContext)
@@ -372,19 +374,19 @@ extension SafeBrowsing {
                     threat.threatType = response.threatType.rawValue
                     threat.state = response.newClientState
                     
-                    var hashes = (threat.hashes ?? []).compactMap({ ($0 as? ThreatHash)?.hashData })
+                    var hashes = (threat.hashes ?? []).compactMap { ($0 as? ThreatHash)?.hashData }
                     
-                    response.removals.forEach({
-                        $0.rawIndices?.indices.forEach({
+                    response.removals.forEach {
+                        $0.rawIndices?.indices.forEach {
                             if Int($0) > 0 && Int($0) < hashes.count {
                                 hashes[Int($0)] = Data()
                             }
-                        })
-                    })
+                        }
+                    }
                     
-                    hashes = hashes.filter({ !$0.isEmpty })
+                    hashes = hashes.filter { !$0.isEmpty }
                     
-                    response.additions.forEach({
+                    response.additions.forEach {
                         guard let rawHashes = $0.rawHashes else {
                             return
                         }
@@ -398,23 +400,23 @@ extension SafeBrowsing {
                                 hashes.append(data.subdata(in: startIndex..<endIndex))
                             }
                         }
-                    })
+                    }
                     
                     //Hashes must be sorted
                     hashes.sort(by: { $0.lexicographicallyPrecedes($1) })
                     
-                    threat.hashes?.forEach({
+                    threat.hashes?.forEach {
                         if let hash = $0 as? ThreatHash {
                             backgroundContext.delete(hash)
                         }
-                    })
+                    }
                     
-                    threat.hashes = NSOrderedSet(array: hashes.map({
+                    threat.hashes = NSOrderedSet(array: hashes.map {
                         let hash = ThreatHash(context: backgroundContext)
                         hash.hashPrefix = $0.rawString()
                         hash.hashData = $0
                         return hash
-                    }))
+                    })
                     
                     if !response.checksum.sha256.isEmpty {
                         threat.checksum = response.checksum.sha256
@@ -428,7 +430,7 @@ extension SafeBrowsing {
                     
                     self.saveContext(backgroundContext)
                 }
-            })
+            }
         }
         
         func scheduleUpdate(onNeedsUpdating: @escaping () -> Void) {
@@ -518,9 +520,9 @@ extension SafeBrowsing {
         private func destroy() {
             dbLock.lock(); defer { dbLock.unlock() }
             
-            cachedPersistentContainer.persistentStoreDescriptions.forEach({
+            cachedPersistentContainer.persistentStoreDescriptions.forEach {
                 try? cachedPersistentContainer.persistentStoreCoordinator.destroyPersistentStore(at: $0.url!, ofType: NSSQLiteStoreType, options: nil)
-            })
+            }
         }
     }
 }

@@ -70,7 +70,7 @@ extension SafeBrowsing {
         func update(_ request: FindRequest, _ response: FindResponse) {
             cacheLock.lock(); defer { cacheLock.unlock() }
             
-            response.matches.forEach({
+            response.matches.forEach {
                 guard let fullHash = $0.threat.hash else {
                     return
                 }
@@ -84,17 +84,17 @@ extension SafeBrowsing {
                 }
                 
                 positiveCache[fullHash]?.insert(ThreatCache(expiryDate: Date().timeIntervalSince1970 + TimeInterval($0.cacheDuration), hash: fullHash, threatType: $0.threatType))
-            })
+            }
             
             if let negative = response.negativeCacheDuration?.replacingOccurrences(of: "s", with: ""), let negativeCacheDuration = TimeInterval(negative) {
                 
-                request.threatInfo.threatEntries.forEach({
+                request.threatInfo.threatEntries.forEach {
                     guard let partialHash = $0.hash else {
                         return
                     }
                     
                     negativeCache[partialHash] = Date().timeIntervalSince1970 + negativeCacheDuration
-                })
+                }
             }
         }
         

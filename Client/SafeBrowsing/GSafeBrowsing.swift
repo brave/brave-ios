@@ -35,11 +35,11 @@ extension SafeBrowsing {
         
         private init() {
             self.database.scheduleUpdate { [weak self] in
-                self?.fetch({
+                self?.fetch {
                     if let error = $0 {
                         log.error(error)
                     }
-                })
+                }
             }
         }
         
@@ -136,7 +136,7 @@ extension SafeBrowsing {
                                 
                                 if !response.matches.isEmpty {
                                     //Positive Results
-                                    response.matches.forEach({ match in
+                                    response.matches.forEach { match in
                                         if let hash = match.threat.hash, hashes.contains(hash) {
                                             if var threats = definitelyBadHashes[hash] {
                                                 threats.append(match.threatType)
@@ -144,7 +144,7 @@ extension SafeBrowsing {
                                                 definitelyBadHashes.updateValue([match.threatType], forKey: hash)
                                             }
                                         }
-                                    })
+                                    }
                                 }
                                 completion(definitelyBadHashes.isEmpty ? .safe : self.classify(hashes: definitelyBadHashes), nil)
                                 return
@@ -206,11 +206,11 @@ extension SafeBrowsing {
                     if let error = error {
                         self.database.enterBackoffMode(.update)
                         self.database.scheduleUpdate { [weak self] in
-                            self?.fetch({
+                            self?.fetch {
                                 if let error = $0 {
                                     log.error(error)
                                 }
-                            })
+                            }
                         }
                         completion(error)
                         return
@@ -252,13 +252,13 @@ extension SafeBrowsing {
             var isPotentiallyHarmful = false
             
             //Short Circuit Classification of Threats
-            hashes.values.flatMap({ $0 }).forEach({
+            hashes.values.flatMap { $0 }.forEach {
                 isUnspecified = isUnspecified || $0 == .unspecified
                 isMalware = isMalware || $0 == .malware
                 isSocialEngineering = isSocialEngineering || $0 == .socialEngineering
                 isUnwantedSoftware = isUnwantedSoftware || $0 == .unwantedSoftware
                 isPotentiallyHarmful = isPotentiallyHarmful || $0 == .potentiallyHarmfulApplication
-            })
+            }
             
             //Return the order of highest severity first..
             if isMalware {
@@ -399,13 +399,13 @@ extension SafeBrowsing {
     private static func isValidIPAddress(string: String) -> Bool {
         //IPv6
         var sin6 = sockaddr_in6()
-        if string.withCString({ cstring in inet_pton(AF_INET6, cstring, &sin6.sin6_addr) }) == 1 {
+        if string.withCString { cstring in inet_pton(AF_INET6, cstring, &sin6.sin6_addr) } == 1 {
             return true
         }
         
         //IPv4
         var sin = sockaddr_in()
-        if string.withCString({ cstring in inet_pton(AF_INET, cstring, &sin.sin_addr) }) == 1 {
+        if string.withCString { cstring in inet_pton(AF_INET, cstring, &sin.sin_addr) } == 1 {
             return true
         }
 
@@ -502,14 +502,14 @@ extension SafeBrowsing {
             }()
         }
         
-        if var path = URL(string: absoluteString)?.pathComponents.map({ $0.removingPercentEncoding ?? $0 }) {
+        if var path = URL(string: absoluteString)?.pathComponents.map { $0.removingPercentEncoding ?? $0 } {
             components.path = {
                 for i in 0..<path.count where path[i] == ".." {
                     path[i] = ""
                     path[i - 1] = ""
                 }
                 
-                return path.filter({ $0 != "." && !$0.isEmpty }).joined(separator: "/").replacingOccurrences(of: "//", with: "/")
+                return path.filter { $0 != "." && !$0.isEmpty }.joined(separator: "/").replacingOccurrences(of: "//", with: "/")
             }()
         }
         
@@ -542,7 +542,7 @@ extension SafeBrowsing {
                 isIPAddress = isValidIPAddress(string: hostName)
             }
             
-            var hostComponents = isIPAddress ? [hostName] : hostName.split(separator: ".").map({ String($0) })
+            var hostComponents = isIPAddress ? [hostName] : hostName.split(separator: ".").map { String($0) }
             while !isIPAddress && hostComponents.count > 5 {
                 hostComponents = Array(hostComponents.dropFirst())
             }
@@ -598,8 +598,8 @@ extension SafeBrowsing {
             return Data()
         }
         
-        return calculatePrefixesAndSuffixes(canonicalize(url: url)).map({
+        return calculatePrefixesAndSuffixes(canonicalize(url: url)).map {
             hash($0).base64EncodedString()
-        })
+        }
     }
 }
