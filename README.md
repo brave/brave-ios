@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.org/brave/brave-ios.svg?branch=development)](https://travis-ci.org/brave/brave-ios)
 
+gh test 2
 Brave for iOS 🦁
 ===============
 
