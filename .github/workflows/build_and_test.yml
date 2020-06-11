@@ -1,9 +1,10 @@
 name: Build
 
-on: push
+on: [push, pull_request]
 
 jobs:
   test:
+    if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != 'brave/brave-ios') }}
     name: Run tests
     runs-on: macOS-latest
     env:
