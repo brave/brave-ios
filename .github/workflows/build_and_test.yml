@@ -17,7 +17,7 @@ jobs:
         # Use XCODE_VERSION env variable to set the XCode version you want.
         run: sudo xcode-select --switch /Applications/Xcode_${{ env.XCODE_VERSION }}.app
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
       - name: Install required software.
         run: |
           brew install swiftlint
