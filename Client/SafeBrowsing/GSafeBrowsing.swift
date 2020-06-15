@@ -17,7 +17,7 @@ extension SafeBrowsing {
     }
 
     class SafeBrowsingClient {
-        private static let apiKey = "DUMMY_KEY"
+        private static let apiKey = SafeBrowsingClient.getAPIKey()
         private static let maxBandwidth = 2048 //Maximum amount of results we can process per threat-type
         private static let maxDatabaseEntries = 250000 //Maximum amount of entries our database can hold per threat-type
         private static let clientId = AppInfo.baseBundleIdentifier
@@ -41,6 +41,10 @@ extension SafeBrowsing {
                     }
                 }
             }
+        }
+        
+        private static func getAPIKey() -> String {
+            return (Bundle.main.infoDictionary?["SERVICES_API_KEY"] as? String)?.trimmingCharacters(in: .whitespaces) ?? "INVALID_API_KEY"
         }
         
         func find(_ hashes: [String], _ completion: @escaping (_ isSafe: SafeBrowsingResult, Error?) -> Void) {
