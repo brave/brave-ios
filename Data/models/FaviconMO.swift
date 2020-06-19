@@ -15,15 +15,15 @@ public final class FaviconMO: NSManagedObject, CRUD {
 
     // MARK: - Public interface
     
-    public class func add(_ favicon: Favicon, forSiteUrl siteUrl: URL, isPrivateBrowsing: Bool) {
-        DataController.perform(context: .new(inMemory: isPrivateBrowsing)) { context in
+    public class func add(_ favicon: Favicon, forSiteUrl siteUrl: URL, persistent: Bool) {
+        DataController.perform(context: .new(inMemory: !persistent)) { context in
             var item = FaviconMO.get(forFaviconUrl: favicon.url, context: context)
             if item == nil {
                 item = FaviconMO(entity: FaviconMO.entity(context), insertInto: context)
                 item!.url = favicon.url
             }
             if item?.domain == nil {
-                let strategy: Domain.SaveStrategy = isPrivateBrowsing ? .inMemory : .delayedPersistentStore
+                let strategy: Domain.SaveStrategy = persistent ?.delayedPersistentStore : .inMemory
                 
                 item!.domain = Domain.getOrCreateInternal(siteUrl, context: context,
                                                           saveStrategy: strategy)
