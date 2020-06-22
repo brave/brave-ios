@@ -243,7 +243,7 @@ class Tab: NSObject {
                 isCookieBlockingEnabled: Preferences.Privacy.blockAllCookies.value,
                 isU2FEnabled: webView.hasOnlySecureContent,
                 isPaymentRequestEnabled: webView.hasOnlySecureContent,
-                isAdblockEnabled: Preferences.Shields.blockAdsAndTracking.value)
+                isYoutubeAdblockEnabled: false)
             tabDelegate?.tab?(self, didCreateWebView: webView)
         }
     }

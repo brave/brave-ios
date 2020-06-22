@@ -46,20 +46,20 @@ class UserScriptManager {
     }
     
     // Whether or not the Adblock shields are enabled
-    var isAdblockEnabled: Bool {
+    var isYoutubeAdblockEnabled: Bool {
         didSet {
-            if oldValue == isAdblockEnabled { return }
+            if oldValue == isYoutubeAdblockEnabled { return }
             reloadUserScripts()
         }
     }
     
-    init(tab: Tab, isFingerprintingProtectionEnabled: Bool, isCookieBlockingEnabled: Bool, isU2FEnabled: Bool, isPaymentRequestEnabled: Bool, isAdblockEnabled: Bool) {
+    init(tab: Tab, isFingerprintingProtectionEnabled: Bool, isCookieBlockingEnabled: Bool, isU2FEnabled: Bool, isPaymentRequestEnabled: Bool, isYoutubeAdblockEnabled: Bool) {
         self.tab = tab
         self.isFingerprintingProtectionEnabled = isFingerprintingProtectionEnabled
         self.isCookieBlockingEnabled = isCookieBlockingEnabled
         self.isU2FEnabled = isU2FEnabled
         self.isPaymentRequestEnabled = isPaymentRequestEnabled
-        self.isAdblockEnabled = isAdblockEnabled
+        self.isYoutubeAdblockEnabled = isYoutubeAdblockEnabled
         reloadUserScripts()
     }
     
@@ -196,7 +196,7 @@ class UserScriptManager {
         
         //Verify that the application itself is making a call to the JS script instead of other scripts on the page.
         //This variable will be unique amongst scripts loaded in the page.
-        //When the script is called, the token is provided in order to access teh script variable.
+        //When the script is called, the token is provided in order to access the script variable.
         var alteredSource = source
         let token = UserScriptManager.securityToken.uuidString.replacingOccurrences(of: "-", with: "", options: .literal)
         alteredSource = alteredSource.replacingOccurrences(of: "$<possiblySupportedFunctions>", with: "PSF\(token)", options: .literal)
@@ -208,20 +208,20 @@ class UserScriptManager {
     }()
     
     private let AdblockJSScript: WKUserScript? = {
-        guard let path = Bundle.main.path(forResource: "Adblock", ofType: "js"), let source = try? String(contentsOfFile: path) else {
-            log.error("Failed to load Adblock.js")
+        guard let path = Bundle.main.path(forResource: "YoutubeAdblock", ofType: "js"), let source = try? String(contentsOfFile: path) else {
+            log.error("Failed to load YoutubeAdblock.js")
             return nil
         }
         
         //Verify that the application itself is making a call to the JS script instead of other scripts on the page.
         //This variable will be unique amongst scripts loaded in the page.
-        //When the script is called, the token is provided in order to access teh script variable.
+        //When the script is called, the token is provided in order to access the script variable.
         var alteredSource = source
         let token = UserScriptManager.securityToken.uuidString.replacingOccurrences(of: "-", with: "", options: .literal)
         alteredSource = alteredSource.replacingOccurrences(of: "$<prunePaths>", with: "ABS\(token)", options: .literal)
         alteredSource = alteredSource.replacingOccurrences(of: "$<findOwner>", with: "ABS\(token)", options: .literal)
         
-        return WKUserScript(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: true)
+        return WKUserScript(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false)
     }()
 
     private func reloadUserScripts() {
@@ -256,7 +256,7 @@ class UserScriptManager {
                 $0.addUserScript(script)
             }
             
-            if isAdblockEnabled, let script = AdblockJSScript {
+            if isYoutubeAdblockEnabled, let script = AdblockJSScript {
                 $0.addUserScript(script)
             }
             
