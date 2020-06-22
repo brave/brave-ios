@@ -191,7 +191,7 @@ extension BrowserViewController: WKNavigationDelegate {
         
         let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
         
-        if url.host == "youtube.com" || url.host == "m.youtube.com" {
+        if url.baseDomain == "youtube.com" {
             let domain = Domain.getOrCreate(forUrl: url, persistent: !isPrivateBrowsing)
             tabManager[webView]?.userScriptManager?.isYoutubeAdblockEnabled = domain.isShieldExpected(.AdblockAndTp, considerAllShieldsOption: true)
         }
