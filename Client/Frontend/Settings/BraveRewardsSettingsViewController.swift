@@ -84,25 +84,13 @@ class BraveRewardsSettingsViewController: TableViewController {
                         sheet.addAction(UIAlertAction(title: Strings.copyWalletSupportInfo, style: .default, handler: { [unowned self] _ in
                             self.rewards.ledger.rewardsInternalInfo { info in
                                 guard let info = info else { return }
-                                var supportInfo = """
+                                let supportInfo = """
                                 Device Status: \(DCDevice.current.isSupported ? "Supported" : "Not supported")
                                 Enrollment State: \(DeviceCheckClient.isDeviceEnrolled() ? "Enrolled" : "Not enrolled")
                                 Key Info Seed: \(info.isKeyInfoSeedValid ? "Valid" : "Invalid")
                                 Wallet Payment ID: \(info.paymentId)
                                 Wallet created: \(walletCreatedDate)
                                 """
-                                if info.currentReconciles.count > 0 {
-                                    supportInfo += "\nReconciles:"
-                                    for (viewingId, reconcile) in info.currentReconciles {
-                                        supportInfo += """
-                                        
-                                        \t\(viewingId):
-                                        \t\tAmount: \(reconcile.amount)
-                                        \t\tRetry Step: \(reconcile.retryStep.name)
-                                        \t\tRetry Level: \(reconcile.retryLevel)
-                                        """
-                                    }
-                                }
                                 UIPasteboard.general.string = supportInfo
                             }
                         }))
