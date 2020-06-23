@@ -18,30 +18,10 @@ private extension Int32 {
     var loggerLevel: XCGLogger.Level {
         switch self {
         case 0: return .error
-        case 1: return .warning
-        case 2: return .info
-        case 3: return .debug
+        case 1: return .info
+        case 2..<7: return .debug
         default: return .verbose
         }
-    }
-}
-
-struct RewardsHelper {
-    static func configureRewardsLogs(showFileName: Bool = true, showLine: Bool = true) {
-        RewardsLogger.configure(logCallback: { logLevel, line, file, data in
-            if data.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { return }
-            
-            var extraInfo = ""
-            
-            if showFileName {
-                // Rewards logger gives us full file path, extracting filename from it.
-                let fileName = (file as NSString).lastPathComponent
-                extraInfo = showLine ? "[\(fileName).\(line)]" : "[\(fileName)]"
-            }
-            
-            let logOutput = extraInfo.isEmpty ? data : "\(extraInfo) \(data)"
-            log.logln(logOutput, level: logLevel.loggerLevel)
-        }, withFlush: nil)
     }
 }
 
@@ -285,5 +265,16 @@ extension BrowserViewController: RewardsDataSource {
                 }
             })
         }
+    }
+}
+
+extension BrowserViewController: BraveRewardsDelegate {
+    func faviconURL(fromPageURL pageURL: URL, completion: @escaping (URL?) -> Void) {
+        // Currently unused, may be removed in the future
+    }
+    
+    func logMessage(withFilename file: String, lineNumber: Int32, verbosity: Int32, message: String) {
+        if message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { return }
+        log.logln(verbosity.loggerLevel, fileName: file, lineNumber: Int(lineNumber), closure: { message })
     }
 }
