@@ -255,7 +255,7 @@ typedef NS_ENUM(NSInteger, BATInlineTipsPlatforms) {
 
 
 
-@class BATContributionInfo, BATContributionPublisher, BATPublisherInfo, BATPublisherBanner, BATPendingContribution, BATPendingContributionInfo, BATVisitData, BATRewardsParameters, BATBalance, BATAutoContributeProperties, BATMediaEventInfo, BATExternalWallet, BATBalanceReportInfo, BATActivityInfoFilterOrderPair, BATActivityInfoFilter, BATReconcileInfo, BATRewardsInternalsInfo, BATServerPublisherInfo, BATServerPublisherPartial, BATTransferFee, BATContributionQueue, BATContributionQueuePublisher, BATPromotion, BATUnblindedToken, BATClientInfo, BATRecurringTip, BATTransactionReportInfo, BATContributionReportInfo, BATMonthlyReportInfo, BATCredsBatch, BATSKUOrder, BATSKUOrderItem, BATSKUTransaction, BATUrlResponse;
+@class BATContributionInfo, BATContributionPublisher, BATPublisherInfo, BATPublisherBanner, BATPendingContribution, BATPendingContributionInfo, BATVisitData, BATRewardsParameters, BATBalance, BATAutoContributeProperties, BATMediaEventInfo, BATExternalWallet, BATBalanceReportInfo, BATActivityInfoFilterOrderPair, BATActivityInfoFilter, BATRewardsInternalsInfo, BATServerPublisherInfo, BATServerPublisherPartial, BATTransferFee, BATContributionQueue, BATContributionQueuePublisher, BATPromotion, BATUnblindedToken, BATClientInfo, BATRecurringTip, BATTransactionReportInfo, BATContributionReportInfo, BATMonthlyReportInfo, BATCredsBatch, BATSKUOrder, BATSKUOrderItem, BATSKUTransaction, BATUrlResponse;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -424,20 +424,11 @@ NS_SWIFT_NAME(ActivityInfoFilter)
 @property (nonatomic) uint32_t minVisits;
 @end
 
-NS_SWIFT_NAME(ReconcileInfo)
-@interface BATReconcileInfo : NSObject <NSCopying>
-@property (nonatomic, copy) NSString * viewingId;
-@property (nonatomic, copy) NSString * amount;
-@property (nonatomic) BATContributionRetry retryStep;
-@property (nonatomic) int32_t retryLevel;
-@end
-
 NS_SWIFT_NAME(RewardsInternalsInfo)
 @interface BATRewardsInternalsInfo : NSObject <NSCopying>
 @property (nonatomic, copy) NSString * paymentId;
 @property (nonatomic) bool isKeyInfoSeedValid;
 @property (nonatomic) uint64_t bootStamp;
-@property (nonatomic, copy) NSDictionary<NSString *, BATReconcileInfo *> * currentReconciles;
 @end
 
 NS_SWIFT_NAME(ServerPublisherInfo)
