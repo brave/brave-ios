@@ -10,8 +10,21 @@ import Shared
 import BraveShared
 import BraveUI
 import Storage
+import XCGLogger
 
 private let log = Logger.rewardsLogger
+
+private extension Int32 {
+    var loggerLevel: XCGLogger.Level {
+        switch self {
+        case 0: return .error
+        case 1: return .warning
+        case 2: return .info
+        case 3: return .debug
+        default: return .verbose
+        }
+    }
+}
 
 struct RewardsHelper {
     static func configureRewardsLogs(showFileName: Bool = true, showLine: Bool = true) {
@@ -27,17 +40,7 @@ struct RewardsHelper {
             }
             
             let logOutput = extraInfo.isEmpty ? data : "\(extraInfo) \(data)"
-            
-            switch logLevel {
-            // Response and request log levels are ledger-specific.
-            case .logDebug, .logResponse, .logRequest: log.debug(logOutput)
-            case .logInfo: log.info(logOutput)
-            case .logWarning: log.warning(logOutput)
-            case .logError: log.error(logOutput)
-            @unknown default:
-                assertionFailure()
-                log.debug(logOutput)
-            }
+            log.logln(logOutput, level: logLevel.loggerLevel)
         }, withFlush: nil)
     }
 }
