@@ -77,26 +77,10 @@ class BraveRewardsSettingsViewController: TableViewController {
                     }, image: RewardsPanelController.batLogoImage, cellClass: ButtonCell.self)
                 ]),
                 Section(rows: [
-                    Row(text: Strings.walletCreationDate, detailText: walletCreatedDate, selection: {
-                        let sheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-                        sheet.popoverPresentationController?.sourceView = self.view
-                        sheet.popoverPresentationController?.sourceRect = self.view.bounds
-                        sheet.addAction(UIAlertAction(title: Strings.copyWalletSupportInfo, style: .default, handler: { [unowned self] _ in
-                            self.rewards.ledger.rewardsInternalInfo { info in
-                                guard let info = info else { return }
-                                let supportInfo = """
-                                Device Status: \(DCDevice.current.isSupported ? "Supported" : "Not supported")
-                                Enrollment State: \(DeviceCheckClient.isDeviceEnrolled() ? "Enrolled" : "Not enrolled")
-                                Key Info Seed: \(info.isKeyInfoSeedValid ? "Valid" : "Invalid")
-                                Wallet Payment ID: \(info.paymentId)
-                                Wallet created: \(walletCreatedDate)
-                                """
-                                UIPasteboard.general.string = supportInfo
-                            }
-                        }))
-                        sheet.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil))
-                        self.present(sheet, animated: true)
-                    })
+                    Row(text: "Rewards Internals", selection: {
+                        let controller = RewardsInternalsViewController(rewards: self.rewards)
+                        self.navigationController?.pushViewController(controller, animated: true)
+                    }, accessory: .disclosureIndicator)
                 ])
             ]
         }
