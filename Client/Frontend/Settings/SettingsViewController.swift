@@ -419,8 +419,25 @@ class SettingsViewController: TableViewController {
                         }))
 
                         alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: { _ in
+                            let oldItem = self.navigationItem.rightBarButtonItem
+                            self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: UIActivityIndicatorView(style: .white).then {
+                                $0.color = UX.braveOrange
+                                $0.startAnimating()
+                            })
+                            
                             Preferences.Privacy.privateBrowsingOnly.value = value
-                            applyThemeBlock()
+                            
+                            DispatchQueue.global(qos: .background).asyncAfter(deadline: .now() + 0.1) {
+                                let clearables: [Clearable] = [CookiesAndCacheClearable()]
+                                ClearPrivateDataTableViewController.clearPrivateData(clearables).uponQueue(.main) { [weak self] in
+                                    guard let self = self else { return }
+                                    self.tabManager.removeAll()
+                                    self.tabManager.reset()
+                                    
+                                    self.navigationItem.rightBarButtonItem = oldItem
+                                    applyThemeBlock()
+                                }
+                            }
                         }))
 
                         self.present(alert, animated: true, completion: nil)
