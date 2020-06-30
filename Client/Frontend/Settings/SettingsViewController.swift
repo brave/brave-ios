@@ -419,11 +419,9 @@ class SettingsViewController: TableViewController {
                         }))
 
                         alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: { _ in
-                            let oldItem = self.navigationItem.rightBarButtonItem
-                            self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: UIActivityIndicatorView(style: .white).then {
-                                $0.color = UX.braveOrange
-                                $0.startAnimating()
-                            })
+                            let spinner = SpinnerView().then {
+                                $0.present(on: self.view)
+                            }
                             
                             Preferences.Privacy.privateBrowsingOnly.value = value
                             
@@ -434,7 +432,7 @@ class SettingsViewController: TableViewController {
                                     self.tabManager.removeAll()
                                     self.tabManager.reset()
                                     
-                                    self.navigationItem.rightBarButtonItem = oldItem
+                                    spinner.dismiss()
                                     applyThemeBlock()
                                 }
                             }
