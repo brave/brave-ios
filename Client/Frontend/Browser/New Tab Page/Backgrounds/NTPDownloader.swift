@@ -123,7 +123,8 @@ class NTPDownloader {
                 self.scheduleObservers(relativeTime: relativeTime)
             }
             
-            return completion(self.loadNTPResource(for: type))
+            completion(self.loadNTPResource(for: type))
+            return
         }
         
         // Download the NTP resource to a temporary directory
@@ -139,22 +140,26 @@ class NTPDownloader {
                 } catch {
                     logger.error(error)
                 }
-                return completion(nil)
+                completion(nil)
+                return
             }
             
             if let error = error?.underlyingError() {
                 logger.error(error)
-                return completion(self.loadNTPResource(for: type))
+                completion(self.loadNTPResource(for: type))
+                return
             }
             
             if let cacheInfo = cacheInfo, cacheInfo.statusCode == 304 {
                 logger.debug("NTPDownloader Cache is still valid")
-                return completion(self.loadNTPResource(for: type))
+                completion(self.loadNTPResource(for: type))
+                return
             }
             
             guard let url = url else {
                 logger.error("Invalid NTP Temporary Downloads URL")
-                return completion(self.loadNTPResource(for: type))
+                completion(self.loadNTPResource(for: type))
+                return
             }
             
             //Move contents of `url` directory
@@ -380,19 +385,23 @@ class NTPDownloader {
             guard let self = self else { return }
             
             if let error = error {
-                return completion(nil, nil, .metadataError(error))
+                completion(nil, nil, .metadataError(error))
+                return
             }
             
             if let cacheInfo = cacheInfo, cacheInfo.statusCode == 304 {
-                return completion(nil, cacheInfo, nil)
+                completion(nil, cacheInfo, nil)
+                return
             }
             
             guard let data = data else {
-                return completion(nil, nil, .metadataError("Invalid \(type.resourceName) for NTP Download"))
+                completion(nil, nil, .metadataError("Invalid \(type.resourceName) for NTP Download"))
+                return
             }
             
             if self.isCampaignEnded(data: data) {
-                return completion(nil, nil, .campaignEnded)
+                completion(nil, nil, .campaignEnded)
+                return
             }
             
             self.unpackMetadata(type: type, data: data) { url, error in
@@ -418,7 +427,8 @@ class NTPDownloader {
     // Downloads the item at the specified url relative to the baseUrl
     private func download(type: ResourceType, path: String?, etag: String?, _ completion: @escaping (Data?, CacheResponse?, Error?) -> Void) {
         guard var url = type.resourceBaseURL else {
-            return completion(nil, nil, nil)
+            completion(nil, nil, nil)
+            return
         }
         
         if let path = path {
@@ -564,7 +574,8 @@ class NTPDownloader {
             
             group.notify(queue: .main) {
                 if let error = error {
-                    return completion(nil, .unpackError(error))
+                    completion(nil, .unpackError(error))
+                    return
                 }
                 
                 completion(directory, nil)

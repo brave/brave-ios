@@ -341,6 +341,13 @@ class SettingsViewController: TableViewController {
                 }
             )
         )
+        privacy.rows.append(
+            .boolRowWithSubtitle(
+                title: Strings.googleSafeBrowsing,
+                detailText: Strings.googleSafeBrowsingDescription,
+                option: Preferences.Shields.googleSafeBrowsing
+            )
+        )
         return privacy
     }()
 
@@ -376,9 +383,8 @@ class SettingsViewController: TableViewController {
             rows: [
                 .boolRow(title: Strings.blockAdsAndTracking, option: Preferences.Shields.blockAdsAndTracking),
                 .boolRow(title: Strings.HTTPSEverywhere, option: Preferences.Shields.httpsEverywhere),
-                .boolRow(title: Strings.blockPhishingAndMalware, option: Preferences.Shields.blockPhishingAndMalware),
                 .boolRow(title: Strings.blockScripts, option: Preferences.Shields.blockScripts),
-                .boolRow(title: Strings.fingerprintingProtection, option: Preferences.Shields.fingerprintingProtection),
+                .boolRow(title: Strings.fingerprintingProtection, option: Preferences.Shields.fingerprintingProtection)
             ]
         )
         if let locale = Locale.current.languageCode, let _ = ContentBlockerRegion.with(localeCode: locale) {

@@ -156,6 +156,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
 
         self.updateAuthenticationInfo()
         SystemUtils.onFirstRun()
+        
+        DispatchQueue.global(qos: .background).asyncAfter(deadline: .now() + TimeInterval.random(in: 0...60)) {
+            SafeBrowsing.SafeBrowsingClient.shared.fetch({
+                if let error = $0 {
+                    log.error(error)
+                }
+            })
+        }
 
         log.info("startApplication end")
         return true
@@ -427,7 +435,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         let server = WebServer.sharedInstance
         ReaderModeHandlers.register(server, profile: profile)
         ErrorPageHelper.register(server, certStore: profile.certStore)
-        SafeBrowsingHandler.register(server)
+        InterstitialPageHandler.register(server)
         AboutHomeHandler.register(server)
         AboutLicenseHandler.register(server)
         SessionRestoreHandler.register(server)

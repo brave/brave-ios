@@ -83,8 +83,6 @@ public final class Domain: NSManagedObject, CRUD {
                 return self.shield_adblockAndTp?.boolValue ?? Preferences.Shields.blockAdsAndTracking.value
             case .HTTPSE:
                 return self.shield_httpse?.boolValue ?? Preferences.Shields.httpsEverywhere.value
-            case .SafeBrowsing:
-                return self.shield_safeBrowsing?.boolValue ?? Preferences.Shields.blockPhishingAndMalware.value
             case .FpProtection:
                 return self.shield_fpProtection?.boolValue ?? Preferences.Shields.fingerprintingProtection.value
             case .NoScript:
@@ -235,7 +233,6 @@ extension Domain {
           // HTTPSE must be scheme indepedent or user may get stuck not being able to access the http version
           //  of a website (turning off httpse for an upgraded-https domain does not allow access to http version)
           self.domainForInverseHttpScheme(context: context)?.shield_httpse = setting
-        case .SafeBrowsing: shield_safeBrowsing = setting
         case .FpProtection: shield_fpProtection = setting
         case .NoScript: shield_noScript = setting
         }
@@ -250,8 +247,6 @@ extension Domain {
             return self.shield_adblockAndTp?.boolValue
         case .HTTPSE:
             return self.shield_httpse?.boolValue
-        case .SafeBrowsing:
-            return self.shield_safeBrowsing?.boolValue
         case .FpProtection:
             return self.shield_fpProtection?.boolValue
         case .NoScript:

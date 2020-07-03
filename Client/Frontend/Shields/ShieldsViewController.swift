@@ -19,6 +19,10 @@ class ShieldsViewController: UIViewController, PopoverContentComponent {
             return _url.originalURLFromErrorURL
         }
         
+        if _url.isInterstitialURL {
+            return _url.originalURLFromErrorURL
+        }
+        
         return _url
     }()
     
@@ -133,7 +137,6 @@ class ShieldsViewController: UIViewController, PopoverContentComponent {
     private lazy var shieldControlMapping: [(BraveShield, ToggleView, Preferences.Option<Bool>?)] = [
         (.AllOff, shieldsView.shieldOverrideControl, nil),
         (.AdblockAndTp, shieldsView.shieldsContainerStackView.adsTrackersControl, Preferences.Shields.blockAdsAndTracking),
-        (.SafeBrowsing, shieldsView.shieldsContainerStackView.blockMalwareControl, Preferences.Shields.blockPhishingAndMalware),
         (.NoScript, shieldsView.shieldsContainerStackView.blockScriptsControl, Preferences.Shields.blockScripts),
         (.HTTPSE, shieldsView.shieldsContainerStackView.httpsUpgradesControl, Preferences.Shields.httpsEverywhere),
         (.FpProtection, shieldsView.shieldsContainerStackView.fingerprintingControl, Preferences.Shields.fingerprintingProtection),

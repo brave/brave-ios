@@ -9,7 +9,6 @@ public enum BraveShield {
     case AllOff
     case AdblockAndTp
     case HTTPSE
-    case SafeBrowsing
     case FpProtection
     case NoScript
     
@@ -21,8 +20,6 @@ public enum BraveShield {
             return Preferences.Shields.blockAdsAndTracking.value
         case .HTTPSE:
             return Preferences.Shields.httpsEverywhere.value
-        case .SafeBrowsing:
-            return Preferences.Shields.blockPhishingAndMalware.value
         case .FpProtection:
             return Preferences.Shields.fingerprintingProtection.value
         case .NoScript:

@@ -4,6 +4,8 @@
 <dict>
 	<key>API_KEY</key>
 	<string>$(BRAVE_API_KEY)</string>
+	<key>SERVICES_API_KEY</key>
+	<string>$(BRAVE_SERVICES_API_KEY)</string>
 	<key>AdjustAppToken</key>
 	<string>$(ADJUST_APP_TOKEN)</string>
 	<key>AdjustEnvironment</key>
@@ -69,8 +71,8 @@
 	<string>$(DEVELOPMENT_TEAM)</string>
 	<key>MozWhatsNewTopic</key>
 	<string></string>
-        <key>NFCReaderUsageDescription</key>
-        <string>The application needs access to NFC reading to communicate with your Yubikey.</string>
+	<key>NFCReaderUsageDescription</key>
+	<string>The application needs access to NFC reading to communicate with your Yubikey.</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
@@ -155,10 +157,10 @@
 	</array>
 	<key>UIFileSharingEnabled</key>
 	<true/>
-        <key>com.apple.developer.nfc.readersession.iso7816.select-identifiers</key>
-        <array>
-    	    <string>A000000527471117</string>
-            <string>A0000006472F0001</string>
-        </array>
+	<key>com.apple.developer.nfc.readersession.iso7816.select-identifiers</key>
+	<array>
+		<string>A000000527471117</string>
+		<string>A0000006472F0001</string>
+	</array>
 </dict>
 </plist>

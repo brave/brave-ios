@@ -182,14 +182,16 @@ class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
     
     func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         if challenge.protectionSpace.host == "localhost" && challenge.protectionSpace.port == Int(WebServer.sharedInstance.server.port) {
-            return completionHandler(.useCredential, WebServer.sharedInstance.credentials)
+            completionHandler(.useCredential, WebServer.sharedInstance.credentials)
+            return
         }
         
         let origin = "\(challenge.protectionSpace.host):\(challenge.protectionSpace.port)"
         if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust,
             let trust = challenge.protectionSpace.serverTrust,
             let cert = SecTrustGetCertificateAtIndex(trust, 0), profile.certStore.containsCertificate(cert, forOrigin: origin) {
-            return completionHandler(.useCredential, URLCredential(trust: trust))
+            completionHandler(.useCredential, URLCredential(trust: trust))
+            return
         }
         
         completionHandler(.performDefaultHandling, nil)

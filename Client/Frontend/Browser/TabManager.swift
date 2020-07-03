@@ -990,7 +990,8 @@ class TabManagerNavDelegate: NSObject, WKNavigationDelegate {
             }
 
             guard let firstAuthenticatingDelegate = authenticatingDelegates.first else {
-                return completionHandler(.performDefaultHandling, nil)
+                completionHandler(.performDefaultHandling, nil)
+                return
             }
 
             firstAuthenticatingDelegate.webView?(webView, didReceive: challenge) { (disposition, credential) in

@@ -136,20 +136,16 @@ class BrowserViewController: UIViewController {
     
     // Web filters
     
-    let safeBrowsing: SafeBrowsing?
-    
     let rewards: BraveRewards
     let rewardsObserver: LedgerObserver
     private var notificationsHandler: AdsNotificationHandler?
     private(set) var publisher: PublisherInfo?
 
-    init(profile: Profile, tabManager: TabManager, crashedLastSession: Bool,
-         safeBrowsingManager: SafeBrowsing? = SafeBrowsing()) {
+    init(profile: Profile, tabManager: TabManager, crashedLastSession: Bool) {
         self.profile = profile
         self.tabManager = tabManager
         self.readerModeCache = ReaderMode.cache(for: tabManager.selectedTab)
         self.crashedLastSession = crashedLastSession
-        self.safeBrowsing = safeBrowsingManager
         
         RewardsHelper.configureRewardsLogs()
         let configuration: BraveRewardsConfiguration
@@ -1149,9 +1145,9 @@ class BrowserViewController: UIViewController {
                 hideActiveNewTabPageController()
                 return
             }
-            if url.isAboutHomeURL && !url.isErrorPageURL {
+            if url.isAboutHomeURL && !url.isErrorPageURL && !url.isInterstitialURL {
                 showNewTabPageController()
-            } else if !url.isLocalUtility || url.isReaderModeURL || url.isErrorPageURL {
+            } else if !url.isLocalUtility || url.isReaderModeURL || url.isErrorPageURL || url.isInterstitialURL {
                 hideActiveNewTabPageController()
             }
         }
@@ -1384,7 +1380,7 @@ class BrowserViewController: UIViewController {
             
             guard let serverTrust = tab.webView?.serverTrust else {
                 if let url = tab.webView?.url ?? tab.url {
-                    if url.isAboutHomeURL || url.isAboutURL || url.scheme == "about" {
+                    if url.isAboutHomeURL || url.isAboutURL || url.scheme == "about" || url.isInterstitialURL {
                         tab.secureContentState = .localHost
                         if tabManager.selectedTab === tab {
                             topToolbar.secureContentState = .localHost
@@ -1661,7 +1657,7 @@ class BrowserViewController: UIViewController {
             // Whether to show search icon or + icon
             toolbar?.setSearchButtonState(url: url)
             
-            if !url.isErrorPageURL, !url.isAboutHomeURL, !url.isFileURL {
+            if !url.isErrorPageURL, !url.isAboutHomeURL, !url.isFileURL, !url.isInterstitialURL {
                 // Fire the readability check. This is here and not in the pageShow event handler in ReaderMode.js anymore
                 // because that event wil not always fire due to unreliable page caching. This will either let us know that
                 // the currently loaded page can be turned into reading mode or if the page already is in reading mode. We
@@ -1903,6 +1899,9 @@ extension BrowserViewController: TopToolbarDelegate {
         // use the initial value for the URL so we can do proper pattern matching with search URLs
         var searchURL = self.tabManager.selectedTab?.currentInitialURL
         if searchURL?.isErrorPageURL ?? true {
+            searchURL = topToolbar
+        }
+        if searchURL?.isInterstitialURL ?? true {
             searchURL = topToolbar
         }
         if let query = profile.searchEngines.queryForSearchURL(searchURL as URL?) {
@@ -2281,6 +2280,10 @@ extension BrowserViewController: TabDelegate {
         tab.addContentScript(RewardsReporting(rewards: rewards, tab: tab), name: RewardsReporting.name())
         tab.addContentScript(AdsMediaReporting(rewards: rewards, tab: tab), name: AdsMediaReporting.name())
         
+        let interstitialPageHandler = InterstitialPageHandler(tab: tab)
+        tab.interstitialPageHandler = interstitialPageHandler
+        tab.addContentScript(interstitialPageHandler, name: InterstitialPageHandler.name())
+        
         #if !NO_SKUS
         tab.addContentScript(PaymentRequestExtension(rewards: rewards, tab: tab, paymentRequested: self.paymentRequested), name: PaymentRequestExtension.name())
         #endif
@@ -2366,7 +2369,8 @@ extension BrowserViewController: SearchViewControllerDelegate {
     }
     
     func searchViewControllerAllowFindInPage() -> Bool {
-        return tabManager.selectedTab?.webView?.url?.isAboutHomeURL == false
+        let url = tabManager.selectedTab?.webView?.url
+        return url?.isAboutHomeURL == false && url?.isInterstitialURL == false
     }
 }
 
@@ -2688,7 +2692,10 @@ extension BrowserViewController: WKUIDelegate {
     @available(iOS 13.0, *)
     func webView(_ webView: WKWebView, contextMenuConfigurationForElement elementInfo: WKContextMenuElementInfo, completionHandler: @escaping (UIContextMenuConfiguration?) -> Void) {
         
-        guard let url = elementInfo.linkURL else { return completionHandler(UIContextMenuConfiguration(identifier: nil, previewProvider: nil, actionProvider: nil)) }
+        guard let url = elementInfo.linkURL else {
+            completionHandler(UIContextMenuConfiguration(identifier: nil, previewProvider: nil, actionProvider: nil))
+            return
+        }
         
         let actionProvider: UIContextMenuActionProvider = { _ -> UIMenu? in
             var actions = [UIAction]()
@@ -3579,7 +3586,7 @@ extension BrowserViewController: PreferencesObserver {
         case Preferences.Shields.blockAdsAndTracking.key,
              Preferences.Shields.httpsEverywhere.key,
              Preferences.Shields.blockScripts.key,
-             Preferences.Shields.blockPhishingAndMalware.key,
+             Preferences.Shields.googleSafeBrowsing.key,
              Preferences.Shields.blockImages.key,
              Preferences.Shields.fingerprintingProtection.key,
              Preferences.Shields.useRegionAdBlock.key:

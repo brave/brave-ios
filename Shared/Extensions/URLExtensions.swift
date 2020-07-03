@@ -211,6 +211,10 @@ extension URL {
         if self.isErrorPageURL {
             return originalURLFromErrorURL?.displayURL
         }
+        
+        if self.isInterstitialURL {
+            return originalURLFromErrorURL?.displayURL
+        }
 
         if !self.isAboutURL {
             return self.havingRemovedAuthorisationComponents()
@@ -397,6 +401,10 @@ extension URL {
     
     public var safeBrowsingErrorURL: Bool {
         return isLocalhost && path.contains("/errors/SafeBrowsingError.html")
+    }
+    
+    public var isInterstitialURL: Bool {
+        return isLocalhost && path.contains("/interstitial/")
     }
     
     public var isSessionRestoreURL: Bool {
