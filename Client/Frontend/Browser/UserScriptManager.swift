@@ -207,7 +207,7 @@ class UserScriptManager {
         return WKUserScript(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false)
     }()
     
-    private let AdblockJSScript: WKUserScript? = {
+    private let youtubeAdblockJSScript: WKUserScript? = {
         guard let path = Bundle.main.path(forResource: "YoutubeAdblock", ofType: "js"), let source = try? String(contentsOfFile: path) else {
             log.error("Failed to load YoutubeAdblock.js")
             return nil
@@ -256,7 +256,7 @@ class UserScriptManager {
                 $0.addUserScript(script)
             }
             
-            if isYoutubeAdblockEnabled, let script = AdblockJSScript {
+            if isYoutubeAdblockEnabled, let script = youtubeAdblockJSScript {
                 $0.addUserScript(script)
             }
             
