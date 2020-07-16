@@ -117,6 +117,32 @@ platform :ios do
     sh("echo GENERATED_BUILD_ID=#{formattedBuildNumber} > #{LOCAL_PATH}/BuildId.xcconfig")
   end
 
+  desc "Fetches the app version number from App Center."
+  lane :appcenter_fetch_version_number do
+    UI.message("\n\n\n=====================================\n Fetch latest version: \n=====================================")
+
+    version = appcenter_fetch_version_number(
+      api_token: ENV["APPCENTER_API_TOKEN"],
+      owner_name: "BraveSoftware",
+      app_name: "brave-ios"
+    )
+
+    UI.message(version.to_s)
+  end
+
+  desc "Fetches the device list from App Center."
+  lane :appcenter_fetch_devices do
+    UI.message("\n\n\n=====================================\n Fetch devices: \n=====================================")
+
+    version = appcenter_fetch_devices(
+      api_token: ENV["APPCENTER_API_TOKEN"],
+      owner_name: "BraveSoftware",
+      app_name: "brave-ios"
+    )
+
+    UI.message(version.to_s)
+  end
+
   # TODO: Attempt action override on same name
   private_lane :get_client_version_number do
     buildIdFile = Xcodeproj::Config.new("#{CONFIG_PATH}/Base.xcconfig")
