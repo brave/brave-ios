@@ -123,8 +123,8 @@ platform :ios do
 
     version = appcenter_fetch_version_number(
       api_token: ENV["APPCENTER_API_TOKEN"],
-      owner_name: "BraveSoftware",
-      app_name: "brave-ios"
+      owner_name: ENV["APPCENTER_OWNER_NAME"],
+      app_name: ENV["APPCENTER_APP_NAME"]
     )
 
     UI.message(version.to_s)
@@ -136,8 +136,8 @@ platform :ios do
 
     version = appcenter_fetch_devices(
       api_token: ENV["APPCENTER_API_TOKEN"],
-      owner_name: "BraveSoftware",
-      app_name: "brave-ios"
+      owner_name: ENV["APPCENTER_OWNER_NAME"],
+      app_name: ENV["APPCENTER_APP_NAME"]
     )
 
     UI.message(version.to_s)
