@@ -117,14 +117,11 @@ platform :ios do
           "com.brave.ios.enterprise.Browser.BraveShareTo" => "Ent-ShareTo"
         }
       },
-      xcargs: "-allowProvisioningUpdates BRAVE_API_KEY=\"#{sh("head", "-1", "#{ENV['HOME']}/.brave-api-key")}\""
+      xcargs: "-allowProvisioningUpdates BRAVE_API_KEY=\"#{ENV['BRAVE_STATS_API_KEY']}\""
     )
 
     appcenter_upload(
-      api_token: ENV["APPCENTER_API_TOKEN"],
-      owner_name: ENV["APPCENTER_OWNER_NAME"],
       owner_type: "organization",
-      app_name: ENV["APPCENTER_APP_NAME"],
       file: "./build/Client.ipa",
       dsym: "./build/Client.app.dSYM.zip",
       notify_testers: false
@@ -139,7 +136,7 @@ platform :ios do
       sdk: "iphoneos",
       clean: true,
       skip_package_ipa: true,
-      xcargs: "-allowProvisioningUpdates BRAVE_API_KEY=\"#{sh("head", "-1", "#{ENV['HOME']}/.brave-api-key")}\""
+      xcargs: "-allowProvisioningUpdates BRAVE_API_KEY=\"#{ENV['BRAVE_STATS_API_KEY']}\""
     }
   end
 
