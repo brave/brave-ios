@@ -47,7 +47,7 @@ public class DAU {
     /// Sends ping to server and returns a boolean whether a timer for the server call was scheduled.
     /// A user needs to be active for a certain amount of time before we ping the server.
     @discardableResult public func sendPingToServer() -> Bool {
-        if AppConstants.buildChannel == .developer {
+        if AppConstants.buildChannel == .developer || AppConstants.buildChannel == .enterprise {
             log.info("Development build detected, no server ping.")
             return false
         }
