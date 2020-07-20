@@ -98,8 +98,6 @@ platform :ios do
   
   desc "All enterprise releases use this as the foundation"
   lane :enterprise do |options|
-    set_build_number(options)
-
     carthage(
       platform: "iOS",
       cache_builds: true,
@@ -117,7 +115,7 @@ platform :ios do
           "com.brave.ios.enterprise.Browser.BraveShareTo" => "Ent-ShareTo"
         }
       },
-      xcargs: "-allowProvisioningUpdates BRAVE_API_KEY=\"#{ENV['BRAVE_STATS_API_KEY']}\""
+      xcargs: "-allowProvisioningUpdates BRAVE_API_KEY=\"#{ENV['BRAVE_STATS_API_KEY']}\" BRAVE_VERSION=\"#{git_branch}\" GENERATED_BUILD_ID=\"#{get_build_number_repository}\""
     )
 
     appcenter_upload(
