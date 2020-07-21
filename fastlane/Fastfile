@@ -105,7 +105,7 @@ platform :ios do
     )
 
     build_app(
-      scheme: "Ent",
+      scheme: "Enterprise",
       clean: true,
       output_directory: "build",
       export_options: {

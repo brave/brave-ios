@@ -1649,12 +1649,13 @@
 		2798E015213EFC3F003EDBB1 /* FavoriteTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FavoriteTests.swift; sourceTree = "<group>"; };
 		279C756A219DDE3B001CD1CB /* FingerprintingProtection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FingerprintingProtection.swift; sourceTree = "<group>"; };
 		279C75C021A5B37D001CD1CB /* FingerprintingProtection.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = FingerprintingProtection.js; sourceTree = "<group>"; };
-		27A1AC1424884EB300344503 /* Ent.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Ent.xcconfig; sourceTree = "<group>"; };
+		27A1AC1424884EB300344503 /* Enterprise.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Enterprise.xcconfig; sourceTree = "<group>"; };
 		27A586E0214C0DDD000CAE3C /* PreferencesTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesTest.swift; sourceTree = "<group>"; };
 		27A9068823D65A10005D7609 /* PendingContributionListController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PendingContributionListController.swift; sourceTree = "<group>"; };
 		27A9068A23D65E0E005D7609 /* PendingContributionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PendingContributionCell.swift; sourceTree = "<group>"; };
 		27AC168F23833A16004BE19C /* MonthlyAdsGrantReminder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthlyAdsGrantReminder.swift; sourceTree = "<group>"; };
 		27AC169623834510004BE19C /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
+		27AC7CF724C759BE00441317 /* Enterprise.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Enterprise.entitlements; sourceTree = "<group>"; };
 		27B0C7B323D24BAA00B9EA3D /* AutoContributeExclusionListController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoContributeExclusionListController.swift; sourceTree = "<group>"; };
 		27B0C7B623D2555C00B9EA3D /* ExclusionListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExclusionListCell.swift; sourceTree = "<group>"; };
 		27B0C7BA23D604C500B9EA3D /* AutoContributeSupportedListController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoContributeSupportedListController.swift; sourceTree = "<group>"; };
@@ -2442,7 +2443,7 @@
 		E6231C001B90A44F005ABB0D /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		E6231C021B90A466005ABB0D /* libstdc++.6.0.9.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libstdc++.6.0.9.tbd"; path = "usr/lib/libstdc++.6.0.9.tbd"; sourceTree = SDKROOT; };
 		E6231C041B90A472005ABB0D /* libxml2.2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libxml2.2.tbd; path = usr/lib/libxml2.2.tbd; sourceTree = SDKROOT; };
-		E62AC15F1E956AFC00843532 /* FennecEnterpriseApplication.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FennecEnterpriseApplication.entitlements; sourceTree = "<group>"; };
+		E62AC15F1E956AFC00843532 /* Dev.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Dev.entitlements; sourceTree = "<group>"; };
 		E633E2D91C21EAF8001FFF6C /* LoginDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = LoginDetailViewController.swift; path = ../Settings/LoginDetailViewController.swift; sourceTree = "<group>"; };
 		E63ED7D71BFCD9990097D08E /* LoginTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginTableViewCell.swift; sourceTree = "<group>"; };
 		E63ED8E01BFD25580097D08E /* LoginListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginListViewController.swift; sourceTree = "<group>"; };
@@ -2522,9 +2523,9 @@
 		E698FFD91B4AADF40001F623 /* TabScrollController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabScrollController.swift; sourceTree = "<group>"; };
 		E69922121B94E3EF007C480D /* Licenses.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = Licenses.html; sourceTree = "<group>"; };
 		E6D8D5E61B569D70009E5A58 /* BrowserTrayAnimators.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserTrayAnimators.swift; sourceTree = "<group>"; };
-		E6F738741EB7A8D300B50143 /* FennecApplication.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FennecApplication.entitlements; sourceTree = "<group>"; };
-		E6F738751EB7A97100B50143 /* FirefoxBetaApplication.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FirefoxBetaApplication.entitlements; sourceTree = "<group>"; };
-		E6F738761EB7A97500B50143 /* FirefoxApplication.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FirefoxApplication.entitlements; sourceTree = "<group>"; };
+		E6F738741EB7A8D300B50143 /* Debug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Debug.entitlements; sourceTree = "<group>"; };
+		E6F738751EB7A97100B50143 /* Beta.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Beta.entitlements; sourceTree = "<group>"; };
+		E6F738761EB7A97500B50143 /* Release.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Release.entitlements; sourceTree = "<group>"; };
 		E6F9650C1B2F1CF20034B023 /* SharedTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SharedTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E6F9650F1B2F1CF20034B023 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E6F9653B1B2F1D5D0034B023 /* NSURLExtensionsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSURLExtensionsTests.swift; sourceTree = "<group>"; };
@@ -2795,7 +2796,7 @@
 				0A24F846233EB5B5004D2F3A /* Dev.xcconfig */,
 				0A24F839233EB5B4004D2F3A /* Beta.xcconfig */,
 				0A24F837233EB5B4004D2F3A /* Release.xcconfig */,
-				27A1AC1424884EB300344503 /* Ent.xcconfig */,
+				27A1AC1424884EB300344503 /* Enterprise.xcconfig */,
 				0A24F83A233EB5B4004D2F3A /* Local.xcconfig */,
 				0A24F83B233EB5B4004D2F3A /* Local */,
 				0A24F840233EB5B4004D2F3A /* Local.templates */,
@@ -4789,10 +4790,11 @@
 		E689C6FF1E0C716F008BAADB /* Entitlements */ = {
 			isa = PBXGroup;
 			children = (
-				E6F738761EB7A97500B50143 /* FirefoxApplication.entitlements */,
-				E6F738751EB7A97100B50143 /* FirefoxBetaApplication.entitlements */,
-				E6F738741EB7A8D300B50143 /* FennecApplication.entitlements */,
-				E62AC15F1E956AFC00843532 /* FennecEnterpriseApplication.entitlements */,
+				E6F738761EB7A97500B50143 /* Release.entitlements */,
+				E6F738751EB7A97100B50143 /* Beta.entitlements */,
+				E6F738741EB7A8D300B50143 /* Debug.entitlements */,
+				E62AC15F1E956AFC00843532 /* Dev.entitlements */,
+				27AC7CF724C759BE00441317 /* Enterprise.entitlements */,
 			);
 			path = Entitlements;
 			sourceTree = "<group>";
@@ -8244,9 +8246,9 @@
 			};
 			name = Beta;
 		};
-		27A1AC1624884F7A00344503 /* Ent */ = {
+		27A1AC1624884F7A00344503 /* Enterprise */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 27A1AC1424884EB300344503 /* Ent.xcconfig */;
+			baseConfigurationReference = 27A1AC1424884EB300344503 /* Enterprise.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -8329,14 +8331,14 @@
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
-			name = Ent;
+			name = Enterprise;
 		};
-		27A1AC1724884F7A00344503 /* Ent */ = {
+		27A1AC1724884F7A00344503 /* Enterprise */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon_Dev;
-				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Client/Entitlements/FennecEnterpriseApplication.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Client/Entitlements/Enterprise.entitlements";
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -8386,9 +8388,9 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/Client/Application/Client-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
-			name = Ent;
+			name = Enterprise;
 		};
-		27A1AC1824884F7A00344503 /* Ent */ = {
+		27A1AC1824884F7A00344503 /* Enterprise */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
@@ -8451,9 +8453,9 @@
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
-			name = Ent;
+			name = Enterprise;
 		};
-		27A1AC1924884F7A00344503 /* Ent */ = {
+		27A1AC1924884F7A00344503 /* Enterprise */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
@@ -8525,9 +8527,9 @@
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
-			name = Ent;
+			name = Enterprise;
 		};
-		27A1AC1A24884F7A00344503 /* Ent */ = {
+		27A1AC1A24884F7A00344503 /* Enterprise */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
@@ -8551,9 +8553,9 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "$SRCROOT/Shared/Shared-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
-			name = Ent;
+			name = Enterprise;
 		};
-		27A1AC1B24884F7A00344503 /* Ent */ = {
+		27A1AC1B24884F7A00344503 /* Enterprise */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
@@ -8579,9 +8581,9 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "$SRCROOT/Storage/Storage-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
-			name = Ent;
+			name = Enterprise;
 		};
-		27A1AC1C24884F7A00344503 /* Ent */ = {
+		27A1AC1C24884F7A00344503 /* Enterprise */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
@@ -8652,9 +8654,9 @@
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
-			name = Ent;
+			name = Enterprise;
 		};
-		27A1AC1D24884F7A00344503 /* Ent */ = {
+		27A1AC1D24884F7A00344503 /* Enterprise */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
@@ -8727,9 +8729,9 @@
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
-			name = Ent;
+			name = Enterprise;
 		};
-		27A1AC1E24884F7A00344503 /* Ent */ = {
+		27A1AC1E24884F7A00344503 /* Enterprise */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
@@ -8806,9 +8808,9 @@
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
-			name = Ent;
+			name = Enterprise;
 		};
-		27A1AC1F24884F7A00344503 /* Ent */ = {
+		27A1AC1F24884F7A00344503 /* Enterprise */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -8829,9 +8831,9 @@
 				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Client.app/Client";
 			};
-			name = Ent;
+			name = Enterprise;
 		};
-		27A1AC2024884F7A00344503 /* Ent */ = {
+		27A1AC2024884F7A00344503 /* Enterprise */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -8847,9 +8849,9 @@
 				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Client.app/Client";
 			};
-			name = Ent;
+			name = Enterprise;
 		};
-		27A1AC2124884F7A00344503 /* Ent */ = {
+		27A1AC2124884F7A00344503 /* Enterprise */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -8866,9 +8868,9 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "$SRCROOT/Shared/Shared-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
-			name = Ent;
+			name = Enterprise;
 		};
-		27A1AC2224884F7A00344503 /* Ent */ = {
+		27A1AC2224884F7A00344503 /* Enterprise */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
@@ -8931,9 +8933,9 @@
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
-			name = Ent;
+			name = Enterprise;
 		};
-		27A1AC2324884F7A00344503 /* Ent */ = {
+		27A1AC2324884F7A00344503 /* Enterprise */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
@@ -8997,9 +8999,9 @@
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Client.app/Client";
 				VALIDATE_PRODUCT = YES;
 			};
-			name = Ent;
+			name = Enterprise;
 		};
-		27A1AC2424884F7A00344503 /* Ent */ = {
+		27A1AC2424884F7A00344503 /* Enterprise */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
@@ -9068,7 +9070,7 @@
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Client.app/Client";
 				VALIDATE_PRODUCT = YES;
 			};
-			name = Ent;
+			name = Enterprise;
 		};
 		27F443A02135E11200296C58 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -10628,7 +10630,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Client/Entitlements/FirefoxApplication.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Client/Entitlements/Release.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				ENABLE_BITCODE = NO;
@@ -10859,7 +10861,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon_Dev;
-				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Client/Entitlements/FennecEnterpriseApplication.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Client/Entitlements/Dev.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				ENABLE_BITCODE = NO;
@@ -11154,7 +11156,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon_Beta;
-				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Client/Entitlements/FirefoxBetaApplication.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Client/Entitlements/Beta.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				ENABLE_BITCODE = NO;
@@ -11403,7 +11405,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon_Nightly;
-				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Client/Entitlements/FennecApplication.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Client/Entitlements/Debug.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				ENABLE_BITCODE = NO;
@@ -11488,7 +11490,7 @@
 			buildConfigurations = (
 				271DEC30234CC760009DAC37 /* Debug */,
 				271DEC31234CC760009DAC37 /* Dev */,
-				27A1AC1E24884F7A00344503 /* Ent */,
+				27A1AC1E24884F7A00344503 /* Enterprise */,
 				271DEC32234CC760009DAC37 /* Release */,
 				271DEC33234CC760009DAC37 /* Beta */,
 			);
@@ -11500,7 +11502,7 @@
 			buildConfigurations = (
 				271DEC34234CC760009DAC37 /* Debug */,
 				271DEC35234CC760009DAC37 /* Dev */,
-				27A1AC2424884F7A00344503 /* Ent */,
+				27A1AC2424884F7A00344503 /* Enterprise */,
 				271DEC36234CC760009DAC37 /* Release */,
 				271DEC37234CC760009DAC37 /* Beta */,
 			);
@@ -11512,7 +11514,7 @@
 			buildConfigurations = (
 				278C469023F1E6270083347F /* Debug */,
 				278C469123F1E6270083347F /* Dev */,
-				27A1AC1D24884F7A00344503 /* Ent */,
+				27A1AC1D24884F7A00344503 /* Enterprise */,
 				278C469223F1E6270083347F /* Release */,
 				278C469323F1E6270083347F /* Beta */,
 			);
@@ -11524,7 +11526,7 @@
 			buildConfigurations = (
 				27F443A02135E11200296C58 /* Debug */,
 				27F443A12135E11200296C58 /* Dev */,
-				27A1AC1824884F7A00344503 /* Ent */,
+				27A1AC1824884F7A00344503 /* Enterprise */,
 				27F443A22135E11200296C58 /* Release */,
 				27F443A32135E11200296C58 /* Beta */,
 			);
@@ -11536,7 +11538,7 @@
 			buildConfigurations = (
 				288A2DA01AB8B3260023ABC3 /* Debug */,
 				E6DCC20B1DCBB6F100CEC4B7 /* Dev */,
-				27A1AC1A24884F7A00344503 /* Ent */,
+				27A1AC1A24884F7A00344503 /* Enterprise */,
 				E448FCA31AEE7A6000869B6C /* Release */,
 				E6FCC4311C40562400DF6113 /* Beta */,
 			);
@@ -11548,7 +11550,7 @@
 			buildConfigurations = (
 				2FCAE2341ABB51F900877008 /* Debug */,
 				E6DCC20C1DCBB6F100CEC4B7 /* Dev */,
-				27A1AC1B24884F7A00344503 /* Ent */,
+				27A1AC1B24884F7A00344503 /* Enterprise */,
 				E448FCA41AEE7A6000869B6C /* Release */,
 				E6FCC4321C40562400DF6113 /* Beta */,
 			);
@@ -11560,7 +11562,7 @@
 			buildConfigurations = (
 				2FCAE2381ABB51F900877008 /* Debug */,
 				E6DCC2131DCBB6F100CEC4B7 /* Dev */,
-				27A1AC2024884F7A00344503 /* Ent */,
+				27A1AC2024884F7A00344503 /* Enterprise */,
 				E448FCA51AEE7A6000869B6C /* Release */,
 				E6FCC4331C40562400DF6113 /* Beta */,
 			);
@@ -11572,7 +11574,7 @@
 			buildConfigurations = (
 				5D1DC52A20AC9AFB00905E5A /* Debug */,
 				5D1DC52B20AC9AFB00905E5A /* Dev */,
-				27A1AC1C24884F7A00344503 /* Ent */,
+				27A1AC1C24884F7A00344503 /* Enterprise */,
 				5D1DC52C20AC9AFB00905E5A /* Release */,
 				5D1DC52D20AC9AFB00905E5A /* Beta */,
 			);
@@ -11584,7 +11586,7 @@
 			buildConfigurations = (
 				5D1DC52E20AC9AFB00905E5A /* Debug */,
 				5D1DC52F20AC9AFB00905E5A /* Dev */,
-				27A1AC2224884F7A00344503 /* Ent */,
+				27A1AC2224884F7A00344503 /* Enterprise */,
 				5D1DC53020AC9AFB00905E5A /* Release */,
 				5D1DC53120AC9AFB00905E5A /* Beta */,
 			);
@@ -11596,7 +11598,7 @@
 			buildConfigurations = (
 				5DE7689C20B3456E00FF5533 /* Debug */,
 				5DE7689D20B3456E00FF5533 /* Dev */,
-				27A1AC1924884F7A00344503 /* Ent */,
+				27A1AC1924884F7A00344503 /* Enterprise */,
 				5DE7689E20B3456E00FF5533 /* Release */,
 				5DE7689F20B3456E00FF5533 /* Beta */,
 			);
@@ -11608,7 +11610,7 @@
 			buildConfigurations = (
 				5DE768A120B3456E00FF5533 /* Debug */,
 				5DE768A220B3456E00FF5533 /* Dev */,
-				27A1AC2324884F7A00344503 /* Ent */,
+				27A1AC2324884F7A00344503 /* Enterprise */,
 				5DE768A320B3456E00FF5533 /* Release */,
 				5DE768A420B3456E00FF5533 /* Beta */,
 			);
@@ -11620,7 +11622,7 @@
 			buildConfigurations = (
 				E6F965151B2F1CF20034B023 /* Debug */,
 				E6DCC2171DCBB6F100CEC4B7 /* Dev */,
-				27A1AC2124884F7A00344503 /* Ent */,
+				27A1AC2124884F7A00344503 /* Enterprise */,
 				E6F965171B2F1CF20034B023 /* Release */,
 				E6FCC43A1C40562400DF6113 /* Beta */,
 			);
@@ -11632,7 +11634,7 @@
 			buildConfigurations = (
 				F84B21DB1A090F8100AAB793 /* Debug */,
 				E6DCC2051DCBB6F100CEC4B7 /* Dev */,
-				27A1AC1624884F7A00344503 /* Ent */,
+				27A1AC1624884F7A00344503 /* Enterprise */,
 				E448FC9D1AEE7A6000869B6C /* Release */,
 				E6FCC4291C40562400DF6113 /* Beta */,
 			);
@@ -11644,7 +11646,7 @@
 			buildConfigurations = (
 				F84B21DE1A090F8100AAB793 /* Debug */,
 				E6DCC2061DCBB6F100CEC4B7 /* Dev */,
-				27A1AC1724884F7A00344503 /* Ent */,
+				27A1AC1724884F7A00344503 /* Enterprise */,
 				E448FC9E1AEE7A6000869B6C /* Release */,
 				E6FCC42A1C40562400DF6113 /* Beta */,
 			);
@@ -11656,7 +11658,7 @@
 			buildConfigurations = (
 				F84B21E11A090F8100AAB793 /* Debug */,
 				E6DCC2101DCBB6F100CEC4B7 /* Dev */,
-				27A1AC1F24884F7A00344503 /* Ent */,
+				27A1AC1F24884F7A00344503 /* Enterprise */,
 				E448FC9F1AEE7A6000869B6C /* Release */,
 				E6FCC42B1C40562400DF6113 /* Beta */,
 			);
