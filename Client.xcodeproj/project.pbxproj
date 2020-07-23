@@ -8337,7 +8337,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon_Dev;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon_Enterprise;
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Client/Entitlements/Enterprise.entitlements";
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
