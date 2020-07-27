@@ -12,6 +12,8 @@
 
 
 typedef NS_ENUM(NSInteger, BATContributionStep) {
+  BATContributionStepStepAcOff = -6,
+  BATContributionStepStepRewardsOff = -5,
   BATContributionStepStepAcTableEmpty = -4,
   BATContributionStepStepNotEnoughFunds = -3,
   BATContributionStepStepFailed = -2,
@@ -91,6 +93,8 @@ typedef NS_ENUM(NSInteger, BATResult) {
   BATResultRetryLong = 31,
   BATResultContinue = 32,
   BATResultInProgress = 33,
+  BATResultRewardsOff = 34,
+  BATResultAcOff = 35,
 } NS_SWIFT_NAME(Result);
 
 

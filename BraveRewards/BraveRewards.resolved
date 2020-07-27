@@ -1,4 +1,4 @@
 build: Release
-brave-browser: 1.11.x (1491fb8e392d8b4409e644dd21613ccbb2f64d2b)
-brave-core: 1.11.x (c9b9312700813e60299806ecce81814f766393fb)
-  latest tag: v1.11.74
+brave-browser: 1.11.x (3aac3d796c64a02c66c01764cbab2ef05e6df549)
+brave-core: 1.11.x (0ef09b93d321c7533b1d0f7ec0a03a14ecdba761)
+  latest tag: v1.11.102
