@@ -3562,10 +3562,10 @@
 			children = (
 				2746D28224A4FB7400E38852 /* RewardsInternalsSharable.swift */,
 				2746D26E24A291FD00E38852 /* RewardsInternalsViewController.swift */,
+				2746D27C24A3E44900E38852 /* RewardsInternalsLogController.swift */,
 				2746D27024A2A12700E38852 /* RewardsInternalsPromotionListController.swift */,
 				2746D27224A2A5DA00E38852 /* RewardsInternalsContributionListController.swift */,
 				2746D27424A2A9FE00E38852 /* RewardsInternalsContributionPublishersListController.swift */,
-				2746D27C24A3E44900E38852 /* RewardsInternalsLogController.swift */,
 				2746D28024A4F8DA00E38852 /* RewardsInternalsShareController.swift */,
 			);
 			path = "Rewards Internals";

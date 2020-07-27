@@ -36,7 +36,7 @@ class RewardsInternalsViewController: TableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        title = "Rewards Internals"
+        title = Strings.RewardsInternals.title
         
         guard let info = internalsInfo else { return }
         
@@ -48,40 +48,41 @@ class RewardsInternalsViewController: TableViewController {
             $0.maximumFractionDigits = 3
         }
         
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(tappedShare))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(tappedShare)).then {
+            $0.accessibilityLabel = Strings.RewardsInternals.shareInternalsTitle
+        }
         
         var sections: [Static.Section] = [
             .init(
-                header: .title("Wallet Info"),
+                header: .title(Strings.RewardsInternals.walletInfoHeader),
                 rows: [
-                    Row(text: "Key Info Seed", detailText: "\(info.isKeyInfoSeedValid ? "Valid" : "Invalid")"),
-                    Row(text: "Wallet Payment ID", detailText: info.paymentId, cellClass: SubtitleCell.self),
-                    Row(text: "Wallet Creation Date", detailText: dateFormatter.string(from: Date(timeIntervalSince1970: TimeInterval(info.bootStamp))))
+                    Row(text: Strings.RewardsInternals.keyInfoSeed, detailText: "\(info.isKeyInfoSeedValid ? Strings.RewardsInternals.valid : Strings.RewardsInternals.invalid)"),
+                    Row(text: Strings.RewardsInternals.walletPaymentID, detailText: info.paymentId, cellClass: SubtitleCell.self),
+                    Row(text: Strings.RewardsInternals.walletCreationDate, detailText: dateFormatter.string(from: Date(timeIntervalSince1970: TimeInterval(info.bootStamp))))
                 ]
             ),
             .init(
-                header: .title("Device Info"),
+                header: .title(Strings.RewardsInternals.deviceInfoHeader),
                 rows: [
-                    Row(text: "Status", detailText: DCDevice.current.isSupported ? "Supported" : "Not supported"),
-                    Row(text: "Enrollment State", detailText: DeviceCheckClient.isDeviceEnrolled() ? "Enrolled" : "Not enrolled")
+                    Row(text: Strings.RewardsInternals.status, detailText: DCDevice.current.isSupported ? Strings.RewardsInternals.supported : Strings.RewardsInternals.notSupported),
+                    Row(text: Strings.RewardsInternals.enrollmentState, detailText: DeviceCheckClient.isDeviceEnrolled() ? Strings.RewardsInternals.enrolled : Strings.RewardsInternals.notEnrolled)
                 ]
             )
         ]
         
         if let balance = rewards.ledger.balance {
             let keyMaps = [
-                "anonymous": "Anonymous",
-                "blinded": "Rewards BAT",
-                "uphold": "Uphold Wallet"
+                "anonymous": Strings.RewardsInternals.anonymous,
+                "blinded": "Rewards \(Strings.BAT)"
             ]
             let walletRows = balance.wallets.lazy.filter({ $0.key != "uphold" }).map { (key, value) -> Row in
                 Row(text: keyMaps[key] ?? key, detailText: "\(batFormatter.string(from: value) ?? "0.0") \(Strings.BAT)")
             }
             sections.append(
                 .init(
-                    header: .title("Balance Info"),
+                    header: .title(Strings.RewardsInternals.balanceInfoHeader),
                     rows: [
-                        Row(text: "Total Balance", detailText: "\(batFormatter.string(from: NSNumber(value: balance.total)) ?? "0.0") \(Strings.BAT)")
+                        Row(text: Strings.RewardsInternals.totalBalance, detailText: "\(batFormatter.string(from: NSNumber(value: balance.total)) ?? "0.0") \(Strings.BAT)")
                     ] + walletRows
                 )
             )
@@ -90,15 +91,15 @@ class RewardsInternalsViewController: TableViewController {
         sections.append(
             .init(
                 rows: [
-                    Row(text: "Logs", selection: {
+                    Row(text: Strings.RewardsInternals.logsTitle, selection: {
                         let controller = RewardsInternalsLogController(rewards: self.rewards)
                         self.navigationController?.pushViewController(controller, animated: true)
                     }, accessory: .disclosureIndicator),
-                    Row(text: "Promotions", selection: {
+                    Row(text: Strings.RewardsInternals.promotionsTitle, selection: {
                         let controller = RewardsInternalsPromotionListController(rewards: self.rewards)
                         self.navigationController?.pushViewController(controller, animated: true)
                     }, accessory: .disclosureIndicator),
-                    Row(text: "Contributions", selection: {
+                    Row(text: Strings.RewardsInternals.contributionsTitle, selection: {
                         let controller = RewardsInternalsContributionListController(rewards: self.rewards)
                         self.navigationController?.pushViewController(controller, animated: true)
                     }, accessory: .disclosureIndicator)

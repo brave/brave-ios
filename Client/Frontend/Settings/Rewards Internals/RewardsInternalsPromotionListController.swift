@@ -10,12 +10,13 @@ import Shared
 
 extension PromotionStatus {
     fileprivate var displayText: String {
+        let s = Strings.RewardsInternals.self
         switch self {
-        case .active: return "Active"
-        case .attested: return "Attested"
-        case .corrupted: return "Corrupted"
-        case .finished: return "Finished"
-        case .over: return "Over"
+        case .active: return s.promotionStatusActive
+        case .attested: return s.promotionStatusAttested
+        case .corrupted: return s.promotionStatusCorrupted
+        case .finished: return s.promotionStatusFinished
+        case .over: return s.promotionStatusOver
         @unknown default:
             return "-"
         }
@@ -46,9 +47,11 @@ class RewardsInternalsPromotionListController: TableViewController {
     }
     
     override func viewDidLoad() {
-        title = "Promotions"
+        title = Strings.RewardsInternals.promotionsTitle
         
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(tappedShare))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(tappedShare)).then {
+            $0.accessibilityLabel = Strings.RewardsInternals.shareInternalsTitle
+        }
         
         rewards.ledger.updatePendingAndFinishedPromotions {
             self.reloadData()
@@ -68,17 +71,17 @@ class RewardsInternalsPromotionListController: TableViewController {
         let promotions = (rewards.ledger.pendingPromotions + rewards.ledger.finishedPromotions).sorted(by: { $0.claimedAt < $1.claimedAt })
         dataSource.sections = promotions.map { promo in
             var rows = [
-                Row(text: "Status", detailText: promo.status.displayText),
-                Row(text: "Amount", detailText: "\(batFormatter.string(from: NSNumber(value: promo.approximateValue)) ?? "0.0") \(Strings.BAT)"),
-                Row(text: "Type", detailText: promo.type.displayText),
-                Row(text: "Expires at", detailText: dateFormatter.string(from: Date(timeIntervalSince1970: TimeInterval(promo.expiresAt)))),
-                Row(text: "Legacy promotion", detailText: promo.legacyClaimed ? "Yes" : "No"),
-                Row(text: "Version", detailText: "\(promo.version)"),
+                Row(text: Strings.RewardsInternals.status, detailText: promo.status.displayText),
+                Row(text: Strings.RewardsInternals.amount, detailText: "\(batFormatter.string(from: NSNumber(value: promo.approximateValue)) ?? "0.0") \(Strings.BAT)"),
+                Row(text: Strings.RewardsInternals.type, detailText: promo.type.displayText),
+                Row(text: Strings.RewardsInternals.expiresAt, detailText: dateFormatter.string(from: Date(timeIntervalSince1970: TimeInterval(promo.expiresAt)))),
+                Row(text: Strings.RewardsInternals.legacyPromotion, detailText: promo.legacyClaimed ? Strings.yes : Strings.no),
+                Row(text: Strings.RewardsInternals.version, detailText: "\(promo.version)"),
             ]
             if promo.status == .finished {
                 rows.append(contentsOf: [
-                    Row(text: "Claimed at", detailText: dateFormatter.string(from: Date(timeIntervalSince1970: TimeInterval(promo.claimedAt)))),
-                    Row(text: "Claim ID", detailText: promo.claimId, cellClass: SubtitleCell.self)
+                    Row(text: Strings.RewardsInternals.claimedAt, detailText: dateFormatter.string(from: Date(timeIntervalSince1970: TimeInterval(promo.claimedAt)))),
+                    Row(text: Strings.RewardsInternals.claimID, detailText: promo.claimId, cellClass: SubtitleCell.self)
                 ])
             }
             return .init(

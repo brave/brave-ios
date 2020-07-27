@@ -49,7 +49,7 @@ class RewardsInternalsLogController: UITableViewController {
     
     private var lines: [LogLine] = [] {
         didSet {
-            lineCountToolbarLabel.text = "\(lines.count) logs shown"
+            lineCountToolbarLabel.text = String.localizedStringWithFormat(Strings.RewardsInternals.logsCount, lines.count)
             lineCountToolbarLabel.sizeToFit()
         }
     }
@@ -74,18 +74,22 @@ class RewardsInternalsLogController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        title = "Rewards Logs"
+        title = Strings.RewardsInternals.logsTitle
         
         tableView.register(LogLineCell.self)
         tableView.estimatedRowHeight = UITableView.automaticDimension
         
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(tappedShare))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(tappedShare)).then {
+            $0.accessibilityLabel = Strings.RewardsInternals.shareInternalsTitle
+        }
         toolbarItems = [
             .init(barButtonSystemItem: .refresh, target: self, action: #selector(tappedRefreshLogs)),
             .init(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
             .init(customView: lineCountToolbarLabel),
             .init(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
-            .init(barButtonSystemItem: .trash, target: self, action: #selector(clearLogs(_:)))
+            UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(clearLogs(_:))).then {
+                $0.accessibilityLabel = Strings.RewardsInternals.clearLogsTitle
+            }
         ]
         refreshLogs(animated: false)
     }
@@ -101,8 +105,8 @@ class RewardsInternalsLogController: UITableViewController {
     }
     
     @objc private func clearLogs(_ sender: UIBarButtonItem) {
-        let alert = UIAlertController(title: "Clear Logs", message: "Are you sure you wish to clear all Rewards logs?", preferredStyle: .actionSheet)
-        alert.addAction(UIAlertAction(title: "Yes", style: .destructive, handler: { _ in
+        let alert = UIAlertController(title: Strings.RewardsInternals.clearLogsTitle, message: Strings.RewardsInternals.clearLogsConfirmation, preferredStyle: .actionSheet)
+        alert.addAction(UIAlertAction(title: Strings.yes, style: .destructive, handler: { _ in
             rewardsLogger.deleteAllLogs()
             rewardsLogger.newLogWithDate(Date(), configureDestination: { destination in
                 // Same as debug log, Rewards framework handles function names in message
@@ -112,7 +116,7 @@ class RewardsInternalsLogController: UITableViewController {
             self.lines = []
             self.tableView.reloadData()
         }))
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil))
         alert.popoverPresentationController?.barButtonItem = sender
         alert.popoverPresentationController?.permittedArrowDirections = .any
         present(alert, animated: true)

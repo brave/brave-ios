@@ -23,7 +23,7 @@ class RewardsInternalsContributionPublishersListController: TableViewController 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        title = "Publishers"
+        title = Strings.RewardsInternals.publishers
         
         let batFormatter = NumberFormatter().then {
             $0.minimumFractionDigits = 1
@@ -34,8 +34,8 @@ class RewardsInternalsContributionPublishersListController: TableViewController 
             .init(
                 header: .title(pub.publisherKey),
                 rows: [
-                    Row(text: "Total amount", detailText: "\(batFormatter.string(from: NSNumber(value: pub.totalAmount)) ?? "0.0") \(Strings.BAT)"),
-                    Row(text: "Contribution amount", detailText: "\(batFormatter.string(from: NSNumber(value: pub.contributedAmount)) ?? "0.0") \(Strings.BAT)"),
+                    Row(text: Strings.RewardsInternals.totalAmount, detailText: "\(batFormatter.string(from: NSNumber(value: pub.totalAmount)) ?? "0.0") \(Strings.BAT)"),
+                    Row(text: Strings.RewardsInternals.contributionAmount, detailText: "\(batFormatter.string(from: NSNumber(value: pub.contributedAmount)) ?? "0.0") \(Strings.BAT)"),
                 ]
             )
         }

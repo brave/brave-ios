@@ -5,6 +5,7 @@
 
 import Foundation
 import BraveRewards
+import Shared
 
 /// A set of helpers for `RewardsInternalsFileGenerator` to use to generate data to share with support
 struct RewardsInternalsSharableBuilder {
@@ -51,36 +52,36 @@ struct RewardsInternalsSharable: Equatable {
     
     static let basic = RewardsInternalsSharable(
         id: "basic",
-        title: "Basic Info",
-        description: "Wallet, device & balance info (always shared)",
+        title: Strings.RewardsInternals.sharableBasicTitle,
+        description: Strings.RewardsInternals.sharableBasicDescription,
         generator: RewardsInternalsBasicInfoGenerator()
     )
     
     static let logs = RewardsInternalsSharable(
         id: "logs",
-        title: "Logs",
-        description: "Rewards specific logging",
+        title: Strings.RewardsInternals.logsTitle,
+        description: Strings.RewardsInternals.sharableLogsDescription,
         generator: RewardsInternalsLogsGenerator()
     )
     
     static let promotions = RewardsInternalsSharable(
         id: "promotions",
-        title: "Promotions",
-        description: "Any BAT promotions you have claimed or have pending from Ads or Grants",
+        title: Strings.RewardsInternals.promotionsTitle,
+        description: Strings.RewardsInternals.sharablePromotionsDescription,
         generator: RewardsInternalsPromotionsGenerator()
     )
     
     static let contributions = RewardsInternalsSharable(
         id: "contributions",
-        title: "Contributions",
-        description: "Any contributions made to publishers through tipping or auto-contribute",
+        title: Strings.RewardsInternals.contributionsTitle,
+        description: Strings.RewardsInternals.sharableContributionsDescription,
         generator: RewardsInternalsContributionsGenerator()
     )
     
     static let database = RewardsInternalsSharable(
         id: "database",
-        title: "Rewards Database",
-        description: "The internal data store.",
+        title: Strings.RewardsInternals.sharableDatabaseTitle,
+        description: Strings.RewardsInternals.sharableDatabaseDescription,
         generator: RewardsInternalsDatabaseGenerator()
     )
     

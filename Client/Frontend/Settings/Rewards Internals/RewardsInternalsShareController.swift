@@ -62,7 +62,7 @@ class RewardsInternalsShareController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        title = "Share Rewards Internals"
+        title = Strings.RewardsInternals.shareInternalsTitle
         
         tableView.register(RewardsInternalsSharableCell.self)
         tableView.register(ButtonCell.self, forCellReuseIdentifier: "button")
@@ -203,7 +203,7 @@ class RewardsInternalsShareController: UITableViewController {
         }
         let cell = tableView.dequeueReusableCell(withIdentifier: "button", for: indexPath)
         cell.textLabel?.textAlignment = .center
-        cell.textLabel?.text = "Share"
+        cell.textLabel?.text = Strings.RewardsInternals.share
         return cell
     }
     

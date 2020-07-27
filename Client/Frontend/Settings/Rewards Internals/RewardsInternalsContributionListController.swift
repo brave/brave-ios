@@ -7,13 +7,15 @@ import Foundation
 import BraveRewards
 import Static
 import Shared
+import BraveRewardsUI
 
 extension RewardsType {
     fileprivate var displayText: String {
+        let s = Strings.RewardsInternals.self
         switch self {
-        case .autoContribute: return "Auto-Contribute"
-        case .oneTimeTip: return "One time tip"
-        case .recurringTip: return "Recurring tip"
+        case .autoContribute: return s.rewardsTypeAutoContribute
+        case .oneTimeTip: return s.rewardsTypeOneTimeTip
+        case .recurringTip: return s.rewardsTypeRecurringTip
         default:
             return "-"
         }
@@ -21,31 +23,32 @@ extension RewardsType {
 }
 extension ContributionStep {
     fileprivate var displayText: String {
+        let s = Strings.RewardsInternals.self
         switch self {
         case .stepAcOff:
-            return "Auto-Contribute Off"
+            return s.contributionsStepACOff
         case .stepRewardsOff:
-            return "Rewards Off"
+            return s.contributionsStepRewardsOff
         case .stepAcTableEmpty:
-            return "AC table empty"
+            return s.contributionsStepACTableEmpty
         case .stepNotEnoughFunds:
-            return "Not enough funds"
+            return s.contributionsStepNotEnoughFunds
         case .stepFailed:
-            return "Failed"
+            return s.contributionsStepFailed
         case .stepCompleted:
-            return "Completed"
+            return s.contributionsStepCompleted
         case .stepNo:
-            return "No"
+            return Strings.no
         case .stepStart:
-            return "Start"
+            return s.contributionsStepStart
         case .stepPrepare:
-            return "Prepare"
+            return s.contributionsStepPrepare
         case .stepReserve:
-            return "Reserve"
+            return s.contributionsStepReserve
         case .stepExternalTransaction:
-            return "External transaction"
+            return s.contributionsStepExternalTransaction
         case .stepCreds:
-            return "Creds"
+            return s.contributionsStepCreds
         @unknown default:
             return "-"
         }
@@ -53,11 +56,12 @@ extension ContributionStep {
 }
 extension ContributionProcessor {
     fileprivate var displayText: String {
+        let s = Strings.RewardsInternals.self
         switch self {
-        case .braveTokens: return "Brave Tokens"
-        case .braveUserFunds: return "User Funds"
-        case .uphold: return "Uphold"
-        case .none: return "None"
+        case .braveTokens: return s.contributionProcessorBraveTokens
+        case .braveUserFunds: return s.contributionProcessorUserFunds
+        case .uphold: return s.contributionProcessorUphold
+        case .none: return s.contributionProcessorNone
         @unknown default:
             return "-"
         }
@@ -79,9 +83,11 @@ class RewardsInternalsContributionListController: TableViewController {
     }
     
     override func viewDidLoad() {
-        title = "Contributions"
+        title = Strings.RewardsInternals.contributionsTitle
         
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(tappedShare))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(tappedShare)).then {
+            $0.accessibilityLabel = Strings.RewardsInternals.shareInternalsTitle
+        }
         
         rewards.ledger.allContributions { contributions in
             self.contributions = contributions
@@ -103,18 +109,18 @@ class RewardsInternalsContributionListController: TableViewController {
             .init(
                 header: .title(cont.contributionId),
                 rows: [
-                    Row(text: "Created at", detailText: dateFormatter.string(from: Date(timeIntervalSince1970: TimeInterval(cont.createdAt)))),
-                    Row(text: "Type", detailText: cont.type.displayText),
-                    Row(text: "Amount", detailText: "\(batFormatter.string(from: NSNumber(value: cont.amount)) ?? "0.0") \(Strings.BAT)"),
-                    Row(text: "Step", detailText: cont.step.displayText),
-                    Row(text: "Retry Count", detailText: "\(cont.retryCount)"),
-                    Row(text: "Processor", detailText: cont.processor.displayText),
+                    Row(text: Strings.RewardsInternals.createdAt, detailText: dateFormatter.string(from: Date(timeIntervalSince1970: TimeInterval(cont.createdAt)))),
+                    Row(text: Strings.RewardsInternals.type, detailText: cont.type.displayText),
+                    Row(text: Strings.RewardsInternals.amount, detailText: "\(batFormatter.string(from: NSNumber(value: cont.amount)) ?? "0.0") \(Strings.BAT)"),
+                    Row(text: Strings.RewardsInternals.step, detailText: cont.step.displayText),
+                    Row(text: Strings.RewardsInternals.retryCount, detailText: "\(cont.retryCount)"),
+                    Row(text: Strings.RewardsInternals.processor, detailText: cont.processor.displayText),
                     cont.publishers.count > 1 ?
-                        Row(text: "Publishers", selection: {
+                        Row(text: Strings.RewardsInternals.publishers, selection: {
                             let controller = RewardsInternalsContributionPublishersListController(publishers: cont.publishers)
                             self.navigationController?.pushViewController(controller, animated: true)
                         }, accessory: .disclosureIndicator) :
-                        Row(text: "Publisher", detailText: cont.publishers.first?.publisherKey, cellClass: SubtitleCell.self)
+                        Row(text: Strings.RewardsInternals.publisher, detailText: cont.publishers.first?.publisherKey, cellClass: SubtitleCell.self)
                 ],
                 uuid: cont.contributionId
             )
