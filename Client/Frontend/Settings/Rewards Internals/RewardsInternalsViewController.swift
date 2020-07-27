@@ -10,6 +10,20 @@ import DeviceCheck
 import BraveRewardsUI
 import Shared
 
+private class WarningCell: MultilineSubtitleCell {
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        
+        textLabel?.font = .systemFont(ofSize: 16.0, weight: .semibold)
+        detailTextLabel?.font = .systemFont(ofSize: 15.0)
+    }
+    
+    @available(*, unavailable)
+    required init(coder: NSCoder) {
+        fatalError()
+    }
+}
+
 /// A place where all rewards debugging information will live.
 class RewardsInternalsViewController: TableViewController {
     
@@ -53,6 +67,11 @@ class RewardsInternalsViewController: TableViewController {
         }
         
         var sections: [Static.Section] = [
+            .init(
+                rows: [
+                    Row(text: Strings.RewardsInternals.sharingWarningTitle, detailText: Strings.RewardsInternals.sharingWarningMessage, cellClass: WarningCell.self)
+                ]
+            ),
             .init(
                 header: .title(Strings.RewardsInternals.walletInfoHeader),
                 rows: [
