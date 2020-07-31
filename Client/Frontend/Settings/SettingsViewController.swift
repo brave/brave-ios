@@ -429,8 +429,15 @@ class SettingsViewController: TableViewController {
                                 let clearables: [Clearable] = [CookiesAndCacheClearable()]
                                 ClearPrivateDataTableViewController.clearPrivateData(clearables).uponQueue(.main) { [weak self] in
                                     guard let self = self else { return }
+                                    
+                                    //First remove all tabs so that only a blank tab exists.
                                     self.tabManager.removeAll()
+                                    
+                                    //Reset tab configurations and delete all webviews..
                                     self.tabManager.reset()
+                                    
+                                    //Restore all existing tabs by removing the blank tabs and recreating new ones..
+                                    self.tabManager.removeAll()
                                     
                                     spinner.dismiss()
                                     applyThemeBlock()
