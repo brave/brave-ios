@@ -117,7 +117,7 @@ class RewardsInternalsContributionListController: TableViewController {
                     Row(text: Strings.RewardsInternals.retryCount, detailText: "\(cont.retryCount)"),
                     Row(text: Strings.RewardsInternals.processor, detailText: cont.processor.displayText),
                     cont.publishers.count > 1 ?
-                        Row(text: Strings.RewardsInternals.publishers, selection: {
+                        Row(text: Strings.RewardsInternals.publishers, selection: { [unowned self] in
                             let controller = RewardsInternalsContributionPublishersListController(publishers: cont.publishers)
                             self.navigationController?.pushViewController(controller, animated: true)
                         }, accessory: .disclosureIndicator) :

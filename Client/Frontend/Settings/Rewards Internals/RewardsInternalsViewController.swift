@@ -111,15 +111,15 @@ class RewardsInternalsViewController: TableViewController {
         sections.append(
             .init(
                 rows: [
-                    Row(text: Strings.RewardsInternals.logsTitle, selection: {
+                    Row(text: Strings.RewardsInternals.logsTitle, selection: { [unowned self] in
                         let controller = RewardsInternalsLogController(rewards: self.rewards)
                         self.navigationController?.pushViewController(controller, animated: true)
                     }, accessory: .disclosureIndicator),
-                    Row(text: Strings.RewardsInternals.promotionsTitle, selection: {
+                    Row(text: Strings.RewardsInternals.promotionsTitle, selection: { [unowned self] in
                         let controller = RewardsInternalsPromotionListController(rewards: self.rewards)
                         self.navigationController?.pushViewController(controller, animated: true)
                     }, accessory: .disclosureIndicator),
-                    Row(text: Strings.RewardsInternals.contributionsTitle, selection: {
+                    Row(text: Strings.RewardsInternals.contributionsTitle, selection: { [unowned self] in
                         let controller = RewardsInternalsContributionListController(rewards: self.rewards)
                         self.navigationController?.pushViewController(controller, animated: true)
                     }, accessory: .disclosureIndicator)
