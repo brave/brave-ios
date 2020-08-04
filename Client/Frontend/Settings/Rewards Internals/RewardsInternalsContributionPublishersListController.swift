@@ -26,6 +26,7 @@ class RewardsInternalsContributionPublishersListController: TableViewController 
         title = Strings.RewardsInternals.publishers
         
         let batFormatter = NumberFormatter().then {
+            $0.minimumIntegerDigits = 1
             $0.minimumFractionDigits = 1
             $0.maximumFractionDigits = 3
         }

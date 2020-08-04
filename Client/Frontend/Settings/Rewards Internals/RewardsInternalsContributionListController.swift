@@ -101,6 +101,7 @@ class RewardsInternalsContributionListController: TableViewController {
             $0.timeStyle = .short
         }
         let batFormatter = NumberFormatter().then {
+            $0.minimumIntegerDigits = 1
             $0.minimumFractionDigits = 1
             $0.maximumFractionDigits = 3
         }
@@ -147,7 +148,7 @@ struct RewardsInternalsContributionsGenerator: RewardsInternalsFileGenerator {
                     "Type": cont.type.displayText,
                     "Amount": cont.amount,
                     "Step": cont.step.displayText,
-                    "Retry Count": "\(cont.retryCount)",
+                    "Retry Count": cont.retryCount,
                     "Processor": cont.processor.displayText,
                     "Publishers": cont.publishers.map { pub in
                         return [

@@ -34,14 +34,14 @@ class RewardsInternalsLogController: UITableViewController {
         
         init?(from line: String) {
             let logPrefix = #"^[0-9]{4}-[0-9]{2}-[0-9]{2}[^>]+"#
-            if let range = line.range(of: logPrefix, options: .regularExpression, range: line.startIndex..<line.endIndex, locale: nil), !range.isEmpty {
-                self.metadata = line[range].trimmingCharacters(in: .whitespacesAndNewlines)
-                self.message = line[line.index(range.upperBound, offsetBy: 1)..<line.endIndex].trimmingCharacters(in: .whitespacesAndNewlines)
+            if let range = line.range(of: logPrefix, options: .regularExpression, range: line.startIndex..<line.endIndex), !range.isEmpty {
+                metadata = line[range].trimmingCharacters(in: .whitespacesAndNewlines)
+                message = line[line.index(range.upperBound, offsetBy: 1)..<line.endIndex].trimmingCharacters(in: .whitespacesAndNewlines)
             } else {
-                self.metadata = nil
-                self.message = line
+                metadata = nil
+                message = line
             }
-            if self.metadata == nil && self.message.isEmpty {
+            if metadata == nil && message.isEmpty {
                 return nil
             }
         }
@@ -141,7 +141,7 @@ class RewardsInternalsLogController: UITableViewController {
                 let urls = try rewardsLogger.logFilenamesAndURLs().map(\.1).reversed()
                 for url in urls {
                     // If user leaves controller and its dealloc'd no reason to continue reading files
-                    guard self != nil else { return }
+                    if self == nil { return }
                     let fileURL = URL(fileURLWithPath: url.path)
                     do {
                         // Load file

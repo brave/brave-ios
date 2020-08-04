@@ -9,19 +9,25 @@ import BraveRewards
 import Static
 import Shared
 import ZIPFoundation
+import BraveShared
 
 private let log = Logger.browserLogger
 
-private class RewardsInternalsSharableCell: UITableViewCell, TableViewReusable {
+private class RewardsInternalsSharableCell: UITableViewCell, TableViewReusable, Themeable {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
         
         textLabel?.numberOfLines = 0
         detailTextLabel?.numberOfLines = 0
+        selectedBackgroundView = UIView()
     }
     @available(*, unavailable)
     required init(coder: NSCoder) {
         fatalError()
+    }
+    
+    func applyTheme(_ theme: Theme) {
+        selectedBackgroundView?.backgroundColor = theme.isDark ? UIColor(white: 0.2, alpha: 1.0) : BraveUX.braveOrange.withAlphaComponent(0.06)
     }
 }
 
@@ -88,7 +94,7 @@ class RewardsInternalsShareController: UITableViewController {
     }
     
     deinit {
-        cleanup(true)
+        cleanup(callingFromDeinit: true)
     }
     
     override func viewDidLayoutSubviews() {
@@ -101,7 +107,7 @@ class RewardsInternalsShareController: UITableViewController {
     
     private let progressIndiciator = UIProgressView(progressViewStyle: .default)
     
-    private func cleanup(_ callingFromDeinit: Bool = false) {
+    private func cleanup(callingFromDeinit: Bool = false) {
         if !callingFromDeinit {
             DispatchQueue.main.async {
                 // Reset
@@ -121,8 +127,8 @@ class RewardsInternalsShareController: UITableViewController {
         }
     }
     
-    let dropDirectory: URL
-    let zipPath: URL
+    private let dropDirectory: URL
+    private let zipPath: URL
     
     private func share(_ senderIndexPath: IndexPath) {
         // create temp folder, zip, share
@@ -180,7 +186,7 @@ class RewardsInternalsShareController: UITableViewController {
         }
     }
     
-    // MARK: -
+    // MARK: - UITableViewDataSource
     
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 2
@@ -199,6 +205,7 @@ class RewardsInternalsShareController: UITableViewController {
             let cell = tableView.dequeueReusableCell(for: indexPath) as RewardsInternalsSharableCell
             cell.textLabel?.text = sharable.title
             cell.detailTextLabel?.text = sharable.description
+            cell.applyTheme(Theme.of(nil))
             return cell
         }
         let cell = tableView.dequeueReusableCell(withIdentifier: "button", for: indexPath)
@@ -210,6 +217,8 @@ class RewardsInternalsShareController: UITableViewController {
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         return indexPath.section == 0
     }
+    
+    // MARK: - UITableViewDelegate
     
     override func tableView(_ tableView: UITableView, willDeselectRowAt indexPath: IndexPath) -> IndexPath? {
         if indexPath.row == 0 && indexPath.section == 0 {

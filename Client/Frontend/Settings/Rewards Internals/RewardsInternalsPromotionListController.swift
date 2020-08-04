@@ -64,6 +64,7 @@ class RewardsInternalsPromotionListController: TableViewController {
             $0.timeStyle = .short
         }
         let batFormatter = NumberFormatter().then {
+            $0.minimumIntegerDigits = 1
             $0.minimumFractionDigits = 1
             $0.maximumFractionDigits = 3
         }

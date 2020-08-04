@@ -58,6 +58,7 @@ class RewardsInternalsViewController: TableViewController {
             $0.dateStyle = .short
         }
         let batFormatter = NumberFormatter().then {
+            $0.minimumIntegerDigits = 1
             $0.minimumFractionDigits = 1
             $0.maximumFractionDigits = 3
         }
