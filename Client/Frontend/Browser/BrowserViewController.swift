@@ -3616,26 +3616,6 @@ extension BrowserViewController: PreferencesObserver {
             setupTabs()
             updateTabsBarVisibility()
             updateApplicationShortcuts()
-            /*if isPrivate { //When PBO is turned ON, we remove all tabs and configurations.
-                // Clear ALL data when going from normal mode to private
-                // The other way around is handled in `removeTab`
-                
-                //If I don't dispatch after, the WKWebsiteDataStore has no time to sync its process.
-                //This is a bug in WebKit itself. If this isn't done, data is NOT cleared!
-                let group = DispatchGroup()
-                group.enter()
-                DispatchQueue.global(qos: .background).asyncAfter(deadline: .now() + 0.1) {
-                    let clearables: [Clearable] = [CookiesAndCacheClearable()]
-                    ClearPrivateDataTableViewController.clearPrivateData(clearables).uponQueue(.main) { [weak self] in
-                        defer { group.leave() }
-                        guard let self = self else { return }
-                        self.tabManager.removeAll()
-                        self.tabManager.reset()
-                    }
-                }
-                
-                group.wait(timeout: .now() + 10.0)
-            }*/
         case Preferences.General.alwaysRequestDesktopSite.key:
             tabManager.reset()
             self.tabManager.reloadSelectedTab()
