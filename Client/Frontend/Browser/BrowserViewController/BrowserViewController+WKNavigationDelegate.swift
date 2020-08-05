@@ -265,6 +265,51 @@ extension BrowserViewController: WKNavigationDelegate {
                 self.tabManager.selectedTab?.alertShownCount = 0
                 self.tabManager.selectedTab?.blockAllAlerts = false
             }
+            
+            // Prevents synthetically activated links such as: CVE-2017-7089
+            //Follow desktop
+            //https://blog.mozilla.org/security/2017/11/27/blocking-top-level-navigations-data-urls-firefox-59
+            
+            if url.scheme == "data" {
+                do {
+                    //A click is synthetic if its value is 0 (aka WKSyntheticClickTypeNoTap).
+                    //Or if its navigationType is "other".
+                    if let clickType = navigationAction.value(forKey: "syntheticClickType") as? Int, clickType == 0 || navigationAction.navigationType == .other {
+                        /*case WebKit::WebMouseEvent::OneFingerTap:
+                            return WKSyntheticClickTypeOneFingerTap;
+                        case WebKit::WebMouseEvent::TwoFingerTap:
+                            return WKSyntheticClickTypeTwoFingerTap;
+                        }*/
+                        return decisionHandler(.cancel)
+                    }
+                    
+                    let allowedMimeTypes = ["image", "text/json",
+                                            "text/plain", "text/css",
+                                            "audio", "video",
+                                            "application",
+                                            "application/pdf", "application/json"]
+                    
+                    let blockedMimeTypes = ["image/svg+xml", "text/html",
+                                            "text/xhtml", "text/xml",
+                                            "application/xhtml", "application/html",
+                                            "application/xml"
+                    ]
+                    
+                    let URIInfo = try DataURIParser(uri: url.absoluteString)
+                    if blockedMimeTypes.contains(URIInfo.mediaType) {
+                        return decisionHandler(.cancel)
+                    }
+                    
+                    if allowedMimeTypes.contains(URIInfo.mediaType) {
+                        return decisionHandler(.allow)
+                    }
+                    
+                    return decisionHandler(.cancel)
+                } catch {
+                    return
+                }
+            }
+            
             decisionHandler(.allow)
             return
         }
