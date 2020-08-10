@@ -2,10 +2,7 @@
 
 ## [1.19.2](https://github.com/brave/brave-ios/releases/tag/v1.19.2)
 
- - Implemented URL scheme handlers for both "http" and "https". ([#2784](https://github.com/brave/brave-ios/issues/2784))
-
-## [1.19.1](https://github.com/brave/brave-ios/releases/tag/v1.19.1)
-
+ - Implemented URL scheme handlers for both "http" and "https". ([#2784](https://github.com/brave/brave-ios/issues/2784))sss
  - Removed Sync UI from settings. ([#2718](https://github.com/brave/brave-ios/issues/2718))
  
 ## [1.19](https://github.com/brave/brave-ios/releases/tag/v1.19)
