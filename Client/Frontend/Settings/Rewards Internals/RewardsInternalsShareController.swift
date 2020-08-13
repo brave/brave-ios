@@ -144,6 +144,9 @@ class RewardsInternalsShareController: UITableViewController {
         }
         let builder = RewardsInternalsSharableBuilder(rewards: self.rewards, dateFormatter: dateFormatter, dateAndTimeFormatter: dateAndTimeFormatter)
         do {
+            if FileManager.default.fileExists(atPath: dropDirectory.path) {
+                try FileManager.default.removeItem(at: dropDirectory)
+            }
             try FileManager.default.createDirectory(at: dropDirectory, withIntermediateDirectories: true, attributes: nil)
             let group = DispatchGroup()
             
