@@ -310,6 +310,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         let initialOnboarding =
             Preferences.General.basicOnboardingProgress.value == OnboardingProgress.none.rawValue
         
+        // FIXME: Update to iOS14 clipboard api once ready (#2838)
         if initialOnboarding && UIPasteboard.general.hasStrings {
             log.debug("Skipping URP call at app launch, this is handled in privacy consent onboarding screen")
             return
@@ -318,9 +319,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         if Preferences.URP.referralLookupOutstanding.value == true {
             var refCode: String?
             
-            let savedRefCode: String? =
-                (!checkClipboard && ProcessInfo().operatingSystemVersion.majorVersion > 13) ?
-                    nil : UIPasteboard.general.string
+            let savedRefCode = checkClipboard ? UIPasteboard.general.string : nil
             
             if Preferences.URP.referralCode.value == nil {
                 UrpLog.log("No ref code exists on launch, attempting clipboard retrieval")

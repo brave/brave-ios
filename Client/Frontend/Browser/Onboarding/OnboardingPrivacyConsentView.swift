@@ -27,12 +27,12 @@ extension OnboardingPrivacyConsentViewController {
             $0.distribution = .equalSpacing
         }
         
-        private let braveLogo = UIImageView(image: #imageLiteral(resourceName: "browser_lock_popup")).then { logo in
-            logo.contentMode = .scaleAspectFit
+        private let braveLogo = UIImageView(image: #imageLiteral(resourceName: "browser_lock_popup")).then {
+            $0.contentMode = .scaleAspectFit
         }
         
         private let titleLabel = CommonViews.primaryText(Strings.OBPrivacyConsentTitle).then {
-            $0.font = UIFont.systemFont(ofSize: 20, weight: UIFont.Weight.semibold)
+            $0.font = .systemFont(ofSize: 20, weight: .semibold)
             $0.numberOfLines = 0
         }
         
@@ -44,7 +44,7 @@ extension OnboardingPrivacyConsentViewController {
         
         private let refProgramLabel = UILabel().then {
             $0.text = Strings.OBPrivacyConsentDetail
-            $0.font = UIFont.systemFont(ofSize: 16, weight: .regular)
+            $0.font = .systemFont(ofSize: 16, weight: .regular)
             $0.numberOfLines = 0
             $0.textAlignment = .left
             $0.minimumScaleFactor = 0.7

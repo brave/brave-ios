@@ -63,7 +63,7 @@ class OnboardingNavigationController: UINavigationController {
                         newUserScreens.append(.adsCountdown)
                     }
                     
-                    // FIXME: Once iOS14 launches replace `hasStrings` with `UIPasteboard.DetectionPattern` api.
+                    // FIXME: Update to iOS14 clipboard api once ready (#2838)
                     if Preferences.URP.referralLookupOutstanding.value == true
                         && UIPasteboard.general.hasStrings {
                         newUserScreens.insert(.privacyConsent, at: 0)
