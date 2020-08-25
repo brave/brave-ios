@@ -52,6 +52,7 @@ class AboutShieldsViewController: UIViewController, Themeable {
             $0.width += 64
             $0.height += 64
         }
+        navigationController?.preferredContentSize = preferredContentSize
     }
     
     func applyTheme(_ theme: Theme) {
