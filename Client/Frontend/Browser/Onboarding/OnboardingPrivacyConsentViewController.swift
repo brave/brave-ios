@@ -21,11 +21,11 @@ class OnboardingPrivacyConsentViewController: OnboardingViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        contentView.yesConsentButton.addTarget(self, action: #selector(yesConsentTaapped), for: .touchUpInside)
+        contentView.yesConsentButton.addTarget(self, action: #selector(yesConsentTapped), for: .touchUpInside)
         contentView.noConsentButton.addTarget(self, action: #selector(noConsentTaapped), for: .touchUpInside)
     }
     
-    @objc func yesConsentTaapped() {
+    @objc func yesConsentTapped() {
         presentNextScreen(withPrivacyConsent: true)
     }
     

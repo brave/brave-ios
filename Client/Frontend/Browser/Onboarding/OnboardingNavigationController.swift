@@ -64,8 +64,7 @@ class OnboardingNavigationController: UINavigationController {
                     }
                     
                     // FIXME: Update to iOS14 clipboard api once ready (#2838)
-                    if Preferences.URP.referralLookupOutstanding.value == true
-                        && UIPasteboard.general.hasStrings {
+                    if Preferences.URP.referralCode.value == nil && UIPasteboard.general.hasStrings {
                         newUserScreens.insert(.privacyConsent, at: 0)
                     }
                     

@@ -319,17 +319,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         if Preferences.URP.referralLookupOutstanding.value == true {
             var refCode: String?
             
-            let savedRefCode = checkClipboard ? UIPasteboard.general.string : nil
-            
             if Preferences.URP.referralCode.value == nil {
                 UrpLog.log("No ref code exists on launch, attempting clipboard retrieval")
+                let savedRefCode = checkClipboard ? UIPasteboard.general.string : nil
                 refCode = UserReferralProgram.sanitize(input: savedRefCode)
-            }
-            
-            if refCode != nil {
-                UrpLog.log("Clipboard ref code found: " + (savedRefCode ?? "!Clipboard Empty!"))
-                UrpLog.log("Clearing clipboard.")
-                UIPasteboard.general.clearPasteboard()
+                
+                if refCode != nil {
+                    UrpLog.log("Clipboard ref code found: " + (savedRefCode ?? "!Clipboard Empty!"))
+                    UrpLog.log("Clearing clipboard.")
+                    UIPasteboard.general.clearPasteboard()
+                }
             }
             
             urp.referralLookup(refCode: refCode) { referralCode, offerUrl in

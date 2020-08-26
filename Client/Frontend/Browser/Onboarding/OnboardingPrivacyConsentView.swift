@@ -36,12 +36,6 @@ extension OnboardingPrivacyConsentViewController {
             $0.numberOfLines = 0
         }
         
-        private let copyFromClipboardLabel = UILabel().then {
-            $0.text = "Allow Brave to check my clipboard for a matching referral code"
-            $0.font = .systemFont(ofSize: 16, weight: .medium)
-            $0.numberOfLines = 0
-        }
-        
         private let refProgramLabel = UILabel().then {
             $0.text = Strings.OBPrivacyConsentDetail
             $0.font = .systemFont(ofSize: 16, weight: .regular)
