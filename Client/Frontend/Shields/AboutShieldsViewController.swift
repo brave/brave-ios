@@ -30,8 +30,6 @@ class AboutShieldsViewController: UIViewController, Themeable {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        applyTheme(Theme.of(tab))
-        
         self.title = Strings.aboutBraveShieldsTitle
         
         view.addSubview(textLabel)
@@ -57,5 +55,16 @@ class AboutShieldsViewController: UIViewController, Themeable {
     
     func applyTheme(_ theme: Theme) {
         view.backgroundColor = theme.isDark ? UIColor(rgb: 0x17171f) : UIColor.white
+        textLabel.textColor = theme.colors.tints.home
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        
+        if #available(iOS 13.0, *) {
+            if traitCollection.userInterfaceStyle != previousTraitCollection?.userInterfaceStyle {
+                applyTheme(Theme.of(tab))
+            }
+        }
     }
 }

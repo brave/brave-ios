@@ -34,7 +34,7 @@ class AdvancedShieldsView: UIStackView, Themeable {
         
         axis = .vertical
         
-        let rows = [
+        let rows: [UIView & Themeable] = [
             siteTitle,
             adsTrackersControl,
             httpsUpgradesControl,
@@ -51,7 +51,7 @@ class AdvancedShieldsView: UIStackView, Themeable {
             addArrangedSubview(row)
         }
         
-        themeableChildren = separators + [globalControlsButton]
+        themeableChildren = separators + rows
     }
     
     @available(*, unavailable)
@@ -62,12 +62,12 @@ class AdvancedShieldsView: UIStackView, Themeable {
 
 extension AdvancedShieldsView {
     
-    class HeaderTitleView: UIView {
+    class HeaderTitleView: UIView, Themeable {
         
         let titleLabel = UILabel().then {
             $0.font = .systemFont(ofSize: 13.0)
             $0.numberOfLines = 0
-            $0.textColor = Colors.grey700
+            $0.appearanceTextColor = Colors.grey700
         }
         
         override init(frame: CGRect) {
@@ -87,7 +87,7 @@ extension AdvancedShieldsView {
     }
     
     /// A container displaying a toggle for the user
-    class ToggleView: UIView {
+    class ToggleView: UIView, Themeable {
         
         let titleLabel: UILabel = {
             let l = UILabel()
@@ -135,6 +135,10 @@ extension AdvancedShieldsView {
         
         @objc private func switchValueChanged() {
             valueToggled?(toggleSwitch.isOn)
+        }
+        
+        func applyTheme(_ theme: Theme) {
+            titleLabel.textColor = theme.colors.tints.home
         }
     }
     
@@ -226,5 +230,6 @@ final class ChangeGlobalDefaultsView: UIControl, Themeable {
             UIColor(white: 1.0, alpha: 0.1) :
             UIColor(white: 0.0, alpha: 0.1)
         imageView.tintColor = theme.isDark ? Colors.grey500 : Colors.grey700
+        textLabel.textColor = theme.colors.tints.home
     }
 }

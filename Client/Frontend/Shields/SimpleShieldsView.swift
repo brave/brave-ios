@@ -91,7 +91,6 @@ class SimpleShieldsView: UIView, Themeable {
     }
     
     let reportSiteButton = ActionButton().then {
-        $0.tintColor = Colors.grey800
         $0.titleLabel?.font = .systemFont(ofSize: 16, weight: .semibold)
         $0.titleEdgeInsets = UIEdgeInsets(top: 4, left: 20, bottom: 4, right: 20)
         $0.setTitle(Strings.reportABrokenSite, for: .normal)
@@ -149,5 +148,11 @@ class SimpleShieldsView: UIView, Themeable {
         blockCountInfoButton.tintColor = theme.isDark ?
             Colors.orange400 :
             Colors.orange500
+        braveShieldsLabel.textColor = theme.colors.tints.home
+        statusLabel.textColor = theme.colors.tints.home
+        hostLabel.textColor = theme.isDark ? .white : .black
+        blockCountLabel.textColor = theme.isDark ? .white : .black
+        shieldsDownDisclaimerLabel.textColor = theme.colors.tints.home
+        reportSiteButton.tintColor = theme.isDark ? Colors.grey200 : Colors.grey800
     }
 }

@@ -10,7 +10,7 @@ import Data
 import BraveUI
 
 /// Displays shield settings and shield stats for a given URL
-class ShieldsViewController: UIViewController, PopoverContentComponent {
+class ShieldsViewController: UIViewController, PopoverContentComponent, Themeable {
     
     let tab: Tab
     private lazy var url: URL? = {
@@ -188,13 +188,27 @@ class ShieldsViewController: UIViewController, PopoverContentComponent {
         (.FpProtection, shieldsView.advancedShieldView.fingerprintingControl, Preferences.Shields.fingerprintingProtection),
     ]
     
-    var shieldsView: View2 {
-        return view as! View2 // swiftlint:disable:this force_cast
+    var shieldsView: View {
+        return view as! View // swiftlint:disable:this force_cast
     }
     
     override func loadView() {
-        view = View2()
-        shieldsView.applyTheme(Theme.of(tab))
+        view = View()
+        applyTheme(Theme.of(nil))
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        
+        if #available(iOS 13.0, *) {
+            if traitCollection.userInterfaceStyle != previousTraitCollection?.userInterfaceStyle {
+                applyTheme(Theme.of(nil))
+            }
+        }
+    }
+    
+    func applyTheme(_ theme: Theme) {
+        shieldsView.applyTheme(theme)
     }
     
     override func viewDidLoad() {
@@ -241,6 +255,7 @@ class ShieldsViewController: UIViewController, PopoverContentComponent {
     
     @objc private func tappedAboutShieldsButton() {
         let aboutShields = AboutShieldsViewController(tab: tab)
+        aboutShields.applyTheme(Theme.of(tab))
         aboutShields.preferredContentSize = preferredContentSize
         navigationController?.pushViewController(aboutShields, animated: true)
     }

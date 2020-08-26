@@ -7,7 +7,7 @@ import Shared
 import BraveShared
 
 extension ShieldsViewController {
-    class View2: UIView, Themeable {
+    class View: UIView, Themeable {
         
         private let scrollView = UIScrollView().then {
             $0.delaysContentTouches = false

@@ -58,6 +58,7 @@ class AdvancedControlsBarView: UIControl, Themeable {
         appearanceBackgroundColor = isDark ? Colors.grey900 : Colors.neutral000
         topBorderView.backgroundColor = UIColor(white: isDark ? 1.0 : 0.0, alpha: 0.2)
         imageView.image = UIImage(imageLiteralResourceName: isDark ? "advanced-bar-chevron-dark" : "advanced-bar-chevron").withRenderingMode(.alwaysOriginal)
+        label.textColor = theme.colors.tints.home
     }
     
     @available(*, unavailable)
