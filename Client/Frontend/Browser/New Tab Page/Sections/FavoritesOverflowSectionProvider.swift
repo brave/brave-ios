@@ -43,26 +43,11 @@ class FavoritesOverflowButton: SpringButton, Themeable {
     }
 }
 
-class FavoritesOverflowCell: NewTabCollectionViewCell<FavoritesOverflowButton> {
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        view.snp.remakeConstraints {
-            $0.top.bottom.equalToSuperview()
-            $0.centerX.equalToSuperview()
-        }
-    }
-    
-    override func preferredLayoutAttributesFitting(_ layoutAttributes: UICollectionViewLayoutAttributes) -> UICollectionViewLayoutAttributes {
-        // swiftlint:disable:next force_cast
-        let attributes = layoutAttributes.copy() as! UICollectionViewLayoutAttributes
-        attributes.size.height = systemLayoutSizeFitting(layoutAttributes.size, withHorizontalFittingPriority: .required, verticalFittingPriority: .fittingSizeLevel).height
-        return attributes
-    }
-}
-
 class FavoritesOverflowSectionProvider: NSObject, NTPObservableSectionProvider {
     let action: () -> Void
     var sectionDidChange: (() -> Void)?
+    
+    private typealias Cell = NewTabCenteredCollectionViewCell<FavoritesOverflowButton>
     
     private var frc: NSFetchedResultsController<Bookmark>
     
@@ -86,11 +71,11 @@ class FavoritesOverflowSectionProvider: NSObject, NTPObservableSectionProvider {
     }
     
     func registerCells(to collectionView: UICollectionView) {
-        collectionView.register(FavoritesOverflowCell.self)
+        collectionView.register(Cell.self)
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(for: indexPath) as FavoritesOverflowCell
+        let cell = collectionView.dequeueReusableCell(for: indexPath) as Cell
         cell.view.addTarget(self, action: #selector(tappedButton), for: .touchUpInside)
         return cell
     }
