@@ -241,6 +241,7 @@ class ShieldsViewController: UIViewController, PopoverContentComponent, Themeabl
             shieldsView.simpleShieldView.faviconImageView.isHidden = true
         }
         shieldsView.simpleShieldView.hostLabel.text = url?.normalizedHost()
+        shieldsView.reportBrokenSiteView.urlLabel.text = url?.absoluteString
         shieldsView.simpleShieldView.shieldsSwitch.addTarget(self, action: #selector(shieldsOverrideSwitchValueChanged), for: .valueChanged)
         shieldsView.advancedShieldView.siteTitle.titleLabel.text = url?.normalizedHost()?.uppercased()
         
