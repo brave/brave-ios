@@ -9,7 +9,16 @@ import BraveUI
 
 class SimpleShieldsView: UIView, Themeable {
     
-    let faviconImageView = UIImageView()
+    let faviconImageView = UIImageView().then {
+        $0.snp.makeConstraints {
+            $0.size.equalTo(24)
+        }
+        $0.layer.cornerRadius = 4
+        if #available(iOS 13.0, *) {
+            $0.layer.cornerCurve = .continuous
+        }
+        $0.clipsToBounds = true
+    }
     
     let hostLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 25.0)
@@ -18,13 +27,13 @@ class SimpleShieldsView: UIView, Themeable {
     let shieldsSwitch = ShieldsSwitch()
     
     private let braveShieldsLabel = UILabel().then {
-        $0.text = Strings.braveShieldsStatusTitle
+        $0.text = Strings.Shields.statusTitle
         $0.font = .systemFont(ofSize: 16, weight: .medium)
     }
     
     let statusLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 16, weight: .bold)
-        $0.text = Strings.braveShieldsStatusValueUp.uppercased()
+        $0.text = Strings.Shields.statusValueUp.uppercased()
     }
     
     // Shields Up
@@ -46,7 +55,7 @@ class SimpleShieldsView: UIView, Themeable {
     private lazy var blockDescriptionLabel = ViewLabel().then {
         $0.attributedText = {
             let string = NSMutableAttributedString(
-                string: Strings.braveShieldsBlockedCountLabel,
+                string: Strings.Shields.blockedCountLabel,
                 attributes: [.font: UIFont.systemFont(ofSize: 13.0)]
             )
             let attachment = ViewTextAttachment(view: self.blockCountInfoButton)
@@ -63,11 +72,11 @@ class SimpleShieldsView: UIView, Themeable {
         $0.imageEdgeInsets = .zero
         $0.titleEdgeInsets = .zero
         $0.contentEdgeInsets = UIEdgeInsets(top: -2, left: 4, bottom: -3, right: 4)
-        $0.accessibilityLabel = Strings.braveShieldsBlockedInfoButtonAccessibilityLabel
+        $0.accessibilityLabel = Strings.Shields.blockedInfoButtonAccessibilityLabel
     }
     
     let footerLabel = UILabel().then {
-        $0.text = Strings.braveShieldsSiteBroken
+        $0.text = Strings.Shields.siteBroken
         $0.font = .systemFont(ofSize: 13.0)
         $0.appearanceTextColor = UIColor(rgb: 0x868e96)
         $0.numberOfLines = 0
@@ -85,15 +94,15 @@ class SimpleShieldsView: UIView, Themeable {
     
     private let shieldsDownDisclaimerLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 13)
-        $0.text = Strings.shieldsDownDisclaimer
+        $0.text = Strings.Shields.shieldsDownDisclaimer
         $0.numberOfLines = 0
         $0.textAlignment = .center
     }
     
-    let reportSiteButton = ActionButton().then {
+    let reportSiteButton = ActionButton(type: .system).then {
         $0.titleLabel?.font = .systemFont(ofSize: 16, weight: .semibold)
         $0.titleEdgeInsets = UIEdgeInsets(top: 4, left: 20, bottom: 4, right: 20)
-        $0.setTitle(Strings.reportABrokenSite, for: .normal)
+        $0.setTitle(Strings.Shields.reportABrokenSite, for: .normal)
     }
     
     override init(frame: CGRect) {

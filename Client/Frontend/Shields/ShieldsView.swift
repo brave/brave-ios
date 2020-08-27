@@ -13,6 +13,18 @@ extension ShieldsViewController {
             $0.delaysContentTouches = false
         }
         
+        var contentView: UIView? {
+            didSet {
+                oldValue?.removeFromSuperview()
+                if let view = contentView {
+                    scrollView.addSubview(view)
+                    view.snp.makeConstraints {
+                        $0.edges.equalToSuperview()
+                    }
+                }
+            }
+        }
+        
         let stackView = UIStackView().then {
             $0.axis = .vertical
             $0.isLayoutMarginsRelativeArrangement = true
@@ -24,6 +36,9 @@ extension ShieldsViewController {
         let advancedShieldView = AdvancedShieldsView().then {
             $0.isHidden = true
         }
+        
+        let reportBrokenSiteView = ReportBrokenSiteView()
+        let siteReportedView = SiteReportedView()
         
         override init(frame: CGRect) {
             super.init(frame: frame)
@@ -46,12 +61,15 @@ extension ShieldsViewController {
             stackView.snp.makeConstraints {
                 $0.edges.equalToSuperview()
             }
+            
+            contentView = stackView
         }
         
         func applyTheme(_ theme: Theme) {
             simpleShieldView.applyTheme(theme)
             advancedControlsBar.applyTheme(theme)
             advancedShieldView.applyTheme(theme)
+            reportBrokenSiteView.applyTheme(theme)
             
             backgroundColor = theme.isDark ? UIColor(rgb: 0x17171f) : UIColor.white
         }

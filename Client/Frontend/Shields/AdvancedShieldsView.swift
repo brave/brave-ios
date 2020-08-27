@@ -18,7 +18,7 @@ class AdvancedShieldsView: UIStackView, Themeable {
     let blockScriptsControl = ToggleView(title: Strings.blockScripts)
     let fingerprintingControl = ToggleView(title: Strings.fingerprintingProtectionWrapped)
     let globalControlsTitleView = HeaderTitleView().then {
-        $0.titleLabel.text = Strings.braveShieldsGlobalControls.uppercased()
+        $0.titleLabel.text = Strings.Shields.globalControls.uppercased()
     }
     let globalControlsButton = ChangeGlobalDefaultsView()
     
@@ -176,7 +176,7 @@ final class ChangeGlobalDefaultsView: UIControl, Themeable {
     private let textLabel = UILabel().then {
         $0.setContentHuggingPriority(.defaultLow, for: .horizontal)
         $0.font = .systemFont(ofSize: 15.0)
-        $0.text = Strings.braveShieldsGlobalChangeButton
+        $0.text = Strings.Shields.globalChangeButton
     }
     private let chevron = UIImageView(image: UIImage(imageLiteralResourceName: "chevron").template).then {
         $0.setContentHuggingPriority(.required, for: .horizontal)

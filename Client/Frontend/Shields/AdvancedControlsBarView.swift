@@ -18,7 +18,7 @@ class AdvancedControlsBarView: UIControl, Themeable {
     private let topBorderView = UIView()
     
     private let label = UILabel().then {
-        $0.text = Strings.braveShieldsAdvancedControls
+        $0.text = Strings.Shields.advancedControls
         $0.font = .systemFont(ofSize: 16)
         $0.numberOfLines = 0
     }

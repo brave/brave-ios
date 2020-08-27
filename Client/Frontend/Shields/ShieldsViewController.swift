@@ -107,8 +107,8 @@ class ShieldsViewController: UIViewController, PopoverContentComponent, Themeabl
     
     private func updateGlobalShieldState(_ on: Bool, animated: Bool = false) {
         shieldsView.simpleShieldView.statusLabel.text = on ?
-            Strings.braveShieldsStatusValueUp.uppercased() :
-            Strings.braveShieldsStatusValueDown.uppercased()
+            Strings.Shields.statusValueUp.uppercased() :
+            Strings.Shields.statusValueDown.uppercased()
         
         // Whether or not shields are available for this URL.
         let isShieldsAvailable = url?.isLocal == false
@@ -166,12 +166,33 @@ class ShieldsViewController: UIViewController, PopoverContentComponent, Themeabl
         }
     }
     
+    private func updateContentView(to view: UIView, animated: Bool) {
+        if animated {
+            UIView.animate(withDuration: shieldsView.contentView == nil ? 0 : 0.1, animations: {
+                self.shieldsView.contentView?.alpha = 0.0
+            }, completion: { _ in
+                self.shieldsView.contentView = view
+                view.alpha = 0
+                self.updatePreferredContentSize()
+                UIView.animate(withDuration: 0.1) {
+                    view.alpha = 1.0
+                }
+            })
+        } else {
+            shieldsView.contentView = view
+        }
+    }
+    
     private func updatePreferredContentSize() {
-        shieldsView.stackView.setNeedsLayout()
-        shieldsView.stackView.layoutIfNeeded()
+        guard let visibleView = shieldsView.contentView else { return }
+        visibleView.setNeedsLayout()
+        visibleView.layoutIfNeeded()
         
-        preferredContentSize = shieldsView.stackView.systemLayoutSizeFitting(
-            UIScreen.main.bounds.size,
+        preferredContentSize = visibleView.systemLayoutSizeFitting(
+            CGSize(
+                width: UIScreen.main.bounds.width - 20,
+                height: UIScreen.main.bounds.height
+            ),
             withHorizontalFittingPriority: .required,
             verticalFittingPriority: .fittingSizeLevel
         )
@@ -214,12 +235,20 @@ class ShieldsViewController: UIViewController, PopoverContentComponent, Themeabl
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        if let url = url {
+            shieldsView.simpleShieldView.faviconImageView.loadFavicon(for: url)
+        } else {
+            shieldsView.simpleShieldView.faviconImageView.isHidden = true
+        }
         shieldsView.simpleShieldView.hostLabel.text = url?.normalizedHost()
         shieldsView.simpleShieldView.shieldsSwitch.addTarget(self, action: #selector(shieldsOverrideSwitchValueChanged), for: .valueChanged)
         shieldsView.advancedShieldView.siteTitle.titleLabel.text = url?.normalizedHost()?.uppercased()
         
         shieldsView.advancedControlsBar.addTarget(self, action: #selector(tappedAdvancedControlsBar), for: .touchUpInside)
         shieldsView.simpleShieldView.blockCountInfoButton.addTarget(self, action: #selector(tappedAboutShieldsButton), for: .touchUpInside)
+        
+        shieldsView.simpleShieldView.reportSiteButton.addTarget(self, action: #selector(tappedReportSiteButton), for: .touchUpInside)
+        shieldsView.reportBrokenSiteView.cancelButton.addTarget(self, action: #selector(tappedCancelReportingButton), for: .touchUpInside)
         
         updateShieldBlockStats()
         
@@ -258,6 +287,14 @@ class ShieldsViewController: UIViewController, PopoverContentComponent, Themeabl
         aboutShields.applyTheme(Theme.of(tab))
         aboutShields.preferredContentSize = preferredContentSize
         navigationController?.pushViewController(aboutShields, animated: true)
+    }
+    
+    @objc private func tappedReportSiteButton() {
+        updateContentView(to: shieldsView.reportBrokenSiteView, animated: true)
+    }
+    
+    @objc private func tappedCancelReportingButton() {
+        updateContentView(to: shieldsView.stackView, animated: true)
     }
     
     @available(*, unavailable)

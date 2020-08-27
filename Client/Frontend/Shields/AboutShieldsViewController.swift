@@ -22,7 +22,7 @@ class AboutShieldsViewController: UIViewController, Themeable {
     }
     
     private let textLabel = UILabel().then {
-        $0.text = Strings.aboutBraveShieldsBody
+        $0.text = Strings.Shields.aboutBraveShieldsBody
         $0.font = .systemFont(ofSize: 16)
         $0.numberOfLines = 0
     }
@@ -30,7 +30,7 @@ class AboutShieldsViewController: UIViewController, Themeable {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.title = Strings.aboutBraveShieldsTitle
+        self.title = Strings.Shields.aboutBraveShieldsTitle
         
         view.addSubview(textLabel)
         
