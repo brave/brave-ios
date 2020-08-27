@@ -65,6 +65,7 @@ class ReportBrokenSiteView: UIStackView, Themeable {
             .view(UIStackView().then {
                 $0.spacing = 10
                 $0.addStackViewItems(
+                    .view(UIView()), // spacer
                     .view(cancelButton),
                     .view(submitButton)
                 )

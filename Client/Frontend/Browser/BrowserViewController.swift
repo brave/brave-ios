@@ -1952,6 +1952,9 @@ extension BrowserViewController: TopToolbarDelegate {
     
     func topToolbarDidTapBraveShieldsButton(_ topToolbar: TopToolbarView) {
         guard let selectedTab = tabManager.selectedTab else { return }
+        if selectedTab.url?.isLocalUtility == true {
+            return
+        }
         let shields = ShieldsViewController(tab: selectedTab)
         shields.shieldsSettingsChanged = { [unowned self] _ in
             // Reload this tab. This will also trigger an update of the brave icon in `TabLocationView` if

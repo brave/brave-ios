@@ -25,7 +25,6 @@ class SiteReportedView: UIStackView, Themeable {
         super.init(frame: frame)
         
         axis = .vertical
-        alignment = .leading
         spacing = 16
         
         layoutMargins = UIEdgeInsets(equalInset: 30)
@@ -35,7 +34,10 @@ class SiteReportedView: UIStackView, Themeable {
             .view(UIStackView().then {
                 $0.spacing = 16
                 $0.addStackViewItems(
-                    .view(UIImageView(image: UIImage(imageLiteralResourceName: "check-circle"))),
+                    .view(UIImageView(image: UIImage(imageLiteralResourceName: "check-circle")).then {
+                        $0.setContentHuggingPriority(.required, for: .horizontal)
+                        $0.setContentHuggingPriority(.required, for: .vertical)
+                    }),
                     .view(titleLabel)
                 )
             }),

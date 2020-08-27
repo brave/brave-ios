@@ -249,6 +249,7 @@ class ShieldsViewController: UIViewController, PopoverContentComponent, Themeabl
         
         shieldsView.simpleShieldView.reportSiteButton.addTarget(self, action: #selector(tappedReportSiteButton), for: .touchUpInside)
         shieldsView.reportBrokenSiteView.cancelButton.addTarget(self, action: #selector(tappedCancelReportingButton), for: .touchUpInside)
+        shieldsView.reportBrokenSiteView.submitButton.addTarget(self, action: #selector(tappedSubmitReportingButton), for: .touchUpInside)
         
         updateShieldBlockStats()
         
@@ -295,6 +296,10 @@ class ShieldsViewController: UIViewController, PopoverContentComponent, Themeabl
     
     @objc private func tappedCancelReportingButton() {
         updateContentView(to: shieldsView.stackView, animated: true)
+    }
+    
+    @objc private func tappedSubmitReportingButton() {
+        updateContentView(to: shieldsView.siteReportedView, animated: true)
     }
     
     @available(*, unavailable)
