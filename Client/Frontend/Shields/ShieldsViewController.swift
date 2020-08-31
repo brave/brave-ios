@@ -186,16 +186,16 @@ class ShieldsViewController: UIViewController, PopoverContentComponent, Themeabl
     
     private func updatePreferredContentSize() {
         guard let visibleView = shieldsView.contentView else { return }
-        visibleView.setNeedsLayout()
-        visibleView.layoutIfNeeded()
+        let width = min(360, UIScreen.main.bounds.width - 20)
+        // Ensure the a static width is given to the main view so we can calculate the height
+        // correctly when we force a layout
+        shieldsView.frame = CGRect(origin: .zero, size: .init(width: width, height: 0))
+        shieldsView.setNeedsLayout()
+        shieldsView.layoutIfNeeded()
         
-        preferredContentSize = visibleView.systemLayoutSizeFitting(
-            CGSize(
-                width: min(360, UIScreen.main.bounds.width - 20),
-                height: UIScreen.main.bounds.height
-            ),
-            withHorizontalFittingPriority: .required,
-            verticalFittingPriority: .fittingSizeLevel
+        preferredContentSize = CGSize(
+            width: width,
+            height: visibleView.bounds.height
         )
     }
     
