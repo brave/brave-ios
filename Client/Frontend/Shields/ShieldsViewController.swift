@@ -191,7 +191,7 @@ class ShieldsViewController: UIViewController, PopoverContentComponent, Themeabl
         
         preferredContentSize = visibleView.systemLayoutSizeFitting(
             CGSize(
-                width: UIScreen.main.bounds.width - 20,
+                width: min(360, UIScreen.main.bounds.width - 20),
                 height: UIScreen.main.bounds.height
             ),
             withHorizontalFittingPriority: .required,
