@@ -260,6 +260,12 @@ class ShieldsViewController: UIViewController, PopoverContentComponent, Themeabl
         
         updateToggleStatus()
         
+        if advancedControlsShowing {
+            shieldsView.advancedShieldView.isHidden = false
+            shieldsView.advancedControlsBar.isShowingAdvancedControls = true
+            updatePreferredContentSize()
+        }
+        
         shieldControlMapping.forEach { shield, toggle, option in
             toggle.valueToggled = { [unowned self] on in
                 // Localized / per domain toggles triggered here
@@ -276,10 +282,12 @@ class ShieldsViewController: UIViewController, PopoverContentComponent, Themeabl
         self.shieldsSettingsChanged?(self)
     }
     
-    private var advancedControlsShowing: Bool = false
+    private var advancedControlsShowing: Bool {
+        Preferences.Shields.advancedControlsVisible.value
+    }
     
     @objc private func tappedAdvancedControlsBar() {
-        advancedControlsShowing.toggle()
+        Preferences.Shields.advancedControlsVisible.value.toggle()
         UIView.animate(withDuration: 0.25) {
             self.shieldsView.advancedShieldView.isHidden.toggle()
         }
