@@ -1964,6 +1964,30 @@ extension BrowserViewController: TopToolbarDelegate {
             // In 1.6 we "reload" the whole web view state, dumping caches, etc. (reload():BraveWebView.swift:495)
             // BRAVE TODO: Port over proper tab reloading with Shields
         }
+        shields.showGlobalShieldsSettings = { [unowned self] vc in
+            vc.dismiss(animated: true) {
+                let shieldsAndPrivacy = BraveShieldsAndPrivacySettingsController(
+                    profile: self.profile,
+                    tabManager: self.tabManager,
+                    feedDataSource: self.feedDataSource
+                )
+                let container = SettingsNavigationController(rootViewController: shieldsAndPrivacy)
+                if #available(iOS 13.0, *) {
+                    container.isModalInPresentation = true
+                    container.modalPresentationStyle =
+                        UIDevice.current.userInterfaceIdiom == .phone ? .pageSheet : .formSheet
+                } else {
+                    container.modalPresentationStyle =
+                        UIDevice.current.userInterfaceIdiom == .phone ? .fullScreen : .formSheet
+                }
+                shieldsAndPrivacy.navigationItem.rightBarButtonItem = .init(
+                    barButtonSystemItem: .done,
+                    target: container,
+                    action: #selector(SettingsNavigationController.done)
+                )
+                self.present(container, animated: true)
+            }
+        }
         let container = PopoverNavigationController(rootViewController: shields)
         let popover = PopoverController(contentController: container, contentSizeBehavior: .preferredContentSize)
         popover.present(from: topToolbar.locationView.shieldsButton, on: self)

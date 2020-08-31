@@ -24,6 +24,7 @@ class ShieldsViewController: UIViewController, PopoverContentComponent, Themeabl
     }()
     
     var shieldsSettingsChanged: ((ShieldsViewController) -> Void)?
+    var showGlobalShieldsSettings: ((ShieldsViewController) -> Void)?
     
     private var statsUpdateObservable: AnyObject?
     
@@ -244,6 +245,7 @@ class ShieldsViewController: UIViewController, PopoverContentComponent, Themeabl
         shieldsView.reportBrokenSiteView.urlLabel.text = url?.absoluteString
         shieldsView.simpleShieldView.shieldsSwitch.addTarget(self, action: #selector(shieldsOverrideSwitchValueChanged), for: .valueChanged)
         shieldsView.advancedShieldView.siteTitle.titleLabel.text = url?.normalizedHost()?.uppercased()
+        shieldsView.advancedShieldView.globalControlsButton.addTarget(self, action: #selector(tappedGlobalShieldsButton), for: .touchUpInside)
         
         shieldsView.advancedControlsBar.addTarget(self, action: #selector(tappedAdvancedControlsBar), for: .touchUpInside)
         shieldsView.simpleShieldView.blockCountInfoButton.addTarget(self, action: #selector(tappedAboutShieldsButton), for: .touchUpInside)
@@ -301,6 +303,10 @@ class ShieldsViewController: UIViewController, PopoverContentComponent, Themeabl
     
     @objc private func tappedSubmitReportingButton() {
         updateContentView(to: shieldsView.siteReportedView, animated: true)
+    }
+    
+    @objc private func tappedGlobalShieldsButton() {
+        showGlobalShieldsSettings?(self)
     }
     
     @available(*, unavailable)
