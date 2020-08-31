@@ -5,6 +5,7 @@
 import UIKit
 import pop
 import BraveUI
+import Shared
 
 /// A big UISwitch that has a fancy animated gradient when its turned on
 ///
@@ -93,6 +94,7 @@ class ShieldsSwitch: UIControl {
         
         isAccessibilityElement = true
         accessibilityTraits = [.button]
+        accessibilityHint = Strings.Shields.toggleHint
         
         addSubview(backgroundView)
         addSubview(gradientView)
@@ -111,6 +113,13 @@ class ShieldsSwitch: UIControl {
             gradientView.gradientLayer.colors = step.gradientColors
             gradientView.gradientLayer.shadowColor = step.shadowColor
         }
+    }
+    
+    override var accessibilityLabel: String? {
+        get {
+            "\(Strings.Shields.statusTitle): \(isOn ? Strings.Shields.statusValueUp : Strings.Shields.statusValueDown)"
+        }
+        set { assertionFailure() } // swiftlint:disable:this unused_setter_value
     }
     
     @available(*, unavailable)

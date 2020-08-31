@@ -126,11 +126,30 @@ extension AdvancedShieldsView {
             snp.makeConstraints {
                 $0.height.greaterThanOrEqualTo(toggleSwitch)
             }
+            
+            isAccessibilityElement = true
+            accessibilityTraits.insert(.button)
         }
         
         @available(*, unavailable)
         required init?(coder aDecoder: NSCoder) {
             fatalError()
+        }
+        
+        override func accessibilityActivate() -> Bool {
+            toggleSwitch.setOn(!toggleSwitch.isOn, animated: true)
+            toggleSwitch.sendActions(for: .valueChanged)
+            return true
+        }
+        
+        override var accessibilityLabel: String? {
+            get { titleLabel.accessibilityLabel }
+            set { assertionFailure() } // swiftlint:disable:this unused_setter_value
+        }
+        
+        override var accessibilityValue: String? {
+            get { toggleSwitch.accessibilityValue }
+            set { assertionFailure() } // swiftlint:disable:this unused_setter_value
         }
         
         @objc private func switchValueChanged() {
@@ -193,6 +212,10 @@ final class ChangeGlobalDefaultsView: UIControl, Themeable {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        
+        isAccessibilityElement = true
+        accessibilityTraits.insert(.button)
+        accessibilityLabel = textLabel.text
         
         let stackView = UIStackView().then {
             $0.spacing = 10

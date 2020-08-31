@@ -85,7 +85,7 @@ class ShieldsViewController: UIViewController, PopoverContentComponent, Themeabl
     }
     
     private func updateShieldBlockStats() {
-        shieldsView.simpleShieldView.blockCountLabel.text = String(
+        shieldsView.simpleShieldView.blockCountView.countLabel.text = String(
             tab.contentBlocker.stats.adCount +
             tab.contentBlocker.stats.trackerCount +
             tab.contentBlocker.stats.httpsCount +
@@ -121,7 +121,7 @@ class ShieldsViewController: UIViewController, PopoverContentComponent, Themeabl
             if shieldsEnabled {
                 partOneViews = [self.shieldsView.simpleShieldView.shieldsDownStackView]
                 partTwoViews = [
-                    self.shieldsView.simpleShieldView.blockCountStackView,
+                    self.shieldsView.simpleShieldView.blockCountView,
                     self.shieldsView.simpleShieldView.footerLabel,
                     self.shieldsView.advancedControlsBar
                 ]
@@ -130,7 +130,7 @@ class ShieldsViewController: UIViewController, PopoverContentComponent, Themeabl
                 }
             } else {
                 partOneViews = [
-                    self.shieldsView.simpleShieldView.blockCountStackView,
+                    self.shieldsView.simpleShieldView.blockCountView,
                     self.shieldsView.simpleShieldView.footerLabel,
                     self.shieldsView.advancedControlsBar,
                 ]
@@ -158,7 +158,7 @@ class ShieldsViewController: UIViewController, PopoverContentComponent, Themeabl
                 self.updatePreferredContentSize()
             })
         } else {
-            shieldsView.simpleShieldView.blockCountStackView.isHidden = !shieldsEnabled
+            shieldsView.simpleShieldView.blockCountView.isHidden = !shieldsEnabled
             shieldsView.simpleShieldView.footerLabel.isHidden = !shieldsEnabled
             shieldsView.simpleShieldView.shieldsDownStackView.isHidden = shieldsEnabled
             shieldsView.advancedControlsBar.isHidden = !shieldsEnabled
@@ -248,7 +248,7 @@ class ShieldsViewController: UIViewController, PopoverContentComponent, Themeabl
         shieldsView.advancedShieldView.globalControlsButton.addTarget(self, action: #selector(tappedGlobalShieldsButton), for: .touchUpInside)
         
         shieldsView.advancedControlsBar.addTarget(self, action: #selector(tappedAdvancedControlsBar), for: .touchUpInside)
-        shieldsView.simpleShieldView.blockCountInfoButton.addTarget(self, action: #selector(tappedAboutShieldsButton), for: .touchUpInside)
+        shieldsView.simpleShieldView.blockCountView.infoButton.addTarget(self, action: #selector(tappedAboutShieldsButton), for: .touchUpInside)
         
         shieldsView.simpleShieldView.reportSiteButton.addTarget(self, action: #selector(tappedReportSiteButton), for: .touchUpInside)
         shieldsView.reportBrokenSiteView.cancelButton.addTarget(self, action: #selector(tappedCancelReportingButton), for: .touchUpInside)

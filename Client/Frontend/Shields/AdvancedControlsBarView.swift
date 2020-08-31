@@ -36,11 +36,17 @@ class AdvancedControlsBarView: UIControl, Themeable {
             $0.isUserInteractionEnabled = false
         }
         
+        isAccessibilityElement = true
+        accessibilityTraits.insert(.button)
+        
         addSubview(topBorderView)
         addSubview(stackView)
         
         stackView.addArrangedSubview(label)
         stackView.addArrangedSubview(imageView)
+        
+        accessibilityLabel = label.text
+        accessibilityValue = isShowingAdvancedControls ? "1" : "0"
         
         topBorderView.snp.makeConstraints {
             $0.top.leading.trailing.equalTo(self)
