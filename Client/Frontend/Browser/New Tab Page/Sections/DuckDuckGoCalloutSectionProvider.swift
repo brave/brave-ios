@@ -58,7 +58,7 @@ class DuckDuckGoCalloutSectionProvider: NSObject, NTPObservableSectionProvider {
     private let profile: Profile
     private let action: () -> Void
     
-    private typealias Cell = NewTabCenteredCollectionViewCell<DuckDuckGoCalloutButton>
+    private typealias DuckDuckGoCalloutCell = NewTabCenteredCollectionViewCell<DuckDuckGoCalloutButton>
     
     init(profile: Profile, action: @escaping () -> Void) {
         self.profile = profile
@@ -88,11 +88,11 @@ class DuckDuckGoCalloutSectionProvider: NSObject, NTPObservableSectionProvider {
     }
     
     func registerCells(to collectionView: UICollectionView) {
-        collectionView.register(Cell.self)
+        collectionView.register(DuckDuckGoCalloutCell.self)
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(for: indexPath) as Cell
+        let cell = collectionView.dequeueReusableCell(for: indexPath) as DuckDuckGoCalloutCell
         cell.view.addTarget(self, action: #selector(tappedButton), for: .touchUpInside)
         return cell
     }

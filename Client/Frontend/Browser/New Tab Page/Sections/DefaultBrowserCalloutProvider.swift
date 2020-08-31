@@ -11,7 +11,7 @@ import BraveShared
 class DefaultBrowserCalloutProvider: NSObject, NTPObservableSectionProvider {
     var sectionDidChange: (() -> Void)?
     
-    private typealias Cell = NewTabCenteredCollectionViewCell<DefaultBrowserCalloutView>
+    private typealias DefaultBrowserCalloutCell = NewTabCenteredCollectionViewCell<DefaultBrowserCalloutView>
     
     static var shouldShowCallout: Bool {
         !Preferences.General.defaultBrowserCalloutDismissed.value
@@ -19,7 +19,7 @@ class DefaultBrowserCalloutProvider: NSObject, NTPObservableSectionProvider {
     }
     
     func registerCells(to collectionView: UICollectionView) {
-        collectionView.register(Cell.self)
+        collectionView.register(DefaultBrowserCalloutCell.self)
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -28,7 +28,7 @@ class DefaultBrowserCalloutProvider: NSObject, NTPObservableSectionProvider {
     
     func collectionView(_ collectionView: UICollectionView,
                         cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(for: indexPath) as Cell
+        let cell = collectionView.dequeueReusableCell(for: indexPath) as DefaultBrowserCalloutCell
         cell.view.addTarget(self, action: #selector(openSettings), for: .touchUpInside)
         cell.view.closeHaandler = { [weak self] in
             Preferences.General.defaultBrowserCalloutDismissed.value = true
@@ -71,6 +71,7 @@ private class DefaultBrowserCalloutView: SpringButton, Themeable {
         $0.setImage(#imageLiteral(resourceName: "close_tab_bar").template, for: .normal)
         $0.tintColor = .lightGray
         $0.contentEdgeInsets = UIEdgeInsets(equalInset: 4)
+        $0.accessibilityLabel = Strings.defaultBrowserCalloutCloseAccesabilityLabel
     }
     
     private let label = UILabel().then {

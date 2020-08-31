@@ -47,7 +47,7 @@ class FavoritesOverflowSectionProvider: NSObject, NTPObservableSectionProvider {
     let action: () -> Void
     var sectionDidChange: (() -> Void)?
     
-    private typealias Cell = NewTabCenteredCollectionViewCell<FavoritesOverflowButton>
+    private typealias FavoritesOverflowCell = NewTabCenteredCollectionViewCell<FavoritesOverflowButton>
     
     private var frc: NSFetchedResultsController<Bookmark>
     
@@ -71,11 +71,11 @@ class FavoritesOverflowSectionProvider: NSObject, NTPObservableSectionProvider {
     }
     
     func registerCells(to collectionView: UICollectionView) {
-        collectionView.register(Cell.self)
+        collectionView.register(FavoritesOverflowCell.self)
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(for: indexPath) as Cell
+        let cell = collectionView.dequeueReusableCell(for: indexPath) as FavoritesOverflowCell
         cell.view.addTarget(self, action: #selector(tappedButton), for: .touchUpInside)
         return cell
     }

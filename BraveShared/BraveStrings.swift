@@ -335,6 +335,9 @@ extension Strings {
     public static let setDefaultBrowserCalloutTitle =
         NSLocalizedString("setDefaultBrowserCalloutTitle", tableName: "BraveShared", bundle: .braveShared,
                           value: "Brave can now be set as your default browser in iOS. Tap here to open settings.", comment: "")
+    public static let defaultBrowserCalloutCloseAccesabilityLabel =
+        NSLocalizedString("defaultBrowserCalloutCloseAccesabilityLabel", tableName: "BraveShared",
+                          bundle: .braveShared, value: "Close default browser callout", comment: "")
 }
 
 // MARK:- Error pages.
