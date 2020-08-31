@@ -260,7 +260,7 @@ class ShieldsViewController: UIViewController, PopoverContentComponent, Themeabl
         
         updateToggleStatus()
         
-        if advancedControlsShowing {
+        if advancedControlsShowing && shieldsUpSwitch.isOn {
             shieldsView.advancedShieldView.isHidden = false
             shieldsView.advancedControlsBar.isShowingAdvancedControls = true
             updatePreferredContentSize()
