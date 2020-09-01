@@ -34,13 +34,18 @@ public class WebcompatReporter {
         components.host = baseURL
         components.path = "/\(version)/webcompat"
         
-        guard let domain = url.baseDomain,
+        guard let baseDomain = url.baseDomain,
             let key = apiKey,
             let endpoint = components.url else {
                 log.error("Failed to setup webcompat request")
                 deferred.fill(false)
                 return deferred
         }
+        
+        // We want to ensure that the URL _can_ be normalized, since `domainURL` will return itself
+        // (the full URL) if the URL can't be normalized. If the URL can't be normalized, send only
+        // the base domain without scheme.
+        let domain = url.normalizedHost() != nil ? url.domainURL.absoluteString : baseDomain
         
         let payload = [
             "domain": domain,

@@ -94,7 +94,7 @@ class SimpleShieldsView: UIView, Themeable {
             get {
                 [countLabel.accessibilityLabel, Strings.Shields.blockedCountLabel]
                     .compactMap { $0 }
-                    .joined(separator: ".")
+                    .joined(separator: " ")
             }
             set { assertionFailure() } // swiftlint:disable:this unused_setter_value
         }
