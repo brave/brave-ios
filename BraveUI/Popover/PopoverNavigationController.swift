@@ -104,7 +104,7 @@ open class PopoverNavigationController: UINavigationController, PopoverContentCo
   /// Used because when you pop a controller off the stack it is no longer listed within
   /// `viewControllers`, or set as `visibleViewController` even if the animation is still
   /// ongoing.
-  weak var lastPoppedController: UIViewController?
+  private(set) weak var lastPoppedController: UIViewController?
   
   open override func popViewController(animated: Bool) -> UIViewController? {
     let vc = super.popViewController(animated: animated)

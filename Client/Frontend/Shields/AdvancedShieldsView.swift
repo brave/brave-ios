@@ -121,7 +121,6 @@ extension AdvancedShieldsView {
             toggleSwitch.addTarget(self, action: #selector(switchValueChanged), for: .valueChanged)
             
             toggleSwitch.setContentHuggingPriority(.required, for: .horizontal)
-//            titleLabel.setContentCompressionResistancePriority(.required, for: .vertical)
             
             snp.makeConstraints {
                 $0.height.greaterThanOrEqualTo(toggleSwitch)
