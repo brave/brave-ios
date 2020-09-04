@@ -312,6 +312,10 @@ class ShieldsViewController: UIViewController, PopoverContentComponent, Themeabl
     @objc private func tappedSubmitReportingButton() {
         if let url = url {
             WebcompatReporter.reportIssue(on: url)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
+                guard let self = self, !self.isBeingDismissed else { return }
+                self.dismiss(animated: true)
+            }
         }
         updateContentView(to: shieldsView.siteReportedView, animated: true)
     }
