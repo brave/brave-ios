@@ -135,7 +135,7 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
         return Section(
             header: .title(Strings.clearPrivateData),
             rows: clearables.indices.map { idx in
-                Row(text: self.clearables[idx].clearable.label, accessory: .switchToggle(value: self.toggles[idx], { checked in
+                Row(text: self.clearables[idx].clearable.label, accessory: .switchToggle(value: self.toggles[idx], { [unowned self] checked in
                     self.toggles[idx] = checked
                 }))
             } + [
@@ -211,13 +211,15 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
         
         if value {
             let alert = UIAlertController(title: Strings.privateBrowsingOnly, message: Strings.privateBrowsingOnlyWarning, preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: { _ in
+            alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: { [weak self] _ in
+                guard let self = self else { return }
                 DispatchQueue.main.async {
                     self.toggleSwitch(on: false, section: self.otherSettingsSection, rowUUID: Preferences.Privacy.privateBrowsingOnly.key)
                 }
             }))
             
-            alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: { _ in
+            alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: { [weak self] _ in
+                guard let self = self else { return }
                 let spinner = SpinnerView().then {
                     $0.present(on: self.view)
                 }

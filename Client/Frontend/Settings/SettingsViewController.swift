@@ -206,7 +206,7 @@ class SettingsViewController: TableViewController {
         var general = Section(
             header: .title(Strings.settingsGeneralSectionTitle),
             rows: [
-                Row(text: Strings.searchEngines, selection: {
+                Row(text: Strings.searchEngines, selection: { [unowned self] in
                     let viewController = SearchSettingsTableViewController()
                     viewController.model = self.profile.searchEngines
                     viewController.profile = self.profile
@@ -447,25 +447,25 @@ class SettingsViewController: TableViewController {
         return Section(
             rows: [
                 Row(text: "Region: \(Locale.current.regionCode ?? "--")"),
-                Row(text: "Adblock Debug", selection: { [weak self] in
+                Row(text: "Adblock Debug", selection: { [unowned self] in
                     let vc = AdblockDebugMenuTableViewController(style: .grouped)
-                    self?.navigationController?.pushViewController(vc, animated: true)
+                    self.navigationController?.pushViewController(vc, animated: true)
                 }, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self),
-                Row(text: "View URP Logs", selection: {
+                Row(text: "View URP Logs", selection: { [unowned self] in
                     self.navigationController?.pushViewController(UrpLogsViewController(), animated: true)
                 }, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self),
                 Row(text: "URP Code: \(UserReferralProgram.getReferralCode() ?? "--")"),
-                Row(text: "View Rewards Debug Menu", selection: {
+                Row(text: "View Rewards Debug Menu", selection: { [unowned self] in
                     self.displayRewardsDebugMenu()
                 }, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self),
-                Row(text: "Load all QA Links", selection: {
+                Row(text: "Load all QA Links", selection: { [unowned self] in
                     let url = URL(string: "https://raw.githubusercontent.com/brave/qa-resources/master/testlinks.json")!
                     let string = try? String(contentsOf: url)
                     let urls = JSON(parseJSON: string!)["links"].arrayValue.compactMap { URL(string: $0.stringValue) }
                     self.settingsDelegate?.settingsOpenURLs(urls)
                     self.dismiss(animated: true)
                 }, cellClass: MultilineButtonCell.self),
-                Row(text: "CRASH!!!", selection: {
+                Row(text: "CRASH!!!", selection: { [unowned self] in
                     let alert = UIAlertController(title: "Force crash?", message: nil, preferredStyle: .alert)
                     alert.addAction(UIAlertAction(title: "Crash app", style: .destructive) { _ in
                         fatalError()
