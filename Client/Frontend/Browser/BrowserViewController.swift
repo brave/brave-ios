@@ -1961,7 +1961,8 @@ extension BrowserViewController: TopToolbarDelegate {
             // In 1.6 we "reload" the whole web view state, dumping caches, etc. (reload():BraveWebView.swift:495)
             // BRAVE TODO: Port over proper tab reloading with Shields
         }
-        let popover = PopoverController(contentController: shields, contentSizeBehavior: .preferredContentSize)
+        let container = PopoverNavigationController(rootViewController: shields)
+        let popover = PopoverController(contentController: container, contentSizeBehavior: .preferredContentSize)
         popover.present(from: topToolbar.locationView.shieldsButton, on: self)
     }
     

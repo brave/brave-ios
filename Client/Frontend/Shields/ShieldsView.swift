@@ -7,6 +7,62 @@ import Shared
 import BraveShared
 
 extension ShieldsViewController {
+    class View2: UIView, Themeable {
+        
+        private let scrollView = UIScrollView().then {
+            $0.delaysContentTouches = false
+        }
+        
+        let stackView = UIStackView().then {
+            $0.axis = .vertical
+            $0.isLayoutMarginsRelativeArrangement = true
+            $0.translatesAutoresizingMaskIntoConstraints = false
+        }
+        
+        let simpleShieldView = SimpleShieldsView()
+        let advancedControlsBar = AdvancedControlsBarView()
+        let advancedShieldView = AdvancedShieldsView().then {
+            $0.isHidden = true
+        }
+        
+        override init(frame: CGRect) {
+            super.init(frame: frame)
+            
+            stackView.addArrangedSubview(simpleShieldView)
+            stackView.addArrangedSubview(advancedControlsBar)
+            stackView.addArrangedSubview(advancedShieldView)
+            
+            addSubview(scrollView)
+            scrollView.addSubview(stackView)
+            
+            scrollView.snp.makeConstraints {
+                $0.edges.equalToSuperview()
+            }
+            
+            scrollView.contentLayoutGuide.snp.makeConstraints {
+                $0.left.right.equalTo(self)
+            }
+            
+            stackView.snp.makeConstraints {
+                $0.edges.equalToSuperview()
+            }
+        }
+        
+        func applyTheme(_ theme: Theme) {
+            simpleShieldView.applyTheme(theme)
+            advancedControlsBar.applyTheme(theme)
+            advancedShieldView.applyTheme(theme)
+            
+            backgroundColor = theme.isDark ? UIColor(rgb: 0x17171f) : UIColor.white
+        }
+        
+        @available(*, unavailable)
+        required init(coder: NSCoder) {
+            fatalError()
+        }
+    }
+    
+    /*
     /// The custom loaded view for the `ShieldsViewController`
     class View: UIView, Themeable {
         private let scrollView = UIScrollView()
@@ -21,13 +77,6 @@ extension ShieldsViewController {
             return sv
         }()
         
-        // Global Shields Override
-        let shieldOverrideControl: ToggleView = {
-            let toggleView = ToggleView(title: Strings.siteShieldSettings, toggleSide: .right)
-            toggleView.titleLabel.font = .systemFont(ofSize: 17.0, weight: .medium)
-            return toggleView
-        }()
-        
         let overviewStackView: OverviewContainerStackView = {
             let sv = OverviewContainerStackView()
             sv.isHidden = true
@@ -39,7 +88,6 @@ extension ShieldsViewController {
         override init(frame: CGRect) {
             super.init(frame: frame)
             
-            stackView.addArrangedSubview(shieldOverrideControl)
             stackView.addArrangedSubview(overviewStackView)
             stackView.addArrangedSubview(shieldsContainerStackView)
             
@@ -151,11 +199,6 @@ extension ShieldsViewController {
         // Settings
         let settingsDivider = dividerView()
         let settingsHeaderLabel = headerLabel(title: Strings.individualControls)
-        let adsTrackersControl = ToggleView(title: Strings.blockAdsAndTracking)
-        let httpsUpgradesControl = ToggleView(title: Strings.HTTPSEverywhere)
-        let blockMalwareControl = ToggleView(title: Strings.blockPhishing)
-        let blockScriptsControl = ToggleView(title: Strings.blockScripts)
-        let fingerprintingControl = ToggleView(title: Strings.fingerprintingProtectionWrapped)
         
         override init(frame: CGRect) {
             super.init(frame: frame)
@@ -251,68 +294,7 @@ extension ShieldsViewController {
         required init?(coder aDecoder: NSCoder) {
             fatalError()
         }
-    }
-    
-    /// A container displaying a toggle for the user
-    class ToggleView: UIView {
-        /// Where the toggle resides
-        enum ToggleSide {
-            /// Resides on the left edge of the view
-            case left
-            /// Resides on the right edge of the view
-            case right
-        }
-        
-        let titleLabel: UILabel = {
-            let l = UILabel()
-            l.font = .systemFont(ofSize: 15.0)
-            l.numberOfLines = 0
-            return l
-        }()
-        
-        let toggleSwitch = UISwitch()
-        var valueToggled: ((Bool) -> Void)?
-        
-        init(title: String, toggleSide: ToggleSide = .left) {
-            super.init(frame: .zero)
-            
-            let stackView = UIStackView()
-            stackView.spacing = 12.0
-            stackView.alignment = .center
-            addSubview(stackView)
-            stackView.snp.makeConstraints {
-                $0.edges.equalTo(self)
-            }
-            
-            if toggleSide == .left {
-                stackView.addArrangedSubview(toggleSwitch)
-                stackView.addArrangedSubview(titleLabel)
-            } else {
-                stackView.addArrangedSubview(titleLabel)
-                stackView.addArrangedSubview(toggleSwitch)
-            }
-            
-            titleLabel.text = title
-            toggleSwitch.addTarget(self, action: #selector(switchValueChanged), for: .valueChanged)
-            
-            toggleSwitch.setContentHuggingPriority(.required, for: .horizontal)
-            toggleSwitch.setContentCompressionResistancePriority(.required, for: .horizontal)
-            titleLabel.setContentCompressionResistancePriority(.required, for: .vertical)
-            
-            snp.makeConstraints {
-                $0.height.greaterThanOrEqualTo(toggleSwitch)
-            }
-        }
-        
-        @available(*, unavailable)
-        required init?(coder aDecoder: NSCoder) {
-            fatalError()
-        }
-        
-        @objc private func switchValueChanged() {
-            valueToggled?(toggleSwitch.isOn)
-        }
-    }
+    }*/
 }
 
 extension ShieldsViewController {

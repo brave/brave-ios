@@ -366,6 +366,8 @@
 		2777275A22EB4C7700F0214C /* BraveShared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DE7688420B3456C00FF5533 /* BraveShared.framework */; };
 		277771D42419726100E9E3D8 /* SKUEnableRewardsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 277771D32419726100E9E3D8 /* SKUEnableRewardsViewController.swift */; };
 		2784874524DC658C0004F03C /* BraveTodayEmptyFeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2784874424DC658C0004F03C /* BraveTodayEmptyFeedView.swift */; };
+		278C467823EDF0060083347F /* SimpleShieldsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 278C467723EDF0060083347F /* SimpleShieldsView.swift */; };
+		278C467B23EDF0940083347F /* ShieldsSwitch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 278C467A23EDF0940083347F /* ShieldsSwitch.swift */; };
 		278C467C23EE2B450083347F /* UIStackViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 271DECBA234CC7EF009DAC37 /* UIStackViewExtensions.swift */; };
 		278C468A23F1E6270083347F /* BraveUI.h in Headers */ = {isa = PBXBuildFile; fileRef = 278C468823F1E6270083347F /* BraveUI.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		278C468D23F1E6270083347F /* BraveUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C468623F1E6270083347F /* BraveUI.framework */; };
@@ -378,6 +380,8 @@
 		278C46A023F1ED340083347F /* LinkLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 271DECA7234CC7EF009DAC37 /* LinkLabel.swift */; };
 		278C46A323F1EDAB0083347F /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 278C46A223F1EDAB0083347F /* Colors.swift */; };
 		278C46A523F1EF6D0083347F /* DisclaimerLinks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 278C46A423F1EF6D0083347F /* DisclaimerLinks.swift */; };
+		278C46A923F216CE0083347F /* AdvancedControlsBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 278C46A823F216CE0083347F /* AdvancedControlsBarView.swift */; };
+		278C46AC23F499730083347F /* AdvancedShieldsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 278C46AB23F499730083347F /* AdvancedShieldsView.swift */; };
 		278C46AF23F4A91C0083347F /* PopoverController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1D841FF20BC44F800BDAFF7 /* PopoverController.swift */; };
 		278C46B023F4A91C0083347F /* PopoverContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1D8420020BC44F800BDAFF7 /* PopoverContainerView.swift */; };
 		278C46B123F4A91D0083347F /* PopoverContentComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1D8420120BC44F800BDAFF7 /* PopoverContentComponent.swift */; };
@@ -387,6 +391,7 @@
 		278C46B923F4AB5A0083347F /* Then.swift in Sources */ = {isa = PBXBuildFile; fileRef = 278C46B823F4AB590083347F /* Then.swift */; };
 		2795274A21A890EB00921AA1 /* FingerprintingProtectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2795274921A890EB00921AA1 /* FingerprintingProtectionTests.swift */; };
 		27953F7423F5B04500B4B595 /* ViewLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27953F7323F5B04500B4B595 /* ViewLabel.swift */; };
+		27953F7723F5DF5D00B4B595 /* AboutShieldsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27953F7623F5DF5D00B4B595 /* AboutShieldsViewController.swift */; };
 		2798E01D213EFC3F003EDBB1 /* FavoriteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2798E015213EFC3F003EDBB1 /* FavoriteTests.swift */; };
 		279C756B219DDE3B001CD1CB /* FingerprintingProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279C756A219DDE3B001CD1CB /* FingerprintingProtection.swift */; };
 		279C75C821A5B37D001CD1CB /* FingerprintingProtection.js in Resources */ = {isa = PBXBuildFile; fileRef = 279C75C021A5B37D001CD1CB /* FingerprintingProtection.js */; };
@@ -1771,14 +1776,19 @@
 		2777273F22EB44B300F0214C /* StringExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtensionTests.swift; sourceTree = "<group>"; };
 		277771D32419726100E9E3D8 /* SKUEnableRewardsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKUEnableRewardsViewController.swift; sourceTree = "<group>"; };
 		2784874424DC658C0004F03C /* BraveTodayEmptyFeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveTodayEmptyFeedView.swift; sourceTree = "<group>"; };
+		278C467723EDF0060083347F /* SimpleShieldsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleShieldsView.swift; sourceTree = "<group>"; };
+		278C467A23EDF0940083347F /* ShieldsSwitch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShieldsSwitch.swift; sourceTree = "<group>"; };
 		278C468623F1E6270083347F /* BraveUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = BraveUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		278C468823F1E6270083347F /* BraveUI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BraveUI.h; sourceTree = "<group>"; };
 		278C468923F1E6270083347F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		278C46A223F1EDAB0083347F /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
 		278C46A423F1EF6D0083347F /* DisclaimerLinks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisclaimerLinks.swift; sourceTree = "<group>"; };
+		278C46A823F216CE0083347F /* AdvancedControlsBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedControlsBarView.swift; sourceTree = "<group>"; };
+		278C46AB23F499730083347F /* AdvancedShieldsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedShieldsView.swift; sourceTree = "<group>"; };
 		278C46B823F4AB590083347F /* Then.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Then.swift; sourceTree = "<group>"; };
 		2795274921A890EB00921AA1 /* FingerprintingProtectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FingerprintingProtectionTests.swift; sourceTree = "<group>"; };
 		27953F7323F5B04500B4B595 /* ViewLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewLabel.swift; sourceTree = "<group>"; };
+		27953F7623F5DF5D00B4B595 /* AboutShieldsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutShieldsViewController.swift; sourceTree = "<group>"; };
 		2798E015213EFC3F003EDBB1 /* FavoriteTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FavoriteTests.swift; sourceTree = "<group>"; };
 		279C756A219DDE3B001CD1CB /* FingerprintingProtection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FingerprintingProtection.swift; sourceTree = "<group>"; };
 		279C75C021A5B37D001CD1CB /* FingerprintingProtection.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = FingerprintingProtection.js; sourceTree = "<group>"; };
@@ -4719,6 +4729,11 @@
 			children = (
 				A104E198210A384400D2323E /* ShieldsViewController.swift */,
 				27C461DD211B76500088A441 /* ShieldsView.swift */,
+				278C467A23EDF0940083347F /* ShieldsSwitch.swift */,
+				278C467723EDF0060083347F /* SimpleShieldsView.swift */,
+				278C46A823F216CE0083347F /* AdvancedControlsBarView.swift */,
+				278C46AB23F499730083347F /* AdvancedShieldsView.swift */,
+				27953F7623F5DF5D00B4B595 /* AboutShieldsViewController.swift */,
 			);
 			path = Shields;
 			sourceTree = "<group>";
@@ -6808,6 +6823,7 @@
 				E68F36981EA694000048CF44 /* PanelDataObservers.swift in Sources */,
 				0A3C789F23056C910022F6D8 /* OnboardingSearchEnginesView.swift in Sources */,
 				27A1AC0024855C1700344503 /* FeedCardCell.swift in Sources */,
+				278C467B23EDF0940083347F /* ShieldsSwitch.swift in Sources */,
 				31ADB5DA1E58CEC300E87909 /* ClipboardBarDisplayHandler.swift in Sources */,
 				0A4B012020D02EC4004D4011 /* TabsBarViewController.swift in Sources */,
 				4422D4D921BFFB7600BF1855 /* merger.cc in Sources */,
@@ -6948,6 +6964,7 @@
 				A1AD4BCF20BF3E8C007A6EA1 /* BookmarksViewController.swift in Sources */,
 				5D24AF9021BA4D7700F9506A /* ContentBlockerRegion.swift in Sources */,
 				E4B423BE1AB9FE6A007E66C8 /* ReaderModeCache.swift in Sources */,
+				278C46A923F216CE0083347F /* AdvancedControlsBarView.swift in Sources */,
 				396CDB55203C5B870034A3A3 /* TabTrayController+KeyCommands.swift in Sources */,
 				74E36D781B71323500D69DA1 /* SettingsContentViewController.swift in Sources */,
 				0A1DF468244858CA00541FE4 /* VPNProductInfo.swift in Sources */,
@@ -7034,6 +7051,7 @@
 				4422D4B721BFFB7600BF1855 /* filter_policy.cc in Sources */,
 				0AADC4D520D2A6A200FDE368 /* PreloadedFavorites.swift in Sources */,
 				0AC77602242A6AE000139377 /* BuyVPNView.swift in Sources */,
+				278C467823EDF0060083347F /* SimpleShieldsView.swift in Sources */,
 				5D24AF8421BA489A00F9506A /* ContentBlocker.swift in Sources */,
 				4422D4B021BFFB7600BF1855 /* arena.cc in Sources */,
 				E47616C71AB74CA600E7DD25 /* ReaderModeBarView.swift in Sources */,
@@ -7048,6 +7066,7 @@
 				4422D57321BFFB7F00BF1855 /* stringpiece.cc in Sources */,
 				27187808216526090006036E /* AlertPopupView.swift in Sources */,
 				4422D56421BFFB7F00BF1855 /* re2.cc in Sources */,
+				278C46AC23F499730083347F /* AdvancedShieldsView.swift in Sources */,
 				0AEF16C723CDE4B800158AD9 /* BottomSheetViewController.swift in Sources */,
 				2F44FCC51A9E85E900FD20CC /* SettingsTableSectionHeaderFooterView.swift in Sources */,
 				44331DD8225521B6007E3E93 /* UrlBarTextField.swift in Sources */,
@@ -7168,6 +7187,7 @@
 				3BE7275D1CCFE8B60099189F /* CustomSearchHandler.swift in Sources */,
 				F930CDD72270F14300A23FE1 /* WebAuthnUtils.swift in Sources */,
 				A1FEEE2020BF28D900298DA2 /* Then.swift in Sources */,
+				27953F7723F5DF5D00B4B595 /* AboutShieldsViewController.swift in Sources */,
 				0A1E84442190A57F0042F782 /* SyncCameraView.swift in Sources */,
 				A1CA29C420E1746A00CB9126 /* OptionSelectionViewController.swift in Sources */,
 				5EC594ED232C2C8F00922111 /* OnboardingWebViewController.swift in Sources */,
