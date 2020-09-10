@@ -310,6 +310,9 @@ class ShieldsViewController: UIViewController, PopoverContentComponent, Themeabl
     }
     
     @objc private func tappedSubmitReportingButton() {
+        if let url = url {
+            WebcompatReporter.reportIssue(on: url)
+        }
         updateContentView(to: shieldsView.siteReportedView, animated: true)
     }
     

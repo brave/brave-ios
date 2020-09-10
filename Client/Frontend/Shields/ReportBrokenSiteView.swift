@@ -31,6 +31,7 @@ class ReportBrokenSiteView: UIStackView, Themeable {
     let urlLabel = UILabel().then {
         $0.appearanceTextColor = BraveUX.braveOrange
         $0.font = .systemFont(ofSize: 16.0)
+        $0.numberOfLines = 0
     }
     
     let cancelButton = ActionButton(type: .system).then {
