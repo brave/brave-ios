@@ -81,20 +81,12 @@ extension RewardsDisabledView {
       $0.text = Strings.disabledTitle
     }
     
-    let subtitleLabel = UILabel().then {
-      $0.font = .systemFont(ofSize: 18.0, weight: .semibold)
-      $0.appearanceTextColor = UX.subtitleColor
-      $0.textAlignment = .center
-      $0.numberOfLines = 0
-      $0.text = Strings.disabledSubtitle
-    }
-    
     let bodyLabel = UILabel().then {
       $0.font = .systemFont(ofSize: 16.0)
       $0.appearanceTextColor = UX.bodyColor
       $0.textAlignment = .center
       $0.numberOfLines = 0
-      $0.text = Strings.disabledBody
+      $0.text = Strings.rewardsOptInDescription
     }
     
     let enableRewardsButton = ActionButton(type: .system).then {
@@ -125,7 +117,6 @@ extension RewardsDisabledView {
       
       addSubview(batLogoImageView)
       addSubview(titleLabel)
-      addSubview(subtitleLabel)
       addSubview(bodyLabel)
       addSubview(termsOfServiceLabel)
       addSubview(enableRewardsButton)
@@ -138,12 +129,8 @@ extension RewardsDisabledView {
         $0.top.equalTo(self.batLogoImageView.snp.bottom).offset(10.0)
         $0.leading.trailing.equalTo(self).inset(20.0)
       }
-      subtitleLabel.snp.makeConstraints {
-        $0.top.equalTo(self.titleLabel.snp.bottom).offset(5.0)
-        $0.leading.trailing.equalTo(self.titleLabel)
-      }
       bodyLabel.snp.makeConstraints {
-        $0.top.equalTo(self.subtitleLabel.snp.bottom).offset(10.0)
+        $0.top.equalTo(self.titleLabel.snp.bottom).offset(10.0)
         $0.leading.trailing.equalTo(self).inset(40.0)
       }
       enableRewardsButton.snp.makeConstraints {

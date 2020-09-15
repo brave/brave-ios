@@ -86,6 +86,7 @@ class WalletViewController: UIViewController, RewardsSummaryProtocol {
     navigationController?.setNavigationBarHidden(true, animated: false)
     
     rewardsSummaryView.rewardsSummaryButton.addTarget(self, action: #selector(tappedRewardsSummaryButton), for: .touchUpInside)
+    walletNoticeView.noticeView.learnMoreButton.addTarget(self, action: #selector(tappedNoticeLearnMoreButton), for: .touchUpInside)
     
     walletView.headerView.addFundsButton.addTarget(self, action: #selector(tappedAddFunds), for: .touchUpInside)
     walletView.headerView.settingsButton.addTarget(self, action: #selector(tappedSettings), for: .touchUpInside)
@@ -338,6 +339,8 @@ class WalletViewController: UIViewController, RewardsSummaryProtocol {
     }
   }
   
+  let walletNoticeView = WalletUpgradeNoticeView()
+  
   func reloadUIState() {
     if state.ledger.isEnabled {
       if isLocal {
@@ -351,9 +354,10 @@ class WalletViewController: UIViewController, RewardsSummaryProtocol {
         }
       } else {
         walletView.rewardsSummaryView = rewardsSummaryView
-        walletView.contentView = publisherSummaryView
-        
-        publisherSummaryView.updateViewVisibility(globalAutoContributionEnabled: state.ledger.isAutoContributeEnabled)
+        walletView.contentView = walletNoticeView
+//        walletView.contentView = publisherSummaryView
+//
+//        publisherSummaryView.updateViewVisibility(globalAutoContributionEnabled: state.ledger.isAutoContributeEnabled)
       }
     } else {
       if rewardsDisabledView.enableRewardsButton.allTargets.count == 0 {
@@ -637,6 +641,10 @@ extension WalletViewController {
         tappedNotificationClose()
       }
     }
+  }
+  
+  @objc private func tappedNoticeLearnMoreButton() {
+    state.delegate?.loadNewTabWithURL(URL(string: "https://brave.com")!)
   }
   
   func updateWalletHeader() {

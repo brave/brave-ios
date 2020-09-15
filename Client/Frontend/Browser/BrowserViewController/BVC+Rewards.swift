@@ -67,7 +67,6 @@ extension BrowserViewController {
                 // Show the tab currently visible
                 self.rewards.ledger.selectedTabId = tabId
             }
-            self.displayMyFirstAdIfAvailable()
         }
         // Hide the current tab
         rewards.ledger.selectedTabId = 0

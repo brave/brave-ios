@@ -10,6 +10,10 @@ class SettingsRewardsSectionView: SettingsSectionView {
     return toggleView.toggleSwitch
   }
   
+  var noticeViewLearnMoreButton: UIButton {
+    disabledTextView.learnMoreButton
+  }
+  
   /// Set the rewards enabled state based on the ledger.
   func setRewardsEnabled(_ enabled: Bool, animated: Bool = false) {
     if disabledTextView.isHidden == enabled {
@@ -50,57 +54,5 @@ class SettingsRewardsSectionView: SettingsSectionView {
     $0.spacing = 15.0
   }
   
-  private let disabledTextView = DisabledRewardsLabelsView()
-}
-
-private class DisabledRewardsLabelsView: UIView {
-  
-  override init(frame: CGRect) {
-    super.init(frame: frame)
-    
-    addSubview(stackView)
-    labels.forEach { stackView.addArrangedSubview($0) }
-    stackView.setCustomSpacing(16.0, after: labels[1])
-    
-    stackView.snp.makeConstraints {
-      $0.edges.equalTo(self)
-    }
-  }
-  
-  @available(*, unavailable)
-  required init(coder: NSCoder) {
-    fatalError()
-  }
-  
-  let stackView = UIStackView().then {
-    $0.axis = .vertical
-    $0.spacing = 8.0
-  }
-  
-  let labels = [
-    UILabel().then {
-      $0.appearanceTextColor = SettingsUX.headerTextColor
-      $0.text = Strings.settingsDisabledTitle1
-      $0.numberOfLines = 0
-      $0.font = .systemFont(ofSize: 15.0)
-    },
-    UILabel().then {
-      $0.appearanceTextColor = SettingsUX.bodyTextColor
-      $0.text = Strings.settingsDisabledBody1
-      $0.numberOfLines = 0
-      $0.font = .systemFont(ofSize: 13.0)
-    },
-    UILabel().then {
-      $0.appearanceTextColor = SettingsUX.headerTextColor
-      $0.text = Strings.settingsDisabledTitle2
-      $0.numberOfLines = 0
-      $0.font = .systemFont(ofSize: 15.0)
-    },
-    UILabel().then {
-      $0.appearanceTextColor = SettingsUX.bodyTextColor
-      $0.text = Strings.settingsDisabledBody2
-      $0.numberOfLines = 0
-      $0.font = .systemFont(ofSize: 13.0)
-    },
-  ]
+  let disabledTextView = RewardsChangesNoticeView()
 }

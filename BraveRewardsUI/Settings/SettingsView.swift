@@ -22,6 +22,10 @@ extension SettingsViewController {
           grantsSections.reversed().forEach {
             stackView.insertArrangedSubview($0, at: index)
           }
+        } else {
+          grantsSections.reversed().forEach {
+            stackView.addArrangedSubview($0)
+          }
         }
       }
     }
@@ -34,10 +38,10 @@ extension SettingsViewController {
       addSubview(scrollView)
       scrollView.addSubview(stackView)
       stackView.addArrangedSubview(rewardsToggleSection)
-      stackView.addArrangedSubview(adsSection)
-      stackView.addArrangedSubview(autoContributeSection)
-      stackView.addArrangedSubview(monthlyTipsSection)
-      stackView.addArrangedSubview(tipsSection)
+//      stackView.addArrangedSubview(adsSection)
+//      stackView.addArrangedSubview(autoContributeSection)
+//      stackView.addArrangedSubview(monthlyTipsSection)
+//      stackView.addArrangedSubview(tipsSection)
       
       scrollView.snp.makeConstraints {
         $0.edges.equalTo(self)

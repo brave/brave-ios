@@ -39,12 +39,11 @@ class SettingsViewController: UIViewController {
     
     navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(tappedDone))
     
-    preferredContentSize = CGSize(width: RewardsUX.preferredPanelSize.width, height: 750)
-    
     state.ledger.updateAdsRewards()
     
     settingsView.do {
       $0.rewardsToggleSection.toggleSwitch.addTarget(self, action: #selector(rewardsSwitchValueChanged), for: .valueChanged)
+      $0.rewardsToggleSection.noticeViewLearnMoreButton.addTarget(self, action: #selector(tappedNoticeLearnMoreButton), for: .touchUpInside)
       $0.adsSection.viewDetailsButton.addTarget(self, action: #selector(tappedAdsViewDetails), for: .touchUpInside)
       $0.adsSection.toggleSwitch.addTarget(self, action: #selector(adsToggleValueChanged), for: .valueChanged)
       $0.monthlyTipsSection.viewDetailsButton.addTarget(self, action: #selector(tappedMonthlyTipsViewDetails), for: .touchUpInside)
@@ -65,9 +64,6 @@ class SettingsViewController: UIViewController {
   
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
-    
-    // Not sure why this has to be set on the nav controller specifically instead of just this controller
-    preferredContentSize = CGSize(width: RewardsUX.preferredPanelSize.width, height: 1000)
     
     updateGrantsSection()
   }
@@ -150,6 +146,10 @@ class SettingsViewController: UIViewController {
   @objc private func autoContributeToggleValueChanged() {
     state.ledger.isAutoContributeEnabled = settingsView.autoContributeSection.toggleSwitch.isOn
     updateVisualStateOfSections(animated: true)
+  }
+  
+  @objc private func tappedNoticeLearnMoreButton() {
+    state.delegate?.loadNewTabWithURL(URL(string: "https://brave.com")!)
   }
   
   func setupLedgerObservers() {

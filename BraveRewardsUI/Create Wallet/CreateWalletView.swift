@@ -85,7 +85,6 @@ extension CreateWalletViewController {
       addSubview(descriptionLabel)
       addSubview(createWalletButton)
       addSubview(termsOfServiceLabel)
-      addSubview(learnMoreButton)
       
       backgroundView.snp.makeConstraints {
         $0.edges.equalTo(self)
@@ -118,11 +117,6 @@ extension CreateWalletViewController {
       termsOfServiceLabel.snp.makeConstraints {
         $0.top.equalTo(self.createWalletButton.snp.bottom).offset(25.0)
         $0.leading.trailing.equalTo(self).inset(60.0)
-      }
-      learnMoreButton.snp.makeConstraints {
-        $0.top.equalTo(self.termsOfServiceLabel.snp.bottom).offset(30.0)
-        $0.centerX.equalTo(self)
-        $0.height.equalTo(UX.learnMoreButtonHeight)
         $0.bottom.equalTo(self).offset(-20.0)
       }
     }

@@ -104,11 +104,16 @@ extension Preferences {
     
     public final class Rewards {
         public static let myFirstAdShown = Option<Bool>(key: "rewards.ads.my-first-ad-shown", default: false)
-        public static let hideRewardsIcon = Option<Bool>(key: "rewards.hide-rewards-icon", default: true)
+        public static let hideRewardsIcon = Option<Bool>(key: "rewards.hide-rewards-icon", default: false)
         public static let panelOpened = Option<Bool>(key: "rewards.rewards-panel-opened", default: false)
         public static let isUsingBAP = Option<Bool?>(key: "rewards.is-using-bap", default: nil)
         public static let checkedPreviousCycleForAdsViewing = Option<Bool>(key: "rewards.checked-previous-ads-cycle", default: false)
         public static let seenDataMigrationFailureError = Option<Bool>(key: "rewards.seen-data-migration-failure-error", default: false)
+        
+        public final class Workaround {
+            public static let previousAutoContributeState = Option<Bool?>(key: "rewards.workaround.previous-ac", default: nil)
+            public static let previousAdsState = Option<Bool?>(key: "rewards.workaround.previous-ads", default: nil)
+        }
         
         public enum EnvironmentOverride: Int {
             case none

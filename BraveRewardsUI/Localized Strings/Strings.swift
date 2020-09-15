@@ -153,7 +153,6 @@ internal extension Strings {
   static let tippingOneTimeTitle = NSLocalizedString("BraveRewardsTippingOneTimeTitle", bundle: .rewardsUI, value: "You've just sent a tip to:", comment: "")
   static let tippingRecurring = NSLocalizedString("BraveRewardsTippingRecurring", bundle: .rewardsUI, value: "Monthly", comment: "")
   static let tippingRecurringDetails = NSLocalizedString("BraveRewardsTippingRecurringDetails", bundle: .rewardsUI, value: "Your first monthly tip will be sent on:", comment: "")
-  static let disabledBody = NSLocalizedString("BraveRewardsDisabledBody", bundle: .rewardsUI, value: "Earn by viewing privacy-respecting ads, and pay it forward to support content creators you love.", comment: "")
   static let learnMoreCreateWallet2 = NSLocalizedString("BraveRewardsLearnMoreCreateWallet2", bundle: .rewardsUI, value: "Yes I'm Ready!", comment: "")
   static let disabledTitle = NSLocalizedString("BraveRewardsDisabledTitle", bundle: .rewardsUI, value: "Welcome Back!", comment: "")
   static let learnMoreCreateWallet1 = NSLocalizedString("BraveRewardsLearnMoreCreateWallet1", bundle: .rewardsUI, value: "Yes, I'm In!", comment: "")
@@ -179,10 +178,7 @@ internal extension Strings {
   static let panelTitle = NSLocalizedString("BraveRewardsPanelTitle", bundle: .rewardsUI, value: "Rewards", comment: "")
   static let creatingWallet = NSLocalizedString("BraveRewardsCreatingWallet", bundle: .rewardsUI, value: "Creating wallet", comment: "")
   static var rewardsOptInDescription: String {
-    if Preferences.Rewards.isUsingBAP.value == true {
-      return NSLocalizedString("RewardsOptInDescriptionJapan", bundle: .rewardsUI, value: "Earn points and reward creators for great content while you browse", comment: "")
-    }
-    return NSLocalizedString("RewardsOptInDescription", bundle: .rewardsUI, value: "Earn tokens and reward creators for great content while you browse", comment: "")
+    return NSLocalizedString("RewardsOptInDescription", bundle: .rewardsUI, value: "Brave Rewards is a platform that rewards users for their attention, and creators for great content.", comment: "")
   }
   static var walletHeaderTitle: String {
     if Preferences.Rewards.isUsingBAP.value == true {
@@ -329,5 +325,7 @@ internal extension Strings {
   static let SKUEnableRewardsButtonTitle = NSLocalizedString("SKUEnableRewardsButtonTitle", bundle: .rewardsUI, value: "Enable Brave Rewards", comment: "")
   static let SKUEnableRewardsDisclaimer = NSLocalizedString("SKUEnableRewardsDisclaimer", bundle: .rewardsUI, value: "By tapping Enable Brave Rewards, you agree to Brave Reward’s Terms of Service.", comment: "")
   static let SKUEnableRewardsDisclaimerLink = NSLocalizedString("SKUEnableRewardsDisclaimerLink", bundle: .rewardsUI, value: "Terms of Service.", comment: "The hyperlinked portion of the copy: 'By tapping Enable Brave Rewards, you agree to Brave Reward’s Terms of Service.'")
+  static let platformChangesNoticeMessage = NSLocalizedString("platformChangesNoticeMessage", bundle: .rewardsUI, value: "Brave Rewards is a platform that rewards users for their attention, and creators for great content. In the future, new features will be added and managed here.\n\nBrave Ads, Tips and Contributions have been disabled on this device for platform specific compliance reasons. If you earned BAT in the past on this device, your wallet amount has been preserved.", comment: "")
+  static let platformChangesNoticeLearnMoreTitle = NSLocalizedString("platformChangesNoticeLearnMoreTitle", bundle: .rewardsUI, value: "Learn more about these platform changes", comment: "")
 }
 

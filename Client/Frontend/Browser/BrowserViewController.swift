@@ -332,9 +332,27 @@ class BrowserViewController: UIViewController {
                 }
             }
         }
+        
+        disableRewardsServices()
     }
     
     let deviceCheckClient: DeviceCheckClient?
+    
+    private func disableRewardsServices() {
+        if Preferences.Rewards.Workaround.previousAutoContributeState.value == nil {
+            Preferences.Rewards.Workaround.previousAutoContributeState.value = self.rewards.ledger.isAutoContributeEnabled
+            self.rewards.ledger.isAutoContributeEnabled = false
+        }
+        if Preferences.Rewards.Workaround.previousAdsState.value == nil {
+            Preferences.Rewards.Workaround.previousAdsState.value = self.rewards.ads.isEnabled
+            // Wait for ads to finish initalizing before turning the service off
+            if self.rewards.ads.isEnabled {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                    self.rewards.ads.isEnabled = false
+                }
+            }
+        }
+    }
     
     private func setupRewardsObservers() {
         rewards.ledger.add(rewardsObserver)
@@ -342,10 +360,7 @@ class BrowserViewController: UIViewController {
             guard let self = self, let client = self.deviceCheckClient else { return }
             if result == .walletCreated {
                 self.rewards.ledger.setupDeviceCheckEnrollment(client) { }
-                
-                if self.notificationsHandler?.shouldShowNotifications() == true {
-                    self.displayMyFirstAdIfAvailable()
-                }
+                self.disableRewardsServices()
             }
         }
         rewardsObserver.fetchedPanelPublisher = { [weak self] publisher, tabId in
@@ -363,25 +378,6 @@ class BrowserViewController: UIViewController {
         }
         rewardsObserver.rewardsEnabledStateUpdated = { [weak self] _ in
             self?.updateRewardsButtonState()
-        }
-    }
-    
-    // Display first ad when the user gets back to this controller if they havent seen one before
-    func displayMyFirstAdIfAvailable() {
-        if !rewards.ledger.isEnabled || !rewards.ads.isEnabled { return }
-        if Preferences.Rewards.myFirstAdShown.value { return }
-        // Check if ads are eligible
-        if BraveAds.isCurrentLocaleSupported() {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                if Preferences.Rewards.myFirstAdShown.value { return }
-                Preferences.Rewards.myFirstAdShown.value = true
-                 AdsViewController.displayFirstAd(on: self) { [weak self] action, url in
-                    if action == .opened {
-                        let request = URLRequest(url: url)
-                        self?.tabManager.addTabAndSelect(request, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
-                    }
-                }
-            }
         }
     }
 
