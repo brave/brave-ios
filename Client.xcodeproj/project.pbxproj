@@ -391,6 +391,7 @@
 		278C46B923F4AB5A0083347F /* Then.swift in Sources */ = {isa = PBXBuildFile; fileRef = 278C46B823F4AB590083347F /* Then.swift */; };
 		278C6FFF24F6EA3700A246C8 /* ReportBrokenSiteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 278C6FFE24F6EA3700A246C8 /* ReportBrokenSiteView.swift */; };
 		278C700224F6F33E00A246C8 /* SiteReportedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 278C700124F6F33D00A246C8 /* SiteReportedView.swift */; };
+		278C700A24F96D7000A246C8 /* BraveShieldsAndPrivacySettingsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 278C700924F96D7000A246C8 /* BraveShieldsAndPrivacySettingsController.swift */; };
 		2795274A21A890EB00921AA1 /* FingerprintingProtectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2795274921A890EB00921AA1 /* FingerprintingProtectionTests.swift */; };
 		27953F7423F5B04500B4B595 /* ViewLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27953F7323F5B04500B4B595 /* ViewLabel.swift */; };
 		27953F7723F5DF5D00B4B595 /* AboutShieldsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27953F7623F5DF5D00B4B595 /* AboutShieldsViewController.swift */; };
@@ -938,7 +939,6 @@
 		D3C3696E1CC6B78800348A61 /* LocalRequestHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3C3696D1CC6B78800348A61 /* LocalRequestHelper.swift */; };
 		D3C744CD1A687D6C004CE85D /* URIFixup.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3C744CC1A687D6C004CE85D /* URIFixup.swift */; };
 		D3D488591ABB54CD00A93597 /* FileAccessorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3D488581ABB54CD00A93597 /* FileAccessorTests.swift */; };
-		D3E8EF101B97BE69001900FB /* ClearPrivateDataTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3E8EEE71B97A87A001900FB /* ClearPrivateDataTableViewController.swift */; };
 		D3FA777B1A43B2990010CD32 /* SearchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3FA777A1A43B2990010CD32 /* SearchTests.swift */; };
 		D3FEC38D1AC4B42F00494F45 /* AutocompleteTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3FEC38C1AC4B42F00494F45 /* AutocompleteTextField.swift */; };
 		D82ED2641FEB3C420059570B /* DefaultSearchPrefsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D82ED2631FEB3C420059570B /* DefaultSearchPrefsTests.swift */; };
@@ -1790,6 +1790,7 @@
 		278C46B823F4AB590083347F /* Then.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Then.swift; sourceTree = "<group>"; };
 		278C6FFE24F6EA3700A246C8 /* ReportBrokenSiteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportBrokenSiteView.swift; sourceTree = "<group>"; };
 		278C700124F6F33D00A246C8 /* SiteReportedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiteReportedView.swift; sourceTree = "<group>"; };
+		278C700924F96D7000A246C8 /* BraveShieldsAndPrivacySettingsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveShieldsAndPrivacySettingsController.swift; sourceTree = "<group>"; };
 		2795274921A890EB00921AA1 /* FingerprintingProtectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FingerprintingProtectionTests.swift; sourceTree = "<group>"; };
 		27953F7323F5B04500B4B595 /* ViewLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewLabel.swift; sourceTree = "<group>"; };
 		27953F7623F5DF5D00B4B595 /* AboutShieldsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutShieldsViewController.swift; sourceTree = "<group>"; };
@@ -2556,7 +2557,6 @@
 		D3C3696D1CC6B78800348A61 /* LocalRequestHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocalRequestHelper.swift; sourceTree = "<group>"; };
 		D3C744CC1A687D6C004CE85D /* URIFixup.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URIFixup.swift; sourceTree = "<group>"; };
 		D3D488581ABB54CD00A93597 /* FileAccessorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileAccessorTests.swift; sourceTree = "<group>"; };
-		D3E8EEE71B97A87A001900FB /* ClearPrivateDataTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClearPrivateDataTableViewController.swift; sourceTree = "<group>"; };
 		D3FA777A1A43B2990010CD32 /* SearchTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchTests.swift; sourceTree = "<group>"; };
 		D3FA77831A43B2CE0010CD32 /* OpenSearch.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpenSearch.swift; sourceTree = "<group>"; };
 		D3FEC38C1AC4B42F00494F45 /* AutocompleteTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutocompleteTextField.swift; sourceTree = "<group>"; };
@@ -4015,7 +4015,6 @@
 			children = (
 				2746D26C24A291ED00E38852 /* Rewards Internals */,
 				0B62EFD11AD63CD100ACB9CD /* Clearables.swift */,
-				D3E8EEE71B97A87A001900FB /* ClearPrivateDataTableViewController.swift */,
 				2F44FCCA1A9E972E00FD20CC /* SearchEnginePicker.swift */,
 				2F44FCC61A9E8CF500FD20CC /* SearchSettingsTableViewController.swift */,
 				74E36D771B71323500D69DA1 /* SettingsContentViewController.swift */,
@@ -4029,6 +4028,7 @@
 				27D114D32358FBBF00166534 /* BraveRewardsSettingsViewController.swift */,
 				27D114D52358FCA400166534 /* SettingsRowViews.swift */,
 				27D67CEC24D07EB800066D83 /* BraveTodaySettingsViewController.swift */,
+				278C700924F96D7000A246C8 /* BraveShieldsAndPrivacySettingsController.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -6813,6 +6813,7 @@
 				5E4845C222DE3DF800372022 /* WindowRenderHelperScript.swift in Sources */,
 				27F94A3A21909A5900F4FADF /* SearchSuggestionsPromptView.swift in Sources */,
 				C690C208212FF35100E6EEE9 /* WebImageCacheWithNoPrivacyProtectionManager.swift in Sources */,
+				278C700A24F96D7000A246C8 /* BraveShieldsAndPrivacySettingsController.swift in Sources */,
 				27D114D42358FBBF00166534 /* BraveRewardsSettingsViewController.swift in Sources */,
 				2746D27124A2A12700E38852 /* RewardsInternalsPromotionListController.swift in Sources */,
 				0A4BEFDA221EF3360005551A /* NetworkResourceType.swift in Sources */,
@@ -7204,7 +7205,6 @@
 				E663D5781BB341C4001EF30E /* ToggleButton.swift in Sources */,
 				0AD9F88122F049E5008B4D95 /* AdblockRustEngine.swift in Sources */,
 				0A39FE992486604D00290ABC /* GRDGatewayAPI.m in Sources */,
-				D3E8EF101B97BE69001900FB /* ClearPrivateDataTableViewController.swift in Sources */,
 				0A1DF48424487AA000541FE4 /* GRDGatewayAPIResponse.m in Sources */,
 				4422D4B421BFFB7600BF1855 /* hash.cc in Sources */,
 				0A5CBD3823D4905D00362CC8 /* NTPNotificationView.swift in Sources */,
