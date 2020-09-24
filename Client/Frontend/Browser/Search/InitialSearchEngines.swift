@@ -13,7 +13,7 @@ class InitialSearchEngines {
         case google, bing, duckduckgo, yandex, qwant, startpage, yahoo
     }
     
-    struct SearchEngine: Equatable {
+    struct SearchEngine: Equatable, CustomStringConvertible {
         /// ID of the engine, this is also used to look up the xml file of given search engine if `customId` is not provided.
         let id: SearchEngineID
         /// Some search engines have regional variations which correspond to different xml files in `SearchPlugins` folder.
@@ -25,6 +25,14 @@ class InitialSearchEngines {
         static func == (lhs: Self, rhs: Self) -> Bool {
             lhs.id == rhs.id
         }
+        
+        var description: String {
+            var desc = id.rawValue
+            if let customId = customId {
+                desc += " with '\(customId)' custom id"
+            }
+            return desc
+        }
     }
     
     private let locale: Locale
@@ -33,14 +41,14 @@ class InitialSearchEngines {
     
     static let ddgDefaultRegions = ["DE", "AU", "NZ", "IE"]
     static let qwantDefaultRegions = ["FR"]
-    private let yandexDefaultRegions = ["BY", "KZ", "RU", "TR"]
-    private let yahooEligibleRegions =
+    static let yandexDefaultRegions = ["BY", "KZ", "RU", "TR"]
+    static let yahooEligibleRegions =
         ["GB", "US", "AR", "AT", "AU", "BR", "CA", "CH", "CL", "CO", "DE", "DK", "ES", "FI", "FR", "HK",
          "ID", "IE", "IN", "IT", "MX", "MY", "NL", "NO", "NZ", "PE", "PH", "SE", "SG", "TH", "TW", "VE", "VN"]
     
     /// Sets what should be the default search engine for given locale.
     /// If the engine does not exist in `engines` list, it is added to it.
-    var defaultSearchEngine: SearchEngineID {
+    private(set) var defaultSearchEngine: SearchEngineID {
         didSet {
             if !engines.contains(.init(id: defaultSearchEngine)) {
                 // As a fallback we add the missing engine
@@ -52,7 +60,7 @@ class InitialSearchEngines {
     /// Sets what should be the default priority engine for given locale.
     /// Priority engines show at the top of search engine onboarding as well as in search engines setting unless user changes search engines order.
     /// If the engine does not exist in `engines` list, it is added to it.
-    var priorityEngine: SearchEngineID? {
+    private(set) var priorityEngine: SearchEngineID? {
         didSet {
             guard let engine = priorityEngine else { return }
             if !engines.contains(.init(id: engine)) {
@@ -99,7 +107,7 @@ class InitialSearchEngines {
         if language == "ru" {
             replaceOrInsert(engineId: .yandex, customId: "yandex-ru")
             
-            if yandexDefaultRegions.contains(region) {
+            if Self.yandexDefaultRegions.contains(region) {
                 defaultSearchEngine = .yandex
             }
         }
@@ -107,7 +115,7 @@ class InitialSearchEngines {
         if language == "kk" {
             engines.append(.init(id: .yandex))
             
-            if yandexDefaultRegions.contains(region) {
+            if Self.yandexDefaultRegions.contains(region) {
                 defaultSearchEngine = .yandex
             }
         }
@@ -115,7 +123,7 @@ class InitialSearchEngines {
         if language == "tr" {
             replaceOrInsert(engineId: .yandex, customId: "yandex-tr")
             
-            if yandexDefaultRegions.contains(region) {
+            if Self.yandexDefaultRegions.contains(region) {
                 defaultSearchEngine = .yandex
             }
         }
@@ -137,7 +145,7 @@ class InitialSearchEngines {
     private func priorityOverrides() {
         guard let region = locale.regionCode else { return }
         
-        if yahooEligibleRegions.contains(region) {
+        if Self.yahooEligibleRegions.contains(region) {
             priorityEngine = .yahoo
         }
     }
