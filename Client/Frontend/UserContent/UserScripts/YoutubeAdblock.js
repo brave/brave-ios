@@ -38,116 +38,124 @@
 
 /// SetJS
 (function() {
-    const chain = '{{1}}';
-    let cValue = '{{2}}';
-    const thisScript = document.currentScript;
-    if ( cValue === 'undefined' ) {
-        cValue = undefined;
-    } else if ( cValue === 'false' ) {
-        cValue = false;
-    } else if ( cValue === 'true' ) {
-        cValue = true;
-    } else if ( cValue === 'null' ) {
-        cValue = null;
-    } else if ( cValue === 'noopFunc' ) {
-        cValue = function(){};
-    } else if ( cValue === 'trueFunc' ) {
-        cValue = function(){ return true; };
-    } else if ( cValue === 'falseFunc' ) {
-        cValue = function(){ return false; };
-    } else if ( /^\d+$/.test(cValue) ) {
-        cValue = parseFloat(cValue);
-        if ( isNaN(cValue) ) { return; }
-        if ( Math.abs(cValue) > 0x7FFF ) { return; }
-    } else if ( cValue === "''" ) {
-        cValue = '';
-    } else {
-        return;
-    }
-    let aborted = false;
-    const mustAbort = function(v) {
-        if ( aborted ) { return true; }
-        aborted =
-            (v !== undefined && v !== null) &&
-            (cValue !== undefined && cValue !== null) &&
-            (typeof v !== typeof cValue);
-        return aborted;
-    };
-    // https://github.com/uBlockOrigin/uBlock-issues/issues/156
-    //   Support multiple trappers for the same property.
-    const trapProp = function(owner, prop, handler) {
-        if ( handler.init(owner[prop]) === false ) { return; }
-        const odesc = Object.getOwnPropertyDescriptor(owner, prop);
-        let prevGetter, prevSetter;
-        if ( odesc instanceof Object ) {
-            if ( odesc.get instanceof Function ) {
-                prevGetter = odesc.get;
-            }
-            if ( odesc.set instanceof Function ) {
-                prevSetter = odesc.set;
-            }
+    const $<setJS> = function(chain, cValue) {
+        const thisScript = document.currentScript;
+        if (cValue === 'undefined') {
+            cValue = undefined;
+        } else if (cValue === 'false') {
+            cValue = false;
+        } else if (cValue === 'true') {
+            cValue = true;
+        } else if (cValue === 'null') {
+            cValue = null;
+        } else if (cValue === 'noopFunc') {
+            cValue = function(){};
+        } else if (cValue === 'trueFunc') {
+            cValue = function(){ return true; };
+        } else if (cValue === 'falseFunc') {
+            cValue = function(){ return false; };
+        } else if (/^\d+$/.test(cValue)) {
+            cValue = parseFloat(cValue);
+            if (isNaN(cValue)) { return; }
+            if (Math.abs(cValue) > 0x7FFF) { return; }
+        } else if (cValue === "''") {
+            cValue = '';
+        } else {
+            return;
         }
-        Object.defineProperty(owner, prop, {
-            configurable: true,
-            get() {
-                if ( prevGetter !== undefined ) {
-                    prevGetter();
+        
+        let aborted = false;
+        const mustAbort = function(v) {
+            if (aborted) { return true; }
+            aborted =
+                (v !== undefined && v !== null) &&
+                (cValue !== undefined && cValue !== null) &&
+                (typeof v !== typeof cValue);
+            return aborted;
+        };
+        
+        // https://github.com/uBlockOrigin/uBlock-issues/issues/156
+        //   Support multiple trappers for the same property.
+        const trapProp = function(owner, prop, handler) {
+            if (handler.init(owner[prop]) === false) { return; }
+            const odesc = Object.getOwnPropertyDescriptor(owner, prop);
+            let prevGetter, prevSetter;
+            if (odesc instanceof Object) {
+                if (odesc.get instanceof Function) {
+                    prevGetter = odesc.get;
                 }
-                return handler.getter();
-            },
-            set(a) {
-                if ( prevSetter !== undefined ) {
-                    prevSetter(a);
+                if (odesc.set instanceof Function) {
+                    prevSetter = odesc.set;
                 }
-                handler.setter(a);
             }
-        });
-    };
-    const trapChain = function(owner, chain) {
-        const pos = chain.indexOf('.');
-        if ( pos === -1 ) {
-            trapProp(owner, chain, {
+            
+            Object.defineProperty(owner, prop, {
+                configurable: true,
+                get() {
+                    if (prevGetter !== undefined) {
+                        prevGetter();
+                    }
+                    return handler.getter();
+                },
+                set(a) {
+                    if (prevSetter !== undefined) {
+                        prevSetter(a);
+                    }
+                    handler.setter(a);
+                }
+            });
+        };
+        
+        const trapChain = function(owner, chain) {
+            const pos = chain.indexOf('.');
+            if (pos === -1) {
+                trapProp(owner, chain, {
+                    v: undefined,
+                    init: function(v) {
+                        if (mustAbort(v)) { return false; }
+                        this.v = v;
+                        return true;
+                    },
+                    getter: function() {
+                        return document.currentScript === thisScript
+                            ? this.v
+                            : cValue;
+                    },
+                    setter: function(a) {
+                        if (mustAbort(a) === false) { return; }
+                        cValue = a;
+                    }
+                });
+                return;
+            }
+            const prop = chain.slice(0, pos);
+            const v = owner[prop];
+            chain = chain.slice(pos + 1);
+            if (v instanceof Object || typeof v === 'object' && v !== null) {
+                trapChain(v, chain);
+                return;
+            }
+            trapProp(owner, prop, {
                 v: undefined,
                 init: function(v) {
-                    if ( mustAbort(v) ) { return false; }
                     this.v = v;
                     return true;
                 },
                 getter: function() {
-                    return document.currentScript === thisScript
-                        ? this.v
-                        : cValue;
+                    return this.v;
                 },
                 setter: function(a) {
-                    if ( mustAbort(a) === false ) { return; }
-                    cValue = a;
+                    this.v = a;
+                    if (a instanceof Object) {
+                        trapChain(a, chain);
+                    }
                 }
             });
-            return;
-        }
-        const prop = chain.slice(0, pos);
-        const v = owner[prop];
-        chain = chain.slice(pos + 1);
-        if ( v instanceof Object || typeof v === 'object' && v !== null ) {
-            trapChain(v, chain);
-            return;
-        }
-        trapProp(owner, prop, {
-            v: undefined,
-            init: function(v) {
-                this.v = v;
-                return true;
-            },
-            getter: function() {
-                return this.v;
-            },
-            setter: function(a) {
-                this.v = a;
-                if ( a instanceof Object ) {
-                    trapChain(a, chain);
-                }
-            }
-        });
+        };
+        
+        trapChain(window, chain);
     };
-    trapChain(window, chain);
+    
+    $<setJS>('ytInitialPlayerResponse.adPlacements', 'undefined');
+    $<setJS>('playerResponse.adPlacements', 'undefined');
 })();
