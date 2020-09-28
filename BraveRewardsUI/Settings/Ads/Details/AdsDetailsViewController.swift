@@ -226,7 +226,7 @@ extension AdsDetailsViewController: UITableViewDelegate, UITableViewDataSource {
 
       var adsSubdivisionTargetingCode: String
       if state.ads.subdivisionTargetingCode == "AUTO" {
-        adsSubdivisionTargetingCode = state.ads.automaticallyDetectedSubdivisionTargetingCode
+        adsSubdivisionTargetingCode = state.ads.autoDetectedSubdivisionTargetingCode
       } else {
         adsSubdivisionTargetingCode = state.ads.subdivisionTargetingCode
       }
