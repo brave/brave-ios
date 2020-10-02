@@ -2326,6 +2326,10 @@ extension BrowserViewController: TabDelegate {
         alertStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
     }
 
+    func tab(_ tab: Tab, shouldShowToast toast: Toast) {
+        show(toast: toast)
+    }
+
     func tab(_ tab: Tab, didAddSnackbar bar: SnackBar) {
         showBar(bar, animated: true)
     }
