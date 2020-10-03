@@ -210,15 +210,24 @@ class LoginsHelper: TabContentScript {
 
             let json = JSON(jsonObj)
             let src = "window.__firefox__.logins.inject(\(json.stringValue()!))"
+
+            guard !json["logins"].isEmpty else {
+                self.tab?.webView?.evaluateJavaScript(src, completionHandler: { (obj, err) -> Void in
+                })
+                return
+            }
+
             let toast = ButtonToast(labelText: Strings.autoPopulateCredentialsToastLabelText, buttonText: Strings.autoPopulateCredentialsToastButtonText, completion: { buttonPressed in
                 if buttonPressed {
                     self.tab?.webView?.evaluateJavaScript(src, completionHandler: { (obj, err) -> Void in
                     })
                 }
             })
+
             guard let tab = self.tab else {
                 return
             }
+
             tab.tabDelegate?.tab(tab, shouldShowToast: toast)
         }
     }
