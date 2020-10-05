@@ -15,6 +15,7 @@ import UserNotifications
 import BraveShared
 import Data
 import StoreKit
+import BraveRewards
 
 private let log = Logger.browserLogger
 
@@ -31,6 +32,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
     var rootViewController: UIViewController!
     weak var profile: Profile?
     var tabManager: TabManager!
+    var braveCore: BraveCoreMain?
 
     weak var application: UIApplication?
     var launchOptions: [AnyHashable: Any]?
@@ -63,6 +65,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         self.launchOptions = launchOptions
         self.window = UIWindow(frame: UIScreen.main.bounds)
         self.window!.backgroundColor = .black
+        
+        //Brave Core Initialization
+        self.braveCore = BraveCoreMain()
+        self.braveCore?.setUserAgent(UserAgent.mobile)
+
         
         SceneObserver.setupApplication(window: self.window!)
 
@@ -170,6 +177,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
 
         self.updateAuthenticationInfo()
         SystemUtils.onFirstRun()
+        
+        // Schedule Brave Core Priority Tasks
+        self.braveCore?.scheduleLowPriorityStartupTasks()
 
         log.info("startApplication end")
         return true
@@ -185,6 +195,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         self.browserViewController = nil
         self.rootViewController = nil
         SKPaymentQueue.default().remove(iapObserver)
+        self.braveCore = nil
     }
 
     /**

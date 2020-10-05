@@ -51,9 +51,9 @@ class AddEditBookmarkTableViewController: UITableViewController {
         case .addFolder(let title):
             return FolderDetailsViewTableViewCell(title: title, viewHeight: UX.cellHeight)
         case .editBookmark(let bookmark), .editFavorite(let bookmark):
-            return BookmarkDetailsView(title: bookmark.displayTitle, url: bookmark.url)
+            return BookmarkDetailsView(title: bookmark.title, url: bookmark.url)
         case .editFolder(let folder):
-            return FolderDetailsViewTableViewCell(title: folder.displayTitle, viewHeight: UX.cellHeight)
+            return FolderDetailsViewTableViewCell(title: folder.title, viewHeight: UX.cellHeight)
         }
     }()
     
@@ -112,7 +112,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
     
     // MARK: - Init
     
-    private let frc: NSFetchedResultsController<Bookmark>
+    private var frc: BookmarksV2FetchResultsController
     private let mode: BookmarkEditMode
     
     private var presentationMode: DataSourcePresentationMode
@@ -125,7 +125,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
         
         saveLocation = mode.initialSaveLocation
         presentationMode = .currentSelection
-        frc = Bookmark.foldersFrc(excludedFolder: mode.folder)
+        frc = Bookmarkv2.foldersFrc(excludedFolder: mode.folder)
         
         super.init(style: .grouped)
     }
@@ -178,7 +178,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
     // MARK: - Getting data
     
     /// Bookmark with a level of indentation
-    private typealias IndentedFolder = (folder: Bookmark, indentationLevel: Int)
+    private typealias IndentedFolder = (folder: Bookmarkv2, indentationLevel: Int)
     
     /// Main data source
     private var sortedFolders = [IndentedFolder]()
@@ -186,7 +186,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
     /// Sorts folders by their older and nesting level.
     /// Indentation level starts with 0, but level 0 is designed for special folders
     /// (root level bookamrks, favorites).
-    private func sortFolders(parentID: NSManagedObjectID? = nil,
+    private func sortFolders(parentID: Int? = nil,
                              indentationLevel: Int = 1) -> [IndentedFolder] {
         guard let objects = frc.fetchedObjects else { return [] }
         
@@ -194,7 +194,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
         
         var result = [IndentedFolder]()
         
-        sortedObjects.filter { $0.parentFolder?.objectID == parentID }.forEach {
+        sortedObjects.filter { $0.parent?.objectID == parentID }.forEach {
             result.append(($0, indentationLevel: indentationLevel))
             // Append children recursively
             result.append(contentsOf: sortFolders(parentID: $0.objectID,
@@ -242,20 +242,20 @@ class AddEditBookmarkTableViewController: UITableViewController {
             
             switch saveLocation {
             case .rootLevel:
-                Bookmark.add(url: url, title: title)
+                Bookmarkv2.add(url: url, title: title)
             case .favorites:
                 Bookmark.addFavorite(url: url, title: title)
             case .folder(let folder):
-                Bookmark.add(url: url, title: title, parentFolder: folder)
+                Bookmarkv2.add(url: url, title: title, parentFolder: folder)
             }
         case .addFolder(_):
             switch saveLocation {
             case .rootLevel:
-                Bookmark.addFolder(title: title)
+                Bookmarkv2.addFolder(title: title)
             case .favorites:
                 fatalError("Folders can't be saved to favorites")
             case .folder(let folder):
-                Bookmark.addFolder(title: title, parentFolder: folder)
+                Bookmarkv2.addFolder(title: title, parentFolder: folder)
             }
         case .editBookmark(let bookmark):
             guard let urlString = bookmarkDetailsView.urlTextField?.text,
@@ -303,7 +303,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
                 favorite.update(customTitle: title, url: url.absoluteString)
             case .folder(let folder):
                 favorite.delete()
-                Bookmark.add(url: url, title: title, parentFolder: folder)
+                Bookmarkv2.add(url: url, title: title, parentFolder: folder)
             }
         }
         

@@ -116,6 +116,7 @@ class SettingsViewController: TableViewController {
             generalSection,
             displaySection,
             securitySection,
+            syncSection,
             supportSection,
             aboutSection
         ]
@@ -371,6 +372,31 @@ class SettingsViewController: TableViewController {
             ]
         )
     }()
+    
+    private lazy var syncSection: Section = {
+            return Section(
+                header: .title(Strings.sync),
+                rows: [
+                    Row(text: Strings.sync, selection: { [unowned self] in
+                        if BraveSyncAPI.shared.isInSyncGroup {
+                            let syncSettingsVC = SyncSettingsTableViewController(style: .grouped)
+                            syncSettingsVC.dismissHandler = {
+                                self.navigationController?.popToRootViewController(animated: true)
+                            }
+
+                            self.navigationController?.pushViewController(syncSettingsVC, animated: true)
+                        } else {
+                            let view = SyncWelcomeViewController()
+                            view.dismissHandler = {
+                                view.navigationController?.popToRootViewController(animated: true)
+                            }
+                            self.navigationController?.pushViewController(view, animated: true)
+                        }
+                        }, accessory: .disclosureIndicator,
+                           cellClass: MultilineValue1Cell.self)
+                ]
+            )
+        }()
     
     private lazy var supportSection: Section = {
         return Section(

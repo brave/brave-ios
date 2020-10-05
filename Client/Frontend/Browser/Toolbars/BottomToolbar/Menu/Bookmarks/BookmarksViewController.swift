@@ -14,7 +14,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
   /// Called when the bookmarks are updated via some user input (i.e. Delete, edit, etc.)
     var bookmarksDidChange: (() -> Void)?
     weak var toolbarUrlActionsDelegate: ToolbarUrlActionsDelegate?
-    var bookmarksFRC: NSFetchedResultsController<Bookmark>?
+    var bookmarksFRC: BookmarksV2FetchResultsController?
   
     lazy var editBookmarksButton: UIBarButtonItem? = UIBarButtonItem().then {
         $0.image = #imageLiteral(resourceName: "edit").template
@@ -33,7 +33,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     
     var isEditingIndividualBookmark: Bool = false
   
-    var currentFolder: Bookmark?
+    var currentFolder: Bookmarkv2?
     /// Certain bookmark actions are different in private browsing mode.
     let isPrivateBrowsing: Bool
     
@@ -41,7 +41,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     
     enum Mode {
         // Set nil for root level bookmarks.
-        case bookmarks(inFolder: Bookmark?)
+        case bookmarks(inFolder: Bookmarkv2?)
         case favorites
     }
   
@@ -55,10 +55,10 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         case .bookmarks(let folder):
             self.currentFolder = folder
             self.title = folder?.displayTitle ?? Strings.bookmarks
-            self.bookmarksFRC = Bookmark.frc(parentFolder: folder)
+            self.bookmarksFRC = Bookmarkv2.frc(parent: folder)
         case .favorites:
             title = Strings.favoritesRootLevelCellTitle
-            bookmarksFRC = Bookmark.frc(forFavorites: true, parentFolder: nil)
+            bookmarksFRC = Bookmarkv2.frc(forFavorites: true, parent: nil)
             addFolderButton = nil
         }
         
@@ -103,9 +103,9 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         if bookmarksFRC == nil {
             switch mode {
             case .bookmarks(_):
-                bookmarksFRC = Bookmark.frc(parentFolder: currentFolder)
+                bookmarksFRC = Bookmarkv2.frc(parent: currentFolder)
             case .favorites:
-                bookmarksFRC = Bookmark.frc(forFavorites: true, parentFolder: nil)
+                bookmarksFRC = Bookmarkv2.frc(forFavorites: true, parent: nil)
             }
             bookmarksFRC?.delegate = self
         }
@@ -172,7 +172,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
   }
   
   func addFolder(titled title: String) {
-    Bookmark.addFolder(title: title, parentFolder: currentFolder)
+    Bookmarkv2.addFolder(title: title, parentFolder: currentFolder)
     tableView.setContentOffset(CGPoint.zero, animated: true)
   }
   
@@ -181,7 +181,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
   }
   
   func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-    Bookmark.reorderBookmarks(frc: bookmarksFRC, sourceIndexPath: sourceIndexPath, destinationIndexPath: destinationIndexPath)
+    Bookmarkv2.reorderBookmarks(frc: bookmarksFRC, sourceIndexPath: sourceIndexPath, destinationIndexPath: destinationIndexPath)
   }
   
   func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
@@ -197,7 +197,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     }
     
     guard let item = bookmarksFRC?.object(at: indexPath) else { return }
-    cell.tag = item.objectID.hashValue
+    cell.tag = item.objectID //.hashValue
     
     func configCell(image: UIImage? = nil, icon: FaviconMO? = nil) {
       if !tableView.isEditing {
@@ -261,8 +261,8 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
                                 customActions: bookmark.isFolder ? folderLongPressActions(bookmark) : nil)
     }
     
-    private func folderLongPressActions(_ folder: Bookmark) -> [UIAlertAction] {
-        let children = Bookmark.getChildren(forFolder: folder, includeFolders: false) ?? []
+    private func folderLongPressActions(_ folder: Bookmarkv2) -> [UIAlertAction] {
+        let children = Bookmarkv2.getChildren(forFolder: folder, includeFolders: false) ?? []
         
         let urls: [URL] = children.compactMap { b in
             guard let url = b.url else { return nil }
@@ -375,7 +375,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     return [deleteAction, editAction]
   }
   
-    fileprivate func showEditBookmarkController(bookmark: Bookmark) {
+    fileprivate func showEditBookmarkController(bookmark: Bookmarkv2) {
         self.isEditingIndividualBookmark = true
     
         var mode: BookmarkEditMode?

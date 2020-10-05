@@ -152,6 +152,10 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         return all(where: isFavoritePredicate) ?? []
     }
     
+    public class var allBookmarks: [Bookmark] {
+        return getAllBookmarks()
+    }
+    
     // MARK: Update
     
     public func update(customTitle: String?, url: String?) {

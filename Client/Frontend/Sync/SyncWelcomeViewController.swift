@@ -4,6 +4,7 @@ import UIKit
 import Shared
 import Data
 import BraveShared
+import BraveRewards
 
 /// Sometimes during heavy operations we want to prevent user from navigating back, changing screen etc.
 protocol NavigationPrevention {
@@ -13,6 +14,9 @@ protocol NavigationPrevention {
 
 class SyncWelcomeViewController: SyncViewController {
     var dismissHandler: (() -> Void)?
+    
+    private var syncServiceObserver: BraveSyncServiceObserver?
+    private var syncDeviceInfoObserver: BraveSyncDeviceObserver?
     
     lazy var mainStackView: UIStackView = {
         let stackView = UIStackView()
@@ -131,14 +135,18 @@ class SyncWelcomeViewController: SyncViewController {
     /// Sync setup failure is handled here because it can happen from few places in children VCs(new chain, qr code, codewords)
     /// This makes all presented Sync View Controllers to dismiss, cleans up any sync setup and shows user a friendly message.
     private func handleSyncSetupFailure() {
-        let sync = Sync.shared
-        sync.syncSetupFailureCallback = { [weak self] in
-            self?.dismiss(animated: true)
-            sync.leaveSyncGroup()
+        syncServiceObserver = BraveSyncServiceObserver { [weak self] in
+            guard let self = self else { return }
+            print("SYNC SERVICE STATUS - In Sync Group: \(BraveSyncAPI.shared.isInSyncGroup)")
             
-            let bvc = (UIApplication.shared.delegate as? AppDelegate)?.browserViewController
-            
-            bvc?.present(SyncAlerts.initializationError, animated: true)
+            //bvc?.present(SyncAlerts.initializationError, animated: true)
+            if !BraveSyncAPI.shared.isInSyncGroup {
+                self.dismiss(animated: true)
+
+                let bvc = (UIApplication.shared.delegate as? AppDelegate)?.browserViewController
+
+                bvc?.present(SyncAlerts.initializationError, animated: true)
+            }
         }
     }
     
@@ -147,7 +155,7 @@ class SyncWelcomeViewController: SyncViewController {
         addDevice.syncInitHandler = { (title, type) in
             weak var weakSelf = self
             func pushAddDeviceVC() {
-                guard Sync.shared.isInSyncGroup else {
+                guard BraveSyncAPI.shared.isInSyncGroup else {
                     addDevice.disableNavigationPrevention()
                     let alert = UIAlertController(title: Strings.syncUnsuccessful, message: Strings.syncUnableCreateGroup, preferredStyle: .alert)
                     alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
@@ -161,15 +169,19 @@ class SyncWelcomeViewController: SyncViewController {
                 weakSelf?.navigationController?.pushViewController(view, animated: true)
             }
             
-            if Sync.shared.isInSyncGroup {
+            if BraveSyncAPI.shared.isInSyncGroup {
                 pushAddDeviceVC()
                 return
             }
 
             addDevice.enableNavigationPrevention()
-            self.addSyncReadyNotificationObserver { pushAddDeviceVC() }
+            self.syncDeviceInfoObserver = BraveSyncDeviceObserver { [weak self] in
+                self?.syncDeviceInfoObserver = nil
+                pushAddDeviceVC()
+            }
             
-            Sync.shared.initializeNewSyncGroup(deviceName: UIDevice.current.name)
+            BraveSyncAPI.shared.joinSyncGroup(codeWords: BraveSyncAPI.shared.getSyncCode())
+            BraveSyncAPI.shared.setSyncEnabled(true)
         }
 
         navigationController?.pushViewController(addDevice, animated: true)
@@ -178,28 +190,20 @@ class SyncWelcomeViewController: SyncViewController {
     @objc func existingUserAction() {
         let pairCamera = SyncPairCameraViewController()
         
-        pairCamera.syncHandler = { bytes in
+        pairCamera.syncHandler = { codeWords in
             pairCamera.enableNavigationPrevention()
-            Sync.shared.initializeSync(seed: bytes, deviceName: UIDevice.current.name)
-
-            self.addSyncReadyNotificationObserver {
+            
+            self.syncDeviceInfoObserver = BraveSyncDeviceObserver { [weak self] in
+                self?.syncDeviceInfoObserver = nil
                 pairCamera.disableNavigationPrevention()
-                self.pushSettings()
+                self?.pushSettings()
             }
+ 
+            BraveSyncAPI.shared.joinSyncGroup(codeWords: codeWords)
+            BraveSyncAPI.shared.setSyncEnabled(true)
         }
         
         navigationController?.pushViewController(pairCamera, animated: true)
-    }
-
-    private func addSyncReadyNotificationObserver(completion: @escaping () -> Void) {
-        NotificationCenter.default.addObserver(forName: Sync.Notifications.syncReady,
-                                               object: nil,
-                                               queue: .main,
-                                               using: { notification in
-                                                completion()
-                                                // This is a one-time notification, removing it immediately.
-                                                NotificationCenter.default.removeObserver(notification)
-        })
     }
     
     private func pushSettings() {

@@ -11,6 +11,8 @@ import Data
 private let log = Logger.browserLogger
 
 class Migration {
+    private static var migration: BraveCoreMigrator?
+    
     static func launchMigrations(keyPrefix: String) {
         Preferences.migratePreferences(keyPrefix: keyPrefix)
         
@@ -23,6 +25,8 @@ class Migration {
             documentsDirectoryCleanup()
             Preferences.Migration.documentsDirectoryCleanupCompleted.value = true
         }
+        
+        migration = BraveCoreMigrator()
     }
     
     static func moveDatabaseToApplicationDirectory() {
