@@ -437,8 +437,8 @@ extension AddEditBookmarkTableViewController: BookmarkDetailsViewDelegate {
 
 // MARK: - NSFetchedResultsControllerDelegate
 
-extension AddEditBookmarkTableViewController: NSFetchedResultsControllerDelegate {
-    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+extension AddEditBookmarkTableViewController: BookmarksV2FetchResultsDelegate {
+    func controller(_ controller: BookmarksV2FetchResultsController, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         
         // Possible performance bottleneck.
         // There is not easy way to get folder sorted by their parent/children hierarchy
@@ -450,5 +450,17 @@ extension AddEditBookmarkTableViewController: NSFetchedResultsControllerDelegate
         //
         // Watching for CoreData save notification could be an alternative to using a frc delegate.
         reloadData()
+    }
+    
+    func controllerWillChangeContent(_ controller: BookmarksV2FetchResultsController) {
+        print("WILL CHANGE CONTENT")
+    }
+    
+    func controllerDidChangeContent(_ controller: BookmarksV2FetchResultsController) {
+        print("DID CHANGE CONTENT")
+    }
+    
+    func noIdeaReloadTable(_ controller: BookmarksV2FetchResultsController) {
+      reloadData()
     }
 }

@@ -15,6 +15,41 @@ protocol NavigationPrevention {
 class SyncWelcomeViewController: SyncViewController {
     var dismissHandler: (() -> Void)?
     
+    private var overlayView: UIView?
+    
+    private var isLoading: Bool = false {
+        didSet {
+            overlayView?.removeFromSuperview()
+            
+            // Toggle 'restore' button.
+            navigationItem.rightBarButtonItem?.isEnabled = !isLoading
+            
+            // Prevent dismissing the modal by swipe when migration happens.
+            if #available(iOS 13.0, *) {
+                navigationController?.isModalInPresentation = isLoading == true
+            }
+            
+            if !isLoading { return }
+            
+            let overlay = UIView().then {
+                $0.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+                let activityIndicator = UIActivityIndicatorView().then { indicator in
+                    indicator.startAnimating()
+                    indicator.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+                }
+                
+                $0.addSubview(activityIndicator)
+            }
+            
+            view.addSubview(overlay)
+            overlay.snp.makeConstraints {
+                $0.edges.equalToSuperview()
+            }
+            
+            overlayView = overlay
+        }
+    }
+    
     private var syncServiceObserver: BraveSyncServiceObserver?
     private var syncDeviceInfoObserver: BraveSyncDeviceObserver?
     
@@ -151,59 +186,100 @@ class SyncWelcomeViewController: SyncViewController {
     }
     
     @objc func newToSyncAction() {
-        let addDevice = SyncSelectDeviceTypeViewController()
-        addDevice.syncInitHandler = { (title, type) in
-            weak var weakSelf = self
-            func pushAddDeviceVC() {
-                guard BraveSyncAPI.shared.isInSyncGroup else {
-                    addDevice.disableNavigationPrevention()
-                    let alert = UIAlertController(title: Strings.syncUnsuccessful, message: Strings.syncUnableCreateGroup, preferredStyle: .alert)
-                    alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
-                    addDevice.present(alert, animated: true, completion: nil)
+        migrationCheck { [weak self] in
+            guard let self = self else { return }
+            
+            let addDevice = SyncSelectDeviceTypeViewController()
+            addDevice.syncInitHandler = { (title, type) in
+                func pushAddDeviceVC() {
+                    guard BraveSyncAPI.shared.isInSyncGroup else {
+                        addDevice.disableNavigationPrevention()
+                        let alert = UIAlertController(title: Strings.syncUnsuccessful, message: Strings.syncUnableCreateGroup, preferredStyle: .alert)
+                        alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
+                        addDevice.present(alert, animated: true, completion: nil)
+                        return
+                    }
+
+                    let view = SyncAddDeviceViewController(title: title, type: type)
+                    view.doneHandler = self.pushSettings
+                    view.navigationItem.hidesBackButton = true
+                    self.navigationController?.pushViewController(view, animated: true)
+                }
+                
+                if BraveSyncAPI.shared.isInSyncGroup {
+                    pushAddDeviceVC()
                     return
                 }
 
-                let view = SyncAddDeviceViewController(title: title, type: type)
-                view.doneHandler = self.pushSettings
-                view.navigationItem.hidesBackButton = true
-                weakSelf?.navigationController?.pushViewController(view, animated: true)
-            }
-            
-            if BraveSyncAPI.shared.isInSyncGroup {
-                pushAddDeviceVC()
-                return
+                addDevice.enableNavigationPrevention()
+                self.syncDeviceInfoObserver = BraveSyncDeviceObserver {
+                    self.syncDeviceInfoObserver = nil
+                    pushAddDeviceVC()
+                }
+                
+                BraveSyncAPI.shared.joinSyncGroup(codeWords: BraveSyncAPI.shared.getSyncCode())
+                BraveSyncAPI.shared.setSyncEnabled(true)
             }
 
-            addDevice.enableNavigationPrevention()
-            self.syncDeviceInfoObserver = BraveSyncDeviceObserver { [weak self] in
-                self?.syncDeviceInfoObserver = nil
-                pushAddDeviceVC()
-            }
-            
-            BraveSyncAPI.shared.joinSyncGroup(codeWords: BraveSyncAPI.shared.getSyncCode())
-            BraveSyncAPI.shared.setSyncEnabled(true)
+            self.navigationController?.pushViewController(addDevice, animated: true)
         }
-
-        navigationController?.pushViewController(addDevice, animated: true)
     }
     
     @objc func existingUserAction() {
-        let pairCamera = SyncPairCameraViewController()
-        
-        pairCamera.syncHandler = { codeWords in
-            pairCamera.enableNavigationPrevention()
+        migrationCheck { [weak self] in
+            guard let self = self else { return }
             
-            self.syncDeviceInfoObserver = BraveSyncDeviceObserver { [weak self] in
-                self?.syncDeviceInfoObserver = nil
-                pairCamera.disableNavigationPrevention()
-                self?.pushSettings()
+            let pairCamera = SyncPairCameraViewController()
+            
+            pairCamera.syncHandler = { codeWords in
+                pairCamera.enableNavigationPrevention()
+                
+                self.syncDeviceInfoObserver = BraveSyncDeviceObserver {
+                    self.syncDeviceInfoObserver = nil
+                    pairCamera.disableNavigationPrevention()
+                    self.pushSettings()
+                }
+     
+                BraveSyncAPI.shared.joinSyncGroup(codeWords: codeWords)
+                BraveSyncAPI.shared.setSyncEnabled(true)
             }
- 
-            BraveSyncAPI.shared.joinSyncGroup(codeWords: codeWords)
-            BraveSyncAPI.shared.setSyncEnabled(true)
+            
+            self.navigationController?.pushViewController(pairCamera, animated: true)
+        }
+    }
+    
+    private func migrationCheck(completion: @escaping (() -> Void)) {
+        if BraveCoreMigrator.chromiumBookmarksMigration_v1 {
+            completion()
+            return
         }
         
-        navigationController?.pushViewController(pairCamera, animated: true)
+        let alert = UIAlertController(title: Strings.syncV2MigrationTitle,
+                                      message: Strings.syncV2MigrationMessage, preferredStyle: .alert)
+        
+        let okAction = UIAlertAction(title: Strings.syncV2MigrationOKButton, style: .default) { [weak self] _ in
+            guard let self = self else { return }
+            self.isLoading = true
+            // TODO: Call migration code
+            
+            self.isLoading = false
+            // if error -> show this alert
+            let alert = UIAlertController(title: Strings.syncV2MigrationErrorTitle,
+                                          message: Strings.syncV2MigrationErrorMessage,
+                                          preferredStyle: .alert)
+            
+            let cancelAction = UIAlertAction(title: Strings.OKString, style: .cancel)
+            alert.addAction(cancelAction)
+            
+            self.present(alert, animated: true)
+            
+        }
+        let cancelAction = UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel)
+        
+        alert.addAction(okAction)
+        alert.addAction(cancelAction)
+        
+        present(alert, animated: true)
     }
     
     private func pushSettings() {

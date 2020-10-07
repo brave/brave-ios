@@ -78,11 +78,8 @@ class BraveCoreMigrator {
     }
     
     private func convertToChromiumFormat(_ bookmark: Bookmark) -> BookmarkInfo {
-        if let children = bookmark.children {
-            return BookmarkInfo(title: bookmark.customTitle ?? bookmark.title, url: bookmark.url, isFolder: bookmark.isFolder, children: children.map({ convertToChromiumFormat($0) }))
-        }
-        
-        return BookmarkInfo(title: bookmark.customTitle ?? bookmark.title, url: bookmark.url, isFolder: bookmark.isFolder, children: nil)
+        // Tail recursion to map children..
+        return BookmarkInfo(title: bookmark.customTitle ?? bookmark.title, url: bookmark.url, isFolder: bookmark.isFolder, children: bookmark.children?.map({ convertToChromiumFormat($0) }))
     }
     
     //TODO: Possibly change this to throw a specific error to let us know what went wrong..
@@ -129,36 +126,13 @@ extension BraveCoreMigrator {
         func bookmarkModelLoaded() {
             self.onModelLoaded()
         }
-        
-        func bookmarkNodeChanged(_ bookmarkNode: BookmarkNode) {
-            print("NODE CHANGED")
-        }
-        
-        func bookmarkNodeChildrenChanged(_ bookmarkNode: BookmarkNode) {
-            print("CHILDREN CHANGED")
-        }
-        
-        func bookmarkNodeFaviconChanged(_ bookmarkNode: BookmarkNode) {
-            print("FAV ICON CHANGED")
-        }
-        
-        func bookmarkNodeDeleted(_ node: BookmarkNode, fromFolder folder: BookmarkNode) {
-            print("NODE DELETED")
-        }
-        
-        func bookmarkNode(_ bookmarkNode: BookmarkNode, movedFromParent oldParent: BookmarkNode, toParent newParent: BookmarkNode) {
-            print("MOVED FROM PARENT")
-        }
-        
-        func bookmarkModelRemovedAllNodes() {
-            print("REMOVED ALL NODES")
-        }
     }
 }
 
 class Bookmarkv2 {
     private let coreDataBookmark: Bookmark?
     private let bookmarkNode: BookmarkNode?
+    private static let bookmarksAPI = BraveBookmarksAPI()
     
     init(_ coreDataBookmark: Bookmark) {
         self.coreDataBookmark = coreDataBookmark
@@ -219,7 +193,7 @@ class Bookmarkv2 {
             return coreDataBookmark.domain
         }
         
-        if let url = bookmarkNode?.iconUrl {
+        if let url = bookmarkNode?.url {
             return Domain.getOrCreate(forUrl: url, persistent: true)
         }
         return nil
@@ -269,11 +243,10 @@ extension Bookmarkv2 {
     public class func addFolder(title: String, parentFolder: Bookmarkv2? = nil) {
         if BraveCoreMigrator.chromiumBookmarksMigration_v1 {
             //User is using BraveCore
-            let bookmarksAPI = BraveBookmarksAPI()
             if let parentFolder = parentFolder?.bookmarkNode {
-                bookmarksAPI.createFolder(withParent: parentFolder, title: title)
+                Bookmarkv2.bookmarksAPI.createFolder(withParent: parentFolder, title: title)
             } else {
-                bookmarksAPI.createFolder(withTitle: title)
+                Bookmarkv2.bookmarksAPI.createFolder(withTitle: title)
             }
         } else {
             //Fallback to CoreData
@@ -284,11 +257,10 @@ extension Bookmarkv2 {
     public class func add(url: URL, title: String?, parentFolder: Bookmarkv2? = nil) {
         if BraveCoreMigrator.chromiumBookmarksMigration_v1 {
             //User is using BraveCore
-            let bookmarksAPI = BraveBookmarksAPI()
             if let parentFolder = parentFolder?.bookmarkNode {
-                bookmarksAPI.createBookmark(withParent: parentFolder, title: title ?? "", with: url)
+                Bookmarkv2.bookmarksAPI.createBookmark(withParent: parentFolder, title: title ?? "", with: url)
             } else {
-                bookmarksAPI.createBookmark(withTitle: title ?? "", url: url)
+                Bookmarkv2.bookmarksAPI.createBookmark(withTitle: title ?? "", url: url)
             }
         } else {
             //Fallback to CoreData
@@ -313,12 +285,12 @@ extension Bookmarkv2 {
                 }
                 
                 if let bookmarkNode = parent.bookmarkNode {
-                    return Bookmarkv2Fetcher(bookmarkNode)
+                    return Bookmarkv2Fetcher(bookmarkNode, api: Bookmarkv2.bookmarksAPI)
                 }
                 return nil
             } else {
                 if BraveCoreMigrator.chromiumBookmarksMigration_v1 {
-                    return Bookmarkv2ExclusiveFetcher(nil)
+                    return Bookmarkv2ExclusiveFetcher(nil, api: Bookmarkv2.bookmarksAPI)
                 } else {
                     return Bookmarkv2Fetcher(Bookmark.frc(forFavorites: forFavorites, parentFolder: nil))
                 }
@@ -330,7 +302,7 @@ extension Bookmarkv2 {
     public static func foldersFrc(excludedFolder: Bookmarkv2? = nil) -> BookmarksV2FetchResultsController {
         if BraveCoreMigrator.chromiumBookmarksMigration_v1 {
             //Brave Core
-            return Bookmarkv2ExclusiveFetcher(excludedFolder?.bookmarkNode)
+            return Bookmarkv2ExclusiveFetcher(excludedFolder?.bookmarkNode, api: Bookmarkv2.bookmarksAPI)
         }
         //Core Data
         return Bookmarkv2Fetcher(Bookmark.foldersFrc(excludedFolder: excludedFolder?.coreDataBookmark))
@@ -354,7 +326,27 @@ extension Bookmarkv2 {
     }
     
     public func updateWithNewLocation(customTitle: String?, url: String?, location: Bookmarkv2?) {
-        fatalError("NOT IMPLEMENTED")
+        if let coreDataBookmark = coreDataBookmark {
+            coreDataBookmark.updateWithNewLocation(customTitle: customTitle, url: url, location: location?.coreDataBookmark)
+        } else {
+            if let location = location?.bookmarkNode {
+                bookmarkNode?.move(toParent: location)
+            } else {
+                if let mobileNode = Bookmarkv2.bookmarksAPI.mobileNode {
+                    bookmarkNode?.move(toParent: mobileNode)
+                }
+            }
+            
+            if let customTitle = customTitle {
+                bookmarkNode?.setTitle(customTitle)
+            }
+            
+            if let url = url {
+                bookmarkNode?.url = URL(string: url)
+            } else {
+                bookmarkNode?.url = nil
+            }
+        }
     }
     
     public class func reorderBookmarks(frc: BookmarksV2FetchResultsController?, sourceIndexPath: IndexPath,
@@ -374,7 +366,7 @@ extension Bookmarkv2 {
         if let coreDataBookmark = self.coreDataBookmark {
             return coreDataBookmark.objectID.hashValue
         }
-        return bookmarkNode?.guid.hashValue ?? -1
+        return Int(bookmarkNode?.nodeId ?? 0)
     }
     
     public var order: Int16 {
@@ -390,21 +382,32 @@ extension Bookmarkv2 {
         if let coreDataBookmark = coreDataBookmark {
             coreDataBookmark.delete()
         } else if let bookmarkNode = bookmarkNode {
-            BraveBookmarksAPI().removeBookmark(bookmarkNode)
+            Bookmarkv2.bookmarksAPI.removeBookmark(bookmarkNode)
         }
     }
 }
 
+protocol BookmarksV2FetchResultsDelegate: class {
+    func controllerWillChangeContent(_ controller: BookmarksV2FetchResultsController)
+    
+    func controllerDidChangeContent(_ controller: BookmarksV2FetchResultsController)
+    
+    func controller(_ controller: BookmarksV2FetchResultsController, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?)
+    
+    func noIdeaReloadTable(_ controller: BookmarksV2FetchResultsController)
+}
+
 protocol BookmarksV2FetchResultsController {
+    /* weak */ var delegate: BookmarksV2FetchResultsDelegate? { get set }
+    
     var fetchedObjects: [Bookmarkv2]? { get }
     func performFetch() throws
     func object(at indexPath: IndexPath) -> Bookmarkv2?
-    
-    /* weak */ var delegate: AnyObject? { get set }
 }
 
-class Bookmarkv2Fetcher: BookmarksV2FetchResultsController {
-    weak var delegate: AnyObject?
+class Bookmarkv2Fetcher: NSObject, BookmarksV2FetchResultsController {
+    weak var delegate: BookmarksV2FetchResultsDelegate?
+    private var bookmarkModelListener: BookmarkModelListener?
     
     private let controller: NSFetchedResultsController<Bookmark>?
     private let parentNode: BookmarkNode?
@@ -413,11 +416,18 @@ class Bookmarkv2Fetcher: BookmarksV2FetchResultsController {
     init(_ controller: NSFetchedResultsController<Bookmark>) {
         self.controller = controller
         self.parentNode = nil
+        self.bookmarkModelListener = nil
+        super.init()
+        
+        self.controller?.delegate = self
     }
     
-    init(_ parentNode: BookmarkNode) {
+    init(_ parentNode: BookmarkNode, api: BraveBookmarksAPI) {
         self.controller = nil
         self.parentNode = parentNode
+        super.init()
+        
+        self.bookmarkModelListener = api.add(self)
     }
     
     var fetchedObjects: [Bookmarkv2]? {
@@ -447,15 +457,20 @@ class Bookmarkv2Fetcher: BookmarksV2FetchResultsController {
     }
 }
 
-class Bookmarkv2ExclusiveFetcher: BookmarksV2FetchResultsController {
-    weak var delegate: AnyObject?
+class Bookmarkv2ExclusiveFetcher: NSObject, BookmarksV2FetchResultsController {
+    weak var delegate: BookmarksV2FetchResultsDelegate?
+    private var bookmarkModelListener: BookmarkModelListener?
     
     private var excludedFolder: BookmarkNode?
     private var children = [BookmarkNode]()
-    private let bookmarksAPI = BraveBookmarksAPI()
+    private weak var bookmarksAPI: BraveBookmarksAPI?
     
-    init(_ excludedFolder: BookmarkNode?) {
+    init(_ excludedFolder: BookmarkNode?, api: BraveBookmarksAPI) {
         self.excludedFolder = excludedFolder
+        self.bookmarksAPI = api
+        super.init()
+        
+        self.bookmarkModelListener = api.add(self)
     }
     
     var fetchedObjects: [Bookmarkv2]? {
@@ -464,15 +479,15 @@ class Bookmarkv2ExclusiveFetcher: BookmarksV2FetchResultsController {
     
     func performFetch() throws {
         self.children = []
-        if let node = bookmarksAPI.mobileNode {
+        if let node = bookmarksAPI?.mobileNode {
             self.children.append(node)
         }
         
-        if let node = bookmarksAPI.desktopNode {
+        if let node = bookmarksAPI?.desktopNode {
             self.children.append(node)
         }
         
-        if let node = bookmarksAPI.otherNode {
+        if let node = bookmarksAPI?.otherNode {
             self.children.append(node)
         }
         
@@ -495,5 +510,95 @@ class Bookmarkv2ExclusiveFetcher: BookmarksV2FetchResultsController {
             result.append(child)
         }
         return result
+    }
+}
+
+extension Bookmarkv2Fetcher: NSFetchedResultsControllerDelegate, BookmarkModelObserver {
+    // MARK: - NSFetchedResultsControllerDelegate
+    
+    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        delegate?.controllerWillChangeContent(self)
+    }
+    
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        delegate?.controllerDidChangeContent(self)
+    }
+    
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+        if let coreDataBookmark = anObject as? Bookmark {
+            delegate?.controller(self, didChange: Bookmarkv2(coreDataBookmark), at: indexPath, for: type, newIndexPath: newIndexPath)
+        } else if let bookmarkNode = anObject as? BookmarkNode {
+            delegate?.controller(self, didChange: Bookmarkv2(bookmarkNode), at: indexPath, for: type, newIndexPath: newIndexPath)
+        }
+    }
+    
+    // MARK: - BookmarkModelObserver
+    func bookmarkNodeChanged(_ bookmarkNode: BookmarkNode) {
+        delegate?.noIdeaReloadTable(self)
+    }
+    
+    func bookmarkNodeFaviconChanged(_ bookmarkNode: BookmarkNode) {
+        delegate?.noIdeaReloadTable(self)
+    }
+    
+    func bookmarkNodeChildrenChanged(_ bookmarkNode: BookmarkNode) {
+        delegate?.noIdeaReloadTable(self)
+    }
+    
+    func bookmarkNode(_ bookmarkNode: BookmarkNode, movedFromParent oldParent: BookmarkNode, toParent newParent: BookmarkNode) {
+        delegate?.noIdeaReloadTable(self)
+    }
+    
+    func bookmarkNodeDeleted(_ node: BookmarkNode, fromFolder folder: BookmarkNode) {
+        delegate?.noIdeaReloadTable(self)
+    }
+    
+    func bookmarkModelRemovedAllNodes() {
+        delegate?.noIdeaReloadTable(self)
+    }
+}
+
+extension Bookmarkv2ExclusiveFetcher: NSFetchedResultsControllerDelegate, BookmarkModelObserver {
+    // MARK: - NSFetchedResultsControllerDelegate
+    
+    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        delegate?.controllerWillChangeContent(self)
+    }
+    
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        delegate?.controllerDidChangeContent(self)
+    }
+    
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+        if let coreDataBookmark = anObject as? Bookmark {
+            delegate?.controller(self, didChange: Bookmarkv2(coreDataBookmark), at: indexPath, for: type, newIndexPath: newIndexPath)
+        } else if let bookmarkNode = anObject as? BookmarkNode {
+            delegate?.controller(self, didChange: Bookmarkv2(bookmarkNode), at: indexPath, for: type, newIndexPath: newIndexPath)
+        }
+    }
+    
+    // MARK: - BookmarkModelObserver
+    func bookmarkNodeChanged(_ bookmarkNode: BookmarkNode) {
+        delegate?.noIdeaReloadTable(self)
+    }
+    
+    func bookmarkNodeFaviconChanged(_ bookmarkNode: BookmarkNode) {
+        delegate?.noIdeaReloadTable(self)
+    }
+    
+    func bookmarkNodeChildrenChanged(_ bookmarkNode: BookmarkNode) {
+        delegate?.noIdeaReloadTable(self)
+    }
+    
+    func bookmarkNode(_ bookmarkNode: BookmarkNode, movedFromParent oldParent: BookmarkNode, toParent newParent: BookmarkNode) {
+        delegate?.noIdeaReloadTable(self)
+    }
+    
+    func bookmarkNodeDeleted(_ node: BookmarkNode, fromFolder folder: BookmarkNode) {
+        delegate?.noIdeaReloadTable(self)
+    }
+    
+    func bookmarkModelRemovedAllNodes() {
+        delegate?.noIdeaReloadTable(self)
     }
 }

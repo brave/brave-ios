@@ -7,6 +7,7 @@ import CoreData
 import Shared
 import Data
 import BraveShared
+import CoreServices
 
 private let log = Logger.browserLogger
 
@@ -29,6 +30,14 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         $0.target = self
         $0.action = #selector(onAddBookmarksFolderButton)
     }
+    
+    private lazy var importExportButton: UIBarButtonItem? = UIBarButtonItem().then {
+        $0.image = #imageLiteral(resourceName: "nav-share").template
+        $0.style = .plain
+        $0.target = self
+        $0.action = #selector(importExportAction(_:))
+    }
+    
     weak var addBookmarksFolderOkAction: UIAlertAction?
     
     var isEditingIndividualBookmark: Bool = false
@@ -43,6 +52,15 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         // Set nil for root level bookmarks.
         case bookmarks(inFolder: Bookmarkv2?)
         case favorites
+    }
+    
+    private var isAtBookmarkRootLevel: Bool {
+        switch mode {
+        case .bookmarks(let folder):
+            return folder == nil
+        case .favorites:
+            return false
+        }
     }
   
     init(mode: Mode, isPrivateBrowsing: Bool) {
@@ -91,7 +109,10 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         var padding: UIBarButtonItem { return UIBarButtonItem.fixedSpace(5) }
         let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
         
-        let items = [padding, addFolderButton, flexibleSpace, editBookmarksButton, padding].compactMap { $0 }
+        let leftItem = isAtBookmarkRootLevel ? importExportButton : addFolderButton
+        let rightItem = isAtBookmarkRootLevel ? nil : editBookmarksButton
+        
+        let items = [padding, leftItem, flexibleSpace, rightItem, padding].compactMap { $0 }
         setToolbarItems(items, animated: true)
     }
   
@@ -170,6 +191,39 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     }
     self.present(alert, animated: true) {}
   }
+    
+    @objc private func importExportAction(_ sender: UIBarButtonItem) {
+        let alert = AlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        alert.popoverPresentationController?.barButtonItem = sender
+        let importAction = UIAlertAction(title: Strings.bookmarksImportAction, style: .default) { [weak self] _ in
+            let vc = UIDocumentPickerViewController(documentTypes: [String(kUTTypeHTML)], in: .import)
+            vc.delegate = self
+            self?.present(vc, animated: true)
+        }
+        
+        let exportAction = UIAlertAction(title: Strings.bookmarksExportAction, style: .default) { [weak self] _ in
+            // TODO: Export bookmarks, generate html file
+            let sampleFile = FileManager.default.temporaryDirectory.appendingPathComponent("test")
+            let data = "<html>Brave</html>".data(using: .utf8)!
+            try! data.write(to: sampleFile)
+            
+            let vc = UIDocumentInteractionController(url: sampleFile)
+            vc.uti = String(kUTTypeHTML)
+            
+            guard let importExportButton = self?.importExportButton else { return }
+            vc.presentOptionsMenu(from: importExportButton, animated: true)
+        }
+        
+        let cancelAction = UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel)
+        
+        if BraveCoreMigrator.chromiumBookmarksMigration_v1 {
+            alert.addAction(importAction)
+        }
+        alert.addAction(exportAction)
+        alert.addAction(cancelAction)
+        
+        present(alert, animated: true)
+    }
   
   func addFolder(titled title: String) {
     Bookmarkv2.addFolder(title: title, parentFolder: currentFolder)
@@ -392,20 +446,24 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
             self.navigationController?.pushViewController(vc, animated: true)
         }
     }
+    
+    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        !isAtBookmarkRootLevel
+    }
 }
 
-extension BookmarksViewController: NSFetchedResultsControllerDelegate {
-  func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+extension BookmarksViewController: BookmarksV2FetchResultsDelegate {
+  func controllerWillChangeContent(_ controller: BookmarksV2FetchResultsController) {
     tableView.beginUpdates()
   }
   
-  func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+  func controllerDidChangeContent(_ controller: BookmarksV2FetchResultsController) {
     tableView.endUpdates()
     bookmarksDidChange?()
     updateEditBookmarksButtonStatus()
   }
   
-  func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+  func controller(_ controller: BookmarksV2FetchResultsController, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
     switch type {
     case .update:
         let update = { (path: IndexPath?) in
@@ -435,5 +493,14 @@ extension BookmarksViewController: NSFetchedResultsControllerDelegate {
         break
     }
   }
+  
+  func noIdeaReloadTable(_ controller: BookmarksV2FetchResultsController) {
+    reloadData()
+  }
 }
 
+extension BookmarksViewController: UIDocumentPickerDelegate {
+    func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+        // TODO: Wire up import logic here
+    }
+}

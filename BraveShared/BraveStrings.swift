@@ -420,6 +420,28 @@ extension Strings {
     public static let syncRemoveOtherDeviceTitle = NSLocalizedString("SyncRemoveOtherDeviceTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Remove %@ from Sync Chain?", comment: "Title for removing other device from Sync")
     public static let syncRemoveOtherDeviceMessage = NSLocalizedString("SyncRemoveOtherDeviceMessage", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Removing the device from the Sync Chain will not clear previously synced data from the device.", comment: "Message for removing other device from Sync")
     public static let syncRemoveDeviceDefaultName = NSLocalizedString("SyncRemoveDeviceDefaultName", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Device", comment: "Default name for a device")
+    
+    public static let syncV2MigrationTitle =
+        NSLocalizedString("syncV2MigrationTitle", tableName: "BraveShared", bundle: .braveShared,
+                          value: "Migration required",
+                          comment: "Title for popup to inform the user that bookmarks migration is required for sync")
+    public static let syncV2MigrationMessage =
+        NSLocalizedString("syncV2MigrationMessage", tableName: "BraveShared", bundle: .braveShared,
+                          value: "In order to use Brave Sync your existing bookmarks must be migrated to use the new system. This operation will not delete your bookmarks.",
+                          comment: "Message for popup to inform the user that bookmarks migration is required for sync")
+    public static let syncV2MigrationOKButton =
+        NSLocalizedString("syncV2MigrationOKButton", tableName: "BraveShared", bundle: .braveShared,
+                          value: "Migrate",
+                          comment: "Button to perform bookmarks migration in order to support sync")
+    public static let syncV2MigrationErrorTitle =
+        NSLocalizedString("syncV2MigrationErrorTitle", tableName: "BraveShared", bundle: .braveShared,
+                          value: "Error",
+                          comment: "Title for popup when the bookmark migration fails")
+    public static let syncV2MigrationErrorMessage =
+        NSLocalizedString("syncV2MigrationErrorMessage", tableName: "BraveShared", bundle: .braveShared,
+                          value: "Failed to migrate bookmarks. Please try again later.",
+                          comment: "Message for popup when the bookmark migration fails")
+
 }
 
 extension Strings {
@@ -499,6 +521,8 @@ extension Strings {
     public static let features = NSLocalizedString("Features", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Features", comment: "")
     
     public static let braveShieldsAndPrivacy = NSLocalizedString("BraveShieldsAndPrivacy", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Brave Shields & Privacy", comment: "")
+    public static let bookmarksImportAction = NSLocalizedString("bookmarksImportAction", tableName: "BraveShared", bundle: .braveShared, value: "Import Bookmarks", comment: "Action to import bookmarks from a file.")
+    public static let bookmarksExportAction = NSLocalizedString("bookmarksExportAction", tableName: "BraveShared", bundle: .braveShared, value: "Export Bookmarks", comment: "Action to export bookmarks to another device.")
 }
 
 extension Strings {
