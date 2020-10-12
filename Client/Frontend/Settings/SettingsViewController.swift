@@ -219,18 +219,10 @@ class SettingsViewController: TableViewController {
                 }, image: #imageLiteral(resourceName: "settings-search").template, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self),
                 Row(text: Strings.sync, selection: { [unowned self] in
                     if BraveSyncAPI.shared.isInSyncGroup {
-                        let syncSettingsVC = SyncSettingsTableViewController(style: .grouped)
-                        syncSettingsVC.dismissHandler = {
-                            self.navigationController?.popToRootViewController(animated: true)
-                        }
-
-                        self.navigationController?.pushViewController(syncSettingsVC, animated: true)
+                        self.navigationController?
+                            .pushViewController(SyncSettingsTableViewController(style: .grouped), animated: true)
                     } else {
-                        let view = SyncWelcomeViewController()
-                        view.dismissHandler = {
-                            view.navigationController?.popToRootViewController(animated: true)
-                        }
-                        self.navigationController?.pushViewController(view, animated: true)
+                        self.navigationController?.pushViewController(SyncWelcomeViewController(), animated: true)
                     }
                     }, image: #imageLiteral(resourceName: "settings-sync").template, accessory: .disclosureIndicator,
                        cellClass: MultilineValue1Cell.self)

@@ -13,8 +13,6 @@ protocol NavigationPrevention {
 }
 
 class SyncWelcomeViewController: SyncViewController {
-    var dismissHandler: (() -> Void)?
-    
     private var overlayView: UIView?
     
     private var isLoading: Bool = false {
@@ -284,7 +282,6 @@ class SyncWelcomeViewController: SyncViewController {
     
     private func pushSettings() {
         let syncSettingsVC = SyncSettingsTableViewController(style: .grouped)
-        syncSettingsVC.dismissHandler = dismissHandler
         syncSettingsVC.disableBackButton = true
         navigationController?.pushViewController(syncSettingsVC, animated: true)
     }

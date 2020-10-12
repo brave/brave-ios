@@ -36,9 +36,6 @@ class SyncSettingsTableViewController: UITableViewController {
     /// left in the Sync Chain.
     enum DeviceRemovalType { case lastDeviceLeft, currentDevice, otherDevice }
     
-    /// Handles dismissing parent view controller.
-    var dismissHandler: (() -> Void)?
-    
     /// After synchronization is completed, user needs to tap on `Done` to go back.
     /// Standard navigation is disabled then.
     var disableBackButton = false
@@ -91,7 +88,7 @@ class SyncSettingsTableViewController: UITableViewController {
     // MARK: - Button actions.
     
     @objc func doneTapped() {
-        dismissHandler?()
+        navigationController?.popToRootViewController(animated: true)
     }
     
     private func addAnotherDeviceAction() {
