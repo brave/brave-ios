@@ -13,6 +13,7 @@ struct BraveSyncDevice: Codable {
     let chromeVersion: String
     let hasSharingInfo: Bool
     let id: String
+    let guid: String
     let isCurrentDevice: Bool
     let lastUpdatedTimestamp: TimeInterval
     let name: String?
@@ -21,7 +22,7 @@ struct BraveSyncDevice: Codable {
     let type: String
     
     func remove() {
-        //TODO: Figure out how to delete a single device from the chain by ID..
+        BraveSyncAPI.shared.removeDeviceFromSyncGroup(deviceGuid: self.guid)
     }
 }
 
@@ -52,7 +53,7 @@ class SyncSettingsTableViewController: UITableViewController {
         
         let codeWords = BraveSyncAPI.shared.getSyncCode()
         BraveSyncAPI.shared.joinSyncGroup(codeWords: codeWords)
-        BraveSyncAPI.shared.setSyncEnabled(true)
+        BraveSyncAPI.shared.syncEnabled = true
         
         self.updateDeviceList()
         

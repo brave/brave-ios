@@ -154,6 +154,11 @@ extension Preferences {
             Option<Bool>(key: "vpn.vpn-header-dismissed", default: false)
     }
     
+    final class Chromium {
+        static let migrationBookmarks = Option<Bool>(key: "chromium.migration.bookmarks", default: true)
+        static let syncEnabled = Option<Bool>(key: "chromium.sync.enabled", default: false)
+    }
+    
     final class Debug {
         /// When general blocklists were last time updated on the device.
         static let lastGeneralAdblockUpdate = Option<Date?>(key: "last-general-adblock-update", default: nil)

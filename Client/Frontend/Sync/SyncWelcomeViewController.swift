@@ -216,7 +216,7 @@ class SyncWelcomeViewController: SyncViewController {
                 }
                 
                 BraveSyncAPI.shared.joinSyncGroup(codeWords: BraveSyncAPI.shared.getSyncCode())
-                BraveSyncAPI.shared.setSyncEnabled(true)
+                BraveSyncAPI.shared.syncEnabled = true
             }
 
             self.navigationController?.pushViewController(addDevice, animated: true)
@@ -239,7 +239,7 @@ class SyncWelcomeViewController: SyncViewController {
                 }
      
                 BraveSyncAPI.shared.joinSyncGroup(codeWords: codeWords)
-                BraveSyncAPI.shared.setSyncEnabled(true)
+                BraveSyncAPI.shared.syncEnabled = true
             }
             
             self.navigationController?.pushViewController(pairCamera, animated: true)
@@ -247,7 +247,7 @@ class SyncWelcomeViewController: SyncViewController {
     }
     
     private func migrationCheck(completion: @escaping (() -> Void)) {
-        if BraveCoreMigrator.chromiumBookmarksMigration_v1 {
+        if Preferences.Chromium.migrationBookmarks.value {
             completion()
             return
         }
@@ -258,19 +258,22 @@ class SyncWelcomeViewController: SyncViewController {
         let okAction = UIAlertAction(title: Strings.syncV2MigrationOKButton, style: .default) { [weak self] _ in
             guard let self = self else { return }
             self.isLoading = true
-            // TODO: Call migration code
             
-            self.isLoading = false
-            // if error -> show this alert
-            let alert = UIAlertController(title: Strings.syncV2MigrationErrorTitle,
-                                          message: Strings.syncV2MigrationErrorMessage,
-                                          preferredStyle: .alert)
-            
-            let cancelAction = UIAlertAction(title: Strings.OKString, style: .cancel)
-            alert.addAction(cancelAction)
-            
-            self.present(alert, animated: true)
-            
+            Migration.braveCoreBookmarksMigrator?.migrate({ [weak self] success in
+                guard let self = self else { return }
+                self.isLoading = false
+                
+                if !success {
+                    let alert = UIAlertController(title: Strings.syncV2MigrationErrorTitle,
+                                                  message: Strings.syncV2MigrationErrorMessage,
+                                                  preferredStyle: .alert)
+                    
+                    let cancelAction = UIAlertAction(title: Strings.OKString, style: .cancel)
+                    alert.addAction(cancelAction)
+                    
+                    self.present(alert, animated: true)
+                }
+            })
         }
         let cancelAction = UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel)
         

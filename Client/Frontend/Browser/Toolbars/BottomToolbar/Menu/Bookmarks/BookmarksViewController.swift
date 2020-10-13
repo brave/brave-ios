@@ -46,40 +46,20 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     /// Certain bookmark actions are different in private browsing mode.
     let isPrivateBrowsing: Bool
     
-    let mode: Mode
-    
-    enum Mode {
-        // Set nil for root level bookmarks.
-        case bookmarks(inFolder: Bookmarkv2?)
-        case favorites
-    }
-    
     private var isAtBookmarkRootLevel: Bool {
-        switch mode {
-        case .bookmarks(let folder):
-            return folder == nil
-        case .favorites:
-            return false
-        }
+        return self.currentFolder == nil
     }
+    
+    private var importExportUtility = BraveCoreImportExportUtility()
+    private var documentInteractionController: UIDocumentInteractionController?
   
-    init(mode: Mode, isPrivateBrowsing: Bool) {
+    init(folder: Bookmarkv2?, isPrivateBrowsing: Bool) {
         self.isPrivateBrowsing = isPrivateBrowsing
-        self.mode = mode
-        
         super.init(nibName: nil, bundle: nil)
         
-        switch mode {
-        case .bookmarks(let folder):
-            self.currentFolder = folder
-            self.title = folder?.displayTitle ?? Strings.bookmarks
-            self.bookmarksFRC = Bookmarkv2.frc(parent: folder)
-        case .favorites:
-            title = Strings.favoritesRootLevelCellTitle
-            bookmarksFRC = Bookmarkv2.frc(forFavorites: true, parent: nil)
-            addFolderButton = nil
-        }
-        
+        self.currentFolder = folder
+        self.title = folder?.displayTitle ?? Strings.bookmarks
+        self.bookmarksFRC = Bookmarkv2.frc(parent: folder)
         self.bookmarksFRC?.delegate = self
     }
   
@@ -105,14 +85,31 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         }
     }
     
+    private var leftToolbarItems: [UIBarButtonItem?] {
+        var items: [UIBarButtonItem?] = [.fixedSpace(5)]
+        if currentFolder == nil {
+            items.append(importExportButton)
+            
+            // Unlike Chromium, old CoreData implementation did not have permanent folders
+            if !Preferences.Chromium.migrationBookmarks.value {
+                items.append(.fixedSpace(16))
+                items.append(addFolderButton)
+            }
+        } else {
+            items.append(addFolderButton)
+        }
+        
+        return items
+    }
+    
     private func setUpToolbar() {
-        var padding: UIBarButtonItem { return UIBarButtonItem.fixedSpace(5) }
         let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
         
-        let leftItem = isAtBookmarkRootLevel ? importExportButton : addFolderButton
-        let rightItem = isAtBookmarkRootLevel ? nil : editBookmarksButton
+        let rightItem = { () -> UIBarButtonItem? in
+            return currentFolder == nil ? nil : editBookmarksButton
+        }()
         
-        let items = [padding, leftItem, flexibleSpace, rightItem, padding].compactMap { $0 }
+        let items = (leftToolbarItems + [flexibleSpace, rightItem, .fixedSpace(5)]).compactMap { $0 }
         setToolbarItems(items, animated: true)
     }
   
@@ -122,12 +119,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         // Recreate the frc if it was previously removed
         // (when user navigated into a nested folder for example)
         if bookmarksFRC == nil {
-            switch mode {
-            case .bookmarks(_):
-                bookmarksFRC = Bookmarkv2.frc(parent: currentFolder)
-            case .favorites:
-                bookmarksFRC = Bookmarkv2.frc(forFavorites: true, parent: nil)
-            }
+            bookmarksFRC = Bookmarkv2.frc(parent: currentFolder)
             bookmarksFRC?.delegate = self
         }
       try self.bookmarksFRC?.performFetch()
@@ -202,23 +194,13 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         }
         
         let exportAction = UIAlertAction(title: Strings.bookmarksExportAction, style: .default) { [weak self] _ in
-            // TODO: Export bookmarks, generate html file
-            let sampleFile = FileManager.default.temporaryDirectory.appendingPathComponent("test")
-            let data = "<html>Brave</html>".data(using: .utf8)!
-            try! data.write(to: sampleFile)
-            
-            let vc = UIDocumentInteractionController(url: sampleFile)
-            vc.uti = String(kUTTypeHTML)
-            
-            guard let importExportButton = self?.importExportButton else { return }
-            vc.presentOptionsMenu(from: importExportButton, animated: true)
+            let fileUrl = FileManager.default.temporaryDirectory.appendingPathComponent("Bookmarks").appendingPathExtension("html")
+            self?.exportBookmarks(to: fileUrl)
         }
         
         let cancelAction = UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel)
         
-        if BraveCoreMigrator.chromiumBookmarksMigration_v1 {
-            alert.addAction(importAction)
-        }
+        alert.addAction(importAction)
         alert.addAction(exportAction)
         alert.addAction(cancelAction)
         
@@ -372,7 +354,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         //show editing view for bookmark item
         self.showEditBookmarkController(bookmark: bookmark)
       } else {
-        let nextController = BookmarksViewController(mode: .bookmarks(inFolder: bookmark), isPrivateBrowsing: isPrivateBrowsing)
+        let nextController = BookmarksViewController(folder: bookmark, isPrivateBrowsing: isPrivateBrowsing)
         nextController.profile = profile
         nextController.bookmarksDidChange = bookmarksDidChange
         nextController.toolbarUrlActionsDelegate = toolbarUrlActionsDelegate
@@ -406,6 +388,10 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
   func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
     guard let item = bookmarksFRC?.object(at: indexPath) else { return nil }
     
+    if !item.canBeDeleted {
+        return []
+    }
+    
     let deleteAction = UITableViewRowAction(style: UITableViewRowAction.Style.destructive, title: Strings.delete,
                                             handler: { action, indexPath in
       
@@ -435,8 +421,6 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         var mode: BookmarkEditMode?
         if bookmark.isFolder {
             mode = .editFolder(bookmark)
-        } else if bookmark.isFavorite {
-            mode = .editFavorite(bookmark)
         } else {
             mode = .editBookmark(bookmark)
         }
@@ -445,10 +429,6 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
             let vc = AddEditBookmarkTableViewController(mode: mode)
             self.navigationController?.pushViewController(vc, animated: true)
         }
-    }
-    
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        !isAtBookmarkRootLevel
     }
 }
 
@@ -499,8 +479,76 @@ extension BookmarksViewController: BookmarksV2FetchResultsDelegate {
   }
 }
 
-extension BookmarksViewController: UIDocumentPickerDelegate {
+extension BookmarksViewController: UIDocumentPickerDelegate, UIDocumentInteractionControllerDelegate {
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
-        // TODO: Wire up import logic here
+        guard let url = urls.first, urls.count == 1 else {
+            return
+        }
+        
+        self.documentInteractionController = nil
+        self.importBookmarks(from: url)
+    }
+    
+    func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
+        self.documentInteractionController = nil
+    }
+    
+    func documentInteractionControllerDidEndPreview(_ controller: UIDocumentInteractionController) {
+        if let url = controller.url {
+            try? FileManager.default.removeItem(at: url)
+        }
+        self.documentInteractionController = nil
+    }
+    
+    func documentInteractionControllerDidDismissOptionsMenu(_ controller: UIDocumentInteractionController) {
+        if let url = controller.url {
+            try? FileManager.default.removeItem(at: url)
+        }
+        self.documentInteractionController = nil
+    }
+    
+    func documentInteractionControllerDidDismissOpenInMenu(_ controller: UIDocumentInteractionController) {
+        if let url = controller.url {
+            try? FileManager.default.removeItem(at: url)
+        }
+        self.documentInteractionController = nil
+    }
+}
+
+extension BookmarksViewController {
+    func importBookmarks(from url: URL) {
+        guard let importURL = URL(string: url.relativePath) else {
+            log.error("Invalid Bookmarks Import File URL")
+            return
+        }
+        
+        self.importExportUtility.importBookmarks(from: importURL) { success in
+            let alert = UIAlertController(title: "Bookmarks",
+                                          message: success ? "Bookmarks Imported Successfully" : "Bookmarks Import Failed",
+                                          preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Okay", style: .default, handler: nil))
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
+    
+    func exportBookmarks(to url: URL) {
+        guard let exportURL = URL(string: url.relativePath) else {
+            log.error("Invalid Bookmarks Export File URL")
+            return
+        }
+        
+        self.importExportUtility.exportBookmarks(to: exportURL) { [weak self] success in
+            guard let self = self else { return }
+            
+            //Controller must be retained otherwise `AirDrop` and other sharing options will fail!
+            self.documentInteractionController = UIDocumentInteractionController(url: url)
+            guard let vc = self.documentInteractionController else { return }
+            vc.uti = String(kUTTypeHTML)
+            vc.name = "Bookmarks.html"
+            vc.delegate = self
+            
+            guard let importExportButton = self.importExportButton else { return }
+            vc.presentOptionsMenu(from: importExportButton, animated: true)
+        }
     }
 }

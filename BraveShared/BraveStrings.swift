@@ -420,6 +420,7 @@ extension Strings {
     public static let syncRemoveOtherDeviceTitle = NSLocalizedString("SyncRemoveOtherDeviceTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Remove %@ from Sync Chain?", comment: "Title for removing other device from Sync")
     public static let syncRemoveOtherDeviceMessage = NSLocalizedString("SyncRemoveOtherDeviceMessage", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Removing the device from the Sync Chain will not clear previously synced data from the device.", comment: "Message for removing other device from Sync")
     public static let syncRemoveDeviceDefaultName = NSLocalizedString("SyncRemoveDeviceDefaultName", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Device", comment: "Default name for a device")
+    public static let syncImportFolderName = NSLocalizedString("SyncImportFolderName", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Imported Bookmarks", comment: "Folder name for where bookmarks are imported into when the root folder is not empty (Do NOT change the `KEY` parameter without updating it in BraveCore's brave_bookmarks_importer.mm file")
     
     public static let syncV2MigrationTitle =
         NSLocalizedString("syncV2MigrationTitle", tableName: "BraveShared", bundle: .braveShared,

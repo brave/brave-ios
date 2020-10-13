@@ -28,6 +28,10 @@ extension BraveSyncAPI {
         return false
     }
     
+    func removeDeviceFromSyncGroup(deviceGuid: String) {
+        BraveSyncAPI.shared.removeDevice(deviceGuid)
+    }
+    
     func leaveSyncGroup() {
         BraveSyncAPI.shared.resetSync()
         UserDefaults.standard.removeObject(forKey: BraveSyncAPI.isInGroupKey)

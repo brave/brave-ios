@@ -666,6 +666,72 @@ class BrowserViewController: UIViewController {
         
         vpnProductInfo.load()
         BraveVPN.initialize()
+        
+        if !Preferences.Chromium.migrationBookmarks.value {
+            //TODO: Show a loading screen and block the user?
+            self.migrateToChromiumBookmarks { shouldShowError in
+                if shouldShowError {
+                    DispatchQueue.main.async {
+                        let alert = UIAlertController(title: Strings.syncV2MigrationErrorTitle,
+                                                      message: Strings.syncV2MigrationErrorMessage,
+                                                      preferredStyle: .alert)
+                        alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
+                        self.present(alert, animated: true, completion: nil)
+                    }
+                }
+            }
+        }
+    }
+    
+    private func migrateToChromiumBookmarks(_ completion: @escaping (_ showError: Bool) -> Void) {
+        Migration.braveCoreBookmarksMigrator?.migrate({ success in
+            if success {
+                let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
+                guard let documentsDirectory = paths.first else {
+                    log.error("Unable to access documents directory")
+                    completion(true)
+                    return
+                }
+                
+                let dateFormatter = DateFormatter().then {
+                    $0.dateFormat = "yyyy-MM-dd_HH:mm:ss"
+                }
+                
+                let dateString = dateFormatter.string(from: Date()).escape() ?? "\(Date().timeIntervalSince1970)"
+                
+                guard let url = URL(string: "\(documentsDirectory)/Bookmarks_\(dateString).html") else {
+                    log.error("Unable to access Bookmarks_\(dateString).html")
+                    completion(true)
+                    return
+                }
+                
+                Migration.braveCoreBookmarksMigrator?.exportBookmarks(to: url) { success in
+                    if success {
+                        if !BookmarksInterstitialPageHandler.showBookmarksPage(tabManager: self.tabManager, url: url) {
+                            log.error("Unable to open the users bookmarks.html in a new tab")
+                            completion(true)
+                            return
+                        }
+                        completion(false)
+                    } else {
+                        guard let url = URL(string: "\(documentsDirectory)/Bookmarks.html") else {
+                            log.error("Unable to access Bookmarks.html")
+                            completion(true)
+                            return
+                        }
+                        
+                        if !BookmarksInterstitialPageHandler.showBookmarksPage(tabManager: self.tabManager, url: url) {
+                            log.error("Unable to open the users bookmarks.html in a new tab")
+                            completion(true)
+                            return
+                        }
+                        completion(false)
+                    }
+                }
+            } else {
+                completion(false)
+            }
+        })
     }
     
     private func deprecateSyncV1() {
@@ -2034,10 +2100,8 @@ extension BrowserViewController: TopToolbarDelegate {
     
     // TODO: This logic should be fully abstracted away and share logic from current MenuViewController
     // See: https://github.com/brave/brave-ios/issues/1452
-    func topToolbarDidTapBookmarkButton(_ topToolbar: TopToolbarView?, favorites: Bool) {
-        let mode: BookmarksViewController.Mode = favorites ? .favorites : .bookmarks(inFolder: nil)
-        
-        let vc = BookmarksViewController(mode: mode,
+    func topToolbarDidTapBookmarkButton(_ topToolbar: TopToolbarView) {
+        let vc = BookmarksViewController(folder: nil,
                                          isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing)
         vc.toolbarUrlActionsDelegate = self
         
