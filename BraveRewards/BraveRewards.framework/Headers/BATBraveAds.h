@@ -131,8 +131,8 @@ NS_SWIFT_NAME(BraveAds)
 - (void)reportAdNotificationEvent:(NSString *)notificationUuid
                         eventType:(BATAdNotificationEventType)eventType;
 
-/// Reconcile ad rewards with server
-- (void)reconcileAdRewards;
+/// Update ad totals on month roll over, optionally reconcile with server
+- (void)updateAdRewards:(BOOL)shouldReconcile;
 
 /// Get the number of ads received and the estimated earnings of viewing said ads for this cycle
 - (void)detailsForCurrentCycle:(void (^)(NSInteger adsReceived, double estimatedEarnings, NSDate * _Nullable nextPaymentDate))completion NS_SWIFT_NAME(detailsForCurrentCycle(_:));
