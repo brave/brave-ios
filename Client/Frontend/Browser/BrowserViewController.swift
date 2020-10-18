@@ -1050,6 +1050,11 @@ class BrowserViewController: UIViewController {
             activeController.removeFromParent()
             activeController.view.removeFromSuperview()
         }
+
+        if isHidingActiveNewTabPageController {
+            ntpController.view.alpha = 1
+            isHidingActiveNewTabPageController = false
+        }
         
         if ntpController.parent == nil {
             activeNewTabPageViewController = ntpController
@@ -1077,26 +1082,39 @@ class BrowserViewController: UIViewController {
     }
     
     private(set) weak var activeNewTabPageViewController: NewTabPageViewController?
-    
+
+    private(set) var isHidingActiveNewTabPageController: Bool = false
+
     fileprivate func hideActiveNewTabPageController() {
         guard let controller = activeNewTabPageViewController else { return }
+        isHidingActiveNewTabPageController = true
         UIView.animate(withDuration: 0.2, animations: {
             controller.view.alpha = 0.0
         }, completion: { finished in
-            controller.willMove(toParent: nil)
-            controller.view.removeFromSuperview()
-            controller.removeFromParent()
-            self.webViewContainer.accessibilityElementsHidden = false
-            UIAccessibility.post(notification: .screenChanged, argument: nil)
-            
-            // Refresh the reading view toolbar since the article record may have changed
-            if let readerMode = self.tabManager.selectedTab?.getContentScript(name: ReaderMode.name()) as? ReaderMode, readerMode.state == .active {
-                self.showReaderModeBar(animated: false)
-            }
+            self.didHideActiveNewTabPageController()
         })
     }
 
-    fileprivate func updateInContentHomePanel(_ url: URL?) {
+    private func didHideActiveNewTabPageController() {
+        guard isHidingActiveNewTabPageController else { return }
+
+        guard let controller = activeNewTabPageViewController else { return }
+
+        controller.willMove(toParent: nil)
+        controller.view.removeFromSuperview()
+        controller.removeFromParent()
+        self.webViewContainer.accessibilityElementsHidden = false
+        UIAccessibility.post(notification: .screenChanged, argument: nil)
+
+        // Refresh the reading view toolbar since the article record may have changed
+        if let readerMode = self.tabManager.selectedTab?.getContentScript(name: ReaderMode.name()) as? ReaderMode, readerMode.state == .active {
+          self.showReaderModeBar(animated: false)
+        }
+
+        isHidingActiveNewTabPageController = false
+   }
+
+   fileprivate func updateInContentHomePanel(_ url: URL?) {
         if !topToolbar.inOverlayMode {
             guard let url = url else {
                 hideActiveNewTabPageController()
