@@ -26,8 +26,8 @@ class Migration {
             Preferences.Migration.documentsDirectoryCleanupCompleted.value = true
         }
         
+        //`.migrate` is called in `BrowserViewController.viewDidLoad()`
         braveCoreBookmarksMigrator = BraveCoreMigrator()
-        braveCoreBookmarksMigrator?.migrate()
     }
     
     static func moveDatabaseToApplicationDirectory() {
