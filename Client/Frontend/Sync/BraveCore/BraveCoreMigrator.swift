@@ -64,19 +64,19 @@ class BraveCoreMigrator {
     }
     
     public func migrate(_ completion: ((_ success: Bool) -> Void)? = nil) {
-        if Preferences.Chromium.migrationBookmarks.value {
+        if Preferences.Chromium.syncV2BookmarksMigrationCompleted.value {
             completion?(true)
             return
         }
         
         func performMigrationIfNeeded(_ completion: ((Bool) -> Void)?) {
-            if !Preferences.Chromium.migrationBookmarks.value {
+            if !Preferences.Chromium.syncV2BookmarksMigrationCompleted.value {
                 log.info("Migrating to Chromium Bookmarks v1 - Exporting")
                 self.exportBookmarks { [weak self] success in
                     if success {
                         log.info("Migrating to Chromium Bookmarks v1 - Start")
                         self?.migrateBookmarks() { success in
-                            Preferences.Chromium.migrationBookmarks.value = success
+                            Preferences.Chromium.syncV2BookmarksMigrationCompleted.value = success
                             completion?(success)
                         }
                     } else {
@@ -211,7 +211,7 @@ extension BraveCoreMigrator {
     private func testMigration(_ completion: @escaping () -> Void) {
         //CODE FOR TESTING MIGRATION!
         //DELETES ALL EXISTING CORE-DATA BOOKMARKS, CREATES A BUNCH OF FAKE BOOKMARKS..
-        Preferences.Chromium.migrationBookmarks.value = false
+        Preferences.Chromium.syncV2BookmarksMigrationCompleted.value = false
 
         DataController.perform { context in
             //Delete all existing bookmarks

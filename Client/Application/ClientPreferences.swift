@@ -155,7 +155,7 @@ extension Preferences {
     }
     
     final class Chromium {
-        static let migrationBookmarks = Option<Bool>(key: "chromium.migration.bookmarks", default: true)
+        static let syncV2BookmarksMigrationCompleted = Option<Bool>(key: "chromium.migration.bookmarks", default: true)
         static let syncEnabled = Option<Bool>(key: "chromium.sync.enabled", default: false)
     }
     

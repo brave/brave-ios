@@ -453,11 +453,11 @@ extension AddEditBookmarkTableViewController: BookmarksV2FetchResultsDelegate {
     }
     
     func controllerWillChangeContent(_ controller: BookmarksV2FetchResultsController) {
-        print("WILL CHANGE CONTENT")
+        
     }
     
     func controllerDidChangeContent(_ controller: BookmarksV2FetchResultsController) {
-        print("DID CHANGE CONTENT")
+        
     }
     
     func noIdeaReloadTable(_ controller: BookmarksV2FetchResultsController) {

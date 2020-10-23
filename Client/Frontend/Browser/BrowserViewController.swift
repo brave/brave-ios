@@ -667,7 +667,7 @@ class BrowserViewController: UIViewController {
         vpnProductInfo.load()
         BraveVPN.initialize()
         
-        if !Preferences.Chromium.migrationBookmarks.value {
+        if !Preferences.Chromium.syncV2BookmarksMigrationCompleted.value {
             //TODO: Show a loading screen and block the user?
             self.migrateToChromiumBookmarks { shouldShowError in
                 if shouldShowError {
@@ -676,7 +676,7 @@ class BrowserViewController: UIViewController {
                                                       message: Strings.syncV2MigrationErrorMessage,
                                                       preferredStyle: .alert)
                         alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
-                        self.present(alert, animated: true, completion: nil)
+                        self.present(alert, animated: true)
                     }
                 }
             }

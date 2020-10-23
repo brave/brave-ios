@@ -126,8 +126,13 @@ class SyncSettingsTableViewController: UITableViewController {
         }
         
         let devices = self.devices
-        guard !devices.isEmpty else { return }
-        let device = devices[indexPath.row]
+        if devices.isEmpty {
+            return
+        }
+        
+        guard let device = devices[safe: indexPath.row] else {
+            return
+        }
         
         let actionSheet = UIAlertController(title: device.name, message: nil, preferredStyle: .actionSheet)
         if UIDevice.current.userInterfaceIdiom == .pad {
@@ -222,14 +227,18 @@ class SyncSettingsTableViewController: UITableViewController {
     }
     
     private func configureCell(_ cell: UITableViewCell, atIndexPath indexPath: IndexPath) {
-        guard !devices.isEmpty else {
+        if devices.isEmpty {
             log.error("No sync devices to configure.")
             return
         }
         
         switch indexPath.section {
         case Sections.deviceList.rawValue:
-            let device = devices[indexPath.row]
+            guard let device = devices[safe: indexPath.row] else {
+                log.error("Invalid device to configure.")
+                return
+            }
+            
             guard let name = device.name else { break }
             let deviceName = device.isCurrentDevice ? "\(name) (\(Strings.syncThisDevice))" : name
             

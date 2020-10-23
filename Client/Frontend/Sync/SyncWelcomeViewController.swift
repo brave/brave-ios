@@ -247,7 +247,7 @@ class SyncWelcomeViewController: SyncViewController {
     }
     
     private func migrationCheck(completion: @escaping (() -> Void)) {
-        if Preferences.Chromium.migrationBookmarks.value {
+        if Preferences.Chromium.syncV2BookmarksMigrationCompleted.value {
             completion()
             return
         }
