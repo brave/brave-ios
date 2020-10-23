@@ -71,14 +71,14 @@ class AddEditBookmarkTableViewController: UITableViewController {
     /// Returns a count of how many non-folder cells should be visible(depends on Mode state)
     private var specialButtonsCount: Int {
         switch mode {
-        case .addFolder(_), .editFolder(_): return 1
-        case .addBookmark(_, _), .editBookmark(_), .editFavorite(_): return 3
+        case .addFolder(_), .editFolder(_): return 0
+        case .addBookmark(_, _), .editBookmark(_), .editFavorite(_): return 2
         }
     }
     
     private var rootLevelFolderCell: IndentedImageTableViewCell {
         let cell = IndentedImageTableViewCell(image: #imageLiteral(resourceName: "menu_bookmarks")).then {
-            $0.folderName.text = Strings.bookmarkRootLevelCellTitle
+            $0.folderName.text = self.rootFolderName
             $0.tag = SpecialCell.rootLevel.rawValue
             if case .rootLevel = saveLocation, presentationMode == .folderHierarchy {
                 $0.accessoryType = .checkmark
@@ -119,6 +119,8 @@ class AddEditBookmarkTableViewController: UITableViewController {
     
     /// Currently selected save location.
     private var saveLocation: BookmarkSaveLocation
+    private var rootFolderName: String
+    private var rootFolderId: Int
     
     init(mode: BookmarkEditMode) {
         self.mode = mode
@@ -126,7 +128,8 @@ class AddEditBookmarkTableViewController: UITableViewController {
         saveLocation = mode.initialSaveLocation
         presentationMode = .currentSelection
         frc = Bookmarkv2.foldersFrc(excludedFolder: mode.folder)
-        
+        rootFolderName = Bookmarkv2.mobileNode()?.displayTitle ?? Strings.bookmarkRootLevelCellTitle
+        rootFolderId = Bookmarkv2.mobileNode()?.objectID ?? 0
         super.init(style: .grouped)
     }
     
@@ -187,7 +190,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
     /// Indentation level starts with 0, but level 0 is designed for special folders
     /// (root level bookamrks, favorites).
     private func sortFolders(parentID: Int? = nil,
-                             indentationLevel: Int = 1) -> [IndentedFolder] {
+                             indentationLevel: Int = 0) -> [IndentedFolder] {
         guard let objects = frc.fetchedObjects else { return [] }
         
         let sortedObjects = objects.sorted(by: { $0.order < $1.order })
@@ -402,9 +405,15 @@ class AddEditBookmarkTableViewController: UITableViewController {
             
             // Folders with children folders have a different icon
             let hasChildrenFolders = indentedFolder.folder.children?.contains(where: { $0.isFolder })
-            cell.customImage.image = hasChildrenFolders == true ? #imageLiteral(resourceName: "menu_folder_open") : #imageLiteral(resourceName: "menu_folder")
+            if indentedFolder.folder.parent == nil {
+                cell.customImage.image = #imageLiteral(resourceName: "menu_bookmarks")
+            } else {
+                cell.customImage.image = hasChildrenFolders == true ? #imageLiteral(resourceName: "menu_folder_open") : #imageLiteral(resourceName: "menu_folder")
+            }
             
             if let folder = saveLocation.getFolder, folder.objectID == indentedFolder.folder.objectID {
+                cell.accessoryType = .checkmark
+            } else if case .rootLevel = saveLocation, indentedFolder.folder.objectID == self.rootFolderId {
                 cell.accessoryType = .checkmark
             }
             
@@ -421,7 +430,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
         switch cell {
         case .addFolder: return addNewFolderCell
         case .favorites: return favoritesCell
-        case .rootLevel: return rootLevelFolderCell
+        case .rootLevel: return nil
         }
     }
 }

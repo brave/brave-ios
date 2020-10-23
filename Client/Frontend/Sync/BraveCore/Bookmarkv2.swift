@@ -27,7 +27,7 @@ class Bookmarkv2 {
     }
     
     public var customTitle: String? {
-        return bookmarkNode?.titleUrlNodeTitle
+        return self.title
     }
     
     public var displayTitle: String? {
@@ -95,6 +95,13 @@ class Bookmarkv2 {
 }
 
 extension Bookmarkv2 {
+    
+    public class func mobileNode() -> Bookmarkv2? {
+        if let node = Bookmarkv2.bookmarksAPI.mobileNode {
+            return Bookmarkv2(node)
+        }
+        return nil
+    }
     
     public class func addFolder(title: String, parentFolder: Bookmarkv2? = nil) {
         if let parentFolder = parentFolder?.bookmarkNode {
