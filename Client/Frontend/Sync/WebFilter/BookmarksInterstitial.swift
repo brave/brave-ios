@@ -14,22 +14,13 @@ private let log = Logger.browserLogger
 class BookmarksInterstitialPageHandler {
     
     class func showBookmarksPage(tabManager: TabManager, url: URL) -> Bool {
-        let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-        guard let documentsDirectory = paths.first else {
-            return false
-        }
-        
-        guard let url = URL(string: "\(documentsDirectory)/Bookmarks.html") else {
-            return false
-        }
-        
         if !FileManager.default.fileExists(atPath: url.absoluteString) {
             return false
         }
         
         let components = URLComponents(string: WebServer.sharedInstance.base + "/interstitial/Bookmarks.html")!
-        if let url = components.url {
-            let request = PrivilegedRequest(url: url).then {
+        if let pageUrl = components.url {
+            let request = PrivilegedRequest(url: pageUrl).then {
                 $0.setValue("bookmarks", forHTTPHeaderField: "X-REQUEST-INTERSTITIAL-INFO")
                 $0.setValue(url.absoluteString, forHTTPHeaderField: "X-REQUEST-INTERSTITIAL-URL")
             }
