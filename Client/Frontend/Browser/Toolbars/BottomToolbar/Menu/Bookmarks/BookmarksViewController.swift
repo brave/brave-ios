@@ -523,10 +523,10 @@ extension BookmarksViewController {
         }
         
         self.importExportUtility.importBookmarks(from: importURL) { success in
-            let alert = UIAlertController(title: "Bookmarks",
-                                          message: success ? "Bookmarks Imported Successfully" : "Bookmarks Import Failed",
+            let alert = UIAlertController(title: Strings.Sync.bookmarksImportPopupErrorTitle,
+                                          message: success ? Strings.Sync.bookmarksImportPopupSuccessMessage : Strings.Sync.bookmarksImportPopupFailureMessage,
                                           preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "Okay", style: .default, handler: nil))
+            alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
             self.present(alert, animated: true, completion: nil)
         }
     }

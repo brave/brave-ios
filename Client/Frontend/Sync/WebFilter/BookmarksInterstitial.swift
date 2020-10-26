@@ -65,8 +65,8 @@ extension BookmarksInterstitialPageHandler {
             }
             
             let variables = [
-                "bookmarks_tab_title": "Bookmarks Migration",
-                "bookmarks_page_description": "Some of your bookmarks failed to migrate.",
+                "bookmarks_tab_title": Strings.Sync.v2MigrationInterstitialTitle,
+                "bookmarks_page_description": Strings.Sync.v2MigrationInterstitialPageDescription,
                 "bookmarks_file_url": html
             ]
             

@@ -19,7 +19,7 @@ class BraveCoreImportExportUtility {
         
         state = .importing
         self.queue.async {
-            self.importer.import(from: array, topLevelFolderName: Strings.syncImportFolderName) { state in
+            self.importer.import(from: array, topLevelFolderName: Strings.Sync.importFolderName) { state in
                 guard state != .started else { return }
                 
                 self.state = .none
@@ -36,7 +36,7 @@ class BraveCoreImportExportUtility {
         
         state = .importing
         self.queue.async {
-            self.importer.import(fromFile: path.absoluteString, topLevelFolderName: Strings.syncImportFolderName, automaticImport: true) { [weak self] state, bookmarks in
+            self.importer.import(fromFile: path.absoluteString, topLevelFolderName: Strings.Sync.importFolderName, automaticImport: true) { [weak self] state, bookmarks in
                 guard let self = self, state != .started else { return }
                 
                 do {
@@ -63,7 +63,7 @@ class BraveCoreImportExportUtility {
         
         state = .importing
         self.queue.async {
-            self.importer.import(fromFile: path.absoluteString, topLevelFolderName: Strings.syncImportFolderName, automaticImport: false) { [weak self] state, bookmarks in
+            self.importer.import(fromFile: path.absoluteString, topLevelFolderName: Strings.Sync.importFolderName, automaticImport: false) { [weak self] state, bookmarks in
                 guard let self = self, state != .started else { return }
                 
                 do {

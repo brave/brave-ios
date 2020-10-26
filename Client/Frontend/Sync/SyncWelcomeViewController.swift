@@ -252,10 +252,10 @@ class SyncWelcomeViewController: SyncViewController {
             return
         }
         
-        let alert = UIAlertController(title: Strings.syncV2MigrationTitle,
-                                      message: Strings.syncV2MigrationMessage, preferredStyle: .alert)
+        let alert = UIAlertController(title: Strings.Sync.v2MigrationTitle,
+                                      message: Strings.Sync.v2MigrationMessage, preferredStyle: .alert)
         
-        let okAction = UIAlertAction(title: Strings.syncV2MigrationOKButton, style: .default) { [weak self] _ in
+        let okAction = UIAlertAction(title: Strings.Sync.v2MigrationOKButton, style: .default) { [weak self] _ in
             guard let self = self else { return }
             self.isLoading = true
             
@@ -264,8 +264,8 @@ class SyncWelcomeViewController: SyncViewController {
                 self.isLoading = false
                 
                 if !success {
-                    let alert = UIAlertController(title: Strings.syncV2MigrationErrorTitle,
-                                                  message: Strings.syncV2MigrationErrorMessage,
+                    let alert = UIAlertController(title: Strings.Sync.v2MigrationErrorTitle,
+                                                  message: Strings.Sync.v2MigrationErrorMessage,
                                                   preferredStyle: .alert)
                     
                     let cancelAction = UIAlertAction(title: Strings.OKString, style: .cancel)

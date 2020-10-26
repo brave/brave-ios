@@ -672,8 +672,8 @@ class BrowserViewController: UIViewController {
             self.migrateToChromiumBookmarks { shouldShowError in
                 if shouldShowError {
                     DispatchQueue.main.async {
-                        let alert = UIAlertController(title: Strings.syncV2MigrationErrorTitle,
-                                                      message: Strings.syncV2MigrationErrorMessage,
+                        let alert = UIAlertController(title: Strings.Sync.v2MigrationErrorTitle,
+                                                      message: Strings.Sync.v2MigrationErrorMessage,
                                                       preferredStyle: .alert)
                         alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
                         self.present(alert, animated: true)
