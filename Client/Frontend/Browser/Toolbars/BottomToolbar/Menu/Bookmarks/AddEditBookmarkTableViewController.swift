@@ -67,6 +67,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
     }
     
     private let folderCellTag = 13
+    private static let defaultIndentationLevel = 0
     
     /// Returns a count of how many non-folder cells should be visible(depends on Mode state)
     private var specialButtonsCount: Int {
@@ -120,7 +121,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
     /// Currently selected save location.
     private var saveLocation: BookmarkSaveLocation
     private var rootFolderName: String
-    private var rootFolderId: Int
+    private var rootFolderId: Int = 0 //MobileBookmarks Folder Id
     
     init(mode: BookmarkEditMode) {
         self.mode = mode
@@ -129,7 +130,12 @@ class AddEditBookmarkTableViewController: UITableViewController {
         presentationMode = .currentSelection
         frc = Bookmarkv2.foldersFrc(excludedFolder: mode.folder)
         rootFolderName = Bookmarkv2.mobileNode()?.displayTitle ?? Strings.bookmarkRootLevelCellTitle
-        rootFolderId = Bookmarkv2.mobileNode()?.objectID ?? 0
+        
+        if let mobileFolderId = Bookmarkv2.mobileNode()?.objectID {
+            rootFolderId = mobileFolderId
+        } else {
+            log.error("Invalid MobileBookmarks Folder Id")
+        }
         super.init(style: .grouped)
     }
     
@@ -190,7 +196,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
     /// Indentation level starts with 0, but level 0 is designed for special folders
     /// (root level bookamrks, favorites).
     private func sortFolders(parentID: Int? = nil,
-                             indentationLevel: Int = 0) -> [IndentedFolder] {
+                             indentationLevel: Int = defaultIndentationLevel) -> [IndentedFolder] {
         guard let objects = frc.fetchedObjects else { return [] }
         
         let sortedObjects = objects.sorted(by: { $0.order < $1.order })
@@ -469,7 +475,7 @@ extension AddEditBookmarkTableViewController: BookmarksV2FetchResultsDelegate {
         
     }
     
-    func noIdeaReloadTable(_ controller: BookmarksV2FetchResultsController) {
+    func controllerDidReloadContents(_ controller: BookmarksV2FetchResultsController) {
       reloadData()
     }
 }

@@ -474,7 +474,7 @@ extension BookmarksViewController: BookmarksV2FetchResultsDelegate {
     }
   }
   
-  func noIdeaReloadTable(_ controller: BookmarksV2FetchResultsController) {
+  func controllerDidReloadContents(_ controller: BookmarksV2FetchResultsController) {
     reloadData()
   }
 }

@@ -35,7 +35,7 @@ class Bookmarkv2 {
     }
     
     public var url: String? {
-        return bookmarkNode?.titleUrlNodeUrl?.absoluteString
+        bookmarkNode?.titleUrlNodeUrl?.absoluteString
     }
     
     public var domain: Domain? {
@@ -132,7 +132,8 @@ extension Bookmarkv2 {
     }
     
     public static func getChildren(forFolder folder: Bookmarkv2, includeFolders: Bool) -> [Bookmarkv2]? {
-        return folder.bookmarkNode?.children.filter({ $0.isFolder == includeFolders }).map({ Bookmarkv2($0) })
+        let result = folder.bookmarkNode?.children.map({ Bookmarkv2($0) })
+        return includeFolders ? result : result?.filter({ $0.isFolder == false })
     }
     
     public func update(customTitle: String?, url: String?) {
@@ -161,8 +162,7 @@ extension Bookmarkv2 {
     }
     
     public class func reorderBookmarks(frc: BookmarksV2FetchResultsController?, sourceIndexPath: IndexPath,
-                                       destinationIndexPath: IndexPath,
-                                       isInteractiveDragReorder: Bool = false) {
+                                       destinationIndexPath: IndexPath) {
         if let node = frc?.object(at: sourceIndexPath)?.bookmarkNode,
            let parent = node.parent ?? bookmarksAPI.mobileNode {
             
@@ -183,7 +183,7 @@ protocol BookmarksV2FetchResultsDelegate: class {
     
     func controller(_ controller: BookmarksV2FetchResultsController, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?)
     
-    func noIdeaReloadTable(_ controller: BookmarksV2FetchResultsController)
+    func controllerDidReloadContents(_ controller: BookmarksV2FetchResultsController)
 }
 
 protocol BookmarksV2FetchResultsController {
@@ -209,7 +209,7 @@ class Bookmarkv2Fetcher: NSObject, BookmarksV2FetchResultsController {
         
         self.bookmarkModelListener = api.add(BookmarkModelStateChangeObserver { [weak self] _ in
             guard let self = self else { return }
-            self.delegate?.noIdeaReloadTable(self)
+            self.delegate?.controllerDidReloadContents(self)
         })
     }
     
@@ -244,7 +244,8 @@ class Bookmarkv2Fetcher: NSObject, BookmarksV2FetchResultsController {
     }
     
     func object(at indexPath: IndexPath) -> Bookmarkv2? {
-        return Bookmarkv2(children[indexPath.row])
+        guard let node = children[safe: indexPath.row] else { return nil }
+        return Bookmarkv2(node)
     }
 }
 
@@ -263,7 +264,7 @@ class Bookmarkv2ExclusiveFetcher: NSObject, BookmarksV2FetchResultsController {
         
         self.bookmarkModelListener = api.add(BookmarkModelStateChangeObserver { [weak self] _ in
             guard let self = self else { return }
-            self.delegate?.noIdeaReloadTable(self)
+            self.delegate?.controllerDidReloadContents(self)
         })
     }
     
@@ -314,7 +315,8 @@ class Bookmarkv2ExclusiveFetcher: NSObject, BookmarksV2FetchResultsController {
     }
     
     func object(at indexPath: IndexPath) -> Bookmarkv2? {
-        return Bookmarkv2(children[indexPath.row])
+        guard let node = children[safe: indexPath.row] else { return nil }
+        return Bookmarkv2(node)
     }
     
     private func recurseNode(_ node: BookmarkNode) -> [BookmarkNode] {

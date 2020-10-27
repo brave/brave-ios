@@ -9,26 +9,8 @@ import BraveRewards
 
 private let log = Logger.browserLogger
 
-struct BraveSyncDevice: Codable {
-    let chromeVersion: String
-    let hasSharingInfo: Bool
-    let id: String
-    let guid: String
-    let isCurrentDevice: Bool
-    let lastUpdatedTimestamp: TimeInterval
-    let name: String?
-    let os: String
-    let sendTabToSelfReceivingEnabled: Bool
-    let type: String
-    
-    func remove() {
-        BraveSyncAPI.shared.removeDeviceFromSyncGroup(deviceGuid: self.guid)
-    }
-}
-
 class SyncSettingsTableViewController: UITableViewController {
     private var syncDeviceObserver: BraveSyncDeviceObserver?
-    private var syncStateObserver: BraveSyncServiceObserver?
     private var devices = [BraveSyncDevice]()
     
     private enum Sections: Int { case deviceList, buttons }
@@ -289,5 +271,22 @@ extension SyncSettingsTableViewController {
         } else {
             log.error("Something went wrong while retrieving Sync Devices..")
         }
+    }
+}
+
+private struct BraveSyncDevice: Codable {
+    let chromeVersion: String
+    let hasSharingInfo: Bool
+    let id: String
+    let guid: String
+    let isCurrentDevice: Bool
+    let lastUpdatedTimestamp: TimeInterval
+    let name: String?
+    let os: String
+    let sendTabToSelfReceivingEnabled: Bool
+    let type: String
+    
+    func remove() {
+        BraveSyncAPI.shared.removeDeviceFromSyncGroup(deviceGuid: self.guid)
     }
 }

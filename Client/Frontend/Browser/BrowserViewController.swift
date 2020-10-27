@@ -651,8 +651,6 @@ class BrowserViewController: UIViewController {
         let dropInteraction = UIDropInteraction(delegate: self)
         view.addInteraction(dropInteraction)
         
-        deprecateSyncV1()
-        
         if AppConstants.buildChannel.isPublic && AppReview.shouldRequestReview() {
             // Request Review when the main-queue is free or on the next cycle.
             DispatchQueue.main.async {
@@ -667,94 +665,49 @@ class BrowserViewController: UIViewController {
         vpnProductInfo.load()
         BraveVPN.initialize()
         
-        if !Preferences.Chromium.syncV2BookmarksMigrationCompleted.value {
-            //TODO: Show a loading screen and block the user?
-            self.migrateToChromiumBookmarks { shouldShowError in
-                if shouldShowError {
-                    DispatchQueue.main.async {
-                        let alert = UIAlertController(title: Strings.Sync.v2MigrationErrorTitle,
-                                                      message: Strings.Sync.v2MigrationErrorMessage,
-                                                      preferredStyle: .alert)
-                        alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
-                        self.present(alert, animated: true)
-                    }
+        self.migrateToChromiumBookmarks { success in
+            if !success {
+                DispatchQueue.main.async {
+                    let alert = UIAlertController(title: Strings.Sync.v2MigrationErrorTitle,
+                                                  message: Strings.Sync.v2MigrationErrorMessage,
+                                                  preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
+                    self.present(alert, animated: true)
                 }
             }
         }
     }
     
-    private func migrateToChromiumBookmarks(_ completion: @escaping (_ showError: Bool) -> Void) {
+    private func migrateToChromiumBookmarks(_ completion: @escaping (_ success: Bool) -> Void) {
+        let showInterstitialPage = { (url: URL?) -> Bool in
+            guard let url = url else {
+                log.error("Cannot open bookmarks page in new tab")
+                return false
+            }
+            
+            return BookmarksInterstitialPageHandler.showBookmarksPage(tabManager: self.tabManager, url: url)
+        }
+        
         Migration.braveCoreBookmarksMigrator?.migrate({ success in
-            if success {
-                let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-                guard let documentsDirectory = paths.first else {
-                    log.error("Unable to access documents directory")
-                    completion(true)
-                    return
-                }
-                
-                let dateFormatter = DateFormatter().then {
-                    $0.dateFormat = "yyyy-MM-dd_HH:mm:ss"
-                }
-                
-                let dateString = dateFormatter.string(from: Date()).escape() ?? "\(Date().timeIntervalSince1970)"
-                
-                guard let url = URL(string: "\(documentsDirectory)/Bookmarks_\(dateString).html") else {
-                    log.error("Unable to access Bookmarks_\(dateString).html")
-                    completion(true)
+            Preferences.Chromium.syncV2BookmarksMigrationCount.value += 1
+            
+            if !success {
+                guard let url = BraveCoreMigrator.datedBookmarksURL else {
+                    completion(showInterstitialPage(BraveCoreMigrator.bookmarksURL))
                     return
                 }
                 
                 Migration.braveCoreBookmarksMigrator?.exportBookmarks(to: url) { success in
                     if success {
-                        if !BookmarksInterstitialPageHandler.showBookmarksPage(tabManager: self.tabManager, url: url) {
-                            log.error("Unable to open the users bookmarks.html in a new tab")
-                            completion(true)
-                            return
-                        }
-                        completion(false)
+                        completion(showInterstitialPage(url))
                     } else {
-                        guard let url = URL(string: "\(documentsDirectory)/Bookmarks.html") else {
-                            log.error("Unable to access Bookmarks.html")
-                            completion(true)
-                            return
-                        }
-                        
-                        if !BookmarksInterstitialPageHandler.showBookmarksPage(tabManager: self.tabManager, url: url) {
-                            log.error("Unable to open the users bookmarks.html in a new tab")
-                            completion(true)
-                            return
-                        }
-                        completion(false)
+                        completion(showInterstitialPage(BraveCoreMigrator.bookmarksURL))
                     }
                 }
             } else {
-                completion(false)
+                completion(true)
             }
         })
-    }
-    
-    private func deprecateSyncV1() {
-        let sync = Sync.shared
-        
-        if sync.syncSeedArray == nil { return }
-        
-        sync.leaveSyncGroup()
-        
-        let alert = UIAlertController(title: "", message: Strings.Sync.syncV1DeprecationText,
-                                      preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
-        let learnMoreAction = UIAlertAction(title: Strings.learnMore, style: .default) { [weak self] _ in
-            guard let syncDeprecationUrl = URL(string: "https://brave.com/sync-v2-is-coming") else {
-                log.error("Failed to unwrap sync deprecation url")
-                return
-            }
-            
-            self?.tabManager.addTabAndSelect(URLRequest(url: syncDeprecationUrl),
-                                            isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
-        }
-        alert.addAction(learnMoreAction)
-        present(alert, animated: true)
     }
     
     fileprivate func setupTabs() {
