@@ -195,6 +195,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         self.browserViewController = nil
         self.rootViewController = nil
         SKPaymentQueue.default().remove(iapObserver)
+        
+        // Clean up BraveCore
+        BraveSyncAPI.removeAllObservers()
         self.braveCore = nil
     }
 

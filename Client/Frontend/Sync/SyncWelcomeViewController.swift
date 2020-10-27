@@ -48,8 +48,8 @@ class SyncWelcomeViewController: SyncViewController {
         }
     }
     
-    private var syncServiceObserver: BraveSyncServiceObserver?
-    private var syncDeviceInfoObserver: BraveSyncDeviceObserver?
+    private var syncServiceObserver: AnyObject?
+    private var syncDeviceInfoObserver: AnyObject?
     
     lazy var mainStackView: UIStackView = {
         let stackView = UIStackView()
@@ -166,7 +166,7 @@ class SyncWelcomeViewController: SyncViewController {
     /// Sync setup failure is handled here because it can happen from few places in children VCs(new chain, qr code, codewords)
     /// This makes all presented Sync View Controllers to dismiss, cleans up any sync setup and shows user a friendly message.
     private func handleSyncSetupFailure() {
-        syncServiceObserver = BraveSyncServiceObserver { [weak self] in
+        syncServiceObserver = BraveSyncAPI.addServiceStateObserver { [weak self] in
             guard let self = self else { return }
             if !BraveSyncAPI.shared.isInSyncGroup {
                 self.dismiss(animated: true)
@@ -202,7 +202,7 @@ class SyncWelcomeViewController: SyncViewController {
             }
 
             addDevice.enableNavigationPrevention()
-            self.syncDeviceInfoObserver = BraveSyncDeviceObserver {
+            self.syncDeviceInfoObserver = BraveSyncAPI.addDeviceStateObserver {
                 self.syncDeviceInfoObserver = nil
                 pushAddDeviceVC()
             }
@@ -221,7 +221,7 @@ class SyncWelcomeViewController: SyncViewController {
         pairCamera.syncHandler = { codeWords in
             pairCamera.enableNavigationPrevention()
             
-            self.syncDeviceInfoObserver = BraveSyncDeviceObserver {
+            self.syncDeviceInfoObserver = BraveSyncAPI.addDeviceStateObserver {
                 self.syncServiceObserver = nil
                 self.syncDeviceInfoObserver = nil
                 pairCamera.disableNavigationPrevention()

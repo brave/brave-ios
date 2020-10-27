@@ -10,7 +10,7 @@ import BraveRewards
 private let log = Logger.browserLogger
 
 class SyncSettingsTableViewController: UITableViewController {
-    private var syncDeviceObserver: BraveSyncDeviceObserver?
+    private var syncDeviceObserver: AnyObject?
     private var devices = [BraveSyncDevice]()
     
     private enum Sections: Int { case deviceList, buttons }
@@ -29,7 +29,7 @@ class SyncSettingsTableViewController: UITableViewController {
         super.viewDidLoad()
         title = Strings.sync
         
-        syncDeviceObserver = BraveSyncDeviceObserver { [weak self] in
+        syncDeviceObserver = BraveSyncAPI.addDeviceStateObserver { [weak self] in
             self?.updateDeviceList()
         }
         
@@ -113,6 +113,11 @@ class SyncSettingsTableViewController: UITableViewController {
         }
         
         guard let device = devices[safe: indexPath.row] else {
+            return
+        }
+        
+        guard device.isCurrentDevice else {
+            //See: `BraveSyncDevice.remove()` for more info.
             return
         }
         
@@ -287,6 +292,9 @@ private struct BraveSyncDevice: Codable {
     let type: String
     
     func remove() {
-        BraveSyncAPI.shared.removeDeviceFromSyncGroup(deviceGuid: self.guid)
+        // Desktop and Android CANNOT delete devices from sync chain
+        // iOS will remove it from BraveCore and iOS side to match
+        // Once Desktop and Android catch up, we will add it back
+        //BraveSyncAPI.shared.removeDeviceFromSyncGroup(deviceGuid: self.guid)
     }
 }
