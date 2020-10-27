@@ -11,7 +11,7 @@ import CoreData
 // A Lightweight wrapper around BraveCore bookmarks
 // with the same layout/interface as `Bookmark (from CoreData)`
 class Bookmarkv2 {
-    private let bookmarkNode: BookmarkNode?
+    private let bookmarkNode: BookmarkNode
     private static let bookmarksAPI = BraveBookmarksAPI()
     
     init(_ bookmarkNode: BookmarkNode) {
@@ -19,11 +19,11 @@ class Bookmarkv2 {
     }
     
     public var isFolder: Bool {
-        return bookmarkNode?.isFolder == true
+        return bookmarkNode.isFolder == true
     }
     
     public var title: String? {
-        return bookmarkNode?.titleUrlNodeTitle
+        return bookmarkNode.titleUrlNodeTitle
     }
     
     public var customTitle: String? {
@@ -35,11 +35,11 @@ class Bookmarkv2 {
     }
     
     public var url: String? {
-        bookmarkNode?.titleUrlNodeUrl?.absoluteString
+        bookmarkNode.titleUrlNodeUrl?.absoluteString
     }
     
     public var domain: Domain? {
-        if let url = bookmarkNode?.url {
+        if let url = bookmarkNode.url {
             return Domain.getOrCreate(forUrl: url, persistent: true)
         }
         return nil
@@ -47,48 +47,51 @@ class Bookmarkv2 {
     
     public var created: Date? {
         get {
-            return bookmarkNode?.dateAdded
+            return bookmarkNode.dateAdded
         }
         
         set {
-            bookmarkNode?.dateAdded = newValue ?? Date()
+            bookmarkNode.dateAdded = newValue ?? Date()
         }
     }
     
     public var parent: Bookmarkv2? {
-        get {
-            if let parent = bookmarkNode?.parent {
-                // Return nil if the parent is the ROOT node
-                // because AddEditBookmarkTableViewController.sortFolders
-                // sorts root folders by having a nil parent.
-                // If that code changes, we should change here to match.
-                if bookmarkNode?.parent?.guid != Bookmarkv2.bookmarksAPI.rootNode?.guid {
-                    return Bookmarkv2(parent)
-                }
+        if let parent = bookmarkNode.parent {
+            // Return nil if the parent is the ROOT node
+            // because AddEditBookmarkTableViewController.sortFolders
+            // sorts root folders by having a nil parent.
+            // If that code changes, we should change here to match.
+            if bookmarkNode.parent?.guid != Bookmarkv2.bookmarksAPI.rootNode?.guid {
+                return Bookmarkv2(parent)
             }
-            return nil
         }
+        return nil
     }
     
     public var children: [Bookmarkv2]? {
-        return bookmarkNode?.children.map({ Bookmarkv2($0) })
+        return bookmarkNode.children.map({ Bookmarkv2($0) })
     }
     
     public var canBeDeleted: Bool {
-        return bookmarkNode?.isPermanentNode == false
+        return bookmarkNode.isPermanentNode == false
     }
     
     public var objectID: Int {
-        return Int(bookmarkNode?.nodeId ?? 0)
+        return Int(bookmarkNode.nodeId)
     }
     
     public var order: Int16 {
-        let children = bookmarkNode?.parent?.children
-        return Int16(children?.firstIndex(where: { $0.guid == self.bookmarkNode?.guid }) ?? -1)
+        let defaultOrder = 0 //taken from CoreData
+        
+        guard let children = bookmarkNode.parent?.children else {
+            return Int16(defaultOrder)
+        }
+        
+        return Int16(children.firstIndex(where: { $0.guid == self.bookmarkNode.guid }) ?? defaultOrder)
     }
     
     public func delete() {
-        if let bookmarkNode = bookmarkNode, self.canBeDeleted {
+        if self.canBeDeleted {
             Bookmarkv2.bookmarksAPI.removeBookmark(bookmarkNode)
         }
     }
@@ -132,32 +135,32 @@ extension Bookmarkv2 {
     }
     
     public static func getChildren(forFolder folder: Bookmarkv2, includeFolders: Bool) -> [Bookmarkv2]? {
-        let result = folder.bookmarkNode?.children.map({ Bookmarkv2($0) })
-        return includeFolders ? result : result?.filter({ $0.isFolder == false })
+        let result = folder.bookmarkNode.children.map({ Bookmarkv2($0) })
+        return includeFolders ? result : result.filter({ $0.isFolder == false })
     }
     
     public func update(customTitle: String?, url: String?) {
-        bookmarkNode?.setTitle(customTitle ?? "")
-        bookmarkNode?.url = URL(string: url ?? "")
+        bookmarkNode.setTitle(customTitle ?? "")
+        bookmarkNode.url = URL(string: url ?? "")
     }
     
     public func updateWithNewLocation(customTitle: String?, url: String?, location: Bookmarkv2?) {
         if let location = location?.bookmarkNode {
-            bookmarkNode?.move(toParent: location)
+            bookmarkNode.move(toParent: location)
         } else {
             if let mobileNode = Bookmarkv2.bookmarksAPI.mobileNode {
-                bookmarkNode?.move(toParent: mobileNode)
+                bookmarkNode.move(toParent: mobileNode)
             }
         }
         
         if let customTitle = customTitle {
-            bookmarkNode?.setTitle(customTitle)
+            bookmarkNode.setTitle(customTitle)
         }
         
         if let url = url {
-            bookmarkNode?.url = URL(string: url)
+            bookmarkNode.url = URL(string: url)
         } else {
-            bookmarkNode?.url = nil
+            bookmarkNode.url = nil
         }
     }
     
@@ -218,24 +221,24 @@ class Bookmarkv2Fetcher: NSObject, BookmarksV2FetchResultsController {
     }
     
     func performFetch() throws {
-        self.children.removeAll()
+        children.removeAll()
         
         if let parentNode = self.parentNode {
-            self.children.append(contentsOf: parentNode.children)
+            children.append(contentsOf: parentNode.children)
         } else {
             if let node = bookmarksAPI?.mobileNode {
-                self.children.append(node)
+                children.append(node)
             }
             
             if let node = bookmarksAPI?.desktopNode, !node.children.isEmpty {
-                self.children.append(node)
+                children.append(node)
             }
             
             if let node = bookmarksAPI?.otherNode, !node.children.isEmpty {
-                self.children.append(node)
+                children.append(node)
             }
             
-            if self.children.isEmpty {
+            if children.isEmpty {
                 throw NSError(domain: "brave.core.migrator", code: -1, userInfo: [
                     NSLocalizedFailureReasonErrorKey: "Invalid Bookmark Nodes"
                 ])
@@ -273,41 +276,41 @@ class Bookmarkv2ExclusiveFetcher: NSObject, BookmarksV2FetchResultsController {
     }
     
     func performFetch() throws {
-        self.children = []
+        children = []
         
         if let excludedFolder = self.excludedFolder {
             if let node = bookmarksAPI?.mobileNode {
-                self.children.append(node)
-                self.children.append(contentsOf: self.recurseNode(node).filter({ $0.isFolder && $0.guid != excludedFolder.guid }))
+                children.append(node)
+                children.append(contentsOf: recurseNode(node).filter({ $0.isFolder && $0.guid != excludedFolder.guid }))
             }
             
             if let node = bookmarksAPI?.desktopNode, !node.children.isEmpty {
-                self.children.append(node)
-                self.children.append(contentsOf: self.recurseNode(node).filter({ $0.isFolder && $0.guid != excludedFolder.guid }))
+                children.append(node)
+                children.append(contentsOf: recurseNode(node).filter({ $0.isFolder && $0.guid != excludedFolder.guid }))
             }
             
             if let node = bookmarksAPI?.otherNode, !node.children.isEmpty {
-                self.children.append(node)
-                self.children.append(contentsOf: self.recurseNode(node).filter({ $0.isFolder && $0.guid != excludedFolder.guid }))
+                children.append(node)
+                children.append(contentsOf: recurseNode(node).filter({ $0.isFolder && $0.guid != excludedFolder.guid }))
             }
         } else {
             if let node = bookmarksAPI?.mobileNode {
-                self.children.append(node)
-                self.children.append(contentsOf: self.recurseNode(node).filter({ $0.isFolder }))
+                children.append(node)
+                children.append(contentsOf: recurseNode(node).filter({ $0.isFolder }))
             }
             
             if let node = bookmarksAPI?.desktopNode, !node.children.isEmpty {
-                self.children.append(node)
-                self.children.append(contentsOf: self.recurseNode(node).filter({ $0.isFolder }))
+                children.append(node)
+                children.append(contentsOf: recurseNode(node).filter({ $0.isFolder }))
             }
             
             if let node = bookmarksAPI?.otherNode, !node.children.isEmpty {
-                self.children.append(node)
-                self.children.append(contentsOf: self.recurseNode(node).filter({ $0.isFolder }))
+                children.append(node)
+                children.append(contentsOf: recurseNode(node).filter({ $0.isFolder }))
             }
         }
         
-        if self.children.isEmpty {
+        if children.isEmpty {
             throw NSError(domain: "brave.core.migrator", code: -1, userInfo: [
                 NSLocalizedFailureReasonErrorKey: "Invalid Bookmark Nodes"
             ])

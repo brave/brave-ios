@@ -5,7 +5,7 @@
 
 import Foundation
 import BraveRewards
-import SwiftKeychainWrapper
+import BraveShared
 
 extension BraveSyncAPI {
     
@@ -13,16 +13,13 @@ extension BraveSyncAPI {
     private static let isInGroupKey = "BraveSyncAPI.isInGroupKey"
     
     var isInSyncGroup: Bool {
-        if let codeWords = UserDefaults.standard.object(forKey: BraveSyncAPI.isInGroupKey) as? Bool {
-            return codeWords
-        }
-        return false
+        return Preferences.Chromium.syncEnabled.value
     }
     
     @discardableResult
     func joinSyncGroup(codeWords: String) -> Bool {
         if self.setSyncCode(codeWords) {
-            UserDefaults.standard.setValue(true, forKey: BraveSyncAPI.isInGroupKey)
+            Preferences.Chromium.syncEnabled.value = true
             return true
         }
         return false
@@ -34,6 +31,6 @@ extension BraveSyncAPI {
     
     func leaveSyncGroup() {
         BraveSyncAPI.shared.resetSync()
-        UserDefaults.standard.removeObject(forKey: BraveSyncAPI.isInGroupKey)
+        Preferences.Chromium.syncEnabled.value = false
     }
 }

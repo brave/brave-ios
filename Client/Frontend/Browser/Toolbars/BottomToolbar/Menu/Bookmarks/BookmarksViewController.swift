@@ -233,7 +233,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     }
     
     guard let item = bookmarksFRC?.object(at: indexPath) else { return }
-    cell.tag = item.objectID //.hashValue
+    cell.tag = item.objectID
     
     func configCell(image: UIImage? = nil, icon: FaviconMO? = nil) {
       if !tableView.isEditing {
