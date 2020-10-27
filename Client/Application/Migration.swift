@@ -27,7 +27,9 @@ class Migration {
         }
         
         //`.migrate` is called in `BrowserViewController.viewDidLoad()`
-        braveCoreBookmarksMigrator = BraveCoreMigrator()
+        if !Preferences.Chromium.syncV2BookmarksMigrationCompleted.value {
+            braveCoreBookmarksMigrator = BraveCoreMigrator()
+        }
     }
     
     static func moveDatabaseToApplicationDirectory() {

@@ -10,7 +10,6 @@ import BraveShared
 extension BraveSyncAPI {
     
     public static let seedByteLength = 32
-    private static let isInGroupKey = "BraveSyncAPI.isInGroupKey"
     private static var serviceObservers = NSHashTable<BraveSyncServiceListener>.weakObjects()
     private static var deviceObservers = NSHashTable<BraveSyncDeviceListener>.weakObjects()
     
