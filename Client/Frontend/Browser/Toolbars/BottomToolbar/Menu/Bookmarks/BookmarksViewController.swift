@@ -257,9 +257,10 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
       } else {
         cell.imageView?.layer.borderColor = BraveUX.faviconBorderColor.cgColor
         cell.imageView?.layer.borderWidth = BraveUX.faviconBorderWidth
+        
         // favicon object associated through domain relationship - set from cache or download
-        if let url = item.domain?.url?.asURL {
-            cell.imageView?.loadFavicon(for: url, domain: item.domain, fallbackMonogramCharacter: item.title?.first)
+        if let domain = item.domain, let url = domain.url?.asURL {
+            cell.imageView?.loadFavicon(for: url, domain: domain, fallbackMonogramCharacter: item.title?.first)
         } else {
             cell.imageView?.clearMonogramFavicon()
             cell.imageView?.image = FaviconFetcher.defaultFaviconImage

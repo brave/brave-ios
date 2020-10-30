@@ -7,6 +7,9 @@ import Foundation
 import Data
 import BraveRewards
 import CoreData
+import Shared
+
+private let log = Logger.browserLogger
 
 // A Lightweight wrapper around BraveCore bookmarks
 // with the same layout/interface as `Bookmark (from CoreData)`
@@ -39,7 +42,7 @@ class Bookmarkv2 {
     }
     
     public var domain: Domain? {
-        if let url = bookmarkNode.url {
+        if let url = bookmarkNode.titleUrlNodeUrl {
             return Domain.getOrCreate(forUrl: url, persistent: true)
         }
         return nil
@@ -145,22 +148,20 @@ extension Bookmarkv2 {
     }
     
     public func updateWithNewLocation(customTitle: String?, url: String?, location: Bookmarkv2?) {
-        if let location = location?.bookmarkNode {
+        if let location = location?.bookmarkNode ?? Bookmarkv2.bookmarksAPI.mobileNode {
             bookmarkNode.move(toParent: location)
-        } else {
-            if let mobileNode = Bookmarkv2.bookmarksAPI.mobileNode {
-                bookmarkNode.move(toParent: mobileNode)
+            
+            if let customTitle = customTitle {
+                bookmarkNode.setTitle(customTitle)
             }
-        }
-        
-        if let customTitle = customTitle {
-            bookmarkNode.setTitle(customTitle)
-        }
-        
-        if let url = url {
-            bookmarkNode.url = URL(string: url)
+            
+            if let url = url, !bookmarkNode.isFolder {
+                bookmarkNode.url = URL(string: url)
+            } else if url != nil {
+                log.error("Error: Moving bookmark - Cannot convert a folder into a bookmark with url.")
+            }
         } else {
-            bookmarkNode.url = nil
+            log.error("Error: Moving bookmark - Cannot move a bookmark to Root.")
         }
     }
     
