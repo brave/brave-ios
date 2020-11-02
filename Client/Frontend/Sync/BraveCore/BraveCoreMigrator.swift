@@ -178,7 +178,7 @@ class BraveCoreMigrator {
     }
     
     public func exportBookmarks(to url: URL, _ completion: @escaping (_ success: Bool) -> Void) {
-        self.dataImportExporter.exportBookmarks(to: url, bookmarks: Bookmark.getAllTopLevelBookmarks()) { success in
+        self.dataImportExporter.exportBookmarks(to: url, bookmarks: Bookmark.getAllTopLevelBookmarks().sorted(by: { $0.order < $1.order })) { success in
             completion(success)
         }
     }
@@ -188,7 +188,7 @@ class BraveCoreMigrator {
             return completion(false)
         }
         
-        self.dataImportExporter.exportBookmarks(to: url, bookmarks: Bookmark.getAllTopLevelBookmarks()) { success in
+        self.dataImportExporter.exportBookmarks(to: url, bookmarks: Bookmark.getAllTopLevelBookmarks().sorted(by: { $0.order < $1.order })) { success in
             completion(success)
         }
     }
@@ -205,7 +205,7 @@ class BraveCoreMigrator {
         
         DataController.performOnMainContext { context in
             var didSucceed = true
-            for bookmark in Bookmark.getAllTopLevelBookmarks(context) {
+            for bookmark in Bookmark.getAllTopLevelBookmarks(context).sorted(by: { $0.order < $1.order }) {
                 if self.migrateChromiumBookmarks(context: context, bookmark: bookmark, chromiumBookmark: rootFolder) {
                     bookmark.delete(context: .existing(context))
                 } else {
@@ -248,7 +248,7 @@ class BraveCoreMigrator {
             }
         } else if let absoluteUrl = bookmark.url, let url = URL(string: absoluteUrl) {
             // Migrate URLs..
-            if chromiumBookmark.addChildBookmark(withTitle: title, url: url) != nil {
+            if chromiumBookmark.addChildBookmark(withTitle: title, url: url) == nil {
                 log.error("Failed to Migrate Bookmark URL")
                 return false
             }
