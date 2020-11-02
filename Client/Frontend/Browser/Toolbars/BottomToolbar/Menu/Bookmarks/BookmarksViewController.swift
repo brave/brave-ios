@@ -50,7 +50,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         return self.currentFolder == nil
     }
     
-    private var importExportUtility = BraveCoreImportExportUtility()
+    private let importExportUtility = BraveCoreImportExportUtility()
     private var documentInteractionController: UIDocumentInteractionController?
   
     init(folder: Bookmarkv2?, isPrivateBrowsing: Bool) {
@@ -517,8 +517,8 @@ extension BookmarksViewController: UIDocumentPickerDelegate, UIDocumentInteracti
             return
         }
         
-        self.documentInteractionController = nil
         self.importBookmarks(from: url)
+        self.documentInteractionController = nil
     }
     
     func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
@@ -549,12 +549,7 @@ extension BookmarksViewController: UIDocumentPickerDelegate, UIDocumentInteracti
 
 extension BookmarksViewController {
     func importBookmarks(from url: URL) {
-        guard let importURL = URL(string: url.relativePath) else {
-            log.error("Invalid Bookmarks Import File URL")
-            return
-        }
-        
-        self.importExportUtility.importBookmarks(from: importURL) { success in
+        self.importExportUtility.importBookmarks(from: url) { success in
             let alert = UIAlertController(title: Strings.Sync.bookmarksImportPopupErrorTitle,
                                           message: success ? Strings.Sync.bookmarksImportPopupSuccessMessage : Strings.Sync.bookmarksImportPopupFailureMessage,
                                           preferredStyle: .alert)
@@ -564,12 +559,7 @@ extension BookmarksViewController {
     }
     
     func exportBookmarks(to url: URL) {
-        guard let exportURL = URL(string: url.relativePath) else {
-            log.error("Invalid Bookmarks Export File URL")
-            return
-        }
-        
-        self.importExportUtility.exportBookmarks(to: exportURL) { [weak self] success in
+        self.importExportUtility.exportBookmarks(to: url) { [weak self] success in
             guard let self = self else { return }
             
             //Controller must be retained otherwise `AirDrop` and other sharing options will fail!

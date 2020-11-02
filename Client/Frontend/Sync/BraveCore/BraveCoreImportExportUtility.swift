@@ -34,9 +34,17 @@ class BraveCoreImportExportUtility {
     func importBookmarks(from path: URL, _ completion: @escaping (_ success: Bool) -> Void) {
         precondition(state == .none, "Bookmarks Import - Error Importing while an Import/Export operation is in progress")
         
+        guard let path = nativeURLPathFromURL(path) else {
+            log.error("Bookmarks Import - Invalid FileSystem Path")
+            DispatchQueue.main.async {
+                completion(false)
+            }
+            return
+        }
+        
         state = .importing
         self.queue.async {
-            self.importer.import(fromFile: path.absoluteString, topLevelFolderName: Strings.Sync.importFolderName, automaticImport: true) { [weak self] state, bookmarks in
+            self.importer.import(fromFile: path, topLevelFolderName: Strings.Sync.importFolderName, automaticImport: true) { [weak self] state, bookmarks in
                 guard let self = self, state != .started else { return }
                 
                 do {
@@ -61,9 +69,17 @@ class BraveCoreImportExportUtility {
     func importBookmarks(from path: URL, _ completion: @escaping (_ success: Bool, _ bookmarks: [BraveImportedBookmark]) -> Void) {
         precondition(state == .none, "Bookmarks Import - Error Importing while an Import/Export operation is in progress")
         
+        guard let path = nativeURLPathFromURL(path) else {
+            log.error("Bookmarks Import - Invalid FileSystem Path")
+            DispatchQueue.main.async {
+                completion(false, [])
+            }
+            return
+        }
+        
         state = .importing
         self.queue.async {
-            self.importer.import(fromFile: path.absoluteString, topLevelFolderName: Strings.Sync.importFolderName, automaticImport: false) { [weak self] state, bookmarks in
+            self.importer.import(fromFile: path, topLevelFolderName: Strings.Sync.importFolderName, automaticImport: false) { [weak self] state, bookmarks in
                 guard let self = self, state != .started else { return }
                 
                 do {
@@ -88,9 +104,17 @@ class BraveCoreImportExportUtility {
     func exportBookmarks(to path: URL, _ completion: @escaping (_ success: Bool) -> Void) {
         precondition(state == .none, "Bookmarks Import - Error Exporting while an Import/Export operation is in progress")
         
+        guard let path = nativeURLPathFromURL(path) else {
+            log.error("Bookmarks Export - Invalid FileSystem Path")
+            DispatchQueue.main.async {
+                completion(false)
+            }
+            return
+        }
+        
         self.state = .exporting
         self.queue.async {
-            self.exporter.export(toFile: path.absoluteString) { [weak self] state in
+            self.exporter.export(toFile: path) { [weak self] state in
                 guard let self = self, state != .started else { return }
                 
                 do {
@@ -115,10 +139,18 @@ class BraveCoreImportExportUtility {
     func exportBookmarks(to path: URL, bookmarks: [Bookmark], _ completion: @escaping (_ success: Bool) -> Void) {
         precondition(state == .none, "Bookmarks Import - Error Exporting while an Import/Export operation is in progress")
         
+        guard let path = nativeURLPathFromURL(path) else {
+            log.error("Bookmarks Export - Invalid FileSystem Path")
+            DispatchQueue.main.async {
+                completion(false)
+            }
+            return
+        }
+        
         self.state = .exporting
         let bookmarks = bookmarks.map({ $0.toChromiumExportedBookmark() })
         self.queue.async {
-            self.exporter.export(toFile: path.absoluteString, bookmarks: bookmarks) { [weak self] state in
+            self.exporter.export(toFile: path, bookmarks: bookmarks) { [weak self] state in
                 guard let self = self, state != .started else { return }
                 
                 do {
@@ -151,6 +183,16 @@ class BraveCoreImportExportUtility {
         case importing
         case exporting
         case none
+    }
+}
+
+// MARK: - Parsing
+extension BraveCoreImportExportUtility {
+    func nativeURLPathFromURL(_ url: URL) -> String? {
+        return url.withUnsafeFileSystemRepresentation { bytes -> String? in
+            guard let bytes = bytes else { return nil }
+            return String(cString: bytes)
+        }
     }
 }
 
