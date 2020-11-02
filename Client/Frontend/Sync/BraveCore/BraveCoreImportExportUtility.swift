@@ -175,7 +175,7 @@ extension Bookmark {
             url: URL(string: self.url ?? ""),
             dateAdded: self.created ?? Date(),
             dateModified: self.lastVisited ?? Date(),
-            children: self.children?.map({ $0.toChromiumExportedBookmark() })
+            children: self.children?.sorted(by: { $0.order < $1.order }).map({ $0.toChromiumExportedBookmark() })
         )
     }
 }
@@ -202,6 +202,8 @@ extension BraveCoreImportExportUtility {
             throw ParsingError.errorWritingHeader
         case .errorWritingNodes:
             throw ParsingError.errorWritingNode
+        case .cancelled:
+            throw ParsingError.errorUnknown
         @unknown default:
             throw ParsingError.errorUnknown
         }

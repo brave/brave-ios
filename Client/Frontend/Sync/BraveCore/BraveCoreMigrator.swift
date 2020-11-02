@@ -134,6 +134,15 @@ class BraveCoreMigrator {
                         log.info("Migrating to Chromium Bookmarks v1 - Start")
                         self?.migrateBookmarks() { success in
                             Preferences.Chromium.syncV2BookmarksMigrationCompleted.value = success
+                            
+                            if let url = BraveCoreMigrator.bookmarksURL {
+                                do {
+                                    try FileManager.default.removeItem(at: url)
+                                } catch {
+                                    log.error("Failed to delete Bookmarks.html backup during Migration")
+                                }
+                            }
+                            
                             completion?(success)
                         }
                     } else {
@@ -175,12 +184,7 @@ class BraveCoreMigrator {
     }
     
     private func exportBookmarks(_ completion: @escaping (_ success: Bool) -> Void) {
-        let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-        guard let documentsDirectory = paths.first else {
-            return completion(false)
-        }
-        
-        guard let url = URL(string: "\(documentsDirectory)/Bookmarks.html") else {
+        guard let url = BraveCoreMigrator.bookmarksURL else {
             return completion(false)
         }
         

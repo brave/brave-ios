@@ -258,12 +258,9 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         cell.imageView?.layer.borderColor = BraveUX.faviconBorderColor.cgColor
         cell.imageView?.layer.borderWidth = BraveUX.faviconBorderWidth
         
-        item.addFavIconObserver { [weak item] in
-            guard let item = item else { return }
-            if item.isFavIconLoaded {
-                item.removeFavIconObserver()
-            }
-            
+        // Sets the favIcon of a cell's imageView from Brave-Core
+        // If the icon does not exist, fallback to our FavIconFetcher
+        let setFavIcon = { (cell: UITableViewCell, item: Bookmarkv2) in
             cell.imageView?.clearMonogramFavicon()
             
             if let icon = item.icon {
@@ -277,13 +274,21 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
             }
         }
         
-        // triggers a favIcon load on Brave-Core then it will notify observers
-        // and update loading properties..
-        if (item.icon == nil && (item.isFavIconLoading || item.isFavIconLoaded)) || item.icon != nil {
-            cell.imageView?.clearMonogramFavicon()
-            if let icon = item.icon {
-                cell.imageView?.image = icon
+        // Brave-Core favIcons are async and notify an observer when changed..
+        item.addFavIconObserver { [weak item] in
+            guard let item = item else { return }
+            if item.isFavIconLoaded {
+                item.removeFavIconObserver()
             }
+            
+            setFavIcon(cell, item)
+        }
+        
+        // `item.icon` triggers a favIcon load on Brave-Core, then it will notify observers
+        // and update `item.isFavIconLoading` and `item.isFavIconLoaded` properties..
+        // Order of this if-statement matters because of that logic!
+        if (item.icon == nil && (item.isFavIconLoading || item.isFavIconLoaded)) || item.icon != nil {
+            setFavIcon(cell, item)
         } else if let domain = item.domain, let url = domain.url?.asURL {
             // favicon object associated through domain relationship - set from cache or download
             cell.imageView?.loadFavicon(for: url, domain: domain, fallbackMonogramCharacter: item.title?.first)
