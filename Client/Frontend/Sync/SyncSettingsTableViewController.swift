@@ -90,6 +90,11 @@ class SyncSettingsTableViewController: UITableViewController {
         let alert = UIAlertController(title: Strings.syncRemoveThisDeviceQuestion, message: Strings.syncRemoveThisDeviceQuestionDesc, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil))
         alert.addAction(UIAlertAction(title: Strings.removeDevice, style: .destructive) { action in
+            if !DeviceInfo.hasConnectivity() {
+                self.present(SyncAlerts.noConnection, animated: true)
+                return
+            }
+            
             BraveSyncAPI.shared.leaveSyncGroup()
             self.navigationController?.popToRootViewController(animated: true)
         })
