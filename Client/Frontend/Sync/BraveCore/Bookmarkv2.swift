@@ -197,7 +197,9 @@ extension Bookmarkv2 {
     }
     
     public func addFavIconObserver(_ observer: @escaping () -> Void) {
-        let observer = BookmarkModelStateObserver { state in
+        let observer = BookmarkModelStateObserver { [weak self] state in
+            guard let self = self else { return }
+            
             if case .favIconChanged(let node) = state {
                 if node.guid == self.bookmarkNode.guid {
                     observer()
