@@ -230,7 +230,8 @@ class BraveCoreMigrator {
             
             var canDeleteFolder = true
             // Recursively migrate all bookmarks and sub-folders in that root folder..
-            for childBookmark in bookmark.children ?? [] {
+            // Keeping the original order
+            for childBookmark in bookmark.children?.sorted(by: { $0.order < $1.order }) ?? [] {
                 if migrateChromiumBookmarks(context: context, bookmark: childBookmark, chromiumBookmark: folder) {
                     childBookmark.delete(context: .existing(context))
                 } else {
@@ -243,7 +244,7 @@ class BraveCoreMigrator {
             }
         } else if let absoluteUrl = bookmark.url, let url = URL(string: absoluteUrl) {
             // Migrate URLs..
-            if chromiumBookmark.addChildBookmark(withTitle: title, url: url) == nil {
+            if chromiumBookmark.addChildBookmark(withTitle: title, url: url) != nil {
                 log.error("Failed to Migrate Bookmark URL")
                 return false
             }
