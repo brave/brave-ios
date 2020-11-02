@@ -15,6 +15,7 @@ private let log = Logger.browserLogger
 // with the same layout/interface as `Bookmark (from CoreData)`
 class Bookmarkv2 {
     private let bookmarkNode: BookmarkNode
+    private var observer: BookmarkModelListener?
     private static let bookmarksAPI = BraveBookmarksAPI()
     
     init(_ bookmarkNode: BookmarkNode) {
@@ -100,6 +101,7 @@ class Bookmarkv2 {
     }
 }
 
+// Bookmarks Fetching
 extension Bookmarkv2 {
     
     public class func mobileNode() -> Bookmarkv2? {
@@ -180,197 +182,33 @@ extension Bookmarkv2 {
     }
 }
 
-protocol BookmarksV2FetchResultsDelegate: class {
-    func controllerWillChangeContent(_ controller: BookmarksV2FetchResultsController)
-    
-    func controllerDidChangeContent(_ controller: BookmarksV2FetchResultsController)
-    
-    func controller(_ controller: BookmarksV2FetchResultsController, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?)
-    
-    func controllerDidReloadContents(_ controller: BookmarksV2FetchResultsController)
-}
-
-protocol BookmarksV2FetchResultsController {
-    /* weak */ var delegate: BookmarksV2FetchResultsDelegate? { get set }
-    
-    var fetchedObjects: [Bookmarkv2]? { get }
-    func performFetch() throws
-    func object(at indexPath: IndexPath) -> Bookmarkv2?
-}
-
-class Bookmarkv2Fetcher: NSObject, BookmarksV2FetchResultsController {
-    weak var delegate: BookmarksV2FetchResultsDelegate?
-    private var bookmarkModelListener: BookmarkModelListener?
-    private weak var bookmarksAPI: BraveBookmarksAPI?
-    
-    private let parentNode: BookmarkNode?
-    private var children = [BookmarkNode]()
-    
-    init(_ parentNode: BookmarkNode?, api: BraveBookmarksAPI) {
-        self.parentNode = parentNode
-        self.bookmarksAPI = api
-        super.init()
-        
-        self.bookmarkModelListener = api.add(BookmarkModelStateChangeObserver { [weak self] _ in
-            guard let self = self else { return }
-            self.delegate?.controllerDidReloadContents(self)
-        })
+// Brave-Core only
+extension Bookmarkv2 {
+    public var icon: UIImage? {
+        return bookmarkNode.icon
     }
     
-    var fetchedObjects: [Bookmarkv2]? {
-        return children.map({ Bookmarkv2($0) })
+    public var isFavIconLoading: Bool {
+        return bookmarkNode.isFavIconLoading
     }
     
-    func performFetch() throws {
-        children.removeAll()
-        
-        if let parentNode = self.parentNode {
-            children.append(contentsOf: parentNode.children)
-        } else {
-            if let node = bookmarksAPI?.mobileNode {
-                children.append(node)
-            }
-            
-            if let node = bookmarksAPI?.desktopNode, !node.children.isEmpty {
-                children.append(node)
-            }
-            
-            if let node = bookmarksAPI?.otherNode, !node.children.isEmpty {
-                children.append(node)
-            }
-            
-            if children.isEmpty {
-                throw NSError(domain: "brave.core.migrator", code: -1, userInfo: [
-                    NSLocalizedFailureReasonErrorKey: "Invalid Bookmark Nodes"
-                ])
-            }
-        }
+    public var isFavIconLoaded: Bool {
+        return bookmarkNode.isFavIconLoaded
     }
     
-    func object(at indexPath: IndexPath) -> Bookmarkv2? {
-        guard let node = children[safe: indexPath.row] else { return nil }
-        return Bookmarkv2(node)
-    }
-}
-
-class Bookmarkv2ExclusiveFetcher: NSObject, BookmarksV2FetchResultsController {
-    weak var delegate: BookmarksV2FetchResultsDelegate?
-    private var bookmarkModelListener: BookmarkModelListener?
-    
-    private var excludedFolder: BookmarkNode?
-    private var children = [BookmarkNode]()
-    private weak var bookmarksAPI: BraveBookmarksAPI?
-    
-    init(_ excludedFolder: BookmarkNode?, api: BraveBookmarksAPI) {
-        self.excludedFolder = excludedFolder
-        self.bookmarksAPI = api
-        super.init()
-        
-        self.bookmarkModelListener = api.add(BookmarkModelStateChangeObserver { [weak self] _ in
-            guard let self = self else { return }
-            self.delegate?.controllerDidReloadContents(self)
-        })
-    }
-    
-    var fetchedObjects: [Bookmarkv2]? {
-        return children.map({ Bookmarkv2($0) })
-    }
-    
-    func performFetch() throws {
-        children = []
-        
-        if let excludedFolder = self.excludedFolder {
-            if let node = bookmarksAPI?.mobileNode {
-                children.append(node)
-                children.append(contentsOf: recurseNode(node).filter({ $0.isFolder && $0.guid != excludedFolder.guid }))
-            }
-            
-            if let node = bookmarksAPI?.desktopNode, !node.children.isEmpty {
-                children.append(node)
-                children.append(contentsOf: recurseNode(node).filter({ $0.isFolder && $0.guid != excludedFolder.guid }))
-            }
-            
-            if let node = bookmarksAPI?.otherNode, !node.children.isEmpty {
-                children.append(node)
-                children.append(contentsOf: recurseNode(node).filter({ $0.isFolder && $0.guid != excludedFolder.guid }))
-            }
-        } else {
-            if let node = bookmarksAPI?.mobileNode {
-                children.append(node)
-                children.append(contentsOf: recurseNode(node).filter({ $0.isFolder }))
-            }
-            
-            if let node = bookmarksAPI?.desktopNode, !node.children.isEmpty {
-                children.append(node)
-                children.append(contentsOf: recurseNode(node).filter({ $0.isFolder }))
-            }
-            
-            if let node = bookmarksAPI?.otherNode, !node.children.isEmpty {
-                children.append(node)
-                children.append(contentsOf: recurseNode(node).filter({ $0.isFolder }))
+    public func addFavIconObserver(_ observer: @escaping () -> Void) {
+        let observer = BookmarkModelStateObserver { state in
+            if case .favIconChanged(let node) = state {
+                if node.guid == self.bookmarkNode.guid {
+                    observer()
+                }
             }
         }
         
-        if children.isEmpty {
-            throw NSError(domain: "brave.core.migrator", code: -1, userInfo: [
-                NSLocalizedFailureReasonErrorKey: "Invalid Bookmark Nodes"
-            ])
-        }
+        self.observer = Bookmarkv2.bookmarksAPI.add(observer)
     }
     
-    func object(at indexPath: IndexPath) -> Bookmarkv2? {
-        guard let node = children[safe: indexPath.row] else { return nil }
-        return Bookmarkv2(node)
-    }
-    
-    private func recurseNode(_ node: BookmarkNode) -> [BookmarkNode] {
-        var result = [BookmarkNode]()
-        
-        for child in node.children {
-            result += recurseNode(child)
-            result.append(child)
-        }
-        return result
-    }
-}
-
-class BookmarkModelStateChangeObserver: NSObject, BookmarkModelObserver {
-    private let listener: (StateChange) -> Void
-    
-    enum StateChange {
-        case nodeChanged(BookmarkNode)
-        case favIconChanged(BookmarkNode)
-        case childrenChanged(BookmarkNode)
-        case nodeMoved(_ node: BookmarkNode, _ from: BookmarkNode, _ to: BookmarkNode)
-        case nodeDeleted(_ node: BookmarkNode, _ from: BookmarkNode)
-        case allRemoved
-    }
-    
-    init(_ listener: @escaping (StateChange) -> Void) {
-        self.listener = listener
-    }
-    
-    func bookmarkNodeChanged(_ bookmarkNode: BookmarkNode) {
-        self.listener(.nodeChanged(bookmarkNode))
-    }
-    
-    func bookmarkNodeFaviconChanged(_ bookmarkNode: BookmarkNode) {
-        self.listener(.favIconChanged(bookmarkNode))
-    }
-    
-    func bookmarkNodeChildrenChanged(_ bookmarkNode: BookmarkNode) {
-        self.listener(.childrenChanged(bookmarkNode))
-    }
-    
-    func bookmarkNode(_ bookmarkNode: BookmarkNode, movedFromParent oldParent: BookmarkNode, toParent newParent: BookmarkNode) {
-        self.listener(.nodeMoved(bookmarkNode, oldParent, newParent))
-    }
-    
-    func bookmarkNodeDeleted(_ node: BookmarkNode, fromFolder folder: BookmarkNode) {
-        self.listener(.nodeDeleted(node, folder))
-    }
-    
-    func bookmarkModelRemovedAllNodes() {
-        self.listener(.allRemoved)
+    public func removeFavIconObserver() {
+        observer = nil
     }
 }

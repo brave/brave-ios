@@ -258,8 +258,34 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         cell.imageView?.layer.borderColor = BraveUX.faviconBorderColor.cgColor
         cell.imageView?.layer.borderWidth = BraveUX.faviconBorderWidth
         
-        // favicon object associated through domain relationship - set from cache or download
-        if let domain = item.domain, let url = domain.url?.asURL {
+        item.addFavIconObserver { [weak item] in
+            guard let item = item else { return }
+            if item.isFavIconLoaded {
+                item.removeFavIconObserver()
+            }
+            
+            cell.imageView?.clearMonogramFavicon()
+            
+            if let icon = item.icon {
+                cell.imageView?.image = icon
+            } else if let domain = item.domain, let url = domain.url?.asURL {
+                // favicon object associated through domain relationship - set from cache only
+                cell.imageView?.loadFavicon(for: url, domain: domain, fallbackMonogramCharacter: item.title?.first, cachedOnly: true)
+            } else {
+                cell.imageView?.clearMonogramFavicon()
+                cell.imageView?.image = FaviconFetcher.defaultFaviconImage
+            }
+        }
+        
+        // triggers a favIcon load on Brave-Core then it will notify observers
+        // and update loading properties..
+        if (item.icon == nil && (item.isFavIconLoading || item.isFavIconLoaded)) || item.icon != nil {
+            cell.imageView?.clearMonogramFavicon()
+            if let icon = item.icon {
+                cell.imageView?.image = icon
+            }
+        } else if let domain = item.domain, let url = domain.url?.asURL {
+            // favicon object associated through domain relationship - set from cache or download
             cell.imageView?.loadFavicon(for: url, domain: domain, fallbackMonogramCharacter: item.title?.first)
         } else {
             cell.imageView?.clearMonogramFavicon()
