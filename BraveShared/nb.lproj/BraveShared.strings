@@ -23,9 +23,6 @@
 "AdsAndTrackers" = "Annonser og sporingsprogrammer";
 
 /* Shields Ads Stat */
-"AdsAndTrackersrBlocked" = "Annonser og sporer \nblokkert";
-
-/* Shields Ads Stat */
 "AdsrBlocked" = "Annonser \nblokkert";
 
 /* Setting to always request the desktop version of a website. */
@@ -129,9 +126,6 @@
 
 /* cookie settings option */
 "Block3rdPartyCookies" = "Blokker tredjeparts informasjonskapsler";
-
-/* No comment provided by engineer. */
-"BlockAdsAndTracking" = "Blokker annonser og sporing";
 
 /* No comment provided by engineer. */
 "BlockAdsAndTrackingDescription" = "Forhindrer annonser, sprettoppvinduer og sporere fra å lastes inn";
@@ -358,9 +352,6 @@
 /* Label for the button used to delete the current login. */
 "DeleteLoginButtonTitle" = "Slett";
 
-/* Sync device settings page title. */
-"Devices" = "Enheter på kjeden";
-
 /* Current device model and iOS version copied to clipboard. */
 "DeviceTemplate" = "Enhet %1$@ (%2$@)";
 
@@ -487,12 +478,6 @@
 /* individual blocking statistic title */
 "FingerprintingMethods" = "Fingeravtrykkmetoder";
 
-/* blocking stat title */
-"FingerprintingnProtection" = "Fingeravtrykk-\nbeskyttelse";
-
-/* No comment provided by engineer. */
-"FingerprintingProtection" = "Blokkerer fingeravtrykk";
-
 /* No comment provided by engineer. */
 "FingerprintingProtectionDescription" = "Gjør det vanskeligere for nettsteder å gjenkjenne enhetens særegne egenskaper.";
 
@@ -528,9 +513,6 @@
 
 /* No comment provided by engineer. */
 "Home" = "Hjem";
-
-/* No comment provided by engineer. */
-"HTTPSEverywhere" = "HTTPS Everywhere";
 
 /* No comment provided by engineer. */
 "HTTPSEverywhereDescription" = "Åpner noen nettsteder med en sikker HTTPS-tilkobling i stedet for vanlig HTTP.";
@@ -1038,9 +1020,6 @@
 
 /* Sync settings section title */
 "Sync" = "Synk";
-
-/* Add another device cell button. */
-"SyncAddAnotherDevice" = "Legg til en ny enhet";
 
 /* Add a Computer title */
 "SyncAddComputerTitle" = "Legg til en datamaskin";
