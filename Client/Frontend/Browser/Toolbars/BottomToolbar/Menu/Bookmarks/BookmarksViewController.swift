@@ -507,6 +507,19 @@ extension BookmarksViewController: BookmarksV2FetchResultsDelegate {
   }
   
   func controllerDidReloadContents(_ controller: BookmarksV2FetchResultsController) {
+    // We're in some sort of invalid state in sync..
+    // Somehow this folder was deleted but the user is currently viewing it..
+    // Might be a good idea to let the user know in the future that the folder they are currently viewing
+    // has been deleted from the sync chain on another device..
+    // This is only possible if the user tries to purposely break sync..
+    // See brave-ios/issues/3011 && brave-browser/issues/12530
+    // - Brandon T.
+    if let currentFolder = currentFolder, !currentFolder.existsInPersistentStore() {
+        self.navigationController?.popToRootViewController(animated: true)
+        return
+    }
+    
+    // Everything is normal, we can reload the current view..
     reloadData()
   }
 }

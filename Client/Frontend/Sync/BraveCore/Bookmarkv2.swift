@@ -128,7 +128,7 @@ extension Bookmarkv2 {
     }
     
     public func existsInPersistentStore() -> Bool {
-        return true //Need a way to tell if a folder already exists in the sync chain..
+        return bookmarkNode.isValid && bookmarkNode.parent != nil
     }
     
     public static func frc(parent: Bookmarkv2?) -> BookmarksV2FetchResultsController? {
