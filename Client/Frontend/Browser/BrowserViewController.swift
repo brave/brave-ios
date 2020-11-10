@@ -1783,17 +1783,24 @@ class BrowserViewController: UIViewController {
         
         let addBookMarkController = AddEditBookmarkTableViewController(mode: mode)
         
-        presentSettingsNavigation(with: addBookMarkController)
+        presentSettingsNavigation(with: addBookMarkController, cancelEnabled: true)
     }
     
-    private func presentSettingsNavigation(with controller: UIViewController) {
+    private func presentSettingsNavigation(with controller: UIViewController, cancelEnabled: Bool = false) {
         let navigationController = SettingsNavigationController(rootViewController: controller)
         navigationController.modalPresentationStyle = .formSheet
+        
+        let cancelBarbutton = UIBarButtonItem(
+            barButtonSystemItem: .cancel,
+            target: navigationController,
+            action: #selector(SettingsNavigationController.done))
         
         let doneBarbutton = UIBarButtonItem(
             barButtonSystemItem: .done,
             target: navigationController,
             action: #selector(SettingsNavigationController.done))
+        
+        navigationController.navigationBar.topItem?.leftBarButtonItem = cancelEnabled ? cancelBarbutton : nil
         
         navigationController.navigationBar.topItem?.rightBarButtonItem = doneBarbutton
         
