@@ -1771,7 +1771,11 @@ class BrowserViewController: UIViewController {
     }
     
     func openAddBookmark() {
-        guard let selectedTab = tabManager.selectedTab, let selectedUrl = selectedTab.url else { return }
+        guard let selectedTab = tabManager.selectedTab,
+              let selectedUrl = selectedTab.url,
+              !(selectedUrl.isLocal || selectedUrl.isReaderModeURL) else {
+            return
+        }
         
         let bookmarkUrl = selectedUrl.decodeReaderModeURL ?? selectedUrl
         

@@ -145,12 +145,12 @@ extension BrowserViewController {
         ]
         
         let bookmarkEditing = [
-            UIKeyCommand(input: "g", modifierFlags: [.command], action: #selector(addBookmarkCommand))
+            UIKeyCommand(input: "d", modifierFlags: [.command], action: #selector(addBookmarkCommand))
         ]
         
         let findText = [
-            UIKeyCommand(input: "d", modifierFlags: [.command, .shift], action: #selector(findNextCommand)),
-            UIKeyCommand(input: "d", modifierFlags: [.command], action: #selector(findPreviousCommand))
+            UIKeyCommand(input: "g", modifierFlags: [.command], action: #selector(findNextCommand)),
+            UIKeyCommand(input: "g", modifierFlags: [.command, .shift], action: #selector(findPreviousCommand))
         ]
 
         let isEditingText = tabManager.selectedTab?.isEditing ?? false
