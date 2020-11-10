@@ -1759,6 +1759,26 @@ class BrowserViewController: UIViewController {
         duckDuckGoPopup = popup
         popup.showWithType(showType: .flyUp)
     }
+    
+    func showBookmarkController() {
+        let bookmarkViewController = BookmarksViewController(
+            folder: nil,
+            isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing)
+        
+        bookmarkViewController.toolbarUrlActionsDelegate = self
+        
+        let navigationController = SettingsNavigationController(rootViewController: bookmarkViewController)
+        navigationController.modalPresentationStyle = .formSheet
+        
+        let doneBarbutton = UIBarButtonItem(
+            barButtonSystemItem: .done,
+            target: navigationController,
+            action: #selector(SettingsNavigationController.done))
+        
+        navigationController.navigationBar.topItem?.rightBarButtonItem = doneBarbutton
+        
+        present(navigationController, animated: true)
+    }
 }
 
 extension BrowserViewController: ClipboardBarDisplayHandlerDelegate {
@@ -2055,17 +2075,7 @@ extension BrowserViewController: TopToolbarDelegate {
     // TODO: This logic should be fully abstracted away and share logic from current MenuViewController
     // See: https://github.com/brave/brave-ios/issues/1452
     func topToolbarDidTapBookmarkButton(_ topToolbar: TopToolbarView) {
-        let vc = BookmarksViewController(folder: nil,
-                                         isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing)
-        vc.toolbarUrlActionsDelegate = self
-        
-        let nav = SettingsNavigationController(rootViewController: vc)
-        nav.modalPresentationStyle = .formSheet
-        
-        let button = UIBarButtonItem(barButtonSystemItem: .done, target: nav, action: #selector(SettingsNavigationController.done))
-        nav.navigationBar.topItem?.rightBarButtonItem = button
-        
-        present(nav, animated: true)
+        showBookmarkController()
     }
     
     func topToolbarDidTapBraveRewardsButton(_ topToolbar: TopToolbarView) {
@@ -3428,6 +3438,12 @@ extension BrowserViewController: FindInPageBarDelegate, FindInPageHelperDelegate
 
     func findInPageHelper(_ findInPageHelper: FindInPageHelper, didUpdateTotalResults totalResults: Int) {
         findInPageBar?.totalResults = totalResults
+    }
+    
+    func findTextInPage(_ direction: TextSearchDirection) {
+        guard let seachText = findInPageBar?.text else { return }
+                
+        find(seachText, function: direction.rawValue)
     }
 }
 
