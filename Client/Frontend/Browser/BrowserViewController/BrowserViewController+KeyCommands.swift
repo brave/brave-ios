@@ -149,8 +149,8 @@ extension BrowserViewController {
         ]
         
         let findText = [
-            UIKeyCommand(input: "d", modifierFlags: [.command], action: #selector(findNextCommand)),
-            UIKeyCommand(input: "d", modifierFlags: [.command, .shift], action: #selector(findPreviousCommand))
+            UIKeyCommand(input: "d", modifierFlags: [.command, .shift], action: #selector(findNextCommand)),
+            UIKeyCommand(input: "d", modifierFlags: [.command], action: #selector(findPreviousCommand))
         ]
 
         let isEditingText = tabManager.selectedTab?.isEditing ?? false
