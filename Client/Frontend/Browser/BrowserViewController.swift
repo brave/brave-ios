@@ -1760,14 +1760,30 @@ class BrowserViewController: UIViewController {
         popup.showWithType(showType: .flyUp)
     }
     
-    func showBookmarkController() {
+    private func showBookmarkController() {
         let bookmarkViewController = BookmarksViewController(
             folder: nil,
             isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing)
         
         bookmarkViewController.toolbarUrlActionsDelegate = self
         
-        let navigationController = SettingsNavigationController(rootViewController: bookmarkViewController)
+        presentSettingsNavigation(with: bookmarkViewController)
+    }
+    
+    func openAddBookmark() {
+        guard let selectedTab = tabManager.selectedTab, let selectedUrl = selectedTab.url else { return }
+        
+        let bookmarkUrl = selectedUrl.decodeReaderModeURL ?? selectedUrl
+        
+        let mode = BookmarkEditMode.addBookmark(title: selectedTab.displayTitle, url: bookmarkUrl.absoluteString)
+        
+        let addBookMarkController = AddEditBookmarkTableViewController(mode: mode)
+        
+        presentSettingsNavigation(with: addBookMarkController)
+    }
+    
+    private func presentSettingsNavigation(with controller: UIViewController) {
+        let navigationController = SettingsNavigationController(rootViewController: controller)
         navigationController.modalPresentationStyle = .formSheet
         
         let doneBarbutton = UIBarButtonItem(

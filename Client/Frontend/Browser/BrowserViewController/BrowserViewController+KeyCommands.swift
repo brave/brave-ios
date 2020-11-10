@@ -90,8 +90,8 @@ extension BrowserViewController {
         showTabTray()
     }
     
-    @objc private func showBookmarkCommand() {
-        showBookmarkController()
+    @objc private func addBookmarkCommand() {
+        openAddBookmark()
     }
     
     @objc private func findNextCommand() {
@@ -145,7 +145,7 @@ extension BrowserViewController {
         ]
         
         let bookmarkEditing = [
-            UIKeyCommand(input: "g", modifierFlags: [.command], action: #selector(showBookmarkCommand))
+            UIKeyCommand(input: "g", modifierFlags: [.command], action: #selector(addBookmarkCommand))
         ]
         
         let findText = [
