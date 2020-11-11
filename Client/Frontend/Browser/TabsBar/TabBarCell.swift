@@ -5,7 +5,7 @@
 import UIKit
 import BraveShared
 
-class TabBarCell: UICollectionViewCell {
+class TabBarCell: UICollectionViewCell, Themeable {
     
     lazy var titleLabel: UILabel = {
         let label = UILabel()
@@ -111,12 +111,6 @@ class TabBarCell: UICollectionViewCell {
         }
     }
     
-    func setTheme(with activeTheme: Theme) {
-        backgroundColor = .clear
-        titleLabel.textColor = PrivateBrowsingManager.shared.isPrivateBrowsing ? .white : activeTheme.colors.tints.header
-        closeButton.tintColor = activeTheme.colors.tints.header
-    }
-    
     @objc func closeTab() {
         guard let tab = tab else { return }
         closeTabCallback?(tab)
@@ -134,5 +128,13 @@ class TabBarCell: UICollectionViewCell {
             strongSelf.titleUpdateScheduled = false
             strongSelf.titleLabel.text = tab.displayTitle
         }
+    }
+    
+    func applyTheme(_ theme: Theme) {
+        styleChildren(theme: theme)
+        
+        backgroundColor = .clear
+        titleLabel.textColor = theme.colors.tints.header
+        closeButton.tintColor = theme.colors.tints.header
     }
 }

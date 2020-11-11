@@ -311,7 +311,7 @@ extension TabsBarViewController: UICollectionViewDataSource {
         cell.titleLabel.text = tab.displayTitle
         cell.currentIndex = indexPath.row
         cell.separatorLineRight.isHidden = (indexPath.row != tabList.count() - 1)
-        cell.setTheme(with: activeTheme)
+        cell.applyTheme(activeTheme)
 
         cell.closeTabCallback = { [weak self] tab in
             guard let strongSelf = self, let tabManager = strongSelf.tabManager, let previousIndex = strongSelf.tabList.index(of: tab) else { return }
@@ -367,6 +367,10 @@ extension TabsBarViewController: TabManagerDelegate {
 }
 
 extension TabsBarViewController: Themeable {
+    var themeableChildren: [Themeable?]? {
+        return  collectionView.visibleCells.compactMap({ $0 as? TabBarCell })
+    }
+    
     func applyTheme(_ theme: Theme) {
         activeTheme = theme
         
