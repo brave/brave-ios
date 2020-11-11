@@ -53,8 +53,12 @@ class TabsBarViewController: UIViewController {
     fileprivate weak var tabManager: TabManager?
     fileprivate var tabList = WeakList<Tab>()
     
+    private var activeTheme: Theme
+    
     init(tabManager: TabManager) {
         self.tabManager = tabManager
+        activeTheme = Theme.of(tabManager.selectedTab)
+        
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -104,12 +108,31 @@ class TabsBarViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         // Updating tabs here is especially handy when tabs are reordered from the tab tray.
         updateData()
+        
+        if #available(iOS 13.0, *) {
+            let oldTraitCollection = UITraitCollection.current
+            UITraitCollection.current = traitCollection
+            applyTheme(Theme.of(tabManager?.selectedTab))
+            UITraitCollection.current = oldTraitCollection
+        } else {
+            applyTheme(Theme.of(tabManager?.selectedTab))
+        }
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
         updateOverflowIndicatorsLayout()
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+
+        if #available(iOS 13.0, *) {
+            if traitCollection.userInterfaceStyle != previousTraitCollection?.userInterfaceStyle {
+                applyTheme(Theme.of(tabManager?.selectedTab))
+            }
+        }
     }
     
     deinit {
@@ -288,7 +311,8 @@ extension TabsBarViewController: UICollectionViewDataSource {
         cell.titleLabel.text = tab.displayTitle
         cell.currentIndex = indexPath.row
         cell.separatorLineRight.isHidden = (indexPath.row != tabList.count() - 1)
-        
+        cell.setTheme(with: activeTheme)
+
         cell.closeTabCallback = { [weak self] tab in
             guard let strongSelf = self, let tabManager = strongSelf.tabManager, let previousIndex = strongSelf.tabList.index(of: tab) else { return }
             
@@ -344,6 +368,8 @@ extension TabsBarViewController: TabManagerDelegate {
 
 extension TabsBarViewController: Themeable {
     func applyTheme(_ theme: Theme) {
+        activeTheme = theme
+        
         styleChildren(theme: theme)
         
         view.backgroundColor = theme.colors.header
