@@ -127,6 +127,7 @@ mkdir -p "$node_modules_path"
 rsync -a --delete "$framework_drop_point/BraveRewards.framework" "$node_modules_path/"
 rsync -a --delete "$framework_drop_point/MaterialComponents.framework" "$node_modules_path/"
 rsync -a --delete "$framework_drop_point/BraveRewards.dSYM.zip" "$node_modules_path/"
+rsync -a --delete "$framework_drop_point/copy_rewards_dsym.sh" "$node_modules_path/"
 echo "Moved Frameworks to node_modules"
 
 cd brave
