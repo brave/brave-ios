@@ -1588,15 +1588,14 @@ class BrowserViewController: UIViewController {
             #endif
         }
         
-        let controller = helper.createActivityViewController(items: activities) { [unowned self] completed, _ in
-            // After dismissing, check to see if there were any prompts we queued up
-            self.showQueuedAlertIfAvailable()
-
-            // Usually the popover delegate would handle nil'ing out the references we have to it
-            // on the BVC when displaying as a popover but the delegate method doesn't seem to be
-            // invoked on iOS 10. See Bug 1297768 for additional details.
-            self.displayedPopoverController = nil
-            self.updateDisplayedPopoverProperties = nil
+        let controller = helper.createActivityViewController(items: activities) { [weak self] completed, _, documentUrl  in
+            guard let self = self else { return }
+            
+            if let url = documentUrl {
+                self.openPDFInIBooks(url)
+            }
+            
+            self.cleanUpCreateActivity()
         }
 
         if let popoverPresentationController = controller.popoverPresentationController {
@@ -1607,6 +1606,25 @@ class BrowserViewController: UIViewController {
         }
 
         present(controller, animated: true, completion: nil)
+    }
+    
+    private func cleanUpCreateActivity() {
+        // After dismissing, check to see if there were any prompts we queued up
+        showQueuedAlertIfAvailable()
+
+        // Usually the popover delegate would handle nil'ing out the references we have to it
+        // on the BVC when displaying as a popover but the delegate method doesn't seem to be
+        // invoked on iOS 10. See Bug 1297768 for additional details.
+        displayedPopoverController = nil
+        updateDisplayedPopoverProperties = nil
+    }
+    
+    private func openPDFInIBooks(_ url: URL) {
+        let iBooksURL = "itms-books://\(url.absoluteString)"
+
+        guard let url = URL(string: iBooksURL) else { return }
+        
+        UIApplication.shared.open(url, options: [:])
     }
 
     func updateFindInPageVisibility(visible: Bool, tab: Tab? = nil) {
