@@ -57,12 +57,9 @@ class TabsBarViewController: UIViewController {
     
     fileprivate weak var tabManager: TabManager?
     fileprivate var tabList = WeakList<Tab>()
-    
-    private var activeTheme: Theme
-    
+        
     init(tabManager: TabManager) {
         self.tabManager = tabManager
-        activeTheme = Theme.of(tabManager.selectedTab)
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -381,8 +378,6 @@ extension TabsBarViewController: Themeable {
     }
     
     func applyTheme(_ theme: Theme) {
-        activeTheme = theme
-        
         styleChildren(theme: theme)
         
         view.backgroundColor = theme.colors.header
