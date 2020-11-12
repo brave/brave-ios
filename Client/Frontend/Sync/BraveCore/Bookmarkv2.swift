@@ -13,7 +13,7 @@ private let log = Logger.browserLogger
 
 // A Lightweight wrapper around BraveCore bookmarks
 // with the same layout/interface as `Bookmark (from CoreData)`
-class Bookmarkv2 {
+class Bookmarkv2: WebsitePresentable {
     private let bookmarkNode: BookmarkNode
     private var observer: BookmarkModelListener?
     private static let bookmarksAPI = BraveBookmarksAPI()
@@ -142,6 +142,14 @@ extension Bookmarkv2 {
     public static func getChildren(forFolder folder: Bookmarkv2, includeFolders: Bool) -> [Bookmarkv2]? {
         let result = folder.bookmarkNode.children.map({ Bookmarkv2($0) })
         return includeFolders ? result : result.filter({ $0.isFolder == false })
+    }
+    
+    public static func byFrequency(query: String? = nil) -> [WebsitePresentable] {
+        //Invalid query.. BraveCore doesn't store bookmarks based on last visited.
+        //Any last visited bookmarks would show up in `History` anyway.
+        //BraveCore automatically sorts them by date as well.
+        guard let query = query, !query.isEmpty else { return [] }
+        return Bookmarkv2.bookmarksAPI.search(withQuery: query, maxCount: 5).map({ Bookmarkv2($0) })
     }
     
     public func update(customTitle: String?, url: String?) {
