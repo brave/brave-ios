@@ -374,7 +374,7 @@ extension TabsBarViewController: TabManagerDelegate {
 
 extension TabsBarViewController: Themeable {
     var themeableChildren: [Themeable?]? {
-        return  collectionView.visibleCells.compactMap({ $0 as? TabBarCell })
+        collectionView.visibleCells.compactMap({ $0 as? TabBarCell })
     }
     
     func applyTheme(_ theme: Theme) {
