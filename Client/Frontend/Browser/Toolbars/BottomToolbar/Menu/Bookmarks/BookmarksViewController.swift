@@ -77,7 +77,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     }
     
     private func updateEditBookmarksButtonStatus() {
-        guard let count = bookmarksFRC?.fetchedObjects?.count else { return }
+        guard let count = bookmarksFRC?.fetchedObjectsCount else { return }
         
         editBookmarksButton?.isEnabled = count != 0
         if tableView.isEditing && count == 0 {
@@ -156,7 +156,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     updateEditBookmarksButton(editMode)
     resetCellLongpressGesture(tableView.isEditing)
     
-    editBookmarksButton?.isEnabled = bookmarksFRC?.fetchedObjects?.count != 0
+    editBookmarksButton?.isEnabled = bookmarksFRC?.fetchedObjectsCount != 0
     addFolderButton?.isEnabled = !editMode
   }
   
@@ -228,7 +228,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     
     // Make sure Bookmark at index path exists,
     // `frc.object(at:)` crashes otherwise, doesn't fail safely with nil
-    if let objectsCount = bookmarksFRC?.fetchedObjects?.count, indexPath.row >= objectsCount {
+    if let objectsCount = bookmarksFRC?.fetchedObjectsCount, indexPath.row >= objectsCount {
         fatalError("Bookmarks FRC index out of bounds")
     }
     
@@ -408,7 +408,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
   }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return bookmarksFRC?.fetchedObjects?.count ?? 0
+        return bookmarksFRC?.fetchedObjectsCount ?? 0
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -483,7 +483,7 @@ extension BookmarksViewController: BookmarksV2FetchResultsDelegate {
             // (since the object is not deleted but updated to have a different parent Bookmark)
             // Make sure we are not out of bounds here.
             if let path = path, let cell = self.tableView.cellForRow(at: path),
-                let fetchedObjectsCount = self.bookmarksFRC?.fetchedObjects?.count, path.row < fetchedObjectsCount {
+                let fetchedObjectsCount = self.bookmarksFRC?.fetchedObjectsCount, path.row < fetchedObjectsCount {
                     self.configureCell(cell, atIndexPath: path)
             }
         }
