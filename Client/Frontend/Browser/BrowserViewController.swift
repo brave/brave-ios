@@ -1113,8 +1113,7 @@ class BrowserViewController: UIViewController {
             // Refresh the reading view toolbar since the article record may have changed
             if let readerMode = self.tabManager.selectedTab?.getContentScript(name: ReaderMode.name()) as? ReaderMode,
                readerMode.state == .active,
-               isReaderModeURL
-            {
+               isReaderModeURL {
                 self.showReaderModeBar(animated: false)
             }
         })
