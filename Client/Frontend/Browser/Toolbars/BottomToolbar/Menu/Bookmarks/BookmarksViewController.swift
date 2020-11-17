@@ -669,7 +669,7 @@ extension BookmarksViewController {
     }
 }
 
-extension UIViewController {
+private extension UIViewController {
     @objc
     func navigationShouldPopOnBackButton() -> Bool {
         return true
