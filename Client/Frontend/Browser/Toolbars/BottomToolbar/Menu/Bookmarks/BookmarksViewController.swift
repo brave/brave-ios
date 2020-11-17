@@ -139,8 +139,12 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         }
     }
     
+    private func updateLastVisitedFolder(_ folder: Bookmarkv2?) {
+        Preferences.Chromium.lastBookmarksFolderNodeId.value = folder?.objectID ?? -1
+    }
+    
     override func navigationShouldPopOnBackButton() -> Bool {
-        Preferences.Chromium.lastBookmarksFolderNodeId.value = self.currentFolder?.parent?.objectID ?? -1
+        updateLastVisitedFolder(currentFolder?.parent)
         return true
     }
   
@@ -170,6 +174,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     }
     spinner.startAnimating()
     spinner.isHidden = false
+    updateLastVisitedFolder(currentFolder)
     
     Bookmarkv2.waitForBookmarkModelLoaded({
         self.navigationController?.setToolbarHidden(false, animated: true)
@@ -177,6 +182,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         self.switchTableEditingMode(true)
         self.spinner.stopAnimating()
         self.spinner.removeFromSuperview()
+        self.updateLastVisitedFolder(self.currentFolder)
     })
   }
     
@@ -429,7 +435,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         //show editing view for bookmark item
         self.showEditBookmarkController(bookmark: bookmark)
       } else {
-        Preferences.Chromium.lastBookmarksFolderNodeId.value = bookmark.objectID
+        self.updateLastVisitedFolder(bookmark)
         let nextController = BookmarksViewController(folder: bookmark, isPrivateBrowsing: isPrivateBrowsing)
         nextController.profile = profile
         nextController.bookmarksDidChange = bookmarksDidChange
