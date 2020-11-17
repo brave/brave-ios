@@ -41,7 +41,9 @@ class Bookmarkv2Fetcher: NSObject, BookmarksV2FetchResultsController {
         
         self.bookmarkModelListener = api.add(BookmarkModelStateObserver { [weak self] _ in
             guard let self = self else { return }
-            self.delegate?.controllerDidReloadContents(self)
+            DispatchQueue.main.async {
+                self.delegate?.controllerDidReloadContents(self)
+            }
         })
     }
     
@@ -99,7 +101,9 @@ class Bookmarkv2ExclusiveFetcher: NSObject, BookmarksV2FetchResultsController {
         
         self.bookmarkModelListener = api.add(BookmarkModelStateObserver { [weak self] _ in
             guard let self = self else { return }
-            self.delegate?.controllerDidReloadContents(self)
+            DispatchQueue.main.async {
+                self.delegate?.controllerDidReloadContents(self)
+            }
         })
     }
     
@@ -115,17 +119,14 @@ class Bookmarkv2ExclusiveFetcher: NSObject, BookmarksV2FetchResultsController {
         children = []
         
         if let node = bookmarksAPI?.mobileNode {
-            children.append(Bookmarkv2(node))
             children.append(contentsOf: getNestedFolders(node, guid: excludedFolder?.guid))
         }
         
         if let node = bookmarksAPI?.desktopNode, node.childCount > 0 {
-            children.append(Bookmarkv2(node))
             children.append(contentsOf: getNestedFolders(node, guid: excludedFolder?.guid))
         }
         
         if let node = bookmarksAPI?.otherNode, node.childCount > 0 {
-            children.append(Bookmarkv2(node))
             children.append(contentsOf: getNestedFolders(node, guid: excludedFolder?.guid))
         }
         
@@ -142,8 +143,8 @@ class Bookmarkv2ExclusiveFetcher: NSObject, BookmarksV2FetchResultsController {
     
     private func getNestedFolders(_ node: BookmarkNode, guid: String?) -> [Bookmarkv2] {
         if let guid = guid {
-            return node.nestedChildFolders.filter({ $0.guid == guid }).map({ Bookmarkv2($0) })
+            return node.nestedChildFolders.filter({ $0.bookmarkNode.guid == guid }).map({ BraveBookmarkFolder($0) })
         }
-        return node.nestedChildFolders.map({ Bookmarkv2($0) })
+        return node.nestedChildFolders.map({ BraveBookmarkFolder($0) })
     }
 }

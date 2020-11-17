@@ -38,6 +38,14 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         $0.action = #selector(importExportAction(_:))
     }
     
+    private let spinner = UIActivityIndicatorView().then {
+        $0.snp.makeConstraints { make in
+            make.size.equalTo(24)
+        }
+        $0.hidesWhenStopped = true
+        $0.isHidden = true
+    }
+    
     weak var addBookmarksFolderOkAction: UIAlertAction?
     
     var isEditingIndividualBookmark: Bool = false
@@ -74,6 +82,8 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
 
         setUpToolbar()
         updateEditBookmarksButtonStatus()
+        
+        self.showLastVisitedFolder()
     }
     
     private func updateEditBookmarksButtonStatus() {
@@ -112,6 +122,27 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         let items = (leftToolbarItems + [flexibleSpace, rightItem, .fixedSpace(5)]).compactMap { $0 }
         setToolbarItems(items, animated: true)
     }
+    
+    private func showLastVisitedFolder() {
+        DispatchQueue.main.async {
+            guard let navigationController = self.navigationController else { return }
+            let index = navigationController.viewControllers.firstIndex(of: self) ?? 0
+            if index <= 0 && self.currentFolder != nil {
+                let nextController = BookmarksViewController(folder: self.currentFolder?.parent, isPrivateBrowsing: self.isPrivateBrowsing)
+                nextController.profile = self.profile
+                nextController.bookmarksDidChange = self.bookmarksDidChange
+                nextController.toolbarUrlActionsDelegate = self.toolbarUrlActionsDelegate
+                nextController.navigationItem.setRightBarButton(self.navigationItem.rightBarButtonItem, animated: true)
+                navigationController.viewControllers.insert(nextController, at: index)
+                nextController.loadViewIfNeeded()
+            }
+        }
+    }
+    
+    override func navigationShouldPopOnBackButton() -> Bool {
+        Preferences.Chromium.lastBookmarksFolderNodeId.value = self.currentFolder?.parent?.objectID ?? -1
+        return true
+    }
   
   override func reloadData() {
     
@@ -132,9 +163,21 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
   
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
-    navigationController?.setToolbarHidden(false, animated: true)
-    reloadData()
-    switchTableEditingMode(true)
+    
+    view.addSubview(spinner)
+    spinner.snp.makeConstraints {
+        $0.center.equalTo(self.view.snp.center)
+    }
+    spinner.startAnimating()
+    spinner.isHidden = false
+    
+    Bookmarkv2.waitForBookmarkModelLoaded({
+        self.navigationController?.setToolbarHidden(false, animated: true)
+        self.reloadData()
+        self.switchTableEditingMode(true)
+        self.spinner.stopAnimating()
+        self.spinner.removeFromSuperview()
+    })
   }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -386,6 +429,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         //show editing view for bookmark item
         self.showEditBookmarkController(bookmark: bookmark)
       } else {
+        Preferences.Chromium.lastBookmarksFolderNodeId.value = bookmark.objectID
         let nextController = BookmarksViewController(folder: bookmark, isPrivateBrowsing: isPrivateBrowsing)
         nextController.profile = profile
         nextController.bookmarksDidChange = bookmarksDidChange
@@ -415,6 +459,11 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         let cell = super.tableView(tableView, cellForRowAt: indexPath)
         configureCell(cell, atIndexPath: indexPath)
         return cell
+    }
+    
+    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        guard let item = bookmarksFRC?.object(at: indexPath) else { return false }
+        return item.canBeDeleted
     }
   
   func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
@@ -530,8 +579,10 @@ extension BookmarksViewController: UIDocumentPickerDelegate, UIDocumentInteracti
             return
         }
         
-        self.importBookmarks(from: url)
-        self.documentInteractionController = nil
+        DispatchQueue.main.async {
+            self.importBookmarks(from: url)
+            self.documentInteractionController = nil
+        }
     }
     
     func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
@@ -562,7 +613,20 @@ extension BookmarksViewController: UIDocumentPickerDelegate, UIDocumentInteracti
 
 extension BookmarksViewController {
     func importBookmarks(from url: URL) {
-        self.importExportUtility.importBookmarks(from: url) { success in
+        self.view.addSubview(spinner)
+        spinner.snp.makeConstraints {
+            $0.center.equalTo(self.view.snp.center)
+        }
+        
+        spinner.startAnimating()
+        spinner.isHidden = false
+        
+        self.importExportUtility.importBookmarks(from: url) { [weak self] success in
+            guard let self = self else { return }
+            
+            self.spinner.stopAnimating()
+            self.spinner.removeFromSuperview()
+            
             let alert = UIAlertController(title: Strings.Sync.bookmarksImportPopupErrorTitle,
                                           message: success ? Strings.Sync.bookmarksImportPopupSuccessMessage : Strings.Sync.bookmarksImportPopupFailureMessage,
                                           preferredStyle: .alert)
@@ -572,8 +636,19 @@ extension BookmarksViewController {
     }
     
     func exportBookmarks(to url: URL) {
+        self.view.addSubview(spinner)
+        spinner.snp.makeConstraints {
+            $0.center.equalTo(self.view.snp.center)
+        }
+        
+        spinner.startAnimating()
+        spinner.isHidden = false
+        
         self.importExportUtility.exportBookmarks(to: url) { [weak self] success in
             guard let self = self else { return }
+            
+            self.spinner.stopAnimating()
+            self.spinner.removeFromSuperview()
             
             //Controller must be retained otherwise `AirDrop` and other sharing options will fail!
             self.documentInteractionController = UIDocumentInteractionController(url: url)
@@ -585,5 +660,18 @@ extension BookmarksViewController {
             guard let importExportButton = self.importExportButton else { return }
             vc.presentOptionsMenu(from: importExportButton, animated: true)
         }
+    }
+}
+
+extension UIViewController {
+    @objc
+    func navigationShouldPopOnBackButton() -> Bool {
+        return true
+    }
+}
+
+extension UINavigationController: UINavigationBarDelegate {
+    public func navigationBar(_ navigationBar: UINavigationBar, shouldPop item: UINavigationItem) -> Bool {
+        return self.topViewController?.navigationShouldPopOnBackButton() ?? true
     }
 }
