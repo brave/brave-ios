@@ -229,7 +229,7 @@ extension Bookmarkv2 {
         //Any last visited bookmarks would show up in `History` anyway.
         //BraveCore automatically sorts them by date as well.
         guard let query = query, !query.isEmpty else { return [] }
-        return Bookmarkv2.bookmarksAPI.search(withQuery: query, maxCount: Int32.max)
+        return Bookmarkv2.bookmarksAPI.search(withQuery: query, maxCount: UInt(Int32.max))
             .compactMap({ return !$0.isFolder ? Bookmarkv2($0) : nil })
     }
     
