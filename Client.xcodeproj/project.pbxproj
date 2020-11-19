@@ -704,6 +704,7 @@
 		44331DD8225521B6007E3E93 /* UrlBarTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44331DD7225521B6007E3E93 /* UrlBarTextField.swift */; };
 		44331DDA22552313007E3E93 /* LocationContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44331DD922552313007E3E93 /* LocationContainerView.swift */; };
 		44331DDC22561F34007E3E93 /* ToolbarUrlActionsDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44331DDB22561F34007E3E93 /* ToolbarUrlActionsDelegate.swift */; };
+		44E0210D2552D44D00346D09 /* BraveRewards.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27FA2D4F234CC9FB004D5D2D /* BraveRewards.framework */; };
 		44FA2F3021F8DB1000EFA86A /* DataPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44FA2F2F21F8DB1000EFA86A /* DataPreferences.swift */; };
 		592F521E2217327C0078395E /* HttpCookieExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 592F521D2217327B0078395E /* HttpCookieExtension.swift */; };
 		59350AFB22612D95004D7445 /* DisplayTextFieldTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59350AFA22612D95004D7445 /* DisplayTextFieldTest.swift */; };
