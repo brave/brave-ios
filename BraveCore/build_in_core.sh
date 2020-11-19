@@ -26,7 +26,6 @@ function usage() {
   echo " --skip-update:     Skips cloning and rebasing"
   echo " --build-simulator: Build only for simulator"
   echo " --build-device:    Build only for device"
-  echo " --cache-branch:    Caches the current build folder/branch"
   exit 1
 }
 
@@ -53,9 +52,6 @@ case $i in
     --build-device)
     build_device=1
     shift
-    ;;
-    --cache-branch)
-    cache_branch=1
 esac
 done
 
@@ -69,15 +65,6 @@ pushd $brave_browser_dir > /dev/null
 
 brave_browser_build_hash=`git rev-parse HEAD`
 brave_browser_branch=`git symbolic-ref --short HEAD`
-
-# Handle Caching
-if [ "$cache_branch" = 1 ]; then
-  sim_dir_flags="-C ${sim_dir}__${brave_browser_branch}"
-  device_dir_flags="-C ${device_dir}__${brave_browser_branch}"
-else
-  sim_dir_flags="-C ${sim_dir}"
-  device_dir_flags="-C ${device_dir}"
-fi
 
 # Do the rest of the work in the src folder
 cd src
