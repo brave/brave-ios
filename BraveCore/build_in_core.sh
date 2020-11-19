@@ -9,12 +9,15 @@ node_modules_path="$current_dir/../node_modules/brave-core-ios"
 clean=0
 build_simulator=0
 build_device=0
+cache_branch=0
 release_flag="Release"
 brave_browser_dir="${@: -1}"
 
 base_path=""
 sim_dir="out/ios_Release"
 device_dir="out/ios_Release_arm64"
+sim_dir_flags=""
+device_dir_flags=""
 
 function usage() {
   echo "Usage: ./build_in_core.sh [--clean] [--debug] {\$home/brave/brave-browser}"
@@ -23,6 +26,7 @@ function usage() {
   echo " --skip-update:     Skips cloning and rebasing"
   echo " --build-simulator: Build only for simulator"
   echo " --build-device:    Build only for device"
+  echo " --cache-branch:    Caches the current build folder/branch"
   exit 1
 }
 
@@ -50,6 +54,8 @@ case $i in
     build_device=1
     shift
     ;;
+    --cache-branch)
+    cache_branch=1
 esac
 done
 
@@ -63,6 +69,15 @@ pushd $brave_browser_dir > /dev/null
 
 brave_browser_build_hash=`git rev-parse HEAD`
 brave_browser_branch=`git symbolic-ref --short HEAD`
+
+# Handle Caching
+if [ "$cache_branch" = 1 ]; then
+  sim_dir_flags="-C ${sim_dir}__${brave_browser_branch}"
+  device_dir_flags="-C ${device_dir}__${brave_browser_branch}"
+else
+  sim_dir_flags="-C ${sim_dir}"
+  device_dir_flags="-C ${device_dir}"
+fi
 
 # Do the rest of the work in the src folder
 cd src
@@ -87,12 +102,12 @@ else
 fi
 
 if { [ "$build_simulator" = 1 ] && [ "$build_device" = 1 ]; } || { [ "$build_simulator" = 0 ] && [ "$build_device" = 0 ]; } ; then
-  npm run build -- $release_flag --target_os=ios
-  npm run build -- $release_flag --target_os=ios --target_arch=arm64
+  npm run build -- $release_flag ${sim_dir_flags} --target_os=ios
+  npm run build -- $release_flag ${device_dir_flags} --target_os=ios --target_arch=arm64
 elif [ "$build_simulator" = 1 ]; then
-  npm run build -- $release_flag --target_os=ios
+  npm run build -- $release_flag ${sim_dir_flags} --target_os=ios
 elif [ "$build_device" = 1 ]; then
-  npm run build -- $release_flag --target_os=ios --target_arch=arm64
+  npm run build -- $release_flag ${device_dir_flags} --target_os=ios --target_arch=arm64
 fi
 
 # Copy the framework structure (from iphoneos build) to the universal folder
