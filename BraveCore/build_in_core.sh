@@ -9,15 +9,12 @@ node_modules_path="$current_dir/../node_modules/brave-core-ios"
 clean=0
 build_simulator=0
 build_device=0
-cache_branch=0
 release_flag="Release"
 brave_browser_dir="${@: -1}"
 
 base_path=""
 sim_dir="out/ios_Release"
 device_dir="out/ios_Release_arm64"
-sim_dir_flags=""
-device_dir_flags=""
 
 function usage() {
   echo "Usage: ./build_in_core.sh [--clean] [--debug] {\$home/brave/brave-browser}"
@@ -52,6 +49,7 @@ case $i in
     --build-device)
     build_device=1
     shift
+    ;;
 esac
 done
 
@@ -89,12 +87,12 @@ else
 fi
 
 if { [ "$build_simulator" = 1 ] && [ "$build_device" = 1 ]; } || { [ "$build_simulator" = 0 ] && [ "$build_device" = 0 ]; } ; then
-  npm run build -- $release_flag ${sim_dir_flags} --target_os=ios
-  npm run build -- $release_flag ${device_dir_flags} --target_os=ios --target_arch=arm64
+  npm run build -- $release_flag --target_os=ios
+  npm run build -- $release_flag --target_os=ios --target_arch=arm64
 elif [ "$build_simulator" = 1 ]; then
-  npm run build -- $release_flag ${sim_dir_flags} --target_os=ios
+  npm run build -- $release_flag --target_os=ios
 elif [ "$build_device" = 1 ]; then
-  npm run build -- $release_flag ${device_dir_flags} --target_os=ios --target_arch=arm64
+  npm run build -- $release_flag --target_os=ios --target_arch=arm64
 fi
 
 # Copy the framework structure (from iphoneos build) to the universal folder
