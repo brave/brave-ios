@@ -666,16 +666,23 @@ class BrowserViewController: UIViewController {
         vpnProductInfo.load()
         BraveVPN.initialize()
         
-        self.migrateToChromiumBookmarks { success in
-            if !success {
-                DispatchQueue.main.async {
-                    let alert = UIAlertController(title: Strings.Sync.v2MigrationErrorTitle,
-                                                  message: Strings.Sync.v2MigrationErrorMessage,
-                                                  preferredStyle: .alert)
-                    alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
-                    self.present(alert, animated: true)
+        //We stop ever attempting migration after 3 times.
+        if Preferences.Chromium.syncV2BookmarksMigrationCount.value < 3 {
+            self.migrateToChromiumBookmarks { success in
+                if !success {
+                    DispatchQueue.main.async {
+                        let alert = UIAlertController(title: Strings.Sync.v2MigrationErrorTitle,
+                                                      message: Strings.Sync.v2MigrationErrorMessage,
+                                                      preferredStyle: .alert)
+                        alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
+                        self.present(alert, animated: true)
+                    }
                 }
             }
+        } else {
+            //After 3 tries, we mark Migration as successful.
+            //There is nothing more we can do for the user other than to let them export/import bookmarks.
+            Preferences.Chromium.syncV2BookmarksMigrationCompleted.value = true
         }
     }
     
@@ -1758,6 +1765,53 @@ class BrowserViewController: UIViewController {
         }
         duckDuckGoPopup = popup
         popup.showWithType(showType: .flyUp)
+    }
+    
+    private func showBookmarkController() {
+        let bookmarkViewController = BookmarksViewController(
+            folder: Bookmarkv2.lastVisitedFolder(),
+            isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing)
+        
+        bookmarkViewController.toolbarUrlActionsDelegate = self
+        
+        presentSettingsNavigation(with: bookmarkViewController)
+    }
+    
+    func openAddBookmark() {
+        guard let selectedTab = tabManager.selectedTab,
+              let selectedUrl = selectedTab.url,
+              !(selectedUrl.isLocal || selectedUrl.isReaderModeURL) else {
+            return
+        }
+        
+        let bookmarkUrl = selectedUrl.decodeReaderModeURL ?? selectedUrl
+        
+        let mode = BookmarkEditMode.addBookmark(title: selectedTab.displayTitle, url: bookmarkUrl.absoluteString)
+        
+        let addBookMarkController = AddEditBookmarkTableViewController(mode: mode)
+        
+        presentSettingsNavigation(with: addBookMarkController, cancelEnabled: true)
+    }
+    
+    private func presentSettingsNavigation(with controller: UIViewController, cancelEnabled: Bool = false) {
+        let navigationController = SettingsNavigationController(rootViewController: controller)
+        navigationController.modalPresentationStyle = .formSheet
+        
+        let cancelBarbutton = UIBarButtonItem(
+            barButtonSystemItem: .cancel,
+            target: navigationController,
+            action: #selector(SettingsNavigationController.done))
+        
+        let doneBarbutton = UIBarButtonItem(
+            barButtonSystemItem: .done,
+            target: navigationController,
+            action: #selector(SettingsNavigationController.done))
+        
+        navigationController.navigationBar.topItem?.leftBarButtonItem = cancelEnabled ? cancelBarbutton : nil
+        
+        navigationController.navigationBar.topItem?.rightBarButtonItem = doneBarbutton
+        
+        present(navigationController, animated: true)
     }
 }
 
