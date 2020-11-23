@@ -665,11 +665,9 @@ extension TabTrayController: TabManagerDelegate {
         tabDataSource.addTab(tab)
         
         insertTabToCollection(tab, index: index) {
-            if let controller = self.navigationController?.visibleViewController, controller is TabTrayController {
-                // don't pop the tab tray view controller if it is not in the foreground
-                if self.presentedViewController == nil {
-                    _ = self.navigationController?.popViewController(animated: true)
-                }
+            // don't pop the tab tray view controller if it is not in the foreground
+            if self.presentedViewController == nil {
+                _ = self.navigationController?.popViewController(animated: true)
             }
         }
     }
@@ -710,15 +708,17 @@ extension TabTrayController: TabManagerDelegate {
     }
     
     private func insertTabToCollection(_ tab: Tab, index: Int, completion: @escaping () -> Void ) {
-        collectionView?.performBatchUpdates({
-            self.collectionView.insertItems(at: [IndexPath(item: index, section: 0)])
-        }, completion: { finished in
-            if finished {
-                self.tabManager.selectTab(tab)
-                
-                completion()
-            }
-        })
+        if let controller = self.navigationController?.visibleViewController, controller is TabTrayController {
+            collectionView?.performBatchUpdates({
+                self.collectionView.insertItems(at: [IndexPath(item: index, section: 0)])
+            }, completion: { finished in
+                if finished {
+                    self.tabManager.selectTab(tab)
+                    
+                    completion()
+                }
+            })
+        }
     }
 }
 
