@@ -677,7 +677,8 @@ extension TabTrayController: TabManagerDelegate {
         // through the Close All Tabs feature (which will close tabs that are not in our current privacy mode)
         // check this before removing the item from the collection
         let removedIndex = tabDataSource.removeTab(tab)
-        if removedIndex > -1, let collectionView = self.collectionView {
+        
+        if removedIndex > -1, let collectionView = collectionView, collectionView.numberOfItems(inSection: 0) > 0 {
             collectionView.performBatchUpdates({
                 collectionView.deleteItems(at: [IndexPath(item: removedIndex, section: 0)])
             }, completion: { finished in
