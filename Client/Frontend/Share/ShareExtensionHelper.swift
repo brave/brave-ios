@@ -13,6 +13,7 @@ class ShareExtensionHelper: NSObject {
     enum ShareActivityType {
         case password
         case iBooks
+        case openByCopy
         case `default`
     }
     
@@ -21,6 +22,8 @@ class ShareExtensionHelper: NSObject {
     fileprivate let selectedURL: URL
     fileprivate var onePasswordExtensionItem: NSExtensionItem!
     fileprivate let browserFillIdentifier = "org.appextension.fill-browser-action"
+
+    fileprivate func isFile(url: URL) -> Bool { url.scheme == "file" }
 
     init(url: URL, tab: Tab?) {
         self.selectedURL = tab?.canonicalURL?.displayURL ?? url
@@ -134,19 +137,37 @@ extension ShareExtensionHelper: UIActivityItemSource {
     }
   
     func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
-        if let type = activityType, shareActivityType(type.rawValue) == .password {
-            return onePasswordExtensionItem
+        let selectedURLItem = selectedURL.isReaderModeURL ? selectedURL.decodeReaderModeURL : selectedURL
+        
+        guard let uiActivityType = activityType else { return selectedURLItem }
+                
+        switch shareActivityType(uiActivityType.rawValue) {
+            case .password:
+                return onePasswordExtensionItem
+            case .openByCopy:
+                return selectedURL
+            default:
+                // Return the URL for the selected tab. If we are in reader view then decode
+                // it so that we copy the original and not the internal localhost one.
+                return selectedURLItem
         }
-        // Return the URL for the selected tab. If we are in reader view then decode
-        // it so that we copy the original and not the internal localhost one.
-        return selectedURL.isReaderModeURL ? selectedURL.decodeReaderModeURL : selectedURL
     }
 
     func activityViewController(_ activityViewController: UIActivityViewController, dataTypeIdentifierForActivityType activityType: UIActivity.ActivityType?) -> String {
-        if let type = activityType, shareActivityType(type.rawValue) == .password {
-            return browserFillIdentifier
+        let dataType = activityType == nil ? browserFillIdentifier : kUTTypeURL as String
+        
+        guard let uiActivityType = activityType else { return dataType }
+
+        switch shareActivityType(uiActivityType.rawValue) {
+            case .password:
+                return browserFillIdentifier
+            case .openByCopy:
+                return isFile(url: selectedURL) ? kUTTypeFileURL as String : kUTTypeURL as String
+            default:
+                // Return the URL for the selected tab. If we are in reader view then decode
+                // it so that we copy the original and not the internal localhost one.
+                return dataType
         }
-        return activityType == nil ? browserFillIdentifier : kUTTypeURL as String
     }
 }
 
@@ -166,15 +187,19 @@ private extension ShareExtensionHelper {
         let isOpenInIBooksActivityType = (activityType?.range(of: "OpenInIBooks") != nil)
             || (activityType == "com.apple.UIKit.activity.OpenInIBooks")
         
-        var shareType: ShareActivityType = .default
+        let isOpenByCopy = activityType?.lowercased().range(of: "remoteopeninapplication-bycopy") != nil
+        
+        var shareActivityType: ShareActivityType = .default
         
         if isPasswordManagerType {
-            shareType = .password
+            shareActivityType = .password
         } else if isOpenInIBooksActivityType {
-            shareType = .iBooks
+            shareActivityType = .iBooks
+        } else if isOpenByCopy {
+            shareActivityType = .openByCopy
         }
         
-        return shareType
+        return shareActivityType
     }
     
     func findLoginExtensionItem() {
