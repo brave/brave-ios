@@ -14,17 +14,6 @@ class ShareExtensionHelper: NSObject {
         case password
         case iBooks
         case `default`
-        
-        var description: String? {
-            switch self {
-            case .password:
-                return "All Password Activity Types pwsafe / 1Password"
-            case .iBooks:
-                return "PDF Sharing Activity Type"
-            case .default:
-                return "Other Types"
-            }
-        }
     }
     
     fileprivate weak var selectedTab: Tab?
