@@ -55,7 +55,7 @@ class SettingsViewController: UIViewController {
       if !BraveAds.isCurrentLocaleSupported() {
          $0.adsSection.status = .unsupportedRegion
       }
-      $0.adsSection.toggleSwitch.isOn = state.ads.isEnabled
+//      $0.adsSection.toggleSwitch.isOn = state.ads.isEnabled
       $0.rewardsToggleSection.toggleSwitch.isOn = state.ledger.isEnabled
       $0.autoContributeSection.toggleSwitch.isOn = state.ledger.isAutoContributeEnabled
     }
@@ -91,7 +91,7 @@ class SettingsViewController: UIViewController {
     settingsView.do {
       $0.rewardsToggleSection.setRewardsEnabled(ledger.isEnabled, animated: animated)
       $0.adsSection.setSectionEnabled(
-        ledger.isEnabled && state.ads.isEnabled,
+        ledger.isEnabled && false,
         hidesToggle: !ledger.isEnabled,
         animated: animated
       )
@@ -142,7 +142,7 @@ class SettingsViewController: UIViewController {
   }
   
   @objc private func adsToggleValueChanged() {
-    state.ads.isEnabled = settingsView.adsSection.toggleSwitch.isOn
+//    state.ads.isEnabled = settingsView.adsSection.toggleSwitch.isOn
     updateVisualStateOfSections(animated: true)
     NotificationCenter.default.post(name: .adsOrRewardsToggledInSettings, object: nil)
   }
