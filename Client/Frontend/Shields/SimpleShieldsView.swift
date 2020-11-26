@@ -40,9 +40,9 @@ class SimpleShieldsView: UIView, Themeable {
     
     class BlockCountView: UIView, Themeable {
         let stackView = UIStackView().then {
-            $0.spacing = 12
+            $0.spacing = 24
             $0.alignment = .center
-            $0.layoutMargins = UIEdgeInsets(top: 0, left: 40, bottom: 0, right: 40)
+            $0.layoutMargins = UIEdgeInsets(top: 13, left: 22, bottom: 14, right: 22)
             $0.isLayoutMarginsRelativeArrangement = true
         }
         
@@ -59,28 +59,28 @@ class SimpleShieldsView: UIView, Themeable {
                     string: Strings.Shields.blockedCountLabel,
                     attributes: [.font: UIFont.systemFont(ofSize: 13.0)]
                 )
-                let attachment = ViewTextAttachment(view: self.infoButton)
-                string.append(NSAttributedString(attachment: attachment))
+                //let attachment = ViewTextAttachment(view: self.infoButton)
+                //string.append(NSAttributedString(attachment: attachment))
                 return string
             }()
             $0.backgroundColor = .clear
             $0.setContentCompressionResistancePriority(UILayoutPriority(999), for: .horizontal)
         }
         
-        let infoButton = Button().then {
-            $0.setImage(UIImage(imageLiteralResourceName: "shields-help"), for: .normal)
-            $0.hitTestSlop = UIEdgeInsets(top: -10, left: -10, bottom: -10, right: -10)
-            $0.imageEdgeInsets = .zero
-            $0.titleEdgeInsets = .zero
-            $0.contentEdgeInsets = UIEdgeInsets(top: -2, left: 4, bottom: -3, right: 4)
-        }
+//        let infoButton = Button().then {
+//            $0.setImage(UIImage(imageLiteralResourceName: "shields-help"), for: .normal)
+//            $0.hitTestSlop = UIEdgeInsets(top: -10, left: -10, bottom: -10, right: -10)
+//            $0.imageEdgeInsets = .zero
+//            $0.titleEdgeInsets = .zero
+//            $0.contentEdgeInsets = UIEdgeInsets(top: -2, left: 4, bottom: -3, right: 4)
+//        }
         
         override init(frame: CGRect) {
             super.init(frame: frame)
             
-            isAccessibilityElement = true
-            accessibilityTraits.insert(.button)
-            accessibilityHint = Strings.Shields.blockedInfoButtonAccessibilityLabel
+//            isAccessibilityElement = true
+//            accessibilityTraits.insert(.button)
+//            accessibilityHint = Strings.Shields.blockedInfoButtonAccessibilityLabel
             
             addSubview(stackView)
             stackView.addArrangedSubview(countLabel)
@@ -99,10 +99,10 @@ class SimpleShieldsView: UIView, Themeable {
             set { assertionFailure() } // swiftlint:disable:this unused_setter_value
         }
         
-        override func accessibilityActivate() -> Bool {
-            infoButton.sendActions(for: .touchUpInside)
-            return true
-        }
+//        override func accessibilityActivate() -> Bool {
+//            infoButton.sendActions(for: .touchUpInside)
+//            return true
+//        }
         
         @available(*, unavailable)
         required init(coder: NSCoder) {
@@ -110,15 +110,18 @@ class SimpleShieldsView: UIView, Themeable {
         }
         
         func applyTheme(_ theme: Theme) {
+            backgroundColor = theme.isDark ? UIColor(rgb: 0x303443) : Colors.neutral000
             countLabel.textColor = theme.isDark ? .white : .black
             descriptionLabel.textColor = theme.isDark ? UIColor.white : .black
-            infoButton.tintColor = theme.isDark ?
-                Colors.orange400 :
-                Colors.orange500
+//            infoButton.tintColor = theme.isDark ?
+//                Colors.orange400 :
+//                Colors.orange500
         }
     }
     
-    let blockCountView = BlockCountView()
+    let blockCountView = BlockCountView().then {
+        $0.layer.cornerRadius = 6.0
+    }
     
     let footerLabel = UILabel().then {
         $0.text = Strings.Shields.siteBroken
