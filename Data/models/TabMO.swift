@@ -88,7 +88,7 @@ public final class TabMO: NSManagedObject, CRUD {
     
     // Updates existing tab with new data.
     // Usually called when user navigates to a new website for in his existing tab.
-    public class func update(tabData: SavedTab) {
+    public class func update(tabData: SavedTab, removeHistory: Bool = false) {
         DataController.perform { context in
             guard let tabToUpdate = getInternal(fromId: tabData.id, context: context) else { return }
             
@@ -98,7 +98,7 @@ public final class TabMO: NSManagedObject, CRUD {
             tabToUpdate.url = tabData.url
             tabToUpdate.order = tabData.order
             tabToUpdate.title = tabData.title
-            tabToUpdate.urlHistorySnapshot = tabData.history as NSArray
+            tabToUpdate.urlHistorySnapshot = removeHistory ? [] : tabData.history as NSArray
             tabToUpdate.urlHistoryCurrentIndex = tabData.historyIndex
             tabToUpdate.isSelected = tabData.isSelected
         }

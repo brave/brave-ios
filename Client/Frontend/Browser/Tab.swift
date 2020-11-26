@@ -256,6 +256,53 @@ class Tab: NSObject {
         contentScriptManager.helpers.removeAll()
     }
     
+    func clearHistory(config: WKWebViewConfiguration) {
+//        guard let webView = webView, let firstWebsite = webView.backForwardList.backList.first else {
+//            return
+//        }
+//
+//        // First we make sure the webview is on the earliest item in the history
+//        if webView.canGoBack {
+//            webView.go(to: firstWebsite)
+//        }
+//
+//        // Then we navigate to our urlB so that we destroy the old "forward" stack
+//        //webView.load(URLRequest(url: firstWebsite.url))
+        
+        //resetWebView(config: config)
+        
+//        let webView = TabWebView(frame: .zero, configuration: config, isPrivate: isPrivate)
+//        webView.delegate = self
+//        configuration = nil
+//
+//        webView.accessibilityLabel = Strings.webContentAccessibilityLabel
+//        webView.allowsBackForwardNavigationGestures = true
+//        if #available(iOS 13, *) {
+//            webView.allowsLinkPreview = true
+//        } else {
+//            webView.allowsLinkPreview = false
+//        }
+//
+//        // Turning off masking allows the web content to flow outside of the scrollView's frame
+//        // which allows the content appear beneath the toolbars in the BrowserViewController
+//        webView.scrollView.layer.masksToBounds = false
+//        webView.navigationDelegate = navigationDelegate
+//
+//        self.webView = webView
+//        self.webView?.addObserver(self, forKeyPath: KVOConstants.URL.rawValue, options: .new, context: nil)
+        
+//        if let url = self.url {
+//            let request = PrivilegedRequest(url: url) as URLRequest
+//            self.webView?.load(request)
+//        }
+        
+        if let savedTabData = sessionData?.savedTabData {
+            TabMO.update(tabData: savedTabData, removeHistory: true)
+        }
+        
+        webView?.backForwardList.perform(Selector(("_removeAllItems")))
+    }
+    
     func restore(_ webView: WKWebView, restorationData: SavedTab?) {
         // Pulls restored session data from a previous SavedTab to load into the Tab. If it's nil, a session restore
         // has already been triggered via custom URL, so we use the last request to trigger it again; otherwise,
