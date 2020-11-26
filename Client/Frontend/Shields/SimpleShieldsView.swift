@@ -39,16 +39,34 @@ class SimpleShieldsView: UIView, Themeable {
     // Shields Up
     
     class BlockCountView: UIView, Themeable {
-        let stackView = UIStackView().then {
+        let contentStackView = UIStackView().then {
+            $0.spacing = 2
+            $0.alignment = .center
+        }
+        
+        let descriptionStackView = UIStackView().then {
             $0.spacing = 24
             $0.alignment = .center
             $0.layoutMargins = UIEdgeInsets(top: 13, left: 22, bottom: 14, right: 22)
             $0.isLayoutMarginsRelativeArrangement = true
         }
         
+        let infoStackView = UIStackView().then {
+            $0.alignment = .center
+            $0.layoutMargins = UIEdgeInsets(top: 22, left: 14, bottom: 22, right: 14)
+            $0.isLayoutMarginsRelativeArrangement = true
+        }
+        
         let countLabel = UILabel().then {
             $0.font = .systemFont(ofSize: 36)
             $0.text = "0"
+            $0.setContentHuggingPriority(.required, for: .horizontal)
+            $0.setContentCompressionResistancePriority(.required, for: .horizontal)
+        }
+        
+        let countLabel1 = UILabel().then {
+            $0.font = .systemFont(ofSize: 36)
+            $0.text = "1"
             $0.setContentHuggingPriority(.required, for: .horizontal)
             $0.setContentCompressionResistancePriority(.required, for: .horizontal)
         }
@@ -67,13 +85,16 @@ class SimpleShieldsView: UIView, Themeable {
             $0.setContentCompressionResistancePriority(UILayoutPriority(999), for: .horizontal)
         }
         
-//        let infoButton = Button().then {
-//            $0.setImage(UIImage(imageLiteralResourceName: "shields-help"), for: .normal)
-//            $0.hitTestSlop = UIEdgeInsets(top: -10, left: -10, bottom: -10, right: -10)
-//            $0.imageEdgeInsets = .zero
-//            $0.titleEdgeInsets = .zero
-//            $0.contentEdgeInsets = UIEdgeInsets(top: -2, left: 4, bottom: -3, right: 4)
-//        }
+        let infoButton = Button().then {
+            $0.setImage(#imageLiteral(resourceName: "shields-help"), for: .normal)
+            $0.hitTestSlop = UIEdgeInsets(top: -10, left: -10, bottom: -10, right: -10)
+            $0.imageEdgeInsets = .zero
+            $0.titleEdgeInsets = .zero
+            $0.contentEdgeInsets = UIEdgeInsets(top: -2, left: 4, bottom: -3, right: 4)
+            $0.contentMode = .scaleAspectFit
+            $0.setContentHuggingPriority(.required, for: .horizontal)
+            $0.setContentCompressionResistancePriority(.required, for: .horizontal)
+        }
         
         override init(frame: CGRect) {
             super.init(frame: frame)
@@ -82,10 +103,23 @@ class SimpleShieldsView: UIView, Themeable {
 //            accessibilityTraits.insert(.button)
 //            accessibilityHint = Strings.Shields.blockedInfoButtonAccessibilityLabel
             
-            addSubview(stackView)
-            stackView.addArrangedSubview(countLabel)
-            stackView.addArrangedSubview(descriptionLabel)
-            stackView.snp.makeConstraints {
+//            addSubview(descriptionStackView)
+//            descriptionStackView.addArrangedSubview(countLabel)
+//            descriptionStackView.addArrangedSubview(descriptionLabel)
+//            descriptionStackView.snp.makeConstraints {
+//                $0.edges.equalToSuperview()
+//            }
+            
+            addSubview(contentStackView)
+            contentStackView.addArrangedSubview(descriptionStackView)
+            contentStackView.addArrangedSubview(infoStackView)
+            
+            descriptionStackView.addArrangedSubview(countLabel)
+            descriptionStackView.addArrangedSubview(descriptionLabel)
+            
+            infoStackView.addArrangedSubview(infoButton)
+            
+            contentStackView.snp.makeConstraints {
                 $0.edges.equalToSuperview()
             }
         }
