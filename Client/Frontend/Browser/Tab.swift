@@ -257,50 +257,20 @@ class Tab: NSObject {
     }
     
     func clearHistory(config: WKWebViewConfiguration) {
-//        guard let webView = webView, let firstWebsite = webView.backForwardList.backList.first else {
-//            return
-//        }
-//
-//        // First we make sure the webview is on the earliest item in the history
-//        if webView.canGoBack {
-//            webView.go(to: firstWebsite)
-//        }
-//
-//        // Then we navigate to our urlB so that we destroy the old "forward" stack
-//        //webView.load(URLRequest(url: firstWebsite.url))
-        
-        //resetWebView(config: config)
-        
-//        let webView = TabWebView(frame: .zero, configuration: config, isPrivate: isPrivate)
-//        webView.delegate = self
-//        configuration = nil
-//
-//        webView.accessibilityLabel = Strings.webContentAccessibilityLabel
-//        webView.allowsBackForwardNavigationGestures = true
-//        if #available(iOS 13, *) {
-//            webView.allowsLinkPreview = true
-//        } else {
-//            webView.allowsLinkPreview = false
-//        }
-//
-//        // Turning off masking allows the web content to flow outside of the scrollView's frame
-//        // which allows the content appear beneath the toolbars in the BrowserViewController
-//        webView.scrollView.layer.masksToBounds = false
-//        webView.navigationDelegate = navigationDelegate
-//
-//        self.webView = webView
-//        self.webView?.addObserver(self, forKeyPath: KVOConstants.URL.rawValue, options: .new, context: nil)
-        
-//        if let url = self.url {
-//            let request = PrivilegedRequest(url: url) as URLRequest
-//            self.webView?.load(request)
-//        }
-        
-        if let savedTabData = sessionData?.savedTabData {
-            TabMO.update(tabData: savedTabData, removeHistory: true)
+        guard let webView = webView, let firstWebsite = webView.backForwardList.backList.first else { return }
+
+        // First we make sure the webview is on the earliest item in the history
+        if webView.canGoBack {
+            webView.go(to: firstWebsite)
         }
         
-        webView?.backForwardList.perform(Selector(("_removeAllItems")))
+        guard let tabID = id else { return }
+        
+        // Remove the tab history from saved tabs
+        TabMO.removeHistory(with: tabID)
+        
+        // Clear backforward list
+        webView.backForwardList.perform(Selector(("_removeAllItems")))
     }
     
     func restore(_ webView: WKWebView, restorationData: SavedTab?) {
@@ -312,6 +282,7 @@ class Tab: NSObject {
             lastTitle = sessionData.title
             var updatedURLs = [String]()
             var previous = ""
+            
             for urlString in sessionData.history {
                 guard let url = URL(string: urlString) else { continue }
                 let updatedURL = WebServer.sharedInstance.updateLocalURL(url)!.absoluteString
@@ -322,19 +293,24 @@ class Tab: NSObject {
                 previous = current
                 updatedURLs.append(updatedURL)
             }
+            
             let currentPage = sessionData.historyIndex
             self.sessionData = nil
+            
             var jsonDict = [String: AnyObject]()
             jsonDict[SessionData.Keys.history] = updatedURLs as AnyObject
             jsonDict[SessionData.Keys.currentPage] = Int(currentPage) as AnyObject
             
-            guard let escapedJSON = JSON(jsonDict).rawString()?.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed) else {
+            guard let escapedJSON = JSON(jsonDict).rawString()?.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed),
+                  let restoreURL = URL(string: "\(WebServer.sharedInstance.base)/about/sessionrestore?history=\(escapedJSON)") else {
                 return
             }
             
-            let restoreURL = URL(string: "\(WebServer.sharedInstance.base)/about/sessionrestore?history=\(escapedJSON)")
-            lastRequest = PrivilegedRequest(url: restoreURL!) as URLRequest
-            webView.load(lastRequest!)
+            lastRequest = PrivilegedRequest(url: restoreURL) as URLRequest
+            
+            if let request = lastRequest {
+                webView.load(request)
+            }
         } else if let request = lastRequest {
             webView.load(request)
         } else {

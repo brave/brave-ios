@@ -185,7 +185,6 @@ class TabManager: NSObject {
     func clearTabHistory() {
         allTabs.filter({$0.webView != nil}).forEach({
             $0.clearHistory(config: configuration)
-            
         })
     }
     
