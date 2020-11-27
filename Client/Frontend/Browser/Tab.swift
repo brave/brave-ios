@@ -265,13 +265,13 @@ class Tab: NSObject {
         // Remove the tab history from saved tabs
         TabMO.removeHistory(with: tabID)
 
-        let allBase64Decoded = Data(base64Encoded: "QWxs", options: Data.Base64DecodingOptions(rawValue: 0))
-            .map({ String(data: $0, encoding: .utf8) }) ?? "" // "All" text in base64Decoded
-              
-        // Clear backforward list
-        let argument: [Any] = ["_", "r", "\u{65}", "mov", "\u{65}", // _remove
-                             "\(allBase64Decoded ?? "")", // All
-                             "It", "\u{65}", "ms"] // Items
+        /*
+         * Remove all items selector on WKWebView backForwardList because backForwardList list is only exposed with getter
+         * This approach is chosen because in the event of removing history, tab history should be removed and
+         * The best way perform is to clear the backforward list because in our case there is no drawback and
+         * Alternative would be to reload webpages
+         */
+        let argument: [Any] = ["_r", "emoveA", "llIt", "ems"]
 
         let method = argument.compactMap { $0 as? String }.joined()
         let selector: Selector = NSSelectorFromString(method)
