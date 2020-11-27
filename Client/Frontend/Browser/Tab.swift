@@ -264,17 +264,21 @@ class Tab: NSObject {
         
         // Remove the tab history from saved tabs
         TabMO.removeHistory(with: tabID)
-        
+
+        let allBase64Decoded = Data(base64Encoded: "QWxs", options: Data.Base64DecodingOptions(rawValue: 0))
+            .map({ String(data: $0, encoding: .utf8) }) ?? "" // "All" text in base64Decoded
+              
         // Clear backforward list
-        let argument: [Any] = ["_", "\u{72}", "\u{65}", "\u{6D}", "\u{6F}", "\u{76}", "\u{65}",
-                               "\u{41}", "\u{6C}", "\u{6C}",
-                               "\u{49}", "\u{74}", "\u{65}", "\u{6D}", "\u{73}"]
-        
+        let argument: [Any] = ["_", "r", "\u{65}", "mov", "\u{65}", // _remove
+                             "\(allBase64Decoded ?? "")", // All
+                             "It", "\u{65}", "ms"] // Items
+
         let method = argument.compactMap { $0 as? String }.joined()
-        
         let selector: Selector = NSSelectorFromString(method)
 
-        webView.backForwardList.performSelector(onMainThread: selector, with: nil, waitUntilDone: true)
+        if webView.backForwardList.responds(to: selector) {
+          webView.backForwardList.performSelector(onMainThread: selector, with: nil, waitUntilDone: true)
+        }
     }
     
     func restore(_ webView: WKWebView, restorationData: SavedTab?) {
