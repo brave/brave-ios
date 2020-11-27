@@ -211,12 +211,13 @@ class SearchViewController: SiteTableViewController, LoaderListener {
         layoutSearchEngineScrollView()
 
         searchEngineScrollViewContent.snp.makeConstraints { make in
-            make.center.equalTo(searchEngineScrollView).priority(10)
+            make.center.equalTo(searchEngineScrollView).priority(.low)
+            
             // Left-align the engines on iphones, center on ipad
             if UIScreen.main.traitCollection.horizontalSizeClass == .compact {
-                make.left.equalTo(searchEngineScrollView).priority(1000)
+                make.left.equalTo(searchEngineScrollView).priority(.required)
             } else {
-                make.left.greaterThanOrEqualTo(searchEngineScrollView).priority(1000)
+                make.left.greaterThanOrEqualTo(searchEngineScrollView).priority(.required)
             }
             make.bottom.right.top.equalTo(searchEngineScrollView)
         }
@@ -234,7 +235,7 @@ class SearchViewController: SiteTableViewController, LoaderListener {
     }
     
     private func layoutSuggestionsOptInPrompt() {
-        if tabType.isPrivate || !(searchEngines?.shouldShowSearchSuggestionsOptIn ?? false) {
+        if tabType.isPrivate || searchEngines?.shouldShowSearchSuggestionsOptIn == true {
             // Make sure any pending layouts are drawn so they don't get coupled
             // with the "slide up" animation below.
             view.layoutIfNeeded()
@@ -351,7 +352,7 @@ class SearchViewController: SiteTableViewController, LoaderListener {
     private func querySuggestClient() {
         suggestClient?.cancelPendingRequest()
 
-        if searchQuery.isEmpty || !(searchEngines?.shouldShowSearchSuggestions ?? false) || searchQuery.looksLikeAURL() {
+        if searchQuery.isEmpty || searchEngines?.shouldShowSearchSuggestionsOptIn == true || searchQuery.looksLikeAURL() {
             suggestionCell.suggestions = []
             return
         }
