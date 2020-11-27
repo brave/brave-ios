@@ -58,9 +58,18 @@ class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, Loa
 
     // Views for displaying the bottom scrollable search engine list. searchEngineScrollView is the
     // scrollable container; searchEngineScrollViewContent contains the actual set of search engine buttons.
-    private let searchEngineScrollView = ButtonScrollView()
-    private let searchEngineScrollViewContent = UIView()
-
+    private let searchEngineScrollView = ButtonScrollView().then {
+        $0.layer.shadowRadius = 0
+        $0.layer.shadowOpacity = 100
+        $0.layer.shadowOffset = CGSize(width: 0, height: -SearchViewControllerUX.searchEngineTopBorderWidth)
+        $0.layer.shadowColor = SearchViewControllerUX.searchEngineScrollViewBorderColor
+        $0.clipsToBounds = false
+        $0.decelerationRate = UIScrollView.DecelerationRate.fast
+    }
+    private let searchEngineScrollViewContent = UIView().then {
+        $0.layer.backgroundColor = UIColor.clear.cgColor
+    }
+    
     private lazy var bookmarkedBadge: UIImage = {
         return #imageLiteral(resourceName: "bookmarked_passive")
     }()
@@ -114,28 +123,19 @@ class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, Loa
     private func setupSearchEngineScrollViewIfNeeded() {
         if !hasQuickSearchEngines { return }
 
-        searchEngineScrollView.layer.shadowRadius = 0
-        searchEngineScrollView.layer.shadowOpacity = 100
-        searchEngineScrollView.layer.shadowOffset = CGSize(width: 0, height: -SearchViewControllerUX.searchEngineTopBorderWidth)
-        searchEngineScrollView.layer.shadowColor = SearchViewControllerUX.searchEngineScrollViewBorderColor
-        searchEngineScrollView.clipsToBounds = false
-
-        searchEngineScrollView.decelerationRate = UIScrollView.DecelerationRate.fast
         view.addSubview(searchEngineScrollView)
-
-        searchEngineScrollViewContent.layer.backgroundColor = UIColor.clear.cgColor
         searchEngineScrollView.addSubview(searchEngineScrollViewContent)
 
         layoutTable()
         layoutSearchEngineScrollView()
 
         searchEngineScrollViewContent.snp.makeConstraints { make in
-            make.center.equalTo(self.searchEngineScrollView).priority(10)
+            make.center.equalTo(self.searchEngineScrollView).priority(.low)
             // Left-align the engines on iphones, center on ipad
             if UIScreen.main.traitCollection.horizontalSizeClass == .compact {
-                make.left.equalTo(self.searchEngineScrollView).priority(1000)
+                make.left.equalTo(self.searchEngineScrollView).priority(.required)
             } else {
-                make.left.greaterThanOrEqualTo(self.searchEngineScrollView).priority(1000)
+                make.left.greaterThanOrEqualTo(self.searchEngineScrollView).priority(.required)
             }
             make.bottom.right.top.equalTo(self.searchEngineScrollView)
         }
@@ -378,6 +378,8 @@ class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, Loa
         }
 
         suggestClient?.query(searchQuery, callback: { suggestions, error in
+            self.tableView.reloadData()
+            
             if let error = error {
                 let isSuggestClientError = error.domain == SearchSuggestClientErrorDomain
 
@@ -640,7 +642,6 @@ private protocol SuggestionCellDelegate: class {
  */
 private class SuggestionCell: UITableViewCell {
     weak var delegate: SuggestionCellDelegate?
-    let container = UIView()
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -651,10 +652,8 @@ private class SuggestionCell: UITableViewCell {
         separatorInset = .zero
         selectionStyle = .none
 
-        container.backgroundColor = UIColor.clear
-        contentView.backgroundColor = UIColor.clear
+        contentView.backgroundColor = .clear
         backgroundColor = UIColor.clear
-        contentView.addSubview(container)
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -662,20 +661,26 @@ private class SuggestionCell: UITableViewCell {
     }
 
     var suggestions: [String] = [] {
-        didSet {
-            for view in container.subviews {
+        willSet {
+            for view in contentView.subviews {
                 view.removeFromSuperview()
             }
+        }
+        
+        didSet {
+            var buttonList: [SuggestionButton] = []
 
-            for suggestion in suggestions {
+            buttonList = suggestions.map { suggestion in
                 let button = SuggestionButton()
                 button.setTitle(suggestion, for: [])
+
                 button.addTarget(self, action: #selector(didSelectSuggestion), for: .touchUpInside)
                 button.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(didLongPressSuggestion)))
 
                 // If this is the first image, add the search icon.
-                if container.subviews.isEmpty {
+                if contentView.subviews.isEmpty {
                     button.setImage(#imageLiteral(resourceName: "search"), for: [])
+
                     if UIApplication.shared.userInterfaceLayoutDirection == .leftToRight {
                         button.titleEdgeInsets = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 0)
                     } else {
@@ -683,8 +688,10 @@ private class SuggestionCell: UITableViewCell {
                     }
                 }
 
-                container.addSubview(button)
+                return button
             }
+
+            buttonList.forEach { contentView.addSubview($0) }
 
             setNeedsLayout()
         }
@@ -692,14 +699,16 @@ private class SuggestionCell: UITableViewCell {
 
     @objc
     func didSelectSuggestion(_ sender: UIButton) {
-        delegate?.suggestionCell(self, didSelectSuggestion: sender.titleLabel!.text!)
+        if let titleText = sender.titleLabel?.text {
+            delegate?.suggestionCell(self, didSelectSuggestion: titleText)
+        }
     }
 
     @objc
     func didLongPressSuggestion(_ recognizer: UILongPressGestureRecognizer) {
         if recognizer.state == .began {
-            if let button = recognizer.view as? UIButton {
-                delegate?.suggestionCell(self, didLongPressSuggestion: button.titleLabel!.text!)
+            if let button = recognizer.view as? UIButton, let titleText = button.titleLabel?.text {
+                delegate?.suggestionCell(self, didLongPressSuggestion: titleText)
             }
         }
     }
@@ -723,7 +732,9 @@ private class SuggestionCell: UITableViewCell {
         var currentTop = SearchViewControllerUX.suggestionCellVerticalPadding
         var currentRow = 0
 
-        for view in container.subviews.compactMap({ $0 as? UIButton }) {
+        let suggestionButtonList = contentView.subviews.compactMap({ $0 as? SuggestionButton })
+
+        for view in suggestionButtonList {
             let button = view
             var buttonSize = button.intrinsicContentSize
 
@@ -758,16 +769,20 @@ private class SuggestionCell: UITableViewCell {
             }
 
             button.frame = CGRect(x: currentLeft, y: currentTop, width: buttonSize.width, height: buttonSize.height)
+            button.titleLabel?.alpha = 1.0
+            
             currentLeft += buttonSize.width + SearchViewControllerUX.suggestionMargin
         }
 
         frame.size.height = height + 2 * SearchViewControllerUX.suggestionCellVerticalPadding
         contentView.frame = bounds
-        container.frame = bounds
 
         let imageX = (textLeft - imageSize) / 2
         let imageY = (frame.size.height - imageSize) / 2
-        imageView!.frame = CGRect(x: imageX, y: imageY, width: imageSize, height: imageSize)
+        
+        if let cellImageView = imageView {
+            cellImageView.frame = CGRect(x: imageX, y: imageY, width: imageSize, height: imageSize)
+        }
     }
 }
 
