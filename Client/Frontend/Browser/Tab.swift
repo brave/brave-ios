@@ -266,10 +266,10 @@ class Tab: NSObject {
         TabMO.removeHistory(with: tabID)
 
         /*
-         * Remove all items selector on WKWebView backForwardList because backForwardList list is only exposed with getter
-         * This approach is chosen because in the event of removing history, tab history should be removed and
-         * The best way perform is to clear the backforward list because in our case there is no drawback and
-         * Alternative would be to reload webpages
+         * Remove all items selector is used on WKWebView backForwardList because backForwardList list is only exposed with a getter
+         * This approach is chosen to achieve removing tab history in the event of removing  browser history
+         * Best way perform this is to clear the backforward list and in our case there is no drawback to clear the list
+         * And alternative would be to reload webpages which will be costly and also can cause unexpected results
          */
         let argument: [Any] = ["_r", "emoveA", "llIt", "ems"]
 
