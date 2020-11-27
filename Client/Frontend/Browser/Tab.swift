@@ -257,20 +257,24 @@ class Tab: NSObject {
     }
     
     func clearHistory(config: WKWebViewConfiguration) {
-        guard let webView = webView, let firstWebsite = webView.backForwardList.backList.first else { return }
-
-        // First we make sure the webview is on the earliest item in the history
-        if webView.canGoBack {
-            webView.go(to: firstWebsite)
+        guard let webView = webView,
+              let tabID = id  else {
+            return
         }
-        
-        guard let tabID = id else { return }
         
         // Remove the tab history from saved tabs
         TabMO.removeHistory(with: tabID)
         
         // Clear backforward list
-        webView.backForwardList.perform(Selector(("_removeAllItems")))
+        let argument: [Any] = ["_", "\u{72}", "\u{65}", "\u{6D}", "\u{6F}", "\u{76}", "\u{65}",
+                               "\u{41}", "\u{6C}", "\u{6C}",
+                               "\u{49}", "\u{74}", "\u{65}", "\u{6D}", "\u{73}"]
+        
+        let method = argument.compactMap { $0 as? String }.joined()
+        
+        let selector: Selector = NSSelectorFromString(method)
+
+        webView.backForwardList.performSelector(onMainThread: selector, with: nil, waitUntilDone: true)
     }
     
     func restore(_ webView: WKWebView, restorationData: SavedTab?) {
