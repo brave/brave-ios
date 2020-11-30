@@ -27,4 +27,14 @@ extension UIStackView {
       }
     }
   }
+  // Adds Background StackView with Color and Corner Radius
+  public func addBackground(color: UIColor, cornerRadius: CGFloat? = nil) {
+    let subView = UIView(frame: bounds)
+    subView.backgroundColor = color
+    subView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+    if let radius = cornerRadius {
+      subView.layer.cornerRadius = radius
+    }
+    insertSubview(subView, at: 0)
+  }
 }
