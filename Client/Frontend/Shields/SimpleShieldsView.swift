@@ -39,9 +39,16 @@ class SimpleShieldsView: UIView, Themeable {
     // Shields Up
     
     class BlockCountView: UIView, Themeable {
+        
+        private struct UX {
+            static let iconEdgeInset = UIEdgeInsets(top: 22, left: 14, bottom: 22, right: 14)
+            static let hitBoxEdgeInsets = UIEdgeInsets(top: -10, left: -10, bottom: -10, right: -10)
+            static let buttonEdgeInsets = UIEdgeInsets(top: -2, left: 4, bottom: -3, right: 4)
+        }
+        
         let contentStackView = UIStackView().then {
             $0.spacing = 2
-            $0.alignment = .center
+            $0.alignment = .fill
         }
         
         let descriptionStackView = UIStackView().then {
@@ -53,19 +60,18 @@ class SimpleShieldsView: UIView, Themeable {
         
         let infoStackView = UIStackView().then {
             $0.alignment = .center
-            $0.layoutMargins = UIEdgeInsets(top: 22, left: 14, bottom: 22, right: 14)
+            $0.layoutMargins = UX.iconEdgeInset
             $0.isLayoutMarginsRelativeArrangement = true
         }
         
         let shareStackView = UIStackView().then {
             $0.alignment = .center
-            $0.layoutMargins = UIEdgeInsets(top: 22, left: 14, bottom: 22, right: 14)
+            $0.layoutMargins = UX.iconEdgeInset
             $0.isLayoutMarginsRelativeArrangement = true
         }
         
         let countLabel = UILabel().then {
             $0.font = .systemFont(ofSize: 36)
-            $0.text = "0"
             $0.setContentHuggingPriority(.required, for: .horizontal)
             $0.setContentCompressionResistancePriority(.required, for: .horizontal)
         }
@@ -76,17 +82,15 @@ class SimpleShieldsView: UIView, Themeable {
                     string: Strings.Shields.blockedCountLabel,
                     attributes: [.font: UIFont.systemFont(ofSize: 13.0)]
                 )
-                //let attachment = ViewTextAttachment(view: self.infoButton)
-                //string.append(NSAttributedString(attachment: attachment))
                 return string
             }()
             $0.backgroundColor = .clear
-            $0.setContentCompressionResistancePriority(UILayoutPriority(999), for: .horizontal)
+            $0.setContentCompressionResistancePriority(.required, for: .horizontal)
         }
         
         let infoButton = Button().then {
-            $0.setImage(#imageLiteral(resourceName: "shields-help"), for: .normal)
-            $0.hitTestSlop = UIEdgeInsets(top: -10, left: -10, bottom: -10, right: -10)
+            $0.setImage(#imageLiteral(resourceName: "shields-help").withRenderingMode(.alwaysTemplate), for: .normal)
+            $0.hitTestSlop = UX.hitBoxEdgeInsets
             $0.imageEdgeInsets = .zero
             $0.titleEdgeInsets = .zero
             $0.contentEdgeInsets = UIEdgeInsets(top: -2, left: 4, bottom: -3, right: 4)
@@ -96,8 +100,8 @@ class SimpleShieldsView: UIView, Themeable {
         }
         
         let shareButton = Button().then {
-            $0.setImage(#imageLiteral(resourceName: "shields-share"), for: .normal)
-            $0.hitTestSlop = UIEdgeInsets(top: -10, left: -10, bottom: -10, right: -10)
+            $0.setImage(#imageLiteral(resourceName: "shields-share").withRenderingMode(.alwaysTemplate), for: .normal)
+            $0.hitTestSlop = UX.hitBoxEdgeInsets
             $0.imageEdgeInsets = .zero
             $0.titleEdgeInsets = .zero
             $0.contentEdgeInsets = UIEdgeInsets(top: -2, left: 4, bottom: -3, right: 4)
@@ -109,27 +113,24 @@ class SimpleShieldsView: UIView, Themeable {
         override init(frame: CGRect) {
             super.init(frame: frame)
             
-//            isAccessibilityElement = true
-//            accessibilityTraits.insert(.button)
-//            accessibilityHint = Strings.Shields.blockedInfoButtonAccessibilityLabel
-            
-//            addSubview(descriptionStackView)
-//            descriptionStackView.addArrangedSubview(countLabel)
-//            descriptionStackView.addArrangedSubview(descriptionLabel)
-//            descriptionStackView.snp.makeConstraints {
-//                $0.edges.equalToSuperview()
-//            }
+            isAccessibilityElement = true
+            accessibilityTraits.insert(.button)
+            accessibilityHint = Strings.Shields.blockedInfoButtonAccessibilityLabel
             
             addSubview(contentStackView)
-            contentStackView.addArrangedSubview(descriptionStackView)
-            contentStackView.addArrangedSubview(infoStackView)
-            contentStackView.addArrangedSubview(shareStackView)
+
+            contentStackView.addStackViewItems(
+                .view(descriptionStackView),
+                .view(infoStackView),
+                .view(shareStackView)
+            )
             
-            descriptionStackView.addArrangedSubview(countLabel)
-            descriptionStackView.addArrangedSubview(descriptionLabel)
+            descriptionStackView.addStackViewItems(
+                .view(countLabel),
+                .view(descriptionLabel)
+            )
             
             infoStackView.addArrangedSubview(infoButton)
-            
             shareStackView.addArrangedSubview(shareButton)
             
             contentStackView.snp.makeConstraints {
@@ -146,10 +147,10 @@ class SimpleShieldsView: UIView, Themeable {
             set { assertionFailure() } // swiftlint:disable:this unused_setter_value
         }
         
-//        override func accessibilityActivate() -> Bool {
-//            infoButton.sendActions(for: .touchUpInside)
-//            return true
-//        }
+        override func accessibilityActivate() -> Bool {
+            infoButton.sendActions(for: .touchUpInside)
+            return true
+        }
         
         @available(*, unavailable)
         required init(coder: NSCoder) {
@@ -157,18 +158,20 @@ class SimpleShieldsView: UIView, Themeable {
         }
         
         func applyTheme(_ theme: Theme) {
-            backgroundColor = theme.isDark ? UIColor(rgb: 0x303443) : Colors.neutral000
+            let contentBackgroundColor = theme.isDark ? UIColor(rgb: 0x303443) : Colors.neutral000
+            descriptionStackView.addBackground(color: contentBackgroundColor, cornerRadius: 6.0)
+            infoStackView.addBackground(color: contentBackgroundColor, cornerRadius: 6.0)
+            shareStackView.addBackground(color: contentBackgroundColor, cornerRadius: 6.0)
+            
             countLabel.textColor = theme.isDark ? .white : .black
-            descriptionLabel.textColor = theme.isDark ? UIColor.white : .black
-//            infoButton.tintColor = theme.isDark ?
-//                Colors.orange400 :
-//                Colors.orange500
+            descriptionLabel.textColor = theme.isDark ? .white : .black
+            
+            infoButton.tintColor = theme.isDark ? .white : .black
+            shareButton.tintColor = theme.isDark ? . white : .black
         }
     }
     
-    let blockCountView = BlockCountView().then {
-        $0.layer.cornerRadius = 6.0
-    }
+    let blockCountView = BlockCountView()
     
     let footerLabel = UILabel().then {
         $0.text = Strings.Shields.siteBroken

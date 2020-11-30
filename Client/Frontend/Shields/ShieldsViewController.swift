@@ -249,7 +249,8 @@ class ShieldsViewController: UIViewController, PopoverContentComponent, Themeabl
         
         shieldsView.advancedControlsBar.addTarget(self, action: #selector(tappedAdvancedControlsBar), for: .touchUpInside)
         shieldsView.simpleShieldView.blockCountView.infoButton.addTarget(self, action: #selector(tappedAboutShieldsButton), for: .touchUpInside)
-        
+        shieldsView.simpleShieldView.blockCountView.shareButton.addTarget(self, action: #selector(tappedShareShieldsButton), for: .touchUpInside)
+
         shieldsView.simpleShieldView.reportSiteButton.addTarget(self, action: #selector(tappedReportSiteButton), for: .touchUpInside)
         shieldsView.reportBrokenSiteView.cancelButton.addTarget(self, action: #selector(tappedCancelReportingButton), for: .touchUpInside)
         shieldsView.reportBrokenSiteView.submitButton.addTarget(self, action: #selector(tappedSubmitReportingButton), for: .touchUpInside)
@@ -307,6 +308,10 @@ class ShieldsViewController: UIViewController, PopoverContentComponent, Themeabl
         aboutShields.applyTheme(Theme.of(tab))
         aboutShields.preferredContentSize = preferredContentSize
         navigationController?.pushViewController(aboutShields, animated: true)
+    }
+    
+    @objc private func tappedShareShieldsButton() {
+        // TODO: Present Action Sheet
     }
     
     @objc private func tappedReportSiteButton() {
