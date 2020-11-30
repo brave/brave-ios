@@ -57,16 +57,15 @@ class SimpleShieldsView: UIView, Themeable {
             $0.isLayoutMarginsRelativeArrangement = true
         }
         
+        let shareStackView = UIStackView().then {
+            $0.alignment = .center
+            $0.layoutMargins = UIEdgeInsets(top: 22, left: 14, bottom: 22, right: 14)
+            $0.isLayoutMarginsRelativeArrangement = true
+        }
+        
         let countLabel = UILabel().then {
             $0.font = .systemFont(ofSize: 36)
             $0.text = "0"
-            $0.setContentHuggingPriority(.required, for: .horizontal)
-            $0.setContentCompressionResistancePriority(.required, for: .horizontal)
-        }
-        
-        let countLabel1 = UILabel().then {
-            $0.font = .systemFont(ofSize: 36)
-            $0.text = "1"
             $0.setContentHuggingPriority(.required, for: .horizontal)
             $0.setContentCompressionResistancePriority(.required, for: .horizontal)
         }
@@ -96,6 +95,17 @@ class SimpleShieldsView: UIView, Themeable {
             $0.setContentCompressionResistancePriority(.required, for: .horizontal)
         }
         
+        let shareButton = Button().then {
+            $0.setImage(#imageLiteral(resourceName: "shields-share"), for: .normal)
+            $0.hitTestSlop = UIEdgeInsets(top: -10, left: -10, bottom: -10, right: -10)
+            $0.imageEdgeInsets = .zero
+            $0.titleEdgeInsets = .zero
+            $0.contentEdgeInsets = UIEdgeInsets(top: -2, left: 4, bottom: -3, right: 4)
+            $0.contentMode = .scaleAspectFit
+            $0.setContentHuggingPriority(.required, for: .horizontal)
+            $0.setContentCompressionResistancePriority(.required, for: .horizontal)
+        }
+        
         override init(frame: CGRect) {
             super.init(frame: frame)
             
@@ -113,11 +123,14 @@ class SimpleShieldsView: UIView, Themeable {
             addSubview(contentStackView)
             contentStackView.addArrangedSubview(descriptionStackView)
             contentStackView.addArrangedSubview(infoStackView)
+            contentStackView.addArrangedSubview(shareStackView)
             
             descriptionStackView.addArrangedSubview(countLabel)
             descriptionStackView.addArrangedSubview(descriptionLabel)
             
             infoStackView.addArrangedSubview(infoButton)
+            
+            shareStackView.addArrangedSubview(shareButton)
             
             contentStackView.snp.makeConstraints {
                 $0.edges.equalToSuperview()
