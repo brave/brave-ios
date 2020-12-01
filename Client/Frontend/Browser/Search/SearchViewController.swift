@@ -668,9 +668,7 @@ private class SuggestionCell: UITableViewCell {
         }
         
         didSet {
-            var buttonList: [SuggestionButton] = []
-
-            buttonList = suggestions.map { suggestion in
+            suggestions.forEach { suggestion in
                 let button = SuggestionButton()
                 button.setTitle(suggestion, for: [])
 
@@ -688,11 +686,9 @@ private class SuggestionCell: UITableViewCell {
                     }
                 }
 
-                return button
+                contentView.addSubview(button)
             }
-
-            buttonList.forEach { contentView.addSubview($0) }
-
+            
             setNeedsLayout()
         }
     }
