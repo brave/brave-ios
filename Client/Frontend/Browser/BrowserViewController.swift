@@ -2778,7 +2778,7 @@ extension BrowserViewController: WKUIDelegate {
         return newTab.webView
     }
 
-    fileprivate func shouldRequestBeOpenedAsPopup(_ request: URLRequest) -> Bool {
+    func shouldRequestBeOpenedAsPopup(_ request: URLRequest) -> Bool {
         // Treat `window.open("")` the same as `window.open("about:blank")`.
         if request.url?.absoluteString.isEmpty ?? false {
             return true

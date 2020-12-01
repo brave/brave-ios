@@ -23,7 +23,7 @@ class ShareExtensionHelper: NSObject {
     fileprivate var onePasswordExtensionItem: NSExtensionItem!
     fileprivate let browserFillIdentifier = "org.appextension.fill-browser-action"
 
-    fileprivate func isFile(url: URL) -> Bool { url.scheme == "file" }
+//    fileprivate func isFile(url: URL) -> Bool { url.scheme == "file" }
 
     init(url: URL, tab: Tab?) {
         self.selectedURL = tab?.canonicalURL?.displayURL ?? url
@@ -69,7 +69,9 @@ class ShareExtensionHelper: NSObject {
         activityViewController.completionWithItemsHandler = { [weak self] activityType, completed, returnedItems, activityError in
             guard let self = self else { return }
             
-            if self.shareActivityType(activityType.map { $0.rawValue }) != .iBooks { //!self.isOpenInIBooksActivityType(activityType.map { $0.rawValue }) {
+            print("Share type \(self.shareActivityType(activityType.map { $0.rawValue }))")
+            
+            if self.shareActivityType(activityType.map { $0.rawValue }) != .iBooks {
                 if !completed {
                     completionHandler(completed, activityType, nil)
                     return
@@ -80,7 +82,7 @@ class ShareExtensionHelper: NSObject {
                     UIPasteboard.general.urls = [url]
                 }
                 
-                if self.shareActivityType(activityType.map { $0.rawValue }) != .password { //self.isPasswordManagerActivityType(activityType.map { $0.rawValue }) {
+                if self.shareActivityType(activityType.map { $0.rawValue }) != .password {
                     if let logins = returnedItems {
                         self.fillPasswords(logins as [AnyObject])
                     }
@@ -162,7 +164,7 @@ extension ShareExtensionHelper: UIActivityItemSource {
             case .password:
                 return browserFillIdentifier
             case .openByCopy:
-                return isFile(url: selectedURL) ? kUTTypeFileURL as String : kUTTypeURL as String
+                return selectedURL.isFileScheme ? kUTTypeFileURL as String : kUTTypeURL as String
             default:
                 // Return the URL for the selected tab. If we are in reader view then decode
                 // it so that we copy the original and not the internal localhost one.
