@@ -354,7 +354,7 @@ class SearchViewController: SiteTableViewController, LoaderListener {
     private func querySuggestClient() {
         suggestClient?.cancelPendingRequest()
 
-        if searchQuery.isEmpty || searchEngines?.shouldShowSearchSuggestionsOptIn == false || searchQuery.looksLikeAURL() {
+        if searchQuery.isEmpty || searchEngines?.shouldShowSearchSuggestionsOptIn == true || searchQuery.looksLikeAURL() {
             suggestionCell.suggestions = []
             return
         }
