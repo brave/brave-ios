@@ -6,6 +6,23 @@ import Foundation
 import BraveRewards
 import BraveShared
 
+extension BraveLedger {
+    struct AssociatedKeys {
+        static var isEnabled: Bool = false
+        static var isWalletCreated: Bool = false
+    }
+    
+    public var isEnabled: Bool {
+        get { objc_getAssociatedObject(self, &AssociatedKeys.isEnabled) as? Bool ?? false }
+        set { objc_setAssociatedObject(self, &AssociatedKeys.isEnabled, newValue, .OBJC_ASSOCIATION_ASSIGN) }
+    }
+    
+    public var isWalletCreated: Bool {
+        get { objc_getAssociatedObject(self, &AssociatedKeys.isWalletCreated) as? Bool ?? false }
+        set { objc_setAssociatedObject(self, &AssociatedKeys.isWalletCreated, newValue, .OBJC_ASSOCIATION_ASSIGN) }
+    }
+}
+
 extension BraveRewards {
     
     /// Whether or not Brave Rewards is available/can be enabled
@@ -55,9 +72,15 @@ extension BraveRewards {
         get { objc_getAssociatedObject(self, &AssociatedKeys.isCreatingWallet) as? Bool ?? false }
         set { objc_setAssociatedObject(self, &AssociatedKeys.isCreatingWallet, newValue, .OBJC_ASSOCIATION_ASSIGN) }
     }
+    
+    public var isAdsEnabled: Bool {
+        get { objc_getAssociatedObject(self, &AssociatedKeys.isAdsEnabled) as? Bool ?? false }
+        set { objc_setAssociatedObject(self, &AssociatedKeys.isAdsEnabled, newValue, .OBJC_ASSOCIATION_ASSIGN) }
+    }
 }
 
 private struct AssociatedKeys {
   static var isCreatingWallet: Int = 0
+  static var isAdsEnabled: Bool = false
 }
   
