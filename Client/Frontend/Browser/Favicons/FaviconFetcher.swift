@@ -366,38 +366,41 @@ class FaviconFetcher {
                 return
             }
             
-            let xpath = self.kind == .largeIcon ?
-                "//head//link[contains(@rel, 'apple-touch-icon')]" :
-                "//head//link[contains(@rel, 'icon')]"
+            let xpaths = self.kind == .largeIcon ?
+                ["//head//link[contains(@rel, 'apple-touch-icon')]",
+                 "//head//link[contains(@rel, 'apple-touch-icon-precomposed')]"] :
+                ["//head//link[contains(@rel, 'icon')]"]
             var highestScore: Double = -1.0
             var icon: Favicon?
             // Look for a favicon with the sizes closest to the goal
             let goal = self.kind == .largeIcon ? 180.0 * 180.0 : 48 * 48
-            for link in root.xpath(xpath) {
-                guard let href = link["href"] else { continue }
-                let size = link["sizes"]?
-                    .split(separator: "x")
-                    .compactMap { Double($0) }
-                    .reduce(0, { $0 * $1 }) ?? 0.0
-                let score = 1.0 - (abs(size - goal)) / goal
-                
-                if score > highestScore, let faviconURL = URL(string: href, relativeTo: url) {
-                    highestScore = score
-                    icon = Favicon(url: faviconURL.absoluteString, date: Date(), type: self.kind.iconType)
+            for xpath in xpaths {
+                for link in root.xpath(xpath) {
+                    guard let href = link["href"] else { continue }
+                    let size = link["sizes"]?
+                        .split(separator: "x")
+                        .compactMap { Double($0) }
+                        .reduce(0, { $0 * $1 }) ?? 0.0
+                    let score = 1.0 - (abs(size - goal)) / goal
+                    
+                    if score > highestScore, let faviconURL = URL(string: href, relativeTo: url) {
+                        highestScore = score
+                        icon = Favicon(url: faviconURL.absoluteString, date: Date(), type: self.kind.iconType)
+                    }
                 }
-            }
-            
-            guard let favicon = icon, let faviconURL = URL(string: favicon.url) else {
-                completion(self.monogramFavicon)
-                return
-            }
-            
-            self.downloadIcon(url: faviconURL, addingToDatabase: true) { [weak self] image in
-                guard let self = self else { return }
-                if let image = image {
-                    completion(FaviconAttributes(image: image))
-                } else {
+                
+                guard let favicon = icon, let faviconURL = URL(string: favicon.url) else {
                     completion(self.monogramFavicon)
+                    return
+                }
+                
+                self.downloadIcon(url: faviconURL, addingToDatabase: true) { [weak self] image in
+                    guard let self = self else { return }
+                    if let image = image {
+                        completion(FaviconAttributes(image: image))
+                    } else {
+                        completion(self.monogramFavicon)
+                    }
                 }
             }
         }
