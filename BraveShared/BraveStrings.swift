@@ -791,6 +791,42 @@ extension Strings {
     }
 }
 
+// MARK: Share
+
+extension Strings {
+    public struct Share {
+        public static let shareScreenTitle =
+            NSLocalizedString("ShieldShareTitle",
+                              bundle: .braveShared,
+                              value: "Share to",
+                              comment: "Title for screen to share shields")
+
+        public static let emailShareActionTitle =
+            NSLocalizedString("ShieldShareEmailAction",
+                              bundle: .braveShared,
+                              value: "Share with email",
+                              comment: "Share with email action title")
+        
+        public static let twitterShareActionTitle =
+            NSLocalizedString("ShieldShareTwitterAction",
+                              bundle: .braveShared,
+                              value: "Share with twitter",
+                              comment: "Share with twitter action title")
+        
+        public static let facebookShareActionTitle =
+            NSLocalizedString("ShieldShareFacebookAction",
+                              bundle: .braveShared,
+                              value: "Share with facebook",
+                              comment: "Share with facebook action title")
+        
+        public static let moreShareActionTitle =
+            NSLocalizedString("ShieldShareMoreAction",
+                              bundle: .braveShared,
+                              value: "More...",
+                              comment: "Share with more action title")
+    }
+}
+
 // MARK: - VPN
 extension Strings {
     public struct VPN {
