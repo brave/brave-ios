@@ -311,7 +311,11 @@ class ShieldsViewController: UIViewController, PopoverContentComponent, Themeabl
     }
     
     @objc private func tappedShareShieldsButton() {
-        // TODO: Present Action Sheet
+        let shareShieldsController = ShareShieldsViewController(tab: tab)
+        shareShieldsController.applyTheme(Theme.of(tab))
+        shareShieldsController.preferredContentSize = preferredContentSize
+        
+        navigationController?.pushViewController(shareShieldsController, animated: true)
     }
     
     @objc private func tappedReportSiteButton() {

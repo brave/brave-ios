@@ -102,6 +102,26 @@ extension UIView {
         return spacer
     }
     
+    /// Adding multiple subviews in one instruction.
+    @discardableResult
+    func addSubviews(_ listofViews: [UIView]) -> Self {
+        for view in listofViews {
+            self.addSubview(view)
+        }
+        return self
+    }
+
+    /// List of subviews owned by the the view
+    public func subviews(where: (_ view: UIView) -> Bool) -> [UIView] {
+        return self.subviews.flatMap { subview -> [UIView] in
+            var result = subview.subviews(where: `where`)
+            if `where`(subview) {
+                result.append(subview)
+            }
+            return result
+        }
+    }
+    
     /// Returns a line with height of 1pt. Used to imitate a separator line in custom views.
     static var separatorLine: UIView {
         let view = UIView().then {
