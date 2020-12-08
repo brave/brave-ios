@@ -3,47 +3,47 @@
     "packaged": true,
     "imageUrl": "alex-plesovskich.jpg",
     "focalPoint": {
-      "x": null,
-      "y": null
+      "x": 1355,
+      "y": 720
     },
     "credit": {
-      "name": "alex-plesovskich.jpg",
-      "url": ""
+      "name": "Alex Plesovskich",
+      "url": "https://unsplash.com/@aples"
     }
   },
   {
     "packaged": true,
     "imageUrl": "andre-benz.jpg",
     "focalPoint": {
-      "x": null,
-      "y": null
+      "x": 1150,
+      "y": 720
     },
     "credit": {
-      "name": "andre-benz.jpg",
-      "url": ""
+      "name": "Andre Benz",
+      "url": "https://unsplash.com/@trapnation"
     }
   },
   {
     "packaged": true,
     "imageUrl": "corwin-prescott_beach.jpg",
     "focalPoint": {
-      "x": null,
-      "y": null
+        "x": 925,
+        "y": 720
     },
     "credit": {
-      "name": "corwin-prescott_beach.jpg",
-      "url": ""
+        "name": "Corwin Prescott",
+        "url": ""
     }
-  },
+    },
   {
     "packaged": true,
     "imageUrl": "corwin-prescott_canyon.jpg",
     "focalPoint": {
-      "x": null,
-      "y": null
+      "x": 755,
+      "y": 720
     },
     "credit": {
-      "name": "corwin-prescott_canyon.jpg",
+      "name": "Corwin Prescott",
       "url": ""
     }
   },
@@ -51,11 +51,11 @@
     "packaged": true,
     "imageUrl": "corwin-prescott_crestone.jpg",
     "focalPoint": {
-      "x": null,
-      "y": null
+      "x": 1550,
+      "y": 720
     },
     "credit": {
-      "name": "corwin-prescott_crestone.jpg",
+      "name": "Corwin Prescott",
       "url": ""
     }
   },
@@ -63,11 +63,11 @@
     "packaged": true,
     "imageUrl": "corwin-prescott_olympic.jpg",
     "focalPoint": {
-      "x": null,
-      "y": null
+      "x": 1700,
+      "y": 720
     },
     "credit": {
-      "name": "corwin-prescott_olympic.jpg",
+      "name": "Corwin Prescott",
       "url": ""
     }
   },
@@ -75,108 +75,108 @@
     "packaged": true,
     "imageUrl": "dylan-malval_alps.jpg",
     "focalPoint": {
-      "x": null,
-      "y": null
+      "x": 450,
+      "y": 720
     },
     "credit": {
-      "name": "dylan-malval_alps.jpg",
-      "url": ""
+      "name": "Dylan Malval",
+      "url": "https://www.instagram.com/vass_captures/"
     }
   },
   {
     "packaged": true,
     "imageUrl": "dylan-malval_sea.jpg",
     "focalPoint": {
-      "x": null,
-      "y": null
+      "x": 1500,
+      "y": 720
     },
     "credit": {
-      "name": "dylan-malval_sea.jpg",
-      "url": ""
+      "name": "Dylan Malval",
+      "url": "https://www.instagram.com/vass_captures/"
     }
   },
   {
     "packaged": true,
     "imageUrl": "sora-sagano.jpg",
     "focalPoint": {
-      "x": null,
-      "y": null
+      "x": 1600,
+      "y": 720
     },
     "credit": {
-      "name": "sora-sagano.jpg",
-      "url": ""
+      "name": "Sora Sogano",
+      "url": "https://unsplash.com/@sorasagano"
     }
   },
   {
     "packaged": true,
     "imageUrl": "spencer-moore_desert.jpg",
     "focalPoint": {
-      "x": null,
-      "y": null
+      "x": 1200,
+      "y": 720
     },
     "credit": {
-      "name": "spencer-moore_desert.jpg",
-      "url": ""
+      "name": "Spencer M. Moore",
+      "url": "https://www.smoorevisuals.com/landscapes"
     }
   },
   {
     "packaged": true,
     "imageUrl": "spencer-moore_fern.jpg",
     "focalPoint": {
-      "x": null,
-      "y": null
+      "x": 900,
+      "y": 720
     },
     "credit": {
-      "name": "spencer-moore_fern.jpg",
-      "url": ""
+      "name": "Spencer M. Moore",
+      "url": "https://www.smoorevisuals.com/landscapes"
     }
   },
   {
     "packaged": true,
     "imageUrl": "spencer-moore_lake.jpg",
     "focalPoint": {
-      "x": null,
-      "y": null
+      "x": 1300,
+      "y": 720
     },
     "credit": {
-      "name": "spencer-moore_lake.jpg",
-      "url": ""
+      "name": "Spencer M. Moore",
+      "url": "https://www.smoorevisuals.com/landscapes"
     }
   },
   {
     "packaged": true,
     "imageUrl": "spencer-moore_ocean.jpg",
     "focalPoint": {
-      "x": null,
-      "y": null
+      "x": 900,
+      "y": 720
     },
     "credit": {
-      "name": "spencer-moore_ocean.jpg",
-      "url": ""
+      "name": "Spencer M. Moore",
+      "url": "https://www.smoorevisuals.com/landscapes"
     }
   },
   {
     "packaged": true,
     "imageUrl": "su-san-lee.jpg",
     "focalPoint": {
-      "x": null,
-      "y": null
+      "x": 250,
+      "y": 720
     },
     "credit": {
-      "name": "su-san-lee.jpg",
-      "url": ""
+      "name": "Su San Lee",
+      "url": "https://unsplash.com/@blackodc"
     }
   },
   {
     "packaged": true,
     "imageUrl": "zane-lee.jpg",
     "focalPoint": {
-      "x": null,
-      "y": null
+      "x": 800,
+      "y": 720
     },
     "credit": {
-      "name": "zane-lee.jpg",
-      "url": ""
+      "name": "Zane Lee",
+      "url": "https://unsplash.com/@zane4004"
     }
   },
 ]
