@@ -64,9 +64,7 @@ class ShareShieldsViewController: UIViewController, Themeable {
         
         navigationController?.preferredContentSize = preferredContentSize
     }
-    
-    // MARK: Internal
-    
+        
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         
@@ -76,6 +74,8 @@ class ShareShieldsViewController: UIViewController, Themeable {
             }
         }
     }
+    
+    // MARK: Internal
     
     private func doLayout() {
         let shareTypeViewEmail = ShareTypeView(type: .email)
@@ -107,6 +107,8 @@ class ShareShieldsViewController: UIViewController, Themeable {
             .view(shareTypeViewDefault)
         )
     }
+    
+    // MARK: Themeable
     
     func applyTheme(_ theme: Theme) {
         view.backgroundColor = theme.isDark ? BraveUX.popoverDarkBackground : UIColor.white
