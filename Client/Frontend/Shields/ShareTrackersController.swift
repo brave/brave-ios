@@ -76,7 +76,7 @@ class ShareTrackersController: UIViewController, Themeable, PopoverContentCompon
         positions: [0, 1],
         startPoint: .zero,
         endPoint: CGPoint(x: 1, y: 0.5))
-    
+
     var actionHandler: ((Action) -> Void)?
 
     // MARK: Lifecycle
@@ -85,33 +85,33 @@ class ShareTrackersController: UIViewController, Themeable, PopoverContentCompon
         self.theme = theme
         self.trackingType = trackingType
         shareTrackersView = ShareTrackersView(trackingType: trackingType)
-        
+
         super.init(nibName: nil, bundle: nil)
     }
-    
+
     @available(*, unavailable)
     required init(coder: NSCoder) {
         fatalError()
     }
-    
+
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
-        
+
         if #available(iOS 13.0, *) {
             if traitCollection.userInterfaceStyle != previousTraitCollection?.userInterfaceStyle {
                 applyTheme(Theme.of(nil))
             }
         }
     }
-    
+
     // MARK: Internal
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         shareTrackersView.actionHandler = { [weak self] action in
             guard let self = self else { return }
-            
+
             switch action {
             case .didShareWithMailTapped:
                 self.actionHandler?(.takeALookTapped)
@@ -123,13 +123,15 @@ class ShareTrackersController: UIViewController, Themeable, PopoverContentCompon
                 self.actionHandler?(.shareMoreTapped)
             case .didTakeALookTapped:
                 self.actionHandler?(.takeALookTapped)
+            case .didDontShowTapped:
+                self.actionHandler?(.dontShowAgainTapped)
             }
         }
-        
+
         applyTheme(theme)
         doLayout()
     }
-    
+
     private func doLayout() {
         view.addSubview(shareTrackersView)
 
@@ -137,31 +139,30 @@ class ShareTrackersController: UIViewController, Themeable, PopoverContentCompon
             $0.width.equalTo(264)
             $0.height.equalTo(shareTrackersView)
         }
-        
+
         shareTrackersView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
-        
+
         if case .trackerAdWarning = trackingType {
             shareTrackersView.insertSubview(gradientView, at: 0)
-            
+
             gradientView.snp.makeConstraints { make in
                 make.edges.equalToSuperview()
             }
         }
     }
-    
+
     // MARK: Themeable
     
     func applyTheme(_ theme: Theme) {
         view.backgroundColor = UIColor(rgb: 0x339AF0)
-        
+
         shareTrackersView.applyTheme(theme)
     }
 }
 
 // MARK: - ShareTrackersView
-
 private class ShareTrackersView: UIView, ShareTrayViewDelegate, Themeable {
 
     // MARK: UX
@@ -170,7 +171,7 @@ private class ShareTrackersView: UIView, ShareTrayViewDelegate, Themeable {
         static let contentMargins: UIEdgeInsets = UIEdgeInsets(equalInset: 32)
         static let actionButtonInsets: UIEdgeInsets = UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0)
     }
-    
+
     // MARK: Action
     
     enum Action {
@@ -179,32 +180,33 @@ private class ShareTrackersView: UIView, ShareTrayViewDelegate, Themeable {
         case didShareWithFacebookTapped
         case didShareWithDefaultTapped
         case didTakeALookTapped
+        case didDontShowTapped
     }
-    
+
     // MARK: Properties
     
     private let trackingType: TrackingType
 
     private let shareTrayView = ShareTrayView()
-    
+
     private let stackView = UIStackView().then {
         $0.axis = .vertical
         $0.spacing = 20
         $0.isLayoutMarginsRelativeArrangement = true
         $0.layoutMargins = UX.contentMargins
     }
-    
+
     private lazy var titleLabel = UILabel().then {
         $0.backgroundColor = .clear
         $0.setContentCompressionResistancePriority(.required, for: .horizontal)
         $0.numberOfLines = 0
     }
-    
+
     private let subtitleLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 16)
         $0.numberOfLines = 0
     }
-    
+
     private lazy var actionButton: UIButton = {
         let actionButton = InsetButton()
         actionButton.addTarget(self, action: #selector(tappedInformationAction), for: .touchUpInside)
@@ -217,28 +219,28 @@ private class ShareTrackersView: UIView, ShareTrayViewDelegate, Themeable {
         actionButton.setContentCompressionResistancePriority(.required, for: .horizontal)
         return actionButton
     }()
-    
+
     var actionHandler: ((Action) -> Void)?
-    
+
     // MARK: Lifecycle
     
     init(trackingType: TrackingType) {
         self.trackingType = trackingType
-        
+
         super.init(frame: .zero)
-        
+
         doLayout()
         setContent()
     }
-    
+
     @available(*, unavailable)
     required init(coder: NSCoder) {
         fatalError()
     }
-    
+
     private func doLayout() {
         addSubview(stackView)
-        
+
         stackView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
@@ -260,38 +262,37 @@ private class ShareTrackersView: UIView, ShareTrayViewDelegate, Themeable {
                 )
             })
         )
-        
+
         switch trackingType {
             case .trackerCountShare:
                 stackView.addArrangedSubview(shareTrayView)
-            case .trackerAdWarning:
+            case .trackerAdWarning, .trackerAdCountBlock, .encryptedConnectionWarning:
                 stackView.addArrangedSubview(actionButton)
             default:
                 return
         }
-
     }
-    
+
     private func setContent() {
         titleLabel.attributedText = {
             let imageAttachment = NSTextAttachment().then {
                 $0.image = #imageLiteral(resourceName: "share-bubble-shield")
             }
-            
+
             let string = NSMutableAttributedString(attachment: imageAttachment)
-            
+
             string.append(NSMutableAttributedString(
                 string: trackingType.title,
                 attributes: [.font: UIFont.systemFont(ofSize: 20.0)]
             ))
             return string.withLineSpacing(2)
         }()
-        
+
         subtitleLabel.attributedText = NSAttributedString(string: trackingType.subTitle).withLineSpacing(2)
-        
+
         actionButton.setTitle(Strings.ShieldEducation.educationInspectTitle, for: .normal)
     }
-    
+
     // MARK: Action
     @objc func tappedInformationAction() {
         actionHandler?(.didTakeALookTapped)
