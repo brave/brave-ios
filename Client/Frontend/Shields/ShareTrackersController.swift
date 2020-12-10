@@ -44,6 +44,7 @@ enum TrackingType: Equatable {
                 return Strings.ShieldEducation.trackerAdCountBlockSubtitle
             case .encryptedConnectionWarning:
                 return Strings.ShieldEducation.encryptedConnectionWarningSubtitle
+
         }
     }
 }
@@ -209,7 +210,6 @@ private class ShareTrackersView: UIView, ShareTrayViewDelegate, Themeable {
     private lazy var actionButton: UIButton = {
         let actionButton = InsetButton()
         actionButton.addTarget(self, action: #selector(tappedInformationAction), for: .touchUpInside)
-
         actionButton.contentEdgeInsets = UX.actionButtonInsets
         actionButton.layer.cornerRadius = 20
         actionButton.clipsToBounds = true
@@ -295,11 +295,7 @@ private class ShareTrackersView: UIView, ShareTrayViewDelegate, Themeable {
     // MARK: Action
     
     @objc func tappedInformationAction() {
-        if case .trackerAdWarning = trackingType {
-            actionHandler?(.didTakeALookTapped)
-        } else {
-            actionHandler?(.didDontShowTapped)
-        }
+        actionHandler?(.didTakeALookTapped)
     }
 
     // MARK: ShareTrayViewDelegate
