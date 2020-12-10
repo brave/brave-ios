@@ -4173,6 +4173,7 @@
 				2FE5B4532582BEF500BFDDB8 /* ShareTrayView.swift */,
 				2F21BA31257ADCCF00F703A8 /* ShareShieldsController.swift */,
 				2FE5B42A2580216700BFDDB8 /* ShareTrackersController.swift */,
+				2FE5B4532582BEF500BFDDB8 /* ShareTrayView.swift */,
 			);
 			path = Shields;
 			sourceTree = "<group>";
