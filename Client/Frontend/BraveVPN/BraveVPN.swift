@@ -165,19 +165,19 @@ class BraveVPN {
     }
     
     static var alertDataTrackerCount: String {
-        UserDefaults.standard.string(forKey: kAppAlertsDataTrackerCount) ?? "0"
+        UserDefaults.standard.string(forKey: kAppAlertsDataTrackerCount) ?? "-"
     }
     
     static var alertLocationTrackerCount: String {
-        UserDefaults.standard.string(forKey: kAppAlertsLocationTrackerCount) ?? "0"
+        UserDefaults.standard.string(forKey: kAppAlertsLocationTrackerCount) ?? "-"
     }
     
     static var alertMailTrackerCount: String {
-        UserDefaults.standard.string(forKey: kAppAlertMailTrackerCount) ?? "0"
+        UserDefaults.standard.string(forKey: kAppAlertMailTrackerCount) ?? "-"
     }
     
     static var alertPageHijackedCount: String {
-        UserDefaults.standard.string(forKey: kAppAlertPageHijackerCount) ?? "0"
+        UserDefaults.standard.string(forKey: kAppAlertPageHijackerCount) ?? "-"
     }
     
     /// Whether the vpn subscription has expired.

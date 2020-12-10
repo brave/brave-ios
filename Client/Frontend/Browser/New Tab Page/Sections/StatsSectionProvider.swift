@@ -44,7 +44,7 @@ class GuardianShieldStatsView: UIView, Themeable {
     func applyTheme(_ theme: Theme) {
         styleChildren(theme: theme)
         //ignoring theme for now
-        pageHijackerView.color = UIColor.pageHijackerPurpleSelected(true)
+        mailTrackerView.color = UIColor.mailTrackerRedSelected(true)
         dataTrackerView.color = UIColor.dataTrackerYellowSelected(true)
         locationTrackerView.color = UIColor.locationTrackerGreenSelected(true)
         
@@ -52,9 +52,9 @@ class GuardianShieldStatsView: UIView, Themeable {
     
     fileprivate let millisecondsPerItem: Int = 50
     
-    private lazy var pageHijackerView: StatView = {
+    private lazy var mailTrackerView: StatView = {
         let statView = StatView(frame: CGRect.zero)
-        statView.title = "Page Hi-Jackers Blocked"
+        statView.title = "Mail Trackers Blocked"
         return statView
     }()
     
@@ -71,7 +71,7 @@ class GuardianShieldStatsView: UIView, Themeable {
     }()
     
     private lazy var stats: [StatView] = {
-        return [self.dataTrackerView, self.locationTrackerView, self.pageHijackerView]
+        return [self.dataTrackerView, self.locationTrackerView, self.mailTrackerView]
     }()
     
     override init(frame: CGRect) {
@@ -109,39 +109,9 @@ class GuardianShieldStatsView: UIView, Themeable {
     @objc private func update() {
         dataTrackerView.stat = BraveVPN.alertDataTrackerCount
         locationTrackerView.stat = BraveVPN.alertLocationTrackerCount
-        pageHijackerView.stat = BraveVPN.alertPageHijackedCount
+        mailTrackerView.stat = BraveVPN.alertMailTrackerCount
     }
     
-    var timeSaved: String {
-        get {
-            let estimatedMillisecondsSaved = (BraveGlobalShieldStats.shared.adblock + BraveGlobalShieldStats.shared.trackingProtection) * millisecondsPerItem
-            let hours = estimatedMillisecondsSaved < 1000 * 60 * 60 * 24
-            let minutes = estimatedMillisecondsSaved < 1000 * 60 * 60
-            let seconds = estimatedMillisecondsSaved < 1000 * 60
-            var counter: Double = 0
-            var text = ""
-            
-            if seconds {
-                counter = ceil(Double(estimatedMillisecondsSaved / 1000))
-                text = Strings.shieldsTimeStatsSeconds
-            } else if minutes {
-                counter = ceil(Double(estimatedMillisecondsSaved / 1000 / 60))
-                text = Strings.shieldsTimeStatsMinutes
-            } else if hours {
-                counter = ceil(Double(estimatedMillisecondsSaved / 1000 / 60 / 60))
-                text = Strings.shieldsTimeStatsHour
-            } else {
-                counter = ceil(Double(estimatedMillisecondsSaved / 1000 / 60 / 60 / 24))
-                text = Strings.shieldsTimeStatsDays
-            }
-            
-            if let counterLocaleStr = Int(counter).decimalFormattedString {
-                return counterLocaleStr + text
-            } else {
-                return "0" + Strings.shieldsTimeStatsSeconds     // If decimalFormattedString returns nil, default to "0s"
-            }
-        }
-    }
 }
 
 class BraveShieldStatsView: UIView, Themeable {
