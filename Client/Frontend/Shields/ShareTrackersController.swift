@@ -2,7 +2,6 @@
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
 import Foundation
 import BraveRewards
 import BraveUI
@@ -17,7 +16,7 @@ enum TrackingType: Equatable {
     case videoAdBlock
     case trackerAdCountBlock(count: Int)
     case encryptedConnectionWarning
-    
+
     var title: String {
         switch self {
             case .trackerCountShare(let count):
@@ -32,7 +31,7 @@ enum TrackingType: Equatable {
                 return Strings.ShieldEducation.encryptedConnectionWarningTitle
         }
     }
-    
+
     var subTitle: String {
         switch self {
             case .trackerCountShare:
@@ -50,9 +49,8 @@ enum TrackingType: Equatable {
 }
 
 // MARK: - ShareTrackersController
-
 class ShareTrackersController: UIViewController, Themeable, PopoverContentComponent {
-    
+
     // MARK: Action
     
     enum Action {
@@ -63,14 +61,14 @@ class ShareTrackersController: UIViewController, Themeable, PopoverContentCompon
         case shareFacebookTapped
         case shareMoreTapped
     }
-    
+
     // MARK: Properties
     
     private let theme: Theme
     private let trackingType: TrackingType
-    
+
     private let shareTrackersView: ShareTrackersView
-    
+
     private lazy var gradientView = GradientView(
         colors: [#colorLiteral(red: 0.968627451, green: 0.2274509804, blue: 0.1098039216, alpha: 1), #colorLiteral(red: 0.7490196078, green: 0.07843137255, blue: 0.6352941176, alpha: 1)],
         positions: [0, 1],
@@ -163,6 +161,7 @@ class ShareTrackersController: UIViewController, Themeable, PopoverContentCompon
 }
 
 // MARK: - ShareTrackersView
+
 private class ShareTrackersView: UIView, ShareTrayViewDelegate, Themeable {
 
     // MARK: UX
@@ -294,10 +293,15 @@ private class ShareTrackersView: UIView, ShareTrayViewDelegate, Themeable {
     }
 
     // MARK: Action
-    @objc func tappedInformationAction() {
-        actionHandler?(.didTakeALookTapped)
-    }
     
+    @objc func tappedInformationAction() {
+        if case .trackerAdWarning = trackingType {
+            actionHandler?(.didTakeALookTapped)
+        } else {
+            actionHandler?(.didDontShowTapped)
+        }
+    }
+
     // MARK: ShareTrayViewDelegate
     
     func didShareWith(_ view: ShareTrayView, type: ShareTrayView.ViewType) {
@@ -311,10 +315,10 @@ private class ShareTrackersView: UIView, ShareTrayViewDelegate, Themeable {
             case .default:
                 actionHandler?(.didShareWithDefaultTapped)
         }
-        
+
         actionHandler?(.didShareWithMailTapped)
     }
-    
+
     // MARK: Themeable
     
     func applyTheme(_ theme: Theme) {
