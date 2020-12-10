@@ -65,10 +65,13 @@ class BraveRewardsStatusView: UIView, Themeable {
                 UIView.animate(withDuration: 0.1, delay: 0.05, usingSpringWithDamping: 0, initialSpringVelocity: 0, options: UIView.AnimationOptions(rawValue: 0), animations: {
                     self.visibleView?.alpha = 1.0
                 }, completion: nil)
+               
+                //this was throwing an error, doesnt seem like this particular iteration even exists?
                 
-                //UIView.animate(withDuration: 0.1, delay: 0.05) {
-                  //  self.visibleView?.alpha = 1.0
-               // }
+                /*
+                UIView.animate(withDuration: 0.1, delay: 0.05) {
+                    self.visibleView?.alpha = 1.0
+                }*/
             })
         } else {
             visibleView?.isHidden = true

@@ -22,7 +22,7 @@ class StatsSectionProvider: NSObject, NTPSectionProvider {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        if indexPath.row == 0{
+        if indexPath.row == 0 {
             return collectionView.dequeueReusableCell(for: indexPath) as NewTabCollectionViewCell<BraveShieldStatsView>
         } else {
             return collectionView.dequeueReusableCell(for: indexPath) as NewTabCollectionViewCell<GuardianShieldStatsView>
@@ -47,10 +47,14 @@ class GuardianShieldStatsView: UIView, Themeable {
         mailTrackerView.color = UIColor.mailTrackerRedSelected(true)
         dataTrackerView.color = UIColor.dataTrackerYellowSelected(true)
         locationTrackerView.color = UIColor.locationTrackerGreenSelected(true)
-        
+        pageHijackerView.color = UIColor.pageHijackerPurpleSelected(true)
     }
     
-    fileprivate let millisecondsPerItem: Int = 50
+    private lazy var pageHijackerView: StatView = {
+        let statView = StatView(frame: CGRect.zero)
+        statView.title = "Page Hijackers Blocked"
+        return statView
+    }()
     
     private lazy var mailTrackerView: StatView = {
         let statView = StatView(frame: CGRect.zero)
@@ -71,7 +75,7 @@ class GuardianShieldStatsView: UIView, Themeable {
     }()
     
     private lazy var stats: [StatView] = {
-        return [self.dataTrackerView, self.locationTrackerView, self.mailTrackerView]
+        return [self.dataTrackerView, self.locationTrackerView, self.mailTrackerView, self.pageHijackerView]
     }()
     
     override init(frame: CGRect) {
@@ -110,6 +114,7 @@ class GuardianShieldStatsView: UIView, Themeable {
         dataTrackerView.stat = BraveVPN.alertDataTrackerCount
         locationTrackerView.stat = BraveVPN.alertLocationTrackerCount
         mailTrackerView.stat = BraveVPN.alertMailTrackerCount
+        pageHijackerView.stat = BraveVPN.alertPageHijackedCount
     }
     
 }
