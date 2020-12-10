@@ -12,6 +12,15 @@ import BraveUI
 
 class ShareShieldsViewController: UIViewController, Themeable {
     
+    // MARK: Action
+    
+    enum Action {
+        case shareEmailClicked
+        case shareTwitterClicked
+        case shareFacebookClicked
+        case shareDefaultClicked
+    }
+    
     // MARK: UX
     
     private struct UX {
@@ -30,6 +39,8 @@ class ShareShieldsViewController: UIViewController, Themeable {
         $0.layoutMargins = UX.defaultInset
         $0.isLayoutMarginsRelativeArrangement = true
     }
+    
+    var actionHandler: ((Action) -> Void)?
     
     // MARK: Lifecycle
     
@@ -123,19 +134,19 @@ class ShareShieldsViewController: UIViewController, Themeable {
     // MARK: Actions
     
     @objc func shareEmailClicked(gesture: UITapGestureRecognizer) {
-        // TODO: Share With email
+        actionHandler?(.shareEmailClicked)
     }
     
     @objc func shareTwitterClicked(gesture: UITapGestureRecognizer) {
-        // TODO: Share With twitter
+        actionHandler?(.shareTwitterClicked)
     }
     
     @objc func shareFacebookClicked(gesture: UITapGestureRecognizer) {
-        // TODO: Share With facebook
+        actionHandler?(.shareFacebookClicked)
     }
     
     @objc func shareDefaultClicked(gesture: UITapGestureRecognizer) {
-        // TODO: Share With default
+        actionHandler?(.shareDefaultClicked)
     }
     
 }
