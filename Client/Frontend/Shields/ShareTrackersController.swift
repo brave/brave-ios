@@ -89,12 +89,14 @@ class ShareTrackersController: UIViewController, Themeable, PopoverContentCompon
         startPoint: .zero,
         endPoint: CGPoint(x: 1, y: 0.5))
     
+    var actionHandler: ((Action) -> Void)?
+
     // MARK: Lifecycle
     
     init(tab: Tab, trackingType: TrackingType) {
         self.tab = tab
         self.trackingType = trackingType
-        self.shareTrackersView = ShareTrackersView(trackingType: trackingType)
+        shareTrackersView = ShareTrackersView(trackingType: trackingType)
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -118,6 +120,23 @@ class ShareTrackersController: UIViewController, Themeable, PopoverContentCompon
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        shareTrackersView.actionHandler = { [weak self] action in
+            switch action {
+            case .didShareWithMailTapped:
+                self?.actionHandler?(.takeALookTapped)
+            case .didShareWithTwitterTapped:
+                self?.actionHandler?(.shareTwitterTapped)
+            case .didShareWithFacebookTapped:
+                self?.actionHandler?(.shareFacebookTapped)
+            case .didShareWithDefaultTapped:
+                self?.actionHandler?(.shareMoreTapped)
+            case .didTakeALookTapped:
+                self?.actionHandler?(.takeALookTapped)
+            case .didDontShowTapped:
+                self?.actionHandler?(.dontShowAgainTapped)
+            }
+        }
         
         applyTheme(Theme.of(tab))
         doLayout()
@@ -155,13 +174,24 @@ class ShareTrackersController: UIViewController, Themeable, PopoverContentCompon
 
 // MARK: - ShareTrackersView
 
-private class ShareTrackersView: UIView, Themeable {
-    
+private class ShareTrackersView: UIView, ShareTrayViewDelegate, Themeable {
+
     // MARK: UX
     
     struct UX {
         static let contentMargins: UIEdgeInsets = UIEdgeInsets(top: 32, left: 32, bottom: 32, right: 32)
         static let actionButtonInsets: UIEdgeInsets = UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0)
+    }
+    
+    // MARK: Action
+    
+    enum Action {
+        case didShareWithMailTapped
+        case didShareWithTwitterTapped
+        case didShareWithFacebookTapped
+        case didShareWithDefaultTapped
+        case didTakeALookTapped
+        case didDontShowTapped
     }
     
     // MARK: Properties
@@ -190,6 +220,8 @@ private class ShareTrackersView: UIView, Themeable {
     
     private lazy var actionButton: UIButton = {
         let actionButton = InsetButton()
+        actionButton.addTarget(self, action: #selector(tappedInformationAction), for: .touchUpInside)
+
         actionButton.contentEdgeInsets = UX.actionButtonInsets
         actionButton.layer.cornerRadius = 20
         actionButton.clipsToBounds = true
@@ -198,6 +230,8 @@ private class ShareTrackersView: UIView, Themeable {
         actionButton.setContentCompressionResistancePriority(.required, for: .horizontal)
         return actionButton
     }()
+    
+    var actionHandler: ((Action) -> Void)?
     
     // MARK: Lifecycle
     
@@ -267,93 +301,38 @@ private class ShareTrackersView: UIView, Themeable {
         actionButton.setTitle(trackingType.actionTitle, for: .normal)
     }
     
+    // MARK: Action
+    @objc func tappedInformationAction() {
+        if case .trackerAdWarning = trackingType {
+            actionHandler?(.didTakeALookTapped)
+        } else {
+            actionHandler?(.didDontShowTapped)
+        }
+    }
+    
+    // MARK: ShareTrayViewDelegate
+    
+    func didShareWithMail(_ view: ShareTrayView) {
+        actionHandler?(.didShareWithMailTapped)
+    }
+    
+    func didShareWithTwitter(_ view: ShareTrayView) {
+        actionHandler?(.didShareWithTwitterTapped)
+    }
+    
+    func didShareWithFacebook(_ view: ShareTrayView) {
+        actionHandler?(.didShareWithFacebookTapped)
+    }
+    
+    func didShareWithDefault(_ view: ShareTrayView) {
+        actionHandler?(.didShareWithDefaultTapped)
+    }
+    
     // MARK: Themeable
     
     func applyTheme(_ theme: Theme) {
         titleLabel.appearanceTextColor = .white
         subtitleLabel.appearanceTextColor = .white
         actionButton.appearanceTextColor = .white
-    }
-}
-
-// MARK: - ShareTrackersView
-
-private class ShareTrayView: UIView, Themeable {
-    
-    // MARK: Properties
-    
-    private let mailShareButton = UIButton().then {
-        $0.setImage(#imageLiteral(resourceName: "share-bubble-mail").template, for: .normal)
-        $0.contentMode = .scaleAspectFit
-        $0.tintColor = .white
-        $0.setContentHuggingPriority(.required, for: .horizontal)
-        $0.setContentCompressionResistancePriority(.required, for: .horizontal)
-    }
-    
-    private let twitterShareButton = UIButton().then {
-        $0.setImage(#imageLiteral(resourceName: "share-bubble-twitter").template, for: .normal)
-        $0.contentMode = .scaleAspectFit
-        $0.tintColor = .white
-        $0.setContentHuggingPriority(.required, for: .horizontal)
-        $0.setContentCompressionResistancePriority(.required, for: .horizontal)
-    }
-    
-    private let facebookShareButton = UIButton().then {
-        $0.setImage(#imageLiteral(resourceName: "share-bubble-facebook").template, for: .normal)
-        $0.contentMode = .scaleAspectFit
-        $0.tintColor = .white
-        $0.setContentHuggingPriority(.required, for: .horizontal)
-        $0.setContentCompressionResistancePriority(.required, for: .horizontal)
-    }
-    
-    private let defaultShareButton = UIButton().then {
-        $0.setImage(#imageLiteral(resourceName: "share-bubble-more").template, for: .normal)
-        $0.contentMode = .scaleAspectFit
-        $0.tintColor = .white
-        $0.setContentHuggingPriority(.required, for: .horizontal)
-        $0.setContentCompressionResistancePriority(.required, for: .horizontal)
-    }
-
-    // MARK: Lifecycle
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        
-        doLayout()
-    }
-    
-    @available(*, unavailable)
-    required init(coder: NSCoder) {
-        fatalError()
-    }
-    
-    private func doLayout() {
-        let stackView = UIStackView().then {
-            $0.alignment = .leading
-            $0.spacing = 8
-            $0.isUserInteractionEnabled = false
-        }
-        
-        addSubview(stackView)
-        
-        stackView.snp.makeConstraints {
-            $0.leading.top.bottom.equalToSuperview()
-        }
-
-        stackView.addStackViewItems(
-            .view(mailShareButton),
-            .view(twitterShareButton),
-            .view(facebookShareButton),
-            .view(defaultShareButton)
-        )
-    }
-    
-    // MARK: Themeable
-    
-    func applyTheme(_ theme: Theme) {
-        mailShareButton.tintColor = .white
-        twitterShareButton.tintColor = .white
-        facebookShareButton.tintColor = .white
-        defaultShareButton.tintColor = .white
     }
 }
