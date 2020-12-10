@@ -21,30 +21,30 @@ public enum TrackingType: Equatable {
     var title: String {
         switch self {
             case .trackerCountShare(let count):
-                return "\(count) trackers & ads blocked"
+                return String(format: Strings.ShieldEducation.trackerCountShareTitle, "\(count)")
             case .trackerAdWarning:
-                return "Trackers & ads blocked on this page."
+                return Strings.ShieldEducation.trackerAdWarningTitle
             case .videoAdBlock:
-                return "Ads in this video are blocked."
+                return Strings.ShieldEducation.videoAdBlockTitle
             case .trackerAdCountBlock(let count):
-                return "\(count)+ trackers &ads blocked on this page."
+                return String(format: Strings.ShieldEducation.trackerAdCountBlockTitle, "\(count)")
             case .encryptedConnectionWarning:
-                return "Your connection is now encrypted."
+                return Strings.ShieldEducation.encryptedConnectionWarningTitle
         }
     }
     
     var subTitle: String {
         switch self {
             case .trackerCountShare:
-                return "Congratulations. You're pretty special."
+                return Strings.ShieldEducation.trackerCountShareSubtitle
             case .trackerAdWarning:
-                return "Brave Shields just protected your online privacy."
+                return Strings.ShieldEducation.trackerAdWarningSubtitle
             case .videoAdBlock:
-                return "You save ~5mb with every video you watch in Brave!"
+                return Strings.ShieldEducation.videoAdBlockSubtitle
             case .trackerAdCountBlock:
-                return "Brave Shields protects your online privacy on every site."
+                return Strings.ShieldEducation.trackerAdCountBlockSubtitle
             case .encryptedConnectionWarning:
-                return "If available, Brave upgrades you to a secure connection automatically."
+                return Strings.ShieldEducation.encryptedConnectionWarningSubtitle
         }
     }
     
@@ -54,9 +54,9 @@ public enum TrackingType: Equatable {
                  .videoAdBlock,
                  .trackerAdCountBlock,
                  .encryptedConnectionWarning:
-                return "Don't show this again"
+                return Strings.ShieldEducation.educationDismissTitle
             case .trackerAdWarning:
-                return "Take a look"
+                return Strings.ShieldEducation.educationInspectTitle
         }
     }
 }
@@ -157,6 +157,13 @@ class ShareTrackersController: UIViewController, Themeable, PopoverContentCompon
 
 private class ShareTrackersView: UIView, Themeable {
     
+    // MARK: UX
+    
+    struct UX {
+        static let contentMargins: UIEdgeInsets = UIEdgeInsets(top: 32, left: 32, bottom: 32, right: 32)
+        static let actionButtonInsets: UIEdgeInsets = UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0)
+    }
+    
     // MARK: Properties
     
     private let trackingType: TrackingType
@@ -167,7 +174,7 @@ private class ShareTrackersView: UIView, Themeable {
         $0.axis = .vertical
         $0.spacing = 20
         $0.isLayoutMarginsRelativeArrangement = true
-        $0.layoutMargins = UIEdgeInsets(top: 32, left: 32, bottom: 32, right: 32)
+        $0.layoutMargins = UX.contentMargins
     }
     
     private lazy var titleLabel = UILabel().then {
@@ -183,7 +190,7 @@ private class ShareTrackersView: UIView, Themeable {
     
     private lazy var actionButton: UIButton = {
         let actionButton = InsetButton()
-        actionButton.contentEdgeInsets = UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0)
+        actionButton.contentEdgeInsets = UX.actionButtonInsets
         actionButton.layer.cornerRadius = 20
         actionButton.clipsToBounds = true
         actionButton.layer.borderWidth = 1
@@ -312,24 +319,7 @@ private class ShareTrayView: UIView, Themeable {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        let stackView = UIStackView().then {
-            $0.alignment = .leading
-            $0.spacing = 8
-            $0.isUserInteractionEnabled = false
-        }
-        
-        addSubview(stackView)
-        
-        stackView.snp.makeConstraints {
-            $0.leading.top.bottom.equalToSuperview()
-        }
-
-        stackView.addStackViewItems(
-            .view(mailShareButton),
-            .view(twitterShareButton),
-            .view(facebookShareButton),
-            .view(defaultShareButton)
-        )
+        doLayout()
     }
     
     @available(*, unavailable)

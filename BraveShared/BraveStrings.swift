@@ -827,6 +827,84 @@ extension Strings {
     }
 }
 
+// MARK: ShieldEducation
+
+extension Strings {
+    public struct ShieldEducation {
+        public static let trackerCountShareTitle =
+            NSLocalizedString("TrackerCountShareTitle",
+                              bundle: .braveShared,
+                              value: "%@ trackers & ads blocked",
+                              comment: "Title for Shield Education Tracker Count Share")
+
+        public static let trackerAdWarningTitle =
+            NSLocalizedString("TrackerAdWarningTitle",
+                              bundle: .braveShared,
+                              value: "Trackers & ads blocked on this page.",
+                              comment: "Title for Shield Education Tracker Ad Warning")
+        
+        public static let videoAdBlockTitle =
+            NSLocalizedString("videoAdBlockTitle",
+                              bundle: .braveShared,
+                              value: "Ads in this video are blocked.",
+                              comment: "Title for Shield Education Tracker Video Ad Block")
+        
+        public static let trackerAdCountBlockTitle =
+            NSLocalizedString("TrackerAdCountBlockTitle",
+                              bundle: .braveShared,
+                              value: "%@ trackers & ads blocked on this page.",
+                              comment: "Title for Shield Education Tracker Ad Count Block")
+        
+        public static let encryptedConnectionWarningTitle =
+            NSLocalizedString("RncryptedConnectionWarningTitle",
+                              bundle: .braveShared,
+                              value: "Your connection is now encrypted.",
+                              comment: "Title for Shield Education Encrypted Connection Warning")
+        
+        public static let trackerCountShareSubtitle =
+            NSLocalizedString("TrackerCountShareSubtitle",
+                              bundle: .braveShared,
+                              value: "Congratulations. You're pretty special.",
+                              comment: "Subtitle for Shield Education Tracker Count Share")
+
+        public static let trackerAdWarningSubtitle =
+            NSLocalizedString("TrackerAdWarningSubTitle",
+                              bundle: .braveShared,
+                              value: "Brave Shields just protected your online privacy.",
+                              comment: "Subtitle for Shield Education Tracker Ad Warning")
+        
+        public static let videoAdBlockSubtitle =
+            NSLocalizedString("videoAdBlockSubtitle",
+                              bundle: .braveShared,
+                              value: "You save ~5mb with every video you watch in Brave!",
+                              comment: "Subtitle for Shield Education Tracker Video Ad Block")
+        
+        public static let trackerAdCountBlockSubtitle =
+            NSLocalizedString("TrackerAdCountBlockSubtitle",
+                              bundle: .braveShared,
+                              value: "Brave Shields protects your online privacy on every site.",
+                              comment: "Subtitle for Shield Education Tracker Ad Count Block")
+        
+        public static let encryptedConnectionWarningSubtitle =
+            NSLocalizedString("EncryptedConnectionWarningSubtitle",
+                              bundle: .braveShared,
+                              value: "If available, Brave upgrades you to a secure connection automatically.",
+                              comment: "Subtitle for Shield Education Encrypted Connection Warning")
+        
+        public static let educationDismissTitle =
+            NSLocalizedString("educationDismissTitle",
+                              bundle: .braveShared,
+                              value: "Don't show this again.",
+                              comment: "Action title for dismissable Education warnings")
+        
+        public static let educationInspectTitle =
+            NSLocalizedString("educationInspectTitle",
+                              bundle: .braveShared,
+                              value: "Take a look",
+                              comment: "Action title for inspectable Education warnings")
+    }
+}
+
 // MARK: - VPN
 extension Strings {
     public struct VPN {
