@@ -10,15 +10,23 @@ import BraveUI
 
 class StatsSectionProvider: NSObject, NTPSectionProvider {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 1
+        //if (BraveVPN.isConnected){
+            return 2
+        //}
+        //return 1
     }
     
     func registerCells(to collectionView: UICollectionView) {
         collectionView.register(NewTabCollectionViewCell<BraveShieldStatsView>.self)
+        collectionView.register(NewTabCollectionViewCell<GuardianShieldStatsView>.self)
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        return collectionView.dequeueReusableCell(for: indexPath) as NewTabCollectionViewCell<BraveShieldStatsView>
+        if indexPath.row == 0{
+            return collectionView.dequeueReusableCell(for: indexPath) as NewTabCollectionViewCell<BraveShieldStatsView>
+        } else {
+            return collectionView.dequeueReusableCell(for: indexPath) as NewTabCollectionViewCell<GuardianShieldStatsView>
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -29,6 +37,110 @@ class StatsSectionProvider: NSObject, NTPSectionProvider {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         return UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
+    }
+}
+
+class GuardianShieldStatsView: UIView, Themeable {
+    func applyTheme(_ theme: Theme) {
+        styleChildren(theme: theme)
+        //ignoring theme for now
+        pageHijackerView.color = UIColor.pageHijackerPurpleSelected(true)
+        dataTrackerView.color = UIColor.dataTrackerYellowSelected(true)
+        locationTrackerView.color = UIColor.locationTrackerGreenSelected(true)
+        
+    }
+    
+    fileprivate let millisecondsPerItem: Int = 50
+    
+    private lazy var pageHijackerView: StatView = {
+        let statView = StatView(frame: CGRect.zero)
+        statView.title = "Page Hi-Jackers Blocked"
+        return statView
+    }()
+    
+    private lazy var dataTrackerView: StatView = {
+        let statView = StatView(frame: CGRect.zero)
+        statView.title = "Data Trackers Blocked"
+        return statView
+    }()
+    
+    private lazy var locationTrackerView: StatView = {
+        let statView = StatView(frame: CGRect.zero)
+        statView.title = "Location Trackers Blocked"
+        return statView
+    }()
+    
+    private lazy var stats: [StatView] = {
+        return [self.dataTrackerView, self.locationTrackerView, self.pageHijackerView]
+    }()
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        
+        for s: StatView in stats {
+            addSubview(s)
+        }
+        
+        update()
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(update), name: NSNotification.Name.alertValuesChanged, object: nil)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    override func layoutSubviews() {
+        let width: CGFloat = frame.width / CGFloat(stats.count)
+        var offset: CGFloat = 0
+        for s: StatView in stats {
+            var f: CGRect = s.frame
+            f.origin.x = offset
+            f.size = CGSize(width: width, height: frame.height)
+            s.frame = f
+            offset += width
+        }
+    }
+    
+    @objc private func update() {
+        dataTrackerView.stat = BraveVPN.alertDataTrackerCount
+        locationTrackerView.stat = BraveVPN.alertLocationTrackerCount
+        pageHijackerView.stat = BraveVPN.alertPageHijackedCount
+    }
+    
+    var timeSaved: String {
+        get {
+            let estimatedMillisecondsSaved = (BraveGlobalShieldStats.shared.adblock + BraveGlobalShieldStats.shared.trackingProtection) * millisecondsPerItem
+            let hours = estimatedMillisecondsSaved < 1000 * 60 * 60 * 24
+            let minutes = estimatedMillisecondsSaved < 1000 * 60 * 60
+            let seconds = estimatedMillisecondsSaved < 1000 * 60
+            var counter: Double = 0
+            var text = ""
+            
+            if seconds {
+                counter = ceil(Double(estimatedMillisecondsSaved / 1000))
+                text = Strings.shieldsTimeStatsSeconds
+            } else if minutes {
+                counter = ceil(Double(estimatedMillisecondsSaved / 1000 / 60))
+                text = Strings.shieldsTimeStatsMinutes
+            } else if hours {
+                counter = ceil(Double(estimatedMillisecondsSaved / 1000 / 60 / 60))
+                text = Strings.shieldsTimeStatsHour
+            } else {
+                counter = ceil(Double(estimatedMillisecondsSaved / 1000 / 60 / 60 / 24))
+                text = Strings.shieldsTimeStatsDays
+            }
+            
+            if let counterLocaleStr = Int(counter).decimalFormattedString {
+                return counterLocaleStr + text
+            } else {
+                return "0" + Strings.shieldsTimeStatsSeconds     // If decimalFormattedString returns nil, default to "0s"
+            }
+        }
     }
 }
 
@@ -104,7 +216,6 @@ class BraveShieldStatsView: UIView, Themeable {
         httpsStatView.stat = BraveGlobalShieldStats.shared.httpse.kFormattedNumber
         timeStatView.stat = timeSaved
     }
-    
     var timeSaved: String {
         get {
             let estimatedMillisecondsSaved = (BraveGlobalShieldStats.shared.adblock + BraveGlobalShieldStats.shared.trackingProtection) * millisecondsPerItem

@@ -26,5 +26,5 @@
 #import "GRDVPNHelper.h"
 #import "VPNConstants.h"
 #import "GRDSubscriberCredential.h"
-
+#import "UIColor+Additions.h"
 #endif

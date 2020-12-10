@@ -97,6 +97,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// @param completion De-Serialized JSON from the server containing an array with all alerts
 - (void)getEvents:(void (^)(NSDictionary *response, BOOL success, NSString *error))completion;
 
+- (void)getAlertTotals:(void (^)(NSDictionary * _Nullable, BOOL, NSString * _Nullable))completion;
 @end
 
 NS_ASSUME_NONNULL_END

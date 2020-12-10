@@ -722,7 +722,9 @@ class BrowserViewController: UIViewController {
         
         vpnProductInfo.load()
         BraveVPN.initialize()
-        
+        if BraveVPN.isConnected { //FIXME: probably want to do this in more scenarios and more frequently
+            BraveVPN.fetchAlertCounts(completion: nil)
+        }
         //We stop ever attempting migration after 3 times.
         if Preferences.Chromium.syncV2BookmarksMigrationCount.value < 3 {
             self.migrateToChromiumBookmarks { success in

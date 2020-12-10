@@ -176,7 +176,7 @@ class RewardsDebugSettingsViewController: TableViewController {
                 header: .title("Legacy Wallet"),
                 rows: [
                     Row(text: "Internals", selection: { [unowned self] in
-                        guard let legacyWallet = legacyWallet else {
+                        guard let legacyWallet = self.legacyWallet else {
                             let alert = UIAlertController(title: "Legacy Wallet", message: "No Wallet Found. Use \"Create Legacy Wallet\" action below to duplicate the current wallet", preferredStyle: .alert)
                             alert.addAction(.init(title: "OK", style: .default, handler: nil))
                             self.present(alert, animated: true)

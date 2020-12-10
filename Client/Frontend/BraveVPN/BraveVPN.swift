@@ -164,6 +164,22 @@ class BraveVPN {
         UserDefaults.standard.string(forKey: kGRDHostnameOverride)
     }
     
+    static var alertDataTrackerCount: String {
+        UserDefaults.standard.string(forKey: kAppAlertsDataTrackerCount) ?? "0"
+    }
+    
+    static var alertLocationTrackerCount: String {
+        UserDefaults.standard.string(forKey: kAppAlertsLocationTrackerCount) ?? "0"
+    }
+    
+    static var alertMailTrackerCount: String {
+        UserDefaults.standard.string(forKey: kAppAlertMailTrackerCount) ?? "0"
+    }
+    
+    static var alertPageHijackedCount: String {
+        UserDefaults.standard.string(forKey: kAppAlertPageHijackerCount) ?? "0"
+    }
+    
     /// Whether the vpn subscription has expired.
     /// Returns nil if there has been no subscription yet (user never bought the vpn).
     static var hasExpired: Bool? {
@@ -219,6 +235,7 @@ class BraveVPN {
         let credential = GRDSubscriberCredential(subscriberCredential: credentialString)
         
         let tokenExpirationDate = Date(timeIntervalSince1970: TimeInterval(credential.tokenExpirationDate))
+        
         
         if Date() > tokenExpirationDate {
             guard let host = hostname else {
@@ -315,6 +332,17 @@ class BraveVPN {
             createNewSubscriberCredential(for: host) { status in
                 firstTimeUserConfigPending = false
                 completion?(status)
+            }
+            
+        }
+    }
+    
+    static func fetchAlertCounts(completion: (([AnyHashable: Any]?) -> Void)?) {
+        GRDGatewayAPI.shared().getAlertTotals { (counts, success, error) in
+            if success == true {
+                completion?(counts)
+            } else {
+                completion?(nil)
             }
         }
     }
