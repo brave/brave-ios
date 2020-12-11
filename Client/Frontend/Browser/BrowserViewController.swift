@@ -2862,7 +2862,7 @@ extension BrowserViewController: WKUIDelegate {
             return
         }
         promptingTab.alertShownCount += 1
-        var suppressBlock: JSAlertInfo.SuppressHandler = {[unowned self] suppress in
+        let suppressBlock: JSAlertInfo.SuppressHandler = {[unowned self] suppress in
             if suppress {
                 func suppressDialogues(_: UIAlertAction) {
                     self.suppressJSAlerts(webView: webView)
@@ -3011,6 +3011,54 @@ extension BrowserViewController: WKUIDelegate {
                 }
             
                 actions.append(linkPreviewAction)
+                
+                guard let contextHelper = currentTab.getContentScript(name: ContextMenuHelper.name()) as? ContextMenuHelper,
+                let elements = contextHelper.elements else { return nil }
+                
+                if let url = elements.image {
+                    actions.append(UIAction(title: Strings.saveImageActionTitle, identifier: UIAction.Identifier("linkContextMenu.saveImage")) { _ in
+                        self.getData(url) { [weak self] data in
+                            guard let self = self,
+                                  let image = data.isGIF ? UIImage.imageFromGIFDataThreadSafe(data) : UIImage.imageFromDataThreadSafe(data) else { return }
+
+                            UIImageWriteToSavedPhotosAlbum(image, self, #selector(self.image(image:didFinishSavingwithError:contextInfo:)), nil)
+                        }
+                    })
+
+                    actions.append(UIAction(title: Strings.copyImageActionTitle, identifier: UIAction.Identifier("linkContextMenu.copyImage")) { _ in
+                        // put the actual image on the clipboard
+                        // do this asynchronously just in case we're in a low bandwidth situation
+                        let pasteboard = UIPasteboard.general
+                        pasteboard.url = url as URL
+                        let changeCount = pasteboard.changeCount
+                        let application = UIApplication.shared
+                        var taskId: UIBackgroundTaskIdentifier = UIBackgroundTaskIdentifier(rawValue: 0)
+                        taskId = application.beginBackgroundTask(expirationHandler: {
+                            application.endBackgroundTask(taskId)
+                        })
+
+                        URLSession(configuration: .default, delegate: nil, delegateQueue: .main).dataTask(with: url, completionHandler: { data, response, error in
+                            if let response = response as? HTTPURLResponse {
+                                if !(200..<300).contains(response.statusCode) {
+                                    return application.endBackgroundTask(taskId)
+                                }
+                            }
+                                                    
+                            // Only set the image onto the pasteboard if the pasteboard hasn't changed since
+                            // fetching the image; otherwise, in low-bandwidth situations,
+                            // we might be overwriting something that the user has subsequently added.
+                            if changeCount == pasteboard.changeCount, let imageData = data, error == nil {
+                                pasteboard.addImageWithData(imageData, forURL: url)
+                            }
+                            
+                            application.endBackgroundTask(taskId)
+                        }).resume()
+                    })
+
+                    actions.append(UIAction(title: Strings.copyImageActionTitle, identifier: UIAction.Identifier("linkContextMenu.copyImageLink")) { _ in
+                        UIPasteboard.general.url = url as URL
+                    })
+                }
             }
             
             return UIMenu(title: url.absoluteString.truncate(length: 100), children: actions)
@@ -3162,7 +3210,7 @@ extension BrowserViewController: ContextMenuHelperDelegate {
                 let changeCount = pasteboard.changeCount
                 let application = UIApplication.shared
                 var taskId: UIBackgroundTaskIdentifier = UIBackgroundTaskIdentifier(rawValue: 0)
-                taskId = application.beginBackgroundTask (expirationHandler: {
+                taskId = application.beginBackgroundTask(expirationHandler: {
                     application.endBackgroundTask(taskId)
                 })
                 
