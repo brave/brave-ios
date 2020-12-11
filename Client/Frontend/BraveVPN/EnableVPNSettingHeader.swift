@@ -66,7 +66,7 @@ class EnableVPNSettingHeader: UIView {
         $0.backgroundColor = BraveVPNCommonUI.UX.purpleBackgroundColor
     }
     
-    private let backgroundImage = UIImageView(image: #imageLiteral(resourceName: "enable_vpn_settings_banner")).then { //#imageLiteral(resourceName: "enable_vpn_settings_banner")
+    private let backgroundImage = UIImageView(image: #imageLiteral(resourceName: "enable_vpn_settings_banner")).then {
         $0.contentMode = .scaleAspectFill
     }
     
