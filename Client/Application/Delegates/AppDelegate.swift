@@ -304,6 +304,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
             // To avoid unexpected problems we clear all vpn keychain items.
             // New set of keychain items will be created on purchase or iap restoration.
             BraveVPN.clearCredentials()
+            
         }
         
         if let urp = UserReferralProgram.shared {

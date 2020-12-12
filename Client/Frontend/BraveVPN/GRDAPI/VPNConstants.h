@@ -17,4 +17,11 @@ extern NSString *const kIsPremiumUser;
 extern NSString *const kGuardianSuccessfulSubscription;
 extern NSString *const kGRDHostnameOverride;
 
+// MARK: - Alerts defaults
+extern NSString *const kAppAlertsDataTrackerCount;
+extern NSString *const kAppAlertsLocationTrackerCount;
+extern NSString *const kAppAlertPageHijackerCount;
+extern NSString *const kAppAlertMailTrackerCount;
+extern NSString *const kAlertValuesChangedNotification;
+
 #endif /* VPNConstants_h */

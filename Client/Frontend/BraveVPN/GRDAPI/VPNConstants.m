@@ -16,3 +16,9 @@ NSString *const kIsPremiumUser = @"kIsPremiumUser";
 NSString *const kGuardianSuccessfulSubscription = @"kGuardianSuccessfulSubscription";
 NSString *const kGRDHostnameOverride = @"kGRDHostnameOverride";
 
+// MARK: Alert defaults
+NSString *const kAppAlertsDataTrackerCount = @"kAppAlertsDataTrackerCount";
+NSString *const kAppAlertsLocationTrackerCount = @"kAppAlertsLocationTrackerCount";
+NSString *const kAppAlertPageHijackerCount = @"kAppAlertPageHijackerCount";
+NSString *const kAppAlertMailTrackerCount = @"kAppAlertMailTrackerCount";
+NSString *const kAlertValuesChangedNotification = @"kAlertValuesChangedNotification";

@@ -360,6 +360,57 @@
     return [NSArray arrayWithArray:fakeAlerts];
 }
 
+- (void)getAlertTotals:(void (^)(NSDictionary * _Nullable, BOOL, NSString * _Nullable))completion {
+    if ([self _canMakeApiRequests] == NO) {
+        NSLog(@"Cannot make API requests !!! won't continue");
+        if (completion) completion(nil, NO, @"cant make API requests");
+        return;
+    }
+    
+    if (!deviceIdentifier) {
+        if (completion) completion(nil, NO, @"An error occured!, Missing device id!");
+        return;
+    }
+    
+    NSString *apiEndpoint = [NSString stringWithFormat:@"/api/v1.1/device/%@/alert-totals", deviceIdentifier];
+    NSString *finalHost = [NSString stringWithFormat:@"https://%@%@", [self _baseHostname], apiEndpoint];
+    
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL: [NSURL URLWithString:finalHost]];
+    NSDictionary *jsonDict = @{kKeychainStr_APIAuthToken:apiAuthToken};
+    [request setHTTPBody:[NSJSONSerialization dataWithJSONObject:jsonDict options:0 error:nil]];
+    [request setHTTPMethod:@"POST"];
+    
+    NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+        if (error != nil) {
+            NSLog(@"Failed to send request: %@", [error localizedDescription]);
+            if (completion) completion(nil, NO, [NSString stringWithFormat:@"Failed to send request: %@", [error localizedDescription]]);
+            return;
+        }
+        
+        NSInteger statusCode = [(NSHTTPURLResponse *)response statusCode];
+        if (statusCode == 500) {
+            NSLog(@"Failed to get alert totals: Internal Server Error!");
+            if (completion) completion(nil, NO, @"Failed to get alert totals. Internal Server Error");
+            return;
+            
+        } else if (statusCode == 400) {
+            NSLog(@"Failed to get alert totals: Bad request");
+            if (completion) completion(nil, NO, @"Failed to get alert totals: Malformed request!");
+            return;
+            
+        } else if (statusCode == 200) {
+            NSDictionary *alertTotals = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+            if (completion) completion(alertTotals, YES, nil);
+            return;
+            
+        } else {
+            NSLog(@"Unknown server error. Status code: %ld", statusCode);
+            if (completion) completion(nil, NO, [NSString stringWithFormat:@"Unknown server error. Status code: %ld", statusCode]);
+        }
+    }];
+    [task resume];
+}
+
 - (void)getEvents:(void(^)(NSDictionary *response, BOOL success, NSString *error))completion {
     if (self.dummyDataForDebugging == NO) {
         if ([self _canMakeApiRequests] == NO) {
@@ -412,6 +463,14 @@
                     NSLog(@"Failed to decode JSON with alerts: %@", jsonError);
                     if (completion) completion(nil, NO, @"Failed to decode JSON");
                 } else {
+                
+                    NSDictionary *alertTotals = dictFromJSON[@"alertTotals"];
+                    NSUserDefaults *def = [NSUserDefaults standardUserDefaults];
+                    [def setObject:alertTotals[@"page-hijacker-total"] forKey:kAppAlertPageHijackerCount];
+                    [def setObject:alertTotals[@"data-tracker-total"] forKey:kAppAlertsDataTrackerCount];
+                    [def setObject:alertTotals[@"location-tracker-total"] forKey:kAppAlertsLocationTrackerCount];
+                    [def setObject:alertTotals[@"mail-tracker-total"] forKey:kAppAlertMailTrackerCount];
+                    [[NSNotificationCenter defaultCenter] postNotificationName:kAlertValuesChangedNotification object:nil];
                     if (completion) completion(dictFromJSON, YES, nil);
                 }
                 return;
