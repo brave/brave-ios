@@ -41,6 +41,12 @@ enum TabSecureContentState {
     case unknown
 }
 
+enum TabProductNotificationType {
+    case privacyProtected
+    case videoAdsBlocked
+    case httpsUpgrade
+}
+
 class Tab: NSObject {
     var id: String?
     
@@ -95,6 +101,8 @@ class Tab: NSObject {
             }
         }
     }
+    
+    var notificationTypeList = [TabProductNotificationType]()
     
     private func deleteNewTabPageController() {
         guard let controller = newTabPageViewController, controller.parent != nil else { return }

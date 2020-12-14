@@ -146,6 +146,9 @@ class BrowserViewController: UIViewController {
     private(set) var publisher: PublisherInfo?
     
     let vpnProductInfo = VPNProductInfo()
+    
+    /// Tracking If a product notification is presented in order to not to try to present another one over existing popover
+    var benchmarkNotificationPresented: Bool
 
     init(profile: Profile, tabManager: TabManager, crashedLastSession: Bool,
          safeBrowsingManager: SafeBrowsing? = SafeBrowsing()) {
@@ -214,6 +217,8 @@ class BrowserViewController: UIViewController {
         rewardsObserver = LedgerObserver(ledger: rewards.ledger)
         deviceCheckClient = DeviceCheckClient(environment: configuration.environment)
 
+        benchmarkNotificationPresented = false
+        
         super.init(nibName: nil, bundle: nil)
         didInit()
         
@@ -611,7 +616,8 @@ class BrowserViewController: UIViewController {
                            name: .adsOrRewardsToggledInSettings, object: nil)
             $0.addObserver(self, selector: #selector(vpnConfigChanged),
                            name: .NEVPNConfigurationChange, object: nil)
-            
+            $0.addObserver(self, selector: #selector(presentEducationalProductNotifications),
+                           name: NSNotification.Name(rawValue: BraveGlobalShieldStats.didUpdateNotification), object: nil)
         }
         
         KeyboardHelper.defaultHelper.addDelegate(self)

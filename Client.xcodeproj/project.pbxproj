@@ -414,6 +414,7 @@
 		2F44FCC71A9E8CF500FD20CC /* SearchSettingsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F44FCC61A9E8CF500FD20CC /* SearchSettingsTableViewController.swift */; };
 		2F44FCCB1A9E972E00FD20CC /* SearchEnginePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F44FCCA1A9E972E00FD20CC /* SearchEnginePicker.swift */; };
 		2F697F7E1A9FD22D009E03AE /* SearchEnginesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F697F7D1A9FD22D009E03AE /* SearchEnginesTests.swift */; };
+		2FB9C2A12587E742009DA1FE /* BrowserViewController+ProductNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FB9C2A02587E742009DA1FE /* BrowserViewController+ProductNotification.swift */; };
 		2FCAE2251ABB51F800877008 /* Storage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2FCAE21A1ABB51F800877008 /* Storage.framework */; };
 		2FCAE2311ABB51F800877008 /* Storage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2FCAE21A1ABB51F800877008 /* Storage.framework */; };
 		2FCAE25D1ABB531100877008 /* Bookmarks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FCAE23F1ABB531100877008 /* Bookmarks.swift */; };
@@ -1668,6 +1669,7 @@
 		2F44FCC61A9E8CF500FD20CC /* SearchSettingsTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchSettingsTableViewController.swift; sourceTree = "<group>"; };
 		2F44FCCA1A9E972E00FD20CC /* SearchEnginePicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchEnginePicker.swift; sourceTree = "<group>"; };
 		2F697F7D1A9FD22D009E03AE /* SearchEnginesTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchEnginesTests.swift; sourceTree = "<group>"; };
+		2FB9C2A02587E742009DA1FE /* BrowserViewController+ProductNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowserViewController+ProductNotification.swift"; sourceTree = "<group>"; };
 		2FCAE21A1ABB51F800877008 /* Storage.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Storage.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2FCAE2241ABB51F800877008 /* StorageTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StorageTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2FCAE22C1ABB51F800877008 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -4203,6 +4205,7 @@
 				D0C95EF5201A55A800E4E51C /* BrowserViewController+UIDropInteractionDelegate.swift */,
 				C8F457A71F1FD75A000CB895 /* BrowserViewController+WKNavigationDelegate.swift */,
 				2F098F8A255F2D730084FB37 /* BrowserViewController+ReaderMode.swift */,
+				2FB9C2A02587E742009DA1FE /* BrowserViewController+ProductNotification.swift */,
 				0A91598822B834CE00CCC119 /* BVC+Rewards.swift */,
 			);
 			path = BrowserViewController;
@@ -6444,6 +6447,7 @@
 				5E9B28EB255047C80072E655 /* BookmarkModelStateObserver.swift in Sources */,
 				4422D55521BFFB7E00BF1855 /* nfa.cc in Sources */,
 				E663D5781BB341C4001EF30E /* ToggleButton.swift in Sources */,
+				2FB9C2A12587E742009DA1FE /* BrowserViewController+ProductNotification.swift in Sources */,
 				0AD9F88122F049E5008B4D95 /* AdblockRustEngine.swift in Sources */,
 				0A39FE992486604D00290ABC /* GRDGatewayAPI.m in Sources */,
 				0A1DF48424487AA000541FE4 /* GRDGatewayAPIResponse.m in Sources */,
