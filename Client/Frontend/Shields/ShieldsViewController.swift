@@ -315,6 +315,21 @@ class ShieldsViewController: UIViewController, PopoverContentComponent, Themeabl
         shareShieldsController.applyTheme(Theme.of(tab))
         shareShieldsController.preferredContentSize = preferredContentSize
         
+        shareShieldsController.actionHandler = { [weak self] action in
+                guard let self = self else { return }
+        
+                switch action {
+                    case .shareEmailClicked:
+                        self.shareTrackersAndAdsWithEmail()
+                    case .shareTwitterClicked:
+                        self.shareTrackersAndAdsWithTwitter()
+                    case .shareFacebookClicked:
+                        self.shareTrackersAndAdsWithFacebook()
+                    case .shareDefaultClicked:
+                        self.shareTrackersAndAdsWithDefault()
+                }
+        }
+        
         navigationController?.pushViewController(shareShieldsController, animated: true)
     }
     
@@ -344,5 +359,31 @@ class ShieldsViewController: UIViewController, PopoverContentComponent, Themeabl
     @available(*, unavailable)
     required init?(coder aDecoder: NSCoder) {
         fatalError()
+    }
+    
+    // MARK: Share Actions
+    
+    func shareTrackersAndAdsWithEmail() {
+        dismiss(animated: true) {
+            // TODO: Share with Email
+        }
+    }
+    
+    func shareTrackersAndAdsWithTwitter() {
+        dismiss(animated: true) {
+            // TODO: Share with Twitter
+        }
+    }
+    
+    func shareTrackersAndAdsWithFacebook() {
+        dismiss(animated: true) {
+            // TODO: Share with Facebook
+        }
+    }
+    
+    func shareTrackersAndAdsWithDefault() {
+        dismiss(animated: true) {
+            // TODO: Share with Default
+        }
     }
 }

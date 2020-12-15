@@ -11,6 +11,8 @@ import Shared
 
 extension BrowserViewController {
     
+    // MARK: BenchmarkTrackerCountTier
+    
     enum BenchmarkTrackerCountTier: Int, Equatable, CaseIterable {
         case specialTier = 1000
         case newbieExclusive = 5000
@@ -63,22 +65,24 @@ extension BrowserViewController {
         }
     }
     
+    // MARK: Internal
+    
     @objc func presentEducationalProductNotifications() {
-        guard let selectedTab = tabManager.selectedTab, benchmarkNotificationPresented else { return }
+        guard let selectedTab = tabManager.selectedTab, !benchmarkNotificationPresented else { return }
         
         let todayInSeconds = Date().timeIntervalSince1970
         let checkDate = Preferences.ProductNotificationBenchmarks.ongoingEducationCheckDate.value
         let isProductNotificationsValid = todayInSeconds <= checkDate
         
         var notificationShown = false
-        let contentBlockerStats = ContentBlockerHelper(tab: selectedTab).stats
+        let contentBlockerStats = selectedTab.contentBlocker.stats
 
         // Step 1: First Time Block Notification
         if isProductNotificationsValid,
            !Preferences.ProductNotificationBenchmarks.firstTimeBlockingShown.value,
            contentBlockerStats.total > 0 {
             
-            notifyFirstTimeBlock(selectedTab: selectedTab)
+            notifyFirstTimeBlock(theme: Theme.of(selectedTab))
             
             Preferences.ProductNotificationBenchmarks.firstTimeBlockingShown.value = true
             Preferences.ProductNotificationBenchmarks.ongoingEducationCheckDate.value = Date().timeIntervalSince1970 + 7.days
@@ -89,13 +93,14 @@ extension BrowserViewController {
         // Step 2: Load a video on a streaming site
         guard !notificationShown else { return }
 
+        let isVideoStreamingSite = (selectedTab.canonicalURL?.absoluteString.contains("youtube") == true
+                                        || selectedTab.canonicalURL?.absoluteString.contains("vimeo") == true)
+            
         if isProductNotificationsValid,
-           !selectedTab.notificationTypeList.contains(.videoAdsBlocked),
-           selectedTab.canonicalURL?.absoluteString.contains("youtube") == true {
+           !Preferences.ProductNotificationBenchmarks.videoAdBlockShown.value,
+           isVideoStreamingSite {
             
-            notifyVideoAdsBlocked(selectedTab: selectedTab)
-            
-            selectedTab.notificationTypeList.append(.videoAdsBlocked)
+            notifyVideoAdsBlocked(theme: Theme.of(selectedTab))
             notificationShown = true
         }
         
@@ -103,12 +108,10 @@ extension BrowserViewController {
         guard !notificationShown else { return }
 
         if isProductNotificationsValid,
-           !selectedTab.notificationTypeList.contains(.videoAdsBlocked),
+           !Preferences.ProductNotificationBenchmarks.privacyProtectionBlockShown.value,
            contentBlockerStats.total > benchmarkNumberOfTrackers {
             
-            notifyPrivacyProtectBlock(selectedTab: selectedTab)
-            
-            selectedTab.notificationTypeList.append(.videoAdsBlocked)
+            notifyPrivacyProtectBlock(theme: Theme.of(selectedTab))
             notificationShown = true
         }
         
@@ -116,12 +119,10 @@ extension BrowserViewController {
         guard !notificationShown else { return }
 
         if isProductNotificationsValid,
-           !selectedTab.notificationTypeList.contains(.httpsUpgrade),
+           !Preferences.ProductNotificationBenchmarks.httpsUpgradeShown.value,
            contentBlockerStats.httpsCount > 0 {
             
-            notifyHttpsUpgrade(selectedTab: selectedTab)
-            
-            selectedTab.notificationTypeList.append(.httpsUpgrade)
+            notifyHttpsUpgrade(theme: Theme.of(selectedTab))
             notificationShown = true
         }
         
@@ -142,15 +143,15 @@ extension BrowserViewController {
                     Preferences.ProductNotificationBenchmarks.allTiersShown.value = true
                 }
                     
-                notifyTrackerAdsCount(tier.rawValue, selectedTab: selectedTab)
+                notifyTrackerAdsCount(tier.rawValue, theme: Theme.of(selectedTab))
                 
                 break
             }
         }
     }
     
-    private func notifyFirstTimeBlock(selectedTab: Tab) {
-        let shareTrackersViewController = ShareTrackersController(tab: selectedTab, trackingType: .trackerAdWarning)
+    private func notifyFirstTimeBlock(theme: Theme) {
+        let shareTrackersViewController = ShareTrackersController(theme: theme, trackingType: .trackerAdWarning)
         
         shareTrackersViewController.actionHandler = { [weak self] action in
             guard let self = self else { return }
@@ -166,15 +167,17 @@ extension BrowserViewController {
         showBenchmarkNotificationPopover(controller: shareTrackersViewController)
     }
     
-    private func notifyVideoAdsBlocked(selectedTab: Tab) {
-        let shareTrackersViewController = ShareTrackersController(tab: selectedTab, trackingType: .videoAdBlock)
+    private func notifyVideoAdsBlocked(theme: Theme) {
+        let shareTrackersViewController = ShareTrackersController(theme: theme, trackingType: .videoAdBlock)
         
         shareTrackersViewController.actionHandler = { [weak self] action in
             guard let self = self else { return }
             
+            self.benchmarkNotificationPresented = false
+
             switch action {
                 case .dontShowAgainTapped:
-                    self.showShieldsScreen()
+                    self.dismissAndAddNoShowList(.videoAdBlock)
                 default:
                     break
             }
@@ -183,12 +186,14 @@ extension BrowserViewController {
         showBenchmarkNotificationPopover(controller: shareTrackersViewController)
     }
     
-    private func notifyPrivacyProtectBlock(selectedTab: Tab) {
-        let shareTrackersViewController = ShareTrackersController(tab: selectedTab, trackingType: .trackerAdCountBlock(count: benchmarkNumberOfTrackers))
+    private func notifyPrivacyProtectBlock(theme: Theme) {
+        let shareTrackersViewController = ShareTrackersController(theme: theme, trackingType: .trackerAdCountBlock(count: benchmarkNumberOfTrackers))
         
         shareTrackersViewController.actionHandler = { [weak self] action in
             guard let self = self else { return }
             
+            self.benchmarkNotificationPresented = false
+
             switch action {
                 case .dontShowAgainTapped:
                     self.dismissAndAddNoShowList(.trackerAdCountBlock(count: self.benchmarkNumberOfTrackers))
@@ -200,12 +205,14 @@ extension BrowserViewController {
         showBenchmarkNotificationPopover(controller: shareTrackersViewController)
     }
     
-    private func notifyHttpsUpgrade(selectedTab: Tab) {
-        let shareTrackersViewController = ShareTrackersController(tab: selectedTab, trackingType: .encryptedConnectionWarning)
+    private func notifyHttpsUpgrade(theme: Theme) {
+        let shareTrackersViewController = ShareTrackersController(theme: theme, trackingType: .encryptedConnectionWarning)
         
         shareTrackersViewController.actionHandler = { [weak self] action in
             guard let self = self else { return }
             
+            self.benchmarkNotificationPresented = false
+
             switch action {
                 case .dontShowAgainTapped:
                     self.dismissAndAddNoShowList(.encryptedConnectionWarning)
@@ -217,11 +224,13 @@ extension BrowserViewController {
         showBenchmarkNotificationPopover(controller: shareTrackersViewController)
     }
     
-    private func notifyTrackerAdsCount(_ count: Int, selectedTab: Tab) {
-        let shareTrackersViewController = ShareTrackersController(tab: selectedTab, trackingType: .trackerCountShare(count: count))
+    private func notifyTrackerAdsCount(_ count: Int, theme: Theme) {
+        let shareTrackersViewController = ShareTrackersController(theme: theme, trackingType: .trackerCountShare(count: count))
         
         shareTrackersViewController.actionHandler = { [weak self] action in
             guard let self = self else { return }
+            
+            self.benchmarkNotificationPresented = false
             
             switch action {
                 case .shareEmailTapped:
@@ -256,26 +265,59 @@ extension BrowserViewController {
     // MARK: Actions
     
     func showShieldsScreen() {
-        // TODO: Show Brave Shields Detail Screen
+        benchmarkNotificationPresented = false
+
+        dismiss(animated: true) {
+            self.presentBraveShieldsViewController()
+        }
     }
     
     func dismissAndAddNoShowList(_ type: TrackingType) {
-        // TODO: Dismiss and do not show that kind of notification
+        benchmarkNotificationPresented = false
+        
+        dismiss(animated: true) {
+            switch type {
+                case .videoAdBlock:
+                    Preferences.ProductNotificationBenchmarks.videoAdBlockShown.value = true
+                case .trackerAdCountBlock(count: _):
+                    Preferences.ProductNotificationBenchmarks.privacyProtectionBlockShown.value = true
+                case .encryptedConnectionWarning:
+                    Preferences.ProductNotificationBenchmarks.httpsUpgradeShown.value = true
+                default:
+                    break
+            }
+        }
     }
     
     func shareTrackersAndAdsWithEmail(_ count: Int) {
-        // TODO: Share with Email
+        benchmarkNotificationPresented = false
+
+        dismiss(animated: true) {
+            // TODO: Share with Email
+        }
     }
     
     func shareTrackersAndAdsWithTwitter(_ count: Int) {
-        // TODO: Share with Twitter
+        benchmarkNotificationPresented = false
+
+        dismiss(animated: true) {
+            // TODO: Share with Twitter
+        }
     }
     
     func shareTrackersAndAdsWithFacebook(_ count: Int) {
-        // TODO: Share with Facebook
+        benchmarkNotificationPresented = false
+
+        dismiss(animated: true) {
+            // TODO: Share with Facebook
+        }
     }
     
     func shareTrackersAndAdsWithDefault(_ count: Int) {
-        // TODO: Share with Default
+        benchmarkNotificationPresented = false
+
+        dismiss(animated: true) {
+            // TODO: Share with Default
+        }
     }
 }
