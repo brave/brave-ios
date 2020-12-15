@@ -24,7 +24,7 @@ class ShareShieldsViewController: UIViewController, Themeable {
     // MARK: UX
     
     private struct UX {
-        static let defaultInset: UIEdgeInsets = UIEdgeInsets(top: 19, left: 19, bottom: 19, right: 19)
+        static let defaultInset = UIEdgeInsets(top: 19, left: 19, bottom: 19, right: 19)
         static let contentSizeChange: CGFloat = 64
     }
     
@@ -58,7 +58,7 @@ class ShareShieldsViewController: UIViewController, Themeable {
         super.viewDidLoad()
         title = Strings.Share.shareScreenTitle
     
-        doLayout()
+        doLayoutAndAddGestureRecognizers()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -88,7 +88,7 @@ class ShareShieldsViewController: UIViewController, Themeable {
     
     // MARK: Internal
     
-    private func doLayout() {
+    private func doLayoutAndAddGestureRecognizers() {
         let shareTypeViewEmail = ShareTypeView(type: .email)
         let shareEmailGesture = UITapGestureRecognizer(target: self, action: #selector(shareEmailClicked))
         shareTypeViewEmail.addGestureRecognizer(shareEmailGesture)
@@ -249,7 +249,7 @@ private class ShareTypeView: UIView, Themeable {
         if shareType != .default {
             titleImageView.snp.makeConstraints {
                 $0.width.equalTo(UX.iconSize)
-                $0.width.equalTo(titleImageView.snp.height)
+                $0.height.equalTo(UX.iconSize)
                 $0.trailing.equalTo(titleLabel.snp.leading).offset(-UX.defaultOffsetInset)
                 $0.top.equalTo(contentView.snp.top)
                 $0.bottom.equalTo(titleLabel.snp.bottom)
@@ -263,12 +263,12 @@ private class ShareTypeView: UIView, Themeable {
             $0.centerX.equalToSuperview().offset(labelOffset)
             $0.bottom.equalToSuperview()
         }
+        
+        layer.cornerRadius = 6
+        layer.masksToBounds = true
     }
     
     private func setContent() {
-        layer.cornerRadius = 6
-        layer.masksToBounds = true
-        
         titleLabel.text = shareType.title
         titleImageView.image = shareType.icon
     }
