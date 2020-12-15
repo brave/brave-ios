@@ -311,7 +311,7 @@ class ShieldsViewController: UIViewController, PopoverContentComponent, Themeabl
     }
     
     @objc private func tappedShareShieldsButton() {
-        let shareShieldsController = ShareShieldsViewController(tab: tab)
+        let shareShieldsController = ShareShieldsViewController(theme: Theme.of(tab))
         shareShieldsController.applyTheme(Theme.of(tab))
         shareShieldsController.preferredContentSize = preferredContentSize
         

@@ -78,7 +78,7 @@ class ShareTrackersController: UIViewController, Themeable, PopoverContentCompon
     
     // MARK: Properties
     
-    private let tab: Tab
+    private let theme: Theme
     private let trackingType: TrackingType
     
     private let shareTrackersView: ShareTrackersView
@@ -93,8 +93,8 @@ class ShareTrackersController: UIViewController, Themeable, PopoverContentCompon
 
     // MARK: Lifecycle
     
-    init(tab: Tab, trackingType: TrackingType) {
-        self.tab = tab
+    init(theme: Theme, trackingType: TrackingType) {
+        self.theme = theme
         self.trackingType = trackingType
         shareTrackersView = ShareTrackersView(trackingType: trackingType)
         
@@ -138,7 +138,7 @@ class ShareTrackersController: UIViewController, Themeable, PopoverContentCompon
             }
         }
         
-        applyTheme(Theme.of(tab))
+        applyTheme(theme)
         doLayout()
     }
     

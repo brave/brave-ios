@@ -79,7 +79,7 @@ class ShareTrayView: UIView, Themeable {
         addSubview(stackView)
         
         stackView.snp.makeConstraints {
-            $0.leading.top.bottom.equalToSuperview()
+            $0.edges.equalToSuperview()
         }
 
         stackView.addStackViewItems(
