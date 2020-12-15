@@ -30,7 +30,7 @@ class ShareShieldsViewController: UIViewController, Themeable {
     
     // MARK: Properties
     
-    private let tab: Tab
+    private let theme: Theme
 
     private let contentStackView = UIStackView().then {
         $0.axis = .vertical
@@ -44,8 +44,8 @@ class ShareShieldsViewController: UIViewController, Themeable {
     
     // MARK: Lifecycle
     
-    init(tab: Tab) {
-        self.tab = tab
+    init(theme: Theme) {
+        self.theme = theme
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -81,7 +81,7 @@ class ShareShieldsViewController: UIViewController, Themeable {
         
         if #available(iOS 13.0, *) {
             if traitCollection.userInterfaceStyle != previousTraitCollection?.userInterfaceStyle {
-                applyTheme(Theme.of(tab))
+                applyTheme(theme)
             }
         }
     }

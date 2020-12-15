@@ -1,8 +1,19 @@
 {
   "images" : [
     {
-      "filename" : "share-bubble-facebook.pdf",
-      "idiom" : "universal"
+      "filename" : "share-bubble-facebook.png",
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
+      "filename" : "share-bubble-facebook@2x.png",
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "filename" : "share-bubble-facebook@3x.png",
+      "idiom" : "universal",
+      "scale" : "3x"
     }
   ],
   "info" : {
