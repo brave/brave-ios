@@ -149,6 +149,7 @@ class BrowserViewController: UIViewController {
     
     /// Tracking If a product notification is presented in order to not to try to present another one over existing popover
     var benchmarkNotificationPresented: Bool
+    var benchmarkNumberOfTrackers: Int = 20
 
     init(profile: Profile, tabManager: TabManager, crashedLastSession: Bool,
          safeBrowsingManager: SafeBrowsing? = SafeBrowsing()) {

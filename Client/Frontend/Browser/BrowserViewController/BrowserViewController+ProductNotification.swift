@@ -66,23 +66,47 @@ extension BrowserViewController {
     @objc func presentEducationalProductNotifications() {
         guard let selectedTab = tabManager.selectedTab, benchmarkNotificationPresented else { return }
         
+        let todayInSeconds = Date().timeIntervalSince1970
+        let checkDate = Preferences.ProductNotificationBenchmarks.ongoingEducationCheckDate.value
+        let isProductNotificationsValid = todayInSeconds <= checkDate
+        
         var notificationShown = false
         let contentBlockerStats = ContentBlockerHelper(tab: selectedTab).stats
 
         // Step 1: First Time Block Notification
-        if !Preferences.ProductNotificationBenchmarks.firstTimeBlockingShown.value, contentBlockerStats.total > 0 {
+        if isProductNotificationsValid,
+           !Preferences.ProductNotificationBenchmarks.firstTimeBlockingShown.value,
+           contentBlockerStats.total > 0 {
+            
             notifyFirstTimeBlock(selectedTab: selectedTab)
             
             Preferences.ProductNotificationBenchmarks.firstTimeBlockingShown.value = true
+            Preferences.ProductNotificationBenchmarks.ongoingEducationCheckDate.value = Date().timeIntervalSince1970 + 7.days
+            
+            notificationShown = true
+        }
+        
+        // Step 2: Load a video on a streaming site
+        guard !notificationShown else { return }
+
+        if isProductNotificationsValid,
+           !selectedTab.notificationTypeList.contains(.videoAdsBlocked),
+           selectedTab.canonicalURL?.absoluteString.contains("youtube") == true {
+            
+            notifyVideoAdsBlocked(selectedTab: selectedTab)
+            
+            selectedTab.notificationTypeList.append(.videoAdsBlocked)
             notificationShown = true
         }
         
         // Step 3: 20+ Trackers and Ads Blocked
         guard !notificationShown else { return }
 
-        if !selectedTab.notificationTypeList.contains(.videoAdsBlocked),
-           contentBlockerStats.total > 20 {
-            notifyVideoAdsBlocked(selectedTab: selectedTab)
+        if isProductNotificationsValid,
+           !selectedTab.notificationTypeList.contains(.videoAdsBlocked),
+           contentBlockerStats.total > benchmarkNumberOfTrackers {
+            
+            notifyPrivacyProtectBlock(selectedTab: selectedTab)
             
             selectedTab.notificationTypeList.append(.videoAdsBlocked)
             notificationShown = true
@@ -91,8 +115,10 @@ extension BrowserViewController {
         // Step 4: Https Upgrade
         guard !notificationShown else { return }
 
-        if !selectedTab.notificationTypeList.contains(.httpsUpgrade),
+        if isProductNotificationsValid,
+           !selectedTab.notificationTypeList.contains(.httpsUpgrade),
            contentBlockerStats.httpsCount > 0 {
+            
             notifyHttpsUpgrade(selectedTab: selectedTab)
             
             selectedTab.notificationTypeList.append(.httpsUpgrade)
@@ -148,7 +174,24 @@ extension BrowserViewController {
             
             switch action {
                 case .dontShowAgainTapped:
-                    self.dismissAndAddNoShowList(.videoAdBlock)
+                    self.showShieldsScreen()
+                default:
+                    break
+            }
+        }
+        
+        showBenchmarkNotificationPopover(controller: shareTrackersViewController)
+    }
+    
+    private func notifyPrivacyProtectBlock(selectedTab: Tab) {
+        let shareTrackersViewController = ShareTrackersController(tab: selectedTab, trackingType: .trackerAdCountBlock(count: benchmarkNumberOfTrackers))
+        
+        shareTrackersViewController.actionHandler = { [weak self] action in
+            guard let self = self else { return }
+            
+            switch action {
+                case .dontShowAgainTapped:
+                    self.dismissAndAddNoShowList(.trackerAdCountBlock(count: self.benchmarkNumberOfTrackers))
                 default:
                     break
             }
