@@ -902,6 +902,42 @@ extension Strings {
                               bundle: .braveShared,
                               value: "Take a look",
                               comment: "Action title for inspectable Education warnings")
+        
+        public static let benchmarkSpecialTierTitle =
+            NSLocalizedString("benchmarkSpecialTierTitle",
+                              bundle: .braveShared,
+                              value: "Congratulations. You’re pretty special.",
+                              comment: "Subtitle for tracker benchmark Share")
+        
+        public static let benchmarkExclusiveTierTitle =
+            NSLocalizedString("benchmarkExclusiveTierTitle",
+                              bundle: .braveShared,
+                              value: "Congratulations. You’re part of an exclusive club.",
+                              comment: "Subtitle for tracker benchmark Share")
+        
+        public static let benchmarkProfessionalTierTitle =
+            NSLocalizedString("benchmarkProfessionalTierTitle",
+                              bundle: .braveShared,
+                              value: "Congratulations. You joined the pros.",
+                              comment: "Subtitle for tracker benchmark Share")
+        
+        public static let benchmarkPrimeTierTitle =
+            NSLocalizedString("benchmarkPrimeTierTitle",
+                              bundle: .braveShared,
+                              value: "Congratulations. You’ve become a master.",
+                              comment: "Subtitle for tracker benchmark Share")
+        
+        public static let benchmarkGrandTierTitle =
+            NSLocalizedString("benchmarkGrandTierTitle",
+                              bundle: .braveShared,
+                              value: "Congratulations. You’ve become a Grand Master.",
+                              comment: "Subtitle for tracker benchmark Share")
+        
+        public static let benchmarkLegendaryTierTitle =
+            NSLocalizedString("benchmarkLegendaryTierTitle",
+                              bundle: .braveShared,
+                              value: "Congratulations. You are legendary.",
+                              comment: "Subtitle for tracker benchmark Share")
     }
 }
 

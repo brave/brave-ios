@@ -35,13 +35,6 @@ public extension Array {
         }
         return false
     }
-    
-    // Safe accessing
-    func at(_ index: Int) -> Element? {
-        guard index >= 0, index < self.count else { return nil }
-        
-        return self[index]
-    }
 
     // Performs a union operator using the result of f(Element) as the value to base uniqueness on.
     func union<T: Hashable>(_ arr: [Element], f: ((Element) -> T)) -> [Element] {

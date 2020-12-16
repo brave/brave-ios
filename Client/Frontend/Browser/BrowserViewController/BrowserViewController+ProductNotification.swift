@@ -27,41 +27,26 @@ extension BrowserViewController {
         var title: String {
             switch self {
                 case .specialTier:
-                    return "Congratulations. You’re pretty special."
+                    return Strings.ShieldEducation.benchmarkSpecialTierTitle
                 case .newbieExclusive, .casualExclusive, .regularExclusive, .expertExclusive:
-                    return "Congratulations. You’re part of an exclusive club."
+                    return Strings.ShieldEducation.benchmarkExclusiveTierTitle
                 case .professionalTier:
-                    return "Congratulations. You joined the pros."
+                    return Strings.ShieldEducation.benchmarkProfessionalTierTitle
                 case .primeTier:
-                    return "Congratulations. You’ve become a master."
+                    return Strings.ShieldEducation.benchmarkPrimeTierTitle
                 case .grandTier:
-                    return "Congratulations. You’ve become a Grand Master."
+                    return Strings.ShieldEducation.benchmarkGrandTierTitle
                 case .legendaryTier:
-                    return "Congratulations. You are legendary."
+                    return Strings.ShieldEducation.benchmarkLegendaryTierTitle
             }
         }
         
         var nextTier: BenchmarkTrackerCountTier? {
-            switch self {
-                case .specialTier:
-                    return .newbieExclusive
-                case .newbieExclusive:
-                    return .casualExclusive
-                case .casualExclusive:
-                    return .regularExclusive
-                case .regularExclusive:
-                    return .expertExclusive
-                case .expertExclusive:
-                    return .professionalTier
-                case .professionalTier:
-                    return .primeTier
-                case .primeTier:
-                    return .grandTier
-                case .grandTier:
-                    return .legendaryTier
-                case .legendaryTier:
-                    return nil
+            guard let indexOfSelf = Self.allCases.firstIndex(where: { self == $0 }) else {
+                return nil
             }
+            
+            return Self.allCases[safe: indexOfSelf + 1]
         }
     }
     
@@ -134,10 +119,10 @@ extension BrowserViewController {
             let allBenchmarkTiers = BenchmarkTrackerCountTier.allCases
             let savedTrackerTierCount = Preferences.ProductNotificationBenchmarks.trackerTierCount.value
             
-            for (index, tier) in (allBenchmarkTiers.filter { numOfTrackersAds > $0.rawValue }).enumerated() {
+            for tier in allBenchmarkTiers.filter({ numOfTrackersAds > $0.rawValue }) {
                 guard savedTrackerTierCount < numOfTrackersAds else { return }
                 
-                if let nextTier = allBenchmarkTiers.at(index)?.nextTier {
+                if let nextTier = tier.nextTier {
                     Preferences.ProductNotificationBenchmarks.trackerTierCount.value = nextTier.rawValue
                 } else {
                     Preferences.ProductNotificationBenchmarks.allTiersShown.value = true
