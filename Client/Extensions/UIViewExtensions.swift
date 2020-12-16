@@ -112,10 +112,10 @@ extension UIView {
     }
 
     /// List of subviews owned by the the view
-    public func subviews(where: (_ view: UIView) -> Bool) -> [UIView] {
+    public func subviews(where predicate: (_ view: UIView) -> Bool) -> [UIView] {
         return self.subviews.flatMap { subview -> [UIView] in
-            var result = subview.subviews(where: `where`)
-            if `where`(subview) {
+            var result = subview.subviews(where: predicate)
+            if predicate(subview) {
                 result.append(subview)
             }
             return result
