@@ -22,7 +22,7 @@ extension BrowserViewController {
             case primeTier = 250000
             case grandTier = 500000
             case legendaryTier = 1000000
-            
+
             var title: String {
                 switch self {
                     case .specialTier:
