@@ -115,22 +115,20 @@ extension BrowserViewController {
         guard !notificationShown else { return }
 
         if !Preferences.ProductNotificationBenchmarks.allTiersShown.value {
-            let numOfTrackersAds = BraveGlobalShieldStats.shared.adblock + BraveGlobalShieldStats.shared.trackingProtection
-            let allBenchmarkTiers = BenchmarkTrackerCountTier.allCases
-            let savedTrackerTierCount = Preferences.ProductNotificationBenchmarks.trackerTierCount.value
+            let numOfTrackerAds = BraveGlobalShieldStats.shared.adblock + BraveGlobalShieldStats.shared.trackingProtection
+            let existingTierList = BenchmarkTrackerCountTier.allCases.filter({ numOfTrackerAds > $0.rawValue })
             
-            for tier in allBenchmarkTiers.filter({ numOfTrackersAds > $0.rawValue }) {
-                guard savedTrackerTierCount < numOfTrackersAds else { return }
-                
-                if let nextTier = tier.nextTier {
-                    Preferences.ProductNotificationBenchmarks.trackerTierCount.value = nextTier.rawValue
-                } else {
-                    Preferences.ProductNotificationBenchmarks.allTiersShown.value = true
+            for tier in existingTierList {
+                if Preferences.ProductNotificationBenchmarks.trackerTierCount.value < numOfTrackerAds {
+                    if let nextTier = tier.nextTier {
+                        Preferences.ProductNotificationBenchmarks.trackerTierCount.value = nextTier.rawValue
+                    } else {
+                        Preferences.ProductNotificationBenchmarks.allTiersShown.value = true
+                    }
+                        
+                    notifyTrackerAdsCount(tier.rawValue, theme: Theme.of(selectedTab))
+                    break
                 }
-                    
-                notifyTrackerAdsCount(tier.rawValue, theme: Theme.of(selectedTab))
-                
-                break
             }
         }
     }
