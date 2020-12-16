@@ -78,12 +78,9 @@ extension BrowserViewController {
         // Step 2: Load a video on a streaming site
         guard !notificationShown else { return }
 
-        let isVideoStreamingSite = (selectedTab.canonicalURL?.absoluteString.contains("youtube") == true
-                                        || selectedTab.canonicalURL?.absoluteString.contains("vimeo") == true)
-            
         if isProductNotificationsValid,
            !Preferences.ProductNotificationBenchmarks.videoAdBlockShown.value,
-           isVideoStreamingSite {
+           selectedTab.url?.isMediaSiteURL == true {
             
             notifyVideoAdsBlocked(theme: Theme.of(selectedTab))
             notificationShown = true
