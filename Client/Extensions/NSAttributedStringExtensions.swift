@@ -24,6 +24,6 @@ extension NSAttributedString {
                                       value: paragraphStyle,
                                       range: NSRange(location: 0, length: string.count))
         
-        return NSAttributedString(attributedString: attributedString)
+        return attributedString
     }
 }
