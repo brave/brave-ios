@@ -122,19 +122,21 @@ class ShareTrackersController: UIViewController, Themeable, PopoverContentCompon
         super.viewDidLoad()
         
         shareTrackersView.actionHandler = { [weak self] action in
+            guard let self = self else { return }
+            
             switch action {
             case .didShareWithMailTapped:
-                self?.actionHandler?(.takeALookTapped)
+                self.actionHandler?(.takeALookTapped)
             case .didShareWithTwitterTapped:
-                self?.actionHandler?(.shareTwitterTapped)
+                self.actionHandler?(.shareTwitterTapped)
             case .didShareWithFacebookTapped:
-                self?.actionHandler?(.shareFacebookTapped)
+                self.actionHandler?(.shareFacebookTapped)
             case .didShareWithDefaultTapped:
-                self?.actionHandler?(.shareMoreTapped)
+                self.actionHandler?(.shareMoreTapped)
             case .didTakeALookTapped:
-                self?.actionHandler?(.takeALookTapped)
+                self.actionHandler?(.takeALookTapped)
             case .didDontShowTapped:
-                self?.actionHandler?(.dontShowAgainTapped)
+                self.actionHandler?(.dontShowAgainTapped)
             }
         }
         
@@ -179,7 +181,7 @@ private class ShareTrackersView: UIView, ShareTrayViewDelegate, Themeable {
     // MARK: UX
     
     struct UX {
-        static let contentMargins: UIEdgeInsets = UIEdgeInsets(top: 32, left: 32, bottom: 32, right: 32)
+        static let contentMargins: UIEdgeInsets = UIEdgeInsets(equalInset: 32)
         static let actionButtonInsets: UIEdgeInsets = UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0)
     }
     

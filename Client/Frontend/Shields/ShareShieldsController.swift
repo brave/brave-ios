@@ -24,7 +24,7 @@ class ShareShieldsViewController: UIViewController, Themeable {
     // MARK: UX
     
     private struct UX {
-        static let defaultInset = UIEdgeInsets(top: 19, left: 19, bottom: 19, right: 19)
+        static let defaultInset = UIEdgeInsets(equalInset: 19)
         static let contentSizeChange: CGFloat = 64
     }
     
@@ -90,19 +90,19 @@ class ShareShieldsViewController: UIViewController, Themeable {
     
     private func doLayoutAndAddGestureRecognizers() {
         let shareTypeViewEmail = ShareTypeView(type: .email)
-        let shareEmailGesture = UITapGestureRecognizer(target: self, action: #selector(shareEmailClicked))
+        let shareEmailGesture = UITapGestureRecognizer(target: self, action: #selector(shareClicked(_:)))
         shareTypeViewEmail.addGestureRecognizer(shareEmailGesture)
         
         let shareTypeViewTwitter = ShareTypeView(type: .twitter)
-        let shareTwitterGesture = UITapGestureRecognizer(target: self, action: #selector(shareTwitterClicked))
+        let shareTwitterGesture = UITapGestureRecognizer(target: self, action: #selector(shareClicked(_:)))
         shareTypeViewTwitter.addGestureRecognizer(shareTwitterGesture)
         
         let shareTypeViewFacebook = ShareTypeView(type: .facebook)
-        let shareFacebookGesture = UITapGestureRecognizer(target: self, action: #selector(shareFacebookClicked))
+        let shareFacebookGesture = UITapGestureRecognizer(target: self, action: #selector(shareClicked(_:)))
         shareTypeViewFacebook.addGestureRecognizer(shareFacebookGesture)
         
         let shareTypeViewDefault = ShareTypeView(type: .default)
-        let shareDefaultGesture = UITapGestureRecognizer(target: self, action: #selector(shareDefaultClicked))
+        let shareDefaultGesture = UITapGestureRecognizer(target: self, action: #selector(shareClicked(_:)))
         shareTypeViewDefault.addGestureRecognizer(shareDefaultGesture)
          
         view.addSubview(contentStackView)
@@ -133,22 +133,20 @@ class ShareShieldsViewController: UIViewController, Themeable {
     
     // MARK: Actions
     
-    @objc func shareEmailClicked(gesture: UITapGestureRecognizer) {
-        actionHandler?(.shareEmailClicked)
+    @objc fileprivate func shareClicked(_ sender: UITapGestureRecognizer) {
+        if let typeView = sender.view as? ShareTypeView {
+            switch typeView.shareType {
+                case .email:
+                    actionHandler?(.shareEmailClicked)
+                case .twitter:
+                    actionHandler?(.shareTwitterClicked)
+                case .facebook:
+                    actionHandler?(.shareFacebookClicked)
+                case .default:
+                    actionHandler?(.shareDefaultClicked)
+            }
+        }
     }
-    
-    @objc func shareTwitterClicked(gesture: UITapGestureRecognizer) {
-        actionHandler?(.shareTwitterClicked)
-    }
-    
-    @objc func shareFacebookClicked(gesture: UITapGestureRecognizer) {
-        actionHandler?(.shareFacebookClicked)
-    }
-    
-    @objc func shareDefaultClicked(gesture: UITapGestureRecognizer) {
-        actionHandler?(.shareDefaultClicked)
-    }
-    
 }
 
 // MARK: - ShareTypeView
@@ -197,7 +195,7 @@ private class ShareTypeView: UIView, Themeable {
     
     // MARK: Properties
     
-    private let shareType: ShareType
+    let shareType: ShareType
     
     private let contentView = UIView().then {
         $0.backgroundColor = .clear
