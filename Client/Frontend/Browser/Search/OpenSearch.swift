@@ -21,7 +21,8 @@ class OpenSearchEngine: NSObject, NSSecureCoding {
     static let defaultSearchClientName = "brave"
     
     let shortName: String
-    
+    let referenceURL: String?
+
     // Backwards compatibility workaround, see #3056.
     // We use `shortName` to store persist what engines are set as default, order etc.
     // This means there's no easy way to change display text for the search engine without
@@ -50,9 +51,10 @@ class OpenSearchEngine: NSObject, NSSecureCoding {
 
     fileprivate lazy var searchQueryComponentKey: String? = self.getQueryArgFromTemplate()
 
-    init(engineID: String?, shortName: String, image: UIImage, searchTemplate: String,
+    init(engineID: String?, shortName: String, referenceURL: String? = nil, image: UIImage, searchTemplate: String,
          suggestTemplate: String?, isCustomEngine: Bool) {
         self.shortName = shortName
+        self.referenceURL = referenceURL
         self.image = image
         self.searchTemplate = searchTemplate
         self.suggestTemplate = suggestTemplate
@@ -74,6 +76,7 @@ class OpenSearchEngine: NSObject, NSSecureCoding {
 
         self.searchTemplate = searchTemplate
         self.shortName = shortName
+        self.referenceURL = aDecoder.decodeObject(of: NSString.self, forKey: "href") as String?
         self.isCustomEngine = isCustomEngine
         self.image = image
         self.engineID = aDecoder.decodeObject(of: NSString.self, forKey: "engineID") as String?
@@ -86,6 +89,7 @@ class OpenSearchEngine: NSObject, NSSecureCoding {
         aCoder.encode(isCustomEngine, forKey: "isCustomEngine")
         aCoder.encode(image, forKey: "image")
         aCoder.encode(engineID, forKey: "engineID")
+        aCoder.encode(referenceURL, forKey: "href")
     }
 
     static var supportsSecureCoding: Bool {
@@ -239,7 +243,7 @@ class OpenSearchParser {
         self.pluginMode = pluginMode
     }
 
-    func parse(_ file: String, engineID: String) -> OpenSearchEngine? {
+    func parse(_ file: String, engineID: String, refenceURL: String? = nil, image: UIImage? = nil) -> OpenSearchEngine? {
         guard let data = try? Data(contentsOf: URL(fileURLWithPath: file)) else {
             print("Invalid search file")
             return nil
@@ -346,9 +350,12 @@ class OpenSearchParser {
                 }
             }
         }
-
+        
         let uiImage: UIImage
-        if let imageElement = largestImageElement,
+        
+        if let image = image {
+            uiImage = image
+        } else if let imageElement = largestImageElement,
            let imageURL = URL(string: imageElement.stringValue),
            let imageData = try? Data(contentsOf: imageURL),
            let image = UIImage.imageFromDataThreadSafe(imageData) {
@@ -358,6 +365,6 @@ class OpenSearchParser {
             return nil
         }
 
-        return OpenSearchEngine(engineID: engineID, shortName: shortName, image: uiImage, searchTemplate: searchTemplate, suggestTemplate: suggestTemplate, isCustomEngine: false)
+        return OpenSearchEngine(engineID: engineID, shortName: shortName, referenceURL: refenceURL, image: uiImage, searchTemplate: searchTemplate, suggestTemplate: suggestTemplate, isCustomEngine: false)
     }
 }

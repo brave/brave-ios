@@ -65,7 +65,9 @@ class BrowserViewController: UIViewController {
 
     lazy var mailtoLinkHandler: MailtoLinkHandler = MailtoLinkHandler()
 
-    // Custom Search Engine Buttons
+    // Custom Search Engine
+    var openSearchEngine: OpenSearchReference?
+
     lazy var customSearchEngineButton: UIButton = {
         let searchButton = UIButton()
         searchButton.setImage(#imageLiteral(resourceName: "AddSearch").template, for: [])
