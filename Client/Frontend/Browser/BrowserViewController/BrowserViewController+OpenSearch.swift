@@ -53,11 +53,12 @@ extension BrowserViewController {
     }
     
     private func updateAddOpenSearchEngine(_ webView: WKWebView, referenceObject: OpenSearchReference) {
-        //check if the search engine has already been added.
-        //self.openSearchLinkDict = dict
+        // Add Reference Object as Open Search Engine
+        openSearchEngine = referenceObject
+        
         // Open Search guidlines requires Title to be same as Short Name but it is not enforced,
         // thus in case of yahoo.com the title is 'Yahoo Search' and Shortname is 'Yahoo'
-        // This results in mismatch. Adding title field in engine.
+        // Instead we are checking referenceURL match to determine searchEngine is added or not
         
         let matches = self.profile.searchEngines.orderedEngines.filter {$0.referenceURL == referenceObject.reference}
         
@@ -101,50 +102,63 @@ extension BrowserViewController {
     }
 
     @objc func addCustomSearchEngineForFocusedElement() {
-        guard let webView = tabManager.selectedTab?.webView else {
+        guard var referenceURLString = openSearchEngine?.reference,
+              let title = openSearchEngine?.title,
+              var referenceURL = URL(string: referenceURLString),
+              let faviconURLString = self.tabManager.selectedTab?.displayFavicon?.url,
+              let iconURL = URL(string: faviconURLString) else {
+            let alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
+            present(alert, animated: true, completion: nil)
             return
         }
-        webView.evaluateJavaScript("__firefox__.searchQueryForField()") { (result, _) in
-            guard let searchQuery = result as? String, let favicon = self.tabManager.selectedTab!.displayFavicon else {
-                //Javascript responded with an incorrectly formatted message. Show an error.
-                let alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
-                self.present(alert, animated: true, completion: nil)
-                return
-            }
-            self.addSearchEngine(searchQuery, favicon: favicon)
-            self.customSearchEngineButton.tintColor = UIColor.Photon.grey50
-            self.customSearchEngineButton.isUserInteractionEnabled = false
+                
+        guard let scheme = tabManager.selectedTab?.webView?.url?.scheme,
+              let host = tabManager.selectedTab?.webView?.url?.host else {
+            log.error("Selected Tab doesn't have URL")
+            return
         }
+        
+        while referenceURLString.hasPrefix("/") {
+            referenceURLString.remove(at: referenceURLString.startIndex)
+        }
+        
+        let constructedReferenceURLString = "\(scheme)://\(host)/\(referenceURLString)"
+
+        if referenceURL.host == nil, let constructedReferenceURL = URL(string: constructedReferenceURLString) {
+            referenceURL = constructedReferenceURL
+        }
+            
+        //TODO: Continue with dowloading xml opensearch
     }
 
     func addSearchEngine(_ searchQuery: String, favicon: Favicon) {
-        guard searchQuery != "",
-            let iconURL = URL(string: favicon.url),
-            let url = URL(string: searchQuery.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlFragmentAllowed)!),
-            let shortName = url.domainURL.host else {
-                let alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
-                self.present(alert, animated: true, completion: nil)
-                return
-        }
-
-        let alert = ThirdPartySearchAlerts.addThirdPartySearchEngine { alert in
-            self.customSearchEngineButton.tintColor = UIColor.Photon.grey50
-            self.customSearchEngineButton.isUserInteractionEnabled = false
-            
-            WebImageCacheManager.shared.load(from: iconURL, completion: { (image, _, _, _, _) in
-                guard let image = image else {
-                    let alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
-                    self.present(alert, animated: true, completion: nil)
-                    return
-                }
-                
-                self.profile.searchEngines.addSearchEngine(OpenSearchEngine(engineID: nil, shortName: shortName, image: image, searchTemplate: searchQuery, suggestTemplate: nil, isCustomEngine: true))
-                let Toast = SimpleToast()
-                Toast.showAlertWithText(Strings.thirdPartySearchEngineAdded, bottomContainer: self.webViewContainer)
-            })
-        }
-
-        self.present(alert, animated: true, completion: {})
+//        guard searchQuery != "",
+//            let iconURL = URL(string: favicon.url),
+//            let url = URL(string: searchQuery.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlFragmentAllowed)!),
+//            let shortName = url.domainURL.host else {
+//                let alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
+//                self.present(alert, animated: true, completion: nil)
+//                return
+//        }
+//
+//        let alert = ThirdPartySearchAlerts.addThirdPartySearchEngine { alert in
+//            self.customSearchEngineButton.tintColor = UIColor.Photon.grey50
+//            self.customSearchEngineButton.isUserInteractionEnabled = false
+//
+//            WebImageCacheManager.shared.load(from: iconURL, completion: { (image, _, _, _, _) in
+//                guard let image = image else {
+//                    let alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
+//                    self.present(alert, animated: true, completion: nil)
+//                    return
+//                }
+//
+//                self.profile.searchEngines.addSearchEngine(OpenSearchEngine(engineID: nil, shortName: shortName, image: image, searchTemplate: searchQuery, suggestTemplate: nil, isCustomEngine: true))
+//                let Toast = SimpleToast()
+//                Toast.showAlertWithText(Strings.thirdPartySearchEngineAdded, bottomContainer: self.webViewContainer)
+//            })
+//        }
+//
+//        self.present(alert, animated: true, completion: {})
     }
 }
 
