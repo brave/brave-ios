@@ -62,6 +62,7 @@ extension BrowserViewController {
         
         let matches = self.profile.searchEngines.orderedEngines.filter {$0.referenceURL == referenceObject.reference}
         
+        // TODO: Change the button !!!!!!!!!!!!!!! Enable Disable
         if !matches.isEmpty {
             customSearchEngineButton.tintColor = .gray
             customSearchEngineButton.isUserInteractionEnabled = false
@@ -128,37 +129,50 @@ extension BrowserViewController {
             referenceURL = constructedReferenceURL
         }
             
-        //TODO: Continue with dowloading xml opensearch
+        downloadOpenSearchXML(referenceURL, referenceURL: referenceURLString, title: title, iconURL: iconURL)
     }
 
-    func addSearchEngine(_ searchQuery: String, favicon: Favicon) {
-//        guard searchQuery != "",
-//            let iconURL = URL(string: favicon.url),
-//            let url = URL(string: searchQuery.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlFragmentAllowed)!),
-//            let shortName = url.domainURL.host else {
-//                let alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
-//                self.present(alert, animated: true, completion: nil)
-//                return
-//        }
-//
-//        let alert = ThirdPartySearchAlerts.addThirdPartySearchEngine { alert in
-//            self.customSearchEngineButton.tintColor = UIColor.Photon.grey50
-//            self.customSearchEngineButton.isUserInteractionEnabled = false
-//
-//            WebImageCacheManager.shared.load(from: iconURL, completion: { (image, _, _, _, _) in
-//                guard let image = image else {
-//                    let alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
-//                    self.present(alert, animated: true, completion: nil)
-//                    return
-//                }
-//
-//                self.profile.searchEngines.addSearchEngine(OpenSearchEngine(engineID: nil, shortName: shortName, image: image, searchTemplate: searchQuery, suggestTemplate: nil, isCustomEngine: true))
-//                let Toast = SimpleToast()
-//                Toast.showAlertWithText(Strings.thirdPartySearchEngineAdded, bottomContainer: self.webViewContainer)
-//            })
-//        }
-//
-//        self.present(alert, animated: true, completion: {})
+    func downloadOpenSearchXML(_ url: URL, referenceURL: String, title: String, iconURL: URL) {
+        
+        // TODO: Change the button !!!!!!!!!!!!!!! Loading
+        
+        WebImageCacheManager.shared.load(from: iconURL, completion: { (image, _, _, _, _) in
+            guard let image = image else {
+                let alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
+                self.present(alert, animated: true, completion: nil)
+                return
+            }
+            
+            NetworkManager().downloadResource(with: url).upon() { [weak self] response in
+                guard let openSearchEngine =
+                        OpenSearchParser(pluginMode: true).parse(response.data, referenceURL: referenceURL, image: image) else {
+                    return
+                }
+                
+                self?.addSearchEngine(openSearchEngine)
+            }
+        })
+    }
+    
+    func addSearchEngine(_ engine: OpenSearchEngine) {
+        let alert = ThirdPartySearchAlerts.addThirdPartySearchEngine(engine) { alert in
+            do {
+                try self.profile.searchEngines.addSearchEngine(engine)
+                
+                let toast = SimpleToast()
+                toast.showAlertWithText(Strings.thirdPartySearchEngineAdded, bottomContainer: self.webViewContainer)
+                
+                // TODO: Change the button !!!!!!!!!!!!!!! Enabled
+
+            } catch {
+                let alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
+                self.present(alert, animated: true) {
+                    // TODO: Change the button !!!!!!!!!!!!!!! Disabled
+                }
+            }
+        }
+
+        self.present(alert, animated: true, completion: {})
     }
 }
 

@@ -242,13 +242,17 @@ class OpenSearchParser {
     init(pluginMode: Bool) {
         self.pluginMode = pluginMode
     }
-
-    func parse(_ file: String, engineID: String, refenceURL: String? = nil, image: UIImage? = nil) -> OpenSearchEngine? {
+    
+    func parse(_ file: String, engineID: String, referenceURL: String = "") -> OpenSearchEngine? {
         guard let data = try? Data(contentsOf: URL(fileURLWithPath: file)) else {
             print("Invalid search file")
             return nil
         }
 
+        return parse(data, engineID: engineID, referenceURL: referenceURL)
+    }
+
+    func parse(_ data: Data, engineID: String = "", referenceURL: String? = nil, image: UIImage? = nil) -> OpenSearchEngine? {
         guard let indexer = try? XMLDocument(data: data),
             let docIndexer = indexer.root else {
                 print("Invalid XML document")
@@ -365,6 +369,6 @@ class OpenSearchParser {
             return nil
         }
 
-        return OpenSearchEngine(engineID: engineID, shortName: shortName, referenceURL: refenceURL, image: uiImage, searchTemplate: searchTemplate, suggestTemplate: suggestTemplate, isCustomEngine: false)
+        return OpenSearchEngine(engineID: engineID, shortName: shortName, referenceURL: referenceURL, image: uiImage, searchTemplate: searchTemplate, suggestTemplate: suggestTemplate, isCustomEngine: false)
     }
 }
