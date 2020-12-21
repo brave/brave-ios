@@ -5,6 +5,8 @@
 import UIKit
 import Shared
 
+private let log = Logger.browserLogger
+
 protocol SearchEnginePickerDelegate: class {
     func searchEnginePicker(_ searchEnginePicker: SearchEnginePicker?,
                             didSelectSearchEngine engine: OpenSearchEngine?, forType: DefaultEngineType?)
@@ -251,8 +253,13 @@ class SearchSettingsTableViewController: UITableViewController {
         if editingStyle == .delete {
             let index = indexPath.item + 1
             let engine = model.orderedEngines[index]
-            model.deleteCustomEngine(engine)
-            tableView.deleteRows(at: [indexPath], with: .right)
+            
+            do {
+                try model.deleteCustomEngine(engine)
+                tableView.deleteRows(at: [indexPath], with: .right)
+            } catch {
+                log.error("Search Engine Error while deleting")
+            }
         }
     }
 }
