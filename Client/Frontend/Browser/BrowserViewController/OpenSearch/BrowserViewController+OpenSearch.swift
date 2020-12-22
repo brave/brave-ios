@@ -62,13 +62,10 @@ extension BrowserViewController {
         
         let matches = self.profile.searchEngines.orderedEngines.filter {$0.referenceURL == referenceObject.reference}
         
-        // TODO: Change the button !!!!!!!!!!!!!!! Enable Disable
         if !matches.isEmpty {
-            customSearchEngineButton.tintColor = .gray
-            customSearchEngineButton.isUserInteractionEnabled = false
+            self.customSearchEngineButton.state = .disabled
         } else {
-            customSearchEngineButton.tintColor = .blue
-            customSearchEngineButton.isUserInteractionEnabled = true
+            self.customSearchEngineButton.state = .enabled
         }
         
         /*
@@ -133,13 +130,15 @@ extension BrowserViewController {
     }
 
     func downloadOpenSearchXML(_ url: URL, referenceURL: String, title: String, iconURL: URL) {
-        
-        // TODO: Change the button !!!!!!!!!!!!!!! Loading
-        
+        customSearchEngineButton.state = .loading
+
         WebImageCacheManager.shared.load(from: iconURL, completion: { (image, _, _, _, _) in
             guard let image = image else {
                 let alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
-                self.present(alert, animated: true, completion: nil)
+                self.present(alert, animated: true) {
+                    self.customSearchEngineButton.state = .enabled
+                }
+                
                 return
             }
             
@@ -162,12 +161,11 @@ extension BrowserViewController {
                 let toast = SimpleToast()
                 toast.showAlertWithText(Strings.thirdPartySearchEngineAdded, bottomContainer: self.webViewContainer)
                 
-                // TODO: Change the button !!!!!!!!!!!!!!! Enabled
-
+                self.customSearchEngineButton.state = .disabled
             } catch {
                 let alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
                 self.present(alert, animated: true) {
-                    // TODO: Change the button !!!!!!!!!!!!!!! Disabled
+                    self.customSearchEngineButton.state = .enabled
                 }
             }
         }
