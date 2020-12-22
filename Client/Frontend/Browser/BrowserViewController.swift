@@ -67,9 +67,8 @@ class BrowserViewController: UIViewController {
     // Custom Search Engine
     var openSearchEngine: OpenSearchReference?
 
-    lazy var customSearchEngineButton: UIButton = {
-        let searchButton = UIButton()
-        searchButton.setImage(#imageLiteral(resourceName: "AddSearch").template, for: [])
+    lazy var customSearchEngineButton: OpenSearchEngineButton = {
+        let searchButton = OpenSearchEngineButton(hidesWhenDisabled: false)
         searchButton.addTarget(self, action: #selector(addCustomSearchEngineForFocusedElement), for: .touchUpInside)
         searchButton.accessibilityIdentifier = "BrowserViewController.customSearchEngineButton"
         return searchButton
