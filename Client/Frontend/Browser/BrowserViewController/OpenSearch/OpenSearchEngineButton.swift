@@ -7,9 +7,9 @@ import UIKit
 import SnapKit
 import BraveShared
 
-// MARK: - OpenSearchEngineAddButton
+// MARK: - OpenSearchEngineButton
 
-class OpenSearchEngineAddButton: UIView {
+class OpenSearchEngineButton: UIView {
 
     // MARK: State
     
@@ -62,10 +62,9 @@ class OpenSearchEngineAddButton: UIView {
         super.init(frame: frame)
     }
 
-    convenience init(title: String? = nil, hidesWhenDisabled: Bool = false) {
+    convenience init(title: String? = nil, hidesWhenDisabled: Bool) {
         self.init(frame: CGRect(x: 0, y: 0, width: 44.0, height: 44.0))
         
-
         self.hidesWhenDisabled = hidesWhenDisabled
         
         setTheme(with: title)
@@ -102,3 +101,4 @@ class OpenSearchEngineAddButton: UIView {
         searchButton.addTarget(target, action: action, for: controlEvents)
     }
 }
+
