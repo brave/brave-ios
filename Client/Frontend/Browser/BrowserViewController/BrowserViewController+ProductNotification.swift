@@ -11,45 +11,6 @@ import Shared
 
 extension BrowserViewController {
     
-    // MARK: BenchmarkTrackerCountTier
-    
-    enum BenchmarkTrackerCountTier: Int, Equatable, CaseIterable {
-        case specialTier = 1000
-        case newbieExclusive = 5000
-        case casualExclusive = 10000
-        case regularExclusive = 25000
-        case expertExclusive = 75000
-        case professionalTier = 100000
-        case primeTier = 250000
-        case grandTier = 500000
-        case legendaryTier = 1000000
-        
-        var title: String {
-            switch self {
-                case .specialTier:
-                    return Strings.ShieldEducation.benchmarkSpecialTierTitle
-                case .newbieExclusive, .casualExclusive, .regularExclusive, .expertExclusive:
-                    return Strings.ShieldEducation.benchmarkExclusiveTierTitle
-                case .professionalTier:
-                    return Strings.ShieldEducation.benchmarkProfessionalTierTitle
-                case .primeTier:
-                    return Strings.ShieldEducation.benchmarkPrimeTierTitle
-                case .grandTier:
-                    return Strings.ShieldEducation.benchmarkGrandTierTitle
-                case .legendaryTier:
-                    return Strings.ShieldEducation.benchmarkLegendaryTierTitle
-            }
-        }
-        
-        var nextTier: BenchmarkTrackerCountTier? {
-            guard let indexOfSelf = Self.allCases.firstIndex(where: { self == $0 }) else {
-                return nil
-            }
-            
-            return Self.allCases[safe: indexOfSelf + 1]
-        }
-    }
-    
     // MARK: Internal
     
     @objc func presentEducationalProductNotifications() {
@@ -106,27 +67,6 @@ extension BrowserViewController {
             
             notifyHttpsUpgrade(theme: Theme.of(selectedTab))
             notificationShown = true
-        }
-        
-        // Step 5: Share Brave Benchmark Tiers
-        guard !notificationShown else { return }
-
-        if !Preferences.ProductNotificationBenchmarks.allTiersShown.value {
-            let numOfTrackerAds = BraveGlobalShieldStats.shared.adblock + BraveGlobalShieldStats.shared.trackingProtection
-            let existingTierList = BenchmarkTrackerCountTier.allCases.filter({ numOfTrackerAds > $0.rawValue })
-            
-            for tier in existingTierList {
-                if Preferences.ProductNotificationBenchmarks.trackerTierCount.value < numOfTrackerAds {
-                    if let nextTier = tier.nextTier {
-                        Preferences.ProductNotificationBenchmarks.trackerTierCount.value = nextTier.rawValue
-                    } else {
-                        Preferences.ProductNotificationBenchmarks.allTiersShown.value = true
-                    }
-                        
-                    notifyTrackerAdsCount(tier.rawValue, theme: Theme.of(selectedTab))
-                    break
-                }
-            }
         }
     }
     
@@ -204,31 +144,6 @@ extension BrowserViewController {
         showBenchmarkNotificationPopover(controller: shareTrackersViewController)
     }
     
-    private func notifyTrackerAdsCount(_ count: Int, theme: Theme) {
-        let shareTrackersViewController = ShareTrackersController(theme: theme, trackingType: .trackerCountShare(count: count))
-        
-        shareTrackersViewController.actionHandler = { [weak self] action in
-            guard let self = self else { return }
-            
-            self.benchmarkNotificationPresented = false
-            
-            switch action {
-                case .shareEmailTapped:
-                    self.shareTrackersAndAdsWithEmail(count)
-                case .shareTwitterTapped:
-                    self.shareTrackersAndAdsWithTwitter(count)
-                case .shareFacebookTapped:
-                    self.shareTrackersAndAdsWithFacebook(count)
-                case .shareMoreTapped:
-                    self.shareTrackersAndAdsWithDefault(count)
-                default:
-                    break
-            }
-        }
-        
-        showBenchmarkNotificationPopover(controller: shareTrackersViewController)
-    }
-    
     private func showBenchmarkNotificationPopover(controller: (UIViewController & PopoverContentComponent)) {
         let popover = PopoverController(contentController: controller, contentSizeBehavior: .autoLayout)
         popover.addsConvenientDismissalMargins = false
@@ -266,38 +181,6 @@ extension BrowserViewController {
                 default:
                     break
             }
-        }
-    }
-    
-    func shareTrackersAndAdsWithEmail(_ count: Int) {
-        benchmarkNotificationPresented = false
-
-        dismiss(animated: true) {
-            // TODO: Share with Email
-        }
-    }
-    
-    func shareTrackersAndAdsWithTwitter(_ count: Int) {
-        benchmarkNotificationPresented = false
-
-        dismiss(animated: true) {
-            // TODO: Share with Twitter
-        }
-    }
-    
-    func shareTrackersAndAdsWithFacebook(_ count: Int) {
-        benchmarkNotificationPresented = false
-
-        dismiss(animated: true) {
-            // TODO: Share with Facebook
-        }
-    }
-    
-    func shareTrackersAndAdsWithDefault(_ count: Int) {
-        benchmarkNotificationPresented = false
-
-        dismiss(animated: true) {
-            // TODO: Share with Default
         }
     }
 }
