@@ -311,10 +311,8 @@ private class ShareTrackersView: UIView, ShareTrayViewDelegate, Themeable {
             case .default:
                 actionHandler?(.didShareWithDefaultTapped)
         }
-
-        actionHandler?(.didShareWithMailTapped)
     }
-
+    
     // MARK: Themeable
     
     func applyTheme(_ theme: Theme) {

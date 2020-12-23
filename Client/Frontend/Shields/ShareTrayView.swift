@@ -13,10 +13,11 @@ protocol ShareTrayViewDelegate: AnyObject {
 }
 
 // MARK: - ShareTrayView
+
 class ShareTrayView: UIView, Themeable {
 
     // MARK: ViewType
-    
+        
     enum ViewType {
         case mail
         case twitter
