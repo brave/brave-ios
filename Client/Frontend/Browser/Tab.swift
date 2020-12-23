@@ -95,7 +95,7 @@ class Tab: NSObject {
             }
         }
     }
-        
+    
     private func deleteNewTabPageController() {
         guard let controller = newTabPageViewController, controller.parent != nil else { return }
         controller.willMove(toParent: nil)

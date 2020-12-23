@@ -39,39 +39,16 @@ class SimpleShieldsView: UIView, Themeable {
     // Shields Up
     
     class BlockCountView: UIView, Themeable {
-        
-        private struct UX {
-            static let iconEdgeInset = UIEdgeInsets(top: 22, left: 14, bottom: 22, right: 14)
-            static let hitBoxEdgeInsets = UIEdgeInsets(top: -10, left: -10, bottom: -10, right: -10)
-            static let buttonEdgeInsets = UIEdgeInsets(top: -2, left: 4, bottom: -3, right: 4)
-        }
-        
-        let contentStackView = UIStackView().then {
-            $0.spacing = 2
-            $0.alignment = .fill
-        }
-        
-        let descriptionStackView = UIStackView().then {
-            $0.spacing = 24
+        let stackView = UIStackView().then {
+            $0.spacing = 12
             $0.alignment = .center
-            $0.layoutMargins = UIEdgeInsets(top: 13, left: 22, bottom: 14, right: 22)
-            $0.isLayoutMarginsRelativeArrangement = true
-        }
-        
-        let infoStackView = UIStackView().then {
-            $0.alignment = .center
-            $0.layoutMargins = UX.iconEdgeInset
-            $0.isLayoutMarginsRelativeArrangement = true
-        }
-        
-        let shareStackView = UIStackView().then {
-            $0.alignment = .center
-            $0.layoutMargins = UX.iconEdgeInset
+            $0.layoutMargins = UIEdgeInsets(top: 0, left: 40, bottom: 0, right: 40)
             $0.isLayoutMarginsRelativeArrangement = true
         }
         
         let countLabel = UILabel().then {
             $0.font = .systemFont(ofSize: 36)
+            $0.text = "0"
             $0.setContentHuggingPriority(.required, for: .horizontal)
             $0.setContentCompressionResistancePriority(.required, for: .horizontal)
         }
@@ -82,32 +59,20 @@ class SimpleShieldsView: UIView, Themeable {
                     string: Strings.Shields.blockedCountLabel,
                     attributes: [.font: UIFont.systemFont(ofSize: 13.0)]
                 )
+                let attachment = ViewTextAttachment(view: self.infoButton)
+                string.append(NSAttributedString(attachment: attachment))
                 return string
             }()
             $0.backgroundColor = .clear
-            $0.setContentCompressionResistancePriority(.required, for: .horizontal)
+            $0.setContentCompressionResistancePriority(UILayoutPriority(999), for: .horizontal)
         }
         
         let infoButton = Button().then {
-            $0.setImage(#imageLiteral(resourceName: "shields-help").withRenderingMode(.alwaysTemplate), for: .normal)
-            $0.hitTestSlop = UX.hitBoxEdgeInsets
+            $0.setImage(UIImage(imageLiteralResourceName: "shields-help"), for: .normal)
+            $0.hitTestSlop = UIEdgeInsets(top: -10, left: -10, bottom: -10, right: -10)
             $0.imageEdgeInsets = .zero
             $0.titleEdgeInsets = .zero
             $0.contentEdgeInsets = UIEdgeInsets(top: -2, left: 4, bottom: -3, right: 4)
-            $0.contentMode = .scaleAspectFit
-            $0.setContentHuggingPriority(.required, for: .horizontal)
-            $0.setContentCompressionResistancePriority(.required, for: .horizontal)
-        }
-        
-        let shareButton = Button().then {
-            $0.setImage(#imageLiteral(resourceName: "shields-share").withRenderingMode(.alwaysTemplate), for: .normal)
-            $0.hitTestSlop = UX.hitBoxEdgeInsets
-            $0.imageEdgeInsets = .zero
-            $0.titleEdgeInsets = .zero
-            $0.contentEdgeInsets = UIEdgeInsets(top: -2, left: 4, bottom: -3, right: 4)
-            $0.contentMode = .scaleAspectFit
-            $0.setContentHuggingPriority(.required, for: .horizontal)
-            $0.setContentCompressionResistancePriority(.required, for: .horizontal)
         }
         
         override init(frame: CGRect) {
@@ -117,23 +82,10 @@ class SimpleShieldsView: UIView, Themeable {
             accessibilityTraits.insert(.button)
             accessibilityHint = Strings.Shields.blockedInfoButtonAccessibilityLabel
             
-            addSubview(contentStackView)
-
-            contentStackView.addStackViewItems(
-                .view(descriptionStackView),
-                .view(infoStackView),
-                .view(shareStackView)
-            )
-            
-            descriptionStackView.addStackViewItems(
-                .view(countLabel),
-                .view(descriptionLabel)
-            )
-            
-            infoStackView.addArrangedSubview(infoButton)
-            shareStackView.addArrangedSubview(shareButton)
-            
-            contentStackView.snp.makeConstraints {
+            addSubview(stackView)
+            stackView.addArrangedSubview(countLabel)
+            stackView.addArrangedSubview(descriptionLabel)
+            stackView.snp.makeConstraints {
                 $0.edges.equalToSuperview()
             }
         }
@@ -158,16 +110,11 @@ class SimpleShieldsView: UIView, Themeable {
         }
         
         func applyTheme(_ theme: Theme) {
-            let contentBackgroundColor = theme.isDark ? UIColor(rgb: 0x303443) : Colors.neutral000
-            descriptionStackView.addBackground(color: contentBackgroundColor, cornerRadius: 6.0)
-            infoStackView.addBackground(color: contentBackgroundColor, cornerRadius: 6.0)
-            shareStackView.addBackground(color: contentBackgroundColor, cornerRadius: 6.0)
-            
             countLabel.textColor = theme.isDark ? .white : .black
-            descriptionLabel.textColor = theme.isDark ? .white : .black
-            
-            infoButton.tintColor = theme.isDark ? .white : .black
-            shareButton.tintColor = theme.isDark ? . white : .black
+            descriptionLabel.textColor = theme.isDark ? UIColor.white : .black
+            infoButton.tintColor = theme.isDark ?
+                Colors.orange400 :
+                Colors.orange500
         }
     }
     
