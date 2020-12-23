@@ -406,7 +406,6 @@
 		2C49854E206173C800893DAE /* photon-colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C49854D206173C800893DAE /* photon-colors.swift */; };
 		2F098F8B255F2D730084FB37 /* BrowserViewController+ReaderMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F098F8A255F2D730084FB37 /* BrowserViewController+ReaderMode.swift */; };
 		2F13E79B1AC0C02700D75081 /* StringExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F13E79A1AC0C02700D75081 /* StringExtensionsTests.swift */; };
-		2F21BA32257ADCCF00F703A8 /* ShareShieldsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F21BA31257ADCCF00F703A8 /* ShareShieldsController.swift */; };
 		2F44FA1B1A9D426A00FD20CC /* TestHashExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F44FA1A1A9D426A00FD20CC /* TestHashExtensions.swift */; };
 		2F44FB2D1A9D5D8500FD20CC /* FiraSans-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E4B7B7421A793CF20022C5E0 /* FiraSans-BoldItalic.ttf */; };
 		2F44FC721A9E840300FD20CC /* SettingsNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F44FC711A9E840300FD20CC /* SettingsNavigationController.swift */; };
@@ -1662,7 +1661,6 @@
 		2C49854D206173C800893DAE /* photon-colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "photon-colors.swift"; sourceTree = "<group>"; };
 		2F098F8A255F2D730084FB37 /* BrowserViewController+ReaderMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowserViewController+ReaderMode.swift"; sourceTree = "<group>"; };
 		2F13E79A1AC0C02700D75081 /* StringExtensionsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringExtensionsTests.swift; sourceTree = "<group>"; };
-		2F21BA31257ADCCF00F703A8 /* ShareShieldsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareShieldsController.swift; sourceTree = "<group>"; };
 		2F44FA1A1A9D426A00FD20CC /* TestHashExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestHashExtensions.swift; sourceTree = "<group>"; };
 		2F44FC711A9E840300FD20CC /* SettingsNavigationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsNavigationController.swift; sourceTree = "<group>"; };
 		2F44FCC41A9E85E900FD20CC /* SettingsTableSectionHeaderFooterView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsTableSectionHeaderFooterView.swift; sourceTree = "<group>"; };
@@ -4169,7 +4167,6 @@
 				27953F7623F5DF5D00B4B595 /* AboutShieldsViewController.swift */,
 				278C6FFE24F6EA3700A246C8 /* ReportBrokenSiteView.swift */,
 				278C700124F6F33D00A246C8 /* SiteReportedView.swift */,
-				2F21BA31257ADCCF00F703A8 /* ShareShieldsController.swift */,
 				2FE5B42A2580216700BFDDB8 /* ShareTrackersController.swift */,
 				2FE5B4532582BEF500BFDDB8 /* ShareTrayView.swift */,
 			);
@@ -6017,7 +6014,6 @@
 				27036F9825684F9F004EF6B6 /* AdsViewController.swift in Sources */,
 				27F94A3A21909A5900F4FADF /* SearchSuggestionsPromptView.swift in Sources */,
 				5E096174252B63A300F3AFBB /* BraveCoreMigrator.swift in Sources */,
-				2F21BA32257ADCCF00F703A8 /* ShareShieldsController.swift in Sources */,
 				C690C208212FF35100E6EEE9 /* WebImageCacheWithNoPrivacyProtectionManager.swift in Sources */,
 				27C647772550AE16006D72FC /* WalletTransferCompleteViewController.swift in Sources */,
 				278C700A24F96D7000A246C8 /* BraveShieldsAndPrivacySettingsController.swift in Sources */,
