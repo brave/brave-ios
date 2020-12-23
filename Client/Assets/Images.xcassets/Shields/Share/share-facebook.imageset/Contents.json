@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "shields-help.png",
+      "filename" : "share-facebook.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "shields-help@2x.png",
+      "filename" : "share-facebook@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "shields-help@3x.png",
+      "filename" : "share-facebook@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
