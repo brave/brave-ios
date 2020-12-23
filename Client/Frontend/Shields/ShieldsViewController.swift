@@ -250,6 +250,8 @@ class ShieldsViewController: UIViewController, PopoverContentComponent, Themeabl
         shieldsView.advancedControlsBar.addTarget(self, action: #selector(tappedAdvancedControlsBar), for: .touchUpInside)
         shieldsView.simpleShieldView.blockCountView.infoButton.addTarget(self, action: #selector(tappedAboutShieldsButton), for: .touchUpInside)
         
+        shieldsView.simpleShieldView.blockCountView.shareButton.addTarget(self, action: #selector(tappedShareShieldsButton), for: .touchUpInside)
+
         shieldsView.simpleShieldView.reportSiteButton.addTarget(self, action: #selector(tappedReportSiteButton), for: .touchUpInside)
         shieldsView.reportBrokenSiteView.cancelButton.addTarget(self, action: #selector(tappedCancelReportingButton), for: .touchUpInside)
         shieldsView.reportBrokenSiteView.submitButton.addTarget(self, action: #selector(tappedSubmitReportingButton), for: .touchUpInside)
@@ -309,6 +311,29 @@ class ShieldsViewController: UIViewController, PopoverContentComponent, Themeabl
         navigationController?.pushViewController(aboutShields, animated: true)
     }
     
+    @objc private func tappedShareShieldsButton() {
+        let shareShieldsController = ShareShieldsViewController(theme: Theme.of(tab))
+        shareShieldsController.applyTheme(Theme.of(tab))
+        shareShieldsController.preferredContentSize = preferredContentSize
+
+        shareShieldsController.actionHandler = { [weak self] action in
+                guard let self = self else { return }
+
+                switch action {
+                    case .shareEmailClicked:
+                        self.shareTrackersAndAdsWithEmail()
+                    case .shareTwitterClicked:
+                        self.shareTrackersAndAdsWithTwitter()
+                    case .shareFacebookClicked:
+                        self.shareTrackersAndAdsWithFacebook()
+                    case .shareDefaultClicked:
+                        self.shareTrackersAndAdsWithDefault()
+                }
+        }
+
+        navigationController?.pushViewController(shareShieldsController, animated: true)
+    }
+    
     @objc private func tappedReportSiteButton() {
         updateContentView(to: shieldsView.reportBrokenSiteView, animated: true)
     }
@@ -335,5 +360,31 @@ class ShieldsViewController: UIViewController, PopoverContentComponent, Themeabl
     @available(*, unavailable)
     required init?(coder aDecoder: NSCoder) {
         fatalError()
+    }
+    
+    // MARK: Share Actions
+    
+    func shareTrackersAndAdsWithEmail() {
+        dismiss(animated: true) {
+            // TODO: Share with Email
+        }
+    }
+
+    func shareTrackersAndAdsWithTwitter() {
+        dismiss(animated: true) {
+            // TODO: Share with Twitter
+        }
+    }
+
+    func shareTrackersAndAdsWithFacebook() {
+        dismiss(animated: true) {
+            // TODO: Share with Facebook
+        }
+    }
+
+    func shareTrackersAndAdsWithDefault() {
+        dismiss(animated: true) {
+            // TODO: Share with Default
+        }
     }
 }
