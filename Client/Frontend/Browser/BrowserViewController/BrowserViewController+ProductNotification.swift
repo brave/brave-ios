@@ -264,3 +264,4 @@ extension BrowserViewController {
         }
     }
 }
+
