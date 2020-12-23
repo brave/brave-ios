@@ -314,20 +314,19 @@ private class ShareTrackersView: UIView, ShareTrayViewDelegate, Themeable {
     
     // MARK: ShareTrayViewDelegate
     
-    func didShareWithMail(_ view: ShareTrayView) {
+    func didShareWith(_ view: ShareTrayView, type: ShareTrayView.ViewType) {
+        switch type {
+            case .mail:
+                actionHandler?(.didShareWithMailTapped)
+            case .twitter:
+                actionHandler?(.didShareWithTwitterTapped)
+            case .facebook:
+                actionHandler?(.didShareWithFacebookTapped)
+            case .default:
+                actionHandler?(.didShareWithDefaultTapped)
+        }
+        
         actionHandler?(.didShareWithMailTapped)
-    }
-    
-    func didShareWithTwitter(_ view: ShareTrayView) {
-        actionHandler?(.didShareWithTwitterTapped)
-    }
-    
-    func didShareWithFacebook(_ view: ShareTrayView) {
-        actionHandler?(.didShareWithFacebookTapped)
-    }
-    
-    func didShareWithDefault(_ view: ShareTrayView) {
-        actionHandler?(.didShareWithDefaultTapped)
     }
     
     // MARK: Themeable

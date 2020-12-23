@@ -9,15 +9,21 @@ import Foundation
 
 protocol ShareTrayViewDelegate: AnyObject {
 
-    func didShareWithMail(_ view: ShareTrayView)
-    func didShareWithTwitter(_ view: ShareTrayView)
-    func didShareWithFacebook(_ view: ShareTrayView)
-    func didShareWithDefault(_ view: ShareTrayView)
+    func didShareWith(_ view: ShareTrayView, type: ShareTrayView.ViewType)
 }
 
-// MARK: - ShareTrackersView
+// MARK: - ShareTrayView
 
 class ShareTrayView: UIView, Themeable {
+    
+    // MARK: ViewType
+    
+    enum ViewType {
+        case mail
+        case twitter
+        case facebook
+        case `default`
+    }
     
     // MARK: Properties
     
@@ -93,19 +99,19 @@ class ShareTrayView: UIView, Themeable {
     // MARK: Actions
     
     @objc private func tappedMailShareButton() {
-        delegate?.didShareWithMail(self)
+        delegate?.didShareWith(self, type: .mail)
     }
     
     @objc private func tappedTwitterShareButton() {
-        delegate?.didShareWithTwitter(self)
+        delegate?.didShareWith(self, type: .twitter)
     }
     
     @objc private func tappedFacebookShareButton() {
-        delegate?.didShareWithFacebook(self)
+        delegate?.didShareWith(self, type: .facebook)
     }
     
     @objc private func tappedDefaultShareButton() {
-        delegate?.didShareWithDefault(self)
+        delegate?.didShareWith(self, type: .default)
     }
     
     // MARK: Themeable
