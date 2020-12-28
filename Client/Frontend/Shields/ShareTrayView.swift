@@ -91,7 +91,7 @@ class ShareTrayView: UIView, Themeable {
         if let image = image {
             button.setImage(image.template, for: .normal)
         }
-
+        
         button.contentMode = .scaleAspectFit
         button.tintColor = .white
         button.setContentHuggingPriority(.required, for: .horizontal)
@@ -99,7 +99,7 @@ class ShareTrayView: UIView, Themeable {
 
         return button
     }
-
+    
     // MARK: Actions
     
     @objc private func tappedMailShareButton() {
