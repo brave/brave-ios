@@ -26,40 +26,15 @@ class ShareTrayView: UIView, Themeable {
     }
     
     // MARK: Properties
+        
+    private let mailShareButton = createShareButton(.mail)
     
-    private let mailShareButton = UIButton().then {
-        $0.addTarget(self, action: #selector(tappedMailShareButton), for: .touchUpInside)
-        $0.setImage(#imageLiteral(resourceName: "share-bubble-mail").template, for: .normal)
-        $0.contentMode = .scaleAspectFit
-        $0.tintColor = .white
-        $0.setContentHuggingPriority(.required, for: .horizontal)
-        $0.setContentCompressionResistancePriority(.required, for: .horizontal)
-    }
+    private let twitterShareButton = createShareButton(.twitter)
     
-    private let twitterShareButton = UIButton().then {
-        $0.setImage(#imageLiteral(resourceName: "share-bubble-twitter").template, for: .normal)
-        $0.contentMode = .scaleAspectFit
-        $0.tintColor = .white
-        $0.setContentHuggingPriority(.required, for: .horizontal)
-        $0.setContentCompressionResistancePriority(.required, for: .horizontal)
-    }
+    private let facebookShareButton = createShareButton(.facebook)
     
-    private let facebookShareButton = UIButton().then {
-        $0.setImage(#imageLiteral(resourceName: "share-bubble-facebook").template, for: .normal)
-        $0.contentMode = .scaleAspectFit
-        $0.tintColor = .white
-        $0.setContentHuggingPriority(.required, for: .horizontal)
-        $0.setContentCompressionResistancePriority(.required, for: .horizontal)
-    }
-    
-    private let defaultShareButton = UIButton().then {
-        $0.setImage(#imageLiteral(resourceName: "share-bubble-more").template, for: .normal)
-        $0.contentMode = .scaleAspectFit
-        $0.tintColor = .white
-        $0.setContentHuggingPriority(.required, for: .horizontal)
-        $0.setContentCompressionResistancePriority(.required, for: .horizontal)
-    }
-    
+    private let defaultShareButton = createShareButton(.default)
+        
     weak var delegate: ShareTrayViewDelegate?
 
     // MARK: Lifecycle
@@ -94,6 +69,35 @@ class ShareTrayView: UIView, Themeable {
             .view(facebookShareButton),
             .view(defaultShareButton)
         )
+    }
+    
+    // MARK: Internal
+    
+    static func createShareButton(_ type: ViewType) -> UIButton {
+        let button = UIButton()
+        let image: UIImage?
+        
+        switch type {
+            case .mail:
+                image = #imageLiteral(resourceName: "share-bubble-mail")
+            case .twitter:
+                image = #imageLiteral(resourceName: "share-bubble-twitter")
+            case .facebook:
+                image = #imageLiteral(resourceName: "share-bubble-facebook")
+            case .default:
+                image = #imageLiteral(resourceName: "share-bubble-more")
+        }
+        
+        if let image = image {
+            button.setImage(image.template, for: .normal)
+        }
+        
+        button.contentMode = .scaleAspectFit
+        button.tintColor = .white
+        button.setContentHuggingPriority(.required, for: .horizontal)
+        button.setContentCompressionResistancePriority(.required, for: .horizontal)
+        
+        return button
     }
     
     // MARK: Actions
