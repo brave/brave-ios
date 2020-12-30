@@ -53,6 +53,7 @@ class SearchSettingsTableViewController: UITableViewController {
     }
     
     private var model: SearchEngines
+    private let profile: Profile
     private var showDeletion = false
     
     private var searchPickerEngines: [OpenSearchEngine] {
@@ -69,9 +70,9 @@ class SearchSettingsTableViewController: UITableViewController {
     
     // MARK: Lifecycle
     
-    init(model: SearchEngines) {
-        self.model = model
-        
+    init(profile: Profile, theme: Theme) {
+        self.profile = profile
+        self.model = profile.searchEngines
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -244,7 +245,8 @@ class SearchSettingsTableViewController: UITableViewController {
             
             navigationController?.pushViewController(searchEnginePicker, animated: true)
         } else if indexPath.section == Section.quickSearch.rawValue && indexPath.item == model.orderedEngines.count - 1 {
-            // TODO: Add Custom Search Controller
+            let customEngineViewController = SearchCustomEngineViewController(profile: profile)
+            navigationController?.pushViewController(customEngineViewController, animated: true)
         }
         
         return nil
