@@ -217,7 +217,7 @@ class SettingsViewController: TableViewController {
             header: .title(Strings.settingsGeneralSectionTitle),
             rows: [
                 Row(text: Strings.searchEngines, selection: { [unowned self] in
-                    let viewController = SearchSettingsTableViewController(model: self.profile.searchEngines)
+                    let viewController = SearchSettingsTableViewController(profile: self.profile)
                     self.navigationController?.pushViewController(viewController, animated: true)
                 }, image: #imageLiteral(resourceName: "settings-search").template, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self),
                 Row(text: Strings.sync, selection: { [unowned self] in
