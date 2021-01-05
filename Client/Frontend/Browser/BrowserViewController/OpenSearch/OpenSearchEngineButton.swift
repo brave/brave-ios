@@ -28,11 +28,13 @@ class OpenSearchEngineButton: UIView {
                 searchButton.isHidden = hidesWhenDisabled ? true : false
                 loadingIndicator.stopAnimating()
                 searchButton.tintColor = UIColor.Photon.grey50
+                searchButton.setTitleColor(UIColor.Photon.grey50, for: .normal)
                 searchButton.isUserInteractionEnabled = false
             case .enabled:
                 searchButton.isHidden = false
                 loadingIndicator.stopAnimating()
                 searchButton.tintColor = .systemBlue
+                searchButton.setTitleColor(BraveUX.braveOrange, for: .normal)
                 searchButton.isUserInteractionEnabled = true
             case .loading:
                 loadingIndicator.isHidden = false
@@ -45,7 +47,6 @@ class OpenSearchEngineButton: UIView {
     private let searchButton = UIButton().then {
         $0.setImage(#imageLiteral(resourceName: "AddSearch").template, for: [])
         $0.titleLabel?.font = UIFont.systemFont(ofSize: 14)
-        $0.setTitleColor(BraveUX.braveOrange, for: .normal)
     }
     
     private let loadingIndicator = UIActivityIndicatorView(style: .white).then {

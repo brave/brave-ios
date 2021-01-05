@@ -125,6 +125,8 @@ class SearchCustomEngineViewController: UIViewController {
                     alert = ThirdPartySearchAlerts.incorrectCustomEngineForm()
                 case .failedToSave:
                     alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
+                case .missingInformation:
+                    alert = ThirdPartySearchAlerts.missingInfoToAddThirdPartySearch()
             }
         } else {
             alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
@@ -139,11 +141,88 @@ class SearchCustomEngineViewController: UIViewController {
     @objc func addCustomSearchEngine(_ nav: UINavigationController?) {
         view.endEditing(true)
         
-        // TODO: Add Logic
+        guard let title = titleText,
+              let urlQuery = urlText,
+              !title.isEmpty,
+              !urlQuery.isEmpty else {
+            present(ThirdPartySearchAlerts.missingInfoToAddThirdPartySearch(), animated: true, completion: nil)
+            return
+        }
+        
+        navigationItem.rightBarButtonItem?.isEnabled = false
+        addSearchEngine(with: urlQuery, title: title)
     }
     
     @objc func cancel() {
         navigationController?.popViewController(animated: true)
+    }
+}
+
+extension SearchCustomEngineViewController {
+    
+    fileprivate func addSearchEngine(with urlQuery: String, title: String) {
+        setSaveButton(for: .loading)
+
+        let safeURLQuery = urlQuery.trimmingCharacters(in: .whitespacesAndNewlines)
+        let safeTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        createSearchEngine(using: safeURLQuery, name: safeTitle) { [weak self] engine, error in
+            guard let self = self else { return }
+            
+            if let error = error {
+                self.handleError(error: error)
+            } else if let engine = engine {
+                try? self.profile.searchEngines.addSearchEngine(engine)
+            }
+            
+            self.setSaveButton(for: .enabled)
+        }
+    }
+    
+    private func createSearchEngine(using query: String, name: String, completion: @escaping ((OpenSearchEngine?, SearchEngineError?) -> Void)) {
+        // Check Search Query is not valid
+        guard let template = getSearchTemplate(with: query),
+              let urlText = template.addingPercentEncoding(withAllowedCharacters: .urlFragmentAllowed),
+              let url = URL(string: urlText),
+              url.isWebPage()  else {
+            completion(nil, SearchEngineError.invalidQuery)
+            return
+        }
+    
+        // Check Engine Exists
+        guard !profile.searchEngines.orderedEngines.filter({ $0.shortName == name }).isEmpty else {
+            completion(nil, SearchEngineError.duplicate)
+            return
+        }
+        
+        let fetcher = FaviconFetcher(siteURL: url, kind: .favicon, domain: nil)
+        
+        fetcher.load { siteUrl, attributes in
+            guard siteUrl == url else { return }
+            
+            let engineImage = attributes.image ?? #imageLiteral(resourceName: "defaultFavicon")
+            
+            let engine = OpenSearchEngine(
+                engineID: nil,
+                shortName: name,
+                image: engineImage,
+                searchTemplate: template,
+                suggestTemplate: nil,
+                isCustomEngine: true)
+
+            completion(engine, nil)
+        }
+    }
+    
+    private func getSearchTemplate(with query: String) -> String? {
+        let searchTermPlaceholder = "%s"
+        let searchTemplatePlaceholder = "{searchTerms}"
+        
+        guard query.contains(searchTermPlaceholder) else {
+            return nil
+        }
+        
+        return query.replacingOccurrences(of: searchTermPlaceholder, with: searchTemplatePlaceholder)
     }
 }
 
@@ -242,7 +321,7 @@ extension SearchCustomEngineViewController: UITextViewDelegate {
 extension SearchCustomEngineViewController: UITextFieldDelegate {
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        guard let text = textField.text else { return false }
+        guard let text = textField.text, text.rangeOfCharacter(from: .newlines) == nil else { return false }
         
         let currentString: NSString = text as NSString
         let newString: NSString = currentString.replacingCharacters(in: range, with: string) as NSString
@@ -280,7 +359,7 @@ fileprivate class SearchEngineTableViewHeader: UITableViewHeaderFooterView {
     }
 
     lazy var addEngineButton = OpenSearchEngineButton(title: "Auto Add", hidesWhenDisabled: false).then {
-        $0.addTarget(self, action: #selector(addEngine), for: .touchUpInside)
+        $0.addTarget(self, action: #selector(addEngineAuto), for: .touchUpInside)
     }
 
     // MARK: Lifecycle
@@ -317,7 +396,7 @@ fileprivate class SearchEngineTableViewHeader: UITableViewHeaderFooterView {
     
     // MARK: Actions
 
-    @objc private func addEngine() {
+    @objc private func addEngineAuto() {
         // TODO: Add Engine URL
     }
 }
