@@ -22,10 +22,11 @@ extension BrowserViewController {
         
         var notificationShown = false
         let contentBlockerStats = selectedTab.contentBlocker.stats
+        
+        if !isProductNotificationsValid { return }
 
         // Step 1: First Time Block Notification
-        if isProductNotificationsValid,
-           !Preferences.ProductNotificationBenchmarks.firstTimeBlockingShown.value,
+        if !Preferences.ProductNotificationBenchmarks.firstTimeBlockingShown.value,
            contentBlockerStats.total > 0 {
             
             notifyFirstTimeBlock(theme: Theme.of(selectedTab))
@@ -37,10 +38,9 @@ extension BrowserViewController {
         }
         
         // Step 2: Load a video on a streaming site
-        guard !notificationShown else { return }
+        if notificationShown { return }
 
-        if isProductNotificationsValid,
-           !Preferences.ProductNotificationBenchmarks.videoAdBlockShown.value,
+        if !Preferences.ProductNotificationBenchmarks.videoAdBlockShown.value,
            selectedTab.url?.isMediaSiteURL == true {
             
             notifyVideoAdsBlocked(theme: Theme.of(selectedTab))
@@ -48,10 +48,9 @@ extension BrowserViewController {
         }
         
         // Step 3: 20+ Trackers and Ads Blocked
-        guard !notificationShown else { return }
+        if notificationShown { return }
 
-        if isProductNotificationsValid,
-           !Preferences.ProductNotificationBenchmarks.privacyProtectionBlockShown.value,
+        if !Preferences.ProductNotificationBenchmarks.privacyProtectionBlockShown.value,
            contentBlockerStats.total > benchmarkNumberOfTrackers {
             
             notifyPrivacyProtectBlock(theme: Theme.of(selectedTab))
@@ -59,10 +58,9 @@ extension BrowserViewController {
         }
         
         // Step 4: Https Upgrade
-        guard !notificationShown else { return }
+        if notificationShown { return }
 
-        if isProductNotificationsValid,
-           !Preferences.ProductNotificationBenchmarks.httpsUpgradeShown.value,
+        if !Preferences.ProductNotificationBenchmarks.httpsUpgradeShown.value,
            contentBlockerStats.httpsCount > 0 {
             
             notifyHttpsUpgrade(theme: Theme.of(selectedTab))
