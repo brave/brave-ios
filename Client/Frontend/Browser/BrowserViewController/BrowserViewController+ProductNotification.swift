@@ -172,7 +172,7 @@ extension BrowserViewController {
             switch type {
                 case .videoAdBlock:
                     Preferences.ProductNotificationBenchmarks.videoAdBlockShown.value = true
-                case .trackerAdCountBlock(count: _):
+                case .trackerAdCountBlock:
                     Preferences.ProductNotificationBenchmarks.privacyProtectionBlockShown.value = true
                 case .encryptedConnectionWarning:
                     Preferences.ProductNotificationBenchmarks.httpsUpgradeShown.value = true
