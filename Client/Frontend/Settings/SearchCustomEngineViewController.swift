@@ -39,6 +39,8 @@ class SearchCustomEngineViewController: UIViewController {
         static let urlInputRowIdentifier = "urlInputRowIdentifier"
         static let titleInputRowIdentifier = "titleInputRowIdentifier"
         static let searchEngineHeaderIdentifier = "searchEngineHeaderIdentifier"
+        static let urlEntryMaxCharacterCount  = 150
+        static let titleEntryMaxCharacterCount = 50
     }
     
     // MARK: Properties
@@ -96,7 +98,7 @@ class SearchCustomEngineViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        title = "Add Search Engine"
+        title = Strings.CustomSearchEngine.customEngineNavigationTitle
         
         setup()
         doLayout()
@@ -114,7 +116,7 @@ class SearchCustomEngineViewController: UIViewController {
             $0.delegate = self
         }
         
-        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Cancel", style: .plain, target: self, action: #selector(cancel))
+        navigationItem.leftBarButtonItem = UIBarButtonItem(title: Strings.cancelButtonTitle, style: .plain, target: self, action: #selector(cancel))
     }
     
     private func doLayout() {
@@ -216,7 +218,7 @@ extension SearchCustomEngineViewController: UITableViewDelegate, UITableViewData
     func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
         guard section == Section.url.rawValue else { return nil }
         
-        return "Write the search url and replace the query with %s.\nFor example: https://youtube.com/search?q=%s \n(If the site supports OpenSearch an option to add automatically will be provided while editing this field.)"
+        return Strings.CustomSearchEngine.customEngineAddDesription
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
@@ -235,7 +237,7 @@ extension SearchCustomEngineViewController: UITableViewDelegate, UITableViewData
                 headerView.addEngineButton.state = showAutoAddSearchButton ? .enabled : .disabled
                 urlHeader = headerView
             default:
-                headerView.titleLabel.text = "Title"
+                headerView.titleLabel.text = Strings.title
                 headerView.addEngineButton.isHidden = true
         }
         
@@ -276,7 +278,6 @@ extension SearchCustomEngineViewController {
         urlHeader?.addEngineButton.state = .loading
         view.endEditing(true)
         
-
         NetworkManager().downloadResource(with: url).uponQueue(.main) { [weak self] response in
             guard let self = self else { return }
             
@@ -379,7 +380,6 @@ extension SearchCustomEngineViewController {
     }
 }
 
-
 // MARK: Manual Add Engine
 
 extension SearchCustomEngineViewController {
@@ -442,11 +442,11 @@ extension SearchCustomEngineViewController {
         let searchTermPlaceholder = "%s"
         let searchTemplatePlaceholder = "{searchTerms}"
         
-        guard query.contains(searchTermPlaceholder) else {
-            return nil
+        if query.contains(searchTermPlaceholder) {
+            return query.replacingOccurrences(of: searchTermPlaceholder, with: searchTemplatePlaceholder)
         }
         
-        return query.replacingOccurrences(of: searchTermPlaceholder, with: searchTemplatePlaceholder)
+        return nil
     }
 }
 
@@ -460,7 +460,7 @@ extension SearchCustomEngineViewController: UITextViewDelegate {
             return false
         }
 
-        return textView.text.count + (text.count - range.length) <= 150
+        return textView.text.count + (text.count - range.length) <= Constants.urlEntryMaxCharacterCount
     }
     
     func textViewDidChange(_ textView: UITextView) {
@@ -492,7 +492,7 @@ extension SearchCustomEngineViewController: UITextFieldDelegate {
         let currentString: NSString = text as NSString
         let newString: NSString = currentString.replacingCharacters(in: range, with: string) as NSString
         
-        return newString.length <= 50
+        return newString.length <= Constants.titleEntryMaxCharacterCount
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
@@ -524,7 +524,7 @@ fileprivate class SearchEngineTableViewHeader: UITableViewHeaderFooterView {
         $0.textColor = UIColor.Photon.grey50
     }
 
-    lazy var addEngineButton = OpenSearchEngineButton(title: "Auto Add", hidesWhenDisabled: false).then {
+    lazy var addEngineButton = OpenSearchEngineButton(title: Strings.CustomSearchEngine.customEngineAutoAddTitle, hidesWhenDisabled: false).then {
         $0.addTarget(self, action: #selector(addEngineAuto), for: .touchUpInside)
     }
 
