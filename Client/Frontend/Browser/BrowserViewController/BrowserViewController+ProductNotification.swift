@@ -105,7 +105,7 @@ extension BrowserViewController {
     }
     
     private func notifyPrivacyProtectBlock(theme: Theme) {
-        let shareTrackersViewController = ShareTrackersController(theme: theme, trackingType: .trackerAdCountBlock(count: benchmarkNumberOfTrackers))
+        let shareTrackersViewController = ShareTrackersController(theme: theme, trackingType: .trackerAdCountBlock)
         
         shareTrackersViewController.actionHandler = { [weak self] action in
             guard let self = self else { return }
@@ -114,7 +114,7 @@ extension BrowserViewController {
 
             switch action {
                 case .dontShowAgainTapped:
-                    self.dismissAndAddNoShowList(.trackerAdCountBlock(count: self.benchmarkNumberOfTrackers))
+                    self.dismissAndAddNoShowList(.trackerAdCountBlock)
                 default:
                     break
             }

@@ -15,7 +15,7 @@ public enum TrackingType: Equatable {
     case trackerCountShare(count: Int)
     case trackerAdWarning
     case videoAdBlock
-    case trackerAdCountBlock(count: Int)
+    case trackerAdCountBlock
     case encryptedConnectionWarning
     
     var title: String {
@@ -26,8 +26,8 @@ public enum TrackingType: Equatable {
                 return Strings.ShieldEducation.trackerAdWarningTitle
             case .videoAdBlock:
                 return Strings.ShieldEducation.videoAdBlockTitle
-            case .trackerAdCountBlock(let count):
-                return String(format: Strings.ShieldEducation.trackerAdCountBlockTitle, "\(count)")
+            case .trackerAdCountBlock:
+                return Strings.ShieldEducation.trackerAdCountBlockTitle
             case .encryptedConnectionWarning:
                 return Strings.ShieldEducation.encryptedConnectionWarningTitle
         }
