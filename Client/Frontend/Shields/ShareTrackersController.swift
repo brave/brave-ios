@@ -295,7 +295,7 @@ private class ShareTrackersView: UIView, ShareTrayViewDelegate, Themeable {
                 string: trackingType.title,
                 attributes: [.font: UIFont.systemFont(ofSize: 20.0)]
             ))
-            return string.withLineSpacing(3)
+            return string.withLineSpacing(2)
         }()
         
         subtitleLabel.attributedText = NSAttributedString(string: trackingType.subTitle).withLineSpacing(2)
