@@ -106,12 +106,12 @@ extension UIView {
     @discardableResult
     func addSubviews(_ listofViews: [UIView]) -> Self {
         for view in listofViews {
-            self.addSubview(view)
+            addSubview(view)
         }
         return self
     }
 
-    /// List of subviews owned by the the view
+    /// Fetchs list of subviews recursively owned by the the view
     public func subviews(where predicate: (_ view: UIView) -> Bool) -> [UIView] {
         return self.subviews.flatMap { subview -> [UIView] in
             var result = subview.subviews(where: predicate)

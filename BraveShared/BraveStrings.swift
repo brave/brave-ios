@@ -795,33 +795,33 @@ extension Strings {
 extension Strings {
     public struct Share {
         public static let shareScreenTitle =
-            NSLocalizedString("ShieldShareTitle",
+            NSLocalizedString("share.shieldShareTitle",
                               bundle: .braveShared,
                               value: "Share to",
                               comment: "Title for screen to share shields")
 
         public static let emailShareActionTitle =
-            NSLocalizedString("ShieldShareEmailAction",
+            NSLocalizedString("share.shieldShareEmailAction",
                               bundle: .braveShared,
                               value: "Share with email",
                               comment: "Share with email action title")
 
         public static let twitterShareActionTitle =
-            NSLocalizedString("ShieldShareTwitterAction",
+            NSLocalizedString("share.shieldShareTwitterAction",
                               bundle: .braveShared,
                               value: "Share with twitter",
                               comment: "Share with twitter action title")
 
         public static let facebookShareActionTitle =
-            NSLocalizedString("ShieldShareFacebookAction",
+            NSLocalizedString("share.shieldShareFacebookAction",
                               bundle: .braveShared,
                               value: "Share with facebook",
                               comment: "Share with facebook action title")
 
         public static let moreShareActionTitle =
-            NSLocalizedString("ShieldShareMoreAction",
+            NSLocalizedString("share.shieldShareMoreAction",
                               bundle: .braveShared,
-                              value: "More...",
+                              value: "More…",
                               comment: "Share with more action title")
     }
 }

@@ -41,6 +41,7 @@ class SimpleShieldsView: UIView, Themeable {
     class BlockCountView: UIView, Themeable {
 
         private struct UX {
+            static let descriptionEdgeInset = UIEdgeInsets(top: 13, left: 22, bottom: 14, right: 22)
             static let iconEdgeInset = UIEdgeInsets(top: 22, left: 14, bottom: 22, right: 14)
             static let hitBoxEdgeInsets = UIEdgeInsets(top: -10, left: -10, bottom: -10, right: -10)
             static let buttonEdgeInsets = UIEdgeInsets(top: -2, left: 4, bottom: -3, right: 4)
@@ -48,27 +49,15 @@ class SimpleShieldsView: UIView, Themeable {
 
         let contentStackView = UIStackView().then {
             $0.spacing = 2
-            $0.alignment = .fill
         }
 
-        let descriptionStackView = UIStackView().then {
+        let descriptionStackView = ShieldsStackView(edgeInsets: UX.descriptionEdgeInset).then {
             $0.spacing = 24
-            $0.alignment = .center
-            $0.layoutMargins = UIEdgeInsets(top: 13, left: 22, bottom: 14, right: 22)
-            $0.isLayoutMarginsRelativeArrangement = true
         }
         
-        let infoStackView = UIStackView().then {
-            $0.alignment = .center
-            $0.layoutMargins = UX.iconEdgeInset
-            $0.isLayoutMarginsRelativeArrangement = true
-        }
+        let infoStackView = ShieldsStackView(edgeInsets: UX.iconEdgeInset)
 
-        let shareStackView = UIStackView().then {
-            $0.alignment = .center
-            $0.layoutMargins = UX.iconEdgeInset
-            $0.isLayoutMarginsRelativeArrangement = true
-        }
+        let shareStackView = ShieldsStackView(edgeInsets: UX.iconEdgeInset)
         
         let countLabel = UILabel().then {
             $0.font = .systemFont(ofSize: 36)
@@ -89,7 +78,7 @@ class SimpleShieldsView: UIView, Themeable {
         }
         
         let infoButton = Button().then {
-            $0.setImage(#imageLiteral(resourceName: "shields-help").withRenderingMode(.alwaysTemplate), for: .normal)
+            $0.setImage(#imageLiteral(resourceName: "shields-help").template, for: .normal)
             $0.hitTestSlop = UX.hitBoxEdgeInsets
             $0.imageEdgeInsets = .zero
             $0.titleEdgeInsets = .zero
@@ -255,5 +244,40 @@ class SimpleShieldsView: UIView, Themeable {
         hostLabel.textColor = theme.isDark ? .white : .black
         shieldsDownDisclaimerLabel.textColor = theme.colors.tints.home
         reportSiteButton.tintColor = theme.isDark ? Colors.grey200 : Colors.grey800
+    }
+}
+
+// MARK: - ShieldsStackView
+
+extension SimpleShieldsView {
+    
+    class ShieldsStackView: UIStackView {
+                        
+        init(edgeInsets: UIEdgeInsets) {
+            super.init(frame: .zero)
+            
+            alignment = .center
+            layoutMargins = edgeInsets
+            isLayoutMarginsRelativeArrangement = true
+        }
+        
+        @available(*, unavailable)
+        required init(coder: NSCoder) {
+            fatalError()
+        }
+        
+        /// Adds Background to StackView with Color and Corner Radius
+        public func addBackground(color: UIColor, cornerRadius: CGFloat? = nil) {
+            let backgroundView = UIView(frame: bounds).then {
+                $0.backgroundColor = color
+                $0.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+            }
+
+            if let radius = cornerRadius {
+                backgroundView.layer.cornerRadius = radius
+            }
+            
+            insertSubview(backgroundView, at: 0)
+        }
     }
 }

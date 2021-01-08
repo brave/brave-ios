@@ -18,7 +18,7 @@ class ShareShieldsViewController: UIViewController, Themeable {
         case shareEmailClicked
         case shareTwitterClicked
         case shareFacebookClicked
-        case shareDefaultClicked
+        case shareDefaultClicked // For presenting generic share menu
     }
 
     // MARK: UX
@@ -35,7 +35,6 @@ class ShareShieldsViewController: UIViewController, Themeable {
     private let contentStackView = UIStackView().then {
         $0.axis = .vertical
         $0.spacing = 3
-        $0.alignment = .fill
         $0.layoutMargins = UX.defaultInset
         $0.isLayoutMarginsRelativeArrangement = true
     }
@@ -90,20 +89,16 @@ class ShareShieldsViewController: UIViewController, Themeable {
     
     private func doLayoutAndAddGestureRecognizers() {
         let shareTypeViewEmail = ShareTypeView(type: .email)
-        let shareEmailGesture = UITapGestureRecognizer(target: self, action: #selector(shareClicked(_:)))
-        shareTypeViewEmail.addGestureRecognizer(shareEmailGesture)
+        shareTypeViewEmail.addTarget(self, action: #selector(shareClicked(_:)), for: .touchUpInside)
 
         let shareTypeViewTwitter = ShareTypeView(type: .twitter)
-        let shareTwitterGesture = UITapGestureRecognizer(target: self, action: #selector(shareClicked(_:)))
-        shareTypeViewTwitter.addGestureRecognizer(shareTwitterGesture)
+        shareTypeViewTwitter.addTarget(self, action: #selector(shareClicked(_:)), for: .touchUpInside)
 
         let shareTypeViewFacebook = ShareTypeView(type: .facebook)
-        let shareFacebookGesture = UITapGestureRecognizer(target: self, action: #selector(shareClicked(_:)))
-        shareTypeViewFacebook.addGestureRecognizer(shareFacebookGesture)
+        shareTypeViewFacebook.addTarget(self, action: #selector(shareClicked(_:)), for: .touchUpInside)
 
         let shareTypeViewDefault = ShareTypeView(type: .default)
-        let shareDefaultGesture = UITapGestureRecognizer(target: self, action: #selector(shareClicked(_:)))
-        shareTypeViewDefault.addGestureRecognizer(shareDefaultGesture)
+        shareTypeViewDefault.addTarget(self, action: #selector(shareClicked(_:)), for: .touchUpInside)
 
         view.addSubview(contentStackView)
 
@@ -125,7 +120,7 @@ class ShareShieldsViewController: UIViewController, Themeable {
         view.backgroundColor = theme.isDark ? BraveUX.popoverDarkBackground : UIColor.white
 
         contentStackView.arrangedSubviews.forEach { subview in
-            if let typeView = subview as? ShareTypeView {
+            if let typeView = subview as? Themeable {
                 typeView.applyTheme(theme)
             }
         }
@@ -151,7 +146,7 @@ class ShareShieldsViewController: UIViewController, Themeable {
 
 // MARK: - ShareTypeView
 
-private class ShareTypeView: UIView, Themeable {
+private class ShareTypeView: UIControl, Themeable {
 
     // MARK: ShareType
     
@@ -189,6 +184,7 @@ private class ShareTypeView: UIView, Themeable {
     // MARK: UX
     
     private struct UX {
+        static let darkBackgroundColor = UIColor(rgb: 0x303443)
         static let defaultOffsetInset: CGFloat = 19
         static let iconSize: CGFloat = 24
     }
@@ -216,10 +212,10 @@ private class ShareTypeView: UIView, Themeable {
 
     // MARK: Lifecycle
     
-    init(frame: CGRect = .zero, type: ShareType) {
+    init(type: ShareType) {
         shareType = type
 
-        super.init(frame: frame)
+        super.init(frame: .zero)
 
         doLayout()
         setContent()
@@ -272,7 +268,7 @@ private class ShareTypeView: UIView, Themeable {
     }
 
     func applyTheme(_ theme: Theme) {
-        backgroundColor = theme.isDark ? UIColor(rgb: 0x303443) : Colors.neutral000
+        backgroundColor = theme.isDark ? UX.darkBackgroundColor : Colors.neutral000
         titleLabel.textColor = theme.isDark ? .white : .black
     }
 }
