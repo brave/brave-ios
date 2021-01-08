@@ -1018,7 +1018,7 @@ extension Strings {
                               comment: "Button text to buy Brave VPN")
         
         public static let tryForFreeButton =
-            NSLocalizedString("learnMore",
+            NSLocalizedString("vpn.learnMore",
                               bundle: .braveShared,
                               value: "Try for FREE",
                               comment: "Button text to try free Brave VPN")
