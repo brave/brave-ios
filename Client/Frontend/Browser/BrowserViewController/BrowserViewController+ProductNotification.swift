@@ -88,19 +88,7 @@ extension BrowserViewController {
     private func notifyVideoAdsBlocked(theme: Theme) {
         let shareTrackersViewController = ShareTrackersController(theme: theme, trackingType: .videoAdBlock)
         
-        shareTrackersViewController.actionHandler = { [weak self] action in
-            guard let self = self else { return }
-            
-            self.benchmarkNotificationPresented = false
-
-            switch action {
-                case .dontShowAgainTapped:
-                    self.dismissAndAddNoShowList(.videoAdBlock)
-                default:
-                    break
-            }
-        }
-        
+        dismissAndAddNoShowList(.videoAdBlock)
         showBenchmarkNotificationPopover(controller: shareTrackersViewController)
     }
     
@@ -145,13 +133,18 @@ extension BrowserViewController {
     private func showBenchmarkNotificationPopover(controller: (UIViewController & PopoverContentComponent)) {
         let popover = PopoverController(contentController: controller, contentSizeBehavior: .autoLayout)
         popover.addsConvenientDismissalMargins = false
-        popover.present(from: topToolbar.locationView.shieldsButton, on: self)
-        benchmarkNotificationPresented = true
-        
         popover.popoverDidDismiss = { [weak self] _ in
             guard let self = self else { return }
             
             self.benchmarkNotificationPresented = false
+        }
+        
+        // Adding slight delay so the popover notification will be shown after page loaded
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+            guard let self = self else { return }
+            
+            popover.present(from: self.topToolbar.locationView.shieldsButton, on: self)
+            self.benchmarkNotificationPresented = true
         }
     }
     

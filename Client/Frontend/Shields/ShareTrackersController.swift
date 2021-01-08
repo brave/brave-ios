@@ -276,10 +276,13 @@ private class ShareTrackersView: UIView, ShareTrayViewDelegate, Themeable {
             })
         )
         
-        if case .trackerCountShare = trackingType {
-            stackView.addArrangedSubview(shareTrayView)
-        } else {
-            stackView.addArrangedSubview(actionButton)
+        switch trackingType {
+            case .trackerCountShare:
+                stackView.addArrangedSubview(shareTrayView)
+            case .trackerAdWarning, .trackerAdCountBlock, .encryptedConnectionWarning:
+                stackView.addArrangedSubview(actionButton)
+            default:
+                return
         }
     }
     
