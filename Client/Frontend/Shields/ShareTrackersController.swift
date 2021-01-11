@@ -21,7 +21,7 @@ public enum TrackingType: Equatable {
     var title: String {
         switch self {
             case .trackerCountShare(let count):
-                return String(format: Strings.ShieldEducation.trackerCountShareTitle, "\(count)")
+                return String(format: Strings.ShieldEducation.trackerCountShareTitle, count)
             case .trackerAdWarning:
                 return Strings.ShieldEducation.trackerAdWarningTitle
             case .videoAdBlock:

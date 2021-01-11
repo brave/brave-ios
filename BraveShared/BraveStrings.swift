@@ -799,7 +799,7 @@ extension Strings {
             NSLocalizedString("shieldEducation.trackerCountShareTitle",
                               bundle: .braveShared,
                               value: "%ld trackers & ads blocked",
-                              comment: "Title for Shield Education Tracker Count Share. The parameter substituted for \"%@\" is the count of the trackers and ads blocked in total until present. E.g.: 5000 trackers & ads blocked")
+                              comment: "Title for Shield Education Tracker Count Share. The parameter substituted for \"%ld\" is the count of the trackers and ads blocked in total until present. E.g.: 5000 trackers & ads blocked")
 
         public static let trackerAdWarningTitle =
             NSLocalizedString("shieldEducation.trackerAdWarningTitle",
