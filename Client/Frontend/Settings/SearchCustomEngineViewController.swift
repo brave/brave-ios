@@ -53,9 +53,27 @@ class SearchCustomEngineViewController: UIViewController {
     
     private var urlHeader: SearchEngineTableViewHeader?
     
-    private var openSearchEngine: OpenSearchReference?
+    private var host: URL? {
+        didSet {
+            if let host = host, oldValue != host {
+                fetchSearchEngineSupportForHost(host)
+            }
+        }
+    }
     
-    private var host: URL?
+    private var openSearchEngine: OpenSearchReference? {
+        didSet {
+            checkSupportAutoAddSearchEngine()
+        }
+    }
+    
+    private var dataTask: URLSessionDataTask? {
+        didSet {
+            oldValue?.cancel()
+        }
+    }
+    
+    fileprivate var faviconImage: UIImage?
     
     private lazy var spinnerView = UIActivityIndicatorView(style: .gray).then {
         $0.hidesWhenStopped = true
@@ -230,13 +248,10 @@ extension SearchCustomEngineViewController: UITableViewDelegate, UITableViewData
 extension SearchCustomEngineViewController {
     
     fileprivate func autoAddSearchEngine() {
-        let favIconURLText: String? = ""
-        
         guard var referenceURLString = openSearchEngine?.reference,
               let title = openSearchEngine?.title,
               var referenceURL = URL(string: referenceURLString),
-              let faviconURLString = favIconURLText,
-              let iconURL = URL(string: faviconURLString),
+              let faviconImage = faviconImage,
               let hostURLString = host?.absoluteString else {
             let alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
             present(alert, animated: true, completion: nil)
@@ -253,37 +268,29 @@ extension SearchCustomEngineViewController {
             referenceURL = constructedReferenceURL
         }
             
-        downloadOpenSearchXML(referenceURL, referenceURL: referenceURLString, title: title, iconURL: iconURL)
+        downloadOpenSearchXML(referenceURL, referenceURL: referenceURLString, title: title, iconImage: faviconImage)
     }
     
-    func downloadOpenSearchXML(_ url: URL, referenceURL: String, title: String, iconURL: URL) {
+    func downloadOpenSearchXML(_ url: URL, referenceURL: String, title: String, iconImage: UIImage) {
         setSaveButton(for: .loading)
         urlHeader?.addEngineButton.state = .loading
         view.endEditing(true)
+        
 
-        WebImageCacheManager.shared.load(from: iconURL, completion: { [weak self] (image, _, _, _, _) in
+        NetworkManager().downloadResource(with: url).uponQueue(.main) { [weak self] response in
             guard let self = self else { return }
             
-            guard let image = image else {
+            if let openSearchEngine = OpenSearchParser(pluginMode: true).parse(response.data, referenceURL: referenceURL, image: iconImage) {
+                self.addSearchEngine(openSearchEngine)
+            } else {
                 let alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
+                
                 self.present(alert, animated: true) {
                     self.setSaveButton(for: .enabled)
                     self.urlHeader?.addEngineButton.state = .enabled
                 }
-
-                return
             }
-
-            NetworkManager().downloadResource(with: url).uponQueue(.main) { [weak self] response in
-                guard let self = self,
-                      let openSearchEngine =
-                        OpenSearchParser(pluginMode: true).parse(response.data, referenceURL: referenceURL, image: image) else {
-                    return
-                }
-
-                self.addSearchEngine(openSearchEngine)
-            }
-        })
+        }
     }
     
     func addSearchEngine(_ engine: OpenSearchEngine) {
@@ -303,6 +310,75 @@ extension SearchCustomEngineViewController {
         self.present(alert, animated: true, completion: {})
     }
 }
+
+// MARK: Auto Add Meta Data
+
+extension SearchCustomEngineViewController {
+    
+    func checkSupportAutoAddSearchEngine() {
+        guard let openSearchEngine = openSearchEngine else {
+            showAutoAddSearchButton = false
+            urlHeader?.addEngineButton.state = .disabled
+            faviconImage = nil
+            
+            return
+        }
+        
+        let matches = profile.searchEngines.orderedEngines.filter {$0.referenceURL == openSearchEngine.reference}
+        
+        if !matches.isEmpty {
+            showAutoAddSearchButton = false
+            urlHeader?.addEngineButton.state = .disabled
+        } else {
+            showAutoAddSearchButton = true
+            urlHeader?.addEngineButton.state = .enabled
+        }
+    }
+    
+    func fetchSearchEngineSupportForHost(_ host: URL) {
+        showAutoAddSearchButton = false
+        urlHeader?.addEngineButton.state = .disabled
+        
+        dataTask = URLSession.shared.dataTask(with: host) { [weak self] data, _, error in
+            guard let data = data, error == nil else {
+                self?.openSearchEngine = nil
+                return
+            }
+            
+            self?.loadSearchEngineMetaData(from: data, url: host)
+        }
+        
+        dataTask?.resume()
+    }
+
+    func loadSearchEngineMetaData(from data: Data, url: URL) {
+        guard let root = try? HTMLDocument(data: data as Data),
+            let searchEngineDetails = fetchOpenSearchReference(document: root) else {
+            openSearchEngine = nil
+            return
+        }
+        
+        openSearchEngine = searchEngineDetails
+        
+        let fetcher = FaviconFetcher(siteURL: url, kind: .favicon, domain: nil)
+        fetcher.load { [weak self] _, attributes in
+            self?.faviconImage = attributes.image ?? #imageLiteral(resourceName: "defaultFavicon")
+        }
+    }
+    
+    func fetchOpenSearchReference(document: HTMLDocument) -> OpenSearchReference? {
+        let documentXpath = "//head//link[contains(@type, 'application/opensearchdescription+xml')]"
+        
+        for link in document.xpath(documentXpath) {
+            if let referenceLink = link["href"], let title = link["title"] {
+                return OpenSearchReference(reference: referenceLink, title: title)
+            }
+        }
+        
+        return nil
+    }
+}
+
 
 // MARK: Manual Add Engine
 
