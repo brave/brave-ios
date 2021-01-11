@@ -228,6 +228,7 @@ private class ShareTrackersView: UIView, ShareTrayViewDelegate, Themeable {
 
         super.init(frame: .zero)
 
+        
         doLayout()
         setContent()
     }
