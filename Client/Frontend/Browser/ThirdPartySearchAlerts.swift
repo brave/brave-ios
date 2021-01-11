@@ -75,6 +75,11 @@ class ThirdPartySearchAlerts: UIAlertController {
                                  message: Strings.customEngineDuplicateErrorMessage)
     }
     
+    static func missingInfoToAddThirdPartySearch() -> UIAlertController {
+        return searchAlertWithOK(title: Strings.thirdPartySearchFailedTitle,
+                                 message: Strings.customEngineFillAllFieldsErrorMessage)
+    }
+    
     private static func searchAlertWithOK(title: String, message: String) -> UIAlertController {
         let alert = ThirdPartySearchAlerts(
             title: title,
