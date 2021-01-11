@@ -10,8 +10,8 @@ import BraveShared
 import Shared
 
 // MARK: TrackingType
-
-public enum TrackingType: Equatable {
+ 
+enum TrackingType: Equatable {
     case trackerCountShare(count: Int)
     case trackerAdWarning
     case videoAdBlock
@@ -237,10 +237,10 @@ private class ShareTrackersView: UIView, ShareTrayViewDelegate, Themeable {
     
     // MARK: Lifecycle
     
-    init(frame: CGRect = .zero, trackingType: TrackingType) {
+    init(trackingType: TrackingType) {
         self.trackingType = trackingType
         
-        super.init(frame: frame)
+        super.init(frame: .zero)
         
         doLayout()
         setContent()

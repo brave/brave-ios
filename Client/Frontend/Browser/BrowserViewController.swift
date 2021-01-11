@@ -148,7 +148,7 @@ class BrowserViewController: UIViewController {
     let vpnProductInfo = VPNProductInfo()
     
     /// Tracking If a product notification is presented in order to not to try to present another one over existing popover
-    var benchmarkNotificationPresented: Bool
+    var benchmarkNotificationPresented = false
     var benchmarkNumberOfTrackers = 15
 
     init(profile: Profile, tabManager: TabManager, crashedLastSession: Bool,
@@ -217,8 +217,6 @@ class BrowserViewController: UIViewController {
         }
         rewardsObserver = LedgerObserver(ledger: rewards.ledger)
         deviceCheckClient = DeviceCheckClient(environment: configuration.environment)
-
-        benchmarkNotificationPresented = false
         
         super.init(nibName: nil, bundle: nil)
         didInit()
