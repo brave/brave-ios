@@ -11,6 +11,15 @@
         }
       },
       {
+        "package": "GCDWebServers",
+        "repositoryURL": "https://github.com/nostradani/GCDWebServer",
+        "state": {
+          "branch": null,
+          "revision": "ad60adf1929dcd6855b0a0a1a1cf20d2898159fb",
+          "version": null
+        }
+      },
+      {
         "package": "Lottie",
         "repositoryURL": "https://github.com/airbnb/lottie-ios",
         "state": {
