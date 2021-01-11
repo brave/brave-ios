@@ -5,6 +5,7 @@
 import BraveShared
 import BraveUI
 import Shared
+
 // MARK: - ProductNotification
 
 extension BrowserViewController {
