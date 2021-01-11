@@ -70,7 +70,7 @@ class SearchSettingsTableViewController: UITableViewController {
     
     // MARK: Lifecycle
     
-    init(profile: Profile, theme: Theme) {
+    init(profile: Profile) {
         self.profile = profile
         self.model = profile.searchEngines
         super.init(nibName: nil, bundle: nil)
