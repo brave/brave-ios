@@ -42,6 +42,8 @@ extension Strings {
                                              bundle: .braveShared, value: "Learn More", comment: "")
     public static let termsOfService = NSLocalizedString("TermsOfService", tableName: "BraveShared",
                                                   bundle: .braveShared, value: "Terms of Service", comment: "")
+    public static let title = NSLocalizedString("Title", tableName: "BraveShared",
+                                                  bundle: .braveShared, value: "Title", comment: "")
     public static let monthAbbreviation =
         NSLocalizedString("monthAbbreviation", tableName: "BraveShared",
                           bundle: .braveShared, value: "mo.", comment: "Abbreviation for 'Month', use full word' Month' if this word can't be shortened in your language")
@@ -250,6 +252,31 @@ extension Strings {
                           bundle: .braveShared,
                           value: "Add Custom Search Engine",
                           comment: "Add Custom Search Engine Table Cell Row Title")
+}
+
+// MARK: - SearchCustomEngineViewController
+
+extension Strings {
+    public struct CustomSearchEngine {
+        public static let customEngineNavigationTitle = NSLocalizedString(
+            "customSearchEngine.navigationTitle",
+            bundle: .braveShared,
+            value: "Add Search Engine",
+            comment: "Navigation Bar title")
+        
+        public static let customEngineAddDesription = NSLocalizedString(
+            "customSearchEngine.addEngineDescription",
+            bundle: Bundle.braveShared,
+            value: "Write the search url and replace the query with %s.\nFor example: https://youtube.com/search?q=%s \n(If the site supports OpenSearch an option to add automatically will be provided while editing this field.)",
+            comment: "Label explaining how to add search engine.")
+        
+        public static let customEngineAutoAddTitle = NSLocalizedString(
+            "customSearchEngine.autoAddTitle",
+            bundle: Bundle.braveShared,
+            value: "Auto Add",
+            comment: "Button title for Auto Add in header")
+
+    }
 }
 
 // MARK:-  SettingsContentViewController.swift
