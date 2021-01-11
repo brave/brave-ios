@@ -302,6 +302,8 @@
 		27756A8425ACFFEB00C129AF /* pop.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 277569AE25ACFC1C00C129AF /* pop.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		27756ABF25AD017A00C129AF /* OnePasswordExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 277569F425ACFD3F00C129AF /* OnePasswordExtension.framework */; };
 		27756B0F25AD08FA00C129AF /* SDWebImage in Frameworks */ = {isa = PBXBuildFile; productRef = 27756B0E25AD08FA00C129AF /* SDWebImage */; };
+		27756BBE25AD122200C129AF /* Static.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27756B9925AD120100C129AF /* Static.framework */; };
+		27756BBF25AD122200C129AF /* Static.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 27756B9925AD120100C129AF /* Static.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		2777273722EB43A100F0214C /* StringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2777273622EB43A100F0214C /* StringExtensions.swift */; };
 		2777274022EB44B300F0214C /* StringExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2777273F22EB44B300F0214C /* StringExtensionTests.swift */; };
 		2777275A22EB4C7700F0214C /* BraveShared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DE7688420B3456C00FF5533 /* BraveShared.framework */; };
@@ -1075,33 +1077,26 @@
 			remoteGlobalIDString = 9C3F4D8C1A59ACDC004B3ECE;
 			remoteInfo = OnePasswordExtension;
 		};
-		27756A3D25ACFD3F00C129AF /* PBXContainerItemProxy */ = {
+		27756B9825AD120100C129AF /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 27756A2E25ACFD3F00C129AF /* App Demo for iOS Swift.xcodeproj */;
+			containerPortal = 27756B6D25AD120100C129AF /* Static.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = F1B11CE71ACA827600BBB963;
-			remoteInfo = ACME;
+			remoteGlobalIDString = 21826AAA1B3F51A100AA9641;
+			remoteInfo = "Static-iOS";
 		};
-		27756A4025ACFD3F00C129AF /* PBXContainerItemProxy */ = {
+		27756B9A25AD120100C129AF /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 27756A1B25ACFD3F00C129AF /* App Demo for iOS.xcodeproj */;
+			containerPortal = 27756B6D25AD120100C129AF /* Static.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = C0FA52971974821100570166;
-			remoteInfo = ACME;
+			remoteGlobalIDString = 21826AB41B3F51A100AA9641;
+			remoteInfo = StaticTests;
 		};
-		27756A4325ACFD3F00C129AF /* PBXContainerItemProxy */ = {
+		27756B9C25AD120100C129AF /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 27756A2025ACFD3F00C129AF /* WebView Demo for iOS Swift.xcodeproj */;
+			containerPortal = 27756B6D25AD120100C129AF /* Static.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = C0525F671B05831F003613F5;
-			remoteInfo = "ACME Browser";
-		};
-		27756A4625ACFD3F00C129AF /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 277569FB25ACFD3F00C129AF /* WebView Demo for iOS.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = C0169CD5197D6C3C006E7618;
-			remoteInfo = "ACME Browser";
+			remoteGlobalIDString = 36748D4F1B5034EC0046F207;
+			remoteInfo = Example;
 		};
 		278C468B23F1E6270083347F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -1300,6 +1295,7 @@
 				5D1DC52920AC9AFB00905E5A /* Data.framework in Copy Frameworks */,
 				E60138661C89EB7D00DF9756 /* Storage.framework in Copy Frameworks */,
 				5DE7689A20B3456E00FF5533 /* BraveShared.framework in Copy Frameworks */,
+				27756BBF25AD122200C129AF /* Static.framework in Copy Frameworks */,
 				277568D825ACF91600C129AF /* SPMLibraries.framework in Copy Frameworks */,
 				278C468E23F1E6270083347F /* BraveUI.framework in Copy Frameworks */,
 				E60138651C89EB7600DF9756 /* Shared.framework in Copy Frameworks */,
@@ -1744,54 +1740,44 @@
 		277569A325ACFC1C00C129AF /* Podfile.lock */ = {isa = PBXFileReference; lastKnownFileType = text; path = Podfile.lock; sourceTree = "<group>"; };
 		277569EE25ACFD3E00C129AF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		277569EF25ACFD3E00C129AF /* OnePasswordExtension.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = OnePasswordExtension.xcodeproj; sourceTree = "<group>"; };
-		277569F525ACFD3F00C129AF /* 1PasswordExtension.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; path = 1PasswordExtension.podspec; sourceTree = "<group>"; };
 		277569F625ACFD3F00C129AF /* 1Password.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = 1Password.xcassets; sourceTree = "<group>"; };
 		277569F725ACFD3F00C129AF /* LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 		277569F825ACFD3F00C129AF /* OnePasswordExtension.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OnePasswordExtension.m; sourceTree = "<group>"; };
-		277569FB25ACFD3F00C129AF /* WebView Demo for iOS.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = "WebView Demo for iOS.xcodeproj"; sourceTree = "<group>"; };
-		27756A0025ACFD3F00C129AF /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
-		27756A0125ACFD3F00C129AF /* WebViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WebViewController.m; sourceTree = "<group>"; };
-		27756A0325ACFD3F00C129AF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		27756A0425ACFD3F00C129AF /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		27756A0525ACFD3F00C129AF /* welcome.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = welcome.html; sourceTree = "<group>"; };
-		27756A0625ACFD3F00C129AF /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		27756A0725ACFD3F00C129AF /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		27756A0825ACFD3F00C129AF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		27756A0925ACFD3F00C129AF /* WebViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WebViewController.h; sourceTree = "<group>"; };
-		27756A0C25ACFD3F00C129AF /* ChangePasswordViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ChangePasswordViewController.h; sourceTree = "<group>"; };
-		27756A0D25ACFD3F00C129AF /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
-		27756A0E25ACFD3F00C129AF /* LoginViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LoginViewController.m; sourceTree = "<group>"; };
-		27756A0F25ACFD3F00C129AF /* ThankYouViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ThankYouViewController.m; sourceTree = "<group>"; };
-		27756A1025ACFD3F00C129AF /* RegisterViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RegisterViewController.m; sourceTree = "<group>"; };
-		27756A1225ACFD3F00C129AF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		27756A1325ACFD3F00C129AF /* ChangePasswordViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ChangePasswordViewController.m; sourceTree = "<group>"; };
-		27756A1425ACFD3F00C129AF /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		27756A1525ACFD3F00C129AF /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		27756A1625ACFD3F00C129AF /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		27756A1725ACFD3F00C129AF /* LoginViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LoginViewController.h; sourceTree = "<group>"; };
-		27756A1825ACFD3F00C129AF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		27756A1925ACFD3F00C129AF /* RegisterViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RegisterViewController.h; sourceTree = "<group>"; };
-		27756A1A25ACFD3F00C129AF /* ThankYouViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ThankYouViewController.h; sourceTree = "<group>"; };
-		27756A1B25ACFD3F00C129AF /* App Demo for iOS.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = "App Demo for iOS.xcodeproj"; sourceTree = "<group>"; };
-		27756A2025ACFD3F00C129AF /* WebView Demo for iOS Swift.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = "WebView Demo for iOS Swift.xcodeproj"; sourceTree = "<group>"; };
-		27756A2625ACFD3F00C129AF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		27756A2725ACFD3F00C129AF /* WebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
-		27756A2825ACFD3F00C129AF /* welcome.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = welcome.html; sourceTree = "<group>"; };
-		27756A2925ACFD3F00C129AF /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		27756A2A25ACFD3F00C129AF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		27756A2B25ACFD3F00C129AF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		27756A2C25ACFD3F00C129AF /* 1Password Extension Demos.xcworkspace */ = {isa = PBXFileReference; lastKnownFileType = wrapper.workspace; path = "1Password Extension Demos.xcworkspace"; sourceTree = "<group>"; };
-		27756A2E25ACFD3F00C129AF /* App Demo for iOS Swift.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = "App Demo for iOS Swift.xcodeproj"; sourceTree = "<group>"; };
-		27756A3325ACFD3F00C129AF /* ChangePasswordViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangePasswordViewController.swift; sourceTree = "<group>"; };
-		27756A3525ACFD3F00C129AF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		27756A3625ACFD3F00C129AF /* ThankYouViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThankYouViewController.swift; sourceTree = "<group>"; };
-		27756A3725ACFD3F00C129AF /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		27756A3825ACFD3F00C129AF /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
-		27756A3925ACFD3F00C129AF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		27756A3A25ACFD3F00C129AF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		27756A3B25ACFD3F00C129AF /* RegisterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterViewController.swift; sourceTree = "<group>"; };
 		27756A4825ACFD3F00C129AF /* OnePasswordExtension.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OnePasswordExtension.h; sourceTree = "<group>"; };
 		27756A4925ACFD4000C129AF /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		27756B6D25AD120100C129AF /* Static.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Static.xcodeproj; sourceTree = "<group>"; };
+		27756B7025AD120100C129AF /* .swift-version */ = {isa = PBXFileReference; lastKnownFileType = text; path = ".swift-version"; sourceTree = "<group>"; };
+		27756B7125AD120100C129AF /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		27756B7225AD120100C129AF /* Static.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; path = Static.podspec; sourceTree = "<group>"; };
+		27756B7425AD120100C129AF /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		27756B7525AD120100C129AF /* WindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowController.swift; sourceTree = "<group>"; };
+		27756B7625AD120100C129AF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		27756B7725AD120100C129AF /* NibTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NibTableViewCell.xib; sourceTree = "<group>"; };
+		27756B7925AD120100C129AF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		27756B7A25AD120100C129AF /* CustomTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTableViewCell.swift; sourceTree = "<group>"; };
+		27756B7B25AD120100C129AF /* NibTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NibTableViewCell.swift; sourceTree = "<group>"; };
+		27756B7C25AD120100C129AF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		27756B7E25AD120100C129AF /* static.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = static.png; sourceTree = "<group>"; };
+		27756B7F25AD120100C129AF /* Readme.markdown */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Readme.markdown; sourceTree = "<group>"; };
+		27756B8025AD120100C129AF /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
+		27756B8225AD120100C129AF /* Value2Cell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Value2Cell.swift; sourceTree = "<group>"; };
+		27756B8325AD120100C129AF /* SegmentedControlAccessory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentedControlAccessory.swift; sourceTree = "<group>"; };
+		27756B8425AD120100C129AF /* Cell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cell.swift; sourceTree = "<group>"; };
+		27756B8625AD120100C129AF /* RowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RowTests.swift; sourceTree = "<group>"; };
+		27756B8725AD120100C129AF /* DataSourceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSourceTests.swift; sourceTree = "<group>"; };
+		27756B8825AD120100C129AF /* SectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionTests.swift; sourceTree = "<group>"; };
+		27756B8925AD120100C129AF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		27756B8A25AD120100C129AF /* SubtitleCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubtitleCell.swift; sourceTree = "<group>"; };
+		27756B8B25AD120100C129AF /* SwitchAccessory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwitchAccessory.swift; sourceTree = "<group>"; };
+		27756B8C25AD120100C129AF /* TableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewController.swift; sourceTree = "<group>"; };
+		27756B8D25AD120100C129AF /* Static.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Static.h; sourceTree = "<group>"; };
+		27756B8E25AD120100C129AF /* Section.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Section.swift; sourceTree = "<group>"; };
+		27756B8F25AD120100C129AF /* DataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSource.swift; sourceTree = "<group>"; };
+		27756B9025AD120100C129AF /* Value1Cell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Value1Cell.swift; sourceTree = "<group>"; };
+		27756B9125AD120100C129AF /* ButtonCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonCell.swift; sourceTree = "<group>"; };
+		27756B9225AD120100C129AF /* Row.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Row.swift; sourceTree = "<group>"; };
+		27756B9325AD120100C129AF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		27756B9425AD120100C129AF /* .travis.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .travis.yml; sourceTree = "<group>"; };
 		2777273622EB43A100F0214C /* StringExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtensions.swift; sourceTree = "<group>"; };
 		2777273F22EB44B300F0214C /* StringExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtensionTests.swift; sourceTree = "<group>"; };
 		277C5B16254CAD2A0032DEF2 /* BraveRewardsExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveRewardsExtensions.swift; sourceTree = "<group>"; };
@@ -2763,6 +2749,7 @@
 				27756ABF25AD017A00C129AF /* OnePasswordExtension.framework in Frameworks */,
 				5EE5918123A290E000E8E8DE /* CoreNFC.framework in Frameworks */,
 				278C468D23F1E6270083347F /* BraveUI.framework in Frameworks */,
+				27756BBE25AD122200C129AF /* Static.framework in Frameworks */,
 				F98E1EA122B6D70E0018AF29 /* libYubiKit.a in Frameworks */,
 				5E8CD8E123D5E3DA00548FC0 /* libarchive.2.tbd in Frameworks */,
 				27756A8325ACFFEB00C129AF /* pop.framework in Frameworks */,
@@ -3564,8 +3551,6 @@
 			isa = PBXGroup;
 			children = (
 				277569F625ACFD3F00C129AF /* 1Password.xcassets */,
-				277569F525ACFD3F00C129AF /* 1PasswordExtension.podspec */,
-				277569F925ACFD3F00C129AF /* Demos */,
 				277569EE25ACFD3E00C129AF /* Info.plist */,
 				277569F725ACFD3F00C129AF /* LICENSE.txt */,
 				27756A4825ACFD3F00C129AF /* OnePasswordExtension.h */,
@@ -3584,149 +3569,87 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		277569F925ACFD3F00C129AF /* Demos */ = {
+		27756B6C25AD120100C129AF /* Static */ = {
 			isa = PBXGroup;
 			children = (
-				277569FA25ACFD3F00C129AF /* WebView Demo for iOS */,
-				27756A0A25ACFD3F00C129AF /* App Demo for iOS */,
-				27756A1F25ACFD3F00C129AF /* WebView Demo for iOS Swift */,
-				27756A2C25ACFD3F00C129AF /* 1Password Extension Demos.xcworkspace */,
-				27756A2D25ACFD3F00C129AF /* App Demo for iOS Swift */,
+				27756B6D25AD120100C129AF /* Static.xcodeproj */,
+				27756B7025AD120100C129AF /* .swift-version */,
+				27756B7125AD120100C129AF /* LICENSE */,
+				27756B7225AD120100C129AF /* Static.podspec */,
+				27756B7325AD120100C129AF /* Example */,
+				27756B7D25AD120100C129AF /* docs */,
+				27756B7F25AD120100C129AF /* Readme.markdown */,
+				27756B8025AD120100C129AF /* .gitignore */,
+				27756B8125AD120100C129AF /* Static */,
+				27756B9425AD120100C129AF /* .travis.yml */,
 			);
-			path = Demos;
+			name = Static;
+			path = ../../../../Downloads/Static;
 			sourceTree = "<group>";
 		};
-		277569FA25ACFD3F00C129AF /* WebView Demo for iOS */ = {
+		27756B6E25AD120100C129AF /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				277569FB25ACFD3F00C129AF /* WebView Demo for iOS.xcodeproj */,
-				277569FF25ACFD3F00C129AF /* WebView Demo for iOS */,
-			);
-			path = "WebView Demo for iOS";
-			sourceTree = "<group>";
-		};
-		277569FC25ACFD3F00C129AF /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				27756A4725ACFD3F00C129AF /* WebView Demo for iOS.app */,
+				27756B9925AD120100C129AF /* Static.framework */,
+				27756B9B25AD120100C129AF /* StaticTests.xctest */,
+				27756B9D25AD120100C129AF /* Example.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		277569FF25ACFD3F00C129AF /* WebView Demo for iOS */ = {
+		27756B7325AD120100C129AF /* Example */ = {
 			isa = PBXGroup;
 			children = (
-				27756A0025ACFD3F00C129AF /* AppDelegate.h */,
-				27756A0125ACFD3F00C129AF /* WebViewController.m */,
-				27756A0225ACFD3F00C129AF /* Main.storyboard */,
-				27756A0425ACFD3F00C129AF /* main.m */,
-				27756A0525ACFD3F00C129AF /* welcome.html */,
-				27756A0625ACFD3F00C129AF /* Images.xcassets */,
-				27756A0725ACFD3F00C129AF /* AppDelegate.m */,
-				27756A0825ACFD3F00C129AF /* Info.plist */,
-				27756A0925ACFD3F00C129AF /* WebViewController.h */,
+				27756B7425AD120100C129AF /* ViewController.swift */,
+				27756B7525AD120100C129AF /* WindowController.swift */,
+				27756B7625AD120100C129AF /* Assets.xcassets */,
+				27756B7725AD120100C129AF /* NibTableViewCell.xib */,
+				27756B7825AD120100C129AF /* LaunchScreen.storyboard */,
+				27756B7A25AD120100C129AF /* CustomTableViewCell.swift */,
+				27756B7B25AD120100C129AF /* NibTableViewCell.swift */,
+				27756B7C25AD120100C129AF /* Info.plist */,
 			);
-			path = "WebView Demo for iOS";
+			path = Example;
 			sourceTree = "<group>";
 		};
-		27756A0A25ACFD3F00C129AF /* App Demo for iOS */ = {
+		27756B7D25AD120100C129AF /* docs */ = {
 			isa = PBXGroup;
 			children = (
-				27756A0B25ACFD3F00C129AF /* App Demo for iOS */,
-				27756A1B25ACFD3F00C129AF /* App Demo for iOS.xcodeproj */,
+				27756B7E25AD120100C129AF /* static.png */,
 			);
-			path = "App Demo for iOS";
+			path = docs;
 			sourceTree = "<group>";
 		};
-		27756A0B25ACFD3F00C129AF /* App Demo for iOS */ = {
+		27756B8125AD120100C129AF /* Static */ = {
 			isa = PBXGroup;
 			children = (
-				27756A0C25ACFD3F00C129AF /* ChangePasswordViewController.h */,
-				27756A0D25ACFD3F00C129AF /* AppDelegate.h */,
-				27756A0E25ACFD3F00C129AF /* LoginViewController.m */,
-				27756A0F25ACFD3F00C129AF /* ThankYouViewController.m */,
-				27756A1025ACFD3F00C129AF /* RegisterViewController.m */,
-				27756A1125ACFD3F00C129AF /* Main.storyboard */,
-				27756A1325ACFD3F00C129AF /* ChangePasswordViewController.m */,
-				27756A1425ACFD3F00C129AF /* main.m */,
-				27756A1525ACFD3F00C129AF /* Images.xcassets */,
-				27756A1625ACFD3F00C129AF /* AppDelegate.m */,
-				27756A1725ACFD3F00C129AF /* LoginViewController.h */,
-				27756A1825ACFD3F00C129AF /* Info.plist */,
-				27756A1925ACFD3F00C129AF /* RegisterViewController.h */,
-				27756A1A25ACFD3F00C129AF /* ThankYouViewController.h */,
+				27756B8225AD120100C129AF /* Value2Cell.swift */,
+				27756B8325AD120100C129AF /* SegmentedControlAccessory.swift */,
+				27756B8425AD120100C129AF /* Cell.swift */,
+				27756B8525AD120100C129AF /* Tests */,
+				27756B8A25AD120100C129AF /* SubtitleCell.swift */,
+				27756B8B25AD120100C129AF /* SwitchAccessory.swift */,
+				27756B8C25AD120100C129AF /* TableViewController.swift */,
+				27756B8D25AD120100C129AF /* Static.h */,
+				27756B8E25AD120100C129AF /* Section.swift */,
+				27756B8F25AD120100C129AF /* DataSource.swift */,
+				27756B9025AD120100C129AF /* Value1Cell.swift */,
+				27756B9125AD120100C129AF /* ButtonCell.swift */,
+				27756B9225AD120100C129AF /* Row.swift */,
+				27756B9325AD120100C129AF /* Info.plist */,
 			);
-			path = "App Demo for iOS";
+			path = Static;
 			sourceTree = "<group>";
 		};
-		27756A1C25ACFD3F00C129AF /* Products */ = {
+		27756B8525AD120100C129AF /* Tests */ = {
 			isa = PBXGroup;
 			children = (
-				27756A4125ACFD3F00C129AF /* App Demo for iOS.app */,
+				27756B8625AD120100C129AF /* RowTests.swift */,
+				27756B8725AD120100C129AF /* DataSourceTests.swift */,
+				27756B8825AD120100C129AF /* SectionTests.swift */,
+				27756B8925AD120100C129AF /* Info.plist */,
 			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		27756A1F25ACFD3F00C129AF /* WebView Demo for iOS Swift */ = {
-			isa = PBXGroup;
-			children = (
-				27756A2025ACFD3F00C129AF /* WebView Demo for iOS Swift.xcodeproj */,
-				27756A2425ACFD3F00C129AF /* WebView Demo for iOS Swift */,
-			);
-			path = "WebView Demo for iOS Swift";
-			sourceTree = "<group>";
-		};
-		27756A2125ACFD3F00C129AF /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				27756A4425ACFD3F00C129AF /* WebView Demo for iOS Swift.app */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		27756A2425ACFD3F00C129AF /* WebView Demo for iOS Swift */ = {
-			isa = PBXGroup;
-			children = (
-				27756A2525ACFD3F00C129AF /* Main.storyboard */,
-				27756A2725ACFD3F00C129AF /* WebViewController.swift */,
-				27756A2825ACFD3F00C129AF /* welcome.html */,
-				27756A2925ACFD3F00C129AF /* Images.xcassets */,
-				27756A2A25ACFD3F00C129AF /* AppDelegate.swift */,
-				27756A2B25ACFD3F00C129AF /* Info.plist */,
-			);
-			path = "WebView Demo for iOS Swift";
-			sourceTree = "<group>";
-		};
-		27756A2D25ACFD3F00C129AF /* App Demo for iOS Swift */ = {
-			isa = PBXGroup;
-			children = (
-				27756A2E25ACFD3F00C129AF /* App Demo for iOS Swift.xcodeproj */,
-				27756A3225ACFD3F00C129AF /* App Demo for iOS Swift */,
-			);
-			path = "App Demo for iOS Swift";
-			sourceTree = "<group>";
-		};
-		27756A2F25ACFD3F00C129AF /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				27756A3E25ACFD3F00C129AF /* App Demo for iOS Swift.app */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		27756A3225ACFD3F00C129AF /* App Demo for iOS Swift */ = {
-			isa = PBXGroup;
-			children = (
-				27756A3325ACFD3F00C129AF /* ChangePasswordViewController.swift */,
-				27756A3425ACFD3F00C129AF /* Main.storyboard */,
-				27756A3625ACFD3F00C129AF /* ThankYouViewController.swift */,
-				27756A3725ACFD3F00C129AF /* Images.xcassets */,
-				27756A3825ACFD3F00C129AF /* LoginViewController.swift */,
-				27756A3925ACFD3F00C129AF /* AppDelegate.swift */,
-				27756A3A25ACFD3F00C129AF /* Info.plist */,
-				27756A3B25ACFD3F00C129AF /* RegisterViewController.swift */,
-			);
-			path = "App Demo for iOS Swift";
+			path = Tests;
 			sourceTree = "<group>";
 		};
 		27829DE72548A81A007CF0B2 /* Brave Rewards */ = {
@@ -3967,6 +3890,7 @@
 		28CE83EF1A1D246900576538 /* ThirdParty */ = {
 			isa = PBXGroup;
 			children = (
+				27756B6C25AD120100C129AF /* Static */,
 				277569ED25ACFCF000C129AF /* onepassword-app-extension */,
 				2711D99224E444E200E3844B /* DateTools */,
 				A1FEEE1F20BF28D900298DA2 /* Then.swift */,
@@ -6042,14 +5966,6 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = 27756A2F25ACFD3F00C129AF /* Products */;
-					ProjectRef = 27756A2E25ACFD3F00C129AF /* App Demo for iOS Swift.xcodeproj */;
-				},
-				{
-					ProductGroup = 27756A1C25ACFD3F00C129AF /* Products */;
-					ProjectRef = 27756A1B25ACFD3F00C129AF /* App Demo for iOS.xcodeproj */;
-				},
-				{
 					ProductGroup = 277569F025ACFD3E00C129AF /* Products */;
 					ProjectRef = 277569EF25ACFD3E00C129AF /* OnePasswordExtension.xcodeproj */;
 				},
@@ -6058,12 +5974,8 @@
 					ProjectRef = 2775698925ACFC1C00C129AF /* pop.xcodeproj */;
 				},
 				{
-					ProductGroup = 27756A2125ACFD3F00C129AF /* Products */;
-					ProjectRef = 27756A2025ACFD3F00C129AF /* WebView Demo for iOS Swift.xcodeproj */;
-				},
-				{
-					ProductGroup = 277569FC25ACFD3F00C129AF /* Products */;
-					ProjectRef = 277569FB25ACFD3F00C129AF /* WebView Demo for iOS.xcodeproj */;
+					ProductGroup = 27756B6E25AD120100C129AF /* Products */;
+					ProjectRef = 27756B6D25AD120100C129AF /* Static.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -6142,32 +6054,25 @@
 			remoteRef = 277569F325ACFD3F00C129AF /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		27756A3E25ACFD3F00C129AF /* App Demo for iOS Swift.app */ = {
+		27756B9925AD120100C129AF /* Static.framework */ = {
 			isa = PBXReferenceProxy;
-			fileType = wrapper.application;
-			path = "App Demo for iOS Swift.app";
-			remoteRef = 27756A3D25ACFD3F00C129AF /* PBXContainerItemProxy */;
+			fileType = wrapper.framework;
+			path = Static.framework;
+			remoteRef = 27756B9825AD120100C129AF /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		27756A4125ACFD3F00C129AF /* App Demo for iOS.app */ = {
+		27756B9B25AD120100C129AF /* StaticTests.xctest */ = {
 			isa = PBXReferenceProxy;
-			fileType = wrapper.application;
-			path = "App Demo for iOS.app";
-			remoteRef = 27756A4025ACFD3F00C129AF /* PBXContainerItemProxy */;
+			fileType = wrapper.cfbundle;
+			path = StaticTests.xctest;
+			remoteRef = 27756B9A25AD120100C129AF /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		27756A4425ACFD3F00C129AF /* WebView Demo for iOS Swift.app */ = {
+		27756B9D25AD120100C129AF /* Example.app */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.application;
-			path = "WebView Demo for iOS Swift.app";
-			remoteRef = 27756A4325ACFD3F00C129AF /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		27756A4725ACFD3F00C129AF /* WebView Demo for iOS.app */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.application;
-			path = "WebView Demo for iOS.app";
-			remoteRef = 27756A4625ACFD3F00C129AF /* PBXContainerItemProxy */;
+			path = Example.app;
+			remoteRef = 27756B9C25AD120100C129AF /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -6442,7 +6347,6 @@
 			);
 			inputPaths = (
 				"$(SRCROOT)/Carthage/Build/iOS/GCDWebServers.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/Static.framework",
 				"$(SRCROOT)/node_modules/brave-core-ios/BraveRewards.framework",
 				"$(SRCROOT)/node_modules/brave-core-ios/MaterialComponents.framework",
 			);
@@ -7414,36 +7318,12 @@
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
-		27756A0225ACFD3F00C129AF /* Main.storyboard */ = {
+		27756B7825AD120100C129AF /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
-				27756A0325ACFD3F00C129AF /* Base */,
+				27756B7925AD120100C129AF /* Base */,
 			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		27756A1125ACFD3F00C129AF /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				27756A1225ACFD3F00C129AF /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		27756A2525ACFD3F00C129AF /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				27756A2625ACFD3F00C129AF /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		27756A3425ACFD3F00C129AF /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				27756A3525ACFD3F00C129AF /* Base */,
-			);
-			name = Main.storyboard;
+			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
 		};
 		27F443F22138843400296C58 /* BraveShareToInfoPlist.strings */ = {
