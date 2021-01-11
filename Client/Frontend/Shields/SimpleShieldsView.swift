@@ -75,6 +75,7 @@ class SimpleShieldsView: UIView, Themeable {
             }()
             $0.backgroundColor = .clear
             $0.setContentCompressionResistancePriority(.required, for: .horizontal)
+            $0.isAccessibilityElement = false
         }
         
         let infoButton = Button().then {
@@ -86,6 +87,7 @@ class SimpleShieldsView: UIView, Themeable {
             $0.contentMode = .scaleAspectFit
             $0.setContentHuggingPriority(.required, for: .horizontal)
             $0.setContentCompressionResistancePriority(.required, for: .horizontal)
+            $0.accessibilityLabel = Strings.Shields.aboutBraveShieldsTitle
         }
         
         let shareButton = Button().then {
@@ -97,6 +99,7 @@ class SimpleShieldsView: UIView, Themeable {
             $0.contentMode = .scaleAspectFit
             $0.setContentHuggingPriority(.required, for: .horizontal)
             $0.setContentCompressionResistancePriority(.required, for: .horizontal)
+            $0.accessibilityLabel = Strings.Share.shareScreenTitle
         }
         
         override init(frame: CGRect) {
@@ -152,11 +155,11 @@ class SimpleShieldsView: UIView, Themeable {
             infoStackView.addBackground(color: contentBackgroundColor, cornerRadius: 6.0)
             shareStackView.addBackground(color: contentBackgroundColor, cornerRadius: 6.0)
             
-            countLabel.textColor = theme.isDark ? .white : .black
-            descriptionLabel.textColor = theme.isDark ? .white : .black
+            countLabel.appearanceTextColor = theme.isDark ? .white : .black
+            descriptionLabel.appearanceTextColor = theme.isDark ? .white : .black
 
-            infoButton.tintColor = theme.isDark ? .white : .black
-            shareButton.tintColor = theme.isDark ? . white : .black
+            infoButton.appearanceTintColor = theme.isDark ? .white : .black
+            shareButton.appearanceTintColor = theme.isDark ? . white : .black
         }
     }
     
@@ -239,11 +242,11 @@ class SimpleShieldsView: UIView, Themeable {
             UIColor(rgb: 0x26262E) :
             UIColor(white: 0.9, alpha: 1.0)
         blockCountView.applyTheme(theme)
-        braveShieldsLabel.textColor = theme.colors.tints.home
-        statusLabel.textColor = theme.colors.tints.home
-        hostLabel.textColor = theme.isDark ? .white : .black
-        shieldsDownDisclaimerLabel.textColor = theme.colors.tints.home
-        reportSiteButton.tintColor = theme.isDark ? Colors.grey200 : Colors.grey800
+        braveShieldsLabel.appearanceTextColor = theme.colors.tints.home
+        statusLabel.appearanceTextColor = theme.colors.tints.home
+        hostLabel.appearanceTextColor = theme.isDark ? .white : .black
+        shieldsDownDisclaimerLabel.appearanceTextColor = theme.colors.tints.home
+        reportSiteButton.appearanceTintColor = theme.isDark ? Colors.grey200 : Colors.grey800
     }
 }
 

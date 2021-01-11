@@ -202,12 +202,26 @@ private class ShareTypeView: UIControl, Themeable {
         $0.font = .systemFont(ofSize: 19)
         $0.numberOfLines = 0
         $0.setContentHuggingPriority(.required, for: .horizontal)
+        $0.isAccessibilityElement = true
     }
 
     private let titleImageView = UIImageView().then {
         $0.contentMode = .scaleAspectFit
         $0.tintColor = .darkGray
         $0.setContentCompressionResistancePriority(.required, for: .horizontal)
+    }
+    
+    override func accessibilityElementCount() -> Int {
+        return 1
+    }
+
+    override func accessibilityElement(at index: Int) -> Any? {
+        switch index {
+        case 0:
+            return titleLabel
+        default:
+            return nil
+        }
     }
 
     // MARK: Lifecycle
@@ -269,6 +283,6 @@ private class ShareTypeView: UIControl, Themeable {
 
     func applyTheme(_ theme: Theme) {
         backgroundColor = theme.isDark ? UX.darkBackgroundColor : Colors.neutral000
-        titleLabel.textColor = theme.isDark ? .white : .black
+        titleLabel.appearanceTextColor = theme.isDark ? .white : .black
     }
 }
