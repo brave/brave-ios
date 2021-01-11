@@ -6309,7 +6309,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# sh \"$SRCROOT/swiftlint.sh\"\n\n";
+			shellScript = "sh \"$SRCROOT/swiftlint.sh\"\n\n";
 		};
 		7B604F8F1C494AAA006EEEC3 /* Copy Carthage Dependencies */ = {
 			isa = PBXShellScriptBuildPhase;
