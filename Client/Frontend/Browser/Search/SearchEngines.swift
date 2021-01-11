@@ -18,6 +18,7 @@ enum SearchEngineError: Error {
     case duplicate
     case failedToSave
     case invalidQuery
+    case missingInformation
 }
 
 // BRAVE TODO: Move to newer Preferences class(#259)
