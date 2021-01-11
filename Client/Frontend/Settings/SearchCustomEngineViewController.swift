@@ -53,6 +53,10 @@ class SearchCustomEngineViewController: UIViewController {
     
     private var urlHeader: SearchEngineTableViewHeader?
     
+    private var openSearchEngine: OpenSearchReference?
+    
+    private var host: URL?
+    
     private lazy var spinnerView = UIActivityIndicatorView(style: .gray).then {
         $0.hidesWhenStopped = true
     }
@@ -158,6 +162,150 @@ class SearchCustomEngineViewController: UIViewController {
     }
 }
 
+// MARK: - UITableViewDelegate UITableViewDataSource
+
+extension SearchCustomEngineViewController: UITableViewDelegate, UITableViewDataSource {
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return Section.allCases.count
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 1
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        switch indexPath.section {
+            case Section.url.rawValue:
+                guard let cell =
+                        tableView.dequeueReusableCell(withIdentifier: Constants.urlInputRowIdentifier) as? URLInputTableViewCell else {
+                    return UITableViewCell()
+                }
+                
+                cell.delegate = self
+                return cell
+            default:
+                guard let cell =
+                        tableView.dequeueReusableCell(withIdentifier: Constants.titleInputRowIdentifier) as? TitleInputTableViewCell else {
+                    return UITableViewCell()
+                }
+                
+                cell.delegate = self
+                return cell
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
+        guard section == Section.url.rawValue else { return nil }
+        
+        return "Write the search url and replace the query with %s.\nFor example: https://youtube.com/search?q=%s \n(If the site supports OpenSearch an option to add automatically will be provided while editing this field.)"
+    }
+    
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        guard let headerView = tableView.dequeueReusableHeaderFooterView(
+                withIdentifier: Constants.searchEngineHeaderIdentifier) as? SearchEngineTableViewHeader else {
+            return nil
+        }
+        
+        headerView.actionHandler = { [weak self] in
+            self?.autoAddSearchEngine()
+        }
+
+        switch section {
+            case Section.url.rawValue:
+                headerView.titleLabel.text = Strings.URL
+                headerView.addEngineButton.state = showAutoAddSearchButton ? .enabled : .disabled
+                urlHeader = headerView
+            default:
+                headerView.titleLabel.text = "Title"
+                headerView.addEngineButton.isHidden = true
+        }
+        
+        return headerView
+    }
+}
+
+// MARK: Auto Add Engine
+
+extension SearchCustomEngineViewController {
+    
+    fileprivate func autoAddSearchEngine() {
+        let favIconURLText: String? = ""
+        
+        guard var referenceURLString = openSearchEngine?.reference,
+              let title = openSearchEngine?.title,
+              var referenceURL = URL(string: referenceURLString),
+              let faviconURLString = favIconURLText,
+              let iconURL = URL(string: faviconURLString),
+              let hostURLString = host?.absoluteString else {
+            let alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
+            present(alert, animated: true, completion: nil)
+            return
+        }
+        
+        while referenceURLString.hasPrefix("/") {
+            referenceURLString.remove(at: referenceURLString.startIndex)
+        }
+        
+        let constructedReferenceURLString = "\(hostURLString)/\(referenceURLString)"
+
+        if referenceURL.host == nil, let constructedReferenceURL = URL(string: constructedReferenceURLString) {
+            referenceURL = constructedReferenceURL
+        }
+            
+        downloadOpenSearchXML(referenceURL, referenceURL: referenceURLString, title: title, iconURL: iconURL)
+    }
+    
+    func downloadOpenSearchXML(_ url: URL, referenceURL: String, title: String, iconURL: URL) {
+        setSaveButton(for: .loading)
+        urlHeader?.addEngineButton.state = .loading
+        view.endEditing(true)
+
+        WebImageCacheManager.shared.load(from: iconURL, completion: { [weak self] (image, _, _, _, _) in
+            guard let self = self else { return }
+            
+            guard let image = image else {
+                let alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
+                self.present(alert, animated: true) {
+                    self.setSaveButton(for: .enabled)
+                    self.urlHeader?.addEngineButton.state = .enabled
+                }
+
+                return
+            }
+
+            NetworkManager().downloadResource(with: url).uponQueue(.main) { [weak self] response in
+                guard let self = self,
+                      let openSearchEngine =
+                        OpenSearchParser(pluginMode: true).parse(response.data, referenceURL: referenceURL, image: image) else {
+                    return
+                }
+
+                self.addSearchEngine(openSearchEngine)
+            }
+        })
+    }
+    
+    func addSearchEngine(_ engine: OpenSearchEngine) {
+        let alert = ThirdPartySearchAlerts.addThirdPartySearchEngine(engine) { [weak self] alert in
+            guard let self = self else { return }
+            do {
+                try self.profile.searchEngines.addSearchEngine(engine)
+                self.cancel()
+            } catch {
+                self.handleError(error: SearchEngineError.failedToSave)
+            }
+            
+            self.setSaveButton(for: .enabled)
+            self.urlHeader?.addEngineButton.state = .enabled
+        }
+
+        self.present(alert, animated: true, completion: {})
+    }
+}
+
+// MARK: Manual Add Engine
+
 extension SearchCustomEngineViewController {
     
     fileprivate func addSearchEngine(with urlQuery: String, title: String) {
@@ -226,65 +374,6 @@ extension SearchCustomEngineViewController {
     }
 }
 
-// MARK: - UITableViewDelegate UITableViewDataSource
-
-extension SearchCustomEngineViewController: UITableViewDelegate, UITableViewDataSource {
-    
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return Section.allCases.count
-    }
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 1
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        switch indexPath.section {
-            case Section.url.rawValue:
-                guard let cell =
-                        tableView.dequeueReusableCell(withIdentifier: Constants.urlInputRowIdentifier) as? URLInputTableViewCell else {
-                    return UITableViewCell()
-                }
-                
-                cell.delegate = self
-                return cell
-            default:
-                guard let cell =
-                        tableView.dequeueReusableCell(withIdentifier: Constants.titleInputRowIdentifier) as? TitleInputTableViewCell else {
-                    return UITableViewCell()
-                }
-                
-                cell.delegate = self
-                return cell
-        }
-    }
-    
-    func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
-        guard section == Section.url.rawValue else { return nil }
-        
-        return "Write the search url and replace the query with %s.\nFor example: https://youtube.com/search?q=%s \n(If the site supports OpenSearch an option to add automatically will be provided while editing this field.)"
-    }
-    
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        guard let headerView = tableView.dequeueReusableHeaderFooterView(
-                withIdentifier: Constants.searchEngineHeaderIdentifier) as? SearchEngineTableViewHeader else {
-            return nil
-        }
-
-        switch section {
-            case Section.url.rawValue:
-                headerView.titleLabel.text = Strings.URL
-                headerView.addEngineButton.state = showAutoAddSearchButton ? .enabled : .disabled
-                urlHeader = headerView
-            default:
-                headerView.titleLabel.text = "Title"
-                headerView.addEngineButton.isHidden = true
-        }
-        
-        return headerView
-    }
-}
-
 // MARK: - UITextViewDelegate
 
 extension SearchCustomEngineViewController: UITextViewDelegate {
@@ -304,8 +393,9 @@ extension SearchCustomEngineViewController: UITextViewDelegate {
            let url = URL(string: encodedText),
            url.host != nil,
            url.isWebPage() {
-            
-            // TODO: Identify the host
+            if let scheme = url.scheme, let host = url.host {
+                self.host = URL(string: "\(scheme)://\(host)")
+            }
         }
         
         urlText = textView.text
@@ -362,6 +452,8 @@ fileprivate class SearchEngineTableViewHeader: UITableViewHeaderFooterView {
         $0.addTarget(self, action: #selector(addEngineAuto), for: .touchUpInside)
     }
 
+    var actionHandler: (() -> Void)?
+
     // MARK: Lifecycle
     
     override init(reuseIdentifier: String?) {
@@ -397,7 +489,7 @@ fileprivate class SearchEngineTableViewHeader: UITableViewHeaderFooterView {
     // MARK: Actions
 
     @objc private func addEngineAuto() {
-        // TODO: Add Engine URL
+        actionHandler?()
     }
 }
 
