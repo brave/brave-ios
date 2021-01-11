@@ -286,6 +286,11 @@ extension Strings {
 extension Strings {
     public static let searchSettingNavTitle = NSLocalizedString("SearchSettingNavTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Search", comment: "Navigation title for search settings.")
     public static let searchSettingSuggestionCellTitle = NSLocalizedString("SearchSettingSuggestionCellTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Show Search Suggestions", comment: "Label for show search suggestions setting.")
+    public static let searchSettingAddCustomEngineCellTitle =
+        NSLocalizedString("searchSettingAddCustomEngineCellTitle",
+                          bundle: .braveShared,
+                          value: "Add Custom Search Engine",
+                          comment: "Add Custom Search Engine Table Cell Row Title")
 }
 
 // MARK:-  SettingsContentViewController.swift
