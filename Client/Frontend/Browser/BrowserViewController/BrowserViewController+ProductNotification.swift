@@ -47,7 +47,7 @@ extension BrowserViewController {
             notificationShown = true
         }
         
-        // Step 3: 20+ Trackers and Ads Blocked
+        // Step 3: 15+ Trackers and Ads Blocked
         if notificationShown { return }
 
         if !Preferences.ProductNotificationBenchmarks.privacyProtectionBlockShown.value,
