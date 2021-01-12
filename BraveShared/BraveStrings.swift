@@ -810,7 +810,7 @@ extension Strings {
         public static let videoAdBlockTitle =
             NSLocalizedString("shieldEducation.videoAdBlockTitle",
                               bundle: .braveShared,
-                              value: "Ads are blocked while watching videos on this page.",
+                              value: "Ads are blocked while watching videos on this website.",
                               comment: "Title for Shield Education Tracker Video Ad Block")
         
         public static let trackerAdCountBlockTitle =
@@ -840,7 +840,7 @@ extension Strings {
         public static let videoAdBlockSubtitle =
             NSLocalizedString("shieldEducation.videoAdBlockSubtitle",
                               bundle: .braveShared,
-                              value: "You save ~5mb with every video you watch in Brave!",
+                              value: "Videos without ads use less data.",
                               comment: "Subtitle for Shield Education Tracker Video Ad Block")
         
         public static let trackerAdCountBlockSubtitle =

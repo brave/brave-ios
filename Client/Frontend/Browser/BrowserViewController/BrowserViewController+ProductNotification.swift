@@ -14,57 +14,70 @@ extension BrowserViewController {
     // MARK: Internal
     
     @objc func presentEducationalProductNotifications() {
-        guard let selectedTab = tabManager.selectedTab, !benchmarkNotificationPresented else { return }
+        // Adding slight delay so the popover notification will be shown after page loaded
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+            guard let self = self,
+                  let selectedTab = self.tabManager.selectedTab,
+                  !self.benchmarkNotificationPresented else {
+                return
+            }
         
-        let todayInSeconds = Date().timeIntervalSince1970
-        let checkDate = Preferences.ProductNotificationBenchmarks.ongoingEducationCheckDate.value
-        let isProductNotificationsValid = todayInSeconds <= checkDate
-        
-        var notificationShown = false
-        let contentBlockerStats = selectedTab.contentBlocker.stats
-        
-        if !isProductNotificationsValid { return }
+            let todayInSeconds = Date().timeIntervalSince1970
+            let checkDate = Preferences.ProductNotificationBenchmarks.ongoingEducationCheckDate.value
+            let isProductNotificationsValid = todayInSeconds <= checkDate
+            
+            var notificationShown = false
+            let contentBlockerStats = selectedTab.contentBlocker.stats
+            
+            if !isProductNotificationsValid { return }
 
-        // Step 1: First Time Block Notification
-        if !Preferences.ProductNotificationBenchmarks.firstTimeBlockingShown.value,
-           contentBlockerStats.total > 0 {
+            // Step 1: First Time Block Notification
+            if !Preferences.ProductNotificationBenchmarks.firstTimeBlockingShown.value,
+               contentBlockerStats.total > 0 {
+                
+                self.notifyFirstTimeBlock(theme: Theme.of(selectedTab))
+                
+                Preferences.ProductNotificationBenchmarks.firstTimeBlockingShown.value = true
+                Preferences.ProductNotificationBenchmarks.ongoingEducationCheckDate.value = Date().timeIntervalSince1970 + 7.days
+                
+                notificationShown = true
+            }
             
-            notifyFirstTimeBlock(theme: Theme.of(selectedTab))
-            
-            Preferences.ProductNotificationBenchmarks.firstTimeBlockingShown.value = true
-            Preferences.ProductNotificationBenchmarks.ongoingEducationCheckDate.value = Date().timeIntervalSince1970 + 7.days
-            
-            notificationShown = true
-        }
-        
-        // Step 2: Load a video on a streaming site
-        if notificationShown { return }
+            // Step 2: Load a video on a streaming site
+            if notificationShown, BraveGlobalShieldStats.shared.shieldStatChangesNotified { return }
 
-        if !Preferences.ProductNotificationBenchmarks.videoAdBlockShown.value,
-           selectedTab.url?.isMediaSiteURL == true {
+            if !Preferences.ProductNotificationBenchmarks.videoAdBlockShown.value,
+               selectedTab.url?.isVideoSteamingSiteURL == true {
+                
+                self.notifyVideoAdsBlocked(theme: Theme.of(selectedTab))
+                
+                notificationShown = true
+                BraveGlobalShieldStats.shared.shieldStatChangesNotified = true
+            }
             
-            notifyVideoAdsBlocked(theme: Theme.of(selectedTab))
-            notificationShown = true
-        }
-        
-        // Step 3: 15+ Trackers and Ads Blocked
-        if notificationShown { return }
+            // Step 3: 15+ Trackers and Ads Blocked
+            if notificationShown, BraveGlobalShieldStats.shared.shieldStatChangesNotified { return }
 
-        if !Preferences.ProductNotificationBenchmarks.privacyProtectionBlockShown.value,
-           contentBlockerStats.total > benchmarkNumberOfTrackers {
+            if !Preferences.ProductNotificationBenchmarks.privacyProtectionBlockShown.value,
+               contentBlockerStats.total > self.benchmarkNumberOfTrackers {
+                
+                self.notifyPrivacyProtectBlock(theme: Theme.of(selectedTab))
+                
+                notificationShown = true
+                BraveGlobalShieldStats.shared.shieldStatChangesNotified = true
+            }
             
-            notifyPrivacyProtectBlock(theme: Theme.of(selectedTab))
-            notificationShown = true
-        }
-        
-        // Step 4: Https Upgrade
-        if notificationShown { return }
+            // Step 4: Https Upgrade
+            if notificationShown, BraveGlobalShieldStats.shared.shieldStatChangesNotified { return }
 
-        if !Preferences.ProductNotificationBenchmarks.httpsUpgradeShown.value,
-           contentBlockerStats.httpsCount > 0 {
-            
-            notifyHttpsUpgrade(theme: Theme.of(selectedTab))
-            notificationShown = true
+            if !Preferences.ProductNotificationBenchmarks.httpsUpgradeShown.value,
+               contentBlockerStats.httpsCount > 0 {
+                
+                self.notifyHttpsUpgrade(theme: Theme.of(selectedTab))
+                
+                notificationShown = true
+                BraveGlobalShieldStats.shared.shieldStatChangesNotified = true
+            }
         }
     }
     
@@ -94,19 +107,7 @@ extension BrowserViewController {
     
     private func notifyPrivacyProtectBlock(theme: Theme) {
         let shareTrackersViewController = ShareTrackersController(theme: theme, trackingType: .trackerAdCountBlock)
-        
-        shareTrackersViewController.actionHandler = { [weak self] action in
-            guard let self = self else { return }
-            
-            self.benchmarkNotificationPresented = false
-
-            switch action {
-                case .dontShowAgainTapped:
-                    self.dismissAndAddNoShowList(.trackerAdCountBlock)
-                default:
-                    break
-            }
-        }
+        dismissAndAddNoShowList(.trackerAdCountBlock)
         
         showBenchmarkNotificationPopover(controller: shareTrackersViewController)
     }
@@ -114,19 +115,7 @@ extension BrowserViewController {
     private func notifyHttpsUpgrade(theme: Theme) {
         let shareTrackersViewController = ShareTrackersController(theme: theme, trackingType: .encryptedConnectionWarning)
         
-        shareTrackersViewController.actionHandler = { [weak self] action in
-            guard let self = self else { return }
-            
-            self.benchmarkNotificationPresented = false
-
-            switch action {
-                case .dontShowAgainTapped:
-                    self.dismissAndAddNoShowList(.encryptedConnectionWarning)
-                default:
-                    break
-            }
-        }
-        
+        dismissAndAddNoShowList(.encryptedConnectionWarning)
         showBenchmarkNotificationPopover(controller: shareTrackersViewController)
     }
     
@@ -138,14 +127,9 @@ extension BrowserViewController {
             
             self.benchmarkNotificationPresented = false
         }
-        
-        // Adding slight delay so the popover notification will be shown after page loaded
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
-            guard let self = self else { return }
-            
-            popover.present(from: self.topToolbar.locationView.shieldsButton, on: self)
-            self.benchmarkNotificationPresented = true
-        }
+                    
+        popover.present(from: self.topToolbar.locationView.shieldsButton, on: self)
+        benchmarkNotificationPresented = true
     }
     
     // MARK: Actions
