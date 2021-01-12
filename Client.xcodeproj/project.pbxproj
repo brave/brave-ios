@@ -142,10 +142,6 @@
 		0AB22A95257EADA900126ADC /* corwin-prescott_beach.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 0AB22A86257EADA600126ADC /* corwin-prescott_beach.jpg */; };
 		0AB22A96257EADA900126ADC /* sora-sagano.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 0AB22A87257EADA900126ADC /* sora-sagano.jpg */; };
 		0AB2442C22AA789B00B4D9DD /* ReaderModeButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AB2442B22AA789B00B4D9DD /* ReaderModeButton.swift */; };
-		0AB477DC24D3130800D9DA90 /* sqlite3.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AB477DB24D3130700D9DA90 /* sqlite3.h */; };
-		0AB477DE24D3131A00D9DA90 /* libsqlcipher.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AB477DD24D3131900D9DA90 /* libsqlcipher.a */; };
-		0AB477DF24D3137900D9DA90 /* sqlite3.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AB477DB24D3130700D9DA90 /* sqlite3.h */; };
-		0AB477E024D3137D00D9DA90 /* libsqlcipher.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AB477DD24D3131900D9DA90 /* libsqlcipher.a */; platformFilter = ios; };
 		0AB6E25724C5EE290060B052 /* NSLogDisabler.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AB6E25624C5EE290060B052 /* NSLogDisabler.h */; };
 		0AB7FCDC235DED0B00F1D9F5 /* NumberExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AB7FCDB235DED0B00F1D9F5 /* NumberExtensions.swift */; };
 		0AB7FCDF235DEE8F00F1D9F5 /* NumberExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AB7FCDE235DEE8F00F1D9F5 /* NumberExtensionTests.swift */; };
@@ -260,6 +256,9 @@
 		2746D27F24A3EB9800E38852 /* UITableViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 271DECB8234CC7EF009DAC37 /* UITableViewExtensions.swift */; };
 		2746D28124A4F8DA00E38852 /* RewardsInternalsShareController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2746D28024A4F8DA00E38852 /* RewardsInternalsShareController.swift */; };
 		2746D28324A4FB7400E38852 /* RewardsInternalsSharable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2746D28224A4FB7400E38852 /* RewardsInternalsSharable.swift */; };
+		2748625D25AD309800BC40AA /* sqlcipher.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2748625C25AD308A00BC40AA /* sqlcipher.xcframework */; };
+		2748626925AD30A500BC40AA /* sqlcipher.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2748625C25AD308A00BC40AA /* sqlcipher.xcframework */; };
+		2748626A25AD30A500BC40AA /* sqlcipher.xcframework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 2748625C25AD308A00BC40AA /* sqlcipher.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		2755AB7D23107BC600F0721F /* AdsReporting.js in Resources */ = {isa = PBXBuildFile; fileRef = 2755AB7C23107BC600F0721F /* AdsReporting.js */; };
 		2755AB8623107DBD00F0721F /* AdsMediaReporting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2755AB8523107DBD00F0721F /* AdsMediaReporting.swift */; };
 		2755EA9C2551F94B0033C43F /* RewardsInternalsAutoContributeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2755EA9B2551F94B0033C43F /* RewardsInternalsAutoContributeController.swift */; };
@@ -1295,6 +1294,7 @@
 				E60138661C89EB7D00DF9756 /* Storage.framework in Copy Frameworks */,
 				5DE7689A20B3456E00FF5533 /* BraveShared.framework in Copy Frameworks */,
 				27756C8B25AD153700C129AF /* Static.framework in Copy Frameworks */,
+				2748626A25AD30A500BC40AA /* sqlcipher.xcframework in Copy Frameworks */,
 				277568D825ACF91600C129AF /* SPMLibraries.framework in Copy Frameworks */,
 				278C468E23F1E6270083347F /* BraveUI.framework in Copy Frameworks */,
 				E60138651C89EB7600DF9756 /* Shared.framework in Copy Frameworks */,
@@ -1490,8 +1490,6 @@
 		0AB22A86257EADA600126ADC /* corwin-prescott_beach.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "corwin-prescott_beach.jpg"; sourceTree = "<group>"; };
 		0AB22A87257EADA900126ADC /* sora-sagano.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "sora-sagano.jpg"; sourceTree = "<group>"; };
 		0AB2442B22AA789B00B4D9DD /* ReaderModeButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderModeButton.swift; sourceTree = "<group>"; };
-		0AB477DB24D3130700D9DA90 /* sqlite3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sqlite3.h; sourceTree = "<group>"; };
-		0AB477DD24D3131900D9DA90 /* libsqlcipher.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libsqlcipher.a; sourceTree = "<group>"; };
 		0AB6E25624C5EE290060B052 /* NSLogDisabler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NSLogDisabler.h; sourceTree = "<group>"; };
 		0AB70C6A23571F4C00E9C2C8 /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = zh.lproj/Storage.strings; sourceTree = "<group>"; };
 		0AB7FCDB235DED0B00F1D9F5 /* NumberExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberExtensions.swift; sourceTree = "<group>"; };
@@ -1616,6 +1614,7 @@
 		2746D27C24A3E44900E38852 /* RewardsInternalsLogController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardsInternalsLogController.swift; sourceTree = "<group>"; };
 		2746D28024A4F8DA00E38852 /* RewardsInternalsShareController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardsInternalsShareController.swift; sourceTree = "<group>"; };
 		2746D28224A4FB7400E38852 /* RewardsInternalsSharable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardsInternalsSharable.swift; sourceTree = "<group>"; };
+		2748625C25AD308A00BC40AA /* sqlcipher.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = sqlcipher.xcframework; sourceTree = "<group>"; };
 		2755AB7C23107BC600F0721F /* AdsReporting.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = AdsReporting.js; sourceTree = "<group>"; };
 		2755AB8523107DBD00F0721F /* AdsMediaReporting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdsMediaReporting.swift; sourceTree = "<group>"; };
 		2755EA9B2551F94B0033C43F /* RewardsInternalsAutoContributeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardsInternalsAutoContributeController.swift; sourceTree = "<group>"; };
@@ -2736,6 +2735,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2748626925AD30A500BC40AA /* sqlcipher.xcframework in Frameworks */,
 				27756C8A25AD153700C129AF /* Static.framework in Frameworks */,
 				27756ABF25AD017A00C129AF /* OnePasswordExtension.framework in Frameworks */,
 				5EE5918123A290E000E8E8DE /* CoreNFC.framework in Frameworks */,
@@ -2750,7 +2750,6 @@
 				2FCAE2311ABB51F800877008 /* Storage.framework in Frameworks */,
 				0A2BD6092497780A00254494 /* libadblock.a in Frameworks */,
 				5D1DC52820AC9AFB00905E5A /* Data.framework in Frameworks */,
-				0AB477DE24D3131A00D9DA90 /* libsqlcipher.a in Frameworks */,
 				0A1DF486244A2ECB00541FE4 /* NetworkExtension.framework in Frameworks */,
 				277568D725ACF91600C129AF /* SPMLibraries.framework in Frameworks */,
 			);
@@ -2762,7 +2761,7 @@
 			files = (
 				2775690425ACF94B00C129AF /* SPMLibraries.framework in Frameworks */,
 				D09A0CD81FAA23F6009A0273 /* Shared.framework in Frameworks */,
-				0AB477E024D3137D00D9DA90 /* libsqlcipher.a in Frameworks */,
+				2748625D25AD309800BC40AA /* sqlcipher.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3103,8 +3102,7 @@
 		0AC0D3A4233E86E50091EFA5 /* sqlcipher */ = {
 			isa = PBXGroup;
 			children = (
-				0AB477DB24D3130700D9DA90 /* sqlite3.h */,
-				0AB477DD24D3131900D9DA90 /* libsqlcipher.a */,
+				2748625C25AD308A00BC40AA /* sqlcipher.xcframework */,
 			);
 			path = sqlcipher;
 			sourceTree = "<group>";
@@ -5393,7 +5391,6 @@
 				4422D4FB21BFFB7600BF1855 /* builder.h in Headers */,
 				4422D56721BFFB7F00BF1855 /* unicode_casefold.h in Headers */,
 				4422D56121BFFB7F00BF1855 /* filtered_re2.h in Headers */,
-				0AB477DC24D3130800D9DA90 /* sqlite3.h in Headers */,
 				4422D4CA21BFFB7600BF1855 /* status.h in Headers */,
 				0A39FE972486604D00290ABC /* GRDHousekeepingAPI.h in Headers */,
 				4422D42E21BFCF8900BF1855 /* HttpsEverywhere.h in Headers */,
@@ -5501,7 +5498,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0AB477DF24D3137900D9DA90 /* sqlite3.h in Headers */,
 				2FCAE33E1ABB5F1800877008 /* Storage-Bridging-Header.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -8430,12 +8426,17 @@
 		27A1AC1B24884F7A00344503 /* Enterprise */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)",
+					"$(SRCROOT)/ThirdParty/sqlcipher",
+				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"SQLITE_HAS_CODEC=1",
 					"DEBUG=1",
@@ -9090,13 +9091,18 @@
 		27EEEDAA2507CDF900024038 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_TESTABILITY = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)",
+					"$(SRCROOT)/ThirdParty/sqlcipher",
+				);
 				GCC_PREPROCESSOR_DEFINITIONS = "SQLITE_HAS_CODEC=1";
 				INFOPLIST_FILE = Storage/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -9749,12 +9755,17 @@
 		2FCAE2341ABB51F900877008 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)",
+					"$(SRCROOT)/ThirdParty/sqlcipher",
+				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"SQLITE_HAS_CODEC=1",
 					"DEBUG=1",
@@ -11109,13 +11120,18 @@
 		E448FCA41AEE7A6000869B6C /* Release (AppStore) */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_TESTABILITY = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)",
+					"$(SRCROOT)/ThirdParty/sqlcipher",
+				);
 				GCC_PREPROCESSOR_DEFINITIONS = "SQLITE_HAS_CODEC=1";
 				INFOPLIST_FILE = Storage/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -11330,12 +11346,17 @@
 		E6DCC20C1DCBB6F100CEC4B7 /* Dev */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)",
+					"$(SRCROOT)/ThirdParty/sqlcipher",
+				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"SQLITE_HAS_CODEC=1",
 					"DEBUG=1",
@@ -11634,13 +11655,18 @@
 		E6FCC4321C40562400DF6113 /* Beta */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_TESTABILITY = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)",
+					"$(SRCROOT)/ThirdParty/sqlcipher",
+				);
 				GCC_PREPROCESSOR_DEFINITIONS = "SQLITE_HAS_CODEC=1";
 				INFOPLIST_FILE = Storage/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
