@@ -46,8 +46,6 @@ case $i in
 esac
 done
 
-./carthage_command.sh
-
 # Install Node.js dependencies and build user scripts
 
 if [ "$IS_CI_BUILD" = 0 ]; then
