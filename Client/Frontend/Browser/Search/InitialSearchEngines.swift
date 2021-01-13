@@ -157,7 +157,7 @@ class InitialSearchEngines {
     }
     
     private func replaceOrInsert(engineId: SearchEngineID, customId: String?) {
-        guard let engineIndex = engines.firstIndex(of: .init(id: engineId)) else {
+        guard let engineIndex = engines.firstIndex(where: { $0.id == engineId }) else {
             engines.append(.init(id: engineId, customId: customId))
             return
         }
