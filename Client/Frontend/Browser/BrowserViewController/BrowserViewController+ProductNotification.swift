@@ -30,15 +30,9 @@ extension BrowserViewController {
               !benchmarkNotificationPresented else {
             return
         }
-    
-        let todayInSeconds = Date().timeIntervalSince1970
-        let checkDate = Preferences.ProductNotificationBenchmarks.ongoingEducationCheckDate.value
-        let isProductNotificationsValid = todayInSeconds <= checkDate
         
         let contentBlockerStats = selectedTab.contentBlocker.stats
         
-        if !isProductNotificationsValid { return }
-
         // Step 1: First Time Block Notification
         if !Preferences.ProductNotificationBenchmarks.firstTimeBlockingShown.value,
            contentBlockerStats.total > 0 {
@@ -46,8 +40,6 @@ extension BrowserViewController {
             notifyFirstTimeBlock(theme: Theme.of(selectedTab))
             
             Preferences.ProductNotificationBenchmarks.firstTimeBlockingShown.value = true
-            Preferences.ProductNotificationBenchmarks.ongoingEducationCheckDate.value = Date().timeIntervalSince1970 + 7.days
-            
         }
         
         // Step 2: Load a video on a streaming site
