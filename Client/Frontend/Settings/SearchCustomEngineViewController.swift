@@ -346,7 +346,9 @@ extension SearchCustomEngineViewController {
                 return
             }
             
-            self?.loadSearchEngineMetaData(from: data, url: host)
+            ensureMainThread {
+                self?.loadSearchEngineMetaData(from: data, url: host)
+            }
         }
         
         dataTask?.resume()
@@ -359,12 +361,16 @@ extension SearchCustomEngineViewController {
             return
         }
         
-        openSearchEngine = searchEngineDetails
+        faviconImage = #imageLiteral(resourceName: "defaultFavicon")
         
-        let fetcher = FaviconFetcher(siteURL: url, kind: .favicon, domain: nil)
+        let fetcher = FaviconFetcher(siteURL: url, kind: .largeIcon)
         fetcher.load { [weak self] _, attributes in
-            self?.faviconImage = attributes.image ?? #imageLiteral(resourceName: "defaultFavicon")
+            guard let self = self else { return }
+            
+            self.faviconImage = attributes.image ?? #imageLiteral(resourceName: "defaultFavicon")
         }
+        
+        openSearchEngine = searchEngineDetails
     }
     
     func fetchOpenSearchReference(document: HTMLDocument) -> OpenSearchReference? {
