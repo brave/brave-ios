@@ -423,10 +423,10 @@ extension URL {
     
     // Check if the website is a video streaming content site used inside product notifications
     public var isVideoSteamingSiteURL: Bool {
-        // Don't need to include Github as it does a page load instead of XHR load.
         guard let domain = self.baseDomain else {
-            return true
+            return false
         }
+        
         return ["youtube", "vimeo", "twitch"].contains(where: domain.contains)
     }
 }

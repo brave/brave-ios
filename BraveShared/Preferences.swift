@@ -82,8 +82,6 @@ extension Preferences {
     }
     
     public final class ProductNotificationBenchmarks {
-        public static let trackerTierCount = Option<Int>(key: "product-benchmark.trackerTierCount", default: 0)
-        public static let allTiersShown = Option<Bool>(key: "product-benchmark.allTiersShown", default: false)
         public static let firstTimeBlockingShown = Option<Bool>(key: "product-benchmark.firstTimeBlocking", default: false)
         public static let privacyProtectionBlockShown = Option<Bool>(key: "product-benchmark.privacyProtectionBlockShown", default: false)
         public static let httpsUpgradeShown = Option<Bool>(key: "product-benchmark.httpsUpgradeShown", default: false)

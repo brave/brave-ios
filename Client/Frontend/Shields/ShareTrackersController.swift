@@ -15,7 +15,7 @@ enum TrackingType: Equatable {
     case trackerCountShare(count: Int)
     case trackerAdWarning
     case videoAdBlock
-    case trackerAdCountBlock
+    case trackerAdCountBlock(count: Int)
     case encryptedConnectionWarning
     
     var title: String {
@@ -26,8 +26,8 @@ enum TrackingType: Equatable {
                 return Strings.ShieldEducation.trackerAdWarningTitle
             case .videoAdBlock:
                 return Strings.ShieldEducation.videoAdBlockTitle
-            case .trackerAdCountBlock:
-                return Strings.ShieldEducation.trackerAdCountBlockTitle
+            case .trackerAdCountBlock(let count):
+                return String(format: Strings.ShieldEducation.trackerAdCountBlockTitle, count)
             case .encryptedConnectionWarning:
                 return Strings.ShieldEducation.encryptedConnectionWarningTitle
         }
@@ -45,18 +45,6 @@ enum TrackingType: Equatable {
                 return Strings.ShieldEducation.trackerAdCountBlockSubtitle
             case .encryptedConnectionWarning:
                 return Strings.ShieldEducation.encryptedConnectionWarningSubtitle
-        }
-    }
-    
-    var actionTitle: String {
-        switch self {
-            case .trackerCountShare,
-                 .videoAdBlock,
-                 .trackerAdCountBlock,
-                 .encryptedConnectionWarning:
-                return Strings.ShieldEducation.educationDismissTitle
-            case .trackerAdWarning:
-                return Strings.ShieldEducation.educationInspectTitle
         }
     }
 }
@@ -135,8 +123,6 @@ class ShareTrackersController: UIViewController, Themeable, PopoverContentCompon
                 self.actionHandler?(.shareMoreTapped)
             case .didTakeALookTapped:
                 self.actionHandler?(.takeALookTapped)
-            case .didDontShowTapped:
-                self.actionHandler?(.dontShowAgainTapped)
             }
         }
         
@@ -193,7 +179,6 @@ private class ShareTrackersView: UIView, ShareTrayViewDelegate, Themeable {
         case didShareWithFacebookTapped
         case didShareWithDefaultTapped
         case didTakeALookTapped
-        case didDontShowTapped
     }
     
     // MARK: Properties
@@ -279,11 +264,12 @@ private class ShareTrackersView: UIView, ShareTrayViewDelegate, Themeable {
         switch trackingType {
             case .trackerCountShare:
                 stackView.addArrangedSubview(shareTrayView)
-            case .trackerAdWarning, .trackerAdCountBlock, .encryptedConnectionWarning:
+            case .trackerAdWarning:
                 stackView.addArrangedSubview(actionButton)
             default:
                 return
         }
+
     }
     
     private func setContent() {
@@ -303,16 +289,12 @@ private class ShareTrackersView: UIView, ShareTrayViewDelegate, Themeable {
         
         subtitleLabel.attributedText = NSAttributedString(string: trackingType.subTitle).withLineSpacing(2)
         
-        actionButton.setTitle(trackingType.actionTitle, for: .normal)
+        actionButton.setTitle(Strings.ShieldEducation.educationInspectTitle, for: .normal)
     }
     
     // MARK: Action
     @objc func tappedInformationAction() {
-        if case .trackerAdWarning = trackingType {
-            actionHandler?(.didTakeALookTapped)
-        } else {
-            actionHandler?(.didDontShowTapped)
-        }
+        actionHandler?(.didTakeALookTapped)
     }
     
     // MARK: ShareTrayViewDelegate

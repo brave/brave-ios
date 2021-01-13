@@ -147,8 +147,15 @@ class BrowserViewController: UIViewController {
     
     let vpnProductInfo = VPNProductInfo()
     
-    /// Tracking If a product notification is presented in order to not to try to present another one over existing popover
+    // Boolean which is tracking If a product notification is presented
+    // in order to not to try to present another one over existing popover
     var benchmarkNotificationPresented = false
+    
+    // Boolean which is tracking If a benchmark notification is presented
+    // in simgle application instance
+    var shieldStatChangesNotified = false
+    
+    // Number of Ads/Trackers used a limit to show benchmark notification
     var benchmarkNumberOfTrackers = 15
 
     init(profile: Profile, tabManager: TabManager, crashedLastSession: Bool,
@@ -615,7 +622,7 @@ class BrowserViewController: UIViewController {
                            name: .adsOrRewardsToggledInSettings, object: nil)
             $0.addObserver(self, selector: #selector(vpnConfigChanged),
                            name: .NEVPNConfigurationChange, object: nil)
-            $0.addObserver(self, selector: #selector(presentEducationalProductNotifications),
+            $0.addObserver(self, selector: #selector(updateShieldNotifications),
                            name: NSNotification.Name(rawValue: BraveGlobalShieldStats.didUpdateNotification), object: nil)
         }
         

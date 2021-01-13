@@ -9,9 +9,7 @@ import SwiftyJSON
 open class BraveGlobalShieldStats {
     public static let shared = BraveGlobalShieldStats()
     public static let didUpdateNotification = "BraveGlobalShieldStatsDidUpdate"
-    
-    public var shieldStatChangesNotified = false
-    
+        
     public var adblock: Int = 0 {
         didSet {
             Preferences.BlockStats.adsCount.value = adblock
