@@ -15,8 +15,6 @@
 #import "NSData+GZIP.h"
 #import "NSFileManager+Tar.h"
 
-#import <YubiKit/YubiKit.h>
-
 #import "ablock_rust_lib.h"
 
 // MARK: - VPN

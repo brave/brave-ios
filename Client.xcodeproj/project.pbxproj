@@ -389,6 +389,7 @@
 		27F4439F2135E11200296C58 /* BraveShareTo.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 27F443952135E11200296C58 /* BraveShareTo.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		27F443AD2135E25300296C58 /* ShareToBraveViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27F443AC2135E25300296C58 /* ShareToBraveViewController.swift */; };
 		27F443F42138843400296C58 /* BraveShareToInfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 27F443F22138843400296C58 /* BraveShareToInfoPlist.strings */; };
+		27F4798C25AF94B0004922E4 /* YubiKit in Frameworks */ = {isa = PBXBuildFile; productRef = 27F4798B25AF94B0004922E4 /* YubiKit */; };
 		27F56F8D24E447020018F2F9 /* DateTools.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 27F56F7D24E447020018F2F9 /* DateTools.bundle */; };
 		27F94A3A21909A5900F4FADF /* SearchSuggestionsPromptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27F94A3921909A5900F4FADF /* SearchSuggestionsPromptView.swift */; };
 		27FCA8E02447708300A8CA48 /* FavoritesSectionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FCA8DF2447708300A8CA48 /* FavoritesSectionProvider.swift */; };
@@ -1003,7 +1004,6 @@
 		F930CDD12270F09000A23FE1 /* WebAuthnAuthenticateRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F930CDD02270F09000A23FE1 /* WebAuthnAuthenticateRequest.swift */; };
 		F930CDD72270F14300A23FE1 /* WebAuthnUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = F930CDD62270F14300A23FE1 /* WebAuthnUtils.swift */; };
 		F939FBFE22A596B900D9CD3F /* U2FTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F939FBFD22A596B900D9CD3F /* U2FTests.swift */; };
-		F98E1EA122B6D70E0018AF29 /* libYubiKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AC8E23A22A6C56D0064F3FA /* libYubiKit.a */; };
 		F99505FF22937E3900CC6543 /* U2F-low-level.js in Resources */ = {isa = PBXBuildFile; fileRef = F99505FE22937E3900CC6543 /* U2F-low-level.js */; };
 		F9B23EE223F61173000EB3D8 /* PaymentRequest.js in Resources */ = {isa = PBXBuildFile; fileRef = F9B23EE123F61173000EB3D8 /* PaymentRequest.js */; };
 		F9B23EE523F613E8000EB3D8 /* PaymentRequestExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B23EE423F613E8000EB3D8 /* PaymentRequestExtension.swift */; };
@@ -1358,8 +1358,6 @@
 		0A1E843A2190A57F0042F782 /* SyncCameraView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncCameraView.swift; sourceTree = "<group>"; };
 		0A1E843B2190A57F0042F782 /* SyncPairWordsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncPairWordsViewController.swift; sourceTree = "<group>"; };
 		0A1E843C2190A57F0042F782 /* SyncAddDeviceViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncAddDeviceViewController.swift; sourceTree = "<group>"; };
-		0A24F7E0233E8F0E004D2F3A /* Cartfile.resolved */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Cartfile.resolved; sourceTree = "<group>"; };
-		0A24F7E1233E8F0E004D2F3A /* Cartfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Cartfile; sourceTree = "<group>"; };
 		0A24F7E2233E8F0F004D2F3A /* package-lock.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "package-lock.json"; sourceTree = "<group>"; };
 		0A24F7E3233E8F0F004D2F3A /* package.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = package.json; sourceTree = "<group>"; };
 		0A24F7E4233E8F0F004D2F3A /* bootstrap.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = bootstrap.sh; sourceTree = "<group>"; };
@@ -2713,6 +2711,7 @@
 				277568F125ACF92400C129AF /* XCGLogger in Frameworks */,
 				27756B0F25AD08FA00C129AF /* SDWebImage in Frameworks */,
 				277568F925ACF92400C129AF /* SwiftKeychainWrapper in Frameworks */,
+				27F4798C25AF94B0004922E4 /* YubiKit in Frameworks */,
 				277568F325ACF92400C129AF /* Fuzi in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2761,7 +2760,6 @@
 				27756ABF25AD017A00C129AF /* OnePasswordExtension.framework in Frameworks */,
 				5EE5918123A290E000E8E8DE /* CoreNFC.framework in Frameworks */,
 				278C468D23F1E6270083347F /* BraveUI.framework in Frameworks */,
-				F98E1EA122B6D70E0018AF29 /* libYubiKit.a in Frameworks */,
 				5E8CD8E123D5E3DA00548FC0 /* libarchive.2.tbd in Frameworks */,
 				27756A8325ACFFEB00C129AF /* pop.framework in Frameworks */,
 				E6231C051B90A472005ABB0D /* libxml2.2.tbd in Frameworks */,
@@ -2946,8 +2944,6 @@
 			children = (
 				0A24F7E4233E8F0F004D2F3A /* bootstrap.sh */,
 				0AA398DE250A45AC006C1BF5 /* carthage_command.sh */,
-				0A24F7E1233E8F0E004D2F3A /* Cartfile */,
-				0A24F7E0233E8F0E004D2F3A /* Cartfile.resolved */,
 				0A24F7E2233E8F0F004D2F3A /* package-lock.json */,
 				0A24F7E3233E8F0F004D2F3A /* package.json */,
 				0A24F7EE233E9129004D2F3A /* Fastfile */,
@@ -5579,6 +5575,7 @@
 				277568F825ACF92400C129AF /* SwiftKeychainWrapper */,
 				27756B0E25AD08FA00C129AF /* SDWebImage */,
 				27756BE925AD14B600C129AF /* GCDWebServers */,
+				27F4798B25AF94B0004922E4 /* YubiKit */,
 			);
 			productName = SPMLibraries;
 			productReference = 277568D025ACF91500C129AF /* SPMLibraries.framework */;
@@ -5985,6 +5982,7 @@
 				2775689A25ACF7B500C129AF /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */,
 				27756B0D25AD08FA00C129AF /* XCRemoteSwiftPackageReference "SDWebImage" */,
 				27756BE825AD14B600C129AF /* XCRemoteSwiftPackageReference "GCDWebServer" */,
+				27F4798A25AF94B0004922E4 /* XCRemoteSwiftPackageReference "yubikit-ios" */,
 			);
 			productRefGroup = F84B21BF1A090F8100AAB793 /* Products */;
 			projectDirPath = "";
@@ -8457,13 +8455,11 @@
 					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)/include/**",
 					"$(SRCROOT)/Client/WebFilters/ShieldStats/Httpse/ThirdParty/leveldb/**",
 					"$(SRCROOT)/Client/WebFilters/ShieldStats/Httpse/ThirdParty/re2",
-					"$(SRCROOT)/ThirdParty/YubiKit/include",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)",
-					"$(SRCROOT)/ThirdParty/YubiKit",
 					"$(PROJECT_DIR)/Client/WebFilters/ShieldStats/Adblock/Resources",
 					"$(PROJECT_DIR)/ThirdParty/sqlcipher",
 				);
@@ -9141,13 +9137,11 @@
 					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)/include/**",
 					"$(SRCROOT)/Client/WebFilters/ShieldStats/Httpse/ThirdParty/leveldb/**",
 					"$(SRCROOT)/Client/WebFilters/ShieldStats/Httpse/ThirdParty/re2",
-					"$(SRCROOT)/ThirdParty/YubiKit/include",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)",
-					"$(SRCROOT)/ThirdParty/YubiKit",
 					"$(PROJECT_DIR)/Client/WebFilters/ShieldStats/Adblock/Resources",
 					"$(PROJECT_DIR)/ThirdParty/sqlcipher",
 				);
@@ -11290,13 +11284,11 @@
 					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)/include/**",
 					"$(SRCROOT)/Client/WebFilters/ShieldStats/Httpse/ThirdParty/leveldb/**",
 					"$(SRCROOT)/Client/WebFilters/ShieldStats/Httpse/ThirdParty/re2",
-					"$(SRCROOT)/ThirdParty/YubiKit/include",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)",
-					"$(SRCROOT)/ThirdParty/YubiKit",
 					"$(PROJECT_DIR)/Client/WebFilters/ShieldStats/Adblock/Resources",
 					"$(PROJECT_DIR)/ThirdParty/sqlcipher",
 				);
@@ -11530,13 +11522,11 @@
 					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)/include/**",
 					"$(SRCROOT)/Client/WebFilters/ShieldStats/Httpse/ThirdParty/leveldb/**",
 					"$(SRCROOT)/Client/WebFilters/ShieldStats/Httpse/ThirdParty/re2",
-					"$(SRCROOT)/ThirdParty/YubiKit/include",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)",
-					"$(SRCROOT)/ThirdParty/YubiKit",
 					"$(PROJECT_DIR)/Client/WebFilters/ShieldStats/Adblock/Resources",
 					"$(PROJECT_DIR)/ThirdParty/sqlcipher",
 				);
@@ -11837,13 +11827,11 @@
 					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)/include/**",
 					"$(SRCROOT)/Client/WebFilters/ShieldStats/Httpse/ThirdParty/leveldb/**",
 					"$(SRCROOT)/Client/WebFilters/ShieldStats/Httpse/ThirdParty/re2",
-					"$(SRCROOT)/ThirdParty/YubiKit/include",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)",
-					"$(SRCROOT)/ThirdParty/YubiKit",
 					"$(PROJECT_DIR)/Client/WebFilters/ShieldStats/Adblock/Resources",
 					"$(PROJECT_DIR)/ThirdParty/sqlcipher",
 				);
@@ -12097,13 +12085,11 @@
 					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)/include/**",
 					"$(SRCROOT)/Client/WebFilters/ShieldStats/Httpse/ThirdParty/leveldb/**",
 					"$(SRCROOT)/Client/WebFilters/ShieldStats/Httpse/ThirdParty/re2",
-					"$(SRCROOT)/ThirdParty/YubiKit/include",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)",
-					"$(SRCROOT)/ThirdParty/YubiKit",
 					"$(PROJECT_DIR)/Client/WebFilters/ShieldStats/Adblock/Resources",
 					"$(PROJECT_DIR)/ThirdParty/sqlcipher",
 				);
@@ -12485,6 +12471,14 @@
 				revision = ad60adf1929dcd6855b0a0a1a1cf20d2898159fb;
 			};
 		};
+		27F4798A25AF94B0004922E4 /* XCRemoteSwiftPackageReference "yubikit-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Yubico/yubikit-ios";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.2.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -12537,6 +12531,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 27756BE825AD14B600C129AF /* XCRemoteSwiftPackageReference "GCDWebServer" */;
 			productName = GCDWebServers;
+		};
+		27F4798B25AF94B0004922E4 /* YubiKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 27F4798A25AF94B0004922E4 /* XCRemoteSwiftPackageReference "yubikit-ios" */;
+			productName = YubiKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 

@@ -6,6 +6,7 @@ import Data
 import Shared
 import WebKit
 import Lottie
+import YubiKit
 
 private struct FIDORegisterRequest: Codable {
     var challenge: String
