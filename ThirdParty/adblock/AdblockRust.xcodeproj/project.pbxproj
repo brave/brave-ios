@@ -158,7 +158,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export PATH=$PATH:~/.cargo/bin\n\ncd adblock-rust-ffi\ncargo clean\ncargo lipo --xcode-integ\ncbindgen -o src/lib.h\ncp src/lib.h ../AdblockRust/adblock_rust_lib.h\n";
+			shellScript = "export PATH=$PATH:~/.cargo/bin\n\ncd adblock-rust-ffi\ncargo clean\ncargo lipo --xcode-integ\ncbindgen -o ../AdblockRust/adblock_rust_lib.h\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
