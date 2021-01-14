@@ -36,7 +36,6 @@
 		0A1E84452190A57F0042F782 /* SyncPairWordsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A1E843B2190A57F0042F782 /* SyncPairWordsViewController.swift */; };
 		0A1E84462190A57F0042F782 /* SyncAddDeviceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A1E843C2190A57F0042F782 /* SyncAddDeviceViewController.swift */; };
 		0A27ABA123D1B9C400194921 /* BrandedImageCalloutState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A27ABA023D1B9C400194921 /* BrandedImageCalloutState.swift */; };
-		0A2BD6092497780A00254494 /* libadblock.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A2BD6082497780A00254494 /* libadblock.a */; };
 		0A2FF33F24A4B75100F88F43 /* vpncheckmark.json in Resources */ = {isa = PBXBuildFile; fileRef = 0A2FF33E24A4B75000F88F43 /* vpncheckmark.json */; };
 		0A39D56D21930B89008B2772 /* ScriptOpener.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A39D56C21930B89008B2772 /* ScriptOpener.swift */; };
 		0A39FE902486604D00290ABC /* GRDSubscriberCredential.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A39FE832486604100290ABC /* GRDSubscriberCredential.h */; };
@@ -162,7 +161,6 @@
 		0AD4FEF4223AC32200E00C05 /* JSValueExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AD4FEF3223AC32200E00C05 /* JSValueExtensions.swift */; };
 		0AD4FEFA223BBE5400E00C05 /* SyncCryptoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AD4FEF9223BBE5400E00C05 /* SyncCryptoTests.swift */; };
 		0AD5E9C42200591F00D0D91B /* BraveShield.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AD5E9C32200591F00D0D91B /* BraveShield.swift */; };
-		0AD9F88122F049E5008B4D95 /* AdblockRustEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AD9F88022F049E5008B4D95 /* AdblockRustEngine.swift */; };
 		0AD9F88E22F05376008B4D95 /* AdblockRustTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AD9F88D22F05376008B4D95 /* AdblockRustTests.swift */; };
 		0ADA01F32450894B00B21475 /* IAPObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ADA01F22450894B00B21475 /* IAPObserver.swift */; };
 		0ADCD4522319640F0078CC67 /* UserAgentBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ADCD4512319640F0078CC67 /* UserAgentBuilder.swift */; };
@@ -390,6 +388,7 @@
 		27F443AD2135E25300296C58 /* ShareToBraveViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27F443AC2135E25300296C58 /* ShareToBraveViewController.swift */; };
 		27F443F42138843400296C58 /* BraveShareToInfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 27F443F22138843400296C58 /* BraveShareToInfoPlist.strings */; };
 		27F4798C25AF94B0004922E4 /* YubiKit in Frameworks */ = {isa = PBXBuildFile; productRef = 27F4798B25AF94B0004922E4 /* YubiKit */; };
+		27F47A3225AFCECE004922E4 /* AdblockRust.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27F47A3125AFCECE004922E4 /* AdblockRust.xcframework */; };
 		27F56F8D24E447020018F2F9 /* DateTools.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 27F56F7D24E447020018F2F9 /* DateTools.bundle */; };
 		27F94A3A21909A5900F4FADF /* SearchSuggestionsPromptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27F94A3921909A5900F4FADF /* SearchSuggestionsPromptView.swift */; };
 		27FCA8E02447708300A8CA48 /* FavoritesSectionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FCA8DF2447708300A8CA48 /* FavoritesSectionProvider.swift */; };
@@ -1520,7 +1519,6 @@
 		0AD4FEF3223AC32200E00C05 /* JSValueExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSValueExtensions.swift; sourceTree = "<group>"; };
 		0AD4FEF9223BBE5400E00C05 /* SyncCryptoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncCryptoTests.swift; sourceTree = "<group>"; };
 		0AD5E9C32200591F00D0D91B /* BraveShield.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveShield.swift; sourceTree = "<group>"; };
-		0AD9F88022F049E5008B4D95 /* AdblockRustEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdblockRustEngine.swift; sourceTree = "<group>"; };
 		0AD9F88D22F05376008B4D95 /* AdblockRustTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdblockRustTests.swift; sourceTree = "<group>"; };
 		0ADA01F22450894B00B21475 /* IAPObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAPObserver.swift; sourceTree = "<group>"; };
 		0ADAFD9223571ED700C8669B /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Storage.strings; sourceTree = "<group>"; };
@@ -1847,6 +1845,7 @@
 		27F4439C2135E11200296C58 /* BraveShareToInfo.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = BraveShareToInfo.plist; sourceTree = "<group>"; };
 		27F443AC2135E25300296C58 /* ShareToBraveViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareToBraveViewController.swift; sourceTree = "<group>"; };
 		27F443F32138843400296C58 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = Localizations/en.lproj/BraveShareToInfoPlist.strings; sourceTree = "<group>"; };
+		27F47A3125AFCECE004922E4 /* AdblockRust.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = AdblockRust.xcframework; sourceTree = "<group>"; };
 		27F56F7D24E447020018F2F9 /* DateTools.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = DateTools.bundle; sourceTree = "<group>"; };
 		27F94A3921909A5900F4FADF /* SearchSuggestionsPromptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchSuggestionsPromptView.swift; sourceTree = "<group>"; };
 		27FA2D4F234CC9FB004D5D2D /* BraveRewards.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = BraveRewards.framework; path = "node_modules/brave-core-ios/BraveRewards.framework"; sourceTree = "<group>"; };
@@ -2767,7 +2766,7 @@
 				288A2D9D1AB8B3260023ABC3 /* Shared.framework in Frameworks */,
 				5DE7689920B3456E00FF5533 /* BraveShared.framework in Frameworks */,
 				2FCAE2311ABB51F800877008 /* Storage.framework in Frameworks */,
-				0A2BD6092497780A00254494 /* libadblock.a in Frameworks */,
+				27F47A3225AFCECE004922E4 /* AdblockRust.xcframework in Frameworks */,
 				5D1DC52820AC9AFB00905E5A /* Data.framework in Frameworks */,
 				0A1DF486244A2ECB00541FE4 /* NetworkExtension.framework in Frameworks */,
 				277568D725ACF91600C129AF /* SPMLibraries.framework in Frameworks */,
@@ -3021,7 +3020,6 @@
 				0AD9F87522F04090008B4D95 /* Resources */,
 				0A43292F21B1C7F50041625B /* AdBlockStats.swift */,
 				0A43293A21B1C8D10041625B /* FifoDict.swift */,
-				0AD9F88022F049E5008B4D95 /* AdblockRustEngine.swift */,
 			);
 			path = Adblock;
 			sourceTree = "<group>";
@@ -3855,6 +3853,14 @@
 			path = BraveShareTo;
 			sourceTree = "<group>";
 		};
+		27F47A3025AFCECE004922E4 /* adblock */ = {
+			isa = PBXGroup;
+			children = (
+				27F47A3125AFCECE004922E4 /* AdblockRust.xcframework */,
+			);
+			path = adblock;
+			sourceTree = "<group>";
+		};
 		28532D301C483DEB000072D9 /* Bookmarks */ = {
 			isa = PBXGroup;
 			children = (
@@ -3887,6 +3893,7 @@
 		28CE83EF1A1D246900576538 /* ThirdParty */ = {
 			isa = PBXGroup;
 			children = (
+				27F47A3025AFCECE004922E4 /* adblock */,
 				27756C5825AD152F00C129AF /* Static */,
 				277569ED25ACFCF000C129AF /* onepassword-app-extension */,
 				2711D99224E444E200E3844B /* DateTools */,
@@ -7138,7 +7145,6 @@
 				4422D55521BFFB7E00BF1855 /* nfa.cc in Sources */,
 				E663D5781BB341C4001EF30E /* ToggleButton.swift in Sources */,
 				2FB9C2A12587E742009DA1FE /* BrowserViewController+ProductNotification.swift in Sources */,
-				0AD9F88122F049E5008B4D95 /* AdblockRustEngine.swift in Sources */,
 				0A39FE992486604D00290ABC /* GRDGatewayAPI.m in Sources */,
 				0A1DF48424487AA000541FE4 /* GRDGatewayAPIResponse.m in Sources */,
 				4422D4B421BFFB7600BF1855 /* hash.cc in Sources */,
@@ -8460,7 +8466,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)",
-					"$(PROJECT_DIR)/Client/WebFilters/ShieldStats/Adblock/Resources",
 					"$(PROJECT_DIR)/ThirdParty/sqlcipher",
 				);
 				MTL_ENABLE_DEBUG_INFO = YES;
@@ -9142,7 +9147,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)",
-					"$(PROJECT_DIR)/Client/WebFilters/ShieldStats/Adblock/Resources",
 					"$(PROJECT_DIR)/ThirdParty/sqlcipher",
 				);
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -11289,7 +11293,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)",
-					"$(PROJECT_DIR)/Client/WebFilters/ShieldStats/Adblock/Resources",
 					"$(PROJECT_DIR)/ThirdParty/sqlcipher",
 				);
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -11527,7 +11530,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)",
-					"$(PROJECT_DIR)/Client/WebFilters/ShieldStats/Adblock/Resources",
 					"$(PROJECT_DIR)/ThirdParty/sqlcipher",
 				);
 				MTL_ENABLE_DEBUG_INFO = YES;
@@ -11832,7 +11834,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)",
-					"$(PROJECT_DIR)/Client/WebFilters/ShieldStats/Adblock/Resources",
 					"$(PROJECT_DIR)/ThirdParty/sqlcipher",
 				);
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -12090,7 +12091,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)",
-					"$(PROJECT_DIR)/Client/WebFilters/ShieldStats/Adblock/Resources",
 					"$(PROJECT_DIR)/ThirdParty/sqlcipher",
 				);
 				MTL_ENABLE_DEBUG_INFO = YES;
