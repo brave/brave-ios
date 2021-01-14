@@ -75,6 +75,8 @@ class SearchCustomEngineViewController: UIViewController {
         }
     }
     
+    private var fetcher: FaviconFetcher?
+    
     fileprivate var faviconImage: UIImage?
     
     private lazy var spinnerView = UIActivityIndicatorView(style: .gray).then {
@@ -360,17 +362,15 @@ extension SearchCustomEngineViewController {
             openSearchEngine = nil
             return
         }
+                
+        fetcher = FaviconFetcher(siteURL: url, kind: .favicon)
         
-        faviconImage = #imageLiteral(resourceName: "defaultFavicon")
-        
-        let fetcher = FaviconFetcher(siteURL: url, kind: .largeIcon)
-        fetcher.load { [weak self] _, attributes in
+        fetcher?.load { [weak self] _, attributes in
             guard let self = self else { return }
             
             self.faviconImage = attributes.image ?? #imageLiteral(resourceName: "defaultFavicon")
+            self.openSearchEngine = searchEngineDetails
         }
-        
-        openSearchEngine = searchEngineDetails
     }
     
     func fetchOpenSearchReference(document: HTMLDocument) -> OpenSearchReference? {
@@ -403,6 +403,7 @@ extension SearchCustomEngineViewController {
                 self.handleError(error: error)
             } else if let engine = engine {
                 try? self.profile.searchEngines.addSearchEngine(engine)
+                
             }
             
             self.setSaveButton(for: .enabled)
@@ -434,11 +435,9 @@ extension SearchCustomEngineViewController {
             return
         }
 
-        let fetcher = FaviconFetcher(siteURL: hostUrl, kind: .favicon, domain: nil)
+        fetcher = FaviconFetcher(siteURL: hostUrl, kind: .favicon)
 
-        fetcher.load { siteUrl, attributes in
-            guard siteUrl == url else { return }
-
+        fetcher?.load { siteUrl, attributes in
             if let image = attributes.image {
                 engineImage = image
             }
