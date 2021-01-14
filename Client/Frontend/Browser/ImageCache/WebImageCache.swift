@@ -55,7 +55,7 @@ final class WebImageCache: ImageCacheProtocol {
         let imageOperation = webImageManager.loadImage(with: url, options: SDWebImageOptions(webImageOptions), context: webImageContext, progress: progressBlock) { image, data, error, webImageCacheType, _, imageURL in
             let key = self.webImageManager.cacheKey(for: url)
             if let image = image, !self.isPrivate {
-                self.webImageManager.imageCache.store(image, imageData: data, forKey: key, cacheType: .disk)
+                self.webImageManager.imageCache.store(image, imageData: data, forKey: key, cacheType: .all)
             }
             
             let cacheType = self.mapImageCacheType(from: webImageCacheType)
