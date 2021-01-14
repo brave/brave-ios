@@ -14,7 +14,7 @@
 		</data>
 		<key>Headers/adblock_rust_lib.h</key>
 		<data>
-		j0MjKrp3ZYAVC6ZYGkp+ML/n51k=
+		O2R8NV8Ig4wDbKtLJ27gLeBVlEg=
 		</data>
 		<key>Info.plist</key>
 		<data>
@@ -26,11 +26,11 @@
 		</data>
 		<key>Modules/AdblockRust.swiftmodule/arm64-apple-ios-simulator.swiftinterface</key>
 		<data>
-		JgfV7GxxNRyIxNbGDgbKKwPPLKA=
+		QMbJZY3OFtd/PHwlHrA+idAn0yM=
 		</data>
 		<key>Modules/AdblockRust.swiftmodule/arm64-apple-ios-simulator.swiftmodule</key>
 		<data>
-		7YEojt9ZiDCDJE8kJ/eOFc9Pi+4=
+		AdwNaqgcXrKNhAKdSbk8W1Wu870=
 		</data>
 		<key>Modules/AdblockRust.swiftmodule/arm64.swiftdoc</key>
 		<data>
@@ -38,11 +38,11 @@
 		</data>
 		<key>Modules/AdblockRust.swiftmodule/arm64.swiftinterface</key>
 		<data>
-		JgfV7GxxNRyIxNbGDgbKKwPPLKA=
+		QMbJZY3OFtd/PHwlHrA+idAn0yM=
 		</data>
 		<key>Modules/AdblockRust.swiftmodule/arm64.swiftmodule</key>
 		<data>
-		7YEojt9ZiDCDJE8kJ/eOFc9Pi+4=
+		AdwNaqgcXrKNhAKdSbk8W1Wu870=
 		</data>
 		<key>Modules/AdblockRust.swiftmodule/x86_64-apple-ios-simulator.swiftdoc</key>
 		<data>
@@ -50,11 +50,11 @@
 		</data>
 		<key>Modules/AdblockRust.swiftmodule/x86_64-apple-ios-simulator.swiftinterface</key>
 		<data>
-		p0h1vaipWT8LNlAVlYJ84BXoaHM=
+		EJkIe4fVwYRAnQ6/w4M7RWWCv9o=
 		</data>
 		<key>Modules/AdblockRust.swiftmodule/x86_64-apple-ios-simulator.swiftmodule</key>
 		<data>
-		jka0z5EEJsOpQ75RKf8N7CFj1F8=
+		IAI3jb473kLBvdgiObFyNHIIfpA=
 		</data>
 		<key>Modules/AdblockRust.swiftmodule/x86_64.swiftdoc</key>
 		<data>
@@ -62,11 +62,11 @@
 		</data>
 		<key>Modules/AdblockRust.swiftmodule/x86_64.swiftinterface</key>
 		<data>
-		p0h1vaipWT8LNlAVlYJ84BXoaHM=
+		EJkIe4fVwYRAnQ6/w4M7RWWCv9o=
 		</data>
 		<key>Modules/AdblockRust.swiftmodule/x86_64.swiftmodule</key>
 		<data>
-		jka0z5EEJsOpQ75RKf8N7CFj1F8=
+		IAI3jb473kLBvdgiObFyNHIIfpA=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -93,7 +93,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			waF6IJdEQktT3XRX1B3CV3/avU0G0lOVwbY7zJpYCDA=
+			NyB6rUvYT9d6k/IPTWtpjlDDdG64Jj8+A9DxP9P1acc=
 			</data>
 		</dict>
 		<key>Modules/AdblockRust.swiftmodule/arm64-apple-ios-simulator.swiftdoc</key>
@@ -107,14 +107,14 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			Ac50evJrq+4Dyrom/uwq+BL1XieCp0tgCCnjWZpZVUs=
+			l1FV+cPze++/jBfH22V4RmyYSnGIwfVJLO8tjpQU2zg=
 			</data>
 		</dict>
 		<key>Modules/AdblockRust.swiftmodule/arm64-apple-ios-simulator.swiftmodule</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			i2QguVWE7p6slfkhKHowKkALbAAUk7hT6/siB6qG1jo=
+			fffkXSZVyjt0BpK5G30fNAzbXWSH1HZa0WobgH4yLFs=
 			</data>
 		</dict>
 		<key>Modules/AdblockRust.swiftmodule/arm64.swiftdoc</key>
@@ -128,14 +128,14 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			Ac50evJrq+4Dyrom/uwq+BL1XieCp0tgCCnjWZpZVUs=
+			l1FV+cPze++/jBfH22V4RmyYSnGIwfVJLO8tjpQU2zg=
 			</data>
 		</dict>
 		<key>Modules/AdblockRust.swiftmodule/arm64.swiftmodule</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			i2QguVWE7p6slfkhKHowKkALbAAUk7hT6/siB6qG1jo=
+			fffkXSZVyjt0BpK5G30fNAzbXWSH1HZa0WobgH4yLFs=
 			</data>
 		</dict>
 		<key>Modules/AdblockRust.swiftmodule/x86_64-apple-ios-simulator.swiftdoc</key>
@@ -149,14 +149,14 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			jpbKcxV5eGSjdgCnyGxpMUpNH4J75qyhUn33jF2DaoY=
+			skAwxZV5lkl/bhmY8eafSv3p70GeASsM0Rki4xrGRLY=
 			</data>
 		</dict>
 		<key>Modules/AdblockRust.swiftmodule/x86_64-apple-ios-simulator.swiftmodule</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			IpBdFtNtgZEBMWi3Lco6+BGn5bJSjV8fhX7kJGWk87Y=
+			tLAPLMECOf62kBdMnYH/T6qjzeS+11CgiazIN8W+iOE=
 			</data>
 		</dict>
 		<key>Modules/AdblockRust.swiftmodule/x86_64.swiftdoc</key>
@@ -170,14 +170,14 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			jpbKcxV5eGSjdgCnyGxpMUpNH4J75qyhUn33jF2DaoY=
+			skAwxZV5lkl/bhmY8eafSv3p70GeASsM0Rki4xrGRLY=
 			</data>
 		</dict>
 		<key>Modules/AdblockRust.swiftmodule/x86_64.swiftmodule</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			IpBdFtNtgZEBMWi3Lco6+BGn5bJSjV8fhX7kJGWk87Y=
+			tLAPLMECOf62kBdMnYH/T6qjzeS+11CgiazIN8W+iOE=
 			</data>
 		</dict>
 		<key>Modules/module.modulemap</key>

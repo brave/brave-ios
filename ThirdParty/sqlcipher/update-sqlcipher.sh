@@ -28,6 +28,7 @@ cp sqlite3session.h $OUTPUT_DIR
 popd
 
 rm -rf /tmp/sqlcipher
-echo $1 >! VERSION
 
-# ./create-xcframework.sh
+./create-xcframework.sh
+
+echo $1 > VERSION

@@ -4,11 +4,6 @@
 @_exported import AdblockRust
 import Foundation
 import Swift
-extension Data {
-  public var int8Array: [Swift.Int8] {
-    get
-  }
-}
 public class AdblockRustEngine {
   public init(rules: Swift.String = "")
   @objc deinit
