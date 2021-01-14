@@ -51,8 +51,8 @@ class OpenSearchEngine: NSObject, NSSecureCoding {
 
     fileprivate lazy var searchQueryComponentKey: String? = self.getQueryArgFromTemplate()
 
-    init(engineID: String?, shortName: String, referenceURL: String? = nil, image: UIImage, searchTemplate: String,
-         suggestTemplate: String?, isCustomEngine: Bool) {
+    init(engineID: String? = nil, shortName: String, referenceURL: String? = nil, image: UIImage, searchTemplate: String,
+         suggestTemplate: String? = nil, isCustomEngine: Bool) {
         self.shortName = shortName
         self.referenceURL = referenceURL
         self.image = image

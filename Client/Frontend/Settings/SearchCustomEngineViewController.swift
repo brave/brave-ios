@@ -420,25 +420,30 @@ extension SearchCustomEngineViewController {
         }
     
         // Check Engine Exists
-        guard !profile.searchEngines.orderedEngines.filter({ $0.shortName == name }).isEmpty else {
+        guard profile.searchEngines.orderedEngines.filter({ $0.shortName == name }).isEmpty else {
             completion(nil, SearchEngineError.duplicate)
             return
         }
-        
-        let fetcher = FaviconFetcher(siteURL: url, kind: .favicon, domain: nil)
-        
+
+        var engineImage = #imageLiteral(resourceName: "defaultFavicon")
+
+        guard let hostUrl = host else {
+            let engine = OpenSearchEngine(shortName: name, image: engineImage, searchTemplate: template, isCustomEngine: true)
+
+            completion(engine, nil)
+            return
+        }
+
+        let fetcher = FaviconFetcher(siteURL: hostUrl, kind: .favicon, domain: nil)
+
         fetcher.load { siteUrl, attributes in
             guard siteUrl == url else { return }
-            
-            let engineImage = attributes.image ?? #imageLiteral(resourceName: "defaultFavicon")
-            
-            let engine = OpenSearchEngine(
-                engineID: nil,
-                shortName: name,
-                image: engineImage,
-                searchTemplate: template,
-                suggestTemplate: nil,
-                isCustomEngine: true)
+
+            if let image = attributes.image {
+                engineImage = image
+            }
+
+            let engine = OpenSearchEngine(shortName: name, image: engineImage, searchTemplate: template, isCustomEngine: true)
 
             completion(engine, nil)
         }
