@@ -147,16 +147,16 @@ class BrowserViewController: UIViewController {
     
     let vpnProductInfo = VPNProductInfo()
     
-    // Boolean which is tracking If a product notification is presented
-    // in order to not to try to present another one over existing popover
+    /// Boolean which is tracking If a product notification is presented
+    /// in order to not to try to present another one over existing popover
     var benchmarkNotificationPresented = false
     
-    // Boolean which is tracking If a benchmark notification is presented
-    // in simgle application instance
+    /// Boolean which is tracking If a benchmark notification is presented
+    /// in single application instance
     var shieldStatChangesNotified = false
     
-    // Number of Ads/Trackers used a limit to show benchmark notification
-    var benchmarkNumberOfTrackers = 15
+    /// Number of Ads/Trackers used a limit to show benchmark notification
+    let benchmarkNumberOfTrackers = 10
 
     init(profile: Profile, tabManager: TabManager, crashedLastSession: Bool,
          safeBrowsingManager: SafeBrowsing? = SafeBrowsing()) {

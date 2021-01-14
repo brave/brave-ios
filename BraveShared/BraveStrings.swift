@@ -817,7 +817,7 @@ extension Strings {
             NSLocalizedString("shieldEducation.trackerAdCountBlockTitle",
                               bundle: .braveShared,
                               value: "%ld+ trackers & ads blocked on this page.",
-                              comment: "Title for Shield Education Tracker Ad Count Block when block count raises over the defined limit. The parameter substituted for \"%ld\" is the limit of the trackers and ads blocked on the page when education pop over is presented. E.g.: 15+ trackers & ads blocked on the page")
+                              comment: "Title for Shield Education Tracker Ad Count Block when block count raises over the defined limit. The parameter substituted for \"%ld\" is the limit of the trackers and ads blocked on the page when education pop over is presented. E.g.: 10+ trackers & ads blocked on the page")
         
         public static let encryptedConnectionWarningTitle =
             NSLocalizedString("shieldEducation.encryptedConnectionWarningTitle",

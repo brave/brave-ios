@@ -53,7 +53,7 @@ extension BrowserViewController {
             shieldStatChangesNotified = true
         }
         
-        // Step 3: 15+ Trackers and Ads Blocked
+        // Step 3: Pre-determined # of Trackers and Ads Blocked
         if benchmarkNotificationPresented || shieldStatChangesNotified { return }
 
         if !Preferences.ProductNotificationBenchmarks.privacyProtectionBlockShown.value,
