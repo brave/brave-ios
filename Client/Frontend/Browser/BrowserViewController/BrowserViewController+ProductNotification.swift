@@ -97,7 +97,7 @@ extension BrowserViewController {
 
         if !Preferences.ProductNotificationBenchmarks.privacyProtectionBlockShown.value,
            contentBlockerStats.total > benchmarkNumberOfTrackers {
-
+            
             notifyPrivacyProtectBlock(theme: Theme.of(selectedTab))
             
             shieldStatChangesNotified = true
@@ -143,7 +143,7 @@ extension BrowserViewController {
                     break
             }
         }
-
+        
         showBenchmarkNotificationPopover(controller: shareTrackersViewController)
     }
     
@@ -201,7 +201,7 @@ extension BrowserViewController {
             
             self.benchmarkNotificationPresented = false
         }
-
+        
         popover.present(from: self.topToolbar.locationView.shieldsButton, on: self)
         benchmarkNotificationPresented = true
     }
@@ -215,7 +215,7 @@ extension BrowserViewController {
             self.presentBraveShieldsViewController()
         }
     }
-
+    
     func dismissAndAddNoShowList(_ type: TrackingType) {
         benchmarkNotificationPresented = false
         

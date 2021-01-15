@@ -49,7 +49,7 @@ class ShareTrayView: UIView, Themeable {
     required init(coder: NSCoder) {
         fatalError()
     }
-
+    
     private func doLayout() {
         let stackView = UIStackView().then {
             $0.alignment = .leading

@@ -87,7 +87,6 @@ extension Preferences {
         public static let privacyProtectionBlockShown = Option<Bool>(key: "product-benchmark.privacyProtectionBlockShown", default: false)
         public static let httpsUpgradeShown = Option<Bool>(key: "product-benchmark.httpsUpgradeShown", default: false)
         public static let videoAdBlockShown = Option<Bool>(key: "product-benchmark.videoAdBlockShown", default: false)
-        public static let ongoingEducationCheckDate = Option<TimeInterval>(key: "product-benchmark.ongoingEducationCheckDate", default: Date().timeIntervalSince1970)
     }
     
     public final class Shields {

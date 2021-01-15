@@ -2,6 +2,7 @@
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
 import Foundation
 import BraveRewards
 import BraveUI
@@ -44,7 +45,6 @@ enum TrackingType: Equatable {
                 return Strings.ShieldEducation.trackerAdCountBlockSubtitle
             case .encryptedConnectionWarning:
                 return Strings.ShieldEducation.encryptedConnectionWarningSubtitle
-
         }
     }
 }
@@ -93,7 +93,7 @@ class ShareTrackersController: UIViewController, Themeable, PopoverContentCompon
     required init(coder: NSCoder) {
         fatalError()
     }
-
+    
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         
@@ -103,7 +103,7 @@ class ShareTrackersController: UIViewController, Themeable, PopoverContentCompon
             }
         }
     }
-
+    
     // MARK: Internal
     
     override func viewDidLoad() {
@@ -152,7 +152,7 @@ class ShareTrackersController: UIViewController, Themeable, PopoverContentCompon
             }
         }
     }
-
+    
     // MARK: Themeable
     
     func applyTheme(_ theme: Theme) {
@@ -183,7 +183,7 @@ private class ShareTrackersView: UIView, ShareTrayViewDelegate, Themeable {
         case didTakeALookTapped
         case didDontShowTapped
     }
-
+    
     // MARK: Properties
     
     private let trackingType: TrackingType
@@ -207,11 +207,10 @@ private class ShareTrackersView: UIView, ShareTrayViewDelegate, Themeable {
         $0.font = .systemFont(ofSize: 16)
         $0.numberOfLines = 0
     }
-
+    
     private lazy var actionButton: UIButton = {
         let actionButton = InsetButton()
         actionButton.addTarget(self, action: #selector(tappedInformationAction), for: .touchUpInside)
-        
         actionButton.contentEdgeInsets = UX.actionButtonInsets
         actionButton.layer.cornerRadius = 20
         actionButton.clipsToBounds = true
@@ -238,7 +237,7 @@ private class ShareTrackersView: UIView, ShareTrayViewDelegate, Themeable {
     required init(coder: NSCoder) {
         fatalError()
     }
-
+    
     private func doLayout() {
         addSubview(stackView)
         
@@ -293,13 +292,13 @@ private class ShareTrackersView: UIView, ShareTrayViewDelegate, Themeable {
         
         actionButton.setTitle(Strings.ShieldEducation.educationInspectTitle, for: .normal)
     }
-
+    
     // MARK: Action
     
     @objc func tappedInformationAction() {
         actionHandler?(.didTakeALookTapped)
     }
-
+    
     // MARK: ShareTrayViewDelegate
     
     func didShareWith(_ view: ShareTrayView, type: ShareTrayView.ViewType) {
