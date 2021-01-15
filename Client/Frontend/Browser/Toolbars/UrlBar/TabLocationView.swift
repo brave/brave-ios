@@ -396,6 +396,8 @@ extension TabLocationView: Themeable {
 
         readerModeButton.unselectedTintColor = theme.colors.tints.header
         readerModeButton.selectedTintColor = theme.colors.accent
+        
+        lockImageView.tintColor = theme.colors.tints.header
 
         separatorLine.backgroundColor = theme.colors.border.withAlphaComponent(theme.colors.transparencies.borderAlpha)
     }
