@@ -16,7 +16,7 @@ enum TrackingType: Equatable {
     case videoAdBlock
     case trackerAdCountBlock(count: Int)
     case encryptedConnectionWarning
-
+    
     var title: String {
         switch self {
             case .trackerCountShare(let count):
@@ -31,7 +31,7 @@ enum TrackingType: Equatable {
                 return Strings.ShieldEducation.encryptedConnectionWarningTitle
         }
     }
-
+    
     var subTitle: String {
         switch self {
             case .trackerCountShare:
@@ -50,8 +50,9 @@ enum TrackingType: Equatable {
 }
 
 // MARK: - ShareTrackersController
-class ShareTrackersController: UIViewController, Themeable, PopoverContentComponent {
 
+class ShareTrackersController: UIViewController, Themeable, PopoverContentComponent {
+    
     // MARK: Action
     
     enum Action {
@@ -62,20 +63,20 @@ class ShareTrackersController: UIViewController, Themeable, PopoverContentCompon
         case shareFacebookTapped
         case shareMoreTapped
     }
-
+    
     // MARK: Properties
     
     private let theme: Theme
     private let trackingType: TrackingType
-
+    
     private let shareTrackersView: ShareTrackersView
-
+    
     private lazy var gradientView = GradientView(
         colors: [#colorLiteral(red: 0.968627451, green: 0.2274509804, blue: 0.1098039216, alpha: 1), #colorLiteral(red: 0.7490196078, green: 0.07843137255, blue: 0.6352941176, alpha: 1)],
         positions: [0, 1],
         startPoint: .zero,
         endPoint: CGPoint(x: 1, y: 0.5))
-
+    
     var actionHandler: ((Action) -> Void)?
 
     // MARK: Lifecycle
@@ -84,10 +85,10 @@ class ShareTrackersController: UIViewController, Themeable, PopoverContentCompon
         self.theme = theme
         self.trackingType = trackingType
         shareTrackersView = ShareTrackersView(trackingType: trackingType)
-
+        
         super.init(nibName: nil, bundle: nil)
     }
-
+    
     @available(*, unavailable)
     required init(coder: NSCoder) {
         fatalError()
@@ -95,7 +96,7 @@ class ShareTrackersController: UIViewController, Themeable, PopoverContentCompon
 
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
-
+        
         if #available(iOS 13.0, *) {
             if traitCollection.userInterfaceStyle != previousTraitCollection?.userInterfaceStyle {
                 applyTheme(Theme.of(nil))
@@ -107,10 +108,10 @@ class ShareTrackersController: UIViewController, Themeable, PopoverContentCompon
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         shareTrackersView.actionHandler = { [weak self] action in
             guard let self = self else { return }
-
+            
             switch action {
             case .didShareWithMailTapped:
                 self.actionHandler?(.takeALookTapped)
@@ -126,11 +127,11 @@ class ShareTrackersController: UIViewController, Themeable, PopoverContentCompon
                 self.actionHandler?(.dontShowAgainTapped)
             }
         }
-
+        
         applyTheme(theme)
         doLayout()
     }
-
+    
     private func doLayout() {
         view.addSubview(shareTrackersView)
 
@@ -138,14 +139,14 @@ class ShareTrackersController: UIViewController, Themeable, PopoverContentCompon
             $0.width.equalTo(264)
             $0.height.equalTo(shareTrackersView)
         }
-
+        
         shareTrackersView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
-
+        
         if case .trackerAdWarning = trackingType {
             shareTrackersView.insertSubview(gradientView, at: 0)
-
+            
             gradientView.snp.makeConstraints { make in
                 make.edges.equalToSuperview()
             }
@@ -156,7 +157,7 @@ class ShareTrackersController: UIViewController, Themeable, PopoverContentCompon
     
     func applyTheme(_ theme: Theme) {
         view.backgroundColor = UIColor(rgb: 0x339AF0)
-
+        
         shareTrackersView.applyTheme(theme)
     }
 }
@@ -171,7 +172,7 @@ private class ShareTrackersView: UIView, ShareTrayViewDelegate, Themeable {
         static let contentMargins: UIEdgeInsets = UIEdgeInsets(equalInset: 32)
         static let actionButtonInsets: UIEdgeInsets = UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0)
     }
-
+    
     // MARK: Action
     
     enum Action {
@@ -188,14 +189,14 @@ private class ShareTrackersView: UIView, ShareTrayViewDelegate, Themeable {
     private let trackingType: TrackingType
 
     private let shareTrayView = ShareTrayView()
-
+    
     private let stackView = UIStackView().then {
         $0.axis = .vertical
         $0.spacing = 20
         $0.isLayoutMarginsRelativeArrangement = true
         $0.layoutMargins = UX.contentMargins
     }
-
+    
     private lazy var titleLabel = UILabel().then {
         $0.backgroundColor = .clear
         $0.setContentCompressionResistancePriority(.required, for: .horizontal)
@@ -210,6 +211,7 @@ private class ShareTrackersView: UIView, ShareTrayViewDelegate, Themeable {
     private lazy var actionButton: UIButton = {
         let actionButton = InsetButton()
         actionButton.addTarget(self, action: #selector(tappedInformationAction), for: .touchUpInside)
+        
         actionButton.contentEdgeInsets = UX.actionButtonInsets
         actionButton.layer.cornerRadius = 20
         actionButton.clipsToBounds = true
@@ -218,21 +220,20 @@ private class ShareTrackersView: UIView, ShareTrayViewDelegate, Themeable {
         actionButton.setContentCompressionResistancePriority(.required, for: .horizontal)
         return actionButton
     }()
-
+    
     var actionHandler: ((Action) -> Void)?
-
+    
     // MARK: Lifecycle
     
     init(trackingType: TrackingType) {
         self.trackingType = trackingType
-
+        
         super.init(frame: .zero)
-
         
         doLayout()
         setContent()
     }
-
+    
     @available(*, unavailable)
     required init(coder: NSCoder) {
         fatalError()
@@ -240,7 +241,7 @@ private class ShareTrackersView: UIView, ShareTrayViewDelegate, Themeable {
 
     private func doLayout() {
         addSubview(stackView)
-
+        
         stackView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
@@ -262,7 +263,7 @@ private class ShareTrackersView: UIView, ShareTrayViewDelegate, Themeable {
                 )
             })
         )
-
+        
         switch trackingType {
             case .trackerCountShare:
                 stackView.addArrangedSubview(shareTrayView)
@@ -272,24 +273,24 @@ private class ShareTrackersView: UIView, ShareTrayViewDelegate, Themeable {
                 return
         }
     }
-
+    
     private func setContent() {
         titleLabel.attributedText = {
             let imageAttachment = NSTextAttachment().then {
                 $0.image = #imageLiteral(resourceName: "share-bubble-shield")
             }
-
+            
             let string = NSMutableAttributedString(attachment: imageAttachment)
-
+            
             string.append(NSMutableAttributedString(
                 string: trackingType.title,
                 attributes: [.font: UIFont.systemFont(ofSize: 20.0)]
             ))
             return string.withLineSpacing(2)
         }()
-
+        
         subtitleLabel.attributedText = NSAttributedString(string: trackingType.subTitle).withLineSpacing(2)
-
+        
         actionButton.setTitle(Strings.ShieldEducation.educationInspectTitle, for: .normal)
     }
 

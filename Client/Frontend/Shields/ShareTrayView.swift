@@ -15,36 +15,36 @@ protocol ShareTrayViewDelegate: AnyObject {
 // MARK: - ShareTrayView
 
 class ShareTrayView: UIView, Themeable {
-
+    
     // MARK: ViewType
-        
+    
     enum ViewType {
         case mail
         case twitter
         case facebook
         case `default`
     }
-
+    
     // MARK: Properties
         
     private let mailShareButton = createShareButton(.mail)
-
+    
     private let twitterShareButton = createShareButton(.twitter)
-
+    
     private let facebookShareButton = createShareButton(.facebook)
-
+    
     private let defaultShareButton = createShareButton(.default)
-
+    
     weak var delegate: ShareTrayViewDelegate?
 
     // MARK: Lifecycle
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-
+        
         doLayout()
     }
-
+    
     @available(*, unavailable)
     required init(coder: NSCoder) {
         fatalError()
@@ -56,9 +56,9 @@ class ShareTrayView: UIView, Themeable {
             $0.spacing = 8
             $0.isUserInteractionEnabled = false
         }
-
+        
         addSubview(stackView)
-
+        
         stackView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
@@ -70,13 +70,13 @@ class ShareTrayView: UIView, Themeable {
             .view(defaultShareButton)
         )
     }
-
+    
     // MARK: Internal
     
     static func createShareButton(_ type: ViewType) -> UIButton {
         let button = UIButton()
         let image: UIImage?
-
+        
         switch type {
             case .mail:
                 image = #imageLiteral(resourceName: "share-bubble-mail")
@@ -87,7 +87,7 @@ class ShareTrayView: UIView, Themeable {
             case .default:
                 image = #imageLiteral(resourceName: "share-bubble-more")
         }
-
+        
         if let image = image {
             button.setImage(image.template, for: .normal)
         }
@@ -96,7 +96,7 @@ class ShareTrayView: UIView, Themeable {
         button.tintColor = .white
         button.setContentHuggingPriority(.required, for: .horizontal)
         button.setContentCompressionResistancePriority(.required, for: .horizontal)
-
+        
         return button
     }
     
@@ -105,19 +105,19 @@ class ShareTrayView: UIView, Themeable {
     @objc private func tappedMailShareButton() {
         delegate?.didShareWith(self, type: .mail)
     }
-
+    
     @objc private func tappedTwitterShareButton() {
         delegate?.didShareWith(self, type: .twitter)
     }
-
+    
     @objc private func tappedFacebookShareButton() {
         delegate?.didShareWith(self, type: .facebook)
     }
-
+    
     @objc private func tappedDefaultShareButton() {
         delegate?.didShareWith(self, type: .default)
     }
-
+    
     // MARK: Themeable
     
     func applyTheme(_ theme: Theme) {
