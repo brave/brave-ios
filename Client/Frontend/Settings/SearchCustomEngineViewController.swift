@@ -134,6 +134,7 @@ class SearchCustomEngineViewController: UIViewController {
             case .enabled:
                 navigationItem.rightBarButtonItem = UIBarButtonItem(
                     barButtonSystemItem: .save, target: self, action: #selector(self.addCustomSearchEngine))
+                spinnerView.stopAnimating()
             case .loading:
                 navigationItem.rightBarButtonItem = UIBarButtonItem(customView: spinnerView)
                 spinnerView.startAnimating()
@@ -297,17 +298,24 @@ extension SearchCustomEngineViewController {
     }
     
     func addSearchEngine(_ engine: OpenSearchEngine) {
-        let alert = ThirdPartySearchAlerts.addThirdPartySearchEngine(engine) { [weak self] alert in
+        let alert = ThirdPartySearchAlerts.addThirdPartySearchEngine(engine) { [weak self] alertAction in
             guard let self = self else { return }
+            
+            if alertAction.style == .cancel {
+                self.setSaveButton(for: .enabled)
+                self.urlHeader?.addEngineButton.state = .enabled
+                return
+            }
+            
             do {
                 try self.profile.searchEngines.addSearchEngine(engine)
                 self.cancel()
             } catch {
                 self.handleError(error: SearchEngineError.failedToSave)
+                
+                self.setSaveButton(for: .enabled)
+                self.urlHeader?.addEngineButton.state = .enabled
             }
-            
-            self.setSaveButton(for: .enabled)
-            self.urlHeader?.addEngineButton.state = .enabled
         }
 
         self.present(alert, animated: true, completion: {})
@@ -401,12 +409,21 @@ extension SearchCustomEngineViewController {
             
             if let error = error {
                 self.handleError(error: error)
-            } else if let engine = engine {
-                try? self.profile.searchEngines.addSearchEngine(engine)
                 
+                self.setSaveButton(for: .enabled)
+                self.urlHeader?.addEngineButton.state = .enabled
+            } else if let engine = engine {
+                do {
+                    try self.profile.searchEngines.addSearchEngine(engine)
+                    self.cancel()
+                } catch {
+                    self.handleError(error: SearchEngineError.failedToSave)
+
+                    self.setSaveButton(for: .enabled)
+                    self.urlHeader?.addEngineButton.state = .enabled
+                }
             }
             
-            self.setSaveButton(for: .enabled)
         }
     }
     
