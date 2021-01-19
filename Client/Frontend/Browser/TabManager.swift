@@ -244,8 +244,6 @@ class TabManager: NSObject {
             selectedTab?.createWebview()
             restoreTab(t)
         }
-
-        assert(tab === selectedTab, "Expected tab is selected")
         
         UIImpactFeedbackGenerator(style: .light).bzzt()
         selectedTab?.createWebview()
