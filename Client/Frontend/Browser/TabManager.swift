@@ -245,6 +245,25 @@ class TabManager: NSObject {
             restoreTab(t)
         }
         
+        guard tab === selectedTab else {
+            var errorLog = "Expected tab is not selected.\n"
+            
+            if let currentTabData = tab?.pageMetadata {
+                errorLog += "Current tab metadata: \(currentTabData)\n"
+            } else {
+                errorLog += "Current tab metadata doesnt exist\n"
+            }
+            
+            if let selectedTabData = selectedTab?.pageMetadata {
+                errorLog += "Selected tab metadata: \(selectedTabData)"
+            } else {
+                errorLog += "Selected tab metadata doesnt exist\n"
+            }
+            
+            log.error(errorLog)
+            return
+        }
+    
         UIImpactFeedbackGenerator(style: .light).bzzt()
         selectedTab?.createWebview()
         selectedTab?.lastExecutedTime = Date.now()
