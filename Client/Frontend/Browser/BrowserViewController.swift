@@ -3015,17 +3015,17 @@ extension BrowserViewController: WKUIDelegate {
                 guard let contextHelper = currentTab.getContentScript(name: ContextMenuHelper.name()) as? ContextMenuHelper,
                 let elements = contextHelper.elements else { return nil }
                 
-                if let url = elements.image {
+                if let imageURL = elements.image {
                     actions.append(UIAction(title: Strings.saveImageActionTitle, identifier: UIAction.Identifier("linkContextMenu.saveImage")) { _ in
-                        self.writePhotoToAlbumAction(url)
+                        self.writePhotoToAlbumAction(imageURL)
                     })
 
                     actions.append(UIAction(title: Strings.copyImageActionTitle, identifier: UIAction.Identifier("linkContextMenu.copyImage")) { _ in
-                        self.copyImageClipBoardAction(url)
+                        self.copyImageClipBoardAction(imageURL)
                     })
 
                     actions.append(UIAction(title: Strings.copyImageActionTitle, identifier: UIAction.Identifier("linkContextMenu.copyImageLink")) { _ in
-                        UIPasteboard.general.url = url as URL
+                        UIPasteboard.general.url = imageURL as URL
                     })
                 }
             }
@@ -3160,13 +3160,13 @@ extension BrowserViewController: ContextMenuHelperDelegate {
             }
             actionSheetController.addAction(openInNewTabAction, accessibilityIdentifier: "linkContextMenu.openImageInNewTab")
 
-            let saveImageAction = UIAlertAction(title: Strings.saveImageActionTitle, style: .default) { _ in
-                self.writePhotoToAlbumAction(url)
+            let saveImageAction = UIAlertAction(title: Strings.saveImageActionTitle, style: .default) { [weak self] _ in
+                self?.writePhotoToAlbumAction(url)
             }
             actionSheetController.addAction(saveImageAction, accessibilityIdentifier: "linkContextMenu.saveImage")
 
-            let copyAction = UIAlertAction(title: Strings.copyImageActionTitle, style: .default) { _ in
-                self.copyImageClipBoardAction(url)
+            let copyAction = UIAlertAction(title: Strings.copyImageActionTitle, style: .default) { [weak self] _ in
+                self?.copyImageClipBoardAction(url)
             }
             actionSheetController.addAction(copyAction, accessibilityIdentifier: "linkContextMenu.copyImage")
         }
