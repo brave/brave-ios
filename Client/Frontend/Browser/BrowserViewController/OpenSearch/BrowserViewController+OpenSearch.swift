@@ -139,18 +139,15 @@ extension BrowserViewController {
         customSearchEngineButton.state = .loading
 
         WebImageCacheManager.shared.load(from: iconURL, completion: { (image, _, _, _, _) in
-            guard let image = image else {
-                let alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
-                self.present(alert, animated: true) {
-                    self.customSearchEngineButton.state = .enabled
-                }
-                
-                return
+            var searchEngineIcon = #imageLiteral(resourceName: "defaultFavicon")
+
+            if let favIcon = image {
+                searchEngineIcon = favIcon
             }
             
             NetworkManager().downloadResource(with: url).uponQueue(.main) { [weak self] response in
                 guard let openSearchEngine =
-                        OpenSearchParser(pluginMode: true).parse(response.data, referenceURL: referenceURL, image: image) else {
+                        OpenSearchParser(pluginMode: true).parse(response.data, referenceURL: referenceURL, image: searchEngineIcon) else {
                     return
                 }
                 
