@@ -32,9 +32,11 @@ class SearchSettingsTableViewController: UITableViewController {
     
     struct Constants {
         static let sectionHeaderIdentifier = "sectionHeaderIdentifier"
-        static let customEngineRowIdentifier = "customEngineRowIdentifier"
+        static let addCustomEngineRowIdentifier = "addCustomEngineRowIdentifier"
         static let searchEngineRowIdentifier = "searchEngineRowIdentifier"
-        static let quickEngineRowIdentifier = "quickEngineRowIdentifier"
+        static let quickSearchEngineRowIdentifier = "quickSearchEngineRowIdentifier"
+        
+        static let quickRemoveEngineRowIdentifier = "quickRemoveEngineRowIdentifier"
     }
     
     // MARK: Section
@@ -49,6 +51,7 @@ class SearchSettingsTableViewController: UITableViewController {
     enum CurrentEngineType: Int, CaseIterable {
         case standard
         case `private`
+        case quick
         case suggestions
     }
     
@@ -92,9 +95,11 @@ class SearchSettingsTableViewController: UITableViewController {
             $0.allowsSelectionDuringEditing = true
 
             $0.register(SettingsTableSectionHeaderFooterView.self, forHeaderFooterViewReuseIdentifier: Constants.sectionHeaderIdentifier)
-            $0.register(UITableViewCell.self, forCellReuseIdentifier: Constants.customEngineRowIdentifier)
+            $0.register(UITableViewCell.self, forCellReuseIdentifier: Constants.addCustomEngineRowIdentifier)
             $0.register(UITableViewCell.self, forCellReuseIdentifier: Constants.searchEngineRowIdentifier)
-            $0.register(UITableViewCell.self, forCellReuseIdentifier: Constants.quickEngineRowIdentifier)
+            $0.register(UITableViewCell.self, forCellReuseIdentifier: Constants.quickSearchEngineRowIdentifier)
+            
+            $0.register(UITableViewCell.self, forCellReuseIdentifier: Constants.quickRemoveEngineRowIdentifier)
         }
 
         // Insert Done button if being presented outside of the Settings Nav stack
@@ -127,6 +132,11 @@ class SearchSettingsTableViewController: UITableViewController {
                 case CurrentEngineType.private.rawValue:
                     engine = model.defaultEngine(forType: .privateMode)
                     cell = configureSearchEngineCell(type: .privateMode, engineName: engine?.displayName)
+                case CurrentEngineType.quick.rawValue:
+                    cell = tableView.dequeueReusableCell(withIdentifier: Constants.quickSearchEngineRowIdentifier, for: indexPath).then {
+                        $0.textLabel?.text = Strings.quickSearchEngines
+                        $0.editingAccessoryType = .disclosureIndicator
+                    }
                 case CurrentEngineType.suggestions.rawValue:
                     let toggle = UISwitch().then {
                         $0.addTarget(self, action: #selector(didToggleSearchSuggestions), for: .valueChanged)
@@ -148,7 +158,7 @@ class SearchSettingsTableViewController: UITableViewController {
             
             // Add custom engine
             if index == model.orderedEngines.count {
-                cell = tableView.dequeueReusableCell(withIdentifier: Constants.customEngineRowIdentifier, for: indexPath).then {
+                cell = tableView.dequeueReusableCell(withIdentifier: Constants.addCustomEngineRowIdentifier, for: indexPath).then {
                     $0.textLabel?.text = Strings.searchSettingAddCustomEngineCellTitle
                     $0.editingAccessoryType = .disclosureIndicator
                 }
@@ -164,7 +174,7 @@ class SearchSettingsTableViewController: UITableViewController {
                     }
                 }
                 
-                cell = tableView.dequeueReusableCell(withIdentifier: Constants.quickEngineRowIdentifier, for: indexPath).then {
+                cell = tableView.dequeueReusableCell(withIdentifier: Constants.quickRemoveEngineRowIdentifier, for: indexPath).then {
                     $0.showsReorderControl = true
                     $0.editingAccessoryView = toggle
                     $0.textLabel?.text = engine?.displayName
@@ -244,6 +254,9 @@ class SearchSettingsTableViewController: UITableViewController {
             }
             
             navigationController?.pushViewController(searchEnginePicker, animated: true)
+        } else if indexPath.section == Section.current.rawValue && indexPath.item == CurrentEngineType.quick.rawValue {
+            let quickSearchEnginesViewController = SearchQuickEnginesViewController(profile: profile)
+            navigationController?.pushViewController(quickSearchEnginesViewController, animated: true)
         } else if indexPath.section == Section.quickSearch.rawValue && indexPath.item == model.orderedEngines.count - 1 {
             let customEngineViewController = SearchCustomEngineViewController(profile: profile)
             navigationController?.pushViewController(customEngineViewController, animated: true)

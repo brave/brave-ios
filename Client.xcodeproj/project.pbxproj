@@ -462,6 +462,7 @@
 		2FE5B4542582BEF500BFDDB8 /* ShareTrayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FE5B4532582BEF500BFDDB8 /* ShareTrayView.swift */; };
 		2FE63DB8258BCC29004B219D /* BrowserViewController+OpenSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FE63DB7258BCC29004B219D /* BrowserViewController+OpenSearch.swift */; };
 		2FEA1613259CDFE800E00E4D /* SearchCustomEngineViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FEA1612259CDFE800E00E4D /* SearchCustomEngineViewController.swift */; };
+		2FF0EDB325BA19E9004B18E2 /* SearchQuickEnginesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FF0EDB225BA19E9004B18E2 /* SearchQuickEnginesViewController.swift */; };
 		31ADB5DA1E58CEC300E87909 /* ClipboardBarDisplayHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31ADB5D91E58CEC300E87909 /* ClipboardBarDisplayHandler.swift */; };
 		39236E721FCC600200A38F1B /* TabEventHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39236E711FCC600200A38F1B /* TabEventHandlerTests.swift */; };
 		392ED7E41D0AEF56009D9B62 /* NewTabAccessors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 392ED7E31D0AEF56009D9B62 /* NewTabAccessors.swift */; };
@@ -1939,6 +1940,7 @@
 		2FE63DB7258BCC29004B219D /* BrowserViewController+OpenSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowserViewController+OpenSearch.swift"; sourceTree = "<group>"; };
 		2FEA1612259CDFE800E00E4D /* SearchCustomEngineViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchCustomEngineViewController.swift; sourceTree = "<group>"; };
 		2FEBABAE1AB3659000DB5728 /* ResultTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResultTests.swift; sourceTree = "<group>"; };
+		2FF0EDB225BA19E9004B18E2 /* SearchQuickEnginesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchQuickEnginesViewController.swift; sourceTree = "<group>"; };
 		31ADB5D91E58CEC300E87909 /* ClipboardBarDisplayHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClipboardBarDisplayHandler.swift; sourceTree = "<group>"; };
 		39236E711FCC600200A38F1B /* TabEventHandlerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabEventHandlerTests.swift; sourceTree = "<group>"; };
 		392ED7E31D0AEF56009D9B62 /* NewTabAccessors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NewTabAccessors.swift; path = Accessors/NewTabAccessors.swift; sourceTree = "<group>"; };
@@ -3978,6 +3980,7 @@
 				0B62EFD11AD63CD100ACB9CD /* Clearables.swift */,
 				2F44FCCA1A9E972E00FD20CC /* SearchEnginePicker.swift */,
 				2F44FCC61A9E8CF500FD20CC /* SearchSettingsTableViewController.swift */,
+				2FF0EDB225BA19E9004B18E2 /* SearchQuickEnginesViewController.swift */,
 				2FEA1612259CDFE800E00E4D /* SearchCustomEngineViewController.swift */,
 				74E36D771B71323500D69DA1 /* SettingsContentViewController.swift */,
 				2F44FC711A9E840300FD20CC /* SettingsNavigationController.swift */,
@@ -7013,6 +7016,7 @@
 				5E1DF2FD253E138500F84C39 /* Bookmarkv2.swift in Sources */,
 				27829E412548B8A0007CF0B2 /* BraveRewardsSupportedCountView.swift in Sources */,
 				282DA4731A68C1E700A406E2 /* OpenSearch.swift in Sources */,
+				2FF0EDB325BA19E9004B18E2 /* SearchQuickEnginesViewController.swift in Sources */,
 				0A5CBD3423D4677100362CC8 /* NTPLearnMoreViewController.swift in Sources */,
 				F35B8D2F1D638408008E3D61 /* SessionRestoreHandler.swift in Sources */,
 				27201EF924535A9500C19DD1 /* NewTabCollectionViewCell.swift in Sources */,
