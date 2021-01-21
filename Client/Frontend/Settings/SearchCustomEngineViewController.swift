@@ -18,10 +18,11 @@ private let log = Logger.browserLogger
 
 class SearchCustomEngineViewController: UIViewController {
     
-    // MARK: SaveButtonType
+    // MARK: AddButtonType
     
-    private enum SaveButtonType {
+    private enum AddButtonType {
         case enabled
+        case disabled
         case loading
     }
     
@@ -46,14 +47,10 @@ class SearchCustomEngineViewController: UIViewController {
     // MARK: Properties
     
     private var profile: Profile
-    
-    private var showAutoAddSearchButton = false
-    
+        
     private var urlText: String?
     
     private var titleText: String?
-    
-    private var urlHeader: SearchEngineTableViewHeader?
     
     private var host: URL? {
         didSet {
@@ -68,6 +65,8 @@ class SearchCustomEngineViewController: UIViewController {
             checkSupportAutoAddSearchEngine()
         }
     }
+    
+    private var isAutoAddEnabled = false
     
     private var dataTask: URLSessionDataTask? {
         didSet {
@@ -104,7 +103,7 @@ class SearchCustomEngineViewController: UIViewController {
         
         setup()
         doLayout()
-        setSaveButton(for: .enabled)
+        changeAddButton(for: .disabled)
     }
     
     // MARK: Internal
@@ -129,15 +128,23 @@ class SearchCustomEngineViewController: UIViewController {
         }
     }
     
-    private func setSaveButton(for type: SaveButtonType) {
-        switch type {
-            case .enabled:
-                navigationItem.rightBarButtonItem = UIBarButtonItem(
-                    barButtonSystemItem: .save, target: self, action: #selector(self.addCustomSearchEngine))
-                spinnerView.stopAnimating()
-            case .loading:
-                navigationItem.rightBarButtonItem = UIBarButtonItem(customView: spinnerView)
-                spinnerView.startAnimating()
+    private func changeAddButton(for type: AddButtonType) {
+        ensureMainThread {
+            switch type {
+                case .enabled:
+                    self.navigationItem.rightBarButtonItem = UIBarButtonItem(
+                        title: "Add", style: .done, target: self, action: #selector(self.checkAddEngineType))
+                    self.spinnerView.stopAnimating()
+                case .disabled:
+                    self.navigationItem.rightBarButtonItem = UIBarButtonItem(
+                        title: "Add", style: .done, target: self, action: #selector(self.checkAddEngineType))
+                    self.navigationItem.rightBarButtonItem?.isEnabled = false
+                    self.spinnerView.stopAnimating()
+                    self.isAutoAddEnabled = false
+                case .loading:
+                    self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: self.spinnerView)
+                    self.spinnerView.startAnimating()
+            }
         }
     }
     
@@ -165,7 +172,15 @@ class SearchCustomEngineViewController: UIViewController {
 
     // MARK: Actions
     
-    @objc func addCustomSearchEngine(_ nav: UINavigationController?) {
+    @objc func checkAddEngineType(_ nav: UINavigationController?) {
+        if isAutoAddEnabled {
+            addOpenSearchEngine()
+        } else {
+            addCustomSearchEngine()
+        }
+    }
+    
+    func addCustomSearchEngine() {
         view.endEditing(true)
         
         guard let title = titleText,
@@ -176,7 +191,7 @@ class SearchCustomEngineViewController: UIViewController {
             return
         }
         
-        navigationItem.rightBarButtonItem?.isEnabled = false
+        changeAddButton(for: .disabled)
         addSearchEngine(with: urlQuery, title: title)
     }
     
@@ -230,18 +245,15 @@ extension SearchCustomEngineViewController: UITableViewDelegate, UITableViewData
             return nil
         }
         
-        headerView.actionHandler = { [weak self] in
-            self?.autoAddSearchEngine()
-        }
+//        headerView.actionHandler = { [weak self] in
+//            self?.autoAddSearchEngine()
+//        }
 
         switch section {
             case Section.url.rawValue:
                 headerView.titleLabel.text = Strings.URL
-                headerView.addEngineButton.state = showAutoAddSearchButton ? .enabled : .disabled
-                urlHeader = headerView
             default:
                 headerView.titleLabel.text = Strings.title
-                headerView.addEngineButton.isHidden = true
         }
         
         return headerView
@@ -252,7 +264,7 @@ extension SearchCustomEngineViewController: UITableViewDelegate, UITableViewData
 
 extension SearchCustomEngineViewController {
     
-    fileprivate func autoAddSearchEngine() {
+    fileprivate func addOpenSearchEngine() {
         guard var referenceURLString = openSearchEngine?.reference,
               let title = openSearchEngine?.title,
               var referenceURL = URL(string: referenceURLString),
@@ -277,8 +289,7 @@ extension SearchCustomEngineViewController {
     }
     
     func downloadOpenSearchXML(_ url: URL, referenceURL: String, title: String, iconImage: UIImage) {
-        setSaveButton(for: .loading)
-        urlHeader?.addEngineButton.state = .loading
+        changeAddButton(for: .loading)
         view.endEditing(true)
         
         NetworkManager().downloadResource(with: url).uponQueue(.main) { [weak self] response in
@@ -290,8 +301,7 @@ extension SearchCustomEngineViewController {
                 let alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
                 
                 self.present(alert, animated: true) {
-                    self.setSaveButton(for: .enabled)
-                    self.urlHeader?.addEngineButton.state = .enabled
+                    self.changeAddButton(for: .disabled)
                 }
             }
         }
@@ -302,8 +312,7 @@ extension SearchCustomEngineViewController {
             guard let self = self else { return }
             
             if alertAction.style == .cancel {
-                self.setSaveButton(for: .enabled)
-                self.urlHeader?.addEngineButton.state = .enabled
+                self.changeAddButton(for: .enabled)
                 return
             }
             
@@ -313,8 +322,7 @@ extension SearchCustomEngineViewController {
             } catch {
                 self.handleError(error: SearchEngineError.failedToSave)
                 
-                self.setSaveButton(for: .enabled)
-                self.urlHeader?.addEngineButton.state = .enabled
+                self.changeAddButton(for: .disabled)
             }
         }
 
@@ -328,8 +336,9 @@ extension SearchCustomEngineViewController {
     
     func checkSupportAutoAddSearchEngine() {
         guard let openSearchEngine = openSearchEngine else {
-            showAutoAddSearchButton = false
-            urlHeader?.addEngineButton.state = .disabled
+            changeAddButton(for: .disabled)
+            checkManualAddExists()
+
             faviconImage = nil
             
             return
@@ -338,17 +347,16 @@ extension SearchCustomEngineViewController {
         let matches = profile.searchEngines.orderedEngines.filter {$0.referenceURL == openSearchEngine.reference}
         
         if !matches.isEmpty {
-            showAutoAddSearchButton = false
-            urlHeader?.addEngineButton.state = .disabled
+            changeAddButton(for: .disabled)
+            checkManualAddExists()
         } else {
-            showAutoAddSearchButton = true
-            urlHeader?.addEngineButton.state = .enabled
+            changeAddButton(for: .enabled)
+            isAutoAddEnabled = true
         }
     }
     
     func fetchSearchEngineSupportForHost(_ host: URL) {
-        showAutoAddSearchButton = false
-        urlHeader?.addEngineButton.state = .disabled
+        changeAddButton(for: .disabled)
         
         dataTask = URLSession.shared.dataTask(with: host) { [weak self] data, _, error in
             guard let data = data, error == nil else {
@@ -399,7 +407,7 @@ extension SearchCustomEngineViewController {
 extension SearchCustomEngineViewController {
     
     fileprivate func addSearchEngine(with urlQuery: String, title: String) {
-        setSaveButton(for: .loading)
+        changeAddButton(for: .loading)
 
         let safeURLQuery = urlQuery.trimmingCharacters(in: .whitespacesAndNewlines)
         let safeTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -410,8 +418,7 @@ extension SearchCustomEngineViewController {
             if let error = error {
                 self.handleError(error: error)
                 
-                self.setSaveButton(for: .enabled)
-                self.urlHeader?.addEngineButton.state = .enabled
+                self.changeAddButton(for: .disabled)
             } else if let engine = engine {
                 do {
                     try self.profile.searchEngines.addSearchEngine(engine)
@@ -419,8 +426,7 @@ extension SearchCustomEngineViewController {
                 } catch {
                     self.handleError(error: SearchEngineError.failedToSave)
 
-                    self.setSaveButton(for: .enabled)
-                    self.urlHeader?.addEngineButton.state = .enabled
+                    self.changeAddButton(for: .enabled)
                 }
             }
             
@@ -475,6 +481,18 @@ extension SearchCustomEngineViewController {
         
         return nil
     }
+    
+    private func checkManualAddExists() {
+        guard let url = urlText, let title = titleText  else {
+            return
+        }
+        
+        if !url.isEmpty, !title.isEmpty {
+            changeAddButton(for: .enabled)
+        } else {
+            changeAddButton(for: .disabled)
+        }
+    }
 }
 
 // MARK: - UITextViewDelegate
@@ -491,6 +509,10 @@ extension SearchCustomEngineViewController: UITextViewDelegate {
     }
     
     func textViewDidChange(_ textView: UITextView) {
+        changeAddButton(for: .disabled)
+        
+        urlText = textView.text
+
         if let text = textView.text?.trimmingCharacters(in: .whitespacesAndNewlines),
            let encodedText = text.addingPercentEncoding(withAllowedCharacters: .urlFragmentAllowed),
            let url = URL(string: encodedText),
@@ -500,8 +522,6 @@ extension SearchCustomEngineViewController: UITextViewDelegate {
                 self.host = URL(string: "\(scheme)://\(host)")
             }
         }
-        
-        urlText = textView.text
     }
 
     func textViewDidEndEditing(_ textView: UITextView) {
@@ -516,10 +536,17 @@ extension SearchCustomEngineViewController: UITextFieldDelegate {
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         guard let text = textField.text, text.rangeOfCharacter(from: .newlines) == nil else { return false }
         
-        let currentString: NSString = text as NSString
+        let currentString = text as NSString
         let newString: NSString = currentString.replacingCharacters(in: range, with: string) as NSString
         
-        return newString.length <= Constants.titleEntryMaxCharacterCount
+        let shouldChangeCharacters = newString.length <= Constants.titleEntryMaxCharacterCount
+        
+        if shouldChangeCharacters {
+            titleText = newString as String
+            checkManualAddExists()
+        }
+        
+        return shouldChangeCharacters
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
@@ -551,8 +578,11 @@ fileprivate class SearchEngineTableViewHeader: UITableViewHeaderFooterView {
         $0.textColor = UIColor.Photon.grey50
     }
 
-    lazy var addEngineButton = OpenSearchEngineButton(title: Strings.CustomSearchEngine.customEngineAutoAddTitle, hidesWhenDisabled: false).then {
+    lazy var addEngineButton = OpenSearchEngineButton(
+        title: Strings.CustomSearchEngine.customEngineAutoAddTitle,
+        hidesWhenDisabled: false).then {
         $0.addTarget(self, action: #selector(addEngineAuto), for: .touchUpInside)
+        $0.isHidden = true
     }
 
     var actionHandler: (() -> Void)?

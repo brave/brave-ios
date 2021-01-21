@@ -138,9 +138,11 @@ extension BrowserViewController {
     func downloadOpenSearchXML(_ url: URL, referenceURL: String, title: String, iconURL: URL) {
         customSearchEngineButton.state = .loading
 
+        // Try to fetch Engine Icon using cache manager
         WebImageCacheManager.shared.load(from: iconURL, completion: { (image, _, _, _, _) in
             var searchEngineIcon = #imageLiteral(resourceName: "defaultFavicon")
 
+            // In case fetch fails use default icon and do not block addition of this engine
             if let favIcon = image {
                 searchEngineIcon = favIcon
             }
