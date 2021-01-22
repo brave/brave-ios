@@ -295,7 +295,7 @@ extension SearchCustomEngineViewController {
         NetworkManager().downloadResource(with: url).uponQueue(.main) { [weak self] response in
             guard let self = self else { return }
             
-            if let openSearchEngine = OpenSearchParser(pluginMode: true).parse(response.data, referenceURL: referenceURL, image: iconImage) {
+            if let openSearchEngine = OpenSearchParser(pluginMode: true).parse(response.data, referenceURL: referenceURL, image: iconImage, isCustomEngine: true) {
                 self.addSearchEngine(openSearchEngine)
             } else {
                 let alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()

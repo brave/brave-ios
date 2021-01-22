@@ -148,8 +148,8 @@ extension BrowserViewController {
             }
             
             NetworkManager().downloadResource(with: url).uponQueue(.main) { [weak self] response in
-                guard let openSearchEngine =
-                        OpenSearchParser(pluginMode: true).parse(response.data, referenceURL: referenceURL, image: searchEngineIcon) else {
+                guard let openSearchEngine = OpenSearchParser(pluginMode: true).parse(
+                        response.data, referenceURL: referenceURL, image: searchEngineIcon, isCustomEngine: true) else {
                     return
                 }
                 

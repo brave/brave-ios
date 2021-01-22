@@ -252,7 +252,7 @@ class OpenSearchParser {
         return parse(data, engineID: engineID, referenceURL: referenceURL)
     }
 
-    func parse(_ data: Data, engineID: String = "", referenceURL: String? = nil, image: UIImage? = nil) -> OpenSearchEngine? {
+    func parse(_ data: Data, engineID: String = "", referenceURL: String? = nil, image: UIImage? = nil, isCustomEngine: Bool = false) -> OpenSearchEngine? {
         guard let indexer = try? XMLDocument(data: data),
             let docIndexer = indexer.root else {
                 print("Invalid XML document")
@@ -369,6 +369,6 @@ class OpenSearchParser {
             return nil
         }
 
-        return OpenSearchEngine(engineID: engineID, shortName: shortName, referenceURL: referenceURL, image: uiImage, searchTemplate: searchTemplate, suggestTemplate: suggestTemplate, isCustomEngine: false)
+        return OpenSearchEngine(engineID: engineID, shortName: shortName, referenceURL: referenceURL, image: uiImage, searchTemplate: searchTemplate, suggestTemplate: suggestTemplate, isCustomEngine: isCustomEngine)
     }
 }
