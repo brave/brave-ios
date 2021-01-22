@@ -119,8 +119,60 @@ class SearchSettingsTableViewController: UITableViewController {
         tableView.reloadData()
     }
     
+    // MARK: Internal
+    
+    private func configureSearchEnginePicker(_ type: DefaultEngineType) -> SearchEnginePicker {
+        return SearchEnginePicker(type: type).then {
+            // Order alphabetically, so that picker is always consistently ordered.
+            // Every engine is a valid choice for the default engine, even the current default engine.
+            $0.engines = searchPickerEngines
+            $0.delegate = self
+            $0.selectedSearchEngineName = searchEngines.defaultEngine(forType: type).shortName
+        }
+    }
+    
+    private func configureSearchEngineCell(type: DefaultEngineType, engineName: String?) -> UITableViewCell {
+        guard let searchEngineName = engineName else { return UITableViewCell() }
+
+        var text: String
+        
+        switch type {
+        case .standard:
+            text = Strings.standardTabSearch
+        case .privateMode:
+            text = Strings.privateTabSearch
+        }
+        
+        let cell = UITableViewCell(style: .value1, reuseIdentifier: Constants.searchEngineRowIdentifier).then {
+            $0.accessoryType = .disclosureIndicator
+            $0.accessibilityLabel = text
+            $0.textLabel?.text = text
+            $0.accessibilityValue = searchEngineName
+            $0.detailTextLabel?.text = searchEngineName
+        }
+        
+        return cell
+    }
+
     // MARK: TableViewDataSource - TableViewDelegate
 
+    override func numberOfSections(in tableView: UITableView) -> Int {
+        return Section.allCases.count
+    }
+    
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if section == Section.current.rawValue {
+            return CurrentEngineType.allCases.count
+        } else {
+            // Adding an extra row for Add Search Engine Entry
+            return customSearchEngines.count + 1
+        }
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return Design.headerHeight
+    }
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         var cell: UITableViewCell?
         var engine: OpenSearchEngine?
@@ -175,71 +227,30 @@ class SearchSettingsTableViewController: UITableViewController {
             }
         }
 
-        guard let searchEngineCell = cell else { return UITableViewCell() }
-        
-        // So that the seperator line goes all the way to the left edge.
-        searchEngineCell.separatorInset = .zero
+        guard let tableViewCell = cell else { return UITableViewCell() }
+        tableViewCell.separatorInset = .zero
 
-        return searchEngineCell
+        return tableViewCell
     }
     
-    private func configureSearchEngineCell(type: DefaultEngineType, engineName: String?) -> UITableViewCell {
-        guard let searchEngineName = engineName else { return UITableViewCell() }
-
-        var text: String
-        
-        switch type {
-        case .standard:
-            text = Strings.standardTabSearch
-        case .privateMode:
-            text = Strings.privateTabSearch
+    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        guard let headerView =
+                tableView.dequeueReusableHeaderFooterView(withIdentifier: Constants.sectionHeaderIdentifier) as? SettingsTableSectionHeaderFooterView else {
+            return UITableViewHeaderFooterView()
         }
         
-        let cell = UITableViewCell(style: .value1, reuseIdentifier: Constants.searchEngineRowIdentifier).then {
-            $0.accessoryType = .disclosureIndicator
-            $0.accessibilityLabel = text
-            $0.textLabel?.text = text
-            $0.accessibilityValue = searchEngineName
-            $0.detailTextLabel?.text = searchEngineName
-        }
+        let sectionTitle = section == Section.current.rawValue ?
+            Strings.currentlyUsedSearchEngines : Strings.customSearchEngines
         
-        return cell
-    }
-
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        return Section.allCases.count
-    }
-
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if section == Section.current.rawValue {
-            returrcn CurrentEngineType.allCases.count
-        } else {
-            // Adding an extra row for Add Search Engine Entry
-            return customSearchEngines.count + 1
-        }
+        headerView.titleLabel.text = sectionTitle
+        return headerView
     }
 
     override func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
         if indexPath.section == Section.current.rawValue && indexPath.item == CurrentEngineType.standard.rawValue {
-            let searchEnginePicker = SearchEnginePicker(type: .standard).then {
-                // Order alphabetically, so that picker is always consistently ordered.
-                // Every engine is a valid choice for the default engine, even the current default engine.
-                $0.engines = searchPickerEngines
-                $0.delegate = self
-                $0.selectedSearchEngineName = searchEngines.defaultEngine(forType: .standard).shortName
-            }
-            
-            navigationController?.pushViewController(searchEnginePicker, animated: true)
+            navigationController?.pushViewController(configureSearchEnginePicker(.standard), animated: true)
         } else if indexPath.section == Section.current.rawValue && indexPath.item == CurrentEngineType.private.rawValue {
-            let searchEnginePicker = SearchEnginePicker(type: .privateMode).then {
-                // Order alphabetically, so that picker is always consistently ordered.
-                // Every engine is a valid choice for the default engine, even the current default engine.
-                $0.engines = searchPickerEngines
-                $0.delegate = self
-                $0.selectedSearchEngineName = searchEngines.defaultEngine(forType: .privateMode).shortName
-            }
-            
-            navigationController?.pushViewController(searchEnginePicker, animated: true)
+            navigationController?.pushViewController(configureSearchEnginePicker(.privateMode), animated: true)
         } else if indexPath.section == Section.current.rawValue && indexPath.item == CurrentEngineType.quick.rawValue {
             let quickSearchEnginesViewController = SearchQuickEnginesViewController(profile: profile)
             navigationController?.pushViewController(quickSearchEnginesViewController, animated: true)
@@ -251,7 +262,7 @@ class SearchSettingsTableViewController: UITableViewController {
         return nil
     }
 
-    // Don't show delete button on the left.
+    // Determine whether to show delete button in edit mode
     override func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
         guard indexPath.section == Section.customSearch.rawValue, indexPath.row != customSearchEngines.count else {
             return .none
@@ -260,35 +271,16 @@ class SearchSettingsTableViewController: UITableViewController {
         return .delete
     }
 
-    // Don't reserve space for the delete button on the left.
+    // Determine whether to indent while in edit mode for deletion
     override func tableView(_ tableView: UITableView, shouldIndentWhileEditingRowAt indexPath: IndexPath) -> Bool {
         return indexPath.section == Section.customSearch.rawValue && indexPath.row != customSearchEngines.count
     }
-
-    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return Design.headerHeight
-    }
-
-    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        guard let headerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: Constants.sectionHeaderIdentifier) as? SettingsTableSectionHeaderFooterView else {
-            return UITableViewHeaderFooterView()
-        }
-        
-        let sectionTitle = section == Section.current.rawValue ?
-            Strings.currentlyUsedSearchEngines : Strings.customSearchEngines
-        
-        headerView.titleLabel.text = sectionTitle
-        return headerView
-    }
-
 
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             let index = indexPath.row
             let engine = customSearchEngines[index]
             
-            print("Engine delete \(engine)")
-
             do {
                 try searchEngines.deleteCustomEngine(engine)
                 tableView.deleteRows(at: [indexPath], with: .right)
