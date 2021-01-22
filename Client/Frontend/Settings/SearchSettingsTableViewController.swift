@@ -71,7 +71,9 @@ class SearchSettingsTableViewController: UITableViewController {
     }
     
     private var customSearchEngines: [OpenSearchEngine] {
-        return searchEngines.quickSearchEngines.filter { $0.isCustomEngine }
+        get {
+            return searchEngines.quickSearchEngines.filter { $0.isCustomEngine }
+        }
     }
     
     // MARK: Lifecycle
@@ -104,6 +106,8 @@ class SearchSettingsTableViewController: UITableViewController {
             navigationItem.leftBarButtonItem =
                 UIBarButtonItem(title: Strings.settingsSearchDoneButton, style: .done, target: self, action: #selector(dismissAnimated))
         }
+        
+        self.navigationItem.rightBarButtonItem = editButtonItem
 
         let footer = SettingsTableSectionHeaderFooterView(frame: CGRect(width: tableView.bounds.width, height: Design.headerHeight))
         tableView.tableFooterView = footer
@@ -208,10 +212,9 @@ class SearchSettingsTableViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == Section.current.rawValue {
-            return CurrentEngineType.allCases.count
+            returrcn CurrentEngineType.allCases.count
         } else {
-            // The first engine -- the default engine -- is not shown in the quick search engine list.
-            // But the option to add Custom Engine is.
+            // Adding an extra row for Add Search Engine Entry
             return customSearchEngines.count + 1
         }
     }
@@ -248,30 +251,19 @@ class SearchSettingsTableViewController: UITableViewController {
         return nil
     }
 
-//    // Don't show delete button on the left.
-//    override func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
-//        if indexPath.section == Section.current.rawValue || indexPath.item + 1 == searchEngines.orderedEngines.count {
-//            return UITableViewCell.EditingStyle.none
-//        }
-//
-//        let index = indexPath.item + 1
-//        let engine = searchEngines.orderedEngines[index]
-//        return (self.showDeletion && engine.isCustomEngine) ? .delete : .none
-//    }
-//
-//    // Don't reserve space for the delete button on the left.
-//    override func tableView(_ tableView: UITableView, shouldIndentWhileEditingRowAt indexPath: IndexPath) -> Bool {
-//        return false
-//    }
+    // Don't show delete button on the left.
+    override func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+        guard indexPath.section == Section.customSearch.rawValue, indexPath.row != customSearchEngines.count else {
+            return .none
+        }
+        
+        return .delete
+    }
 
-//    // Hide a thin vertical line that iOS renders between the accessoryView and the reordering control.
-//    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-//        if cell.isEditing {
-//            for v in cell.subviews where v.frame.width == 1.0 {
-//                v.backgroundColor = UIColor.clear
-//            }
-//        }
-//    }
+    // Don't reserve space for the delete button on the left.
+    override func tableView(_ tableView: UITableView, shouldIndentWhileEditingRowAt indexPath: IndexPath) -> Bool {
+        return indexPath.section == Section.customSearch.rawValue && indexPath.row != customSearchEngines.count
+    }
 
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return Design.headerHeight
@@ -289,59 +281,22 @@ class SearchSettingsTableViewController: UITableViewController {
         return headerView
     }
 
-//    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-//        if indexPath.section == Section.current.rawValue || indexPath.item + 1 == searchEngines.orderedEngines.count {
-//            return false
-//        } else {
-//            return true
-//        }
-//    }
 
-//    override func tableView(_ tableView: UITableView, moveRowAt indexPath: IndexPath, to newIndexPath: IndexPath) {
-//        // The first engine (default engine) is not shown in the list, so the indices are off-by-1.
-//        let index = indexPath.item + 1
-//        let newIndex = newIndexPath.item + 1
-//        let engine = searchEngines.orderedEngines.remove(at: index)
-//        searchEngines.orderedEngines.insert(engine, at: newIndex)
-//        tableView.reloadData()
-//    }
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            let index = indexPath.row
+            let engine = customSearchEngines[index]
+            
+            print("Engine delete \(engine)")
 
-//    // Snap to first or last row of the list of engines.
-//    override func tableView(_ tableView: UITableView, targetIndexPathForMoveFromRowAt sourceIndexPath: IndexPath, toProposedIndexPath proposedDestinationIndexPath: IndexPath) -> IndexPath {
-//        // You can't drag or drop on the default engine.
-//        if sourceIndexPath.section == Section.current.rawValue ||
-//            proposedDestinationIndexPath.section == Section.current.rawValue {
-//            return sourceIndexPath
-//        }
-//
-//        //Can't drag/drop over "Add Custom Engine button"
-//        if sourceIndexPath.item + 1 == searchEngines.orderedEngines.count || proposedDestinationIndexPath.item + 1 == searchEngines.orderedEngines.count {
-//            return sourceIndexPath
-//        }
-//
-//        if sourceIndexPath.section != proposedDestinationIndexPath.section {
-//            var row = 0
-//            if sourceIndexPath.section < proposedDestinationIndexPath.section {
-//                row = tableView.numberOfRows(inSection: sourceIndexPath.section) - 1
-//            }
-//            return IndexPath(row: row, section: sourceIndexPath.section)
-//        }
-//        return proposedDestinationIndexPath
-//    }
-
-//    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-//        if editingStyle == .delete {
-//            let index = indexPath.item + 1
-//            let engine = searchEngines.orderedEngines[index]
-//
-//            do {
-//                try searchEngines.deleteCustomEngine(engine)
-//                tableView.deleteRows(at: [indexPath], with: .right)
-//            } catch {
-//                log.error("Search Engine Error while deleting")
-//            }
-//        }
-//    }
+            do {
+                try searchEngines.deleteCustomEngine(engine)
+                tableView.deleteRows(at: [indexPath], with: .right)
+            } catch {
+                log.error("Search Engine Error while deleting")
+            }
+        }
+    }
 }
 
 // MARK: - Actions
