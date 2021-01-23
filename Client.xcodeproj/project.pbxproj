@@ -824,7 +824,6 @@
 		D018F93E1F44A71A0098F8CA /* Schema.swift in Sources */ = {isa = PBXBuildFile; fileRef = D018F93D1F44A7190098F8CA /* Schema.swift */; };
 		D029A04920A62DB0001DB72F /* TemporaryDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = D029A04820A62DB0001DB72F /* TemporaryDocument.swift */; };
 		D03F8EB22004014E003C2224 /* FaviconHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = D03F8EB12004014E003C2224 /* FaviconHandler.swift */; };
-		D03F8F23200EAC1F003C2224 /* AllFramesAtDocumentStart.js in Resources */ = {isa = PBXBuildFile; fileRef = D03F8F22200EAC1E003C2224 /* AllFramesAtDocumentStart.js */; };
 		D04D1B862097859B0074B35F /* DownloadToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04D1B852097859B0074B35F /* DownloadToast.swift */; };
 		D04D1B92209790B60074B35F /* Toast.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04D1B91209790B60074B35F /* Toast.swift */; };
 		D0625C98208E87F10081F3B2 /* DownloadQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0625C97208E87F10081F3B2 /* DownloadQueue.swift */; };
@@ -836,9 +835,6 @@
 		D0C95EF6201A55A800E4E51C /* BrowserViewController+UIDropInteractionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C95EF5201A55A800E4E51C /* BrowserViewController+UIDropInteractionDelegate.swift */; };
 		D0E55C4F1FB4FD23006DC274 /* FormPostHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0E55C4E1FB4FD23006DC274 /* FormPostHelper.swift */; };
 		D0FCF7F51FE45842004A7995 /* UserScriptManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0FCF7F41FE45842004A7995 /* UserScriptManager.swift */; };
-		D0FCF8061FE4772D004A7995 /* AllFramesAtDocumentEnd.js in Resources */ = {isa = PBXBuildFile; fileRef = D0FCF8031FE4772C004A7995 /* AllFramesAtDocumentEnd.js */; };
-		D0FCF8071FE4772D004A7995 /* MainFrameAtDocumentEnd.js in Resources */ = {isa = PBXBuildFile; fileRef = D0FCF8041FE4772D004A7995 /* MainFrameAtDocumentEnd.js */; };
-		D0FCF8081FE4772D004A7995 /* MainFrameAtDocumentStart.js in Resources */ = {isa = PBXBuildFile; fileRef = D0FCF8051FE4772D004A7995 /* MainFrameAtDocumentStart.js */; };
 		D301AAEE1A3A55B70078DD1D /* TabTrayController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D301AAED1A3A55B70078DD1D /* TabTrayController.swift */; };
 		D308E4E41A5306F500842685 /* SearchEngines.swift in Sources */ = {isa = PBXBuildFile; fileRef = D308E4E31A5306F500842685 /* SearchEngines.swift */; };
 		D308EE561CBF0BF5006843F2 /* CertError.css in Resources */ = {isa = PBXBuildFile; fileRef = D308EE551CBF0BF5006843F2 /* CertError.css */; };
@@ -1000,10 +996,9 @@
 		F84B21DA1A090F8100AAB793 /* ClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F84B21D91A090F8100AAB793 /* ClientTests.swift */; };
 		F84B22041A0910F600AAB793 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F84B21E51A0910F600AAB793 /* AppDelegate.swift */; };
 		F84B220B1A0910F600AAB793 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F84B21EF1A0910F600AAB793 /* Images.xcassets */; };
-		F926074B25B230EC000E659A /* gpc.js in Resources */ = {isa = PBXBuildFile; fileRef = F926074A25B230EC000E659A /* gpc.js */; };
 		F91785DB255F38D6002976F2 /* WKWebViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F91785DA255F38D6002976F2 /* WKWebViewExtensions.swift */; };
 		F919BFAC2584204900D94BA5 /* ContextMenu.js in Resources */ = {isa = PBXBuildFile; fileRef = D03F8F24200EACD8003C2224 /* ContextMenu.js */; };
-		F919BFB7258440C100D94BA5 /* AllFramesAtDocumentEndSandboxed.js in Resources */ = {isa = PBXBuildFile; fileRef = F919BFB6258440C100D94BA5 /* AllFramesAtDocumentEndSandboxed.js */; };
+		F926074B25B230EC000E659A /* gpc.js in Resources */ = {isa = PBXBuildFile; fileRef = F926074A25B230EC000E659A /* gpc.js */; };
 		F930CDAC227000F200A23FE1 /* U2F.js in Resources */ = {isa = PBXBuildFile; fileRef = F930CDAB227000F200A23FE1 /* U2F.js */; };
 		F930CDAE2270015C00A23FE1 /* U2FExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F930CDAD2270015C00A23FE1 /* U2FExtensions.swift */; };
 		F930CDB82270040D00A23FE1 /* WebAuthnClientData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F930CDB72270040D00A23FE1 /* WebAuthnClientData.swift */; };
@@ -1012,9 +1007,14 @@
 		F930CDD72270F14300A23FE1 /* WebAuthnUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = F930CDD62270F14300A23FE1 /* WebAuthnUtils.swift */; };
 		F939FBFE22A596B900D9CD3F /* U2FTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F939FBFD22A596B900D9CD3F /* U2FTests.swift */; };
 		F9488EB32589899800A72C84 /* RewardsReporting.js in Resources */ = {isa = PBXBuildFile; fileRef = 276E7A2E22F21A7700939424 /* RewardsReporting.js */; };
-		F9488EC72589A93F00A72C84 /* AllFramesAtDocumentStartSandboxed.js in Resources */ = {isa = PBXBuildFile; fileRef = F9488EC62589A93F00A72C84 /* AllFramesAtDocumentStartSandboxed.js */; };
 		F9488F1D258EFE9800A72C84 /* WKWebViewExtensionsTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9488F12258D6B9800A72C84 /* WKWebViewExtensionsTest.swift */; };
 		F95ED17E25A95426001A432D /* UserScriptManagerTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F95ED17D25A95426001A432D /* UserScriptManagerTest.swift */; };
+		F979BE2F25BCC54E009B6ACF /* AllFramesAtDocumentStart.js in Resources */ = {isa = PBXBuildFile; fileRef = F979BE2B25BCC54D009B6ACF /* AllFramesAtDocumentStart.js */; };
+		F979BE3025BCC54E009B6ACF /* AllFramesAtDocumentEnd.js in Resources */ = {isa = PBXBuildFile; fileRef = F979BE2C25BCC54D009B6ACF /* AllFramesAtDocumentEnd.js */; };
+		F979BE3125BCC54E009B6ACF /* AllFramesAtDocumentStartSandboxed.js in Resources */ = {isa = PBXBuildFile; fileRef = F979BE2D25BCC54E009B6ACF /* AllFramesAtDocumentStartSandboxed.js */; };
+		F979BE3225BCC54E009B6ACF /* AllFramesAtDocumentEndSandboxed.js in Resources */ = {isa = PBXBuildFile; fileRef = F979BE2E25BCC54E009B6ACF /* AllFramesAtDocumentEndSandboxed.js */; };
+		F979BE4725BCC5D3009B6ACF /* MainFrameAtDocumentEnd.js in Resources */ = {isa = PBXBuildFile; fileRef = F979BE4525BCC5D3009B6ACF /* MainFrameAtDocumentEnd.js */; };
+		F979BE4825BCC5D3009B6ACF /* MainFrameAtDocumentStart.js in Resources */ = {isa = PBXBuildFile; fileRef = F979BE4625BCC5D3009B6ACF /* MainFrameAtDocumentStart.js */; };
 		F98E1EA122B6D70E0018AF29 /* libYubiKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AC8E23A22A6C56D0064F3FA /* libYubiKit.a */; };
 		F99505FF22937E3900CC6543 /* U2F-low-level.js in Resources */ = {isa = PBXBuildFile; fileRef = F99505FE22937E3900CC6543 /* U2F-low-level.js */; };
 		F9B23EE223F61173000EB3D8 /* PaymentRequest.js in Resources */ = {isa = PBXBuildFile; fileRef = F9B23EE123F61173000EB3D8 /* PaymentRequest.js */; };
@@ -2494,7 +2494,6 @@
 		D029A04820A62DB0001DB72F /* TemporaryDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemporaryDocument.swift; sourceTree = "<group>"; };
 		D03F8EB12004014E003C2224 /* FaviconHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaviconHandler.swift; sourceTree = "<group>"; };
 		D03F8F20200EABB0003C2224 /* __firefox__.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = __firefox__.js; sourceTree = "<group>"; };
-		D03F8F22200EAC1E003C2224 /* AllFramesAtDocumentStart.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = AllFramesAtDocumentStart.js; sourceTree = "<group>"; };
 		D03F8F24200EACD8003C2224 /* ContextMenu.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = ContextMenu.js; sourceTree = "<group>"; };
 		D04D1B852097859B0074B35F /* DownloadToast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadToast.swift; sourceTree = "<group>"; };
 		D04D1B91209790B60074B35F /* Toast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Toast.swift; sourceTree = "<group>"; };
@@ -2510,9 +2509,6 @@
 		D0C95EF5201A55A800E4E51C /* BrowserViewController+UIDropInteractionDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowserViewController+UIDropInteractionDelegate.swift"; sourceTree = "<group>"; };
 		D0E55C4E1FB4FD23006DC274 /* FormPostHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormPostHelper.swift; sourceTree = "<group>"; };
 		D0FCF7F41FE45842004A7995 /* UserScriptManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserScriptManager.swift; sourceTree = "<group>"; };
-		D0FCF8031FE4772C004A7995 /* AllFramesAtDocumentEnd.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = AllFramesAtDocumentEnd.js; sourceTree = "<group>"; };
-		D0FCF8041FE4772D004A7995 /* MainFrameAtDocumentEnd.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = MainFrameAtDocumentEnd.js; sourceTree = "<group>"; };
-		D0FCF8051FE4772D004A7995 /* MainFrameAtDocumentStart.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = MainFrameAtDocumentStart.js; sourceTree = "<group>"; };
 		D0FCF8091FE47B49004A7995 /* CustomSearchHandler.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = CustomSearchHandler.js; sourceTree = "<group>"; };
 		D301AAED1A3A55B70078DD1D /* TabTrayController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabTrayController.swift; sourceTree = "<group>"; };
 		D308E4E31A5306F500842685 /* SearchEngines.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchEngines.swift; sourceTree = "<group>"; };
@@ -2693,10 +2689,9 @@
 		F84B21E51A0910F600AAB793 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = AppDelegate.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		F84B21EF1A0910F600AAB793 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		F84B22431A09165600AAB793 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		F926074A25B230EC000E659A /* gpc.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = gpc.js; sourceTree = "<group>"; };
 		F91785DA255F38D6002976F2 /* WKWebViewExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WKWebViewExtensions.swift; sourceTree = "<group>"; };
-		F919BFB6258440C100D94BA5 /* AllFramesAtDocumentEndSandboxed.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = AllFramesAtDocumentEndSandboxed.js; sourceTree = "<group>"; };
 		F91EAD56256C90720056C8CC /* BraveGetUA.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = BraveGetUA.js; sourceTree = "<group>"; };
+		F926074A25B230EC000E659A /* gpc.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = gpc.js; sourceTree = "<group>"; };
 		F926647A234D4EF400359492 /* CoreNFC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreNFC.framework; path = System/Library/Frameworks/CoreNFC.framework; sourceTree = SDKROOT; };
 		F930CDAB227000F200A23FE1 /* U2F.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = U2F.js; sourceTree = "<group>"; };
 		F930CDAD2270015C00A23FE1 /* U2FExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = U2FExtensions.swift; sourceTree = "<group>"; };
@@ -2705,10 +2700,15 @@
 		F930CDD02270F09000A23FE1 /* WebAuthnAuthenticateRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebAuthnAuthenticateRequest.swift; sourceTree = "<group>"; };
 		F930CDD62270F14300A23FE1 /* WebAuthnUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebAuthnUtils.swift; sourceTree = "<group>"; };
 		F939FBFD22A596B900D9CD3F /* U2FTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = U2FTests.swift; sourceTree = "<group>"; };
-		F9488EC62589A93F00A72C84 /* AllFramesAtDocumentStartSandboxed.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = AllFramesAtDocumentStartSandboxed.js; sourceTree = "<group>"; };
 		F9488F12258D6B9800A72C84 /* WKWebViewExtensionsTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WKWebViewExtensionsTest.swift; sourceTree = "<group>"; };
 		F95ED17D25A95426001A432D /* UserScriptManagerTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserScriptManagerTest.swift; sourceTree = "<group>"; };
 		F9616E6A240EE43F00667C2D /* PaymentRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentRequest.swift; sourceTree = "<group>"; };
+		F979BE2B25BCC54D009B6ACF /* AllFramesAtDocumentStart.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = AllFramesAtDocumentStart.js; sourceTree = "<group>"; };
+		F979BE2C25BCC54D009B6ACF /* AllFramesAtDocumentEnd.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = AllFramesAtDocumentEnd.js; sourceTree = "<group>"; };
+		F979BE2D25BCC54E009B6ACF /* AllFramesAtDocumentStartSandboxed.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = AllFramesAtDocumentStartSandboxed.js; sourceTree = "<group>"; };
+		F979BE2E25BCC54E009B6ACF /* AllFramesAtDocumentEndSandboxed.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = AllFramesAtDocumentEndSandboxed.js; sourceTree = "<group>"; };
+		F979BE4525BCC5D3009B6ACF /* MainFrameAtDocumentEnd.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = MainFrameAtDocumentEnd.js; sourceTree = "<group>"; };
+		F979BE4625BCC5D3009B6ACF /* MainFrameAtDocumentStart.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = MainFrameAtDocumentStart.js; sourceTree = "<group>"; };
 		F99505FE22937E3900CC6543 /* U2F-low-level.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "U2F-low-level.js"; sourceTree = "<group>"; };
 		F9B23EE123F61173000EB3D8 /* PaymentRequest.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = PaymentRequest.js; sourceTree = "<group>"; };
 		F9B23EE423F613E8000EB3D8 /* PaymentRequestExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentRequestExtension.swift; sourceTree = "<group>"; };
@@ -5328,13 +5328,11 @@
 		F84B21EB1A0910F600AAB793 /* Assets */ = {
 			isa = PBXGroup;
 			children = (
+				F979BE2C25BCC54D009B6ACF /* AllFramesAtDocumentEnd.js */,
+				F979BE2E25BCC54E009B6ACF /* AllFramesAtDocumentEndSandboxed.js */,
+				F979BE2B25BCC54D009B6ACF /* AllFramesAtDocumentStart.js */,
+				F979BE2D25BCC54E009B6ACF /* AllFramesAtDocumentStartSandboxed.js */,
 				2765826D217130B700754B2F /* Certificates */,
-				D0FCF8031FE4772C004A7995 /* AllFramesAtDocumentEnd.js */,
-				F919BFB6258440C100D94BA5 /* AllFramesAtDocumentEndSandboxed.js */,
-				D03F8F22200EAC1E003C2224 /* AllFramesAtDocumentStart.js */,
-				F9488EC62589A93F00A72C84 /* AllFramesAtDocumentStartSandboxed.js */,
-				D0FCF8041FE4772D004A7995 /* MainFrameAtDocumentEnd.js */,
-				D0FCF8051FE4772D004A7995 /* MainFrameAtDocumentStart.js */,
 				5D21AE002303B70E00B30D97 /* Themes */,
 				3BC659581E5BA505006D560F /* top_sites.json */,
 				3BC659481E5BA4AE006D560F /* TopSites */,
@@ -5342,6 +5340,8 @@
 				D308EE551CBF0BF5006843F2 /* CertError.css */,
 				0BA1E02F1B051A07007675AF /* NetError.css */,
 				D38A1EDF1CB458EC0080C842 /* CertError.html */,
+				F979BE4525BCC5D3009B6ACF /* MainFrameAtDocumentEnd.js */,
+				F979BE4625BCC5D3009B6ACF /* MainFrameAtDocumentStart.js */,
 				0BA1E00D1B03FB0B007675AF /* NetError.html */,
 				39A35AEC1C0662A3006B9E87 /* SpotlightHelper.js */,
 				F84B21EF1A0910F600AAB793 /* Images.xcassets */,
@@ -5874,6 +5874,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F84B21DD1A090F8100AAB793 /* Build configuration list for PBXNativeTarget "Client" */;
 			buildPhases = (
+				F979BE0F25BCC098009B6ACF /* Build packaged javascript files */,
 				7B604F8F1C494AAA006EEEC3 /* Copy Carthage Dependencies */,
 				2779B7052159297D0044A102 /* Run SwiftLint */,
 				F84B21BA1A090F8100AAB793 /* Sources */,
@@ -6293,8 +6294,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F9488EC72589A93F00A72C84 /* AllFramesAtDocumentStartSandboxed.js in Resources */,
-				F919BFB7258440C100D94BA5 /* AllFramesAtDocumentEndSandboxed.js in Resources */,
+				F979BE4725BCC5D3009B6ACF /* MainFrameAtDocumentEnd.js in Resources */,
+				F979BE4825BCC5D3009B6ACF /* MainFrameAtDocumentStart.js in Resources */,
+				F979BE2F25BCC54E009B6ACF /* AllFramesAtDocumentStart.js in Resources */,
+				F979BE3025BCC54E009B6ACF /* AllFramesAtDocumentEnd.js in Resources */,
+				F979BE3125BCC54E009B6ACF /* AllFramesAtDocumentStartSandboxed.js in Resources */,
+				F979BE3225BCC54E009B6ACF /* AllFramesAtDocumentEndSandboxed.js in Resources */,
 				5E0FCD212342526700AC831E /* FullscreenHelper.js in Resources */,
 				D38A1EE01CB458EC0080C842 /* CertError.html in Resources */,
 				0BA1E0301B051A07007675AF /* NetError.css in Resources */,
@@ -6330,7 +6335,6 @@
 				7B2142FE1E5E055000CDD3FC /* InfoPlist.strings in Resources */,
 				E69922171B94E3EF007C480D /* Licenses.html in Resources */,
 				E4CD9F5B1A71506C00318571 /* Reader.css in Resources */,
-				D0FCF8061FE4772D004A7995 /* AllFramesAtDocumentEnd.js in Resources */,
 				27658273217130D900754B2F /* DigiCertHighAssurance.cer in Resources */,
 				E4B7B7611A793CF20022C5E0 /* CharisSILB.ttf in Resources */,
 				0AB22A96257EADA900126ADC /* sora-sagano.jpg in Resources */,
@@ -6356,7 +6360,6 @@
 				F99505FF22937E3900CC6543 /* U2F-low-level.js in Resources */,
 				59D4161B232681080087A6E1 /* Localizable.strings in Resources */,
 				F9F8597C2533CEBC000CEB24 /* DownloadHelper.js in Resources */,
-				D0FCF8081FE4772D004A7995 /* MainFrameAtDocumentStart.js in Resources */,
 				0A0D3D5021A5609600BEE65B /* SafeBrowsingError.html in Resources */,
 				74821FFE1DB6D3AC00EEEA72 /* MailSchemes.plist in Resources */,
 				5EC1DDBC2356883800CA4028 /* onboarding-shields.json in Resources */,
@@ -6392,10 +6395,8 @@
 				5DE52511218CE92C000DFAA6 /* block-trackers.json in Resources */,
 				F919BFAC2584204900D94BA5 /* ContextMenu.js in Resources */,
 				39A35AED1C0662A3006B9E87 /* SpotlightHelper.js in Resources */,
-				D0FCF8071FE4772D004A7995 /* MainFrameAtDocumentEnd.js in Resources */,
 				2F44FB2D1A9D5D8500FD20CC /* FiraSans-BoldItalic.ttf in Resources */,
 				5EE4CF5B2540868E00BC4509 /* Bookmarks.html in Resources */,
-				D03F8F23200EAC1F003C2224 /* AllFramesAtDocumentStart.js in Resources */,
 				0AA21E4A2302C4CC00358988 /* webauth_verify_key.json in Resources */,
 				F9E0F3BF25787E2C003A6A30 /* __firefox__.js in Resources */,
 				279C75C821A5B37D001CD1CB /* FingerprintingProtection.js in Resources */,
@@ -6466,6 +6467,30 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "rm -rf ${TMPDIR}/TemporaryItems/*carthage*\n/usr/local/bin/carthage copy-frameworks\n";
+		};
+		F979BE0F25BCC098009B6ACF /* Build packaged javascript files */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Build packaged javascript files";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(SRCROOT)/Client/Assets/MainFrameAtDocumentStart.js",
+				"$(SRCROOT)/Client/Assets/MainFrameAtDocumentEnd.js",
+				"$(SRCROOT)/Client/Assets/AllFramesAtDocumentStart.js",
+				"$(SRCROOT)/Client/Assets/AllFramesAtDocumentEnd.js",
+				"$(SRCROOT)/Client/Assets/AllFramesAtDocumentStartSandboxed.js",
+				"$(SRCROOT)/Client/Assets/AllFramesAtDocumentEndSandboxed.js",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "npm run build\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
