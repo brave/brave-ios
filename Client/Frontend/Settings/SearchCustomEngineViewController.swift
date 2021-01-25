@@ -133,11 +133,11 @@ class SearchCustomEngineViewController: UIViewController {
             switch type {
                 case .enabled:
                     self.navigationItem.rightBarButtonItem = UIBarButtonItem(
-                        title: "Add", style: .done, target: self, action: #selector(self.checkAddEngineType))
+                        title: Strings.CustomSearchEngine.customEngineAddButtonTitle, style: .done, target: self, action: #selector(self.checkAddEngineType))
                     self.spinnerView.stopAnimating()
                 case .disabled:
                     self.navigationItem.rightBarButtonItem = UIBarButtonItem(
-                        title: "Add", style: .done, target: self, action: #selector(self.checkAddEngineType))
+                        title: Strings.CustomSearchEngine.customEngineAddButtonTitle, style: .done, target: self, action: #selector(self.checkAddEngineType))
                     self.navigationItem.rightBarButtonItem?.isEnabled = false
                     self.spinnerView.stopAnimating()
                     self.isAutoAddEnabled = false
@@ -244,10 +244,6 @@ extension SearchCustomEngineViewController: UITableViewDelegate, UITableViewData
                 withIdentifier: Constants.searchEngineHeaderIdentifier) as? SearchEngineTableViewHeader else {
             return nil
         }
-        
-//        headerView.actionHandler = { [weak self] in
-//            self?.autoAddSearchEngine()
-//        }
 
         switch section {
             case Section.url.rawValue:
@@ -662,6 +658,7 @@ fileprivate class URLInputTableViewCell: UITableViewCell {
     
     private func setup() {
         textview = UITextView(frame: CGRect(x: 0, y: 0, width: contentView.frame.width, height: contentView.frame.height)).then {
+            $0.text = "https://"
             $0.backgroundColor = .clear
             $0.backgroundColor = .clear
             $0.font = UIFont.systemFont(ofSize: Design.cellInset)
