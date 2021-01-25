@@ -33,7 +33,7 @@ enum DefaultEngineType: String {
         }
     }
 }
-    
+
 /**
  * Manage a set of Open Search engines.
  *

@@ -94,6 +94,7 @@ class SearchSettingsTableViewController: UITableViewController {
         navigationItem.title = Strings.searchSettingNavTitle
 
         tableView.do {
+            $0.allowsSelectionDuringEditing = true
             $0.register(SettingsTableSectionHeaderFooterView.self, forHeaderFooterViewReuseIdentifier: Constants.sectionHeaderIdentifier)
             $0.register(UITableViewCell.self, forCellReuseIdentifier: Constants.addCustomEngineRowIdentifier)
             $0.register(UITableViewCell.self, forCellReuseIdentifier: Constants.searchEngineRowIdentifier)
@@ -145,6 +146,7 @@ class SearchSettingsTableViewController: UITableViewController {
         
         let cell = UITableViewCell(style: .value1, reuseIdentifier: Constants.searchEngineRowIdentifier).then {
             $0.accessoryType = .disclosureIndicator
+            $0.editingAccessoryType = .disclosureIndicator
             $0.accessibilityLabel = text
             $0.textLabel?.text = text
             $0.accessibilityValue = searchEngineName
@@ -189,6 +191,7 @@ class SearchSettingsTableViewController: UITableViewController {
                     cell = tableView.dequeueReusableCell(withIdentifier: Constants.quickSearchEngineRowIdentifier, for: indexPath).then {
                         $0.textLabel?.text = Strings.quickSearchEngines
                         $0.accessoryType = .disclosureIndicator
+                        $0.editingAccessoryType = .disclosureIndicator
                     }
                 case CurrentEngineType.suggestions.rawValue:
                     let toggle = UISwitch().then {
@@ -211,6 +214,7 @@ class SearchSettingsTableViewController: UITableViewController {
                 cell = tableView.dequeueReusableCell(withIdentifier: Constants.addCustomEngineRowIdentifier, for: indexPath).then {
                     $0.textLabel?.text = Strings.searchSettingAddCustomEngineCellTitle
                     $0.accessoryType = .disclosureIndicator
+                    $0.editingAccessoryType = .disclosureIndicator
                 }
             } else {
                 engine = customSearchEngines[indexPath.item]

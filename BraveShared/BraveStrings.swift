@@ -316,6 +316,12 @@ extension Strings {
             bundle: Bundle.braveShared,
             value: "Auto Add",
             comment: "Button title for Auto Add in header")
+        
+        public static let customEngineAddButtonTitle = NSLocalizedString(
+            "customSearchEngine.addButtonTitle",
+            bundle: Bundle.braveShared,
+            value: "Add",
+            comment: "Button title for Adding Engine in navigation Bar")
 
     }
 }
