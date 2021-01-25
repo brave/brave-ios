@@ -2540,6 +2540,7 @@ extension BrowserViewController: TabDelegate {
         tab.addContentScript(ResourceDownloadManager(tab: tab), name: ResourceDownloadManager.name())
         
         tab.addContentScript(WindowRenderHelperScript(tab: tab), name: WindowRenderHelperScript.name())
+        tab.addContentScript(PlaylistHelper(tab: tab), name: PlaylistHelper.name())
         
         tab.addContentScript(RewardsReporting(rewards: rewards, tab: tab), name: RewardsReporting.name())
         tab.addContentScript(AdsMediaReporting(rewards: rewards, tab: tab), name: AdsMediaReporting.name())
