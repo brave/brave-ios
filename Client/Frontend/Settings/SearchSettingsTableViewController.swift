@@ -34,6 +34,7 @@ class SearchSettingsTableViewController: UITableViewController {
         static let sectionHeaderIdentifier = "sectionHeaderIdentifier"
         static let addCustomEngineRowIdentifier = "addCustomEngineRowIdentifier"
         static let searchEngineRowIdentifier = "searchEngineRowIdentifier"
+        static let showSearchSuggestionsRowIdentifier = "showSearchSuggestionsRowIdentifier"
         static let quickSearchEngineRowIdentifier = "quickSearchEngineRowIdentifier"
         static let customSearchEngineRowIdentifier = "customSearchEngineRowIdentifier"
     }
@@ -98,6 +99,7 @@ class SearchSettingsTableViewController: UITableViewController {
             $0.register(SettingsTableSectionHeaderFooterView.self, forHeaderFooterViewReuseIdentifier: Constants.sectionHeaderIdentifier)
             $0.register(UITableViewCell.self, forCellReuseIdentifier: Constants.addCustomEngineRowIdentifier)
             $0.register(UITableViewCell.self, forCellReuseIdentifier: Constants.searchEngineRowIdentifier)
+            $0.register(UITableViewCell.self, forCellReuseIdentifier: Constants.showSearchSuggestionsRowIdentifier)
             $0.register(UITableViewCell.self, forCellReuseIdentifier: Constants.quickSearchEngineRowIdentifier)
             $0.register(UITableViewCell.self, forCellReuseIdentifier: Constants.customSearchEngineRowIdentifier)
         }
@@ -199,7 +201,7 @@ class SearchSettingsTableViewController: UITableViewController {
                         $0.isOn = searchEngines.shouldShowSearchSuggestions
                     }
                     
-                    cell = tableView.dequeueReusableCell(withIdentifier: Constants.searchEngineRowIdentifier, for: indexPath).then {
+                    cell = tableView.dequeueReusableCell(withIdentifier: Constants.showSearchSuggestionsRowIdentifier, for: indexPath).then {
                         $0.textLabel?.text = Strings.searchSettingSuggestionCellTitle
                         $0.accessoryView = toggle
                         $0.selectionStyle = .none
