@@ -227,7 +227,6 @@ private class VideoTrackerBar: UIView {
     }
 }
 
-
 protocol VideoViewDelegate: class {
     func onPreviousTrack()
     func onNextTrack()
@@ -260,22 +259,20 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         $0.backgroundColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 0.4024561216)
     }
     
-    private let skipBackButton = UIButton().then {
+    private let skipBackButton = UIButton(type: .system).then {
         $0.imageView?.contentMode = .scaleAspectFit
         $0.setBackgroundImage(#imageLiteral(resourceName: "playlist_rewind"), for: .normal)
         $0.setTitleColor(.white, for: .normal)
         $0.setTitle("15", for: .normal)
         $0.tintColor = .white
-        //TODO: Figure out button's highlighting for label
     }
     
-    private let skipForwardButton = UIButton().then {
+    private let skipForwardButton = UIButton(type: .system).then {
         $0.imageView?.contentMode = .scaleAspectFit
         $0.setBackgroundImage(#imageLiteral(resourceName: "playlist_forward"), for: .normal)
         $0.setTitleColor(.white, for: .normal)
         $0.setTitle("15", for: .normal)
         $0.tintColor = .white
-        //TODO: Figure out button's highlighting for label
     }
     
     private let playPauseButton = UIButton().then {
