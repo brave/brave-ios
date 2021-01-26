@@ -12,25 +12,48 @@ import AVFoundation
 
 private let log = Logger.browserLogger
 
+// MARK: PlaylistViewController
+
 class PlaylistViewController: UIViewController {
+    
+    // MARK: Constants
+     
+     struct Constants {
+        static let playListCellIdentifier = "playlistCellIdentifier"
+        static let tableRowDimension: CGFloat = 70
+     }
+
+    // MARK: Properties
+    
+    private let playerView = VideoView()
+    
+    private let playlistFRC = Playlist.shared.fetchResultsController()
+    
+    private lazy var activityIndicator = UIActivityIndicatorView(style: .white).then {
+        $0.isHidden = true
+        $0.hidesWhenStopped = true
+    }
+    
     private let infoLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 12.0, weight: .regular)
         $0.textColor = .white
         $0.textAlignment = .center
         $0.appearanceTextColor = .white
         $0.numberOfLines = 0
-        $0.text = "Playlist"
+        $0.text = Strings.PlayList.playListSectionTitle
     }
     
-    private let playerView = VideoView()
-    private let playlistFRC = Playlist.shared.fetchResultsController()
-    private lazy var mediaInfo = PlaylistMediaInfo(playerView: playerView)
-    private var tableView = UITableView(frame: .zero, style: .grouped)
-    private var currentItem = -1
-    private let activityIndicator = UIActivityIndicatorView(style: .white).then {
-        $0.isHidden = true
-        $0.hidesWhenStopped = true
+    private var tableView = UITableView(frame: .zero, style: .grouped).then {
+        $0.backgroundView = UIView()
+        $0.backgroundColor = BraveUX.popoverDarkBackground
+        $0.appearanceBackgroundColor = BraveUX.popoverDarkBackground
+        $0.separatorColor = .clear
+        $0.appearanceSeparatorColor = .clear
     }
+
+    private lazy var mediaInfo = PlaylistMediaInfo(playerView: playerView)
+    
+    private var currentItem = -1
     
     init() {
         super.init(nibName: nil, bundle: nil)
@@ -43,32 +66,53 @@ class PlaylistViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
     
-        self.title = "Media Player"
-        navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
-        UILabel.appearance(whenContainedInInstancesOf: [UINavigationBar.self]).appearanceTextColor = .white
-        
-        navigationController?.presentationController?.delegate = self
-        navigationController?.navigationBar.tintColor = .white
-        navigationController?.navigationBar.isTranslucent = false
-        navigationController?.navigationBar.barTintColor = BraveUX.popoverDarkBackground
-        navigationController?.navigationBar.appearanceBarTintColor = BraveUX.popoverDarkBackground
-        navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
-        navigationController?.navigationBar.shadowImage = UIImage()
+        setTheme()
+        setup()
+        doLayout()
 
-        navigationItem.rightBarButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "playlist_exit"), style: .done, target: self, action: #selector(onExit(_:)))
+        fetchResults()
+    }
+    
+    // MARK: Internal
+    
+    private func setTheme() {
+        title = Strings.PlayList.mediaPlayerSectionTitle
+
+        navigationController?.do {
+            $0.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
+            UILabel.appearance(whenContainedInInstancesOf: [UINavigationBar.self]).appearanceTextColor = .white
+            
+            $0.presentationController?.delegate = self
+            $0.navigationBar.tintColor = .white
+            $0.navigationBar.isTranslucent = false
+            $0.navigationBar.barTintColor = BraveUX.popoverDarkBackground
+            $0.navigationBar.appearanceBarTintColor = BraveUX.popoverDarkBackground
+            $0.navigationBar.setBackgroundImage(UIImage(), for: .default)
+            $0.navigationBar.shadowImage = UIImage()
+        }
         
         view.backgroundColor = BraveUX.popoverDarkBackground
         
-        tableView.backgroundView = UIView()
-        tableView.backgroundColor = BraveUX.popoverDarkBackground
-        tableView.appearanceBackgroundColor = BraveUX.popoverDarkBackground
-        tableView.separatorColor = .clear
-        tableView.appearanceSeparatorColor = .clear
+        tableView.do {
+            //tableView.contentInsetAdjustmentBehavior = .never
+            $0.contentInset = UIEdgeInsets(top: 0.60 * view.bounds.width, left: 0.0, bottom: 0.0, right: 0.0)
+            $0.contentOffset = CGPoint(x: 0.0, y: -0.60 * view.bounds.width)
+        }
+    }
+    
+    private func setup () {
+        navigationItem.rightBarButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "playlist_exit"), style: .done, target: self, action: #selector(onExit(_:)))
+              
+        tableView.do {
+            $0.register(PlaylistCell.self, forCellReuseIdentifier: Constants.playListCellIdentifier)
+            $0.dataSource = self
+            $0.delegate = self
+        }
         
-        tableView.register(PlaylistCell.self, forCellReuseIdentifier: "PlaylistCell")
-        tableView.dataSource = self
-        tableView.delegate = self
-        
+        playerView.delegate = self
+    }
+    
+    private func doLayout() {
         view.addSubview(tableView)
         view.addSubview(playerView)
         playerView.addSubview(activityIndicator)
@@ -86,17 +130,16 @@ class PlaylistViewController: UIViewController {
         tableView.snp.makeConstraints {
             $0.edges.equalTo(view.safeArea.edges)
         }
-        
-        //tableView.contentInsetAdjustmentBehavior = .never
-        tableView.contentInset = UIEdgeInsets(top: 0.60 * view.bounds.width, left: 0.0, bottom: 0.0, right: 0.0)
-        tableView.contentOffset = CGPoint(x: 0.0, y: -0.60 * view.bounds.width)
-        playerView.delegate = self
-        
+    }
+    
+    private func fetchResults() {
         DispatchQueue.main.async {
             try? self.playlistFRC.performFetch()
             self.tableView.reloadData()
         }
     }
+    
+    // MARK: Actions
     
     @objc
     private func onExit(_ button: UIBarButtonItem) {
@@ -104,11 +147,15 @@ class PlaylistViewController: UIViewController {
     }
 }
 
+// MARK: UIAdaptivePresentationControllerDelegate
+
 extension PlaylistViewController: UIAdaptivePresentationControllerDelegate {
     func adaptivePresentationStyle(for controller: UIPresentationController, traitCollection: UITraitCollection) -> UIModalPresentationStyle {
         return .fullScreen
     }
 }
+
+// MARK: UITableViewDataSource
 
 extension PlaylistViewController: UITableViewDataSource {
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -120,15 +167,15 @@ extension PlaylistViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 70.0
+        return Constants.tableRowDimension
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 70.0
+        return Constants.tableRowDimension
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: "PlaylistCell", for: indexPath) as? PlaylistCell else {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: Constants.playListCellIdentifier, for: indexPath) as? PlaylistCell else {
             return UITableViewCell()
         }
         
@@ -137,20 +184,23 @@ extension PlaylistViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         
-        cell.selectionStyle = .none
-        cell.indicatorIcon.image = #imageLiteral(resourceName: "playlist_currentitem_indicator").template
-        cell.indicatorIcon.alpha = 0.0
-        cell.titleLabel.text = item.name
-        cell.detailLabel.text = String(format: "%.2fm", item.duration / 60.0)
-        cell.contentView.backgroundColor = .clear
-        cell.backgroundColor = .clear
+        cell.do {
+            $0.selectionStyle = .none
+            $0.indicatorIcon.image = #imageLiteral(resourceName: "playlist_currentitem_indicator").template
+            $0.indicatorIcon.alpha = 0.0
+            $0.titleLabel.text = item.name
+            $0.detailLabel.text = String(format: "%.2fm", item.duration / 60.0)
+            $0.contentView.backgroundColor = .clear
+            $0.backgroundColor = .clear
+            $0.thumbnailImage = #imageLiteral(resourceName: "menu-NoImageMode")
+        }
         
         if let url = URL(string: mediaSrc) {
             AVAsset(url: url).generateThumbnail { image in
-                cell.thumbnailImage = image ?? #imageLiteral(resourceName: "menu-NoImageMode")
+                if let thumbnailImage = image {
+                    cell.thumbnailImage = thumbnailImage
+                }
             }
-        } else {
-            cell.thumbnailImage = #imageLiteral(resourceName: "menu-NoImageMode")
         }
         
         if indexPath.row == currentItem {
@@ -175,6 +225,8 @@ extension PlaylistViewController: UITableViewDataSource {
     }
 }
 
+// MARK: UITableViewDelegate
+
 extension PlaylistViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
@@ -187,21 +239,26 @@ extension PlaylistViewController: UITableViewDelegate {
         let currentItem = PlaylistInfo(item: playlistItems[indexPath.row])
         let itemURL = URL(string: currentItem.src)
         let cache = Playlist.shared.getCache(item: currentItem)
-        let downloadedItemTitle = cache.isEmpty ? "Download" : "Clear"
+        let downloadedItemTitle = cache.isEmpty ? Strings.download : Strings.PlayList.clearActionButtonTitle
         
         let cacheAction = UIContextualAction(style: .normal, title: downloadedItemTitle, handler: { [weak self] (action, view, completionHandler) in
             guard let self = self else { return }
             
-            if cache.isEmpty {
-                URLSession(configuration: .ephemeral).dataTask(with: itemURL!) { [weak self] data, response, error in
+            if cache.isEmpty, let itemURL = itemURL {
+                URLSession(configuration: .ephemeral).dataTask(with: itemURL) { [weak self] data, response, error in
                     guard let self = self else { return }
+                    
                     DispatchQueue.main.async {
                         if let error = error {
-                            let alert = UIAlertController(title: "Notice", message: "Sorry, there was a problem downloading that item", preferredStyle: .alert)
-                            alert.addAction(UIAlertAction(title: "Okay", style: .default, handler: nil))
+                            let alert = UIAlertController(
+                                title: Strings.PlayList.noticeAlertTitle, message: Strings.PlayList.downloadErrorAlertDescription, preferredStyle: .alert)
+                            alert.addAction(UIAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: nil))
+                            
                             self.present(alert, animated: true, completion: nil)
-                            print(error)
+                            
+                            log.error(error)
                             completionHandler(false)
+                            
                             return
                         }
                         
@@ -219,23 +276,26 @@ extension PlaylistViewController: UITableViewDelegate {
             } else {
                 Playlist.shared.updateCache(item: currentItem, cachedData: Data())
                 completionHandler(true)
+                
                 self.tableView.reloadData()
             }
         })
         
-        let deleteAction = UIContextualAction(style: .normal, title: "Remove", handler: { [weak self] (action, view, completionHandler) in
+        let deleteAction = UIContextualAction(style: .normal, title: Strings.PlayList.removeActionButtonTitle, handler: { [weak self] (action, view, completionHandler) in
             guard let self = self,
                   let playlistItems = self.playlistFRC.fetchedObjects,
                   !playlistItems.isEmpty else { return }
             
             let item = PlaylistInfo(item: playlistItems[indexPath.row])
             Playlist.shared.removeItem(item: item)
+            
             self.tableView.deleteRows(at: [indexPath], with: .fade)
 
             if self.currentItem == indexPath.row {
                 self.currentItem = -1
                 self.mediaInfo.updateNowPlayingMediaInfo()
                 //Playlist.shared.currentlyPlayingInfo.value = nil
+                
                 self.activityIndicator.stopAnimating()
                 self.playerView.stop()
             }
@@ -245,8 +305,9 @@ extension PlaylistViewController: UITableViewDelegate {
         })
 
         cacheAction.image = cache.isEmpty ? #imageLiteral(resourceName: "menu-downloads") : #imageLiteral(resourceName: "nowPlayingCheckmark")
-        cacheAction.backgroundColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
+        cacheAction.backgroundColor = .white
         deleteAction.backgroundColor = #colorLiteral(red: 0.812063769, green: 0.04556301224, blue: 0, alpha: 1)
+        
         return UISwipeActionsConfiguration(actions: [deleteAction, cacheAction])
     }
     
@@ -276,11 +337,15 @@ extension PlaylistViewController: UITableViewDelegate {
     }
     
     private func displayLoadingResourceError() {
-        let alert = UIAlertController(title: "Sorry", message: "There was a problem loading the resource!", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "Okay", style: .default, handler: nil))
+        let alert = UIAlertController(
+            title: Strings.PlayList.sorryAlertTitle, message: Strings.PlayList.loadResourcesErrorAlertDescription, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: nil))
+        
         self.present(alert, animated: true, completion: nil)
     }
 }
+
+// MARK: VideoViewDelegate
 
 extension PlaylistViewController: VideoViewDelegate {
     func onPreviousTrack() {
@@ -321,16 +386,19 @@ extension PlaylistViewController: VideoViewDelegate {
     
     func onFullScreen() {
         playerView.player.pause()
-        let playerController = AVPlayerViewController()
-        playerController.player = playerView.player
-        playerController.delegate = self
-        playerController.allowsPictureInPicturePlayback = true
+        
+        let playerController = AVPlayerViewController().then {
+            $0.player = playerView.player
+            $0.delegate = self
+            $0.allowsPictureInPicturePlayback = true
+        }
         
         if #available(iOS 14.2, *) {
             playerController.canStartPictureInPictureAutomaticallyFromInline = true
         }
         
         playerController.entersFullScreenWhenPlaybackBegins = true
+        
         self.present(playerController, animated: true, completion: {
             playerController.player?.play()
         })
@@ -342,6 +410,8 @@ extension PlaylistViewController: VideoViewDelegate {
         }
     }
 }
+
+// MARK: AVPlayerViewControllerDelegate
 
 extension PlaylistViewController: AVPlayerViewControllerDelegate {
     //TODO: When entering PIP, dismiss the current playlist controller.
