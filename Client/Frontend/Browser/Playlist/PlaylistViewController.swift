@@ -344,5 +344,6 @@ extension PlaylistViewController: VideoViewDelegate {
 }
 
 extension PlaylistViewController: AVPlayerViewControllerDelegate {
-    
+    //TODO: When entering PIP, dismiss the current playlist controller.
+    //TODO: When exiting PIP, destroy the video player and its media info. Clear control centre, etc.
 }
