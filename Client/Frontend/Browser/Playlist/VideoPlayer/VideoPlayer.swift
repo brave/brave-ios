@@ -135,7 +135,7 @@ private class VideoSliderBar: UIControl {
     private var tracker = UIImageView().then {
         $0.contentMode = .scaleAspectFit
         $0.isUserInteractionEnabled = true
-        //$0.image = #imageLiteral(resourceName: "videoThumbSlider")
+        $0.image = #imageLiteral(resourceName: "playlist_video_thumb")
     }
 }
 
@@ -168,7 +168,7 @@ private class VideoTrackerBar: UIView {
             slider.value = CGFloat(currentTime.value) / CGFloat(endTime.value)
             
             currentTimeLabel.text = self.timeToString(currentTime)
-            endTimeLabel.text = self.timeToString(endTime)
+            endTimeLabel.text = "-\(self.timeToString(endTime - currentTime))"
         } else {
             slider.value = 0.0
             currentTimeLabel.text = "0:00"

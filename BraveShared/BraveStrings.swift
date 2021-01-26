@@ -1056,12 +1056,6 @@ extension Strings {
 
 extension Strings {
     public struct PlayList {
-        public static let mediaPlayerSectionTitle =
-            NSLocalizedString("playList.mediaPlayerSectionTitle",
-                              bundle: .braveShared,
-                              value: "Media Player",
-                              comment: "Title For the Section that videos are listed")
-        
         public static let playListSectionTitle =
             NSLocalizedString("playList.playListSectionTitle",
                               bundle: .braveShared,
@@ -1108,6 +1102,12 @@ extension Strings {
             NSLocalizedString("playList.loadResourcesErrorAlertDescription",
                               bundle: .braveShared,
                               value: "There was a problem loading the resource!",
+                              comment: "Description for load resources error alert")
+        
+        public static let listFilterActionTitle =
+            NSLocalizedString("playList.listFilterActionTitle",
+                              bundle: .braveShared,
+                              value: "Filter By…",
                               comment: "Description for load resources error alert")
     }
 }
