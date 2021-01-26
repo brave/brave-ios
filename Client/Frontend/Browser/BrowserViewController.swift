@@ -2540,7 +2540,10 @@ extension BrowserViewController: TabDelegate {
         tab.addContentScript(ResourceDownloadManager(tab: tab), name: ResourceDownloadManager.name())
         
         tab.addContentScript(WindowRenderHelperScript(tab: tab), name: WindowRenderHelperScript.name())
-        tab.addContentScript(PlaylistHelper(tab: tab), name: PlaylistHelper.name())
+        
+        let playlistHelper = PlaylistHelper(tab: tab)
+        playlistHelper.delegate = self
+        tab.addContentScript(playlistHelper, name: PlaylistHelper.name())
         
         tab.addContentScript(RewardsReporting(rewards: rewards, tab: tab), name: RewardsReporting.name())
         tab.addContentScript(AdsMediaReporting(rewards: rewards, tab: tab), name: AdsMediaReporting.name())
@@ -3752,4 +3755,10 @@ extension BrowserViewController: OnboardingControllerDelegate {
     
     // 60 days until the next time the user sees the onboarding..
     static let onboardingDaysInterval = TimeInterval(60.days)
+}
+
+extension BrowserViewController: PlaylistHelperDelegate {
+    func present(controller: UIViewController) {
+        self.present(controller, animated: true, completion: nil)
+    }
 }
