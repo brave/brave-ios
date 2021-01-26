@@ -175,7 +175,7 @@ class PlaylistCacheLoader: NSObject, AVAssetResourceLoaderDelegate, URLSessionTa
 }
 
 class PlaylistWebLoader: UIView, WKScriptMessageHandler, WKNavigationDelegate {
-    private let webView = WKWebView(frame: .zero, configuration: WKWebViewConfiguration().then {
+    private let webView = BraveWebView(frame: .zero, configuration: WKWebViewConfiguration().then {
         $0.processPool = WKProcessPool()
         
         let script: WKUserScript? = {
@@ -193,7 +193,7 @@ class PlaylistWebLoader: UIView, WKScriptMessageHandler, WKNavigationDelegate {
         if let script = script {
             $0.userContentController.addUserScript(script)
         }
-    })
+    }, isPrivate: true)
     
     private let handler: (PlaylistInfo?) -> Void
     
@@ -230,14 +230,27 @@ class PlaylistWebLoader: UIView, WKScriptMessageHandler, WKNavigationDelegate {
         
         DispatchQueue.main.async {
             self.webView.loadHTMLString("<html><body>PlayList</body></html>", baseURL: nil)
+            
+            let dataTypes = WKWebsiteDataStore.allWebsiteDataTypes()
+            self.webView.configuration.websiteDataStore.removeData(ofTypes: dataTypes,
+                                                              modifiedSince: Date.distantPast,
+                                                              completionHandler: {})
         }
     }
     
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        let dataTypes = WKWebsiteDataStore.allWebsiteDataTypes()
+        webView.configuration.websiteDataStore.removeData(ofTypes: dataTypes,
+                                                          modifiedSince: Date.distantPast,
+                                                          completionHandler: {})
+        
         handler(nil)
     }
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        
+        let dataTypes = WKWebsiteDataStore.allWebsiteDataTypes()
+        webView.configuration.websiteDataStore.removeData(ofTypes: dataTypes,
+                                                          modifiedSince: Date.distantPast,
+                                                          completionHandler: {})
     }
 }
