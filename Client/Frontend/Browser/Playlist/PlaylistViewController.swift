@@ -179,7 +179,7 @@ extension PlaylistViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         
-        let item = self.playlistFRC.object(at: indexPath)
+        let item = playlistFRC.object(at: indexPath)
         guard let mediaSrc = item.mediaSrc else {
             return UITableViewCell()
         }
