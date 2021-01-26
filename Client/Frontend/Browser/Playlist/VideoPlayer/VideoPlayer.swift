@@ -277,8 +277,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     
     private let playPauseButton = UIButton().then {
         $0.imageView?.contentMode = .scaleAspectFit
-        $0.setImage(#imageLiteral(resourceName: "nav-forward").template, for: .normal)
-        $0.tintColor = .white
+        $0.setImage(#imageLiteral(resourceName: "playlist_play"), for: .normal)
     }
     
     private let castButton = UIButton().then {
@@ -647,7 +646,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     public func play() {
         if !isPlaying {
             isPlaying.toggle()
-            playPauseButton.setImage(#imageLiteral(resourceName: "nav-forward").template, for: .normal)
+            playPauseButton.setImage(#imageLiteral(resourceName: "playlist_play"), for: .normal)
             player.play()
             
             showOverlays(false)
@@ -670,7 +669,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     
     public func stop() {
         isPlaying = false
-        playPauseButton.setImage(#imageLiteral(resourceName: "nav-forward").template, for: .normal)
+        playPauseButton.setImage(#imageLiteral(resourceName: "playlist_play"), for: .normal)
         player.pause()
         
         showOverlays(true)
