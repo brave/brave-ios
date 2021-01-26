@@ -9,6 +9,7 @@ import BraveShared
 import Shared
 import AVKit
 import AVFoundation
+import SDWebImage
 
 private let log = Logger.browserLogger
 
@@ -196,11 +197,7 @@ extension PlaylistViewController: UITableViewDataSource {
         }
         
         if let url = URL(string: mediaSrc) {
-            AVAsset(url: url).generateThumbnail { image in
-                if let thumbnailImage = image {
-                    cell.thumbnailImage = thumbnailImage
-                }
-            }
+            cell.thumbnailImage = previewImageFromVideo(url: url)
         }
         
         if indexPath.row == currentItem {
@@ -222,6 +219,46 @@ extension PlaylistViewController: UITableViewDataSource {
                 $0.addButton.addTarget(self, action: #selector(onAddItem(_:)), for: .touchUpInside)
             }
         }*/
+    }
+    
+    private func previewImageFromVideo(url: URL) -> UIImage? {
+        let request = URLRequest(url: url)
+        let cache = URLCache.shared
+        let imageCache = SDImageCache.shared()
+
+        if let cachedImage = imageCache.imageFromCache(forKey: url.absoluteString) {
+            return cachedImage
+        }
+
+        if let cachedResponse = cache.cachedResponse(for: request), let image = UIImage(data: cachedResponse.data) {
+            return image
+        }
+
+        let asset = AVAsset(url: url)
+        let imageGenerator = AVAssetImageGenerator(asset: asset)
+        imageGenerator.appliesPreferredTrackTransform = true
+
+        var time = asset.duration
+        time.value = min(time.value, 2)
+
+        var image: UIImage?
+
+        do {
+            let cgImage = try imageGenerator.copyCGImage(at: time, actualTime: nil)
+            image = UIImage(cgImage: cgImage)
+        } catch {
+            log.error(error)
+        }
+
+        if let image = image, let data = image.pngData(),
+           let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil) {
+            let cachedResponse = CachedURLResponse(response: response, data: data)
+            cache.storeCachedResponse(cachedResponse, for: request)
+            
+            imageCache.store(image, forKey: url.absoluteString, completion: nil)
+        }
+        
+        return image
     }
 }
 
