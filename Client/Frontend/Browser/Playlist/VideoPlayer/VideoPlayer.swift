@@ -262,14 +262,20 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     
     private let skipBackButton = UIButton().then {
         $0.imageView?.contentMode = .scaleAspectFit
-        $0.setImage(#imageLiteral(resourceName: "playlist_rewind"), for: .normal)
+        $0.setBackgroundImage(#imageLiteral(resourceName: "playlist_rewind"), for: .normal)
+        $0.setTitleColor(.white, for: .normal)
+        $0.setTitle("15", for: .normal)
         $0.tintColor = .white
+        //TODO: Figure out button's highlighting for label
     }
     
     private let skipForwardButton = UIButton().then {
         $0.imageView?.contentMode = .scaleAspectFit
-        $0.setImage(#imageLiteral(resourceName: "playlist_forward"), for: .normal)
+        $0.setBackgroundImage(#imageLiteral(resourceName: "playlist_forward"), for: .normal)
+        $0.setTitleColor(.white, for: .normal)
+        $0.setTitle("15", for: .normal)
         $0.tintColor = .white
+        //TODO: Figure out button's highlighting for label
     }
     
     private let playPauseButton = UIButton().then {
