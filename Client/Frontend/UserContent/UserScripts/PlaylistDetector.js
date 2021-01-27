@@ -14,7 +14,7 @@ function notifyNodeSource(node, src, mimeType) {
         }
     }
 
-    if (src != "") {
+    if (src !== "") {
         window.webkit.messageHandlers.playlistCacheLoader.postMessage({
                                                                     "name": name,
                                                                     "src": src,
@@ -23,6 +23,32 @@ function notifyNodeSource(node, src, mimeType) {
                                                                     "mimeType": mimeType,
                                                                     "duration": node.duration !== node.duration ? 0.0 : node.duration
                                                                     });
+    } else {
+        document.querySelectorAll('source').forEach(function(node) {
+            if (node.src !== "") {
+                if (node.closest('video') === target) {
+                    window.webkit.messageHandlers.playlistHelper.postMessage({
+                                                                                "name": name,
+                                                                                "src": node.src,
+                                                                                "pageSrc": window.location.href,
+                                                                                "pageTitle": document.title,
+                                                                                "mimeType": type,
+                                                                                "duration": target.duration !== target.duration ? 0.0 : target.duration
+                                                                                });
+                }
+                
+                if (node.closest('audio') === target) {
+                    window.webkit.messageHandlers.playlistHelper.postMessage({
+                                                                                "name": name,
+                                                                                "src": node.src,
+                                                                                "pageSrc": window.location.href,
+                                                                                "pageTitle": document.title,
+                                                                                "mimeType": type,
+                                                                                "duration": target.duration !== target.duration ? 0.0 : target.duration
+                                                                                });
+                }
+            }
+        });
     }
 }
 
