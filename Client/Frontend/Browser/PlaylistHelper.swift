@@ -12,7 +12,7 @@ import Shared
 private let log = Logger.browserLogger
 
 protocol PlaylistHelperDelegate: NSObject {
-    func present(controller: UIViewController)
+    func present(alertController: UIAlertController)
 }
 
 class PlaylistHelper: TabContentScript {
@@ -37,8 +37,10 @@ class PlaylistHelper: TabContentScript {
         
         log.debug("FOUND VIDEO ITEM ON PAGE: \(message.body)")
         
-        let alert = UIAlertController(title: "Add to Playlist", message: "Would you like to add this video to your playlist?", preferredStyle: .actionSheet)
-        alert.addAction(UIAlertAction(title: "Add to Playlist", style: .default, handler: { _ in
+        let alert = UIAlertController(
+            title: Strings.PlayList.addToPlayListAlertTitle, message: Strings.PlayList.addToPlayListAlertDescription, preferredStyle: .actionSheet)
+        
+        alert.addAction(UIAlertAction(title: Strings.PlayList.addToPlayListAlertTitle, style: .default, handler: { _ in
             if Playlist.shared.itemExists(item: item) {
                 //Update playlist existing items..
                 if !item.src.isEmpty {
@@ -51,9 +53,11 @@ class PlaylistHelper: TabContentScript {
                 Playlist.shared.addItem(item: item, cachedData: nil) {
                     log.debug("Playlist Item Added")
                 }
+                
             }
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-        self.delegate?.present(controller: alert)
+        
+        self.delegate?.present(alertController: alert)
     }
 }
