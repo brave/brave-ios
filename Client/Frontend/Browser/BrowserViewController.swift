@@ -3758,7 +3758,13 @@ extension BrowserViewController: OnboardingControllerDelegate {
 }
 
 extension BrowserViewController: PlaylistHelperDelegate {
-    func present(controller: UIViewController) {
-        self.present(controller, animated: true, completion: nil)
+    func present(alertController: UIAlertController) {
+        if UIDevice.current.userInterfaceIdiom == .pad, let popoverController = alertController.popoverPresentationController {
+            popoverController.sourceView = view
+            popoverController.sourceRect = CGRect(x: view.bounds.midX, y: view.bounds.midY, width: 0, height: 0)
+            popoverController.permittedArrowDirections = [.up]
+        }
+        
+        present(alertController, animated: true)
     }
 }
