@@ -314,7 +314,6 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         $0.backgroundColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 0.6004120291)
     }
     
-    
     private let playControlsView = UIView().then {
         $0.backgroundColor = .clear
     }
@@ -402,14 +401,8 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
             $0.edges.equalToSuperview()
         }
         
-//        playControlsStackView.snp.makeConstraints {
-//            $0.left.right.equalToSuperview()
-//            $0.centerY.equalToSuperview()
-//        }
-        
         playControlsView.snp.makeConstraints {
-            $0.left.right.equalToSuperview()
-            $0.centerY.equalToSuperview()
+            $0.edges.equalToSuperview()
         }
         
         trackBar.snp.makeConstraints {
@@ -680,7 +673,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     public func play() {
         if !isPlaying {
             isPlaying.toggle()
-            playPauseButton.setImage(#imageLiteral(resourceName: "playlist_play"), for: .normal)
+            playPauseButton.setImage(#imageLiteral(resourceName: "playlist_pause"), for: .normal)
             player.play()
             
             showOverlays(false)
@@ -692,7 +685,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     public func pause() {
         if isPlaying {
             isPlaying.toggle()
-            playPauseButton.setImage(#imageLiteral(resourceName: "playlist_pause"), for: .normal)
+            playPauseButton.setImage(#imageLiteral(resourceName: "playlist_play"), for: .normal)
             player.pause()
             
             showOverlays(true)
@@ -764,9 +757,9 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         thumbnailView.isHidden = false
         var asset = AVURLAsset(url: url)
         
-//        if let delegate = resourceDelegate as? PlaylistCacheLoader {
-//            asset = AVURLAsset(url: url, options: ["AVURLAssetOutOfBandMIMETypeKey": delegate.mimeType])
-//        }
+        if let delegate = resourceDelegate as? PlaylistCacheLoader {
+            asset = AVURLAsset(url: url, options: ["AVURLAssetOutOfBandMIMETypeKey": delegate.mimeType])
+        }
         
         if let delegate = resourceDelegate {
             asset.resourceLoader.setDelegate(delegate, queue: .main)
