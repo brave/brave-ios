@@ -21,6 +21,7 @@ class PlaylistViewController: UIViewController {
      
      struct Constants {
         static let playListCellIdentifier = "playlistCellIdentifier"
+        static let playListFilterHeaderIdentifier = "playListFilterHeaderIdentifier"
         static let tableRowDimension: CGFloat = 70
      }
 
@@ -95,9 +96,8 @@ class PlaylistViewController: UIViewController {
         view.backgroundColor = BraveUX.popoverDarkBackground
         
         tableView.do {
-            //tableView.contentInsetAdjustmentBehavior = .never
-            $0.contentInset = UIEdgeInsets(top: 0.60 * view.bounds.width, left: 0.0, bottom: 0.0, right: 0.0)
-            $0.contentOffset = CGPoint(x: 0.0, y: -0.60 * view.bounds.width)
+            $0.contentInset = UIEdgeInsets(top: 0.50 * view.bounds.width, left: 0.0, bottom: 0.0, right: 0.0)
+            $0.contentOffset = CGPoint(x: 0.0, y: -0.50 * view.bounds.width)
         }
     }
     
@@ -106,6 +106,7 @@ class PlaylistViewController: UIViewController {
               
         tableView.do {
             $0.register(PlaylistCell.self, forCellReuseIdentifier: Constants.playListCellIdentifier)
+            $0.register(PlaylistFilterView.self, forHeaderFooterViewReuseIdentifier: Constants.playListFilterHeaderIdentifier)
             $0.dataSource = self
             $0.delegate = self
         }
@@ -121,7 +122,7 @@ class PlaylistViewController: UIViewController {
         playerView.snp.makeConstraints {
             $0.top.equalTo(view.safeArea.top)
             $0.leading.trailing.equalToSuperview()
-            $0.height.equalTo(0.60 * view.bounds.width)
+            $0.height.equalTo(0.50 * view.bounds.width)
         }
         
         activityIndicator.snp.makeConstraints {
@@ -211,16 +212,12 @@ extension PlaylistViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        return PlaylistFilterView()/*.then {
-            if let playlistItems = self.playlistFRC.fetchedObjects {
-                if currentItem != -1 && currentItem < playlistItems.count {
-                    $0.titleLabel.text = playlistItems[currentItem].name
-                    $0.detailLabel.text = URL(string: playlistItems[currentItem].pageSrc!)?.baseDomain
-                    $0.addButton.isHidden = true
-                }
-                $0.addButton.addTarget(self, action: #selector(onAddItem(_:)), for: .touchUpInside)
-            }
-        }*/
+        guard let headerView = tableView.dequeueReusableHeaderFooterView(
+                      withIdentifier: Constants.playListFilterHeaderIdentifier) as? PlaylistFilterView else {
+                  return UITableViewHeaderFooterView()
+        }
+        
+        return headerView
     }
     
     private func previewImageFromVideo(url: URL, _ completion: @escaping (UIImage?) -> Void) {
