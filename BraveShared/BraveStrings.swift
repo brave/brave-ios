@@ -998,6 +998,18 @@ extension Strings {
                               bundle: .braveShared,
                               value: "Filter By…",
                               comment: "Description for load resources error alert")
+        
+        public static let addToPlayListAlertTitle =
+            NSLocalizedString("playList.addToPlayListAlertTitle",
+                              bundle: .braveShared,
+                              value: "Add to Playlist",
+                              comment: "Alert Title for adding videos to playlist")
+        
+        public static let addToPlayListAlertDescription =
+            NSLocalizedString("playList.addToPlayListAlertDescription",
+                              bundle: .braveShared,
+                              value: "Would you like to add this video to your playlist?",
+                              comment: "Alert Description for adding videos to playlist")
     }
 }
 
