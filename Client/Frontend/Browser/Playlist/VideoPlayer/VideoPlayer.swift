@@ -282,7 +282,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     
     private let castButton = UIButton().then {
         $0.imageView?.contentMode = .scaleAspectFit
-        $0.setImage(#imageLiteral(resourceName: "playlist_airplay").scale(toSize: CGSize(width: 22.0, height: 22.0)).template, for: .normal)
+        $0.setImage(#imageLiteral(resourceName: "playlist_airplay"), for: .normal)
         $0.tintColor = .white
         
         let routePicker = AVRoutePickerView()
@@ -299,6 +299,11 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         }
     }
     
+    private let pipButton = UIButton().then {
+        $0.imageView?.contentMode = .scaleAspectFit
+        $0.setImage(#imageLiteral(resourceName: "playlist_pip"), for: .normal)
+    }
+    
     private let fullScreenButton = UIButton().then {
         $0.imageView?.contentMode = .scaleAspectFit
         $0.setImage(#imageLiteral(resourceName: "playlist_fullscreen"), for: .normal)
@@ -309,11 +314,9 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         $0.backgroundColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 0.6004120291)
     }
     
-    private let playControlsStackView = UIStackView().then {
-        $0.axis = .horizontal
-        $0.alignment = .fill
-        $0.distribution = .fillEqually
-        $0.spacing = 15.0
+    
+    private let playControlsView = UIView().then {
+        $0.backgroundColor = .clear
     }
     
     private let trackBar = VideoTrackerBar()
@@ -348,6 +351,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
 
         playPauseButton.addTarget(self, action: #selector(onPlay(_:)), for: .touchUpInside)
         castButton.addTarget(self, action: #selector(onCast(_:)), for: .touchUpInside)
+        pipButton.addTarget(self, action: #selector(onPictureInPicture(_:)), for: .touchUpInside)
         fullScreenButton.addTarget(self, action: #selector(onFullscreen(_:)), for: .touchUpInside)
         skipBackButton.addTarget(self, action: #selector(onSeekBackwards(_:)), for: .touchUpInside)
         skipForwardButton.addTarget(self, action: #selector(onSeekForwards(_:)), for: .touchUpInside)
@@ -355,16 +359,31 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         skipForwardButton.addTarget(self, action: #selector(onSeekNext(_:event:)), for: .touchDownRepeat)
         
         //Layout
-        self.addSubview(trackBarBackground)
-        self.addSubview(thumbnailView)
-        self.addSubview(particleView)
-        self.addSubview(overlayView)
-        self.addSubview(playControlsStackView)
-        self.addSubview(castButton)
-        self.addSubview(fullScreenButton)
-        self.addSubview(trackBar)
+        addSubview(trackBarBackground)
+        addSubview(thumbnailView)
+        addSubview(particleView)
+        addSubview(overlayView)
+        addSubview(playControlsView)
+        addSubview(castButton)
+        addSubview(pipButton)
+        addSubview(fullScreenButton)
+        addSubview(trackBar)
+                
+        [skipBackButton, playPauseButton, skipForwardButton].forEach({ playControlsView.addSubview($0) })
         
-        [skipBackButton, playPauseButton, skipForwardButton].forEach({ playControlsStackView.addArrangedSubview($0) })
+        playPauseButton.snp.makeConstraints {
+            $0.center.equalToSuperview()
+        }
+        
+        skipBackButton.snp.makeConstraints {
+            $0.centerY.equalToSuperview()
+            $0.centerX.equalToSuperview().multipliedBy(0.5)
+        }
+
+        skipForwardButton.snp.makeConstraints {
+            $0.centerY.equalToSuperview()
+            $0.centerX.equalToSuperview().multipliedBy(1.5)
+        }
         
         trackBarBackground.snp.makeConstraints {
             $0.left.right.bottom.equalToSuperview()
@@ -383,8 +402,14 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
             $0.edges.equalToSuperview()
         }
         
-        playControlsStackView.snp.makeConstraints {
-            $0.center.equalToSuperview()
+//        playControlsStackView.snp.makeConstraints {
+//            $0.left.right.equalToSuperview()
+//            $0.centerY.equalToSuperview()
+//        }
+        
+        playControlsView.snp.makeConstraints {
+            $0.left.right.equalToSuperview()
+            $0.centerY.equalToSuperview()
         }
         
         trackBar.snp.makeConstraints {
@@ -396,10 +421,14 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         }
         
         castButton.snp.makeConstraints {
+            $0.top.left.equalToSuperview().inset(15.0)
+        }
+        
+        pipButton.snp.makeConstraints {
             $0.top.equalToSuperview().inset(15.0)
             $0.right.equalTo(fullScreenButton.snp.left).offset(-15.0)
         }
-        
+
         registerNotifications()
         trackBar.delegate = self
         
@@ -492,6 +521,11 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     @objc
     private func onCast(_ button: UIButton) {
         //print("Route Picker Video")
+    }
+    
+    @objc
+    private func onPictureInPicture(_ button: UIButton) {
+        // TODO: Picture In Picture
     }
     
     @objc
