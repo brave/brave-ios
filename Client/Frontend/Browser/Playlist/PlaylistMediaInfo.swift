@@ -145,7 +145,9 @@ extension PlaylistMediaInfo: MPPlayableContentDelegate {
         if cache.isEmpty {
             if !item.src.isEmpty, let url = URL(string: item.src) {
                 //Try to stream the asset from its url..
-                MediaResourceManager.canStreamURL(url) { canStream in
+                MediaResourceManager.canStreamURL(url) { [weak self] canStream in
+                    guard let self = self else { return }
+                    
                     if canStream {
                         self.playerView?.seek(to: 0.0)
                         self.playerView?.load(url: url, resourceDelegate: nil)
@@ -177,6 +179,7 @@ extension PlaylistMediaInfo: MPPlayableContentDelegate {
                 }
             } else {
                 //Fallback to the webview because there was no stream URL somehow..
+                webLoader.removeFromSuperview()
                 webLoader = PlaylistWebLoader(handler: { [weak self] item in
                     guard let self = self else { return }
                     if let item = item, let url = URL(string: item.src) {
@@ -186,6 +189,7 @@ extension PlaylistMediaInfo: MPPlayableContentDelegate {
                         completion("Cannot Load Media")
                     }
                 })
+                self.playerView?.addSubview(webLoader)
                 
                 if let url = URL(string: item.pageSrc) {
                     webLoader.load(url: url)
