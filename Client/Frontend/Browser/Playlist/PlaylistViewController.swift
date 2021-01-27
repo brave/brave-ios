@@ -326,7 +326,8 @@ extension PlaylistViewController: UITableViewDelegate {
             let item = PlaylistInfo(item: playlistItems[indexPath.row])
             Playlist.shared.removeItem(item: item)
             
-            self.tableView.deleteRows(at: [indexPath], with: .fade)
+            //self.tableView.deleteRows(at: [indexPath], with: .fade)
+            self.tableView.reloadData()
 
             if self.currentItem == indexPath.row {
                 self.currentItem = -1
