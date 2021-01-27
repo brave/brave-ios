@@ -43,9 +43,6 @@ class BraveShieldStatsView: UIView, Themeable {
         
     }
     
-    fileprivate let millisecondsPerItem = 50
-    fileprivate let bytesPerItem = 30485
-    
     private lazy var adsStatView: StatView = {
         let statView = StatView(frame: CGRect.zero)
         statView.title = Strings.shieldsAdAndTrackerStats.capitalized
@@ -102,52 +99,8 @@ class BraveShieldStatsView: UIView, Themeable {
     
     @objc private func update() {
         adsStatView.stat = (BraveGlobalShieldStats.shared.adblock + BraveGlobalShieldStats.shared.trackingProtection).kFormattedNumber
-        dataSavedStatView.stat = dataSaved
-        timeStatView.stat = timeSaved
-    }
-    
-    var dataSaved: String {
-        let estimatedDataSavedInBytes = (BraveGlobalShieldStats.shared.adblock + BraveGlobalShieldStats.shared.trackingProtection) * bytesPerItem
-        
-        if estimatedDataSavedInBytes <= 0 { return "0" }
-        
-        let formatter = ByteCountFormatter().then {
-            $0.allowsNonnumericFormatting = false
-            // Skip bytes, because it displays as `bytes` instead of `B` which is too long for our shield stat.
-            // This is for extra safety only, there's not many sub 1000 bytes tracker scripts in the wild.
-            $0.allowedUnits = [.useKB, .useMB, .useGB, .useTB]
-        }
-        
-        return formatter.string(fromByteCount: Int64(estimatedDataSavedInBytes))
-    }
-    
-    var timeSaved: String {
-        let estimatedMillisecondsSaved = (BraveGlobalShieldStats.shared.adblock + BraveGlobalShieldStats.shared.trackingProtection) * millisecondsPerItem
-        let hours = estimatedMillisecondsSaved < 1000 * 60 * 60 * 24
-        let minutes = estimatedMillisecondsSaved < 1000 * 60 * 60
-        let seconds = estimatedMillisecondsSaved < 1000 * 60
-        var counter: Double = 0
-        var text = ""
-        
-        if seconds {
-            counter = ceil(Double(estimatedMillisecondsSaved / 1000))
-            text = Strings.shieldsTimeStatsSeconds
-        } else if minutes {
-            counter = ceil(Double(estimatedMillisecondsSaved / 1000 / 60))
-            text = Strings.shieldsTimeStatsMinutes
-        } else if hours {
-            counter = ceil(Double(estimatedMillisecondsSaved / 1000 / 60 / 60))
-            text = Strings.shieldsTimeStatsHour
-        } else {
-            counter = ceil(Double(estimatedMillisecondsSaved / 1000 / 60 / 60 / 24))
-            text = Strings.shieldsTimeStatsDays
-        }
-        
-        if let counterLocaleStr = Int(counter).decimalFormattedString {
-            return counterLocaleStr + text
-        } else {
-            return "0" + Strings.shieldsTimeStatsSeconds     // If decimalFormattedString returns nil, default to "0s"
-        }
+        dataSavedStatView.stat = BraveGlobalShieldStats.shared.dataSaved
+        timeStatView.stat = BraveGlobalShieldStats.shared.timeSaved
     }
 }
 
@@ -208,14 +161,5 @@ private class StatView: UIView {
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-}
-
-private extension Int {
-    var decimalFormattedString: String? {
-        let numberFormatter = NumberFormatter()
-        numberFormatter.numberStyle = NumberFormatter.Style.decimal
-        numberFormatter.locale = NSLocale.current
-        return numberFormatter.string(from: self as NSNumber)
     }
 }
