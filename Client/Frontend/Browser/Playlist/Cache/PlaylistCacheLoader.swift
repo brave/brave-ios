@@ -174,12 +174,65 @@ class PlaylistCacheLoader: NSObject, AVAssetResourceLoaderDelegate, URLSessionTa
     }
 }
 
-class PlaylistWebLoader: UIView, WKScriptMessageHandler, WKNavigationDelegate {
-    private let webView = BraveWebView(frame: .zero, configuration: WKWebViewConfiguration().then {
+class PlaylistWebLoader: UIView, WKNavigationDelegate {
+    private let tab = Tab(configuration: WKWebViewConfiguration().then {
         $0.processPool = WKProcessPool()
+        $0.preferences = WKPreferences()
+        $0.preferences.javaScriptCanOpenWindowsAutomatically = false
+        $0.allowsInlineMediaPlayback = true
+        $0.ignoresViewportScaleLimits = true
+        $0.mediaTypesRequiringUserActionForPlayback = []
+    }, type: .private).then {
+        $0.createWebview()
+        
+        $0.webView?.scrollView.layer.masksToBounds = true
+        $0.webView?.configuration.userContentController.removeAllUserScripts()
+        _ = UserScriptManager(
+            tab: $0,
+            isFingerprintingProtectionEnabled: false,
+            isCookieBlockingEnabled: false,
+            isU2FEnabled: false,
+            isPaymentRequestEnabled: false)
+    }
+    
+    private var handler: (PlaylistInfo?) -> Void
+    
+    init(handler: @escaping (PlaylistInfo?) -> Void) {
+        self.handler = handler
+        super.init(frame: .zero)
+
+        guard let webView = tab.webView else {
+            return
+        }
+        
+        self.addSubview(webView)
+        webView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+        
+        webView.navigationDelegate = self
+        
+        tab.addContentScript(ContextMenuHelper(tab: tab), name: ContextMenuHelper.name())
+        tab.addContentScript(ErrorPageHelper(), name: ErrorPageHelper.name())
+        tab.addContentScript(SessionRestoreHelper(tab: tab), name: SessionRestoreHelper.name())
+        tab.addContentScript(FindInPageHelper(tab: tab), name: FindInPageHelper.name())
+        tab.addContentScript(NoImageModeHelper(tab: tab), name: NoImageModeHelper.name())
+        tab.addContentScript(PrintHelper(tab: tab), name: PrintHelper.name())
+        tab.addContentScript(CustomSearchHelper(tab: tab), name: CustomSearchHelper.name())
+        tab.addContentScript(LocalRequestHelper(), name: LocalRequestHelper.name())
+        tab.contentBlocker.setupTabTrackingProtection()
+        tab.addContentScript(tab.contentBlocker, name: ContentBlockerHelper.name())
+        tab.addContentScript(FocusHelper(tab: tab), name: FocusHelper.name())
+        tab.addContentScript(FingerprintingProtection(tab: tab), name: FingerprintingProtection.name())
+        tab.addContentScript(BraveGetUA(tab: tab), name: BraveGetUA.name())
+        tab.addContentScript(U2FExtensions(tab: tab), name: U2FExtensions.name())
+        tab.addContentScript(ResourceDownloadManager(tab: tab), name: ResourceDownloadManager.name())
+        tab.addContentScript(WindowRenderHelperScript(tab: tab), name: WindowRenderHelperScript.name())
+        tab.addContentScript(PlaylistHelper(tab: tab), name: PlaylistHelper.name())
+        tab.addContentScript(PlaylistWebLoaderContentHelper(self), name: PlaylistWebLoaderContentHelper.name())
         
         let script: WKUserScript? = {
-            guard let path = Bundle.main.path(forResource: "Playlist", ofType: "js"), let source = try? String(contentsOfFile: path) else {
+            guard let path = Bundle.main.path(forResource: "PlaylistDetector", ofType: "js"), let source = try? String(contentsOfFile: path) else {
                 return nil
             }
             
@@ -191,23 +244,12 @@ class PlaylistWebLoader: UIView, WKScriptMessageHandler, WKNavigationDelegate {
         }()
         
         if let script = script {
-            $0.userContentController.addUserScript(script)
+            tab.webView?.configuration.userContentController.addUserScript(script)
         }
-    }, isPrivate: true)
+    }
     
-    private let handler: (PlaylistInfo?) -> Void
-    
-    init(handler: @escaping (PlaylistInfo?) -> Void) {
-        self.handler = handler
-        super.init(frame: .zero)
-        self.addSubview(webView)
-        webView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-        }
-        
-        webView.navigationDelegate = self
-        webView.configuration.mediaTypesRequiringUserActionForPlayback = []
-        webView.configuration.userContentController.add(self, name: "playlistManager")
+    deinit {
+        print("DIED")
     }
     
     required init?(coder: NSCoder) {
@@ -215,42 +257,63 @@ class PlaylistWebLoader: UIView, WKScriptMessageHandler, WKNavigationDelegate {
     }
     
     func load(url: URL) {
+        guard let webView = tab.webView else { return }
+        webView.frame = self.window?.bounds ?? .zero
         webView.load(URLRequest(url: url, cachePolicy: .reloadIgnoringCacheData, timeoutInterval: 60.0))
     }
     
-    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        do {
-            guard let item = try PlaylistInfo.from(message: message) else { return }
-            if !item.src.isEmpty {
-                handler(item)
-            }
-        } catch {
-            handler(nil)
-        }
-        
-        DispatchQueue.main.async {
-            self.webView.loadHTMLString("<html><body>PlayList</body></html>", baseURL: nil)
-            
-            let dataTypes = WKWebsiteDataStore.allWebsiteDataTypes()
-            self.webView.configuration.websiteDataStore.removeData(ofTypes: dataTypes,
-                                                              modifiedSince: Date.distantPast,
-                                                              completionHandler: {})
-        }
-    }
-    
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        let dataTypes = WKWebsiteDataStore.allWebsiteDataTypes()
-        webView.configuration.websiteDataStore.removeData(ofTypes: dataTypes,
-                                                          modifiedSince: Date.distantPast,
-                                                          completionHandler: {})
-        
+        clearData()
         handler(nil)
     }
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        let dataTypes = WKWebsiteDataStore.allWebsiteDataTypes()
-        webView.configuration.websiteDataStore.removeData(ofTypes: dataTypes,
-                                                          modifiedSince: Date.distantPast,
-                                                          completionHandler: {})
+        clearData()
+    }
+    
+    private func clearData() {
+        DispatchQueue.main.async { [weak self] in
+            //self?.tab.deleteWebView()
+        }
+    }
+    
+    private class PlaylistWebLoaderContentHelper: TabContentScript {
+        private weak var webLoader: PlaylistWebLoader?
+        
+        init(_ webLoader: PlaylistWebLoader) {
+            self.webLoader = webLoader
+        }
+        
+        static func name() -> String {
+            return "PlaylistWebLoader"
+        }
+        
+        func scriptMessageHandlerName() -> String? {
+            return "playlistCacheLoader"
+        }
+        
+        func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage) {
+            guard let item = PlaylistInfo.from(message: message) else {
+                webLoader?.handler(nil)
+                return
+            }
+            
+            //For now, we ignore base64 video mime-types loaded via the `data:` scheme.
+            if item.src.contains("data:") && item.src.contains(";base64") {
+                return
+            }
+            
+            if !item.src.isEmpty {
+                webLoader?.handler(item)
+            } else {
+                webLoader?.handler(nil)
+            }
+            
+            DispatchQueue.main.async {
+                //This line MAY cause problems..
+                self.webLoader?.tab.webView?.loadHTMLString("<html><body>PlayList</body></html>", baseURL: nil)
+                //self.webLoader?.tab.deleteWebView()
+            }
+        }
     }
 }
