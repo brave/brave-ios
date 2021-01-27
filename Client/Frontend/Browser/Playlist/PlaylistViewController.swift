@@ -242,7 +242,7 @@ extension PlaylistViewController: UITableViewDataSource {
         let imageGenerator = AVAssetImageGenerator(asset: asset)
         imageGenerator.appliesPreferredTrackTransform = false
 
-        let time = CMTimeMake(value: 2, timescale: 600)
+        let time = CMTimeMake(value: 0, timescale: 600)
 
         imageGenerator.generateCGImagesAsynchronously(forTimes: [NSValue(time: time)]) { _, cgImage, _, result, error in
             if result == .succeeded, let cgImage = cgImage {
@@ -330,21 +330,24 @@ extension PlaylistViewController: UITableViewDelegate {
             
             let item = PlaylistInfo(item: playlistItems[indexPath.row])
             Playlist.shared.removeItem(item: item)
-            
-            //self.tableView.deleteRows(at: [indexPath], with: .fade)
-            self.tableView.reloadData()
+            do {
+                try self.playlistFRC.performFetch()
+                self.tableView.deleteRows(at: [indexPath], with: .fade)
 
-            if self.currentItem == indexPath.row {
-                self.currentItem = -1
-                self.mediaInfo.updateNowPlayingMediaInfo()
-                //Playlist.shared.currentlyPlayingInfo.value = nil
+                if self.currentItem == indexPath.row {
+                    self.currentItem = -1
+                    self.mediaInfo.updateNowPlayingMediaInfo()
+                    //Playlist.shared.currentlyPlayingInfo.value = nil
+                    
+                    self.activityIndicator.stopAnimating()
+                    self.playerView.stop()
+                }
                 
-                self.activityIndicator.stopAnimating()
-                self.playerView.stop()
+                completionHandler(true)
+            } catch {
+                log.error(error)
+                self.tableView.reloadData()
             }
-            
-            completionHandler(true)
-            self.tableView.reloadData()
         })
 
         cacheAction.image = cache.isEmpty ? #imageLiteral(resourceName: "menu-downloads") : #imageLiteral(resourceName: "nowPlayingCheckmark")
@@ -372,6 +375,11 @@ extension PlaylistViewController: UITableViewDelegate {
                 if let error = error {
                     log.error(error)
                     self.displayLoadingResourceError()
+                } else if let url = URL(string: item.src) {
+                    self.previewImageFromVideo(url: url) { image in
+                        (tableView.cellForRow(at: indexPath) as? PlaylistCell)?.thumbnailImage = image
+                        tableView.reloadRows(at: [indexPath], with: .automatic)
+                    }
                 }
             }
         }

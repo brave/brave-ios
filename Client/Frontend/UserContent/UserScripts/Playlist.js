@@ -8,7 +8,7 @@ window.__firefox__.includeOnce("Playlist", function() {
                 name = document.title;
             }
             
-            if (target.src != "") {
+            if (target.src !== "") {
                 window.webkit.messageHandlers.playlistHelper.postMessage({
                                                                             "name": name,
                                                                             "src": target.src,
@@ -20,26 +20,28 @@ window.__firefox__.includeOnce("Playlist", function() {
             }
             else {
                 document.querySelectorAll('source').forEach(function(node) {
-                    if (node.closest('video') === target) {
-                        window.webkit.messageHandlers.playlistHelper.postMessage({
-                                                                                    "name": name,
-                                                                                    "src": target.src,
-                                                                                    "pageSrc": window.location.href,
-                                                                                    "pageTitle": document.title,
-                                                                                    "mimeType": type,
-                                                                                    "duration": target.duration !== target.duration ? 0.0 : target.duration
-                                                                                    });
-                    }
-                    
-                    if (node.closest('audio') === target) {
-                        window.webkit.messageHandlers.playlistHelper.postMessage({
-                                                                                    "name": name,
-                                                                                    "src": target.src,
-                                                                                    "pageSrc": window.location.href,
-                                                                                    "pageTitle": document.title,
-                                                                                    "mimeType": type,
-                                                                                    "duration": target.duration !== target.duration ? 0.0 : target.duration
-                                                                                    });
+                    if (node.src !== "") {
+                        if (node.closest('video') === target) {
+                            window.webkit.messageHandlers.playlistHelper.postMessage({
+                                                                                        "name": name,
+                                                                                        "src": node.src,
+                                                                                        "pageSrc": window.location.href,
+                                                                                        "pageTitle": document.title,
+                                                                                        "mimeType": type,
+                                                                                        "duration": target.duration !== target.duration ? 0.0 : target.duration
+                                                                                        });
+                        }
+                        
+                        if (node.closest('audio') === target) {
+                            window.webkit.messageHandlers.playlistHelper.postMessage({
+                                                                                        "name": name,
+                                                                                        "src": node.src,
+                                                                                        "pageSrc": window.location.href,
+                                                                                        "pageTitle": document.title,
+                                                                                        "mimeType": type,
+                                                                                        "duration": target.duration !== target.duration ? 0.0 : target.duration
+                                                                                        });
+                        }
                     }
                 });
             }
