@@ -756,6 +756,7 @@
 		5EC2C07325BF988E005EA984 /* PlaylistCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EC2C07225BF988E005EA984 /* PlaylistCell.swift */; };
 		5EC2C08725BF9B13005EA984 /* PlaylistCurrentPlayingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EC2C08625BF9B13005EA984 /* PlaylistCurrentPlayingView.swift */; };
 		5EC2C09225BF9B82005EA984 /* PlaylistFilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EC2C09125BF9B82005EA984 /* PlaylistFilterView.swift */; };
+		5EC2C0E525C0B321005EA984 /* PlaylistDetector.js in Resources */ = {isa = PBXBuildFile; fileRef = 5EC2C0E425C0B321005EA984 /* PlaylistDetector.js */; };
 		5EC594ED232C2C8F00922111 /* OnboardingWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EC594EC232C2C8F00922111 /* OnboardingWebViewController.swift */; };
 		5EE4CF452540829D00BC4509 /* BookmarksInterstitial.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EE4CF442540829D00BC4509 /* BookmarksInterstitial.swift */; };
 		5EE4CF5B2540868E00BC4509 /* Bookmarks.html in Resources */ = {isa = PBXBuildFile; fileRef = 5EE4CF5A2540868E00BC4509 /* Bookmarks.html */; };
@@ -2427,6 +2428,7 @@
 		5EC2C07225BF988E005EA984 /* PlaylistCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistCell.swift; sourceTree = "<group>"; };
 		5EC2C08625BF9B13005EA984 /* PlaylistCurrentPlayingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistCurrentPlayingView.swift; sourceTree = "<group>"; };
 		5EC2C09125BF9B82005EA984 /* PlaylistFilterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistFilterView.swift; sourceTree = "<group>"; };
+		5EC2C0E425C0B321005EA984 /* PlaylistDetector.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = PlaylistDetector.js; sourceTree = "<group>"; };
 		5EC594EC232C2C8F00922111 /* OnboardingWebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingWebViewController.swift; sourceTree = "<group>"; };
 		5EE4CF442540829D00BC4509 /* BookmarksInterstitial.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksInterstitial.swift; sourceTree = "<group>"; };
 		5EE4CF5A2540868E00BC4509 /* Bookmarks.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = Bookmarks.html; sourceTree = "<group>"; };
@@ -4794,6 +4796,7 @@
 				5E4E078224A0E4D700B01720 /* YoutubeAdblock.js */,
 				0A64384D24FD4E43000E80A3 /* ArchiveIsCompat.js */,
 				5E5E6F2825BB61320035B6A0 /* Playlist.js */,
+				5EC2C0E425C0B321005EA984 /* PlaylistDetector.js */,
 			);
 			path = UserScripts;
 			sourceTree = "<group>";
@@ -6364,6 +6367,7 @@
 				E4CD9F5B1A71506C00318571 /* Reader.css in Resources */,
 				27658273217130D900754B2F /* DigiCertHighAssurance.cer in Resources */,
 				E4B7B7611A793CF20022C5E0 /* CharisSILB.ttf in Resources */,
+				5EC2C0E525C0B321005EA984 /* PlaylistDetector.js in Resources */,
 				0AB22A96257EADA900126ADC /* sora-sagano.jpg in Resources */,
 				0AB22A89257EADA900126ADC /* dylan-malval_alps.jpg in Resources */,
 				0AB22A92257EADA900126ADC /* spencer-moore_desert.jpg in Resources */,
