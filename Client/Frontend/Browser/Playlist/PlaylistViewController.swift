@@ -197,7 +197,9 @@ extension PlaylistViewController: UITableViewDataSource {
         }
         
         if let url = URL(string: mediaSrc) {
-            cell.thumbnailImage = previewImageFromVideo(url: url)
+            previewImageFromVideo(url: url) {
+                cell.thumbnailImage = $0
+            }
         }
         
         if indexPath.row == currentItem {
@@ -221,44 +223,47 @@ extension PlaylistViewController: UITableViewDataSource {
         }*/
     }
     
-    private func previewImageFromVideo(url: URL) -> UIImage? {
+    private func previewImageFromVideo(url: URL, _ completion: @escaping (UIImage?) -> Void) {
         let request = URLRequest(url: url)
         let cache = URLCache.shared
         let imageCache = SDImageCache.shared()
 
         if let cachedImage = imageCache.imageFromCache(forKey: url.absoluteString) {
-            return cachedImage
+            completion(cachedImage)
+            return
         }
 
         if let cachedResponse = cache.cachedResponse(for: request), let image = UIImage(data: cachedResponse.data) {
-            return image
+            completion(image)
+            return
         }
 
         let asset = AVAsset(url: url)
         let imageGenerator = AVAssetImageGenerator(asset: asset)
-        imageGenerator.appliesPreferredTrackTransform = true
+        imageGenerator.appliesPreferredTrackTransform = false
 
-        var time = asset.duration
-        time.value = min(time.value, 2)
+        let time = CMTimeMake(value: 2, timescale: 600)
 
-        var image: UIImage?
-
-        do {
-            let cgImage = try imageGenerator.copyCGImage(at: time, actualTime: nil)
-            image = UIImage(cgImage: cgImage)
-        } catch {
-            log.error(error)
+        imageGenerator.generateCGImagesAsynchronously(forTimes: [NSValue(time: time)]) { _, cgImage, _, result, error in
+            if result == .succeeded, let cgImage = cgImage {
+                let image = UIImage(cgImage: cgImage)
+                if let data = image.pngData(),
+                   let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil) {
+                    let cachedResponse = CachedURLResponse(response: response, data: data)
+                    cache.storeCachedResponse(cachedResponse, for: request)
+                    imageCache.store(image, forKey: url.absoluteString, completion: nil)
+                }
+                
+                DispatchQueue.main.async {
+                    completion(image)
+                }
+            } else {
+                log.error(error)
+                DispatchQueue.main.async {
+                    completion(nil)
+                }
+            }
         }
-
-        if let image = image, let data = image.pngData(),
-           let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil) {
-            let cachedResponse = CachedURLResponse(response: response, data: data)
-            cache.storeCachedResponse(cachedResponse, for: request)
-            
-            imageCache.store(image, forKey: url.absoluteString, completion: nil)
-        }
-        
-        return image
     }
 }
 
