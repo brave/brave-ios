@@ -3559,13 +3559,7 @@ extension BrowserViewController: UNUserNotificationCenterDelegate {
 }
 
 extension BrowserViewController: PlaylistHelperDelegate {
-    func present(alertController: UIAlertController) {
-        if UIDevice.current.userInterfaceIdiom == .pad, let popoverController = alertController.popoverPresentationController {
-            popoverController.sourceView = view
-            popoverController.sourceRect = CGRect(x: view.bounds.midX, y: view.bounds.midY, width: 0, height: 0)
-            popoverController.permittedArrowDirections = [.up]
-        }
-        
-        present(alertController, animated: true)
+    func present(controller: UIViewController) {
+        present(controller, animated: true)
     }
 }
