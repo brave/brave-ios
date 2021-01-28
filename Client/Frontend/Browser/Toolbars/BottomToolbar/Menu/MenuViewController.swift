@@ -360,7 +360,7 @@ class MenuViewController: UITableViewController {
         let currentTheme = Theme.of(bvc.tabManager.selectedTab)
         //vc.applyTheme(currentTheme)
         
-        open(vc, doneButton: DoneButton(style: .done, position: .right), alwaysFullScreen: true)
+        open(vc, doneButton: DoneButton(style: .done, position: .right), alwaysFullScreen: UIDevice.current.userInterfaceIdiom == .pad)
     }
     
     private func openAddBookmark() {
