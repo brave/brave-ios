@@ -106,7 +106,7 @@ class PlaylistViewController: UIViewController {
               
         tableView.do {
             $0.register(PlaylistCell.self, forCellReuseIdentifier: Constants.playListCellIdentifier)
-            $0.register(PlaylistFilterView.self, forHeaderFooterViewReuseIdentifier: Constants.playListFilterHeaderIdentifier)
+//            $0.register(PlaylistFilterView.self, forHeaderFooterViewReuseIdentifier: Constants.playListFilterHeaderIdentifier)
             $0.dataSource = self
             $0.delegate = self
         }
@@ -212,12 +212,13 @@ extension PlaylistViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        guard let headerView = tableView.dequeueReusableHeaderFooterView(
-                      withIdentifier: Constants.playListFilterHeaderIdentifier) as? PlaylistFilterView else {
-                  return UITableViewHeaderFooterView()
-        }
-        
-        return headerView
+//        guard let headerView = tableView.dequeueReusableHeaderFooterView(
+//                      withIdentifier: Constants.playListFilterHeaderIdentifier) as? PlaylistFilterView else {
+//                  return UITableViewHeaderFooterView()
+//        }
+//
+//        return headerView
+        return PlaylistFilterView()
     }
     
     private func previewImageFromVideo(url: URL, _ completion: @escaping (UIImage?) -> Void) {
