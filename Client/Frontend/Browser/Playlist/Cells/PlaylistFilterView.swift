@@ -8,7 +8,7 @@ import UIKit
 import BraveShared
 import Shared
 
-class PlaylistFilterView: UITableViewHeaderFooterView {
+class PlaylistFilterView: UIView {
     
     private let filterButton = UIButton().then {
         $0.setTitle(Strings.PlayList.listFilterActionTitle, for: .normal)
@@ -23,12 +23,13 @@ class PlaylistFilterView: UITableViewHeaderFooterView {
         $0.font = .systemFont(ofSize: 13.0, weight: .medium)
     }
     
-    override init(reuseIdentifier: String?) {
-         super.init(reuseIdentifier: reuseIdentifier)
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+    
 
         preservesSuperviewLayoutMargins = false
         
-        backgroundColor = .clear
+        //backgroundColor = .clear
         
         addSubview(filterButton)
         addSubview(titleLabel)
