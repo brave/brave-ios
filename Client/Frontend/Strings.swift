@@ -177,6 +177,12 @@ extension Strings {
     public static let contextMenuButtonToastNewTabOpenedButtonText = NSLocalizedString("ContextMenuButtonToastNewTabOpenedButtonText", bundle: Bundle.shared, value: "Switch", comment: "The button text in the Button Toast for switching to a fresh New Tab.")
 }
 
+// Autopopulate credentials toast
+extension Strings {
+    public static let autoPopulateCredentialsToastLabelText = NSLocalizedString("autoPopulateCredentialsToastLabelText", bundle: Bundle.shared, value: "Saved credentials found for this site", comment: "The label text in the toast for auto populating credentials.")
+    public static let autoPopulateCredentialsToastButtonText = NSLocalizedString("autoPopulateCredentialsToastButtonText", bundle: Bundle.shared, value: "Fill", comment: "The button text in the toast for filling login credentials.")
+}
+
 // Reader Mode.
 extension Strings {
     public static let readerModeAvailableVoiceOverAnnouncement = NSLocalizedString("ReaderModeAvailableVoiceOverAnnouncement", bundle: Bundle.shared, value: "Reader Mode available", comment: "Accessibility message e.g. spoken by VoiceOver when Reader Mode becomes available.")

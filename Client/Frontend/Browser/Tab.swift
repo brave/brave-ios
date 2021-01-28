@@ -22,6 +22,7 @@ protocol TabContentScript {
 
 @objc
 protocol TabDelegate {
+    func tab(_ tab: Tab, shouldShowToast toast: Toast)
     func tab(_ tab: Tab, didAddSnackbar bar: SnackBar)
     func tab(_ tab: Tab, didRemoveSnackbar bar: SnackBar)
     func tab(_ tab: Tab, didSelectFindInPageForSelection selection: String)
