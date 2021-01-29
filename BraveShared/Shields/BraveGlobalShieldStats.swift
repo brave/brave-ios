@@ -130,7 +130,7 @@ open class BraveGlobalShieldStats {
     }
 }
 
-private extension Int {
+fileprivate extension Int {
     var decimalFormattedString: String? {
         let numberFormatter = NumberFormatter()
         numberFormatter.numberStyle = NumberFormatter.Style.decimal

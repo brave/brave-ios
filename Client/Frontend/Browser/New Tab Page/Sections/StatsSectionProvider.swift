@@ -210,3 +210,12 @@ private class StatView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 }
+
+fileprivate extension Int {
+    var decimalFormattedString: String? {
+        let numberFormatter = NumberFormatter()
+        numberFormatter.numberStyle = NumberFormatter.Style.decimal
+        numberFormatter.locale = NSLocale.current
+        return numberFormatter.string(from: self as NSNumber)
+    }
+}
