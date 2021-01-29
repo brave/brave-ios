@@ -11,8 +11,13 @@ import Shared
 
 private let log = Logger.browserLogger
 
+protocol PlaylistHelperDelegate: NSObject {
+    func present(controller: UIViewController)
+}
+
 class PlaylistHelper: TabContentScript {
     fileprivate weak var tab: Tab?
+    public weak var delegate: PlaylistHelperDelegate?
     
     init(tab: Tab) {
         self.tab = tab
@@ -32,18 +37,23 @@ class PlaylistHelper: TabContentScript {
         
         log.debug("FOUND VIDEO ITEM ON PAGE: \(message.body)")
         
-//        if Playlist.shared.itemExists(item: item) {
-//            //Update playlist existing items..
-//            if !item.src.isEmpty {
-//                Playlist.shared.updateItem(mediaSrc: item.src, item: item) {
-//                    log.debug("Playlist Item Updated")
-//                }
-//            }
-//        } else {
-//            //Update playlist with new items..
-//            Playlist.shared.addItem(item: item, cachedData: nil) {
-//                log.debug("Playlist Item Added")
-//            }
-//        }
+        let alert = UIAlertController(title: "Add to Playlist", message: "Would you like to add this video to your playlist?", preferredStyle: .actionSheet)
+        alert.addAction(UIAlertAction(title: "Add to Playlist", style: .default, handler: { _ in
+            if Playlist.shared.itemExists(item: item) {
+                //Update playlist existing items..
+                if !item.src.isEmpty {
+                    Playlist.shared.updateItem(mediaSrc: item.src, item: item) {
+                        log.debug("Playlist Item Updated")
+                    }
+                }
+            } else {
+                //Update playlist with new items..
+                Playlist.shared.addItem(item: item, cachedData: nil) {
+                    log.debug("Playlist Item Added")
+                }
+            }
+        }))
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        self.delegate?.present(controller: alert)
     }
 }
