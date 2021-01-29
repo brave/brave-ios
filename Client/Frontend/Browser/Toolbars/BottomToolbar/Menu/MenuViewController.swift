@@ -103,7 +103,6 @@ class MenuViewController: UITableViewController {
         
         var title: String {
             switch self {
-            // This string should not be translated.
             case .vpn: return "Brave VPN"
             case .bookmarks: return Strings.bookmarksMenuItem
             case .history: return Strings.historyMenuItem
@@ -319,19 +318,49 @@ class MenuViewController: UITableViewController {
     
     private func openVPNAction(menuCell: MenuCell) {
         let enabled = !menuCell.toggleButton.isOn
+        let vpnState = BraveVPN.vpnState
+        
         /// Connecting to the vpn takes a while, that's why we have to show a spinner until it finishes.
         if enabled {
             menuCell.isLoading = true
         }
-        bvc.navigationHelper.toggleVPN()
+        
+        if !VPNProductInfo.isComplete {
+            let alert =
+                UIAlertController(title: Strings.VPN.errorCantGetPricesTitle,
+                                  message: Strings.VPN.errorCantGetPricesBody,
+                                  preferredStyle: .alert)
+            alert.addAction(.init(title: Strings.OKString, style: .default))
+            dismissView()
+            bvc.present(alert, animated: true)
+            // Reattempt to connect to the App Store to get VPN prices.
+            bvc.vpnProductInfo.load()
+            return
+        }
+        
+        switch BraveVPN.vpnState {
+        case .notPurchased, .purchased, .expired:
+            guard let vc = vpnState.enableVPNDestinationVC else { return }
+            open(vc, doneButton: DoneButton(style: .cancel, position: .left), allowSwipeToDismiss: true)
+        case .installed:
+            // Do not modify UISwitch state here, update it based on vpn status observer.
+            enabled ? BraveVPN.reconnect() : BraveVPN.disconnect()
+        }
     }
     
     private func openBookmarks() {
-        bvc.navigationHelper.openBookmarks()
+        let vc = BookmarksViewController(folder: Bookmarkv2.lastVisitedFolder(), isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing)
+        vc.toolbarUrlActionsDelegate = bvc
+        
+        open(vc, doneButton: DoneButton(style: .done, position: .right))
     }
     
     private func openDownloads() {
-        bvc.navigationHelper.openDownloads()
+        let vc = DownloadsPanel(profile: bvc.profile)
+        let currentTheme = Theme.of(bvc.tabManager.selectedTab)
+        vc.applyTheme(currentTheme)
+        
+        open(vc, doneButton: DoneButton(style: .done, position: .right))
     }
     
     private func openPlaylist() {
@@ -353,15 +382,26 @@ class MenuViewController: UITableViewController {
     }
     
     private func openHistory() {
-        bvc.navigationHelper.openHistory()
+        let vc = HistoryViewController(isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing)
+        vc.toolbarUrlActionsDelegate = bvc
+        
+        open(vc, doneButton: DoneButton(style: .done, position: .right))
     }
     
     private func openSettings() {
-        bvc.navigationHelper.openSettings()
+        let vc = SettingsViewController(profile: bvc.profile, tabManager: bvc.tabManager, feedDataSource: bvc.feedDataSource, rewards: bvc.rewards, legacyWallet: bvc.legacyWallet)
+        vc.settingsDelegate = bvc
+        open(vc, doneButton: DoneButton(style: .done, position: .right),
+             allowSwipeToDismiss: false)
     }
     
     private func openShareSheet() {
-        bvc.navigationHelper.openShareSheet()
+        dismissView()
+        bvc.tabToolbarDidPressShare()
+    }
+    
+    @objc func dismissView() {
+        dismiss(animated: true)
     }
     
     @objc func vpnConfigChanged() {
