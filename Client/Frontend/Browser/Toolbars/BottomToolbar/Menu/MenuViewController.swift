@@ -99,7 +99,7 @@ class MenuViewController: UITableViewController {
     }
     
     private enum MenuButtons: Int, CaseIterable {
-        case vpn, settings, history, bookmarks, downloads, add, share
+        case vpn, settings, history, bookmarks, downloads, add, share, playlist
         
         var title: String {
             switch self {
@@ -111,6 +111,7 @@ class MenuViewController: UITableViewController {
             case .add: return Strings.addToMenuItem
             case .share: return Strings.shareWithMenuItem
             case .downloads: return Strings.downloadsMenuItem
+            case .playlist: return Strings.playlistMenuItem
             }
         }
         
@@ -123,6 +124,7 @@ class MenuViewController: UITableViewController {
             case .add: return #imageLiteral(resourceName: "menu-add-bookmark").template
             case .share: return #imageLiteral(resourceName: "nav-share").template
             case .downloads: return #imageLiteral(resourceName: "menu-downloads").template
+            case .playlist: return #imageLiteral(resourceName: "playlist_menu").template
             }
         }
     }
@@ -219,6 +221,7 @@ class MenuViewController: UITableViewController {
         case .add: openAddBookmark()
         case .share: openShareSheet()
         case .downloads: openDownloads()
+        case .playlist: openPlaylist()
         }
     }
     
@@ -278,6 +281,42 @@ class MenuViewController: UITableViewController {
     
     // MARK: - Actions
     
+    private enum DoneButtonPosition { case left, right }
+    private typealias DoneButton = (style: UIBarButtonItem.SystemItem, position: DoneButtonPosition)
+    
+    private func open(_ viewController: UIViewController, doneButton: DoneButton,
+                      allowSwipeToDismiss: Bool = true, alwaysFullScreen: Bool = false) {
+        let nav = SettingsNavigationController(rootViewController: viewController)
+        
+        // All menu views should be opened in portrait on iPhones.
+        UIDevice.current.forcePortraitIfIphone(for: UIApplication.shared)
+
+        if alwaysFullScreen {
+            nav.modalPresentationStyle = .fullScreen
+        } else {
+            if #available(iOS 13.0, *) {
+                nav.isModalInPresentation = !allowSwipeToDismiss
+
+                nav.modalPresentationStyle =
+                    UIDevice.current.userInterfaceIdiom == .phone ? .pageSheet : .formSheet
+            } else {
+                nav.modalPresentationStyle =
+                    UIDevice.current.userInterfaceIdiom == .phone ? .fullScreen : .formSheet
+            }
+        }
+        
+        
+        let button = UIBarButtonItem(barButtonSystemItem: doneButton.style, target: nav, action: #selector(nav.done))
+        
+        switch doneButton.position {
+        case .left: nav.navigationBar.topItem?.leftBarButtonItem = button
+        case .right: nav.navigationBar.topItem?.rightBarButtonItem = button
+        }
+        
+        dismissView()
+        bvc.present(nav, animated: true)
+    }
+    
     private func openVPNAction(menuCell: MenuCell) {
         let enabled = !menuCell.toggleButton.isOn
         /// Connecting to the vpn takes a while, that's why we have to show a spinner until it finishes.
@@ -295,8 +334,22 @@ class MenuViewController: UITableViewController {
         bvc.navigationHelper.openDownloads()
     }
     
+    private func openPlaylist() {
+        let vc = PlaylistViewController()
+        let currentTheme = Theme.of(bvc.tabManager.selectedTab)
+        //vc.applyTheme(currentTheme)
+        
+        open(vc, doneButton: DoneButton(style: .done, position: .right), alwaysFullScreen: UIDevice.current.userInterfaceIdiom == .pad)
+    }
+    
     private func openAddBookmark() {
-        bvc.navigationHelper.openAddBookmark()
+        guard let title = tab?.displayTitle, let url = tab?.url else { return }
+        
+        let bookmarkUrl = url.decodeReaderModeURL ?? url
+        let mode = BookmarkEditMode.addBookmark(title: title, url: bookmarkUrl.absoluteString)
+        let vc = AddEditBookmarkTableViewController(mode: mode)
+        
+        open(vc, doneButton: DoneButton(style: .cancel, position: .left))
     }
     
     private func openHistory() {

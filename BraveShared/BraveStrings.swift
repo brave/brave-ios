@@ -635,6 +635,7 @@ extension Strings {
     public static let openExternalAppURLDontAllow = NSLocalizedString("ExternalAppURLDontAllow", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Don't Allow", comment: "Don't allow Brave to open the external app URL")
     public static let downloadsMenuItem = NSLocalizedString("DownloadsMenuItem", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Downloads", comment: "Title for downloads menu item")
     public static let downloadsPanelEmptyStateTitle = NSLocalizedString("DownloadsPanelEmptyStateTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Downloaded files will show up here.", comment: "Title for when a user has nothing downloaded onto their device, and the list is empty.")
+    public static let playlistMenuItem = NSLocalizedString("PlaylistMenuItem", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Media Player", comment: "Playlist menu item")
     
     // MARK: - Themes
     
@@ -937,6 +938,78 @@ extension Strings {
                               bundle: .braveShared,
                               value: "Congratulations. You are legendary.",
                               comment: "Subtitle for tracker benchmark Share")
+    }
+}
+
+// MARK: PlayList
+
+extension Strings {
+    public struct PlayList {
+        public static let playListSectionTitle =
+            NSLocalizedString("playList.playListSectionTitle",
+                              bundle: .braveShared,
+                              value: "Playlist",
+                              comment: "Title For the Section that videos are listed")
+        
+        public static let clearActionButtonTitle =
+            NSLocalizedString("playList.clearActionButtonTitle",
+                              bundle: .braveShared,
+                              value: "Clear",
+                              comment: "Title for swipe action Title for clearing")
+        
+        public static let removeActionButtonTitle =
+            NSLocalizedString("playList.removeActionButtonTitle",
+                              bundle: .braveShared,
+                              value: "Remove",
+                              comment: "Title for swipe action Title for removing")
+        
+        public static let noticeAlertTitle =
+            NSLocalizedString("playList.noticeAlertTitle",
+                              bundle: .braveShared,
+                              value: "Notice",
+                              comment: "Title for download video error alert")
+        
+        public static let downloadErrorAlertDescription =
+            NSLocalizedString("playList.downloadErrorAlertDescription",
+                              bundle: .braveShared,
+                              value: "Sorry, there was a problem downloading that item",
+                              comment: "Description for download video error alert")
+        
+        public static let okayButtonTitle =
+            NSLocalizedString("playList.okayButtonTitle",
+                              bundle: .braveShared,
+                              value: "Okay",
+                              comment: "Okay Alert button title")
+        
+        public static let sorryAlertTitle =
+            NSLocalizedString("playList.sorryAlertTitle",
+                              bundle: .braveShared,
+                              value: "Sorry",
+                              comment: "Title for load resources error alert")
+        
+        public static let loadResourcesErrorAlertDescription =
+            NSLocalizedString("playList.loadResourcesErrorAlertDescription",
+                              bundle: .braveShared,
+                              value: "There was a problem loading the resource!",
+                              comment: "Description for load resources error alert")
+        
+        public static let listFilterActionTitle =
+            NSLocalizedString("playList.listFilterActionTitle",
+                              bundle: .braveShared,
+                              value: "Filter By…",
+                              comment: "Description for load resources error alert")
+        
+        public static let addToPlayListAlertTitle =
+            NSLocalizedString("playList.addToPlayListAlertTitle",
+                              bundle: .braveShared,
+                              value: "Add to Playlist",
+                              comment: "Alert Title for adding videos to playlist")
+        
+        public static let addToPlayListAlertDescription =
+            NSLocalizedString("playList.addToPlayListAlertDescription",
+                              bundle: .braveShared,
+                              value: "Would you like to add this video to your playlist?",
+                              comment: "Alert Description for adding videos to playlist")
     }
 }
 
