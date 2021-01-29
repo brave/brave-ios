@@ -43,3 +43,12 @@ jobs:
         run: |
           set -o pipefail
           fastlane ios test
+      - name: Archive build folder for artifacts
+        if: failure()
+        run: tar -zcf build_folder_artifacts.tar.gz ./build
+      - name: Store build folder artifacts
+        if: failure()
+        uses: actions/upload-artifact@v1
+        with:
+          name: <proj name here>-build-artifacts
+          path: build_folder_artifacts.tar.gz
