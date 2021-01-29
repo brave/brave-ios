@@ -43,26 +43,25 @@ class PlaylistViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
     
-        self.title = "Playlist"
+        self.title = "Media Player"
         navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
         UILabel.appearance(whenContainedInInstancesOf: [UINavigationBar.self]).appearanceTextColor = .white
         
         navigationController?.presentationController?.delegate = self
         navigationController?.navigationBar.tintColor = .white
         navigationController?.navigationBar.isTranslucent = false
-        navigationController?.navigationBar.barTintColor = #colorLiteral(red: 0.231372549, green: 0.2431372549, blue: 0.3137254902, alpha: 1)
-        navigationController?.navigationBar.appearanceBarTintColor = #colorLiteral(red: 0.231372549, green: 0.2431372549, blue: 0.3137254902, alpha: 1)
+        navigationController?.navigationBar.barTintColor = BraveUX.popoverDarkBackground
+        navigationController?.navigationBar.appearanceBarTintColor = BraveUX.popoverDarkBackground
         navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
         navigationController?.navigationBar.shadowImage = UIImage()
+
+        navigationItem.rightBarButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "playlist_exit"), style: .done, target: self, action: #selector(onExit(_:)))
         
-        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Clear All", style: .plain, target: self, action: #selector(onClearAll(_:)))
-        navigationItem.rightBarButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "close_popup"), style: .done, target: self, action: #selector(onExit(_:)))
-        
-        view.backgroundColor = #colorLiteral(red: 0.231372549, green: 0.2431372549, blue: 0.3137254902, alpha: 1)
+        view.backgroundColor = BraveUX.popoverDarkBackground
         
         tableView.backgroundView = UIView()
-        tableView.backgroundColor = #colorLiteral(red: 0.231372549, green: 0.2431372549, blue: 0.3137254902, alpha: 1)
-        tableView.appearanceBackgroundColor = #colorLiteral(red: 0.231372549, green: 0.2431372549, blue: 0.3137254902, alpha: 1)
+        tableView.backgroundColor = BraveUX.popoverDarkBackground
+        tableView.appearanceBackgroundColor = BraveUX.popoverDarkBackground
         tableView.separatorColor = .clear
         tableView.appearanceSeparatorColor = .clear
         
@@ -91,30 +90,12 @@ class PlaylistViewController: UIViewController {
         //tableView.contentInsetAdjustmentBehavior = .never
         tableView.contentInset = UIEdgeInsets(top: 0.60 * view.bounds.width, left: 0.0, bottom: 0.0, right: 0.0)
         tableView.contentOffset = CGPoint(x: 0.0, y: -0.60 * view.bounds.width)
+        playerView.delegate = self
         
         DispatchQueue.main.async {
             try? self.playlistFRC.performFetch()
+            self.tableView.reloadData()
         }
-    }
-    
-    @objc
-    private func onAddItem(_ button: UIButton) {
-        
-    }
-    
-    @objc
-    private func onClearAll(_ button: UIBarButtonItem) {
-//        let alert = UIAlertController(title: "Warning", message: "Are you sure you want to remove all items from your playlist?", preferredStyle: .alert)
-//        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-//        alert.addAction(UIAlertAction(title: "Okay", style: .default, handler: { _ in
-//            self.playlistItems = []
-//            Playlist.shared.removeAll()
-//            Playlist.shared.currentlyPlayingInfo.value = nil
-//            self.tabManager.allTabs.forEach({ $0.playlistItems.refresh() })
-//            self.dismiss(animated: true, completion: nil)
-//        }))
-//
-//        self.present(alert, animated: true, completion: nil)
     }
     
     @objc
@@ -139,14 +120,11 @@ extension PlaylistViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 50.0
+        return 70.0
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        if currentItem != -1 {
-            return 50.0
-        }
-        return .leastNormalMagnitude
+        return 70.0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -154,46 +132,46 @@ extension PlaylistViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         
-        guard let item = self.playlistFRC.fetchedObjects?[safe: indexPath.row],
-              let pageSrc = item.pageSrc else {
+        let item = self.playlistFRC.object(at: indexPath)
+        guard let mediaSrc = item.mediaSrc else {
             return UITableViewCell()
         }
         
         cell.selectionStyle = .none
-        cell.indicatorIcon.image = #imageLiteral(resourceName: "videoThumbSlider").template
-        cell.indicatorIcon.tintColor = #colorLiteral(red: 0, green: 0.6666666667, blue: 1, alpha: 1)
-        cell.thumbnailView.image = #imageLiteral(resourceName: "menu-NoImageMode")
+        cell.indicatorIcon.image = #imageLiteral(resourceName: "playlist_currentitem_indicator").template
+        cell.indicatorIcon.alpha = 0.0
         cell.titleLabel.text = item.name
-        cell.detailLabel.text = URL(string: pageSrc)?.baseDomain ?? pageSrc //String(format: "%.2f mins", item.duration / 60.0)
+        cell.detailLabel.text = String(format: "%.2fm", item.duration / 60.0)
         cell.contentView.backgroundColor = .clear
         cell.backgroundColor = .clear
         
-        if let url = URL(string: pageSrc) {
-            cell.thumbnailView.loadFavicon(for: url)
+        if let url = URL(string: mediaSrc) {
+            AVAsset(url: url).generateThumbnail { image in
+                cell.thumbnailImage = image ?? #imageLiteral(resourceName: "menu-NoImageMode")
+            }
+        } else {
+            cell.thumbnailImage = #imageLiteral(resourceName: "menu-NoImageMode")
         }
         
         if indexPath.row == currentItem {
-            cell.indicatorIcon.image = #imageLiteral(resourceName: "videoPlayingIndicator")
-            cell.indicatorIcon.tintColor = .clear
+            cell.indicatorIcon.image = #imageLiteral(resourceName: "playlist_currentitem_indicator")
+            cell.indicatorIcon.alpha = 1.0
         }
         
         return cell
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        return nil
-//        return PlaylistItemPlayingView().then {
-//            if let item = self.itemToBeAdded {
-//                $0.titleLabel.text = item.name
-//                $0.detailLabel.text = URL(string: item.pageSrc)?.baseDomain
-//                $0.addButton.isHidden = false
-//            } else if currentItem != -1 && currentItem < playlistItems.count {
-//                $0.titleLabel.text = playlistItems[currentItem].name
-//                $0.detailLabel.text = URL(string: playlistItems[currentItem].pageSrc)?.baseDomain
-//                $0.addButton.isHidden = true
-//            }
-//            $0.addButton.addTarget(self, action: #selector(onAddItem(_:)), for: .touchUpInside)
-//        }
+        return PlaylistFilterView()/*.then {
+            if let playlistItems = self.playlistFRC.fetchedObjects {
+                if currentItem != -1 && currentItem < playlistItems.count {
+                    $0.titleLabel.text = playlistItems[currentItem].name
+                    $0.detailLabel.text = URL(string: playlistItems[currentItem].pageSrc!)?.baseDomain
+                    $0.addButton.isHidden = true
+                }
+                $0.addButton.addTarget(self, action: #selector(onAddItem(_:)), for: .touchUpInside)
+            }
+        }*/
     }
 }
 
@@ -304,180 +282,67 @@ extension PlaylistViewController: UITableViewDelegate {
     }
 }
 
-private class PlaylistItemPlayingView: UIView {
-    
-    public let titleLabel = UILabel().then {
-        $0.textColor = .white
-        $0.appearanceTextColor = .white
-        $0.font = .systemFont(ofSize: 14.0, weight: .medium)
-    }
-    
-    public let detailLabel = UILabel().then {
-        $0.textColor = #colorLiteral(red: 0.5176470588, green: 0.5411764706, blue: 0.568627451, alpha: 1)
-        $0.appearanceTextColor = #colorLiteral(red: 0.5176470588, green: 0.5411764706, blue: 0.568627451, alpha: 1)
-        $0.font = .systemFont(ofSize: 12.0, weight: .regular)
-    }
-    
-    public let addButton = UIButton().then {
-        let image = #imageLiteral(resourceName: "playlistsAdd")
-        $0.setTitle("Add", for: .normal)
-        $0.setImage(image, for: .normal)
-        $0.imageEdgeInsets = UIEdgeInsets(top: 0.0, left: 10 - image.size.width, bottom: 0.0, right: 0.0)
-        $0.titleEdgeInsets = UIEdgeInsets(top: 0.0, left: 0, bottom: 0.0, right: 0.0)
-        $0.contentEdgeInsets = UIEdgeInsets(top: 8.0, left: 20.0, bottom: 8.0, right: 20.0)
-        $0.contentHorizontalAlignment = .left
-        $0.imageView?.contentMode = .scaleAspectFit
-        $0.setContentHuggingPriority(.required, for: .horizontal)
-        $0.setContentCompressionResistancePriority(.required, for: .horizontal)
+extension PlaylistViewController: VideoViewDelegate {
+    func onPreviousTrack() {
+        guard let currentItem = mediaInfo.nowPlayingInfo,
+              let playlistItems = playlistFRC.fetchedObjects,
+              let index = playlistItems.firstIndex(where: { $0.mediaSrc == currentItem.src }) else {
+            return
+        }
         
-        $0.setTitleColor(.white, for: .normal)
-        $0.titleLabel?.appearanceTextColor = .white
-        $0.titleLabel?.font = .systemFont(ofSize: 12.0, weight: .semibold)
-        $0.layer.borderColor = UIColor.white.withAlphaComponent(0.5).cgColor
-        $0.layer.borderWidth = 1.0
-        $0.layer.cornerRadius = 18.0
-    }
-    
-    private let infoStackView = UIStackView().then {
-        $0.axis = .vertical
-        $0.spacing = 5.0
-    }
-    
-    private let stackView = UIStackView().then {
-        $0.axis = .horizontal
-        $0.alignment = .center
-        $0.spacing = 15.0
-    }
-    
-    override init(frame: CGRect) {
-        
-        super.init(frame: frame)
-        
-        self.preservesSuperviewLayoutMargins = false
-        self.backgroundColor = #colorLiteral(red: 0.05098039216, green: 0.2862745098, blue: 0.4823529412, alpha: 1)
-        
-        self.addSubview(stackView)
-        stackView.addArrangedSubview(infoStackView)
-        stackView.addArrangedSubview(addButton)
-        infoStackView.addArrangedSubview(titleLabel)
-        infoStackView.addArrangedSubview(detailLabel)
-
-        stackView.snp.makeConstraints {
-            $0.left.equalToSuperview().offset(15.0)
-            $0.right.equalToSuperview().offset(-15.0)
-            $0.top.equalToSuperview().offset(5.0)
-            $0.bottom.equalToSuperview().offset(-5.0)
+        if index > 0 && index < playlistItems.count - 1 {
+            mediaInfo.loadMediaItem(PlaylistInfo(item: playlistItems[index - 1])) { [weak self] error in
+                if error != nil {
+                    self?.displayLoadingResourceError()
+                } else {
+                    self?.currentItem = index - 1
+                }
+            }
         }
     }
     
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    func onNextTrack() {
+        guard let currentItem = mediaInfo.nowPlayingInfo,
+              let playlistItems = playlistFRC.fetchedObjects,
+              let index = playlistItems.firstIndex(where: { $0.mediaSrc == currentItem.src }) else {
+            return
+        }
+        
+        if index >= 0 && index < playlistItems.count - 1 {
+            mediaInfo.loadMediaItem(PlaylistInfo(item: playlistItems[index + 1])) { [weak self] error in
+                if error != nil {
+                    self?.displayLoadingResourceError()
+                } else {
+                    self?.currentItem = index + 1
+                }
+            }
+        }
+    }
+    
+    func onFullScreen() {
+        playerView.player.pause()
+        let playerController = AVPlayerViewController()
+        playerController.player = playerView.player
+        playerController.delegate = self
+        playerController.allowsPictureInPicturePlayback = true
+        
+        if #available(iOS 14.2, *) {
+            playerController.canStartPictureInPictureAutomaticallyFromInline = true
+        }
+        
+        playerController.entersFullScreenWhenPlaybackBegins = true
+        self.present(playerController, animated: true, completion: {
+            playerController.player?.play()
+        })
+        
+        if AVPictureInPictureController.isPictureInPictureSupported() {
+            print("SUPPORTED")
+        } else {
+            print("NOT SUPPORTED")
+        }
     }
 }
 
-private class PlaylistCell: UITableViewCell {
-    public let indicatorIcon = UIImageView().then {
-        $0.contentMode = .scaleAspectFit
-    }
+extension PlaylistViewController: AVPlayerViewControllerDelegate {
     
-    public let thumbnailView = UIImageView().then {
-        $0.contentMode = .scaleAspectFit
-        $0.layer.cornerRadius = 5.0
-        $0.layer.masksToBounds = true
-    }
-    
-    public let titleLabel = UILabel().then {
-        $0.textColor = .white
-        $0.appearanceTextColor = .white
-        $0.font = .systemFont(ofSize: 14.0, weight: .medium)
-    }
-    
-    public let detailLabel = UILabel().then {
-        $0.textColor = #colorLiteral(red: 0.5176470588, green: 0.5411764706, blue: 0.568627451, alpha: 1)
-        $0.appearanceTextColor = #colorLiteral(red: 0.5176470588, green: 0.5411764706, blue: 0.568627451, alpha: 1)
-        $0.font = .systemFont(ofSize: 12.0, weight: .regular)
-    }
-    
-    private let iconStackView = UIStackView().then {
-        $0.axis = .horizontal
-        $0.alignment = .center
-        $0.spacing = 15.0
-    }
-    
-    private let infoStackView = UIStackView().then {
-        $0.axis = .vertical
-    }
-    
-    private let separator = UIView().then {
-        $0.backgroundColor = #colorLiteral(red: 0.5176470588, green: 0.5411764706, blue: 0.568627451, alpha: 1)
-    }
-    
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
-        
-        self.preservesSuperviewLayoutMargins = false
-        self.selectionStyle = .none
-        
-        contentView.addSubview(iconStackView)
-        contentView.addSubview(infoStackView)
-        iconStackView.addArrangedSubview(indicatorIcon)
-        iconStackView.addArrangedSubview(thumbnailView)
-        infoStackView.addArrangedSubview(titleLabel)
-        infoStackView.addArrangedSubview(detailLabel)
-        contentView.addSubview(separator)
-        
-        indicatorIcon.snp.makeConstraints {
-            $0.width.height.equalTo(12.0)
-        }
-        
-        thumbnailView.snp.makeConstraints {
-            $0.width.height.equalTo(30.0)
-        }
-        
-        iconStackView.snp.makeConstraints {
-            $0.leading.equalToSuperview().offset(15.0)
-            $0.top.equalToSuperview().offset(5.0)
-            $0.bottom.equalToSuperview().offset(-5.0)
-        }
-        
-        infoStackView.snp.makeConstraints {
-            $0.left.equalTo(iconStackView.snp.right).offset(15.0)
-            $0.right.equalToSuperview().offset(-15.0)
-            $0.top.equalToSuperview().offset(5.0)
-            $0.bottom.equalToSuperview().offset(-5.0)
-        }
-        
-        separator.snp.makeConstraints {
-            $0.left.equalTo(titleLabel.snp.left)
-            $0.right.bottom.equalToSuperview()
-            $0.height.equalTo(1.0 / UIScreen.main.scale)
-        }
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override public var layoutMargins: UIEdgeInsets {
-        get {
-            return .zero
-        }
-
-        set (newValue) {
-            _ = newValue
-            super.layoutMargins = .zero
-        }
-    }
-    
-    override var separatorInset: UIEdgeInsets {
-        get {
-            return UIEdgeInsets(top: 0, left: self.titleLabel.frame.origin.x, bottom: 0, right: 0)
-        }
-        
-        set (newValue) {
-            _ = newValue
-            super.separatorInset = UIEdgeInsets(top: 0, left: self.titleLabel.frame.origin.x, bottom: 0, right: 0)
-        }
-    }
 }

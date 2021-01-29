@@ -2612,7 +2612,11 @@ extension BrowserViewController: TabDelegate {
         
         tab.addContentScript(WindowRenderHelperScript(tab: tab), name: WindowRenderHelperScript.name(), sandboxed: false)
         tab.addContentScript(PlaylistHelper(tab: tab), name: PlaylistHelper.name(), sandboxed: false)
-        
+
+        let playlistHelper = PlaylistHelper(tab: tab)
+        playlistHelper.delegate = self
+        tab.addContentScript(playlistHelper, name: PlaylistHelper.name())
+
         tab.addContentScript(RewardsReporting(rewards: rewards, tab: tab), name: RewardsReporting.name())
         tab.addContentScript(AdsMediaReporting(rewards: rewards, tab: tab), name: AdsMediaReporting.name())
     }
@@ -3668,5 +3672,11 @@ extension BrowserViewController: UNUserNotificationCenterDelegate {
             UIApplication.shared.open(settingsUrl)
         }
         completionHandler()
+    }
+}
+
+extension BrowserViewController: PlaylistHelperDelegate {
+    func present(controller: UIViewController) {
+        self.present(controller, animated: true, completion: nil)
     }
 }
