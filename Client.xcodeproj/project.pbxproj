@@ -272,12 +272,15 @@
 		2746D27F24A3EB9800E38852 /* UITableViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 271DECB8234CC7EF009DAC37 /* UITableViewExtensions.swift */; };
 		2746D28124A4F8DA00E38852 /* RewardsInternalsShareController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2746D28024A4F8DA00E38852 /* RewardsInternalsShareController.swift */; };
 		2746D28324A4FB7400E38852 /* RewardsInternalsSharable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2746D28224A4FB7400E38852 /* RewardsInternalsSharable.swift */; };
+		274E1AC3252BACFC0086A84D /* WebpagePreviewWidgetData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 274E1AC2252BACFC0086A84D /* WebpagePreviewWidgetData.swift */; };
+		274E1AE5252E29560086A84D /* BrowserNavigationHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 274E1AE4252E29560086A84D /* BrowserNavigationHelper.swift */; };
 		2755AB7D23107BC600F0721F /* AdsReporting.js in Resources */ = {isa = PBXBuildFile; fileRef = 2755AB7C23107BC600F0721F /* AdsReporting.js */; };
 		2755AB8623107DBD00F0721F /* AdsMediaReporting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2755AB8523107DBD00F0721F /* AdsMediaReporting.swift */; };
 		2755EA9C2551F94B0033C43F /* RewardsInternalsAutoContributeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2755EA9B2551F94B0033C43F /* RewardsInternalsAutoContributeController.swift */; };
 		2755EABD255323C60033C43F /* PublisherInfoExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2755EABC255323C60033C43F /* PublisherInfoExtensions.swift */; };
 		2755EAD3255329540033C43F /* BraveLedgerExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2755EAD2255329540033C43F /* BraveLedgerExtensions.swift */; };
 		275965E224EEC4EA0051A827 /* FeedFillStrategyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275965E124EEC4EA0051A827 /* FeedFillStrategyTests.swift */; };
+		275FDA57252285CB00080907 /* FavoritesWidgetData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275FDA3E252281E100080907 /* FavoritesWidgetData.swift */; };
 		2760D2BF215ACCE20068E131 /* BundleExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2760D2BE215ACCE20068E131 /* BundleExtensions.swift */; };
 		2765825D2171263A00754B2F /* UserReferralProgram.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2765825C2171263A00754B2F /* UserReferralProgram.swift */; };
 		276582692171266900754B2F /* ReferralData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 276582652171266900754B2F /* ReferralData.swift */; };
@@ -292,11 +295,10 @@
 		276A790C244660B500AC9446 /* UICollectionViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 276A790B244660B500AC9446 /* UICollectionViewExtensions.swift */; };
 		276A791024476FD200AC9446 /* StatsSectionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 276A790F24476FD200AC9446 /* StatsSectionProvider.swift */; };
 		276E7A3C22F21DBE00939424 /* RewardsReporting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 276E7A3B22F21DBE00939424 /* RewardsReporting.swift */; };
-		277223722469B4FB0059A7EB /* FaviconFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 277223712469B4FB0059A7EB /* FaviconFetcher.swift */; };
-		277223762469E7290059A7EB /* LargeFaviconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 277223752469E7290059A7EB /* LargeFaviconView.swift */; };
 		2777273722EB43A100F0214C /* StringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2777273622EB43A100F0214C /* StringExtensions.swift */; };
 		2777274022EB44B300F0214C /* StringExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2777273F22EB44B300F0214C /* StringExtensionTests.swift */; };
 		2777275A22EB4C7700F0214C /* BraveShared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DE7688420B3456C00FF5533 /* BraveShared.framework */; };
+		277B86BE25266C5D0075F7B8 /* WebpageWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 277B869025266B990075F7B8 /* WebpageWidget.swift */; };
 		277C5B21254CAD790032DEF2 /* BraveRewardsExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 277C5B16254CAD2A0032DEF2 /* BraveRewardsExtensions.swift */; };
 		27829DE92548AA4F007CF0B2 /* BraveRewardsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27829DE82548AA4F007CF0B2 /* BraveRewardsViewController.swift */; };
 		27829E092548AA8B007CF0B2 /* BraveRewardsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27829E082548AA8B007CF0B2 /* BraveRewardsView.swift */; };
@@ -353,6 +355,17 @@
 		27B3DDD524AF98EA0006A7ED /* FeedItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27B3DDD424AF98EA0006A7ED /* FeedItem.swift */; };
 		27C405E3242559AE00347246 /* Shared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288A2D861AB8B3260023ABC3 /* Shared.framework */; };
 		27C405E924255A2B00347246 /* BraveShared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DE7688420B3456C00FF5533 /* BraveShared.framework */; };
+		27C434D2250AB8AC004F7791 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27C434D1250AB8AC004F7791 /* WidgetKit.framework */; };
+		27C434D4250AB8AC004F7791 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27C434D3250AB8AC004F7791 /* SwiftUI.framework */; };
+		27C434D7250AB8AD004F7791 /* BraveWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C434D6250AB8AD004F7791 /* BraveWidgets.swift */; };
+		27C434D9250AB8AD004F7791 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 27C434D8250AB8AD004F7791 /* Assets.xcassets */; };
+		27C434DD250AB8AD004F7791 /* BraveWidgetsExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 27C434D0250AB8AC004F7791 /* BraveWidgetsExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		27C434E8250AB8D9004F7791 /* StatsWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C434E5250AB8D9004F7791 /* StatsWidget.swift */; };
+		27C434E9250AB8D9004F7791 /* FavoritesWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C434E6250AB8D9004F7791 /* FavoritesWidget.swift */; };
+		27C434EA250AB8D9004F7791 /* StatWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C434E7250AB8D9004F7791 /* StatWidget.swift */; };
+		27C434ED250AB8E3004F7791 /* BraveWidgets.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = 27C434EB250AB8E2004F7791 /* BraveWidgets.intentdefinition */; };
+		27C434EE250AB8E3004F7791 /* BraveWidgets.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = 27C434EB250AB8E2004F7791 /* BraveWidgets.intentdefinition */; };
+		27C434F3250ABA6A004F7791 /* FaviconAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C434F2250ABA6A004F7791 /* FaviconAttributes.swift */; };
 		27C461DE211B76500088A441 /* ShieldsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C461DD211B76500088A441 /* ShieldsView.swift */; };
 		27C46201211CD8D20088A441 /* DeferredTestUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = A176323020CF2A6000126F25 /* DeferredTestUtils.swift */; };
 		27C626CB25BA198700418F40 /* WalletTransferExpiredViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C626CA25BA198700418F40 /* WalletTransferExpiredViewController.swift */; };
@@ -369,6 +382,7 @@
 		27E0652824CB6AE300134946 /* BraveTodayErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27E0652724CB6AE300134946 /* BraveTodayErrorView.swift */; };
 		27EA04C2249D4336004F5D2E /* FeedCardContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27EA04C1249D4336004F5D2E /* FeedCardContent.swift */; };
 		27EB6020244607DA00265C1B /* NewTabPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27EB601F244607DA00265C1B /* NewTabPageViewController.swift */; };
+		27ED2B2D2515434D0046E95D /* ShortcutsWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27ED2B0A251543390046E95D /* ShortcutsWidget.swift */; };
 		27EF6B8024BF48C7005E034F /* FeedSourceListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27EF6B7F24BF48C7005E034F /* FeedSourceListViewController.swift */; };
 		27EF6B8124BF6095005E034F /* UITableViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 271DECB8234CC7EF009DAC37 /* UITableViewExtensions.swift */; };
 		27F4439F2135E11200296C58 /* BraveShareTo.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 27F443952135E11200296C58 /* BraveShareTo.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -376,6 +390,8 @@
 		27F443F42138843400296C58 /* BraveShareToInfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 27F443F22138843400296C58 /* BraveShareToInfoPlist.strings */; };
 		27F56F8D24E447020018F2F9 /* DateTools.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 27F56F7D24E447020018F2F9 /* DateTools.bundle */; };
 		27F94A3A21909A5900F4FADF /* SearchSuggestionsPromptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27F94A3921909A5900F4FADF /* SearchSuggestionsPromptView.swift */; };
+		27FBD9CB25759373001B2604 /* LargeFaviconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FBD9C925759373001B2604 /* LargeFaviconView.swift */; };
+		27FBD9CC25759373001B2604 /* FaviconFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FBD9CA25759373001B2604 /* FaviconFetcher.swift */; };
 		27FCA8E02447708300A8CA48 /* FavoritesSectionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FCA8DF2447708300A8CA48 /* FavoritesSectionProvider.swift */; };
 		27FCA8E3244770AB00A8CA48 /* FavoritesOverflowSectionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FCA8E2244770AB00A8CA48 /* FavoritesOverflowSectionProvider.swift */; };
 		27FCA8E72447BCFE00A8CA48 /* DuckDuckGoCalloutSectionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FCA8E62447BCFE00A8CA48 /* DuckDuckGoCalloutSectionProvider.swift */; };
@@ -1037,6 +1053,13 @@
 			remoteGlobalIDString = 5DE7688320B3456C00FF5533;
 			remoteInfo = BraveShared;
 		};
+		27C434DB250AB8AD004F7791 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F84B21B61A090F8100AAB793 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 27C434CF250AB8AC004F7791;
+			remoteInfo = BraveWidgetsExtension;
+		};
 		27F4439D2135E11200296C58 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F84B21B61A090F8100AAB793 /* Project object */;
@@ -1232,6 +1255,7 @@
 			dstSubfolderSpec = 13;
 			files = (
 				27F4439F2135E11200296C58 /* BraveShareTo.appex in Embed App Extensions */,
+				27C434DD250AB8AD004F7791 /* BraveWidgetsExtension.appex in Embed App Extensions */,
 			);
 			name = "Embed App Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1542,12 +1566,15 @@
 		2746D27C24A3E44900E38852 /* RewardsInternalsLogController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardsInternalsLogController.swift; sourceTree = "<group>"; };
 		2746D28024A4F8DA00E38852 /* RewardsInternalsShareController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardsInternalsShareController.swift; sourceTree = "<group>"; };
 		2746D28224A4FB7400E38852 /* RewardsInternalsSharable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardsInternalsSharable.swift; sourceTree = "<group>"; };
+		274E1AC2252BACFC0086A84D /* WebpagePreviewWidgetData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebpagePreviewWidgetData.swift; sourceTree = "<group>"; };
+		274E1AE4252E29560086A84D /* BrowserNavigationHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserNavigationHelper.swift; sourceTree = "<group>"; };
 		2755AB7C23107BC600F0721F /* AdsReporting.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = AdsReporting.js; sourceTree = "<group>"; };
 		2755AB8523107DBD00F0721F /* AdsMediaReporting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdsMediaReporting.swift; sourceTree = "<group>"; };
 		2755EA9B2551F94B0033C43F /* RewardsInternalsAutoContributeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardsInternalsAutoContributeController.swift; sourceTree = "<group>"; };
 		2755EABC255323C60033C43F /* PublisherInfoExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublisherInfoExtensions.swift; sourceTree = "<group>"; };
 		2755EAD2255329540033C43F /* BraveLedgerExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveLedgerExtensions.swift; sourceTree = "<group>"; };
 		275965E124EEC4EA0051A827 /* FeedFillStrategyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedFillStrategyTests.swift; sourceTree = "<group>"; };
+		275FDA3E252281E100080907 /* FavoritesWidgetData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesWidgetData.swift; sourceTree = "<group>"; };
 		2760D2BE215ACCE20068E131 /* BundleExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundleExtensions.swift; sourceTree = "<group>"; };
 		2765825C2171263A00754B2F /* UserReferralProgram.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserReferralProgram.swift; sourceTree = "<group>"; };
 		276582652171266900754B2F /* ReferralData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReferralData.swift; sourceTree = "<group>"; };
@@ -1563,10 +1590,9 @@
 		276A790F24476FD200AC9446 /* StatsSectionProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsSectionProvider.swift; sourceTree = "<group>"; };
 		276E7A2E22F21A7700939424 /* RewardsReporting.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = RewardsReporting.js; sourceTree = "<group>"; };
 		276E7A3B22F21DBE00939424 /* RewardsReporting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardsReporting.swift; sourceTree = "<group>"; };
-		277223712469B4FB0059A7EB /* FaviconFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaviconFetcher.swift; sourceTree = "<group>"; };
-		277223752469E7290059A7EB /* LargeFaviconView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargeFaviconView.swift; sourceTree = "<group>"; };
 		2777273622EB43A100F0214C /* StringExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtensions.swift; sourceTree = "<group>"; };
 		2777273F22EB44B300F0214C /* StringExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtensionTests.swift; sourceTree = "<group>"; };
+		277B869025266B990075F7B8 /* WebpageWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebpageWidget.swift; sourceTree = "<group>"; };
 		277C5B16254CAD2A0032DEF2 /* BraveRewardsExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveRewardsExtensions.swift; sourceTree = "<group>"; };
 		27829DE82548AA4F007CF0B2 /* BraveRewardsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveRewardsViewController.swift; sourceTree = "<group>"; };
 		27829E082548AA8B007CF0B2 /* BraveRewardsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveRewardsView.swift; sourceTree = "<group>"; };
@@ -1612,12 +1638,29 @@
 		27B16C5824E1D72600E0CF2C /* NewTabPageFeedOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageFeedOverlayView.swift; sourceTree = "<group>"; };
 		27B3DDCF24AE83710006A7ED /* FeedSourceOverride.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedSourceOverride.swift; sourceTree = "<group>"; };
 		27B3DDD424AF98EA0006A7ED /* FeedItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedItem.swift; sourceTree = "<group>"; };
+		27C434D0250AB8AC004F7791 /* BraveWidgetsExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BraveWidgetsExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		27C434D1250AB8AC004F7791 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		27C434D3250AB8AC004F7791 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		27C434D6250AB8AD004F7791 /* BraveWidgets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveWidgets.swift; sourceTree = "<group>"; };
+		27C434D8250AB8AD004F7791 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		27C434DA250AB8AD004F7791 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		27C434E5250AB8D9004F7791 /* StatsWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatsWidget.swift; sourceTree = "<group>"; };
+		27C434E6250AB8D9004F7791 /* FavoritesWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FavoritesWidget.swift; sourceTree = "<group>"; };
+		27C434E7250AB8D9004F7791 /* StatWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatWidget.swift; sourceTree = "<group>"; };
+		27C434EC250AB8E3004F7791 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.intentdefinition; name = Base; path = Base.lproj/BraveWidgets.intentdefinition; sourceTree = "<group>"; };
+		27C434F1250AB8FB004F7791 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/BraveWidgets.strings; sourceTree = "<group>"; };
+		27C434F2250ABA6A004F7791 /* FaviconAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaviconAttributes.swift; sourceTree = "<group>"; };
 		27C461DD211B76500088A441 /* ShieldsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShieldsView.swift; sourceTree = "<group>"; };
 		27C626CA25BA198700418F40 /* WalletTransferExpiredViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletTransferExpiredViewController.swift; sourceTree = "<group>"; };
 		27C647762550AE16006D72FC /* WalletTransferCompleteViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletTransferCompleteViewController.swift; sourceTree = "<group>"; };
 		27C647822550AF34006D72FC /* WalletTransferCompleteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletTransferCompleteView.swift; sourceTree = "<group>"; };
 		27C6478E2551CD2B006D72FC /* RewardsInternalsDebugViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardsInternalsDebugViewController.swift; sourceTree = "<group>"; };
 		27C647A52551F082006D72FC /* RewardsDebugSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardsDebugSettingsViewController.swift; sourceTree = "<group>"; };
+		27C7B682250ACCC900267A8F /* WidgetRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WidgetRelease.entitlements; sourceTree = "<group>"; };
+		27C7B683250ACCC900267A8F /* WidgetBeta.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WidgetBeta.entitlements; sourceTree = "<group>"; };
+		27C7B684250ACCC900267A8F /* WidgetDev.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WidgetDev.entitlements; sourceTree = "<group>"; };
+		27C7B685250ACCC900267A8F /* WidgetEnterprise.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WidgetEnterprise.entitlements; sourceTree = "<group>"; };
+		27C7B686250ACCC900267A8F /* WidgetDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WidgetDebug.entitlements; sourceTree = "<group>"; };
 		27CFB71324E1F67B008DFC8C /* Observable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Observable.swift; sourceTree = "<group>"; };
 		27D114D32358FBBF00166534 /* BraveRewardsSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveRewardsSettingsViewController.swift; sourceTree = "<group>"; };
 		27D114D52358FCA400166534 /* SettingsRowViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsRowViews.swift; sourceTree = "<group>"; };
@@ -1628,6 +1671,7 @@
 		27E0652724CB6AE300134946 /* BraveTodayErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveTodayErrorView.swift; sourceTree = "<group>"; };
 		27EA04C1249D4336004F5D2E /* FeedCardContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedCardContent.swift; sourceTree = "<group>"; };
 		27EB601F244607DA00265C1B /* NewTabPageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageViewController.swift; sourceTree = "<group>"; };
+		27ED2B0A251543390046E95D /* ShortcutsWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutsWidget.swift; sourceTree = "<group>"; };
 		27EEEDB52507CE1C00024038 /* Release.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
 		27EEEDB72507D51E00024038 /* Release (AppStore).entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Release (AppStore).entitlements"; sourceTree = "<group>"; };
 		27EF6B7F24BF48C7005E034F /* FeedSourceListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedSourceListViewController.swift; sourceTree = "<group>"; };
@@ -1638,6 +1682,8 @@
 		27F56F7D24E447020018F2F9 /* DateTools.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = DateTools.bundle; sourceTree = "<group>"; };
 		27F94A3921909A5900F4FADF /* SearchSuggestionsPromptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchSuggestionsPromptView.swift; sourceTree = "<group>"; };
 		27FA2D4F234CC9FB004D5D2D /* BraveRewards.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = BraveRewards.framework; path = "node_modules/brave-core-ios/BraveRewards.framework"; sourceTree = "<group>"; };
+		27FBD9C925759373001B2604 /* LargeFaviconView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LargeFaviconView.swift; sourceTree = "<group>"; };
+		27FBD9CA25759373001B2604 /* FaviconFetcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FaviconFetcher.swift; sourceTree = "<group>"; };
 		27FCA8DF2447708300A8CA48 /* FavoritesSectionProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesSectionProvider.swift; sourceTree = "<group>"; };
 		27FCA8E2244770AB00A8CA48 /* FavoritesOverflowSectionProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesOverflowSectionProvider.swift; sourceTree = "<group>"; };
 		27FCA8E62447BCFE00A8CA48 /* DuckDuckGoCalloutSectionProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckDuckGoCalloutSectionProvider.swift; sourceTree = "<group>"; };
@@ -2507,6 +2553,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		27C434CD250AB8AC004F7791 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				27C434D4250AB8AC004F7791 /* SwiftUI.framework in Frameworks */,
+				27C434D2250AB8AC004F7791 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		27F443922135E11200296C58 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -3085,6 +3140,15 @@
 			path = Rewards;
 			sourceTree = "<group>";
 		};
+		275FDA63252285E500080907 /* Widgets */ = {
+			isa = PBXGroup;
+			children = (
+				275FDA3E252281E100080907 /* FavoritesWidgetData.swift */,
+				274E1AC2252BACFC0086A84D /* WebpagePreviewWidgetData.swift */,
+			);
+			path = Widgets;
+			sourceTree = "<group>";
+		};
 		2765826D217130B700754B2F /* Certificates */ = {
 			isa = PBXGroup;
 			children = (
@@ -3145,8 +3209,7 @@
 		2772236F2469B4AE0059A7EB /* Favicons */ = {
 			isa = PBXGroup;
 			children = (
-				277223712469B4FB0059A7EB /* FaviconFetcher.swift */,
-				277223752469E7290059A7EB /* LargeFaviconView.swift */,
+				27C434F2250ABA6A004F7791 /* FaviconAttributes.swift */,
 			);
 			path = Favicons;
 			sourceTree = "<group>";
@@ -3313,6 +3376,23 @@
 			path = Composer;
 			sourceTree = "<group>";
 		};
+		27C434D5250AB8AD004F7791 /* BraveWidgets */ = {
+			isa = PBXGroup;
+			children = (
+				27C7B681250ACCC900267A8F /* Entitlements */,
+				27C434EB250AB8E2004F7791 /* BraveWidgets.intentdefinition */,
+				27C434D6250AB8AD004F7791 /* BraveWidgets.swift */,
+				27C434E6250AB8D9004F7791 /* FavoritesWidget.swift */,
+				27C434E5250AB8D9004F7791 /* StatsWidget.swift */,
+				27C434E7250AB8D9004F7791 /* StatWidget.swift */,
+				27ED2B0A251543390046E95D /* ShortcutsWidget.swift */,
+				277B869025266B990075F7B8 /* WebpageWidget.swift */,
+				27C434D8250AB8AD004F7791 /* Assets.xcassets */,
+				27C434DA250AB8AD004F7791 /* Info.plist */,
+			);
+			path = BraveWidgets;
+			sourceTree = "<group>";
+		};
 		27C647A42551F071006D72FC /* QA */ = {
 			isa = PBXGroup;
 			children = (
@@ -3321,6 +3401,18 @@
 				2755EA9B2551F94B0033C43F /* RewardsInternalsAutoContributeController.swift */,
 			);
 			path = QA;
+			sourceTree = "<group>";
+		};
+		27C7B681250ACCC900267A8F /* Entitlements */ = {
+			isa = PBXGroup;
+			children = (
+				27C7B682250ACCC900267A8F /* WidgetRelease.entitlements */,
+				27C7B683250ACCC900267A8F /* WidgetBeta.entitlements */,
+				27C7B684250ACCC900267A8F /* WidgetDev.entitlements */,
+				27C7B685250ACCC900267A8F /* WidgetEnterprise.entitlements */,
+				27C7B686250ACCC900267A8F /* WidgetDebug.entitlements */,
+			);
+			path = Entitlements;
 			sourceTree = "<group>";
 		};
 		27DD87F4242175B000BBB624 /* Design System */ = {
@@ -3356,6 +3448,16 @@
 				59B6912121B695A400E9388E /* InfoPlist.strings */,
 			);
 			path = BraveShareTo;
+			sourceTree = "<group>";
+		};
+		27FBD9C825759373001B2604 /* Favicons */ = {
+			isa = PBXGroup;
+			children = (
+				27FBD9C925759373001B2604 /* LargeFaviconView.swift */,
+				27FBD9CA25759373001B2604 /* FaviconFetcher.swift */,
+			);
+			name = Favicons;
+			path = Browser/Favicons;
 			sourceTree = "<group>";
 		};
 		28532D301C483DEB000072D9 /* Bookmarks */ = {
@@ -4038,6 +4140,8 @@
 		5DE7688520B3456D00FF5533 /* BraveShared */ = {
 			isa = PBXGroup;
 			children = (
+				275FDA63252285E500080907 /* Widgets */,
+				2772236F2469B4AE0059A7EB /* Favicons */,
 				27A1AC0324855D2000344503 /* Private CDN */,
 				F9B23EE323F61380000EB3D8 /* PaymentRequest */,
 				0AD4FEE8223A998700E00C05 /* Javascript */,
@@ -4150,6 +4254,8 @@
 				7B604FA11C495268006EEEC3 /* SnapKit.framework */,
 				7B604F9A1C4950F2006EEEC3 /* SDWebImage.framework */,
 				7B604F851C494983006EEEC3 /* Alamofire.framework */,
+				27C434D1250AB8AC004F7791 /* WidgetKit.framework */,
+				27C434D3250AB8AC004F7791 /* SwiftUI.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -4367,7 +4473,6 @@
 				C6D267592137E39A00465DFA /* ImageCache */,
 				276A790D24476F7600AC9446 /* New Tab Page */,
 				0AADC4BB20D2A4F700FDE368 /* Favorites */,
-				2772236F2469B4AE0059A7EB /* Favicons */,
 				0A4B011620D02DAC004D4011 /* TabsBar */,
 				44331DC722551871007E3E93 /* Toolbars */,
 				0A583F752142BC9B0086B3E7 /* Search */,
@@ -4436,6 +4541,7 @@
 				0A8A6224257905E300B035F4 /* UniversalLinkManager.swift */,
 				4452CAEF255412800053EFE6 /* DefaultBrowserIntroCalloutViewController.swift */,
 				0A0A5ED025B1F080007B3E74 /* DefaultBrowserIntroManager.swift */,
+				274E1AE4252E29560086A84D /* BrowserNavigationHelper.swift */,
 			);
 			indentWidth = 4;
 			path = Browser;
@@ -4674,6 +4780,7 @@
 				5DE7688520B3456D00FF5533 /* BraveShared */,
 				27F443962135E11200296C58 /* BraveShareTo */,
 				278C468723F1E6270083347F /* BraveUI */,
+				27C434D5250AB8AD004F7791 /* BraveWidgets */,
 				7B604FC11C496005006EEEC3 /* Frameworks */,
 				F84B21BF1A090F8100AAB793 /* Products */,
 				D34DC84C1A16C40C00D49B7B /* Providers */,
@@ -4704,6 +4811,7 @@
 				5DE7688C20B3456E00FF5533 /* BraveSharedTests.xctest */,
 				27F443952135E11200296C58 /* BraveShareTo.appex */,
 				278C468623F1E6270083347F /* BraveUI.framework */,
+				27C434D0250AB8AC004F7791 /* BraveWidgetsExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -4837,6 +4945,7 @@
 				27A1ABF1248555E900344503 /* Brave Today */,
 				27829DE72548A81A007CF0B2 /* Brave Rewards */,
 				D3A994941A368691008AD1AC /* Browser */,
+				27FBD9C825759373001B2604 /* Favicons */,
 				A104E190210A380E00D2323E /* Shields */,
 				E63ED8DF1BFD254E0097D08E /* Login Management */,
 				0AC775FD242A280400139377 /* BraveVPN */,
@@ -5077,6 +5186,23 @@
 			productReference = 278C468623F1E6270083347F /* BraveUI.framework */;
 			productType = "com.apple.product-type.framework";
 		};
+		27C434CF250AB8AC004F7791 /* BraveWidgetsExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 27C434DE250AB8AD004F7791 /* Build configuration list for PBXNativeTarget "BraveWidgetsExtension" */;
+			buildPhases = (
+				27C434CC250AB8AC004F7791 /* Sources */,
+				27C434CD250AB8AC004F7791 /* Frameworks */,
+				27C434CE250AB8AC004F7791 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = BraveWidgetsExtension;
+			productName = BraveWidgetsExtension;
+			productReference = 27C434D0250AB8AC004F7791 /* BraveWidgetsExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		27F443942135E11200296C58 /* BraveShareTo */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 27F443AB2135E11200296C58 /* Build configuration list for PBXNativeTarget "BraveShareTo" */;
@@ -5271,6 +5397,7 @@
 				5DE7689820B3456E00FF5533 /* PBXTargetDependency */,
 				27F4439E2135E11200296C58 /* PBXTargetDependency */,
 				278C468C23F1E6270083347F /* PBXTargetDependency */,
+				27C434DC250AB8AD004F7791 /* PBXTargetDependency */,
 			);
 			name = Client;
 			packageProductDependencies = (
@@ -5308,13 +5435,16 @@
 			attributes = {
 				DefaultBuildSystemTypeForWorkspace = Latest;
 				LastSwiftMigration = 0700;
-				LastSwiftUpdateCheck = 1110;
+				LastSwiftUpdateCheck = 1200;
 				LastUpgradeCheck = 1110;
 				ORGANIZATIONNAME = Mozilla;
 				TargetAttributes = {
 					278C468523F1E6270083347F = {
 						CreatedOnToolsVersion = 11.3.1;
 						ProvisioningStyle = Automatic;
+					};
+					27C434CF250AB8AC004F7791 = {
+						CreatedOnToolsVersion = 12.0;
 					};
 					27F443942135E11200296C58 = {
 						CreatedOnToolsVersion = 10.0;
@@ -5434,6 +5564,7 @@
 				E6F9650B1B2F1CF20034B023 /* SharedTests */,
 				5D1DC51A20AC9AFA00905E5A /* DataTests */,
 				5DE7688B20B3456E00FF5533 /* BraveSharedTests */,
+				27C434CF250AB8AC004F7791 /* BraveWidgetsExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -5443,6 +5574,14 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		27C434CE250AB8AC004F7791 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				27C434D9250AB8AD004F7791 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5750,6 +5889,20 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		27C434CC250AB8AC004F7791 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				27C434D7250AB8AD004F7791 /* BraveWidgets.swift in Sources */,
+				27C434E8250AB8D9004F7791 /* StatsWidget.swift in Sources */,
+				27C434E9250AB8D9004F7791 /* FavoritesWidget.swift in Sources */,
+				27ED2B2D2515434D0046E95D /* ShortcutsWidget.swift in Sources */,
+				27C434EE250AB8E3004F7791 /* BraveWidgets.intentdefinition in Sources */,
+				277B86BE25266C5D0075F7B8 /* WebpageWidget.swift in Sources */,
+				27C434EA250AB8D9004F7791 /* StatWidget.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		27F443912135E11200296C58 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -5946,6 +6099,7 @@
 				5DE768A720B345C600FF5533 /* BraveStrings.swift in Sources */,
 				0AD4FEF2223AA6CA00E00C05 /* JSContextExtensions.swift in Sources */,
 				0AD4FEF4223AC32200E00C05 /* JSValueExtensions.swift in Sources */,
+				274E1AC3252BACFC0086A84D /* WebpagePreviewWidgetData.swift in Sources */,
 				0AD4FEEE223AA09D00E00C05 /* BrowserifyExposable.swift in Sources */,
 				0A917388231D11960069A08B /* AppReview.swift in Sources */,
 				5D6DDEF3214003A6001FF0AE /* DAU.swift in Sources */,
@@ -5956,6 +6110,7 @@
 				0AD5E9C42200591F00D0D91B /* BraveShield.swift in Sources */,
 				5DE768A920B3461300FF5533 /* BraveUX.swift in Sources */,
 				2765825D2171263A00754B2F /* UserReferralProgram.swift in Sources */,
+				275FDA57252285CB00080907 /* FavoritesWidgetData.swift in Sources */,
 				273EB3A72422AB24002A8AAF /* PaymentRequest.swift in Sources */,
 				2777273722EB43A100F0214C /* StringExtensions.swift in Sources */,
 				276582692171266900754B2F /* ReferralData.swift in Sources */,
@@ -5973,6 +6128,7 @@
 				2765826B2171266900754B2F /* CustomHeaderData.swift in Sources */,
 				5E0FCD252342544C00AC831E /* URLSession+Requests.swift in Sources */,
 				5D6DDEFE2141B6A1001FF0AE /* Preferences.swift in Sources */,
+				27C434F3250ABA6A004F7791 /* FaviconAttributes.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6112,6 +6268,7 @@
 				0A55E53A2434EEB60069F06A /* EnableVPNPopupViewController.swift in Sources */,
 				0A3C78A3230597F10022F6D8 /* OnboardingShieldsView.swift in Sources */,
 				4422D4E221BFFB7600BF1855 /* format.cc in Sources */,
+				27C434ED250AB8E3004F7791 /* BraveWidgets.intentdefinition in Sources */,
 				39F819C61FD70F5D009E31E4 /* TabEventHandlers.swift in Sources */,
 				4422D50B21BFFB7600BF1855 /* memenv.cc in Sources */,
 				E65607611C08B4E200534B02 /* SearchInputView.swift in Sources */,
@@ -6148,6 +6305,7 @@
 				0A8C69BE225E350300988715 /* IndentedImageTableViewCell.swift in Sources */,
 				0AE5C69124F0059D004CBC9B /* OnboardingPrivacyConsentViewController.swift in Sources */,
 				5E096180252B63F200F3AFBB /* BraveSyncAPI+Utilities.swift in Sources */,
+				274E1AE5252E29560086A84D /* BrowserNavigationHelper.swift in Sources */,
 				0A1E843D2190A57F0042F782 /* SyncSettingsTableViewController.swift in Sources */,
 				4422D56C21BFFB7F00BF1855 /* bitstate.cc in Sources */,
 				E68E7ADE1CAC208A00FDCA76 /* RemovePasscodeViewController.swift in Sources */,
@@ -6364,7 +6522,6 @@
 				4422D55C21BFFB7F00BF1855 /* perl_groups.cc in Sources */,
 				C4E3984C1D21F2FD004E89BA /* TabTrayButtonExtensions.swift in Sources */,
 				5D24AF8221BA459000F9506A /* BlocklistName.swift in Sources */,
-				277223762469E7290059A7EB /* LargeFaviconView.swift in Sources */,
 				D3FEC38D1AC4B42F00494F45 /* AutocompleteTextField.swift in Sources */,
 				F930CDC9227006D600A23FE1 /* WebAuthnRegisterRequest.swift in Sources */,
 				0BD19A671A25309B0084FBA7 /* NSUserDefaultsPrefs.swift in Sources */,
@@ -6380,7 +6537,6 @@
 				5E6683A923D61CF7005B3A6C /* NTPDownloader.swift in Sources */,
 				2816F0001B33E05400522243 /* UIConstants.swift in Sources */,
 				4422D56521BFFB7F00BF1855 /* filtered_re2.cc in Sources */,
-				277223722469B4FB0059A7EB /* FaviconFetcher.swift in Sources */,
 				274398F524E71D8700E79605 /* FailableDecodable.swift in Sources */,
 				279C756B219DDE3B001CD1CB /* FingerprintingProtection.swift in Sources */,
 				E650755F1E37F756006961AC /* Try.m in Sources */,
@@ -6390,6 +6546,7 @@
 				0A1E84402190A57F0042F782 /* SyncSelectDeviceTypeViewController.swift in Sources */,
 				392ED7E41D0AEF56009D9B62 /* NewTabAccessors.swift in Sources */,
 				276E7A3C22F21DBE00939424 /* RewardsReporting.swift in Sources */,
+				27FBD9CC25759373001B2604 /* FaviconFetcher.swift in Sources */,
 				F9C6B7D623886EF8003F7D16 /* SceneObserver.swift in Sources */,
 				4422D50421BFFB7600BF1855 /* memtable.cc in Sources */,
 				D3A9949D1A3686BD008AD1AC /* Tab.swift in Sources */,
@@ -6408,6 +6565,7 @@
 				E4A961181AC041C40069AD6F /* ReadabilityService.swift in Sources */,
 				0A55E544243744DC0069F06A /* BraveVPN.swift in Sources */,
 				0A6BEF6624FCF23C0057A166 /* NewTabCenteredCollectionViewCell.swift in Sources */,
+				27FBD9CB25759373001B2604 /* LargeFaviconView.swift in Sources */,
 				4422D56A21BFFB7F00BF1855 /* simplify.cc in Sources */,
 				274398E724E483AD00E79605 /* FeedItemMenu.swift in Sources */,
 				27B16C5924E1D72600E0CF2C /* NewTabPageFeedOverlayView.swift in Sources */,
@@ -6547,6 +6705,11 @@
 			target = 5DE7688320B3456C00FF5533 /* BraveShared */;
 			targetProxy = 27C405EB24255A2B00347246 /* PBXContainerItemProxy */;
 		};
+		27C434DC250AB8AD004F7791 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 27C434CF250AB8AC004F7791 /* BraveWidgetsExtension */;
+			targetProxy = 27C434DB250AB8AD004F7791 /* PBXContainerItemProxy */;
+		};
 		27F4439E2135E11200296C58 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 27F443942135E11200296C58 /* BraveShareTo */;
@@ -6674,6 +6837,15 @@
 				0AC0D3C1233E889D0091EFA5 /* ms */,
 			);
 			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		27C434EB250AB8E2004F7791 /* BraveWidgets.intentdefinition */ = {
+			isa = PBXVariantGroup;
+			children = (
+				27C434EC250AB8E3004F7791 /* Base */,
+				27C434F1250AB8FB004F7791 /* en */,
+			);
+			name = BraveWidgets.intentdefinition;
 			sourceTree = "<group>";
 		};
 		27F443F22138843400296C58 /* BraveShareToInfoPlist.strings */ = {
@@ -7946,6 +8118,219 @@
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Enterprise;
+		};
+		27C434DF250AB8AD004F7791 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/BraveWidgets/Entitlements/WidgetDebug.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = BraveWidgets/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(inherited).$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		27C434E0250AB8AD004F7791 /* Dev */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/BraveWidgets/Entitlements/WidgetDev.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = BraveWidgets/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(inherited).$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Dev;
+		};
+		27C434E1250AB8AD004F7791 /* Enterprise */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/BraveWidgets/Entitlements/WidgetEnterprise.entitlements";
+				CODE_SIGN_STYLE = Manual;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = L6556KQ6XT;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = BraveWidgets/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(inherited).$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = BraveEntWidgets;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Enterprise;
+		};
+		27C434E2250AB8AD004F7791 /* Release (AppStore) */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/BraveWidgets/Entitlements/WidgetRelease.entitlements";
+				CODE_SIGN_STYLE = Manual;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = BraveWidgets/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(inherited).$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "Brave iOS Widgets Extension";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = "Release (AppStore)";
+		};
+		27C434E3250AB8AD004F7791 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/BraveWidgets/Entitlements/WidgetRelease.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = BraveWidgets/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(inherited).$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		27C434E4250AB8AD004F7791 /* Beta */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/BraveWidgets/Entitlements/WidgetBeta.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = BraveWidgets/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(inherited).$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Beta;
 		};
 		27EEEDA52507CDF900024038 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -11033,6 +11418,19 @@
 				278C469223F1E6270083347F /* Release (AppStore) */,
 				27EEEDAC2507CDF900024038 /* Release */,
 				278C469323F1E6270083347F /* Beta */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		27C434DE250AB8AD004F7791 /* Build configuration list for PBXNativeTarget "BraveWidgetsExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				27C434DF250AB8AD004F7791 /* Debug */,
+				27C434E0250AB8AD004F7791 /* Dev */,
+				27C434E1250AB8AD004F7791 /* Enterprise */,
+				27C434E2250AB8AD004F7791 /* Release (AppStore) */,
+				27C434E3250AB8AD004F7791 /* Release */,
+				27C434E4250AB8AD004F7791 /* Beta */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
