@@ -3091,21 +3091,22 @@ extension BrowserViewController: WKUIDelegate {
             
                 actions.append(linkPreviewAction)
                 
-                guard let contextHelper = currentTab.getContentScript(name: ContextMenuHelper.name()) as? ContextMenuHelper,
-                let elements = contextHelper.elements else { return nil }
+                if let contextHelper = currentTab.getContentScript(name: ContextMenuHelper.name()) as? ContextMenuHelper,
+                   let elements = contextHelper.elements {
                 
-                if let imageURL = elements.image {
-                    actions.append(UIAction(title: Strings.saveImageActionTitle, identifier: UIAction.Identifier("linkContextMenu.saveImage")) { _ in
-                        self.writePhotoToAlbumAction(imageURL)
-                    })
+                    if let imageURL = elements.image {
+                        actions.append(UIAction(title: Strings.saveImageActionTitle, identifier: UIAction.Identifier("linkContextMenu.saveImage")) { _ in
+                            self.writePhotoToAlbumAction(imageURL)
+                        })
 
-                    actions.append(UIAction(title: Strings.copyImageActionTitle, identifier: UIAction.Identifier("linkContextMenu.copyImage")) { _ in
-                        self.copyImageClipBoardAction(imageURL)
-                    })
+                        actions.append(UIAction(title: Strings.copyImageActionTitle, identifier: UIAction.Identifier("linkContextMenu.copyImage")) { _ in
+                            self.copyImageClipBoardAction(imageURL)
+                        })
 
-                    actions.append(UIAction(title: Strings.copyImageActionTitle, identifier: UIAction.Identifier("linkContextMenu.copyImageLink")) { _ in
-                        UIPasteboard.general.url = imageURL as URL
-                    })
+                        actions.append(UIAction(title: Strings.copyImageActionTitle, identifier: UIAction.Identifier("linkContextMenu.copyImageLink")) { _ in
+                            UIPasteboard.general.url = imageURL as URL
+                        })
+                    }
                 }
             }
             
@@ -3325,10 +3326,22 @@ extension BrowserViewController: ContextMenuHelperDelegate {
     
     private func writePhotoToAlbumAction(_ url: URL) {
         self.getData(url) { [weak self] data in
-            guard let self = self,
-                  let image = data.isGIF ? UIImage.imageFromGIFDataThreadSafe(data) : UIImage.imageFromDataThreadSafe(data) else { return }
-
-            UIImageWriteToSavedPhotosAlbum(image, self, #selector(self.image(image:didFinishSavingwithError:contextInfo:)), nil)
+            guard let self = self else { return }
+            
+            if data.isGIF {
+                PHPhotoLibrary.shared().performChanges({
+                    let request = PHAssetCreationRequest.forAsset()
+                    request.addResource(with: .photo, data: data, options: nil)
+                }) { (success, error) in
+                    if let error = error {
+                        log.error(error.localizedDescription)
+                    }
+                }
+            } else {
+                if let image = UIImage.imageFromDataThreadSafe(data) {
+                    UIImageWriteToSavedPhotosAlbum(image, self, #selector(self.image(image:didFinishSavingwithError:contextInfo:)), nil)
+                }
+            }
         }
     }
 }
