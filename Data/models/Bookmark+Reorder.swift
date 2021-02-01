@@ -7,6 +7,7 @@ import CoreData
 import Foundation
 import Shared
 import Storage
+import JavaScriptCore
 
 private let log = Logger.browserLogger
 
@@ -108,7 +109,7 @@ extension Bookmark {
                 }
             }
             
-            guard let updatedSyncOrder = Sync.shared.getBookmarkOrder(previousOrder: previousOrder, nextOrder: nextOrder) else {
+            guard let updatedSyncOrder = getBookmarkOrder(previousOrder: previousOrder, nextOrder: nextOrder) else {
                 log.error("updated syncOrder from the javascript method was nil")
                 return
             }
@@ -118,9 +119,6 @@ extension Bookmark {
             // attributes.
             self.setOrderForAllBookmarksOnGivenLevel(parent: srcBookmark.parentFolder,
                                                      forFavorites: srcBookmark.isFavorite, context: context)
-            if !srcBookmark.isFavorite {
-                Sync.shared.sendSyncRecords(action: .update, records: [srcBookmark])
-            }
             
             if isInteractiveDragReorder && context.hasChanges {
                 do {
@@ -132,6 +130,33 @@ extension Bookmark {
             }
         }
     }
+    
+    static func getBookmarkOrder(previousOrder: String?, nextOrder: String?) -> String? {
+        let context = JSContext()
+        
+        context?.exceptionHandler = { _, exc in
+            log.error(exc.debugDescription)
+        }
+        
+        let script = ScriptOpener.get(withName: "bookmark_util")
+        context?.evaluateScript(script)
+        
+            // Empty string as a parameter means next/previous bookmark doesn't exist
+            let prev = previousOrder ?? ""
+            let next = nextOrder ?? ""
+            
+            let getBookmarkOrderFunction = context?.objectForKeyedSubscript("getBookmarkOrder")
+            
+            guard let value = getBookmarkOrderFunction?.call(withArguments: [prev, next]).toString() else {
+                return nil
+            }
+            
+            if Bookmark.isSyncOrderValid(value) {
+                return value
+            }
+            
+            return nil
+        }
     
     private enum ReorderMovement {
         case up(toTheTop: Bool)

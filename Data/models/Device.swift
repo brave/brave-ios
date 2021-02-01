@@ -7,7 +7,7 @@ import Shared
 
 private let log = Logger.browserLogger
 
-public final class Device: NSManagedObject, Syncable, CRUD {
+public final class Device: NSManagedObject, CRUD {
     
     // Check if this can be nested inside the method
     static var sharedCurrentDeviceId: NSManagedObjectID?
@@ -20,9 +20,6 @@ public final class Device: NSManagedObject, Syncable, CRUD {
     @NSManaged public var deviceDisplayId: String?
     @NSManaged public var syncDisplayUUID: String?
     @NSManaged public var name: String?
-    
-    // Device is subtype of prefs 🤢
-    public var recordType: SyncRecordType = .prefs
     
     // MARK: - Public interface
     
@@ -48,10 +45,8 @@ public final class Device: NSManagedObject, Syncable, CRUD {
 
 extension Device {
     
-    // Just a facade around the displayId, for easier access and better CD storage
-    var deviceId: [Int]? {
-        get { return SyncHelpers.syncUUID(fromString: deviceDisplayId) }
-        set(value) { deviceDisplayId = SyncHelpers.syncDisplay(fromUUID: value) }
+    static func entity(context: NSManagedObjectContext) -> NSEntityDescription {
+        return NSEntityDescription.entity(forEntityName: "Bookmark", in: context)!
     }
     
     /// Returns a current device and assings it to a shared variable.
@@ -75,7 +70,6 @@ extension Device {
         DataController.perform { context in
             let device = Device(entity: Device.entity(context: context), insertInto: context)
             device.created = Date()
-            device.syncUUID = SyncCrypto.uniqueSerialBytes(count: 16)
             device.name = name
             device.isCurrentDevice = isCurrent
         }
@@ -84,66 +78,7 @@ extension Device {
     func removeInternal(save: Bool = true, sendToSync: Bool = true) {
         guard let context = managedObjectContext else { return }
         
-        if sendToSync {
-            Sync.shared.sendSyncRecords(action: .delete, records: [self])
-        }
-        
-        if isCurrentDevice {
-            Sync.shared.leaveSyncGroupInternal(sendToSync: false, context: .existing(context))
-        } else {
-            context.delete(self)
-            if save { DataController.save(context: context) }
-        }
-    }
-}
-
-// MARK: - Syncable methods
-extension Device {
-    static func createResolvedRecord(rootObject root: SyncRecord?, save: Bool,
-                                     context: WriteContext) {
-        
-        DataController.perform(context: context, save: save) { context in
-            // No guard, let bleed through to allow 'empty' devices (e.g. local)
-            let root = root as? SyncDevice
-            
-            let syncUUID = root?.objectId ?? SyncCrypto.uniqueSerialBytes(count: 16)
-            
-            var device: Device?
-            if let syncDisplayUUID = SyncHelpers.syncDisplay(fromUUID: syncUUID) {
-                // There can't be more than two device with the same syncUUID.
-                // A race condition could sometimes happen while getting two `Sync.resolvedSyncRecords` callbacks at the same time.
-                // Fixing issue #692 should help with it, until then we do a simple guard and disallow adding another device with the same syncUUID.
-                let predicate = NSPredicate(format: "syncDisplayUUID == %@", syncDisplayUUID)
-                device = Device.first(where: predicate, context: context)
-            }
-            
-            if device == nil {
-                device = Device(entity: Device.entity(context: context), insertInto: context)
-                device?.created = root?.syncNativeTimestamp ?? Date()
-                device?.syncUUID = syncUUID
-            }
-            
-            // Due to race conditions, there is a chance that we will get for example a different device name
-            // in insert(insead of update). Updating the Device regardless of whether it's already present.
-            device?.updateResolvedRecord(root, context: .existing(context))
-        }
-    }
-    
-    func updateResolvedRecord(_ record: SyncRecord?, context: WriteContext = .new(inMemory: false)) {
-        guard let root = record as? SyncDevice else { return }
-        self.name = root.name
-        self.deviceId = root.deviceId
-        created = record?.syncNativeTimestamp
-        
-        // No save currently
-    }
-    
-    func deleteResolvedRecord(save: Bool, context: NSManagedObjectContext) {
-        removeInternal(save: save, sendToSync: false)
-    }
-    
-    // This should be abstractable
-    func asDictionary(deviceId: [Int]?, action: Int?) -> [String: Any] {
-        return SyncDevice(record: self, deviceId: deviceId, action: action).dictionaryRepresentation()
+        context.delete(self)
+        if save { DataController.save(context: context) }
     }
 }

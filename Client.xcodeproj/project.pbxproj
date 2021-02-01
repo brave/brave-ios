@@ -685,15 +685,9 @@
 		5D1DC55B20AE004600905E5A /* Domain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC54820AE004600905E5A /* Domain.swift */; };
 		5D1DC55C20AE004600905E5A /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC54920AE004600905E5A /* Device.swift */; };
 		5D1DC55D20AE004600905E5A /* History.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC54A20AE004600905E5A /* History.swift */; };
-		5D1DC55E20AE004600905E5A /* Syncable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC54B20AE004600905E5A /* Syncable.swift */; };
 		5D1DC55F20AE004600905E5A /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC54C20AE004600905E5A /* Model.xcdatamodeld */; };
 		5D1DC56B20AE005400905E5A /* SyncCrypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC56120AE005400905E5A /* SyncCrypto.swift */; };
 		5D1DC56C20AE005400905E5A /* SyncShowCodewords.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC56220AE005400905E5A /* SyncShowCodewords.swift */; };
-		5D1DC56D20AE005400905E5A /* Sync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC56320AE005400905E5A /* Sync.swift */; };
-		5D1DC56E20AE005400905E5A /* SyncBookmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC56420AE005400905E5A /* SyncBookmark.swift */; };
-		5D1DC56F20AE005400905E5A /* SyncResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC56520AE005400905E5A /* SyncResponse.swift */; };
-		5D1DC57020AE005400905E5A /* SyncRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC56620AE005400905E5A /* SyncRecord.swift */; };
-		5D1DC57120AE005400905E5A /* SyncDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC56720AE005400905E5A /* SyncDevice.swift */; };
 		5D1DC57220AE005400905E5A /* JSInjector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC56820AE005400905E5A /* JSInjector.swift */; };
 		5D1DC57320AE005400905E5A /* SyncSite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC56920AE005400905E5A /* SyncSite.swift */; };
 		5D1DC57420AE005400905E5A /* ios-sync.js in Resources */ = {isa = PBXBuildFile; fileRef = 5D1DC56A20AE005400905E5A /* ios-sync.js */; };
@@ -2356,7 +2350,6 @@
 		5D1DC54820AE004600905E5A /* Domain.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Domain.swift; sourceTree = "<group>"; };
 		5D1DC54920AE004600905E5A /* Device.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Device.swift; sourceTree = "<group>"; };
 		5D1DC54A20AE004600905E5A /* History.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = History.swift; sourceTree = "<group>"; };
-		5D1DC54B20AE004600905E5A /* Syncable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Syncable.swift; sourceTree = "<group>"; };
 		5D1DC54D20AE004600905E5A /* Model7.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model7.xcdatamodel; sourceTree = "<group>"; };
 		5D1DC54E20AE004600905E5A /* Model2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model2.xcdatamodel; sourceTree = "<group>"; };
 		5D1DC54F20AE004600905E5A /* Model4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model4.xcdatamodel; sourceTree = "<group>"; };
@@ -2366,11 +2359,6 @@
 		5D1DC55320AE004600905E5A /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
 		5D1DC56120AE005400905E5A /* SyncCrypto.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncCrypto.swift; sourceTree = "<group>"; };
 		5D1DC56220AE005400905E5A /* SyncShowCodewords.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncShowCodewords.swift; sourceTree = "<group>"; };
-		5D1DC56320AE005400905E5A /* Sync.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sync.swift; sourceTree = "<group>"; };
-		5D1DC56420AE005400905E5A /* SyncBookmark.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncBookmark.swift; sourceTree = "<group>"; };
-		5D1DC56520AE005400905E5A /* SyncResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncResponse.swift; sourceTree = "<group>"; };
-		5D1DC56620AE005400905E5A /* SyncRecord.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncRecord.swift; sourceTree = "<group>"; };
-		5D1DC56720AE005400905E5A /* SyncDevice.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncDevice.swift; sourceTree = "<group>"; };
 		5D1DC56820AE005400905E5A /* JSInjector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSInjector.swift; sourceTree = "<group>"; };
 		5D1DC56920AE005400905E5A /* SyncSite.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncSite.swift; sourceTree = "<group>"; };
 		5D1DC56A20AE005400905E5A /* ios-sync.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "ios-sync.js"; sourceTree = "<group>"; };
@@ -4519,7 +4507,6 @@
 				5D1DC54820AE004600905E5A /* Domain.swift */,
 				5D1DC54920AE004600905E5A /* Device.swift */,
 				5D1DC54A20AE004600905E5A /* History.swift */,
-				5D1DC54B20AE004600905E5A /* Syncable.swift */,
 				5D1DC54C20AE004600905E5A /* Model.xcdatamodeld */,
 				0A53F3E621E6560A0086E80C /* InMemoryDataController.swift */,
 			);
@@ -4533,11 +4520,6 @@
 				0AD4FEEF223AA45800E00C05 /* BraveCryptoJS.swift */,
 				5D1DC56120AE005400905E5A /* SyncCrypto.swift */,
 				5D1DC56220AE005400905E5A /* SyncShowCodewords.swift */,
-				5D1DC56320AE005400905E5A /* Sync.swift */,
-				5D1DC56420AE005400905E5A /* SyncBookmark.swift */,
-				5D1DC56520AE005400905E5A /* SyncResponse.swift */,
-				5D1DC56620AE005400905E5A /* SyncRecord.swift */,
-				5D1DC56720AE005400905E5A /* SyncDevice.swift */,
 				5D1DC56820AE005400905E5A /* JSInjector.swift */,
 				5D1DC56920AE005400905E5A /* SyncSite.swift */,
 				0A39D56C21930B89008B2772 /* ScriptOpener.swift */,
@@ -6680,22 +6662,17 @@
 			buildActionMask = 2147483647;
 			files = (
 				0AA029F8222E899400D6B535 /* Bookmark+Reorder.swift in Sources */,
-				5D1DC56E20AE005400905E5A /* SyncBookmark.swift in Sources */,
 				5D1DC55A20AE004600905E5A /* FaviconMO.swift in Sources */,
 				0AD4FEF0223AA45800E00C05 /* BraveCryptoJS.swift in Sources */,
 				5D1DC55C20AE004600905E5A /* Device.swift in Sources */,
 				5D1DC56C20AE005400905E5A /* SyncShowCodewords.swift in Sources */,
 				5D1DC55D20AE004600905E5A /* History.swift in Sources */,
-				5D1DC57120AE005400905E5A /* SyncDevice.swift in Sources */,
 				0A39D56D21930B89008B2772 /* ScriptOpener.swift in Sources */,
 				44FA2F3021F8DB1000EFA86A /* DataPreferences.swift in Sources */,
 				5D1DC55620AE004600905E5A /* DataController.swift in Sources */,
-				5D1DC56F20AE005400905E5A /* SyncResponse.swift in Sources */,
 				5D1DC57320AE005400905E5A /* SyncSite.swift in Sources */,
 				5D1DC55520AE004600905E5A /* TabMO.swift in Sources */,
 				0A53F3E721E6560A0086E80C /* InMemoryDataController.swift in Sources */,
-				5D1DC55E20AE004600905E5A /* Syncable.swift in Sources */,
-				5D1DC56D20AE005400905E5A /* Sync.swift in Sources */,
 				0A771D35218C8FDC00336E0D /* Bookmark+Sync.swift in Sources */,
 				5D1DC57220AE005400905E5A /* JSInjector.swift in Sources */,
 				5D1DC55920AE004600905E5A /* Bookmark.swift in Sources */,
@@ -6706,7 +6683,6 @@
 				0A62A355238C6F3E008902E3 /* Bookmark+Restoration.swift in Sources */,
 				5D1DC56B20AE005400905E5A /* SyncCrypto.swift in Sources */,
 				5D1DC55F20AE004600905E5A /* Model.xcdatamodeld in Sources */,
-				5D1DC57020AE005400905E5A /* SyncRecord.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

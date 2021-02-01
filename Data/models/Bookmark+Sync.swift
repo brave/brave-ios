@@ -138,7 +138,7 @@ extension Bookmark {
         } else if let parentOrder = parentFolder?.syncOrder, lastBookmarkOrder == nil {
             syncOrder = parentOrder + ".1"
         } else {
-            syncOrder = Sync.shared.getBookmarkOrder(previousOrder: lastBookmarkOrder, nextOrder: nil)
+            syncOrder = Bookmark.getBookmarkOrder(previousOrder: lastBookmarkOrder, nextOrder: nil)
         }
     }
     
