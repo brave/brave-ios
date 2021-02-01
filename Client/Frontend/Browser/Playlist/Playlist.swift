@@ -102,16 +102,26 @@ class Playlist {
         }) ?? []
     }
     
-    func getCache(item: PlaylistInfo) -> Data {
+    func getItem(pageSrc: String) -> PlaylistItem? {
         let request: NSFetchRequest<PlaylistItem> = PlaylistItem.fetchRequest()
-        request.predicate = NSPredicate(format: "pageSrc == %@", item.pageSrc)
-        request.fetchLimit = 1
-        return (try? self.mainContext.fetch(request))?.first?.cachedData ?? Data()
+        request.predicate = NSPredicate(format: "pageSrc == %@", pageSrc)
+        
+        if let item = (try? self.mainContext.fetch(request))?.first {
+            return item
+        }
+        return nil
     }
     
-    func updateCache(item: PlaylistInfo, cachedData: Data) {
+    func getCache(pageSrc: String) -> Data? {
         let request: NSFetchRequest<PlaylistItem> = PlaylistItem.fetchRequest()
-        request.predicate = NSPredicate(format: "pageSrc == %@", item.pageSrc)
+        request.predicate = NSPredicate(format: "pageSrc == %@", pageSrc)
+        request.fetchLimit = 1
+        return (try? self.mainContext.fetch(request))?.first?.cachedData
+    }
+    
+    func updateCache(pageSrc: String, cachedData: Data?) {
+        let request: NSFetchRequest<PlaylistItem> = PlaylistItem.fetchRequest()
+        request.predicate = NSPredicate(format: "pageSrc == %@", pageSrc)
         request.fetchLimit = 1
         
         (try? self.mainContext.fetch(request))?.first?.cachedData = cachedData

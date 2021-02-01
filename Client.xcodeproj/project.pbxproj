@@ -755,6 +755,7 @@
 		5E72D54F253657FF00F8D62D /* BraveCoreImportExportUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E72D54E253657FF00F8D62D /* BraveCoreImportExportUtility.swift */; };
 		5E8CD8E123D5E3DA00548FC0 /* libarchive.2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E8CD8E023D5E3D100548FC0 /* libarchive.2.tbd */; };
 		5E9288CA22DF864C007BE7A6 /* TabSessionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E9288C922DF864C007BE7A6 /* TabSessionTests.swift */; };
+		5E99C88B25C83BE3003F30B4 /* PlaylistManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E99C88A25C83BE3003F30B4 /* PlaylistManager.swift */; };
 		5E9B28EB255047C80072E655 /* BookmarkModelStateObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E9B28EA255047C80072E655 /* BookmarkModelStateObserver.swift */; };
 		5E9B28F7255048540072E655 /* BookmarkFetchers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E9B28F6255048540072E655 /* BookmarkFetchers.swift */; };
 		5EA8438E234F802C00076A91 /* expired.badssl.com-root-ca.cer in Resources */ = {isa = PBXBuildFile; fileRef = 5EA84389234F802C00076A91 /* expired.badssl.com-root-ca.cer */; };
@@ -1032,7 +1033,6 @@
 		F979BE3225BCC54E009B6ACF /* AllFramesAtDocumentEndSandboxed.js in Resources */ = {isa = PBXBuildFile; fileRef = F979BE2E25BCC54E009B6ACF /* AllFramesAtDocumentEndSandboxed.js */; };
 		F979BE4725BCC5D3009B6ACF /* MainFrameAtDocumentEnd.js in Resources */ = {isa = PBXBuildFile; fileRef = F979BE4525BCC5D3009B6ACF /* MainFrameAtDocumentEnd.js */; };
 		F979BE4825BCC5D3009B6ACF /* MainFrameAtDocumentStart.js in Resources */ = {isa = PBXBuildFile; fileRef = F979BE4625BCC5D3009B6ACF /* MainFrameAtDocumentStart.js */; };
-		F98E1EA122B6D70E0018AF29 /* libYubiKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AC8E23A22A6C56D0064F3FA /* libYubiKit.a */; };
 		F99505FF22937E3900CC6543 /* U2F-low-level.js in Resources */ = {isa = PBXBuildFile; fileRef = F99505FE22937E3900CC6543 /* U2F-low-level.js */; };
 		F9B23EE223F61173000EB3D8 /* PaymentRequest.js in Resources */ = {isa = PBXBuildFile; fileRef = F9B23EE123F61173000EB3D8 /* PaymentRequest.js */; };
 		F9B23EE523F613E8000EB3D8 /* PaymentRequestExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B23EE423F613E8000EB3D8 /* PaymentRequestExtension.swift */; };
@@ -2444,6 +2444,7 @@
 		5E72D54E253657FF00F8D62D /* BraveCoreImportExportUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveCoreImportExportUtility.swift; sourceTree = "<group>"; };
 		5E8CD8E023D5E3D100548FC0 /* libarchive.2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libarchive.2.tbd; path = usr/lib/libarchive.2.tbd; sourceTree = SDKROOT; };
 		5E9288C922DF864C007BE7A6 /* TabSessionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabSessionTests.swift; sourceTree = "<group>"; };
+		5E99C88A25C83BE3003F30B4 /* PlaylistManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistManager.swift; sourceTree = "<group>"; };
 		5E9B28EA255047C80072E655 /* BookmarkModelStateObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkModelStateObserver.swift; sourceTree = "<group>"; };
 		5E9B28F6255048540072E655 /* BookmarkFetchers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkFetchers.swift; sourceTree = "<group>"; };
 		5EA84389234F802C00076A91 /* expired.badssl.com-root-ca.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = "expired.badssl.com-root-ca.cer"; sourceTree = "<group>"; };
@@ -4687,6 +4688,7 @@
 			isa = PBXGroup;
 			children = (
 				5E5E6E7925BA156F0035B6A0 /* PlaylistCacheLoader.swift */,
+				5E99C88A25C83BE3003F30B4 /* PlaylistManager.swift */,
 			);
 			path = Cache;
 			sourceTree = "<group>";
@@ -6938,6 +6940,7 @@
 				D3B6923F1B9F9A58004B87A4 /* FindInPageHelper.swift in Sources */,
 				2F098F8B255F2D730084FB37 /* BrowserViewController+ReaderMode.swift in Sources */,
 				4422D57421BFFB7F00BF1855 /* prog.cc in Sources */,
+				5E99C88B25C83BE3003F30B4 /* PlaylistManager.swift in Sources */,
 				4422D42F21BFCF8900BF1855 /* HttpsEverywhereObjC.mm in Sources */,
 				4422D56B21BFFB7F00BF1855 /* prefilter_tree.cc in Sources */,
 				5EC2C08725BF9B13005EA984 /* PlaylistCurrentPlayingView.swift in Sources */,

@@ -10,7 +10,6 @@ import AVFoundation
 
 class PlaylistMediaInfo: NSObject {
     private weak var playerView: VideoView?
-    private var cacheLoader = PlaylistCacheLoader()
     private var webLoader = PlaylistWebLoader(handler: { _ in })
     private var streamLoader = MediaResourceManager({ _ in })
     public var nowPlayingInfo: PlaylistInfo? {
@@ -92,6 +91,7 @@ class PlaylistMediaInfo: NSObject {
         
         UIApplication.shared.beginReceivingRemoteControlEvents()
         
+        PlaylistManager.shared.delegate = self
         self.updateItems()
         self.updateNowPlayingMediaInfo()
         
@@ -138,11 +138,11 @@ extension PlaylistMediaInfo: MPPlayableContentDelegate {
         //self.present(alert, animated: true, completion: nil)
     }
     
-    public func loadMediaItem(_ item: PlaylistInfo, completion: @escaping (Error?) -> Void) {
+    public func loadMediaItem(_ item: PlaylistInfo, index: Int, completion: @escaping (Error?) -> Void) {
         self.nowPlayingInfo = item
-        let cache = Playlist.shared.getCache(item: item)
+        let cacheState = PlaylistManager.shared.state(for: item.pageSrc)
 
-        if cache.isEmpty {
+        if cacheState == .invalid {
             if !item.src.isEmpty, let url = URL(string: item.src) {
                 //Try to stream the asset from its url..
                 MediaResourceManager.canStreamURL(url) { [weak self] canStream in
@@ -199,9 +199,8 @@ extension PlaylistMediaInfo: MPPlayableContentDelegate {
             }
         } else {
             //Load from the cache since this item was downloaded before..
-            self.cacheLoader = PlaylistCacheLoader(cacheData: cache)
-            let url = URL(string: "brave-media-ios://local-media-resource?time=\(Date().timeIntervalSince1970)")!
-            self.playerView?.load(url: url, resourceDelegate: self.cacheLoader)
+            let asset = PlaylistManager.shared.assetAtIndex(index)
+            self.playerView?.load(asset: asset)
             completion(nil)
         }
     }
@@ -218,6 +217,16 @@ extension PlaylistMediaInfo {
             return nil
         }
         return UIImage(cgImage: imageRef)
+    }
+}
+
+extension PlaylistMediaInfo: PlaylistManagerDelegate {
+    func onDownloadProgressUpdate(id: String, percentComplete: Double) {
+        
+    }
+    
+    func onDownloadStateChanged(id: String, state: PlaylistManager.DownloadState, displayName: String) {
+        
     }
 }
 
