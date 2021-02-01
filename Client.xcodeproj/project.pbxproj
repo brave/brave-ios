@@ -22,9 +22,6 @@
 		0A1DF468244858CA00541FE4 /* VPNProductInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A1DF467244858CA00541FE4 /* VPNProductInfo.swift */; };
 		0A1DF48424487AA000541FE4 /* GRDGatewayAPIResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A1DF48324487AA000541FE4 /* GRDGatewayAPIResponse.m */; };
 		0A1DF486244A2ECB00541FE4 /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A1DF485244A2ECB00541FE4 /* NetworkExtension.framework */; };
-		0A1E842D21909CA70042F782 /* crypto.js in Resources */ = {isa = PBXBuildFile; fileRef = 0A1E842C21909CA70042F782 /* crypto.js */; };
-		0A1E842F21909CBC0042F782 /* bundle.js in Resources */ = {isa = PBXBuildFile; fileRef = 0A1E842E21909CBB0042F782 /* bundle.js */; };
-		0A1E843121909CC40042F782 /* fetch.js in Resources */ = {isa = PBXBuildFile; fileRef = 0A1E843021909CC30042F782 /* fetch.js */; };
 		0A1E843D2190A57F0042F782 /* SyncSettingsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A1E84332190A57D0042F782 /* SyncSettingsTableViewController.swift */; };
 		0A1E843E2190A57F0042F782 /* SyncCodewordsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A1E84342190A57D0042F782 /* SyncCodewordsView.swift */; };
 		0A1E843F2190A57F0042F782 /* SyncQRCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A1E84352190A57E0042F782 /* SyncQRCodeView.swift */; };
@@ -157,7 +154,6 @@
 		0AD4FEEA223A9A5500E00C05 /* BundledJSProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AD4FEE9223A9A5500E00C05 /* BundledJSProtocol.swift */; };
 		0AD4FEEC223A9C1300E00C05 /* BrowserifiedJS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AD4FEEB223A9C1300E00C05 /* BrowserifiedJS.swift */; };
 		0AD4FEEE223AA09D00E00C05 /* BrowserifyExposable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AD4FEED223AA09D00E00C05 /* BrowserifyExposable.swift */; };
-		0AD4FEF0223AA45800E00C05 /* BraveCryptoJS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AD4FEEF223AA45800E00C05 /* BraveCryptoJS.swift */; };
 		0AD4FEF2223AA6CA00E00C05 /* JSContextExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AD4FEF1223AA6CA00E00C05 /* JSContextExtensions.swift */; };
 		0AD4FEF4223AC32200E00C05 /* JSValueExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AD4FEF3223AC32200E00C05 /* JSValueExtensions.swift */; };
 		0AD4FEFA223BBE5400E00C05 /* SyncCryptoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AD4FEF9223BBE5400E00C05 /* SyncCryptoTests.swift */; };
@@ -686,11 +682,7 @@
 		5D1DC55C20AE004600905E5A /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC54920AE004600905E5A /* Device.swift */; };
 		5D1DC55D20AE004600905E5A /* History.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC54A20AE004600905E5A /* History.swift */; };
 		5D1DC55F20AE004600905E5A /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC54C20AE004600905E5A /* Model.xcdatamodeld */; };
-		5D1DC56B20AE005400905E5A /* SyncCrypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC56120AE005400905E5A /* SyncCrypto.swift */; };
 		5D1DC56C20AE005400905E5A /* SyncShowCodewords.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC56220AE005400905E5A /* SyncShowCodewords.swift */; };
-		5D1DC57220AE005400905E5A /* JSInjector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC56820AE005400905E5A /* JSInjector.swift */; };
-		5D1DC57320AE005400905E5A /* SyncSite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC56920AE005400905E5A /* SyncSite.swift */; };
-		5D1DC57420AE005400905E5A /* ios-sync.js in Resources */ = {isa = PBXBuildFile; fileRef = 5D1DC56A20AE005400905E5A /* ios-sync.js */; };
 		5D21AE082303B70E00B30D97 /* Themes in Resources */ = {isa = PBXBuildFile; fileRef = 5D21AE002303B70E00B30D97 /* Themes */; };
 		5D24AF8221BA459000F9506A /* BlocklistName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D24AF8121BA459000F9506A /* BlocklistName.swift */; };
 		5D24AF8421BA489A00F9506A /* ContentBlocker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D24AF8321BA489A00F9506A /* ContentBlocker.swift */; };
@@ -1365,10 +1357,6 @@
 		0A1DF467244858CA00541FE4 /* VPNProductInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNProductInfo.swift; sourceTree = "<group>"; };
 		0A1DF48324487AA000541FE4 /* GRDGatewayAPIResponse.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GRDGatewayAPIResponse.m; sourceTree = "<group>"; };
 		0A1DF485244A2ECB00541FE4 /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
-		0A1E841B219095410042F782 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		0A1E842C21909CA70042F782 /* crypto.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = crypto.js; path = "node_modules/brave-sync/node_modules/brave-crypto/browser/crypto.js"; sourceTree = SOURCE_ROOT; };
-		0A1E842E21909CBB0042F782 /* bundle.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = bundle.js; path = "node_modules/brave-sync/bundles/bundle.js"; sourceTree = SOURCE_ROOT; };
-		0A1E843021909CC30042F782 /* fetch.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = fetch.js; path = "node_modules/brave-sync/client/polyfill/fetch.js"; sourceTree = SOURCE_ROOT; };
 		0A1E84332190A57D0042F782 /* SyncSettingsTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncSettingsTableViewController.swift; sourceTree = "<group>"; };
 		0A1E84342190A57D0042F782 /* SyncCodewordsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncCodewordsView.swift; sourceTree = "<group>"; };
 		0A1E84352190A57E0042F782 /* SyncQRCodeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncQRCodeView.swift; sourceTree = "<group>"; };
@@ -1534,7 +1522,6 @@
 		0AD4FEE9223A9A5500E00C05 /* BundledJSProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundledJSProtocol.swift; sourceTree = "<group>"; };
 		0AD4FEEB223A9C1300E00C05 /* BrowserifiedJS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserifiedJS.swift; sourceTree = "<group>"; };
 		0AD4FEED223AA09D00E00C05 /* BrowserifyExposable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserifyExposable.swift; sourceTree = "<group>"; };
-		0AD4FEEF223AA45800E00C05 /* BraveCryptoJS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveCryptoJS.swift; sourceTree = "<group>"; };
 		0AD4FEF1223AA6CA00E00C05 /* JSContextExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSContextExtensions.swift; sourceTree = "<group>"; };
 		0AD4FEF3223AC32200E00C05 /* JSValueExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSValueExtensions.swift; sourceTree = "<group>"; };
 		0AD4FEF9223BBE5400E00C05 /* SyncCryptoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncCryptoTests.swift; sourceTree = "<group>"; };
@@ -2357,11 +2344,7 @@
 		5D1DC55120AE004600905E5A /* Model6.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model6.xcdatamodel; sourceTree = "<group>"; };
 		5D1DC55220AE004600905E5A /* Model5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model5.xcdatamodel; sourceTree = "<group>"; };
 		5D1DC55320AE004600905E5A /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
-		5D1DC56120AE005400905E5A /* SyncCrypto.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncCrypto.swift; sourceTree = "<group>"; };
 		5D1DC56220AE005400905E5A /* SyncShowCodewords.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncShowCodewords.swift; sourceTree = "<group>"; };
-		5D1DC56820AE005400905E5A /* JSInjector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSInjector.swift; sourceTree = "<group>"; };
-		5D1DC56920AE005400905E5A /* SyncSite.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncSite.swift; sourceTree = "<group>"; };
-		5D1DC56A20AE005400905E5A /* ios-sync.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "ios-sync.js"; sourceTree = "<group>"; };
 		5D21AE002303B70E00B30D97 /* Themes */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Themes; sourceTree = "<group>"; };
 		5D24AF8121BA459000F9506A /* BlocklistName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlocklistName.swift; sourceTree = "<group>"; };
 		5D24AF8321BA489A00F9506A /* ContentBlocker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBlocker.swift; sourceTree = "<group>"; };
@@ -2934,17 +2917,6 @@
 				0AB6E25624C5EE290060B052 /* NSLogDisabler.h */,
 			);
 			path = GRDAPI;
-			sourceTree = "<group>";
-		};
-		0A1E8413219094100042F782 /* Dependencies */ = {
-			isa = PBXGroup;
-			children = (
-				0A1E841B219095410042F782 /* README.md */,
-				0A1E842E21909CBB0042F782 /* bundle.js */,
-				0A1E842C21909CA70042F782 /* crypto.js */,
-				0A1E843021909CC30042F782 /* fetch.js */,
-			);
-			path = Dependencies;
 			sourceTree = "<group>";
 		};
 		0A1E84322190A4BA0042F782 /* Sync */ = {
@@ -4516,14 +4488,8 @@
 		5D1DC56020AE005400905E5A /* sync */ = {
 			isa = PBXGroup;
 			children = (
-				0A1E8413219094100042F782 /* Dependencies */,
-				0AD4FEEF223AA45800E00C05 /* BraveCryptoJS.swift */,
-				5D1DC56120AE005400905E5A /* SyncCrypto.swift */,
 				5D1DC56220AE005400905E5A /* SyncShowCodewords.swift */,
-				5D1DC56820AE005400905E5A /* JSInjector.swift */,
-				5D1DC56920AE005400905E5A /* SyncSite.swift */,
 				0A39D56C21930B89008B2772 /* ScriptOpener.swift */,
-				5D1DC56A20AE005400905E5A /* ios-sync.js */,
 				0AF6845A2191D6470079EC77 /* bookmark_util.js */,
 			);
 			path = sync;
@@ -6247,10 +6213,6 @@
 			files = (
 				0AF684622191D6470079EC77 /* bookmark_util.js in Resources */,
 				59B6912921B695A400E9388E /* InfoPlist.strings in Resources */,
-				5D1DC57420AE005400905E5A /* ios-sync.js in Resources */,
-				0A1E843121909CC40042F782 /* fetch.js in Resources */,
-				0A1E842D21909CA70042F782 /* crypto.js in Resources */,
-				0A1E842F21909CBC0042F782 /* bundle.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6663,25 +6625,21 @@
 			files = (
 				0AA029F8222E899400D6B535 /* Bookmark+Reorder.swift in Sources */,
 				5D1DC55A20AE004600905E5A /* FaviconMO.swift in Sources */,
-				0AD4FEF0223AA45800E00C05 /* BraveCryptoJS.swift in Sources */,
 				5D1DC55C20AE004600905E5A /* Device.swift in Sources */,
 				5D1DC56C20AE005400905E5A /* SyncShowCodewords.swift in Sources */,
 				5D1DC55D20AE004600905E5A /* History.swift in Sources */,
 				0A39D56D21930B89008B2772 /* ScriptOpener.swift in Sources */,
 				44FA2F3021F8DB1000EFA86A /* DataPreferences.swift in Sources */,
 				5D1DC55620AE004600905E5A /* DataController.swift in Sources */,
-				5D1DC57320AE005400905E5A /* SyncSite.swift in Sources */,
 				5D1DC55520AE004600905E5A /* TabMO.swift in Sources */,
 				0A53F3E721E6560A0086E80C /* InMemoryDataController.swift in Sources */,
 				0A771D35218C8FDC00336E0D /* Bookmark+Sync.swift in Sources */,
-				5D1DC57220AE005400905E5A /* JSInjector.swift in Sources */,
 				5D1DC55920AE004600905E5A /* Bookmark.swift in Sources */,
 				27B3DDD024AE83710006A7ED /* FeedSourceOverride.swift in Sources */,
 				5D1DC55B20AE004600905E5A /* Domain.swift in Sources */,
 				0AF0411B2267C61100EBF982 /* ManagedObjectExtensions.swift in Sources */,
 				0AA4FC392109D685000B173A /* CRUDProtocols.swift in Sources */,
 				0A62A355238C6F3E008902E3 /* Bookmark+Restoration.swift in Sources */,
-				5D1DC56B20AE005400905E5A /* SyncCrypto.swift in Sources */,
 				5D1DC55F20AE004600905E5A /* Model.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
