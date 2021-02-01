@@ -755,11 +755,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     
     public func load(url: URL, resourceDelegate: AVAssetResourceLoaderDelegate?) {
         thumbnailView.isHidden = false
-        var asset = AVURLAsset(url: url)
-        
-        if let delegate = resourceDelegate as? PlaylistCacheLoader {
-            asset = AVURLAsset(url: url, options: ["AVURLAssetOutOfBandMIMETypeKey": delegate.mimeType])
-        }
+        let asset = AVURLAsset(url: url)
         
         if let delegate = resourceDelegate {
             asset.resourceLoader.setDelegate(delegate, queue: .main)
@@ -767,6 +763,36 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         
         if let currentItem = player.currentItem, currentItem.asset.isKind(of: AVURLAsset.self) && player.status == .readyToPlay {
             if let asset = currentItem.asset as? AVURLAsset, asset.url.absoluteString == url.absoluteString {
+                thumbnailView.isHidden = true
+                
+                if isPlaying {
+                    self.pause()
+                    self.play()
+                }
+                
+                return
+            }
+        }
+        
+        asset.loadValuesAsynchronously(forKeys: ["playable", "tracks", "duration"]) { [weak self] in
+            guard let self = self else { return }
+            DispatchQueue.main.async {
+                let item = AVPlayerItem(asset: asset)
+                self.player.replaceCurrentItem(with: item)
+                
+                let endTime = CMTimeConvertScale(item.asset.duration, timescale: self.player.currentTime().timescale, method: .roundHalfAwayFromZero)
+                self.trackBar.setTimeRange(currentTime: item.currentTime(), endTime: endTime)
+                self.thumbnailView.isHidden = true
+                self.play()
+            }
+        }
+    }
+    
+    public func load(asset: AVURLAsset) {
+        thumbnailView.isHidden = false
+        
+        if let currentItem = player.currentItem, currentItem.asset.isKind(of: AVURLAsset.self) && player.status == .readyToPlay {
+            if let currentAsset = currentItem.asset as? AVURLAsset, currentAsset.url.absoluteString == asset.url.absoluteString {
                 thumbnailView.isHidden = true
                 
                 if isPlaying {

@@ -2659,8 +2659,7 @@ extension BrowserViewController: TabDelegate {
         tab.addContentScript(ResourceDownloadManager(tab: tab), name: ResourceDownloadManager.name(), sandboxed: false)
         
         tab.addContentScript(WindowRenderHelperScript(tab: tab), name: WindowRenderHelperScript.name(), sandboxed: false)
-        tab.addContentScript(PlaylistHelper(tab: tab), name: PlaylistHelper.name(), sandboxed: false)
-
+        
         let playlistHelper = PlaylistHelper(tab: tab)
         playlistHelper.delegate = self
         tab.addContentScript(playlistHelper, name: PlaylistHelper.name())
