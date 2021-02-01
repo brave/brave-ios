@@ -682,7 +682,6 @@
 		5D1DC55C20AE004600905E5A /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC54920AE004600905E5A /* Device.swift */; };
 		5D1DC55D20AE004600905E5A /* History.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC54A20AE004600905E5A /* History.swift */; };
 		5D1DC55F20AE004600905E5A /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC54C20AE004600905E5A /* Model.xcdatamodeld */; };
-		5D1DC56C20AE005400905E5A /* SyncShowCodewords.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC56220AE005400905E5A /* SyncShowCodewords.swift */; };
 		5D21AE082303B70E00B30D97 /* Themes in Resources */ = {isa = PBXBuildFile; fileRef = 5D21AE002303B70E00B30D97 /* Themes */; };
 		5D24AF8221BA459000F9506A /* BlocklistName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D24AF8121BA459000F9506A /* BlocklistName.swift */; };
 		5D24AF8421BA489A00F9506A /* ContentBlocker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D24AF8321BA489A00F9506A /* ContentBlocker.swift */; };
@@ -2344,7 +2343,6 @@
 		5D1DC55120AE004600905E5A /* Model6.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model6.xcdatamodel; sourceTree = "<group>"; };
 		5D1DC55220AE004600905E5A /* Model5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model5.xcdatamodel; sourceTree = "<group>"; };
 		5D1DC55320AE004600905E5A /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
-		5D1DC56220AE005400905E5A /* SyncShowCodewords.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncShowCodewords.swift; sourceTree = "<group>"; };
 		5D21AE002303B70E00B30D97 /* Themes */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Themes; sourceTree = "<group>"; };
 		5D24AF8121BA459000F9506A /* BlocklistName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlocklistName.swift; sourceTree = "<group>"; };
 		5D24AF8321BA489A00F9506A /* ContentBlocker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBlocker.swift; sourceTree = "<group>"; };
@@ -4431,8 +4429,9 @@
 			isa = PBXGroup;
 			children = (
 				44FA2F2F21F8DB1000EFA86A /* DataPreferences.swift */,
+				0A39D56C21930B89008B2772 /* ScriptOpener.swift */,
+				0AF6845A2191D6470079EC77 /* bookmark_util.js */,
 				5D1DC54020AE004600905E5A /* models */,
-				5D1DC56020AE005400905E5A /* sync */,
 				5D1DC51520AC9AFA00905E5A /* Data.h */,
 				5D1DC51620AC9AFA00905E5A /* Info.plist */,
 				59B6912721B695A400E9388E /* InfoPlist.strings */,
@@ -4483,16 +4482,6 @@
 				0A53F3E621E6560A0086E80C /* InMemoryDataController.swift */,
 			);
 			path = models;
-			sourceTree = "<group>";
-		};
-		5D1DC56020AE005400905E5A /* sync */ = {
-			isa = PBXGroup;
-			children = (
-				5D1DC56220AE005400905E5A /* SyncShowCodewords.swift */,
-				0A39D56C21930B89008B2772 /* ScriptOpener.swift */,
-				0AF6845A2191D6470079EC77 /* bookmark_util.js */,
-			);
-			path = sync;
 			sourceTree = "<group>";
 		};
 		5D26E89C22E117660015D7E9 /* Themes */ = {
@@ -6626,7 +6615,6 @@
 				0AA029F8222E899400D6B535 /* Bookmark+Reorder.swift in Sources */,
 				5D1DC55A20AE004600905E5A /* FaviconMO.swift in Sources */,
 				5D1DC55C20AE004600905E5A /* Device.swift in Sources */,
-				5D1DC56C20AE005400905E5A /* SyncShowCodewords.swift in Sources */,
 				5D1DC55D20AE004600905E5A /* History.swift in Sources */,
 				0A39D56D21930B89008B2772 /* ScriptOpener.swift in Sources */,
 				44FA2F3021F8DB1000EFA86A /* DataPreferences.swift in Sources */,

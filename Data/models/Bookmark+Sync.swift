@@ -11,9 +11,9 @@ private let log = Logger.browserLogger
 
 // Sync related methods for Bookmark model.
 extension Bookmark {
-    /// If sync is not used, we still utilize its syncOrder algorithm to determine order of bookmarks.
-    /// Base order is needed to distinguish between bookmarks on different devices and platforms.
-    static var baseOrder: String { return Preferences.Sync.baseSyncOrder.value }
+    // This value was used in old sync v1 implementation,
+    // currently it can still be used for favorites ordering.
+    static let baseOrder = "0.0."
     
     /// syncOrder for Brave < 1.8 has to be set in order to support the new ordering mechanism.
     /// Pre 1.8 bookmarks didn't have syncOrder set which makes it hard to calculate syncOrder for new
@@ -139,20 +139,6 @@ extension Bookmark {
             syncOrder = parentOrder + ".1"
         } else {
             syncOrder = Bookmark.getBookmarkOrder(previousOrder: lastBookmarkOrder, nextOrder: nil)
-        }
-    }
-    
-    class func removeSyncOrders() {
-        DataController.perform { context in
-            let allBookmarks = getAllBookmarks(context: context)
-            
-            allBookmarks.forEach { bookmark in
-                bookmark.syncOrder = nil
-                // TODO: Clear syncUUIDs
-                //            bookmark.syncUUID = nil
-            }
-            
-            Preferences.Sync.baseSyncOrder.reset()
         }
     }
     
