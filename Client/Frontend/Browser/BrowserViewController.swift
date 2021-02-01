@@ -3326,22 +3326,10 @@ extension BrowserViewController: ContextMenuHelperDelegate {
     
     private func writePhotoToAlbumAction(_ url: URL) {
         self.getData(url) { [weak self] data in
-            guard let self = self else { return }
-            
-            if data.isGIF {
-                PHPhotoLibrary.shared().performChanges({
-                    let request = PHAssetCreationRequest.forAsset()
-                    request.addResource(with: .photo, data: data, options: nil)
-                }) { (success, error) in
-                    if let error = error {
-                        log.error(error.localizedDescription)
-                    }
-                }
-            } else {
-                if let image = UIImage.imageFromDataThreadSafe(data) {
-                    UIImageWriteToSavedPhotosAlbum(image, self, #selector(self.image(image:didFinishSavingwithError:contextInfo:)), nil)
-                }
-            }
+            guard let self = self,
+                  let image = data.isGIF ? UIImage.imageFromGIFDataThreadSafe(data) : UIImage.imageFromDataThreadSafe(data) else { return }
+
+            UIImageWriteToSavedPhotosAlbum(image, self, #selector(self.image(image:didFinishSavingwithError:contextInfo:)), nil)
         }
     }
 }
