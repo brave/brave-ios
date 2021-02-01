@@ -29,8 +29,6 @@ class PlaylistViewController: UIViewController {
     
     private let playerView = VideoView()
     
-    private let playlistFRC = Playlist.shared.fetchResultsController()
-    
     private lazy var activityIndicator = UIActivityIndicatorView(style: .white).then {
         $0.isHidden = true
         $0.hidesWhenStopped = true
@@ -55,7 +53,7 @@ class PlaylistViewController: UIViewController {
 
     private lazy var mediaInfo = PlaylistMediaInfo(playerView: playerView)
     
-    private var currentItem = -1
+    private var currentlyPlayingItemIndex = -1
     
     init() {
         super.init(nibName: nil, bundle: nil)
@@ -136,7 +134,7 @@ class PlaylistViewController: UIViewController {
     
     private func fetchResults() {
         DispatchQueue.main.async {
-            try? self.playlistFRC.performFetch()
+            PlaylistManager.shared.reloadData()
             self.tableView.reloadData()
         }
     }
@@ -165,7 +163,7 @@ extension PlaylistViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return playlistFRC.fetchedObjects?.count ?? 0
+        return PlaylistManager.shared.numberOfAssets()
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -181,10 +179,7 @@ extension PlaylistViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         
-        let item = playlistFRC.object(at: indexPath)
-        guard let mediaSrc = item.mediaSrc else {
-            return UITableViewCell()
-        }
+        let item = PlaylistManager.shared.itemAtIndex(indexPath.row)
         
         cell.do {
             $0.selectionStyle = .none
@@ -197,13 +192,13 @@ extension PlaylistViewController: UITableViewDataSource {
             $0.thumbnailImage = #imageLiteral(resourceName: "menu-NoImageMode")
         }
         
-        if let url = URL(string: mediaSrc) {
+        if let url = URL(string: item.src) {
             previewImageFromVideo(url: url) {
                 cell.thumbnailImage = $0
             }
         }
         
-        if indexPath.row == currentItem {
+        if indexPath.row == currentlyPlayingItemIndex {
             cell.indicatorIcon.image = #imageLiteral(resourceName: "playlist_currentitem_indicator")
             cell.indicatorIcon.alpha = 1.0
         }
@@ -224,7 +219,7 @@ extension PlaylistViewController: UITableViewDataSource {
     private func previewImageFromVideo(url: URL, _ completion: @escaping (UIImage?) -> Void) {
         let request = URLRequest(url: url)
         let cache = URLCache.shared
-        let imageCache = SDImageCache.shared()
+        let imageCache = SDImageCache.shared
 
         if let cachedImage = imageCache.imageFromCache(forKey: url.absoluteString) {
             completion(cachedImage)
@@ -271,84 +266,50 @@ extension PlaylistViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         
-        guard let playlistItems = playlistFRC.fetchedObjects,
-              !playlistItems.isEmpty else {
+        if indexPath.row < 0 || indexPath.row >= PlaylistManager.shared.numberOfAssets() {
             return nil
         }
-        
-        let currentItem = PlaylistInfo(item: playlistItems[indexPath.row])
-        let itemURL = URL(string: currentItem.src)
-        let cache = Playlist.shared.getCache(item: currentItem)
-        let downloadedItemTitle = cache.isEmpty ? Strings.download : Strings.PlayList.clearActionButtonTitle
+
+        let currentItem = PlaylistManager.shared.itemAtIndex(indexPath.row)
+        let cacheState = PlaylistManager.shared.state(for: currentItem.src)
+        let downloadedItemTitle = cacheState == .invalid ? Strings.download : Strings.PlayList.clearActionButtonTitle
         
         let cacheAction = UIContextualAction(style: .normal, title: downloadedItemTitle, handler: { [weak self] (action, view, completionHandler) in
             guard let self = self else { return }
             
-            if cache.isEmpty, let itemURL = itemURL {
-                URLSession(configuration: .ephemeral).dataTask(with: itemURL) { [weak self] data, response, error in
-                    guard let self = self else { return }
-                    
-                    DispatchQueue.main.async {
-                        if let error = error {
-                            let alert = UIAlertController(
-                                title: Strings.PlayList.noticeAlertTitle, message: Strings.PlayList.downloadErrorAlertDescription, preferredStyle: .alert)
-                            alert.addAction(UIAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: nil))
-                            
-                            self.present(alert, animated: true, completion: nil)
-                            
-                            log.error(error)
-                            completionHandler(false)
-                            
-                            return
-                        }
-                        
-                        self.currentItem = -1
-                        self.mediaInfo.updateNowPlayingMediaInfo()
-                        //Playlist.shared.currentlyPlayingInfo.value = nil
-                        
-                        //currentItem.mimeType = response?.mimeType
-                        Playlist.shared.updateCache(item: currentItem, cachedData: data ?? Data())
-                        completionHandler(true)
-                        
-                        self.tableView.reloadData()
-                    }
-                }.resume()
+            if cacheState == .inProgress {
+                PlaylistManager.shared.cancelDownload(item: currentItem)
+                self.tableView.reloadRows(at: [indexPath], with: .automatic)
+            } else if cacheState == .invalid {
+                PlaylistManager.shared.download(item: currentItem)
+                self.tableView.reloadRows(at: [indexPath], with: .automatic)
             } else {
-                Playlist.shared.updateCache(item: currentItem, cachedData: Data())
-                completionHandler(true)
-                
-                self.tableView.reloadData()
+                PlaylistManager.shared.deleteCache(item: currentItem)
+                self.tableView.reloadRows(at: [indexPath], with: .automatic)
             }
+            
+            completionHandler(true)
         })
         
         let deleteAction = UIContextualAction(style: .normal, title: Strings.PlayList.removeActionButtonTitle, handler: { [weak self] (action, view, completionHandler) in
-            guard let self = self,
-                  let playlistItems = self.playlistFRC.fetchedObjects,
-                  !playlistItems.isEmpty else { return }
+            guard let self = self else { return }
             
-            let item = PlaylistInfo(item: playlistItems[indexPath.row])
-            Playlist.shared.removeItem(item: item)
-            do {
-                try self.playlistFRC.performFetch()
-                self.tableView.deleteRows(at: [indexPath], with: .fade)
+            PlaylistManager.shared.delete(item: currentItem)
+            PlaylistManager.shared.reloadData()
+            self.tableView.deleteRows(at: [indexPath], with: .fade)
 
-                if self.currentItem == indexPath.row {
-                    self.currentItem = -1
-                    self.mediaInfo.updateNowPlayingMediaInfo()
-                    //Playlist.shared.currentlyPlayingInfo.value = nil
-                    
-                    self.activityIndicator.stopAnimating()
-                    self.playerView.stop()
-                }
+            if self.currentlyPlayingItemIndex == indexPath.row {
+                self.currentlyPlayingItemIndex = -1
+                self.mediaInfo.updateNowPlayingMediaInfo()
                 
-                completionHandler(true)
-            } catch {
-                log.error(error)
-                self.tableView.reloadData()
+                self.activityIndicator.stopAnimating()
+                self.playerView.stop()
             }
+            
+            completionHandler(true)
         })
 
-        cacheAction.image = cache.isEmpty ? #imageLiteral(resourceName: "menu-downloads") : #imageLiteral(resourceName: "nowPlayingCheckmark")
+        cacheAction.image = cacheState == .invalid ? #imageLiteral(resourceName: "menu-downloads") : #imageLiteral(resourceName: "close_translucent_popup")
         cacheAction.backgroundColor = .white
         deleteAction.backgroundColor = #colorLiteral(red: 0.812063769, green: 0.04556301224, blue: 0, alpha: 1)
         
@@ -356,17 +317,14 @@ extension PlaylistViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let playlistItems = playlistFRC.fetchedObjects,
-              !playlistItems.isEmpty else { return }
-        
-        if indexPath.row < playlistItems.count {
+        if indexPath.row < PlaylistManager.shared.numberOfAssets() {
             activityIndicator.startAnimating()
             activityIndicator.isHidden = false
-            currentItem = indexPath.row
+            currentlyPlayingItemIndex = indexPath.row
 
-            let item = PlaylistInfo(item: playlistItems[indexPath.row])
+            let item = PlaylistManager.shared.itemAtIndex(indexPath.row)
             infoLabel.text = item.name
-            mediaInfo.loadMediaItem(item) { [weak self] error in
+            mediaInfo.loadMediaItem(item, index: indexPath.row) { [weak self] error in
                 guard let self = self else { return }
                 self.activityIndicator.stopAnimating()
 
@@ -398,36 +356,36 @@ extension PlaylistViewController: UITableViewDelegate {
 
 extension PlaylistViewController: VideoViewDelegate {
     func onPreviousTrack() {
-        guard let currentItem = mediaInfo.nowPlayingInfo,
-              let playlistItems = playlistFRC.fetchedObjects,
-              let index = playlistItems.firstIndex(where: { $0.mediaSrc == currentItem.src }) else {
+        if currentlyPlayingItemIndex <= 0 {
             return
         }
         
-        if index > 0 && index < playlistItems.count - 1 {
-            mediaInfo.loadMediaItem(PlaylistInfo(item: playlistItems[index - 1])) { [weak self] error in
+        let index = currentlyPlayingItemIndex - 1
+        if index < PlaylistManager.shared.numberOfAssets() {
+            let item = PlaylistManager.shared.itemAtIndex(index)
+            mediaInfo.loadMediaItem(item, index: index) { [weak self] error in
                 if error != nil {
                     self?.displayLoadingResourceError()
                 } else {
-                    self?.currentItem = index - 1
+                    self?.currentlyPlayingItemIndex = index
                 }
             }
         }
     }
     
     func onNextTrack() {
-        guard let currentItem = mediaInfo.nowPlayingInfo,
-              let playlistItems = playlistFRC.fetchedObjects,
-              let index = playlistItems.firstIndex(where: { $0.mediaSrc == currentItem.src }) else {
+        if currentlyPlayingItemIndex >= PlaylistManager.shared.numberOfAssets() - 1 {
             return
         }
         
-        if index >= 0 && index < playlistItems.count - 1 {
-            mediaInfo.loadMediaItem(PlaylistInfo(item: playlistItems[index + 1])) { [weak self] error in
+        let index = currentlyPlayingItemIndex + 1
+        if index >= 0 {
+            let item = PlaylistManager.shared.itemAtIndex(index)
+            mediaInfo.loadMediaItem(item, index: index) { [weak self] error in
                 if error != nil {
                     self?.displayLoadingResourceError()
                 } else {
-                    self?.currentItem = index + 1
+                    self?.currentlyPlayingItemIndex = index
                 }
             }
         }
