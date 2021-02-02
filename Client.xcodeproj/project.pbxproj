@@ -769,7 +769,6 @@
 		5EC1DDBE2356892900CA4028 /* onboarding-ads.json in Resources */ = {isa = PBXBuildFile; fileRef = 5E11C3FF23314D970003C363 /* onboarding-ads.json */; };
 		5EC2C07325BF988E005EA984 /* PlaylistCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EC2C07225BF988E005EA984 /* PlaylistCell.swift */; };
 		5EC2C08725BF9B13005EA984 /* PlaylistCurrentPlayingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EC2C08625BF9B13005EA984 /* PlaylistCurrentPlayingView.swift */; };
-		5EC2C09225BF9B82005EA984 /* PlaylistFilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EC2C09125BF9B82005EA984 /* PlaylistFilterView.swift */; };
 		5EC2C0E525C0B321005EA984 /* PlaylistDetector.js in Resources */ = {isa = PBXBuildFile; fileRef = 5EC2C0E425C0B321005EA984 /* PlaylistDetector.js */; };
 		5EC594ED232C2C8F00922111 /* OnboardingWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EC594EC232C2C8F00922111 /* OnboardingWebViewController.swift */; };
 		5EE4CF452540829D00BC4509 /* BookmarksInterstitial.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EE4CF442540829D00BC4509 /* BookmarksInterstitial.swift */; };
@@ -2464,7 +2463,6 @@
 		5EB57D0122FDC0CB00A07325 /* FullscreenHelper.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = FullscreenHelper.js; sourceTree = "<group>"; };
 		5EC2C07225BF988E005EA984 /* PlaylistCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistCell.swift; sourceTree = "<group>"; };
 		5EC2C08625BF9B13005EA984 /* PlaylistCurrentPlayingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistCurrentPlayingView.swift; sourceTree = "<group>"; };
-		5EC2C09125BF9B82005EA984 /* PlaylistFilterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistFilterView.swift; sourceTree = "<group>"; };
 		5EC2C0E425C0B321005EA984 /* PlaylistDetector.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = PlaylistDetector.js; sourceTree = "<group>"; };
 		5EC594EC232C2C8F00922111 /* OnboardingWebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingWebViewController.swift; sourceTree = "<group>"; };
 		5EE4CF442540829D00BC4509 /* BookmarksInterstitial.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksInterstitial.swift; sourceTree = "<group>"; };
@@ -4733,7 +4731,6 @@
 			children = (
 				5EC2C07225BF988E005EA984 /* PlaylistCell.swift */,
 				5EC2C08625BF9B13005EA984 /* PlaylistCurrentPlayingView.swift */,
-				5EC2C09125BF9B82005EA984 /* PlaylistFilterView.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -7066,7 +7063,6 @@
 				44331DD622551E15007E3E93 /* ToolbarProtocols.swift in Sources */,
 				0A1E84422190A57F0042F782 /* SyncPairCameraViewController.swift in Sources */,
 				27C647A62551F082006D72FC /* RewardsDebugSettingsViewController.swift in Sources */,
-				5EC2C09225BF9B82005EA984 /* PlaylistFilterView.swift in Sources */,
 				27829E752549FF13007CF0B2 /* WalletTransferViewController.swift in Sources */,
 				2760056625D1FFF500D47A75 /* AddFeedToBraveTodayActivity.swift in Sources */,
 				44331DDC22561F34007E3E93 /* ToolbarUrlActionsDelegate.swift in Sources */,
