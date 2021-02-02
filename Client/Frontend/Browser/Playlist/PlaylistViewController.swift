@@ -22,8 +22,8 @@ class PlaylistViewController: UIViewController {
      
      struct Constants {
         static let playListCellIdentifier = "playlistCellIdentifier"
-        static let playListFilterHeaderIdentifier = "playListFilterHeaderIdentifier"
-        static let tableRowDimension: CGFloat = 70
+        static let tableRowHeight: CGFloat = 70
+        static let tableHeaderHeight: CGFloat = 11
      }
 
     // MARK: Properties
@@ -107,7 +107,6 @@ class PlaylistViewController: UIViewController {
               
         tableView.do {
             $0.register(PlaylistCell.self, forCellReuseIdentifier: Constants.playListCellIdentifier)
-//            $0.register(PlaylistFilterView.self, forHeaderFooterViewReuseIdentifier: Constants.playListFilterHeaderIdentifier)
             $0.dataSource = self
             $0.delegate = self
         }
@@ -170,11 +169,11 @@ extension PlaylistViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return Constants.tableRowDimension
+        return Constants.tableRowHeight
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return Constants.tableRowDimension
+        return Constants.tableHeaderHeight
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -210,13 +209,10 @@ extension PlaylistViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-//        guard let headerView = tableView.dequeueReusableHeaderFooterView(
-//                      withIdentifier: Constants.playListFilterHeaderIdentifier) as? PlaylistFilterView else {
-//                  return UITableViewHeaderFooterView()
-//        }
-//
-//        return headerView
-        return PlaylistFilterView()
+        let headerView = UIView()
+        headerView.backgroundColor = UIColor.clear
+        
+        return headerView
     }
     
     private func previewImageFromVideo(url: URL, _ completion: @escaping (UIImage?) -> Void) {
