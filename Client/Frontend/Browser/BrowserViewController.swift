@@ -2662,7 +2662,7 @@ extension BrowserViewController: TabDelegate {
         
         let playlistHelper = PlaylistHelper(tab: tab)
         playlistHelper.delegate = self
-        tab.addContentScript(playlistHelper, name: PlaylistHelper.name())
+        tab.addContentScript(playlistHelper, name: PlaylistHelper.name(), sandboxed: false)
 
         tab.addContentScript(RewardsReporting(rewards: rewards, tab: tab), name: RewardsReporting.name())
         tab.addContentScript(AdsMediaReporting(rewards: rewards, tab: tab), name: AdsMediaReporting.name())
