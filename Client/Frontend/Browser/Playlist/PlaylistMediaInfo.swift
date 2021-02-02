@@ -7,6 +7,9 @@ import Foundation
 import MediaPlayer
 import AVKit
 import AVFoundation
+import Shared
+
+private let log = Logger.browserLogger
 
 class PlaylistMediaInfo: NSObject {
     private weak var playerView: VideoView?
@@ -91,7 +94,6 @@ class PlaylistMediaInfo: NSObject {
         
         UIApplication.shared.beginReceivingRemoteControlEvents()
         
-        PlaylistManager.shared.delegate = self
         self.updateItems()
         self.updateNowPlayingMediaInfo()
         
@@ -217,16 +219,6 @@ extension PlaylistMediaInfo {
             return nil
         }
         return UIImage(cgImage: imageRef)
-    }
-}
-
-extension PlaylistMediaInfo: PlaylistManagerDelegate {
-    func onDownloadProgressUpdate(id: String, percentComplete: Double) {
-        
-    }
-    
-    func onDownloadStateChanged(id: String, state: PlaylistManager.DownloadState, displayName: String) {
-        
     }
 }
 
@@ -403,6 +395,12 @@ extension MediaResourceManager {
     //Would be nice if AVPlayer could detect the mime-type from the URL for my delegate without a head request..
     //This function only exists because I can't figure out why videos from URLs don't play unless I explicitly specify a mime-type..
     public static func canStreamURL(_ url: URL, _ completion: @escaping (Bool) -> Void) {
+        getMimeType(url) { mimeType in
+            completion(!mimeType.isEmpty)
+        }
+    }
+    
+    public static func getMimeType(_ url: URL, _ completion: @escaping (String) -> Void) {
         let request: URLRequest = {
             var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10.0)
             request.addValue("bytes=0-1", forHTTPHeaderField: "Range")
@@ -414,17 +412,110 @@ extension MediaResourceManager {
         URLSession(configuration: .ephemeral).dataTask(with: request) { data, response, error in
             DispatchQueue.main.async {
                 if error != nil {
-                    return completion(false)
+                    return completion("")
                 }
                 
-                if let response = response as? HTTPURLResponse {
-                    if response.statusCode == 302 || response.statusCode >= 200 && response.statusCode <= 299 {
-                        return completion(true)
+                if let response = response as? HTTPURLResponse, response.statusCode == 302 || response.statusCode >= 200 && response.statusCode <= 299 {
+                    if let contentType = response.allHeaderFields["Content-Type"] as? String {
+                        completion(contentType)
+                        return
+                    } else {
+                        completion("video/*")
+                        return
                     }
                 }
                 
-                completion(false)
+                completion("")
             }
         }.resume()
+    }
+    
+    public static func downloadAsset(_ url: URL, name: String, _ completion: @escaping (String) -> Void) {
+        let request: URLRequest = {
+            var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10.0)
+            request.addValue("bytes=0-", forHTTPHeaderField: "Range")
+            request.addValue(UUID().uuidString, forHTTPHeaderField: "X-Playback-Session-Id")
+            request.addValue("AppleCoreMedia/1.0.0.17E255 (iPhone; U; CPU OS 13_4 like Mac OS X; en_ca)", forHTTPHeaderField: "User-Agent")
+            return request
+        }()
+        
+        URLSession(configuration: .ephemeral).downloadTask(with: request) { location, response, error in
+            if let error = error {
+                log.error(error)
+                return completion("")
+            }
+            
+            guard let location = location else {
+                return completion("")
+            }
+            
+            if let response = response as? HTTPURLResponse, response.statusCode == 302 || response.statusCode >= 200 && response.statusCode <= 299 {
+                
+                var fileExtension = ""
+                
+                //Detect based on Content-Type header.
+                if let contentType = response.allHeaderFields["Content-Type"] as? String {
+                    let detectedExtension = PlaylistMimeTypeDetector(mimeType: contentType).fileExtension
+                    if !detectedExtension.isEmpty {
+                        fileExtension = detectedExtension
+                    }
+                }
+                
+                //Detect based on Data.
+                if fileExtension.isEmpty {
+                    if let data = try? Data(contentsOf: location, options: .mappedIfSafe) {
+                        let detectedExtension = PlaylistMimeTypeDetector(data: data).fileExtension
+                        if !detectedExtension.isEmpty {
+                            fileExtension = detectedExtension
+                        }
+                    }
+                }
+                
+                //Couldn't determine file type so we assume mp4 which is the most widely used container.
+                //If it doesn't work, the video/audio just won't play anyway.
+                if fileExtension.isEmpty {
+                    fileExtension = "mp4"
+                }
+                
+                do {
+                    if let path = try? MediaResourceManager.uniqueDownloadPathForFilename(name + ".\(fileExtension)") {
+                        try FileManager.default.moveItem(at: location, to: path)
+                        completion(path.absoluteString)
+                        return
+                    }
+                } catch {
+                    log.error(error)
+                    completion("")
+                    return
+                }
+            }
+            
+            completion("")
+        }.resume()
+    }
+    
+    private static func playlistPath() throws -> URL {
+        FileManager.default.getOrCreateFolder(name: "Playlist", excludeFromBackups: true, location: .documentDirectory)
+        return try FileManager.default.url(for: .documentDirectory, in: .userDomainMask,
+                                       appropriateFor: nil, create: false).appendingPathComponent("Playlist")
+    }
+    
+    private static func uniqueDownloadPathForFilename(_ filename: String) throws -> URL {
+        let downloadsPath = try playlistPath()
+        let basePath = downloadsPath.appendingPathComponent(filename)
+        let fileExtension = basePath.pathExtension
+        let filenameWithoutExtension = fileExtension.count > 0 ? String(filename.dropLast(fileExtension.count + 1)) : filename
+        
+        var proposedPath = basePath
+        var count = 0
+        
+        while FileManager.default.fileExists(atPath: proposedPath.path) {
+            count += 1
+            
+            let proposedFilenameWithoutExtension = "\(filenameWithoutExtension) (\(count))"
+            proposedPath = downloadsPath.appendingPathComponent(proposedFilenameWithoutExtension).appendingPathExtension(fileExtension)
+        }
+        
+        return proposedPath
     }
 }
