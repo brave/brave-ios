@@ -230,6 +230,7 @@ private class VideoTrackerBar: UIView {
 protocol VideoViewDelegate: class {
     func onPreviousTrack()
     func onNextTrack()
+    func onPictureInPicture(enabled: Bool)
     func onFullScreen()
 }
 
@@ -302,6 +303,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     private let pipButton = UIButton().then {
         $0.imageView?.contentMode = .scaleAspectFit
         $0.setImage(#imageLiteral(resourceName: "playlist_pip"), for: .normal)
+        $0.isHidden = !AVPictureInPictureController.isPictureInPictureSupported()
     }
     
     private let fullScreenButton = UIButton().then {
@@ -328,6 +330,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     private(set) public var isFullscreen: Bool = false
     private(set) public var isOverlayDisplayed: Bool = false
     private var notificationObservers = [NSObjectProtocol]()
+    private(set) public var pictureInPictureController: AVPictureInPictureController?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -518,7 +521,27 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     
     @objc
     private func onPictureInPicture(_ button: UIButton) {
-        // TODO: Picture In Picture
+        guard let pictureInPictureController = pictureInPictureController else { return }
+        
+        if pictureInPictureController.isPictureInPictureActive {
+            (self.layer as? AVPlayerLayer)?.player = self.player
+            
+            self.delegate?.onPictureInPicture(enabled: false)
+            pictureInPictureController.stopPictureInPicture()
+        } else {
+            (self.layer as? AVPlayerLayer)?.player = nil
+            
+            if #available(iOS 14.2, *) {
+                pictureInPictureController.canStartPictureInPictureAutomaticallyFromInline = true
+            }
+            
+            if #available(iOS 14.0, *) {
+                pictureInPictureController.requiresLinearPlayback = false
+            }
+            
+            self.delegate?.onPictureInPicture(enabled: true)
+            pictureInPictureController.startPictureInPicture()
+        }
     }
     
     @objc
@@ -635,6 +658,20 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         })
     }
     
+    private func registerPictureInPictureNotifications() {
+        if AVPictureInPictureController.isPictureInPictureSupported(),
+           let playerLayer = self.layer as? AVPlayerLayer {
+            pictureInPictureController = AVPictureInPictureController(playerLayer: playerLayer)
+            guard let pictureInPictureController = pictureInPictureController else { return }
+            
+            notificationObservers.append(pictureInPictureController.observe(\AVPictureInPictureController.isPictureInPicturePossible, options: [.initial, .new]) { [weak self] _, change in
+                self?.pipButton.isEnabled = change.newValue ?? false
+            })
+        } else {
+            pipButton.isEnabled = false
+        }
+    }
+    
     private func showOverlays(_ show: Bool) {
         //self.showOverlays(show, except: [self.overlayView], display: [])
         self.showOverlays(show, except: [], display: [])
@@ -668,6 +705,18 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
                 }
             })
         })
+    }
+    
+    public func attach() {
+        (self.layer as? AVPlayerLayer)?.do {
+            $0.player = self.player
+        }
+    }
+    
+    public func detach() {
+        (self.layer as? AVPlayerLayer)?.do {
+            $0.player = nil
+        }
     }
     
     public func play() {
