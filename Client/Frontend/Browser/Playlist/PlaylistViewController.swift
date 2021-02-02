@@ -10,6 +10,7 @@ import Shared
 import AVKit
 import AVFoundation
 import SDWebImage
+import CoreData
 
 private let log = Logger.browserLogger
 
@@ -65,6 +66,8 @@ class PlaylistViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        PlaylistManager.shared.delegate = self
     
         setTheme()
         setup()
@@ -271,7 +274,7 @@ extension PlaylistViewController: UITableViewDelegate {
         }
 
         let currentItem = PlaylistManager.shared.itemAtIndex(indexPath.row)
-        let cacheState = PlaylistManager.shared.state(for: currentItem.src)
+        let cacheState = PlaylistManager.shared.state(for: currentItem.pageSrc)
         let downloadedItemTitle = cacheState == .invalid ? Strings.download : Strings.PlayList.clearActionButtonTitle
         
         let cacheAction = UIContextualAction(style: .normal, title: downloadedItemTitle, handler: { [weak self] (action, view, completionHandler) in
@@ -295,8 +298,6 @@ extension PlaylistViewController: UITableViewDelegate {
             guard let self = self else { return }
             
             PlaylistManager.shared.delete(item: currentItem)
-            PlaylistManager.shared.reloadData()
-            self.tableView.deleteRows(at: [indexPath], with: .fade)
 
             if self.currentlyPlayingItemIndex == indexPath.row {
                 self.currentlyPlayingItemIndex = -1
@@ -309,7 +310,7 @@ extension PlaylistViewController: UITableViewDelegate {
             completionHandler(true)
         })
 
-        cacheAction.image = cacheState == .invalid ? #imageLiteral(resourceName: "menu-downloads") : #imageLiteral(resourceName: "close_translucent_popup")
+        cacheAction.image = cacheState == .invalid ? #imageLiteral(resourceName: "menu-downloads") : #imageLiteral(resourceName: "action_remove")
         cacheAction.backgroundColor = .white
         deleteAction.backgroundColor = #colorLiteral(red: 0.812063769, green: 0.04556301224, blue: 0, alpha: 1)
         
@@ -423,4 +424,49 @@ extension PlaylistViewController: VideoViewDelegate {
 extension PlaylistViewController: AVPlayerViewControllerDelegate {
     //TODO: When entering PIP, dismiss the current playlist controller.
     //TODO: When exiting PIP, destroy the video player and its media info. Clear control centre, etc.
+}
+
+extension PlaylistViewController: PlaylistManagerDelegate {
+    func onDownloadProgressUpdate(id: String, percentComplete: Double) {
+        if let index = PlaylistManager.shared.index(of: id) {
+            
+            //TODO: Update row to show percentage of download????
+            //Probably not a good idea to reload the row because it'll trigger fetching the thumbnail every time
+            //the percentage changes..
+            //tableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+        }
+    }
+    
+    func onDownloadStateChanged(id: String, state: PlaylistManager.DownloadState, displayName: String) {
+        if let index = PlaylistManager.shared.index(of: id) {
+            
+            //TODO: Update row to show/hide download icon????
+            tableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+        }
+    }
+    
+    func controllerDidChange(_ anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+        
+        switch type {
+            case .insert:
+                tableView.insertRows(at: [newIndexPath!], with: .fade)
+            case .delete:
+                tableView.deleteRows(at: [indexPath!], with: .fade)
+            case .update:
+                tableView.reloadRows(at: [indexPath!], with: .fade)
+            case .move:
+                tableView.deleteRows(at: [indexPath!], with: .fade)
+                tableView.insertRows(at: [newIndexPath!], with: .fade)
+            default:
+                break
+        }
+    }
+    
+    func controllerDidChangeContent() {
+        tableView.endUpdates()
+    }
+    
+    func controllerWillChangeContent() {
+        tableView.beginUpdates()
+    }
 }

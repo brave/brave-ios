@@ -8,12 +8,39 @@ import AVFoundation
 import WebKit
 import MobileCoreServices
 
-private class MimeTypeDetector {
+public class PlaylistMimeTypeDetector {
     private(set) var mimeType: String = ""
     private(set) var fileExtension: String = ""
     
+    init(mimeType: String) {
+        self.mimeType = mimeType
+        
+        let mimeTypeMap = [
+            "video/webm": "webm",
+            "application/ogg": "ogg",
+            "audio/x-wav": "wav",
+            "video/x-msvideo": "avi",
+            "audio/mpeg": "mp4",
+            "audio/flac": "flac",
+            "video/mp4": "mp4",
+            "application/x-mpegURL": "mpg",
+            "application/vnd.apple.mpegurl": "mpg"
+        ]
+        
+        for (key, value) in mimeTypeMap {
+            if mimeType.contains(key) {
+                self.fileExtension = value
+                break
+            }
+        }
+    }
+    
     init(data: Data) {
         let bytes = [UInt8](data)
+        
+        //TODO:
+        //Add all that is in AVURLAsset.audiovisualTypes()
+        //Add all that is in AVURLAsset.audiovisualMIMETypes()
         
         if scan(data: bytes, header: [0x1A, 0x45, 0xDF, 0xA3]) {
             mimeType = "video/webm"
@@ -74,7 +101,7 @@ private class MimeTypeDetector {
             return
         }
         
-        mimeType = "application/x-mpegURL"
+        mimeType = "application/x-mpegURL" //application/vnd.apple.mpegurl
         fileExtension = "mpg"
     }
     
@@ -83,10 +110,8 @@ private class MimeTypeDetector {
             return false
         }
         
-        for i in 0..<header.count {
-            if data[i] != header[i] {
-                return false
-            }
+        for i in 0..<header.count where data[i] != header[i] {
+            return false
         }
         return true
     }

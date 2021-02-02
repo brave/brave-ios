@@ -6,12 +6,17 @@
 import Foundation
 import AVFoundation
 import Shared
+import CoreData
 
 private let log = Logger.browserLogger
 
 protocol PlaylistManagerDelegate: class {
     func onDownloadProgressUpdate(id: String, percentComplete: Double)
     func onDownloadStateChanged(id: String, state: PlaylistManager.DownloadState, displayName: String)
+    
+    func controllerDidChange(_ anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?)
+    func controllerDidChangeContent()
+    func controllerWillChangeContent()
 }
 
 class PlaylistManager: NSObject {
@@ -30,6 +35,8 @@ class PlaylistManager: NSObject {
         session = AVAssetDownloadURLSession(configuration: configuration,
                                             assetDownloadDelegate: self,
                                             delegateQueue: .main)
+        
+        frc.delegate = self
     }
     
     func numberOfAssets() -> Int {
@@ -41,7 +48,11 @@ class PlaylistManager: NSObject {
     }
     
     func assetAtIndex(_ index: Int) -> AVURLAsset {
-        return asset(for: itemAtIndex(index).src)
+        return asset(for: itemAtIndex(index).pageSrc)
+    }
+    
+    func index(of pageSrc: String) -> Int? {
+        return frc.fetchedObjects?.firstIndex(where: { $0.pageSrc == pageSrc })
     }
     
     func state(for pageSrc: String) -> DownloadState {
@@ -88,22 +99,21 @@ class PlaylistManager: NSObject {
     }
     
     func download(item: PlaylistInfo) {
-        guard self.task(for: item.pageSrc) == nil else { return }
+        guard self.task(for: item.pageSrc) == nil, let assetUrl = URL(string: item.src) else { return }
         
-        let asset = AVURLAsset(url: URL(string: item.src)!)
-        
-        guard let task =
-            session.aggregateAssetDownloadTask(with: asset,
-                                               mediaSelections: [asset.preferredMediaSelection],
-                                               assetTitle: item.name,
-                                               assetArtworkData: nil,
-                                               options: [AVAssetDownloadTaskMinimumRequiredMediaBitrateKey: 265_000]) else { return }
-        
-        task.taskDescription = item.pageSrc
-        activeTasks[task] = DownloadTask(id: item.pageSrc, name: item.name, asset: asset)
-        task.resume()
-        
-        delegate?.onDownloadStateChanged(id: item.pageSrc, state: .inProgress, displayName: self.displayNames(for: asset.preferredMediaSelection))
+        MediaResourceManager.getMimeType(assetUrl) { [weak self] mimeType in
+            guard let self = self else { return }
+
+            if mimeType.contains("x-mpegURL") || mimeType.contains("application/vnd.apple.mpegurl") || mimeType.lowercased().contains("mpegurl") {
+                DispatchQueue.main.async {
+                    self.downloadHLSAsset(assetUrl, for: item)
+                }
+            } else {
+                DispatchQueue.main.async {
+                    self.downloadFileAsset(assetUrl, for: item)
+                }
+            }
+        }
     }
     
     func cancelDownload(item: PlaylistInfo) {
@@ -120,6 +130,8 @@ class PlaylistManager: NSObject {
                 Playlist.shared.removeItem(item: item)
                 
                 delegate?.onDownloadStateChanged(id: item.pageSrc, state: .invalid, displayName: "")
+            } else {
+                Playlist.shared.removeItem(item: item)
             }
         } catch {
             log.error("An error occured deleting Playlist Item \(item.name): \(error)")
@@ -139,6 +151,44 @@ class PlaylistManager: NSObject {
     }
     
     // MARK: - Private
+    
+    private func downloadFileAsset(_ assetUrl: URL, for item: PlaylistInfo) {
+        MediaResourceManager.downloadAsset(assetUrl, name: item.name) { location in
+            DispatchQueue.main.async {
+                do {
+                    let bookmarkData = try URL(string: location)?.bookmarkData()
+                    Playlist.shared.updateCache(pageSrc: item.pageSrc, cachedData: bookmarkData)
+                    
+                    if let url = URL(string: location) {
+                        let asset = AVURLAsset(url: url)
+                        self.delegate?.onDownloadStateChanged(id: item.pageSrc, state: .inProgress, displayName: self.displayNames(for: asset.preferredMediaSelection))
+                    } else {
+                        self.delegate?.onDownloadStateChanged(id: item.pageSrc, state: .inProgress, displayName: "")
+                    }
+                } catch {
+                    log.error(error)
+                    try? FileManager.default.removeItem(atPath: location)
+                }
+            }
+        }
+    }
+    
+    private func downloadHLSAsset(_ assetUrl: URL, for item: PlaylistInfo) {
+        let asset = AVURLAsset(url: assetUrl)
+
+        guard let task =
+            session.aggregateAssetDownloadTask(with: asset,
+                                               mediaSelections: [asset.preferredMediaSelection],
+                                               assetTitle: item.name,
+                                               assetArtworkData: nil,
+                                               options: [AVAssetDownloadTaskMinimumRequiredMediaBitrateKey: 265_000]) else { return }
+
+        task.taskDescription = item.pageSrc
+        activeTasks[task] = DownloadTask(id: item.pageSrc, name: item.name, asset: asset)
+        task.resume()
+
+        delegate?.onDownloadStateChanged(id: item.pageSrc, state: .inProgress, displayName: self.displayNames(for: asset.preferredMediaSelection))
+    }
     
     private func task(for pageSrc: String) -> DownloadTask? {
         for (_, asset) in activeTasks where pageSrc == asset.id {
@@ -290,5 +340,20 @@ extension PlaylistManager: AVAssetDownloadDelegate {
         }
         
         delegate?.onDownloadProgressUpdate(id: asset.id, percentComplete: percentComplete)
+    }
+}
+
+extension PlaylistManager: NSFetchedResultsControllerDelegate {
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+        
+        delegate?.controllerDidChange(anObject, at: indexPath, for: type, newIndexPath: newIndexPath)
+    }
+    
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        delegate?.controllerDidChangeContent()
+    }
+    
+    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        delegate?.controllerWillChangeContent()
     }
 }
