@@ -392,6 +392,10 @@ extension PlaylistViewController: VideoViewDelegate {
         }
     }
     
+    func onPictureInPicture(enabled: Bool) {
+        playerView.pictureInPictureController?.delegate = enabled ? self : nil
+    }
+    
     func onFullScreen() {
         playerView.player.pause()
         
@@ -421,9 +425,62 @@ extension PlaylistViewController: VideoViewDelegate {
 
 // MARK: AVPlayerViewControllerDelegate
 
-extension PlaylistViewController: AVPlayerViewControllerDelegate {
+extension PlaylistViewController: AVPlayerViewControllerDelegate, AVPictureInPictureControllerDelegate {
+    
     //TODO: When entering PIP, dismiss the current playlist controller.
     //TODO: When exiting PIP, destroy the video player and its media info. Clear control centre, etc.
+    
+    
+    // MARK: - AVPlayerViewControllerDelegate
+    func playerViewControllerWillStartPictureInPicture(_ playerViewController: AVPlayerViewController) {
+        self.dismiss(animated: true, completion: nil)
+    }
+    
+    func playerViewControllerDidStartPictureInPicture(_ playerViewController: AVPlayerViewController) {
+        
+    }
+    
+    func playerViewController(_ playerViewController: AVPlayerViewController, failedToStartPictureInPictureWithError error: Error) {
+        
+    }
+    
+    func playerViewControllerWillStopPictureInPicture(_ playerViewController: AVPlayerViewController) {
+        
+    }
+    
+    func playerViewControllerDidStopPictureInPicture(_ playerViewController: AVPlayerViewController) {
+        
+    }
+    
+    func playerViewController(_ playerViewController: AVPlayerViewController, restoreUserInterfaceForPictureInPictureStopWithCompletionHandler completionHandler: @escaping (Bool) -> Void) {
+        
+    }
+    
+    // MARK: - AVPictureInPictureControllerDelegate
+    func pictureInPictureControllerWillStartPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
+        
+        self.dismiss(animated: true, completion: nil)
+    }
+    
+    func pictureInPictureControllerDidStartPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
+        
+    }
+    
+    func pictureInPictureController(_ pictureInPictureController: AVPictureInPictureController, failedToStartPictureInPictureWithError error: Error) {
+        
+    }
+    
+    func pictureInPictureControllerWillStopPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
+        
+    }
+    
+    func pictureInPictureControllerDidStopPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
+        
+    }
+    
+    func pictureInPictureController(_ pictureInPictureController: AVPictureInPictureController, restoreUserInterfaceForPictureInPictureStopWithCompletionHandler completionHandler: @escaping (Bool) -> Void) {
+        
+    }
 }
 
 extension PlaylistViewController: PlaylistManagerDelegate {
