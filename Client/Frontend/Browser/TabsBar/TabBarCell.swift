@@ -131,7 +131,6 @@ class TabBarCell: UICollectionViewCell, Themeable {
     }
     
     func applyTheme(_ theme: Theme) {        
-        backgroundColor = .clear
         titleLabel.textColor = theme.colors.tints.header
         closeButton.tintColor = theme.colors.tints.header
     }
