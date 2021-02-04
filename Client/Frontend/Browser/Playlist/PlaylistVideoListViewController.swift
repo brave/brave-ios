@@ -51,8 +51,12 @@ class PlaylistVideoListViewController: UIViewController {
         $0.separatorColor = .clear
         $0.appearanceSeparatorColor = .clear
     }
-
-//    private lazy var mediaInfo = PlaylistMediaInfo(playerView: playerView)
+    
+    private let formatter = DateComponentsFormatter().then {
+        $0.allowedUnits = [.day, .hour, .minute, .second]
+        $0.unitsStyle = .abbreviated
+        $0.maximumUnitCount = 1
+    }
     
     private var currentlyPlayingItemIndex = -1
     
@@ -167,10 +171,17 @@ extension PlaylistVideoListViewController: UITableViewDataSource {
             $0.indicatorIcon.image = #imageLiteral(resourceName: "playlist_currentitem_indicator").template
             $0.indicatorIcon.alpha = 0.0
             $0.titleLabel.text = item.name
-            $0.detailLabel.text = String(format: "%.2fm", item.duration / 60.0)
+            $0.detailLabel.text = formatter.string(from: TimeInterval(item.duration)) ?? "0:00"
             $0.contentView.backgroundColor = .clear
             $0.backgroundColor = .clear
             $0.thumbnailImage = #imageLiteral(resourceName: "menu-NoImageMode")
+        }
+        
+        let cacheState = PlaylistManager.shared.state(for: item.pageSrc)
+        if cacheState == .inProgress {
+            cell.detailLabel.text = "Downloading"
+        } else if cacheState == .downloaded {
+            cell.detailLabel.text = "\(formatter.string(from: TimeInterval(item.duration)) ?? "0:00") - Downloaded"
         }
         
         if let url = URL(string: item.src) {
@@ -329,23 +340,37 @@ extension PlaylistVideoListViewController: UITableViewDelegate {
     }
 }
 
-
 extension PlaylistVideoListViewController: PlaylistManagerDelegate {
     func onDownloadProgressUpdate(id: String, percentComplete: Double) {
-        if let index = PlaylistManager.shared.index(of: id) {
+        if let index = PlaylistManager.shared.index(of: id),
+           let cell = tableView.cellForRow(at: IndexPath(row: index, section: 0)) as? PlaylistCell {
             
-            //TODO: Update row to show percentage of download????
-            //Probably not a good idea to reload the row because it'll trigger fetching the thumbnail every time
-            //the percentage changes..
-            //tableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+            let cacheState = PlaylistManager.shared.state(for: id)
+            if cacheState == .inProgress {
+                cell.detailLabel.text = "Downloading: \(percentComplete)%"
+            } else if cacheState == .downloaded {
+                let item = PlaylistManager.shared.itemAtIndex(index)
+                cell.detailLabel.text = "\(formatter.string(from: TimeInterval(item.duration)) ?? "0:00") - Downloaded"
+            } else {
+                let item = PlaylistManager.shared.itemAtIndex(index)
+                cell.detailLabel.text = formatter.string(from: TimeInterval(item.duration)) ?? "0:00"
+            }
         }
     }
     
     func onDownloadStateChanged(id: String, state: PlaylistManager.DownloadState, displayName: String) {
-        if let index = PlaylistManager.shared.index(of: id) {
+        if let index = PlaylistManager.shared.index(of: id),
+           let cell = tableView.cellForRow(at: IndexPath(row: index, section: 0)) as? PlaylistCell {
             
-            //TODO: Update row to show/hide download icon????
-            tableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+            if state == .inProgress {
+                cell.detailLabel.text = "Downloading"
+            } else if state == .downloaded {
+                let item = PlaylistManager.shared.itemAtIndex(index)
+                cell.detailLabel.text = "\(formatter.string(from: TimeInterval(item.duration)) ?? "0:00") - Downloaded"
+            } else {
+                let item = PlaylistManager.shared.itemAtIndex(index)
+                cell.detailLabel.text = formatter.string(from: TimeInterval(item.duration)) ?? "0:00"
+            }
         }
     }
     

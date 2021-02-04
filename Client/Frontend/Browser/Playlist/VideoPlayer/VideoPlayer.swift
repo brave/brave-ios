@@ -243,6 +243,8 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         $0.actionAtItemEnd = .none
     }
     
+    private var requestedPlaybackRate = 1.0
+    
     private let thumbnailView = UIImageView().then {
         $0.contentMode = .scaleAspectFit
         $0.isUserInteractionEnabled = true
@@ -260,7 +262,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         $0.backgroundColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 0.4024561216)
     }
     
-    private let skipBackButton = UIButton(type: .system).then {
+    private let skipBackButton = UIButton().then {
         $0.imageView?.contentMode = .scaleAspectFit
         $0.setBackgroundImage(#imageLiteral(resourceName: "playlist_rewind"), for: .normal)
         $0.setTitleColor(.white, for: .normal)
@@ -268,7 +270,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         $0.tintColor = .white
     }
     
-    private let skipForwardButton = UIButton(type: .system).then {
+    private let skipForwardButton = UIButton().then {
         $0.imageView?.contentMode = .scaleAspectFit
         $0.setBackgroundImage(#imageLiteral(resourceName: "playlist_forward"), for: .normal)
         $0.setTitleColor(.white, for: .normal)
@@ -309,6 +311,13 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     private let fullScreenButton = UIButton().then {
         $0.imageView?.contentMode = .scaleAspectFit
         $0.setImage(#imageLiteral(resourceName: "playlist_fullscreen"), for: .normal)
+    }
+    
+    private let playbackRateButton = UIButton().then {
+        $0.imageView?.contentMode = .scaleAspectFit
+        $0.setTitle("1x", for: .normal)
+        $0.setTitleColor(.white, for: .normal)
+        $0.titleLabel?.font = .systemFont(ofSize: 14.0, weight: .medium)
     }
     
     private let trackBarBackground = UIView().then {
@@ -353,6 +362,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
 
         playPauseButton.addTarget(self, action: #selector(onPlay(_:)), for: .touchUpInside)
         castButton.addTarget(self, action: #selector(onCast(_:)), for: .touchUpInside)
+        playbackRateButton.addTarget(self, action: #selector(onPlaybackRateChanged(_:)), for: .touchUpInside)
         pipButton.addTarget(self, action: #selector(onPictureInPicture(_:)), for: .touchUpInside)
         fullScreenButton.addTarget(self, action: #selector(onFullscreen(_:)), for: .touchUpInside)
         skipBackButton.addTarget(self, action: #selector(onSeekBackwards(_:)), for: .touchUpInside)
@@ -367,6 +377,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         addSubview(overlayView)
         addSubview(playControlsView)
         addSubview(castButton)
+        addSubview(playbackRateButton)
         addSubview(pipButton)
         addSubview(fullScreenButton)
         addSubview(trackBar)
@@ -420,6 +431,12 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
             $0.top.left.equalToSuperview().inset(15.0)
         }
         
+        playbackRateButton.snp.makeConstraints {
+            $0.top.equalToSuperview().inset(15.0)
+            $0.left.equalTo(castButton.snp.right).offset(15.0)
+            $0.width.height.equalTo(castButton)
+        }
+        
         pipButton.snp.makeConstraints {
             $0.top.equalToSuperview().inset(15.0)
             $0.right.equalTo(fullScreenButton.snp.left).offset(-15.0)
@@ -433,7 +450,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
             $0.numberOfTouchesRequired = 1
         })
         
-        self.showOverlays(false)
+        self.showOverlays(true)
     }
     
     required init?(coder: NSCoder) {
@@ -517,6 +534,17 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     @objc
     private func onCast(_ button: UIButton) {
         //print("Route Picker Video")
+    }
+    
+    @objc
+    private func onPlaybackRateChanged(_ button: UIButton) {
+        requestedPlaybackRate += 1.0
+        if Int(requestedPlaybackRate) > 3 {
+            requestedPlaybackRate = 1.0
+        }
+        
+        player.rate = Float(requestedPlaybackRate)
+        button.setTitle("\(Int(requestedPlaybackRate))x", for: .normal)
     }
     
     @objc
@@ -717,6 +745,15 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         (self.layer as? AVPlayerLayer)?.do {
             $0.player = nil
         }
+    }
+    
+    public func setControlsEnabled(_ enabled: Bool) {
+//        [skipBackButton, playPauseButton, skipForwardButton,
+//         pipButton, castButton, fullScreenButton].forEach({
+//            $0.isEnabled = enabled
+//         })
+        
+        isUserInteractionEnabled = enabled
     }
     
     public func play() {

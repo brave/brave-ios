@@ -7,10 +7,11 @@
         <attribute name="mediaSrc" attributeType="String"/>
         <attribute name="mimeType" attributeType="String"/>
         <attribute name="name" attributeType="String"/>
+        <attribute name="order" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="pageSrc" attributeType="String"/>
         <attribute name="pageTitle" optional="YES" attributeType="String"/>
     </entity>
     <elements>
-        <element name="PlaylistItem" positionX="-63" positionY="-18" width="128" height="163"/>
+        <element name="PlaylistItem" positionX="-63" positionY="-18" width="128" height="178"/>
     </elements>
 </model>
