@@ -25,6 +25,7 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, CRUD {
     @NSManaged public var created: Date?
     @NSManaged public var order: Int16
     @NSManaged public var tags: [String]?
+    @available(*, deprecated, message: "This is sync v1 property and is not used anymore")
     @NSManaged public var syncOrder: String?
     
     @NSManaged public var parentFolder: Bookmark?
@@ -158,12 +159,6 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, CRUD {
         case new(location: Bookmark?)
     }
     
-    public func updateWithNewLocation(customTitle: String?, url: String?, location: Bookmark?) {
-        if !hasTitle(customTitle) { return }
-        
-        updateInternal(customTitle: customTitle, url: url, location: .new(location: location))
-    }
-    
     // Title can't be empty.
     private func hasTitle(_ title: String?) -> Bool {
         return title?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
@@ -184,6 +179,55 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, CRUD {
             favorites.forEach {
                 addInternal(url: $0.url, title: $0.title, isFavorite: true,
                             context: .existing(context))
+            }
+        }
+    }
+    
+    /// Passing in `isInteractiveDragReorder` will force the write to happen on
+    /// the main view context. Defaults to `false`
+    public class func reorderFavorites(sourceIndexPath: IndexPath,
+                                       destinationIndexPath: IndexPath,
+                                       isInteractiveDragReorder: Bool = false) {
+        if destinationIndexPath.row == sourceIndexPath.row {
+            log.error("Source and destination bookmarks are the same!")
+            return
+        }
+        
+        // If we're doing an interactive drag reorder then we want to make sure
+        // to do the reorder on main queue so the underlying dataset & FRC is
+        // updated immediately so the animation does not glitch out on drop.
+        //
+        // Doing it on a background thread will cause the favorites overlay
+        // to temporarely show the old items and require a full-table refresh
+        let context: WriteContext = isInteractiveDragReorder ?
+            .existing(DataController.viewContext) :
+            .new(inMemory: false)
+        
+        DataController.perform(context: context) { context in
+            let destinationIndex = destinationIndexPath.row
+            let sourceIndex = sourceIndexPath.row
+            
+            var allFavorites = Bookmark.getAllFavorites(context: context).sorted()
+            // Out of bounds safety check, `swapAt` crashes beyond array length.
+            if destinationIndex > allFavorites.count - 1 {
+                assertionFailure("destinationIndex is out of bounds")
+                return
+            }
+            
+            allFavorites.swapAt(sourceIndex, destinationIndex)
+            
+            // Update order of all favorites that have changed.
+            for (index, element) in allFavorites.enumerated() where index != element.order {
+                element.order = Int16(index)
+            }
+            
+            if isInteractiveDragReorder && context.hasChanges {
+                do {
+                    assert(Thread.isMainThread)
+                    try context.save()
+                } catch {
+                    log.error("performTask save error: \(error)")
+                }
             }
         }
     }
@@ -222,7 +266,6 @@ extension Bookmark {
                            parentFolder: Bookmark? = nil,
                            isFolder: Bool = false,
                            isFavorite: Bool = false,
-                           syncOrder: String? = nil,
                            save: Bool = true,
                            context: WriteContext = .new(inMemory: false),
                            completion: ((NSManagedObjectID) -> Void)? = nil) {
@@ -274,12 +317,10 @@ extension Bookmark {
                                                        saveStrategy: .delayedPersistentStore)
             }
             
-            if bk.syncOrder == nil {
-                bk.newSyncOrder(forFavorites: bk.isFavorite, context: context)
+            if let lastOrder = getAllFavorites(context: context).map(\.order).max() {
+                bk.order = lastOrder + 1
             }
             
-            setOrderForAllBookmarksOnGivenLevel(parent: bk.parentFolder, forFavorites: bk.isFavorite,
-                                                context: context)
             completion?(bk.objectID)
         })
     }
@@ -318,19 +359,14 @@ extension Bookmark {
         }
     }
     
-    private func updateInternal(customTitle: String?, url: String?, newSyncOrder: String? = nil,
-                                save: Bool = true,
-                                location: SaveLocation = .keep,
+    private func updateInternal(customTitle: String?, url: String?, save: Bool = true,
                                 context: WriteContext = .new(inMemory: false)) {
         
         DataController.perform(context: context) { context in
             guard let bookmarkToUpdate = context.object(with: self.objectID) as? Bookmark else { return }
             
             // See if there has been any change
-            if bookmarkToUpdate.customTitle == customTitle &&
-                bookmarkToUpdate.url == url &&
-                (newSyncOrder == nil || bookmarkToUpdate.syncOrder == newSyncOrder),
-                case .keep = location {
+            if bookmarkToUpdate.customTitle == customTitle && bookmarkToUpdate.url == url {
                 return
             }
             
@@ -346,30 +382,6 @@ extension Bookmark {
                 } else {
                     bookmarkToUpdate.domain = nil
                 }
-            }
-            
-            switch location {
-            case .keep:
-                // Checking if syncOrder has changed is imporant here for performance reasons.
-                // Currently to do bookmark sorting right, we have to grab all bookmarks in a given directory
-                // and update their order which is a costly operation.
-                if newSyncOrder != nil && bookmarkToUpdate.syncOrder != newSyncOrder {
-                    bookmarkToUpdate.syncOrder = newSyncOrder
-                    Bookmark.setOrderForAllBookmarksOnGivenLevel(parent: bookmarkToUpdate.parentFolder, forFavorites: bookmarkToUpdate.isFavorite, context: context)
-                }
-            case .new(let newParent):
-                var parentOnCorrectContext: Bookmark?
-                if let newParent = newParent {
-                    parentOnCorrectContext = context.object(with: newParent.objectID) as? Bookmark
-                }
-                
-                if parentOnCorrectContext === bookmarkToUpdate.parentFolder { return }
-                
-                bookmarkToUpdate.parentFolder = parentOnCorrectContext
-                bookmarkToUpdate.newSyncOrder(forFavorites: bookmarkToUpdate.isFavorite, context: context)
-                Bookmark.setOrderForAllBookmarksOnGivenLevel(parent: bookmarkToUpdate.parentFolder,
-                                                             forFavorites: bookmarkToUpdate.isFavorite,
-                                                             context: context)
             }
         }
     }
@@ -416,6 +428,12 @@ extension Bookmark {
         return all(where: predicate, context: context ?? DataController.viewContext) ?? []
     }
     
+    public static func getAllFavorites(context: NSManagedObjectContext? = nil) -> [Bookmark] {
+        let predicate = NSPredicate(format: "isFavorite == YES")
+        
+        return all(where: predicate, context: context ?? DataController.viewContext) ?? []
+    }
+    
     // MARK: Delete
     
     private func deleteInternal(save: Bool = true, context: WriteContext = .new(inMemory: false)) {
@@ -433,45 +451,7 @@ extension Bookmark {
 
 // MARK: - Comparable
 extension Bookmark: Comparable {
-    
     public static func < (lhs: Bookmark, rhs: Bookmark) -> Bool {
-        return lhs.compare(rhs) == .orderedAscending
-    }
-    
-    private func compare(_ rhs: Bookmark) -> ComparisonResult {
-        
-        guard let lhsSyncOrder = syncOrder, let rhsSyncOrder = rhs.syncOrder else {
-            log.info("""
-                Wanting to compare bookmark: \(String(describing: displayTitle)) \
-                and \(String(describing: rhs.displayTitle)) but no syncOrder is set \
-                in at least one of them.
-                """)
-            return .orderedSame
-        }
-        
-        // Split is O(n)
-        let lhsSyncOrderBits = lhsSyncOrder.split(separator: ".").compactMap { Int($0) }
-        let rhsSyncOrderBits = rhsSyncOrder.split(separator: ".").compactMap { Int($0) }
-        
-        // Preventing going out of bounds.
-        for i in 0..<min(lhsSyncOrderBits.count, rhsSyncOrderBits.count) {
-            let comparison = lhsSyncOrderBits[i].compare(rhsSyncOrderBits[i])
-            if comparison != .orderedSame { return comparison }
-        }
-        
-        // We went through all numbers and everything is equal.
-        // Need to check if one of arrays has more numbers because 0.0.1.1 > 0.0.1
-        //
-        // Alternatively, we could append zeros to make int arrays between the two objects
-        // have same length. 0.0.1 vs 0.0.1.2 would convert to 0.0.1.0 vs 0.0.1.2
-        return lhsSyncOrderBits.count.compare(rhsSyncOrderBits.count)
-    }
-}
-
-extension Int {
-    func compare(_ against: Int) -> ComparisonResult {
-        if self > against { return .orderedDescending }
-        if self < against { return .orderedAscending }
-        return .orderedSame
+        return lhs.order < rhs.order
     }
 }

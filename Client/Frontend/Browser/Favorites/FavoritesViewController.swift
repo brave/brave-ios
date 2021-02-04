@@ -247,7 +247,7 @@ extension FavoritesViewController: UICollectionViewDataSource, UICollectionViewD
     }
     
     func collectionView(_ collectionView: UICollectionView, moveItemAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-        Bookmark.reorderBookmarks(frc: frc, sourceIndexPath: sourceIndexPath, destinationIndexPath: destinationIndexPath)
+        Bookmark.reorderFavorites(sourceIndexPath: sourceIndexPath, destinationIndexPath: destinationIndexPath)
     }
     
     @available(iOS 13, *)
@@ -328,8 +328,7 @@ extension FavoritesViewController: UICollectionViewDragDelegate, UICollectionVie
         case .move:
             guard let item = coordinator.items.first else { return }
             _ = coordinator.drop(item.dragItem, toItemAt: destinationIndexPath)
-            Bookmark.reorderBookmarks(
-                frc: frc,
+            Bookmark.reorderFavorites(
                 sourceIndexPath: sourceIndexPath,
                 destinationIndexPath: destinationIndexPath,
                 isInteractiveDragReorder: true

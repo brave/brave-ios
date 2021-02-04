@@ -446,16 +446,6 @@ extension AddEditBookmarkTableViewController: BookmarkDetailsViewDelegate {
 
 extension AddEditBookmarkTableViewController: BookmarksV2FetchResultsDelegate {
     func controller(_ controller: BookmarksV2FetchResultsController, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        
-        // Possible performance bottleneck.
-        // There is not easy way to get folder sorted by their parent/children hierarchy
-        // and folders can be updated while user is in edit mode(via Sync)
-        // We have to listen for database changes and reload data afterwards.
-        // Unfortunately due to `syncOrder` implementation, a lot of folder updates may come in
-        // For example, moving a folder may result in having to update all other folders on a given
-        // level with updated `newSyncOrder`, which means a lot of calls to `reloadData`.
-        //
-        // Watching for CoreData save notification could be an alternative to using a frc delegate.
         reloadData()
     }
     

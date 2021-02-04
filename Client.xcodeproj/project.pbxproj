@@ -34,7 +34,6 @@
 		0A1E84462190A57F0042F782 /* SyncAddDeviceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A1E843C2190A57F0042F782 /* SyncAddDeviceViewController.swift */; };
 		0A27ABA123D1B9C400194921 /* BrandedImageCalloutState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A27ABA023D1B9C400194921 /* BrandedImageCalloutState.swift */; };
 		0A2FF33F24A4B75100F88F43 /* vpncheckmark.json in Resources */ = {isa = PBXBuildFile; fileRef = 0A2FF33E24A4B75000F88F43 /* vpncheckmark.json */; };
-		0A39D56D21930B89008B2772 /* ScriptOpener.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A39D56C21930B89008B2772 /* ScriptOpener.swift */; };
 		0A39FE902486604D00290ABC /* GRDSubscriberCredential.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A39FE832486604100290ABC /* GRDSubscriberCredential.h */; };
 		0A39FE912486604D00290ABC /* GRDGatewayAPIResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A39FE842486604200290ABC /* GRDGatewayAPIResponse.h */; };
 		0A39FE922486604D00290ABC /* GRDServerManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A39FE852486604400290ABC /* GRDServerManager.h */; };
@@ -96,7 +95,6 @@
 		0A6BEF6624FCF23C0057A166 /* NewTabCenteredCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A6BEF6524FCF23C0057A166 /* NewTabCenteredCollectionViewCell.swift */; };
 		0A6F957624044F070098217F /* NTPLearnMoreContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A6F957524044F070098217F /* NTPLearnMoreContentView.swift */; };
 		0A764F31230EE5CA003A1D9B /* OnboardingState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A764F30230EE5CA003A1D9B /* OnboardingState.swift */; };
-		0A771D35218C8FDC00336E0D /* Bookmark+Sync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A771D34218C8FDC00336E0D /* Bookmark+Sync.swift */; };
 		0A7B5D6722689C5D00AADF22 /* AddEditHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7B5D6622689C5D00AADF22 /* AddEditHeaderView.swift */; };
 		0A7B5D702269E72C00AADF22 /* BookmarkSaveLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7B5D6F2269E72C00AADF22 /* BookmarkSaveLocation.swift */; };
 		0A7B5D722269E7AD00AADF22 /* BookmarkEditMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7B5D712269E7AD00AADF22 /* BookmarkEditMode.swift */; };
@@ -112,7 +110,6 @@
 		0A917391231D173C0069A08B /* AppReviewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A917390231D173C0069A08B /* AppReviewTests.swift */; };
 		0A93F1802264C2D200A3571B /* FolderDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A93F17F2264C2D200A3571B /* FolderDetailsView.swift */; };
 		0A93F1892264C72000A3571B /* BookmarkFormFieldsProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A93F1882264C72000A3571B /* BookmarkFormFieldsProtocol.swift */; };
-		0AA029F8222E899400D6B535 /* Bookmark+Reorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AA029F7222E899400D6B535 /* Bookmark+Reorder.swift */; };
 		0AA21E4A2302C4CC00358988 /* webauth_verify_key.json in Resources */ = {isa = PBXBuildFile; fileRef = 0AA21E472302C4CC00358988 /* webauth_verify_key.json */; };
 		0AA21E4B2302C4CC00358988 /* webauth_insert_key.json in Resources */ = {isa = PBXBuildFile; fileRef = 0AA21E482302C4CC00358988 /* webauth_insert_key.json */; };
 		0AA21E4C2302C4CC00358988 /* webauth_touch_key.json in Resources */ = {isa = PBXBuildFile; fileRef = 0AA21E492302C4CC00358988 /* webauth_touch_key.json */; };
@@ -184,7 +181,6 @@
 		0AF3B4F4213D8E3300695962 /* TabMOTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AF3B4EC213D8E3300695962 /* TabMOTests.swift */; };
 		0AF4C59424F8003A00E500DD /* NTPDefaultBrowserCalloutProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AF4C59324F8003A00E500DD /* NTPDefaultBrowserCalloutProvider.swift */; };
 		0AF52D06237B19CB00BFAB56 /* BytesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AF52D05237B19CB00BFAB56 /* BytesTests.swift */; };
-		0AF684622191D6470079EC77 /* bookmark_util.js in Resources */ = {isa = PBXBuildFile; fileRef = 0AF6845A2191D6470079EC77 /* bookmark_util.js */; };
 		0AF6B1E824A0EDC1005417FC /* InstallVPNViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AF6B1E624A0EDC1005417FC /* InstallVPNViewController.swift */; };
 		0AF6B1EA24A0EE19005417FC /* InstallVPNView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AF6B1E924A0EE19005417FC /* InstallVPNView.swift */; };
 		0AFC8F9523D1DF6500941895 /* TranslucentBottomSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AFC8F9423D1DF6500941895 /* TranslucentBottomSheet.swift */; };
@@ -1388,7 +1384,6 @@
 		0A2D5DF623571F02001ED889 /* ko-KR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "ko-KR"; path = "ko-KR.lproj/Storage.strings"; sourceTree = "<group>"; };
 		0A2FF33E24A4B75000F88F43 /* vpncheckmark.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = vpncheckmark.json; sourceTree = "<group>"; };
 		0A38EA7F216532DB00142710 /* CRUDProtocolsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CRUDProtocolsTests.swift; sourceTree = "<group>"; };
-		0A39D56C21930B89008B2772 /* ScriptOpener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScriptOpener.swift; sourceTree = "<group>"; };
 		0A39FE832486604100290ABC /* GRDSubscriberCredential.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GRDSubscriberCredential.h; sourceTree = "<group>"; };
 		0A39FE842486604200290ABC /* GRDGatewayAPIResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GRDGatewayAPIResponse.h; sourceTree = "<group>"; };
 		0A39FE852486604400290ABC /* GRDServerManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GRDServerManager.h; sourceTree = "<group>"; };
@@ -1457,7 +1452,6 @@
 		0A6F957524044F070098217F /* NTPLearnMoreContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NTPLearnMoreContentView.swift; sourceTree = "<group>"; };
 		0A75A3BD23571F2B00013540 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/Storage.strings"; sourceTree = "<group>"; };
 		0A764F30230EE5CA003A1D9B /* OnboardingState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingState.swift; sourceTree = "<group>"; };
-		0A771D34218C8FDC00336E0D /* Bookmark+Sync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bookmark+Sync.swift"; sourceTree = "<group>"; };
 		0A7B5D6622689C5D00AADF22 /* AddEditHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEditHeaderView.swift; sourceTree = "<group>"; };
 		0A7B5D6F2269E72C00AADF22 /* BookmarkSaveLocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkSaveLocation.swift; sourceTree = "<group>"; };
 		0A7B5D712269E7AD00AADF22 /* BookmarkEditMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkEditMode.swift; sourceTree = "<group>"; };
@@ -1477,7 +1471,6 @@
 		0A95EF7A23571F3A001385A3 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/Storage.strings; sourceTree = "<group>"; };
 		0A977C97249B7B380004216A /* Model10.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model10.xcdatamodel; sourceTree = "<group>"; };
 		0A9B6A3420E6453400712BC9 /* Model8.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model8.xcdatamodel; sourceTree = "<group>"; };
-		0AA029F7222E899400D6B535 /* Bookmark+Reorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bookmark+Reorder.swift"; sourceTree = "<group>"; };
 		0AA21E472302C4CC00358988 /* webauth_verify_key.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = webauth_verify_key.json; sourceTree = "<group>"; };
 		0AA21E482302C4CC00358988 /* webauth_insert_key.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = webauth_insert_key.json; sourceTree = "<group>"; };
 		0AA21E492302C4CC00358988 /* webauth_touch_key.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = webauth_touch_key.json; sourceTree = "<group>"; };
@@ -1551,7 +1544,6 @@
 		0AF3B4EC213D8E3300695962 /* TabMOTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabMOTests.swift; sourceTree = "<group>"; };
 		0AF4C59324F8003A00E500DD /* NTPDefaultBrowserCalloutProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NTPDefaultBrowserCalloutProvider.swift; sourceTree = "<group>"; };
 		0AF52D05237B19CB00BFAB56 /* BytesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BytesTests.swift; sourceTree = "<group>"; };
-		0AF6845A2191D6470079EC77 /* bookmark_util.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = bookmark_util.js; sourceTree = "<group>"; };
 		0AF6B1E624A0EDC1005417FC /* InstallVPNViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InstallVPNViewController.swift; sourceTree = "<group>"; };
 		0AF6B1E924A0EE19005417FC /* InstallVPNView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InstallVPNView.swift; sourceTree = "<group>"; };
 		0AF89E5A23571EE80074E1EF /* id-ID */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "id-ID"; path = "id-ID.lproj/Storage.strings"; sourceTree = "<group>"; };
@@ -4427,8 +4419,6 @@
 			isa = PBXGroup;
 			children = (
 				44FA2F2F21F8DB1000EFA86A /* DataPreferences.swift */,
-				0A39D56C21930B89008B2772 /* ScriptOpener.swift */,
-				0AF6845A2191D6470079EC77 /* bookmark_util.js */,
 				5D1DC54020AE004600905E5A /* models */,
 				5D1DC51520AC9AFA00905E5A /* Data.h */,
 				5D1DC51620AC9AFA00905E5A /* Info.plist */,
@@ -4469,8 +4459,6 @@
 				5D1DC54220AE004600905E5A /* TabMO.swift */,
 				5D1DC54620AE004600905E5A /* Bookmark.swift */,
 				27B3DDCF24AE83710006A7ED /* FeedSourceOverride.swift */,
-				0AA029F7222E899400D6B535 /* Bookmark+Reorder.swift */,
-				0A771D34218C8FDC00336E0D /* Bookmark+Sync.swift */,
 				0A62A354238C6F3E008902E3 /* Bookmark+Restoration.swift */,
 				5D1DC54720AE004600905E5A /* FaviconMO.swift */,
 				5D1DC54820AE004600905E5A /* Domain.swift */,
@@ -6197,7 +6185,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0AF684622191D6470079EC77 /* bookmark_util.js in Resources */,
 				59B6912921B695A400E9388E /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -6609,15 +6596,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0AA029F8222E899400D6B535 /* Bookmark+Reorder.swift in Sources */,
 				5D1DC55A20AE004600905E5A /* FaviconMO.swift in Sources */,
 				5D1DC55D20AE004600905E5A /* History.swift in Sources */,
-				0A39D56D21930B89008B2772 /* ScriptOpener.swift in Sources */,
 				44FA2F3021F8DB1000EFA86A /* DataPreferences.swift in Sources */,
 				5D1DC55620AE004600905E5A /* DataController.swift in Sources */,
 				5D1DC55520AE004600905E5A /* TabMO.swift in Sources */,
 				0A53F3E721E6560A0086E80C /* InMemoryDataController.swift in Sources */,
-				0A771D35218C8FDC00336E0D /* Bookmark+Sync.swift in Sources */,
 				5D1DC55920AE004600905E5A /* Bookmark.swift in Sources */,
 				27B3DDD024AE83710006A7ED /* FeedSourceOverride.swift in Sources */,
 				5D1DC55B20AE004600905E5A /* Domain.swift in Sources */,
