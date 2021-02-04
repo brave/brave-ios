@@ -27,15 +27,15 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, CRUD {
     @NSManaged public var tags: [String]?
     @NSManaged public var syncOrder: String?
     
-    /// Should not be set directly, due to specific formatting required, use `syncUUID` instead
-    /// CD does not allow (easily) searching on transformable properties, could use binary, but would still require tranformtion
-    //  syncUUID should never change
-    @NSManaged public var syncDisplayUUID: String?
-    @NSManaged public var syncParentDisplayUUID: String?
     @NSManaged public var parentFolder: Bookmark?
     @NSManaged public var children: Set<Bookmark>?
     
     @NSManaged public var domain: Domain?
+    
+    @available(*, deprecated, message: "This is sync v1 property and is not used anymore")
+    @NSManaged public var syncDisplayUUID: String?
+    @available(*, deprecated, message: "This is sync v1 property and is not used anymore")
+    @NSManaged public var syncParentDisplayUUID: String?
     
     private static let isFavoritePredicate = NSPredicate(format: "isFavorite == true")
     
@@ -46,14 +46,13 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, CRUD {
     public class func addFavorites(from list: [(url: URL, title: String)]) {
         DataController.perform { context in
             list.forEach {
-                addInternal(url: $0.url, title: $0.title, isFavorite: true, sendToSync: false,
-                                     context: .existing(context))
+                addInternal(url: $0.url, title: $0.title, isFavorite: true, context: .existing(context))
             }
         }
     }
     
     public class func addFavorite(url: URL, title: String?) {
-        addInternal(url: url, title: title, isFavorite: true, sendToSync: false)
+        addInternal(url: url, title: title, isFavorite: true)
     }
     
     public class func addFolder(title: String, parentFolder: Bookmark? = nil, context: WriteContext = .new(inMemory: false)) {
@@ -165,7 +164,7 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, CRUD {
         updateInternal(customTitle: customTitle, url: url, location: .new(location: location))
     }
     
-    // Title can't be empty, except when coming from Sync
+    // Title can't be empty.
     private func hasTitle(_ title: String?) -> Bool {
         return title?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
     }
@@ -183,7 +182,7 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, CRUD {
             Bookmark.deleteAll(predicate: isFavoritePredicate, context: .existing(context))
             
             favorites.forEach {
-                addInternal(url: $0.url, title: $0.title, isFavorite: true, sendToSync: false,
+                addInternal(url: $0.url, title: $0.title, isFavorite: true,
                             context: .existing(context))
             }
         }
@@ -225,7 +224,6 @@ extension Bookmark {
                            isFavorite: Bool = false,
                            syncOrder: String? = nil,
                            save: Bool = true,
-                           sendToSync: Bool = true,
                            context: WriteContext = .new(inMemory: false),
                            completion: ((NSManagedObjectID) -> Void)? = nil) {
         
@@ -238,7 +236,7 @@ extension Bookmark {
             }
             
             create(url: url, title: title, customTitle: customTitle, isFolder: isFolder,
-                   isFavorite: isFavorite, save: save, sendToSync: false,
+                   isFavorite: isFavorite, save: save,
                    parentFolder: parentFolderOnCorrectContext,
                    context: .existing(context)) { objectId in
                 completion?(objectId)
@@ -254,7 +252,6 @@ extension Bookmark {
                               isFolder: Bool = false,
                               isFavorite: Bool = false,
                               save: Bool = true,
-                              sendToSync: Bool = true,
                               parentFolder: Bookmark? = nil,
                               context: WriteContext = .new(inMemory: false),
                               completion: ((NSManagedObjectID) -> Void)? = nil) {
@@ -322,7 +319,7 @@ extension Bookmark {
     }
     
     private func updateInternal(customTitle: String?, url: String?, newSyncOrder: String? = nil,
-                                save: Bool = true, sendToSync: Bool = true,
+                                save: Bool = true,
                                 location: SaveLocation = .keep,
                                 context: WriteContext = .new(inMemory: false)) {
         
@@ -421,7 +418,7 @@ extension Bookmark {
     
     // MARK: Delete
     
-    private func deleteInternal(save: Bool = true, sendToSync: Bool = true, context: WriteContext = .new(inMemory: false)) {
+    private func deleteInternal(save: Bool = true, context: WriteContext = .new(inMemory: false)) {
         func deleteFromStore(context: WriteContext) {
             DataController.perform(context: context, save: save) { context in
                 let objectOnContext = context.object(with: self.objectID)

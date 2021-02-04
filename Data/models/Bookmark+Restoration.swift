@@ -167,7 +167,7 @@ extension Bookmark {
                 // Otherwise favorites are treated as regular bookmarks inside of some folder.
                 if saveLocation == nil {
                     Bookmark.addInternal(url: url, title: bookmark.title, isFavorite: true,
-                                         sendToSync: false, context: .existing(context))
+                                         context: .existing(context))
                 } else {
                     Bookmark.addInternal(url: url, title: bookmark.title, parentFolder: saveLocation,
                                          context: .existing(context))
