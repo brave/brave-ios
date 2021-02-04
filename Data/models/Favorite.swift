@@ -51,7 +51,7 @@ public final class Favorite: NSManagedObject, WebsitePresentable, CRUD {
     
     // MARK: Create
     
-    public class func addFavorites(from list: [(url: URL, title: String)]) {
+    public class func add(from list: [(url: URL, title: String)]) {
         DataController.perform { context in
             list.forEach {
                 addInternal(url: $0.url, title: $0.title, isFavorite: true, context: .existing(context))
@@ -59,7 +59,7 @@ public final class Favorite: NSManagedObject, WebsitePresentable, CRUD {
         }
     }
     
-    public class func addFavorite(url: URL, title: String?) {
+    public class func add(url: URL, title: String?) {
         addInternal(url: url, title: title, isFavorite: true)
     }
     
@@ -136,9 +136,9 @@ public final class Favorite: NSManagedObject, WebsitePresentable, CRUD {
     
     /// Passing in `isInteractiveDragReorder` will force the write to happen on
     /// the main view context. Defaults to `false`
-    public class func reorderFavorites(sourceIndexPath: IndexPath,
-                                       destinationIndexPath: IndexPath,
-                                       isInteractiveDragReorder: Bool = false) {
+    public class func reorder(sourceIndexPath: IndexPath,
+                              destinationIndexPath: IndexPath,
+                              isInteractiveDragReorder: Bool = false) {
         if destinationIndexPath.row == sourceIndexPath.row {
             log.error("Source and destination bookmarks are the same!")
             return
@@ -263,7 +263,7 @@ extension Favorite {
     
     // MARK: Read
     
-    static func getAllFavorites(context: NSManagedObjectContext? = nil) -> [Favorite] {
+    private static func getAllFavorites(context: NSManagedObjectContext? = nil) -> [Favorite] {
         let predicate = NSPredicate(format: "isFavorite == YES")
         
         return all(where: predicate, context: context ?? DataController.viewContext) ?? []

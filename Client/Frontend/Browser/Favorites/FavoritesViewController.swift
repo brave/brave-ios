@@ -247,7 +247,7 @@ extension FavoritesViewController: UICollectionViewDataSource, UICollectionViewD
     }
     
     func collectionView(_ collectionView: UICollectionView, moveItemAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-        Favorite.reorderFavorites(sourceIndexPath: sourceIndexPath, destinationIndexPath: destinationIndexPath)
+        Favorite.reorder(sourceIndexPath: sourceIndexPath, destinationIndexPath: destinationIndexPath)
     }
     
     @available(iOS 13, *)
@@ -328,7 +328,7 @@ extension FavoritesViewController: UICollectionViewDragDelegate, UICollectionVie
         case .move:
             guard let item = coordinator.items.first else { return }
             _ = coordinator.drop(item.dragItem, toItemAt: destinationIndexPath)
-            Favorite.reorderFavorites(
+            Favorite.reorder(
                 sourceIndexPath: sourceIndexPath,
                 destinationIndexPath: destinationIndexPath,
                 isInteractiveDragReorder: true

@@ -365,7 +365,7 @@ class BrowserViewController: UIViewController {
                 }
                 
                 let customFavorites = sites.compactMap { $0.asFavoriteSite }
-                Favorite.addFavorites(from: customFavorites)
+                Favorite.add(from: customFavorites)
             }
         }
         
