@@ -317,7 +317,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         $0.imageView?.contentMode = .scaleAspectFit
         $0.setTitle("1x", for: .normal)
         $0.setTitleColor(.white, for: .normal)
-        $0.titleLabel?.font = .systemFont(ofSize: 14.0, weight: .medium)
+        $0.titleLabel?.font = .systemFont(ofSize: 21.0, weight: .medium)
     }
     
     private let trackBarBackground = UIView().then {
@@ -486,7 +486,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
             showOverlays(true)
             isOverlayDisplayed = true
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
                 self.isOverlayDisplayed = false
                 if self.isPlaying && !self.isSeeking {
                     self.showOverlays(false)
@@ -496,7 +496,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
             showOverlays(true)
             isOverlayDisplayed = true
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
                 self.isOverlayDisplayed = false
                 if self.isPlaying && !self.isSeeking {
                     self.showOverlays(false)
@@ -517,7 +517,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
             self.showOverlays(false)
         })
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0, execute: fadeAnimationWorkItem!)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0, execute: fadeAnimationWorkItem!)
     }
     
     @objc

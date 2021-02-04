@@ -134,13 +134,19 @@ class PlaylistMediaInfo: NSObject {
 
 extension PlaylistMediaInfo: MPPlayableContentDelegate {
     
+    public enum MediaPlaybackError {
+        case expired
+        case error(Error)
+        case none
+    }
+    
     private func displayLoadingResourceError() {
         let alert = UIAlertController(title: "Sorry", message: "There was a problem loading the resource!", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Okay", style: .default, handler: nil))
         //self.present(alert, animated: true, completion: nil)
     }
     
-    public func loadMediaItem(_ item: PlaylistInfo, index: Int, completion: @escaping (Error?) -> Void) {
+    public func loadMediaItem(_ item: PlaylistInfo, index: Int, completion: @escaping (MediaPlaybackError) -> Void) {
         self.nowPlayingInfo = item
         let cacheState = PlaylistManager.shared.state(for: item.pageSrc)
 
@@ -153,7 +159,7 @@ extension PlaylistMediaInfo: MPPlayableContentDelegate {
                     if canStream {
                         self.playerView?.seek(to: 0.0)
                         self.playerView?.load(url: url, resourceDelegate: nil)
-                        completion(nil)
+                        completion(.expired)
                     } else {
                         //Stream failed so fallback to the webview
                         //It's possible the URL expired..
@@ -164,18 +170,18 @@ extension PlaylistMediaInfo: MPPlayableContentDelegate {
 
                                 Playlist.shared.updateItem(mediaSrc: item.src, item: newItem) {
                                     DispatchQueue.main.async {
-                                        completion(nil)
+                                        completion(.none)
                                     }
                                 }
                             } else {
-                                completion("Cannot Load Media")
+                                completion(.error("Cannot Load Media"))
                             }
                         })
                         
                         if let url = URL(string: item.pageSrc) {
                             self.webLoader.load(url: url)
                         } else {
-                            completion("Cannot Load Media")
+                            completion(.error("Cannot Load Media"))
                         }
                     }
                 }
@@ -186,9 +192,9 @@ extension PlaylistMediaInfo: MPPlayableContentDelegate {
                     guard let self = self else { return }
                     if let item = item, let url = URL(string: item.src) {
                         self.playerView?.load(url: url, resourceDelegate: nil)
-                        completion(nil)
+                        completion(.none)
                     } else {
-                        completion("Cannot Load Media")
+                        completion(.error("Cannot Load Media"))
                     }
                 })
                 self.playerView?.addSubview(webLoader)
@@ -196,14 +202,14 @@ extension PlaylistMediaInfo: MPPlayableContentDelegate {
                 if let url = URL(string: item.pageSrc) {
                     webLoader.load(url: url)
                 } else {
-                    completion("Cannot Load Media")
+                    completion(.error("Cannot Load Media"))
                 }
             }
         } else {
             //Load from the cache since this item was downloaded before..
             let asset = PlaylistManager.shared.assetAtIndex(index)
             self.playerView?.load(asset: asset)
-            completion(nil)
+            completion(.none)
         }
     }
 }

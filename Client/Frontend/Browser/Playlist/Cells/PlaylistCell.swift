@@ -33,13 +33,14 @@ class PlaylistCell: UITableViewCell {
     let titleLabel = UILabel().then {
         $0.textColor = .white
         $0.appearanceTextColor = .white
-        $0.font = .systemFont(ofSize: 14.0, weight: .medium)
+        $0.numberOfLines = 2
+        $0.font = .systemFont(ofSize: 16.0, weight: .medium)
     }
     
     let detailLabel = UILabel().then {
         $0.textColor = #colorLiteral(red: 0.5254901961, green: 0.5568627451, blue: 0.5882352941, alpha: 1)
         $0.appearanceTextColor = #colorLiteral(red: 0.5254901961, green: 0.5568627451, blue: 0.5882352941, alpha: 1)
-        $0.font = .systemFont(ofSize: 12.0, weight: .regular)
+        $0.font = .systemFont(ofSize: 14.0, weight: .regular)
     }
     
     private let iconStackView = UIStackView().then {
@@ -50,6 +51,7 @@ class PlaylistCell: UITableViewCell {
     
     private let infoStackView = UIStackView().then {
         $0.axis = .vertical
+        $0.spacing = 8.0
     }
     
     private let separator = UIView().then {
@@ -88,8 +90,8 @@ class PlaylistCell: UITableViewCell {
             $0.left.equalTo(iconStackView.snp.right).offset(8.0)
             $0.right.equalToSuperview().offset(-15.0)
             $0.centerY.equalToSuperview()
-            $0.top.greaterThanOrEqualToSuperview().inset(5.0)
-            $0.bottom.lessThanOrEqualToSuperview().inset(5.0)
+            $0.top.greaterThanOrEqualToSuperview().inset(1.0)
+            $0.bottom.lessThanOrEqualToSuperview().inset(1.0)
         }
         
         separator.snp.makeConstraints {
