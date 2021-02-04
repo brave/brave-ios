@@ -19,6 +19,7 @@ extension PlaylistItem {
     @NSManaged public var mediaSrc: String?
     @NSManaged public var mimeType: String?
     @NSManaged public var name: String?
+    @NSManaged public var order: Int32
     @NSManaged public var pageSrc: String?
     @NSManaged public var pageTitle: String?
 

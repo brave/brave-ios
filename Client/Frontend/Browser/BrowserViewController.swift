@@ -3561,4 +3561,42 @@ extension BrowserViewController: PlaylistHelperDelegate {
     func present(controller: UIViewController) {
         present(controller, animated: true)
     }
+    
+    func showPlaylistToast(info: PlaylistInfo, autoDetected: Bool) {
+        DispatchQueue.main.async {
+            if let toast = self.pendingToast {
+                toast.dismiss(false)
+            }
+            
+            if autoDetected {
+                let kind = info.mimeType == "video" ? "video" : "audio"
+                let toast = ButtonToast(labelText: "Add \(kind) to Playlist?",
+                                        descriptionText: nil,
+                                        imageName: "playlist_play",
+                                        buttonText: "Add",
+                                        backgroundColor: SimpleToastUX.toastDefaultColor,
+                                        textAlignment: .left,
+                                        completion: { [weak self] buttonPressed in
+                                            if buttonPressed {
+                                                //Update playlist with new items..
+                                                Playlist.shared.addItem(item: info, cachedData: nil) {
+                                                    log.debug("Playlist Item Added")
+                                                    
+                                                    self?.showPlaylistToast(info: info, autoDetected: false)
+                                                }
+                                            }
+                                        })
+                self.show(toast: toast, afterWaiting: .milliseconds(250), duration: nil)
+            } else {
+                let toast = ButtonToast(labelText: "Added to Playlist",
+                                        descriptionText: nil,
+                                        imageName: "playlist_play",
+                                        buttonText: "Okay",
+                                        backgroundColor: SimpleToastUX.toastDefaultColor,
+                                        textAlignment: .left,
+                                        completion: nil)
+                self.show(toast: toast, afterWaiting: .milliseconds(250), duration: .seconds(5))
+            }
+        }
+    }
 }

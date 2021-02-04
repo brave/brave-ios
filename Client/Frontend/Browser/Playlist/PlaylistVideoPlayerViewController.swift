@@ -86,7 +86,7 @@ class PlaylistVideoPlayerViewController: UIViewController {
     // MARK: Internal
     
     private func setTheme() {
-        title = "Media Player"
+        title = "Playlist"
 
         navigationController?.do {
             $0.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
