@@ -357,13 +357,20 @@ extension PlaylistVideoPlayerViewController: UITableViewDelegate {
                 guard let self = self else { return }
                 self.activityIndicator.stopAnimating()
 
-                if let error = error {
-                    log.error(error)
+                switch error {
+                case .error(let err):
+                    log.error(err)
                     self.displayLoadingResourceError()
-                } else if let url = URL(string: item.src) {
-                    self.previewImageFromVideo(url: url) { image in
-                        (tableView.cellForRow(at: indexPath) as? PlaylistCell)?.thumbnailImage = image
-                        tableView.reloadRows(at: [indexPath], with: .automatic)
+                    
+                case .expired:
+                    (tableView.cellForRow(at: indexPath) as? PlaylistCell)?.detailLabel.text = "Expired"
+                    
+                case .none:
+                    if let url = URL(string: item.src) {
+                        self.previewImageFromVideo(url: url) { image in
+                            (tableView.cellForRow(at: indexPath) as? PlaylistCell)?.thumbnailImage = image
+                            tableView.reloadRows(at: [indexPath], with: .automatic)
+                        }
                     }
                 }
             }
@@ -393,10 +400,10 @@ extension PlaylistVideoPlayerViewController: VideoViewDelegate {
         if index < PlaylistManager.shared.numberOfAssets() {
             let item = PlaylistManager.shared.itemAtIndex(index)
             mediaInfo.loadMediaItem(item, index: index) { [weak self] error in
-                if error != nil {
-                    self?.displayLoadingResourceError()
-                } else {
+                if case .none = error {
                     self?.currentlyPlayingItemIndex = index
+                } else {
+                    self?.displayLoadingResourceError()
                 }
             }
         }
@@ -411,10 +418,10 @@ extension PlaylistVideoPlayerViewController: VideoViewDelegate {
         if index >= 0 {
             let item = PlaylistManager.shared.itemAtIndex(index)
             mediaInfo.loadMediaItem(item, index: index) { [weak self] error in
-                if error != nil {
-                    self?.displayLoadingResourceError()
-                } else {
+                if case .none = error {
                     self?.currentlyPlayingItemIndex = index
+                } else {
+                    self?.displayLoadingResourceError()
                 }
             }
         }
@@ -457,7 +464,6 @@ extension PlaylistVideoPlayerViewController: AVPlayerViewControllerDelegate, AVP
     
     //TODO: When entering PIP, dismiss the current playlist controller.
     //TODO: When exiting PIP, destroy the video player and its media info. Clear control centre, etc.
-    
     
     // MARK: - AVPlayerViewControllerDelegate
     func playerViewControllerWillStartPictureInPicture(_ playerViewController: AVPlayerViewController) {

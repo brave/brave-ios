@@ -22,7 +22,7 @@ class PlaylistViewController: UIViewController {
      
      struct Constants {
         static let playListCellIdentifier = "playlistCellIdentifier"
-        static let tableRowHeight: CGFloat = 70
+        static let tableRowHeight: CGFloat = 80
         static let tableHeaderHeight: CGFloat = 11
      }
 
@@ -212,7 +212,7 @@ extension PlaylistViewController: UITableViewDataSource {
         
         let cacheState = PlaylistManager.shared.state(for: item.pageSrc)
         if cacheState == .inProgress {
-            cell.detailLabel.text = "Downloading"
+            cell.detailLabel.text = "Downloading..."
         } else if cacheState == .downloaded {
             cell.detailLabel.text = "\(formatter.string(from: TimeInterval(item.duration)) ?? "0:00") - Downloaded"
         }
@@ -347,14 +347,21 @@ extension PlaylistViewController: UITableViewDelegate {
             mediaInfo.loadMediaItem(item, index: indexPath.row) { [weak self] error in
                 guard let self = self else { return }
                 self.activityIndicator.stopAnimating()
-
-                if let error = error {
-                    log.error(error)
+                
+                switch error {
+                case .error(let err):
+                    log.error(err)
                     self.displayLoadingResourceError()
-                } else if let url = URL(string: item.src) {
-                    self.previewImageFromVideo(url: url) { image in
-                        (tableView.cellForRow(at: indexPath) as? PlaylistCell)?.thumbnailImage = image
-                        tableView.reloadRows(at: [indexPath], with: .automatic)
+                    
+                case .expired:
+                    (tableView.cellForRow(at: indexPath) as? PlaylistCell)?.detailLabel.text = "Expired"
+                    
+                case .none:
+                    if let url = URL(string: item.src) {
+                        self.previewImageFromVideo(url: url) { image in
+                            (tableView.cellForRow(at: indexPath) as? PlaylistCell)?.thumbnailImage = image
+                            tableView.reloadRows(at: [indexPath], with: .automatic)
+                        }
                     }
                 }
             }
@@ -392,10 +399,10 @@ extension PlaylistViewController: VideoViewDelegate {
         if index < PlaylistManager.shared.numberOfAssets() {
             let item = PlaylistManager.shared.itemAtIndex(index)
             mediaInfo.loadMediaItem(item, index: index) { [weak self] error in
-                if error != nil {
-                    self?.displayLoadingResourceError()
-                } else {
+                if case .none = error {
                     self?.currentlyPlayingItemIndex = index
+                } else {
+                    self?.displayLoadingResourceError()
                 }
             }
         }
@@ -410,10 +417,10 @@ extension PlaylistViewController: VideoViewDelegate {
         if index >= 0 {
             let item = PlaylistManager.shared.itemAtIndex(index)
             mediaInfo.loadMediaItem(item, index: index) { [weak self] error in
-                if error != nil {
-                    self?.displayLoadingResourceError()
-                } else {
+                if case .none = error {
                     self?.currentlyPlayingItemIndex = index
+                } else {
+                    self?.displayLoadingResourceError()
                 }
             }
         }
@@ -456,7 +463,6 @@ extension PlaylistViewController: AVPlayerViewControllerDelegate, AVPictureInPic
     
     //TODO: When entering PIP, dismiss the current playlist controller.
     //TODO: When exiting PIP, destroy the video player and its media info. Clear control centre, etc.
-    
     
     // MARK: - AVPlayerViewControllerDelegate
     func playerViewControllerWillStartPictureInPicture(_ playerViewController: AVPlayerViewController) {
@@ -533,7 +539,7 @@ extension PlaylistViewController: PlaylistManagerDelegate {
         let cell = tableView.cellForRow(at: IndexPath(row: index, section: 0)) as? PlaylistCell {
             
             if state == .inProgress {
-                cell.detailLabel.text = "Downloading"
+                cell.detailLabel.text = "Downloading..."
             } else if state == .downloaded {
                 let item = PlaylistManager.shared.itemAtIndex(index)
                 cell.detailLabel.text = "\(formatter.string(from: TimeInterval(item.duration)) ?? "0:00") - Downloaded"

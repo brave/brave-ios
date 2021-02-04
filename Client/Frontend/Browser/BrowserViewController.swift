@@ -3569,32 +3569,20 @@ extension BrowserViewController: PlaylistHelperDelegate {
             }
             
             if autoDetected {
-                let kind = info.mimeType == "video" ? "video" : "audio"
-                let toast = ButtonToast(labelText: "Add \(kind) to Playlist?",
-                                        descriptionText: nil,
-                                        imageName: "playlist_play",
-                                        buttonText: "Add",
-                                        backgroundColor: SimpleToastUX.toastDefaultColor,
-                                        textAlignment: .left,
-                                        completion: { [weak self] buttonPressed in
-                                            if buttonPressed {
-                                                //Update playlist with new items..
-                                                Playlist.shared.addItem(item: info, cachedData: nil) {
-                                                    log.debug("Playlist Item Added")
-                                                    
-                                                    self?.showPlaylistToast(info: info, autoDetected: false)
-                                                }
-                                            }
-                                        })
+                let toast = PlaylistToast(item: info, state: .itemPendingUserAction) { [weak self] buttonPressed in
+                    
+                    if buttonPressed {
+                        //Update playlist with new items..
+                        Playlist.shared.addItem(item: info, cachedData: nil) {
+                            log.debug("Playlist Item Added")
+                            
+                            self?.showPlaylistToast(info: info, autoDetected: false)
+                        }
+                    }
+                }
                 self.show(toast: toast, afterWaiting: .milliseconds(250), duration: nil)
             } else {
-                let toast = ButtonToast(labelText: "Added to Playlist",
-                                        descriptionText: nil,
-                                        imageName: "playlist_play",
-                                        buttonText: "Okay",
-                                        backgroundColor: SimpleToastUX.toastDefaultColor,
-                                        textAlignment: .left,
-                                        completion: nil)
+                let toast = PlaylistToast(item: info, state: .itemAdded, completion: nil)
                 self.show(toast: toast, afterWaiting: .milliseconds(250), duration: .seconds(5))
             }
         }
