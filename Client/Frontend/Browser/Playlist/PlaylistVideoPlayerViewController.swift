@@ -179,10 +179,12 @@ extension PlaylistVideoPlayerViewController: VideoViewDelegate {
         if index < PlaylistManager.shared.numberOfAssets() {
             let item = PlaylistManager.shared.itemAtIndex(index)
             mediaInfo.loadMediaItem(item, index: index) { [weak self] error in
+                guard let self = self else { return }
+
                 if case .none = error {
-                    self?.currentlyPlayingItemIndex = index
+                    self.currentlyPlayingItemIndex = index
                 } else {
-                    self?.displayLoadingResourceError()
+                    self.delegate?.playlistVideoPlayerViewControllerDisplayResourceError(self)
                 }
             }
         }
@@ -197,10 +199,12 @@ extension PlaylistVideoPlayerViewController: VideoViewDelegate {
         if index >= 0 {
             let item = PlaylistManager.shared.itemAtIndex(index)
             mediaInfo.loadMediaItem(item, index: index) { [weak self] error in
+                guard let self = self else { return }
+                
                 if case .none = error {
-                    self?.currentlyPlayingItemIndex = index
+                    self.currentlyPlayingItemIndex = index
                 } else {
-                    self?.displayLoadingResourceError()
+                    self.delegate?.playlistVideoPlayerViewControllerDisplayResourceError(self)
                 }
             }
         }
