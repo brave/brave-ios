@@ -156,16 +156,14 @@ public final class Favorite: NSManagedObject, WebsitePresentable, CRUD {
         
         DataController.perform(context: context) { context in
             let destinationIndex = destinationIndexPath.row
-            let sourceIndex = sourceIndexPath.row
+            let source = sourceIndexPath.row
             
-            var allFavorites = Favorite.getAllFavorites(context: context).sorted()
-            // Out of bounds safety check, `swapAt` crashes beyond array length.
-            if destinationIndex > allFavorites.count - 1 {
-                assertionFailure("destinationIndex is out of bounds")
-                return
+            var allFavorites = Favorite.getAllFavorites(context: context).sorted { $0.order < $1.order }
+            
+            if let sourceIndex = allFavorites.firstIndex(where: { $0.order == source }) {
+                let removedItem = allFavorites.remove(at: sourceIndex)
+                allFavorites.insert(removedItem, at: destinationIndex)
             }
-            
-            allFavorites.swapAt(sourceIndex, destinationIndex)
             
             // Update order of all favorites that have changed.
             for (index, element) in allFavorites.enumerated() where index != element.order {
@@ -226,7 +224,10 @@ extension Favorite {
                                                        saveStrategy: .delayedPersistentStore)
             }
             
-            if let lastOrder = getAllFavorites(context: context).map(\.order).max() {
+            let favorites = getAllFavorites(context: context)
+            
+            // First fav is zero, then we increment all others.
+            if favorites.count > 1, let lastOrder = favorites.map(\.order).max() {
                 bk.order = lastOrder + 1
             }
         })
