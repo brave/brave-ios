@@ -328,19 +328,34 @@ extension PlaylistVideoListViewController: UITableViewDelegate {
                 guard let self = self else { return }
                 self.activityIndicator.stopAnimating()
 
-                if let error = error {
-                    log.error(error)
+                switch error {
+                case .error(let err):
+                    log.error(err)
                     self.delegate?.playlistVideoListViewControllerDisplayResourceError(self)
-                } else if let url = URL(string: item.src) {
-                    self.previewImageFromVideo(url: url) { image in
-                        (tableView.cellForRow(at: indexPath) as? PlaylistCell)?.thumbnailImage = image
-                        tableView.reloadRows(at: [indexPath], with: .automatic)
+                    
+                case .expired:
+                    (tableView.cellForRow(at: indexPath) as? PlaylistCell)?.detailLabel.text = "Expired"
+                    
+                case .none:
+                    if let url = URL(string: item.src) {
+                        self.previewImageFromVideo(url: url) { image in
+                            (tableView.cellForRow(at: indexPath) as? PlaylistCell)?.thumbnailImage = image
+                            tableView.reloadRows(at: [indexPath], with: .automatic)
+                        }
                     }
                 }
             }
         }
 
         tableView.reloadData()
+    }
+    
+    func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
+    func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+        PlaylistManager.shared.reorderItems(from: sourceIndexPath, to: destinationIndexPath)
     }
 }
 
