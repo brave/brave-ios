@@ -163,7 +163,7 @@ fileprivate extension Preferences {
         TabMO.deleteAllPrivateTabs()
         
         Domain.migrateShieldOverrides()
-        Bookmark.migrateBookmarkOrders()
+        LegacyBookmarksHelper.migrateBookmarkOrders()
         
         Preferences.Migration.completed.value = true
     }

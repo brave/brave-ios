@@ -34,7 +34,7 @@ class FavoritesViewController: UIViewController, Themeable {
     
     var action: (Bookmark, BookmarksAction) -> Void
     
-    private let frc = Bookmark.frc(forFavorites: true, parentFolder: nil)
+    private let frc = Bookmark.frc()
     
     private let layout = UICollectionViewFlowLayout().then {
         $0.sectionInset = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)

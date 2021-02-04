@@ -31,7 +31,7 @@ struct FavoritesHelper {
     }
 
     static func isAlreadyAdded(_ url: URL) -> Bool {
-        return Bookmark.contains(url: url, getFavorites: true)
+        return Bookmark.contains(url: url)
     }
     
     static func fallbackIcon(withLetter letter: String, color: UIColor, andSize iconSize: CGSize) -> UIImage {

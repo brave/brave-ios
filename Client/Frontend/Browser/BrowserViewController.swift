@@ -720,7 +720,7 @@ class BrowserViewController: UIViewController {
             }
         }
         
-        Bookmark.restore_1_12_Bookmarks() {
+        LegacyBookmarksHelper.restore_1_12_Bookmarks() {
             log.info("Bookmarks from old database were successfully restored")
         }
         

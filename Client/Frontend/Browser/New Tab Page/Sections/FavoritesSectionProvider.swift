@@ -28,7 +28,7 @@ class FavoritesSectionProvider: NSObject, NTPObservableSectionProvider {
         self.action = action
         self.legacyLongPressAction = legacyLongPressAction
         
-        frc = Bookmark.frc(forFavorites: true, parentFolder: nil)
+        frc = Bookmark.frc()
         super.init()
         frc.fetchRequest.fetchLimit = 10
         frc.delegate = self

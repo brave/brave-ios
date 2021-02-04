@@ -299,7 +299,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
             switch saveLocation {
             case .rootLevel:
                 favorite.delete()
-                Bookmark.add(url: url, title: title)
+                Bookmarkv2.add(url: url, title: title)
             case .favorites:
                 favorite.update(customTitle: title, url: url.absoluteString)
             case .folder(let folder):

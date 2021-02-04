@@ -87,7 +87,6 @@
 		0A5EBA5B24DD8CD900D605FC /* Deferred.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A5EBA5824DD8CD900D605FC /* Deferred.swift */; };
 		0A6112AC230B00E7001BBC45 /* OnboardingNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A6112AB230B00E7001BBC45 /* OnboardingNavigationController.swift */; };
 		0A6112BD230B4306001BBC45 /* OnboardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A6112BC230B4306001BBC45 /* OnboardingViewController.swift */; };
-		0A62A355238C6F3E008902E3 /* Bookmark+Restoration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A62A354238C6F3E008902E3 /* Bookmark+Restoration.swift */; };
 		0A64384B24FD3F0F000E80A3 /* DomainUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A64384A24FD3F0F000E80A3 /* DomainUserScript.swift */; };
 		0A64384E24FD4E43000E80A3 /* ArchiveIsCompat.js in Resources */ = {isa = PBXBuildFile; fileRef = 0A64384D24FD4E43000E80A3 /* ArchiveIsCompat.js */; };
 		0A66550A23E9D9750047EF2A /* UserAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A66550923E9D9750047EF2A /* UserAgent.swift */; };
@@ -147,6 +146,7 @@
 		0AC77602242A6AE000139377 /* BuyVPNView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AC77601242A6AE000139377 /* BuyVPNView.swift */; };
 		0ACF621322FDC17800297576 /* Shared.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 288A2D861AB8B3260023ABC3 /* Shared.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		0ACF621422FDC17800297576 /* BraveShared.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5DE7688420B3456C00FF5533 /* BraveShared.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		0AD0B33225CC6106002EF4F4 /* LegacyBookmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AD0B33125CC6106002EF4F4 /* LegacyBookmark.swift */; };
 		0AD48EEF24AF6E6200938B3B /* FeedSourceOverrideTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AD48EEE24AF6E6200938B3B /* FeedSourceOverrideTests.swift */; };
 		0AD4FEEA223A9A5500E00C05 /* BundledJSProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AD4FEE9223A9A5500E00C05 /* BundledJSProtocol.swift */; };
 		0AD4FEEC223A9C1300E00C05 /* BrowserifiedJS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AD4FEEB223A9C1300E00C05 /* BrowserifiedJS.swift */; };
@@ -1439,7 +1439,6 @@
 		0A60A1882358AF9E00953CA8 /* Brave.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; name = Brave.xctestplan; path = Client.xcodeproj/Brave.xctestplan; sourceTree = "<group>"; };
 		0A6112AB230B00E7001BBC45 /* OnboardingNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingNavigationController.swift; sourceTree = "<group>"; };
 		0A6112BC230B4306001BBC45 /* OnboardingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewController.swift; sourceTree = "<group>"; };
-		0A62A354238C6F3E008902E3 /* Bookmark+Restoration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bookmark+Restoration.swift"; sourceTree = "<group>"; };
 		0A64384A24FD3F0F000E80A3 /* DomainUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DomainUserScript.swift; sourceTree = "<group>"; };
 		0A64384D24FD4E43000E80A3 /* ArchiveIsCompat.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = ArchiveIsCompat.js; sourceTree = "<group>"; };
 		0A66550923E9D9750047EF2A /* UserAgent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserAgent.swift; sourceTree = "<group>"; };
@@ -1509,6 +1508,7 @@
 		0AC77601242A6AE000139377 /* BuyVPNView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuyVPNView.swift; sourceTree = "<group>"; };
 		0ACB38EA23571F5600DDC245 /* zh-TW */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-TW"; path = "zh-TW.lproj/Storage.strings"; sourceTree = "<group>"; };
 		0ACB3BF723571ED1000AC688 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Storage.strings; sourceTree = "<group>"; };
+		0AD0B33125CC6106002EF4F4 /* LegacyBookmark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegacyBookmark.swift; sourceTree = "<group>"; };
 		0AD48EEE24AF6E6200938B3B /* FeedSourceOverrideTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedSourceOverrideTests.swift; sourceTree = "<group>"; };
 		0AD4FEE9223A9A5500E00C05 /* BundledJSProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundledJSProtocol.swift; sourceTree = "<group>"; };
 		0AD4FEEB223A9C1300E00C05 /* BrowserifiedJS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserifiedJS.swift; sourceTree = "<group>"; };
@@ -4459,12 +4459,12 @@
 				5D1DC54220AE004600905E5A /* TabMO.swift */,
 				5D1DC54620AE004600905E5A /* Bookmark.swift */,
 				27B3DDCF24AE83710006A7ED /* FeedSourceOverride.swift */,
-				0A62A354238C6F3E008902E3 /* Bookmark+Restoration.swift */,
 				5D1DC54720AE004600905E5A /* FaviconMO.swift */,
 				5D1DC54820AE004600905E5A /* Domain.swift */,
 				5D1DC54A20AE004600905E5A /* History.swift */,
 				5D1DC54C20AE004600905E5A /* Model.xcdatamodeld */,
 				0A53F3E621E6560A0086E80C /* InMemoryDataController.swift */,
+				0AD0B33125CC6106002EF4F4 /* LegacyBookmark.swift */,
 			);
 			path = models;
 			sourceTree = "<group>";
@@ -6606,8 +6606,8 @@
 				27B3DDD024AE83710006A7ED /* FeedSourceOverride.swift in Sources */,
 				5D1DC55B20AE004600905E5A /* Domain.swift in Sources */,
 				0AF0411B2267C61100EBF982 /* ManagedObjectExtensions.swift in Sources */,
+				0AD0B33225CC6106002EF4F4 /* LegacyBookmark.swift in Sources */,
 				0AA4FC392109D685000B173A /* CRUDProtocols.swift in Sources */,
-				0A62A355238C6F3E008902E3 /* Bookmark+Restoration.swift in Sources */,
 				5D1DC55F20AE004600905E5A /* Model.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

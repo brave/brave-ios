@@ -53,7 +53,7 @@ class FavoritesOverflowSectionProvider: NSObject, NTPObservableSectionProvider {
     
     init(action: @escaping () -> Void) {
         self.action = action
-        frc = Bookmark.frc(forFavorites: true, parentFolder: nil)
+        frc = Bookmark.frc()
         frc.fetchRequest.fetchLimit = 10
         super.init()
         try? frc.performFetch()

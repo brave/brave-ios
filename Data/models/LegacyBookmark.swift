@@ -1,3 +1,4 @@
+// Copyright 2020 The Brave Authors. All rights reserved.
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -9,27 +10,56 @@ import BraveShared
 
 private let log = Logger.browserLogger
 
-/// Moving Core Data objects between different stores and contextes is risky.
-/// This structure provides us data needed to move a bookmark from one place to another.
-struct BookmarkRestorationData {
-    enum BookmarkType {
-        case bookmark(url: URL)
-        case favorite(url: URL)
-        case folder
+/// Contains methods that rely on old pre-syncv2 Bookmark system.
+public struct LegacyBookmarksHelper {
+    /// Naming note:
+    /// Before sync v2 `Favorite` was named `Bookmark` and contained logic for both bookmarks and favorites.
+    /// Now it's renamed and few migration methods still rely on this old Bookmarks system.
+    typealias LegacyBookmark = Bookmark
+    
+    public static func getTopLevelLegacyBookmarks(_ context: NSManagedObjectContext? = nil) -> [Bookmark] {
+        Bookmark.getTopLevelLegacyBookmarks(context)
     }
     
-    let bookmarkType: BookmarkType
-    let id: NSManagedObjectID
-    let parentId: NSManagedObjectID?
-    let title: String
+    public static func migrateBookmarkOrders() {
+        Bookmark.migrateBookmarkOrders()
+    }
+    
+    public static func restore_1_12_Bookmarks(completion: @escaping () -> Void) {
+        Bookmark.restore_1_12_Bookmarks(completion: completion)
+    }
 }
 
+// MARK: - 1.21 migration(Sync V2)
 extension Bookmark {
+    fileprivate class func getTopLevelLegacyBookmarks(_ context: NSManagedObjectContext? = nil) -> [Bookmark] {
+        let predicate = NSPredicate(format: "isFavorite == NO and parentFolder = nil")
+        return all(where: predicate, context: context ?? DataController.viewContext) ?? []
+    }
+}
+
+// MARK: - 1.12 migration(database location change)
+extension Bookmark {
+    /// Moving Core Data objects between different stores and contextes is risky.
+    /// This structure provides us data needed to move a bookmark from one place to another.
+    private struct BookmarkRestorationData {
+        enum BookmarkType {
+            case bookmark(url: URL)
+            case favorite(url: URL)
+            case folder
+        }
+        
+        let bookmarkType: BookmarkType
+        let id: NSManagedObjectID
+        let parentId: NSManagedObjectID?
+        let title: String
+    }
+    
     /// In 1.12 we moved database to new location. That migration caused some bugs for few users.
     /// This will attempt to restore bookmarks for them.
     ///
     /// Restoration must happen after Brave Sync is initialized.
-    public static func restore_1_12_Bookmarks(completion: @escaping () -> Void) {
+    fileprivate static func restore_1_12_Bookmarks(completion: @escaping () -> Void) {
         let restorationCompleted = Preferences.Database.bookmark_v1_12_1RestorationCompleted
         
         if restorationCompleted.value { return }
@@ -62,7 +92,7 @@ extension Bookmark {
         }
     }
     
-    static func restoreLostBookmarksInternal(_ bookmarksToRestore: [Bookmark], completion: @escaping () -> Void) {
+    private static func restoreLostBookmarksInternal(_ bookmarksToRestore: [Bookmark], completion: @escaping () -> Void) {
         var oldBookmarksData = [BookmarkRestorationData]()
         var oldFavoritesData = [BookmarkRestorationData]()
         
@@ -156,7 +186,7 @@ extension Bookmark {
                                           bookmarksToInsertAtGivenLevel: [BookmarkRestorationData],
                                           allBookmarks: [BookmarkRestorationData],
                                           context: NSManagedObjectContext) {
-        
+        Bookmark.migrateBookmarkOrders()
         bookmarksToInsertAtGivenLevel.forEach { bookmark in
             switch bookmark.bookmarkType {
             case .bookmark(let url):
@@ -185,6 +215,48 @@ extension Bookmark {
                                            bookmarksToInsertAtGivenLevel: children, allBookmarks: allBookmarks,
                                            context: context)
                 }
+            }
+        }
+    }
+}
+
+// MARK: - 1.6 Migration (ordering bugs)
+extension Bookmark {
+    fileprivate class func migrateBookmarkOrders() {
+        DataController.perform { context in
+            migrateOrder(forFavorites: true, context: context)
+            migrateOrder(forFavorites: false, context: context)
+        }
+    }
+    
+    /// Takes all Bookmarks and Favorites from 1.6 and sets correct order for them.
+    /// 1.6 had few bugs with reordering which we want to avoid, in particular non-reordered bookmarks on 1.6
+    /// all have order set to 0 which makes sorting confusing.
+    /// In migration we take all bookmarks using the same sorting method as on 1.6 and add a proper `order`
+    /// attribute to them. The goal is to have all bookmarks with a proper unique order number set.
+    private class func migrateOrder(parentFolder: Bookmark? = nil,
+                                    forFavorites: Bool,
+                                    context: NSManagedObjectContext) {
+        
+        let predicate = forFavorites ?
+            NSPredicate(format: "isFavorite == true") : allBookmarksOfAGivenLevelPredicate(parent: parentFolder)
+        
+        let orderSort = NSSortDescriptor(key: #keyPath(Bookmark.order), ascending: true)
+        let folderSort = NSSortDescriptor(key: #keyPath(Bookmark.isFolder), ascending: false)
+        let createdSort = NSSortDescriptor(key: #keyPath(Bookmark.created), ascending: true)
+        
+        let sort = [orderSort, folderSort, createdSort]
+        
+        guard let allBookmarks = all(where: predicate, sortDescriptors: sort, context: context),
+            !allBookmarks.isEmpty else {
+                return
+        }
+        
+        for (i, bookmark) in allBookmarks.enumerated() {
+            bookmark.order = Int16(i)
+            // Calling this method recursively to get ordering for nested bookmarks
+            if !forFavorites && bookmark.isFolder {
+                migrateOrder(parentFolder: bookmark, forFavorites: forFavorites, context: context)
             }
         }
     }

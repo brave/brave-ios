@@ -56,14 +56,6 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, CRUD {
         addInternal(url: url, title: title, isFavorite: true)
     }
     
-    public class func addFolder(title: String, parentFolder: Bookmark? = nil, context: WriteContext = .new(inMemory: false)) {
-        addInternal(url: nil, title: nil, customTitle: title, parentFolder: parentFolder, isFolder: true, context: context)
-    }
-    
-    public class func add(url: URL, title: String?, parentFolder: Bookmark? = nil, context: WriteContext = .new(inMemory: false)) {
-        addInternal(url: url, title: title, parentFolder: parentFolder, context: context)
-    }
-    
     // MARK: Read
     
     public var displayTitle: String? {
@@ -79,7 +71,7 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, CRUD {
         return nil
     }
     
-    public class func frc(forFavorites: Bool = false, parentFolder: Bookmark?) -> NSFetchedResultsController<Bookmark> {
+    public static func frc() -> NSFetchedResultsController<Bookmark> {
         let context = DataController.viewContext
         let fetchRequest = NSFetchRequest<Bookmark>()
         
@@ -90,48 +82,16 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, CRUD {
         let createdSort = NSSortDescriptor(key: "created", ascending: false)
         fetchRequest.sortDescriptors = [orderSort, createdSort]
         
-        fetchRequest.predicate = forFavorites ?
-            NSPredicate(format: "isFavorite == YES") : allBookmarksOfAGivenLevelPredicate(parent: parentFolder)
+        fetchRequest.predicate = isFavoritePredicate
         
         return NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: context,
                                           sectionNameKeyPath: nil, cacheName: nil)
     }
     
-    public class func foldersFrc(excludedFolder: Bookmark? = nil) -> NSFetchedResultsController<Bookmark> {
-        let context = DataController.viewContext
-        let fetchRequest = NSFetchRequest<Bookmark>()
+    public class func contains(url: URL) -> Bool {
+        let predicate = NSPredicate(format: "url == %@ AND isFavorite == true", url.absoluteString)
         
-        fetchRequest.entity = entity(context: context)
-        fetchRequest.fetchBatchSize = 20
-        
-        let createdSort = NSSortDescriptor(key: "created", ascending: false)
-        fetchRequest.sortDescriptors = [createdSort]
-        
-        var predicate: NSPredicate?
-        if let excludedFolder = excludedFolder {
-            predicate = NSPredicate(format: "isFolder == true AND SELF != %@", excludedFolder)
-        } else {
-            predicate = NSPredicate(format: "isFolder == true")
-        }
-        
-        fetchRequest.predicate = predicate
-        
-        return NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: context,
-                                          sectionNameKeyPath: nil, cacheName: nil)
-    }
-    
-    public class func contains(url: URL, getFavorites: Bool = false) -> Bool {
-        guard let count = count(forUrl: url, getFavorites: getFavorites) else { return false }
-        return count > 0
-    }
-    
-    public class func getTopLevelFolders(_ context: NSManagedObjectContext? = nil) -> [Bookmark] {
-        return getFoldersInternal(bookmark: nil, context: context ?? DataController.viewContext)
-    }
-    
-    public class func getAllTopLevelBookmarks(_ context: NSManagedObjectContext? = nil) -> [Bookmark] {
-        let predicate = NSPredicate(format: "isFavorite == NO and parentFolder = nil")
-        return all(where: predicate, context: context ?? DataController.viewContext) ?? []
+        return (count(predicate: predicate) ?? 0) > 0
     }
     
     public class var hasFavorites: Bool {
@@ -143,10 +103,6 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, CRUD {
         return all(where: isFavoritePredicate) ?? []
     }
     
-    public class var allBookmarks: [Bookmark] {
-        return getAllBookmarks()
-    }
-    
     // MARK: Update
     
     public func update(customTitle: String?, url: String?) {
@@ -154,21 +110,9 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, CRUD {
         updateInternal(customTitle: customTitle, url: url)
     }
     
-    enum SaveLocation {
-        case keep
-        case new(location: Bookmark?)
-    }
-    
     // Title can't be empty.
     private func hasTitle(_ title: String?) -> Bool {
         return title?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
-    }
-    
-    public class func migrateBookmarkOrders() {
-        DataController.perform { context in
-            migrateOrder(forFavorites: true, context: context)
-            migrateOrder(forFavorites: false, context: context)
-        }
     }
     
     /// WARNING: This method deletes all current favorites and replaces them with new one from the array.
@@ -236,17 +180,6 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, CRUD {
     
     public func delete(context: WriteContext? = nil) {
         deleteInternal(context: context ?? .new(inMemory: false))
-    }
-    
-    /// Removes a single Bookmark of a given URL.
-    /// In case of having two bookmarks with the same url, a bookmark to delete is chosen randomly.
-    public class func remove(forUrl url: URL) {
-        DataController.perform { context in
-            let predicate = isFavoriteOrBookmarkByUrlPredicate(url: url, getFavorites: false)
-            
-            let record = first(where: predicate, context: context)
-            record?.deleteInternal(context: .existing(context))
-        }
     }
 }
 
@@ -327,38 +260,6 @@ extension Bookmark {
     
     // MARK: Update
     
-    /// Takes all Bookmarks and Favorites from 1.6 and sets correct order for them.
-    /// 1.6 had few bugs with reordering which we want to avoid, in particular non-reordered bookmarks on 1.6
-    /// all have order set to 0 which makes sorting confusing.
-    /// In migration we take all bookmarks using the same sorting method as on 1.6 and add a proper `order`
-    /// attribute to them. The goal is to have all bookmarks with a proper unique order number set.
-    private class func migrateOrder(parentFolder: Bookmark? = nil,
-                                    forFavorites: Bool,
-                                    context: NSManagedObjectContext) {
-        
-        let predicate = forFavorites ?
-            isFavoritePredicate : allBookmarksOfAGivenLevelPredicate(parent: parentFolder)
-        
-        let orderSort = NSSortDescriptor(key: #keyPath(Bookmark.order), ascending: true)
-        let folderSort = NSSortDescriptor(key: #keyPath(Bookmark.isFolder), ascending: false)
-        let createdSort = NSSortDescriptor(key: #keyPath(Bookmark.created), ascending: true)
-        
-        let sort = [orderSort, folderSort, createdSort]
-        
-        guard let allBookmarks = all(where: predicate, sortDescriptors: sort, context: context),
-            !allBookmarks.isEmpty else {
-                return
-        }
-        
-        for (i, bookmark) in allBookmarks.enumerated() {
-            bookmark.order = Int16(i)
-            // Calling this method recursively to get ordering for nested bookmarks
-            if !forFavorites && bookmark.isFolder {
-                migrateOrder(parentFolder: bookmark, forFavorites: forFavorites, context: context)
-            }
-        }
-    }
-    
     private func updateInternal(customTitle: String?, url: String?, save: Bool = true,
                                 context: WriteContext = .new(inMemory: false)) {
         
@@ -388,18 +289,6 @@ extension Bookmark {
     
     // MARK: Read
     
-    private static func getFoldersInternal(bookmark: Bookmark?,
-                                           context: NSManagedObjectContext = DataController.viewContext) -> [Bookmark] {
-        var predicate: NSPredicate?
-        if let parent = bookmark?.parentFolder {
-            predicate = NSPredicate(format: "isFolder == true and parentFolder == %@", parent)
-        } else {
-            predicate = NSPredicate(format: "isFolder == true and parentFolder = nil")
-        }
-        
-        return all(where: predicate, context: context) ?? []
-    }
-    
     class func allBookmarksOfAGivenLevelPredicate(parent: Bookmark?) -> NSPredicate {
         let isFavoriteKP = #keyPath(Bookmark.isFavorite)
         let parentFolderKP = #keyPath(Bookmark.parentFolder)
@@ -410,25 +299,7 @@ extension Bookmark {
             format: "%K == %@ AND %K == NO", parentFolderKP, parent ?? nilArgumentForPredicate, isFavoriteKP)
     }
     
-    private static func count(forUrl url: URL, getFavorites: Bool = false) -> Int? {
-        let predicate = isFavoriteOrBookmarkByUrlPredicate(url: url, getFavorites: getFavorites)
-        return count(predicate: predicate)
-    }
-    
-    private static func isFavoriteOrBookmarkByUrlPredicate(url: URL, getFavorites: Bool) -> NSPredicate {
-        let urlKeyPath = #keyPath(Bookmark.url)
-        let isFavoriteKeyPath = #keyPath(Bookmark.isFavorite)
-        
-        return NSPredicate(format: "\(urlKeyPath) == %@ AND \(isFavoriteKeyPath) == \(NSNumber(value: getFavorites))", url.absoluteString)
-    }
-    
-    public static func getAllBookmarks(context: NSManagedObjectContext? = nil) -> [Bookmark] {
-        let predicate = NSPredicate(format: "isFavorite == NO")
-        
-        return all(where: predicate, context: context ?? DataController.viewContext) ?? []
-    }
-    
-    public static func getAllFavorites(context: NSManagedObjectContext? = nil) -> [Bookmark] {
+    static func getAllFavorites(context: NSManagedObjectContext? = nil) -> [Bookmark] {
         let predicate = NSPredicate(format: "isFavorite == YES")
         
         return all(where: predicate, context: context ?? DataController.viewContext) ?? []
@@ -436,9 +307,9 @@ extension Bookmark {
     
     // MARK: Delete
     
-    private func deleteInternal(save: Bool = true, context: WriteContext = .new(inMemory: false)) {
+    private func deleteInternal(context: WriteContext = .new(inMemory: false)) {
         func deleteFromStore(context: WriteContext) {
-            DataController.perform(context: context, save: save) { context in
+            DataController.perform(context: context) { context in
                 let objectOnContext = context.object(with: self.objectID)
                 context.delete(objectOnContext)
             }
