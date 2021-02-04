@@ -1121,6 +1121,37 @@ extension Strings {
                               bundle: .braveShared,
                               value: "Would you like to add this video to your playlist?",
                               comment: "Alert Description for adding videos to playlist")
+        
+        public static let dowloadingLabelTitle =
+            NSLocalizedString("playList.dowloadingLabelTitle",
+                              bundle: .braveShared,
+                              value: "Dowloading…",
+                              comment: "Text indicator on the table cell while downloading a video")
+        
+        public static let dowloadingPercentageLabelTitle =
+            NSLocalizedString("playList.dowloadingLabelTitle",
+                              bundle: .braveShared,
+                              value: "Dowloading:",
+                              comment: "Text indicator on the table cell while downloading a video")
+        
+        public static let dowloadedLabelTitle =
+            NSLocalizedString("playList.dowloadedLabelTitle",
+                              bundle: .braveShared,
+                              value: "Dowloaded",
+                              comment: "Text indicator on the table cell If a video is already downloaded")
+        
+        public static let noItemLabelTitle =
+            NSLocalizedString("playList.noItemLabelTitle",
+                              bundle: .braveShared,
+                              value: "No Items Available",
+                              comment: "Text indicator on the table cell If a video is already downloaded")
+        
+        public static let expiredLabelTitle =
+            NSLocalizedString("playList.expiredLabelTitle",
+                              bundle: .braveShared,
+                              value: "Expired",
+                              comment: "Text indicator on the table cell If a video is expired")
+        
     }
 }
 
