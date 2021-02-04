@@ -14,9 +14,25 @@ class Playlist {
     static let shared = Playlist()
     private let dbLock = NSRecursiveLock()
     
+    private func reorderItems() {
+        backgroundContext.performAndWait { [weak self] in
+            guard let self = self else { return }
+            let request: NSFetchRequest<PlaylistItem> = PlaylistItem.fetchRequest()
+            let items = (try? self.backgroundContext.fetch(request)) ?? []
+            
+            for (order, item) in items.enumerated() {
+                item.order = Int32(order)
+            }
+            
+            self.saveContext(self.backgroundContext)
+        }
+    }
+    
     func updateItem(mediaSrc: String, item: PlaylistInfo, completion: @escaping () -> Void) {
-        if self.itemExists(item: item) {
-            self.backgroundContext.perform {
+        if itemExists(item: item) {
+            backgroundContext.perform { [weak self] in
+                guard let self = self else { return }
+                
                 let request: NSFetchRequest<PlaylistItem> = PlaylistItem.fetchRequest()
                 request.predicate = NSPredicate(format: "mediaSrc == %@", mediaSrc)
                 
@@ -25,6 +41,7 @@ class Playlist {
                 })
                 
                 self.saveContext(self.backgroundContext)
+                self.reorderItems()
                 completion()
             }
         } else {
@@ -33,8 +50,8 @@ class Playlist {
     }
     
     func addItem(item: PlaylistInfo, cachedData: Data?, completion: @escaping () -> Void) {
-        if !self.itemExists(item: item) {
-            self.backgroundContext.perform { [weak self] in
+        if !itemExists(item: item) {
+            backgroundContext.perform { [weak self] in
                 guard let self = self else { return }
 
                 let playlistItem = PlaylistItem(context: self.backgroundContext)
@@ -48,6 +65,7 @@ class Playlist {
                 playlistItem.mediaSrc = item.src
                 
                 self.saveContext(self.backgroundContext)
+                self.reorderItems()
                 completion()
             }
         } else {
@@ -56,8 +74,8 @@ class Playlist {
     }
     
     func removeItem(item: PlaylistInfo) {
-        if self.itemExists(item: item) {
-            self.backgroundContext.performAndWait { [weak self] in
+        if itemExists(item: item) {
+            backgroundContext.performAndWait { [weak self] in
                 guard let self = self else { return }
                 let request = { () -> NSBatchDeleteRequest in
                     let request: NSFetchRequest<NSFetchRequestResult> = PlaylistItem.fetchRequest()
@@ -85,19 +103,20 @@ class Playlist {
                 }
                 
                 self.saveContext(self.backgroundContext)
+                self.reorderItems()
                 self.backgroundContext.reset()
             }
         }
     }
     
     func removeAll() {
-        self.destroy()
-        self.persistentContainer = self.create()
+        destroy()
+        persistentContainer = create()
     }
     
     func getItems() -> [PlaylistInfo] {
         let request: NSFetchRequest<PlaylistItem> = PlaylistItem.fetchRequest()
-        return (try? self.mainContext.fetch(request))?.map({
+        return (try? mainContext.fetch(request))?.map({
             return PlaylistInfo(item: $0)
         }) ?? []
     }
@@ -106,17 +125,21 @@ class Playlist {
         let request: NSFetchRequest<PlaylistItem> = PlaylistItem.fetchRequest()
         request.predicate = NSPredicate(format: "pageSrc == %@", pageSrc)
         
-        if let item = (try? self.mainContext.fetch(request))?.first {
+        if let item = (try? mainContext.fetch(request))?.first {
             return item
         }
         return nil
+    }
+    
+    func moveItem(from sourceOrder: Int, to destinationOrder: Int) {
+        
     }
     
     func getCache(pageSrc: String) -> Data? {
         let request: NSFetchRequest<PlaylistItem> = PlaylistItem.fetchRequest()
         request.predicate = NSPredicate(format: "pageSrc == %@", pageSrc)
         request.fetchLimit = 1
-        return (try? self.mainContext.fetch(request))?.first?.cachedData
+        return (try? mainContext.fetch(request))?.first?.cachedData
     }
     
     func updateCache(pageSrc: String, cachedData: Data?) {
@@ -124,25 +147,25 @@ class Playlist {
         request.predicate = NSPredicate(format: "pageSrc == %@", pageSrc)
         request.fetchLimit = 1
         
-        (try? self.mainContext.fetch(request))?.first?.cachedData = cachedData
-        self.saveContext(self.mainContext)
+        (try? mainContext.fetch(request))?.first?.cachedData = cachedData
+        saveContext(mainContext)
     }
     
     func itemExists(item: PlaylistInfo) -> Bool {
         let request: NSFetchRequest<PlaylistItem> = PlaylistItem.fetchRequest()
         request.predicate = NSPredicate(format: "pageSrc == %@", item.pageSrc)
-        return ((try? self.mainContext.count(for: request)) ?? 0) > 0
+        return ((try? mainContext.count(for: request)) ?? 0) > 0
     }
     
     func getPlaylistCount() -> Int {
         let request: NSFetchRequest<PlaylistItem> = PlaylistItem.fetchRequest()
-        return (try? self.mainContext.count(for: request)) ?? 0
+        return (try? mainContext.count(for: request)) ?? 0
     }
     
     func fetchResultsController() -> NSFetchedResultsController<PlaylistItem> {
         let descriptor = NSEntityDescription.entity(forEntityName:
                                                         "PlaylistItem",
-                                                    in: self.mainContext)!
+                                                    in: mainContext)!
         
         let fetchRequest: NSFetchRequest<PlaylistItem> = PlaylistItem.fetchRequest()
         
@@ -150,21 +173,21 @@ class Playlist {
         fetchRequest.fetchBatchSize = 20
         
         let nameSort = NSSortDescriptor(key: "name", ascending: true)
-        let dateAddedSort = NSSortDescriptor(key: "dateAdded", ascending: false)
-        fetchRequest.sortDescriptors = [nameSort, dateAddedSort]
+        let orderSort = NSSortDescriptor(key: "order", ascending: false)
+        fetchRequest.sortDescriptors = [nameSort, orderSort]
 
         return NSFetchedResultsController(fetchRequest: fetchRequest,
-                                          managedObjectContext: self.mainContext,
+                                          managedObjectContext: mainContext,
                                           sectionNameKeyPath: nil,
                                           cacheName: nil)
     }
     
     private init() {
-        self.mainContext.reset()
+        mainContext.reset()
     }
     
     private lazy var persistentContainer: NSPersistentContainer = {
-        return self.create()
+        return create()
     }()
     
     private lazy var backgroundContext: NSManagedObjectContext = {

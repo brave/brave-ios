@@ -55,6 +55,45 @@ class PlaylistManager: NSObject {
         return frc.fetchedObjects?.firstIndex(where: { $0.pageSrc == pageSrc })
     }
     
+    func reorderItems(from sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+        let src = frc.object(at: sourceIndexPath)
+        let dest = frc.object(at: destinationIndexPath)
+        
+        if src === dest {
+            log.error("Source and destination playlist items are the same!")
+            return
+        }
+        
+        var destinationNode: NSManagedObjectID?
+        let isMovingUp = sourceIndexPath.row > destinationIndexPath.row
+        if isMovingUp {
+            let isMovingToTop = destinationIndexPath.row == 0
+            if !isMovingToTop {
+                let previousIndex = IndexPath(row: destinationIndexPath.row - 1,
+                                              section: destinationIndexPath.section)
+                destinationNode = frc.object(at: previousIndex).objectID
+            }
+        } else {
+            let isMovingToBottom = destinationIndexPath.row + 1 >= numberOfAssets()
+            if !isMovingToBottom {
+                let nextBookmarkIndex = IndexPath(row: destinationIndexPath.row + 1,
+                                                  section: destinationIndexPath.section)
+                destinationNode = frc.object(at: nextBookmarkIndex).objectID
+            }
+        }
+        
+        let context = frc.managedObjectContext
+        context.perform {
+            guard let source = context.object(with: src.objectID) as? PlaylistItem,
+                let destination = context.object(with: dest.objectID) as? PlaylistItem else {
+                    log.error("Could not retrieve source or destination playlist items on background context.")
+                    return
+            }
+            
+            
+        }
+    }
+    
     func state(for pageSrc: String) -> DownloadState {
         if let assetUrl = self.localAsset(for: pageSrc)?.url {
             if FileManager.default.fileExists(atPath: assetUrl.path) {
@@ -153,6 +192,8 @@ class PlaylistManager: NSObject {
     // MARK: - Private
     
     private func downloadFileAsset(_ assetUrl: URL, for item: PlaylistInfo) {
+        self.delegate?.onDownloadStateChanged(id: item.pageSrc, state: .inProgress, displayName: "")
+        
         MediaResourceManager.downloadAsset(assetUrl, name: item.name) { location in
             DispatchQueue.main.async {
                 do {
