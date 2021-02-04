@@ -212,9 +212,9 @@ extension PlaylistViewController: UITableViewDataSource {
         
         let cacheState = PlaylistManager.shared.state(for: item.pageSrc)
         if cacheState == .inProgress {
-            cell.detailLabel.text = "Downloading..."
+            cell.detailLabel.text = Strings.PlayList.dowloadingLabelTitle
         } else if cacheState == .downloaded {
-            cell.detailLabel.text = "\(formatter.string(from: TimeInterval(item.duration)) ?? "0:00") - Downloaded"
+            cell.detailLabel.text = "\(formatter.string(from: TimeInterval(item.duration)) ?? "0:00") - \(Strings.PlayList.dowloadedLabelTitle)"
         }
         
         if let url = URL(string: item.src) {
@@ -354,7 +354,7 @@ extension PlaylistViewController: UITableViewDelegate {
                     self.displayLoadingResourceError()
                     
                 case .expired:
-                    (tableView.cellForRow(at: indexPath) as? PlaylistCell)?.detailLabel.text = "Expired"
+                    (tableView.cellForRow(at: indexPath) as? PlaylistCell)?.detailLabel.text = Strings.PlayList.expiredLabelTitle
                     
                 case .none:
                     if let url = URL(string: item.src) {
@@ -523,10 +523,10 @@ extension PlaylistViewController: PlaylistManagerDelegate {
             
             let cacheState = PlaylistManager.shared.state(for: id)
             if cacheState == .inProgress {
-                cell.detailLabel.text = "Downloading: \(percentComplete)%"
+                cell.detailLabel.text = "\(Strings.PlayList.dowloadingPercentageLabelTitle) \(percentComplete)%"
             } else if cacheState == .downloaded {
                 let item = PlaylistManager.shared.itemAtIndex(index)
-                cell.detailLabel.text = "\(formatter.string(from: TimeInterval(item.duration)) ?? "0:00") - Downloaded"
+                cell.detailLabel.text = "\(formatter.string(from: TimeInterval(item.duration)) ?? "0:00") - \(Strings.PlayList.dowloadedLabelTitle)"
             } else {
                 let item = PlaylistManager.shared.itemAtIndex(index)
                 cell.detailLabel.text = formatter.string(from: TimeInterval(item.duration)) ?? "0:00"
@@ -539,10 +539,10 @@ extension PlaylistViewController: PlaylistManagerDelegate {
         let cell = tableView.cellForRow(at: IndexPath(row: index, section: 0)) as? PlaylistCell {
             
             if state == .inProgress {
-                cell.detailLabel.text = "Downloading..."
+                cell.detailLabel.text = Strings.PlayList.dowloadingLabelTitle
             } else if state == .downloaded {
                 let item = PlaylistManager.shared.itemAtIndex(index)
-                cell.detailLabel.text = "\(formatter.string(from: TimeInterval(item.duration)) ?? "0:00") - Downloaded"
+                cell.detailLabel.text = "\(formatter.string(from: TimeInterval(item.duration)) ?? "0:00") - \(Strings.PlayList.dowloadedLabelTitle)"
             } else {
                 let item = PlaylistManager.shared.itemAtIndex(index)
                 cell.detailLabel.text = formatter.string(from: TimeInterval(item.duration)) ?? "0:00"
@@ -583,7 +583,7 @@ extension PlaylistViewController {
             tableView.separatorStyle = .singleLine
         } else {
             let messageLabel = UILabel(frame: view.bounds).then {
-                $0.text = "No Items Available"
+                $0.text = Strings.PlayList.noItemLabelTitle
                 $0.textColor = .white
                 $0.numberOfLines = 0
                 $0.textAlignment = .center
