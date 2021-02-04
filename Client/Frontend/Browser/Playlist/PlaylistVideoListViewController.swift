@@ -14,6 +14,13 @@ import CoreData
 
 private let log = Logger.browserLogger
 
+// MARK: PlaylistVideoListViewControllerDelegate
+
+protocol PlaylistVideoListViewControllerDelegate: AnyObject {
+
+    func playlistVideoListViewControllerDisplayResourceError(_ controller: PlaylistVideoListViewController)
+}
+
 // MARK: PlaylistVideoListViewController
 
 class PlaylistVideoListViewController: UIViewController {
@@ -27,9 +34,7 @@ class PlaylistVideoListViewController: UIViewController {
      }
 
     // MARK: Properties
-    
-//    private let playerView = VideoView()
-    
+        
     private lazy var activityIndicator = UIActivityIndicatorView(style: .white).then {
         $0.isHidden = true
         $0.hidesWhenStopped = true
@@ -57,8 +62,9 @@ class PlaylistVideoListViewController: UIViewController {
         $0.unitsStyle = .abbreviated
         $0.maximumUnitCount = 1
     }
-    
-    private var currentlyPlayingItemIndex = -1
+        
+    weak var delegate: PlaylistVideoListViewControllerDelegate?
+    weak var videoPlayer: PlaylistVideoPlayerViewController?
     
     init() {
         super.init(nibName: nil, bundle: nil)
@@ -98,7 +104,7 @@ class PlaylistVideoListViewController: UIViewController {
             $0.navigationBar.shadowImage = UIImage()
         }
         
-        view.backgroundColor = BraveUX.popoverDarkBackground
+        view.backgroundColor = .clear
     }
     
     private func setup () {              
@@ -118,24 +124,29 @@ class PlaylistVideoListViewController: UIViewController {
     }
     
     private func fetchResults() {
+        videoPlayer?.changeVideoControls(isCurrentItem: true)
+        updateTableBackgroundView()
+        
         DispatchQueue.main.async {
             PlaylistManager.shared.reloadData()
             self.tableView.reloadData()
+            
+            if PlaylistManager.shared.numberOfAssets() > 0 {
+                self.videoPlayer?.changeVideoControls()
+                self.tableView.delegate?.tableView?(self.tableView, didSelectRowAt: IndexPath(row: 0, section: 0))
+            }
+            
+            self.updateTableBackgroundView()
         }
-    }
-    
-    // MARK: Actions
-    
-    @objc
-    private func onExit(_ button: UIBarButtonItem) {
-        self.dismiss(animated: true, completion: nil)
     }
 }
 
 // MARK: UIAdaptivePresentationControllerDelegate
 
 extension PlaylistVideoListViewController: UIAdaptivePresentationControllerDelegate {
-    func adaptivePresentationStyle(for controller: UIPresentationController, traitCollection: UITraitCollection) -> UIModalPresentationStyle {
+    
+    func adaptivePresentationStyle(for controller: UIPresentationController,
+                                   traitCollection: UITraitCollection) -> UIModalPresentationStyle {
         return .fullScreen
     }
 }
@@ -160,7 +171,8 @@ extension PlaylistVideoListViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: Constants.playListCellIdentifier, for: indexPath) as? PlaylistCell else {
+        guard let cell =
+                tableView.dequeueReusableCell(withIdentifier: Constants.playListCellIdentifier, for: indexPath) as? PlaylistCell else {
             return UITableViewCell()
         }
         
@@ -190,7 +202,7 @@ extension PlaylistVideoListViewController: UITableViewDataSource {
             }
         }
         
-        if indexPath.row == currentlyPlayingItemIndex {
+        if indexPath.row == videoPlayer?.currentlyPlayingItemIndex {
             cell.indicatorIcon.image = #imageLiteral(resourceName: "playlist_currentitem_indicator")
             cell.indicatorIcon.alpha = 1.0
         }
@@ -281,16 +293,16 @@ extension PlaylistVideoListViewController: UITableViewDelegate {
         })
         
         let deleteAction = UIContextualAction(style: .normal, title: Strings.PlayList.removeActionButtonTitle, handler: { [weak self] (action, view, completionHandler) in
-            guard let self = self else { return }
+            guard let self = self, let videoPlayer = self.videoPlayer else { return }
             
             PlaylistManager.shared.delete(item: currentItem)
 
-            if self.currentlyPlayingItemIndex == indexPath.row {
-                self.currentlyPlayingItemIndex = -1
-//                self.mediaInfo.updateNowPlayingMediaInfo()
+            if videoPlayer.currentlyPlayingItemIndex == indexPath.row {
+                videoPlayer.currentlyPlayingItemIndex = -1
+                videoPlayer.mediaInfo.updateNowPlayingMediaInfo()
                 
                 self.activityIndicator.stopAnimating()
-//                self.playerView.stop()
+                videoPlayer.playerView.stop()
             }
             
             completionHandler(true)
@@ -307,40 +319,33 @@ extension PlaylistVideoListViewController: UITableViewDelegate {
         if indexPath.row < PlaylistManager.shared.numberOfAssets() {
             activityIndicator.startAnimating()
             activityIndicator.isHidden = false
-            currentlyPlayingItemIndex = indexPath.row
+            videoPlayer?.currentlyPlayingItemIndex = indexPath.row
 
             let item = PlaylistManager.shared.itemAtIndex(indexPath.row)
             infoLabel.text = item.name
             
-//            mediaInfo.loadMediaItem(item, index: indexPath.row) { [weak self] error in
-//                guard let self = self else { return }
-//                self.activityIndicator.stopAnimating()
-//
-//                if let error = error {
-//                    log.error(error)
-//                    self.displayLoadingResourceError()
-//                } else if let url = URL(string: item.src) {
-//                    self.previewImageFromVideo(url: url) { image in
-//                        (tableView.cellForRow(at: indexPath) as? PlaylistCell)?.thumbnailImage = image
-//                        tableView.reloadRows(at: [indexPath], with: .automatic)
-//                    }
-//                }
-//            }
+            videoPlayer?.mediaInfo.loadMediaItem(item, index: indexPath.row) { [weak self] error in
+                guard let self = self else { return }
+                self.activityIndicator.stopAnimating()
+
+                if let error = error {
+                    log.error(error)
+                    self.delegate?.playlistVideoListViewControllerDisplayResourceError(self)
+                } else if let url = URL(string: item.src) {
+                    self.previewImageFromVideo(url: url) { image in
+                        (tableView.cellForRow(at: indexPath) as? PlaylistCell)?.thumbnailImage = image
+                        tableView.reloadRows(at: [indexPath], with: .automatic)
+                    }
+                }
+            }
         }
 
         tableView.reloadData()
     }
-    
-    private func displayLoadingResourceError() {
-        let alert = UIAlertController(
-            title: Strings.PlayList.sorryAlertTitle, message: Strings.PlayList.loadResourcesErrorAlertDescription, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: nil))
-        
-        self.present(alert, animated: true, completion: nil)
-    }
 }
 
 extension PlaylistVideoListViewController: PlaylistManagerDelegate {
+
     func onDownloadProgressUpdate(id: String, percentComplete: Double) {
         if let index = PlaylistManager.shared.index(of: id),
            let cell = tableView.cellForRow(at: IndexPath(row: index, section: 0)) as? PlaylistCell {
@@ -360,7 +365,7 @@ extension PlaylistVideoListViewController: PlaylistManagerDelegate {
     
     func onDownloadStateChanged(id: String, state: PlaylistManager.DownloadState, displayName: String) {
         if let index = PlaylistManager.shared.index(of: id),
-           let cell = tableView.cellForRow(at: IndexPath(row: index, section: 0)) as? PlaylistCell {
+        let cell = tableView.cellForRow(at: IndexPath(row: index, section: 0)) as? PlaylistCell {
             
             if state == .inProgress {
                 cell.detailLabel.text = "Downloading"
@@ -397,5 +402,26 @@ extension PlaylistVideoListViewController: PlaylistManagerDelegate {
     
     func controllerWillChangeContent() {
         tableView.beginUpdates()
+    }
+}
+
+extension PlaylistVideoListViewController {
+    func updateTableBackgroundView() {
+        if PlaylistManager.shared.numberOfAssets() > 0 {
+            tableView.backgroundView = nil
+            tableView.separatorStyle = .singleLine
+        } else {
+            let messageLabel = UILabel(frame: view.bounds).then {
+                $0.text = "No Items Available"
+                $0.textColor = .white
+                $0.numberOfLines = 0
+                $0.textAlignment = .center
+                $0.font = .systemFont(ofSize: 18.0, weight: .medium)
+                $0.sizeToFit()
+            }
+            
+            tableView.backgroundView = messageLabel
+            tableView.separatorStyle = .none
+        }
     }
 }
