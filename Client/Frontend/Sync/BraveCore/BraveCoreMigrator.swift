@@ -219,7 +219,7 @@ class BraveCoreMigrator {
         }
     }
     
-    private func migrateChromiumBookmarks(context: NSManagedObjectContext, bookmark: Bookmark, chromiumBookmark: BookmarkNode) -> Bool {
+    private func migrateChromiumBookmarks(context: NSManagedObjectContext, bookmark: LegacyBookmark, chromiumBookmark: BookmarkNode) -> Bool {
         guard let title = bookmark.isFolder ? bookmark.customTitle : bookmark.title else {
             log.error("Invalid Bookmark Title")
             return false

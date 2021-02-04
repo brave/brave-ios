@@ -13,30 +13,37 @@ public protocol WebsitePresentable {
 
 private let log = Logger.browserLogger
 
-public final class Bookmark: NSManagedObject, WebsitePresentable, CRUD {
-    // Favorite bookmarks are shown only on homepanel as a tile, they are not visible on bookmarks panel.
-    @NSManaged public var isFavorite: Bool
-    @NSManaged public var isFolder: Bool
+/// Note: This class is named as `Bookmark` in our core data model due to sync v1 legacy..
+public final class Favorite: NSManagedObject, WebsitePresentable, CRUD {
     @NSManaged public var title: String?
     @NSManaged public var customTitle: String?
     @NSManaged public var url: String?
-    @NSManaged public var visits: Int32
     @NSManaged public var lastVisited: Date?
     @NSManaged public var created: Date?
     @NSManaged public var order: Int16
-    @NSManaged public var tags: [String]?
-    @available(*, deprecated, message: "This is sync v1 property and is not used anymore")
-    @NSManaged public var syncOrder: String?
-    
-    @NSManaged public var parentFolder: Bookmark?
-    @NSManaged public var children: Set<Bookmark>?
     
     @NSManaged public var domain: Domain?
     
-    @available(*, deprecated, message: "This is sync v1 property and is not used anymore")
+    // MARK: Legacy
+    /// Pre sync v2 this object could be either a bookmark or a favorite, this flag was used to store this info.
+    @NSManaged public var isFavorite: Bool
+    /// Legacy: this property is not used anymore except for migration.
+    @NSManaged public var isFolder: Bool
+    /// Legacy: this property is not used anymore except for migration.
+    @NSManaged public var parentFolder: LegacyBookmark?
+    /// Legacy: this property is not used anymore except for migration.
+    @NSManaged public var children: Set<LegacyBookmark>?
+    /// Unused
+    @NSManaged public var tags: [String]?
+    /// Unused
+    @NSManaged public var visits: Int32
+    
+    @available(*, deprecated, message: "This is a sync v1 property and is not used anymore")
     @NSManaged public var syncDisplayUUID: String?
-    @available(*, deprecated, message: "This is sync v1 property and is not used anymore")
+    @available(*, deprecated, message: "This is a sync v1 property and is not used anymore")
     @NSManaged public var syncParentDisplayUUID: String?
+    @available(*, deprecated, message: "This is a sync v1 property and is not used anymore")
+    @NSManaged public var syncOrder: String?
     
     private static let isFavoritePredicate = NSPredicate(format: "isFavorite == true")
     
@@ -71,11 +78,11 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, CRUD {
         return nil
     }
     
-    public static func frc() -> NSFetchedResultsController<Bookmark> {
+    public static func frc() -> NSFetchedResultsController<Favorite> {
         let context = DataController.viewContext
-        let fetchRequest = NSFetchRequest<Bookmark>()
+        let fetchRequest = NSFetchRequest<Favorite>()
         
-        fetchRequest.entity = Bookmark.entity(context: context)
+        fetchRequest.entity = Favorite.entity(context: context)
         fetchRequest.fetchBatchSize = 20
         
         let orderSort = NSSortDescriptor(key: "order", ascending: true)
@@ -99,7 +106,7 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, CRUD {
         return count > 0
     }
     
-    public class var allFavorites: [Bookmark] {
+    public class var allFavorites: [Favorite] {
         return all(where: isFavoritePredicate) ?? []
     }
     
@@ -118,7 +125,7 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, CRUD {
     /// WARNING: This method deletes all current favorites and replaces them with new one from the array.
     public class func forceOverwriteFavorites(with favorites: [(url: URL, title: String)]) {
         DataController.perform { context in
-            Bookmark.deleteAll(predicate: isFavoritePredicate, context: .existing(context))
+            Favorite.deleteAll(predicate: isFavoritePredicate, context: .existing(context))
             
             favorites.forEach {
                 addInternal(url: $0.url, title: $0.title, isFavorite: true,
@@ -151,7 +158,7 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, CRUD {
             let destinationIndex = destinationIndexPath.row
             let sourceIndex = sourceIndexPath.row
             
-            var allFavorites = Bookmark.getAllFavorites(context: context).sorted()
+            var allFavorites = Favorite.getAllFavorites(context: context).sorted()
             // Out of bounds safety check, `swapAt` crashes beyond array length.
             if destinationIndex > allFavorites.count - 1 {
                 assertionFailure("destinationIndex is out of bounds")
@@ -184,7 +191,9 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, CRUD {
 }
 
 // MARK: - Internal implementations
-extension Bookmark {
+extension Favorite {
+    /// Favorites are named `Bookmark` due to legacy reasons.
+    /// Pre sync-v2 we used this class for both bookmarks and favorites
     static func entity(context: NSManagedObjectContext) -> NSEntityDescription {
         return NSEntityDescription.entity(forEntityName: "Bookmark", in: context)!
     }
@@ -196,44 +205,12 @@ extension Bookmark {
     class func addInternal(url: URL?,
                            title: String?,
                            customTitle: String? = nil,
-                           parentFolder: Bookmark? = nil,
-                           isFolder: Bool = false,
-                           isFavorite: Bool = false,
+                           isFavorite: Bool,
                            save: Bool = true,
-                           context: WriteContext = .new(inMemory: false),
-                           completion: ((NSManagedObjectID) -> Void)? = nil) {
-        
-        DataController.perform(context: context) { context in
-            var parentFolderOnCorrectContext: Bookmark?
-            
-            if let parent = parentFolder {
-                parentFolderOnCorrectContext = context.object(with: parent.objectID) as? Bookmark
-                
-            }
-            
-            create(url: url, title: title, customTitle: customTitle, isFolder: isFolder,
-                   isFavorite: isFavorite, save: save,
-                   parentFolder: parentFolderOnCorrectContext,
-                   context: .existing(context)) { objectId in
-                completion?(objectId)
-            }
-        }
-    }
-    
-    /// - parameter completion: Returns object id associated with this object.
-    /// IMPORTANT: this id might change after the object has been saved to persistent store. Better to use it within one context.
-    private class func create(url: URL?,
-                              title: String?,
-                              customTitle: String? = nil,
-                              isFolder: Bool = false,
-                              isFavorite: Bool = false,
-                              save: Bool = true,
-                              parentFolder: Bookmark? = nil,
-                              context: WriteContext = .new(inMemory: false),
-                              completion: ((NSManagedObjectID) -> Void)? = nil) {
+                           context: WriteContext = .new(inMemory: false)) {
         
         DataController.perform(context: context, save: save, task: { context in
-            let bk = Bookmark(entity: entity(context: context), insertInto: context)
+            let bk = Favorite(entity: entity(context: context), insertInto: context)
             
             let location = url?.absoluteString
             
@@ -241,7 +218,6 @@ extension Bookmark {
             bk.title = title
             bk.customTitle = customTitle
             bk.isFavorite = isFavorite
-            bk.isFolder = isFolder
             bk.created = Date()
             bk.lastVisited = bk.created
             
@@ -253,8 +229,6 @@ extension Bookmark {
             if let lastOrder = getAllFavorites(context: context).map(\.order).max() {
                 bk.order = lastOrder + 1
             }
-            
-            completion?(bk.objectID)
         })
     }
     
@@ -264,7 +238,7 @@ extension Bookmark {
                                 context: WriteContext = .new(inMemory: false)) {
         
         DataController.perform(context: context) { context in
-            guard let bookmarkToUpdate = context.object(with: self.objectID) as? Bookmark else { return }
+            guard let bookmarkToUpdate = context.object(with: self.objectID) as? Favorite else { return }
             
             // See if there has been any change
             if bookmarkToUpdate.customTitle == customTitle && bookmarkToUpdate.url == url {
@@ -289,17 +263,7 @@ extension Bookmark {
     
     // MARK: Read
     
-    class func allBookmarksOfAGivenLevelPredicate(parent: Bookmark?) -> NSPredicate {
-        let isFavoriteKP = #keyPath(Bookmark.isFavorite)
-        let parentFolderKP = #keyPath(Bookmark.parentFolder)
-        
-        // A bit hacky but you can't just pass 'nil' string to %@.
-        let nilArgumentForPredicate = 0
-        return NSPredicate(
-            format: "%K == %@ AND %K == NO", parentFolderKP, parent ?? nilArgumentForPredicate, isFavoriteKP)
-    }
-    
-    static func getAllFavorites(context: NSManagedObjectContext? = nil) -> [Bookmark] {
+    static func getAllFavorites(context: NSManagedObjectContext? = nil) -> [Favorite] {
         let predicate = NSPredicate(format: "isFavorite == YES")
         
         return all(where: predicate, context: context ?? DataController.viewContext) ?? []
@@ -321,8 +285,8 @@ extension Bookmark {
 }
 
 // MARK: - Comparable
-extension Bookmark: Comparable {
-    public static func < (lhs: Bookmark, rhs: Bookmark) -> Bool {
+extension Favorite: Comparable {
+    public static func < (lhs: Favorite, rhs: Favorite) -> Bool {
         return lhs.order < rhs.order
     }
 }

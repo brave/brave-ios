@@ -672,7 +672,7 @@
 		5D1DC52920AC9AFB00905E5A /* Data.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1DC51320AC9AF900905E5A /* Data.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5D1DC55520AE004600905E5A /* TabMO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC54220AE004600905E5A /* TabMO.swift */; };
 		5D1DC55620AE004600905E5A /* DataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC54320AE004600905E5A /* DataController.swift */; };
-		5D1DC55920AE004600905E5A /* Bookmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC54620AE004600905E5A /* Bookmark.swift */; };
+		5D1DC55920AE004600905E5A /* Favorite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC54620AE004600905E5A /* Favorite.swift */; };
 		5D1DC55A20AE004600905E5A /* FaviconMO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC54720AE004600905E5A /* FaviconMO.swift */; };
 		5D1DC55B20AE004600905E5A /* Domain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC54820AE004600905E5A /* Domain.swift */; };
 		5D1DC55D20AE004600905E5A /* History.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1DC54A20AE004600905E5A /* History.swift */; };
@@ -2322,7 +2322,7 @@
 		5D1DC52420AC9AFB00905E5A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5D1DC54220AE004600905E5A /* TabMO.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabMO.swift; sourceTree = "<group>"; };
 		5D1DC54320AE004600905E5A /* DataController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataController.swift; sourceTree = "<group>"; };
-		5D1DC54620AE004600905E5A /* Bookmark.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Bookmark.swift; sourceTree = "<group>"; };
+		5D1DC54620AE004600905E5A /* Favorite.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Favorite.swift; sourceTree = "<group>"; };
 		5D1DC54720AE004600905E5A /* FaviconMO.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FaviconMO.swift; sourceTree = "<group>"; };
 		5D1DC54820AE004600905E5A /* Domain.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Domain.swift; sourceTree = "<group>"; };
 		5D1DC54A20AE004600905E5A /* History.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = History.swift; sourceTree = "<group>"; };
@@ -4457,7 +4457,7 @@
 				5D1DC54320AE004600905E5A /* DataController.swift */,
 				0AA4FC382109D685000B173A /* CRUDProtocols.swift */,
 				5D1DC54220AE004600905E5A /* TabMO.swift */,
-				5D1DC54620AE004600905E5A /* Bookmark.swift */,
+				5D1DC54620AE004600905E5A /* Favorite.swift */,
 				27B3DDCF24AE83710006A7ED /* FeedSourceOverride.swift */,
 				5D1DC54720AE004600905E5A /* FaviconMO.swift */,
 				5D1DC54820AE004600905E5A /* Domain.swift */,
@@ -6602,7 +6602,7 @@
 				5D1DC55620AE004600905E5A /* DataController.swift in Sources */,
 				5D1DC55520AE004600905E5A /* TabMO.swift in Sources */,
 				0A53F3E721E6560A0086E80C /* InMemoryDataController.swift in Sources */,
-				5D1DC55920AE004600905E5A /* Bookmark.swift in Sources */,
+				5D1DC55920AE004600905E5A /* Favorite.swift in Sources */,
 				27B3DDD024AE83710006A7ED /* FeedSourceOverride.swift in Sources */,
 				5D1DC55B20AE004600905E5A /* Domain.swift in Sources */,
 				0AF0411B2267C61100EBF982 /* ManagedObjectExtensions.swift in Sources */,

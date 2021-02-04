@@ -32,9 +32,9 @@ private class FavoritesHeaderView: UICollectionReusableView {
 
 class FavoritesViewController: UIViewController, Themeable {
     
-    var action: (Bookmark, BookmarksAction) -> Void
+    var action: (Favorite, BookmarksAction) -> Void
     
-    private let frc = Bookmark.frc()
+    private let frc = Favorite.frc()
     
     private let layout = UICollectionViewFlowLayout().then {
         $0.sectionInset = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
@@ -44,7 +44,7 @@ class FavoritesViewController: UIViewController, Themeable {
     private let collectionView: UICollectionView
     private let backgroundView = UIVisualEffectView()
     
-    init(action: @escaping (Bookmark, BookmarksAction) -> Void) {
+    init(action: @escaping (Favorite, BookmarksAction) -> Void) {
         self.action = action
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         
@@ -247,7 +247,7 @@ extension FavoritesViewController: UICollectionViewDataSource, UICollectionViewD
     }
     
     func collectionView(_ collectionView: UICollectionView, moveItemAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-        Bookmark.reorderFavorites(sourceIndexPath: sourceIndexPath, destinationIndexPath: destinationIndexPath)
+        Favorite.reorderFavorites(sourceIndexPath: sourceIndexPath, destinationIndexPath: destinationIndexPath)
     }
     
     @available(iOS 13, *)
@@ -328,7 +328,7 @@ extension FavoritesViewController: UICollectionViewDragDelegate, UICollectionVie
         case .move:
             guard let item = coordinator.items.first else { return }
             _ = coordinator.drop(item.dragItem, toItemAt: destinationIndexPath)
-            Bookmark.reorderFavorites(
+            Favorite.reorderFavorites(
                 sourceIndexPath: sourceIndexPath,
                 destinationIndexPath: destinationIndexPath,
                 isInteractiveDragReorder: true

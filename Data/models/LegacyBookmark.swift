@@ -10,36 +10,40 @@ import BraveShared
 
 private let log = Logger.browserLogger
 
+/// Naming note:
+/// Before sync v2 `Favorite` was named `Bookmark` and contained logic for both bookmarks and favorites.
+/// Now it's renamed and few migration methods still rely on this old Bookmarks system.
+/// LegacyBookmark can be either a bookmark or a favorite.
+public typealias LegacyBookmark = Favorite
+
 /// Contains methods that rely on old pre-syncv2 Bookmark system.
 public struct LegacyBookmarksHelper {
-    /// Naming note:
-    /// Before sync v2 `Favorite` was named `Bookmark` and contained logic for both bookmarks and favorites.
-    /// Now it's renamed and few migration methods still rely on this old Bookmarks system.
-    typealias LegacyBookmark = Bookmark
     
-    public static func getTopLevelLegacyBookmarks(_ context: NSManagedObjectContext? = nil) -> [Bookmark] {
-        Bookmark.getTopLevelLegacyBookmarks(context)
+    public static func getTopLevelLegacyBookmarks(
+        _ context: NSManagedObjectContext? = nil) -> [LegacyBookmark] {
+        Favorite.getTopLevelLegacyBookmarks(context)
     }
     
     public static func migrateBookmarkOrders() {
-        Bookmark.migrateBookmarkOrders()
+        Favorite.migrateBookmarkOrders()
     }
     
     public static func restore_1_12_Bookmarks(completion: @escaping () -> Void) {
-        Bookmark.restore_1_12_Bookmarks(completion: completion)
+        Favorite.restore_1_12_Bookmarks(completion: completion)
     }
 }
 
 // MARK: - 1.21 migration(Sync V2)
-extension Bookmark {
-    fileprivate class func getTopLevelLegacyBookmarks(_ context: NSManagedObjectContext? = nil) -> [Bookmark] {
+extension Favorite {
+    fileprivate class func getTopLevelLegacyBookmarks(
+        _ context: NSManagedObjectContext? = nil) -> [Favorite] {
         let predicate = NSPredicate(format: "isFavorite == NO and parentFolder = nil")
         return all(where: predicate, context: context ?? DataController.viewContext) ?? []
     }
 }
 
 // MARK: - 1.12 migration(database location change)
-extension Bookmark {
+extension Favorite {
     /// Moving Core Data objects between different stores and contextes is risky.
     /// This structure provides us data needed to move a bookmark from one place to another.
     private struct BookmarkRestorationData {
@@ -72,7 +76,7 @@ extension Bookmark {
         
         let context = migrationContainer.viewContext
         
-        guard let oldBookmarks = Bookmark.all(context: context)?.sorted() else {
+        guard let oldBookmarks = Favorite.all(context: context)?.sorted() else {
             // This might be some database problem. Not setting restoreation preference here
             // Trying to re-attempt on next launch.
             log.warning("Could not get bookmarks from database. Will retry restoration on next app launch.")
@@ -92,7 +96,7 @@ extension Bookmark {
         }
     }
     
-    private static func restoreLostBookmarksInternal(_ bookmarksToRestore: [Bookmark], completion: @escaping () -> Void) {
+    private static func restoreLostBookmarksInternal(_ bookmarksToRestore: [Favorite], completion: @escaping () -> Void) {
         var oldBookmarksData = [BookmarkRestorationData]()
         var oldFavoritesData = [BookmarkRestorationData]()
         
@@ -123,105 +127,57 @@ extension Bookmark {
         }
         
         DataController.perform { context in
-            guard let existingBookmarks =
-                Bookmark.all(where: NSPredicate(format: "isFavorite == false"), context: context),
-                let existingFavorites =
-                Bookmark.all(where: NSPredicate(format: "isFavorite == true"), context: context) else {
-                    return
-            }
-            
             log.debug("Attempting to restore \(oldFavoritesData.count) favorites.")
-            if existingFavorites.isEmpty {
-                log.debug("No existing favorites found, adding restored favorites to homescreen.")
-                Bookmark.reinsertBookmarks(saveLocation: nil,
-                                           bookmarksToInsertAtGivenLevel: oldFavoritesData,
-                                           allBookmarks: oldFavoritesData,
-                                           context: context)
-            } else if !oldFavoritesData.isEmpty {
-                log.debug("Existing favorites found, adding restored favorites to 'Restored Favorites' folder.")
-                Bookmark.addInternal(url: nil, title: nil, customTitle: Strings.restoredFavoritesFolderName,
-                                     isFolder: true, context: .existing(context)) { objectId in
-                    
-                    guard let restoredFavoritesFolder = context.object(with: objectId) as? Bookmark else {
-                        return
-                    }
-                    
-                    Bookmark.reinsertBookmarks(saveLocation: restoredFavoritesFolder,
-                                               bookmarksToInsertAtGivenLevel: oldFavoritesData,
-                                               allBookmarks: oldFavoritesData,
-                                               context: context)
-                }
-            }
+            Favorite.reinsertBookmarks(saveLocation: nil,
+                                       bookmarksToInsertAtGivenLevel: oldFavoritesData,
+                                       allBookmarks: oldFavoritesData,
+                                       context: context)
             
             log.debug("Attempting to restore \(oldBookmarksData.count) bookmarks.")
             // Entry point is root level bookmarks only.
             // Nested bookmarks are added recursively in `reinsertBookmarks` method
             let bookmarksAtRootLevel = oldBookmarksData.filter { $0.parentId == nil }
             
-            if existingBookmarks.isEmpty {
-                log.debug("No existing favorites found, adding restored bookmarks at root level.")
-                Bookmark.reinsertBookmarks(saveLocation: nil,
-                                           bookmarksToInsertAtGivenLevel: bookmarksAtRootLevel,
-                                           allBookmarks: oldBookmarksData,
-                                           context: context)
-            } else if !oldBookmarksData.isEmpty {
-                log.debug("No existing favorites found, adding restored bookmarks to 'Restored Bookmarks' folder.")
-                Bookmark.addInternal(url: nil, title: nil, customTitle: Strings.restoredBookmarksFolderName, isFolder: true, context: .existing(context)) { objectId in
-                    
-                    guard let restoredBookmarksFolder = context.object(with: objectId) as? Bookmark else {
-                        return
-                    }
-                    Bookmark.reinsertBookmarks(saveLocation: restoredBookmarksFolder,
-                                               bookmarksToInsertAtGivenLevel: bookmarksAtRootLevel,
-                                               allBookmarks: oldBookmarksData,
-                                               context: context)
-                }
-            }
+            Favorite.reinsertBookmarks(saveLocation: nil,
+                                       bookmarksToInsertAtGivenLevel: bookmarksAtRootLevel,
+                                       allBookmarks: oldBookmarksData,
+                                       context: context)
             
             completion()
         }
     }
     
-    private static func reinsertBookmarks(saveLocation: Bookmark?,
+    private static func reinsertBookmarks(saveLocation: Favorite?,
                                           bookmarksToInsertAtGivenLevel: [BookmarkRestorationData],
                                           allBookmarks: [BookmarkRestorationData],
                                           context: NSManagedObjectContext) {
-        Bookmark.migrateBookmarkOrders()
+        Favorite.migrateBookmarkOrders()
         bookmarksToInsertAtGivenLevel.forEach { bookmark in
             switch bookmark.bookmarkType {
             case .bookmark(let url):
-                Bookmark.addInternal(url: url, title: bookmark.title, parentFolder: saveLocation,
-                                     context: .existing(context))
+                Favorite.addInternal(url: url, title: bookmark.title, isFavorite: false, context: .existing(context))
             case .favorite(let url):
-                // No save location for favorites means it is added straight into homescreen.
-                // Otherwise favorites are treated as regular bookmarks inside of some folder.
                 if saveLocation == nil {
-                    Bookmark.addInternal(url: url, title: bookmark.title, isFavorite: true,
+                    Favorite.addInternal(url: url, title: bookmark.title, isFavorite: true,
                                          context: .existing(context))
                 } else {
-                    Bookmark.addInternal(url: url, title: bookmark.title, parentFolder: saveLocation,
-                                         context: .existing(context))
+                    Favorite.addInternal(url: url, title: bookmark.title,
+                                         isFavorite: false, context: .existing(context))
                 }
                 
             case .folder:
-                Bookmark.addInternal(url: nil, title: bookmark.title, parentFolder: saveLocation,
-                                     isFolder: true, context: .existing(context)) { objectId in
-                    
-                    // For folders we search for nested bookmarks recursively.
-                    guard let folder = context.object(with: objectId) as? Bookmark else { return }
-                    let children = allBookmarks.filter { $0.parentId == bookmark.id }
-                    
-                    self.reinsertBookmarks(saveLocation: folder,
-                                           bookmarksToInsertAtGivenLevel: children, allBookmarks: allBookmarks,
-                                           context: context)
-                }
+                let children = allBookmarks.filter { $0.parentId == bookmark.id }
+                
+                self.reinsertBookmarks(saveLocation: nil,
+                                       bookmarksToInsertAtGivenLevel: children, allBookmarks: allBookmarks,
+                                       context: context)
             }
         }
     }
 }
 
 // MARK: - 1.6 Migration (ordering bugs)
-extension Bookmark {
+extension Favorite {
     fileprivate class func migrateBookmarkOrders() {
         DataController.perform { context in
             migrateOrder(forFavorites: true, context: context)
@@ -234,16 +190,16 @@ extension Bookmark {
     /// all have order set to 0 which makes sorting confusing.
     /// In migration we take all bookmarks using the same sorting method as on 1.6 and add a proper `order`
     /// attribute to them. The goal is to have all bookmarks with a proper unique order number set.
-    private class func migrateOrder(parentFolder: Bookmark? = nil,
+    private class func migrateOrder(parentFolder: Favorite? = nil,
                                     forFavorites: Bool,
                                     context: NSManagedObjectContext) {
         
         let predicate = forFavorites ?
             NSPredicate(format: "isFavorite == true") : allBookmarksOfAGivenLevelPredicate(parent: parentFolder)
         
-        let orderSort = NSSortDescriptor(key: #keyPath(Bookmark.order), ascending: true)
-        let folderSort = NSSortDescriptor(key: #keyPath(Bookmark.isFolder), ascending: false)
-        let createdSort = NSSortDescriptor(key: #keyPath(Bookmark.created), ascending: true)
+        let orderSort = NSSortDescriptor(key: #keyPath(Favorite.order), ascending: true)
+        let folderSort = NSSortDescriptor(key: #keyPath(Favorite.isFolder), ascending: false)
+        let createdSort = NSSortDescriptor(key: #keyPath(Favorite.created), ascending: true)
         
         let sort = [orderSort, folderSort, createdSort]
         
@@ -259,5 +215,15 @@ extension Bookmark {
                 migrateOrder(parentFolder: bookmark, forFavorites: forFavorites, context: context)
             }
         }
+    }
+    
+    private class func allBookmarksOfAGivenLevelPredicate(parent: Favorite?) -> NSPredicate {
+        let isFavoriteKP = #keyPath(Favorite.isFavorite)
+        let parentFolderKP = #keyPath(Favorite.parentFolder)
+        
+        // A bit hacky but you can't just pass 'nil' string to %@.
+        let nilArgumentForPredicate = 0
+        return NSPredicate(
+            format: "%K == %@ AND %K == NO", parentFolderKP, parent ?? nilArgumentForPredicate, isFavoriteKP)
     }
 }
