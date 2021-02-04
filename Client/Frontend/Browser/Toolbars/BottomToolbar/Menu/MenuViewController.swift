@@ -285,13 +285,11 @@ class MenuViewController: UITableViewController {
     private typealias DoneButton = (style: UIBarButtonItem.SystemItem, position: DoneButtonPosition)
     
     private func open(_ viewController: UIViewController, doneButton: DoneButton,
-                      allowSwipeToDismiss: Bool = true, alwaysFullScreen: Bool = false, forcePortraitIfIphone: Bool = true) {
+                      allowSwipeToDismiss: Bool = true, alwaysFullScreen: Bool = false) {
         let navigationController = SettingsNavigationController(rootViewController: viewController)
         
         // All menu views should be opened in portrait on iPhones.
-        if forcePortraitIfIphone {
-            UIDevice.current.forcePortraitIfIphone(for: UIApplication.shared)
-        }
+        UIDevice.current.forcePortraitIfIphone(for: UIApplication.shared)
 
         if #available(iOS 13.0, *) {
             navigationController.isModalInPresentation = !allowSwipeToDismiss
@@ -374,7 +372,7 @@ class MenuViewController: UITableViewController {
         } else {
             let playListController = PlaylistViewController()
             
-            open(playListController, doneButton: DoneButton(style: .done, position: .right), forcePortraitIfIphone: false)
+            open(playListController, doneButton: DoneButton(style: .done, position: .right))
         }
     }
     
