@@ -159,7 +159,7 @@ extension PlaylistMediaInfo: MPPlayableContentDelegate {
                     if canStream {
                         self.playerView?.seek(to: 0.0)
                         self.playerView?.load(url: url, resourceDelegate: nil)
-                        completion(.expired)
+                        completion(.none)
                     } else {
                         //Stream failed so fallback to the webview
                         //It's possible the URL expired..
@@ -174,7 +174,7 @@ extension PlaylistMediaInfo: MPPlayableContentDelegate {
                                     }
                                 }
                             } else {
-                                completion(.error("Cannot Load Media"))
+                                completion(.expired)
                             }
                         })
                         
