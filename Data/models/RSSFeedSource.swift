@@ -11,7 +11,8 @@ public final class RSSFeedSource: NSManagedObject, CRUD {
     @NSManaged public var feedUrl: String
     
     public class func get(with feedUrl: String) -> RSSFeedSource? {
-        getInternal(with: feedUrl)
+        let predicate = NSPredicate(format: "\(#keyPath(RSSFeedSource.feedUrl)) == %@", feedUrl)
+        return first(where: predicate, context: DataController.viewContext)
     }
     
     public class func all() -> [RSSFeedSource] {
@@ -19,30 +20,22 @@ public final class RSSFeedSource: NSManagedObject, CRUD {
     }
     
     public class func delete(with feedUrl: String) {
-        deleteInternal(feedUrl: feedUrl, context: .existing(DataController.viewContext))
-    }
-    
-    public class func insert(title: String?, feedUrl: String) {
-        insertInternal(title: title, feedUrl: feedUrl, context: .existing(DataController.viewContext))
-    }
-    
-    class func getInternal(with feedUrl: String, context: NSManagedObjectContext = DataController.viewContext) -> RSSFeedSource? {
-        let predicate = NSPredicate(format: "\(#keyPath(RSSFeedSource.feedUrl)) == %@", feedUrl)
-        return first(where: predicate, context: context)
-    }
-    
-    class func insertInternal(title: String?, feedUrl: String, context: WriteContext = .new(inMemory: false)) {
-        DataController.perform(context: context) { context in
-            let source = RSSFeedSource(entity: entity(in: context), insertInto: context)
-            
-            source.title = title
-            source.feedUrl = feedUrl
+        let context = DataController.viewContext
+        if let item = get(with: feedUrl) {
+            item.delete(context: .existing(context))
+            if context.hasChanges {
+                try? context.save()
+            }
         }
     }
     
-    class func deleteInternal(feedUrl: String, context: WriteContext = .new(inMemory: false)) {
-        if let item = getInternal(with: feedUrl, context: DataController.viewContext) {
-            item.delete(context: context)
+    public class func insert(title: String?, feedUrl: String) {
+        let context = DataController.viewContext
+        let source = RSSFeedSource(entity: entity(in: context), insertInto: context)
+        source.title = title
+        source.feedUrl = feedUrl
+        if context.hasChanges {
+            try? context.save()
         }
     }
     

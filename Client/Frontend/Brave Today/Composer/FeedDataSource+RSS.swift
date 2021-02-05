@@ -7,6 +7,7 @@ import Foundation
 import Data
 import FeedKit
 import Fuzi
+import Shared
 
 struct RSSFeedLocation: Hashable {
     var title: String?
@@ -66,8 +67,45 @@ extension FeedDataSource {
 }
 
 extension FeedItem.Content {
-    init?(from feedItem: JSONFeedItem) {
-        return nil
+    init?(from feedItem: JSONFeedItem, location: RSSFeedLocation) {
+        guard let publishTime = feedItem.datePublished,
+              let url = feedItem.url?.asURL,
+              let title = feedItem.title else {
+            return nil
+        }
+        var description = ""
+        var imageURL: URL?
+        if let image = feedItem.image {
+            imageURL = URL(string: image, relativeTo: location.url.domainURL)
+        }
+        if let text = feedItem.contentText {
+            description = text
+        }
+        if let html = feedItem.contentHtml {
+            let doc = try? HTMLDocument(string: html)
+            if imageURL == nil, let src = doc?.firstChild(xpath: "//img[@src]")?.attr("src") {
+                imageURL = URL(string: src, relativeTo: location.url.domainURL)
+            }
+            if description.isEmpty, let text = doc?.root?.childNodes(ofTypes: [.Text, .Element]).map({ node in
+                node.stringValue
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+                    .replacingOccurrences(of: "\n", with: " ")
+            }).joined(separator: " ") {
+                description = text
+            }
+        }
+        self.init(
+            publishTime: publishTime,
+            url: url,
+            imageURL: imageURL,
+            title: title,
+            description: description,
+            contentType: .article,
+            publisherID: location.id,
+            urlHash: url.absoluteString,
+            baseScore: 0,
+            offersCategory: nil
+        )
     }
     init?(from feedItem: AtomFeedEntry, location: RSSFeedLocation) {
         guard let publishTime = feedItem.published,
@@ -77,14 +115,17 @@ extension FeedItem.Content {
             return nil
         }
         var description = ""
-        var imageURL = feedItem.media?.mediaThumbnails?.first?.attributes?.url?.asURL
+        var imageURL: URL?
+        if let thumbnail = feedItem.media?.mediaThumbnails?.first?.attributes?.url {
+            imageURL = URL(string: thumbnail, relativeTo: location.url.domainURL)
+        }
         if feedItem.summary?.attributes?.type == "text" {
             description = feedItem.summary?.value ?? ""
         } else if feedItem.content?.attributes?.type == "html", let html = feedItem.content?.value {
             // Find one in description?
             let doc = try? HTMLDocument(string: html)
-            if imageURL == nil {
-                imageURL = doc?.firstChild(xpath: "//img[@src]")?.attr("src")?.asURL
+            if imageURL == nil, let src = doc?.firstChild(xpath: "//img[@src]")?.attr("src") {
+                imageURL = URL(string: src, relativeTo: location.url.domainURL)
             }
             if let text = doc?.root?.childNodes(ofTypes: [.Text, .Element]).map({ node in
                 node.stringValue
@@ -115,12 +156,15 @@ extension FeedItem.Content {
             return nil
         }
         var description = ""
-        var imageURL = feedItem.media?.mediaThumbnails?.first?.attributes?.url?.asURL
+        var imageURL: URL?
+        if let thumbnail = feedItem.media?.mediaThumbnails?.first?.attributes?.url {
+            imageURL = URL(string: thumbnail, relativeTo: location.url.domainURL)
+        }
         if let html = feedItem.description {
             // Find one in description?
             let doc = try? HTMLDocument(string: html)
-            if imageURL == nil {
-                imageURL = doc?.firstChild(xpath: "//img[@src]")?.attr("src")?.asURL
+            if imageURL == nil, let src = doc?.firstChild(xpath: "//img[@src]")?.attr("src") {
+                imageURL = URL(string: src, relativeTo: location.url.domainURL)
             }
             if let text = doc?.root?.childNodes(ofTypes: [.Text, .Element]).map({ node in
                 node.stringValue
@@ -147,15 +191,18 @@ extension FeedItem.Content {
 extension FeedItem.Source {
     init?(from feed: FeedKit.Feed, location: RSSFeedLocation) {
         let id = location.id
+        let feedTitle: String
         switch feed {
         case .atom(let feed):
             guard let title = feed.title else { return nil }
-            self.init(id: id, isDefault: true, category: "", name: title)
+            feedTitle = title
         case .rss(let feed):
             guard let title = feed.title else { return nil }
-            self.init(id: id, isDefault: true, category: "", name: title)
+            feedTitle = title
         case .json(let feed):
-            return nil
+            guard let title = feed.title else { return nil }
+            feedTitle = title
         }
+        self.init(id: id, isDefault: true, category: "", name: feedTitle)
     }
 }
