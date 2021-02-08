@@ -448,12 +448,6 @@ extension PlaylistViewController: VideoViewDelegate {
         self.present(playerController, animated: true, completion: {
             playerController.player?.play()
         })
-        
-        if AVPictureInPictureController.isPictureInPictureSupported() {
-            print("SUPPORTED")
-        } else {
-            print("NOT SUPPORTED")
-        }
     }
 }
 
@@ -492,6 +486,7 @@ extension PlaylistViewController: AVPlayerViewControllerDelegate, AVPictureInPic
     // MARK: - AVPictureInPictureControllerDelegate
     func pictureInPictureControllerWillStartPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
         
+        (UIApplication.shared.delegate as? AppDelegate)?.playlistNavigationController = self.navigationController
         self.dismiss(animated: true, completion: nil)
     }
     
@@ -513,6 +508,13 @@ extension PlaylistViewController: AVPlayerViewControllerDelegate, AVPictureInPic
     
     func pictureInPictureController(_ pictureInPictureController: AVPictureInPictureController, restoreUserInterfaceForPictureInPictureStopWithCompletionHandler completionHandler: @escaping (Bool) -> Void) {
         
+        if let delegate = UIApplication.shared.delegate as? AppDelegate,
+           let navigationController = delegate.playlistNavigationController {
+            delegate.browserViewController.present(controller: navigationController)
+            delegate.playlistNavigationController = nil
+        }
+        
+        completionHandler(true)
     }
 }
 

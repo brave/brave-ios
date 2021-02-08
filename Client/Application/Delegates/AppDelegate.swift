@@ -30,6 +30,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
     var window: UIWindow?
     var browserViewController: BrowserViewController!
     var rootViewController: UIViewController!
+    var playlistNavigationController: UINavigationController?
     weak var profile: Profile?
     var tabManager: TabManager!
     var braveCore: BraveCoreMain?

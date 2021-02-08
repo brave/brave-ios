@@ -370,7 +370,7 @@ class MenuViewController: UITableViewController {
             bvc.present(playlistDetailsController, animated: true)
 
         } else {
-            let playListController = PlaylistViewController()
+            let playListController = (UIApplication.shared.delegate as? AppDelegate)?.playlistNavigationController?.viewControllers.first ?? PlaylistViewController()
             
             open(playListController, doneButton: DoneButton(style: .done, position: .right))
         }

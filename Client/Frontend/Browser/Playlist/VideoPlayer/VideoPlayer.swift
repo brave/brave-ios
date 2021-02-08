@@ -345,7 +345,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         super.init(frame: frame)
         
         do {
-            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, policy: .longFormAudio)
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback)
             try AVAudioSession.sharedInstance().setActive(true, options: [])
         } catch {
             log.error(error)
@@ -443,6 +443,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         }
 
         registerNotifications()
+        registerPictureInPictureNotifications()
         trackBar.delegate = self
         
         self.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onOverlayTapped(_:))).then {
@@ -551,24 +552,25 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     private func onPictureInPicture(_ button: UIButton) {
         guard let pictureInPictureController = pictureInPictureController else { return }
         
-        if pictureInPictureController.isPictureInPictureActive {
-            (self.layer as? AVPlayerLayer)?.player = self.player
-            
-            self.delegate?.onPictureInPicture(enabled: false)
-            pictureInPictureController.stopPictureInPicture()
-        } else {
-            (self.layer as? AVPlayerLayer)?.player = nil
-            
-            if #available(iOS 14.2, *) {
-                pictureInPictureController.canStartPictureInPictureAutomaticallyFromInline = true
+        DispatchQueue.main.async {
+            if pictureInPictureController.isPictureInPictureActive {
+                self.delegate?.onPictureInPicture(enabled: false)
+                pictureInPictureController.stopPictureInPicture()
+                self.setNeedsLayout()
+                self.layoutIfNeeded()
+                self.setNeedsDisplay()
+            } else {
+                if #available(iOS 14.2, *) {
+                    pictureInPictureController.canStartPictureInPictureAutomaticallyFromInline = true
+                }
+                
+                if #available(iOS 14.0, *) {
+                    pictureInPictureController.requiresLinearPlayback = false
+                }
+                
+                self.delegate?.onPictureInPicture(enabled: true)
+                pictureInPictureController.startPictureInPicture()
             }
-            
-            if #available(iOS 14.0, *) {
-                pictureInPictureController.requiresLinearPlayback = false
-            }
-            
-            self.delegate?.onPictureInPicture(enabled: true)
-            pictureInPictureController.startPictureInPicture()
         }
     }
     
