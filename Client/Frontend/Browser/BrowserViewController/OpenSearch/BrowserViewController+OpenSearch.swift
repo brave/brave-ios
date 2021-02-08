@@ -108,9 +108,7 @@ extension BrowserViewController {
     @objc func addCustomSearchEngineForFocusedElement() {
         guard var referenceURLString = openSearchEngine?.reference,
               let title = openSearchEngine?.title,
-              var referenceURL = URL(string: referenceURLString),
-              let faviconURLString = self.tabManager.selectedTab?.displayFavicon?.url,
-              let iconURL = URL(string: faviconURLString) else {
+              var referenceURL = URL(string: referenceURLString) else {
             let alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
             present(alert, animated: true, completion: nil)
             return
@@ -131,34 +129,44 @@ extension BrowserViewController {
         if referenceURL.host == nil, let constructedReferenceURL = URL(string: constructedReferenceURLString) {
             referenceURL = constructedReferenceURL
         }
-            
-        downloadOpenSearchXML(referenceURL, referenceURL: referenceURLString, title: title, iconURL: iconURL)
+                    
+        downloadOpenSearchXML(referenceURL, title: title, iconURL: tabManager.selectedTab?.displayFavicon?.url)
     }
 
-    func downloadOpenSearchXML(_ url: URL, referenceURL: String, title: String, iconURL: URL) {
+    func downloadOpenSearchXML(_ url: URL, title: String, iconURL: String?) {
         customSearchEngineButton.state = .loading
-
-        // Try to fetch Engine Icon using cache manager
-        WebImageCacheManager.shared.load(from: iconURL, completion: { (image, _, _, _, _) in
-            var searchEngineIcon = #imageLiteral(resourceName: "defaultFavicon")
-
-            // In case fetch fails use default icon and do not block addition of this engine
-            if let favIcon = image {
-                searchEngineIcon = favIcon
-            }
+        
+        var searchEngineIcon = #imageLiteral(resourceName: "defaultFavicon")
+        
+        if let faviconURLString = tabManager.selectedTab?.displayFavicon?.url,
+           let iconURL = URL(string: faviconURLString) {
             
-            NetworkManager().downloadResource(with: url).uponQueue(.main) { [weak self] response in
-                guard let openSearchEngine = OpenSearchParser(pluginMode: true).parse(
-                        response.data, referenceURL: referenceURL, image: searchEngineIcon, isCustomEngine: true) else {
-                    return
+            // Try to fetch Engine Icon using cache manager
+            WebImageCacheManager.shared.load(from: iconURL, completion: { [weak self] (image, _, _, _, _) in
+                // In case fetch fails use default icon and do not block addition of this engine
+                if let favIcon = image {
+                    searchEngineIcon = favIcon
                 }
                 
-                self?.addSearchEngine(openSearchEngine)
-            }
-        })
+                self?.createSearchEngine(url, icon: searchEngineIcon)
+            })
+        } else {
+            createSearchEngine(url, icon: searchEngineIcon)
+        }
     }
     
-    func addSearchEngine(_ engine: OpenSearchEngine) {
+    private func createSearchEngine(_ url: URL, icon: UIImage) {
+        NetworkManager().downloadResource(with: url).uponQueue(.main) { [weak self] response in
+            guard let openSearchEngine = OpenSearchParser(pluginMode: true).parse(
+                    response.data, referenceURL: url.absoluteString, image: icon, isCustomEngine: true) else {
+                return
+            }
+            
+            self?.addSearchEngine(openSearchEngine)
+        }
+    }
+    
+    private func addSearchEngine(_ engine: OpenSearchEngine) {
         let alert = ThirdPartySearchAlerts.addThirdPartySearchEngine(engine) { alert in
             do {
                 try self.profile.searchEngines.addSearchEngine(engine)

@@ -18,9 +18,9 @@ protocol SearchEnginePickerDelegate: class {
 
 class SearchSettingsTableViewController: UITableViewController {
     
-    // MARK: Design
+    // MARK: UX
     
-    struct Design {
+    struct UX {
         static let iconSize = CGSize(
             width: OpenSearchEngine.preferredIconSize,
             height: OpenSearchEngine.preferredIconSize)
@@ -112,7 +112,7 @@ class SearchSettingsTableViewController: UITableViewController {
         
         self.navigationItem.rightBarButtonItem = editButtonItem
 
-        let footer = SettingsTableSectionHeaderFooterView(frame: CGRect(width: tableView.bounds.width, height: Design.headerHeight))
+        let footer = SettingsTableSectionHeaderFooterView(frame: CGRect(width: tableView.bounds.width, height: UX.headerHeight))
         tableView.tableFooterView = footer
     }
     
@@ -174,7 +174,7 @@ class SearchSettingsTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return Design.headerHeight
+        return UX.headerHeight
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -225,7 +225,7 @@ class SearchSettingsTableViewController: UITableViewController {
                     $0.textLabel?.text = engine?.displayName
                     $0.textLabel?.adjustsFontSizeToFitWidth = true
                     $0.textLabel?.minimumScaleFactor = 0.5
-                    $0.imageView?.image = engine?.image.createScaled(Design.iconSize)
+                    $0.imageView?.image = engine?.image.createScaled(UX.iconSize)
                     $0.imageView?.layer.cornerRadius = 4
                     $0.imageView?.layer.masksToBounds = true
                     $0.selectionStyle = .none

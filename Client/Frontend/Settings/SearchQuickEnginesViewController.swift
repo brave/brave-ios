@@ -12,9 +12,9 @@ private let log = Logger.browserLogger
 
 class SearchQuickEnginesViewController: UITableViewController {
     
-    // MARK: Design
+    // MARK: UX
     
-    struct Design {
+    struct UX {
         static let iconSize = CGSize(
             width: OpenSearchEngine.preferredIconSize,
             height: OpenSearchEngine.preferredIconSize)
@@ -55,7 +55,7 @@ class SearchQuickEnginesViewController: UITableViewController {
             $0.register(UITableViewCell.self, forCellReuseIdentifier: Constants.quickSearchEngineRowIdentifier)
         }
 
-        let footer = SettingsTableSectionHeaderFooterView(frame: CGRect(width: tableView.bounds.width, height: Design.headerHeight))
+        let footer = SettingsTableSectionHeaderFooterView(frame: CGRect(width: tableView.bounds.width, height: UX.headerHeight))
         tableView.tableFooterView = footer
     }
     
@@ -67,10 +67,6 @@ class SearchQuickEnginesViewController: UITableViewController {
     
     // MARK: TableViewDataSource - TableViewDelegate
     
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
-    }
-
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return searchEngines.orderedEngines.count - 1
     }
@@ -90,7 +86,7 @@ class SearchQuickEnginesViewController: UITableViewController {
 
         // The default engine is not a quick search engine.
         let index = indexPath.item + 1
-        engine = searchEngines.orderedEngines[index]
+        engine = searchEngines.orderedEngines[safe: index]
         
         let toggle = UISwitch().then {
             $0.tag = index
@@ -108,7 +104,7 @@ class SearchQuickEnginesViewController: UITableViewController {
             $0.textLabel?.text = engine?.displayName
             $0.textLabel?.adjustsFontSizeToFitWidth = true
             $0.textLabel?.minimumScaleFactor = 0.5
-            $0.imageView?.image = engine?.image.createScaled(Design.iconSize)
+            $0.imageView?.image = engine?.image.createScaled(UX.iconSize)
             $0.imageView?.layer.cornerRadius = 4
             $0.imageView?.layer.masksToBounds = true
         }
@@ -117,7 +113,7 @@ class SearchQuickEnginesViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return Design.headerHeight
+        return UX.headerHeight
     }
 
     override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {

@@ -33,7 +33,7 @@ class OpenSearchEngineButton: UIView {
             case .enabled:
                 searchButton.isHidden = false
                 loadingIndicator.stopAnimating()
-                searchButton.tintColor = .systemBlue
+                searchButton.tintColor = BraveUX.braveOrange
                 searchButton.setTitleColor(BraveUX.braveOrange, for: .normal)
                 searchButton.isUserInteractionEnabled = true
             case .loading:

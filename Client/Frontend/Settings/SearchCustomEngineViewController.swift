@@ -560,9 +560,9 @@ extension SearchCustomEngineViewController: UITextFieldDelegate {
 
 fileprivate class SearchEngineTableViewHeader: UITableViewHeaderFooterView {
     
-    // MARK: Design
+    // MARK: UX
     
-    struct Design {
+    struct UX {
         static let headerHeight: CGFloat = 44
         static let headerInset: CGFloat = 20
     }
@@ -602,14 +602,14 @@ fileprivate class SearchEngineTableViewHeader: UITableViewHeaderFooterView {
     
     func setConstraints() {
         titleLabel.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(Design.headerInset)
+            make.leading.equalToSuperview().offset(UX.headerInset)
             make.top.equalToSuperview()
             make.bottom.equalToSuperview()
-            make.height.equalTo(Design.headerHeight)
+            make.height.equalTo(UX.headerHeight)
         }
         
         addEngineButton.snp.makeConstraints { make in
-            make.trailing.equalTo(snp.trailing).inset(Design.headerInset)
+            make.trailing.equalTo(snp.trailing).inset(UX.headerInset)
             make.centerY.equalToSuperview()
             make.height.equalTo(snp.height)
         }
@@ -626,9 +626,9 @@ fileprivate class SearchEngineTableViewHeader: UITableViewHeaderFooterView {
 
 fileprivate class URLInputTableViewCell: UITableViewCell {
 
-    // MARK: Design
+    // MARK: UX
     
-    struct Design {
+    struct UX {
         static let cellHeight: CGFloat = 88
         static let cellInset: CGFloat = 16
     }
@@ -660,8 +660,7 @@ fileprivate class URLInputTableViewCell: UITableViewCell {
         textview = UITextView(frame: CGRect(x: 0, y: 0, width: contentView.frame.width, height: contentView.frame.height)).then {
             $0.text = "https://"
             $0.backgroundColor = .clear
-            $0.backgroundColor = .clear
-            $0.font = UIFont.systemFont(ofSize: Design.cellInset)
+            $0.font = UIFont.systemFont(ofSize: UX.cellInset)
             $0.autocapitalizationType = .none
             $0.autocorrectionType = .no
             $0.spellCheckingType = .no
@@ -671,9 +670,9 @@ fileprivate class URLInputTableViewCell: UITableViewCell {
         contentView.addSubview(textview)
         
         textview.snp.makeConstraints({ make in
-            make.leading.trailing.equalToSuperview().inset(Design.cellInset)
+            make.leading.trailing.equalToSuperview().inset(UX.cellInset)
             make.bottom.top.equalToSuperview()
-            make.height.equalTo(Design.cellHeight)
+            make.height.equalTo(UX.cellHeight)
         })
     }
 }
@@ -682,9 +681,9 @@ fileprivate class URLInputTableViewCell: UITableViewCell {
 
 fileprivate class TitleInputTableViewCell: UITableViewCell {
 
-    // MARK: Design
+    // MARK: UX
     
-    struct Design {
+    struct UX {
         static let cellHeight: CGFloat = 44
         static let cellInset: CGFloat = 16
     }
@@ -719,9 +718,9 @@ fileprivate class TitleInputTableViewCell: UITableViewCell {
         contentView.addSubview(textfield)
         
         textfield.snp.makeConstraints({ make in
-            make.leading.trailing.equalToSuperview().inset(Design.cellInset)
+            make.leading.trailing.equalToSuperview().inset(UX.cellInset)
             make.bottom.top.equalToSuperview()
-            make.height.equalTo(Design.cellHeight)
+            make.height.equalTo(UX.cellHeight)
         })
     }
 }
