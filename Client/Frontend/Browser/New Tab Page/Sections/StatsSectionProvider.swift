@@ -118,7 +118,20 @@ class BraveShieldStatsView: UIView, Themeable {
             $0.allowedUnits = [.useKB, .useMB, .useGB, .useTB]
         }
         
-        return formatter.string(fromByteCount: Int64(estimatedDataSavedInBytes))
+        // Byte formatted megabytes value can be too long to display nicely(#3274).
+        // As a workaround we trim the decimal value when megabytes or kilobytes are displayed.
+        // For gigabytes it takes a lot of time to make the stat 100GB+ to be a problem.
+        // In such case the stat font is being scaled down.
+        // In the future we might have to write our own byte formater to handle this.
+        let byteFormattedString = formatter.string(fromByteCount: Int64(estimatedDataSavedInBytes))
+        let _1MB = 1000 * 1000
+        if estimatedDataSavedInBytes / _1MB < 1000 {
+            if let withRemovedDecimal = try? byteFormattedString.regexReplacePattern("\\.[0-9]+", with: "") {
+                return withRemovedDecimal
+            }
+        }
+        
+        return byteFormattedString
     }
     
     var timeSaved: String {
@@ -173,8 +186,9 @@ private class StatView: UIView {
     fileprivate var statLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .center
-        label.numberOfLines = 0
-        label.font = UIFont.systemFont(ofSize: 32, weight: UIFont.Weight.medium)
+        label.font = .systemFont(ofSize: 32, weight: UIFont.Weight.medium)
+        label.minimumScaleFactor = 0.5
+        label.adjustsFontSizeToFitWidth = true
         return label
     }()
     
