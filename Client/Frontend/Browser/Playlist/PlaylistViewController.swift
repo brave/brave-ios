@@ -70,6 +70,10 @@ class PlaylistViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    deinit {
+        playerView.stop()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -454,33 +458,26 @@ extension PlaylistViewController: VideoViewDelegate {
 // MARK: AVPlayerViewControllerDelegate
 
 extension PlaylistViewController: AVPlayerViewControllerDelegate, AVPictureInPictureControllerDelegate {
-    
-    //TODO: When entering PIP, dismiss the current playlist controller.
-    //TODO: When exiting PIP, destroy the video player and its media info. Clear control centre, etc.
-    
+
     // MARK: - AVPlayerViewControllerDelegate
     func playerViewControllerWillStartPictureInPicture(_ playerViewController: AVPlayerViewController) {
+        (UIApplication.shared.delegate as? AppDelegate)?.playlistNavigationController = self.navigationController
         self.dismiss(animated: true, completion: nil)
-    }
-    
-    func playerViewControllerDidStartPictureInPicture(_ playerViewController: AVPlayerViewController) {
-        
     }
     
     func playerViewController(_ playerViewController: AVPlayerViewController, failedToStartPictureInPictureWithError error: Error) {
         
     }
     
-    func playerViewControllerWillStopPictureInPicture(_ playerViewController: AVPlayerViewController) {
-        
-    }
-    
-    func playerViewControllerDidStopPictureInPicture(_ playerViewController: AVPlayerViewController) {
-        
-    }
-    
     func playerViewController(_ playerViewController: AVPlayerViewController, restoreUserInterfaceForPictureInPictureStopWithCompletionHandler completionHandler: @escaping (Bool) -> Void) {
         
+        if let delegate = UIApplication.shared.delegate as? AppDelegate,
+           let navigationController = delegate.playlistNavigationController {
+            delegate.browserViewController.present(controller: navigationController)
+            delegate.playlistNavigationController = nil
+        }
+        
+        completionHandler(true)
     }
     
     // MARK: - AVPictureInPictureControllerDelegate
@@ -490,19 +487,8 @@ extension PlaylistViewController: AVPlayerViewControllerDelegate, AVPictureInPic
         self.dismiss(animated: true, completion: nil)
     }
     
-    func pictureInPictureControllerDidStartPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
-        
-    }
-    
     func pictureInPictureController(_ pictureInPictureController: AVPictureInPictureController, failedToStartPictureInPictureWithError error: Error) {
         
-    }
-    
-    func pictureInPictureControllerWillStopPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
-        
-    }
-    
-    func pictureInPictureControllerDidStopPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
         
     }
     

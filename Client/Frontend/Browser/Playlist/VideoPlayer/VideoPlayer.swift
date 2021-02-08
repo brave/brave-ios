@@ -329,6 +329,11 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         $0.backgroundColor = .clear
     }
     
+    private let playerLayer = AVPlayerLayer().then {
+        $0.videoGravity = .resizeAspect
+        $0.needsDisplayOnBoundsChange = true
+    }
+    
     private let trackBar = VideoTrackerBar()
     private let orientation: UIInterfaceOrientation = .portrait
     private var playObserver: Any?
@@ -353,12 +358,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
 
         //Setup
         self.backgroundColor = .black
-        
-        (self.layer as? AVPlayerLayer)?.do {
-            $0.player = self.player
-            $0.videoGravity = .resizeAspect
-            $0.needsDisplayOnBoundsChange = true
-        }
+        self.playerLayer.player = self.player
 
         playPauseButton.addTarget(self, action: #selector(onPlay(_:)), for: .touchUpInside)
         castButton.addTarget(self, action: #selector(onCast(_:)), for: .touchUpInside)
@@ -371,6 +371,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         skipForwardButton.addTarget(self, action: #selector(onSeekNext(_:event:)), for: .touchDownRepeat)
         
         //Layout
+        layer.addSublayer(playerLayer)
         addSubview(trackBarBackground)
         addSubview(thumbnailView)
         addSubview(particleView)
@@ -475,8 +476,10 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         })
     }
     
-    public override class var layerClass: AnyClass {
-        return AVPlayerLayer.self
+    public override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        playerLayer.frame = self.bounds
     }
     
     @objc
@@ -556,9 +559,6 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
             if pictureInPictureController.isPictureInPictureActive {
                 self.delegate?.onPictureInPicture(enabled: false)
                 pictureInPictureController.stopPictureInPicture()
-                self.setNeedsLayout()
-                self.layoutIfNeeded()
-                self.setNeedsDisplay()
             } else {
                 if #available(iOS 14.2, *) {
                     pictureInPictureController.canStartPictureInPictureAutomaticallyFromInline = true
@@ -641,12 +641,12 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     private func registerNotifications() {
         notificationObservers.append(NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: .main) { [weak self] _ in
             guard let self = self else { return }
-            (self.layer as? AVPlayerLayer)?.player = nil
+            self.playerLayer.player = nil
         })
         
         notificationObservers.append(NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: .main) { [weak self] _ in
             guard let self = self else { return }
-            (self.layer as? AVPlayerLayer)?.player = self.player
+            self.playerLayer.player = self.player
         })
         
         notificationObservers.append(NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: self.player.currentItem, queue: .main) { [weak self] _ in
@@ -689,9 +689,8 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     }
     
     private func registerPictureInPictureNotifications() {
-        if AVPictureInPictureController.isPictureInPictureSupported(),
-           let playerLayer = self.layer as? AVPlayerLayer {
-            pictureInPictureController = AVPictureInPictureController(playerLayer: playerLayer)
+        if AVPictureInPictureController.isPictureInPictureSupported() {
+            pictureInPictureController = AVPictureInPictureController(playerLayer: self.playerLayer)
             guard let pictureInPictureController = pictureInPictureController else { return }
             
             notificationObservers.append(pictureInPictureController.observe(\AVPictureInPictureController.isPictureInPicturePossible, options: [.initial, .new]) { [weak self] _, change in
@@ -735,18 +734,6 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
                 }
             })
         })
-    }
-    
-    public func attach() {
-        (self.layer as? AVPlayerLayer)?.do {
-            $0.player = self.player
-        }
-    }
-    
-    public func detach() {
-        (self.layer as? AVPlayerLayer)?.do {
-            $0.player = nil
-        }
     }
     
     public func setControlsEnabled(_ enabled: Bool) {
