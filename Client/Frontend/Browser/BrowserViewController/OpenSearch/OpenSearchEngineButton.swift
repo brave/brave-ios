@@ -4,16 +4,15 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import UIKit
+import BraveUI
 import SnapKit
 import BraveShared
 
-// MARK: - OpenSearchEngineButton
+class OpenSearchEngineButton: Button {
 
-class OpenSearchEngineButton: UIView {
-
-    // MARK: State
+    // MARK: Action
     
-    enum State {
+    enum Action {
         case loading
         case enabled
         case disabled
@@ -21,24 +20,23 @@ class OpenSearchEngineButton: UIView {
 
     // MARK: Properties
     
-    var state: State {
+    var action: Action {
         didSet {
-            switch state {
+            switch action {
             case .disabled:
                 searchButton.isHidden = hidesWhenDisabled ? true : false
-                loadingIndicator.stopAnimating()
-                searchButton.tintColor = UIColor.Photon.grey50
-                searchButton.setTitleColor(UIColor.Photon.grey50, for: .normal)
+                isLoading = false
+                searchButton.appearanceTintColor = UIColor.Photon.grey50
+                searchButton.appearanceTextColor = UIColor.Photon.grey50
                 searchButton.isUserInteractionEnabled = false
             case .enabled:
                 searchButton.isHidden = false
-                loadingIndicator.stopAnimating()
-                searchButton.tintColor = BraveUX.braveOrange
-                searchButton.setTitleColor(BraveUX.braveOrange, for: .normal)
+                isLoading = false
+                searchButton.appearanceTintColor = BraveUX.braveOrange
+                searchButton.appearanceTextColor = BraveUX.braveOrange
                 searchButton.isUserInteractionEnabled = true
             case .loading:
-                loadingIndicator.isHidden = false
-                loadingIndicator.startAnimating()
+                isLoading = true
                 searchButton.isHidden = true
             }
         }
@@ -46,12 +44,7 @@ class OpenSearchEngineButton: UIView {
     
     private let searchButton = UIButton().then {
         $0.setImage(#imageLiteral(resourceName: "AddSearch").template, for: [])
-        $0.titleLabel?.font = UIFont.systemFont(ofSize: 14)
-    }
-    
-    private let loadingIndicator = UIActivityIndicatorView(style: .white).then {
-        $0.hidesWhenStopped = true
-        $0.color = UIColor.Photon.grey50
+        $0.titleLabel?.font = UIFont.preferredFont(forTextStyle: .body)
     }
     
     private var hidesWhenDisabled: Bool = false
@@ -59,7 +52,7 @@ class OpenSearchEngineButton: UIView {
     // MARK: Lifecycle
     
     override init(frame: CGRect) {
-        self.state = .disabled
+        self.action = .disabled
         super.init(frame: frame)
     }
 
@@ -83,23 +76,18 @@ class OpenSearchEngineButton: UIView {
             searchButton.setImage(nil, for: .normal)
             searchButton.setTitle(title, for: .normal)
         }
+        
+        loaderView = LoaderView(size: .small).then {
+            $0.tintColor = UIColor.Photon.grey50
+        }
     }
     
     private func doLayout() {
         addSubview(searchButton)
-        addSubview(loadingIndicator)
         
         searchButton.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
-        
-        loadingIndicator.snp.makeConstraints {
-            $0.center.equalToSuperview()
-        }
-    }
-
-    func addTarget(_ target: Any?, action: Selector, for controlEvents: UIControl.Event) {
-        searchButton.addTarget(target, action: action, for: controlEvents)
     }
 }
 

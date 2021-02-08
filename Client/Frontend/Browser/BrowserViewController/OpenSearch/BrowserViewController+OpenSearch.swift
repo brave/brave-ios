@@ -39,7 +39,7 @@ extension BrowserViewController {
                         JSON.stringify(dict)
                      """
         
-        webView.evaluateJavaScript(script) { (result, _) in
+        webView.evaluateSafeJavaScript(functionName: script, asFunction: false) { (result, _) in
             guard let htmlStr = result as? String,
                   let data: Data = htmlStr.data(using: .utf8) else { return }
                         
@@ -49,6 +49,7 @@ extension BrowserViewController {
             } catch {
                 log.error(error.localizedDescription)
             }
+
         }
     }
     
@@ -60,12 +61,12 @@ extension BrowserViewController {
         // thus in case of yahoo.com the title is 'Yahoo Search' and Shortname is 'Yahoo'
         // Instead we are checking referenceURL match to determine searchEngine is added or not
         
-        let matches = self.profile.searchEngines.orderedEngines.filter {$0.referenceURL == referenceObject.reference}
-        
-        if !matches.isEmpty {
-            self.customSearchEngineButton.state = .disabled
+        let searchEngineExists = profile.searchEngines.orderedEngines.contains(where: {$0.referenceURL == referenceObject.reference})
+
+        if searchEngineExists {
+            self.customSearchEngineButton.action = .disabled
         } else {
-            self.customSearchEngineButton.state = .enabled
+            self.customSearchEngineButton.action = .enabled
         }
         
         /*
@@ -134,7 +135,7 @@ extension BrowserViewController {
     }
 
     func downloadOpenSearchXML(_ url: URL, title: String, iconURL: String?) {
-        customSearchEngineButton.state = .loading
+        customSearchEngineButton.action = .loading
         
         var searchEngineIcon = #imageLiteral(resourceName: "defaultFavicon")
         
@@ -174,11 +175,11 @@ extension BrowserViewController {
                 let toast = SimpleToast()
                 toast.showAlertWithText(Strings.thirdPartySearchEngineAdded, bottomContainer: self.webViewContainer)
                 
-                self.customSearchEngineButton.state = .disabled
+                self.customSearchEngineButton.action = .disabled
             } catch {
                 let alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
                 self.present(alert, animated: true) {
-                    self.customSearchEngineButton.state = .enabled
+                    self.customSearchEngineButton.action = .enabled
                 }
             }
         }

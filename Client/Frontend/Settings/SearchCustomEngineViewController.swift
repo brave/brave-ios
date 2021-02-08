@@ -4,6 +4,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
+import BraveUI
 import Static
 import Shared
 import WebKit
@@ -13,8 +14,6 @@ import Storage
 import Data
 
 private let log = Logger.browserLogger
-
-// MARK: - SearchCustomEngineViewController
 
 class SearchCustomEngineViewController: UIViewController {
     
@@ -36,10 +35,6 @@ class SearchCustomEngineViewController: UIViewController {
     // MARK: Constants
     
     struct Constants {
-        static let textInputRowIdentifier = "textInputRowIdentifier"
-        static let urlInputRowIdentifier = "urlInputRowIdentifier"
-        static let titleInputRowIdentifier = "titleInputRowIdentifier"
-        static let searchEngineHeaderIdentifier = "searchEngineHeaderIdentifier"
         static let urlEntryMaxCharacterCount  = 150
         static let titleEntryMaxCharacterCount = 50
     }
@@ -110,9 +105,9 @@ class SearchCustomEngineViewController: UIViewController {
     
     private func setup() {
         tableView.do {
-            $0.register(URLInputTableViewCell.self, forCellReuseIdentifier: Constants.urlInputRowIdentifier)
-            $0.register(TitleInputTableViewCell.self, forCellReuseIdentifier: Constants.titleInputRowIdentifier)
-            $0.register(SearchEngineTableViewHeader.self, forHeaderFooterViewReuseIdentifier: Constants.searchEngineHeaderIdentifier)
+            $0.register(URLInputTableViewCell.self)
+            $0.register(TitleInputTableViewCell.self)
+            $0.registerHeaderFooter(SearchEngineTableViewHeader.self)
             $0.dataSource = self
             $0.delegate = self
         }
@@ -215,19 +210,11 @@ extension SearchCustomEngineViewController: UITableViewDelegate, UITableViewData
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         switch indexPath.section {
             case Section.url.rawValue:
-                guard let cell =
-                        tableView.dequeueReusableCell(withIdentifier: Constants.urlInputRowIdentifier) as? URLInputTableViewCell else {
-                    return UITableViewCell()
-                }
-                
+                let cell = tableView.dequeueReusableCell(for: indexPath) as URLInputTableViewCell
                 cell.delegate = self
                 return cell
             default:
-                guard let cell =
-                        tableView.dequeueReusableCell(withIdentifier: Constants.titleInputRowIdentifier) as? TitleInputTableViewCell else {
-                    return UITableViewCell()
-                }
-                
+                let cell = tableView.dequeueReusableCell(for: indexPath) as TitleInputTableViewCell
                 cell.delegate = self
                 return cell
         }
@@ -240,10 +227,7 @@ extension SearchCustomEngineViewController: UITableViewDelegate, UITableViewData
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        guard let headerView = tableView.dequeueReusableHeaderFooterView(
-                withIdentifier: Constants.searchEngineHeaderIdentifier) as? SearchEngineTableViewHeader else {
-            return nil
-        }
+        let headerView = tableView.dequeueReusableHeaderFooter() as SearchEngineTableViewHeader
 
         switch section {
             case Section.url.rawValue:
@@ -340,9 +324,9 @@ extension SearchCustomEngineViewController {
             return
         }
         
-        let matches = profile.searchEngines.orderedEngines.filter {$0.referenceURL == openSearchEngine.reference}
+        let searchEngineExists = profile.searchEngines.orderedEngines.contains(where: {$0.referenceURL == openSearchEngine.reference})
         
-        if !matches.isEmpty {
+        if searchEngineExists {
             changeAddButton(for: .disabled)
             checkManualAddExists()
         } else {
@@ -558,20 +542,20 @@ extension SearchCustomEngineViewController: UITextFieldDelegate {
 
 // MARK: - SearchEngineTableViewHeader
 
-fileprivate class SearchEngineTableViewHeader: UITableViewHeaderFooterView {
+fileprivate class SearchEngineTableViewHeader: UITableViewHeaderFooterView, TableViewReusable {
     
     // MARK: UX
     
     struct UX {
-        static let headerHeight: CGFloat = 44
         static let headerInset: CGFloat = 20
+        static let addButtonInset: CGFloat = 10
     }
     
     // MARK: Properties
     
     var titleLabel = UILabel().then {
-        $0.font = UIFont.systemFont(ofSize: 14)
-        $0.textColor = UIColor.Photon.grey50
+        $0.font = UIFont.preferredFont(forTextStyle: .body)
+        $0.appearanceTextColor = UIColor.Photon.grey50
     }
 
     lazy var addEngineButton = OpenSearchEngineButton(
@@ -603,9 +587,7 @@ fileprivate class SearchEngineTableViewHeader: UITableViewHeaderFooterView {
     func setConstraints() {
         titleLabel.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(UX.headerInset)
-            make.top.equalToSuperview()
-            make.bottom.equalToSuperview()
-            make.height.equalTo(UX.headerHeight)
+            make.top.bottom.equalToSuperview().inset(UX.addButtonInset)
         }
         
         addEngineButton.snp.makeConstraints { make in
@@ -624,13 +606,13 @@ fileprivate class SearchEngineTableViewHeader: UITableViewHeaderFooterView {
 
 // MARK: URLInputTableViewCell
 
-fileprivate class URLInputTableViewCell: UITableViewCell {
+fileprivate class URLInputTableViewCell: UITableViewCell, TableViewReusable {
 
     // MARK: UX
     
     struct UX {
-        static let cellHeight: CGFloat = 88
-        static let cellInset: CGFloat = 16
+        static let textViewHeight: CGFloat = 88
+        static let textViewInset: CGFloat = 16
     }
     
     // MARK: Properties
@@ -660,7 +642,7 @@ fileprivate class URLInputTableViewCell: UITableViewCell {
         textview = UITextView(frame: CGRect(x: 0, y: 0, width: contentView.frame.width, height: contentView.frame.height)).then {
             $0.text = "https://"
             $0.backgroundColor = .clear
-            $0.font = UIFont.systemFont(ofSize: UX.cellInset)
+            $0.font = UIFont.preferredFont(forTextStyle: .body)
             $0.autocapitalizationType = .none
             $0.autocorrectionType = .no
             $0.spellCheckingType = .no
@@ -670,22 +652,21 @@ fileprivate class URLInputTableViewCell: UITableViewCell {
         contentView.addSubview(textview)
         
         textview.snp.makeConstraints({ make in
-            make.leading.trailing.equalToSuperview().inset(UX.cellInset)
+            make.leading.trailing.equalToSuperview().inset(UX.textViewInset)
             make.bottom.top.equalToSuperview()
-            make.height.equalTo(UX.cellHeight)
+            make.height.equalTo(UX.textViewHeight)
         })
     }
 }
 
 // MARK: TitleInputTableViewCell
 
-fileprivate class TitleInputTableViewCell: UITableViewCell {
+fileprivate class TitleInputTableViewCell: UITableViewCell, TableViewReusable {
 
     // MARK: UX
     
     struct UX {
-        static let cellHeight: CGFloat = 44
-        static let cellInset: CGFloat = 16
+        static let textFieldInset: CGFloat = 16
     }
     
     // MARK: Properties
@@ -718,9 +699,8 @@ fileprivate class TitleInputTableViewCell: UITableViewCell {
         contentView.addSubview(textfield)
         
         textfield.snp.makeConstraints({ make in
-            make.leading.trailing.equalToSuperview().inset(UX.cellInset)
-            make.bottom.top.equalToSuperview()
-            make.height.equalTo(UX.cellHeight)
+            make.leading.trailing.equalToSuperview().inset(UX.textFieldInset)
+            make.bottom.top.equalToSuperview().inset(UX.textFieldInset)
         })
     }
 }

@@ -25,7 +25,6 @@ class SearchQuickEnginesViewController: UITableViewController {
     // MARK: Constants
     
     struct Constants {
-        static let sectionHeaderIdentifier = "sectionHeaderIdentifier"
         static let quickSearchEngineRowIdentifier = "quickSearchEngineRowIdentifier"
     }
     
@@ -51,7 +50,7 @@ class SearchQuickEnginesViewController: UITableViewController {
 
         tableView.do {
             $0.isEditing = true
-            $0.register(SettingsTableSectionHeaderFooterView.self, forHeaderFooterViewReuseIdentifier: Constants.sectionHeaderIdentifier)
+            $0.registerHeaderFooter(SettingsTableSectionHeaderFooterView.self)
             $0.register(UITableViewCell.self, forCellReuseIdentifier: Constants.quickSearchEngineRowIdentifier)
         }
 
@@ -72,12 +71,9 @@ class SearchQuickEnginesViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        guard let headerView =
-                tableView.dequeueReusableHeaderFooterView(withIdentifier: Constants.sectionHeaderIdentifier) as? SettingsTableSectionHeaderFooterView else {
-            return UITableViewHeaderFooterView()
-        }
-                
+        let headerView = tableView.dequeueReusableHeaderFooter() as SettingsTableSectionHeaderFooterView
         headerView.titleLabel.text = Strings.quickSearchEngines
+        
         return headerView
     }
 

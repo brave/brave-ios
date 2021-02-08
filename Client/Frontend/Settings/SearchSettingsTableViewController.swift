@@ -31,7 +31,6 @@ class SearchSettingsTableViewController: UITableViewController {
     // MARK: Constants
     
     struct Constants {
-        static let sectionHeaderIdentifier = "sectionHeaderIdentifier"
         static let addCustomEngineRowIdentifier = "addCustomEngineRowIdentifier"
         static let searchEngineRowIdentifier = "searchEngineRowIdentifier"
         static let showSearchSuggestionsRowIdentifier = "showSearchSuggestionsRowIdentifier"
@@ -94,7 +93,7 @@ class SearchSettingsTableViewController: UITableViewController {
 
         tableView.do {
             $0.allowsSelectionDuringEditing = true
-            $0.register(SettingsTableSectionHeaderFooterView.self, forHeaderFooterViewReuseIdentifier: Constants.sectionHeaderIdentifier)
+            $0.registerHeaderFooter(SettingsTableSectionHeaderFooterView.self)
             $0.register(UITableViewCell.self, forCellReuseIdentifier: Constants.addCustomEngineRowIdentifier)
             $0.register(UITableViewCell.self, forCellReuseIdentifier: Constants.searchEngineRowIdentifier)
             $0.register(UITableViewCell.self, forCellReuseIdentifier: Constants.showSearchSuggestionsRowIdentifier)
@@ -238,10 +237,7 @@ class SearchSettingsTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        guard let headerView =
-                tableView.dequeueReusableHeaderFooterView(withIdentifier: Constants.sectionHeaderIdentifier) as? SettingsTableSectionHeaderFooterView else {
-            return UITableViewHeaderFooterView()
-        }
+        let headerView = tableView.dequeueReusableHeaderFooter() as SettingsTableSectionHeaderFooterView
         
         let sectionTitle = section == Section.current.rawValue ?
             Strings.currentlyUsedSearchEngines : Strings.customSearchEngines
