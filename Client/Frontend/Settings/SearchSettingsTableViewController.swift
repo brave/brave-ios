@@ -72,9 +72,7 @@ class SearchSettingsTableViewController: UITableViewController {
     }
     
     private var customSearchEngines: [OpenSearchEngine] {
-        get {
-            return searchEngines.quickSearchEngines.filter { $0.isCustomEngine }
-        }
+        searchEngines.quickSearchEngines.filter { $0.isCustomEngine }
     }
     
     // MARK: Lifecycle

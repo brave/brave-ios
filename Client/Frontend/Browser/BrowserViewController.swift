@@ -68,12 +68,10 @@ class BrowserViewController: UIViewController {
     // Custom Search Engine
     var openSearchEngine: OpenSearchReference?
 
-    lazy var customSearchEngineButton: OpenSearchEngineButton = {
-        let searchButton = OpenSearchEngineButton(hidesWhenDisabled: false)
-        searchButton.addTarget(self, action: #selector(addCustomSearchEngineForFocusedElement), for: .touchUpInside)
-        searchButton.accessibilityIdentifier = "BrowserViewController.customSearchEngineButton"
-        return searchButton
-    }()
+    lazy var customSearchEngineButton = OpenSearchEngineButton(hidesWhenDisabled: false).then {
+        $0.addTarget(self, action: #selector(addCustomSearchEngineForFocusedElement), for: .touchUpInside)
+        $0.accessibilityIdentifier = "BrowserViewController.customSearchEngineButton"
+    }
     var customSearchBarButton: UIBarButtonItem?
 
     // popover rotation handling
