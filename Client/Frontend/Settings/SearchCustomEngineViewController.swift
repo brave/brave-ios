@@ -113,8 +113,6 @@ class SearchCustomEngineViewController: UIViewController {
             $0.dataSource = self
             $0.delegate = self
         }
-        
-        navigationItem.leftBarButtonItem = UIBarButtonItem(title: Strings.cancelButtonTitle, style: .plain, target: self, action: #selector(cancel))
     }
     
     private func doLayout() {

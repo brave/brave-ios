@@ -122,7 +122,7 @@ class SearchSettingsTableViewController: UITableViewController {
     // MARK: Internal
     
     private func configureSearchEnginePicker(_ type: DefaultEngineType) -> SearchEnginePicker {
-        return SearchEnginePicker(type: type).then {
+        return SearchEnginePicker(type: type, showCancel: false).then {
             // Order alphabetically, so that picker is always consistently ordered.
             // Every engine is a valid choice for the default engine, even the current default engine.
             $0.engines = searchPickerEngines
