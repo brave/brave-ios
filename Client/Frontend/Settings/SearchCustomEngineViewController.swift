@@ -79,6 +79,8 @@ class SearchCustomEngineViewController: UIViewController {
     
     private var tableView = UITableView(frame: .zero, style: .grouped)
     
+    private var searchEngineTimer: Timer?
+
     // MARK: Lifecycle
     
     init(profile: Profile) {
@@ -490,10 +492,25 @@ extension SearchCustomEngineViewController: UITextViewDelegate {
     
     func textViewDidChange(_ textView: UITextView) {
         changeAddButton(for: .disabled)
-        
         urlText = textView.text
 
-        if let text = textView.text?.trimmingCharacters(in: .whitespacesAndNewlines),
+        if searchEngineTimer != nil {
+            searchEngineTimer?.invalidate()
+            searchEngineTimer = nil
+        }
+        
+        // Reschedule the search engine fetch: in 0.25 second, call the setupHost method on the new textview content
+        searchEngineTimer =
+            Timer.scheduledTimer(timeInterval: 0.25, target: self, selector: #selector(setupHost), userInfo: nil, repeats: false)
+    }
+
+    func textViewDidEndEditing(_ textView: UITextView) {
+        urlText = textView.text
+    }
+    
+    @objc
+    private func setupHost() {
+        if let text = urlText?.trimmingCharacters(in: .whitespacesAndNewlines),
            let encodedText = text.addingPercentEncoding(withAllowedCharacters: .urlFragmentAllowed),
            let url = URL(string: encodedText),
            url.host != nil,
@@ -502,10 +519,6 @@ extension SearchCustomEngineViewController: UITextViewDelegate {
                 self.host = URL(string: "\(scheme)://\(host)")
             }
         }
-    }
-
-    func textViewDidEndEditing(_ textView: UITextView) {
-        urlText = textView.text
     }
 }
 
