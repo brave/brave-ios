@@ -30,26 +30,9 @@ extension BrowserViewController {
     /// Adding Toolbar button over the keyboard for adding Open Search Engine
     /// - Parameter webView: webview triggered open seach engine
     func evaluateWebsiteSupportOpenSearchEngine(_ webView: WKWebView) {
-        let script = """
-                        var link = document.querySelector("link[type='application/opensearchdescription+xml']")
-                        var dict = {
-                            href : link.getAttribute("href"),
-                            title : link.getAttribute("title")
-                        };
-                        JSON.stringify(dict)
-                     """
-        
-        webView.evaluateSafeJavaScript(functionName: script, asFunction: false) { (result, _) in
-            guard let htmlStr = result as? String,
-                  let data: Data = htmlStr.data(using: .utf8) else { return }
-                        
-            do {
-                let openSearchReference = try JSONDecoder().decode(OpenSearchReference.self, from: data)
-                self.updateAddOpenSearchEngine(webView, referenceObject: openSearchReference)
-            } catch {
-                log.error(error.localizedDescription)
-            }
-
+        if let openSearchMetaData = tabManager.selectedTab?.pageMetadata?.search {
+            updateAddOpenSearchEngine(
+                webView, referenceObject: OpenSearchReference(reference: openSearchMetaData.href, title: openSearchMetaData.title))
         }
     }
     
