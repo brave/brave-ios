@@ -213,11 +213,17 @@ extension SearchCustomEngineViewController: UITableViewDelegate, UITableViewData
         switch indexPath.section {
             case Section.url.rawValue:
                 let cell = tableView.dequeueReusableCell(for: indexPath) as URLInputTableViewCell
-                cell.delegate = self
+                cell.do {
+                    $0.delegate = self
+                    $0.selectionStyle = .none
+                }
                 return cell
             default:
                 let cell = tableView.dequeueReusableCell(for: indexPath) as TitleInputTableViewCell
-                cell.delegate = self
+                cell.do {
+                    $0.delegate = self
+                    $0.selectionStyle = .none
+                }
                 return cell
         }
     }
@@ -619,7 +625,7 @@ fileprivate class SearchEngineTableViewHeader: UITableViewHeaderFooterView, Tabl
 
 // MARK: URLInputTableViewCell
 
-fileprivate class URLInputTableViewCell: UITableViewCell, TableViewReusable {
+fileprivate class URLInputTableViewCell: UITableViewCell, TableViewReusable, Themeable {
 
     // MARK: UX
     
@@ -643,6 +649,7 @@ fileprivate class URLInputTableViewCell: UITableViewCell, TableViewReusable {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
         setup()
+        applyTheme(Theme.of(nil))
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -669,6 +676,10 @@ fileprivate class URLInputTableViewCell: UITableViewCell, TableViewReusable {
             make.bottom.top.equalToSuperview()
             make.height.equalTo(UX.textViewHeight)
         })
+    }
+    
+    func applyTheme(_ theme: Theme) {
+        textview.appearanceTextColor = theme.isDark ? .white : .black
     }
 }
 
