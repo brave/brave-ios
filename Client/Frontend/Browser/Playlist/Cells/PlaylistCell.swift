@@ -5,11 +5,15 @@
 
 import Foundation
 import UIKit
+import SDWebImage
+import AVFoundation
 
 class PlaylistCell: UITableViewCell {
     let indicatorIcon = UIImageView().then {
         $0.contentMode = .scaleAspectFit
     }
+    
+    private var favIconFetcher: FaviconFetcher?
     
     private let thumbnailMaskView = CAShapeLayer().then {
         $0.fillColor = UIColor.white.cgColor
@@ -24,6 +28,7 @@ class PlaylistCell: UITableViewCell {
     var thumbnailImage: UIImage? {
         didSet {
             self.thumbnailView.image = thumbnailImage
+            self.thumbnailView.backgroundColor = thumbnailImage == nil ? .black : .clear
             self.setNeedsLayout()
             self.layoutIfNeeded()
             self.updateThumbnail()
@@ -149,6 +154,63 @@ class PlaylistCell: UITableViewCell {
         set (newValue) {
             _ = newValue
             super.separatorInset = UIEdgeInsets(top: 0, left: self.titleLabel.frame.origin.x, bottom: 0, right: 0)
+        }
+    }
+    
+    func loadThumbnail(item: PlaylistInfo) {
+        guard let url = URL(string: item.src) else { return }
+        
+        let request = URLRequest(url: url)
+        let cache = URLCache.shared
+        let imageCache = SDImageCache.shared
+        self.thumbnailView.backgroundColor = nil
+
+        if let cachedImage = imageCache.imageFromCache(forKey: url.absoluteString) {
+            self.thumbnailImage = cachedImage
+            return
+        }
+
+        if let cachedResponse = cache.cachedResponse(for: request), let cachedImage = UIImage(data: cachedResponse.data) {
+            self.thumbnailImage = cachedImage
+            return
+        }
+
+        let asset = AVAsset(url: url)
+        let imageGenerator = AVAssetImageGenerator(asset: asset)
+        imageGenerator.appliesPreferredTrackTransform = false
+
+        let time = CMTimeMake(value: 0, timescale: 600)
+
+        imageGenerator.generateCGImagesAsynchronously(forTimes: [NSValue(time: time)]) { [weak self] _, cgImage, _, result, error in
+            guard let self = self else {
+                return
+            }
+            
+            if result == .succeeded, let cgImage = cgImage {
+                let image = UIImage(cgImage: cgImage)
+                if let data = image.pngData(),
+                   let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil) {
+                    let cachedResponse = CachedURLResponse(response: response, data: data)
+                    cache.storeCachedResponse(cachedResponse, for: request)
+                    imageCache.store(image, forKey: url.absoluteString, completion: nil)
+                }
+                
+                DispatchQueue.main.async {
+                    self.thumbnailImage = image
+                }
+            } else {
+                guard let url = URL(string: item.pageSrc) else { return }
+                
+                DispatchQueue.main.async {
+                    self.favIconFetcher = FaviconFetcher(siteURL: url, kind: .largeIcon)
+                    self.favIconFetcher?.load { [weak self] url, attributes in
+                        guard let self = self else { return }
+                        self.favIconFetcher = nil
+                        self.thumbnailImage = attributes.image
+                        self.thumbnailView.backgroundColor = attributes.backgroundColor
+                    }
+                }
+            }
         }
     }
 }

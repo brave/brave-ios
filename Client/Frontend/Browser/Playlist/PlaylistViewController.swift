@@ -211,7 +211,7 @@ extension PlaylistViewController: UITableViewDataSource {
             $0.detailLabel.text = formatter.string(from: TimeInterval(item.duration)) ?? "0:00"
             $0.contentView.backgroundColor = .clear
             $0.backgroundColor = .clear
-            $0.thumbnailImage = #imageLiteral(resourceName: "menu-NoImageMode")
+            $0.thumbnailImage = nil
         }
         
         let cacheState = PlaylistManager.shared.state(for: item.pageSrc)
@@ -221,11 +221,7 @@ extension PlaylistViewController: UITableViewDataSource {
             cell.detailLabel.text = "\(formatter.string(from: TimeInterval(item.duration)) ?? "0:00") - \(Strings.PlayList.dowloadedLabelTitle)"
         }
         
-        if let url = URL(string: item.src) {
-            previewImageFromVideo(url: url) {
-                cell.thumbnailImage = $0
-            }
-        }
+        cell.loadThumbnail(item: item)
         
         if indexPath.row == currentlyPlayingItemIndex {
             cell.indicatorIcon.image = #imageLiteral(resourceName: "playlist_currentitem_indicator")
@@ -240,49 +236,6 @@ extension PlaylistViewController: UITableViewDataSource {
         headerView.backgroundColor = UIColor.clear
         
         return headerView
-    }
-    
-    private func previewImageFromVideo(url: URL, _ completion: @escaping (UIImage?) -> Void) {
-        let request = URLRequest(url: url)
-        let cache = URLCache.shared
-        let imageCache = SDImageCache.shared
-
-        if let cachedImage = imageCache.imageFromCache(forKey: url.absoluteString) {
-            completion(cachedImage)
-            return
-        }
-
-        if let cachedResponse = cache.cachedResponse(for: request), let image = UIImage(data: cachedResponse.data) {
-            completion(image)
-            return
-        }
-
-        let asset = AVAsset(url: url)
-        let imageGenerator = AVAssetImageGenerator(asset: asset)
-        imageGenerator.appliesPreferredTrackTransform = false
-
-        let time = CMTimeMake(value: 0, timescale: 600)
-
-        imageGenerator.generateCGImagesAsynchronously(forTimes: [NSValue(time: time)]) { _, cgImage, _, result, error in
-            if result == .succeeded, let cgImage = cgImage {
-                let image = UIImage(cgImage: cgImage)
-                if let data = image.pngData(),
-                   let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil) {
-                    let cachedResponse = CachedURLResponse(response: response, data: data)
-                    cache.storeCachedResponse(cachedResponse, for: request)
-                    imageCache.store(image, forKey: url.absoluteString, completion: nil)
-                }
-                
-                DispatchQueue.main.async {
-                    completion(image)
-                }
-            } else {
-                log.error(error)
-                DispatchQueue.main.async {
-                    completion(nil)
-                }
-            }
-        }
     }
 }
 
@@ -333,9 +286,11 @@ extension PlaylistViewController: UITableViewDelegate {
             completionHandler(true)
         })
 
-        cacheAction.image = cacheState == .invalid ? #imageLiteral(resourceName: "menu-downloads") : #imageLiteral(resourceName: "action_remove")
-        cacheAction.backgroundColor = .white
-        deleteAction.backgroundColor = #colorLiteral(red: 0.812063769, green: 0.04556301224, blue: 0, alpha: 1)
+        cacheAction.image = cacheState == .invalid ? #imageLiteral(resourceName: "playlist_download") : #imageLiteral(resourceName: "playlist_delete_download")
+        cacheAction.backgroundColor = #colorLiteral(red: 0.4509803922, green: 0.4784313725, blue: 0.8705882353, alpha: 1)
+        
+        deleteAction.image = #imageLiteral(resourceName: "playlist_delete_item")
+        deleteAction.backgroundColor = #colorLiteral(red: 0.9176470588, green: 0.2274509804, blue: 0.05098039216, alpha: 1)
         
         return UISwipeActionsConfiguration(actions: [deleteAction, cacheAction])
     }
@@ -360,13 +315,19 @@ extension PlaylistViewController: UITableViewDelegate {
                 case .expired:
                     (tableView.cellForRow(at: indexPath) as? PlaylistCell)?.detailLabel.text = Strings.PlayList.expiredLabelTitle
                     
-                case .none:
-                    if let url = URL(string: item.src) {
-                        self.previewImageFromVideo(url: url) { image in
-                            (tableView.cellForRow(at: indexPath) as? PlaylistCell)?.thumbnailImage = image
-                            tableView.reloadRows(at: [indexPath], with: .automatic)
+                    let alert = UIAlertController(title: Strings.PlayList.expiredLabelTitle, message: Strings.PlayList.expiredAlertTitle, preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: { _ in
+                        
+                        if let url = URL(string: item.pageSrc) {
+                            self.dismiss(animated: true, completion: nil)
+                            (UIApplication.shared.delegate as? AppDelegate)?.browserViewController.openURLInNewTab(url, isPrivileged: false)
                         }
-                    }
+                    }))
+                    alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil))
+                    self.present(alert, animated: true, completion: nil)
+                    
+                case .none:
+                    (tableView.cellForRow(at: indexPath) as? PlaylistCell)?.loadThumbnail(item: item)
                 }
             }
         }
@@ -467,6 +428,9 @@ extension PlaylistViewController: AVPlayerViewControllerDelegate, AVPictureInPic
     
     func playerViewController(_ playerViewController: AVPlayerViewController, failedToStartPictureInPictureWithError error: Error) {
         
+        let alert = UIAlertController(title: Strings.PlayList.sorryAlertTitle, message: Strings.PlayList.pictureInPictureErrorTitle, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: nil))
+        self.present(alert, animated: true, completion: nil)
     }
     
     func playerViewController(_ playerViewController: AVPlayerViewController, restoreUserInterfaceForPictureInPictureStopWithCompletionHandler completionHandler: @escaping (Bool) -> Void) {
@@ -489,7 +453,9 @@ extension PlaylistViewController: AVPlayerViewControllerDelegate, AVPictureInPic
     
     func pictureInPictureController(_ pictureInPictureController: AVPictureInPictureController, failedToStartPictureInPictureWithError error: Error) {
         
-        
+        let alert = UIAlertController(title: Strings.PlayList.sorryAlertTitle, message: Strings.PlayList.pictureInPictureErrorTitle, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: nil))
+        self.present(alert, animated: true, completion: nil)
     }
     
     func pictureInPictureController(_ pictureInPictureController: AVPictureInPictureController, restoreUserInterfaceForPictureInPictureStopWithCompletionHandler completionHandler: @escaping (Bool) -> Void) {

@@ -5,10 +5,12 @@
 
 import Foundation
 import UIKit
+import BraveShared
+import Shared
 
 enum PlaylistToastState {
     case itemAdded
-    case itemUpdated
+    case itemExisting
     case itemPendingUserAction
 }
 
@@ -60,6 +62,66 @@ class PlaylistToast: Toast {
     }
 
     func createView(_ item: PlaylistInfo, _ state: PlaylistToastState) -> UIView {
+        if state == .itemAdded || state == .itemExisting {
+            let horizontalStackView = UIStackView().then {
+                $0.axis = .horizontal
+                $0.alignment = .center
+                $0.spacing = ButtonToastUX.toastPadding
+            }
+
+            let labelStackView = UIStackView().then {
+                $0.axis = .vertical
+                $0.alignment = .leading
+            }
+
+            let label = UILabel().then {
+                $0.textAlignment = .left
+                $0.appearanceTextColor = UIColor.Photon.white100
+                $0.font = ButtonToastUX.toastLabelFont
+                $0.lineBreakMode = .byWordWrapping
+                $0.numberOfLines = 0
+                
+                if state == .itemAdded {
+                    $0.text = Strings.PlayList.toastAddToPlaylistTitle
+                } else {
+                    $0.text = Strings.PlayList.toastExitingItemPlaylistTitle
+                }
+            }
+            
+            let button = HighlightableButton().then {
+                $0.layer.cornerRadius = ButtonToastUX.toastButtonBorderRadius
+                $0.layer.borderWidth = ButtonToastUX.toastButtonBorderWidth
+                $0.layer.borderColor = UIColor.Photon.white100.cgColor
+                $0.setTitle(Strings.PlayList.toastAddToPlaylistOpenButton, for: [])
+                $0.setTitleColor(toastView.backgroundColor, for: .highlighted)
+                $0.titleLabel?.font = SimpleToastUX.toastFont
+                $0.titleLabel?.numberOfLines = 1
+                $0.titleLabel?.lineBreakMode = .byClipping
+                $0.titleLabel?.adjustsFontSizeToFitWidth = true
+                $0.titleLabel?.minimumScaleFactor = 0.1
+                
+                $0.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(buttonPressed)))
+            }
+
+            button.snp.makeConstraints { (make) in
+                make.width.equalTo(button.titleLabel!.intrinsicContentSize.width + 2 * ButtonToastUX.toastButtonPadding)
+            }
+
+            labelStackView.addArrangedSubview(label)
+            horizontalStackView.addArrangedSubview(labelStackView)
+            horizontalStackView.addArrangedSubview(button)
+
+            toastView.addSubview(horizontalStackView)
+
+            horizontalStackView.snp.makeConstraints { make in
+                make.centerX.equalTo(toastView)
+                make.centerY.equalTo(toastView)
+                make.width.equalTo(toastView.snp.width).offset(-2 * ButtonToastUX.toastPadding)
+            }
+
+            return toastView
+        }
+        
         let horizontalStackView = UIStackView().then {
             $0.axis = .horizontal
             $0.alignment = .center
@@ -97,27 +159,12 @@ class PlaylistToast: Toast {
             make.width.equalTo(toastView.snp.width).offset(-2 * ButtonToastUX.toastPadding)
         }
         
-        switch state {
-        case .itemPendingUserAction:
+        if state == .itemPendingUserAction {
             button.setImage(#imageLiteral(resourceName: "quick_action_new_tab").template, for: [])
-            button.setTitle("Add to Playlist", for: [])
+            button.setTitle(Strings.PlayList.toastAddToPlaylistTitle, for: [])
             toastView.backgroundColor = .clear
-        case .itemAdded:
-            button.do {
-                $0.setTitle("Added to Playlist", for: [])
-                $0.contentEdgeInsets = .zero
-                $0.titleEdgeInsets = .zero
-                $0.isUserInteractionEnabled = false
-            }
-            toastView.backgroundColor = DownloadToastUX.toastBackgroundColor
-        case .itemUpdated:
-            button.do {
-                $0.setTitle("Updated Playlist", for: [])
-                $0.contentEdgeInsets = .zero
-                $0.titleEdgeInsets = .zero
-                $0.isUserInteractionEnabled = false
-            }
-            toastView.backgroundColor = DownloadToastUX.toastBackgroundColor
+        } else {
+            fatalError("Should Never get here. Others case are handled at the start of this function.")
         }
 
         return toastView

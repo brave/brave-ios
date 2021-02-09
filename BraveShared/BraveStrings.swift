@@ -1152,6 +1152,41 @@ extension Strings {
                               value: "Expired",
                               comment: "Text indicator on the table cell If a video is expired")
         
+        public static let expiredAlertTitle =
+            NSLocalizedString("playList.expiredAlertTitle",
+                              bundle: .braveShared,
+                              value: "This item had a time limit and is now expired. Would you like to open the item in a new page?",
+                              comment: "The title for the alert that shows up when an item is expired")
+        
+        public static let pictureInPictureErrorTitle =
+            NSLocalizedString("playList.pictureInPictureErrorTitle",
+                              bundle: .braveShared,
+                              value: "Sorry, an error occurred while attempting to display picture-in-picture.",
+                              comment: "The title for the alert that shows up when an item is expired")
+        
+        public static let toastAddToPlaylistTitle =
+            NSLocalizedString("playList.toastAddToPlaylist",
+                              bundle: .braveShared,
+                              value: "Add to Playlist",
+                              comment: "The title for the toast that shows up on a page containing a playlist item")
+        
+        public static let toastAddedToPlaylistTitle =
+            NSLocalizedString("playList.toastAddedToPlaylistTitle",
+                              bundle: .braveShared,
+                              value: "Added to Playlist",
+                              comment: "The title for the toast that shows up on a page containing a playlist item that was added to playlist")
+        
+        public static let toastAddToPlaylistOpenButton =
+            NSLocalizedString("playList.toastAddToPlaylistOpenButton",
+                              bundle: .braveShared,
+                              value: "Open",
+                              comment: "The title for the toast button when an item was added to playlist")
+        
+        public static let toastExitingItemPlaylistTitle =
+            NSLocalizedString("playList.toastExitingItemPlaylistTitle",
+                              bundle: .braveShared,
+                              value: "View in Playlist",
+                              comment: "The title for the toast that shows up on a page when an item that has already been added, was updated.")
     }
 }
 

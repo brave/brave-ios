@@ -7,6 +7,7 @@ import Foundation
 import AVFoundation
 import WebKit
 import MobileCoreServices
+import YubiKit
 
 public class PlaylistMimeTypeDetector {
     private(set) var mimeType: String = ""
@@ -138,14 +139,21 @@ class PlaylistWebLoader: UIView, WKNavigationDelegate {
             isPaymentRequestEnabled: false)
     }
     
-    private var handler: (PlaylistInfo?) -> Void
+    private var handler: (PlaylistInfo?) -> Void = { _ in }
+    private var handlerDidExecute = false
     
     init(handler: @escaping (PlaylistInfo?) -> Void) {
-        self.handler = handler
         super.init(frame: .zero)
 
         guard let webView = tab.webView else {
+            handlerDidExecute = true
+            handler(nil)
             return
+        }
+        
+        self.handler = { [weak self] in
+            self?.handlerDidExecute = true
+            handler($0)
         }
         
         self.addSubview(webView)
@@ -155,24 +163,27 @@ class PlaylistWebLoader: UIView, WKNavigationDelegate {
         
         webView.navigationDelegate = self
         
+        tab.addContentScript(ReaderMode(tab: tab), name: ReaderMode.name(), sandboxed: false)
         tab.addContentScript(ContextMenuHelper(tab: tab), name: ContextMenuHelper.name())
-        tab.addContentScript(ErrorPageHelper(), name: ErrorPageHelper.name())
+        tab.addContentScript(ErrorPageHelper(), name: ErrorPageHelper.name(), sandboxed: false)
         tab.addContentScript(SessionRestoreHelper(tab: tab), name: SessionRestoreHelper.name())
-        tab.addContentScript(FindInPageHelper(tab: tab), name: FindInPageHelper.name())
+        tab.addContentScript(FindInPageHelper(tab: tab), name: FindInPageHelper.name(), sandboxed: false)
         tab.addContentScript(NoImageModeHelper(tab: tab), name: NoImageModeHelper.name())
         tab.addContentScript(PrintHelper(tab: tab), name: PrintHelper.name())
         tab.addContentScript(CustomSearchHelper(tab: tab), name: CustomSearchHelper.name())
-        tab.addContentScript(LocalRequestHelper(), name: LocalRequestHelper.name())
+        tab.addContentScript(LocalRequestHelper(), name: LocalRequestHelper.name(), sandboxed: false)
         tab.contentBlocker.setupTabTrackingProtection()
-        tab.addContentScript(tab.contentBlocker, name: ContentBlockerHelper.name())
+        tab.addContentScript(tab.contentBlocker, name: ContentBlockerHelper.name(), sandboxed: false)
         tab.addContentScript(FocusHelper(tab: tab), name: FocusHelper.name())
-        tab.addContentScript(FingerprintingProtection(tab: tab), name: FingerprintingProtection.name())
+        tab.addContentScript(FingerprintingProtection(tab: tab), name: FingerprintingProtection.name(), sandboxed: false)
         tab.addContentScript(BraveGetUA(tab: tab), name: BraveGetUA.name())
-        tab.addContentScript(U2FExtensions(tab: tab), name: U2FExtensions.name())
-        tab.addContentScript(ResourceDownloadManager(tab: tab), name: ResourceDownloadManager.name())
-        tab.addContentScript(WindowRenderHelperScript(tab: tab), name: WindowRenderHelperScript.name())
-        tab.addContentScript(PlaylistHelper(tab: tab), name: PlaylistHelper.name())
-        tab.addContentScript(PlaylistWebLoaderContentHelper(self), name: PlaylistWebLoaderContentHelper.name())
+        if YubiKitDeviceCapabilities.supportsMFIAccessoryKey {
+            tab.addContentScript(U2FExtensions(tab: tab), name: U2FExtensions.name(), sandboxed: false)
+        }
+        tab.addContentScript(ResourceDownloadManager(tab: tab), name: ResourceDownloadManager.name(), sandboxed: false)
+        tab.addContentScript(WindowRenderHelperScript(tab: tab), name: WindowRenderHelperScript.name(), sandboxed: false)
+        tab.addContentScript(PlaylistHelper(tab: tab), name: PlaylistHelper.name(), sandboxed: false)
+        tab.addContentScript(PlaylistWebLoaderContentHelper(self), name: PlaylistWebLoaderContentHelper.name(), sandboxed: false)
         
         let script: WKUserScript? = {
             guard let path = Bundle.main.path(forResource: "PlaylistDetector", ofType: "js"), let source = try? String(contentsOfFile: path) else {
@@ -189,10 +200,6 @@ class PlaylistWebLoader: UIView, WKNavigationDelegate {
         if let script = script {
             tab.webView?.configuration.userContentController.addUserScript(script)
         }
-    }
-    
-    deinit {
-        print("DIED")
     }
     
     required init?(coder: NSCoder) {
@@ -212,12 +219,19 @@ class PlaylistWebLoader: UIView, WKNavigationDelegate {
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         clearData()
+        
+        //Fail safe for if a script fails or web-view somehow fails to load,
+        //Then we have a timeout where it will notify the playlist that an error occurred
+        //This happens when the WebView is already finished loading anyway!
+        DispatchQueue.main.async {
+            if !self.handlerDidExecute {
+                self.handler(nil)
+            }
+        }
     }
     
     private func clearData() {
-        DispatchQueue.main.async { [weak self] in
-            //self?.tab.deleteWebView()
-        }
+
     }
     
     private class PlaylistWebLoaderContentHelper: TabContentScript {
@@ -236,7 +250,8 @@ class PlaylistWebLoader: UIView, WKNavigationDelegate {
         }
         
         func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage) {
-            guard let item = PlaylistInfo.from(message: message) else {
+            guard let item = PlaylistInfo.from(message: message),
+                  item.detected else {
                 webLoader?.handler(nil)
                 return
             }

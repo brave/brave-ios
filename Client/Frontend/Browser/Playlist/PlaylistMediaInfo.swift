@@ -15,6 +15,7 @@ class PlaylistMediaInfo: NSObject {
     private weak var playerView: VideoView?
     private var webLoader = PlaylistWebLoader(handler: { _ in })
     private var streamLoader = MediaResourceManager({ _ in })
+    private var playerStatusObserver: StreamObserver?
     public var nowPlayingInfo: PlaylistInfo? {
         didSet {
             self.updateNowPlayingMediaInfo()
@@ -148,6 +149,8 @@ extension PlaylistMediaInfo: MPPlayableContentDelegate {
     
     public func loadMediaItem(_ item: PlaylistInfo, index: Int, completion: @escaping (MediaPlaybackError) -> Void) {
         self.nowPlayingInfo = item
+        self.playerStatusObserver = nil
+        self.playerView?.stop()
         let cacheState = PlaylistManager.shared.state(for: item.pageSrc)
 
         if cacheState == .invalid {
@@ -159,7 +162,22 @@ extension PlaylistMediaInfo: MPPlayableContentDelegate {
                     if canStream {
                         self.playerView?.seek(to: 0.0)
                         self.playerView?.load(url: url, resourceDelegate: nil)
-                        completion(.none)
+                        
+                        if let player = self.playerView?.player {
+                            self.playerStatusObserver = StreamObserver(player: player, onStatusChanged: { status in
+                                self.playerStatusObserver = nil
+
+                                DispatchQueue.main.async {
+                                    if status == .failed {
+                                        completion(.expired)
+                                    } else {
+                                        completion(.none)
+                                    }
+                                }
+                            })
+                        } else {
+                            completion(.expired)
+                        }
                     } else {
                         //Stream failed so fallback to the webview
                         //It's possible the URL expired..
@@ -210,6 +228,61 @@ extension PlaylistMediaInfo: MPPlayableContentDelegate {
             let asset = PlaylistManager.shared.assetAtIndex(index)
             self.playerView?.load(asset: asset)
             completion(.none)
+        }
+    }
+    
+    private class StreamObserver: NSObject {
+        private var context = 0
+        private weak var player: AVPlayer?
+        private var item: AVPlayerItem?
+        private var onStatusChanged: (AVPlayerItem.Status) -> Void
+        
+        init(player: AVPlayer, onStatusChanged: @escaping (AVPlayerItem.Status) -> Void) {
+            self.onStatusChanged = onStatusChanged
+            super.init()
+            
+            self.player = player
+            player.addObserver(self, forKeyPath: #keyPath(AVPlayer.currentItem), options: [.old, .new], context: nil)
+        }
+        
+        deinit {
+            item?.removeObserver(self, forKeyPath: #keyPath(AVPlayerItem.status), context: nil)
+            player?.removeObserver(self, forKeyPath: #keyPath(AVPlayer.currentItem))
+        }
+        
+        override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
+            
+            if keyPath == #keyPath(AVPlayer.currentItem),
+               let change = change {
+                
+                if let newItem = change[.newKey] as? AVPlayerItem {
+                    self.item = newItem
+                    newItem.addObserver(self, forKeyPath: #keyPath(AVPlayerItem.status), options: [.old, .new], context: nil)
+                }
+            }
+            
+            if keyPath == #keyPath(AVPlayerItem.status) {
+                let status: AVPlayerItem.Status
+                if let statusNumber = change?[.newKey] as? NSNumber {
+                    status = AVPlayerItem.Status(rawValue: statusNumber.intValue)!
+                } else {
+                    status = .unknown
+                }
+                
+                switch status {
+                case .readyToPlay:
+                    log.debug("Player Item Status: Ready")
+                    onStatusChanged(.readyToPlay)
+                case .failed:
+                    log.debug("Player Item Status: Failed")
+                    onStatusChanged(.failed)
+                case .unknown:
+                    log.debug("Player Item Status: Unknown")
+                    onStatusChanged(.unknown)
+                @unknown default:
+                    fatalError()
+                }
+            }
         }
     }
 }

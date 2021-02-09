@@ -102,4 +102,18 @@ extension PlaylistDetailsViewController: PlaylistVideoListViewControllerDelegate
     func playlistVideoListViewControllerDisplayResourceError(_ controller: PlaylistVideoListViewController) {
         displayLoadingResourceError()
     }
+    
+    func playlistVideoListViewControllerDisplayExpiredError(_ controller: PlaylistVideoListViewController, item: PlaylistInfo) {
+        
+        let alert = UIAlertController(title: Strings.PlayList.expiredLabelTitle, message: Strings.PlayList.expiredAlertTitle, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: { _ in
+            
+            if let url = URL(string: item.pageSrc) {
+                self.dismiss(animated: true, completion: nil)
+                (UIApplication.shared.delegate as? AppDelegate)?.browserViewController.openURLInNewTab(url, isPrivileged: false)
+            }
+        }))
+        alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil))
+        self.present(alert, animated: true, completion: nil)
+    }
 }
