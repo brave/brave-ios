@@ -222,9 +222,9 @@ window.__firefox__.includeOnce("Playlist", function() {
                 node.observer.observe(node, { attributes: true, attributeFilter: ["src"] });
                 notifyNode(node);
 
-//                node.addEventListener('loadedmetadata', function() {
-//                    notifyNode(node);
-//                });
+                node.addEventListener('loadedmetadata', function() {
+                    notifyNode(node);
+                });
             }
         }
 

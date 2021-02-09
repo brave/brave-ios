@@ -5,12 +5,12 @@
       "scale" : "1x"
     },
     {
-      "filename" : "playlist_menu@2x.png",
+      "filename" : "cloud-off@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "playlist_menu@3x.png",
+      "filename" : "cloud-off@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

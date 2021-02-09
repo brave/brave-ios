@@ -5,12 +5,12 @@
       "scale" : "1x"
     },
     {
-      "filename" : "playlist_menu@2x.png",
+      "filename" : "trash@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "playlist_menu@3x.png",
+      "filename" : "trash@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

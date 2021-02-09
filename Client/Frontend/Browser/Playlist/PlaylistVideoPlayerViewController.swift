@@ -27,6 +27,13 @@ protocol PlaylistVideoPlayerViewControllerDelegate: AnyObject {
 
 class PlaylistVideoPlayerViewController: UIViewController {
     
+    // MARK: Internal
+    
+    let playerView = VideoView()
+    var currentlyPlayingItemIndex = -1
+    lazy var mediaInfo = PlaylistMediaInfo(playerView: playerView)
+    weak var delegate: PlaylistVideoPlayerViewControllerDelegate?
+    
     // MARK: Lifecycle
     
     init() {
@@ -51,16 +58,6 @@ class PlaylistVideoPlayerViewController: UIViewController {
         
         performOrientationChanges()
     }
-    
-    // MARK: Internal
-    
-    let playerView = VideoView()
-        
-    var currentlyPlayingItemIndex = -1
-    
-    lazy var mediaInfo = PlaylistMediaInfo(playerView: playerView)
-    
-    weak var delegate: PlaylistVideoPlayerViewControllerDelegate?
     
     func changeVideoControls(isEnabled: Bool = true, isCurrentItem: Bool = false) {
         if isCurrentItem {
@@ -232,75 +229,59 @@ extension PlaylistVideoPlayerViewController: VideoViewDelegate {
         self.present(playerController, animated: true, completion: {
             playerController.player?.play()
         })
-        
-        if AVPictureInPictureController.isPictureInPictureSupported() {
-            print("SUPPORTED")
-        } else {
-            print("NOT SUPPORTED")
-        }
     }
 }
 
-// MARK: AVPlayerViewControllerDelegate 
+// MARK: AVPlayerViewControllerDelegate
 
-extension PlaylistVideoPlayerViewController: AVPlayerViewControllerDelegate {
-    
-    //TODO: When entering PIP, dismiss the current playlist controller.
-    //TODO: When exiting PIP, destroy the video player and its media info. Clear control centre, etc.
-    
+extension PlaylistVideoPlayerViewController: AVPlayerViewControllerDelegate, AVPictureInPictureControllerDelegate {
+
+    // MARK: - AVPlayerViewControllerDelegate
     func playerViewControllerWillStartPictureInPicture(_ playerViewController: AVPlayerViewController) {
+        (UIApplication.shared.delegate as? AppDelegate)?.playlistNavigationController = self.navigationController
         self.dismiss(animated: true, completion: nil)
-    }
-    
-    func playerViewControllerDidStartPictureInPicture(_ playerViewController: AVPlayerViewController) {
-        
     }
     
     func playerViewController(_ playerViewController: AVPlayerViewController, failedToStartPictureInPictureWithError error: Error) {
         
+        let alert = UIAlertController(title: Strings.PlayList.sorryAlertTitle, message: Strings.PlayList.pictureInPictureErrorTitle, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: nil))
+        self.present(alert, animated: true, completion: nil)
     }
     
-    func playerViewControllerWillStopPictureInPicture(_ playerViewController: AVPlayerViewController) {
+    func playerViewController(_ playerViewController: AVPlayerViewController, restoreUserInterfaceForPictureInPictureStopWithCompletionHandler completionHandler: @escaping (Bool) -> Void) {
         
-    }
-    
-    func playerViewControllerDidStopPictureInPicture(_ playerViewController: AVPlayerViewController) {
+        if let delegate = UIApplication.shared.delegate as? AppDelegate,
+           let navigationController = delegate.playlistNavigationController {
+            delegate.browserViewController.present(controller: navigationController)
+            delegate.playlistNavigationController = nil
+        }
         
+        completionHandler(true)
     }
     
-    func playerViewController(_ playerViewController: AVPlayerViewController,
-                              restoreUserInterfaceForPictureInPictureStopWithCompletionHandler completionHandler: @escaping (Bool) -> Void) {
-        
-    }
-    
-}
-
-// MARK: - AVPictureInPictureControllerDelegate
-
-extension PlaylistVideoPlayerViewController: AVPictureInPictureControllerDelegate {
-    
+    // MARK: - AVPictureInPictureControllerDelegate
     func pictureInPictureControllerWillStartPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
-        self.dismiss(animated: true, completion: nil)
-    }
-    
-    func pictureInPictureControllerDidStartPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
         
+        (UIApplication.shared.delegate as? AppDelegate)?.playlistNavigationController = self.navigationController
+        self.dismiss(animated: true, completion: nil)
     }
     
     func pictureInPictureController(_ pictureInPictureController: AVPictureInPictureController, failedToStartPictureInPictureWithError error: Error) {
         
+        let alert = UIAlertController(title: Strings.PlayList.sorryAlertTitle, message: Strings.PlayList.pictureInPictureErrorTitle, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: nil))
+        self.present(alert, animated: true, completion: nil)
     }
     
-    func pictureInPictureControllerWillStopPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
+    func pictureInPictureController(_ pictureInPictureController: AVPictureInPictureController, restoreUserInterfaceForPictureInPictureStopWithCompletionHandler completionHandler: @escaping (Bool) -> Void) {
         
-    }
-    
-    func pictureInPictureControllerDidStopPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
+        if let delegate = UIApplication.shared.delegate as? AppDelegate,
+           let navigationController = delegate.playlistNavigationController {
+            delegate.browserViewController.present(controller: navigationController)
+            delegate.playlistNavigationController = nil
+        }
         
-    }
-    
-    func pictureInPictureController(_ pictureInPictureController: AVPictureInPictureController,
-                                    restoreUserInterfaceForPictureInPictureStopWithCompletionHandler completionHandler: @escaping (Bool) -> Void) {
-        
+        completionHandler(true)
     }
 }
