@@ -176,6 +176,6 @@ class PlaylistToast: Toast {
     }
 
     @objc override func handleTap(_ gestureRecognizer: UIGestureRecognizer) {
-        // Intentional NOOP to override superclass behavior for dismissing the toast.
+        dismiss(false)
     }
 }
