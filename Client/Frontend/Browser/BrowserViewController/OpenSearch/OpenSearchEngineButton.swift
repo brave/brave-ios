@@ -24,27 +24,19 @@ class OpenSearchEngineButton: Button {
         didSet {
             switch action {
             case .disabled:
-                searchButton.isHidden = hidesWhenDisabled ? true : false
                 isLoading = false
-                searchButton.appearanceTintColor = UIColor.Photon.grey50
-                searchButton.appearanceTextColor = UIColor.Photon.grey50
-                searchButton.isUserInteractionEnabled = false
+                appearanceTintColor = UIColor.Photon.grey50
+                appearanceTextColor = UIColor.Photon.grey50
+                isUserInteractionEnabled = false
             case .enabled:
-                searchButton.isHidden = false
                 isLoading = false
-                searchButton.appearanceTintColor = BraveUX.braveOrange
-                searchButton.appearanceTextColor = BraveUX.braveOrange
-                searchButton.isUserInteractionEnabled = true
+                appearanceTintColor = BraveUX.braveOrange
+                appearanceTextColor = BraveUX.braveOrange
+                isUserInteractionEnabled = true
             case .loading:
                 isLoading = true
-                searchButton.isHidden = true
             }
         }
-    }
-    
-    private let searchButton = UIButton().then {
-        $0.setImage(#imageLiteral(resourceName: "AddSearch").template, for: [])
-        $0.titleLabel?.font = UIFont.preferredFont(forTextStyle: .body)
     }
     
     private var hidesWhenDisabled: Bool = false
@@ -62,7 +54,6 @@ class OpenSearchEngineButton: Button {
         self.hidesWhenDisabled = hidesWhenDisabled
         
         setTheme(with: title)
-        doLayout()
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -72,21 +63,16 @@ class OpenSearchEngineButton: Button {
     //MARK: Internal
     
     private func setTheme(with title: String?) {
+        setImage(#imageLiteral(resourceName: "AddSearch").template, for: [])
+        titleLabel?.font = UIFont.preferredFont(forTextStyle: .body)
+        
         if let title = title {
-            searchButton.setImage(nil, for: .normal)
-            searchButton.setTitle(title, for: .normal)
+            setImage(nil, for: .normal)
+            setTitle(title, for: .normal)
         }
         
         loaderView = LoaderView(size: .small).then {
             $0.tintColor = UIColor.Photon.grey50
-        }
-    }
-    
-    private func doLayout() {
-        addSubview(searchButton)
-        
-        searchButton.snp.makeConstraints {
-            $0.edges.equalToSuperview()
         }
     }
 }

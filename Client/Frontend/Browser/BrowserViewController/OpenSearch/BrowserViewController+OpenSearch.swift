@@ -61,7 +61,7 @@ extension BrowserViewController {
         // thus in case of yahoo.com the title is 'Yahoo Search' and Shortname is 'Yahoo'
         // Instead we are checking referenceURL match to determine searchEngine is added or not
         
-        let searchEngineExists = profile.searchEngines.orderedEngines.contains(where: {$0.referenceURL == referenceObject.reference})
+        let searchEngineExists = profile.searchEngines.orderedEngines.contains(where: { $0.referenceURL == referenceObject.reference })
 
         if searchEngineExists {
             self.customSearchEngineButton.action = .disabled
@@ -107,9 +107,9 @@ extension BrowserViewController {
     }
 
     @objc func addCustomSearchEngineForFocusedElement() {
-        guard var referenceURLString = openSearchEngine?.reference,
+        guard var reference = openSearchEngine?.reference,
               let title = openSearchEngine?.title,
-              var referenceURL = URL(string: referenceURLString) else {
+              var url = URL(string: reference) else {
             let alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
             present(alert, animated: true, completion: nil)
             return
@@ -121,20 +121,20 @@ extension BrowserViewController {
             return
         }
         
-        while referenceURLString.hasPrefix("/") {
-            referenceURLString.remove(at: referenceURLString.startIndex)
+        while reference.hasPrefix("/") {
+            reference.remove(at: reference.startIndex)
         }
         
-        let constructedReferenceURLString = "\(scheme)://\(host)/\(referenceURLString)"
+        let constructedReferenceURLString = "\(scheme)://\(host)/\(reference)"
 
-        if referenceURL.host == nil, let constructedReferenceURL = URL(string: constructedReferenceURLString) {
-            referenceURL = constructedReferenceURL
+        if url.host == nil, let constructedReferenceURL = URL(string: constructedReferenceURLString) {
+            url = constructedReferenceURL
         }
                     
-        downloadOpenSearchXML(referenceURL, title: title, iconURL: tabManager.selectedTab?.displayFavicon?.url)
+        downloadOpenSearchXML(url, reference: reference, title: title, iconURL: tabManager.selectedTab?.displayFavicon?.url)
     }
 
-    func downloadOpenSearchXML(_ url: URL, title: String, iconURL: String?) {
+    func downloadOpenSearchXML(_ url: URL, reference: String, title: String, iconURL: String?) {
         customSearchEngineButton.action = .loading
         
         var searchEngineIcon = #imageLiteral(resourceName: "defaultFavicon")
@@ -149,17 +149,17 @@ extension BrowserViewController {
                     searchEngineIcon = favIcon
                 }
                 
-                self?.createSearchEngine(url, icon: searchEngineIcon)
+                self?.createSearchEngine(url, reference: reference, icon: searchEngineIcon)
             })
         } else {
-            createSearchEngine(url, icon: searchEngineIcon)
+            createSearchEngine(url, reference: reference, icon: searchEngineIcon)
         }
     }
     
-    private func createSearchEngine(_ url: URL, icon: UIImage) {
+    private func createSearchEngine(_ url: URL, reference: String, icon: UIImage) {
         NetworkManager().downloadResource(with: url).uponQueue(.main) { [weak self] response in
             guard let openSearchEngine = OpenSearchParser(pluginMode: true).parse(
-                    response.data, referenceURL: url.absoluteString, image: icon, isCustomEngine: true) else {
+                    response.data, referenceURL: reference, image: icon, isCustomEngine: true) else {
                 return
             }
             
@@ -168,7 +168,11 @@ extension BrowserViewController {
     }
     
     private func addSearchEngine(_ engine: OpenSearchEngine) {
-        let alert = ThirdPartySearchAlerts.addThirdPartySearchEngine(engine) { alert in
+        let alert = ThirdPartySearchAlerts.addThirdPartySearchEngine(engine) { alertAction in
+            if alertAction.style == .cancel {
+                return
+            }
+            
             do {
                 try self.profile.searchEngines.addSearchEngine(engine)
                 
