@@ -1742,6 +1742,30 @@ extension Strings {
             value: "Add Source to Brave Today",
             comment: "The action title displayed in the iOS share menu"
         )
+        public static let addSourceFailureTitle = NSLocalizedString(
+            "today.addSourceFailureTitle",
+            bundle: .braveShared,
+            value: "Failed to Add Source",
+            comment: "The title in the alert when a source fails to add"
+        )
+        public static let addSourceNetworkFailureMessage = NSLocalizedString(
+            "today.addSourceNetworkFailureMessage",
+            bundle: .braveShared,
+            value: "Sorry, we couldn’t find that feed address.",
+            comment: ""
+        )
+        public static let addSourceInvalidDataMessage = NSLocalizedString(
+            "today.addSourceInvalidDataMessage",
+            bundle: .braveShared,
+            value: "Sorry, we couldn’t recognize that feed address.",
+            comment: ""
+        )
+        public static let addSourceNoFeedsFoundMessage = NSLocalizedString(
+            "today.addSourceNoFeedsFoundMessage",
+            bundle: .braveShared,
+            value: "Sorry, that feed address doesn’t have any content.",
+            comment: ""
+        )
     }
 }
 

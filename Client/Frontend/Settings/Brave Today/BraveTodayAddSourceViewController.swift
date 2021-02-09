@@ -71,8 +71,8 @@ class BraveTodayAddSourceViewController: UITableViewController {
         return URLSession(configuration: configuration, delegate: nil, delegateQueue: .main)
     }()
     
-    private func displayError() {
-        let alert = UIAlertController(title: "Failed to Add Source", message: "Brave could not find a feed at the url provided.", preferredStyle: .alert)
+    private func displayError(_ error: FindFeedsError) {
+        let alert = UIAlertController(title: Strings.BraveToday.addSourceFailureTitle, message: error.localizedDescription, preferredStyle: .alert)
         alert.addAction(.init(title: Strings.OKString, style: .default, handler: nil))
         present(alert, animated: true)
     }
@@ -83,9 +83,10 @@ class BraveTodayAddSourceViewController: UITableViewController {
             text.replaceSubrange(range, with: [])
         }
         guard let url = URIFixup.getURL(text) else { return }
-        downloadPageData(for: url) { [weak self] data in
+        downloadPageData(for: url) { [weak self] result in
             guard let self = self else { return }
-            if let data = data {
+            switch result {
+            case .success(let data):
                 let resultsController = BraveTodayAddSourceResultsViewController(
                     dataSource: self.feedDataSource,
                     searchedURL: url,
@@ -93,26 +94,53 @@ class BraveTodayAddSourceViewController: UITableViewController {
                     sourcesAdded: self.sourcesAdded
                 )
                 self.navigationController?.pushViewController(resultsController, animated: true)
-            } else {
-                self.displayError()
+            case .failure(let error):
+                self.displayError(error)
+            }
+        }
+    }
+    
+    private enum FindFeedsError: Error {
+        /// An error occured while attempting to download the page
+        case dataTaskError(Error)
+        /// The data was either not received or is in the incorrect format
+        case invalidData
+        /// The data downloaded did not match a
+        case parserError(ParserError)
+        /// No feeds were found at the given URL
+        case noFeedsFound
+        
+        var localizedDescription: String {
+            switch self {
+            case .dataTaskError(let error as URLError) where error.code == .notConnectedToInternet:
+                return error.localizedDescription
+            case .dataTaskError:
+                return Strings.BraveToday.addSourceNetworkFailureMessage
+            case .invalidData, .parserError:
+                return Strings.BraveToday.addSourceInvalidDataMessage
+            case .noFeedsFound:
+                return Strings.BraveToday.addSourceNoFeedsFoundMessage
             }
         }
     }
     
     private var pageTask: URLSessionDataTask?
-    private func downloadPageData(for url: URL, _ completion: @escaping ([RSSFeedLocation]?) -> Void) {
+    private func downloadPageData(for url: URL, _ completion: @escaping (Result<[RSSFeedLocation], FindFeedsError>) -> Void) {
         pageTask = session.dataTask(with: url) { [weak self] (data, response, error) in
             guard let self = self else { return }
             if let error = error as? URLError, error.code == .cancelled {
                 return
             }
-            guard let data = data, error == nil, let root = try? HTMLDocument(data: data) else {
-                completion(nil)
+            if let error = error {
+                completion(.failure(.dataTaskError(error)))
+                return
+            }
+            guard let data = data, let root = try? HTMLDocument(data: data) else {
+                completion(.failure(.invalidData))
                 return
             }
             let parser = FeedParser(data: data)
-            let result = parser.parse()
-            if case .success(let feed) = result {
+            if case .success(let feed) = parser.parse() {
                 // User provided a direct feed
                 var title: String?
                 switch feed {
@@ -123,8 +151,7 @@ class BraveTodayAddSourceViewController: UITableViewController {
                 case .rss(let rss):
                     title = rss.title
                 }
-                completion([.init(title: title, url: url)])
-                return
+                completion(.success([.init(title: title, url: url)]))
             }
             // Ensure page is reloaded to final landing page before looking for
             // favicons
@@ -149,7 +176,11 @@ class BraveTodayAddSourceViewController: UITableViewController {
                 guard let href = link["href"], let url = URL(string: href, relativeTo: url) else { continue }
                 feeds.append(.init(title: link["title"], url: url))
             }
-            completion(feeds)
+            if feeds.isEmpty {
+                completion(.failure(.noFeedsFound))
+            } else {
+                completion(.success(feeds))
+            }
         }
         pageTask?.resume()
     }
