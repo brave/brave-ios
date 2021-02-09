@@ -203,6 +203,6 @@ extension FeedItem.Source {
             guard let title = feed.title else { return nil }
             feedTitle = title
         }
-        self.init(id: id, isDefault: true, category: "", name: feedTitle)
+        self.init(id: id, isDefault: true, category: "", name: feedTitle, isUserSource: true)
     }
 }
