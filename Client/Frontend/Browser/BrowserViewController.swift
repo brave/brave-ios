@@ -3564,55 +3564,55 @@ extension BrowserViewController: PlaylistHelperDelegate {
     }
     
     func showPlaylistToast(info: PlaylistInfo, itemState: PlaylistItemAddedState) {
-        DispatchQueue.main.async {
-            if let toast = self.pendingToast {
-                toast.dismiss(false)
-            }
-            
-            if let toast = self.playlistToast {
-                toast.dismiss(false)
-            }
-            
-            //Item requires the user to choose whether or not to add it to playlists
-            if itemState == .pendingUserAction {
-                let toast = PlaylistToast(item: info, state: .itemPendingUserAction) { [weak self] buttonPressed in
-                    
-                    if buttonPressed {
-                        //Update playlist with new items..
-                        Playlist.shared.addItem(item: info, cachedData: nil) {
-                            log.debug("Playlist Item Added")
-                            
-                            self?.showPlaylistToast(info: info, itemState: .added)
-                        }
+        if let toast = self.pendingToast {
+            toast.dismiss(false)
+            self.pendingToast = nil
+        }
+        
+        if let toast = self.playlistToast {
+            toast.dismiss(false)
+            self.playlistToast = nil
+        }
+        
+        //Item requires the user to choose whether or not to add it to playlists
+        if itemState == .pendingUserAction {
+            let toast = PlaylistToast(item: info, state: .itemPendingUserAction) { [weak self] buttonPressed in
+                
+                if buttonPressed {
+                    //Update playlist with new items..
+                    Playlist.shared.addItem(item: info, cachedData: nil) {
+                        log.debug("Playlist Item Added")
+                        
+                        self?.showPlaylistToast(info: info, itemState: .added)
                     }
                 }
-                
-                self.playlistToast = toast
-                self.show(toast: toast, afterWaiting: .milliseconds(250), duration: .seconds(10))
-            } else if itemState == .existing {
-                //Item already exists in playlist, so ask them if they want to view it there
-                let toast = PlaylistToast(item: info, state: .itemExisting, completion: { [weak self] buttonPressed in
-                    if buttonPressed {
-                        self?.openPlaylist()
-                    }
-                })
-                
-                self.playlistToast = toast
-                self.show(toast: toast, afterWaiting: .milliseconds(250), duration: .seconds(5))
-            } else if itemState == .added {
-                //Item was added to playlist by the user, so ask them if they want to view it there
-                let toast = PlaylistToast(item: info, state: .itemAdded, completion: { [weak self] buttonPressed in
-                    if buttonPressed {
-                        self?.openPlaylist()
-                    }
-                })
-                
-                self.playlistToast = toast
-                self.show(toast: toast, afterWaiting: .milliseconds(250), duration: .seconds(5))
-            } else {
-                //Unhandled developer error. There should never be any other states for the toast.
-                fatalError("Invalid Playlist Item State!")
             }
+            
+            self.playlistToast = toast
+            self.show(toast: toast, afterWaiting: .milliseconds(250), duration: .seconds(10))
+        } else if itemState == .existing {
+            //Item already exists in playlist, so ask them if they want to view it there
+            let toast = PlaylistToast(item: info, state: .itemExisting, completion: { [weak self] buttonPressed in
+                if buttonPressed {
+                    self?.openPlaylist()
+                }
+            })
+            
+            self.playlistToast = toast
+            self.show(toast: toast, afterWaiting: .milliseconds(250), duration: .seconds(5))
+        } else if itemState == .added {
+            //Item was added to playlist by the user, so ask them if they want to view it there
+            let toast = PlaylistToast(item: info, state: .itemAdded, completion: { [weak self] buttonPressed in
+                if buttonPressed {
+                    self?.openPlaylist()
+                }
+            })
+            
+            self.playlistToast = toast
+            self.show(toast: toast, afterWaiting: .milliseconds(250), duration: .seconds(5))
+        } else {
+            //Unhandled developer error. There should never be any other states for the toast.
+            fatalError("Invalid Playlist Item State!")
         }
     }
     

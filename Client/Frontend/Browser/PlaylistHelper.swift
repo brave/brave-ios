@@ -41,7 +41,8 @@ class PlaylistHelper: TabContentScript {
     func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage) {
         
         guard let item = PlaylistInfo.from(message: message),
-              !item.src.isEmpty else { return }
+              !item.src.isEmpty,
+              item.duration > 0.0 else { return }
         
         log.debug("FOUND VIDEO ITEM ON PAGE: \(message.body)")
         
@@ -49,7 +50,9 @@ class PlaylistHelper: TabContentScript {
             Playlist.shared.updateItem(mediaSrc: item.src, item: item) {
                 log.debug("Playlist Item Updated")
                 
-                self.delegate?.showPlaylistToast(info: item, itemState: .existing)
+                DispatchQueue.main.async {
+                    self.delegate?.showPlaylistToast(info: item, itemState: .existing)
+                }
             }
         } else {
             if item.detected {
@@ -64,7 +67,9 @@ class PlaylistHelper: TabContentScript {
                     Playlist.shared.addItem(item: item, cachedData: nil) {
                         log.debug("Playlist Item Added")
                         
-                        self.delegate?.showPlaylistToast(info: item, itemState: .added)
+                        DispatchQueue.main.async {
+                            self.delegate?.showPlaylistToast(info: item, itemState: .added)
+                        }
                     }
                 }))
                 alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil))
