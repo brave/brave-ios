@@ -3588,7 +3588,7 @@ extension BrowserViewController: PlaylistHelperDelegate {
                 }
                 
                 self.playlistToast = toast
-                self.show(toast: toast, afterWaiting: .milliseconds(250), duration: nil)
+                self.show(toast: toast, afterWaiting: .milliseconds(250), duration: .seconds(10))
             } else if itemState == .existing {
                 //Item already exists in playlist, so ask them if they want to view it there
                 let toast = PlaylistToast(item: info, state: .itemExisting, completion: { [weak self] buttonPressed in
