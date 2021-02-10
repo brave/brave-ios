@@ -5,7 +5,6 @@
 import WebKit
 import Shared
 import Data
-import YubiKit
 
 private let log = Logger.browserLogger
 
