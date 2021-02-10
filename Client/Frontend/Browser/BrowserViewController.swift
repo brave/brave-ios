@@ -954,7 +954,9 @@ class BrowserViewController: UIViewController {
             self.presentVPNCallout()
         }
         
-        presentDefaultBrowserIntroScreen()
+        if #available(*, iOS 14) {
+            presentDefaultBrowserIntroScreen()
+        }
         
         screenshotHelper.viewIsVisible = true
         screenshotHelper.takePendingScreenshots(tabManager.allTabs)
