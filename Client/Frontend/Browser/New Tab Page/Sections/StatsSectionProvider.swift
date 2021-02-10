@@ -107,9 +107,16 @@ class BraveShieldStatsView: UIView, Themeable {
     }
     
     var dataSaved: String {
-        let estimatedDataSavedInBytes = (BraveGlobalShieldStats.shared.adblock + BraveGlobalShieldStats.shared.trackingProtection) * bytesPerItem
+        var estimatedDataSavedInBytes = (BraveGlobalShieldStats.shared.adblock + BraveGlobalShieldStats.shared.trackingProtection) * bytesPerItem
         
         if estimatedDataSavedInBytes <= 0 { return "0" }
+        let _1MB = 1000 * 1000
+        
+        // Byte formatted megabytes value can be too long to display nicely(#3274).
+        // As a workaround we cut fraction value from megabytes by rounding it down.
+        if estimatedDataSavedInBytes > _1MB {
+            estimatedDataSavedInBytes = (estimatedDataSavedInBytes / _1MB) * _1MB
+        }
         
         let formatter = ByteCountFormatter().then {
             $0.allowsNonnumericFormatting = false
@@ -118,20 +125,7 @@ class BraveShieldStatsView: UIView, Themeable {
             $0.allowedUnits = [.useKB, .useMB, .useGB, .useTB]
         }
         
-        // Byte formatted megabytes value can be too long to display nicely(#3274).
-        // As a workaround we trim the decimal value when megabytes or kilobytes are displayed.
-        // For gigabytes it takes a lot of time to make the stat 100GB+ to be a problem.
-        // In such case the stat font is being scaled down.
-        // In the future we might have to write our own byte formater to handle this.
-        let byteFormattedString = formatter.string(fromByteCount: Int64(estimatedDataSavedInBytes))
-        let _1MB = 1000 * 1000
-        if estimatedDataSavedInBytes / _1MB < 1000 {
-            if let withRemovedDecimal = try? byteFormattedString.regexReplacePattern("\\.[0-9]+", with: "") {
-                return withRemovedDecimal
-            }
-        }
-        
-        return byteFormattedString
+        return formatter.string(fromByteCount: Int64(estimatedDataSavedInBytes))
     }
     
     var timeSaved: String {
