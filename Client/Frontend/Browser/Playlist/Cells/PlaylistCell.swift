@@ -9,9 +9,6 @@ import SDWebImage
 import AVFoundation
 
 class PlaylistCell: UITableViewCell {
-    let indicatorIcon = UIImageView().then {
-        $0.contentMode = .scaleAspectFit
-    }
     
     private var favIconFetcher: FaviconFetcher?
     
@@ -72,15 +69,10 @@ class PlaylistCell: UITableViewCell {
         
         contentView.addSubview(iconStackView)
         contentView.addSubview(infoStackView)
-        iconStackView.addArrangedSubview(indicatorIcon)
         iconStackView.addArrangedSubview(thumbnailView)
         infoStackView.addArrangedSubview(titleLabel)
         infoStackView.addArrangedSubview(detailLabel)
         contentView.addSubview(separator)
-        
-        indicatorIcon.snp.makeConstraints {
-            $0.width.height.equalTo(12.0)
-        }
         
         thumbnailView.snp.makeConstraints {
             $0.width.equalTo(94.0)
