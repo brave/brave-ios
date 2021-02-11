@@ -205,8 +205,6 @@ extension PlaylistViewController: UITableViewDataSource {
         
         cell.do {
             $0.selectionStyle = .none
-            $0.indicatorIcon.image = #imageLiteral(resourceName: "playlist_currentitem_indicator").template
-            $0.indicatorIcon.alpha = 0.0
             $0.titleLabel.text = item.name
             $0.detailLabel.text = formatter.string(from: TimeInterval(item.duration)) ?? "0:00"
             $0.contentView.backgroundColor = .clear
@@ -222,11 +220,6 @@ extension PlaylistViewController: UITableViewDataSource {
         }
         
         cell.loadThumbnail(item: item)
-        
-        if indexPath.row == currentlyPlayingItemIndex {
-            cell.indicatorIcon.image = #imageLiteral(resourceName: "playlist_currentitem_indicator")
-            cell.indicatorIcon.alpha = 1.0
-        }
         
         return cell
     }
