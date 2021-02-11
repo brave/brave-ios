@@ -1968,6 +1968,7 @@ class BrowserViewController: UIViewController {
 
     func navigateInTab(tab: Tab, to navigation: WKNavigation? = nil) {
         tabManager.expireSnackbars()
+        playlistToast?.dismiss(false)
 
         guard let webView = tab.webView else {
             print("Cannot navigate in tab without a webView")
