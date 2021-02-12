@@ -41,8 +41,11 @@ class PlaylistHelper: TabContentScript {
     func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage) {
         
         guard let item = PlaylistInfo.from(message: message),
-              !item.src.isEmpty,
-              item.duration > 0.0 else { return }
+              !item.src.isEmpty else { return }
+        
+        if item.duration <= 0.0 && !item.detected {
+            return
+        }
         
         log.debug("FOUND VIDEO ITEM ON PAGE: \(message.body)")
         

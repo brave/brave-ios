@@ -13,6 +13,15 @@
             if (node.constructor.name == 'HTMLAudioElement') {
                 mimeType = 'audio';
             }
+            
+            if (node.constructor.name == 'HTMLSourceElement') {
+                videoNode = node.closest('video');
+                if (videoNode != null && typeof videoNode != 'undefined') {
+                    mimeType = 'video'
+                } else {
+                    mimeType = 'audio'
+                }
+            }
         }
 
         if (src !== "") {
@@ -26,6 +35,7 @@
                                                                         "detected": true,
                                                                         });
         } else {
+            var target = node;
             document.querySelectorAll('source').forEach(function(node) {
                 if (node.src !== "") {
                     if (node.closest('video') === target) {
@@ -34,7 +44,7 @@
                                                                                     "src": node.src,
                                                                                     "pageSrc": window.location.href,
                                                                                     "pageTitle": document.title,
-                                                                                    "mimeType": type,
+                                                                                    "mimeType": mimeType,
                                                                                     "duration": target.duration !== target.duration ? 0.0 : target.duration,
                                                                           "detected": true,
                                                                                     });
@@ -46,7 +56,7 @@
                                                                                     "src": node.src,
                                                                                     "pageSrc": window.location.href,
                                                                                     "pageTitle": document.title,
-                                                                                    "mimeType": type,
+                                                                                    "mimeType": mimeType,
                                                                                     "duration": target.duration !== target.duration ? 0.0 : target.duration,
                                                                           "detected": true,
                                                                                     });
