@@ -80,6 +80,11 @@ class ThirdPartySearchAlerts: UIAlertController {
                                  message: Strings.customEngineFillAllFieldsErrorMessage)
     }
     
+    static func insecureURLEntryThirdPartySearch() -> UIAlertController {
+        return searchAlertWithOK(title: Strings.thirdPartySearchFailedTitle,
+                                 message: Strings.customEngineFormErrorMessage)
+    }
+    
     private static func searchAlertWithOK(title: String, message: String) -> UIAlertController {
         let alert = ThirdPartySearchAlerts(
             title: title,

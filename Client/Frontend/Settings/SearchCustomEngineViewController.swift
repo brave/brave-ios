@@ -156,6 +156,8 @@ class SearchCustomEngineViewController: UIViewController {
                     alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
                 case .missingInformation:
                     alert = ThirdPartySearchAlerts.missingInfoToAddThirdPartySearch()
+                case .insecureURL:
+                    alert = ThirdPartySearchAlerts.insecureURLEntryThirdPartySearch()
             }
         } else {
             alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
@@ -490,11 +492,20 @@ extension SearchCustomEngineViewController: UITextViewDelegate {
             textView.resignFirstResponder()
             return false
         }
-
-        let textLengthInRange = textView.text.count + (text.count - range.length)
         
-        /// The default text "https://" cant ne deleted or changed so nothing without a secure scheme can be added
-        return textLengthInRange <= Constants.urlEntryMaxCharacterCount && textLengthInRange >= 8
+        if let copiedText = UIPasteboard.general.string, text.contains(copiedText) {
+            guard copiedText.hasPrefix("https://") else {
+                handleError(error: SearchEngineError.insecureURL)
+                return false
+            }
+            
+            return true
+        } else {
+            let textLengthInRange = textView.text.count + (text.count - range.length)
+            
+            // The default text "https://" cant ne deleted or changed so nothing without a secure scheme can be added
+            return textLengthInRange <= Constants.urlEntryMaxCharacterCount && textLengthInRange >= 8
+        }
     }
     
     func textViewDidChange(_ textView: UITextView) {

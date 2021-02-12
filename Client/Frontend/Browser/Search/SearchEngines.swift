@@ -19,6 +19,7 @@ enum SearchEngineError: Error {
     case failedToSave
     case invalidQuery
     case missingInformation
+    case insecureURL
 }
 
 // BRAVE TODO: Move to newer Preferences class(#259)
