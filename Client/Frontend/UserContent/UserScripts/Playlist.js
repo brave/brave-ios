@@ -167,6 +167,15 @@ window.__firefox__.includeOnce("Playlist", function() {
                 if (node.constructor.name == 'HTMLAudioElement') {
                     mimeType = 'audio';
                 }
+                
+                if (node.constructor.name == 'HTMLSourceElement') {
+                    videoNode = node.closest('video');
+                    if (videoNode != null && typeof videoNode != 'undefined') {
+                        mimeType = 'video'
+                    } else {
+                        mimeType = 'audio'
+                    }
+                }
             }
 
             if (src !== "") {
@@ -180,6 +189,7 @@ window.__firefox__.includeOnce("Playlist", function() {
                                                                             "detected": true
                                                                             });
             } else {
+                var target = node;
                 document.querySelectorAll('source').forEach(function(node) {
                     if (node.src !== "") {
                         if (node.closest('video') === target) {
@@ -188,7 +198,7 @@ window.__firefox__.includeOnce("Playlist", function() {
                                                                                         "src": node.src,
                                                                                         "pageSrc": window.location.href,
                                                                                         "pageTitle": document.title,
-                                                                                        "mimeType": type,
+                                                                                        "mimeType": mimeType,
                                                                                         "duration": target.duration !== target.duration ? 0.0 : target.duration,
                                                                             "detected": true
                                                                                         });
@@ -200,7 +210,7 @@ window.__firefox__.includeOnce("Playlist", function() {
                                                                                         "src": node.src,
                                                                                         "pageSrc": window.location.href,
                                                                                         "pageTitle": document.title,
-                                                                                        "mimeType": type,
+                                                                                        "mimeType": mimeType,
                                                                                         "duration": target.duration !== target.duration ? 0.0 : target.duration,
                                                                             "detected": true
                                                                                         });
@@ -277,7 +287,17 @@ window.__firefox__.includeOnce("Playlist", function() {
         
         function observePage() {
             observeDocument(document);
-            //observeDynamicElements(document);
+            observeDynamicElements(document);
+
+            onReady(function() {
+                getAllVideoElements().forEach(function(node) {
+                    observeNode(node);
+                });
+
+                getAllAudioElements().forEach(function(node) {
+                    observeNode(node);
+                });
+            });
         }
 
         observePage();
