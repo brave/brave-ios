@@ -491,7 +491,10 @@ extension SearchCustomEngineViewController: UITextViewDelegate {
             return false
         }
 
-        return textView.text.count + (text.count - range.length) <= Constants.urlEntryMaxCharacterCount
+        let textLengthInRange = textView.text.count + (text.count - range.length)
+        
+        /// The default text "https://" cant ne deleted or changed so nothing without a secure scheme can be added
+        return textLengthInRange <= Constants.urlEntryMaxCharacterCount && textLengthInRange >= 8
     }
     
     func textViewDidChange(_ textView: UITextView) {
