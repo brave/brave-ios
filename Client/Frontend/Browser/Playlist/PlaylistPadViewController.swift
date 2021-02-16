@@ -487,6 +487,11 @@ private class PlaylistPadDetailController: UIViewController {
         super.viewWillAppear(animated)
         
         playerController = nil
+
+        if let delegate = UIApplication.shared.delegate as? AppDelegate {
+            playerView.attachLayer()
+            delegate.playlistRestorationController = nil
+        }
     }
 }
 
@@ -555,6 +560,10 @@ extension PlaylistPadDetailController: AVPlayerViewControllerDelegate, AVPicture
 
     // MARK: - AVPlayerViewControllerDelegate
     
+    func playerViewControllerShouldAutomaticallyDismissAtPictureInPictureStart(_ playerViewController: AVPlayerViewController) -> Bool {
+        return true
+    }
+    
     func playerViewController(_ playerViewController: AVPlayerViewController, willBeginFullScreenPresentationWithAnimationCoordinator coordinator: UIViewControllerTransitionCoordinator) {
         
         playerView.detachLayer()
@@ -575,6 +584,13 @@ extension PlaylistPadDetailController: AVPlayerViewControllerDelegate, AVPicture
         DispatchQueue.main.async {
             self.playerView.detachLayer()
             self.delegate?.dismiss(animated: true, completion: nil)
+        }
+    }
+    
+    func playerViewControllerDidStopPictureInPicture(_ playerViewController: AVPlayerViewController) {
+        if let delegate = UIApplication.shared.delegate as? AppDelegate {
+            playerView.attachLayer()
+            delegate.playlistRestorationController = nil
         }
     }
     
@@ -605,6 +621,13 @@ extension PlaylistPadDetailController: AVPlayerViewControllerDelegate, AVPicture
         
         (UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController = delegate
         delegate?.dismiss(animated: true, completion: nil)
+    }
+    
+    func pictureInPictureControllerDidStopPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
+        if let delegate = UIApplication.shared.delegate as? AppDelegate {
+            playerView.attachLayer()
+            delegate.playlistRestorationController = nil
+        }
     }
     
     func pictureInPictureController(_ pictureInPictureController: AVPictureInPictureController, failedToStartPictureInPictureWithError error: Error) {

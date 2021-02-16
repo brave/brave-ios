@@ -29,6 +29,7 @@ class PlaylistViewController: UIViewController {
     // MARK: Properties
     
     private let playerView = VideoView()
+    private var playerController: AVPlayerViewController?
     
     private lazy var activityIndicator = UIActivityIndicatorView(style: .white).then {
         $0.isHidden = true
@@ -389,37 +390,68 @@ extension PlaylistViewController: VideoViewDelegate {
     }
     
     func onFullScreen() {
-        playerView.player.pause()
-        
         let playerController = AVPlayerViewController().then {
             $0.player = playerView.player
             $0.delegate = self
             $0.allowsPictureInPicturePlayback = true
+            $0.entersFullScreenWhenPlaybackBegins = true
         }
         
         if #available(iOS 14.2, *) {
             playerController.canStartPictureInPictureAutomaticallyFromInline = true
         }
         
-        playerController.entersFullScreenWhenPlaybackBegins = true
-        
-        self.present(playerController, animated: true, completion: {
-            playerController.player?.play()
-        })
+        self.present(playerController, animated: true) { [weak self] in
+            self?.playerController = playerController
+        }
     }
 }
 
-// MARK: AVPlayerViewControllerDelegate
+// MARK: AVPlayerViewControllerDelegate && AVPictureInPictureControllerDelegate
 
 extension PlaylistViewController: AVPlayerViewControllerDelegate, AVPictureInPictureControllerDelegate {
 
     // MARK: - AVPlayerViewControllerDelegate
+    
+    func playerViewControllerShouldAutomaticallyDismissAtPictureInPictureStart(_ playerViewController: AVPlayerViewController) -> Bool {
+        return true
+    }
+    
+    func playerViewController(_ playerViewController: AVPlayerViewController, willBeginFullScreenPresentationWithAnimationCoordinator coordinator: UIViewControllerTransitionCoordinator) {
+        
+        playerView.detachLayer()
+        playerController = playerViewController
+    }
+    
+    func playerViewController(_ playerViewController: AVPlayerViewController, willEndFullScreenPresentationWithAnimationCoordinator coordinator: UIViewControllerTransitionCoordinator) {
+        
+        playerView.attachLayer()
+        playerController = nil
+    }
+    
     func playerViewControllerWillStartPictureInPicture(_ playerViewController: AVPlayerViewController) {
+        playerView.detachLayer()
+        
         (UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController = self.navigationController
-        self.dismiss(animated: true, completion: nil)
+    }
+    
+    func playerViewControllerDidStartPictureInPicture(_ playerViewController: AVPlayerViewController) {
+        DispatchQueue.main.async {
+            self.playerView.detachLayer()
+            self.dismiss(animated: true, completion: nil)
+        }
+    }
+    
+    func playerViewControllerDidStopPictureInPicture(_ playerViewController: AVPlayerViewController) {
+        if let delegate = UIApplication.shared.delegate as? AppDelegate {
+            playerView.attachLayer()
+            delegate.playlistRestorationController = nil
+            playerController = nil
+        }
     }
     
     func playerViewController(_ playerViewController: AVPlayerViewController, failedToStartPictureInPictureWithError error: Error) {
+        playerView.attachLayer()
         
         let alert = UIAlertController(title: Strings.PlayList.sorryAlertTitle, message: Strings.PlayList.pictureInPictureErrorTitle, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: nil))
@@ -430,10 +462,14 @@ extension PlaylistViewController: AVPlayerViewControllerDelegate, AVPictureInPic
         
         if let delegate = UIApplication.shared.delegate as? AppDelegate,
            let navigationController = delegate.playlistRestorationController {
-            delegate.browserViewController.present(controller: navigationController)
+            playerView.attachLayer()
+            delegate.browserViewController.present(navigationController, animated: true) {
+                self.playerView.player.play()
+            }
             delegate.playlistRestorationController = nil
         }
         
+        playerController = nil
         completionHandler(true)
     }
     
@@ -441,7 +477,20 @@ extension PlaylistViewController: AVPlayerViewControllerDelegate, AVPictureInPic
     func pictureInPictureControllerWillStartPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
         
         (UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController = self.navigationController
-        self.dismiss(animated: true, completion: nil)
+    }
+    
+    func pictureInPictureControllerDidStartPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
+        DispatchQueue.main.async {
+            //self.playerView.detachLayer()
+            self.dismiss(animated: true, completion: nil)
+        }
+    }
+    
+    func pictureInPictureControllerDidStopPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
+        if let delegate = UIApplication.shared.delegate as? AppDelegate {
+            //playerView.attachLayer()
+            delegate.playlistRestorationController = nil
+        }
     }
     
     func pictureInPictureController(_ pictureInPictureController: AVPictureInPictureController, failedToStartPictureInPictureWithError error: Error) {
