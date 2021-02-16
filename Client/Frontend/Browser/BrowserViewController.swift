@@ -3585,6 +3585,7 @@ extension BrowserViewController: PlaylistHelperDelegate {
                         log.debug("Playlist Item Added")
                         
                         self?.showPlaylistToast(info: info, itemState: .added)
+                        UIImpactFeedbackGenerator(style: .medium).bzzt()
                     }
                 }
             }
