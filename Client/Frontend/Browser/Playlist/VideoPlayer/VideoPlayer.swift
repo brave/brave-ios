@@ -236,6 +236,10 @@ protocol VideoViewDelegate: class {
 
 public class VideoView: UIView, VideoTrackerBarDelegate {
     
+    struct UX {
+        static let controlOffset: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 30 : 15
+    }
+    
     weak var delegate: VideoViewDelegate?
     
     public let player = AVPlayer(playerItem: nil).then {
@@ -434,22 +438,22 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         }
         
         fullScreenButton.snp.makeConstraints {
-            $0.top.right.equalToSuperview().inset(15.0)
+            $0.top.right.equalToSuperview().inset(UX.controlOffset)
         }
         
         castButton.snp.makeConstraints {
-            $0.top.left.equalToSuperview().inset(15.0)
+            $0.top.left.equalToSuperview().inset(UX.controlOffset)
         }
         
         playbackRateButton.snp.makeConstraints {
-            $0.top.equalToSuperview().inset(15.0)
-            $0.left.equalTo(castButton.snp.right).offset(15.0)
+            $0.top.equalToSuperview().inset(UX.controlOffset)
+            $0.left.equalTo(castButton.snp.right).offset(UX.controlOffset)
             $0.width.height.equalTo(castButton)
         }
         
         pipButton.snp.makeConstraints {
-            $0.top.equalToSuperview().inset(15.0)
-            $0.right.equalTo(fullScreenButton.snp.left).offset(-15.0)
+            $0.top.equalToSuperview().inset(UX.controlOffset)
+            $0.right.equalTo(fullScreenButton.snp.left).offset(-UX.controlOffset)
         }
 
         registerNotifications()
