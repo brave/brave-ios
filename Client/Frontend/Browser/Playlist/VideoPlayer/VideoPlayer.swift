@@ -344,13 +344,14 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     private(set) public var isFullscreen: Bool = false
     private(set) public var isOverlayDisplayed: Bool = false
     private var notificationObservers = [NSObjectProtocol]()
+    private var pictureInPictureObservers = [NSObjectProtocol]()
     private(set) public var pictureInPictureController: AVPictureInPictureController?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         
         do {
-            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback)
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
             try AVAudioSession.sharedInstance().setActive(true, options: [])
         } catch {
             log.error(error)
@@ -474,6 +475,8 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         notificationObservers.forEach({
             NotificationCenter.default.removeObserver($0)
         })
+        
+        pictureInPictureObservers.removeAll()
     }
     
     public override func layoutSubviews() {
@@ -641,12 +644,18 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     private func registerNotifications() {
         notificationObservers.append(NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: .main) { [weak self] _ in
             guard let self = self else { return }
-            self.playerLayer.player = nil
+            
+            if self.pictureInPictureController?.isPictureInPictureActive == false {
+                self.playerLayer.player = nil
+            }
         })
         
         notificationObservers.append(NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: .main) { [weak self] _ in
             guard let self = self else { return }
-            self.playerLayer.player = self.player
+            
+            if self.pictureInPictureController?.isPictureInPictureActive == false {
+                self.playerLayer.player = self.player
+            }
         })
         
         notificationObservers.append(NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: self.player.currentItem, queue: .main) { [weak self] _ in
@@ -693,7 +702,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
             pictureInPictureController = AVPictureInPictureController(playerLayer: self.playerLayer)
             guard let pictureInPictureController = pictureInPictureController else { return }
             
-            notificationObservers.append(pictureInPictureController.observe(\AVPictureInPictureController.isPictureInPicturePossible, options: [.initial, .new]) { [weak self] _, change in
+            pictureInPictureObservers.append(pictureInPictureController.observe(\AVPictureInPictureController.isPictureInPicturePossible, options: [.initial, .new]) { [weak self] _, change in
                 self?.pipButton.isEnabled = change.newValue ?? false
             })
         } else {
