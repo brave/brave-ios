@@ -53,7 +53,8 @@ class PlaylistCell: UITableViewCell {
     
     private let infoStackView = UIStackView().then {
         $0.axis = .vertical
-        $0.spacing = 8.0
+        $0.alignment = .top
+        $0.spacing = 5.0
     }
     
     private let separator = UIView().then {
