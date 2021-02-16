@@ -28,6 +28,16 @@ struct PlaylistInfo: Codable {
         self.detected = false
     }
     
+    init(name: String, src: String, pageSrc: String, pageTitle: String, mimeType: String, duration: Float, detected: Bool) {
+        self.name = name
+        self.src = src
+        self.pageSrc = pageSrc
+        self.pageTitle = pageTitle
+        self.mimeType = mimeType
+        self.duration = duration
+        self.detected = detected
+    }
+    
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.name = (try? container.decode(String.self, forKey: .name)) ?? ""
