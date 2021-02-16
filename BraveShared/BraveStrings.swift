@@ -1122,6 +1122,18 @@ extension Strings {
                               bundle: .braveShared,
                               value: "View in Playlist",
                               comment: "The title for the toast that shows up on a page when an item that has already been added, was updated.")
+        
+        public static let removePlaylistVideoAlertTitle =
+            NSLocalizedString("playlist.removePlaylistVideoAlertTitle",
+                              bundle: .braveShared,
+                              value: "Remove Video from Playlist?",
+                              comment: "Title for the alert shown when the user tries to remove a video from playlist")
+        
+        public static let removePlaylistVideoAlertMessage =
+            NSLocalizedString("playlist.removePlaylistAlertMessage",
+                              bundle: .braveShared,
+                              value: "This will remove the video from the list. Are you sure you want to continue?",
+                              comment: "Message for the alert shown when the user tries to remove a video from playlist")
     }
 }
 
