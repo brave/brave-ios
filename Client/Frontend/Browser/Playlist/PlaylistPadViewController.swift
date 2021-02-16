@@ -482,17 +482,6 @@ private class PlaylistPadDetailController: UIViewController {
             $0.edges.equalTo(self.view)
         }
     }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        playerController = nil
-
-        if let delegate = UIApplication.shared.delegate as? AppDelegate {
-            playerView.attachLayer()
-            delegate.playlistRestorationController = nil
-        }
-    }
 }
 
 // MARK: VideoViewDelegate
@@ -567,11 +556,13 @@ extension PlaylistPadDetailController: AVPlayerViewControllerDelegate, AVPicture
     func playerViewController(_ playerViewController: AVPlayerViewController, willBeginFullScreenPresentationWithAnimationCoordinator coordinator: UIViewControllerTransitionCoordinator) {
         
         playerView.detachLayer()
+        playerController = playerViewController
     }
     
     func playerViewController(_ playerViewController: AVPlayerViewController, willEndFullScreenPresentationWithAnimationCoordinator coordinator: UIViewControllerTransitionCoordinator) {
         
         playerView.attachLayer()
+        playerController = nil
     }
     
     func playerViewControllerWillStartPictureInPicture(_ playerViewController: AVPlayerViewController) {
@@ -591,6 +582,7 @@ extension PlaylistPadDetailController: AVPlayerViewControllerDelegate, AVPicture
         if let delegate = UIApplication.shared.delegate as? AppDelegate {
             playerView.attachLayer()
             delegate.playlistRestorationController = nil
+            playerController = nil
         }
     }
     
@@ -613,6 +605,7 @@ extension PlaylistPadDetailController: AVPlayerViewControllerDelegate, AVPicture
             delegate.playlistRestorationController = nil
         }
         
+        playerController = nil
         completionHandler(true)
     }
     
