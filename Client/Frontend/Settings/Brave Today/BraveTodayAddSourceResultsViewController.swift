@@ -55,6 +55,11 @@ class BraveTodayAddSourceResultsViewController: UITableViewController {
         navigationItem.rightBarButtonItem = doneButton
         
         tableView.register(FeedLocationCell.self)
+        
+        if navigationController?.viewControllers.first === self {
+            // Presented via share screen or isolated
+            navigationItem.leftBarButtonItem = .init(barButtonSystemItem: .cancel, target: self, action: #selector(tappedCancel))
+        }
     }
     
     @objc private func tappedAdd() {
@@ -63,6 +68,10 @@ class BraveTodayAddSourceResultsViewController: UITableViewController {
             feedDataSource.addRSSFeedLocation(location)
         }
         sourcesAdded?(selectedLocations)
+        dismiss(animated: true)
+    }
+    
+    @objc private func tappedCancel() {
         dismiss(animated: true)
     }
     

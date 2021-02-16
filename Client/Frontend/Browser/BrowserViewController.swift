@@ -1804,6 +1804,29 @@ class BrowserViewController: UIViewController {
             }
             activities.append(requestDesktopSiteActivity)
             
+            if let metadata = tab?.pageMetadata, !metadata.feeds.isEmpty {
+                let feeds: [RSSFeedLocation] = metadata.feeds.compactMap { feed in
+                    if let url = URL(string: feed.href) {
+                        return RSSFeedLocation(title: feed.title, url: url)
+                    }
+                    return nil
+                }
+                if !feeds.isEmpty {
+                    let addToBraveToday = AddFeedToBraveTodayActivity() { [weak self] in
+                        guard let self = self else { return }
+                        let controller = BraveTodayAddSourceResultsViewController(
+                            dataSource: self.feedDataSource,
+                            searchedURL: url,
+                            rssFeedLocations: feeds,
+                            sourcesAdded: nil
+                        )
+                        let container = UINavigationController(rootViewController: controller)
+                        self.present(container, animated: true)
+                    }
+                    activities.append(addToBraveToday)
+                }
+            }
+            
             #if compiler(>=5.3)
             if #available(iOS 14.0, *), let webView = tab?.webView, tab?.temporaryDocument == nil {
                 let createPDFActivity = CreatePDFActivity(webView: webView) { [weak self] pdfData in

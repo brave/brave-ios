@@ -1736,6 +1736,12 @@ extension Strings {
             value: "Promoted",
             comment: "A button title that is placed on promoted cards"
         )
+        public static let addSourceShareTitle = NSLocalizedString(
+            "today.addSourceShareTitle",
+            bundle: .braveShared,
+            value: "Add Source to Brave Today",
+            comment: "The action title displayed in the iOS share menu"
+        )
     }
 }
 
