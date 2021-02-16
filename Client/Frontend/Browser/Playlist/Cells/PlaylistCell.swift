@@ -11,6 +11,7 @@ import AVFoundation
 class PlaylistCell: UITableViewCell {
     
     private var favIconFetcher: FaviconFetcher?
+    private var thumbnailGenerator: HLSThumbnailGenerator?
     
     private let thumbnailMaskView = CAShapeLayer().then {
         $0.fillColor = UIColor.white.cgColor
@@ -25,10 +26,10 @@ class PlaylistCell: UITableViewCell {
     var thumbnailImage: UIImage? {
         didSet {
             self.thumbnailView.image = thumbnailImage
-            self.thumbnailView.backgroundColor = thumbnailImage == nil ? .black : .clear
+            self.thumbnailView.backgroundColor = .black
             self.setNeedsLayout()
             self.layoutIfNeeded()
-            self.updateThumbnail()
+            //self.updateThumbnail()
         }
     }
     
@@ -58,7 +59,7 @@ class PlaylistCell: UITableViewCell {
     }
     
     private let separator = UIView().then {
-        $0.backgroundColor = #colorLiteral(red: 0.1294117647, green: 0.1450980392, blue: 0.1607843137, alpha: 1)
+        $0.backgroundColor = UIColor(white: 1.0, alpha: 0.15)
     }
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -81,15 +82,14 @@ class PlaylistCell: UITableViewCell {
         
         iconStackView.snp.makeConstraints {
             $0.leading.equalToSuperview().offset(12.0)
-            $0.top.bottom.equalToSuperview().inset(1.0)
+            $0.top.bottom.equalToSuperview().inset(8.0)
         }
         
         infoStackView.snp.makeConstraints {
             $0.left.equalTo(iconStackView.snp.right).offset(8.0)
             $0.right.equalToSuperview().offset(-15.0)
             $0.centerY.equalToSuperview()
-            $0.top.greaterThanOrEqualToSuperview().inset(1.0)
-            $0.bottom.lessThanOrEqualToSuperview().inset(1.0)
+            $0.top.bottom.equalTo(iconStackView)
         }
         
         separator.snp.makeConstraints {
@@ -116,16 +116,11 @@ class PlaylistCell: UITableViewCell {
                 drawingRect.size.height = drawingRect.size.width / imageScale
                 drawingRect.origin.y = (thumbnailView.bounds.size.height - drawingRect.size.height) / 2.0
             }
-            
+
             let path = UIBezierPath(roundedRect: drawingRect, cornerRadius: 5.0)
             thumbnailMaskView.path = path.cgPath
             thumbnailView.layer.mask = thumbnailMaskView
         }
-    }
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        self.updateThumbnail()
     }
     
     override var layoutMargins: UIEdgeInsets {
@@ -150,43 +145,53 @@ class PlaylistCell: UITableViewCell {
         }
     }
     
-    func loadThumbnail(item: PlaylistInfo) {
+    // MARK: - Thumbnail
+    
+    func loadThumbnail(item: PlaylistInfo, onDurationUpdated: ((TimeInterval?) -> Void)? = nil) {
         guard let url = URL(string: item.src) else { return }
         
-        let request = URLRequest(url: url)
-        let cache = URLCache.shared
+        // Load from Cache
         let imageCache = SDImageCache.shared
-        self.thumbnailView.backgroundColor = nil
-
         if let cachedImage = imageCache.imageFromCache(forKey: url.absoluteString) {
             self.thumbnailImage = cachedImage
             return
         }
+        
+        // Loading from Cache failed, attempt to fetch HLS thumbnail
+        self.thumbnailGenerator = HLSThumbnailGenerator(asset: AVAsset(url: url), time: 3, completion: { [weak self] image, trackDuration in
+            guard let self = self else { return }
+            
+            if let trackDuration = trackDuration {
+                onDurationUpdated?(trackDuration)
+            }
+            
+            if let image = image {
+                self.thumbnailImage = image
+                self.thumbnailGenerator = nil
+                imageCache.store(image, forKey: url.absoluteString, completion: nil)
+            } else {
+                //We can fall back to AVAssetImageGenerator or FavIcon
+                self.loadThumbnailFallbackImage(item: item)
+            }
+        })
+    }
+    
+    // Fall back to AVAssetImageGenerator
+    // If that fails, fallback to FavIconFetcher
+    private func loadThumbnailFallbackImage(item: PlaylistInfo) {
+        guard let url = URL(string: item.src) else { return }
 
-        if let cachedResponse = cache.cachedResponse(for: request), let cachedImage = UIImage(data: cachedResponse.data) {
-            self.thumbnailImage = cachedImage
-            return
-        }
-
-        let asset = AVAsset(url: url)
-        let imageGenerator = AVAssetImageGenerator(asset: asset)
+        let imageCache = SDImageCache.shared
+        let imageGenerator = AVAssetImageGenerator(asset: AVAsset(url: url))
         imageGenerator.appliesPreferredTrackTransform = false
 
-        let time = CMTimeMake(value: 0, timescale: 600)
-
+        let time = CMTimeMake(value: 3, timescale: 1)
         imageGenerator.generateCGImagesAsynchronously(forTimes: [NSValue(time: time)]) { [weak self] _, cgImage, _, result, error in
-            guard let self = self else {
-                return
-            }
+            guard let self = self else { return }
             
             if result == .succeeded, let cgImage = cgImage {
                 let image = UIImage(cgImage: cgImage)
-                if let data = image.pngData(),
-                   let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil) {
-                    let cachedResponse = CachedURLResponse(response: response, data: data)
-                    cache.storeCachedResponse(cachedResponse, for: request)
-                    imageCache.store(image, forKey: url.absoluteString, completion: nil)
-                }
+                imageCache.store(image, forKey: url.absoluteString, completion: nil)
                 
                 DispatchQueue.main.async {
                     self.thumbnailImage = image
@@ -200,7 +205,8 @@ class PlaylistCell: UITableViewCell {
                         guard let self = self else { return }
                         self.favIconFetcher = nil
                         self.thumbnailImage = attributes.image
-                        self.thumbnailView.backgroundColor = attributes.backgroundColor
+                        
+                        imageCache.store(attributes.image, forKey: url.absoluteString, completion: nil)
                     }
                 }
             }
