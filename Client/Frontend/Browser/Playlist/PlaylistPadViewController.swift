@@ -371,7 +371,7 @@ extension PlaylistPadListController: UITableViewDelegate {
                 case .expired:
                     (tableView.cellForRow(at: indexPath) as? PlaylistCell)?.detailLabel.text = Strings.PlayList.expiredLabelTitle
                     
-                    let alert = UIAlertController(title: Strings.PlayList.expiredLabelTitle, message: Strings.PlayList.expiredAlertTitle, preferredStyle: .alert)
+                    let alert = UIAlertController(title: Strings.PlayList.expiredAlertTitle, message: Strings.PlayList.expiredAlertDescription, preferredStyle: .alert)
                     alert.addAction(UIAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: { _ in
                         
                         if let url = URL(string: item.pageSrc) {

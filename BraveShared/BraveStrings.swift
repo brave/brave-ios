@@ -1084,8 +1084,14 @@ extension Strings {
         public static let expiredAlertTitle =
             NSLocalizedString("playList.expiredAlertTitle",
                               bundle: .braveShared,
-                              value: "This item had a time limit and is now expired. Would you like to open the item in a new page?",
+                              value: "Expired Video",
                               comment: "The title for the alert that shows up when an item is expired")
+        
+        public static let expiredAlertDescription =
+            NSLocalizedString("playList.expiredAlertDescription",
+                              bundle: .braveShared,
+                              value: "This video was a live stream or time limit was reached. Re-open in a new tab?",
+                              comment: "The description for the alert that shows up when an item is expired")
         
         public static let pictureInPictureErrorTitle =
             NSLocalizedString("playList.pictureInPictureErrorTitle",
