@@ -1766,6 +1766,12 @@ extension Strings {
             value: "Sorry, that feed address doesn’t have any content.",
             comment: ""
         )
+        public static let addSourceAddButtonTitle = NSLocalizedString(
+            "today.addSourceAddButtonTitle",
+            bundle: .braveShared,
+            value: "Add",
+            comment: "To add a list of 1 or more rss feeds"
+        )
         public static let searchTextFieldPlaceholder = NSLocalizedString(
             "today.searchTextFieldPlaceholder",
             bundle: .braveShared,
@@ -1783,6 +1789,24 @@ extension Strings {
             bundle: .braveShared,
             value: "Import OPML",
             comment: "\"OPML\" is a file extension that contains a list of rss feeds."
+        )
+        public static let yourSources = NSLocalizedString(
+            "today.yourSources",
+            bundle: .braveShared,
+            value: "Your Sources",
+            comment: "The header above a list of the users RSS feed sources"
+        )
+        public static let addSource = NSLocalizedString(
+            "today.addSource",
+            bundle: .braveShared,
+            value: "Add Source",
+            comment: "The button title for adding a user RSS feed"
+        )
+        public static let deleteUserSourceTitle = NSLocalizedString(
+            "today.deleteUserSourceTitle",
+            bundle: .braveShared,
+            value: "Delete",
+            comment: "A button title for an action that deletes a users custom source"
         )
     }
 }

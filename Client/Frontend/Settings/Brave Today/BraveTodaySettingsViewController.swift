@@ -52,7 +52,7 @@ class BraveTodaySettingsViewController: TableViewController {
                 ]
             ),
             .init(
-                header: .title("Your Sources"),
+                header: .title(Strings.BraveToday.yourSources),
                 rows: feedDataSource.rssFeedLocations.map { location in
                     let enabled = self.feedDataSource.isRSSFeedEnabled(location)
                     return Row(
@@ -62,14 +62,14 @@ class BraveTodaySettingsViewController: TableViewController {
                             self.feedDataSource.toggleRSSFeedEnabled(location, enabled: newValue)
                         }),
                         cellClass: SubtitleCell.self,
-                        editActions: [.init(title: "Delete", style: .destructive, selection: { [unowned self] indexPath in
+                        editActions: [.init(title: Strings.BraveToday.deleteUserSourceTitle, style: .destructive, selection: { [unowned self] indexPath in
                             guard let location = feedDataSource.rssFeedLocations[safe: indexPath.row] else { return }
                             self.feedDataSource.removeRSSFeed(with: location.url)
                             dataSource.sections[1].rows.remove(at: indexPath.row)
                         })]
                     )
                 } + [
-                    Row(text: "Add Source", selection: { [unowned self] in
+                    Row(text: Strings.BraveToday.addSource, selection: { [unowned self] in
                         let controller = BraveTodayAddSourceViewController(dataSource: self.feedDataSource)
                         controller.sourcesAdded = { [weak self] _ in
                             self?.reloadSections()

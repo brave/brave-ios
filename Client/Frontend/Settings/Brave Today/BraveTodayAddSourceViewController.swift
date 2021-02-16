@@ -34,7 +34,7 @@ class BraveTodayAddSourceViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        title = "Add Source"
+        title = Strings.BraveToday.addSource
         
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.largeTitleDisplayMode = .always

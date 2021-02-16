@@ -40,7 +40,7 @@ class BraveTodayAddSourceResultsViewController: UITableViewController {
     }
     
     private lazy var doneButton = UIBarButtonItem(
-        title: "Add",
+        title: Strings.BraveToday.addSourceAddButtonTitle,
         style: .done,
         target: self,
         action: #selector(tappedAdd)
