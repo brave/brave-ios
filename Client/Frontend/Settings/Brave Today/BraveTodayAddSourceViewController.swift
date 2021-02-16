@@ -12,7 +12,7 @@ import FeedKit
 
 class BraveTodayAddSourceViewController: UITableViewController {
     
-    let feedDataSource: FeedDataSource
+    private let feedDataSource: FeedDataSource
     var sourcesAdded: ((Set<RSSFeedLocation>) -> Void)?
     
     private var isLoading: Bool = false
@@ -29,6 +29,10 @@ class BraveTodayAddSourceViewController: UITableViewController {
     @available(*, unavailable)
     required init(coder: NSCoder) {
         fatalError()
+    }
+    
+    deinit {
+        pageTask?.cancel()
     }
     
     override func viewDidLoad() {
@@ -81,7 +85,7 @@ class BraveTodayAddSourceViewController: UITableViewController {
     }
     
     private let session: URLSession = {
-        let configuration = URLSessionConfiguration.default
+        let configuration = URLSessionConfiguration.ephemeral
         configuration.timeoutIntervalForRequest = 5
         return URLSession(configuration: configuration, delegate: nil, delegateQueue: .main)
     }()
@@ -174,10 +178,8 @@ class BraveTodayAddSourceViewController: UITableViewController {
             // Check if `data` is actually an OPML list
             if let opml = OPMLParser.parse(data: data), !opml.outlines.isEmpty {
                 let locations = opml.outlines.compactMap(self.rssLocationFromOPMLOutline)
-                if !locations.isEmpty {
-                    completion(.success(locations))
-                    return
-                }
+                completion(locations.isEmpty ? .failure(.noFeedsFound) : .success(locations))
+                return
             }
             
             // Ensure page is reloaded to final landing page before looking for

@@ -12,7 +12,7 @@ public final class RSSFeedSource: NSManagedObject, CRUD {
     
     public class func get(with feedUrl: String) -> RSSFeedSource? {
         let predicate = NSPredicate(format: "\(#keyPath(RSSFeedSource.feedUrl)) == %@", feedUrl)
-        return first(where: predicate, context: DataController.viewContext)
+        return first(where: predicate)
     }
     
     public class func all() -> [RSSFeedSource] {

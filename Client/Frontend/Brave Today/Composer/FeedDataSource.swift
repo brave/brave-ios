@@ -303,42 +303,58 @@ class FeedDataSource {
         }
     }
     
-    private func loadRSSFeeds() -> Deferred<Result<[(FeedItem.Source, [FeedItem.Content])], Error>> {
-        let deferred = Deferred<Result<[(FeedItem.Source, [FeedItem.Content])], Error>>(value: nil, defaultQueue: .main)
-        var items: [(FeedItem.Source, [FeedItem.Content])] = []
-        let group = DispatchGroup()
-        for feedLocation in rssFeedLocations {
-            group.enter()
-            let parser = FeedParser(URL: feedLocation.url)
-            parser.parseAsync { result in
-                if case .success(let feed) = result, case .atom(let atomFeed) = feed, let entries = atomFeed.entries {
-                    if let source = FeedItem.Source(from: feed, location: feedLocation) {
-                        let feedItems = entries.compactMap {
-                            FeedItem.Content(from: $0, location: feedLocation)
+    /// Describes a single RSS feed's loaded data set converted into Brave Today based data
+    private struct RSSDataFeed {
+        var source: FeedItem.Source
+        var items: [FeedItem.Content]
+    }
+    
+    private func loadRSSLocation(_ location: RSSFeedLocation) -> Deferred<Result<RSSDataFeed, Error>> {
+        let deferred = Deferred<Result<RSSDataFeed, Error>>(value: nil, defaultQueue: .main)
+        let parser = FeedParser(URL: location.url)
+        parser.parseAsync { [weak self] result in
+            switch result {
+            case .success(let feed):
+                if let source = FeedItem.Source(from: feed, location: location) {
+                    var content: [FeedItem.Content] = []
+                    switch feed {
+                    case .atom(let atomFeed):
+                        if let feedItems = atomFeed.entries?.compactMap({ entry -> FeedItem.Content? in
+                            FeedItem.Content(from: entry, location: location)
+                        }) {
+                            content = feedItems
                         }
-                        items.append((source, feedItems))
-                    }
-                }
-                if case .success(let feed) = result, case .rss(let rssFeed) = feed, let entries = rssFeed.items {
-                    if let source = FeedItem.Source(from: feed, location: feedLocation) {
-                        let feedItems = entries.compactMap {
-                            FeedItem.Content(from: $0, location: feedLocation)
+                    case .rss(let rssFeed):
+                        if let feedItems = rssFeed.items?.compactMap({ entry -> FeedItem.Content? in
+                            FeedItem.Content(from: entry, location: location)
+                        }) {
+                            content = feedItems
                         }
-                        items.append((source, feedItems))
+                    case .json(let jsonFeed):
+                        if let feedItems = jsonFeed.items?.compactMap({ entry -> FeedItem.Content? in
+                            FeedItem.Content(from: entry, location: location)
+                        }) {
+                            content = feedItems
+                        }
                     }
+                    guard let self = self else { return }
+                    content = self.scored(rssItems: content)
+                    deferred.fill(.success(.init(source: source, items: content)))
                 }
-                group.leave()
+            case .failure(let error):
+                deferred.fill(.failure(error))
             }
-        }
-        group.notify(queue: .main) {
-            let sorted = items.map {
-                ($0.0, self.scored(rssItems: $0.1))
-            }
-            deferred.fill(.success(sorted))
         }
         return deferred
     }
     
+    /// Load all RSS feeds that the user has enabled
+    private func loadRSSFeeds() -> Deferred<[Result<RSSDataFeed, Error>]> {
+        let locations = rssFeedLocations.filter(isRSSFeedEnabled)
+        return all(locations.map(loadRSSLocation))
+    }
+    
+    /// Scores RSS items similar to how the backend scores regular Brave Today sources
     private func scored(rssItems: [FeedItem.Content]) -> [FeedItem.Content] {
         var varianceBySource: [String: Double] = [:]
         return rssItems.map {
@@ -395,20 +411,18 @@ class FeedDataSource {
             case (.success(let sources), .success(let items)):
                 self.sources = sources
                 self.items = items
-                print("Regular feed items count: \(items.count)")
-                print("Regular sources count: \(sources.count)")
-                self.loadRSSFeeds().uponQueue(.main) { [weak self] result in
+                self.loadRSSFeeds().uponQueue(.main) { [weak self] results in
                     guard let self = self else { return }
-                    switch result {
-                    case .success(let feeds):
-                        self.sources.append(contentsOf: feeds.map(\.0))
-                        for items in feeds.map(\.1) {
-                            self.items.append(contentsOf: items)
+                    for result in results {
+                        switch result {
+                        case .success(let feed):
+                            self.sources.append(feed.source)
+                            self.items.append(contentsOf: feed.items)
+                        case .failure(_):
+                            // At the moment we dont handle any load errors once the feed has been
+                            // added
+                            break
                         }
-                        print("Post RSS feed items count: \(self.items.count)")
-                        print("Post RSS sources count: \(self.sources.count)")
-                    case .failure(_):
-                        break
                     }
                     self.reloadCards(from: self.items, sources: self.sources, completion: completion)
                 }

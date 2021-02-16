@@ -30,10 +30,12 @@ extension FeedDataSource {
     }
     
     /// Add a users custom RSS feed to the list of sources
+    ///
+    /// - returns: `true` if the feed is successfully added, `false` if it already exists
     @discardableResult
     func addRSSFeedLocation(_ location: RSSFeedLocation) -> Bool {
         let feedUrl = location.url.absoluteString
-        if let _ = RSSFeedSource.get(with: feedUrl) {
+        if RSSFeedSource.get(with: feedUrl) != nil {
             return false
         }
         RSSFeedSource.insert(title: location.title,
