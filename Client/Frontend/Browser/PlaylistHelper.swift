@@ -72,6 +72,7 @@ class PlaylistHelper: TabContentScript {
                         
                         DispatchQueue.main.async {
                             self.delegate?.showPlaylistToast(info: item, itemState: .added)
+                            UIImpactFeedbackGenerator(style: .medium).bzzt()
                         }
                     }
                 }))
