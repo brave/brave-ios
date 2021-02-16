@@ -141,12 +141,6 @@ extension PlaylistMediaInfo: MPPlayableContentDelegate {
         case none
     }
     
-    private func displayLoadingResourceError() {
-        let alert = UIAlertController(title: "Sorry", message: "There was a problem loading the resource!", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "Okay", style: .default, handler: nil))
-        //self.present(alert, animated: true, completion: nil)
-    }
-    
     public func loadMediaItem(_ item: PlaylistInfo, index: Int, completion: @escaping (MediaPlaybackError) -> Void) {
         self.nowPlayingInfo = item
         self.playerStatusObserver = nil

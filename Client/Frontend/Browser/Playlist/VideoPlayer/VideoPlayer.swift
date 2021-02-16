@@ -339,7 +339,15 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     private var playObserver: Any?
     private var fadeAnimationWorkItem: DispatchWorkItem?
     
-    private(set) public var isPlaying: Bool = false
+    public var isPlaying: Bool {
+        //It is better NOT to keep tracking of isPlaying OR rate > 0.0
+        //Instead we should use the timeControlStatus because PIP and Background play
+        //via control-center will modify the timeControlStatus property
+        //This will keep our UI consistent with what is on the lock-screen.
+        //This will also allow us to properly determine play state in
+        //PlaylistMediaInfo -> init -> MPRemoteCommandCenter.shared().playCommand
+        return player.timeControlStatus == .playing
+    }
     private(set) public var isSeeking: Bool = false
     private(set) public var isFullscreen: Bool = false
     private(set) public var isOverlayDisplayed: Bool = false
@@ -670,7 +678,6 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
             self.trackBar.setTimeRange(currentTime: currentItem.currentTime(), endTime: endTime)
             self.player.seek(to: .zero)
             
-            self.isPlaying = false
             self.playPauseButton.isEnabled = true
             self.showOverlays(true)
             
@@ -766,7 +773,6 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     
     public func play() {
         if !isPlaying {
-            isPlaying.toggle()
             playPauseButton.setImage(#imageLiteral(resourceName: "playlist_pause"), for: .normal)
             player.play()
             
@@ -778,7 +784,6 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     
     public func pause() {
         if isPlaying {
-            isPlaying.toggle()
             playPauseButton.setImage(#imageLiteral(resourceName: "playlist_play"), for: .normal)
             player.pause()
             
@@ -789,7 +794,6 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     }
     
     public func stop() {
-        isPlaying = false
         playPauseButton.setImage(#imageLiteral(resourceName: "playlist_play"), for: .normal)
         player.pause()
         
