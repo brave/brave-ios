@@ -352,9 +352,10 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         //PlaylistMediaInfo -> init -> MPRemoteCommandCenter.shared().playCommand
         return player.timeControlStatus == .playing
     }
-    private(set) public var isSeeking: Bool = false
-    private(set) public var isFullscreen: Bool = false
-    private(set) public var isOverlayDisplayed: Bool = false
+    private var wasPlayingBeforeSeeking = false
+    private(set) public var isSeeking = false
+    private(set) public var isFullscreen = false
+    private(set) public var isOverlayDisplayed = false
     private var notificationObservers = [NSObjectProtocol]()
     private var pictureInPictureObservers = [NSObjectProtocol]()
     private(set) public var pictureInPictureController: AVPictureInPictureController?
@@ -521,6 +522,9 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
                     self.showOverlays(false)
                 }
             }
+        } else {
+            showOverlays(true)
+            isOverlayDisplayed = true
         }
     }
 
@@ -632,6 +636,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         
         if isPlaying {
             player.pause()
+            wasPlayingBeforeSeeking = true
         }
         
         showOverlays(false, except: [trackBar, trackBarBackground], display: [trackBar, trackBarBackground])
@@ -645,8 +650,9 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     fileprivate func onValueEnded(_ trackBar: VideoTrackerBar, value: CGFloat) {
         isSeeking = false
         
-        if self.isPlaying {
+        if wasPlayingBeforeSeeking {
             player.play()
+            wasPlayingBeforeSeeking = false
         }
         
         showOverlays(false, except: [overlayView], display: [overlayView])
