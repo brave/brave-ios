@@ -1126,14 +1126,32 @@ extension Strings {
         public static let removePlaylistVideoAlertTitle =
             NSLocalizedString("playlist.removePlaylistVideoAlertTitle",
                               bundle: .braveShared,
-                              value: "Remove Video from Playlist?",
-                              comment: "Title for the alert shown when the user tries to remove a video from playlist")
+                              value: "Remove Media Item from Playlist?",
+                              comment: "Title for the alert shown when the user tries to remove an item from playlist")
         
         public static let removePlaylistVideoAlertMessage =
             NSLocalizedString("playlist.removePlaylistAlertMessage",
                               bundle: .braveShared,
-                              value: "This will remove the video from the list. Are you sure you want to continue?",
+                              value: "This will remove the media item from the list. Are you sure you want to continue?",
                               comment: "Message for the alert shown when the user tries to remove a video from playlist")
+        
+        public static let removePlaylistDownloadedVideoAlertTitle =
+            NSLocalizedString("playlist.removePlaylistDownloadedVideoAlertTitle",
+                              bundle: .braveShared,
+                              value: "Remove Downloaded Media from Playlist?",
+                              comment: "Title for the alert shown when the user tries to remove a downloaded item from playlist")
+        
+        public static let removePlaylistDownloadedVideoAlertMessage =
+            NSLocalizedString("playlist.removePlaylistDownloadedAlertMessage",
+                              bundle: .braveShared,
+                              value: "This will remove the cached media item from the list. Are you sure you want to continue?",
+                              comment: "Message for the alert shown when the user tries to remove a downloaded item from playlist")
+        
+        public static let removePlaylistDownloadedVideoClearButton =
+            NSLocalizedString("playlist.removePlaylistDownloadedVideoClearButton",
+                              bundle: .braveShared,
+                              value: "Clear Cache",
+                              comment: "Button title when clearing Playlist media cache")
     }
 }
 

@@ -49,8 +49,8 @@ public class PlaylistDownloadManager: PlaylistStreamDownloadManagerDelegate {
     }
     
     init() {
-        self.hlsDelegate = PlaylistHLSDownloadManager()
-        self.fileDelegate = PlaylistFileDownloadManager()
+        hlsDelegate = PlaylistHLSDownloadManager()
+        fileDelegate = PlaylistFileDownloadManager()
         
         let hlsConfiguration = URLSessionConfiguration.background(withIdentifier: "com.brave.playlist.hls.background.session")
         hlsSession = AVAssetDownloadURLSession(configuration: hlsConfiguration,
@@ -61,6 +61,9 @@ public class PlaylistDownloadManager: PlaylistStreamDownloadManagerDelegate {
         fileSession = URLSession(configuration: fileConfiguration,
                                  delegate: fileDelegate,
                                  delegateQueue: OperationQueue())
+        
+        hlsDelegate.delegate = self
+        fileDelegate.delegate = self
     }
     
     func restoreSession(_ completion: @escaping () -> Void) {

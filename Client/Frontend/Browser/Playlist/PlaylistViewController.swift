@@ -277,14 +277,16 @@ extension PlaylistViewController: UITableViewDelegate {
                 case .downloaded:
                     let style: UIAlertController.Style = UIDevice.current.userInterfaceIdiom == .pad ? .alert : .actionSheet
                     let alert = UIAlertController(
-                        title: Strings.PlayList.removePlaylistVideoAlertTitle, message: Strings.PlayList.removePlaylistVideoAlertMessage, preferredStyle: style)
+                        title: Strings.PlayList.removePlaylistDownloadedVideoAlertTitle, message: Strings.PlayList.removePlaylistDownloadedVideoAlertMessage, preferredStyle: style)
                     
-                    alert.addAction(UIAlertAction(title: Strings.PlayList.addToPlayListAlertTitle, style: .default, handler: { _ in
+                    alert.addAction(UIAlertAction(title: Strings.PlayList.removePlaylistDownloadedVideoClearButton, style: .default, handler: { _ in
                         PlaylistManager.shared.deleteCache(item: currentItem)
                         self.tableView.reloadRows(at: [indexPath], with: .automatic)
                     }))
                     
                     alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil))
+                    
+                    self.present(alert, animated: true, completion: nil)
             }
             
             completionHandler(true)
@@ -293,15 +295,24 @@ extension PlaylistViewController: UITableViewDelegate {
         let deleteAction = UIContextualAction(style: .normal, title: Strings.PlayList.removeActionButtonTitle, handler: { [weak self] (action, view, completionHandler) in
             guard let self = self else { return }
             
-            PlaylistManager.shared.delete(item: currentItem)
+            let style: UIAlertController.Style = UIDevice.current.userInterfaceIdiom == .pad ? .alert : .actionSheet
+            let alert = UIAlertController(
+                title: Strings.PlayList.removePlaylistVideoAlertTitle, message: Strings.PlayList.removePlaylistVideoAlertMessage, preferredStyle: style)
+            
+            alert.addAction(UIAlertAction(title: Strings.delete, style: .default, handler: { _ in
+                PlaylistManager.shared.delete(item: currentItem)
 
-            if self.currentlyPlayingItemIndex == indexPath.row {
-                self.currentlyPlayingItemIndex = -1
-                self.mediaInfo.updateNowPlayingMediaInfo()
-                
-                self.activityIndicator.stopAnimating()
-                self.playerView.stop()
-            }
+                if self.currentlyPlayingItemIndex == indexPath.row {
+                    self.currentlyPlayingItemIndex = -1
+                    self.mediaInfo.updateNowPlayingMediaInfo()
+                    
+                    self.activityIndicator.stopAnimating()
+                    self.playerView.stop()
+                }
+            }))
+            
+            alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil))
+            self.present(alert, animated: true, completion: nil)
             
             completionHandler(true)
         })
