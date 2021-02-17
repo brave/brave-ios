@@ -21,6 +21,7 @@ private protocol PlaylistPadControllerDetailDelegate: class {
     func setControlsEnabled(_ enabled: Bool)
     func updatePlayerControlsState()
     func loadMediaItem(_ item: PlaylistInfo, index: Int, completion: @escaping (PlaylistMediaInfo.MediaPlaybackError) -> Void)
+    func changeNavigationTitle(_ navigationTitle: String)
     func displayLoadingResourceError()
     func play()
     func stop()
@@ -38,29 +39,13 @@ class PlaylistPadViewController: UIViewController {
         detailController.delegate = self
         
         splitController.do {
-            $0.viewControllers = [SettingsNavigationController(rootViewController: listController).then {
-                if #available(iOS 13.0, *) {
-                    let appearance = UINavigationBarAppearance()
-                    appearance.configureWithTransparentBackground()
-                    appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
-                    appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
-                    appearance.backgroundColor = BraveUX.popoverDarkBackground
-                    $0.navigationBar.standardAppearance = appearance
-                    $0.navigationBar.scrollEdgeAppearance = appearance
-                    $0.navigationBar.prefersLargeTitles = true
-                } else {
-                    $0.navigationBar.barTintColor = BraveUX.popoverDarkBackground
-                    $0.navigationBar.tintColor = .white
-                    $0.navigationBar.isTranslucent = false
-                    $0.navigationBar.prefersLargeTitles = true
-                }
-            }, detailController]
+            $0.viewControllers = [SettingsNavigationController(rootViewController: listController),
+                                  SettingsNavigationController(rootViewController: detailController)]
             
             $0.preferredPrimaryColumnWidthFraction = 1.0 / 3.0
         }
         
         addChild(splitController)
-        view.addSubview(splitController.view)
         view.addSubview(splitController.view)
         
         splitController.do {
@@ -144,9 +129,7 @@ private class PlaylistPadListController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        navigationItem.rightBarButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "playlist_exit"), style: .done, target: self, action: #selector(onExit(_:)))
-        
+                
         PlaylistManager.shared.delegate = self
         
         setTheme()
@@ -162,16 +145,21 @@ private class PlaylistPadListController: UIViewController {
         title = Strings.PlayList.playListSectionTitle
 
         navigationController?.do {
-            $0.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
-            UILabel.appearance(whenContainedInInstancesOf: [UINavigationBar.self]).appearanceTextColor = .white
-            
-            $0.presentationController?.delegate = self
-            $0.navigationBar.tintColor = .white
-            $0.navigationBar.isTranslucent = false
-            $0.navigationBar.barTintColor = BraveUX.popoverDarkBackground
-            $0.navigationBar.appearanceBarTintColor = BraveUX.popoverDarkBackground
-            $0.navigationBar.setBackgroundImage(UIImage(), for: .default)
-            $0.navigationBar.shadowImage = UIImage()
+            if #available(iOS 13.0, *) {
+                let appearance = UINavigationBarAppearance()
+                appearance.configureWithTransparentBackground()
+                appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
+                appearance.backgroundColor = BraveUX.popoverDarkBackground
+                
+                $0.navigationBar.standardAppearance = appearance
+                $0.navigationBar.barTintColor = BraveUX.popoverDarkBackground
+                $0.navigationBar.tintColor = .white
+            } else {
+                $0.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.white]
+                $0.navigationBar.backgroundColor = .clear
+                $0.navigationBar.barTintColor = BraveUX.popoverDarkBackground
+                $0.navigationBar.tintColor = .white
+            }
         }
         
         view.backgroundColor = .clear
@@ -208,13 +196,6 @@ private class PlaylistPadListController: UIViewController {
             
             self.updateTableBackgroundView()
         }
-    }
-    
-    // MARK: - Actions
-    
-    @objc
-    private func onExit(_ button: UIBarButtonItem) {
-        self.dismiss(animated: true, completion: nil)
     }
 }
 
@@ -413,6 +394,9 @@ extension PlaylistPadListController: UITableViewDelegate {
 
             let item = PlaylistManager.shared.itemAtIndex(indexPath.row)
             infoLabel.text = item.name
+            
+            detailControllerDelegate?.changeNavigationTitle(item.name)
+            
             detailControllerDelegate?.loadMediaItem(item, index: indexPath.row) { [weak self] error in
                 guard let self = self else { return }
                 self.activityIndicator.stopAnimating()
@@ -558,9 +542,30 @@ private class PlaylistPadDetailController: UIViewController, UIGestureRecognizer
         
         playerView.delegate = self
         
+        navigationController?.do {
+            if #available(iOS 13.0, *) {
+                let appearance = UINavigationBarAppearance()
+                appearance.configureWithTransparentBackground()
+                appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
+                appearance.backgroundColor = BraveUX.popoverDarkBackground
+                
+                $0.navigationBar.standardAppearance = appearance
+                $0.navigationBar.barTintColor = BraveUX.popoverDarkBackground
+                $0.navigationBar.tintColor = .white
+            } else {
+                $0.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.white]
+                $0.navigationBar.backgroundColor = .clear
+                $0.navigationBar.barTintColor = BraveUX.popoverDarkBackground
+                $0.navigationBar.tintColor = .white
+            }
+        }
+        
+        navigationItem.rightBarButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "playlist_exit"), style: .done, target: self, action: #selector(onExit(_:)))
+        navigationItem.leftBarButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "playlist_video"), style: .done, target: self, action: #selector(onDisplayModeChange))
+
         view.addSubview(playerView)
         playerView.snp.makeConstraints {
-            $0.edges.equalTo(self.view)
+            $0.edges.equalTo(view)
         }
         
         let slideToRevealGesture = UISwipeGestureRecognizer(target: self, action: #selector(handleGesture))
@@ -578,6 +583,11 @@ private class PlaylistPadDetailController: UIViewController, UIGestureRecognizer
     }
     
     // MARK: Actions
+        
+    @objc
+    private func onExit(_ button: UIBarButtonItem) {
+        self.dismiss(animated: true, completion: nil)
+    }
     
     @objc
     func handleGesture(gesture: UISwipeGestureRecognizer) {
@@ -607,6 +617,8 @@ extension PlaylistPadDetailController: VideoViewDelegate {
         let index = currentlyPlayingItemIndex - 1
         if index < PlaylistManager.shared.numberOfAssets() {
             let item = PlaylistManager.shared.itemAtIndex(index)
+            title = item.name
+            
             mediaInfo.loadMediaItem(item, index: index) { [weak self] error in
                 if case .none = error {
                     self?.currentlyPlayingItemIndex = index
@@ -625,6 +637,8 @@ extension PlaylistPadDetailController: VideoViewDelegate {
         let index = currentlyPlayingItemIndex + 1
         if index >= 0 {
             let item = PlaylistManager.shared.itemAtIndex(index)
+            title = item.name
+            
             mediaInfo.loadMediaItem(item, index: index) { [weak self] error in
                 if case .none = error {
                     self?.currentlyPlayingItemIndex = index
@@ -778,6 +792,10 @@ extension PlaylistPadDetailController: PlaylistPadControllerDetailDelegate {
     
     func loadMediaItem(_ item: PlaylistInfo, index: Int, completion: @escaping (PlaylistMediaInfo.MediaPlaybackError) -> Void) {
         mediaInfo.loadMediaItem(item, index: index, completion: completion)
+    }
+    
+    func changeNavigationTitle(_ navigationTitle: String) {
+        title = navigationTitle
     }
     
     func displayLoadingResourceError() {
