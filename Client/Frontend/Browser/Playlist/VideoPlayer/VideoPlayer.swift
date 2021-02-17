@@ -561,13 +561,18 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     
     @objc
     private func onPlaybackRateChanged(_ button: UIButton) {
-        requestedPlaybackRate += 1.0
-        if Int(requestedPlaybackRate) > 3 {
+        if requestedPlaybackRate == 1.0 {
+            requestedPlaybackRate = 1.5
+            button.setTitle("1.5x", for: .normal)
+        } else if requestedPlaybackRate == 1.5 {
+            requestedPlaybackRate = 2.0
+            button.setTitle("2x", for: .normal)
+        } else {
             requestedPlaybackRate = 1.0
+            button.setTitle("1x", for: .normal)
         }
         
         player.rate = Float(requestedPlaybackRate)
-        button.setTitle("\(Int(requestedPlaybackRate))x", for: .normal)
     }
     
     @objc
