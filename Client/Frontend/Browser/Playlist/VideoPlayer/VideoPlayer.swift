@@ -238,6 +238,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     
     struct UX {
         static let controlOffset: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 30 : 15
+        static let trackerOffset: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 20 : 0
     }
     
     weak var delegate: VideoViewDelegate?
@@ -435,7 +436,8 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         }
         
         trackBar.snp.makeConstraints {
-            $0.left.right.bottom.equalToSuperview()
+            $0.left.right.equalToSuperview()
+            $0.bottom.equalToSuperview().offset(-UX.trackerOffset)
         }
         
         fullScreenButton.snp.makeConstraints {
