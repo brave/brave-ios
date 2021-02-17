@@ -21,6 +21,7 @@ import SafariServices
 import BraveUI
 import NetworkExtension
 import YubiKit
+import FeedKit
 
 private let log = Logger.browserLogger
 
@@ -1856,6 +1857,27 @@ class BrowserViewController: UIViewController {
                 activities.append(createPDFActivity)
             }
             #endif
+        } else {
+            // Check if its a feed, url is a temp document file URL
+            if let selectedTab = tabManager.selectedTab,
+               (selectedTab.mimeType == "application/xml" || selectedTab.mimeType == "application/json"),
+               let tabURL = selectedTab.url {
+                let parser = FeedParser(URL: url)
+                if case .success(let feed) = parser.parse() {
+                    let addToBraveToday = AddFeedToBraveTodayActivity() { [weak self] in
+                        guard let self = self else { return }
+                        let controller = BraveTodayAddSourceResultsViewController(
+                            dataSource: self.feedDataSource,
+                            searchedURL: tabURL,
+                            rssFeedLocations: [.init(title: feed.title, url: tabURL)],
+                            sourcesAdded: nil
+                        )
+                        let container = UINavigationController(rootViewController: controller)
+                        self.present(container, animated: true)
+                    }
+                    activities.append(addToBraveToday)
+                }
+            }
         }
         
         let controller = helper.createActivityViewController(items: activities) { [weak self] completed, _, documentUrl  in

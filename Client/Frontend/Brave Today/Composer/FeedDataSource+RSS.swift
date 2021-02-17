@@ -193,18 +193,20 @@ extension FeedItem.Content {
 extension FeedItem.Source {
     init?(from feed: FeedKit.Feed, location: RSSFeedLocation) {
         let id = location.id
-        let feedTitle: String
-        switch feed {
+        guard let title = feed.title else { return nil }
+        self.init(id: id, isDefault: true, category: "", name: title, isUserSource: true)
+    }
+}
+
+extension Feed {
+    var title: String? {
+        switch self {
         case .atom(let feed):
-            guard let title = feed.title else { return nil }
-            feedTitle = title
+            return feed.title
         case .rss(let feed):
-            guard let title = feed.title else { return nil }
-            feedTitle = title
+            return feed.title
         case .json(let feed):
-            guard let title = feed.title else { return nil }
-            feedTitle = title
+            return feed.title
         }
-        self.init(id: id, isDefault: true, category: "", name: feedTitle, isUserSource: true)
     }
 }
