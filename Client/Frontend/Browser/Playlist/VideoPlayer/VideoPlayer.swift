@@ -926,6 +926,10 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         }
     }
     
+    public func checkInsideTrackBar(point: CGPoint) -> Bool {
+        trackBar.frame.contains(point)
+    }
+    
     private func isAudioAvailable() -> Bool {
         if let tracks = self.player.currentItem?.asset.tracks {
             return tracks.filter({ $0.mediaType == .audio }).isEmpty == false

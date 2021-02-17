@@ -59,12 +59,18 @@ class PlaylistPadViewController: UIViewController {
             $0.preferredPrimaryColumnWidthFraction = 1.0 / 3.0
         }
         
-        self.addChild(splitController)
-        splitController.didMove(toParent: self)
-        
+        addChild(splitController)
         view.addSubview(splitController.view)
-        splitController.view.snp.makeConstraints {
-            $0.edges.equalTo(self.view)
+        view.addSubview(splitController.view)
+        
+        splitController.do {
+            $0.didMove(toParent: self)
+            $0.view.translatesAutoresizingMaskIntoConstraints = false
+            $0.view.snp.makeConstraints {
+                $0.edges.equalToSuperview()
+            }
+            $0.primaryEdge = .leading
+            $0.presentsWithGesture = false
         }
         
         updateLayoutForOrientationChange()
@@ -80,7 +86,7 @@ class PlaylistPadViewController: UIViewController {
         if UIDevice.current.orientation.isLandscape {
             splitController.preferredDisplayMode = .secondaryOnly
         } else {
-            splitController.preferredDisplayMode = .oneBesideSecondary
+            splitController.preferredDisplayMode = .primaryOverlay
         }
     }
 }
@@ -477,7 +483,9 @@ extension PlaylistPadListController: PlaylistManagerDelegate {
     }
 }
 
-private class PlaylistPadDetailController: UIViewController {
+// MARK: - PlaylistPadDetailController
+
+private class PlaylistPadDetailController: UIViewController, UIGestureRecognizerDelegate {
     
     weak var delegate: UIViewController?
     private let playerView = VideoView()
@@ -498,6 +506,37 @@ private class PlaylistPadDetailController: UIViewController {
         playerView.snp.makeConstraints {
             $0.edges.equalTo(self.view)
         }
+        
+        let slideToRevealGesture = UISwipeGestureRecognizer(target: self, action: #selector(handleGesture))
+        slideToRevealGesture.direction = .right
+        
+        view.addGestureRecognizer(slideToRevealGesture)
+    }
+    
+    // MARK: Private
+    
+    private func updateSplitViewDisplayMode(to displayMode: UISplitViewController.DisplayMode) {
+        UIView.animate(withDuration: 0.2) {
+            self.splitViewController?.preferredDisplayMode = displayMode
+        }
+    }
+    
+    // MARK: Actions
+    
+    @objc
+    func handleGesture(gesture: UISwipeGestureRecognizer) {
+        guard gesture.direction == .right,
+              !playerView.checkInsideTrackBar(point: gesture.location(in: view)) else {
+            return
+        }
+        
+       onDisplayModeChange()
+    }
+    
+    @objc
+    private func onDisplayModeChange() {
+        updateSplitViewDisplayMode(
+            to: splitViewController?.displayMode == .primaryOverlay ? .secondaryOnly : .primaryOverlay)
     }
 }
 
