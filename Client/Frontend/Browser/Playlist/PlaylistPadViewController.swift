@@ -335,15 +335,26 @@ extension PlaylistPadListController: UITableViewDelegate {
         let cacheAction = UIContextualAction(style: .normal, title: downloadedItemTitle, handler: { [weak self] (action, view, completionHandler) in
             guard let self = self else { return }
             
-            if cacheState == .inProgress {
-                PlaylistManager.shared.cancelDownload(item: currentItem)
-                self.tableView.reloadRows(at: [indexPath], with: .automatic)
-            } else if cacheState == .invalid {
-                PlaylistManager.shared.download(item: currentItem)
-                self.tableView.reloadRows(at: [indexPath], with: .automatic)
-            } else {
-                PlaylistManager.shared.deleteCache(item: currentItem)
-                self.tableView.reloadRows(at: [indexPath], with: .automatic)
+            switch cacheState {
+                case .inProgress:
+                    PlaylistManager.shared.cancelDownload(item: currentItem)
+                    self.tableView.reloadRows(at: [indexPath], with: .automatic)
+                case .invalid:
+                    PlaylistManager.shared.download(item: currentItem)
+                    self.tableView.reloadRows(at: [indexPath], with: .automatic)
+                case .downloaded:
+                    let style: UIAlertController.Style = UIDevice.current.userInterfaceIdiom == .pad ? .alert : .actionSheet
+                    let alert = UIAlertController(
+                        title: Strings.PlayList.removePlaylistDownloadedVideoAlertTitle, message: Strings.PlayList.removePlaylistDownloadedVideoAlertMessage, preferredStyle: style)
+                    
+                    alert.addAction(UIAlertAction(title: Strings.PlayList.removePlaylistDownloadedVideoClearButton, style: .default, handler: { _ in
+                        PlaylistManager.shared.deleteCache(item: currentItem)
+                        self.tableView.reloadRows(at: [indexPath], with: .automatic)
+                    }))
+                    
+                    alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil))
+                    
+                    self.present(alert, animated: true, completion: nil)
             }
             
             completionHandler(true)
@@ -352,15 +363,24 @@ extension PlaylistPadListController: UITableViewDelegate {
         let deleteAction = UIContextualAction(style: .normal, title: Strings.PlayList.removeActionButtonTitle, handler: { [weak self] (action, view, completionHandler) in
             guard let self = self else { return }
             
-            PlaylistManager.shared.delete(item: currentItem)
+            let style: UIAlertController.Style = UIDevice.current.userInterfaceIdiom == .pad ? .alert : .actionSheet
+            let alert = UIAlertController(
+                title: Strings.PlayList.removePlaylistVideoAlertTitle, message: Strings.PlayList.removePlaylistVideoAlertMessage, preferredStyle: style)
+            
+            alert.addAction(UIAlertAction(title: Strings.delete, style: .default, handler: { _ in
+                PlaylistManager.shared.delete(item: currentItem)
 
-            if self.detailControllerDelegate?.getCurrentItemIndex() == indexPath.row {
-                self.detailControllerDelegate?.setCurrentItemIndex(-1)
-                self.detailControllerDelegate?.updateNowPlayingMediaInfo()
-                
-                self.activityIndicator.stopAnimating()
-                self.detailControllerDelegate?.stop()
-            }
+                if self.detailControllerDelegate?.getCurrentItemIndex() == indexPath.row {
+                    self.detailControllerDelegate?.setCurrentItemIndex(-1)
+                    self.detailControllerDelegate?.updateNowPlayingMediaInfo()
+                    
+                    self.activityIndicator.stopAnimating()
+                    self.detailControllerDelegate?.stop()
+                }
+            }))
+            
+            alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil))
+            self.present(alert, animated: true, completion: nil)
             
             completionHandler(true)
         })
