@@ -561,7 +561,7 @@ private class PlaylistPadDetailController: UIViewController, UIGestureRecognizer
         }
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "playlist_exit"), style: .done, target: self, action: #selector(onExit(_:)))
-        navigationItem.leftBarButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "playlist_video"), style: .done, target: self, action: #selector(onDisplayModeChange))
+        navigationItem.leftBarButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "playlist_split_navigation"), style: .done, target: self, action: #selector(onDisplayModeChange))
 
         view.addSubview(playerView)
         playerView.snp.makeConstraints {
