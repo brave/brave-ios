@@ -125,6 +125,7 @@ private class PlaylistPadListController: UIViewController {
         $0.appearanceBackgroundColor = BraveUX.popoverDarkBackground
         $0.separatorColor = .clear
         $0.appearanceSeparatorColor = .clear
+        $0.allowsSelectionDuringEditing = true
     }
     
     private let formatter = DateComponentsFormatter().then {
@@ -286,6 +287,11 @@ extension PlaylistPadListController: UITableViewDataSource {
             }
         }
         
+        cell.gestureRecognizers?.forEach { cell.removeGestureRecognizer($0) }
+        cell.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(longPressedCell(_:))).then {
+            $0.delegate = self
+        })
+        
         return cell
     }
     
@@ -395,6 +401,11 @@ extension PlaylistPadListController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if tableView.isEditing {
+            tableView.setEditing(false, animated: true)
+            return
+        }
+        
         if indexPath.row < PlaylistManager.shared.numberOfAssets() {
             activityIndicator.startAnimating()
             activityIndicator.isHidden = false
@@ -434,12 +445,37 @@ extension PlaylistPadListController: UITableViewDelegate {
         tableView.reloadData()
     }
     
+    // MARK: - Reordering of cells
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        // Intentionally blank. Required to use UITableViewRowActions
+    }
+    
+    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+        return .none
+    }
+    
+    func tableView(_ tableView: UITableView, shouldIndentWhileEditingRowAt indexPath: IndexPath) -> Bool {
+        return false
+    }
+    
     func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
         return true
     }
     
     func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
         PlaylistManager.shared.reorderItems(from: sourceIndexPath, to: destinationIndexPath)
+    }
+    
+    @objc
+    func longPressedCell(_ recognizer: UILongPressGestureRecognizer) {
+        tableView.setEditing(true, animated: true)
+    }
+}
+
+extension PlaylistPadListController: UIGestureRecognizerDelegate {
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+        return !tableView.isEditing
     }
 }
 
