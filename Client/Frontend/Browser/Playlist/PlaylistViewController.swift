@@ -169,6 +169,37 @@ class PlaylistViewController: UIViewController {
     private func onExit(_ button: UIBarButtonItem) {
         self.dismiss(animated: true, completion: nil)
     }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        
+        if UIDevice.current.orientation.isLandscape && presentedViewController == nil {
+            let playerController = AVPlayerViewController().then {
+                $0.player = playerView.player
+                $0.delegate = self
+                $0.allowsPictureInPicturePlayback = true
+                $0.entersFullScreenWhenPlaybackBegins = true
+            }
+            
+            if #available(iOS 14.2, *) {
+                playerController.canStartPictureInPictureAutomaticallyFromInline = true
+            }
+            
+            present(playerController, animated: false) { [weak self] in
+                self?.playerController = playerController
+            }
+        } else if presentedViewController == playerController {
+            let isPlaying = playerView.isPlaying
+            playerView.attachLayer()
+            playerController?.dismiss(animated: false, completion: { [weak self] in
+                guard let self = self else { return }
+                self.playerController = nil
+                if isPlaying {
+                    self.playerView.play()
+                }
+            })
+        }
+    }
 }
 
 // MARK: UIAdaptivePresentationControllerDelegate

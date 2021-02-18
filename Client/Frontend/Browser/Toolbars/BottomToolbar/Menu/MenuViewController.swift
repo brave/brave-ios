@@ -372,7 +372,11 @@ class MenuViewController: UITableViewController {
         } else {
             let playListController = ((UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController as? UINavigationController)?.viewControllers.first ?? PlaylistViewController()
             
-            open(playListController, doneButton: DoneButton(style: .done, position: .right))
+            let navigationController = UINavigationController(rootViewController: playListController)
+            navigationController.modalPresentationStyle = .pageSheet
+            
+            dismissView()
+            bvc.present(navigationController, animated: true)
         }
     }
     
