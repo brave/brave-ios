@@ -110,6 +110,7 @@ class BrowserViewController: UIViewController {
     var pendingToast: Toast? // A toast that might be waiting for BVC to appear before displaying
     var downloadToast: DownloadToast? // A toast that is showing the combined download progress
     var playlistToast: PlaylistToast? // A toast displayed when a playlist item is updated or added
+    private var addToPlayListActivityItem: (enabled: Bool, item: PlaylistInfo?)? // A boolean to determine If AddToListActivity should be added
 
     // Tracking navigation items to record history types.
     // TODO: weak references?
@@ -1792,6 +1793,20 @@ class BrowserViewController: UIViewController {
             tab?.switchUserAgent()
         }
         
+        let addToPlayListActivity = AddToPlaylistActivity() { [unowned self] in
+            guard let item = self.addToPlayListActivityItem?.item else { return }
+            
+            //Update playlist with new items..
+            Playlist.shared.addItem(item: item, cachedData: nil) {
+                log.debug("Playlist Item Added")
+                
+                DispatchQueue.main.async {
+                    self.showPlaylistToast(info: item, itemState: .added)
+                    UIImpactFeedbackGenerator(style: .medium).bzzt()
+                }
+            }
+        }
+        
         var activities: [UIActivity] = [findInPageActivity]
         
         // These actions don't apply if we're sharing a temporary document
@@ -1834,6 +1849,10 @@ class BrowserViewController: UIViewController {
                 activities.append(createPDFActivity)
             }
             #endif
+        }
+        
+        if let playListActivityItem = addToPlayListActivityItem, playListActivityItem.enabled {
+            activities.append(addToPlayListActivity)
         }
         
         let controller = helper.createActivityViewController(items: activities) { [weak self] completed, _, documentUrl  in
@@ -3745,5 +3764,9 @@ extension BrowserViewController: PlaylistHelperDelegate {
             
             presentSettingsNavigation(with: playListController)
         }
+    }
+    
+    func addToPlayListActivity(info: PlaylistInfo?, itemDetected: Bool) {
+        addToPlayListActivityItem = (enabled: itemDetected, item: info)
     }
 }

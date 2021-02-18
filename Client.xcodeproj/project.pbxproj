@@ -450,6 +450,7 @@
 		2FD0E3AF2576C48A000C773B /* SchemePermissionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FD0E3AE2576C48A000C773B /* SchemePermissionTests.swift */; };
 		2FD0E3D62577F327000C773B /* SearchSuggestionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FD0E3D52577F327000C773B /* SearchSuggestionCell.swift */; };
 		2FDB10931A9FBEC5006CF312 /* PrefsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FDB10921A9FBEC5006CF312 /* PrefsTests.swift */; };
+		2FDF290825DEE265001E5C87 /* AddToPlaylistActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FDF290725DEE265001E5C87 /* AddToPlaylistActivity.swift */; };
 		2FE5B42B2580216700BFDDB8 /* ShareTrackersController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FE5B42A2580216700BFDDB8 /* ShareTrackersController.swift */; };
 		2FE5B4542582BEF500BFDDB8 /* ShareTrayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FE5B4532582BEF500BFDDB8 /* ShareTrayView.swift */; };
 		2FE63DB8258BCC29004B219D /* BrowserViewController+OpenSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FE63DB7258BCC29004B219D /* BrowserViewController+OpenSearch.swift */; };
@@ -1930,6 +1931,7 @@
 		2FD0E3AE2576C48A000C773B /* SchemePermissionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchemePermissionTests.swift; sourceTree = "<group>"; };
 		2FD0E3D52577F327000C773B /* SearchSuggestionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchSuggestionCell.swift; sourceTree = "<group>"; };
 		2FDB10921A9FBEC5006CF312 /* PrefsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrefsTests.swift; sourceTree = "<group>"; };
+		2FDF290725DEE265001E5C87 /* AddToPlaylistActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddToPlaylistActivity.swift; sourceTree = "<group>"; };
 		2FE5B42A2580216700BFDDB8 /* ShareTrackersController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareTrackersController.swift; sourceTree = "<group>"; };
 		2FE5B4532582BEF500BFDDB8 /* ShareTrayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareTrayView.swift; sourceTree = "<group>"; };
 		2FE63DB7258BCC29004B219D /* BrowserViewController+OpenSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowserViewController+OpenSearch.swift"; sourceTree = "<group>"; };
@@ -4919,6 +4921,7 @@
 				D3972BF11C22412B00035B87 /* ShareExtensionHelper.swift */,
 				D3972BF21C22412B00035B87 /* TitleActivityItemProvider.swift */,
 				2703BE8A24F4508E00CBE6CD /* CreatePDFActivity.swift */,
+				2FDF290725DEE265001E5C87 /* AddToPlaylistActivity.swift */,
 			);
 			path = Share;
 			sourceTree = "<group>";
@@ -7079,6 +7082,7 @@
 				E63ED8E11BFD25580097D08E /* LoginListViewController.swift in Sources */,
 				D0625CA8208FC47A0081F3B2 /* BrowserViewController+DownloadQueueDelegate.swift in Sources */,
 				2F44FCC71A9E8CF500FD20CC /* SearchSettingsTableViewController.swift in Sources */,
+				2FDF290825DEE265001E5C87 /* AddToPlaylistActivity.swift in Sources */,
 				273FCB9A25A7BC5500F279B5 /* BraveTodayDebugSettingsController.swift in Sources */,
 				5E99CD6125D5E834003F30B4 /* PlaylistPadViewController.swift in Sources */,
 				39A359E41BFCCE94006B9E87 /* UserActivityHandler.swift in Sources */,
