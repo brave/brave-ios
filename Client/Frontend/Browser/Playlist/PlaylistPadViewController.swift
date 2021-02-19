@@ -41,8 +41,6 @@ class PlaylistPadViewController: UIViewController {
         splitController.do {
             $0.viewControllers = [SettingsNavigationController(rootViewController: listController),
                                   SettingsNavigationController(rootViewController: detailController)]
-            
-            $0.preferredPrimaryColumnWidthFraction = 1.0 / 3.0
         }
         
         addChild(splitController)
@@ -54,8 +52,9 @@ class PlaylistPadViewController: UIViewController {
             $0.view.snp.makeConstraints {
                 $0.edges.equalToSuperview()
             }
-            $0.primaryEdge = .leading
+            $0.primaryEdge = PlayListSide(rawValue: Preferences.Playlist.listViewSide.value) == .left ? .leading : .trailing
             $0.presentsWithGesture = false
+            $0.preferredPrimaryColumnWidthFraction = 1.0 / 3.0
         }
         
         updateLayoutForOrientationChange()
@@ -539,9 +538,15 @@ private class PlaylistPadDetailController: UIViewController, UIGestureRecognizer
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        playerView.delegate = self
-        
+
+        setup()
+        layoutBarButtons()
+        addGestureRecognizers()
+    }
+    
+    // MARK: Private
+    
+    private func setup() {
         navigationController?.do {
             if #available(iOS 13.0, *) {
                 let appearance = UINavigationBarAppearance()
@@ -560,21 +565,31 @@ private class PlaylistPadDetailController: UIViewController, UIGestureRecognizer
             }
         }
         
-        navigationItem.rightBarButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "playlist_exit"), style: .done, target: self, action: #selector(onExit(_:)))
-        navigationItem.leftBarButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "playlist_split_navigation"), style: .done, target: self, action: #selector(onDisplayModeChange))
+        playerView.delegate = self
 
         view.addSubview(playerView)
         playerView.snp.makeConstraints {
             $0.edges.equalTo(view)
+            $0.top.equalTo(view.safeAreaLayoutGuide.snp.top)
         }
+    }
+    
+    private func layoutBarButtons() {
+        let exitBarButton =  UIBarButtonItem(image: #imageLiteral(resourceName: "playlist_exit"), style: .done, target: self, action: #selector(onExit(_:)))
+        let sideListBarButton = UIBarButtonItem(image: #imageLiteral(resourceName: "playlist_split_navigation"), style: .done, target: self, action: #selector(onDisplayModeChange))
         
+        navigationItem.rightBarButtonItem =
+            PlayListSide(rawValue: Preferences.Playlist.listViewSide.value) == .left ? exitBarButton : sideListBarButton
+        navigationItem.leftBarButtonItem =
+            PlayListSide(rawValue: Preferences.Playlist.listViewSide.value) == .left ? sideListBarButton : exitBarButton
+    }
+    
+    private func addGestureRecognizers() {
         let slideToRevealGesture = UISwipeGestureRecognizer(target: self, action: #selector(handleGesture))
         slideToRevealGesture.direction = .right
         
         view.addGestureRecognizer(slideToRevealGesture)
     }
-    
-    // MARK: Private
     
     private func updateSplitViewDisplayMode(to displayMode: UISplitViewController.DisplayMode) {
         UIView.animate(withDuration: 0.2) {

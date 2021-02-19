@@ -49,6 +49,18 @@ protocol SettingsDelegate: class {
     func settingsDidFinish(_ settingsViewController: SettingsViewController)
 }
 
+enum PlayListSide: String, CaseIterable, RepresentableOptionType {
+    case left = "left"
+    case right = "right"
+        
+    var displayString: String {
+        switch self {
+            case .left: return "Left"
+            case .right: return "Right"
+        }
+    }
+}
+
 class SettingsViewController: TableViewController {
     weak var settingsDelegate: SettingsDelegate?
     
@@ -118,6 +130,7 @@ class SettingsViewController: TableViewController {
             displaySection,
             securitySection,
             supportSection,
+            playListSection,
             aboutSection
         ]
         
@@ -417,6 +430,48 @@ class SettingsViewController: TableViewController {
                     cellClass: MultilineValue1Cell.self)
             ]
         )
+    }()
+    
+    private lazy var playListSection: Section = {
+        var display = Section(
+            header: .title(Strings.PlayList.playListSectionTitle),
+            rows: [
+                .boolRow(title: "Show Add to Playlist Toast",
+                         option: Preferences.Playlist.showToastForAdd,
+                         image: #imageLiteral(resourceName: "playlist_menu").template)
+            ]
+        )
+        
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            let themeSubtitle = PlayListSide(rawValue: Preferences.Playlist.listViewSide.value)?.displayString
+            
+            var row = Row(text: "Sidebar Location",
+                          detailText: themeSubtitle,
+                          image: #imageLiteral(resourceName: "playlist_split_navigation").template,
+                          accessory: .disclosureIndicator,
+                          cellClass: MultilineSubtitleCell.self)
+             
+            row.selection = { [unowned self] in
+                let optionsViewController = OptionSelectionViewController<PlayListSide>(
+                    options: PlayListSide.allCases,
+                    selectedOption: PlayListSide(rawValue: Preferences.Playlist.listViewSide.value),
+                    optionChanged: { [unowned self] _, option in
+                        Preferences.Playlist.listViewSide.value = option.rawValue
+                        
+                        self.dataSource.reloadCell(row: row, section: display, displayText: option.displayString)
+                        self.applyTheme(self.theme)
+                    }
+                )
+                optionsViewController.headerText = "Sidebar Location"
+                optionsViewController.footerText = "This setting will change video list location between left-hand side/ right-hand side."
+                
+                self.navigationController?.pushViewController(optionsViewController, animated: true)
+            }
+        
+            display.rows.append(row)
+        }
+        
+        return display
     }()
     
     private lazy var aboutSection: Section = {
