@@ -3701,6 +3701,10 @@ extension BrowserViewController: PlaylistHelperDelegate {
     }
     
     func showPlaylistToast(info: PlaylistInfo, itemState: PlaylistItemAddedState) {
+        guard Preferences.Playlist.showToastForAdd.value else {
+            return
+        }
+        
         if let toast = self.pendingToast {
             toast.dismiss(false)
             self.pendingToast = nil
