@@ -8,6 +8,7 @@ import BraveUI
 import Data
 import Shared
 import BraveShared
+import FeedKit
 
 // Named `logger` because we are using math function `log`
 private let logger = Logger.browserLogger
@@ -302,6 +303,54 @@ class FeedDataSource {
         }
     }
     
+    private func loadRSSFeeds() -> Deferred<Result<[(FeedItem.Source, [FeedItem.Content])], Error>> {
+        let deferred = Deferred<Result<[(FeedItem.Source, [FeedItem.Content])], Error>>(value: nil, defaultQueue: .main)
+        var items: [(FeedItem.Source, [FeedItem.Content])] = []
+        let group = DispatchGroup()
+        for feedLocation in rssFeedLocations {
+            group.enter()
+            let parser = FeedParser(URL: feedLocation.url)
+            parser.parseAsync { result in
+                if case .success(let feed) = result, case .atom(let atomFeed) = feed, let entries = atomFeed.entries {
+                    if let source = FeedItem.Source(from: feed, location: feedLocation) {
+                        let feedItems = entries.compactMap {
+                            FeedItem.Content(from: $0, location: feedLocation)
+                        }
+                        items.append((source, feedItems))
+                    }
+                }
+                if case .success(let feed) = result, case .rss(let rssFeed) = feed, let entries = rssFeed.items {
+                    if let source = FeedItem.Source(from: feed, location: feedLocation) {
+                        let feedItems = entries.compactMap {
+                            FeedItem.Content(from: $0, location: feedLocation)
+                        }
+                        items.append((source, feedItems))
+                    }
+                }
+                group.leave()
+            }
+        }
+        group.notify(queue: .main) {
+            let sorted = items.map {
+                ($0.0, self.scored(rssItems: $0.1))
+            }
+            deferred.fill(.success(sorted))
+        }
+        return deferred
+    }
+    
+    private func scored(rssItems: [FeedItem.Content]) -> [FeedItem.Content] {
+        var varianceBySource: [String: Double] = [:]
+        return rssItems.map {
+            var content = $0
+            let recency = log(max(1, -content.publishTime.timeIntervalSinceNow))
+            let variance = (varianceBySource[content.publisherID] ?? 1.0) * 2.0
+            varianceBySource[content.publisherID] = variance
+            content.baseScore = recency * variance
+            return content
+        }
+    }
+    
     /// Whether or not we should load content or just use what's in `state`.
     ///
     /// If the data source is already loading, returns `false`
@@ -346,7 +395,23 @@ class FeedDataSource {
             case (.success(let sources), .success(let items)):
                 self.sources = sources
                 self.items = items
-                self.reloadCards(from: items, sources: sources, completion: completion)
+                print("Regular feed items count: \(items.count)")
+                print("Regular sources count: \(sources.count)")
+                self.loadRSSFeeds().uponQueue(.main) { [weak self] result in
+                    guard let self = self else { return }
+                    switch result {
+                    case .success(let feeds):
+                        self.sources.append(contentsOf: feeds.map(\.0))
+                        for items in feeds.map(\.1) {
+                            self.items.append(contentsOf: items)
+                        }
+                        print("Post RSS feed items count: \(self.items.count)")
+                        print("Post RSS sources count: \(self.sources.count)")
+                    case .failure(_):
+                        break
+                    }
+                    self.reloadCards(from: self.items, sources: self.sources, completion: completion)
+                }
             }
         }
     }
@@ -429,6 +494,11 @@ class FeedDataSource {
     
     /// Whether or not cards need to be reloaded next time we attempt to request state data
     private var needsReloadCards = false
+    
+    /// Notify the feed data source that it needs to reload cards next time we request state data
+    func setNeedsReloadCards() {
+        needsReloadCards = true
+    }
     
     /// Scores and generates cards from a set of items and sources
     private func reloadCards(

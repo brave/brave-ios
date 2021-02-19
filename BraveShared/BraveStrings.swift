@@ -1703,7 +1703,7 @@ extension Strings {
         public static let settingsSourceHeaderTitle = NSLocalizedString(
             "today.settingsSourceHeaderTitle",
             bundle: .braveShared,
-            value: "Sources",
+            value: "Default Sources",
             comment: ""
         )
         public static let resetSourceSettingsButtonTitle = NSLocalizedString(
