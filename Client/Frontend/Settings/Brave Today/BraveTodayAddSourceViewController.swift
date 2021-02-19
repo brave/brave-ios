@@ -15,7 +15,18 @@ class BraveTodayAddSourceViewController: UITableViewController {
     private let feedDataSource: FeedDataSource
     var sourcesAdded: ((Set<RSSFeedLocation>) -> Void)?
     
-    private var isLoading: Bool = false
+    private var isLoading: Bool = false {
+        didSet {
+            if isLoading {
+                self.activityIndicator.startAnimating()
+            } else {
+                self.activityIndicator.stopAnimating()
+            }
+        }
+    }
+    private let activityIndicator = UIActivityIndicatorView(style: .gray).then {
+        $0.hidesWhenStopped = true
+    }
     
     init(dataSource: FeedDataSource) {
         self.feedDataSource = dataSource
@@ -44,6 +55,7 @@ class BraveTodayAddSourceViewController: UITableViewController {
         navigationItem.largeTitleDisplayMode = .always
         navigationItem.backButtonTitle = ""
         navigationItem.leftBarButtonItem = .init(barButtonSystemItem: .cancel, target: self, action: #selector(tappedCancel))
+        navigationItem.rightBarButtonItem = .init(customView: activityIndicator)
         
         textField.addTarget(self, action: #selector(textFieldTextChanged), for: .editingChanged)
         textField.delegate = self
@@ -102,8 +114,10 @@ class BraveTodayAddSourceViewController: UITableViewController {
             text.replaceSubrange(range, with: [])
         }
         guard let url = URIFixup.getURL(text) else { return }
+        isLoading = true
         downloadPageData(for: url) { [weak self] result in
             guard let self = self else { return }
+            self.isLoading = false
             switch result {
             case .success(let data):
                 let resultsController = BraveTodayAddSourceResultsViewController(
