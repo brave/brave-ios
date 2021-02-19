@@ -75,6 +75,12 @@ class BraveTodaySettingsViewController: TableViewController {
                             self?.reloadSections()
                         }
                         let container = UINavigationController(rootViewController: controller)
+                        let idiom = UIDevice.current.userInterfaceIdiom
+                        if #available(iOS 13.0, *) {
+                            container.modalPresentationStyle = idiom == .phone ? .pageSheet : .formSheet
+                        } else {
+                            container.modalPresentationStyle = idiom == .phone ? .fullScreen : .formSheet
+                        }
                         self.present(container, animated: true)
                     }, image: nil, accessory: .disclosureIndicator)
                 ]
