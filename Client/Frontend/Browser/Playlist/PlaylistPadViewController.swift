@@ -569,8 +569,8 @@ private class PlaylistPadDetailController: UIViewController, UIGestureRecognizer
 
         view.addSubview(playerView)
         playerView.snp.makeConstraints {
-            $0.edges.equalTo(view)
-            $0.top.equalTo(view.safeAreaLayoutGuide.snp.top)
+            $0.bottom.left.right.equalTo(view)
+            $0.top.equalTo(view.safeAreaLayoutGuide)
         }
     }
     
