@@ -21,7 +21,6 @@ class BraveVPNRegionPickerViewController: UIViewController {
     }
     
     deinit {
-        dispatchGroup = nil
         NotificationCenter.default.removeObserver(self)
     }
     
@@ -36,7 +35,7 @@ class BraveVPNRegionPickerViewController: UIViewController {
             
             // Prevent dismissing the modal by swipe when the VPN is being configured
             if #available(iOS 13.0, *) {
-                navigationController?.isModalInPresentation = isLoading == true
+                navigationController?.isModalInPresentation = isLoading
             }
             
             if !isLoading { return }

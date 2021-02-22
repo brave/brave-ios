@@ -122,10 +122,14 @@ class BraveVPNSettingsViewController: TableViewController {
                            Row(text: Strings.VPN.settingsServerLocation, detailText: location,
                                uuid: locationCellId),
                            Row(text: Strings.VPN.settingsChangeLocation,
-                               selection: selectServerTapped,
+                               selection: { [unowned self] in
+                                self.selectServerTapped()
+                               },
                                cellClass: ButtonCell.self),
                            Row(text: Strings.VPN.settingsResetConfiguration,
-                               selection: resetConfigurationTapped,
+                               selection: { [unowned self] in
+                                self.selectServerTapped()
+                               },
                                cellClass: ButtonCell.self, uuid: resetCellId)],
                     uuid: serverSectionId)
         
@@ -149,7 +153,6 @@ class BraveVPNSettingsViewController: TableViewController {
     deinit {
         NotificationCenter.default.removeObserver(self)
         serverListRequest?.cancel()
-        serverListRequest = nil
     }
     
     private var serverListRequest: URLSessionDataTask?

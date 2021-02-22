@@ -580,7 +580,13 @@ class BraveVPN {
                 return
             }
             
-            completion(try? JSONDecoder().decode([VPNRegion].self, from: data))
+            
+            do {
+                completion(try JSONDecoder().decode([VPNRegion].self, from: data))
+            } catch {
+                logAndStoreError("Failed to decode VPNRegion JSON: \(error.localizedDescription)")
+                completion(nil)
+            }
         }
     }
 }
