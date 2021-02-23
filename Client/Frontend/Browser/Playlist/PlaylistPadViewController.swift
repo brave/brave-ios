@@ -430,7 +430,7 @@ extension PlaylistPadListController: PlaylistManagerDelegate {
             
             let cacheState = PlaylistManager.shared.state(for: id)
             if cacheState == .inProgress {
-                cell.detailLabel.text = "\(Strings.PlayList.dowloadingPercentageLabelTitle) \(percentComplete)%"
+                cell.detailLabel.text = "\(Strings.PlayList.dowloadingPercentageLabelTitle) \(Int(percentComplete))%"
             } else if cacheState == .downloaded {
                 let item = PlaylistManager.shared.itemAtIndex(index)
                 cell.detailLabel.text = "\(formatter.string(from: TimeInterval(item.duration)) ?? "0:00") - \(Strings.PlayList.dowloadedLabelTitle)"
@@ -441,7 +441,7 @@ extension PlaylistPadListController: PlaylistManagerDelegate {
         }
     }
     
-    func onDownloadStateChanged(id: String, state: PlaylistManager.DownloadState, displayName: String) {
+    func onDownloadStateChanged(id: String, state: PlaylistDownloadManager.DownloadState, displayName: String) {
         if let index = PlaylistManager.shared.index(of: id),
         let cell = tableView.cellForRow(at: IndexPath(row: index, section: 0)) as? PlaylistCell {
             
