@@ -51,6 +51,8 @@ class SearchCustomEngineViewController: UIViewController {
         didSet {
             if let host = host, oldValue != host {
                 fetchSearchEngineSupportForHost(host)
+            } else {
+                checkManualAddExists()
             }
         }
     }
