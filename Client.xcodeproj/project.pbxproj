@@ -432,6 +432,7 @@
 		2F44FCCB1A9E972E00FD20CC /* SearchEnginePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F44FCCA1A9E972E00FD20CC /* SearchEnginePicker.swift */; };
 		2F55443225913BD5000E4689 /* OpenSearchEngineButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F55443125913BD5000E4689 /* OpenSearchEngineButton.swift */; };
 		2F697F7E1A9FD22D009E03AE /* SearchEnginesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F697F7D1A9FD22D009E03AE /* SearchEnginesTests.swift */; };
+		2F8D145F25CA0E1A00D06F0C /* PlaylistVideoListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F8D145E25CA0E1A00D06F0C /* PlaylistVideoListViewController.swift */; };
 		2FB9C2A12587E742009DA1FE /* BrowserViewController+ProductNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FB9C2A02587E742009DA1FE /* BrowserViewController+ProductNotification.swift */; };
 		2FCAE2251ABB51F800877008 /* Storage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2FCAE21A1ABB51F800877008 /* Storage.framework */; };
 		2FCAE2311ABB51F800877008 /* Storage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2FCAE21A1ABB51F800877008 /* Storage.framework */; };
@@ -455,6 +456,8 @@
 		2FE63DB8258BCC29004B219D /* BrowserViewController+OpenSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FE63DB7258BCC29004B219D /* BrowserViewController+OpenSearch.swift */; };
 		2FEA1613259CDFE800E00E4D /* SearchCustomEngineViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FEA1612259CDFE800E00E4D /* SearchCustomEngineViewController.swift */; };
 		2FF0EDB325BA19E9004B18E2 /* SearchQuickEnginesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FF0EDB225BA19E9004B18E2 /* SearchQuickEnginesViewController.swift */; };
+		2FF4EB8525CB63C800BE94DA /* PlaylistVideoPlayerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FF4EB8425CB63C800BE94DA /* PlaylistVideoPlayerViewController.swift */; };
+		2FF4EBCD25CB824600BE94DA /* PlaylistDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FF4EBCC25CB824600BE94DA /* PlaylistDetailsViewController.swift */; };
 		31ADB5DA1E58CEC300E87909 /* ClipboardBarDisplayHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31ADB5D91E58CEC300E87909 /* ClipboardBarDisplayHandler.swift */; };
 		39236E721FCC600200A38F1B /* TabEventHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39236E711FCC600200A38F1B /* TabEventHandlerTests.swift */; };
 		392ED7E41D0AEF56009D9B62 /* NewTabAccessors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 392ED7E31D0AEF56009D9B62 /* NewTabAccessors.swift */; };
@@ -1904,6 +1907,7 @@
 		2F44FCCA1A9E972E00FD20CC /* SearchEnginePicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchEnginePicker.swift; sourceTree = "<group>"; };
 		2F55443125913BD5000E4689 /* OpenSearchEngineButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenSearchEngineButton.swift; sourceTree = "<group>"; };
 		2F697F7D1A9FD22D009E03AE /* SearchEnginesTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchEnginesTests.swift; sourceTree = "<group>"; };
+		2F8D145E25CA0E1A00D06F0C /* PlaylistVideoListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistVideoListViewController.swift; sourceTree = "<group>"; };
 		2FB9C2A02587E742009DA1FE /* BrowserViewController+ProductNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowserViewController+ProductNotification.swift"; sourceTree = "<group>"; };
 		2FCAE21A1ABB51F800877008 /* Storage.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Storage.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2FCAE2241ABB51F800877008 /* StorageTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StorageTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1930,6 +1934,8 @@
 		2FEA1612259CDFE800E00E4D /* SearchCustomEngineViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchCustomEngineViewController.swift; sourceTree = "<group>"; };
 		2FEBABAE1AB3659000DB5728 /* ResultTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResultTests.swift; sourceTree = "<group>"; };
 		2FF0EDB225BA19E9004B18E2 /* SearchQuickEnginesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchQuickEnginesViewController.swift; sourceTree = "<group>"; };
+		2FF4EB8425CB63C800BE94DA /* PlaylistVideoPlayerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistVideoPlayerViewController.swift; sourceTree = "<group>"; };
+		2FF4EBCC25CB824600BE94DA /* PlaylistDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistDetailsViewController.swift; sourceTree = "<group>"; };
 		31ADB5D91E58CEC300E87909 /* ClipboardBarDisplayHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClipboardBarDisplayHandler.swift; sourceTree = "<group>"; };
 		39236E711FCC600200A38F1B /* TabEventHandlerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabEventHandlerTests.swift; sourceTree = "<group>"; };
 		392ED7E31D0AEF56009D9B62 /* NewTabAccessors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NewTabAccessors.swift; path = Accessors/NewTabAccessors.swift; sourceTree = "<group>"; };
@@ -4613,6 +4619,9 @@
 				5E5E6E7825BA15610035B6A0 /* Cache */,
 				5E5E6E4425BA04120035B6A0 /* VideoPlayer */,
 				5E5E6E3925BA03510035B6A0 /* PlaylistViewController.swift */,
+				2FF4EBCC25CB824600BE94DA /* PlaylistDetailsViewController.swift */,
+				2F8D145E25CA0E1A00D06F0C /* PlaylistVideoListViewController.swift */,
+				2FF4EB8425CB63C800BE94DA /* PlaylistVideoPlayerViewController.swift */,
 				5E5E6E9825BA15E80035B6A0 /* Playlist.swift */,
 				5E5E6F6F25BB62EB0035B6A0 /* PlaylistItem+CoreDataClass.swift */,
 				5E5E6F7025BB62EB0035B6A0 /* PlaylistItem+CoreDataProperties.swift */,
@@ -6949,6 +6958,7 @@
 				E4CD9E911A6897FB00318571 /* ReaderMode.swift in Sources */,
 				4422D42321BFCE9200BF1855 /* HttpsEverywhereStats.swift in Sources */,
 				0A8C69AB225CFCAF00988715 /* AddEditBookmarkTableViewController.swift in Sources */,
+				2FF4EBCD25CB824600BE94DA /* PlaylistDetailsViewController.swift in Sources */,
 				27FD2CAD2146C31C00A5A779 /* AddToFavoritesActivity.swift in Sources */,
 				5E5E6E7A25BA156F0035B6A0 /* PlaylistCacheLoader.swift in Sources */,
 				4422D4E121BFFB7600BF1855 /* filter_block.cc in Sources */,
@@ -6969,6 +6979,7 @@
 				FA9293D41D6580E100AC8D33 /* QRCodeViewController.swift in Sources */,
 				27448533245B5EC2001920B5 /* NTPDataSource.swift in Sources */,
 				E6108FF91C84E91C005D25E8 /* BasePasscodeViewController.swift in Sources */,
+				2FF4EB8525CB63C800BE94DA /* PlaylistVideoPlayerViewController.swift in Sources */,
 				39F4C10A2045DB2E00746155 /* FocusHelper.swift in Sources */,
 				E4CD9F2D1A6DC91200318571 /* TabLocationView.swift in Sources */,
 				4452CAF0255412800053EFE6 /* DefaultBrowserIntroCalloutViewController.swift in Sources */,
@@ -7296,6 +7307,7 @@
 				4422D54821BFFB7E00BF1855 /* pcre.cc in Sources */,
 				C8F457AA1F1FDD9B000CB895 /* BrowserViewController+KeyCommands.swift in Sources */,
 				E40FAB0C1A7ABB77009CB80D /* WebServer.swift in Sources */,
+				2F8D145F25CA0E1A00D06F0C /* PlaylistVideoListViewController.swift in Sources */,
 				4422D54C21BFFB7E00BF1855 /* strutil.cc in Sources */,
 				59A68D66379CFA85C4EAF00B /* TwoLineCell.swift in Sources */,
 				A1AD4BE320C0861D007A6EA1 /* UIBarButtonItemExtensions.swift in Sources */,

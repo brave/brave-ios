@@ -1,0 +1,376 @@
+// Copyright 2020 The Brave Authors. All rights reserved.
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+import Foundation
+import UIKit
+import BraveShared
+import Shared
+import AVKit
+import AVFoundation
+import SDWebImage
+import CoreData
+
+private let log = Logger.browserLogger
+
+// MARK: PlaylistVideoListViewController
+
+class PlaylistVideoListViewController: UIViewController {
+    
+    // MARK: Constants
+     
+     struct Constants {
+        static let playListCellIdentifier = "playlistCellIdentifier"
+        static let tableRowHeight: CGFloat = 70
+        static let tableHeaderHeight: CGFloat = 11
+     }
+
+    // MARK: Properties
+    
+//    private let playerView = VideoView()
+    
+    private lazy var activityIndicator = UIActivityIndicatorView(style: .white).then {
+        $0.isHidden = true
+        $0.hidesWhenStopped = true
+    }
+    
+    private let infoLabel = UILabel().then {
+        $0.font = .systemFont(ofSize: 12.0, weight: .regular)
+        $0.textColor = .white
+        $0.textAlignment = .center
+        $0.appearanceTextColor = .white
+        $0.numberOfLines = 0
+        $0.text = Strings.PlayList.playListSectionTitle
+    }
+    
+    private var tableView = UITableView(frame: .zero, style: .grouped).then {
+        $0.backgroundView = UIView()
+        $0.backgroundColor = BraveUX.popoverDarkBackground
+        $0.appearanceBackgroundColor = BraveUX.popoverDarkBackground
+        $0.separatorColor = .clear
+        $0.appearanceSeparatorColor = .clear
+    }
+
+//    private lazy var mediaInfo = PlaylistMediaInfo(playerView: playerView)
+    
+    private var currentlyPlayingItemIndex = -1
+    
+    init() {
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        PlaylistManager.shared.delegate = self
+    
+        setTheme()
+        setup()
+        doLayout()
+
+        fetchResults()
+    }
+    
+    // MARK: Internal
+    
+    private func setTheme() {
+        title = Strings.PlayList.playListSectionTitle
+
+        navigationController?.do {
+            $0.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
+            UILabel.appearance(whenContainedInInstancesOf: [UINavigationBar.self]).appearanceTextColor = .white
+            
+            $0.presentationController?.delegate = self
+            $0.navigationBar.tintColor = .white
+            $0.navigationBar.isTranslucent = false
+            $0.navigationBar.barTintColor = BraveUX.popoverDarkBackground
+            $0.navigationBar.appearanceBarTintColor = BraveUX.popoverDarkBackground
+            $0.navigationBar.setBackgroundImage(UIImage(), for: .default)
+            $0.navigationBar.shadowImage = UIImage()
+        }
+        
+        view.backgroundColor = BraveUX.popoverDarkBackground
+    }
+    
+    private func setup () {              
+        tableView.do {
+            $0.register(PlaylistCell.self, forCellReuseIdentifier: Constants.playListCellIdentifier)
+            $0.dataSource = self
+            $0.delegate = self
+        }
+    }
+    
+    private func doLayout() {
+        view.addSubview(tableView)
+        
+        tableView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+    }
+    
+    private func fetchResults() {
+        DispatchQueue.main.async {
+            PlaylistManager.shared.reloadData()
+            self.tableView.reloadData()
+        }
+    }
+    
+    // MARK: Actions
+    
+    @objc
+    private func onExit(_ button: UIBarButtonItem) {
+        self.dismiss(animated: true, completion: nil)
+    }
+}
+
+// MARK: UIAdaptivePresentationControllerDelegate
+
+extension PlaylistVideoListViewController: UIAdaptivePresentationControllerDelegate {
+    func adaptivePresentationStyle(for controller: UIPresentationController, traitCollection: UITraitCollection) -> UIModalPresentationStyle {
+        return .fullScreen
+    }
+}
+
+// MARK: UITableViewDataSource
+
+extension PlaylistVideoListViewController: UITableViewDataSource {
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 1
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return PlaylistManager.shared.numberOfAssets()
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return Constants.tableRowHeight
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return Constants.tableHeaderHeight
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: Constants.playListCellIdentifier, for: indexPath) as? PlaylistCell else {
+            return UITableViewCell()
+        }
+        
+        let item = PlaylistManager.shared.itemAtIndex(indexPath.row)
+        
+        cell.do {
+            $0.selectionStyle = .none
+            $0.indicatorIcon.image = #imageLiteral(resourceName: "playlist_currentitem_indicator").template
+            $0.indicatorIcon.alpha = 0.0
+            $0.titleLabel.text = item.name
+            $0.detailLabel.text = String(format: "%.2fm", item.duration / 60.0)
+            $0.contentView.backgroundColor = .clear
+            $0.backgroundColor = .clear
+            $0.thumbnailImage = #imageLiteral(resourceName: "menu-NoImageMode")
+        }
+        
+        if let url = URL(string: item.src) {
+            previewImageFromVideo(url: url) {
+                cell.thumbnailImage = $0
+            }
+        }
+        
+        if indexPath.row == currentlyPlayingItemIndex {
+            cell.indicatorIcon.image = #imageLiteral(resourceName: "playlist_currentitem_indicator")
+            cell.indicatorIcon.alpha = 1.0
+        }
+        
+        return cell
+    }
+    
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let headerView = UIView()
+        headerView.backgroundColor = UIColor.clear
+        
+        return headerView
+    }
+    
+    private func previewImageFromVideo(url: URL, _ completion: @escaping (UIImage?) -> Void) {
+        let request = URLRequest(url: url)
+        let cache = URLCache.shared
+        let imageCache = SDImageCache.shared
+
+        if let cachedImage = imageCache.imageFromCache(forKey: url.absoluteString) {
+            completion(cachedImage)
+            return
+        }
+
+        if let cachedResponse = cache.cachedResponse(for: request), let image = UIImage(data: cachedResponse.data) {
+            completion(image)
+            return
+        }
+
+        let asset = AVAsset(url: url)
+        let imageGenerator = AVAssetImageGenerator(asset: asset)
+        imageGenerator.appliesPreferredTrackTransform = false
+
+        let time = CMTimeMake(value: 0, timescale: 600)
+
+        imageGenerator.generateCGImagesAsynchronously(forTimes: [NSValue(time: time)]) { _, cgImage, _, result, error in
+            if result == .succeeded, let cgImage = cgImage {
+                let image = UIImage(cgImage: cgImage)
+                if let data = image.pngData(),
+                   let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil) {
+                    let cachedResponse = CachedURLResponse(response: response, data: data)
+                    cache.storeCachedResponse(cachedResponse, for: request)
+                    imageCache.store(image, forKey: url.absoluteString, completion: nil)
+                }
+                
+                DispatchQueue.main.async {
+                    completion(image)
+                }
+            } else {
+                log.error(error)
+                DispatchQueue.main.async {
+                    completion(nil)
+                }
+            }
+        }
+    }
+}
+
+// MARK: UITableViewDelegate
+
+extension PlaylistVideoListViewController: UITableViewDelegate {
+    
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        
+        if indexPath.row < 0 || indexPath.row >= PlaylistManager.shared.numberOfAssets() {
+            return nil
+        }
+
+        let currentItem = PlaylistManager.shared.itemAtIndex(indexPath.row)
+        let cacheState = PlaylistManager.shared.state(for: currentItem.pageSrc)
+        let downloadedItemTitle = cacheState == .invalid ? Strings.download : Strings.PlayList.clearActionButtonTitle
+        
+        let cacheAction = UIContextualAction(style: .normal, title: downloadedItemTitle, handler: { [weak self] (action, view, completionHandler) in
+            guard let self = self else { return }
+            
+            if cacheState == .inProgress {
+                PlaylistManager.shared.cancelDownload(item: currentItem)
+                self.tableView.reloadRows(at: [indexPath], with: .automatic)
+            } else if cacheState == .invalid {
+                PlaylistManager.shared.download(item: currentItem)
+                self.tableView.reloadRows(at: [indexPath], with: .automatic)
+            } else {
+                PlaylistManager.shared.deleteCache(item: currentItem)
+                self.tableView.reloadRows(at: [indexPath], with: .automatic)
+            }
+            
+            completionHandler(true)
+        })
+        
+        let deleteAction = UIContextualAction(style: .normal, title: Strings.PlayList.removeActionButtonTitle, handler: { [weak self] (action, view, completionHandler) in
+            guard let self = self else { return }
+            
+            PlaylistManager.shared.delete(item: currentItem)
+
+            if self.currentlyPlayingItemIndex == indexPath.row {
+                self.currentlyPlayingItemIndex = -1
+//                self.mediaInfo.updateNowPlayingMediaInfo()
+                
+                self.activityIndicator.stopAnimating()
+//                self.playerView.stop()
+            }
+            
+            completionHandler(true)
+        })
+
+        cacheAction.image = cacheState == .invalid ? #imageLiteral(resourceName: "menu-downloads") : #imageLiteral(resourceName: "action_remove")
+        cacheAction.backgroundColor = .white
+        deleteAction.backgroundColor = #colorLiteral(red: 0.812063769, green: 0.04556301224, blue: 0, alpha: 1)
+        
+        return UISwipeActionsConfiguration(actions: [deleteAction, cacheAction])
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if indexPath.row < PlaylistManager.shared.numberOfAssets() {
+            activityIndicator.startAnimating()
+            activityIndicator.isHidden = false
+            currentlyPlayingItemIndex = indexPath.row
+
+            let item = PlaylistManager.shared.itemAtIndex(indexPath.row)
+            infoLabel.text = item.name
+            
+//            mediaInfo.loadMediaItem(item, index: indexPath.row) { [weak self] error in
+//                guard let self = self else { return }
+//                self.activityIndicator.stopAnimating()
+//
+//                if let error = error {
+//                    log.error(error)
+//                    self.displayLoadingResourceError()
+//                } else if let url = URL(string: item.src) {
+//                    self.previewImageFromVideo(url: url) { image in
+//                        (tableView.cellForRow(at: indexPath) as? PlaylistCell)?.thumbnailImage = image
+//                        tableView.reloadRows(at: [indexPath], with: .automatic)
+//                    }
+//                }
+//            }
+        }
+
+        tableView.reloadData()
+    }
+    
+    private func displayLoadingResourceError() {
+        let alert = UIAlertController(
+            title: Strings.PlayList.sorryAlertTitle, message: Strings.PlayList.loadResourcesErrorAlertDescription, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: nil))
+        
+        self.present(alert, animated: true, completion: nil)
+    }
+}
+
+
+extension PlaylistVideoListViewController: PlaylistManagerDelegate {
+    func onDownloadProgressUpdate(id: String, percentComplete: Double) {
+        if let index = PlaylistManager.shared.index(of: id) {
+            
+            //TODO: Update row to show percentage of download????
+            //Probably not a good idea to reload the row because it'll trigger fetching the thumbnail every time
+            //the percentage changes..
+            //tableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+        }
+    }
+    
+    func onDownloadStateChanged(id: String, state: PlaylistManager.DownloadState, displayName: String) {
+        if let index = PlaylistManager.shared.index(of: id) {
+            
+            //TODO: Update row to show/hide download icon????
+            tableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+        }
+    }
+    
+    func controllerDidChange(_ anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+        
+        switch type {
+            case .insert:
+                tableView.insertRows(at: [newIndexPath!], with: .fade)
+            case .delete:
+                tableView.deleteRows(at: [indexPath!], with: .fade)
+            case .update:
+                tableView.reloadRows(at: [indexPath!], with: .fade)
+            case .move:
+                tableView.deleteRows(at: [indexPath!], with: .fade)
+                tableView.insertRows(at: [newIndexPath!], with: .fade)
+            default:
+                break
+        }
+    }
+    
+    func controllerDidChangeContent() {
+        tableView.endUpdates()
+    }
+    
+    func controllerWillChangeContent() {
+        tableView.beginUpdates()
+    }
+}

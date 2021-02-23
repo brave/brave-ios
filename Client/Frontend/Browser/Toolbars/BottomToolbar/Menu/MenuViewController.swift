@@ -285,36 +285,35 @@ class MenuViewController: UITableViewController {
     private typealias DoneButton = (style: UIBarButtonItem.SystemItem, position: DoneButtonPosition)
     
     private func open(_ viewController: UIViewController, doneButton: DoneButton,
-                      allowSwipeToDismiss: Bool = true, alwaysFullScreen: Bool = false) {
-        let nav = SettingsNavigationController(rootViewController: viewController)
+                      allowSwipeToDismiss: Bool = true, alwaysFullScreen: Bool = false, forcePortraitIfIphone: Bool = true) {
+        let navigationController = SettingsNavigationController(rootViewController: viewController)
         
         // All menu views should be opened in portrait on iPhones.
-        UIDevice.current.forcePortraitIfIphone(for: UIApplication.shared)
+        if forcePortraitIfIphone {
+            UIDevice.current.forcePortraitIfIphone(for: UIApplication.shared)
+        }
 
-        if alwaysFullScreen {
-            nav.modalPresentationStyle = .fullScreen
+        if #available(iOS 13.0, *) {
+            navigationController.isModalInPresentation = !allowSwipeToDismiss
+
+            navigationController.modalPresentationStyle =
+                UIDevice.current.userInterfaceIdiom == .phone ? .pageSheet : .formSheet
         } else {
-            if #available(iOS 13.0, *) {
-                nav.isModalInPresentation = !allowSwipeToDismiss
-
-                nav.modalPresentationStyle =
-                    UIDevice.current.userInterfaceIdiom == .phone ? .pageSheet : .formSheet
-            } else {
-                nav.modalPresentationStyle =
-                    UIDevice.current.userInterfaceIdiom == .phone ? .fullScreen : .formSheet
-            }
+            navigationController.modalPresentationStyle =
+                UIDevice.current.userInterfaceIdiom == .phone ? .fullScreen : .formSheet
         }
         
-        
-        let button = UIBarButtonItem(barButtonSystemItem: doneButton.style, target: nav, action: #selector(nav.done))
+        let button = UIBarButtonItem(barButtonSystemItem: doneButton.style,
+                                     target: navigationController,
+                                     action: #selector(navigationController.done))
         
         switch doneButton.position {
-        case .left: nav.navigationBar.topItem?.leftBarButtonItem = button
-        case .right: nav.navigationBar.topItem?.rightBarButtonItem = button
+            case .left: navigationController.navigationBar.topItem?.leftBarButtonItem = button
+            case .right: navigationController.navigationBar.topItem?.rightBarButtonItem = button
         }
         
         dismissView()
-        bvc.present(nav, animated: true)
+        bvc.present(navigationController, animated: true)
     }
     
     private func openVPNAction(menuCell: MenuCell) {
@@ -365,11 +364,18 @@ class MenuViewController: UITableViewController {
     }
     
     private func openPlaylist() {
-        let vc = PlaylistViewController()
-        let currentTheme = Theme.of(bvc.tabManager.selectedTab)
-        //vc.applyTheme(currentTheme)
-        
-        open(vc, doneButton: DoneButton(style: .done, position: .right), alwaysFullScreen: UIDevice.current.userInterfaceIdiom == .pad)
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            let playlistDetailsController = PlaylistDetailsViewController()
+            playlistDetailsController.modalPresentationStyle = .fullScreen
+                        
+            dismissView()
+            bvc.present(playlistDetailsController, animated: true)
+
+        } else {
+            let playListController = PlaylistViewController()
+            
+            open(playListController, doneButton: DoneButton(style: .done, position: .right), forcePortraitIfIphone: false)
+        }
     }
     
     private func openAddBookmark() {
