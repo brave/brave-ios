@@ -652,6 +652,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         
         if wasPlayingBeforeSeeking {
             player.play()
+            player.rate = Float(requestedPlaybackRate)
             wasPlayingBeforeSeeking = false
         }
         
