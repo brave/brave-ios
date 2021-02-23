@@ -432,7 +432,7 @@ extension SearchCustomEngineViewController {
         }
     
         // Check Engine Exists
-        guard profile.searchEngines.orderedEngines.filter({ $0.shortName == name }).isEmpty else {
+        guard profile.searchEngines.orderedEngines.filter({ $0.shortName == name || $0.searchTemplate.contains(template)}).isEmpty else {
             completion(nil, SearchEngineError.duplicate)
             return
         }
