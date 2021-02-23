@@ -5,30 +5,99 @@
 
 import Foundation
 import UIKit
-import BraveShared
-import Shared
 import AVKit
 import AVFoundation
-import SDWebImage
 import CoreData
+import SnapKit
+import BraveShared
+import Shared
 
 private let log = Logger.browserLogger
 
-// MARK: PlaylistViewController
+private protocol PlaylistPadControllerDetailDelegate: class {
+    func setCurrentItemIndex(_ index: Int)
+    func getCurrentItemIndex() -> Int
+    func updateNowPlayingMediaInfo()
+    func setControlsEnabled(_ enabled: Bool)
+    func updatePlayerControlsState()
+    func loadMediaItem(_ item: PlaylistInfo, index: Int, completion: @escaping (PlaylistMediaInfo.MediaPlaybackError) -> Void)
+    func displayLoadingResourceError()
+    func play()
+    func stop()
+}
 
-class PlaylistViewController: UIViewController {
+class PlaylistPadViewController: UIViewController {
+    private let splitController = UISplitViewController()
+    private let listController = PlaylistPadListController()
+    private let detailController = PlaylistPadDetailController()
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        listController.detailControllerDelegate = detailController
+        detailController.delegate = self
+        
+        splitController.do {
+            $0.viewControllers = [SettingsNavigationController(rootViewController: listController).then {
+                if #available(iOS 13.0, *) {
+                    let appearance = UINavigationBarAppearance()
+                    appearance.configureWithTransparentBackground()
+                    appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
+                    appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
+                    appearance.backgroundColor = BraveUX.popoverDarkBackground
+                    $0.navigationBar.standardAppearance = appearance
+                    $0.navigationBar.scrollEdgeAppearance = appearance
+                    $0.navigationBar.prefersLargeTitles = true
+                } else {
+                    $0.navigationBar.barTintColor = BraveUX.popoverDarkBackground
+                    $0.navigationBar.tintColor = .white
+                    $0.navigationBar.isTranslucent = false
+                    $0.navigationBar.prefersLargeTitles = true
+                }
+            }, detailController]
+            
+            $0.preferredPrimaryColumnWidthFraction = 1.0 / 3.0
+        }
+        
+        self.addChild(splitController)
+        splitController.didMove(toParent: self)
+        
+        view.addSubview(splitController.view)
+        splitController.view.snp.makeConstraints {
+            $0.edges.equalTo(self.view)
+        }
+        
+        updateLayoutForOrientationChange()
+    }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        
+        updateLayoutForOrientationChange()
+    }
+    
+    private func updateLayoutForOrientationChange() {
+        if UIDevice.current.orientation.isLandscape {
+            splitController.preferredDisplayMode = .secondaryOnly
+        } else {
+            splitController.preferredDisplayMode = .oneBesideSecondary
+        }
+    }
+}
+
+private class PlaylistPadListController: UIViewController {
     
     // MARK: Constants
      
      struct Constants {
         static let playListCellIdentifier = "playlistCellIdentifier"
-        static let tableRowHeight: CGFloat = 80
+        static let tableRowHeight: CGFloat = 120
         static let tableHeaderHeight: CGFloat = 11
      }
 
     // MARK: Properties
     
-    private let playerView = VideoView()
+    weak var detailControllerDelegate: PlaylistPadControllerDetailDelegate?
     
     private lazy var activityIndicator = UIActivityIndicatorView(style: .white).then {
         $0.isHidden = true
@@ -57,10 +126,6 @@ class PlaylistViewController: UIViewController {
         $0.unitsStyle = .abbreviated
         $0.maximumUnitCount = 1
     }
-
-    private lazy var mediaInfo = PlaylistMediaInfo(playerView: playerView)
-    
-    private var currentlyPlayingItemIndex = -1
     
     init() {
         super.init(nibName: nil, bundle: nil)
@@ -70,19 +135,17 @@ class PlaylistViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    deinit {
-        playerView.stop()
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        navigationItem.rightBarButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "playlist_exit"), style: .done, target: self, action: #selector(onExit(_:)))
+        
         PlaylistManager.shared.delegate = self
-    
+        
         setTheme()
         setup()
         doLayout()
-
+        
         fetchResults()
     }
     
@@ -104,48 +167,27 @@ class PlaylistViewController: UIViewController {
             $0.navigationBar.shadowImage = UIImage()
         }
         
-        view.backgroundColor = BraveUX.popoverDarkBackground
-        
-        tableView.do {
-            $0.contentInset = UIEdgeInsets(top: 0.50 * view.bounds.width, left: 0.0, bottom: 0.0, right: 0.0)
-            $0.contentOffset = CGPoint(x: 0.0, y: -0.50 * view.bounds.width)
-        }
+        view.backgroundColor = .clear
     }
     
     private func setup () {
-        navigationItem.rightBarButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "playlist_exit"), style: .done, target: self, action: #selector(onExit(_:)))
-              
         tableView.do {
             $0.register(PlaylistCell.self, forCellReuseIdentifier: Constants.playListCellIdentifier)
             $0.dataSource = self
             $0.delegate = self
         }
-        
-        playerView.delegate = self
     }
     
     private func doLayout() {
         view.addSubview(tableView)
-        view.addSubview(playerView)
-        playerView.addSubview(activityIndicator)
-        
-        playerView.snp.makeConstraints {
-            $0.top.equalTo(view.safeArea.top)
-            $0.leading.trailing.equalToSuperview()
-            $0.height.equalTo(0.50 * view.bounds.width)
-        }
-        
-        activityIndicator.snp.makeConstraints {
-            $0.center.equalToSuperview()
-        }
         
         tableView.snp.makeConstraints {
-            $0.edges.equalTo(view.safeArea.edges)
+            $0.edges.equalToSuperview()
         }
     }
     
     private func fetchResults() {
-        playerView.setControlsEnabled(playerView.player.currentItem != nil)
+        detailControllerDelegate?.updatePlayerControlsState()
         updateTableBackgroundView()
         
         DispatchQueue.main.async {
@@ -153,7 +195,7 @@ class PlaylistViewController: UIViewController {
             self.tableView.reloadData()
             
             if PlaylistManager.shared.numberOfAssets() > 0 {
-                self.playerView.setControlsEnabled(true)
+                self.detailControllerDelegate?.setControlsEnabled(true)
                 self.tableView.delegate?.tableView?(self.tableView, didSelectRowAt: IndexPath(row: 0, section: 0))
             }
             
@@ -161,7 +203,7 @@ class PlaylistViewController: UIViewController {
         }
     }
     
-    // MARK: Actions
+    // MARK: - Actions
     
     @objc
     private func onExit(_ button: UIBarButtonItem) {
@@ -171,7 +213,7 @@ class PlaylistViewController: UIViewController {
 
 // MARK: UIAdaptivePresentationControllerDelegate
 
-extension PlaylistViewController: UIAdaptivePresentationControllerDelegate {
+extension PlaylistPadListController: UIAdaptivePresentationControllerDelegate {
     func adaptivePresentationStyle(for controller: UIPresentationController, traitCollection: UITraitCollection) -> UIModalPresentationStyle {
         return .fullScreen
     }
@@ -179,7 +221,7 @@ extension PlaylistViewController: UIAdaptivePresentationControllerDelegate {
 
 // MARK: UITableViewDataSource
 
-extension PlaylistViewController: UITableViewDataSource {
+extension PlaylistPadListController: UITableViewDataSource {
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
@@ -232,9 +274,30 @@ extension PlaylistViewController: UITableViewDataSource {
     }
 }
 
+extension PlaylistPadListController {
+    func updateTableBackgroundView() {
+        if PlaylistManager.shared.numberOfAssets() > 0 {
+            tableView.backgroundView = nil
+            tableView.separatorStyle = .singleLine
+        } else {
+            let messageLabel = UILabel(frame: view.bounds).then {
+                $0.text = Strings.PlayList.noItemLabelTitle
+                $0.textColor = .white
+                $0.numberOfLines = 0
+                $0.textAlignment = .center
+                $0.font = .systemFont(ofSize: 18.0, weight: .medium)
+                $0.sizeToFit()
+            }
+            
+            tableView.backgroundView = messageLabel
+            tableView.separatorStyle = .none
+        }
+    }
+}
+
 // MARK: UITableViewDelegate
 
-extension PlaylistViewController: UITableViewDelegate {
+extension PlaylistPadListController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         
@@ -268,12 +331,12 @@ extension PlaylistViewController: UITableViewDelegate {
             
             PlaylistManager.shared.delete(item: currentItem)
 
-            if self.currentlyPlayingItemIndex == indexPath.row {
-                self.currentlyPlayingItemIndex = -1
-                self.mediaInfo.updateNowPlayingMediaInfo()
+            if self.detailControllerDelegate?.getCurrentItemIndex() == indexPath.row {
+                self.detailControllerDelegate?.setCurrentItemIndex(-1)
+                self.detailControllerDelegate?.updateNowPlayingMediaInfo()
                 
                 self.activityIndicator.stopAnimating()
-                self.playerView.stop()
+                self.detailControllerDelegate?.stop()
             }
             
             completionHandler(true)
@@ -292,18 +355,18 @@ extension PlaylistViewController: UITableViewDelegate {
         if indexPath.row < PlaylistManager.shared.numberOfAssets() {
             activityIndicator.startAnimating()
             activityIndicator.isHidden = false
-            currentlyPlayingItemIndex = indexPath.row
+            detailControllerDelegate?.setCurrentItemIndex(indexPath.row)
 
             let item = PlaylistManager.shared.itemAtIndex(indexPath.row)
             infoLabel.text = item.name
-            mediaInfo.loadMediaItem(item, index: indexPath.row) { [weak self] error in
+            detailControllerDelegate?.loadMediaItem(item, index: indexPath.row) { [weak self] error in
                 guard let self = self else { return }
                 self.activityIndicator.stopAnimating()
                 
                 switch error {
                 case .error(let err):
                     log.error(err)
-                    self.displayLoadingResourceError()
+                    self.detailControllerDelegate?.displayLoadingResourceError()
                     
                 case .expired:
                     (tableView.cellForRow(at: indexPath) as? PlaylistCell)?.detailLabel.text = Strings.PlayList.expiredLabelTitle
@@ -335,135 +398,9 @@ extension PlaylistViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
         PlaylistManager.shared.reorderItems(from: sourceIndexPath, to: destinationIndexPath)
     }
-    
-    private func displayLoadingResourceError() {
-        let alert = UIAlertController(
-            title: Strings.PlayList.sorryAlertTitle, message: Strings.PlayList.loadResourcesErrorAlertDescription, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: nil))
-        
-        self.present(alert, animated: true, completion: nil)
-    }
 }
 
-// MARK: VideoViewDelegate
-
-extension PlaylistViewController: VideoViewDelegate {
-    func onPreviousTrack() {
-        if currentlyPlayingItemIndex <= 0 {
-            return
-        }
-        
-        let index = currentlyPlayingItemIndex - 1
-        if index < PlaylistManager.shared.numberOfAssets() {
-            let item = PlaylistManager.shared.itemAtIndex(index)
-            mediaInfo.loadMediaItem(item, index: index) { [weak self] error in
-                if case .none = error {
-                    self?.currentlyPlayingItemIndex = index
-                } else {
-                    self?.displayLoadingResourceError()
-                }
-            }
-        }
-    }
-    
-    func onNextTrack() {
-        if currentlyPlayingItemIndex >= PlaylistManager.shared.numberOfAssets() - 1 {
-            return
-        }
-        
-        let index = currentlyPlayingItemIndex + 1
-        if index >= 0 {
-            let item = PlaylistManager.shared.itemAtIndex(index)
-            mediaInfo.loadMediaItem(item, index: index) { [weak self] error in
-                if case .none = error {
-                    self?.currentlyPlayingItemIndex = index
-                } else {
-                    self?.displayLoadingResourceError()
-                }
-            }
-        }
-    }
-    
-    func onPictureInPicture(enabled: Bool) {
-        playerView.pictureInPictureController?.delegate = enabled ? self : nil
-    }
-    
-    func onFullScreen() {
-        playerView.player.pause()
-        
-        let playerController = AVPlayerViewController().then {
-            $0.player = playerView.player
-            $0.delegate = self
-            $0.allowsPictureInPicturePlayback = true
-        }
-        
-        if #available(iOS 14.2, *) {
-            playerController.canStartPictureInPictureAutomaticallyFromInline = true
-        }
-        
-        playerController.entersFullScreenWhenPlaybackBegins = true
-        
-        self.present(playerController, animated: true, completion: {
-            playerController.player?.play()
-        })
-    }
-}
-
-// MARK: AVPlayerViewControllerDelegate
-
-extension PlaylistViewController: AVPlayerViewControllerDelegate, AVPictureInPictureControllerDelegate {
-
-    // MARK: - AVPlayerViewControllerDelegate
-    func playerViewControllerWillStartPictureInPicture(_ playerViewController: AVPlayerViewController) {
-        (UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController = self.navigationController
-        self.dismiss(animated: true, completion: nil)
-    }
-    
-    func playerViewController(_ playerViewController: AVPlayerViewController, failedToStartPictureInPictureWithError error: Error) {
-        
-        let alert = UIAlertController(title: Strings.PlayList.sorryAlertTitle, message: Strings.PlayList.pictureInPictureErrorTitle, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: nil))
-        self.present(alert, animated: true, completion: nil)
-    }
-    
-    func playerViewController(_ playerViewController: AVPlayerViewController, restoreUserInterfaceForPictureInPictureStopWithCompletionHandler completionHandler: @escaping (Bool) -> Void) {
-        
-        if let delegate = UIApplication.shared.delegate as? AppDelegate,
-           let navigationController = delegate.playlistRestorationController {
-            delegate.browserViewController.present(controller: navigationController)
-            delegate.playlistRestorationController = nil
-        }
-        
-        completionHandler(true)
-    }
-    
-    // MARK: - AVPictureInPictureControllerDelegate
-    func pictureInPictureControllerWillStartPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
-        
-        (UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController = self.navigationController
-        self.dismiss(animated: true, completion: nil)
-    }
-    
-    func pictureInPictureController(_ pictureInPictureController: AVPictureInPictureController, failedToStartPictureInPictureWithError error: Error) {
-        
-        let alert = UIAlertController(title: Strings.PlayList.sorryAlertTitle, message: Strings.PlayList.pictureInPictureErrorTitle, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: nil))
-        self.present(alert, animated: true, completion: nil)
-    }
-    
-    func pictureInPictureController(_ pictureInPictureController: AVPictureInPictureController, restoreUserInterfaceForPictureInPictureStopWithCompletionHandler completionHandler: @escaping (Bool) -> Void) {
-        
-        if let delegate = UIApplication.shared.delegate as? AppDelegate,
-           let navigationController = delegate.playlistRestorationController {
-            delegate.browserViewController.present(controller: navigationController)
-            delegate.playlistRestorationController = nil
-        }
-        
-        completionHandler(true)
-    }
-}
-
-extension PlaylistViewController: PlaylistManagerDelegate {
+extension PlaylistPadListController: PlaylistManagerDelegate {
     func onDownloadProgressUpdate(id: String, percentComplete: Double) {
         if let index = PlaylistManager.shared.index(of: id),
            let cell = tableView.cellForRow(at: IndexPath(row: index, section: 0)) as? PlaylistCell {
@@ -523,23 +460,211 @@ extension PlaylistViewController: PlaylistManagerDelegate {
     }
 }
 
-extension PlaylistViewController {
-    func updateTableBackgroundView() {
-        if PlaylistManager.shared.numberOfAssets() > 0 {
-            tableView.backgroundView = nil
-            tableView.separatorStyle = .singleLine
-        } else {
-            let messageLabel = UILabel(frame: view.bounds).then {
-                $0.text = Strings.PlayList.noItemLabelTitle
-                $0.textColor = .white
-                $0.numberOfLines = 0
-                $0.textAlignment = .center
-                $0.font = .systemFont(ofSize: 18.0, weight: .medium)
-                $0.sizeToFit()
-            }
-            
-            tableView.backgroundView = messageLabel
-            tableView.separatorStyle = .none
+private class PlaylistPadDetailController: UIViewController {
+    
+    weak var delegate: UIViewController?
+    private let playerView = VideoView()
+    private lazy var mediaInfo = PlaylistMediaInfo(playerView: playerView)
+    private var currentlyPlayingItemIndex = -1
+    private var playerController: AVPlayerViewController?
+    
+    deinit {
+        playerView.stop()
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        playerView.delegate = self
+        
+        view.addSubview(playerView)
+        playerView.snp.makeConstraints {
+            $0.edges.equalTo(self.view)
         }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        playerController = nil
+    }
+}
+
+// MARK: VideoViewDelegate
+
+extension PlaylistPadDetailController: VideoViewDelegate {
+    func onPreviousTrack() {
+        if currentlyPlayingItemIndex <= 0 {
+            return
+        }
+        
+        let index = currentlyPlayingItemIndex - 1
+        if index < PlaylistManager.shared.numberOfAssets() {
+            let item = PlaylistManager.shared.itemAtIndex(index)
+            mediaInfo.loadMediaItem(item, index: index) { [weak self] error in
+                if case .none = error {
+                    self?.currentlyPlayingItemIndex = index
+                } else {
+                    self?.displayLoadingResourceError()
+                }
+            }
+        }
+    }
+    
+    func onNextTrack() {
+        if currentlyPlayingItemIndex >= PlaylistManager.shared.numberOfAssets() - 1 {
+            return
+        }
+        
+        let index = currentlyPlayingItemIndex + 1
+        if index >= 0 {
+            let item = PlaylistManager.shared.itemAtIndex(index)
+            mediaInfo.loadMediaItem(item, index: index) { [weak self] error in
+                if case .none = error {
+                    self?.currentlyPlayingItemIndex = index
+                } else {
+                    self?.displayLoadingResourceError()
+                }
+            }
+        }
+    }
+    
+    func onPictureInPicture(enabled: Bool) {
+        playerView.pictureInPictureController?.delegate = enabled ? self : nil
+    }
+    
+    func onFullScreen() {
+        let playerController = AVPlayerViewController().then {
+            $0.player = playerView.player
+            $0.delegate = self
+            $0.allowsPictureInPicturePlayback = true
+            $0.entersFullScreenWhenPlaybackBegins = true
+        }
+        
+        if #available(iOS 14.2, *) {
+            playerController.canStartPictureInPictureAutomaticallyFromInline = true
+        }
+        
+        self.present(playerController, animated: true)
+    }
+}
+
+// MARK: AVPlayerViewControllerDelegate
+
+extension PlaylistPadDetailController: AVPlayerViewControllerDelegate, AVPictureInPictureControllerDelegate {
+
+    // MARK: - AVPlayerViewControllerDelegate
+    
+    func playerViewController(_ playerViewController: AVPlayerViewController, willBeginFullScreenPresentationWithAnimationCoordinator coordinator: UIViewControllerTransitionCoordinator) {
+        
+        playerView.detachLayer()
+    }
+    
+    func playerViewController(_ playerViewController: AVPlayerViewController, willEndFullScreenPresentationWithAnimationCoordinator coordinator: UIViewControllerTransitionCoordinator) {
+        
+        playerView.attachLayer()
+    }
+    
+    func playerViewControllerWillStartPictureInPicture(_ playerViewController: AVPlayerViewController) {
+        playerView.detachLayer()
+        
+        (UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController = delegate
+    }
+    
+    func playerViewControllerDidStartPictureInPicture(_ playerViewController: AVPlayerViewController) {
+        DispatchQueue.main.async {
+            self.playerView.detachLayer()
+            self.delegate?.dismiss(animated: true, completion: nil)
+        }
+    }
+    
+    func playerViewController(_ playerViewController: AVPlayerViewController, failedToStartPictureInPictureWithError error: Error) {
+        playerView.attachLayer()
+
+        let alert = UIAlertController(title: Strings.PlayList.sorryAlertTitle, message: Strings.PlayList.pictureInPictureErrorTitle, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: nil))
+        self.present(alert, animated: true, completion: nil)
+    }
+    
+    func playerViewController(_ playerViewController: AVPlayerViewController, restoreUserInterfaceForPictureInPictureStopWithCompletionHandler completionHandler: @escaping (Bool) -> Void) {
+        
+        if let delegate = UIApplication.shared.delegate as? AppDelegate,
+           let playlistPadController = delegate.playlistRestorationController {
+            playerView.attachLayer()
+            delegate.browserViewController.present(playlistPadController, animated: true) {
+                self.playerView.player.play()
+            }
+            delegate.playlistRestorationController = nil
+        }
+        
+        completionHandler(true)
+    }
+    
+    // MARK: - AVPictureInPictureControllerDelegate
+    func pictureInPictureControllerWillStartPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
+        
+        (UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController = delegate
+        delegate?.dismiss(animated: true, completion: nil)
+    }
+    
+    func pictureInPictureController(_ pictureInPictureController: AVPictureInPictureController, failedToStartPictureInPictureWithError error: Error) {
+        
+        let alert = UIAlertController(title: Strings.PlayList.sorryAlertTitle, message: Strings.PlayList.pictureInPictureErrorTitle, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: nil))
+        self.present(alert, animated: true, completion: nil)
+    }
+    
+    func pictureInPictureController(_ pictureInPictureController: AVPictureInPictureController, restoreUserInterfaceForPictureInPictureStopWithCompletionHandler completionHandler: @escaping (Bool) -> Void) {
+        
+        if let delegate = UIApplication.shared.delegate as? AppDelegate,
+           let playlistPadController = delegate.playlistRestorationController {
+            delegate.browserViewController.present(controller: playlistPadController)
+            delegate.playlistRestorationController = nil
+        }
+        
+        completionHandler(true)
+    }
+}
+
+extension PlaylistPadDetailController: PlaylistPadControllerDetailDelegate {
+    
+    func setCurrentItemIndex(_ index: Int) {
+        currentlyPlayingItemIndex = index
+    }
+    
+    func getCurrentItemIndex() -> Int {
+        return currentlyPlayingItemIndex
+    }
+    
+    func updateNowPlayingMediaInfo() {
+        mediaInfo.updateNowPlayingMediaInfo()
+    }
+    
+    func setControlsEnabled(_ enabled: Bool) {
+        playerView.setControlsEnabled(enabled)
+    }
+    
+    func updatePlayerControlsState() {
+        playerView.setControlsEnabled(playerView.player.currentItem != nil)
+    }
+    
+    func loadMediaItem(_ item: PlaylistInfo, index: Int, completion: @escaping (PlaylistMediaInfo.MediaPlaybackError) -> Void) {
+        mediaInfo.loadMediaItem(item, index: index, completion: completion)
+    }
+    
+    func displayLoadingResourceError() {
+        let alert = UIAlertController(
+            title: Strings.PlayList.sorryAlertTitle, message: Strings.PlayList.loadResourcesErrorAlertDescription, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: nil))
+        
+        self.present(alert, animated: true, completion: nil)
+    }
+    
+    func play() {
+        playerView.play()
+    }
+    
+    func stop() {
+        playerView.stop()
     }
 }

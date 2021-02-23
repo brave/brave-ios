@@ -363,14 +363,14 @@ class MenuViewController: UITableViewController {
     
     private func openPlaylist() {
         if UIDevice.current.userInterfaceIdiom == .pad {
-            let playlistDetailsController = PlaylistDetailsViewController()
-            playlistDetailsController.modalPresentationStyle = .fullScreen
+            let playlistController = (UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController ?? PlaylistPadViewController()
+            playlistController.modalPresentationStyle = .fullScreen
                         
             dismissView()
-            bvc.present(playlistDetailsController, animated: true)
+            bvc.present(playlistController, animated: true)
 
         } else {
-            let playListController = (UIApplication.shared.delegate as? AppDelegate)?.playlistNavigationController?.viewControllers.first ?? PlaylistViewController()
+            let playListController = ((UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController as? UINavigationController)?.viewControllers.first ?? PlaylistViewController()
             
             open(playListController, doneButton: DoneButton(style: .done, position: .right))
         }
