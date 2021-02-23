@@ -99,7 +99,7 @@ class MenuViewController: UITableViewController {
     }
     
     private enum MenuButtons: Int, CaseIterable {
-        case vpn, settings, history, bookmarks, downloads, add, share
+        case vpn, settings, history, bookmarks, downloads, add, share, playlist
         
         var title: String {
             switch self {
@@ -111,6 +111,7 @@ class MenuViewController: UITableViewController {
             case .add: return Strings.addToMenuItem
             case .share: return Strings.shareWithMenuItem
             case .downloads: return Strings.downloadsMenuItem
+            case .playlist: return Strings.playlistMenuItem
             }
         }
         
@@ -123,6 +124,7 @@ class MenuViewController: UITableViewController {
             case .add: return #imageLiteral(resourceName: "menu-add-bookmark").template
             case .share: return #imageLiteral(resourceName: "nav-share").template
             case .downloads: return #imageLiteral(resourceName: "menu-downloads").template
+            case .playlist: return #imageLiteral(resourceName: "playlist_menu").template
             }
         }
     }
@@ -219,6 +221,7 @@ class MenuViewController: UITableViewController {
         case .add: openAddBookmark()
         case .share: openShareSheet()
         case .downloads: openDownloads()
+        case .playlist: openPlaylist()
         }
     }
     
@@ -351,17 +354,22 @@ class MenuViewController: UITableViewController {
         open(vc, doneButton: DoneButton(style: .done, position: .right))
     }
     
+    private func openPlaylist() {
+        let vc = PlaylistViewController()
+        let currentTheme = Theme.of(bvc.tabManager.selectedTab)
+        //vc.applyTheme(currentTheme)
+        
+        open(vc, doneButton: DoneButton(style: .done, position: .right))
+    }
+    
     private func openAddBookmark() {
         guard let title = tab?.displayTitle, let url = tab?.url else { return }
         
         let bookmarkUrl = url.decodeReaderModeURL ?? url
-        
         let mode = BookmarkEditMode.addBookmark(title: title, url: bookmarkUrl.absoluteString)
-        
         let vc = AddEditBookmarkTableViewController(mode: mode)
         
         open(vc, doneButton: DoneButton(style: .cancel, position: .left))
-
     }
     
     private func openHistory() {
