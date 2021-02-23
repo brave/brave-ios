@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="17709" systemVersion="19H114" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="PlaylistItem" representedClassName="PlaylistItem" syncable="YES">
+        <attribute name="cachedData" attributeType="Binary"/>
+        <attribute name="dateAdded" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="duration" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="mediaSrc" attributeType="String"/>
+        <attribute name="mimeType" attributeType="String"/>
+        <attribute name="name" attributeType="String"/>
+        <attribute name="pageSrc" attributeType="String"/>
+        <attribute name="pageTitle" optional="YES" attributeType="String"/>
+    </entity>
+    <elements>
+        <element name="PlaylistItem" positionX="-63" positionY="-18" width="128" height="163"/>
+    </elements>
+</model>
