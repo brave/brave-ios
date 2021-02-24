@@ -149,7 +149,7 @@ extension PlaylistMediaInfo: MPPlayableContentDelegate {
 
         if cacheState == .invalid {
             if !item.src.isEmpty, let url = URL(string: item.src) {
-                //Try to stream the asset from its url..
+                // Try to stream the asset from its url..
                 MediaResourceManager.canStreamURL(url) { [weak self] canStream in
                     guard let self = self else { return }
                     
@@ -173,8 +173,8 @@ extension PlaylistMediaInfo: MPPlayableContentDelegate {
                             completion(.expired)
                         }
                     } else {
-                        //Stream failed so fallback to the webview
-                        //It's possible the URL expired..
+                        // Stream failed so fallback to the webview
+                        // It's possible the URL expired..
                         self.webLoader = PlaylistWebLoader(handler: { [weak self] newItem in
                             guard let self = self else { return }
                             if let newItem = newItem, let url = URL(string: newItem.src) {
@@ -198,7 +198,7 @@ extension PlaylistMediaInfo: MPPlayableContentDelegate {
                     }
                 }
             } else {
-                //Fallback to the webview because there was no stream URL somehow..
+                // Fallback to the webview because there was no stream URL somehow..
                 webLoader.removeFromSuperview()
                 webLoader = PlaylistWebLoader(handler: { [weak self] item in
                     guard let self = self else { return }
@@ -218,7 +218,7 @@ extension PlaylistMediaInfo: MPPlayableContentDelegate {
                 }
             }
         } else {
-            //Load from the cache since this item was downloaded before..
+            // Load from the cache since this item was downloaded before..
             let asset = PlaylistManager.shared.assetAtIndex(index)
             self.playerView?.load(asset: asset)
             completion(.none)
