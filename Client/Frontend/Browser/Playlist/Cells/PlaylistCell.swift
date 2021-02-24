@@ -150,15 +150,8 @@ class PlaylistCell: UITableViewCell {
     func loadThumbnail(item: PlaylistInfo, onDurationUpdated: ((TimeInterval?) -> Void)? = nil) {
         guard let url = URL(string: item.src) else { return }
         
-        // Load from Cache
-        let imageCache = SDImageCache.shared
-        if let cachedImage = imageCache.imageFromCache(forKey: url.absoluteString) {
-            self.thumbnailImage = cachedImage
-            return
-        }
-        
         // Loading from Cache failed, attempt to fetch HLS thumbnail
-        self.thumbnailGenerator = HLSThumbnailGenerator(asset: AVAsset(url: url), time: 3, completion: { [weak self] image, trackDuration in
+        self.thumbnailGenerator = HLSThumbnailGenerator(url: url, time: 3, completion: { [weak self] image, trackDuration in
             guard let self = self else { return }
             
             if let trackDuration = trackDuration {
@@ -168,7 +161,7 @@ class PlaylistCell: UITableViewCell {
             if let image = image {
                 self.thumbnailImage = image
                 self.thumbnailGenerator = nil
-                imageCache.store(image, forKey: url.absoluteString, completion: nil)
+                SDImageCache.shared.store(image, forKey: url.absoluteString, completion: nil)
             } else {
                 //We can fall back to AVAssetImageGenerator or FavIcon
                 self.loadThumbnailFallbackImage(item: item)

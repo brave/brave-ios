@@ -37,6 +37,11 @@ class Playlist {
                 request.predicate = NSPredicate(format: "mediaSrc == %@", mediaSrc)
                 
                 (try? self.backgroundContext.fetch(request))?.forEach({
+                    $0.name = item.name
+                    $0.pageTitle = item.pageTitle
+                    $0.pageSrc = item.pageSrc
+                    $0.duration = item.duration
+                    $0.mimeType = item.mimeType
                     $0.mediaSrc = item.src
                 })
                 
