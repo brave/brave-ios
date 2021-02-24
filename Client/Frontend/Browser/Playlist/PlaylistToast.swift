@@ -30,8 +30,11 @@ class PlaylistToast: Toast {
         $0.shadowOpacity = 0.15
         $0.shadowRadius = ButtonToastUX.toastButtonBorderRadius
     }
+    
+    var item: PlaylistInfo
 
     init(item: PlaylistInfo, state: PlaylistToastState, completion: ((_ buttonPressed: Bool) -> Void)?) {
+        self.item = item
         super.init(frame: .zero)
 
         self.completionHandler = completion

@@ -73,7 +73,7 @@ class PlaylistHelper: TabContentScript {
                     title: Strings.PlayList.addToPlayListAlertTitle, message: Strings.PlayList.addToPlayListAlertDescription, preferredStyle: style)
                 
                 alert.addAction(UIAlertAction(title: Strings.PlayList.addToPlayListAlertTitle, style: .default, handler: { _ in
-                    //Update playlist with new items..
+                    // Update playlist with new items..
                     Playlist.shared.addItem(item: item, cachedData: nil) {
                         log.debug("Playlist Item Added")
                         
