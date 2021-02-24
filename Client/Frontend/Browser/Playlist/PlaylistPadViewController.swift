@@ -424,8 +424,6 @@ extension PlaylistPadListController: UITableViewDelegate {
                 }
             }
         }
-
-        tableView.reloadData()
     }
     
     // MARK: - Reordering of cells

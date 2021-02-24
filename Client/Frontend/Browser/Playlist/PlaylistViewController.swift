@@ -404,8 +404,6 @@ extension PlaylistViewController: UITableViewDelegate {
                 }
             }
         }
-
-        tableView.reloadData()
     }
     
     // MARK: - Reordering of cells

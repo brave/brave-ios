@@ -6,6 +6,7 @@
 import Foundation
 import AVFoundation
 import CoreImage
+import SDWebImage
 
 public class HLSThumbnailGenerator {
     private enum State {
@@ -15,6 +16,7 @@ public class HLSThumbnailGenerator {
     }
 
     private let asset: AVAsset
+    private let sourceURL: URL
     private let player: AVPlayer
     private let videoOutput: AVPlayerItemVideoOutput
     private var observer: NSKeyValueObservation?
@@ -22,8 +24,9 @@ public class HLSThumbnailGenerator {
     private let queue: DispatchQueue
     private let completion: (UIImage?, TimeInterval?) -> Void
 
-    init(asset: AVAsset, time: TimeInterval, completion: @escaping (UIImage?, TimeInterval?) -> Void) {
-        self.asset = asset
+    init(url: URL, time: TimeInterval, completion: @escaping (UIImage?, TimeInterval?) -> Void) {
+        self.asset = AVAsset(url: url)
+        self.sourceURL = url
         self.queue = DispatchQueue(label: "com.brave.hls-thumbnail-generator")
         self.completion = completion
         
@@ -46,6 +49,17 @@ public class HLSThumbnailGenerator {
                 self.state = .failed
                 DispatchQueue.main.async {
                     self.completion(nil, nil)
+                }
+            }
+        }
+        
+        // Load from cache
+        if let cachedImage = SDImageCache.shared.imageFromCache(forKey: sourceURL.absoluteString) {
+            DispatchQueue.main.async {
+                if let duration = self.player.currentItem?.duration {
+                    self.completion(cachedImage, CMTimeGetSeconds(duration))
+                } else {
+                   self.completion(cachedImage, nil)
                 }
             }
         }
