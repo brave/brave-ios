@@ -166,7 +166,7 @@ extension Strings {
         public static let thirdPartySearchEngineInsecureURLErrorDescription = NSLocalizedString(
             "customSearchEngine.thirdPartySearchEngineInsecureURLErrorDescription",
             bundle: Bundle.shared,
-            value: "The copied URL text should start with 'https://'",
+            value: "The copied text should be a valid secure URL which starts with 'https://'",
             comment: "A description explaining the copied url should be secure")
         
         public static let thirdPartySearchEngineAddedToastTitle = NSLocalizedString(
