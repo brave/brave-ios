@@ -504,30 +504,14 @@ extension SearchCustomEngineViewController: UITextViewDelegate {
     func textViewDidChange(_ textView: UITextView) {
         changeAddButton(for: .disabled)
         
-        // This conditional clause is added in order to force use to use secure url scheme
+        // The withSecureUrlScheme is used in order to force user to use secure url scheme
         // Instead of checking paste-board with every character entry, the textView text is analyzed
-        // And according to what prefix the copied or entered text has we alter the result to start with https://
-        // Also block repeating https:// and http:// schemes
-        if !textView.text.hasPrefix("https://") {
-            var textEntered = textView.text ?? ""
-            
-            if textEntered.hasPrefix("http://") {
-                textEntered = String(textEntered.dropFirst(7))
-            }
-            
-            textView.text = "https://\(textEntered)"
-        } else {
-            let substringWithoutHttps = String(textView.text.dropFirst(8))
-            
-            if substringWithoutHttps.hasPrefix("https://") {
-                textView.text = substringWithoutHttps
-            } else if substringWithoutHttps.hasPrefix("http://") {
-                let substringWithoutHttp = String(substringWithoutHttps.dropFirst(7))
-                textView.text = "https://\(substringWithoutHttp)"
-            }
-        }
+        // and according to what prefix copied or entered, text is altered to start with https://
+        // this logic block repeating https:// and http:// schemes
+        let textEntered = textView.text.withSecureUrlScheme
         
-        urlText = textView.text
+        textView.text = textEntered
+        urlText = textEntered
 
         if searchEngineTimer != nil {
             searchEngineTimer?.invalidate()
