@@ -731,7 +731,7 @@ class BrowserViewController: UIViewController {
         
         showWalletTransferExpiryPanelIfNeeded()
         
-        //We stop ever attempting migration after 3 times.
+        // We stop ever attempting migration after 3 times.
         if Preferences.Chromium.syncV2BookmarksMigrationCount.value < 3 {
             self.migrateToChromiumBookmarks { success in
                 if !success {
@@ -745,8 +745,8 @@ class BrowserViewController: UIViewController {
                 }
             }
         } else {
-            //After 3 tries, we mark Migration as successful.
-            //There is nothing more we can do for the user other than to let them export/import bookmarks.
+            // After 3 tries, we mark Migration as successful.
+            // There is nothing more we can do for the user other than to let them export/import bookmarks.
             Preferences.Chromium.syncV2BookmarksMigrationCompleted.value = true
         }
         
@@ -1454,10 +1454,10 @@ class BrowserViewController: UIViewController {
                 return
             }
             
-            //Another Fix for: https://github.com/brave/brave-ios/pull/2296
-            //Disable any sort of privileged execution contexts
-            //IE: The user must explicitly tap a bookmark they have saved.
-            //Block all other contexts such as redirects, downloads, embed, linked, etc..
+            // Another Fix for: https://github.com/brave/brave-ios/pull/2296
+            // Disable any sort of privileged execution contexts
+            // IE: The user must explicitly tap a bookmark they have saved.
+            // Block all other contexts such as redirects, downloads, embed, linked, etc..
             if visitType == .bookmark {
                 if let webView = tab.webView, let code = url.bookmarkletCodeComponent {
                     webView.evaluateSafeJavaScript(functionName: code, sandboxed: false, asFunction: false) { _, error in
@@ -1621,10 +1621,10 @@ class BrowserViewController: UIViewController {
                         break
                     }
                     
-                    //All our checks failed, we show the page as insecure
+                    // All our checks failed, we show the page as insecure
                     tab.secureContentState = .insecure
                 } else {
-                    //When there is no URL, it's likely a new tab.
+                    // When there is no URL, it's likely a new tab.
                     tab.secureContentState = .localHost
                 }
                 
@@ -1796,7 +1796,7 @@ class BrowserViewController: UIViewController {
         let addToPlayListActivity = AddToPlaylistActivity() { [unowned self] in
             guard let item = self.addToPlayListActivityItem?.item else { return }
             
-            //Update playlist with new items..
+            // Update playlist with new items..
             Playlist.shared.addItem(item: item, cachedData: nil) {
                 log.debug("Playlist Item Added")
                 
@@ -1932,7 +1932,6 @@ class BrowserViewController: UIViewController {
 
     func navigateInTab(tab: Tab, to navigation: WKNavigation? = nil) {
         tabManager.expireSnackbars()
-        playlistToast?.dismiss(false)
 
         guard let webView = tab.webView else {
             print("Cannot navigate in tab without a webView")
@@ -3705,55 +3704,58 @@ extension BrowserViewController: PlaylistHelperDelegate {
             return
         }
         
-        if let toast = self.pendingToast {
-            toast.dismiss(false)
-            self.pendingToast = nil
-        }
-        
         if let toast = self.playlistToast {
-            toast.dismiss(false)
-            self.playlistToast = nil
+            toast.item = info
+            return
         }
         
-        //Item requires the user to choose whether or not to add it to playlists
+        // Item requires the user to choose whether or not to add it to playlists
         if itemState == .pendingUserAction {
             let toast = PlaylistToast(item: info, state: .itemPendingUserAction) { [weak self] buttonPressed in
-                
+                guard let self = self, let info = self.playlistToast?.item else { return }
                 if buttonPressed {
-                    //Update playlist with new items..
+                    // Update playlist with new items..
                     Playlist.shared.addItem(item: info, cachedData: nil) {
                         log.debug("Playlist Item Added")
                         
-                        self?.showPlaylistToast(info: info, itemState: .added)
+                        self.playlistToast = nil
+                        self.showPlaylistToast(info: info, itemState: .added)
                         UIImpactFeedbackGenerator(style: .medium).bzzt()
                     }
+                } else {
+                    self.playlistToast = nil
                 }
             }
             
             self.playlistToast = toast
             self.show(toast: toast, afterWaiting: .milliseconds(250), duration: .seconds(10))
         } else if itemState == .existing {
-            //Item already exists in playlist, so ask them if they want to view it there
+            // Item already exists in playlist, so ask them if they want to view it there
             let toast = PlaylistToast(item: info, state: .itemExisting, completion: { [weak self] buttonPressed in
+                guard let self = self else { return }
                 if buttonPressed {
-                    self?.openPlaylist()
+                    self.openPlaylist()
                 }
+                self.playlistToast = nil
             })
             
             self.playlistToast = toast
             self.show(toast: toast, afterWaiting: .milliseconds(250), duration: .seconds(5))
         } else if itemState == .added {
-            //Item was added to playlist by the user, so ask them if they want to view it there
+            // Item was added to playlist by the user, so ask them if they want to view it there
             let toast = PlaylistToast(item: info, state: .itemAdded, completion: { [weak self] buttonPressed in
+                guard let self = self else { return }
                 if buttonPressed {
-                    self?.openPlaylist()
+                    self.openPlaylist()
                 }
+                
+                self.playlistToast = nil
             })
             
             self.playlistToast = toast
             self.show(toast: toast, afterWaiting: .milliseconds(250), duration: .seconds(5))
         } else {
-            //Unhandled developer error. There should never be any other states for the toast.
+            // Unhandled developer error. There should never be any other states for the toast.
             fatalError("Invalid Playlist Item State!")
         }
     }
