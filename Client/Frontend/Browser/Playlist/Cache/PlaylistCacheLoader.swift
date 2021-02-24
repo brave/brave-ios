@@ -39,9 +39,9 @@ public class PlaylistMimeTypeDetector {
     init(data: Data) {
         let bytes = [UInt8](data)
         
-        //TODO:
-        //Add all that is in AVURLAsset.audiovisualTypes()
-        //Add all that is in AVURLAsset.audiovisualMIMETypes()
+        // TODO:
+        // Add all that is in AVURLAsset.audiovisualTypes()
+        // Add all that is in AVURLAsset.audiovisualMIMETypes()
         
         if scan(data: bytes, header: [0x1A, 0x45, 0xDF, 0xA3]) {
             mimeType = "video/webm"
@@ -102,7 +102,7 @@ public class PlaylistMimeTypeDetector {
             return
         }
         
-        mimeType = "application/x-mpegURL" //application/vnd.apple.mpegurl
+        mimeType = "application/x-mpegURL" // application/vnd.apple.mpegurl
         fileExtension = "mpg"
     }
     
@@ -220,9 +220,9 @@ class PlaylistWebLoader: UIView, WKNavigationDelegate {
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         clearData()
         
-        //Fail safe for if a script fails or web-view somehow fails to load,
-        //Then we have a timeout where it will notify the playlist that an error occurred
-        //This happens when the WebView is already finished loading anyway!
+        // Fail safe for if a script fails or web-view somehow fails to load,
+        // Then we have a timeout where it will notify the playlist that an error occurred
+        // This happens when the WebView is already finished loading anyway!
         DispatchQueue.main.async {
             if !self.handlerDidExecute {
                 self.handler(nil)
@@ -256,7 +256,7 @@ class PlaylistWebLoader: UIView, WKNavigationDelegate {
                 return
             }
             
-            //For now, we ignore base64 video mime-types loaded via the `data:` scheme.
+            // For now, we ignore base64 video mime-types loaded via the `data:` scheme.
             if item.src.contains("data:") && item.src.contains(";base64") {
                 return
             }
@@ -268,9 +268,9 @@ class PlaylistWebLoader: UIView, WKNavigationDelegate {
             }
             
             DispatchQueue.main.async {
-                //This line MAY cause problems..
+                // This line MAY cause problems..
                 self.webLoader?.tab.webView?.loadHTMLString("<html><body>PlayList</body></html>", baseURL: nil)
-                //self.webLoader?.tab.deleteWebView()
+                // self.webLoader?.tab.deleteWebView()
             }
         }
     }

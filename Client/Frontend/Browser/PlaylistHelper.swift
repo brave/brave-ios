@@ -5,6 +5,7 @@
 
 import Foundation
 import WebKit
+import AVKit
 import Data
 import BraveShared
 import Shared
@@ -47,7 +48,16 @@ class PlaylistHelper: TabContentScript {
             return
         }
         
-        if item.duration <= 0.0 && !item.detected {
+        if item.duration <= 0.0 && !item.detected || item.src.isEmpty {
+            delegate?.addToPlayListActivity(info: nil, itemDetected: false)
+            return
+        }
+        
+        // We have to create an AVURLAsset here to determine if the item is playable
+        // because otherwise it will add an invalid item to playlist that can't be played.
+        // IE: WebM videos aren't supported so can't be played.
+        // Therefore we shouldn't prompt the user to add to playlist.
+        if let url = URL(string: item.src), !AVURLAsset(url: url).isPlayable {
             delegate?.addToPlayListActivity(info: nil, itemDetected: false)
             return
         }
