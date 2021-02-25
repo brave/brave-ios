@@ -216,7 +216,10 @@ class BraveTodayAddSourceViewController: UITableViewController {
             var feeds: [RSSFeedLocation] = []
             let xpath = "//head//link[contains(@type, 'application/rss+xml') or contains(@type, 'application/atom+xml') or contains(@type, 'application/json')]"
             for link in root.xpath(xpath) {
-                guard let href = link["href"], let url = URL(string: href, relativeTo: url) else { continue }
+                guard let href = link["href"], let url = URL(string: href, relativeTo: url),
+                      url.isWebPage(includeDataURIs: false) else {
+                    continue
+                }
                 feeds.append(.init(title: link["title"], url: url))
             }
             if feeds.isEmpty {

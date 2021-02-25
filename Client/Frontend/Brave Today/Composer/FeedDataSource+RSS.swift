@@ -31,9 +31,13 @@ extension FeedDataSource {
     
     /// Add a users custom RSS feed to the list of sources
     ///
-    /// - returns: `true` if the feed is successfully added, `false` if it already exists
+    /// - returns: `true` if the feed is successfully added, `false` if it already exists or the
+    ///            url location is not a web page url
     @discardableResult
     func addRSSFeedLocation(_ location: RSSFeedLocation) -> Bool {
+        if !location.url.isWebPage(includeDataURIs: false) {
+            return false
+        }
         let feedUrl = location.url.absoluteString
         if RSSFeedSource.get(with: feedUrl) != nil {
             return false
@@ -69,6 +73,26 @@ extension FeedDataSource {
 }
 
 extension FeedItem.Content {
+    private static func imageURL(from document: HTMLDocument, releativeTo baseURL: URL?) -> URL? {
+        if let src = document.firstChild(xpath: "//img[@src]")?.attr("src"),
+           let url = URL(string: src, relativeTo: baseURL),
+           url.isWebPage(includeDataURIs: false) {
+            return url
+        }
+        return nil
+    }
+    
+    private static func descriptionText(from document: HTMLDocument) -> String? {
+        if let text = document.root?.childNodes(ofTypes: [.Text, .Element]).map({ node in
+            node.stringValue
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+                .replacingOccurrences(of: "\n", with: " ")
+        }).joined(separator: " ") {
+            return text
+        }
+        return nil
+    }
+    
     init?(from feedItem: JSONFeedItem, location: RSSFeedLocation) {
         guard let publishTime = feedItem.datePublished,
               let url = feedItem.url?.asURL,
@@ -77,22 +101,19 @@ extension FeedItem.Content {
         }
         var description = ""
         var imageURL: URL?
-        if let image = feedItem.image {
-            imageURL = URL(string: image, relativeTo: location.url.domainURL)
+        if let image = feedItem.image, let url = URL(string: image, relativeTo: location.url.domainURL),
+           url.isWebPage(includeDataURIs: false) {
+            imageURL = url
         }
         if let text = feedItem.contentText {
             description = text
         }
-        if let html = feedItem.contentHtml {
-            let doc = try? HTMLDocument(string: html)
-            if imageURL == nil, let src = doc?.firstChild(xpath: "//img[@src]")?.attr("src") {
-                imageURL = URL(string: src, relativeTo: location.url.domainURL)
+        if let html = feedItem.contentHtml, let doc = try? HTMLDocument(string: html) {
+            if imageURL == nil,
+               let imageURLFromHTML = Self.imageURL(from: doc, releativeTo: location.url.domainURL) {
+                imageURL = imageURLFromHTML
             }
-            if description.isEmpty, let text = doc?.root?.childNodes(ofTypes: [.Text, .Element]).map({ node in
-                node.stringValue
-                    .trimmingCharacters(in: .whitespacesAndNewlines)
-                    .replacingOccurrences(of: "\n", with: " ")
-            }).joined(separator: " ") {
+            if description.isEmpty, let text = Self.descriptionText(from: doc) {
                 description = text
             }
         }
@@ -118,22 +139,22 @@ extension FeedItem.Content {
         }
         var description = ""
         var imageURL: URL?
-        if let thumbnail = feedItem.media?.mediaThumbnails?.first?.attributes?.url {
-            imageURL = URL(string: thumbnail, relativeTo: location.url.domainURL)
+        if let thumbnail = feedItem.media?.mediaThumbnails?.first?.attributes?.url,
+           let url = URL(string: thumbnail, relativeTo: location.url.domainURL),
+           url.isWebPage(includeDataURIs: false) {
+            imageURL = url
         }
         if feedItem.summary?.attributes?.type == "text" {
             description = feedItem.summary?.value ?? ""
-        } else if feedItem.content?.attributes?.type == "html", let html = feedItem.content?.value {
+        } else if feedItem.content?.attributes?.type == "html",
+                  let html = feedItem.content?.value,
+                  let doc = try? HTMLDocument(string: html) {
             // Find one in description?
-            let doc = try? HTMLDocument(string: html)
-            if imageURL == nil, let src = doc?.firstChild(xpath: "//img[@src]")?.attr("src") {
-                imageURL = URL(string: src, relativeTo: location.url.domainURL)
+            if imageURL == nil,
+               let imageURLFromHTML = Self.imageURL(from: doc, releativeTo: location.url.domainURL) {
+                imageURL = imageURLFromHTML
             }
-            if let text = doc?.root?.childNodes(ofTypes: [.Text, .Element]).map({ node in
-                node.stringValue
-                    .trimmingCharacters(in: .whitespacesAndNewlines)
-                    .replacingOccurrences(of: "\n", with: " ")
-            }).joined(separator: " ") {
+            if description.isEmpty, let text = Self.descriptionText(from: doc) {
                 description = text
             }
         }
@@ -159,20 +180,17 @@ extension FeedItem.Content {
         }
         var description = ""
         var imageURL: URL?
-        if let thumbnail = feedItem.media?.mediaThumbnails?.first?.attributes?.url {
-            imageURL = URL(string: thumbnail, relativeTo: location.url.domainURL)
+        if let thumbnail = feedItem.media?.mediaThumbnails?.first?.attributes?.url,
+           let url = URL(string: thumbnail, relativeTo: location.url.domainURL),
+           url.isWebPage(includeDataURIs: false) {
+            imageURL = url
         }
-        if let html = feedItem.description {
-            // Find one in description?
-            let doc = try? HTMLDocument(string: html)
-            if imageURL == nil, let src = doc?.firstChild(xpath: "//img[@src]")?.attr("src") {
-                imageURL = URL(string: src, relativeTo: location.url.domainURL)
+        if let html = feedItem.description, let doc = try? HTMLDocument(string: html) {
+            if imageURL == nil,
+               let imageURLFromHTML = Self.imageURL(from: doc, releativeTo: location.url.domainURL) {
+                imageURL = imageURLFromHTML
             }
-            if let text = doc?.root?.childNodes(ofTypes: [.Text, .Element]).map({ node in
-                node.stringValue
-                    .trimmingCharacters(in: .whitespacesAndNewlines)
-                    .replacingOccurrences(of: "\n", with: " ")
-            }).joined(separator: " ") {
+            if description.isEmpty, let text = Self.descriptionText(from: doc) {
                 description = text
             }
         }
