@@ -14,7 +14,7 @@ class VideoPlayerControlsView: UIView {
     
     private let topControlsStackView = UIStackView().then {
         $0.axis = .horizontal
-        $0.distribution = .equalSpacing
+        $0.spacing = UIDevice.isIpad ? 50.0 : 35.0
     }
     
     let repeatButton = UIButton().then {
@@ -92,8 +92,10 @@ class VideoPlayerControlsView: UIView {
         }
         
         topControlsStackView.snp.makeConstraints {
-            $0.left.right.equalToSuperview().inset(30.0)
+            $0.left.greaterThanOrEqualToSuperview().inset(30.0)
+            $0.right.lessThanOrEqualToSuperview().inset(30.0)
             $0.top.equalToSuperview().inset(20.0)
+            $0.centerX.equalToSuperview()
         }
         
         playbackRateButton.snp.makeConstraints {
@@ -107,8 +109,8 @@ class VideoPlayerControlsView: UIView {
         }
         
         trackBar.snp.makeConstraints {
-            $0.left.equalTo(repeatButton.snp.right)
-            $0.right.equalTo(nextButton.snp.left)
+            $0.left.equalTo(playbackRateButton.snp.right).offset(15.0)
+            $0.right.equalTo(castButton.snp.left).offset(-15.0)
             $0.top.equalTo(topControlsStackView.snp.bottom).offset(8.0)
             $0.bottom.equalToSuperview().offset(-12.0)
         }

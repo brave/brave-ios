@@ -28,6 +28,7 @@ class PlaylistViewController: UIViewController {
 
     // MARK: Properties
     
+    private var isFullscreen = UIDevice.current.orientation.isLandscape
     private let playerView = VideoView()
     private var playerController: AVPlayerViewController?
     
@@ -122,29 +123,42 @@ class PlaylistViewController: UIViewController {
     }
     
     private func doLayout() {
-        let videoPlayerHeight = (1.0 / 3.0) * view.bounds.height
-        
-        view.addSubview(tableView)
-        view.addSubview(playerView)
-        playerView.addSubview(activityIndicator)
-        
-        tableView.do {
-            $0.contentInset = UIEdgeInsets(top: videoPlayerHeight, left: 0.0, bottom: 0.0, right: 0.0)
-            $0.contentOffset = CGPoint(x: 0.0, y: -videoPlayerHeight)
-        }
-        
-        playerView.snp.makeConstraints {
-            $0.top.equalTo(view.safeArea.top)
-            $0.leading.trailing.equalToSuperview()
-            $0.height.equalTo(videoPlayerHeight)
-        }
-        
-        activityIndicator.snp.makeConstraints {
-            $0.center.equalToSuperview()
-        }
-        
-        tableView.snp.makeConstraints {
-            $0.edges.equalTo(view.safeArea.edges)
+        if UIDevice.current.orientation.isLandscape {
+            view.addSubview(playerView)
+            playerView.addSubview(activityIndicator)
+            
+            playerView.snp.makeConstraints {
+                $0.edges.equalTo(view.safeArea.edges)
+            }
+            
+            activityIndicator.snp.makeConstraints {
+                $0.center.equalToSuperview()
+            }
+        } else {
+            let videoPlayerHeight = (1.0 / 3.0) * view.bounds.height
+            
+            view.addSubview(tableView)
+            view.addSubview(playerView)
+            playerView.addSubview(activityIndicator)
+            
+            tableView.do {
+                $0.contentInset = UIEdgeInsets(top: videoPlayerHeight, left: 0.0, bottom: 0.0, right: 0.0)
+                $0.contentOffset = CGPoint(x: 0.0, y: -videoPlayerHeight)
+            }
+            
+            playerView.snp.makeConstraints {
+                $0.top.equalTo(view.safeArea.top)
+                $0.leading.trailing.equalToSuperview()
+                $0.height.equalTo(videoPlayerHeight)
+            }
+            
+            activityIndicator.snp.makeConstraints {
+                $0.center.equalToSuperview()
+            }
+            
+            tableView.snp.makeConstraints {
+                $0.edges.equalTo(view.safeArea.edges)
+            }
         }
     }
     
@@ -175,31 +189,29 @@ class PlaylistViewController: UIViewController {
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
         
-        if UIDevice.current.orientation.isLandscape && presentedViewController == nil {
-            let playerController = AVPlayerViewController().then {
-                $0.player = playerView.player
-                $0.delegate = self
-                $0.allowsPictureInPicturePlayback = true
-                $0.entersFullScreenWhenPlaybackBegins = true
-            }
-            
-            if #available(iOS 14.2, *) {
-                playerController.canStartPictureInPictureAutomaticallyFromInline = true
-            }
-            
-            present(playerController, animated: false) { [weak self] in
-                self?.playerController = playerController
-            }
-        } else if presentedViewController == playerController {
-            let isPlaying = playerView.isPlaying
-            playerView.attachLayer()
-            playerController?.dismiss(animated: false, completion: { [weak self] in
-                guard let self = self else { return }
-                self.playerController = nil
-                if isPlaying {
-                    self.playerView.play()
+        // If the player view is in fullscreen, we should NOT change the tableView layout on rotation.
+        if !playerView.isFullscreen {
+            if UIDevice.current.orientation.isLandscape {
+                navigationController?.setNavigationBarHidden(true, animated: true)
+                playerView.setFullscreenButtonHidden(true)
+                
+                tableView.isHidden = true
+                playerView.snp.remakeConstraints {
+                    $0.edges.equalTo(view.safeArea.edges)
                 }
-            })
+            } else {
+                navigationController?.setNavigationBarHidden(false, animated: true)
+                playerView.setFullscreenButtonHidden(false)
+                
+                tableView.isHidden = false
+                let videoPlayerHeight = (1.0 / 3.0) * size.height
+                
+                playerView.snp.remakeConstraints {
+                    $0.top.equalTo(view.safeArea.top)
+                    $0.leading.trailing.equalToSuperview()
+                    $0.height.equalTo(videoPlayerHeight)
+                }
+            }
         }
     }
 }
@@ -497,19 +509,25 @@ extension PlaylistViewController: VideoViewDelegate {
     }
     
     func onFullScreen() {
-        let playerController = AVPlayerViewController().then {
-            $0.player = playerView.player
-            $0.delegate = self
-            $0.allowsPictureInPicturePlayback = true
-            $0.entersFullScreenWhenPlaybackBegins = true
+        navigationController?.setNavigationBarHidden(true, animated: true)
+        tableView.isHidden = true
+        playerView.snp.remakeConstraints {
+            $0.edges.equalTo(view.safeArea.edges)
         }
-        
-        if #available(iOS 14.2, *) {
-            playerController.canStartPictureInPictureAutomaticallyFromInline = true
-        }
-        
-        self.present(playerController, animated: true) { [weak self] in
-            self?.playerController = playerController
+    }
+    
+    func onExitFullScreen() {
+        if UIDevice.current.orientation.isPortrait {
+            navigationController?.setNavigationBarHidden(false, animated: true)
+            tableView.isHidden = false
+            
+            let videoPlayerHeight = (1.0 / 3.0) * (UIScreen.main.bounds.size.height > UIScreen.main.bounds.size.width ? UIScreen.main.bounds.size.height : UIScreen.main.bounds.size.width)
+            
+            playerView.snp.remakeConstraints {
+                $0.top.equalTo(view.safeArea.top)
+                $0.leading.trailing.equalToSuperview()
+                $0.height.equalTo(videoPlayerHeight)
+            }
         }
     }
 }
