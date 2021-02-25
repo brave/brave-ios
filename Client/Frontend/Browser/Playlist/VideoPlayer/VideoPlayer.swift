@@ -449,7 +449,23 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     }
     
     public func setVideoInfo(videoDomain: String) {
-        infoView.titleLabel.text = URL(string: videoDomain)?.host ?? videoDomain
+        var hostDomain = ""
+        
+        if let host = URL(string: videoDomain)?.host {
+            let splits = host.split(separator: ".")
+            
+            if splits.first == "www" {
+                hostDomain = String(splits[safe: 1] ?? "")
+            } else {
+                hostDomain = String(splits.first ?? "")
+            }
+        }
+        
+        if hostDomain.isEmpty {
+            hostDomain = videoDomain
+        }
+        
+        infoView.titleLabel.text = hostDomain
         infoView.updateFavIcon(domain: videoDomain)
     }
     

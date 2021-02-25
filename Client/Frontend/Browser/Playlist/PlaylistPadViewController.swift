@@ -66,6 +66,10 @@ class PlaylistPadViewController: UIViewController {
         updateLayoutForOrientationChange()
     }
     
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
+    }
+    
     private func updateLayoutForOrientationChange() {
         if UIDevice.current.orientation.isLandscape {
             splitController.preferredDisplayMode = .secondaryOnly
@@ -316,9 +320,8 @@ extension PlaylistPadListController: UITableViewDelegate {
 
         let currentItem = PlaylistManager.shared.itemAtIndex(indexPath.row)
         let cacheState = PlaylistManager.shared.state(for: currentItem.pageSrc)
-        let downloadedItemTitle = cacheState == .invalid ? Strings.download : Strings.PlayList.clearActionButtonTitle
         
-        let cacheAction = UIContextualAction(style: .normal, title: downloadedItemTitle, handler: { [weak self] (action, view, completionHandler) in
+        let cacheAction = UIContextualAction(style: .normal, title: nil, handler: { [weak self] (action, view, completionHandler) in
             guard let self = self else { return }
             
             switch cacheState {
@@ -346,7 +349,7 @@ extension PlaylistPadListController: UITableViewDelegate {
             completionHandler(true)
         })
         
-        let deleteAction = UIContextualAction(style: .normal, title: Strings.PlayList.removeActionButtonTitle, handler: { [weak self] (action, view, completionHandler) in
+        let deleteAction = UIContextualAction(style: .normal, title: nil, handler: { [weak self] (action, view, completionHandler) in
             guard let self = self else { return }
             
             let style: UIAlertController.Style = UIDevice.current.userInterfaceIdiom == .pad ? .alert : .actionSheet
@@ -586,7 +589,7 @@ private class PlaylistPadDetailController: UIViewController, UIGestureRecognizer
     
     private func addGestureRecognizers() {
         let slideToRevealGesture = UISwipeGestureRecognizer(target: self, action: #selector(handleGesture))
-        slideToRevealGesture.direction = .right
+        slideToRevealGesture.direction = PlayListSide(rawValue: Preferences.Playlist.listViewSide.value) == .left ? .right : .left
         
         view.addGestureRecognizer(slideToRevealGesture)
     }
