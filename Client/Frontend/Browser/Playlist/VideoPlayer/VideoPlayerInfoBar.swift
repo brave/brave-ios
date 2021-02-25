@@ -8,7 +8,10 @@ import UIKit
 import AVKit
 
 class VideoPlayerInfoBar: UIView {
-    private var favIconFetcher: FaviconFetcher?
+    private let controlStackView = UIStackView().then {
+        $0.axis = .horizontal
+        $0.spacing = 32.0
+    }
     
     private let blurView = UIVisualEffectView(effect: UIBlurEffect(style: .dark)).then {
         $0.contentView.backgroundColor = #colorLiteral(red: 0.231372549, green: 0.2431372549, blue: 0.3098039216, alpha: 0.8)
@@ -36,14 +39,22 @@ class VideoPlayerInfoBar: UIView {
         $0.setImage(#imageLiteral(resourceName: "playlist_fullscreen"), for: .normal)
     }
     
+    let exitButton = UIButton().then {
+        $0.imageView?.contentMode = .scaleAspectFit
+        $0.setImage(#imageLiteral(resourceName: "playlist_exit"), for: .normal)
+        $0.isHidden = true
+    }
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         
         addSubview(blurView)
         addSubview(favIconImageView)
         addSubview(titleLabel)
-        addSubview(pictureInPictureButton)
-        addSubview(fullscreenButton)
+        addSubview(controlStackView)
+        [pictureInPictureButton, fullscreenButton, exitButton].forEach({
+            controlStackView.addArrangedSubview($0)
+        })
         
         blurView.snp.makeConstraints {
             $0.edges.equalToSuperview()
@@ -59,13 +70,8 @@ class VideoPlayerInfoBar: UIView {
             $0.centerY.equalToSuperview()
         }
         
-        pictureInPictureButton.snp.makeConstraints {
+        controlStackView.snp.makeConstraints {
             $0.left.greaterThanOrEqualTo(titleLabel.snp.right).offset(20.0)
-            $0.centerY.equalToSuperview()
-        }
-        
-        fullscreenButton.snp.makeConstraints {
-            $0.left.equalTo(pictureInPictureButton.snp.right).offset(32.0)
             $0.right.equalToSuperview().offset(-20.0)
             $0.centerY.equalToSuperview()
         }

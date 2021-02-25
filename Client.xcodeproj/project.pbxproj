@@ -4705,8 +4705,8 @@
 		5E5E6E4425BA04120035B6A0 /* VideoPlayer */ = {
 			isa = PBXGroup;
 			children = (
-				CA439A8F25E80EE400FE9150 /* VideoPlayerTrackbar.swift */,
 				CA439A5825E6F29D00FE9150 /* VideoPlayerInfoBar.swift */,
+				CA439A8F25E80EE400FE9150 /* VideoPlayerTrackbar.swift */,
 				CA439A7525E8054A00FE9150 /* VideoPlayerControlsView.swift */,
 				5E5E6E6D25BA04AB0035B6A0 /* VideoPlayer.swift */,
 				5E5E6E4525BA041E0035B6A0 /* PlaylistParticleEmitter.swift */,

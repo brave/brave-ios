@@ -17,6 +17,7 @@ protocol VideoViewDelegate: class {
     func onNextTrack()
     func onPictureInPicture(enabled: Bool)
     func onFullScreen()
+    func onExitFullScreen()
 }
 
 public class VideoView: UIView, VideoTrackerBarDelegate {
@@ -95,6 +96,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
 
         infoView.pictureInPictureButton.addTarget(self, action: #selector(onPictureInPicture(_:)), for: .touchUpInside)
         infoView.fullscreenButton.addTarget(self, action: #selector(onFullscreen(_:)), for: .touchUpInside)
+        infoView.exitButton.addTarget(self, action: #selector(onExitFullscreen(_:)), for: .touchUpInside)
         
         controlsView.playPauseButton.addTarget(self, action: #selector(onPlay(_:)), for: .touchUpInside)
         controlsView.castButton.addTarget(self, action: #selector(onCast(_:)), for: .touchUpInside)
@@ -277,12 +279,18 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     
     @objc
     private func onFullscreen(_ button: UIButton) {
+        isFullscreen = true
+        infoView.fullscreenButton.isHidden = true
+        infoView.exitButton.isHidden = false
         self.delegate?.onFullScreen()
     }
     
     @objc
     private func onExitFullscreen(_ button: UIButton) {
-        
+        isFullscreen = false
+        infoView.fullscreenButton.isHidden = false
+        infoView.exitButton.isHidden = true
+        self.delegate?.onExitFullScreen()
     }
     
     @objc
@@ -375,10 +383,6 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
             self.showOverlays(true)
             
             self.next()
-            
-            if self.isFullscreen {
-                self.onFullscreen(self.infoView.fullscreenButton)
-            }
         })
         
         notificationObservers.append(NotificationCenter.default.addObserver(forName: UIDevice.orientationDidChangeNotification, object: UIDevice.current, queue: .main) { _ in
@@ -451,6 +455,10 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     
     public func setControlsEnabled(_ enabled: Bool) {
         isUserInteractionEnabled = enabled
+    }
+    
+    public func setFullscreenButtonHidden(_ hidden: Bool) {
+        infoView.fullscreenButton.isHidden = hidden
     }
     
     public func attachLayer() {

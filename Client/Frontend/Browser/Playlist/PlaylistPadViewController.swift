@@ -545,6 +545,8 @@ private class PlaylistPadDetailController: UIViewController, UIGestureRecognizer
     // MARK: Private
     
     private func setup() {
+        view.backgroundColor = .black
+        
         navigationController?.do {
             if #available(iOS 13.0, *) {
                 let appearance = UINavigationBarAppearance()
@@ -669,18 +671,11 @@ extension PlaylistPadDetailController: VideoViewDelegate {
     }
     
     func onFullScreen() {
-        let playerController = AVPlayerViewController().then {
-            $0.player = playerView.player
-            $0.delegate = self
-            $0.allowsPictureInPicturePlayback = true
-            $0.entersFullScreenWhenPlaybackBegins = true
-        }
-        
-        if #available(iOS 14.2, *) {
-            playerController.canStartPictureInPictureAutomaticallyFromInline = true
-        }
-        
-        self.present(playerController, animated: true)
+        navigationController?.setNavigationBarHidden(true, animated: true)
+    }
+    
+    func onExitFullScreen() {
+        navigationController?.setNavigationBarHidden(false, animated: true)
     }
 }
 
