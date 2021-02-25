@@ -632,6 +632,7 @@ extension PlaylistPadDetailController: VideoViewDelegate {
             let item = PlaylistManager.shared.itemAtIndex(index)
             title = item.name
             
+            playerView.setVideoInfo(videoDomain: item.pageSrc)
             mediaInfo.loadMediaItem(item, index: index) { [weak self] error in
                 if case .none = error {
                     self?.currentlyPlayingItemIndex = index
@@ -652,6 +653,7 @@ extension PlaylistPadDetailController: VideoViewDelegate {
             let item = PlaylistManager.shared.itemAtIndex(index)
             title = item.name
             
+            playerView.setVideoInfo(videoDomain: item.pageSrc)
             mediaInfo.loadMediaItem(item, index: index) { [weak self] error in
                 if case .none = error {
                     self?.currentlyPlayingItemIndex = index
@@ -804,6 +806,7 @@ extension PlaylistPadDetailController: PlaylistPadControllerDetailDelegate {
     }
     
     func loadMediaItem(_ item: PlaylistInfo, index: Int, completion: @escaping (PlaylistMediaInfo.MediaPlaybackError) -> Void) {
+        playerView.setVideoInfo(videoDomain: item.pageSrc)
         mediaInfo.loadMediaItem(item, index: index, completion: completion)
     }
     

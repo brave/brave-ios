@@ -107,11 +107,6 @@ class PlaylistViewController: UIViewController {
         }
         
         view.backgroundColor = BraveUX.popoverDarkBackground
-        
-        tableView.do {
-            $0.contentInset = UIEdgeInsets(top: 0.50 * view.bounds.width, left: 0.0, bottom: 0.0, right: 0.0)
-            $0.contentOffset = CGPoint(x: 0.0, y: -0.50 * view.bounds.width)
-        }
     }
     
     private func setup () {
@@ -127,14 +122,21 @@ class PlaylistViewController: UIViewController {
     }
     
     private func doLayout() {
+        let videoPlayerHeight = (1.0 / 3.0) * view.bounds.height
+        
         view.addSubview(tableView)
         view.addSubview(playerView)
         playerView.addSubview(activityIndicator)
         
+        tableView.do {
+            $0.contentInset = UIEdgeInsets(top: videoPlayerHeight, left: 0.0, bottom: 0.0, right: 0.0)
+            $0.contentOffset = CGPoint(x: 0.0, y: -videoPlayerHeight)
+        }
+        
         playerView.snp.makeConstraints {
             $0.top.equalTo(view.safeArea.top)
             $0.leading.trailing.equalToSuperview()
-            $0.height.equalTo(0.50 * view.bounds.width)
+            $0.height.equalTo(videoPlayerHeight)
         }
         
         activityIndicator.snp.makeConstraints {
@@ -376,6 +378,7 @@ extension PlaylistViewController: UITableViewDelegate {
 
             let item = PlaylistManager.shared.itemAtIndex(indexPath.row)
             infoLabel.text = item.name
+            playerView.setVideoInfo(videoDomain: item.pageSrc)
             mediaInfo.loadMediaItem(item, index: indexPath.row) { [weak self] error in
                 guard let self = self else { return }
                 self.activityIndicator.stopAnimating()
@@ -459,6 +462,7 @@ extension PlaylistViewController: VideoViewDelegate {
         let index = currentlyPlayingItemIndex - 1
         if index < PlaylistManager.shared.numberOfAssets() {
             let item = PlaylistManager.shared.itemAtIndex(index)
+            playerView.setVideoInfo(videoDomain: item.pageSrc)
             mediaInfo.loadMediaItem(item, index: index) { [weak self] error in
                 if case .none = error {
                     self?.currentlyPlayingItemIndex = index
@@ -477,6 +481,7 @@ extension PlaylistViewController: VideoViewDelegate {
         let index = currentlyPlayingItemIndex + 1
         if index >= 0 {
             let item = PlaylistManager.shared.itemAtIndex(index)
+            playerView.setVideoInfo(videoDomain: item.pageSrc)
             mediaInfo.loadMediaItem(item, index: index) { [weak self] error in
                 if case .none = error {
                     self?.currentlyPlayingItemIndex = index

@@ -832,6 +832,9 @@
 		C8F457A81F1FD75A000CB895 /* BrowserViewController+WKNavigationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F457A71F1FD75A000CB895 /* BrowserViewController+WKNavigationDelegate.swift */; };
 		C8F457AA1F1FDD9B000CB895 /* BrowserViewController+KeyCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F457A91F1FDD9B000CB895 /* BrowserViewController+KeyCommands.swift */; };
 		CA1659CC25E445FA00A860ED /* BaltimoreCyberTrustRoot.cer in Resources */ = {isa = PBXBuildFile; fileRef = CA1659C025E445EC00A860ED /* BaltimoreCyberTrustRoot.cer */; };
+		CA439A5925E6F29D00FE9150 /* VideoPlayerInfoBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA439A5825E6F29D00FE9150 /* VideoPlayerInfoBar.swift */; };
+		CA439A7625E8054A00FE9150 /* VideoPlayerControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA439A7525E8054A00FE9150 /* VideoPlayerControlsView.swift */; };
+		CA439A9025E80EE400FE9150 /* VideoPlayerTrackbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA439A8F25E80EE400FE9150 /* VideoPlayerTrackbar.swift */; };
 		CE7F11941F3CEEC800ABFC0B /* RemoteDevices.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE7F115E1F3CCEF900ABFC0B /* RemoteDevices.swift */; };
 		D018F93E1F44A71A0098F8CA /* Schema.swift in Sources */ = {isa = PBXBuildFile; fileRef = D018F93D1F44A7190098F8CA /* Schema.swift */; };
 		D029A04920A62DB0001DB72F /* TemporaryDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = D029A04820A62DB0001DB72F /* TemporaryDocument.swift */; };
@@ -2508,6 +2511,9 @@
 		C8F457A71F1FD75A000CB895 /* BrowserViewController+WKNavigationDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "BrowserViewController+WKNavigationDelegate.swift"; sourceTree = "<group>"; };
 		C8F457A91F1FDD9B000CB895 /* BrowserViewController+KeyCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "BrowserViewController+KeyCommands.swift"; sourceTree = "<group>"; };
 		CA1659C025E445EC00A860ED /* BaltimoreCyberTrustRoot.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = BaltimoreCyberTrustRoot.cer; sourceTree = "<group>"; };
+		CA439A5825E6F29D00FE9150 /* VideoPlayerInfoBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPlayerInfoBar.swift; sourceTree = "<group>"; };
+		CA439A7525E8054A00FE9150 /* VideoPlayerControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPlayerControlsView.swift; sourceTree = "<group>"; };
+		CA439A8F25E80EE400FE9150 /* VideoPlayerTrackbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPlayerTrackbar.swift; sourceTree = "<group>"; };
 		CE7F115E1F3CCEF900ABFC0B /* RemoteDevices.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RemoteDevices.swift; sourceTree = "<group>"; };
 		D000661320472890009BA6F6 /* __firefox__.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = __firefox__.js; sourceTree = "<group>"; };
 		D018F93D1F44A7190098F8CA /* Schema.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Schema.swift; sourceTree = "<group>"; };
@@ -4641,9 +4647,12 @@
 		5E5E6E4425BA04120035B6A0 /* VideoPlayer */ = {
 			isa = PBXGroup;
 			children = (
+				CA439A8F25E80EE400FE9150 /* VideoPlayerTrackbar.swift */,
+				CA439A5825E6F29D00FE9150 /* VideoPlayerInfoBar.swift */,
+				CA439A7525E8054A00FE9150 /* VideoPlayerControlsView.swift */,
+				5E5E6E6D25BA04AB0035B6A0 /* VideoPlayer.swift */,
 				5E5E6E4525BA041E0035B6A0 /* PlaylistParticleEmitter.swift */,
 				5E5E6E6225BA04730035B6A0 /* DataURIParser.swift */,
-				5E5E6E6D25BA04AB0035B6A0 /* VideoPlayer.swift */,
 			);
 			path = VideoPlayer;
 			sourceTree = "<group>";
@@ -6907,6 +6916,7 @@
 				4422D4AF21BFFB7600BF1855 /* status.cc in Sources */,
 				4422D4EA21BFFB7600BF1855 /* db_impl.cc in Sources */,
 				0AAAAC972249174A009A8763 /* SyncAlerts.swift in Sources */,
+				CA439A7625E8054A00FE9150 /* VideoPlayerControlsView.swift in Sources */,
 				0A6F957624044F070098217F /* NTPLearnMoreContentView.swift in Sources */,
 				4422D4F221BFFB7600BF1855 /* builder.cc in Sources */,
 				0A1E84432190A57F0042F782 /* SyncWelcomeViewController.swift in Sources */,
@@ -7140,6 +7150,7 @@
 				E63ED7D81BFCD9990097D08E /* LoginTableViewCell.swift in Sources */,
 				C615FACF2129FBD000A8168C /* ImageCacheProtocol.swift in Sources */,
 				4422D4BB21BFFB7600BF1855 /* cache.cc in Sources */,
+				CA439A9025E80EE400FE9150 /* VideoPlayerTrackbar.swift in Sources */,
 				0A39FEA0248660EA00290ABC /* VPNConstants.m in Sources */,
 				39455F771FC83F430088A22C /* TabEventHandler.swift in Sources */,
 				4422D4B721BFFB7600BF1855 /* filter_policy.cc in Sources */,
@@ -7170,6 +7181,7 @@
 				A9072B801D07B34100459960 /* NoImageModeHelper.swift in Sources */,
 				4422D4EB21BFFB7600BF1855 /* filename.cc in Sources */,
 				2726636924944BFA0056CFE1 /* BraveTodayWelcomeView.swift in Sources */,
+				CA439A5925E6F29D00FE9150 /* VideoPlayerInfoBar.swift in Sources */,
 				2FE5B4542582BEF500BFDDB8 /* ShareTrayView.swift in Sources */,
 				2755EABD255323C60033C43F /* PublisherInfoExtensions.swift in Sources */,
 				2746D28324A4FB7400E38852 /* RewardsInternalsSharable.swift in Sources */,

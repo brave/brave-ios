@@ -5,12 +5,12 @@
       "scale" : "1x"
     },
     {
-      "filename" : "exit@2x.png",
+      "filename" : "close-player@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "exit@3x.png",
+      "filename" : "close-player@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

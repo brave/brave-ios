@@ -193,14 +193,11 @@ class PlaylistCell: UITableViewCell {
                 guard let url = URL(string: item.pageSrc) else { return }
                 
                 DispatchQueue.main.async {
-                    self.favIconFetcher = FaviconFetcher(siteURL: url, kind: .largeIcon)
-                    self.favIconFetcher?.load { [weak self] url, attributes in
-                        guard let self = self else { return }
-                        self.favIconFetcher = nil
-                        self.thumbnailImage = attributes.image
-                        
-                        imageCache.store(attributes.image, forKey: url.absoluteString, completion: nil)
-                    }
+                    self.thumbnailView.cancelFaviconLoad()
+                    self.thumbnailView.clearMonogramFavicon()
+                    self.thumbnailView.contentMode = .scaleAspectFit
+                    self.thumbnailView.image = FaviconFetcher.defaultFaviconImage
+                    self.thumbnailView.loadFavicon(for: url)
                 }
             }
         }
