@@ -1772,6 +1772,12 @@ extension Strings {
             value: "Add",
             comment: "To add a list of 1 or more rss feeds"
         )
+        public static let insecureSourcesHeader = NSLocalizedString(
+            "today.insecureSourcesHeader",
+            bundle: .braveShared,
+            value: "Insecure Sources - Add at your own risk",
+            comment: "The header above the list of insecure sources"
+        )
         public static let searchTextFieldPlaceholder = NSLocalizedString(
             "today.searchTextFieldPlaceholder",
             bundle: .braveShared,

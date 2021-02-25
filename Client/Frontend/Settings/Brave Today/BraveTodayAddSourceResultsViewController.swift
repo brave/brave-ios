@@ -11,7 +11,8 @@ class BraveTodayAddSourceResultsViewController: UITableViewController {
     
     let feedDataSource: FeedDataSource
     let searchedURL: URL
-    let locations: [RSSFeedLocation]
+    private let secureLocations: [RSSFeedLocation]
+    private let insecureLocations: [RSSFeedLocation]
     var sourcesAdded: ((Set<RSSFeedLocation>) -> Void)?
     
     private var selectedLocations: Set<RSSFeedLocation>
@@ -23,8 +24,10 @@ class BraveTodayAddSourceResultsViewController: UITableViewController {
     ) {
         self.feedDataSource = dataSource
         self.searchedURL = searchedURL
-        self.locations = rssFeedLocations
-        self.selectedLocations = Set(rssFeedLocations)
+        let locations = Set(rssFeedLocations)
+        self.secureLocations = locations.filter { $0.url.scheme == "https" }
+        self.insecureLocations = Array(locations.subtracting(self.secureLocations))
+        self.selectedLocations = locations
         self.sourcesAdded = sourcesAdded
         
         if #available(iOS 13.0, *) {
@@ -78,6 +81,7 @@ class BraveTodayAddSourceResultsViewController: UITableViewController {
     // MARK: - UITableViewDelegate
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let locations = indexPath.section == 0 ? secureLocations : insecureLocations
         if let location = locations[safe: indexPath.row],
            let cell = tableView.cellForRow(at: indexPath) as? FeedLocationCell {
             if selectedLocations.remove(location) == nil {
@@ -92,11 +96,14 @@ class BraveTodayAddSourceResultsViewController: UITableViewController {
     // MARK: - UITableViewDataSource
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let locations = indexPath.section == 0 ? secureLocations : insecureLocations
         guard let location = locations[safe: indexPath.row] else {
             assertionFailure()
             return UITableViewCell()
         }
         let cell = tableView.dequeueReusableCell(for: indexPath) as FeedLocationCell
+        cell.imageView?.image = indexPath.section == 0 ? #imageLiteral(resourceName: "lock_verified").template : #imageLiteral(resourceName: "insecure-site-icon")
+        cell.imageView?.tintColor = Theme.of(nil).colors.tints.home
         cell.textLabel?.text = location.title
         cell.detailTextLabel?.text = location.url.absoluteString
         cell.accessoryType = selectedLocations.contains(location) ? .checkmark : .none
@@ -104,7 +111,18 @@ class BraveTodayAddSourceResultsViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        locations.count
+        return section == 0 ? secureLocations.count : insecureLocations.count
+    }
+    
+    override func numberOfSections(in tableView: UITableView) -> Int {
+        insecureLocations.isEmpty ? 1 : 2
+    }
+    
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        if section == 1 {
+            return Strings.BraveToday.insecureSourcesHeader
+        }
+        return nil
     }
 }
 
