@@ -117,6 +117,9 @@ class PlaylistViewController: UIViewController {
             $0.register(PlaylistCell.self, forCellReuseIdentifier: Constants.playListCellIdentifier)
             $0.dataSource = self
             $0.delegate = self
+            $0.dragDelegate = self
+            $0.dropDelegate = self
+            $0.dragInteractionEnabled = true
         }
         
         playerView.delegate = self
@@ -285,11 +288,6 @@ extension PlaylistViewController: UITableViewDataSource {
             }
         }
         
-        cell.gestureRecognizers?.forEach { cell.removeGestureRecognizer($0) }
-        cell.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(longPressedCell(_:))).then {
-            $0.delegate = self
-        })
-        
         return cell
     }
     
@@ -421,39 +419,78 @@ extension PlaylistViewController: UITableViewDelegate {
         }
     }
     
-    // MARK: - Reordering of cells
-    
-    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        // Intentionally blank. Required to use UITableViewRowActions
-    }
-    
-    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
-        return .none
-    }
-    
-    func tableView(_ tableView: UITableView, shouldIndentWhileEditingRowAt indexPath: IndexPath) -> Bool {
-        return false
-    }
-    
-    func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        return true
-    }
-    
-    func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-        PlaylistManager.shared.reorderItems(from: sourceIndexPath, to: destinationIndexPath)
-    }
-    
-    @objc
-    func longPressedCell(_ recognizer: UILongPressGestureRecognizer) {
-        tableView.setEditing(true, animated: true)
-    }
-    
     private func displayLoadingResourceError() {
         let alert = UIAlertController(
             title: Strings.PlayList.sorryAlertTitle, message: Strings.PlayList.loadResourcesErrorAlertDescription, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: nil))
         
         self.present(alert, animated: true, completion: nil)
+    }
+}
+
+// MARK: - Reordering of cells
+
+extension PlaylistViewController: UITableViewDragDelegate, UITableViewDropDelegate {
+    func tableView(_ tableView: UITableView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
+        let item = PlaylistManager.shared.itemAtIndex(indexPath.row)
+        let itemProvider = NSItemProvider(object: "\(indexPath)" as NSString)
+        let dragItem = UIDragItem(itemProvider: itemProvider)
+//        dragItem.previewProvider = { () -> UIDragPreview? in
+//            guard let cell = tableView.cellForRow(at: indexPath) as? PlaylistCell else {
+//                    return nil
+//            }
+//            return UIDragPreview(view: cell)
+//        }
+        dragItem.localObject = item
+        return [dragItem]
+    }
+        
+    func tableView(_ tableView: UITableView, performDropWith coordinator: UITableViewDropCoordinator) {
+        guard let sourceIndexPath = coordinator.items.first?.sourceIndexPath else { return }
+        let destinationIndexPath: IndexPath
+        if let indexPath = coordinator.destinationIndexPath {
+            destinationIndexPath = indexPath
+        } else {
+            let section = tableView.numberOfSections - 1
+            let row = tableView.numberOfRows(inSection: section)
+            destinationIndexPath = IndexPath(row: row - 1, section: section)
+        }
+        
+        if coordinator.proposal.operation == .move {
+            guard let item = coordinator.items.first else { return }
+            _ = coordinator.drop(item.dragItem, toRowAt: destinationIndexPath)
+            PlaylistManager.shared.reorderItems(from: sourceIndexPath, to: destinationIndexPath)
+            PlaylistManager.shared.reloadData()
+            tableView.moveRow(at: sourceIndexPath, to: destinationIndexPath)
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, dropSessionDidUpdate session: UIDropSession, withDestinationIndexPath destinationIndexPath: IndexPath?) -> UITableViewDropProposal {
+        if PlaylistManager.shared.numberOfAssets() == 1 {
+            return .init(operation: .cancel)
+        }
+        return .init(operation: .move, intent: .insertAtDestinationIndexPath)
+    }
+    
+    func tableView(_ tableView: UITableView, dragPreviewParametersForRowAt indexPath: IndexPath) -> UIDragPreviewParameters? {
+        let params = UIDragPreviewParameters()
+        params.backgroundColor = .clear
+        if let cell = tableView.cellForRow(at: indexPath) as? PlaylistCell {
+            params.visiblePath = UIBezierPath(roundedRect: cell.frame, cornerRadius: 8)
+        }
+        return params
+    }
+    func tableView(_ tableView: UITableView, dropPreviewParametersForRowAt indexPath: IndexPath) -> UIDragPreviewParameters? {
+        let params = UIDragPreviewParameters()
+        params.backgroundColor = .clear
+        if let cell = tableView.cellForRow(at: indexPath) as? PlaylistCell {
+            params.visiblePath = UIBezierPath(roundedRect: cell.frame, cornerRadius: 8)
+        }
+        return params
+    }
+    
+    func tableView(_ tableView: UITableView, dragSessionIsRestrictedToDraggingApplication session: UIDragSession) -> Bool {
+        return true
     }
 }
 
@@ -673,6 +710,8 @@ extension PlaylistViewController: PlaylistManagerDelegate {
     
     func controllerDidChange(_ anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         
+        if tableView.hasActiveDrag || tableView.hasActiveDrop { return }
+        
         switch type {
             case .insert:
                 tableView.insertRows(at: [newIndexPath!], with: .fade)
@@ -689,10 +728,12 @@ extension PlaylistViewController: PlaylistManagerDelegate {
     }
     
     func controllerDidChangeContent() {
+        if tableView.hasActiveDrag || tableView.hasActiveDrop { return }
         tableView.endUpdates()
     }
     
     func controllerWillChangeContent() {
+        if tableView.hasActiveDrag || tableView.hasActiveDrop { return }
         tableView.beginUpdates()
     }
 }
