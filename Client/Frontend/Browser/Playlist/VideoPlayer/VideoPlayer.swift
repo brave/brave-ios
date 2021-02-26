@@ -451,13 +451,14 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         var hostDomain = ""
         
         if let host = URL(string: videoDomain)?.host {
-            let splits = host.split(separator: ".")
-            
-            if splits.first == "www" {
-                hostDomain = String(splits[safe: 1] ?? "")
-            } else {
-                hostDomain = String(splits.first ?? "")
+            hostDomain = host
+            if host.hasPrefix("www.") {
+                hostDomain = String(host.dropFirst(4))
             }
+        }
+        
+        if hostDomain.hasSuffix("/") {
+            hostDomain = String(hostDomain.dropLast())
         }
         
         if hostDomain.isEmpty {
