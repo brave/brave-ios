@@ -440,6 +440,22 @@ extension URL {
         
         return siteList.contains(where: domain.contains)
     }
+    
+    // Check if the website is supporting showing Add To playlist toast
+    public var isPlaylistSupportedSiteURL: Bool {
+        guard let domain = self.baseDomain else {
+            return false
+        }
+        
+        var siteList = ["youtube", "vimeo", "twitch", "floatplane", "spotify", "soundcloud"]
+        
+        /// Additional sites for Japanese locale
+        if Locale.current.regionCode == "JP" {
+            siteList.append(contentsOf: ["nicovideo", "dailymotion", "pandora", "veoh", "ted", "yahoo.co", "say-move", "9tsu"])
+        }
+        
+        return siteList.contains(where: domain.contains)
+    }
 }
 
 // Helpers to deal with About URLs

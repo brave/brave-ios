@@ -3583,7 +3583,9 @@ extension BrowserViewController: PlaylistHelperDelegate {
     }
     
     func showPlaylistToast(info: PlaylistInfo, itemState: PlaylistItemAddedState) {
-        guard Preferences.Playlist.showToastForAdd.value else {
+        guard Preferences.Playlist.showToastForAdd.value,
+              let selectedTab = tabManager.selectedTab,
+              selectedTab.url?.isPlaylistSupportedSiteURL == true else {
             return
         }
         
