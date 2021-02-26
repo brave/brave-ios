@@ -3604,8 +3604,11 @@ extension BrowserViewController: PlaylistHelperDelegate {
                         log.debug("Playlist Item Added")
                         
                         self.playlistToast = nil
-                        self.showPlaylistToast(info: info, itemState: .added)
-                        UIImpactFeedbackGenerator(style: .medium).bzzt()
+                        
+                        DispatchQueue.main.async {
+                            self.showPlaylistToast(info: info, itemState: .added)
+                            UIImpactFeedbackGenerator(style: .medium).bzzt()
+                        }
                     }
                 } else {
                     self.playlistToast = nil
