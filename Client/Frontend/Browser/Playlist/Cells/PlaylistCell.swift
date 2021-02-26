@@ -24,12 +24,13 @@ class PlaylistCell: UITableViewCell {
     }
     
     var thumbnailImage: UIImage? {
-        didSet {
-            self.thumbnailView.image = thumbnailImage
+        get {
+            return thumbnailView.image
+        }
+        
+        set {
             self.thumbnailView.backgroundColor = .black
-            self.setNeedsLayout()
-            self.layoutIfNeeded()
-            //self.updateThumbnail()
+            self.thumbnailView.image = newValue
         }
     }
     
@@ -163,7 +164,7 @@ class PlaylistCell: UITableViewCell {
                 self.thumbnailGenerator = nil
                 SDImageCache.shared.store(image, forKey: url.absoluteString, completion: nil)
             } else {
-                //We can fall back to AVAssetImageGenerator or FavIcon
+                // We can fall back to AVAssetImageGenerator or FavIcon
                 self.loadThumbnailFallbackImage(item: item)
             }
         })
