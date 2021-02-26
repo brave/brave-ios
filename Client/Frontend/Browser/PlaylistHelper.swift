@@ -48,7 +48,7 @@ class PlaylistHelper: TabContentScript {
             return
         }
         
-        if item.duration <= 0.0 && !item.detected || item.src.isEmpty {
+        if item.duration <= 0.0 && !item.detected || item.src.isEmpty || item.src.hasPrefix("data:") {
             delegate?.addToPlayListActivity(info: nil, itemDetected: false)
             return
         }
