@@ -41,7 +41,7 @@ private class VideoSliderBar: UIControl {
         
         tracker.snp.makeConstraints {
             $0.centerY.equalTo(boundaryView.snp.centerY)
-            $0.width.height.equalTo(12.0)
+            $0.width.height.equalTo(18.0)
         }
         
         filledConstraint = filledView.leftAnchor.constraint(equalTo: background.leftAnchor).then {
