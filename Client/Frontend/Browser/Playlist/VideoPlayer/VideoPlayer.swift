@@ -393,7 +393,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
             guard let self = self, let currentItem = self.player.currentItem else { return }
             
             self.controlsView.playPauseButton.isEnabled = false
-            self.controlsView.playPauseButton.setImage(nil, for: .normal)
+            self.controlsView.playPauseButton.setImage(#imageLiteral(resourceName: "playlist_pause"), for: .normal)
             self.player.pause()
             
             let endTime = CMTimeConvertScale(currentItem.asset.duration, timescale: self.player.currentTime().timescale, method: .roundHalfAwayFromZero)
@@ -402,6 +402,8 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
             self.player.seek(to: .zero)
             
             self.controlsView.playPauseButton.isEnabled = true
+            self.controlsView.playPauseButton.setImage(#imageLiteral(resourceName: "playlist_play"), for: .normal)
+
             self.showOverlays(true)
             
             self.next()
