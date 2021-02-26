@@ -553,11 +553,23 @@ extension PlaylistViewController: VideoViewDelegate {
     }
     
     func onNextTrack() {
-        if currentlyPlayingItemIndex >= PlaylistManager.shared.numberOfAssets() - 1 {
+        let isAtEnd = currentlyPlayingItemIndex >= PlaylistManager.shared.numberOfAssets() - 1
+        var index = currentlyPlayingItemIndex
+        
+        switch playerView.repeatState {
+        case .none:
+            if isAtEnd {
+                return
+            }
+            index += 1
+        case .repeatOne:
+            playerView.seek(to: 0.0)
+            playerView.play()
             return
+        case .repeatAll:
+            index = isAtEnd ? 0 : index + 1
         }
         
-        let index = currentlyPlayingItemIndex + 1
         if index >= 0 {
             let item = PlaylistManager.shared.itemAtIndex(index)
             playerView.setVideoInfo(videoDomain: item.pageSrc)

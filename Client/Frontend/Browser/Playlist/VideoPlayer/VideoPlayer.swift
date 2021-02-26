@@ -12,7 +12,13 @@ import AVFoundation
 
 private let log = Logger.browserLogger
 
-protocol VideoViewDelegate: class {
+public enum VideoViewRepeatMode {
+    case none
+    case repeatOne
+    case repeatAll
+}
+
+public protocol VideoViewDelegate: class {
     func onPreviousTrack()
     func onNextTrack()
     func onPictureInPicture(enabled: Bool)
@@ -76,6 +82,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     private(set) public var isSeeking = false
     private(set) public var isFullscreen = false
     private(set) public var isOverlayDisplayed = false
+    private(set) public var repeatState: VideoViewRepeatMode = .none
     private var notificationObservers = [NSObjectProtocol]()
     private var pictureInPictureObservers = [NSObjectProtocol]()
     private(set) public var pictureInPictureController: AVPictureInPictureController?
@@ -98,6 +105,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         infoView.fullscreenButton.addTarget(self, action: #selector(onFullscreen(_:)), for: .touchUpInside)
         infoView.exitButton.addTarget(self, action: #selector(onExitFullscreen(_:)), for: .touchUpInside)
         
+        controlsView.repeatButton.addTarget(self, action: #selector(onRepeat(_:)), for: .touchUpInside)
         controlsView.playPauseButton.addTarget(self, action: #selector(onPlay(_:)), for: .touchUpInside)
         controlsView.castButton.addTarget(self, action: #selector(onCast(_:)), for: .touchUpInside)
         controlsView.playbackRateButton.addTarget(self, action: #selector(onPlaybackRateChanged(_:)), for: .touchUpInside)
@@ -218,6 +226,21 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         })
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 5.0, execute: fadeAnimationWorkItem!)
+    }
+    
+    @objc
+    private func onRepeat(_ button: UIButton) {
+        switch repeatState {
+        case .none:
+            repeatState = .repeatOne
+            controlsView.repeatButton.setImage(#imageLiteral(resourceName: "playlist_repeat_one"), for: .normal)
+        case .repeatOne:
+            repeatState = .repeatAll
+            controlsView.repeatButton.setImage(#imageLiteral(resourceName: "playlist_repeat_all"), for: .normal)
+        case .repeatAll:
+            repeatState = .none
+            controlsView.repeatButton.setImage(#imageLiteral(resourceName: "playlist_repeat"), for: .normal)
+        }
     }
     
     @objc
