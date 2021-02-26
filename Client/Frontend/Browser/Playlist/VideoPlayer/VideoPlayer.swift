@@ -132,7 +132,6 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
             $0.leading.equalTo(self.safeArea.leading).inset(20.0)
             $0.trailing.equalTo(self.safeArea.trailing).inset(20.0)
             $0.bottom.equalTo(self.safeArea.bottom).inset(25.0)
-            $0.height.equalTo(100.0)
         }
 
         registerNotifications()

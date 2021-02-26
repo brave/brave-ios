@@ -14,7 +14,9 @@ class VideoPlayerControlsView: UIView {
     
     private let topControlsStackView = UIStackView().then {
         $0.axis = .horizontal
-        $0.spacing = UIDevice.isIpad ? 50.0 : 35.0
+        $0.distribution = .equalSpacing
+        $0.isLayoutMarginsRelativeArrangement = true
+        $0.layoutMargins = UIEdgeInsets(top: 0.0, left: 30.0, bottom: 0.0, right: 30.0)
     }
     
     let repeatButton = UIButton().then {
@@ -25,16 +27,12 @@ class VideoPlayerControlsView: UIView {
     let skipBackButton = UIButton().then {
         $0.imageView?.contentMode = .scaleAspectFit
         $0.setBackgroundImage(#imageLiteral(resourceName: "playlist_rewind"), for: .normal)
-        $0.setTitleColor(.white, for: .normal)
-        $0.setTitle("15", for: .normal)
         $0.titleLabel?.font = .systemFont(ofSize: 10.0)
     }
     
     let skipForwardButton = UIButton().then {
         $0.imageView?.contentMode = .scaleAspectFit
         $0.setBackgroundImage(#imageLiteral(resourceName: "playlist_forward"), for: .normal)
-        $0.setTitleColor(.white, for: .normal)
-        $0.setTitle("15", for: .normal)
         $0.titleLabel?.font = .systemFont(ofSize: 10.0)
     }
     
@@ -92,8 +90,9 @@ class VideoPlayerControlsView: UIView {
         }
         
         topControlsStackView.snp.makeConstraints {
-            $0.left.greaterThanOrEqualToSuperview().inset(30.0)
-            $0.right.lessThanOrEqualToSuperview().inset(30.0)
+            $0.left.equalToSuperview().priority(.high)
+            $0.right.equalToSuperview().priority(.high)
+            $0.width.equalTo(350.0).priority(.required)
             $0.top.equalToSuperview().inset(20.0)
             $0.centerX.equalToSuperview()
         }
