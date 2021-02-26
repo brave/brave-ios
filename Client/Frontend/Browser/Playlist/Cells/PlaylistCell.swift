@@ -78,7 +78,8 @@ class PlaylistCell: UITableViewCell {
         contentView.addSubview(separator)
         
         thumbnailView.snp.makeConstraints {
-            $0.width.equalTo(94.0)
+            // Keeps a 94.0px width on iPhone-X as per design
+            $0.width.equalTo(iconStackView.snp.height).multipliedBy(1.46875)
         }
         
         iconStackView.snp.makeConstraints {
@@ -90,7 +91,8 @@ class PlaylistCell: UITableViewCell {
             $0.left.equalTo(iconStackView.snp.right).offset(8.0)
             $0.right.equalToSuperview().offset(-15.0)
             $0.centerY.equalToSuperview()
-            $0.top.bottom.equalTo(iconStackView)
+            $0.top.greaterThanOrEqualTo(iconStackView.snp.top)
+            $0.bottom.lessThanOrEqualTo(iconStackView.snp.bottom)
         }
         
         separator.snp.makeConstraints {
