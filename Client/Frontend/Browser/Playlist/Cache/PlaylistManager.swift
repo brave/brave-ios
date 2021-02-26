@@ -58,6 +58,10 @@ class PlaylistManager: NSObject {
             objects.remove(at: sourceIndexPath.row)
             objects.insert(src, at: destinationIndexPath.row)
             
+            for (order, item) in objects.enumerated().reversed() {
+                item.order = Int32(order)
+            }
+            
             do {
                 try frc.managedObjectContext.save()
             } catch {

@@ -18,6 +18,11 @@ class Playlist {
         backgroundContext.performAndWait { [weak self] in
             guard let self = self else { return }
             let request: NSFetchRequest<PlaylistItem> = PlaylistItem.fetchRequest()
+            request.fetchBatchSize = 20
+            
+            let orderSort = NSSortDescriptor(key: "order", ascending: true)
+            request.sortDescriptors = [orderSort]
+            
             let items = (try? self.backgroundContext.fetch(request)) ?? []
             
             for (order, item) in items.enumerated() {
@@ -46,7 +51,6 @@ class Playlist {
                 })
                 
                 self.saveContext(self.backgroundContext)
-                self.reorderItems()
                 completion()
             }
         } else {
@@ -68,6 +72,7 @@ class Playlist {
                 playlistItem.duration = item.duration
                 playlistItem.mimeType = item.mimeType
                 playlistItem.mediaSrc = item.src
+                playlistItem.order = -9999
                 
                 self.saveContext(self.backgroundContext)
                 self.reorderItems()
@@ -121,6 +126,11 @@ class Playlist {
     
     func getItems() -> [PlaylistInfo] {
         let request: NSFetchRequest<PlaylistItem> = PlaylistItem.fetchRequest()
+        request.fetchBatchSize = 20
+        
+        let orderSort = NSSortDescriptor(key: "order", ascending: true)
+        request.sortDescriptors = [orderSort]
+        
         return (try? mainContext.fetch(request))?.map({
             return PlaylistInfo(item: $0)
         }) ?? []
@@ -134,10 +144,6 @@ class Playlist {
             return item
         }
         return nil
-    }
-    
-    func moveItem(from sourceOrder: Int, to destinationOrder: Int) {
-        
     }
     
     func getCache(pageSrc: String) -> Data? {
@@ -177,9 +183,8 @@ class Playlist {
         fetchRequest.entity = descriptor
         fetchRequest.fetchBatchSize = 20
         
-        let nameSort = NSSortDescriptor(key: "name", ascending: true)
-        let orderSort = NSSortDescriptor(key: "order", ascending: false)
-        fetchRequest.sortDescriptors = [nameSort, orderSort]
+        let orderSort = NSSortDescriptor(key: "order", ascending: true)
+        fetchRequest.sortDescriptors = [orderSort]
 
         return NSFetchedResultsController(fetchRequest: fetchRequest,
                                           managedObjectContext: mainContext,
