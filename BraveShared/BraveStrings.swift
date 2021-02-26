@@ -1125,19 +1125,19 @@ extension Strings {
         public static let dowloadingLabelTitle =
             NSLocalizedString("playList.dowloadingLabelTitle",
                               bundle: .braveShared,
-                              value: "Dowloading…",
+                              value: "Downloading…",
                               comment: "Text indicator on the table cell while downloading a video")
         
         public static let dowloadingPercentageLabelTitle =
             NSLocalizedString("playList.dowloadingLabelTitle",
                               bundle: .braveShared,
-                              value: "Dowloading:",
+                              value: "Downloading:",
                               comment: "Text indicator on the table cell while downloading a video")
         
         public static let dowloadedLabelTitle =
             NSLocalizedString("playList.dowloadedLabelTitle",
                               bundle: .braveShared,
-                              value: "Dowloaded",
+                              value: "Downloaded",
                               comment: "Text indicator on the table cell If a video is already downloaded")
         
         public static let noItemLabelTitle =
