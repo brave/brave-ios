@@ -7,6 +7,7 @@ import Foundation
 import UIKit
 import BraveShared
 import Shared
+import SnapKit
 
 enum PlaylistToastState {
     case itemAdded
@@ -180,5 +181,21 @@ class PlaylistToast: Toast {
 
     @objc override func handleTap(_ gestureRecognizer: UIGestureRecognizer) {
         dismiss(false)
+    }
+    
+    override func showToast(viewController: UIViewController? = nil, delay: DispatchTimeInterval, duration: DispatchTimeInterval?, makeConstraints: @escaping (SnapKit.ConstraintMaker) -> Swift.Void) {
+        
+        super.showToast(viewController: viewController, delay: delay, duration: duration) { make in
+            guard let viewController = viewController as? BrowserViewController else {
+                assertionFailure("Playlist Toast should only be presented on BrowserViewController")
+                return
+            }
+            
+            make.centerX.equalTo(viewController.view.snp.centerX)
+            make.left.equalTo(viewController.view.safeArea.left).priority(.high)
+            make.right.equalTo(viewController.view.safeArea.right).priority(.high)
+            make.bottom.equalTo(viewController.webViewContainer.safeArea.bottom)
+            make.width.equalTo(375.0).priority(.required)
+        }
     }
 }
