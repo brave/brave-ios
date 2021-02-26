@@ -26,7 +26,6 @@ class PlaylistMediaInfo: NSObject {
         self.playerView = playerView
         super.init()
         
-        //playerView.delegate = self
         MPRemoteCommandCenter.shared().pauseCommand.addTarget { [weak self] _ in
             self?.playerView?.pause()
             return .success
@@ -94,20 +93,13 @@ class PlaylistMediaInfo: NSObject {
         }
         
         UIApplication.shared.beginReceivingRemoteControlEvents()
-        
-        self.updateItems()
         self.updateNowPlayingMediaInfo()
-        
         self.playerView?.player.addObserver(self, forKeyPath: "rate", options: .new, context: nil)
     }
     
     deinit {
         self.playerView?.player.removeObserver(self, forKeyPath: "rate", context: nil)
-    }
-    
-    public func updateItems() {
-        //playlistItems = Playlist.shared.getItems()
-        //contentManager.reloadData()
+        UIApplication.shared.endReceivingRemoteControlEvents()
     }
     
     public func updateNowPlayingMediaInfo() {
@@ -123,6 +115,16 @@ class PlaylistMediaInfo: NSObject {
             ]
         } else {
             MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
+        }
+    }
+    
+    public func updateNowPlayingMediaArtwork(image: UIImage?) {
+        if let image = image {
+            MPNowPlayingInfoCenter.default().nowPlayingInfo?[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: image.size, requestHandler: { _ -> UIImage in
+                // Do not resize image here.
+                // According to Apple it isn't necessary to use expensive resize operations
+                return image
+            })
         }
     }
     
@@ -148,6 +150,40 @@ extension PlaylistMediaInfo: MPPlayableContentDelegate {
         let cacheState = PlaylistManager.shared.state(for: item.pageSrc)
 
         if cacheState == .invalid {
+            // Fallback to web stream
+            let streamingFallback = { [weak self] in
+                guard let self = self else {
+                    completion(.expired)
+                    return
+                }
+                
+                self.webLoader = PlaylistWebLoader(handler: { [weak self] newItem in
+                    guard let self = self else { return }
+                    if let newItem = newItem, let url = URL(string: newItem.src), item.duration == newItem.duration {
+                        self.playerView?.load(url: url, resourceDelegate: nil)
+
+                        Playlist.shared.updateItem(mediaSrc: item.src, item: newItem) {
+                            DispatchQueue.main.async {
+                                completion(.none)
+                            }
+                        }
+                    } else {
+                        self.nowPlayingInfo = nil
+                        self.updateNowPlayingMediaArtwork(image: nil)
+                        completion(.expired)
+                    }
+                })
+                
+                if let url = URL(string: item.pageSrc) {
+                    self.webLoader.load(url: url)
+                } else {
+                    self.nowPlayingInfo = nil
+                    self.updateNowPlayingMediaArtwork(image: nil)
+                    completion(.error("Cannot Load Media"))
+                }
+            }
+
+            // Determine if an item can be streamed and stream it directly
             if !item.src.isEmpty, let url = URL(string: item.src) {
                 // Try to stream the asset from its url..
                 MediaResourceManager.canStreamURL(url) { [weak self] canStream in
@@ -163,6 +199,8 @@ extension PlaylistMediaInfo: MPPlayableContentDelegate {
 
                                 DispatchQueue.main.async {
                                     if status == .failed {
+                                        self.nowPlayingInfo = nil
+                                        self.updateNowPlayingMediaArtwork(image: nil)
                                         completion(.expired)
                                     } else {
                                         completion(.none)
@@ -170,52 +208,19 @@ extension PlaylistMediaInfo: MPPlayableContentDelegate {
                                 }
                             })
                         } else {
+                            self.nowPlayingInfo = nil
+                            self.updateNowPlayingMediaArtwork(image: nil)
                             completion(.expired)
                         }
                     } else {
                         // Stream failed so fallback to the webview
                         // It's possible the URL expired..
-                        self.webLoader = PlaylistWebLoader(handler: { [weak self] newItem in
-                            guard let self = self else { return }
-                            if let newItem = newItem, let url = URL(string: newItem.src) {
-                                self.playerView?.load(url: url, resourceDelegate: nil)
-
-                                Playlist.shared.updateItem(mediaSrc: item.src, item: newItem) {
-                                    DispatchQueue.main.async {
-                                        completion(.none)
-                                    }
-                                }
-                            } else {
-                                completion(.expired)
-                            }
-                        })
-                        
-                        if let url = URL(string: item.pageSrc) {
-                            self.webLoader.load(url: url)
-                        } else {
-                            completion(.error("Cannot Load Media"))
-                        }
+                        streamingFallback()
                     }
                 }
             } else {
                 // Fallback to the webview because there was no stream URL somehow..
-                webLoader.removeFromSuperview()
-                webLoader = PlaylistWebLoader(handler: { [weak self] item in
-                    guard let self = self else { return }
-                    if let item = item, let url = URL(string: item.src) {
-                        self.playerView?.load(url: url, resourceDelegate: nil)
-                        completion(.none)
-                    } else {
-                        completion(.error("Cannot Load Media"))
-                    }
-                })
-                self.playerView?.addSubview(webLoader)
-                
-                if let url = URL(string: item.pageSrc) {
-                    webLoader.load(url: url)
-                } else {
-                    completion(.error("Cannot Load Media"))
-                }
+                streamingFallback()
             }
         } else {
             // Load from the cache since this item was downloaded before..

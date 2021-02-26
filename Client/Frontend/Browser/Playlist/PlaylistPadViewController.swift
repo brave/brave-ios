@@ -17,7 +17,8 @@ private let log = Logger.browserLogger
 private protocol PlaylistPadControllerDetailDelegate: class {
     func setCurrentItemIndex(_ index: Int)
     func getCurrentItemIndex() -> Int
-    func updateNowPlayingMediaInfo()
+    func updateNowPlayingMediaInfo(_ info: PlaylistInfo?)
+    func updateNowPlayingMediaArtwork(image: UIImage?)
     func setControlsEnabled(_ enabled: Bool)
     func updatePlayerControlsState()
     func loadMediaItem(_ item: PlaylistInfo, index: Int, completion: @escaping (PlaylistMediaInfo.MediaPlaybackError) -> Void)
@@ -359,7 +360,8 @@ extension PlaylistPadListController: UITableViewDelegate {
 
                 if self.detailControllerDelegate?.getCurrentItemIndex() == indexPath.row {
                     self.detailControllerDelegate?.setCurrentItemIndex(-1)
-                    self.detailControllerDelegate?.updateNowPlayingMediaInfo()
+                    self.detailControllerDelegate?.updateNowPlayingMediaInfo(nil)
+                    self.detailControllerDelegate?.updateNowPlayingMediaArtwork(image: nil)
                     
                     self.activityIndicator.stopAnimating()
                     self.detailControllerDelegate?.stop()
@@ -391,10 +393,13 @@ extension PlaylistPadListController: UITableViewDelegate {
             activityIndicator.startAnimating()
             activityIndicator.isHidden = false
             detailControllerDelegate?.setCurrentItemIndex(indexPath.row)
+            
+            let selectedCell = tableView.cellForRow(at: indexPath) as? PlaylistCell
 
             let item = PlaylistManager.shared.itemAtIndex(indexPath.row)
             infoLabel.text = item.name
             
+            detailControllerDelegate?.updateNowPlayingMediaArtwork(image: selectedCell?.thumbnailImage)
             detailControllerDelegate?.changeNavigationTitle(item.name)
             
             detailControllerDelegate?.loadMediaItem(item, index: indexPath.row) { [weak self] error in
@@ -407,7 +412,7 @@ extension PlaylistPadListController: UITableViewDelegate {
                     self.detailControllerDelegate?.displayLoadingResourceError()
                     
                 case .expired:
-                    (tableView.cellForRow(at: indexPath) as? PlaylistCell)?.detailLabel.text = Strings.PlayList.expiredLabelTitle
+                    selectedCell?.detailLabel.text = Strings.PlayList.expiredLabelTitle
                     
                     let alert = UIAlertController(title: Strings.PlayList.expiredAlertTitle, message: Strings.PlayList.expiredAlertDescription, preferredStyle: .alert)
                     alert.addAction(UIAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: { _ in
@@ -421,7 +426,7 @@ extension PlaylistPadListController: UITableViewDelegate {
                     self.present(alert, animated: true, completion: nil)
                     
                 case .none:
-                    (tableView.cellForRow(at: indexPath) as? PlaylistCell)?.loadThumbnail(item: item)
+                    selectedCell?.loadThumbnail(item: item)
                 }
             }
         }
@@ -854,8 +859,12 @@ extension PlaylistPadDetailController: PlaylistPadControllerDetailDelegate {
         return currentlyPlayingItemIndex
     }
     
-    func updateNowPlayingMediaInfo() {
-        mediaInfo.updateNowPlayingMediaInfo()
+    func updateNowPlayingMediaInfo(_ info: PlaylistInfo?) {
+        mediaInfo.nowPlayingInfo = info
+    }
+    
+    func updateNowPlayingMediaArtwork(image: UIImage?) {
+        mediaInfo.updateNowPlayingMediaArtwork(image: image)
     }
     
     func setControlsEnabled(_ enabled: Bool) {

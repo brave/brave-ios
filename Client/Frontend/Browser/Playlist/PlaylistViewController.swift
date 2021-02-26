@@ -353,7 +353,8 @@ extension PlaylistViewController: UITableViewDelegate {
 
                 if self.currentlyPlayingItemIndex == indexPath.row {
                     self.currentlyPlayingItemIndex = -1
-                    self.mediaInfo.updateNowPlayingMediaInfo()
+                    self.mediaInfo.nowPlayingInfo = nil
+                    self.mediaInfo.updateNowPlayingMediaArtwork(image: nil)
                     
                     self.activityIndicator.stopAnimating()
                     self.playerView.stop()
@@ -385,10 +386,13 @@ extension PlaylistViewController: UITableViewDelegate {
             activityIndicator.startAnimating()
             activityIndicator.isHidden = false
             currentlyPlayingItemIndex = indexPath.row
+            
+            let selectedCell = tableView.cellForRow(at: indexPath) as? PlaylistCell
 
             let item = PlaylistManager.shared.itemAtIndex(indexPath.row)
             infoLabel.text = item.name
             playerView.setVideoInfo(videoDomain: item.pageSrc)
+            mediaInfo.updateNowPlayingMediaArtwork(image: selectedCell?.thumbnailImage)
             mediaInfo.loadMediaItem(item, index: indexPath.row) { [weak self] error in
                 guard let self = self else { return }
                 self.activityIndicator.stopAnimating()
@@ -399,7 +403,7 @@ extension PlaylistViewController: UITableViewDelegate {
                     self.displayLoadingResourceError()
                     
                 case .expired:
-                    (tableView.cellForRow(at: indexPath) as? PlaylistCell)?.detailLabel.text = Strings.PlayList.expiredLabelTitle
+                    selectedCell?.detailLabel.text = Strings.PlayList.expiredLabelTitle
                     
                     let alert = UIAlertController(title: Strings.PlayList.expiredAlertTitle, message: Strings.PlayList.expiredAlertDescription, preferredStyle: .alert)
                     alert.addAction(UIAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: { _ in
@@ -413,7 +417,7 @@ extension PlaylistViewController: UITableViewDelegate {
                     self.present(alert, animated: true, completion: nil)
                     
                 case .none:
-                    (tableView.cellForRow(at: indexPath) as? PlaylistCell)?.loadThumbnail(item: item)
+                    selectedCell?.loadThumbnail(item: item)
                 }
             }
         }
