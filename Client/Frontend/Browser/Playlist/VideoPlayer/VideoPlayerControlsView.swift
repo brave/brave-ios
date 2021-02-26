@@ -21,18 +21,18 @@ class VideoPlayerControlsView: UIView {
     
     let repeatButton = UIButton().then {
         $0.imageView?.contentMode = .scaleAspectFit
-        $0.setBackgroundImage(#imageLiteral(resourceName: "playlist_repeat"), for: .normal)
+        $0.setImage(#imageLiteral(resourceName: "playlist_repeat"), for: .normal)
     }
     
     let skipBackButton = UIButton().then {
         $0.imageView?.contentMode = .scaleAspectFit
-        $0.setBackgroundImage(#imageLiteral(resourceName: "playlist_rewind"), for: .normal)
+        $0.setImage(#imageLiteral(resourceName: "playlist_rewind"), for: .normal)
         $0.titleLabel?.font = .systemFont(ofSize: 10.0)
     }
     
     let skipForwardButton = UIButton().then {
         $0.imageView?.contentMode = .scaleAspectFit
-        $0.setBackgroundImage(#imageLiteral(resourceName: "playlist_forward"), for: .normal)
+        $0.setImage(#imageLiteral(resourceName: "playlist_forward"), for: .normal)
         $0.titleLabel?.font = .systemFont(ofSize: 10.0)
     }
     
