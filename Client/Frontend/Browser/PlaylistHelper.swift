@@ -27,9 +27,21 @@ protocol PlaylistHelperDelegate: NSObject {
 class PlaylistHelper: TabContentScript {
     fileprivate weak var tab: Tab?
     public weak var delegate: PlaylistHelperDelegate?
+    private var url: URL?
+    private var playlistItems = Set<String>()
+    private var urlObserver: NSObjectProtocol?
     
     init(tab: Tab) {
         self.tab = tab
+        self.url = tab.url
+        
+        urlObserver = tab.webView?.observe(\.url, options: [.old, .new], changeHandler: { [weak self] _, change in
+            guard let self = self, let url = change.newValue else { return }
+            if self.url != url {
+                self.url = url
+                self.playlistItems = Set<String>()
+            }
+        })
     }
     
     static func name() -> String {
@@ -70,8 +82,12 @@ class PlaylistHelper: TabContentScript {
             Playlist.shared.updateItem(mediaSrc: item.src, item: item) {
                 log.debug("Playlist Item Updated")
                 
-                DispatchQueue.main.async {
-                    self.delegate?.showPlaylistToast(info: item, itemState: .existing)
+                if !self.playlistItems.contains(item.src) {
+                    self.playlistItems.insert(item.src)
+                    
+                    DispatchQueue.main.async {
+                        self.delegate?.showPlaylistToast(info: item, itemState: .existing)
+                    }
                 }
             }
         } else {
