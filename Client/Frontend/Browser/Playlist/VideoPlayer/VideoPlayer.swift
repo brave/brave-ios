@@ -130,16 +130,16 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         }
         
         infoView.snp.makeConstraints {
-            $0.leading.equalTo(self.safeArea.leading).inset(20.0)
-            $0.trailing.equalTo(self.safeArea.trailing).inset(20.0)
-            $0.top.equalTo(self.safeArea.top).inset(25.0)
+            $0.leading.equalTo(self.safeArea.leading).inset(8.0)
+            $0.trailing.equalTo(self.safeArea.trailing).inset(8.0)
+            $0.top.equalTo(self.safeArea.top).inset(8.0)
             $0.height.equalTo(70.0)
         }
         
         controlsView.snp.makeConstraints {
-            $0.leading.equalTo(self.safeArea.leading).inset(20.0)
-            $0.trailing.equalTo(self.safeArea.trailing).inset(20.0)
-            $0.bottom.equalTo(self.safeArea.bottom).inset(25.0)
+            $0.leading.equalTo(self.safeArea.leading).inset(8.0)
+            $0.trailing.equalTo(self.safeArea.trailing).inset(8.0)
+            $0.bottom.equalTo(self.safeArea.bottom).inset(8.0)
         }
 
         registerNotifications()

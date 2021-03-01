@@ -372,8 +372,9 @@ class MenuViewController: UITableViewController {
         } else {
             let playListController = ((UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController as? UINavigationController)?.viewControllers.first ?? PlaylistViewController()
             
-            let navigationController = UINavigationController(rootViewController: playListController)
-            navigationController.modalPresentationStyle = .pageSheet
+            let navigationController = ColorAwareNavigationController(rootViewController: playListController)
+            navigationController.statusBarStyle = .lightContent
+            navigationController.modalPresentationStyle = .fullScreen
             
             dismissView()
             bvc.present(navigationController, animated: true)
@@ -428,4 +429,15 @@ class MenuViewController: UITableViewController {
 
 extension MenuViewController: PopoverContentComponent {
     var extendEdgeIntoArrow: Bool { return false }
+}
+
+class ColorAwareNavigationController: UINavigationController {
+    var statusBarStyle: UIStatusBarStyle = .default {
+        didSet {
+            setNeedsStatusBarAppearanceUpdate()
+        }
+    }
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return statusBarStyle
+    }
 }

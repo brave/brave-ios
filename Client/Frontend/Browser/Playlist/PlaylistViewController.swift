@@ -200,7 +200,7 @@ class PlaylistViewController: UIViewController {
                 
                 tableView.isHidden = true
                 playerView.snp.remakeConstraints {
-                    $0.edges.equalTo(view.safeArea.edges)
+                    $0.edges.equalTo(0)
                 }
             } else {
                 navigationController?.setNavigationBarHidden(false, animated: true)
