@@ -99,7 +99,7 @@ class MenuViewController: UITableViewController {
     }
     
     private enum MenuButtons: Int, CaseIterable {
-        case vpn, settings, history, bookmarks, downloads, add, share, playlist
+        case vpn, settings, history, bookmarks, downloads, playlist, add, share
         
         var title: String {
             switch self {
