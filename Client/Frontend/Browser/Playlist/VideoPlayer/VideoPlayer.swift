@@ -304,6 +304,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         isFullscreen = true
         infoView.fullscreenButton.isHidden = true
         infoView.exitButton.isHidden = false
+        infoView.layoutIfNeeded()
         self.delegate?.onFullScreen()
     }
     
@@ -312,6 +313,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         isFullscreen = false
         infoView.fullscreenButton.isHidden = false
         infoView.exitButton.isHidden = true
+        infoView.layoutIfNeeded()
         self.delegate?.onExitFullScreen()
     }
     
@@ -472,25 +474,31 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         })
     }
     
-    public func setVideoInfo(videoDomain: String) {
-        var hostDomain = ""
+    public func setVideoInfo(videoDomain: String, videoTitle: String?) {
+        var displayTitle = videoTitle ?? ""
         
-        if let host = URL(string: videoDomain)?.host {
-            hostDomain = host
-            if host.hasPrefix("www.") {
-                hostDomain = String(host.dropFirst(4))
+        if displayTitle.isEmpty {
+            var hostDomain = ""
+            
+            if let host = URL(string: videoDomain)?.host {
+                hostDomain = host
+                if host.hasPrefix("www.") {
+                    hostDomain = String(host.dropFirst(4))
+                }
             }
+            
+            if hostDomain.hasSuffix("/") {
+                hostDomain = String(hostDomain.dropLast())
+            }
+            
+            if hostDomain.isEmpty {
+                hostDomain = videoDomain
+            }
+            
+            displayTitle = hostDomain
         }
         
-        if hostDomain.hasSuffix("/") {
-            hostDomain = String(hostDomain.dropLast())
-        }
-        
-        if hostDomain.isEmpty {
-            hostDomain = videoDomain
-        }
-        
-        infoView.titleLabel.text = hostDomain
+        infoView.titleLabel.text = displayTitle
         infoView.updateFavIcon(domain: videoDomain)
     }
     
