@@ -14,9 +14,7 @@ class VideoPlayerControlsView: UIView {
     
     private let topControlsStackView = UIStackView().then {
         $0.axis = .horizontal
-        $0.distribution = .equalSpacing
-        $0.isLayoutMarginsRelativeArrangement = true
-        $0.layoutMargins = UIEdgeInsets(top: 0.0, left: 30.0, bottom: 0.0, right: 30.0)
+        $0.distribution = .fillEqually
     }
     
     let repeatButton = UIButton().then {
@@ -94,6 +92,7 @@ class VideoPlayerControlsView: UIView {
             $0.right.equalToSuperview().priority(.high)
             $0.width.equalTo(350.0).priority(.required)
             $0.top.equalToSuperview().inset(20.0)
+            $0.bottom.equalTo(self.snp.centerY).offset(-4.0)
             $0.centerX.equalToSuperview()
         }
         
@@ -110,7 +109,7 @@ class VideoPlayerControlsView: UIView {
         trackBar.snp.makeConstraints {
             $0.left.equalTo(playbackRateButton.snp.right).offset(15.0)
             $0.right.equalTo(castButton.snp.left).offset(-15.0)
-            $0.top.equalTo(topControlsStackView.snp.bottom).offset(8.0)
+            $0.top.equalTo(self.snp.centerY).offset(4.0)
             $0.bottom.equalToSuperview().offset(-12.0)
         }
     }

@@ -133,13 +133,13 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
             $0.leading.equalTo(self.safeArea.leading).inset(8.0)
             $0.trailing.equalTo(self.safeArea.trailing).inset(8.0)
             $0.top.equalTo(self.safeArea.top).inset(8.0)
-            $0.height.equalTo(70.0)
         }
         
         controlsView.snp.makeConstraints {
             $0.leading.equalTo(self.safeArea.leading).inset(8.0)
             $0.trailing.equalTo(self.safeArea.trailing).inset(8.0)
             $0.bottom.equalTo(self.safeArea.bottom).inset(8.0)
+            $0.height.equalTo(100.0)
         }
 
         registerNotifications()
@@ -304,7 +304,6 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         isFullscreen = true
         infoView.fullscreenButton.isHidden = true
         infoView.exitButton.isHidden = false
-        infoView.layoutIfNeeded()
         self.delegate?.onFullScreen()
     }
     
@@ -313,7 +312,6 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         isFullscreen = false
         infoView.fullscreenButton.isHidden = false
         infoView.exitButton.isHidden = true
-        infoView.layoutIfNeeded()
         self.delegate?.onExitFullScreen()
     }
     
@@ -409,10 +407,6 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
             self.showOverlays(true)
             
             self.next()
-        })
-        
-        notificationObservers.append(NotificationCenter.default.addObserver(forName: UIDevice.orientationDidChangeNotification, object: UIDevice.current, queue: .main) { _ in
-            
         })
         
         let interval = CMTimeMake(value: 25, timescale: 1000)
