@@ -68,10 +68,10 @@ class VideoPlayerInfoBar: UIView {
         titleLabel.snp.makeConstraints {
             $0.left.equalTo(favIconImageView.snp.right).offset(13.0)
             $0.centerY.equalToSuperview()
+            $0.right.lessThanOrEqualTo(controlStackView.snp.left).offset(-20.0)
         }
         
         controlStackView.snp.makeConstraints {
-            $0.left.greaterThanOrEqualTo(titleLabel.snp.right).offset(20.0)
             $0.right.equalToSuperview().offset(-20.0)
             $0.centerY.equalToSuperview()
         }

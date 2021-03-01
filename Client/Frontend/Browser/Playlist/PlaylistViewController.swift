@@ -391,7 +391,7 @@ extension PlaylistViewController: UITableViewDelegate {
 
             let item = PlaylistManager.shared.itemAtIndex(indexPath.row)
             infoLabel.text = item.name
-            playerView.setVideoInfo(videoDomain: item.pageSrc)
+            playerView.setVideoInfo(videoDomain: item.pageSrc, videoTitle: item.pageTitle)
             mediaInfo.updateNowPlayingMediaArtwork(image: selectedCell?.thumbnailImage)
             mediaInfo.loadMediaItem(item, index: indexPath.row) { [weak self] error in
                 guard let self = self else { return }
@@ -541,7 +541,7 @@ extension PlaylistViewController: VideoViewDelegate {
         let index = currentlyPlayingItemIndex - 1
         if index < PlaylistManager.shared.numberOfAssets() {
             let item = PlaylistManager.shared.itemAtIndex(index)
-            playerView.setVideoInfo(videoDomain: item.pageSrc)
+            playerView.setVideoInfo(videoDomain: item.pageSrc, videoTitle: item.pageTitle)
             mediaInfo.loadMediaItem(item, index: index) { [weak self] error in
                 if case .none = error {
                     self?.currentlyPlayingItemIndex = index
@@ -572,7 +572,7 @@ extension PlaylistViewController: VideoViewDelegate {
         
         if index >= 0 {
             let item = PlaylistManager.shared.itemAtIndex(index)
-            playerView.setVideoInfo(videoDomain: item.pageSrc)
+            playerView.setVideoInfo(videoDomain: item.pageSrc, videoTitle: item.pageTitle)
             mediaInfo.loadMediaItem(item, index: index) { [weak self] error in
                 if case .none = error {
                     self?.currentlyPlayingItemIndex = index
@@ -591,7 +591,7 @@ extension PlaylistViewController: VideoViewDelegate {
         navigationController?.setNavigationBarHidden(true, animated: true)
         tableView.isHidden = true
         playerView.snp.remakeConstraints {
-            $0.edges.equalTo(view.safeArea.edges)
+            $0.edges.equalTo(0)
         }
     }
     
