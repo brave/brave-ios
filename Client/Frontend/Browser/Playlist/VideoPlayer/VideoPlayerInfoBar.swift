@@ -26,6 +26,8 @@ class VideoPlayerInfoBar: UIView {
     let titleLabel = UILabel().then {
         $0.textColor = .white
         $0.font = .systemFont(ofSize: 15.0, weight: .medium)
+        $0.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        $0.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
     }
     
     let pictureInPictureButton = UIButton().then {
@@ -67,13 +69,13 @@ class VideoPlayerInfoBar: UIView {
         
         titleLabel.snp.makeConstraints {
             $0.left.equalTo(favIconImageView.snp.right).offset(13.0)
-            $0.centerY.equalToSuperview()
-            $0.right.lessThanOrEqualTo(controlStackView.snp.left).offset(-20.0)
+            $0.top.bottom.equalToSuperview().inset(20.0)
         }
         
         controlStackView.snp.makeConstraints {
+            $0.left.greaterThanOrEqualTo(titleLabel.snp.right).offset(20.0)
             $0.right.equalToSuperview().offset(-20.0)
-            $0.centerY.equalToSuperview()
+            $0.top.bottom.equalToSuperview().inset(8.0)
         }
     }
     

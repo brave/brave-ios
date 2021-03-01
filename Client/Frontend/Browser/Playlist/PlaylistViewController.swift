@@ -200,7 +200,7 @@ class PlaylistViewController: UIViewController {
                 
                 tableView.isHidden = true
                 playerView.snp.remakeConstraints {
-                    $0.edges.equalTo(0)
+                    $0.edges.equalToSuperview()
                 }
             } else {
                 navigationController?.setNavigationBarHidden(false, animated: true)
@@ -216,6 +216,10 @@ class PlaylistViewController: UIViewController {
                 }
             }
         }
+    }
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
     }
 }
 
@@ -591,7 +595,7 @@ extension PlaylistViewController: VideoViewDelegate {
         navigationController?.setNavigationBarHidden(true, animated: true)
         tableView.isHidden = true
         playerView.snp.remakeConstraints {
-            $0.edges.equalTo(0)
+            $0.edges.equalToSuperview()
         }
     }
     
