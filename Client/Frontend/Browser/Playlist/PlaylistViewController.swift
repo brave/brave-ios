@@ -176,7 +176,6 @@ class PlaylistViewController: UIViewController {
             if PlaylistManager.shared.numberOfAssets() > 0 {
                 self.playerView.setControlsEnabled(true)
                 
-                
                 if let lastPlayedItemUrl = Preferences.Playlist.lastPlayedItemUrl.value, let index = PlaylistManager.shared.index(of: lastPlayedItemUrl) {
                     self.tableView.delegate?.tableView?(self.tableView, didSelectRowAt: IndexPath(row: index, section: 0))
                 } else {

@@ -652,7 +652,7 @@ private class PlaylistPadDetailController: UIViewController, UIGestureRecognizer
     }
     
     private func layoutBarButtons() {
-        let exitBarButton =  UIBarButtonItem(image: #imageLiteral(resourceName: "playlist_exit"), style: .done, target: self, action: #selector(onExit(_:)))
+        let exitBarButton =  UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(onExit(_:)))
         let sideListBarButton = UIBarButtonItem(image: #imageLiteral(resourceName: "playlist_split_navigation"), style: .done, target: self, action: #selector(onDisplayModeChange))
         
         navigationItem.rightBarButtonItem =
