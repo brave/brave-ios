@@ -22,7 +22,6 @@ private protocol PlaylistPadControllerDetailDelegate: class {
     func setControlsEnabled(_ enabled: Bool)
     func updatePlayerControlsState()
     func loadMediaItem(_ item: PlaylistInfo, index: Int, completion: @escaping (PlaylistMediaInfo.MediaPlaybackError) -> Void)
-    func changeNavigationTitle(_ navigationTitle: String)
     func displayLoadingResourceError()
     func play()
     func stop()
@@ -405,7 +404,6 @@ extension PlaylistPadListController: UITableViewDelegate {
             infoLabel.text = item.name
             
             detailControllerDelegate?.updateNowPlayingMediaArtwork(image: selectedCell?.thumbnailImage)
-            detailControllerDelegate?.changeNavigationTitle(item.name)
             
             detailControllerDelegate?.loadMediaItem(item, index: indexPath.row) { [weak self] error in
                 guard let self = self else { return }
@@ -624,6 +622,8 @@ private class PlaylistPadDetailController: UIViewController, UIGestureRecognizer
     private func setup() {
         view.backgroundColor = .black
         
+        title = Strings.PlayList.playListMediaPlayerTitle
+        
         navigationController?.do {
             if #available(iOS 13.0, *) {
                 let appearance = UINavigationBarAppearance()
@@ -709,7 +709,6 @@ extension PlaylistPadDetailController: VideoViewDelegate {
         let index = currentlyPlayingItemIndex - 1
         if index < PlaylistManager.shared.numberOfAssets() {
             let item = PlaylistManager.shared.itemAtIndex(index)
-            title = item.name
             
             playerView.setVideoInfo(videoDomain: item.pageSrc, videoTitle: item.pageTitle)
             mediaInfo.loadMediaItem(item, index: index) { [weak self] error in
@@ -742,7 +741,6 @@ extension PlaylistPadDetailController: VideoViewDelegate {
         
         if index >= 0 {
             let item = PlaylistManager.shared.itemAtIndex(index)
-            title = item.name
             
             playerView.setVideoInfo(videoDomain: item.pageSrc, videoTitle: item.pageTitle)
             mediaInfo.loadMediaItem(item, index: index) { [weak self] error in
@@ -896,10 +894,6 @@ extension PlaylistPadDetailController: PlaylistPadControllerDetailDelegate {
     func loadMediaItem(_ item: PlaylistInfo, index: Int, completion: @escaping (PlaylistMediaInfo.MediaPlaybackError) -> Void) {
         playerView.setVideoInfo(videoDomain: item.pageSrc, videoTitle: item.pageTitle)
         mediaInfo.loadMediaItem(item, index: index, completion: completion)
-    }
-    
-    func changeNavigationTitle(_ navigationTitle: String) {
-        title = navigationTitle
     }
     
     func displayLoadingResourceError() {
