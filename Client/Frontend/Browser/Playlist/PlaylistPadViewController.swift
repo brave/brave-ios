@@ -54,6 +54,8 @@ class PlaylistPadViewController: UIViewController {
             }
             $0.primaryEdge = PlayListSide(rawValue: Preferences.Playlist.listViewSide.value) == .left ? .leading : .trailing
             $0.presentsWithGesture = false
+            $0.maximumPrimaryColumnWidth = 400
+            $0.minimumPrimaryColumnWidth = 400
         }
         
         updateLayoutForOrientationChange()
