@@ -313,17 +313,17 @@ class ShieldsViewController: UIViewController, PopoverContentComponent, Themeabl
     }
     
     @objc private func tappedShareShieldsButton() {
-        var shareImage = #imageLiteral(resourceName: "settings-shields")
         let shareText = Strings.SocialSharing.shareDescriptionTitle
                         
         let statsView = BraveShieldStatsView(frame: CGRect(width: view.frame.height, height: 110))
         statsView.applyTheme(Theme.of(tab))
+        statsView.backgroundColor = .black
         
-        if let statScreenshot = statsView.screenshot() {
-            shareImage = statScreenshot
-        }
-        
-        let activityViewController = UIActivityViewController(activityItems: [ImageActivityItemSource(image: shareImage), OptionalTextActivityItemSource(text: shareText)], applicationActivities: nil)
+        let shareImage = statsView.snapshot
+
+        let activityViewController = UIActivityViewController(activityItems: [ImageActivityItemSource(image: shareImage),
+                                                                              OptionalTextActivityItemSource(text: shareText)],
+                                                              applicationActivities: nil)
         
         activityViewController.popoverPresentationController?.sourceView = view
         activityViewController.excludedActivityTypes = [.openInIBooks, .saveToCameraRoll, .assignToContact]
@@ -407,4 +407,15 @@ class ImageActivityItemSource: NSObject, UIActivityItemSource {
         metadata.title = Strings.SocialSharing.shareDescriptionTitle
         return metadata
     }
+}
+
+
+extension UIView {
+
+    var snapshot: UIImage {
+        return UIGraphicsImageRenderer(size: bounds.size).image { _ in
+            drawHierarchy(in: bounds, afterScreenUpdates: true)
+        }
+    }
+
 }
