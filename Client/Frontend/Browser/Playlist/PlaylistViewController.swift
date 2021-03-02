@@ -175,7 +175,13 @@ class PlaylistViewController: UIViewController {
             
             if PlaylistManager.shared.numberOfAssets() > 0 {
                 self.playerView.setControlsEnabled(true)
-                self.tableView.delegate?.tableView?(self.tableView, didSelectRowAt: IndexPath(row: 0, section: 0))
+                
+                
+                if let lastPlayedItemUrl = Preferences.Playlist.lastPlayedItemUrl.value, let index = PlaylistManager.shared.index(of: lastPlayedItemUrl) {
+                    self.tableView.delegate?.tableView?(self.tableView, didSelectRowAt: IndexPath(row: index, section: 0))
+                } else {
+                    self.tableView.delegate?.tableView?(self.tableView, didSelectRowAt: IndexPath(row: 0, section: 0))
+                }
             }
             
             self.updateTableBackgroundView()
@@ -422,6 +428,7 @@ extension PlaylistViewController: UITableViewDelegate {
                     
                 case .none:
                     selectedCell?.loadThumbnail(item: item)
+                    Preferences.Playlist.lastPlayedItemUrl.value = item.pageSrc
                 }
             }
         }
