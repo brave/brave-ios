@@ -316,7 +316,10 @@ class ShieldsViewController: UIViewController, PopoverContentComponent, Themeabl
         var shareImage = #imageLiteral(resourceName: "settings-shields")
         let shareText = Strings.SocialSharing.shareDescriptionTitle
                         
-        if let statScreenshot = BraveShieldStatsView(frame: CGRect(width: view.frame.height, height: 110)).screenshot() {
+        let statsView = BraveShieldStatsView(frame: CGRect(width: view.frame.height, height: 110))
+        statsView.applyTheme(Theme.of(tab))
+        
+        if let statScreenshot = statsView.screenshot() {
             shareImage = statScreenshot
         }
         
