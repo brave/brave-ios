@@ -113,7 +113,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         controlsView.skipForwardButton.addTarget(self, action: #selector(onSeekForwards(_:)), for: .touchUpInside)
         controlsView.skipBackButton.addTarget(self, action: #selector(onSeekPrevious(_:event:)), for: .touchDownRepeat)
         controlsView.skipForwardButton.addTarget(self, action: #selector(onSeekNext(_:event:)), for: .touchDownRepeat)
-        controlsView.nextButton.addTarget(self, action: #selector(next()), for: .touchUpInside)
+        controlsView.nextButton.addTarget(self, action: #selector(onNextTrack(_:)), for: .touchUpInside)
         
         // Layout
         layer.addSublayer(playerLayer)
@@ -342,6 +342,11 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         if let tapCount = event.allTouches?.first?.tapCount, tapCount >= 2 {
             self.delegate?.onNextTrack()
         }
+    }
+    
+    @objc
+    private func onNextTrack(_ button: UIButton) {
+        self.delegate?.onNextTrack()
     }
     
     func onValueChanged(_ trackBar: VideoTrackerBar, value: CGFloat) {
