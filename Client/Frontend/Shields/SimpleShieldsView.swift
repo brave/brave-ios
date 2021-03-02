@@ -75,8 +75,6 @@ class SimpleShieldsView: UIView, Themeable {
                     string: Strings.Shields.blockedCountLabel,
                     attributes: [.font: UIFont.systemFont(ofSize: 13.0)]
                 )
-//                let attachment = ViewTextAttachment(view: self.infoButton)
-//                string.append(NSAttributedString(attachment: attachment))
                 return string
             }()
             $0.backgroundColor = .clear
@@ -84,7 +82,7 @@ class SimpleShieldsView: UIView, Themeable {
             $0.isAccessibilityElement = false
         }
         
-        let infoButton = Button().then { //#imageLiteral(resourceName: "shields-help")
+        let infoButton = Button().then {
             $0.setImage(#imageLiteral(resourceName: "shields-help").template, for: .normal)
             $0.hitTestSlop = UX.hitBoxEdgeInsets
             $0.imageEdgeInsets = .zero

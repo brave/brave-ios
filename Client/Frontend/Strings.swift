@@ -189,6 +189,17 @@ extension Strings {
     }
 }
 
+// Social Sharing
+extension Strings {
+    public struct SocialSharing {
+        public static let shareDescriptionTitle = NSLocalizedString(
+            "socialSharing.shareDescriptionTitle",
+            bundle: Bundle.shared,
+            value: "Everyday I save data by browsing the web with Brave.",
+            comment: "Text used shile sharing Brave Shield values")
+    }
+}
+
 // Tabs Delete All Undo Toast
 extension Strings {
     public static let tabsDeleteAllUndoTitle = NSLocalizedString("TabsDeleteAllUndoTitle", bundle: Bundle.shared, value: "%d tab(s) closed", comment: "The label indicating that all the tabs were closed")

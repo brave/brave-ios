@@ -8,6 +8,7 @@ import Shared
 import BraveShared
 import Data
 import BraveUI
+import LinkPresentation
 
 /// Displays shield settings and shield stats for a given URL
 class ShieldsViewController: UIViewController, PopoverContentComponent, Themeable {
@@ -248,8 +249,10 @@ class ShieldsViewController: UIViewController, PopoverContentComponent, Themeabl
         shieldsView.advancedShieldView.globalControlsButton.addTarget(self, action: #selector(tappedGlobalShieldsButton), for: .touchUpInside)
         
         shieldsView.advancedControlsBar.addTarget(self, action: #selector(tappedAdvancedControlsBar), for: .touchUpInside)
-        shieldsView.simpleShieldView.blockCountView.infoButton.addTarget(self, action: #selector(tappedAboutShieldsButton), for: .touchUpInside)
         
+        shieldsView.simpleShieldView.blockCountView.infoButton.addTarget(self, action: #selector(tappedAboutShieldsButton), for: .touchUpInside)
+        shieldsView.simpleShieldView.blockCountView.shareButton.addTarget(self, action: #selector(tappedShareShieldsButton), for: .touchUpInside)
+
         shieldsView.simpleShieldView.reportSiteButton.addTarget(self, action: #selector(tappedReportSiteButton), for: .touchUpInside)
         shieldsView.reportBrokenSiteView.cancelButton.addTarget(self, action: #selector(tappedCancelReportingButton), for: .touchUpInside)
         shieldsView.reportBrokenSiteView.submitButton.addTarget(self, action: #selector(tappedSubmitReportingButton), for: .touchUpInside)
@@ -309,6 +312,22 @@ class ShieldsViewController: UIViewController, PopoverContentComponent, Themeabl
         navigationController?.pushViewController(aboutShields, animated: true)
     }
     
+    @objc private func tappedShareShieldsButton() {
+        var shareImage = #imageLiteral(resourceName: "settings-shields")
+        let shareText = Strings.SocialSharing.shareDescriptionTitle
+                        
+        if let statScreenshot = BraveShieldStatsView(frame: CGRect(width: view.frame.height, height: 110)).screenshot() {
+            shareImage = statScreenshot
+        }
+        
+        let activityViewController = UIActivityViewController(activityItems: [ImageActivityItemSource(image: shareImage), OptionalTextActivityItemSource(text: shareText)], applicationActivities: nil)
+        
+        activityViewController.popoverPresentationController?.sourceView = view
+        activityViewController.excludedActivityTypes = [.openInIBooks, .saveToCameraRoll, .assignToContact]
+
+        present(activityViewController, animated: true, completion: nil)
+     }
+    
     @objc private func tappedReportSiteButton() {
         updateContentView(to: shieldsView.reportBrokenSiteView, animated: true)
     }
@@ -335,5 +354,54 @@ class ShieldsViewController: UIViewController, PopoverContentComponent, Themeabl
     @available(*, unavailable)
     required init?(coder aDecoder: NSCoder) {
         fatalError()
+    }
+}
+
+class OptionalTextActivityItemSource: NSObject, UIActivityItemSource {
+    let text: String
+    
+    weak var viewController: UIViewController?
+    
+    init(text: String) {
+        self.text = text
+    }
+    
+    func activityViewControllerPlaceholderItem(_ activityViewController: UIActivityViewController) -> Any {
+        return text
+    }
+    
+    func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
+        if activityType?.rawValue == "net.whatsapp.WhatsApp.ShareExtension" ||
+            activityType?.rawValue == "com.tinyspeck.chatlyio.share" {
+            return nil
+        } else {
+            return text
+        }
+    }
+}
+
+class ImageActivityItemSource: NSObject, UIActivityItemSource {
+    let image: UIImage
+    
+    init(image: UIImage) {
+        self.image = image
+    }
+    
+    func activityViewControllerPlaceholderItem(_ activityViewController: UIActivityViewController) -> Any {
+        return image
+    }
+    
+    func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
+        return image
+    }
+    
+    @available(iOS 13.0, *)
+    func activityViewControllerLinkMetadata(_ activityViewController: UIActivityViewController) -> LPLinkMetadata? {
+        let imageProvider = NSItemProvider(object: image)
+        
+        let metadata = LPLinkMetadata()
+        metadata.imageProvider = imageProvider
+        metadata.title = Strings.SocialSharing.shareDescriptionTitle
+        return metadata
     }
 }
