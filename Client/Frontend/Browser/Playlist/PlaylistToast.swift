@@ -86,7 +86,7 @@ class PlaylistToast: Toast {
                 $0.numberOfLines = 0
                 
                 if state == .itemAdded {
-                    $0.text = Strings.PlayList.toastAddToPlaylistTitle
+                    $0.text = Strings.PlayList.toastAddedToPlaylistTitle
                 } else {
                     $0.text = Strings.PlayList.toastExitingItemPlaylistTitle
                 }

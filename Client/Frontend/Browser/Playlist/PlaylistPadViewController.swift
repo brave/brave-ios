@@ -54,10 +54,12 @@ class PlaylistPadViewController: UIViewController {
             }
             $0.primaryEdge = PlayListSide(rawValue: Preferences.Playlist.listViewSide.value) == .left ? .leading : .trailing
             $0.presentsWithGesture = false
-            $0.preferredPrimaryColumnWidthFraction = 1.0 / 3.0
         }
         
         updateLayoutForOrientationChange()
+        
+        // This has to be manually called because when launching a split controller in landscape, it does NOT call `viewDidLoad` on the primary/list controller!
+        listController.loadViewIfNeeded()
     }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
