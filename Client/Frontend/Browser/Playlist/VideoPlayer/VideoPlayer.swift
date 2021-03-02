@@ -113,6 +113,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         controlsView.skipForwardButton.addTarget(self, action: #selector(onSeekForwards(_:)), for: .touchUpInside)
         controlsView.skipBackButton.addTarget(self, action: #selector(onSeekPrevious(_:event:)), for: .touchDownRepeat)
         controlsView.skipForwardButton.addTarget(self, action: #selector(onSeekNext(_:event:)), for: .touchDownRepeat)
+        controlsView.nextButton.addTarget(self, action: #selector(next()), for: .touchUpInside)
         
         // Layout
         layer.addSublayer(playerLayer)
