@@ -1277,6 +1277,36 @@ extension Strings {
                               bundle: .braveShared,
                               value: "Right",
                               comment: "Option Text for Sidebar Location Right")
+        
+        public static let playlistAutoDownloadSettingsTitle =
+            NSLocalizedString("playlist.playlistAutoDownloadSettingsTitle",
+                              bundle: .braveShared,
+                              value: "Auto Download Videos",
+                              comment: "Title for the Playlist Settings Option for Auto Download (Off/On/Only Wifi)")
+        
+        public static let playlistAutoDownloadFooterSettingsText =
+            NSLocalizedString("playlist.playlistAutoDownloadFooterSettingsText",
+                              bundle: .braveShared,
+                              value: "This setting will determine to auto-download the video when it is added to Playlist.",
+                              comment: "Footer Text for the Playlist Settings Option for Auto doDownload (Off/On/Only Wifi))")
+        
+        public static let playlistAutoDownloadOptionOn =
+            NSLocalizedString("playlist.playlistAutoDownloadOptionOn",
+                              bundle: .braveShared,
+                              value: "On",
+                              comment: "Option Text for Auto Download On Option")
+        
+        public static let playlistAutoDownloadOptionOff =
+            NSLocalizedString("playlist.playlistAutoDownloadOptionOff",
+                              bundle: .braveShared,
+                              value: "Off",
+                              comment: "Option Text for Auto Download Off Option")
+        
+        public static let playlistAutoDownloadOptionOnlyWifi =
+            NSLocalizedString("playlist.playlistAutoDownloadOptionOnlyWifi",
+                              bundle: .braveShared,
+                              value: "Only Wifi",
+                              comment: "Option Text for Auto Download Only Wifi Option")
     }
 }
 

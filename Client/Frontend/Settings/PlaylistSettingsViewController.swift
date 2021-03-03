@@ -24,6 +24,25 @@ enum PlayListSide: String, CaseIterable, RepresentableOptionType {
     }
 }
 
+// MARK: - PlayListDownloadType
+
+enum PlayListDownloadType: String, CaseIterable, RepresentableOptionType {
+    case on = "on"
+    case off = "off"
+    case wifi = "wifi"
+        
+    var displayString: String {
+        switch self {
+            case .on:
+                return Strings.PlayList.playlistAutoDownloadOptionOn
+            case .off:
+                return Strings.PlayList.playlistAutoDownloadOptionOff
+            case .wifi:
+                return Strings.PlayList.playlistAutoDownloadOptionOnlyWifi
+        }
+    }
+}
+
 // MARK: - PlaylistSettingsViewController
 
 class PlaylistSettingsViewController: TableViewController {
@@ -69,13 +88,36 @@ class PlaylistSettingsViewController: TableViewController {
             )
         ]
         
+        var autoDownloadSection = Section(rows: [])
+        var row = Row(text: Strings.PlayList.playlistAutoDownloadSettingsTitle,
+                      detailText: PlayListDownloadType(rawValue: Preferences.Playlist.autoDownloadVideo.value)?.displayString,
+                      accessory: .disclosureIndicator,
+                      cellClass: MultilineSubtitleCell.self)
+
+        row.selection = { [unowned self] in
+            let optionsViewController = OptionSelectionViewController<PlayListDownloadType>(
+                options: PlayListDownloadType.allCases,
+                selectedOption: PlayListDownloadType(rawValue: Preferences.Playlist.autoDownloadVideo.value),
+                optionChanged: { [unowned self] _, option in
+                    Preferences.Playlist.autoDownloadVideo.value = option.rawValue
+
+                    self.dataSource.reloadCell(row: row, section: autoDownloadSection, displayText: option.displayString)
+                    self.applyTheme(self.theme)
+                }
+            )
+            optionsViewController.title = Strings.PlayList.playlistAutoDownloadSettingsTitle
+            optionsViewController.footerText = Strings.PlayList.playlistAutoDownloadFooterSettingsText
+
+            self.navigationController?.pushViewController(optionsViewController, animated: true)
+        }
+        
+        autoDownloadSection.rows.append(row)
+        dataSource.sections.append(autoDownloadSection)
+        
         if UIDevice.current.userInterfaceIdiom == .pad {
-            var sideSelection = Section(rows: [])
-
-            let themeSubtitle = PlayListSide(rawValue: Preferences.Playlist.listViewSide.value)?.displayString
-
+            var sideSelectionSection = Section(rows: [])
             var row = Row(text: Strings.PlayList.playlistSidebarLocationTitle,
-                          detailText: themeSubtitle,
+                          detailText: PlayListSide(rawValue: Preferences.Playlist.listViewSide.value)?.displayString,
                           accessory: .disclosureIndicator,
                           cellClass: MultilineSubtitleCell.self)
 
@@ -86,7 +128,7 @@ class PlaylistSettingsViewController: TableViewController {
                     optionChanged: { [unowned self] _, option in
                         Preferences.Playlist.listViewSide.value = option.rawValue
 
-                        self.dataSource.reloadCell(row: row, section: sideSelection, displayText: option.displayString)
+                        self.dataSource.reloadCell(row: row, section: sideSelectionSection, displayText: option.displayString)
                         self.applyTheme(self.theme)
                     }
                 )
@@ -96,9 +138,8 @@ class PlaylistSettingsViewController: TableViewController {
                 self.navigationController?.pushViewController(optionsViewController, animated: true)
             }
             
-            sideSelection.rows.append(row)
-            
-            dataSource.sections.append(sideSelection)
+            sideSelectionSection.rows.append(row)
+            dataSource.sections.append(sideSelectionSection)
         }
         
         if !AppConstants.buildChannel.isPublic {

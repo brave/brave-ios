@@ -209,6 +209,8 @@ extension Preferences {
         static let lastPlayedItemUrl = Option<String?>(key: "playlist.last.played.item.url", default: nil)
         /// Whether to play the video when controller loaded
         static let firstLoadAutoPlay = Option<Bool>(key: "playlist.firstLoadAutoPlay", default: false)
+        /// The Option to download video yes / no / only wifi
+        static let autoDownloadVideo = Option<String>(key: "playlist.listViewSide", default: PlayListDownloadType.off.rawValue)
     }
 }
 
