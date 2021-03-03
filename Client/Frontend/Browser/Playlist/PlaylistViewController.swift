@@ -65,6 +65,8 @@ class PlaylistViewController: UIViewController {
     
     private var currentlyPlayingItemIndex = -1
     
+    private var autoPlayEnabled: Bool = false
+    
     init() {
         super.init(nibName: nil, bundle: nil)
     }
@@ -173,6 +175,8 @@ class PlaylistViewController: UIViewController {
             PlaylistManager.shared.reloadData()
             self.tableView.reloadData()
             
+            self.autoPlayEnabled = false
+            
             if PlaylistManager.shared.numberOfAssets() > 0 {
                 self.playerView.setControlsEnabled(true)
                 
@@ -181,6 +185,8 @@ class PlaylistViewController: UIViewController {
                 } else {
                     self.tableView.delegate?.tableView?(self.tableView, didSelectRowAt: IndexPath(row: 0, section: 0))
                 }
+                
+                self.autoPlayEnabled = true
             }
             
             self.updateTableBackgroundView()
@@ -402,7 +408,8 @@ extension PlaylistViewController: UITableViewDelegate {
             infoLabel.text = item.name
             playerView.setVideoInfo(videoDomain: item.pageSrc, videoTitle: item.pageTitle)
             mediaInfo.updateNowPlayingMediaArtwork(image: selectedCell?.thumbnailImage)
-            mediaInfo.loadMediaItem(item, index: indexPath.row) { [weak self] error in
+            
+            mediaInfo.loadMediaItem(item, index: indexPath.row, autoPlayEnabled: autoPlayEnabled) { [weak self] error in
                 guard let self = self else { return }
                 self.activityIndicator.stopAnimating()
                 

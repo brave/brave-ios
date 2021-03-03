@@ -600,7 +600,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         self.delegate?.onNextTrack()
     }
     
-    public func load(url: URL, resourceDelegate: AVAssetResourceLoaderDelegate?) {
+    public func load(url: URL, resourceDelegate: AVAssetResourceLoaderDelegate?, autoPlayEnabled: Bool) {
         let asset = AVURLAsset(url: url)
         
         if let delegate = resourceDelegate {
@@ -626,12 +626,15 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
                 
                 let endTime = CMTimeConvertScale(item.asset.duration, timescale: self.player.currentTime().timescale, method: .roundHalfAwayFromZero)
                 self.controlsView.trackBar.setTimeRange(currentTime: item.currentTime(), endTime: endTime)
-                self.play()
+                
+                if autoPlayEnabled {
+                    self.play()
+                }
             }
         }
     }
     
-    public func load(asset: AVURLAsset) {
+    public func load(asset: AVURLAsset, autoPlayEnabled: Bool) {
         if let currentItem = player.currentItem, currentItem.asset.isKind(of: AVURLAsset.self) && player.status == .readyToPlay {
             if let currentAsset = currentItem.asset as? AVURLAsset, currentAsset.url.absoluteString == asset.url.absoluteString {
                 if isPlaying {
@@ -651,7 +654,10 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
                 
                 let endTime = CMTimeConvertScale(item.asset.duration, timescale: self.player.currentTime().timescale, method: .roundHalfAwayFromZero)
                 self.controlsView.trackBar.setTimeRange(currentTime: item.currentTime(), endTime: endTime)
-                self.play()
+                
+                if autoPlayEnabled {
+                    self.play()
+                }
             }
         }
     }

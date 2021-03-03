@@ -143,7 +143,7 @@ extension PlaylistMediaInfo: MPPlayableContentDelegate {
         case none
     }
     
-    public func loadMediaItem(_ item: PlaylistInfo, index: Int, completion: @escaping (MediaPlaybackError) -> Void) {
+    public func loadMediaItem(_ item: PlaylistInfo, index: Int, autoPlayEnabled: Bool = true, completion: @escaping (MediaPlaybackError) -> Void) {
         self.nowPlayingInfo = item
         self.playerStatusObserver = nil
         self.playerView?.stop()
@@ -161,7 +161,7 @@ extension PlaylistMediaInfo: MPPlayableContentDelegate {
                     guard let self = self else { return }
                     //item.duration == newItem.duration TODO: FIX ADS!
                     if let newItem = newItem, let url = URL(string: newItem.src) {
-                        self.playerView?.load(url: url, resourceDelegate: nil)
+                        self.playerView?.load(url: url, resourceDelegate: nil, autoPlayEnabled: autoPlayEnabled)
 
                         Playlist.shared.updateItem(mediaSrc: item.src, item: newItem) {
                             DispatchQueue.main.async {
@@ -192,7 +192,7 @@ extension PlaylistMediaInfo: MPPlayableContentDelegate {
                     
                     if canStream {
                         self.playerView?.seek(to: 0.0)
-                        self.playerView?.load(url: url, resourceDelegate: nil)
+                        self.playerView?.load(url: url, resourceDelegate: nil, autoPlayEnabled: autoPlayEnabled)
                         
                         if let player = self.playerView?.player {
                             self.playerStatusObserver = StreamObserver(player: player, onStatusChanged: { status in
@@ -226,7 +226,7 @@ extension PlaylistMediaInfo: MPPlayableContentDelegate {
         } else {
             // Load from the cache since this item was downloaded before..
             let asset = PlaylistManager.shared.assetAtIndex(index)
-            self.playerView?.load(asset: asset)
+            self.playerView?.load(asset: asset, autoPlayEnabled: autoPlayEnabled)
             completion(.none)
         }
     }
