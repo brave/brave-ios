@@ -7,6 +7,7 @@ import Foundation
 import UIKit
 import CoreData
 import Shared
+import BraveShared
 
 private let log = Logger.browserLogger
 
@@ -76,6 +77,20 @@ class Playlist {
                 
                 self.saveContext(self.backgroundContext)
                 self.reorderItems()
+                
+                let downloadType = PlayListDownloadType(rawValue: Preferences.Playlist.autoDownloadVideo.value)
+                
+                switch downloadType {
+                    case .on:
+                        PlaylistManager.shared.download(item: item)
+                    case .wifi:
+                        if DeviceInfo.hasWifiConnection() {
+                            PlaylistManager.shared.download(item: item)
+                        }
+                    default:
+                        break
+                }
+                
                 completion()
             }
         } else {
