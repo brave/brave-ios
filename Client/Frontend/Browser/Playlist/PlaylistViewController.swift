@@ -65,7 +65,7 @@ class PlaylistViewController: UIViewController {
     
     private var currentlyPlayingItemIndex = -1
     
-    private var autoPlayEnabled: Bool = false
+    private var autoPlayEnabled: Bool = true
     
     init() {
         super.init(nibName: nil, bundle: nil)
@@ -175,7 +175,7 @@ class PlaylistViewController: UIViewController {
             PlaylistManager.shared.reloadData()
             self.tableView.reloadData()
             
-            self.autoPlayEnabled = false
+            self.autoPlayEnabled = Preferences.Playlist.firstLoadAutoPlay.value
             
             if PlaylistManager.shared.numberOfAssets() > 0 {
                 self.playerView.setControlsEnabled(true)

@@ -59,6 +59,13 @@ class PlaylistSettingsViewController: TableViewController {
                              option: Preferences.Playlist.showToastForAdd)
                 ],
                 footer: .title(Strings.PlayList.playlistToastShowSettingsOptionFooterText)
+            ),
+            Section(
+                rows: [
+                    .boolRow(title: Strings.PlayList.playlistAutoPlaySettingsOptionTitle,
+                             option: Preferences.Playlist.firstLoadAutoPlay)
+                ],
+                footer: .title(Strings.PlayList.playlistAutoPlaySettingsOptionFooterText)
             )
         ]
         

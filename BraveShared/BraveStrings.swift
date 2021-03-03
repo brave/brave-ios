@@ -1171,6 +1171,18 @@ extension Strings {
                               value: "This option will disable showing 'Add to Playlist Toast' on websites. However media (videos/audio) can still be added by long pressing the media item or using Add option in Share Sheet.",
                               comment: "Footer Text for the Playlist Settings Option for Enable/Disable Add Toast")
         
+        public static let playlistAutoPlaySettingsOptionTitle =
+            NSLocalizedString("playlist.playlistAutoPlaySettingsOptionTitle",
+                              bundle: .braveShared,
+                              value: "Start Playlist with Auto-Play",
+                              comment: "Title for the Playlist Settings Option for Enable/Disable Auto-Play")
+        
+        public static let playlistAutoPlaySettingsOptionFooterText =
+            NSLocalizedString("playlist.playlistAutoPlaySettingsOptionFooterText",
+                              bundle: .braveShared,
+                              value: "This option will enable/disable auto-play when Playlist is opened. However this option will not effect auto-play when next-video on the list is loaded.",
+                              comment: "Footer Text for the Playlist Settings Option for Enable/Disable Auto-Play")
+        
         public static let playlistSidebarLocationTitle =
             NSLocalizedString("playlist.playlistSidebarLocationTitle",
                               bundle: .braveShared,
