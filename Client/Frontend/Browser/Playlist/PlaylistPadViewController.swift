@@ -21,7 +21,7 @@ private protocol PlaylistPadControllerDetailDelegate: class {
     func updateNowPlayingMediaArtwork(image: UIImage?)
     func setControlsEnabled(_ enabled: Bool)
     func updatePlayerControlsState()
-    func loadMediaItem(_ item: PlaylistInfo, index: Int, completion: @escaping (PlaylistMediaInfo.MediaPlaybackError) -> Void)
+    func loadMediaItem(_ item: PlaylistInfo, index: Int, autoPlayEnabled: Bool, completion: @escaping (PlaylistMediaInfo.MediaPlaybackError) -> Void)
     func displayLoadingResourceError()
     func play()
     func stop()
@@ -126,6 +126,8 @@ private class PlaylistPadListController: UIViewController {
         $0.maximumUnitCount = 1
     }
     
+    private var autoPlayEnabled: Bool = false
+    
     init() {
         super.init(nibName: nil, bundle: nil)
     }
@@ -199,6 +201,8 @@ private class PlaylistPadListController: UIViewController {
             PlaylistManager.shared.reloadData()
             self.tableView.reloadData()
             
+            self.autoPlayEnabled = false
+
             if PlaylistManager.shared.numberOfAssets() > 0 {
                 self.detailControllerDelegate?.setControlsEnabled(true)
                 
@@ -207,6 +211,8 @@ private class PlaylistPadListController: UIViewController {
                 } else {
                     self.tableView.delegate?.tableView?(self.tableView, didSelectRowAt: IndexPath(row: 0, section: 0))
                 }
+                
+                self.autoPlayEnabled = true
             }
             
             self.updateTableBackgroundView()
@@ -409,7 +415,7 @@ extension PlaylistPadListController: UITableViewDelegate {
             
             detailControllerDelegate?.updateNowPlayingMediaArtwork(image: selectedCell?.thumbnailImage)
             
-            detailControllerDelegate?.loadMediaItem(item, index: indexPath.row) { [weak self] error in
+            detailControllerDelegate?.loadMediaItem(item, index: indexPath.row, autoPlayEnabled: autoPlayEnabled) { [weak self] error in
                 guard let self = self else { return }
                 self.activityIndicator.stopAnimating()
                 
@@ -895,9 +901,9 @@ extension PlaylistPadDetailController: PlaylistPadControllerDetailDelegate {
         playerView.setControlsEnabled(playerView.player.currentItem != nil)
     }
     
-    func loadMediaItem(_ item: PlaylistInfo, index: Int, completion: @escaping (PlaylistMediaInfo.MediaPlaybackError) -> Void) {
+    func loadMediaItem(_ item: PlaylistInfo, index: Int, autoPlayEnabled: Bool, completion: @escaping (PlaylistMediaInfo.MediaPlaybackError) -> Void) {
         playerView.setVideoInfo(videoDomain: item.pageSrc, videoTitle: item.pageTitle)
-        mediaInfo.loadMediaItem(item, index: index, completion: completion)
+        mediaInfo.loadMediaItem(item, index: index, autoPlayEnabled: autoPlayEnabled, completion: completion)
     }
     
     func displayLoadingResourceError() {
