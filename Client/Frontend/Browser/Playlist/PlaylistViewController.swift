@@ -147,7 +147,8 @@ class PlaylistViewController: UIViewController {
             playerView.addSubview(activityIndicator)
             
             tableView.do {
-                $0.contentInset = UIEdgeInsets(top: videoPlayerHeight, left: 0.0, bottom: 0.0, right: 0.0)
+                $0.contentInset = UIEdgeInsets(top: videoPlayerHeight, left: 0.0, bottom: view.safeAreaInsets.bottom, right: 0.0)
+                $0.scrollIndicatorInsets = $0.contentInset
                 $0.contentOffset = CGPoint(x: 0.0, y: -videoPlayerHeight)
             }
             
@@ -162,7 +163,7 @@ class PlaylistViewController: UIViewController {
             }
             
             tableView.snp.makeConstraints {
-                $0.edges.equalTo(view.safeArea.edges)
+                $0.edges.equalTo(0)
             }
         }
     }
