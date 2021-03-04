@@ -49,6 +49,7 @@ class Playlist {
                     $0.duration = item.duration
                     $0.mimeType = item.mimeType
                     $0.mediaSrc = item.src
+                    $0.other = item.getYtInfoEncoded()
                 })
                 
                 self.saveContext(self.backgroundContext)
@@ -74,6 +75,7 @@ class Playlist {
                 playlistItem.mimeType = item.mimeType
                 playlistItem.mediaSrc = item.src
                 playlistItem.order = -9999
+                playlistItem.other = item.getYtInfoEncoded()
                 
                 self.saveContext(self.backgroundContext)
                 self.reorderItems()

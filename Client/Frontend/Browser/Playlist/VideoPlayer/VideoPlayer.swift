@@ -64,9 +64,15 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         $0.layer.masksToBounds = true
     }
     
+    private let subtitlesView = UILabel().then {
+        $0.font = .systemFont(ofSize: 12.0)
+        $0.textColor = .white
+    }
+    
     // State
     private let orientation: UIInterfaceOrientation = .portrait
     private var playObserver: Any?
+    private var subtitlesObserver: Any?
     private var fadeAnimationWorkItem: DispatchWorkItem?
     
     public var isPlaying: Bool {
@@ -118,12 +124,17 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         // Layout
         layer.addSublayer(playerLayer)
         addSubview(particleView)
+        addSubview(subtitlesView)
         addSubview(overlayView)
         addSubview(infoView)
         addSubview(controlsView)
         
         particleView.snp.makeConstraints {
             $0.edges.equalToSuperview()
+        }
+        
+        subtitlesView.snp.makeConstraints {
+            $0.left.right.bottom.equalToSuperview().inset(15.0)
         }
         
         overlayView.snp.makeConstraints {
@@ -168,6 +179,10 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         }
         
         if let observer = self.playObserver {
+            player.removeTimeObserver(observer)
+        }
+        
+        if let observer = self.subtitlesObserver {
             player.removeTimeObserver(observer)
         }
         
@@ -508,6 +523,28 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     
     public func setFullscreenButtonHidden(_ hidden: Bool) {
         infoView.fullscreenButton.isHidden = hidden
+    }
+    
+    public func showSubtitles(_ subtitles: [PlaylistSubtitle]?) {
+        if let subtitles = subtitles {
+            let interval = CMTimeMake(value: 25, timescale: 1000)
+            self.subtitlesObserver = self.player.addPeriodicTimeObserver(forInterval: interval, queue: .main, using: { [weak self] time in
+                guard let self = self, let currentItem = self.player.currentItem else { return }
+                
+                let endTime = CMTimeConvertScale(currentItem.asset.duration, timescale: self.player.currentTime().timescale, method: .roundHalfAwayFromZero)
+                
+                if CMTimeCompare(endTime, .zero) != 0 && endTime.value > 0 {
+                    let time = self.player.currentTime()
+                    for item in subtitles {
+                        if item.startTime >= time.seconds {
+                            self.subtitlesView.text = item.text
+                        }
+                    }
+                }
+            })
+        } else {
+            subtitlesView.text = nil
+        }
     }
     
     public func attachLayer() {

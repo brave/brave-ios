@@ -299,7 +299,8 @@ extension PlaylistViewController: UITableViewDataSource {
                                            pageTitle: item.pageTitle,
                                            mimeType: item.mimeType,
                                            duration: Float(newTrackDuration),
-                                           detected: item.detected)
+                                           detected: item.detected,
+                                           ytInfo: item.ytInfo)
                 Playlist.shared.updateItem(mediaSrc: item.src, item: newItem, completion: {})
             }
         }
@@ -410,9 +411,17 @@ extension PlaylistViewController: UITableViewDelegate {
             playerView.setVideoInfo(videoDomain: item.pageSrc, videoTitle: item.pageTitle)
             mediaInfo.updateNowPlayingMediaArtwork(image: selectedCell?.thumbnailImage)
             
+            var parser: VTTParser?
+            //if let ytInfo = item.ytInfo {
+                parser = VTTParser(url: "https://www.youtube.com/api/timedtext?v=Mb1ZvUDvLDY&exp=xftt&xoaf=4&hl=en&ip=0.0.0.0&ipbits=0&expire=1614899580&sparams=ip,ipbits,expire,v,exp,xoaf&signature=0A77A9DF3AA9EC4BC927E13385969CFC2128F8CF.096A54F411A299D388BC680A0656AF09EC0F6091&key=yt8&lang=en&fmt=vtt") { parser in
+                    self.playerView.showSubtitles(parser.subtitles)
+                }
+            //}
+            
             mediaInfo.loadMediaItem(item, index: indexPath.row, autoPlayEnabled: autoPlayEnabled) { [weak self] error in
                 guard let self = self else { return }
                 self.activityIndicator.stopAnimating()
+                print(parser)
                 
                 switch error {
                 case .error(let err):

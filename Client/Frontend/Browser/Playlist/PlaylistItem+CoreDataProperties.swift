@@ -22,5 +22,6 @@ extension PlaylistItem {
     @NSManaged public var order: Int32
     @NSManaged public var pageSrc: String?
     @NSManaged public var pageTitle: String?
+    @NSManaged public var other: Data?
 
 }

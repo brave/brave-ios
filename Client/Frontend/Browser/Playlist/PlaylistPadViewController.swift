@@ -270,8 +270,8 @@ extension PlaylistPadListController: UITableViewDataSource {
             cell.detailLabel.text = "\(formatter.string(from: TimeInterval(item.duration)) ?? "0:00") - \(Strings.PlayList.dowloadedLabelTitle)"
         }
         
-        //Fixes a duration bug where sometimes the duration is NOT fetched!
-        //So when we fetch the thumbnail, the duration will be updated (if possible)
+        // Fixes a duration bug where sometimes the duration is NOT fetched!
+        // So when we fetch the thumbnail, the duration will be updated (if possible)
         cell.loadThumbnail(item: item) { [weak self] newTrackDuration in
             guard let newTrackDuration = newTrackDuration else { return }
             
@@ -284,7 +284,8 @@ extension PlaylistPadListController: UITableViewDataSource {
                                            pageTitle: item.pageTitle,
                                            mimeType: item.mimeType,
                                            duration: Float(newTrackDuration),
-                                           detected: item.detected)
+                                           detected: item.detected,
+                                           ytInfo: item.ytInfo)
                 Playlist.shared.updateItem(mediaSrc: item.src, item: newItem, completion: {})
             }
         }

@@ -1,5 +1,88 @@
 window.__firefox__.includeOnce("Playlist", function() {
     
+    function getYTinfo() {
+        var response = ytInitialPlayerResponse || window.ytInitialPlayerResponse || ytplayer.config.args.raw_player_response;
+        var videoIdMetaTag = document.querySelector('meta[itemprop=videoId]');
+        
+        var info = {};
+        if (videoIdMetaTag) {
+            info['videoId'] = videoIdMetaTag.content;
+        }
+        
+        if (response && response.streamingData) {
+            if (!videoIdMetaTag) {
+                info['videoId'] = response.videoDetails.videoId;
+            }
+            
+            info['title'] = response.videoDetails.title;
+            info['hlsManifestUrl'] = response.streamingData.hlsManifestUrl;
+            info['lengthSeconds'] = response.videoDetails.lengthSeconds;
+            info['expiresInSeconds'] = response.streamingData.expiresInSeconds;
+            
+            if (response.streamingData && response.streamingData.formats) {
+                info['formats'] = [];
+                response.streamingData.formats.forEach(function(format) {
+                    info['formats'].push({
+                        'url': format.url,
+                        'mimeType': format.mimeType,
+                        'quality': format.quality,
+                        'qualityLabel': format.qualityLabel,
+                        'signatureCipher': format.signatureCipher
+                    });
+                });
+            }
+            
+            if (response.streamingData && response.streamingData.adaptiveFormats) {
+                info['adaptiveFormats'] = [];
+                response.streamingData.adaptiveFormats.forEach(function(format) {
+                    info['adaptiveFormats'].push({
+                        'url': format.url,
+                        'mimeType': format.mimeType,
+                        'quality': format.quality,
+                        'qualityLabel': format.qualityLabel,
+                        'signatureCipher': format.signatureCipher
+                    });
+                });
+            }
+        }
+        
+        if (response && response.captions && response.captions.playerCaptionsTracklistRenderer) {
+            var captionTracks = response.captions.playerCaptionsTracklistRenderer.captionTracks;
+            //var audioTracks = response.captions.playerCaptionsTracklistRenderer.audioTracks;
+            var translationLanguages = response.captions.playerCaptionsTracklistRenderer.translationLanguages;
+            //var defaultAudioTrackIndex = response.captions.playerCaptionsTracklistRenderer.defaultAudioTrackIndex;
+            
+            // Do not support audioTracks (aka Voice-Over/Accessibility Tracks) yet.
+            
+            if (captionTracks) {
+                info['captionTracks'] = [];
+                captionTracks.forEach(function(track) {
+                    info['captionTracks'].push({
+                        'baseUrl': track.baseUrl,
+                        'name': track.name.simpleText,
+                        'vssId': track.vssId,
+                        'languageCode': track.languageCode
+                    });
+                });
+            }
+            
+            if (translationLanguages) {
+                info['translationLanguages'] = [];
+                translationLanguages.forEach(function(track) {
+                    info['translationLanguages'].push({
+                        'name': track.languageName.simpleText,
+                        'languageCode': track.languageCode
+                    });
+                });
+            }
+        }
+        
+        if (response) {
+            return info;
+        }
+        return null;
+    }
+    
     
     function notify(target, type) {
         if (target) {
@@ -17,6 +100,7 @@ window.__firefox__.includeOnce("Playlist", function() {
                                                                             "mimeType": type,
                                                                             "duration": target.duration !== target.duration ? 0.0 : target.duration,
                                                                             "detected": false,
+                                                                            "ytInfo": getYTinfo()
                                                                             });
             }
             else {
@@ -31,6 +115,7 @@ window.__firefox__.includeOnce("Playlist", function() {
                                                                                         "mimeType": type,
                                                                                         "duration": target.duration !== target.duration ? 0.0 : target.duration,
                                                                                         "detected": false,
+                                                                                        "ytInfo": getYTinfo()
                                                                                         });
                         }
                         
@@ -43,6 +128,7 @@ window.__firefox__.includeOnce("Playlist", function() {
                                                                                         "mimeType": type,
                                                                                         "duration": target.duration !== target.duration ? 0.0 : target.duration,
                                                                                         "detected": false,
+                                                                                        "ytInfo": getYTinfo()
                                                                                         });
                         }
                     }
@@ -186,7 +272,8 @@ window.__firefox__.includeOnce("Playlist", function() {
                                                                             "pageTitle": document.title,
                                                                             "mimeType": mimeType,
                                                                             "duration": node.duration !== node.duration ? 0.0 : node.duration,
-                                                                            "detected": true
+                                                                            "detected": true,
+                                                                            "ytInfo": getYTinfo()
                                                                             });
             } else {
                 var target = node;
@@ -200,7 +287,8 @@ window.__firefox__.includeOnce("Playlist", function() {
                                                                                         "pageTitle": document.title,
                                                                                         "mimeType": mimeType,
                                                                                         "duration": target.duration !== target.duration ? 0.0 : target.duration,
-                                                                            "detected": true
+                                                                                        "detected": true,
+                                                                                        "ytInfo": getYTinfo()
                                                                                         });
                         }
                         
@@ -212,7 +300,8 @@ window.__firefox__.includeOnce("Playlist", function() {
                                                                                         "pageTitle": document.title,
                                                                                         "mimeType": mimeType,
                                                                                         "duration": target.duration !== target.duration ? 0.0 : target.duration,
-                                                                            "detected": true
+                                                                                        "detected": true,
+                                                                                        "ytInfo": getYTinfo()
                                                                                         });
                         }
                     }
