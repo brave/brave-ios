@@ -33,14 +33,47 @@ struct PlaylistYTInfo: Codable {
     
     struct CaptionTrack: Codable {
         let baseUrl: String
-        let name: String
+        let name: Name?
         let vssId: String?
         let languageCode: String
     }
     
     struct TranslationLanguage: Codable {
-        let name: String
+        let languageName: Name?
         let languageCode: String
+    }
+    
+    struct Name: Codable {
+        let name: String
+        private let key: String
+        
+        init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            
+            var name: String?
+            var key: String?
+            [CodingKeys.text, CodingKeys.simpleText, CodingKeys.languageName, CodingKeys.name].forEach({
+                if let decodedName = try? container.decodeIfPresent(String.self, forKey: $0) {
+                    name = decodedName
+                    key = $0.rawValue
+                }
+            })
+            
+            self.name = name ?? ""
+            self.key = key ?? CodingKeys.simpleText.rawValue
+        }
+        
+        func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(self.name, forKey: CodingKeys(rawValue: self.key)!)
+        }
+        
+        private enum CodingKeys: String, CodingKey {
+            case text
+            case simpleText
+            case languageName
+            case name
+        }
     }
 }
 

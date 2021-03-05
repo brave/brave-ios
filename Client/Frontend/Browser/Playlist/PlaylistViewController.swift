@@ -412,11 +412,21 @@ extension PlaylistViewController: UITableViewDelegate {
             mediaInfo.updateNowPlayingMediaArtwork(image: selectedCell?.thumbnailImage)
             
             var parser: VTTParser?
-            //if let ytInfo = item.ytInfo {
-                parser = VTTParser(url: "https://www.youtube.com/api/timedtext?v=Mb1ZvUDvLDY&exp=xftt&xoaf=4&hl=en&ip=0.0.0.0&ipbits=0&expire=1614899580&sparams=ip,ipbits,expire,v,exp,xoaf&signature=0A77A9DF3AA9EC4BC927E13385969CFC2128F8CF.096A54F411A299D388BC680A0656AF09EC0F6091&key=yt8&lang=en&fmt=vtt") { parser in
-                    self.playerView.showSubtitles(parser.subtitles)
+            if let ytInfo = item.ytInfo {
+                if let captionInfo = ytInfo.captionTracks?.filter({ $0.languageCode == "en" }).first {
+                    let url = captionInfo.baseUrl.replacingOccurrences(of: "\\u0026", with: "&")
+                    
+                    parser = VTTParser(url: "https://www.youtube.com\(url)&fmt=vtt") { parser in
+                        self.playerView.showSubtitles(parser.subtitles)
+                    }
+                } else {
+                    parser = VTTParser(url: "https://www.youtube.com/api/timedtext?v=\(ytInfo.videoId)&sparams=v&key=yt8&lang=en&fmt=vtt") { parser in
+                        self.playerView.showSubtitles(parser.subtitles)
+                    }
                 }
-            //}
+            } else {
+                self.playerView.showSubtitles(nil)
+            }
             
             mediaInfo.loadMediaItem(item, index: indexPath.row, autoPlayEnabled: autoPlayEnabled) { [weak self] error in
                 guard let self = self else { return }

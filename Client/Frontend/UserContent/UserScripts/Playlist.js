@@ -59,7 +59,7 @@ window.__firefox__.includeOnce("Playlist", function() {
                 captionTracks.forEach(function(track) {
                     info['captionTracks'].push({
                         'baseUrl': track.baseUrl,
-                        'name': track.name.simpleText,
+                        'name': track.name,
                         'vssId': track.vssId,
                         'languageCode': track.languageCode
                     });
@@ -70,7 +70,7 @@ window.__firefox__.includeOnce("Playlist", function() {
                 info['translationLanguages'] = [];
                 translationLanguages.forEach(function(track) {
                     info['translationLanguages'].push({
-                        'name': track.languageName.simpleText,
+                        'name': track.languageName,
                         'languageCode': track.languageCode
                     });
                 });

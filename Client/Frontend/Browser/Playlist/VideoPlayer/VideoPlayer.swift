@@ -67,6 +67,8 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     private let subtitlesView = UILabel().then {
         $0.font = .systemFont(ofSize: 12.0)
         $0.textColor = .white
+        $0.textAlignment = .center
+        $0.numberOfLines = 0
     }
     
     // State
@@ -134,7 +136,9 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         }
         
         subtitlesView.snp.makeConstraints {
-            $0.left.right.bottom.equalToSuperview().inset(15.0)
+            $0.leading.equalTo(self.safeArea.leading).inset(15.0)
+            $0.trailing.equalTo(self.safeArea.trailing).inset(15.0)
+            $0.bottom.equalTo(self.safeArea.bottom).inset(15.0)
         }
         
         overlayView.snp.makeConstraints {
@@ -527,6 +531,13 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     
     public func showSubtitles(_ subtitles: [PlaylistSubtitle]?) {
         if let subtitles = subtitles {
+            subtitlesView.text = nil
+            
+            if let observer = self.subtitlesObserver {
+                player.removeTimeObserver(observer)
+                self.subtitlesObserver = nil
+            }
+            
             let interval = CMTimeMake(value: 25, timescale: 1000)
             self.subtitlesObserver = self.player.addPeriodicTimeObserver(forInterval: interval, queue: .main, using: { [weak self] time in
                 guard let self = self, let currentItem = self.player.currentItem else { return }
@@ -535,15 +546,23 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
                 
                 if CMTimeCompare(endTime, .zero) != 0 && endTime.value > 0 {
                     let time = self.player.currentTime()
-                    for item in subtitles {
-                        if item.startTime >= time.seconds {
-                            self.subtitlesView.text = item.text
-                        }
+                    let subtitle = subtitles.first(where: { time.seconds >= $0.startTime && time.seconds <= $0.endTime })
+                    if let subtitle = subtitle {
+                        self.subtitlesView.text = subtitle.text
+                        self.subtitlesView.alpha = 1.0
+                    } else {
+                        self.subtitlesView.text = nil
+                        self.subtitlesView.alpha = 0.0
                     }
                 }
             })
         } else {
             subtitlesView.text = nil
+            
+            if let observer = self.subtitlesObserver {
+                player.removeTimeObserver(observer)
+                self.subtitlesObserver = nil
+            }
         }
     }
     

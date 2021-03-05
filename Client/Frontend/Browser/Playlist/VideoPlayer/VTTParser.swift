@@ -49,17 +49,33 @@ public class VTTParser {
             session = URLSession(configuration: .ephemeral).dataTask(with: url) { data, response, error in
                 if let error = error {
                     print(error)
-                    return
+                    return DispatchQueue.main.async { completion(self) }
                 }
                 
                 guard let response = response as? HTTPURLResponse, response.statusCode >= 200 && response.statusCode <= 399 else {
-                    return
+                    return DispatchQueue.main.async { completion(self) }
                 }
                 
-                guard let data = data, let subtitles = String(data: data, encoding: .utf8), !subtitles.isEmpty else { return }
+                guard let data = data, let subtitles = String(data: data, encoding: .utf8), !subtitles.isEmpty else {
+                    return DispatchQueue.main.async { completion(self) }
+                }
                 
-                let formatter = DateFormatter()
-                formatter.dateFormat = "hh:mm:ss.SSS"
+                let getRelativeSecondsFromStringInterval = { (time: String) -> TimeInterval in
+                    let formatter = DateFormatter().then {
+                        $0.dateFormat = "hh:mm:ss.SSS"
+                    }
+                    
+                    let date = formatter.date(from: time)!
+                    
+                    let units: Set<Calendar.Component> = [.nanosecond, .second, .minute, .hour]
+                    let components = Calendar.current.dateComponents(units, from: date)
+                    
+                    let hours = components.hour ?? 0
+                    let minutes = components.minute ?? 0
+                    let seconds = components.second ?? 0
+                    let milliseconds = (Float(components.nanosecond ?? 0) / 1000000.0) / 1000.0
+                    return TimeInterval((hours * 60 * 60) + (minutes * 60) + seconds) + TimeInterval(milliseconds)
+                }
                 
                 for chunk in subtitles.replacingOccurrences(of: "\n\n", with: "\r").split(separator: "\r") {
                     if chunk.contains("-->") {
@@ -69,8 +85,8 @@ public class VTTParser {
                         let startTime = String(times[0])
                         let endTime = String(String(times[1]).split(separator: " ").first!)
                         
-                        let startDate = formatter.date(from: startTime)!.timeIntervalSinceNow
-                        let endDate = formatter.date(from: endTime)!.timeIntervalSinceNow
+                        let startDate = getRelativeSecondsFromStringInterval(startTime)
+                        let endDate = getRelativeSecondsFromStringInterval(endTime)
                         
                         self.subtitles.append(
                             PlaylistSubtitle(
@@ -82,7 +98,7 @@ public class VTTParser {
                     }
                 }
                 
-                completion(self)
+                DispatchQueue.main.async { completion(self) }
             }
             
             session?.resume()
