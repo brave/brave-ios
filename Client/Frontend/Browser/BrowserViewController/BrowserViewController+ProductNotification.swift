@@ -11,6 +11,45 @@ import Shared
 
 extension BrowserViewController {
     
+    // MARK: BenchmarkTrackerCountTier
+        
+    enum BenchmarkTrackerCountTier: Int, Equatable, CaseIterable {
+        case specialTier = 1000
+        case newbieExclusiveTier = 5000
+        case casualExclusiveTier = 10000
+        case regularExclusiveTier = 25000
+        case expertExclusiveTier = 75000
+        case professionalTier = 100000
+        case primeTier = 250000
+        case grandTier = 500000
+        case legendaryTier = 1000000
+
+        var title: String {
+            switch self {
+                case .specialTier:
+                    return Strings.ShieldEducation.benchmarkSpecialTierTitle
+                case .newbieExclusiveTier, .casualExclusiveTier, .regularExclusiveTier, .expertExclusiveTier:
+                    return Strings.ShieldEducation.benchmarkExclusiveTierTitle
+                case .professionalTier:
+                    return Strings.ShieldEducation.benchmarkProfessionalTierTitle
+                case .primeTier:
+                    return Strings.ShieldEducation.benchmarkPrimeTierTitle
+                case .grandTier:
+                    return Strings.ShieldEducation.benchmarkGrandTierTitle
+                case .legendaryTier:
+                    return Strings.ShieldEducation.benchmarkLegendaryTierTitle
+            }
+        }
+
+        var nextTier: BenchmarkTrackerCountTier? {
+            guard let indexOfSelf = Self.allCases.firstIndex(where: { self == $0 }) else {
+                return nil
+            }
+
+            return Self.allCases[safe: indexOfSelf + 1]
+        }
+    }
+    
     // MARK: Internal
     
     @objc func updateShieldNotifications() {
@@ -26,52 +65,71 @@ extension BrowserViewController {
     }
     
     private func presentEducationalProductNotifications() {
-        guard let selectedTab = tabManager.selectedTab,
-              !benchmarkNotificationPresented,
-              !topToolbar.inOverlayMode else {
+//        guard let selectedTab = tabManager.selectedTab,
+//              !benchmarkNotificationPresented,
+//              !topToolbar.inOverlayMode else {
+//            return
+//        }
+        
+        guard let selectedTab = tabManager.selectedTab else {
             return
         }
         
-        let contentBlockerStats = selectedTab.contentBlocker.stats
+//        let contentBlockerStats = selectedTab.contentBlocker.stats
+//
+//        // Step 1: First Time Block Notification
+//        if !Preferences.ProductNotificationBenchmarks.firstTimeBlockingShown.value,
+//           contentBlockerStats.total > 0 {
+//
+//            notifyFirstTimeBlock(theme: Theme.of(selectedTab))
+//            Preferences.ProductNotificationBenchmarks.firstTimeBlockingShown.value = true
+//
+//            return
+//        }
+//
+//        // Step 2: Load a video on a streaming site
+//        if !Preferences.ProductNotificationBenchmarks.videoAdBlockShown.value,
+//           selectedTab.url?.isVideoSteamingSiteURL == true {
+//
+//            notifyVideoAdsBlocked(theme: Theme.of(selectedTab))
+//            Preferences.ProductNotificationBenchmarks.videoAdBlockShown.value = true
+//
+//            return
+//        }
+//
+//        // Step 3: Pre-determined # of Trackers and Ads Blocked
+//        if !Preferences.ProductNotificationBenchmarks.privacyProtectionBlockShown.value,
+//           contentBlockerStats.total > benchmarkNumberOfTrackers {
+//
+//            notifyPrivacyProtectBlock(theme: Theme.of(selectedTab))
+//            Preferences.ProductNotificationBenchmarks.privacyProtectionBlockShown.value = true
+//
+//            return
+//        }
+//
+//        // Step 4: Https Upgrade
+//        if !Preferences.ProductNotificationBenchmarks.httpsUpgradeShown.value,
+//           contentBlockerStats.httpsCount > 0 {
+//
+//            notifyHttpsUpgrade(theme: Theme.of(selectedTab))
+//            Preferences.ProductNotificationBenchmarks.httpsUpgradeShown.value = true
+//
+//            return
+//        }
         
-        // Step 1: First Time Block Notification
-        if !Preferences.ProductNotificationBenchmarks.firstTimeBlockingShown.value,
-           contentBlockerStats.total > 0 {
-            
-            notifyFirstTimeBlock(theme: Theme.of(selectedTab))
-            Preferences.ProductNotificationBenchmarks.firstTimeBlockingShown.value = true
-            
-            return
-        }
+        // Step 5: Share Brave Benchmark Tiers
+        let numOfTrackerAds = BraveGlobalShieldStats.shared.adblock + BraveGlobalShieldStats.shared.trackingProtection
+        let existingTierList = BenchmarkTrackerCountTier.allCases.filter({ numOfTrackerAds < $0.rawValue })
         
-        // Step 2: Load a video on a streaming site
-        if !Preferences.ProductNotificationBenchmarks.videoAdBlockShown.value,
-           selectedTab.url?.isVideoSteamingSiteURL == true {
-
-            notifyVideoAdsBlocked(theme: Theme.of(selectedTab))
-            Preferences.ProductNotificationBenchmarks.videoAdBlockShown.value = true
-
-            return
-        }
-        
-        // Step 3: Pre-determined # of Trackers and Ads Blocked
-        if !Preferences.ProductNotificationBenchmarks.privacyProtectionBlockShown.value,
-           contentBlockerStats.total > benchmarkNumberOfTrackers {
-            
-            notifyPrivacyProtectBlock(theme: Theme.of(selectedTab))
-            Preferences.ProductNotificationBenchmarks.privacyProtectionBlockShown.value = true
-
-            return
-        }
-        
-        // Step 4: Https Upgrade
-        if !Preferences.ProductNotificationBenchmarks.httpsUpgradeShown.value,
-           contentBlockerStats.httpsCount > 0 {
-
-            notifyHttpsUpgrade(theme: Theme.of(selectedTab))
-            Preferences.ProductNotificationBenchmarks.httpsUpgradeShown.value = true
-
-            return
+        if !existingTierList.isEmpty {
+            for tier in existingTierList where Preferences.ProductNotificationBenchmarks.trackerTierCount.value < numOfTrackerAds {
+                if let nextTier = tier.nextTier {
+                    Preferences.ProductNotificationBenchmarks.trackerTierCount.value = nextTier.rawValue
+                }
+                
+                self.notifyTrackerAdsCount(tier.rawValue, theme: Theme.of(selectedTab))
+                break
+            }
         }
     }
     
@@ -111,6 +169,24 @@ extension BrowserViewController {
         showBenchmarkNotificationPopover(controller: shareTrackersViewController)
     }
     
+    private func notifyTrackerAdsCount(_ count: Int, theme: Theme) {
+        let shareTrackersViewController = ShareTrackersController(theme: theme, trackingType: .trackerCountShare(count: count))
+        dismiss(animated: true)
+
+        shareTrackersViewController.actionHandler = { [weak self] action in
+            guard let self = self else { return }
+
+            switch action {
+                case .shareTheNewsTapped:
+                    self.showShareScreen(with: theme)
+                default:
+                    break
+            }
+        }
+
+        showBenchmarkNotificationPopover(controller: shareTrackersViewController)
+    }
+    
     private func showBenchmarkNotificationPopover(controller: (UIViewController & PopoverContentComponent)) {
         benchmarkNotificationPresented = true
 
@@ -124,6 +200,17 @@ extension BrowserViewController {
     func showShieldsScreen() {
         dismiss(animated: true) {
             self.presentBraveShieldsViewController()
+        }
+    }
+    
+    func showShareScreen(with theme: Theme) {
+        dismiss(animated: true) {
+            let globalShieldsActivityController = ShieldsActivityItemSourceProvider.shared.setupGlobalShieldsActivityController(
+                height: self.view.frame.height,
+                theme: theme)
+            globalShieldsActivityController.popoverPresentationController?.sourceView = self.view
+    
+            self.present(globalShieldsActivityController, animated: true, completion: nil)
         }
     }
 }

@@ -8,7 +8,6 @@ import Shared
 import BraveShared
 import Data
 import BraveUI
-import LinkPresentation
 
 /// Displays shield settings and shield stats for a given URL
 class ShieldsViewController: UIViewController, PopoverContentComponent, Themeable {
@@ -313,34 +312,12 @@ class ShieldsViewController: UIViewController, PopoverContentComponent, Themeabl
     }
     
     @objc private func tappedShareShieldsButton() {
-        let statsView = BraveShieldStatsView(frame: CGRect(width: view.frame.height, height: 110)).then {
-            $0.applyTheme(Theme.of(tab))
-            $0.backgroundColor = .darkGray
-        }
+        let globalShieldsActivityController =
+            ShieldsActivityItemSourceProvider.shared.setupGlobalShieldsActivityController(height: view.frame.height,
+                                                                                          theme: Theme.of(tab))
+        globalShieldsActivityController.popoverPresentationController?.sourceView = view
         
-        let contentView = UIView(frame: CGRect(width: statsView.frame.width, height: statsView.frame.height + 85)).then {
-            $0.backgroundColor = .darkGray
-            $0.layer.borderWidth = 1
-            $0.layer.borderColor = UIColor.black.cgColor
-        }
-        
-        contentView.addSubview(statsView)
-        statsView.frame = CGRect(origin: .zero,
-                                 size: CGSize(width: statsView.frame.width, height: statsView.frame.height))
-        
-        let snapshotImage = statsView.snapshot
-        let snapshotImageWithText = contentView.snapshot.textToImage(drawText: Strings.SocialSharing.shareDescriptionTitle,
-                                                                     atPoint: CGPoint(x: 0, y: statsView.frame.height + 20)) ?? snapshotImage
-
-        let activityViewController = UIActivityViewController(activityItems: [ImageActivityItemSource(image: snapshotImage,
-                                                                                                      imageWithText: snapshotImageWithText),
-                                                                              OptionalTextActivityItemSource(text: Strings.SocialSharing.shareDescriptionTitle)],
-                                                              applicationActivities: nil)
-        
-        activityViewController.popoverPresentationController?.sourceView = view
-        activityViewController.excludedActivityTypes = [.openInIBooks, .saveToCameraRoll, .assignToContact]
-
-        present(activityViewController, animated: true, completion: nil)
+        present(globalShieldsActivityController, animated: true, completion: nil)
      }
     
     @objc private func tappedReportSiteButton() {
@@ -369,71 +346,5 @@ class ShieldsViewController: UIViewController, PopoverContentComponent, Themeabl
     @available(*, unavailable)
     required init?(coder aDecoder: NSCoder) {
         fatalError()
-    }
-}
-
-public enum ActivityTypeValue: String, CaseIterable {
-    case whatsapp = "net.whatsapp.WhatsApp.ShareExtension"
-    case slack = "com.tinyspeck.chatlyio.share"
-    case gmail = "com.google.Gmail.ShareExtension"
-    case instagram = "com.burbn.instagram.shareextension"
-}
-
-class OptionalTextActivityItemSource: NSObject, UIActivityItemSource {
-    
-    let text: String
-    
-    weak var viewController: UIViewController?
-    
-    init(text: String) {
-        self.text = text
-    }
-    
-    func activityViewControllerPlaceholderItem(_ activityViewController: UIActivityViewController) -> Any {
-        return text
-    }
-    
-    func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
-        let activityValueType = ActivityTypeValue.allCases.first(where: { $0.rawValue == activityType?.rawValue })
-        
-        if activityValueType != nil {
-            return nil
-        } else {
-            return text
-        }
-    }
-}
-
-class ImageActivityItemSource: NSObject, UIActivityItemSource {
-    let image: UIImage
-    let imageWithText: UIImage
-    
-    init(image: UIImage, imageWithText: UIImage) {
-        self.image = image
-        self.imageWithText = imageWithText
-    }
-    
-    func activityViewControllerPlaceholderItem(_ activityViewController: UIActivityViewController) -> Any {
-        return image
-    }
-    
-    func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
-        let activityValueType = ActivityTypeValue.allCases.first(where: { $0.rawValue == activityType?.rawValue })
-        
-        if activityValueType != nil {
-            return imageWithText
-        } else {
-            return image
-        }
-    }
-    
-    @available(iOS 13.0, *)
-    func activityViewControllerLinkMetadata(_ activityViewController: UIActivityViewController) -> LPLinkMetadata? {
-        let imageProvider = NSItemProvider(object: image)
-        
-        let metadata = LPLinkMetadata()
-        metadata.imageProvider = imageProvider
-        metadata.title = Strings.SocialSharing.shareDescriptionTitle
-        return metadata
     }
 }
