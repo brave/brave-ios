@@ -86,6 +86,16 @@ class PlaylistManager: NSObject {
         return .invalid
     }
     
+    func sizeOfDownloadedItem(for pageSrc: String) -> String? {
+        if let assetUrl = downloadManager.localAsset(for: pageSrc)?.url, FileManager.default.fileExists(atPath: assetUrl.path), let size = try? FileManager.default.attributesOfItem(atPath: assetUrl.path)[.size] as? Int {
+            let formatter = ByteCountFormatter()
+            formatter.zeroPadsFractionDigits = true
+            formatter.countStyle = .file
+            return formatter.string(fromByteCount: Int64(size))
+        }
+        return ""
+    }
+    
     func reloadData() {
         do {
             try frc.performFetch()

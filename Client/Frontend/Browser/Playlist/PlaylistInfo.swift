@@ -17,6 +17,7 @@ struct PlaylistInfo: Codable {
     let mimeType: String
     let duration: Float
     let detected: Bool
+    let dateAdded: Date
     
     init(item: PlaylistItem) {
         self.name = item.name ?? ""
@@ -25,10 +26,11 @@ struct PlaylistInfo: Codable {
         self.pageTitle = item.pageTitle ?? ""
         self.mimeType = item.mimeType ?? ""
         self.duration = item.duration
+        self.dateAdded = item.dateAdded ?? Date()
         self.detected = false
     }
     
-    init(name: String, src: String, pageSrc: String, pageTitle: String, mimeType: String, duration: Float, detected: Bool) {
+    init(name: String, src: String, pageSrc: String, pageTitle: String, mimeType: String, duration: Float, detected: Bool, dateAdded: Date) {
         self.name = name
         self.src = src
         self.pageSrc = pageSrc
@@ -36,6 +38,7 @@ struct PlaylistInfo: Codable {
         self.mimeType = mimeType
         self.duration = duration
         self.detected = detected
+        self.dateAdded = dateAdded
     }
     
     init(from decoder: Decoder) throws {
@@ -47,6 +50,7 @@ struct PlaylistInfo: Codable {
         self.mimeType = (try? container.decode(String.self, forKey: .mimeType)) ?? ""
         self.duration = (try? container.decode(Float.self, forKey: .duration)) ?? 0.0
         self.detected = (try? container.decode(Bool.self, forKey: .detected)) ?? false
+        self.dateAdded = Date()
     }
     
     static func from(message: WKScriptMessage) -> PlaylistInfo? {
@@ -72,5 +76,6 @@ struct PlaylistInfo: Codable {
         case mimeType
         case duration
         case detected
+        case dateAdded
     }
 }

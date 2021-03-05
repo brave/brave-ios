@@ -267,24 +267,27 @@ extension PlaylistPadListController: UITableViewDataSource {
         if cacheState == .inProgress {
             cell.detailLabel.text = Strings.PlayList.dowloadingLabelTitle
         } else if cacheState == .downloaded {
-            cell.detailLabel.text = "\(formatter.string(from: TimeInterval(item.duration)) ?? "0:00") - \(Strings.PlayList.dowloadedLabelTitle)"
+            if let itemSize = PlaylistManager.shared.sizeOfDownloadedItem(for: item.pageSrc) {
+                cell.detailLabel.text = "\(getRelativeDateFormat(date: item.dateAdded)) - \(itemSize)"
+            } else {
+                cell.detailLabel.text = "\(getRelativeDateFormat(date: item.dateAdded)) - \(Strings.PlayList.dowloadedLabelTitle)"
+            }
         }
         
         //Fixes a duration bug where sometimes the duration is NOT fetched!
         //So when we fetch the thumbnail, the duration will be updated (if possible)
-        cell.loadThumbnail(item: item) { [weak self] newTrackDuration in
+        cell.loadThumbnail(item: item) { newTrackDuration in
             guard let newTrackDuration = newTrackDuration else { return }
             
             if newTrackDuration > 0.0 && item.duration <= 0.0 {
-                cell.detailLabel.text = self?.formatter.string(from: newTrackDuration) ?? "0:00"
-                
                 let newItem = PlaylistInfo(name: item.name,
                                            src: item.src,
                                            pageSrc: item.pageSrc,
                                            pageTitle: item.pageTitle,
                                            mimeType: item.mimeType,
                                            duration: Float(newTrackDuration),
-                                           detected: item.detected)
+                                           detected: item.detected,
+                                           dateAdded: item.dateAdded)
                 Playlist.shared.updateItem(mediaSrc: item.src, item: newItem, completion: {})
             }
         }
@@ -450,6 +453,17 @@ extension PlaylistPadListController: UITableViewDelegate {
 // MARK: - Reordering of cells
 
 extension PlaylistPadListController: UITableViewDragDelegate, UITableViewDropDelegate {
+    private func getRelativeDateFormat(date: Date) -> String {
+        if #available(iOS 13.0, *) {
+            let formatter = RelativeDateTimeFormatter()
+            formatter.unitsStyle = .abbreviated
+            formatter.dateTimeStyle = .numeric
+            return formatter.localizedString(fromTimeInterval: date.timeIntervalSince1970)
+        } else {
+            fatalError("We're dropping iOS 12..")
+        }
+    }
+    
     func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
         return true
     }
@@ -552,13 +566,18 @@ extension PlaylistPadListController: PlaylistManagerDelegate {
             
             let cacheState = PlaylistManager.shared.state(for: id)
             if cacheState == .inProgress {
-                cell.detailLabel.text = "\(Strings.PlayList.dowloadingPercentageLabelTitle) \(Int(percentComplete))%"
+                let item = PlaylistManager.shared.itemAtIndex(index)
+                cell.detailLabel.text = "\(getRelativeDateFormat(date: item.dateAdded)) - \(Strings.PlayList.dowloadingPercentageLabelTitle) \(Int(percentComplete))%"
             } else if cacheState == .downloaded {
                 let item = PlaylistManager.shared.itemAtIndex(index)
-                cell.detailLabel.text = "\(formatter.string(from: TimeInterval(item.duration)) ?? "0:00") - \(Strings.PlayList.dowloadedLabelTitle)"
+                if let itemSize = PlaylistManager.shared.sizeOfDownloadedItem(for: item.pageSrc) {
+                    cell.detailLabel.text = "\(getRelativeDateFormat(date: item.dateAdded)) - \(itemSize)"
+                } else {
+                    cell.detailLabel.text = "\(getRelativeDateFormat(date: item.dateAdded)) - \(Strings.PlayList.dowloadedLabelTitle)"
+                }
             } else {
                 let item = PlaylistManager.shared.itemAtIndex(index)
-                cell.detailLabel.text = formatter.string(from: TimeInterval(item.duration)) ?? "0:00"
+                cell.detailLabel.text = getRelativeDateFormat(date: item.dateAdded)
             }
         }
     }
@@ -568,13 +587,18 @@ extension PlaylistPadListController: PlaylistManagerDelegate {
         let cell = tableView.cellForRow(at: IndexPath(row: index, section: 0)) as? PlaylistCell {
             
             if state == .inProgress {
-                cell.detailLabel.text = Strings.PlayList.dowloadingLabelTitle
+                let item = PlaylistManager.shared.itemAtIndex(index)
+                cell.detailLabel.text = "\(getRelativeDateFormat(date: item.dateAdded)) - \(Strings.PlayList.dowloadingPercentageLabelTitle)"
             } else if state == .downloaded {
                 let item = PlaylistManager.shared.itemAtIndex(index)
-                cell.detailLabel.text = "\(formatter.string(from: TimeInterval(item.duration)) ?? "0:00") - \(Strings.PlayList.dowloadedLabelTitle)"
+                if let itemSize = PlaylistManager.shared.sizeOfDownloadedItem(for: item.pageSrc) {
+                    cell.detailLabel.text = "\(getRelativeDateFormat(date: item.dateAdded)) - \(itemSize)"
+                } else {
+                    cell.detailLabel.text = "\(getRelativeDateFormat(date: item.dateAdded)) - \(Strings.PlayList.dowloadedLabelTitle)"
+                }
             } else {
                 let item = PlaylistManager.shared.itemAtIndex(index)
-                cell.detailLabel.text = formatter.string(from: TimeInterval(item.duration)) ?? "0:00"
+                cell.detailLabel.text = getRelativeDateFormat(date: item.dateAdded)
             }
         }
     }
