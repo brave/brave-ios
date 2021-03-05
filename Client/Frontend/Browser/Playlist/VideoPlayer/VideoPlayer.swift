@@ -188,26 +188,23 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     private func onOverlayTapped(_ gestureRecognizer: UITapGestureRecognizer) {
         if isSeeking {
             showOverlays(true, except: [overlayView, infoView, controlsView.playPauseButton], display: [controlsView.trackBar])
-        } else if isPlaying && !isOverlayDisplayed {
+        } else if (isPlaying && !isOverlayDisplayed) || (!isPlaying && !isSeeking && !isOverlayDisplayed) {
             showOverlays(true)
             isOverlayDisplayed = true
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
+            fadeAnimationWorkItem?.cancel()
+            fadeAnimationWorkItem = DispatchWorkItem(block: { [weak self] in
+                guard let self = self else { return }
                 self.isOverlayDisplayed = false
                 if self.isPlaying && !self.isSeeking {
                     self.showOverlays(false)
                 }
-            }
-        } else if !isPlaying && !isSeeking && !isOverlayDisplayed {
-            showOverlays(true)
-            isOverlayDisplayed = true
+            })
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
-                self.isOverlayDisplayed = false
-                if self.isPlaying && !self.isSeeking {
-                    self.showOverlays(false)
-                }
-            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 5.0, execute: fadeAnimationWorkItem!)
+        } else if isPlaying && isOverlayDisplayed {
+            showOverlays(false)
+            isOverlayDisplayed = false
         } else {
             showOverlays(true)
             isOverlayDisplayed = true
@@ -217,6 +214,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     private func seekDirectionWithAnimation(_ seekBlock: () -> Void) {
         isSeeking = true
         showOverlays(true)
+        isOverlayDisplayed = true
         
         seekBlock()
         
@@ -224,6 +222,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         fadeAnimationWorkItem = DispatchWorkItem(block: {
             self.isSeeking = false
             self.showOverlays(false)
+            self.isOverlayDisplayed = false
         })
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 5.0, execute: fadeAnimationWorkItem!)
@@ -358,6 +357,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         }
         
         showOverlays(false, except: [infoView, controlsView], display: [controlsView])
+        isOverlayDisplayed = true
         
         if let currentItem = player.currentItem {
             let seekTime = CMTimeMakeWithSeconds(Float64(value * CGFloat(currentItem.asset.duration.value) / CGFloat(currentItem.asset.duration.timescale)), preferredTimescale: currentItem.currentTime().timescale)
@@ -374,8 +374,17 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
             wasPlayingBeforeSeeking = false
         }
         
-        showOverlays(false, except: [overlayView], display: [overlayView])
-        overlayView.alpha = 1.0
+        if isPlaying || player.rate > 0.0 {
+            fadeAnimationWorkItem?.cancel()
+            showOverlays(false, except: [overlayView], display: [overlayView])
+            overlayView.alpha = 0.0
+            isOverlayDisplayed = false
+        } else {
+            fadeAnimationWorkItem?.cancel()
+            showOverlays(true)
+            overlayView.alpha = 1.0
+            isOverlayDisplayed = true
+        }
     }
     
     private func registerNotifications() {
@@ -526,6 +535,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
             player.play()
             
             showOverlays(false)
+            isOverlayDisplayed = false
         } else {
             showOverlays(isOverlayDisplayed)
         }
@@ -537,6 +547,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
             player.pause()
             
             showOverlays(true)
+            isOverlayDisplayed = true
         } else {
             showOverlays(isOverlayDisplayed)
         }
@@ -547,6 +558,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         player.pause()
         
         showOverlays(true)
+        isOverlayDisplayed = true
         player.replaceCurrentItem(with: nil)
     }
     
