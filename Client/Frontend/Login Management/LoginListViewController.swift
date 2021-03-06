@@ -269,7 +269,7 @@ extension LoginListViewController: LoginDataSourceObserver {
         loadingStateView.isHidden = true
         tableView.reloadData()
         activeLoginQuery = nil
-        navigationItem.rightBarButtonItem?.isEnabled = loginDataSource.count > 0
+        navigationItem.rightBarButtonItem?.isEnabled = loginDataSource.count > 0 // swiftlint:disable:this empty_count
         restoreSelectedRows()
     }
     
@@ -486,7 +486,7 @@ class LoginDataSource: NSObject, UITableViewDataSource {
     }
 
     fileprivate func computeSectionsFromLogins(_ logins: [Login]) -> Deferred<Maybe<([Character], [Character: [Login]])>> {
-        guard logins.count > 0 else {
+        guard !logins.isEmpty else {
             return deferMaybe( ([Character](), [Character: [Login]]()) )
         }
 

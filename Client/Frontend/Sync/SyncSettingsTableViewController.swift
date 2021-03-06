@@ -122,7 +122,7 @@ class SyncSettingsTableViewController: UITableViewController {
         }
         
         guard device.isCurrentDevice || (!device.isCurrentDevice && device.supportsSelfDelete) else {
-            //See: `BraveSyncDevice.remove()` for more info.
+            // See: `BraveSyncDevice.remove()` for more info.
             return
         }
         
@@ -275,7 +275,7 @@ extension SyncSettingsTableViewController {
                 let devices = try JSONDecoder().decode([BraveSyncDevice].self, from: data)
                 self.devices = devices
                 
-                if self.devices.count <= 0 {
+                if self.devices.count <= 0 { // swiftlint:disable:this empty_count
                     // Technically we shouldn't be calling this function..
                     // If Desktop deletes an iOS device from the chain, we're already removed..
                     // We should be just updating our UI and calling
