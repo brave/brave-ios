@@ -79,13 +79,13 @@ public class HLSThumbnailGenerator {
                             self.snapshotPixelBuffer(buffer, atTime: time.seconds)
                         } else {
                             DispatchQueue.main.async {
-                                self.completion(nil, nil) //Cannot copy pixel-buffer (PBO)
+                                self.completion(nil, nil) // Cannot copy pixel-buffer (PBO)
                             }
                         }
                     }
                 } else {
                     DispatchQueue.main.async {
-                        self.completion(nil, nil) //Failed to seek to specified time
+                        self.completion(nil, nil) // Failed to seek to specified time
                     }
                 }
             }
@@ -110,7 +110,7 @@ public class HLSThumbnailGenerator {
             }
         } else {
             DispatchQueue.main.async {
-                self.completion(nil, nil) //Failed to create image from pixel-buffer frame.
+                self.completion(nil, nil) // Failed to create image from pixel-buffer frame.
             }
         }
     }

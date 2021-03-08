@@ -159,7 +159,7 @@ extension PlaylistMediaInfo: MPPlayableContentDelegate {
                 
                 self.webLoader = PlaylistWebLoader(handler: { [weak self] newItem in
                     guard let self = self else { return }
-                    //item.duration == newItem.duration TODO: FIX ADS!
+                    // item.duration == newItem.duration TODO: FIX ADS!
                     if let newItem = newItem, let url = URL(string: newItem.src) {
                         self.playerView?.load(url: url, resourceDelegate: nil, autoPlayEnabled: autoPlayEnabled)
 
@@ -317,13 +317,13 @@ class MediaResourceManager: NSObject, AVAssetResourceLoaderDelegate {
     
     func resourceLoader(_ resourceLoader: AVAssetResourceLoader, shouldWaitForLoadingOfRequestedResource loadingRequest: AVAssetResourceLoadingRequest) -> Bool {
 
-        //Load the content information..
+        // Load the content information..
         if let contentRequest = loadingRequest.contentInformationRequest {
             guard let requestURL = loadingRequest.request.url else { return false }
             guard MediaResourceManager.isShimmedURL(requestURL) else { return false }
             let originalURL = MediaResourceManager.unShimURL(requestURL)
             
-            //Request for byte-ranges..
+            // Request for byte-ranges..
             let request: URLRequest = {
                 let offset = loadingRequest.dataRequest?.currentOffset ?? 0
                 let length = loadingRequest.dataRequest?.requestedLength ?? 0
@@ -363,7 +363,7 @@ class MediaResourceManager: NSObject, AVAssetResourceLoaderDelegate {
                     return
                 }
                 
-                //loadingRequest.dataRequest?.respond(with: data!)
+                // loadingRequest.dataRequest?.respond(with: data!)
                 loadingRequest.finishLoading()
             }.resume()
             contentInfoRequest = loadingRequest
@@ -375,7 +375,7 @@ class MediaResourceManager: NSObject, AVAssetResourceLoaderDelegate {
             guard MediaResourceManager.isShimmedURL(requestURL) else { return false }
             let originalURL = MediaResourceManager.unShimURL(requestURL)
             
-            //Request for byte-ranges..
+            // Request for byte-ranges..
             let request: URLRequest = {
                 let offset = dataRequest.currentOffset
                 let length = dataRequest.requestedLength
@@ -386,7 +386,7 @@ class MediaResourceManager: NSObject, AVAssetResourceLoaderDelegate {
                 return request
             }()
             
-            //Should use URLSessionDataDelegate to stream instead of downloading all chunks at once..
+            // Should use URLSessionDataDelegate to stream instead of downloading all chunks at once..
             self.session.dataTask(with: request) { [weak self] data, response, error in
                 guard let self = self else { return }
                 
@@ -398,7 +398,6 @@ class MediaResourceManager: NSObject, AVAssetResourceLoaderDelegate {
                 
             }.resume()
             
-            //session.dataTask(with: request).resume()
             dataRequests.append(loadingRequest)
             return true
         }
@@ -471,8 +470,8 @@ extension MediaResourceManager {
         return scheme.hasPrefix("brave-media-resource")
     }
     
-    //Would be nice if AVPlayer could detect the mime-type from the URL for my delegate without a head request..
-    //This function only exists because I can't figure out why videos from URLs don't play unless I explicitly specify a mime-type..
+    // Would be nice if AVPlayer could detect the mime-type from the URL for my delegate without a head request..
+    // This function only exists because I can't figure out why videos from URLs don't play unless I explicitly specify a mime-type..
     public static func canStreamURL(_ url: URL, _ completion: @escaping (Bool) -> Void) {
         getMimeType(url) { mimeType in
             completion(!mimeType.isEmpty)

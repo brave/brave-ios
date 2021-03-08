@@ -251,7 +251,7 @@ extension PlaylistViewController: UITableViewDataSource {
             let formatter = RelativeDateTimeFormatter()
             formatter.unitsStyle = .abbreviated
             formatter.dateTimeStyle = .numeric
-            return formatter.localizedString(fromTimeInterval: date.timeIntervalSince1970)
+            return formatter.localizedString(fromTimeInterval: date.timeIntervalSinceNow)
         } else {
             fatalError("We're dropping iOS 12..")
         }
@@ -283,7 +283,7 @@ extension PlaylistViewController: UITableViewDataSource {
         cell.do {
             $0.selectionStyle = .none
             $0.titleLabel.text = item.name
-            $0.detailLabel.text = formatter.string(from: TimeInterval(item.duration)) ?? "0:00"
+            $0.detailLabel.text = ""
             $0.contentView.backgroundColor = .clear
             $0.backgroundColor = .clear
             $0.thumbnailImage = nil
@@ -298,6 +298,8 @@ extension PlaylistViewController: UITableViewDataSource {
             } else {
                 cell.detailLabel.text = "\(getRelativeDateFormat(date: item.dateAdded)) - \(Strings.PlayList.dowloadedLabelTitle)"
             }
+        } else {
+            cell.detailLabel.text = getRelativeDateFormat(date: item.dateAdded)
         }
         
         // Fixes a duration bug where sometimes the duration is NOT fetched!
@@ -717,14 +719,14 @@ extension PlaylistViewController: AVPlayerViewControllerDelegate, AVPictureInPic
     
     func pictureInPictureControllerDidStartPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
         DispatchQueue.main.async {
-            //self.playerView.detachLayer()
+            // self.playerView.detachLayer()
             self.dismiss(animated: true, completion: nil)
         }
     }
     
     func pictureInPictureControllerDidStopPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
         if let delegate = UIApplication.shared.delegate as? AppDelegate {
-            //playerView.attachLayer()
+            // playerView.attachLayer()
             delegate.playlistRestorationController = nil
         }
     }

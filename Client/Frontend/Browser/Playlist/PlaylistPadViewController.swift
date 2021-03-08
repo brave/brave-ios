@@ -272,10 +272,12 @@ extension PlaylistPadListController: UITableViewDataSource {
             } else {
                 cell.detailLabel.text = "\(getRelativeDateFormat(date: item.dateAdded)) - \(Strings.PlayList.dowloadedLabelTitle)"
             }
+        } else {
+            cell.detailLabel.text = getRelativeDateFormat(date: item.dateAdded)
         }
         
-        //Fixes a duration bug where sometimes the duration is NOT fetched!
-        //So when we fetch the thumbnail, the duration will be updated (if possible)
+        // Fixes a duration bug where sometimes the duration is NOT fetched!
+        // So when we fetch the thumbnail, the duration will be updated (if possible)
         cell.loadThumbnail(item: item) { newTrackDuration in
             guard let newTrackDuration = newTrackDuration else { return }
             
@@ -458,7 +460,7 @@ extension PlaylistPadListController: UITableViewDragDelegate, UITableViewDropDel
             let formatter = RelativeDateTimeFormatter()
             formatter.unitsStyle = .abbreviated
             formatter.dateTimeStyle = .numeric
-            return formatter.localizedString(fromTimeInterval: date.timeIntervalSince1970)
+            return formatter.localizedString(fromTimeInterval: date.timeIntervalSinceNow)
         } else {
             fatalError("We're dropping iOS 12..")
         }

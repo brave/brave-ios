@@ -31,7 +31,7 @@ class DataURIParser {
         mediaType = headers.first ?? "text/plain"
         
         let dataSegment = uri.index(infoSegment, offsetBy: 1)
-        //data = try! Data(contentsOf: URL(string: uri)!)
+        // data = try! Data(contentsOf: URL(string: uri)!)
         data = Data(base64Encoded: String(uri[dataSegment..<uri.endIndex])) ?? Data()
     }
 }

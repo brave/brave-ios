@@ -67,7 +67,7 @@ public class PlaylistDownloadManager: PlaylistStreamDownloadManagerDelegate {
     }
     
     func restoreSession(_ completion: @escaping () -> Void) {
-        //Called from AppDelegate to restore pending downloads
+        // Called from AppDelegate to restore pending downloads
         guard !didRestoreSession else { return }
         didRestoreSession = true
         
@@ -403,7 +403,7 @@ private class PlaylistFileDownloadManager: NSObject, URLSessionDownloadDelegate 
             
             var fileExtension = ""
             
-            //Detect based on Content-Type header.
+            // Detect based on Content-Type header.
             if let contentType = response.allHeaderFields["Content-Type"] as? String {
                 let detectedExtension = PlaylistMimeTypeDetector(mimeType: contentType).fileExtension
                 if !detectedExtension.isEmpty {
@@ -411,7 +411,7 @@ private class PlaylistFileDownloadManager: NSObject, URLSessionDownloadDelegate 
                 }
             }
             
-            //Detect based on Data.
+            // Detect based on Data.
             if fileExtension.isEmpty {
                 if let data = try? Data(contentsOf: location, options: .mappedIfSafe) {
                     let detectedExtension = PlaylistMimeTypeDetector(data: data).fileExtension
@@ -421,8 +421,8 @@ private class PlaylistFileDownloadManager: NSObject, URLSessionDownloadDelegate 
                 }
             }
             
-            //Couldn't determine file type so we assume mp4 which is the most widely used container.
-            //If it doesn't work, the video/audio just won't play anyway.
+            // Couldn't determine file type so we assume mp4 which is the most widely used container.
+            // If it doesn't work, the video/audio just won't play anyway.
             if fileExtension.isEmpty {
                 fileExtension = "mp4"
             }
