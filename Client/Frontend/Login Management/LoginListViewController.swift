@@ -269,7 +269,7 @@ extension LoginListViewController: LoginDataSourceObserver {
         loadingStateView.isHidden = true
         tableView.reloadData()
         activeLoginQuery = nil
-        navigationItem.rightBarButtonItem?.isEnabled = loginDataSource.count > 0 // swiftlint:disable:this empty_count
+        navigationItem.rightBarButtonItem?.isEnabled = loginDataSource.count > 0
         restoreSelectedRows()
     }
     

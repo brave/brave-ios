@@ -188,7 +188,7 @@ extension Domain {
         do {
             let results = try context.fetch(fetchRequest)
             results.forEach {
-                if let bms = $0.bookmarks, bms.count > 0 { // swiftlint:disable:this empty_count
+                if let bms = $0.bookmarks, bms.count > 0 {
                     // Clear visit count
                     $0.visits = 0
                 } else {
