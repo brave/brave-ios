@@ -94,8 +94,13 @@ class SimpleShieldsView: UIView, Themeable {
             $0.isAccessibilityElement = false
         }
         
-        let infoButton = Button().then { //#imageLiteral(resourceName: "shields-help")
-            $0.setImage(#imageLiteral(resourceName: "shields-help").template, for: .normal)
+        let infoButton = Button().then {
+            // Share UI only exist in locale JP
+            if Locale.current.regionCode == "JP" {
+                $0.setImage(#imageLiteral(resourceName: "shields-help").template, for: .normal)
+            } else {
+                $0.setImage(UIImage(imageLiteralResourceName: "shields-help-colored"), for: .normal)
+            }
             $0.hitTestSlop = UX.hitBoxEdgeInsets
             $0.imageEdgeInsets = .zero
             $0.titleEdgeInsets = .zero
