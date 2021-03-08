@@ -285,9 +285,9 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
                 self.delegate?.onPictureInPicture(enabled: false)
                 pictureInPictureController.stopPictureInPicture()
             } else {
-                if #available(iOS 14.2, *) {
+                /*if #available(iOS 14.2, *) {
                     pictureInPictureController.canStartPictureInPictureAutomaticallyFromInline = true
-                }
+                }*/
                 
                 if #available(iOS 14.0, *) {
                     pictureInPictureController.requiresLinearPlayback = false
