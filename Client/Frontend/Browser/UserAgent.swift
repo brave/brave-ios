@@ -15,9 +15,6 @@ struct UserAgent {
     }
     
     static var shouldUseDesktopMode: Bool {
-        // Unfortunately this preference is set to true even for iOS 12 iPads.
-        // Which means we should avoid looking at it directly and always use this helper
-        // to determine if desktop mode should be used.
         if UIDevice.isIpad {
             return Preferences.General.alwaysRequestDesktopSite.value
         }
