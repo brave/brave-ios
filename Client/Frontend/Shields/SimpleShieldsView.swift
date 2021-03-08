@@ -41,7 +41,7 @@ class SimpleShieldsView: UIView, Themeable {
     class BlockCountView: UIView, Themeable {
         
         private struct UX {
-            static let descriptionEdgeInset = UIEdgeInsets(top: 13, left: 22, bottom: 14, right: 22)
+            static let descriptionEdgeInset = UIEdgeInsets(top: 13, left: 16, bottom: 14, right: 16)
             static let iconEdgeInset = UIEdgeInsets(top: 22, left: 14, bottom: 22, right: 14)
             static let hitBoxEdgeInsets = UIEdgeInsets(top: -10, left: -10, bottom: -10, right: -10)
             static let buttonEdgeInsets = UIEdgeInsets(top: -2, left: 4, bottom: -3, right: 4)
@@ -52,7 +52,7 @@ class SimpleShieldsView: UIView, Themeable {
         }
 
         let descriptionStackView = ShieldsStackView(edgeInsets: UX.descriptionEdgeInset).then {
-            $0.spacing = 24
+            $0.spacing = 16
         }
         
         let descriptionStackView2 = ShieldsStackView(edgeInsets: UX.descriptionEdgeInset).then {
@@ -206,7 +206,7 @@ class SimpleShieldsView: UIView, Themeable {
             $0.axis = .vertical
             $0.spacing = 16
             $0.alignment = .center
-            $0.layoutMargins = UIEdgeInsets(top: 24, left: 24, bottom: 24, right: 24)
+            $0.layoutMargins = UIEdgeInsets(top: 24, left: 12, bottom: 24, right: 12)
             $0.isLayoutMarginsRelativeArrangement = true
         }
         

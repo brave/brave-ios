@@ -65,57 +65,53 @@ extension BrowserViewController {
     }
     
     private func presentEducationalProductNotifications() {
-//        guard let selectedTab = tabManager.selectedTab,
-//              !benchmarkNotificationPresented,
-//              !topToolbar.inOverlayMode else {
-//            return
-//        }
-        
-        guard let selectedTab = tabManager.selectedTab else {
+        guard let selectedTab = tabManager.selectedTab,
+              !benchmarkNotificationPresented,
+              !topToolbar.inOverlayMode else {
             return
         }
         
-//        let contentBlockerStats = selectedTab.contentBlocker.stats
-//
-//        // Step 1: First Time Block Notification
-//        if !Preferences.ProductNotificationBenchmarks.firstTimeBlockingShown.value,
-//           contentBlockerStats.total > 0 {
-//
-//            notifyFirstTimeBlock(theme: Theme.of(selectedTab))
-//            Preferences.ProductNotificationBenchmarks.firstTimeBlockingShown.value = true
-//
-//            return
-//        }
-//
-//        // Step 2: Load a video on a streaming site
-//        if !Preferences.ProductNotificationBenchmarks.videoAdBlockShown.value,
-//           selectedTab.url?.isVideoSteamingSiteURL == true {
-//
-//            notifyVideoAdsBlocked(theme: Theme.of(selectedTab))
-//            Preferences.ProductNotificationBenchmarks.videoAdBlockShown.value = true
-//
-//            return
-//        }
-//
-//        // Step 3: Pre-determined # of Trackers and Ads Blocked
-//        if !Preferences.ProductNotificationBenchmarks.privacyProtectionBlockShown.value,
-//           contentBlockerStats.total > benchmarkNumberOfTrackers {
-//
-//            notifyPrivacyProtectBlock(theme: Theme.of(selectedTab))
-//            Preferences.ProductNotificationBenchmarks.privacyProtectionBlockShown.value = true
-//
-//            return
-//        }
-//
-//        // Step 4: Https Upgrade
-//        if !Preferences.ProductNotificationBenchmarks.httpsUpgradeShown.value,
-//           contentBlockerStats.httpsCount > 0 {
-//
-//            notifyHttpsUpgrade(theme: Theme.of(selectedTab))
-//            Preferences.ProductNotificationBenchmarks.httpsUpgradeShown.value = true
-//
-//            return
-//        }
+        let contentBlockerStats = selectedTab.contentBlocker.stats
+
+        // Step 1: First Time Block Notification
+        if !Preferences.ProductNotificationBenchmarks.firstTimeBlockingShown.value,
+           contentBlockerStats.total > 0 {
+
+            notifyFirstTimeBlock(theme: Theme.of(selectedTab))
+            Preferences.ProductNotificationBenchmarks.firstTimeBlockingShown.value = true
+
+            return
+        }
+
+        // Step 2: Load a video on a streaming site
+        if !Preferences.ProductNotificationBenchmarks.videoAdBlockShown.value,
+           selectedTab.url?.isVideoSteamingSiteURL == true {
+
+            notifyVideoAdsBlocked(theme: Theme.of(selectedTab))
+            Preferences.ProductNotificationBenchmarks.videoAdBlockShown.value = true
+
+            return
+        }
+
+        // Step 3: Pre-determined # of Trackers and Ads Blocked
+        if !Preferences.ProductNotificationBenchmarks.privacyProtectionBlockShown.value,
+           contentBlockerStats.total > benchmarkNumberOfTrackers {
+
+            notifyPrivacyProtectBlock(theme: Theme.of(selectedTab))
+            Preferences.ProductNotificationBenchmarks.privacyProtectionBlockShown.value = true
+
+            return
+        }
+
+        // Step 4: Https Upgrade
+        if !Preferences.ProductNotificationBenchmarks.httpsUpgradeShown.value,
+           contentBlockerStats.httpsCount > 0 {
+
+            notifyHttpsUpgrade(theme: Theme.of(selectedTab))
+            Preferences.ProductNotificationBenchmarks.httpsUpgradeShown.value = true
+
+            return
+        }
         
         // Step 5: Share Brave Benchmark Tiers
         let numOfTrackerAds = BraveGlobalShieldStats.shared.adblock + BraveGlobalShieldStats.shared.trackingProtection

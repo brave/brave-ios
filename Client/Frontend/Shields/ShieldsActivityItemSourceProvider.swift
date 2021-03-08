@@ -4,6 +4,8 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import LinkPresentation
+import BraveShared
+import BraveUI
 import Shared
 
 // MARK: - ActivityTypeValue
@@ -38,12 +40,12 @@ final class ShieldsActivityItemSourceProvider {
                                  size: CGSize(width: statsView.frame.width, height: statsView.frame.height))
         
         let snapshotImage = statsView.snapshot
-        let snapshotImageWithText = contentView.snapshot.textToImage(drawText: Strings.SocialSharing.shareDescriptionTitle,
+        let snapshotImageWithText = contentView.snapshot.textToImage(drawText: Strings.ShieldEducation.shareDescriptionTitle,
                                                                      atPoint: CGPoint(x: 0, y: statsView.frame.height + 20)) ?? snapshotImage
 
         let activityViewController = UIActivityViewController(activityItems: [ImageActivityItemSource(image: snapshotImage,
                                                                                                       imageWithText: snapshotImageWithText),
-                                                                              OptionalTextActivityItemSource(text: Strings.SocialSharing.shareDescriptionTitle)],
+                                                                              OptionalTextActivityItemSource(text: Strings.ShieldEducation.shareDescriptionTitle)],
                                                               applicationActivities: nil)
         
         activityViewController.excludedActivityTypes = [.openInIBooks, .saveToCameraRoll, .assignToContact]
@@ -111,7 +113,7 @@ class ImageActivityItemSource: NSObject, UIActivityItemSource {
         
         let metadata = LPLinkMetadata()
         metadata.imageProvider = imageProvider
-        metadata.title = Strings.SocialSharing.shareDescriptionTitle
+        metadata.title = Strings.ShieldEducation.shareDescriptionTitle
         return metadata
     }
 }
