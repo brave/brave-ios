@@ -113,18 +113,21 @@ extension BrowserViewController {
             return
         }
         
-        // Step 5: Share Brave Benchmark Tiers
-        let numOfTrackerAds = BraveGlobalShieldStats.shared.adblock + BraveGlobalShieldStats.shared.trackingProtection
-        let existingTierList = BenchmarkTrackerCountTier.allCases.filter({ numOfTrackerAds < $0.rawValue })
-        
-        if !existingTierList.isEmpty {
-            for tier in existingTierList where Preferences.ProductNotificationBenchmarks.trackerTierCount.value < numOfTrackerAds {
-                if let nextTier = tier.nextTier {
-                    Preferences.ProductNotificationBenchmarks.trackerTierCount.value = nextTier.rawValue
+        // Benchmark Tier Pop-Over only exist in JP locale
+        if Locale.current.regionCode == "JP" {
+            // Step 5: Share Brave Benchmark Tiers
+            let numOfTrackerAds = BraveGlobalShieldStats.shared.adblock + BraveGlobalShieldStats.shared.trackingProtection
+            let existingTierList = BenchmarkTrackerCountTier.allCases.filter({ numOfTrackerAds < $0.rawValue })
+            
+            if !existingTierList.isEmpty {
+                for tier in existingTierList where Preferences.ProductNotificationBenchmarks.trackerTierCount.value < numOfTrackerAds {
+                    if let nextTier = tier.nextTier {
+                        Preferences.ProductNotificationBenchmarks.trackerTierCount.value = nextTier.rawValue
+                    }
+                    
+                    self.notifyTrackerAdsCount(tier.rawValue, theme: Theme.of(selectedTab))
+                    break
                 }
-                
-                self.notifyTrackerAdsCount(tier.rawValue, theme: Theme.of(selectedTab))
-                break
             }
         }
     }

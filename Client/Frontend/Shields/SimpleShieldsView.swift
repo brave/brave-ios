@@ -46,6 +46,13 @@ class SimpleShieldsView: UIView, Themeable {
             static let hitBoxEdgeInsets = UIEdgeInsets(top: -10, left: -10, bottom: -10, right: -10)
             static let buttonEdgeInsets = UIEdgeInsets(top: -2, left: 4, bottom: -3, right: 4)
         }
+        
+        let stackView = UIStackView().then {
+            $0.spacing = 12
+            $0.alignment = .center
+            $0.layoutMargins = UIEdgeInsets(top: 0, left: 40, bottom: 0, right: 40)
+            $0.isLayoutMarginsRelativeArrangement = true
+        }
 
         let contentStackView = UIStackView().then {
             $0.spacing = 2
@@ -75,6 +82,11 @@ class SimpleShieldsView: UIView, Themeable {
                     string: Strings.Shields.blockedCountLabel,
                     attributes: [.font: UIFont.systemFont(ofSize: 13.0)]
                 )
+                // Share UI only exist in locale JP
+                if Locale.current.regionCode != "JP" {
+                    let attachment = ViewTextAttachment(view: self.infoButton)
+                    string.append(NSAttributedString(attachment: attachment))
+                }
                 return string
             }()
             $0.backgroundColor = .clear
@@ -82,16 +94,20 @@ class SimpleShieldsView: UIView, Themeable {
             $0.isAccessibilityElement = false
         }
         
-        let infoButton = Button().then {
+        let infoButton = Button().then { //#imageLiteral(resourceName: "shields-help")
             $0.setImage(#imageLiteral(resourceName: "shields-help").template, for: .normal)
             $0.hitTestSlop = UX.hitBoxEdgeInsets
             $0.imageEdgeInsets = .zero
             $0.titleEdgeInsets = .zero
             $0.contentEdgeInsets = UIEdgeInsets(top: -2, left: 4, bottom: -3, right: 4)
-            $0.contentMode = .scaleAspectFit
-            $0.setContentHuggingPriority(.required, for: .horizontal)
-            $0.setContentCompressionResistancePriority(.required, for: .horizontal)
-            $0.accessibilityLabel = Strings.Shields.aboutBraveShieldsTitle
+            
+            // Share UI only exist in locale JP
+            if Locale.current.regionCode == "JP" {
+                $0.contentMode = .scaleAspectFit
+                $0.setContentHuggingPriority(.required, for: .horizontal)
+                $0.setContentCompressionResistancePriority(.required, for: .horizontal)
+                $0.accessibilityLabel = Strings.Shields.aboutBraveShieldsTitle
+            }
         }
         
         let shareButton = Button().then {
@@ -113,24 +129,34 @@ class SimpleShieldsView: UIView, Themeable {
             accessibilityTraits.insert(.button)
             accessibilityHint = Strings.Shields.blockedInfoButtonAccessibilityLabel
             
-            addSubview(contentStackView)
+            // Share UI only exist in locale JP
+            if Locale.current.regionCode == "JP" {
+                addSubview(contentStackView)
 
-            contentStackView.addStackViewItems(
-                .view(descriptionStackView),
-                .view(infoStackView),
-                .view(shareStackView)
-            )
+                contentStackView.addStackViewItems(
+                    .view(descriptionStackView),
+                    .view(infoStackView),
+                    .view(shareStackView)
+                )
 
-            descriptionStackView.addStackViewItems(
-                .view(countLabel),
-                .view(descriptionLabel)
-            )
+                descriptionStackView.addStackViewItems(
+                    .view(countLabel),
+                    .view(descriptionLabel)
+                )
 
-            infoStackView.addArrangedSubview(infoButton)
-            shareStackView.addArrangedSubview(shareButton)
+                infoStackView.addArrangedSubview(infoButton)
+                shareStackView.addArrangedSubview(shareButton)
 
-            contentStackView.snp.makeConstraints {
-                $0.edges.equalToSuperview()
+                contentStackView.snp.makeConstraints {
+                    $0.edges.equalToSuperview()
+                }
+            } else {
+                addSubview(stackView)
+                stackView.addArrangedSubview(countLabel)
+                stackView.addArrangedSubview(descriptionLabel)
+                stackView.snp.makeConstraints {
+                    $0.edges.equalToSuperview()
+                }
             }
         }
         
@@ -154,16 +180,23 @@ class SimpleShieldsView: UIView, Themeable {
         }
         
         func applyTheme(_ theme: Theme) {
-            let contentBackgroundColor = theme.isDark ? UIColor(rgb: 0x303443) : Colors.neutral000
-            descriptionStackView.addBackground(color: contentBackgroundColor, cornerRadius: 6.0)
-            infoStackView.addBackground(color: contentBackgroundColor, cornerRadius: 6.0)
-            shareStackView.addBackground(color: contentBackgroundColor, cornerRadius: 6.0)
-
             countLabel.appearanceTextColor = theme.isDark ? .white : .black
             descriptionLabel.appearanceTextColor = theme.isDark ? .white : .black
+            
+            // Share UI only exist in locale JP
+            if Locale.current.regionCode == "JP" {
+                let contentBackgroundColor = theme.isDark ? UIColor(rgb: 0x303443) : Colors.neutral000
+                descriptionStackView.addBackground(color: contentBackgroundColor, cornerRadius: 6.0)
+                infoStackView.addBackground(color: contentBackgroundColor, cornerRadius: 6.0)
+                shareStackView.addBackground(color: contentBackgroundColor, cornerRadius: 6.0)
+                shareButton.appearanceTintColor = theme.isDark ? . white : .black
+                infoButton.appearanceTintColor = theme.isDark ? .white : .black
+            } else {
+                infoButton.tintColor = theme.isDark ?
+                    Colors.orange400 :
+                    Colors.orange500
+            }
 
-            infoButton.appearanceTintColor = theme.isDark ? .white : .black
-            shareButton.appearanceTintColor = theme.isDark ? . white : .black
         }
     }
     
