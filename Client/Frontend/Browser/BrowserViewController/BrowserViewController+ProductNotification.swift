@@ -72,14 +72,14 @@ extension BrowserViewController {
         }
         
         let contentBlockerStats = selectedTab.contentBlocker.stats
-
+        
         // Step 1: First Time Block Notification
         if !Preferences.ProductNotificationBenchmarks.firstTimeBlockingShown.value,
            contentBlockerStats.total > 0 {
-
+            
             notifyFirstTimeBlock(theme: Theme.of(selectedTab))
             Preferences.ProductNotificationBenchmarks.firstTimeBlockingShown.value = true
-
+            
             return
         }
 
@@ -92,17 +92,17 @@ extension BrowserViewController {
 
             return
         }
-
+        
         // Step 3: Pre-determined # of Trackers and Ads Blocked
         if !Preferences.ProductNotificationBenchmarks.privacyProtectionBlockShown.value,
            contentBlockerStats.total > benchmarkNumberOfTrackers {
-
+            
             notifyPrivacyProtectBlock(theme: Theme.of(selectedTab))
             Preferences.ProductNotificationBenchmarks.privacyProtectionBlockShown.value = true
 
             return
         }
-
+        
         // Step 4: Https Upgrade
         if !Preferences.ProductNotificationBenchmarks.httpsUpgradeShown.value,
            contentBlockerStats.httpsCount > 0 {
