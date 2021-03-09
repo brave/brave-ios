@@ -297,7 +297,7 @@ private class ListController: UIViewController {
             // If the player view is in fullscreen, we should NOT change the tableView layout on rotation.
             view.addSubview(playerView)
             if !playerView.isFullscreen {
-                if UIDevice.current.orientation.isLandscape {
+                if UIDevice.current.orientation.isLandscape && UIDevice.isPhone {
                     playerView.setFullscreenButtonHidden(true)
                     playerView.snp.remakeConstraints {
                         $0.edges.equalTo(view.safeArea.edges)
@@ -809,7 +809,7 @@ extension ListController: VideoViewDelegate {
     }
     
     func onFullScreen() {
-        if !UIDevice.isIpad {
+        if !UIDevice.isIpad || splitViewController?.isCollapsed == true {
             navigationController?.setNavigationBarHidden(true, animated: true)
             tableView.isHidden = true
             playerView.snp.remakeConstraints {
@@ -821,7 +821,7 @@ extension ListController: VideoViewDelegate {
     }
     
     func onExitFullScreen() {
-        if UIDevice.isIpad {
+        if UIDevice.isIpad && splitViewController?.isCollapsed == false {
             (splitViewController?.parent as? PlaylistViewController)?.onExitFullscreen()
         } else if UIDevice.current.orientation.isPortrait {
             navigationController?.setNavigationBarHidden(false, animated: true)
