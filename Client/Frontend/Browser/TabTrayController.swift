@@ -26,15 +26,7 @@ struct TabTrayControllerUX {
     static let menuFixedWidth: CGFloat = 320
 }
 
-private struct LightTabCellUX {
-    static let tabTitleTextColor = UIColor.black
-}
-
-private struct DarkTabCellUX {
-    static let tabTitleTextColor = UIColor.Photon.white100
-}
-
-protocol TabCellDelegate: class {
+protocol TabCellDelegate: AnyObject {
     func tabCellDidClose(_ cell: TabCell)
 }
 
@@ -71,7 +63,6 @@ class TabCell: UICollectionViewCell, Themeable {
         self.screenshotView.isUserInteractionEnabled = false
         self.screenshotView.alignLeft = true
         self.screenshotView.alignTop = true
-        screenshotView.backgroundColor = UIConstants.appBackgroundColor
 
         self.favicon.backgroundColor = UIColor.clear
         self.favicon.layer.cornerRadius = 2.0
@@ -81,7 +72,7 @@ class TabCell: UICollectionViewCell, Themeable {
         self.titleLabel.isUserInteractionEnabled = false
         self.titleLabel.numberOfLines = 1
         self.titleLabel.font = DynamicFontHelper.defaultHelper.DefaultSmallFontBold
-        self.titleLabel.textColor = LightTabCellUX.tabTitleTextColor
+        self.titleLabel.textColor = .black
         self.titleLabel.backgroundColor = .clear
 
         self.closeButton = UIButton()
@@ -95,7 +86,6 @@ class TabCell: UICollectionViewCell, Themeable {
         self.animator = SwipeAnimator(animatingView: self)
         self.closeButton.addTarget(self, action: #selector(close), for: .touchUpInside)
 
-        layer.borderColor = UIColor.Photon.grey90A20.cgColor
         layer.borderWidth = TabTrayControllerUX.defaultBorderWidth
         layer.cornerRadius = TabTrayControllerUX.cornerRadius
         
@@ -134,7 +124,7 @@ class TabCell: UICollectionViewCell, Themeable {
         backgroundHolder.frame = CGRect(x: margin, y: margin, width: frame.width, height: frame.height)
         screenshotView.frame = CGRect(size: backgroundHolder.frame.size)
 
-        titleBackgroundView.snp.makeConstraints { (make) in
+        titleBackgroundView.snp.makeConstraints { make in
             make.top.left.right.equalTo(backgroundHolder)
             make.height.equalTo(TabTrayControllerUX.textBoxHeight + 15.0)
         }
@@ -145,7 +135,7 @@ class TabCell: UICollectionViewCell, Themeable {
             make.size.equalTo(TabTrayControllerUX.faviconSize)
         }
 
-        titleLabel.snp.makeConstraints { (make) in
+        titleLabel.snp.makeConstraints { make in
             make.leading.equalTo(favicon.snp.trailing).offset(6)
             make.trailing.equalTo(closeButton.snp.leading).offset(-6)
             make.centerY.equalTo(favicon)
@@ -188,20 +178,23 @@ class TabCell: UICollectionViewCell, Themeable {
 
     @objc
     func close() {
-        self.animator.closeWithoutGesture()
+        animator.closeWithoutGesture()
     }
     
     func applyTheme(_ theme: Theme) {
         styleChildren(theme: theme)
-        
-        // TabCell doesn't use much theming atm, using non-themable values for some views here.
+
         titleLabel.appearanceTextColor = .black
-        screenshotView.backgroundColor = backgroundHolder.backgroundColor
+        screenshotView.backgroundColor = theme.colors.home
         favicon.tintColor = theme.colors.tints.home
+
+        layer.borderColor = theme.colors.border
+            .withAlphaComponent(theme.colors.transparencies.borderAlpha)
+            .cgColor
     }
 }
 
-protocol TabTrayDelegate: class {
+protocol TabTrayDelegate: AnyObject {
     func tabTrayDidDismiss(_ tabTray: TabTrayController)
     func tabTrayDidAddTab(_ tabTray: TabTrayController, tab: Tab)
     func tabTrayDidAddBookmark(_ tab: Tab)
