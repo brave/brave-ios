@@ -285,7 +285,7 @@ private class ListController: UIViewController {
     
     @objc
     private func onExit(_ button: UIBarButtonItem) {
-        self.dismiss(animated: true, completion: nil)
+        dismiss(animated: true, completion: nil)
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -384,10 +384,6 @@ extension ListController: UITableViewDataSource {
         } else {
             fatalError("We're dropping iOS 12..")
         }
-    }
-    
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -1124,7 +1120,7 @@ private class DetailController: UIViewController, UIGestureRecognizerDelegate {
         
     @objc
     private func onExit(_ button: UIBarButtonItem) {
-        self.dismiss(animated: true, completion: nil)
+        dismiss(animated: true, completion: nil)
     }
     
     @objc

@@ -98,8 +98,8 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         }
 
         // Setup
-        self.backgroundColor = .black
-        self.playerLayer.player = self.player
+        backgroundColor = .black
+        playerLayer.player = self.player
 
         infoView.pictureInPictureButton.addTarget(self, action: #selector(onPictureInPicture(_:)), for: .touchUpInside)
         infoView.fullscreenButton.addTarget(self, action: #selector(onFullscreen(_:)), for: .touchUpInside)

@@ -1135,7 +1135,7 @@ extension Strings {
                               comment: "Text indicator on the table cell while downloading a video")
         
         public static let dowloadingPercentageLabelTitle =
-            NSLocalizedString("playList.dowloadingLabelTitle",
+            NSLocalizedString("playList.dowloadingPercentageLabelTitle",
                               bundle: .braveShared,
                               value: "Downloading:",
                               comment: "Text indicator on the table cell while downloading a video")
@@ -1294,13 +1294,13 @@ extension Strings {
             NSLocalizedString("playlist.playlistAutoDownloadOptionOn",
                               bundle: .braveShared,
                               value: "On",
-                              comment: "Option Text for Auto Download On Option")
+                              comment: "Auto Download turn On Option")
         
         public static let playlistAutoDownloadOptionOff =
             NSLocalizedString("playlist.playlistAutoDownloadOptionOff",
                               bundle: .braveShared,
                               value: "Off",
-                              comment: "Option Text for Auto Download Off Option")
+                              comment: "Auto Download turn Off Option")
         
         public static let playlistAutoDownloadOptionOnlyWifi =
             NSLocalizedString("playlist.playlistAutoDownloadOptionOnlyWifi",
