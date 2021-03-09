@@ -130,7 +130,7 @@ extension PlaylistViewController: UISplitViewControllerDelegate {
         listController.updateLayoutForMode(.iPadLayout)
         detailController.setVideoPlayer(listController.playerView)
         detailController.updateLayoutForMode(.iPadLayout)
-        return detailController
+        return detailController.navigationController
     }
 }
 
