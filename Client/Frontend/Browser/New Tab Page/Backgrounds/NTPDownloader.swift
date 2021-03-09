@@ -275,7 +275,7 @@ class NTPDownloader {
             }
             
             let metadata = try Data(contentsOf: metadataFileURL)
-            if NTPDownloader.isCampaignEnded(data: metadata) {
+            if Self.isCampaignEnded(data: metadata) {
                 try self.removeCampaign(type: type)
                 return nil
             }
@@ -392,7 +392,7 @@ class NTPDownloader {
                 return completion(nil, nil, .metadataError("Invalid \(type.resourceName) for NTP Download"))
             }
             
-            if NTPDownloader.isCampaignEnded(data: data) {
+            if Self.isCampaignEnded(data: data) {
                 return completion(nil, nil, .campaignEnded)
             }
             
