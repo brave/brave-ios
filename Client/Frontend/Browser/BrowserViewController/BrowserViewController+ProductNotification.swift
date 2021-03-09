@@ -16,13 +16,13 @@ extension BrowserViewController {
     enum BenchmarkTrackerCountTier: Int, Equatable, CaseIterable {
         case specialTier = 1000
         case newbieExclusiveTier = 5000
-        case casualExclusiveTier = 10000
-        case regularExclusiveTier = 25000
-        case expertExclusiveTier = 75000
-        case professionalTier = 100000
-        case primeTier = 250000
-        case grandTier = 500000
-        case legendaryTier = 1000000
+        case casualExclusiveTier = 10_000
+        case regularExclusiveTier = 25_000
+        case expertExclusiveTier = 75_000
+        case professionalTier = 100_000
+        case primeTier = 250_000
+        case grandTier = 500_000
+        case legendaryTier = 1_000_000
 
         var title: String {
             switch self {
@@ -136,14 +136,9 @@ extension BrowserViewController {
         let shareTrackersViewController = ShareTrackersController(theme: theme, trackingType: .trackerAdWarning)
         
         shareTrackersViewController.actionHandler = { [weak self] action in
-            guard let self = self else { return }
+            guard let self = self, action == .takeALookTapped else { return }
             
-            switch action {
-                case .takeALookTapped:
-                    self.showShieldsScreen()
-                default:
-                    break
-            }
+            self.showShieldsScreen()
         }
         
         showBenchmarkNotificationPopover(controller: shareTrackersViewController)
@@ -173,14 +168,9 @@ extension BrowserViewController {
         dismiss(animated: true)
 
         shareTrackersViewController.actionHandler = { [weak self] action in
-            guard let self = self else { return }
+            guard let self = self, action == .shareTheNewsTapped else { return }
 
-            switch action {
-                case .shareTheNewsTapped:
-                    self.showShareScreen(with: theme)
-                default:
-                    break
-            }
+            self.showShareScreen(with: theme)
         }
 
         showBenchmarkNotificationPopover(controller: shareTrackersViewController)

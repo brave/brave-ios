@@ -90,11 +90,7 @@ class OptionalTextActivityItemSource: NSObject, UIActivityItemSource {
     func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
         let activityValueType = ActivityTypeValue.allCases.first(where: { $0.rawValue == activityType?.rawValue })
         
-        if activityValueType != nil {
-            return nil
-        } else {
-            return text
-        }
+        return activityValueType == nil ? text : nil
     }
 }
 
@@ -116,11 +112,7 @@ class ImageActivityItemSource: NSObject, UIActivityItemSource {
     func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
         let activityValueType = ActivityTypeValue.allCases.first(where: { $0.rawValue == activityType?.rawValue })
         
-        if activityValueType != nil {
-            return imageWithText
-        } else {
-            return image
-        }
+        return activityValueType == nil ? image : imageWithText
     }
     
     @available(iOS 13.0, *)

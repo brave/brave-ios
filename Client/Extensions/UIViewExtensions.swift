@@ -46,11 +46,9 @@ extension UIView {
         return screenshot(size, offset: offset, quality: quality)
     }
    
-    /**
-     * Getting a snapshot froma  view using image renderer
-     */
+    /// Getting a snapshot from a view using image renderer
     var snapshot: UIImage {
-        return UIGraphicsImageRenderer(size: bounds.size).image { _ in
+        UIGraphicsImageRenderer(size: bounds.size).image { _ in
             drawHierarchy(in: bounds, afterScreenUpdates: true)
         }
     }
