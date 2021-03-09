@@ -50,7 +50,7 @@ class TabCell: UICollectionViewCell, Themeable {
         startPoint: .zero,
         endPoint: CGPoint(x: 0, y: 1)
     )
-    let titleText: UILabel
+    let titleLabel: UILabel
     let favicon: UIImageView = UIImageView()
     let closeButton: UIButton
 
@@ -77,12 +77,12 @@ class TabCell: UICollectionViewCell, Themeable {
         self.favicon.layer.cornerRadius = 2.0
         self.favicon.layer.masksToBounds = true
 
-        self.titleText = UILabel()
-        self.titleText.isUserInteractionEnabled = false
-        self.titleText.numberOfLines = 1
-        self.titleText.font = DynamicFontHelper.defaultHelper.DefaultSmallFontBold
-        self.titleText.textColor = LightTabCellUX.tabTitleTextColor
-        self.titleText.backgroundColor = .clear
+        self.titleLabel = UILabel()
+        self.titleLabel.isUserInteractionEnabled = false
+        self.titleLabel.numberOfLines = 1
+        self.titleLabel.font = DynamicFontHelper.defaultHelper.DefaultSmallFontBold
+        self.titleLabel.textColor = LightTabCellUX.tabTitleTextColor
+        self.titleLabel.backgroundColor = .clear
 
         self.closeButton = UIButton()
         self.closeButton.setImage(#imageLiteral(resourceName: "tab_close"), for: [])
@@ -104,7 +104,7 @@ class TabCell: UICollectionViewCell, Themeable {
         backgroundHolder.addSubview(self.titleBackgroundView)
         
         titleBackgroundView.addSubview(self.closeButton)
-        titleBackgroundView.addSubview(self.titleText)
+        titleBackgroundView.addSubview(self.titleLabel)
         titleBackgroundView.addSubview(self.favicon)
 
         self.accessibilityCustomActions = [
@@ -145,7 +145,7 @@ class TabCell: UICollectionViewCell, Themeable {
             make.size.equalTo(TabTrayControllerUX.faviconSize)
         }
 
-        titleText.snp.makeConstraints { (make) in
+        titleLabel.snp.makeConstraints { (make) in
             make.leading.equalTo(favicon.snp.trailing).offset(6)
             make.trailing.equalTo(closeButton.snp.leading).offset(-6)
             make.centerY.equalTo(favicon)
@@ -165,7 +165,7 @@ class TabCell: UICollectionViewCell, Themeable {
         // Reset any close animations.
         backgroundHolder.transform = .identity
         backgroundHolder.alpha = 1
-        self.titleText.font = DynamicFontHelper.defaultHelper.DefaultSmallFontBold
+        titleLabel.font = DynamicFontHelper.defaultHelper.DefaultSmallFontBold
         layer.shadowOffset = .zero
         layer.shadowPath = nil
         layer.shadowOpacity = 0
@@ -195,7 +195,7 @@ class TabCell: UICollectionViewCell, Themeable {
         styleChildren(theme: theme)
         
         // TabCell doesn't use much theming atm, using non-themable values for some views here.
-        titleText.appearanceTextColor = .black
+        titleLabel.appearanceTextColor = .black
         screenshotView.backgroundColor = backgroundHolder.backgroundColor
         favicon.tintColor = theme.colors.tints.home
     }
@@ -818,7 +818,7 @@ fileprivate class TabManagerDataSource: NSObject, UICollectionViewDataSource {
 
         let tab = tabs[indexPath.item]
 
-        tabCell.titleText.text = tab.displayTitle
+        tabCell.titleLabel.text = tab.displayTitle
         tabCell.favicon.image = #imageLiteral(resourceName: "defaultFavicon")
 
         if !tab.displayTitle.isEmpty {
