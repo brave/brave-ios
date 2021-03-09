@@ -204,9 +204,8 @@ extension BrowserViewController {
     
     func showShareScreen(with theme: Theme) {
         dismiss(animated: true) {
-            let globalShieldsActivityController = ShieldsActivityItemSourceProvider.shared.setupGlobalShieldsActivityController(
-                height: self.view.frame.height,
-                theme: theme)
+            let globalShieldsActivityController =
+                ShieldsActivityItemSourceProvider.shared.setupGlobalShieldsActivityController(theme: theme)
             globalShieldsActivityController.popoverPresentationController?.sourceView = self.view
     
             self.present(globalShieldsActivityController, animated: true, completion: nil)

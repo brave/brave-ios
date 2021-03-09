@@ -313,8 +313,7 @@ class ShieldsViewController: UIViewController, PopoverContentComponent, Themeabl
     
     @objc private func tappedShareShieldsButton() {
         let globalShieldsActivityController =
-            ShieldsActivityItemSourceProvider.shared.setupGlobalShieldsActivityController(height: view.frame.height,
-                                                                                          theme: Theme.of(tab))
+            ShieldsActivityItemSourceProvider.shared.setupGlobalShieldsActivityController(theme: Theme.of(tab))
         globalShieldsActivityController.popoverPresentationController?.sourceView = view
         
         present(globalShieldsActivityController, animated: true, completion: nil)

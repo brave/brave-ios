@@ -23,16 +23,32 @@ final class ShieldsActivityItemSourceProvider {
     
     static let shared = ShieldsActivityItemSourceProvider()
     
-    func setupGlobalShieldsActivityController(height: CGFloat, theme: Theme) -> UIActivityViewController {
-        let statsView = BraveShieldStatsView(frame: CGRect(width: height, height: 110)).then {
-            $0.applyTheme(theme)
-            $0.backgroundColor = .darkGray
-        }
+    func setupGlobalShieldsActivityController(theme: Theme) -> UIActivityViewController {
+        let backgroundImage = #imageLiteral(resourceName: "share-activity-background")
         
+        let statsView = UIView(frame: CGRect(size: backgroundImage.size)).then {
+            let backgroundImageView = UIImageView(image: backgroundImage)
+            let statsInfoView = BraveShieldStatsView().then {
+                $0.applyTheme(theme)
+            }
+            
+            $0.addSubview(backgroundImageView)
+            $0.addSubview(statsInfoView)
+            
+            backgroundImageView.snp.makeConstraints {
+                $0.edges.equalToSuperview()
+            }
+            statsInfoView.snp.makeConstraints {
+                $0.centerX.equalToSuperview()
+                $0.centerY.equalToSuperview()
+                $0.height.equalToSuperview().multipliedBy(0.3)
+                $0.width.equalToSuperview().multipliedBy(0.65)
+            }
+        }
+    
         let contentView = UIView(frame: CGRect(width: statsView.frame.width, height: statsView.frame.height + 85)).then {
-            $0.backgroundColor = .darkGray
+            $0.backgroundColor = UIColor(rgb: 0xBE5269)
             $0.layer.borderWidth = 1
-            $0.layer.borderColor = UIColor.black.cgColor
         }
         
         contentView.addSubview(statsView)
