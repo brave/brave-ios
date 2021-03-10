@@ -40,14 +40,14 @@ final class ShieldsActivityItemSourceProvider {
             }
             statsInfoView.snp.makeConstraints {
                 $0.centerX.equalToSuperview()
-                $0.centerY.equalToSuperview()
-                $0.height.equalToSuperview().multipliedBy(0.3)
-                $0.width.equalToSuperview().multipliedBy(0.65)
+                $0.centerY.equalToSuperview().offset(15)
+                $0.height.equalToSuperview().multipliedBy(0.40)
+                $0.width.equalToSuperview().multipliedBy(0.70)
             }
         }
     
         let contentView = UIView(frame: CGRect(width: statsView.frame.width, height: statsView.frame.height + 85)).then {
-            $0.backgroundColor = UIColor(rgb: 0xBE5269)
+            $0.backgroundColor = UIColor(rgb: 0x4C54D2)
             $0.layer.borderWidth = 1
         }
         
