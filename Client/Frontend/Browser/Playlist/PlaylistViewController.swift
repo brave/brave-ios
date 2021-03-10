@@ -333,7 +333,9 @@ private class ListController: UIViewController {
                     
                     // On iPhone-8, 14.4, I need to scroll the tableView after setting its contentOffset and contentInset
                     // Otherwise the layout is broken when exiting fullscreen in portrait mode.
-                    tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
+                    if PlaylistManager.shared.numberOfAssets() > 0 {
+                        tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
+                    }
                 }
             } else {
                 playerView.snp.remakeConstraints {
