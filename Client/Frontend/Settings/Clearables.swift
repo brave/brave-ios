@@ -184,3 +184,31 @@ class BraveTodayClearable: Clearable {
         return succeed()
     }
 }
+
+class PlayListCacheClearable: Clearable {
+        
+    init() { }
+    
+    var label: String {
+        return Strings.PlayList.playlistCacheToggleOption
+    }
+    
+    func clear() -> Success {
+        PlaylistManager.shared.deleteAllItems(cacheOnly: true)
+        return succeed()
+    }
+}
+
+class PlayListDataClearable: Clearable {
+    
+    init() { }
+    
+    var label: String {
+        return Strings.PlayList.playlistCacheAndVideoToggleOption
+    }
+    
+    func clear() -> Success {
+        PlaylistManager.shared.deleteAllItems()
+        return succeed()
+    }
+}

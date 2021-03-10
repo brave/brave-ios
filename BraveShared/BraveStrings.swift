@@ -1307,6 +1307,36 @@ extension Strings {
                               bundle: .braveShared,
                               value: "Only Wifi",
                               comment: "Option Text for Auto Download Only Wifi Option")
+        
+        public static let playlistCacheToggleOption =
+            NSLocalizedString("playlist.playlistCacheOption",
+                              bundle: .braveShared,
+                              value: "Playlist Cache",
+                              comment: "Text for Playlist Cache Toggle while clearing the cache in settings")
+        
+        public static let playlistCacheAndVideoToggleOption =
+            NSLocalizedString("playlist.playlistCacheAndVideoToggleOption",
+                              bundle: .braveShared,
+                              value: "Playlist Videos & Cache",
+                              comment: "Text for Playlist Videos & Cache Toggle while clearing the cache in settings")
+        
+        public static let playlistDeleteCacheAlertTitle =
+            NSLocalizedString("playList.playlistDeleteCacheAlertTitle",
+                              bundle: .braveShared,
+                              value: "Delete All Videos and Cache",
+                              comment: "The title for the alert that shows up when deleting cache in playlist settings")
+
+        public static let playlistDeleteCacheAlertDescription =
+            NSLocalizedString("playList.playlistDeleteCacheAlertDescription",
+                              bundle: .braveShared,
+                              value: "Are you sure you want to delete all the videos from Playlist? This will also clear the download cache.",
+                              comment: "The description for the alert that shows up when deleting cache in settings")
+        
+        public static let playlistDeleteAllSettingsOptionFooterText =
+            NSLocalizedString("playlist.playlistDeleteAllSettingsOptionFooterText",
+                              bundle: .braveShared,
+                              value: "This option will remove all videos from Playlist. Also it will delete entire cache for downloaded videos.",
+                              comment: "Footer Text for the Playlist Settings Option for Deleating All Videos Cache")
     }
 }
 

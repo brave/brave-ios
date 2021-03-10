@@ -158,6 +158,35 @@ class PlaylistManager: NSObject {
             log.error("An error occured deleting Playlist Cached Item \(item.name): \(error)")
         }
     }
+    
+    func deleteAllItems(cacheOnly: Bool = false) {
+        func clearCache(item: PlaylistInfo) throws {
+            if let assetUrl = localAsset(for: item.pageSrc)?.url {
+                try FileManager.default.removeItem(at: assetUrl)
+                Playlist.shared.updateCache(pageSrc: item.pageSrc, cachedData: nil)
+            }
+        }
+        
+        guard let playlistItems = frc.fetchedObjects else {
+            log.error("An error occured while fetching Playlist Objects")
+            return
+        }
+        
+        for playlistItem in playlistItems {
+            let item = PlaylistInfo(item: playlistItem)
+            
+            do {
+                if cacheOnly {
+                    try clearCache(item: item)
+                } else {
+                    try clearCache(item: item)
+                    Playlist.shared.removeItem(item: item)
+                }
+            } catch {
+                log.error("An error occured deleting Playlist Cached Item \(item.name): \(error)")
+            }
+        }
+    }
 }
 
 extension PlaylistManager {

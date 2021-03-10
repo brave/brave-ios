@@ -142,6 +142,24 @@ class PlaylistSettingsViewController: TableViewController {
             dataSource.sections.append(sideSelectionSection)
         }
         
+        dataSource.sections.append(
+            Section(rows: [
+                Row(text: Strings.PlayList.playlistDeleteCacheAlertTitle, selection: { [unowned self] in
+                    let style: UIAlertController.Style = UIDevice.current.userInterfaceIdiom == .pad ? .alert : .actionSheet
+                    let alert = UIAlertController(
+                        title: Strings.PlayList.playlistDeleteCacheAlertTitle,
+                        message: Strings.PlayList.playlistDeleteCacheAlertDescription,
+                        preferredStyle: style)
+                    
+                    alert.addAction(UIAlertAction(title: Strings.delete, style: .default, handler: { _ in
+                        PlaylistManager.shared.deleteAllItems()
+                    }))
+                    alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil))
+                    self.present(alert, animated: true, completion: nil)
+                }, cellClass: ButtonCell.self)],
+                    footer: .title(Strings.PlayList.playlistDeleteAllSettingsOptionFooterText))
+        )
+        
         if !AppConstants.buildChannel.isPublic {
             // TODO: Add debug settings here
         }
