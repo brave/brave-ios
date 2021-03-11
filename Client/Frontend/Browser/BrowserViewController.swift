@@ -2628,7 +2628,11 @@ extension BrowserViewController: Themeable {
     func applyTheme(_ theme: Theme) {
         theme.applyAppearanceProperties()
         
-        styleChildren(theme: theme)
+        if PrivateBrowsingManager.shared.isPrivateBrowsing {
+            styleChildren(theme: Theme.from(id: Theme.DefaultTheme.private.rawValue))
+        } else {
+            styleChildren(theme: theme)
+        }
 
         statusBarOverlay.backgroundColor = topToolbar.backgroundColor
         setNeedsStatusBarAppearanceUpdate()
