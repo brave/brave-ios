@@ -65,6 +65,21 @@ class BraveTodayAddSourceViewController: UITableViewController {
         }
     }
     
+    private func tappedImportOPML() {
+        let picker = UIDocumentPickerViewController(documentTypes: ["public.opml"], in: .import)
+        picker.delegate = self
+        picker.allowsMultipleSelection = false
+        if #available(iOS 13.0, *) {
+            picker.shouldShowFileExtensions = true
+        }
+        present(picker, animated: true)
+    }
+    
+    private func rssLocationFromOPMLOutline(_ outline: OPML.Outline) -> RSSFeedLocation? {
+        guard let url = outline.xmlUrl?.asURL else { return nil }
+        return .init(title: outline.text, url: url)
+    }
+    
     private let session: URLSession = {
         let configuration = URLSessionConfiguration.default
         configuration.timeoutIntervalForRequest = 5
@@ -139,8 +154,9 @@ class BraveTodayAddSourceViewController: UITableViewController {
                 completion(.failure(.invalidData))
                 return
             }
-            let parser = FeedParser(data: data)
-            if case .success(let feed) = parser.parse() {
+            
+            // Check if `data` is actually an RSS feed
+            if case .success(let feed) = FeedParser(data: data).parse() {
                 // User provided a direct feed
                 var title: String?
                 switch feed {
@@ -152,7 +168,18 @@ class BraveTodayAddSourceViewController: UITableViewController {
                     title = rss.title
                 }
                 completion(.success([.init(title: title, url: url)]))
+                return
             }
+            
+            // Check if `data` is actually an OPML list
+            if let opml = OPMLParser.parse(data: data), !opml.outlines.isEmpty {
+                let locations = opml.outlines.compactMap(self.rssLocationFromOPMLOutline)
+                if !locations.isEmpty {
+                    completion(.success(locations))
+                    return
+                }
+            }
+            
             // Ensure page is reloaded to final landing page before looking for
             // favicons
             var reloadUrl: URL?
@@ -187,7 +214,7 @@ class BraveTodayAddSourceViewController: UITableViewController {
     
     private let textField = UITextField().then {
         $0.attributedPlaceholder = NSAttributedString(
-            string: "Feed or Site URL",
+            string: Strings.BraveToday.searchTextFieldPlaceholder,
             attributes: [.foregroundColor: UIColor.lightGray]
         )
         $0.font = .preferredFont(forTextStyle: .body)
@@ -210,28 +237,44 @@ class BraveTodayAddSourceViewController: UITableViewController {
         if indexPath.section == 0 && indexPath.row == 1, isSearchEnabled, !isLoading {
             searchPageForFeeds()
         }
+        if indexPath.section == 1 && indexPath.row == 0 {
+            tappedImportOPML()
+        }
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
     override func tableView(_ tableView: UITableView, shouldHighlightRowAt indexPath: IndexPath) -> Bool {
-        if indexPath.row == 1 {
-            return isSearchEnabled && !isLoading
+        if indexPath.section == 0 {
+            if indexPath.row == 1 {
+                return isSearchEnabled && !isLoading
+            }
+            return false
         }
-        return false
+        return true
     }
     
     // MARK: - UITableViewDataSource
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        switch indexPath.row {
+        switch indexPath.section {
         case 0:
-            let cell = tableView.dequeueReusableCell(for: indexPath) as FeedSearchCellClass
-            cell.textField = textField
-            return cell
+            switch indexPath.row {
+            case 0:
+                let cell = tableView.dequeueReusableCell(for: indexPath) as FeedSearchCellClass
+                cell.textField = textField
+                return cell
+            case 1:
+                let cell = tableView.dequeueReusableCell(for: indexPath) as CenteredButtonCell
+                cell.textLabel?.text = Strings.BraveToday.searchButtonTitle
+                cell.tintColor = isSearchEnabled && !isLoading ? BraveUX.braveOrange : Colors.grey500
+                return cell
+            default:
+                fatalError("No cell available for index path: \(indexPath)")
+            }
         case 1:
             let cell = tableView.dequeueReusableCell(for: indexPath) as CenteredButtonCell
-            cell.textLabel?.text = "Search"
-            cell.tintColor = isSearchEnabled && !isLoading ? BraveUX.braveOrange : Colors.grey500
+            cell.textLabel?.text = Strings.BraveToday.importOPML
+            cell.tintColor = BraveUX.braveOrange
             return cell
         default:
             fatalError("No cell available for index path: \(indexPath)")
@@ -239,11 +282,54 @@ class BraveTodayAddSourceViewController: UITableViewController {
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
-        1
+        2
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        2
+        switch section {
+        case 0: return 2
+        case 1: return 1
+        default: return 0
+        }
+    }
+}
+
+extension BraveTodayAddSourceViewController: UIDocumentPickerDelegate {
+    func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+        guard let url = urls.first, url.isFileURL, let data = try? Data(contentsOf: url) else {
+            controller.dismiss(animated: true) {
+                self.displayError(.noFeedsFound)
+            }
+            return
+        }
+        DispatchQueue.global(qos: .userInitiated).async {
+            let opml = OPMLParser.parse(data: data)
+            DispatchQueue.main.async {
+                guard let opml = opml else {
+                    controller.dismiss(animated: true) {
+                        self.displayError(.invalidData)
+                    }
+                    return
+                }
+                let locations = opml.outlines.compactMap(self.rssLocationFromOPMLOutline)
+                if locations.isEmpty {
+                    controller.dismiss(animated: true) {
+                        self.displayError(.noFeedsFound)
+                    }
+                    return
+                }
+                let resultsController = BraveTodayAddSourceResultsViewController(
+                    dataSource: self.feedDataSource,
+                    searchedURL: url,
+                    rssFeedLocations: locations,
+                    sourcesAdded: self.sourcesAdded
+                )
+                self.navigationController?.pushViewController(resultsController, animated: true)
+            }
+        }
+    }
+    func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
+        controller.dismiss(animated: true)
     }
 }
 

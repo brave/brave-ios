@@ -373,6 +373,10 @@
 		27C405E924255A2B00347246 /* BraveShared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DE7688420B3456C00FF5533 /* BraveShared.framework */; };
 		27C461DE211B76500088A441 /* ShieldsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C461DD211B76500088A441 /* ShieldsView.swift */; };
 		27C46201211CD8D20088A441 /* DeferredTestUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = A176323020CF2A6000126F25 /* DeferredTestUtils.swift */; };
+		27C5AC8725D6FA6D00B8F50E /* OPML.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C5AC8625D6FA6D00B8F50E /* OPML.swift */; };
+		27C5AE2E25D72B0A00B8F50E /* OPMLParsingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C5AE2D25D72B0A00B8F50E /* OPMLParsingTests.swift */; };
+		27C5AE4A25D72B9700B8F50E /* subscriptionList.opml in Resources */ = {isa = PBXBuildFile; fileRef = 27C5AE4425D72B9700B8F50E /* subscriptionList.opml */; };
+		27C5AE4B25D72B9700B8F50E /* states.opml in Resources */ = {isa = PBXBuildFile; fileRef = 27C5AE4525D72B9700B8F50E /* states.opml */; };
 		27C626CB25BA198700418F40 /* WalletTransferExpiredViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C626CA25BA198700418F40 /* WalletTransferExpiredViewController.swift */; };
 		27C647772550AE16006D72FC /* WalletTransferCompleteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C647762550AE16006D72FC /* WalletTransferCompleteViewController.swift */; };
 		27C647832550AF34006D72FC /* WalletTransferCompleteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C647822550AF34006D72FC /* WalletTransferCompleteView.swift */; };
@@ -1845,6 +1849,10 @@
 		27B68E8725C88F28002D0826 /* Model11.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model11.xcdatamodel; sourceTree = "<group>"; };
 		27B68E9325C8911D002D0826 /* BraveTodayAddSourceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveTodayAddSourceViewController.swift; sourceTree = "<group>"; };
 		27C461DD211B76500088A441 /* ShieldsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShieldsView.swift; sourceTree = "<group>"; };
+		27C5AC8625D6FA6D00B8F50E /* OPML.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OPML.swift; sourceTree = "<group>"; };
+		27C5AE2D25D72B0A00B8F50E /* OPMLParsingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OPMLParsingTests.swift; sourceTree = "<group>"; };
+		27C5AE4425D72B9700B8F50E /* subscriptionList.opml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = subscriptionList.opml; sourceTree = "<group>"; };
+		27C5AE4525D72B9700B8F50E /* states.opml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = states.opml; sourceTree = "<group>"; };
 		27C626CA25BA198700418F40 /* WalletTransferExpiredViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletTransferExpiredViewController.swift; sourceTree = "<group>"; };
 		27C647762550AE16006D72FC /* WalletTransferCompleteViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletTransferCompleteViewController.swift; sourceTree = "<group>"; };
 		27C647822550AF34006D72FC /* WalletTransferCompleteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletTransferCompleteView.swift; sourceTree = "<group>"; };
@@ -3789,6 +3797,7 @@
 				2726637224981B5F0056CFE1 /* FeedSectionHeaderView.swift */,
 				27AC7CF924C77EBC00441317 /* FeedActionAlertView.swift */,
 				27E0652324CB699800134946 /* Lottie Assets */,
+				27C5AC7A25D6FA5400B8F50E /* OPML */,
 			);
 			path = "Brave Today";
 			sourceTree = "<group>";
@@ -3837,6 +3846,23 @@
 				27FD3F7725C8B0E700696156 /* BraveTodayAddSourceResultsViewController.swift */,
 			);
 			path = "Brave Today";
+			sourceTree = "<group>";
+		};
+		27C5AC7A25D6FA5400B8F50E /* OPML */ = {
+			isa = PBXGroup;
+			children = (
+				27C5AC8625D6FA6D00B8F50E /* OPML.swift */,
+			);
+			path = OPML;
+			sourceTree = "<group>";
+		};
+		27C5AE4325D72B9700B8F50E /* opml-test-files */ = {
+			isa = PBXGroup;
+			children = (
+				27C5AE4425D72B9700B8F50E /* subscriptionList.opml */,
+				27C5AE4525D72B9700B8F50E /* states.opml */,
+			);
+			path = "opml-test-files";
 			sourceTree = "<group>";
 		};
 		27C647A42551F071006D72FC /* QA */ = {
@@ -5283,6 +5309,7 @@
 				F9488F12258D6B9800A72C84 /* WKWebViewExtensionsTest.swift */,
 				F95ED17D25A95426001A432D /* UserScriptManagerTest.swift */,
 				0A2BFB3325F2754600719AA9 /* NTPDownloaderTests.swift */,
+				27C5AE2D25D72B0A00B8F50E /* OPMLParsingTests.swift */,
 			);
 			path = ClientTests;
 			sourceTree = "<group>";
@@ -5290,6 +5317,7 @@
 		F84B21D71A090F8100AAB793 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				27C5AE4325D72B9700B8F50E /* opml-test-files */,
 				A83E5B181C1DA8BF0026D912 /* image.gif */,
 				F84B21D81A090F8100AAB793 /* Info.plist */,
 				A83E5B191C1DA8BF0026D912 /* image.png */,
@@ -6397,7 +6425,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				A83E5B1A1C1DA8BF0026D912 /* image.gif in Resources */,
+				27C5AE4B25D72B9700B8F50E /* states.opml in Resources */,
 				A83E5B1B1C1DA8BF0026D912 /* image.png in Resources */,
+				27C5AE4A25D72B9700B8F50E /* subscriptionList.opml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6901,6 +6931,7 @@
 				E4CD9E911A6897FB00318571 /* ReaderMode.swift in Sources */,
 				4422D42321BFCE9200BF1855 /* HttpsEverywhereStats.swift in Sources */,
 				0A8C69AB225CFCAF00988715 /* AddEditBookmarkTableViewController.swift in Sources */,
+				27C5AC8725D6FA6D00B8F50E /* OPML.swift in Sources */,
 				27FD2CAD2146C31C00A5A779 /* AddToFavoritesActivity.swift in Sources */,
 				4422D4E121BFFB7600BF1855 /* filter_block.cc in Sources */,
 				0A8C69BE225E350300988715 /* IndentedImageTableViewCell.swift in Sources */,
@@ -7290,6 +7321,7 @@
 				2FDB10931A9FBEC5006CF312 /* PrefsTests.swift in Sources */,
 				D8EFFA261FF702A8001D3A09 /* NavigationRouterTests.swift in Sources */,
 				F939FBFE22A596B900D9CD3F /* U2FTests.swift in Sources */,
+				27C5AE2E25D72B0A00B8F50E /* OPMLParsingTests.swift in Sources */,
 				0A4BEFD6221E13830005551A /* ContentBlockerTests.swift in Sources */,
 				0A2BFB3425F2754600719AA9 /* NTPDownloaderTests.swift in Sources */,
 				A83E5B1D1C1DA8D80026D912 /* UIPasteboardExtensionsTests.swift in Sources */,

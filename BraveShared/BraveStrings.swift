@@ -1766,6 +1766,24 @@ extension Strings {
             value: "Sorry, that feed address doesn’t have any content.",
             comment: ""
         )
+        public static let searchTextFieldPlaceholder = NSLocalizedString(
+            "today.searchTextFieldPlaceholder",
+            bundle: .braveShared,
+            value: "Feed or Site URL",
+            comment: "The placeholder displayed on the text field where a user is expected to type in a website URL"
+        )
+        public static let searchButtonTitle = NSLocalizedString(
+            "today.searchButtonTitle",
+            bundle: .braveShared,
+            value: "Search",
+            comment: "An action title where the user is executing a search based on inputted text"
+        )
+        public static let importOPML = NSLocalizedString(
+            "today.importOPML",
+            bundle: .braveShared,
+            value: "Import OPML",
+            comment: "\"OPML\" is a file extension that contains a list of rss feeds."
+        )
     }
 }
 
