@@ -227,10 +227,6 @@ private class ListController: UIViewController {
     }
     
     private func setup () {
-        if UIDevice.isPhone {
-            navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(onExit(_:)))
-        }
-              
         tableView.do {
             $0.register(PlaylistCell.self, forCellReuseIdentifier: Constants.playListCellIdentifier)
             $0.dataSource = self
@@ -293,6 +289,12 @@ private class ListController: UIViewController {
     }
     
     public func updateLayoutForMode(_ mode: DisplayMode) {
+        if splitViewController?.isCollapsed == true || (UIDevice.isIpad && traitCollection.horizontalSizeClass == .compact) {
+            navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(onExit(_:)))
+        } else {
+            navigationItem.rightBarButtonItem = nil
+        }
+        
         if mode == .iPhoneLayout {
             // If the player view is in fullscreen, we should NOT change the tableView layout on rotation.
             view.addSubview(playerView)
@@ -418,15 +420,16 @@ extension ListController: UITableViewDataSource {
         }
         
         let cacheState = PlaylistManager.shared.state(for: item.pageSrc)
-        if cacheState == .inProgress {
+        switch cacheState {
+        case .inProgress:
             cell.detailLabel.text = Strings.PlayList.dowloadingLabelTitle
-        } else if cacheState == .downloaded {
+        case .downloaded:
             if let itemSize = PlaylistManager.shared.sizeOfDownloadedItem(for: item.pageSrc) {
                 cell.detailLabel.text = "\(getRelativeDateFormat(date: item.dateAdded)) - \(itemSize)"
             } else {
                 cell.detailLabel.text = "\(getRelativeDateFormat(date: item.dateAdded)) - \(Strings.PlayList.dowloadedLabelTitle)"
             }
-        } else {
+        case .invalid:
             cell.detailLabel.text = getRelativeDateFormat(date: item.dateAdded)
         }
         
@@ -512,7 +515,9 @@ extension ListController: UITableViewDataSource {
                     cell.thumbnailView.clearMonogramFavicon()
                     cell.thumbnailView.contentMode = .scaleAspectFit
                     cell.thumbnailView.image = FaviconFetcher.defaultFaviconImage
-                    cell.thumbnailView.loadFavicon(for: url)
+                    cell.thumbnailView.loadFavicon(for: url) {
+                        cell.thumbnailView.contentMode = .scaleAspectFit
+                    }
                 }
             }
         }
@@ -637,6 +642,8 @@ extension ListController: UITableViewDelegate {
                     self.present(alert, animated: true, completion: nil)
                     
                 case .none:
+                    log.debug("Playing Live Video: \(self.playerView.player.currentItem?.duration.isIndefinite ?? false)")
+                    
                     if let selectedCell = selectedCell {
                         self.loadThumbnail(item: item, cell: selectedCell)
                     }
@@ -893,7 +900,12 @@ extension ListController: AVPlayerViewControllerDelegate, AVPictureInPictureCont
            let restorationController = delegate.playlistRestorationController {
             restorationController.modalPresentationStyle = .fullScreen
             playerView.attachLayer()
-            delegate.browserViewController.present(restorationController, animated: true) {
+            if view.window == nil {
+                delegate.browserViewController.present(restorationController, animated: true) {
+                    self.playerView.player.play()
+                    delegate.playlistRestorationController = nil
+                }
+            } else {
                 self.playerView.player.play()
                 delegate.playlistRestorationController = nil
             }
@@ -943,7 +955,11 @@ extension ListController: AVPlayerViewControllerDelegate, AVPictureInPictureCont
         if let delegate = UIApplication.shared.delegate as? AppDelegate,
            let restorationController = delegate.playlistRestorationController {
             restorationController.modalPresentationStyle = .fullScreen
-            delegate.browserViewController.present(restorationController, animated: true) {
+            if view.window == nil {
+                delegate.browserViewController.present(restorationController, animated: true) {
+                    delegate.playlistRestorationController = nil
+                }
+            } else {
                 delegate.playlistRestorationController = nil
             }
         }
@@ -958,40 +974,53 @@ extension ListController: PlaylistManagerDelegate {
            let cell = tableView.cellForRow(at: IndexPath(row: index, section: 0)) as? PlaylistCell {
             
             let cacheState = PlaylistManager.shared.state(for: id)
-            if cacheState == .inProgress {
+            switch cacheState {
+            case .inProgress:
                 let item = PlaylistManager.shared.itemAtIndex(index)
                 cell.detailLabel.text = "\(getRelativeDateFormat(date: item.dateAdded)) - \(Strings.PlayList.dowloadingPercentageLabelTitle) \(Int(percentComplete))%"
-            } else if cacheState == .downloaded {
+            case .downloaded:
                 let item = PlaylistManager.shared.itemAtIndex(index)
                 if let itemSize = PlaylistManager.shared.sizeOfDownloadedItem(for: item.pageSrc) {
                     cell.detailLabel.text = "\(getRelativeDateFormat(date: item.dateAdded)) - \(itemSize)"
                 } else {
                     cell.detailLabel.text = "\(getRelativeDateFormat(date: item.dateAdded)) - \(Strings.PlayList.dowloadedLabelTitle)"
                 }
-            } else {
+            case .invalid:
                 let item = PlaylistManager.shared.itemAtIndex(index)
                 cell.detailLabel.text = getRelativeDateFormat(date: item.dateAdded)
             }
         }
     }
     
-    func onDownloadStateChanged(id: String, state: PlaylistDownloadManager.DownloadState, displayName: String) {
+    func onDownloadStateChanged(id: String, state: PlaylistDownloadManager.DownloadState, displayName: String, error: Error?) {
         if let index = PlaylistManager.shared.index(of: id),
         let cell = tableView.cellForRow(at: IndexPath(row: index, section: 0)) as? PlaylistCell {
             
-            if state == .inProgress {
-                let item = PlaylistManager.shared.itemAtIndex(index)
-                cell.detailLabel.text = "\(getRelativeDateFormat(date: item.dateAdded)) - \(Strings.PlayList.dowloadingPercentageLabelTitle)"
-            } else if state == .downloaded {
-                let item = PlaylistManager.shared.itemAtIndex(index)
-                if let itemSize = PlaylistManager.shared.sizeOfDownloadedItem(for: item.pageSrc) {
-                    cell.detailLabel.text = "\(getRelativeDateFormat(date: item.dateAdded)) - \(itemSize)"
-                } else {
-                    cell.detailLabel.text = "\(getRelativeDateFormat(date: item.dateAdded)) - \(Strings.PlayList.dowloadedLabelTitle)"
-                }
-            } else {
+            if let error = error {
+                log.error("Error downloading playlist item: \(error)")
+                
                 let item = PlaylistManager.shared.itemAtIndex(index)
                 cell.detailLabel.text = getRelativeDateFormat(date: item.dateAdded)
+                
+                let alert = UIAlertController(title: Strings.PlayList.playlistDownloadErrorTitle, message: Strings.PlayList.playlistDownloadErrorMessage, preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: nil))
+                self.present(alert, animated: true, completion: nil)
+            } else {
+                switch state {
+                case .inProgress:
+                    let item = PlaylistManager.shared.itemAtIndex(index)
+                    cell.detailLabel.text = "\(getRelativeDateFormat(date: item.dateAdded)) - \(Strings.PlayList.dowloadingPercentageLabelTitle)"
+                case .downloaded:
+                    let item = PlaylistManager.shared.itemAtIndex(index)
+                    if let itemSize = PlaylistManager.shared.sizeOfDownloadedItem(for: item.pageSrc) {
+                        cell.detailLabel.text = "\(getRelativeDateFormat(date: item.dateAdded)) - \(itemSize)"
+                    } else {
+                        cell.detailLabel.text = "\(getRelativeDateFormat(date: item.dateAdded)) - \(Strings.PlayList.dowloadedLabelTitle)"
+                    }
+                case .invalid:
+                    let item = PlaylistManager.shared.itemAtIndex(index)
+                    cell.detailLabel.text = getRelativeDateFormat(date: item.dateAdded)
+                }
             }
         }
     }

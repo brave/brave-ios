@@ -11,13 +11,13 @@ private let log = Logger.browserLogger
 
 protocol PlaylistDownloadManagerDelegate: class {
     func onDownloadProgressUpdate(id: String, percentComplete: Double)
-    func onDownloadStateChanged(id: String, state: PlaylistDownloadManager.DownloadState, displayName: String)
+    func onDownloadStateChanged(id: String, state: PlaylistDownloadManager.DownloadState, displayName: String, error: Error?)
 }
 
 private protocol PlaylistStreamDownloadManagerDelegate: class {
     func localAsset(for pageSrc: String) -> AVURLAsset?
     func onDownloadProgressUpdate(id: String, percentComplete: Double)
-    func onDownloadStateChanged(id: String, state: PlaylistDownloadManager.DownloadState, displayName: String)
+    func onDownloadStateChanged(id: String, state: PlaylistDownloadManager.DownloadState, displayName: String, error: Error?)
 }
 
 struct MediaDownloadTask {
@@ -123,8 +123,8 @@ public class PlaylistDownloadManager: PlaylistStreamDownloadManagerDelegate {
         delegate?.onDownloadProgressUpdate(id: id, percentComplete: percentComplete)
     }
     
-    fileprivate func onDownloadStateChanged(id: String, state: PlaylistDownloadManager.DownloadState, displayName: String) {
-        delegate?.onDownloadStateChanged(id: id, state: state, displayName: displayName)
+    fileprivate func onDownloadStateChanged(id: String, state: PlaylistDownloadManager.DownloadState, displayName: String, error: Error?) {
+        delegate?.onDownloadStateChanged(id: id, state: state, displayName: displayName, error: error)
     }
 }
 
@@ -169,7 +169,7 @@ private class PlaylistHLSDownloadManager: NSObject, AVAssetDownloadDelegate {
         activeDownloadTasks[task] = MediaDownloadTask(id: item.pageSrc, name: item.name, asset: asset)
         task.resume()
 
-        delegate?.onDownloadStateChanged(id: item.pageSrc, state: .inProgress, displayName: asset.displayNames(for: asset.preferredMediaSelection))
+        delegate?.onDownloadStateChanged(id: item.pageSrc, state: .inProgress, displayName: asset.displayNames(for: asset.preferredMediaSelection), error: nil)
     }
     
     func cancelDownload(item: PlaylistInfo) {
@@ -212,22 +212,32 @@ private class PlaylistHLSDownloadManager: NSObject, AVAssetDownloadDelegate {
                 assertionFailure("Downloading HLS streams is not supported on the simulator.")
 
             default:
-                assertionFailure("An unknown error occured while attempting to download the playlist item: \(error.domain)")
+                assertionFailure("An unknown error occured while attempting to download the playlist item: \(error)")
             }
             
             DispatchQueue.main.async {
-                self.delegate?.onDownloadStateChanged(id: asset.id, state: .invalid, displayName: "")
+                self.delegate?.onDownloadStateChanged(id: asset.id, state: .invalid, displayName: "", error: error)
             }
         } else {
             do {
                 let cachedData = try assetUrl.bookmarkData()
                 Playlist.shared.updateCache(pageSrc: asset.id, cachedData: cachedData)
+                
+                DispatchQueue.main.async {
+                    self.delegate?.onDownloadStateChanged(id: asset.id, state: .downloaded, displayName: "", error: nil)
+                }
             } catch {
                 log.error("Failed to create bookmarkData for download URL.")
-            }
-            
-            DispatchQueue.main.async {
-                self.delegate?.onDownloadStateChanged(id: asset.id, state: .downloaded, displayName: "")
+                
+                DispatchQueue.main.async {
+                    self.delegate?.onDownloadStateChanged(id: asset.id, state: .downloaded, displayName: "", error: error)
+                }
+                
+                do {
+                    try FileManager.default.removeItem(at: assetUrl)
+                } catch {
+                    log.error("Error Deleting Playlist Item: \(error)")
+                }
             }
         }
     }
@@ -244,7 +254,7 @@ private class PlaylistHLSDownloadManager: NSObject, AVAssetDownloadDelegate {
         aggregateAssetDownloadTask.resume()
         
         DispatchQueue.main.async {
-            self.delegate?.onDownloadStateChanged(id: asset.id, state: .inProgress, displayName: mediaSelection.asset?.displayNames(for: mediaSelection) ?? "")
+            self.delegate?.onDownloadStateChanged(id: asset.id, state: .inProgress, displayName: mediaSelection.asset?.displayNames(for: mediaSelection) ?? "", error: nil)
         }
     }
     
@@ -309,7 +319,7 @@ private class PlaylistFileDownloadManager: NSObject, URLSessionDownloadDelegate 
         activeDownloadTasks[task] = MediaDownloadTask(id: item.pageSrc, name: item.name, asset: asset)
         task.resume()
         
-        delegate?.onDownloadStateChanged(id: item.pageSrc, state: .inProgress, displayName: asset.displayNames(for: asset.preferredMediaSelection))
+        delegate?.onDownloadStateChanged(id: item.pageSrc, state: .inProgress, displayName: asset.displayNames(for: asset.preferredMediaSelection), error: nil)
     }
     
     func cancelDownload(item: PlaylistInfo) {
@@ -354,7 +364,7 @@ private class PlaylistFileDownloadManager: NSObject, URLSessionDownloadDelegate 
             }
             
             DispatchQueue.main.async {
-                self.delegate?.onDownloadStateChanged(id: asset.id, state: .invalid, displayName: "")
+                self.delegate?.onDownloadStateChanged(id: asset.id, state: .invalid, displayName: "", error: error)
             }
         }
     }
@@ -386,11 +396,14 @@ private class PlaylistFileDownloadManager: NSObject, URLSessionDownloadDelegate 
             
             // Detect based on Data.
             if fileExtension.isEmpty {
-                if let data = try? Data(contentsOf: location, options: .mappedIfSafe) {
+                do {
+                    let data = try Data(contentsOf: location, options: .mappedIfSafe)
                     let detectedExtension = PlaylistMimeTypeDetector(data: data).fileExtension
                     if !detectedExtension.isEmpty {
                         fileExtension = detectedExtension
                     }
+                } catch {
+                    log.error("Error mapping downloaded playlist file to virtual memory: \(error)")
                 }
             }
             
@@ -401,30 +414,54 @@ private class PlaylistFileDownloadManager: NSObject, URLSessionDownloadDelegate 
             }
             
             do {
-                if let path = try? uniqueDownloadPathForFilename(asset.name + ".\(fileExtension)") {
-                    try FileManager.default.moveItem(at: location, to: path)
+                let path = try uniqueDownloadPathForFilename(asset.name + ".\(fileExtension)")
+                try FileManager.default.moveItem(at: location, to: path)
+                do {
+                    let cachedData = try path.bookmarkData()
+                    
+                    DispatchQueue.main.async {
+                        Playlist.shared.updateCache(pageSrc: asset.id, cachedData: cachedData)
+                        self.delegate?.onDownloadStateChanged(id: asset.id, state: .downloaded, displayName: "", error: nil)
+                    }
+                } catch {
+                    log.error("Failed to create bookmarkData for download URL.")
+                    
                     do {
-                        let cachedData = try path.bookmarkData()
-                        
-                        DispatchQueue.main.async {
-                            Playlist.shared.updateCache(pageSrc: asset.id, cachedData: cachedData)
-                            self.delegate?.onDownloadStateChanged(id: asset.id, state: .downloaded, displayName: "")
-                        }
-                        return
+                        try FileManager.default.removeItem(at: path)
                     } catch {
-                        log.error("Failed to create bookmarkData for download URL.")
+                        log.error("Error Deleting Playlist Item: \(error)")
                     }
                     
-                    try FileManager.default.removeItem(at: path)
+                    DispatchQueue.main.async {
+                        self.delegate?.onDownloadStateChanged(id: asset.id, state: .downloaded, displayName: "", error: error)
+                    }
                 }
             } catch {
-                log.error(error)
+                log.error("An error occurred attempting to download a playlist item: \(error)")
+                
+                do {
+                    try FileManager.default.removeItem(at: location)
+                } catch {
+                    log.error("Error Deleting Playlist Item: \(error)")
+                }
+                
+                DispatchQueue.main.async {
+                    Playlist.shared.updateCache(pageSrc: asset.id, cachedData: nil)
+                    self.delegate?.onDownloadStateChanged(id: asset.id, state: .invalid, displayName: "", error: error)
+                }
             }
-        }
-        
-        DispatchQueue.main.async {
-            Playlist.shared.updateCache(pageSrc: asset.id, cachedData: nil)
-            self.delegate?.onDownloadStateChanged(id: asset.id, state: .invalid, displayName: "")
+        } else {
+            DispatchQueue.main.async {
+                Playlist.shared.updateCache(pageSrc: asset.id, cachedData: nil)
+                
+                if let response = downloadTask.response as? HTTPURLResponse {
+                    self.delegate?.onDownloadStateChanged(id: asset.id, state: .invalid, displayName: "", error: "Invalid Status Code: \(response.statusCode)")
+                } else if let response = downloadTask.response {
+                    self.delegate?.onDownloadStateChanged(id: asset.id, state: .invalid, displayName: "", error: "Invalid Response: \(response)")
+                } else {
+                    self.delegate?.onDownloadStateChanged(id: asset.id, state: .invalid, displayName: "", error: "Unknown Error")
+                }
+            }
         }
     }
     

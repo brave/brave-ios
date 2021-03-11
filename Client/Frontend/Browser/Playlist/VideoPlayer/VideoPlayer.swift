@@ -110,8 +110,8 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         controlsView.playbackRateButton.addTarget(self, action: #selector(onPlaybackRateChanged(_:)), for: .touchUpInside)
         controlsView.skipBackButton.addTarget(self, action: #selector(onSeekBackwards(_:)), for: .touchUpInside)
         controlsView.skipForwardButton.addTarget(self, action: #selector(onSeekForwards(_:)), for: .touchUpInside)
-        controlsView.skipBackButton.addTarget(self, action: #selector(onSeekPrevious(_:event:)), for: .touchDownRepeat)
-        controlsView.skipForwardButton.addTarget(self, action: #selector(onSeekNext(_:event:)), for: .touchDownRepeat)
+        controlsView.skipBackButton.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(onSeekPrevious(_:))))
+        controlsView.skipForwardButton.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(onSeekNext(_:))))
         controlsView.nextButton.addTarget(self, action: #selector(onNextTrack(_:)), for: .touchUpInside)
         
         // Layout
@@ -322,15 +322,15 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     }
     
     @objc
-    private func onSeekPrevious(_ button: UIButton, event: UIEvent) {
-        if let tapCount = event.allTouches?.first?.tapCount, tapCount >= 2 {
+    private func onSeekPrevious(_ gestureRecognizer: UIGestureRecognizer) {
+        if gestureRecognizer.state == .began {
             self.delegate?.onPreviousTrack()
         }
     }
     
     @objc
-    private func onSeekNext(_ button: UIButton, event: UIEvent) {
-        if let tapCount = event.allTouches?.first?.tapCount, tapCount >= 2 {
+    private func onSeekNext(_ gestureRecognizer: UIGestureRecognizer) {
+        if gestureRecognizer.state == .began {
             self.delegate?.onNextTrack()
         }
     }

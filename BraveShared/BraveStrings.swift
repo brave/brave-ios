@@ -1337,6 +1337,18 @@ extension Strings {
                               bundle: .braveShared,
                               value: "This option will remove all videos from Playlist. Also it will delete entire cache for downloaded videos.",
                               comment: "Footer Text for the Playlist Settings Option for Deleating All Videos Cache")
+        
+        public static let playlistDownloadErrorTitle =
+            NSLocalizedString("playlist.playlistDownloadErrorTitle",
+                              bundle: .braveShared,
+                              value: "Sorry, something went wrong",
+                              comment: "Title of alert when downloading a playlist item")
+        
+        public static let playlistDownloadErrorMessage =
+            NSLocalizedString("playlist.playlistDeleteAllSettingsOptionFooterText",
+                              bundle: .braveShared,
+                              value: "Sorry, this item could not be downloaded at this time.",
+                              comment: "Error message when downloading a playlist item fails")
     }
 }
 

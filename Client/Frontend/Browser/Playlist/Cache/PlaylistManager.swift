@@ -12,7 +12,7 @@ private let log = Logger.browserLogger
 
 protocol PlaylistManagerDelegate: AnyObject {
     func onDownloadProgressUpdate(id: String, percentComplete: Double)
-    func onDownloadStateChanged(id: String, state: PlaylistDownloadManager.DownloadState, displayName: String)
+    func onDownloadStateChanged(id: String, state: PlaylistDownloadManager.DownloadState, displayName: String, error: Error?)
     
     func controllerDidChange(_ anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?)
     func controllerDidChangeContent()
@@ -138,7 +138,7 @@ class PlaylistManager: NSObject {
                 try FileManager.default.removeItem(at: assetUrl)
                 Playlist.shared.removeItem(item: item)
                 
-                delegate?.onDownloadStateChanged(id: item.pageSrc, state: .invalid, displayName: "")
+                delegate?.onDownloadStateChanged(id: item.pageSrc, state: .invalid, displayName: "", error: nil)
             } else {
                 Playlist.shared.removeItem(item: item)
             }
@@ -152,7 +152,7 @@ class PlaylistManager: NSObject {
             if let assetUrl = localAsset(for: item.pageSrc)?.url {
                 try FileManager.default.removeItem(at: assetUrl)
                 Playlist.shared.updateCache(pageSrc: item.pageSrc, cachedData: nil)
-                delegate?.onDownloadStateChanged(id: item.pageSrc, state: .invalid, displayName: "")
+                delegate?.onDownloadStateChanged(id: item.pageSrc, state: .invalid, displayName: "", error: nil)
             }
         } catch {
             log.error("An error occured deleting Playlist Cached Item \(item.name): \(error)")
@@ -226,8 +226,8 @@ extension PlaylistManager: PlaylistDownloadManagerDelegate {
         delegate?.onDownloadProgressUpdate(id: id, percentComplete: percentComplete)
     }
     
-    func onDownloadStateChanged(id: String, state: PlaylistDownloadManager.DownloadState, displayName: String) {
-        delegate?.onDownloadStateChanged(id: id, state: state, displayName: displayName)
+    func onDownloadStateChanged(id: String, state: PlaylistDownloadManager.DownloadState, displayName: String, error: Error?) {
+        delegate?.onDownloadStateChanged(id: id, state: state, displayName: displayName, error: error)
     }
 }
 
