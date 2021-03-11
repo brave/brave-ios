@@ -189,11 +189,13 @@ class BraveTodayAddSourceViewController: UITableViewController {
                 return
             }
             
-            // Check if `data` is actually an OPML list
-            if let opml = OPMLParser.parse(data: data), !opml.outlines.isEmpty {
-                let locations = opml.outlines.compactMap(self.rssLocationFromOPMLOutline)
-                completion(locations.isEmpty ? .failure(.noFeedsFound) : .success(locations))
-                return
+            if FeedDataSource.isOPMLParsingAvailable {
+                // Check if `data` is actually an OPML list
+                if let opml = OPMLParser.parse(data: data), !opml.outlines.isEmpty {
+                    let locations = opml.outlines.compactMap(self.rssLocationFromOPMLOutline)
+                    completion(locations.isEmpty ? .failure(.noFeedsFound) : .success(locations))
+                    return
+                }
             }
             
             // Ensure page is reloaded to final landing page before looking for
@@ -301,7 +303,7 @@ class BraveTodayAddSourceViewController: UITableViewController {
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
-        2
+        FeedDataSource.isOPMLParsingAvailable ? 2 : 1
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

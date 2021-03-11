@@ -1772,6 +1772,24 @@ extension Strings {
             value: "Add",
             comment: "To add a list of 1 or more rss feeds"
         )
+        public static let rssFeedLimitExceededAlertTitle = NSLocalizedString(
+            "today.rssFeedLimitExceededAlertTitle",
+            bundle: .braveShared,
+            value: "Feed limit exceeded",
+            comment: ""
+        )
+        public static let rssFeedLimitExceededAlertMessage = NSLocalizedString(
+            "today.rssFeedLimitExceededAlertMessage",
+            bundle: .braveShared,
+            value: "The free ad-supported version of Brave Today includes 5 RSS feeds. You can customize your feed selections from the Sources list.",
+            comment: ""
+        )
+        public static let rssFeedLimitRemainingFooter = NSLocalizedString(
+            "today.rssFeedLimitRemainingFooter",
+            bundle: .braveShared,
+            value: "You currently have %d RSS feeds in your Sources list. The free ad-supported version of Brave Today includes 5 RSS feeds. Support for unlimited feeds and OPML import will be coming soon. You can customize your feed selections from the Sources list.",
+            comment: "%d will be a number (i.e. 4)"
+        )
         public static let insecureSourcesHeader = NSLocalizedString(
             "today.insecureSourcesHeader",
             bundle: .braveShared,
