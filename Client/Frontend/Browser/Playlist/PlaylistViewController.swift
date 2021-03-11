@@ -183,6 +183,8 @@ private class ListController: UIViewController {
     
     deinit {
         playerView.stop()
+        playerView.pictureInPictureController?.delegate = nil
+        playerView.pictureInPictureController?.stopPictureInPicture()
     }
     
     override func viewDidLoad() {

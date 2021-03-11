@@ -160,6 +160,14 @@ class PlaylistManager: NSObject {
     }
     
     func deleteAllItems(cacheOnly: Bool = false) {
+        // This is the only way to have the system kill picture in picture as the restoration controller is deallocated
+        // And that means the video is deallocated, its AudioSession is stopped, and the Picture-In-Picture controller is deallocated.
+        // This is because `AVPictureInPictureController` is NOT a view controller and there is no way to dismiss it
+        // other than to deallocate the restoration controller.
+        // We could also call `AVPictureInPictureController.stopPictureInPicture` BUT we'd still have to deallocate all resources.
+        // At least this way, we deallocate both AND pip is stopped in the destructor of `PlaylistViewController->ListController`
+        (UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController = nil
+        
         func clearCache(item: PlaylistInfo) throws {
             if let assetUrl = localAsset(for: item.pageSrc)?.url {
                 try FileManager.default.removeItem(at: assetUrl)
