@@ -176,10 +176,8 @@ class PlaylistManager: NSObject {
             let item = PlaylistInfo(item: playlistItem)
             
             do {
-                if cacheOnly {
-                    try clearCache(item: item)
-                } else {
-                    try clearCache(item: item)
+                try clearCache(item: item)
+                if !cacheOnly {
                     Playlist.shared.removeItem(item: item)
                 }
             } catch {
