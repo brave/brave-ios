@@ -41,10 +41,10 @@ class SimpleShieldsView: UIView, Themeable {
     class BlockCountView: UIView, Themeable {
         
         private struct UX {
-            static let descriptionEdgeInset = UIEdgeInsets(top: 13, left: 16, bottom: 14, right: 16)
+            static let descriptionEdgeInset = UIEdgeInsets(top: 13, left: 16, bottom: 13, right: 16)
             static let iconEdgeInset = UIEdgeInsets(top: 22, left: 14, bottom: 22, right: 14)
-            static let hitBoxEdgeInsets = UIEdgeInsets(top: -10, left: -10, bottom: -10, right: -10)
-            static let buttonEdgeInsets = UIEdgeInsets(top: -2, left: 4, bottom: -3, right: 4)
+            static let hitBoxEdgeInsets = UIEdgeInsets(equalInset: -10)
+            static let buttonEdgeInsets = UIEdgeInsets(top: -3, left: 4, bottom: -3, right: 4)
         }
         
         let stackView = UIStackView().then {
@@ -190,7 +190,7 @@ class SimpleShieldsView: UIView, Themeable {
             
             // Share UI only exist in locale JP
             if Locale.current.regionCode == "JP" {
-                let contentBackgroundColor = theme.isDark ? UIColor(rgb: 0x303443) : Colors.neutral000
+                let contentBackgroundColor = theme.isDark ? #colorLiteral(red: 0.1882352941, green: 0.2039215686, blue: 0.262745098, alpha: 1) : Colors.neutral000
                 descriptionStackView.addBackground(color: contentBackgroundColor, cornerRadius: 6.0)
                 infoStackView.addBackground(color: contentBackgroundColor, cornerRadius: 6.0)
                 shareStackView.addBackground(color: contentBackgroundColor, cornerRadius: 6.0)

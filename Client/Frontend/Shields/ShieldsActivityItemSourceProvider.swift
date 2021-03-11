@@ -47,7 +47,7 @@ final class ShieldsActivityItemSourceProvider {
         }
     
         let contentView = UIView(frame: CGRect(width: statsView.frame.width, height: statsView.frame.height + 85)).then {
-            $0.backgroundColor = UIColor(rgb: 0x4C54D2)
+            $0.backgroundColor = #colorLiteral(red: 0.2980392157, green: 0.3294117647, blue: 0.8235294118, alpha: 1)
             $0.layer.borderWidth = 1
         }
         
@@ -81,6 +81,8 @@ class OptionalTextActivityItemSource: NSObject, UIActivityItemSource {
     
     init(text: String) {
         self.text = text
+
+        super.init()
     }
     
     func activityViewControllerPlaceholderItem(_ activityViewController: UIActivityViewController) -> Any {
@@ -103,6 +105,8 @@ class ImageActivityItemSource: NSObject, UIActivityItemSource {
     init(image: UIImage, imageWithText: UIImage) {
         self.image = image
         self.imageWithText = imageWithText
+        
+        super.init()
     }
     
     func activityViewControllerPlaceholderItem(_ activityViewController: UIActivityViewController) -> Any {
