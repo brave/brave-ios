@@ -117,6 +117,8 @@ extension BrowserViewController {
         // Benchmark Tier Pop-Over only exist in JP locale
         if Locale.current.regionCode == "JP" {
             let numOfTrackerAds = BraveGlobalShieldStats.shared.adblock + BraveGlobalShieldStats.shared.trackingProtection
+            guard numOfTrackerAds > benchmarkCurrentSessionAdCount + 20 else { return }
+                
             let existingTierList = BenchmarkTrackerCountTier.allCases.filter({ Preferences.ProductNotificationBenchmarks.trackerTierCount.value < $0.rawValue})
             
             if !existingTierList.isEmpty {
