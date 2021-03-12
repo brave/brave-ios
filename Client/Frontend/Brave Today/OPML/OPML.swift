@@ -34,7 +34,7 @@ class OPMLParser {
     static func parse(data: Data) -> OPML? {
         guard let document = try? XMLDocument(data: data),
               let _ = document.firstChild(xpath: "//opml") else {
-            log.info("Failed to parse XML document")
+            log.warning("Failed to parse XML document")
             return nil
         }
         let title = document.firstChild(xpath: "//head/title")?.stringValue

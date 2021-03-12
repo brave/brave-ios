@@ -126,7 +126,7 @@ class BraveTodayAddSourceResultsViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return section == 0 ? secureLocations.count : insecureLocations.count
+        section == 0 ? secureLocations.count : insecureLocations.count
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {

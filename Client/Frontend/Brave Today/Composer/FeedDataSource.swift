@@ -418,7 +418,7 @@ class FeedDataSource {
                         case .success(let feed):
                             self.sources.append(feed.source)
                             self.items.append(contentsOf: feed.items)
-                        case .failure(_):
+                        case .failure:
                             // At the moment we dont handle any load errors once the feed has been
                             // added
                             break
