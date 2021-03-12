@@ -82,11 +82,6 @@ class SimpleShieldsView: UIView, Themeable {
                     string: Strings.Shields.blockedCountLabel,
                     attributes: [.font: UIFont.systemFont(ofSize: 13.0)]
                 )
-                // Share UI only exist in locale JP
-                if Locale.current.regionCode != "JP" {
-                    let attachment = ViewTextAttachment(view: self.infoButton)
-                    string.append(NSAttributedString(attachment: attachment))
-                }
                 return string
             }()
             $0.backgroundColor = .clear
@@ -95,24 +90,15 @@ class SimpleShieldsView: UIView, Themeable {
         }
         
         let infoButton = Button().then {
-            // Share UI only exist in locale JP
-            if Locale.current.regionCode == "JP" {
-                $0.setImage(#imageLiteral(resourceName: "shields-help").template, for: .normal)
-            } else {
-                $0.setImage(UIImage(imageLiteralResourceName: "shields-help-colored"), for: .normal)
-            }
+            $0.setImage(#imageLiteral(resourceName: "shields-help").template, for: .normal)
             $0.hitTestSlop = UX.hitBoxEdgeInsets
             $0.imageEdgeInsets = .zero
             $0.titleEdgeInsets = .zero
             $0.contentEdgeInsets = UIEdgeInsets(top: -2, left: 4, bottom: -3, right: 4)
-            
-            // Share UI only exist in locale JP
-            if Locale.current.regionCode == "JP" {
-                $0.contentMode = .scaleAspectFit
-                $0.setContentHuggingPriority(.required, for: .horizontal)
-                $0.setContentCompressionResistancePriority(.required, for: .horizontal)
-                $0.accessibilityLabel = Strings.Shields.aboutBraveShieldsTitle
-            }
+            $0.contentMode = .scaleAspectFit
+            $0.setContentHuggingPriority(.required, for: .horizontal)
+            $0.setContentCompressionResistancePriority(.required, for: .horizontal)
+            $0.accessibilityLabel = Strings.Shields.aboutBraveShieldsTitle
         }
         
         let shareButton = Button().then {
@@ -134,34 +120,24 @@ class SimpleShieldsView: UIView, Themeable {
             accessibilityTraits.insert(.button)
             accessibilityHint = Strings.Shields.blockedInfoButtonAccessibilityLabel
             
-            // Share UI only exist in locale JP
-            if Locale.current.regionCode == "JP" {
-                addSubview(contentStackView)
+            addSubview(contentStackView)
 
-                contentStackView.addStackViewItems(
-                    .view(descriptionStackView),
-                    .view(infoStackView),
-                    .view(shareStackView)
-                )
+            contentStackView.addStackViewItems(
+                .view(descriptionStackView),
+                .view(infoStackView),
+                .view(shareStackView)
+            )
 
-                descriptionStackView.addStackViewItems(
-                    .view(countLabel),
-                    .view(descriptionLabel)
-                )
+            descriptionStackView.addStackViewItems(
+                .view(countLabel),
+                .view(descriptionLabel)
+            )
 
-                infoStackView.addArrangedSubview(infoButton)
-                shareStackView.addArrangedSubview(shareButton)
+            infoStackView.addArrangedSubview(infoButton)
+            shareStackView.addArrangedSubview(shareButton)
 
-                contentStackView.snp.makeConstraints {
-                    $0.edges.equalToSuperview()
-                }
-            } else {
-                addSubview(stackView)
-                stackView.addArrangedSubview(countLabel)
-                stackView.addArrangedSubview(descriptionLabel)
-                stackView.snp.makeConstraints {
-                    $0.edges.equalToSuperview()
-                }
+            contentStackView.snp.makeConstraints {
+                $0.edges.equalToSuperview()
             }
         }
         
@@ -188,20 +164,12 @@ class SimpleShieldsView: UIView, Themeable {
             countLabel.appearanceTextColor = theme.isDark ? .white : .black
             descriptionLabel.appearanceTextColor = theme.isDark ? .white : .black
             
-            // Share UI only exist in locale JP
-            if Locale.current.regionCode == "JP" {
-                let contentBackgroundColor = theme.isDark ? #colorLiteral(red: 0.1882352941, green: 0.2039215686, blue: 0.262745098, alpha: 1) : Colors.neutral000
-                descriptionStackView.addBackground(color: contentBackgroundColor, cornerRadius: 6.0)
-                infoStackView.addBackground(color: contentBackgroundColor, cornerRadius: 6.0)
-                shareStackView.addBackground(color: contentBackgroundColor, cornerRadius: 6.0)
-                shareButton.appearanceTintColor = theme.isDark ? . white : .black
-                infoButton.appearanceTintColor = theme.isDark ? .white : .black
-            } else {
-                infoButton.tintColor = theme.isDark ?
-                    Colors.orange400 :
-                    Colors.orange500
-            }
-
+            let contentBackgroundColor = theme.isDark ? #colorLiteral(red: 0.1882352941, green: 0.2039215686, blue: 0.262745098, alpha: 1) : Colors.neutral000
+            descriptionStackView.addBackground(color: contentBackgroundColor, cornerRadius: 6.0)
+            infoStackView.addBackground(color: contentBackgroundColor, cornerRadius: 6.0)
+            shareStackView.addBackground(color: contentBackgroundColor, cornerRadius: 6.0)
+            shareButton.appearanceTintColor = theme.isDark ? . white : .black
+            infoButton.appearanceTintColor = theme.isDark ? .white : .black
         }
     }
     
