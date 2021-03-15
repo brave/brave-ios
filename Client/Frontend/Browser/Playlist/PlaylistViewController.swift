@@ -291,13 +291,11 @@ private class ListController: UIViewController {
     }
     
     public func updateLayoutForMode(_ mode: DisplayMode) {
-        if splitViewController?.isCollapsed == true || (UIDevice.isIpad && traitCollection.horizontalSizeClass == .compact) {
-            navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(onExit(_:)))
-        } else {
-            navigationItem.rightBarButtonItem = nil
-        }
+        navigationItem.rightBarButtonItem = nil
         
         if mode == .iPhoneLayout {
+            navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(onExit(_:)))
+            
             // If the player view is in fullscreen, we should NOT change the tableView layout on rotation.
             view.addSubview(playerView)
             if !playerView.isFullscreen {
