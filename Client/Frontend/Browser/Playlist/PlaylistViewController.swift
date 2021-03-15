@@ -515,9 +515,7 @@ extension ListController: UITableViewDataSource {
                     cell.thumbnailView.clearMonogramFavicon()
                     cell.thumbnailView.contentMode = .scaleAspectFit
                     cell.thumbnailView.image = FaviconFetcher.defaultFaviconImage
-                    cell.thumbnailView.loadFavicon(for: url) {
-                        cell.thumbnailView.contentMode = .scaleAspectFit
-                    }
+                    cell.thumbnailView.loadFavicon(for: url)
                 }
             }
         }

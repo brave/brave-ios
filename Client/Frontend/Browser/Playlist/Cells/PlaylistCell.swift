@@ -8,6 +8,25 @@ import UIKit
 import SDWebImage
 import AVFoundation
 
+class PlaylistResizingThumbnailView: UIImageView {
+    private var onImageChanged: (PlaylistResizingThumbnailView) -> Void
+    
+    init(onImageChanged: @escaping (PlaylistResizingThumbnailView) -> Void) {
+        self.onImageChanged = onImageChanged
+        super.init(frame: .zero)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override var image: UIImage? {
+        didSet {
+            onImageChanged(self)
+        }
+    }
+}
+
 class PlaylistCell: UITableViewCell {
     var thumbnailGenerator: HLSThumbnailGenerator?
     
@@ -15,7 +34,19 @@ class PlaylistCell: UITableViewCell {
         $0.fillColor = UIColor.white.cgColor
     }
     
-    let thumbnailView = UIImageView().then {
+    private let thumbnailHolder = UIView().then {
+        $0.backgroundColor = .black
+        $0.contentMode = .scaleAspectFit
+        $0.layer.cornerRadius = 5.0
+        if #available(iOS 13.0, *) {
+            $0.layer.cornerCurve = .continuous
+        }
+        $0.layer.masksToBounds = true
+    }
+    
+    let thumbnailView = PlaylistResizingThumbnailView(onImageChanged: {
+        onThumbnailChanged($0)
+    }).then {
         $0.contentMode = .scaleAspectFit
         $0.layer.cornerRadius = 5.0
         if #available(iOS 13.0, *) {
@@ -58,14 +89,22 @@ class PlaylistCell: UITableViewCell {
         
         contentView.addSubview(iconStackView)
         contentView.addSubview(infoStackView)
-        iconStackView.addArrangedSubview(thumbnailView)
+        iconStackView.addArrangedSubview(thumbnailHolder)
         infoStackView.addArrangedSubview(titleLabel)
         infoStackView.addArrangedSubview(detailLabel)
         contentView.addSubview(separator)
+        thumbnailHolder.addSubview(thumbnailView)
         
-        thumbnailView.snp.makeConstraints {
+        thumbnailHolder.snp.makeConstraints {
             // Keeps a 94.0px width on iPhone-X as per design
             $0.width.equalTo(iconStackView.snp.height).multipliedBy(1.46875 /* 94.0 / (tableViewCellHeight - (8.0 * 2)) */)
+            $0.height.equalToSuperview()
+        }
+        
+        thumbnailView.snp.makeConstraints {
+            $0.center.equalToSuperview()
+            $0.left.right.top.bottom.equalToSuperview().priority(.high)
+            $0.width.height.equalToSuperview()
         }
         
         iconStackView.snp.makeConstraints {
@@ -85,6 +124,25 @@ class PlaylistCell: UITableViewCell {
             $0.left.equalTo(titleLabel.snp.left)
             $0.right.bottom.equalToSuperview()
             $0.height.equalTo(1.0 / UIScreen.main.scale)
+        }
+    }
+    
+    private static func onThumbnailChanged(_ imageView: PlaylistResizingThumbnailView) {
+        guard let superView = imageView.superview else { return }
+        
+        imageView.snp.remakeConstraints {
+            $0.center.equalToSuperview()
+            
+            if let size = imageView.image?.size {
+                if size.width > superView.bounds.width || size.height > superView.bounds.height {
+                    $0.width.height.equalToSuperview()
+                } else {
+                    $0.left.right.top.bottom.equalToSuperview().priority(.high)
+                    $0.width.height.equalTo(28.0)
+                }
+            } else {
+                $0.width.height.equalToSuperview()
+            }
         }
     }
     
