@@ -10,6 +10,10 @@ import Shared
 import SnapKit
 
 class PlaylistToast: Toast {
+    private struct DesignUX {
+        static let maxToastWidth: CGFloat = 450.0
+    }
+    
     enum State {
         case itemAdded
         case itemExisting
@@ -149,12 +153,6 @@ class PlaylistToast: Toast {
             
             $0.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(buttonPressed)))
         }
-
-        button.snp.makeConstraints { make in
-            if let titleLabel = button.titleLabel {
-                make.width.equalTo(titleLabel.intrinsicContentSize.width + 2 * ButtonToastUX.toastButtonPadding)
-            }
-        }
         
         horizontalStackView.addArrangedSubview(button)
         toastView.addSubview(horizontalStackView)
@@ -194,10 +192,10 @@ class PlaylistToast: Toast {
             }
             
             make.centerX.equalTo(viewController.view.snp.centerX)
+            make.bottom.equalTo(viewController.webViewContainer.safeArea.bottom)
             make.left.equalTo(viewController.view.safeArea.left).priority(.high)
             make.right.equalTo(viewController.view.safeArea.right).priority(.high)
-            make.bottom.equalTo(viewController.webViewContainer.safeArea.bottom)
-            make.width.equalTo(375.0).priority(.required)
+            make.width.lessThanOrEqualTo(DesignUX.maxToastWidth)
         }
     }
 }
