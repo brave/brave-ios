@@ -579,6 +579,8 @@ extension ListController: UITableViewDelegate {
                     self.mediaInfo.nowPlayingInfo = nil
                     self.mediaInfo.updateNowPlayingMediaArtwork(image: nil)
                     
+                    self.updateTableBackgroundView()
+                    self.playerView.resetVideoInfo()
                     self.activityIndicator.stopAnimating()
                     self.playerView.stop()
                 }

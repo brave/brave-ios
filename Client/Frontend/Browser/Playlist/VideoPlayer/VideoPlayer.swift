@@ -500,6 +500,11 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         infoView.updateFavIcon(domain: videoDomain)
     }
     
+    public func resetVideoInfo() {
+        infoView.titleLabel.text = ""
+        infoView.clearFavIcon()
+    }
+    
     public func setControlsEnabled(_ enabled: Bool) {
         isUserInteractionEnabled = enabled
     }

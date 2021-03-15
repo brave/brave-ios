@@ -95,4 +95,9 @@ class VideoPlayerInfoBar: UIView {
             favIconImageView.loadFavicon(for: url)
         }
     }
+    
+    func clearFavIcon() {
+        favIconImageView.clearMonogramFavicon()
+        favIconImageView.image = nil
+    }
 }
