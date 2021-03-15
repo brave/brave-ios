@@ -302,7 +302,7 @@ private class ListController: UIViewController {
                 if UIDevice.current.orientation.isLandscape && UIDevice.isPhone {
                     playerView.setFullscreenButtonHidden(true)
                     playerView.snp.remakeConstraints {
-                        $0.edges.equalTo(view.safeArea.edges)
+                        $0.edges.equalTo(view.snp.edges)
                     }
                     
                     activityIndicator.snp.remakeConstraints {
@@ -479,6 +479,7 @@ extension ListController: UITableViewDataSource {
             if let image = image {
                 cell.thumbnailView.image = image
                 cell.thumbnailView.backgroundColor = .black
+                cell.thumbnailView.contentMode = .scaleAspectFit
                 cell.thumbnailGenerator = nil
                 SDImageCache.shared.store(image, forKey: url.absoluteString, completion: nil)
             } else {
@@ -506,6 +507,7 @@ extension ListController: UITableViewDataSource {
                 DispatchQueue.main.async {
                     cell.thumbnailView.image = image
                     cell.thumbnailView.backgroundColor = .black
+                    cell.thumbnailView.contentMode = .scaleAspectFit
                 }
             } else {
                 guard let url = URL(string: item.pageSrc) else { return }

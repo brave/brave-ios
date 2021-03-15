@@ -146,10 +146,19 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         registerPictureInPictureNotifications()
         controlsView.trackBar.delegate = self
         
-        self.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onOverlayTapped(_:))).then {
+        let overlayTappedGesture = UITapGestureRecognizer(target: self, action: #selector(onOverlayTapped(_:))).then {
             $0.numberOfTapsRequired = 1
             $0.numberOfTouchesRequired = 1
-        })
+        }
+        
+        let overlayDoubleTappedGesture = UITapGestureRecognizer(target: self, action: #selector(onOverlayDoubleTapped(_:))).then {
+            $0.numberOfTapsRequired = 2
+            $0.numberOfTouchesRequired = 1
+        }
+        
+        addGestureRecognizer(overlayTappedGesture)
+        addGestureRecognizer(overlayDoubleTappedGesture)
+        overlayTappedGesture.require(toFail: overlayDoubleTappedGesture)
         
         self.showOverlays(true)
     }
@@ -208,6 +217,20 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         } else {
             showOverlays(true)
             isOverlayDisplayed = true
+        }
+    }
+    
+    @objc
+    private func onOverlayDoubleTapped(_ gestureRecognizer: UITapGestureRecognizer) {
+        switch playerLayer.videoGravity {
+        case .resize:
+            playerLayer.videoGravity = .resizeAspect
+        case .resizeAspect:
+            playerLayer.videoGravity = .resizeAspectFill
+        case .resizeAspectFill:
+            playerLayer.videoGravity = .resizeAspect
+        default:
+            assertionFailure("Invalid VideoPlayer Gravity")
         }
     }
 
