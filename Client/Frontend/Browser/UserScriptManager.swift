@@ -242,6 +242,14 @@ class UserScriptManager {
         return WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false)
     }()
     
+    private let PlaylistSwizzlerScript: WKUserScript? = {
+        guard let path = Bundle.main.path(forResource: "PlaylistSwizzler", ofType: "js"), let source = try? String(contentsOfFile: path) else {
+            log.error("Failed to load PlaylistSwizzler.js")
+            return nil
+        }
+        return WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+    }()
+    
     private let PlaylistHelperScript: WKUserScript? = {
         guard let path = Bundle.main.path(forResource: "Playlist", ofType: "js"), let source = try? String(contentsOfFile: path) else {
             log.error("Failed to load Playlist.js")
@@ -284,6 +292,10 @@ class UserScriptManager {
             }
             
             if let script = FullscreenHelperScript {
+                $0.addUserScript(script)
+            }
+            
+            if let script = PlaylistSwizzlerScript {
                 $0.addUserScript(script)
             }
             

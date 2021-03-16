@@ -768,6 +768,7 @@
 		5EA84390234F802C00076A91 /* expired.badssl.com-intermediate-ca-2.cer in Resources */ = {isa = PBXBuildFile; fileRef = 5EA8438C234F802C00076A91 /* expired.badssl.com-intermediate-ca-2.cer */; };
 		5EA84391234F802C00076A91 /* expired.badssl.com-leaf.cer in Resources */ = {isa = PBXBuildFile; fileRef = 5EA8438D234F802C00076A91 /* expired.badssl.com-leaf.cer */; };
 		5EAB745C230456F0006055F5 /* BookmarkValidation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EAB745B230456F0006055F5 /* BookmarkValidation.swift */; };
+		5EC0017E260129AC005DDE4A /* PlaylistSwizzler.js in Resources */ = {isa = PBXBuildFile; fileRef = 5EC0017D260129AC005DDE4A /* PlaylistSwizzler.js */; };
 		5EC1DDBC2356883800CA4028 /* onboarding-shields.json in Resources */ = {isa = PBXBuildFile; fileRef = 0A6E095E230E05BC00AB3F19 /* onboarding-shields.json */; };
 		5EC1DDBD2356888000CA4028 /* onboarding-rewards.json in Resources */ = {isa = PBXBuildFile; fileRef = 5E1D8C6E232C0BDB00BDE662 /* onboarding-rewards.json */; };
 		5EC1DDBE2356892900CA4028 /* onboarding-ads.json in Resources */ = {isa = PBXBuildFile; fileRef = 5E11C3FF23314D970003C363 /* onboarding-ads.json */; };
@@ -2471,6 +2472,7 @@
 		5EA8438D234F802C00076A91 /* expired.badssl.com-leaf.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = "expired.badssl.com-leaf.cer"; sourceTree = "<group>"; };
 		5EAB745B230456F0006055F5 /* BookmarkValidation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkValidation.swift; sourceTree = "<group>"; };
 		5EB57D0122FDC0CB00A07325 /* FullscreenHelper.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = FullscreenHelper.js; sourceTree = "<group>"; };
+		5EC0017D260129AC005DDE4A /* PlaylistSwizzler.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = PlaylistSwizzler.js; sourceTree = "<group>"; };
 		5EC2C07225BF988E005EA984 /* PlaylistCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistCell.swift; sourceTree = "<group>"; };
 		5EC2C0E425C0B321005EA984 /* PlaylistDetector.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = PlaylistDetector.js; sourceTree = "<group>"; };
 		5EC594EC232C2C8F00922111 /* OnboardingWebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingWebViewController.swift; sourceTree = "<group>"; };
@@ -4880,6 +4882,7 @@
 				0A64384D24FD4E43000E80A3 /* ArchiveIsCompat.js */,
 				5E5E6F2825BB61320035B6A0 /* Playlist.js */,
 				5EC2C0E425C0B321005EA984 /* PlaylistDetector.js */,
+				5EC0017D260129AC005DDE4A /* PlaylistSwizzler.js */,
 			);
 			path = UserScripts;
 			sourceTree = "<group>";
@@ -6489,6 +6492,7 @@
 				5EC1DDBE2356892900CA4028 /* onboarding-ads.json in Resources */,
 				4422D57621C05DE600BF1855 /* httpse.leveldb.tgz in Resources */,
 				FA9294011D6584A200AC8D33 /* QRCode.xcassets in Resources */,
+				5EC0017E260129AC005DDE4A /* PlaylistSwizzler.js in Resources */,
 				0AB22A88257EADA900126ADC /* dylan-malval_sea.jpg in Resources */,
 				D308EE561CBF0BF5006843F2 /* CertError.css in Resources */,
 				CA1659CC25E445FA00A860ED /* BaltimoreCyberTrustRoot.cer in Resources */,
