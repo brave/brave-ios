@@ -257,7 +257,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     private let overlayView = UIImageView().then {
         $0.contentMode = .scaleAspectFit
         $0.isUserInteractionEnabled = true
-        $0.backgroundColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 0.2)
+        $0.backgroundColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 0.4024561216)
     }
     
     private let skipBackButton = UIButton().then {
@@ -274,13 +274,14 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     
     private let playPauseButton = UIButton().then {
         $0.imageView?.contentMode = .scaleAspectFit
-        $0.setImage(#imageLiteral(resourceName: "nav-forward").scale(toSize: CGSize(width: 22.0, height: 22.0)), for: .normal)
+        $0.setImage(#imageLiteral(resourceName: "nav-forward").template, for: .normal)
         $0.tintColor = .white
     }
     
     private let castButton = UIButton().then {
         $0.imageView?.contentMode = .scaleAspectFit
-        $0.setImage(#imageLiteral(resourceName: "close_popup"), for: .normal)
+        $0.setImage(#imageLiteral(resourceName: "playlist_airplay").scale(toSize: CGSize(width: 22.0, height: 22.0)).template, for: .normal)
+        $0.tintColor = .white
         
         let routePicker = AVRoutePickerView()
         routePicker.tintColor = .clear
@@ -299,13 +300,6 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     private let fullScreenButton = UIButton().then {
         $0.imageView?.contentMode = .scaleAspectFit
         $0.setImage(#imageLiteral(resourceName: "playlist_fullscreen"), for: .normal)
-    }
-    
-    private let exitFullScreenButton = UIButton().then {
-        $0.imageView?.contentMode = .scaleAspectFit
-        $0.setImage(#imageLiteral(resourceName: "close-medium").template, for: .normal)
-        $0.tintColor = .white
-        $0.isHidden = true
     }
     
     private let trackBarBackground = UIView().then {
@@ -353,7 +347,6 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         playPauseButton.addTarget(self, action: #selector(onPlay(_:)), for: .touchUpInside)
         castButton.addTarget(self, action: #selector(onCast(_:)), for: .touchUpInside)
         fullScreenButton.addTarget(self, action: #selector(onFullscreen(_:)), for: .touchUpInside)
-        exitFullScreenButton.addTarget(self, action: #selector(onExitFullscreen(_:)), for: .touchUpInside)
         skipBackButton.addTarget(self, action: #selector(onSeekBackwards(_:)), for: .touchUpInside)
         skipForwardButton.addTarget(self, action: #selector(onSeekForwards(_:)), for: .touchUpInside)
         skipBackButton.addTarget(self, action: #selector(onSeekPrevious(_:event:)), for: .touchDownRepeat)
@@ -367,7 +360,6 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         self.addSubview(playControlsStackView)
         self.addSubview(castButton)
         self.addSubview(fullScreenButton)
-        self.addSubview(exitFullScreenButton)
         self.addSubview(trackBar)
         
         [skipBackButton, playPauseButton, skipForwardButton].forEach({ playControlsStackView.addArrangedSubview($0) })
@@ -397,18 +389,13 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
             $0.left.right.bottom.equalToSuperview()
         }
         
-        castButton.snp.makeConstraints {
-            $0.top.right.equalToSuperview().inset(10.0)
-        }
-        
         fullScreenButton.snp.makeConstraints {
-            $0.top.equalToSuperview().inset(12.0)
-            $0.right.equalTo(castButton.snp.left).offset(-20.0)
+            $0.top.right.equalToSuperview().inset(15.0)
         }
         
-        exitFullScreenButton.snp.makeConstraints {
-            $0.right.equalToSuperview().offset(-15.0)
-            $0.top.equalToSuperview().offset(15.0)
+        castButton.snp.makeConstraints {
+            $0.top.equalToSuperview().inset(15.0)
+            $0.right.equalTo(fullScreenButton.snp.left).offset(-15.0)
         }
         
         registerNotifications()
@@ -657,7 +644,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     public func play() {
         if !isPlaying {
             isPlaying.toggle()
-            playPauseButton.setImage(#imageLiteral(resourceName: "nav-forward").scale(toSize: CGSize(width: 22.0, height: 22.0)), for: .normal)
+            playPauseButton.setImage(#imageLiteral(resourceName: "nav-forward").template, for: .normal)
             player.play()
             
             showOverlays(false)
@@ -669,7 +656,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     public func pause() {
         if isPlaying {
             isPlaying.toggle()
-            playPauseButton.setImage(#imageLiteral(resourceName: "playlist_pause").scale(toSize: CGSize(width: 22.0, height: 22.0)), for: .normal)
+            playPauseButton.setImage(#imageLiteral(resourceName: "playlist_pause"), for: .normal)
             player.pause()
             
             showOverlays(true)
@@ -680,7 +667,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     
     public func stop() {
         isPlaying = false
-        playPauseButton.setImage(#imageLiteral(resourceName: "nav-forward").scale(toSize: CGSize(width: 22.0, height: 22.0)), for: .normal)
+        playPauseButton.setImage(#imageLiteral(resourceName: "nav-forward").template, for: .normal)
         player.pause()
         
         showOverlays(true)

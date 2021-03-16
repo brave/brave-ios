@@ -122,6 +122,12 @@ class PlaylistMediaInfo: NSObject {
             MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
         }
     }
+    
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
+            if keyPath == "rate" {
+                self.updateNowPlayingMediaInfo()
+            }
+        }
 }
 
 extension PlaylistMediaInfo: MPPlayableContentDelegate {
@@ -199,7 +205,7 @@ extension PlaylistMediaInfo: MPPlayableContentDelegate {
 
 extension PlaylistMediaInfo {
     
-    private func thumbnailForURL(_ url: String) -> UIImage? {
+    public func thumbnailForURL(_ url: String) -> UIImage? {
         let sourceURL = URL(string: url)
         let asset = AVAsset(url: sourceURL!)
         let imageGenerator = AVAssetImageGenerator(asset: asset)
@@ -407,5 +413,26 @@ extension MediaResourceManager {
                 completion(false)
             }
         }.resume()
+    }
+}
+
+extension AVAsset {
+    func generateThumbnail(completion: @escaping (UIImage?) -> Void) {
+        DispatchQueue.global().async {
+            let imageGenerator = AVAssetImageGenerator(asset: self)
+            let time = CMTime(seconds: 0.0, preferredTimescale: 600)
+            let times = [NSValue(time: time)]
+            imageGenerator.generateCGImagesAsynchronously(forTimes: times, completionHandler: { _, image, _, _, _ in
+                if let image = image {
+                    DispatchQueue.main.async {
+                        completion(UIImage(cgImage: image))
+                    }
+                } else {
+                    DispatchQueue.main.async {
+                        completion(nil)
+                    }
+                }
+            })
+        }
     }
 }
