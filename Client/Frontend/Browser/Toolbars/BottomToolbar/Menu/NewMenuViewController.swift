@@ -54,15 +54,23 @@ struct MenuItemHeaderView: View {
 @available(iOS 13.0, *)
 struct NewMenuView<Content: View>: View {
     var content: Content
-    @Environment(\.colorScheme) var colorScheme: ColorScheme
+    @ObservedObject var themeNormalMode = PreferenceObserver(option: Preferences.General.themeNormalMode)
     var body: some View {
         ScrollView(.vertical) {
             content
                 .padding(.vertical, 8)
                 .frame(maxWidth: .infinity)
         }
-        .background(Color(Theme.of(nil).colors.home))
-        .environment(\.colorScheme, Theme.of(nil).isDark ? .dark : .light)
+    }
+}
+
+@available(iOS 13.0, *)
+class PreferenceObserver: ObservableObject, PreferencesObserver {
+    init<T>(option: Preferences.Option<T>) {
+        option.observe(from: self)
+    }
+    func preferencesDidChange(for key: String) {
+        objectWillChange.send()
     }
 }
 
@@ -84,7 +92,7 @@ struct MenuItemButton: View {
 }
 
 @available(iOS 13.0, *)
-class NewMenuController: UINavigationController, PanModalPresentable {
+class NewMenuController: UINavigationController, PanModalPresentable, UIPopoverPresentationControllerDelegate {
     
     private var menuNavigationDelegate: MenuNavigationControllerDelegate?
     
@@ -212,9 +220,14 @@ class NewMenuController: UINavigationController, PanModalPresentable {
 }
 
 @available(iOS 13.0, *)
-private class NewMenuHostingController<MenuContent: View>: UIHostingController<NewMenuView<MenuContent>> {
+private class NewMenuHostingController<MenuContent: View>: UIHostingController<NewMenuView<MenuContent>>, PreferencesObserver {
     init(content: MenuContent) {
         super.init(rootView: NewMenuView(content: content))
+        Preferences.General.themeNormalMode.observe(from: self)
+    }
+    
+    func preferencesDidChange(for key: String) {
+        view.backgroundColor = Theme.of(nil).colors.home
     }
     
     @available(*, unavailable)
@@ -228,12 +241,23 @@ private class NewMenuHostingController<MenuContent: View>: UIHostingController<N
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        navigationController?.setNavigationBarHidden(true, animated: animated)
+        let animateNavBar = (navigationController?.isBeingPresented == false ? animated : false)
+        navigationController?.setNavigationBarHidden(true, animated: animateNavBar)
+        view.backgroundColor = Theme.of(nil).colors.home
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        navigationController?.setNavigationBarHidden(false, animated: animated)
+        if navigationController?.isBeingDismissed == false {
+            navigationController?.setNavigationBarHidden(false, animated: animated)
+        }
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        if traitCollection.userInterfaceStyle != previousTraitCollection?.userInterfaceStyle {
+            view.backgroundColor = Theme.of(nil).colors.home
+        }
     }
 }
 
