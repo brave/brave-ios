@@ -55,6 +55,14 @@ class UserScriptManager {
         }
     }
     
+    /// Whether or not the MediaSource API should be disabled for Playlists
+    var isWebCompatibilityMediaSourceAPIEnabled: Bool {
+        didSet {
+            if oldValue == isWebCompatibilityMediaSourceAPIEnabled { return }
+            reloadUserScripts()
+        }
+    }
+    
     /// Stores domain specific scriplet, usually used for webcompat workarounds.
     var domainUserScript: DomainUserScript? {
         didSet {
@@ -94,12 +102,13 @@ class UserScriptManager {
         return false
     }
     
-    init(tab: Tab, isFingerprintingProtectionEnabled: Bool, isCookieBlockingEnabled: Bool, isU2FEnabled: Bool, isPaymentRequestEnabled: Bool) {
+    init(tab: Tab, isFingerprintingProtectionEnabled: Bool, isCookieBlockingEnabled: Bool, isU2FEnabled: Bool, isPaymentRequestEnabled: Bool, isWebCompatibilityMediaSourceAPIEnabled: Bool) {
         self.tab = tab
         self.isFingerprintingProtectionEnabled = isFingerprintingProtectionEnabled
         self.isCookieBlockingEnabled = isCookieBlockingEnabled
         self.isU2FEnabled = isU2FEnabled
         self.isPaymentRequestEnabled = isPaymentRequestEnabled
+        self.isWebCompatibilityMediaSourceAPIEnabled = isWebCompatibilityMediaSourceAPIEnabled
         reloadUserScripts()
     }
     
@@ -295,7 +304,7 @@ class UserScriptManager {
                 $0.addUserScript(script)
             }
             
-            if let script = PlaylistSwizzlerScript {
+            if isWebCompatibilityMediaSourceAPIEnabled, let script = PlaylistSwizzlerScript {
                 $0.addUserScript(script)
             }
             

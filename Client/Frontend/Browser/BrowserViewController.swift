@@ -341,6 +341,7 @@ class BrowserViewController: UIViewController {
             self.setupAdsNotificationHandler()
         }
         Preferences.NewTabPage.selectedCustomTheme.observe(from: self)
+        Preferences.Playlist.webMediaSourceCompatibility.observe(from: self)
         // Lists need to be compiled before attempting tab restoration
         contentBlockListDeferred = ContentBlockerHelper.compileBundledLists()
         
@@ -3489,6 +3490,13 @@ extension BrowserViewController: PreferencesObserver {
         case Preferences.NewTabPage.selectedCustomTheme.key:
             Preferences.NTP.ntpCheckDate.value = nil
             backgroundDataSource.startFetching()
+        case Preferences.Playlist.webMediaSourceCompatibility.key:
+            playlistToast?.dismiss(false)
+            
+            tabManager.allTabs.forEach {
+                $0.userScriptManager?.isWebCompatibilityMediaSourceAPIEnabled = Preferences.Playlist.webMediaSourceCompatibility.value
+                $0.webView?.reload()
+            }
         default:
             log.debug("Received a preference change for an unknown key: \(key) on \(type(of: self))")
             break

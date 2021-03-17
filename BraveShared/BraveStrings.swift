@@ -1349,6 +1349,17 @@ extension Strings {
                               bundle: .braveShared,
                               value: "Sorry, this item could not be downloaded at this time.",
                               comment: "Error message when downloading a playlist item fails")
+        
+        public static let playlistWebCompatibilityTitle =
+            NSLocalizedString("playlist.playlistWebCompatibilityTitle",
+                              bundle: .braveShared,
+                              value: "Web Compatibility",
+                              comment: "Title for Playlist setting")
+        public static let playlistWebCompatibilityDescription =
+            NSLocalizedString("playlist.playlistWebCompatibilityDescription",
+                              bundle: .braveShared,
+                              value: "Disables the WebKit MediaSource API",
+                              comment: "Description for Playlist setting")
     }
 }
 

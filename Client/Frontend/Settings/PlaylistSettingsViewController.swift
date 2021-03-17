@@ -143,6 +143,15 @@ class PlaylistSettingsViewController: TableViewController {
         }
         
         dataSource.sections.append(
+            Section(
+                rows: [
+                    .boolRow(title: Strings.PlayList.playlistWebCompatibilityTitle,
+                             detailText: Strings.PlayList.playlistWebCompatibilityDescription,
+                             option: Preferences.Playlist.webMediaSourceCompatibility)
+                ])
+        )
+        
+        dataSource.sections.append(
             Section(rows: [
                 Row(text: Strings.PlayList.playlistDeleteCacheAlertTitle, selection: { [unowned self] in
                     let style: UIAlertController.Style = UIDevice.current.userInterfaceIdiom == .pad ? .alert : .actionSheet

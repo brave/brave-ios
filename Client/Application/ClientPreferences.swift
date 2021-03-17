@@ -211,6 +211,8 @@ extension Preferences {
         static let firstLoadAutoPlay = Option<Bool>(key: "playlist.firstLoadAutoPlay", default: false)
         /// The Option to download video yes / no / only wifi
         static let autoDownloadVideo = Option<String>(key: "playlist.listViewSide", default: PlayListDownloadType.off.rawValue)
+        /// The Option to disable playlist MediaSource web-compatibility
+        static let webMediaSourceCompatibility = Option<Bool>(key: "playlist.webMediaSourceCompatibility", default: true)
     }
 }
 
