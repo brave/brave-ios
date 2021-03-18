@@ -75,26 +75,32 @@ extension BrowserViewController {
             return
         }
         
-        let argumentNextItem: [Any] = ["_n", "extI", "tem"]
-        let argumentView: [Any] = ["v", "ie", "w"]
-        
-        let valueKeyNextItem = argumentNextItem.compactMap { $0 as? String }.joined()
-        let valueKeyView = argumentView.compactMap { $0 as? String }.joined()
+        if UIDevice.isIpad {
+            webContentView.inputAssistantItem.trailingBarButtonGroups +=
+                [UIBarButtonItemGroup(barButtonItems: [UIBarButtonItem(customView: customSearchEngineButton)], representativeItem: nil)]
 
-        guard let input = webContentView.perform(#selector(getter: UIResponder.inputAccessoryView)),
-              let inputView = input.takeUnretainedValue() as? UIInputView,
-              let nextButton = inputView.value(forKey: valueKeyNextItem) as? UIBarButtonItem,
-              let nextButtonView = nextButton.value(forKey: valueKeyView) as? UIView else {
-            return
-        }
-        
-        inputView.addSubview(customSearchEngineButton)
-        
-        customSearchEngineButton.snp.remakeConstraints { make in
-            make.leading.equalTo(nextButtonView.snp.trailing).offset(20)
-            make.width.equalTo(inputView.snp.height)
-            make.top.equalTo(nextButtonView.snp.top)
-            make.height.equalTo(inputView.snp.height)
+        } else {
+            let argumentNextItem: [Any] = ["_n", "extI", "tem"]
+            let argumentView: [Any] = ["v", "ie", "w"]
+            
+            let valueKeyNextItem = argumentNextItem.compactMap { $0 as? String }.joined()
+            let valueKeyView = argumentView.compactMap { $0 as? String }.joined()
+
+            guard let input = webContentView.perform(#selector(getter: UIResponder.inputAccessoryView)),
+                  let inputView = input.takeUnretainedValue() as? UIInputView,
+                  let nextButton = inputView.value(forKey: valueKeyNextItem) as? UIBarButtonItem,
+                  let nextButtonView = nextButton.value(forKey: valueKeyView) as? UIView else {
+                return
+            }
+            
+            inputView.addSubview(customSearchEngineButton)
+            
+            customSearchEngineButton.snp.remakeConstraints { make in
+                make.leading.equalTo(nextButtonView.snp.trailing).offset(20)
+                make.width.equalTo(inputView.snp.height)
+                make.top.equalTo(nextButtonView.snp.top)
+                make.height.equalTo(inputView.snp.height)
+            }
         }
     }
 
