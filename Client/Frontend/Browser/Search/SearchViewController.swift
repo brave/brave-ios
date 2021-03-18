@@ -326,8 +326,15 @@ class SearchViewController: SiteTableViewController, LoaderListener {
         for engine in quickSearchEngines {
             let engineButton = UIButton()
             engineButton.setImage(engine.image, for: [])
-            engineButton.imageView?.contentMode = .scaleAspectFit
+            
+            if engine.isCustomEngine, let hostURL = fetchEngineHost(from: engine.searchTemplate) {
+                engineButton.imageView?.loadFavicon(for: hostURL, fallbackMonogramCharacter: engine.displayName.first)
+            } else {
+                engineButton.imageView?.contentMode = .scaleAspectFit
+            }
+
             engineButton.layer.backgroundColor = SearchViewControllerUX.engineButtonBackgroundColor
+            
             engineButton.addTarget(self, action: #selector(didSelectEngine), for: .touchUpInside)
             engineButton.accessibilityLabel = String(format: Strings.searchEngineFormatText, engine.shortName)
 
@@ -349,6 +356,21 @@ class SearchViewController: SiteTableViewController, LoaderListener {
             }
             leftEdge = engineButton.snp.right
         }
+    }
+    
+    private func fetchEngineHost(from searchTemplate: String) -> URL? {
+        var engineHost: URL?
+        
+        guard let siteURL = searchTemplate.addingPercentEncoding(withAllowedCharacters: .urlFragmentAllowed),
+              let url = URL(string: siteURL) else {
+            return nil
+        }
+        
+        if let scheme = url.scheme, let host = url.host {
+            engineHost = URL(string: "\(scheme)://\(host)")
+        }
+
+        return engineHost
     }
 
     private func querySuggestClient() {
