@@ -142,14 +142,16 @@ class PlaylistSettingsViewController: TableViewController {
             dataSource.sections.append(sideSelectionSection)
         }
         
-        dataSource.sections.append(
-            Section(
-                rows: [
-                    .boolRow(title: Strings.PlayList.playlistWebCompatibilityTitle,
-                             detailText: Strings.PlayList.playlistWebCompatibilityDescription,
-                             option: Preferences.Playlist.webMediaSourceCompatibility)
-                ])
-        )
+        if UIDevice.isIpad {
+            dataSource.sections.append(
+                Section(
+                    rows: [
+                        .boolRow(title: Strings.PlayList.playlistWebCompatibilityTitle,
+                                 detailText: Strings.PlayList.playlistWebCompatibilityDescription,
+                                 option: Preferences.Playlist.webMediaSourceCompatibility)
+                    ])
+            )
+        }
         
         dataSource.sections.append(
             Section(rows: [

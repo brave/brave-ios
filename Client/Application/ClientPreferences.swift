@@ -212,7 +212,7 @@ extension Preferences {
         /// The Option to download video yes / no / only wifi
         static let autoDownloadVideo = Option<String>(key: "playlist.listViewSide", default: PlayListDownloadType.off.rawValue)
         /// The Option to disable playlist MediaSource web-compatibility
-        static let webMediaSourceCompatibility = Option<Bool>(key: "playlist.webMediaSourceCompatibility", default: true)
+        static let webMediaSourceCompatibility = Option<Bool>(key: "playlist.webMediaSourceCompatibility", default: UIDevice.isIpad)
     }
 }
 

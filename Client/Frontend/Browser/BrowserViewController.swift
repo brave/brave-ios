@@ -3491,11 +3491,13 @@ extension BrowserViewController: PreferencesObserver {
             Preferences.NTP.ntpCheckDate.value = nil
             backgroundDataSource.startFetching()
         case Preferences.Playlist.webMediaSourceCompatibility.key:
-            playlistToast?.dismiss(false)
-            
-            tabManager.allTabs.forEach {
-                $0.userScriptManager?.isWebCompatibilityMediaSourceAPIEnabled = Preferences.Playlist.webMediaSourceCompatibility.value
-                $0.webView?.reload()
+            if UIDevice.isIpad {
+                playlistToast?.dismiss(false)
+                
+                tabManager.allTabs.forEach {
+                    $0.userScriptManager?.isWebCompatibilityMediaSourceAPIEnabled = Preferences.Playlist.webMediaSourceCompatibility.value
+                    $0.webView?.reload()
+                }
             }
         default:
             log.debug("Received a preference change for an unknown key: \(key) on \(type(of: self))")
