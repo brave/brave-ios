@@ -37,13 +37,13 @@ class Playlist {
         }
     }
     
-    func updateItem(mediaSrc: String, item: PlaylistInfo, completion: (() -> Void)? = nil) {
+    func updateItem(item: PlaylistInfo, completion: (() -> Void)? = nil) {
         if itemExists(item: item) {
             backgroundContext.perform { [weak self] in
                 guard let self = self else { return }
                 
                 let request: NSFetchRequest<PlaylistItem> = PlaylistItem.fetchRequest()
-                request.predicate = NSPredicate(format: "mediaSrc == %@", mediaSrc)
+                request.predicate = NSPredicate(format: "pageSrc == %@", item.pageSrc)
                 
                 do {
                     try self.backgroundContext.fetch(request).forEach({
@@ -118,7 +118,7 @@ class Playlist {
                 guard let self = self else { return }
                 let request = { () -> NSBatchDeleteRequest in
                     let request: NSFetchRequest<NSFetchRequestResult> = PlaylistItem.fetchRequest()
-                    request.predicate = NSPredicate(format: "pageSrc == %@", item.pageSrc)
+                    request.predicate = NSPredicate(format: "mediaSrc == %@", item.src)
                     
                     let deleteRequest = NSBatchDeleteRequest(fetchRequest: request)
                     deleteRequest.resultType = .resultTypeObjectIDs
@@ -136,7 +136,7 @@ class Playlist {
                     log.error(error)
                     
                     let request: NSFetchRequest<PlaylistItem> = PlaylistItem.fetchRequest()
-                    request.predicate = NSPredicate(format: "pageSrc == %@", item.pageSrc)
+                    request.predicate = NSPredicate(format: "mediaSrc == %@", item.src)
                     
                     do {
                         try self.backgroundContext.fetch(request).forEach({

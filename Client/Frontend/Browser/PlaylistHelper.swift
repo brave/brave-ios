@@ -79,7 +79,7 @@ class PlaylistHelper: TabContentScript {
         delegate?.addToPlayListActivity(info: item, itemDetected: true)
         
         if Playlist.shared.itemExists(item: item) {
-            Playlist.shared.updateItem(mediaSrc: item.src, item: item) {
+            Playlist.shared.updateItem(item: item) {
                 log.debug("Playlist Item Updated")
                 
                 if !self.playlistItems.contains(item.src) {

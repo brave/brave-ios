@@ -160,10 +160,10 @@ extension PlaylistMediaInfo: MPPlayableContentDelegate {
                 self.webLoader = PlaylistWebLoader(handler: { [weak self] newItem in
                     guard let self = self else { return }
                     // item.duration == newItem.duration TODO: FIX ADS!
-                    if let newItem = newItem, let url = URL(string: newItem.src) {
+                    if let newItem = newItem, let url = URL(string: newItem.src), !url.absoluteString.contains("pltype=adhost") {
                         self.playerView?.load(url: url, resourceDelegate: nil, autoPlayEnabled: autoPlayEnabled)
 
-                        Playlist.shared.updateItem(mediaSrc: item.src, item: newItem) {
+                        Playlist.shared.updateItem(item: newItem) {
                             completion(.none)
                         }
                     } else {
