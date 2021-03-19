@@ -50,7 +50,7 @@ extension BrowserViewController {
         }
         
         var value: Int {
-            return AppConstants.buildChannel.isPublic ? self.rawValue : self.rawValue / 10
+            AppConstants.buildChannel.isPublic ? self.rawValue : self.rawValue / 10
         }
     }
     
