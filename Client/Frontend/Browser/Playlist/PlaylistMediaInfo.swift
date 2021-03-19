@@ -42,11 +42,11 @@ class PlaylistMediaInfo: NSObject {
         }
         
         MPRemoteCommandCenter.shared().changeRepeatModeCommand.addTarget { _ in
-            return .success
+            .success
         }
         
         MPRemoteCommandCenter.shared().changeShuffleModeCommand.addTarget { _ in
-            return .success
+            .success
         }
         
         MPRemoteCommandCenter.shared().previousTrackCommand.addTarget { [weak self] _ in
@@ -159,7 +159,7 @@ extension PlaylistMediaInfo: MPPlayableContentDelegate {
                 
                 self.webLoader = PlaylistWebLoader(handler: { [weak self] newItem in
                     guard let self = self else { return }
-                    // item.duration == newItem.duration TODO: FIX ADS!
+                    // `adhost` makes sure the playlist is not streaming an ad-video
                     if let newItem = newItem, let url = URL(string: newItem.src), !url.absoluteString.contains("pltype=adhost") {
                         self.playerView?.load(url: url, resourceDelegate: nil, autoPlayEnabled: autoPlayEnabled)
 
@@ -404,7 +404,7 @@ class MediaResourceManager: NSObject, AVAssetResourceLoaderDelegate {
     }
     
     func resourceLoader(_ resourceLoader: AVAssetResourceLoader, shouldWaitForRenewalOfRequestedResource renewalRequest: AVAssetResourceRenewalRequest) -> Bool {
-        return false
+        false
     }
     
     func resourceLoader(_ resourceLoader: AVAssetResourceLoader, didCancel loadingRequest: AVAssetResourceLoadingRequest) {
@@ -476,7 +476,7 @@ extension MediaResourceManager {
         }
     }
     
-    public static func getMimeType(_ url: URL, _ completion: @escaping (String) -> Void) {
+    public static func getMimeType(_ url: URL, _ completion: @escaping (String?) -> Void) {
         let request: URLRequest = {
             var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10.0)
             request.addValue("bytes=0-1", forHTTPHeaderField: "Range")
@@ -488,7 +488,7 @@ extension MediaResourceManager {
         URLSession(configuration: .ephemeral).dataTask(with: request) { data, response, error in
             DispatchQueue.main.async {
                 if error != nil {
-                    return completion("")
+                    return completion(nil)
                 }
                 
                 if let response = response as? HTTPURLResponse, response.statusCode == 302 || response.statusCode >= 200 && response.statusCode <= 299 {
@@ -501,7 +501,7 @@ extension MediaResourceManager {
                     }
                 }
                 
-                completion("")
+                completion(nil)
             }
         }.resume()
     }

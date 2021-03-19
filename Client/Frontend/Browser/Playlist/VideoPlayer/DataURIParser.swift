@@ -11,7 +11,7 @@ class DataURIParser {
     let data: Data
     
     init(uri: String) throws {
-        if uri == "data:," {
+        if uri.lowercased() == "data:," {
             mediaType = "text/plain"
             headers = ["charset=US-ASCII"]
             data = Data()

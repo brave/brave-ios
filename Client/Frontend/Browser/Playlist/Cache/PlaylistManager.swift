@@ -35,19 +35,19 @@ class PlaylistManager: NSObject {
     }
     
     func numberOfAssets() -> Int {
-        return frc.fetchedObjects?.count ?? 0
+        frc.fetchedObjects?.count ?? 0
     }
     
     func itemAtIndex(_ index: Int) -> PlaylistInfo {
-        return PlaylistInfo(item: frc.object(at: IndexPath(row: index, section: 0)))
+        PlaylistInfo(item: frc.object(at: IndexPath(row: index, section: 0)))
     }
     
     func assetAtIndex(_ index: Int) -> AVURLAsset {
-        return asset(for: itemAtIndex(index).pageSrc)
+        asset(for: itemAtIndex(index).pageSrc)
     }
     
     func index(of pageSrc: String) -> Int? {
-        return frc.fetchedObjects?.firstIndex(where: { $0.pageSrc == pageSrc })
+        frc.fetchedObjects?.firstIndex(where: { $0.pageSrc == pageSrc })
     }
     
     func reorderItems(from sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
@@ -114,7 +114,7 @@ class PlaylistManager: NSObject {
         guard downloadManager.downloadTask(for: item.pageSrc) == nil, let assetUrl = URL(string: item.src) else { return }
         
         MediaResourceManager.getMimeType(assetUrl) { [weak self] mimeType in
-            guard let self = self else { return }
+            guard let self = self, let mimeType = mimeType else { return }
 
             if mimeType.contains("x-mpegURL") || mimeType.contains("application/vnd.apple.mpegurl") || mimeType.lowercased().contains("mpegurl") {
                 DispatchQueue.main.async {
