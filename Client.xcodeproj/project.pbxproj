@@ -1038,8 +1038,6 @@
 		F979BE3025BCC54E009B6ACF /* AllFramesAtDocumentEnd.js in Resources */ = {isa = PBXBuildFile; fileRef = F979BE2C25BCC54D009B6ACF /* AllFramesAtDocumentEnd.js */; };
 		F979BE3125BCC54E009B6ACF /* AllFramesAtDocumentStartSandboxed.js in Resources */ = {isa = PBXBuildFile; fileRef = F979BE2D25BCC54E009B6ACF /* AllFramesAtDocumentStartSandboxed.js */; };
 		F979BE3225BCC54E009B6ACF /* AllFramesAtDocumentEndSandboxed.js in Resources */ = {isa = PBXBuildFile; fileRef = F979BE2E25BCC54E009B6ACF /* AllFramesAtDocumentEndSandboxed.js */; };
-		F979BE4725BCC5D3009B6ACF /* MainFrameAtDocumentEnd.js in Resources */ = {isa = PBXBuildFile; fileRef = F979BE4525BCC5D3009B6ACF /* MainFrameAtDocumentEnd.js */; };
-		F979BE4825BCC5D3009B6ACF /* MainFrameAtDocumentStart.js in Resources */ = {isa = PBXBuildFile; fileRef = F979BE4625BCC5D3009B6ACF /* MainFrameAtDocumentStart.js */; };
 		F99505FF22937E3900CC6543 /* U2F-low-level.js in Resources */ = {isa = PBXBuildFile; fileRef = F99505FE22937E3900CC6543 /* U2F-low-level.js */; };
 		F9B23EE223F61173000EB3D8 /* PaymentRequest.js in Resources */ = {isa = PBXBuildFile; fileRef = F9B23EE123F61173000EB3D8 /* PaymentRequest.js */; };
 		F9B23EE523F613E8000EB3D8 /* PaymentRequestExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B23EE423F613E8000EB3D8 /* PaymentRequestExtension.swift */; };
@@ -2762,8 +2760,6 @@
 		F979BE2C25BCC54D009B6ACF /* AllFramesAtDocumentEnd.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = AllFramesAtDocumentEnd.js; sourceTree = "<group>"; };
 		F979BE2D25BCC54E009B6ACF /* AllFramesAtDocumentStartSandboxed.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = AllFramesAtDocumentStartSandboxed.js; sourceTree = "<group>"; };
 		F979BE2E25BCC54E009B6ACF /* AllFramesAtDocumentEndSandboxed.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = AllFramesAtDocumentEndSandboxed.js; sourceTree = "<group>"; };
-		F979BE4525BCC5D3009B6ACF /* MainFrameAtDocumentEnd.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = MainFrameAtDocumentEnd.js; sourceTree = "<group>"; };
-		F979BE4625BCC5D3009B6ACF /* MainFrameAtDocumentStart.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = MainFrameAtDocumentStart.js; sourceTree = "<group>"; };
 		F99505FE22937E3900CC6543 /* U2F-low-level.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "U2F-low-level.js"; sourceTree = "<group>"; };
 		F9B23EE123F61173000EB3D8 /* PaymentRequest.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = PaymentRequest.js; sourceTree = "<group>"; };
 		F9B23EE423F613E8000EB3D8 /* PaymentRequestExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentRequestExtension.swift; sourceTree = "<group>"; };
@@ -5466,8 +5462,6 @@
 				D308EE551CBF0BF5006843F2 /* CertError.css */,
 				0BA1E02F1B051A07007675AF /* NetError.css */,
 				D38A1EDF1CB458EC0080C842 /* CertError.html */,
-				F979BE4525BCC5D3009B6ACF /* MainFrameAtDocumentEnd.js */,
-				F979BE4625BCC5D3009B6ACF /* MainFrameAtDocumentStart.js */,
 				0BA1E00D1B03FB0B007675AF /* NetError.html */,
 				39A35AEC1C0662A3006B9E87 /* SpotlightHelper.js */,
 				F84B21EF1A0910F600AAB793 /* Images.xcassets */,
@@ -6418,8 +6412,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F979BE4725BCC5D3009B6ACF /* MainFrameAtDocumentEnd.js in Resources */,
-				F979BE4825BCC5D3009B6ACF /* MainFrameAtDocumentStart.js in Resources */,
 				F979BE2F25BCC54E009B6ACF /* AllFramesAtDocumentStart.js in Resources */,
 				F979BE3025BCC54E009B6ACF /* AllFramesAtDocumentEnd.js in Resources */,
 				F979BE3125BCC54E009B6ACF /* AllFramesAtDocumentStartSandboxed.js in Resources */,
@@ -7046,7 +7038,6 @@
 				4422D42321BFCE9200BF1855 /* HttpsEverywhereStats.swift in Sources */,
 				0A8C69AB225CFCAF00988715 /* AddEditBookmarkTableViewController.swift in Sources */,
 				27C5AC8725D6FA6D00B8F50E /* OPML.swift in Sources */,
-				2FF4EBCD25CB824600BE94DA /* PlaylistDetailsViewController.swift in Sources */,
 				27FD2CAD2146C31C00A5A779 /* AddToFavoritesActivity.swift in Sources */,
 				4422D4E121BFFB7600BF1855 /* filter_block.cc in Sources */,
 				0A8C69BE225E350300988715 /* IndentedImageTableViewCell.swift in Sources */,
@@ -7253,9 +7244,8 @@
 				A9072B801D07B34100459960 /* NoImageModeHelper.swift in Sources */,
 				4422D4EB21BFFB7600BF1855 /* filename.cc in Sources */,
 				2726636924944BFA0056CFE1 /* BraveTodayOptInView.swift in Sources */,
-				2726636924944BFA0056CFE1 /* BraveTodayWelcomeView.swift in Sources */,
+				2726636924944BFA0056CFE1 /* BraveTodayOptInView.swift in Sources */,
 				CA439A5925E6F29D00FE9150 /* VideoPlayerInfoBar.swift in Sources */,
-				2FE5B4542582BEF500BFDDB8 /* ShareTrayView.swift in Sources */,
 				2755EABD255323C60033C43F /* PublisherInfoExtensions.swift in Sources */,
 				2746D28324A4FB7400E38852 /* RewardsInternalsSharable.swift in Sources */,
 				44331DDA22552313007E3E93 /* LocationContainerView.swift in Sources */,
