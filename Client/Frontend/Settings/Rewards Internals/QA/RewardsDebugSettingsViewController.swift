@@ -42,6 +42,8 @@ class RewardsDebugSettingsViewController: TableViewController {
         let overrideForIndex = EnvironmentOverride.sortedCases[value]
         Preferences.Rewards.environmentOverride.value = overrideForIndex.rawValue
         self.rewards.reset()
+        Preferences.Rewards.transferDrainID.value = nil
+        Preferences.Rewards.transferCompletionAcknowledged.value = false
         self.showResetRewardsAlert()
     }
     
@@ -324,6 +326,8 @@ class RewardsDebugSettingsViewController: TableViewController {
     
     @objc private func tappedReset() {
         rewards.reset()
+        Preferences.Rewards.transferDrainID.value = nil
+        Preferences.Rewards.transferCompletionAcknowledged.value = false
         showResetRewardsAlert()
     }
     
