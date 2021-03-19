@@ -25,6 +25,11 @@
         }
 
         if (src !== "") {
+            // If the video is an ad, we don't bother notifying the delegate..
+            if (src.includes("pltype=adhost")) {
+                return
+            }
+            
             window.webkit.messageHandlers.playlistCacheLoader.postMessage({
                                                                         "name": name,
                                                                         "src": src,
@@ -38,7 +43,7 @@
             var target = node;
             document.querySelectorAll('source').forEach(function(node) {
                 if (node.src !== "") {
-                    if (node.closest('video') === target) {
+                    if (node.closest('video') === target && !node.src.includes("pltype=adhost")) {
                         window.webkit.messageHandlers.playlistCacheLoader.postMessage({
                                                                                     "name": name,
                                                                                     "src": node.src,
@@ -50,7 +55,7 @@
                                                                                     });
                     }
                     
-                    if (node.closest('audio') === target) {
+                    if (node.closest('audio') === target && !node.src.includes("pltype=adhost")) {
                         window.webkit.messageHandlers.playlistCacheLoader.postMessage({
                                                                                     "name": name,
                                                                                     "src": node.src,

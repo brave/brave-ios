@@ -8,12 +8,13 @@ import MediaPlayer
 import AVKit
 import AVFoundation
 import Shared
+import Data
 
 private let log = Logger.browserLogger
 
 class PlaylistMediaInfo: NSObject {
     private weak var playerView: VideoView?
-    private var webLoader = PlaylistWebLoader(handler: { _ in })
+    private var webLoader: PlaylistWebLoader?
     private var streamLoader = MediaResourceManager({ _ in })
     private var playerStatusObserver: StreamObserver?
     public var nowPlayingInfo: PlaylistInfo? {
@@ -98,6 +99,7 @@ class PlaylistMediaInfo: NSObject {
     }
     
     deinit {
+        self.webLoader?.removeFromSuperview()
         self.playerView?.player.removeObserver(self, forKeyPath: "rate", context: nil)
         UIApplication.shared.endReceivingRemoteControlEvents()
     }
@@ -157,13 +159,19 @@ extension PlaylistMediaInfo: MPPlayableContentDelegate {
                     return
                 }
                 
+                self.webLoader?.removeFromSuperview()
                 self.webLoader = PlaylistWebLoader(handler: { [weak self] newItem in
                     guard let self = self else { return }
-                    // `adhost` makes sure the playlist is not streaming an ad-video
-                    if let newItem = newItem, let url = URL(string: newItem.src), !url.absoluteString.contains("pltype=adhost") {
+                    defer {
+                        // Destroy the web loader when the callback is complete.
+                        self.webLoader?.removeFromSuperview()
+                        self.webLoader = nil
+                    }
+                    
+                    if let newItem = newItem, let url = URL(string: newItem.src) {
                         self.playerView?.load(url: url, resourceDelegate: nil, autoPlayEnabled: autoPlayEnabled)
 
-                        Playlist.shared.updateItem(item: newItem) {
+                        PlaylistItem.updateItem(newItem) {
                             completion(.none)
                         }
                     } else {
@@ -171,10 +179,15 @@ extension PlaylistMediaInfo: MPPlayableContentDelegate {
                         self.updateNowPlayingMediaArtwork(image: nil)
                         completion(.expired)
                     }
-                })
+                }).then {
+                    // If we don't do this, youtube shows ads 100% of the time.
+                    // It's some weird race-condition in WKWebView where the content blockers may not load until
+                    // The WebView is visible!
+                    self.playerView?.window?.insertSubview($0, at: 0)
+                }
                 
                 if let url = URL(string: item.pageSrc) {
-                    self.webLoader.load(url: url)
+                    self.webLoader?.load(url: url)
                 } else {
                     self.nowPlayingInfo = nil
                     self.updateNowPlayingMediaArtwork(image: nil)
@@ -472,7 +485,11 @@ extension MediaResourceManager {
     // This function only exists because I can't figure out why videos from URLs don't play unless I explicitly specify a mime-type..
     public static func canStreamURL(_ url: URL, _ completion: @escaping (Bool) -> Void) {
         getMimeType(url) { mimeType in
-            completion(!mimeType.isEmpty)
+            if let mimeType = mimeType {
+                completion(!mimeType.isEmpty)
+            } else {
+                completion(false)
+            }
         }
     }
     

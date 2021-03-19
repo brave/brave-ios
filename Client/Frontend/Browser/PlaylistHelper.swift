@@ -78,8 +78,8 @@ class PlaylistHelper: TabContentScript {
         
         delegate?.addToPlayListActivity(info: item, itemDetected: true)
         
-        if Playlist.shared.itemExists(item: item) {
-            Playlist.shared.updateItem(item: item) {
+        if PlaylistItem.itemExists(item) {
+            PlaylistItem.updateItem(item) {
                 log.debug("Playlist Item Updated")
                 
                 if !self.playlistItems.contains(item.src) {
@@ -97,7 +97,7 @@ class PlaylistHelper: TabContentScript {
                 
                 alert.addAction(UIAlertAction(title: Strings.PlayList.addToPlayListAlertTitle, style: .default, handler: { _ in
                     // Update playlist with new items..
-                    Playlist.shared.addItem(item: item, cachedData: nil) {
+                    PlaylistItem.addItem(item, cachedData: nil) {
                         log.debug("Playlist Item Added")
                         self.delegate?.showPlaylistToast(info: item, itemState: .added)
                         UIImpactFeedbackGenerator(style: .medium).bzzt()

@@ -8,6 +8,7 @@ import UIKit
 import BraveShared
 import Shared
 import SnapKit
+import Data
 
 class PlaylistToast: Toast {
     private struct DesignUX {

@@ -11,6 +11,7 @@ import AVKit
 import AVFoundation
 import SDWebImage
 import CoreData
+import Data
 
 private let log = Logger.browserLogger
 
@@ -447,7 +448,7 @@ extension ListController: UITableViewDataSource {
                                            duration: Float(newTrackDuration),
                                            detected: item.detected,
                                            dateAdded: item.dateAdded)
-                Playlist.shared.updateItem(item: newItem)
+                PlaylistItem.updateItem(newItem)
             }
         }
         

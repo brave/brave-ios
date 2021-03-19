@@ -7,6 +7,7 @@ import Foundation
 import AVFoundation
 import Shared
 import CoreData
+import Data
 
 private let log = Logger.browserLogger
 
@@ -24,7 +25,7 @@ class PlaylistManager: NSObject {
     weak var delegate: PlaylistManagerDelegate?
     
     private let downloadManager = PlaylistDownloadManager()
-    private let frc = Playlist.shared.fetchResultsController()
+    private let frc = PlaylistItem.frc()
     private var didRestoreSession = false
     
     private override init() {
@@ -73,14 +74,14 @@ class PlaylistManager: NSObject {
     }
     
     func state(for pageSrc: String) -> PlaylistDownloadManager.DownloadState {
+        if downloadManager.downloadTask(for: pageSrc) != nil {
+            return .inProgress
+        }
+        
         if let assetUrl = downloadManager.localAsset(for: pageSrc)?.url {
             if FileManager.default.fileExists(atPath: assetUrl.path) {
                 return .downloaded
             }
-        }
-        
-        if downloadManager.downloadTask(for: pageSrc) != nil {
-            return .inProgress
         }
 
         return .invalid
@@ -136,11 +137,11 @@ class PlaylistManager: NSObject {
         do {
             if let assetUrl = localAsset(for: item.pageSrc)?.url {
                 try FileManager.default.removeItem(at: assetUrl)
-                Playlist.shared.removeItem(item: item)
+                PlaylistItem.removeItem(item)
                 
                 delegate?.onDownloadStateChanged(id: item.pageSrc, state: .invalid, displayName: "", error: nil)
             } else {
-                Playlist.shared.removeItem(item: item)
+                PlaylistItem.removeItem(item)
             }
         } catch {
             log.error("An error occured deleting Playlist Item \(item.name): \(error)")
@@ -151,7 +152,7 @@ class PlaylistManager: NSObject {
         do {
             if let assetUrl = localAsset(for: item.pageSrc)?.url {
                 try FileManager.default.removeItem(at: assetUrl)
-                Playlist.shared.updateCache(pageSrc: item.pageSrc, cachedData: nil)
+                PlaylistItem.updateCache(pageSrc: item.pageSrc, cachedData: nil)
                 delegate?.onDownloadStateChanged(id: item.pageSrc, state: .invalid, displayName: "", error: nil)
             }
         } catch {
@@ -171,7 +172,7 @@ class PlaylistManager: NSObject {
         func clearCache(item: PlaylistInfo) throws {
             if let assetUrl = localAsset(for: item.pageSrc)?.url {
                 try FileManager.default.removeItem(at: assetUrl)
-                Playlist.shared.updateCache(pageSrc: item.pageSrc, cachedData: nil)
+                PlaylistItem.updateCache(pageSrc: item.pageSrc, cachedData: nil)
             }
         }
         
@@ -186,7 +187,7 @@ class PlaylistManager: NSObject {
             do {
                 try clearCache(item: item)
                 if !cacheOnly {
-                    Playlist.shared.removeItem(item: item)
+                    PlaylistItem.removeItem(item)
                 }
             } catch {
                 log.error("An error occured deleting Playlist Cached Item \(item.name): \(error)")
@@ -197,7 +198,7 @@ class PlaylistManager: NSObject {
 
 extension PlaylistManager {
     private func localAsset(for pageSrc: String) -> AVURLAsset? {
-        guard let item = Playlist.shared.getItem(pageSrc: pageSrc),
+        guard let item = PlaylistItem.getItem(pageSrc: pageSrc),
               let cachedData = item.cachedData else { return nil }
 
         var bookmarkDataIsStale = false

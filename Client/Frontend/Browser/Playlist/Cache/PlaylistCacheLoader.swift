@@ -8,6 +8,7 @@ import AVFoundation
 import WebKit
 import MobileCoreServices
 import YubiKit
+import Data
 
 public class PlaylistMimeTypeDetector {
     private(set) var mimeType: String = ""
@@ -165,12 +166,8 @@ class PlaylistWebLoader: UIView, WKNavigationDelegate {
             guard let path = Bundle.main.path(forResource: "PlaylistDetector", ofType: "js"), let source = try? String(contentsOfFile: path) else {
                 return nil
             }
-            
-            var alteredSource = source
-            let token = UserScriptManager.securityToken.uuidString.replacingOccurrences(of: "-", with: "", options: .literal)
-            alteredSource = alteredSource.replacingOccurrences(of: "$<videosSupportFullscreen>", with: "VSF\(token)", options: .literal)
-            
-            return WKUserScript(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+
+            return WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false)
         }()
         
         if let script = script {
@@ -182,6 +179,10 @@ class PlaylistWebLoader: UIView, WKNavigationDelegate {
         fatalError("init(coder:) has not been implemented")
     }
     
+    deinit {
+        self.removeFromSuperview()
+    }
+    
     func load(url: URL) {
         guard let webView = tab.webView else { return }
         webView.frame = self.window?.bounds ?? .zero
@@ -189,14 +190,15 @@ class PlaylistWebLoader: UIView, WKNavigationDelegate {
     }
     
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        handler(nil)
+        self.handler(nil)
     }
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         // Fail safe for if a script fails or web-view somehow fails to load,
         // Then we have a timeout where it will notify the playlist that an error occurred
         // This happens when the WebView is already finished loading anyway!
-        DispatchQueue.main.async {
+        // We use a 30-second timeout because it isn't possible to know when a page is FULL loaded..
+        DispatchQueue.main.asyncAfter(deadline: .now() + 30) {
             if !self.handlerDidExecute {
                 self.handler(nil)
             }
@@ -205,6 +207,7 @@ class PlaylistWebLoader: UIView, WKNavigationDelegate {
     
     private class PlaylistWebLoaderContentHelper: TabContentScript {
         private weak var webLoader: PlaylistWebLoader?
+        private var playlistItems = Set<String>()
         
         init(_ webLoader: PlaylistWebLoader) {
             self.webLoader = webLoader
@@ -226,18 +229,32 @@ class PlaylistWebLoader: UIView, WKNavigationDelegate {
             }
             
             // For now, we ignore base64 video mime-types loaded via the `data:` scheme.
-            if item.src.isEmpty || item.src.contains("data:") && item.src.contains(";base64") {
+            if item.duration <= 0.0 && !item.detected || item.src.isEmpty || item.src.hasPrefix("data:") || item.src.hasPrefix("blob:") {
                 webLoader?.handler(nil)
                 return
             }
             
-            webLoader?.handler(item)
+            // We have to create an AVURLAsset here to determine if the item is playable
+            // because otherwise it will add an invalid item to playlist that can't be played.
+            // IE: WebM videos aren't supported so can't be played.
+            // Therefore we shouldn't prompt the user to add to playlist.
+            if let url = URL(string: item.src), !AVURLAsset(url: url).isPlayable {
+                webLoader?.handler(nil)
+                return
+            }
+            
+            if !playlistItems.contains(item.src) {
+                playlistItems.insert(item.src)
+                
+                webLoader?.handler(item)
+            }
+            
+            // This line MAY cause problems.. because some websites have a loading delay for the source of the media item
+            // If the second we receive the src, we reload the page by doing the below HTML,
+            // It may not have received all info necessary to play the item such as MetadataInfo
+            // For now it works 100% of the time and it is safe to do it. If we come across such a website, that causes problems,
+            // we'll need to find a different way of forcing the WebView to STOP loading metadata in the background
             DispatchQueue.main.async {
-                // This line MAY cause problems.. because some websites have a loading delay for the source of the media item
-                // If the second we receive the src, we reload the page by doing the below HTML,
-                // It may not have received all info necessary to play the item such as MetadataInfo
-                // For now it works 100% of the time and it is safe to do it. If we come across such a website, that causes problems,
-                // we'll need to find a different way of forcing the WebView to STOP loading metadata in the background
                 self.webLoader?.tab.webView?.loadHTMLString("<html><body>PlayList</body></html>", baseURL: nil)
             }
         }

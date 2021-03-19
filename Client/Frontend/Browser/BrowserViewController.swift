@@ -1787,7 +1787,7 @@ class BrowserViewController: UIViewController {
             guard let item = self.addToPlayListActivityItem?.item else { return }
             
             // Update playlist with new items..
-            Playlist.shared.addItem(item: item, cachedData: nil) {
+            PlaylistItem.addItem(item, cachedData: nil) {
                 log.debug("Playlist Item Added")
                 self.showPlaylistToast(info: item, itemState: .added)
                 UIImpactFeedbackGenerator(style: .medium).bzzt()
@@ -3608,7 +3608,7 @@ extension BrowserViewController: PlaylistHelperDelegate {
                 guard let self = self, let info = self.playlistToast?.item else { return }
                 if buttonPressed {
                     // Update playlist with new items..
-                    Playlist.shared.addItem(item: info, cachedData: nil) {
+                    PlaylistItem.addItem(info, cachedData: nil) {
                         log.debug("Playlist Item Added")
                         
                         self.playlistToast = nil
