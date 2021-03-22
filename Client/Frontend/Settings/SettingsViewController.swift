@@ -239,9 +239,7 @@ class SettingsViewController: TableViewController {
                     }
                     }, image: #imageLiteral(resourceName: "settings-sync").template, accessory: .disclosureIndicator,
                        cellClass: MultilineValue1Cell.self),
-                Row(text: Strings.bookmarksLastVisitedFolderTitle, image: #imageLiteral(resourceName: "menu_folder_open").template, accessory: .switchToggle(value: Preferences.General.showLastVisitedBookmarksFolder.value, { newValue in
-                    Preferences.General.showLastVisitedBookmarksFolder.value = newValue
-                }), cellClass: MultilineValue1Cell.self)
+                .boolRow(title: Strings.bookmarksLastVisitedFolderTitle, option: Preferences.General.showLastVisitedBookmarksFolder, image: #imageLiteral(resourceName: "menu_folder_open").template)
             ]
         )
         
