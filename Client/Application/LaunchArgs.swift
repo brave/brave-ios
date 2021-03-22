@@ -1,0 +1,28 @@
+// Copyright 2021 The Brave Authors. All rights reserved.
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+import Foundation
+import Shared
+import BraveShared
+
+extension Preferences {
+    /// Launch arguments can be set in scheme editor in XCode.
+    struct LaunchArgs {
+        private static let prefs = UserDefaults.standard
+        
+        static let skipOnboardingIntro = boolOrNil(for: "BRSkipOnboarding")
+        static let skipEduPopups = boolOrNil(for: "BRSkipEduPopups")
+        /// Skips default browser, Brave VPN, DDG callouts.
+        static let skipNTPCallouts = boolOrNil(for: "BRSkipAppLaunchPopups")
+        
+        private static func boolOrNil(for key: String) -> Bool? {
+            if prefs.object(forKey: key) == nil {
+                return nil
+            }
+            
+            return prefs.bool(forKey: key)
+        }
+    }
+}
