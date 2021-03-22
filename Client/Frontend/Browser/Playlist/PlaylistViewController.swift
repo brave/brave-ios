@@ -171,7 +171,7 @@ private class ListController: UIViewController {
     private let formatter = DateComponentsFormatter().then {
         $0.allowedUnits = [.day, .hour, .minute, .second]
         $0.unitsStyle = .abbreviated
-        $0.maximumUnitCount = 1
+        $0.maximumUnitCount = 2
     }
     
     init() {
@@ -391,32 +391,87 @@ extension ListController: UITableViewDataSource {
         }
     }
     
-    private func getAssetDuration(item: PlaylistInfo) -> TimeInterval {
+    private func getAssetDuration(item: PlaylistInfo, _ completion: @escaping (TimeInterval, AVAsset?) -> Void) {
         let tolerance: Float = 0.00001
-        let distance = abs(item.duration).distance(to: 0.0)
+        let distance = abs(item.duration.distance(to: 0.0))
         
-        // If the database duration is <= 0.0
-        if distance <= tolerance {
+        // If the database duration is 0.0
+        if distance < tolerance {
             // Attempt to retrieve the duration from the Asset file
             if let index = PlaylistManager.shared.index(of: item.pageSrc) {
                 let asset = PlaylistManager.shared.assetAtIndex(index)
                 
                 if let track = asset.tracks(withMediaType: .video).first {
-                    return track.timeRange.duration.seconds
+                    completion(track.timeRange.duration.seconds, asset)
                 } else if let track = asset.tracks(withMediaType: .audio).first {
-                    return track.timeRange.duration.seconds
+                    completion(track.timeRange.duration.seconds, asset)
+                } else if abs(asset.duration.seconds.distance(to: 0.0)) < Double(tolerance) {
+                    
+                    // We can't get the duration synchronously so we need to let the AVAsset load the media item
+                    // and hopefully we get a valid duration from that.
+                    asset.loadValuesAsynchronously(forKeys: ["playable", "tracks", "duration"]) {
+                        var duration: TimeInterval = 0.0
+                        if let track = asset.tracks(withMediaType: .video).first {
+                            duration = track.timeRange.duration.seconds
+                        } else if let track = asset.tracks(withMediaType: .audio).first {
+                            duration = track.timeRange.duration.seconds
+                        } else {
+                            duration = asset.duration.seconds
+                        }
+                        
+                        if abs(asset.duration.seconds.distance(to: 0.0)) > Double(tolerance) {
+                            let newItem = PlaylistInfo(name: item.name,
+                                                       src: item.src,
+                                                       pageSrc: item.pageSrc,
+                                                       pageTitle: item.pageTitle,
+                                                       mimeType: item.mimeType,
+                                                       duration: Float(duration),
+                                                       detected: item.detected,
+                                                       dateAdded: item.dateAdded)
+                            
+                            PlaylistItem.updateItem(newItem) {
+                                DispatchQueue.main.async {
+                                    completion(duration, asset)
+                                }
+                            }
+                        } else {
+                            DispatchQueue.main.async {
+                                completion(duration, asset)
+                            }
+                        }
+                    }
                 } else {
-                    return asset.duration.seconds
+                    completion(asset.duration.seconds, asset)
                 }
+            } else {
+                // Return the database duration
+                completion(TimeInterval(item.duration), nil)
             }
+        } else {
+            // Return the database duration
+            completion(TimeInterval(item.duration), nil)
         }
-        
-        // Return the database duration
-        return TimeInterval(item.duration)
     }
     
-    private func getAssetDurationFormatted(item: PlaylistInfo) -> String {
-        return formatter.string(from: getAssetDuration(item: item)) ?? "0:00"
+    private func getAssetDurationFormatted(item: PlaylistInfo, _ completion: @escaping (String) -> Void) {
+        getAssetDuration(item: item) { [weak self] duration, asset in
+            guard let self = self else { return }
+            
+            let domain = URL(string: item.pageSrc)?.baseDomain ?? "0s"
+            
+            if abs(duration.distance(to: 0.0)) > 0.00001 {
+                completion(self.formatter.string(from: duration) ?? domain)
+            } else if let asset = asset {
+                if asset.duration.isIndefinite {
+                    // Live video/audio
+                    completion(Strings.PlayList.playlistLiveMediaStream)
+                } else {
+                    completion(domain)
+                }
+            } else {
+                completion(domain)
+            }
+        }
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -454,12 +509,18 @@ extension ListController: UITableViewDataSource {
             cell.detailLabel.text = Strings.PlayList.dowloadingLabelTitle
         case .downloaded:
             if let itemSize = PlaylistManager.shared.sizeOfDownloadedItem(for: item.pageSrc) {
-                cell.detailLabel.text = "\(getAssetDurationFormatted(item: item)) - \(itemSize)"
+                getAssetDurationFormatted(item: item) {
+                    cell.detailLabel.text = "\($0) - \(itemSize)"
+                }
             } else {
-                cell.detailLabel.text = "\(getAssetDurationFormatted(item: item)) - \(Strings.PlayList.dowloadedLabelTitle)"
+                getAssetDurationFormatted(item: item) {
+                    cell.detailLabel.text = "\($0) - \(Strings.PlayList.dowloadedLabelTitle)"
+                }
             }
         case .invalid:
-            cell.detailLabel.text = getAssetDurationFormatted(item: item)
+            getAssetDurationFormatted(item: item) {
+                cell.detailLabel.text = $0
+            }
         }
         
         // Fixes a duration bug where sometimes the duration is NOT fetched!
@@ -468,12 +529,12 @@ extension ListController: UITableViewDataSource {
             guard let newTrackDuration = newTrackDuration else { return }
             
             let tolerance: Float = 0.00001
-            let existingDistance = abs(item.duration).distance(to: 0.0)
-            let newDistance = abs(newTrackDuration).distance(to: 0.0)
+            let existingDistance = abs(item.duration.distance(to: 0.0))
+            let newDistance = abs(newTrackDuration.distance(to: 0.0))
             
-            // If the database duration is <= 0.0
-            // and the new duration > 0.0
-            if existingDistance <= tolerance && Float(newDistance) < -tolerance {
+            // If the database duration is 0.0
+            // and the new duration != 0.0
+            if existingDistance < tolerance && Float(newDistance) > tolerance {
                 let newItem = PlaylistInfo(name: item.name,
                                            src: item.src,
                                            pageSrc: item.pageSrc,
@@ -1014,17 +1075,27 @@ extension ListController: PlaylistManagerDelegate {
             switch cacheState {
             case .inProgress:
                 let item = PlaylistManager.shared.itemAtIndex(index)
-                cell.detailLabel.text = "\(getAssetDurationFormatted(item: item)) - \(Strings.PlayList.dowloadingPercentageLabelTitle) \(Int(percentComplete))%"
+                getAssetDurationFormatted(item: item) {
+                    cell.detailLabel.text = "\($0) - \(Strings.PlayList.dowloadingPercentageLabelTitle) \(Int(percentComplete))%"
+                }
             case .downloaded:
                 let item = PlaylistManager.shared.itemAtIndex(index)
                 if let itemSize = PlaylistManager.shared.sizeOfDownloadedItem(for: item.pageSrc) {
-                    cell.detailLabel.text = "\(getAssetDurationFormatted(item: item)) - \(itemSize)"
+                    
+                    getAssetDurationFormatted(item: item) {
+                        cell.detailLabel.text = "\($0) - \(itemSize)"
+                    }
                 } else {
-                    cell.detailLabel.text = "\(getAssetDurationFormatted(item: item)) - \(Strings.PlayList.dowloadedLabelTitle)"
+                    getAssetDurationFormatted(item: item) {
+                        cell.detailLabel.text = "\($0) - \(Strings.PlayList.dowloadedLabelTitle)"
+                    }
                 }
             case .invalid:
                 let item = PlaylistManager.shared.itemAtIndex(index)
-                cell.detailLabel.text = getAssetDurationFormatted(item: item)
+                
+                getAssetDurationFormatted(item: item) {
+                    cell.detailLabel.text = $0
+                }
             }
         }
     }
@@ -1037,7 +1108,9 @@ extension ListController: PlaylistManagerDelegate {
                 log.error("Error downloading playlist item: \(error)")
                 
                 let item = PlaylistManager.shared.itemAtIndex(index)
-                cell.detailLabel.text = getAssetDurationFormatted(item: item)
+                getAssetDurationFormatted(item: item) {
+                    cell.detailLabel.text = $0
+                }
                 
                 let alert = UIAlertController(title: Strings.PlayList.playlistDownloadErrorTitle, message: Strings.PlayList.playlistDownloadErrorMessage, preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: nil))
@@ -1046,17 +1119,26 @@ extension ListController: PlaylistManagerDelegate {
                 switch state {
                 case .inProgress:
                     let item = PlaylistManager.shared.itemAtIndex(index)
-                    cell.detailLabel.text = "\(getAssetDurationFormatted(item: item)) - \(Strings.PlayList.dowloadingPercentageLabelTitle)"
+                    getAssetDurationFormatted(item: item) {
+                        cell.detailLabel.text = "\($0) - \(Strings.PlayList.dowloadingPercentageLabelTitle)"
+                    }
                 case .downloaded:
                     let item = PlaylistManager.shared.itemAtIndex(index)
                     if let itemSize = PlaylistManager.shared.sizeOfDownloadedItem(for: item.pageSrc) {
-                        cell.detailLabel.text = "\(getAssetDurationFormatted(item: item)) - \(itemSize)"
+                        getAssetDurationFormatted(item: item) {
+                            cell.detailLabel.text = "\($0) - \(itemSize)"
+                        }
                     } else {
-                        cell.detailLabel.text = "\(getAssetDurationFormatted(item: item)) - \(Strings.PlayList.dowloadedLabelTitle)"
+                        getAssetDurationFormatted(item: item) {
+                            cell.detailLabel.text = "\($0) - \(Strings.PlayList.dowloadedLabelTitle)"
+                        }
                     }
                 case .invalid:
                     let item = PlaylistManager.shared.itemAtIndex(index)
-                    cell.detailLabel.text = getAssetDurationFormatted(item: item)
+                    
+                    getAssetDurationFormatted(item: item) {
+                        cell.detailLabel.text = $0
+                    }
                 }
             }
         }

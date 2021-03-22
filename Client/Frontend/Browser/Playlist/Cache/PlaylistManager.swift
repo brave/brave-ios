@@ -45,7 +45,8 @@ class PlaylistManager: NSObject {
     }
     
     func assetAtIndex(_ index: Int) -> AVURLAsset {
-        asset(for: itemAtIndex(index).pageSrc)
+        let item = itemAtIndex(index)
+        return asset(for: item.pageSrc, mediaSrc: item.src)
     }
     
     func index(of pageSrc: String) -> Int? {
@@ -233,7 +234,7 @@ extension PlaylistManager {
         }
     }
     
-    private func asset(for pageSrc: String) -> AVURLAsset {
+    private func asset(for pageSrc: String, mediaSrc: String) -> AVURLAsset {
         if let task = downloadManager.downloadTask(for: pageSrc) {
             return task.asset
         }
@@ -242,7 +243,7 @@ extension PlaylistManager {
             return asset
         }
         
-        return AVURLAsset(url: URL(string: pageSrc)!)
+        return AVURLAsset(url: URL(string: mediaSrc)!)
     }
 }
 

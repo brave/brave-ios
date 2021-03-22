@@ -1355,11 +1355,18 @@ extension Strings {
                               bundle: .braveShared,
                               value: "Web Compatibility",
                               comment: "Title for Playlist setting")
+        
         public static let playlistWebCompatibilityDescription =
             NSLocalizedString("playlist.playlistWebCompatibilityDescription",
                               bundle: .braveShared,
                               value: "Disables the WebKit MediaSource API",
                               comment: "Description for Playlist setting")
+        
+        public static let playlistLiveMediaStream =
+            NSLocalizedString("playlist.playlistLiveMediaStream",
+                              bundle: .braveShared,
+                              value: "Live Stream",
+                              comment: "When a video or audio is live and has no duration")
     }
 }
 
