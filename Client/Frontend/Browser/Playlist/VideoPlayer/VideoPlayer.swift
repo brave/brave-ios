@@ -12,221 +12,6 @@ import AVFoundation
 
 private let log = Logger.browserLogger
 
-private class VideoSliderBar: UIControl {
-    public var trackerInsets = UIEdgeInsets(top: 0.0, left: 5.0, bottom: 0.0, right: 5.0)
-    public var value: CGFloat = 0.0 {
-        didSet {
-            trackerConstraint?.constant = boundaryView.bounds.size.width * value
-            filledConstraint?.constant = value >= 1.0 ? bounds.size.width : ((bounds.size.width - (trackerInsets.left + trackerInsets.right)) * value) + trackerInsets.left
-        }
-    }
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        
-        tracker.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(onPanned(_:))))
-        
-        addSubview(background)
-        addSubview(boundaryView)
-        
-        background.addSubview(filledView)
-        boundaryView.addSubview(tracker)
-        
-        background.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-        }
-        
-        boundaryView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-        }
-        
-        filledView.snp.makeConstraints {
-            $0.right.top.bottom.equalTo(background)
-        }
-        
-        tracker.snp.makeConstraints {
-            $0.centerY.equalTo(boundaryView.snp.centerY)
-            $0.width.height.equalTo(12.0)
-        }
-        
-        filledConstraint = filledView.leftAnchor.constraint(equalTo: background.leftAnchor).then {
-            $0.isActive = true
-        }
-        
-        trackerConstraint = tracker.centerXAnchor.constraint(equalTo: boundaryView.leftAnchor).then {
-            $0.isActive = true
-        }
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        
-        self.background.layer.cornerRadius = self.bounds.size.height / 2.0
-        
-        boundaryView.snp.remakeConstraints {
-            $0.edges.equalToSuperview().inset(self.trackerInsets)
-        }
-        
-        if self.filledConstraint?.constant ?? 0 < self.trackerInsets.left {
-            self.filledConstraint?.constant = self.trackerInsets.left
-        }
-    }
-    
-    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-        if tracker.bounds.size.width < 44.0 || tracker.bounds.size.height < 44.0 {
-            let adjustedBounds = CGRect(x: tracker.center.x, y: tracker.center.y, width: 0.0, height: 0.0).inset(by: touchInsets)
-            
-            if adjustedBounds.contains(point) {
-                return tracker
-            }
-        }
-        
-        return super.hitTest(point, with: event)
-    }
-    
-    override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
-        if tracker.bounds.size.width < 44.0 || tracker.bounds.size.height < 44.0 {
-            let adjustedBounds = CGRect(x: tracker.center.x, y: tracker.center.y, width: 0.0, height: 0.0).inset(by: touchInsets)
-            
-            if adjustedBounds.contains(point) {
-                return true
-            }
-        }
-        
-        return super.point(inside: point, with: event)
-    }
-    
-    @objc
-    private func onPanned(_ recognizer: UIPanGestureRecognizer) {
-        let offset = min(boundaryView.bounds.size.width, max(0.0, recognizer.location(in: boundaryView).x))
-        
-        value = offset / boundaryView.bounds.size.width
-        
-        sendActions(for: .valueChanged)
-        
-        if recognizer.state == .cancelled || recognizer.state == .ended {
-            sendActions(for: .touchUpInside)
-        }
-    }
-    
-    private var filledConstraint: NSLayoutConstraint?
-    private var trackerConstraint: NSLayoutConstraint?
-    
-    private let touchInsets = UIEdgeInsets(top: 44.0, left: 44.0, bottom: 44.0, right: 44.0)
-    
-    private var background = UIView().then {
-        $0.backgroundColor = .white
-        $0.clipsToBounds = true
-    }
-    
-    private var filledView = UIView().then {
-        $0.backgroundColor = #colorLiteral(red: 0.337254902, green: 0.337254902, blue: 0.337254902, alpha: 1)
-        $0.clipsToBounds = true
-    }
-    
-    private var boundaryView = UIView().then {
-        $0.backgroundColor = .clear
-    }
-    
-    private var tracker = UIImageView().then {
-        $0.contentMode = .scaleAspectFit
-        $0.isUserInteractionEnabled = true
-        $0.image = #imageLiteral(resourceName: "playlist_video_thumb")
-    }
-}
-
-private protocol VideoTrackerBarDelegate: class {
-    func onValueChanged(_ trackBar: VideoTrackerBar, value: CGFloat)
-    func onValueEnded(_ trackBar: VideoTrackerBar, value: CGFloat)
-}
-
-private class VideoTrackerBar: UIView {
-    public weak var delegate: VideoTrackerBarDelegate?
-    
-    private let slider = VideoSliderBar()
-    
-    private let currentTimeLabel = UILabel().then {
-        $0.text = "0:00"
-        $0.textColor = .white
-        $0.appearanceTextColor = .white
-        $0.font = .systemFont(ofSize: 12.0)
-    }
-    
-    private let endTimeLabel = UILabel().then {
-        $0.text = "0:00"
-        $0.textColor = .white
-        $0.appearanceTextColor = .white
-        $0.font = .systemFont(ofSize: 12.0)
-    }
-    
-    public func setTimeRange(currentTime: CMTime, endTime: CMTime) {
-        if CMTimeCompare(endTime, .zero) != 0 && endTime.value > 0 {
-            slider.value = CGFloat(currentTime.value) / CGFloat(endTime.value)
-            
-            currentTimeLabel.text = self.timeToString(currentTime)
-            endTimeLabel.text = "-\(self.timeToString(endTime - currentTime))"
-        } else {
-            slider.value = 0.0
-            currentTimeLabel.text = "0:00"
-            endTimeLabel.text = "0:00"
-        }
-    }
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        
-        slider.addTarget(self, action: #selector(onValueChanged(_:)), for: .valueChanged)
-        slider.addTarget(self, action: #selector(onValueEnded(_:)), for: .touchUpInside)
-        
-        addSubview(slider)
-        addSubview(currentTimeLabel)
-        addSubview(endTimeLabel)
-        
-        currentTimeLabel.snp.makeConstraints {
-            $0.left.equalToSuperview().inset(10.0)
-            $0.top.equalToSuperview().offset(2.0)
-            $0.bottom.equalTo(slider.snp.top).offset(-5.0)
-        }
-        
-        endTimeLabel.snp.makeConstraints {
-            $0.right.equalToSuperview().inset(10.0)
-            $0.top.equalToSuperview().offset(2.0)
-            $0.bottom.equalTo(slider.snp.top).offset(-5.0)
-        }
-        
-        slider.snp.makeConstraints {
-            $0.left.right.equalToSuperview().inset(10.0)
-            $0.centerY.equalToSuperview()
-            $0.height.equalTo(2.5)
-        }
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    @objc
-    private func onValueChanged(_ slider: VideoSliderBar) {
-        self.delegate?.onValueChanged(self, value: slider.value)
-    }
-    
-    @objc
-    private func onValueEnded(_ slider: VideoSliderBar) {
-        self.delegate?.onValueEnded(self, value: slider.value)
-    }
-    
-    private func timeToString(_ time: CMTime) -> String {
-        let totalSeconds = CMTimeGetSeconds(time)
-        let minutes = floor(totalSeconds.truncatingRemainder(dividingBy: 3600.0) / 60.0)
-        let seconds = floor(totalSeconds.truncatingRemainder(dividingBy: 60.0))
-        return String(format: "%02zu:%02zu", Int(minutes), Int(seconds))
-    }
-}
-
 protocol VideoViewDelegate: class {
     func onPreviousTrack()
     func onNextTrack()
@@ -235,11 +20,6 @@ protocol VideoViewDelegate: class {
 }
 
 public class VideoView: UIView, VideoTrackerBarDelegate {
-    
-    struct UX {
-        static let controlOffset: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 30 : 15
-        static let trackerOffset: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 20 : 0
-    }
     
     weak var delegate: VideoViewDelegate?
     
@@ -255,11 +35,6 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     
     private var requestedPlaybackRate = 1.0
     
-    private let thumbnailView = UIImageView().then {
-        $0.contentMode = .scaleAspectFit
-        $0.isUserInteractionEnabled = true
-    }
-    
     private let particleView = PlaylistParticleEmitter().then {
         $0.isHidden = false
         $0.contentMode = .scaleAspectFit
@@ -272,85 +47,28 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         $0.backgroundColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 0.4024561216)
     }
     
-    private let skipBackButton = UIButton().then {
-        $0.imageView?.contentMode = .scaleAspectFit
-        $0.setBackgroundImage(#imageLiteral(resourceName: "playlist_rewind"), for: .normal)
-        $0.setTitleColor(.white, for: .normal)
-        $0.setTitle("15", for: .normal)
-        $0.tintColor = .white
+    private let infoView = VideoPlayerInfoBar().then {
+        $0.layer.cornerRadius = 18.0
+        $0.layer.masksToBounds = true
     }
     
-    private let skipForwardButton = UIButton().then {
-        $0.imageView?.contentMode = .scaleAspectFit
-        $0.setBackgroundImage(#imageLiteral(resourceName: "playlist_forward"), for: .normal)
-        $0.setTitleColor(.white, for: .normal)
-        $0.setTitle("15", for: .normal)
-        $0.tintColor = .white
+    private let controlsView = VideoPlayerControlsView().then {
+        $0.layer.cornerRadius = 18.0
+        $0.layer.masksToBounds = true
     }
     
-    private let playPauseButton = UIButton().then {
-        $0.imageView?.contentMode = .scaleAspectFit
-        $0.setImage(#imageLiteral(resourceName: "playlist_play"), for: .normal)
-    }
-    
-    private let castButton = UIButton().then {
-        $0.imageView?.contentMode = .scaleAspectFit
-        $0.setImage(#imageLiteral(resourceName: "playlist_airplay"), for: .normal)
-        $0.tintColor = .white
-        
-        let routePicker = AVRoutePickerView()
-        routePicker.tintColor = .clear
-        routePicker.activeTintColor = .clear
-
-        if #available(iOS 13.0, *) {
-            routePicker.prioritizesVideoDevices = true
-        }
-        
-        $0.addSubview(routePicker)
-        routePicker.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-        }
-    }
-    
-    private let pipButton = UIButton().then {
-        $0.imageView?.contentMode = .scaleAspectFit
-        $0.setImage(#imageLiteral(resourceName: "playlist_pip"), for: .normal)
-        $0.isHidden = !AVPictureInPictureController.isPictureInPictureSupported()
-    }
-    
-    private let fullScreenButton = UIButton().then {
-        $0.imageView?.contentMode = .scaleAspectFit
-        $0.setImage(#imageLiteral(resourceName: "playlist_fullscreen"), for: .normal)
-    }
-    
-    private let playbackRateButton = UIButton().then {
-        $0.imageView?.contentMode = .scaleAspectFit
-        $0.setTitle("1x", for: .normal)
-        $0.setTitleColor(.white, for: .normal)
-        $0.titleLabel?.font = .systemFont(ofSize: 21.0, weight: .medium)
-    }
-    
-    private let trackBarBackground = UIView().then {
-        $0.contentMode = .scaleAspectFit
-        $0.backgroundColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 0.6004120291)
-    }
-    
-    private let playControlsView = UIView().then {
-        $0.backgroundColor = .clear
-    }
-    
-    private let trackBar = VideoTrackerBar()
+    // State
     private let orientation: UIInterfaceOrientation = .portrait
     private var playObserver: Any?
     private var fadeAnimationWorkItem: DispatchWorkItem?
     
     public var isPlaying: Bool {
-        //It is better NOT to keep tracking of isPlaying OR rate > 0.0
-        //Instead we should use the timeControlStatus because PIP and Background play
-        //via control-center will modify the timeControlStatus property
-        //This will keep our UI consistent with what is on the lock-screen.
-        //This will also allow us to properly determine play state in
-        //PlaylistMediaInfo -> init -> MPRemoteCommandCenter.shared().playCommand
+        // It is better NOT to keep tracking of isPlaying OR rate > 0.0
+        // Instead we should use the timeControlStatus because PIP and Background play
+        // via control-center will modify the timeControlStatus property
+        // This will keep our UI consistent with what is on the lock-screen.
+        // This will also allow us to properly determine play state in
+        // PlaylistMediaInfo -> init -> MPRemoteCommandCenter.shared().playCommand
         return player.timeControlStatus == .playing
     }
     private var wasPlayingBeforeSeeking = false
@@ -371,57 +89,27 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
             log.error(error)
         }
 
-        //Setup
+        // Setup
         self.backgroundColor = .black
         self.playerLayer.player = self.player
 
-        playPauseButton.addTarget(self, action: #selector(onPlay(_:)), for: .touchUpInside)
-        castButton.addTarget(self, action: #selector(onCast(_:)), for: .touchUpInside)
-        playbackRateButton.addTarget(self, action: #selector(onPlaybackRateChanged(_:)), for: .touchUpInside)
-        pipButton.addTarget(self, action: #selector(onPictureInPicture(_:)), for: .touchUpInside)
-        fullScreenButton.addTarget(self, action: #selector(onFullscreen(_:)), for: .touchUpInside)
-        skipBackButton.addTarget(self, action: #selector(onSeekBackwards(_:)), for: .touchUpInside)
-        skipForwardButton.addTarget(self, action: #selector(onSeekForwards(_:)), for: .touchUpInside)
-        skipBackButton.addTarget(self, action: #selector(onSeekPrevious(_:event:)), for: .touchDownRepeat)
-        skipForwardButton.addTarget(self, action: #selector(onSeekNext(_:event:)), for: .touchDownRepeat)
+        infoView.pictureInPictureButton.addTarget(self, action: #selector(onPictureInPicture(_:)), for: .touchUpInside)
+        infoView.fullscreenButton.addTarget(self, action: #selector(onFullscreen(_:)), for: .touchUpInside)
         
-        //Layout
+        controlsView.playPauseButton.addTarget(self, action: #selector(onPlay(_:)), for: .touchUpInside)
+        controlsView.castButton.addTarget(self, action: #selector(onCast(_:)), for: .touchUpInside)
+        controlsView.playbackRateButton.addTarget(self, action: #selector(onPlaybackRateChanged(_:)), for: .touchUpInside)
+        controlsView.skipBackButton.addTarget(self, action: #selector(onSeekBackwards(_:)), for: .touchUpInside)
+        controlsView.skipForwardButton.addTarget(self, action: #selector(onSeekForwards(_:)), for: .touchUpInside)
+        controlsView.skipBackButton.addTarget(self, action: #selector(onSeekPrevious(_:event:)), for: .touchDownRepeat)
+        controlsView.skipForwardButton.addTarget(self, action: #selector(onSeekNext(_:event:)), for: .touchDownRepeat)
+        
+        // Layout
         layer.addSublayer(playerLayer)
-        addSubview(trackBarBackground)
-        addSubview(thumbnailView)
         addSubview(particleView)
         addSubview(overlayView)
-        addSubview(playControlsView)
-        addSubview(castButton)
-        addSubview(playbackRateButton)
-        addSubview(pipButton)
-        addSubview(fullScreenButton)
-        addSubview(trackBar)
-                
-        [skipBackButton, playPauseButton, skipForwardButton].forEach({ playControlsView.addSubview($0) })
-        
-        playPauseButton.snp.makeConstraints {
-            $0.center.equalToSuperview()
-        }
-        
-        skipBackButton.snp.makeConstraints {
-            $0.centerY.equalToSuperview()
-            $0.centerX.equalToSuperview().multipliedBy(0.5)
-        }
-
-        skipForwardButton.snp.makeConstraints {
-            $0.centerY.equalToSuperview()
-            $0.centerX.equalToSuperview().multipliedBy(1.5)
-        }
-        
-        trackBarBackground.snp.makeConstraints {
-            $0.left.right.bottom.equalToSuperview()
-            $0.top.equalTo(trackBar.snp.top)
-        }
-        
-        thumbnailView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-        }
+        addSubview(infoView)
+        addSubview(controlsView)
         
         particleView.snp.makeConstraints {
             $0.edges.equalToSuperview()
@@ -431,37 +119,23 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
             $0.edges.equalToSuperview()
         }
         
-        playControlsView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+        infoView.snp.makeConstraints {
+            $0.leading.equalTo(self.safeArea.leading).inset(20.0)
+            $0.trailing.equalTo(self.safeArea.trailing).inset(20.0)
+            $0.top.equalTo(self.safeArea.top).inset(25.0)
+            $0.height.equalTo(70.0)
         }
         
-        trackBar.snp.makeConstraints {
-            $0.left.right.equalToSuperview()
-            $0.bottom.equalToSuperview().offset(-UX.trackerOffset)
-        }
-        
-        fullScreenButton.snp.makeConstraints {
-            $0.top.right.equalToSuperview().inset(UX.controlOffset)
-        }
-        
-        castButton.snp.makeConstraints {
-            $0.top.left.equalToSuperview().inset(UX.controlOffset)
-        }
-        
-        playbackRateButton.snp.makeConstraints {
-            $0.top.equalToSuperview().inset(UX.controlOffset)
-            $0.left.equalTo(castButton.snp.right).offset(UX.controlOffset)
-            $0.width.height.equalTo(castButton)
-        }
-        
-        pipButton.snp.makeConstraints {
-            $0.top.equalToSuperview().inset(UX.controlOffset)
-            $0.right.equalTo(fullScreenButton.snp.left).offset(-UX.controlOffset)
+        controlsView.snp.makeConstraints {
+            $0.leading.equalTo(self.safeArea.leading).inset(20.0)
+            $0.trailing.equalTo(self.safeArea.trailing).inset(20.0)
+            $0.bottom.equalTo(self.safeArea.bottom).inset(25.0)
+            $0.height.equalTo(100.0)
         }
 
         registerNotifications()
         registerPictureInPictureNotifications()
-        trackBar.delegate = self
+        controlsView.trackBar.delegate = self
         
         self.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onOverlayTapped(_:))).then {
             $0.numberOfTapsRequired = 1
@@ -503,7 +177,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     @objc
     private func onOverlayTapped(_ gestureRecognizer: UITapGestureRecognizer) {
         if isSeeking {
-            showOverlays(true, except: [overlayView, playPauseButton], display: [trackBarBackground, trackBar])
+            showOverlays(true, except: [overlayView, infoView, controlsView.playPauseButton], display: [controlsView.trackBar])
         } else if isPlaying && !isOverlayDisplayed {
             showOverlays(true)
             isOverlayDisplayed = true
@@ -558,7 +232,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     
     @objc
     private func onCast(_ button: UIButton) {
-        //print("Route Picker Video")
+        // print("Route Picker Video")
     }
     
     @objc
@@ -575,6 +249,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         }
         
         player.rate = Float(requestedPlaybackRate)
+        controlsView.playPauseButton.setImage(#imageLiteral(resourceName: "playlist_pause"), for: .normal)
     }
     
     @objc
@@ -638,7 +313,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         }
     }
     
-    fileprivate func onValueChanged(_ trackBar: VideoTrackerBar, value: CGFloat) {
+    func onValueChanged(_ trackBar: VideoTrackerBar, value: CGFloat) {
         isSeeking = true
         
         if isPlaying {
@@ -646,7 +321,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
             wasPlayingBeforeSeeking = true
         }
         
-        showOverlays(false, except: [trackBar, trackBarBackground], display: [trackBar, trackBarBackground])
+        showOverlays(false, except: [infoView, controlsView], display: [controlsView])
         
         if let currentItem = player.currentItem {
             let seekTime = CMTimeMakeWithSeconds(Float64(value * CGFloat(currentItem.asset.duration.value) / CGFloat(currentItem.asset.duration.timescale)), preferredTimescale: currentItem.currentTime().timescale)
@@ -654,7 +329,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         }
     }
     
-    fileprivate func onValueEnded(_ trackBar: VideoTrackerBar, value: CGFloat) {
+    func onValueEnded(_ trackBar: VideoTrackerBar, value: CGFloat) {
         isSeeking = false
         
         if wasPlayingBeforeSeeking {
@@ -687,22 +362,22 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         notificationObservers.append(NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: self.player.currentItem, queue: .main) { [weak self] _ in
             guard let self = self, let currentItem = self.player.currentItem else { return }
             
-            self.playPauseButton.isEnabled = false
-            self.playPauseButton.setImage(nil, for: .normal)
+            self.controlsView.playPauseButton.isEnabled = false
+            self.controlsView.playPauseButton.setImage(nil, for: .normal)
             self.player.pause()
             
             let endTime = CMTimeConvertScale(currentItem.asset.duration, timescale: self.player.currentTime().timescale, method: .roundHalfAwayFromZero)
             
-            self.trackBar.setTimeRange(currentTime: currentItem.currentTime(), endTime: endTime)
+            self.controlsView.trackBar.setTimeRange(currentTime: currentItem.currentTime(), endTime: endTime)
             self.player.seek(to: .zero)
             
-            self.playPauseButton.isEnabled = true
+            self.controlsView.playPauseButton.isEnabled = true
             self.showOverlays(true)
             
             self.next()
             
             if self.isFullscreen {
-                self.onFullscreen(self.fullScreenButton)
+                self.onFullscreen(self.infoView.fullscreenButton)
             }
         })
         
@@ -717,7 +392,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
             let endTime = CMTimeConvertScale(currentItem.asset.duration, timescale: self.player.currentTime().timescale, method: .roundHalfAwayFromZero)
             
             if CMTimeCompare(endTime, .zero) != 0 && endTime.value > 0 {
-                self.trackBar.setTimeRange(currentTime: self.player.currentTime(), endTime: endTime)
+                self.controlsView.trackBar.setTimeRange(currentTime: self.player.currentTime(), endTime: endTime)
             }
         })
     }
@@ -728,15 +403,14 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
             guard let pictureInPictureController = pictureInPictureController else { return }
             
             pictureInPictureObservers.append(pictureInPictureController.observe(\AVPictureInPictureController.isPictureInPicturePossible, options: [.initial, .new]) { [weak self] _, change in
-                self?.pipButton.isEnabled = change.newValue ?? false
+                self?.infoView.pictureInPictureButton.isEnabled = change.newValue ?? false
             })
         } else {
-            pipButton.isEnabled = false
+            infoView.pictureInPictureButton.isEnabled = false
         }
     }
     
     private func showOverlays(_ show: Bool) {
-        //self.showOverlays(show, except: [self.overlayView], display: [])
         self.showOverlays(show, except: [], display: [])
     }
     
@@ -745,7 +419,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         var display = display
         
         if !isVideoAvailable() {
-            //if the overlay is showing, hide the particle view.. else show it..
+            // If the overlay is showing, hide the particle view.. else show it..
             except.append(particleView)
             
             if !show {
@@ -770,12 +444,12 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         })
     }
     
+    public func setVideoInfo(videoDomain: String) {
+        infoView.titleLabel.text = URL(string: videoDomain)?.host ?? videoDomain
+        infoView.updateFavIcon(domain: videoDomain)
+    }
+    
     public func setControlsEnabled(_ enabled: Bool) {
-//        [skipBackButton, playPauseButton, skipForwardButton,
-//         pipButton, castButton, fullScreenButton].forEach({
-//            $0.isEnabled = enabled
-//         })
-        
         isUserInteractionEnabled = enabled
     }
     
@@ -791,7 +465,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     
     public func play() {
         if !isPlaying {
-            playPauseButton.setImage(#imageLiteral(resourceName: "playlist_pause"), for: .normal)
+            controlsView.playPauseButton.setImage(#imageLiteral(resourceName: "playlist_pause"), for: .normal)
             player.play()
             
             showOverlays(false)
@@ -802,7 +476,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     
     public func pause() {
         if isPlaying {
-            playPauseButton.setImage(#imageLiteral(resourceName: "playlist_play"), for: .normal)
+            controlsView.playPauseButton.setImage(#imageLiteral(resourceName: "playlist_play"), for: .normal)
             player.pause()
             
             showOverlays(true)
@@ -812,7 +486,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     }
     
     public func stop() {
-        playPauseButton.setImage(#imageLiteral(resourceName: "playlist_play"), for: .normal)
+        controlsView.playPauseButton.setImage(#imageLiteral(resourceName: "playlist_play"), for: .normal)
         player.pause()
         
         showOverlays(true)
@@ -870,7 +544,6 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     }
     
     public func load(url: URL, resourceDelegate: AVAssetResourceLoaderDelegate?) {
-        thumbnailView.isHidden = false
         let asset = AVURLAsset(url: url)
         
         if let delegate = resourceDelegate {
@@ -879,8 +552,6 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         
         if let currentItem = player.currentItem, currentItem.asset.isKind(of: AVURLAsset.self) && player.status == .readyToPlay {
             if let asset = currentItem.asset as? AVURLAsset, asset.url.absoluteString == url.absoluteString {
-                thumbnailView.isHidden = true
-                
                 if isPlaying {
                     self.pause()
                     self.play()
@@ -897,20 +568,15 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
                 self.player.replaceCurrentItem(with: item)
                 
                 let endTime = CMTimeConvertScale(item.asset.duration, timescale: self.player.currentTime().timescale, method: .roundHalfAwayFromZero)
-                self.trackBar.setTimeRange(currentTime: item.currentTime(), endTime: endTime)
-                self.thumbnailView.isHidden = true
+                self.controlsView.trackBar.setTimeRange(currentTime: item.currentTime(), endTime: endTime)
                 self.play()
             }
         }
     }
     
     public func load(asset: AVURLAsset) {
-        thumbnailView.isHidden = false
-        
         if let currentItem = player.currentItem, currentItem.asset.isKind(of: AVURLAsset.self) && player.status == .readyToPlay {
             if let currentAsset = currentItem.asset as? AVURLAsset, currentAsset.url.absoluteString == asset.url.absoluteString {
-                thumbnailView.isHidden = true
-                
                 if isPlaying {
                     self.pause()
                     self.play()
@@ -927,15 +593,14 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
                 self.player.replaceCurrentItem(with: item)
                 
                 let endTime = CMTimeConvertScale(item.asset.duration, timescale: self.player.currentTime().timescale, method: .roundHalfAwayFromZero)
-                self.trackBar.setTimeRange(currentTime: item.currentTime(), endTime: endTime)
-                self.thumbnailView.isHidden = true
+                self.controlsView.trackBar.setTimeRange(currentTime: item.currentTime(), endTime: endTime)
                 self.play()
             }
         }
     }
     
     public func checkInsideTrackBar(point: CGPoint) -> Bool {
-        trackBar.frame.contains(point)
+        controlsView.trackBar.frame.contains(point)
     }
     
     private func isAudioAvailable() -> Bool {
@@ -950,9 +615,9 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
             return tracks.isEmpty || tracks.filter({ $0.mediaType == .video }).isEmpty == false
         }
         
-        //We do this because for m3u8 HLS streams,
-        //tracks may not always be available and the particle effect will show even on videos..
-        //It's best to assume this type of media is a video stream.
+        // We do this because for m3u8 HLS streams,
+        // tracks may not always be available and the particle effect will show even on videos..
+        // It's best to assume this type of media is a video stream.
         return true
     }
 }
