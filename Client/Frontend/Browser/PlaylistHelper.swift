@@ -20,6 +20,7 @@ enum PlaylistItemAddedState {
 protocol PlaylistHelperDelegate: NSObject {
     func present(controller: UIViewController)
     func showPlaylistToast(info: PlaylistInfo, itemState: PlaylistItemAddedState)
+    func addToPlayListActivity(info: PlaylistInfo?, itemDetected: Bool)
 }
 
 class PlaylistHelper: TabContentScript {
@@ -41,13 +42,19 @@ class PlaylistHelper: TabContentScript {
     func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage) {
         
         guard let item = PlaylistInfo.from(message: message),
-              !item.src.isEmpty else { return }
+              !item.src.isEmpty else {
+            delegate?.addToPlayListActivity(info: nil, itemDetected: false)
+            return
+        }
         
         if item.duration <= 0.0 && !item.detected {
+            delegate?.addToPlayListActivity(info: nil, itemDetected: false)
             return
         }
         
         log.debug("FOUND VIDEO ITEM ON PAGE: \(message.body)")
+        
+        delegate?.addToPlayListActivity(info: item, itemDetected: true)
         
         if Playlist.shared.itemExists(item: item) {
             Playlist.shared.updateItem(mediaSrc: item.src, item: item) {
