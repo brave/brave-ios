@@ -152,6 +152,15 @@ class NewMenuController: UINavigationController, PanModalPresentable, UIPopoverP
         .lightContent
     }
     
+    override var shouldAutorotate: Bool {
+        // Due to a bug in PanModal, the presenting controller does not receive safe area updates
+        // while a pan modal is presented, therefore for the time being, do not allow rotation
+        // while this menu is open.
+        //
+        // Issue: https://github.com/slackhq/PanModal/issues/139
+        false
+    }
+    
     private var isDismissing: Bool = false
     
     override func dismiss(animated flag: Bool, completion: (() -> Void)? = nil) {
