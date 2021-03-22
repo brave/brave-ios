@@ -69,7 +69,7 @@ extension BrowserViewController {
     }
     
     private func presentEducationalProductNotifications() {
-        if Preferences.LaunchArgs.skipEduPopups == true { return }
+        if Preferences.DebugFlag.skipEduPopups == true { return }
         
         guard let selectedTab = tabManager.selectedTab,
               !benchmarkNotificationPresented,

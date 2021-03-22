@@ -8,8 +8,9 @@ import Shared
 import BraveShared
 
 extension Preferences {
-    /// Launch arguments can be set in scheme editor in XCode.
-    struct LaunchArgs {
+    /// Launch arguments can be set in scheme editor in Xcode.
+    /// Note: these flags may be used for values in Debug scheme only, otherwise it returns nill when trying to access any of them.
+    struct DebugFlag {
         private static let prefs = UserDefaults.standard
         
         static let skipOnboardingIntro = boolOrNil(for: "BRSkipOnboarding")
@@ -18,7 +19,7 @@ extension Preferences {
         static let skipNTPCallouts = boolOrNil(for: "BRSkipAppLaunchPopups")
         
         private static func boolOrNil(for key: String) -> Bool? {
-            if prefs.object(forKey: key) == nil {
+            if AppConstants.buildChannel != .debug || prefs.object(forKey: key) == nil {
                 return nil
             }
             
