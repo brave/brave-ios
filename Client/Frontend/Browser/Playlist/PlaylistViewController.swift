@@ -391,6 +391,34 @@ extension ListController: UITableViewDataSource {
         }
     }
     
+    private func getAssetDuration(item: PlaylistInfo) -> TimeInterval {
+        let tolerance: Float = 0.00001
+        let distance = abs(item.duration).distance(to: 0.0)
+        
+        // If the database duration is <= 0.0
+        if distance <= tolerance {
+            // Attempt to retrieve the duration from the Asset file
+            if let index = PlaylistManager.shared.index(of: item.pageSrc) {
+                let asset = PlaylistManager.shared.assetAtIndex(index)
+                
+                if let track = asset.tracks(withMediaType: .video).first {
+                    return track.timeRange.duration.seconds
+                } else if let track = asset.tracks(withMediaType: .audio).first {
+                    return track.timeRange.duration.seconds
+                } else {
+                    return asset.duration.seconds
+                }
+            }
+        }
+        
+        // Return the database duration
+        return TimeInterval(item.duration)
+    }
+    
+    private func getAssetDurationFormatted(item: PlaylistInfo) -> String {
+        return formatter.string(from: getAssetDuration(item: item)) ?? "0:00"
+    }
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         PlaylistManager.shared.numberOfAssets()
     }
@@ -426,12 +454,12 @@ extension ListController: UITableViewDataSource {
             cell.detailLabel.text = Strings.PlayList.dowloadingLabelTitle
         case .downloaded:
             if let itemSize = PlaylistManager.shared.sizeOfDownloadedItem(for: item.pageSrc) {
-                cell.detailLabel.text = "\(getRelativeDateFormat(date: item.dateAdded)) - \(itemSize)"
+                cell.detailLabel.text = "\(getAssetDurationFormatted(item: item)) - \(itemSize)"
             } else {
-                cell.detailLabel.text = "\(getRelativeDateFormat(date: item.dateAdded)) - \(Strings.PlayList.dowloadedLabelTitle)"
+                cell.detailLabel.text = "\(getAssetDurationFormatted(item: item)) - \(Strings.PlayList.dowloadedLabelTitle)"
             }
         case .invalid:
-            cell.detailLabel.text = getRelativeDateFormat(date: item.dateAdded)
+            cell.detailLabel.text = getAssetDurationFormatted(item: item)
         }
         
         // Fixes a duration bug where sometimes the duration is NOT fetched!
@@ -439,7 +467,13 @@ extension ListController: UITableViewDataSource {
         loadThumbnail(item: item, cell: cell) { newTrackDuration in
             guard let newTrackDuration = newTrackDuration else { return }
             
-            if newTrackDuration > 0.0 && item.duration <= 0.0 {
+            let tolerance: Float = 0.00001
+            let existingDistance = abs(item.duration).distance(to: 0.0)
+            let newDistance = abs(newTrackDuration).distance(to: 0.0)
+            
+            // If the database duration is <= 0.0
+            // and the new duration > 0.0
+            if existingDistance <= tolerance && Float(newDistance) < -tolerance {
                 let newItem = PlaylistInfo(name: item.name,
                                            src: item.src,
                                            pageSrc: item.pageSrc,
@@ -980,17 +1014,17 @@ extension ListController: PlaylistManagerDelegate {
             switch cacheState {
             case .inProgress:
                 let item = PlaylistManager.shared.itemAtIndex(index)
-                cell.detailLabel.text = "\(getRelativeDateFormat(date: item.dateAdded)) - \(Strings.PlayList.dowloadingPercentageLabelTitle) \(Int(percentComplete))%"
+                cell.detailLabel.text = "\(getAssetDurationFormatted(item: item)) - \(Strings.PlayList.dowloadingPercentageLabelTitle) \(Int(percentComplete))%"
             case .downloaded:
                 let item = PlaylistManager.shared.itemAtIndex(index)
                 if let itemSize = PlaylistManager.shared.sizeOfDownloadedItem(for: item.pageSrc) {
-                    cell.detailLabel.text = "\(getRelativeDateFormat(date: item.dateAdded)) - \(itemSize)"
+                    cell.detailLabel.text = "\(getAssetDurationFormatted(item: item)) - \(itemSize)"
                 } else {
-                    cell.detailLabel.text = "\(getRelativeDateFormat(date: item.dateAdded)) - \(Strings.PlayList.dowloadedLabelTitle)"
+                    cell.detailLabel.text = "\(getAssetDurationFormatted(item: item)) - \(Strings.PlayList.dowloadedLabelTitle)"
                 }
             case .invalid:
                 let item = PlaylistManager.shared.itemAtIndex(index)
-                cell.detailLabel.text = getRelativeDateFormat(date: item.dateAdded)
+                cell.detailLabel.text = getAssetDurationFormatted(item: item)
             }
         }
     }
@@ -1003,7 +1037,7 @@ extension ListController: PlaylistManagerDelegate {
                 log.error("Error downloading playlist item: \(error)")
                 
                 let item = PlaylistManager.shared.itemAtIndex(index)
-                cell.detailLabel.text = getRelativeDateFormat(date: item.dateAdded)
+                cell.detailLabel.text = getAssetDurationFormatted(item: item)
                 
                 let alert = UIAlertController(title: Strings.PlayList.playlistDownloadErrorTitle, message: Strings.PlayList.playlistDownloadErrorMessage, preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: nil))
@@ -1012,17 +1046,17 @@ extension ListController: PlaylistManagerDelegate {
                 switch state {
                 case .inProgress:
                     let item = PlaylistManager.shared.itemAtIndex(index)
-                    cell.detailLabel.text = "\(getRelativeDateFormat(date: item.dateAdded)) - \(Strings.PlayList.dowloadingPercentageLabelTitle)"
+                    cell.detailLabel.text = "\(getAssetDurationFormatted(item: item)) - \(Strings.PlayList.dowloadingPercentageLabelTitle)"
                 case .downloaded:
                     let item = PlaylistManager.shared.itemAtIndex(index)
                     if let itemSize = PlaylistManager.shared.sizeOfDownloadedItem(for: item.pageSrc) {
-                        cell.detailLabel.text = "\(getRelativeDateFormat(date: item.dateAdded)) - \(itemSize)"
+                        cell.detailLabel.text = "\(getAssetDurationFormatted(item: item)) - \(itemSize)"
                     } else {
-                        cell.detailLabel.text = "\(getRelativeDateFormat(date: item.dateAdded)) - \(Strings.PlayList.dowloadedLabelTitle)"
+                        cell.detailLabel.text = "\(getAssetDurationFormatted(item: item)) - \(Strings.PlayList.dowloadedLabelTitle)"
                     }
                 case .invalid:
                     let item = PlaylistManager.shared.itemAtIndex(index)
-                    cell.detailLabel.text = getRelativeDateFormat(date: item.dateAdded)
+                    cell.detailLabel.text = getAssetDurationFormatted(item: item)
                 }
             }
         }
