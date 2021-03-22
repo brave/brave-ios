@@ -22,6 +22,7 @@ protocol PlaylistHelperDelegate: NSObject {
     func showPlaylistAlert(_ alertController: UIAlertController)
     func showPlaylistToast(info: PlaylistInfo, itemState: PlaylistItemAddedState)
     func addToPlayListActivity(info: PlaylistInfo?, itemDetected: Bool)
+    func dismissPlaylistToast(animated: Bool)
 }
 
 class PlaylistHelper: TabContentScript {
@@ -40,6 +41,7 @@ class PlaylistHelper: TabContentScript {
             if self.url != url {
                 self.url = url
                 self.playlistItems = Set<String>()
+                self.delegate?.dismissPlaylistToast(animated: false)
             }
         })
     }

@@ -3656,6 +3656,10 @@ extension BrowserViewController: PlaylistHelperDelegate {
         }
     }
     
+    func dismissPlaylistToast(animated: Bool) {
+        playlistToast?.dismiss(false, animated: animated)
+    }
+    
     private func openPlaylist() {
         let playlistController = (UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController ?? PlaylistViewController()
         playlistController.modalPresentationStyle = .fullScreen

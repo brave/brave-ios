@@ -199,4 +199,24 @@ class PlaylistToast: Toast {
             make.width.lessThanOrEqualTo(DesignUX.maxToastWidth)
         }
     }
+    
+    func dismiss(_ buttonPressed: Bool, animated: Bool) {
+        if animated {
+            super.dismiss(buttonPressed)
+        } else {
+            guard !dismissed else { return }
+            dismissed = true
+            superview?.removeGestureRecognizer(gestureRecognizer)
+            
+            UIView.animate(withDuration: 0.1, animations: {
+                self.animationConstraint?.update(offset: SimpleToastUX.toastHeight)
+                self.layoutIfNeeded()
+            }) { finished in
+                self.removeFromSuperview()
+                if !buttonPressed {
+                    self.completionHandler?(false)
+                }
+            }
+        }
+    }
 }
