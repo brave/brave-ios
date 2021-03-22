@@ -12,7 +12,7 @@ import Data
 
 public class PlaylistMimeTypeDetector {
     private(set) var mimeType: String = ""
-    private(set) var fileExtension: String = ""
+    private(set) var fileExtension: String? // When nil, assume `mpg` format.
     
     init(mimeType: String) {
         self.mimeType = mimeType
@@ -29,7 +29,7 @@ public class PlaylistMimeTypeDetector {
             "application/vnd.apple.mpegurl": "mpg"
         ]
         
-        self.fileExtension = mimeTypeMap[mimeType] ?? "mpg"
+        self.fileExtension = mimeTypeMap[mimeType]
     }
     
     init(data: Data) {
@@ -104,7 +104,6 @@ public class PlaylistMimeTypeDetector {
         }
         
         mimeType = "application/x-mpegURL" // application/vnd.apple.mpegurl
-        fileExtension = "mpg"
     }
     
     private func scan(data: [UInt8], header: [UInt8]) -> Bool {

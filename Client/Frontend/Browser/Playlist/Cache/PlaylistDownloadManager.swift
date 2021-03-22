@@ -10,12 +10,12 @@ import Data
 
 private let log = Logger.browserLogger
 
-protocol PlaylistDownloadManagerDelegate: class {
+protocol PlaylistDownloadManagerDelegate: AnyObject {
     func onDownloadProgressUpdate(id: String, percentComplete: Double)
     func onDownloadStateChanged(id: String, state: PlaylistDownloadManager.DownloadState, displayName: String, error: Error?)
 }
 
-private protocol PlaylistStreamDownloadManagerDelegate: class {
+private protocol PlaylistStreamDownloadManagerDelegate: AnyObject {
     func localAsset(for pageSrc: String) -> AVURLAsset?
     func onDownloadProgressUpdate(id: String, percentComplete: Double)
     func onDownloadStateChanged(id: String, state: PlaylistDownloadManager.DownloadState, displayName: String, error: Error?)
@@ -95,7 +95,7 @@ public class PlaylistDownloadManager: PlaylistStreamDownloadManagerDelegate {
     }
     
     func downloadTask(for pageSrc: String) -> MediaDownloadTask? {
-        return hlsDelegate.downloadTask(for: pageSrc) ?? fileDelegate.downloadTask(for: pageSrc)
+        hlsDelegate.downloadTask(for: pageSrc) ?? fileDelegate.downloadTask(for: pageSrc)
     }
     
     // MARK: - PlaylistStreamDownloadManagerDelegate
@@ -208,20 +208,15 @@ private class PlaylistHLSDownloadManager: NSObject, AVAssetDownloadDelegate {
     }
     
     func cancelDownload(item: PlaylistInfo) {
-        for (task, value) in activeDownloadTasks where item.pageSrc == value.id {
+        if let task = activeDownloadTasks.first(where: { $0.value.id == item.pageSrc })?.key {
             task.cancel()
             activeDownloadTasks.removeValue(forKey: task)
             pendingDownloadTasks.removeValue(forKey: task)
-            break
         }
     }
     
     func downloadTask(for pageSrc: String) -> MediaDownloadTask? {
-        for (_, asset) in activeDownloadTasks where pageSrc == asset.id {
-            return asset
-        }
-
-        return nil
+        activeDownloadTasks.first(where: { $0.value.id == pageSrc })?.value
     }
     
     // MARK: - AVAssetDownloadTask
@@ -364,7 +359,7 @@ private class PlaylistFileDownloadManager: NSObject, URLSessionDownloadDelegate 
             var request = URLRequest(url: assetUrl, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10.0)
             request.addValue("bytes=0-", forHTTPHeaderField: "Range")
             request.addValue(UUID().uuidString, forHTTPHeaderField: "X-Playback-Session-Id")
-            request.addValue("AppleCoreMedia/1.0.0.17E255 (iPhone; U; CPU OS 13_4 like Mac OS X; en_ca)", forHTTPHeaderField: "User-Agent")
+            request.addValue(UserAgent.shouldUseDesktopMode ? UserAgent.desktop : UserAgent.mobile, forHTTPHeaderField: "User-Agent")
             return request
         }()
         
@@ -378,19 +373,14 @@ private class PlaylistFileDownloadManager: NSObject, URLSessionDownloadDelegate 
     }
     
     func cancelDownload(item: PlaylistInfo) {
-        for (task, value) in activeDownloadTasks where item.pageSrc == value.id {
+        if let task = activeDownloadTasks.first(where: { item.pageSrc == $0.value.id })?.key {
             task.cancel()
             activeDownloadTasks.removeValue(forKey: task)
-            break
         }
     }
     
     func downloadTask(for pageSrc: String) -> MediaDownloadTask? {
-        for (_, asset) in activeDownloadTasks where pageSrc == asset.id {
-            return asset
-        }
-
-        return nil
+        return activeDownloadTasks.first(where: { $0.value.id == pageSrc })?.value
     }
     
     // MARK: - URLSessionDownloadDelegate
@@ -425,12 +415,18 @@ private class PlaylistFileDownloadManager: NSObject, URLSessionDownloadDelegate 
     }
     
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
-        
         guard let asset = activeDownloadTasks[downloadTask] else { return }
-        let percentage = (Double(totalBytesWritten) / Double(totalBytesExpectedToWrite)) * 100.0
         
-        DispatchQueue.main.async {
-            self.delegate?.onDownloadProgressUpdate(id: asset.id, percentComplete: percentage)
+        if totalBytesExpectedToWrite == NSURLSessionTransferSizeUnknown || totalBytesExpectedToWrite == 0 {
+            DispatchQueue.main.async {
+                self.delegate?.onDownloadProgressUpdate(id: asset.id, percentComplete: 0.0)
+            }
+        } else {
+            let percentage = (Double(totalBytesWritten) / Double(totalBytesExpectedToWrite)) * 100.0
+            
+            DispatchQueue.main.async {
+                self.delegate?.onDownloadProgressUpdate(id: asset.id, percentComplete: percentage)
+            }
         }
     }
     
@@ -439,23 +435,19 @@ private class PlaylistFileDownloadManager: NSObject, URLSessionDownloadDelegate 
         
         if let response = downloadTask.response as? HTTPURLResponse, response.statusCode == 302 || response.statusCode >= 200 && response.statusCode <= 299 {
             
-            var fileExtension = ""
+            var detectedFileExtension: String?
             
             // Detect based on Content-Type header.
-            if let contentType = response.allHeaderFields["Content-Type"] as? String {
-                let detectedExtension = PlaylistMimeTypeDetector(mimeType: contentType).fileExtension
-                if !detectedExtension.isEmpty {
-                    fileExtension = detectedExtension
-                }
+            if let contentType = response.allHeaderFields["Content-Type"] as? String, let detectedExtension = PlaylistMimeTypeDetector(mimeType: contentType).fileExtension {
+                detectedFileExtension = detectedExtension
             }
             
             // Detect based on Data.
-            if fileExtension.isEmpty {
+            if detectedFileExtension == nil {
                 do {
                     let data = try Data(contentsOf: location, options: .mappedIfSafe)
-                    let detectedExtension = PlaylistMimeTypeDetector(data: data).fileExtension
-                    if !detectedExtension.isEmpty {
-                        fileExtension = detectedExtension
+                    if let detectedExtension = PlaylistMimeTypeDetector(data: data).fileExtension {
+                        detectedFileExtension = detectedExtension
                     }
                 } catch {
                     log.error("Error mapping downloaded playlist file to virtual memory: \(error)")
@@ -464,8 +456,10 @@ private class PlaylistFileDownloadManager: NSObject, URLSessionDownloadDelegate 
             
             // Couldn't determine file type so we assume mp4 which is the most widely used container.
             // If it doesn't work, the video/audio just won't play anyway.
-            if fileExtension.isEmpty {
-                fileExtension = "mp4"
+            
+            var fileExtension = "mp4"
+            if let detectedFileExtension = detectedFileExtension {
+                fileExtension = detectedFileExtension
             }
             
             do {

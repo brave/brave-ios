@@ -498,7 +498,7 @@ extension MediaResourceManager {
             var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10.0)
             request.addValue("bytes=0-1", forHTTPHeaderField: "Range")
             request.addValue(UUID().uuidString, forHTTPHeaderField: "X-Playback-Session-Id")
-            request.addValue("AppleCoreMedia/1.0.0.17E255 (iPhone; U; CPU OS 13_4 like Mac OS X; en_ca)", forHTTPHeaderField: "User-Agent")
+            request.addValue(UserAgent.shouldUseDesktopMode ? UserAgent.desktop : UserAgent.mobile, forHTTPHeaderField: "User-Agent")
             return request
         }()
         
