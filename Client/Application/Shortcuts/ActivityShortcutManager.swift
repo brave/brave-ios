@@ -21,7 +21,7 @@ enum ActivityType: String {
     var title: String {
         switch self {
             case .newTab:
-                return "Open a New Browser Tab!"
+                return "Open a New Browser Tab"
             case .newPrivateTab:
                 return "Open a New Private Browser Tab"
         }
