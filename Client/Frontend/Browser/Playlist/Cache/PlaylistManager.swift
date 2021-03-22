@@ -8,6 +8,7 @@ import AVFoundation
 import Shared
 import CoreData
 import Data
+import BraveShared
 
 private let log = Logger.browserLogger
 
@@ -192,6 +193,21 @@ class PlaylistManager: NSObject {
             } catch {
                 log.error("An error occured deleting Playlist Cached Item \(item.name): \(error)")
             }
+        }
+    }
+    
+    func autoDownload(item: PlaylistInfo) {
+        let downloadType = PlayListDownloadType(rawValue: Preferences.Playlist.autoDownloadVideo.value)
+
+        switch downloadType {
+            case .on:
+                PlaylistManager.shared.download(item: item)
+            case .wifi:
+                if DeviceInfo.hasWifiConnection() {
+                    PlaylistManager.shared.download(item: item)
+                }
+            default:
+                break
         }
     }
 }

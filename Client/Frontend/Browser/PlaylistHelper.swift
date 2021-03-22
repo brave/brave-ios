@@ -98,6 +98,8 @@ class PlaylistHelper: TabContentScript {
                 alert.addAction(UIAlertAction(title: Strings.PlayList.addToPlayListAlertTitle, style: .default, handler: { _ in
                     // Update playlist with new items..
                     PlaylistItem.addItem(item, cachedData: nil) {
+                        PlaylistManager.shared.autoDownload(item: item)
+                        
                         log.debug("Playlist Item Added")
                         self.delegate?.showPlaylistToast(info: item, itemState: .added)
                         UIImpactFeedbackGenerator(style: .medium).bzzt()
