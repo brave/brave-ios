@@ -153,12 +153,26 @@ public class PlaylistMimeTypeDetector {
         return [UInt8](data[offset..<(offset + header.count)]) == header
     }
     
-    public func supportedAudioFileTypes() -> [String] {
-        return AVURLAsset.audiovisualTypes().map({ $0.rawValue })
+    /// Converts a list of AVFileType to a list of file extensions
+    public func supportedAVAssetFileExtensions() -> [String] {
+        if #available(iOS 14.0, *) {
+            let types = AVURLAsset.audiovisualTypes()
+            return types.compactMap({ UTType(tag: $0.rawValue, tagClass: .filenameExtension, conformingTo: nil)?.preferredFilenameExtension }).filter({ !$0.isEmpty })
+        } else {
+            let types = AVURLAsset.audiovisualTypes()
+            return types.compactMap({ UTTypeCopyPreferredTagWithClass($0 as CFString, kUTTagClassFilenameExtension)?.takeRetainedValue() as String? }).filter({ !$0.isEmpty })
+        }
     }
     
-    public func supportedAudioMimeTypes() -> [String] {
-        return AVURLAsset.audiovisualMIMETypes()
+    /// Converts a list of AVFileType to a list of mime-types
+    public func supportedAVAssetMimeTypes() -> [String] {
+        if #available(iOS 14.0, *) {
+            let types = AVURLAsset.audiovisualTypes()
+            return types.compactMap({ UTType(tag: $0.rawValue, tagClass: .mimeType, conformingTo: nil)?.preferredFilenameExtension }).filter({ !$0.isEmpty })
+        } else {
+            let types = AVURLAsset.audiovisualTypes()
+            return types.compactMap({ UTTypeCopyPreferredTagWithClass($0 as CFString, kUTTagClassMIMEType)?.takeRetainedValue() as String? }).filter({ !$0.isEmpty })
+        }
     }
     
     private let knownFileExtensions = [
