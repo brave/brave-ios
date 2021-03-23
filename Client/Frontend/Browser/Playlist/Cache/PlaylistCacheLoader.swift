@@ -19,16 +19,24 @@ public class PlaylistMimeTypeDetector {
     private(set) var fileExtension: String? // When nil, assume `mpg` format.
     
     init(url: URL) {
-        let possibleFileExtension = url.pathExtension
+        let possibleFileExtension = url.pathExtension.lowercased()
         if let supportedExtension = knownFileExtensions.first(where: { $0.lowercased() == possibleFileExtension }) {
             self.fileExtension = supportedExtension
             self.mimeType = mimeTypeMap.first(where: { $0.value == supportedExtension })?.key
+        } else if let fileExtension = PlaylistMimeTypeDetector.supportedAVAssetFileExtensions().first(where: { $0.lowercased() == possibleFileExtension }) {
+            self.fileExtension = fileExtension
+            self.mimeType = PlaylistMimeTypeDetector.fileExtensionToMimeType(fileExtension)
         }
     }
     
     init(mimeType: String) {
-        self.mimeType = mimeType
-        self.fileExtension = mimeTypeMap[mimeType.lowercased()]
+        if let fileExtension = mimeTypeMap[mimeType.lowercased()] {
+            self.mimeType = mimeType
+            self.fileExtension = fileExtension
+        } else if let mimeType = PlaylistMimeTypeDetector.supportedAVAssetMimeTypes().first(where: { $0.lowercased() == mimeType.lowercased() }) {
+            self.mimeType = mimeType
+            self.fileExtension = PlaylistMimeTypeDetector.mimeTypeToFileExtension(mimeType)
+        }
     }
     
     init(data: Data) {
@@ -153,11 +161,35 @@ public class PlaylistMimeTypeDetector {
         return [UInt8](data[offset..<(offset + header.count)]) == header
     }
     
+    /// Converts a File Extension to a Mime-Type
+    private static func fileExtensionToMimeType(_ fileExtension: String) -> String? {
+        if #available(iOS 14.0, *) {
+            return UTType(tag: fileExtension, tagClass: .filenameExtension, conformingTo: nil)?.preferredMIMEType
+        } else {
+            if let tag = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, fileExtension as CFString, nil)?.takeRetainedValue() {
+                return UTTypeCopyPreferredTagWithClass(tag, kUTTagClassMIMEType)?.takeRetainedValue() as String?
+            }
+            return nil
+        }
+    }
+    
+    /// Converts a Mime-Type to File Extension
+    private static func mimeTypeToFileExtension(_ mimeType: String) -> String? {
+        if #available(iOS 14.0, *) {
+            return UTType(tag: mimeType, tagClass: .mimeType, conformingTo: nil)?.preferredFilenameExtension
+        } else {
+            if let tag = UTTypeCreatePreferredIdentifierForTag(kUTTagClassMIMEType, mimeType as CFString, nil)?.takeRetainedValue() {
+                return UTTypeCopyPreferredTagWithClass(tag, kUTTagClassFilenameExtension)?.takeRetainedValue() as String?
+            }
+            return nil
+        }
+    }
+    
     /// Converts a list of AVFileType to a list of file extensions
-    public func supportedAVAssetFileExtensions() -> [String] {
+    private static func supportedAVAssetFileExtensions() -> [String] {
         if #available(iOS 14.0, *) {
             let types = AVURLAsset.audiovisualTypes()
-            return types.compactMap({ UTType(tag: $0.rawValue, tagClass: .filenameExtension, conformingTo: nil)?.preferredFilenameExtension }).filter({ !$0.isEmpty })
+            return types.compactMap({ UTType($0.rawValue)?.preferredFilenameExtension }).filter({ !$0.isEmpty })
         } else {
             let types = AVURLAsset.audiovisualTypes()
             return types.compactMap({ UTTypeCopyPreferredTagWithClass($0 as CFString, kUTTagClassFilenameExtension)?.takeRetainedValue() as String? }).filter({ !$0.isEmpty })
@@ -165,10 +197,10 @@ public class PlaylistMimeTypeDetector {
     }
     
     /// Converts a list of AVFileType to a list of mime-types
-    public func supportedAVAssetMimeTypes() -> [String] {
+    private static func supportedAVAssetMimeTypes() -> [String] {
         if #available(iOS 14.0, *) {
             let types = AVURLAsset.audiovisualTypes()
-            return types.compactMap({ UTType(tag: $0.rawValue, tagClass: .mimeType, conformingTo: nil)?.preferredFilenameExtension }).filter({ !$0.isEmpty })
+            return types.compactMap({ UTType($0.rawValue)?.preferredMIMEType }).filter({ !$0.isEmpty })
         } else {
             let types = AVURLAsset.audiovisualTypes()
             return types.compactMap({ UTTypeCopyPreferredTagWithClass($0 as CFString, kUTTagClassMIMEType)?.takeRetainedValue() as String? }).filter({ !$0.isEmpty })
