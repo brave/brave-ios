@@ -437,8 +437,16 @@ private class PlaylistFileDownloadManager: NSObject, URLSessionDownloadDelegate 
             
             var detectedFileExtension: String?
             
+            // Detect based on File Extension.
+            if let url = downloadTask.originalRequest?.url,
+               let detectedExtension = PlaylistMimeTypeDetector(url: url).fileExtension {
+                detectedFileExtension = detectedExtension
+            }
+            
             // Detect based on Content-Type header.
-            if let contentType = response.allHeaderFields["Content-Type"] as? String, let detectedExtension = PlaylistMimeTypeDetector(mimeType: contentType).fileExtension {
+            if detectedFileExtension == nil,
+               let contentType = response.allHeaderFields["Content-Type"] as? String,
+               let detectedExtension = PlaylistMimeTypeDetector(mimeType: contentType).fileExtension {
                 detectedFileExtension = detectedExtension
             }
             
