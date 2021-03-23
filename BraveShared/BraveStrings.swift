@@ -988,7 +988,7 @@ extension Strings {
             "socialSharing.shareDescriptionTitle",
             bundle: Bundle.shared,
             value: "Every day I save data by browsing the web with Brave.",
-            comment: "Text usedn for social sharing together with Brave Shield values")
+            comment: "Text used for social sharing together with Brave Shield values")
     }
 }
 
