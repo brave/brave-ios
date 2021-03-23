@@ -82,5 +82,4 @@ class ActivityShortcutManager: NSObject {
                 browserViewController.openBlankNewTab(attemptLocationFieldFocus: true, isPrivate: true)
         }
     }
-    
 }

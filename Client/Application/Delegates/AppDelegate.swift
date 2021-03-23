@@ -638,12 +638,12 @@ extension AppDelegate {
                     browserViewController.switchToTabForURLOrOpen(url, isPrivileged: true)
                     return true
                 }
-            case ActivityType.newTab.rawValue:
+            case ActivityType.newTab.identifier:
                 ActivityShortcutManager.shared.performShortcutActivity(
                     type: .newTab, using: browserViewController)
                 
                 return true
-            case ActivityType.newPrivateTab.rawValue:
+            case ActivityType.newPrivateTab.identifier:
                 ActivityShortcutManager.shared.performShortcutActivity(
                     type: .newPrivateTab, using: browserViewController)
                 
