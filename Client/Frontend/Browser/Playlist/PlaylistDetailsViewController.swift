@@ -32,17 +32,24 @@ class PlaylistDetailsViewController: UIViewController {
         super.viewDidLoad()
         
         setUpSplitViewController()
+        
+        view.backgroundColor = BraveUX.popoverDarkBackground
     }
     
     // MARK: Internal
     
-    let playlistSplitViewController = UISplitViewController()
-    let videoListViewController = PlaylistVideoListViewController()
-    let videoPlayerViewController = PlaylistVideoPlayerViewController()
-
+    private let playlistSplitViewController = UISplitViewController()
+    private let videoListViewController = PlaylistVideoListViewController()
+    private let videoPlayerViewController = PlaylistVideoPlayerViewController()
+    
     // MARK: Private
     
     private func setUpSplitViewController() {
+        videoListViewController.delegate = self
+        videoListViewController.videoPlayer = videoPlayerViewController
+        
+        videoPlayerViewController.delegate = self
+        
         let videoListNavigationViewController = SettingsNavigationController(rootViewController: videoListViewController)
         let videoPlayerNavigationViewController = SettingsNavigationController(rootViewController: videoPlayerViewController)
 
@@ -51,15 +58,48 @@ class PlaylistDetailsViewController: UIViewController {
             $0.modalPresentationStyle = .fullScreen
             $0.preferredDisplayMode = .oneBesideSecondary
             $0.primaryEdge = .trailing
+            $0.view.backgroundColor = .clear
         }
         
         addChild(playlistSplitViewController)
         view.addSubview(playlistSplitViewController.view)
             
-        playlistSplitViewController.didMove(toParent: self)
-        playlistSplitViewController.view.translatesAutoresizingMaskIntoConstraints = false
-        playlistSplitViewController.view.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+        playlistSplitViewController.do {
+            $0.didMove(toParent: self)
+            $0.view.translatesAutoresizingMaskIntoConstraints = false
+            $0.view.snp.makeConstraints {
+                $0.edges.equalToSuperview()
+            }
         }
+    }
+    
+    private func displayLoadingResourceError() {
+        let alert = UIAlertController(
+            title: Strings.PlayList.sorryAlertTitle, message: Strings.PlayList.loadResourcesErrorAlertDescription, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: nil))
+        
+        self.present(alert, animated: true, completion: nil)
+    }
+}
+
+// MARK: PlaylistVideoPlayerViewControllerDelegate
+
+extension PlaylistDetailsViewController: PlaylistVideoPlayerViewControllerDelegate {
+    
+    func playlistVideoPlayerViewControllerDisplayResourceError(_ controller: PlaylistVideoPlayerViewController) {
+        displayLoadingResourceError()
+    }
+    
+    func playlistVideoPlayerViewControllerDidTapExit(_ controller: PlaylistVideoPlayerViewController) {
+        dismiss(animated: true, completion: nil)
+    }
+}
+
+// MARK: PlayListVideoListViewControllerDelegate
+
+extension PlaylistDetailsViewController: PlaylistVideoListViewControllerDelegate {
+
+    func playlistVideoListViewControllerDisplayResourceError(_ controller: PlaylistVideoListViewController) {
+        displayLoadingResourceError()
     }
 }

@@ -285,7 +285,7 @@ class MenuViewController: UITableViewController {
     private typealias DoneButton = (style: UIBarButtonItem.SystemItem, position: DoneButtonPosition)
     
     private func open(_ viewController: UIViewController, doneButton: DoneButton,
-                      allowSwipeToDismiss: Bool = true, alwaysFullScreen: Bool = false, forcePortraitIfIphone: Bool = true) {
+                      allowSwipeToDismiss: Bool = true, alwaysFullScreen: Bool = false) {
         let navigationController = SettingsNavigationController(rootViewController: viewController)
         
         // All menu views should be opened in portrait on iPhones.
