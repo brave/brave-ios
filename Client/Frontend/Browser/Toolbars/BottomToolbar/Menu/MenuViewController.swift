@@ -285,7 +285,7 @@ class MenuViewController: UITableViewController {
     private typealias DoneButton = (style: UIBarButtonItem.SystemItem, position: DoneButtonPosition)
     
     private func open(_ viewController: UIViewController, doneButton: DoneButton,
-                      allowSwipeToDismiss: Bool = true) {
+                      allowSwipeToDismiss: Bool = true, alwaysFullScreen: Bool = false) {
         let nav = SettingsNavigationController(rootViewController: viewController)
         
         // All menu views should be opened in portrait on iPhones.
@@ -295,6 +295,7 @@ class MenuViewController: UITableViewController {
         
         nav.modalPresentationStyle =
             UIDevice.current.userInterfaceIdiom == .phone ? .pageSheet : .formSheet
+        
         
         let button = UIBarButtonItem(barButtonSystemItem: doneButton.style, target: nav, action: #selector(nav.done))
         
@@ -359,7 +360,7 @@ class MenuViewController: UITableViewController {
         let currentTheme = Theme.of(bvc.tabManager.selectedTab)
         //vc.applyTheme(currentTheme)
         
-        open(vc, doneButton: DoneButton(style: .done, position: .right))
+        open(vc, doneButton: DoneButton(style: .done, position: .right), alwaysFullScreen: true)
     }
     
     private func openAddBookmark() {
