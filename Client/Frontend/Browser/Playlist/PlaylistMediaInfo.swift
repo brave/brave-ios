@@ -15,7 +15,6 @@ private let log = Logger.browserLogger
 class PlaylistMediaInfo: NSObject {
     private weak var playerView: VideoView?
     private var webLoader: PlaylistWebLoader?
-    private var streamLoader = MediaResourceManager({ _ in })
     private var playerStatusObserver: StreamObserver?
     private var rateObserver: NSKeyValueObservation?
     public var nowPlayingInfo: PlaylistInfo? {
