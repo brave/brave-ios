@@ -66,7 +66,7 @@ class ActivityShortcutManager: NSObject {
         activity.isEligibleForPrediction = true
         
         activity.title = type.title
-        activity.suggestedInvocationPhrase =  "Open New Private Tab"
+        activity.suggestedInvocationPhrase = type.suggestedPhrase
         activity.contentAttributeSet = attributes
 
         return activity
