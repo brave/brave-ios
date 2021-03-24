@@ -751,6 +751,8 @@
 		5E6683A923D61CF7005B3A6C /* NTPDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E6683A823D61CF7005B3A6C /* NTPDownloader.swift */; };
 		5E72D54F253657FF00F8D62D /* BraveCoreImportExportUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E72D54E253657FF00F8D62D /* BraveCoreImportExportUtility.swift */; };
 		5E824A34260BC6CA00127F36 /* BrowserViewController+Playlist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E824A33260BC6CA00127F36 /* BrowserViewController+Playlist.swift */; };
+		5E824A95260BCE0D00127F36 /* MainFrameAtDocumentEnd.js in Resources */ = {isa = PBXBuildFile; fileRef = 5E824A88260BCE0D00127F36 /* MainFrameAtDocumentEnd.js */; };
+		5E824A96260BCE0D00127F36 /* MainFrameAtDocumentStart.js in Resources */ = {isa = PBXBuildFile; fileRef = 5E824A94260BCE0D00127F36 /* MainFrameAtDocumentStart.js */; };
 		5E8CD8E123D5E3DA00548FC0 /* libarchive.2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E8CD8E023D5E3D100548FC0 /* libarchive.2.tbd */; };
 		5E9288CA22DF864C007BE7A6 /* TabSessionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E9288C922DF864C007BE7A6 /* TabSessionTests.swift */; };
 		5E99CAB025CC610B003F30B4 /* PlaylistToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E99CAAF25CC610B003F30B4 /* PlaylistToast.swift */; };
@@ -2452,6 +2454,8 @@
 		5E6683A823D61CF7005B3A6C /* NTPDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NTPDownloader.swift; sourceTree = "<group>"; };
 		5E72D54E253657FF00F8D62D /* BraveCoreImportExportUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveCoreImportExportUtility.swift; sourceTree = "<group>"; };
 		5E824A33260BC6CA00127F36 /* BrowserViewController+Playlist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowserViewController+Playlist.swift"; sourceTree = "<group>"; };
+		5E824A88260BCE0D00127F36 /* MainFrameAtDocumentEnd.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = MainFrameAtDocumentEnd.js; sourceTree = "<group>"; };
+		5E824A94260BCE0D00127F36 /* MainFrameAtDocumentStart.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = MainFrameAtDocumentStart.js; sourceTree = "<group>"; };
 		5E8CD8E023D5E3D100548FC0 /* libarchive.2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libarchive.2.tbd; path = usr/lib/libarchive.2.tbd; sourceTree = SDKROOT; };
 		5E9288C922DF864C007BE7A6 /* TabSessionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabSessionTests.swift; sourceTree = "<group>"; };
 		5E99C88A25C83BE3003F30B4 /* PlaylistManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistManager.swift; sourceTree = "<group>"; };
@@ -5446,6 +5450,8 @@
 		F84B21EB1A0910F600AAB793 /* Assets */ = {
 			isa = PBXGroup;
 			children = (
+				5E824A88260BCE0D00127F36 /* MainFrameAtDocumentEnd.js */,
+				5E824A94260BCE0D00127F36 /* MainFrameAtDocumentStart.js */,
 				F979BE2C25BCC54D009B6ACF /* AllFramesAtDocumentEnd.js */,
 				F979BE2E25BCC54E009B6ACF /* AllFramesAtDocumentEndSandboxed.js */,
 				F979BE2B25BCC54D009B6ACF /* AllFramesAtDocumentStart.js */,
@@ -6417,6 +6423,7 @@
 				0BA1E0301B051A07007675AF /* NetError.css in Resources */,
 				59871C1921E4D83900316590 /* block-cookies.json in Resources */,
 				0AB22A90257EADA900126ADC /* corwin-prescott_crestone.jpg in Resources */,
+				5E824A95260BCE0D00127F36 /* MainFrameAtDocumentEnd.js in Resources */,
 				3BC659491E5BA4AE006D560F /* TopSites in Resources */,
 				E4B7B77E1A793CF20022C5E0 /* FiraSans-SemiBold.ttf in Resources */,
 				0AB22A93257EADA900126ADC /* corwin-prescott_canyon.jpg in Resources */,
@@ -6499,6 +6506,7 @@
 				0AB22A8E257EADA900126ADC /* spencer-moore_lake.jpg in Resources */,
 				59C8119922D754D4005D5BBC /* BraveShared.strings in Resources */,
 				F9E0F3B4257878C1003A6A30 /* PrintHandler.js in Resources */,
+				5E824A96260BCE0D00127F36 /* MainFrameAtDocumentStart.js in Resources */,
 				F9E0F38B25772E57003A6A30 /* ReaderMode.js in Resources */,
 				E4ECCDAE1AB131770005E717 /* FiraSans-Medium.ttf in Resources */,
 				0AB22A8C257EADA900126ADC /* andre-benz.jpg in Resources */,
