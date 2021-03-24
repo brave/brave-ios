@@ -17,9 +17,10 @@ class PlaylistMediaInfo: NSObject {
     private var webLoader: PlaylistWebLoader?
     private var streamLoader = MediaResourceManager({ _ in })
     private var playerStatusObserver: StreamObserver?
+    private var rateObserver: NSKeyValueObservation?
     public var nowPlayingInfo: PlaylistInfo? {
         didSet {
-            self.updateNowPlayingMediaInfo()
+            updateNowPlayingMediaInfo()
         }
     }
     
@@ -94,17 +95,18 @@ class PlaylistMediaInfo: NSObject {
         }
         
         UIApplication.shared.beginReceivingRemoteControlEvents()
-        self.updateNowPlayingMediaInfo()
-        self.playerView?.player.addObserver(self, forKeyPath: "rate", options: .new, context: nil)
+        updateNowPlayingMediaInfo()
+        rateObserver = playerView.player.observe(\AVPlayer.rate, options: [.new], changeHandler: { [weak self] _, _ in
+            self?.updateNowPlayingMediaInfo()
+        })
     }
     
     deinit {
         self.webLoader?.removeFromSuperview()
-        self.playerView?.player.removeObserver(self, forKeyPath: "rate", context: nil)
         UIApplication.shared.endReceivingRemoteControlEvents()
     }
     
-    public func updateNowPlayingMediaInfo() {
+    func updateNowPlayingMediaInfo() {
         if let nowPlayingItem = self.nowPlayingInfo {
             MPNowPlayingInfoCenter.default().nowPlayingInfo = [
                 MPNowPlayingInfoPropertyMediaType: "Audio",
@@ -120,7 +122,7 @@ class PlaylistMediaInfo: NSObject {
         }
     }
     
-    public func updateNowPlayingMediaArtwork(image: UIImage?) {
+    func updateNowPlayingMediaArtwork(image: UIImage?) {
         if let image = image {
             MPNowPlayingInfoCenter.default().nowPlayingInfo?[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: image.size, requestHandler: { _ -> UIImage in
                 // Do not resize image here.
@@ -129,23 +131,17 @@ class PlaylistMediaInfo: NSObject {
             })
         }
     }
-    
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
-            if keyPath == "rate" {
-                self.updateNowPlayingMediaInfo()
-            }
-        }
 }
 
 extension PlaylistMediaInfo: MPPlayableContentDelegate {
     
-    public enum MediaPlaybackError {
+    enum MediaPlaybackError {
         case expired
         case error(Error)
         case none
     }
     
-    public func loadMediaItem(_ item: PlaylistInfo, index: Int, autoPlayEnabled: Bool = true, completion: @escaping (MediaPlaybackError) -> Void) {
+    func loadMediaItem(_ item: PlaylistInfo, index: Int, autoPlayEnabled: Bool = true, completion: @escaping (MediaPlaybackError) -> Void) {
         self.nowPlayingInfo = item
         self.playerStatusObserver = nil
         self.playerView?.stop()
@@ -247,60 +243,46 @@ extension PlaylistMediaInfo: MPPlayableContentDelegate {
         private weak var player: AVPlayer?
         private var item: AVPlayerItem?
         private var onStatusChanged: (AVPlayerItem.Status) -> Void
+        private var currentItemObserver: NSKeyValueObservation?
+        private var itemStatusObserver: NSKeyValueObservation?
         
         init(player: AVPlayer, onStatusChanged: @escaping (AVPlayerItem.Status) -> Void) {
             self.onStatusChanged = onStatusChanged
             super.init()
             
             self.player = player
-            player.addObserver(self, forKeyPath: #keyPath(AVPlayer.currentItem), options: [.old, .new], context: nil)
-        }
-        
-        deinit {
-            item?.removeObserver(self, forKeyPath: #keyPath(AVPlayerItem.status), context: nil)
-            player?.removeObserver(self, forKeyPath: #keyPath(AVPlayer.currentItem))
-        }
-        
-        override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
-            
-            if keyPath == #keyPath(AVPlayer.currentItem),
-               let change = change {
+            currentItemObserver = player.observe(\AVPlayer.currentItem, options: [.old, .new], changeHandler: { [weak self] _, change in
+                guard let self = self else { return }
                 
-                if let newItem = change[.newKey] as? AVPlayerItem {
+                if let newItem = change.newValue {
                     self.item = newItem
-                    newItem.addObserver(self, forKeyPath: #keyPath(AVPlayerItem.status), options: [.old, .new], context: nil)
+                    self.itemStatusObserver = newItem?.observe(\AVPlayerItem.status, options: [.old, .new], changeHandler: { [weak self] _, change in
+                        guard let self = self else { return }
+                        
+                        let status = change.newValue ?? .unknown
+                        switch status {
+                        case .readyToPlay:
+                            log.debug("Player Item Status: Ready")
+                            self.onStatusChanged(.readyToPlay)
+                        case .failed:
+                            log.debug("Player Item Status: Failed")
+                            self.onStatusChanged(.failed)
+                        case .unknown:
+                            log.debug("Player Item Status: Unknown")
+                            self.onStatusChanged(.unknown)
+                        @unknown default:
+                            assertionFailure("Unknown Switch Case for AVPlayerItemStatus")
+                        }
+                    })
                 }
-            }
-            
-            if keyPath == #keyPath(AVPlayerItem.status) {
-                let status: AVPlayerItem.Status
-                if let statusNumber = change?[.newKey] as? NSNumber {
-                    status = AVPlayerItem.Status(rawValue: statusNumber.intValue)!
-                } else {
-                    status = .unknown
-                }
-                
-                switch status {
-                case .readyToPlay:
-                    log.debug("Player Item Status: Ready")
-                    onStatusChanged(.readyToPlay)
-                case .failed:
-                    log.debug("Player Item Status: Failed")
-                    onStatusChanged(.failed)
-                case .unknown:
-                    log.debug("Player Item Status: Unknown")
-                    onStatusChanged(.unknown)
-                @unknown default:
-                    assertionFailure("Unknown Switch Case for AVPlayerItemStatus")
-                }
-            }
+            })
         }
     }
 }
 
 extension PlaylistMediaInfo {
     
-    public func thumbnailForURL(_ url: String) -> UIImage? {
+    func thumbnailForURL(_ url: String) -> UIImage? {
         let sourceURL = URL(string: url)
         let asset = AVAsset(url: sourceURL!)
         let imageGenerator = AVAssetImageGenerator(asset: asset)
@@ -327,7 +309,6 @@ class MediaResourceManager: NSObject, AVAssetResourceLoaderDelegate {
     }
     
     func resourceLoader(_ resourceLoader: AVAssetResourceLoader, shouldWaitForLoadingOfRequestedResource loadingRequest: AVAssetResourceLoadingRequest) -> Bool {
-
         // Load the content information..
         if let contentRequest = loadingRequest.contentInformationRequest {
             guard let requestURL = loadingRequest.request.url else { return false }
@@ -374,7 +355,6 @@ class MediaResourceManager: NSObject, AVAssetResourceLoaderDelegate {
                     return
                 }
                 
-                // loadingRequest.dataRequest?.respond(with: data!)
                 loadingRequest.finishLoading()
             }.resume()
             contentInfoRequest = loadingRequest
@@ -461,21 +441,21 @@ class MediaResourceManager: NSObject, AVAssetResourceLoaderDelegate {
 }
 
 extension MediaResourceManager {
-    public static func shimURL(_ url: URL) -> URL {
+    static func shimURL(_ url: URL) -> URL {
         var components = URLComponents(url: url, resolvingAgainstBaseURL: false)
         guard let scheme = components?.scheme else { return url }
         components?.scheme = "brave-media-resource" + scheme
         return components?.url ?? url
     }
     
-    public static func unShimURL(_ url: URL) -> URL {
+    static func unShimURL(_ url: URL) -> URL {
         var components = URLComponents(url: url, resolvingAgainstBaseURL: false)
         guard let scheme = components?.scheme else { return url }
         components?.scheme = scheme.replacingOccurrences(of: "brave-media-resource", with: "")
         return components?.url ?? url
     }
     
-    public static func isShimmedURL(_ url: URL) -> Bool {
+    static func isShimmedURL(_ url: URL) -> Bool {
         let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
         guard let scheme = components?.scheme else { return false }
         return scheme.hasPrefix("brave-media-resource")
@@ -483,7 +463,7 @@ extension MediaResourceManager {
     
     // Would be nice if AVPlayer could detect the mime-type from the URL for my delegate without a head request..
     // This function only exists because I can't figure out why videos from URLs don't play unless I explicitly specify a mime-type..
-    public static func canStreamURL(_ url: URL, _ completion: @escaping (Bool) -> Void) {
+    static func canStreamURL(_ url: URL, _ completion: @escaping (Bool) -> Void) {
         getMimeType(url) { mimeType in
             if let mimeType = mimeType {
                 completion(!mimeType.isEmpty)
@@ -493,7 +473,7 @@ extension MediaResourceManager {
         }
     }
     
-    public static func getMimeType(_ url: URL, _ completion: @escaping (String?) -> Void) {
+    static func getMimeType(_ url: URL, _ completion: @escaping (String?) -> Void) {
         let request: URLRequest = {
             var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10.0)
             request.addValue("bytes=0-1", forHTTPHeaderField: "Range")
