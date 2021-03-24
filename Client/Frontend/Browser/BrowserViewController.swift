@@ -172,6 +172,9 @@ class BrowserViewController: UIViewController {
     /// Boolean Tracking NTP Education should be loaded after onboarding of user
     var shouldShowNTPEducation = false
 
+    /// Data Source object used to determine blocking stats
+    let benchmarkBlockingDataSource = BlockingSummaryDataSource()
+
     init(profile: Profile, tabManager: TabManager, crashedLastSession: Bool,
          safeBrowsingManager: SafeBrowsing? = SafeBrowsing()) {
         self.profile = profile
