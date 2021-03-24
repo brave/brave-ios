@@ -57,10 +57,7 @@ class VideoPlayerControlsView: UIView {
         let routePicker = AVRoutePickerView()
         routePicker.tintColor = .clear
         routePicker.activeTintColor = .clear
-
-        if #available(iOS 13.0, *) {
-            routePicker.prioritizesVideoDevices = true
-        }
+        routePicker.prioritizesVideoDevices = true
         
         $0.addSubview(routePicker)
         routePicker.snp.makeConstraints {

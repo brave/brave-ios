@@ -53,12 +53,7 @@ class PlaylistSettingsViewController: TableViewController {
     
     init(_ theme: Theme) {
         self.theme = theme
-        
-        if #available(iOS 13.0, *) {
-            super.init(style: .insetGrouped)
-        } else {
-            super.init(style: .grouped)
-        }
+        super.init(style: .insetGrouped)
     }
     
     @available(*, unavailable)

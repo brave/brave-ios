@@ -28,9 +28,7 @@ class VideoPlayerInfoBar: UIView {
     private let favIconImageView = UIImageView().then {
         $0.contentMode = .scaleAspectFit
         $0.layer.cornerRadius = 6.0
-        if #available(iOS 13.0, *) {
-            $0.layer.cornerCurve = .continuous
-        }
+        $0.layer.cornerCurve = .continuous
         $0.layer.masksToBounds = true
     }
     

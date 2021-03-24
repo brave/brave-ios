@@ -38,9 +38,7 @@ class PlaylistCell: UITableViewCell {
         $0.backgroundColor = .black
         $0.contentMode = .scaleAspectFit
         $0.layer.cornerRadius = 5.0
-        if #available(iOS 13.0, *) {
-            $0.layer.cornerCurve = .continuous
-        }
+        $0.layer.cornerCurve = .continuous
         $0.layer.masksToBounds = true
     }
     
@@ -49,9 +47,7 @@ class PlaylistCell: UITableViewCell {
     }).then {
         $0.contentMode = .scaleAspectFit
         $0.layer.cornerRadius = 5.0
-        if #available(iOS 13.0, *) {
-            $0.layer.cornerCurve = .continuous
-        }
+        $0.layer.cornerCurve = .continuous
         $0.layer.masksToBounds = true
     }
     

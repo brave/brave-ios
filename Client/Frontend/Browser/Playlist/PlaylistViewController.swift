@@ -227,25 +227,14 @@ private class ListController: UIViewController {
 
         view.backgroundColor = BraveUX.popoverDarkBackground
         navigationController?.do {
-            if #available(iOS 13.0, *) {
-                let appearance = UINavigationBarAppearance()
-                appearance.configureWithTransparentBackground()
-                appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
-                appearance.backgroundColor = BraveUX.popoverDarkBackground
-                
-                $0.navigationBar.standardAppearance = appearance
-                $0.navigationBar.barTintColor = BraveUX.popoverDarkBackground
-                $0.navigationBar.tintColor = .white
-            } else {
-                $0.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.white]
-                UILabel.appearance(whenContainedInInstancesOf: [UINavigationBar.self]).appearanceTextColor = .white
-                $0.navigationBar.backgroundColor = .clear
-                $0.navigationBar.barTintColor = BraveUX.popoverDarkBackground
-                $0.navigationBar.tintColor = .white
-                $0.navigationBar.isTranslucent = false
-                $0.navigationBar.setBackgroundImage(UIImage(), for: .default)
-                $0.navigationBar.shadowImage = UIImage()
-            }
+            let appearance = UINavigationBarAppearance()
+            appearance.configureWithTransparentBackground()
+            appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
+            appearance.backgroundColor = BraveUX.popoverDarkBackground
+            
+            $0.navigationBar.standardAppearance = appearance
+            $0.navigationBar.barTintColor = BraveUX.popoverDarkBackground
+            $0.navigationBar.tintColor = .white
         }
     }
     
@@ -411,14 +400,10 @@ private class ListController: UIViewController {
 
 extension ListController: UITableViewDataSource {
     private func getRelativeDateFormat(date: Date) -> String {
-        if #available(iOS 13.0, *) {
-            let formatter = RelativeDateTimeFormatter()
-            formatter.unitsStyle = .abbreviated
-            formatter.dateTimeStyle = .numeric
-            return formatter.localizedString(fromTimeInterval: date.timeIntervalSinceNow)
-        } else {
-            fatalError("We're dropping iOS 12..")
-        }
+        let formatter = RelativeDateTimeFormatter()
+        formatter.unitsStyle = .abbreviated
+        formatter.dateTimeStyle = .numeric
+        return formatter.localizedString(fromTimeInterval: date.timeIntervalSinceNow)
     }
     
     private func getAssetDuration(item: PlaylistInfo, _ completion: @escaping (TimeInterval, AVAsset?) -> Void) {
@@ -1259,21 +1244,14 @@ private class DetailController: UIViewController, UIGestureRecognizerDelegate {
         title = Strings.PlayList.playListMediaPlayerTitle
         
         navigationController?.do {
-            if #available(iOS 13.0, *) {
-                let appearance = UINavigationBarAppearance()
-                appearance.configureWithTransparentBackground()
-                appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
-                appearance.backgroundColor = BraveUX.popoverDarkBackground
-                
-                $0.navigationBar.standardAppearance = appearance
-                $0.navigationBar.barTintColor = BraveUX.popoverDarkBackground
-                $0.navigationBar.tintColor = .white
-            } else {
-                $0.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.white]
-                $0.navigationBar.backgroundColor = .clear
-                $0.navigationBar.barTintColor = BraveUX.popoverDarkBackground
-                $0.navigationBar.tintColor = .white
-            }
+            let appearance = UINavigationBarAppearance()
+            appearance.configureWithTransparentBackground()
+            appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
+            appearance.backgroundColor = BraveUX.popoverDarkBackground
+            
+            $0.navigationBar.standardAppearance = appearance
+            $0.navigationBar.barTintColor = BraveUX.popoverDarkBackground
+            $0.navigationBar.tintColor = .white
         }
     }
     
