@@ -3644,8 +3644,10 @@ extension BrowserViewController: PlaylistHelperDelegate {
             present(playlistController, animated: true)
         } else {
             let playListController = ((UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController as? UINavigationController)?.viewControllers.first ?? PlaylistViewController()
-            
-            presentSettingsNavigation(with: playListController)
+
+            let navigationController = UINavigationController(rootViewController: playListController)
+            navigationController.modalPresentationStyle = .pageSheet
+            present(navigationController, animated: true)
         }
     }
     
