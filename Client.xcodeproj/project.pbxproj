@@ -459,6 +459,7 @@
 		2FE63DB8258BCC29004B219D /* BrowserViewController+OpenSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FE63DB7258BCC29004B219D /* BrowserViewController+OpenSearch.swift */; };
 		2FEA1613259CDFE800E00E4D /* SearchCustomEngineViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FEA1612259CDFE800E00E4D /* SearchCustomEngineViewController.swift */; };
 		2FF0EDB325BA19E9004B18E2 /* SearchQuickEnginesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FF0EDB225BA19E9004B18E2 /* SearchQuickEnginesViewController.swift */; };
+		2FFD201F260B915700E552A5 /* blocking-summary.json in Resources */ = {isa = PBXBuildFile; fileRef = 2FFD201E260B915700E552A5 /* blocking-summary.json */; };
 		31ADB5DA1E58CEC300E87909 /* ClipboardBarDisplayHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31ADB5D91E58CEC300E87909 /* ClipboardBarDisplayHandler.swift */; };
 		39236E721FCC600200A38F1B /* TabEventHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39236E711FCC600200A38F1B /* TabEventHandlerTests.swift */; };
 		392ED7E41D0AEF56009D9B62 /* NewTabAccessors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 392ED7E31D0AEF56009D9B62 /* NewTabAccessors.swift */; };
@@ -1923,6 +1924,7 @@
 		2FEA1612259CDFE800E00E4D /* SearchCustomEngineViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchCustomEngineViewController.swift; sourceTree = "<group>"; };
 		2FEBABAE1AB3659000DB5728 /* ResultTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResultTests.swift; sourceTree = "<group>"; };
 		2FF0EDB225BA19E9004B18E2 /* SearchQuickEnginesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchQuickEnginesViewController.swift; sourceTree = "<group>"; };
+		2FFD201E260B915700E552A5 /* blocking-summary.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "blocking-summary.json"; sourceTree = "<group>"; };
 		31ADB5D91E58CEC300E87909 /* ClipboardBarDisplayHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClipboardBarDisplayHandler.swift; sourceTree = "<group>"; };
 		39236E711FCC600200A38F1B /* TabEventHandlerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabEventHandlerTests.swift; sourceTree = "<group>"; };
 		392ED7E31D0AEF56009D9B62 /* NewTabAccessors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NewTabAccessors.swift; path = Accessors/NewTabAccessors.swift; sourceTree = "<group>"; };
@@ -4045,6 +4047,15 @@
 			path = ThirdParty;
 			sourceTree = "<group>";
 		};
+		2FFD2012260B914200E552A5 /* ProductNotifications */ = {
+			isa = PBXGroup;
+			children = (
+				2FB9C2A02587E742009DA1FE /* BrowserViewController+ProductNotification.swift */,
+				2FFD201E260B915700E552A5 /* blocking-summary.json */,
+			);
+			path = ProductNotifications;
+			sourceTree = "<group>";
+		};
 		392ED7D51D0AEEEE009D9B62 /* Accessors */ = {
 			isa = PBXGroup;
 			children = (
@@ -4737,6 +4748,7 @@
 				2FD1C61B2639AE9100E3C25F /* BrowserViewController+Onboarding.swift */,
 				279CC2D7260CF37C009B3895 /* BrowserViewController+Menu.swift */,
 				0A91598822B834CE00CCC119 /* BVC+Rewards.swift */,
+				2FFD2012260B914200E552A5 /* ProductNotifications */,
 				2F55443025913BAA000E4689 /* OpenSearch */,
 			);
 			path = BrowserViewController;
@@ -6391,6 +6403,7 @@
 				0AB22A8C257EADA900126ADC /* andre-benz.jpg in Resources */,
 				F9B23EE223F61173000EB3D8 /* PaymentRequest.js in Resources */,
 				E4424B3C1AC71FB400F44C38 /* FiraSans-Book.ttf in Resources */,
+				2FFD201F260B915700E552A5 /* blocking-summary.json in Resources */,
 				0AA21E4C2302C4CC00358988 /* webauth_touch_key.json in Resources */,
 				0A64384E24FD4E43000E80A3 /* ArchiveIsCompat.js in Resources */,
 				F908653325F993C1006B3035 /* upgrade-http.json in Resources */,

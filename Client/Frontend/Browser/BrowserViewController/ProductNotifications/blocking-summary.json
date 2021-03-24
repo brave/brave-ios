@@ -1,0 +1,863 @@
+﻿[
+    {
+        "site": "http://ascii.jp/",
+        "savings": 1784026,
+        "childpages": 5,
+        "avgchildsavings": 1353495.2,
+        "avgsitesavings": 1425250.33
+    },
+    {
+        "site": "http://blog.livedoor.jp/nwknews/",
+        "savings": 639567,
+        "childpages": 5,
+        "avgchildsavings": 706453,
+        "avgsitesavings": 695305.33
+    },
+    {
+        "site": "http://bunshun.jp/",
+        "savings": 788109,
+        "childpages": 5,
+        "avgchildsavings": 1265025.4,
+        "avgsitesavings": 1185539.33
+    },
+    {
+        "site": "http://dengekionline.com/",
+        "savings": 683777,
+        "childpages": 5,
+        "avgchildsavings": 1722530.8,
+        "avgsitesavings": 1549405.17
+    },
+    {
+        "site": "http://gendai.ismedia.jp/",
+        "savings": 1706101,
+        "childpages": 5,
+        "avgchildsavings": 837090.4,
+        "avgsitesavings": 981925.5
+    },
+    {
+        "site": "http://jbpress.ismedia.jp/",
+        "savings": 982268,
+        "childpages": 3,
+        "avgchildsavings": 1550331.33333333,
+        "avgsitesavings": 1408315.5
+    },
+    {
+        "site": "http://jisin.jp/",
+        "savings": 763026,
+        "childpages": 2,
+        "avgchildsavings": 685194,
+        "avgsitesavings": 711138
+    },
+    {
+        "site": "http://mamastar.jp/",
+        "savings": 611611,
+        "childpages": 5,
+        "avgchildsavings": 360090.4,
+        "avgsitesavings": 402010.5
+    },
+    {
+        "site": "http://medical.nikkeibp.co.jp/",
+        "savings": 659038,
+        "childpages": 4,
+        "avgchildsavings": 453691.5,
+        "avgsitesavings": 494760.8
+    },
+    {
+        "site": "http://president.jp/",
+        "savings": 2349223,
+        "childpages": 5,
+        "avgchildsavings": 2307430.4,
+        "avgsitesavings": 2314395.83
+    },
+    {
+        "site": "http://tabi-labo.com/",
+        "savings": 640275,
+        "childpages": 5,
+        "avgchildsavings": 582197.4,
+        "avgsitesavings": 591877
+    },
+    {
+        "site": "http://ure.pia.co.jp/",
+        "savings": 4937893,
+        "childpages": 5,
+        "avgchildsavings": 4074933.6,
+        "avgsitesavings": 4218760.17
+    },
+    {
+        "site": "http://women.benesse.ne.jp/",
+        "savings": 1048196,
+        "childpages": 4,
+        "avgchildsavings": 775780.5,
+        "avgsitesavings": 830263.6
+    },
+    {
+        "site": "http://wpb.shueisha.co.jp/",
+        "savings": 1285752,
+        "childpages": 5,
+        "avgchildsavings": 832840.4,
+        "avgsitesavings": 908325.67
+    },
+    {
+        "site": "http://www.akb48matomemory.com/",
+        "savings": 1442557,
+        "childpages": 3,
+        "avgchildsavings": 1381056.66666666,
+        "avgsitesavings": 1396431.75
+    },
+    {
+        "site": "http://www.cosme.net/",
+        "savings": 949421,
+        "childpages": 4,
+        "avgchildsavings": 994284.75,
+        "avgsitesavings": 985312
+    },
+    {
+        "site": "http://www.huffingtonpost.jp/",
+        "savings": 610373,
+        "childpages": 5,
+        "avgchildsavings": 342172.8,
+        "avgsitesavings": 386872.83
+    },
+    {
+        "site": "http://www.itmedia.co.jp/business/",
+        "savings": 1447965,
+        "childpages": 3,
+        "avgchildsavings": 862241,
+        "avgsitesavings": 1008672
+    },
+    {
+        "site": "http://www.jprime.jp/",
+        "savings": 1357803,
+        "childpages": 5,
+        "avgchildsavings": 1604442.8,
+        "avgsitesavings": 1563336.17
+    },
+    {
+        "site": "http://www.livedoor.com/",
+        "savings": 211983,
+        "childpages": 5,
+        "avgchildsavings": 786270,
+        "avgsitesavings": 690555.5
+    },
+    {
+        "site": "https://5ch.net/",
+        "savings": 459926,
+        "childpages": 5,
+        "avgchildsavings": 252835.8,
+        "avgsitesavings": 287350.83
+    },
+    {
+        "site": "https://ananweb.jp/",
+        "savings": 981076,
+        "childpages": 4,
+        "avgchildsavings": 874634.5,
+        "avgsitesavings": 895922.8
+    },
+    {
+        "site": "https://app.famitsu.com/",
+        "savings": 833917,
+        "childpages": 5,
+        "avgchildsavings": 700876.4,
+        "avgsitesavings": 723049.83
+    },
+    {
+        "site": "https://asajo.jp/",
+        "savings": 486929,
+        "childpages": 4,
+        "avgchildsavings": 1322273.75,
+        "avgsitesavings": 1155204.8
+    },
+    {
+        "site": "https://baseballking.jp/",
+        "savings": 937455,
+        "childpages": 3,
+        "avgchildsavings": 1476356.66666666,
+        "avgsitesavings": 1341631.25
+    },
+    {
+        "site": "https://blog.fc2.com/",
+        "savings": 17203,
+        "childpages": 5,
+        "avgchildsavings": 22078.4,
+        "avgsitesavings": 21265.83
+    },
+    {
+        "site": "https://blog.livedoor.com/",
+        "savings": 136420,
+        "childpages": 5,
+        "avgchildsavings": 119087.8,
+        "avgsitesavings": 121976.5
+    },
+    {
+        "site": "https://business.nikkei.com/",
+        "savings": 1449746,
+        "childpages": 5,
+        "avgchildsavings": 1292524.2,
+        "avgsitesavings": 1318727.83
+    },
+    {
+        "site": "https://camphack.nap-camp.com/",
+        "savings": 836641,
+        "childpages": 5,
+        "avgchildsavings": 757321.6,
+        "avgsitesavings": 770541.5
+    },
+    {
+        "site": "https://cancam.jp/",
+        "savings": 765884,
+        "childpages": 5,
+        "avgchildsavings": 1122597.6,
+        "avgsitesavings": 1063145.33
+    },
+    {
+        "site": "https://chiebukuro.yahoo.co.jp/",
+        "savings": 276549,
+        "childpages": 5,
+        "avgchildsavings": 771373.6,
+        "avgsitesavings": 688902.83
+    },
+    {
+        "site": "https://comic-walker.com/",
+        "savings": 785535,
+        "childpages": 5,
+        "avgchildsavings": 683774,
+        "avgsitesavings": 700734.17
+    },
+    {
+        "site": "https://curazy.com/?layout=pc",
+        "savings": 741602,
+        "childpages": 5,
+        "avgchildsavings": 781796.4,
+        "avgsitesavings": 775097.33
+    },
+    {
+        "site": "https://ddnavi.com/",
+        "savings": 857540,
+        "childpages": 5,
+        "avgchildsavings": 1025162.8,
+        "avgsitesavings": 997225.67
+    },
+    {
+        "site": "https://diamond.jp/",
+        "savings": 733667,
+        "childpages": 5,
+        "avgchildsavings": 337965.4,
+        "avgsitesavings": 403915.67
+    },
+    {
+        "site": "https://dime.jp/",
+        "savings": 3318295,
+        "childpages": 5,
+        "avgchildsavings": 771490.8,
+        "avgsitesavings": 1195958.17
+    },
+    {
+        "site": "https://dot.asahi.com/",
+        "savings": 760808,
+        "childpages": 4,
+        "avgchildsavings": 738045.75,
+        "avgsitesavings": 742598.2
+    },
+    {
+        "site": "https://esse-online.jp/",
+        "savings": 996189,
+        "childpages": 4,
+        "avgchildsavings": 1690919.75,
+        "avgsitesavings": 1551973.6
+    },
+    {
+        "site": "https://forbesjapan.com/",
+        "savings": 415774,
+        "childpages": 5,
+        "avgchildsavings": 796562,
+        "avgsitesavings": 733097.33
+    },
+    {
+        "site": "https://friday.kodansha.co.jp/",
+        "savings": 1061458,
+        "childpages": 5,
+        "avgchildsavings": 1040324.4,
+        "avgsitesavings": 1043846.67
+    },
+    {
+        "site": "https://gakumado.mynavi.jp/",
+        "savings": 3483792,
+        "childpages": 5,
+        "avgchildsavings": 2305648.6,
+        "avgsitesavings": 2502005.83
+    },
+    {
+        "site": "https://getnavi.jp/",
+        "savings": 1281415,
+        "childpages": 5,
+        "avgchildsavings": 1291933.8,
+        "avgsitesavings": 1290180.67
+    },
+    {
+        "site": "https://getnews.jp/",
+        "savings": 673359,
+        "childpages": 5,
+        "avgchildsavings": 2438437,
+        "avgsitesavings": 2144257.33
+    },
+    {
+        "site": "https://gqjapan.jp/",
+        "savings": 1030678,
+        "childpages": 5,
+        "avgchildsavings": 1010348.4,
+        "avgsitesavings": 1013736.67
+    },
+    {
+        "site": "https://grapee.jp/",
+        "savings": 1242682,
+        "childpages": 3,
+        "avgchildsavings": 1501024,
+        "avgsitesavings": 1436438.5
+    },
+    {
+        "site": "https://i-voce.jp/",
+        "savings": 610132,
+        "childpages": 3,
+        "avgchildsavings": 1068765,
+        "avgsitesavings": 954106.75
+    },
+    {
+        "site": "https://iko-yo.net/",
+        "savings": 777759,
+        "childpages": 5,
+        "avgchildsavings": 720588.2,
+        "avgsitesavings": 730116.67
+    },
+    {
+        "site": "https://ja.wikipedia.org/",
+        "savings": 0,
+        "childpages": 5,
+        "avgchildsavings": 0,
+        "avgsitesavings": 0
+    },
+    {
+        "site": "https://japanese.engadget.com/",
+        "savings": 498542,
+        "childpages": 5,
+        "avgchildsavings": 684974.2,
+        "avgsitesavings": 653902.17
+    },
+    {
+        "site": "https://kinarino.jp/",
+        "savings": 849247,
+        "childpages": 5,
+        "avgchildsavings": 729887.6,
+        "avgsitesavings": 749780.83
+    },
+    {
+        "site": "https://komachi.yomiuri.co.jp/",
+        "savings": 1126838,
+        "childpages": 5,
+        "avgchildsavings": 689147.2,
+        "avgsitesavings": 762095.67
+    },
+    {
+        "site": "https://laurier.press/",
+        "savings": 403931,
+        "childpages": 5,
+        "avgchildsavings": 722741.6,
+        "avgsitesavings": 669606.5
+    },
+    {
+        "site": "https://lee.hpplus.jp/",
+        "savings": 1437672,
+        "childpages": 3,
+        "avgchildsavings": 1102098.33333333,
+        "avgsitesavings": 1185991.75
+    },
+    {
+        "site": "https://locari.jp/",
+        "savings": 843349,
+        "childpages": 5,
+        "avgchildsavings": 793361.6,
+        "avgsitesavings": 801692.83
+    },
+    {
+        "site": "https://macaro-ni.jp/",
+        "savings": 1421420,
+        "childpages": 4,
+        "avgchildsavings": 491513.25,
+        "avgsitesavings": 677494.6
+    },
+    {
+        "site": "https://mainichi.jp/",
+        "savings": 1127908,
+        "childpages": 5,
+        "avgchildsavings": 914603,
+        "avgsitesavings": 950153.83
+    },
+    {
+        "site": "https://mamari.jp/",
+        "savings": 816521,
+        "childpages": 5,
+        "avgchildsavings": 622201.8,
+        "avgsitesavings": 654588.33
+    },
+    {
+        "site": "https://marisol.hpplus.jp/",
+        "savings": 657762,
+        "childpages": 5,
+        "avgchildsavings": 602887.8,
+        "avgsitesavings": 612033.5
+    },
+    {
+        "site": "https://mdpr.jp/",
+        "savings": 584259,
+        "childpages": 4,
+        "avgchildsavings": 421458.25,
+        "avgsitesavings": 454018.4
+    },
+    {
+        "site": "https://mery.jp/",
+        "savings": 1159458,
+        "childpages": 5,
+        "avgchildsavings": 543384.6,
+        "avgsitesavings": 646063.5
+    },
+    {
+        "site": "https://mi-mollet.com/",
+        "savings": 1028932,
+        "childpages": 1,
+        "avgchildsavings": 4278,
+        "avgsitesavings": 516605
+    },
+    {
+        "site": "https://natalie.mu/",
+        "savings": 661733,
+        "childpages": 5,
+        "avgchildsavings": 576737.2,
+        "avgsitesavings": 590903.17
+    },
+    {
+        "site": "https://news.mynavi.jp/",
+        "savings": 2283377,
+        "childpages": 5,
+        "avgchildsavings": 1805885.6,
+        "avgsitesavings": 1885467.5
+    },
+    {
+        "site": "https://number.bunshun.jp/",
+        "savings": 509992,
+        "childpages": 5,
+        "avgchildsavings": 571544.6,
+        "avgsitesavings": 561285.83
+    },
+    {
+        "site": "https://oceans.tokyo.jp/",
+        "savings": 595144,
+        "childpages": 5,
+        "avgchildsavings": 633555.2,
+        "avgsitesavings": 627153.33
+    },
+    {
+        "site": "https://oggi.jp/",
+        "savings": 1541183,
+        "childpages": 5,
+        "avgchildsavings": 1529395,
+        "avgsitesavings": 1531359.67
+    },
+    {
+        "site": "https://otonasalone.jp/",
+        "savings": 897346,
+        "childpages": 5,
+        "avgchildsavings": 947885.6,
+        "avgsitesavings": 939462.33
+    },
+    {
+        "site": "https://pc.watch.impress.co.jp/",
+        "savings": 179941,
+        "childpages": 4,
+        "avgchildsavings": 412322.5,
+        "avgsitesavings": 365846.2
+    },
+    {
+        "site": "https://peco-japan.com/",
+        "savings": 403765,
+        "childpages": 5,
+        "avgchildsavings": 481958.4,
+        "avgsitesavings": 468926.17
+    },
+    {
+        "site": "https://precious.jp/",
+        "savings": 1345170,
+        "childpages": 5,
+        "avgchildsavings": 1291507.4,
+        "avgsitesavings": 1300451.17
+    },
+    {
+        "site": "https://rocketnews24.com/",
+        "savings": 1436453,
+        "childpages": 5,
+        "avgchildsavings": 1321281.8,
+        "avgsitesavings": 1340477
+    },
+    {
+        "site": "https://safari-online.jp/",
+        "savings": 18980,
+        "childpages": 1,
+        "avgchildsavings": 18980,
+        "avgsitesavings": 18980
+    },
+    {
+        "site": "https://smart-flash.jp/",
+        "savings": 556704,
+        "childpages": 5,
+        "avgchildsavings": 947835.6,
+        "avgsitesavings": 882647
+    },
+    {
+        "site": "https://sportiva.shueisha.co.jp/",
+        "savings": 977034,
+        "childpages": 5,
+        "avgchildsavings": 894039.2,
+        "avgsitesavings": 907871.67
+    },
+    {
+        "site": "https://spur.hpplus.jp/",
+        "savings": 635801,
+        "childpages": 5,
+        "avgchildsavings": 643329.6,
+        "avgsitesavings": 642074.83
+    },
+    {
+        "site": "https://thetv.jp/",
+        "savings": 863257,
+        "childpages": 3,
+        "avgchildsavings": 927843,
+        "avgsitesavings": 911696.5
+    },
+    {
+        "site": "https://tokyo-calendar.jp/",
+        "savings": 1653821,
+        "childpages": 5,
+        "avgchildsavings": 824924,
+        "avgsitesavings": 963073.5
+    },
+    {
+        "site": "https://travel.mdpr.jp/",
+        "savings": 481992,
+        "childpages": 4,
+        "avgchildsavings": 525099.25,
+        "avgsitesavings": 516477.8
+    },
+    {
+        "site": "https://trilltrill.jp/",
+        "savings": 1231732,
+        "childpages": 4,
+        "avgchildsavings": 941309.25,
+        "avgsitesavings": 999393.8
+    },
+    {
+        "site": "https://video.fc2.com/",
+        "savings": 121137,
+        "childpages": 5,
+        "avgchildsavings": 166190.2,
+        "avgsitesavings": 158681.33
+    },
+    {
+        "site": "https://voguegirl.jp/",
+        "savings": 1086967,
+        "childpages": 5,
+        "avgchildsavings": 1092488.4,
+        "avgsitesavings": 1091568.17
+    },
+    {
+        "site": "https://web.gekisaka.jp/",
+        "savings": 1133601,
+        "childpages": 2,
+        "avgchildsavings": 1197637,
+        "avgsitesavings": 1176291.67
+    },
+    {
+        "site": "https://woman.mynavi.jp/",
+        "savings": 1138163,
+        "childpages": 1,
+        "avgchildsavings": 1500237,
+        "avgsitesavings": 1319200
+    },
+    {
+        "site": "https://www.andgirl.jp/",
+        "savings": 571759,
+        "childpages": 5,
+        "avgchildsavings": 623951,
+        "avgsitesavings": 615252.33
+    },
+    {
+        "site": "https://www.asagei.com/",
+        "savings": 559078,
+        "childpages": 5,
+        "avgchildsavings": 1105935,
+        "avgsitesavings": 1014792.17
+    },
+    {
+        "site": "https://www.asahi.com/",
+        "savings": 1418641,
+        "childpages": 4,
+        "avgchildsavings": 1304714,
+        "avgsitesavings": 1327499.4
+    },
+    {
+        "site": "https://www.biteki.com/",
+        "savings": 3111866,
+        "childpages": 5,
+        "avgchildsavings": 2527428.4,
+        "avgsitesavings": 2624834.67
+    },
+    {
+        "site": "https://www.businessinsider.jp/",
+        "savings": 2159975,
+        "childpages": 4,
+        "avgchildsavings": 1304542.5,
+        "avgsitesavings": 1475629
+    },
+    {
+        "site": "https://www.buzzfeed.com/jp",
+        "savings": 716673,
+        "childpages": 4,
+        "avgchildsavings": 445338,
+        "avgsitesavings": 499605
+    },
+    {
+        "site": "https://www.daily.co.jp/",
+        "savings": 1227175,
+        "childpages": 5,
+        "avgchildsavings": 1510010.4,
+        "avgsitesavings": 1462871.17
+    },
+    {
+        "site": "https://www.dmm.co.jp/digital/",
+        "savings": 158107,
+        "childpages": 0,
+        "avgchildsavings": 1510010.4,
+        "avgsitesavings": 158107
+    },
+    {
+        "site": "https://www.famitsu.com/",
+        "savings": 543562,
+        "childpages": 5,
+        "avgchildsavings": 713798.8,
+        "avgsitesavings": 685426
+    },
+    {
+        "site": "https://www.fashionsnap.com/",
+        "savings": 435229,
+        "childpages": 2,
+        "avgchildsavings": 224894,
+        "avgsitesavings": 295005.67
+    },
+    {
+        "site": "https://www.gizmodo.jp/",
+        "savings": 2124396,
+        "childpages": 5,
+        "avgchildsavings": 1488017,
+        "avgsitesavings": 1594080.17
+    },
+    {
+        "site": "https://www.glam.jp/",
+        "savings": 449567,
+        "childpages": 5,
+        "avgchildsavings": 1046132.4,
+        "avgsitesavings": 946704.83
+    },
+    {
+        "site": "https://www.goo.ne.jp/",
+        "savings": 6549113,
+        "childpages": 5,
+        "avgchildsavings": 311030.2,
+        "avgsitesavings": 1350710.67
+    },
+    {
+        "site": "https://www.goodspress.jp/",
+        "savings": 308931,
+        "childpages": 5,
+        "avgchildsavings": 1153064.2,
+        "avgsitesavings": 1012375.33
+    },
+    {
+        "site": "https://www.iza.ne.jp/",
+        "savings": 4325262,
+        "childpages": 5,
+        "avgchildsavings": 2251981,
+        "avgsitesavings": 2597527.83
+    },
+    {
+        "site": "https://www.kyounoryouri.jp/",
+        "savings": 708892,
+        "childpages": 5,
+        "avgchildsavings": 479297.6,
+        "avgsitesavings": 517563.33
+    },
+    {
+        "site": "https://www.lettuceclub.net/",
+        "savings": 863962,
+        "childpages": 5,
+        "avgchildsavings": 1001326.2,
+        "avgsitesavings": 978432.17
+    },
+    {
+        "site": "https://www.lifehacker.jp/",
+        "savings": 1119602,
+        "childpages": 5,
+        "avgchildsavings": 1051395.2,
+        "avgsitesavings": 1062763
+    },
+    {
+        "site": "https://www.msn.com/ja-jp/",
+        "savings": 322571,
+        "childpages": 5,
+        "avgchildsavings": 852154.4,
+        "avgsitesavings": 763890.5
+    },
+    {
+        "site": "https://www.news-postseven.com/",
+        "savings": 1036719,
+        "childpages": 4,
+        "avgchildsavings": 1530211.5,
+        "avgsitesavings": 1431513
+    },
+    {
+        "site": "https://www.newsweekjapan.jp/",
+        "savings": 582344,
+        "childpages": 5,
+        "avgchildsavings": 818890.6,
+        "avgsitesavings": 779466.17
+    },
+    {
+        "site": "https://www.nicovideo.jp/",
+        "savings": 1312477,
+        "childpages": 5,
+        "avgchildsavings": 577441.8,
+        "avgsitesavings": 699947.67
+    },
+    {
+        "site": "https://www.nikkei.com/",
+        "savings": 412067,
+        "childpages": 4,
+        "avgchildsavings": 502473,
+        "avgsitesavings": 484391.8
+    },
+    {
+        "site": "https://www.orangepage.net/",
+        "savings": 844436,
+        "childpages": 1,
+        "avgchildsavings": 1848673,
+        "avgsitesavings": 1346554.5
+    },
+    {
+        "site": "https://www.oricon.co.jp/",
+        "savings": 412399,
+        "childpages": 2,
+        "avgchildsavings": 398159,
+        "avgsitesavings": 402905.67
+    },
+    {
+        "site": "https://www.sankei.com/",
+        "savings": 2257833,
+        "childpages": 0,
+        "avgchildsavings": 398159,
+        "avgsitesavings": 2257833
+    },
+    {
+        "site": "https://www.shuminoengei.jp/",
+        "savings": 867538,
+        "childpages": 5,
+        "avgchildsavings": 462404.8,
+        "avgsitesavings": 529927
+    },
+    {
+        "site": "https://www.soccer-king.jp/",
+        "savings": 3531112,
+        "childpages": 5,
+        "avgchildsavings": 769469.4,
+        "avgsitesavings": 1229743.17
+    },
+    {
+        "site": "https://www.tiktok.com/ja-JP",
+        "savings": 39036,
+        "childpages": 5,
+        "avgchildsavings": 21960.2,
+        "avgsitesavings": 24806.17
+    },
+    {
+        "site": "https://www.tokyo-sports.co.jp/",
+        "savings": 622231,
+        "childpages": 3,
+        "avgchildsavings": 619473.333333333,
+        "avgsitesavings": 620162.75
+    },
+    {
+        "site": "https://www.vivi.tv/",
+        "savings": 353017,
+        "childpages": 5,
+        "avgchildsavings": 671993.2,
+        "avgsitesavings": 618830.5
+    },
+    {
+        "site": "https://www.vogue.co.jp/",
+        "savings": 1748470,
+        "childpages": 5,
+        "avgchildsavings": 1157321.2,
+        "avgsitesavings": 1255846
+    },
+    {
+        "site": "https://www.walkerplus.com/",
+        "savings": 466069,
+        "childpages": 5,
+        "avgchildsavings": 840190.2,
+        "avgsitesavings": 777836.67
+    },
+    {
+        "site": "https://www.wwdjapan.com/",
+        "savings": 920765,
+        "childpages": 5,
+        "avgchildsavings": 1703331.8,
+        "avgsitesavings": 1572904
+    },
+    {
+        "site": "https://www.xvideos.com/lang/japanese",
+        "savings": 15072,
+        "childpages": 5,
+        "avgchildsavings": 0,
+        "avgsitesavings": 2512
+    },
+    {
+        "site": "https://www.yahoo.co.jp/",
+        "savings": 1637561,
+        "childpages": 5,
+        "avgchildsavings": 613577.4,
+        "avgsitesavings": 784241.33
+    },
+    {
+        "site": "https://www.yomiuri.co.jp/",
+        "savings": 905559,
+        "childpages": 5,
+        "avgchildsavings": 862389,
+        "avgsitesavings": 869584
+    },
+    {
+        "site": "https://www.youtube.com",
+        "savings": 71,
+        "childpages": 5,
+        "avgchildsavings": 155,
+        "avgsitesavings": 141
+    },
+    {
+        "site": "https://xtech.nikkei.com/",
+        "savings": 1256488,
+        "childpages": 5,
+        "avgchildsavings": 1127107,
+        "avgsitesavings": 1148670.5
+    },
+    {
+        "site": "AVG",
+        "savings": 1061116,
+        "childpages": 4.401639344,
+        "avgchildsavings": 932747.7306,
+        "avgsitesavings": 956603.8052
+    }
+]
