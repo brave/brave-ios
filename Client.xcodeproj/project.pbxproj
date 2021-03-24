@@ -1407,6 +1407,7 @@
 		0A2BFB3325F2754600719AA9 /* NTPDownloaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NTPDownloaderTests.swift; sourceTree = "<group>"; };
 		0A2D5DF623571F02001ED889 /* ko-KR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "ko-KR"; path = "ko-KR.lproj/Storage.strings"; sourceTree = "<group>"; };
 		0A2FF33E24A4B75000F88F43 /* vpncheckmark.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = vpncheckmark.json; sourceTree = "<group>"; };
+		0A3033EA260A08D60045F90A /* Model12.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model12.xcdatamodel; sourceTree = "<group>"; };
 		0A38EA7F216532DB00142710 /* CRUDProtocolsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CRUDProtocolsTests.swift; sourceTree = "<group>"; };
 		0A39FE832486604100290ABC /* GRDSubscriberCredential.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GRDSubscriberCredential.h; sourceTree = "<group>"; };
 		0A39FE842486604200290ABC /* GRDGatewayAPIResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GRDGatewayAPIResponse.h; sourceTree = "<group>"; };
@@ -12620,6 +12621,7 @@
 		5D1DC54C20AE004600905E5A /* Model.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				0A3033EA260A08D60045F90A /* Model12.xcdatamodel */,
 				27B68E8725C88F28002D0826 /* Model11.xcdatamodel */,
 				0A977C97249B7B380004216A /* Model10.xcdatamodel */,
 				27D922B221C9830F00345BF3 /* Model9.xcdatamodel */,
@@ -12632,7 +12634,7 @@
 				5D1DC55220AE004600905E5A /* Model5.xcdatamodel */,
 				5D1DC55320AE004600905E5A /* Model.xcdatamodel */,
 			);
-			currentVersion = 27B68E8725C88F28002D0826 /* Model11.xcdatamodel */;
+			currentVersion = 0A3033EA260A08D60045F90A /* Model12.xcdatamodel */;
 			path = Model.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
