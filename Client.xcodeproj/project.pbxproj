@@ -761,6 +761,7 @@
 		5E9288CA22DF864C007BE7A6 /* TabSessionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E9288C922DF864C007BE7A6 /* TabSessionTests.swift */; };
 		5E99C88B25C83BE3003F30B4 /* PlaylistManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E99C88A25C83BE3003F30B4 /* PlaylistManager.swift */; };
 		5E99CAB025CC610B003F30B4 /* PlaylistToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E99CAAF25CC610B003F30B4 /* PlaylistToast.swift */; };
+		5E99CD6125D5E834003F30B4 /* PlaylistPadViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E99CD6025D5E834003F30B4 /* PlaylistPadViewController.swift */; };
 		5E9B28EB255047C80072E655 /* BookmarkModelStateObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E9B28EA255047C80072E655 /* BookmarkModelStateObserver.swift */; };
 		5E9B28F7255048540072E655 /* BookmarkFetchers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E9B28F6255048540072E655 /* BookmarkFetchers.swift */; };
 		5EA8438E234F802C00076A91 /* expired.badssl.com-root-ca.cer in Resources */ = {isa = PBXBuildFile; fileRef = 5EA84389234F802C00076A91 /* expired.badssl.com-root-ca.cer */; };
@@ -2461,6 +2462,7 @@
 		5E9288C922DF864C007BE7A6 /* TabSessionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabSessionTests.swift; sourceTree = "<group>"; };
 		5E99C88A25C83BE3003F30B4 /* PlaylistManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistManager.swift; sourceTree = "<group>"; };
 		5E99CAAF25CC610B003F30B4 /* PlaylistToast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistToast.swift; sourceTree = "<group>"; };
+		5E99CD6025D5E834003F30B4 /* PlaylistPadViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistPadViewController.swift; sourceTree = "<group>"; };
 		5E9B28EA255047C80072E655 /* BookmarkModelStateObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkModelStateObserver.swift; sourceTree = "<group>"; };
 		5E9B28F6255048540072E655 /* BookmarkFetchers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkFetchers.swift; sourceTree = "<group>"; };
 		5EA84389234F802C00076A91 /* expired.badssl.com-root-ca.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = "expired.badssl.com-root-ca.cer"; sourceTree = "<group>"; };
@@ -4679,9 +4681,6 @@
 				5E5E6E7825BA15610035B6A0 /* Cache */,
 				5E5E6E4425BA04120035B6A0 /* VideoPlayer */,
 				5E5E6E3925BA03510035B6A0 /* PlaylistViewController.swift */,
-				2FF4EBCC25CB824600BE94DA /* PlaylistDetailsViewController.swift */,
-				2F8D145E25CA0E1A00D06F0C /* PlaylistVideoListViewController.swift */,
-				2FF4EB8425CB63C800BE94DA /* PlaylistVideoPlayerViewController.swift */,
 				5E5E6E9825BA15E80035B6A0 /* Playlist.swift */,
 				5E5E6F6F25BB62EB0035B6A0 /* PlaylistItem+CoreDataClass.swift */,
 				5E5E6F7025BB62EB0035B6A0 /* PlaylistItem+CoreDataProperties.swift */,
@@ -4689,6 +4688,7 @@
 				5E5E6F0925BA8C150035B6A0 /* PlaylistInfo.swift */,
 				5E5E6F1425BA8DD70035B6A0 /* PlaylistMediaInfo.swift */,
 				5E99CAAF25CC610B003F30B4 /* PlaylistToast.swift */,
+				5E99CD6025D5E834003F30B4 /* PlaylistPadViewController.swift */,
 			);
 			path = Playlist;
 			sourceTree = "<group>";
@@ -7050,7 +7050,6 @@
 				FA9293D41D6580E100AC8D33 /* QRCodeViewController.swift in Sources */,
 				27448533245B5EC2001920B5 /* NTPDataSource.swift in Sources */,
 				E6108FF91C84E91C005D25E8 /* BasePasscodeViewController.swift in Sources */,
-				2FF4EB8525CB63C800BE94DA /* PlaylistVideoPlayerViewController.swift in Sources */,
 				39F4C10A2045DB2E00746155 /* FocusHelper.swift in Sources */,
 				E4CD9F2D1A6DC91200318571 /* TabLocationView.swift in Sources */,
 				4452CAF0255412800053EFE6 /* DefaultBrowserIntroCalloutViewController.swift in Sources */,
@@ -7145,6 +7144,7 @@
 				D0625CA8208FC47A0081F3B2 /* BrowserViewController+DownloadQueueDelegate.swift in Sources */,
 				2F44FCC71A9E8CF500FD20CC /* SearchSettingsTableViewController.swift in Sources */,
 				273FCB9A25A7BC5500F279B5 /* BraveTodayDebugSettingsController.swift in Sources */,
+				5E99CD6125D5E834003F30B4 /* PlaylistPadViewController.swift in Sources */,
 				39A359E41BFCCE94006B9E87 /* UserActivityHandler.swift in Sources */,
 				0AF6B1EA24A0EE19005417FC /* InstallVPNView.swift in Sources */,
 				27201F0424589B9800C19DD1 /* NewTabPageNotifications.swift in Sources */,
@@ -7384,7 +7384,6 @@
 				4422D54821BFFB7E00BF1855 /* pcre.cc in Sources */,
 				C8F457AA1F1FDD9B000CB895 /* BrowserViewController+KeyCommands.swift in Sources */,
 				E40FAB0C1A7ABB77009CB80D /* WebServer.swift in Sources */,
-				2F8D145F25CA0E1A00D06F0C /* PlaylistVideoListViewController.swift in Sources */,
 				4422D54C21BFFB7E00BF1855 /* strutil.cc in Sources */,
 				59A68D66379CFA85C4EAF00B /* TwoLineCell.swift in Sources */,
 				A1AD4BE320C0861D007A6EA1 /* UIBarButtonItemExtensions.swift in Sources */,

@@ -3619,12 +3619,11 @@ extension BrowserViewController: PlaylistHelperDelegate {
     
     private func openPlaylist() {
         if UIDevice.current.userInterfaceIdiom == .pad {
-            let playlistDetailsController = PlaylistDetailsViewController()
-            playlistDetailsController.modalPresentationStyle = .fullScreen
-            self.present(playlistDetailsController, animated: true)
-
+            let playlistController = (UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController ?? PlaylistPadViewController()
+            playlistController.modalPresentationStyle = .fullScreen
+            present(playlistController, animated: true)
         } else {
-            let playListController = (UIApplication.shared.delegate as? AppDelegate)?.playlistNavigationController?.viewControllers.first ?? PlaylistViewController()
+            let playListController = ((UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController as? UINavigationController)?.viewControllers.first ?? PlaylistViewController()
             
             presentSettingsNavigation(with: playListController)
         }

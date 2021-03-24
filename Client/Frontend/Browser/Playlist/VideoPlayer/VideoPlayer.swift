@@ -243,6 +243,11 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         $0.actionAtItemEnd = .none
     }
     
+    public let playerLayer = AVPlayerLayer().then {
+        $0.videoGravity = .resizeAspect
+        $0.needsDisplayOnBoundsChange = true
+    }
+    
     private var requestedPlaybackRate = 1.0
     
     private let thumbnailView = UIImageView().then {
@@ -327,11 +332,6 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     
     private let playControlsView = UIView().then {
         $0.backgroundColor = .clear
-    }
-    
-    private let playerLayer = AVPlayerLayer().then {
-        $0.videoGravity = .resizeAspect
-        $0.needsDisplayOnBoundsChange = true
     }
     
     private let trackBar = VideoTrackerBar()
@@ -743,6 +743,16 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
 //         })
         
         isUserInteractionEnabled = enabled
+    }
+    
+    public func attachLayer() {
+        layer.insertSublayer(playerLayer, at: 0)
+        playerLayer.player = player
+    }
+    
+    public func detachLayer() {
+        playerLayer.removeFromSuperlayer()
+        playerLayer.player = nil
     }
     
     public func play() {
