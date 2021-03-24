@@ -111,7 +111,7 @@ class BrowserViewController: UIViewController {
     var pendingToast: Toast? // A toast that might be waiting for BVC to appear before displaying
     var downloadToast: DownloadToast? // A toast that is showing the combined download progress
     var playlistToast: PlaylistToast? // A toast displayed when a playlist item is updated or added
-    private var addToPlayListActivityItem: (enabled: Bool, item: PlaylistInfo?)? // A boolean to determine If AddToListActivity should be added
+    var addToPlayListActivityItem: (enabled: Bool, item: PlaylistInfo?)? // A boolean to determine If AddToListActivity should be added
 
     // Tracking navigation items to record history types.
     // TODO: weak references?
@@ -3583,90 +3583,5 @@ extension BrowserViewController: UNUserNotificationCenterDelegate {
             UIApplication.shared.open(settingsUrl)
         }
         completionHandler()
-    }
-}
-
-extension BrowserViewController: PlaylistHelperDelegate {
-    func showPlaylistAlert(_ alertController: UIAlertController) {
-        self.present(alertController, animated: true)
-    }
-    
-    func showPlaylistToast(info: PlaylistInfo, itemState: PlaylistItemAddedState) {
-        guard Preferences.Playlist.showToastForAdd.value,
-              let selectedTab = tabManager.selectedTab,
-              selectedTab.url?.isPlaylistSupportedSiteURL == true else {
-            return
-        }
-        
-        if let toast = playlistToast {
-            toast.item = info
-            return
-        }
-        
-        // Item requires the user to choose whether or not to add it to playlists
-        switch itemState {
-        case .pendingUserAction:
-            let toast = PlaylistToast(item: info, state: .itemPendingUserAction) { [weak self] buttonPressed in
-                guard let self = self, let info = self.playlistToast?.item else { return }
-                if buttonPressed {
-                    // Update playlist with new items..
-                    PlaylistItem.addItem(info, cachedData: nil) {
-                        PlaylistManager.shared.autoDownload(item: info)
-                        
-                        log.debug("Playlist Item Added")
-                        
-                        self.playlistToast = nil
-                        self.showPlaylistToast(info: info, itemState: .added)
-                        UIImpactFeedbackGenerator(style: .medium).bzzt()
-                    }
-                } else {
-                    self.playlistToast = nil
-                }
-            }
-            
-            playlistToast = toast
-            show(toast: toast, afterWaiting: .milliseconds(250), duration: .seconds(10))
-            
-        case .existing:
-            // Item already exists in playlist, so ask them if they want to view it there
-            let toast = PlaylistToast(item: info, state: .itemExisting, completion: { [weak self] buttonPressed in
-                guard let self = self else { return }
-                if buttonPressed {
-                    self.openPlaylist()
-                }
-                self.playlistToast = nil
-            })
-            
-            playlistToast = toast
-            show(toast: toast, afterWaiting: .milliseconds(250), duration: .seconds(5))
-            
-        case .added:
-            // Item was added to playlist by the user, so ask them if they want to view it there
-            let toast = PlaylistToast(item: info, state: .itemAdded, completion: { [weak self] buttonPressed in
-                guard let self = self else { return }
-                if buttonPressed {
-                    self.openPlaylist()
-                }
-                
-                self.playlistToast = nil
-            })
-            
-            playlistToast = toast
-            show(toast: toast, afterWaiting: .milliseconds(250), duration: .seconds(5))
-        }
-    }
-    
-    func dismissPlaylistToast(animated: Bool) {
-        playlistToast?.dismiss(false, animated: animated)
-    }
-    
-    private func openPlaylist() {
-        let playlistController = (UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController ?? PlaylistViewController()
-        playlistController.modalPresentationStyle = .fullScreen
-        present(playlistController, animated: true)
-    }
-    
-    func addToPlayListActivity(info: PlaylistInfo?, itemDetected: Bool) {
-        addToPlayListActivityItem = (enabled: itemDetected, item: info)
     }
 }

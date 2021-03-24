@@ -15,12 +15,6 @@ class PlaylistToast: Toast {
         static let maxToastWidth: CGFloat = 450.0
     }
     
-    enum State {
-        case itemAdded
-        case itemExisting
-        case itemPendingUserAction
-    }
-    
     private class HighlightableButton: UIButton {
         override var isHighlighted: Bool {
             didSet {
@@ -39,7 +33,7 @@ class PlaylistToast: Toast {
     
     var item: PlaylistInfo
 
-    init(item: PlaylistInfo, state: State, completion: ((_ buttonPressed: Bool) -> Void)?) {
+    init(item: PlaylistInfo, state: PlaylistItemAddedState, completion: ((_ buttonPressed: Bool) -> Void)?) {
         self.item = item
         super.init(frame: .zero)
 
@@ -70,8 +64,8 @@ class PlaylistToast: Toast {
         layer.insertSublayer(shadowLayer, at: 0)
     }
 
-    func createView(_ item: PlaylistInfo, _ state: State) -> UIView {
-        if state == .itemAdded || state == .itemExisting {
+    func createView(_ item: PlaylistInfo, _ state: PlaylistItemAddedState) -> UIView {
+        if state == .added || state == .existing {
             let horizontalStackView = UIStackView().then {
                 $0.alignment = .center
                 $0.spacing = ButtonToastUX.toastPadding
@@ -89,7 +83,7 @@ class PlaylistToast: Toast {
                 $0.lineBreakMode = .byWordWrapping
                 $0.numberOfLines = 0
                 
-                if state == .itemAdded {
+                if state == .added {
                     $0.text = Strings.PlayList.toastAddedToPlaylistTitle
                 } else {
                     $0.text = Strings.PlayList.toastExitingItemPlaylistTitle
@@ -164,7 +158,7 @@ class PlaylistToast: Toast {
             make.width.equalTo(toastView.snp.width).offset(-2 * ButtonToastUX.toastPadding)
         }
         
-        if state == .itemPendingUserAction {
+        if state == .pendingUserAction {
             button.setImage(#imageLiteral(resourceName: "quick_action_new_tab").template, for: [])
             button.setTitle(Strings.PlayList.toastAddToPlaylistTitle, for: [])
             toastView.backgroundColor = .clear

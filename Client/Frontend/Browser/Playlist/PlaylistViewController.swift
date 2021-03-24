@@ -948,7 +948,6 @@ extension ListController: VideoViewDelegate {
     
     func onExitFullScreen() {
         if UIDevice.isIpad && splitViewController?.isCollapsed == false {
-            // (splitViewController?.parent as? PlaylistViewController)?.onExitFullscreen()
             playerView.setFullscreenButtonHidden(true)
             playerView.setExitButtonHidden(false)
             splitViewController?.parent?.dismiss(animated: true, completion: nil)
@@ -961,8 +960,6 @@ extension ListController: VideoViewDelegate {
             tableView.isHidden = false
             updateLayoutForMode(.iPhoneLayout)
         } else {
-            // playerView.setFullscreenButtonHidden(true)
-            // updateLayoutForMode(.iPhoneLayout)
             playerView.setFullscreenButtonHidden(true)
             playerView.setExitButtonHidden(false)
             splitViewController?.parent?.dismiss(animated: true, completion: nil)
@@ -1055,7 +1052,6 @@ extension ListController: AVPlayerViewControllerDelegate, AVPictureInPictureCont
     func pictureInPictureControllerDidStartPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
         if UIDevice.isPhone {
             DispatchQueue.main.async {
-                // self.playerView.detachLayer()
                 self.dismiss(animated: true, completion: nil)
             }
         }

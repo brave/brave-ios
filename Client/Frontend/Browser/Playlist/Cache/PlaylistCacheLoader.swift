@@ -7,7 +7,6 @@ import Foundation
 import AVFoundation
 import WebKit
 import MobileCoreServices
-import YubiKit
 import Data
 
 // IANA List of Audio types: https://www.iana.org/assignments/media-types/media-types.xhtml#audio
