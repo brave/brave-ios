@@ -58,11 +58,23 @@ class PlaylistViewController: UIViewController {
         
         updateLayoutForOrientationChange()
         
-        // This has to be manually called because when launching a split controller in landscape, it does NOT call `viewDidLoad` on the primary/list controller!
-        listController.loadViewIfNeeded()
         detailController.setVideoPlayer(listController.playerView)
+        detailController.navigationController?.setNavigationBarHidden(splitController.isCollapsed || traitCollection.horizontalSizeClass == .regular, animated: false)
         
-        if UIDevice.isIpad {
+        if UIDevice.isPhone {
+            if splitController.isCollapsed == false && traitCollection.horizontalSizeClass == .regular {
+                listController.updateLayoutForMode(.iPadLayout)
+                detailController.updateLayoutForMode(.iPadLayout)
+            } else {
+                listController.updateLayoutForMode(.iPhoneLayout)
+                detailController.updateLayoutForMode(.iPhoneLayout)
+                
+                // On iPhone Pro Max which displays like an iPad, we need to hide navigation bar.
+                if UIDevice.isPhone && UIDevice.current.orientation.isLandscape {
+                    listController.onFullScreen()
+                }
+            }
+        } else {
             listController.updateLayoutForMode(.iPadLayout)
             detailController.updateLayoutForMode(.iPadLayout)
         }
@@ -88,6 +100,10 @@ class PlaylistViewController: UIViewController {
                 splitController.preferredDisplayMode = .primaryOverlay
             }
         }
+    }
+    
+    fileprivate func onSidePanelStateChanged() {
+        detailController.onSidePanelStateChanged()
     }
     
     fileprivate func onFullscreen() {
@@ -131,7 +147,12 @@ extension PlaylistViewController: UISplitViewControllerDelegate {
         listController.updateLayoutForMode(.iPadLayout)
         detailController.setVideoPlayer(listController.playerView)
         detailController.updateLayoutForMode(.iPadLayout)
-        return detailController.navigationController
+        
+        if UIDevice.isPhone {
+            detailController.navigationController?.setNavigationBarHidden(true, animated: true)
+        }
+        
+        return detailController.navigationController ?? detailController
     }
 }
 
@@ -195,7 +216,6 @@ private class ListController: UIViewController {
     
         setTheme()
         setup()
-        doLayout()
 
         fetchResults()
     }
@@ -242,18 +262,6 @@ private class ListController: UIViewController {
         playerView.delegate = self
     }
     
-    private func doLayout() {
-        view.addSubview(tableView)
-        view.addSubview(playerView)
-        playerView.addSubview(activityIndicator)
-        
-        if UIDevice.isPhone {
-            updateLayoutForMode(.iPhoneLayout)
-        } else {
-            updateLayoutForMode(.iPadLayout)
-        }
-    }
-    
     private func fetchResults() {
         playerView.setControlsEnabled(playerView.player.currentItem != nil)
         updateTableBackgroundView()
@@ -297,10 +305,16 @@ private class ListController: UIViewController {
         if mode == .iPhoneLayout {
             navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(onExit(_:)))
             
+            playerView.setSidePanelHidden(true)
+            
             // If the player view is in fullscreen, we should NOT change the tableView layout on rotation.
+            view.addSubview(tableView)
             view.addSubview(playerView)
+            playerView.addSubview(activityIndicator)
+            
             if !playerView.isFullscreen {
                 if UIDevice.current.orientation.isLandscape && UIDevice.isPhone {
+                    playerView.setExitButtonHidden(false)
                     playerView.setFullscreenButtonHidden(true)
                     playerView.snp.remakeConstraints {
                         $0.edges.equalTo(view.snp.edges)
@@ -311,6 +325,7 @@ private class ListController: UIViewController {
                     }
                 } else {
                     playerView.setFullscreenButtonHidden(false)
+                    playerView.setExitButtonHidden(true)
                     let videoPlayerHeight = (1.0 / 3.0) * (UIScreen.main.bounds.width > UIScreen.main.bounds.height ? UIScreen.main.bounds.width : UIScreen.main.bounds.height)
 
                     tableView.do {
@@ -350,12 +365,27 @@ private class ListController: UIViewController {
                 }
             }
         } else {
-            playerView.setFullscreenButtonHidden(UIDevice.isPhone)
+            if splitViewController?.isCollapsed == true {
+                playerView.setFullscreenButtonHidden(false)
+                playerView.setExitButtonHidden(true)
+                playerView.setSidePanelHidden(true)
+            } else {
+                playerView.setFullscreenButtonHidden(true)
+                playerView.setExitButtonHidden(false)
+                playerView.setSidePanelHidden(false)
+            }
+            
+            view.addSubview(tableView)
+            playerView.addSubview(activityIndicator)
             
             tableView.do {
                 $0.contentInset = .zero
                 $0.scrollIndicatorInsets = $0.contentInset
                 $0.contentOffset = .zero
+            }
+            
+            activityIndicator.snp.remakeConstraints {
+                $0.center.equalToSuperview()
             }
             
             tableView.snp.remakeConstraints {
@@ -367,7 +397,7 @@ private class ListController: UIViewController {
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
 
-        if splitViewController?.isCollapsed == true {
+        if UIDevice.isPhone && splitViewController?.isCollapsed == true {
             updateLayoutForMode(.iPhoneLayout)
             
             if !playerView.isFullscreen {
@@ -915,6 +945,10 @@ extension ListController: VideoViewDelegate {
         playerView.pictureInPictureController?.delegate = enabled ? self : nil
     }
     
+    func onSidePanelStateChanged() {
+        (splitViewController?.parent as? PlaylistViewController)?.onSidePanelStateChanged()
+    }
+    
     func onFullScreen() {
         if !UIDevice.isIpad || splitViewController?.isCollapsed == true {
             navigationController?.setNavigationBarHidden(true, animated: true)
@@ -929,14 +963,24 @@ extension ListController: VideoViewDelegate {
     
     func onExitFullScreen() {
         if UIDevice.isIpad && splitViewController?.isCollapsed == false {
-            (splitViewController?.parent as? PlaylistViewController)?.onExitFullscreen()
+            // (splitViewController?.parent as? PlaylistViewController)?.onExitFullscreen()
+            playerView.setFullscreenButtonHidden(true)
+            playerView.setExitButtonHidden(false)
+            splitViewController?.parent?.dismiss(animated: true, completion: nil)
+        } else if UIDevice.isIpad && splitViewController?.isCollapsed == true {
+            navigationController?.setNavigationBarHidden(false, animated: true)
+            playerView.setFullscreenButtonHidden(true)
+            updateLayoutForMode(.iPhoneLayout)
         } else if UIDevice.current.orientation.isPortrait {
             navigationController?.setNavigationBarHidden(false, animated: true)
             tableView.isHidden = false
             updateLayoutForMode(.iPhoneLayout)
         } else {
+            // playerView.setFullscreenButtonHidden(true)
+            // updateLayoutForMode(.iPhoneLayout)
             playerView.setFullscreenButtonHidden(true)
-            updateLayoutForMode(.iPhoneLayout)
+            playerView.setExitButtonHidden(false)
+            splitViewController?.parent?.dismiss(animated: true, completion: nil)
         }
     }
 }
@@ -1258,14 +1302,24 @@ private class DetailController: UIViewController, UIGestureRecognizerDelegate {
     
     // MARK: Actions
     
+    func onSidePanelStateChanged() {
+        onDisplayModeChange()
+    }
+    
     func onFullScreen() {
         navigationController?.setNavigationBarHidden(true, animated: true)
-        splitViewController?.preferredDisplayMode = .secondaryOnly
+        
+        if navigationController?.isNavigationBarHidden == true {
+            splitViewController?.preferredDisplayMode = .secondaryOnly
+        }
     }
     
     func onExitFullScreen() {
         navigationController?.setNavigationBarHidden(false, animated: true)
-        splitViewController?.preferredDisplayMode = .primaryOverlay
+        
+        if navigationController?.isNavigationBarHidden == true {
+            splitViewController?.preferredDisplayMode = .primaryOverlay
+        }
     }
         
     @objc

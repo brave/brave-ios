@@ -21,6 +21,7 @@ public enum VideoViewRepeatMode {
 public protocol VideoViewDelegate: class {
     func onPreviousTrack()
     func onNextTrack()
+    func onSidePanelStateChanged()
     func onPictureInPicture(enabled: Bool)
     func onFullScreen()
     func onExitFullScreen()
@@ -101,6 +102,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         backgroundColor = .black
         playerLayer.player = self.player
 
+        infoView.sidePanelButton.addTarget(self, action: #selector(onSidePanel(_:)), for: .touchUpInside)
         infoView.pictureInPictureButton.addTarget(self, action: #selector(onPictureInPicture(_:)), for: .touchUpInside)
         infoView.fullscreenButton.addTarget(self, action: #selector(onFullscreen(_:)), for: .touchUpInside)
         infoView.exitButton.addTarget(self, action: #selector(onExitFullscreen(_:)), for: .touchUpInside)
@@ -293,6 +295,11 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         
         player.rate = Float(requestedPlaybackRate)
         controlsView.playPauseButton.setImage(#imageLiteral(resourceName: "playlist_pause"), for: .normal)
+    }
+    
+    @objc
+    private func onSidePanel(_ button: UIButton) {
+        self.delegate?.onSidePanelStateChanged()
     }
     
     @objc
@@ -534,6 +541,14 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     
     public func setFullscreenButtonHidden(_ hidden: Bool) {
         infoView.fullscreenButton.isHidden = hidden
+    }
+    
+    public func setExitButtonHidden(_ hidden: Bool) {
+        infoView.exitButton.isHidden = hidden
+    }
+    
+    public func setSidePanelHidden(_ hidden: Bool) {
+        infoView.sidePanelButton.isHidden = hidden
     }
     
     public func attachLayer() {

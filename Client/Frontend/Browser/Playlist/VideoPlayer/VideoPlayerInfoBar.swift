@@ -12,8 +12,17 @@ class VideoPlayerInfoBar: UIView {
         $0.spacing = 32.0
     }
     
+    private let leftStackView = UIStackView().then {
+        $0.spacing = 32.0
+        $0.alignment = .center
+    }
+    
     private let blurView = UIVisualEffectView(effect: UIBlurEffect(style: .dark)).then {
         $0.contentView.backgroundColor = #colorLiteral(red: 0.231372549, green: 0.2431372549, blue: 0.3098039216, alpha: 0.8)
+    }
+    
+    let sidePanelButton = UIButton().then {
+        $0.setImage(#imageLiteral(resourceName: "playlist_split_navigation"), for: .normal)
     }
     
     private let favIconImageView = UIImageView().then {
@@ -53,9 +62,13 @@ class VideoPlayerInfoBar: UIView {
         super.init(frame: frame)
         
         addSubview(blurView)
-        addSubview(favIconImageView)
+        addSubview(leftStackView)
         addSubview(titleLabel)
         addSubview(controlStackView)
+        
+        [sidePanelButton, favIconImageView].forEach({
+            leftStackView.addArrangedSubview($0)
+        })
         [pictureInPictureButton, fullscreenButton, exitButton].forEach({
             controlStackView.addArrangedSubview($0)
         })
@@ -64,9 +77,14 @@ class VideoPlayerInfoBar: UIView {
             $0.edges.equalToSuperview()
         }
         
+        leftStackView.snp.makeConstraints {
+            $0.left.equalToSuperview().inset(20.0)
+            $0.top.bottom.equalToSuperview().inset(8.0)
+        }
+        
         favIconImageView.snp.makeConstraints {
             $0.width.height.equalTo(28.0)
-            $0.left.top.bottom.equalToSuperview().inset(20.0)
+            $0.top.bottom.equalToSuperview().inset(12.0)
         }
         
         titleLabel.snp.makeConstraints {
