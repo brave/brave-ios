@@ -413,3 +413,14 @@ class MenuViewController: UITableViewController {
 extension MenuViewController: PopoverContentComponent {
     var extendEdgeIntoArrow: Bool { return false }
 }
+
+class ColorAwareNavigationController: UINavigationController {
+    var statusBarStyle: UIStatusBarStyle = .default {
+        didSet {
+            setNeedsStatusBarAppearanceUpdate()
+        }
+    }
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return statusBarStyle
+    }
+}
