@@ -13,7 +13,6 @@ class VideoPlayerControlsView: UIView {
     }
     
     private let topControlsStackView = UIStackView().then {
-        $0.axis = .horizontal
         $0.distribution = .fillEqually
     }
     

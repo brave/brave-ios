@@ -11,8 +11,8 @@ import BraveShared
 // MARK: - PlayListSide
 
 enum PlayListSide: String, CaseIterable, RepresentableOptionType {
-    case left = "left"
-    case right = "right"
+    case left
+    case right
         
     var displayString: String {
         switch self {
@@ -27,9 +27,9 @@ enum PlayListSide: String, CaseIterable, RepresentableOptionType {
 // MARK: - PlayListDownloadType
 
 enum PlayListDownloadType: String, CaseIterable, RepresentableOptionType {
-    case on = "on"
-    case off = "off"
-    case wifi = "wifi"
+    case on
+    case off
+    case wifi
         
     var displayString: String {
         switch self {

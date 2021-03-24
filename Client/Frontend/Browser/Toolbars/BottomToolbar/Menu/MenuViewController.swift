@@ -357,11 +357,11 @@ class MenuViewController: UITableViewController {
     }
     
     private func openPlaylist() {
-        let vc = PlaylistViewController()
-        let currentTheme = Theme.of(bvc.tabManager.selectedTab)
-        //vc.applyTheme(currentTheme)
-        
-        open(vc, doneButton: DoneButton(style: .done, position: .right), alwaysFullScreen: UIDevice.current.userInterfaceIdiom == .pad)
+        let playlistController = (UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController ?? PlaylistViewController()
+        playlistController.modalPresentationStyle = .fullScreen
+                    
+        dismissView()
+        bvc.present(playlistController, animated: true)
     }
     
     private func openAddBookmark() {

@@ -19,7 +19,7 @@ enum PlaylistItemAddedState {
 }
 
 protocol PlaylistHelperDelegate: NSObject {
-    func present(controller: UIViewController)
+    func showPlaylistAlert(_ alertController: UIAlertController)
     func showPlaylistToast(info: PlaylistInfo, itemState: PlaylistItemAddedState)
     func addToPlayListActivity(info: PlaylistInfo?, itemDetected: Bool)
 }
@@ -84,10 +84,7 @@ class PlaylistHelper: TabContentScript {
                 
                 if !self.playlistItems.contains(item.src) {
                     self.playlistItems.insert(item.src)
-                    
-                    DispatchQueue.main.async {
-                        self.delegate?.showPlaylistToast(info: item, itemState: .existing)
-                    }
+                    self.delegate?.showPlaylistToast(info: item, itemState: .existing)
                 }
             }
         } else {
@@ -102,15 +99,12 @@ class PlaylistHelper: TabContentScript {
                     // Update playlist with new items..
                     Playlist.shared.addItem(item: item, cachedData: nil) {
                         log.debug("Playlist Item Added")
-                        
-                        DispatchQueue.main.async {
-                            self.delegate?.showPlaylistToast(info: item, itemState: .added)
-                            UIImpactFeedbackGenerator(style: .medium).bzzt()
-                        }
+                        self.delegate?.showPlaylistToast(info: item, itemState: .added)
+                        UIImpactFeedbackGenerator(style: .medium).bzzt()
                     }
                 }))
                 alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil))
-                self.delegate?.present(controller: alert)
+                self.delegate?.showPlaylistAlert(alert)
             }
         }
     }

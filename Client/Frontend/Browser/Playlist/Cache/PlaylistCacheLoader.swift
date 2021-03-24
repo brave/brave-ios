@@ -28,21 +28,21 @@ public class PlaylistMimeTypeDetector {
             "application/vnd.apple.mpegurl": "mpg"
         ]
         
-        for (key, value) in mimeTypeMap {
-            if mimeType.contains(key) {
-                self.fileExtension = value
-                break
-            }
-        }
+        self.fileExtension = mimeTypeMap[mimeType] ?? "mpg"
     }
     
     init(data: Data) {
+        // Assume mpg by default. If it can't play, it will fail anyway..
+        // AVPlayer REQUIRES that you give a file extension no matter what and will refuse to determine the extension for you without an
+        // AVResourceLoaderDelegate :S
+        
+        guard data.count > 4 else {
+            mimeType = "application/x-mpegURL" // application/vnd.apple.mpegurl
+            fileExtension = "mpg"
+            return
+        }
+        
         let bytes = [UInt8](data)
-        
-        // TODO:
-        // Add all that is in AVURLAsset.audiovisualTypes()
-        // Add all that is in AVURLAsset.audiovisualMIMETypes()
-        
         if scan(data: bytes, header: [0x1A, 0x45, 0xDF, 0xA3]) {
             mimeType = "video/webm"
             fileExtension = "webm"
@@ -128,15 +128,7 @@ class PlaylistWebLoader: UIView, WKNavigationDelegate {
         $0.mediaTypesRequiringUserActionForPlayback = []
     }, type: .private).then {
         $0.createWebview()
-        
         $0.webView?.scrollView.layer.masksToBounds = true
-        $0.webView?.configuration.userContentController.removeAllUserScripts()
-        _ = UserScriptManager(
-            tab: $0,
-            isFingerprintingProtectionEnabled: false,
-            isCookieBlockingEnabled: false,
-            isU2FEnabled: false,
-            isPaymentRequestEnabled: false)
     }
     
     private var handler: (PlaylistInfo?) -> Void = { _ in }
@@ -162,25 +154,9 @@ class PlaylistWebLoader: UIView, WKNavigationDelegate {
         }
         
         webView.navigationDelegate = self
-        
-        tab.addContentScript(ReaderMode(tab: tab), name: ReaderMode.name(), sandboxed: false)
-        tab.addContentScript(ContextMenuHelper(tab: tab), name: ContextMenuHelper.name())
-        tab.addContentScript(ErrorPageHelper(), name: ErrorPageHelper.name(), sandboxed: false)
-        tab.addContentScript(SessionRestoreHelper(tab: tab), name: SessionRestoreHelper.name())
-        tab.addContentScript(FindInPageHelper(tab: tab), name: FindInPageHelper.name(), sandboxed: false)
-        tab.addContentScript(NoImageModeHelper(tab: tab), name: NoImageModeHelper.name())
-        tab.addContentScript(PrintHelper(tab: tab), name: PrintHelper.name())
-        tab.addContentScript(CustomSearchHelper(tab: tab), name: CustomSearchHelper.name())
-        tab.addContentScript(LocalRequestHelper(), name: LocalRequestHelper.name(), sandboxed: false)
         tab.contentBlocker.setupTabTrackingProtection()
         tab.addContentScript(tab.contentBlocker, name: ContentBlockerHelper.name(), sandboxed: false)
-        tab.addContentScript(FocusHelper(tab: tab), name: FocusHelper.name())
         tab.addContentScript(FingerprintingProtection(tab: tab), name: FingerprintingProtection.name(), sandboxed: false)
-        tab.addContentScript(BraveGetUA(tab: tab), name: BraveGetUA.name())
-        if YubiKitDeviceCapabilities.supportsMFIAccessoryKey {
-            tab.addContentScript(U2FExtensions(tab: tab), name: U2FExtensions.name(), sandboxed: false)
-        }
-        tab.addContentScript(ResourceDownloadManager(tab: tab), name: ResourceDownloadManager.name(), sandboxed: false)
         tab.addContentScript(WindowRenderHelperScript(tab: tab), name: WindowRenderHelperScript.name(), sandboxed: false)
         tab.addContentScript(PlaylistHelper(tab: tab), name: PlaylistHelper.name(), sandboxed: false)
         tab.addContentScript(PlaylistWebLoaderContentHelper(self), name: PlaylistWebLoaderContentHelper.name(), sandboxed: false)
@@ -213,13 +189,10 @@ class PlaylistWebLoader: UIView, WKNavigationDelegate {
     }
     
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        clearData()
         handler(nil)
     }
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        clearData()
-        
         // Fail safe for if a script fails or web-view somehow fails to load,
         // Then we have a timeout where it will notify the playlist that an error occurred
         // This happens when the WebView is already finished loading anyway!
@@ -228,10 +201,6 @@ class PlaylistWebLoader: UIView, WKNavigationDelegate {
                 self.handler(nil)
             }
         }
-    }
-    
-    private func clearData() {
-
     }
     
     private class PlaylistWebLoaderContentHelper: TabContentScript {
@@ -257,20 +226,19 @@ class PlaylistWebLoader: UIView, WKNavigationDelegate {
             }
             
             // For now, we ignore base64 video mime-types loaded via the `data:` scheme.
-            if item.src.contains("data:") && item.src.contains(";base64") {
+            if item.src.isEmpty || item.src.contains("data:") && item.src.contains(";base64") {
+                webLoader?.handler(nil)
                 return
             }
             
-            if !item.src.isEmpty {
-                webLoader?.handler(item)
-            } else {
-                webLoader?.handler(nil)
-            }
-            
+            webLoader?.handler(item)
             DispatchQueue.main.async {
-                // This line MAY cause problems..
+                // This line MAY cause problems.. because some websites have a loading delay for the source of the media item
+                // If the second we receive the src, we reload the page by doing the below HTML,
+                // It may not have received all info necessary to play the item such as MetadataInfo
+                // For now it works 100% of the time and it is safe to do it. If we come across such a website, that causes problems,
+                // we'll need to find a different way of forcing the WebView to STOP loading metadata in the background
                 self.webLoader?.tab.webView?.loadHTMLString("<html><body>PlayList</body></html>", baseURL: nil)
-                // self.webLoader?.tab.deleteWebView()
             }
         }
     }

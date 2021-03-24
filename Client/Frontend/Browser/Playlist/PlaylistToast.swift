@@ -9,13 +9,13 @@ import BraveShared
 import Shared
 import SnapKit
 
-enum PlaylistToastState {
-    case itemAdded
-    case itemExisting
-    case itemPendingUserAction
-}
-
 class PlaylistToast: Toast {
+    enum State {
+        case itemAdded
+        case itemExisting
+        case itemPendingUserAction
+    }
+    
     private class HighlightableButton: UIButton {
         override var isHighlighted: Bool {
             didSet {
@@ -34,7 +34,7 @@ class PlaylistToast: Toast {
     
     var item: PlaylistInfo
 
-    init(item: PlaylistInfo, state: PlaylistToastState, completion: ((_ buttonPressed: Bool) -> Void)?) {
+    init(item: PlaylistInfo, state: State, completion: ((_ buttonPressed: Bool) -> Void)?) {
         self.item = item
         super.init(frame: .zero)
 
@@ -65,10 +65,9 @@ class PlaylistToast: Toast {
         layer.insertSublayer(shadowLayer, at: 0)
     }
 
-    func createView(_ item: PlaylistInfo, _ state: PlaylistToastState) -> UIView {
+    func createView(_ item: PlaylistInfo, _ state: State) -> UIView {
         if state == .itemAdded || state == .itemExisting {
             let horizontalStackView = UIStackView().then {
-                $0.axis = .horizontal
                 $0.alignment = .center
                 $0.spacing = ButtonToastUX.toastPadding
             }
@@ -108,7 +107,9 @@ class PlaylistToast: Toast {
             }
 
             button.snp.makeConstraints { (make) in
-                make.width.equalTo(button.titleLabel!.intrinsicContentSize.width + 2 * ButtonToastUX.toastButtonPadding)
+                if let titleLabel = button.titleLabel {
+                    make.width.equalTo(titleLabel.intrinsicContentSize.width + 2 * ButtonToastUX.toastButtonPadding)
+                }
             }
 
             labelStackView.addArrangedSubview(label)
@@ -127,7 +128,6 @@ class PlaylistToast: Toast {
         }
         
         let horizontalStackView = UIStackView().then {
-            $0.axis = .horizontal
             $0.alignment = .center
             $0.spacing = ButtonToastUX.toastPadding
         }
@@ -151,7 +151,9 @@ class PlaylistToast: Toast {
         }
 
         button.snp.makeConstraints { make in
-            make.width.equalTo(button.titleLabel!.intrinsicContentSize.width + 2 * ButtonToastUX.toastButtonPadding)
+            if let titleLabel = button.titleLabel {
+                make.width.equalTo(titleLabel.intrinsicContentSize.width + 2 * ButtonToastUX.toastButtonPadding)
+            }
         }
         
         horizontalStackView.addArrangedSubview(button)
@@ -168,7 +170,7 @@ class PlaylistToast: Toast {
             button.setTitle(Strings.PlayList.toastAddToPlaylistTitle, for: [])
             toastView.backgroundColor = .clear
         } else {
-            fatalError("Should Never get here. Others case are handled at the start of this function.")
+            assertionFailure("Should Never get here. Others case are handled at the start of this function.")
         }
 
         return toastView

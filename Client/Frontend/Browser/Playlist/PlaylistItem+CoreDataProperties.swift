@@ -7,10 +7,11 @@
 import Foundation
 import CoreData
 
-extension PlaylistItem {
-
+@objc(PlaylistItem)
+public class PlaylistItem: NSManagedObject {
+    
     @nonobjc public class func fetchRequest() -> NSFetchRequest<PlaylistItem> {
-        return NSFetchRequest<PlaylistItem>(entityName: "PlaylistItem")
+        NSFetchRequest<PlaylistItem>(entityName: "PlaylistItem")
     }
 
     @NSManaged public var cachedData: Data?
@@ -22,5 +23,4 @@ extension PlaylistItem {
     @NSManaged public var order: Int32
     @NSManaged public var pageSrc: String?
     @NSManaged public var pageTitle: String?
-
 }

@@ -16,7 +16,6 @@ protocol PlaylistDownloadManagerDelegate: class {
 
 private protocol PlaylistStreamDownloadManagerDelegate: class {
     func localAsset(for pageSrc: String) -> AVURLAsset?
-    func displayNames(for mediaSelection: AVMediaSelection) -> String
     func onDownloadProgressUpdate(id: String, percentComplete: Double)
     func onDownloadStateChanged(id: String, state: PlaylistDownloadManager.DownloadState, displayName: String)
 }
@@ -25,12 +24,6 @@ struct MediaDownloadTask {
     let id: String
     let name: String
     let asset: AVURLAsset
-    
-    enum Keys: String {
-        case id
-        case state
-        case displayName
-    }
 }
 
 public class PlaylistDownloadManager: PlaylistStreamDownloadManagerDelegate {
@@ -126,26 +119,6 @@ public class PlaylistDownloadManager: PlaylistStreamDownloadManagerDelegate {
         }
     }
     
-    fileprivate func displayNames(for mediaSelection: AVMediaSelection) -> String {
-        guard let asset = mediaSelection.asset else {
-            return ""
-        }
-        
-        var names = ""
-        for mediaCharacteristic in asset.availableMediaCharacteristicsWithMediaSelectionOptions {
-            guard let mediaSelectionGroup = asset.mediaSelectionGroup(forMediaCharacteristic: mediaCharacteristic),
-                  let option = mediaSelection.selectedMediaOption(in: mediaSelectionGroup) else { continue }
-
-            if names.isEmpty {
-                names += " " + option.displayName
-            } else {
-                names += ", " + option.displayName
-            }
-        }
-
-        return names
-    }
-    
     fileprivate func onDownloadProgressUpdate(id: String, percentComplete: Double) {
         delegate?.onDownloadProgressUpdate(id: id, percentComplete: percentComplete)
     }
@@ -196,7 +169,7 @@ private class PlaylistHLSDownloadManager: NSObject, AVAssetDownloadDelegate {
         activeDownloadTasks[task] = MediaDownloadTask(id: item.pageSrc, name: item.name, asset: asset)
         task.resume()
 
-        delegate?.onDownloadStateChanged(id: item.pageSrc, state: .inProgress, displayName: delegate?.displayNames(for: asset.preferredMediaSelection) ?? "")
+        delegate?.onDownloadStateChanged(id: item.pageSrc, state: .inProgress, displayName: asset.displayNames(for: asset.preferredMediaSelection))
     }
     
     func cancelDownload(item: PlaylistInfo) {
@@ -236,10 +209,10 @@ private class PlaylistHLSDownloadManager: NSObject, AVAssetDownloadDelegate {
                 }
 
             case (NSURLErrorDomain, NSURLErrorUnknown):
-                fatalError("Downloading HLS streams is not supported on the simulator.")
+                assertionFailure("Downloading HLS streams is not supported on the simulator.")
 
             default:
-                fatalError("Fatal Error: \(error.domain)")
+                assertionFailure("An unknown error occured while attempting to download the playlist item: \(error.domain)")
             }
             
             DispatchQueue.main.async {
@@ -271,7 +244,7 @@ private class PlaylistHLSDownloadManager: NSObject, AVAssetDownloadDelegate {
         aggregateAssetDownloadTask.resume()
         
         DispatchQueue.main.async {
-            self.delegate?.onDownloadStateChanged(id: asset.id, state: .inProgress, displayName: self.delegate?.displayNames(for: mediaSelection) ?? "")
+            self.delegate?.onDownloadStateChanged(id: asset.id, state: .inProgress, displayName: mediaSelection.asset?.displayNames(for: mediaSelection) ?? "")
         }
     }
     
@@ -336,7 +309,7 @@ private class PlaylistFileDownloadManager: NSObject, URLSessionDownloadDelegate 
         activeDownloadTasks[task] = MediaDownloadTask(id: item.pageSrc, name: item.name, asset: asset)
         task.resume()
         
-        delegate?.onDownloadStateChanged(id: item.pageSrc, state: .inProgress, displayName: delegate?.displayNames(for: asset.preferredMediaSelection) ?? "")
+        delegate?.onDownloadStateChanged(id: item.pageSrc, state: .inProgress, displayName: asset.displayNames(for: asset.preferredMediaSelection))
     }
     
     func cancelDownload(item: PlaylistInfo) {
@@ -374,10 +347,10 @@ private class PlaylistFileDownloadManager: NSObject, URLSessionDownloadDelegate 
                 }
 
             case (NSURLErrorDomain, NSURLErrorUnknown):
-                fatalError("Downloading HLS streams is not supported on the simulator.")
+                assertionFailure("Downloading HLS streams is not supported on the simulator.")
 
             default:
-                fatalError("Fatal Error: \(error.domain)")
+                assertionFailure("An unknown error occurred while attempting to download the playlist item: \(error.domain)")
             }
             
             DispatchQueue.main.async {

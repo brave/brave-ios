@@ -164,9 +164,7 @@ extension PlaylistMediaInfo: MPPlayableContentDelegate {
                         self.playerView?.load(url: url, resourceDelegate: nil, autoPlayEnabled: autoPlayEnabled)
 
                         Playlist.shared.updateItem(mediaSrc: item.src, item: newItem) {
-                            DispatchQueue.main.async {
-                                completion(.none)
-                            }
+                            completion(.none)
                         }
                     } else {
                         self.nowPlayingInfo = nil
@@ -280,7 +278,7 @@ extension PlaylistMediaInfo: MPPlayableContentDelegate {
                     log.debug("Player Item Status: Unknown")
                     onStatusChanged(.unknown)
                 @unknown default:
-                    fatalError()
+                    assertionFailure("Unknown Switch Case for AVPlayerItemStatus")
                 }
             }
         }

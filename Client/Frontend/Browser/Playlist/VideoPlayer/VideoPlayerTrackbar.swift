@@ -11,7 +11,11 @@ private class VideoSliderBar: UIControl {
     public var trackerInsets = UIEdgeInsets(top: 0.0, left: 5.0, bottom: 0.0, right: 5.0)
     public var value: CGFloat = 0.0 {
         didSet {
+            // Calculating the tracker offsets based on a ratio (value) of its bounds
             trackerConstraint?.constant = boundaryView.bounds.size.width * value
+            
+            // Clamps the value between 0.0 and 1.0
+            // Calculates the insets and then the offsets based on the ratio (value) of its bounds relative to its start position
             filledConstraint?.constant = value >= 1.0 ? bounds.size.width : ((bounds.size.width - (trackerInsets.left + trackerInsets.right)) * value) + trackerInsets.left
         }
     }

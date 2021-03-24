@@ -1788,11 +1788,8 @@ class BrowserViewController: UIViewController {
             // Update playlist with new items..
             Playlist.shared.addItem(item: item, cachedData: nil) {
                 log.debug("Playlist Item Added")
-                
-                DispatchQueue.main.async {
-                    self.showPlaylistToast(info: item, itemState: .added)
-                    UIImpactFeedbackGenerator(style: .medium).bzzt()
-                }
+                self.showPlaylistToast(info: item, itemState: .added)
+                UIImpactFeedbackGenerator(style: .medium).bzzt()
             }
         }
         
@@ -3578,8 +3575,8 @@ extension BrowserViewController: UNUserNotificationCenterDelegate {
 }
 
 extension BrowserViewController: PlaylistHelperDelegate {
-    func present(controller: UIViewController) {
-        present(controller, animated: true)
+    func showPlaylistAlert(_ alertController: UIAlertController) {
+        self.present(alertController, animated: true)
     }
     
     func showPlaylistToast(info: PlaylistInfo, itemState: PlaylistItemAddedState) {
@@ -3589,13 +3586,14 @@ extension BrowserViewController: PlaylistHelperDelegate {
             return
         }
         
-        if let toast = self.playlistToast {
+        if let toast = playlistToast {
             toast.item = info
             return
         }
         
         // Item requires the user to choose whether or not to add it to playlists
-        if itemState == .pendingUserAction {
+        switch itemState {
+        case .pendingUserAction:
             let toast = PlaylistToast(item: info, state: .itemPendingUserAction) { [weak self] buttonPressed in
                 guard let self = self, let info = self.playlistToast?.item else { return }
                 if buttonPressed {
@@ -3604,20 +3602,18 @@ extension BrowserViewController: PlaylistHelperDelegate {
                         log.debug("Playlist Item Added")
                         
                         self.playlistToast = nil
-                        
-                        DispatchQueue.main.async {
-                            self.showPlaylistToast(info: info, itemState: .added)
-                            UIImpactFeedbackGenerator(style: .medium).bzzt()
-                        }
+                        self.showPlaylistToast(info: info, itemState: .added)
+                        UIImpactFeedbackGenerator(style: .medium).bzzt()
                     }
                 } else {
                     self.playlistToast = nil
                 }
             }
             
-            self.playlistToast = toast
-            self.show(toast: toast, afterWaiting: .milliseconds(250), duration: .seconds(10))
-        } else if itemState == .existing {
+            playlistToast = toast
+            show(toast: toast, afterWaiting: .milliseconds(250), duration: .seconds(10))
+            
+        case .existing:
             // Item already exists in playlist, so ask them if they want to view it there
             let toast = PlaylistToast(item: info, state: .itemExisting, completion: { [weak self] buttonPressed in
                 guard let self = self else { return }
@@ -3627,9 +3623,10 @@ extension BrowserViewController: PlaylistHelperDelegate {
                 self.playlistToast = nil
             })
             
-            self.playlistToast = toast
-            self.show(toast: toast, afterWaiting: .milliseconds(250), duration: .seconds(5))
-        } else if itemState == .added {
+            playlistToast = toast
+            show(toast: toast, afterWaiting: .milliseconds(250), duration: .seconds(5))
+            
+        case .added:
             // Item was added to playlist by the user, so ask them if they want to view it there
             let toast = PlaylistToast(item: info, state: .itemAdded, completion: { [weak self] buttonPressed in
                 guard let self = self else { return }
@@ -3640,26 +3637,15 @@ extension BrowserViewController: PlaylistHelperDelegate {
                 self.playlistToast = nil
             })
             
-            self.playlistToast = toast
-            self.show(toast: toast, afterWaiting: .milliseconds(250), duration: .seconds(5))
-        } else {
-            // Unhandled developer error. There should never be any other states for the toast.
-            fatalError("Invalid Playlist Item State!")
+            playlistToast = toast
+            show(toast: toast, afterWaiting: .milliseconds(250), duration: .seconds(5))
         }
     }
     
     private func openPlaylist() {
-        if UIDevice.current.userInterfaceIdiom == .pad {
-            let playlistController = (UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController ?? PlaylistPadViewController()
-            playlistController.modalPresentationStyle = .fullScreen
-            present(playlistController, animated: true)
-        } else {
-            let playListController = ((UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController as? UINavigationController)?.viewControllers.first ?? PlaylistViewController()
-
-            let navigationController = UINavigationController(rootViewController: playListController)
-            navigationController.modalPresentationStyle = .pageSheet
-            present(navigationController, animated: true)
-        }
+        let playlistController = (UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController ?? PlaylistViewController()
+        playlistController.modalPresentationStyle = .fullScreen
+        present(playlistController, animated: true)
     }
     
     func addToPlayListActivity(info: PlaylistInfo?, itemDetected: Bool) {

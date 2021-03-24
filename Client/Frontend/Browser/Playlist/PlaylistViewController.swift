@@ -14,10 +14,129 @@ import CoreData
 
 private let log = Logger.browserLogger
 
+// MARK: - DisplayMode
+
+private enum DisplayMode {
+    case iPhoneLayout
+    case iPadLayout
+}
+
 // MARK: PlaylistViewController
 
 class PlaylistViewController: UIViewController {
     
+    // MARK: Properties
+
+    private let splitController = UISplitViewController()
+    private let listController = ListController()
+    private let detailController = DetailController()
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        splitController.do {
+            $0.viewControllers = [SettingsNavigationController(rootViewController: listController),
+                                  SettingsNavigationController(rootViewController: detailController)]
+            $0.delegate = self
+            $0.primaryEdge = PlayListSide(rawValue: Preferences.Playlist.listViewSide.value) == .left ? .leading : .trailing
+            $0.presentsWithGesture = false
+            $0.maximumPrimaryColumnWidth = 400
+            $0.minimumPrimaryColumnWidth = 400
+        }
+        
+        addChild(splitController)
+        view.addSubview(splitController.view)
+        
+        splitController.do {
+            $0.didMove(toParent: self)
+            $0.view.translatesAutoresizingMaskIntoConstraints = false
+            $0.view.snp.makeConstraints {
+                $0.edges.equalToSuperview()
+            }
+        }
+        
+        updateLayoutForOrientationChange()
+        
+        // This has to be manually called because when launching a split controller in landscape, it does NOT call `viewDidLoad` on the primary/list controller!
+        listController.loadViewIfNeeded()
+        detailController.setVideoPlayer(listController.playerView)
+        
+        if UIDevice.isIpad {
+            listController.updateLayoutForMode(.iPadLayout)
+            detailController.updateLayoutForMode(.iPadLayout)
+        }
+    }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        
+        updateLayoutForOrientationChange()
+    }
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
+    }
+    
+    private func updateLayoutForOrientationChange() {
+        if listController.playerView.isFullscreen {
+            splitController.preferredDisplayMode = .secondaryOnly
+        } else {
+            if UIDevice.current.orientation.isLandscape {
+                splitController.preferredDisplayMode = .secondaryOnly
+            } else {
+                splitController.preferredDisplayMode = .primaryOverlay
+            }
+        }
+    }
+    
+    fileprivate func onFullscreen() {
+        detailController.onFullScreen()
+    }
+    
+    fileprivate func onExitFullscreen() {
+        detailController.onExitFullScreen()
+    }
+}
+
+// MARK: - UIAdaptivePresentationControllerDelegate
+
+extension PlaylistViewController: UIAdaptivePresentationControllerDelegate {
+    func adaptivePresentationStyle(for controller: UIPresentationController, traitCollection: UITraitCollection) -> UIModalPresentationStyle {
+        return .fullScreen
+    }
+}
+
+// MARK: - UISplitViewControllerDelegate
+
+extension PlaylistViewController: UISplitViewControllerDelegate {
+    func splitViewControllerSupportedInterfaceOrientations(_ splitViewController: UISplitViewController) -> UIInterfaceOrientationMask {
+        return .allButUpsideDown
+    }
+    
+    func splitViewController(_ splitViewController: UISplitViewController, collapseSecondary secondaryViewController: UIViewController, onto primaryViewController: UIViewController) -> Bool {
+        
+        // On iPhone, always display the iPhone layout (collapsed) no matter what.
+        // On iPad, we need to update both the list controller's layout (collapsed) and the detail controller's layout (collapsed).
+        listController.updateLayoutForMode(.iPhoneLayout)
+        detailController.setVideoPlayer(nil)
+        detailController.updateLayoutForMode(.iPhoneLayout)
+        return true
+    }
+    
+    func splitViewController(_ splitViewController: UISplitViewController, separateSecondaryFrom primaryViewController: UIViewController) -> UIViewController? {
+        
+        // On iPhone, always display the iPad layout (expanded) when not in compact mode.
+        // On iPad, we need to update both the list controller's layout (expanded) and the detail controller's layout (expanded).
+        listController.updateLayoutForMode(.iPadLayout)
+        detailController.setVideoPlayer(listController.playerView)
+        detailController.updateLayoutForMode(.iPadLayout)
+        return detailController
+    }
+}
+
+// MARK: - ListController
+
+private class ListController: UIViewController {
     // MARK: Constants
      
      struct Constants {
@@ -28,22 +147,15 @@ class PlaylistViewController: UIViewController {
 
     // MARK: Properties
     
-    private var isFullscreen = UIDevice.current.orientation.isLandscape
-    private let playerView = VideoView()
+    public let playerView = VideoView()
+    private lazy var mediaInfo = PlaylistMediaInfo(playerView: playerView)
+    private var currentlyPlayingItemIndex = -1
+    private var autoPlayEnabled: Bool = true
     private var playerController: AVPlayerViewController?
     
     private lazy var activityIndicator = UIActivityIndicatorView(style: .white).then {
         $0.isHidden = true
         $0.hidesWhenStopped = true
-    }
-    
-    private let infoLabel = UILabel().then {
-        $0.font = .systemFont(ofSize: 12.0, weight: .regular)
-        $0.textColor = .white
-        $0.textAlignment = .center
-        $0.appearanceTextColor = .white
-        $0.numberOfLines = 0
-        $0.text = Strings.PlayList.playListSectionTitle
     }
     
     private var tableView = UITableView(frame: .zero, style: .grouped).then {
@@ -60,12 +172,6 @@ class PlaylistViewController: UIViewController {
         $0.unitsStyle = .abbreviated
         $0.maximumUnitCount = 1
     }
-
-    private lazy var mediaInfo = PlaylistMediaInfo(playerView: playerView)
-    
-    private var currentlyPlayingItemIndex = -1
-    
-    private var autoPlayEnabled: Bool = true
     
     init() {
         super.init(nibName: nil, bundle: nil)
@@ -96,24 +202,34 @@ class PlaylistViewController: UIViewController {
     private func setTheme() {
         title = Strings.PlayList.playListSectionTitle
 
-        navigationController?.do {
-            $0.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
-            UILabel.appearance(whenContainedInInstancesOf: [UINavigationBar.self]).appearanceTextColor = .white
-            
-            $0.presentationController?.delegate = self
-            $0.navigationBar.tintColor = .white
-            $0.navigationBar.isTranslucent = false
-            $0.navigationBar.barTintColor = BraveUX.popoverDarkBackground
-            $0.navigationBar.appearanceBarTintColor = BraveUX.popoverDarkBackground
-            $0.navigationBar.setBackgroundImage(UIImage(), for: .default)
-            $0.navigationBar.shadowImage = UIImage()
-        }
-        
         view.backgroundColor = BraveUX.popoverDarkBackground
+        navigationController?.do {
+            if #available(iOS 13.0, *) {
+                let appearance = UINavigationBarAppearance()
+                appearance.configureWithTransparentBackground()
+                appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
+                appearance.backgroundColor = BraveUX.popoverDarkBackground
+                
+                $0.navigationBar.standardAppearance = appearance
+                $0.navigationBar.barTintColor = BraveUX.popoverDarkBackground
+                $0.navigationBar.tintColor = .white
+            } else {
+                $0.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.white]
+                UILabel.appearance(whenContainedInInstancesOf: [UINavigationBar.self]).appearanceTextColor = .white
+                $0.navigationBar.backgroundColor = .clear
+                $0.navigationBar.barTintColor = BraveUX.popoverDarkBackground
+                $0.navigationBar.tintColor = .white
+                $0.navigationBar.isTranslucent = false
+                $0.navigationBar.setBackgroundImage(UIImage(), for: .default)
+                $0.navigationBar.shadowImage = UIImage()
+            }
+        }
     }
     
     private func setup () {
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(onExit(_:)))
+        if UIDevice.isPhone {
+            navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(onExit(_:)))
+        }
               
         tableView.do {
             $0.register(PlaylistCell.self, forCellReuseIdentifier: Constants.playListCellIdentifier)
@@ -128,43 +244,14 @@ class PlaylistViewController: UIViewController {
     }
     
     private func doLayout() {
-        if UIDevice.current.orientation.isLandscape {
-            view.addSubview(playerView)
-            playerView.addSubview(activityIndicator)
-            
-            playerView.snp.makeConstraints {
-                $0.edges.equalTo(view.safeArea.edges)
-            }
-            
-            activityIndicator.snp.makeConstraints {
-                $0.center.equalToSuperview()
-            }
+        view.addSubview(tableView)
+        view.addSubview(playerView)
+        playerView.addSubview(activityIndicator)
+        
+        if UIDevice.isPhone {
+            updateLayoutForMode(.iPhoneLayout)
         } else {
-            let videoPlayerHeight = (1.0 / 3.0) * view.bounds.height
-            
-            view.addSubview(tableView)
-            view.addSubview(playerView)
-            playerView.addSubview(activityIndicator)
-            
-            tableView.do {
-                $0.contentInset = UIEdgeInsets(top: videoPlayerHeight, left: 0.0, bottom: view.safeAreaInsets.bottom, right: 0.0)
-                $0.scrollIndicatorInsets = $0.contentInset
-                $0.contentOffset = CGPoint(x: 0.0, y: -videoPlayerHeight)
-            }
-            
-            playerView.snp.makeConstraints {
-                $0.top.equalTo(view.safeArea.top)
-                $0.leading.trailing.equalToSuperview()
-                $0.height.equalTo(videoPlayerHeight)
-            }
-            
-            activityIndicator.snp.makeConstraints {
-                $0.center.equalToSuperview()
-            }
-            
-            tableView.snp.makeConstraints {
-                $0.edges.equalTo(0)
-            }
+            updateLayoutForMode(.iPadLayout)
         }
     }
     
@@ -201,51 +288,93 @@ class PlaylistViewController: UIViewController {
         self.dismiss(animated: true, completion: nil)
     }
     
-    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        super.viewWillTransition(to: size, with: coordinator)
-        
-        // If the player view is in fullscreen, we should NOT change the tableView layout on rotation.
-        if !playerView.isFullscreen {
-            if UIDevice.current.orientation.isLandscape {
-                navigationController?.setNavigationBarHidden(true, animated: true)
-                playerView.setFullscreenButtonHidden(true)
-                
-                tableView.isHidden = true
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
+    }
+    
+    public func updateLayoutForMode(_ mode: DisplayMode) {
+        if mode == .iPhoneLayout {
+            // If the player view is in fullscreen, we should NOT change the tableView layout on rotation.
+            view.addSubview(playerView)
+            if !playerView.isFullscreen {
+                if UIDevice.current.orientation.isLandscape {
+                    playerView.setFullscreenButtonHidden(true)
+                    playerView.snp.remakeConstraints {
+                        $0.edges.equalTo(view.safeArea.edges)
+                    }
+                    
+                    activityIndicator.snp.remakeConstraints {
+                        $0.center.equalToSuperview()
+                    }
+                } else {
+                    playerView.setFullscreenButtonHidden(false)
+                    let videoPlayerHeight = (1.0 / 3.0) * (UIScreen.main.bounds.width > UIScreen.main.bounds.height ? UIScreen.main.bounds.width : UIScreen.main.bounds.height)
+
+                    tableView.do {
+                        $0.contentInset = UIEdgeInsets(top: videoPlayerHeight, left: 0.0, bottom: view.safeAreaInsets.bottom, right: 0.0)
+                        $0.scrollIndicatorInsets = $0.contentInset
+                        $0.contentOffset = CGPoint(x: 0.0, y: -videoPlayerHeight)
+                        $0.isHidden = false
+                    }
+                    
+                    playerView.snp.remakeConstraints {
+                        $0.top.equalTo(view.safeArea.top)
+                        $0.leading.trailing.equalToSuperview()
+                        $0.height.equalTo(videoPlayerHeight)
+                    }
+                    
+                    activityIndicator.snp.remakeConstraints {
+                        $0.center.equalToSuperview()
+                    }
+                    
+                    tableView.snp.remakeConstraints {
+                        $0.edges.equalToSuperview()
+                    }
+                    
+                    // On iPhone-8, 14.4, I need to scroll the tableView after setting its contentOffset and contentInset
+                    // Otherwise the layout is broken when exiting fullscreen in portrait mode.
+                    tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
+                }
+            } else {
                 playerView.snp.remakeConstraints {
                     $0.edges.equalToSuperview()
                 }
-            } else {
-                navigationController?.setNavigationBarHidden(false, animated: true)
-                playerView.setFullscreenButtonHidden(false)
                 
-                tableView.isHidden = false
-                let videoPlayerHeight = (1.0 / 3.0) * size.height
-                
-                playerView.snp.remakeConstraints {
-                    $0.top.equalTo(view.safeArea.top)
-                    $0.leading.trailing.equalToSuperview()
-                    $0.height.equalTo(videoPlayerHeight)
+                activityIndicator.snp.remakeConstraints {
+                    $0.center.equalToSuperview()
                 }
+            }
+        } else {
+            playerView.setFullscreenButtonHidden(UIDevice.isPhone)
+            
+            tableView.do {
+                $0.contentInset = .zero
+                $0.scrollIndicatorInsets = $0.contentInset
+                $0.contentOffset = .zero
+            }
+            
+            tableView.snp.remakeConstraints {
+                $0.edges.equalToSuperview()
             }
         }
     }
     
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        return .lightContent
-    }
-}
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
 
-// MARK: UIAdaptivePresentationControllerDelegate
-
-extension PlaylistViewController: UIAdaptivePresentationControllerDelegate {
-    func adaptivePresentationStyle(for controller: UIPresentationController, traitCollection: UITraitCollection) -> UIModalPresentationStyle {
-        return .fullScreen
+        if splitViewController?.isCollapsed == true {
+            updateLayoutForMode(.iPhoneLayout)
+            
+            if !playerView.isFullscreen {
+                navigationController?.setNavigationBarHidden(UIDevice.current.orientation.isLandscape, animated: true)
+            }
+        }
     }
 }
 
 // MARK: UITableViewDataSource
 
-extension PlaylistViewController: UITableViewDataSource {
+extension ListController: UITableViewDataSource {
     private func getRelativeDateFormat(date: Date) -> String {
         if #available(iOS 13.0, *) {
             let formatter = RelativeDateTimeFormatter()
@@ -286,7 +415,8 @@ extension PlaylistViewController: UITableViewDataSource {
             $0.detailLabel.text = ""
             $0.contentView.backgroundColor = .clear
             $0.backgroundColor = .clear
-            $0.thumbnailImage = nil
+            $0.thumbnailView.image = nil
+            $0.thumbnailView.backgroundColor = .black
         }
         
         let cacheState = PlaylistManager.shared.state(for: item.pageSrc)
@@ -304,7 +434,7 @@ extension PlaylistViewController: UITableViewDataSource {
         
         // Fixes a duration bug where sometimes the duration is NOT fetched!
         // So when we fetch the thumbnail, the duration will be updated (if possible)
-        cell.loadThumbnail(item: item) { newTrackDuration in
+        loadThumbnail(item: item, cell: cell) { newTrackDuration in
             guard let newTrackDuration = newTrackDuration else { return }
             
             if newTrackDuration > 0.0 && item.duration <= 0.0 {
@@ -316,7 +446,7 @@ extension PlaylistViewController: UITableViewDataSource {
                                            duration: Float(newTrackDuration),
                                            detected: item.detected,
                                            dateAdded: item.dateAdded)
-                Playlist.shared.updateItem(mediaSrc: item.src, item: newItem, completion: {})
+                Playlist.shared.updateItem(mediaSrc: item.src, item: newItem)
             }
         }
         
@@ -329,11 +459,71 @@ extension PlaylistViewController: UITableViewDataSource {
         
         return headerView
     }
+    
+    // MARK: - Thumbnail
+    
+    private func loadThumbnail(item: PlaylistInfo, cell: PlaylistCell, onDurationUpdated: ((TimeInterval?) -> Void)? = nil) {
+        guard let url = URL(string: item.src) else { return }
+        
+        // Loading from Cache failed, attempt to fetch HLS thumbnail
+        cell.thumbnailGenerator = HLSThumbnailGenerator(url: url, time: 3, completion: { [weak self] image, trackDuration, error in
+            guard let self = self else { return }
+            
+            log.error(error)
+            
+            if let trackDuration = trackDuration {
+                onDurationUpdated?(trackDuration)
+            }
+            
+            if let image = image {
+                cell.thumbnailView.image = image
+                cell.thumbnailView.backgroundColor = .black
+                cell.thumbnailGenerator = nil
+                SDImageCache.shared.store(image, forKey: url.absoluteString, completion: nil)
+            } else {
+                // We can fall back to AVAssetImageGenerator or FavIcon
+                self.loadThumbnailFallbackImage(item: item, cell: cell)
+            }
+        })
+    }
+    
+    // Fall back to AVAssetImageGenerator
+    // If that fails, fallback to FavIconFetcher
+    private func loadThumbnailFallbackImage(item: PlaylistInfo, cell: PlaylistCell) {
+        guard let url = URL(string: item.src) else { return }
+
+        let imageCache = SDImageCache.shared
+        let imageGenerator = AVAssetImageGenerator(asset: AVAsset(url: url))
+        imageGenerator.appliesPreferredTrackTransform = false
+
+        let time = CMTimeMake(value: 3, timescale: 1)
+        imageGenerator.generateCGImagesAsynchronously(forTimes: [NSValue(time: time)]) { _, cgImage, _, result, error in
+            if result == .succeeded, let cgImage = cgImage {
+                let image = UIImage(cgImage: cgImage)
+                imageCache.store(image, forKey: url.absoluteString, completion: nil)
+                
+                DispatchQueue.main.async {
+                    cell.thumbnailView.image = image
+                    cell.thumbnailView.backgroundColor = .black
+                }
+            } else {
+                guard let url = URL(string: item.pageSrc) else { return }
+                
+                DispatchQueue.main.async {
+                    cell.thumbnailView.cancelFaviconLoad()
+                    cell.thumbnailView.clearMonogramFavicon()
+                    cell.thumbnailView.contentMode = .scaleAspectFit
+                    cell.thumbnailView.image = FaviconFetcher.defaultFaviconImage
+                    cell.thumbnailView.loadFavicon(for: url)
+                }
+            }
+        }
+    }
 }
 
 // MARK: UITableViewDelegate
 
-extension PlaylistViewController: UITableViewDelegate {
+extension ListController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         
@@ -422,9 +612,8 @@ extension PlaylistViewController: UITableViewDelegate {
             let selectedCell = tableView.cellForRow(at: indexPath) as? PlaylistCell
 
             let item = PlaylistManager.shared.itemAtIndex(indexPath.row)
-            infoLabel.text = item.name
             playerView.setVideoInfo(videoDomain: item.pageSrc, videoTitle: item.pageTitle)
-            mediaInfo.updateNowPlayingMediaArtwork(image: selectedCell?.thumbnailImage)
+            mediaInfo.updateNowPlayingMediaArtwork(image: selectedCell?.thumbnailView.image)
             
             mediaInfo.loadMediaItem(item, index: indexPath.row, autoPlayEnabled: autoPlayEnabled) { [weak self] error in
                 guard let self = self else { return }
@@ -450,7 +639,9 @@ extension PlaylistViewController: UITableViewDelegate {
                     self.present(alert, animated: true, completion: nil)
                     
                 case .none:
-                    selectedCell?.loadThumbnail(item: item)
+                    if let selectedCell = selectedCell {
+                        self.loadThumbnail(item: item, cell: selectedCell)
+                    }
                     Preferences.Playlist.lastPlayedItemUrl.value = item.pageSrc
                 }
             }
@@ -468,7 +659,7 @@ extension PlaylistViewController: UITableViewDelegate {
 
 // MARK: - Reordering of cells
 
-extension PlaylistViewController: UITableViewDragDelegate, UITableViewDropDelegate {
+extension ListController: UITableViewDragDelegate, UITableViewDropDelegate {
     func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
         return true
     }
@@ -558,7 +749,7 @@ extension PlaylistViewController: UITableViewDragDelegate, UITableViewDropDelega
     }
 }
 
-extension PlaylistViewController: UIGestureRecognizerDelegate {
+extension ListController: UIGestureRecognizerDelegate {
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
         return !tableView.isEditing
     }
@@ -566,7 +757,7 @@ extension PlaylistViewController: UIGestureRecognizerDelegate {
 
 // MARK: VideoViewDelegate
 
-extension PlaylistViewController: VideoViewDelegate {
+extension ListController: VideoViewDelegate {
     func onPreviousTrack() {
         if currentlyPlayingItemIndex <= 0 {
             return
@@ -622,32 +813,34 @@ extension PlaylistViewController: VideoViewDelegate {
     }
     
     func onFullScreen() {
-        navigationController?.setNavigationBarHidden(true, animated: true)
-        tableView.isHidden = true
-        playerView.snp.remakeConstraints {
-            $0.edges.equalToSuperview()
+        if !UIDevice.isIpad {
+            navigationController?.setNavigationBarHidden(true, animated: true)
+            tableView.isHidden = true
+            playerView.snp.remakeConstraints {
+                $0.edges.equalToSuperview()
+            }
+        } else {
+            (splitViewController?.parent as? PlaylistViewController)?.onFullscreen()
         }
     }
     
     func onExitFullScreen() {
-        if UIDevice.current.orientation.isPortrait {
+        if UIDevice.isIpad {
+            (splitViewController?.parent as? PlaylistViewController)?.onExitFullscreen()
+        } else if UIDevice.current.orientation.isPortrait {
             navigationController?.setNavigationBarHidden(false, animated: true)
             tableView.isHidden = false
-            
-            let videoPlayerHeight = (1.0 / 3.0) * (UIScreen.main.bounds.size.height > UIScreen.main.bounds.size.width ? UIScreen.main.bounds.size.height : UIScreen.main.bounds.size.width)
-            
-            playerView.snp.remakeConstraints {
-                $0.top.equalTo(view.safeArea.top)
-                $0.leading.trailing.equalToSuperview()
-                $0.height.equalTo(videoPlayerHeight)
-            }
+            updateLayoutForMode(.iPhoneLayout)
+        } else {
+            playerView.setFullscreenButtonHidden(true)
+            updateLayoutForMode(.iPhoneLayout)
         }
     }
 }
 
 // MARK: AVPlayerViewControllerDelegate && AVPictureInPictureControllerDelegate
 
-extension PlaylistViewController: AVPlayerViewControllerDelegate, AVPictureInPictureControllerDelegate {
+extension ListController: AVPlayerViewControllerDelegate, AVPictureInPictureControllerDelegate {
 
     // MARK: - AVPlayerViewControllerDelegate
     
@@ -670,7 +863,7 @@ extension PlaylistViewController: AVPlayerViewControllerDelegate, AVPictureInPic
     func playerViewControllerWillStartPictureInPicture(_ playerViewController: AVPlayerViewController) {
         playerView.detachLayer()
         
-        (UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController = self.navigationController
+        (UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController = splitViewController?.parent
     }
     
     func playerViewControllerDidStartPictureInPicture(_ playerViewController: AVPlayerViewController) {
@@ -699,12 +892,13 @@ extension PlaylistViewController: AVPlayerViewControllerDelegate, AVPictureInPic
     func playerViewController(_ playerViewController: AVPlayerViewController, restoreUserInterfaceForPictureInPictureStopWithCompletionHandler completionHandler: @escaping (Bool) -> Void) {
         
         if let delegate = UIApplication.shared.delegate as? AppDelegate,
-           let navigationController = delegate.playlistRestorationController {
+           let restorationController = delegate.playlistRestorationController {
+            restorationController.modalPresentationStyle = .fullScreen
             playerView.attachLayer()
-            delegate.browserViewController.present(navigationController, animated: true) {
+            delegate.browserViewController.present(restorationController, animated: true) {
                 self.playerView.player.play()
+                delegate.playlistRestorationController = nil
             }
-            delegate.playlistRestorationController = nil
         }
         
         playerController = nil
@@ -714,19 +908,27 @@ extension PlaylistViewController: AVPlayerViewControllerDelegate, AVPictureInPic
     // MARK: - AVPictureInPictureControllerDelegate
     func pictureInPictureControllerWillStartPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
         
-        (UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController = self.navigationController
+        (UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController = splitViewController?.parent
+        
+        if UIDevice.isIpad {
+            splitViewController?.dismiss(animated: true, completion: nil)
+        }
     }
     
     func pictureInPictureControllerDidStartPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
-        DispatchQueue.main.async {
-            // self.playerView.detachLayer()
-            self.dismiss(animated: true, completion: nil)
+        if UIDevice.isPhone {
+            DispatchQueue.main.async {
+                // self.playerView.detachLayer()
+                self.dismiss(animated: true, completion: nil)
+            }
         }
     }
     
     func pictureInPictureControllerDidStopPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
         if let delegate = UIApplication.shared.delegate as? AppDelegate {
-            // playerView.attachLayer()
+            if UIDevice.isIpad {
+                playerView.attachLayer()
+            }
             delegate.playlistRestorationController = nil
         }
     }
@@ -741,16 +943,18 @@ extension PlaylistViewController: AVPlayerViewControllerDelegate, AVPictureInPic
     func pictureInPictureController(_ pictureInPictureController: AVPictureInPictureController, restoreUserInterfaceForPictureInPictureStopWithCompletionHandler completionHandler: @escaping (Bool) -> Void) {
         
         if let delegate = UIApplication.shared.delegate as? AppDelegate,
-           let navigationController = delegate.playlistRestorationController {
-            delegate.browserViewController.present(controller: navigationController)
-            delegate.playlistRestorationController = nil
+           let restorationController = delegate.playlistRestorationController {
+            restorationController.modalPresentationStyle = .fullScreen
+            delegate.browserViewController.present(restorationController, animated: true) {
+                delegate.playlistRestorationController = nil
+            }
         }
         
         completionHandler(true)
     }
 }
 
-extension PlaylistViewController: PlaylistManagerDelegate {
+extension ListController: PlaylistManagerDelegate {
     func onDownloadProgressUpdate(id: String, percentComplete: Double) {
         if let index = PlaylistManager.shared.index(of: id),
            let cell = tableView.cellForRow(at: IndexPath(row: index, section: 0)) as? PlaylistCell {
@@ -824,7 +1028,7 @@ extension PlaylistViewController: PlaylistManagerDelegate {
     }
 }
 
-extension PlaylistViewController {
+extension ListController {
     func updateTableBackgroundView() {
         if PlaylistManager.shared.numberOfAssets() > 0 {
             tableView.backgroundView = nil
@@ -841,6 +1045,126 @@ extension PlaylistViewController {
             
             tableView.backgroundView = messageLabel
             tableView.separatorStyle = .none
+        }
+    }
+}
+
+private class DetailController: UIViewController, UIGestureRecognizerDelegate {
+    
+    private weak var playerView: VideoView?
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        setup()
+        layoutBarButtons()
+        addGestureRecognizers()
+    }
+    
+    // MARK: Private
+    
+    private func setup() {
+        view.backgroundColor = .black
+        
+        title = Strings.PlayList.playListMediaPlayerTitle
+        
+        navigationController?.do {
+            if #available(iOS 13.0, *) {
+                let appearance = UINavigationBarAppearance()
+                appearance.configureWithTransparentBackground()
+                appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
+                appearance.backgroundColor = BraveUX.popoverDarkBackground
+                
+                $0.navigationBar.standardAppearance = appearance
+                $0.navigationBar.barTintColor = BraveUX.popoverDarkBackground
+                $0.navigationBar.tintColor = .white
+            } else {
+                $0.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.white]
+                $0.navigationBar.backgroundColor = .clear
+                $0.navigationBar.barTintColor = BraveUX.popoverDarkBackground
+                $0.navigationBar.tintColor = .white
+            }
+        }
+    }
+    
+    private func layoutBarButtons() {
+        let exitBarButton =  UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(onExit(_:)))
+        let sideListBarButton = UIBarButtonItem(image: #imageLiteral(resourceName: "playlist_split_navigation"), style: .done, target: self, action: #selector(onDisplayModeChange))
+        
+        navigationItem.rightBarButtonItem =
+            PlayListSide(rawValue: Preferences.Playlist.listViewSide.value) == .left ? exitBarButton : sideListBarButton
+        navigationItem.leftBarButtonItem =
+            PlayListSide(rawValue: Preferences.Playlist.listViewSide.value) == .left ? sideListBarButton : exitBarButton
+    }
+    
+    private func addGestureRecognizers() {
+        let slideToRevealGesture = UISwipeGestureRecognizer(target: self, action: #selector(handleGesture))
+        slideToRevealGesture.direction = PlayListSide(rawValue: Preferences.Playlist.listViewSide.value) == .left ? .right : .left
+        
+        view.addGestureRecognizer(slideToRevealGesture)
+    }
+    
+    private func updateSplitViewDisplayMode(to displayMode: UISplitViewController.DisplayMode) {
+        UIView.animate(withDuration: 0.2) {
+            self.splitViewController?.preferredDisplayMode = displayMode
+        }
+    }
+    
+    // MARK: Actions
+    
+    func onFullScreen() {
+        navigationController?.setNavigationBarHidden(true, animated: true)
+        splitViewController?.preferredDisplayMode = .secondaryOnly
+    }
+    
+    func onExitFullScreen() {
+        navigationController?.setNavigationBarHidden(false, animated: true)
+        splitViewController?.preferredDisplayMode = .primaryOverlay
+    }
+        
+    @objc
+    private func onExit(_ button: UIBarButtonItem) {
+        self.dismiss(animated: true, completion: nil)
+    }
+    
+    @objc
+    func handleGesture(gesture: UISwipeGestureRecognizer) {
+        guard gesture.direction == .right,
+              let playerView = playerView,
+              !playerView.checkInsideTrackBar(point: gesture.location(in: view)) else {
+            return
+        }
+        
+       onDisplayModeChange()
+    }
+    
+    @objc
+    private func onDisplayModeChange() {
+        updateSplitViewDisplayMode(
+            to: splitViewController?.displayMode == .primaryOverlay ? .secondaryOnly : .primaryOverlay)
+    }
+    
+    public func setVideoPlayer(_ videoPlayer: VideoView?) {
+        if playerView?.superview == view {
+            playerView?.removeFromSuperview()
+        }
+        
+        playerView = videoPlayer
+    }
+    
+    public func updateLayoutForMode(_ mode: DisplayMode) {
+        guard let playerView = playerView else { return }
+        
+        if mode == .iPadLayout {
+            view.addSubview(playerView)
+            playerView.snp.makeConstraints {
+                $0.bottom.left.right.equalTo(view)
+                $0.top.equalTo(view.safeAreaLayoutGuide)
+            }
+        } else {
+            if playerView.superview == view {
+                playerView.removeFromSuperview()
+            }
         }
     }
 }

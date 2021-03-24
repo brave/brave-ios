@@ -107,7 +107,6 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         
         controlsView.repeatButton.addTarget(self, action: #selector(onRepeat(_:)), for: .touchUpInside)
         controlsView.playPauseButton.addTarget(self, action: #selector(onPlay(_:)), for: .touchUpInside)
-        controlsView.castButton.addTarget(self, action: #selector(onCast(_:)), for: .touchUpInside)
         controlsView.playbackRateButton.addTarget(self, action: #selector(onPlaybackRateChanged(_:)), for: .touchUpInside)
         controlsView.skipBackButton.addTarget(self, action: #selector(onSeekBackwards(_:)), for: .touchUpInside)
         controlsView.skipForwardButton.addTarget(self, action: #selector(onSeekForwards(_:)), for: .touchUpInside)
@@ -201,7 +200,8 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
                 }
             })
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 5.0, execute: fadeAnimationWorkItem!)
+            guard let fadeAnimationWorkItem = fadeAnimationWorkItem else { return }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 5.0, execute: fadeAnimationWorkItem)
         } else if isPlaying && isOverlayDisplayed {
             showOverlays(false)
             isOverlayDisplayed = false
@@ -225,7 +225,8 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
             self.isOverlayDisplayed = false
         })
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0, execute: fadeAnimationWorkItem!)
+        guard let fadeAnimationWorkItem = fadeAnimationWorkItem else { return }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0, execute: fadeAnimationWorkItem)
     }
     
     @objc
@@ -255,11 +256,6 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     }
     
     @objc
-    private func onCast(_ button: UIButton) {
-        // print("Route Picker Video")
-    }
-    
-    @objc
     private func onPlaybackRateChanged(_ button: UIButton) {
         if requestedPlaybackRate == 1.0 {
             requestedPlaybackRate = 1.5
@@ -285,10 +281,6 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
                 self.delegate?.onPictureInPicture(enabled: false)
                 pictureInPictureController.stopPictureInPicture()
             } else {
-                /*if #available(iOS 14.2, *) {
-                    pictureInPictureController.canStartPictureInPictureAutomaticallyFromInline = true
-                }*/
-                
                 if #available(iOS 14.0, *) {
                     pictureInPictureController.requiresLinearPlayback = false
                 }
@@ -457,16 +449,16 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         var except = except
         var display = display
         
-        if !isVideoAvailable() {
+        if isVideoAvailable() {
+            if show {
+                except.append(particleView)
+            }
+        } else {
             // If the overlay is showing, hide the particle view.. else show it..
             except.append(particleView)
             
             if !show {
                 display.append(particleView)
-            }
-        } else {
-            if show {
-                except.append(particleView)
             }
         }
         
@@ -489,11 +481,8 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         if displayTitle.isEmpty {
             var hostDomain = ""
             
-            if let host = URL(string: videoDomain)?.host {
+            if let host = URL(string: videoDomain)?.baseDomain {
                 hostDomain = host
-                if host.hasPrefix("www.") {
-                    hostDomain = String(host.dropFirst(4))
-                }
             }
             
             if hostDomain.hasSuffix("/") {
@@ -530,14 +519,14 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     }
     
     public func play() {
-        if !isPlaying {
+        if isPlaying {
+            showOverlays(isOverlayDisplayed)
+        } else {
             controlsView.playPauseButton.setImage(#imageLiteral(resourceName: "playlist_pause"), for: .normal)
             player.play()
             
             showOverlays(false)
             isOverlayDisplayed = false
-        } else {
-            showOverlays(isOverlayDisplayed)
         }
     }
     

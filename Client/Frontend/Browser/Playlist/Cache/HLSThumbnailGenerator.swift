@@ -21,13 +21,12 @@ public class HLSThumbnailGenerator {
     private let videoOutput: AVPlayerItemVideoOutput
     private var observer: NSKeyValueObservation?
     private var state: State = .loading
-    private let queue: DispatchQueue
-    private let completion: (UIImage?, TimeInterval?) -> Void
+    private let queue = DispatchQueue(label: "com.brave.hls-thumbnail-generator")
+    private let completion: (UIImage?, TimeInterval?, Error?) -> Void
 
-    init(url: URL, time: TimeInterval, completion: @escaping (UIImage?, TimeInterval?) -> Void) {
+    init(url: URL, time: TimeInterval, completion: @escaping (UIImage?, TimeInterval?, Error?) -> Void) {
         self.asset = AVAsset(url: url)
         self.sourceURL = url
-        self.queue = DispatchQueue(label: "com.brave.hls-thumbnail-generator")
         self.completion = completion
         
         let item = AVPlayerItem(asset: asset, automaticallyLoadedAssetKeys: [])
@@ -36,7 +35,7 @@ public class HLSThumbnailGenerator {
         }
         
         self.videoOutput = AVPlayerItemVideoOutput(pixelBufferAttributes: [
-                                                kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA
+            kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA
         ])
         
         self.observer = self.player.currentItem?.observe(\.status, options: [.old, .new]) { [weak self] item, _ in
@@ -48,7 +47,7 @@ public class HLSThumbnailGenerator {
             } else if item.status == .failed {
                 self.state = .failed
                 DispatchQueue.main.async {
-                    self.completion(nil, nil)
+                    self.completion(nil, nil, "Failed to load item")
                 }
             }
         }
@@ -57,9 +56,9 @@ public class HLSThumbnailGenerator {
         if let cachedImage = SDImageCache.shared.imageFromCache(forKey: sourceURL.absoluteString) {
             DispatchQueue.main.async {
                 if let duration = self.player.currentItem?.duration {
-                    self.completion(cachedImage, CMTimeGetSeconds(duration))
+                    self.completion(cachedImage, CMTimeGetSeconds(duration), nil)
                 } else {
-                   self.completion(cachedImage, nil)
+                   self.completion(cachedImage, nil, nil)
                 }
             }
         }
@@ -68,7 +67,7 @@ public class HLSThumbnailGenerator {
     }
 
     private func generateThumbnail(at time: TimeInterval) {
-        self.queue.async {
+        queue.async {
             let time = CMTime(seconds: time, preferredTimescale: 1)
             self.player.seek(to: time) { [weak self] finished in
                 guard let self = self else { return }
@@ -79,13 +78,13 @@ public class HLSThumbnailGenerator {
                             self.snapshotPixelBuffer(buffer, atTime: time.seconds)
                         } else {
                             DispatchQueue.main.async {
-                                self.completion(nil, nil) // Cannot copy pixel-buffer (PBO)
+                                self.completion(nil, nil, "Cannot copy pixel-buffer (PBO)")
                             }
                         }
                     }
                 } else {
                     DispatchQueue.main.async {
-                        self.completion(nil, nil) // Failed to seek to specified time
+                        self.completion(nil, nil, "Failed to seek to specified time")
                     }
                 }
             }
@@ -103,14 +102,14 @@ public class HLSThumbnailGenerator {
             
             DispatchQueue.main.async {
                 if let duration = self.player.currentItem?.duration {
-                    self.completion(result, CMTimeGetSeconds(duration))
+                    self.completion(result, CMTimeGetSeconds(duration), nil)
                 } else {
-                    self.completion(result, nil)
+                    self.completion(result, nil, nil)
                 }
             }
         } else {
             DispatchQueue.main.async {
-                self.completion(nil, nil) // Failed to create image from pixel-buffer frame.
+                self.completion(nil, nil, "Failed to create image from pixel-buffer frame.")
             }
         }
     }

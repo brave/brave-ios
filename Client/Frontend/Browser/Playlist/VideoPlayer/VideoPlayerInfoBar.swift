@@ -9,7 +9,6 @@ import AVKit
 
 class VideoPlayerInfoBar: UIView {
     private let controlStackView = UIStackView().then {
-        $0.axis = .horizontal
         $0.spacing = 32.0
     }
     
@@ -20,6 +19,9 @@ class VideoPlayerInfoBar: UIView {
     private let favIconImageView = UIImageView().then {
         $0.contentMode = .scaleAspectFit
         $0.layer.cornerRadius = 6.0
+        if #available(iOS 13.0, *) {
+            $0.layer.cornerCurve = .continuous
+        }
         $0.layer.masksToBounds = true
     }
     

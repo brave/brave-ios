@@ -10,7 +10,7 @@ import CoreData
 
 private let log = Logger.browserLogger
 
-protocol PlaylistManagerDelegate: class {
+protocol PlaylistManagerDelegate: AnyObject {
     func onDownloadProgressUpdate(id: String, percentComplete: Double)
     func onDownloadStateChanged(id: String, state: PlaylistDownloadManager.DownloadState, displayName: String)
     
@@ -24,7 +24,7 @@ class PlaylistManager: NSObject {
     weak var delegate: PlaylistManagerDelegate?
     
     private let downloadManager = PlaylistDownloadManager()
-    private var frc = Playlist.shared.fetchResultsController()
+    private let frc = Playlist.shared.fetchResultsController()
     private var didRestoreSession = false
     
     private override init() {
@@ -51,25 +51,25 @@ class PlaylistManager: NSObject {
     }
     
     func reorderItems(from sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-        if var objects = frc.fetchedObjects {
-            frc.delegate = nil
-            
-            let src = frc.object(at: sourceIndexPath)
-            objects.remove(at: sourceIndexPath.row)
-            objects.insert(src, at: destinationIndexPath.row)
-            
-            for (order, item) in objects.enumerated().reversed() {
-                item.order = Int32(order)
-            }
-            
-            do {
-                try frc.managedObjectContext.save()
-            } catch {
-                log.error(error)
-            }
-            
-            frc.delegate = self
+        guard var objects = frc.fetchedObjects else { return }
+
+        frc.delegate = nil
+        
+        let src = frc.object(at: sourceIndexPath)
+        objects.remove(at: sourceIndexPath.row)
+        objects.insert(src, at: destinationIndexPath.row)
+        
+        for (order, item) in objects.enumerated().reversed() {
+            item.order = Int32(order)
         }
+        
+        do {
+            try frc.managedObjectContext.save()
+        } catch {
+            log.error(error)
+        }
+        
+        frc.delegate = self
     }
     
     func state(for pageSrc: String) -> PlaylistDownloadManager.DownloadState {
@@ -93,7 +93,7 @@ class PlaylistManager: NSObject {
             formatter.countStyle = .file
             return formatter.string(fromByteCount: Int64(size))
         }
-        return ""
+        return nil
     }
     
     func reloadData() {
@@ -158,43 +158,9 @@ class PlaylistManager: NSObject {
             log.error("An error occured deleting Playlist Cached Item \(item.name): \(error)")
         }
     }
-    
-    // MARK: - Private
-    
-    private struct MediaDownloadTask {
-        let id: String
-        let name: String
-        let asset: AVURLAsset
-        
-        enum Keys: String {
-            case id
-            case state
-            case displayName
-        }
-    }
 }
 
 extension PlaylistManager {
-    private func displayNames(for mediaSelection: AVMediaSelection) -> String {
-        guard let asset = mediaSelection.asset else {
-            return ""
-        }
-        
-        var names = ""
-        for mediaCharacteristic in asset.availableMediaCharacteristicsWithMediaSelectionOptions {
-            guard let mediaSelectionGroup = asset.mediaSelectionGroup(forMediaCharacteristic: mediaCharacteristic),
-                  let option = mediaSelection.selectedMediaOption(in: mediaSelectionGroup) else { continue }
-
-            if names.isEmpty {
-                names += " " + option.displayName
-            } else {
-                names += ", " + option.displayName
-            }
-        }
-
-        return names
-    }
-    
     private func localAsset(for pageSrc: String) -> AVURLAsset? {
         guard let item = Playlist.shared.getItem(pageSrc: pageSrc),
               let cachedData = item.cachedData else { return nil }
@@ -250,5 +216,23 @@ extension PlaylistManager: NSFetchedResultsControllerDelegate {
     
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         delegate?.controllerWillChangeContent()
+    }
+}
+
+extension AVAsset {
+    func displayNames(for mediaSelection: AVMediaSelection) -> String {
+        var names = ""
+        for mediaCharacteristic in availableMediaCharacteristicsWithMediaSelectionOptions {
+            guard let mediaSelectionGroup = mediaSelectionGroup(forMediaCharacteristic: mediaCharacteristic),
+                  let option = mediaSelection.selectedMediaOption(in: mediaSelectionGroup) else { continue }
+
+            if names.isEmpty {
+                names += " " + option.displayName
+            } else {
+                names += ", " + option.displayName
+            }
+        }
+
+        return names
     }
 }

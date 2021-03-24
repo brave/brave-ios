@@ -24,17 +24,20 @@ class Playlist {
             let orderSort = NSSortDescriptor(key: "order", ascending: true)
             request.sortDescriptors = [orderSort]
             
-            let items = (try? self.backgroundContext.fetch(request)) ?? []
-            
-            for (order, item) in items.enumerated() {
-                item.order = Int32(order)
+            do {
+                let items = try self.backgroundContext.fetch(request)
+                for (order, item) in items.enumerated() {
+                    item.order = Int32(order)
+                }
+            } catch {
+                log.error(error)
             }
             
             self.saveContext(self.backgroundContext)
         }
     }
     
-    func updateItem(mediaSrc: String, item: PlaylistInfo, completion: @escaping () -> Void) {
+    func updateItem(mediaSrc: String, item: PlaylistInfo, completion: (() -> Void)? = nil) {
         if itemExists(item: item) {
             backgroundContext.perform { [weak self] in
                 guard let self = self else { return }
@@ -42,24 +45,31 @@ class Playlist {
                 let request: NSFetchRequest<PlaylistItem> = PlaylistItem.fetchRequest()
                 request.predicate = NSPredicate(format: "mediaSrc == %@", mediaSrc)
                 
-                (try? self.backgroundContext.fetch(request))?.forEach({
-                    $0.name = item.name
-                    $0.pageTitle = item.pageTitle
-                    $0.pageSrc = item.pageSrc
-                    $0.duration = item.duration
-                    $0.mimeType = item.mimeType
-                    $0.mediaSrc = item.src
-                })
+                do {
+                    try self.backgroundContext.fetch(request).forEach({
+                        $0.name = item.name
+                        $0.pageTitle = item.pageTitle
+                        $0.pageSrc = item.pageSrc
+                        $0.duration = item.duration
+                        $0.mimeType = item.mimeType
+                        $0.mediaSrc = item.src
+                    })
+                } catch {
+                    log.error(error)
+                }
                 
                 self.saveContext(self.backgroundContext)
-                completion()
+                
+                DispatchQueue.main.async {
+                    completion?()
+                }
             }
         } else {
             self.addItem(item: item, cachedData: nil, completion: completion)
         }
     }
     
-    func addItem(item: PlaylistInfo, cachedData: Data?, completion: @escaping () -> Void) {
+    func addItem(item: PlaylistInfo, cachedData: Data?, completion: (() -> Void)? = nil) {
         if !itemExists(item: item) {
             backgroundContext.perform { [weak self] in
                 guard let self = self else { return }
@@ -91,10 +101,14 @@ class Playlist {
                         break
                 }
                 
-                completion()
+                DispatchQueue.main.async {
+                    completion?()
+                }
             }
         } else {
-            completion()
+            DispatchQueue.main.async {
+                completion?()
+            }
         }
     }
     
@@ -111,20 +125,26 @@ class Playlist {
                     return deleteRequest
                 }()
                 
-                if let result = (try? self.backgroundContext.execute(request)) as? NSBatchDeleteResult {
-                    if let deletedObjects = result.result as? [NSManagedObjectID] {
+                do {
+                    if let result = try self.backgroundContext.execute(request) as? NSBatchDeleteResult, let deletedObjects = result.result as? [NSManagedObjectID] {
                         NSManagedObjectContext.mergeChanges(
                             fromRemoteContextSave: [NSDeletedObjectsKey: deletedObjects],
                             into: [self.mainContext, self.backgroundContext]
                         )
                     }
-                } else {
+                } catch {
+                    log.error(error)
+                    
                     let request: NSFetchRequest<PlaylistItem> = PlaylistItem.fetchRequest()
                     request.predicate = NSPredicate(format: "pageSrc == %@", item.pageSrc)
                     
-                    (try? self.backgroundContext.fetch(request))?.forEach({
-                        self.backgroundContext.delete($0)
-                    })
+                    do {
+                        try self.backgroundContext.fetch(request).forEach({
+                            self.backgroundContext.delete($0)
+                        })
+                    } catch {
+                        log.error(error)
+                    }
                 }
                 
                 self.saveContext(self.backgroundContext)
@@ -146,17 +166,24 @@ class Playlist {
         let orderSort = NSSortDescriptor(key: "order", ascending: true)
         request.sortDescriptors = [orderSort]
         
-        return (try? mainContext.fetch(request))?.map({
-            return PlaylistInfo(item: $0)
-        }) ?? []
+        do {
+            return try mainContext.fetch(request).map({ PlaylistInfo(item: $0) })
+        } catch {
+            log.error(error)
+            return []
+        }
     }
     
     func getItem(pageSrc: String) -> PlaylistItem? {
         let request: NSFetchRequest<PlaylistItem> = PlaylistItem.fetchRequest()
         request.predicate = NSPredicate(format: "pageSrc == %@", pageSrc)
         
-        if let item = (try? mainContext.fetch(request))?.first {
-            return item
+        do {
+            if let item = try mainContext.fetch(request).first {
+                return item
+            }
+        } catch {
+            log.error(error)
         }
         return nil
     }
@@ -165,7 +192,13 @@ class Playlist {
         let request: NSFetchRequest<PlaylistItem> = PlaylistItem.fetchRequest()
         request.predicate = NSPredicate(format: "pageSrc == %@", pageSrc)
         request.fetchLimit = 1
-        return (try? mainContext.fetch(request))?.first?.cachedData
+        
+        do {
+            return try mainContext.fetch(request).first?.cachedData
+        } catch {
+            log.error(error)
+        }
+        return nil
     }
     
     func updateCache(pageSrc: String, cachedData: Data?) {
@@ -173,19 +206,35 @@ class Playlist {
         request.predicate = NSPredicate(format: "pageSrc == %@", pageSrc)
         request.fetchLimit = 1
         
-        (try? mainContext.fetch(request))?.first?.cachedData = cachedData
-        saveContext(mainContext)
+        do {
+            try mainContext.fetch(request).first?.cachedData = cachedData
+            saveContext(mainContext)
+        } catch {
+            log.error(error)
+        }
     }
     
     func itemExists(item: PlaylistInfo) -> Bool {
         let request: NSFetchRequest<PlaylistItem> = PlaylistItem.fetchRequest()
         request.predicate = NSPredicate(format: "pageSrc == %@", item.pageSrc)
-        return ((try? mainContext.count(for: request)) ?? 0) > 0
+        
+        do {
+            return try mainContext.count(for: request) > 0
+        } catch {
+            log.error(error)
+        }
+        return false
     }
     
     func getPlaylistCount() -> Int {
         let request: NSFetchRequest<PlaylistItem> = PlaylistItem.fetchRequest()
-        return (try? mainContext.count(for: request)) ?? 0
+        
+        do {
+            return try mainContext.count(for: request)
+        } catch {
+            log.error(error)
+            return 0
+        }
     }
     
     func fetchResultsController() -> NSFetchedResultsController<PlaylistItem> {
@@ -245,7 +294,7 @@ class Playlist {
     // MARK: - CoreData Stack
     
     private lazy var cachedPersistentContainer = {
-        return NSPersistentContainer(name: "Playlist")
+        NSPersistentContainer(name: "Playlist")
     }()
     
     private func create() -> NSPersistentContainer {
@@ -259,7 +308,7 @@ class Playlist {
                 
                 self.cachedPersistentContainer.loadPersistentStores(completionHandler: { (storeDescription, error) in
                     if let error = error as NSError? {
-                        fatalError("Playlist Load persistent store error: \(error)")
+                        assertionFailure("Playlist Load persistent store error: \(error)")
                     }
                 })
             }
@@ -271,7 +320,13 @@ class Playlist {
         dbLock.lock(); defer { dbLock.unlock() }
         
         cachedPersistentContainer.persistentStoreDescriptions.forEach({
-            try? cachedPersistentContainer.persistentStoreCoordinator.destroyPersistentStore(at: $0.url!, ofType: NSSQLiteStoreType, options: nil)
+            if let url = $0.url {
+                do {
+                    try cachedPersistentContainer.persistentStoreCoordinator.destroyPersistentStore(at: url, ofType: NSSQLiteStoreType, options: nil)
+                } catch {
+                    log.error(error)
+                }
+            }
         })
     }
 }

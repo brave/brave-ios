@@ -211,7 +211,7 @@ class SettingsViewController: TableViewController {
         }
         
         section.rows.append(
-            Row(text: Strings.PlayList.playListSectionTitle, selection: {
+            Row(text: Strings.PlayList.playListSectionTitle, selection: { [unowned self] in
                 let playlistSettings = PlaylistSettingsViewController(self.theme)
                 self.navigationController?.pushViewController(playlistSettings, animated: true)
             }, image: #imageLiteral(resourceName: "playlist_menu").template, accessory: .disclosureIndicator)

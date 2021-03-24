@@ -43,13 +43,13 @@ struct PlaylistInfo: Codable {
     
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.name = (try? container.decode(String.self, forKey: .name)) ?? ""
-        self.src = (try? container.decode(String.self, forKey: .src)) ?? ""
-        self.pageSrc = (try? container.decode(String.self, forKey: .pageSrc)) ?? ""
-        self.pageTitle = (try? container.decode(String.self, forKey: .pageTitle)) ?? ""
-        self.mimeType = (try? container.decode(String.self, forKey: .mimeType)) ?? ""
-        self.duration = (try? container.decode(Float.self, forKey: .duration)) ?? 0.0
-        self.detected = (try? container.decode(Bool.self, forKey: .detected)) ?? false
+        self.name = try container.decode(String.self, forKey: .name)
+        self.src = try container.decode(String.self, forKey: .src)
+        self.pageSrc = try container.decode(String.self, forKey: .pageSrc)
+        self.pageTitle = try container.decode(String.self, forKey: .pageTitle)
+        self.mimeType = try container.decodeIfPresent(String.self, forKey: .mimeType) ?? ""
+        self.duration = try container.decodeIfPresent(Float.self, forKey: .duration) ?? 0.0
+        self.detected = try container.decodeIfPresent(Bool.self, forKey: .detected) ?? false
         self.dateAdded = Date()
     }
     

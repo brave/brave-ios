@@ -23,7 +23,7 @@ class PlaylistParticleEmitter: UIView {
     }
     
     override class var layerClass: AnyClass {
-        return CAEmitterLayer.self
+        CAEmitterLayer.self
     }
     
     override func layoutSubviews() {
