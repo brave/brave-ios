@@ -285,8 +285,8 @@ class MenuViewController: UITableViewController {
     private typealias DoneButton = (style: UIBarButtonItem.SystemItem, position: DoneButtonPosition)
     
     private func open(_ viewController: UIViewController, doneButton: DoneButton,
-                      allowSwipeToDismiss: Bool = true, alwaysFullScreen: Bool = false) {
-        let nav = SettingsNavigationController(rootViewController: viewController)
+                      allowSwipeToDismiss: Bool = true, alwaysFullScreen: Bool = false, forcePortraitIfIphone: Bool = true) {
+        let navigationController = SettingsNavigationController(rootViewController: viewController)
         
         // All menu views should be opened in portrait on iPhones.
         UIDevice.current.forcePortraitIfIphone(for: UIApplication.shared)
@@ -296,16 +296,17 @@ class MenuViewController: UITableViewController {
         nav.modalPresentationStyle =
             UIDevice.current.userInterfaceIdiom == .phone ? .pageSheet : .formSheet
         
-        
-        let button = UIBarButtonItem(barButtonSystemItem: doneButton.style, target: nav, action: #selector(nav.done))
+        let button = UIBarButtonItem(barButtonSystemItem: doneButton.style,
+                                     target: navigationController,
+                                     action: #selector(navigationController.done))
         
         switch doneButton.position {
-        case .left: nav.navigationBar.topItem?.leftBarButtonItem = button
-        case .right: nav.navigationBar.topItem?.rightBarButtonItem = button
+            case .left: navigationController.navigationBar.topItem?.leftBarButtonItem = button
+            case .right: navigationController.navigationBar.topItem?.rightBarButtonItem = button
         }
         
         dismissView()
-        bvc.present(nav, animated: true)
+        bvc.present(navigationController, animated: true)
     }
     
     private func openVPNAction(menuCell: MenuCell) {
