@@ -28,7 +28,7 @@
 			<key>INIntentKeyParameter</key>
 			<string>websiteURL</string>
 			<key>INIntentLastParameterTag</key>
-			<integer>2</integer>
+			<integer>3</integer>
 			<key>INIntentManagedParameterCombinations</key>
 			<dict>
 				<key>websiteURL</key>
@@ -85,6 +85,13 @@
 					<string>WiB0aJ</string>
 					<key>INIntentParameterDisplayPriority</key>
 					<integer>1</integer>
+					<key>INIntentParameterMetadata</key>
+					<dict>
+						<key>INIntentParameterMetadataCapitalization</key>
+						<string>None</string>
+						<key>INIntentParameterMetadataDefaultValueID</key>
+						<string>avC9qd</string>
+					</dict>
 					<key>INIntentParameterName</key>
 					<string>websiteURL</string>
 					<key>INIntentParameterPromptDialogs</key>
@@ -103,9 +110,9 @@
 						</dict>
 					</array>
 					<key>INIntentParameterTag</key>
-					<integer>2</integer>
+					<integer>3</integer>
 					<key>INIntentParameterType</key>
-					<string>URL</string>
+					<string>String</string>
 				</dict>
 			</array>
 			<key>INIntentResponse</key>

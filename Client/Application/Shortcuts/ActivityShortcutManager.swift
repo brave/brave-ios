@@ -87,9 +87,9 @@ class ActivityShortcutManager: NSObject {
     
     // MARK: Intent Creation Methods
     
-    private func createOpenWebsiteIntent(with url: URL) -> OpenWebsiteIntent {
+    private func createOpenWebsiteIntent(with urlString: String) -> OpenWebsiteIntent {
         let intent = OpenWebsiteIntent()
-        intent.websiteURL = url
+        intent.websiteURL = urlString
         intent.suggestedInvocationPhrase = "Open Website"
         
         return intent
@@ -97,8 +97,8 @@ class ActivityShortcutManager: NSObject {
     
     // MARK: Intent Donation Methods
     
-    private func donateOpenWebsiteIntent(for url: URL) {
-        let intent = createOpenWebsiteIntent(with: url)
+    private func donateOpenWebsiteIntent(for urlString: String) {
+        let intent = createOpenWebsiteIntent(with: urlString)
 
         let interaction = INInteraction(intent: intent, response: nil)
         interaction.donate { (error) in
