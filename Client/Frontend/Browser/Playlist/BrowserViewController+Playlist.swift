@@ -29,7 +29,7 @@ extension BrowserViewController: PlaylistHelperDelegate {
         
         // Item requires the user to choose whether or not to add it to playlists
         let toast = PlaylistToast(item: info, state: itemState, completion: { [weak self] buttonPressed in
-            guard let self = self else { return }
+            guard let self = self, let item = self.playlistToast?.item else { return }
             
             switch itemState {
             // Item requires user action to add it to playlists
@@ -37,12 +37,12 @@ extension BrowserViewController: PlaylistHelperDelegate {
                 if buttonPressed {
                     // Update playlist with new items..
                     PlaylistItem.addItem(info, cachedData: nil) {
-                        PlaylistManager.shared.autoDownload(item: info)
+                        PlaylistManager.shared.autoDownload(item: item)
                         
                         log.debug("Playlist Item Added")
                         
                         self.playlistToast = nil
-                        self.showPlaylistToast(info: info, itemState: .added)
+                        self.showPlaylistToast(info: item, itemState: .added)
                         UIImpactFeedbackGenerator(style: .medium).bzzt()
                     }
                 } else {

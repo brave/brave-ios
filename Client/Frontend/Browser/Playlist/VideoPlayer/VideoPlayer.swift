@@ -536,7 +536,15 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     }
     
     public func setControlsEnabled(_ enabled: Bool) {
-        isUserInteractionEnabled = enabled
+        // Disable all controls except the side-panel and the exit button
+        
+        infoView.fullscreenButton.isUserInteractionEnabled = enabled
+        infoView.pictureInPictureButton.isUserInteractionEnabled = enabled
+        controlsView.isUserInteractionEnabled = enabled
+        
+        gestureRecognizers?.forEach({
+            $0.isEnabled = enabled
+        })
     }
     
     public func setFullscreenButtonHidden(_ hidden: Bool) {
