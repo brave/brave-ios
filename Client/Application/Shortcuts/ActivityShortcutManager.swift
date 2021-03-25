@@ -8,6 +8,8 @@ import Intents
 import CoreSpotlight
 import MobileCoreServices
 
+private let log = Logger.browserLogger
+
 /// Shortcut Activity Types and detailed information to create and perform actions
 enum ActivityType: String {
     case newTab = "NewTab"
@@ -80,6 +82,31 @@ class ActivityShortcutManager: NSObject {
                 browserViewController.openBlankNewTab(attemptLocationFieldFocus: true, isPrivate: false)
             case .newPrivateTab:
                 browserViewController.openBlankNewTab(attemptLocationFieldFocus: true, isPrivate: true)
+        }
+    }
+    
+    // MARK: Intent Creation Methods
+    
+    private func createOpenWebsiteIntent(with url: URL) -> OpenWebsiteIntent {
+        let intent = OpenWebsiteIntent()
+        intent.websiteURL = url
+        intent.suggestedInvocationPhrase = "Open Website"
+        
+        return intent
+    }
+    
+    // MARK: Intent Donation Methods
+    
+    private func donateOpenWebsiteIntent(for url: URL) {
+        let intent = createOpenWebsiteIntent(with: url)
+
+        let interaction = INInteraction(intent: intent, response: nil)
+        interaction.donate { (error) in
+            guard let error = error else {
+                return
+            }
+            
+            log.error("Failed to donate shorcut open website, error: \(error)")
         }
     }
 }

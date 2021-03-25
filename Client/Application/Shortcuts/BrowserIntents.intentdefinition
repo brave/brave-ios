@@ -49,8 +49,6 @@
 			<dict>
 				<key></key>
 				<dict>
-					<key>INIntentParameterCombinationIsPrimary</key>
-					<true/>
 					<key>INIntentParameterCombinationSubtitle</key>
 					<string>using website</string>
 					<key>INIntentParameterCombinationSubtitleID</key>
@@ -102,26 +100,6 @@
 							<true/>
 							<key>INIntentParameterPromptDialogType</key>
 							<string>Primary</string>
-						</dict>
-						<dict>
-							<key>INIntentParameterPromptDialogCustom</key>
-							<true/>
-							<key>INIntentParameterPromptDialogFormatString</key>
-							<string>There are ${count} options matching ‘${websiteURL}’.</string>
-							<key>INIntentParameterPromptDialogFormatStringID</key>
-							<string>hA2Go0</string>
-							<key>INIntentParameterPromptDialogType</key>
-							<string>DisambiguationIntroduction</string>
-						</dict>
-						<dict>
-							<key>INIntentParameterPromptDialogCustom</key>
-							<true/>
-							<key>INIntentParameterPromptDialogFormatString</key>
-							<string>Just to confirm, you wanted ‘${websiteURL}’?</string>
-							<key>INIntentParameterPromptDialogFormatStringID</key>
-							<string>EKaVhR</string>
-							<key>INIntentParameterPromptDialogType</key>
-							<string>Confirmation</string>
 						</dict>
 					</array>
 					<key>INIntentParameterTag</key>
