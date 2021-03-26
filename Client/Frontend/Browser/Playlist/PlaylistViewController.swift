@@ -683,7 +683,7 @@ extension ListController: UITableViewDelegate {
             let alert = UIAlertController(
                 title: Strings.PlayList.removePlaylistVideoAlertTitle, message: Strings.PlayList.removePlaylistVideoAlertMessage, preferredStyle: style)
             
-            alert.addAction(UIAlertAction(title: Strings.delete, style: .default, handler: { _ in
+            alert.addAction(UIAlertAction(title: Strings.PlayList.removeActionButtonTitle, style: .default, handler: { _ in
                 PlaylistManager.shared.delete(item: currentItem)
 
                 if self.currentlyPlayingItemIndex == indexPath.row {

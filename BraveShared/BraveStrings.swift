@@ -1185,7 +1185,7 @@ extension Strings {
         public static let removePlaylistOfflineDataAlertTitle =
             NSLocalizedString("playlist.removePlaylistOfflineDataAlertTitle",
                               bundle: .braveShared,
-                              value: "Remove offline data",
+                              value: "Remove Offline Data",
                               comment: "Title for the alert shown when the user tries to remove offline data of an item from playlist")
         
         public static let removePlaylistOfflineDataAlertMessage =
