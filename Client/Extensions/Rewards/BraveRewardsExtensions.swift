@@ -57,8 +57,8 @@ private struct AssociatedKeys {
   static var isCreatingWallet: Int = 0
 }
 
-extension DrainStatus {
-    var displayString: String {
+extension DrainStatus: RepresentableOptionType {
+    public var displayString: String {
         switch self {
         case .invalid:
             return Strings.Rewards.legacyWalletTransferStatusShortformInvalid

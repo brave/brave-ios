@@ -129,6 +129,7 @@ extension Preferences {
         public static let lastTransferStatusDismissed = Option<Int?>(key: "rewards.legacy-wallet-transfer-last-dismissed-status", default: nil)
         public static let transferCompletionAcknowledged = Option<Bool>(key: "rewards.legacy-wallet-transfer-completion-acknowledged", default: false)
         public static let transferUnavailableLastSeen = Option<TimeInterval?>(key: "rewards.transfer-unavailable-warning-last-seen-date", default: nil)
+        public static let drainStatusOverride = Option<Int?>(key: "rewards.drain-status-override", default: nil)
         
         public enum EnvironmentOverride: Int {
             case none
