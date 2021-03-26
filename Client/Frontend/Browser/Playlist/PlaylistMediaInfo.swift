@@ -101,6 +101,7 @@ class PlaylistMediaInfo: NSObject {
     }
     
     deinit {
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
         self.webLoader?.removeFromSuperview()
         UIApplication.shared.endReceivingRemoteControlEvents()
     }
