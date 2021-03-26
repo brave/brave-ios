@@ -190,7 +190,7 @@ class PlayListCacheClearable: Clearable {
     init() { }
     
     var label: String {
-        return Strings.PlayList.playlistCacheToggleOption
+        return Strings.PlayList.playlistOfflineDataToggleOption
     }
     
     func clear() -> Success {
@@ -204,7 +204,7 @@ class PlayListDataClearable: Clearable {
     init() { }
     
     var label: String {
-        return Strings.PlayList.playlistCacheAndVideoToggleOption
+        return Strings.PlayList.playlistMediaAndOfflineDataToggleOption
     }
     
     func clear() -> Success {

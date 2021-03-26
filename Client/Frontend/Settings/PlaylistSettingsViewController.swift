@@ -34,11 +34,11 @@ enum PlayListDownloadType: String, CaseIterable, RepresentableOptionType {
     var displayString: String {
         switch self {
             case .on:
-                return Strings.PlayList.playlistAutoDownloadOptionOn
+                return Strings.PlayList.playlistAutoSaveOptionOn
             case .off:
-                return Strings.PlayList.playlistAutoDownloadOptionOff
+                return Strings.PlayList.playlistAutoSaveOptionOff
             case .wifi:
-                return Strings.PlayList.playlistAutoDownloadOptionOnlyWifi
+                return Strings.PlayList.playlistAutoSaveOptionOnlyWifi
         }
     }
 }
@@ -83,8 +83,10 @@ class PlaylistSettingsViewController: TableViewController {
             )
         ]
         
-        var autoDownloadSection = Section(rows: [])
-        var row = Row(text: Strings.PlayList.playlistAutoDownloadSettingsTitle,
+        var autoDownloadSection = Section(
+            rows: [],
+            footer: .title(Strings.PlayList.playlistAutoSaveSettingsFooterText))
+        var row = Row(text: Strings.PlayList.playlistAutoSaveSettingsTitle,
                       detailText: PlayListDownloadType(rawValue: Preferences.Playlist.autoDownloadVideo.value)?.displayString,
                       accessory: .disclosureIndicator,
                       cellClass: MultilineSubtitleCell.self)
@@ -100,8 +102,7 @@ class PlaylistSettingsViewController: TableViewController {
                     self.applyTheme(self.theme)
                 }
             )
-            optionsViewController.title = Strings.PlayList.playlistAutoDownloadSettingsTitle
-            optionsViewController.footerText = Strings.PlayList.playlistAutoDownloadFooterSettingsText
+            optionsViewController.title = Strings.PlayList.playlistAutoSaveSettingsTitle
 
             self.navigationController?.pushViewController(optionsViewController, animated: true)
         }
@@ -150,20 +151,20 @@ class PlaylistSettingsViewController: TableViewController {
         
         dataSource.sections.append(
             Section(rows: [
-                Row(text: Strings.PlayList.playlistDeleteCacheAlertTitle, selection: { [unowned self] in
+                Row(text: Strings.PlayList.playlistResetAlertTitle, selection: { [unowned self] in
                     let style: UIAlertController.Style = UIDevice.current.userInterfaceIdiom == .pad ? .alert : .actionSheet
                     let alert = UIAlertController(
-                        title: Strings.PlayList.playlistDeleteCacheAlertTitle,
-                        message: Strings.PlayList.playlistDeleteCacheAlertDescription,
+                        title: Strings.PlayList.playlistResetAlertTitle,
+                        message: Strings.PlayList.playlistResetPlaylistOptionFooterText,
                         preferredStyle: style)
                     
-                    alert.addAction(UIAlertAction(title: Strings.delete, style: .default, handler: { _ in
+                    alert.addAction(UIAlertAction(title: Strings.PlayList.playlistResetAlertTitle, style: .default, handler: { _ in
                         PlaylistManager.shared.deleteAllItems()
                     }))
                     alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil))
                     self.present(alert, animated: true, completion: nil)
                 }, cellClass: ButtonCell.self)],
-                    footer: .title(Strings.PlayList.playlistDeleteAllSettingsOptionFooterText))
+                    footer: .title(Strings.PlayList.playlistResetPlaylistOptionFooterText))
         )
         
         if !AppConstants.buildChannel.isPublic {

@@ -521,7 +521,7 @@ extension ListController: UITableViewDataSource {
         let cacheState = PlaylistManager.shared.state(for: item.pageSrc)
         switch cacheState {
         case .inProgress:
-            cell.detailLabel.text = Strings.PlayList.dowloadingLabelTitle
+            cell.detailLabel.text = Strings.PlayList.savingForOfflineLabelTitle
         case .downloaded:
             if let itemSize = PlaylistManager.shared.sizeOfDownloadedItem(for: item.pageSrc) {
                 getAssetDurationFormatted(item: item) {
@@ -529,7 +529,7 @@ extension ListController: UITableViewDataSource {
                 }
             } else {
                 getAssetDurationFormatted(item: item) {
-                    cell.detailLabel.text = "\($0) - \(Strings.PlayList.dowloadedLabelTitle)"
+                    cell.detailLabel.text = "\($0) - \(Strings.PlayList.savedForOfflineLabelTitle)"
                 }
             }
         case .invalid:
@@ -647,9 +647,8 @@ extension ListController: UITableViewDelegate {
 
         let currentItem = PlaylistManager.shared.itemAtIndex(indexPath.row)
         let cacheState = PlaylistManager.shared.state(for: currentItem.pageSrc)
-        let downloadedItemTitle = cacheState == .invalid ? Strings.download : Strings.PlayList.clearActionButtonTitle
         
-        let cacheAction = UIContextualAction(style: .normal, title: downloadedItemTitle, handler: { [weak self] (action, view, completionHandler) in
+        let cacheAction = UIContextualAction(style: .normal, title: nil, handler: { [weak self] (action, view, completionHandler) in
             guard let self = self else { return }
             
             switch cacheState {
@@ -662,9 +661,9 @@ extension ListController: UITableViewDelegate {
                 case .downloaded:
                     let style: UIAlertController.Style = UIDevice.current.userInterfaceIdiom == .pad ? .alert : .actionSheet
                     let alert = UIAlertController(
-                        title: Strings.PlayList.removePlaylistDownloadedVideoAlertTitle, message: Strings.PlayList.removePlaylistDownloadedVideoAlertMessage, preferredStyle: style)
+                        title: Strings.PlayList.removePlaylistOfflineDataAlertTitle, message: Strings.PlayList.removePlaylistOfflineDataAlertMessage, preferredStyle: style)
                     
-                    alert.addAction(UIAlertAction(title: Strings.PlayList.removePlaylistDownloadedVideoClearButton, style: .default, handler: { _ in
+                    alert.addAction(UIAlertAction(title: Strings.PlayList.removeActionButtonTitle, style: .default, handler: { _ in
                         PlaylistManager.shared.deleteCache(item: currentItem)
                         self.tableView.reloadRows(at: [indexPath], with: .automatic)
                     }))
@@ -677,7 +676,7 @@ extension ListController: UITableViewDelegate {
             completionHandler(true)
         })
         
-        let deleteAction = UIContextualAction(style: .normal, title: Strings.PlayList.removeActionButtonTitle, handler: { [weak self] (action, view, completionHandler) in
+        let deleteAction = UIContextualAction(style: .normal, title: nil, handler: { [weak self] (action, view, completionHandler) in
             guard let self = self else { return }
             
             let style: UIAlertController.Style = UIDevice.current.userInterfaceIdiom == .pad ? .alert : .actionSheet
@@ -743,7 +742,8 @@ extension ListController: UITableViewDelegate {
                 case .expired:
                     selectedCell?.detailLabel.text = Strings.PlayList.expiredLabelTitle
                     
-                    let alert = UIAlertController(title: Strings.PlayList.expiredAlertTitle, message: Strings.PlayList.expiredAlertDescription, preferredStyle: .alert)
+                    let alert = UIAlertController(title: Strings.PlayList.expiredAlertTitle,
+                                                  message: Strings.PlayList.expiredAlertDescription, preferredStyle: .alert)
                     alert.addAction(UIAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: { _ in
                         
                         if let url = URL(string: item.pageSrc) {
@@ -1013,7 +1013,8 @@ extension ListController: AVPlayerViewControllerDelegate, AVPictureInPictureCont
     func playerViewController(_ playerViewController: AVPlayerViewController, failedToStartPictureInPictureWithError error: Error) {
         playerView.attachLayer()
         
-        let alert = UIAlertController(title: Strings.PlayList.sorryAlertTitle, message: Strings.PlayList.pictureInPictureErrorTitle, preferredStyle: .alert)
+        let alert = UIAlertController(title: Strings.PlayList.sorryAlertTitle,
+                                      message: Strings.PlayList.pictureInPictureErrorTitle, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: nil))
         self.present(alert, animated: true, completion: nil)
     }
@@ -1068,7 +1069,8 @@ extension ListController: AVPlayerViewControllerDelegate, AVPictureInPictureCont
     
     func pictureInPictureController(_ pictureInPictureController: AVPictureInPictureController, failedToStartPictureInPictureWithError error: Error) {
         
-        let alert = UIAlertController(title: Strings.PlayList.sorryAlertTitle, message: Strings.PlayList.pictureInPictureErrorTitle, preferredStyle: .alert)
+        let alert = UIAlertController(title: Strings.PlayList.sorryAlertTitle,
+                                      message: Strings.PlayList.pictureInPictureErrorTitle, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: nil))
         self.present(alert, animated: true, completion: nil)
     }
@@ -1101,7 +1103,7 @@ extension ListController: PlaylistManagerDelegate {
             case .inProgress:
                 let item = PlaylistManager.shared.itemAtIndex(index)
                 getAssetDurationFormatted(item: item) {
-                    cell.detailLabel.text = "\($0) - \(Strings.PlayList.dowloadingPercentageLabelTitle) \(Int(percentComplete))%"
+                    cell.detailLabel.text = "\($0) - \(Int(percentComplete))% \(Strings.PlayList.savedForOfflineLabelTitle)"
                 }
             case .downloaded:
                 let item = PlaylistManager.shared.itemAtIndex(index)
@@ -1112,7 +1114,7 @@ extension ListController: PlaylistManagerDelegate {
                     }
                 } else {
                     getAssetDurationFormatted(item: item) {
-                        cell.detailLabel.text = "\($0) - \(Strings.PlayList.dowloadedLabelTitle)"
+                        cell.detailLabel.text = "\($0) - \(Strings.PlayList.savedForOfflineLabelTitle)"
                     }
                 }
             case .invalid:
@@ -1137,7 +1139,8 @@ extension ListController: PlaylistManagerDelegate {
                     cell.detailLabel.text = $0
                 }
                 
-                let alert = UIAlertController(title: Strings.PlayList.playlistDownloadErrorTitle, message: Strings.PlayList.playlistDownloadErrorMessage, preferredStyle: .alert)
+                let alert = UIAlertController(title: Strings.PlayList.playlistSaveForOfflineErrorTitle,
+                                              message: Strings.PlayList.playlistSaveForOfflineErrorMessage, preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: nil))
                 self.present(alert, animated: true, completion: nil)
             } else {
@@ -1145,7 +1148,7 @@ extension ListController: PlaylistManagerDelegate {
                 case .inProgress:
                     let item = PlaylistManager.shared.itemAtIndex(index)
                     getAssetDurationFormatted(item: item) {
-                        cell.detailLabel.text = "\($0) - \(Strings.PlayList.dowloadingPercentageLabelTitle)"
+                        cell.detailLabel.text = "\($0) - \(Strings.PlayList.savingForOfflineLabelTitle)"
                     }
                 case .downloaded:
                     let item = PlaylistManager.shared.itemAtIndex(index)
@@ -1155,7 +1158,7 @@ extension ListController: PlaylistManagerDelegate {
                         }
                     } else {
                         getAssetDurationFormatted(item: item) {
-                            cell.detailLabel.text = "\($0) - \(Strings.PlayList.dowloadedLabelTitle)"
+                            cell.detailLabel.text = "\($0) - \(Strings.PlayList.savedForOfflineLabelTitle)"
                         }
                     }
                 case .invalid:
@@ -1236,9 +1239,7 @@ private class DetailController: UIViewController, UIGestureRecognizerDelegate {
     
     private func setup() {
         view.backgroundColor = .black
-        
-        title = Strings.PlayList.playListMediaPlayerTitle
-        
+                
         navigationController?.do {
             let appearance = UINavigationBarAppearance()
             appearance.configureWithTransparentBackground()
