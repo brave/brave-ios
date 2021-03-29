@@ -197,6 +197,8 @@ private class ShareTrackersView: UIView, Themeable {
         actionButton.clipsToBounds = true
         actionButton.layer.borderWidth = 1
         actionButton.layer.borderColor = UIColor.white.cgColor
+        actionButton.titleLabel?.adjustsFontSizeToFitWidth = true
+        actionButton.titleLabel?.allowsDefaultTighteningForTruncation = true
         actionButton.setContentCompressionResistancePriority(.required, for: .horizontal)
         return actionButton
     }()

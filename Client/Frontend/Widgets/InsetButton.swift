@@ -13,14 +13,17 @@ class InsetButton: UIButton {
     }
     
     func addTrailingImageIcon(image: UIImage, offset: CGFloat = 15) {
-        let imageView = UIImageView(image: image)
-        imageView.translatesAutoresizingMaskIntoConstraints = false
+        let imageView = UIImageView(image: image).then {
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            $0.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
+        }
 
         addSubview(imageView)
         titleEdgeInsets.right += offset
 
         NSLayoutConstraint.activate([
             imageView.leadingAnchor.constraint(equalTo: titleLabel?.trailingAnchor ?? trailingAnchor, constant: offset),
+            imageView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -offset),
             imageView.centerYAnchor.constraint(equalTo: titleLabel?.centerYAnchor ?? centerYAnchor),
             imageView.widthAnchor.constraint(equalToConstant: offset),
             imageView.heightAnchor.constraint(equalToConstant: offset)
