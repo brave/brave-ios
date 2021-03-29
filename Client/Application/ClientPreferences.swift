@@ -215,6 +215,8 @@ extension Preferences {
         static let autoDownloadVideo = Option<String>(key: "playlist.listViewSide", default: PlayListDownloadType.off.rawValue)
         /// The Option to disable playlist MediaSource web-compatibility
         static let webMediaSourceCompatibility = Option<Bool>(key: "playlist.webMediaSourceCompatibility", default: UIDevice.isIpad)
+        /// The option to start the playback where user left-off
+        static let playbackLeftOff = Option<Bool>(key: "playlist.playbackLeftOff", default: true)
     }
 }
 

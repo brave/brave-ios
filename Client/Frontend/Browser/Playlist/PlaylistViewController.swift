@@ -204,7 +204,8 @@ private class ListController: UIViewController {
     }
     
     deinit {
-        if let playTime = playerView.player.currentItem?.currentTime() {
+        if let playTime = playerView.player.currentItem?.currentTime(),
+           Preferences.Playlist.playbackLeftOff.value {
             Preferences.Playlist.lastPlayedItemTime.value = playTime.seconds
         } else {
             Preferences.Playlist.lastPlayedItemTime.value = 0.0
@@ -289,7 +290,8 @@ private class ListController: UIViewController {
                             
                             if item.pageSrc == Preferences.Playlist.lastPlayedItemUrl.value &&
                                 lastPlayedTime > 0.0 &&
-                                lastPlayedTime < self.playerView.player.currentItem?.duration.seconds ?? 0.0 {
+                                lastPlayedTime < self.playerView.player.currentItem?.duration.seconds ?? 0.0 &&
+                                Preferences.Playlist.playbackLeftOff.value {
                                 self.playerView.seek(to: Preferences.Playlist.lastPlayedItemTime.value)
                             }
                             
@@ -804,7 +806,8 @@ extension ListController: UITableViewDelegate {
         let item = PlaylistManager.shared.itemAtIndex(indexPath.row)
         Preferences.Playlist.lastPlayedItemUrl.value = item.pageSrc
         
-        if let playTime = self.playerView.player.currentItem?.currentTime() {
+        if let playTime = self.playerView.player.currentItem?.currentTime(),
+           Preferences.Playlist.playbackLeftOff.value {
             Preferences.Playlist.lastPlayedItemTime.value = playTime.seconds
         } else {
             Preferences.Playlist.lastPlayedItemTime.value = 0.0

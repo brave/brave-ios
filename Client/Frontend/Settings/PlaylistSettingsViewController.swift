@@ -110,6 +110,15 @@ class PlaylistSettingsViewController: TableViewController {
         autoDownloadSection.rows.append(row)
         dataSource.sections.append(autoDownloadSection)
         
+        dataSource.sections.append(
+            Section(
+                rows: [
+                    .boolRow(title: Strings.PlayList.playlistStartPlaybackSettingsOptionTitle,
+                             option: Preferences.Playlist.playbackLeftOff)
+                ],
+                footer: .title(Strings.PlayList.playlistStartPlaybackSettingsFooterText)
+        ))
+        
         if UIDevice.current.userInterfaceIdiom == .pad {
             var sideSelectionSection = Section(rows: [])
             var row = Row(text: Strings.PlayList.playlistSidebarLocationTitle,

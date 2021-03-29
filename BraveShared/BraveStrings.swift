@@ -1254,6 +1254,18 @@ extension Strings {
                               value: "This option will automatically keep your playlist items on your device so you can play them while you dont have the internet connection.",
                               comment: "Footer Text for the Playlist Settings Option for Auto Save Videos for Offline (Off/On/Only Wifi))")
         
+        public static let playlistStartPlaybackSettingsOptionTitle =
+            NSLocalizedString("playlist.playlistStartPlaybackSettingsOptionTitle",
+                              bundle: .braveShared,
+                              value: "Start Playback where I last left off",
+                              comment: "Title for the Playlist Settings Option for Enable/Disable ability to start playing from the point where user last left-off")
+        
+        public static let playlistStartPlaybackSettingsFooterText =
+            NSLocalizedString("playlist.playlistStartPlaybackSettingsFooterText",
+                              bundle: .braveShared,
+                              value: "This option will enable/disable the ability to start playback of media (video/audio) from the time where you last left off.",
+                              comment: "Footer Text for the Playlist Settings Option for Enable/Disable ability to start playing from the point where user last left-off")
+        
         public static let playlistAutoSaveOptionOn =
             NSLocalizedString("playlist.playlistAutoSaveOptionOn",
                               bundle: .braveShared,
