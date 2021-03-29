@@ -19,8 +19,8 @@ public enum VideoViewRepeatMode {
 }
 
 public protocol VideoViewDelegate: class {
-    func onPreviousTrack()
-    func onNextTrack()
+    func onPreviousTrack(isUserInitiated: Bool)
+    func onNextTrack(isUserInitiated: Bool)
     func onSidePanelStateChanged()
     func onPictureInPicture(enabled: Bool)
     func onFullScreen()
@@ -354,20 +354,20 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     @objc
     private func onSeekPrevious(_ gestureRecognizer: UIGestureRecognizer) {
         if gestureRecognizer.state == .began {
-            self.delegate?.onPreviousTrack()
+            self.delegate?.onPreviousTrack(isUserInitiated: true)
         }
     }
     
     @objc
     private func onSeekNext(_ gestureRecognizer: UIGestureRecognizer) {
         if gestureRecognizer.state == .began {
-            self.delegate?.onNextTrack()
+            self.delegate?.onNextTrack(isUserInitiated: true)
         }
     }
     
     @objc
     private func onNextTrack(_ button: UIButton) {
-        self.delegate?.onNextTrack()
+        self.delegate?.onNextTrack(isUserInitiated: true)
     }
     
     func onValueChanged(_ trackBar: VideoTrackerBar, value: CGFloat) {
@@ -645,11 +645,11 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     }
     
     public func previous() {
-        self.delegate?.onPreviousTrack()
+        self.delegate?.onPreviousTrack(isUserInitiated: false)
     }
     
     public func next() {
-        self.delegate?.onNextTrack()
+        self.delegate?.onNextTrack(isUserInitiated: false)
     }
     
     public func load(url: URL, resourceDelegate: AVAssetResourceLoaderDelegate?, autoPlayEnabled: Bool) {

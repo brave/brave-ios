@@ -207,6 +207,8 @@ extension Preferences {
         static let showToastForAdd = Option<Bool>(key: "playlist.showToastForAdd", default: true)
         /// The last played item url
         static let lastPlayedItemUrl = Option<String?>(key: "playlist.last.played.item.url", default: nil)
+        /// The last played item time
+        static let lastPlayedItemTime = Option<Double>(key: "playlist.last.played.item.time", default: 0.0)
         /// Whether to play the video when controller loaded
         static let firstLoadAutoPlay = Option<Bool>(key: "playlist.firstLoadAutoPlay", default: false)
         /// The Option to download video yes / no / only wifi

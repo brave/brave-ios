@@ -149,29 +149,32 @@ class VideoTrackerBar: UIView {
     private let slider = VideoSliderBar()
     
     private let currentTimeLabel = UILabel().then {
-        $0.text = "0:00"
+        $0.text = "00:00"
         $0.textColor = .white
         $0.appearanceTextColor = #colorLiteral(red: 0.5254901961, green: 0.5568627451, blue: 0.5882352941, alpha: 1)
         $0.font = .systemFont(ofSize: 14.0, weight: .medium)
     }
     
     private let endTimeLabel = UILabel().then {
-        $0.text = "0:00"
+        $0.text = "00:00"
         $0.textColor = .white
         $0.appearanceTextColor = #colorLiteral(red: 0.5254901961, green: 0.5568627451, blue: 0.5882352941, alpha: 1)
         $0.font = .systemFont(ofSize: 14.0, weight: .medium)
     }
     
     public func setTimeRange(currentTime: CMTime, endTime: CMTime) {
-        if CMTimeCompare(endTime, .zero) != 0 && endTime.value > 0 {
-            slider.value = CGFloat(currentTime.value) / CGFloat(endTime.value)
+        if CMTimeCompare(endTime, .zero) != 0,
+           endTime.value > 0,
+           currentTime.isValid && !currentTime.isIndefinite,
+           endTime.isValid && !endTime.isIndefinite {
             
+            slider.value = CGFloat(currentTime.value) / CGFloat(endTime.value)
             currentTimeLabel.text = self.timeToString(currentTime)
             endTimeLabel.text = "-\(self.timeToString(endTime - currentTime))"
         } else {
             slider.value = 0.0
-            currentTimeLabel.text = "0:00"
-            endTimeLabel.text = "0:00"
+            currentTimeLabel.text = "00:00"
+            endTimeLabel.text = "00:00"
         }
     }
     
@@ -219,7 +222,7 @@ class VideoTrackerBar: UIView {
     }
     
     private func timeToString(_ time: CMTime) -> String {
-        let totalSeconds = CMTimeGetSeconds(time)
+        let totalSeconds = abs(CMTimeGetSeconds(time))
         let minutes = floor(totalSeconds.truncatingRemainder(dividingBy: 3600.0) / 60.0)
         let seconds = floor(totalSeconds.truncatingRemainder(dividingBy: 60.0))
         return String(format: "%02zu:%02zu", Int(minutes), Int(seconds))

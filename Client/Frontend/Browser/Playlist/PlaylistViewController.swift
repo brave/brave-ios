@@ -175,7 +175,7 @@ private class ListController: UIViewController {
     private var autoPlayEnabled: Bool = true
     private var playerController: AVPlayerViewController?
     
-    private lazy var activityIndicator = UIActivityIndicatorView(style: .white).then {
+    private lazy var activityIndicator = UIActivityIndicatorView(style: .medium).then {
         $0.isHidden = true
         $0.hidesWhenStopped = true
     }
@@ -204,6 +204,12 @@ private class ListController: UIViewController {
     }
     
     deinit {
+        if let playTime = playerView.player.currentItem?.currentTime() {
+            Preferences.Playlist.lastPlayedItemTime.value = playTime.seconds
+        } else {
+            Preferences.Playlist.lastPlayedItemTime.value = 0.0
+        }
+        
         playerView.stop()
         playerView.pictureInPictureController?.delegate = nil
         playerView.pictureInPictureController?.stopPictureInPicture()
@@ -265,7 +271,31 @@ private class ListController: UIViewController {
                 self.playerView.setControlsEnabled(true)
                 
                 if let lastPlayedItemUrl = Preferences.Playlist.lastPlayedItemUrl.value, let index = PlaylistManager.shared.index(of: lastPlayedItemUrl) {
-                    self.tableView.delegate?.tableView?(self.tableView, didSelectRowAt: IndexPath(row: index, section: 0))
+                    let indexPath = IndexPath(row: index, section: 0)
+                    
+                    self.playItem(at: indexPath, completion: { [weak self] error in
+                        guard let self = self else { return }
+                        
+                        switch error {
+                        case .error(let err):
+                            log.error(err)
+                            self.displayLoadingResourceError()
+                        case .expired:
+                            let item = PlaylistManager.shared.itemAtIndex(indexPath.row)
+                            self.displayExpiredResourceError(item: item)
+                        case .none:
+                            let item = PlaylistManager.shared.itemAtIndex(indexPath.row)
+                            let lastPlayedTime = Preferences.Playlist.lastPlayedItemTime.value
+                            
+                            if item.pageSrc == Preferences.Playlist.lastPlayedItemUrl.value &&
+                                lastPlayedTime > 0.0 &&
+                                lastPlayedTime < self.playerView.player.currentItem?.duration.seconds ?? 0.0 {
+                                self.playerView.seek(to: Preferences.Playlist.lastPlayedItemTime.value)
+                            }
+                            
+                            self.updateLastPlayedItem(indexPath: indexPath)
+                        }
+                    })
                 } else {
                     self.tableView.delegate?.tableView?(self.tableView, didSelectRowAt: IndexPath(row: 0, section: 0))
                 }
@@ -719,6 +749,23 @@ extension ListController: UITableViewDelegate {
             return
         }
         
+        playItem(at: indexPath, completion: { [weak self] error in
+            guard let self = self else { return }
+            
+            switch error {
+            case .error(let err):
+                log.error(err)
+                self.displayLoadingResourceError()
+            case .expired:
+                let item = PlaylistManager.shared.itemAtIndex(indexPath.row)
+                self.displayExpiredResourceError(item: item)
+            case .none:
+                self.updateLastPlayedItem(indexPath: indexPath)
+            }
+        })
+    }
+    
+    private func playItem(at indexPath: IndexPath, completion: ((PlaylistMediaInfo.MediaPlaybackError) -> Void)?) {
         if indexPath.row < PlaylistManager.shared.numberOfAssets() {
             activityIndicator.startAnimating()
             activityIndicator.isHidden = false
@@ -732,27 +779,15 @@ extension ListController: UITableViewDelegate {
             
             mediaInfo.loadMediaItem(item, index: indexPath.row, autoPlayEnabled: autoPlayEnabled) { [weak self] error in
                 guard let self = self else { return }
+                defer { completion?(error) }
                 self.activityIndicator.stopAnimating()
                 
                 switch error {
-                case .error(let err):
-                    log.error(err)
-                    self.displayLoadingResourceError()
+                case .error:
+                    break
                     
                 case .expired:
                     selectedCell?.detailLabel.text = Strings.PlayList.expiredLabelTitle
-                    
-                    let alert = UIAlertController(title: Strings.PlayList.expiredAlertTitle,
-                                                  message: Strings.PlayList.expiredAlertDescription, preferredStyle: .alert)
-                    alert.addAction(UIAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: { _ in
-                        
-                        if let url = URL(string: item.pageSrc) {
-                            self.dismiss(animated: true, completion: nil)
-                            (UIApplication.shared.delegate as? AppDelegate)?.browserViewController.openURLInNewTab(url, isPrivileged: false)
-                        }
-                    }))
-                    alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil))
-                    self.present(alert, animated: true, completion: nil)
                     
                 case .none:
                     log.debug("Playing Live Video: \(self.playerView.player.currentItem?.duration.isIndefinite ?? false)")
@@ -760,10 +795,34 @@ extension ListController: UITableViewDelegate {
                     if let selectedCell = selectedCell {
                         self.loadThumbnail(item: item, cell: selectedCell)
                     }
-                    Preferences.Playlist.lastPlayedItemUrl.value = item.pageSrc
                 }
             }
         }
+    }
+    
+    private func updateLastPlayedItem(indexPath: IndexPath) {
+        let item = PlaylistManager.shared.itemAtIndex(indexPath.row)
+        Preferences.Playlist.lastPlayedItemUrl.value = item.pageSrc
+        
+        if let playTime = self.playerView.player.currentItem?.currentTime() {
+            Preferences.Playlist.lastPlayedItemTime.value = playTime.seconds
+        } else {
+            Preferences.Playlist.lastPlayedItemTime.value = 0.0
+        }
+    }
+    
+    private func displayExpiredResourceError(item: PlaylistInfo) {
+        let alert = UIAlertController(title: Strings.PlayList.expiredAlertTitle,
+                                      message: Strings.PlayList.expiredAlertDescription, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: { _ in
+            
+            if let url = URL(string: item.pageSrc) {
+                self.dismiss(animated: true, completion: nil)
+                (UIApplication.shared.delegate as? AppDelegate)?.browserViewController.openURLInNewTab(url, isPrivileged: false)
+            }
+        }))
+        alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil))
+        self.present(alert, animated: true, completion: nil)
     }
     
     private func displayLoadingResourceError() {
@@ -876,27 +935,34 @@ extension ListController: UIGestureRecognizerDelegate {
 // MARK: VideoViewDelegate
 
 extension ListController: VideoViewDelegate {
-    func onPreviousTrack() {
+    func onPreviousTrack(isUserInitiated: Bool) {
         if currentlyPlayingItemIndex <= 0 {
             return
         }
         
         let index = currentlyPlayingItemIndex - 1
         if index < PlaylistManager.shared.numberOfAssets() {
-            let item = PlaylistManager.shared.itemAtIndex(index)
-            playerView.setVideoInfo(videoDomain: item.pageSrc, videoTitle: item.pageTitle)
-            mediaInfo.loadMediaItem(item, index: index) { [weak self] error in
-                if case .none = error {
-                    self?.currentlyPlayingItemIndex = index
-                } else {
-                    self?.displayLoadingResourceError()
+            let indexPath = IndexPath(row: index, section: 0)
+            playItem(at: indexPath) { [weak self] error in
+                guard let self = self else { return }
+                switch error {
+                case .error(let err):
+                    log.error(err)
+                    self.displayLoadingResourceError()
+                case .expired:
+                    let item = PlaylistManager.shared.itemAtIndex(index)
+                    self.displayExpiredResourceError(item: item)
+                case .none:
+                    self.currentlyPlayingItemIndex = index
+                    self.updateLastPlayedItem(indexPath: indexPath)
                 }
             }
         }
     }
     
-    func onNextTrack() {
-        let isAtEnd = currentlyPlayingItemIndex >= PlaylistManager.shared.numberOfAssets() - 1
+    func onNextTrack(isUserInitiated: Bool) {
+        let assetCount = PlaylistManager.shared.numberOfAssets()
+        let isAtEnd = currentlyPlayingItemIndex >= assetCount - 1
         var index = currentlyPlayingItemIndex
         
         switch playerView.repeatState {
@@ -914,13 +980,26 @@ extension ListController: VideoViewDelegate {
         }
         
         if index >= 0 {
-            let item = PlaylistManager.shared.itemAtIndex(index)
-            playerView.setVideoInfo(videoDomain: item.pageSrc, videoTitle: item.pageTitle)
-            mediaInfo.loadMediaItem(item, index: index) { [weak self] error in
-                if case .none = error {
-                    self?.currentlyPlayingItemIndex = index
-                } else {
-                    self?.displayLoadingResourceError()
+            let indexPath = IndexPath(row: index, section: 0)
+            playItem(at: indexPath) { [weak self] error in
+                guard let self = self else { return }
+                switch error {
+                case .error(let err):
+                    log.error(err)
+                    self.displayLoadingResourceError()
+                case .expired:
+                    if isUserInitiated || self.playerView.repeatState == .repeatOne || assetCount <= 1 {
+                        let item = PlaylistManager.shared.itemAtIndex(index)
+                        self.displayExpiredResourceError(item: item)
+                    } else {
+                        DispatchQueue.main.async {
+                            self.currentlyPlayingItemIndex = index
+                            self.onNextTrack(isUserInitiated: isUserInitiated)
+                        }
+                    }
+                case .none:
+                    self.currentlyPlayingItemIndex = index
+                    self.updateLastPlayedItem(indexPath: indexPath)
                 }
             }
         }
