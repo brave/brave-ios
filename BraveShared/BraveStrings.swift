@@ -1223,6 +1223,42 @@ extension Strings {
                               bundle: .braveShared,
                               value: "Clear Cache",
                               comment: "Button title when clearing Playlist media cache")
+        
+        public static let playlistToastShowSettingsOptionTitle =
+            NSLocalizedString("playlist.playlistToastShowSettingsOptionTitle",
+                              bundle: .braveShared,
+                              value: "Show Add to Playlist Toast",
+                              comment: "Title for the Playlist Settings Option for Enable/Disable Add Toast")
+        
+        public static let playlistToastShowSettingsOptionFooterText =
+            NSLocalizedString("playlist.playlistToastShowSettingsOptionFooterText",
+                              bundle: .braveShared,
+                              value: "This option will disable showing 'Add to Playlist Toast' on websites. However media (videos/audio) can still be added by long pressing the media item or using Add option in Share Sheet.",
+                              comment: "Footer Text for the Playlist Settings Option for Enable/Disable Add Toast")
+        
+        public static let playlistSidebarLocationTitle =
+            NSLocalizedString("playlist.playlistSidebarLocationTitle",
+                              bundle: .braveShared,
+                              value: "Sidebar Location",
+                              comment: "Title for the Playlist Settings Option for Sidebar Location (Left/Right)")
+        
+        public static let playlistSidebarLocationFooterText =
+            NSLocalizedString("playlist.playlistSidebarLocationFooterText",
+                              bundle: .braveShared,
+                              value: "This setting will change video list location between left-hand side/ right-hand side.",
+                              comment: "Footer Text for the Playlist Settings Option for Sidebar Location (Left/Right)")
+        
+        public static let playlistSidebarLocationOptionLeft =
+            NSLocalizedString("playlist.playlistSidebarLocationOptionLeft",
+                              bundle: .braveShared,
+                              value: "Left",
+                              comment: "Option Text for Sidebar Location Left")
+        
+        public static let playlistSidebarLocationOptionRight =
+            NSLocalizedString("playlist.playlistSidebarLocationOptionRight",
+                              bundle: .braveShared,
+                              value: "Right",
+                              comment: "Option Text for Sidebar Location Right")
     }
 }
 

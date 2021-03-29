@@ -444,6 +444,7 @@
 		2F44FCC71A9E8CF500FD20CC /* SearchSettingsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F44FCC61A9E8CF500FD20CC /* SearchSettingsTableViewController.swift */; };
 		2F44FCCB1A9E972E00FD20CC /* SearchEnginePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F44FCCA1A9E972E00FD20CC /* SearchEnginePicker.swift */; };
 		2F55443225913BD5000E4689 /* OpenSearchEngineButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F55443125913BD5000E4689 /* OpenSearchEngineButton.swift */; };
+		2F51767425E4024B00429692 /* PlaylistSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F51767325E4024B00429692 /* PlaylistSettingsViewController.swift */; };
 		2F697F7E1A9FD22D009E03AE /* SearchEnginesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F697F7D1A9FD22D009E03AE /* SearchEnginesTests.swift */; };
 		2FA01E2825F29B0900103D67 /* BenchmarkTierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FA01E2725F29B0900103D67 /* BenchmarkTierTests.swift */; };
 		2FA01E5D25F2C93800103D67 /* ShieldsActivityItemSourceProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FA01E5C25F2C93800103D67 /* ShieldsActivityItemSourceProvider.swift */; };
@@ -1943,6 +1944,7 @@
 		2F44FCC61A9E8CF500FD20CC /* SearchSettingsTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchSettingsTableViewController.swift; sourceTree = "<group>"; };
 		2F44FCCA1A9E972E00FD20CC /* SearchEnginePicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchEnginePicker.swift; sourceTree = "<group>"; };
 		2F55443125913BD5000E4689 /* OpenSearchEngineButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenSearchEngineButton.swift; sourceTree = "<group>"; };
+		2F51767325E4024B00429692 /* PlaylistSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistSettingsViewController.swift; sourceTree = "<group>"; };
 		2F697F7D1A9FD22D009E03AE /* SearchEnginesTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchEnginesTests.swift; sourceTree = "<group>"; };
 		2FA01E2725F29B0900103D67 /* BenchmarkTierTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BenchmarkTierTests.swift; sourceTree = "<group>"; };
 		2FA01E5C25F2C93800103D67 /* ShieldsActivityItemSourceProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShieldsActivityItemSourceProvider.swift; sourceTree = "<group>"; };
@@ -4052,6 +4054,7 @@
 				27D114D52358FCA400166534 /* SettingsRowViews.swift */,
 				278C700924F96D7000A246C8 /* BraveShieldsAndPrivacySettingsController.swift */,
 				0A42BC42260CEDA3007EBBF3 /* VPNLogs.swift */,
+				2F51767325E4024B00429692 /* PlaylistSettingsViewController.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -7124,6 +7127,7 @@
 				278C46A923F216CE0083347F /* AdvancedControlsBarView.swift in Sources */,
 				396CDB55203C5B870034A3A3 /* TabTrayController+KeyCommands.swift in Sources */,
 				74E36D781B71323500D69DA1 /* SettingsContentViewController.swift in Sources */,
+				2F51767425E4024B00429692 /* PlaylistSettingsViewController.swift in Sources */,
 				0A1DF468244858CA00541FE4 /* VPNProductInfo.swift in Sources */,
 				27B3DDD524AF98EA0006A7ED /* FeedItem.swift in Sources */,
 				0AF4C59424F8003A00E500DD /* NTPDefaultBrowserCalloutProvider.swift in Sources */,
