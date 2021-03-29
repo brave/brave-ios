@@ -132,7 +132,7 @@ extension BrowserViewController {
                 Preferences.ProductNotificationBenchmarks.trackerTierCount.value = numOfTrackerAds
                 
                 if numOfTrackerAds > firstExistingTier.value {
-                    notifyTrackerAdsCount(firstExistingTier.value, theme: Theme.of(selectedTab))
+                    notifyTrackerAdsCount(firstExistingTier.value, description: firstExistingTier.title, theme: Theme.of(selectedTab))
                 }
             }
         }
@@ -169,8 +169,8 @@ extension BrowserViewController {
         showBenchmarkNotificationPopover(controller: shareTrackersViewController)
     }
     
-    private func notifyTrackerAdsCount(_ count: Int, theme: Theme) {
-        let shareTrackersViewController = ShareTrackersController(theme: theme, trackingType: .trackerCountShare(count: count))
+    private func notifyTrackerAdsCount(_ count: Int, description: String, theme: Theme) {
+        let shareTrackersViewController = ShareTrackersController(theme: theme, trackingType: .trackerCountShare(count: count, description: description))
         dismiss(animated: true)
 
         shareTrackersViewController.actionHandler = { [weak self] action in
