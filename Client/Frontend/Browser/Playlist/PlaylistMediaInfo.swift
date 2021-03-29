@@ -155,6 +155,7 @@ extension PlaylistMediaInfo: MPPlayableContentDelegate {
                     return
                 }
                 
+                #if PLAYLIST_WEB_LOADER
                 self.webLoader?.removeFromSuperview()
                 self.webLoader = PlaylistWebLoader(handler: { [weak self] newItem in
                     guard let self = self else { return }
@@ -189,6 +190,9 @@ extension PlaylistMediaInfo: MPPlayableContentDelegate {
                     self.updateNowPlayingMediaArtwork(image: nil)
                     completion(.error("Cannot Load Media"))
                 }
+                #else
+                completion(.expired)
+                #endif
             }
 
             // Determine if an item can be streamed and stream it directly
