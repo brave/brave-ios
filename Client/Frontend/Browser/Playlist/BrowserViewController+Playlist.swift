@@ -36,7 +36,7 @@ extension BrowserViewController: PlaylistHelperDelegate {
             case .pendingUserAction:
                 if buttonPressed {
                     // Update playlist with new items..
-                    PlaylistItem.addItem(info, cachedData: nil) {
+                    PlaylistItem.addItem(item, cachedData: nil) {
                         PlaylistManager.shared.autoDownload(item: item)
                         
                         log.debug("Playlist Item Added")
