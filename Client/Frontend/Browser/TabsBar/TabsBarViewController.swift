@@ -181,8 +181,8 @@ class TabsBarViewController: UIViewController {
     }
     
     private var selectedTabIndexPath: IndexPath? {
-        guard let tabManager = tabManager, let selectedTab = tabManager.selectedTab else { return nil }
-        let selectedIndex = tabList.index(of: selectedTab) ?? 0
+        guard let tabManager = tabManager, let selectedTab = tabManager.selectedTab,
+              let selectedIndex = tabList.index(of: selectedTab) else { return nil }
         
         return IndexPath(row: selectedIndex, section: 0)
     }
