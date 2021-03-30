@@ -817,7 +817,7 @@ extension ListController: UITableViewDelegate {
     private func displayExpiredResourceError(item: PlaylistInfo) {
         let alert = UIAlertController(title: Strings.PlayList.expiredAlertTitle,
                                       message: Strings.PlayList.expiredAlertDescription, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: { _ in
+        alert.addAction(UIAlertAction(title: Strings.PlayList.reopenButtonTitle, style: .default, handler: { _ in
             
             if let url = URL(string: item.pageSrc) {
                 self.dismiss(animated: true, completion: nil)
