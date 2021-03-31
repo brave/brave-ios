@@ -130,6 +130,12 @@ extension BrowserViewController {
                 }
             }
         }
+        
+        // Step 6: Domain Specific Data Saved
+        // Data Saved Pop-Over only exist in JP locale
+        if Locale.current.regionCode == "JP" {
+
+        }
     }
     
     private func notifyFirstTimeBlock() {
