@@ -648,6 +648,11 @@ extension AppDelegate {
                     type: .newPrivateTab, using: browserViewController)
                 
                 return true
+            case ActivityType.clearBrowsingHistory.identifier:
+                ActivityShortcutManager.shared.performShortcutActivity(
+                    type: .clearBrowsingHistory, using: browserViewController)
+                
+                return true
             default:
                 break
         }

@@ -52,6 +52,22 @@ class ShortcutSettingsViewController: TableViewController {
                         }, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self)],
                     footer: .title("Use Shortcuts to open a new private tab via Siri - Voice Assistant"))
         )
+        
+        dataSource.sections.append(
+            Section(rows: [
+                        Row(text: "Clear Browser History", selection: { [unowned self] in
+                            manageShortcutActivity(for: .clearBrowsingHistory)
+                        }, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self)],
+                    footer: .title("Use Shortcuts to Clear Browsing History & Open a New Tab via Siri - Voice Assistant"))
+            )
+            
+        dataSource.sections.append(
+            Section(rows: [
+                        Row(text: "Enable VPN", selection: { [unowned self] in
+                            manageShortcutActivity(for: .enableBraveVPN)
+                        }, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self)],
+                    footer: .title("Use Shortcuts to enable Brave VPN via Siri - Voice Assistant"))
+        )
     }
     
     private func manageShortcutActivity(for type: ActivityType) {
