@@ -259,6 +259,7 @@
 		2755EABD255323C60033C43F /* PublisherInfoExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2755EABC255323C60033C43F /* PublisherInfoExtensions.swift */; };
 		2755EAD3255329540033C43F /* BraveLedgerExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2755EAD2255329540033C43F /* BraveLedgerExtensions.swift */; };
 		275965E224EEC4EA0051A827 /* FeedFillStrategyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275965E124EEC4EA0051A827 /* FeedFillStrategyTests.swift */; };
+		275985B826167023004B8C33 /* UIViewControllerExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275985B726167023004B8C33 /* UIViewControllerExtensions.swift */; };
 		2760056625D1FFF500D47A75 /* AddFeedToBraveTodayActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2760056525D1FFF500D47A75 /* AddFeedToBraveTodayActivity.swift */; };
 		2760D2BF215ACCE20068E131 /* BundleExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2760D2BE215ACCE20068E131 /* BundleExtensions.swift */; };
 		2765825D2171263A00754B2F /* UserReferralProgram.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2765825C2171263A00754B2F /* UserReferralProgram.swift */; };
@@ -1680,6 +1681,7 @@
 		2755EABC255323C60033C43F /* PublisherInfoExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublisherInfoExtensions.swift; sourceTree = "<group>"; };
 		2755EAD2255329540033C43F /* BraveLedgerExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveLedgerExtensions.swift; sourceTree = "<group>"; };
 		275965E124EEC4EA0051A827 /* FeedFillStrategyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedFillStrategyTests.swift; sourceTree = "<group>"; };
+		275985B726167023004B8C33 /* UIViewControllerExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewControllerExtensions.swift; sourceTree = "<group>"; };
 		2760056525D1FFF500D47A75 /* AddFeedToBraveTodayActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddFeedToBraveTodayActivity.swift; sourceTree = "<group>"; };
 		2760D2BE215ACCE20068E131 /* BundleExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundleExtensions.swift; sourceTree = "<group>"; };
 		2765825C2171263A00754B2F /* UserReferralProgram.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserReferralProgram.swift; sourceTree = "<group>"; };
@@ -4052,6 +4054,7 @@
 				592F521D2217327B0078395E /* HttpCookieExtension.swift */,
 				5D8AE6AE230C76B60096C845 /* AppearanceExtensions.swift */,
 				2727369A24A65F650096DCB9 /* UIActionExtensions.swift */,
+				275985B726167023004B8C33 /* UIViewControllerExtensions.swift */,
 			);
 			indentWidth = 4;
 			path = Extensions;
@@ -6984,6 +6987,7 @@
 				0A3C789F23056C910022F6D8 /* OnboardingSearchEnginesView.swift in Sources */,
 				27A1AC0024855C1700344503 /* FeedCardCell.swift in Sources */,
 				27829E842549FF9D007CF0B2 /* WalletTransferView.swift in Sources */,
+				275985B826167023004B8C33 /* UIViewControllerExtensions.swift in Sources */,
 				278C467B23EDF0940083347F /* ShieldsSwitch.swift in Sources */,
 				27829E212548AFFE007CF0B2 /* BraveRewardsPublisherView.swift in Sources */,
 				31ADB5DA1E58CEC300E87909 /* ClipboardBarDisplayHandler.swift in Sources */,

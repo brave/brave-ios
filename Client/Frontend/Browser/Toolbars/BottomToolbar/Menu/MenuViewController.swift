@@ -11,6 +11,7 @@ import BraveUI
 import SwiftUI
 
 struct MenuItemHeaderView: View {
+    @ObservedObject var themeNormalMode = Preferences.General.themeNormalMode
     @Environment(\.colorScheme) var colorScheme: ColorScheme
     var icon: UIImage
     var title: String
@@ -35,7 +36,6 @@ struct MenuItemHeaderView: View {
 
 private struct MenuView<Content: View>: View {
     var content: Content
-    @ObservedObject var themeNormalMode = Preferences.General.themeNormalMode
     var body: some View {
         ScrollView(.vertical) {
             content
@@ -46,6 +46,9 @@ private struct MenuView<Content: View>: View {
 }
 
 struct MenuItemButton: View {
+    @ObservedObject var themeNormalMode = Preferences.General.themeNormalMode
+    @Environment(\.colorScheme) var colorScheme: ColorScheme
+    
     var icon: UIImage
     var title: String
     var action: () -> Void
@@ -91,6 +94,7 @@ class MenuViewController: UINavigationController, UIPopoverPresentationControlle
             self.panModalSetNeedsLayoutUpdate()
         }
         if expandToLongForm {
+            // Delay a fraction of a second to make the animation look more fluid
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
                 self.panModalTransition(to: .longForm)
             }
@@ -130,7 +134,7 @@ class MenuViewController: UINavigationController, UIPopoverPresentationControlle
         false
     }
     
-    private var isDismissing: Bool = false
+    private var isDismissing = false
     
     override func dismiss(animated flag: Bool, completion: (() -> Void)? = nil) {
         if let _ = presentedViewController as? InnerMenuNavigationController,
@@ -143,10 +147,7 @@ class MenuViewController: UINavigationController, UIPopoverPresentationControlle
     }
     
     private var isPresentingInnerMenu: Bool {
-        if let _ = presentedViewController as? InnerMenuNavigationController {
-            return true
-        }
-        return false
+        presentedViewController is InnerMenuNavigationController
     }
 }
 
