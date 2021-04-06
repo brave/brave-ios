@@ -104,8 +104,27 @@ class ActivityShortcutManager: NSObject {
                     }
                 }
             case .enableBraveVPN:
-                print("enablEnable")
-        }
+                bvc.openBlankNewTab(attemptLocationFieldFocus: true, isPrivate: false)
+
+                switch BraveVPN.vpnState {
+                    case .notPurchased, .purchased, .expired:
+                        guard let vc = BraveVPN.vpnState.enableVPNDestinationVC else { return }
+                    
+                        let nav = SettingsNavigationController(rootViewController: vc)
+                        nav.isModalInPresentation = false
+                        nav.modalPresentationStyle = UIDevice.current.userInterfaceIdiom == .phone ? .pageSheet : .formSheet
+                        nav.navigationBar.topItem?.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: nav, action: #selector(nav.done))
+                        
+                        // All menu views should be opened in portrait on iPhones.
+                        UIDevice.current.forcePortraitIfIphone(for: UIApplication.shared)
+
+                        bvc.present(nav, animated: true)
+                    case .installed(let connected):
+                        if !connected {
+                            BraveVPN.reconnect()
+                        }
+                }
+            }
     }
     
     // MARK: Intent Creation Methods

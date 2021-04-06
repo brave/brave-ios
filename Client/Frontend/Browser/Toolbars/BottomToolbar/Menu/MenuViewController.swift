@@ -237,9 +237,52 @@ extension MenuViewController: PanModalPresentable {
     var allowsExtendedPanScrolling: Bool {
         true
     }
+    
     var cornerRadius: CGFloat {
         10.0
     }
+    
+    private func openVPNAction(menuCell: MenuCell) {
+        let enabled = !menuCell.toggleButton.isOn
+        let vpnState = BraveVPN.vpnState
+        
+        /// Connecting to the vpn takes a while, that's why we have to show a spinner until it finishes.
+        if enabled {
+            menuCell.isLoading = true
+        }
+        
+        if !VPNProductInfo.isComplete {
+            let alert =
+                UIAlertController(title: Strings.VPN.errorCantGetPricesTitle,
+                                  message: Strings.VPN.errorCantGetPricesBody,
+                                  preferredStyle: .alert)
+            alert.addAction(.init(title: Strings.OKString, style: .default))
+            dismissView()
+            bvc.present(alert, animated: true)
+            // Reattempt to connect to the App Store to get VPN prices.
+            bvc.vpnProductInfo.load()
+            return
+        }
+        
+        switch BraveVPN.vpnState {
+        case .notPurchased, .purchased, .expired:
+            guard let vc = vpnState.enableVPNDestinationVC else { return }
+            open(vc, doneButton: DoneButton(style: .cancel, position: .left), allowSwipeToDismiss: true)
+        case .installed:
+            // Do not modify UISwitch state here, update it based on vpn status observer.
+            if enabled {
+                BraveVPN.reconnect()
+                
+                /// Donate enable VPN Activity for suggestions
+                let enableVPNActivity = ActivityShortcutManager.shared.createShortcutActivity(type: .enableBraveVPN)
+                self.userActivity = enableVPNActivity
+                enableVPNActivity.becomeCurrent()
+            } else {
+                BraveVPN.disconnect()
+            }
+        }
+    }
+    
     var anchorModalToLongForm: Bool {
         isPresentingInnerMenu
     }
