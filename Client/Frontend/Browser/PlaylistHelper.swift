@@ -51,7 +51,7 @@ class PlaylistHelper: TabContentScript {
     }
     
     func scriptMessageHandlerName() -> String? {
-        return "playlistHelper"
+        return "playlistHelper_\(UserScriptManager.messageHandlerTokenString)"
     }
     
     func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage) {

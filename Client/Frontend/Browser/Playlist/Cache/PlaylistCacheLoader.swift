@@ -363,7 +363,7 @@ class PlaylistWebLoader: UIView, WKNavigationDelegate {
         tab.addContentScript(tab.contentBlocker, name: ContentBlockerHelper.name(), sandboxed: false)
         tab.addContentScript(FingerprintingProtection(tab: tab), name: FingerprintingProtection.name(), sandboxed: false)
         tab.addContentScript(WindowRenderHelperScript(tab: tab), name: WindowRenderHelperScript.name(), sandboxed: false)
-        tab.addContentScript(PlaylistHelper(tab: tab), name: PlaylistHelper.name(), sandboxed: false)
+        tab.addContentScript(PlaylistHelper(tab: tab), name: PlaylistHelper.name(), sandboxed: true)
         tab.addContentScript(PlaylistWebLoaderContentHelper(self), name: PlaylistWebLoaderContentHelper.name(), sandboxed: false)
         
         let script: WKUserScript? = {

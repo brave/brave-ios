@@ -252,11 +252,13 @@ class UserScriptManager {
     }()
     
     private let PlaylistSwizzlerScript: WKUserScript? = {
-        guard let path = Bundle.main.path(forResource: "PlaylistSwizzler", ofType: "js"), let source = try? String(contentsOfFile: path) else {
+        guard let path = Bundle.main.path(forResource: "PlaylistSwizzler", ofType: "js"),
+              let source = try? String(contentsOfFile: path) else {
             log.error("Failed to load PlaylistSwizzler.js")
             return nil
         }
-        return WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+        //return WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+        return WKUserScript.createInDefaultContentWorld(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false)
     }()
     
     private let PlaylistHelperScript: WKUserScript? = {
@@ -267,9 +269,31 @@ class UserScriptManager {
         
         var alteredSource = source
         let token = UserScriptManager.securityToken.uuidString.replacingOccurrences(of: "-", with: "", options: .literal)
-        alteredSource = alteredSource.replacingOccurrences(of: "$<videosSupportFullscreen>", with: "PVSF\(token)", options: .literal)
         
-        return WKUserScript(source: alteredSource, injectionTime: .atDocumentEnd, forMainFrameOnly: false)
+        let replacements = [
+            "$<Playlist>": "Playlist_\(token)",
+            "$<security_token>": "\(token)",
+            "$<handler>": "playlistHelper_\(messageHandlerTokenString)",
+            "$<notify>": "notify_\(token)",
+            "$<onLongPressActivated>": "onLongPressActivated_\(token)",
+            "$<setupLongPress>": "setupLongPress_\(token)",
+            "$<setupDetector>": "setupDetector_\(token)",
+            "$<notifyNodeSource>": "notifyNodeSource_\(token)",
+            "$<notifyNode>": "notifyNode_\(token)",
+            "$<observeNode>": "observeNode_\(token)",
+            "$<observeDocument>": "observeDocument_\(token)",
+            "$<observeDynamicElements>": "observeDynamicElements_\(token)",
+            "$<getAllVideoElements>": "getAllVideoElements_\(token)",
+            "$<getAllAudioElements>": "getAllAudioElements_\(token)",
+            "$<onReady>": "onReady_\(token)",
+            "$<observePage>": "observePage_\(token)",
+        ]
+        
+        replacements.forEach({
+            alteredSource = alteredSource.replacingOccurrences(of: $0.key, with: $0.value, options: .literal)
+        })
+        return WKUserScript.createInDefaultContentWorld(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+        //return WKUserScript(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false)
     }()
 
     private func reloadUserScripts() {

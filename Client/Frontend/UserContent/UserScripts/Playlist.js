@@ -1,7 +1,7 @@
-window.__firefox__.includeOnce("Playlist", function() {
+window.__firefox__.includeOnce("$<Playlist>", function() {
     
     
-    function notify(target, type) {
+    function $<notify>(target, type) {
         if (target) {
             var name = target.title;
             if (name == null || typeof name == 'undefined' || name == "") {
@@ -9,41 +9,44 @@ window.__firefox__.includeOnce("Playlist", function() {
             }
             
             if (target.src !== "") {
-                window.webkit.messageHandlers.playlistHelper.postMessage({
-                                                                            "name": name,
-                                                                            "src": target.src,
-                                                                            "pageSrc": window.location.href,
-                                                                            "pageTitle": document.title,
-                                                                            "mimeType": type,
-                                                                            "duration": target.duration !== target.duration ? 0.0 : target.duration,
-                                                                            "detected": false,
-                                                                            });
+                window.webkit.messageHandlers.$<handler>.postMessage({
+                    "securitytoken": "$<security_token>",
+                    "name": name,
+                    "src": target.src,
+                    "pageSrc": window.location.href,
+                    "pageTitle": document.title,
+                    "mimeType": type,
+                    "duration": target.duration !== target.duration ? 0.0 : target.duration,
+                    "detected": false,
+                });
             }
             else {
                 document.querySelectorAll('source').forEach(function(node) {
                     if (node.src !== "") {
                         if (node.closest('video') === target) {
-                            window.webkit.messageHandlers.playlistHelper.postMessage({
-                                                                                        "name": name,
-                                                                                        "src": node.src,
-                                                                                        "pageSrc": window.location.href,
-                                                                                        "pageTitle": document.title,
-                                                                                        "mimeType": type,
-                                                                                        "duration": target.duration !== target.duration ? 0.0 : target.duration,
-                                                                                        "detected": false,
-                                                                                        });
+                            window.webkit.messageHandlers.$<handler>.postMessage({
+                                "securitytoken": "$<security_token>",
+                                "name": name,
+                                "src": node.src,
+                                "pageSrc": window.location.href,
+                                "pageTitle": document.title,
+                                "mimeType": type,
+                                "duration": target.duration !== target.duration ? 0.0 : target.duration,
+                                "detected": false,
+                            });
                         }
                         
                         if (node.closest('audio') === target) {
-                            window.webkit.messageHandlers.playlistHelper.postMessage({
-                                                                                        "name": name,
-                                                                                        "src": node.src,
-                                                                                        "pageSrc": window.location.href,
-                                                                                        "pageTitle": document.title,
-                                                                                        "mimeType": type,
-                                                                                        "duration": target.duration !== target.duration ? 0.0 : target.duration,
-                                                                                        "detected": false,
-                                                                                        });
+                            window.webkit.messageHandlers.$<handler>.postMessage({
+                                "securitytoken": "$<security_token>",
+                                "name": name,
+                                "src": node.src,
+                                "pageSrc": window.location.href,
+                                "pageTitle": document.title,
+                                "mimeType": type,
+                                "duration": target.duration !== target.duration ? 0.0 : target.duration,
+                                "detected": false,
+                            });
                         }
                     }
                 });
@@ -51,7 +54,7 @@ window.__firefox__.includeOnce("Playlist", function() {
         }
     }
     
-    function onLongPressActivated(event) {
+    function $<onLongPressActivated>(event) {
         var target = event.target;
 
         var targetVideo = target.closest("video");
@@ -94,22 +97,22 @@ window.__firefox__.includeOnce("Playlist", function() {
             
             //No elements found nearby so do nothing..
             if (!targetVideo && !targetAudio) {
-                //webkit.messageHandlers.playlistHelper.postMessage({});
+                //webkit.messageHandlers.$<handler>.postMessage({});
                 return;
             }
         }
         
         //Elements found
         if (targetVideo) {
-            notify(targetVideo, 'video');
+            $<notify>(targetVideo, 'video');
         }
 
         if (targetAudio) {
-            notify(targetAudio, 'audio');
+            $<notify>(targetAudio, 'audio');
         }
     }
     
-    function setupLongPress() {
+    function $<setupLongPress>() {
         var timer = null;
         var touchDuration = 800;
         var cancelDistance = 50;
@@ -118,7 +121,7 @@ window.__firefox__.includeOnce("Playlist", function() {
         function onLongPress() {
             timer = null;
             if (touchEvent) {
-                onLongPressActivated(touchEvent);
+                $<onLongPressActivated>(touchEvent);
             }
         };
 
@@ -152,8 +155,8 @@ window.__firefox__.includeOnce("Playlist", function() {
     
     // MARK: ---------------------------------------
     
-    function setupDetector() {
-        function notifyNodeSource(node, src, mimeType) {
+    function $<setupDetector>() {
+        function $<notifyNodeSource>(node, src, mimeType) {
             var name = node.title;
             if (name == null || typeof name == 'undefined' || name == "") {
                 name = document.title;
@@ -179,75 +182,78 @@ window.__firefox__.includeOnce("Playlist", function() {
             }
 
             if (src !== "") {
-                window.webkit.messageHandlers.playlistHelper.postMessage({
-                                                                            "name": name,
-                                                                            "src": src,
-                                                                            "pageSrc": window.location.href,
-                                                                            "pageTitle": document.title,
-                                                                            "mimeType": mimeType,
-                                                                            "duration": node.duration !== node.duration ? 0.0 : node.duration,
-                                                                            "detected": true
-                                                                            });
+                window.webkit.messageHandlers.$<handler>.postMessage({
+                    "securitytoken": "$<security_token>",
+                    "name": name,
+                    "src": src,
+                    "pageSrc": window.location.href,
+                    "pageTitle": document.title,
+                    "mimeType": mimeType,
+                    "duration": node.duration !== node.duration ? 0.0 : node.duration,
+                    "detected": true
+                });
             } else {
                 var target = node;
                 document.querySelectorAll('source').forEach(function(node) {
                     if (node.src !== "") {
                         if (node.closest('video') === target) {
-                            window.webkit.messageHandlers.playlistHelper.postMessage({
-                                                                                        "name": name,
-                                                                                        "src": node.src,
-                                                                                        "pageSrc": window.location.href,
-                                                                                        "pageTitle": document.title,
-                                                                                        "mimeType": mimeType,
-                                                                                        "duration": target.duration !== target.duration ? 0.0 : target.duration,
-                                                                            "detected": true
-                                                                                        });
+                            window.webkit.messageHandlers.$<handler>.postMessage({
+                                "securitytoken": "$<security_token>",
+                                "name": name,
+                                "src": node.src,
+                                "pageSrc": window.location.href,
+                                "pageTitle": document.title,
+                                "mimeType": mimeType,
+                                "duration": target.duration !== target.duration ? 0.0 : target.duration,
+                    "detected": true
+                            });
                         }
                         
                         if (node.closest('audio') === target) {
-                            window.webkit.messageHandlers.playlistHelper.postMessage({
-                                                                                        "name": name,
-                                                                                        "src": node.src,
-                                                                                        "pageSrc": window.location.href,
-                                                                                        "pageTitle": document.title,
-                                                                                        "mimeType": mimeType,
-                                                                                        "duration": target.duration !== target.duration ? 0.0 : target.duration,
-                                                                            "detected": true
-                                                                                        });
+                            window.webkit.messageHandlers.$<handler>.postMessage({
+                                "securitytoken": "$<security_token>",
+                                "name": name,
+                                "src": node.src,
+                                "pageSrc": window.location.href,
+                                "pageTitle": document.title,
+                                "mimeType": mimeType,
+                                "duration": target.duration !== target.duration ? 0.0 : target.duration,
+                    "detected": true
+                            });
                         }
                     }
                 });
             }
         }
 
-        function notifyNode(node) {
-            notifyNodeSource(node, node.src, node.type);
+        function $<notifyNode>(node) {
+            $<notifyNodeSource>(node, node.src, node.type);
         }
 
-        function observeNode(node) {
+        function $<observeNode>(node) {
             if (node.observer == null || node.observer === undefined) {
                 node.observer = new MutationObserver(function (mutations) {
-                    notifyNode(node);
+                    $<notifyNode>(node);
                 });
                 node.observer.observe(node, { attributes: true, attributeFilter: ["src"] });
-                notifyNode(node);
+                $<notifyNode>(node);
 
                 node.addEventListener('loadedmetadata', function() {
-                    notifyNode(node);
+                    $<notifyNode>(node);
                 });
             }
         }
 
-        function observeDocument(node) {
+        function $<observeDocument>(node) {
             if (node.observer == null || node.observer === undefined) {
                 node.observer = new MutationObserver(function (mutations) {
                     mutations.forEach(function (mutation) {
                         mutation.addedNodes.forEach(function (node) {
                             if (node.constructor.name == "HTMLVideoElement") {
-                                observeNode(node);
+                                $<observeNode>(node);
                             }
                             else if (node.constructor.name == "HTMLAudioElement") {
-                                observeNode(node);
+                                $<observeNode>(node);
                             }
                         });
                     });
@@ -256,28 +262,28 @@ window.__firefox__.includeOnce("Playlist", function() {
             }
         }
 
-        function observeDynamicElements(node) {
+        function $<observeDynamicElements>(node) {
             var original = node.createElement;
             node.createElement = function (tag) {
                 if (tag === 'audio' || tag === 'video') {
                     var result = original.call(node, tag);
-                    observeNode(result);
-                    notifyNode(result);
+                    $<observeNode>(result);
+                    $<notifyNode>(result);
                     return result;
                 }
                 return original.call(node, tag);
             };
         }
 
-        function getAllVideoElements() {
+        function $<getAllVideoElements>() {
             return document.querySelectorAll('video');
         }
 
-        function getAllAudioElements() {
+        function $<getAllAudioElements>() {
             return document.querySelectorAll('audio');
         }
 
-        function onReady(fn) {
+        function $<onReady>(fn) {
             if (document.readyState === "complete" || document.readyState === "interactive") {
                 setTimeout(fn, 1);
             } else {
@@ -285,64 +291,27 @@ window.__firefox__.includeOnce("Playlist", function() {
             }
         }
         
-        function observePage() {
-            observeDocument(document);
-            observeDynamicElements(document);
+        function $<observePage>() {
+            $<observeDocument>(document);
+            $<observeDynamicElements>(document);
 
-            onReady(function() {
-                getAllVideoElements().forEach(function(node) {
-                    observeNode(node);
+            $<onReady>(function() {
+                $<getAllVideoElements>().forEach(function(node) {
+                    $<observeNode>(node);
                 });
 
-                getAllAudioElements().forEach(function(node) {
-                    observeNode(node);
+                $<getAllAudioElements>().forEach(function(node) {
+                    $<observeNode>(node);
                 });
             });
         }
 
-        observePage();
+        $<observePage>();
     }
     
     
     // MARK: -----------------------------
     
-    setupLongPress();
-    setupDetector();
+    $<setupLongPress>();
+    $<setupDetector>();
 });
-
-
-//function setZoom(zoom,el) {
-//
-//      transformOrigin = [0,0];
-//        el = el || instance.getContainer();
-//        var p = ["webkit", "moz", "ms", "o"],
-//            s = "scale(" + zoom + ")",
-//            oString = (transformOrigin[0] * 100) + "% " + (transformOrigin[1] * 100) + "%";
-//
-//        for (var i = 0; i < p.length; i++) {
-//            el.style[p[i] + "Transform"] = s;
-//            el.style[p[i] + "TransformOrigin"] = oString;
-//        }
-//
-//        el.style["transform"] = s;
-//        el.style["transformOrigin"] = oString;
-//
-//}
-//
-//var zoom = 1;
-//var width = 100;
-//
-//function bigger() {
-//    zoom = zoom + 0.1;
-//    width = 100 / zoom;
-//    document.body.style.transformOrigin = "left top";
-//    document.body.style.transform = "scale(" + zoom + ")";
-//    document.body.style.width = width + "%";
-//}
-//function smaller() {
-//    zoom = zoom - 0.1;
-//    width = 100 / zoom;
-//    document.body.style.transformOrigin = "left top";
-//    document.body.style.transform = "scale(" + zoom + ")";
-//    document.body.style.width = width + "%";
-//}
