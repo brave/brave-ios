@@ -36,12 +36,12 @@ struct VPNMenuButton: View {
             vpnProductInfo.load()
             return
         }
-        isVPNStatusChanging = true
         switch BraveVPN.vpnState {
         case .notPurchased, .purchased, .expired:
             guard let vc = vpnState.enableVPNDestinationVC else { return }
             displayVPNDestination(vc)
         case .installed:
+            isVPNStatusChanging = true
             // Do not modify UISwitch state here, update it based on vpn status observer.
             enabled ? BraveVPN.reconnect() : BraveVPN.disconnect()
         }

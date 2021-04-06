@@ -12,9 +12,8 @@ extension BrowserViewController {
     func featuresMenuSection(_ menuController: MenuViewController) -> some View {
         VStack(spacing: 0) {
             VPNMenuButton(vpnProductInfo: self.vpnProductInfo) { vc in
-                self.dismiss(animated: true) {
-                    self.present(vc, animated: true)
-                }
+                (self.presentedViewController as? MenuViewController)?
+                    .pushViewController(vc, animated: true)
             }
         }
     }
