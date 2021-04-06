@@ -76,6 +76,14 @@ class ShortcutSettingsViewController: TableViewController {
                         }, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self)],
                     footer: .title("Use Shortcuts to Open a New Tab & Show Brave Today Feed via Siri - Voice Assistant"))
         )
+        
+        dataSource.sections.append(
+            Section(rows: [
+                        Row(text: "Open Playlist", selection: { [unowned self] in
+                            manageShortcutActivity(for: .openBraveToday)
+                        }, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self)],
+                    footer: .title("Use Shortcuts to Open Playlist via Siri - Voice Assistant"))
+        )
     }
     
     private func manageShortcutActivity(for type: ActivityType) {

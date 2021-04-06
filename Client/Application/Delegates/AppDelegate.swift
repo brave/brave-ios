@@ -663,6 +663,11 @@ extension AppDelegate {
                     type: .openBraveToday, using: browserViewController)
                 
                 return true
+            case ActivityType.openPlayList.identifier:
+                ActivityShortcutManager.shared.performShortcutActivity(
+                    type: .openPlayList, using: browserViewController)
+                
+                return true
             default:
                 break
         }

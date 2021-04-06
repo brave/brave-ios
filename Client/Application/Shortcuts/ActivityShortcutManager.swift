@@ -18,6 +18,7 @@ enum ActivityType: String {
     case clearBrowsingHistory = "ClearBrowsingHistory"
     case enableBraveVPN = "EnableBraveVPN"
     case openBraveToday = "OpenBraveToday"
+    case openPlayList = "OpenPlayList"
 
     var identifier: String {
         return " \(Bundle.main.bundleIdentifier ?? "") + .\(self.rawValue)"
@@ -36,6 +37,8 @@ enum ActivityType: String {
                 return "Open Brave Browser and Enable VPN"
             case .openBraveToday:
                 return "Open Brave Today"
+            case .openPlayList:
+                return "Open Playlist"
         }
     }
     
@@ -43,13 +46,15 @@ enum ActivityType: String {
     var description: String {
         switch self {
             case .newTab, .newPrivateTab:
-                return "Start Searching the web securely with Brave."
+                return "Start Searching the Web Securely with Brave"
             case .clearBrowsingHistory:
                 return "Open Browser in a New Tab and Delete All Private Browser History Data"
             case .enableBraveVPN:
                 return "Open Browser in a New Tab and Enable VPN"
             case .openBraveToday:
-                return "Open Brave Today and check Today's top stories."
+                return "Open Brave Today and Check Today's Top Stories"
+            case .openPlayList:
+                return "Start Playing your Videos in Playlist"
         }
     }
     
@@ -66,6 +71,8 @@ enum ActivityType: String {
                 return "Enable VPN"
             case .openBraveToday:
                 return "Open Brave Today"
+            case .openPlayList:
+                return "Open Playlist"
         }
     }
 }
@@ -135,8 +142,9 @@ class ActivityShortcutManager: NSObject {
                 bvc.openBlankNewTab(attemptLocationFieldFocus: true, isPrivate: false)
 
                 guard let newTabPageController = bvc.tabManager.selectedTab?.newTabPageViewController else { return }
-                            
                 newTabPageController.scrollToBraveToday()
+            case .openPlayList:
+                print("Open Playlist")
         }
     }
     
