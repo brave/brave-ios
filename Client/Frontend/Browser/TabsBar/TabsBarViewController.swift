@@ -315,6 +315,8 @@ extension TabsBarViewController: UICollectionViewDataSource {
         cell.titleLabel.text = tab.displayTitle
         cell.currentIndex = indexPath.row
         cell.separatorLineRight.isHidden = (indexPath.row != tabList.count() - 1)
+        cell.separatorLineRight.backgroundColor = Theme.of(nil).colors.border.withAlphaComponent(Theme.of(nil).colors.transparencies.borderAlpha)
+        cell.separatorLine.backgroundColor = cell.separatorLineRight.backgroundColor
         
         cell.closeTabCallback = { [weak self] tab in
             guard let strongSelf = self, let tabManager = strongSelf.tabManager, let previousIndex = strongSelf.tabList.index(of: tab) else { return }
