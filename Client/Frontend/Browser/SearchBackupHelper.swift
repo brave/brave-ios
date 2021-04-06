@@ -27,6 +27,11 @@ class SearchBackupHelper: TabContentScript {
         // 🙀 😭 🏃‍♀️💨
         print("bxx search backup")
         
+        guard let info = SearchBackupMessage.from(message: message) else {
+            print("INVALID SCRIPT MESSAGE") //TODO: Log This.
+            return
+        }
+        
         let str = "https://www.google.com/search?q=test&hl=us&gl=us"
         let request = URLRequest(url: URL(string: str)!)
         URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
@@ -35,9 +40,20 @@ class SearchBackupHelper: TabContentScript {
             let str = data.websafeBase64String()!
             
             DispatchQueue.main.async {
-                // swiftlint:disable:next safe_javascript
-                self.tab?.webView?.evaluateJavaScript("searchBackupCallback('\(str)')") { _, _ in
+                if let error = error {
+                    print(error) //TODO: Log Error.
                     
+                    // swiftlint:disable:next safe_javascript
+                    self.tab?.webView?.evaluateJavaScript("window.brave_ios.resolve('\(info.id)', null, '\(error)');", completionHandler: { _, err in
+                        
+                        print(err) //TODO: Log Error.
+                    })
+                } else {
+                    // swiftlint:disable:next safe_javascript
+                    self.tab?.webView?.evaluateJavaScript("window.brave_ios.resolve('\(info.id)', '\(str)', null);", completionHandler: { _, err in
+                        
+                        print(err) //TODO: Log Error.
+                    })
                 }
             }
             
@@ -47,5 +63,21 @@ class SearchBackupHelper: TabContentScript {
 
     static var isActivated: Bool {
         return true
+    }
+    
+    private struct SearchBackupMessage: Codable {
+        let id: String
+        let securitytoken: String
+        let data: [String: String]
+        
+        static func from(message: WKScriptMessage) -> SearchBackupMessage? {
+            do {
+                let jsonData = try JSONSerialization.data(withJSONObject: message.body, options: .fragmentsAllowed)
+                return try JSONDecoder().decode(SearchBackupMessage.self, from: jsonData)
+            } catch {
+                print(error) //TODO: Log Error.
+                return nil
+            }
+        }
     }
 }
