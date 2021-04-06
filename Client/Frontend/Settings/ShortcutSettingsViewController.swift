@@ -59,7 +59,7 @@ class ShortcutSettingsViewController: TableViewController {
                             manageShortcutActivity(for: .clearBrowsingHistory)
                         }, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self)],
                     footer: .title("Use Shortcuts to Clear Browsing History & Open a New Tab via Siri - Voice Assistant"))
-            )
+        )
             
         dataSource.sections.append(
             Section(rows: [
@@ -67,6 +67,14 @@ class ShortcutSettingsViewController: TableViewController {
                             manageShortcutActivity(for: .enableBraveVPN)
                         }, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self)],
                     footer: .title("Use Shortcuts to enable Brave VPN via Siri - Voice Assistant"))
+        )
+        
+        dataSource.sections.append(
+            Section(rows: [
+                        Row(text: "Open Brave Today", selection: { [unowned self] in
+                            manageShortcutActivity(for: .openBraveToday)
+                        }, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self)],
+                    footer: .title("Use Shortcuts to Open a New Tab & Show Brave Today Feed via Siri - Voice Assistant"))
         )
     }
     

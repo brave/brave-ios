@@ -513,6 +513,11 @@ class NewTabPageViewController: UIViewController {
                 inNewTab: inNewTab,
                 switchingToPrivateMode: switchingToPrivateMode
             )
+            
+            /// Donate Open Brave Today for suggestions
+            let openBraveTodayActivity = ActivityShortcutManager.shared.createShortcutActivity(type: .openBraveToday)
+            self.userActivity = openBraveTodayActivity
+            openBraveTodayActivity.becomeCurrent()
         case .itemAction(.toggledSource, let context):
             let isEnabled = feedDataSource.isSourceEnabled(context.item.source)
             feedDataSource.toggleSource(context.item.source, enabled: !isEnabled)
@@ -777,6 +782,13 @@ extension NewTabPageViewController {
                 }
             }
         }
+    }
+    
+    /// Moves New Tab Page Scroll to start of Brave Today - Used for shorcut
+    func scrollToBraveToday() {
+        // Offset of where Brave Today starts
+        let todayStart = collectionView.frame.height - feedOverlayView.headerView.bounds.height - 32 - 16
+        collectionView.contentOffset.y = todayStart
     }
 }
 

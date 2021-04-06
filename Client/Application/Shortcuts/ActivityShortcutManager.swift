@@ -17,6 +17,7 @@ enum ActivityType: String {
     case newPrivateTab = "NewPrivateTab"
     case clearBrowsingHistory = "ClearBrowsingHistory"
     case enableBraveVPN = "EnableBraveVPN"
+    case openBraveToday = "OpenBraveToday"
 
     var identifier: String {
         return " \(Bundle.main.bundleIdentifier ?? "") + .\(self.rawValue)"
@@ -33,6 +34,8 @@ enum ActivityType: String {
                 return "Clear Brave Browsing History"
             case .enableBraveVPN:
                 return "Open Brave Browser and Enable VPN"
+            case .openBraveToday:
+                return "Open Brave Today"
         }
     }
     
@@ -45,6 +48,8 @@ enum ActivityType: String {
                 return "Open Browser in a New Tab and Delete All Private Browser History Data"
             case .enableBraveVPN:
                 return "Open Browser in a New Tab and Enable VPN"
+            case .openBraveToday:
+                return "Open Brave Today and check Today's top stories."
         }
     }
     
@@ -59,6 +64,8 @@ enum ActivityType: String {
                 return "Clear Browser History"
             case .enableBraveVPN:
                 return "Enable VPN"
+            case .openBraveToday:
+                return "Open Brave Today"
         }
     }
 }
@@ -124,7 +131,13 @@ class ActivityShortcutManager: NSObject {
                             BraveVPN.reconnect()
                         }
                 }
-            }
+            case .openBraveToday:
+                bvc.openBlankNewTab(attemptLocationFieldFocus: true, isPrivate: false)
+
+                guard let newTabPageController = bvc.tabManager.selectedTab?.newTabPageViewController else { return }
+                            
+                newTabPageController.scrollToBraveToday()
+        }
     }
     
     // MARK: Intent Creation Methods
