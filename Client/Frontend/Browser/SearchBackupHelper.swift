@@ -6,7 +6,8 @@ import Foundation
 import WebKit
 import Shared
 import BraveShared
-import Combine
+
+private let log = Logger.browserLogger
 
 class SearchBackupHelper: TabContentScript {
     fileprivate weak var tab: Tab?
@@ -23,12 +24,9 @@ class SearchBackupHelper: TabContentScript {
         return SearchBackupHelper.name()
     }
 
-    func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage) {
-        // 🙀 😭 🏃‍♀️💨
-        print("bxx search backup")
-        
+    func userContentController(_ userContentController: WKUserContentController,
+                               didReceiveScriptMessage message: WKScriptMessage) {
         guard let info = SearchBackupMessage.from(message: message) else {
-            print("INVALID SCRIPT MESSAGE") //TODO: Log This.
             return
         }
         
@@ -37,24 +35,22 @@ class SearchBackupHelper: TabContentScript {
         URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
             guard let self = self, let data = data else { return }
             
-            let str = data.websafeBase64String()!
+            if let error = error {
+                log.error("Search backup network error: \(error)")
+                return
+            }
+            
+            guard let str = data.websafeBase64String() else {
+                log.error("Failed to get backup search data as base64")
+                return
+            }
             
             DispatchQueue.main.async {
-                if let error = error {
-                    print(error) //TODO: Log Error.
-                    
-                    // swiftlint:disable:next safe_javascript
-                    self.tab?.webView?.evaluateJavaScript("window.brave_ios.resolve('\(info.id)', null, '\(error)');", completionHandler: { _, err in
-                        
-                        print(err) //TODO: Log Error.
-                    })
-                } else {
-                    // swiftlint:disable:next safe_javascript
-                    self.tab?.webView?.evaluateJavaScript("window.brave_ios.resolve('\(info.id)', '\(str)', null);", completionHandler: { _, err in
-                        
-                        print(err) //TODO: Log Error.
-                    })
-                }
+                // TODO: Convert to safe javascript.
+                // swiftlint:disable:next safe_javascript
+                self.tab?.webView?.evaluateJavaScript("window.brave_ios.resolve('\(info.id)', '\(str)', null);", completionHandler: { _, error in
+                    log.error("promise resolve error: \(String(describing: error))")
+                })
             }
             
         }.resume()
@@ -68,14 +64,21 @@ class SearchBackupHelper: TabContentScript {
     private struct SearchBackupMessage: Codable {
         let id: String
         let securitytoken: String
-        let data: [String: String]
+        let data: MessageData
+        
+        struct MessageData: Codable {
+            let query: String
+            let language: String
+            let country: String
+            let geo: String?
+        }
         
         static func from(message: WKScriptMessage) -> SearchBackupMessage? {
             do {
                 let jsonData = try JSONSerialization.data(withJSONObject: message.body, options: .fragmentsAllowed)
                 return try JSONDecoder().decode(SearchBackupMessage.self, from: jsonData)
             } catch {
-                print(error) //TODO: Log Error.
+                log.error("Failed to decode message parameters: \(error)")
                 return nil
             }
         }

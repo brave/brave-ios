@@ -42,9 +42,7 @@ Object.defineProperty(window, 'brave_ios', {
     writable: false,
      value: {
         fetchBackupResults(query, language, country, geo) {
-            return window.brave_ios.sendMessage({"data": "messageData"}).then((res) => {
-                res(`sample html: ${query}, ${language}, ${country}, ${geo}`)
-            });
+            return window.brave_ios.sendMessage({ "query": query, "language": language, "country": country, "geo": geo})
         }
     }
   });
