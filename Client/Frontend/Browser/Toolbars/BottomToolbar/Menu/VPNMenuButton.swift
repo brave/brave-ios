@@ -47,6 +47,18 @@ struct VPNMenuButton: View {
         }
     }
     
+    private var vpnToggle: some View {
+        Group {
+            let toggle = Toggle("Brave VPN", isOn: isVPNEnabledBinding)
+            if #available(iOS 14.0, *) {
+                toggle
+                    .toggleStyle(SwitchToggleStyle(tint: .accentColor))
+            } else {
+                toggle
+            }
+        }
+    }
+    
     var body: some View {
         Button(action: { toggleVPN(!BraveVPN.isConnected) }) {
             HStack {
@@ -55,7 +67,7 @@ struct VPNMenuButton: View {
                 if isVPNStatusChanging {
                     ActivityIndicatorView(isAnimating: true)
                 }
-                Toggle("Brave VPN", isOn: isVPNEnabledBinding)
+                vpnToggle
                     .labelsHidden()
             }
             .padding(.horizontal, 14)

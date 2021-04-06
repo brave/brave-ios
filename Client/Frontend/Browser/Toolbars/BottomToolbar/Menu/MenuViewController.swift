@@ -41,6 +41,7 @@ private struct MenuView<Content: View>: View {
             content
                 .padding(.vertical, 8)
                 .frame(maxWidth: .infinity)
+                .accentColor(Color(BraveUX.braveOrange))
         }
     }
 }
@@ -60,7 +61,6 @@ struct MenuItemButton: View {
                 .frame(maxWidth: .infinity, minHeight: 48.0, alignment: .leading)
         }
         .buttonStyle(TableCellButtonStyle())
-        .accentColor(Color(Theme.of(nil).colors.tints.home))
     }
 }
 
