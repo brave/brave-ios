@@ -30,8 +30,18 @@ class SearchBackupHelper: TabContentScript {
             return
         }
         
-        let str = "https://www.google.com/search?q=test&hl=us&gl=us"
-        let request = URLRequest(url: URL(string: str)!)
+        guard var components = URLComponents(string: "https://www.google.com") else { return }
+        components.queryItems = [.init(name: "q", value: info.data.query),
+                                 .init(name: "hl", value: info.data.language),
+                                 .init(name: "gl", value: info.data.country)]
+        
+        guard let url = components.url else { return }
+        var request = URLRequest(url: url)
+        
+        if let geoHeader = info.data.geo {
+            request.addValue(geoHeader, forHTTPHeaderField: "x-geo")
+        }
+        
         URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
             guard let self = self, let data = data else { return }
             
@@ -49,16 +59,14 @@ class SearchBackupHelper: TabContentScript {
                 // TODO: Convert to safe javascript.
                 // swiftlint:disable:next safe_javascript
                 self.tab?.webView?.evaluateJavaScript("window.brave_ios.resolve('\(info.id)', '\(str)', null);", completionHandler: { _, error in
-                    log.error("promise resolve error: \(String(describing: error))")
+                    if let error = error {
+                        log.error("Promise resolve error: \(error)")
+                    }
                 })
             }
             
         }.resume()
         
-    }
-
-    static var isActivated: Bool {
-        return true
     }
     
     private struct SearchBackupMessage: Codable {
