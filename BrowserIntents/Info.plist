@@ -26,9 +26,14 @@
 		<dict>
 			<key>IntentsRestrictedWhileLocked</key>
 			<array/>
+			<key>IntentsRestrictedWhileProtectedDataUnavailable</key>
+			<array/>
 			<key>IntentsSupported</key>
 			<array>
+				<string>OpenBookmarkWebsiteIntent</string>
+				<string>OpenHistoryWebsiteIntent</string>
 				<string>OpenWebsite</string>
+				<string>OpenWebsiteIntent</string>
 			</array>
 		</dict>
 		<key>NSExtensionPointIdentifier</key>

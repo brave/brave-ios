@@ -80,7 +80,7 @@ class ShortcutSettingsViewController: TableViewController {
         dataSource.sections.append(
             Section(rows: [
                         Row(text: "Open Playlist", selection: { [unowned self] in
-                            manageShortcutActivity(for: .openBraveToday)
+                            manageShortcutActivity(for: .openPlayList)
                         }, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self)],
                     footer: .title("Use Shortcuts to Open Playlist via Siri - Voice Assistant"))
         )
