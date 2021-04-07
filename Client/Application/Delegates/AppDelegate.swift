@@ -672,6 +672,15 @@ extension AppDelegate {
                 break
         }
         
+        if let intent = userActivity.interaction?.intent as? OpenWebsiteIntent {
+            guard let siteURL = intent.websiteURL, let url = URL(string: siteURL) else {
+                return false
+            }
+
+            browserViewController.switchToTabForURLOrOpen(url, isPrivileged: true)
+            return true
+        }
+        
         return false
     }
     

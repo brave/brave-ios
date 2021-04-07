@@ -160,7 +160,7 @@ class ActivityShortcutManager: NSObject {
     
     // MARK: Intent Donation Methods
     
-    private func donateOpenWebsiteIntent(for urlString: String) {
+    public func donateOpenWebsiteIntent(for urlString: String) {
         let intent = createOpenWebsiteIntent(with: urlString)
 
         let interaction = INInteraction(intent: intent, response: nil)

@@ -22,7 +22,7 @@
 			<key>INIntentConfigurable</key>
 			<true/>
 			<key>INIntentDescription</key>
-			<string>Open a website in new tab</string>
+			<string>Open a Website in New Tab</string>
 			<key>INIntentDescriptionID</key>
 			<string>3oC6Qm</string>
 			<key>INIntentKeyParameter</key>
@@ -36,7 +36,7 @@
 					<key>INIntentParameterCombinationSupportsBackgroundExecution</key>
 					<true/>
 					<key>INIntentParameterCombinationTitle</key>
-					<string>Open ${websiteURL}in a new Tab</string>
+					<string>Open ${websiteURL}in a New Tab</string>
 					<key>INIntentParameterCombinationTitleID</key>
 					<string>azhMra</string>
 					<key>INIntentParameterCombinationUpdatesLinked</key>
@@ -69,7 +69,7 @@
 					<key>INIntentParameterCombinationSupportsBackgroundExecution</key>
 					<true/>
 					<key>INIntentParameterCombinationTitle</key>
-					<string>Open website in a new Tab</string>
+					<string>Open a Website in a New Tab</string>
 					<key>INIntentParameterCombinationTitleID</key>
 					<string>1QT5y6</string>
 				</dict>

@@ -430,6 +430,9 @@
 		2F26C438267B9F0D00E5AD60 /* BlockSummaryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F26C437267B9F0D00E5AD60 /* BlockSummaryTests.swift */; };
 		2F26C43A267B9F9400E5AD60 /* blocking-summary-test.json in Resources */ = {isa = PBXBuildFile; fileRef = 2F26C439267B9F9400E5AD60 /* blocking-summary-test.json */; };
 		2F29FB8B267BE06100B0AD6A /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 2F29FB7E267BE06100B0AD6A /* Model.xcdatamodeld */; };
+		2F2C3549261D10AE00631310 /* OpenWebsiteIntentHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F693223260D218900ECEB38 /* OpenWebsiteIntentHandler.swift */; };
+		2F2C3572261D10FA00631310 /* BrowserIntents.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = 2F67701C260BE2D10048A1DB /* BrowserIntents.intentdefinition */; };
+		2F2C35A6261DF41100631310 /* OpenWebsiteIntentHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F693223260D218900ECEB38 /* OpenWebsiteIntentHandler.swift */; };
 		2F44FA1B1A9D426A00FD20CC /* TestHashExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F44FA1A1A9D426A00FD20CC /* TestHashExtensions.swift */; };
 		2F44FB2D1A9D5D8500FD20CC /* FiraSans-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E4B7B7421A793CF20022C5E0 /* FiraSans-BoldItalic.ttf */; };
 		2F44FC721A9E840300FD20CC /* SettingsNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F44FC711A9E840300FD20CC /* SettingsNavigationController.swift */; };
@@ -445,7 +448,6 @@
 		2F67701D260BE2D10048A1DB /* BrowserIntents.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = 2F67701C260BE2D10048A1DB /* BrowserIntents.intentdefinition */; };
 		2F6931B7260CFB3700ECEB38 /* IntentHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F6931B6260CFB3700ECEB38 /* IntentHandler.swift */; };
 		2F6931BB260CFB3700ECEB38 /* BrowserIntents.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 2F6931B4260CFB3700ECEB38 /* BrowserIntents.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		2F69322F260D225400ECEB38 /* OpenWebsiteIntentHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F693223260D218900ECEB38 /* OpenWebsiteIntentHandler.swift */; };
 		2F697F7E1A9FD22D009E03AE /* SearchEnginesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F697F7D1A9FD22D009E03AE /* SearchEnginesTests.swift */; };
 		2F9311D52665883400C6B74D /* DataSaved.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F9311D42665883400C6B74D /* DataSaved.swift */; };
 		2F9311DA266698E600C6B74D /* DataSavedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F9311D8266698E600C6B74D /* DataSavedTests.swift */; };
@@ -6778,6 +6780,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2F2C3549261D10AE00631310 /* OpenWebsiteIntentHandler.swift in Sources */,
+				2F2C3572261D10FA00631310 /* BrowserIntents.intentdefinition in Sources */,
 				2F6931B7260CFB3700ECEB38 /* IntentHandler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -7154,6 +7158,7 @@
 				74E36D781B71323500D69DA1 /* SettingsContentViewController.swift in Sources */,
 				2F51767425E4024B00429692 /* PlaylistSettingsViewController.swift in Sources */,
 				0A1DF468244858CA00541FE4 /* VPNProductInfo.swift in Sources */,
+				2F2C35A6261DF41100631310 /* OpenWebsiteIntentHandler.swift in Sources */,
 				27B3DDD524AF98EA0006A7ED /* FeedItem.swift in Sources */,
 				448DC7D6268A5C3E00F4795C /* BraveSearchDebugMenu.swift in Sources */,
 				0AF4C59424F8003A00E500DD /* NTPDefaultBrowserCalloutProvider.swift in Sources */,
@@ -7309,7 +7314,6 @@
 				27A1AC0924859D0900344503 /* FeedHeadlineViews.swift in Sources */,
 				0A93F1892264C72000A3571B /* BookmarkFormFieldsProtocol.swift in Sources */,
 				4422D4D821BFFB7600BF1855 /* block.cc in Sources */,
-				2F69322F260D225400ECEB38 /* OpenWebsiteIntentHandler.swift in Sources */,
 				F9B23EE523F613E8000EB3D8 /* PaymentRequestExtension.swift in Sources */,
 				E65075541E37F6FC006961AC /* DynamicFontHelper.swift in Sources */,
 				0A179E282519F97E0014D9E1 /* InitialSearchEngines.swift in Sources */,

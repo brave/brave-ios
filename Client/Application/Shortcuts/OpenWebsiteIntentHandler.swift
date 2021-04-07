@@ -3,28 +3,28 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import Shared
 import Intents
 import CoreSpotlight
 import MobileCoreServices
 
-private let log = Logger.browserLogger
-
 public class OpenWebsiteIntentHandler: NSObject, OpenWebsiteIntentHandling {
 
     public func handle(intent: OpenWebsiteIntent, completion: @escaping (OpenWebsiteIntentResponse) -> Void) {
-        
-    }
-    
-    public func confirm(intent: OpenWebsiteIntent, completion: @escaping (OpenWebsiteIntentResponse) -> Void) {
-        guard let urlString = intent.websiteURL, let websiteURL = URL(string: urlString) else {
-            
+        guard let siteURL = intent.websiteURL else {
             completion(OpenWebsiteIntentResponse(code: .failure, userActivity: nil))
+
             return
         }
         
-        log.debug("URL generated from Intent's website URL Text \(websiteURL)")
+        completion(OpenWebsiteIntentResponse.success(websiteURL: siteURL))
+    }
+    
+    public func confirm(intent: OpenWebsiteIntent, completion: @escaping (OpenWebsiteIntentResponse) -> Void) {
+        guard let urlString = intent.websiteURL, URL(string: urlString) != nil else {
+            completion(OpenWebsiteIntentResponse(code: .failure, userActivity: nil))
+            return
+        }
 
-        completion(OpenWebsiteIntentResponse(code: .ready, userActivity: nil))
+        completion(OpenWebsiteIntentResponse(code: .success, userActivity: nil))
     }
 }
