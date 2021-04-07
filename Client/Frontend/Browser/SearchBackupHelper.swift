@@ -6,11 +6,14 @@ import Foundation
 import WebKit
 import Shared
 import BraveShared
+import Combine
 
 private let log = Logger.browserLogger
 
 class SearchBackupHelper: TabContentScript {
     fileprivate weak var tab: Tab?
+    
+    private var cancellable: AnyCancellable?
 
     required init(tab: Tab) {
         self.tab = tab
@@ -42,30 +45,66 @@ class SearchBackupHelper: TabContentScript {
             request.addValue(geoHeader, forHTTPHeaderField: "x-geo")
         }
         
-        URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
-            guard let self = self, let data = data else { return }
-            
-            if let error = error {
-                log.error("Search backup network error: \(error)")
-                return
+        cancellable = URLSession.shared
+            .dataTaskPublisher(for: request)
+            .tryMap { output -> String in
+                guard let base64Data = output.data.websafeBase64String() else {
+                    throw "Failed to get backup search data as base64"
+                }
+                
+                guard let response = output.response as? HTTPURLResponse,
+                      response.statusCode >= 200 && response.statusCode < 300 else {
+                    throw "Invalid response"
+                }
+                
+                return base64Data
             }
-            
-            guard let str = data.websafeBase64String() else {
-                log.error("Failed to get backup search data as base64")
-                return
-            }
-            
-            DispatchQueue.main.async {
-                // TODO: Convert to safe javascript.
+            .eraseToAnyPublisher()
+            .receive(on: DispatchQueue.main)
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .failure(let error):
+                    log.error("Error: \(error)")
+                case .finished:
+                    break
+                }
+            },
+            receiveValue: { [weak self] data in
                 // swiftlint:disable:next safe_javascript
-                self.tab?.webView?.evaluateJavaScript("window.brave_ios.resolve('\(info.id)', '\(str)', null);", completionHandler: { _, error in
+                self?.tab?.webView?.evaluateJavaScript("window.brave_ios.resolve('\(info.id)', '\(data)', null);", completionHandler: { _, error in
                     if let error = error {
                         log.error("Promise resolve error: \(error)")
                     }
                 })
-            }
+            })
             
-        }.resume()
+            
+        
+        
+//        URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
+//            guard let self = self, let data = data else { return }
+//
+//            if let error = error {
+//                log.error("Search backup network error: \(error)")
+//                return
+//            }
+//
+//            guard let str = data.websafeBase64String() else {
+//                log.error("Failed to get backup search data as base64")
+//                return
+//            }
+//
+//            DispatchQueue.main.async {
+//                // TODO: Convert to safe javascript.
+//                // swiftlint:disable:next safe_javascript
+//                self.tab?.webView?.evaluateJavaScript("window.brave_ios.resolve('\(info.id)', '\(str)', null);", completionHandler: { _, error in
+//                    if let error = error {
+//                        log.error("Promise resolve error: \(error)")
+//                    }
+//                })
+//            }
+//
+//        }.resume()
         
     }
     
