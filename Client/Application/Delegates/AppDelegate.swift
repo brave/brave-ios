@@ -672,13 +672,25 @@ extension AppDelegate {
                 break
         }
         
-        if let intent = userActivity.interaction?.intent as? OpenWebsiteIntent {
-            guard let siteURL = intent.websiteURL, let url = URL(string: siteURL) else {
+        func switchToTabForIntentURL(intentURL: String?) -> Bool {
+            guard let siteURL = intentURL, let url = URL(string: siteURL) else {
                 return false
             }
 
             browserViewController.switchToTabForURLOrOpen(url, isPrivileged: true)
             return true
+        }
+        
+        if let intent = userActivity.interaction?.intent as? OpenWebsiteIntent {
+            return switchToTabForIntentURL(intentURL: intent.websiteURL)
+        }
+        
+        if let intent = userActivity.interaction?.intent as? OpenHistoryWebsiteIntent {
+            return switchToTabForIntentURL(intentURL: intent.websiteURL)
+        }
+        
+        if let intent = userActivity.interaction?.intent as? OpenBookmarkWebsiteIntent {
+            return switchToTabForIntentURL(intentURL: intent.websiteURL)
         }
         
         return false
