@@ -29,6 +29,20 @@ class SearchBackupHelper: TabContentScript {
 
     func userContentController(_ userContentController: WKUserContentController,
                                didReceiveScriptMessage message: WKScriptMessage) {
+        var allowedHosts = ["search.brave.com"]
+        if !AppConstants.buildChannel.isPublic {
+            allowedHosts.append("search-dev.brave.com")
+            // TODO: Remove before merge.
+            allowedHosts.append("webpiaskownica.000webhostapp.com")
+        }
+        
+        guard let requestHost = message.frameInfo.request.url?.host,
+              allowedHosts.contains(requestHost),
+              message.frameInfo.isMainFrame else {
+            log.error("Backup search request called from disallowed host")
+            return
+        }
+        
         guard let info = SearchBackupMessage.from(message: message) else {
             return
         }
@@ -48,16 +62,22 @@ class SearchBackupHelper: TabContentScript {
         cancellable = URLSession.shared
             .dataTaskPublisher(for: request)
             .tryMap { output -> String in
-                guard let base64Data = output.data.websafeBase64String() else {
-                    throw "Failed to get backup search data as base64"
-                }
-                
                 guard let response = output.response as? HTTPURLResponse,
+                      let contentType = response.value(forHTTPHeaderField: "Content-Type"),
                       response.statusCode >= 200 && response.statusCode < 300 else {
                     throw "Invalid response"
                 }
                 
-                return base64Data
+                // For some reason sometimes no matter what headers are set, ISO encoding is returned
+                // instead of utf, we check for that to decode it correctly.
+                let encoding: String.Encoding =
+                    contentType.contains("ISO-8859-1") ? .isoLatin1 : .utf8
+                
+                guard let stringFromData = String(data: output.data, encoding: encoding) else {
+                    throw "Failed to decode string from data"
+                }
+                
+                return stringFromData.javaScriptEscapedString
             }
             .eraseToAnyPublisher()
             .receive(on: DispatchQueue.main)
@@ -70,42 +90,17 @@ class SearchBackupHelper: TabContentScript {
                 }
             },
             receiveValue: { [weak self] data in
-                // swiftlint:disable:next safe_javascript
-                self?.tab?.webView?.evaluateJavaScript("window.brave_ios.resolve('\(info.id)', '\(data)', null);", completionHandler: { _, error in
+                self?.tab?.webView?.evaluateSafeJavaScript(
+                    functionName: "window.brave_ios.resolve",
+                    args: ["'\(info.id)'", data],
+                    sandboxed: false,
+                    escapeArgs: false) { _, error  in
                     if let error = error {
                         log.error("Promise resolve error: \(error)")
                     }
-                })
+                    
+                }
             })
-            
-            
-        
-        
-//        URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
-//            guard let self = self, let data = data else { return }
-//
-//            if let error = error {
-//                log.error("Search backup network error: \(error)")
-//                return
-//            }
-//
-//            guard let str = data.websafeBase64String() else {
-//                log.error("Failed to get backup search data as base64")
-//                return
-//            }
-//
-//            DispatchQueue.main.async {
-//                // TODO: Convert to safe javascript.
-//                // swiftlint:disable:next safe_javascript
-//                self.tab?.webView?.evaluateJavaScript("window.brave_ios.resolve('\(info.id)', '\(str)', null);", completionHandler: { _, error in
-//                    if let error = error {
-//                        log.error("Promise resolve error: \(error)")
-//                    }
-//                })
-//            }
-//
-//        }.resume()
-        
     }
     
     private struct SearchBackupMessage: Codable {
