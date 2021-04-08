@@ -55,6 +55,14 @@ class UserScriptManager {
         }
     }
     
+    /// Whether or not Playlist is enabled
+    var isPlaylistEnabled: Bool {
+        didSet {
+            if oldValue == isPlaylistEnabled { return }
+            reloadUserScripts()
+        }
+    }
+    
     /// Whether or not the MediaSource API should be disabled for Playlists
     var isWebCompatibilityMediaSourceAPIEnabled: Bool {
         didSet {
@@ -109,6 +117,7 @@ class UserScriptManager {
         self.isU2FEnabled = isU2FEnabled
         self.isPaymentRequestEnabled = isPaymentRequestEnabled
         self.isWebCompatibilityMediaSourceAPIEnabled = isWebCompatibilityMediaSourceAPIEnabled
+        self.isPlaylistEnabled = true
         reloadUserScripts()
     }
     
@@ -257,7 +266,6 @@ class UserScriptManager {
             log.error("Failed to load PlaylistSwizzler.js")
             return nil
         }
-        //return WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false)
         return WKUserScript.createInDefaultContentWorld(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false)
     }()
     
@@ -273,6 +281,7 @@ class UserScriptManager {
         let replacements = [
             "$<Playlist>": "Playlist_\(token)",
             "$<security_token>": "\(token)",
+            "$<sendMessage>": "playlistHelper_sendMessage_\(token)",
             "$<handler>": "playlistHelper_\(messageHandlerTokenString)",
             "$<notify>": "notify_\(token)",
             "$<onLongPressActivated>": "onLongPressActivated_\(token)",
@@ -293,7 +302,6 @@ class UserScriptManager {
             alteredSource = alteredSource.replacingOccurrences(of: $0.key, with: $0.value, options: .literal)
         })
         return WKUserScript.createInDefaultContentWorld(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false)
-        //return WKUserScript(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false)
     }()
 
     private func reloadUserScripts() {
@@ -332,7 +340,7 @@ class UserScriptManager {
                 $0.addUserScript(script)
             }
             
-            if let script = PlaylistHelperScript {
+            if isPlaylistEnabled, let script = PlaylistHelperScript {
                 $0.addUserScript(script)
             }
             

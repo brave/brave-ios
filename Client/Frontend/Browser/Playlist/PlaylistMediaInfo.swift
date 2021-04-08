@@ -155,7 +155,7 @@ extension PlaylistMediaInfo: MPPlayableContentDelegate {
                     return
                 }
                 
-                #if PLAYLIST_WEB_LOADER
+                #if !PLAYLIST_WEB_LOADER
                 self.webLoader?.removeFromSuperview()
                 self.webLoader = PlaylistWebLoader(handler: { [weak self] newItem in
                     guard let self = self else { return }

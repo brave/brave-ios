@@ -8,6 +8,10 @@ import AVFoundation
 import WebKit
 import MobileCoreServices
 import Data
+import Shared
+import BraveShared
+
+private let log = Logger.browserLogger
 
 // IANA List of Audio types: https://www.iana.org/assignments/media-types/media-types.xhtml#audio
 // IANA List of Video types: https://www.iana.org/assignments/media-types/media-types.xhtml#video
@@ -261,13 +265,13 @@ public class PlaylistMimeTypeDetector {
         "audio/mpeg3": "mp3",
         "audio/mp3": "mp3",
         "audio/x-caf": "caf",
-        "audio/mpeg": "mp3", //mpg3
+        "audio/mpeg": "mp3", // mpg3
         "audio/x-mpeg3": "mp3",
         "audio/wav": "wav",
         "audio/flac": "flac",
         "audio/x-flac": "flac",
         "audio/mp4": "mp4",
-        "audio/x-mpg": "mp3", //maybe mpg3
+        "audio/x-mpg": "mp3", // maybe mpg3
         "audio/scpls": "pls",
         "audio/x-aiff": "aiff",
         "audio/usac": "eac3",  // Extended AC3
@@ -279,7 +283,7 @@ public class PlaylistMimeTypeDetector {
         "audio/aiff": "aiff",
         "audio/3gpp2": "3gp2",
         "audio/aac": "aac",
-        "audio/mpg": "mp3", //mpg3
+        "audio/mpg": "mp3", // mpg3
         "audio/mpegurl": "mpg", // actually .m3u8, .m3u HLS stream
         "audio/x-m4b": "m4b",
         "audio/x-m4p": "m4p",
@@ -323,18 +327,57 @@ public class PlaylistMimeTypeDetector {
     ]
 }
 
-class PlaylistWebLoader: UIView, WKNavigationDelegate {
+class PlaylistWebLoader: UIView {
+    private let safeBrowsing = SafeBrowsing()
+    var pendingHTTPUpgrades = [String: URLRequest]()
+    var pendingRequests = [String: URLRequest]()
+    
     private let tab = Tab(configuration: WKWebViewConfiguration().then {
         $0.processPool = WKProcessPool()
         $0.preferences = WKPreferences()
         $0.preferences.javaScriptCanOpenWindowsAutomatically = false
         $0.allowsInlineMediaPlayback = true
         $0.ignoresViewportScaleLimits = true
-        $0.mediaTypesRequiringUserActionForPlayback = []
+        //$0.mediaTypesRequiringUserActionForPlayback = []
     }, type: .private).then {
         $0.createWebview()
         $0.webView?.scrollView.layer.masksToBounds = true
     }
+    
+    private let PlaylistDetectorScript: WKUserScript? = {
+        guard let path = Bundle.main.path(forResource: "PlaylistDetector", ofType: "js"), let source = try? String(contentsOfFile: path) else {
+            log.error("Failed to load PlaylistDetector.js")
+            return nil
+        }
+        
+        var alteredSource = source
+        let token = UserScriptManager.securityToken.uuidString.replacingOccurrences(of: "-", with: "", options: .literal)
+        
+        let replacements = [
+            "$<PlaylistDetector>": "PlaylistDetector_\(token)",
+            "$<security_token>": "\(token)",
+            "$<sendMessage>": "playlistDetector_sendMessage_\(token)",
+            "$<handler>": "playlistCacheLoader_\(UserScriptManager.messageHandlerTokenString)",
+            "$<notify>": "notify_\(token)",
+            "$<onLongPressActivated>": "onLongPressActivated_\(token)",
+            "$<setupLongPress>": "setupLongPress_\(token)",
+            "$<setupDetector>": "setupDetector_\(token)",
+            "$<notifyNodeSource>": "notifyNodeSource_\(token)",
+            "$<notifyNode>": "notifyNode_\(token)",
+            "$<observeNode>": "observeNode_\(token)",
+            "$<observeDocument>": "observeDocument_\(token)",
+            "$<observeDynamicElements>": "observeDynamicElements_\(token)",
+            "$<getAllVideoElements>": "getAllVideoElements_\(token)",
+            "$<getAllAudioElements>": "getAllAudioElements_\(token)",
+            "$<onReady>": "onReady_\(token)",
+            "$<observePage>": "observePage_\(token)",
+        ]
+        
+        replacements.forEach({
+            alteredSource = alteredSource.replacingOccurrences(of: $0.key, with: $0.value, options: .literal)
+        })
+        return WKUserScript.createInDefaultContentWorld(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+    }()
     
     private var handler: (PlaylistInfo?) -> Void = { _ in }
     private var handlerDidExecute = false
@@ -358,24 +401,32 @@ class PlaylistWebLoader: UIView, WKNavigationDelegate {
             $0.edges.equalToSuperview()
         }
         
+        if let browserController = (UIApplication.shared.delegate as? AppDelegate)?.browserViewController {
+            let KVOs: [KVOConstants] = [
+                .estimatedProgress, .loading, .canGoBack,
+                .canGoForward, .URL, .title,
+                .hasOnlySecureContent, .serverTrust
+            ]
+            
+            browserController.tab(tab, didCreateWebView: webView)
+            KVOs.forEach { webView.removeObserver(browserController, forKeyPath: $0.rawValue) }
+            webView.scrollView.removeObserver(browserController.scrollController, forKeyPath: KVOConstants.contentSize.rawValue)
+        }
+        
+        webView.uiDelegate = nil
         webView.navigationDelegate = self
-        tab.contentBlocker.setupTabTrackingProtection()
-        tab.addContentScript(tab.contentBlocker, name: ContentBlockerHelper.name(), sandboxed: false)
-        tab.addContentScript(FingerprintingProtection(tab: tab), name: FingerprintingProtection.name(), sandboxed: false)
-        tab.addContentScript(WindowRenderHelperScript(tab: tab), name: WindowRenderHelperScript.name(), sandboxed: false)
-        tab.addContentScript(PlaylistHelper(tab: tab), name: PlaylistHelper.name(), sandboxed: true)
-        tab.addContentScript(PlaylistWebLoaderContentHelper(self), name: PlaylistWebLoaderContentHelper.name(), sandboxed: false)
+        tab.addContentScript(PlaylistWebLoaderContentHelper(self), name: PlaylistWebLoaderContentHelper.name(), sandboxed: true)
         
-        let script: WKUserScript? = {
-            guard let path = Bundle.main.path(forResource: "PlaylistDetector", ofType: "js"), let source = try? String(contentsOfFile: path) else {
-                return nil
+        if let script = PlaylistDetectorScript {
+            // Do NOT inject the PlaylistHelper script!
+            // The Playlist Detector script will interfere with it.
+            // The detector script is only to be used in the background in an invisible webView
+            // but the helper script is to be used in the foreground!
+            tab.userScriptManager?.isPlaylistEnabled = false
+            
+            tab.webView?.configuration.userContentController.do {
+                $0.addUserScript(script)
             }
-
-            return WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false)
-        }()
-        
-        if let script = script {
-            tab.webView?.configuration.userContentController.addUserScript(script)
         }
     }
     
@@ -393,22 +444,6 @@ class PlaylistWebLoader: UIView, WKNavigationDelegate {
         webView.load(URLRequest(url: url, cachePolicy: .reloadIgnoringCacheData, timeoutInterval: 60.0))
     }
     
-    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        self.handler(nil)
-    }
-    
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        // Fail safe for if a script fails or web-view somehow fails to load,
-        // Then we have a timeout where it will notify the playlist that an error occurred
-        // This happens when the WebView is already finished loading anyway!
-        // We use a 30-second timeout because it isn't possible to know when a page is FULL loaded..
-        DispatchQueue.main.asyncAfter(deadline: .now() + 30) {
-            if !self.handlerDidExecute {
-                self.handler(nil)
-            }
-        }
-    }
-    
     private class PlaylistWebLoaderContentHelper: TabContentScript {
         private weak var webLoader: PlaylistWebLoader?
         private var playlistItems = Set<String>()
@@ -422,7 +457,7 @@ class PlaylistWebLoader: UIView, WKNavigationDelegate {
         }
         
         func scriptMessageHandlerName() -> String? {
-            return "playlistCacheLoader"
+            return "playlistCacheLoader_\(UserScriptManager.messageHandlerTokenString)"
         }
         
         func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage) {
@@ -462,5 +497,237 @@ class PlaylistWebLoader: UIView, WKNavigationDelegate {
                 self.webLoader?.tab.webView?.loadHTMLString("<html><body>PlayList</body></html>", baseURL: nil)
             }
         }
+    }
+}
+
+extension PlaylistWebLoader: WKNavigationDelegate {
+    // Recognize an Apple Maps URL. This will trigger the native app. But only if a search query is present. Otherwise
+    // it could just be a visit to a regular page on maps.apple.com.
+    fileprivate func isAppleMapsURL(_ url: URL) -> Bool {
+        if url.scheme == "http" || url.scheme == "https" {
+            if url.host == "maps.apple.com" && url.query != nil {
+                return true
+            }
+        }
+        return false
+    }
+
+    // Recognize a iTunes Store URL. These all trigger the native apps. Note that appstore.com and phobos.apple.com
+    // used to be in this list. I have removed them because they now redirect to itunes.apple.com. If we special case
+    // them then iOS will actually first open Safari, which then redirects to the app store. This works but it will
+    // leave a 'Back to Safari' button in the status bar, which we do not want.
+    fileprivate func isStoreURL(_ url: URL) -> Bool {
+        if url.scheme == "http" || url.scheme == "https" {
+            if url.host == "itunes.apple.com" {
+                return true
+            }
+        }
+        if url.scheme == "itms-appss" || url.scheme == "itmss" {
+            return true
+        }
+        return false
+    }
+
+    // This is the place where we decide what to do with a new navigation action. There are a number of special schemes
+    // and http(s) urls that need to be handled in a different way. All the logic for that is inside this delegate
+    // method.
+    
+    fileprivate func isUpholdOAuthAuthorization(_ url: URL) -> Bool {
+        return url.scheme == "rewards" && url.host == "uphold"
+    }
+
+    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        guard let url = navigationAction.request.url else {
+            decisionHandler(.cancel)
+            return
+        }
+
+        if url.scheme == "about" || url.isBookmarklet {
+            decisionHandler(.cancel)
+            return
+        }
+
+        if !navigationAction.isAllowed && navigationAction.navigationType != .backForward {
+            decisionHandler(.cancel)
+            return
+        }
+        
+        if safeBrowsing.shouldBlock(url) {
+            decisionHandler(.cancel)
+            return
+        }
+        
+        // Universal links do not work if the request originates from the app, manual handling is required.
+        if let mainDocURL = navigationAction.request.mainDocumentURL,
+           let universalLink = UniversalLinkManager.universalLinkType(for: mainDocURL, checkPath: true) {
+            switch universalLink {
+            case .buyVPN:
+                decisionHandler(.cancel)
+                return
+            }
+        }
+
+        // First special case are some schemes that are about Calling. We prompt the user to confirm this action. This
+        // gives us the exact same behaviour as Safari.
+        if url.scheme == "tel" ||
+            url.scheme == "facetime" ||
+            url.scheme == "facetime-audio" ||
+            url.scheme == "mailto" ||
+            isAppleMapsURL(url) ||
+            isStoreURL(url) {
+            decisionHandler(.cancel)
+            return
+        }
+        
+        tab.userScriptManager?.handleDomainUserScript(for: url)
+        
+        // For Playlist automatic detection since the above `handleDomainUserScript` removes ALL scripts!
+        if let script = PlaylistDetectorScript {
+            tab.webView?.configuration.userContentController.do {
+                $0.addUserScript(script)
+            }
+        }
+
+        if ["http", "https", "data", "blob", "file"].contains(url.scheme) {
+            if navigationAction.targetFrame?.isMainFrame == true {
+                tab.updateUserAgent(webView, newURL: url)
+            }
+
+            pendingRequests[url.absoluteString] = navigationAction.request
+            
+            if let urlHost = url.normalizedHost() {
+                if let mainDocumentURL = navigationAction.request.mainDocumentURL, url.scheme == "http" {
+                    let domainForShields = Domain.getOrCreate(forUrl: mainDocumentURL, persistent: false)
+                    if domainForShields.isShieldExpected(.HTTPSE, considerAllShieldsOption: true) && HttpsEverywhereStats.shared.shouldUpgrade(url) {
+                        // Check if HTTPSE is on and if it is, whether or not this http url would be upgraded
+                        pendingHTTPUpgrades[urlHost] = navigationAction.request
+                    }
+                }
+            }
+
+            if
+                let mainDocumentURL = navigationAction.request.mainDocumentURL,
+                mainDocumentURL.schemelessAbsoluteString == url.schemelessAbsoluteString,
+                !url.isSessionRestoreURL,
+                navigationAction.sourceFrame.isMainFrame || navigationAction.targetFrame?.isMainFrame == true {
+                
+                // Identify specific block lists that need to be applied to the requesting domain
+                let domainForShields = Domain.getOrCreate(forUrl: mainDocumentURL, persistent: false)
+                
+                // Force adblocking on
+                domainForShields.shield_allOff = 1
+                domainForShields.shield_adblockAndTp = true
+                domainForShields.shield_httpse = true
+                
+                let (on, off) = BlocklistName.blocklists(forDomain: domainForShields)
+                let controller = webView.configuration.userContentController
+                
+                // Grab all lists that have valid rules and add/remove them as necessary
+                on.compactMap { $0.rule }.forEach(controller.add)
+                off.compactMap { $0.rule }.forEach(controller.remove)
+              
+                tab.userScriptManager?.isFingerprintingProtectionEnabled =
+                    domainForShields.isShieldExpected(.FpProtection, considerAllShieldsOption: true)
+
+                webView.configuration.preferences.javaScriptEnabled = !domainForShields.isShieldExpected(.NoScript, considerAllShieldsOption: true)
+            }
+            
+            // Cookie Blocking code below
+            tab.userScriptManager?.isCookieBlockingEnabled = Preferences.Privacy.blockAllCookies.value
+            
+            if let rule = BlocklistName.cookie.rule {
+                if Preferences.Privacy.blockAllCookies.value {
+                    webView.configuration.userContentController.add(rule)
+                } else {
+                    webView.configuration.userContentController.remove(rule)
+                }
+            }
+            
+            decisionHandler(.allow)
+            return
+        }
+
+        decisionHandler(.cancel)
+    }
+
+    func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
+        let response = navigationResponse.response
+        let responseURL = response.url
+        
+        if responseURL?.isSessionRestoreURL == true {
+            tab.shouldClassifyLoadsForAds = false
+        }
+        
+        var request: URLRequest?
+        if let url = responseURL {
+            request = pendingRequests.removeValue(forKey: url.absoluteString)
+        }
+
+        if let url = responseURL, let urlHost = responseURL?.normalizedHost() {
+            // If an upgraded https load happens with a host which was upgraded, increase the stats
+            if url.scheme == "https", let _ = pendingHTTPUpgrades.removeValue(forKey: urlHost) {
+                BraveGlobalShieldStats.shared.httpse += 1
+                tab.contentBlocker.stats = tab.contentBlocker.stats.create(byAddingListItem: .https)
+            }
+        }
+        
+        if let browserController = (UIApplication.shared.delegate as? AppDelegate)?.browserViewController {
+            // Check if this response should be handed off to Passbook.
+            if OpenPassBookHelper(request: request, response: response, canShowInWebView: false, forceDownload: false, browserViewController: browserController) != nil {
+                decisionHandler(.cancel)
+                return
+            }
+            
+            // Check if this response should be downloaded.
+//            if DownloadHelper(request: request, response: response, canShowInWebView: false, forceDownload: false, browserViewController: browserController) != nil {
+//                decisionHandler(.cancel)
+//                return
+//            }
+        }
+        
+        if navigationResponse.isForMainFrame {
+            if response.mimeType?.isKindOfHTML == false, request != nil {
+                decisionHandler(.cancel)
+                return
+            } else {
+                tab.temporaryDocument = nil
+            }
+            
+            tab.mimeType = response.mimeType
+        }
+
+        decisionHandler(.allow)
+    }
+    
+    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: WKWebpagePreferences, decisionHandler: @escaping (WKNavigationActionPolicy, WKWebpagePreferences) -> Void) {
+        
+        self.webView(webView, decidePolicyFor: navigationAction) {
+            decisionHandler($0, preferences)
+        }
+    }
+
+    func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        
+        guard let profile = (UIApplication.shared.delegate as? AppDelegate)?.profile else {
+            completionHandler(.rejectProtectionSpace, nil)
+            return
+        }
+        
+        let origin = "\(challenge.protectionSpace.host):\(challenge.protectionSpace.port)"
+        if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust,
+           let trust = challenge.protectionSpace.serverTrust,
+           let cert = SecTrustGetCertificateAtIndex(trust, 0), profile.certStore.containsCertificate(cert, forOrigin: origin) {
+            completionHandler(.useCredential, URLCredential(trust: trust))
+            return
+        }
+
+        guard challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic ||
+              challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPDigest ||
+              challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodNTLM else {
+            completionHandler(.performDefaultHandling, nil)
+            return
+        }
+
+        completionHandler(.rejectProtectionSpace, nil)
     }
 }

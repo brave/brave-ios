@@ -1,5 +1,30 @@
+// The below is needed because the script may not be web-packed into a bundle so it may be missing the run-once code
+
+// MARK: - Include Once
+
+if (!window.__firefox__) {
+    window.__firefox__ = {};
+}
+
+if (!window.__firefox__.includeOnce) {
+    window.__firefox__ = {};
+    window.__firefox__.includeOnce = function(key, func) {
+        var keys = {};
+        if (!keys[key]) {
+            keys[key] = true;
+            func();
+        }
+    };
+}
+
+// MARK: - Media Detection
+
 window.__firefox__.includeOnce("$<Playlist>", function() {
-    
+    function $<sendMessage>(message) {
+        if (window.webkit.messageHandlers.$<handler>) {
+            window.webkit.messageHandlers.$<handler>.postMessage(message);
+        }
+    }
     
     function $<notify>(target, type) {
         if (target) {
@@ -9,7 +34,7 @@ window.__firefox__.includeOnce("$<Playlist>", function() {
             }
             
             if (target.src !== "") {
-                window.webkit.messageHandlers.$<handler>.postMessage({
+                $<sendMessage>({
                     "securitytoken": "$<security_token>",
                     "name": name,
                     "src": target.src,
@@ -24,7 +49,7 @@ window.__firefox__.includeOnce("$<Playlist>", function() {
                 document.querySelectorAll('source').forEach(function(node) {
                     if (node.src !== "") {
                         if (node.closest('video') === target) {
-                            window.webkit.messageHandlers.$<handler>.postMessage({
+                            $<sendMessage>({
                                 "securitytoken": "$<security_token>",
                                 "name": name,
                                 "src": node.src,
@@ -37,7 +62,7 @@ window.__firefox__.includeOnce("$<Playlist>", function() {
                         }
                         
                         if (node.closest('audio') === target) {
-                            window.webkit.messageHandlers.$<handler>.postMessage({
+                            $<sendMessage>({
                                 "securitytoken": "$<security_token>",
                                 "name": name,
                                 "src": node.src,
@@ -182,7 +207,7 @@ window.__firefox__.includeOnce("$<Playlist>", function() {
             }
 
             if (src !== "") {
-                window.webkit.messageHandlers.$<handler>.postMessage({
+                $<sendMessage>({
                     "securitytoken": "$<security_token>",
                     "name": name,
                     "src": src,
@@ -197,7 +222,7 @@ window.__firefox__.includeOnce("$<Playlist>", function() {
                 document.querySelectorAll('source').forEach(function(node) {
                     if (node.src !== "") {
                         if (node.closest('video') === target) {
-                            window.webkit.messageHandlers.$<handler>.postMessage({
+                            $<sendMessage>({
                                 "securitytoken": "$<security_token>",
                                 "name": name,
                                 "src": node.src,
@@ -210,7 +235,7 @@ window.__firefox__.includeOnce("$<Playlist>", function() {
                         }
                         
                         if (node.closest('audio') === target) {
-                            window.webkit.messageHandlers.$<handler>.postMessage({
+                            $<sendMessage>({
                                 "securitytoken": "$<security_token>",
                                 "name": name,
                                 "src": node.src,
@@ -273,6 +298,9 @@ window.__firefox__.includeOnce("$<Playlist>", function() {
                 }
                 return original.call(node, tag);
             };
+            
+            console.log(original);
+            console.log(node.createElement);
         }
 
         function $<getAllVideoElements>() {
@@ -314,4 +342,6 @@ window.__firefox__.includeOnce("$<Playlist>", function() {
     
     $<setupLongPress>();
     $<setupDetector>();
+    
+    console.log("SETUP COMPLETE");
 });
