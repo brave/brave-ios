@@ -91,7 +91,7 @@ class SearchBackupHelper: TabContentScript {
             },
             receiveValue: { [weak self] data in
                 self?.tab?.webView?.evaluateSafeJavaScript(
-                    functionName: "window.brave_ios.resolve",
+                    functionName: "window.__firefox__.search_backup.resolve",
                     args: ["'\(info.id)'", data],
                     sandboxed: false,
                     escapeArgs: false) { _, error  in

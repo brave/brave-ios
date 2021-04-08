@@ -4,7 +4,7 @@
 
 'use strict';
 
-Object.defineProperty(window, 'brave_ios', {
+Object.defineProperty(window.__firefox__, 'search_backup', {
     enumerable: false,
     configurable: true,
     writable: false,
@@ -12,22 +12,22 @@ Object.defineProperty(window, 'brave_ios', {
         id: 1,
         resolution_handlers: {},
         resolve(id, data, error) {
-            if (error && window.brave_ios.resolution_handlers[id].reject) {
-                window.brave_ios.resolution_handlers[id].reject(error);
-            } else if (window.brave_ios.resolution_handlers[id].resolve) {
-                window.brave_ios.resolution_handlers[id].resolve(data);
-            } else if (window.brave_ios.resolution_handlers[id].reject) {
-                window.brave_ios.resolution_handlers[id].reject(new Error("Invalid Data!"));
+            if (error && window.__firefox__.search_backup.resolution_handlers[id].reject) {
+                window.__firefox__.search_backup.resolution_handlers[id].reject(error);
+            } else if (window.__firefox__.search_backup.resolution_handlers[id].resolve) {
+                window.__firefox__.search_backup.resolution_handlers[id].resolve(data);
+            } else if (window.__firefox__.search_backup.resolution_handlers[id].reject) {
+                window.__firefox__.search_backup.resolution_handlers[id].reject(new Error("Invalid Data!"));
             } else {
                 console.log("Invalid Promise ID: ", id);
             }
             
-            delete window.brave_ios.resolution_handlers[id];
+            delete window.__firefox__.search_backup.resolution_handlers[id];
         },
         sendMessage(data) {
             return new Promise((resolve, reject) => {
-               const p_id = 'id' + ++window.brave_ios.id;
-               window.brave_ios.resolution_handlers[p_id] = { resolve, reject };
+               const p_id = 'id' + ++window.__firefox__.search_backup.id;
+               window.__firefox__.search_backup.resolution_handlers[p_id] = { resolve, reject };
                webkit.messageHandlers.SearchBackup.postMessage({'securitytoken': SECURITY_TOKEN,
                                                                 'data': data,
                                                                 'id': p_id});
@@ -42,7 +42,7 @@ Object.defineProperty(window, 'brave_ios', {
     writable: false,
      value: {
         fetchBackupResults(query, language, country, geo) {
-            return window.brave_ios.sendMessage({ "query": query, "language": language, "country": country, "geo": geo})
+            return window.__firefox__.search_backup.sendMessage({ "query": query, "language": language, "country": country, "geo": geo})
         }
     }
   });
