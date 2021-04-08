@@ -229,6 +229,8 @@ window.__firefox__.includeOnce("$<PlaylistDetector>", function() {
                 $<getAllAudioElements>().forEach(function(node) {
                     $<observeNode>(node);
                 });
+                
+                $<sendMessage>({"pageLoad": true})
             });
             
             // Timeinterval is needed for DailyMotion as their DOM is bad
@@ -250,6 +252,7 @@ window.__firefox__.includeOnce("$<PlaylistDetector>", function() {
             }, 10000);
         }
 
+        $<sendMessage>({"pageLoad": false})
         $<observePage>();
     }
     

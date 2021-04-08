@@ -77,6 +77,10 @@ extension BrowserViewController: PlaylistHelperDelegate {
     }
     
     func addToPlayListActivity(info: PlaylistInfo?, itemDetected: Bool) {
-        addToPlayListActivityItem = (enabled: itemDetected, item: info)
+        if info == nil {
+            addToPlayListActivityItem = nil
+        } else {
+            addToPlayListActivityItem = (enabled: itemDetected, item: info)
+        }
     }
 }

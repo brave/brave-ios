@@ -36,12 +36,13 @@ class PlaylistHelper: TabContentScript {
         self.tab = tab
         self.url = tab.url
         
-        urlObserver = tab.webView?.observe(\.url, options: [.old, .new], changeHandler: { [weak self] _, change in
+        urlObserver = tab.webView?.observe(\.url, options: [.new], changeHandler: { [weak self] _, change in
             guard let self = self, let url = change.newValue else { return }
             if self.url != url {
                 self.url = url
                 self.playlistItems = Set<String>()
                 self.delegate?.dismissPlaylistToast(animated: false)
+                self.delegate?.addToPlayListActivity(info: nil, itemDetected: false)
             }
         })
     }

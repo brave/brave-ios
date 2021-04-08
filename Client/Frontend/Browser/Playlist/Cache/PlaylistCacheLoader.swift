@@ -328,9 +328,11 @@ public class PlaylistMimeTypeDetector {
 }
 
 class PlaylistWebLoader: UIView {
+    fileprivate static var pageLoadTimeout = 10.0
+    
     private let safeBrowsing = SafeBrowsing()
-    var pendingHTTPUpgrades = [String: URLRequest]()
-    var pendingRequests = [String: URLRequest]()
+    private var pendingHTTPUpgrades = [String: URLRequest]()
+    private var pendingRequests = [String: URLRequest]()
     
     private let tab = Tab(configuration: WKWebViewConfiguration().then {
         $0.processPool = WKProcessPool()
@@ -376,7 +378,7 @@ class PlaylistWebLoader: UIView {
         replacements.forEach({
             alteredSource = alteredSource.replacingOccurrences(of: $0.key, with: $0.value, options: .literal)
         })
-        return WKUserScript.createInDefaultContentWorld(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+        return WKUserScript(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false)
     }()
     
     private var handler: (PlaylistInfo?) -> Void = { _ in }
@@ -392,7 +394,8 @@ class PlaylistWebLoader: UIView {
         }
         
         self.handler = { [weak self] in
-            self?.handlerDidExecute = true
+            guard let self = self else { return }
+            self.handlerDidExecute = true
             handler($0)
         }
         
@@ -415,7 +418,7 @@ class PlaylistWebLoader: UIView {
         
         webView.uiDelegate = nil
         webView.navigationDelegate = self
-        tab.addContentScript(PlaylistWebLoaderContentHelper(self), name: PlaylistWebLoaderContentHelper.name(), sandboxed: true)
+        tab.addContentScript(PlaylistWebLoaderContentHelper(self), name: PlaylistWebLoaderContentHelper.name(), sandboxed: false)
         
         if let script = PlaylistDetectorScript {
             // Do NOT inject the PlaylistHelper script!
@@ -447,6 +450,8 @@ class PlaylistWebLoader: UIView {
     private class PlaylistWebLoaderContentHelper: TabContentScript {
         private weak var webLoader: PlaylistWebLoader?
         private var playlistItems = Set<String>()
+        private var isPageLoaded = false
+        private var timeout: DispatchWorkItem?
         
         init(_ webLoader: PlaylistWebLoader) {
             self.webLoader = webLoader
@@ -461,15 +466,43 @@ class PlaylistWebLoader: UIView {
         }
         
         func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage) {
+            if !isPageLoaded {
+                if let info = PageInfo.from(message: message) {
+                    isPageLoaded = info.pageLoad
+                    
+                    if isPageLoaded {
+                        timeout = DispatchWorkItem(block: { [weak self] in
+                            guard let self = self else { return }
+                            if self.webLoader?.handlerDidExecute == false {
+                                self.webLoader?.handler(nil)
+                            }
+                            
+                            self.webLoader?.tab.webView?.loadHTMLString("<html><body>PlayList</body></html>", baseURL: nil)
+                        })
+                        
+                        if let timeout = timeout {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + PlaylistWebLoader.pageLoadTimeout, execute: timeout)
+                        }
+                    }
+                    return
+                }
+            }
+            
             guard let item = PlaylistInfo.from(message: message),
                   item.detected else {
+                timeout?.cancel()
+                timeout = nil
                 webLoader?.handler(nil)
+                self.webLoader?.tab.webView?.loadHTMLString("<html><body>PlayList</body></html>", baseURL: nil)
                 return
             }
             
             // For now, we ignore base64 video mime-types loaded via the `data:` scheme.
             if item.duration <= 0.0 && !item.detected || item.src.isEmpty || item.src.hasPrefix("data:") || item.src.hasPrefix("blob:") {
+                timeout?.cancel()
+                timeout = nil
                 webLoader?.handler(nil)
+                self.webLoader?.tab.webView?.loadHTMLString("<html><body>PlayList</body></html>", baseURL: nil)
                 return
             }
             
@@ -478,13 +511,18 @@ class PlaylistWebLoader: UIView {
             // IE: WebM videos aren't supported so can't be played.
             // Therefore we shouldn't prompt the user to add to playlist.
             if let url = URL(string: item.src), !AVURLAsset(url: url).isPlayable {
+                timeout?.cancel()
+                timeout = nil
                 webLoader?.handler(nil)
+                self.webLoader?.tab.webView?.loadHTMLString("<html><body>PlayList</body></html>", baseURL: nil)
                 return
             }
             
             if !playlistItems.contains(item.src) {
                 playlistItems.insert(item.src)
                 
+                timeout?.cancel()
+                timeout = nil
                 webLoader?.handler(item)
             }
             
@@ -496,6 +534,25 @@ class PlaylistWebLoader: UIView {
             DispatchQueue.main.async {
                 self.webLoader?.tab.webView?.loadHTMLString("<html><body>PlayList</body></html>", baseURL: nil)
             }
+        }
+    }
+    
+    private struct PageInfo: Codable {
+        let pageLoad: Bool
+        
+        public static func from(message: WKScriptMessage) -> PageInfo? {
+            if !JSONSerialization.isValidJSONObject(message.body) {
+                return nil
+            }
+            
+            do {
+                let data = try JSONSerialization.data(withJSONObject: message.body, options: [.fragmentsAllowed])
+                return try JSONDecoder().decode(PageInfo.self, from: data)
+            } catch {
+                log.error("Error Decoding PageInfo: \(error)")
+            }
+            
+            return nil
         }
     }
 }
@@ -534,6 +591,10 @@ extension PlaylistWebLoader: WKNavigationDelegate {
     
     fileprivate func isUpholdOAuthAuthorization(_ url: URL) -> Bool {
         return url.scheme == "rewards" && url.host == "uphold"
+    }
+    
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        self.handler(nil)
     }
 
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
@@ -677,12 +738,6 @@ extension PlaylistWebLoader: WKNavigationDelegate {
                 decisionHandler(.cancel)
                 return
             }
-            
-            // Check if this response should be downloaded.
-//            if DownloadHelper(request: request, response: response, canShowInWebView: false, forceDownload: false, browserViewController: browserController) != nil {
-//                decisionHandler(.cancel)
-//                return
-//            }
         }
         
         if navigationResponse.isForMainFrame {

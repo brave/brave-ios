@@ -266,7 +266,7 @@ class UserScriptManager {
             log.error("Failed to load PlaylistSwizzler.js")
             return nil
         }
-        return WKUserScript.createInDefaultContentWorld(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+        return WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false)
     }()
     
     private let PlaylistHelperScript: WKUserScript? = {
@@ -301,7 +301,8 @@ class UserScriptManager {
         replacements.forEach({
             alteredSource = alteredSource.replacingOccurrences(of: $0.key, with: $0.value, options: .literal)
         })
-        return WKUserScript.createInDefaultContentWorld(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+        
+        return WKUserScript(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false)
     }()
 
     private func reloadUserScripts() {
