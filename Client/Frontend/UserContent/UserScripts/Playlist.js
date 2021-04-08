@@ -298,9 +298,6 @@ window.__firefox__.includeOnce("$<Playlist>", function() {
                 }
                 return original.call(node, tag);
             };
-            
-            console.log(original);
-            console.log(node.createElement);
         }
 
         function $<getAllVideoElements>() {
@@ -342,6 +339,4 @@ window.__firefox__.includeOnce("$<Playlist>", function() {
     
     $<setupLongPress>();
     $<setupDetector>();
-    
-    console.log("SETUP COMPLETE");
 });
