@@ -12,6 +12,14 @@ class IntentHandler: INExtension {
             return OpenWebsiteIntentHandler()
         }
         
+        if intent is OpenHistoryWebsiteIntent {
+            return OpenHistoryWebsiteIntentHandler()
+        }
+        
+        if intent is OpenBookmarkWebsiteIntent {
+            return OpenBookmarkWebsiteIntent()
+        }
+        
         return self
     }
 }

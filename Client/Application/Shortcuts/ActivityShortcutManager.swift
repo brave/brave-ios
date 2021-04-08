@@ -79,6 +79,13 @@ enum ActivityType: String {
 
 /// Singleton Manager handles creation and action for Activities
 class ActivityShortcutManager: NSObject {
+    
+    /// Custom Intent Types
+    enum IntentType {
+        case openWebsite
+        case openHistory
+        case openBookmarks
+    }
 
     // MARK: Lifecycle
     
@@ -150,18 +157,33 @@ class ActivityShortcutManager: NSObject {
     
     // MARK: Intent Creation Methods
     
-    private func createOpenWebsiteIntent(with urlString: String) -> OpenWebsiteIntent {
-        let intent = OpenWebsiteIntent()
-        intent.websiteURL = urlString
-        intent.suggestedInvocationPhrase = "Open Website"
-        
-        return intent
+    private func createOpenWebsiteIntent(for type: IntentType, with urlString: String) -> INIntent {
+        switch type {
+            case .openWebsite:
+                let intent = OpenWebsiteIntent()
+                intent.websiteURL = urlString
+                intent.suggestedInvocationPhrase = "Open Website"
+                
+                return intent
+            case .openHistory:
+                let intent = OpenHistoryWebsiteIntent()
+                intent.websiteURL = urlString
+                intent.suggestedInvocationPhrase = "Open History Website"
+                
+                return intent
+            case .openBookmarks:
+                let intent = OpenBookmarkWebsiteIntent()
+                intent.websiteURL = urlString
+                intent.suggestedInvocationPhrase = "Open Bookmark Website"
+                
+                return intent
+        }
     }
     
     // MARK: Intent Donation Methods
     
-    public func donateOpenWebsiteIntent(for urlString: String) {
-        let intent = createOpenWebsiteIntent(with: urlString)
+    public func donateOpenWebsiteIntent(for type: IntentType, with urlString: String) {
+        let intent = createOpenWebsiteIntent(for: type, with: urlString)
 
         let interaction = INInteraction(intent: intent, response: nil)
         interaction.donate { (error) in

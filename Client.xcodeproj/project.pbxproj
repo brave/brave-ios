@@ -431,8 +431,9 @@
 		2F26C43A267B9F9400E5AD60 /* blocking-summary-test.json in Resources */ = {isa = PBXBuildFile; fileRef = 2F26C439267B9F9400E5AD60 /* blocking-summary-test.json */; };
 		2F29FB8B267BE06100B0AD6A /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 2F29FB7E267BE06100B0AD6A /* Model.xcdatamodeld */; };
 		2F2C3549261D10AE00631310 /* OpenWebsiteIntentHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F693223260D218900ECEB38 /* OpenWebsiteIntentHandler.swift */; };
+		2F2C3549261D10AE00631310 /* CustomIntentHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F693223260D218900ECEB38 /* CustomIntentHandler.swift */; };
 		2F2C3572261D10FA00631310 /* BrowserIntents.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = 2F67701C260BE2D10048A1DB /* BrowserIntents.intentdefinition */; };
-		2F2C35A6261DF41100631310 /* OpenWebsiteIntentHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F693223260D218900ECEB38 /* OpenWebsiteIntentHandler.swift */; };
+		2F2C35A6261DF41100631310 /* CustomIntentHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F693223260D218900ECEB38 /* CustomIntentHandler.swift */; };
 		2F44FA1B1A9D426A00FD20CC /* TestHashExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F44FA1A1A9D426A00FD20CC /* TestHashExtensions.swift */; };
 		2F44FB2D1A9D5D8500FD20CC /* FiraSans-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E4B7B7421A793CF20022C5E0 /* FiraSans-BoldItalic.ttf */; };
 		2F44FC721A9E840300FD20CC /* SettingsNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F44FC711A9E840300FD20CC /* SettingsNavigationController.swift */; };
@@ -1946,7 +1947,7 @@
 		2F69320C260D03B000ECEB38 /* BrowserIntentsRelease (AppStore).entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "BrowserIntentsRelease (AppStore).entitlements"; sourceTree = "<group>"; };
 		2F69320D260D048400ECEB38 /* BrowserIntentsRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BrowserIntentsRelease.entitlements; sourceTree = "<group>"; };
 		2F69320E260D056100ECEB38 /* BrowserIntentsBeta.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BrowserIntentsBeta.entitlements; sourceTree = "<group>"; };
-		2F693223260D218900ECEB38 /* OpenWebsiteIntentHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenWebsiteIntentHandler.swift; sourceTree = "<group>"; };
+		2F693223260D218900ECEB38 /* CustomIntentHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomIntentHandler.swift; sourceTree = "<group>"; };
 		2F697F7D1A9FD22D009E03AE /* SearchEnginesTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchEnginesTests.swift; sourceTree = "<group>"; };
 		2F84BCF8267BE0A100850801 /* Model13.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model13.xcdatamodel; sourceTree = "<group>"; };
 		2F9311D42665883400C6B74D /* DataSaved.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSaved.swift; sourceTree = "<group>"; };
@@ -4067,7 +4068,7 @@
 			isa = PBXGroup;
 			children = (
 				2F91AFD225FFA830002DBC4A /* ActivityShortcutManager.swift */,
-				2F693223260D218900ECEB38 /* OpenWebsiteIntentHandler.swift */,
+				2F693223260D218900ECEB38 /* CustomIntentHandler.swift */,
 				2F67701C260BE2D10048A1DB /* BrowserIntents.intentdefinition */,
 			);
 			path = Shortcuts;
@@ -6780,7 +6781,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2F2C3549261D10AE00631310 /* OpenWebsiteIntentHandler.swift in Sources */,
+				2F2C3549261D10AE00631310 /* CustomIntentHandler.swift in Sources */,
 				2F2C3572261D10FA00631310 /* BrowserIntents.intentdefinition in Sources */,
 				2F6931B7260CFB3700ECEB38 /* IntentHandler.swift in Sources */,
 			);
@@ -7158,7 +7159,7 @@
 				74E36D781B71323500D69DA1 /* SettingsContentViewController.swift in Sources */,
 				2F51767425E4024B00429692 /* PlaylistSettingsViewController.swift in Sources */,
 				0A1DF468244858CA00541FE4 /* VPNProductInfo.swift in Sources */,
-				2F2C35A6261DF41100631310 /* OpenWebsiteIntentHandler.swift in Sources */,
+				2F2C35A6261DF41100631310 /* CustomIntentHandler.swift in Sources */,
 				27B3DDD524AF98EA0006A7ED /* FeedItem.swift in Sources */,
 				448DC7D6268A5C3E00F4795C /* BraveSearchDebugMenu.swift in Sources */,
 				0AF4C59424F8003A00E500DD /* NTPDefaultBrowserCalloutProvider.swift in Sources */,
