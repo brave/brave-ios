@@ -5,6 +5,7 @@
 
 import Shared
 import Data
+import BraveShared
 import Intents
 import CoreSpotlight
 import MobileCoreServices
@@ -28,17 +29,17 @@ enum ActivityType: String {
     var title: String {
         switch self {
             case .newTab:
-                return "Open a New Browser Tab"
+                return Strings.Shortcuts.activityTypeNewTabTitle
             case .newPrivateTab:
-                return "Open a New Private Browser Tab"
+                return Strings.Shortcuts.activityTypeNewPrivateTabTitle
             case .clearBrowsingHistory:
-                return "Clear Brave Browsing History"
+                return Strings.Shortcuts.activityTypeClearHistoryTitle
             case .enableBraveVPN:
-                return "Open Brave Browser and Enable VPN"
+                return Strings.Shortcuts.activityTypeEnableVPNTitle
             case .openBraveToday:
-                return "Open Brave Today"
+                return Strings.Shortcuts.activityTypeOpenBraveTodayTitle
             case .openPlayList:
-                return "Open Playlist"
+                return Strings.Shortcuts.activityTypeOpenPlaylistTitle
         }
     }
     
@@ -46,15 +47,15 @@ enum ActivityType: String {
     var description: String {
         switch self {
             case .newTab, .newPrivateTab:
-                return "Start Searching the Web Securely with Brave"
+                return Strings.Shortcuts.activityTypeTabDescription
             case .clearBrowsingHistory:
-                return "Open Browser in a New Tab and Delete All Private Browser History Data"
+                return Strings.Shortcuts.activityTypeClearHistoryDescription
             case .enableBraveVPN:
-                return "Open Browser in a New Tab and Enable VPN"
+                return Strings.Shortcuts.activityTypeEnableVPNDescription
             case .openBraveToday:
-                return "Open Brave Today and Check Today's Top Stories"
+                return Strings.Shortcuts.activityTypeBraveTodayDescription
             case .openPlayList:
-                return "Start Playing your Videos in Playlist"
+                return Strings.Shortcuts.activityTypeOpenPlaylistDescription
         }
     }
     
@@ -62,17 +63,17 @@ enum ActivityType: String {
     var suggestedPhrase: String {
         switch self {
             case .newTab:
-                return "Open New Tab"
+                return Strings.Shortcuts.activityTypeNewTabSuggestedPhrase
             case .newPrivateTab:
-                return "Open New Private Tab"
+                return Strings.Shortcuts.activityTypeNewPrivateTabSuggestedPhrase
             case .clearBrowsingHistory:
-                return "Clear Browser History"
+                return Strings.Shortcuts.activityTypeClearHistorySuggestedPhrase
             case .enableBraveVPN:
-                return "Enable VPN"
+                return Strings.Shortcuts.activityTypeEnableVPNSuggestedPhrase
             case .openBraveToday:
-                return "Open Brave Today"
+                return Strings.Shortcuts.activityTypeOpenBraveTodaySuggestedPhrase
             case .openPlayList:
-                return "Open Playlist"
+                return Strings.Shortcuts.activityTypeOpenPlaylistSuggestedPhrase
         }
     }
 }
@@ -152,6 +153,7 @@ class ActivityShortcutManager: NSObject {
                 newTabPageController.scrollToBraveToday()
             case .openPlayList:
                 print("Open Playlist")
+                //TODO: Add Playlist navigation after it is merged
         }
     }
     
@@ -162,19 +164,19 @@ class ActivityShortcutManager: NSObject {
             case .openWebsite:
                 let intent = OpenWebsiteIntent()
                 intent.websiteURL = urlString
-                intent.suggestedInvocationPhrase = "Open Website"
+                intent.suggestedInvocationPhrase = Strings.Shortcuts.customIntentOpenWebsiteSuggestedPhrase
                 
                 return intent
             case .openHistory:
                 let intent = OpenHistoryWebsiteIntent()
                 intent.websiteURL = urlString
-                intent.suggestedInvocationPhrase = "Open History Website"
+                intent.suggestedInvocationPhrase = Strings.Shortcuts.customIntentOpenHistorySuggestedPhrase
                 
                 return intent
             case .openBookmarks:
                 let intent = OpenBookmarkWebsiteIntent()
                 intent.websiteURL = urlString
-                intent.suggestedInvocationPhrase = "Open Bookmark Website"
+                intent.suggestedInvocationPhrase = Strings.Shortcuts.customIntentOpenBookmarkSuggestedPhrase
                 
                 return intent
         }

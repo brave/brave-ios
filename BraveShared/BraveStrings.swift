@@ -1412,6 +1412,132 @@ extension Strings {
     }
 }
 
+// MARK: - Shorcuts
+
+extension Strings {
+    public struct Shortcuts {
+        public static let activityTypeNewTabTitle =
+            NSLocalizedString("shortcuts.activityTypeNewTabTitle",
+                              bundle: .braveShared,
+                              value: "Open a New Browser Tab",
+                              comment: "")
+        
+        public static let activityTypeNewPrivateTabTitle =
+            NSLocalizedString("shortcuts.activityTypeNewPrivateTabTitle",
+                              bundle: .braveShared,
+                              value: "Open a New Private Browser Tab",
+                              comment: "")
+        
+        public static let activityTypeClearHistoryTitle =
+            NSLocalizedString("shortcuts.activityTypeClearHistoryTitle",
+                              bundle: .braveShared,
+                              value: "Clear Brave Browsing History",
+                              comment: "")
+        
+        public static let activityTypeEnableVPNTitle =
+            NSLocalizedString("shortcuts.activityTypeEnableVPNTitle",
+                              bundle: .braveShared,
+                              value: "Open Brave Browser and Enable VPN",
+                              comment: "")
+        
+        public static let activityTypeOpenBraveTodayTitle =
+            NSLocalizedString("shortcuts.activityTypeOpenBraveTodayTitle",
+                              bundle: .braveShared,
+                              value: "Clear Brave Browsing History",
+                              comment: "")
+        
+        public static let activityTypeOpenPlaylistTitle =
+            NSLocalizedString("shortcuts.activityTypeOpenPlaylistTitle",
+                              bundle: .braveShared,
+                              value: "Open Playlist",
+                              comment: "")
+        
+        public static let activityTypeTabDescription =
+            NSLocalizedString("shortcuts.activityTypeTabDescription",
+                              bundle: .braveShared,
+                              value: "Start Searching the Web Securely with Brave",
+                              comment: "")
+        
+        public static let activityTypeClearHistoryDescription =
+            NSLocalizedString("shortcuts.activityTypeClearHistoryDescription",
+                              bundle: .braveShared,
+                              value: "Open Browser in a New Tab and Delete All Private Browser History Data",
+                              comment: "")
+        
+        public static let activityTypeEnableVPNDescription =
+            NSLocalizedString("shortcuts.activityTypeEnableVPNDescription",
+                              bundle: .braveShared,
+                              value: "Open Browser in a New Tab and Enable VPN",
+                              comment: "")
+        
+        public static let activityTypeBraveTodayDescription =
+            NSLocalizedString("shortcuts.activityTypeBraveTodayDescription",
+                              bundle: .braveShared,
+                              value: "Open Brave Today and Check Today's Top Stories",
+                              comment: "")
+        
+        public static let activityTypeOpenPlaylistDescription =
+            NSLocalizedString("shortcuts.activityTypeOpenPlaylistDescription",
+                              bundle: .braveShared,
+                              value: "Start Playing your Videos in Playlist",
+                              comment: "")
+        
+        public static let activityTypeNewTabSuggestedPhrase =
+            NSLocalizedString("shortcuts.activityTypeNewTabSuggestedPhrase",
+                              bundle: .braveShared,
+                              value: "Open New Tab",
+                              comment: "")
+        
+        public static let activityTypeNewPrivateTabSuggestedPhrase =
+            NSLocalizedString("shortcuts.activityTypeNewPrivateTabSuggestedPhrase",
+                              bundle: .braveShared,
+                              value: "Open New Private Tab",
+                              comment: "")
+        
+        public static let activityTypeClearHistorySuggestedPhrase =
+            NSLocalizedString("shortcuts.activityTypeClearHistorySuggestedPhrase",
+                              bundle: .braveShared,
+                              value: "Clear Browser History",
+                              comment: "")
+        
+        public static let activityTypeEnableVPNSuggestedPhrase =
+            NSLocalizedString("shortcuts.activityTypeEnableVPNSuggestedPhrase",
+                              bundle: .braveShared,
+                              value: "Enable VPN",
+                              comment: "")
+        
+        public static let activityTypeOpenBraveTodaySuggestedPhrase =
+            NSLocalizedString("shortcuts.activityTypeOpenBraveTodaySuggestedPhrase",
+                              bundle: .braveShared,
+                              value: "Open Brave Today",
+                              comment: "")
+        
+        public static let activityTypeOpenPlaylistSuggestedPhrase =
+            NSLocalizedString("shortcuts.activityTypeOpenPlaylistSuggestedPhrase",
+                              bundle: .braveShared,
+                              value: "Open Playlist",
+                              comment: "")
+        
+        public static let customIntentOpenWebsiteSuggestedPhrase =
+            NSLocalizedString("shortcuts.customIntentOpenWebsiteSuggestedPhrase",
+                              bundle: .braveShared,
+                              value: "Open Website",
+                              comment: "")
+        
+        public static let customIntentOpenHistorySuggestedPhrase =
+            NSLocalizedString("shortcuts.customIntentOpenHistorySuggestedPhrase",
+                              bundle: .braveShared,
+                              value: "Open History Website",
+                              comment: "")
+        
+        public static let customIntentOpenBookmarkSuggestedPhrase =
+            NSLocalizedString("shortcuts.customIntentOpenBookmarkSuggestedPhrase",
+                              bundle: .braveShared,
+                              value: "Open Bookmark Website",
+                              comment: "")
+    }
+}
+
 // MARK: - VPN
 extension Strings {
     public struct VPN {
