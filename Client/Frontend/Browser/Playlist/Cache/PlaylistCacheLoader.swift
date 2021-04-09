@@ -1,4 +1,4 @@
-// Copyright 2020 The Brave Authors. All rights reserved.
+// Copyright 2021 The Brave Authors. All rights reserved.
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -583,14 +583,6 @@ extension PlaylistWebLoader: WKNavigationDelegate {
             return true
         }
         return false
-    }
-
-    // This is the place where we decide what to do with a new navigation action. There are a number of special schemes
-    // and http(s) urls that need to be handled in a different way. All the logic for that is inside this delegate
-    // method.
-    
-    fileprivate func isUpholdOAuthAuthorization(_ url: URL) -> Bool {
-        return url.scheme == "rewards" && url.host == "uphold"
     }
     
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {

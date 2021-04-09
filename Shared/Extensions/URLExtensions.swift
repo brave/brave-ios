@@ -443,10 +443,7 @@ extension URL {
     
     // Check if the website is supporting showing Add To playlist toast
     public var isPlaylistSupportedSiteURL: Bool {
-        guard let domain = self.baseDomain else {
-            return false
-        }
-        
+        let domain = self.hostSLD
         var siteList = ["youtube", "vimeo", "twitch", "floatplane", "spotify", "soundcloud"]
         
         /// Additional sites for Japanese locale
