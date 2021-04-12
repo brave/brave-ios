@@ -688,8 +688,22 @@ extension ListController: UITableViewDelegate {
                     PlaylistManager.shared.cancelDownload(item: currentItem)
                     self.tableView.reloadRows(at: [indexPath], with: .automatic)
                 case .invalid:
-                    PlaylistManager.shared.download(item: currentItem)
-                    self.tableView.reloadRows(at: [indexPath], with: .automatic)
+                    if PlaylistManager.shared.isDiskSpaceEncumbered() {
+                        let style: UIAlertController.Style = UIDevice.current.userInterfaceIdiom == .pad ? .alert : .actionSheet
+                        let alert = UIAlertController(
+                            title: Strings.PlayList.playlistDiskSpaceWarningTitle, message: Strings.PlayList.playlistDiskSpaceWarningMessage, preferredStyle: style)
+                        
+                        alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: { _ in
+                            PlaylistManager.shared.download(item: currentItem)
+                            self.tableView.reloadRows(at: [indexPath], with: .automatic)
+                        }))
+                        
+                        alert.addAction(UIAlertAction(title: Strings.CancelString, style: .cancel, handler: nil))
+                        self.present(alert, animated: true, completion: nil)
+                    } else {
+                        PlaylistManager.shared.download(item: currentItem)
+                        self.tableView.reloadRows(at: [indexPath], with: .automatic)
+                    }
                 case .downloaded:
                     let style: UIAlertController.Style = UIDevice.current.userInterfaceIdiom == .pad ? .alert : .actionSheet
                     let alert = UIAlertController(

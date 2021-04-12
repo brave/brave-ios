@@ -36,14 +36,16 @@ extension BrowserViewController: PlaylistHelperDelegate {
             case .pendingUserAction:
                 if buttonPressed {
                     // Update playlist with new items..
-                    PlaylistItem.addItem(item, cachedData: nil) {
-                        PlaylistManager.shared.autoDownload(item: item)
+                    self.addToPlaylist(item: item) { [weak self] didAddItem in
+                        guard let self = self else { return }
                         
                         log.debug("Playlist Item Added")
-                        
                         self.playlistToast = nil
-                        self.showPlaylistToast(info: item, itemState: .added)
-                        UIImpactFeedbackGenerator(style: .medium).bzzt()
+                        
+                        if didAddItem {
+                            self.showPlaylistToast(info: item, itemState: .added)
+                            UIImpactFeedbackGenerator(style: .medium).bzzt()
+                        }
                     }
                 } else {
                     self.playlistToast = nil
@@ -81,6 +83,31 @@ extension BrowserViewController: PlaylistHelperDelegate {
             addToPlayListActivityItem = nil
         } else {
             addToPlayListActivityItem = (enabled: itemDetected, item: info)
+        }
+    }
+    
+    func addToPlaylist(item: PlaylistInfo, completion: ((_ didAddItem: Bool) -> Void)?) {
+        if PlaylistManager.shared.isDiskSpaceEncumbered() {
+            let style: UIAlertController.Style = UIDevice.current.userInterfaceIdiom == .pad ? .alert : .actionSheet
+            let alert = UIAlertController(
+                title: Strings.PlayList.playlistDiskSpaceWarningTitle, message: Strings.PlayList.playlistDiskSpaceWarningMessage, preferredStyle: style)
+            
+            alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: { _ in
+                PlaylistItem.addItem(item, cachedData: nil) {
+                    PlaylistManager.shared.autoDownload(item: item)
+                    completion?(true)
+                }
+            }))
+            
+            alert.addAction(UIAlertAction(title: Strings.CancelString, style: .cancel, handler: { _ in
+                completion?(false)
+            }))
+            self.present(alert, animated: true, completion: nil)
+        } else {
+            PlaylistItem.addItem(item, cachedData: nil) {
+                PlaylistManager.shared.autoDownload(item: item)
+                completion?(true)
+            }
         }
     }
 }

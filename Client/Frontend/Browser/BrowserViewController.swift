@@ -1787,12 +1787,13 @@ class BrowserViewController: UIViewController {
             guard let item = self.addToPlayListActivityItem?.item else { return }
             
             // Update playlist with new items..
-            PlaylistItem.addItem(item, cachedData: nil) {
-                PlaylistManager.shared.autoDownload(item: item)
+            self.addToPlaylist(item: item) { [weak self] didAddItem in
+                guard let self = self else { return }
                 
                 log.debug("Playlist Item Added")
                 self.showPlaylistToast(info: item, itemState: .added)
                 UIImpactFeedbackGenerator(style: .medium).bzzt()
+                
             }
         }
         

@@ -224,6 +224,34 @@ class PlaylistManager: NSObject {
             break
         }
     }
+    
+    func isDiskSpaceEncumbered() -> Bool {
+        let freeSpace = availableDiskSpace() ?? 0
+        let totalSpace = totalDiskSpace() ?? 0
+        
+        // If disk space is 90% used
+        return totalSpace == 0 || (Double(freeSpace) / Double(totalSpace)) * 100.0 >= 90.0
+    }
+    
+    private func availableDiskSpace() -> Int64? {
+        do {
+            return try URL(fileURLWithPath: NSHomeDirectory() as String).resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey]).volumeAvailableCapacityForImportantUsage
+        } catch {
+            log.error("Error Retrieving Disk Space: \(error)")
+        }
+        return nil
+    }
+    
+    private func totalDiskSpace() -> Int64? {
+        do {
+            if let result = try URL(fileURLWithPath: NSHomeDirectory() as String).resourceValues(forKeys: [.volumeTotalCapacityKey]).volumeTotalCapacity {
+                return Int64(result)
+            }
+        } catch {
+            log.error("Error Retrieving Disk Space: \(error)")
+        }
+        return nil
+    }
 }
 
 extension PlaylistManager {

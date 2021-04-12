@@ -1343,6 +1343,18 @@ extension Strings {
                               bundle: .braveShared,
                               value: "Live Stream",
                               comment: "When a video or audio is live and has no duration")
+        
+        public static let playlistDiskSpaceWarningTitle =
+            NSLocalizedString("playlist.playlistDiskSpaceWarningTitle",
+                              bundle: .braveShared,
+                              value: "Storage Almost Full",
+                              comment: "When the user's disk space is almost full")
+        
+        public static let playlistDiskSpaceWarningMessage =
+            NSLocalizedString("playlist.playlistDiskSpaceWarningMessage",
+                              bundle: .braveShared,
+                              value: "Adding video and audio files for offline use can use a lot of storage on your device. Please removes some files to free up storage space.",
+                              comment: "When the user's disk space is almost full")
     }
 }
 
