@@ -40,7 +40,7 @@ private class VideoSliderBar: UIControl {
         }
         
         filledView.snp.makeConstraints {
-            $0.right.top.bottom.equalTo(background)
+            $0.trailing.top.bottom.equalTo(background)
         }
         
         tracker.snp.makeConstraints {
@@ -48,11 +48,11 @@ private class VideoSliderBar: UIControl {
             $0.width.height.equalTo(18.0)
         }
         
-        filledConstraint = filledView.leftAnchor.constraint(equalTo: background.leftAnchor).then {
+        filledConstraint = filledView.leadingAnchor.constraint(equalTo: background.leadingAnchor).then {
             $0.isActive = true
         }
         
-        trackerConstraint = tracker.centerXAnchor.constraint(equalTo: boundaryView.leftAnchor).then {
+        trackerConstraint = tracker.centerXAnchor.constraint(equalTo: boundaryView.leadingAnchor).then {
             $0.isActive = true
         }
     }
@@ -189,19 +189,19 @@ class VideoTrackerBar: UIView {
         addSubview(endTimeLabel)
         
         currentTimeLabel.snp.makeConstraints {
-            $0.left.equalToSuperview().inset(10.0)
+            $0.leading.equalToSuperview().inset(10.0)
             $0.top.equalToSuperview().offset(2.0)
             $0.bottom.equalTo(slider.snp.top).offset(-10.0)
         }
         
         endTimeLabel.snp.makeConstraints {
-            $0.right.equalToSuperview().inset(10.0)
+            $0.trailing.equalToSuperview().inset(10.0)
             $0.top.equalToSuperview().offset(2.0)
             $0.bottom.equalTo(slider.snp.top).offset(-10.0)
         }
         
         slider.snp.makeConstraints {
-            $0.left.right.equalToSuperview().inset(10.0)
+            $0.leading.trailing.equalToSuperview().inset(10.0)
             $0.bottom.equalToSuperview()
             $0.height.equalTo(2.5)
         }

@@ -1435,7 +1435,7 @@ private class DetailController: UIViewController, UIGestureRecognizerDelegate {
         if mode == .iPadLayout {
             view.addSubview(playerView)
             playerView.snp.makeConstraints {
-                $0.bottom.left.right.equalTo(view)
+                $0.bottom.leading.trailing.equalTo(view)
                 $0.top.equalTo(view.safeAreaLayoutGuide)
             }
         } else {

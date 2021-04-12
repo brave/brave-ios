@@ -43,7 +43,7 @@ class PlaylistToast: Toast {
         self.addSubview(createView(item, state))
 
         self.toastView.snp.makeConstraints { make in
-            make.left.right.height.equalTo(self)
+            make.leading.trailing.height.equalTo(self)
             self.animationConstraint = make.top.equalTo(self).offset(ButtonToastUX.toastHeight).constraint
         }
 
@@ -188,8 +188,8 @@ class PlaylistToast: Toast {
             
             make.centerX.equalTo(viewController.view.snp.centerX)
             make.bottom.equalTo(viewController.webViewContainer.safeArea.bottom)
-            make.left.equalTo(viewController.view.safeArea.left).priority(.high)
-            make.right.equalTo(viewController.view.safeArea.right).priority(.high)
+            make.leading.equalTo(viewController.view.safeArea.leading).priority(.high)
+            make.trailing.equalTo(viewController.view.safeArea.trailing).priority(.high)
             make.width.lessThanOrEqualTo(DesignUX.maxToastWidth)
         }
     }

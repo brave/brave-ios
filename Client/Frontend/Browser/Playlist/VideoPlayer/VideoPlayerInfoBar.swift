@@ -76,7 +76,7 @@ class VideoPlayerInfoBar: UIView {
         }
         
         leftStackView.snp.makeConstraints {
-            $0.left.equalToSuperview().inset(20.0)
+            $0.leading.equalToSuperview().inset(20.0)
             $0.top.bottom.equalToSuperview().inset(8.0)
         }
         
@@ -86,13 +86,13 @@ class VideoPlayerInfoBar: UIView {
         }
         
         titleLabel.snp.makeConstraints {
-            $0.left.equalTo(favIconImageView.snp.right).offset(13.0)
+            $0.leading.equalTo(favIconImageView.snp.trailing).offset(13.0)
             $0.top.bottom.equalToSuperview().inset(20.0)
         }
         
         controlStackView.snp.makeConstraints {
-            $0.left.greaterThanOrEqualTo(titleLabel.snp.right).offset(20.0)
-            $0.right.equalToSuperview().offset(-20.0)
+            $0.leading.greaterThanOrEqualTo(titleLabel.snp.trailing).offset(20.0)
+            $0.trailing.equalToSuperview().offset(-20.0)
             $0.top.bottom.equalToSuperview().inset(8.0)
         }
     }

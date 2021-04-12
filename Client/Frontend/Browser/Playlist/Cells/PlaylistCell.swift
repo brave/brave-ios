@@ -99,7 +99,7 @@ class PlaylistCell: UITableViewCell {
         
         thumbnailView.snp.makeConstraints {
             $0.center.equalToSuperview()
-            $0.left.right.top.bottom.equalToSuperview().priority(.high)
+            $0.leading.trailing.top.bottom.equalToSuperview().priority(.high)
             $0.width.height.equalToSuperview()
         }
         
@@ -109,16 +109,16 @@ class PlaylistCell: UITableViewCell {
         }
         
         infoStackView.snp.makeConstraints {
-            $0.left.equalTo(iconStackView.snp.right).offset(8.0)
-            $0.right.equalToSuperview().offset(-15.0)
+            $0.leading.equalTo(iconStackView.snp.right).offset(8.0)
+            $0.trailing.equalToSuperview().offset(-15.0)
             $0.centerY.equalToSuperview()
             $0.top.greaterThanOrEqualTo(iconStackView.snp.top)
             $0.bottom.lessThanOrEqualTo(iconStackView.snp.bottom)
         }
         
         separator.snp.makeConstraints {
-            $0.left.equalTo(titleLabel.snp.left)
-            $0.right.bottom.equalToSuperview()
+            $0.leading.equalTo(titleLabel.snp.left)
+            $0.trailing.bottom.equalToSuperview()
             $0.height.equalTo(1.0 / UIScreen.main.scale)
         }
     }
@@ -133,7 +133,7 @@ class PlaylistCell: UITableViewCell {
                 if size.width > superView.bounds.width || size.height > superView.bounds.height {
                     $0.width.height.equalToSuperview()
                 } else {
-                    $0.left.right.top.bottom.equalToSuperview().priority(.high)
+                    $0.leading.trailing.top.bottom.equalToSuperview().priority(.high)
                     $0.width.height.equalTo(28.0)
                 }
             } else {

@@ -84,8 +84,8 @@ class VideoPlayerControlsView: UIView {
         }
         
         topControlsStackView.snp.makeConstraints {
-            $0.left.equalToSuperview().priority(.high)
-            $0.right.equalToSuperview().priority(.high)
+            $0.leading.equalToSuperview().priority(.high)
+            $0.trailing.equalToSuperview().priority(.high)
             $0.width.equalTo(350.0).priority(.required)
             $0.top.equalToSuperview().inset(20.0)
             $0.bottom.equalTo(self.snp.centerY).offset(-4.0)
@@ -93,18 +93,18 @@ class VideoPlayerControlsView: UIView {
         }
         
         playbackRateButton.snp.makeConstraints {
-            $0.left.equalToSuperview().inset(15.0)
+            $0.leading.equalToSuperview().inset(15.0)
             $0.centerY.equalTo(trackBar.snp.centerY)
         }
         
         castButton.snp.makeConstraints {
-            $0.right.equalToSuperview().inset(15.0)
+            $0.trailing.equalToSuperview().inset(15.0)
             $0.centerY.equalTo(trackBar.snp.centerY)
         }
         
         trackBar.snp.makeConstraints {
-            $0.left.equalTo(playbackRateButton.snp.right).offset(15.0)
-            $0.right.equalTo(castButton.snp.left).offset(-15.0)
+            $0.leading.equalTo(playbackRateButton.snp.trailing).offset(15.0)
+            $0.trailing.equalTo(castButton.snp.leading).offset(-15.0)
             $0.top.equalTo(self.snp.centerY).offset(4.0)
             $0.bottom.equalToSuperview().offset(-12.0)
         }
