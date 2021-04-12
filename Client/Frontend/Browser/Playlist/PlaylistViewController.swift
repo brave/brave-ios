@@ -853,8 +853,9 @@ extension ListController: UITableViewDragDelegate, UITableViewDropDelegate {
     }
     
     func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-        PlaylistManager.shared.reorderItems(from: sourceIndexPath, to: destinationIndexPath)
-        PlaylistManager.shared.reloadData()
+        PlaylistManager.shared.reorderItems(from: sourceIndexPath, to: destinationIndexPath) {
+            PlaylistManager.shared.reloadData()
+        }
     }
     
     func tableView(_ tableView: UITableView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
@@ -1209,7 +1210,7 @@ extension ListController: PlaylistManagerDelegate {
         }
     }
     
-    func onDownloadStateChanged(id: String, state: PlaylistDownloadManager.DownloadState, displayName: String, error: Error?) {
+    func onDownloadStateChanged(id: String, state: PlaylistDownloadManager.DownloadState, displayName: String?, error: Error?) {
         if let index = PlaylistManager.shared.index(of: id),
         let cell = tableView.cellForRow(at: IndexPath(row: index, section: 0)) as? PlaylistCell {
             
@@ -1260,14 +1261,19 @@ extension ListController: PlaylistManagerDelegate {
         
         switch type {
             case .insert:
-                tableView.insertRows(at: [newIndexPath!], with: .fade)
+                guard let newIndexPath = newIndexPath else { break }
+                tableView.insertRows(at: [newIndexPath], with: .fade)
             case .delete:
-                tableView.deleteRows(at: [indexPath!], with: .fade)
+                guard let indexPath = indexPath else { break }
+                tableView.deleteRows(at: [indexPath], with: .fade)
             case .update:
-                tableView.reloadRows(at: [indexPath!], with: .fade)
+                guard let indexPath = indexPath else { break }
+                tableView.reloadRows(at: [indexPath], with: .fade)
             case .move:
-                tableView.deleteRows(at: [indexPath!], with: .fade)
-                tableView.insertRows(at: [newIndexPath!], with: .fade)
+                guard let indexPath = indexPath,
+                      let newIndexPath = newIndexPath else { break }
+                tableView.deleteRows(at: [indexPath], with: .fade)
+                tableView.insertRows(at: [newIndexPath], with: .fade)
             default:
                 break
         }

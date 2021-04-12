@@ -337,7 +337,7 @@ class MediaResourceManager: NSObject, AVAssetResourceLoaderDelegate {
                     return
                 }
                 
-                if response.statusCode >= 200 && response.statusCode <= 299 {
+                if response.statusCode == 200 {
                     contentRequest.contentType = response.mimeType
                     contentRequest.contentLength = response.expectedContentLength
                     contentRequest.isByteRangeAccessSupported = response.expectedContentLength != -1
@@ -480,6 +480,8 @@ extension MediaResourceManager {
     static func getMimeType(_ url: URL, _ completion: @escaping (String?) -> Void) {
         let request: URLRequest = {
             var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10.0)
+            
+            // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Range
             request.addValue("bytes=0-1", forHTTPHeaderField: "Range")
             request.addValue(UUID().uuidString, forHTTPHeaderField: "X-Playback-Session-Id")
             request.addValue(UserAgent.shouldUseDesktopMode ? UserAgent.desktop : UserAgent.mobile, forHTTPHeaderField: "User-Agent")

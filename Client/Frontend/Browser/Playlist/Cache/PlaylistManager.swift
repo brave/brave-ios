@@ -14,7 +14,7 @@ private let log = Logger.browserLogger
 
 protocol PlaylistManagerDelegate: AnyObject {
     func onDownloadProgressUpdate(id: String, percentComplete: Double)
-    func onDownloadStateChanged(id: String, state: PlaylistDownloadManager.DownloadState, displayName: String, error: Error?)
+    func onDownloadStateChanged(id: String, state: PlaylistDownloadManager.DownloadState, displayName: String?, error: Error?)
     
     func controllerDidChange(_ anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?)
     func controllerDidChangeContent()
@@ -53,26 +53,37 @@ class PlaylistManager: NSObject {
         frc.fetchedObjects?.firstIndex(where: { $0.pageSrc == pageSrc })
     }
     
-    func reorderItems(from sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-        guard var objects = frc.fetchedObjects else { return }
+    func reorderItems(from sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath, completion: (() -> Void)?) {
+        guard var objects = frc.fetchedObjects else {
+            ensureMainThread {
+                completion?()
+            }
+            return
+        }
 
-        frc.delegate = nil
-        
-        let src = frc.object(at: sourceIndexPath)
-        objects.remove(at: sourceIndexPath.row)
-        objects.insert(src, at: destinationIndexPath.row)
-        
-        for (order, item) in objects.enumerated().reversed() {
-            item.order = Int32(order)
+        frc.managedObjectContext.perform { [weak self] in
+            defer {
+                ensureMainThread {
+                    completion?()
+                }
+            }
+            
+            guard let self = self else { return }
+            
+            let src = self.frc.object(at: sourceIndexPath)
+            objects.remove(at: sourceIndexPath.row)
+            objects.insert(src, at: destinationIndexPath.row)
+            
+            for (order, item) in objects.enumerated().reversed() {
+                item.order = Int32(order)
+            }
+            
+            do {
+                try self.frc.managedObjectContext.save()
+            } catch {
+                log.error(error)
+            }
         }
-        
-        do {
-            try frc.managedObjectContext.save()
-        } catch {
-            log.error(error)
-        }
-        
-        frc.delegate = self
     }
     
     func state(for pageSrc: String) -> PlaylistDownloadManager.DownloadState {
@@ -117,9 +128,9 @@ class PlaylistManager: NSObject {
         guard downloadManager.downloadTask(for: item.pageSrc) == nil, let assetUrl = URL(string: item.src) else { return }
         
         MediaResourceManager.getMimeType(assetUrl) { [weak self] mimeType in
-            guard let self = self, let mimeType = mimeType else { return }
+            guard let self = self, let mimeType = mimeType?.lowercased() else { return }
 
-            if mimeType.contains("x-mpegURL") || mimeType.contains("application/vnd.apple.mpegurl") || mimeType.lowercased().contains("mpegurl") {
+            if mimeType.contains("x-mpegurl") || mimeType.contains("application/vnd.apple.mpegurl") || mimeType.contains("mpegurl") {
                 DispatchQueue.main.async {
                     self.downloadManager.downloadHLSAsset(assetUrl, for: item)
                 }
@@ -137,11 +148,11 @@ class PlaylistManager: NSObject {
     
     func delete(item: PlaylistInfo) {
         do {
-            if let assetUrl = localAsset(for: item.pageSrc)?.url {
+            if let assetUrl = downloadManager.localAsset(for: item.pageSrc)?.url {
                 try FileManager.default.removeItem(at: assetUrl)
                 PlaylistItem.removeItem(item)
                 
-                delegate?.onDownloadStateChanged(id: item.pageSrc, state: .invalid, displayName: "", error: nil)
+                delegate?.onDownloadStateChanged(id: item.pageSrc, state: .invalid, displayName: nil, error: nil)
             } else {
                 PlaylistItem.removeItem(item)
             }
@@ -152,10 +163,10 @@ class PlaylistManager: NSObject {
     
     func deleteCache(item: PlaylistInfo) {
         do {
-            if let assetUrl = localAsset(for: item.pageSrc)?.url {
+            if let assetUrl = downloadManager.localAsset(for: item.pageSrc)?.url {
                 try FileManager.default.removeItem(at: assetUrl)
                 PlaylistItem.updateCache(pageSrc: item.pageSrc, cachedData: nil)
-                delegate?.onDownloadStateChanged(id: item.pageSrc, state: .invalid, displayName: "", error: nil)
+                delegate?.onDownloadStateChanged(id: item.pageSrc, state: .invalid, displayName: nil, error: nil)
             }
         } catch {
             log.error("An error occured deleting Playlist Cached Item \(item.name): \(error)")
@@ -172,7 +183,7 @@ class PlaylistManager: NSObject {
         (UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController = nil
         
         func clearCache(item: PlaylistInfo) throws {
-            if let assetUrl = localAsset(for: item.pageSrc)?.url {
+            if let assetUrl = downloadManager.localAsset(for: item.pageSrc)?.url {
                 try FileManager.default.removeItem(at: assetUrl)
                 PlaylistItem.updateCache(pageSrc: item.pageSrc, cachedData: nil)
             }
@@ -198,48 +209,30 @@ class PlaylistManager: NSObject {
     }
     
     func autoDownload(item: PlaylistInfo) {
-        let downloadType = PlayListDownloadType(rawValue: Preferences.Playlist.autoDownloadVideo.value)
+        guard let downloadType = PlayListDownloadType(rawValue: Preferences.Playlist.autoDownloadVideo.value) else {
+            return
+        }
 
         switch downloadType {
-            case .on:
+        case .on:
+            PlaylistManager.shared.download(item: item)
+        case .wifi:
+            if DeviceInfo.hasWifiConnection() {
                 PlaylistManager.shared.download(item: item)
-            case .wifi:
-                if DeviceInfo.hasWifiConnection() {
-                    PlaylistManager.shared.download(item: item)
-                }
-            default:
-                break
+            }
+        case .off:
+            break
         }
     }
 }
 
 extension PlaylistManager {
-    private func localAsset(for pageSrc: String) -> AVURLAsset? {
-        guard let item = PlaylistItem.getItem(pageSrc: pageSrc),
-              let cachedData = item.cachedData else { return nil }
-
-        var bookmarkDataIsStale = false
-        do {
-            let url = try URL(resolvingBookmarkData: cachedData,
-                              bookmarkDataIsStale: &bookmarkDataIsStale)
-
-            if bookmarkDataIsStale {
-                return nil
-            }
-            
-            return AVURLAsset(url: url)
-        } catch {
-            log.error(error)
-            return nil
-        }
-    }
-    
     private func asset(for pageSrc: String, mediaSrc: String) -> AVURLAsset {
         if let task = downloadManager.downloadTask(for: pageSrc) {
             return task.asset
         }
         
-        if let asset = self.localAsset(for: pageSrc) {
+        if let asset = downloadManager.localAsset(for: pageSrc) {
             return asset
         }
         
@@ -252,7 +245,7 @@ extension PlaylistManager: PlaylistDownloadManagerDelegate {
         delegate?.onDownloadProgressUpdate(id: id, percentComplete: percentComplete)
     }
     
-    func onDownloadStateChanged(id: String, state: PlaylistDownloadManager.DownloadState, displayName: String, error: Error?) {
+    func onDownloadStateChanged(id: String, state: PlaylistDownloadManager.DownloadState, displayName: String?, error: Error?) {
         delegate?.onDownloadStateChanged(id: id, state: state, displayName: displayName, error: error)
     }
 }
@@ -273,7 +266,7 @@ extension PlaylistManager: NSFetchedResultsControllerDelegate {
 }
 
 extension AVAsset {
-    func displayNames(for mediaSelection: AVMediaSelection) -> String {
+    func displayNames(for mediaSelection: AVMediaSelection) -> String? {
         var names = ""
         for mediaCharacteristic in availableMediaCharacteristicsWithMediaSelectionOptions {
             guard let mediaSelectionGroup = mediaSelectionGroup(forMediaCharacteristic: mediaCharacteristic),
@@ -286,6 +279,6 @@ extension AVAsset {
             }
         }
 
-        return names
+        return names.isEmpty ? nil : names
     }
 }

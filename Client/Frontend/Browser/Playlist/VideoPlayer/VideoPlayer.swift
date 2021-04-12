@@ -171,10 +171,10 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     
     deinit {
         do {
-            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, policy: .longForm, options: [.allowAirPlay, .allowBluetooth, .duckOthers])
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, policy: .longFormAudio, options: [.allowAirPlay, .allowBluetooth, .duckOthers])
             try AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
         } catch {
-            print(error)
+            log.error(error)
         }
         
         if let observer = self.playObserver {
