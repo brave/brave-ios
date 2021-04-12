@@ -7,6 +7,6 @@ if (window.MediaSource || window.WebKitMediaSource || window.HTMLMediaElement &&
     //HTMLMediaElement.prototype.webkitSourceAddId = null;
     //window.SourceBuffer = null;
     
-    delete MediaSource;
-    delete WebKitMediaSource;
+    delete window.MediaSource;
+    delete window.WebKitMediaSource;
 }
