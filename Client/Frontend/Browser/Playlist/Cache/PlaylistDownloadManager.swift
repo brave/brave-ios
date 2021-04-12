@@ -132,30 +132,12 @@ public class PlaylistDownloadManager: PlaylistStreamDownloadManagerDelegate {
         delegate?.onDownloadStateChanged(id: id, state: state, displayName: displayName, error: error)
     }
     
-    fileprivate static func playlistPath() throws -> URL {
-        FileManager.default.getOrCreateFolder(name: "Playlist", excludeFromBackups: true, location: .applicationSupportDirectory)
-        return try FileManager.default.url(for: .applicationSupportDirectory, in: .userDomainMask,
-                                       appropriateFor: nil, create: false).appendingPathComponent("Playlist")
-    }
-    
-    fileprivate static func uniqueDownloadPathForFilename(_ filename: String) throws -> URL {
+    fileprivate static func uniqueDownloadPathForFilename(_ filename: String) throws -> URL? {
         let filename = HTTPDownload.stripUnicode(fromFilename: filename)
-        let downloadsPath = try playlistPath()
-        let basePath = downloadsPath.appendingPathComponent(filename)
-        let fileExtension = basePath.pathExtension
-        let filenameWithoutExtension = !fileExtension.isEmpty ? String(filename.dropLast(fileExtension.count + 1)) : filename
-        
-        var proposedPath = basePath
-        var count = 0
-        
-        while FileManager.default.fileExists(atPath: proposedPath.path) {
-            count += 1
-            
-            let proposedFilenameWithoutExtension = "\(filenameWithoutExtension) (\(count))"
-            proposedPath = downloadsPath.appendingPathComponent(proposedFilenameWithoutExtension).appendingPathExtension(fileExtension)
-        }
-        
-        return proposedPath
+        let playlistDirectory = FileManager.default.getOrCreateFolder(name: "Playlist",
+                                                                      excludeFromBackups: true,
+                                                                      location: .applicationSupportDirectory)
+        return try playlistDirectory?.uniquePathForFilename(filename)
     }
 }
 
@@ -446,6 +428,21 @@ private class PlaylistFileDownloadManager: NSObject, URLSessionDownloadDelegate 
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         guard let asset = activeDownloadTasks.removeValue(forKey: downloadTask) else { return }
         
+        let cleanupAndFailDownload = { (location: URL?, error: Error) in
+            if let location = location {
+                do {
+                    try FileManager.default.removeItem(at: location)
+                } catch {
+                    log.error("Error Deleting Playlist Item: \(error)")
+                }
+            }
+            
+            DispatchQueue.main.async {
+                PlaylistItem.updateCache(pageSrc: asset.id, cachedData: nil)
+                self.delegate?.onDownloadStateChanged(streamDownloader: self, id: asset.id, state: .invalid, displayName: nil, error: error)
+            }
+        }
+        
         if let response = downloadTask.response as? HTTPURLResponse, response.statusCode == 302 || response.statusCode >= 200 && response.statusCode <= 299 {
             
             var detectedFileExtension: String?
@@ -484,7 +481,10 @@ private class PlaylistFileDownloadManager: NSObject, URLSessionDownloadDelegate 
             }
             
             do {
-                let path = try PlaylistDownloadManager.uniqueDownloadPathForFilename(asset.name + ".\(fileExtension)")
+                guard let path = try PlaylistDownloadManager.uniqueDownloadPathForFilename(asset.name + ".\(fileExtension)") else {
+                    throw "Failed to create unique path for playlist item."
+                }
+                
                 try FileManager.default.moveItem(at: location, to: path)
                 do {
                     let cachedData = try path.bookmarkData()
@@ -495,44 +495,21 @@ private class PlaylistFileDownloadManager: NSObject, URLSessionDownloadDelegate 
                     }
                 } catch {
                     log.error("Failed to create bookmarkData for download URL.")
-                    
-                    do {
-                        try FileManager.default.removeItem(at: path)
-                    } catch {
-                        log.error("Error Deleting Playlist Item: \(error)")
-                    }
-                    
-                    DispatchQueue.main.async {
-                        self.delegate?.onDownloadStateChanged(streamDownloader: self, id: asset.id, state: .downloaded, displayName: nil, error: error)
-                    }
+                    cleanupAndFailDownload(path, error)
                 }
             } catch {
                 log.error("An error occurred attempting to download a playlist item: \(error)")
-                
-                do {
-                    try FileManager.default.removeItem(at: location)
-                } catch {
-                    log.error("Error Deleting Playlist Item: \(error)")
-                }
-                
-                DispatchQueue.main.async {
-                    PlaylistItem.updateCache(pageSrc: asset.id, cachedData: nil)
-                    self.delegate?.onDownloadStateChanged(streamDownloader: self, id: asset.id, state: .invalid, displayName: nil, error: error)
-                }
+                cleanupAndFailDownload(location, error)
             }
         } else {
-            DispatchQueue.main.async {
-                PlaylistItem.updateCache(pageSrc: asset.id, cachedData: nil)
-                
-                var error = "UnknownError"
-                if let response = downloadTask.response as? HTTPURLResponse {
-                    error = "Invalid Status Code: \(response.statusCode)"
-                } else if let response = downloadTask.response {
-                    error = "Invalid Response: \(response)"
-                }
-                
-                self.delegate?.onDownloadStateChanged(streamDownloader: self, id: asset.id, state: .invalid, displayName: nil, error: error)
+            var error = "UnknownError"
+            if let response = downloadTask.response as? HTTPURLResponse {
+                error = "Invalid Status Code: \(response.statusCode)"
+            } else if let response = downloadTask.response {
+                error = "Invalid Response: \(response)"
             }
+            
+            cleanupAndFailDownload(nil, error)
         }
     }
 }

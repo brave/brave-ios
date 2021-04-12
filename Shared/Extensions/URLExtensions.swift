@@ -453,6 +453,24 @@ extension URL {
         
         return siteList.contains(where: domain.contains)
     }
+    
+    public func uniquePathForFilename(_ filename: String) throws -> URL {
+        let basePath = self.appendingPathComponent(filename)
+        let fileExtension = basePath.pathExtension
+        let filenameWithoutExtension = !fileExtension.isEmpty ? String(filename.dropLast(fileExtension.count + 1)) : filename
+        
+        var proposedPath = basePath
+        var count = 0
+        
+        while FileManager.default.fileExists(atPath: proposedPath.path) {
+            count += 1
+            
+            let proposedFilenameWithoutExtension = "\(filenameWithoutExtension) (\(count))"
+            proposedPath = self.appendingPathComponent(proposedFilenameWithoutExtension).appendingPathExtension(fileExtension)
+        }
+        
+        return proposedPath
+    }
 }
 
 // Helpers to deal with About URLs
