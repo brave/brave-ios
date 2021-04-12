@@ -103,6 +103,7 @@ class PlaylistSettingsViewController: TableViewController {
                 }
             )
             optionsViewController.title = Strings.PlayList.playlistAutoSaveSettingsTitle
+            optionsViewController.headerText = Strings.PlayList.playlistAutoSaveSettingsDescription
 
             self.navigationController?.pushViewController(optionsViewController, animated: true)
         }

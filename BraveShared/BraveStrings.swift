@@ -1254,6 +1254,12 @@ extension Strings {
                               value: "Auto-Save for Offline",
                               comment: "Title for the Playlist Settings Option for Auto Save Videos for Offline (Off/On/Only Wifi)")
         
+        public static let playlistAutoSaveSettingsDescription =
+            NSLocalizedString("playlist.playlistAutoSaveSettingsDescription",
+                              bundle: .braveShared,
+                              value: "Adding video and audio files for offline use can use a lot of storage on your device as well as use your cellular data",
+                              comment: "Description for the Playlist Settings Option for Auto Save Videos for Offline (Off/On/Only Wifi)")
+        
         public static let playlistAutoSaveSettingsFooterText =
             NSLocalizedString("playlist.playlistAutoSaveSettingsFooterText",
                               bundle: .braveShared,
