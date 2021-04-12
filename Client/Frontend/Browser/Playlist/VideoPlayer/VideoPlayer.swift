@@ -162,7 +162,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         addGestureRecognizer(overlayDoubleTappedGesture)
         overlayTappedGesture.require(toFail: overlayDoubleTappedGesture)
         
-        self.showOverlays(true)
+        self.toggleOverlays(showOverlay: true)
     }
     
     required init?(coder: NSCoder) {
@@ -197,9 +197,9 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     @objc
     private func onOverlayTapped(_ gestureRecognizer: UITapGestureRecognizer) {
         if isSeeking {
-            showOverlays(true, except: [overlayView, infoView, controlsView.playPauseButton], display: [controlsView.trackBar])
+            toggleOverlays(showOverlay: true, except: [overlayView, infoView, controlsView.playPauseButton], display: [controlsView.trackBar])
         } else if (isPlaying && !isOverlayDisplayed) || (!isPlaying && !isSeeking && !isOverlayDisplayed) {
-            showOverlays(true)
+            toggleOverlays(showOverlay: true)
             isOverlayDisplayed = true
             
             fadeAnimationWorkItem?.cancel()
@@ -207,17 +207,17 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
                 guard let self = self else { return }
                 self.isOverlayDisplayed = false
                 if self.isPlaying && !self.isSeeking {
-                    self.showOverlays(false)
+                    self.toggleOverlays(showOverlay: false)
                 }
             })
             
             guard let fadeAnimationWorkItem = fadeAnimationWorkItem else { return }
             DispatchQueue.main.asyncAfter(deadline: .now() + 5.0, execute: fadeAnimationWorkItem)
         } else if isPlaying && isOverlayDisplayed {
-            showOverlays(false)
+            toggleOverlays(showOverlay: false)
             isOverlayDisplayed = false
         } else {
-            showOverlays(true)
+            toggleOverlays(showOverlay: true)
             isOverlayDisplayed = true
         }
     }
@@ -238,7 +238,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
 
     private func seekDirectionWithAnimation(_ seekBlock: () -> Void) {
         isSeeking = true
-        showOverlays(true)
+        toggleOverlays(showOverlay: true)
         isOverlayDisplayed = true
         
         seekBlock()
@@ -246,7 +246,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         fadeAnimationWorkItem?.cancel()
         fadeAnimationWorkItem = DispatchWorkItem(block: {
             self.isSeeking = false
-            self.showOverlays(false)
+            self.toggleOverlays(showOverlay: false)
             self.isOverlayDisplayed = false
         })
         
@@ -378,7 +378,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
             wasPlayingBeforeSeeking = true
         }
         
-        showOverlays(false, except: [infoView, controlsView], display: [controlsView])
+        toggleOverlays(showOverlay: false, except: [infoView, controlsView], display: [controlsView])
         isOverlayDisplayed = true
         
         if let currentItem = player.currentItem {
@@ -398,12 +398,12 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         
         if isPlaying || player.rate > 0.0 {
             fadeAnimationWorkItem?.cancel()
-            showOverlays(false, except: [overlayView], display: [overlayView])
+            toggleOverlays(showOverlay: false, except: [overlayView], display: [overlayView])
             overlayView.alpha = 0.0
             isOverlayDisplayed = false
         } else {
             fadeAnimationWorkItem?.cancel()
-            showOverlays(true)
+            toggleOverlays(showOverlay: true)
             overlayView.alpha = 1.0
             isOverlayDisplayed = true
         }
@@ -441,7 +441,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
             self.controlsView.playPauseButton.isEnabled = true
             self.controlsView.playPauseButton.setImage(#imageLiteral(resourceName: "playlist_play"), for: .normal)
 
-            self.showOverlays(true)
+            self.toggleOverlays(showOverlay: true)
             
             self.next()
         })
@@ -471,23 +471,23 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         }
     }
     
-    private func showOverlays(_ show: Bool) {
-        self.showOverlays(show, except: [], display: [])
+    private func toggleOverlays(showOverlay: Bool) {
+        self.toggleOverlays(showOverlay: showOverlay, except: [], display: [])
     }
     
-    private func showOverlays(_ show: Bool, except: [UIView] = [], display: [UIView] = []) {
+    private func toggleOverlays(showOverlay: Bool, except: [UIView] = [], display: [UIView] = []) {
         var except = except
         var display = display
         
         if isVideoAvailable() {
-            if show {
+            if showOverlay {
                 except.append(particleView)
             }
         } else {
             // If the overlay is showing, hide the particle view.. else show it..
             except.append(particleView)
             
-            if !show {
+            if !showOverlay {
                 display.append(particleView)
             }
         }
@@ -495,7 +495,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         UIView.animate(withDuration: 1.0, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 1.0, options: [.curveEaseInOut, .allowUserInteraction], animations: {
             self.subviews.forEach({
                 if !except.contains($0) {
-                    $0.alpha = show ? 1.0 : 0.0
+                    $0.alpha = showOverlay ? 1.0 : 0.0
                 } else if display.contains($0) {
                     $0.alpha = 1.0
                 } else {
@@ -571,12 +571,12 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     
     public func play() {
         if isPlaying {
-            showOverlays(isOverlayDisplayed)
+            toggleOverlays(showOverlay: isOverlayDisplayed)
         } else {
             controlsView.playPauseButton.setImage(#imageLiteral(resourceName: "playlist_pause"), for: .normal)
             player.play()
             
-            showOverlays(false)
+            toggleOverlays(showOverlay: false)
             isOverlayDisplayed = false
         }
     }
@@ -586,10 +586,10 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
             controlsView.playPauseButton.setImage(#imageLiteral(resourceName: "playlist_play"), for: .normal)
             player.pause()
             
-            showOverlays(true)
+            toggleOverlays(showOverlay: true)
             isOverlayDisplayed = true
         } else {
-            showOverlays(isOverlayDisplayed)
+            toggleOverlays(showOverlay: isOverlayDisplayed)
         }
     }
     
@@ -597,7 +597,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         controlsView.playPauseButton.setImage(#imageLiteral(resourceName: "playlist_play"), for: .normal)
         player.pause()
         
-        showOverlays(true)
+        toggleOverlays(showOverlay: true)
         isOverlayDisplayed = true
         player.replaceCurrentItem(with: nil)
     }
