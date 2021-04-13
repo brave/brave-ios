@@ -109,7 +109,7 @@ class PlaylistCell: UITableViewCell {
         }
         
         infoStackView.snp.makeConstraints {
-            $0.leading.equalTo(iconStackView.snp.right).offset(8.0)
+            $0.leading.equalTo(iconStackView.snp.trailing).offset(8.0)
             $0.trailing.equalToSuperview().offset(-15.0)
             $0.centerY.equalToSuperview()
             $0.top.greaterThanOrEqualTo(iconStackView.snp.top)
@@ -117,7 +117,7 @@ class PlaylistCell: UITableViewCell {
         }
         
         separator.snp.makeConstraints {
-            $0.leading.equalTo(titleLabel.snp.left)
+            $0.leading.equalTo(titleLabel.snp.leading)
             $0.trailing.bottom.equalToSuperview()
             $0.height.equalTo(1.0 / UIScreen.main.scale)
         }
