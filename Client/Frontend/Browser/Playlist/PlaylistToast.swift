@@ -38,17 +38,17 @@ class PlaylistToast: Toast {
         super.init(frame: .zero)
 
         self.completionHandler = completion
-        self.clipsToBounds = true
+        clipsToBounds = true
 
-        self.addSubview(createView(item, state))
+        addSubview(createView(item, state))
 
-        self.toastView.snp.makeConstraints { make in
-            make.leading.trailing.height.equalTo(self)
-            self.animationConstraint = make.top.equalTo(self).offset(ButtonToastUX.toastHeight).constraint
+        toastView.snp.makeConstraints {
+            $0.leading.trailing.height.equalTo(self)
+            self.animationConstraint = $0.top.equalTo(self).offset(ButtonToastUX.toastHeight).constraint
         }
 
-        self.snp.makeConstraints { make in
-            make.height.equalTo(ButtonToastUX.toastHeight)
+        self.snp.makeConstraints {
+            $0.height.equalTo(ButtonToastUX.toastHeight)
         }
     }
 
@@ -105,9 +105,9 @@ class PlaylistToast: Toast {
                 $0.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(buttonPressed)))
             }
 
-            button.snp.makeConstraints { (make) in
+            button.snp.makeConstraints {
                 if let titleLabel = button.titleLabel {
-                    make.width.equalTo(titleLabel.intrinsicContentSize.width + 2 * ButtonToastUX.toastButtonPadding)
+                    $0.width.equalTo(titleLabel.intrinsicContentSize.width + 2 * ButtonToastUX.toastButtonPadding)
                 }
             }
 
@@ -117,10 +117,10 @@ class PlaylistToast: Toast {
 
             toastView.addSubview(horizontalStackView)
 
-            horizontalStackView.snp.makeConstraints { make in
-                make.centerX.equalTo(toastView)
-                make.centerY.equalTo(toastView)
-                make.width.equalTo(toastView.snp.width).offset(-2 * ButtonToastUX.toastPadding)
+            horizontalStackView.snp.makeConstraints {
+                $0.centerX.equalTo(toastView)
+                $0.centerY.equalTo(toastView)
+                $0.width.equalTo(toastView.snp.width).offset(-2 * ButtonToastUX.toastPadding)
             }
 
             return toastView
@@ -152,10 +152,10 @@ class PlaylistToast: Toast {
         horizontalStackView.addArrangedSubview(button)
         toastView.addSubview(horizontalStackView)
 
-        horizontalStackView.snp.makeConstraints { make in
-            make.centerX.equalTo(toastView)
-            make.centerY.equalTo(toastView)
-            make.width.equalTo(toastView.snp.width).offset(-2 * ButtonToastUX.toastPadding)
+        horizontalStackView.snp.makeConstraints {
+            $0.centerX.equalTo(toastView)
+            $0.centerY.equalTo(toastView)
+            $0.width.equalTo(toastView.snp.width).offset(-2 * ButtonToastUX.toastPadding)
         }
         
         if state == .pendingUserAction {
@@ -180,17 +180,17 @@ class PlaylistToast: Toast {
     
     override func showToast(viewController: UIViewController? = nil, delay: DispatchTimeInterval, duration: DispatchTimeInterval?, makeConstraints: @escaping (SnapKit.ConstraintMaker) -> Swift.Void) {
         
-        super.showToast(viewController: viewController, delay: delay, duration: duration) { make in
+        super.showToast(viewController: viewController, delay: delay, duration: duration) {
             guard let viewController = viewController as? BrowserViewController else {
                 assertionFailure("Playlist Toast should only be presented on BrowserViewController")
                 return
             }
             
-            make.centerX.equalTo(viewController.view.snp.centerX)
-            make.bottom.equalTo(viewController.webViewContainer.safeArea.bottom)
-            make.leading.equalTo(viewController.view.safeArea.leading).priority(.high)
-            make.trailing.equalTo(viewController.view.safeArea.trailing).priority(.high)
-            make.width.lessThanOrEqualTo(DesignUX.maxToastWidth)
+            $0.centerX.equalTo(viewController.view.snp.centerX)
+            $0.bottom.equalTo(viewController.webViewContainer.safeArea.bottom)
+            $0.leading.equalTo(viewController.view.safeArea.leading).priority(.high)
+            $0.trailing.equalTo(viewController.view.safeArea.trailing).priority(.high)
+            $0.width.lessThanOrEqualTo(DesignUX.maxToastWidth)
         }
     }
     

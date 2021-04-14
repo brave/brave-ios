@@ -4743,13 +4743,6 @@
 			path = expired.badssl.com;
 			sourceTree = "<group>";
 		};
-		5EC003562608F794005DDE4A /* Recovered References */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = "Recovered References";
-			sourceTree = "<group>";
-		};
 		5EC2C07125BF9880005EA984 /* Cells */ = {
 			isa = PBXGroup;
 			children = (
@@ -5319,7 +5312,6 @@
 				2FCAE22A1ABB51F800877008 /* StorageTests */,
 				5DE7689220B3456E00FF5533 /* BraveSharedTests */,
 				28CE83EF1A1D246900576538 /* ThirdParty */,
-				5EC003562608F794005DDE4A /* Recovered References */,
 			);
 			indentWidth = 4;
 			sourceTree = "<group>";

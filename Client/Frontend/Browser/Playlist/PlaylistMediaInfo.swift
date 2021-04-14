@@ -95,7 +95,7 @@ class PlaylistMediaInfo: NSObject {
         
         UIApplication.shared.beginReceivingRemoteControlEvents()
         updateNowPlayingMediaInfo()
-        rateObserver = playerView.player.observe(\AVPlayer.rate, options: [.new], changeHandler: { [weak self] _, _ in
+        rateObserver = playerView.player.observe(\AVPlayer.rate, changeHandler: { [weak self] _, _ in
             self?.updateNowPlayingMediaInfo()
         })
     }
@@ -155,7 +155,6 @@ extension PlaylistMediaInfo: MPPlayableContentDelegate {
                     return
                 }
                 
-                #if !PLAYLIST_WEB_LOADER
                 self.webLoader?.removeFromSuperview()
                 self.webLoader = PlaylistWebLoader(handler: { [weak self] newItem in
                     guard let self = self else { return }
@@ -190,9 +189,6 @@ extension PlaylistMediaInfo: MPPlayableContentDelegate {
                     self.updateNowPlayingMediaArtwork(image: nil)
                     completion(.error("Cannot Load Media"))
                 }
-                #else
-                completion(.expired)
-                #endif
             }
 
             // Determine if an item can be streamed and stream it directly
@@ -255,12 +251,12 @@ extension PlaylistMediaInfo: MPPlayableContentDelegate {
             super.init()
             
             self.player = player
-            currentItemObserver = player.observe(\AVPlayer.currentItem, options: [.old, .new], changeHandler: { [weak self] _, change in
+            currentItemObserver = player.observe(\AVPlayer.currentItem, options: [.new], changeHandler: { [weak self] _, change in
                 guard let self = self else { return }
                 
                 if let newItem = change.newValue {
                     self.item = newItem
-                    self.itemStatusObserver = newItem?.observe(\AVPlayerItem.status, options: [.old, .new], changeHandler: { [weak self] _, change in
+                    self.itemStatusObserver = newItem?.observe(\AVPlayerItem.status, options: [.new], changeHandler: { [weak self] _, change in
                         guard let self = self else { return }
                         
                         let status = change.newValue ?? .unknown
@@ -287,14 +283,21 @@ extension PlaylistMediaInfo: MPPlayableContentDelegate {
 extension PlaylistMediaInfo {
     
     func thumbnailForURL(_ url: String) -> UIImage? {
-        let sourceURL = URL(string: url)
-        let asset = AVAsset(url: sourceURL!)
-        let imageGenerator = AVAssetImageGenerator(asset: asset)
-        let time = CMTimeMakeWithSeconds(2, preferredTimescale: 1)
-        guard let imageRef = try? imageGenerator.copyCGImage(at: time, actualTime: nil) else {
+        guard let sourceURL = URL(string: url) else {
             return nil
         }
-        return UIImage(cgImage: imageRef)
+        
+        let asset = AVAsset(url: sourceURL)
+        let imageGenerator = AVAssetImageGenerator(asset: asset)
+        let time = CMTimeMakeWithSeconds(2, preferredTimescale: 1)
+        
+        do {
+            let imageRef = try imageGenerator.copyCGImage(at: time, actualTime: nil)
+            return UIImage(cgImage: imageRef)
+        } catch {
+            log.error("Error copying thumbnail for playlist url: \(url) -  \(error)")
+        }
+        return nil
     }
 }
 
@@ -490,7 +493,8 @@ extension MediaResourceManager {
         
         URLSession(configuration: .ephemeral).dataTask(with: request) { data, response, error in
             DispatchQueue.main.async {
-                if error != nil {
+                if let error = error {
+                    log.error("Error fetching MimeType for playlist item: \(url) - \(error)")
                     return completion(nil)
                 }
                 

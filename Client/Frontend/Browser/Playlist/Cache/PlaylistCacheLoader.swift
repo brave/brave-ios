@@ -346,7 +346,7 @@ class PlaylistWebLoader: UIView {
         $0.webView?.scrollView.layer.masksToBounds = true
     }
     
-    private let PlaylistDetectorScript: WKUserScript? = {
+    private let playlistDetectorScript: WKUserScript? = {
         guard let path = Bundle.main.path(forResource: "PlaylistDetector", ofType: "js"), let source = try? String(contentsOfFile: path) else {
             log.error("Failed to load PlaylistDetector.js")
             return nil
@@ -381,22 +381,15 @@ class PlaylistWebLoader: UIView {
         return WKUserScript(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false)
     }()
     
-    private var handler: (PlaylistInfo?) -> Void = { _ in }
-    private var handlerDidExecute = false
+    private var handler: (PlaylistInfo?) -> Void
     
     init(handler: @escaping (PlaylistInfo?) -> Void) {
+        self.handler = handler
         super.init(frame: .zero)
 
         guard let webView = tab.webView else {
-            handlerDidExecute = true
             handler(nil)
             return
-        }
-        
-        self.handler = { [weak self] in
-            guard let self = self else { return }
-            self.handlerDidExecute = true
-            handler($0)
         }
         
         self.addSubview(webView)
@@ -416,11 +409,13 @@ class PlaylistWebLoader: UIView {
             webView.scrollView.removeObserver(browserController.scrollController, forKeyPath: KVOConstants.contentSize.rawValue)
         }
         
+        // When creating a tab, TabManager automatically adds a uiDelegate
+        // This webView is invisible and we don't want any UI being handled.
         webView.uiDelegate = nil
         webView.navigationDelegate = self
         tab.addContentScript(PlaylistWebLoaderContentHelper(self), name: PlaylistWebLoaderContentHelper.name(), sandboxed: false)
         
-        if let script = PlaylistDetectorScript {
+        if let script = playlistDetectorScript {
             // Do NOT inject the PlaylistHelper script!
             // The Playlist Detector script will interfere with it.
             // The detector script is only to be used in the background in an invisible webView
@@ -473,10 +468,7 @@ class PlaylistWebLoader: UIView {
                     if isPageLoaded {
                         timeout = DispatchWorkItem(block: { [weak self] in
                             guard let self = self else { return }
-                            if self.webLoader?.handlerDidExecute == false {
-                                self.webLoader?.handler(nil)
-                            }
-                            
+                            self.webLoader?.handler(nil)
                             self.webLoader?.tab.webView?.loadHTMLString("<html><body>PlayList</body></html>", baseURL: nil)
                         })
                         
@@ -635,7 +627,7 @@ extension PlaylistWebLoader: WKNavigationDelegate {
         tab.userScriptManager?.handleDomainUserScript(for: url)
         
         // For Playlist automatic detection since the above `handleDomainUserScript` removes ALL scripts!
-        if let script = PlaylistDetectorScript {
+        if let script = playlistDetectorScript {
             tab.webView?.configuration.userContentController.do {
                 $0.addUserScript(script)
             }

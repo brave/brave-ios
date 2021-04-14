@@ -172,7 +172,7 @@ private class ListController: UIViewController {
     public let playerView = VideoView()
     private lazy var mediaInfo = PlaylistMediaInfo(playerView: playerView)
     private var currentlyPlayingItemIndex = -1
-    private var autoPlayEnabled: Bool = true
+    private var autoPlayEnabled = true
     private var playerController: AVPlayerViewController?
     
     private lazy var activityIndicator = UIActivityIndicatorView(style: .medium).then {
@@ -180,11 +180,9 @@ private class ListController: UIViewController {
         $0.hidesWhenStopped = true
     }
     
-    private var tableView = UITableView(frame: .zero, style: .grouped).then {
+    private let tableView = UITableView(frame: .zero, style: .grouped).then {
         $0.backgroundView = UIView()
-        $0.backgroundColor = BraveUX.popoverDarkBackground
         $0.appearanceBackgroundColor = BraveUX.popoverDarkBackground
-        $0.separatorColor = .clear
         $0.appearanceSeparatorColor = .clear
         $0.allowsSelectionDuringEditing = true
     }
@@ -268,7 +266,7 @@ private class ListController: UIViewController {
             
             self.autoPlayEnabled = Preferences.Playlist.firstLoadAutoPlay.value
             
-            if PlaylistManager.shared.numberOfAssets() > 0 {
+            if PlaylistManager.shared.numberOfAssets > 0 {
                 self.playerView.setControlsEnabled(true)
                 
                 if let lastPlayedItemUrl = Preferences.Playlist.lastPlayedItemUrl.value, let index = PlaylistManager.shared.index(of: lastPlayedItemUrl) {
@@ -372,7 +370,7 @@ private class ListController: UIViewController {
                     
                     // On iPhone-8, 14.4, I need to scroll the tableView after setting its contentOffset and contentInset
                     // Otherwise the layout is broken when exiting fullscreen in portrait mode.
-                    if PlaylistManager.shared.numberOfAssets() > 0 {
+                    if PlaylistManager.shared.numberOfAssets > 0 {
                         tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
                     }
                 }
@@ -522,7 +520,7 @@ extension ListController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        PlaylistManager.shared.numberOfAssets()
+        PlaylistManager.shared.numberOfAssets
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -673,7 +671,7 @@ extension ListController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         
-        if indexPath.row < 0 || indexPath.row >= PlaylistManager.shared.numberOfAssets() {
+        if indexPath.row < 0 || indexPath.row >= PlaylistManager.shared.numberOfAssets {
             return nil
         }
 
@@ -782,35 +780,37 @@ extension ListController: UITableViewDelegate {
     }
     
     private func playItem(at indexPath: IndexPath, completion: ((PlaylistMediaInfo.MediaPlaybackError) -> Void)?) {
-        if indexPath.row < PlaylistManager.shared.numberOfAssets() {
-            activityIndicator.startAnimating()
-            activityIndicator.isHidden = false
-            currentlyPlayingItemIndex = indexPath.row
-            
-            let selectedCell = tableView.cellForRow(at: indexPath) as? PlaylistCell
+        if indexPath.row >= PlaylistManager.shared.numberOfAssets {
+            return
+        }
+        
+        activityIndicator.startAnimating()
+        activityIndicator.isHidden = false
+        currentlyPlayingItemIndex = indexPath.row
+        
+        let selectedCell = tableView.cellForRow(at: indexPath) as? PlaylistCell
 
-            let item = PlaylistManager.shared.itemAtIndex(indexPath.row)
-            playerView.setVideoInfo(videoDomain: item.pageSrc, videoTitle: item.pageTitle)
-            mediaInfo.updateNowPlayingMediaArtwork(image: selectedCell?.thumbnailView.image)
+        let item = PlaylistManager.shared.itemAtIndex(indexPath.row)
+        playerView.setVideoInfo(videoDomain: item.pageSrc, videoTitle: item.pageTitle)
+        mediaInfo.updateNowPlayingMediaArtwork(image: selectedCell?.thumbnailView.image)
+        
+        mediaInfo.loadMediaItem(item, index: indexPath.row, autoPlayEnabled: autoPlayEnabled) { [weak self] error in
+            guard let self = self else { return }
+            defer { completion?(error) }
+            self.activityIndicator.stopAnimating()
             
-            mediaInfo.loadMediaItem(item, index: indexPath.row, autoPlayEnabled: autoPlayEnabled) { [weak self] error in
-                guard let self = self else { return }
-                defer { completion?(error) }
-                self.activityIndicator.stopAnimating()
+            switch error {
+            case .error:
+                break
                 
-                switch error {
-                case .error:
-                    break
-                    
-                case .expired:
-                    selectedCell?.detailLabel.text = Strings.PlayList.expiredLabelTitle
-                    
-                case .none:
-                    log.debug("Playing Live Video: \(self.playerView.player.currentItem?.duration.isIndefinite ?? false)")
-                    
-                    if let selectedCell = selectedCell {
-                        self.loadThumbnail(item: item, cell: selectedCell)
-                    }
+            case .expired:
+                selectedCell?.detailLabel.text = Strings.PlayList.expiredLabelTitle
+                
+            case .none:
+                log.debug("Playing Live Video: \(self.playerView.player.currentItem?.duration.isIndefinite ?? false)")
+                
+                if let selectedCell = selectedCell {
+                    self.loadThumbnail(item: item, cell: selectedCell)
                 }
             }
         }
@@ -913,7 +913,7 @@ extension ListController: UITableViewDragDelegate, UITableViewDropDelegate {
         
         let preview = UIDragPreviewParameters()
         preview.visiblePath = UIBezierPath(roundedRect: cell.contentView.frame, cornerRadius: 12.0)
-        preview.backgroundColor = self.slightlyLighterColour(colour: BraveUX.popoverDarkBackground)
+        preview.backgroundColor = slightlyLighterColour(color: BraveUX.popoverDarkBackground)
         return preview
     }
 
@@ -922,7 +922,7 @@ extension ListController: UITableViewDragDelegate, UITableViewDropDelegate {
         
         let preview = UIDragPreviewParameters()
         preview.visiblePath = UIBezierPath(roundedRect: cell.contentView.frame, cornerRadius: 12.0)
-        preview.backgroundColor = self.slightlyLighterColour(colour: BraveUX.popoverDarkBackground)
+        preview.backgroundColor = slightlyLighterColour(color: BraveUX.popoverDarkBackground)
         return preview
     }
     
@@ -930,12 +930,12 @@ extension ListController: UITableViewDragDelegate, UITableViewDropDelegate {
         true
     }
     
-    private func slightlyLighterColour(colour: UIColor) -> UIColor {
+    private func slightlyLighterColour(color: UIColor) -> UIColor {
         let desaturation: CGFloat = 0.5
         var h: CGFloat = 0, s: CGFloat = 0
         var b: CGFloat = 0, a: CGFloat = 0
 
-        guard colour.getHue(&h, saturation: &s, brightness: &b, alpha: &a) else {return colour}
+        guard color.getHue(&h, saturation: &s, brightness: &b, alpha: &a) else {return color}
 
         return UIColor(hue: h,
                        saturation: max(s - desaturation, 0.0),
@@ -959,7 +959,7 @@ extension ListController: VideoViewDelegate {
         }
         
         let index = currentlyPlayingItemIndex - 1
-        if index < PlaylistManager.shared.numberOfAssets() {
+        if index < PlaylistManager.shared.numberOfAssets {
             let indexPath = IndexPath(row: index, section: 0)
             playItem(at: indexPath) { [weak self] error in
                 guard let self = self else { return }
@@ -979,7 +979,7 @@ extension ListController: VideoViewDelegate {
     }
     
     func onNextTrack(isUserInitiated: Bool) {
-        let assetCount = PlaylistManager.shared.numberOfAssets()
+        let assetCount = PlaylistManager.shared.numberOfAssets
         let isAtEnd = currentlyPlayingItemIndex >= assetCount - 1
         var index = currentlyPlayingItemIndex
         
@@ -1192,20 +1192,67 @@ extension ListController: AVPlayerViewControllerDelegate, AVPictureInPictureCont
 
 extension ListController: PlaylistManagerDelegate {
     func onDownloadProgressUpdate(id: String, percentComplete: Double) {
-        if let index = PlaylistManager.shared.index(of: id),
-           let cell = tableView.cellForRow(at: IndexPath(row: index, section: 0)) as? PlaylistCell {
+        guard let index = PlaylistManager.shared.index(of: id),
+              let cell = tableView.cellForRow(at: IndexPath(row: index, section: 0)) as? PlaylistCell else {
+            return
+        }
+        
+        let cacheState = PlaylistManager.shared.state(for: id)
+        switch cacheState {
+        case .inProgress:
+            let item = PlaylistManager.shared.itemAtIndex(index)
+            getAssetDurationFormatted(item: item) {
+                cell.detailLabel.text = "\($0) - \(Int(percentComplete))% \(Strings.PlayList.savedForOfflineLabelTitle)"
+            }
+        case .downloaded:
+            let item = PlaylistManager.shared.itemAtIndex(index)
+            if let itemSize = PlaylistManager.shared.sizeOfDownloadedItem(for: item.pageSrc) {
+                
+                getAssetDurationFormatted(item: item) {
+                    cell.detailLabel.text = "\($0) - \(itemSize)"
+                }
+            } else {
+                getAssetDurationFormatted(item: item) {
+                    cell.detailLabel.text = "\($0) - \(Strings.PlayList.savedForOfflineLabelTitle)"
+                }
+            }
+        case .invalid:
+            let item = PlaylistManager.shared.itemAtIndex(index)
             
-            let cacheState = PlaylistManager.shared.state(for: id)
-            switch cacheState {
+            getAssetDurationFormatted(item: item) {
+                cell.detailLabel.text = $0
+            }
+        }
+    }
+    
+    func onDownloadStateChanged(id: String, state: PlaylistDownloadManager.DownloadState, displayName: String?, error: Error?) {
+        guard let index = PlaylistManager.shared.index(of: id),
+              let cell = tableView.cellForRow(at: IndexPath(row: index, section: 0)) as? PlaylistCell else {
+            return
+        }
+            
+        if let error = error {
+            log.error("Error downloading playlist item: \(error)")
+            
+            let item = PlaylistManager.shared.itemAtIndex(index)
+            getAssetDurationFormatted(item: item) {
+                cell.detailLabel.text = $0
+            }
+            
+            let alert = UIAlertController(title: Strings.PlayList.playlistSaveForOfflineErrorTitle,
+                                          message: Strings.PlayList.playlistSaveForOfflineErrorMessage, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: nil))
+            self.present(alert, animated: true, completion: nil)
+        } else {
+            switch state {
             case .inProgress:
                 let item = PlaylistManager.shared.itemAtIndex(index)
                 getAssetDurationFormatted(item: item) {
-                    cell.detailLabel.text = "\($0) - \(Int(percentComplete))% \(Strings.PlayList.savedForOfflineLabelTitle)"
+                    cell.detailLabel.text = "\($0) - \(Strings.PlayList.savingForOfflineLabelTitle)"
                 }
             case .downloaded:
                 let item = PlaylistManager.shared.itemAtIndex(index)
                 if let itemSize = PlaylistManager.shared.sizeOfDownloadedItem(for: item.pageSrc) {
-                    
                     getAssetDurationFormatted(item: item) {
                         cell.detailLabel.text = "\($0) - \(itemSize)"
                     }
@@ -1219,51 +1266,6 @@ extension ListController: PlaylistManagerDelegate {
                 
                 getAssetDurationFormatted(item: item) {
                     cell.detailLabel.text = $0
-                }
-            }
-        }
-    }
-    
-    func onDownloadStateChanged(id: String, state: PlaylistDownloadManager.DownloadState, displayName: String?, error: Error?) {
-        if let index = PlaylistManager.shared.index(of: id),
-        let cell = tableView.cellForRow(at: IndexPath(row: index, section: 0)) as? PlaylistCell {
-            
-            if let error = error {
-                log.error("Error downloading playlist item: \(error)")
-                
-                let item = PlaylistManager.shared.itemAtIndex(index)
-                getAssetDurationFormatted(item: item) {
-                    cell.detailLabel.text = $0
-                }
-                
-                let alert = UIAlertController(title: Strings.PlayList.playlistSaveForOfflineErrorTitle,
-                                              message: Strings.PlayList.playlistSaveForOfflineErrorMessage, preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: nil))
-                self.present(alert, animated: true, completion: nil)
-            } else {
-                switch state {
-                case .inProgress:
-                    let item = PlaylistManager.shared.itemAtIndex(index)
-                    getAssetDurationFormatted(item: item) {
-                        cell.detailLabel.text = "\($0) - \(Strings.PlayList.savingForOfflineLabelTitle)"
-                    }
-                case .downloaded:
-                    let item = PlaylistManager.shared.itemAtIndex(index)
-                    if let itemSize = PlaylistManager.shared.sizeOfDownloadedItem(for: item.pageSrc) {
-                        getAssetDurationFormatted(item: item) {
-                            cell.detailLabel.text = "\($0) - \(itemSize)"
-                        }
-                    } else {
-                        getAssetDurationFormatted(item: item) {
-                            cell.detailLabel.text = "\($0) - \(Strings.PlayList.savedForOfflineLabelTitle)"
-                        }
-                    }
-                case .invalid:
-                    let item = PlaylistManager.shared.itemAtIndex(index)
-                    
-                    getAssetDurationFormatted(item: item) {
-                        cell.detailLabel.text = $0
-                    }
                 }
             }
         }
@@ -1306,7 +1308,7 @@ extension ListController: PlaylistManagerDelegate {
 
 extension ListController {
     func updateTableBackgroundView() {
-        if PlaylistManager.shared.numberOfAssets() > 0 {
+        if PlaylistManager.shared.numberOfAssets > 0 {
             tableView.backgroundView = nil
             tableView.separatorStyle = .singleLine
         } else {

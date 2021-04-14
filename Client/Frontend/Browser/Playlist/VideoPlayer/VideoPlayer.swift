@@ -244,7 +244,8 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         seekBlock()
         
         fadeAnimationWorkItem?.cancel()
-        fadeAnimationWorkItem = DispatchWorkItem(block: {
+        fadeAnimationWorkItem = DispatchWorkItem(block: { [weak self] in
+            guard let self = self else { return }
             self.isSeeking = false
             self.toggleOverlays(showOverlay: false)
             self.isOverlayDisplayed = false

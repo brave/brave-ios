@@ -36,7 +36,7 @@ class PlaylistManager: NSObject {
         frc.delegate = self
     }
     
-    func numberOfAssets() -> Int {
+    var numberOfAssets: Int {
         frc.fetchedObjects?.count ?? 0
     }
     
@@ -101,7 +101,9 @@ class PlaylistManager: NSObject {
     }
     
     func sizeOfDownloadedItem(for pageSrc: String) -> String? {
-        if let assetUrl = downloadManager.localAsset(for: pageSrc)?.url, FileManager.default.fileExists(atPath: assetUrl.path), let size = try? FileManager.default.attributesOfItem(atPath: assetUrl.path)[.size] as? Int {
+        if let assetUrl = downloadManager.localAsset(for: pageSrc)?.url,
+           FileManager.default.fileExists(atPath: assetUrl.path),
+           let size = try? FileManager.default.attributesOfItem(atPath: assetUrl.path)[.size] as? Int {
             let formatter = ByteCountFormatter()
             formatter.zeroPadsFractionDigits = true
             formatter.countStyle = .file

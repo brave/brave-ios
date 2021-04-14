@@ -38,7 +38,7 @@ public class HLSThumbnailGenerator {
             kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA
         ])
         
-        self.observer = self.player.currentItem?.observe(\.status, options: [.old, .new]) { [weak self] item, _ in
+        self.observer = self.player.currentItem?.observe(\.status) { [weak self] item, _ in
             guard let self = self else { return }
             
             if item.status == .readyToPlay && self.state == .loading {
