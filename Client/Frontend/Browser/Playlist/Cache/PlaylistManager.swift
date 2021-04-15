@@ -101,13 +101,37 @@ class PlaylistManager: NSObject {
     }
     
     func sizeOfDownloadedItem(for pageSrc: String) -> String? {
-        if let assetUrl = downloadManager.localAsset(for: pageSrc)?.url,
-           FileManager.default.fileExists(atPath: assetUrl.path),
-           let size = try? FileManager.default.attributesOfItem(atPath: assetUrl.path)[.size] as? Int {
-            let formatter = ByteCountFormatter()
-            formatter.zeroPadsFractionDigits = true
-            formatter.countStyle = .file
-            return formatter.string(fromByteCount: Int64(size))
+        var isDirectory: ObjCBool = false
+        if let asset = downloadManager.localAsset(for: pageSrc),
+           FileManager.default.fileExists(atPath: asset.url.path, isDirectory: &isDirectory) {
+            
+            if isDirectory.boolValue || asset.url.pathExtension.lowercased() == "movpkg" {
+                let properties: [URLResourceKey] = [.isRegularFileKey, .totalFileAllocatedSizeKey]
+                guard let enumerator = FileManager.default.enumerator(at: asset.url,
+                                                                      includingPropertiesForKeys: properties,
+                                                                      options: .skipsHiddenFiles,
+                                                                      errorHandler: nil) else {
+                    return nil
+                }
+                
+                let resources = enumerator.compactMap({ try? ($0 as? URL)?.resourceValues(forKeys: Set(properties)) })
+                                          .filter({ $0.isRegularFile == true })
+                let sizes = resources.compactMap({ $0.totalFileAllocatedSize })
+                                     .compactMap({ Int64($0) })
+                
+                let totalSize = sizes.reduce(0, +)
+                let formatter = ByteCountFormatter()
+                formatter.zeroPadsFractionDigits = true
+                formatter.countStyle = .file
+                return formatter.string(fromByteCount: Int64(totalSize))
+            }
+            
+            if let size = try? FileManager.default.attributesOfItem(atPath: asset.url.path)[.size] as? Int {
+                let formatter = ByteCountFormatter()
+                formatter.zeroPadsFractionDigits = true
+                formatter.countStyle = .file
+                return formatter.string(fromByteCount: Int64(size))
+            }
         }
         return nil
     }
@@ -230,9 +254,10 @@ class PlaylistManager: NSObject {
     func isDiskSpaceEncumbered() -> Bool {
         let freeSpace = availableDiskSpace() ?? 0
         let totalSpace = totalDiskSpace() ?? 0
+        let usedSpace = totalSpace - freeSpace
         
         // If disk space is 90% used
-        return totalSpace == 0 || (Double(freeSpace) / Double(totalSpace)) * 100.0 >= 90.0
+        return totalSpace == 0 || (Double(usedSpace) / Double(totalSpace)) * 100.0 >= 90.0
     }
     
     private func availableDiskSpace() -> Int64? {
