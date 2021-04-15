@@ -64,16 +64,18 @@ public final class TabMO: NSManagedObject, CRUD {
     
     /// Creates new tab and returns its syncUUID. If you want to add urls to existing tabs use `update()` method.
     public class func create(uuidString: String = UUID().uuidString) -> String {
-        
+        createInternal(uuidString: uuidString, lastUpdateDate: Date())
+        return uuidString
+    }
+    
+    class func createInternal(uuidString: String, lastUpdateDate: Date) {
         DataController.perform(task: { context in
             let tab = TabMO(entity: entity(context), insertInto: context)
             // TODO: replace with logic to create sync uuid then buble up new uuid to browser.
             tab.syncUUID = uuidString
             tab.title = Strings.newTab
-            tab.lastUpdate = Date()
+            tab.lastUpdate = lastUpdateDate
         })
-        
-        return uuidString
     }
     
     // MARK: Read
