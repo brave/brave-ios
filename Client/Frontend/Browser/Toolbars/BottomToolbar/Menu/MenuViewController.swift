@@ -201,7 +201,7 @@ extension MenuViewController: PanModalPresentable {
         .maxHeight
     }
     var shortFormHeight: PanModalHeight {
-        isPresentingInnerMenu ? .maxHeight : .contentHeight(340)
+        isPresentingInnerMenu ? .maxHeight : .contentHeight(370)
     }
     var allowsExtendedPanScrolling: Bool {
         true
