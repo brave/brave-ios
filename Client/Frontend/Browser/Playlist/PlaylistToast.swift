@@ -19,7 +19,7 @@ class PlaylistToast: Toast {
     private class HighlightableButton: UIButton {
         override var isHighlighted: Bool {
             didSet {
-                backgroundColor = isHighlighted ? .white : DownloadToastUX.toastBackgroundColor
+                backgroundColor = isHighlighted ? .white : .clear
             }
         }
     }
@@ -104,6 +104,7 @@ class PlaylistToast: Toast {
                 $0.layer.cornerRadius = ButtonToastUX.toastButtonBorderRadius
                 $0.layer.borderWidth = ButtonToastUX.toastButtonBorderWidth
                 $0.layer.borderColor = UIColor.Photon.white100.cgColor
+                $0.imageView?.tintColor = UIColor.Photon.white100
                 $0.setTitle(Strings.PlayList.toastAddToPlaylistOpenButton, for: [])
                 $0.setTitleColor(toastView.backgroundColor, for: .highlighted)
                 $0.titleLabel?.font = SimpleToastUX.toastFont
@@ -147,7 +148,8 @@ class PlaylistToast: Toast {
             $0.layer.masksToBounds = true
             $0.backgroundColor = .clear
             $0.setTitleColor(toastView.backgroundColor, for: .highlighted)
-            $0.tintColor = UIColor.Photon.white100
+            $0.imageView?.tintColor = UIColor.Photon.white100
+            $0.appearanceTintColor = UIColor.Photon.white100
             $0.titleLabel?.font = UIFont.systemFont(ofSize: 15, weight: .medium)
             $0.titleLabel?.numberOfLines = 1
             $0.titleLabel?.lineBreakMode = .byClipping
