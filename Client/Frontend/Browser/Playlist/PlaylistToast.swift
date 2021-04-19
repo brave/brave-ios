@@ -9,6 +9,7 @@ import BraveShared
 import Shared
 import SnapKit
 import Data
+import BraveUI
 
 class PlaylistToast: Toast {
     private struct DesignUX {
@@ -30,6 +31,13 @@ class PlaylistToast: Toast {
         $0.shadowOpacity = 0.15
         $0.shadowRadius = ButtonToastUX.toastButtonBorderRadius
     }
+    
+    private lazy var gradientView = { () -> GradientView in
+        let isDarkMode = self.traitCollection.userInterfaceStyle == .dark
+        return isDarkMode ? Gradients.Dark.gradient02 : Gradients.Light.gradient02
+    }()
+    
+    private let button = HighlightableButton()
     
     var item: PlaylistInfo
 
@@ -90,7 +98,7 @@ class PlaylistToast: Toast {
                 }
             }
             
-            let button = HighlightableButton().then {
+            self.button.do {
                 $0.layer.cornerRadius = ButtonToastUX.toastButtonBorderRadius
                 $0.layer.borderWidth = ButtonToastUX.toastButtonBorderWidth
                 $0.layer.borderColor = UIColor.Photon.white100.cgColor
@@ -105,8 +113,8 @@ class PlaylistToast: Toast {
                 $0.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(buttonPressed)))
             }
 
-            button.snp.makeConstraints {
-                if let titleLabel = button.titleLabel {
+            self.button.snp.makeConstraints {
+                if let titleLabel = self.button.titleLabel {
                     $0.width.equalTo(titleLabel.intrinsicContentSize.width + 2 * ButtonToastUX.toastButtonPadding)
                 }
             }
@@ -145,11 +153,6 @@ class PlaylistToast: Toast {
             $0.contentHorizontalAlignment = .left
             $0.contentEdgeInsets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: 20.0)
             $0.titleEdgeInsets = UIEdgeInsets(top: 0.0, left: 10.0, bottom: 0.0, right: -10.0)
-            
-            let colors = [#colorLiteral(red: 0.4352941176, green: 0.2980392157, blue: 0.8235294118, alpha: 1), #colorLiteral(red: 0.7490196078, green: 0.07843137255, blue: 0.6352941176, alpha: 1), #colorLiteral(red: 0.968627451, green: 0.2274509804, blue: 0.1098039216, alpha: 1)]
-            let gradientView = GradientView(colors: colors,
-                                            positions: [0.1581, 0.6317, 1.0],
-                                            angle: 304.74)
             $0.insertSubview(gradientView, at: 0)
             
             gradientView.snp.makeConstraints {
@@ -219,6 +222,21 @@ class PlaylistToast: Toast {
                 if !buttonPressed {
                     self.completionHandler?(false)
                 }
+            }
+        }
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        
+        if UITraitCollection.current.userInterfaceStyle != previousTraitCollection?.userInterfaceStyle {
+            let isDarkMode = traitCollection.userInterfaceStyle == .dark
+            
+            gradientView.removeFromSuperview()
+            gradientView = isDarkMode ? Gradients.Dark.gradient02 : Gradients.Light.gradient02
+            button.insertSubview(gradientView, at: 0)
+            gradientView.snp.makeConstraints {
+                $0.edges.equalToSuperview()
             }
         }
     }
