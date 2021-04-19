@@ -223,7 +223,10 @@ extension Preferences {
     
     final class Chromium {
         static let syncV2BookmarksMigrationCompleted = Option<Bool>(key: "chromium.migration.bookmarks", default: false)
-        static let syncV2BookmarksMigrationCount = Option<Int>(key: "chromium.migration.bookmarks.count", default: 0)
+        static let syncV2HistoryMigrationCompleted = Option<Bool>(key: "chromium.migration.history", default: false)
+
+        static let syncV2ObjectMigrationCount = Option<Int>(key: "chromium.migration.bookmarks.count", default: 0)
+        
         static let syncEnabled = Option<Bool>(key: "chromium.sync.enabled", default: false)
         static let lastBookmarksFolderNodeId = Option<Int?>(key: "chromium.last.bookmark.folder.node.id", default: nil)
     }

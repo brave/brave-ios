@@ -711,24 +711,8 @@ class BrowserViewController: UIViewController {
         
         showWalletTransferExpiryPanelIfNeeded()
         
-        // We stop ever attempting migration after 3 times.
-        if Preferences.Chromium.syncV2BookmarksMigrationCount.value < 3 {
-            self.migrateToChromiumBookmarks { success in
-                if !success {
-                    DispatchQueue.main.async {
-                        let alert = UIAlertController(title: Strings.Sync.v2MigrationErrorTitle,
-                                                      message: Strings.Sync.v2MigrationErrorMessage,
-                                                      preferredStyle: .alert)
-                        alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
-                        self.present(alert, animated: true)
-                    }
-                }
-            }
-        } else {
-            // After 3 tries, we mark Migration as successful.
-            // There is nothing more we can do for the user other than to let them export/import bookmarks.
-            Preferences.Chromium.syncV2BookmarksMigrationCompleted.value = true
-        }
+        /// Perform migration to brave-core sync objects
+        doSyncMigration()
         
         if #available(iOS 14, *), !Preferences.DefaultBrowserIntro.defaultBrowserNotificationScheduled.value {
             scheduleDefaultBrowserNotification()
@@ -744,38 +728,6 @@ class BrowserViewController: UIViewController {
                     self?.statusBarOverlay.backgroundColor = .secondaryBraveBackground
                 }
             })
-    }
-    
-    private func migrateToChromiumBookmarks(_ completion: @escaping (_ success: Bool) -> Void) {
-        let showInterstitialPage = { (url: URL?) -> Bool in
-            guard let url = url else {
-                log.error("Cannot open bookmarks page in new tab")
-                return false
-            }
-            
-            return BookmarksInterstitialPageHandler.showBookmarksPage(tabManager: self.tabManager, url: url)
-        }
-        
-        Migration.braveCoreBookmarksMigrator?.migrate({ success in
-            Preferences.Chromium.syncV2BookmarksMigrationCount.value += 1
-            
-            if !success {
-                guard let url = BraveCoreMigrator.datedBookmarksURL else {
-                    completion(showInterstitialPage(BraveCoreMigrator.bookmarksURL))
-                    return
-                }
-                
-                Migration.braveCoreBookmarksMigrator?.exportBookmarks(to: url) { success in
-                    if success {
-                        completion(showInterstitialPage(url))
-                    } else {
-                        completion(showInterstitialPage(BraveCoreMigrator.bookmarksURL))
-                    }
-                }
-            } else {
-                completion(true)
-            }
-        })
     }
     
     fileprivate let defaultBrowserNotificationId = "defaultBrowserNotification"

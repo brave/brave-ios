@@ -2189,6 +2189,11 @@ extension Strings {
             NSLocalizedString("sync.v2MigrationErrorMessage", tableName: "BraveShared", bundle: .braveShared,
                               value: "Failed to migrate bookmarks. Please try again later.",
                               comment: "Message for popup when the bookmark migration fails")
+        /// History Migration localization text
+        public static let historyMigrationErrorMessage =
+            NSLocalizedString("sync.historyMigrationErrorMessage", tableName: "BraveShared", bundle: .braveShared,
+                              value: "Failed to migrate hitory. Please try again later.",
+                              comment: "Message for popup when the history migration fails")
     }
 }
 

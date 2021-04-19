@@ -11,7 +11,12 @@ import Data
 private let log = Logger.browserLogger
 
 class Migration {
-    private(set) public static var braveCoreBookmarksMigrator: BraveCoreMigrator?
+    private(set) public static var braveCoreSyncObjectsMigrator: BraveCoreMigrator?
+    
+    private(set) public static var isChromiumMigrationCompleted: Bool = {
+        return Preferences.Chromium.syncV2BookmarksMigrationCompleted.value &&
+            Preferences.Chromium.syncV2HistoryMigrationCompleted.value
+    }()
     
     static func launchMigrations(keyPrefix: String) {
         Preferences.migratePreferences(keyPrefix: keyPrefix)
@@ -22,8 +27,8 @@ class Migration {
         }
         
         // `.migrate` is called in `BrowserViewController.viewDidLoad()`
-        if !Preferences.Chromium.syncV2BookmarksMigrationCompleted.value {
-            braveCoreBookmarksMigrator = BraveCoreMigrator()
+        if !isChromiumMigrationCompleted {
+            braveCoreSyncObjectsMigrator = BraveCoreMigrator()
         }
         
         if !Preferences.Migration.playlistV1FileSettingsLocationCompleted.value {

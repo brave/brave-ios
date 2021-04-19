@@ -95,8 +95,8 @@ public final class History: NSManagedObject, WebsitePresentable, CRUD {
         return NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: context, sectionNameKeyPath: "sectionIdentifier", cacheName: nil)
     }
     
-    public func delete() {
-        delete(context: .new(inMemory: false))
+    public func delete(context: WriteContext? = nil) {
+        delete(context: context ?? .new(inMemory: false))
     }
 
     public class func deleteAll(_ completionOnMain: @escaping () -> Void) {
@@ -133,6 +133,13 @@ public final class History: NSManagedObject, WebsitePresentable, CRUD {
         }
         
         return all(where: predicate, fetchLimit: 100, context: DataController.viewContext) ?? []
+    }
+    
+    public class func fetchAllHistory(_ context: NSManagedObjectContext? = nil, visitedAscending: Bool = false) -> [History] {
+        let predicate = NSPredicate(format: "visitedOn >= %@", History.thisMonth as CVarArg)
+        let sortDescriptors = [NSSortDescriptor(key: "visitedOn", ascending: visitedAscending)]
+        
+        return all(where: predicate, sortDescriptors: sortDescriptors, context: context ?? DataController.viewContext) ?? []
     }
 }
 

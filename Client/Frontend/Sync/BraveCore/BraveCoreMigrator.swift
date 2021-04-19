@@ -12,14 +12,17 @@ import CoreData
 
 private let log = Logger.browserLogger
 
+// MARK: MigrationSyncTypes
+
+public enum MigrationSyncTypes {
+    case bookmarks
+    case history
+    case all
+}
+
 class BraveCoreMigrator {
     
-    @Observable
-    private(set) public var migrationObserver: MigrationState = .notStarted
-    
-    private let dataImportExporter = BraveCoreImportExportUtility()
-    private let bookmarksAPI = BraveBookmarksAPI()
-    private var observer: BookmarkModelListener?
+    // MARK: Migration State
     
     enum MigrationState {
         case notStarted
@@ -28,8 +31,20 @@ class BraveCoreMigrator {
         case completed
     }
     
+    @Observable
+    private(set) public var migrationObserver: MigrationState = .notStarted
+    
+    private var bookmarkMigrationState: MigrationState = .notStarted
+    private var historyMigrationState: MigrationState = .notStarted
+    
+    private let bookmarksAPI = BraveBookmarksAPI()
+    private let historyAPI = BraveHistoryAPI()
+    private let dataImportExporter = BraveCoreImportExportUtility()
+    private var observer: BookmarkModelListener?
+    
     public init() {
-        if Preferences.Chromium.syncV2BookmarksMigrationCompleted.value {
+        // Check If Chromium Sync Objects Migration is complete (Bookmarks-History)
+        if Migration.isChromiumMigrationCompleted {
             migrationObserver = .completed
         }
         
@@ -83,113 +98,89 @@ class BraveCoreMigrator {
         _migrationObserver.observe(from: object, handler)
     }
     
-    public static var bookmarksURL: URL? {
-        let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-        guard let documentsDirectory = paths.first else {
-            log.error("Unable to access documents directory")
-            return nil
-        }
-        
-        guard let url = URL(string: "\(documentsDirectory)/Bookmarks.html") else {
-            log.error("Unable to access Bookmarks.html")
-            return nil
-        }
-        
-        return url
-    }
-    
-    public static var datedBookmarksURL: URL? {
-        let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-        guard let documentsDirectory = paths.first else {
-            log.error("Unable to access documents directory")
-            return nil
-        }
-        
-        let dateFormatter = DateFormatter().then {
-            $0.dateFormat = "yyyy-MM-dd_HH:mm:ss"
-        }
-        
-        let dateString = dateFormatter.string(from: Date()).escape() ?? "\(Date().timeIntervalSince1970)"
-        
-        guard let url = URL(string: "\(documentsDirectory)/Bookmarks_\(dateString).html") else {
-            log.error("Unable to access Bookmarks_\(dateString).html")
-            return nil
-        }
-        
-        return url
-    }
-    
-    public func migrate(_ completion: ((_ success: Bool) -> Void)? = nil) {
-        if Preferences.Chromium.syncV2BookmarksMigrationCompleted.value {
+    public func migrate(_ completion: ((_ success: Bool, _ type: MigrationSyncTypes?) -> Void)? = nil) {
+        // Check If Chromium Sync Objects Migration is complete (Bookmarks-History)
+        if Migration.isChromiumMigrationCompleted {
             migrationObserver = .completed
-            completion?(true)
+            completion?(true, .all)
             return
         }
         
-        func performMigrationIfNeeded(_ completion: ((Bool) -> Void)?) {
-            if !Preferences.Chromium.syncV2BookmarksMigrationCompleted.value {
-                log.info("Migrating to Chromium Bookmarks v1 - Exporting")
-                self.exportBookmarks { [weak self] success in
-                    if success {
-                        log.info("Migrating to Chromium Bookmarks v1 - Start")
-                        self?.migrateBookmarks() { success in
-                            Preferences.Chromium.syncV2BookmarksMigrationCompleted.value = success
-                            
-                            if let url = BraveCoreMigrator.bookmarksURL {
-                                do {
-                                    try FileManager.default.removeItem(at: url)
-                                } catch {
-                                    log.error("Failed to delete Bookmarks.html backup during Migration")
-                                }
-                            }
-                            
-                            completion?(success)
-                        }
-                    } else {
-                        log.info("Migrating to Chromium Bookmarks v1 failed: Exporting")
-                        completion?(success)
-                    }
+        // Step 1:  Check If bookmarks are migrated / migrate
+        migrateBookmarkModels { [unowned self] success in
+            guard success else {
+                self.migrationObserver = .failed
+                completion?(false, .bookmarks)
+                
+                return
+            }
+    
+            // Step 2: Check If history is migrated / migrate
+            migrateHistoryModels { [unowned self] success in
+                guard success else {
+                    self.migrationObserver = .failed
+                    completion?(false, .history)
+                    
+                    return
                 }
-            } else {
-                completion?(true)
+                
+                completion?(true, .all)
             }
         }
-        
-        // If the bookmark model has already loaded, the observer does NOT get called!
-        // Therefore we should continue to migrate the bookmarks
-        if bookmarksAPI.isLoaded {
-            performMigrationIfNeeded({
-                self.migrationObserver = $0 ? .completed : .failed
-                completion?($0)
-            })
-        } else {
-            // Wait for the bookmark model to load before we attempt to perform migration!
-            self.observer = bookmarksAPI.add(BookmarksModelLoadedObserver({ [weak self] in
-                guard let self = self else { return }
-                self.observer?.destroy()
-                self.observer = nil
+    }
+}
 
-                performMigrationIfNeeded({
-                    self.migrationObserver = $0 ? .completed : .failed
-                    completion?($0)
-                })
-            }))
+// MARK: Bookmarks Migration
+
+extension BraveCoreMigrator {
+    
+    private func migrateBookmarkModels(_ completion: @escaping (Bool) -> Void) {
+        if !Preferences.Chromium.syncV2BookmarksMigrationCompleted.value {
+            // If the bookmark model has already loaded, the observer does NOT get called!
+            // Therefore we should continue to migrate the bookmarks
+            if bookmarksAPI.isLoaded {
+                performBookmarkMigrationIfNeeded { success in
+                    completion(success)
+                }
+            } else {
+                // Wait for the bookmark model to load before we attempt to perform migration!
+                self.observer = bookmarksAPI.add(BookmarksModelLoadedObserver({ [weak self] in
+                    guard let self = self else { return }
+                    self.observer?.destroy()
+                    self.observer = nil
+
+                    self.performBookmarkMigrationIfNeeded { success in
+                        completion(success)
+                    }
+                }))
+            }
+        } else {
+            completion(true)
         }
     }
     
-    public func exportBookmarks(to url: URL, _ completion: @escaping (_ success: Bool) -> Void) {
-        self.dataImportExporter.exportBookmarks(to: url, bookmarks: LegacyBookmarksHelper.getTopLevelLegacyBookmarks().sorted(by: { $0.order < $1.order })) { success in
-            completion(success)
-        }
-    }
-    
-    private func exportBookmarks(_ completion: @escaping (_ success: Bool) -> Void) {
-        guard let url = BraveCoreMigrator.bookmarksURL else {
-            return completion(false)
-        }
-        
-        self.dataImportExporter.exportBookmarks(to: url, bookmarks: LegacyBookmarksHelper.getTopLevelLegacyBookmarks().sorted(by: { $0.order < $1.order })) { success in
-            completion(success)
+    private func performBookmarkMigrationIfNeeded(_ completion: ((Bool) -> Void)?) {
+        log.info("Migrating to Chromium Bookmarks v1 - Exporting")
+        exportBookmarks { [weak self] success in
+            if success {
+                log.info("Migrating to Chromium Bookmarks v1 - Start")
+                self?.migrateBookmarks() { success in
+                    Preferences.Chromium.syncV2BookmarksMigrationCompleted.value = success
+                    
+                    if let url = BraveCoreMigrator.bookmarksURL {
+                        do {
+                            try FileManager.default.removeItem(at: url)
+                        } catch {
+                            log.error("Failed to delete Bookmarks.html backup during Migration")
+                        }
+                    }
+                    
+                    completion?(success)
+                }
+            } else {
+                log.info("Migrating to Chromium Bookmarks v1 failed: Exporting")
+                completion?(success)
+            }
         }
     }
     
@@ -261,7 +252,126 @@ class BraveCoreMigrator {
     }
 }
 
+// MARK: - History Migration
+
 extension BraveCoreMigrator {
+    
+    private func migrateHistoryModels(_ completion: @escaping (Bool) -> Void) {
+        if !Preferences.Chromium.syncV2HistoryMigrationCompleted.value {
+            // If the history model has already loaded, the observer does NOT get called!
+            // Therefore we should continue to migrate the history
+            if historyAPI.isLoaded {
+                performHistoryMigrationIfNeeded { success in
+                    completion(success)
+                }
+            } else {
+                // TODO: Add Observer for History Loading
+            }
+        } else {
+            completion(true)
+        }
+    }
+    
+    private func performHistoryMigrationIfNeeded(_ completion: ((Bool) -> Void)?) {
+        log.info("Migrating to Chromium History v1 - Start")
+        migrateHistory() { success in
+            Preferences.Chromium.syncV2HistoryMigrationCompleted.value = success
+            completion?(success)
+        }
+    }
+    
+    private func migrateHistory(_ completion: @escaping (_ success: Bool) -> Void) {
+        DataController.performOnMainContext { context in
+            var didSucceed = true
+            
+            for history in History.fetchAllHistory(context) {
+                if self.migrateChromiumHistory(context: context, history: history) {
+                    history.delete(context: .existing(context))
+                } else {
+                    didSucceed = false
+                }
+            }
+            
+            DispatchQueue.main.async {
+                completion(didSucceed)
+            }
+        }
+    }
+    
+    private func migrateChromiumHistory(context: NSManagedObjectContext, history: History) -> Bool {
+        guard let title = history.title,
+              let absoluteUrl = history.url, let url = URL(string: absoluteUrl),
+              let dateAdded = history.visitedOn else {
+            log.error("Invalid History Specifics")
+            return false
+        }
+
+        historyAPI.addHistory(title, url: url, dateAdded: dateAdded)
+        return true
+    }
+}
+
+// MARK: - Bookmarks Export
+
+extension BraveCoreMigrator {
+    
+    public static var bookmarksURL: URL? {
+        let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
+        guard let documentsDirectory = paths.first else {
+            log.error("Unable to access documents directory")
+            return nil
+        }
+        
+        guard let url = URL(string: "\(documentsDirectory)/Bookmarks.html") else {
+            log.error("Unable to access Bookmarks.html")
+            return nil
+        }
+        
+        return url
+    }
+    
+    public static var datedBookmarksURL: URL? {
+        let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
+        guard let documentsDirectory = paths.first else {
+            log.error("Unable to access documents directory")
+            return nil
+        }
+        
+        let dateFormatter = DateFormatter().then {
+            $0.dateFormat = "yyyy-MM-dd_HH:mm:ss"
+        }
+        
+        let dateString = dateFormatter.string(from: Date()).escape() ?? "\(Date().timeIntervalSince1970)"
+        
+        guard let url = URL(string: "\(documentsDirectory)/Bookmarks_\(dateString).html") else {
+            log.error("Unable to access Bookmarks_\(dateString).html")
+            return nil
+        }
+        
+        return url
+    }
+    
+    public func exportBookmarks(to url: URL, _ completion: @escaping (_ success: Bool) -> Void) {
+        self.dataImportExporter.exportBookmarks(to: url, bookmarks: LegacyBookmarksHelper.getTopLevelLegacyBookmarks().sorted(by: { $0.order < $1.order })) { success in
+            completion(success)
+        }
+    }
+    
+    private func exportBookmarks(_ completion: @escaping (_ success: Bool) -> Void) {
+        guard let url = BraveCoreMigrator.bookmarksURL else {
+            return completion(false)
+        }
+        
+        self.dataImportExporter.exportBookmarks(to: url, bookmarks: LegacyBookmarksHelper.getTopLevelLegacyBookmarks().sorted(by: { $0.order < $1.order })) { success in
+            completion(success)
+        }
+    }
+}
+
+// MARK: Model Observer
+
+extension BraveCoreMigrator {
+    
     class BookmarksModelLoadedObserver: NSObject & BookmarkModelObserver {
         private let onModelLoaded: () -> Void
         
