@@ -134,7 +134,7 @@ class PlaylistToast: Toast {
         let button = HighlightableButton().then {
             $0.layer.cornerRadius = ButtonToastUX.toastButtonBorderRadius
             $0.layer.masksToBounds = true
-            $0.backgroundColor = DownloadToastUX.toastBackgroundColor
+            $0.backgroundColor = .clear
             $0.setTitleColor(toastView.backgroundColor, for: .highlighted)
             $0.tintColor = UIColor.Photon.white100
             $0.titleLabel?.font = UIFont.systemFont(ofSize: 15, weight: .medium)
@@ -145,6 +145,16 @@ class PlaylistToast: Toast {
             $0.contentHorizontalAlignment = .left
             $0.contentEdgeInsets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: 20.0)
             $0.titleEdgeInsets = UIEdgeInsets(top: 0.0, left: 10.0, bottom: 0.0, right: -10.0)
+            
+            let colors = [#colorLiteral(red: 0.4352941176, green: 0.2980392157, blue: 0.8235294118, alpha: 1), #colorLiteral(red: 0.7490196078, green: 0.07843137255, blue: 0.6352941176, alpha: 1), #colorLiteral(red: 0.968627451, green: 0.2274509804, blue: 0.1098039216, alpha: 1)]
+            let gradientView = GradientView(colors: colors,
+                                            positions: [0.1581, 0.6317, 1.0],
+                                            angle: 304.74)
+            $0.insertSubview(gradientView, at: 0)
+            
+            gradientView.snp.makeConstraints {
+                $0.edges.equalToSuperview()
+            }
             
             $0.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(buttonPressed)))
         }
@@ -165,7 +175,6 @@ class PlaylistToast: Toast {
         } else {
             assertionFailure("Should Never get here. Others case are handled at the start of this function.")
         }
-
         return toastView
     }
     

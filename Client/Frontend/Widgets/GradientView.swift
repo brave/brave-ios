@@ -20,6 +20,28 @@ class GradientView: UIView {
         gradientLayer.endPoint = endPoint
     }
     
+    init(colors: [UIColor], positions: [CGFloat], angle: Float = 0) {
+        super.init(frame: .zero)
+        
+        // x² + y² = r² for unit circles
+        // Constraints:
+        // y = x * tan(angle) { 0 < x < cos(a) }
+        // y = x * tan(angle) { cos(a) < x < 0 }
+        // x = cos(a) { x < y < sin(a) }
+        // x = cos(a) { sin(a) < y < 0 }
+        
+        let alpha = angle * .pi / 180.0
+        let startPointX = 0.5 * sin(alpha) + 0.5
+        let startPointY = 0.5 * cos(alpha) + 0.5
+        let endPointX = -0.5 * sin(alpha) + 0.5
+        let endPointY = -0.5 * cos(alpha) + 0.5
+        
+        gradientLayer.colors = colors.map { $0.cgColor }
+        gradientLayer.locations = positions.map { NSNumber(value: Double($0)) }
+        gradientLayer.startPoint = CGPoint(x: CGFloat(startPointX), y: CGFloat(startPointY))
+        gradientLayer.endPoint = CGPoint(x: CGFloat(endPointX), y: CGFloat(endPointY))
+    }
+    
     @available(*, unavailable)
     required init?(coder aDecoder: NSCoder) {
         fatalError()
