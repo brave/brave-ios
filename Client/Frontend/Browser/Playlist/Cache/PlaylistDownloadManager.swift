@@ -86,7 +86,7 @@ public class PlaylistDownloadManager: PlaylistStreamDownloadManagerDelegate {
     
     func downloadHLSAsset(_ assetUrl: URL, for item: PlaylistInfo) {
         if Thread.current.isMainThread {
-            self.hlsDelegate.downloadAsset(self.hlsSession, assetUrl: assetUrl, for: item)
+            hlsDelegate.downloadAsset(self.hlsSession, assetUrl: assetUrl, for: item)
         } else {
             hlsQueue.addOperation {  [weak self] in
                 guard let self = self else { return }
@@ -97,7 +97,7 @@ public class PlaylistDownloadManager: PlaylistStreamDownloadManagerDelegate {
     
     func downloadFileAsset(_ assetUrl: URL, for item: PlaylistInfo) {
         if Thread.current.isMainThread {
-            self.fileDelegate.downloadAsset(self.fileSession, assetUrl: assetUrl, for: item)
+            fileDelegate.downloadAsset(self.fileSession, assetUrl: assetUrl, for: item)
         } else {
             fileQueue.addOperation {  [weak self] in
                 guard let self = self else { return }
