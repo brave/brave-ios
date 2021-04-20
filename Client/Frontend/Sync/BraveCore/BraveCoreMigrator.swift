@@ -286,7 +286,7 @@ extension BraveCoreMigrator {
             
             for history in History.fetchAllHistory(context) {
                 if self.migrateChromiumHistory(context: context, history: history) {
-                    history.delete(context: .existing(context))
+                    history.delete()
                 } else {
                     didSucceed = false
                 }
@@ -306,7 +306,9 @@ extension BraveCoreMigrator {
             return false
         }
 
-        historyAPI.addHistory(title, url: url, dateAdded: dateAdded)
+        let historyNode = HistoryNode(title: title, guid: nil, url: url, dateAdded: dateAdded)
+        historyAPI.addHistory(historyNode)
+        
         return true
     }
 }

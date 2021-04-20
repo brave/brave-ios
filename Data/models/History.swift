@@ -95,8 +95,8 @@ public final class History: NSManagedObject, WebsitePresentable, CRUD {
         return NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: context, sectionNameKeyPath: "sectionIdentifier", cacheName: nil)
     }
     
-    public func delete(context: WriteContext? = nil) {
-        delete(context: context ?? .new(inMemory: false))
+    public func delete() {
+        delete(context: .new(inMemory: false))
     }
 
     public class func deleteAll(_ completionOnMain: @escaping () -> Void) {
