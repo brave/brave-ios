@@ -105,6 +105,11 @@ class PlaylistManager: NSObject {
         if let asset = downloadManager.localAsset(for: pageSrc),
            FileManager.default.fileExists(atPath: asset.url.path, isDirectory: &isDirectory) {
             
+            let formatter = ByteCountFormatter().then {
+                $0.zeroPadsFractionDigits = true
+                $0.countStyle = .file
+            }
+            
             if isDirectory.boolValue || asset.url.pathExtension.lowercased() == "movpkg" {
                 let properties: [URLResourceKey] = [.isRegularFileKey, .totalFileAllocatedSizeKey]
                 guard let enumerator = FileManager.default.enumerator(at: asset.url,
@@ -114,22 +119,16 @@ class PlaylistManager: NSObject {
                     return nil
                 }
                 
-                let resources = enumerator.compactMap({ try? ($0 as? URL)?.resourceValues(forKeys: Set(properties)) })
-                                          .filter({ $0.isRegularFile == true })
-                let sizes = resources.compactMap({ $0.totalFileAllocatedSize })
-                                     .compactMap({ Int64($0) })
+                let sizes = enumerator.compactMap({ try? ($0 as? URL)?
+                                    .resourceValues(forKeys: Set(properties)) })
+                                    .filter({ $0.isRegularFile == true })
+                                    .compactMap({ $0.totalFileAllocatedSize })
+                                    .compactMap({ Int64($0) })
                 
-                let totalSize = sizes.reduce(0, +)
-                let formatter = ByteCountFormatter()
-                formatter.zeroPadsFractionDigits = true
-                formatter.countStyle = .file
-                return formatter.string(fromByteCount: Int64(totalSize))
+                return formatter.string(fromByteCount: Int64(sizes.reduce(0, +)))
             }
             
             if let size = try? FileManager.default.attributesOfItem(atPath: asset.url.path)[.size] as? Int {
-                let formatter = ByteCountFormatter()
-                formatter.zeroPadsFractionDigits = true
-                formatter.countStyle = .file
                 return formatter.string(fromByteCount: Int64(size))
             }
         }
