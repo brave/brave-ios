@@ -35,7 +35,7 @@ Object.defineProperty(window.__firefox__, '$<search-backup>', {
     }
 });
 
- Object.defineProperty(window, 'chrome', {
+ Object.defineProperty(navigator, 'brave', {
     enumerable: false,
     configurable: true,
     writable: false,
