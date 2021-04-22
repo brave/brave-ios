@@ -615,10 +615,21 @@ extension ListController: UITableViewDataSource {
     private func loadThumbnail(item: PlaylistInfo, cell: PlaylistCell, onDurationUpdated: ((TimeInterval?) -> Void)? = nil) {
         guard let url = URL(string: item.src) else { return }
         
+        cell.thumbnailActivityIndicator.startAnimating()
+        if let cachedImage = SDImageCache.shared.imageFromCache(forKey: url.absoluteString) {
+            cell.thumbnailView.image = cachedImage
+            cell.thumbnailView.backgroundColor = .black
+            cell.thumbnailView.contentMode = .scaleAspectFit
+            cell.thumbnailActivityIndicator.stopAnimating()
+            return
+        }
+        
         // Loading from Cache failed, attempt to fetch HLS thumbnail
-        cell.thumbnailGenerator = HLSThumbnailGenerator(url: url, time: 3, completion: { [weak self] image, trackDuration, error in
-            guard let self = self else { return }
+        cell.thumbnailActivityIndicator.startAnimating()
+        cell.thumbnailGenerator = HLSThumbnailGenerator(url: url, time: 3, completion: { [weak self, weak cell] image, trackDuration, error in
+            guard let self = self, let cell = cell else { return }
             
+            cell.thumbnailView.stopAnimating()
             log.error(error)
             
             if let trackDuration = trackDuration {
@@ -643,30 +654,40 @@ extension ListController: UITableViewDataSource {
     private func loadThumbnailFallbackImage(item: PlaylistInfo, cell: PlaylistCell) {
         guard let url = URL(string: item.src) else { return }
 
-        let imageCache = SDImageCache.shared
+        cell.thumbnailActivityIndicator.startAnimating()
         let imageGenerator = AVAssetImageGenerator(asset: AVAsset(url: url))
         imageGenerator.appliesPreferredTrackTransform = false
 
         let time = CMTimeMake(value: 3, timescale: 1)
-        imageGenerator.generateCGImagesAsynchronously(forTimes: [NSValue(time: time)]) { _, cgImage, _, result, error in
+        imageGenerator.generateCGImagesAsynchronously(forTimes: [NSValue(time: time)]) { [weak cell] _, cgImage, _, result, error in
+            guard let cell = cell else { return }
+            
             if result == .succeeded, let cgImage = cgImage {
                 let image = UIImage(cgImage: cgImage)
-                imageCache.store(image, forKey: url.absoluteString, completion: nil)
-                
+
                 DispatchQueue.main.async {
+                    cell.thumbnailActivityIndicator.stopAnimating()
                     cell.thumbnailView.image = image
                     cell.thumbnailView.backgroundColor = .black
                     cell.thumbnailView.contentMode = .scaleAspectFit
+                    SDImageCache.shared.store(image, forKey: url.absoluteString, completion: nil)
                 }
             } else {
                 guard let url = URL(string: item.pageSrc) else { return }
                 
                 DispatchQueue.main.async {
+                    cell.thumbnailActivityIndicator.stopAnimating()
                     cell.thumbnailView.cancelFaviconLoad()
                     cell.thumbnailView.clearMonogramFavicon()
                     cell.thumbnailView.contentMode = .scaleAspectFit
                     cell.thumbnailView.image = FaviconFetcher.defaultFaviconImage
-                    cell.thumbnailView.loadFavicon(for: url)
+                    cell.thumbnailActivityIndicator.startAnimating()
+                    
+                    let domain = Domain.getOrCreate(forUrl: url, persistent: false)
+                    cell.thumbnailView.loadFavicon(for: url, domain: domain) { [weak cell] in
+                        guard let cell = cell else { return }
+                        cell.thumbnailActivityIndicator.stopAnimating()
+                    }
                 }
             }
         }
@@ -802,6 +823,8 @@ extension ListController: UITableViewDelegate {
         playerView.setVideoInfo(videoDomain: item.pageSrc, videoTitle: item.pageTitle)
         mediaInfo.updateNowPlayingMediaArtwork(image: selectedCell?.thumbnailView.image)
         
+        playerView.stop()
+        
         mediaInfo.loadMediaItem(item, index: indexPath.row, autoPlayEnabled: autoPlayEnabled) { [weak self] error in
             guard let self = self else { return }
             defer { completion?(error) }
@@ -815,11 +838,8 @@ extension ListController: UITableViewDelegate {
                 selectedCell?.detailLabel.text = Strings.PlayList.expiredLabelTitle
                 
             case .none:
-                log.debug("Playing Live Video: \(self.playerView.player.currentItem?.duration.isIndefinite ?? false)")
-                
-                if let selectedCell = selectedCell {
-                    self.loadThumbnail(item: item, cell: selectedCell)
-                }
+                let mediaItem = self.playerView.player.currentItem ?? self.playerView.pendingMediaItem
+                log.debug("Playing Live Video: \(mediaItem?.duration.isIndefinite ?? false)")
             }
         }
     }

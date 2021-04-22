@@ -42,6 +42,11 @@ class PlaylistCell: UITableViewCell {
         $0.layer.masksToBounds = true
     }
     
+    let thumbnailActivityIndicator = UIActivityIndicatorView(style: .medium).then {
+        $0.hidesWhenStopped = true
+        $0.tintColor = .white
+    }
+    
     let thumbnailView = PlaylistResizingThumbnailView(onImageChanged: {
         onThumbnailChanged($0)
     }).then {
@@ -90,6 +95,7 @@ class PlaylistCell: UITableViewCell {
         infoStackView.addArrangedSubview(detailLabel)
         contentView.addSubview(separator)
         thumbnailHolder.addSubview(thumbnailView)
+        thumbnailHolder.addSubview(thumbnailActivityIndicator)
         
         thumbnailHolder.snp.makeConstraints {
             // Keeps a 94.0px width on iPhone-X as per design
@@ -101,6 +107,10 @@ class PlaylistCell: UITableViewCell {
             $0.center.equalToSuperview()
             $0.leading.trailing.top.bottom.equalToSuperview().priority(.high)
             $0.width.height.equalToSuperview()
+        }
+        
+        thumbnailActivityIndicator.snp.makeConstraints {
+            $0.center.equalToSuperview()
         }
         
         iconStackView.snp.makeConstraints {

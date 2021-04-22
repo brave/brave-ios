@@ -41,6 +41,8 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         $0.needsDisplayOnBoundsChange = true
     }
     
+    private(set) public var pendingMediaItem: AVPlayerItem?
+    
     private var requestedPlaybackRate = 1.0
     
     private let particleView = PlaylistParticleEmitter().then {
@@ -664,15 +666,17 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
                     self.play()
                 }
                 
+                self.pendingMediaItem = nil
                 return
             }
         }
         
+        self.pendingMediaItem = AVPlayerItem(asset: asset)
         asset.loadValuesAsynchronously(forKeys: ["playable", "tracks", "duration"]) { [weak self] in
-            guard let self = self else { return }
+            guard let self = self, let item = self.pendingMediaItem else { return }
             DispatchQueue.main.async {
-                let item = AVPlayerItem(asset: asset)
                 self.player.replaceCurrentItem(with: item)
+                self.pendingMediaItem = nil
                 
                 let endTime = CMTimeConvertScale(item.asset.duration, timescale: self.player.currentTime().timescale, method: .roundHalfAwayFromZero)
                 self.controlsView.trackBar.setTimeRange(currentTime: item.currentTime(), endTime: endTime)
@@ -692,15 +696,17 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
                     self.play()
                 }
                 
+                self.pendingMediaItem = nil
                 return
             }
         }
         
+        self.pendingMediaItem = AVPlayerItem(asset: asset)
         asset.loadValuesAsynchronously(forKeys: ["playable", "tracks", "duration"]) { [weak self] in
-            guard let self = self else { return }
+            guard let self = self, let item = self.pendingMediaItem else { return }
             DispatchQueue.main.async {
-                let item = AVPlayerItem(asset: asset)
                 self.player.replaceCurrentItem(with: item)
+                self.pendingMediaItem = nil
                 
                 let endTime = CMTimeConvertScale(item.asset.duration, timescale: self.player.currentTime().timescale, method: .roundHalfAwayFromZero)
                 self.controlsView.trackBar.setTimeRange(currentTime: item.currentTime(), endTime: endTime)

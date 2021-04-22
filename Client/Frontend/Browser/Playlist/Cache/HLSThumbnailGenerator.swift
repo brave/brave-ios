@@ -28,46 +28,32 @@ public class HLSThumbnailGenerator {
         self.asset = AVAsset(url: url)
         self.sourceURL = url
         self.completion = completion
+
+        let item = AVPlayerItem(asset: asset, automaticallyLoadedAssetKeys: [])
+        self.player = AVPlayer(playerItem: item).then {
+            $0.rate = 0
+        }
         
-        // Load from cache
-        if let cachedImage = SDImageCache.shared.imageFromCache(forKey: sourceURL.absoluteString) {
-            self.player = nil
-            self.videoOutput = nil
+        self.videoOutput = AVPlayerItemVideoOutput(pixelBufferAttributes: [
+            kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA
+        ])
+        
+        self.observer = self.player?.currentItem?.observe(\.status) { [weak self] item, _ in
+            guard let self = self else { return }
             
-            DispatchQueue.main.async {
-                if let duration = self.player?.currentItem?.duration {
-                    self.completion(cachedImage, CMTimeGetSeconds(duration), nil)
-                } else {
-                   self.completion(cachedImage, nil, nil)
+            if item.status == .readyToPlay && self.state == .loading {
+                self.state = .ready
+                self.generateThumbnail(at: time)
+            } else if item.status == .failed {
+                self.state = .failed
+                DispatchQueue.main.async {
+                    self.completion(nil, nil, "Failed to load item")
                 }
             }
-        } else {
-            let item = AVPlayerItem(asset: asset, automaticallyLoadedAssetKeys: [])
-            self.player = AVPlayer(playerItem: item).then {
-                $0.rate = 0
-            }
-            
-            self.videoOutput = AVPlayerItemVideoOutput(pixelBufferAttributes: [
-                kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA
-            ])
-            
-            self.observer = self.player?.currentItem?.observe(\.status) { [weak self] item, _ in
-                guard let self = self else { return }
-                
-                if item.status == .readyToPlay && self.state == .loading {
-                    self.state = .ready
-                    self.generateThumbnail(at: time)
-                } else if item.status == .failed {
-                    self.state = .failed
-                    DispatchQueue.main.async {
-                        self.completion(nil, nil, "Failed to load item")
-                    }
-                }
-            }
-            
-            if let videoOutput = self.videoOutput {
-                self.player?.currentItem?.add(videoOutput)
-            }
+        }
+        
+        if let videoOutput = self.videoOutput {
+            self.player?.currentItem?.add(videoOutput)
         }
     }
 
