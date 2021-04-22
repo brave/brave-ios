@@ -440,8 +440,15 @@ extension ListController: UITableViewDataSource {
         let tolerance: Double = 0.00001
         let distance = abs(item.duration.distance(to: 0.0))
         
-        // If the database duration is 0.0 and not live/indefinite
-        if distance >= tolerance || item.duration.isInfinite {
+        // If the database duration is live/indefinite
+        if item.duration.isInfinite ||
+            abs(item.duration.distance(to: TimeInterval.greatestFiniteMagnitude)) < tolerance {
+            completion(TimeInterval.infinity, nil)
+            return nil
+        }
+        
+        // If the database duration is 0.0
+        if distance >= tolerance {
             // Return the database duration
             completion(item.duration, nil)
             return nil
