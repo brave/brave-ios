@@ -664,29 +664,8 @@ extension ListController: UITableViewDataSource {
             }
         }
         
-        // Fixes a duration bug where sometimes the duration is NOT fetched!
-        // So when we fetch the thumbnail, the duration will be updated (if possible)
-        loadThumbnail(item: item, cell: cell) { newTrackDuration in
-            guard let newTrackDuration = newTrackDuration else { return }
-            
-            let tolerance: Double = 0.00001
-            let existingDistance = abs(item.duration.distance(to: 0.0))
-            let newDistance = abs(newTrackDuration.distance(to: 0.0))
-            
-            // If the database duration is 0.0
-            // and the new duration != 0.0
-            if existingDistance < tolerance && newDistance > tolerance {
-                let newItem = PlaylistInfo(name: item.name,
-                                           src: item.src,
-                                           pageSrc: item.pageSrc,
-                                           pageTitle: item.pageTitle,
-                                           mimeType: item.mimeType,
-                                           duration: newTrackDuration,
-                                           detected: item.detected,
-                                           dateAdded: item.dateAdded)
-                PlaylistItem.updateItem(newItem)
-            }
-        }
+        // Load the HLS/Media thumbnail. If it fails, fall-back to favIcon
+        loadThumbnail(item: item, cell: cell)
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
@@ -698,7 +677,7 @@ extension ListController: UITableViewDataSource {
     
     // MARK: - Thumbnail
     
-    private func loadThumbnail(item: PlaylistInfo, cell: PlaylistCell, onDurationUpdated: ((TimeInterval?) -> Void)? = nil) {
+    private func loadThumbnail(item: PlaylistInfo, cell: PlaylistCell) {
         guard let url = URL(string: item.src) else { return }
         
         cell.thumbnailActivityIndicator.startAnimating()
@@ -713,16 +692,12 @@ extension ListController: UITableViewDataSource {
         
         // Loading from Cache failed, attempt to fetch HLS thumbnail
         cell.thumbnailActivityIndicator.startAnimating()
-        cell.thumbnailGenerator = HLSThumbnailGenerator(url: url, time: 3, completion: { [weak self, weak cell] image, trackDuration, error in
+        cell.thumbnailGenerator = HLSThumbnailGenerator(url: url, time: 3, completion: { [weak self, weak cell] image, error in
             guard let self = self, let cell = cell else { return }
             
             cell.thumbnailGenerator = nil
             cell.thumbnailView.stopAnimating()
             log.error(error)
-            
-            if let trackDuration = trackDuration {
-                onDurationUpdated?(trackDuration)
-            }
             
             if let image = image {
                 cell.thumbnailView.image = image
