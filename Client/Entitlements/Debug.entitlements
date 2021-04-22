@@ -20,5 +20,7 @@
 	<array>
 		<string>group.$(LOCAL_BUNDLE_ID)</string>
 	</array>
+    <key>com.apple.developer.WebKit.ServiceWorkers</key>
+    <true/>
 </dict>
 </plist>
