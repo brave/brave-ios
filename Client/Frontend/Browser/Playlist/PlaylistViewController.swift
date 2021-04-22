@@ -436,85 +436,162 @@ extension ListController: UITableViewDataSource {
         return formatter.localizedString(fromTimeInterval: date.timeIntervalSinceNow)
     }
     
-    private func getAssetDuration(item: PlaylistInfo, _ completion: @escaping (TimeInterval, AVAsset?) -> Void) {
+    private func getAssetDuration(item: PlaylistInfo, _ completion: @escaping (TimeInterval?, AVAsset?) -> Void) -> PlaylistAssetFetcher? {
         let tolerance: Double = 0.00001
         let distance = abs(item.duration.distance(to: 0.0))
         
-        // If the database duration is 0.0
-        if distance < tolerance {
-            // Attempt to retrieve the duration from the Asset file
-            if let index = PlaylistManager.shared.index(of: item.pageSrc) {
-                let asset = PlaylistManager.shared.assetAtIndex(index)
-                
-                if let track = asset.tracks(withMediaType: .video).first {
-                    completion(track.timeRange.duration.seconds, asset)
-                } else if let track = asset.tracks(withMediaType: .audio).first {
-                    completion(track.timeRange.duration.seconds, asset)
-                } else if abs(asset.duration.seconds.distance(to: 0.0)) < tolerance {
-                    
-                    // We can't get the duration synchronously so we need to let the AVAsset load the media item
-                    // and hopefully we get a valid duration from that.
-                    asset.loadValuesAsynchronously(forKeys: ["playable", "tracks", "duration"]) {
-                        var duration: TimeInterval = 0.0
-                        if let track = asset.tracks(withMediaType: .video).first {
-                            duration = track.timeRange.duration.seconds
-                        } else if let track = asset.tracks(withMediaType: .audio).first {
-                            duration = track.timeRange.duration.seconds
-                        } else {
-                            duration = asset.duration.seconds
-                        }
-                        
-                        if abs(asset.duration.seconds.distance(to: 0.0)) > tolerance {
-                            let newItem = PlaylistInfo(name: item.name,
-                                                       src: item.src,
-                                                       pageSrc: item.pageSrc,
-                                                       pageTitle: item.pageTitle,
-                                                       mimeType: item.mimeType,
-                                                       duration: duration,
-                                                       detected: item.detected,
-                                                       dateAdded: item.dateAdded)
-                            
-                            PlaylistItem.updateItem(newItem) {
-                                DispatchQueue.main.async {
-                                    completion(duration, asset)
-                                }
-                            }
-                        } else {
-                            DispatchQueue.main.async {
-                                completion(duration, asset)
-                            }
-                        }
-                    }
+        // If the database duration is 0.0 and not live/indefinite
+        if distance >= tolerance || item.duration.isInfinite {
+            // Return the database duration
+            completion(item.duration, nil)
+            return nil
+        }
+        
+        guard let index = PlaylistManager.shared.index(of: item.pageSrc) else {
+            completion(item.duration, nil) // Return the database duration
+            return nil
+        }
+        
+        // Attempt to retrieve the duration from the Asset file
+        let asset = PlaylistManager.shared.assetAtIndex(index)
+        
+        // Accessing tracks blocks the main-thread if not already loaded
+        // So we first need to check the track status before attempting to access it!
+        var error: NSError?
+        let trackStatus = asset.statusOfValue(forKey: "tracks", error: &error)
+        if let error = error {
+            log.error("AVAsset.statusOfValue error occurred: \(error)")
+        }
+        
+        if trackStatus == .loaded {
+            if !asset.tracks.isEmpty,
+               let track = asset.tracks(withMediaType: .video).first ??
+                            asset.tracks(withMediaType: .audio).first {
+                if track.timeRange.duration.isIndefinite {
+                    completion(TimeInterval.infinity, nil)
                 } else {
-                    completion(asset.duration.seconds, asset)
+                    completion(track.timeRange.duration.seconds, asset)
                 }
-            } else {
-                // Return the database duration
-                completion(TimeInterval(item.duration), nil)
+                return nil
             }
         } else {
-            // Return the database duration
-            completion(TimeInterval(item.duration), nil)
+            log.debug("AVAsset.statusOfValue not loaded. Status: \(trackStatus)")
         }
+        
+        // Accessing duration or commonMetadata blocks the main-thread if not already loaded
+        // So we first need to check the track status before attempting to access it!
+        let durationStatus = asset.statusOfValue(forKey: "duration", error: &error)
+        if let error = error {
+            log.error("AVAsset.statusOfValue error occurred: \(error)")
+        }
+        
+        if durationStatus == .loaded {
+            // If it's live/indefinite
+            if asset.duration.isIndefinite {
+                completion(TimeInterval.infinity, asset)
+                return nil
+            }
+            
+            // If it's a valid duration
+            if abs(asset.duration.seconds.distance(to: 0.0)) >= tolerance {
+                completion(asset.duration.seconds, asset)
+                return nil
+            }
+        } else {
+            log.debug("AVAsset.statusOfValue not loaded. Status: \(durationStatus)")
+        }
+        
+        // We can't get the duration synchronously so we need to let the AVAsset load the media item
+        // and hopefully we get a valid duration from that.
+        asset.loadValuesAsynchronously(forKeys: ["playable", "tracks", "duration"]) {
+            var error: NSError?
+            let trackStatus = asset.statusOfValue(forKey: "tracks", error: &error)
+            if let error = error {
+                log.error("AVAsset.statusOfValue error occurred: \(error)")
+            }
+            
+            let durationStatus = asset.statusOfValue(forKey: "tracks", error: &error)
+            if let error = error {
+                log.error("AVAsset.statusOfValue error occurred: \(error)")
+            }
+            
+            if trackStatus == .cancelled || durationStatus == .cancelled {
+                return
+            }
+            
+            if trackStatus == .failed && durationStatus == .failed, let error = error {
+                if error.code == NSURLErrorNoPermissionsToReadFile {
+                    // Media item is expired.. permission is denied
+                    log.debug("Playlist Media Item Expired: \(item.pageSrc)")
+                    
+                    ensureMainThread {
+                        completion(nil, nil)
+                    }
+                } else {
+                    log.error("An unknown error occurred while attempting to fetch track and duration information: \(error)")
+                    
+                    ensureMainThread {
+                        completion(nil, nil)
+                    }
+                }
+                
+                return
+            }
+            
+            var duration: CMTime = .zero
+            if trackStatus == .loaded {
+                if let track = asset.tracks(withMediaType: .video).first ?? asset.tracks(withMediaType: .audio).first {
+                    duration = track.timeRange.duration
+                } else {
+                    duration = asset.duration
+                }
+            } else if durationStatus == .loaded {
+                duration = asset.duration
+            }
+
+            ensureMainThread {
+                if duration.isIndefinite {
+                    completion(TimeInterval.infinity, asset)
+                } else if abs(duration.seconds.distance(to: 0.0)) > tolerance {
+                    let newItem = PlaylistInfo(name: item.name,
+                                               src: item.src,
+                                               pageSrc: item.pageSrc,
+                                               pageTitle: item.pageTitle,
+                                               mimeType: item.mimeType,
+                                               duration: duration.seconds,
+                                               detected: item.detected,
+                                               dateAdded: item.dateAdded)
+
+                    PlaylistItem.updateItem(newItem) {
+                        completion(duration.seconds, asset)
+                    }
+                } else {
+                    completion(duration.seconds, asset)
+                }
+            }
+        }
+        
+        return PlaylistAssetFetcher(asset: asset)
     }
     
-    private func getAssetDurationFormatted(item: PlaylistInfo, _ completion: @escaping (String) -> Void) {
-        getAssetDuration(item: item) { [weak self] duration, asset in
+    private func getAssetDurationFormatted(item: PlaylistInfo, _ completion: @escaping (String) -> Void) -> PlaylistAssetFetcher? {
+        return getAssetDuration(item: item) { [weak self] duration, asset in
             guard let self = self else { return }
             
             let domain = URL(string: item.pageSrc)?.baseDomain ?? "0s"
-            
-            if abs(duration.distance(to: 0.0)) > 0.00001 {
-                completion(self.formatter.string(from: duration) ?? domain)
-            } else if let asset = asset {
-                if asset.duration.isIndefinite {
+            if let duration = duration {
+                if duration.isInfinite {
                     // Live video/audio
                     completion(Strings.PlayList.playlistLiveMediaStream)
+                } else if abs(duration.distance(to: 0.0)) > 0.00001 {
+                    completion(self.formatter.string(from: duration) ?? domain)
                 } else {
                     completion(domain)
                 }
             } else {
-                completion(domain)
+                // Media Item is expired or some sort of error occurred retrieving its duration
+                // Whatever the reason, we mark it as expired now
+                completion(Strings.PlayList.expiredLabelTitle)
             }
         }
     }
@@ -544,12 +621,14 @@ extension ListController: UITableViewDataSource {
             return
         }
         
+        cell.prepareForDisplay()
         let item = PlaylistManager.shared.itemAtIndex(indexPath.row)
+        let domain = URL(string: item.pageSrc)?.baseDomain ?? "0s"
         
         cell.do {
             $0.selectionStyle = .none
             $0.titleLabel.text = item.name
-            $0.detailLabel.text = ""
+            $0.detailLabel.text = domain
             $0.contentView.backgroundColor = .clear
             $0.backgroundColor = .clear
             $0.thumbnailView.image = nil
@@ -559,21 +638,21 @@ extension ListController: UITableViewDataSource {
         let cacheState = PlaylistManager.shared.state(for: item.pageSrc)
         switch cacheState {
         case .inProgress:
-            getAssetDurationFormatted(item: item) {
+            cell.durationFetcher = getAssetDurationFormatted(item: item) {
                 cell.detailLabel.text = "\($0) - \(Strings.PlayList.savingForOfflineLabelTitle)"
             }
         case .downloaded:
             if let itemSize = PlaylistManager.shared.sizeOfDownloadedItem(for: item.pageSrc) {
-                getAssetDurationFormatted(item: item) {
+                cell.durationFetcher = getAssetDurationFormatted(item: item) {
                     cell.detailLabel.text = "\($0) - \(itemSize)"
                 }
             } else {
-                getAssetDurationFormatted(item: item) {
+                cell.durationFetcher = getAssetDurationFormatted(item: item) {
                     cell.detailLabel.text = "\($0) - \(Strings.PlayList.savedForOfflineLabelTitle)"
                 }
             }
         case .invalid:
-            getAssetDurationFormatted(item: item) {
+            cell.durationFetcher = getAssetDurationFormatted(item: item) {
                 cell.detailLabel.text = $0
             }
         }
@@ -621,6 +700,7 @@ extension ListController: UITableViewDataSource {
             cell.thumbnailView.backgroundColor = .black
             cell.thumbnailView.contentMode = .scaleAspectFit
             cell.thumbnailActivityIndicator.stopAnimating()
+            cell.thumbnailGenerator = nil
             return
         }
         
@@ -629,6 +709,7 @@ extension ListController: UITableViewDataSource {
         cell.thumbnailGenerator = HLSThumbnailGenerator(url: url, time: 3, completion: { [weak self, weak cell] image, trackDuration, error in
             guard let self = self, let cell = cell else { return }
             
+            cell.thumbnailGenerator = nil
             cell.thumbnailView.stopAnimating()
             log.error(error)
             
@@ -654,14 +735,14 @@ extension ListController: UITableViewDataSource {
     private func loadThumbnailFallbackImage(item: PlaylistInfo, cell: PlaylistCell) {
         guard let url = URL(string: item.src) else { return }
 
-        cell.thumbnailActivityIndicator.startAnimating()
-        let imageGenerator = AVAssetImageGenerator(asset: AVAsset(url: url))
-        imageGenerator.appliesPreferredTrackTransform = false
-
         let time = CMTimeMake(value: 3, timescale: 1)
-        imageGenerator.generateCGImagesAsynchronously(forTimes: [NSValue(time: time)]) { [weak cell] _, cgImage, _, result, error in
+        cell.thumbnailActivityIndicator.startAnimating()
+        cell.imageAssetGenerator = AVAssetImageGenerator(asset: AVAsset(url: url))
+        cell.imageAssetGenerator?.appliesPreferredTrackTransform = false
+        cell.imageAssetGenerator?.generateCGImagesAsynchronously(forTimes: [NSValue(time: time)]) { [weak cell] _, cgImage, _, result, error in
             guard let cell = cell else { return }
             
+            cell.imageAssetGenerator = nil
             if result == .succeeded, let cgImage = cgImage {
                 let image = UIImage(cgImage: cgImage)
 
@@ -1220,8 +1301,17 @@ extension ListController: AVPlayerViewControllerDelegate, AVPictureInPictureCont
 
 extension ListController: PlaylistManagerDelegate {
     func onDownloadProgressUpdate(id: String, percentComplete: Double) {
-        guard let index = PlaylistManager.shared.index(of: id),
-              let cell = tableView.cellForRow(at: IndexPath(row: index, section: 0)) as? PlaylistCell else {
+        guard let index = PlaylistManager.shared.index(of: id) else {
+            return
+        }
+         
+        let indexPath = IndexPath(row: index, section: 0)
+        guard let cell = tableView.cellForRow(at: IndexPath(row: index, section: 0)) as? PlaylistCell else {
+            return
+        }
+        
+        // Cell is not visible, do not update percentages
+        if tableView.indexPathsForVisibleRows?.contains(indexPath) == false {
             return
         }
         
@@ -1229,33 +1319,40 @@ extension ListController: PlaylistManagerDelegate {
         switch cacheState {
         case .inProgress:
             let item = PlaylistManager.shared.itemAtIndex(index)
-            getAssetDurationFormatted(item: item) {
-                cell.detailLabel.text = "\($0) - \(Int(percentComplete))% \(Strings.PlayList.savedForOfflineLabelTitle)"
+            cell.durationFetcher = getAssetDurationFormatted(item: item) { [weak cell] in
+                cell?.detailLabel.text = "\($0) - \(Int(percentComplete))% \(Strings.PlayList.savedForOfflineLabelTitle)"
             }
         case .downloaded:
             let item = PlaylistManager.shared.itemAtIndex(index)
             if let itemSize = PlaylistManager.shared.sizeOfDownloadedItem(for: item.pageSrc) {
-                
-                getAssetDurationFormatted(item: item) {
-                    cell.detailLabel.text = "\($0) - \(itemSize)"
+                cell.durationFetcher = getAssetDurationFormatted(item: item) { [weak cell] in
+                    cell?.detailLabel.text = "\($0) - \(itemSize)"
                 }
             } else {
-                getAssetDurationFormatted(item: item) {
-                    cell.detailLabel.text = "\($0) - \(Strings.PlayList.savedForOfflineLabelTitle)"
+                cell.durationFetcher = getAssetDurationFormatted(item: item) { [weak cell] in
+                    cell?.detailLabel.text = "\($0) - \(Strings.PlayList.savedForOfflineLabelTitle)"
                 }
             }
         case .invalid:
             let item = PlaylistManager.shared.itemAtIndex(index)
-            
-            getAssetDurationFormatted(item: item) {
-                cell.detailLabel.text = $0
+            cell.durationFetcher = getAssetDurationFormatted(item: item) { [weak cell] in
+                cell?.detailLabel.text = $0
             }
         }
     }
     
     func onDownloadStateChanged(id: String, state: PlaylistDownloadManager.DownloadState, displayName: String?, error: Error?) {
-        guard let index = PlaylistManager.shared.index(of: id),
-              let cell = tableView.cellForRow(at: IndexPath(row: index, section: 0)) as? PlaylistCell else {
+        guard let index = PlaylistManager.shared.index(of: id) else {
+            return
+        }
+         
+        let indexPath = IndexPath(row: index, section: 0)
+        guard let cell = tableView.cellForRow(at: IndexPath(row: index, section: 0)) as? PlaylistCell else {
+            return
+        }
+        
+        // Cell is not visible, do not update status
+        if tableView.indexPathsForVisibleRows?.contains(indexPath) == false {
             return
         }
             
@@ -1263,8 +1360,8 @@ extension ListController: PlaylistManagerDelegate {
             log.error("Error downloading playlist item: \(error)")
             
             let item = PlaylistManager.shared.itemAtIndex(index)
-            getAssetDurationFormatted(item: item) {
-                cell.detailLabel.text = $0
+            cell.durationFetcher = getAssetDurationFormatted(item: item) { [weak cell] in
+                cell?.detailLabel.text = $0
             }
             
             let alert = UIAlertController(title: Strings.PlayList.playlistSaveForOfflineErrorTitle,
@@ -1275,25 +1372,24 @@ extension ListController: PlaylistManagerDelegate {
             switch state {
             case .inProgress:
                 let item = PlaylistManager.shared.itemAtIndex(index)
-                getAssetDurationFormatted(item: item) {
-                    cell.detailLabel.text = "\($0) - \(Strings.PlayList.savingForOfflineLabelTitle)"
+                cell.durationFetcher = getAssetDurationFormatted(item: item) { [weak cell] in
+                    cell?.detailLabel.text = "\($0) - \(Strings.PlayList.savingForOfflineLabelTitle)"
                 }
             case .downloaded:
                 let item = PlaylistManager.shared.itemAtIndex(index)
                 if let itemSize = PlaylistManager.shared.sizeOfDownloadedItem(for: item.pageSrc) {
-                    getAssetDurationFormatted(item: item) {
-                        cell.detailLabel.text = "\($0) - \(itemSize)"
+                    cell.durationFetcher = getAssetDurationFormatted(item: item) { [weak cell] in
+                        cell?.detailLabel.text = "\($0) - \(itemSize)"
                     }
                 } else {
-                    getAssetDurationFormatted(item: item) {
-                        cell.detailLabel.text = "\($0) - \(Strings.PlayList.savedForOfflineLabelTitle)"
+                    cell.durationFetcher = getAssetDurationFormatted(item: item) { [weak cell] in
+                        cell?.detailLabel.text = "\($0) - \(Strings.PlayList.savedForOfflineLabelTitle)"
                     }
                 }
             case .invalid:
                 let item = PlaylistManager.shared.itemAtIndex(index)
-                
-                getAssetDurationFormatted(item: item) {
-                    cell.detailLabel.text = $0
+                cell.durationFetcher = getAssetDurationFormatted(item: item) { [weak cell] in
+                    cell?.detailLabel.text = $0
                 }
             }
         }
