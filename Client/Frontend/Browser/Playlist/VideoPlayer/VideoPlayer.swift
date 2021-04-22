@@ -43,6 +43,10 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     
     private(set) public var pendingMediaItem: AVPlayerItem?
     
+    private var isLiveMedia: Bool {
+        return (player.currentItem ?? pendingMediaItem)?.asset.duration.isIndefinite == true
+    }
+    
     private var requestedPlaybackRate = 1.0
     
     private let particleView = PlaylistParticleEmitter().then {
@@ -678,6 +682,12 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
                 self.player.replaceCurrentItem(with: item)
                 self.pendingMediaItem = nil
                 
+                // Live media item
+                let isPlayingLiveMedia = self.isLiveMedia
+                self.controlsView.trackBar.isUserInteractionEnabled = !isPlayingLiveMedia
+                self.controlsView.skipBackButton.isEnabled = !isPlayingLiveMedia
+                self.controlsView.skipForwardButton.isEnabled = !isPlayingLiveMedia
+                
                 let endTime = CMTimeConvertScale(item.asset.duration, timescale: self.player.currentTime().timescale, method: .roundHalfAwayFromZero)
                 self.controlsView.trackBar.setTimeRange(currentTime: item.currentTime(), endTime: endTime)
                 
@@ -707,6 +717,12 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
             DispatchQueue.main.async {
                 self.player.replaceCurrentItem(with: item)
                 self.pendingMediaItem = nil
+                
+                // Live media item
+                let isPlayingLiveMedia = self.isLiveMedia
+                self.controlsView.trackBar.isUserInteractionEnabled = !isPlayingLiveMedia
+                self.controlsView.skipBackButton.isEnabled = !isPlayingLiveMedia
+                self.controlsView.skipForwardButton.isEnabled = !isPlayingLiveMedia
                 
                 let endTime = CMTimeConvertScale(item.asset.duration, timescale: self.player.currentTime().timescale, method: .roundHalfAwayFromZero)
                 self.controlsView.trackBar.setTimeRange(currentTime: item.currentTime(), endTime: endTime)
