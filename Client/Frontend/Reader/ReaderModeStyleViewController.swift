@@ -28,7 +28,7 @@ private struct ReaderModeStyleViewControllerUX {
     static let themeTitleColorSepia = UIColor.Photon.grey70
     static let themeBackgroundColorLight = UIColor.Photon.white100
     static let themeBackgroundColorDark = UIColor.Photon.grey70
-    static let themeBackgroundColorSepia = UIColor.Defaults.lightBeige
+    static let themeBackgroundColorSepia = UIColor(rgb: 0xf0e6dc) // Light Beige
 
     static let brightnessRowBackground = UIColor.Photon.grey20
     static let brightnessSliderTintColor = UIColor.Photon.orange60

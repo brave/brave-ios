@@ -78,7 +78,7 @@ class AlertPopupView: PopupView {
         
         setPopupContentView(view: containerView)
         setStyle(popupStyle: .dialog)
-        setDialogColor(color: BraveUX.popupDialogColorLight)
+        setDialogColor(color: UIColor.braveBackground)
     }
     
     func update(title: String) {

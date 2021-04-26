@@ -5,11 +5,12 @@
 import Foundation
 import SnapKit
 import Shared
+import BraveUI
 
 class SnackBarUX {
     static var maxWidth: CGFloat = 400
     static let borderWidth: CGFloat = 0.5
-    static let highlightColor = UIColor.Defaults.iOSHighlightBlue.withAlphaComponent(0.9)
+    static let highlightColor = UIColor.braveInfoBorder.withAlphaComponent(0.9)
     static let highlightText = UIColor.Photon.blue60
 }
 
@@ -52,7 +53,7 @@ class SnackButton: UIButton {
 
     func drawSeparator() {
         let separator = UIView()
-        separator.backgroundColor = UIConstants.borderColor
+        separator.backgroundColor = .braveSeparator
         self.addSubview(separator)
         separator.snp.makeConstraints { make in
             make.leading.equalTo(self)
@@ -121,7 +122,7 @@ class SnackBar: UIView {
         titleView.addArrangedSubview(textLabel)
 
         let separator = UIView()
-        separator.backgroundColor = UIConstants.borderColor
+        separator.backgroundColor = .braveSeparator
 
         addSubview(titleView)
         addSubview(separator)
@@ -147,7 +148,7 @@ class SnackBar: UIView {
 
         backgroundColor = UIColor.clear
         self.layer.borderWidth = SnackBarUX.borderWidth
-        self.layer.borderColor = UIConstants.borderColor.cgColor
+        self.layer.borderColor = UIColor.Photon.grey60.cgColor
     }
 
     required init?(coder aDecoder: NSCoder) {

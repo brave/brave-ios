@@ -138,7 +138,7 @@ class DefaultBrowserIntroCalloutViewController: UIViewController, Themeable {
     
     // MARK: - Themeable
     func applyTheme(_ theme: Theme) {
-        view.backgroundColor = theme.isDark ? BraveUX.popoverDarkBackground : .white
+        view.backgroundColor = theme.isDark ? UIColor.braveBackground : .white
         image.image = theme.isDark ? #imageLiteral(resourceName: "default_browser_intro_dark") : #imageLiteral(resourceName: "default_browser_intro")
     }
 }

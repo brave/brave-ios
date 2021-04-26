@@ -98,7 +98,7 @@ class SiteTableViewController: UIViewController, UITableViewDelegate, UITableVie
         tableView.register(SiteTableViewHeader.self, forHeaderFooterViewReuseIdentifier: HeaderIdentifier)
         tableView.layoutMargins = .zero
         tableView.keyboardDismissMode = .onDrag
-        tableView.backgroundColor = UIConstants.panelBackgroundColor
+        tableView.backgroundColor = .braveBackground
         tableView.separatorColor = .braveSeparator
         tableView.accessibilityIdentifier = "SiteTable"
         tableView.cellLayoutMarginsFollowReadableWidth = false

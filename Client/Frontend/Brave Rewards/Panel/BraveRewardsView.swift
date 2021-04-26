@@ -89,7 +89,7 @@ extension BraveRewardsViewController {
             publisherView.applyTheme(theme)
             statusView.applyTheme(theme)
             legacyWalletTransferButton.applyTheme(theme)
-            backgroundColor = theme.isDark ? BraveUX.popoverDarkBackground : .white
+            backgroundColor = theme.isDark ? UIColor.braveBackground : .white
         }
     }
 }

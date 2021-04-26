@@ -69,7 +69,7 @@ class PopupView: UIView, UIGestureRecognizerDelegate {
         
         var titleColor: UIColor {
             if self == .link {
-                return BraveUX.blue
+                return .braveBlurple
             }
             return .white
         }

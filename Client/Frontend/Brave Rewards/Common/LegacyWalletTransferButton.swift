@@ -51,7 +51,7 @@ class LegacyWalletTransferButton: UIControl, Themeable {
         layer.cornerRadius = 8
         layer.cornerCurve = .continuous
         
-        backgroundColor = UIColor(rgb: 0x339AF0)
+        backgroundColor = .braveInfoLabel
         
         addSubview(stackView)
         addSubview(dismissButton)

@@ -72,7 +72,7 @@ extension ShieldsViewController {
             reportBrokenSiteView.applyTheme(theme)
             siteReportedView.applyTheme(theme)
             
-            backgroundColor = theme.isDark ? BraveUX.popoverDarkBackground : UIColor.white
+            backgroundColor = theme.isDark ? UIColor.braveBackground : UIColor.white
         }
         
         @available(*, unavailable)

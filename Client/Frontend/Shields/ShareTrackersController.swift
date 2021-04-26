@@ -137,7 +137,7 @@ class ShareTrackersController: UIViewController, Themeable, PopoverContentCompon
     // MARK: Themeable
     
     func applyTheme(_ theme: Theme) {
-        view.backgroundColor = UIColor(rgb: 0x339AF0)
+        view.backgroundColor = .braveInfoLabel
         
         shareTrackersView.applyTheme(theme)
     }

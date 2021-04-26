@@ -5,13 +5,14 @@
 import UIKit
 import Shared
 import BraveShared
+import BraveUI
 
 class SearchSuggestionPromptView: UIView {
     
     private let optionSelected: (Bool) -> Void
     
     private struct UX {
-        static let promptColor = UIConstants.panelBackgroundColor
+        static let promptColor = UIColor.braveBackground
         static let promptFont = UIFont.systemFont(ofSize: 12, weight: UIFont.Weight.regular)
         static let promptYesFont = UIFont.systemFont(ofSize: 15, weight: UIFont.Weight.bold)
         static let promptNoFont = UIFont.systemFont(ofSize: 15, weight: UIFont.Weight.regular)

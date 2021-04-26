@@ -6,6 +6,7 @@
 
 import UIKit
 import Shared
+import BraveUI
 
 /// Delegate for the text field events. Since AutocompleteTextField owns the UITextFieldDelegate,
 /// callers must use this instead.
@@ -18,7 +19,7 @@ protocol AutocompleteTextFieldDelegate: class {
 }
 
 private struct AutocompleteTextFieldUX {
-       static let highlightColor = UIColor.Defaults.iOSHighlightBlue
+       static let highlightColor = UIColor.braveInfoBorder
 }
 
 class AutocompleteTextField: UITextField, UITextFieldDelegate {

@@ -54,7 +54,7 @@ class AboutShieldsViewController: UIViewController, Themeable {
     }
     
     func applyTheme(_ theme: Theme) {
-        view.backgroundColor = theme.isDark ? BraveUX.popoverDarkBackground : UIColor.white
+        view.backgroundColor = theme.isDark ? UIColor.braveBackground : UIColor.white
         textLabel.textColor = theme.colors.tints.home
     }
     
