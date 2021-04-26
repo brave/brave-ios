@@ -933,6 +933,11 @@ class BrowserViewController: UIViewController {
         screenshotHelper.takePendingScreenshots(tabManager.allTabs)
 
         super.viewDidAppear(animated)
+        
+        // NTP Education Load after onboarding screen
+        if showNTPEducation().isEnabled, let url = showNTPEducation().url {
+            tabManager.selectedTab?.loadRequest(PrivilegedRequest(url: url) as URLRequest)
+        }
 
         if shouldShowWhatsNewTab() {
             // Only display if the SUMO topic has been configured in the Info.plist (present and not empty)
@@ -1129,6 +1134,17 @@ class BrowserViewController: UIViewController {
         }
 
         return latestMajorAppVersion != AppInfo.majorAppVersion && DeviceInfo.hasConnectivity()
+    }
+    
+    /// New Tab Page Education screen should load after onboarding is finished and user is on locale JP
+    /// - Returns: A tuple which shows NTP Edication is enabled and URL to be loaed
+    fileprivate func showNTPEducation() -> (isEnabled: Bool, url: URL?) {
+        guard Preferences.General.basicOnboardingCompleted.value == OnboardingState.completed.rawValue,
+              let url = AppInfo.ntpTutorialPageURL else {
+            return (false, nil)
+        }
+
+        return (Locale.current.regionCode == "JP", url)
     }
 
     fileprivate func showQueuedAlertIfAvailable() {
