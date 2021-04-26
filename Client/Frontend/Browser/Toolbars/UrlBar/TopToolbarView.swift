@@ -298,6 +298,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
         
         guard let locationTextField = locationTextField else { return }
         
+        locationTextField.backgroundColor = .braveBackground
         locationTextField.translatesAutoresizingMaskIntoConstraints = false
         locationTextField.autocompleteDelegate = self
         locationTextField.keyboardType = .webSearch

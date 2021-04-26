@@ -270,6 +270,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         
         UIScrollView.doBadSwizzleStuff()
         
+        window!.tintColor = .braveOrange
         window!.makeKeyAndVisible()
         
         authenticator = AppAuthenticator(protectedWindow: window!, promptImmediately: true, isPasscodeEntryCancellable: false)

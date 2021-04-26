@@ -71,12 +71,9 @@ extension UIColor {
     DesignSystemColor.background04.color
   }
   public static var braveLabel: UIColor {
-    DesignSystemColor.text01.color
-  }
-  public static var secondaryBraveLabel: UIColor {
     DesignSystemColor.text02.color
   }
-  public static var tertiaryBraveLabel: UIColor {
+  public static var secondaryBraveLabel: UIColor {
     DesignSystemColor.text03.color
   }
   public static var braveOrange: UIColor {
@@ -96,6 +93,9 @@ extension UIColor {
   }
   public static var braveInfoBorder: UIColor {
     DesignSystemColor.infoBorder.color
+  }
+  public static var braveInfoBackground: UIColor {
+    DesignSystemColor.infoBackground.color
   }
   public static var braveSuccessLabel: UIColor {
     DesignSystemColor.successText.color
