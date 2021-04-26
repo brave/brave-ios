@@ -8,7 +8,6 @@ enum DesignSystemColor: String {
   case background01
   case background02
   case background03
-  case background04
   
   case text01
   case text02
@@ -62,13 +61,13 @@ extension UIColor {
     DesignSystemColor.background03.color
   }
   public static var braveGroupedBackground: UIColor {
-    DesignSystemColor.background04.color
+    DesignSystemColor.background01.color
   }
   public static var secondaryBraveGroupedBackground: UIColor {
     DesignSystemColor.background02.color
   }
   public static var tertiaryBraveGroupedBackground: UIColor {
-    DesignSystemColor.background04.color
+    DesignSystemColor.background01.color
   }
   public static var braveLabel: UIColor {
     DesignSystemColor.text02.color

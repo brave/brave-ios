@@ -65,7 +65,7 @@ class TabCell: UICollectionViewCell {
         self.closeButton.addTarget(self, action: #selector(close), for: .touchUpInside)
         
         layer.borderWidth = TabTrayControllerUX.defaultBorderWidth
-        layer.borderColor = UIColor.braveInfoBorder.cgColor
+        layer.borderColor = UIColor.braveSeparator.cgColor
         layer.cornerRadius = TabTrayControllerUX.cornerRadius
         
         contentView.addSubview(backgroundHolder)
@@ -82,7 +82,7 @@ class TabCell: UICollectionViewCell {
     }
     
     func setTabSelected(_ tab: Tab) {
-        layer.shadowColor = UIColor.Photon.blue40.cgColor
+        layer.shadowColor = UIColor.braveInfoBorder.cgColor
         layer.shadowOpacity = 1
         layer.shadowRadius = 0 // A 0 radius creates a solid border instead of a gradient blur
         layer.masksToBounds = false
@@ -164,6 +164,7 @@ class TabCell: UICollectionViewCell {
         super.traitCollectionDidChange(previousTraitCollection)
         
         // cgcolor does not dynamically update
-        layer.borderColor = UIColor.braveInfoBorder.cgColor
+        layer.shadowColor = UIColor.braveInfoBorder.cgColor
+        layer.borderColor = UIColor.braveSeparator.cgColor
     }
 }
