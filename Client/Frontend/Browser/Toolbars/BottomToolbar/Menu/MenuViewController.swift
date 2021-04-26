@@ -273,7 +273,7 @@ extension MenuViewController: PanModalPresentable {
             if enabled {
                 BraveVPN.reconnect()
                 
-                /// Donate enable VPN Activity for suggestions
+                /// Donate Enable VPN Activity for suggestions
                 let enableVPNActivity = ActivityShortcutManager.shared.createShortcutActivity(type: .enableBraveVPN)
                 self.userActivity = enableVPNActivity
                 enableVPNActivity.becomeCurrent()

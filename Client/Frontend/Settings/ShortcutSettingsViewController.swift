@@ -20,11 +20,7 @@ class ShortcutSettingsViewController: TableViewController {
     init(_ theme: Theme) {
         self.theme = theme
         
-        if #available(iOS 13.0, *) {
-            super.init(style: .insetGrouped)
-        } else {
-            super.init(style: .grouped)
-        }
+        super.init(style: .insetGrouped)
     }
     
     @available(*, unavailable)
@@ -35,54 +31,54 @@ class ShortcutSettingsViewController: TableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        title = "Siri Shorcuts"
+        title = Strings.Shortcuts.shortcutSettingsTitle
         
         dataSource.sections.append(
             Section(rows: [
-                        Row(text: "Open New Tab", selection: { [unowned self] in
+                        Row(text: Strings.Shortcuts.shortcutSettingsOpenNewTabTitle, selection: { [unowned self] in
                             manageShortcutActivity(for: .newTab)
                         }, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self)],
-                    footer: .title("Use Shortcuts to open a new tab via Siri - Voice Assistant"))
+                    footer: .title(Strings.Shortcuts.shortcutSettingsOpenNewTabDescription))
         )
         
         dataSource.sections.append(
             Section(rows: [
-                        Row(text: "Open New Private Tab", selection: { [unowned self] in
+                        Row(text: Strings.Shortcuts.shortcutSettingsOpenNewPrivateTabTitle, selection: { [unowned self] in
                             manageShortcutActivity(for: .newPrivateTab)
                         }, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self)],
-                    footer: .title("Use Shortcuts to open a new private tab via Siri - Voice Assistant"))
+                    footer: .title(Strings.Shortcuts.shortcutSettingsOpenNewPrivateTabDescription))
         )
         
         dataSource.sections.append(
             Section(rows: [
-                        Row(text: "Clear Browser History", selection: { [unowned self] in
+                        Row(text: Strings.Shortcuts.shortcutSettingsClearBrowserHistoryTitle, selection: { [unowned self] in
                             manageShortcutActivity(for: .clearBrowsingHistory)
                         }, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self)],
-                    footer: .title("Use Shortcuts to Clear Browsing History & Open a New Tab via Siri - Voice Assistant"))
+                    footer: .title(Strings.Shortcuts.shortcutSettingsClearBrowserHistoryDescription))
         )
             
         dataSource.sections.append(
             Section(rows: [
-                        Row(text: "Enable VPN", selection: { [unowned self] in
+                        Row(text: Strings.Shortcuts.shortcutSettingsEnableVPNTitle, selection: { [unowned self] in
                             manageShortcutActivity(for: .enableBraveVPN)
                         }, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self)],
-                    footer: .title("Use Shortcuts to enable Brave VPN via Siri - Voice Assistant"))
+                    footer: .title(Strings.Shortcuts.shortcutSettingsEnableVPNDescription))
         )
         
         dataSource.sections.append(
             Section(rows: [
-                        Row(text: "Open Brave Today", selection: { [unowned self] in
+                        Row(text: Strings.Shortcuts.shortcutSettingsOpenBraveTodayTitle, selection: { [unowned self] in
                             manageShortcutActivity(for: .openBraveToday)
                         }, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self)],
-                    footer: .title("Use Shortcuts to Open a New Tab & Show Brave Today Feed via Siri - Voice Assistant"))
+                    footer: .title(Strings.Shortcuts.shorcutSettingsOpenPlaylistDescription))
         )
         
         dataSource.sections.append(
             Section(rows: [
-                        Row(text: "Open Playlist", selection: { [unowned self] in
+                        Row(text: Strings.Shortcuts.shortcutSettingsOpenPlaylistTitle, selection: { [unowned self] in
                             manageShortcutActivity(for: .openPlayList)
                         }, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self)],
-                    footer: .title("Use Shortcuts to Open Playlist via Siri - Voice Assistant"))
+                    footer: .title(Strings.Shortcuts.shorcutSettingsOpenPlaylistDescription))
         )
     }
     

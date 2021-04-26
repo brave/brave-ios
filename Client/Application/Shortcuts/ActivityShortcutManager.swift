@@ -159,7 +159,7 @@ class ActivityShortcutManager: NSObject {
     
     // MARK: Intent Creation Methods
     
-    private func createOpenWebsiteIntent(for type: IntentType, with urlString: String) -> INIntent {
+    private func createCustomIntent(for type: IntentType, with urlString: String) -> INIntent {
         switch type {
             case .openWebsite:
                 let intent = OpenWebsiteIntent()
@@ -184,8 +184,8 @@ class ActivityShortcutManager: NSObject {
     
     // MARK: Intent Donation Methods
     
-    public func donateOpenWebsiteIntent(for type: IntentType, with urlString: String) {
-        let intent = createOpenWebsiteIntent(for: type, with: urlString)
+    public func donateCustomIntent(for type: IntentType, with urlString: String) {
+        let intent = createCustomIntent(for: type, with: urlString)
 
         let interaction = INInteraction(intent: intent, response: nil)
         interaction.donate { (error) in

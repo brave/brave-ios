@@ -413,8 +413,9 @@ class Tab: NSObject {
                     return webView.loadFileURL(url, allowingReadAccessTo: url)
                 }
                 
+                /// Donate Custom Intent Open Website
                 if url.isSecureWebPage(), !isPrivate {
-                    ActivityShortcutManager.shared.donateOpenWebsiteIntent(for: .openWebsite, with: url.absoluteString)
+                    ActivityShortcutManager.shared.donateCustomIntent(for: .openWebsite, with: url.absoluteString)
                 }
             }
 

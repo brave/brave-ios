@@ -1128,6 +1128,7 @@ class BrowserViewController: UIViewController {
                                                          dataSource: backgroundDataSource,
                                                          feedDataSource: feedDataSource,
                                                          rewards: rewards)
+            /// Donate NewTabPage Activity For Custom Suggestions
             let newTabPageActivity =
                 ActivityShortcutManager.shared.createShortcutActivity(type: selectedTab.isPrivate ? .newPrivateTab : .newTab)
             

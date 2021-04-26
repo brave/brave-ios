@@ -237,7 +237,7 @@ class SettingsViewController: TableViewController {
                     }, image: #imageLiteral(resourceName: "settings-sync").template, accessory: .disclosureIndicator,
                        cellClass: MultilineValue1Cell.self),
                 .boolRow(title: Strings.bookmarksLastVisitedFolderTitle, option: Preferences.General.showLastVisitedBookmarksFolder, image: #imageLiteral(resourceName: "menu_folder_open").template),
-                Row(text: "Siri Shortcuts", selection: { [unowned self] in
+                Row(text: Strings.Shortcuts.shortcutSettingsTitle, selection: { [unowned self] in
                     let viewController = ShortcutSettingsViewController(self.theme)
                     self.navigationController?.pushViewController(viewController, animated: true)
                 }, image: #imageLiteral(resourceName: "settings-siri-shortcuts").template, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self)

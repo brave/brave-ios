@@ -1535,6 +1535,84 @@ extension Strings {
                               bundle: .braveShared,
                               value: "Open Bookmark Website",
                               comment: "")
+        
+        public static let shortcutSettingsTitle =
+            NSLocalizedString("shortcuts.shorcutSettingsTitle",
+                              bundle: .braveShared,
+                              value: "Siri Shorcuts",
+                              comment: "")
+        
+        public static let shortcutSettingsOpenNewTabTitle =
+            NSLocalizedString("shortcuts.shortcutSettingsOpenNewTabTitle",
+                              bundle: .braveShared,
+                              value: "Open New Tab",
+                              comment: "")
+        
+        public static let shortcutSettingsOpenNewTabDescription =
+            NSLocalizedString("shortcuts.shortcutSettingsOpenNewTabDescription",
+                              bundle: .braveShared,
+                              value: "Use Shortcuts to open a new tab via Siri - Voice Assistant",
+                              comment: "")
+        
+        public static let shortcutSettingsOpenNewPrivateTabTitle =
+            NSLocalizedString("shortcuts.shortcutSettingsOpenNewPrivateTabTitle",
+                              bundle: .braveShared,
+                              value: "Open New Private Tab",
+                              comment: "")
+        
+        public static let shortcutSettingsOpenNewPrivateTabDescription =
+            NSLocalizedString("shortcuts.shortcutSettingsOpenNewPrivateTabDescription",
+                              bundle: .braveShared,
+                              value: "Use Shortcuts to open a new private tab via Siri - Voice Assistant",
+                              comment: "")
+        
+        public static let shortcutSettingsClearBrowserHistoryTitle =
+            NSLocalizedString("shortcuts.shortcutSettingsClearBrowserHistoryTitle",
+                              bundle: .braveShared,
+                              value: "Clear Browser History",
+                              comment: "")
+        
+        public static let shortcutSettingsClearBrowserHistoryDescription =
+            NSLocalizedString("shortcuts.shortcutSettingsClearBrowserHistoryDescription",
+                              bundle: .braveShared,
+                              value: "Use Shortcuts to open a new tab via Siri - Voice Assistant",
+                              comment: "")
+        
+        public static let shortcutSettingsEnableVPNTitle =
+            NSLocalizedString("shortcuts.shortcutSettingsEnableVPNTitle",
+                              bundle: .braveShared,
+                              value: "Enable VPN",
+                              comment: "")
+        
+        public static let shortcutSettingsEnableVPNDescription =
+            NSLocalizedString("shortcuts.shortcutSettingsEnableVPNDescription",
+                              bundle: .braveShared,
+                              value: "Use Shortcuts to enable Brave VPN via Siri - Voice Assistant",
+                              comment: "")
+
+        public static let shortcutSettingsOpenBraveTodayTitle =
+            NSLocalizedString("shortcuts.shortcutSettingsOpenBraveTodayTitle",
+                              bundle: .braveShared,
+                              value: "Open Brave Today",
+                              comment: "")
+        
+        public static let shortcutSettingsOpenBraveTodayDescription =
+            NSLocalizedString("shortcuts.shortcutSettingsOpenBraveTodayDescription",
+                              bundle: .braveShared,
+                              value: "Use Shortcuts to Open a New Tab & Show Brave Today Feed via Siri - Voice Assistant",
+                              comment: "Description of Open Brave Today Siri Shortcutin Settings Screen")
+        
+        public static let shortcutSettingsOpenPlaylistTitle =
+            NSLocalizedString("shortcuts.shortcutSettingsOpenPlaylistTitle",
+                              bundle: .braveShared,
+                              value: "Open Playlist",
+                              comment: "")
+        
+        public static let shorcutSettingsOpenPlaylistDescription =
+            NSLocalizedString("shortcuts.shorcutSettingsOpenPlaylistDescription",
+                              bundle: .braveShared,
+                              value: "Use Shortcuts to enable Brave VPN via Siri - Voice Assistant",
+                              comment: "Use Shortcuts to Open Playlist via Siri - Voice Assistant")
     }
 }
 

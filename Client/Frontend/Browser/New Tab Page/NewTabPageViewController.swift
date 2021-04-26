@@ -514,7 +514,7 @@ class NewTabPageViewController: UIViewController {
                 switchingToPrivateMode: switchingToPrivateMode
             )
             
-            /// Donate Open Brave Today for suggestions
+            /// Donate Open Brave Today Activity for Custom Suggestions
             let openBraveTodayActivity = ActivityShortcutManager.shared.createShortcutActivity(type: .openBraveToday)
             self.userActivity = openBraveTodayActivity
             openBraveTodayActivity.becomeCurrent()
