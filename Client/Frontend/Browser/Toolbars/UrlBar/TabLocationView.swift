@@ -132,6 +132,7 @@ class TabLocationView: UIView {
         urlTextField.font = UIConstants.defaultChromeFont
         urlTextField.backgroundColor = .clear
         urlTextField.clipsToBounds = true
+        urlTextField.textColor = .braveLabel
         // Remove the default drop interaction from the URL text field so that our
         // custom drop interaction on the BVC can accept dropped URLs.
         if let dropInteraction = urlTextField.textDropInteraction {
@@ -163,6 +164,8 @@ class TabLocationView: UIView {
         readerModeButton.accessibilityLabel = Strings.tabToolbarReaderViewButtonAccessibilityLabel
         readerModeButton.accessibilityIdentifier = "TabLocationView.readerModeButton"
         readerModeButton.accessibilityCustomActions = [UIAccessibilityCustomAction(name: Strings.tabToolbarReaderViewButtonTitle, target: self, selector: #selector(readerModeCustomAction))]
+        readerModeButton.unselectedTintColor = .braveLabel
+        readerModeButton.selectedTintColor = .braveOrange
         return readerModeButton
     }()
     
@@ -171,7 +174,7 @@ class TabLocationView: UIView {
         $0.isAccessibilityElement = true
         $0.accessibilityLabel = Strings.tabToolbarReloadButtonAccessibilityLabel
         $0.setImage(#imageLiteral(resourceName: "nav-refresh").template, for: .normal)
-        $0.tintColor = UIColor.Photon.grey30
+        $0.tintColor = .braveLabel
         let longPressGestureStopReloadButton = UILongPressGestureRecognizer(target: self, action: #selector(didLongPressStopReload(_:)))
         $0.addGestureRecognizer(longPressGestureStopReloadButton)
         $0.addTarget(self, action: #selector(didClickStopReload), for: .touchUpInside)
@@ -195,13 +198,17 @@ class TabLocationView: UIView {
         return button
     }()
     
-    lazy var separatorLine: UIView = CustomSeparatorView(lineSize: .init(width: 1, height: 26), cornerRadius: 2)
+    lazy var separatorLine: UIView = CustomSeparatorView(lineSize: .init(width: 1, height: 26), cornerRadius: 2).then {
+        $0.backgroundColor = .braveSeparator
+    }
     
     lazy var tabOptionsStackView = UIStackView()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
 
+        backgroundColor = .braveBackground
+        
         self.tabObservers = registerFor(.didChangeContentBlocking, .didGainFocus, queue: .main)
 
         longPressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(longPressLocation))
@@ -377,27 +384,6 @@ extension TabLocationView: AccessibilityActionsSource {
             return delegate?.tabLocationViewLocationAccessibilityActions(self)
         }
         return nil
-    }
-}
-
-// MARK: - Themeable
-
-extension TabLocationView: Themeable {
-    var themeableChildren: [Themeable?]? {
-        return [reloadButton]
-    }
-    
-    func applyTheme(_ theme: Theme) {
-        styleChildren(theme: theme)
-        
-        backgroundColor = theme.colors.addressBar.withAlphaComponent(theme.colors.transparencies.addressBarAlpha)
-        
-        urlTextField.textColor = theme.colors.tints.addressBar
-
-        readerModeButton.unselectedTintColor = theme.colors.tints.header
-        readerModeButton.selectedTintColor = theme.colors.accent
-
-        separatorLine.backgroundColor = theme.colors.border.withAlphaComponent(theme.colors.transparencies.borderAlpha)
     }
 }
 

@@ -10,7 +10,7 @@ import BraveShared
 class BottomToolbarView: UIView, ToolbarProtocol {
     weak var tabToolbarDelegate: ToolbarDelegate?
 
-    let tabsButton = TabsButton(top: false)
+    let tabsButton = TabsButton()
     let forwardButton = ToolbarButton(top: false)
     let backButton = ToolbarButton(top: false)
     let shareButton = ToolbarButton(top: false)
@@ -19,7 +19,7 @@ class BottomToolbarView: UIView, ToolbarProtocol {
         $0.isHidden = true
     }
     let menuButton = ToolbarButton(top: false)
-    let actionButtons: [Themeable & UIButton]
+    let actionButtons: [UIButton]
 
     var helper: ToolbarHelper?
     private let contentView = UIStackView()
@@ -28,6 +28,8 @@ class BottomToolbarView: UIView, ToolbarProtocol {
         actionButtons = [backButton, forwardButton, addTabButton, searchButton, tabsButton, menuButton]
         super.init(frame: frame)
         setupAccessibility()
+        
+        backgroundColor = .secondaryBraveBackground
 
         addSubview(contentView)
         helper = ToolbarHelper(toolbar: self)
@@ -113,18 +115,5 @@ class BottomToolbarView: UIView, ToolbarProtocol {
         default:
             break
         }
-    }
-}
-
-// MARK: - Themeable
-
-extension BottomToolbarView: Themeable {
-    var themeableChildren: [Themeable?]? {
-        return actionButtons
-    }
-    
-    func applyTheme(_ theme: Theme) {
-        styleChildren(theme: theme)
-        backgroundColor = theme.colors.footer
     }
 }
