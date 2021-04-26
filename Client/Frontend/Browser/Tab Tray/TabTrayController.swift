@@ -31,170 +31,6 @@ protocol TabCellDelegate: AnyObject {
     func tabCellDidClose(_ cell: TabCell)
 }
 
-class TabCell: UICollectionViewCell, Themeable {
-    static let identifier = "TabCellIdentifier"
-    static let borderWidth: CGFloat = 3
-
-    let backgroundHolder = UIView()
-    let screenshotView = UIImageViewAligned()
-    let titleBackgroundView = GradientView(
-        colors: [UIColor(white: 1.0, alpha: 0.98), UIColor(white: 1.0, alpha: 0.9), UIColor(white: 1.0, alpha: 0.0)],
-        positions: [0, 0.5, 1],
-        startPoint: .zero,
-        endPoint: CGPoint(x: 0, y: 1)
-    )
-    let titleLabel: UILabel
-    let favicon: UIImageView = UIImageView()
-    let closeButton: UIButton
-
-    var animator: SwipeAnimator!
-
-    weak var delegate: TabCellDelegate?
-
-    // Changes depending on whether we're full-screen or not.
-    var margin = CGFloat(0)
-
-    override init(frame: CGRect) {
-        self.backgroundHolder.backgroundColor = .white
-        self.backgroundHolder.layer.cornerRadius = TabTrayControllerUX.cornerRadius
-        self.backgroundHolder.clipsToBounds = true
-
-        self.screenshotView.contentMode = .scaleAspectFill
-        self.screenshotView.clipsToBounds = true
-        self.screenshotView.isUserInteractionEnabled = false
-        self.screenshotView.alignLeft = true
-        self.screenshotView.alignTop = true
-
-        self.favicon.backgroundColor = UIColor.clear
-        self.favicon.layer.cornerRadius = 2.0
-        self.favicon.layer.masksToBounds = true
-
-        self.titleLabel = UILabel()
-        self.titleLabel.isUserInteractionEnabled = false
-        self.titleLabel.numberOfLines = 1
-        self.titleLabel.font = DynamicFontHelper.defaultHelper.DefaultSmallFontBold
-        self.titleLabel.textColor = .black
-        self.titleLabel.backgroundColor = .clear
-
-        self.closeButton = UIButton()
-        self.closeButton.setImage(#imageLiteral(resourceName: "tab_close"), for: [])
-        self.closeButton.imageView?.contentMode = .scaleAspectFit
-        self.closeButton.contentMode = .center
-        self.closeButton.imageEdgeInsets = UIEdgeInsets(equalInset: TabTrayControllerUX.closeButtonEdgeInset)
-
-        super.init(frame: frame)
-        
-        self.animator = SwipeAnimator(animatingView: self)
-        self.closeButton.addTarget(self, action: #selector(close), for: .touchUpInside)
-
-        layer.borderWidth = TabTrayControllerUX.defaultBorderWidth
-        layer.cornerRadius = TabTrayControllerUX.cornerRadius
-        
-        contentView.addSubview(backgroundHolder)
-        backgroundHolder.addSubview(self.screenshotView)
-        backgroundHolder.addSubview(self.titleBackgroundView)
-        
-        titleBackgroundView.addSubview(self.closeButton)
-        titleBackgroundView.addSubview(self.titleLabel)
-        titleBackgroundView.addSubview(self.favicon)
-
-        self.accessibilityCustomActions = [
-            UIAccessibilityCustomAction(name: Strings.tabAccessibilityCloseActionLabel, target: self.animator, selector: #selector(SwipeAnimator.closeWithoutGesture))
-        ]
-    }
-
-    func setTabSelected(_ tab: Tab) {
-        layer.shadowColor = UIColor.Photon.blue40.cgColor
-        layer.shadowOpacity = 1
-        layer.shadowRadius = 0 // A 0 radius creates a solid border instead of a gradient blur
-        layer.masksToBounds = false
-        // create a frame that is "BorderWidth" size bigger than the cell
-        layer.shadowOffset = CGSize(width: -TabCell.borderWidth, height: -TabCell.borderWidth)
-        let shadowPath = CGRect(width: layer.frame.width + (TabCell.borderWidth * 2), height: layer.frame.height + (TabCell.borderWidth * 2))
-        layer.shadowPath = UIBezierPath(roundedRect: shadowPath, cornerRadius: TabTrayControllerUX.cornerRadius+TabCell.borderWidth).cgPath
-        layer.borderWidth = 0.0
-    }
-
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    override func layoutSubviews() {
-        super.layoutSubviews()
-
-        backgroundHolder.frame = CGRect(x: margin, y: margin, width: frame.width, height: frame.height)
-        screenshotView.frame = CGRect(size: backgroundHolder.frame.size)
-
-        titleBackgroundView.snp.makeConstraints { make in
-            make.top.left.right.equalTo(backgroundHolder)
-            make.height.equalTo(TabTrayControllerUX.textBoxHeight + 15.0)
-        }
-
-        favicon.snp.makeConstraints { make in
-            make.leading.equalTo(titleBackgroundView).offset(6)
-            make.top.equalTo((TabTrayControllerUX.textBoxHeight - TabTrayControllerUX.faviconSize) / 2)
-            make.size.equalTo(TabTrayControllerUX.faviconSize)
-        }
-
-        titleLabel.snp.makeConstraints { make in
-            make.leading.equalTo(favicon.snp.trailing).offset(6)
-            make.trailing.equalTo(closeButton.snp.leading).offset(-6)
-            make.centerY.equalTo(favicon)
-        }
-
-        closeButton.snp.makeConstraints { make in
-            make.size.equalTo(TabTrayControllerUX.closeButtonSize)
-            make.trailing.equalTo(titleBackgroundView)
-            make.centerY.equalTo(favicon)
-        }
-
-        let shadowPath = CGRect(width: layer.frame.width + (TabCell.borderWidth * 2), height: layer.frame.height + (TabCell.borderWidth * 2))
-        layer.shadowPath = UIBezierPath(roundedRect: shadowPath, cornerRadius: TabTrayControllerUX.cornerRadius+TabCell.borderWidth).cgPath
-    }
-
-    override func prepareForReuse() {
-        // Reset any close animations.
-        backgroundHolder.transform = .identity
-        backgroundHolder.alpha = 1
-        titleLabel.font = DynamicFontHelper.defaultHelper.DefaultSmallFontBold
-        layer.shadowOffset = .zero
-        layer.shadowPath = nil
-        layer.shadowOpacity = 0
-        layer.borderWidth = TabTrayControllerUX.defaultBorderWidth
-    }
-
-    override func accessibilityScroll(_ direction: UIAccessibilityScrollDirection) -> Bool {
-        var right: Bool
-        switch direction {
-        case .left:
-            right = false
-        case .right:
-            right = true
-        default:
-            return false
-        }
-        animator.close(right: right)
-        return true
-    }
-
-    @objc
-    func close() {
-        animator.closeWithoutGesture()
-    }
-    
-    func applyTheme(_ theme: Theme) {
-        styleChildren(theme: theme)
-
-        titleLabel.textColor = .black
-        screenshotView.backgroundColor = theme.colors.home
-        favicon.tintColor = theme.colors.tints.home
-
-        layer.borderColor = theme.colors.border
-            .withAlphaComponent(theme.colors.transparencies.borderAlpha)
-            .cgColor
-    }
-}
-
 protocol TabTrayDelegate: AnyObject {
     func tabTrayDidDismiss(_ tabTray: TabTrayController)
     func tabTrayDidAddTab(_ tabTray: TabTrayController, tab: Tab)
@@ -202,7 +38,7 @@ protocol TabTrayDelegate: AnyObject {
     func tabTrayRequestsPresentationOf(_ viewController: UIViewController)
 }
 
-class TabTrayController: UIViewController, Themeable {
+class TabTrayController: UIViewController {
     let tabManager: TabManager
     let profile: Profile
     weak var delegate: TabTrayDelegate?
@@ -225,10 +61,6 @@ class TabTrayController: UIViewController, Themeable {
             PrivateBrowsingManager.shared.isPrivateBrowsing = privateMode
             tabDataSource.tabs = tabManager.tabsForCurrentMode
             
-            // This is a little tricky since this menu is one of the only places inside of the appliation
-            //  that has a state without gauranteeing a tab exists. Most UI elements should use `theme` or at the least
-            //  the related tab's theme, here this is not possible, so using hardened values 😕😭
-            applyTheme(Theme.of(nil))
             toolbar.privateModeButton.isSelected = privateMode
             collectionView?.reloadData()
             setNeedsStatusBarAppearanceUpdate()
@@ -293,10 +125,12 @@ class TabTrayController: UIViewController, Themeable {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        view.backgroundColor = .braveBackground
         view.accessibilityLabel = Strings.tabTrayAccessibilityLabel
         
         collectionView = UICollectionView(frame: view.frame, collectionViewLayout: UICollectionViewFlowLayout())
         
+        collectionView.backgroundColor = .braveBackground
         collectionView.dataSource = tabDataSource
         collectionView.delegate = tabLayoutDelegate
         collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: UIConstants.bottomToolbarHeight, right: 0)
@@ -334,13 +168,6 @@ class TabTrayController: UIViewController, Themeable {
         NotificationCenter.default.addObserver(self, selector: #selector(appWillResignActiveNotification), name: UIApplication.willResignActiveNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(appDidBecomeActiveNotification), name: UIApplication.didBecomeActiveNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(dynamicFontChanged), name: .dynamicFontChanged, object: nil)
-        
-        /// At this point in time the `UITraitCollection.current` is not correct so the theme
-        /// that `Theme.of(_:)` gets does not get the current theme in automatic-theme mode
-        let oldTraitCollection = UITraitCollection.current
-        UITraitCollection.current = traitCollection
-        applyTheme(Theme.of(tabManager.selectedTab))
-        UITraitCollection.current = oldTraitCollection
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -356,10 +183,6 @@ class TabTrayController: UIViewController, Themeable {
 
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
-        
-        if traitCollection.userInterfaceStyle != previousTraitCollection?.userInterfaceStyle {
-            applyTheme(Theme.of(tabManager.selectedTab))
-        }
 
         // Update the trait collection we reference in our layout delegate
         tabLayoutDelegate.traitCollection = traitCollection
@@ -398,17 +221,6 @@ class TabTrayController: UIViewController, Themeable {
             make.bottom.equalTo(view)
             make.height.equalTo(UIConstants.bottomToolbarHeight)
         }
-    }
-    
-    var themeableChildren: [Themeable?]? {
-        let cells = collectionView?.visibleCells.compactMap({ $0 as? TabCell }) ?? []
-        return [toolbar] + cells
-    }
-    
-    func applyTheme(_ theme: Theme) {
-        styleChildren(theme: theme)
-        view.backgroundColor = theme.colors.home
-        collectionView?.backgroundColor = theme.colors.home
     }
     
     /// Reset the empty private browsing state (hide the details, unhide the learn more button) if it was changed
@@ -836,7 +648,6 @@ fileprivate class TabManagerDataSource: NSObject, UICollectionViewDataSource {
         }
 
         tabCell.screenshotView.image = tab.screenshot
-        tabCell.applyTheme(Theme.of(tab))
         
         return tabCell
     }
@@ -1132,77 +943,5 @@ extension TabTrayController: UIAdaptivePresentationControllerDelegate, UIPopover
     // not as a full-screen modal, which is the default on compact device classes.
     func adaptivePresentationStyle(for controller: UIPresentationController, traitCollection: UITraitCollection) -> UIModalPresentationStyle {
         return .none
-    }
-}
-
-// MARK: - Toolbar
-class TrayToolbar: UIView, Themeable {
-    fileprivate let toolbarButtonSize = CGSize(width: 44, height: 44)
-
-    let addTabButton = UIButton(type: .system).then {
-        $0.setImage(#imageLiteral(resourceName: "add_tab").template, for: .normal)
-        $0.accessibilityLabel = Strings.tabTrayAddTabAccessibilityLabel
-        $0.accessibilityIdentifier = "TabTrayController.addTabButton"
-    }
-    
-    let doneButton = UIButton(type: .system).then {
-        $0.setTitle(Strings.done, for: .normal)
-        $0.titleLabel?.font = TabTrayControllerUX.toolbarFont
-        $0.accessibilityLabel = Strings.done
-        $0.accessibilityIdentifier = "TabTrayController.doneButton"
-    }
-
-    let privateModeButton = PrivateModeButton().then {
-        $0.titleLabel?.font = TabTrayControllerUX.toolbarFont
-        $0.setTitle(Strings.private, for: .normal)
-    }
-    
-    fileprivate let sideOffset: CGFloat = 22
-
-    fileprivate override init(frame: CGRect) {
-        super.init(frame: frame)
-        backgroundColor = .white
-        addSubview(addTabButton)
-        addSubview(doneButton)
-
-        var buttonToCenter: UIButton?
-        buttonToCenter = addTabButton
-        
-        privateModeButton.accessibilityIdentifier = "TabTrayController.maskButton"
-
-        buttonToCenter?.snp.makeConstraints { make in
-            make.centerX.equalTo(self)
-            make.top.equalTo(self)
-            make.size.equalTo(toolbarButtonSize)
-        }
-
-        doneButton.snp.makeConstraints { make in
-            make.centerY.equalTo(safeArea.centerY)
-            make.trailing.equalTo(self).offset(-sideOffset)
-        }
-
-        addSubview(privateModeButton)
-        privateModeButton.snp.makeConstraints { make in
-            make.centerY.equalTo(safeArea.centerY)
-            make.leading.equalTo(self).offset(sideOffset)
-        }
-    }
-
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    var themeableChildren: [Themeable?]? {
-        return [privateModeButton]
-    }
-
-    func applyTheme(_ theme: Theme) {
-        styleChildren(theme: theme)
-        
-        backgroundColor = theme.colors.home
-        
-        addTabButton.tintColor = theme.colors.tints.footer
-        doneButton.tintColor = addTabButton.tintColor
-        
     }
 }
