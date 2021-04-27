@@ -83,7 +83,7 @@ class PopupView: UIView, UIGestureRecognizerDelegate {
     let kPopupDialogButtonHeight: CGFloat = 50.0
     let kPopupDialogMaxWidth: CGFloat = 390.0
     
-    fileprivate let kPopupBackgroundAlpha: CGFloat = 0.6
+    fileprivate let kPopupBackgroundAlpha: CGFloat = 0.4
     fileprivate let kPopupBackgroundDismissTouchDuration: Double = 0.005
     fileprivate let kPopupDialogShakeAngle: CGFloat = 0.2
     fileprivate let kPopupDialogCornerRadius: CGFloat = 12.0
@@ -140,7 +140,7 @@ class PopupView: UIView, UIGestureRecognizerDelegate {
         
         overlayView = UIView(frame: bounds)
         overlayView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        overlayView.backgroundColor = BraveUX.greyJ
+        overlayView.backgroundColor = .black
         overlayView.alpha = kPopupBackgroundAlpha
         overlayView.addGestureRecognizer(touchRecognizer)
         addSubview(overlayView)
@@ -199,6 +199,7 @@ class PopupView: UIView, UIGestureRecognizerDelegate {
                     button!.titleLabel!.font = buttonData.font
                     button!.titleLabel!.adjustsFontSizeToFitWidth = true
                     button!.layer.cornerRadius = buttonFrame.height / 2.0 // kPopupDialogButtonRadius
+                    button!.layer.cornerCurve = .continuous
                     button!.backgroundColor = buttonData.type.backgroundColor
                     button!.setTitle(buttonData.title, for: .normal)
                     button!.setTitleColor(buttonData.type.titleColor, for: .normal)

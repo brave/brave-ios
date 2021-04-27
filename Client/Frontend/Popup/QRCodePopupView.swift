@@ -15,7 +15,7 @@ class QRCodePopupView: PopupView {
     
     private let title = UILabel().then {
         $0.text = Strings.themeQRCodeShareTitle
-        $0.textColor = .black
+        $0.textColor = .bravePrimary
         $0.setContentHuggingPriority(.defaultHigh, for: .vertical)
         $0.font = UIFont.systemFont(ofSize: 16, weight: .medium)
     }
@@ -37,7 +37,7 @@ class QRCodePopupView: PopupView {
     private let shareButton = RoundInterfaceButton(type: .system).then {
         $0.setTitle(Strings.themeQRCodeShareButton, for: .normal)
         $0.setContentHuggingPriority(.defaultHigh, for: .vertical)
-        $0.layer.borderColor = UIColor.orange.cgColor
+        $0.layer.borderColor = UIColor.braveOrange.cgColor
         $0.layer.borderWidth = 1
         $0.snp.makeConstraints { $0.height.equalTo(44) }
         $0.tintColor = UIColor.braveOrange
@@ -49,7 +49,7 @@ class QRCodePopupView: PopupView {
     
     private let closeButton = UIButton().then {
         $0.setImage(#imageLiteral(resourceName: "close_popup").template, for: .normal)
-        $0.tintColor = .lightGray
+        $0.tintColor = .braveLabel
     }
     
     init(url: URL) {
