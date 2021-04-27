@@ -10,6 +10,7 @@ class PrivateModeButton: InsetButton {
         didSet {
             accessibilityValue = isSelected ? Strings.tabPrivateModeToggleAccessibilityValueOn : Strings.tabPrivateModeToggleAccessibilityValueOff
             backgroundColor = isSelected ? selectedBackgroundColor : .clear
+            setTitleColor(isSelected ? .white : .braveLabel, for: .normal)
         }
     }
     

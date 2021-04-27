@@ -63,7 +63,6 @@ class TabTrayController: UIViewController {
             
             toolbar.privateModeButton.isSelected = privateMode
             collectionView?.reloadData()
-            setNeedsStatusBarAppearanceUpdate()
         }
     }
 
@@ -202,10 +201,6 @@ class TabTrayController: UIViewController {
         coordinator.animate(alongsideTransition: { _ in
             self.collectionView.collectionViewLayout.invalidateLayout()
         }, completion: nil)
-    }
-
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        return privateMode ? .lightContent : .default
     }
 
     fileprivate func makeConstraints() {
@@ -788,9 +783,9 @@ fileprivate class TabLayoutDelegate: NSObject, UICollectionViewDelegateFlowLayou
 }
 
 private struct EmptyPrivateTabsViewUX {
-    static let titleColor = UIColor.Photon.grey10
+    static let titleColor = UIColor.braveLabel
     static let titleFont = UIFont.systemFont(ofSize: 20, weight: .semibold)
-    static let descriptionColor = UIColor.Photon.grey20
+    static let descriptionColor = UIColor.secondaryBraveLabel
     static let descriptionFont = UIFont.systemFont(ofSize: 14)
     static let learnMoreFont = UIFont.systemFont(ofSize: 17, weight: .medium)
     static let textMargin: CGFloat = 40
@@ -835,15 +830,16 @@ fileprivate class EmptyPrivateTabsView: UIView {
 
     let learnMoreButton = UIButton(type: .system).then {
         $0.setTitle(Strings.privateTabLink, for: [])
-        $0.setTitleColor(UIColor.Photon.purple60, for: [])
+        $0.setTitleColor(.braveOrange, for: [])
         $0.titleLabel?.font = EmptyPrivateTabsViewUX.learnMoreFont
         $0.titleLabel?.numberOfLines = 0
     }
 
-    let iconImageView = UIImageView(image: #imageLiteral(resourceName: "private_glasses")).then {
+    let iconImageView = UIImageView(image: #imageLiteral(resourceName: "private_glasses").template).then {
         $0.contentMode = .center
         $0.setContentHuggingPriority(.required, for: .vertical)
         $0.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
+        $0.tintColor = .braveLabel
     }
 
     override init(frame: CGRect) {
