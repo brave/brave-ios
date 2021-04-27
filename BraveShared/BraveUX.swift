@@ -12,7 +12,6 @@ public struct BraveUX {
     public static let braveTermsOfUseURL = URL(string: "https://www.brave.com/terms_of_use")!
     public static let ntpTutorialPageURL = URL(string: "https://brave.com/ja/ntp-tutorial")
     
-    public static let greyD = UIColor(rgb: 0xCDD1D5)
     public static let greyE = UIColor(rgb: 0xA7ACB2)
     public static let greyG = UIColor(rgb: 0x818589)
     public static let greyH = UIColor(rgb: 0x606467)
