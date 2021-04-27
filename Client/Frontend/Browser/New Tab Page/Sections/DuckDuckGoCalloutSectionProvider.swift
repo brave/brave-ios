@@ -8,7 +8,7 @@ import BraveUI
 import Shared
 import BraveShared
 
-private class DuckDuckGoCalloutButton: SpringButton, Themeable {
+private class DuckDuckGoCalloutButton: SpringButton {
     fileprivate struct UX {
         static let logoSize = CGSize(width: 38, height: 38)
         static let padding = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 20)

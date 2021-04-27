@@ -150,7 +150,7 @@ class NewTabPageBackgroundButtonsView: UIView, PreferencesObserver {
 }
 
 extension NewTabPageBackgroundButtonsView {
-    private class ImageCreditButton: SpringButton, Themeable {
+    private class ImageCreditButton: SpringButton {
         private let backgroundView = UIVisualEffectView(effect: UIBlurEffect(style: .light)).then {
             $0.clipsToBounds = true
             $0.isUserInteractionEnabled = false

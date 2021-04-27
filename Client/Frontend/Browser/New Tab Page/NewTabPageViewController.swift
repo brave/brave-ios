@@ -81,7 +81,7 @@ protocol NewTabPageDelegate: AnyObject {
 
 /// The new tab page. Shows users a variety of information, including stats and
 /// favourites
-class NewTabPageViewController: UIViewController, Themeable {
+class NewTabPageViewController: UIViewController {
     weak var delegate: NewTabPageDelegate?
     
     /// The modules to show on the new tab page
@@ -152,7 +152,6 @@ class NewTabPageViewController: UIViewController, Themeable {
         
         collectionView.delegate = self
         collectionView.dataSource = self
-        applyTheme(Theme.of(tab))
         
         background.changed = { [weak self] in
             self?.setupBackgroundImage()
@@ -232,24 +231,6 @@ class NewTabPageViewController: UIViewController, Themeable {
         // to use it.
         backgroundView.layoutIfNeeded()
         calculateBackgroundCenterPoints()
-    }
-    
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        
-        if UITraitCollection.current.userInterfaceStyle != previousTraitCollection?.userInterfaceStyle {
-            // Reload UI
-            applyTheme(Theme.of(tab))
-        }
-    }
-    
-    var themeableChildren: [Themeable?]? {
-        [backgroundView]
-    }
-    
-    func applyTheme(_ theme: Theme) {
-        styleChildren(theme: theme)
-        collectionView.reloadData()
     }
     
     override func viewDidAppear(_ animated: Bool) {

@@ -32,35 +32,28 @@ class StatsSectionProvider: NSObject, NTPSectionProvider {
     }
 }
 
-class BraveShieldStatsView: UIView, Themeable {
-    func applyTheme(_ theme: Theme) {
-        styleChildren(theme: theme)
-        
-        let colors = theme.colors.stats
-        adsStatView.color = colors.ads
-        dataSavedStatView.color = colors.dataSaved
-        timeStatView.color = colors.timeSaved
-        
-    }
-    
+class BraveShieldStatsView: UIView {
     fileprivate let millisecondsPerItem = 50
     fileprivate let bytesPerItem = 30485
     
     private lazy var adsStatView: StatView = {
         let statView = StatView(frame: CGRect.zero)
         statView.title = Strings.shieldsAdAndTrackerStats.capitalized
+        statView.color = .statsAdsBlockedTint
         return statView
     }()
     
     private lazy var dataSavedStatView: StatView = {
         let statView = StatView(frame: .zero)
         statView.title = Strings.dataSavedStat
+        statView.color = .statsDataSavedTint
         return statView
     }()
     
     private lazy var timeStatView: StatView = {
         let statView = StatView(frame: .zero)
         statView.title = Strings.shieldsTimeStats
+        statView.color = .statsTimeSavedTint
         return statView
     }()
     

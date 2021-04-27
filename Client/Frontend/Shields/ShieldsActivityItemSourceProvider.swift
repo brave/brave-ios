@@ -28,9 +28,7 @@ final class ShieldsActivityItemSourceProvider {
         
         let statsView = UIView(frame: CGRect(size: backgroundImage.size)).then {
             let backgroundImageView = UIImageView(image: backgroundImage)
-            let statsInfoView = BraveShieldStatsView().then {
-                $0.applyTheme(theme)
-            }
+            let statsInfoView = BraveShieldStatsView()
             
             $0.addSubview(backgroundImageView)
             $0.addSubview(statsInfoView)

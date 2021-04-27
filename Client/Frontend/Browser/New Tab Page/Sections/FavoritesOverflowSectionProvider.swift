@@ -11,7 +11,7 @@ import Shared
 
 private let log = Logger.browserLogger
 
-class FavoritesOverflowButton: SpringButton, Themeable {
+class FavoritesOverflowButton: SpringButton {
     private let backgroundView = UIVisualEffectView(effect: UIBlurEffect(style: .light)).then {
         $0.clipsToBounds = true
         $0.isUserInteractionEnabled = false

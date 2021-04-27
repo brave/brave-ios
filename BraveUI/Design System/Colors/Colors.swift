@@ -50,6 +50,8 @@ enum DesignSystemColor: String {
 
 final private class Brave { }
 
+// MARK: - Design System Colors
+
 extension UIColor {
   public static var braveBackground: UIColor {
     DesignSystemColor.background02.color
@@ -99,12 +101,25 @@ extension UIColor {
   public static var braveSuccessLabel: UIColor {
     DesignSystemColor.successText.color
   }
+  public static var braveSuccessBackground: UIColor {
+    DesignSystemColor.successBackground.color
+  }
 }
+
+// MARK: - Static Colors
 
 extension UIColor {
   public static var privateModeBackground: UIColor {
-    // Static!
-    UIColor(hex: 0x2C2153)
+    .init(hex: 0x2C2153)
+  }
+  public static var statsAdsBlockedTint: UIColor {
+    .init(hex: 0xFB542B)
+  }
+  public static var statsDataSavedTint: UIColor {
+    .init(hex: 0xA0A5EB)
+  }
+  public static var statsTimeSavedTint: UIColor {
+    .white
   }
 }
 
