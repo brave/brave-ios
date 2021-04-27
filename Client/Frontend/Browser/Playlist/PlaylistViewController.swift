@@ -35,6 +35,8 @@ class PlaylistViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        overrideUserInterfaceStyle = .dark
+        
         splitController.do {
             $0.viewControllers = [SettingsNavigationController(rootViewController: listController),
                                   SettingsNavigationController(rootViewController: detailController)]

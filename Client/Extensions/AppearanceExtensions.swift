@@ -67,21 +67,5 @@ extension AppDelegate {
             .textColor = .braveLabel
         
         UITextField.appearance().textColor = UIColor.braveLabel
-        
-        // Sync items
-//
-//        SyncDeviceTypeButton.appearance().backgroundColor = .braveBackground
-        
-//        UIButton.appearance(
-//            whenContainedInInstancesOf: [SyncViewController.self]
-//        ).setTitleColor(.braveLabel, for: .normal)
-        
-//        // Search
-//        UIView.appearance(whenContainedInInstancesOf: [SearchViewController.self])
-//            .backgroundColor = .braveBackground
-//        InsetButton.appearance(whenContainedInInstancesOf: [SearchViewController.self])
-//            .backgroundColor = .clear
-//        InsetButton.appearance(whenContainedInInstancesOf: [SearchSuggestionPromptView.self])
-//            .setTitleColor(.braveLabel, for: .normal)
     }
 }
