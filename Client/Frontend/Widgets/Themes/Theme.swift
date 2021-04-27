@@ -6,26 +6,6 @@ import Foundation
 import BraveShared
 import Shared
 
-protocol Themeable {
-    
-    var themeableChildren: [Themeable?]? { get }
-    
-    // This method should _always_ call `styleChildren`, regardless of `themableChildren` value.
-    func applyTheme(_ theme: Theme)
-}
-
-extension Themeable {
-    var themeableChildren: [Themeable?]? { return nil }
-    
-    func applyTheme(_ theme: Theme) {
-        styleChildren(theme: theme)
-    }
-    
-    func styleChildren(theme: Theme) {
-        self.themeableChildren?.forEach { $0?.applyTheme(theme) }
-    }
-}
-
 class Theme: Equatable, Decodable {
     
     enum DefaultTheme: String, RepresentableOptionType {

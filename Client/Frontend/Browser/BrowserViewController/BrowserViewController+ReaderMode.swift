@@ -93,13 +93,6 @@ extension BrowserViewController: ReaderModeBarViewDelegate {
 
 extension BrowserViewController {
     
-    func updateReaderModeBar() {
-        if let readerModeBar = readerModeBar {
-            let theme = Theme.of(tabManager.selectedTab)
-            readerModeBar.applyTheme(theme)
-        }
-    }
-
     func showReaderModeBar(animated: Bool) {
         if self.readerModeBar == nil {
             let readerModeBar = ReaderModeBarView(frame: CGRect.zero)
@@ -113,8 +106,6 @@ extension BrowserViewController {
                 make.leading.trailing.equalTo(self.view)
             }
         }
-
-        updateReaderModeBar()
 
         updateViewConstraints()
     }

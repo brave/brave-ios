@@ -839,11 +839,7 @@ extension NewTabPageViewController: UICollectionViewDataSource {
         sections[section].collectionView(collectionView, numberOfItemsInSection: section)
     }
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = sections[indexPath.section].collectionView(collectionView, cellForItemAt: indexPath)
-        if let themableCell = cell as? Themeable {
-            themableCell.applyTheme(Theme.of(tab))
-        }
-        return cell
+        sections[indexPath.section].collectionView(collectionView, cellForItemAt: indexPath)
     }
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         sections[indexPath.section].collectionView?(collectionView, viewForSupplementaryElementOfKind: kind, at: indexPath) ?? UICollectionReusableView()

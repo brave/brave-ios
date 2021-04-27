@@ -40,14 +40,10 @@ class ReaderModeBarView: UIView {
 
     var settingsButton: UIButton!
 
-    @objc dynamic var buttonTintColor: UIColor = UIColor.clear {
-        didSet {
-            settingsButton.tintColor = self.buttonTintColor
-        }
-    }
-
     override init(frame: CGRect) {
         super.init(frame: frame)
+        
+        backgroundColor = .secondaryBraveBackground
 
         settingsButton = createButton(.settings, action: #selector(tappedSettingsButton))
         settingsButton.accessibilityIdentifier = "ReaderModeBarView.settingsButton"
@@ -55,6 +51,7 @@ class ReaderModeBarView: UIView {
             make.height.centerX.centerY.equalTo(self)
             make.width.equalTo(80)
         }
+        settingsButton.tintColor = .braveLabel
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -83,15 +80,5 @@ class ReaderModeBarView: UIView {
 
     @objc func tappedSettingsButton(_ sender: UIButton!) {
         delegate?.readerModeBar(self, didSelectButton: .settings)
-    }
-}
-
-extension ReaderModeBarView: Themeable {
-
-    func applyTheme(_ theme: Theme) {
-        styleChildren(theme: theme)
-        
-        backgroundColor = theme.colors.home
-        buttonTintColor = theme.colors.tints.home
     }
 }

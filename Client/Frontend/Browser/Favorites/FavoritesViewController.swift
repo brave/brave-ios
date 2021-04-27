@@ -30,7 +30,7 @@ private class FavoritesHeaderView: UICollectionReusableView {
     }
 }
 
-class FavoritesViewController: UIViewController, Themeable {
+class FavoritesViewController: UIViewController {
     
     var action: (Favorite, BookmarksAction) -> Void
     

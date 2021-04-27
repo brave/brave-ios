@@ -10,7 +10,7 @@ import BraveUI
 
 private let log = Logger.browserLogger
 
-class DefaultBrowserIntroCalloutViewController: UIViewController, Themeable {
+class DefaultBrowserIntroCalloutViewController: UIViewController {
     
     private let openSettingsButton = Button(type: .system).then {
         $0.setTitle(Strings.DefaultBrowserCallout.introOpenSettingsButtonText, for: .normal)

@@ -5,7 +5,7 @@
 import UIKit
 import Shared
 
-class PrivateModeButton: InsetButton, Themeable {
+class PrivateModeButton: InsetButton {
     override var isSelected: Bool {
         didSet {
             accessibilityValue = isSelected ? Strings.tabPrivateModeToggleAccessibilityValueOn : Strings.tabPrivateModeToggleAccessibilityValueOff
