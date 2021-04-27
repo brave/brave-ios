@@ -1774,9 +1774,7 @@ class BrowserViewController: UIViewController {
             guard let item = self.openInPlaylistActivityItem?.item else { return }
             
             // Update playlist with new items..
-            self.openInPlaylist(item: item) { [weak self]  in
-                guard let self = self else { return }
-                
+            self.openInPlaylist(item: item) {
                 log.debug("Playlist Item Opened")
                 UIImpactFeedbackGenerator(style: .medium).bzzt()
                 
