@@ -269,6 +269,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         // but then keyboard may misalign with Brave selected theme override
         
         UIScrollView.doBadSwizzleStuff()
+        applyAppearanceDefaults()
         
         window!.tintColor = .braveOrange
         window!.makeKeyAndVisible()
