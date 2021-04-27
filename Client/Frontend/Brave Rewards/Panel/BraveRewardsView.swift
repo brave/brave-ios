@@ -19,6 +19,7 @@ extension BraveRewardsViewController {
         }
         let rewardsToggle = UISwitch().then {
             $0.setContentHuggingPriority(.required, for: .horizontal)
+            $0.onTintColor = .braveOrange
         }
         private let titleLabel = UILabel().then {
             $0.text = Strings.braveRewardsTitle

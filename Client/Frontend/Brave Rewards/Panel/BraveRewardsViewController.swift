@@ -12,7 +12,7 @@ import Combine
 
 private let log = Logger.rewardsLogger
 
-class BraveRewardsViewController: UIViewController, Themeable, PopoverContentComponent {
+class BraveRewardsViewController: UIViewController, PopoverContentComponent {
     enum Action {
         case rewardsTransferTapped
         case unverifiedPublisherLearnMoreTapped
@@ -78,15 +78,6 @@ class BraveRewardsViewController: UIViewController, Themeable, PopoverContentCom
     
     override func loadView() {
         view = BraveRewardsView()
-        applyTheme(Theme.of(nil))
-    }
-    
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        
-        if traitCollection.userInterfaceStyle != previousTraitCollection?.userInterfaceStyle {
-            applyTheme(Theme.of(nil))
-        }
     }
     
     private func reloadData() {

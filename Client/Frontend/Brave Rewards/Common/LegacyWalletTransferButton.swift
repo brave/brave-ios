@@ -7,7 +7,7 @@ import Foundation
 import BraveUI
 import Shared
 
-class LegacyWalletTransferButton: UIControl, Themeable {
+class LegacyWalletTransferButton: UIControl {
     
     let dismissButton = Button(type: .system).then {
         $0.setImage(UIImage(imageLiteralResourceName: "close-medium").template, for: .normal)
