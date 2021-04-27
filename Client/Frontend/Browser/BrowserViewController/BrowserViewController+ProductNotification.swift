@@ -133,7 +133,7 @@ extension BrowserViewController {
     }
     
     private func notifyFirstTimeBlock(theme: Theme) {
-        let shareTrackersViewController = ShareTrackersController(theme: theme, trackingType: .trackerAdWarning)
+        let shareTrackersViewController = ShareTrackersController(trackingType: .trackerAdWarning)
         
         shareTrackersViewController.actionHandler = { [weak self] action in
             guard let self = self, action == .takeALookTapped else { return }
@@ -145,20 +145,20 @@ extension BrowserViewController {
     }
     
     private func notifyVideoAdsBlocked(theme: Theme) {
-        let shareTrackersViewController = ShareTrackersController(theme: theme, trackingType: .videoAdBlock)
+        let shareTrackersViewController = ShareTrackersController(trackingType: .videoAdBlock)
         
         dismiss(animated: true)
         showBenchmarkNotificationPopover(controller: shareTrackersViewController)
     }
     
     private func notifyPrivacyProtectBlock(theme: Theme) {
-        let shareTrackersViewController = ShareTrackersController(theme: theme, trackingType: .trackerAdCountBlock(count: benchmarkNumberOfTrackers))
+        let shareTrackersViewController = ShareTrackersController(trackingType: .trackerAdCountBlock(count: benchmarkNumberOfTrackers))
         dismiss(animated: true)
         showBenchmarkNotificationPopover(controller: shareTrackersViewController)
     }
     
     private func notifyTrackerAdsCount(_ count: Int, description: String, theme: Theme) {
-        let shareTrackersViewController = ShareTrackersController(theme: theme, trackingType: .trackerCountShare(count: count, description: description))
+        let shareTrackersViewController = ShareTrackersController(trackingType: .trackerCountShare(count: count, description: description))
         dismiss(animated: true)
 
         shareTrackersViewController.actionHandler = { [weak self] action in
@@ -189,7 +189,7 @@ extension BrowserViewController {
     func showShareScreen(with theme: Theme) {
         dismiss(animated: true) {
             let globalShieldsActivityController =
-                ShieldsActivityItemSourceProvider.shared.setupGlobalShieldsActivityController(theme: theme)
+                ShieldsActivityItemSourceProvider.shared.setupGlobalShieldsActivityController()
             globalShieldsActivityController.popoverPresentationController?.sourceView = self.view
     
             self.present(globalShieldsActivityController, animated: true, completion: nil)

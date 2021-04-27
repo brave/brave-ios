@@ -77,6 +77,9 @@ extension UIColor {
   public static var secondaryBraveLabel: UIColor {
     DesignSystemColor.text03.color
   }
+  public static var bravePrimary: UIColor {
+    DesignSystemColor.text01.color
+  }
   public static var braveOrange: UIColor {
     DesignSystemColor.interactive02.color
   }
