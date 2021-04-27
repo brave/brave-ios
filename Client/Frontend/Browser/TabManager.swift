@@ -1073,10 +1073,10 @@ class TabManagerNavDelegate: NSObject, WKNavigationDelegate {
             })
         }
 
-        if res == .allow, let appDelegate = UIApplication.shared.delegate as? AppDelegate {
-            let tab = appDelegate.browserViewController.tabManager[webView]
-            tab?.mimeType = navigationResponse.response.mimeType
-        }
+//        if res == .allow, let appDelegate = UIApplication.shared.delegate as? AppDelegate {
+//            let tab = appDelegate.browserViewController.tabManager[webView]
+//            tab?.mimeType = navigationResponse.response.mimeType
+//        }
 
         decisionHandler(res)
     }

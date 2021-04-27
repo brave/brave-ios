@@ -32,8 +32,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
     var rootViewController: UIViewController!
     var playlistRestorationController: UIViewController? // When Picture-In-Picture is enabled, we need to store a reference to the controller to keep it alive, otherwise if it deallocates, the system automatically kills Picture-In-Picture.
     weak var profile: Profile?
-    var tabManager: TabManager!
     var braveCore: BraveCoreMain?
+    var imageStore: DiskImageStore?
 
     weak var application: UIApplication?
     var launchOptions: [AnyHashable: Any]?
@@ -113,7 +113,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         
         setUpWebServer(profile)
         
-        var imageStore: DiskImageStore?
+        
         do {
             imageStore = try DiskImageStore(files: profile.files, namespace: "TabManagerScreenshots", quality: UIConstants.screenshotQuality)
         } catch {
@@ -142,8 +142,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         }
         #endif
 
-        self.tabManager = TabManager(prefs: profile.prefs, imageStore: imageStore)
-
         // Make sure current private browsing flag respects the private browsing only user preference
         PrivateBrowsingManager.shared.isPrivateBrowsing = Preferences.Privacy.privateBrowsingOnly.value
         
@@ -151,27 +149,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         // the simulator via Xcode will count as a "crash" and lead to restore popups in the subsequent launch
         let crashedLastSession = !Preferences.AppState.backgroundedCleanly.value && AppConstants.buildChannel != .debug
         Preferences.AppState.backgroundedCleanly.value = false
-        browserViewController = BrowserViewController(profile: self.profile!, tabManager: self.tabManager, crashedLastSession: crashedLastSession)
-        browserViewController.edgesForExtendedLayout = []
-
-        // Add restoration class, the factory that will return the ViewController we will restore with.
-        browserViewController.restorationIdentifier = NSStringFromClass(BrowserViewController.self)
-        browserViewController.restorationClass = AppDelegate.self
-
-        let navigationController = UINavigationController(rootViewController: browserViewController)
-        navigationController.delegate = self
-        navigationController.isNavigationBarHidden = true
-        navigationController.edgesForExtendedLayout = UIRectEdge(rawValue: 0)
-        rootViewController = navigationController
-
-        self.window!.rootViewController = rootViewController
 
         self.updateAuthenticationInfo()
         SystemUtils.onFirstRun()
         
         // Schedule Brave Core Priority Tasks
         self.braveCore?.scheduleLowPriorityStartupTasks()
-        browserViewController.removeScheduledAdGrantReminders()
+        //browserViewController.removeScheduledAdGrantReminders()
 
         log.info("startApplication end")
         return true
@@ -183,7 +167,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
 
         // Allow deinitializers to close our database connections.
         self.profile = nil
-        self.tabManager = nil
         self.browserViewController = nil
         self.rootViewController = nil
         SKPaymentQueue.default().remove(iapObserver)
@@ -284,8 +267,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
             Preferences.VPN.appLaunchCountForVPNPopup.value += 1
         }
         
-        browserViewController.shouldShowIntroScreen =
-            DefaultBrowserIntroManager.prepareAndShowIfNeeded(isNewUser: isFirstLaunch)
+        //browserViewController.shouldShowIntroScreen =
+          //  DefaultBrowserIntroManager.prepareAndShowIfNeeded(isNewUser: isFirstLaunch)
         
         // Search engine setup must be checked outside of 'firstLaunch' loop because of #2770.
         // There was a bug that when you skipped onboarding, default search engine preference
@@ -360,18 +343,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
                     
                     Preferences.NewTabPage.superReferrerThemeRetryDeadline.value = retryDeadline
                     
-                    self.browserViewController.backgroundDataSource
-                        .fetchSpecificResource(.superReferral(code: code))
+                    //self.browserViewController.backgroundDataSource
+                      //  .fetchSpecificResource(.superReferral(code: code))
                 } else {
-                    self.browserViewController.backgroundDataSource.startFetching()
+                    //self.browserViewController.backgroundDataSource.startFetching()
                 }
                 
                 guard let url = offerUrl?.asURL else { return }
-                self.browserViewController.openReferralLink(url: url)
+                //self.browserViewController.openReferralLink(url: url)
             }
         } else {
             urp.pingIfEnoughTimePassed()
-            browserViewController.backgroundDataSource.startFetching()
+            //browserViewController.backgroundDataSource.startFetching()
         }
     }
 
@@ -379,17 +362,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         guard let routerpath = NavigationPath(url: url) else {
             return false
         }
-        self.browserViewController.handleNavigationPath(path: routerpath)
+        //self.browserViewController.handleNavigationPath(path: routerpath)
         return true
     }
     
-    func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
-        if let presentedViewController = rootViewController.presentedViewController {
-            return presentedViewController.supportedInterfaceOrientations
-        } else {
-            return rootViewController.supportedInterfaceOrientations
-        }
-    }
+//    func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
+//        if let presentedViewController = rootViewController.presentedViewController {
+//            return presentedViewController.supportedInterfaceOrientations
+//        } else {
+//            return rootViewController.supportedInterfaceOrientations
+//        }
+//    }
 
     // We sync in the foreground only, to avoid the possibility of runaway resource usage.
     // Eventually we'll sync in response to notifications.
@@ -410,12 +393,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
 
         // handle quick actions is available
         let quickActions = QuickActions.sharedInstance
-        if let shortcut = quickActions.launchedShortcutItem {
-            // dispatch asynchronously so that BVC is all set up for handling new tabs
-            // when we try and open them
-            quickActions.handleShortCutItem(shortcut, withBrowserViewController: browserViewController)
-            quickActions.launchedShortcutItem = nil
-        }
+//        if let shortcut = quickActions.launchedShortcutItem {
+//            // dispatch asynchronously so that BVC is all set up for handling new tabs
+//            // when we try and open them
+//            quickActions.handleShortCutItem(shortcut, withBrowserViewController: browserViewController)
+//            quickActions.launchedShortcutItem = nil
+//        }
         
         // We try to send DAU ping each time the app goes to foreground to work around network edge cases
         // (offline, bad connection etc.).
@@ -585,6 +568,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         let handledShortCutItem = QuickActions.sharedInstance.handleShortCutItem(shortcutItem, withBrowserViewController: browserViewController)
 
         completionHandler(handledShortCutItem)
+    }
+    
+    func application(_ application: UIApplication,
+                     configurationForConnecting connectingSceneSession: UISceneSession,
+                     options: UIScene.ConnectionOptions) -> UISceneConfiguration {
+        
+         UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
+    }
+    
+    func application(_ application: UIApplication, didDiscardSceneSessions sceneSessions: Set<UISceneSession>) {
+        
     }
 }
 

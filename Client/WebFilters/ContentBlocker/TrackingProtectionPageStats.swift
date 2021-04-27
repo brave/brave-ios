@@ -72,6 +72,9 @@ class TPStatsBlocklistChecker {
             deferred.fill(nil)
             return deferred
         }
+        
+        // TODO: Fix!
+        return deferred
         let currentTabUrl = delegate.browserViewController.tabManager.selectedTab?.url
         
         adblockSerialQueue.async {
