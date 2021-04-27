@@ -306,7 +306,7 @@ extension BraveCoreMigrator {
             return false
         }
 
-        let historyNode = HistoryNode(title: title, guid: nil, url: url, dateAdded: dateAdded)
+        let historyNode = HistoryNode(url: url, title: title, dateAdded: dateAdded)
         historyAPI.addHistory(historyNode)
         
         return true

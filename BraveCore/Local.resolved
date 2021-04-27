@@ -1,0 +1,8 @@
+REMINDER: Your local brave-core-ios dependency has been overwritten in node_modules. Re-run bootstrap.sh when you are done testing.  
+
+build: Debug
+brave-browser: 1.23.x (77c504a6b4e661e9140d3a7d2a63706b8b659981)
+brave-core: ios/sync/history (90f24d51b381878a4c967cff1d5245481e0f6fd7)
+  latest tag: v1.23.76
+
+DO NOT COMMIT THIS FILE

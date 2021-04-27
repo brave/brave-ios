@@ -11,30 +11,6 @@ private func getDate(_ dayOffset: Int) -> Date {
     return (calendar as NSCalendar).date(byAdding: NSCalendar.Unit.day, value: dayOffset, to: today, options: [])!
 }
 
-private var ignoredSchemes = ["about"]
-
-public func isIgnoredURL(_ url: URL) -> Bool {
-    guard let scheme = url.scheme else { return false }
-
-    if let _ = ignoredSchemes.firstIndex(of: scheme) {
-        return true
-    }
-
-    if url.host == "localhost" {
-        return true
-    }
-
-    return false
-}
-
-public func isIgnoredURL(_ url: String) -> Bool {
-    if let url = URL(string: url) {
-        return isIgnoredURL(url)
-    }
-
-    return false
-}
-
 public final class History: NSManagedObject, WebsitePresentable, CRUD {
 
     @NSManaged public var title: String?
