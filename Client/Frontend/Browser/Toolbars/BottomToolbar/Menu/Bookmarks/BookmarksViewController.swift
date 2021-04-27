@@ -376,7 +376,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
             cell.textLabel?.font = UIFont.systemFont(ofSize: fontSize)
             cell.accessoryType = .none
         } else {
-            configCell(image: #imageLiteral(resourceName: "bookmarks_folder_hollow"))
+            configCell(image: #imageLiteral(resourceName: "bookmarks_folder_hollow").withTintColor(.braveLabel))
             cell.textLabel?.font = UIFont.boldSystemFont(ofSize: fontSize)
             cell.accessoryType = .disclosureIndicator
             if let twoLineCell = cell as? TwoLineTableViewCell {
