@@ -66,7 +66,6 @@ extension AppDelegate {
         UILabel.appearance(whenContainedInInstancesOf: [UICollectionReusableView.self])
             .textColor = .braveLabel
         
-//        AddEditHeaderView.appearance().backgroundColor = tableSecondaryColor
         UITextField.appearance().textColor = UIColor.braveLabel
         
         // Sync items
