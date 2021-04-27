@@ -265,6 +265,9 @@ class TabManager: NSObject {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate,
             let newSelectedTab = tab, let previousTab = previous, let newTabUrl = newSelectedTab.url, let previousTabUrl = previousTab.url else { return }
         
+        // TODO: FIX FIX
+        return
+        
         let rewards = appDelegate.browserViewController.rewards
         
         if !PrivateBrowsingManager.shared.isPrivateBrowsing {
