@@ -106,7 +106,7 @@ extension InstallVPNViewController {
         let contactSupportButton = Button(type: .system).then {
             $0.setTitle(Strings.VPN.settingsContactSupport, for: .normal)
             $0.titleLabel?.font = .systemFont(ofSize: 16)
-            $0.titleLabel?.textColor = BraveUX.greyH
+            $0.titleLabel?.textColor = .braveLabel
             $0.snp.makeConstraints { make in
                 make.height.equalTo(44)
             }

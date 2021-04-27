@@ -110,6 +110,9 @@ extension UIColor {
   public static var braveDisabled: UIColor {
     DesignSystemColor.disabled.color
   }
+  public static var secondaryButtonTint: UIColor {
+    DesignSystemColor.interactive08.color
+  }
 }
 
 // MARK: - Static Colors

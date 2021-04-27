@@ -152,7 +152,7 @@ class BraveShieldStatsView: UIView {
 }
 
 private class StatView: UIView {
-    var color: UIColor = BraveUX.greyJ {
+    var color: UIColor = .braveLabel {
         didSet {
             statLabel.textColor = color
         }

@@ -59,7 +59,7 @@ class PopupView: UIView, UIGestureRecognizerDelegate {
             case .primary:
                 return .braveBlurple
             case .secondary:
-                return BraveUX.greyE
+                return .secondaryButtonTint
             case .destructive:
                 return .braveErrorLabel
             case .link:

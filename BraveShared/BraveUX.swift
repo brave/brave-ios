@@ -12,11 +12,6 @@ public struct BraveUX {
     public static let braveTermsOfUseURL = URL(string: "https://www.brave.com/terms_of_use")!
     public static let ntpTutorialPageURL = URL(string: "https://brave.com/ja/ntp-tutorial")
     
-    public static let greyE = UIColor(rgb: 0xA7ACB2)
-    public static let greyG = UIColor(rgb: 0x818589)
-    public static let greyH = UIColor(rgb: 0x606467)
-    public static let greyJ = UIColor(rgb: 0x222326)
-    
     public static let textFieldCornerRadius: CGFloat = 8.0
     
     public static let faviconBorderColor = UIColor(white: 0, alpha: 0.2)
