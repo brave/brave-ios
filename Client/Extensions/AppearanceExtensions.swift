@@ -69,9 +69,6 @@ extension AppDelegate {
         UITextField.appearance().textColor = UIColor.braveLabel
         
         // Sync items
-//        SyncViewController.SyncView.appearance(
-//            whenContainedInInstancesOf: [UINavigationController.self]
-//        ).backgroundColor = .braveBackground
 //
 //        SyncDeviceTypeButton.appearance().backgroundColor = .braveBackground
         

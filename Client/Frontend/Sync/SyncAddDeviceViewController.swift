@@ -140,11 +140,13 @@ class SyncAddDeviceViewController: SyncViewController {
         titleLabel = UILabel()
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.font = UIFont.systemFont(ofSize: 20, weight: UIFont.Weight.semibold)
+        titleLabel.textColor = .braveLabel
         titleLabel.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
         titleDescriptionStackView.addArrangedSubview(titleLabel)
 
         descriptionLabel = UILabel()
         descriptionLabel.font = UIFont.systemFont(ofSize: 15, weight: UIFont.Weight.regular)
+        descriptionLabel.textColor = .braveLabel
         descriptionLabel.numberOfLines = 0
         descriptionLabel.lineBreakMode = .byTruncatingTail
         descriptionLabel.textAlignment = .center
@@ -170,7 +172,7 @@ class SyncAddDeviceViewController: SyncViewController {
         doneButton.translatesAutoresizingMaskIntoConstraints = false
         doneButton.setTitle(Strings.done, for: .normal)
         doneButton.titleLabel?.font = UIFont.systemFont(ofSize: 17, weight: UIFont.Weight.bold)
-        doneButton.titleLabel?.textColor = .white
+        doneButton.setTitleColor(.white, for: .normal)
         doneButton.backgroundColor = UIColor.braveOrange
         doneButton.addTarget(self, action: #selector(SEL_done), for: .touchUpInside)
 
@@ -180,7 +182,7 @@ class SyncAddDeviceViewController: SyncViewController {
         enterWordsButton.translatesAutoresizingMaskIntoConstraints = false
         enterWordsButton.setTitle(Strings.showCodeWords, for: .normal)
         enterWordsButton.titleLabel?.font = UIFont.systemFont(ofSize: 15, weight: UIFont.Weight.semibold)
-        enterWordsButton.setTitleColor(BraveUX.greyH, for: .normal)
+        enterWordsButton.setTitleColor(.braveLabel, for: .normal)
         enterWordsButton.addTarget(self, action: #selector(SEL_showCodewords), for: .touchUpInside)
 
         doneEnterWordsStackView.setContentCompressionResistancePriority(.required, for: .vertical)
