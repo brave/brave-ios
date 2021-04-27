@@ -32,6 +32,8 @@ class TwoLineTableViewCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
 
+        backgroundColor = .secondaryBraveBackground
+        
         contentView.addSubview(_textLabel)
         contentView.addSubview(_detailTextLabel)
 
