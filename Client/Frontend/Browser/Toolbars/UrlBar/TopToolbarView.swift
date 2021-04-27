@@ -386,7 +386,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
         if search {
             locationTextField?.text = text
             // Not notifying when empty agrees with AutocompleteTextField.textDidChange.
-            delegate?.topToolbar(self, didEnterText: text)
+            delegate?.topToolbar(self, didSubmitText: text)
         } else {
             locationTextField?.setTextWithoutSearching(text)
         }

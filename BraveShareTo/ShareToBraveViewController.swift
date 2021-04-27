@@ -14,6 +14,10 @@ class ShareToBraveViewController: SLComposeServiceViewController {
         return URL(string: "brave://open-url?url=\(url)")
     }
     
+    private func searchScheme(for text: String) -> URL? {
+        return URL(string: "brave://search?q=\(text)")
+    }
+    
     override func configurationItems() -> [Any]! {
         guard let inputItems = extensionContext?.inputItems as? [NSExtensionItem] else {
             return []
@@ -35,10 +39,15 @@ class ShareToBraveViewController: SLComposeServiceViewController {
         
         provider.loadItem(of: provider.isUrl ? kUTTypeURL : kUTTypeText) { item, error in
             var urlItem: URL?
+            var nonUrlText: String?
             
             // We can get urls from other apps as a kUTTypeText type, for example from Apple's mail.app.
             if let text = item as? String {
-                urlItem = text.firstURL
+                if let url = text.firstURL {
+                    urlItem = url
+                } else {
+                    nonUrlText = text
+                }
             } else if let url = item as? URL {
                 urlItem = url.absoluteString.firstURL
             } else {
@@ -46,11 +55,15 @@ class ShareToBraveViewController: SLComposeServiceViewController {
                 return
             }
             
-            // Just open the app if we don't find a url. In the future we could
-            // use this entry point to search instead of open a given URL
-            let urlString = urlItem?.absoluteString ?? ""
-            if let braveUrl = urlString.addingPercentEncoding(withAllowedCharacters: .alphanumerics).flatMap(self.urlScheme) {
-                self.handleUrl(braveUrl)
+            // Open url if it was found, in other case search for text with default search engine in browser
+            if let urlString = urlItem?.absoluteString {
+                if let braveUrl = urlString.addingPercentEncoding(withAllowedCharacters: .alphanumerics).flatMap(self.urlScheme) {
+                    self.handleUrl(braveUrl)
+                }
+            } else if let text = nonUrlText {
+                if let braveUrl = text.addingPercentEncoding(withAllowedCharacters: .alphanumerics).flatMap(self.searchScheme) {
+                    self.handleUrl(braveUrl)
+                }
             }
         }
         
