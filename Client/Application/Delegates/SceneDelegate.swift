@@ -15,6 +15,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     private let crashedLastSession =
         !Preferences.AppState.backgroundedCleanly.value && AppConstants.buildChannel != .debug
     
+    var tabManager: TabManager?
+    
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         
         guard let windowScene = scene as? UIWindowScene,
@@ -22,9 +24,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             return
         }
         
-        let tabManager = TabManager(prefs: appDelegate.profile!.prefs, imageStore: appDelegate.imageStore!)
+        tabManager = TabManager(prefs: appDelegate.profile!.prefs, imageStore: appDelegate.imageStore!)
         
-        let browserViewController = BrowserViewController(profile: appDelegate.profile!, tabManager: tabManager, crashedLastSession: false)
+        let browserViewController = BrowserViewController(profile: appDelegate.profile!, tabManager: tabManager!, crashedLastSession: false)
         browserViewController.edgesForExtendedLayout = []
 
         // Add restoration class, the factory that will return the ViewController we will restore with.
