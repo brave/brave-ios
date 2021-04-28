@@ -117,7 +117,7 @@ extension BrowserViewController {
     /// New Tab Page Education screen should load after onboarding is finished and user is on locale JP
     /// - Returns: A tuple which shows NTP Edication is enabled and URL to be loaed
     fileprivate func showNTPEducation() -> (isEnabled: Bool, url: URL?) {
-        guard let url = AppInfo.ntpTutorialPageURL else {
+        guard let url = BraveUX.ntpTutorialPageURL else {
             return (false, nil)
         }
 

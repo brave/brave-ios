@@ -84,7 +84,4 @@ open class AppInfo {
     public static var isApplication: Bool {
         return Bundle.main.infoDictionaryString(forKey: "CFBundlePackageType") == "APPL"
     }
-    
-    /// Return URL used for New Tab Page Tutorial in JP locale
-    public static let ntpTutorialPageURL = URL(string: "https://brave.com/ja/ntp-tutorial")
 }
