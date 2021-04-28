@@ -31,7 +31,7 @@ extension BrowserViewController {
         if AppConstants.buildChannel.isPublic { return }
         
         let settings = RewardsDebugSettingsViewController(rewards: braveRewardsManager.rewards,
-                                                          legacyWallet: legacyWallet)
+                                                          legacyWallet: braveRewardsManager.legacyWallet)
         let container = UINavigationController(rootViewController: settings)
         present(container, animated: true)
     }
@@ -46,12 +46,12 @@ extension BrowserViewController {
         let braveRewardsPanel = BraveRewardsViewController(
             tab: tab,
             rewards: braveRewardsManager.rewards,
-            legacyWallet: legacyWallet
+            legacyWallet: braveRewardsManager.legacyWallet
         )
         braveRewardsPanel.actionHandler = { [weak self, unowned braveRewardsPanel] action in
             switch action {
             case .rewardsTransferTapped:
-                guard let legacyWallet = self?.legacyWallet else { return }
+                guard let legacyWallet = self?.braveRewardsManager.legacyWallet else { return }
                 braveRewardsPanel.dismiss(animated: true) {
                     let controller = WalletTransferViewController(legacyWallet: legacyWallet)
                     controller.learnMoreHandler = { [weak self, unowned controller] in
@@ -99,7 +99,7 @@ extension BrowserViewController {
         
         let now = Date()
         
-        guard let legacyWallet = legacyWallet,
+        guard let legacyWallet = braveRewardsManager.legacyWallet,
               !legacyWallet.isLedgerTransferExpired,
               presentedViewController == nil,
               Locale.current.regionCode == "JP" else { return }

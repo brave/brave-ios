@@ -142,10 +142,7 @@ class BrowserViewController: UIViewController {
     
     let safeBrowsing: SafeBrowsing?
     
-    let legacyWallet: BraveLedger?
-    var promotionFetchTimer: Timer?
     private var notificationsHandler: AdsNotificationHandler?
-    var publisher: PublisherInfo?
     
     let vpnProductInfo = VPNProductInfo()
     
@@ -174,31 +171,7 @@ class BrowserViewController: UIViewController {
         self.crashedLastSession = crashedLastSession
         self.safeBrowsing = safeBrowsingManager
 
-        let configuration: BraveRewardsConfiguration
-        if AppConstants.buildChannel.isPublic {
-            configuration = .production
-        } else {
-            if let override = Preferences.Rewards.EnvironmentOverride(rawValue: Preferences.Rewards.environmentOverride.value), override != .none {
-                switch override {
-                case .dev:
-                    configuration = .default
-                case .staging:
-                    configuration = .staging
-                case .prod:
-                    configuration = .production
-                default:
-                    configuration = .staging
-                }
-            } else {
-                configuration = AppConstants.buildChannel == .debug ? .staging : .production
-            }
-        }
-        
         self.braveRewardsManager = braveRewardsManager
-
-        // FIXME: TEMPORARY
-        legacyWallet = braveRewardsManager.legacyWallet
-        deviceCheckClient = braveRewardsManager.deviceCheckClient
         
         super.init(nibName: nil, bundle: nil)
         didInit()
@@ -372,8 +345,6 @@ class BrowserViewController: UIViewController {
             }
         }
     }
-    
-    let deviceCheckClient: DeviceCheckClient?
     
     private func setupAdsNotificationHandler() {
         notificationsHandler = AdsNotificationHandler(ads: braveRewardsManager.rewards.ads,
