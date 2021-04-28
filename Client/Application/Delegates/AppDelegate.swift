@@ -117,9 +117,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         
         setUpWebServer(profile)
         
-        
-        braveRewardsManager = BraveRewardsManager()
-        
         do {
             imageStore = try DiskImageStore(files: profile.files, namespace: "TabManagerScreenshots", quality: UIConstants.screenshotQuality)
         } catch {
@@ -590,20 +587,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
     
     func application(_ application: UIApplication, didDiscardSceneSessions sceneSessions: Set<UISceneSession>) {
         
-    }
-}
-
-// MARK: - Root View Controller Animations
-extension AppDelegate: UINavigationControllerDelegate {
-    func navigationController(_ navigationController: UINavigationController, animationControllerFor operation: UINavigationController.Operation, from fromVC: UIViewController, to toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        switch operation {
-        case .push:
-            return BrowserToTrayAnimator()
-        case .pop:
-            return TrayToBrowserAnimator()
-        default:
-            return nil
-        }
     }
 }
 

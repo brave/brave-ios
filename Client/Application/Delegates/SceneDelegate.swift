@@ -26,8 +26,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         tabManager = TabManager(prefs: appDelegate.profile!.prefs, imageStore: appDelegate.imageStore!)
         
-        
-        
         let browserViewController =
             BrowserViewController(profile: appDelegate.profile!,
                                   tabManager: tabManager!,
@@ -41,7 +39,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         let window = UIWindow(windowScene: windowScene)
         let navigationController = UINavigationController(rootViewController: browserViewController)
-        //navigationController.delegate = self
+        navigationController.delegate = self
         navigationController.isNavigationBarHidden = true
         navigationController.edgesForExtendedLayout = UIRectEdge(rawValue: 0)
         
@@ -50,6 +48,18 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         self.window = window
         window.makeKeyAndVisible()
     }
-    
-    
+}
+
+// MARK: - Root View Controller Animations
+extension SceneDelegate: UINavigationControllerDelegate {
+    func navigationController(_ navigationController: UINavigationController, animationControllerFor operation: UINavigationController.Operation, from fromVC: UIViewController, to toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        switch operation {
+        case .push:
+            return BrowserToTrayAnimator()
+        case .pop:
+            return TrayToBrowserAnimator()
+        default:
+            return nil
+        }
+    }
 }
