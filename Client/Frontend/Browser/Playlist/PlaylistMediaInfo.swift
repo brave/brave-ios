@@ -12,11 +12,19 @@ import Data
 
 private let log = Logger.browserLogger
 
+protocol PlaylistMediaInfoDelegate: AnyObject {
+    func initializeWebView(_ webView: BraveWebView, tab tabToInitialize: Tab)
+    func shouldCancelForPassbook(request: URLRequest?, response: URLResponse) -> Bool
+}
+
 class PlaylistMediaInfo: NSObject {
     private weak var playerView: VideoView?
     private var webLoader: PlaylistWebLoader?
     private var playerStatusObserver: StreamObserver?
     private var rateObserver: NSKeyValueObservation?
+    
+    weak var delegate: PlaylistMediaInfoDelegate?
+    
     public var nowPlayingInfo: PlaylistInfo? {
         didSet {
             updateNowPlayingMediaInfo()
@@ -26,6 +34,8 @@ class PlaylistMediaInfo: NSObject {
     public init(playerView: VideoView) {
         self.playerView = playerView
         super.init()
+        
+        webLoader?.delegate = self
         
         MPRemoteCommandCenter.shared().pauseCommand.addTarget { [weak self] _ in
             self?.playerView?.pause()
@@ -130,6 +140,16 @@ class PlaylistMediaInfo: NSObject {
                 return image
             })
         }
+    }
+}
+
+extension PlaylistMediaInfo: PlaylistWebLoaderDelegate {
+    func initializeWebView(_ webView: BraveWebView, tab tabToInitialize: Tab) {
+        delegate?.initializeWebView(webView, tab: tabToInitialize)
+    }
+    
+    func shouldCancelForPassbook(request: URLRequest?, response: URLResponse) -> Bool {
+        delegate?.shouldCancelForPassbook(request: request, response: response) == true
     }
 }
 

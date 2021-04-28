@@ -327,12 +327,19 @@ public class PlaylistMimeTypeDetector {
     ]
 }
 
+protocol PlaylistWebLoaderDelegate: AnyObject {
+    func initializeWebView(_ webView: BraveWebView, tab tabToInitialize: Tab)
+    func shouldCancelForPassbook(request: URLRequest?, response: URLResponse) -> Bool
+}
+
 class PlaylistWebLoader: UIView {
     fileprivate static var pageLoadTimeout = 10.0
     
     private let safeBrowsing = SafeBrowsing()
     private var pendingHTTPUpgrades = [String: URLRequest]()
     private var pendingRequests = [String: URLRequest]()
+    
+    weak var delegate: PlaylistWebLoaderDelegate?
     
     private let tab = Tab(configuration: WKWebViewConfiguration().then {
         $0.processPool = WKProcessPool()
@@ -397,17 +404,7 @@ class PlaylistWebLoader: UIView {
             $0.edges.equalToSuperview()
         }
         
-        if let browserController = (UIApplication.shared.delegate as? AppDelegate)?.browserViewController {
-            let KVOs: [KVOConstants] = [
-                .estimatedProgress, .loading, .canGoBack,
-                .canGoForward, .URL, .title,
-                .hasOnlySecureContent, .serverTrust
-            ]
-            
-            browserController.tab(tab, didCreateWebView: webView)
-            KVOs.forEach { webView.removeObserver(browserController, forKeyPath: $0.rawValue) }
-            webView.scrollView.removeObserver(browserController.scrollController, forKeyPath: KVOConstants.contentSize.rawValue)
-        }
+        delegate?.initializeWebView(webView, tab: tab)
         
         // When creating a tab, TabManager automatically adds a uiDelegate
         // This webView is invisible and we don't want any UI being handled.
@@ -716,12 +713,9 @@ extension PlaylistWebLoader: WKNavigationDelegate {
             }
         }
         
-        if let browserController = (UIApplication.shared.delegate as? AppDelegate)?.browserViewController {
-            // Check if this response should be handed off to Passbook.
-            if OpenPassBookHelper(request: request, response: response, canShowInWebView: false, forceDownload: false, browserViewController: browserController) != nil {
-                decisionHandler(.cancel)
-                return
-            }
+        if delegate?.shouldCancelForPassbook(request: request, response: response) == true {
+            decisionHandler(.cancel)
+            return
         }
         
         if navigationResponse.isForMainFrame {

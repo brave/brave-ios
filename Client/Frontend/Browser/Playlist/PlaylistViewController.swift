@@ -24,6 +24,13 @@ private enum DisplayMode {
 
 // MARK: PlaylistViewController
 
+protocol PlaylistViewControllerDelegate: AnyObject {
+    func playlistOpeURLInNewTab(_ url: URL)
+    func playlistPresent(restorationViewController: UIViewController, completion: @escaping () -> Void)
+    func playlistInitializeWebView(_ webView: BraveWebView, tab tabToInitialize: Tab)
+    func playlistShouldCancelForPassbook(request: URLRequest?, response: URLResponse) -> Bool
+}
+
 class PlaylistViewController: UIViewController {
     
     // MARK: Properties
@@ -32,8 +39,12 @@ class PlaylistViewController: UIViewController {
     private let listController = ListController()
     private let detailController = DetailController()
     
+    weak var delegate: PlaylistViewControllerDelegate?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        listController.delegate = self
         
         splitController.do {
             $0.viewControllers = [SettingsNavigationController(rootViewController: listController),
@@ -158,6 +169,13 @@ extension PlaylistViewController: UISplitViewControllerDelegate {
 
 // MARK: - ListController
 
+private protocol ListViewControllerDelegate: AnyObject {
+    func listOpeURLInNewTab(_ url: URL)
+    func listPresent(restorationViewController: UIViewController, completion: @escaping () -> Void)
+    func listInitializeWebView(_ webView: BraveWebView, tab tabToInitialize: Tab)
+    func listShouldCancelForPassbook(request: URLRequest?, response: URLResponse) -> Bool
+}
+
 private class ListController: UIViewController {
     // MARK: Constants
      
@@ -174,6 +192,8 @@ private class ListController: UIViewController {
     private var currentlyPlayingItemIndex = -1
     private var autoPlayEnabled = true
     private var playerController: AVPlayerViewController?
+    
+    weak var delegate: ListViewControllerDelegate?
     
     private lazy var activityIndicator = UIActivityIndicatorView(style: .medium).then {
         $0.isHidden = true
@@ -217,6 +237,7 @@ private class ListController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        mediaInfo.delegate = self
         PlaylistManager.shared.delegate = self
     
         setTheme()
@@ -423,6 +444,35 @@ private class ListController: UIViewController {
                 navigationController?.setNavigationBarHidden(UIDevice.current.orientation.isLandscape, animated: true)
             }
         }
+    }
+}
+
+extension ListController: PlaylistMediaInfoDelegate {
+    func initializeWebView(_ webView: BraveWebView, tab tabToInitialize: Tab) {
+        delegate?.listInitializeWebView(webView, tab: tabToInitialize)
+    }
+    
+    func shouldCancelForPassbook(request: URLRequest?, response: URLResponse) -> Bool {
+        delegate?.listShouldCancelForPassbook(request: request, response: response) == true
+    }
+}
+
+extension PlaylistViewController: ListViewControllerDelegate {
+    func listInitializeWebView(_ webView: BraveWebView, tab tabToInitialize: Tab) {
+        delegate?.playlistInitializeWebView(webView, tab: tabToInitialize)
+    }
+    
+    func listShouldCancelForPassbook(request: URLRequest?, response: URLResponse) -> Bool {
+        delegate?.playlistShouldCancelForPassbook(request: request, response: response) == true
+    }
+    
+    func listOpeURLInNewTab(_ url: URL) {
+        delegate?.playlistOpeURLInNewTab(url)
+    }
+    
+    func listPresent(restorationViewController: UIViewController, completion: @escaping () -> Void) {
+        delegate?.playlistPresent(restorationViewController: restorationViewController,
+                                  completion: completion)
     }
 }
 
@@ -922,11 +972,12 @@ extension ListController: UITableViewDelegate {
     private func displayExpiredResourceError(item: PlaylistInfo) {
         let alert = UIAlertController(title: Strings.PlayList.expiredAlertTitle,
                                       message: Strings.PlayList.expiredAlertDescription, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: Strings.PlayList.reopenButtonTitle, style: .default, handler: { _ in
+        alert.addAction(UIAlertAction(title: Strings.PlayList.reopenButtonTitle, style: .default,
+                                      handler: { [weak self] _ in
             
             if let url = URL(string: item.pageSrc) {
-                self.dismiss(animated: true, completion: nil)
-                (UIApplication.shared.delegate as? AppDelegate)?.browserViewController.openURLInNewTab(url, isPrivileged: false)
+                self?.dismiss(animated: true, completion: nil)
+                self?.delegate?.listOpeURLInNewTab(url)
             }
         }))
         alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil))
@@ -1209,18 +1260,20 @@ extension ListController: AVPlayerViewControllerDelegate, AVPictureInPictureCont
     
     func playerViewController(_ playerViewController: AVPlayerViewController, restoreUserInterfaceForPictureInPictureStopWithCompletionHandler completionHandler: @escaping (Bool) -> Void) {
         
-        if let delegate = UIApplication.shared.delegate as? AppDelegate,
-           let restorationController = delegate.playlistRestorationController {
+        if let appDelegate = UIApplication.shared.delegate as? AppDelegate,
+           let restorationController = appDelegate.playlistRestorationController {
             restorationController.modalPresentationStyle = .fullScreen
             playerView.attachLayer()
+            
+            
             if view.window == nil {
-                delegate.browserViewController.present(restorationController, animated: true) {
-                    self.playerView.player.play()
-                    delegate.playlistRestorationController = nil
+                delegate?.listPresent(restorationViewController: restorationController) { [weak self] in
+                    self?.playerView.player.play()
+                    appDelegate.playlistRestorationController = nil
                 }
             } else {
                 self.playerView.player.play()
-                delegate.playlistRestorationController = nil
+                appDelegate.playlistRestorationController = nil
             }
         }
         
@@ -1265,15 +1318,15 @@ extension ListController: AVPlayerViewControllerDelegate, AVPictureInPictureCont
     
     func pictureInPictureController(_ pictureInPictureController: AVPictureInPictureController, restoreUserInterfaceForPictureInPictureStopWithCompletionHandler completionHandler: @escaping (Bool) -> Void) {
         
-        if let delegate = UIApplication.shared.delegate as? AppDelegate,
-           let restorationController = delegate.playlistRestorationController {
+        if let appDelegate = UIApplication.shared.delegate as? AppDelegate,
+           let restorationController = appDelegate.playlistRestorationController {
             restorationController.modalPresentationStyle = .fullScreen
             if view.window == nil {
-                delegate.browserViewController.present(restorationController, animated: true) {
-                    delegate.playlistRestorationController = nil
+                delegate?.listPresent(restorationViewController: restorationController) {
+                    appDelegate.playlistRestorationController = nil
                 }
             } else {
-                delegate.playlistRestorationController = nil
+                appDelegate.playlistRestorationController = nil
             }
         }
         

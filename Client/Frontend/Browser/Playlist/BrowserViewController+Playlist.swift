@@ -74,6 +74,7 @@ extension BrowserViewController: PlaylistHelperDelegate {
     
     private func openPlaylist() {
         let playlistController = (UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController ?? PlaylistViewController()
+        (playlistController as? PlaylistViewController)?.delegate = self
         playlistController.modalPresentationStyle = .fullScreen
         present(playlistController, animated: true)
     }
@@ -128,9 +129,43 @@ extension BrowserViewController: PlaylistHelperDelegate {
     
     func openInPlaylist(item: PlaylistInfo, completion: (() -> Void)?) {
         let playlistController = (UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController ?? PlaylistViewController()
+        (playlistController as? PlaylistViewController)?.delegate = self
         playlistController.modalPresentationStyle = .fullScreen
         present(playlistController, animated: true) {
             completion?()
         }
+    }
+}
+
+extension BrowserViewController: PlaylistViewControllerDelegate {
+    func playlistOpeURLInNewTab(_ url: URL) {
+        
+    }
+    
+    func playlistPresent(restorationViewController: UIViewController, completion: @escaping () -> Void) {
+        present(restorationViewController, animated: true) {
+            completion()
+        }
+    }
+    
+    func playlistInitializeWebView(_ webView: BraveWebView, tab tabToInitialize: Tab) {
+        let KVOsToRemove: [KVOConstants] = [
+            .estimatedProgress, .loading, .canGoBack,
+            .canGoForward, .URL, .title,
+            .hasOnlySecureContent, .serverTrust
+        ]
+        tab(tabToInitialize, didCreateWebView: webView)
+        
+        KVOsToRemove.forEach { webView.removeObserver(self, forKeyPath: $0.rawValue) }
+        webView.scrollView.removeObserver(scrollController, forKeyPath: KVOConstants.contentSize.rawValue)
+    }
+    
+    func playlistShouldCancelForPassbook(request: URLRequest?, response: URLResponse) -> Bool {
+        OpenPassBookHelper(request: request,
+                           response: response,
+                           canShowInWebView: false,
+                           forceDownload: false,
+                           browserViewController: self) != nil
+        
     }
 }
