@@ -118,7 +118,6 @@ class PlaylistToast: Toast {
                 $0.titleLabel?.adjustsFontSizeToFitWidth = true
                 $0.titleLabel?.minimumScaleFactor = 0.1
                 $0.addTarget(self, action: #selector(buttonPressed), for: .touchUpInside)
-                //$0.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(buttonPressed)))
             }
 
             self.button.snp.makeConstraints {
