@@ -132,15 +132,17 @@ class ActivityShortcutManager: NSObject {
                     case .notPurchased, .purchased, .expired:
                         guard let vc = BraveVPN.vpnState.enableVPNDestinationVC else { return }
                     
-                        let nav = SettingsNavigationController(rootViewController: vc)
-                        nav.isModalInPresentation = false
-                        nav.modalPresentationStyle = UIDevice.current.userInterfaceIdiom == .phone ? .pageSheet : .formSheet
-                        nav.navigationBar.topItem?.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: nav, action: #selector(nav.done))
+                        let settingsNavigationController = SettingsNavigationController(rootViewController: vc)
+                        settingsNavigationController.isModalInPresentation = false
+                        settingsNavigationController.modalPresentationStyle =
+                            UIDevice.current.userInterfaceIdiom == .phone ? .pageSheet : .formSheet
+                        settingsNavigationController.navigationBar.topItem?.leftBarButtonItem =
+                            UIBarButtonItem(barButtonSystemItem: .done, target: settingsNavigationController, action: #selector(settingsNavigationController.done))
                         
                         // All menu views should be opened in portrait on iPhones.
                         UIDevice.current.forcePortraitIfIphone(for: UIApplication.shared)
 
-                        bvc.present(nav, animated: true)
+                        bvc.present(settingsNavigationController, animated: true)
                     case .installed(let connected):
                         if !connected {
                             BraveVPN.reconnect()
@@ -152,8 +154,10 @@ class ActivityShortcutManager: NSObject {
                 guard let newTabPageController = bvc.tabManager.selectedTab?.newTabPageViewController else { return }
                 newTabPageController.scrollToBraveToday()
             case .openPlayList:
-                print("Open Playlist")
-                //TODO: Add Playlist navigation after it is merged
+                let playlistController = (UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController ?? PlaylistViewController()
+                playlistController.modalPresentationStyle = .fullScreen
+                
+                bvc.present(playlistController, animated: true)
         }
     }
     

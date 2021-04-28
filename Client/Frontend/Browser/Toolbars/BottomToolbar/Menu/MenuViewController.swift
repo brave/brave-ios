@@ -289,9 +289,24 @@ extension MenuViewController: PanModalPresentable {
     var panModalBackgroundColor: UIColor {
         UIColor(white: 0.0, alpha: 0.5)
     }
+
     var dragIndicatorBackgroundColor: UIColor {
         UIColor(white: 0.95, alpha: 1.0)
     }
+    
+    private func openPlaylist() {
+        let playlistController = (UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController ?? PlaylistViewController()
+        playlistController.modalPresentationStyle = .fullScreen
+                    
+        /// Donate Open Playlist Activity for suggestions
+        let openPlaylist = ActivityShortcutManager.shared.createShortcutActivity(type: .openPlayList)
+        self.userActivity = openPlaylist
+        openPlaylist.becomeCurrent()
+        
+        dismissView()
+        bvc.present(playlistController, animated: true)
+    }
+    
     var transitionDuration: Double {
         0.35
     }

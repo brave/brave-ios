@@ -32,7 +32,6 @@
 			<array>
 				<string>OpenBookmarkWebsiteIntent</string>
 				<string>OpenHistoryWebsiteIntent</string>
-				<string>OpenWebsite</string>
 				<string>OpenWebsiteIntent</string>
 			</array>
 		</dict>
