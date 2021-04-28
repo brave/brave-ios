@@ -25,8 +25,10 @@ class OnboardingViewController: UIViewController, Themeable {
     }
     
     static func getUpdatedTheme() -> Theme {
-        let tabManager = (UIApplication.shared.delegate as? AppDelegate)?.browserViewController.tabManager
-        return Theme.of(tabManager?.selectedTab)
+        
+        // KYLE: REMOVE: Theme changes will fix that
+        //let tabManager = (UIApplication.shared.delegate as? AppDelegate)?.browserViewController.tabManager
+        return Theme.of(nil)
     }
     
     init(profile: Profile, rewards: BraveRewards?, theme: Theme) {
