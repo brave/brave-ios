@@ -41,7 +41,7 @@ class BraveTodayOptInView: UIView, FeedCardContent {
         $0.titleLabel?.textColor = .white
         $0.setTitle(Strings.BraveToday.turnOnBraveToday, for: .normal)
         $0.contentEdgeInsets = UIEdgeInsets(top: 10, left: 20, bottom: 10, right: 20)
-        $0.backgroundColor = .braveBlurple
+        $0.backgroundColor = .braveLighterBlurple
         $0.loaderView = LoaderView(size: .small).then {
             $0.tintColor = .white
         }

@@ -81,22 +81,22 @@ extension UIColor {
     DesignSystemColor.text01.color
   }
   public static var braveLighterOrange: UIColor {
-    DesignSystemColor.interactive01.color
+    DesignSystemColor.interactive03.color
   }
   public static var braveOrange: UIColor {
     DesignSystemColor.interactive02.color
   }
   public static var braveDarkerOrange: UIColor {
-    DesignSystemColor.interactive03.color
+    DesignSystemColor.interactive01.color
   }
   public static var braveLighterBlurple: UIColor {
-    DesignSystemColor.interactive04.color
+    DesignSystemColor.interactive06.color
   }
   public static var braveBlurple: UIColor {
     DesignSystemColor.interactive05.color
   }
   public static var braveDarkerBlurple: UIColor {
-    DesignSystemColor.interactive06.color
+    DesignSystemColor.interactive04.color
   }
   public static var braveSeparator: UIColor {
     DesignSystemColor.divider01.color
@@ -132,6 +132,9 @@ extension UIColor {
 extension UIColor {
   public static var privateModeBackground: UIColor {
     .init(hex: 0x2C2153)
+  }
+  public static var secondaryPrivateModeBackground: UIColor {
+    .init(hex: 0x0D0920)
   }
   public static var statsAdsBlockedTint: UIColor {
     .braveOrange
