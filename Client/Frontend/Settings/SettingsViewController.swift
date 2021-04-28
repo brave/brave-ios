@@ -47,6 +47,7 @@ protocol SettingsDelegate: class {
     func settingsOpenURLInNewTab(_ url: URL)
     func settingsOpenURLs(_ urls: [URL])
     func settingsDidFinish(_ settingsViewController: SettingsViewController)
+    func settingsPresentAlert(_ alert: UIAlertController)
 }
 
 class SettingsViewController: TableViewController {
@@ -238,7 +239,9 @@ class SettingsViewController: TableViewController {
                         self.navigationController?
                             .pushViewController(SyncSettingsTableViewController(style: .grouped), animated: true)
                     } else {
-                        self.navigationController?.pushViewController(SyncWelcomeViewController(), animated: true)
+                        let welcomeViewController = SyncWelcomeViewController()
+                        welcomeViewController.settingsDelegate = self.settingsDelegate
+                        self.navigationController?.pushViewController(welcomeViewController, animated: true)
                     }
                     }, image: #imageLiteral(resourceName: "settings-sync").template, accessory: .disclosureIndicator,
                        cellClass: MultilineValue1Cell.self),

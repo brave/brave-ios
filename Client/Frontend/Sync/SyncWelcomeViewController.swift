@@ -15,6 +15,8 @@ protocol NavigationPrevention {
 class SyncWelcomeViewController: SyncViewController {
     private var overlayView: UIView?
     
+    weak var settingsDelegate: SettingsDelegate?
+    
     private var isLoading: Bool = false {
         didSet {
             overlayView?.removeFromSuperview()
@@ -168,8 +170,8 @@ class SyncWelcomeViewController: SyncViewController {
             guard let self = self else { return }
             if !BraveSyncAPI.shared.isInSyncGroup {
                 self.dismiss(animated: true)
-                let bvc = (UIApplication.shared.delegate as? AppDelegate)?.browserViewController
-                bvc?.present(SyncAlerts.initializationError, animated: true)
+                
+                self.settingsDelegate?.settingsPresentAlert(SyncAlerts.initializationError)
             }
         }
     }

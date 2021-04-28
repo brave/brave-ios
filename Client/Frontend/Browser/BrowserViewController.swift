@@ -2122,6 +2122,10 @@ extension BrowserViewController: SettingsDelegate {
             }
         })
     }
+    
+    func settingsPresentAlert(_ alert: UIAlertController) {
+        present(alert, animated: true)
+    }
 }
 
 extension BrowserViewController: PresentingModalViewControllerDelegate {
