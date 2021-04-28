@@ -341,9 +341,7 @@ class Tab: NSObject {
         contentScriptManager.helpers.removeAll()
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
         
-        // TODO: FIX FIX
-        return
-        let rewards = appDelegate.browserViewController.rewards
+        let rewards = appDelegate.braveRewardsManager.rewards
         if !PrivateBrowsingManager.shared.isPrivateBrowsing {
             rewards.reportTabClosed(tabId: rewardsId)
         }

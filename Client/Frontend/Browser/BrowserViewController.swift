@@ -162,8 +162,11 @@ class BrowserViewController: UIViewController {
     /// So user will not be introduced with a pop-over directly
     let benchmarkCurrentSessionAdCount = BraveGlobalShieldStats.shared.adblock + BraveGlobalShieldStats.shared.trackingProtection
 
-    init(profile: Profile, tabManager: TabManager, crashedLastSession: Bool,
-         safeBrowsingManager: SafeBrowsing? = SafeBrowsing()) {
+    init(profile: Profile,
+         tabManager: TabManager,
+         crashedLastSession: Bool,
+         safeBrowsingManager: SafeBrowsing? = SafeBrowsing(),
+         braveRewardsManager: BraveRewardsManager) {
         self.profile = profile
         self.tabManager = tabManager
         self.readerModeCache = ReaderMode.cache(for: tabManager.selectedTab)
@@ -190,44 +193,13 @@ class BrowserViewController: UIViewController {
             }
         }
 
-        configuration.buildChannel = BraveAdsBuildChannel().then {
-          $0.name = AppConstants.buildChannel.rawValue
-          $0.isRelease = AppConstants.buildChannel == .release
-        }
-        Self.migrateAdsConfirmations(for: configuration)
-        legacyWallet = Self.legacyWallet(for: configuration)
-        if let wallet = legacyWallet {
-            // Legacy ledger is disabled by default
-            wallet.isAutoContributeEnabled = false
-            // Ensure we remove any pending contributions or recurring tips from the legacy wallet
-            wallet.removeAllPendingContributions { _ in }
-            wallet.listRecurringTips { publishers in
-                publishers.forEach {
-                    wallet.removeRecurringTip(publisherId: $0.id)
-                }
-            }
-        }
-        rewards = BraveRewards(configuration: configuration)
-        if !BraveRewards.isAvailable {
-            // Disable rewards services in case previous user already enabled
-            // rewards in previous build
-            rewards.isAdsEnabled = false
-        } else {
-            if rewards.isEnabled && !Preferences.Rewards.rewardsToggledOnce.value {
-                Preferences.Rewards.rewardsToggledOnce.value = true
-            }
-        }
-        deviceCheckClient = DeviceCheckClient(environment: configuration.environment)
+        // FIXME: TEMPORARY
+        rewards = braveRewardsManager.rewards
+        legacyWallet = braveRewardsManager.legacyWallet
+        deviceCheckClient = braveRewardsManager.deviceCheckClient
         
         super.init(nibName: nil, bundle: nil)
         didInit()
-        
-        rewards.delegate = self
-        
-        // Only start ledger service automatically if ads is enabled
-        if rewards.isAdsEnabled {
-            rewards.startLedgerService(nil)
-        }
     }
     
     static func legacyWallet(for config: BraveRewardsConfiguration) -> BraveLedger? {

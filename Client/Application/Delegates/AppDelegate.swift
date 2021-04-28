@@ -45,6 +45,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
     var authenticator: AppAuthenticator?
     var shutdownWebServer: DispatchSourceTimer?
     
+    lazy var braveRewardsManager: BraveRewardsManager = {
+      BraveRewardsManager()
+    }()
+    
     /// Object used to handle server pings
     let dau = DAU()
     
@@ -113,6 +117,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         
         setUpWebServer(profile)
         
+        
+        braveRewardsManager = BraveRewardsManager()
         
         do {
             imageStore = try DiskImageStore(files: profile.files, namespace: "TabManagerScreenshots", quality: UIConstants.screenshotQuality)

@@ -26,7 +26,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         tabManager = TabManager(prefs: appDelegate.profile!.prefs, imageStore: appDelegate.imageStore!)
         
-        let browserViewController = BrowserViewController(profile: appDelegate.profile!, tabManager: tabManager!, crashedLastSession: false)
+        
+        
+        let browserViewController =
+            BrowserViewController(profile: appDelegate.profile!,
+                                  tabManager: tabManager!,
+                                  crashedLastSession: false,
+                                  braveRewardsManager: appDelegate.braveRewardsManager)
         browserViewController.edgesForExtendedLayout = []
 
         // Add restoration class, the factory that will return the ViewController we will restore with.
