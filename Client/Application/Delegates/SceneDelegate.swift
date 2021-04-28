@@ -16,6 +16,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         !Preferences.AppState.backgroundedCleanly.value && AppConstants.buildChannel != .debug
     
     var tabManager: TabManager?
+    var bvc: BrowserViewController?
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         
@@ -26,19 +27,20 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         tabManager = TabManager(prefs: appDelegate.profile!.prefs, imageStore: appDelegate.imageStore!)
         
-        let browserViewController =
-            BrowserViewController(profile: appDelegate.profile!,
+        bvc = BrowserViewController(profile: appDelegate.profile!,
                                   tabManager: tabManager!,
                                   crashedLastSession: false,
                                   braveRewardsManager: appDelegate.braveRewardsManager)
-        browserViewController.edgesForExtendedLayout = []
+        
+        guard let bvc = bvc else { return }
+        bvc.edgesForExtendedLayout = []
 
         // Add restoration class, the factory that will return the ViewController we will restore with.
-        browserViewController.restorationIdentifier = NSStringFromClass(BrowserViewController.self)
+        bvc.restorationIdentifier = NSStringFromClass(BrowserViewController.self)
         //browserViewController.restorationClass = AppDelegate.self
         
         let window = UIWindow(windowScene: windowScene)
-        let navigationController = UINavigationController(rootViewController: browserViewController)
+        let navigationController = UINavigationController(rootViewController: bvc)
         navigationController.delegate = self
         navigationController.isNavigationBarHidden = true
         navigationController.edgesForExtendedLayout = UIRectEdge(rawValue: 0)
@@ -48,6 +50,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         self.window = window
         window.makeKeyAndVisible()
     }
+    
+    func sceneWillEnterForeground(_ scene: UIScene) {
+        bvc?.showWalletTransferExpiryPanelIfNeeded()
+    }
+    
+    
 }
 
 // MARK: - Root View Controller Animations

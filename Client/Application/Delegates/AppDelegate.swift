@@ -28,6 +28,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
     }
 
     var window: UIWindow?
+    // TODO: FIX FIX REMOVE
     var browserViewController: BrowserViewController!
     var rootViewController: UIViewController!
     var playlistRestorationController: UIViewController? // When Picture-In-Picture is enabled, we need to store a reference to the controller to keep it alive, otherwise if it deallocates, the system automatically kills Picture-In-Picture.
@@ -170,8 +171,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
 
         // Allow deinitializers to close our database connections.
         self.profile = nil
-        self.browserViewController = nil
-        self.rootViewController = nil
         SKPaymentQueue.default().remove(iapObserver)
         
         // Clean up BraveCore
@@ -470,7 +469,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         
         AdblockResourceDownloader.shared.startLoading()
         
-        browserViewController.showWalletTransferExpiryPanelIfNeeded()
+        
     }
     
     func applicationWillResignActive(_ application: UIApplication) {
@@ -532,29 +531,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         FaviconFetcher.htmlParsingUserAgent = UserAgent.desktop
     }
 
-    fileprivate func presentEmailComposerWithLogs() {
-        if let buildNumber = Bundle.main.object(forInfoDictionaryKey: String(kCFBundleVersionKey)) as? NSString {
-            let mailComposeViewController = MFMailComposeViewController()
-            mailComposeViewController.mailComposeDelegate = self
-            mailComposeViewController.setSubject("Debug Info for iOS client version v\(appVersion) (\(buildNumber))")
-
-            self.window?.rootViewController?.present(mailComposeViewController, animated: true, completion: nil)
-        }
-    }
-
     func application(_ application: UIApplication, continue userActivity: NSUserActivity,
                      restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
 
         if let url = userActivity.webpageURL {
             switch UniversalLinkManager.universalLinkType(for: url, checkPath: false) {
             case .buyVPN:
-                browserViewController.presentCorrespondingVPNViewController()
+//                browserViewController.presentCorrespondingVPNViewController()
                 return true
             case .none:
                 break
             }
 
-            browserViewController.switchToTabForURLOrOpen(url, isPrivileged: true)
+//            browserViewController.switchToTabForURLOrOpen(url, isPrivileged: true)
             return true
         }
 
@@ -564,7 +553,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
             if let userInfo = userActivity.userInfo,
                 let urlString = userInfo[CSSearchableItemActivityIdentifier] as? String,
                 let url = URL(string: urlString) {
-                browserViewController.switchToTabForURLOrOpen(url, isPrivileged: true)
+//                browserViewController.switchToTabForURLOrOpen(url, isPrivileged: true)
                 return true
             }
         }
@@ -573,27 +562,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
     }
 
     func application(_ application: UIApplication, performActionFor shortcutItem: UIApplicationShortcutItem, completionHandler: @escaping (Bool) -> Void) {
-        let handledShortCutItem = QuickActions.sharedInstance.handleShortCutItem(shortcutItem, withBrowserViewController: browserViewController)
-
-        completionHandler(handledShortCutItem)
+//        let handledShortCutItem = QuickActions.sharedInstance.handleShortCutItem(shortcutItem, withBrowserViewController: browserViewController)
+//
+//        completionHandler(handledShortCutItem)
     }
     
     func application(_ application: UIApplication,
                      configurationForConnecting connectingSceneSession: UISceneSession,
                      options: UIScene.ConnectionOptions) -> UISceneConfiguration {
+        // TODO: Handle shortcut and user activity here? with `options`, call on first scene
         
          UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
     }
     
     func application(_ application: UIApplication, didDiscardSceneSessions sceneSessions: Set<UISceneSession>) {
         
-    }
-}
-
-extension AppDelegate: MFMailComposeViewControllerDelegate {
-    func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
-        // Dismiss the view controller and start the app up
-        controller.dismiss(animated: true, completion: nil)
-        startApplication(application!, withLaunchOptions: self.launchOptions)
     }
 }
