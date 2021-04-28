@@ -232,6 +232,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
     }
     
     private var cancellables: Set<AnyCancellable> = []
+    
+    private func updateTheme() {
+        guard let window = window,
+              let themeOverride = DefaultTheme(rawValue: Preferences.General.themeNormalMode.value)?.userInterfaceStyleOverride else {
+            return
+        }
+        let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
+        let override: UIUserInterfaceStyle = isPrivateBrowsing ? .dark : themeOverride
+        UIView.transition(with: window, duration: 0.15, options: [.transitionCrossDissolve], animations: {
+            window.overrideUserInterfaceStyle = override
+        }, completion: nil)
+    }
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // IAPs can trigger on the app as soon as it launches,
@@ -269,15 +281,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         applyAppearanceDefaults()
         
         Preferences.General.themeNormalMode.$value
-            .sink { [weak window] value in
-                guard let window = window,
-                      let override = DefaultTheme(rawValue: value)?.userInterfaceStyleOverride,
-                      override != window.overrideUserInterfaceStyle else {
-                    return
-                }
-                UIView.transition(with: window, duration: 0.15, options: [.transitionCrossDissolve], animations: {
-                    window.overrideUserInterfaceStyle = override
-                }, completion: nil)
+            .map { _ in () }
+            .merge(with: PrivateBrowsingManager.shared.$isPrivateBrowsing.map { _ in () })
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in
+                self?.updateTheme()
             }
             .store(in: &cancellables)
         

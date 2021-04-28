@@ -6,6 +6,7 @@ import Shared
 import SnapKit
 import BraveShared
 import Data
+import Combine
 
 private struct TopToolbarViewUX {
     static let locationPadding: CGFloat = 8
@@ -185,6 +186,15 @@ class TopToolbarView: UIView, ToolbarProtocol {
         locationView.shieldsButton.setImage(UIImage(imageLiteralResourceName: shieldIcon), for: .normal)
     }
     
+    private var privateModeCancellable: AnyCancellable?
+    private func updateColors(_ isPrivateBrowsing: Bool) {
+        if isPrivateBrowsing {
+            backgroundColor = .privateModeBackground
+        } else {
+            backgroundColor = .secondaryBraveBackground
+        }
+    }
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -225,6 +235,13 @@ class TopToolbarView: UIView, ToolbarProtocol {
         
         // Make sure we hide any views that shouldn't be showing in non-overlay mode.
         updateViewsForOverlayModeAndToolbarChanges()
+        
+        privateModeCancellable = PrivateBrowsingManager.shared
+            .$isPrivateBrowsing
+            .removeDuplicates()
+            .sink(receiveValue: { [weak self] isPrivateBrowsing in
+                self?.updateColors(isPrivateBrowsing)
+            })
     }
     
     @available(*, unavailable)

@@ -6,6 +6,7 @@ import UIKit
 import SnapKit
 import Shared
 import BraveShared
+import Combine
 
 class BottomToolbarView: UIView, ToolbarProtocol {
     weak var tabToolbarDelegate: ToolbarDelegate?
@@ -38,6 +39,22 @@ class BottomToolbarView: UIView, ToolbarProtocol {
         contentView.distribution = .fillEqually
         
         addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(didSwipeToolbar(_:))))
+        
+        privateModeCancellable = PrivateBrowsingManager.shared
+            .$isPrivateBrowsing
+            .removeDuplicates()
+            .sink(receiveValue: { [weak self] isPrivateBrowsing in
+                self?.updateColors(isPrivateBrowsing)
+            })
+    }
+    
+    private var privateModeCancellable: AnyCancellable?
+    private func updateColors(_ isPrivateBrowsing: Bool) {
+        if isPrivateBrowsing {
+            backgroundColor = .privateModeBackground
+        } else {
+            backgroundColor = .secondaryBraveBackground
+        }
     }
     
     private var isSearchButtonEnabled: Bool = false {

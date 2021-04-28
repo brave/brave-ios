@@ -7,6 +7,7 @@ import Foundation
 import BraveUI
 import Shared
 import BraveShared
+import Combine
 
 private class DuckDuckGoCalloutButton: SpringButton {
     fileprivate struct UX {
@@ -65,16 +66,19 @@ class DuckDuckGoCalloutSectionProvider: NSObject, NTPObservableSectionProvider {
     
     private typealias DuckDuckGoCalloutCell = NewTabCenteredCollectionViewCell<DuckDuckGoCalloutButton>
     
+    var privateModeCancellable: AnyCancellable?
+    
     init(profile: Profile, action: @escaping () -> Void) {
         self.profile = profile
         self.action = action
         super.init()
         
-        NotificationCenter.default.addObserver(self, selector: #selector(privateModeChanged), name: .privacyModeChanged, object: nil)
-    }
-    
-    deinit {
-        NotificationCenter.default.removeObserver(self)
+        privateModeCancellable = PrivateBrowsingManager.shared
+            .$isPrivateBrowsing
+            .receive(on: RunLoop.main)
+            .sink(receiveValue: { [weak self] _ in
+                self?.privateModeChanged()
+            })
     }
     
     private var isShowingCallout: Bool {
