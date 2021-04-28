@@ -7,10 +7,13 @@ import UIKit
 import Shared
 import BraveShared
 import Storage
+import SwiftKeychainWrapper
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     var window: UIWindow?
+    
+    var authenticator: AppAuthenticator?
     
     private let crashedLastSession =
         !Preferences.AppState.backgroundedCleanly.value && AppConstants.buildChannel != .debug
@@ -49,13 +52,28 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         self.window = window
         window.makeKeyAndVisible()
+        
+        SceneObserver.setupApplication(window: window)
+        authenticator = AppAuthenticator(protectedWindow: window, promptImmediately: true, isPasscodeEntryCancellable: false)
+    }
+    
+    func sceneDidBecomeActive(_ scene: UIScene) {
+        authenticator?.hideBackgroundedBlur()
     }
     
     func sceneWillEnterForeground(_ scene: UIScene) {
+        if let authInfo = KeychainWrapper.sharedAppContainerKeychain.authenticationInfo(), authInfo.isPasscodeRequiredImmediately {
+            authenticator?.willEnterForeground()
+        }
+        
         bvc?.showWalletTransferExpiryPanelIfNeeded()
     }
     
-    
+    func sceneWillResignActive(_ scene: UIScene) {
+        if KeychainWrapper.sharedAppContainerKeychain.authenticationInfo() != nil {
+            authenticator?.showBackgroundBlur()
+        }
+    }
 }
 
 // MARK: - Root View Controller Animations

@@ -168,13 +168,9 @@ class PopupView: UIView, UIGestureRecognizerDelegate {
     
     // MARK: Layout
     
-    private var applicationWindow: UIWindow? {
-        return (UIApplication.shared.delegate as? AppDelegate)?.window
-    }
-    
     override func layoutSubviews() {
         let contentSize: CGSize = contentView.frame.size
-        let keyboardHeight = keyboardState?.intersectionHeightForView(applicationWindow ?? self) ?? 0
+        let keyboardHeight = keyboardState?.intersectionHeightForView(window ?? self) ?? 0
         
         dialogView.frame = _dialogFrameWithKeyboardHeight(height: keyboardHeight)
         contentView.frame = CGRect(x: 0.0, y: 0.0, width: dialogView.bounds.size.width, height: contentSize.height)
@@ -270,9 +266,9 @@ class PopupView: UIView, UIGestureRecognizerDelegate {
         dialogView.removeFromSuperview()
         
         if presentsOverWindow {
+            // TODO: fix fix
             UIApplication.shared.keyWindow?.addSubview(self)
-        } else {
-            let currentViewController: AnyObject = (applicationWindow?.rootViewController)!
+        } else if let currentViewController: AnyObject = window?.rootViewController {
             if currentViewController is UINavigationController {
                 let navigationController: UINavigationController? = currentViewController as? UINavigationController
                 navigationController?.visibleViewController?.view.addSubview(self)
@@ -579,7 +575,7 @@ extension PopupView: KeyboardHelperDelegate {
         if !automaticallyMovesWithKeyboard {
             return
         }
-        let keyboardHeight = keyboardState?.intersectionHeightForView(applicationWindow ?? self) ?? 0
+        let keyboardHeight = keyboardState?.intersectionHeightForView(window ?? self) ?? 0
         _dialogFrameWithKeyboardHeight(height: keyboardHeight)
     }
     
@@ -588,7 +584,7 @@ extension PopupView: KeyboardHelperDelegate {
         if !automaticallyMovesWithKeyboard {
             return
         }
-        let keyboardHeight = keyboardState?.intersectionHeightForView(applicationWindow ?? self) ?? 0
+        let keyboardHeight = keyboardState?.intersectionHeightForView(window ?? self) ?? 0
         _dialogFrameWithKeyboardHeight(height: keyboardHeight)
     }
 }

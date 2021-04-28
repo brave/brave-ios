@@ -27,10 +27,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         return nil
     }
 
-    var window: UIWindow?
-    // TODO: FIX FIX REMOVE
-    var browserViewController: BrowserViewController!
-    var rootViewController: UIViewController!
     var playlistRestorationController: UIViewController? // When Picture-In-Picture is enabled, we need to store a reference to the controller to keep it alive, otherwise if it deallocates, the system automatically kills Picture-In-Picture.
     weak var profile: Profile?
     var braveCore: BraveCoreMain?
@@ -43,7 +39,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
 
     var receivedURLs: [URL]?
     
-    var authenticator: AppAuthenticator?
     var shutdownWebServer: DispatchSourceTimer?
     
     lazy var braveRewardsManager: BraveRewardsManager = {
@@ -60,14 +55,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         // Hold references to willFinishLaunching parameters for delayed app launch
         self.application = application
         self.launchOptions = launchOptions
-        self.window = UIWindow(frame: UIScreen.main.bounds)
-        self.window!.backgroundColor = .black
         
         // Brave Core Initialization
         self.braveCore = BraveCoreMain()
         self.braveCore?.setUserAgent(UserAgent.mobile)
         
-        SceneObserver.setupApplication(window: self.window!)
+        
 
         AdBlockStats.shared.startLoading()
         HttpsEverywhereStats.shared.startLoading()
@@ -229,10 +222,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         Theme.of(nil).applyAppearanceProperties()
         
         UIScrollView.doBadSwizzleStuff()
-        
-        window!.makeKeyAndVisible()
-        
-        authenticator = AppAuthenticator(protectedWindow: window!, promptImmediately: true, isPasscodeEntryCancellable: false)
 
         if Preferences.Rewards.isUsingBAP.value == nil {
             Preferences.Rewards.isUsingBAP.value = Locale.current.regionCode == "JP"
@@ -386,7 +375,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
     func applicationDidBecomeActive(_ application: UIApplication) {
         shutdownWebServer?.cancel()
         shutdownWebServer = nil
-        authenticator?.hideBackgroundedBlur()
+        
         
         Preferences.AppState.backgroundedCleanly.value = false
 
@@ -463,9 +452,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         // `applicationDidBecomeActive` will get called whenever the Touch ID authentication overlay disappears.
         self.updateAuthenticationInfo()
         
-        if let authInfo = KeychainWrapper.sharedAppContainerKeychain.authenticationInfo(), authInfo.isPasscodeRequiredImmediately {
-            authenticator?.willEnterForeground()
-        }
+        
         
         AdblockResourceDownloader.shared.startLoading()
         
@@ -473,9 +460,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
     }
     
     func applicationWillResignActive(_ application: UIApplication) {
-        if KeychainWrapper.sharedAppContainerKeychain.authenticationInfo() != nil {
-            authenticator?.showBackgroundBlur()
-        }
+        
         
         Preferences.AppState.backgroundedCleanly.value = true
     }
