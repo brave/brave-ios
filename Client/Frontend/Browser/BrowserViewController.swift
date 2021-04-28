@@ -3173,6 +3173,12 @@ extension BrowserViewController: TabTrayDelegate {
     func tabTrayRequestsPresentationOf(_ viewController: UIViewController) {
         self.present(viewController, animated: false, completion: nil)
     }
+    
+    func tabTrayDidOpenNewTab() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+            self.topToolbar.tabLocationViewDidTapLocation(self.topToolbar.locationView)
+        }
+    }
 }
 
 // MARK: Browser Chrome Theming

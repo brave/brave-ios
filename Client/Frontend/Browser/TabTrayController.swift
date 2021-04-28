@@ -200,6 +200,7 @@ protocol TabTrayDelegate: AnyObject {
     func tabTrayDidAddTab(_ tabTray: TabTrayController, tab: Tab)
     func tabTrayDidAddBookmark(_ tab: Tab)
     func tabTrayRequestsPresentationOf(_ viewController: UIViewController)
+    func tabTrayDidOpenNewTab()
 }
 
 class TabTrayController: UIViewController, Themeable {
@@ -537,12 +538,8 @@ class TabTrayController: UIViewController, Themeable {
         }, completion: { finished in
             // The addTab delegate method will pop to the BVC no need to do anything here.
             self.toolbar.isUserInteractionEnabled = true
-            if finished, request == nil, NewTabAccessors.getNewTabPage() == .blankPage,
-                let appDelegate = UIApplication.shared.delegate as? AppDelegate,
-                let bvc = appDelegate.browserViewController {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-                    bvc.topToolbar.tabLocationViewDidTapLocation(bvc.topToolbar.locationView)
-                }
+            if finished, request == nil, NewTabAccessors.getNewTabPage() == .blankPage {
+                self.delegate?.tabTrayDidOpenNewTab()
             }
 
             if let tab = tab {
