@@ -27,7 +27,6 @@ class BraveRewardsManager: NSObject {
     
     override init() {
         
-        
         let configuration: BraveRewardsConfiguration
         if AppConstants.buildChannel.isPublic {
             configuration = .production
@@ -86,6 +85,12 @@ class BraveRewardsManager: NSObject {
         // Only start ledger service automatically if ads is enabled
         if rewards.isAdsEnabled {
             rewards.startLedgerService(nil)
+        }
+        
+        // KYLE: I moved it from bvc didInit() here.
+        if rewards.ledger != nil {
+            // Ledger was started immediately due to user having ads enabled
+            setupLedger()
         }
     }
     

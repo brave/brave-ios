@@ -142,7 +142,6 @@ class BrowserViewController: UIViewController {
     
     let safeBrowsing: SafeBrowsing?
     
-    let rewards: BraveRewards
     let legacyWallet: BraveLedger?
     var promotionFetchTimer: Timer?
     private var notificationsHandler: AdsNotificationHandler?
@@ -161,6 +160,8 @@ class BrowserViewController: UIViewController {
     /// Current session ad count is compared with live ad count
     /// So user will not be introduced with a pop-over directly
     let benchmarkCurrentSessionAdCount = BraveGlobalShieldStats.shared.adblock + BraveGlobalShieldStats.shared.trackingProtection
+    
+    let braveRewardsManager: BraveRewardsManager
 
     init(profile: Profile,
          tabManager: TabManager,
@@ -192,14 +193,16 @@ class BrowserViewController: UIViewController {
                 configuration = AppConstants.buildChannel == .debug ? .staging : .production
             }
         }
+        
+        self.braveRewardsManager = braveRewardsManager
 
         // FIXME: TEMPORARY
-        rewards = braveRewardsManager.rewards
         legacyWallet = braveRewardsManager.legacyWallet
         deviceCheckClient = braveRewardsManager.deviceCheckClient
         
         super.init(nibName: nil, bundle: nil)
         didInit()
+        braveRewardsManager.delegate = self
     }
     
     static func legacyWallet(for config: BraveRewardsConfiguration) -> BraveLedger? {
@@ -305,7 +308,7 @@ class BrowserViewController: UIViewController {
         Preferences.Privacy.blockAllCookies.observe(from: self)
         Preferences.Rewards.hideRewardsIcon.observe(from: self)
         Preferences.Rewards.rewardsToggledOnce.observe(from: self)
-        rewardsEnabledObserveration = rewards.observe(\.isEnabled, options: [.new]) { [weak self] _, _ in
+        rewardsEnabledObserveration = braveRewardsManager.rewards.observe(\.isEnabled, options: [.new]) { [weak self] _, _ in
             guard let self = self else { return }
             self.updateRewardsButtonState()
             self.setupAdsNotificationHandler()
@@ -314,11 +317,6 @@ class BrowserViewController: UIViewController {
         Preferences.Playlist.webMediaSourceCompatibility.observe(from: self)
         // Lists need to be compiled before attempting tab restoration
         contentBlockListDeferred = ContentBlockerHelper.compileBundledLists()
-        
-        if rewards.ledger != nil {
-            // Ledger was started immediately due to user having ads enabled
-            setupLedger()
-        }
         
         Preferences.NewTabPage.attemptToShowClaimRewardsNotification.value = true
         
@@ -378,7 +376,8 @@ class BrowserViewController: UIViewController {
     let deviceCheckClient: DeviceCheckClient?
     
     private func setupAdsNotificationHandler() {
-        notificationsHandler = AdsNotificationHandler(ads: rewards.ads, presentingController: self)
+        notificationsHandler = AdsNotificationHandler(ads: braveRewardsManager.rewards.ads,
+                                                      presentingController: self)
         notificationsHandler?.canShowNotifications = { [weak self] in
             guard let self = self else { return false }
             return !PrivateBrowsingManager.shared.isPrivateBrowsing &&
@@ -847,8 +846,9 @@ class BrowserViewController: UIViewController {
         updateTabCountUsingTabManager(tabManager)
         clipboardBarDisplayHandler?.checkIfShouldDisplayBar()
         
-        if let tabId = tabManager.selectedTab?.rewardsId, rewards.ledger?.selectedTabId == 0 {
-            rewards.ledger?.selectedTabId = tabId
+        if let tabId = tabManager.selectedTab?.rewardsId,
+           braveRewardsManager.rewards.ledger?.selectedTabId == 0 {
+            braveRewardsManager.rewards.ledger?.selectedTabId = tabId
         }
     }
     
@@ -936,7 +936,7 @@ class BrowserViewController: UIViewController {
         }
         
         // The user either skipped or didn't complete onboarding.
-        let isRewardsEnabled = rewards.isEnabled
+        let isRewardsEnabled = braveRewardsManager.rewards.isEnabled
         let currentProgress = OnboardingProgress(rawValue: Preferences.General.basicOnboardingProgress.value) ?? .none
         
         // 1. Existing user.
@@ -953,7 +953,7 @@ class BrowserViewController: UIViewController {
                 guard let onboarding = OnboardingNavigationController(
                     profile: profile,
                     onboardingType: .existingUserRewardsOff(currentProgress),
-                    rewards: rewards,
+                    rewards: braveRewardsManager.rewards,
                     theme: Theme.of(tabManager.selectedTab)
                     ) else { return }
                 
@@ -975,7 +975,7 @@ class BrowserViewController: UIViewController {
             guard !isRewardsEnabled, let onboarding = OnboardingNavigationController(
                 profile: profile,
                 onboardingType: .existingUserRewardsOff(currentProgress),
-                rewards: rewards,
+                rewards: braveRewardsManager.rewards,
                 theme: Theme.of(tabManager.selectedTab)
                 ) else { return }
             
@@ -993,7 +993,7 @@ class BrowserViewController: UIViewController {
             guard !isRewardsEnabled, let onboarding = OnboardingNavigationController(
                 profile: profile,
                 onboardingType: .existingUserRewardsOff(currentProgress),
-                rewards: rewards,
+                rewards: braveRewardsManager.rewards,
                 theme: Theme.of(tabManager.selectedTab)
                 ) else { return }
             
@@ -1011,7 +1011,7 @@ class BrowserViewController: UIViewController {
             guard let onboarding = OnboardingNavigationController(
                 profile: profile,
                 onboardingType: .newUser(currentProgress),
-                rewards: rewards,
+                rewards: braveRewardsManager.rewards,
                 theme: Theme.of(tabManager.selectedTab)
                 ) else { return }
             
@@ -1107,7 +1107,7 @@ class BrowserViewController: UIViewController {
         screenshotHelper.viewIsVisible = false
         super.viewWillDisappear(animated)
         
-        rewards.ledger?.selectedTabId = 0
+        braveRewardsManager.rewards.ledger?.selectedTabId = 0
     }
 
     override func viewDidDisappear(_ animated: Bool) {
@@ -1227,7 +1227,7 @@ class BrowserViewController: UIViewController {
                                                          profile: profile,
                                                          dataSource: backgroundDataSource,
                                                          feedDataSource: feedDataSource,
-                                                         rewards: rewards)
+                                                         rewards: braveRewardsManager.rewards)
             ntpController.delegate = self
             selectedTab.newTabPageViewController = ntpController
         }
@@ -1630,8 +1630,8 @@ class BrowserViewController: UIViewController {
             if let rewardsURL = rewardsXHRLoadURL,
                 url.host == rewardsURL.host,
                 url.isMediaSiteURL {
-                tabManager.selectedTab?.reportPageNaviagtion(to: rewards)
-                tabManager.selectedTab?.reportPageLoad(to: rewards)
+                tabManager.selectedTab?.reportPageNaviagtion(to: braveRewardsManager.rewards)
+                tabManager.selectedTab?.reportPageLoad(to: braveRewardsManager.rewards)
             }
         }
         
@@ -2645,8 +2645,10 @@ extension BrowserViewController: TabDelegate {
         playlistHelper.delegate = self
         tab.addContentScript(playlistHelper, name: PlaylistHelper.name(), sandboxed: false)
 
-        tab.addContentScript(RewardsReporting(rewards: rewards, tab: tab), name: RewardsReporting.name(), sandboxed: false)
-        tab.addContentScript(AdsMediaReporting(rewards: rewards, tab: tab), name: AdsMediaReporting.name())
+        tab.addContentScript(RewardsReporting(rewards: braveRewardsManager.rewards, tab: tab),
+                             name: RewardsReporting.name(), sandboxed: false)
+        tab.addContentScript(AdsMediaReporting(rewards: braveRewardsManager.rewards, tab: tab),
+                             name: AdsMediaReporting.name())
     }
 
     func tab(_ tab: Tab, willDeleteWebView webView: WKWebView) {
@@ -2841,7 +2843,7 @@ extension BrowserViewController: TabManagerDelegate {
         }
         updateTabsBarVisibility()
         
-        rewards.reportTabClosed(tabId: tab.rewardsId)
+        braveRewardsManager.rewards.reportTabClosed(tabId: tab.rewardsId)
     }
 
     func tabManagerDidAddTabs(_ tabManager: TabManager) {
@@ -3378,7 +3380,7 @@ extension BrowserViewController: NewTabPageDelegate {
     func brandedImageCalloutActioned(_ state: BrandedImageCalloutState) {
         guard state.hasDetailViewController else { return }
         
-        let vc = NTPLearnMoreViewController(state: state, rewards: rewards)
+        let vc = NTPLearnMoreViewController(state: state, rewards: braveRewardsManager.rewards)
         
         vc.linkHandler = { [weak self] url in
             self?.tabManager.selectedTab?.loadRequest(PrivilegedRequest(url: url) as URLRequest)

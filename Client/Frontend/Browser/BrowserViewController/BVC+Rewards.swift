@@ -26,21 +26,12 @@ private extension Int32 {
 }
 
 extension BrowserViewController {
-    func updateRewardsButtonState() {
-        if !isViewLoaded { return }
-        if !BraveRewards.isAvailable {
-            self.topToolbar.locationView.rewardsButton.isHidden = true
-            return
-        }
-        self.topToolbar.locationView.rewardsButton.isHidden = Preferences.Rewards.hideRewardsIcon.value || PrivateBrowsingManager.shared.isPrivateBrowsing
-        self.topToolbar.locationView.rewardsButton.iconState = Preferences.Rewards.rewardsToggledOnce.value ?
-            (rewards.isEnabled || rewards.isCreatingWallet ? .enabled : .disabled) : .initial
-    }
 
     func showRewardsDebugSettings() {
         if AppConstants.buildChannel.isPublic { return }
         
-        let settings = RewardsDebugSettingsViewController(rewards: rewards, legacyWallet: legacyWallet)
+        let settings = RewardsDebugSettingsViewController(rewards: braveRewardsManager.rewards,
+                                                          legacyWallet: legacyWallet)
         let container = UINavigationController(rootViewController: settings)
         present(container, animated: true)
     }
@@ -54,7 +45,7 @@ extension BrowserViewController {
         
         let braveRewardsPanel = BraveRewardsViewController(
             tab: tab,
-            rewards: rewards,
+            rewards: braveRewardsManager.rewards,
             legacyWallet: legacyWallet
         )
         braveRewardsPanel.actionHandler = { [weak self, unowned braveRewardsPanel] action in
@@ -82,15 +73,16 @@ extension BrowserViewController {
         popover.present(from: topToolbar.locationView.rewardsButton, on: self)
         popover.popoverDidDismiss = { [weak self] _ in
             guard let self = self else { return }
-            if let tabId = self.tabManager.selectedTab?.rewardsId, self.rewards.ledger?.selectedTabId == 0 {
+            if let tabId = self.tabManager.selectedTab?.rewardsId,
+               self.braveRewardsManager.rewards.ledger?.selectedTabId == 0 {
                 // Show the tab currently visible
-                self.rewards.ledger?.selectedTabId = tabId
+                self.braveRewardsManager.rewards.ledger?.selectedTabId = tabId
             }
         }
         // Hide the current tab
-        rewards.ledger?.selectedTabId = 0
+        braveRewardsManager.rewards.ledger?.selectedTabId = 0
         // Fetch new promotions
-        rewards.ledger?.fetchPromotions(nil)
+        braveRewardsManager.rewards.ledger?.fetchPromotions(nil)
     }
     
     func showWalletTransferExpiryPanelIfNeeded() {
@@ -127,7 +119,7 @@ extension BrowserViewController {
     }
     
     func claimPendingPromotions() {
-        guard let ledger = rewards.ledger else { return }
+        guard let ledger = braveRewardsManager.rewards.ledger else { return }
         ledger.pendingPromotions.forEach { promo in
             if promo.status == .active {
                 ledger.claimPromotion(promo) { success in
@@ -138,7 +130,7 @@ extension BrowserViewController {
     }
     
     func authorizeUpholdWallet(from tab: Tab, queryItems items: [String: String]) {
-        guard let ledger = rewards.ledger else { return }
+        guard let ledger = braveRewardsManager.rewards.ledger else { return }
         ledger.authorizeExternalWallet(
             ofType: .uphold,
             queryItems: items) { result, redirectURL in
@@ -253,46 +245,6 @@ extension BrowserViewController {
             center.removePendingNotificationRequests(withIdentifiers: ids)
         }
     }
-    
-    func setupLedger() {
-        guard let ledger = rewards.ledger else { return }
-        // Update defaults
-        ledger.minimumVisitDuration = 8
-        ledger.minimumNumberOfVisits = 1
-        ledger.allowUnverifiedPublishers = false
-        ledger.allowVideoContributions = true
-        ledger.contributionAmount = Double.greatestFiniteMagnitude
-        
-        // Create ledger observer
-        let rewardsObserver = LedgerObserver(ledger: ledger)
-        ledger.add(rewardsObserver)
-        
-        rewardsObserver.walletInitalized = { [weak self] result in
-            guard let self = self, let client = self.deviceCheckClient else { return }
-            if result == .walletCreated {
-                ledger.setupDeviceCheckEnrollment(client) { }
-                self.updateRewardsButtonState()
-            }
-        }
-        rewardsObserver.promotionsAdded = { [weak self] promotions in
-            self?.claimPendingPromotions()
-        }
-        rewardsObserver.fetchedPanelPublisher = { [weak self] publisher, tabId in
-            guard let self = self, self.isViewLoaded, let tab = self.tabManager.selectedTab, tab.rewardsId == tabId else { return }
-            self.publisher = publisher
-        }
-        
-        promotionFetchTimer = Timer.scheduledTimer(
-            withTimeInterval: 1.hours,
-            repeats: true,
-            block: { [weak self, weak ledger] _ in
-                guard let self = self, let ledger = ledger else { return }
-                if self.rewards.isEnabled {
-                    ledger.fetchPromotions(nil)
-                }
-            }
-        )
-    }
 }
 
 extension Tab {
@@ -335,17 +287,19 @@ extension Tab {
     }
 }
 
-extension BrowserViewController: BraveRewardsDelegate {
-    func faviconURL(fromPageURL pageURL: URL, completion: @escaping (URL?) -> Void) {
-        // Currently unused, may be removed in the future
-    }
-    
-    func logMessage(withFilename file: String, lineNumber: Int32, verbosity: Int32, message: String) {
-        if message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { return }
-        log.logln(verbosity.loggerLevel, fileName: file, lineNumber: Int(lineNumber), closure: { message })
-    }
-    
-    func ledgerServiceDidStart(_ ledger: BraveLedger) {
-        setupLedger()
+extension BrowserViewController: BraveRewardsManagerDelegate {
+    func updateRewardsButtonState() {
+        if !isViewLoaded { return }
+        if !BraveRewards.isAvailable {
+            self.topToolbar.locationView.rewardsButton.isHidden = true
+            return
+        }
+        
+        let rewards = braveRewardsManager.rewards
+        
+        topToolbar.locationView.rewardsButton.isHidden =
+            Preferences.Rewards.hideRewardsIcon.value || PrivateBrowsingManager.shared.isPrivateBrowsing
+        topToolbar.locationView.rewardsButton.iconState = Preferences.Rewards.rewardsToggledOnce.value ?
+            (rewards.isEnabled || rewards.isCreatingWallet ? .enabled : .disabled) : .initial
     }
 }

@@ -404,7 +404,7 @@ extension BrowserViewController: WKNavigationDelegate {
         tab.url = webView.url
         self.scrollController.resetZoomState()
 
-        rewards.reportTabNavigation(tabId: tab.rewardsId)
+        braveRewardsManager.rewards.reportTabNavigation(tabId: tab.rewardsId)
         
         if tabManager.selectedTab === tab {
             updateUIForReaderHomeStateForTab(tab)
@@ -416,7 +416,7 @@ extension BrowserViewController: WKNavigationDelegate {
             navigateInTab(tab: tab, to: navigation)
             if let url = tab.url, tab.shouldClassifyLoadsForAds {
                 let faviconURL = URL(string: tab.displayFavicon?.url ?? "")
-                rewards.reportTabUpdated(
+                braveRewardsManager.rewards.reportTabUpdated(
                     Int(tab.rewardsId),
                     url: url,
                     faviconURL: faviconURL,
@@ -424,7 +424,7 @@ extension BrowserViewController: WKNavigationDelegate {
                     isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing
                 )
             }
-            tab.reportPageLoad(to: rewards)
+            tab.reportPageLoad(to: braveRewardsManager.rewards)
             if webView.url?.isLocal == false {
                 // Reset should classify
                 tab.shouldClassifyLoadsForAds = true
