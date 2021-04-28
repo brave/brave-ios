@@ -44,11 +44,11 @@ enum DesignSystemColor: String {
   case successText = "success-text"
   
   var color: UIColor {
-    return UIColor(named: rawValue, in: Bundle(for: Brave.self), compatibleWith: nil)!
+    return UIColor(named: rawValue, in: Bundle(for: BraveUI.self), compatibleWith: nil)!
   }
 }
 
-final private class Brave { }
+final private class BraveUI { }
 
 // MARK: - Design System Colors
 
@@ -80,11 +80,23 @@ extension UIColor {
   public static var bravePrimary: UIColor {
     DesignSystemColor.text01.color
   }
+  public static var braveLighterOrange: UIColor {
+    DesignSystemColor.interactive01.color
+  }
   public static var braveOrange: UIColor {
     DesignSystemColor.interactive02.color
   }
+  public static var braveDarkerOrange: UIColor {
+    DesignSystemColor.interactive03.color
+  }
+  public static var braveLighterBlurple: UIColor {
+    DesignSystemColor.interactive04.color
+  }
   public static var braveBlurple: UIColor {
     DesignSystemColor.interactive05.color
+  }
+  public static var braveDarkerBlurple: UIColor {
+    DesignSystemColor.interactive06.color
   }
   public static var braveSeparator: UIColor {
     DesignSystemColor.divider01.color
@@ -122,7 +134,7 @@ extension UIColor {
     .init(hex: 0x2C2153)
   }
   public static var statsAdsBlockedTint: UIColor {
-    .init(hex: 0xFB542B)
+    .braveOrange
   }
   public static var statsDataSavedTint: UIColor {
     .init(hex: 0xA0A5EB)
@@ -130,29 +142,6 @@ extension UIColor {
   public static var statsTimeSavedTint: UIColor {
     .white
   }
-}
-
-/// The Brave Color Palette used in Brave's Design System
-///
-/// File: `Color Palette.sketch`
-/// Version: `9dc5d63`
-final public class Colors {
-  // MARK: - Neutral
-  public static let neutral000 = UIColor(hex: 0xF8F9Fa)
-  public static let neutral700 = UIColor(hex: 0x495057)
-  // MARK: - Grey
-  public static let grey000 = UIColor(hex: 0xF0F2FF)
-  public static let grey200 = UIColor(hex: 0xDADCE8)
-  public static let grey500 = UIColor(hex: 0xAEB1C2)
-  public static let grey600 = UIColor(hex: 0x84889C)
-  public static let grey700 = UIColor(hex: 0x5E6175)
-  public static let grey800 = UIColor(hex: 0x3B3E4F)
-  public static let grey900 = UIColor(hex: 0x1E2029)
-  // MARK: - Blurple
-  public static let blurple300 = UIColor(hex: 0xA0A5EB)
-  public static let blurple400 = UIColor(hex: 0x737ADE)
-  // MARK: - Blue
-  public static let blue400 = UIColor(hex: 0x5DB5FC)
 }
 
 extension UIColor {
