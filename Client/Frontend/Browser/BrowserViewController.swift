@@ -168,6 +168,9 @@ class BrowserViewController: UIViewController {
     /// Used to determine If pop-over should be presented
     var isTabTrayActive = false
         
+    /// Boolean Tracking NTP Education should be loaded after onboarding of user
+    var shouldShowNTPEducation = false
+
     init(profile: Profile, tabManager: TabManager, crashedLastSession: Bool,
          safeBrowsingManager: SafeBrowsing? = SafeBrowsing()) {
         self.profile = profile
@@ -920,7 +923,10 @@ class BrowserViewController: UIViewController {
     }
 
     override func viewDidAppear(_ animated: Bool) {
-        presentOnboardingIntro()
+        presentOnboardingIntro() { [weak self] in
+            self?.shouldShowNTPEducation = true
+        }
+        
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
             self.presentVPNCallout()
         }
@@ -933,11 +939,6 @@ class BrowserViewController: UIViewController {
         screenshotHelper.takePendingScreenshots(tabManager.allTabs)
 
         super.viewDidAppear(animated)
-        
-        // NTP Education Load after onboarding screen
-        if showNTPEducation().isEnabled, let url = showNTPEducation().url {
-            tabManager.selectedTab?.loadRequest(PrivilegedRequest(url: url) as URLRequest)
-        }
 
         if shouldShowWhatsNewTab() {
             // Only display if the SUMO topic has been configured in the Info.plist (present and not empty)
@@ -948,7 +949,7 @@ class BrowserViewController: UIViewController {
                 }
             }
         }
-
+        
         if let toast = self.pendingToast {
             self.pendingToast = nil
             show(toast: toast, afterWaiting: ButtonToastUX.toastDelay)
@@ -962,7 +963,7 @@ class BrowserViewController: UIViewController {
         }
     }
     
-    func presentOnboardingIntro() {
+    func presentOnboardingIntro(_ completion: @escaping () -> Void) {
         if Preferences.DebugFlag.skipOnboardingIntro == true { return }
         
         // 1. Existing user.
@@ -1058,6 +1059,8 @@ class BrowserViewController: UIViewController {
             
             onboarding.onboardingDelegate = self
             present(onboarding, animated: true)
+            completion()
+            
             return
         }
     }
@@ -1139,8 +1142,7 @@ class BrowserViewController: UIViewController {
     /// New Tab Page Education screen should load after onboarding is finished and user is on locale JP
     /// - Returns: A tuple which shows NTP Edication is enabled and URL to be loaed
     fileprivate func showNTPEducation() -> (isEnabled: Bool, url: URL?) {
-        guard Preferences.General.basicOnboardingCompleted.value == OnboardingState.completed.rawValue,
-              let url = AppInfo.ntpTutorialPageURL else {
+        guard let url = AppInfo.ntpTutorialPageURL else {
             return (false, nil)
         }
 
@@ -3025,7 +3027,16 @@ extension BrowserViewController: OnboardingControllerDelegate {
         }
         
         // Present private browsing prompt if necessary when onboarding has been completed
-        onboardingController.dismiss(animated: true) {
+        onboardingController.dismiss(animated: true) { [weak self] in
+            guard let self = self else { return }
+            
+            // NTP Education Load after onboarding screen
+            if self.shouldShowNTPEducation,
+               self.showNTPEducation().isEnabled,
+               let url = self.showNTPEducation().url {
+                self.tabManager.selectedTab?.loadRequest(PrivilegedRequest(url: url) as URLRequest)
+            }
+            
             self.presentDuckDuckGoCalloutIfNeeded()
         }
     }
