@@ -22,11 +22,8 @@ private let log = Logger.browserLogger
 let LatestAppVersionProfileKey = "latestAppVersion"
 private let InitialPingSentKey = "initialPingSent"
 
-class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestoration {
-    public static func viewController(withRestorationIdentifierPath identifierComponents: [String], coder: NSCoder) -> UIViewController? {
-        return nil
-    }
-
+class AppDelegate: UIResponder, UIApplicationDelegate {
+    
     var playlistRestorationController: UIViewController? // When Picture-In-Picture is enabled, we need to store a reference to the controller to keep it alive, otherwise if it deallocates, the system automatically kills Picture-In-Picture.
     weak var profile: Profile?
     var braveCore: BraveCoreMain?
@@ -321,6 +318,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
                     self.backgroundDataSource.startFetching()
                 }
                 
+                // fix: maybe just open in first opened window
                 guard let url = offerUrl?.asURL else { return }
                 //self.browserViewController.openReferralLink(url: url)
             }
@@ -328,14 +326,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
             urp.pingIfEnoughTimePassed()
             backgroundDataSource.startFetching()
         }
-    }
-
-    func application(_ application: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
-        guard let routerpath = NavigationPath(url: url) else {
-            return false
-        }
-        //self.browserViewController.handleNavigationPath(path: routerpath)
-        return true
     }
     
     func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
@@ -357,22 +347,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         shutdownWebServer?.cancel()
         shutdownWebServer = nil
         
-        
         Preferences.AppState.backgroundedCleanly.value = false
 
         if let profile = self.profile {
             profile.reopen()
             setUpWebServer(profile)
         }
-
-        // handle quick actions is available
-        let quickActions = QuickActions.sharedInstance
-//        if let shortcut = quickActions.launchedShortcutItem {
-//            // dispatch asynchronously so that BVC is all set up for handling new tabs
-//            // when we try and open them
-//            quickActions.handleShortCutItem(shortcut, withBrowserViewController: browserViewController)
-//            quickActions.launchedShortcutItem = nil
-//        }
         
         // We try to send DAU ping each time the app goes to foreground to work around network edge cases
         // (offline, bad connection etc.).
@@ -381,28 +361,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
             dau.sendPingToServer()
         }
     }
-
+    
     func applicationDidEnterBackground(_ application: UIApplication) {
-        syncOnDidEnterBackground(application: application)
-        BraveVPN.sendVPNWorksInBackgroundNotification()
-    }
-
-    fileprivate func syncOnDidEnterBackground(application: UIApplication) {
-        guard let profile = self.profile else {
-            return
-        }
-      
         // BRAVE TODO: Decide whether or not we want to use this for our own sync down the road
-
         var taskId: UIBackgroundTaskIdentifier = UIBackgroundTaskIdentifier(rawValue: 0)
         taskId = application.beginBackgroundTask {
-            print("Running out of background time, but we have a profile shutdown pending.")
+            log.info("Running out of background time, but we have a profile shutdown pending.")
             self.shutdownProfileWhenNotActive(application)
             application.endBackgroundTask(taskId)
         }
-
-        profile.shutdown()
-        application.endBackgroundTask(taskId)
+        
+        profile?.shutdown()
         
         let singleShotTimer = DispatchSource.makeTimerSource(queue: DispatchQueue.main)
         // 2 seconds is ample for a localhost request to be completed by GCDWebServer. <500ms is expected on newer devices.
@@ -413,6 +382,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         }
         singleShotTimer.resume()
         shutdownWebServer = singleShotTimer
+        
+        BraveVPN.sendVPNWorksInBackgroundNotification()
     }
 
     fileprivate func shutdownProfileWhenNotActive(_ application: UIApplication) {
@@ -430,16 +401,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         // `applicationDidBecomeActive` will get called whenever the Touch ID authentication overlay disappears.
         self.updateAuthenticationInfo()
         
-        
-        
         AdblockResourceDownloader.shared.startLoading()
-        
-        
     }
     
     func applicationWillResignActive(_ application: UIApplication) {
-        
-        
         Preferences.AppState.backgroundedCleanly.value = true
     }
 
@@ -471,7 +436,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         do {
             try server.start()
         } catch let err as NSError {
-            print("Error: Unable to start WebServer \(err)")
+            log.error("Error: Unable to start WebServer \(err)")
         }
     }
 
@@ -492,42 +457,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         // Some sites will only serve HTML that points to .ico files.
         // The FaviconFetcher is explicitly for getting high-res icons, so use the desktop user agent.
         FaviconFetcher.htmlParsingUserAgent = UserAgent.desktop
-    }
-
-    func application(_ application: UIApplication, continue userActivity: NSUserActivity,
-                     restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
-
-        if let url = userActivity.webpageURL {
-            switch UniversalLinkManager.universalLinkType(for: url, checkPath: false) {
-            case .buyVPN:
-//                browserViewController.presentCorrespondingVPNViewController()
-                return true
-            case .none:
-                break
-            }
-
-//            browserViewController.switchToTabForURLOrOpen(url, isPrivileged: true)
-            return true
-        }
-
-        // Otherwise, check if the `NSUserActivity` is a CoreSpotlight item and switch to its tab or
-        // open a new one.
-        if userActivity.activityType == CSSearchableItemActionType {
-            if let userInfo = userActivity.userInfo,
-                let urlString = userInfo[CSSearchableItemActivityIdentifier] as? String,
-                let url = URL(string: urlString) {
-//                browserViewController.switchToTabForURLOrOpen(url, isPrivileged: true)
-                return true
-            }
-        }
-
-        return false
-    }
-
-    func application(_ application: UIApplication, performActionFor shortcutItem: UIApplicationShortcutItem, completionHandler: @escaping (Bool) -> Void) {
-//        let handledShortCutItem = QuickActions.sharedInstance.handleShortCutItem(shortcutItem, withBrowserViewController: browserViewController)
-//
-//        completionHandler(handledShortCutItem)
     }
     
     func application(_ application: UIApplication,

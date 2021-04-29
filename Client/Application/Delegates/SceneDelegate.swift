@@ -8,6 +8,7 @@ import Shared
 import BraveShared
 import Storage
 import SwiftKeychainWrapper
+import CoreSpotlight
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
@@ -43,7 +44,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         // Add restoration class, the factory that will return the ViewController we will restore with.
         bvc.restorationIdentifier = NSStringFromClass(BrowserViewController.self)
-        //browserViewController.restorationClass = AppDelegate.self
+        bvc.restorationClass = SceneDelegate.self
         
         let window = UIWindow(windowScene: windowScene)
         let navigationController = UINavigationController(rootViewController: bvc)
@@ -66,8 +67,19 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
           //  DefaultBrowserIntroManager.prepareAndShowIfNeeded(isNewUser: isFirstLaunch)
     }
     
+    // MARK: - Lifecycle
+    
     func sceneDidBecomeActive(_ scene: UIScene) {
         authenticator?.hideBackgroundedBlur()
+        
+        // handle quick actions is available
+        let quickActions = QuickActions.sharedInstance
+        if let shortcut = quickActions.launchedShortcutItem, let bvc = bvc {
+            // dispatch asynchronously so that BVC is all set up for handling new tabs
+            // when we try and open them
+            quickActions.handleShortCutItem(shortcut, withBrowserViewController: bvc)
+            quickActions.launchedShortcutItem = nil
+        }
     }
     
     func sceneWillEnterForeground(_ scene: UIScene) {
@@ -83,6 +95,34 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             authenticator?.showBackgroundBlur()
         }
     }
+    
+    // MARK: - Navigation
+    
+    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        guard let url = URLContexts.first?.url, let routerpath = NavigationPath(url: url) else {
+            return
+        }
+        bvc?.handleNavigationPath(path: routerpath)
+    }
+    
+    func windowScene(_ windowScene: UIWindowScene, performActionFor shortcutItem: UIApplicationShortcutItem, completionHandler: @escaping (Bool) -> Void) {
+        guard let bvc = bvc else { return }
+        
+        let handledShortCutItem = QuickActions.sharedInstance
+            .handleShortCutItem(shortcutItem, withBrowserViewController: bvc)
+        
+        completionHandler(handledShortCutItem)
+    }
+    
+    func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
+        if userActivity.activityType == CSSearchableItemActionType {
+            if let userInfo = userActivity.userInfo,
+                let urlString = userInfo[CSSearchableItemActivityIdentifier] as? String,
+                let url = URL(string: urlString) {
+                bvc?.switchToTabForURLOrOpen(url, isPrivileged: true)
+            }
+        }
+    }
 }
 
 // MARK: - Root View Controller Animations
@@ -96,5 +136,11 @@ extension SceneDelegate: UINavigationControllerDelegate {
         default:
             return nil
         }
+    }
+}
+
+extension SceneDelegate: UIViewControllerRestoration {
+    public static func viewController(withRestorationIdentifierPath identifierComponents: [String], coder: NSCoder) -> UIViewController? {
+        return nil
     }
 }
