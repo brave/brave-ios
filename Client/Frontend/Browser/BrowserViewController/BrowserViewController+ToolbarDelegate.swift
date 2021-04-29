@@ -28,6 +28,8 @@ extension BrowserViewController: TopToolbarDelegate {
             screenshotHelper.takeScreenshot(tab)
         }
         
+        isTabTrayActive = true
+        
         navigationController?.pushViewController(tabTrayController, animated: true)
         self.tabTrayController = tabTrayController
     }

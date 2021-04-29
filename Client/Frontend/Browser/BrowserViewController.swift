@@ -162,6 +162,10 @@ class BrowserViewController: UIViewController {
     /// Current session ad count is compared with live ad count
     /// So user will not be introduced with a pop-over directly
     let benchmarkCurrentSessionAdCount = BraveGlobalShieldStats.shared.adblock + BraveGlobalShieldStats.shared.trackingProtection
+    
+    /// Boolean tracking  if Tab Tray is active on the screen
+    /// Used to determine If pop-over should be presented
+    var isTabTrayActive = false
         
     init(profile: Profile, tabManager: TabManager, crashedLastSession: Bool,
          safeBrowsingManager: SafeBrowsing? = SafeBrowsing()) {
@@ -2674,6 +2678,8 @@ extension BrowserViewController: TabTrayDelegate {
     // This function animates and resets the tab chrome transforms when
     // the tab tray dismisses.
     func tabTrayDidDismiss(_ tabTray: TabTrayController) {
+        isTabTrayActive = false
+        
         // BRAVE TODO: Add update tabs method?
         resetBrowserChrome()
     }
