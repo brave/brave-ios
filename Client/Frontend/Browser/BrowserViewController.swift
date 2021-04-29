@@ -59,7 +59,7 @@ class BrowserViewController: UIViewController {
     fileprivate var findInPageBar: FindInPageBar?
     
     // Single data source used for all favorites vcs
-    let backgroundDataSource = NTPDataSource()
+    let backgroundDataSource: NTPDataSource
     let feedDataSource = FeedDataSource()
     
     var loadQueue = Deferred<Void>()
@@ -164,7 +164,8 @@ class BrowserViewController: UIViewController {
          tabManager: TabManager,
          crashedLastSession: Bool,
          safeBrowsingManager: SafeBrowsing? = SafeBrowsing(),
-         braveRewardsManager: BraveRewardsManager) {
+         braveRewardsManager: BraveRewardsManager,
+         backgroundDataSource: NTPDataSource) {
         self.profile = profile
         self.tabManager = tabManager
         self.readerModeCache = ReaderMode.cache(for: tabManager.selectedTab)
@@ -172,6 +173,7 @@ class BrowserViewController: UIViewController {
         self.safeBrowsing = safeBrowsingManager
 
         self.braveRewardsManager = braveRewardsManager
+        self.backgroundDataSource = backgroundDataSource
         
         super.init(nibName: nil, bundle: nil)
         didInit()

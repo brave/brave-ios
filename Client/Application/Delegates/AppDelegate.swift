@@ -31,6 +31,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
     weak var profile: Profile?
     var braveCore: BraveCoreMain?
     var imageStore: DiskImageStore?
+    
+    let backgroundDataSource = NTPDataSource()
 
     var shutdownWebServer: DispatchSourceTimer?
     
@@ -314,10 +316,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
                     
                     Preferences.NewTabPage.superReferrerThemeRetryDeadline.value = retryDeadline
                     
-                    //self.browserViewController.backgroundDataSource
-                      //  .fetchSpecificResource(.superReferral(code: code))
+                    self.backgroundDataSource.fetchSpecificResource(.superReferral(code: code))
                 } else {
-                    //self.browserViewController.backgroundDataSource.startFetching()
+                    self.backgroundDataSource.startFetching()
                 }
                 
                 guard let url = offerUrl?.asURL else { return }
@@ -325,7 +326,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
             }
         } else {
             urp.pingIfEnoughTimePassed()
-            //browserViewController.backgroundDataSource.startFetching()
+            backgroundDataSource.startFetching()
         }
     }
 

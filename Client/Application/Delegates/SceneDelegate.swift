@@ -35,7 +35,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         bvc = BrowserViewController(profile: appDelegate.profile!,
                                   tabManager: tabManager!,
                                   crashedLastSession: false,
-                                  braveRewardsManager: appDelegate.braveRewardsManager)
+                                  braveRewardsManager: appDelegate.braveRewardsManager,
+                                  backgroundDataSource: appDelegate.backgroundDataSource)
         
         guard let bvc = bvc else { return }
         bvc.edgesForExtendedLayout = []
@@ -60,8 +61,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         bvc.removeScheduledAdGrantReminders()
         
-        browserViewController.shouldShowIntroScreen =
-            DefaultBrowserIntroManager.prepareAndShowIfNeeded(isNewUser: isFirstLaunch)
+        // fix
+        //bvc.shouldShowIntroScreen =
+          //  DefaultBrowserIntroManager.prepareAndShowIfNeeded(isNewUser: isFirstLaunch)
     }
     
     func sceneDidBecomeActive(_ scene: UIScene) {
