@@ -60,7 +60,7 @@ class BrowserViewController: UIViewController {
     
     // Single data source used for all favorites vcs
     let backgroundDataSource: NTPDataSource
-    let feedDataSource = FeedDataSource()
+    let feedDataSource: FeedDataSource
     
     var loadQueue = Deferred<Void>()
 
@@ -165,7 +165,8 @@ class BrowserViewController: UIViewController {
          crashedLastSession: Bool,
          safeBrowsingManager: SafeBrowsing? = SafeBrowsing(),
          braveRewardsManager: BraveRewardsManager,
-         backgroundDataSource: NTPDataSource) {
+         backgroundDataSource: NTPDataSource,
+         feedDataSource: FeedDataSource) {
         self.profile = profile
         self.tabManager = tabManager
         self.readerModeCache = ReaderMode.cache(for: tabManager.selectedTab)
@@ -174,6 +175,7 @@ class BrowserViewController: UIViewController {
 
         self.braveRewardsManager = braveRewardsManager
         self.backgroundDataSource = backgroundDataSource
+        self.feedDataSource = feedDataSource
         
         super.init(nibName: nil, bundle: nil)
         didInit()

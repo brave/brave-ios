@@ -30,6 +30,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var imageStore: DiskImageStore?
     
     let backgroundDataSource = NTPDataSource()
+    let feedDataSource = FeedDataSource()
 
     var shutdownWebServer: DispatchSourceTimer?
     

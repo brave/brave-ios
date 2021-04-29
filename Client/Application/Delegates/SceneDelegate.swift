@@ -37,7 +37,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                                   tabManager: tabManager!,
                                   crashedLastSession: false,
                                   braveRewardsManager: appDelegate.braveRewardsManager,
-                                  backgroundDataSource: appDelegate.backgroundDataSource)
+                                  backgroundDataSource: appDelegate.backgroundDataSource,
+                                  feedDataSource: appDelegate.feedDataSource)
         
         guard let bvc = bvc else { return }
         bvc.edgesForExtendedLayout = []
