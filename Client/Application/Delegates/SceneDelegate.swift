@@ -15,6 +15,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     var authenticator: AppAuthenticator?
     
+    // Don't track crashes if we're building the development environment due to the fact that terminating/stopping
+    // the simulator via Xcode will count as a "crash" and lead to restore popups in the subsequent launch
     private let crashedLastSession =
         !Preferences.AppState.backgroundedCleanly.value && AppConstants.buildChannel != .debug
     
@@ -55,6 +57,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         SceneObserver.setupApplication(window: window)
         authenticator = AppAuthenticator(protectedWindow: window, promptImmediately: true, isPasscodeEntryCancellable: false)
+        
+        bvc.removeScheduledAdGrantReminders()
+        
+        browserViewController.shouldShowIntroScreen =
+            DefaultBrowserIntroManager.prepareAndShowIfNeeded(isNewUser: isFirstLaunch)
     }
     
     func sceneDidBecomeActive(_ scene: UIScene) {

@@ -32,13 +32,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
     var braveCore: BraveCoreMain?
     var imageStore: DiskImageStore?
 
-    weak var application: UIApplication?
-    var launchOptions: [AnyHashable: Any]?
-
-    let appVersion = Bundle.main.infoDictionaryString(forKey: "CFBundleShortVersionString")
-
-    var receivedURLs: [URL]?
-    
     var shutdownWebServer: DispatchSourceTimer?
     
     lazy var braveRewardsManager: BraveRewardsManager = {
@@ -52,16 +45,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
     let iapObserver = IAPObserver()
 
     @discardableResult func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Hold references to willFinishLaunching parameters for delayed app launch
-        self.application = application
-        self.launchOptions = launchOptions
         
         // Brave Core Initialization
         self.braveCore = BraveCoreMain()
         self.braveCore?.setUserAgent(UserAgent.mobile)
         
-        
-
         AdBlockStats.shared.startLoading()
         HttpsEverywhereStats.shared.startLoading()
         
@@ -141,10 +129,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
 
         // Make sure current private browsing flag respects the private browsing only user preference
         PrivateBrowsingManager.shared.isPrivateBrowsing = Preferences.Privacy.privateBrowsingOnly.value
-        
-        // Don't track crashes if we're building the development environment due to the fact that terminating/stopping
-        // the simulator via Xcode will count as a "crash" and lead to restore popups in the subsequent launch
-        let crashedLastSession = !Preferences.AppState.backgroundedCleanly.value && AppConstants.buildChannel != .debug
         Preferences.AppState.backgroundedCleanly.value = false
 
         self.updateAuthenticationInfo()
@@ -152,7 +136,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         
         // Schedule Brave Core Priority Tasks
         self.braveCore?.scheduleLowPriorityStartupTasks()
-        //browserViewController.removeScheduledAdGrantReminders()
 
         log.info("startApplication end")
         return true
@@ -257,9 +240,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         if !Preferences.VPN.popupShowed.value {
             Preferences.VPN.appLaunchCountForVPNPopup.value += 1
         }
-        
-        //browserViewController.shouldShowIntroScreen =
-          //  DefaultBrowserIntroManager.prepareAndShowIfNeeded(isNewUser: isFirstLaunch)
         
         // Search engine setup must be checked outside of 'firstLaunch' loop because of #2770.
         // There was a bug that when you skipped onboarding, default search engine preference
@@ -383,9 +363,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
             profile.reopen()
             setUpWebServer(profile)
         }
-        
-        self.receivedURLs = nil
-        application.applicationIconBadgeNumber = 0
 
         // handle quick actions is available
         let quickActions = QuickActions.sharedInstance
