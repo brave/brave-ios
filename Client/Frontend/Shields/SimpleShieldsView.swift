@@ -277,6 +277,7 @@ extension SimpleShieldsView {
 
             if let radius = cornerRadius {
                 backgroundView.layer.cornerRadius = radius
+                backgroundView.layer.cornerCurve = .continuous
             }
 
             insertSubview(backgroundView, at: 0)

@@ -19,6 +19,7 @@ private class DuckDuckGoCalloutButton: SpringButton {
         $0.clipsToBounds = true
         $0.isUserInteractionEnabled = false
         $0.layer.cornerRadius = 4
+        $0.layer.cornerCurve = .continuous
     }
     
     private let logoImageView = UIImageView(image: #imageLiteral(resourceName: "duckduckgo"))
@@ -38,6 +39,8 @@ private class DuckDuckGoCalloutButton: SpringButton {
             $0.spacing = 12
             $0.alignment = .center
         }
+        
+        backgroundView.layer.cornerCurve = .continuous
         
         addSubview(backgroundView)
         backgroundView.contentView.addSubview(stackView)

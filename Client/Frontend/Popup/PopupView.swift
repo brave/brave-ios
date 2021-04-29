@@ -434,6 +434,7 @@ class PopupView: UIView, UIGestureRecognizerDelegate {
         switch popupStyle {
         case .dialog:
             dialogView.layer.cornerRadius = kPopupDialogCornerRadius
+            dialogView.layer.cornerCurve = .continuous
             defaultShowType = .flyUp
             defaultDismissType = .flyDown
             verticalAlignment = .middle

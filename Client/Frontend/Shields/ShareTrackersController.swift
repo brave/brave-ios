@@ -174,6 +174,7 @@ private class ShareTrackersView: UIView {
 
         actionButton.contentEdgeInsets = UX.actionButtonInsets
         actionButton.layer.cornerRadius = 20
+        actionButton.layer.cornerCurve = .continuous
         actionButton.clipsToBounds = true
         actionButton.layer.borderWidth = 1
         actionButton.layer.borderColor = UIColor.white.cgColor

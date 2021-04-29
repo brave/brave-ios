@@ -12,6 +12,7 @@ open class ActionButton: Button {
     
     backgroundColor = .clear
     layer.borderWidth = 1.0
+    layer.cornerCurve = .continuous
     tintColor = .white
   }
   

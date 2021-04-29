@@ -30,6 +30,7 @@ class AdContentButton: UIControl {
     backgroundView.isUserInteractionEnabled = false
     backgroundView.contentView.backgroundColor = UIColor.white.withAlphaComponent(0.7)
     backgroundView.layer.cornerRadius = 10
+    backgroundView.layer.cornerCurve = .continuous
     backgroundView.layer.masksToBounds = true
     return backgroundView
   }()

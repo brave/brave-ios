@@ -155,6 +155,7 @@ extension NewTabPageBackgroundButtonsView {
             $0.clipsToBounds = true
             $0.isUserInteractionEnabled = false
             $0.layer.cornerRadius = 4
+            $0.layer.cornerCurve = .continuous
         }
         
         let label = UILabel().then {

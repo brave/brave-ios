@@ -94,6 +94,7 @@ class ButtonToast: Toast {
         if let buttonText = buttonText {
             let button = HighlightableButton()
             button.layer.cornerRadius = ButtonToastUX.toastButtonBorderRadius
+            button.layer.cornerCurve = .continuous
             button.layer.borderWidth = ButtonToastUX.toastButtonBorderWidth
             button.layer.borderColor = UIColor.white.cgColor
             button.setTitle(buttonText, for: [])

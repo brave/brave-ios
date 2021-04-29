@@ -164,9 +164,7 @@ private class MaskedNewLabel: UIView {
         
         backgroundColor = .white
         layer.cornerRadius = 8
-        if #available(iOS 13.0, *) {
-            layer.cornerCurve = .continuous
-        }
+        layer.cornerCurve = .continuous
         
         gradientView.mask = label
         clipsToBounds = true

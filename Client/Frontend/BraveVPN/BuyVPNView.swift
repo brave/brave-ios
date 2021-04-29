@@ -370,6 +370,7 @@ extension BuyVPNViewController {
             }
             
             layer.cornerRadius = 12
+            layer.cornerCurve = .continuous
             layer.masksToBounds = true
             
             let mainStackView = UIStackView().then {
@@ -399,6 +400,7 @@ extension BuyVPNViewController {
                         startPoint: .zero,
                         endPoint: CGPoint(x: 1, y: 0.5)).then {
                         $0.layer.cornerRadius = 4
+                        $0.layer.cornerCurve = .continuous
                     }
                     
                     let disclaimerLabel = DisclaimerLabel().then {
@@ -408,6 +410,7 @@ extension BuyVPNViewController {
                         $0.font = .systemFont(ofSize: 12, weight: .bold)
                         // $0.backgroundColor = UX.disclaimerColor
                         $0.layer.cornerRadius = 4
+                        $0.layer.cornerCurve = .continuous
                         $0.layer.masksToBounds = true
                     }
                     

@@ -33,6 +33,7 @@ class TabCell: UICollectionViewCell {
     override init(frame: CGRect) {
         self.backgroundHolder.backgroundColor = .white
         self.backgroundHolder.layer.cornerRadius = TabTrayControllerUX.cornerRadius
+        self.backgroundHolder.layer.cornerCurve = .continuous
         self.backgroundHolder.clipsToBounds = true
         
         self.screenshotView.contentMode = .scaleAspectFill
@@ -44,6 +45,7 @@ class TabCell: UICollectionViewCell {
         
         self.favicon.backgroundColor = UIColor.clear
         self.favicon.layer.cornerRadius = 2.0
+        self.favicon.layer.cornerCurve = .continuous
         self.favicon.layer.masksToBounds = true
         
         self.titleLabel = UILabel()
@@ -67,6 +69,7 @@ class TabCell: UICollectionViewCell {
         layer.borderWidth = TabTrayControllerUX.defaultBorderWidth
         layer.borderColor = UIColor.braveSeparator.cgColor
         layer.cornerRadius = TabTrayControllerUX.cornerRadius
+        layer.cornerCurve = .continuous
         
         contentView.addSubview(backgroundHolder)
         backgroundHolder.addSubview(self.screenshotView)

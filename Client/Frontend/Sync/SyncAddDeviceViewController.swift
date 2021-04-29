@@ -96,6 +96,7 @@ class SyncAddDeviceViewController: SyncViewController {
         containerView = UIView()
         containerView.translatesAutoresizingMaskIntoConstraints = false
         containerView.layer.cornerRadius = 8
+        containerView.layer.cornerCurve = .continuous
         containerView.layer.masksToBounds = true
 
         if !BraveSyncAPI.shared.isInSyncGroup {

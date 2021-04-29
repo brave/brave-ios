@@ -22,6 +22,7 @@ class BackForwardTableViewCell: UITableViewCell {
         let faviconView = UIImageView(image: FaviconFetcher.defaultFaviconImage)
         faviconView.backgroundColor = .braveBackground
         faviconView.layer.cornerRadius = 6
+        faviconView.layer.cornerCurve = .continuous
         faviconView.layer.borderWidth = 0.5
         faviconView.layer.borderColor = UIColor(white: 0, alpha: 0.1).cgColor
         faviconView.layer.masksToBounds = true

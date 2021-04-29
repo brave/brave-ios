@@ -16,7 +16,6 @@ class TabsButton: UIButton {
     
     private let countLabel = UILabel().then {
         $0.font = TabsButtonUX.titleFont
-        $0.layer.cornerRadius = TabsButtonUX.cornerRadius
         $0.textAlignment = .center
         $0.isUserInteractionEnabled = false
         $0.textColor = .braveLabel

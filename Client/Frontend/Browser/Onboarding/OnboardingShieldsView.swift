@@ -41,6 +41,7 @@ extension OnboardingShieldsViewController {
         private let descriptionView = UIView().then {
             $0.backgroundColor = .braveBackground
             $0.layer.cornerRadius = 12
+            $0.layer.cornerCurve = .continuous
             $0.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         }
         

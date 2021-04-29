@@ -12,6 +12,7 @@ extension WalletTransferViewController {
         let cameraView = SyncCameraView().then {
             $0.backgroundColor = .black
             $0.layer.cornerRadius = 4
+            $0.layer.cornerCurve = .continuous
         }
         
         private let scrollView = UIScrollView()

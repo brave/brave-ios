@@ -141,6 +141,7 @@ private class ContentView: UIView {
         
         clipsToBounds = true
         layer.cornerRadius = 8
+        layer.cornerCurve = .continuous
         
         mainStackView.snp.makeConstraints {
             $0.edges.equalToSuperview().inset(36)

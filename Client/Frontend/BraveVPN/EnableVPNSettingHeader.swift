@@ -64,6 +64,7 @@ class EnableVPNSettingHeader: UIView {
     private let contentView = UIView().then {
         $0.clipsToBounds = true
         $0.layer.cornerRadius = 16
+        $0.layer.cornerCurve = .continuous
         $0.backgroundColor = BraveVPNCommonUI.UX.purpleBackgroundColor
     }
     

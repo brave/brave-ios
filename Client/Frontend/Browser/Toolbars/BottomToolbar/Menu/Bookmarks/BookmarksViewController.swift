@@ -307,6 +307,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
             cell.imageView?.contentMode = .scaleAspectFit
             cell.imageView?.image = FaviconFetcher.defaultFaviconImage
             cell.imageView?.layer.cornerRadius = 6
+            cell.imageView?.layer.cornerCurve = .continuous
             cell.imageView?.layer.masksToBounds = true
             
             if let image = image {

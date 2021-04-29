@@ -218,6 +218,7 @@ extension OnboardingSearchEnginesViewController {
             
             imageView?.contentMode = .scaleAspectFit
             layer.cornerRadius = UX.SearchEngineCell.cornerRadius
+            layer.cornerCurve = .continuous
             
             selectedBackgroundView = UIView().then {
                 $0.layer.cornerRadius = UX.SearchEngineCell.cornerRadius

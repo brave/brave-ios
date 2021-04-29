@@ -210,6 +210,7 @@ private class SuggestionButton: InsetButton {
         titleLabel?.font = DynamicFontHelper.defaultHelper.DefaultMediumFont
         layer.borderWidth = SuggestionCellUX.suggestionBorderWidth
         layer.cornerRadius = SuggestionCellUX.suggestionCornerRadius
+        layer.cornerCurve = .continuous
         layer.borderColor = UIColor.braveInfoBorder.cgColor
         contentEdgeInsets = SuggestionCellUX.suggestionInsets
 

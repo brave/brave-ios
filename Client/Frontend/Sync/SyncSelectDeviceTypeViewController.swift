@@ -46,6 +46,7 @@ class SyncDeviceTypeButton: UIControl {
         backgroundColor = .braveBackground
         clipsToBounds = false
         layer.cornerRadius = 12
+        layer.cornerCurve = .continuous
         layer.shadowColor = UIColor(white: 0.2, alpha: 1.0).cgColor
         layer.shadowRadius = 3
         layer.shadowOpacity = 0.1

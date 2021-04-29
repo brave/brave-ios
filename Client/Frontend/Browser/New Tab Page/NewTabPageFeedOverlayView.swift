@@ -130,6 +130,7 @@ class NewContentAvailableButton: SpringButton {
         super.init(frame: frame)
         
         backgroundColor = UIColor.braveOrange
+        layer.cornerCurve = .continuous
         
         clipsToBounds = true
         layer.shadowOffset = CGSize(width: 0, height: 1)

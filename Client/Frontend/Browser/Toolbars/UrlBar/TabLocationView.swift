@@ -433,6 +433,7 @@ private class CustomSeparatorView: UIView {
         super.init(frame: .zero)
         backgroundColor = .clear
         innerView.layer.cornerRadius = cornerRadius
+        innerView.layer.cornerCurve = .continuous
         addSubview(innerView)
         innerView.snp.makeConstraints {
             $0.width.height.equalTo(lineSize)

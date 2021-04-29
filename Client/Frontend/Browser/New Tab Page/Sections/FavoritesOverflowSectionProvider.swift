@@ -26,6 +26,8 @@ class FavoritesOverflowButton: SpringButton {
             $0.font = UIFont.systemFont(ofSize: 12.0, weight: .medium)
         }
         
+        backgroundView.layer.cornerCurve = .continuous
+        
         addSubview(backgroundView)
         backgroundView.contentView.addSubview(label)
         

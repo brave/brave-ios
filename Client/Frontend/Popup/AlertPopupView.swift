@@ -65,6 +65,7 @@ class AlertPopupView: PopupView {
                 $0.autocorrectionType = .no
                 $0.autocapitalizationType = .none
                 $0.layer.cornerRadius = 4
+                $0.layer.cornerCurve = .continuous
                 $0.layer.borderColor = UIColor(white: 0, alpha: 0.3).cgColor
                 $0.layer.borderWidth = 1
                 $0.delegate = self

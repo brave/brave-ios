@@ -225,6 +225,7 @@ class SearchSettingsTableViewController: UITableViewController {
                     $0.textLabel?.minimumScaleFactor = 0.5
                     $0.imageView?.image = engine?.image.createScaled(UX.iconSize)
                     $0.imageView?.layer.cornerRadius = 4
+                    $0.imageView?.layer.cornerCurve = .continuous
                     $0.imageView?.layer.masksToBounds = true
                     $0.selectionStyle = .none
                 }

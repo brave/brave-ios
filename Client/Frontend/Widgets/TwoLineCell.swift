@@ -217,6 +217,7 @@ private class TwoLineCellHelper {
 
         imageView.contentMode = .scaleAspectFill
         imageView.layer.cornerRadius = 6 // hmm
+        imageView.layer.cornerCurve = .continuous
         imageView.layer.masksToBounds = true
     }
 
