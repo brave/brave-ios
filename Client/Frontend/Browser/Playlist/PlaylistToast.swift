@@ -39,7 +39,9 @@ class PlaylistToast: Toast {
     
     private let button = HighlightableButton()
     private var swipeStartLocation = CGPoint()
-    private let idealDismissDistance: CGFloat = 40.0
+    private let idealDismissLongDistance: CGFloat = 40.0
+    private let idealDismissShortDistance: CGFloat = 10.0
+    private let outOfRangeSwipeDistance: CGFloat = 40.0
     
     private let state: PlaylistItemAddedState
     var item: PlaylistInfo
@@ -278,15 +280,31 @@ class PlaylistToast: Toast {
             if dy < -15.0 {
                 return
             }
+
+            // UIDevice.current.orientation.isLandscape does NOT work here
+            // because it doesn't take into account `faceUp` or laying flat
+            let isLandscape = bounds.width > bounds.height
             
-            // Swiping left or right
-            if (dx > idealDismissDistance * 2.0 || dx < -idealDismissDistance * 2.0) && abs(dy) < idealDismissDistance {
-                return
+            if isLandscape || UIDevice.isIpad {
+                // Swiping left or right
+                if (dx > outOfRangeSwipeDistance * 2.0 || dx < -outOfRangeSwipeDistance * 2.0) && abs(dy) < outOfRangeSwipeDistance {
+                    return
+                }
+                
+                if distance > idealDismissShortDistance {
+                    self.dismiss(false)
+                }
+            } else {
+                // Swiping left or right
+                if (dx > outOfRangeSwipeDistance * 2.0 || dx < -outOfRangeSwipeDistance * 2.0) && abs(dy) < outOfRangeSwipeDistance {
+                    return
+                }
+                
+                if distance > idealDismissLongDistance {
+                    self.dismiss(false)
+                }
             }
             
-            if distance > idealDismissDistance {
-                self.dismiss(false)
-            }
         }
     }
 }
