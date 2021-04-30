@@ -10,17 +10,17 @@ import Shared
 /// The main ads view. Mimics a system notification in that it shows an icon, "app name" (always will be "Brave Rewards"), title and body.
 class AdContentButton: UIControl {
   let titleLabel = UILabel().then {
-    $0.textColor = .black
+    $0.textColor = .bravePrimary
     $0.font = .systemFont(ofSize: 15.0, weight: .semibold)
     $0.numberOfLines = 2
   }
   let bodyLabel = UILabel().then {
-    $0.textColor = .black
+    $0.textColor = .bravePrimary
     $0.font = .systemFont(ofSize: 15.0)
     $0.numberOfLines = 3
   }
   private let appNameLabel = UILabel().then {
-    $0.textColor = UIColor.black.withAlphaComponent(0.5)
+    $0.textColor = UIColor.bravePrimary.withAlphaComponent(0.5)
     $0.font = .systemFont(ofSize: 14.0, weight: .regular)
     $0.text = Strings.Ads.adNotificationTitle.uppercased()
   }
@@ -28,7 +28,7 @@ class AdContentButton: UIControl {
   private let backgroundView: UIVisualEffectView = {
     let backgroundView = UIVisualEffectView(effect: UIBlurEffect(style: .systemThinMaterial))
     backgroundView.isUserInteractionEnabled = false
-    backgroundView.contentView.backgroundColor = UIColor.white.withAlphaComponent(0.7)
+    backgroundView.contentView.backgroundColor = UIColor.braveBackground.withAlphaComponent(0.5)
     backgroundView.layer.cornerRadius = 10
     backgroundView.layer.cornerCurve = .continuous
     backgroundView.layer.masksToBounds = true
@@ -78,8 +78,6 @@ class AdContentButton: UIControl {
     layer.shadowOpacity = 0.25
     layer.shadowOffset = CGSize(width: 0, height: 1)
     layer.shadowRadius = 2
-    
-    applyTheme(for: traitCollection)
   }
   
   public override func layoutSubviews() {
@@ -102,18 +100,5 @@ class AdContentButton: UIControl {
         animation.toValue = CGSize(width: scale, height: scale)
       }
     }
-  }
-  
-  func applyTheme(for traitCollection: UITraitCollection) {
-    let isDarkMode = traitCollection.userInterfaceStyle == .dark
-    appNameLabel.textColor = (isDarkMode ? UIColor.white : UIColor.black).withAlphaComponent(0.5)
-    titleLabel.textColor = isDarkMode ? .white : .black
-    bodyLabel.textColor = isDarkMode ? .white : .black
-    backgroundView.contentView.backgroundColor = isDarkMode ? UIColor.black.withAlphaComponent(0.3) : UIColor.white.withAlphaComponent(0.7)
-  }
-  
-  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-    super.traitCollectionDidChange(previousTraitCollection)
-    applyTheme(for: traitCollection)
   }
 }

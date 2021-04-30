@@ -280,9 +280,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         UIScrollView.doBadSwizzleStuff()
         applyAppearanceDefaults()
         
-        Preferences.General.themeNormalMode.$value
-            .map { _ in () }
-            .merge(with: PrivateBrowsingManager.shared.$isPrivateBrowsing.map { _ in () })
+        Preferences.General.themeNormalMode.objectWillChange
+            .merge(with: PrivateBrowsingManager.shared.objectWillChange)
             .receive(on: RunLoop.main)
             .sink { [weak self] _ in
                 self?.updateTheme()
