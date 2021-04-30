@@ -28,7 +28,7 @@ private class ToastShadowView: UIView {
                 $0.fillColor = UIColor.clear.cgColor
                 $0.shadowColor = UIColor.black.cgColor
                 $0.shadowPath = path
-                $0.shadowOffset = CGSize(width: 0.0, height: 0.0)
+                $0.shadowOffset = .zero
                 $0.shadowOpacity = 0.5
                 $0.shadowRadius = ButtonToastUX.toastButtonBorderRadius
             }
@@ -74,7 +74,7 @@ private class HighlightableButton: UIButton {
                 $0.fillColor = UIColor.clear.cgColor
                 $0.shadowColor = UIColor.black.cgColor
                 $0.shadowPath = path
-                $0.shadowOffset = CGSize(width: 0.0, height: 0.0)
+                $0.shadowOffset = .zero
                 $0.shadowOpacity = 0.5
                 $0.shadowRadius = ButtonToastUX.toastButtonBorderRadius
             }
