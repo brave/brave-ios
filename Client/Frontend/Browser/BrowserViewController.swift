@@ -2155,13 +2155,7 @@ extension BrowserViewController: TabManagerDelegate {
                     topToolbar.updateProgressBar(Float(selectedEstimatedProgress))
                 }
             }
-
-            // FIXME: Theme - Private Mode
-//            let newTheme = Theme.of(tab)
-//            if previous == nil || newTheme != Theme.of(previous) {
-//
-//            }
-
+            
             readerModeCache = ReaderMode.cache(for: tab)
             ReaderModeHandlers.readerModeCache = readerModeCache
 

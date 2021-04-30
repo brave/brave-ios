@@ -69,7 +69,7 @@ class DuckDuckGoCalloutSectionProvider: NSObject, NTPObservableSectionProvider {
     
     private typealias DuckDuckGoCalloutCell = NewTabCenteredCollectionViewCell<DuckDuckGoCalloutButton>
     
-    var privateModeCancellable: AnyCancellable?
+    private var privateModeCancellable: AnyCancellable?
     
     init(profile: Profile, action: @escaping () -> Void) {
         self.profile = profile
@@ -91,7 +91,7 @@ class DuckDuckGoCalloutSectionProvider: NSObject, NTPObservableSectionProvider {
         return isPrivateBrowsing && !isSearchEngineSet && shouldShowPromo
     }
     
-    @objc private func privateModeChanged() {
+    private func privateModeChanged() {
         sectionDidChange?()
     }
     
