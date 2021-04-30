@@ -252,7 +252,7 @@ class DownloadsPanel: UIViewController, UITableViewDelegate, UITableViewDataSour
     }
     
     fileprivate func createEmptyStateOverlayView() -> UIView {
-        overlayView.backgroundColor = .braveBackground
+        overlayView.backgroundColor = .secondaryBraveBackground
         
         overlayView.addSubview(logoImageView)
         logoImageView.snp.makeConstraints { make in

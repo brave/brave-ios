@@ -36,7 +36,7 @@ class TrayToolbar: UIView {
     fileprivate override init(frame: CGRect) {
         super.init(frame: frame)
         
-        backgroundColor = .braveBackground
+        backgroundColor = .secondaryBraveBackground
         
         addSubview(addTabButton)
         addSubview(doneButton)

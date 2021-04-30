@@ -124,12 +124,12 @@ class TabTrayController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        view.backgroundColor = .braveBackground
+        view.backgroundColor = .secondaryBraveBackground
         view.accessibilityLabel = Strings.tabTrayAccessibilityLabel
         
         collectionView = UICollectionView(frame: view.frame, collectionViewLayout: UICollectionViewFlowLayout())
         
-        collectionView.backgroundColor = .braveBackground
+        collectionView.backgroundColor = .secondaryBraveBackground
         collectionView.dataSource = tabDataSource
         collectionView.delegate = tabLayoutDelegate
         collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: UIConstants.bottomToolbarHeight, right: 0)
