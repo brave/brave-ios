@@ -75,7 +75,7 @@ class FindInPageBar: UIView {
         searchText.accessibilityIdentifier = "FindInPage.searchField"
         addSubview(searchText)
 
-        matchCountView.textColor = .braveLabel
+        matchCountView.textColor = .secondaryBraveLabel
         matchCountView.font = FindInPageUX.matchCountFont
         matchCountView.isHidden = true
         matchCountView.accessibilityIdentifier = "FindInPage.matchCount"

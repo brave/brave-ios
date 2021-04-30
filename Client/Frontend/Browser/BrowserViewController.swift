@@ -1085,14 +1085,12 @@ class BrowserViewController: UIViewController {
             make.centerX.equalTo(self.view)
             make.width.equalTo(self.view.safeArea.width)
             if let keyboardHeight = keyboardState?.intersectionHeightForView(self.view), keyboardHeight > 0 {
-                make.bottom.equalTo(self.view).offset(-keyboardHeight - 10)
+                make.bottom.equalTo(self.view).offset(-keyboardHeight)
             } else if let toolbar = self.toolbar {
                 make.bottom.lessThanOrEqualTo(toolbar.snp.top)
-                    .offset(-10)
                 make.bottom.lessThanOrEqualTo(self.view.safeArea.bottom)
-                    .offset(-10)
             } else {
-                make.bottom.equalTo(self.view.safeArea.bottom).offset(-10)
+                make.bottom.equalTo(self.view.safeArea.bottom)
             }
         }
         
