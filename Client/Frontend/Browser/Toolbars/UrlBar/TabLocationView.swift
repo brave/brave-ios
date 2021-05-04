@@ -28,8 +28,6 @@ protocol TabLocationViewDelegate {
 }
 
 private struct TabLocationViewUX {
-    static let hostFontColor = UIColor.black
-    static let baseURLFontColor = UIColor.Photon.grey50
     static let spacing: CGFloat = 8
     static let statusIconSize: CGFloat = 18
     static let TPIconSize: CGFloat = 24
@@ -43,10 +41,6 @@ class TabLocationView: UIView {
     var tapRecognizer: UITapGestureRecognizer!
     var contentView: UIStackView!
     private var tabObservers: TabObservers!
-
-    @objc dynamic var baseURLFontColor: UIColor = TabLocationViewUX.baseURLFontColor {
-        didSet { updateTextWithURL() }
-    }
 
     var url: URL? {
         didSet {
@@ -118,7 +112,7 @@ class TabLocationView: UIView {
     }
 
     lazy var placeholder: NSAttributedString = {
-        return NSAttributedString(string: Strings.tabToolbarSearchAddressPlaceholderText, attributes: [NSAttributedString.Key.foregroundColor: UIColor.Photon.grey40])
+        return NSAttributedString(string: Strings.tabToolbarSearchAddressPlaceholderText, attributes: [NSAttributedString.Key.foregroundColor: UIColor.secondaryBraveLabel])
     }()
 
     lazy var urlTextField: UITextField = {

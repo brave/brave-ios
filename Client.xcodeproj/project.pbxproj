@@ -439,7 +439,6 @@
 		28B62ACE1BC745E7004A585A /* Syncable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28B62ACD1BC745E7004A585A /* Syncable.swift */; };
 		28C4AB721AD42D4300D9ACE3 /* Clients.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28C4AB711AD42D4300D9ACE3 /* Clients.swift */; };
 		28E08C991AF44EF9009BA2FA /* SQLiteHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FCAE2551ABB531100877008 /* SQLiteHistory.swift */; };
-		2C49854E206173C800893DAE /* photon-colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C49854D206173C800893DAE /* photon-colors.swift */; };
 		2F098F8B255F2D730084FB37 /* BrowserViewController+ReaderMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F098F8A255F2D730084FB37 /* BrowserViewController+ReaderMode.swift */; };
 		2F13E79B1AC0C02700D75081 /* StringExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F13E79A1AC0C02700D75081 /* StringExtensionsTests.swift */; };
 		2F198EE82603FDD900945AB3 /* AddSearchEngineActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F198EE72603FDD900945AB3 /* AddSearchEngineActivity.swift */; };
@@ -994,7 +993,6 @@
 		E653422D1C5944F90039DD9E /* BrowserPrompts.swift in Sources */ = {isa = PBXBuildFile; fileRef = E653422C1C5944F90039DD9E /* BrowserPrompts.swift */; };
 		E65D89181C8647420006EA35 /* AppAuthenticator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E65D89171C8647420006EA35 /* AppAuthenticator.swift */; };
 		E660BDD91BB06521009AC090 /* TabsButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = E660BDD81BB06521009AC090 /* TabsButton.swift */; };
-		E663D5781BB341C4001EF30E /* ToggleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = E663D5771BB341C4001EF30E /* ToggleButton.swift */; };
 		E677F0541D94247300ECF1FB /* Metadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = E677F0531D94247300ECF1FB /* Metadata.swift */; };
 		E683F0A61E92E0820035D990 /* MockableHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = E683F0A51E92E0820035D990 /* MockableHistory.swift */; };
 		E683F0C21E93D4E90035D990 /* DictionaryExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E683F0C11E93D4E90035D990 /* DictionaryExtensions.swift */; };
@@ -1941,7 +1939,6 @@
 		28B62ACD1BC745E7004A585A /* Syncable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Syncable.swift; sourceTree = "<group>"; };
 		28C4AB711AD42D4300D9ACE3 /* Clients.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Clients.swift; sourceTree = "<group>"; };
 		28CE83E81A1D206D00576538 /* Client-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Client-Bridging-Header.h"; sourceTree = "<group>"; };
-		2C49854D206173C800893DAE /* photon-colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "photon-colors.swift"; sourceTree = "<group>"; };
 		2F098F8A255F2D730084FB37 /* BrowserViewController+ReaderMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowserViewController+ReaderMode.swift"; sourceTree = "<group>"; };
 		2F13E79A1AC0C02700D75081 /* StringExtensionsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringExtensionsTests.swift; sourceTree = "<group>"; };
 		2F198EE72603FDD900945AB3 /* AddSearchEngineActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddSearchEngineActivity.swift; sourceTree = "<group>"; };
@@ -2709,7 +2706,6 @@
 		E653422C1C5944F90039DD9E /* BrowserPrompts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserPrompts.swift; sourceTree = "<group>"; };
 		E65D89171C8647420006EA35 /* AppAuthenticator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppAuthenticator.swift; sourceTree = "<group>"; };
 		E660BDD81BB06521009AC090 /* TabsButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabsButton.swift; sourceTree = "<group>"; };
-		E663D5771BB341C4001EF30E /* ToggleButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ToggleButton.swift; sourceTree = "<group>"; };
 		E677F0531D94247300ECF1FB /* Metadata.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Metadata.swift; sourceTree = "<group>"; };
 		E683F0A51E92E0820035D990 /* MockableHistory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockableHistory.swift; sourceTree = "<group>"; };
 		E683F0C11E93D4E90035D990 /* DictionaryExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DictionaryExtensions.swift; sourceTree = "<group>"; };
@@ -4994,7 +4990,6 @@
 				D38A1BEC1A9FA2CA00F6A386 /* SiteTableViewController.swift */,
 				0BB5B2861AC0A2B90052877D /* SnackBar.swift */,
 				E660BDD81BB06521009AC090 /* TabsButton.swift */,
-				E663D5771BB341C4001EF30E /* ToggleButton.swift */,
 				7B844E3C1BBDDB9D00E733A2 /* ChevronView.swift */,
 				C4E3984B1D21F2FD004E89BA /* TabTrayButtonExtensions.swift */,
 				5D26E89C22E117660015D7E9 /* Themes */,
@@ -5510,7 +5505,6 @@
 				271877FF216525FB0006036E /* Popup */,
 				D0FCF7EE1FE44E15004A7995 /* UserContent */,
 				D38A1BEB1A9FA2CA00F6A386 /* Widgets */,
-				2C49854D206173C800893DAE /* photon-colors.swift */,
 			);
 			path = Frontend;
 			sourceTree = "<group>";
@@ -7146,7 +7140,6 @@
 				27B3DDD524AF98EA0006A7ED /* FeedItem.swift in Sources */,
 				0AF4C59424F8003A00E500DD /* NTPDefaultBrowserCalloutProvider.swift in Sources */,
 				C4EFEECF1CEBB6F2009762A4 /* BackForwardTableViewCell.swift in Sources */,
-				2C49854E206173C800893DAE /* photon-colors.swift in Sources */,
 				E689C7301E0C7617008BAADB /* NSAttributedStringExtensions.swift in Sources */,
 				27036F9A25684F9F004EF6B6 /* AdView.swift in Sources */,
 				27A1AC0C2485A1C200344503 /* FeedDataSource.swift in Sources */,
@@ -7407,7 +7400,6 @@
 				0A4B012420D0321A004D4011 /* UX.swift in Sources */,
 				5E9B28EB255047C80072E655 /* BookmarkModelStateObserver.swift in Sources */,
 				4422D55521BFFB7E00BF1855 /* nfa.cc in Sources */,
-				E663D5781BB341C4001EF30E /* ToggleButton.swift in Sources */,
 				2FB9C2A12587E742009DA1FE /* BrowserViewController+ProductNotification.swift in Sources */,
 				0A39FE992486604D00290ABC /* GRDGatewayAPI.m in Sources */,
 				0A1DF48424487AA000541FE4 /* GRDGatewayAPIResponse.m in Sources */,

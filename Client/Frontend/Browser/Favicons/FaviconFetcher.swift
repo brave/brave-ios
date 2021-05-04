@@ -412,7 +412,7 @@ class FaviconFetcher {
     private var monogramFavicon: FaviconAttributes {
         func backgroundColor() -> UIColor {
             guard let hash = url.baseDomain?.hashValue else {
-                return UIColor.Photon.grey50
+                return .gray
             }
             let index = abs(hash) % (UIConstants.defaultColorStrings.count - 1)
             let colorHex = UIConstants.defaultColorStrings[index]

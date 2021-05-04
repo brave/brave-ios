@@ -52,22 +52,17 @@ class ReaderModeBarView: UIView {
             make.width.equalTo(80)
         }
         settingsButton.tintColor = .braveLabel
+        
+        let borderView = UIView.separatorLine
+        addSubview(borderView)
+        borderView.snp.makeConstraints {
+            $0.top.equalTo(snp.bottom)
+            $0.leading.trailing.equalToSuperview()
+        }
     }
 
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-
-    override func draw(_ rect: CGRect) {
-        super.draw(rect)
-        guard let context = UIGraphicsGetCurrentContext() else { return }
-        context.setLineWidth(0.5)
-        context.setStrokeColor(red: 0.1, green: 0.1, blue: 0.1, alpha: 1.0)
-        context.setStrokeColor(UIColor.Photon.grey50.cgColor)
-        context.beginPath()
-        context.move(to: CGPoint(x: 0, y: frame.height))
-        context.addLine(to: CGPoint(x: frame.width, y: frame.height))
-        context.strokePath()
     }
 
     fileprivate func createButton(_ type: ReaderModeBarButtonType, action: Selector) -> UIButton {

@@ -74,7 +74,7 @@ class OpenSearchEngineButton: Button {
         }
         
         loaderView = LoaderView(size: .small).then {
-            $0.tintColor = UIColor.Photon.grey50
+            $0.tintColor = .braveLabel
         }
     }
 }

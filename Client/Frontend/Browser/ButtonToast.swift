@@ -57,7 +57,7 @@ class ButtonToast: Toast {
 
         if let imageName = imageName {
             let icon = UIImageView(image: UIImage(imageLiteralResourceName: imageName).template)
-            icon.tintColor = UIColor.Photon.white100
+            icon.tintColor = UIColor.white
             horizontalStackView.addArrangedSubview(icon)
         }
 
@@ -67,7 +67,7 @@ class ButtonToast: Toast {
 
         let label = UILabel()
         label.textAlignment = textAlignment
-        label.textColor = UIColor.Photon.white100
+        label.textColor = UIColor.white
         label.font = ButtonToastUX.toastLabelFont
         label.text = labelText
         label.lineBreakMode = .byWordWrapping
@@ -82,7 +82,7 @@ class ButtonToast: Toast {
 
             descriptionLabel = UILabel()
             descriptionLabel?.textAlignment = textAlignment
-            descriptionLabel?.textColor = UIColor.Photon.white100
+            descriptionLabel?.textColor = UIColor.white
             descriptionLabel?.font = ButtonToastUX.toastDescriptionFont
             descriptionLabel?.text = descriptionText
             descriptionLabel?.lineBreakMode = .byTruncatingTail
@@ -95,7 +95,7 @@ class ButtonToast: Toast {
             let button = HighlightableButton()
             button.layer.cornerRadius = ButtonToastUX.toastButtonBorderRadius
             button.layer.borderWidth = ButtonToastUX.toastButtonBorderWidth
-            button.layer.borderColor = UIColor.Photon.white100.cgColor
+            button.layer.borderColor = UIColor.white.cgColor
             button.setTitle(buttonText, for: [])
             button.setTitleColor(toastView.backgroundColor, for: .highlighted)
             button.titleLabel?.font = SimpleToastUX.toastFont
