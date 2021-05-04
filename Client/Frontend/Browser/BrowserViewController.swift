@@ -1843,7 +1843,7 @@ class BrowserViewController: UIViewController {
                 
                 // Only add history of a url which is not a localhost url
                 if !tab.isPrivate {
-                    History.add(tab.title ?? "", url: url)
+                    Historyv2.add(url: url, title: tab.title ?? "", dateAdded: Date())
                 }
             }
 

@@ -106,7 +106,7 @@ class HistoryClearable: Clearable {
     
     func clear() -> Success {
         let result = Success()
-        History.deleteAll {
+        Historyv2.deleteAll {
             NotificationCenter.default.post(name: .privateDataClearedHistory, object: nil)
             result.fill(Maybe<()>(success: ()))
         }
