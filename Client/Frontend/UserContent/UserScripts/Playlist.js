@@ -171,18 +171,17 @@ window.__firefox__.includeOnce("$<Playlist>", function() {
         
         // When the long-press gesture is recognized, we want to disable all selections and context menus on the page
         function clearSelection() {
-            var sel;
-            if ((sel = document.selection) && sel.empty) {
-                sel.empty();
+            var selection;
+            if ((selection = document.selection) && selection.empty) {
+                selection.empty();
             } else {
                 if (window.getSelection) {
                     window.getSelection().removeAllRanges();
                 }
                 
-                var activeEl = document.activeElement;
-                if (activeEl) {
-                    var tagName = activeEl.nodeName.toLowerCase();
-                    activeEl.selectionStart = activeEl.selectionEnd;
+                var element = document.activeElement;
+                if (element) {
+                    element.selectionStart = element.selectionEnd;
                 }
             }
         }
