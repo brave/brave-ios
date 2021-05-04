@@ -1030,19 +1030,6 @@ class TabManagerNavDelegate: NSObject, WKNavigationDelegate {
         }
         return .allow
     }
-
-    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-        var res = defaultAllowPolicy()
-        for delegate in delegates {
-            delegate.webView?(webView, decidePolicyFor: navigationAction, decisionHandler: { policy in
-                if policy == .cancel {
-                    res = policy
-                }
-            })
-        }
-
-        decisionHandler(res)
-    }
     
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: WKWebpagePreferences, decisionHandler: @escaping (WKNavigationActionPolicy, WKWebpagePreferences) -> Void) {
         
