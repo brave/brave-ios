@@ -63,15 +63,15 @@ class Historyv2Fetcher: NSObject, HistoryV2FetchResultsController {
     weak var delegate: HistoryV2FetchResultsDelegate?
     
     var fetchedObjects: [Historyv2]? {
-        return historyList
+        historyList
     }
     
     var fetchedObjectsCount: Int {
-        return historyList.count
+        historyList.count
     }
     
     var sectionCount: Int {
-        return sectionDetails.count
+        sectionDetails.elements.filter { $0.value > 0 }.count
     }
     
     func performFetch(_ completion: @escaping () -> Void) {
@@ -79,17 +79,14 @@ class Historyv2Fetcher: NSObject, HistoryV2FetchResultsController {
         
         historyAPI?.search(withQuery: "", maxCount: 0, completion: { [weak self] historyNodeList in
             guard let self = self else { return }
+            
             self.historyList = historyNodeList.map { [unowned self] historyNode in
                 let historyItem = Historyv2(with: historyNode)
                 
-                for section in Historyv2.Section.allCases {
-                    if let detailCount = self.sectionDetails[section] {
-                        self.sectionDetails.updateValue(detailCount + 1, forKey: section)
-                    } else {
-                        self.sectionDetails.updateValue(0, forKey: section)
-                    }
+                if let section = historyItem.sectionID, let numOfItemInSection = self.sectionDetails[section] {
+                    self.sectionDetails.updateValue(numOfItemInSection + 1, forKey: section)
                 }
-            
+                
                 return historyItem
             }
             
@@ -98,23 +95,22 @@ class Historyv2Fetcher: NSObject, HistoryV2FetchResultsController {
     }
     
     func object(at indexPath: IndexPath) -> Historyv2? {
-        var (sectionIndex, itemCount) = (0, 0)
+        let filteredDetails = sectionDetails.elements.filter { $0.value > 0 }
+        var totalItemIndex = 0
         
-        repeat {
-            itemCount += objectCount(for: sectionIndex)
-            
-            sectionIndex += 1
-        } while sectionIndex == indexPath.section
-        
-        return historyList[safe: itemCount + indexPath.row]
+        for sectionIndex in 0..<indexPath.section {
+            totalItemIndex += filteredDetails[safe: sectionIndex]?.value ?? 0
+        }
+
+        return fetchedObjects?[totalItemIndex + indexPath.row]
     }
     
     func objectCount(for section: Int) -> Int {
-        return sectionDetails.elements[section].value
+        return sectionDetails.elements[safe: section]?.value ?? 0
     }
     
     func titleHeader(for section: Int) -> String {
-        return sectionDetails.elements[section].key.title
+        return sectionDetails.elements[safe: section]?.key.title ?? ""
 
     }
     
@@ -124,5 +120,9 @@ class Historyv2Fetcher: NSObject, HistoryV2FetchResultsController {
     
     private var historyList = [Historyv2]()
     
-    private var sectionDetails: OrderedDictionary<Historyv2.Section, Int> = [:]
+    private var sectionDetails: OrderedDictionary<Historyv2.Section, Int> = [.today: 0,
+                                                                             .yesterday: 0,
+                                                                             .lastWeek: 0,
+                                                                             .thisMonth: 0]
+    
 }
