@@ -83,6 +83,9 @@ class PlaylistHelper: TabContentScript {
         
         log.debug("FOUND VIDEO ITEM ON PAGE: \(message.body)")
         
+        // Has to be done otherwise it is impossible to play a video after selecting its elements
+        UIMenuController.shared.hideMenu()
+        
         if PlaylistItem.itemExists(item) {
             delegate?.openInPlayListActivity(info: item)
             delegate?.addToPlayListActivity(info: nil, itemDetected: false)
