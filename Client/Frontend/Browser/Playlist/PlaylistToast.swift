@@ -92,10 +92,7 @@ class PlaylistToast: Toast {
     }
     
     private let toastShadowView = ToastShadowView()
-    private lazy var gradientView = { () -> GradientView in
-        let isDarkMode = self.traitCollection.userInterfaceStyle == .dark
-        return isDarkMode ? Gradients.Dark.gradient02 : Gradients.Light.gradient02
-    }()
+    private lazy var gradientView = BraveGradientView.gradient02
     
     private let button = HighlightableButton()
     private var panState: CGPoint = .zero
@@ -196,7 +193,7 @@ class PlaylistToast: Toast {
                 $0.width.equalTo(toastView.snp.width).offset(-2 * ButtonToastUX.toastPadding)
             }
             
-            updateGradientView(traitCollection: traitCollection)
+            updateGradientView()
             return toastView
         }
         
@@ -239,7 +236,7 @@ class PlaylistToast: Toast {
             assertionFailure("Should Never get here. Others case are handled at the start of this function.")
         }
         
-        updateGradientView(traitCollection: traitCollection)
+        updateGradientView()
         return toastView
     }
     
@@ -292,15 +289,7 @@ class PlaylistToast: Toast {
             }
         }
     }
-    
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        
-        if UITraitCollection.current.userInterfaceStyle != previousTraitCollection?.userInterfaceStyle {
-            updateGradientView(traitCollection: traitCollection)
-        }
-    }
-    
+
     private var shadowLayerZOrder: Int {
         if state == .added || state == .existing {
             // In this state, the shadow is on the toastView
@@ -311,15 +300,8 @@ class PlaylistToast: Toast {
         return button.shadowLayerZOrder + 1
     }
     
-    private func updateGradientView(traitCollection: UITraitCollection) {
-        let isDarkMode = traitCollection.userInterfaceStyle == .dark
-        
+    private func updateGradientView() {
         gradientView.removeFromSuperview()
-        gradientView = isDarkMode ? Gradients.Dark.gradient02 : Gradients.Light.gradient02
-        gradientView.do {
-            $0.layer.cornerRadius = ButtonToastUX.toastButtonBorderRadius
-            $0.layer.masksToBounds = true
-        }
         
         if state == .added || state == .existing {
             toastView.insertSubview(gradientView, at: shadowLayerZOrder)

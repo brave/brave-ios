@@ -394,11 +394,7 @@ extension BuyVPNViewController {
                 }
                 
                 if let disclaimer = disclaimer {
-                    let gradient = GradientView(
-                        colors: [#colorLiteral(red: 0.968627451, green: 0.2274509804, blue: 0.1098039216, alpha: 1), #colorLiteral(red: 0.7490196078, green: 0.07843137255, blue: 0.6352941176, alpha: 1)],
-                        positions: [0, 1],
-                        startPoint: .zero,
-                        endPoint: CGPoint(x: 1, y: 0.5)).then {
+                    let gradient = BraveGradientView.gradient03.then {
                         $0.layer.cornerRadius = 4
                         $0.layer.cornerCurve = .continuous
                     }

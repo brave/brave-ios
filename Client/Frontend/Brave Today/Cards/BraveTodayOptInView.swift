@@ -148,12 +148,10 @@ class BraveTodayOptInView: UIView, FeedCardContent {
 
 /// Displays the word "New" with a gradient mask
 private class MaskedNewLabel: UIView {
-    private let gradientView = GradientView(
-        colors: [UIColor(rgb: 0x4C54D2), UIColor(rgb: 0xBF14A2), UIColor(rgb: 0xF73A1C)],   // light
-        positions: [0, 0.4, 1],
-        startPoint: .zero,
-        endPoint: .init(x: 1, y: 1)
-    )
+    private let gradientView = BraveGradientView.gradient02.then {
+        // New has a white background always behind it, so only light
+        $0.overrideUserInterfaceStyle = .light
+    }
     private let label = UILabel().then {
         $0.text = Strings.BraveToday.introCardNew.uppercased()
         $0.textColor = .black

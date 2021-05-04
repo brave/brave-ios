@@ -61,11 +61,7 @@ class ShareTrackersController: UIViewController, PopoverContentComponent {
     
     private let shareTrackersView: ShareTrackersView
     
-    private lazy var gradientView = GradientView(
-        colors: [#colorLiteral(red: 0.968627451, green: 0.2274509804, blue: 0.1098039216, alpha: 1), #colorLiteral(red: 0.7490196078, green: 0.07843137255, blue: 0.6352941176, alpha: 1)],
-        positions: [0, 1],
-        startPoint: .zero,
-        endPoint: CGPoint(x: 1, y: 0.5))
+    private lazy var gradientView = BraveGradientView.gradient03
     
     var actionHandler: ((Action) -> Void)?
 

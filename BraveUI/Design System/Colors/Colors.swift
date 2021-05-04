@@ -43,6 +43,16 @@ enum DesignSystemColor: String {
   case successBorder = "success-border"
   case successText = "success-text"
   
+  case gradient01_step0 = "gradient01-step0"
+  case gradient01_step1 = "gradient01-step1"
+  
+  case gradient02_step0 = "gradient02-step0"
+  case gradient02_step1 = "gradient02-step1"
+  case gradient02_step2 = "gradient02-step2"
+  
+  case gradient03_step0 = "gradient03-step0"
+  case gradient03_step1 = "gradient03-step1"
+  
   var color: UIColor {
     return UIColor(named: rawValue, in: Bundle(for: BraveUI.self), compatibleWith: nil)!
   }
