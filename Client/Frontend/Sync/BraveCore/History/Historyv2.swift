@@ -12,9 +12,41 @@ import Shared
 
 private let log = Logger.browserLogger
 
+struct Historyv2Section {
+    var title: String
+    
+    var numberOfObjects: Int
+}
+
 // A Lightweight wrapper around BraveCore history
 // with the same layout/interface as `History (from CoreData)`
 class Historyv2: WebsitePresentable {
+    
+    /// Sections in History List to be displayed
+    enum Section: Int, CaseIterable {
+        /// History happened Today
+        case today
+        /// History happened Yesterday
+        case yesterday
+        /// History happened between yesterday and end of this week
+        case lastWeek
+        /// History happaned
+        case thisMonth
+        
+        /// The list of titles time period
+        var title: String {
+            switch self {
+                case .today:
+                     return Strings.today
+                case .yesterday:
+                     return Strings.yesterday
+                case .lastWeek:
+                     return Strings.lastWeek
+                case .thisMonth:
+                     return Strings.lastMonth
+            }
+        }
+    }
     
     // MARK: Lifecycle
     
@@ -42,16 +74,12 @@ class Historyv2: WebsitePresentable {
         }
     }
     
-    public var sectionIdentifier: String? {
-        if created?.compare(Historyv2.today) == ComparisonResult.orderedDescending {
-            return Strings.today
-        } else if created?.compare(Historyv2.yesterday) == ComparisonResult.orderedDescending {
-            return Strings.yesterday
-        } else if created?.compare(Historyv2.thisWeek) == ComparisonResult.orderedDescending {
-            return Strings.lastWeek
-        } else {
-            return Strings.lastMonth
-        }
+    public var domain: String? {
+        historyNode.url.domainURL.absoluteString
+    }
+    
+    public var sectionID: Section? {
+        fetchHistoryTimePeriod(visited: created)
     }
     
     // MARK: Private
@@ -59,12 +87,26 @@ class Historyv2: WebsitePresentable {
     private let historyNode: HistoryNode
     private static let historyAPI = BraveHistoryAPI()
     
-    private static let today = getDate(0)
-    private static let yesterday = getDate(-1)
-    private static let thisWeek = getDate(-7)
-    private static let thisMonth = getDate(-31)
+    private func fetchHistoryTimePeriod(visited: Date?) -> Section? {
+        let todayOffset = 0
+        let yesterdayOffset = -1
+        let thisWeekOffset = -7
+        let thisMonthOffset = -31
+        
+        if created?.compare(getDate(todayOffset)) == ComparisonResult.orderedDescending {
+            return .today
+        } else if created?.compare(getDate(yesterdayOffset)) == ComparisonResult.orderedDescending {
+            return .yesterday
+        } else if created?.compare(getDate(thisWeekOffset)) == ComparisonResult.orderedDescending {
+            return .lastWeek
+        } else if created?.compare(getDate(thisMonthOffset))  == ComparisonResult.orderedDescending {
+            return .thisMonth
+        }
+        
+        return nil
+    }
     
-    private class func getDate(_ dayOffset: Int) -> Date {
+    private func getDate(_ dayOffset: Int) -> Date {
         let calendar = Calendar(identifier: Calendar.Identifier.gregorian)
         let nowComponents = calendar.dateComponents(
             [Calendar.Component.year, Calendar.Component.month, Calendar.Component.day], from: Date())
@@ -86,7 +128,7 @@ extension Historyv2 {
         Historyv2.historyAPI.addHistory(HistoryNode(url: url, title: title, dateAdded: dateAdded))
     }
     
-    public static func frc(parent: Historyv2?) -> HistoryV2FetchResultsController? {
+    public static func frc() -> HistoryV2FetchResultsController? {
         return Historyv2Fetcher(historyAPI: Historyv2.historyAPI)
     }
     

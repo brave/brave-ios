@@ -12,7 +12,7 @@ import XCGLogger
 
 private let log = Logger.browserLogger
 
-// MARK: - Sync Browser Extension
+// MARK: - Core Migration Browser Extension
 
 extension BrowserViewController {
     
