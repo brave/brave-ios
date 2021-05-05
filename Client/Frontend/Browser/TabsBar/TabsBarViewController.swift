@@ -107,6 +107,8 @@ class TabsBarViewController: UIViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
         // Updating tabs here is especially handy when tabs are reordered from the tab tray.
         updateData()
     }
@@ -123,7 +125,6 @@ class TabsBarViewController: UIViewController {
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
-        
         // Updates overflow colors which use CGColor's
         overflowIndicators()
     }
@@ -244,7 +245,7 @@ class TabsBarViewController: UIViewController {
     private func addScrollHint(for side: HintSide, maskLayer: CAGradientLayer) {
         maskLayer.removeFromSuperlayer()
         
-        guard let barsColor = collectionView.backgroundColor ?? view.backgroundColor else {
+        guard let barsColor = collectionView.backgroundColor?.resolvedColor(with: traitCollection) ?? view.backgroundColor else {
             // If not setup now, will be at some point, and then this can be flushed
             return
         }
@@ -266,7 +267,7 @@ class TabsBarViewController: UIViewController {
 // MARK: - UIScrollViewDelegate
 extension TabsBarViewController: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        overflowIndicators()
+        updateOverflowIndicatorsLayout()
     }
 }
 

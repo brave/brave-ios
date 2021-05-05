@@ -445,7 +445,13 @@ class TopToolbarView: UIView, ToolbarProtocol {
     }
     
     private func updateViewsForOverlayModeAndToolbarChanges() {
-        cancelButton.isHidden = !inOverlayMode
+        // UIStackView bug:
+        // Don't set `isHidden` to the same value on a view that adjusts layout of a UIStackView
+        // inside of a UIView.animate() block, otherwise on occasion the view will render but
+        // `isHidden` will still be true
+        if cancelButton.isHidden == inOverlayMode {
+            cancelButton.isHidden = !inOverlayMode
+        }
         progressBar.isHidden = inOverlayMode
         navigationStackView.isHidden = !toolbarIsShowing || inOverlayMode
         menuButton.isHidden = !toolbarIsShowing || inOverlayMode
