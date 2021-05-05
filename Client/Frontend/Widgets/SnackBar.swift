@@ -141,7 +141,7 @@ class SnackBar: UIView {
 
         backgroundColor = .clear
         layer.borderWidth = SnackBarUX.borderWidth
-        layer.borderColor = UIColor.braveSeparator.cgColor
+        layer.borderColor = UIColor.braveSeparator.resolvedColor(with: traitCollection).cgColor
         layer.cornerRadius = 6
         layer.cornerCurve = .continuous
         clipsToBounds = true
@@ -150,7 +150,7 @@ class SnackBar: UIView {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         
-        self.layer.borderColor = UIColor.braveSeparator.cgColor
+        self.layer.borderColor = UIColor.braveSeparator.resolvedColor(with: traitCollection).cgColor
     }
 
     required init?(coder aDecoder: NSCoder) {

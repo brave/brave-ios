@@ -37,7 +37,6 @@ class QRCodePopupView: PopupView {
     private let shareButton = RoundInterfaceButton(type: .system).then {
         $0.setTitle(Strings.themeQRCodeShareButton, for: .normal)
         $0.setContentHuggingPriority(.defaultHigh, for: .vertical)
-        $0.layer.borderColor = UIColor.braveOrange.cgColor
         $0.layer.borderWidth = 1
         $0.snp.makeConstraints { $0.height.equalTo(44) }
         $0.tintColor = .braveOrange
@@ -59,6 +58,9 @@ class QRCodePopupView: PopupView {
         let contentView = UIView().then {
             $0.frame = CGRect(x: 0, y: 0, width: 300, height: 300)
         }
+        
+        shareButton.layer.borderColor = UIColor.braveOrange
+            .resolvedColor(with: traitCollection).cgColor
         
         [qrCodeImage, title, shareButton, closeButton].forEach(contentView.addSubview(_:))
         
@@ -110,5 +112,13 @@ class QRCodePopupView: PopupView {
         filter?.setValue("H", forKey: "inputCorrectionLevel")
         
         return filter?.outputImage
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
+            shareButton.layer.borderColor = UIColor.braveOrange
+                .resolvedColor(with: traitCollection).cgColor
+        }
     }
 }

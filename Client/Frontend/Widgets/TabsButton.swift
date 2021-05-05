@@ -22,7 +22,6 @@ class TabsButton: UIButton {
     }
     
     private let borderView = UIView().then {
-        $0.layer.borderColor = UIColor.braveLabel.cgColor
         $0.layer.borderWidth = TabsButtonUX.borderStrokeWidth
         $0.layer.cornerRadius = TabsButtonUX.cornerRadius
         $0.layer.cornerCurve = .continuous
@@ -46,6 +45,8 @@ class TabsButton: UIButton {
             $0.center.equalToSuperview()
             $0.size.equalTo(19)
         }
+        
+        borderView.layer.borderColor = UIColor.braveLabel.resolvedColor(with: traitCollection).cgColor
     }
     
     @available(*, unavailable)

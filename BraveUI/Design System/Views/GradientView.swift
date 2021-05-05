@@ -16,7 +16,7 @@ public class GradientView: UIView {
   public init(colors: [UIColor], positions: [CGFloat], startPoint: CGPoint, endPoint: CGPoint) {
     super.init(frame: .zero)
     
-    gradientLayer.colors = colors.map(\.cgColor)
+    gradientLayer.colors = colors.map { $0.resolvedColor(with: traitCollection).cgColor }
     gradientLayer.locations = positions.map { NSNumber(value: Double($0)) }
     gradientLayer.startPoint = startPoint
     gradientLayer.endPoint = endPoint
