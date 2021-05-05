@@ -9,7 +9,6 @@ import Shared
 import SwiftUI
 #endif
 
-@available(iOS 13.0, *)
 struct VPNMenuButton: View {
     var icon: UIImage
     var title: String

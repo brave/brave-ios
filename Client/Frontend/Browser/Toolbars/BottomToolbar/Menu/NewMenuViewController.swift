@@ -14,7 +14,6 @@ import BraveUI
 import SwiftUI
 #endif
 
-@available(iOS 13.0, *)
 struct TableButtonStyle: ButtonStyle {
     @Environment(\.colorScheme) var colorScheme: ColorScheme
     func makeBody(configuration: Configuration) -> some View {
@@ -27,7 +26,6 @@ struct TableButtonStyle: ButtonStyle {
     }
 }
 
-@available(iOS 13.0, *)
 struct MenuItemHeaderView: View {
     @Environment(\.colorScheme) var colorScheme: ColorScheme
     var icon: UIImage
@@ -51,26 +49,15 @@ struct MenuItemHeaderView: View {
     }
 }
 
-@available(iOS 13.0, *)
 struct NewMenuView<Content: View>: View {
     var content: Content
-    @ObservedObject var themeNormalMode = PreferenceObserver(option: Preferences.General.themeNormalMode)
+    @ObservedObject var themeNormalMode = Preferences.General.themeNormalMode
     var body: some View {
         ScrollView(.vertical) {
             content
                 .padding(.vertical, 8)
                 .frame(maxWidth: .infinity)
         }
-    }
-}
-
-@available(iOS 13.0, *)
-class PreferenceObserver: ObservableObject, PreferencesObserver {
-    init<T>(option: Preferences.Option<T>) {
-        option.observe(from: self)
-    }
-    func preferencesDidChange(for key: String) {
-        objectWillChange.send()
     }
 }
 
@@ -91,7 +78,7 @@ struct MenuItemButton: View {
     }
 }
 
-@available(iOS 13.0, *)
+
 class NewMenuController: UINavigationController, PanModalPresentable, UIPopoverPresentationControllerDelegate {
     
     private var menuNavigationDelegate: MenuNavigationControllerDelegate?
@@ -243,7 +230,6 @@ class NewMenuController: UINavigationController, PanModalPresentable, UIPopoverP
     }
 }
 
-@available(iOS 13.0, *)
 private class NewMenuHostingController<MenuContent: View>: UIHostingController<NewMenuView<MenuContent>>, PreferencesObserver {
     init(content: MenuContent) {
         super.init(rootView: NewMenuView(content: content))

@@ -16,9 +16,7 @@ class LocationContainerView: UIView {
         super.init(frame: frame)
         let layer = self.layer
         layer.cornerRadius = LocationContainerUX.cornerRadius
-        if #available(iOS 13.0, *) {
-            layer.cornerCurve = .continuous
-        }
+        layer.cornerCurve = .continuous
         layer.masksToBounds = true
     }
     
