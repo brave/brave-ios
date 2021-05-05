@@ -57,7 +57,7 @@ class TabsButton: UIButton {
         didSet {
             let color: UIColor = isHighlighted ? .braveOrange : .braveLabel
             countLabel.textColor = color
-            borderView.layer.borderColor = color.cgColor
+            borderView.layer.borderColor = color.resolvedColor(with: traitCollection).cgColor
         }
     }
     
@@ -65,7 +65,7 @@ class TabsButton: UIButton {
         super.traitCollectionDidChange(previousTraitCollection)
         // CGColor's do not get automatic updates
         borderView.layer.borderColor = isHighlighted ? UIColor.braveOrange.cgColor :
-            UIColor.braveLabel.cgColor
+            UIColor.braveLabel.resolvedColor(with: traitCollection).cgColor
     }
     
     private var currentCount: Int?
