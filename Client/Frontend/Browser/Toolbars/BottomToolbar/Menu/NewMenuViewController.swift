@@ -133,6 +133,21 @@ class NewMenuController: UINavigationController, PanModalPresentable, UIPopoverP
         navigationBar.isTranslucent = false
     }
     
+    override func viewSafeAreaInsetsDidChange() {
+        super.viewSafeAreaInsetsDidChange()
+        
+        // Bug with pan modal + hidden nav bar causes safe area insets to zero out
+        if view.safeAreaInsets == .zero, isPanModalPresented,
+           var insets = view.window?.safeAreaInsets {
+            // When that happens we re-set them via additionalSafeAreaInsets to the windows safe
+            // area insets. Since the pan modal appears over the entire screen we can safely use
+            // the windows safe area. Top will stay 0 since we are using non-translucent nav bar
+            // and the top never reachs the safe area (handled by pan modal)
+            insets.top = 0
+            additionalSafeAreaInsets = insets
+        }
+    }
+    
     override var preferredStatusBarStyle: UIStatusBarStyle {
         .lightContent
     }
@@ -194,7 +209,7 @@ class NewMenuController: UINavigationController, PanModalPresentable, UIPopoverP
         .maxHeight
     }
     var shortFormHeight: PanModalHeight {
-        isPresentingInnerMenu ? .maxHeight : .contentHeight(320)
+        isPresentingInnerMenu ? .maxHeight : .contentHeight(340)
     }
     var allowsExtendedPanScrolling: Bool {
         true

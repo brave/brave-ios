@@ -476,6 +476,11 @@ extension BrowserViewController: ToolbarDelegate {
                 let vc = DownloadsPanel(profile: self.profile)
                 menuController.pushViewController(vc, animated: true)
             }
+            MenuItemButton(icon: #imageLiteral(resourceName: "menu-settings").template, title: Strings.settingsMenuItem) {
+                let vc = SettingsViewController(profile: self.profile, tabManager: self.tabManager, feedDataSource: self.feedDataSource, rewards: self.rewards, legacyWallet: self.legacyWallet)
+                vc.settingsDelegate = self
+                menuController.pushViewController(vc, animated: true)
+            }
         }
     }
     
@@ -547,12 +552,6 @@ extension BrowserViewController: ToolbarDelegate {
                     if let tabURL = selectedTabURL {
                         Divider()
                         activitiesMenuSection(menuController, tabURL: tabURL, activities: activities)
-                    }
-                    Divider()
-                    MenuItemButton(icon: #imageLiteral(resourceName: "menu-settings").template, title: Strings.settingsMenuItem) {
-                        let vc = SettingsViewController(profile: self.profile, tabManager: self.tabManager, feedDataSource: self.feedDataSource, rewards: self.rewards, legacyWallet: self.legacyWallet)
-                        vc.settingsDelegate = self
-                        menuController.pushViewController(vc, animated: true)
                     }
                 }
             })
