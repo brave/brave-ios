@@ -80,15 +80,26 @@ class MenuViewController: UINavigationController, UIPopoverPresentationControlle
         fatalError()
     }
     
+    private var previousPreferredContentSize: CGSize?
     func presentInnerMenu(_ viewController: UIViewController,
                           expandToLongForm: Bool = true) {
         let container = InnerMenuNavigationController(rootViewController: viewController)
         container.delegate = menuNavigationDelegate
         container.modalPresentationStyle = .overCurrentContext // over to fix the dismiss animation
-        container.innerMenuDismissed = {
+        container.innerMenuDismissed = { [weak self] in
+            guard let self = self else { return }
             if !self.isDismissing {
                 self.panModalSetNeedsLayoutUpdate()
             }
+            // Restore original content size
+            if let contentSize = self.previousPreferredContentSize {
+                self.preferredContentSize = contentSize
+            }
+        }
+        // Save current content size to be restored when inner menu is dismissed
+        if preferredContentSize.height < 580 {
+            previousPreferredContentSize = preferredContentSize
+            preferredContentSize = CGSize(width: 375, height: 580)
         }
         present(container, animated: true) {
             self.panModalSetNeedsLayoutUpdate()
@@ -238,6 +249,14 @@ private class MenuHostingController<MenuContent: View>: UIHostingController<Menu
         super.viewWillAppear(animated)
         let animateNavBar = (navigationController?.isBeingPresented == false ? animated : false)
         navigationController?.setNavigationBarHidden(true, animated: animateNavBar)
+        self.navigationController?.preferredContentSize = {
+            let controller = UIHostingController(rootView: self.rootView.content)
+            let size = controller.view.sizeThatFits(CGSize(width: 375, height: 0))
+            // Have to increase the content size by the hidden nav bar height so that the size
+            // doesn't change when the user navigates within the menu where the nav bar is visible
+            let navBarHeight = navigationController?.navigationBar.bounds.height ?? 0
+            return CGSize(width: 375, height: min(max(size.height + 16, 240), 580 + navBarHeight))
+        }()
         view.backgroundColor = Theme.of(nil).colors.home
     }
     
@@ -245,6 +264,7 @@ private class MenuHostingController<MenuContent: View>: UIHostingController<Menu
         super.viewWillDisappear(animated)
         if navigationController?.isBeingDismissed == false {
             navigationController?.setNavigationBarHidden(false, animated: animated)
+            navigationController?.preferredContentSize = CGSize(width: 375, height: 580)
         }
     }
     
