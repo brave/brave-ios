@@ -43,6 +43,7 @@ extension Theme {
         UITableViewCell.appearance().backgroundColor = tableSecondaryColor
         
         UIImageView.appearance(whenContainedInInstancesOf: [SettingsViewController.self]).tintColor = colors.tints.home
+//        UIImageView.appearance(whenContainedInInstancesOf: [NewMenuHostingController.self]).tintColor = colors.tints.home
         UIImageView.appearance(whenContainedInInstancesOf: [BraveRewardsSettingsViewController.self]).tintColor = colors.tints.home
 
         UIView.appearance(whenContainedInInstancesOf: [UITableViewHeaderFooterView.self]).appearanceBackgroundColor = tablePrimaryColor
@@ -67,9 +68,6 @@ extension Theme {
         InsetButton.appearance(whenContainedInInstancesOf: [SearchSuggestionPromptView.self]).appearanceTextColor = colors.tints.home
         
         // Overrides all views inside of itself
-        // According to docs, UIWindow override should be enough, but some labels on iOS 13 are still messed up without UIView override as well
-        // (e.g. shields panel)
         UIWindow.appearance().appearanceOverrideUserInterfaceStyle = isDark ? .dark : .light
-        UIView.appearance().appearanceOverrideUserInterfaceStyle = isDark ? .dark : .light
     }
 }

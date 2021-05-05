@@ -78,6 +78,8 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(tappedDone))
+        
         tableView.allowsSelectionDuringEditing = true
         tableView.register(BookmarkTableViewCell.self,
                            forCellReuseIdentifier: String(describing: BookmarkTableViewCell.self))
@@ -85,6 +87,10 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         setUpToolbar()
         updateEditBookmarksButtonStatus()
         updatedFolderHierarchy()
+    }
+    
+    @objc private func tappedDone() {
+        dismiss(animated: true)
     }
     
     private func updateEditBookmarksButtonStatus() {
@@ -133,7 +139,6 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
                 nextController.profile = self.profile
                 nextController.bookmarksDidChange = self.bookmarksDidChange
                 nextController.toolbarUrlActionsDelegate = self.toolbarUrlActionsDelegate
-                nextController.navigationItem.setRightBarButton(self.navigationItem.rightBarButtonItem, animated: true)
                 navigationController.viewControllers.insert(nextController, at: index)
                 nextController.loadViewIfNeeded()
             }
@@ -447,10 +452,6 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
                 nextController.profile = profile
                 nextController.bookmarksDidChange = bookmarksDidChange
                 nextController.toolbarUrlActionsDelegate = toolbarUrlActionsDelegate
-                
-                // Show `Done` button on nested folder levels.
-                nextController.navigationItem.setRightBarButton(navigationItem.rightBarButtonItem, animated: true)
-                
                 self.navigationController?.pushViewController(nextController, animated: true)
             }
         }
