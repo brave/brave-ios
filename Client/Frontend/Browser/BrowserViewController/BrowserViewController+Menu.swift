@@ -88,7 +88,7 @@ extension BrowserViewController {
                         .lineLimit(1)
                         .foregroundColor(Color(Theme.of(nil).colors.tints.home))
                 }
-                Text(verbatim: url.baseDomain ?? url.absoluteDisplayString)
+                Text(verbatim: url.baseDomain ?? url.host ?? url.absoluteDisplayString)
                     .font(.footnote)
                     .lineLimit(1)
                     .foregroundColor(Color(Theme.of(nil).colors.tints.home).opacity(0.8))
