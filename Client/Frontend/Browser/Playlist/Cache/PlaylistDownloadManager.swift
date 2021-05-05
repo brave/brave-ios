@@ -317,6 +317,21 @@ private class PlaylistHLSDownloadManager: NSObject, AVAssetDownloadDelegate {
         
         guard let asset = activeDownloadTasks.removeValue(forKey: task),
               let assetUrl = pendingDownloadTasks.removeValue(forKey: task) else { return }
+        
+        let cleanupAndFailDownload = { (location: URL?, error: Error) in
+            if let location = location {
+                do {
+                    try FileManager.default.removeItem(at: location)
+                } catch {
+                    log.error("Error Deleting Playlist Item: \(error)")
+                }
+            }
+            
+            DispatchQueue.main.async {
+                PlaylistItem.updateCache(pageSrc: asset.id, cachedData: nil)
+                self.delegate?.onDownloadStateChanged(streamDownloader: self, id: asset.id, state: .invalid, displayName: nil, error: error)
+            }
+        }
 
         if let error = error as NSError? {
             switch (error.domain, error.code) {
@@ -342,23 +357,25 @@ private class PlaylistHLSDownloadManager: NSObject, AVAssetDownloadDelegate {
             }
         } else {
             do {
-                let cachedData = try assetUrl.bookmarkData()
-                DispatchQueue.main.async {
-                    PlaylistItem.updateCache(pageSrc: asset.id, cachedData: cachedData)
-                    self.delegate?.onDownloadStateChanged(streamDownloader: self, id: asset.id, state: .downloaded, displayName: nil, error: nil)
+                guard let path = try PlaylistDownloadManager.uniqueDownloadPathForFilename(assetUrl.lastPathComponent) else {
+                    throw "Failed to create unique path for playlist item."
+                }
+                
+                try FileManager.default.moveItem(at: assetUrl, to: path)
+                do {
+                    let cachedData = try path.bookmarkData()
+                    
+                    DispatchQueue.main.async {
+                        PlaylistItem.updateCache(pageSrc: asset.id, cachedData: cachedData)
+                        self.delegate?.onDownloadStateChanged(streamDownloader: self, id: asset.id, state: .downloaded, displayName: nil, error: nil)
+                    }
+                } catch {
+                    log.error("Failed to create bookmarkData for download URL.")
+                    cleanupAndFailDownload(path, error)
                 }
             } catch {
-                log.error("Failed to create bookmarkData for download URL.")
-                
-                DispatchQueue.main.async {
-                    self.delegate?.onDownloadStateChanged(streamDownloader: self, id: asset.id, state: .downloaded, displayName: nil, error: error)
-                }
-                
-                do {
-                    try FileManager.default.removeItem(at: assetUrl)
-                } catch {
-                    log.error("Error Deleting Playlist Item: \(error)")
-                }
+                log.error("An error occurred attempting to download a playlist item: \(error)")
+                cleanupAndFailDownload(assetUrl, error)
             }
         }
     }
