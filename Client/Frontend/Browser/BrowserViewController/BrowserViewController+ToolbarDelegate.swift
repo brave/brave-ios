@@ -469,6 +469,9 @@ extension BrowserViewController: ToolbarDelegate {
             }
         })
         presentPanModal(menuController, sourceView: tabToolbar.menuButton, sourceRect: tabToolbar.menuButton.bounds)
+        if menuController.modalPresentationStyle == .popover {
+            menuController.popoverPresentationController?.popoverLayoutMargins = .init(equalInset: 4)
+        }
     }
     
     func tabToolbarDidPressAddTab(_ tabToolbar: ToolbarProtocol, button: UIButton) {
