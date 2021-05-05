@@ -264,7 +264,7 @@ class TabTrayController: UIViewController {
         collectionView.setContentOffset(self.otherBrowsingModeOffset, animated: false)
         self.otherBrowsingModeOffset = newOffset
         let fromView: UIView
-        if !privateTabsAreEmpty(), let snapshot = collectionView.snapshotView(afterScreenUpdates: false) {
+        if !privateTabsAreEmpty(), let snapshot = collectionView.snapshotView(afterScreenUpdates: true) {
             snapshot.frame = collectionView.frame
             view.insertSubview(snapshot, aboveSubview: collectionView)
             fromView = snapshot
@@ -281,35 +281,37 @@ class TabTrayController: UIViewController {
         tabManager.resetSelectedIndex()
         
         collectionView.layoutSubviews()
-
-        let toView: UIView
-        if !privateTabsAreEmpty(), let newSnapshot = collectionView.snapshotView(afterScreenUpdates: true) {
-            emptyPrivateTabsView.isHidden = true
-            // when exiting private mode don't screenshot the collectionview (causes the UI to hang)
-            newSnapshot.frame = collectionView.frame
-            view.insertSubview(newSnapshot, aboveSubview: fromView)
-            collectionView.alpha = 0
-            toView = newSnapshot
-        } else {
-            emptyPrivateTabsView.isHidden = false
-            toView = emptyPrivateTabsView
-        }
-        toView.alpha = 0
-        toView.transform = scaleDownTransform
-
-        UIView.animate(withDuration: 0.2, delay: 0, options: [], animations: { () -> Void in
-            fromView.transform = scaleDownTransform
-            fromView.alpha = 0
-            toView.transform = .identity
-            toView.alpha = 1
-        }) { finished in
-            if fromView != self.emptyPrivateTabsView {
-                fromView.removeFromSuperview()
+        
+        DispatchQueue.main.async { [self] in
+            let toView: UIView
+            if !privateTabsAreEmpty(), let newSnapshot = collectionView.snapshotView(afterScreenUpdates: true) {
+                emptyPrivateTabsView.isHidden = true
+                // when exiting private mode don't screenshot the collectionview (causes the UI to hang)
+                newSnapshot.frame = collectionView.frame
+                view.insertSubview(newSnapshot, aboveSubview: fromView)
+                collectionView.alpha = 0
+                toView = newSnapshot
+            } else {
+                emptyPrivateTabsView.isHidden = false
+                toView = emptyPrivateTabsView
             }
-            if toView != self.emptyPrivateTabsView {
-                toView.removeFromSuperview()
+            toView.alpha = 0
+            toView.transform = scaleDownTransform
+            
+            UIView.animate(withDuration: 0.2, delay: 0, options: [], animations: { () -> Void in
+                fromView.transform = scaleDownTransform
+                fromView.alpha = 0
+                toView.transform = .identity
+                toView.alpha = 1
+            }) { finished in
+                if fromView != self.emptyPrivateTabsView {
+                    fromView.removeFromSuperview()
+                }
+                if toView != self.emptyPrivateTabsView {
+                    toView.removeFromSuperview()
+                }
+                self.collectionView.alpha = 1
             }
-            self.collectionView.alpha = 1
         }
     }
 
