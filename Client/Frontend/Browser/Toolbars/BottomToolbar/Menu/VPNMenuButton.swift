@@ -5,22 +5,24 @@
 
 import Foundation
 import Shared
-#if canImport(SwiftUI)
 import SwiftUI
-#endif
+import BraveUI
 
+/// A menu button that provides a shortcut to toggling Brave VPN
 struct VPNMenuButton: View {
-    var icon: UIImage
-    var title: String
+    /// The product info
     var vpnProductInfo: VPNProductInfo
+    /// A closure executed when the parent must display a VPN-specific view controller due to some
+    /// user action
     var displayVPNDestination: (UIViewController) -> Void
     
     @State private var isVPNStatusChanging: Bool = BraveVPN.reconnectPending
+    @State private var isVPNEnabled = BraveVPN.isConnected
     @State private var isErrorShowing: Bool = false
     
-    private var isVPNEnabled: Binding<Bool> {
+    private var isVPNEnabledBinding: Binding<Bool> {
         Binding(
-            get: { BraveVPN.isConnected },
+            get: { isVPNEnabled },
             set: { toggleVPN($0) }
         )
     }
@@ -48,17 +50,17 @@ struct VPNMenuButton: View {
     var body: some View {
         Button(action: { toggleVPN(!BraveVPN.isConnected) }) {
             HStack {
-                MenuItemHeaderView(icon: icon, title: title)
+                MenuItemHeaderView(icon: #imageLiteral(resourceName: "vpn_menu_icon").template, title: "Brave VPN")
                 Spacer()
                 if isVPNStatusChanging {
-                    Text("Loading")
+                    ActivityIndicatorView(isAnimating: true)
                 }
-                Toggle("", isOn: isVPNEnabled)
+                Toggle("", isOn: isVPNEnabledBinding)
             }
             .padding(.horizontal, 14)
             .frame(maxWidth: .infinity, minHeight: 48.0, alignment: .leading)
         }
-        .buttonStyle(TableButtonStyle())
+        .buttonStyle(TableCellButtonStyle())
         .alert(isPresented: $isErrorShowing) {
             Alert(
                 title: Text(verbatim: Strings.VPN.errorCantGetPricesTitle),
@@ -67,7 +69,8 @@ struct VPNMenuButton: View {
             )
         }
         .onReceive(NotificationCenter.default.publisher(for: .NEVPNStatusDidChange)) { _ in
-            isVPNStatusChanging = false
+            isVPNEnabled = BraveVPN.isConnected
+            isVPNStatusChanging = BraveVPN.reconnectPending
         }
     }
 }
