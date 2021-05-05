@@ -252,10 +252,17 @@ private class MenuHostingController<MenuContent: View>: UIHostingController<Menu
         self.navigationController?.preferredContentSize = {
             let controller = UIHostingController(rootView: self.rootView.content)
             let size = controller.view.sizeThatFits(CGSize(width: 375, height: 0))
-            // Have to increase the content size by the hidden nav bar height so that the size
-            // doesn't change when the user navigates within the menu where the nav bar is visible
             let navBarHeight = navigationController?.navigationBar.bounds.height ?? 0
-            return CGSize(width: 375, height: min(max(size.height + 16, 240), 580 + navBarHeight))
+            let preferredPopoverWidth: CGFloat = 375.0
+            let minimumPopoverHeight: CGFloat = 240.0
+            let maximumPopoverHeight: CGFloat = 580.0
+            return CGSize(
+                width: preferredPopoverWidth,
+                // Have to increase the content size by the hidden nav bar height so that the size
+                // doesn't change when the user navigates within the menu where the nav bar is
+                // visible.
+                height: min(max(size.height + 16, minimumPopoverHeight), maximumPopoverHeight + navBarHeight)
+            )
         }()
         view.backgroundColor = Theme.of(nil).colors.home
     }
