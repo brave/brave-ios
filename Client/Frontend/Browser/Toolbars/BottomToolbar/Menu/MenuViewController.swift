@@ -11,7 +11,6 @@ import BraveUI
 import SwiftUI
 
 struct MenuItemHeaderView: View {
-    @ObservedObject var themeNormalMode = Preferences.General.themeNormalMode
     @Environment(\.colorScheme) var colorScheme: ColorScheme
     var icon: UIImage
     var title: String
@@ -47,7 +46,6 @@ private struct MenuView<Content: View>: View {
 }
 
 struct MenuItemButton: View {
-    @ObservedObject var themeNormalMode = Preferences.General.themeNormalMode
     @Environment(\.colorScheme) var colorScheme: ColorScheme
     
     var icon: UIImage
