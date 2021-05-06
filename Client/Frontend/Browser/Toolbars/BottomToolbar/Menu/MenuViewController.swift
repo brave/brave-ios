@@ -41,7 +41,7 @@ private struct MenuView<Content: View>: View {
             content
                 .padding(.vertical, 8)
                 .frame(maxWidth: .infinity)
-                .accentColor(Color(BraveUX.braveOrange))
+                .accentColor(Color(.braveOrange))
         }
     }
 }

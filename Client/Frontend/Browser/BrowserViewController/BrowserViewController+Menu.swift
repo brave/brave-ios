@@ -32,7 +32,6 @@ extension BrowserViewController {
             }
             MenuItemButton(icon: #imageLiteral(resourceName: "menu-downloads").template, title: Strings.downloadsMenuItem) {
                 let vc = DownloadsPanel(profile: self.profile)
-                vc.applyTheme(Theme.of(nil))
                 menuController.pushViewController(vc, animated: true)
             }
             MenuItemButton(icon: #imageLiteral(resourceName: "playlist_menu").template, title: Strings.playlistMenuItem) {

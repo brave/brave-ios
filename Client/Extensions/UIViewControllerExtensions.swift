@@ -23,11 +23,11 @@ extension UIViewController {
             superview?.addSubview(view)
             
             navigationController?.navigationBar.tintColor = UINavigationBar.appearance().tintColor
-            navigationController?.navigationBar.barTintColor = UINavigationBar.appearance().appearanceBarTintColor
+            navigationController?.navigationBar.barTintColor = UINavigationBar.appearance().barTintColor
             navigationController?.navigationBar.titleTextAttributes = UINavigationBar.appearance().titleTextAttributes
             
             navigationController?.toolbar.tintColor = UINavigationBar.appearance().tintColor
-            navigationController?.toolbar.barTintColor = UINavigationBar.appearance().appearanceBarTintColor
+            navigationController?.toolbar.barTintColor = UINavigationBar.appearance().barTintColor
         }
     }
 }
