@@ -314,7 +314,6 @@ class SettingsViewController: TableViewController {
                 accessory: .disclosureIndicator,
                 cellClass: MultilineSubtitleCell.self)
         autoCloseTabsRow.selection = { [unowned self] in
-            // Show options for tab bar visibility
             let optionsViewController = OptionSelectionViewController<Preferences.AutoCloseTabsOption>(
                 options: Preferences.AutoCloseTabsOption.allCases,
                 selectedOption:
