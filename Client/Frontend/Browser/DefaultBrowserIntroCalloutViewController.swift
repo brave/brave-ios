@@ -23,32 +23,23 @@ class DefaultBrowserIntroCalloutViewController: UIViewController, Themeable {
         $0.contentEdgeInsets = .init(top: 0, left: 25, bottom: 0, right: 25)
         $0.layer.cornerRadius = 22
         $0.layer.cornerCurve = .continuous
+        $0.tintColor = .white
     }
     
     private let cancelButton = UIButton(type: .system).then {
         $0.setTitle(Strings.DefaultBrowserCallout.introSkipButtonText, for: .normal)
         $0.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
-        $0.titleLabel?.textColor = Colors.grey600
+        $0.tintColor = .secondaryBraveLabel
     }
     
-    private let image = UIImageView()
-    
-    private let theme: Theme
-    
-    init(theme: Theme) {
-        self.theme = theme
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    @available(*, unavailable)
-    required init(coder: NSCoder) { fatalError() }
+    private let image = UIImageView(image: #imageLiteral(resourceName: "default_browser_intro"))
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
+        
+        view.backgroundColor = .braveBackground
         
         setupViews()
-        applyTheme(theme)
         
         cancelButton.addTarget(self, action: #selector(cancelAction), for: .touchUpInside)
         openSettingsButton.addTarget(self, action: #selector(openSettingsAction), for: .touchUpInside)
@@ -134,11 +125,5 @@ class DefaultBrowserIntroCalloutViewController: UIViewController, Themeable {
         mainStackView.snp.makeConstraints {
             $0.edges.equalToSuperview().inset(36)
         }
-    }
-    
-    // MARK: - Themeable
-    func applyTheme(_ theme: Theme) {
-        view.backgroundColor = theme.isDark ? UIColor.braveBackground : .white
-        image.image = theme.isDark ? #imageLiteral(resourceName: "default_browser_intro_dark") : #imageLiteral(resourceName: "default_browser_intro")
     }
 }

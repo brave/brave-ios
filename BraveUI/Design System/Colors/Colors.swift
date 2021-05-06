@@ -102,6 +102,13 @@ extension UIColor {
   }
 }
 
+extension UIColor {
+  public static var privateModeBackground: UIColor {
+    // Static!
+    UIColor(hex: 0x2C2153)
+  }
+}
+
 /// The Brave Color Palette used in Brave's Design System
 ///
 /// File: `Color Palette.sketch`

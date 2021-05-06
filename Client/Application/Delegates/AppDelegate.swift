@@ -267,7 +267,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         // In order to properly apply background and align this with the rest of the UI (keyboard / header)
         // this needs to be called. UI could be handled internally to view systems,
         // but then keyboard may misalign with Brave selected theme override
-        Theme.of(nil).applyAppearanceProperties()
         
         UIScrollView.doBadSwizzleStuff()
         

@@ -9,7 +9,7 @@ import BraveUI
 import Shared
 
 extension BraveRewardsViewController {
-    class BraveRewardsView: UIView, Themeable {
+    class BraveRewardsView: UIView {
         
         private let stackView = UIStackView().then {
             $0.axis = .vertical
@@ -22,10 +22,12 @@ extension BraveRewardsViewController {
         }
         private let titleLabel = UILabel().then {
             $0.text = Strings.braveRewardsTitle
+            $0.textColor = .braveLabel
             $0.font = .systemFont(ofSize: 20)
         }
         let subtitleLabel = UILabel().then {
             $0.text = Strings.Rewards.disabledBody
+            $0.textColor = .secondaryBraveLabel
             $0.font = .systemFont(ofSize: 12)
         }
         
@@ -42,6 +44,8 @@ extension BraveRewardsViewController {
         
         override init(frame: CGRect) {
             super.init(frame: frame)
+            
+            backgroundColor = .braveBackground
             
             addSubview(stackView)
             stackView.snp.makeConstraints {
@@ -80,16 +84,6 @@ extension BraveRewardsViewController {
         @available(*, unavailable)
         required init(coder: NSCoder) {
             fatalError()
-        }
-        
-        func applyTheme(_ theme: Theme) {
-            let isDark = theme.isDark
-            titleLabel.textColor = isDark ? .white : .black
-            subtitleLabel.textColor = isDark ? .lightGray : .gray
-            publisherView.applyTheme(theme)
-            statusView.applyTheme(theme)
-            legacyWalletTransferButton.applyTheme(theme)
-            backgroundColor = theme.isDark ? UIColor.braveBackground : .white
         }
     }
 }
