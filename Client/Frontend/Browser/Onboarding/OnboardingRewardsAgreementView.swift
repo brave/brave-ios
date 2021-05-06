@@ -25,7 +25,7 @@ extension OnboardingRewardsAgreementViewController {
         
         let turnOnButton = CommonViews.primaryButton(text: Strings.OBTurnOnButton).then {
             $0.accessibilityIdentifier = "OnboardingRewardsAgreementViewController.OBTurnOnButton"
-            $0.backgroundColor = UIColor.braveOrange
+            $0.backgroundColor = .braveOrange
             $0.titleLabel?.minimumScaleFactor = 0.75
         }
         

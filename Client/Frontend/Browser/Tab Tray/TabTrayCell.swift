@@ -43,7 +43,7 @@ class TabCell: UICollectionViewCell {
         self.screenshotView.alignTop = true
         self.screenshotView.backgroundColor = .braveBackground
         
-        self.favicon.backgroundColor = UIColor.clear
+        self.favicon.backgroundColor = .clear
         self.favicon.layer.cornerRadius = 2.0
         self.favicon.layer.cornerCurve = .continuous
         self.favicon.layer.masksToBounds = true

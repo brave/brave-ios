@@ -83,7 +83,7 @@ extension OnboardingSearchEnginesViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let headerView = UIView()
-        headerView.backgroundColor = UIColor.clear
+        headerView.backgroundColor = .clear
         return headerView
     }
 }

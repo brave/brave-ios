@@ -90,7 +90,7 @@ extension InstallVPNViewController {
         
         let installVPNButton = Button().then {
             $0.setTitle(Strings.VPN.installProfileButtonText, for: .normal)
-            $0.backgroundColor = UIColor.braveOrange
+            $0.backgroundColor = .braveOrange
             $0.titleLabel?.font = .systemFont(ofSize: 16, weight: .semibold)
             $0.titleLabel?.textColor = .white
             $0.snp.makeConstraints { make in

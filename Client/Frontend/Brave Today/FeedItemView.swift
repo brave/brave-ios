@@ -38,11 +38,11 @@ class FeedItemView: UIView {
     }
     /// An optional description label
     lazy var descriptionLabel = UILabel().then {
-        $0.textColor = UIColor.white.withAlphaComponent(0.5)
+        $0.textColor = .white.withAlphaComponent(0.5)
     }
     /// The date of when the article was posted
     lazy var dateLabel = UILabel().then {
-        $0.textColor = UIColor.white.withAlphaComponent(0.5)
+        $0.textColor = .white.withAlphaComponent(0.5)
     }
     /// The branding information (if applicable)
     lazy var brandContainerView = BrandContainerView()

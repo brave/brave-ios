@@ -20,7 +20,7 @@ extension AppDelegate {
             .backgroundColor = .braveBackground
         
         UIToolbar.appearance().do {
-            $0.tintColor = UIColor.braveOrange
+            $0.tintColor = .braveOrange
             $0.standardAppearance = {
                 let appearance = UIToolbarAppearance()
                 appearance.configureWithDefaultBackground()
@@ -30,7 +30,7 @@ extension AppDelegate {
         }
         
         UINavigationBar.appearance().do {
-            $0.tintColor = UIColor.braveOrange
+            $0.tintColor = .braveOrange
             $0.standardAppearance = {
                 let appearance = UINavigationBarAppearance()
                 appearance.configureWithDefaultBackground()
@@ -57,7 +57,7 @@ extension AppDelegate {
         }
         
         UIImageView.appearance(whenContainedInInstancesOf: [SettingsViewController.self])
-            .tintColor = UIColor.braveLabel
+            .tintColor = .braveLabel
 
         UIView.appearance(whenContainedInInstancesOf: [UITableViewHeaderFooterView.self])
             .backgroundColor = tablePrimaryColor
@@ -66,6 +66,6 @@ extension AppDelegate {
         UILabel.appearance(whenContainedInInstancesOf: [UICollectionReusableView.self])
             .textColor = .braveLabel
         
-        UITextField.appearance().textColor = UIColor.braveLabel
+        UITextField.appearance().textColor = .braveLabel
     }
 }

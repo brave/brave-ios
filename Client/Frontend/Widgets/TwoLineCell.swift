@@ -206,9 +206,9 @@ private class TwoLineCellHelper {
         self.imageView = imageView
 
         if let headerView = self.container as? UITableViewHeaderFooterView {
-            headerView.contentView.backgroundColor = UIColor.clear
+            headerView.contentView.backgroundColor = .clear
         } else {
-            self.container?.backgroundColor = UIColor.clear
+            self.container?.backgroundColor = .clear
         }
 
         textLabel.textColor = .braveLabel

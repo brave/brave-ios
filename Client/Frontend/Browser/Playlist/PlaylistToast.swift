@@ -142,7 +142,7 @@ class PlaylistToast: Toast {
 
             let label = UILabel().then {
                 $0.textAlignment = .left
-                $0.textColor = UIColor.white
+                $0.textColor = .white
                 $0.font = ButtonToastUX.toastLabelFont
                 $0.lineBreakMode = .byWordWrapping
                 $0.numberOfLines = 0
@@ -158,7 +158,7 @@ class PlaylistToast: Toast {
                 $0.layer.cornerRadius = ButtonToastUX.toastButtonBorderRadius
                 $0.layer.borderWidth = ButtonToastUX.toastButtonBorderWidth
                 $0.layer.borderColor = UIColor.white.cgColor
-                $0.imageView?.tintColor = UIColor.white
+                $0.imageView?.tintColor = .white
                 $0.setTitle(Strings.PlayList.toastAddToPlaylistOpenButton, for: [])
                 $0.setTitleColor(.white, for: .highlighted)
                 $0.titleLabel?.font = SimpleToastUX.toastFont
@@ -206,8 +206,8 @@ class PlaylistToast: Toast {
             $0.layer.cornerRadius = ButtonToastUX.toastButtonBorderRadius
             $0.backgroundColor = .clear
             $0.setTitleColor(.white, for: .highlighted)
-            $0.imageView?.tintColor = UIColor.white
-            $0.tintColor = UIColor.white
+            $0.imageView?.tintColor = .white
+            $0.tintColor = .white
             $0.titleLabel?.font = UIFont.systemFont(ofSize: 15, weight: .medium)
             $0.titleLabel?.numberOfLines = 1
             $0.titleLabel?.lineBreakMode = .byClipping

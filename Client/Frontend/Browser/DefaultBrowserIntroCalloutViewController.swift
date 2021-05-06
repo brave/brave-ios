@@ -14,7 +14,7 @@ class DefaultBrowserIntroCalloutViewController: UIViewController {
     
     private let openSettingsButton = Button(type: .system).then {
         $0.setTitle(Strings.DefaultBrowserCallout.introOpenSettingsButtonText, for: .normal)
-        $0.backgroundColor = UIColor.braveOrange
+        $0.backgroundColor = .braveOrange
         $0.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
         $0.titleLabel?.textColor = .white
         $0.snp.makeConstraints { make in

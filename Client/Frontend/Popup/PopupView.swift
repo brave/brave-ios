@@ -131,7 +131,7 @@ class PopupView: UIView, UIGestureRecognizerDelegate {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        backgroundColor = UIColor.clear
+        backgroundColor = .clear
         autoresizingMask = [.flexibleWidth, .flexibleHeight]
         
         let touchRecognizer: UILongPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(backgroundTapped(recognizer:)))
@@ -151,7 +151,7 @@ class PopupView: UIView, UIGestureRecognizerDelegate {
         dialogView = UIView(frame: CGRect.zero)
         dialogView.clipsToBounds = true
         dialogView.autoresizingMask = [.flexibleWidth, .flexibleTopMargin, .flexibleBottomMargin]
-        dialogView.backgroundColor = UIColor.white
+        dialogView.backgroundColor = .white
         
         setStyle(popupStyle: .dialog)
         

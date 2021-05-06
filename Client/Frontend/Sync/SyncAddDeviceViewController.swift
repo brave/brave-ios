@@ -174,7 +174,7 @@ class SyncAddDeviceViewController: SyncViewController {
         doneButton.setTitle(Strings.done, for: .normal)
         doneButton.titleLabel?.font = UIFont.systemFont(ofSize: 17, weight: UIFont.Weight.bold)
         doneButton.setTitleColor(.white, for: .normal)
-        doneButton.backgroundColor = UIColor.braveOrange
+        doneButton.backgroundColor = .braveOrange
         doneButton.addTarget(self, action: #selector(SEL_done), for: .touchUpInside)
 
         doneEnterWordsStackView.addArrangedSubview(doneButton)

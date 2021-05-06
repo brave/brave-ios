@@ -294,7 +294,7 @@ class BraveTodayAddSourceViewController: UITableViewController {
         case 1:
             let cell = tableView.dequeueReusableCell(for: indexPath) as CenteredButtonCell
             cell.textLabel?.text = Strings.BraveToday.importOPML
-            cell.tintColor = UIColor.braveOrange
+            cell.tintColor = .braveOrange
             return cell
         default:
             fatalError("No cell available for index path: \(indexPath)")

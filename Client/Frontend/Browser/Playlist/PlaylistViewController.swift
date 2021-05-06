@@ -184,7 +184,7 @@ private class ListController: UIViewController {
     
     private let tableView = UITableView(frame: .zero, style: .grouped).then {
         $0.backgroundView = UIView()
-        $0.backgroundColor = UIColor.braveBackground
+        $0.backgroundColor = .braveBackground
         $0.separatorColor = .clear
         $0.allowsSelectionDuringEditing = true
     }
@@ -239,12 +239,12 @@ private class ListController: UIViewController {
     private func setTheme() {
         title = Strings.PlayList.playListSectionTitle
 
-        view.backgroundColor = UIColor.braveBackground
+        view.backgroundColor = .braveBackground
         navigationController?.do {
             let appearance = UINavigationBarAppearance()
             appearance.configureWithTransparentBackground()
             appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
-            appearance.backgroundColor = UIColor.braveBackground
+            appearance.backgroundColor = .braveBackground
             
             $0.navigationBar.standardAppearance = appearance
             $0.navigationBar.barTintColor = UIColor.braveBackground
@@ -679,7 +679,7 @@ extension ListController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let headerView = UIView()
-        headerView.backgroundColor = UIColor.clear
+        headerView.backgroundColor = .clear
         
         return headerView
     }
@@ -1473,7 +1473,7 @@ private class DetailController: UIViewController, UIGestureRecognizerDelegate {
             let appearance = UINavigationBarAppearance()
             appearance.configureWithTransparentBackground()
             appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
-            appearance.backgroundColor = UIColor.braveBackground
+            appearance.backgroundColor = .braveBackground
             
             $0.navigationBar.standardAppearance = appearance
             $0.navigationBar.barTintColor = UIColor.braveBackground

@@ -169,7 +169,7 @@ final class ChangeGlobalDefaultsView: UIControl {
     private let highlightedBackgroundView = UIView().then {
         $0.isUserInteractionEnabled = false
         $0.alpha = 0.0
-        $0.backgroundColor = UIColor.bravePrimary.withAlphaComponent(0.1)
+        $0.backgroundColor = .bravePrimary.withAlphaComponent(0.1)
     }
     private let imageView = UIImageView(image: UIImage(imageLiteralResourceName: "internet-block").template).then {
         $0.setContentHuggingPriority(.required, for: .horizontal)

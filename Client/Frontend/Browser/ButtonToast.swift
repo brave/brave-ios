@@ -57,7 +57,7 @@ class ButtonToast: Toast {
 
         if let imageName = imageName {
             let icon = UIImageView(image: UIImage(imageLiteralResourceName: imageName).template)
-            icon.tintColor = UIColor.white
+            icon.tintColor = .white
             horizontalStackView.addArrangedSubview(icon)
         }
 
@@ -67,7 +67,7 @@ class ButtonToast: Toast {
 
         let label = UILabel()
         label.textAlignment = textAlignment
-        label.textColor = UIColor.white
+        label.textColor = .white
         label.font = ButtonToastUX.toastLabelFont
         label.text = labelText
         label.lineBreakMode = .byWordWrapping
@@ -82,7 +82,7 @@ class ButtonToast: Toast {
 
             descriptionLabel = UILabel()
             descriptionLabel?.textAlignment = textAlignment
-            descriptionLabel?.textColor = UIColor.white
+            descriptionLabel?.textColor = .white
             descriptionLabel?.font = ButtonToastUX.toastDescriptionFont
             descriptionLabel?.text = descriptionText
             descriptionLabel?.lineBreakMode = .byTruncatingTail

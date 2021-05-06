@@ -92,7 +92,7 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
   
   fileprivate func createEmptyStateOverview() -> UIView {
     let overlayView = UIView()
-    overlayView.backgroundColor = UIColor.white
+    overlayView.backgroundColor = .white
     
     return overlayView
   }
@@ -113,7 +113,7 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
     }
     
     let site = frc!.object(at: indexPath)
-    cell.backgroundColor = UIColor.clear
+    cell.backgroundColor = .clear
     cell.setLines(site.title, detailText: site.url)
     
     cell.imageView?.contentMode = .scaleAspectFit

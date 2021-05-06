@@ -68,7 +68,7 @@ extension BrowserViewController: ReaderModeBarViewDelegate {
 
                 let setupPopover = { [unowned self] in
                     if let popoverPresentationController = readerModeStyleViewController.popoverPresentationController {
-                        popoverPresentationController.backgroundColor = UIColor.white
+                        popoverPresentationController.backgroundColor = .white
                         popoverPresentationController.delegate = self
                         popoverPresentationController.sourceView = readerModeBar
                         popoverPresentationController.sourceRect = CGRect(x: readerModeBar.frame.width/2, y: UIConstants.toolbarHeight, width: 1, height: 1)

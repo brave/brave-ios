@@ -48,7 +48,7 @@ class SyncSettingsTableViewController: UITableViewController {
             $0.textAlignment = .center
             $0.font = UIFont.systemFont(ofSize: 15)
             $0.isScrollEnabled = false
-            $0.backgroundColor = UIColor.clear
+            $0.backgroundColor = .clear
         }
         
         tableView.tableHeaderView = text
@@ -253,7 +253,7 @@ class SyncSettingsTableViewController: UITableViewController {
         cell.textLabel?.do {
             $0.text = Strings.syncAddAnotherDevice
             $0.textAlignment = .center
-            $0.textColor = UIColor.braveOrange
+            $0.textColor = .braveOrange
             $0.font = UIFont.systemFont(ofSize: 17, weight: UIFont.Weight.regular)
         }
     }

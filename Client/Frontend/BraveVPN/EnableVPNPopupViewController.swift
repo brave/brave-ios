@@ -17,7 +17,7 @@ class EnableVPNPopupViewController: UIViewController {
         super.viewDidLoad()
         
         let backgroundView = UIView().then {
-            $0.backgroundColor = UIColor.black.withAlphaComponent(0.3)
+            $0.backgroundColor = .black.withAlphaComponent(0.3)
         }
         
         view.insertSubview(backgroundView, at: 0)
@@ -95,7 +95,7 @@ private class ContentView: UIView {
     
     let enableButton = RoundInterfaceButton(type: .roundedRect).then {
         $0.setTitle(Strings.learnMore, for: .normal)
-        $0.backgroundColor = UIColor.braveOrange
+        $0.backgroundColor = .braveOrange
         $0.titleLabel?.font = .systemFont(ofSize: 16, weight: .semibold)
         $0.titleLabel?.textColor = .white
         $0.snp.makeConstraints { make in

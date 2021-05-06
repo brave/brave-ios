@@ -79,7 +79,7 @@ class SnackBar: UIView {
         label.backgroundColor = nil
         label.numberOfLines = 0
         label.textColor = .braveLabel
-        label.backgroundColor = UIColor.clear
+        label.backgroundColor = .clear
         return label
     }()
 
@@ -139,7 +139,7 @@ class SnackBar: UIView {
             make.width.lessThanOrEqualTo(self).inset(UIConstants.defaultPadding * 2).priority(1000)
         }
 
-        backgroundColor = UIColor.clear
+        backgroundColor = .clear
         layer.borderWidth = SnackBarUX.borderWidth
         layer.borderColor = UIColor.braveSeparator.cgColor
         layer.cornerRadius = 6

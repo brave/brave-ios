@@ -20,7 +20,7 @@ class AdContentButton: UIControl {
     $0.numberOfLines = 3
   }
   private let appNameLabel = UILabel().then {
-    $0.textColor = UIColor.bravePrimary.withAlphaComponent(0.5)
+    $0.textColor = .bravePrimary.withAlphaComponent(0.5)
     $0.font = .systemFont(ofSize: 14.0, weight: .regular)
     $0.text = Strings.Ads.adNotificationTitle.uppercased()
   }
@@ -28,7 +28,7 @@ class AdContentButton: UIControl {
   private let backgroundView: UIVisualEffectView = {
     let backgroundView = UIVisualEffectView(effect: UIBlurEffect(style: .systemThinMaterial))
     backgroundView.isUserInteractionEnabled = false
-    backgroundView.contentView.backgroundColor = UIColor.braveBackground.withAlphaComponent(0.5)
+    backgroundView.contentView.backgroundColor = .braveBackground.withAlphaComponent(0.5)
     backgroundView.layer.cornerRadius = 10
     backgroundView.layer.cornerCurve = .continuous
     backgroundView.layer.masksToBounds = true

@@ -21,7 +21,7 @@ class BraveTodayErrorView: UIView, FeedCardContent {
     }
     
     let refreshButton = ActionButton().then {
-        $0.backgroundColor = UIColor.braveOrange
+        $0.backgroundColor = .braveOrange
         $0.setTitle(Strings.BraveToday.refresh, for: .normal)
         $0.titleLabel?.font = .systemFont(ofSize: 15.0, weight: .semibold)
         $0.layer.borderWidth = 0

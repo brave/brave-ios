@@ -40,7 +40,7 @@ class QRCodeViewController: UIViewController {
     private lazy var instructionsLabel: UILabel = {
         let label = UILabel()
         label.text = Strings.scanQRCodeInstructionsLabel
-        label.textColor = UIColor.white
+        label.textColor = .white
         label.textAlignment = .center
         label.numberOfLines = 0
         return label
@@ -80,11 +80,11 @@ class QRCodeViewController: UIViewController {
 
         // Setup the NavigationItem
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "qrcode-goBack"), style: .plain, target: self, action: #selector(goBack))
-        self.navigationItem.leftBarButtonItem?.tintColor = UIColor.white
+        self.navigationItem.leftBarButtonItem?.tintColor = .white
 
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "qrcode-light"), style: .plain, target: self, action: #selector(openLight))
         if captureDevice.hasTorch {
-            self.navigationItem.rightBarButtonItem?.tintColor = UIColor.white
+            self.navigationItem.rightBarButtonItem?.tintColor = .white
         } else {
             self.navigationItem.rightBarButtonItem?.tintColor = .braveDisabled
             self.navigationItem.rightBarButtonItem?.isEnabled = false
@@ -187,7 +187,7 @@ class QRCodeViewController: UIViewController {
                 captureDevice.torchMode = AVCaptureDevice.TorchMode.off
                 captureDevice.unlockForConfiguration()
                 navigationItem.rightBarButtonItem?.image = #imageLiteral(resourceName: "qrcode-light")
-                navigationItem.rightBarButtonItem?.tintColor = UIColor.white
+                navigationItem.rightBarButtonItem?.tintColor = .white
             } catch {
                 print(error)
             }

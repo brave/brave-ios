@@ -43,7 +43,7 @@ class FavoritesViewController: UIViewController {
     }
     private let collectionView: UICollectionView
     private let backgroundView = UIVisualEffectView(effect: UIBlurEffect(style: .systemChromeMaterial)).then {
-        $0.contentView.backgroundColor = UIColor.braveBackground.withAlphaComponent(0.5)
+        $0.contentView.backgroundColor = .braveBackground.withAlphaComponent(0.5)
     }
     
     init(action: @escaping (Favorite, BookmarksAction) -> Void) {

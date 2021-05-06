@@ -561,7 +561,7 @@ class BrowserViewController: UIViewController {
             self.topToolbar.locationContainer.alpha = 1
             self.presentedViewController?.popoverPresentationController?.containerView?.alpha = 1
             self.presentedViewController?.view.alpha = 1
-            self.view.backgroundColor = UIColor.clear
+            self.view.backgroundColor = .clear
         }, completion: { _ in
             self.webViewContainerBackdrop.alpha = 0
         })

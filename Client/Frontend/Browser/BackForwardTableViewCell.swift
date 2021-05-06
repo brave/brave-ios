@@ -83,7 +83,7 @@ class BackForwardTableViewCell: UITableViewCell {
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        backgroundColor = UIColor.clear
+        backgroundColor = .clear
         selectionStyle = .none
         
         contentView.addSubview(line)
@@ -131,7 +131,7 @@ class BackForwardTableViewCell: UITableViewCell {
         if highlighted {
             self.backgroundColor = UIColor(white: 0, alpha: 0.1)
         } else {
-            self.backgroundColor = UIColor.clear
+            self.backgroundColor = .clear
         }
     }
     
