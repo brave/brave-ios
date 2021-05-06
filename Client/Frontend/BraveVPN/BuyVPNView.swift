@@ -49,7 +49,7 @@ extension BuyVPNViewController {
             stackView.axis = .vertical
                         
             let line = UIView().then {
-                $0.backgroundColor = .white.withAlphaComponent(0.1)
+                $0.backgroundColor = UIColor.white.withAlphaComponent(0.1)
                 $0.snp.makeConstraints { make in
                     make.height.equalTo(1)
                 }
@@ -123,7 +123,7 @@ extension BuyVPNViewController {
             $0.font = UIFont.systemFont(ofSize: 13, weight: .semibold)
             $0.numberOfLines = 0
             $0.lineBreakMode = .byWordWrapping
-            $0.textColor = .white.withAlphaComponent(0.6)
+            $0.textColor = UIColor.white.withAlphaComponent(0.6)
         }
         
         // MARK: - Init/Lifecycle

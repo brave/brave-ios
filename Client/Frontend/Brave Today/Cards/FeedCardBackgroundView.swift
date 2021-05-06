@@ -15,7 +15,7 @@ class FeedCardBackgroundView: UIVisualEffectView {
         clipsToBounds = true
         isUserInteractionEnabled = false
         isAccessibilityElement = false
-        contentView.backgroundColor = .white.withAlphaComponent(0.17)
+        contentView.backgroundColor = UIColor.white.withAlphaComponent(0.17)
     }
     @available(*, unavailable)
     required init(coder: NSCoder) {

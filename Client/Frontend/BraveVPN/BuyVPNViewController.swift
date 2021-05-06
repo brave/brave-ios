@@ -36,7 +36,7 @@ class BuyVPNViewController: UIViewController {
             if !isLoading { return }
             
             let overlay = UIView().then {
-                $0.backgroundColor = .black.withAlphaComponent(0.5)
+                $0.backgroundColor = UIColor.black.withAlphaComponent(0.5)
                 let activityIndicator = UIActivityIndicatorView().then { indicator in
                     indicator.startAnimating()
                     indicator.autoresizingMask = [.flexibleWidth, .flexibleHeight]

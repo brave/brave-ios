@@ -25,7 +25,7 @@ class BraveTodayEmptyFeedView: UIView, FeedCardContent {
         $0.titleLabel?.font = .systemFont(ofSize: 16.0, weight: .semibold)
         $0.setTitle(Strings.BraveToday.sourcesAndSettings, for: .normal)
         $0.contentEdgeInsets = UIEdgeInsets(top: 10, left: 20, bottom: 10, right: 20)
-        $0.backgroundColor = .white.withAlphaComponent(0.2)
+        $0.backgroundColor = UIColor.white.withAlphaComponent(0.2)
     }
     
     private let titleLabel = UILabel().then {

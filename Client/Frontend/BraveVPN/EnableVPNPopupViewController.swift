@@ -17,7 +17,7 @@ class EnableVPNPopupViewController: UIViewController {
         super.viewDidLoad()
         
         let backgroundView = UIView().then {
-            $0.backgroundColor = .black.withAlphaComponent(0.3)
+            $0.backgroundColor = UIColor.black.withAlphaComponent(0.3)
         }
         
         view.insertSubview(backgroundView, at: 0)
