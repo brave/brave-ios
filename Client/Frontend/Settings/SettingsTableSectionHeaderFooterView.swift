@@ -7,7 +7,6 @@ import BraveUI
 import UIKit
 
 struct SettingsUX {
-    static let tableViewHeaderBackgroundColor = UIConstants.appBackgroundColor
     static let tableViewHeaderTextColor = UIColor.Photon.grey50
     static let tableViewRowTextColor = UIColor.Photon.grey90
     static let tableViewDisabledRowTextColor = UIColor.Photon.grey40

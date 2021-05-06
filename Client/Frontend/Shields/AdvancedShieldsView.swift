@@ -22,13 +22,6 @@ class AdvancedShieldsView: UIStackView, Themeable {
     }
     let globalControlsButton = ChangeGlobalDefaultsView()
     
-    private func dividerView() -> UIView {
-        let divider = UIView()
-        divider.backgroundColor = BraveUX.colorForSidebarLineSeparators
-        divider.snp.makeConstraints { $0.height.equalTo(1.0 / UIScreen.main.scale) }
-        return divider
-    }
-    
     override init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -97,7 +90,7 @@ extension AdvancedShieldsView {
         }()
         
         let toggleSwitch = UISwitch().then {
-            $0.appearanceOnTintColor = BraveUX.braveOrange
+            $0.appearanceOnTintColor = UIColor.braveOrange
         }
         var valueToggled: ((Bool) -> Void)?
         

@@ -4,6 +4,7 @@
 
 import Foundation
 import SnapKit
+import BraveShared
 
 private struct PasscodeUX {
     static let titleVerticalSpacing: CGFloat = 32
@@ -95,8 +96,8 @@ class PasscodeInputView: UIView, UIKeyInput {
         guard let context = UIGraphicsGetCurrentContext() else { return }
 
         context.setLineWidth(1)
-        context.setStrokeColor(UIConstants.passcodeDotColor.cgColor)
-        context.setFillColor(UIConstants.passcodeDotColor.cgColor)
+        context.setStrokeColor(BraveUX.greyG.cgColor)
+        context.setFillColor(BraveUX.greyG.cgColor)
 
         (0..<passcodeSize).forEach { index in
             let offset = floor(rect.width / CGFloat(passcodeSize))

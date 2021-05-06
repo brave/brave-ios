@@ -4,6 +4,95 @@
 
 import UIKit
 
+enum DesignSystemColor: String {
+  case background01
+  case background02
+  case background03
+  case background04
+  
+  case text01
+  case text02
+  case text03
+  
+  case interactive01
+  case interactive02
+  case interactive03
+  case interactive04
+  case interactive05
+  case interactive06
+  case interactive07
+  case interactive08
+  
+  case focusBorder = "focus-border"
+  case disabled
+  
+  case divider01
+  
+  case errorBackground = "error-background"
+  case errorIcon = "error-icon"
+  case errorText = "error-text"
+  
+  case warningBackground = "warning-background"
+  case warningIcon = "warning-icon"
+  case warningText = "warning-text"
+  
+  case infoBackground = "info-background"
+  case infoIcon = "info-icon"
+  case infoText = "info-text"
+  
+  case successBackground = "success-background"
+  case successIcon = "success-icon"
+  case successText = "success-text"
+  
+  var color: UIColor {
+    return UIColor(named: rawValue, in: Bundle(for: Brave.self), compatibleWith: nil)!
+  }
+}
+
+final private class Brave { }
+
+extension UIColor {
+  public static var braveBackground: UIColor {
+    DesignSystemColor.background02.color
+  }
+  public static var secondaryBraveBackground: UIColor {
+    DesignSystemColor.background01.color
+  }
+  public static var tertiaryBraveBackground: UIColor {
+    DesignSystemColor.background03.color
+  }
+  public static var braveGroupedBackground: UIColor {
+    DesignSystemColor.background04.color
+  }
+  public static var secondaryBraveGroupedBackground: UIColor {
+    DesignSystemColor.background02.color
+  }
+  public static var tertiaryBraveGroupedBackground: UIColor {
+    DesignSystemColor.background04.color
+  }
+  public static var braveLabel: UIColor {
+    DesignSystemColor.text01.color
+  }
+  public static var secondaryBraveLabel: UIColor {
+    DesignSystemColor.text02.color
+  }
+  public static var tertiaryBraveLabel: UIColor {
+    DesignSystemColor.text03.color
+  }
+  public static var braveOrange: UIColor {
+    DesignSystemColor.interactive02.color
+  }
+  public static var braveBlurple: UIColor {
+    DesignSystemColor.interactive05.color
+  }
+  public static var braveSeparator: UIColor {
+    DesignSystemColor.divider01.color
+  }
+  public static var braveErrorLabel: UIColor {
+    DesignSystemColor.errorText.color
+  }
+}
+
 /// The Brave Color Palette used in Brave's Design System
 ///
 /// File: `Color Palette.sketch`

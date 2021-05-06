@@ -259,7 +259,7 @@ class SyncSettingsTableViewController: UITableViewController {
         cell.textLabel?.do {
             $0.text = Strings.syncAddAnotherDevice
             $0.textAlignment = .center
-            $0.appearanceTextColor = BraveUX.braveOrange
+            $0.appearanceTextColor = UIColor.braveOrange
             $0.font = UIFont.systemFont(ofSize: 17, weight: UIFont.Weight.regular)
         }
     }

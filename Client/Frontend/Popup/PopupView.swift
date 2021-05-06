@@ -57,11 +57,11 @@ class PopupView: UIView, UIGestureRecognizerDelegate {
         var backgroundColor: UIColor {
             switch self {
             case .primary:
-                return BraveUX.blue
+                return .braveBlurple
             case .secondary:
                 return BraveUX.greyE
             case .destructive:
-                return BraveUX.red
+                return .braveErrorLabel
             case .link:
                 return .clear
             }

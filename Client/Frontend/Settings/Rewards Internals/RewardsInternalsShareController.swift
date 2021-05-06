@@ -27,7 +27,7 @@ private class RewardsInternalsSharableCell: UITableViewCell, TableViewReusable, 
     }
     
     func applyTheme(_ theme: Theme) {
-        selectedBackgroundView?.backgroundColor = theme.isDark ? UIColor(white: 0.2, alpha: 1.0) : BraveUX.braveOrange.withAlphaComponent(0.06)
+        selectedBackgroundView?.backgroundColor = theme.isDark ? UIColor(white: 0.2, alpha: 1.0) : UIColor.braveOrange.withAlphaComponent(0.06)
     }
 }
 

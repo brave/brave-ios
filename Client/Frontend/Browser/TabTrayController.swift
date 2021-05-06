@@ -104,7 +104,7 @@ class TabCell: UICollectionViewCell, Themeable {
     }
 
     func setTabSelected(_ tab: Tab) {
-        layer.shadowColor = UIConstants.systemBlueColor.cgColor
+        layer.shadowColor = UIColor.Photon.blue40.cgColor
         layer.shadowOpacity = 1
         layer.shadowRadius = 0 // A 0 radius creates a solid border instead of a gradient blur
         layer.masksToBounds = false
@@ -1024,7 +1024,7 @@ fileprivate class EmptyPrivateTabsView: UIView {
 
     let learnMoreButton = UIButton(type: .system).then {
         $0.setTitle(Strings.privateTabLink, for: [])
-        $0.setTitleColor(UIConstants.privateModeTextHighlightColor, for: [])
+        $0.setTitleColor(UIColor.Photon.purple60, for: [])
         $0.titleLabel?.font = EmptyPrivateTabsViewUX.learnMoreFont
         $0.titleLabel?.numberOfLines = 0
     }

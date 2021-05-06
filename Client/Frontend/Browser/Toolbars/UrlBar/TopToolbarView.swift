@@ -123,7 +123,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
     fileprivate lazy var cancelButton: UIButton = {
         let cancelButton = InsetButton()
         cancelButton.setTitle(Strings.cancelButtonTitle, for: .normal)
-        cancelButton.setTitleColor(BraveUX.cancelTextColor, for: .normal)
+        cancelButton.setTitleColor(UIColor.secondaryBraveLabel, for: .normal)
         cancelButton.accessibilityIdentifier = "topToolbarView-cancel"
         cancelButton.addTarget(self, action: #selector(didClickCancel), for: .touchUpInside)
         cancelButton.setContentCompressionResistancePriority(.required, for: .horizontal)

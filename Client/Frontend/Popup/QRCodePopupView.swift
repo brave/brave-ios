@@ -40,7 +40,7 @@ class QRCodePopupView: PopupView {
         $0.layer.borderColor = UIColor.orange.cgColor
         $0.layer.borderWidth = 1
         $0.snp.makeConstraints { $0.height.equalTo(44) }
-        $0.tintColor = BraveUX.braveOrange
+        $0.tintColor = UIColor.braveOrange
         $0.setImage(#imageLiteral(resourceName: "nav-share"), for: .normal)
         $0.imageEdgeInsets = UIEdgeInsets(top: 0, left: -18, bottom: 0, right: 0)
         $0.contentEdgeInsets = UIEdgeInsets(top: 0, left: 48, bottom: 0, right: 48)

@@ -129,7 +129,7 @@ class NewContentAvailableButton: SpringButton {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        backgroundColor = BraveUX.braveOrange
+        backgroundColor = UIColor.braveOrange
         
         clipsToBounds = true
         layer.shadowOffset = CGSize(width: 0, height: 1)

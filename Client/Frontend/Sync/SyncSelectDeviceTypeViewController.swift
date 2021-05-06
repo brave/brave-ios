@@ -14,7 +14,7 @@ class SyncDeviceTypeButton: UIControl {
     var type: DeviceType!
     
     // Color for the opposite state of `pressed`
-    private var pressedReversedColor = BraveUX.braveOrange
+    private var pressedReversedColor = UIColor.braveOrange
     var pressed: Bool = false {
         didSet {
             if pressed == oldValue {

@@ -32,8 +32,8 @@ class OpenSearchEngineButton: Button {
             case .enabled:
                 isLoading = false
                 setImage(#imageLiteral(resourceName: "AddSearch").template, for: .normal)
-                appearanceTintColor = BraveUX.braveOrange
-                appearanceTextColor = BraveUX.braveOrange
+                appearanceTintColor = UIColor.braveOrange
+                appearanceTextColor = UIColor.braveOrange
                 isUserInteractionEnabled = true
             case .loading:
                 isLoading = true

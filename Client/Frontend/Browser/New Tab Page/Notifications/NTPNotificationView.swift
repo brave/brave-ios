@@ -53,7 +53,7 @@ class NTPNotificationView: UIStackView {
     lazy var body = LinkLabel().then {
         $0.font = .systemFont(ofSize: 12.0)
         $0.appearanceTextColor = config.textColor
-        $0.linkColor = BraveUX.braveOrange
+        $0.linkColor = UIColor.braveOrange
         $0.text = config.bodyText?.text
         
         $0.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 313), for: .vertical)

@@ -4,6 +4,7 @@
 
 import Foundation
 import BraveShared
+import BraveUI
 
 extension Theme {
     func applyAppearanceProperties() {
@@ -30,9 +31,9 @@ extension Theme {
         // Any change to a single tableView property that currently uses one of these will probably have odd behavior and must be thoroughly tested
         
         /// Used as color a table will use as the base (e.g. background)
-        let tablePrimaryColor = colors.home
+        let tablePrimaryColor = UIColor.braveGroupedBackground
         /// Used to augment `tablePrimaryColor` above
-        let tableSecondaryColor = colors.header
+        let tableSecondaryColor = UIColor.secondaryBraveGroupedBackground
         
         // Will become the color for whatever in the table is .clear
         // In some cases this is the header, footer, cell, or a combination of them.
@@ -48,8 +49,8 @@ extension Theme {
 
         UIView.appearance(whenContainedInInstancesOf: [UITableViewHeaderFooterView.self]).appearanceBackgroundColor = tablePrimaryColor
         
-        UILabel.appearance(whenContainedInInstancesOf: [UITableView.self]).appearanceTextColor = colors.tints.home
-        UILabel.appearance(whenContainedInInstancesOf: [UICollectionReusableView.self]).appearanceTextColor = colors.tints.home
+        UILabel.appearance(whenContainedInInstancesOf: [UITableView.self]).appearanceTextColor = .braveLabel
+        UILabel.appearance(whenContainedInInstancesOf: [UICollectionReusableView.self]).appearanceTextColor = .braveLabel
         
         AddEditHeaderView.appearance().appearanceBackgroundColor = tableSecondaryColor
         UITextField.appearance().appearanceTextColor = colors.tints.home

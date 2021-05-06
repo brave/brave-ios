@@ -183,7 +183,7 @@ class PlaylistCell: UITableViewCell {
             return .zero
         }
 
-        set { //swiftlint:disable:this unused_setter_value
+        set { // swiftlint:disable:this unused_setter_value
             super.layoutMargins = .zero
         }
     }

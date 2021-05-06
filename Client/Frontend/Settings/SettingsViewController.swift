@@ -345,10 +345,10 @@ class SettingsViewController: TableViewController {
                 if enabled {
                     return (Strings.VPN.settingsVPNEnabled, #colorLiteral(red: 0.1607843137, green: 0.737254902, blue: 0.5647058824, alpha: 1))
                 } else {
-                    return (Strings.VPN.settingsVPNDisabled, BraveUX.red)
+                    return (Strings.VPN.settingsVPNDisabled, .braveErrorLabel)
                 }
             case .expired:
-                return (Strings.VPN.settingsVPNExpired, BraveUX.red)
+                return (Strings.VPN.settingsVPNExpired, .braveErrorLabel)
             }
         }()
         

@@ -95,7 +95,7 @@ private class ContentView: UIView {
     
     let enableButton = RoundInterfaceButton(type: .roundedRect).then {
         $0.setTitle(Strings.learnMore, for: .normal)
-        $0.backgroundColor = BraveUX.braveOrange
+        $0.backgroundColor = UIColor.braveOrange
         $0.titleLabel?.font = .systemFont(ofSize: 16, weight: .semibold)
         $0.appearanceTextColor = .white
         $0.snp.makeConstraints { make in

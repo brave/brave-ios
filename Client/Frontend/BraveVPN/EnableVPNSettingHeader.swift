@@ -48,7 +48,7 @@ class EnableVPNSettingHeader: UIView {
         }()
         
         $0.setTitle(title, for: .normal)
-        $0.backgroundColor = BraveUX.braveOrange
+        $0.backgroundColor = UIColor.braveOrange
         $0.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
         $0.appearanceTextColor = .white
         $0.snp.makeConstraints { make in
