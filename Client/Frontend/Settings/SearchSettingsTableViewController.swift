@@ -119,13 +119,6 @@ class SearchSettingsTableViewController: UITableViewController {
         tableView.reloadData()
     }
     
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        if traitCollection.userInterfaceStyle != previousTraitCollection?.userInterfaceStyle {
-            updateThemeForUserInterfaceStyleChange()
-        }
-    }
-    
     // MARK: Internal
     
     private func configureSearchEnginePicker(_ type: DefaultEngineType) -> SearchEnginePicker {

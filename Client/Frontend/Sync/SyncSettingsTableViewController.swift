@@ -68,13 +68,6 @@ class SyncSettingsTableViewController: UITableViewController {
         }
     }
     
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        if traitCollection.userInterfaceStyle != previousTraitCollection?.userInterfaceStyle {
-            updateThemeForUserInterfaceStyleChange()
-        }
-    }
-    
     // MARK: - Button actions.
     
     @objc func doneTapped() {

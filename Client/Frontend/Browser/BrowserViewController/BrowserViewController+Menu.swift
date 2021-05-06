@@ -85,12 +85,12 @@ extension BrowserViewController {
                         .font(.callout)
                         .fontWeight(.medium)
                         .lineLimit(1)
-                        .foregroundColor(Color(Theme.of(nil).colors.tints.home))
+                        .foregroundColor(Color(.braveLabel))
                 }
                 Text(verbatim: url.baseDomain ?? url.host ?? url.absoluteDisplayString)
                     .font(.footnote)
                     .lineLimit(1)
-                    .foregroundColor(Color(Theme.of(nil).colors.tints.home).opacity(0.8))
+                    .foregroundColor(Color(.secondaryBraveLabel))
             }
             .padding(.horizontal, 14)
             .padding(.vertical, 6)

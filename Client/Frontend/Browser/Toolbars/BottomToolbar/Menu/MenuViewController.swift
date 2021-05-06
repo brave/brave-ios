@@ -19,7 +19,7 @@ struct MenuItemHeaderView: View {
     var body: some View {
         HStack(spacing: 14) {
             RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .fill(Color(Theme.of(nil).colors.addressBar))
+                .fill(Color(.secondaryBraveGroupedBackground))
                 .frame(width: 32, height: 32)
                 .overlay(
                     Image(uiImage: icon)
@@ -30,7 +30,7 @@ struct MenuItemHeaderView: View {
                 .shadow(color: Color.black.opacity(0.1), radius: 1, x: 0, y: 1)
             Text(verbatim: title)
         }
-        .foregroundColor(Color(Theme.of(nil).colors.tints.home))
+        .foregroundColor(Color(.braveLabel))
     }
 }
 
@@ -226,14 +226,9 @@ extension MenuViewController: PanModalPresentable {
     }
 }
 
-private class MenuHostingController<MenuContent: View>: UIHostingController<MenuView<MenuContent>>, PreferencesObserver {
+private class MenuHostingController<MenuContent: View>: UIHostingController<MenuView<MenuContent>> {
     init(content: MenuContent) {
         super.init(rootView: MenuView(content: content))
-        Preferences.General.themeNormalMode.observe(from: self)
-    }
-    
-    func preferencesDidChange(for key: String) {
-        view.backgroundColor = Theme.of(nil).colors.home
     }
     
     @available(*, unavailable)
@@ -264,7 +259,7 @@ private class MenuHostingController<MenuContent: View>: UIHostingController<Menu
                 height: min(max(size.height + 16, minimumPopoverHeight), maximumPopoverHeight + navBarHeight)
             )
         }()
-        view.backgroundColor = Theme.of(nil).colors.home
+        view.backgroundColor = .braveGroupedBackground
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -272,13 +267,6 @@ private class MenuHostingController<MenuContent: View>: UIHostingController<Menu
         if navigationController?.isBeingDismissed == false {
             navigationController?.setNavigationBarHidden(false, animated: animated)
             navigationController?.preferredContentSize = CGSize(width: 375, height: 580)
-        }
-    }
-    
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        if traitCollection.userInterfaceStyle != previousTraitCollection?.userInterfaceStyle {
-            view.backgroundColor = Theme.of(nil).colors.home
         }
     }
 }

@@ -258,12 +258,12 @@ class SettingsViewController: TableViewController {
             rows: []
         )
         
-        let themeSubtitle = Theme.DefaultTheme(rawValue: Preferences.General.themeNormalMode.value)?.displayString
+        let themeSubtitle = DefaultTheme(rawValue: Preferences.General.themeNormalMode.value)?.displayString
         var row = Row(text: Strings.themesDisplayBrightness, detailText: themeSubtitle, image: #imageLiteral(resourceName: "settings-appearance").template, accessory: .disclosureIndicator, cellClass: MultilineSubtitleCell.self)
         row.selection = { [unowned self] in
-            let optionsViewController = OptionSelectionViewController<Theme.DefaultTheme>(
-                options: Theme.DefaultTheme.normalThemesOptions,
-                selectedOption: Theme.DefaultTheme(rawValue: Preferences.General.themeNormalMode.value),
+            let optionsViewController = OptionSelectionViewController<DefaultTheme>(
+                options: DefaultTheme.normalThemesOptions,
+                selectedOption: DefaultTheme(rawValue: Preferences.General.themeNormalMode.value),
                 optionChanged: { [unowned self] _, option in
                     Preferences.General.themeNormalMode.value = option.rawValue
                     self.dataSource.reloadCell(row: row, section: display, displayText: option.displayString)

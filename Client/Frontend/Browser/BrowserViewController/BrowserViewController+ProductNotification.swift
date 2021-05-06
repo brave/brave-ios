@@ -86,7 +86,7 @@ extension BrowserViewController {
         if !Preferences.ProductNotificationBenchmarks.firstTimeBlockingShown.value,
            contentBlockerStats.total > 0 {
             
-            notifyFirstTimeBlock(theme: Theme.of(selectedTab))
+            notifyFirstTimeBlock()
             Preferences.ProductNotificationBenchmarks.firstTimeBlockingShown.value = true
             
             return
@@ -96,7 +96,7 @@ extension BrowserViewController {
         if !Preferences.ProductNotificationBenchmarks.videoAdBlockShown.value,
            selectedTab.url?.isVideoSteamingSiteURL == true {
 
-            notifyVideoAdsBlocked(theme: Theme.of(selectedTab))
+            notifyVideoAdsBlocked()
             Preferences.ProductNotificationBenchmarks.videoAdBlockShown.value = true
 
             return
@@ -106,7 +106,7 @@ extension BrowserViewController {
         if !Preferences.ProductNotificationBenchmarks.privacyProtectionBlockShown.value,
            contentBlockerStats.total > benchmarkNumberOfTrackers {
             
-            notifyPrivacyProtectBlock(theme: Theme.of(selectedTab))
+            notifyPrivacyProtectBlock()
             Preferences.ProductNotificationBenchmarks.privacyProtectionBlockShown.value = true
 
             return
@@ -126,13 +126,13 @@ extension BrowserViewController {
                 Preferences.ProductNotificationBenchmarks.trackerTierCount.value = numOfTrackerAds
                 
                 if numOfTrackerAds > firstExistingTier.value {
-                    notifyTrackerAdsCount(firstExistingTier.value, description: firstExistingTier.title, theme: Theme.of(selectedTab))
+                    notifyTrackerAdsCount(firstExistingTier.value, description: firstExistingTier.title)
                 }
             }
         }
     }
     
-    private func notifyFirstTimeBlock(theme: Theme) {
+    private func notifyFirstTimeBlock() {
         let shareTrackersViewController = ShareTrackersController(trackingType: .trackerAdWarning)
         
         shareTrackersViewController.actionHandler = { [weak self] action in
@@ -144,27 +144,27 @@ extension BrowserViewController {
         showBenchmarkNotificationPopover(controller: shareTrackersViewController)
     }
     
-    private func notifyVideoAdsBlocked(theme: Theme) {
+    private func notifyVideoAdsBlocked() {
         let shareTrackersViewController = ShareTrackersController(trackingType: .videoAdBlock)
         
         dismiss(animated: true)
         showBenchmarkNotificationPopover(controller: shareTrackersViewController)
     }
     
-    private func notifyPrivacyProtectBlock(theme: Theme) {
+    private func notifyPrivacyProtectBlock() {
         let shareTrackersViewController = ShareTrackersController(trackingType: .trackerAdCountBlock(count: benchmarkNumberOfTrackers))
         dismiss(animated: true)
         showBenchmarkNotificationPopover(controller: shareTrackersViewController)
     }
     
-    private func notifyTrackerAdsCount(_ count: Int, description: String, theme: Theme) {
+    private func notifyTrackerAdsCount(_ count: Int, description: String) {
         let shareTrackersViewController = ShareTrackersController(trackingType: .trackerCountShare(count: count, description: description))
         dismiss(animated: true)
 
         shareTrackersViewController.actionHandler = { [weak self] action in
             guard let self = self, action == .shareTheNewsTapped else { return }
 
-            self.showShareScreen(with: theme)
+            self.showShareScreen()
         }
 
         showBenchmarkNotificationPopover(controller: shareTrackersViewController)
@@ -186,7 +186,7 @@ extension BrowserViewController {
         }
     }
     
-    func showShareScreen(with theme: Theme) {
+    func showShareScreen() {
         dismiss(animated: true) {
             let globalShieldsActivityController =
                 ShieldsActivityItemSourceProvider.shared.setupGlobalShieldsActivityController()

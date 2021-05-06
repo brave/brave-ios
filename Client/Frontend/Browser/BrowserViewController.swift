@@ -339,7 +339,6 @@ class BrowserViewController: UIViewController {
         // Observe some user preferences
         Preferences.Privacy.privateBrowsingOnly.observe(from: self)
         Preferences.General.tabBarVisibility.observe(from: self)
-        Preferences.General.themeNormalMode.observe(from: self)
         Preferences.General.alwaysRequestDesktopSite.observe(from: self)
         Preferences.Shields.allShields.forEach { $0.observe(from: self) }
         Preferences.Privacy.blockAllCookies.observe(from: self)
@@ -2155,10 +2154,11 @@ extension BrowserViewController: TabManagerDelegate {
                 }
             }
 
-            let newTheme = Theme.of(tab)
-            if previous == nil || newTheme != Theme.of(previous) {
-//                applyTheme(newTheme)
-            }
+            // FIXME: Theme - Private Mode
+//            let newTheme = Theme.of(tab)
+//            if previous == nil || newTheme != Theme.of(previous) {
+//
+//            }
 
             readerModeCache = ReaderMode.cache(for: tab)
             ReaderModeHandlers.readerModeCache = readerModeCache
@@ -2787,10 +2787,6 @@ extension BrowserViewController: PreferencesObserver {
         switch key {
         case Preferences.General.tabBarVisibility.key:
             updateTabsBarVisibility()
-        case Preferences.General.themeNormalMode.key:
-//            applyTheme(Theme.of(tabManager.selectedTab))
-            // FIXME: Theme - Use trait collection override
-            break
         case Preferences.Privacy.privateBrowsingOnly.key:
             let isPrivate = Preferences.Privacy.privateBrowsingOnly.value
             switchToPrivacyMode(isPrivate: isPrivate)

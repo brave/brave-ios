@@ -149,13 +149,6 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         Preferences.Chromium.lastBookmarksFolderNodeId.value = folder?.objectID ?? -1
     }
     
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        if traitCollection.userInterfaceStyle != previousTraitCollection?.userInterfaceStyle {
-            updateThemeForUserInterfaceStyleChange()
-        }
-    }
-    
     override func reloadData() {
         do {
             // Recreate the frc if it was previously removed

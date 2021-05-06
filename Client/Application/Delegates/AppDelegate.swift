@@ -17,6 +17,7 @@ import Data
 import StoreKit
 import BraveRewards
 import AdblockRust
+import Combine
 
 private let log = Logger.browserLogger
 
@@ -229,6 +230,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         
         application.shortcutItems = Preferences.Privacy.privateBrowsingOnly.value ? [privateTabItem] : [newTabItem, privateTabItem]
     }
+    
+    private var cancellables: Set<AnyCancellable> = []
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // IAPs can trigger on the app as soon as it launches,
@@ -261,18 +264,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
             start?.pointee = UInt32(startIndex)
             end?.pointee = UInt32(endIndex)
         }
-
-        // BVC generally handles theme applying, but in some instances views are established
-        // before then (e.g. passcode, so can be privacy concern, meaning this should be called ASAP)
-        // In order to properly apply background and align this with the rest of the UI (keyboard / header)
-        // this needs to be called. UI could be handled internally to view systems,
-        // but then keyboard may misalign with Brave selected theme override
         
         UIScrollView.doBadSwizzleStuff()
         applyAppearanceDefaults()
         
-        window!.tintColor = .braveOrange
-        window!.makeKeyAndVisible()
+        Preferences.General.themeNormalMode.$value
+            .sink { [weak window] value in
+                guard let window = window,
+                      let override = DefaultTheme(rawValue: value)?.userInterfaceStyleOverride,
+                      override != window.overrideUserInterfaceStyle else {
+                    return
+                }
+                UIView.transition(with: window, duration: 0.15, options: [.transitionCrossDissolve], animations: {
+                    window.overrideUserInterfaceStyle = override
+                }, completion: nil)
+            }
+            .store(in: &cancellables)
+        
+        if let themeOverride = DefaultTheme(rawValue: Preferences.General.themeNormalMode.value)?.userInterfaceStyleOverride {
+            window?.overrideUserInterfaceStyle = themeOverride
+        }
+        window?.tintColor = .braveOrange
+        window?.makeKeyAndVisible()
         
         authenticator = AppAuthenticator(protectedWindow: window!, promptImmediately: true, isPasscodeEntryCancellable: false)
 
