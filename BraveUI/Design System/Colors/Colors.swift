@@ -107,6 +107,9 @@ extension UIColor {
   public static var braveSuccessBackground: UIColor {
     DesignSystemColor.successBackground.color
   }
+  public static var braveDisabled: UIColor {
+    DesignSystemColor.disabled.color
+  }
 }
 
 // MARK: - Static Colors

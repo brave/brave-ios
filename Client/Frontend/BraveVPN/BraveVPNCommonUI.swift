@@ -13,6 +13,15 @@ struct BraveVPNCommonUI {
         static let purpleBackgroundColor = #colorLiteral(red: 0.1529411765, green: 0.08235294118, blue: 0.368627451, alpha: 1)
     }
     
+    static var navigationBarAppearance: UINavigationBarAppearance {
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithDefaultBackground()
+        appearance.backgroundColor = BraveVPNCommonUI.UX.purpleBackgroundColor
+        appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
+        appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
+        return appearance
+    }
+    
     struct Views {
         static func poweredByView(textColor: UIColor, fontSize: CGFloat = 13,
                                   imageColor: UIColor) -> UIStackView {
