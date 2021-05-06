@@ -26,7 +26,7 @@ private class DuckDuckGoCalloutButton: SpringButton, Themeable {
         $0.text = Strings.DDGPromotion
         $0.numberOfLines = 0
         $0.preferredMaxLayoutWidth = 180
-        $0.appearanceTextColor = .white
+        $0.textColor = .white
         $0.font = UIFont.systemFont(ofSize: 13.0, weight: .bold)
     }
     

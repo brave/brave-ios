@@ -581,8 +581,8 @@ extension UIImageView {
             } else {
                 // Monogram favicon attributes
                 let label = self.monogramLabel ?? UILabel().then {
-                    $0.appearanceTextColor = .white
-                    $0.appearanceBackgroundColor = .clear
+                    $0.textColor = .white
+                    $0.backgroundColor = .clear
                     $0.minimumScaleFactor = 0.5
                 }
                 label.text = FaviconFetcher.monogramLetter(

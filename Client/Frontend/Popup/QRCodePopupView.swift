@@ -15,7 +15,7 @@ class QRCodePopupView: PopupView {
     
     private let title = UILabel().then {
         $0.text = Strings.themeQRCodeShareTitle
-        $0.appearanceTextColor = .black
+        $0.textColor = .black
         $0.setContentHuggingPriority(.defaultHigh, for: .vertical)
         $0.font = UIFont.systemFont(ofSize: 16, weight: .medium)
     }
@@ -49,7 +49,7 @@ class QRCodePopupView: PopupView {
     
     private let closeButton = UIButton().then {
         $0.setImage(#imageLiteral(resourceName: "close_popup").template, for: .normal)
-        $0.appearanceTintColor = .lightGray
+        $0.tintColor = .lightGray
     }
     
     init(url: URL) {

@@ -178,11 +178,11 @@ extension FindInPageBar: Themeable {
     func applyTheme(_ theme: Theme) {
         styleChildren(theme: theme)
         
-        appearanceBackgroundColor = theme.colors.home
-        searchText.appearanceTextColor = theme.colors.tints.home
+        backgroundColor = theme.colors.home
+        searchText.textColor = theme.colors.tints.home
         
         [nextButton, previousButton, closeButton].forEach {
-            $0.appearanceTintColor = theme.colors.tints.home
+            $0.tintColor = theme.colors.tints.home
         }
     }
 }

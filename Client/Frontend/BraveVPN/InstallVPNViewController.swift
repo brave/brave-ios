@@ -41,7 +41,7 @@ class InstallVPNViewController: UIViewController {
     private func styleNavigationBar() {
         navigationController?.navigationBar.do {
             $0.tintColor = .white
-            $0.appearanceBarTintColor = #colorLiteral(red: 0.1529411765, green: 0.08235294118, blue: 0.3647058824, alpha: 1)
+            $0.barTintColor = #colorLiteral(red: 0.1529411765, green: 0.08235294118, blue: 0.3647058824, alpha: 1)
             $0.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
         }
     }

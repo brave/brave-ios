@@ -595,7 +595,7 @@ fileprivate class SearchEngineTableViewHeader: UITableViewHeaderFooterView, Tabl
     
     var titleLabel = UILabel().then {
         $0.font = UIFont.preferredFont(forTextStyle: .body)
-        $0.appearanceTextColor = UIColor.Photon.grey50
+        $0.textColor = UIColor.Photon.grey50
     }
 
     lazy var addEngineButton = OpenSearchEngineButton(
@@ -700,7 +700,7 @@ fileprivate class URLInputTableViewCell: UITableViewCell, TableViewReusable, The
     }
     
     func applyTheme(_ theme: Theme) {
-        textview.appearanceTextColor = theme.isDark ? .white : .black
+        textview.textColor = theme.isDark ? .white : .black
     }
 }
 

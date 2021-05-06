@@ -185,7 +185,7 @@ class TabCell: UICollectionViewCell, Themeable {
     func applyTheme(_ theme: Theme) {
         styleChildren(theme: theme)
 
-        titleLabel.appearanceTextColor = .black
+        titleLabel.textColor = .black
         screenshotView.backgroundColor = theme.colors.home
         favicon.tintColor = theme.colors.tints.home
 

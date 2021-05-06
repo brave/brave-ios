@@ -29,7 +29,7 @@ class ReportBrokenSiteView: UIStackView, Themeable {
     }
     
     let urlLabel = UILabel().then {
-        $0.appearanceTextColor = UIColor.braveOrange
+        $0.textColor = UIColor.braveOrange
         $0.font = .systemFont(ofSize: 16.0)
         $0.numberOfLines = 0
     }

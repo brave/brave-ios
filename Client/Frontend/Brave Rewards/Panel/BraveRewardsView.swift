@@ -84,8 +84,8 @@ extension BraveRewardsViewController {
         
         func applyTheme(_ theme: Theme) {
             let isDark = theme.isDark
-            titleLabel.appearanceTextColor = isDark ? .white : .black
-            subtitleLabel.appearanceTextColor = isDark ? .lightGray : .gray
+            titleLabel.textColor = isDark ? .white : .black
+            subtitleLabel.textColor = isDark ? .lightGray : .gray
             publisherView.applyTheme(theme)
             statusView.applyTheme(theme)
             legacyWalletTransferButton.applyTheme(theme)

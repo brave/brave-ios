@@ -18,7 +18,7 @@ class SyncPairWordsViewController: SyncViewController {
     lazy var wordCountLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 13, weight: UIFont.Weight.regular)
-        label.appearanceTextColor = BraveUX.greyE
+        label.textColor = BraveUX.greyE
         label.text = String(format: Strings.wordCount, 0)
         return label
     }()

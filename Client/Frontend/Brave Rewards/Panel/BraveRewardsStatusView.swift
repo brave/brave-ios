@@ -141,7 +141,7 @@ private class StatusLabelView: UIStackView, Themeable {
     func applyTheme(_ theme: Theme) {
         let isDark = theme.isDark
         imageView.tintColor = isDark ? .white : Colors.neutral700
-        label.appearanceTextColor = isDark ? .white : .black
+        label.textColor = isDark ? .white : .black
     }
     
     @available(*, unavailable)

@@ -39,7 +39,7 @@ class BraveRewardsSupportedCountView: UIStackView, Themeable {
     
     func applyTheme(_ theme: Theme) {
         let isDark = theme.isDark
-        countLabel.appearanceTextColor = isDark ? UIColor.white : UIColor.black
-        bodyLabel.appearanceTextColor = isDark ? UIColor.white : UIColor.black
+        countLabel.textColor = isDark ? UIColor.white : UIColor.black
+        bodyLabel.textColor = isDark ? UIColor.white : UIColor.black
     }
 }

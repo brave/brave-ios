@@ -19,7 +19,7 @@ class LegacyWalletTransferStatusButton: UIControl, Themeable {
     let titleLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 18, weight: .medium)
         $0.numberOfLines = 0
-        $0.appearanceTextColor = .white
+        $0.textColor = .white
         $0.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
     }
     

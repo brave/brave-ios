@@ -23,7 +23,7 @@ struct BraveVPNCommonUI {
                 let label = UILabel().then {
                     $0.text = Strings.VPN.poweredBy
                     $0.textAlignment = .center
-                    $0.appearanceTextColor = textColor
+                    $0.textColor = textColor
                     $0.setContentHuggingPriority(.defaultHigh, for: .horizontal)
                     $0.textAlignment = .right
                     $0.font = UIFont.systemFont(ofSize: fontSize, weight: .regular)
@@ -64,7 +64,7 @@ struct BraveVPNCommonUI {
                 let label = ShrinkableLabel().then {
                     $0.text = string
                     $0.font = font
-                    $0.appearanceTextColor = textColor
+                    $0.textColor = textColor
                     $0.numberOfLines = 0
                     $0.lineBreakMode = .byWordWrapping
                 }

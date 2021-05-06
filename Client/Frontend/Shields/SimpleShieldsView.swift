@@ -159,15 +159,15 @@ class SimpleShieldsView: UIView, Themeable {
         }
         
         func applyTheme(_ theme: Theme) {
-            countLabel.appearanceTextColor = theme.isDark ? .white : .black
-            descriptionLabel.appearanceTextColor = theme.isDark ? .white : .black
+            countLabel.textColor = theme.isDark ? .white : .black
+            descriptionLabel.textColor = theme.isDark ? .white : .black
             
             let contentBackgroundColor = theme.isDark ? #colorLiteral(red: 0.1882352941, green: 0.2039215686, blue: 0.262745098, alpha: 1) : Colors.neutral000
             descriptionStackView.addBackground(color: contentBackgroundColor, cornerRadius: 6.0)
             infoStackView.addBackground(color: contentBackgroundColor, cornerRadius: 6.0)
             shareStackView.addBackground(color: contentBackgroundColor, cornerRadius: 6.0)
-            shareButton.appearanceTintColor = theme.isDark ? . white : .black
-            infoButton.appearanceTintColor = theme.isDark ? .white : .black
+            shareButton.tintColor = theme.isDark ? . white : .black
+            infoButton.tintColor = theme.isDark ? .white : .black
         }
     }
     
@@ -176,7 +176,7 @@ class SimpleShieldsView: UIView, Themeable {
     let footerLabel = UILabel().then {
         $0.text = Strings.Shields.siteBroken
         $0.font = .systemFont(ofSize: 13.0)
-        $0.appearanceTextColor = UIColor(rgb: 0x868e96)
+        $0.textColor = UIColor(rgb: 0x868e96)
         $0.numberOfLines = 0
     }
     

@@ -292,8 +292,8 @@ private class ShareTrackersView: UIView, Themeable {
     // MARK: Themeable
     
     func applyTheme(_ theme: Theme) {
-        titleLabel.appearanceTextColor = .white
-        subtitleLabel.appearanceTextColor = .white
-        actionButton.appearanceTextColor = .white
+        titleLabel.textColor = .white
+        subtitleLabel.textColor = .white
+        actionButton.titleLabel?.textColor = .white
     }
 }

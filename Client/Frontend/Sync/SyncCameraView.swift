@@ -13,7 +13,6 @@ class SyncCameraView: UIView, AVCaptureMetadataOutputObjectsDelegate {
         let button = self.createCameraButton()
         button.setTitle(Strings.grantCameraAccess, for: .normal)
         button.tintColor = .white
-        button.appearanceTextColor = .white
         button.addTarget(self, action: #selector(SEL_cameraAccess), for: .touchUpInside)
         return button
     }()

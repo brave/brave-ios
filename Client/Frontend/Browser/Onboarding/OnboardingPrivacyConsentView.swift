@@ -80,8 +80,8 @@ extension OnboardingPrivacyConsentViewController {
         
         func applyTheme(_ theme: Theme) {
             backgroundColor = OnboardingViewController.colorForTheme(theme)
-            titleLabel.appearanceTextColor = theme.colors.tints.home
-            refProgramLabel.appearanceTextColor = theme.colors.tints.home
+            titleLabel.textColor = theme.colors.tints.home
+            refProgramLabel.textColor = theme.colors.tints.home
         }
     }
 }

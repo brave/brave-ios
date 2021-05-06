@@ -182,8 +182,8 @@ private class ListController: UIViewController {
     
     private let tableView = UITableView(frame: .zero, style: .grouped).then {
         $0.backgroundView = UIView()
-        $0.appearanceBackgroundColor = BraveUX.popoverDarkBackground
-        $0.appearanceSeparatorColor = .clear
+        $0.backgroundColor = BraveUX.popoverDarkBackground
+        $0.separatorColor = .clear
         $0.allowsSelectionDuringEditing = true
     }
     

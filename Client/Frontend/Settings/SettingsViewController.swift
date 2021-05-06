@@ -547,15 +547,8 @@ extension TableViewController: Themeable {
         // We need this specifically due to changes that happen to the theme from other controllers
         // pushed from settings (e.g. Buy VPN screen, Appearance selection screen)
         navigationController?.navigationBar.tintColor = UINavigationBar.appearance().tintColor
-        navigationController?.navigationBar.barTintColor = UINavigationBar.appearance().appearanceBarTintColor
-        navigationController?.navigationBar.titleTextAttributes = UINavigationBar.appearance().titleTextAttributes
-    }
-    
-    open override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        if traitCollection.userInterfaceStyle != previousTraitCollection?.userInterfaceStyle {
-            updateThemeForUserInterfaceStyleChange()
-            applyTheme(Theme.of(nil))
-        }
+        navigationController?.navigationBar.barTintColor = UINavigationBar.appearance().barTintColor
+        navigationController?.navigationBar.titleTextAttributes =
+            [NSAttributedString.Key.foregroundColor: theme.colors.tints.home]
     }
 }

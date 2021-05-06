@@ -60,7 +60,7 @@ extension AdvancedShieldsView {
         let titleLabel = UILabel().then {
             $0.font = .systemFont(ofSize: 13.0)
             $0.numberOfLines = 0
-            $0.appearanceTextColor = Colors.grey700
+            $0.textColor = Colors.grey700
         }
         
         override init(frame: CGRect) {
@@ -90,7 +90,7 @@ extension AdvancedShieldsView {
         }()
         
         let toggleSwitch = UISwitch().then {
-            $0.appearanceOnTintColor = UIColor.braveOrange
+            $0.onTintColor = UIColor.braveOrange
         }
         var valueToggled: ((Bool) -> Void)?
         

@@ -108,7 +108,7 @@ class SyncWelcomeViewController: SyncViewController {
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitle(Strings.newSyncCode, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 17, weight: UIFont.Weight.bold)
-        button.appearanceTextColor = .white
+        button.titleLabel?.textColor = .white
         button.backgroundColor = UIColor.braveOrange
         button.addTarget(self, action: #selector(newToSyncAction), for: .touchUpInside)
 

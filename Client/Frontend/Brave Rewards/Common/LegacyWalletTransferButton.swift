@@ -24,14 +24,14 @@ class LegacyWalletTransferButton: UIControl, Themeable {
         $0.text = Strings.Rewards.legacyWalletTransfer
         $0.font = .systemFont(ofSize: 18, weight: .medium)
         $0.numberOfLines = 0
-        $0.appearanceTextColor = .white
+        $0.textColor = .white
     }
     
     private let subtitleLabel = UILabel().then {
         $0.text = Strings.Rewards.legacyWalletTransferSubtitle
         $0.font = .systemFont(ofSize: 13)
         $0.numberOfLines = 0
-        $0.appearanceTextColor = .white
+        $0.textColor = .white
     }
     
     override init(frame: CGRect) {

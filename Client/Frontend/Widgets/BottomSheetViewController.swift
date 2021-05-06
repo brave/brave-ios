@@ -41,7 +41,7 @@ class BottomSheetViewController: UIViewController {
     
     private let closeButton = UIButton().then {
         $0.setImage(#imageLiteral(resourceName: "close_popup").template, for: .normal)
-        $0.appearanceTintColor = .lightGray
+        $0.tintColor = .lightGray
     }
     
     // MARK: - Constraint properties

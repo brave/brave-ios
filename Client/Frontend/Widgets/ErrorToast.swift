@@ -14,8 +14,8 @@ private struct ErrorToastDefaultUX {
 class ErrorToast: UIView {
     lazy var textLabel: UILabel = {
         let label = UILabel()
-        label.appearanceTextColor = ErrorToastDefaultUX.textColor
-        label.appearanceBackgroundColor = .clear
+        label.textColor = ErrorToastDefaultUX.textColor
+        label.backgroundColor = .clear
         label.textAlignment = .center
         label.numberOfLines = 0
         return label

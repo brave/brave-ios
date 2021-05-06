@@ -40,13 +40,13 @@ class BraveRewardsPublisherView: UIStackView, Themeable {
     
     let learnMoreButton = Button(type: .system).then {
         $0.setTitle(Strings.learnMore, for: .normal)
-        $0.appearanceTintColor = Colors.blurple400
+        $0.tintColor = Colors.blurple400
         $0.isHidden = true
     }
     
     func applyTheme(_ theme: Theme) {
-        hostLabel.appearanceTextColor = theme.isDark ? .white : .black
-        bodyLabel.appearanceTextColor = theme.isDark ? .white : .black
+        hostLabel.textColor = theme.isDark ? .white : .black
+        bodyLabel.textColor = theme.isDark ? .white : .black
     }
     
     override init(frame: CGRect) {

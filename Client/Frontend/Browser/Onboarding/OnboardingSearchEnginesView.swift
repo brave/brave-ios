@@ -140,8 +140,8 @@ extension OnboardingSearchEnginesViewController {
         func applyTheme(_ theme: Theme) {
             containerView.backgroundColor = OnboardingViewController.colorForTheme(theme)
             searchEnginesTable.backgroundView?.backgroundColor = OnboardingViewController.colorForTheme(theme)
-            titlePrimary.appearanceTextColor = theme.colors.tints.home
-            titleSecondary.appearanceTextColor = theme.colors.tints.home
+            titlePrimary.textColor = theme.colors.tints.home
+            titleSecondary.textColor = theme.colors.tints.home
             searchEnginesTable.reloadData()
         }
         

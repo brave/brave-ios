@@ -161,7 +161,7 @@ class BraveShieldStatsView: UIView, Themeable {
 private class StatView: UIView {
     var color: UIColor = BraveUX.greyJ {
         didSet {
-            statLabel.appearanceTextColor = color
+            statLabel.textColor = color
         }
     }
     
@@ -188,7 +188,7 @@ private class StatView: UIView {
     
     fileprivate var titleLabel: UILabel = {
         let label = UILabel()
-        label.appearanceTextColor = .white
+        label.textColor = .white
         label.textAlignment = .center
         label.numberOfLines = 0
         label.font = UIFont.systemFont(ofSize: 10, weight: UIFont.Weight.medium)

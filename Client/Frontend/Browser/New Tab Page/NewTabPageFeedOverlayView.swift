@@ -91,7 +91,7 @@ class NewContentAvailableButton: SpringButton {
         $0.textAlignment = .center
         $0.text = Strings.BraveToday.contentAvailableButtonTitle
         $0.numberOfLines = 0
-        $0.appearanceTextColor = .white
+        $0.textColor = .white
         $0.font = .systemFont(ofSize: 14.0, weight: .semibold)
     }
     

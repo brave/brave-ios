@@ -76,7 +76,7 @@ private class ContentView: UIView {
         stackView.alignment = .center
         let titleLabel = BraveVPNCommonUI.Views.ShrinkableLabel().then {
             $0.text = Strings.VPN.vpnName
-            $0.appearanceTextColor = .black
+            $0.textColor = .black
             $0.textAlignment = .center
             $0.font = .systemFont(ofSize: 33, weight: .heavy)
         }
@@ -97,7 +97,7 @@ private class ContentView: UIView {
         $0.setTitle(Strings.learnMore, for: .normal)
         $0.backgroundColor = UIColor.braveOrange
         $0.titleLabel?.font = .systemFont(ofSize: 16, weight: .semibold)
-        $0.appearanceTextColor = .white
+        $0.titleLabel?.textColor = .white
         $0.snp.makeConstraints { make in
             make.height.equalTo(44)
         }
@@ -125,7 +125,7 @@ private class ContentView: UIView {
     
     let closeButton = UIButton().then {
         $0.setImage(#imageLiteral(resourceName: "close_popup").template, for: .normal)
-        $0.appearanceTintColor = .lightGray
+        $0.tintColor = .lightGray
     }
     
     override init(frame: CGRect) {

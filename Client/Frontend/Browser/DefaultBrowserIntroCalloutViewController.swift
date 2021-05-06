@@ -16,7 +16,7 @@ class DefaultBrowserIntroCalloutViewController: UIViewController, Themeable {
         $0.setTitle(Strings.DefaultBrowserCallout.introOpenSettingsButtonText, for: .normal)
         $0.backgroundColor = UIColor.braveOrange
         $0.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
-        $0.appearanceTextColor = .white
+        $0.titleLabel?.textColor = .white
         $0.snp.makeConstraints { make in
             make.height.equalTo(44)
         }
@@ -28,7 +28,7 @@ class DefaultBrowserIntroCalloutViewController: UIViewController, Themeable {
     private let cancelButton = UIButton(type: .system).then {
         $0.setTitle(Strings.DefaultBrowserCallout.introSkipButtonText, for: .normal)
         $0.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
-        $0.appearanceTextColor = Colors.grey600
+        $0.titleLabel?.textColor = Colors.grey600
     }
     
     private let image = UIImageView()
@@ -93,7 +93,7 @@ class DefaultBrowserIntroCalloutViewController: UIViewController, Themeable {
                     $0.numberOfLines = 0
                     $0.textAlignment = .center
                     $0.font = .systemFont(ofSize: 17)
-                    $0.appearanceTextColor = #colorLiteral(red: 0.5254901961, green: 0.5568627451, blue: 0.5882352941, alpha: 1)
+                    $0.textColor = #colorLiteral(red: 0.5254901961, green: 0.5568627451, blue: 0.5882352941, alpha: 1)
                 })
             )
         }
@@ -138,7 +138,7 @@ class DefaultBrowserIntroCalloutViewController: UIViewController, Themeable {
     
     // MARK: - Themeable
     func applyTheme(_ theme: Theme) {
-        view.appearanceBackgroundColor = theme.isDark ? BraveUX.popoverDarkBackground : .white
+        view.backgroundColor = theme.isDark ? BraveUX.popoverDarkBackground : .white
         image.image = theme.isDark ? #imageLiteral(resourceName: "default_browser_intro_dark") : #imageLiteral(resourceName: "default_browser_intro")
     }
 }

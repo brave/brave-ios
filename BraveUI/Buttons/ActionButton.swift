@@ -28,7 +28,7 @@ open class ActionButton: Button {
   
   override open var tintColor: UIColor! {
     didSet {
-      appearanceTextColor = tintColor
+      setTitleColor(tintColor, for: .normal)
       layer.borderColor = tintColor.withAlphaComponent(0.5).cgColor
     }
   }

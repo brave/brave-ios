@@ -184,7 +184,7 @@ extension OnboardingRewardsAgreementViewController {
         
         func applyTheme(_ theme: Theme) {
             descriptionView.backgroundColor = OnboardingViewController.colorForTheme(theme)
-            titleLabel.appearanceTextColor = theme.colors.tints.home
+            titleLabel.textColor = theme.colors.tints.home
             updateDescriptionLabel(for: theme)
             
             if let text = (subtitleLabel.attributedText?.mutableCopy() as? NSMutableAttributedString) {

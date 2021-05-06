@@ -26,14 +26,12 @@ class OpenSearchEngineButton: Button {
             case .disabled:
                 isLoading = false
                 setImage(#imageLiteral(resourceName: "AddSearch").template, for: .normal)
-                appearanceTintColor = UIColor.Photon.grey50
-                appearanceTextColor = UIColor.Photon.grey50
+                tintColor = UIColor.Photon.grey50
                 isUserInteractionEnabled = false
             case .enabled:
                 isLoading = false
                 setImage(#imageLiteral(resourceName: "AddSearch").template, for: .normal)
-                appearanceTintColor = UIColor.braveOrange
-                appearanceTextColor = UIColor.braveOrange
+                tintColor = UIColor.braveOrange
                 isUserInteractionEnabled = true
             case .loading:
                 isLoading = true

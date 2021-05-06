@@ -20,7 +20,7 @@ extension WalletTransferCompleteViewController {
             $0.text = Strings.Rewards.walletTransferCompleteTitle
             $0.numberOfLines = 0
             $0.font = .systemFont(ofSize: 17, weight: .semibold)
-            $0.appearanceTextColor = UIColor(rgb: 0x339AF0)
+            $0.textColor = UIColor(rgb: 0x339AF0)
         }
         let bodyLabel = UILabel().then {
             $0.text = Strings.Rewards.walletTransferCompleteBody

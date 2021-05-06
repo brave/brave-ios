@@ -400,8 +400,8 @@ extension DownloadsPanel: Themeable {
         emptyStateOverlayView = createEmptyStateOverlayView()
         updateEmptyPanelState()
         
-        welcomeLabel.appearanceTextColor = theme.colors.tints.home
-        overlayView.appearanceBackgroundColor = theme.colors.home
+        welcomeLabel.textColor = theme.colors.tints.home
+        overlayView.backgroundColor = theme.colors.home
         logoImageView.tintColor = theme.colors.tints.home
         
         tableView.reloadData()

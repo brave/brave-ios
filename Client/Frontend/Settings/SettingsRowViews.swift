@@ -98,7 +98,7 @@ class ColoredDetailCell: UITableViewCell, Cell {
         imageView?.image = row.image
         
         guard let detailColor = row.context?[ColoredDetailCell.colorKey] as? UIColor else { return }
-        detailTextLabel?.appearanceTextColor = detailColor
+        detailTextLabel?.textColor = detailColor
     }
 }
 

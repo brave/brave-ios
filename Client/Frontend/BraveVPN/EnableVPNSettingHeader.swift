@@ -21,7 +21,7 @@ class EnableVPNSettingHeader: UIView {
     private let titleLabel = UILabel().then {
         // This string should not be translated
         $0.text = "Brave VPN"
-        $0.appearanceTextColor = .white
+        $0.textColor = .white
         $0.font = UIFont.systemFont(ofSize: 19, weight: .semibold)
     }
     
@@ -29,7 +29,7 @@ class EnableVPNSettingHeader: UIView {
         $0.text = Strings.VPN.settingHeaderBody
         $0.numberOfLines = 0
         $0.textAlignment = .center
-        $0.appearanceTextColor = .white
+        $0.textColor = .white
         $0.font = UIFont.systemFont(ofSize: 15, weight: .regular)
         $0.setContentHuggingPriority(.defaultHigh, for: .vertical)
     }
@@ -50,7 +50,7 @@ class EnableVPNSettingHeader: UIView {
         $0.setTitle(title, for: .normal)
         $0.backgroundColor = UIColor.braveOrange
         $0.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
-        $0.appearanceTextColor = .white
+        $0.titleLabel?.textColor = .white
         $0.snp.makeConstraints { make in
             make.height.equalTo(44)
             make.width.greaterThanOrEqualTo(120)
@@ -73,7 +73,7 @@ class EnableVPNSettingHeader: UIView {
     
     private let closeButton = UIButton().then {
         $0.setImage(#imageLiteral(resourceName: "card_close"), for: .normal)
-        $0.appearanceTintColor = .white
+        $0.tintColor = .white
     }
     
     override init(frame: CGRect) {

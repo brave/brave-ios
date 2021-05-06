@@ -10,17 +10,17 @@ import Shared
 /// The main ads view. Mimics a system notification in that it shows an icon, "app name" (always will be "Brave Rewards"), title and body.
 class AdContentButton: UIControl {
   let titleLabel = UILabel().then {
-    $0.appearanceTextColor = .black
+    $0.textColor = .black
     $0.font = .systemFont(ofSize: 15.0, weight: .semibold)
     $0.numberOfLines = 2
   }
   let bodyLabel = UILabel().then {
-    $0.appearanceTextColor = .black
+    $0.textColor = .black
     $0.font = .systemFont(ofSize: 15.0)
     $0.numberOfLines = 3
   }
   private let appNameLabel = UILabel().then {
-    $0.appearanceTextColor = UIColor.black.withAlphaComponent(0.5)
+    $0.textColor = UIColor.black.withAlphaComponent(0.5)
     $0.font = .systemFont(ofSize: 14.0, weight: .regular)
     $0.text = Strings.Ads.adNotificationTitle.uppercased()
   }
@@ -105,9 +105,9 @@ class AdContentButton: UIControl {
   
   func applyTheme(for traitCollection: UITraitCollection) {
     let isDarkMode = traitCollection.userInterfaceStyle == .dark
-    appNameLabel.appearanceTextColor = (isDarkMode ? UIColor.white : UIColor.black).withAlphaComponent(0.5)
-    titleLabel.appearanceTextColor = isDarkMode ? .white : .black
-    bodyLabel.appearanceTextColor = isDarkMode ? .white : .black
+    appNameLabel.textColor = (isDarkMode ? UIColor.white : UIColor.black).withAlphaComponent(0.5)
+    titleLabel.textColor = isDarkMode ? .white : .black
+    bodyLabel.textColor = isDarkMode ? .white : .black
     backgroundView.contentView.backgroundColor = isDarkMode ? UIColor.black.withAlphaComponent(0.3) : UIColor.white.withAlphaComponent(0.7)
   }
   

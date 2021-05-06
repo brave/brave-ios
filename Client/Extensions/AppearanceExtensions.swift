@@ -12,18 +12,17 @@ extension Theme {
         // `appearance` modifications only impact UI items not current visible
 
         // important! for privacy concerns, otherwise UI can bleed through
-        UIView.appearance(whenContainedInInstancesOf: [BasePasscodeViewController.self]).appearanceBackgroundColor = colors.home
+        UIView.appearance(whenContainedInInstancesOf: [BasePasscodeViewController.self]).backgroundColor = UIColor.braveBackground
         
-        UIToolbar.appearance().tintColor = colors.accent
-        UIToolbar.appearance().backgroundColor = colors.footer
-        UIToolbar.appearance().barTintColor = colors.footer
+        UIToolbar.appearance().tintColor = UIColor.braveOrange
+        UIToolbar.appearance().backgroundColor = UIColor.braveBackground
+        UIToolbar.appearance().barTintColor = UIColor.braveBackground
         
-        UINavigationBar.appearance().tintColor = colors.accent
-        UINavigationBar.appearance().titleTextAttributes = [.foregroundColor: colors.tints.home]
-        UINavigationBar.appearance().largeTitleTextAttributes = [.foregroundColor: colors.tints.home]
-        UINavigationBar.appearance().appearanceBarTintColor = colors.header
+        UINavigationBar.appearance().tintColor = UIColor.braveOrange
+        UINavigationBar.appearance().largeTitleTextAttributes = [.foregroundColor: UIColor.braveLabel]
+        UINavigationBar.appearance().barTintColor = UIColor.braveBackground
         
-        UISwitch.appearance().appearanceOnTintColor = colors.accent
+        UISwitch.appearance().onTintColor = UIColor.braveOrange
         
         // This is a subtle "abuse" of theme colors
         // In order to properly style things, `addressBar` has been utilized to offer contrast to `home`/`header`, as many of the themes utilize similar colors.
@@ -38,45 +37,40 @@ extension Theme {
         // Will become the color for whatever in the table is .clear
         // In some cases this is the header, footer, cell, or a combination of them.
         // Be careful adjusting colors here, and make sure impact is well known
-        UITableView.appearance().appearanceBackgroundColor = tablePrimaryColor
-        UITableView.appearance().appearanceSeparatorColor = colors.border.withAlphaComponent(colors.transparencies.borderAlpha)
+        UITableView.appearance().backgroundColor = tablePrimaryColor
+        UITableView.appearance().separatorColor = .braveSeparator
         
         UITableViewCell.appearance().tintColor = colors.accent
         UITableViewCell.appearance().backgroundColor = tableSecondaryColor
         
-        UIImageView.appearance(whenContainedInInstancesOf: [SettingsViewController.self]).tintColor = colors.tints.home
-        UIImageView.appearance(whenContainedInInstancesOf: [BraveRewardsSettingsViewController.self]).tintColor = colors.tints.home
+        UIImageView.appearance(whenContainedInInstancesOf: [SettingsViewController.self]).tintColor = UIColor.braveLabel
+        UIImageView.appearance(whenContainedInInstancesOf: [BraveRewardsSettingsViewController.self]).tintColor = UIColor.braveLabel
 
-        UIView.appearance(whenContainedInInstancesOf: [UITableViewHeaderFooterView.self]).appearanceBackgroundColor = tablePrimaryColor
+        UIView.appearance(whenContainedInInstancesOf: [UITableViewHeaderFooterView.self]).backgroundColor = tablePrimaryColor
         
-        UILabel.appearance(whenContainedInInstancesOf: [UITableView.self]).appearanceTextColor = .braveLabel
-        UILabel.appearance(whenContainedInInstancesOf: [UICollectionReusableView.self]).appearanceTextColor = .braveLabel
+        UILabel.appearance(whenContainedInInstancesOf: [UITableView.self]).textColor = .braveLabel
+        UILabel.appearance(whenContainedInInstancesOf: [UICollectionReusableView.self]).textColor = .braveLabel
         
-        AddEditHeaderView.appearance().appearanceBackgroundColor = tableSecondaryColor
-        UITextField.appearance().appearanceTextColor = colors.tints.home
+        AddEditHeaderView.appearance().backgroundColor = tableSecondaryColor
+        UITextField.appearance().textColor = UIColor.braveLabel
         UITextField.appearance().keyboardAppearance = isDark ? .dark : .light
         
         // Sync items
-        SyncViewController.SyncView.appearance(whenContainedInInstancesOf: [UINavigationController.self]).appearanceBackgroundColor = colors.home
-        SyncDeviceTypeButton.appearance().appearanceBackgroundColor = colors.header
+        SyncViewController.SyncView.appearance(whenContainedInInstancesOf: [UINavigationController.self]).backgroundColor = .braveBackground
+        SyncDeviceTypeButton.appearance().backgroundColor = .braveBackground
         UIButton.appearance(
-            whenContainedInInstancesOf: [SyncViewController.self]).appearanceTextColor = colors.tints.home
+            whenContainedInInstancesOf: [SyncViewController.self]).setTitleColor(.braveLabel, for: .normal)
         
         // Search
-        UIView.appearance(whenContainedInInstancesOf: [SearchViewController.self]).appearanceBackgroundColor = colors.home
-        InsetButton.appearance(whenContainedInInstancesOf: [SearchViewController.self]).appearanceBackgroundColor = .clear
+        UIView.appearance(whenContainedInInstancesOf: [SearchViewController.self]).backgroundColor = .braveBackground
+        InsetButton.appearance(whenContainedInInstancesOf: [SearchViewController.self]).backgroundColor = .clear
         
-        InsetButton.appearance(whenContainedInInstancesOf: [SearchSuggestionPromptView.self]).appearanceTextColor = colors.tints.home
+        InsetButton.appearance(whenContainedInInstancesOf: [SearchSuggestionPromptView.self]).setTitleColor(.braveLabel, for: .normal)
         
-        // Overrides all views inside of itself when we're fixed to a specific theme
-        // Private browsing mode is also fixed to a specific theme
-        if PrivateBrowsingManager.shared.isPrivateBrowsing ||
-            Preferences.General.themeNormalMode.value != DefaultTheme.system.rawValue {
-            UIWindow.appearance().appearanceOverrideUserInterfaceStyle = isDark ? .dark : .light
-            UIView.appearance().appearanceOverrideUserInterfaceStyle = isDark ? .dark : .light
-        } else {
-            UIWindow.appearance().appearanceOverrideUserInterfaceStyle = .unspecified
-            UIView.appearance().appearanceOverrideUserInterfaceStyle = .unspecified
-        }
+        // Overrides all views inside of itself
+        // According to docs, UIWindow override should be enough, but some labels on iOS 13 are still messed up without UIView override as well
+        // (e.g. shields panel)
+        UIWindow.appearance().overrideUserInterfaceStyle = isDark ? .dark : .light
+        UIView.appearance().overrideUserInterfaceStyle = isDark ? .dark : .light
     }
 }
