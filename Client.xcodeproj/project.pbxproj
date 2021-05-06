@@ -352,6 +352,7 @@
 		279C75C821A5B37D001CD1CB /* FingerprintingProtection.js in Resources */ = {isa = PBXBuildFile; fileRef = 279C75C021A5B37D001CD1CB /* FingerprintingProtection.js */; };
 		279CC2B0260CEB5D009B3895 /* ActivityIndicatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279CC2AF260CEB5D009B3895 /* ActivityIndicatorView.swift */; };
 		279CC2C4260CEFE7009B3895 /* TableCellButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279CC2C3260CEFE7009B3895 /* TableCellButtonStyle.swift */; };
+		279CC2D8260CF37C009B3895 /* BrowserViewController+Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279CC2D7260CF37C009B3895 /* BrowserViewController+Menu.swift */; };
 		27A1ABF42485567900344503 /* BraveTodaySectionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27A1ABF32485567900344503 /* BraveTodaySectionProvider.swift */; };
 		27A1ABF62485568700344503 /* FlexibleSpaceSectionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27A1ABF52485568700344503 /* FlexibleSpaceSectionProvider.swift */; };
 		27A1ABFF24855C1700344503 /* FeedGroupViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27A1ABFA24855C1700344503 /* FeedGroupViews.swift */; };
@@ -1861,6 +1862,7 @@
 		279C75C021A5B37D001CD1CB /* FingerprintingProtection.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = FingerprintingProtection.js; sourceTree = "<group>"; };
 		279CC2AF260CEB5D009B3895 /* ActivityIndicatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityIndicatorView.swift; sourceTree = "<group>"; };
 		279CC2C3260CEFE7009B3895 /* TableCellButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableCellButtonStyle.swift; sourceTree = "<group>"; };
+		279CC2D7260CF37C009B3895 /* BrowserViewController+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowserViewController+Menu.swift"; sourceTree = "<group>"; };
 		27A1ABF32485567900344503 /* BraveTodaySectionProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveTodaySectionProvider.swift; sourceTree = "<group>"; };
 		27A1ABF52485568700344503 /* FlexibleSpaceSectionProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlexibleSpaceSectionProvider.swift; sourceTree = "<group>"; };
 		27A1ABFA24855C1700344503 /* FeedGroupViews.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FeedGroupViews.swift; sourceTree = "<group>"; };
@@ -4872,6 +4874,7 @@
 				2FB9C2A02587E742009DA1FE /* BrowserViewController+ProductNotification.swift */,
 				2F45B409263AF1C20033A594 /* BrowserViewController+ToolbarDelegate.swift */,
 				2FD1C61B2639AE9100E3C25F /* BrowserViewController+Onboarding.swift */,
+				279CC2D7260CF37C009B3895 /* BrowserViewController+Menu.swift */,
 				0A91598822B834CE00CCC119 /* BVC+Rewards.swift */,
 				2F55443025913BAA000E4689 /* OpenSearch */,
 			);
@@ -7354,6 +7357,7 @@
 				0A4BEFD8221EE78E0005551A /* CachedNetworkResource.swift in Sources */,
 				0A1E84412190A57F0042F782 /* SyncViewController.swift in Sources */,
 				27A1ABF62485568700344503 /* FlexibleSpaceSectionProvider.swift in Sources */,
+				279CC2D8260CF37C009B3895 /* BrowserViewController+Menu.swift in Sources */,
 				2703BE8B24F4508E00CBE6CD /* CreatePDFActivity.swift in Sources */,
 				0A43293021B1C7F50041625B /* AdBlockStats.swift in Sources */,
 				F930CDAE2270015C00A23FE1 /* U2FExtensions.swift in Sources */,

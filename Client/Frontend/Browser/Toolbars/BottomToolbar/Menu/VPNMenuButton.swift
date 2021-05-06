@@ -55,7 +55,8 @@ struct VPNMenuButton: View {
                 if isVPNStatusChanging {
                     ActivityIndicatorView(isAnimating: true)
                 }
-                Toggle("", isOn: isVPNEnabledBinding)
+                Toggle("Brave VPN", isOn: isVPNEnabledBinding)
+                    .labelsHidden()
             }
             .padding(.horizontal, 14)
             .frame(maxWidth: .infinity, minHeight: 48.0, alignment: .leading)
