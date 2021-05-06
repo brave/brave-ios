@@ -291,7 +291,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         if let themeOverride = DefaultTheme(rawValue: Preferences.General.themeNormalMode.value)?.userInterfaceStyleOverride {
             window?.overrideUserInterfaceStyle = themeOverride
         }
-        window?.tintColor = .braveOrange
+        window?.tintColor = UIColor {
+            if $0.userInterfaceStyle == .dark {
+                return .braveLighterBlurple
+            }
+            return .braveBlurple
+        }
         window?.makeKeyAndVisible()
         
         authenticator = AppAuthenticator(protectedWindow: window!, promptImmediately: true, isPasscodeEntryCancellable: false)

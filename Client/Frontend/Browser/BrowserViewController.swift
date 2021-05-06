@@ -23,6 +23,7 @@ import NetworkExtension
 import YubiKit
 import FeedKit
 import SwiftUI
+import class Combine.AnyCancellable
 
 private let log = Logger.browserLogger
 
@@ -67,7 +68,9 @@ class BrowserViewController: UIViewController {
     var loadQueue = Deferred<Void>()
 
     lazy var mailtoLinkHandler: MailtoLinkHandler = MailtoLinkHandler()
-
+    
+    private var privateModeCancellable: AnyCancellable?
+    
     /// Custom Search Engine
     var openSearchEngine: OpenSearchReference?
     var openSearchTextFieldInputAssistantBarButtonGroup = [UIBarButtonItemGroup]()
@@ -720,6 +723,17 @@ class BrowserViewController: UIViewController {
         if #available(iOS 14, *), !Preferences.DefaultBrowserIntro.defaultBrowserNotificationScheduled.value {
             scheduleDefaultBrowserNotification()
         }
+        
+        privateModeCancellable = PrivateBrowsingManager.shared
+            .$isPrivateBrowsing
+            .removeDuplicates()
+            .sink(receiveValue: { [weak self] isPrivateBrowsing in
+                if isPrivateBrowsing {
+                    self?.statusBarOverlay.backgroundColor = .privateModeBackground
+                } else {
+                    self?.statusBarOverlay.backgroundColor = .secondaryBraveBackground
+                }
+            })
     }
     
     private func migrateToChromiumBookmarks(_ completion: @escaping (_ success: Bool) -> Void) {
