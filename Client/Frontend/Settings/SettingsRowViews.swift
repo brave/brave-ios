@@ -108,6 +108,7 @@ class MultilineSubtitleCell: SubtitleCell {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         textLabel?.numberOfLines = 0
         detailTextLabel?.numberOfLines = 0
+        detailTextLabel?.textColor = .secondaryBraveLabel
     }
     
     required init?(coder aDecoder: NSCoder) {
