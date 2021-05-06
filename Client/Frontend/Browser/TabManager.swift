@@ -810,7 +810,7 @@ class TabManager: NSObject {
             savedTabs = TabMO.getAll()
         }
         
-        if savedTabs.isEmpty { return { nil } }
+        if savedTabs.isEmpty { return nil }
 
         var tabToSelect: Tab?
         for savedTab in savedTabs {
