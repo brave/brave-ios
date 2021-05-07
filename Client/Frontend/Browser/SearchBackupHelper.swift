@@ -27,6 +27,12 @@ class SearchBackupHelper: TabContentScript {
         return SearchBackupHelper.name()
     }
     
+    private enum Method: Int {
+        case backupSearch = 1
+        case isBraveSearchDefault = 2
+        case setBraveSearchDefault = 3
+    }
+    
     func userContentController(_ userContentController: WKUserContentController,
                                didReceiveScriptMessage message: WKScriptMessage) {
         var allowedHosts = ["search.brave.com"]
@@ -47,15 +53,37 @@ class SearchBackupHelper: TabContentScript {
             return
         }
         
+        switch info.id {
+        case Method.backupSearch.rawValue:
+            handleSearchBackup(info)
+        case Method.isBraveSearchDefault.rawValue:
+            handleIsBraveSearchDefault(info)
+        case Method.setBraveSearchDefault.rawValue:
+            handleSetBraveSearchDefault(info)
+        default:
+            break
+        }
+        
+        
+    }
+    
+    private let functionName =
+        "window.__firefox__.D\(UserScriptManager.messageHandlerTokenString).resolve"
+    
+    private func handleSearchBackup(_ info: SearchBackupMessage) {
+        guard let data = info.data else {
+            assertionFailure("Search backup data is empty.")
+            return
+        }
         guard var components = URLComponents(string: "https://www.google.com") else { return }
-        components.queryItems = [.init(name: "q", value: info.data.query),
-                                 .init(name: "hl", value: info.data.language),
-                                 .init(name: "gl", value: info.data.country)]
+        components.queryItems = [.init(name: "q", value: data.query),
+                                 .init(name: "hl", value: data.language),
+                                 .init(name: "gl", value: data.country)]
         
         guard let url = components.url else { return }
         var request = URLRequest(url: url)
         
-        if let geoHeader = info.data.geo {
+        if let geoHeader = data.geo {
             request.addValue(geoHeader, forHTTPHeaderField: "x-geo")
         }
         
@@ -90,8 +118,9 @@ class SearchBackupHelper: TabContentScript {
                 }
             },
             receiveValue: { [weak self] data in
-                self?.tab?.webView?.evaluateSafeJavaScript(
-                    functionName: "window.__firefox__.D\(UserScriptManager.messageHandlerTokenString).resolve",
+                guard let self = self else { return }
+                self.tab?.webView?.evaluateSafeJavaScript(
+                    functionName: self.functionName,
                     args: ["'\(info.id)'", data],
                     sandboxed: false,
                     escapeArgs: false) { _, error  in
@@ -102,9 +131,17 @@ class SearchBackupHelper: TabContentScript {
             })
     }
     
+    private func handleIsBraveSearchDefault(_ info: SearchBackupMessage) {
+        
+    }
+    
+    private func handleSetBraveSearchDefault(_ info: SearchBackupMessage) {
+        
+    }
+    
     private struct SearchBackupMessage: Codable {
-        let id: String
-        let data: MessageData
+        let id: Int
+        let data: MessageData?
         
         struct MessageData: Codable {
             let query: String

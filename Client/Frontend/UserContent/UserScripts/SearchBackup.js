@@ -24,12 +24,11 @@ Object.defineProperty(window.__firefox__, '$<search-backup>', {
             
             delete window.__firefox__.$<search-backup>.resolution_handlers[id];
         },
-        sendMessage(data) {
+        sendMessage(method_id, data) {
             return new Promise((resolve, reject) => {
-               const p_id = 'id' + ++window.__firefox__.$<search-backup>.id;
-               window.__firefox__.$<search-backup>.resolution_handlers[p_id] = { resolve, reject };
+               window.__firefox__.$<search-backup>.resolution_handlers[method_id] = { resolve, reject };
                webkit.messageHandlers.SearchBackup.postMessage({'data': data,
-                                                                'id': p_id});
+                                                                'method_id': method_id});
            });
         }
     }
@@ -41,7 +40,24 @@ Object.defineProperty(window.__firefox__, '$<search-backup>', {
     writable: false,
      value: {
         fetchBackupResults(query, language, country, geo) {
-            return window.__firefox__.$<search-backup>.sendMessage({ "query": query, "language": language, "country": country, "geo": geo})
+            return window.__firefox__.$<search-backup>.sendMessage(1, { "query": query, "language": language, "country": country, "geo": geo})
         }
     }
   });
+
+const brave = {};
+
+Object.defineProperty(brave, 'search', {
+enumerable: false,
+configurable: true,
+writable: false,
+    value: {
+    isBraveSearchDefault() {
+        return window.__firefox__.$<search-backup>.sendMessage(2);
+    },
+
+    setBraveSearchDefault() {
+        return window.__firefox__.$<search-backup>.sendMessage(3);
+    }
+}
+});
