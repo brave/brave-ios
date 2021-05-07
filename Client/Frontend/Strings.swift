@@ -212,3 +212,21 @@ extension Strings {
     public static let switchToPBMKeyCodeTitle = NSLocalizedString("SwitchToPBMKeyCodeTitle", bundle: Bundle.shared, value: "Private Browsing Mode", comment: "Hardware shortcut switch to the private browsing tab or tab tray. Shown in the Discoverability overlay when the hardware Command Key is held down.")
     public static let switchToNonPBMKeyCodeTitle = NSLocalizedString("SwitchToNonPBMKeyCodeTitle", bundle: Bundle.shared, value: "Normal Browsing Mode", comment: "Hardware shortcut for non-private tab or tab. Shown in the Discoverability overlay when the hardware Command Key is held down.")
 }
+
+// Recent Searches
+extension Strings {
+    public static let recentSearchFavorites = NSLocalizedString("RecentSearchFavorites", bundle: Bundle.shared, value: "Favorites", comment: "Recent Search Favorites Section Title")
+    public static let recentSearchPasteAndGo = NSLocalizedString("RecentSearchPasteAndGo", bundle: Bundle.shared, value: "Paste & Go", comment: "Recent Search Paste & Go Button Title")
+    public static let recentSearchSectionTitle = NSLocalizedString("RecentSearchSectionTitle", bundle: Bundle.shared, value: "Recent Searches", comment: "Recent Search Section Title")
+    public static let recentSearchSectionDescription = NSLocalizedString("RecentSearchSectionDescription", bundle: Bundle.shared, value: "Recent Searches allow you to privately access past searches. Would you like to enable Recent Searches?", comment: "Recent Search Section Description")
+    public static let recentSearchClear = NSLocalizedString("RecentSearchClear", bundle: Bundle.shared, value: "Clear", comment: "Recent Search Clear Button")
+    public static let recentSearchShow = NSLocalizedString("RecentSearchShow", bundle: Bundle.shared, value: "Show", comment: "Recent Search Show Button")
+    public static let recentSearchHide = NSLocalizedString("RecentSearchHide", bundle: Bundle.shared, value: "Hide", comment: "Recent Search Hide Button")
+    public static let recentShowMore = NSLocalizedString("RecentSearchShowMore", bundle: Bundle.shared, value: "Show more", comment: "Recent Search Show More button")
+    public static let recentSearchScanned = NSLocalizedString("RecentSearchScanned", bundle: Bundle.shared, value: "Scanned", comment: "Recent Search Scanned text when a user scans a qr code")
+    public static let recentSearchQuickSearchOnWebsite = NSLocalizedString("RecentSearchQuickSearchOnWebsite", bundle: Bundle.shared, value: "on", comment: "Recent Search 'on' text when a user searches 'on' a website")
+    public static let recentSearchSuggestionsTitle = NSLocalizedString("RecentSearchSuggestionsTitle", bundle: Bundle.shared, value: "Search Suggestions", comment: "Recent Search suggestions title when prompting to turn on suggestions")
+    public static let recentSearchEnableSuggestions = NSLocalizedString("RecentSearchEnableSuggestions", bundle: Bundle.shared, value: "Enable", comment: "Recent Search button title to enable suggestions")
+    public static let recentSearchDisableSuggestions = NSLocalizedString("RecentSearchDisableSuggestions", bundle: Bundle.shared, value: "Disable", comment: "Recent Search button title to disable suggestions")
+    public static let recentSearchClearDataToggleOption = NSLocalizedString("RecentSearchClearDataToggleOption", bundle: Bundle.shared, value: "Recent Search Data", comment: "Recent Search setting title to clear recent searches")
+}

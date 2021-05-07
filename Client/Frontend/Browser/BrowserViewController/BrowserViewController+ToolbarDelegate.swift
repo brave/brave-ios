@@ -8,6 +8,7 @@ import BraveUI
 import Shared
 import BraveRewards
 import Storage
+import Data
 import SwiftUI
 
 // MARK: - TopToolbarDelegate
@@ -170,6 +171,10 @@ extension BrowserViewController: TopToolbarDelegate {
 
         // We couldn't build a URL, so pass it on to the search engine.
         submitSearchText(text)
+        
+        if !PrivateBrowsingManager.shared.isPrivateBrowsing {
+            RecentSearch.addItem(type: .text, text: text, websiteUrl: nil)
+        }
     }
 
     func submitSearchText(_ text: String) {
@@ -272,6 +277,14 @@ extension BrowserViewController: TopToolbarDelegate {
         tabToolbarDidPressMenu(topToolbar)
     }
     
+    func topToolbarDidPressQrCodeButton(_ urlBar: TopToolbarView) {
+        hideFavoritesController()
+        
+        let qrCodeController = QRCodeViewController()
+        qrCodeController.qrCodeDelegate = self
+        self.present(qrCodeController, animated: true, completion: nil)
+    }
+    
     private func hideSearchController() {
         if let searchController = searchController {
             searchController.willMove(toParent: nil)
@@ -313,9 +326,39 @@ extension BrowserViewController: TopToolbarDelegate {
     
     private func displayFavoritesController() {
         if favoritesController == nil {
-            let favoritesController = FavoritesViewController { [weak self] bookmark, action in
+            let favoritesController = FavoritesViewController(action: { [weak self] bookmark, action in
                 self?.handleFavoriteAction(favorite: bookmark, action: action)
-            }
+            }, recentSearchAction: { [weak self] recentSearch in
+                guard let self = self else { return }
+                
+                if let recentSearch = recentSearch,
+                   let searchType = RecentSearchType(rawValue: recentSearch.searchType) {
+                    switch searchType {
+                    case .text:
+                        if let text = recentSearch.text {
+                            self.topToolbar.setLocation(text, search: false)
+                            self.topToolbar(self.topToolbar, didEnterText: text)
+                        }
+                    case .qrCode:
+                        if let text = recentSearch.text {
+                            self.topToolbar.setLocation(text, search: false)
+                            self.topToolbar(self.topToolbar, didEnterText: text)
+                        } else if let websiteUrl = recentSearch.websiteUrl {
+                            self.topToolbar.setLocation(websiteUrl, search: false)
+                            self.topToolbar(self.topToolbar, didEnterText: websiteUrl)
+                        }
+                    case .website:
+                        if let websiteUrl = recentSearch.websiteUrl {
+                            self.topToolbar.setLocation(websiteUrl, search: false)
+                            self.topToolbar(self.topToolbar, didEnterText: websiteUrl)
+                        }
+                    }
+                } else if UIPasteboard.general.hasStrings || UIPasteboard.general.hasURLs,
+                          let searchQuery = UIPasteboard.general.string ?? UIPasteboard.general.url?.absoluteString {
+                    self.topToolbar.setLocation(searchQuery, search: false)
+                    self.topToolbar(self.topToolbar, didEnterText: searchQuery)
+                }
+            })
             self.favoritesController = favoritesController
             
             addChild(favoritesController)
