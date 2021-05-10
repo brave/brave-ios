@@ -40,7 +40,8 @@ class BraveCoreMigrator {
     private let bookmarksAPI = BraveBookmarksAPI()
     private let historyAPI = BraveHistoryAPI()
     private let dataImportExporter = BraveCoreImportExportUtility()
-    private var observer: BookmarkModelListener?
+    private var bookmarkObserver: BookmarkModelListener?
+    private var historyObserver: HistoryServiceListener?
     
     public init() {
         // Check If Chromium Sync Objects Migration is complete (Bookmarks-History)
@@ -72,10 +73,10 @@ class BraveCoreMigrator {
                     didFinishTest = true
                 // }
             } else {
-                self.observer = self.bookmarksAPI.add(BookmarksModelLoadedObserver({ [weak self] in
+                self.bookmarkObserver = self.bookmarksAPI.add(BookmarksModelLoadedObserver({ [weak self] in
                     guard let self = self else { return }
-                    self.observer?.destroy()
-                    self.observer = nil
+                    self.bookmarkObserver?.destroy()
+                    self.bookmarkObserver = nil
 
                     BraveSyncAPI.shared.leaveSyncGroup()
                     self.bookmarksAPI.removeAll()
@@ -144,10 +145,10 @@ extension BraveCoreMigrator {
                 }
             } else {
                 // Wait for the bookmark model to load before we attempt to perform migration!
-                self.observer = bookmarksAPI.add(BookmarksModelLoadedObserver({ [weak self] in
+                self.bookmarkObserver = bookmarksAPI.add(BookmarksModelLoadedObserver({ [weak self] in
                     guard let self = self else { return }
-                    self.observer?.destroy()
-                    self.observer = nil
+                    self.bookmarkObserver?.destroy()
+                    self.bookmarkObserver = nil
 
                     self.performBookmarkMigrationIfNeeded { success in
                         completion(success)
@@ -265,8 +266,16 @@ extension BraveCoreMigrator {
                     completion(success)
                 }
             } else {
-                // TODO: Add Observer for History Loading
-            }
+                // Wait for the history service to load before we attempt to perform migration!
+                self.historyObserver = historyAPI.add(HistoryServiceLoadedObserver({ [weak self] in
+                    guard let self = self else { return }
+                    self.historyObserver?.destroy()
+                    self.historyObserver = nil
+
+                    self.performHistoryMigrationIfNeeded { success in
+                        completion(success)
+                    }
+                }))            }
         } else {
             completion(true)
         }
@@ -383,6 +392,18 @@ extension BraveCoreMigrator {
         
         func bookmarkModelLoaded() {
             self.onModelLoaded()
+        }
+    }
+    
+    class HistoryServiceLoadedObserver: NSObject & HistoryServiceObserver {
+        private let onServiceLoaded: () -> Void
+        
+        init(_ onModelLoaded: @escaping () -> Void) {
+            self.onServiceLoaded = onModelLoaded
+        }
+        
+        func bookmarkModelLoaded() {
+            self.onServiceLoaded()
         }
     }
 }
