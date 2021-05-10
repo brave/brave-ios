@@ -38,6 +38,12 @@ public class PlaylistDownloadManager: PlaylistStreamDownloadManagerDelegate {
     private var didRestoreSession = false
     weak var delegate: PlaylistDownloadManagerDelegate?
     
+    static var playlistDirectory: URL? {
+        FileManager.default.getOrCreateFolder(name: "Playlist",
+                                              excludeFromBackups: true,
+                                              location: .applicationSupportDirectory)
+    }
+    
     public enum DownloadState: String {
         case downloaded
         case inProgress
@@ -180,9 +186,7 @@ public class PlaylistDownloadManager: PlaylistStreamDownloadManagerDelegate {
     
     fileprivate static func uniqueDownloadPathForFilename(_ filename: String) throws -> URL? {
         let filename = HTTPDownload.stripUnicode(fromFilename: filename)
-        let playlistDirectory = FileManager.default.getOrCreateFolder(name: "Playlist",
-                                                                      excludeFromBackups: true,
-                                                                      location: .applicationSupportDirectory)
+        let playlistDirectory = PlaylistDownloadManager.playlistDirectory
         return try playlistDirectory?.uniquePathForFilename(filename)
     }
 }
