@@ -166,3 +166,28 @@ extension Historyv2 {
         }
     }
 }
+
+// MARK: Brave-Core Only
+
+extension Historyv2 {
+    
+    public static func waitForHistoryServiceLoaded(_ completion: @escaping () -> Void) {
+        if historyAPI.isLoaded {
+            DispatchQueue.main.async {
+                completion()
+            }
+        } else {
+            var observer: HistoryServiceListener?
+            observer = Historyv2.historyAPI.add(HistoryServiceStateObserver({
+                if case .serviceLoaded = $0 {
+                    observer?.destroy()
+                    observer = nil
+                    
+                    DispatchQueue.main.async {
+                        completion()
+                    }
+                }
+            }))
+        }
+    }
+}
