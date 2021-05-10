@@ -501,7 +501,7 @@ private class PlaylistFileDownloadManager: NSObject, URLSessionDownloadDelegate 
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         guard let asset = activeDownloadTasks.removeValue(forKey: downloadTask) else { return }
         
-        let cleanupAndFailDownload = { (location: URL?, error: Error) in
+        func cleanupAndFailDownload(location: URL?, error: Error) {
             if let location = location {
                 do {
                     try FileManager.default.removeItem(at: location)
@@ -568,11 +568,11 @@ private class PlaylistFileDownloadManager: NSObject, URLSessionDownloadDelegate 
                     }
                 } catch {
                     log.error("Failed to create bookmarkData for download URL.")
-                    cleanupAndFailDownload(path, error)
+                    cleanupAndFailDownload(location: path, error: error)
                 }
             } catch {
                 log.error("An error occurred attempting to download a playlist item: \(error)")
-                cleanupAndFailDownload(location, error)
+                cleanupAndFailDownload(location: location, error: error)
             }
         } else {
             var error = "UnknownError"
@@ -582,7 +582,7 @@ private class PlaylistFileDownloadManager: NSObject, URLSessionDownloadDelegate 
                 error = "Invalid Response: \(response)"
             }
             
-            cleanupAndFailDownload(nil, error)
+            cleanupAndFailDownload(location: nil, error: error)
         }
     }
 }
