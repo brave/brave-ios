@@ -107,6 +107,11 @@ class PlaylistHelper: NSObject, TabContentScript {
             if item.detected {
                 self.delegate?.showPlaylistToast(info: item, itemState: .pendingUserAction)
             } else {
+                // Action sheet
+                if !Preferences.Playlist.enableLongPressAddToPlaylist.value {
+                    return
+                }
+                
                 // Has to be done otherwise it is impossible to play a video after selecting its elements
                 UIMenuController.shared.hideMenu()
                 
