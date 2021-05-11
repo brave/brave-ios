@@ -443,14 +443,48 @@ extension URL {
     
     // Check if the website is supporting showing Add To playlist toast
     public var isPlaylistSupportedSiteURL: Bool {
-        let domain = self.hostSLD
-        var siteList = ["youtube", "vimeo", "twitch", "floatplane",
-                        "spotify", "soundcloud", "listennotes"]
+        let domain = self.baseDomain ?? self.host ?? self.hostSLD
+        var siteList = ["youtube.com", "vimeo.com", "twitch.tv", "floatplane.com",
+                        "soundcloud.com", "newness.com", "ted.com", "dailymotion.com",
+                        "pandora.tv", "watchnebula.com", "pbs.org", "curiositystream.com",
+                        "soccer-douga.com", "sports.yahoo.com.jp", "soccer.skyperfectv.co.jp",
+                        "bitchute.com", "rumble.com", "gorf.tv", "odysee.com", "brighteon.com",
+                        "lbry.tv", "luminarypodcasts.com", "marthastewart.com", "bbcgoodfood.com",
+                        "bt.com", "skysports.com",
+                        "sky.co.nz", "kayosports.com.au", "udemy.com",
+                        "listennotes.com"]
         
         /// Additional sites for Japanese locale
         if Locale.current.regionCode == "JP" {
-            siteList.append(contentsOf: ["nicovideo", "dailymotion", "pandora", "veoh", "ted", "yahoo.co", "say-move", "9tsu"])
+            let japanList = ["nicovideo.jp", "video.fc2.com", "musicpv.jp",
+                             "openrec.tv", "mirrativ.com", "mildom.com",
+                             "twitcasting.tv", "creators.yahoo.co.jp",
+                             "jp.voicetube.com", "openclassrooms.com",
+                             "udacity.com", "coursera.org", "edx.org",
+                             "3mcompany.jp", "eikoh-lms.com", "eikoh-http.akamaized.net",
+                             "asuka-academy.com", "chugakujuken.com", "ic0.tv",
+                             "aoi-zemi.com", "prog-8.com", "jmooc.jp", "schoo.jp",
+                             "nlp.netlearning.co.jp", "gacco.org", "dic.okedou.app",
+                             "okedou.app"
+            ]
+            siteList.append(contentsOf: japanList)
         }
+        
+        /// Additonal sites for NewZealand and Australia locale
+        /*if Locale.current.regionCode == "AU" || Locale.current.regionCode == "NZ" {
+            let nzAUList = [
+                "sparksport.co.nz",
+                "neontv.co.nz",
+                "stan.com.au",
+                "binge.com.au",
+                "sbs.com.au",
+                "7plus.com.au",
+                "9now.com.au",
+                "iview.abc.net.au",
+                "10play.com.au"
+            ]
+            siteList.append(contentsOf: nzAUList)
+        }*/
         
         return siteList.contains(where: domain.contains)
     }
