@@ -134,12 +134,9 @@ class PlaylistHelper: NSObject, TabContentScript {
 extension PlaylistHelper: UIGestureRecognizerDelegate {
     @objc
     func onLongPressedWebView(_ gestureRecognizer: UILongPressGestureRecognizer) {
-        if !Preferences.Playlist.enableLongPressAddToPlaylist.value {
-            return
-        }
-        
         if gestureRecognizer.state == .began,
-           let webView = tab?.webView {
+           let webView = tab?.webView,
+           Preferences.Playlist.enableLongPressAddToPlaylist.value {
             let touchPoint = gestureRecognizer.location(in: webView)
             
             let token = UserScriptManager.securityToken.uuidString.replacingOccurrences(of: "-", with: "", options: .literal)
