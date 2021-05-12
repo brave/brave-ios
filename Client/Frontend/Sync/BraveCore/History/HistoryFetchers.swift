@@ -56,6 +56,14 @@ class Historyv2Fetcher: NSObject, HistoryV2FetchResultsController {
     init(historyAPI: BraveHistoryAPI) {
         self.historyAPI = historyAPI
         super.init()
+        
+        self.historyServiceListener = historyAPI.add(HistoryServiceStateObserver { [weak self] _ in
+            guard let self = self else { return }
+            
+            DispatchQueue.main.async {
+                self.delegate?.controllerDidReloadContents(self)
+            }
+        })
     }
     
     // MARK: Internal
@@ -75,7 +83,7 @@ class Historyv2Fetcher: NSObject, HistoryV2FetchResultsController {
     }
     
     func performFetch(_ completion: @escaping () -> Void) {
-        historyList.removeAll()
+        clearHistoryData()
         
         historyAPI?.search(withQuery: "", maxCount: 0, completion: { [weak self] historyNodeList in
             guard let self = self else { return }
@@ -116,6 +124,8 @@ class Historyv2Fetcher: NSObject, HistoryV2FetchResultsController {
     
     // MARK: Private
     
+    private var historyServiceListener: HistoryServiceListener?
+
     private weak var historyAPI: BraveHistoryAPI?
     
     private var historyList = [Historyv2]()
@@ -124,5 +134,13 @@ class Historyv2Fetcher: NSObject, HistoryV2FetchResultsController {
                                                                              .yesterday: 0,
                                                                              .lastWeek: 0,
                                                                              .thisMonth: 0]
+    
+    private func clearHistoryData() {
+        historyList.removeAll()
+
+        for key in sectionDetails.keys {
+            sectionDetails.updateValue(0, forKey: key)
+        }
+    }
     
 }
