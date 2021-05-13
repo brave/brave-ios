@@ -75,25 +75,6 @@ open class SQLiteLogins: BrowserLogins {
         return login
     }
 
-    class func localLoginFactory(_ row: SDRow) -> LocalLogin {
-        let login = self.constructLogin(row, c: LocalLogin.self)
-
-        login.localModified = row.getTimestamp("local_modified") ?? 0
-        login.isDeleted = row.getBoolean("is_deleted")
-        login.syncStatus = SyncStatus(rawValue: row["sync_status"] as! Int)!
-
-        return login
-    }
-
-    class func mirrorLoginFactory(_ row: SDRow) -> MirrorLogin {
-        let login = self.constructLogin(row, c: MirrorLogin.self)
-
-        login.serverModified = row.getTimestamp("server_modified")!
-        login.isOverridden = row.getBoolean("is_overridden")
-
-        return login
-    }
-
     fileprivate class func loginFactory(_ row: SDRow) -> Login {
         return self.constructLogin(row, c: Login.self)
     }
