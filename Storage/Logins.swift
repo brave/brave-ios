@@ -9,17 +9,6 @@ import XCGLogger
 
 private var log = Logger.syncLogger
 
-enum SyncStatus: Int {
-    // Ordinarily not needed; synced items are removed from the overlay. But they start here when cloned.
-    case synced = 0
-
-    // A material change that we want to upload on next sync.
-    case changed = 1
-
-    // Created locally.
-    case new = 2
-}
-
 public enum CommutativeLoginField {
     case timesUsed(increment: Int)
 }

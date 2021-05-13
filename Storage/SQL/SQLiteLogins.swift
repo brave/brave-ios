@@ -285,7 +285,7 @@ open class SQLiteLogins: BrowserLogins {
                 is_deleted,
                 sync_status
             )
-            VALUES (?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?, ?, 0, \(SyncStatus.new.rawValue))
+            VALUES (?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?, ?, 0, \(LoginsSchema.SyncStatus.new.rawValue))
             """
 
         return db.run(sql, withArgs: args)
@@ -422,13 +422,13 @@ open class SQLiteLogins: BrowserLogins {
         // Immediately delete anything that's marked as new -- i.e., it's never reached
         // the server.
         let delete =
-            "DELETE FROM loginsL WHERE guid IN \(inClause) AND sync_status = \(SyncStatus.new.rawValue)"
+            "DELETE FROM loginsL WHERE guid IN \(inClause) AND sync_status = \(LoginsSchema.SyncStatus.new.rawValue)"
 
         // Otherwise, mark it as changed.
         let update = """
             UPDATE loginsL SET
                 local_modified = \(nowMillis),
-                sync_status = \(SyncStatus.changed.rawValue),
+                sync_status = \(LoginsSchema.SyncStatus.changed.rawValue),
                 is_deleted = 1,
                 password = '',
                 hostname = '',
@@ -444,7 +444,7 @@ open class SQLiteLogins: BrowserLogins {
                 guid, local_modified, is_deleted, sync_status, hostname, timeCreated, timePasswordChanged, password, username
             )
             SELECT
-                guid, \(nowMillis), 1, \(SyncStatus.changed.rawValue), '', timeCreated, \(nowMillis)000, '', ''
+                guid, \(nowMillis), 1, \(LoginsSchema.SyncStatus.changed.rawValue), '', timeCreated, \(nowMillis)000, '', ''
             FROM loginsM
             WHERE guid IN \(inClause)
             """
@@ -464,13 +464,13 @@ open class SQLiteLogins: BrowserLogins {
         // Immediately delete anything that's marked as new -- i.e., it's never reached
         // the server. If Sync isn't set up, this will be everything.
         let delete =
-            "DELETE FROM loginsL WHERE sync_status = \(SyncStatus.new.rawValue)"
+            "DELETE FROM loginsL WHERE sync_status = \(LoginsSchema.SyncStatus.new.rawValue)"
 
         let nowMillis = Date.now()
 
         // Mark anything we haven't already deleted.
         let update =
-            "UPDATE loginsL SET local_modified = \(nowMillis), sync_status = \(SyncStatus.changed.rawValue), is_deleted = 1, password = '', hostname = '', username = '' WHERE is_deleted = 0"
+            "UPDATE loginsL SET local_modified = \(nowMillis), sync_status = \(LoginsSchema.SyncStatus.changed.rawValue), is_deleted = 1, password = '', hostname = '', username = '' WHERE is_deleted = 0"
 
         // Copy all the remaining rows from our mirror, marking them as locally deleted. The
         // OR IGNORE will cause conflicts due to non-unique guids to be dropped, preserving
@@ -480,7 +480,7 @@ open class SQLiteLogins: BrowserLogins {
                 guid, local_modified, is_deleted, sync_status, hostname, timeCreated, timePasswordChanged, password, username
             )
             SELECT
-                guid, \(nowMillis), 1, \(SyncStatus.changed.rawValue), '', timeCreated, \(nowMillis)000, '', ''
+                guid, \(nowMillis), 1, \(LoginsSchema.SyncStatus.changed.rawValue), '', timeCreated, \(nowMillis)000, '', ''
             FROM loginsM
             """
 
