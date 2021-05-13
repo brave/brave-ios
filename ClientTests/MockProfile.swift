@@ -8,20 +8,6 @@ import Shared
 import Storage
 import XCTest
 
-open class MockTabQueue: TabQueue {
-    open func addToQueue(_ tab: ShareItem) -> Success {
-        return succeed()
-    }
-
-    open func getQueuedTabs() -> Deferred<Maybe<Cursor<ShareItem>>> {
-        return deferMaybe(ArrayCursor<ShareItem>(data: []))
-    }
-
-    open func clearQueuedTabs() -> Success {
-        return succeed()
-    }
-}
-
 open class MockPanelDataObservers: PanelDataObservers {
     override init(profile: Profile) {
         super.init(profile: profile)
