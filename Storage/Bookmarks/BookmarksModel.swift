@@ -253,14 +253,6 @@ open class MemoryBookmarksSink: ShareToDestination {
     }
 }
 
-private extension SuggestedSite {
-    func asBookmark() -> BookmarkNode {
-        let b = BookmarkItem(guid: self.guid ?? Bytes.generateGUID(), title: self.title, url: self.url)
-        b.favicon = self.icon
-        return b
-    }
-}
-
 open class PrependedBookmarkFolder: BookmarkFolder {
     let main: BookmarkFolder
     fileprivate let prepend: BookmarkNode
