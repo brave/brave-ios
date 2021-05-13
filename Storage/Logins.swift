@@ -9,80 +9,10 @@ import XCGLogger
 
 private var log = Logger.syncLogger
 
-public enum CommutativeLoginField {
-    case timesUsed(increment: Int)
-}
-
-public protocol Indexable {
-    var index: Int { get }
-}
-
-public enum NonCommutativeLoginField: Indexable {
-    case hostname(to: String)
-    case password(to: String)
-    case username(to: String?)
-    case httpRealm(to: String?)
-    case formSubmitURL(to: String?)
-    case timeCreated(to: MicrosecondTimestamp)                  // Should be immutable.
-    case timeLastUsed(to: MicrosecondTimestamp)
-    case timePasswordChanged(to: MicrosecondTimestamp)
-
-    public var index: Int {
-        switch self {
-        case .hostname:
-            return 0
-        case .password:
-            return 1
-        case .username:
-            return 2
-        case .httpRealm:
-            return 3
-        case .formSubmitURL:
-            return 4
-        case .timeCreated:
-            return 5
-        case .timeLastUsed:
-            return 6
-        case .timePasswordChanged:
-            return 7
-        }
-    }
-
-    static let entries: Int = 8
-}
-
-// We don't care about these, because they're slated for removal at some point --
-// we don't really use them for form fill.
-// We handle them in the same way as NonCommutative, just broken out to allow us
-// flexibility in removing them or reconciling them differently.
-public enum NonConflictingLoginField: Indexable {
-    case usernameField(to: String?)
-    case passwordField(to: String?)
-
-    public var index: Int {
-        switch self {
-        case .usernameField:
-            return 0
-        case .passwordField:
-            return 1
-        }
-    }
-
-    static let entries: Int = 2
-}
-
-public typealias LoginDeltas = (
-    commutative: [CommutativeLoginField],
-    nonCommutative: [NonCommutativeLoginField],
-    nonConflicting: [NonConflictingLoginField]
-)
-
-public typealias TimestampedLoginDeltas = (at: Timestamp, changed: LoginDeltas)
-
 /**
  * LoginData is a wrapper around NSURLCredential and NSURLProtectionSpace to allow us to add extra fields where needed.
  **/
-public protocol LoginData: class {
+public protocol LoginData: AnyObject {
     var guid: String { get set }                 // It'd be nice if this were read-only.
     var credentials: URLCredential { get }
     var protectionSpace: URLProtectionSpace { get }
