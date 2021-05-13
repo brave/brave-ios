@@ -52,13 +52,3 @@ public struct SyncCommand: Equatable {
 public func ==(lhs: SyncCommand, rhs: SyncCommand) -> Bool {
     return lhs.value == rhs.value
 }
-
-public protocol SyncCommands {
-    func deleteCommands() -> Success
-    func deleteCommands(_ clientGUID: GUID) -> Success
-
-    func getCommands() -> Deferred<Maybe<[GUID: [SyncCommand]]>>
-
-    func insertCommand(_ command: SyncCommand, forClients clients: [RemoteClient]) -> Deferred<Maybe<Int>>
-    func insertCommands(_ commands: [SyncCommand], forClients clients: [RemoteClient]) -> Deferred<Maybe<Int>>
-}
