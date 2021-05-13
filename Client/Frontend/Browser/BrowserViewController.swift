@@ -2239,9 +2239,6 @@ extension BrowserViewController: TabManagerDelegate {
         // tabDelegate is a weak ref (and the tab's webView may not be destroyed yet)
         // so we don't expcitly unset it.
         topToolbar.leaveOverlayMode(didCancel: true)
-        if let url = tab.url, !url.isAboutURL && !tab.isPrivate {
-            profile.recentlyClosedTabs.addTab(url as URL, title: tab.title, faviconURL: tab.displayFavicon?.url)
-        }
         updateTabsBarVisibility()
         
         rewards.reportTabClosed(tabId: tab.rewardsId)

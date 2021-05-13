@@ -56,7 +56,6 @@ protocol Profile: class {
     var files: FileAccessor { get }
     var logins: BrowserLogins & SyncableLogins & ResettableSyncStorage { get }
     var certStore: CertStore { get }
-    var recentlyClosedTabs: ClosedTabsStore { get }
     var panelDataObservers: PanelDataObservers { get }
 
     var isShutdown: Bool { get }
@@ -195,10 +194,6 @@ open class BrowserProfile: Profile {
 
     lazy var certStore: CertStore = {
         return CertStore()
-    }()
-
-    lazy var recentlyClosedTabs: ClosedTabsStore = {
-        return ClosedTabsStore(prefs: self.prefs)
     }()
 
     lazy var logins: BrowserLogins & SyncableLogins & ResettableSyncStorage = {
