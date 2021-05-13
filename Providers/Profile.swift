@@ -56,7 +56,6 @@ protocol Profile: AnyObject {
     var files: FileAccessor { get }
     var logins: BrowserLogins { get }
     var certStore: CertStore { get }
-    var panelDataObservers: PanelDataObservers { get }
 
     var isShutdown: Bool { get }
     
@@ -175,10 +174,6 @@ open class BrowserProfile: Profile {
     func localName() -> String {
         return name
     }
-
-    lazy var panelDataObservers: PanelDataObservers = {
-        return PanelDataObservers(profile: self)
-    }()
 
     lazy var searchEngines: SearchEngines = {
         return SearchEngines(files: self.files)

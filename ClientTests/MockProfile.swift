@@ -8,35 +8,11 @@ import Shared
 import Storage
 import XCTest
 
-open class MockPanelDataObservers: PanelDataObservers {
-    override init(profile: Profile) {
-        super.init(profile: profile)
-        self.activityStream = MockActivityStreamDataObserver(profile: profile)
-    }
-}
-
-open class MockActivityStreamDataObserver: DataObserver {
-    public var profile: Profile
-    public weak var delegate: DataObserverDelegate?
-
-    init(profile: Profile) {
-        self.profile = profile
-    }
-
-    public func refreshIfNeeded(forceHighlights highlights: Bool, forceTopSites topsites: Bool) {
-
-    }
-}
-
 open class MockProfile: Profile {
     
     // Read/Writeable properties for mocking
     public var files: FileAccessor
     public var logins: BrowserLogins
-
-    public lazy var panelDataObservers: PanelDataObservers = {
-        return MockPanelDataObservers(profile: self)
-    }()
 
     fileprivate let name: String = "mockaccount"
 
