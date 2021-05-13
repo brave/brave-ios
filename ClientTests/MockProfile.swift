@@ -32,7 +32,7 @@ open class MockProfile: Profile {
     
     // Read/Writeable properties for mocking
     public var files: FileAccessor
-    public var logins: BrowserLogins & SyncableLogins & ResettableSyncStorage
+    public var logins: BrowserLogins
 
     public lazy var panelDataObservers: PanelDataObservers = {
         return MockPanelDataObservers(profile: self)

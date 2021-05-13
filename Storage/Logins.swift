@@ -589,29 +589,6 @@ public protocol BrowserLogins {
     func removeAll() -> Success
 }
 
-public protocol SyncableLogins: AccountRemovalDelegate {
-    /**
-     * Delete the login with the provided GUID. Succeeds if the GUID is unknown.
-     */
-    func deleteByGUID(_ guid: GUID, deletedAt: Timestamp) -> Success
-
-    func applyChangedLogin(_ upstream: ServerLogin) -> Success
-
-    func getModifiedLoginsToUpload() -> Deferred<Maybe<[Login]>>
-    func getDeletedLoginsToUpload() -> Deferred<Maybe<[GUID]>>
-
-    /**
-     * Chains through the provided timestamp.
-     */
-    func markAsSynchronized<T: Collection>(_: T, modified: Timestamp) -> Deferred<Maybe<Timestamp>> where T.Iterator.Element == GUID
-    func markAsDeleted<T: Collection>(_ guids: T) -> Success where T.Iterator.Element == GUID
-
-    /**
-     * For inspecting whether we're an active participant in login sync.
-     */
-    func hasSyncedLogins() -> Deferred<Maybe<Bool>>
-}
-
 open class LoginDataError: MaybeErrorType {
     public let description: String
     public init(description: String) {

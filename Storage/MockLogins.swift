@@ -5,7 +5,7 @@
 import Foundation
 import Shared
 
-open class MockLogins: BrowserLogins, SyncableLogins {
+open class MockLogins: BrowserLogins {
     fileprivate var cache = [Login]()
 
     public init(files: FileAccessor) {
@@ -144,10 +144,4 @@ open class MockLogins: BrowserLogins, SyncableLogins {
     open func markAsSynchronized<T: Collection>(_: T, modified: Timestamp) -> Deferred<Maybe<Timestamp>> where T.Iterator.Element == GUID { return deferMaybe(0) }
     open func markAsDeleted<T: Collection>(_ guids: T) -> Success where T.Iterator.Element == GUID { return succeed() }
     open func onRemovedAccount() -> Success { return succeed() }
-}
-
-extension MockLogins: ResettableSyncStorage {
-    public func resetClient() -> Success {
-        return succeed()
-    }
 }
