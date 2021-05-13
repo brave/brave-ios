@@ -4086,17 +4086,9 @@
 				28B62ACD1BC745E7004A585A /* Syncable.swift */,
 				28532D301C483DEB000072D9 /* Bookmarks */,
 				2FCAE2491ABB531100877008 /* SQL */,
-				2FCAE21C1ABB51F800877008 /* Supporting Files */,
 				2FCAE25A1ABB531100877008 /* ThirdParty */,
 			);
 			path = Storage;
-			sourceTree = "<group>";
-		};
-		2FCAE21C1ABB51F800877008 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
 		2FCAE22A1ABB51F800877008 /* StorageTests */ = {
