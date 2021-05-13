@@ -921,3 +921,26 @@ extension SQLiteLogins: AccountRemovalDelegate {
         return self.resetClient()
     }
 }
+
+class NoSuchRecordError: MaybeErrorType {
+    let guid: GUID
+    init(guid: GUID) {
+        self.guid = guid
+    }
+    var description: String {
+        return "No such record: \(guid)."
+    }
+}
+
+extension SDRow {
+    func getTimestamp(_ column: String) -> Timestamp? {
+        return (self[column] as? NSNumber)?.uint64Value
+    }
+
+    func getBoolean(_ column: String) -> Bool {
+        if let val = self[column] as? Int {
+            return val != 0
+        }
+        return false
+    }
+}
