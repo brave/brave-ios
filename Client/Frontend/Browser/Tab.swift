@@ -182,6 +182,8 @@ class Tab: NSObject {
             }
         }
     }
+    
+    var braveSearchManager: BraveSearchManager?
 
     func createWebview() {
         if webView == nil {
@@ -677,5 +679,23 @@ class TabWebViewMenuHelper: UIView {
                 tabWebView.delegate?.tabWebView(tabWebView, didSelectFindInPageForSelection: selection)
             }
         }
+    }
+}
+
+// MARK: - Brave Search
+
+extension Tab {
+    func injectResults() {
+        guard let url = webView?.url, BraveSearchManager.isValidURL(url) else { return }
+        let result = braveSearchManager?.queryResult ?? "nil"
+        
+        webView?.evaluateSafeJavaScript(
+            functionName: "window.brave.onFetchedBackupResults",
+            args: [result],
+            sandboxed: false,
+            escapeArgs: false)
+        
+        // cleanup
+        braveSearchManager = nil
     }
 }

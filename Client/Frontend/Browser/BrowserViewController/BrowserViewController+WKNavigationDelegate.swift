@@ -188,7 +188,26 @@ extension BrowserViewController: WKNavigationDelegate {
         let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
         
         // Check if custom user scripts must be added to the web view.
-        tabManager[webView]?.userScriptManager?.handleDomainUserScript(for: url)
+        let tab = tabManager[webView]
+        tab?.userScriptManager?.handleDomainUserScript(for: url)
+        
+        // Brave Search logic.
+        tab?.braveSearchManager = BraveSearchManager(url: url)
+        if let braveSearchManager = tab?.braveSearchManager {
+            webView.configuration.websiteDataStore.httpCookieStore.getAllCookies { cookies in
+                braveSearchManager.shouldUseFallback(cookies: cookies) { found in
+                    // FIXME: Flip this value back once we finish tests
+                    //if !found {
+                    if found {
+                        braveSearchManager.backupSearch { completion in
+                            tab?.injectResults()
+                        }
+                    }
+                }
+            }
+            
+            
+        }
         
         // This is the normal case, opening a http or https url, which we handle by loading them in this WKWebView. We
         // always allow this. Additionally, data URIs are also handled just like normal web pages.

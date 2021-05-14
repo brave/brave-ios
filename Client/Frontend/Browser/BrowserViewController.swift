@@ -71,6 +71,8 @@ class BrowserViewController: UIViewController {
     
     private var privateModeCancellable: AnyCancellable?
     
+    var braveSearchCancellable: AnyCancellable?
+    
     /// Custom Search Engine
     var openSearchEngine: OpenSearchReference?
     var openSearchTextFieldInputAssistantBarButtonGroup = [UIBarButtonItemGroup]()

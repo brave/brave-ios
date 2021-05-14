@@ -645,6 +645,7 @@
 		44331DDA22552313007E3E93 /* LocationContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44331DD922552313007E3E93 /* LocationContainerView.swift */; };
 		44331DDC22561F34007E3E93 /* ToolbarUrlActionsDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44331DDB22561F34007E3E93 /* ToolbarUrlActionsDelegate.swift */; };
 		4452CAF0255412800053EFE6 /* DefaultBrowserIntroCalloutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4452CAEF255412800053EFE6 /* DefaultBrowserIntroCalloutViewController.swift */; };
+		448E6C20264DA0EE005AFD2A /* BraveSearchManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 448E6C1F264DA0EE005AFD2A /* BraveSearchManager.swift */; };
 		44994DBA2649B137000CC166 /* leaf.cer in Resources */ = {isa = PBXBuildFile; fileRef = 44994DB92649B136000CC166 /* leaf.cer */; };
 		44FA2F3021F8DB1000EFA86A /* DataPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44FA2F2F21F8DB1000EFA86A /* DataPreferences.swift */; };
 		592F521E2217327C0078395E /* HttpCookieExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 592F521D2217327B0078395E /* HttpCookieExtension.swift */; };
@@ -2103,6 +2104,7 @@
 		4452CA392552FC7F0053EFE6 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		4452CA3A2552FD360053EFE6 /* build_in_core.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = build_in_core.sh; sourceTree = "<group>"; };
 		4452CAEF255412800053EFE6 /* DefaultBrowserIntroCalloutViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultBrowserIntroCalloutViewController.swift; sourceTree = "<group>"; };
+		448E6C1F264DA0EE005AFD2A /* BraveSearchManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveSearchManager.swift; sourceTree = "<group>"; };
 		4484BAE8265422760099A205 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		4484BAE9265422770099A205 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		4484BAEA265422770099A205 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/BraveShared.strings; sourceTree = "<group>"; };
@@ -3016,6 +3018,7 @@
 				27F94A3921909A5900F4FADF /* SearchSuggestionsPromptView.swift */,
 				0A179E272519F97E0014D9E1 /* InitialSearchEngines.swift */,
 				2FD0E3D52577F327000C773B /* SearchSuggestionCell.swift */,
+				448E6C1F264DA0EE005AFD2A /* BraveSearchManager.swift */,
 			);
 			path = Search;
 			sourceTree = "<group>";
@@ -6779,6 +6782,7 @@
 				5E9B28F7255048540072E655 /* BookmarkFetchers.swift in Sources */,
 				5E5E6E6325BA04730035B6A0 /* DataURIParser.swift in Sources */,
 				0A4B012020D02EC4004D4011 /* TabsBarViewController.swift in Sources */,
+				448E6C20264DA0EE005AFD2A /* BraveSearchManager.swift in Sources */,
 				5E72D54F253657FF00F8D62D /* BraveCoreImportExportUtility.swift in Sources */,
 				4422D4D921BFFB7600BF1855 /* merger.cc in Sources */,
 				4422D4EF21BFFB7600BF1855 /* log_reader.cc in Sources */,
