@@ -56,14 +56,8 @@ class ShareToBraveViewController: SLComposeServiceViewController {
             }
             
             // Open url if it was found, in other case search for text with default search engine in browser
-            if let urlString = urlItem?.absoluteString {
-                if let braveUrl = urlString.addingPercentEncoding(withAllowedCharacters: .alphanumerics).flatMap(self.urlScheme) {
-                    self.handleUrl(braveUrl)
-                }
-            } else if let text = nonUrlText {
-                if let braveUrl = text.addingPercentEncoding(withAllowedCharacters: .alphanumerics).flatMap(self.searchScheme) {
-                    self.handleUrl(braveUrl)
-                }
+            if let braveUrl = urlItem?.absoluteString.addingPercentEncoding(withAllowedCharacters: .alphanumerics).flatMap(self.urlScheme) ?? nonUrlText?.addingPercentEncoding(withAllowedCharacters: .alphanumerics).flatMap(self.searchScheme) {
+                self.handleUrl(braveUrl)
             }
         }
         
