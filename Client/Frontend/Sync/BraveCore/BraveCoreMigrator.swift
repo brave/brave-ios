@@ -402,7 +402,7 @@ extension BraveCoreMigrator {
             self.onServiceLoaded = onModelLoaded
         }
         
-        func bookmarkModelLoaded() {
+        func historyServiceLoaded() {
             self.onServiceLoaded()
         }
     }

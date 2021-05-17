@@ -6,7 +6,7 @@
 import Foundation
 import BraveRewards
 
-class HistoryServiceStateObserver: NSObject, HistoryServiceObserver {
+class HistoryServiceStateObserver: BraveServiceStateObserver, HistoryServiceObserver {
     private let listener: (StateChange) -> Void
     
     enum StateChange {
@@ -19,10 +19,15 @@ class HistoryServiceStateObserver: NSObject, HistoryServiceObserver {
     
     init(_ listener: @escaping (StateChange) -> Void) {
         self.listener = listener
+        
     }
     
     func historyServiceLoaded() {
         listener(.serviceLoaded)
+
+        if !BraveServiceStateObserver.isServiceLoadStatePosted {
+            postServiceLoadedNotification()
+        }
     }
     
     func historyServiceBeingDeleted() {

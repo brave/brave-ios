@@ -7,12 +7,15 @@ import Shared
 import BraveShared
 import SwiftKeychainWrapper
 import Data
+import BraveRewards
 
 private let log = Logger.browserLogger
 
 class Migration {
-    private(set) public static var braveCoreSyncObjectsMigrator: BraveCoreMigrator?
     
+    private(set) public static var braveCoreSyncObjectsMigrator: BraveCoreMigrator?
+    private(set) public static var profileSyncService: BraveSyncProfileService?
+
     private(set) public static var isChromiumMigrationCompleted: Bool = {
         return Preferences.Chromium.syncV2BookmarksMigrationCompleted.value &&
             Preferences.Chromium.syncV2HistoryMigrationCompleted.value
@@ -39,6 +42,22 @@ class Migration {
             FaviconMO.clearTooLargeFavicons()
             Preferences.Migration.removeLargeFaviconsMigrationCompleted.value = true
         }
+
+        // Adding Observer to enable sync types
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(enableUserSelectedTypesForSync), name: NSNotification.Name(rawValue: BraveServiceStateObserver.coreServiceLoadedNotification),
+            object: nil)
+    }
+    
+    @objc private func enableUserSelectedTypesForSync() {
+        guard BraveSyncAPI.shared.isInSyncGroup else {
+            log.info("Sync is not active")
+            return
+        }
+        
+        BraveSyncProfileService.shared.userSelectedTypes = [.HISTORY, .BOOKMARKS]
     }
     
     static func moveDatabaseToApplicationDirectory() {
