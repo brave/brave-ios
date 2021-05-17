@@ -277,7 +277,7 @@ window.__firefox__.includeOnce("$<Playlist>", function() {
         }
         
         function $<observePage>() {
-            $<observeDynamicElements>(document);
+            //$<observeDynamicElements>(document);
 
             
             Object.defineProperty(HTMLVideoElement.prototype, 'src', {
