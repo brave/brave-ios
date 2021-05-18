@@ -146,7 +146,6 @@
 		0AB7FCDF235DEE8F00F1D9F5 /* NumberExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AB7FCDE235DEE8F00F1D9F5 /* NumberExtensionTests.swift */; };
 		0ABA874320E68CF500D2694F /* SessionData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74C027441B2A348C001B1E88 /* SessionData.swift */; };
 		0AC0D3C2233E889D0091EFA5 /* Storage.strings in Resources */ = {isa = PBXBuildFile; fileRef = 0AC0D3BE233E889D0091EFA5 /* Storage.strings */; };
-		0AC0D3C3233E889D0091EFA5 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 0AC0D3C0233E889D0091EFA5 /* InfoPlist.strings */; };
 		0AC77600242A282C00139377 /* BuyVPNViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AC775FF242A282C00139377 /* BuyVPNViewController.swift */; };
 		0AC77602242A6AE000139377 /* BuyVPNView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AC77601242A6AE000139377 /* BuyVPNView.swift */; };
 		0ACF621322FDC17800297576 /* Shared.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 288A2D861AB8B3260023ABC3 /* Shared.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -1529,7 +1528,6 @@
 		0AB7FCDB235DED0B00F1D9F5 /* NumberExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberExtensions.swift; sourceTree = "<group>"; };
 		0AB7FCDE235DEE8F00F1D9F5 /* NumberExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberExtensionTests.swift; sourceTree = "<group>"; };
 		0AC0D3BF233E889D0091EFA5 /* ms */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ms; path = ms.lproj/Storage.strings; sourceTree = "<group>"; };
-		0AC0D3C1233E889D0091EFA5 /* ms */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ms; path = ms.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		0AC775FF242A282C00139377 /* BuyVPNViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuyVPNViewController.swift; sourceTree = "<group>"; };
 		0AC77601242A6AE000139377 /* BuyVPNView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuyVPNView.swift; sourceTree = "<group>"; };
 		0ACB38EA23571F5600DDC245 /* zh-TW */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-TW"; path = "zh-TW.lproj/Storage.strings"; sourceTree = "<group>"; };
@@ -2140,10 +2138,10 @@
 		4484BAF12654227A0099A205 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		4484BAF22654227B0099A205 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Shared.strings; sourceTree = "<group>"; };
 		4484BAF32654227B0099A205 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		4484BAF42654227C0099A205 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		4484BAF52654227C0099A205 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Storage.strings; sourceTree = "<group>"; };
 		44994DB92649B136000CC166 /* leaf.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = leaf.cer; sourceTree = "<group>"; };
 		449D5AE02628502B00C211D4 /* Model12.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model12.xcdatamodel; sourceTree = "<group>"; };
+		44F319B326542AEC00AB52C6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Storage.strings; sourceTree = "<group>"; };
 		44FA2F2F21F8DB1000EFA86A /* DataPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataPreferences.swift; sourceTree = "<group>"; };
 		5902D2FF22DCD681002232FB /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = zh.lproj/BraveShared.strings; sourceTree = "<group>"; };
 		590913E223268115004625FA /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -4048,7 +4046,6 @@
 		2FCAE21B1ABB51F800877008 /* Storage */ = {
 			isa = PBXGroup;
 			children = (
-				0AC0D3C0233E889D0091EFA5 /* InfoPlist.strings */,
 				0AC0D3BE233E889D0091EFA5 /* Storage.strings */,
 				2FCAE33D1ABB5F1800877008 /* Storage-Bridging-Header.h */,
 				D37DE2821CA2047500A5EC69 /* CertStore.swift */,
@@ -6282,7 +6279,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				0AC0D3C2233E889D0091EFA5 /* Storage.strings in Resources */,
-				0AC0D3C3233E889D0091EFA5 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7516,17 +7512,9 @@
 				0AB70C6A23571F4C00E9C2C8 /* zh */,
 				0ACB38EA23571F5600DDC245 /* zh-TW */,
 				4484BAF52654227C0099A205 /* tr */,
+				44F319B326542AEC00AB52C6 /* en */,
 			);
 			name = Storage.strings;
-			sourceTree = "<group>";
-		};
-		0AC0D3C0233E889D0091EFA5 /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				0AC0D3C1233E889D0091EFA5 /* ms */,
-				4484BAF42654227C0099A205 /* tr */,
-			);
-			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
 		27F443F22138843400296C58 /* BraveShareToInfoPlist.strings */ = {

@@ -1,27 +1,27 @@
 /* Button text to confirm PIN */
-"confirmPin" = "Überprüfen";
+"confirmPin" = "Doğrula";
 
 /* Message for touch key modal. */
-"insertKeyMessage" = "Geben Sie Ihren Sicherheitsschlüssel ein für ";
+"insertKeyMessage" = "Şunun için güvenlik anahtarınızı girin ";
 
 /* No comment provided by engineer. */
-"No server found" = "Kein Server gefunden";
+"No server found" = "Sunucu bulunamadı";
 
 /* Placeholder text for PIN */
-"pinPlaceholder" = "Geben Sie Ihre PIN ein";
+"pinPlaceholder" = "PIN'inizi girin";
 
 /* Title for the alert modal when a security key with PIN is inserted. */
-"pinTitle" = "Überprüfung der PIN erforderlich";
+"pinTitle" = "PIN doğrulaması gerekli";
 
 /* Message for selecting security key. */
-"selectKey" = "Scannen oder geben Sie Ihren Sicherheitsschlüssel ein für ";
+"selectKey" = "Güvenlik anahtarınızı taratın veya girin ";
 
 /* Text for touch key modal button. */
-"touchKeyCancel" = "Abbrechen";
+"touchKeyCancel" = "İptal";
 
 /* Message for touch key modal. */
-"touchKeyMessage" = "Berühren Sie Ihre Taste zum Beenden der Anfrage für";
+"touchKeyMessage" = "İsteği tamamlamak için anahtarınıza dokunun ";
 
 /* Title when PIN code is being verified. */
-"verificationPending" = "Überprüfung Ihrer PIN für";
+"verificationPending" = "Şunun için PIN'iniz doğrulanıyor ";
 
