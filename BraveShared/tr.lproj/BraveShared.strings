@@ -26,7 +26,7 @@
 "AdsAndTrackersrBlocked" = "İzleyiciler ve reklamlar engellendi";
 
 /* Shields Ads Stat */
-"AdsrBlocked" = "Reklam \nEngellenmiş";
+"AdsrBlocked" = "Reklam \nEngellendi";
 
 /* Setting to always request the desktop version of a website. */
 "AlwaysRequestDesktopSite" = "Masaüstü Sitesini Her Zaman İste";
@@ -110,7 +110,7 @@
 "AuthPromptAlertCancelButtonTitle" = "İptal";
 
 /* Authentication prompt message with a realm. First parameter is the hostname. Second is the realm string */
-"AuthPromptAlertFormatRealmMessageText" = "@tarafından bir kullanıcı adı ve parola %1$ isteniyor. Site diyor ki: %2$ @";
+"AuthPromptAlertFormatRealmMessageText" = "%1$@ tarafından bir kullanıcı adı ve parola isteniyor. Site diyor ki: %2$@";
 
 /* Authentication prompt log in button */
 "AuthPromptAlertLogInButtonTitle" = "Oturum aç";
@@ -227,7 +227,7 @@
 "BrowserLockCalloutTitle" = "Özel demek özel demektir.";
 
 /* Settings item for clearing browsing history */
-"BrowsingHistory" = "Gözatma Geçmişi";
+"BrowsingHistory" = "Arama Geçmişi";
 
 /* Settings item for clearing the cache */
 "Cache" = "Önbellek";
@@ -326,7 +326,7 @@
 "CustomSearchEngines" = "Özel Arama Motorları";
 
 /* Data Saved Shield Stat */
-"DataSavedStat" = "Tah. Veri \nKaydedilmiş";
+"DataSavedStat" = "Tah. Veri \nMiktarı";
 
 /* DuckDuckGo callout enable action. */
 "DDGCalloutEnable" = "Evet";
@@ -350,7 +350,7 @@
 "defaultBrowserCallout.introPrimaryText" = "Gizliliğinizi korumak için Brave ile tüm bağlantıları açın";
 
 /* Secondary text on default browser popup. */
-"defaultBrowserCallout.introSecondaryText" = "Brave Kalkanları, izleyicileri ve reklamları engeller, veri kaydeder ve ziyaret ettiğiniz her sitede size zaman kazandırır";
+"defaultBrowserCallout.introSecondaryText" = "Brave Kalkanları, izleyicileri ve reklamları engeller, veri kurtarır ve ziyaret ettiğiniz her sitede size zaman kazandırır";
 
 /* Tertiary text on default browser popup screen */
 "defaultBrowserCallout.introTertiaryText" = "Ayarlar'ı açın, Varsayılan Tarayıcı Uygulaması'nı dokunun ve Brave'i seçin.";
@@ -395,7 +395,7 @@
 "Devices" = "Eşitleme zincirindeki cihazlar";
 
 /* Current device model and iOS version copied to clipboard. */
-"DeviceTemplate" = "Aygıt %1$ @ ( %2$ @)";
+"DeviceTemplate" = "Aygıt %1$@ ( %2$@)";
 
 /* Section name for display preferences. */
 "DisplaySettingsSection" = "Göster";
@@ -476,7 +476,7 @@
 "ErrorPagesVisitOnceButton" = "Siteyi yine de ziyaret et";
 
 /* Shields Time Saved Stat */
-"EstTimerSaved" = "Tah. Saat \nKaydedilmiş";
+"EstTimerSaved" = "Tah. Zaman \nMiktarı";
 
 /* %@ will launch an external application */
 "ExternalAppURLAlertMessage" = "%@ harici bir uygulama başlatacak";
@@ -590,7 +590,7 @@
 "learnMore" = "Daha fazla bilgi edinin";
 
 /* Footer label describing when the current login was last modified with the timestamp as the parameter. */
-"LoginDetailLastModifiedCellFormatTitle" = "Son değiştirilen % @";
+"LoginDetailLastModifiedCellFormatTitle" = "Son değiştirilen %@";
 
 /* Label displayed above the password row in Login Detail View. */
 "LoginDetailPasswordCellTitle" = "parola";
@@ -629,7 +629,7 @@
 "MenuItemRevealPasswordTitle" = "Göster";
 
 /* Abbreviation for 'Month', use full word' Month' if this word can't be shortened in your language */
-"monthAbbreviation" = "mo.";
+"monthAbbreviation" = "ay";
 
 /* Bookmark title / Device name */
 "Name" = "Ad";
@@ -740,7 +740,7 @@
 "OtherSettingsSection" = "Diğer Ayarlar";
 
 /* Sync pair device settings section title */
-"Pair" = "Çift";
+"Pair" = "Eşleştir";
 
 /* Error message displayed to user when their confirming passcode doesn't match the first code. */
 "PasscodeConfirmMisMatchErrorText" = "Parolalar eşleşmedi. Yeniden deneyin.";
@@ -749,7 +749,7 @@
 "PasscodeMatchOldErrorText" = "Yeni parola varolan koddan farklı olmalıdır.";
 
 /* Label that says who took a photograph that will be displayed to the user. '%@' is a placeholder and will include be a specific person's name, example 'Bill Gates'. */
-"PhotoBy" = "Fotoğraf : % @";
+"PhotoBy" = "Fotoğraf : %@";
 
 /* Playlist menu item */
 "PlaylistMenuItem" = "Çalma Listesi";
@@ -764,7 +764,7 @@
 "PreviewActionCopyURLActionTitle" = "URL'yi kopyala";
 
 /* Accessibility label, associated to the 3D Touch action on the current tab in the tab tray, used to display a larger preview of the tab. */
-"PreviewFormatAccessibilityLabel" = "% önizlemesi @";
+"PreviewFormatAccessibilityLabel" = "%@ önizlemesi";
 
 /* Settings privacy section title */
 "Privacy" = "Gizlilik";
@@ -941,7 +941,7 @@
 "SearchSettingSuggestionCellTitle" = "Arama Önerilerini Göster";
 
 /* Accessibility label for image of default search engine displayed left to the actual search suggestions from the engine. The parameter substituted for \"%@\" is the name of the search engine. E.g.: Search suggestions from Google */
-"SearchSuggestionFromFormatText" = "% 'den arama önerileri @";
+"SearchSuggestionFromFormatText" = "%@ 'den arama önerileri";
 
 /* Settings security section title */
 "Security" = "Güvenlik";
@@ -1265,7 +1265,7 @@
 "TabTrayEmptyVoiceOverText" = "Sekme yok";
 
 /* Message spoken by VoiceOver saying the range of tabs that are currently visible in Tabs Tray, along with the total number of tabs. E.g. \"Tabs 8 to 10 of 15\" says tabs 8, 9 and 10 are visible, out of 15 tabs total. */
-"TabTrayMultiTabPositionFormatVoiceOverText" = "%1$Sekme @ için %2$ @ of %3$ @";
+"TabTrayMultiTabPositionFormatVoiceOverText" = "Sekme %1$@'ten %2$@'a %3$@ içinde";
 
 /* Accessibility label for the New Tab button in the tab toolbar. */
 "TabTrayNewTabButtonAccessibilityLabel" = "Yeni Sekme";
@@ -1328,7 +1328,7 @@
 "UseRegionalAdblock" = "Bölgesel reklam engellemesi kullanma";
 
 /* Version number of Brave shown in settings */
-"VersionTemplate" = "Sürüm %1$ @ ( %2$ @)";
+"VersionTemplate" = "Sürüm %1$@ ( %2$@)";
 
 /* Label that says where to view an item. '%@' is a placeholder and will include things like 'Instagram', 'unsplash'. The full label will look like 'View  on Instagram'. */
 "ViewOn" = "% üzerinde görüntüle @";

@@ -41,10 +41,10 @@
 "BraveShieldsToggleHint" = "Brave Kalkanları'nı değiştirmek için iki kez dokunun";
 
 /* Button title for Adding Engine in navigation Bar */
-"customSearchEngine.addButtonTitle" = "eklemek";
+"customSearchEngine.addButtonTitle" = "Ekle";
 
 /* Label explaining how to add search engine. */
-"customSearchEngine.addEngineDescription" = "Arama URL'sini yazın ve sorguyu %1$s ile değiştirin.\nÖrneğin: https://youtube.com/search?q= %2$s \n(Site OpenSearch'i destekliyorsa, bu alan düzenlenirken otomatik olarak ekleme seçeneği sağlanır.)";
+"customSearchEngine.addEngineDescription" = "Arama URL'sini yazın ve sorguyu %s ile değiştirin.\\nÖrneğin: https://youtube.com/search?q= %s \\n(Site OpenSearch'i destekliyorsa, bu alan düzenlenirken otomatik olarak ekleme seçeneği sağlanır.)";
 
 /* Button title for Auto Add in header */
 "customSearchEngine.autoAddTitle" = "Otomatik Ekle";
