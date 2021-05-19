@@ -237,29 +237,6 @@ window.__firefox__.includeOnce("$<Playlist>", function() {
             $<notifyNodeSource>(node, node.src, node.type);
         }
 
-        /*function $<observeDynamicElements>(node) {
-            var original = node.createElement;
-            node.createElement = function (tag) {
-                if (tag === 'audio' || tag === 'video') {
-                    var result = original.call(node, tag);
-                    $<notifyNode>(result);
-                    return result;
-                }
-                return original.call(node, tag);
-            };
-            
-            var originalAppend = Node.prototype.appendChild;
-            Node.prototype.appendChild = function(child) {
-                if (child.constructor.name == "HTMLVideoElement" || child.constructor.name == "HTMLAudioElement") {
-                    var result = originalAppend.call(this, child);
-                    $<notifyNode>(result);
-                    return result;
-                }
-                
-                return originalAppend.call(this, child);
-            }
-        }*/
-
         function $<getAllVideoElements>() {
             return document.querySelectorAll('video');
         }
@@ -277,9 +254,6 @@ window.__firefox__.includeOnce("$<Playlist>", function() {
         }
         
         function $<observePage>() {
-            //$<observeDynamicElements>(document);
-
-            
             Object.defineProperty(HTMLVideoElement.prototype, 'src', {
                 enumerable: true,
                 configurable: false,
