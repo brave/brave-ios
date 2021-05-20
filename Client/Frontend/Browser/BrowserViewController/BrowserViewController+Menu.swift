@@ -23,17 +23,17 @@ extension BrowserViewController {
     
     func destinationMenuSection(_ menuController: MenuViewController) -> some View {
         VStack(spacing: 0) {
-            MenuItemButton(icon: #imageLiteral(resourceName: "menu_bookmarks").template, title: Strings.bookmarksMenuItem) {
+            MenuItemButton(icon: #imageLiteral(resourceName: "menu_bookmarks").template, title: Strings.bookmarksMenuItem) { [unowned menuController] in
                 let vc = BookmarksViewController(folder: Bookmarkv2.lastVisitedFolder(), isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing)
                 vc.toolbarUrlActionsDelegate = self
                 menuController.presentInnerMenu(vc)
             }
-            MenuItemButton(icon: #imageLiteral(resourceName: "menu-history").template, title: Strings.historyMenuItem) {
+            MenuItemButton(icon: #imageLiteral(resourceName: "menu-history").template, title: Strings.historyMenuItem) { [unowned menuController] in
                 let vc = HistoryViewController(isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing)
                 vc.toolbarUrlActionsDelegate = self
                 menuController.pushViewController(vc, animated: true)
             }
-            MenuItemButton(icon: #imageLiteral(resourceName: "menu-downloads").template, title: Strings.downloadsMenuItem) {
+            MenuItemButton(icon: #imageLiteral(resourceName: "menu-downloads").template, title: Strings.downloadsMenuItem) { [unowned menuController] in
                 let vc = DownloadsPanel(profile: self.profile)
                 menuController.pushViewController(vc, animated: true)
             }
@@ -44,7 +44,7 @@ extension BrowserViewController {
                     self.present(playlistController, animated: true)
                 }
             }
-            MenuItemButton(icon: #imageLiteral(resourceName: "menu-settings").template, title: Strings.settingsMenuItem) {
+            MenuItemButton(icon: #imageLiteral(resourceName: "menu-settings").template, title: Strings.settingsMenuItem) { [unowned menuController] in
                 let vc = SettingsViewController(profile: self.profile, tabManager: self.tabManager, feedDataSource: self.feedDataSource, rewards: self.rewards, legacyWallet: self.legacyWallet)
                 vc.settingsDelegate = self
                 menuController.pushViewController(vc, animated: true)
