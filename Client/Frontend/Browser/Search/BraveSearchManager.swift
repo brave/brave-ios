@@ -43,6 +43,16 @@ class BraveSearchManager {
     static func handleAuthChallenge(_ challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         let authMethod = challenge.protectionSpace.authenticationMethod
         if authMethod == NSURLAuthenticationMethodDefault || authMethod == NSURLAuthenticationMethodHTTPBasic || authMethod == NSURLAuthenticationMethodHTTPDigest {
+            
+            // Use previous credentials
+            if let proposedCredential = challenge.proposedCredential {
+                if !(proposedCredential.user?.isEmpty ?? true) && challenge.previousFailureCount == 0 {
+                    completionHandler(.useCredential, proposedCredential)
+                    return
+                }
+            }
+            
+            // Remove bad credentials
             if challenge.previousFailureCount > 0, let proposedCredential = challenge.proposedCredential {
                 URLCredentialStorage.shared.remove(proposedCredential, for: challenge.protectionSpace)
             }
