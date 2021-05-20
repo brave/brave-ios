@@ -32,10 +32,10 @@ class BraveSearchManager {
     }
     
     static func credentials(for url: URL) -> [String: URLCredential]? {
-        let protectionSpace = URLProtectionSpace(host: url.domainURL.baseDomain ?? url.domainURL.host ?? url.domainURL.absoluteString,
+        let protectionSpace = URLProtectionSpace(host: url.domainURL.host ?? url.domainURL.baseDomain ?? url.domainURL.absoluteString,
                                                  port: 443,
                                                  protocol: "https",
-                                                 realm: "Restricted",
+                                                 realm: "Restricted Content",
                                                  authenticationMethod: NSURLAuthenticationMethodHTTPBasic)
         return URLCredentialStorage.shared.credentials(for: protectionSpace)
     }
