@@ -16,10 +16,10 @@ struct PlaylistMenuButton: View {
     var fill: some View {
         if isAdded {
             Color(.braveSuccessLabel)
-                .transition(.opacity.animation(.default))
+                .transition(AnyTransition.opacity.animation(.default))
         } else {
             LinearGradient(braveGradient: colorScheme == .dark ? .darkGradient02 : .lightGradient02)
-                .transition(.opacity.animation(.default))
+                .transition(AnyTransition.opacity.animation(.default))
         }
     }
     
