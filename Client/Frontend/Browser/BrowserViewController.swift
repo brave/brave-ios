@@ -114,7 +114,6 @@ class BrowserViewController: UIViewController {
 
     var pendingToast: Toast? // A toast that might be waiting for BVC to appear before displaying
     var downloadToast: DownloadToast? // A toast that is showing the combined download progress
-    var playlistToast: PlaylistToast? // A toast displayed when a playlist item is updated or added
     var addToPlayListActivityItem: (enabled: Bool, item: PlaylistInfo?)? // A boolean to determine If AddToListActivity should be added
     var openInPlaylistActivityItem: (enabled: Bool, item: PlaylistInfo?)? // A boolean to determine if OpenInPlaylistActivity should be shown
 
@@ -467,7 +466,7 @@ class BrowserViewController: UIViewController {
             toolbar?.setSearchButtonState(url: tabManager.selectedTab?.url)
             footer.addSubview(toolbar!)
             toolbar?.tabToolbarDelegate = self
-
+            toolbar?.menuButton.setBadges(Array(topToolbar.menuButton.badges.keys))
             updateTabCountUsingTabManager(self.tabManager)
         }
 
@@ -1578,31 +1577,6 @@ class BrowserViewController: UIViewController {
             tab?.switchUserAgent()
         }
         
-        let addToPlayListActivity = AddToPlaylistActivity() { [unowned self] in
-            guard let item = self.addToPlayListActivityItem?.item else { return }
-            
-            // Update playlist with new items..
-            self.addToPlaylist(item: item) { [weak self] didAddItem in
-                guard let self = self else { return }
-                
-                log.debug("Playlist Item Added")
-                self.showPlaylistToast(info: item, itemState: .added)
-                UIImpactFeedbackGenerator(style: .medium).bzzt()
-                
-            }
-        }
-        
-        let openInPlayListActivity = OpenInPlaylistActivity() { [unowned self] in
-            guard let item = self.openInPlaylistActivityItem?.item else { return }
-            
-            // Update playlist with new items..
-            self.openInPlaylist(item: item) {
-                log.debug("Playlist Item Opened")
-                UIImpactFeedbackGenerator(style: .medium).bzzt()
-                
-            }
-        }
-        
         var activities: [UIActivity] = [findInPageActivity]
         
         // These actions don't apply if we're sharing a temporary document
@@ -1709,10 +1683,6 @@ class BrowserViewController: UIViewController {
             }
                 
             activities.append(addSearchEngineActivity)
-        }
-
-        if let playListActivityItem = addToPlayListActivityItem, playListActivityItem.enabled {
-            activities.append(addToPlayListActivity)
         }
       
         return activities
@@ -2830,8 +2800,6 @@ extension BrowserViewController: PreferencesObserver {
             backgroundDataSource.startFetching()
         case Preferences.Playlist.webMediaSourceCompatibility.key:
             if UIDevice.isIpad {
-                playlistToast?.dismiss(false)
-                
                 tabManager.allTabs.forEach {
                     $0.userScriptManager?.isWebCompatibilityMediaSourceAPIEnabled = Preferences.Playlist.webMediaSourceCompatibility.value
                     $0.webView?.reload()

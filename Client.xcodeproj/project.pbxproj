@@ -325,7 +325,7 @@
 		278C468E23F1E6270083347F /* BraveUI.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 278C468623F1E6270083347F /* BraveUI.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		278C469523F1E8620083347F /* LoaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 271DECAD234CC7EF009DAC37 /* LoaderView.swift */; };
 		278C469623F1E8620083347F /* ActionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 271DECAE234CC7EF009DAC37 /* ActionButton.swift */; };
-		278C469723F1E8620083347F /* Button.swift in Sources */ = {isa = PBXBuildFile; fileRef = 271DECB4234CC7EF009DAC37 /* Button.swift */; };
+		278C469723F1E8620083347F /* BraveButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 271DECB4234CC7EF009DAC37 /* BraveButton.swift */; };
 		278C46A023F1ED340083347F /* LinkLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 271DECA7234CC7EF009DAC37 /* LinkLabel.swift */; };
 		278C46A323F1EDAB0083347F /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 278C46A223F1EDAB0083347F /* Colors.swift */; };
 		278C46A923F216CE0083347F /* AdvancedControlsBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 278C46A823F216CE0083347F /* AdvancedControlsBarView.swift */; };
@@ -365,6 +365,9 @@
 		27AE35F625E470C000E795E5 /* PanModal in Frameworks */ = {isa = PBXBuildFile; productRef = 27AE35F525E470C000E795E5 /* PanModal */; };
 		27AE360D25E55AA200E795E5 /* MenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27AE360C25E55AA200E795E5 /* MenuViewController.swift */; };
 		27B16C5924E1D72600E0CF2C /* NewTabPageFeedOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27B16C5824E1D72600E0CF2C /* NewTabPageFeedOverlayView.swift */; };
+		27B33D542655606200F3D274 /* PlaylistMenuButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27B33D532655606200F3D274 /* PlaylistMenuButton.swift */; };
+		27B33D5826556E7300F3D274 /* BraveButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27B33D5726556E7300F3D274 /* BraveButtonStyle.swift */; };
+		27B33D782656B20A00F3D274 /* MenuButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27B33D772656B20A00F3D274 /* MenuButton.swift */; };
 		27B3DDD024AE83710006A7ED /* FeedSourceOverride.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27B3DDCF24AE83710006A7ED /* FeedSourceOverride.swift */; };
 		27B3DDD524AF98EA0006A7ED /* FeedItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27B3DDD424AF98EA0006A7ED /* FeedItem.swift */; };
 		27B68DE425C48F36002D0826 /* BraveRewards.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27B68DD725C48EE9002D0826 /* BraveRewards.xcframework */; };
@@ -452,7 +455,6 @@
 		2FD0E3D62577F327000C773B /* SearchSuggestionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FD0E3D52577F327000C773B /* SearchSuggestionCell.swift */; };
 		2FD1C61C2639AE9100E3C25F /* BrowserViewController+Onboarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FD1C61B2639AE9100E3C25F /* BrowserViewController+Onboarding.swift */; };
 		2FDB10931A9FBEC5006CF312 /* PrefsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FDB10921A9FBEC5006CF312 /* PrefsTests.swift */; };
-		2FDF290825DEE265001E5C87 /* AddToPlaylistActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FDF290725DEE265001E5C87 /* AddToPlaylistActivity.swift */; };
 		2FE5B42B2580216700BFDDB8 /* ShareTrackersController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FE5B42A2580216700BFDDB8 /* ShareTrackersController.swift */; };
 		2FE63DB8258BCC29004B219D /* BrowserViewController+OpenSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FE63DB7258BCC29004B219D /* BrowserViewController+OpenSearch.swift */; };
 		2FEA1613259CDFE800E00E4D /* SearchCustomEngineViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FEA1612259CDFE800E00E4D /* SearchCustomEngineViewController.swift */; };
@@ -737,7 +739,6 @@
 		5E824A96260BCE0D00127F36 /* MainFrameAtDocumentStart.js in Resources */ = {isa = PBXBuildFile; fileRef = 5E824A94260BCE0D00127F36 /* MainFrameAtDocumentStart.js */; };
 		5E8CD8E123D5E3DA00548FC0 /* libarchive.2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E8CD8E023D5E3D100548FC0 /* libarchive.2.tbd */; };
 		5E9288CA22DF864C007BE7A6 /* TabSessionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E9288C922DF864C007BE7A6 /* TabSessionTests.swift */; };
-		5E99CAB025CC610B003F30B4 /* PlaylistToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E99CAAF25CC610B003F30B4 /* PlaylistToast.swift */; };
 		5E99D01525E56BFB003F30B4 /* PlaylistManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E99C88A25C83BE3003F30B4 /* PlaylistManager.swift */; };
 		5E99D02025E56C15003F30B4 /* PlaylistDownloadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E99CDEF25DD8C81003F30B4 /* PlaylistDownloadManager.swift */; };
 		5E99D02B25E56C18003F30B4 /* HLSThumbnailGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E99CDAC25DC70E6003F30B4 /* HLSThumbnailGenerator.swift */; };
@@ -1584,7 +1585,7 @@
 		271DECA7234CC7EF009DAC37 /* LinkLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LinkLabel.swift; sourceTree = "<group>"; };
 		271DECAD234CC7EF009DAC37 /* LoaderView.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = LoaderView.swift; sourceTree = "<group>"; tabWidth = 2; };
 		271DECAE234CC7EF009DAC37 /* ActionButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActionButton.swift; sourceTree = "<group>"; };
-		271DECB4234CC7EF009DAC37 /* Button.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Button.swift; sourceTree = "<group>"; };
+		271DECB4234CC7EF009DAC37 /* BraveButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BraveButton.swift; sourceTree = "<group>"; };
 		271DECB5234CC7EF009DAC37 /* BasicAnimationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BasicAnimationController.swift; sourceTree = "<group>"; };
 		271DECB8234CC7EF009DAC37 /* UITableViewExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UITableViewExtensions.swift; sourceTree = "<group>"; };
 		271DECBA234CC7EF009DAC37 /* UIStackViewExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIStackViewExtensions.swift; sourceTree = "<group>"; };
@@ -1823,6 +1824,9 @@
 		27AC7CF924C77EBC00441317 /* FeedActionAlertView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedActionAlertView.swift; sourceTree = "<group>"; };
 		27AE360C25E55AA200E795E5 /* MenuViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuViewController.swift; sourceTree = "<group>"; };
 		27B16C5824E1D72600E0CF2C /* NewTabPageFeedOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageFeedOverlayView.swift; sourceTree = "<group>"; };
+		27B33D532655606200F3D274 /* PlaylistMenuButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistMenuButton.swift; sourceTree = "<group>"; };
+		27B33D5726556E7300F3D274 /* BraveButtonStyle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BraveButtonStyle.swift; sourceTree = "<group>"; };
+		27B33D772656B20A00F3D274 /* MenuButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuButton.swift; sourceTree = "<group>"; };
 		27B3DDCF24AE83710006A7ED /* FeedSourceOverride.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedSourceOverride.swift; sourceTree = "<group>"; };
 		27B3DDD424AF98EA0006A7ED /* FeedItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedItem.swift; sourceTree = "<group>"; };
 		27B68DD625C48EE9002D0826 /* MaterialComponents.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = MaterialComponents.xcframework; path = "node_modules/brave-core-ios/MaterialComponents.xcframework"; sourceTree = "<group>"; };
@@ -1907,7 +1911,6 @@
 		2FD0E3D52577F327000C773B /* SearchSuggestionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchSuggestionCell.swift; sourceTree = "<group>"; };
 		2FD1C61B2639AE9100E3C25F /* BrowserViewController+Onboarding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowserViewController+Onboarding.swift"; sourceTree = "<group>"; };
 		2FDB10921A9FBEC5006CF312 /* PrefsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrefsTests.swift; sourceTree = "<group>"; };
-		2FDF290725DEE265001E5C87 /* AddToPlaylistActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddToPlaylistActivity.swift; sourceTree = "<group>"; };
 		2FE5B42A2580216700BFDDB8 /* ShareTrackersController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareTrackersController.swift; sourceTree = "<group>"; };
 		2FE63DB7258BCC29004B219D /* BrowserViewController+OpenSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowserViewController+OpenSearch.swift"; sourceTree = "<group>"; };
 		2FEA1612259CDFE800E00E4D /* SearchCustomEngineViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchCustomEngineViewController.swift; sourceTree = "<group>"; };
@@ -2357,7 +2360,6 @@
 		5E8CD8E023D5E3D100548FC0 /* libarchive.2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libarchive.2.tbd; path = usr/lib/libarchive.2.tbd; sourceTree = SDKROOT; };
 		5E9288C922DF864C007BE7A6 /* TabSessionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabSessionTests.swift; sourceTree = "<group>"; };
 		5E99C88A25C83BE3003F30B4 /* PlaylistManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistManager.swift; sourceTree = "<group>"; };
-		5E99CAAF25CC610B003F30B4 /* PlaylistToast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistToast.swift; sourceTree = "<group>"; };
 		5E99CDAC25DC70E6003F30B4 /* HLSThumbnailGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HLSThumbnailGenerator.swift; sourceTree = "<group>"; };
 		5E99CDEF25DD8C81003F30B4 /* PlaylistDownloadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistDownloadManager.swift; sourceTree = "<group>"; };
 		5E9B28EA255047C80072E655 /* BookmarkModelStateObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkModelStateObserver.swift; sourceTree = "<group>"; };
@@ -3665,7 +3667,7 @@
 		278C469423F1E84C0083347F /* Buttons */ = {
 			isa = PBXGroup;
 			children = (
-				271DECB4234CC7EF009DAC37 /* Button.swift */,
+				271DECB4234CC7EF009DAC37 /* BraveButton.swift */,
 				271DECAE234CC7EF009DAC37 /* ActionButton.swift */,
 				271DECAD234CC7EF009DAC37 /* LoaderView.swift */,
 				276A7909244660B100AC9446 /* SpringButton.swift */,
@@ -4550,6 +4552,7 @@
 		5E2A74CD262E14C200DBBE88 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				27B33D5726556E7300F3D274 /* BraveButtonStyle.swift */,
 				5E2A74CE262E14E500DBBE88 /* GradientView.swift */,
 			);
 			path = Views;
@@ -4563,7 +4566,6 @@
 				5E5E6E4425BA04120035B6A0 /* VideoPlayer */,
 				5E5E6E3925BA03510035B6A0 /* PlaylistViewController.swift */,
 				5E5E6F1425BA8DD70035B6A0 /* PlaylistMediaInfo.swift */,
-				5E99CAAF25CC610B003F30B4 /* PlaylistToast.swift */,
 				5E824A33260BC6CA00127F36 /* BrowserViewController+Playlist.swift */,
 			);
 			path = Playlist;
@@ -4661,6 +4663,7 @@
 				0AEF99A822E22C5E00294C76 /* DownloadsViewController.swift */,
 				27AE360C25E55AA200E795E5 /* MenuViewController.swift */,
 				277E94F125F834240001926E /* VPNMenuButton.swift */,
+				27B33D532655606200F3D274 /* PlaylistMenuButton.swift */,
 			);
 			path = Menu;
 			sourceTree = "<group>";
@@ -4833,6 +4836,7 @@
 				D38A1BEC1A9FA2CA00F6A386 /* SiteTableViewController.swift */,
 				0BB5B2861AC0A2B90052877D /* SnackBar.swift */,
 				E660BDD81BB06521009AC090 /* TabsButton.swift */,
+				27B33D772656B20A00F3D274 /* MenuButton.swift */,
 				7B844E3C1BBDDB9D00E733A2 /* ChevronView.swift */,
 				C4E3984B1D21F2FD004E89BA /* TabTrayButtonExtensions.swift */,
 				5D26E89C22E117660015D7E9 /* Themes */,
@@ -4854,7 +4858,6 @@
 				2703BE8A24F4508E00CBE6CD /* CreatePDFActivity.swift */,
 				2760056525D1FFF500D47A75 /* AddFeedToBraveTodayActivity.swift */,
 				2F198EE72603FDD900945AB3 /* AddSearchEngineActivity.swift */,
-				2FDF290725DEE265001E5C87 /* AddToPlaylistActivity.swift */,
 			);
 			path = Share;
 			sourceTree = "<group>";
@@ -6488,6 +6491,7 @@
 				279CC2C4260CEFE7009B3895 /* TableCellButtonStyle.swift in Sources */,
 				276A790A244660B100AC9446 /* SpringButton.swift in Sources */,
 				278C46A023F1ED340083347F /* LinkLabel.swift in Sources */,
+				27B33D5826556E7300F3D274 /* BraveButtonStyle.swift in Sources */,
 				27953F7423F5B04500B4B595 /* ViewLabel.swift in Sources */,
 				278C46B123F4A91D0083347F /* PopoverContentComponent.swift in Sources */,
 				278C46AF23F4A91C0083347F /* PopoverController.swift in Sources */,
@@ -6501,7 +6505,7 @@
 				278C46A323F1EDAB0083347F /* Colors.swift in Sources */,
 				276A790C244660B500AC9446 /* UICollectionViewExtensions.swift in Sources */,
 				278C469523F1E8620083347F /* LoaderView.swift in Sources */,
-				278C469723F1E8620083347F /* Button.swift in Sources */,
+				278C469723F1E8620083347F /* BraveButton.swift in Sources */,
 				279CC2B0260CEB5D009B3895 /* ActivityIndicatorView.swift in Sources */,
 				278C469623F1E8620083347F /* ActionButton.swift in Sources */,
 				278C46B623F4A9CF0083347F /* BasicAnimationController.swift in Sources */,
@@ -6740,6 +6744,7 @@
 			files = (
 				E640E86A1C73A47C00C5F072 /* PasscodeViews.swift in Sources */,
 				0ABA874320E68CF500D2694F /* SessionData.swift in Sources */,
+				27B33D782656B20A00F3D274 /* MenuButton.swift in Sources */,
 				D029A04920A62DB0001DB72F /* TemporaryDocument.swift in Sources */,
 				D38F02D11C05127100175932 /* Authenticator.swift in Sources */,
 				E68E7ADC1CAC208200FDCA76 /* SetupPasscodeViewController.swift in Sources */,
@@ -6891,7 +6896,6 @@
 				4452CAF0255412800053EFE6 /* DefaultBrowserIntroCalloutViewController.swift in Sources */,
 				0BB5B2881AC0A2B90052877D /* SnackBar.swift in Sources */,
 				27A1AC0224855C1700344503 /* FeedItemView.swift in Sources */,
-				5E99CAB025CC610B003F30B4 /* PlaylistToast.swift in Sources */,
 				27036F9B25684F9F004EF6B6 /* AdsNotificationHandler.swift in Sources */,
 				7BEFC6801BFF68C30059C952 /* QuickActions.swift in Sources */,
 				0A0D3D5221A565C300BEE65B /* SafeBrowsingHandler.swift in Sources */,
@@ -6978,7 +6982,6 @@
 				4422D4C621BFFB7600BF1855 /* env_posix.cc in Sources */,
 				D0625CA8208FC47A0081F3B2 /* BrowserViewController+DownloadQueueDelegate.swift in Sources */,
 				2F44FCC71A9E8CF500FD20CC /* SearchSettingsTableViewController.swift in Sources */,
-				2FDF290825DEE265001E5C87 /* AddToPlaylistActivity.swift in Sources */,
 				273FCB9A25A7BC5500F279B5 /* BraveTodayDebugSettingsController.swift in Sources */,
 				39A359E41BFCCE94006B9E87 /* UserActivityHandler.swift in Sources */,
 				0AF6B1EA24A0EE19005417FC /* InstallVPNView.swift in Sources */,
@@ -7045,6 +7048,7 @@
 				0AADC4D520D2A6A200FDE368 /* PreloadedFavorites.swift in Sources */,
 				0AC77602242A6AE000139377 /* BuyVPNView.swift in Sources */,
 				2F45B40A263AF1C20033A594 /* BrowserViewController+ToolbarDelegate.swift in Sources */,
+				27B33D542655606200F3D274 /* PlaylistMenuButton.swift in Sources */,
 				278C467823EDF0060083347F /* SimpleShieldsView.swift in Sources */,
 				5D24AF8421BA489A00F9506A /* ContentBlocker.swift in Sources */,
 				27829DE92548AA4F007CF0B2 /* BraveRewardsViewController.swift in Sources */,

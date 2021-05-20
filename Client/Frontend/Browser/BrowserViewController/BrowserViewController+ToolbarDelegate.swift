@@ -463,7 +463,7 @@ extension BrowserViewController: ToolbarDelegate {
                 destinationMenuSection(menuController)
                 if let tabURL = selectedTabURL {
                     Divider()
-                    activitiesMenuSection(menuController, tabURL: tabURL, activities: activities)
+                    PageActionsMenuSection(browserViewController: self, tabURL: tabURL, activities: activities)
                 }
             }
         })
