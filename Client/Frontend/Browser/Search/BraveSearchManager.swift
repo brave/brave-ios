@@ -11,7 +11,7 @@ import WebKit
 
 private let log = Logger.browserLogger
 
-class BraveSearchManager {
+class BraveSearchManager: NSObject {
     struct CanAnswerResponse: Codable {
         let found: Bool
     }
@@ -23,160 +23,13 @@ class BraveSearchManager {
     var queryResult: String?
     
     private var cancellables: Set<AnyCancellable> = []
+    private static var cachedCredentials: URLCredential?
     
     static func isValidURL(_ url: URL) -> Bool {
         let validURLs = AppConstants.buildChannel.isPublic ?
             ["search.brave.com"] : ["search.brave.com", "search-dev.brave.com"]
         
         return validURLs.contains(url.host ?? "")
-    }
-    
-    static func credentials(for url: URL) -> [String: URLCredential]? {
-        let protectionSpace = URLProtectionSpace(host: url.domainURL.host ?? url.domainURL.baseDomain ?? url.domainURL.absoluteString,
-                                                 port: 443,
-                                                 protocol: "https",
-                                                 realm: "Restricted Content",
-                                                 authenticationMethod: NSURLAuthenticationMethodHTTPBasic)
-        return URLCredentialStorage.shared.credentials(for: protectionSpace)
-    }
-    
-    static func canHandleAuthChallenge(_ challenge: URLAuthenticationChallenge) -> Bool {
-        let validURLs = AppConstants.buildChannel.isPublic ?
-            ["search.brave.com"] : ["search.brave.com", "search-dev.brave.com"]
-        
-        if !validURLs.contains(challenge.protectionSpace.host) {
-            return false
-        }
-        
-        let validAuthenticationMethods = [NSURLAuthenticationMethodDefault,
-                                          NSURLAuthenticationMethodHTTPBasic,
-                                          NSURLAuthenticationMethodHTTPDigest,
-                                          NSURLAuthenticationMethodNTLM,
-                                          NSURLAuthenticationMethodServerTrust]
-        return validAuthenticationMethods.contains(challenge.protectionSpace.authenticationMethod)
-    }
-    
-    static func handleAuthChallenge(_ challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        // Validate the host/domain & authentication method
-        guard canHandleAuthChallenge(challenge) else {
-            // We should ALWAYS be able to handle this challenge
-            log.error("Invalid Host or authentication type")
-            completionHandler(.cancelAuthenticationChallenge, nil)
-            return
-        }
-        
-        // -- Handle Server Trust authentication
-        if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust {
-            // * sigh * - To truly validate server trust, we should be validating the certificate as well
-            // Unfortunately, we won't be pinning this certificate, so we should at least do bare minimum validation
-            // Do NOT allow self-signed certificate anchoring
-            // Only validate policies and host
-            if let serverTrust = challenge.protectionSpace.serverTrust {
-                do {
-                    // Default Validation
-                    guard SecTrustSetPolicies(serverTrust, SecPolicyCreateSSL(true, nil)) == errSecSuccess else {
-                        throw "Trust Set Policies Failed"
-                    }
-                    
-                    var err: CFError?
-                    if !SecTrustEvaluateWithError(serverTrust, &err) {
-                        if let err = err as Error? {
-                            throw "Trust Evaluation Failed: \(err)"
-                        }
-                        
-                        throw "Unable to Evaluate Trust"
-                    }
-                    
-                    // Host Validation
-                    guard SecTrustSetPolicies(serverTrust, SecPolicyCreateSSL(true, challenge.protectionSpace.host as CFString)) == errSecSuccess else {
-                        throw "Trust Set Policies for Host Failed"
-                    }
-                    
-                    if !SecTrustEvaluateWithError(serverTrust, &err) {
-                        if let err = err as Error? {
-                            throw "Trust Evaluation Failed: \(err)"
-                        }
-                        
-                        throw "Unable to Evaluate Trust"
-                    }
-                    
-                    // No pinning of certificate against the trust chain, so just continue on and use the trust credential
-                    completionHandler(.useCredential, URLCredential(trust: serverTrust))
-                    return
-                } catch {
-                    log.error("Error Validation Server Trust for Host: \(challenge.protectionSpace.host) - Error Message: \(error)")
-                }
-            }
-            
-            // Either we don't have a trust, or trust validation failed
-            completionHandler(.cancelAuthenticationChallenge, nil)
-            return
-        }
-        
-        // -- Handle all other forms of authentication
-        
-        // Use previous credentials
-        if let proposedCredential = challenge.proposedCredential {
-            if !(proposedCredential.user?.isEmpty ?? true) && challenge.previousFailureCount == 0 {
-                completionHandler(.useCredential, proposedCredential)
-                return
-            }
-        }
-        
-        // Remove bad credentials
-        if challenge.previousFailureCount > 0, let proposedCredential = challenge.proposedCredential {
-            URLCredentialStorage.shared.remove(proposedCredential, for: challenge.protectionSpace)
-        }
-        
-        if let credentials = URLCredentialStorage.shared.credentials(for: challenge.protectionSpace) {
-            if credentials.count == 1, let credential = credentials.first?.value {
-                completionHandler(.useCredential, credential)
-                return
-            }
-            
-            // Destroy all credentials. There should only ever be ONE set stored
-            credentials.forEach({
-                URLCredentialStorage.shared.remove($0.value, for: challenge.protectionSpace)
-            })
-        }
-        
-        let alert = UIAlertController(title: challenge.protectionSpace.host,
-                                   message: "This page requires authentication",
-                                   preferredStyle: .alert)
-        alert.addTextField {
-            $0.placeholder = "User"
-        }
-        
-        alert.addTextField {
-            $0.placeholder = "Password"
-            $0.isSecureTextEntry = true
-        }
-        
-        alert.addAction(UIAlertAction(title: "Submit", style: .default, handler: { _ in
-            guard let user = alert.textFields?.first?.text,
-                  let password = alert.textFields?.last?.text else {
-                completionHandler(.cancelAuthenticationChallenge, nil)
-                return
-            }
-            
-            // User CANNOT contain a colon
-            guard !user.contains(":") else {
-                completionHandler(.cancelAuthenticationChallenge, nil)
-                return
-            }
-            
-            let credential = URLCredential(user: user, password: password, persistence: .forSession) // permanent?
-            
-            // Store the credential potentially. If it doesn't work and challenge failed, we'll destroy it anyway.
-            URLCredentialStorage.shared.setDefaultCredential(credential, for: challenge.protectionSpace)
-            completionHandler(.useCredential, credential)
-        }))
-        
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { _ in
-            completionHandler(.cancelAuthenticationChallenge, nil)
-        }))
-        
-        (UIApplication.shared.delegate as? AppDelegate)?.browserViewController.present(alert, animated: true, completion: nil)
     }
     
     init?(url: URL) {
@@ -201,20 +54,7 @@ class BraveSearchManager {
         var request = URLRequest(url: url,
                                  cachePolicy: .reloadIgnoringLocalAndRemoteCacheData,
                                  timeoutInterval: 5)
-        
-        // There should NEVER be more than one credential, if there is, we have a problem storing failed credentials
-        // Add the credentials we have to the Authorization header of the request
-        if let credentials = BraveSearchManager.credentials(for: url),
-           credentials.count == 1,
-           let credentialPair = credentials.first {
-            
-            let user = credentialPair.value.user ?? credentialPair.key
-            let password = credentialPair.value.password ?? ""
-            
-            let auth = String(format: "%@:%@", user, password).toBase64()
-            request.addValue("Basic \(auth)", forHTTPHeaderField: "Authorization")
-        }
-        
+
         // Doesn't work because this cookie storage is created right there. It is local, not permanent
         let cookieStorage = HTTPCookieStorage()
         cookies.forEach { cookieStorage.setCookie($0) }
@@ -227,7 +67,7 @@ class BraveSearchManager {
             request.setValue($0.key, forHTTPHeaderField: $0.value)
         }
         
-        URLSession(configuration: .ephemeral)
+        URLSession(configuration: .ephemeral, delegate: self, delegateQueue: .main)
             .dataTaskPublisher(for: request)
             .tryMap { output -> CanAnswerResponse in
                 guard let response = output.response as? HTTPURLResponse,
@@ -301,5 +141,96 @@ class BraveSearchManager {
                 completion(data)
             })
             .store(in: &cancellables)
+    }
+}
+
+extension BraveSearchManager: URLSessionDataDelegate {
+    
+    private func findLoginsForProtectionSpace(profile: Profile, challenge: URLAuthenticationChallenge, completion: @escaping (URLCredential?) -> Void) {
+        profile.logins.getLoginsForProtectionSpace(challenge.protectionSpace) >>== { cursor in
+            guard cursor.count >= 1 else {
+                completion(nil)
+                return
+            }
+
+            let logins = cursor.asArray()
+            var credentials: URLCredential?
+
+            if logins.count > 1 {
+                credentials = (logins.find { login in
+                    (login.protectionSpace.`protocol` == challenge.protectionSpace.`protocol`) && !login.hasMalformedHostname
+                })?.credentials
+            } else if logins.count == 1, logins.first?.protectionSpace.`protocol` != challenge.protectionSpace.`protocol` {
+                credentials = logins.first?.credentials
+            } else {
+                credentials = logins.first?.credentials
+            }
+            
+            completion(credentials)
+        }
+    }
+    
+    func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        
+        guard challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic ||
+              challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPDigest ||
+              challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodNTLM else {
+            completionHandler(.performDefaultHandling, nil)
+            return
+        }
+        
+        // There is only ever ONE profile and all tabs share it afaict
+        let profile = { () -> Profile? in
+            if Thread.current.isMainThread {
+                return (UIApplication.shared.delegate as? AppDelegate)?.browserViewController.profile
+            }
+            
+            return DispatchQueue.main.sync {
+                (UIApplication.shared.delegate as? AppDelegate)?.browserViewController.profile
+            }
+        }()
+        
+        if let credentials = BraveSearchManager.cachedCredentials {
+            completionHandler(.useCredential, credentials)
+            return
+        }
+        
+        // -- Handle Authentication --
+        // Too many failed attempts
+        if challenge.previousFailureCount >= 3 {
+            completionHandler(.rejectProtectionSpace, nil)
+            return
+        }
+
+        if let proposedCredential = challenge.proposedCredential,
+           !(proposedCredential.user?.isEmpty ?? true),
+           challenge.previousFailureCount == 0 {
+            completionHandler(.useCredential, proposedCredential)
+            return
+        }
+
+        // Lookup the credentials
+        // If there is no profile or the challenge is not an auth challenge, reject the challenge
+        guard let profile = profile else {
+            completionHandler(.rejectProtectionSpace, nil)
+            return
+        }
+        
+        self.findLoginsForProtectionSpace(profile: profile, challenge: challenge, completion: { credential in
+            if let credential = credential {
+                BraveSearchManager.cachedCredentials = credential
+                
+                completionHandler(.useCredential, credential)
+                return
+            }
+            
+            completionHandler(.rejectProtectionSpace, nil)
+        })
+        return
+    }
+    
+    func urlSession(_ session: URLSession, task: URLSessionTask, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        
+        urlSession(session, didReceive: challenge, completionHandler: completionHandler)
     }
 }

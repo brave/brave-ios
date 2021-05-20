@@ -389,14 +389,6 @@ extension BrowserViewController: WKNavigationDelegate {
             return
         }
         
-        // Brave Search
-        if BraveSearchManager.canHandleAuthChallenge(challenge) {
-            ensureMainThread {
-                BraveSearchManager.handleAuthChallenge(challenge, completionHandler: completionHandler)
-            }
-            return
-        }
-
         guard challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic ||
               challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPDigest ||
               challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodNTLM,
