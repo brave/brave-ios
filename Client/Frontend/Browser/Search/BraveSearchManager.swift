@@ -40,73 +40,143 @@ class BraveSearchManager {
         return URLCredentialStorage.shared.credentials(for: protectionSpace)
     }
     
-    static func handleAuthChallenge(_ challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        let authMethod = challenge.protectionSpace.authenticationMethod
-        if authMethod == NSURLAuthenticationMethodDefault || authMethod == NSURLAuthenticationMethodHTTPBasic || authMethod == NSURLAuthenticationMethodHTTPDigest {
-            
-            // Use previous credentials
-            if let proposedCredential = challenge.proposedCredential {
-                if !(proposedCredential.user?.isEmpty ?? true) && challenge.previousFailureCount == 0 {
-                    completionHandler(.useCredential, proposedCredential)
-                    return
-                }
-            }
-            
-            // Remove bad credentials
-            if challenge.previousFailureCount > 0, let proposedCredential = challenge.proposedCredential {
-                URLCredentialStorage.shared.remove(proposedCredential, for: challenge.protectionSpace)
-            }
-            
-            if let credentials = URLCredentialStorage.shared.credentials(for: challenge.protectionSpace) {
-                if credentials.count == 1, let credential = credentials.first?.value {
-                    completionHandler(.useCredential, credential)
-                    return
-                }
-                
-                // Destroy all credentials. There should only ever be ONE set stored
-                credentials.forEach({
-                    URLCredentialStorage.shared.remove($0.value, for: challenge.protectionSpace)
-                })
-            }
-            
-            let alert = UIAlertController(title: challenge.protectionSpace.host,
-                                       message: "This page requires authentication",
-                                       preferredStyle: .alert)
-            alert.addTextField {
-                $0.placeholder = "User"
-            }
-            
-            alert.addTextField {
-                $0.placeholder = "Password"
-                $0.isSecureTextEntry = true
-            }
-            
-            alert.addAction(UIAlertAction(title: "Submit", style: .default, handler: { _ in
-                guard let user = alert.textFields?.first?.text,
-                      let password = alert.textFields?.last?.text else {
-                    completionHandler(.cancelAuthenticationChallenge, nil)
-                    return
-                }
-                
-                // User CANNOT contain a colon
-                guard !user.contains(":") else {
-                    completionHandler(.cancelAuthenticationChallenge, nil)
-                    return
-                }
-                
-                let credential = URLCredential(user: user, password: password, persistence: .forSession) // permanent?
-                
-                // Store the credential potentially. If it doesn't work and challenge failed, we'll destroy it anyway.
-                URLCredentialStorage.shared.setDefaultCredential(credential, for: challenge.protectionSpace)
-                completionHandler(.useCredential, credential)
-            }))
-            
-            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { _ in
-                completionHandler(.cancelAuthenticationChallenge, nil)
-            }))
-            
-            (UIApplication.shared.delegate as? AppDelegate)?.browserViewController.present(alert, animated: true, completion: nil)
+    static func canHandleAuthChallenge(_ challenge: URLAuthenticationChallenge) -> Bool {
+        let validURLs = AppConstants.buildChannel.isPublic ?
+            ["search.brave.com"] : ["search.brave.com", "search-dev.brave.com"]
+        
+        if !validURLs.contains(challenge.protectionSpace.host) {
+            return false
         }
+        
+        let validAuthenticationMethods = [NSURLAuthenticationMethodDefault,
+                                          NSURLAuthenticationMethodHTTPBasic,
+                                          NSURLAuthenticationMethodHTTPDigest,
+                                          NSURLAuthenticationMethodNTLM,
+                                          NSURLAuthenticationMethodServerTrust]
+        return validAuthenticationMethods.contains(challenge.protectionSpace.authenticationMethod)
+    }
+    
+    static func handleAuthChallenge(_ challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        // Validate the host/domain & authentication method
+        guard canHandleAuthChallenge(challenge) else {
+            // We should ALWAYS be able to handle this challenge
+            log.error("Invalid Host or authentication type")
+            completionHandler(.cancelAuthenticationChallenge, nil)
+            return
+        }
+        
+        // -- Handle Server Trust authentication
+        if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust {
+            // * sigh * - To truly validate server trust, we should be validating the certificate as well
+            // Unfortunately, we won't be pinning this certificate, so we should at least do bare minimum validation
+            // Do NOT allow self-signed certificate anchoring
+            // Only validate policies and host
+            if let serverTrust = challenge.protectionSpace.serverTrust {
+                do {
+                    // Default Validation
+                    guard SecTrustSetPolicies(serverTrust, SecPolicyCreateSSL(true, nil)) == errSecSuccess else {
+                        throw "Trust Set Policies Failed"
+                    }
+                    
+                    var err: CFError?
+                    if !SecTrustEvaluateWithError(serverTrust, &err) {
+                        if let err = err as Error? {
+                            throw "Trust Evaluation Failed: \(err)"
+                        }
+                        
+                        throw "Unable to Evaluate Trust"
+                    }
+                    
+                    // Host Validation
+                    guard SecTrustSetPolicies(serverTrust, SecPolicyCreateSSL(true, challenge.protectionSpace.host as CFString)) == errSecSuccess else {
+                        throw "Trust Set Policies for Host Failed"
+                    }
+                    
+                    if !SecTrustEvaluateWithError(serverTrust, &err) {
+                        if let err = err as Error? {
+                            throw "Trust Evaluation Failed: \(err)"
+                        }
+                        
+                        throw "Unable to Evaluate Trust"
+                    }
+                    
+                    // No pinning of certificate against the trust chain, so just continue on and use the trust credential
+                    completionHandler(.useCredential, URLCredential(trust: serverTrust))
+                    return
+                } catch {
+                    log.error("Error Validation Server Trust for Host: \(challenge.protectionSpace.host) - Error Message: \(error)")
+                }
+            }
+            
+            // Either we don't have a trust, or trust validation failed
+            completionHandler(.cancelAuthenticationChallenge, nil)
+            return
+        }
+        
+        // -- Handle all other forms of authentication
+        
+        // Use previous credentials
+        if let proposedCredential = challenge.proposedCredential {
+            if !(proposedCredential.user?.isEmpty ?? true) && challenge.previousFailureCount == 0 {
+                completionHandler(.useCredential, proposedCredential)
+                return
+            }
+        }
+        
+        // Remove bad credentials
+        if challenge.previousFailureCount > 0, let proposedCredential = challenge.proposedCredential {
+            URLCredentialStorage.shared.remove(proposedCredential, for: challenge.protectionSpace)
+        }
+        
+        if let credentials = URLCredentialStorage.shared.credentials(for: challenge.protectionSpace) {
+            if credentials.count == 1, let credential = credentials.first?.value {
+                completionHandler(.useCredential, credential)
+                return
+            }
+            
+            // Destroy all credentials. There should only ever be ONE set stored
+            credentials.forEach({
+                URLCredentialStorage.shared.remove($0.value, for: challenge.protectionSpace)
+            })
+        }
+        
+        let alert = UIAlertController(title: challenge.protectionSpace.host,
+                                   message: "This page requires authentication",
+                                   preferredStyle: .alert)
+        alert.addTextField {
+            $0.placeholder = "User"
+        }
+        
+        alert.addTextField {
+            $0.placeholder = "Password"
+            $0.isSecureTextEntry = true
+        }
+        
+        alert.addAction(UIAlertAction(title: "Submit", style: .default, handler: { _ in
+            guard let user = alert.textFields?.first?.text,
+                  let password = alert.textFields?.last?.text else {
+                completionHandler(.cancelAuthenticationChallenge, nil)
+                return
+            }
+            
+            // User CANNOT contain a colon
+            guard !user.contains(":") else {
+                completionHandler(.cancelAuthenticationChallenge, nil)
+                return
+            }
+            
+            let credential = URLCredential(user: user, password: password, persistence: .forSession) // permanent?
+            
+            // Store the credential potentially. If it doesn't work and challenge failed, we'll destroy it anyway.
+            URLCredentialStorage.shared.setDefaultCredential(credential, for: challenge.protectionSpace)
+            completionHandler(.useCredential, credential)
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { _ in
+            completionHandler(.cancelAuthenticationChallenge, nil)
+        }))
+        
+        (UIApplication.shared.delegate as? AppDelegate)?.browserViewController.present(alert, animated: true, completion: nil)
     }
     
     init?(url: URL) {

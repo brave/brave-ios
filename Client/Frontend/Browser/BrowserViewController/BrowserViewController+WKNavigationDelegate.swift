@@ -388,6 +388,14 @@ extension BrowserViewController: WKNavigationDelegate {
             completionHandler(.useCredential, URLCredential(trust: trust))
             return
         }
+        
+        // Brave Search
+        if BraveSearchManager.canHandleAuthChallenge(challenge) {
+            ensureMainThread {
+                BraveSearchManager.handleAuthChallenge(challenge, completionHandler: completionHandler)
+            }
+            return
+        }
 
         guard challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic ||
               challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPDigest ||
@@ -405,16 +413,6 @@ extension BrowserViewController: WKNavigationDelegate {
 
         // The challenge may come from a background tab, so ensure it's the one visible.
         tabManager.selectTab(tab)
-        
-        // Brave Search
-        if challenge.protectionSpace.host == "search.brave.com" {
-            ensureMainThread {
-                // Could also use Authenticator.handleAuthRequest like below,
-                // but depends if we want to prompt the user with the same alert
-                BraveSearchManager.handleAuthChallenge(challenge, completionHandler: completionHandler)
-            }
-            return
-        }
 
         let loginsHelper = tab.getContentScript(name: LoginsHelper.name()) as? LoginsHelper
         Authenticator.handleAuthRequest(self, challenge: challenge, loginsHelper: loginsHelper).uponQueue(.main) { res in
