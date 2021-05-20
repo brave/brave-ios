@@ -31,6 +31,82 @@ class BraveSearchManager {
         return validURLs.contains(url.host ?? "")
     }
     
+    static func credentials(for url: URL) -> [String: URLCredential]? {
+        let protectionSpace = URLProtectionSpace(host: url.domainURL.baseDomain ?? url.domainURL.host ?? url.domainURL.absoluteString,
+                                                 port: 443,
+                                                 protocol: "https",
+                                                 realm: "Restricted",
+                                                 authenticationMethod: NSURLAuthenticationMethodHTTPBasic)
+        return URLCredentialStorage.shared.credentials(for: protectionSpace)
+    }
+    
+    static func handleAuthChallenge(_ challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        let authMethod = challenge.protectionSpace.authenticationMethod
+        if authMethod == NSURLAuthenticationMethodDefault || authMethod == NSURLAuthenticationMethodHTTPBasic || authMethod == NSURLAuthenticationMethodHTTPDigest {
+            if challenge.previousFailureCount > 0, let proposedCredential = challenge.proposedCredential {
+                URLCredentialStorage.shared.remove(proposedCredential, for: challenge.protectionSpace)
+            }
+            
+            if let credentials = URLCredentialStorage.shared.credentials(for: challenge.protectionSpace) {
+                if credentials.count == 1, let credential = credentials.first?.value {
+                    completionHandler(.useCredential, credential)
+                    return
+                }
+                
+                // Destroy all credentials. There should only ever be ONE set stored
+                credentials.forEach({
+                    URLCredentialStorage.shared.remove($0.value, for: challenge.protectionSpace)
+                })
+            }
+            
+            let alert = UIAlertController(title: challenge.protectionSpace.host,
+                                       message: "This page requires authentication",
+                                       preferredStyle: .alert)
+            alert.addTextField {
+                $0.placeholder = "User"
+            }
+            
+            alert.addTextField {
+                $0.placeholder = "Password"
+                $0.isSecureTextEntry = true
+            }
+            
+            alert.addAction(UIAlertAction(title: "Submit", style: .default, handler: { _ in
+                guard let user = alert.textFields?.first?.text,
+                      let password = alert.textFields?.last?.text else {
+                    completionHandler(.cancelAuthenticationChallenge, nil)
+                    return
+                }
+                
+                // User CANNOT contain a colon
+                guard !user.contains(":") else {
+                    completionHandler(.cancelAuthenticationChallenge, nil)
+                    return
+                }
+                
+                let credential = URLCredential(user: user, password: password, persistence: .forSession) // permanent?
+                
+                // Store the credential potentially. If it doesn't work and challenge failed, we'll destroy it anyway.
+                URLCredentialStorage.shared.setDefaultCredential(credential, for: challenge.protectionSpace)
+                completionHandler(.useCredential, credential)
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { _ in
+                completionHandler(.cancelAuthenticationChallenge, nil)
+            }))
+            
+            (UIApplication.shared.delegate as? AppDelegate)?.browserViewController.present(alert, animated: true, completion: nil)
+        } else if authMethod == NSURLAuthenticationMethodServerTrust {
+            // If WKNavigationDelegate already handles this, comment it out!
+            // IE: If there is pinning or any other handling of server trust
+            completionHandler(.performDefaultHandling, nil)
+        } else {
+            // If WKNavigationDelegate already handles this, comment it out!
+            // IE: If there is anything other than cancelling an invalid protection space
+            completionHandler(.cancelAuthenticationChallenge, nil)
+        }
+    }
+    
     init?(url: URL) {
         // Check if request is accessed from valid Brave Search domains
         let validURLs = AppConstants.buildChannel.isPublic ?
@@ -53,9 +129,21 @@ class BraveSearchManager {
         var request = URLRequest(url: url,
                                  cachePolicy: .reloadIgnoringLocalAndRemoteCacheData,
                                  timeoutInterval: 5)
-        // BRANDON: I put my hardcoded credentials there, remember to not version it.
-        request.addValue("Basic xxx=", forHTTPHeaderField: "Authorization")
         
+        // There should NEVER be more than one credential, if there is, we have a problem storing failed credentials
+        // Add the credentials we have to the Authorization header of the request
+        if let credentials = BraveSearchManager.credentials(for: url),
+           credentials.count == 1,
+           let credentialPair = credentials.first {
+            
+            let user = credentialPair.value.user ?? credentialPair.key
+            let password = credentialPair.value.password ?? ""
+            
+            let auth = String(format: "%@:%@", user, password).toBase64()
+            request.addValue("Basic \(auth)", forHTTPHeaderField: "Authorization")
+        }
+        
+        // Doesn't work because this cookie storage is created right there. It is local, not permanent
         let cookieStorage = HTTPCookieStorage()
         cookies.forEach { cookieStorage.setCookie($0) }
         
