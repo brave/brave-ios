@@ -179,6 +179,33 @@ extension BraveSearchManager: URLSessionDataDelegate {
             return
         }
         
+        let validURLs = AppConstants.buildChannel.isPublic ?
+            ["search.brave.com"] : ["search.brave.com", "search-dev.brave.com"]
+        if !validURLs.contains(challenge.protectionSpace.host) {
+            completionHandler(.performDefaultHandling, nil)
+            return
+        }
+        
+        // -- Handle Authentication --
+        
+        // Too many failed attempts
+        if challenge.previousFailureCount >= 3 {
+            completionHandler(.rejectProtectionSpace, nil)
+            return
+        }
+        
+        if let credentials = BraveSearchManager.cachedCredentials {
+            completionHandler(.useCredential, credentials)
+            return
+        }
+
+        if let proposedCredential = challenge.proposedCredential,
+           !(proposedCredential.user?.isEmpty ?? true),
+           challenge.previousFailureCount == 0 {
+            completionHandler(.useCredential, proposedCredential)
+            return
+        }
+
         // There is only ever ONE profile and all tabs share it afaict
         let profile = { () -> Profile? in
             if Thread.current.isMainThread {
@@ -190,25 +217,6 @@ extension BraveSearchManager: URLSessionDataDelegate {
             }
         }()
         
-        if let credentials = BraveSearchManager.cachedCredentials {
-            completionHandler(.useCredential, credentials)
-            return
-        }
-        
-        // -- Handle Authentication --
-        // Too many failed attempts
-        if challenge.previousFailureCount >= 3 {
-            completionHandler(.rejectProtectionSpace, nil)
-            return
-        }
-
-        if let proposedCredential = challenge.proposedCredential,
-           !(proposedCredential.user?.isEmpty ?? true),
-           challenge.previousFailureCount == 0 {
-            completionHandler(.useCredential, proposedCredential)
-            return
-        }
-
         // Lookup the credentials
         // If there is no profile or the challenge is not an auth challenge, reject the challenge
         guard let profile = profile else {
