@@ -106,14 +106,6 @@ class BraveSearchManager {
             }))
             
             (UIApplication.shared.delegate as? AppDelegate)?.browserViewController.present(alert, animated: true, completion: nil)
-        } else if authMethod == NSURLAuthenticationMethodServerTrust {
-            // If WKNavigationDelegate already handles this, comment it out!
-            // IE: If there is pinning or any other handling of server trust
-            completionHandler(.performDefaultHandling, nil)
-        } else {
-            // If WKNavigationDelegate already handles this, comment it out!
-            // IE: If there is anything other than cancelling an invalid protection space
-            completionHandler(.cancelAuthenticationChallenge, nil)
         }
     }
     
