@@ -12,8 +12,14 @@ import WebKit
 private let log = Logger.browserLogger
 
 class BraveSearchManager: NSObject {
-    struct CanAnswerResponse: Codable {
+    private let fallbackProviderURLString = "https://www.google.com"
+    
+    /// Brave Search query details which are passed to the fallback provider.
+    struct BackupQuery: Codable {
         let found: Bool
+        let country: String?
+        let language: String?
+        let safesearch: String?
     }
     
     /// URL of the Brave Search request.
@@ -49,7 +55,7 @@ class BraveSearchManager: NSObject {
         self.query = queryItem
     }
     
-    func shouldUseFallback(cookies: [HTTPCookie], completion: @escaping (Bool) -> Void) {
+    func shouldUseFallback(cookies: [HTTPCookie], completion: @escaping (BackupQuery?) -> Void) {
         let url = URL(string: "\(url.domainURL)/api/can_answer?q=\(query)")!
         var request = URLRequest(url: url,
                                  cachePolicy: .reloadIgnoringLocalAndRemoteCacheData,
@@ -69,39 +75,54 @@ class BraveSearchManager: NSObject {
         
         URLSession(configuration: .ephemeral, delegate: self, delegateQueue: .main)
             .dataTaskPublisher(for: request)
-            .tryMap { output -> CanAnswerResponse in
+            .tryMap { output -> BackupQuery in
                 guard let response = output.response as? HTTPURLResponse,
                       response.statusCode >= 200 && response.statusCode < 300 else {
                     throw "Invalid response"
                 }
      
-                let canAnswerResponse = try JSONDecoder().decode(CanAnswerResponse.self, from: output.data)
+                let canAnswerResponse = try JSONDecoder().decode(BackupQuery.self, from: output.data)
                 
+                print("bxx found: \(canAnswerResponse.found)")
                 return canAnswerResponse
             }
             .sink(receiveCompletion: { status in
                 switch status {
                 case .failure(let error):
                     log.error("shouldUseFallback error: \(error)")
-                    completion(false)
+                    completion(nil)
                 case .finished:
                     // Completion is called on `receiveValue`.
                     break
                 }
-            }, receiveValue: { data in
-                print("data.found: \(data.found)")
-                completion(data.found)
+            }, receiveValue: { canAnswer in
+                completion(canAnswer)
             })
             .store(in: &cancellables)
     }
     
-    func backupSearch(completion: @escaping (String) -> Void) {
+    func backupSearch(with backupQuery: BackupQuery,
+                      completion: @escaping (String) -> Void) {
         
-        guard var components = URLComponents(string: "https://www.google.com") else { return }
+        guard var components = URLComponents(string: fallbackProviderURLString) else { return }
         // TODO: Pass correct country ang language params
-        components.queryItems = [.init(name: "q", value: query.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)),
-                                 .init(name: "hl", value: "en"),
-                                 .init(name: "gl", value: "us")]
+        
+        var queryItems: [URLQueryItem] = [
+            .init(name: "q", value: query.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed))]
+        
+        if let language = backupQuery.language {
+            queryItems.append(.init(name: "hl", value: language))
+        }
+        
+        if let country = backupQuery.country {
+            queryItems.append(.init(name: "gl", value: country))
+        }
+        
+        if let safeSearch = backupQuery.safesearch {
+            // TODO: Append safesearch to the query
+        }
+        
+        components.queryItems = queryItems
         
         guard let url = components.url else { return }
         let request = URLRequest(url: url, timeoutInterval: 3)

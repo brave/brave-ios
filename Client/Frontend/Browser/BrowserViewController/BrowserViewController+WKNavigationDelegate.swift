@@ -195,18 +195,18 @@ extension BrowserViewController: WKNavigationDelegate {
         tab?.braveSearchManager = BraveSearchManager(url: url)
         if let braveSearchManager = tab?.braveSearchManager {
             webView.configuration.websiteDataStore.httpCookieStore.getAllCookies { cookies in
-                braveSearchManager.shouldUseFallback(cookies: cookies) { found in
+                braveSearchManager.shouldUseFallback(cookies: cookies) { backupQuery in
+                    guard let query = backupQuery else { return }
+                    
                     // FIXME: Flip this value back once we finish tests
                     //if !found {
-                    if found {
-                        braveSearchManager.backupSearch { completion in
+                    if query.found == true {
+                        braveSearchManager.backupSearch(with: query) { completion in
                             tab?.injectResults()
                         }
                     }
                 }
             }
-            
-            
         }
         
         // This is the normal case, opening a http or https url, which we handle by loading them in this WKWebView. We
