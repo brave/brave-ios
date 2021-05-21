@@ -64,7 +64,7 @@ class BraveSearchManager: NSObject {
         let domainCookies = cookies.filter { $0.domain == url.host }
         let headers = HTTPCookie.requestHeaderFields(with: domainCookies)
         headers.forEach {
-            request.setValue($0.key, forHTTPHeaderField: $0.value)
+            request.setValue($0.value, forHTTPHeaderField: $0.key)
         }
         
         URLSession(configuration: .ephemeral, delegate: self, delegateQueue: .main)
