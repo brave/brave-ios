@@ -67,13 +67,12 @@ struct PlaylistMenuButton: View {
                 Button(action: action) {
                     Text("Open")
                 }
-                .padding(.trailing, 14)
                 .buttonStyle(BraveOutlineButtonStyle(size: .small))
                 .opacity(isAdded ? 1 : 0)
                 .scaleEffect(isAdded ? 1 : 0.85)
                 .animation(animation, value: isAdded)
             }
-            .padding(.leading, 14)
+            .padding(.horizontal, 14)
             .frame(maxWidth: .infinity, minHeight: 48.0, alignment: .leading)
         }
         .buttonStyle(TableCellButtonStyle())
