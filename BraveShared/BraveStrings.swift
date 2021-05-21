@@ -2194,6 +2194,14 @@ extension Strings {
             NSLocalizedString("sync.historyMigrationErrorMessage", tableName: "BraveShared", bundle: .braveShared,
                               value: "Failed to migrate hitory. Please try again later.",
                               comment: "Message for popup when the history migration fails")
+        public static let syncConfigurationInformationText =
+            NSLocalizedString("sync.syncConfigurationInformationText", tableName: "BraveShared", bundle: .braveShared,
+                              value: "Manage what information you would like to sync between devices. These settings only affect this device.",
+                              comment: "Information Text underneath the toggles for enable/disable different sync types for the device")
+        public static let syncSettingsTitle =
+            NSLocalizedString("sync.syncConfigurationInformationText", tableName: "BraveShared", bundle: .braveShared,
+                              value: "Sync Settings",
+                              comment: "Title for Sync Settings Toggle Header")
     }
 }
 
