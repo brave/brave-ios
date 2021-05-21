@@ -2206,8 +2206,25 @@ extension Strings {
 }
 
 extension Strings {
-    public struct BraveNews {
-        public static let braveNews = NSLocalizedString(
+    public struct History {
+        public static let historyClearAlertTitle =
+            NSLocalizedString("history.historyClearAlertTitle", tableName: "BraveShared", bundle: .braveShared,
+                              value: "Clear Browsing History",
+                              comment: "Title for Clear All History Alert Title")
+        public static let historyClearAlertDescription =
+            NSLocalizedString("history.historyClearAlertDescription", tableName: "BraveShared", bundle: .braveShared,
+                              value: "This will clear all browsing history.",
+                              comment: "Description for Clear All History Alert Description")
+        public static let historyClearActionTitle =
+            NSLocalizedString("history.historyClearActionTitle", tableName: "BraveShared", bundle: .braveShared,
+                              value: "Clear History",
+                              comment: "Title for History Clear All Action")
+    }
+}
+
+extension Strings {
+    public struct BraveToday {
+        public static let braveToday = NSLocalizedString(
             "today.braveToday",
             bundle: .braveShared,
             value: "Brave News",
