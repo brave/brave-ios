@@ -8,15 +8,47 @@ import MobileCoreServices
 import BraveShared
 
 class ShareToBraveViewController: SLComposeServiceViewController {
+    private struct Scheme {
+            private enum SchemeType {
+                case url, query
+            }
+            
+            private let type: SchemeType
+            private let urlOrQuery: String
+            
+            init?(item: NSSecureCoding) {
+                if let text = item as? String {
+                    urlOrQuery = text
+                    type = .query
+                } else if let url = (item as? URL)?.absoluteString.firstURL?.absoluteString {
+                    urlOrQuery = url
+                    type = .url
+                } else {
+                    return nil
+                }
+            }
+            
+            var schemeUrl: URL? {
+                var components = URLComponents()
+                let queryItem: URLQueryItem
+                
+                components.scheme = "brave"
+            
+                switch type {
+                case .url:
+                    components.host = "open-url"
+                    queryItem = URLQueryItem(name: "url", value: urlOrQuery)
+                case .query:
+                    components.host = "search"
+                    queryItem = URLQueryItem(name: "q", value: urlOrQuery)
+                }
+                
+                components.queryItems = [queryItem]
+                return components.url
+            }
+        }
     
     // TODO: Separate scheme for debug builds, so it can be tested without need to uninstall production app.
-    private func urlScheme(for url: String) -> URL? {
-        return URL(string: "brave://open-url?url=\(url)")
-    }
-    
-    private func searchScheme(for text: String) -> URL? {
-        return URL(string: "brave://search?q=\(text)")
-    }
     
     override func configurationItems() -> [Any]! {
         guard let inputItems = extensionContext?.inputItems as? [NSExtensionItem] else {
@@ -38,27 +70,12 @@ class ShareToBraveViewController: SLComposeServiceViewController {
         }
         
         provider.loadItem(of: provider.isUrl ? kUTTypeURL : kUTTypeText) { item, error in
-            var urlItem: URL?
-            var nonUrlText: String?
-            
-            // We can get urls from other apps as a kUTTypeText type, for example from Apple's mail.app.
-            if let text = item as? String {
-                if let url = text.firstURL {
-                    urlItem = url
-                } else {
-                    nonUrlText = text
-                }
-            } else if let url = item as? URL {
-                urlItem = url.absoluteString.firstURL
-            } else {
+            guard let item = item, let schemeUrl = Scheme(item: item)?.schemeUrl else {
                 self.cancel()
                 return
-            }
-            
-            // Open url if it was found, in other case search for text with default search engine in browser
-            if let braveUrl = urlItem?.absoluteString.addingPercentEncoding(withAllowedCharacters: .alphanumerics).flatMap(self.urlScheme) ?? nonUrlText?.addingPercentEncoding(withAllowedCharacters: .alphanumerics).flatMap(self.searchScheme) {
-                self.handleUrl(braveUrl)
-            }
+             }
+                        
+            self.handleUrl(schemeUrl)
         }
         
         return []

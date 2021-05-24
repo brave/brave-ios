@@ -393,12 +393,10 @@ class TopToolbarView: UIView, ToolbarProtocol {
     }
     
     func submitLocation(_ location: String?) {
+        locationTextField?.text = location
         guard let text = location, !text.isEmpty else {
-            locationTextField?.text = location
             return
         }
-        
-        locationTextField?.text = text
         // Not notifying when empty agrees with AutocompleteTextField.textDidChange.
         delegate?.topToolbar(self, didSubmitText: text)
     }
