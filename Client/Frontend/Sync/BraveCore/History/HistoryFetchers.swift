@@ -79,7 +79,7 @@ class Historyv2Fetcher: NSObject, HistoryV2FetchResultsController {
     }
     
     var sectionCount: Int {
-        sectionDetails.elements.filter { $0.value > 0 }.count
+        return sectionDetails.elements.filter { $0.value > 0 }.count
     }
     
     func performFetch(_ completion: @escaping () -> Void) {
@@ -114,12 +114,13 @@ class Historyv2Fetcher: NSObject, HistoryV2FetchResultsController {
     }
     
     func objectCount(for section: Int) -> Int {
-        return sectionDetails.elements[safe: section]?.value ?? 0
+        let filteredDetails = sectionDetails.elements.filter { $0.value > 0 }
+        return filteredDetails[safe: section]?.value ?? 0
     }
     
     func titleHeader(for section: Int) -> String {
-        return sectionDetails.elements[safe: section]?.key.title ?? ""
-
+        let filteredDetails = sectionDetails.elements.filter { $0.value > 0 }
+        return  filteredDetails[safe: section]?.key.title ?? ""
     }
     
     // MARK: Private
