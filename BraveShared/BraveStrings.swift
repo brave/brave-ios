@@ -2219,6 +2219,11 @@ extension Strings {
             NSLocalizedString("history.historyClearActionTitle", tableName: "BraveShared", bundle: .braveShared,
                               value: "Clear History",
                               comment: "Title for History Clear All Action")
+        
+        public static let historyEmptyStateTitle =
+            NSLocalizedString("history.historyEmptyStateTitle", tableName: "BraveShared", bundle: .braveShared,
+                              value: "History will show up here.",
+                              comment: "Title which is displayed when History screen is empty.")
     }
 }
 

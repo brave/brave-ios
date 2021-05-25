@@ -230,3 +230,4 @@ extension HistoryViewController: NSFetchedResultsControllerDelegate {
     updateEmptyPanelState()
   }
 }
+
