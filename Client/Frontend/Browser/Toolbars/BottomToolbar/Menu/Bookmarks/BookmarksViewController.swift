@@ -442,7 +442,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
                         if !self.isPrivateBrowsing {
                             ActivityShortcutManager.shared.donateCustomIntent(for: .openBookmarks, with: url.absoluteString)
                         }
-                        self.toolbarUrlActionsDelegate?.select(url: url, visitType: .bookmark)
+                        self.toolbarUrlActionsDelegate?.select(url: url, isBookmark: true)
                     }
                 }
             }

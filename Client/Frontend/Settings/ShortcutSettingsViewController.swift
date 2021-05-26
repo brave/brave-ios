@@ -12,14 +12,10 @@ import IntentsUI
 // MARK: - ShortcutSettingsViewController
 
 class ShortcutSettingsViewController: TableViewController {
-    
-    let theme: Theme
-    
+        
     // MARK: Lifecycle
     
-    init(_ theme: Theme) {
-        self.theme = theme
-        
+    init() {
         super.init(style: .insetGrouped)
     }
     
