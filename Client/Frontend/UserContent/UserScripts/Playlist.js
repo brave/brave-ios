@@ -261,8 +261,10 @@ window.__firefox__.includeOnce("$<Playlist>", function() {
                     return this.getAttribute('src')
                 },
                 set: function(value) {
+                    // Typically we'd call the original setter.
+                    // But since the property represents an attribute, this is okay.
                     this.setAttribute('src', value);
-                    $<notifyNode>(this);
+                    //$<notifyNode>(this); // Handled by `setAudioAttribute`
                 }
             });
             
@@ -273,10 +275,76 @@ window.__firefox__.includeOnce("$<Playlist>", function() {
                     return this.getAttribute('src')
                 },
                 set: function(value) {
+                    // Typically we'd call the original setter.
+                    // But since the property represents an attribute, this is okay.
                     this.setAttribute('src', value);
-                    $<notifyNode>(this);
+                    //$<notifyNode>(this); // Handled by `setAudioAttribute`
                 }
             });
+            
+            var setVideoAttribute = HTMLVideoElement.prototype.setAttribute;
+            HTMLVideoElement.prototype.setAttribute = function(key, value) {
+                setVideoAttribute.call(this, key, value);
+                if (key.toLowerCase() == 'src') {
+                    $<notifyNode>(this);
+                }
+            }
+            
+            var setAudioAttribute = HTMLAudioElement.prototype.setAttribute;
+            HTMLAudioElement.prototype.setAttribute = function(key, value) {
+                setAudioAttribute.call(this, key, value);
+                if (key.toLowerCase() == 'src') {
+                    $<notifyNode>(this);
+                }
+            }
+            
+            // FOR DEBUGGING ONLY!
+            
+            /*var oldAudio = Audio;
+            var oldProto = Audio.prototype;
+            Audio = function(src) {
+                if (src) {
+                    var result = new oldAudio(src);
+                    $<notify>(result);
+                    return result;
+                }
+                return new oldAudio(src);
+            };
+            Audio.prototype = oldProto;
+            
+            var originalCreateElement = document.createElement;
+            document.createElement = function(element) {
+                if (typeof element == "string" && (element.toLowerCase() == "video" || element.toLowerCase() == "audio")) {
+                    var result = originalCreateElement.call(this, element);
+                    $<notifyNode>(result);
+                    return result;
+                }
+                return originalCreateElement.call(this, element);
+            }
+            
+            var originalAppendChild = Node.prototype.appendChild;
+            Node.prototype.appendChild = function(newNode) {
+                if (newNode.constructor.name == "HTMLVideoElement" || newNode.constructor.name == "HTMLAudioElement") {
+                    $<notifyNode>(newNode);
+                }
+                return originalAppendChild.call(this, newNode);
+            }
+            
+            var originalInsertBefore = Node.prototype.insertBefore;
+            Node.prototype.insertBefore = function(newNode, referenceNode) {
+                if (newNode.constructor.name == "HTMLVideoElement" || newNode.constructor.name == "HTMLAudioElement") {
+                    $<notifyNode>(newNode);
+                }
+                return originalInsertBefore.call(this, newNode, referenceNode);
+            }
+            
+            var originalReplaceChild = Node.prototype.replaceChild;
+            Node.prototype.replaceChild = function(newChild, oldChild) {
+                if (newChild.constructor.name == "HTMLVideoElement" || newChild.constructor.name == "HTMLAudioElement") {
+                    $<notifyNode>(newChild);
+                }
+                return originalReplaceChild.call(this, newChild, oldChild);
+            }*/
         }
 
         $<observePage>();
