@@ -450,6 +450,7 @@
 		2F676FAD260BA4860048A1DB /* blocking-summary.json in Resources */ = {isa = PBXBuildFile; fileRef = 2F676FAC260BA4860048A1DB /* blocking-summary.json */; };
 		2F6931B7260CFB3700ECEB38 /* IntentHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F6931B6260CFB3700ECEB38 /* IntentHandler.swift */; };
 		2F6931BB260CFB3700ECEB38 /* BrowserIntents.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 2F6931B4260CFB3700ECEB38 /* BrowserIntents.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		2F5893D6265FEF7E002323D9 /* VisitType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F5893D5265FEF7E002323D9 /* VisitType.swift */; };
 		2F697F7E1A9FD22D009E03AE /* SearchEnginesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F697F7D1A9FD22D009E03AE /* SearchEnginesTests.swift */; };
 		2F91AFD325FFA830002DBC4A /* ActivityShortcutManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F91AFD225FFA830002DBC4A /* ActivityShortcutManager.swift */; };
 		2F9311D52665883400C6B74D /* DataSaved.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F9311D42665883400C6B74D /* DataSaved.swift */; };
@@ -1953,6 +1954,7 @@
 		2F69320D260D048400ECEB38 /* BrowserIntentsRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BrowserIntentsRelease.entitlements; sourceTree = "<group>"; };
 		2F69320E260D056100ECEB38 /* BrowserIntentsBeta.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BrowserIntentsBeta.entitlements; sourceTree = "<group>"; };
 		2F693223260D218900ECEB38 /* CustomIntentHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomIntentHandler.swift; sourceTree = "<group>"; };
+		2F5893D5265FEF7E002323D9 /* VisitType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitType.swift; sourceTree = "<group>"; };
 		2F697F7D1A9FD22D009E03AE /* SearchEnginesTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchEnginesTests.swift; sourceTree = "<group>"; };
 		2F84BCF8267BE0A100850801 /* Model13.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model13.xcdatamodel; sourceTree = "<group>"; };
 		2F91AFD225FFA830002DBC4A /* ActivityShortcutManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityShortcutManager.swift; sourceTree = "<group>"; };
@@ -5159,6 +5161,7 @@
 				4452CAEF255412800053EFE6 /* DefaultBrowserIntroCalloutViewController.swift */,
 				0A0A5ED025B1F080007B3E74 /* DefaultBrowserIntroManager.swift */,
 				0AE50869261C6F2E0099C6A3 /* BraveSearchHelper.swift */,
+				2F5893D5265FEF7E002323D9 /* VisitType.swift */,
 			);
 			indentWidth = 4;
 			path = Browser;
@@ -7131,6 +7134,7 @@
 				27FD2CAD2146C31C00A5A779 /* AddToFavoritesActivity.swift in Sources */,
 				4422D4E121BFFB7600BF1855 /* filter_block.cc in Sources */,
 				0A8C69BE225E350300988715 /* IndentedImageTableViewCell.swift in Sources */,
+				2F5893D6265FEF7E002323D9 /* VisitType.swift in Sources */,
 				0AE5C69124F0059D004CBC9B /* OnboardingPrivacyConsentViewController.swift in Sources */,
 				5E096180252B63F200F3AFBB /* BraveSyncAPI+Utilities.swift in Sources */,
 				5E5E6E3A25BA03510035B6A0 /* PlaylistViewController.swift in Sources */,

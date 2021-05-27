@@ -191,4 +191,8 @@ extension BrowserViewController {
     func ignoreNavigationInTab(_ tab: Tab, navigation: WKNavigation) {
         self.ignoredNavigation.insert(navigation)
     }
+    
+    func recordNavigationInTab(_ tab: Tab, navigation: WKNavigation, visitType: VisitType) {
+        self.typedNavigation[navigation] = visitType
+    }
 }
