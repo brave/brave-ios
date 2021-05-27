@@ -128,6 +128,11 @@ extension Historyv2 {
         Historyv2.historyAPI.addHistory(HistoryNode(url: url, title: title, dateAdded: dateAdded))
     }
     
+    public class func addLocal(url: URL, title: String, dateAdded: Date) {
+        let historyNode = HistoryNode(url: url, title: title, dateAdded: dateAdded)
+        Historyv2.historyAPI.addHistory(historyNode, pageTransition: .LINK)
+    }
+    
     public static func frc() -> HistoryV2FetchResultsController? {
         return Historyv2Fetcher(historyAPI: Historyv2.historyAPI)
     }

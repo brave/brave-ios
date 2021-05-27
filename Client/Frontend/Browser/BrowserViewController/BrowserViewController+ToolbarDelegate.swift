@@ -159,13 +159,16 @@ extension BrowserViewController: TopToolbarDelegate {
     }
 
     func topToolbar(_ topToolbar: TopToolbarView, didSubmitText text: String) {
-        processAddressBar(text: text, visitType: nil)
+        // TopToolBar Submit Text is Typed URL Visit Type
+        // This visit type will be used while adding History
+        // And it will determine either to sync the data or not
+        processAddressBar(text: text, visitType: .typed)
     }
 
-    func processAddressBar(text: String, visitType: VisitType?) {
+    func processAddressBar(text: String, visitType: VisitType) {
         if let fixupURL = URIFixup.getURL(text) {
             // The user entered a URL, so use it.
-            finishEditingAndSubmit(fixupURL, visitType: visitType ?? .typed)
+            finishEditingAndSubmit(fixupURL, visitType: visitType)
             
             return
         }
