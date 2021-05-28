@@ -12,7 +12,7 @@ Object.defineProperty(navigator, 'brave', {
   value: Object.freeze(
     { 
       isBrave: () => new Promise(res => res(true)),
-      braveSearchApiVersion: () => new Promise(res => res(1))
+      braveSearchApiVersion: 1
     }
   )
 })

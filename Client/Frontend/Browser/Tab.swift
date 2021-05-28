@@ -690,7 +690,7 @@ extension Tab {
         let result = braveSearchManager?.queryResult ?? "nil"
         
         webView?.evaluateSafeJavaScript(
-            functionName: "window.brave.onFetchedBackupResults",
+            functionName: "window.onFetchedBackupResults",
             args: [result],
             sandboxed: false,
             escapeArgs: false)

@@ -201,8 +201,8 @@ extension BrowserViewController: WKNavigationDelegate {
                     // FIXME: Flip this value back once we finish tests
                     //if !found {
                     if query.found == true {
-                        braveSearchManager.backupSearch(with: query) { completion in
-                            tab?.injectResults()
+                        braveSearchManager.backupSearch(cookies: cookies, with: query) { completion in
+                            //tab?.injectResults()
                         }
                     }
                 }
@@ -431,6 +431,10 @@ extension BrowserViewController: WKNavigationDelegate {
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         if let tab = tabManager[webView] {
+            if let braveSearchManager = tab.braveSearchManager {
+                tab.injectResults()
+            }
+            
             navigateInTab(tab: tab, to: navigation)
             if let url = tab.url, tab.shouldClassifyLoadsForAds {
                 let faviconURL = URL(string: tab.displayFavicon?.url ?? "")

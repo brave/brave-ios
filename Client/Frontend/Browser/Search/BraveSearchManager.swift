@@ -101,7 +101,7 @@ class BraveSearchManager: NSObject {
             .store(in: &cancellables)
     }
     
-    func backupSearch(with backupQuery: BackupQuery,
+    func backupSearch(cookies: [HTTPCookie], with backupQuery: BackupQuery,
                       completion: @escaping (String) -> Void) {
         
         guard var components = URLComponents(string: fallbackProviderURLString) else { return }
@@ -125,9 +125,22 @@ class BraveSearchManager: NSObject {
         components.queryItems = queryItems
         
         guard let url = components.url else { return }
-        let request = URLRequest(url: url, timeoutInterval: 3)
+        var request = URLRequest(url: url, timeoutInterval: 3)
         
-        URLSession(configuration: .ephemeral)
+        request.addValue(UserAgent.desktop, forHTTPHeaderField: "User-Agent")
+        
+        let cookieStorage = HTTPCookieStorage()
+        cookies.forEach { cookieStorage.setCookie($0) }
+        
+        // does not work for some reason
+        //let domainCookies = cookieStorage.cookies(for: url) ?? []
+        let domainCookies = cookies.filter { $0.domain == ".google.com" }
+        let headers = HTTPCookie.requestHeaderFields(with: domainCookies)
+        headers.forEach {
+            request.setValue($0.value, forHTTPHeaderField: $0.key)
+        }
+        
+        URLSession(configuration: .default)
             .dataTaskPublisher(for: request)
             .tryMap { output -> String in
                 guard let response = output.response as? HTTPURLResponse,
