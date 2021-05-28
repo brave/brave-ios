@@ -123,11 +123,11 @@
 				<array>
 					<dict>
 						<key>INIntentResponseCodeConciseFormatString</key>
-						<string>Will Open ${websiteURL} in a new tab.</string>
+						<string>This will open ${websiteURL} in a new tab.</string>
 						<key>INIntentResponseCodeConciseFormatStringID</key>
 						<string>uT0Oi7</string>
 						<key>INIntentResponseCodeFormatString</key>
-						<string>Will Open ${websiteURL} in a new tab.</string>
+						<string>This will open ${websiteURL} in a new tab.</string>
 						<key>INIntentResponseCodeFormatStringID</key>
 						<string>LHHK1N</string>
 						<key>INIntentResponseCodeName</key>
@@ -182,45 +182,16 @@
 		<dict>
 			<key>INIntentCategory</key>
 			<string>generic</string>
-			<key>INIntentConfigurable</key>
-			<true/>
 			<key>INIntentDescription</key>
 			<string>Open a Website from History</string>
 			<key>INIntentDescriptionID</key>
 			<string>cvU2lS</string>
 			<key>INIntentLastParameterTag</key>
 			<integer>1</integer>
-			<key>INIntentManagedParameterCombinations</key>
-			<dict>
-				<key></key>
-				<dict>
-					<key>INIntentParameterCombinationSupportsBackgroundExecution</key>
-					<true/>
-					<key>INIntentParameterCombinationTitle</key>
-					<string>Open ${websiteURL}from History</string>
-					<key>INIntentParameterCombinationTitleID</key>
-					<string>yVGQ6A</string>
-					<key>INIntentParameterCombinationUpdatesLinked</key>
-					<true/>
-				</dict>
-			</dict>
 			<key>INIntentName</key>
 			<string>OpenHistoryWebsite</string>
 			<key>INIntentParameterCombinations</key>
 			<dict>
-				<key></key>
-				<dict>
-					<key>INIntentParameterCombinationIsLinked</key>
-					<true/>
-					<key>INIntentParameterCombinationIsPrimary</key>
-					<true/>
-					<key>INIntentParameterCombinationSupportsBackgroundExecution</key>
-					<true/>
-					<key>INIntentParameterCombinationTitle</key>
-					<string>Open ${websiteURL}from History</string>
-					<key>INIntentParameterCombinationTitleID</key>
-					<string>pKssbu</string>
-				</dict>
 				<key>websiteURL</key>
 				<dict>
 					<key>INIntentParameterCombinationSubtitle</key>
@@ -265,11 +236,11 @@
 				<array>
 					<dict>
 						<key>INIntentResponseCodeConciseFormatString</key>
-						<string>Will Open ${websiteURL} from History.</string>
+						<string>This will open ${websiteURL} from History.</string>
 						<key>INIntentResponseCodeConciseFormatStringID</key>
 						<string>wZqW4o</string>
 						<key>INIntentResponseCodeFormatString</key>
-						<string>Will Open ${websiteURL} from History.</string>
+						<string>This will open ${websiteURL} from History.</string>
 						<key>INIntentResponseCodeFormatStringID</key>
 						<string>cSYAYC</string>
 						<key>INIntentResponseCodeName</key>
@@ -326,45 +297,16 @@
 		<dict>
 			<key>INIntentCategory</key>
 			<string>generic</string>
-			<key>INIntentConfigurable</key>
-			<true/>
 			<key>INIntentDescription</key>
 			<string>Open a Website from Bookmarks</string>
 			<key>INIntentDescriptionID</key>
 			<string>9iPSKS</string>
 			<key>INIntentLastParameterTag</key>
 			<integer>1</integer>
-			<key>INIntentManagedParameterCombinations</key>
-			<dict>
-				<key></key>
-				<dict>
-					<key>INIntentParameterCombinationSupportsBackgroundExecution</key>
-					<true/>
-					<key>INIntentParameterCombinationTitle</key>
-					<string>Open ${websiteURL}from Bookmarks</string>
-					<key>INIntentParameterCombinationTitleID</key>
-					<string>84HKev</string>
-					<key>INIntentParameterCombinationUpdatesLinked</key>
-					<true/>
-				</dict>
-			</dict>
 			<key>INIntentName</key>
 			<string>OpenBookmarkWebsite</string>
 			<key>INIntentParameterCombinations</key>
 			<dict>
-				<key></key>
-				<dict>
-					<key>INIntentParameterCombinationIsLinked</key>
-					<true/>
-					<key>INIntentParameterCombinationIsPrimary</key>
-					<true/>
-					<key>INIntentParameterCombinationSupportsBackgroundExecution</key>
-					<true/>
-					<key>INIntentParameterCombinationTitle</key>
-					<string>Open ${websiteURL}from Bookmarks</string>
-					<key>INIntentParameterCombinationTitleID</key>
-					<string>4zEyIY</string>
-				</dict>
 				<key>websiteURL</key>
 				<dict>
 					<key>INIntentParameterCombinationSubtitle</key>
@@ -409,11 +351,11 @@
 				<array>
 					<dict>
 						<key>INIntentResponseCodeConciseFormatString</key>
-						<string>Will Open ${websiteURL}from Bookmarks.</string>
+						<string>This will open ${websiteURL}from Bookmarks.</string>
 						<key>INIntentResponseCodeConciseFormatStringID</key>
 						<string>pvi3Ug</string>
 						<key>INIntentResponseCodeFormatString</key>
-						<string>Will Open ${websiteURL}from Bookmarks.</string>
+						<string>This will open ${websiteURL}from Bookmarks.</string>
 						<key>INIntentResponseCodeFormatStringID</key>
 						<string>ZgJKfY</string>
 						<key>INIntentResponseCodeName</key>
