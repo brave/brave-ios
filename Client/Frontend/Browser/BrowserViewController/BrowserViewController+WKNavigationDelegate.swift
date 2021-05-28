@@ -436,10 +436,18 @@ extension BrowserViewController: WKNavigationDelegate {
             // Second attempt to inject results to the BraveSearch.
             // This will be called if we got fallback results faster than
             // the page navigation.
-            if let braveSearchManager = tab.braveSearchManager,
-               !braveSearchManager.fallbackQueryResultsPending {
-                tab.injectResults()
+            if let url = tab.url, BraveSearchManager.isValidURL(url) {
+                if let braveSearchManager = tab.braveSearchManager {
+                    if !braveSearchManager.fallbackQueryResultsPending {
+                        tab.injectResults()
+                    }
+                } else {
+                    tab.injectResults()
+                }
+                
+                
             }
+            
             
             navigateInTab(tab: tab, to: navigation)
             if let url = tab.url, tab.shouldClassifyLoadsForAds {

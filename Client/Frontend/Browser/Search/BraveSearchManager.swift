@@ -25,11 +25,11 @@ class BraveSearchManager: NSObject {
     /// URL of the Brave Search request.
     private let url: URL
     private let query: String
-    let cookies: [HTTPCookie]
+    let domainCookies: [HTTPCookie]
     
     var queryResult: String?
     
-    private(set) var fallbackQueryResultsPending = false
+    var fallbackQueryResultsPending = false
     
     private var cancellables: Set<AnyCancellable> = []
     private static var cachedCredentials: URLCredential?
@@ -56,7 +56,10 @@ class BraveSearchManager: NSObject {
         
         self.url = url
         self.query = queryItem
-        self.cookies = cookies
+        self.domainCookies = cookies.filter { $0.domain == url.host }
+        if domainCookies.first(where: { $0.name == "fallback" })?.value != "1" {
+            return nil
+        }
     }
     
     func shouldUseFallback(completion: @escaping (BackupQuery?) -> Void) {
@@ -67,11 +70,11 @@ class BraveSearchManager: NSObject {
 
         // Doesn't work because this cookie storage is created right there. It is local, not permanent
         let cookieStorage = HTTPCookieStorage()
-        cookies.forEach { cookieStorage.setCookie($0) }
+        domainCookies.forEach { cookieStorage.setCookie($0) }
         
         // does not work for some reason
         //let domainCookies = cookieStorage.cookies(for: url) ?? []
-        let domainCookies = cookies.filter { $0.domain == url.host }
+        let domainCookies = domainCookies.filter { $0.domain == url.host }
         let headers = HTTPCookie.requestHeaderFields(with: domainCookies)
         headers.forEach {
             request.setValue($0.value, forHTTPHeaderField: $0.key)
@@ -134,11 +137,11 @@ class BraveSearchManager: NSObject {
         request.addValue(UserAgent.desktop, forHTTPHeaderField: "User-Agent")
         
         let cookieStorage = HTTPCookieStorage()
-        cookies.forEach { cookieStorage.setCookie($0) }
+        domainCookies.forEach { cookieStorage.setCookie($0) }
         
         // does not work for some reason
         //let domainCookies = cookieStorage.cookies(for: url) ?? []
-        let domainCookies = cookies.filter { $0.domain == ".google.com" }
+        let domainCookies = domainCookies.filter { $0.domain == ".google.com" }
         let headers = HTTPCookie.requestHeaderFields(with: domainCookies)
         headers.forEach {
             request.setValue($0.value, forHTTPHeaderField: $0.key)
