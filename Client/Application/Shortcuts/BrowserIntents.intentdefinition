@@ -9,11 +9,11 @@
 	<key>INIntentDefinitionNamespace</key>
 	<string>Zn4yv3</string>
 	<key>INIntentDefinitionSystemVersion</key>
-	<string>20D80</string>
+	<string>20E232</string>
 	<key>INIntentDefinitionToolsBuildVersion</key>
-	<string>12B45b</string>
+	<string>12E262</string>
 	<key>INIntentDefinitionToolsVersion</key>
-	<string>12.2</string>
+	<string>12.5</string>
 	<key>INIntents</key>
 	<array>
 		<dict>
@@ -91,6 +91,8 @@
 						<string>None</string>
 						<key>INIntentParameterMetadataDefaultValueID</key>
 						<string>avC9qd</string>
+						<key>INIntentParameterMetadataDisableAutocorrect</key>
+						<true/>
 					</dict>
 					<key>INIntentParameterName</key>
 					<string>websiteURL</string>
@@ -121,11 +123,11 @@
 				<array>
 					<dict>
 						<key>INIntentResponseCodeConciseFormatString</key>
-						<string>Opened ${websiteURL}in a new tab.</string>
+						<string>Will Open ${websiteURL} in a new tab.</string>
 						<key>INIntentResponseCodeConciseFormatStringID</key>
 						<string>uT0Oi7</string>
 						<key>INIntentResponseCodeFormatString</key>
-						<string>Opened ${websiteURL}in a new tab.</string>
+						<string>Will Open ${websiteURL} in a new tab.</string>
 						<key>INIntentResponseCodeFormatStringID</key>
 						<string>LHHK1N</string>
 						<key>INIntentResponseCodeName</key>
@@ -134,6 +136,14 @@
 						<true/>
 					</dict>
 					<dict>
+						<key>INIntentResponseCodeConciseFormatString</key>
+						<string>Can't Open ${websiteURL} in a new tab.</string>
+						<key>INIntentResponseCodeConciseFormatStringID</key>
+						<string>UmKnv3</string>
+						<key>INIntentResponseCodeFormatString</key>
+						<string>Can't Open ${websiteURL} in a new tab.</string>
+						<key>INIntentResponseCodeFormatStringID</key>
+						<string>1n1yx4</string>
 						<key>INIntentResponseCodeName</key>
 						<string>failure</string>
 					</dict>
@@ -166,8 +176,6 @@
 			<string>Wh3wb1</string>
 			<key>INIntentType</key>
 			<string>Custom</string>
-			<key>INIntentUserConfirmationRequired</key>
-			<true/>
 			<key>INIntentVerb</key>
 			<string>Do</string>
 		</dict>
@@ -180,13 +188,11 @@
 			<string>Open a Website from History</string>
 			<key>INIntentDescriptionID</key>
 			<string>cvU2lS</string>
-			<key>INIntentKeyParameter</key>
-			<string>websiteURL</string>
 			<key>INIntentLastParameterTag</key>
 			<integer>1</integer>
 			<key>INIntentManagedParameterCombinations</key>
 			<dict>
-				<key>websiteURL</key>
+				<key></key>
 				<dict>
 					<key>INIntentParameterCombinationSupportsBackgroundExecution</key>
 					<true/>
@@ -202,6 +208,19 @@
 			<string>OpenHistoryWebsite</string>
 			<key>INIntentParameterCombinations</key>
 			<dict>
+				<key></key>
+				<dict>
+					<key>INIntentParameterCombinationIsLinked</key>
+					<true/>
+					<key>INIntentParameterCombinationIsPrimary</key>
+					<true/>
+					<key>INIntentParameterCombinationSupportsBackgroundExecution</key>
+					<true/>
+					<key>INIntentParameterCombinationTitle</key>
+					<string>Open ${websiteURL}from History</string>
+					<key>INIntentParameterCombinationTitleID</key>
+					<string>pKssbu</string>
+				</dict>
 				<key>websiteURL</key>
 				<dict>
 					<key>INIntentParameterCombinationSubtitle</key>
@@ -219,8 +238,6 @@
 			<key>INIntentParameters</key>
 			<array>
 				<dict>
-					<key>INIntentParameterConfigurable</key>
-					<true/>
 					<key>INIntentParameterDisplayName</key>
 					<string>Website URL</string>
 					<key>INIntentParameterDisplayNameID</key>
@@ -236,21 +253,6 @@
 					</dict>
 					<key>INIntentParameterName</key>
 					<string>websiteURL</string>
-					<key>INIntentParameterPromptDialogs</key>
-					<array>
-						<dict>
-							<key>INIntentParameterPromptDialogCustom</key>
-							<true/>
-							<key>INIntentParameterPromptDialogType</key>
-							<string>Configuration</string>
-						</dict>
-						<dict>
-							<key>INIntentParameterPromptDialogCustom</key>
-							<true/>
-							<key>INIntentParameterPromptDialogType</key>
-							<string>Primary</string>
-						</dict>
-					</array>
 					<key>INIntentParameterTag</key>
 					<integer>1</integer>
 					<key>INIntentParameterType</key>
@@ -263,11 +265,11 @@
 				<array>
 					<dict>
 						<key>INIntentResponseCodeConciseFormatString</key>
-						<string>Opened ${websiteURL}from History.</string>
+						<string>Will Open ${websiteURL} from History.</string>
 						<key>INIntentResponseCodeConciseFormatStringID</key>
 						<string>wZqW4o</string>
 						<key>INIntentResponseCodeFormatString</key>
-						<string>Opened ${websiteURL}from History.</string>
+						<string>Will Open ${websiteURL} from History.</string>
 						<key>INIntentResponseCodeFormatStringID</key>
 						<string>cSYAYC</string>
 						<key>INIntentResponseCodeName</key>
@@ -276,6 +278,14 @@
 						<true/>
 					</dict>
 					<dict>
+						<key>INIntentResponseCodeConciseFormatString</key>
+						<string>Can't Open ${websiteURL} in a new tab.</string>
+						<key>INIntentResponseCodeConciseFormatStringID</key>
+						<string>c9NKFJ</string>
+						<key>INIntentResponseCodeFormatString</key>
+						<string>Can't Open ${websiteURL} in a new tab.</string>
+						<key>INIntentResponseCodeFormatStringID</key>
+						<string>t7aARA</string>
 						<key>INIntentResponseCodeName</key>
 						<string>failure</string>
 					</dict>
@@ -322,13 +332,11 @@
 			<string>Open a Website from Bookmarks</string>
 			<key>INIntentDescriptionID</key>
 			<string>9iPSKS</string>
-			<key>INIntentKeyParameter</key>
-			<string>websiteURL</string>
 			<key>INIntentLastParameterTag</key>
 			<integer>1</integer>
 			<key>INIntentManagedParameterCombinations</key>
 			<dict>
-				<key>websiteURL</key>
+				<key></key>
 				<dict>
 					<key>INIntentParameterCombinationSupportsBackgroundExecution</key>
 					<true/>
@@ -344,6 +352,19 @@
 			<string>OpenBookmarkWebsite</string>
 			<key>INIntentParameterCombinations</key>
 			<dict>
+				<key></key>
+				<dict>
+					<key>INIntentParameterCombinationIsLinked</key>
+					<true/>
+					<key>INIntentParameterCombinationIsPrimary</key>
+					<true/>
+					<key>INIntentParameterCombinationSupportsBackgroundExecution</key>
+					<true/>
+					<key>INIntentParameterCombinationTitle</key>
+					<string>Open ${websiteURL}from Bookmarks</string>
+					<key>INIntentParameterCombinationTitleID</key>
+					<string>4zEyIY</string>
+				</dict>
 				<key>websiteURL</key>
 				<dict>
 					<key>INIntentParameterCombinationSubtitle</key>
@@ -361,8 +382,6 @@
 			<key>INIntentParameters</key>
 			<array>
 				<dict>
-					<key>INIntentParameterConfigurable</key>
-					<true/>
 					<key>INIntentParameterDisplayName</key>
 					<string>Website URL</string>
 					<key>INIntentParameterDisplayNameID</key>
@@ -378,21 +397,6 @@
 					</dict>
 					<key>INIntentParameterName</key>
 					<string>websiteURL</string>
-					<key>INIntentParameterPromptDialogs</key>
-					<array>
-						<dict>
-							<key>INIntentParameterPromptDialogCustom</key>
-							<true/>
-							<key>INIntentParameterPromptDialogType</key>
-							<string>Configuration</string>
-						</dict>
-						<dict>
-							<key>INIntentParameterPromptDialogCustom</key>
-							<true/>
-							<key>INIntentParameterPromptDialogType</key>
-							<string>Primary</string>
-						</dict>
-					</array>
 					<key>INIntentParameterTag</key>
 					<integer>1</integer>
 					<key>INIntentParameterType</key>
@@ -405,11 +409,11 @@
 				<array>
 					<dict>
 						<key>INIntentResponseCodeConciseFormatString</key>
-						<string>Opened ${websiteURL}from Bookmarks.</string>
+						<string>Will Open ${websiteURL}from Bookmarks.</string>
 						<key>INIntentResponseCodeConciseFormatStringID</key>
 						<string>pvi3Ug</string>
 						<key>INIntentResponseCodeFormatString</key>
-						<string>Opened ${websiteURL}from Bookmarks.</string>
+						<string>Will Open ${websiteURL}from Bookmarks.</string>
 						<key>INIntentResponseCodeFormatStringID</key>
 						<string>ZgJKfY</string>
 						<key>INIntentResponseCodeName</key>
@@ -418,6 +422,14 @@
 						<true/>
 					</dict>
 					<dict>
+						<key>INIntentResponseCodeConciseFormatString</key>
+						<string>Can't Open ${websiteURL} in a new tab.</string>
+						<key>INIntentResponseCodeConciseFormatStringID</key>
+						<string>p3NuX2</string>
+						<key>INIntentResponseCodeFormatString</key>
+						<string>Can't Open ${websiteURL} in a new tab.</string>
+						<key>INIntentResponseCodeFormatStringID</key>
+						<string>0Lu6sT</string>
 						<key>INIntentResponseCodeName</key>
 						<string>failure</string>
 					</dict>
