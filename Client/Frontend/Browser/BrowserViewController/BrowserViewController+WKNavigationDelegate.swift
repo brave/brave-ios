@@ -192,15 +192,18 @@ extension BrowserViewController: WKNavigationDelegate {
         tab?.userScriptManager?.handleDomainUserScript(for: url)
         
         // Brave Search logic.
-        tab?.braveSearchManager = BraveSearchManager(url: url)
-        if let braveSearchManager = tab?.braveSearchManager {
+        if BraveSearchManager.isValidURL(url) {
+            // We fetch cookies to determine if backup search was enabled on the website.
             webView.configuration.websiteDataStore.httpCookieStore.getAllCookies { cookies in
-                braveSearchManager.shouldUseFallback(cookies: cookies) { backupQuery in
-                    guard let query = backupQuery else { return }
-                    
-                    if !query.found {
-                        braveSearchManager.backupSearch(cookies: cookies, with: query) { completion in
-                            tab?.injectResults()
+                tab?.braveSearchManager = BraveSearchManager(url: url, cookies: cookies)
+                if let braveSearchManager = tab?.braveSearchManager {
+                    braveSearchManager.shouldUseFallback { backupQuery in
+                        guard let query = backupQuery else { return }
+                        
+                        if !query.found {
+                            braveSearchManager.backupSearch(with: query) { completion in
+                                tab?.injectResults()
+                            }
                         }
                     }
                 }
@@ -429,8 +432,13 @@ extension BrowserViewController: WKNavigationDelegate {
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         if let tab = tabManager[webView] {
-            if let braveSearchManager = tab.braveSearchManager {
-                //tab.injectResults()
+            
+            // Second attempt to inject results to the BraveSearch.
+            // This will be called if we got fallback results faster than
+            // the page navigation.
+            if let braveSearchManager = tab.braveSearchManager,
+               !braveSearchManager.fallbackQueryResultsPending {
+                tab.injectResults()
             }
             
             navigateInTab(tab: tab, to: navigation)

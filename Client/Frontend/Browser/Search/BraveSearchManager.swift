@@ -25,8 +25,11 @@ class BraveSearchManager: NSObject {
     /// URL of the Brave Search request.
     private let url: URL
     private let query: String
+    let cookies: [HTTPCookie]
     
     var queryResult: String?
+    
+    private(set) var fallbackQueryResultsPending = false
     
     private var cancellables: Set<AnyCancellable> = []
     private static var cachedCredentials: URLCredential?
@@ -38,7 +41,7 @@ class BraveSearchManager: NSObject {
         return validURLs.contains(url.host ?? "")
     }
     
-    init?(url: URL) {
+    init?(url: URL, cookies: [HTTPCookie]) {
         // Check if request is accessed from valid Brave Search domains
         let validURLs = AppConstants.buildChannel.isPublic ?
             ["search.brave.com"] : ["search.brave.com", "search-dev.brave.com"]
@@ -53,9 +56,10 @@ class BraveSearchManager: NSObject {
         
         self.url = url
         self.query = queryItem
+        self.cookies = cookies
     }
     
-    func shouldUseFallback(cookies: [HTTPCookie], completion: @escaping (BackupQuery?) -> Void) {
+    func shouldUseFallback(completion: @escaping (BackupQuery?) -> Void) {
         let url = URL(string: "\(url.domainURL)/api/can_answer?q=\(query)")!
         var request = URLRequest(url: url,
                                  cachePolicy: .reloadIgnoringLocalAndRemoteCacheData,
@@ -101,7 +105,7 @@ class BraveSearchManager: NSObject {
             .store(in: &cancellables)
     }
     
-    func backupSearch(cookies: [HTTPCookie], with backupQuery: BackupQuery,
+    func backupSearch(with backupQuery: BackupQuery,
                       completion: @escaping (String) -> Void) {
         
         guard var components = URLComponents(string: fallbackProviderURLString) else { return }
@@ -140,6 +144,7 @@ class BraveSearchManager: NSObject {
             request.setValue($0.value, forHTTPHeaderField: $0.key)
         }
         
+        fallbackQueryResultsPending = true
         URLSession(configuration: .default)
             .dataTaskPublisher(for: request)
             .tryMap { output -> String in
@@ -162,7 +167,8 @@ class BraveSearchManager: NSObject {
             }
             .eraseToAnyPublisher()
             .receive(on: DispatchQueue.main)
-            .sink(receiveCompletion: { completion in
+            .sink(receiveCompletion: { [weak self] completion in
+                self?.fallbackQueryResultsPending = false
                 switch completion {
                 case .failure(let error):
                     log.error("Error: \(error)")

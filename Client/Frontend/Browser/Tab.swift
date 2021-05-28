@@ -695,7 +695,7 @@ extension Tab {
             sandboxed: false,
             escapeArgs: false)
         
-        // cleanup
+        // Cleanup
         braveSearchManager = nil
     }
 }
