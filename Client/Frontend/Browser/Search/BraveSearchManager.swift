@@ -12,7 +12,7 @@ import WebKit
 private let log = Logger.browserLogger
 
 class BraveSearchManager: NSObject {
-    private let fallbackProviderURLString = "https://www.google.com"
+    private let fallbackProviderURLString = "https://www.google.com/search"
     
     /// Brave Search query details which are passed to the fallback provider.
     struct BackupQuery: Codable {

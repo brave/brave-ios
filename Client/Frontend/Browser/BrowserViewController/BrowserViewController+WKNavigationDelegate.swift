@@ -198,11 +198,9 @@ extension BrowserViewController: WKNavigationDelegate {
                 braveSearchManager.shouldUseFallback(cookies: cookies) { backupQuery in
                     guard let query = backupQuery else { return }
                     
-                    // FIXME: Flip this value back once we finish tests
-                    //if !found {
-                    if query.found == true {
+                    if !query.found {
                         braveSearchManager.backupSearch(cookies: cookies, with: query) { completion in
-                            //tab?.injectResults()
+                            tab?.injectResults()
                         }
                     }
                 }
@@ -432,7 +430,7 @@ extension BrowserViewController: WKNavigationDelegate {
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         if let tab = tabManager[webView] {
             if let braveSearchManager = tab.braveSearchManager {
-                tab.injectResults()
+                //tab.injectResults()
             }
             
             navigateInTab(tab: tab, to: navigation)

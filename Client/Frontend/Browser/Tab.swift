@@ -687,7 +687,7 @@ class TabWebViewMenuHelper: UIView {
 extension Tab {
     func injectResults() {
         guard let url = webView?.url, BraveSearchManager.isValidURL(url) else { return }
-        let result = braveSearchManager?.queryResult ?? "nil"
+        let result = braveSearchManager?.queryResult ?? "null"
         
         webView?.evaluateSafeJavaScript(
             functionName: "window.onFetchedBackupResults",
