@@ -16,7 +16,7 @@ class BraveSearchManager: NSObject {
     private let fallbackProviderURLString = "https://www.google.com/search"
     
     /// Brave Search query details which are passed to the fallback provider.
-    struct BackupQuery: Codable {
+    private struct BackupQuery: Codable {
         let found: Bool
         let country: String?
         let language: String?
@@ -32,8 +32,10 @@ class BraveSearchManager: NSObject {
     /// such as whether to use search fallback, should safe search be performed etc.
     private let domainCookies: [HTTPCookie]
     
-    var queryResult: String?
-    
+    /// The result we got from querying the fallback search engine.
+    var fallbackQueryResult: String?
+    /// Whether the call to the fallback search engine is pending.
+    /// This is used to determine at what point of the web navigation we should inject the results.
     var fallbackQueryResultsPending = false
     
     private var cancellables: Set<AnyCancellable> = []
@@ -181,7 +183,7 @@ class BraveSearchManager: NSObject {
                 }
             },
             receiveValue: { [weak self] data in
-                self?.queryResult = data
+                self?.fallbackQueryResult = data
                 completion(data)
             })
             .store(in: &cancellables)

@@ -183,6 +183,7 @@ class Tab: NSObject {
         }
     }
     
+    /// A helper property that handles native to Brave Search communication.
     var braveSearchManager: BraveSearchManager?
 
     func createWebview() {
@@ -694,7 +695,7 @@ extension Tab {
         
         if let url = webView?.url,
            BraveSearchManager.isValidURL(url),
-           let result = braveSearchManager?.queryResult {
+           let result = braveSearchManager?.fallbackQueryResult {
             queryResult = result
         }
         
