@@ -102,16 +102,15 @@ class BraveSearchManager: NSObject {
         // to handle request authentication.
         session
             .dataTaskPublisher(for: request)
-            .tryMap { output -> BackupQuery in
+            .tryMap { output -> Data in
                 guard let response = output.response as? HTTPURLResponse,
                       response.statusCode >= 200 && response.statusCode < 300 else {
                     throw "Invalid response"
                 }
      
-                let canAnswerResponse = try JSONDecoder().decode(BackupQuery.self, from: output.data)
-                
-                return canAnswerResponse
+                return output.data
             }
+            .decode(type: BackupQuery.self, decoder: JSONDecoder())
             .sink(receiveCompletion: { status in
                 switch status {
                 case .failure(let error):
@@ -176,7 +175,6 @@ class BraveSearchManager: NSObject {
                 
                 return stringFromData.javaScriptEscapedString
             }
-            .eraseToAnyPublisher()
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { completion in
                 switch completion {
