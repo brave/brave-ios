@@ -149,7 +149,7 @@ class BraveSearchManager: NSObject {
         request.addValue(UserAgent.userAgentForDesktopMode, forHTTPHeaderField: "User-Agent")
         
         fallbackQueryResultsPending = true
-        URLSession(configuration: .default)
+        URLSession(configuration: .ephemeral)
             .dataTaskPublisher(for: request)
             .tryMap { output -> String in
                 guard let response = output.response as? HTTPURLResponse,
