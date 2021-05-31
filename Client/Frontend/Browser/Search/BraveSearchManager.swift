@@ -173,8 +173,8 @@ class BraveSearchManager: NSObject {
                 return stringFromData.javaScriptEscapedString
             }
             .receive(on: DispatchQueue.main)
-            .sink(receiveCompletion: { completion in
-                switch completion {
+            .sink(receiveCompletion: { status in
+                switch status {
                 case .failure(let error):
                     log.error("Error: \(error)")
                 case .finished:
