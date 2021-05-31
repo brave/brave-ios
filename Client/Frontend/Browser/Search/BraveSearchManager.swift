@@ -253,21 +253,10 @@ extension BraveSearchManager: URLSessionDataDelegate {
             completionHandler(.useCredential, proposedCredential)
             return
         }
-
-        // There is only ever ONE profile and all tabs share it afaict
-        let profile = { () -> Profile? in
-            if Thread.current.isMainThread {
-                return (UIApplication.shared.delegate as? AppDelegate)?.browserViewController.profile
-            }
-            
-            return DispatchQueue.main.sync {
-                (UIApplication.shared.delegate as? AppDelegate)?.browserViewController.profile
-            }
-        }()
         
         // Lookup the credentials
         // If there is no profile or the challenge is not an auth challenge, reject the challenge
-        guard let profile = profile else {
+        guard let profile = (UIApplication.shared.delegate as? AppDelegate)?.browserViewController.profile else {
             completionHandler(.rejectProtectionSpace, nil)
             return
         }
