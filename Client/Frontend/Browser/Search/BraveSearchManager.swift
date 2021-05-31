@@ -90,7 +90,6 @@ class BraveSearchManager: NSObject {
         let cookieStorage = HTTPCookieStorage()
         domainCookies.forEach { cookieStorage.setCookie($0) }
         
-        let domainCookies = domainCookies.filter { $0.domain == canAnswerURLComponents.host }
         let headers = HTTPCookie.requestHeaderFields(with: domainCookies)
         headers.forEach {
             request.setValue($0.value, forHTTPHeaderField: $0.key)
