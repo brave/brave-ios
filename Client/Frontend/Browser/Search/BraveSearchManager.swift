@@ -155,21 +155,18 @@ class BraveSearchManager: NSObject {
         // Must be set, without it the fallback results may be not retrieved correctly.
         request.addValue(UserAgent.userAgentForDesktopMode, forHTTPHeaderField: "User-Agent")
         
+        request.addValue("text/html;charset=UTF-8, text/plain;charset=UTF-8",
+                         forHTTPHeaderField: "Accept")
+        
         URLSession(configuration: .ephemeral)
             .dataTaskPublisher(for: request)
             .tryMap { output -> String in
                 guard let response = output.response as? HTTPURLResponse,
-                      let contentType = response.value(forHTTPHeaderField: "Content-Type"),
                       response.statusCode >= 200 && response.statusCode < 300 else {
                     throw "Invalid response"
                 }
                 
-                // For some reason sometimes no matter what headers are set, ISO encoding is returned
-                // we check for iso and fallback to utf8 by default.
-                let encoding: String.Encoding =
-                    contentType.contains("ISO-8859-1") ? .isoLatin1 : .utf8
-                
-                guard let stringFromData = String(data: output.data, encoding: encoding) else {
+                guard let stringFromData = String(data: output.data, encoding: .utf8) else {
                     throw "Failed to decode string from data"
                 }
                 
