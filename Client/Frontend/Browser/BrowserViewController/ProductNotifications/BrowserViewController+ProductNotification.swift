@@ -131,10 +131,17 @@ extension BrowserViewController {
             }
         }
         
-        // Step 6: Domain Specific Data Saved
+        // Step 5: Domain Specific Data Saved
         // Data Saved Pop-Over only exist in JP locale
         if Locale.current.regionCode == "JP" {
+            if !Preferences.ProductNotificationBenchmarks.domainSpecificDataSavedShown.value
+                // TODO: Algorithm for checkig website exists and block listed
+            {
+                notifyDomainSpecificDataSaved("1.76") // TODO: Pass the amount using the dta in block_summary data
+                //TODO: Add that website to list block
 
+                return
+            }
         }
     }
     
@@ -171,6 +178,20 @@ extension BrowserViewController {
             guard let self = self, action == .shareTheNewsTapped else { return }
 
             self.showShareScreen()
+        }
+
+        showBenchmarkNotificationPopover(controller: shareTrackersViewController)
+    }
+    
+    private func notifyDomainSpecificDataSaved(_ dataSaved: String) {
+        let shareTrackersViewController = ShareTrackersController(trackingType: .domainSpecificDataSaved(dataSaved: dataSaved))
+        dismiss(animated: true)
+
+        shareTrackersViewController.actionHandler = { [weak self] action in
+            guard let self = self, action == .dontShowAgainTapped else { return }
+
+            Preferences.ProductNotificationBenchmarks.domainSpecificDataSavedShown.value = true
+            self.dismiss(animated: true)
         }
 
         showBenchmarkNotificationPopover(controller: shareTrackersViewController)
