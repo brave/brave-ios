@@ -16,7 +16,7 @@ class BraveSearchManager: NSObject {
     private let fallbackProviderURLString = "https://www.google.com/search"
     
     /// Brave Search query details which are passed to the fallback provider.
-    private struct BackupQuery: Codable {
+    struct BackupQuery: Codable {
         let found: Bool
         let country: String?
         let language: String?
