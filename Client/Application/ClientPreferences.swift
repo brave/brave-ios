@@ -31,7 +31,7 @@ extension Preferences {
             let isPublic = AppConstants.buildChannel.isPublic
             switch self {
             case .manually: return nil
-            case .oneDay: return isPublic ? 1.days : 2.minutes
+            case .oneDay: return isPublic ? 1.days : 5.minutes
             case .oneWeek: return isPublic ? 7.days : 10.minutes
             case .oneMonth: return isPublic ? 30.days : 1.hours
             }
