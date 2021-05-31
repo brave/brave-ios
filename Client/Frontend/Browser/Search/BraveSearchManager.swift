@@ -22,10 +22,14 @@ class BraveSearchManager: NSObject {
         let safesearch: String?
     }
     
-    /// URL of the Brave Search request.
+    /// URL of the Brave Search request we performed.
+    /// Contains a query and endpoint(prod or staging)
     private let url: URL
+    /// What did we search for using Brave Search
     private let query: String
-    let domainCookies: [HTTPCookie]
+    /// BraveSearch cookies are used to pass search settings we saved on the website
+    /// such as whether to use search fallback, should safe search be performed etc.
+    private let domainCookies: [HTTPCookie]
     
     var queryResult: String?
     
@@ -42,10 +46,6 @@ class BraveSearchManager: NSObject {
     }
     
     init?(url: URL, cookies: [HTTPCookie]) {
-        // Check if request is accessed from valid Brave Search domains
-        let validURLs = AppConstants.buildChannel.isPublic ?
-            ["search.brave.com"] : ["search.brave.com", "search-dev.brave.com"]
-        
         if !Self.isValidURL(url) {
             return nil
         }
@@ -62,24 +62,39 @@ class BraveSearchManager: NSObject {
         }
     }
     
+    /// A call is made to the Brave Search api with query we performed.
+    /// It returns  details that are used in call to the fallback search engine.
     func shouldUseFallback(completion: @escaping (BackupQuery?) -> Void) {
-        let url = URL(string: "\(url.domainURL)/api/can_answer?q=\(query)")!
+        guard var canAnswerURLComponents =
+                URLComponents(string: url.domainURL.absoluteString) else {
+            completion(nil)
+            return
+        }
+        
+        canAnswerURLComponents.scheme = "https"
+        canAnswerURLComponents.path = "/api/can_answer"
+        canAnswerURLComponents.queryItems = [.init(name: "q", value: query)]
+        
+        guard let url = canAnswerURLComponents.url else {
+            completion(nil)
+            return
+        }
+        
         var request = URLRequest(url: url,
                                  cachePolicy: .reloadIgnoringLocalAndRemoteCacheData,
                                  timeoutInterval: 5)
 
-        // Doesn't work because this cookie storage is created right there. It is local, not permanent
         let cookieStorage = HTTPCookieStorage()
         domainCookies.forEach { cookieStorage.setCookie($0) }
         
-        // does not work for some reason
-        //let domainCookies = cookieStorage.cookies(for: url) ?? []
-        let domainCookies = domainCookies.filter { $0.domain == url.host }
+        let domainCookies = domainCookies.filter { $0.domain == canAnswerURLComponents.host }
         let headers = HTTPCookie.requestHeaderFields(with: domainCookies)
         headers.forEach {
             request.setValue($0.value, forHTTPHeaderField: $0.key)
         }
         
+        // Important, URLSessionDelegate must have been implemented here
+        // to handle request authentication.
         URLSession(configuration: .ephemeral, delegate: self, delegateQueue: .main)
             .dataTaskPublisher(for: request)
             .tryMap { output -> BackupQuery in
@@ -90,7 +105,6 @@ class BraveSearchManager: NSObject {
      
                 let canAnswerResponse = try JSONDecoder().decode(BackupQuery.self, from: output.data)
                 
-                print("bxx found: \(canAnswerResponse.found)")
                 return canAnswerResponse
             }
             .sink(receiveCompletion: { status in
@@ -112,7 +126,6 @@ class BraveSearchManager: NSObject {
                       completion: @escaping (String) -> Void) {
         
         guard var components = URLComponents(string: fallbackProviderURLString) else { return }
-        // TODO: Pass correct country ang language params
         
         var queryItems: [URLQueryItem] = [
             .init(name: "q", value: query.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed))]
@@ -125,27 +138,12 @@ class BraveSearchManager: NSObject {
             queryItems.append(.init(name: "gl", value: country))
         }
         
-        if let safeSearch = backupQuery.safesearch {
-            // TODO: Append safesearch to the query
-        }
-        
         components.queryItems = queryItems
         
         guard let url = components.url else { return }
         var request = URLRequest(url: url, timeoutInterval: 3)
         
         request.addValue(UserAgent.desktop, forHTTPHeaderField: "User-Agent")
-        
-        let cookieStorage = HTTPCookieStorage()
-        domainCookies.forEach { cookieStorage.setCookie($0) }
-        
-        // does not work for some reason
-        //let domainCookies = cookieStorage.cookies(for: url) ?? []
-        let domainCookies = domainCookies.filter { $0.domain == ".google.com" }
-        let headers = HTTPCookie.requestHeaderFields(with: domainCookies)
-        headers.forEach {
-            request.setValue($0.value, forHTTPHeaderField: $0.key)
-        }
         
         fallbackQueryResultsPending = true
         URLSession(configuration: .default)
@@ -158,7 +156,7 @@ class BraveSearchManager: NSObject {
                 }
                 
                 // For some reason sometimes no matter what headers are set, ISO encoding is returned
-                // instead of utf, we check for that to decode it correctly.
+                // we check for iso and fallback to utf8 by default.
                 let encoding: String.Encoding =
                     contentType.contains("ISO-8859-1") ? .isoLatin1 : .utf8
                 
@@ -187,6 +185,9 @@ class BraveSearchManager: NSObject {
     }
 }
 
+// MARK: - URLSessionDataDelegate
+// The BraveSearch feature can be hidden behind an authentication system.
+// This code helps passing all auth info to the requests we make.
 extension BraveSearchManager: URLSessionDataDelegate {
     
     private func findLoginsForProtectionSpace(profile: Profile, challenge: URLAuthenticationChallenge, completion: @escaping (URLCredential?) -> Void) {
