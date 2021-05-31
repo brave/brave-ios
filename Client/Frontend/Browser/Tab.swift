@@ -700,7 +700,7 @@ extension Tab {
             // The method we pass data to is undefined.
             // For such case we do not call that method or remove the search backup manager.
             // swiftlint:disable:next safe_javascript
-            self.webView? .evaluateJavaScript("window.onFetchedBackupResults === undefined") {
+            self.webView?.evaluateJavaScript("window.onFetchedBackupResults === undefined") {
                 result, error in
                 defer { dispatchGroup.leave() }
                 
