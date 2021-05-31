@@ -11,6 +11,7 @@ import WebKit
 
 private let log = Logger.browserLogger
 
+// A helper class to handle Brave Search fallback needs.
 class BraveSearchManager: NSObject {
     private let fallbackProviderURLString = "https://www.google.com/search"
     
@@ -122,6 +123,7 @@ class BraveSearchManager: NSObject {
             .store(in: &cancellables)
     }
     
+    /// Perform a backup search using an alternative search engine, gets results back as html source.
     func backupSearch(with backupQuery: BackupQuery,
                       completion: @escaping (String) -> Void) {
         
@@ -143,7 +145,8 @@ class BraveSearchManager: NSObject {
         guard let url = components.url else { return }
         var request = URLRequest(url: url, timeoutInterval: 3)
         
-        request.addValue(UserAgent.desktop, forHTTPHeaderField: "User-Agent")
+        // Must be set, without it the fallback results may be not retrieved correctly.
+        request.addValue(UserAgent.userAgentForDesktopMode, forHTTPHeaderField: "User-Agent")
         
         fallbackQueryResultsPending = true
         URLSession(configuration: .default)

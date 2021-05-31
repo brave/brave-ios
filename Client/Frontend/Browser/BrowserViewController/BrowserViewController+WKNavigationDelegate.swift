@@ -208,6 +208,8 @@ extension BrowserViewController: WKNavigationDelegate {
                     }
                 }
             }
+        } else {
+            tab?.braveSearchManager = nil
         }
         
         // This is the normal case, opening a http or https url, which we handle by loading them in this WKWebView. We
@@ -438,16 +440,17 @@ extension BrowserViewController: WKNavigationDelegate {
             // the page navigation.
             if let url = tab.url, BraveSearchManager.isValidURL(url) {
                 if let braveSearchManager = tab.braveSearchManager {
+                    // Fallback results are ready before navigation finished,
+                    // they must be injected here.
                     if !braveSearchManager.fallbackQueryResultsPending {
                         tab.injectResults()
                     }
                 } else {
+                    // If not applicable, null results must be injected regardless.
+                    // The website waits on us until this is called with either results or null.
                     tab.injectResults()
                 }
-                
-                
             }
-            
             
             navigateInTab(tab: tab, to: navigation)
             if let url = tab.url, tab.shouldClassifyLoadsForAds {

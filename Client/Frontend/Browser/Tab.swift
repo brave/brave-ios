@@ -685,13 +685,22 @@ class TabWebViewMenuHelper: UIView {
 // MARK: - Brave Search
 
 extension Tab {
+    /// Call the api on the Brave Search website and passes the fallback results to it.
+    /// Important: This method is also called when there is no fallback results
+    /// or when the fallback call should not happen at all.
+    /// The website expects the iOS device to always call this method(blocks on it).
     func injectResults() {
-        guard let url = webView?.url, BraveSearchManager.isValidURL(url) else { return }
-        let result = braveSearchManager?.queryResult ?? "null"
+        var queryResult = "null"
+        
+        if let url = webView?.url,
+           BraveSearchManager.isValidURL(url),
+           let result = braveSearchManager?.queryResult {
+            queryResult = result
+        }
         
         webView?.evaluateSafeJavaScript(
             functionName: "window.onFetchedBackupResults",
-            args: [result],
+            args: [queryResult],
             sandboxed: false,
             escapeArgs: false)
         
