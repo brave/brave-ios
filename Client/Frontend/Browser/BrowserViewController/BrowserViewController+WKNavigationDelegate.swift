@@ -197,11 +197,18 @@ extension BrowserViewController: WKNavigationDelegate {
             webView.configuration.websiteDataStore.httpCookieStore.getAllCookies { cookies in
                 tab?.braveSearchManager = BraveSearchManager(url: url, cookies: cookies)
                 if let braveSearchManager = tab?.braveSearchManager {
+                    braveSearchManager.fallbackQueryResultsPending = true
                     braveSearchManager.shouldUseFallback { backupQuery in
-                        guard let query = backupQuery else { return }
+                        guard let query = backupQuery else {
+                            braveSearchManager.fallbackQueryResultsPending = false
+                            return
+                        }
                         
-                        if !query.found {
+                        if query.found {
+                            braveSearchManager.fallbackQueryResultsPending = false
+                        } else {
                             braveSearchManager.backupSearch(with: query) { completion in
+                                braveSearchManager.fallbackQueryResultsPending = false
                                 tab?.injectResults()
                             }
                         }
@@ -438,18 +445,16 @@ extension BrowserViewController: WKNavigationDelegate {
             // Second attempt to inject results to the BraveSearch.
             // This will be called if we got fallback results faster than
             // the page navigation.
-            if let url = tab.url, BraveSearchManager.isValidURL(url) {
-                if let braveSearchManager = tab.braveSearchManager {
-                    // Fallback results are ready before navigation finished,
-                    // they must be injected here.
-                    if !braveSearchManager.fallbackQueryResultsPending {
-                        tab.injectResults()
-                    }
-                } else {
-                    // If not applicable, null results must be injected regardless.
-                    // The website waits on us until this is called with either results or null.
+            if let braveSearchManager = tab.braveSearchManager {
+                // Fallback results are ready before navigation finished,
+                // they must be injected here.
+                if !braveSearchManager.fallbackQueryResultsPending {
                     tab.injectResults()
                 }
+            } else {
+                // If not applicable, null results must be injected regardless.
+                // The website waits on us until this is called with either results or null.
+                tab.injectResults()
             }
             
             navigateInTab(tab: tab, to: navigation)

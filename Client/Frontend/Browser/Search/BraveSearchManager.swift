@@ -96,9 +96,11 @@ class BraveSearchManager: NSObject {
             request.setValue($0.value, forHTTPHeaderField: $0.key)
         }
         
+        let session = URLSession(configuration: .ephemeral, delegate: self, delegateQueue: .main)
+        
         // Important, URLSessionDelegate must have been implemented here
         // to handle request authentication.
-        URLSession(configuration: .ephemeral, delegate: self, delegateQueue: .main)
+        session
             .dataTaskPublisher(for: request)
             .tryMap { output -> BackupQuery in
                 guard let response = output.response as? HTTPURLResponse,
@@ -114,6 +116,8 @@ class BraveSearchManager: NSObject {
                 switch status {
                 case .failure(let error):
                     log.error("shouldUseFallback error: \(error)")
+                    // No subsequent call to backup search engine is made in case of error.
+                    // The pending status has to be cancelled.
                     completion(nil)
                 case .finished:
                     // Completion is called on `receiveValue`.
@@ -123,6 +127,8 @@ class BraveSearchManager: NSObject {
                 completion(canAnswer)
             })
             .store(in: &cancellables)
+        
+        session.finishTasksAndInvalidate()
     }
     
     /// Perform a backup search using an alternative search engine, gets results back as html source.
@@ -145,12 +151,11 @@ class BraveSearchManager: NSObject {
         components.queryItems = queryItems
         
         guard let url = components.url else { return }
-        var request = URLRequest(url: url, timeoutInterval: 3)
+        var request = URLRequest(url: url, timeoutInterval: 5)
         
         // Must be set, without it the fallback results may be not retrieved correctly.
         request.addValue(UserAgent.userAgentForDesktopMode, forHTTPHeaderField: "User-Agent")
         
-        fallbackQueryResultsPending = true
         URLSession(configuration: .ephemeral)
             .dataTaskPublisher(for: request)
             .tryMap { output -> String in
@@ -173,8 +178,7 @@ class BraveSearchManager: NSObject {
             }
             .eraseToAnyPublisher()
             .receive(on: DispatchQueue.main)
-            .sink(receiveCompletion: { [weak self] completion in
-                self?.fallbackQueryResultsPending = false
+            .sink(receiveCompletion: { completion in
                 switch completion {
                 case .failure(let error):
                     log.error("Error: \(error)")
