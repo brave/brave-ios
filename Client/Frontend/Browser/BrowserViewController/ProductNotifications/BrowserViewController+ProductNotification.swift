@@ -134,10 +134,13 @@ extension BrowserViewController {
         // Step 5: Domain Specific Data Saved
         // Data Saved Pop-Over only exist in JP locale
         if Locale.current.regionCode == "JP" {
-            if !Preferences.ProductNotificationBenchmarks.domainSpecificDataSavedShown.value
-                // TODO: Algorithm for checkig website exists and block listed
-            {
-                notifyDomainSpecificDataSaved("1.76") // TODO: Pass the amount using the dta in block_summary data
+            if !Preferences.ProductNotificationBenchmarks.domainSpecificDataSavedShown.value {
+                guard let currentURL = selectedTab.url,
+                      let domainFetchedSiteSavings = benchmarkBlockingDataSource.fetchDomainFetchedSiteSavings(currentURL) else {
+                    return
+                }
+                
+                notifyDomainSpecificDataSaved(domainFetchedSiteSavings)
                 //TODO: Add that website to list block
 
                 return

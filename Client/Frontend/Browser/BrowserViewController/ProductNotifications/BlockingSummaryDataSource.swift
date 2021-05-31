@@ -55,10 +55,6 @@ struct BlockingSummary: Codable {
 // MARK: - BlockingSummaryDataSource
 
 class BlockingSummaryDataSource {
-
-    // MARK: Internal
-    
-    let blockingSummaryFilePath = "blocking-summary"
     
     // MARK: Lifecycle
     
@@ -66,10 +62,20 @@ class BlockingSummaryDataSource {
         blockingSummaryList = fetchBlockingSummaryObjects()
     }
     
+    // MARK: Internal
+    
+    func fetchDomainFetchedSiteSavings(_ url: URL) -> String? {
+        let domain = url.baseDomain ?? url.host ?? url.hostSLD
+
+        return blockingSummaryList.first(where: { $0.site .contains(where: domain.contains) })?.avgsavings
+    }
+    
     // MARK: Private
     
     /// The list containing details related with blocking values of sites fetched from the JSON file
     private var blockingSummaryList = [BlockingSummary]()
+    
+    private let blockingSummaryFilePath = "blocking-summary"
 
     /// The function which uses the Data from Local JSON file to fetch list of objects
     private func fetchBlockingSummaryObjects() -> [BlockingSummary] {
