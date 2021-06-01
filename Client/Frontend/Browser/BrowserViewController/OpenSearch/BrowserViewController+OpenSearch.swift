@@ -121,18 +121,21 @@ extension BrowserViewController {
         return supportsAutoAdd
     }
 
-    @objc func addCustomSearchEngineForFocusedElement() {
+    @objc func addCustomSearchEngineForFocusedElement(setAsDefault: Bool,
+                                                      completion: ((Bool) -> Void)? = nil) {
         guard var reference = openSearchEngine?.reference,
               let title = openSearchEngine?.title,
               var url = URL(string: reference) else {
             let alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
             present(alert, animated: true, completion: nil)
+            completion?(false)
             return
         }
                 
         guard let scheme = tabManager.selectedTab?.webView?.url?.scheme,
               let host = tabManager.selectedTab?.webView?.url?.host else {
             log.error("Selected Tab doesn't have URL")
+            completion?(false)
             return
         }
         
@@ -146,10 +149,16 @@ extension BrowserViewController {
             url = constructedReferenceURL
         }
                     
-        downloadOpenSearchXML(url, reference: reference, title: title, iconURL: tabManager.selectedTab?.displayFavicon?.url)
+        downloadOpenSearchXML(url, reference: reference, title: title,
+                              iconURL: tabManager.selectedTab?.displayFavicon?.url,
+                              setAsDefault: setAsDefault,
+                              completion: completion)
     }
 
-    func downloadOpenSearchXML(_ url: URL, reference: String, title: String, iconURL: String?) {
+    private func downloadOpenSearchXML(_ url: URL, reference: String, title: String,
+                                       iconURL: String?,
+                                       setAsDefault: Bool,
+                                       completion: ((Bool) -> Void)?) {
         customSearchEngineButton.action = .loading
         
         var searchEngineIcon = #imageLiteral(resourceName: "defaultFavicon")
@@ -161,14 +170,22 @@ extension BrowserViewController {
             WebImageCacheManager.shared.load(from: iconURL, completion: { [weak self] (image, _, error, _, _) in
                 if error != nil {
                     URLSession.shared.dataTask(with: iconURL, completionHandler: { [weak self] data, response, error in
-                        guard let data = data else { return }
+                        guard let data = data else {
+                            completion?(false)
+                            return
+                        }
                         
                         if let downloadedImage = UIImage(data: data) {
                             searchEngineIcon = downloadedImage
-                            WebImageCacheManager.shared.cacheImage(image: downloadedImage, data: data, url: iconURL)
+                            WebImageCacheManager.shared.cacheImage(image: downloadedImage,
+                                                                   data: data,
+                                                                   url: iconURL)
                         }
                         
-                        self?.createSearchEngine(url, reference: reference, icon: searchEngineIcon)
+                        self?.createSearchEngine(url, reference: reference,
+                                                 icon: searchEngineIcon,
+                                                 setAsDefault: setAsDefault,
+                                                 completion: completion)
                     }).resume()
                 } else {
                     // In case fetch fails use default icon and do not block addition of this engine
@@ -176,23 +193,53 @@ extension BrowserViewController {
                         searchEngineIcon = favIcon
                     }
                     
-                    self?.createSearchEngine(url, reference: reference, icon: searchEngineIcon)
+                    self?.createSearchEngine(url, reference: reference,
+                                             icon: searchEngineIcon,
+                                             setAsDefault: setAsDefault,
+                                             completion: completion)
                 }
                  
             })
         } else {
-            createSearchEngine(url, reference: reference, icon: searchEngineIcon)
+            createSearchEngine(url, reference: reference,
+                               icon: searchEngineIcon,
+                               setAsDefault: setAsDefault,
+                               completion: completion)
         }
     }
     
-    private func createSearchEngine(_ url: URL, reference: String, icon: UIImage) {
+    private func createSearchEngine(_ url: URL, reference: String, icon: UIImage,
+                                    setAsDefault: Bool,
+                                    completion: ((Bool) -> Void)?) {
         NetworkManager().downloadResource(with: url).uponQueue(.main) { [weak self] response in
             guard let openSearchEngine = OpenSearchParser(pluginMode: true).parse(
                     response.data, referenceURL: reference, image: icon, isCustomEngine: true) else {
+                completion?(false)
                 return
             }
             
-            self?.addSearchEngine(openSearchEngine)
+            if setAsDefault {
+                self?.addSearchEngineAndSetAsDefault(openSearchEngine, completion: completion)
+            } else {
+                self?.addSearchEngine(openSearchEngine)
+            }
+        }
+    }
+    
+    private func addSearchEngineAndSetAsDefault(_ engine: OpenSearchEngine,
+                                                completion: ((Bool) -> Void)?) {
+        do {
+            let searchEngines = profile.searchEngines
+            
+            try searchEngines.addSearchEngine(engine)
+            searchEngines.updateDefaultEngine(OpenSearchEngine.EngineNames.brave,
+                                                   forType: .standard)
+            searchEngines.updateDefaultEngine(OpenSearchEngine.EngineNames.brave,
+                                                   forType: .privateMode)
+            completion?(true)
+        } catch {
+            log.error("Add and set as default error: \(error)")
+            completion?(false)
         }
     }
     
