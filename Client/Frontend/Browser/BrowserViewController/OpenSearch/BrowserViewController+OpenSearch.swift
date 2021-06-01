@@ -33,8 +33,9 @@ extension BrowserViewController {
     func evaluateWebsiteSupportOpenSearchEngine(_ webView: WKWebView) -> Bool {
         if let tab = tabManager[webView],
            let openSearchMetaData = tab.pageMetadata?.search,
-           let url = webView.url,
-           url.isSecureWebPage() {
+           let url = webView.url {
+            // FIXME: UNCOMMENT BEFORE MERGE
+           // url.isSecureWebPage() {
             return updateAddOpenSearchEngine(
                 webView, referenceObject: OpenSearchReference(reference: openSearchMetaData.href, title: openSearchMetaData.title))
         }
@@ -49,7 +50,7 @@ extension BrowserViewController {
         // Add Reference Object as Open Search Engine
         openSearchEngine = referenceObject
         
-        // Open Search guidlines requires Title to be same as Short Name but it is not enforced,
+        // Open Search guidelines requires Title to be same as Short Name but it is not enforced,
         // thus in case of yahoo.com the title is 'Yahoo Search' and Shortname is 'Yahoo'
         // We are checking referenceURL match to determine searchEngine is added or not
         // In addition we are also checking if there is another engine with same name

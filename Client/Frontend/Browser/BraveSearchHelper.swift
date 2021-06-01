@@ -11,12 +11,14 @@ import Combine
 private let log = Logger.browserLogger
 
 class BraveSearchHelper: TabContentScript {
-    fileprivate weak var tab: Tab?
+    private weak var tab: Tab?
+    private let profile: Profile
     
     private var cancellable: AnyCancellable?
     
-    required init(tab: Tab) {
+    required init(tab: Tab, profile: Profile) {
         self.tab = tab
+        self.profile = profile
     }
     
     static func name() -> String {
@@ -64,10 +66,25 @@ class BraveSearchHelper: TabContentScript {
     }
     
     private func handleIsBraveSearchDefault(methodId: Int) {
-        callback(methodId: methodId, result: false)
+        let isDefault =
+            profile.searchEngines.defaultEngine().shortName.lowercased() == "brave"
+        
+        callback(methodId: methodId, result: isDefault)
     }
     
     private func handleSetBraveSearchDefault(methodId: Int) {
+        // Tight coupling, in future version this should be removed.
+        // One idea of refactor would be to move `openSearchEngine` to `Tab`
+        // Then we would have easier time accessing it.
+        guard let bvc =
+                (UIApplication.shared.delegate as? AppDelegate)?.browserViewController,
+              let openSearchEngine = bvc.openSearchEngine else {
+            callback(methodId: methodId, result: false)
+            return
+        }
+        
+        bvc.addCustomSearchEngineForFocusedElement()
+        
         callback(methodId: methodId, result: true)
     }
     
