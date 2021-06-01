@@ -19,9 +19,10 @@ public final class DataSaved: NSManagedObject, CRUD {
         all() ?? []
     }
     
-    public class func delete(with feedUrl: String) {
+    public class func delete(with savedUrl: String) {
         let context = DataController.viewContext
-        if let item = get(with: feedUrl) {
+        
+        if let item = get(with: savedUrl) {
             item.delete(context: .existing(context))
             if context.hasChanges {
                 try? context.save()
