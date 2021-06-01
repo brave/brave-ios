@@ -57,7 +57,7 @@ enum DomainUserScript: CaseIterable {
         case .archive:
             return "ArchiveIsCompat"
         case .braveSearch:
-            return "SearchBackup"
+            return "BraveSearchHelper"
         }
     }
     
@@ -85,7 +85,7 @@ enum DomainUserScript: CaseIterable {
         case .braveSearch:
             var alteredSource = source
             alteredSource = alteredSource
-                .replacingOccurrences(of: "$<search-backup>",
+                .replacingOccurrences(of: "$<brave-search-helper>",
                                       with: "D\(UserScriptManager.messageHandlerTokenString)",
                                       options: .literal)
             

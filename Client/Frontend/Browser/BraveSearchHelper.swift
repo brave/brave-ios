@@ -10,7 +10,7 @@ import Combine
 
 private let log = Logger.browserLogger
 
-class SearchBackupHelper: TabContentScript {
+class BraveSearchHelper: TabContentScript {
     fileprivate weak var tab: Tab?
     
     private var cancellable: AnyCancellable?
@@ -20,11 +20,11 @@ class SearchBackupHelper: TabContentScript {
     }
     
     static func name() -> String {
-        return "SearchBackup"
+        return "BraveSearchHelper"
     }
     
     func scriptMessageHandlerName() -> String? {
-        return SearchBackupHelper.name()
+        return BraveSearchHelper.name()
     }
     
     private enum Method: Int {
@@ -49,6 +49,7 @@ class SearchBackupHelper: TabContentScript {
         }
         
         guard let method = (message.body as? [String: Any])?["method_id"] as? Int else {
+            log.error("Failed to retrieve method id")
             return
         }
         
@@ -60,12 +61,7 @@ class SearchBackupHelper: TabContentScript {
         default:
             break
         }
-        
-        
     }
-    
-    private let functionName =
-        "window.__firefox__.D\(UserScriptManager.messageHandlerTokenString).resolve"
     
     private func handleIsBraveSearchDefault(methodId: Int) {
         callback(methodId: methodId, result: false)
@@ -76,32 +72,13 @@ class SearchBackupHelper: TabContentScript {
     }
     
     private func callback(methodId: Int, result: Bool) {
+        let functionName =
+            "window.__firefox__.D\(UserScriptManager.messageHandlerTokenString).resolve"
+        
         self.tab?.webView?.evaluateSafeJavaScript(
-            functionName: self.functionName,
+            functionName: functionName,
             args: ["'\(methodId)'", "\(result)"],
             sandboxed: false,
             escapeArgs: false)
-    }
-    
-    private struct SearchBackupMessage: Codable {
-        let id: Int
-        let data: MessageData?
-        
-        struct MessageData: Codable {
-            let query: String
-            let language: String
-            let country: String
-            let geo: String?
-        }
-        
-        static func from(message: WKScriptMessage) -> SearchBackupMessage? {
-            do {
-                let jsonData = try JSONSerialization.data(withJSONObject: message.body, options: .fragmentsAllowed)
-                return try JSONDecoder().decode(SearchBackupMessage.self, from: jsonData)
-            } catch {
-                log.error("Failed to decode message parameters: \(error)")
-                return nil
-            }
-        }
     }
 }
