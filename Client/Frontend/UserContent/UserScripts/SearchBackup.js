@@ -24,26 +24,14 @@ Object.defineProperty(window.__firefox__, '$<search-backup>', {
             
             delete window.__firefox__.$<search-backup>.resolution_handlers[id];
         },
-        sendMessage(method_id, data) {
+        sendMessage(method_id) {
             return new Promise((resolve, reject) => {
                window.__firefox__.$<search-backup>.resolution_handlers[method_id] = { resolve, reject };
-               webkit.messageHandlers.SearchBackup.postMessage({'data': data,
-                                                                'method_id': method_id});
+               webkit.messageHandlers.SearchBackup.postMessage({'method_id': method_id});
            });
         }
     }
 });
-
- Object.defineProperty(navigator, 'brave', {
-    enumerable: false,
-    configurable: true,
-    writable: false,
-     value: {
-        fetchBackupResults(query, language, country, geo) {
-            return window.__firefox__.$<search-backup>.sendMessage(1, { "query": query, "language": language, "country": country, "geo": geo})
-        }
-    }
-  });
 
 const brave = {};
 
@@ -53,11 +41,11 @@ configurable: true,
 writable: false,
     value: {
     isBraveSearchDefault() {
-        return window.__firefox__.$<search-backup>.sendMessage(2);
+        return window.__firefox__.$<search-backup>.sendMessage(1);
     },
 
     setBraveSearchDefault() {
-        return window.__firefox__.$<search-backup>.sendMessage(3);
+        return window.__firefox__.$<search-backup>.sendMessage(2);
     }
 }
 });
