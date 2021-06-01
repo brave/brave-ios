@@ -8,7 +8,7 @@ import CoreData
 
 public final class DataSaved: NSManagedObject, CRUD {
     @NSManaged public var savedUrl: String
-    @NSManaged public var amount: Double
+    @NSManaged public var amount: String
     
     public class func get(with savedUrl: String) -> DataSaved? {
         let predicate = NSPredicate(format: "\(#keyPath(DataSaved.savedUrl)) == %@", savedUrl)
@@ -29,7 +29,7 @@ public final class DataSaved: NSManagedObject, CRUD {
         }
     }
     
-    public class func insert(savedUrl: String, amount: Double) {
+    public class func insert(savedUrl: String, amount: String) {
         let context = DataController.viewContext
         
         guard let entity =  NSEntityDescription.entity(forEntityName: "DataSaved", in: context) else {

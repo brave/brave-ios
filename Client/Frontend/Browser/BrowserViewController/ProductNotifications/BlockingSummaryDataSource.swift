@@ -48,7 +48,7 @@ struct BlockingSummary: Codable {
         totalsavings = try container.decode(Double.self, forKey: .totalsavings)
         
         let unformattedSaving = try container.decode(Double.self, forKey: .avgsavings)
-        avgsavings = String(format: "$%.2f", unformattedSaving)
+        avgsavings = String(format: "%.2f", unformattedSaving)
     }
 }
 
@@ -67,7 +67,7 @@ class BlockingSummaryDataSource {
     func fetchDomainFetchedSiteSavings(_ url: URL) -> String? {
         let domain = url.baseDomain ?? url.host ?? url.hostSLD
 
-        return blockingSummaryList.first(where: { $0.site .contains(where: domain.contains) })?.avgsavings
+        return blockingSummaryList.first(where: { $0.site.contains(domain) })?.avgsavings
     }
     
     // MARK: Private

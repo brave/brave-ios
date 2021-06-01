@@ -6,6 +6,7 @@
 import BraveShared
 import BraveUI
 import Shared
+import Data
 
 // MARK: - ProductNotification
 
@@ -136,13 +137,15 @@ extension BrowserViewController {
         if Locale.current.regionCode == "JP" {
             if !Preferences.ProductNotificationBenchmarks.domainSpecificDataSavedShown.value {
                 guard let currentURL = selectedTab.url,
+                      DataSaved.get(with: currentURL.absoluteString) == nil,
                       let domainFetchedSiteSavings = benchmarkBlockingDataSource.fetchDomainFetchedSiteSavings(currentURL) else {
                     return
                 }
                 
                 notifyDomainSpecificDataSaved(domainFetchedSiteSavings)
-                //TODO: Add that website to list block
-
+                
+                DataSaved.insert(savedUrl: currentURL.absoluteString,
+                                 amount: domainFetchedSiteSavings)
                 return
             }
         }
