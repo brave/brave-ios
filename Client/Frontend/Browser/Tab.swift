@@ -691,10 +691,9 @@ extension Tab {
     /// or when the fallback call should not happen at all.
     /// The website expects the iOS device to always call this method(blocks on it).
     func injectResults() {
-        let dispatchGroup = DispatchGroup()
-        var shouldInjectResults = true
         
-        dispatchGroup.enter()
+        
+        
         DispatchQueue.main.async {
             // If the backup search results happen before the Brave Search loads
             // The method we pass data to is undefined.
@@ -702,46 +701,38 @@ extension Tab {
             // swiftlint:disable:next safe_javascript
             self.webView?.evaluateJavaScript("window.onFetchedBackupResults === undefined") {
                 result, error in
-                defer { dispatchGroup.leave() }
                 
                 if let error = error {
                     log.error("onFetchedBackupResults existence check error: \(error)")
                 }
                 
-                guard let resultBool = result as? Bool else {
+                guard let methodUndefined = result as? Bool else {
                     log.error("onFetchedBackupResults existence check, failed to unwrap bool result value")
                     return
                 }
                 
-                if resultBool {
-                    shouldInjectResults = false
+                if methodUndefined {
+                    log.info("Search Backup results are ready but the page has not been loaded yet")
+                    return
                 }
-            }
-        }
-        
-        dispatchGroup.notify(queue: .main) { [weak self] in
-            guard let self = self else { return }
-            if !shouldInjectResults {
-                log.info("Search Backup results are ready but the page has not been loaded yet")
-                return
-            }
                 
-            var queryResult = "null"
-            
-            if let url = self.webView?.url,
-               BraveSearchManager.isValidURL(url),
-               let result = self.braveSearchManager?.fallbackQueryResult {
-                queryResult = result
+                var queryResult = "null"
+                
+                if let url = self.webView?.url,
+                   BraveSearchManager.isValidURL(url),
+                   let result = self.braveSearchManager?.fallbackQueryResult {
+                    queryResult = result
+                }
+                
+                self.webView?.evaluateSafeJavaScript(
+                    functionName: "window.onFetchedBackupResults",
+                    args: [queryResult],
+                    sandboxed: false,
+                    escapeArgs: false)
+                
+                // Cleanup
+                self.braveSearchManager = nil
             }
-            
-            self.webView?.evaluateSafeJavaScript(
-                functionName: "window.onFetchedBackupResults",
-                args: [queryResult],
-                sandboxed: false,
-                escapeArgs: false)
-            
-            // Cleanup
-            self.braveSearchManager = nil
         }
     }
 }

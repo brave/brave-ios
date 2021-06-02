@@ -4,6 +4,8 @@
 
 import UIKit
 
+private let log = Logger.browserLogger
+
 extension String {
     public func escape() -> String? {
         // We can't guaruntee that strings have a valid string encoding, as this is an entry point for tainted data,
@@ -156,7 +158,8 @@ extension String {
     }
     
     // Taken from https://gist.github.com/pwightman/64c57076b89c5d7f8e8c
-    public var javaScriptEscapedString: String {
+    // Returns nil if the string cannot be escaped
+    public var javaScriptEscapedString: String? {
         // Because JSON is not a subset of JavaScript, the LINE_SEPARATOR and PARAGRAPH_SEPARATOR unicode
         // characters embedded in (valid) JSON will cause the webview's JavaScript parser to error. So we
         // must encode them first. See here: http://timelessrepo.com/json-isnt-a-javascript-subset
@@ -171,7 +174,8 @@ extension String {
             let encodedString = String(decoding: data, as: UTF8.self)
             return String(encodedString.dropLast().dropFirst())
         } catch {
-            return self
+            log.error("Failed to escape a string containing javascript: \(error)")
+            return nil
         }
     }
 }

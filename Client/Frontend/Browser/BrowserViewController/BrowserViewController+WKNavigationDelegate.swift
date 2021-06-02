@@ -192,7 +192,9 @@ extension BrowserViewController: WKNavigationDelegate {
         tab?.userScriptManager?.handleDomainUserScript(for: url)
         
         // Brave Search logic.
-        if BraveSearchManager.isValidURL(url) {
+        
+        if navigationAction.targetFrame?.isMainFrame == true,
+           BraveSearchManager.isValidURL(url) {
             // We fetch cookies to determine if backup search was enabled on the website.
             webView.configuration.websiteDataStore.httpCookieStore.getAllCookies { cookies in
                 tab?.braveSearchManager = BraveSearchManager(url: url, cookies: cookies)
