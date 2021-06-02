@@ -728,7 +728,7 @@ extension Tab {
                     functionName: "window.onFetchedBackupResults",
                     args: [queryResult],
                     sandboxed: false,
-                    escapeArgs: false)  { result, error in
+                    escapeArgs: true)  { result, error in
                     // :pj: logs, i do not see them in console
                     print("bxx result: \(result)")
                     print("bxx error: \(error)")
