@@ -192,11 +192,7 @@ extension BrowserViewController {
         ignoredNavigation.insert(navigation)
     }
     
-    func recordNavigationInTab(_ tab: Tab, navigation: WKNavigation, visitType: VisitType) {
-        guard let navigationURL = tab.url else {
-            return
-        }
-        
-        typedNavigation[navigationURL] = visitType
+    func recordNavigationInTab(_ url: URL, visitType: VisitType) {
+        typedNavigation[url] = visitType
     }
 }

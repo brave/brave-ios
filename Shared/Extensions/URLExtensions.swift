@@ -192,6 +192,22 @@ extension URL {
             return urlString
         }
     }
+    
+    public var typedDisplayString: String {
+        var urlString = self.absoluteString
+
+        if urlString.hasPrefix("http://") {
+            urlString = String(urlString[urlString.index(urlString.startIndex, offsetBy: 7)...])
+        } else if urlString.hasPrefix("https://") {
+            urlString = String(urlString[urlString.index(urlString.startIndex, offsetBy: 8)...])
+        }
+        
+        if urlString.hasSuffix("/") {
+            urlString.removeLast()
+        }
+        
+        return urlString
+    }
 
     /// String suitable for displaying outside of the app, for example in notifications, were Data Detectors will
     /// linkify the text and make it into a openable-in-Safari link.

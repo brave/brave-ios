@@ -1247,11 +1247,9 @@ class BrowserViewController: UIViewController {
                 return
             }
 
-            guard let navigation = tab.loadRequest(URLRequest(url: url)) else {
-                return
-            }
+            tab.loadRequest(URLRequest(url: url))
             
-            recordNavigationInTab(tab, navigation: navigation, visitType: visitType)
+            recordNavigationInTab(url, visitType: visitType)
         }
     }
 
@@ -1852,7 +1850,8 @@ class BrowserViewController: UIViewController {
                 if !tab.isPrivate {
                     // The visitType is checked If it is "typed" or not to determine the History object we are adding
                     // should be synced or not. This limitation exists on browser side so we are aligning with this
-                    if let visitType = typedNavigation.first(where: { $0.key == url })?.value,
+                    if let visitType =
+                        typedNavigation.first(where: { $0.key.typedDisplayString == url.typedDisplayString })?.value,
                        visitType == .typed {
                         Historyv2.add(url: url, title: tab.title ?? "", dateAdded: Date())
                     } else {
