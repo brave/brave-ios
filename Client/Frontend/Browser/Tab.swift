@@ -728,11 +728,7 @@ extension Tab {
                     functionName: "window.onFetchedBackupResults",
                     args: [queryResult],
                     sandboxed: false,
-                    escapeArgs: true)  { result, error in
-                    // :pj: logs, i do not see them in console
-                    print("bxx result: \(result)")
-                    print("bxx error: \(error)")
-                }
+                    escapeArgs: false)
                 
                 // Cleanup
                 self.braveSearchManager = nil

@@ -29,25 +29,17 @@ public extension WKWebView {
         var error: Error?
 
         args.forEach {
-            
-            
             if !escapeArgs {
                 sanitizedArgs.append("\($0)")
                 return
             }
-            
-            // :pj: i added it, does not seem to help
-            let arg = "\($0)"
-                .replacingOccurrences(of: "\u{2028}", with: "\\u2028")
-                .replacingOccurrences(of: "\u{2029}", with: "\\u2029")
-            
             context?.exceptionHandler = { context, exception in
                 if exception != nil {
                     error = JavascriptError.invalid
                 }
             }
-            context?.evaluateScript("JSON.parse('\"\(arg)\"')")
-            sanitizedArgs.append("'\(String(describing: arg).encodingHTMLEntities())'")
+            context?.evaluateScript("JSON.parse('\"\($0)\"')")
+            sanitizedArgs.append("'\(String(describing: $0).encodingHTMLEntities())'")
             return
         }
         

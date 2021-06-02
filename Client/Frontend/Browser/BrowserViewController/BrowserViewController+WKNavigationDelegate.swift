@@ -206,9 +206,13 @@ extension BrowserViewController: WKNavigationDelegate {
                             return
                         }
                         
-                        braveSearchManager.backupSearch(with: query) { completion in
+                        if query.found {
                             braveSearchManager.fallbackQueryResultsPending = false
-                            tab?.injectResults()
+                        } else {
+                            braveSearchManager.backupSearch(with: query) { completion in
+                                braveSearchManager.fallbackQueryResultsPending = false
+                                tab?.injectResults()
+                            }
                         }
                     }
                 }

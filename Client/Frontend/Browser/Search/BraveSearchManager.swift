@@ -165,12 +165,12 @@ class BraveSearchManager: NSObject {
                     throw "Invalid response"
                 }
                 
-                guard let stringFromData = String(data: output.data, encoding: .utf8) else {
+                guard let stringFromData = String(data: output.data, encoding: .utf8),
+                      let escapedString = stringFromData.javaScriptEscapedString else {
                     throw "Failed to decode string from data"
                 }
                 
-                // :pj: we pass data as string here
-                return stringFromData
+                return escapedString
             }
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { status in
