@@ -28,7 +28,7 @@ final public class RecentSearch: NSManagedObject, CRUD {
         fetchRequest.entity = RecentSearch.entity(context)
         fetchRequest.fetchBatchSize = 5
         
-        let createdSort = NSSortDescriptor(key: "dateAdded", ascending: true)
+        let createdSort = NSSortDescriptor(key: "dateAdded", ascending: false)
         fetchRequest.sortDescriptors = [createdSort]
         
         return NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: context,
