@@ -34,7 +34,7 @@ class SearchSettingsTableViewController: UITableViewController {
         static let addCustomEngineRowIdentifier = "addCustomEngineRowIdentifier"
         static let searchEngineRowIdentifier = "searchEngineRowIdentifier"
         static let showSearchSuggestionsRowIdentifier = "showSearchSuggestionsRowIdentifier"
-        static let showRecentSearchesRowIdentifier = "showSearchSuggestionsRowIdentifier"
+        static let showRecentSearchesRowIdentifier = "showRecentSearchRowIdentifier"
         static let quickSearchEngineRowIdentifier = "quickSearchEngineRowIdentifier"
         static let customSearchEngineRowIdentifier = "customSearchEngineRowIdentifier"
     }

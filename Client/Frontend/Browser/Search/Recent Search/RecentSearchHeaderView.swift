@@ -66,6 +66,11 @@ class RecentSearchHeaderView: UICollectionReusableView {
         fatalError()
     }
     
+    func setButtonVisibility(showButtonVisible: Bool, clearButtonVisible: Bool) {
+        showButton.alpha = showButtonVisible ? 1.0 : 0.0
+        hideClearButton.alpha = showButtonVisible ? 1.0 : 0.0
+    }
+    
     func resetLayout(showRecentSearches: Bool) {
         self.showRecentSearches = showRecentSearches
         themeViews()
@@ -84,9 +89,8 @@ class RecentSearchHeaderView: UICollectionReusableView {
         if showRecentSearches {
             vStackView.addArrangedSubview(hStackView)
             
-            [titleLabel, spacer, showButton, hideClearButton].forEach({
-                self.hStackView.addArrangedSubview($0)
-            })
+            [titleLabel, spacer, showButton, hideClearButton].forEach(hStackView.addArrangedSubview(_:))
+
             
             showButton.snp.makeConstraints {
                 $0.width.equalTo(hideClearButton)

@@ -6,8 +6,9 @@
 import Foundation
 import UIKit
 import SnapKit
+import BraveUI
 
-class RecentSearchCell: UICollectionViewCell {
+class RecentSearchCell: UICollectionViewCell, CollectionViewReusable {
     static let identifier = "RecentSearchCell"
     
     private let stackView = UIStackView().then {

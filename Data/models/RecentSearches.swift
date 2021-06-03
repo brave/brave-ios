@@ -21,7 +21,6 @@ final public class RecentSearch: NSManagedObject, CRUD {
     @NSManaged public var text: String?
     @NSManaged public var websiteUrl: String?
     @NSManaged public var dateAdded: Date?
-    @NSManaged public var order: Int32
     
     public class func frc() -> NSFetchedResultsController<RecentSearch> {
         let context = DataController.viewContext
@@ -29,26 +28,20 @@ final public class RecentSearch: NSManagedObject, CRUD {
         fetchRequest.entity = RecentSearch.entity(context)
         fetchRequest.fetchBatchSize = 5
         
-        let orderSort = NSSortDescriptor(key: "order", ascending: true)
-        let createdSort = NSSortDescriptor(key: "dateAdded", ascending: false)
-        fetchRequest.sortDescriptors = [orderSort, createdSort]
+        let createdSort = NSSortDescriptor(key: "dateAdded", ascending: true)
+        fetchRequest.sortDescriptors = [createdSort]
         
         return NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: context,
                                           sectionNameKeyPath: nil, cacheName: nil)
     }
     
     public static func addItem(type: RecentSearchType, text: String?, websiteUrl: String?) {
-        DataController.perform(context: .new(inMemory: false), save: false) { context in
+        DataController.perform(context: .new(inMemory: false), save: true) { context in
             let item = RecentSearch(context: context)
             item.searchType = type.rawValue
             item.text = text
             item.websiteUrl = websiteUrl
             item.dateAdded = Date()
-            item.order = -9999
-            
-            RecentSearch.saveContext(context)
-            RecentSearch.reorderItems(context: context)
-            RecentSearch.saveContext(context)
         }
     }
     
@@ -57,10 +50,7 @@ final public class RecentSearch: NSManagedObject, CRUD {
     }
     
     public static func itemExists(text: String) -> Bool {
-        if let count = RecentSearch.count(predicate: NSPredicate(format: "text == %@", text)), count > 0 {
-            return true
-        }
-        return false
+        return getItem(text: text) != nil
     }
     
     public static func removeItem(text: String) {
@@ -80,22 +70,6 @@ final public class RecentSearch: NSManagedObject, CRUD {
             log.error("Count error: \(error)")
         }
         return 0
-    }
-    
-    // MARK: - Internal
-    private static func reorderItems(context: NSManagedObjectContext) {
-        DataController.perform(context: .existing(context), save: true) { context in
-            let request = NSFetchRequest<RecentSearch>()
-            request.entity = RecentSearch.entity(context)
-            request.fetchBatchSize = 5
-            
-            let orderSort = NSSortDescriptor(key: "order", ascending: true)
-            let items = RecentSearch.all(sortDescriptors: [orderSort], context: context) ?? []
-            
-            for (order, item) in items.enumerated() {
-                item.order = Int32(order)
-            }
-        }
     }
     
     @nonobjc

@@ -45,7 +45,6 @@ class FavoritesViewController: UIViewController {
     
     private let favoritesFRC = Favorite.frc()
     private let recentSearchesFRC = RecentSearch.frc().then {
-        $0.fetchRequest.fetchOffset = 0
         $0.fetchRequest.fetchLimit = 5
     }
     
@@ -70,8 +69,8 @@ class FavoritesViewController: UIViewController {
         super.init(nibName: nil, bundle: nil)
         
         collectionView.register(RecentSearchClipboardHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "pasteboard_header")
-        collectionView.register(FavoriteCell.self, forCellWithReuseIdentifier: FavoriteCell.identifier)
-        collectionView.register(RecentSearchCell.self, forCellWithReuseIdentifier: RecentSearchCell.identifier)
+        collectionView.register(FavoriteCell.self)
+        collectionView.register(RecentSearchCell.self)
         collectionView.register(FavoritesHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "fav_header")
         collectionView.register(RecentSearchHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "recent_searches_header")
         
@@ -222,10 +221,6 @@ extension FavoritesViewController: KeyboardHelperDelegate {
         }
         return sections
     }
-    
-    private func adjustedSection(_ section: Int) -> Section? {
-        return availableSections[safe: section]
-    }
 }
 
 // MARK: - UICollectionViewDataSource & UICollectionViewDelegateFlowLayout
@@ -235,7 +230,7 @@ extension FavoritesViewController: UICollectionViewDataSource, UICollectionViewD
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        guard let section = adjustedSection(section) else {
+        guard let section = availableSections[safe: section] else {
             assertionFailure("Invalid Section")
             return 0
         }
@@ -254,7 +249,7 @@ extension FavoritesViewController: UICollectionViewDataSource, UICollectionViewD
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let section = adjustedSection(indexPath.section) else {
+        guard let section = availableSections[safe: indexPath.section] else {
             assertionFailure("Invalid Section")
             return
         }
@@ -277,7 +272,7 @@ extension FavoritesViewController: UICollectionViewDataSource, UICollectionViewD
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        guard let section = adjustedSection(indexPath.section) else {
+        guard let section = availableSections[safe: indexPath.section] else {
             assertionFailure("Invalid Section")
             return UICollectionReusableView()
         }
@@ -305,22 +300,17 @@ extension FavoritesViewController: UICollectionViewDataSource, UICollectionViewD
                         let totalCount = RecentSearch.totalCount()
                         if let fetchedObjects = recentSearchesFRC.fetchedObjects {
                             if fetchedObjects.count < totalCount {
-                                header.showButton.alpha = 1.0
-                                header.hideClearButton.alpha = 1.0
+                                header.setButtonVisibility(showButtonVisible: true, clearButtonVisible: true)
                             } else if fetchedObjects.count == totalCount {
-                                header.showButton.alpha = 0.0
-                                header.hideClearButton.alpha = 1.0
+                                header.setButtonVisibility(showButtonVisible: false, clearButtonVisible: true)
                             } else {
-                                header.showButton.alpha = 0.0
-                                header.hideClearButton.alpha = 0.0
+                                header.setButtonVisibility(showButtonVisible: false, clearButtonVisible: false)
                             }
                         } else {
-                            header.showButton.alpha = 0.0
-                            header.hideClearButton.alpha = 0.0
+                            header.setButtonVisibility(showButtonVisible: false, clearButtonVisible: false)
                         }
                     } else {
-                        header.showButton.alpha = 1.0
-                        header.hideClearButton.alpha = 1.0
+                        header.setButtonVisibility(showButtonVisible: true, clearButtonVisible: true)
                     }
                     return header
                 }
@@ -331,7 +321,7 @@ extension FavoritesViewController: UICollectionViewDataSource, UICollectionViewD
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let section = adjustedSection(indexPath.section) else {
+        guard let section = availableSections[safe: indexPath.section] else {
             assertionFailure("Invalid Section")
             return UICollectionViewCell()
         }
@@ -342,7 +332,7 @@ extension FavoritesViewController: UICollectionViewDataSource, UICollectionViewD
             return UICollectionViewCell()
         case .favorites:
             // swiftlint:disable:next force_cast
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FavoriteCell.identifier, for: indexPath) as! FavoriteCell
+            let cell = collectionView.dequeueReusableCell(for: indexPath) as FavoriteCell
             let fav = favoritesFRC.object(at: IndexPath(item: indexPath.item, section: 0))
             cell.textLabel.text = fav.displayTitle ?? fav.url
             if let url = fav.url?.asURL {
@@ -361,7 +351,7 @@ extension FavoritesViewController: UICollectionViewDataSource, UICollectionViewD
             
         case .recentSearches:
             // swiftlint:disable:next force_cast
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: RecentSearchCell.identifier, for: indexPath) as! RecentSearchCell
+            let cell = collectionView.dequeueReusableCell(for: indexPath) as RecentSearchCell
             let recentSearch = recentSearchesFRC.object(at: IndexPath(item: indexPath.item, section: 0))
             guard let searchType = RecentSearchType(rawValue: recentSearch.searchType) else {
                 cell.setTitle(recentSearch.text)
@@ -400,7 +390,7 @@ extension FavoritesViewController: UICollectionViewDataSource, UICollectionViewD
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        guard let section = adjustedSection(section) else {
+        guard let section = availableSections[safe: section] else {
             assertionFailure("Invalid Section")
             return .zero
         }
@@ -419,7 +409,7 @@ extension FavoritesViewController: UICollectionViewDataSource, UICollectionViewD
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        guard let section = adjustedSection(indexPath.section) else {
+        guard let section = availableSections[safe: indexPath.section] else {
             assertionFailure("Invalid Section")
             return .zero
         }
@@ -439,7 +429,7 @@ extension FavoritesViewController: UICollectionViewDataSource, UICollectionViewD
     }
     
     func collectionView(_ collectionView: UICollectionView, canMoveItemAt indexPath: IndexPath) -> Bool {
-        guard let section = adjustedSection(indexPath.section) else {
+        guard let section = availableSections[safe: indexPath.section] else {
             assertionFailure("Invalid Section")
             return false
         }
@@ -455,7 +445,7 @@ extension FavoritesViewController: UICollectionViewDataSource, UICollectionViewD
     }
     
     func collectionView(_ collectionView: UICollectionView, moveItemAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-        guard let section = adjustedSection(sourceIndexPath.section) else {
+        guard let section = availableSections[safe: sourceIndexPath.section] else {
             assertionFailure("Invalid Section")
             return
         }
@@ -471,7 +461,7 @@ extension FavoritesViewController: UICollectionViewDataSource, UICollectionViewD
     }
     
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
-        guard let section = adjustedSection(indexPath.section) else {
+        guard let section = availableSections[safe: indexPath.section] else {
             assertionFailure("Invalid Section")
             return nil
         }
@@ -530,7 +520,7 @@ extension FavoritesViewController: UICollectionViewDataSource, UICollectionViewD
 // MARK: - UICollectionViewDragDelegate & UICollectionViewDropDelegate
 extension FavoritesViewController: UICollectionViewDragDelegate, UICollectionViewDropDelegate {
     func collectionView(_ collectionView: UICollectionView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
-        guard let section = adjustedSection(indexPath.section) else {
+        guard let section = availableSections[safe: indexPath.section] else {
             assertionFailure("Invalid Section")
             return []
         }

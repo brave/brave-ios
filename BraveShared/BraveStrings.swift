@@ -2596,3 +2596,21 @@ extension Strings {
         public static let adNotificationTitle = NSLocalizedString("BraveRewardsAdNotificationTitle", bundle: .braveShared, value: "Brave Rewards", comment: "")
     }
 }
+
+// MARK: - Recent Searches
+extension Strings {
+    public static let recentSearchFavorites = NSLocalizedString("RecentSearchFavorites", bundle: .braveShared, value: "Favorites", comment: "Recent Search Favorites Section Title")
+    public static let recentSearchPasteAndGo = NSLocalizedString("RecentSearchPasteAndGo", bundle: .braveShared, value: "Paste & Go", comment: "Recent Search Paste & Go Button Title")
+    public static let recentSearchSectionTitle = NSLocalizedString("RecentSearchSectionTitle", bundle: .braveShared, value: "Recent Searches", comment: "Recent Search Section Title")
+    public static let recentSearchSectionDescription = NSLocalizedString("RecentSearchSectionDescription", bundle: .braveShared, value: "Recent Searches allow you to privately access past searches. Would you like to enable Recent Searches?", comment: "Recent Search Section Description")
+    public static let recentSearchClear = NSLocalizedString("RecentSearchClear", bundle: .braveShared, value: "Clear", comment: "Recent Search Clear Button")
+    public static let recentSearchShow = NSLocalizedString("RecentSearchShow", bundle: .braveShared, value: "Show", comment: "Recent Search Show Button")
+    public static let recentSearchHide = NSLocalizedString("RecentSearchHide", bundle: .braveShared, value: "Hide", comment: "Recent Search Hide Button")
+    public static let recentShowMore = NSLocalizedString("RecentSearchShowMore", bundle: .braveShared, value: "Show more", comment: "Recent Search Show More button")
+    public static let recentSearchScanned = NSLocalizedString("RecentSearchScanned", bundle: .braveShared, value: "Scanned", comment: "Recent Search Scanned text when a user scans a qr code")
+    public static let recentSearchQuickSearchOnWebsite = NSLocalizedString("RecentSearchQuickSearchOnWebsite", bundle: .braveShared, value: "on", comment: "Recent Search 'on' text when a user searches 'on' a website")
+    public static let recentSearchSuggestionsTitle = NSLocalizedString("RecentSearchSuggestionsTitle", bundle: .braveShared, value: "Search Suggestions", comment: "Recent Search suggestions title when prompting to turn on suggestions")
+    public static let recentSearchEnableSuggestions = NSLocalizedString("RecentSearchEnableSuggestions", bundle: .braveShared, value: "Enable", comment: "Recent Search button title to enable suggestions")
+    public static let recentSearchDisableSuggestions = NSLocalizedString("RecentSearchDisableSuggestions", bundle: .braveShared, value: "Disable", comment: "Recent Search button title to disable suggestions")
+    public static let recentSearchClearDataToggleOption = NSLocalizedString("RecentSearchClearDataToggleOption", bundle: .braveShared, value: "Recent Search Data", comment: "Recent Search setting title to clear recent searches")
+}
