@@ -2228,8 +2228,8 @@ extension Strings {
 }
 
 extension Strings {
-    public struct BraveToday {
-        public static let braveToday = NSLocalizedString(
+    public struct BraveNews {
+        public static let braveNews = NSLocalizedString(
             "today.braveToday",
             bundle: .braveShared,
             value: "Brave News",
