@@ -37,8 +37,8 @@ class BraveCoreMigrator {
     private var bookmarkMigrationState: MigrationState = .notStarted
     private var historyMigrationState: MigrationState = .notStarted
     
-    private let bookmarksAPI = BraveBookmarksAPI()
-    private let historyAPI = BraveHistoryAPI()
+    private let bookmarksAPI = BraveBookmarksAPI.shared
+    private let historyAPI = BraveHistoryAPI.shared
     private let dataImportExporter = BraveCoreImportExportUtility()
     private var bookmarkObserver: BookmarkModelListener?
     private var historyObserver: HistoryServiceListener?

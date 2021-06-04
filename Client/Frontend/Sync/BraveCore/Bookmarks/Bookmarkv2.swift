@@ -17,7 +17,7 @@ private let log = Logger.browserLogger
 class Bookmarkv2: WebsitePresentable {
     private let bookmarkNode: BookmarkNode
     private var observer: BookmarkModelListener?
-    private static let bookmarksAPI = BraveBookmarksAPI()
+    private static let bookmarksAPI = BraveBookmarksAPI.shared
     
     init(_ bookmarkNode: BookmarkNode) {
         self.bookmarkNode = bookmarkNode

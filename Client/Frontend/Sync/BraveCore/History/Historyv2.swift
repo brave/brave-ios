@@ -85,7 +85,7 @@ class Historyv2: WebsitePresentable {
     // MARK: Private
     
     private let historyNode: HistoryNode
-    private static let historyAPI = BraveHistoryAPI()
+    private static let historyAPI = BraveHistoryAPI.shared
     
     private func fetchHistoryTimePeriod(visited: Date?) -> Section? {
         let todayOffset = 0
