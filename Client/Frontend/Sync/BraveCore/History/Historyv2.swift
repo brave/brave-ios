@@ -156,7 +156,7 @@ extension Historyv2 {
     public static func byFrequency(query: String? = nil, _ completion: @escaping ([WebsitePresentable]) -> Void) {
         guard let query = query, !query.isEmpty else { return }
         
-        Historyv2.historyAPI.search(withQuery: nil, maxCount: 200, completion: { historyResults in
+        Historyv2.historyAPI.search(withQuery: query, maxCount: 200, completion: { historyResults in
             completion(historyResults.map { Historyv2(with: $0) })
         })
     }

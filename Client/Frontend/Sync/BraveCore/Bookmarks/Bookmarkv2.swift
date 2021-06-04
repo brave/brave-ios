@@ -225,14 +225,15 @@ extension Bookmarkv2 {
         let result = folder.bookmarkNode.children.map({ Bookmarkv2($0) })
         return includeFolders ? result : result.filter({ $0.isFolder == false })
     }
-    
-    public static func byFrequency(query: String? = nil) -> [WebsitePresentable] {
+    public static func byFrequency(query: String? = nil, _ completion: @escaping ([WebsitePresentable]) -> Void) {
         // Invalid query.. BraveCore doesn't store bookmarks based on last visited.
         // Any last visited bookmarks would show up in `History` anyway.
         // BraveCore automatically sorts them by date as well.
-        guard let query = query, !query.isEmpty else { return [] }
-        return Bookmarkv2.bookmarksAPI.search(withQuery: query, maxCount: 200)
-            .compactMap({ return !$0.isFolder ? Bookmarkv2($0) : nil })
+        guard let query = query, !query.isEmpty else { return }
+        
+        Bookmarkv2.bookmarksAPI.search(withQuery: query, maxCount: 200, completion: { bookmarkResults in
+            completion(bookmarkResults.compactMap({ return !$0.isFolder ? Bookmarkv2($0) : nil }))
+        })
     }
     
     public func update(customTitle: String?, url: URL?) {

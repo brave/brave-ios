@@ -17,19 +17,24 @@ class FrecencyQuery {
         cancellable?.cancel()
         cancellable = nil
         
-        // CoreData is fast, can be fetched on main thread. This also prevents threading problems.
-        let historySites = History.byFrecency(query: query)
-            .map { Site(url: $0.url ?? "", title: $0.title ?? "") }
         cancellable = DispatchWorkItem {
             // brave-core fetch can be slow over 200ms per call,
             // a cancellable serial queue is used for it.
-            let bookmarkSites = Bookmarkv2.byFrequency(query: query)
-                .map { Site(url: $0.url ?? "", title: $0.title ?? "", bookmarked: true) }
             
-            let result = Set<Site>(historySites + bookmarkSites)
-            
-            DispatchQueue.main.async {
-                completion(result)
+            Historyv2.byFrequency(query: query) { historyList in
+                let historySites = historyList
+                    .map { Site(url: $0.url ?? "", title: $0.title ?? "") }
+
+                Bookmarkv2.byFrequency(query: query) { bookmarkList in
+                    let bookmarkSites = bookmarkList
+                        .map { Site(url: $0.url ?? "", title: $0.title ?? "", bookmarked: true) }
+                    
+                    let result = Set<Site>(historySites + bookmarkSites)
+
+                    DispatchQueue.main.async {
+                        completion(result)
+                    }
+                }
             }
         }
         
