@@ -9,37 +9,22 @@ import Storage
 import Data
 
 class FrequencyQuery {
-    private static let queue = DispatchQueue(label: "frequency-query-queue")
-    private static var cancellable: DispatchWorkItem?
     
-    public static func sitesByFrecency(containing query: String? = nil,
-                                       completion: @escaping (Set<Site>) -> Void) {
-        cancellable?.cancel()
-        cancellable = nil
+    public static func sitesByFrequency(containing query: String? = nil,
+                                        completion: @escaping (Set<Site>) -> Void) {
         
-        cancellable = DispatchWorkItem {
-            // brave-core fetch can be slow over 200ms per call,
-            // a cancellable serial queue is used for it.
+        Historyv2.byFrequency(query: query) { historyList in
+            let historySites = historyList
+                .map { Site(url: $0.url ?? "", title: $0.title ?? "") }
             
-            Historyv2.byFrequency(query: query) { historyList in
-                let historySites = historyList
-                    .map { Site(url: $0.url ?? "", title: $0.title ?? "") }
-
-                Bookmarkv2.byFrequency(query: query) { bookmarkList in
-                    let bookmarkSites = bookmarkList
-                        .map { Site(url: $0.url ?? "", title: $0.title ?? "", bookmarked: true) }
-                    
-                    let result = Set<Site>(historySites + bookmarkSites)
-
-                    DispatchQueue.main.async {
-                        completion(result)
-                    }
-                }
+            Bookmarkv2.byFrequency(query: query) { bookmarkList in
+                let bookmarkSites = bookmarkList
+                    .map { Site(url: $0.url ?? "", title: $0.title ?? "", bookmarked: true) }
+                
+                let result = Set<Site>(historySites + bookmarkSites)
+                
+                completion(result)
             }
-        }
-        
-        if let task = cancellable {
-            queue.async(execute: task)
         }
     }
 }
