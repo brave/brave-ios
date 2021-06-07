@@ -28,7 +28,7 @@ class RecentSearchHeaderView: UICollectionReusableView {
         $0.font = .systemFont(ofSize: 13.0)
         $0.textColor = .braveLabel
         $0.numberOfLines = 0
-        $0.lineBreakMode = .byCharWrapping
+        $0.lineBreakMode = .byWordWrapping
         $0.setContentHuggingPriority(.required, for: .vertical)
         $0.setContentCompressionResistancePriority(.required, for: .vertical)
     }

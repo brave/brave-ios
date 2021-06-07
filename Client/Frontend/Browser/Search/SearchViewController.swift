@@ -152,14 +152,12 @@ class SearchViewController: SiteTableViewController, LoaderListener {
             sections.append(.searchSuggestionsOptIn)
         }
         
-        sections.append(.searchSuggestions)
+        if !tabType.isPrivate && searchEngines?.shouldShowSearchSuggestions == true {
+            sections.append(.searchSuggestions)
+        }
         sections.append(.bookmarksAndHistory)
         sections.append(.findInPage)
         return sections
-    }
-    
-    private func adjustedSection(_ section: Int) -> SearchListSection? {
-        return availableSections[safe: section]
     }
 
     // MARK: Lifecycle
@@ -417,7 +415,7 @@ class SearchViewController: SiteTableViewController, LoaderListener {
     // MARK: UITableViewDelegate, UITableViewDataSource
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let section = adjustedSection(indexPath.section) else { return }
+        guard let section = availableSections[safe: indexPath.section] else { return }
         
         switch section {
         case .quickBar:
@@ -447,7 +445,7 @@ class SearchViewController: SiteTableViewController, LoaderListener {
     }
 
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        if let currentSection = adjustedSection(indexPath.section) {
+        if let currentSection = availableSections[safe: indexPath.section] {
             switch currentSection {
             case .quickBar:
                 return super.tableView(tableView, heightForRowAt: indexPath)
@@ -466,7 +464,7 @@ class SearchViewController: SiteTableViewController, LoaderListener {
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        guard let searchSection = adjustedSection(section) else { return nil }
+        guard let searchSection = availableSections[safe: section] else { return nil }
         
         switch searchSection {
         case .quickBar: return nil
@@ -488,7 +486,7 @@ class SearchViewController: SiteTableViewController, LoaderListener {
     }
 
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        guard let searchSection = adjustedSection(section) else { return 0 }
+        guard let searchSection = availableSections[safe: section] else { return 0 }
         let headerHeight: CGFloat = 22
         
         switch searchSection {
@@ -512,7 +510,7 @@ class SearchViewController: SiteTableViewController, LoaderListener {
     }
     
     func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        guard let searchSection = adjustedSection(section) else { return 0 }
+        guard let searchSection = availableSections[safe: section] else { return 0 }
         switch searchSection {
         case .quickBar:
             return 0.0
@@ -527,7 +525,11 @@ class SearchViewController: SiteTableViewController, LoaderListener {
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        switch adjustedSection(indexPath.section)! {
+        guard let section = availableSections[safe: indexPath.section] else {
+            return UITableViewCell()
+        }
+        
+        switch section {
         case .quickBar:
             let cell = TwoLineTableViewCell()
             cell.textLabel?.text = searchQuery
@@ -591,13 +593,17 @@ class SearchViewController: SiteTableViewController, LoaderListener {
             cell.textLabel?.font = .systemFont(ofSize: 15.0)
             cell.textLabel?.lineBreakMode = .byWordWrapping
             cell.textLabel?.textAlignment = .left
-            cell.contentView.backgroundColor = .secondaryBraveBackground
+            cell.backgroundColor = .secondaryBraveBackground
             return cell
         }
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        switch adjustedSection(section)! {
+        guard let section = availableSections[safe: section] else {
+            return 0
+        }
+        
+        switch section {
         case .quickBar:
             return 1
         case .searchSuggestionsOptIn:
@@ -620,7 +626,7 @@ class SearchViewController: SiteTableViewController, LoaderListener {
     }
 
     func tableView(_ tableView: UITableView, didHighlightRowAt indexPath: IndexPath) {
-        guard let section = adjustedSection(indexPath.section) else {
+        guard let section = availableSections[safe: indexPath.section] else {
             return
         }
 

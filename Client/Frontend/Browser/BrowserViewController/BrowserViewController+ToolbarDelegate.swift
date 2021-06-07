@@ -326,7 +326,8 @@ extension BrowserViewController: TopToolbarDelegate {
     
     private func displayFavoritesController() {
         if favoritesController == nil {
-            let favoritesController = FavoritesViewController(action: { [weak self] bookmark, action in
+            let tabType = TabType.of(tabManager.selectedTab)
+            let favoritesController = FavoritesViewController(tabType: tabType, action: { [weak self] bookmark, action in
                 self?.handleFavoriteAction(favorite: bookmark, action: action)
             }, recentSearchAction: { [weak self] recentSearch in
                 guard let self = self else { return }

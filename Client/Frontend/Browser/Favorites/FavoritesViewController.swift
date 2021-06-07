@@ -54,6 +54,7 @@ class FavoritesViewController: UIViewController {
         $0.minimumLineSpacing = 8
     }
     
+    private var tabType: TabType
     private var favoriteGridSize: CGSize = .zero
     private let collectionView: UICollectionView
     private let backgroundView = UIVisualEffectView(effect: UIBlurEffect(style: .systemChromeMaterial)).then {
@@ -61,7 +62,8 @@ class FavoritesViewController: UIViewController {
     }
     private var hasPasteboardURL = false
     
-    init(action: @escaping (Favorite, BookmarksAction) -> Void, recentSearchAction: @escaping (RecentSearch?) -> Void) {
+    init(tabType: TabType, action: @escaping (Favorite, BookmarksAction) -> Void, recentSearchAction: @escaping (RecentSearch?) -> Void) {
+        self.tabType = tabType
         self.action = action
         self.recentSearchAction = recentSearchAction
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
@@ -213,10 +215,11 @@ extension FavoritesViewController: KeyboardHelperDelegate {
         
         sections.append(.favorites)
         
-        if Preferences.Search.shouldShowRecentSearches.value &&
+        if !tabType.isPrivate &&
+           Preferences.Search.shouldShowRecentSearches.value &&
             recentSearchesFRC.fetchedObjects?.isEmpty == false {
             sections.append(.recentSearches)
-        } else if Preferences.Search.shouldShowRecentSearchesOptIn.value {
+        } else if !tabType.isPrivate && Preferences.Search.shouldShowRecentSearchesOptIn.value {
             sections.append(.recentSearches)
         }
         return sections
@@ -241,7 +244,7 @@ extension FavoritesViewController: UICollectionViewDataSource, UICollectionViewD
         case .favorites:
             return favoritesFRC.fetchedObjects?.count ?? 0
         case .recentSearches:
-            if Preferences.Search.shouldShowRecentSearches.value {
+            if !tabType.isPrivate && Preferences.Search.shouldShowRecentSearches.value {
                 return recentSearchesFRC.fetchedObjects?.count ?? 0
             }
             return 0
@@ -388,6 +391,7 @@ extension FavoritesViewController: UICollectionViewDataSource, UICollectionViewD
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        let indexPath = IndexPath(item: 0, section: section)
         guard let section = availableSections[safe: section] else {
             assertionFailure("Invalid Section")
             return .zero
@@ -402,7 +406,8 @@ extension FavoritesViewController: UICollectionViewDataSource, UICollectionViewD
             if Preferences.Search.shouldShowRecentSearches.value {
                 return CGSize(width: collectionView.bounds.width, height: 22.0)
             }
-            return CGSize(width: collectionView.bounds.width, height: 112.0)
+            
+            return CGSize(width: collectionView.bounds.width, height: 150.0)
         }
     }
     

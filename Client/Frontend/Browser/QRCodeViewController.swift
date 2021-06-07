@@ -144,7 +144,7 @@ class QRCodeViewController: UIViewController {
         }
 
         instructionsLabel.snp.makeConstraints { (make) in
-            make.left.right.equalTo(self.view.layoutMarginsGuide)
+            make.left.right.equalTo(self.view.safeAreaLayoutGuide)
             make.top.equalTo(scanBorder.snp.bottom).offset(30)
         }
     }
