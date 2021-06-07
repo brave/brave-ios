@@ -68,7 +68,7 @@ class RecentSearchHeaderView: UICollectionReusableView {
     
     func setButtonVisibility(showButtonVisible: Bool, clearButtonVisible: Bool) {
         showButton.alpha = showButtonVisible ? 1.0 : 0.0
-        hideClearButton.alpha = showButtonVisible ? 1.0 : 0.0
+        hideClearButton.alpha = clearButtonVisible ? 1.0 : 0.0
     }
     
     func resetLayout(showRecentSearches: Bool) {

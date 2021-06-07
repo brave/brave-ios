@@ -42,6 +42,7 @@ class SearchViewController: SiteTableViewController, LoaderListener {
         static let faviconSize: CGFloat = 29
         static let iconBorderColor = UIColor(white: 0, alpha: 0.1)
         static let iconBorderWidth: CGFloat = 0.5
+        static let maxSearchSuggestions = 6
     }
 
     // MARK: SearchListSection
@@ -603,7 +604,7 @@ class SearchViewController: SiteTableViewController, LoaderListener {
             return 1
         case .searchSuggestions:
             guard let shouldShowSuggestions =  searchEngines?.shouldShowSearchSuggestions else { return 0 }
-            return shouldShowSuggestions && !searchQuery.looksLikeAURL() && !tabType.isPrivate ? suggestions.count : 0
+            return shouldShowSuggestions && !searchQuery.looksLikeAURL() && !tabType.isPrivate ? min(suggestions.count, SearchViewControllerUX.maxSearchSuggestions) : 0
         case .bookmarksAndHistory:
             return data.count
         case .findInPage:

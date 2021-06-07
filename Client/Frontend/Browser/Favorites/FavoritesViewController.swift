@@ -331,7 +331,6 @@ extension FavoritesViewController: UICollectionViewDataSource, UICollectionViewD
             assertionFailure("Pasteboard section should have no items")
             return UICollectionViewCell()
         case .favorites:
-            // swiftlint:disable:next force_cast
             let cell = collectionView.dequeueReusableCell(for: indexPath) as FavoriteCell
             let fav = favoritesFRC.object(at: IndexPath(item: indexPath.item, section: 0))
             cell.textLabel.text = fav.displayTitle ?? fav.url
@@ -350,7 +349,6 @@ extension FavoritesViewController: UICollectionViewDataSource, UICollectionViewD
             return cell
             
         case .recentSearches:
-            // swiftlint:disable:next force_cast
             let cell = collectionView.dequeueReusableCell(for: indexPath) as RecentSearchCell
             let recentSearch = recentSearchesFRC.object(at: IndexPath(item: indexPath.item, section: 0))
             guard let searchType = RecentSearchType(rawValue: recentSearch.searchType) else {
