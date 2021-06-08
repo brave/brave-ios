@@ -502,7 +502,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
     }
     
     private func updateLocationBarRightView(showQrCodeButton: Bool) {
-        if QRCodeViewController.hasCameraSupport {
+        if RecentSearchQRCodeScannerController.hasCameraSupport {
             locationTextField?.clearButtonMode = showQrCodeButton ? .never : .whileEditing
             locationTextField?.rightViewMode = showQrCodeButton ? .always : .never
         } else {
