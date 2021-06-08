@@ -278,11 +278,15 @@ extension BrowserViewController: TopToolbarDelegate {
     }
     
     func topToolbarDidPressQrCodeButton(_ urlBar: TopToolbarView) {
-        hideFavoritesController()
-        
-        let qrCodeController = QRCodeViewController()
-        qrCodeController.qrCodeDelegate = self
-        self.present(qrCodeController, animated: true, completion: nil)
+        if QRCodeViewController.hasCameraPermissions {
+            let qrCodeController = QRCodeViewController()
+            qrCodeController.qrCodeDelegate = self
+            self.present(QRCodeNavigationController(rootViewController: qrCodeController), animated: true, completion: nil)
+        } else {
+            let alert = UIAlertController(title: Strings.scanQRCodeViewTitle, message: Strings.scanQRCodePermissionErrorMessage, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: Strings.scanQRCodeErrorOKButton, style: .default, handler: nil))
+            self.present(alert, animated: true, completion: nil)
+        }
     }
     
     private func hideSearchController() {

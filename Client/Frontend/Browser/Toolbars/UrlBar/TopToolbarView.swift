@@ -502,8 +502,12 @@ class TopToolbarView: UIView, ToolbarProtocol {
     }
     
     private func updateLocationBarRightView(showQrCodeButton: Bool) {
-        locationTextField?.clearButtonMode = showQrCodeButton ? .never : .whileEditing
-        locationTextField?.rightViewMode = showQrCodeButton ? .always : .never
+        if QRCodeViewController.hasCameraSupport {
+            locationTextField?.clearButtonMode = showQrCodeButton ? .never : .whileEditing
+            locationTextField?.rightViewMode = showQrCodeButton ? .always : .never
+        } else {
+            locationTextField?.clearButtonMode = .whileEditing
+        }
     }
     
     func didClickAddTab() {
@@ -531,6 +535,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
     }
     
     @objc func topToolbarDidPressQrCodeButton() {
+        leaveOverlayMode(didCancel: true)
         delegate?.topToolbarDidPressQrCodeButton(self)
     }
 }
