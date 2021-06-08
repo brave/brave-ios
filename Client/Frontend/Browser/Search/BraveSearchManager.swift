@@ -149,7 +149,7 @@ class BraveSearchManager: NSObject {
         components.queryItems = queryItems
         
         guard let url = components.url else { return }
-        var request = URLRequest(url: url, timeoutInterval: 5)
+        var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 5)
         
         // Must be set, without it the fallback results may be not retrieved correctly.
         request.addValue(UserAgent.userAgentForDesktopMode, forHTTPHeaderField: "User-Agent")
