@@ -157,7 +157,8 @@ class BraveSearchManager: NSObject {
         request.addValue("text/html;charset=UTF-8, text/plain;charset=UTF-8",
                          forHTTPHeaderField: "Accept")
         
-        URLSession(configuration: .ephemeral)
+        let session = URLSession(configuration: .ephemeral)
+        session
             .dataTaskPublisher(for: request)
             .tryMap { output -> String in
                 guard let response = output.response as? HTTPURLResponse,
@@ -186,6 +187,8 @@ class BraveSearchManager: NSObject {
                 completion(data)
             })
             .store(in: &cancellables)
+        
+        session.finishTasksAndInvalidate()
     }
 }
 
