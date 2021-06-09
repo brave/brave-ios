@@ -288,7 +288,12 @@ extension BrowserViewController: TopToolbarDelegate {
                     self.didScanQRCodeWithText(string)
                 }
             }
-            self.present(UINavigationController(rootViewController: qrCodeController), animated: true, completion: nil)
+            
+            let navigationController = UINavigationController(rootViewController: qrCodeController)
+            navigationController.modalPresentationStyle =
+                UIDevice.current.userInterfaceIdiom == .phone ? .pageSheet : .formSheet
+            
+            self.present(navigationController, animated: true, completion: nil)
         } else {
             let alert = UIAlertController(title: Strings.scanQRCodeViewTitle, message: Strings.scanQRCodePermissionErrorMessage, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: Strings.scanQRCodeErrorOKButton, style: .default, handler: nil))
