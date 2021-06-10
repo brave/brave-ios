@@ -10,7 +10,7 @@ import BraveUI
 
 class RecentSearchCell: UICollectionViewCell, CollectionViewReusable {
     static let identifier = "RecentSearchCell"
-    private var openButtonAction: (() -> Void)?
+    var openButtonAction: (() -> Void)?
     
     private let stackView = UIStackView().then {
         $0.spacing = 20.0
@@ -53,10 +53,6 @@ class RecentSearchCell: UICollectionViewCell, CollectionViewReusable {
     
     func setAttributedTitle(_ title: NSAttributedString?) {
         titleLabel.attributedText = title
-    }
-    
-    func setOpenButtonAction(_ action: (() -> Void)?) {
-        openButtonAction = action
     }
     
     @objc

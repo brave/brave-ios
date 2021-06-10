@@ -359,8 +359,8 @@ extension FavoritesViewController: UICollectionViewDataSource, UICollectionViewD
                 return cell
             }
             
-            cell.setOpenButtonAction { [weak self] in
-                self?.onOpenRecentSearch(recentSearch)
+            cell.openButtonAction = { [unowned self] in
+                self.onOpenRecentSearch(recentSearch)
             }
             
             switch searchType {
