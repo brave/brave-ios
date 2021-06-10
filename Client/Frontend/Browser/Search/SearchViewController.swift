@@ -188,6 +188,7 @@ class SearchViewController: SiteTableViewController, LoaderListener {
             make.edges.equalTo(view)
         }
         
+        tableView.keyboardDismissMode = .interactive
         tableView.separatorStyle = .none
         tableView.addGestureRecognizer(suggestionLongPressGesture)
         tableView.register(SearchSuggestionPromptCell.self, forCellReuseIdentifier: SearchSuggestionPromptCell.identifier)
