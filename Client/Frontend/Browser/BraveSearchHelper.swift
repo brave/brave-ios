@@ -14,6 +14,14 @@ class BraveSearchHelper: TabContentScript {
     private weak var tab: Tab?
     private let profile: Profile
     
+    /// Tracks how many in current browsing session the user has been prompted to set Brave Search as a default
+    /// while on one of Brave Search websites.
+    static var canSetAsDefaultCounter = 0
+    /// How many times user is shown the default browser prompt on Brave Search websites.
+    private let maxCountOfDefaultBrowserPromptsPerSession = 3
+    /// How many times user is shown the default browser prompt in total, this does not reset between app launches.
+    private let maxCountOfDefaultBrowserPromptsTotal = 10
+    
     private var cancellable: AnyCancellable?
     
     required init(tab: Tab, profile: Profile) {
@@ -30,7 +38,7 @@ class BraveSearchHelper: TabContentScript {
     }
     
     private enum Method: Int {
-        case isBraveSearchDefault = 1
+        case canSetBraveSearchAsDefault = 1
         case setBraveSearchDefault = 2
     }
     
@@ -56,8 +64,8 @@ class BraveSearchHelper: TabContentScript {
         }
         
         switch method {
-        case Method.isBraveSearchDefault.rawValue:
-            handleIsBraveSearchDefault(methodId: method)
+        case Method.canSetBraveSearchAsDefault.rawValue:
+            handleCanSetBraveSearchAsDefault(methodId: method)
         case Method.setBraveSearchDefault.rawValue:
             handleSetBraveSearchDefault(methodId: method)
         default:
@@ -65,12 +73,29 @@ class BraveSearchHelper: TabContentScript {
         }
     }
     
-    private func handleIsBraveSearchDefault(methodId: Int) {
-        let defaultEngine = profile.searchEngines.defaultEngine(forType: .standard).shortName
-        let isDefault = defaultEngine == OpenSearchEngine.EngineNames.brave
+    private func handleCanSetBraveSearchAsDefault(methodId: Int) {
         
-        callback(methodId: methodId, result: isDefault)
-        //callback(methodId: methodId, result: true)
+        if PrivateBrowsingManager.shared.isPrivateBrowsing {
+            log.debug("Private mode deteceted, not trying to set Brave Search as a default")
+            callback(methodId: methodId, result: false)
+            return
+        }
+        
+        let maximumPromptCount = Preferences.Search.braveSearchDefaultBrowserPromptCount
+        if Self.canSetAsDefaultCounter >= maxCountOfDefaultBrowserPromptsPerSession ||
+            maximumPromptCount.value >= maxCountOfDefaultBrowserPromptsTotal {
+            log.debug("Maximum number of tries of Brave Search website prompts reached")
+            callback(methodId: methodId, result: false)
+            return
+        }
+        
+        Self.canSetAsDefaultCounter += 1
+        maximumPromptCount.value += 1
+        
+        let defaultEngine = profile.searchEngines.defaultEngine(forType: .standard).shortName
+        let canSetAsDefault = defaultEngine != OpenSearchEngine.EngineNames.brave
+        
+        callback(methodId: methodId, result: canSetAsDefault)
     }
     
     private func handleSetBraveSearchDefault(methodId: Int) {
