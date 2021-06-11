@@ -33,18 +33,16 @@ Object.defineProperty(window.__firefox__, '$<brave-search-helper>', {
     }
 });
 
-const brave = {};
-
-Object.defineProperty(brave, 'search', {
+Object.defineProperty(window, 'brave', {
 enumerable: false,
 configurable: true,
 writable: false,
     value: {
-    isBraveSearchDefault() {
+    getCanSetDefaultSearchProvider() {
         return window.__firefox__.$<brave-search-helper>.sendMessage(1);
     },
 
-    setBraveSearchDefault() {
+    setIsDefaultSearchProvider() {
         return window.__firefox__.$<brave-search-helper>.sendMessage(2);
     }
 }

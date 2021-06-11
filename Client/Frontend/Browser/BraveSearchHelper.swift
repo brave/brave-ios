@@ -66,13 +66,21 @@ class BraveSearchHelper: TabContentScript {
     }
     
     private func handleIsBraveSearchDefault(methodId: Int) {
-        let isDefault =
-            profile.searchEngines.defaultEngine().shortName.lowercased() == "brave"
+        let defaultEngine = profile.searchEngines.defaultEngine(forType: .standard).shortName
+        let isDefault = defaultEngine == OpenSearchEngine.EngineNames.brave
         
         callback(methodId: methodId, result: isDefault)
+        //callback(methodId: methodId, result: true)
     }
     
     private func handleSetBraveSearchDefault(methodId: Int) {
+        
+        profile.searchEngines.updateDefaultEngine(OpenSearchEngine.EngineNames.brave, forType: .standard)
+        callback(methodId: methodId, result: nil)
+        return
+        
+        // FIXME: REMOVE BEFORE MERGE, OPENSEARCH WAY TO ADD SE, not sure what approach we are going to use
+        
         // Tight coupling, in future version this should be removed.
         // One idea of refactor would be to move `openSearchEngine` to `Tab`
         // Then we would have easier time accessing it.
@@ -97,13 +105,18 @@ class BraveSearchHelper: TabContentScript {
         
     }
     
-    private func callback(methodId: Int, result: Bool) {
+    private func callback(methodId: Int, result: Bool?) {
         let functionName =
             "window.__firefox__.D\(UserScriptManager.messageHandlerTokenString).resolve"
         
+        var args = ["'\(methodId)'"]
+        if let result = result {
+            args.append("\(result)")
+        }
+        
         self.tab?.webView?.evaluateSafeJavaScript(
             functionName: functionName,
-            args: ["'\(methodId)'", "\(result)"],
+            args: args,
             sandboxed: false,
             escapeArgs: false)
     }
