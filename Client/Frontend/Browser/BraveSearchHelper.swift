@@ -102,33 +102,8 @@ class BraveSearchHelper: TabContentScript {
     }
     
     private func handleSetBraveSearchDefault(methodId: Int) {
-        
         profile.searchEngines.updateDefaultEngine(OpenSearchEngine.EngineNames.brave, forType: .standard)
         callback(methodId: methodId, result: nil)
-        return
-        
-        // FIXME: REMOVE BEFORE MERGE, OPENSEARCH WAY TO ADD SE, not sure what approach we are going to use
-        
-        // Tight coupling, in future version this should be removed.
-        // One idea of refactor would be to move `openSearchEngine` to `Tab`
-        // Then we would have easier time accessing it.
-        guard let bvc =
-                (UIApplication.shared.delegate as? AppDelegate)?.browserViewController else {
-            callback(methodId: methodId, result: false)
-            return
-        }
-        
-        if profile.searchEngines.engineExists(withName: "Brave") {
-            let engineType: DefaultEngineType =
-                PrivateBrowsingManager.shared.isPrivateBrowsing ? .privateMode : .standard
-            
-            profile.searchEngines.updateDefaultEngine(OpenSearchEngine.EngineNames.brave, forType: engineType)
-            callback(methodId: methodId, result: true)
-        } else {
-            bvc.addCustomSearchEngineForFocusedElement(setAsDefault: true) { [weak self] completion in
-                self?.callback(methodId: methodId, result: completion)
-            }
-        }
     }
     
     private func callback(methodId: Int, result: Bool?) {

@@ -157,11 +157,6 @@ class SearchEngines {
             return self.orderedEngines.filter({ (engine) in !self.isEngineDefault(engine) && self.isEngineEnabled(engine) })
         }
     }
-    
-    func engineExists(withName shortName: String) -> Bool {
-        Set<String>(orderedEngines.map(\.shortName) + disabledEngineNames.keys)
-        .contains(shortName)
-    }
 
     var shouldShowSearchSuggestionsOptIn: Bool {
         get { return Preferences.Search.shouldShowSuggestionsOptIn.value }
