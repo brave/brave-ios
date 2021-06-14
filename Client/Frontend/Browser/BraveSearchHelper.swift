@@ -22,8 +22,6 @@ class BraveSearchHelper: TabContentScript {
     /// How many times user is shown the default browser prompt in total, this does not reset between app launches.
     private let maxCountOfDefaultBrowserPromptsTotal = 10
     
-    private var cancellable: AnyCancellable?
-    
     required init(tab: Tab, profile: Profile) {
         self.tab = tab
         self.profile = profile
@@ -79,7 +77,7 @@ class BraveSearchHelper: TabContentScript {
     private func handleCanSetBraveSearchAsDefault(methodId: Int) {
         
         if PrivateBrowsingManager.shared.isPrivateBrowsing {
-            log.debug("Private mode deteceted, not trying to set Brave Search as a default")
+            log.debug("Private mode detected, skipping setting Brave Search as a default")
             callback(methodId: methodId, result: false)
             return
         }

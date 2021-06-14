@@ -149,7 +149,7 @@ extension BrowserViewController {
                               iconURL: tabManager.selectedTab?.displayFavicon?.url)
     }
 
-    private func downloadOpenSearchXML(_ url: URL, reference: String, title: String, iconURL: String?) {
+    func downloadOpenSearchXML(_ url: URL, reference: String, title: String, iconURL: String?) {
         customSearchEngineButton.action = .loading
         
         var searchEngineIcon = #imageLiteral(resourceName: "defaultFavicon")
@@ -161,9 +161,7 @@ extension BrowserViewController {
             WebImageCacheManager.shared.load(from: iconURL, completion: { [weak self] (image, _, error, _, _) in
                 if error != nil {
                     URLSession.shared.dataTask(with: iconURL, completionHandler: { [weak self] data, response, error in
-                        guard let data = data else {
-                            return
-                        }
+                        guard let data = data else { return }
                         
                         if let downloadedImage = UIImage(data: data) {
                             searchEngineIcon = downloadedImage
