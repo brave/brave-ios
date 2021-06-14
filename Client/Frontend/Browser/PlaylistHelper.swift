@@ -137,6 +137,8 @@ class PlaylistHelper: NSObject, TabContentScript {
             return isPlayable
         }
         
+        // Performance improvement to check the status first
+        // before attempting to load the playable status
         if isAssetPlayable() {
             DispatchQueue.main.async {
                 completion(true)
@@ -148,9 +150,13 @@ class PlaylistHelper: NSObject, TabContentScript {
         case .offline, .unknown:
             log.error("Couldn't load asset's playability -- Offline")
             DispatchQueue.main.async {
-                completion(isAssetPlayable())
+                // We have no other way of knowing the playable status
+                // It is best to assume the item can be played
+                // In the worst case, if it can't be played, it will show an error
+                completion(true)
             }
         case .online:
+            // Fetch the playable status asynchronously
             asset?.loadValuesAsynchronously(forKeys: ["playable"]) {
                 DispatchQueue.main.async {
                     completion(isAssetPlayable())
