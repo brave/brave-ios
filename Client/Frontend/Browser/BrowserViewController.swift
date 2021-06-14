@@ -1705,7 +1705,7 @@ class BrowserViewController: UIViewController {
         if let webView = tabManager.selectedTab?.webView,
            evaluateWebsiteSupportOpenSearchEngine(webView) {
             let addSearchEngineActivity = AddSearchEngineActivity() { [weak self] in
-                self?.addCustomSearchEngineForFocusedElement(setAsDefault: false)
+                self?.addCustomSearchEngineForFocusedElement()
             }
                 
             activities.append(addSearchEngineActivity)
