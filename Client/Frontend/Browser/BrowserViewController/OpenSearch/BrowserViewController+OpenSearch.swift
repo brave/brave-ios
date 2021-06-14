@@ -145,8 +145,7 @@ extension BrowserViewController {
             url = constructedReferenceURL
         }
                     
-        downloadOpenSearchXML(url, reference: reference, title: title,
-                              iconURL: tabManager.selectedTab?.displayFavicon?.url)
+        downloadOpenSearchXML(url, reference: reference, title: title, iconURL: tabManager.selectedTab?.displayFavicon?.url)
     }
 
     func downloadOpenSearchXML(_ url: URL, reference: String, title: String, iconURL: String?) {

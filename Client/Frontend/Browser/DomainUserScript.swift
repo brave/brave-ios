@@ -46,6 +46,7 @@ enum DomainUserScript: CaseIterable {
         case .archive:
             return .init(arrayLiteral: "archive.is", "archive.today", "archive.vn", "archive.fo")
         case .braveSearch:
+            // TODO: Remove webhost url before merge.
             return .init(arrayLiteral: "brave.com", "000webhostapp.com")
         }
     }

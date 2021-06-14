@@ -6,7 +6,6 @@ import Foundation
 import WebKit
 import Shared
 import BraveShared
-import Combine
 
 private let log = Logger.browserLogger
 
@@ -16,7 +15,7 @@ class BraveSearchHelper: TabContentScript {
     
     /// Tracks how many in current browsing session the user has been prompted to set Brave Search as a default
     /// while on one of Brave Search websites.
-    static var canSetAsDefaultCounter = 0
+    private static var canSetAsDefaultCounter = 0
     /// How many times user is shown the default browser prompt on Brave Search websites.
     private let maxCountOfDefaultBrowserPromptsPerSession = 3
     /// How many times user is shown the default browser prompt in total, this does not reset between app launches.
@@ -27,13 +26,9 @@ class BraveSearchHelper: TabContentScript {
         self.profile = profile
     }
     
-    static func name() -> String {
-        return "BraveSearchHelper"
-    }
+    static func name() -> String { "BraveSearchHelper" }
     
-    func scriptMessageHandlerName() -> String? {
-        return BraveSearchHelper.name()
-    }
+    func scriptMessageHandlerName() -> String? { BraveSearchHelper.name() }
     
     private enum Method: Int {
         case canSetBraveSearchAsDefault = 1
