@@ -85,11 +85,14 @@ enum DomainUserScript: CaseIterable {
             return WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false)
         case .braveSearch:
             var alteredSource = source
+            
+            let securityToken = UserScriptManager.securityToken.uuidString
+                .replacingOccurrences(of: "-", with: "", options: .literal)
             alteredSource = alteredSource
                 .replacingOccurrences(of: "$<brave-search-helper>",
                                       with: "BSH\(UserScriptManager.messageHandlerTokenString)",
                                       options: .literal)
-                .replacingOccurrences(of: "$<security_token>", with: UserScriptManager.messageHandlerTokenString)
+                .replacingOccurrences(of: "$<security_token>", with: securityToken)
                 
             return WKUserScript(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false)
         }
