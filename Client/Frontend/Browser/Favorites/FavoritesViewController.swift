@@ -715,7 +715,7 @@ extension FavoritesViewController {
             
             // brave-ios/issues/3762
             // No title, no message
-            let alert = UIAlertController(title: "", message: "", preferredStyle: .alert)
+            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
             alert.addAction(UIAlertAction(title: Strings.recentSearchClearAlertButton, style: .default, handler: { [weak self] _ in
                 guard let self = self else { return }
                 
