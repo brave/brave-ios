@@ -12,12 +12,15 @@ class InitialSearchEngines {
     enum SearchEngineID: String {
         case google, braveSearch, bing, duckduckgo, yandex, qwant, startpage, yahoo, ecosia
         
-        var excludedFromOnboarding: Bool {
+        func excludedFromOnboarding(for locale: Locale) -> Bool {
             switch self {
-            case .google, .bing, .duckduckgo, .yandex, .qwant, .startpage, .ecosia, .braveSearch:
+            case .google, .bing, .duckduckgo, .yandex, .qwant, .startpage, .ecosia:
                 return false
             case .yahoo:
                 return true
+            case .braveSearch:
+                guard let region = locale.regionCode else { return true }
+                return !InitialSearchEngines.braveSearchOnboardingRegions.contains(region)
             }
         }
     }
@@ -50,9 +53,10 @@ class InitialSearchEngines {
     
     /// Lists of engines available during onboarding.
     var onboardingEngines: [SearchEngine] {
-        engines.filter { !$0.id.excludedFromOnboarding }
+        engines.filter { !$0.id.excludedFromOnboarding(for: locale) }
     }
     
+    static let braveSearchOnboardingRegions = ["US", "CA"]
     static let ddgDefaultRegions = ["DE", "AU", "NZ", "IE"]
     static let qwantDefaultRegions = ["FR"]
     static let yandexDefaultRegions = ["AM", "AZ", "BY", "KG", "KZ", "MD", "RU", "TJ", "TM", "TZ"]

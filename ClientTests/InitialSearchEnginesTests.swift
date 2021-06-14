@@ -104,7 +104,6 @@ class InitialSearchEnginesTests: XCTestCase {
         
         let onboardingEngines = localeSE.onboardingEngines.map { $0.id }
         XCTAssertEqual(onboardingEngines, [.google,
-                                           .braveSearch,
                                            .bing,
                                            .duckduckgo,
                                            .qwant,
@@ -129,7 +128,6 @@ class InitialSearchEnginesTests: XCTestCase {
         
         let onboardingEngines = localeSE.onboardingEngines.map { $0.id }
         XCTAssertEqual(onboardingEngines, [.google,
-                                           .braveSearch,
                                            .bing,
                                            .duckduckgo,
                                            .qwant,
@@ -155,7 +153,6 @@ class InitialSearchEnginesTests: XCTestCase {
         
         let onboardingEngines = localeSE.onboardingEngines.map { $0.id }
         XCTAssertEqual(onboardingEngines, [.duckduckgo,
-                                           .braveSearch,
                                            .google,
                                            .bing,
                                            .qwant,
@@ -181,7 +178,6 @@ class InitialSearchEnginesTests: XCTestCase {
         
         let onboardingEngines = localeSE.onboardingEngines.map { $0.id }
         XCTAssertEqual(onboardingEngines, [.qwant,
-                                           .braveSearch,
                                            .google,
                                            .bing,
                                            .duckduckgo,
@@ -205,7 +201,6 @@ class InitialSearchEnginesTests: XCTestCase {
         
         let onboardingEngines = unknownLocaleSE.onboardingEngines.map { $0.id }
         XCTAssertEqual(onboardingEngines, [.google,
-                                           .braveSearch,
                                            .bing,
                                            .duckduckgo,
                                            .qwant,
@@ -229,7 +224,6 @@ class InitialSearchEnginesTests: XCTestCase {
         
         let onboardingEngines = russianLocale.onboardingEngines.map { $0.id }
         XCTAssertEqual(onboardingEngines, [.yandex,
-                                           .braveSearch,
                                            .google,
                                            .bing,
                                            .duckduckgo,
