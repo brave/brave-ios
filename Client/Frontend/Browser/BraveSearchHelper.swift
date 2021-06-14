@@ -110,15 +110,14 @@ class BraveSearchHelper: TabContentScript {
         let functionName =
             "window.__firefox__.D\(UserScriptManager.messageHandlerTokenString).resolve"
         
-        var args = ["'\(methodId)'"]
+        var args: [Any] = [methodId]
         if let result = result {
-            args.append("\(result)")
+            args.append(result)
         }
         
         self.tab?.webView?.evaluateSafeJavaScript(
             functionName: functionName,
             args: args,
-            sandboxed: false,
-            escapeArgs: false)
+            sandboxed: false)
     }
 }
