@@ -101,7 +101,7 @@ class BraveSearchHelper: TabContentScript {
     
     private func callback(methodId: Int, result: Bool?) {
         let functionName =
-            "window.__firefox__.D\(UserScriptManager.messageHandlerTokenString).resolve"
+            "window.__firefox__.BSH\(UserScriptManager.messageHandlerTokenString).resolve"
         
         var args: [Any] = [methodId]
         if let result = result {

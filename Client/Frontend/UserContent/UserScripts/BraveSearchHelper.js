@@ -27,7 +27,7 @@ Object.defineProperty(window.__firefox__, '$<brave-search-helper>', {
         sendMessage(method_id) {
             return new Promise((resolve, reject) => {
                window.__firefox__.$<brave-search-helper>.resolution_handlers[method_id] = { resolve, reject };
-               webkit.messageHandlers.BraveSearchHelper.postMessage({'method_id': method_id});
+               webkit.messageHandlers.BraveSearchHelper.postMessage({ 'securitytoken': '$<security_token>' ,'method_id': method_id});
            });
         }
     }
