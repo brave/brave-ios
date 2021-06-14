@@ -90,8 +90,8 @@ class InitialSearchEngines {
         self.locale = locale
         
         // Default order and available search engines, applies to all locales
-        engines = [.init(id: .google),
-                   .init(id: .braveSearch),
+        engines = [.init(id: .braveSearch),
+                   .init(id: .google),
                    .init(id: .bing),
                    .init(id: .duckduckgo),
                    .init(id: .qwant),
