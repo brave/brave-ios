@@ -46,15 +46,11 @@ class BraveSearchHelper: TabContentScript {
     
     func userContentController(_ userContentController: WKUserContentController,
                                didReceiveScriptMessage message: WKScriptMessage) {
-        var allowedHosts = ["search.brave.com",
+        let allowedHosts = ["search.brave.com",
                             "search-dev.brave.com",
                             "search-dev-local.brave.com",
                             "search.brave.software",
                             "search.bravesoftware.com"]
-        if !AppConstants.buildChannel.isPublic {
-            // TODO: Remove before merge.
-            allowedHosts.append("webpiaskownica.000webhostapp.com")
-        }
         
         guard let requestHost = message.frameInfo.request.url?.host,
               allowedHosts.contains(requestHost),
