@@ -35,6 +35,14 @@ class BraveSearchHelper: TabContentScript {
         case setBraveSearchDefault = 2
     }
     
+    private struct MethodModel: Codable {
+        enum CodingKeys: String, CodingKey {
+            case methodId = "method_id"
+        }
+        
+        let methodId: Int
+    }
+    
     func userContentController(_ userContentController: WKUserContentController,
                                didReceiveScriptMessage message: WKScriptMessage) {
         var allowedHosts = ["search.brave.com",
@@ -54,7 +62,8 @@ class BraveSearchHelper: TabContentScript {
             return
         }
         
-        guard let method = (message.body as? [String: Any])?["method_id"] as? Int else {
+        guard let data = try? JSONSerialization.data(withJSONObject: message.body, options: []),
+              let method = try? JSONDecoder().decode(MethodModel.self, from: data).methodId else {
             log.error("Failed to retrieve method id")
             return
         }
