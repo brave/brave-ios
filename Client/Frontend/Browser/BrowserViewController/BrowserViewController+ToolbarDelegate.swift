@@ -354,7 +354,7 @@ extension BrowserViewController: TopToolbarDelegate {
                 
                 let submitSearch = { [weak self] (text: String) in
                     if let fixupURL = URIFixup.getURL(text) {
-                        self?.finishEditingAndSubmit(fixupURL, isBookmark: false)
+                        self?.finishEditingAndSubmit(fixupURL, visitType: .unknown)
                         return
                     }
                     

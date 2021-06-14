@@ -2081,7 +2081,7 @@ extension BrowserViewController: TabDelegate {
 extension BrowserViewController: SearchViewControllerDelegate {
     func searchViewController(_ searchViewController: SearchViewController, didSubmit query: String) {
         topToolbar.leaveOverlayMode()
-        processAddressBar(text: query)
+        processAddressBar(text: query, visitType: .typed)
     }
     
     func searchViewController(_ searchViewController: SearchViewController, didSelectURL url: URL) {

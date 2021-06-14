@@ -7,6 +7,28 @@ import Shared
 import WebKit
 import Storage
 
+// MARK: VisitType
+
+enum VisitType: Int {
+    case unknown
+    /**
+     * This transition type means the user followed a link and got a new toplevel
+     * window.
+     */
+    case link
+    
+    /**
+     * This transition type means that the user typed the page's URL in the
+     * URL bar or selected it from URL bar autocomplete results.
+     */
+    case typed
+    /**
+     * This transition type means that user opened a link from bookmarks.
+     */
+    case bookmark
+    case download
+}
+
 // MARK: - ReaderModeDelegate
 
 extension BrowserViewController: ReaderModeDelegate {

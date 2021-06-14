@@ -5161,7 +5161,6 @@
 				4452CAEF255412800053EFE6 /* DefaultBrowserIntroCalloutViewController.swift */,
 				0A0A5ED025B1F080007B3E74 /* DefaultBrowserIntroManager.swift */,
 				0AE50869261C6F2E0099C6A3 /* BraveSearchHelper.swift */,
-				2F5893D5265FEF7E002323D9 /* VisitType.swift */,
 			);
 			indentWidth = 4;
 			path = Browser;
@@ -7134,7 +7133,6 @@
 				27FD2CAD2146C31C00A5A779 /* AddToFavoritesActivity.swift in Sources */,
 				4422D4E121BFFB7600BF1855 /* filter_block.cc in Sources */,
 				0A8C69BE225E350300988715 /* IndentedImageTableViewCell.swift in Sources */,
-				2F5893D6265FEF7E002323D9 /* VisitType.swift in Sources */,
 				0AE5C69124F0059D004CBC9B /* OnboardingPrivacyConsentViewController.swift in Sources */,
 				5E096180252B63F200F3AFBB /* BraveSyncAPI+Utilities.swift in Sources */,
 				5E5E6E3A25BA03510035B6A0 /* PlaylistViewController.swift in Sources */,

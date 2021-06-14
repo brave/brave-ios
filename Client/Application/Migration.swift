@@ -14,7 +14,6 @@ private let log = Logger.browserLogger
 class Migration {
     
     private(set) public static var braveCoreSyncObjectsMigrator: BraveCoreMigrator?
-    private(set) public static var profileSyncService: BraveSyncProfileService?
 
     private(set) public static var isChromiumMigrationCompleted: Bool = {
         return Preferences.Chromium.syncV2BookmarksMigrationCompleted.value &&
