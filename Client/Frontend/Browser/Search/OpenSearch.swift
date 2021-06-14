@@ -16,7 +16,7 @@ class OpenSearchEngine: NSObject, NSSecureCoding {
     struct EngineNames {
         static let duckDuckGo = "DuckDuckGo"
         static let qwant = "Qwant"
-        static let brave = "Brave Search"
+        static let brave = "Brave Search beta"
     }
     
     static let defaultSearchClientName = "brave"
