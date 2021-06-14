@@ -359,6 +359,14 @@ extension BrowserViewController: TopToolbarDelegate {
                 
                 if let recentSearch = recentSearch,
                    let searchType = RecentSearchType(rawValue: recentSearch.searchType) {
+                    if shouldSubmitSearch {
+                        let objectId = recentSearch.objectID
+                        DataController.performOnMainContext(save: true) { context in
+                            let recentSearch = context.object(with: objectId) as? RecentSearch
+                            recentSearch?.dateAdded = Date()
+                        }
+                    }
+                    
                     switch searchType {
                     case .text:
                         if let text = recentSearch.text {
@@ -397,6 +405,7 @@ extension BrowserViewController: TopToolbarDelegate {
                     }
                 } else if UIPasteboard.general.hasStrings || UIPasteboard.general.hasURLs,
                           let searchQuery = UIPasteboard.general.string ?? UIPasteboard.general.url?.absoluteString {
+                    
                     self.topToolbar.setLocation(searchQuery, search: false)
                     self.topToolbar(self.topToolbar, didEnterText: searchQuery)
                     

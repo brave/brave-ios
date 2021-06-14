@@ -269,7 +269,7 @@ extension FavoritesViewController: UICollectionViewDataSource, UICollectionViewD
             guard let searchItem = recentSearchesFRC.fetchedObjects?[safe: indexPath.item] else {
                 return
             }
-            recentSearchAction(searchItem, false)
+            recentSearchAction(searchItem, true)
         }
         
     }
@@ -683,12 +683,12 @@ extension FavoritesViewController: NSFetchedResultsControllerDelegate {
 // Recent Searches
 extension FavoritesViewController {
     func onOpenRecentSearch(_ recentSearch: RecentSearch) {
-        recentSearchAction(recentSearch, true)
+        recentSearchAction(recentSearch, false)
     }
     
     @objc
     func onPasteboardAction() {
-        recentSearchAction(nil, false)
+        recentSearchAction(nil, true)
     }
     
     @objc
