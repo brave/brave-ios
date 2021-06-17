@@ -28,7 +28,7 @@ enum TrackingType: Equatable {
                 return Strings.ShieldEducation.videoAdBlockTitle
             case .trackerAdCountBlock(let count):
                 return String(format: Strings.ShieldEducation.trackerAdCountBlockTitle, count)
-            case .domainSpecificDataSaved(_):
+            case .domainSpecificDataSaved:
                 return Strings.ShieldEducation.domainSpecificDataSavedTitle
         }
     }
@@ -236,7 +236,7 @@ private class ShareTrackersView: UIView {
         )
         
         switch trackingType {
-            case .trackerCountShare, .trackerAdWarning, .domainSpecificDataSaved(_):
+            case .trackerCountShare, .trackerAdWarning, .domainSpecificDataSaved:
                 stackView.addArrangedSubview(actionButton)
             default:
                 return

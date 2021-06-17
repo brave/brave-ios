@@ -58,8 +58,8 @@ class BlockingSummaryDataSource {
     
     // MARK: Lifecycle
     
-    init() {
-        blockingSummaryList = fetchBlockingSummaryObjects()
+    init(with fileName: String = "blocking-summary", bundle: Bundle = Bundle.main) {
+        blockingSummaryList = fetchBlockingSummaryObjects(with: fileName, for: bundle)
     }
     
     // MARK: Internal
@@ -75,13 +75,11 @@ class BlockingSummaryDataSource {
     /// The list containing details related with blocking values of sites fetched from the JSON file
     private var blockingSummaryList = [BlockingSummary]()
     
-    private let blockingSummaryFilePath = "blocking-summary"
-
     /// The function which uses the Data from Local JSON file to fetch list of objects
-    private func fetchBlockingSummaryObjects() -> [BlockingSummary] {
+    private func fetchBlockingSummaryObjects(with fileName: String, for bundle: Bundle) -> [BlockingSummary] {
         var blockingSummaryList = [BlockingSummary]()
         
-        guard let blockSummaryData = createJSONDataFrom(file: blockingSummaryFilePath) else {
+        guard let blockSummaryData = createJSONDataFrom(fileName: fileName, bundle: bundle) else {
             return blockingSummaryList
         }
 
@@ -95,15 +93,15 @@ class BlockingSummaryDataSource {
     }
     
     /// The helper function with created the Data from parametrized file path
-    private func createJSONDataFrom(file: String) -> Data? {
-        guard let filePath = Bundle.main.path(forResource: file, ofType: "json") else {
+    private func createJSONDataFrom(fileName: String, bundle: Bundle) -> Data? {
+        guard let filePath =  bundle.path(forResource: fileName, ofType: "json") else {
             return nil
         }
         
         do {
             return try Data(contentsOf: URL(fileURLWithPath: filePath))
         } catch {
-            log.error("Failed to get bundle path for \(file)")
+            log.error("Failed to get bundle path for \(fileName)")
         }
         
         return nil

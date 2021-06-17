@@ -5,6 +5,9 @@
 
 import Foundation
 import CoreData
+import Shared
+
+private let log = Logger.browserLogger
 
 public final class DataSaved: NSManagedObject, CRUD {
     @NSManaged public var savedUrl: String
@@ -20,12 +23,13 @@ public final class DataSaved: NSManagedObject, CRUD {
     }
     
     public class func delete(with savedUrl: String) {
-        let context = DataController.viewContext
-        
         if let item = get(with: savedUrl) {
-            item.delete(context: .existing(context))
-            if context.hasChanges {
-                try? context.save()
+            DataController.perform { context in
+                item.delete(context: .existing(context))
+                
+                if context.hasChanges {
+                    try? context.save()
+                }
             }
         }
     }
@@ -34,7 +38,24 @@ public final class DataSaved: NSManagedObject, CRUD {
         let context = DataController.viewContext
         
         guard let entity =  NSEntityDescription.entity(forEntityName: "DataSaved", in: context) else {
+            log.error("Error fetching the entity 'DataSaved' from Managed Object-Model")
+
             return
+        }
+        
+        DataController.perform { context in
+            let source = DataSaved(entity: entity, insertInto: context)
+            source.savedUrl = savedUrl
+            source.amount = amount
+            
+            if context.hasChanges {
+                do {
+                    assert(Thread.isMainThread)
+                    try context.save()
+                } catch {
+                    log.error("Perform Task Save error for 'DataSaved': \(error)")
+                }
+            }
         }
         
         let source = DataSaved(entity: entity, insertInto: context)
