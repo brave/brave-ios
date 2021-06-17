@@ -14,8 +14,7 @@ public final class DataSaved: NSManagedObject, CRUD {
     @NSManaged public var amount: String
     
     public class func get(with savedUrl: String) -> DataSaved? {
-        let predicate = NSPredicate(format: "\(#keyPath(DataSaved.savedUrl)) == %@", savedUrl)
-        return first(where: predicate)
+        return getInternal(with: savedUrl)
     }
     
     public class func all() -> [DataSaved] {
@@ -23,43 +22,35 @@ public final class DataSaved: NSManagedObject, CRUD {
     }
     
     public class func delete(with savedUrl: String) {
-        if let item = get(with: savedUrl) {
-            DataController.perform { context in
+        DataController.perform { context in
+            if let item = getInternal(with: savedUrl, context: context) {
                 item.delete(context: .existing(context))
-                
-                if context.hasChanges {
-                    try? context.save()
-                }
             }
         }
     }
     
     public class func insert(savedUrl: String, amount: String) {
-        let context = DataController.viewContext
-        
-        guard let entity =  NSEntityDescription.entity(forEntityName: "DataSaved", in: context) else {
-            log.error("Error fetching the entity 'DataSaved' from Managed Object-Model")
-
-            return
-        }
-        
         DataController.perform { context in
+            guard let entity =  entity(in: context) else {
+                log.error("Error fetching the entity 'DataSaved' from Managed Object-Model")
+
+                return
+            }
+            
             let source = DataSaved(entity: entity, insertInto: context)
             source.savedUrl = savedUrl
             source.amount = amount
-            
-            if context.hasChanges {
-                do {
-                    assert(Thread.isMainThread)
-                    try context.save()
-                } catch {
-                    log.error("Perform Task Save error for 'DataSaved': \(error)")
-                }
-            }
         }
     }
     
     private class func entity(in context: NSManagedObjectContext) -> NSEntityDescription? {
         NSEntityDescription.entity(forEntityName: "DataSaved", in: context)
+    }
+    
+    private class func getInternal(with savedUrl: String,
+                                   context: NSManagedObjectContext = DataController.viewContext) -> DataSaved? {
+        let predicate = NSPredicate(format: "\(#keyPath(DataSaved.savedUrl)) == %@", savedUrl)
+        
+        return first(where: predicate, context: context)
     }
 }
