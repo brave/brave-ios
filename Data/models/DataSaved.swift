@@ -57,14 +57,6 @@ public final class DataSaved: NSManagedObject, CRUD {
                 }
             }
         }
-        
-        let source = DataSaved(entity: entity, insertInto: context)
-        source.savedUrl = savedUrl
-        source.amount = amount
-        
-        if context.hasChanges {
-            try? context.save()
-        }
     }
     
     private class func entity(in context: NSManagedObjectContext) -> NSEntityDescription? {
