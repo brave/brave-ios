@@ -175,7 +175,8 @@ class BrowserViewController: UIViewController {
     var shouldShowNTPEducation = false
 
     /// Data Source object used to determine blocking stats
-    let benchmarkBlockingDataSource = BlockingSummaryDataSource()
+    //let benchmarkBlockingDataSource = BlockingSummaryDataSource()
+    var benchmarkBlockingDataSource: BlockingSummaryDataSource?
 
     init(profile: Profile, tabManager: TabManager, crashedLastSession: Bool,
          safeBrowsingManager: SafeBrowsing? = SafeBrowsing()) {
@@ -233,6 +234,10 @@ class BrowserViewController: UIViewController {
             }
         }
         deviceCheckClient = DeviceCheckClient(environment: configuration.environment)
+        
+        if Locale.current.regionCode == "JP" {
+            benchmarkBlockingDataSource = BlockingSummaryDataSource()
+        }
         
         super.init(nibName: nil, bundle: nil)
         didInit()

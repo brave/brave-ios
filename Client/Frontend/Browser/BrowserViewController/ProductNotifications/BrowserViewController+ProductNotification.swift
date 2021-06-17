@@ -138,7 +138,7 @@ extension BrowserViewController {
             if !Preferences.ProductNotificationBenchmarks.showingSpecificDataSavedEnabled.value {
                 guard let currentURL = selectedTab.url,
                       DataSaved.get(with: currentURL.absoluteString) == nil,
-                      let domainFetchedSiteSavings = benchmarkBlockingDataSource.fetchDomainFetchedSiteSavings(currentURL) else {
+                      let domainFetchedSiteSavings = benchmarkBlockingDataSource?.fetchDomainFetchedSiteSavings(currentURL) else {
                     return
                 }
                 
