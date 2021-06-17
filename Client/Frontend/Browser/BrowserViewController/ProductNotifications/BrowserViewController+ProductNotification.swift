@@ -135,7 +135,8 @@ extension BrowserViewController {
         // Step 5: Domain Specific Data Saved
         // Data Saved Pop-Over only exist in JP locale
         if Locale.current.regionCode == "JP" {
-            if !Preferences.ProductNotificationBenchmarks.showingSpecificDataSavedEnabled.value {
+            if !benchmarkNotificationPresented,
+               !Preferences.ProductNotificationBenchmarks.showingSpecificDataSavedEnabled.value {
                 guard let currentURL = selectedTab.url,
                       DataSaved.get(with: currentURL.absoluteString) == nil,
                       let domainFetchedSiteSavings = benchmarkBlockingDataSource?.fetchDomainFetchedSiteSavings(currentURL) else {
