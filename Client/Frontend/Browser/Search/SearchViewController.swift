@@ -421,7 +421,7 @@ class SearchViewController: SiteTableViewController, LoaderListener {
         switch section {
         case .quickBar:
             if !PrivateBrowsingManager.shared.isPrivateBrowsing {
-                RecentSearch.addItem(type: .text, text: searchQuery, websiteUrl:nil)
+                RecentSearch.addItem(type: .text, text: searchQuery, websiteUrl: nil)
             }
             searchDelegate?.searchViewController(self, didSubmit: searchQuery)
         case .searchSuggestionsOptIn: return
