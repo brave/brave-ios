@@ -8,6 +8,7 @@ import Shared
 import Data
 import BraveShared
 import CoreServices
+import PanModal
 
 private let log = Logger.browserLogger
 
@@ -688,5 +689,20 @@ extension BookmarksViewController {
             guard let importExportButton = self.importExportButton else { return }
             vc.presentOptionsMenu(from: importExportButton, animated: true)
         }
+    }
+}
+
+extension BookmarksViewController: PanModalPresentable {
+    var panScrollable: UIScrollView? {
+        (parent as? PanModalPresentable)?.panScrollable
+    }
+
+    func shouldRespond(to panModalGestureRecognizer: UIPanGestureRecognizer) -> Bool {
+        // This prevents 2 problems:
+        // 1. Closing the pan modal when user swipes down on bookmarks list
+        // 2. Allow to reorder bookmarks without triggerring pan modal gesture handlers.
+        false
+        // I would prefer to disable it during editing only, but then it does not fix the problem number 1
+        // !tableView.isEditing
     }
 }

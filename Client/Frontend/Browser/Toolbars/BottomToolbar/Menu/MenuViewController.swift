@@ -197,6 +197,16 @@ extension MenuViewController: PanModalPresentable {
         topVC.view.layoutIfNeeded()
         return _scrollViewChild(in: topVC.view)
     }
+    
+    func shouldRespond(to panModalGestureRecognizer: UIPanGestureRecognizer) -> Bool {
+        let vc = topViewController ?? presentedViewController
+        
+        if let panModalPresentable = vc as? PanModalPresentable {
+            return panModalPresentable.shouldRespond(to: panModalGestureRecognizer)
+        }
+        return true
+    }
+
     var longFormHeight: PanModalHeight {
         .maxHeight
     }
@@ -286,7 +296,8 @@ private class MenuNavigationControllerDelegate: NSObject, UINavigationController
     }
 }
 
-private class InnerMenuNavigationController: UINavigationController {
+private class InnerMenuNavigationController: UINavigationController, PanModalPresentable {
+    
     var innerMenuDismissed: (() -> Void)?
     
     override func viewDidLoad() {
@@ -299,6 +310,18 @@ private class InnerMenuNavigationController: UINavigationController {
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         innerMenuDismissed?()
+    }
+    
+    var panScrollable: UIScrollView? {
+        (parent as? PanModalPresentable)?.panScrollable
+    }
+    
+    func shouldRespond(to panModalGestureRecognizer: UIPanGestureRecognizer) -> Bool {
+        if let panModalPresentable = topViewController as? PanModalPresentable {
+            return panModalPresentable.shouldRespond(to: panModalGestureRecognizer)
+        }
+        
+        return true
     }
 }
 

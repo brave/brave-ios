@@ -12,6 +12,7 @@ import SwiftyJSON
 import Data
 import WebKit
 import BraveRewards
+import PanModal
 
 extension TabBarVisibility: RepresentableOptionType {
     public var displayString: String {

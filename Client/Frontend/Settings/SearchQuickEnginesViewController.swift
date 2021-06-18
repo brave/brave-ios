@@ -5,6 +5,7 @@
 
 import UIKit
 import Shared
+import PanModal
 
 private let log = Logger.browserLogger
 
@@ -150,3 +151,16 @@ extension SearchQuickEnginesViewController {
         }
     }
 }
+
+extension SearchQuickEnginesViewController: PanModalPresentable {
+    var panScrollable: UIScrollView? {
+        // not sure about this, should this be chained through parent views or not
+        tableView
+        // nil
+    }
+
+    func shouldRespond(to panModalGestureRecognizer: UIPanGestureRecognizer) -> Bool {
+        false
+    }
+}
+
