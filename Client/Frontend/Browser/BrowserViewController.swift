@@ -1855,7 +1855,7 @@ class BrowserViewController: UIViewController {
                        visitType == .typed {
                         Historyv2.add(url: url, title: tab.title ?? "", dateAdded: Date())
                     } else {
-                        Historyv2.addLocal(url: url, title: tab.title ?? "", dateAdded: Date())
+                        Historyv2.add(url: url, title: tab.title ?? "", dateAdded: Date(), isURLTyped: false)
                     }
                 }
             }

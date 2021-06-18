@@ -85,7 +85,7 @@ class Historyv2: WebsitePresentable {
     // MARK: Private
     
     private let historyNode: HistoryNode
-    private static let historyAPI = BraveHistoryAPI.shared
+    private static var observer: HistoryServiceListener?
     
     private func fetchHistoryTimePeriod(visited: Date?) -> Section? {
         let todayOffset = 0
@@ -124,39 +124,58 @@ class Historyv2: WebsitePresentable {
 
 extension Historyv2 {
 
-    public class func add(url: URL, title: String, dateAdded: Date) {
-        Historyv2.historyAPI.addHistory(HistoryNode(url: url, title: title, dateAdded: dateAdded))
-    }
-    
-    public class func addLocal(url: URL, title: String, dateAdded: Date) {
+    public class func add(url: URL, title: String, dateAdded: Date, isURLTyped: Bool = true) {
+        guard let historyAPI = (UIApplication.shared.delegate as? AppDelegate)?.braveCore?.historyAPI else {
+            return
+        }
+
         let historyNode = HistoryNode(url: url, title: title, dateAdded: dateAdded)
-        Historyv2.historyAPI.addHistory(historyNode, pageTransition: .LINK)
+        historyAPI.addHistory(historyNode, isURLTyped: isURLTyped)
     }
     
     public static func frc() -> HistoryV2FetchResultsController? {
-        return Historyv2Fetcher(historyAPI: Historyv2.historyAPI)
+        guard let historyAPI = (UIApplication.shared.delegate as? AppDelegate)?.braveCore?.historyAPI else {
+            return nil
+        }
+        
+        return Historyv2Fetcher(historyAPI: historyAPI)
     }
     
     public func delete() {
-        Historyv2.historyAPI.removeHistory(historyNode)
+        guard let historyAPI = (UIApplication.shared.delegate as? AppDelegate)?.braveCore?.historyAPI else {
+            return
+        }
+        
+        historyAPI.removeHistory(historyNode)
     }
     
     public class func deleteAll(_ completion: @escaping () -> Void) {
-        Historyv2.historyAPI.removeAll {
+        guard let historyAPI = (UIApplication.shared.delegate as? AppDelegate)?.braveCore?.historyAPI else {
+            return
+        }
+        
+        historyAPI.removeAll {
             completion()
         }
     }
     
     public class func suffix(_ maxLength: Int, _ completion: @escaping ([Historyv2]) -> Void) {
-        Historyv2.historyAPI.search(withQuery: nil, maxCount: UInt(max(20, maxLength)), completion: { historyResults in
+        guard let historyAPI = (UIApplication.shared.delegate as? AppDelegate)?.braveCore?.historyAPI else {
+            return
+        }
+        
+        historyAPI.search(withQuery: nil, maxCount: UInt(max(20, maxLength)), completion: { historyResults in
             completion(historyResults.map { Historyv2(with: $0) })
         })
     }
 
     public static func byFrequency(query: String? = nil, _ completion: @escaping ([WebsitePresentable]) -> Void) {
-        guard let query = query, !query.isEmpty else { return }
+        guard let query = query, !query.isEmpty,
+              let historyAPI = (UIApplication.shared.delegate as? AppDelegate)?.braveCore?.historyAPI else {
+            return
+        }
         
-        Historyv2.historyAPI.search(withQuery: query, maxCount: 200, completion: { historyResults in
+        historyAPI.search(withQuery: query, maxCount: 200, completion: { historyResults in
             completion(historyResults.map { Historyv2(with: $0) })
         })
     }
@@ -177,13 +196,16 @@ extension Historyv2 {
 extension Historyv2 {
     
     public static func waitForHistoryServiceLoaded(_ completion: @escaping () -> Void) {
-        if historyAPI.isLoaded {
+        guard let historyAPI = (UIApplication.shared.delegate as? AppDelegate)?.braveCore?.historyAPI else {
+            return
+        }
+        
+        if historyAPI.isBackendLoaded {
             DispatchQueue.main.async {
                 completion()
             }
         } else {
-            var observer: HistoryServiceListener?
-            observer = Historyv2.historyAPI.add(HistoryServiceStateObserver({
+            observer = historyAPI.add(HistoryServiceStateObserver({
                 if case .serviceLoaded = $0 {
                     observer?.destroy()
                     observer = nil

@@ -41,14 +41,19 @@ extension BraveSyncAPI {
     }
     
     func enableSyncTypes() {
-        BraveSyncProfileService.shared.userSelectedTypes = []
+        guard let syncProfileService =
+                (UIApplication.shared.delegate as? AppDelegate)?.braveCore?.syncProfileService else {
+            return
+        }
+
+        syncProfileService.userSelectedTypes = []
         
         if Preferences.Chromium.syncBookmarksEnabled.value {
-            BraveSyncProfileService.shared.userSelectedTypes.update(with: .BOOKMARKS)
+            syncProfileService.userSelectedTypes.update(with: .BOOKMARKS)
         }
         
         if Preferences.Chromium.syncHistoryEnabled.value {
-            BraveSyncProfileService.shared.userSelectedTypes.update(with: .HISTORY)
+            syncProfileService.userSelectedTypes.update(with: .HISTORY)
         }
     }
     
