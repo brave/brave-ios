@@ -12,6 +12,21 @@ class InitialSearchEngines {
     enum SearchEngineID: String {
         case google, braveSearch, bing, duckduckgo, yandex, qwant, startpage, yahoo, ecosia
         
+        /// Return time interval when to remove old tabs, or nil if no tabs should be removed.
+        var openSearchReference: String {
+            switch self {
+                case .google: return "google"
+                case .braveSearch: return "search.brave"
+                case .bing: return "bing"
+                case .duckduckgo: return "duckduckgo.com/opensearch"
+                case .yandex: return "yandex.com/search"
+                case .qwant: return "qwant.com/opensearch"
+                case .startpage: return "startpage.com/en/opensearch"
+                case .yahoo: return "search.yahoo.com/opensearch"
+                case .ecosia: return "ecosia.org/opensearch"
+            }
+        }
+        
         func excludedFromOnboarding(for locale: Locale) -> Bool {
             switch self {
             case .google, .bing, .duckduckgo, .yandex, .qwant, .startpage, .ecosia:
@@ -31,6 +46,10 @@ class InitialSearchEngines {
         /// Some search engines have regional variations which correspond to different xml files in `SearchPlugins` folder.
         /// If you provide this custom id, it will be used instead of `regular` id when accessing the open search xml file.
         var customId: String?
+        
+        var reference: String? {
+            return id.openSearchReference
+        }
         
         // Only `id` mattera when comparing search engines.
         // This is to prevent adding more than 2 engines of the same type.
