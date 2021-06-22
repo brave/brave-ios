@@ -1571,6 +1571,30 @@ class BrowserViewController: UIViewController {
             }
         }
     }
+    
+    func clearHistoryAndOpenNewTab() {
+        History.deleteAll { [weak self] in
+            guard let self = self else { return }
+            
+            self.tabManager.clearTabHistory() {
+                self.openBlankNewTab(attemptLocationFieldFocus: true, isPrivate: false)
+            }
+        }
+    }
+    
+    func openInsideSettingsNavigation(with viewController: UIViewController) {
+        let settingsNavigationController = SettingsNavigationController(rootViewController: viewController)
+        settingsNavigationController.isModalInPresentation = false
+        settingsNavigationController.modalPresentationStyle =
+            UIDevice.current.userInterfaceIdiom == .phone ? .pageSheet : .formSheet
+        settingsNavigationController.navigationBar.topItem?.leftBarButtonItem =
+            UIBarButtonItem(barButtonSystemItem: .done, target: settingsNavigationController, action: #selector(settingsNavigationController.done))
+        
+        // All menu views should be opened in portrait on iPhones.
+        UIDevice.current.forcePortraitIfIphone(for: UIApplication.shared)
+
+        present(settingsNavigationController, animated: true)
+    }
 
     func popToBVC() {
         guard let currentViewController = navigationController?.topViewController else {

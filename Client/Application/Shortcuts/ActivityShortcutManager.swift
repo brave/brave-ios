@@ -22,7 +22,7 @@ enum ActivityType: String {
     case openPlayList = "OpenPlayList"
 
     var identifier: String {
-        return " \(Bundle.main.bundleIdentifier ?? "") + .\(self.rawValue)"
+        return "\(Bundle.main.bundleIdentifier ?? "").\(self.rawValue)"
     }
     
     /// The activity title for designated  type
@@ -120,29 +120,15 @@ class ActivityShortcutManager: NSObject {
             case .newPrivateTab:
                 bvc.openBlankNewTab(attemptLocationFieldFocus: true, isPrivate: true)
             case .clearBrowsingHistory:
-                History.deleteAll {
-                    bvc.tabManager.clearTabHistory() {
-                        bvc.openBlankNewTab(attemptLocationFieldFocus: true, isPrivate: false)
-                    }
-                }
+                bvc.clearHistoryAndOpenNewTab()
             case .enableBraveVPN:
                 bvc.openBlankNewTab(attemptLocationFieldFocus: true, isPrivate: false)
 
                 switch BraveVPN.vpnState {
                     case .notPurchased, .purchased, .expired:
-                        guard let vc = BraveVPN.vpnState.enableVPNDestinationVC else { return }
+                        guard let enableVPNController = BraveVPN.vpnState.enableVPNDestinationVC else { return }
                     
-                        let settingsNavigationController = SettingsNavigationController(rootViewController: vc)
-                        settingsNavigationController.isModalInPresentation = false
-                        settingsNavigationController.modalPresentationStyle =
-                            UIDevice.current.userInterfaceIdiom == .phone ? .pageSheet : .formSheet
-                        settingsNavigationController.navigationBar.topItem?.leftBarButtonItem =
-                            UIBarButtonItem(barButtonSystemItem: .done, target: settingsNavigationController, action: #selector(settingsNavigationController.done))
-                        
-                        // All menu views should be opened in portrait on iPhones.
-                        UIDevice.current.forcePortraitIfIphone(for: UIApplication.shared)
-
-                        bvc.present(settingsNavigationController, animated: true)
+                        bvc.openInsideSettingsNavigation(with: enableVPNController)
                     case .installed(let connected):
                         if !connected {
                             BraveVPN.reconnect()
@@ -192,7 +178,7 @@ class ActivityShortcutManager: NSObject {
         let intent = createCustomIntent(for: type, with: urlString)
 
         let interaction = INInteraction(intent: intent, response: nil)
-        interaction.donate { (error) in
+        interaction.donate { error in
             guard let error = error else {
                 return
             }
