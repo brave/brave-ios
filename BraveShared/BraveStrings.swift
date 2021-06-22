@@ -1440,8 +1440,8 @@ extension Strings {
                               value: "Open Brave Browser and Enable VPN",
                               comment: "")
         
-        public static let activityTypeOpenBraveTodayTitle =
-            NSLocalizedString("shortcuts.activityTypeOpenBraveTodayTitle",
+        public static let activityTypeOpenBraveNewsTitle =
+            NSLocalizedString("shortcuts.activityTypeOpenBraveNewsTitle",
                               bundle: .braveShared,
                               value: "Clear Brave Browsing History",
                               comment: "")
@@ -1470,10 +1470,10 @@ extension Strings {
                               value: "Open Browser in a New Tab and Enable VPN",
                               comment: "")
         
-        public static let activityTypeBraveTodayDescription =
-            NSLocalizedString("shortcuts.activityTypeBraveTodayDescription",
+        public static let activityTypeBraveNewsDescription =
+            NSLocalizedString("shortcuts.activityTypeBraveNewsDescription",
                               bundle: .braveShared,
-                              value: "Open Brave Today and Check Today's Top Stories",
+                              value: "Open Brave News and Check Today's Top Stories",
                               comment: "")
         
         public static let activityTypeOpenPlaylistDescription =
@@ -1506,10 +1506,10 @@ extension Strings {
                               value: "Enable VPN",
                               comment: "")
         
-        public static let activityTypeOpenBraveTodaySuggestedPhrase =
+        public static let activityTypeOpenBraveNewsSuggestedPhrase =
             NSLocalizedString("shortcuts.activityTypeOpenBraveTodaySuggestedPhrase",
                               bundle: .braveShared,
-                              value: "Open Brave Today",
+                              value: "Open Brave News",
                               comment: "")
         
         public static let activityTypeOpenPlaylistSuggestedPhrase =
@@ -1590,17 +1590,17 @@ extension Strings {
                               value: "Use Shortcuts to enable Brave VPN via Siri - Voice Assistant",
                               comment: "")
 
-        public static let shortcutSettingsOpenBraveTodayTitle =
-            NSLocalizedString("shortcuts.shortcutSettingsOpenBraveTodayTitle",
+        public static let shortcutSettingsOpenBraveNewsTitle =
+            NSLocalizedString("shortcuts.shortcutSettingsOpenBraveNewsTitle",
                               bundle: .braveShared,
-                              value: "Open Brave Today",
+                              value: "Open Brave News",
                               comment: "")
         
-        public static let shortcutSettingsOpenBraveTodayDescription =
-            NSLocalizedString("shortcuts.shortcutSettingsOpenBraveTodayDescription",
+        public static let shortcutSettingsOpenBraveNewsDescription =
+            NSLocalizedString("shortcuts.shortcutSettingsOpenBraveNewsDescription",
                               bundle: .braveShared,
-                              value: "Use Shortcuts to Open a New Tab & Show Brave Today Feed via Siri - Voice Assistant",
-                              comment: "Description of Open Brave Today Siri Shortcutin Settings Screen")
+                              value: "Use Shortcuts to Open a New Tab & Show Brave News Feed via Siri - Voice Assistant",
+                              comment: "Description of Open Brave News Siri Shortcut in Settings Screen")
         
         public static let shortcutSettingsOpenPlaylistTitle =
             NSLocalizedString("shortcuts.shortcutSettingsOpenPlaylistTitle",

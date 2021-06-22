@@ -18,7 +18,7 @@ enum ActivityType: String {
     case newPrivateTab = "NewPrivateTab"
     case clearBrowsingHistory = "ClearBrowsingHistory"
     case enableBraveVPN = "EnableBraveVPN"
-    case openBraveToday = "OpenBraveToday"
+    case openBraveNews = "OpenBraveNews"
     case openPlayList = "OpenPlayList"
 
     var identifier: String {
@@ -36,8 +36,8 @@ enum ActivityType: String {
                 return Strings.Shortcuts.activityTypeClearHistoryTitle
             case .enableBraveVPN:
                 return Strings.Shortcuts.activityTypeEnableVPNTitle
-            case .openBraveToday:
-                return Strings.Shortcuts.activityTypeOpenBraveTodayTitle
+            case .openBraveNews:
+                return Strings.Shortcuts.activityTypeOpenBraveNewsTitle
             case .openPlayList:
                 return Strings.Shortcuts.activityTypeOpenPlaylistTitle
         }
@@ -52,8 +52,8 @@ enum ActivityType: String {
                 return Strings.Shortcuts.activityTypeClearHistoryDescription
             case .enableBraveVPN:
                 return Strings.Shortcuts.activityTypeEnableVPNDescription
-            case .openBraveToday:
-                return Strings.Shortcuts.activityTypeBraveTodayDescription
+            case .openBraveNews:
+                return Strings.Shortcuts.activityTypeBraveNewsDescription
             case .openPlayList:
                 return Strings.Shortcuts.activityTypeOpenPlaylistDescription
         }
@@ -70,8 +70,8 @@ enum ActivityType: String {
                 return Strings.Shortcuts.activityTypeClearHistorySuggestedPhrase
             case .enableBraveVPN:
                 return Strings.Shortcuts.activityTypeEnableVPNSuggestedPhrase
-            case .openBraveToday:
-                return Strings.Shortcuts.activityTypeOpenBraveTodaySuggestedPhrase
+            case .openBraveNews:
+                return Strings.Shortcuts.activityTypeOpenBraveNewsSuggestedPhrase
             case .openPlayList:
                 return Strings.Shortcuts.activityTypeOpenPlaylistSuggestedPhrase
         }
@@ -148,11 +148,11 @@ class ActivityShortcutManager: NSObject {
                             BraveVPN.reconnect()
                         }
                 }
-            case .openBraveToday:
+            case .openBraveNews:
                 bvc.openBlankNewTab(attemptLocationFieldFocus: true, isPrivate: false)
 
                 guard let newTabPageController = bvc.tabManager.selectedTab?.newTabPageViewController else { return }
-                newTabPageController.scrollToBraveToday()
+                newTabPageController.scrollToBraveNews()
             case .openPlayList:
                 let playlistController = (UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController ?? PlaylistViewController()
                 playlistController.modalPresentationStyle = .fullScreen

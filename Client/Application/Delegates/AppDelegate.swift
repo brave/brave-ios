@@ -658,9 +658,9 @@ extension AppDelegate {
                     type: .enableBraveVPN, using: browserViewController)
                 
                 return true
-            case ActivityType.openBraveToday.identifier:
+            case ActivityType.openBraveNews.identifier:
                 ActivityShortcutManager.shared.performShortcutActivity(
-                    type: .openBraveToday, using: browserViewController)
+                    type: .openBraveNews, using: browserViewController)
                 
                 return true
             case ActivityType.openPlayList.identifier:
