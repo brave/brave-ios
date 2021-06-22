@@ -15,9 +15,9 @@ class InitialSearchEngines {
         /// Return time interval when to remove old tabs, or nil if no tabs should be removed.
         var openSearchReference: String {
             switch self {
-                case .google: return "google"
+                case .google: return "google.com"
                 case .braveSearch: return "search.brave"
-                case .bing: return "bing"
+                case .bing: return "bing.com"
                 case .duckduckgo: return "duckduckgo.com/opensearch"
                 case .yandex: return "yandex.com/search"
                 case .qwant: return "qwant.com/opensearch"
