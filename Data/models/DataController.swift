@@ -23,6 +23,8 @@ public class DataController {
     private static let databaseName = "Brave.sqlite"
     private static let modelName = "Model"
     
+    /// This code is checked when the persistent store is loaded.
+    /// For all codes except this one we crash the app because of database failure.
     private static let storeExistsErrorCode = 134081
     
     // MARK: - Initialization
