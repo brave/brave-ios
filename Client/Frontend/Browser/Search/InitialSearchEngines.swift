@@ -12,7 +12,7 @@ class InitialSearchEngines {
     enum SearchEngineID: String {
         case google, braveSearch, bing, duckduckgo, yandex, qwant, startpage, yahoo, ecosia
         
-        /// Return time interval when to remove old tabs, or nil if no tabs should be removed.
+        /// Open Search Reference  for default search Engines
         var openSearchReference: String {
             switch self {
                 case .google: return "google.com"
@@ -46,7 +46,8 @@ class InitialSearchEngines {
         /// Some search engines have regional variations which correspond to different xml files in `SearchPlugins` folder.
         /// If you provide this custom id, it will be used instead of `regular` id when accessing the open search xml file.
         var customId: String?
-        
+        /// This is used to determine If a seach engine is added already
+        /// Added to espeically to prevent Default Search engines using Open Search Auto-Add
         var reference: String? {
             return id.openSearchReference
         }
