@@ -355,7 +355,7 @@
 						<key>INIntentResponseCodeConciseFormatStringID</key>
 						<string>pvi3Ug</string>
 						<key>INIntentResponseCodeFormatString</key>
-						<string>This will open ${websiteURL}from Bookmarks.</string>
+						<string>This will open ${websiteURL} from Bookmarks.</string>
 						<key>INIntentResponseCodeFormatStringID</key>
 						<string>ZgJKfY</string>
 						<key>INIntentResponseCodeName</key>
