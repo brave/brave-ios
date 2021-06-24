@@ -335,4 +335,87 @@ class SearchEngines {
             return index1! < index2!
         }
     }
+    
+    /// Function for Yahoo Search Engine Migration
+    /// If Default Search Engine is Yahoo or Yahoo! JAPAN,
+    /// the engine will be migrated as Custom Search Engine and set as default
+    /// In Private Mode the default engine will be set as Brave Search
+    func migrateDefaultYahooSearchEngines() {
+        // Checking Default Tab Engine is Yahoo and create a new custom engine for it
+        let defaultTabEngineName = Preferences.Search.defaultEngineName.value
+        
+        switch defaultTabEngineName {
+            case OpenSearchEngine.EngineNames.yahoo:
+                createDefaultYahooCustomEngine(isJapan: false)
+            case OpenSearchEngine.EngineNames.yahooJP:
+                createDefaultYahooCustomEngine(isJapan: true)
+            default:
+                break
+        }
+        
+        // Determining Private Tab Engine is Yahoo and set Brave as default
+        let privateTabEngineName = Preferences.Search.defaultPrivateEngineName.value
+
+        if privateTabEngineName == OpenSearchEngine.EngineNames.yahoo ||
+            privateTabEngineName == OpenSearchEngine.EngineNames.yahooJP {
+            updateDefaultEngine(OpenSearchEngine.EngineNames.brave, forType: .privateMode)
+        }
+        
+        // Marking Migration completed
+        Preferences.Search.yahooEngineMigrationCompleted.value = true
+    }
+    
+    /// Function for creating Yahoo / Yahoo JAPAN as OpenSearchEngine and setting as default
+    /// - Parameter isJapan: The boolean to determine Yahoo Engine for JP locale
+    func createDefaultYahooCustomEngine(isJapan: Bool) {
+        
+        // MARK: SearchEngineDetails
+        
+        enum SearchEngineDetails {
+            case yahoo, yahooJapan
+            
+            var engineName: String {
+                switch self {
+                    case .yahooJapan:
+                        return "Yahoo! JAPAN"
+                    case .yahoo:
+                        return "Yahoo"
+                }
+            }
+            
+            var engineTemplate: String {
+                switch self {
+                    case .yahooJapan:
+                        return "https://search.yahoo.co.jp/search?p={searchTerms}"
+                    case .yahoo:
+                        return "https://search.yahoo.com/search?q={searchTerms}"
+                }
+            }
+            
+            var searchEngineImage: UIImage {
+                switch self {
+                    case .yahooJapan:
+                        return #imageLiteral(resourceName: "faviconYahoo")
+                    case .yahoo:
+                        return #imageLiteral(resourceName: "faviconYahooJP")
+                }
+            }
+        }
+        
+        let engineDetails = isJapan ? SearchEngineDetails.yahooJapan : SearchEngineDetails.yahoo
+        
+        let searchEngine = OpenSearchEngine(
+            shortName: engineDetails.engineName,
+            image: engineDetails.searchEngineImage,
+            searchTemplate: engineDetails.engineTemplate,
+            isCustomEngine: true)
+        
+        do {
+            try addSearchEngine(searchEngine)
+            updateDefaultEngine(engineDetails.engineName, forType: .standard)
+        } catch {
+            log.error("Search Engine migration Failed for \(engineDetails.engineName)")
+        }
+        
+    }
 }
