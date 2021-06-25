@@ -58,6 +58,9 @@ enum DefaultEngineType: String {
 class SearchEngines {
     fileprivate let fileAccessor: FileAccessor
     
+    /// Boolean that determines the custom migrated engine is already created
+    fileprivate var customMigrationEngineCreated = false
+    
     init(files: FileAccessor) {
         self.fileAccessor = files
         self.disabledEngineNames = getDisabledEngineNames()
@@ -341,33 +344,29 @@ class SearchEngines {
     /// the engine will be migrated as Custom Search Engine and set as default
     /// In Private Mode the default engine will be set as Brave Search
     func migrateDefaultYahooSearchEngines() {
-        // Checking Default Tab Engine is Yahoo and create a new custom engine for it
-        let defaultTabEngineName = Preferences.Search.defaultEngineName.value
-        
-        switch defaultTabEngineName {
-            case OpenSearchEngine.EngineNames.yahoo:
-                createDefaultYahooCustomEngine(isJapan: false)
-            case OpenSearchEngine.EngineNames.yahooJP:
-                createDefaultYahooCustomEngine(isJapan: true)
-            default:
-                break
-        }
-        
-        // Determining Private Tab Engine is Yahoo and set Brave as default
+        // Checking Satndar Tab Engine is Yahoo and create a new custom engine for it
+        let standardTabEngineName = Preferences.Search.defaultEngineName.value
         let privateTabEngineName = Preferences.Search.defaultPrivateEngineName.value
 
-        if privateTabEngineName == OpenSearchEngine.EngineNames.yahoo ||
-            privateTabEngineName == OpenSearchEngine.EngineNames.yahooJP {
-            updateDefaultEngine(OpenSearchEngine.EngineNames.brave, forType: .privateMode)
+        if standardTabEngineName == OpenSearchEngine.EngineNames.yahoo {
+            createDefaultYahooCustomEngine(isJapan: false, forType: .standard)
+        } else if standardTabEngineName == OpenSearchEngine.EngineNames.yahooJP {
+            createDefaultYahooCustomEngine(isJapan: true, forType: .standard)
+        }
+        
+        if privateTabEngineName == OpenSearchEngine.EngineNames.yahoo {
+            createDefaultYahooCustomEngine(isJapan: false, forType: .privateMode)
+        } else if privateTabEngineName == OpenSearchEngine.EngineNames.yahooJP {
+            createDefaultYahooCustomEngine(isJapan: true, forType: .privateMode)
         }
         
         // Marking Migration completed
         Preferences.Search.yahooEngineMigrationCompleted.value = true
     }
-    
+        
     /// Function for creating Yahoo / Yahoo JAPAN as OpenSearchEngine and setting as default
     /// - Parameter isJapan: The boolean to determine Yahoo Engine for JP locale
-    func createDefaultYahooCustomEngine(isJapan: Bool) {
+    private func createDefaultYahooCustomEngine(isJapan: Bool, forType type: DefaultEngineType) {
         
         // MARK: SearchEngineDetails
         
@@ -411,12 +410,15 @@ class SearchEngines {
             searchTemplate: engineDetails.engineTemplate,
             isCustomEngine: true)
         
-        do {
-            try addSearchEngine(searchEngine)
-            updateDefaultEngine(engineDetails.engineName, forType: .standard)
-        } catch {
-            log.error("Search Engine migration Failed for \(engineDetails.engineName)")
+        if !customMigrationEngineCreated {
+            do {
+                try addSearchEngine(searchEngine)
+                customMigrationEngineCreated = true
+            } catch {
+                log.error("Search Engine migration Failed for \(engineDetails.engineName)")
+            }
         }
         
+        updateDefaultEngine(engineDetails.engineName, forType: type)
     }
 }
