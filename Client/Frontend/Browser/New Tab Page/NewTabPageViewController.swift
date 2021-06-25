@@ -9,7 +9,7 @@ import CoreData
 import Data
 import Shared
 import BraveShared
-import BraveRewards
+import BraveCore
 import SnapKit
 
 /// The behavior for sizing sections when the user is in landscape orientation

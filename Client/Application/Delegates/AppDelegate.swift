@@ -15,7 +15,7 @@ import UserNotifications
 import BraveShared
 import Data
 import StoreKit
-import BraveRewards
+import BraveCore
 import AdblockRust
 import Combine
 
@@ -61,6 +61,26 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         self.window!.backgroundColor = .black
         
         // Brave Core Initialization
+        BraveCoreMain.setLogHandler { severity, file, line, messageStartIndex, message in
+            if !message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                let level: XCGLogger.Level = {
+                    switch -severity {
+                    case 0: return .error
+                    case 1: return .info
+                    case 2..<7: return .debug
+                    default: return .verbose
+                    }
+                }()
+                Logger.braveCoreLogger.logln(
+                    level,
+                    fileName: file,
+                    lineNumber: Int(line),
+                    closure: { message.dropFirst(messageStartIndex) }
+                )
+            }
+            return true
+        }
+        
         self.braveCore = BraveCoreMain()
         self.braveCore?.setUserAgent(UserAgent.mobile)
         
