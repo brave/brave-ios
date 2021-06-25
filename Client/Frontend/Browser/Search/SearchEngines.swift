@@ -405,6 +405,7 @@ class SearchEngines {
         let engineDetails = isJapan ? SearchEngineDetails.yahooJapan : SearchEngineDetails.yahoo
         
         let searchEngine = OpenSearchEngine(
+            engineID: OpenSearchEngine.migratedYahooEngineID,
             shortName: engineDetails.engineName,
             image: engineDetails.searchEngineImage,
             searchTemplate: engineDetails.engineTemplate,

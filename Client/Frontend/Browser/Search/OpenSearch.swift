@@ -23,6 +23,11 @@ class OpenSearchEngine: NSObject, NSSecureCoding {
     
     static let defaultSearchClientName = "brave"
     
+    // This Identifier is defined to distinguish migrated Open Search Engine
+    // It is used while filtering out Custom Engines for Private Mode
+    // All Custom SE's will be filtered out except the one with this identifier
+    static let migratedYahooEngineID = "yahoo-migrated"
+    
     let shortName: String
     let referenceURL: String?
 
