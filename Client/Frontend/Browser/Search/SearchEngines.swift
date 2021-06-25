@@ -401,7 +401,11 @@ class SearchEngines {
             }
         }
         
-        let engineDetails = isJapan ? SearchEngineDetails.yahooJapan : SearchEngineDetails.yahoo
+        var engineDetails =  SearchEngineDetails.yahoo
+        
+        if isJapan {
+            engineDetails = SearchEngineDetails.yahooJapan
+        }
         
         let searchEngine = OpenSearchEngine(
             engineID: OpenSearchEngine.migratedYahooEngineID,
