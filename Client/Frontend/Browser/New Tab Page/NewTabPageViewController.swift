@@ -216,6 +216,14 @@ class NewTabPageViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         checkForUpdatedFeed()
+        
+        backgroundView.imageView.image = background.backgroundImage
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        backgroundView.imageView.image = nil
     }
     
     override func viewDidLayoutSubviews() {
