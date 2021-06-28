@@ -216,14 +216,6 @@ class NewTabPageViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         checkForUpdatedFeed()
-        
-        backgroundView.imageView.image = background.backgroundImage
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        
-        backgroundView.imageView.image = nil
     }
     
     override func viewDidLayoutSubviews() {
@@ -248,6 +240,12 @@ class NewTabPageViewController: UIViewController {
         super.viewSafeAreaInsetsDidChange()
         
         backgroundButtonsView.collectionViewSafeAreaInsets = view.safeAreaInsets
+    }
+    
+    override func willMove(toParent parent: UIViewController?) {
+        super.willMove(toParent: parent)
+        
+        backgroundView.imageView.image = parent == nil ? nil : background.backgroundImage
     }
     
     // MARK: - Background
