@@ -729,7 +729,9 @@ extension SearchViewController {
         if gestureRecognizer.state == .began {
             let location = gestureRecognizer.location(in: self.tableView)
             if let indexPath = tableView.indexPathForRow(at: location),
-               let suggestion = suggestions[safe: indexPath.row] {
+               let section = availableSections[safe: indexPath.section],
+               let suggestion = suggestions[safe: indexPath.row],
+               section == .searchSuggestions {
                 searchDelegate?.searchViewController(self, didLongPressSuggestion: suggestion)
             }
         }
