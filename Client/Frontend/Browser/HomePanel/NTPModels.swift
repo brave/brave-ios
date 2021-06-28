@@ -86,6 +86,6 @@ class NTPLogo: Codable {
     }
     
     var image: UIImage? {
-        NTPImage(contentsOfFile: imageUrl)
+        UIImage(contentsOfFile: imageUrl)
     }
 }
