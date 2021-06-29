@@ -58,9 +58,6 @@ enum DefaultEngineType: String {
 class SearchEngines {
     fileprivate let fileAccessor: FileAccessor
     
-    /// Boolean that determines the custom migrated engine is already created
-    fileprivate var customMigrationEngineCreated = false
-    
     init(files: FileAccessor) {
         self.fileAccessor = files
         self.disabledEngineNames = getDisabledEngineNames()
@@ -344,7 +341,7 @@ class SearchEngines {
     /// the engine will be migrated as Custom Search Engine and set as default
     /// In Private Mode the default engine will be set as Brave Search
     func migrateDefaultYahooSearchEngines() {
-        // Checking Satndar Tab Engine is Yahoo and create a new custom engine for it
+        // Checking Standard Tab Engine is Yahoo and create a new custom engine for it
         let standardTabEngineName = Preferences.Search.defaultEngineName.value
         let privateTabEngineName = Preferences.Search.defaultPrivateEngineName.value
 
@@ -414,10 +411,13 @@ class SearchEngines {
             searchTemplate: engineDetails.engineTemplate,
             isCustomEngine: true)
         
-        if !customMigrationEngineCreated {
+        let customMigrationEngineCreated = customEngines.first(where: {
+            $0.shortName == searchEngine.shortName
+        })
+        
+        if customMigrationEngineCreated == nil {
             do {
                 try addSearchEngine(searchEngine)
-                customMigrationEngineCreated = true
             } catch {
                 log.error("Search Engine migration Failed for \(engineDetails.engineName)")
             }
