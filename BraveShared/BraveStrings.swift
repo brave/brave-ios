@@ -1443,7 +1443,7 @@ extension Strings {
         public static let activityTypeOpenBraveNewsTitle =
             NSLocalizedString("shortcuts.activityTypeOpenBraveNewsTitle",
                               bundle: .braveShared,
-                              value: "Clear Brave Browsing History",
+                              value: "Open Brave News",
                               comment: "")
         
         public static let activityTypeOpenPlaylistTitle =

@@ -66,7 +66,7 @@ class ShortcutSettingsViewController: TableViewController {
                         Row(text: Strings.Shortcuts.shortcutSettingsOpenBraveNewsTitle, selection: { [unowned self] in
                             manageShortcutActivity(for: .openBraveNews)
                         }, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self)],
-                    footer: .title(Strings.Shortcuts.shorcutSettingsOpenPlaylistDescription))
+                    footer: .title(Strings.Shortcuts.shortcutSettingsOpenBraveNewsDescription))
         )
         
         dataSource.sections.append(
