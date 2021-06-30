@@ -86,7 +86,8 @@ class Historyv2: WebsitePresentable {
     
     private let historyNode: HistoryNode
     private static var observer: HistoryServiceListener?
-    
+    private static let historyAPI = (UIApplication.shared.delegate as? AppDelegate)?.braveCore?.historyAPI
+
     private func fetchHistoryTimePeriod(visited: Date?) -> Section? {
         let todayOffset = 0
         let yesterdayOffset = -1
@@ -125,7 +126,7 @@ class Historyv2: WebsitePresentable {
 extension Historyv2 {
 
     public class func add(url: URL, title: String, dateAdded: Date, isURLTyped: Bool = true) {
-        guard let historyAPI = (UIApplication.shared.delegate as? AppDelegate)?.braveCore?.historyAPI else {
+        guard let historyAPI = Historyv2.historyAPI else {
             return
         }
 
@@ -134,7 +135,7 @@ extension Historyv2 {
     }
     
     public static func frc() -> HistoryV2FetchResultsController? {
-        guard let historyAPI = (UIApplication.shared.delegate as? AppDelegate)?.braveCore?.historyAPI else {
+        guard let historyAPI = Historyv2.historyAPI else {
             return nil
         }
         
@@ -142,7 +143,7 @@ extension Historyv2 {
     }
     
     public func delete() {
-        guard let historyAPI = (UIApplication.shared.delegate as? AppDelegate)?.braveCore?.historyAPI else {
+        guard let historyAPI = Historyv2.historyAPI else {
             return
         }
         
@@ -150,7 +151,7 @@ extension Historyv2 {
     }
     
     public class func deleteAll(_ completion: @escaping () -> Void) {
-        guard let historyAPI = (UIApplication.shared.delegate as? AppDelegate)?.braveCore?.historyAPI else {
+        guard let historyAPI = Historyv2.historyAPI else {
             return
         }
         
@@ -160,7 +161,7 @@ extension Historyv2 {
     }
     
     public class func suffix(_ maxLength: Int, _ completion: @escaping ([Historyv2]) -> Void) {
-        guard let historyAPI = (UIApplication.shared.delegate as? AppDelegate)?.braveCore?.historyAPI else {
+        guard let historyAPI = Historyv2.historyAPI else {
             return
         }
         
@@ -171,7 +172,7 @@ extension Historyv2 {
 
     public static func byFrequency(query: String? = nil, _ completion: @escaping ([WebsitePresentable]) -> Void) {
         guard let query = query, !query.isEmpty,
-              let historyAPI = (UIApplication.shared.delegate as? AppDelegate)?.braveCore?.historyAPI else {
+              let historyAPI = Historyv2.historyAPI else {
             return
         }
         
@@ -196,7 +197,7 @@ extension Historyv2 {
 extension Historyv2 {
     
     public static func waitForHistoryServiceLoaded(_ completion: @escaping () -> Void) {
-        guard let historyAPI = (UIApplication.shared.delegate as? AppDelegate)?.braveCore?.historyAPI else {
+        guard let historyAPI = Historyv2.historyAPI else {
             return
         }
         

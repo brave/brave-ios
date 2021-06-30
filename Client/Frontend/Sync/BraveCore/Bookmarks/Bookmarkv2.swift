@@ -18,7 +18,8 @@ class Bookmarkv2: WebsitePresentable {
     private let bookmarkNode: BookmarkNode
     private var bookmarkFavIconObserver: BookmarkModelListener?
     private static var bookmarkModelLoadedObserver: BookmarkModelListener?
-    
+    private static let bookmarksAPI = (UIApplication.shared.delegate as? AppDelegate)?.braveCore?.bookmarksAPI
+
     init(_ bookmarkNode: BookmarkNode) {
         self.bookmarkNode = bookmarkNode
     }
@@ -61,7 +62,7 @@ class Bookmarkv2: WebsitePresentable {
     }
     
     public var parent: Bookmarkv2? {
-        guard let bookmarksAPI = (UIApplication.shared.delegate as? AppDelegate)?.braveCore?.bookmarksAPI else {
+        guard let bookmarksAPI = Bookmarkv2.bookmarksAPI else {
             return nil
         }
         
@@ -104,7 +105,7 @@ class Bookmarkv2: WebsitePresentable {
     }
     
     public func delete() {
-        guard let bookmarksAPI = (UIApplication.shared.delegate as? AppDelegate)?.braveCore?.bookmarksAPI else {
+        guard let bookmarksAPI = Bookmarkv2.bookmarksAPI else {
             return
         }
         
@@ -117,7 +118,7 @@ class Bookmarkv2: WebsitePresentable {
     // If no folder was visited, returns the mobile bookmarks folder
     // If the root folder was visited, returns nil
     public static func lastVisitedFolder() -> Bookmarkv2? {
-        guard let bookmarksAPI = (UIApplication.shared.delegate as? AppDelegate)?.braveCore?.bookmarksAPI else {
+        guard let bookmarksAPI = self.bookmarksAPI else {
             return nil
         }
         
@@ -149,7 +150,7 @@ class Bookmarkv2: WebsitePresentable {
     }
     
     public static func lastFolderPath() -> [Bookmarkv2] {
-        guard let bookmarksAPI = (UIApplication.shared.delegate as? AppDelegate)?.braveCore?.bookmarksAPI else {
+        guard let bookmarksAPI = Bookmarkv2.bookmarksAPI else {
             return []
         }
         
@@ -203,7 +204,7 @@ class BraveBookmarkFolder: Bookmarkv2 {
 extension Bookmarkv2 {
     
     public class func mobileNode() -> Bookmarkv2? {
-        guard let bookmarksAPI = (UIApplication.shared.delegate as? AppDelegate)?.braveCore?.bookmarksAPI else {
+        guard let bookmarksAPI = Bookmarkv2.bookmarksAPI else {
             return nil
         }
         
@@ -214,7 +215,7 @@ extension Bookmarkv2 {
     }
     
     public class func addFolder(title: String, parentFolder: Bookmarkv2? = nil) {
-        guard let bookmarksAPI = (UIApplication.shared.delegate as? AppDelegate)?.braveCore?.bookmarksAPI else {
+        guard let bookmarksAPI = Bookmarkv2.bookmarksAPI else {
             return
         }
         
@@ -226,7 +227,7 @@ extension Bookmarkv2 {
     }
     
     public class func add(url: URL, title: String?, parentFolder: Bookmarkv2? = nil) {
-        guard let bookmarksAPI = (UIApplication.shared.delegate as? AppDelegate)?.braveCore?.bookmarksAPI else {
+        guard let bookmarksAPI = Bookmarkv2.bookmarksAPI else {
             return
         }
         
@@ -242,7 +243,7 @@ extension Bookmarkv2 {
     }
     
     public static func frc(parent: Bookmarkv2?) -> BookmarksV2FetchResultsController? {
-        guard let bookmarksAPI = (UIApplication.shared.delegate as? AppDelegate)?.braveCore?.bookmarksAPI else {
+        guard let bookmarksAPI = Bookmarkv2.bookmarksAPI else {
             return nil
         }
         
@@ -250,7 +251,7 @@ extension Bookmarkv2 {
     }
     
     public static func foldersFrc(excludedFolder: Bookmarkv2? = nil) -> BookmarksV2FetchResultsController? {
-        guard let bookmarksAPI = (UIApplication.shared.delegate as? AppDelegate)?.braveCore?.bookmarksAPI else {
+        guard let bookmarksAPI = Bookmarkv2.bookmarksAPI else {
             return nil
         }
         
@@ -266,8 +267,7 @@ extension Bookmarkv2 {
         // Invalid query.. BraveCore doesn't store bookmarks based on last visited.
         // Any last visited bookmarks would show up in `History` anyway.
         // BraveCore automatically sorts them by date as well.
-        guard let query = query, !query.isEmpty,
-              let bookmarksAPI = (UIApplication.shared.delegate as? AppDelegate)?.braveCore?.bookmarksAPI else {
+        guard let query = query, !query.isEmpty, let bookmarksAPI = Bookmarkv2.bookmarksAPI else {
             return []
         }
         
@@ -281,7 +281,7 @@ extension Bookmarkv2 {
     }
     
     public func updateWithNewLocation(customTitle: String?, url: URL?, location: Bookmarkv2?) {
-        guard let bookmarksAPI = (UIApplication.shared.delegate as? AppDelegate)?.braveCore?.bookmarksAPI else {
+        guard let bookmarksAPI = Bookmarkv2.bookmarksAPI else {
             return
         }
         
@@ -306,8 +306,7 @@ extension Bookmarkv2 {
     
     public class func reorderBookmarks(frc: BookmarksV2FetchResultsController?, sourceIndexPath: IndexPath,
                                        destinationIndexPath: IndexPath) {
-        guard let frc = frc,
-              let bookmarksAPI = (UIApplication.shared.delegate as? AppDelegate)?.braveCore?.bookmarksAPI else {
+        guard let frc = frc, let bookmarksAPI = Bookmarkv2.bookmarksAPI else {
             return
         }
         
@@ -345,7 +344,7 @@ extension Bookmarkv2 {
     }
     
     public func addFavIconObserver(_ observer: @escaping () -> Void) {
-        guard let bookmarksAPI = (UIApplication.shared.delegate as? AppDelegate)?.braveCore?.bookmarksAPI else {
+        guard let bookmarksAPI = Bookmarkv2.bookmarksAPI else {
             return
         }
         
@@ -368,7 +367,7 @@ extension Bookmarkv2 {
     }
     
     public static func waitForBookmarkModelLoaded(_ completion: @escaping () -> Void) {
-        guard let bookmarksAPI = (UIApplication.shared.delegate as? AppDelegate)?.braveCore?.bookmarksAPI else {
+        guard let bookmarksAPI = Bookmarkv2.bookmarksAPI else {
             return
         }
         
