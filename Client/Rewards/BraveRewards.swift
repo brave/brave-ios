@@ -54,9 +54,11 @@ class BraveRewards: NSObject {
         ledger = BraveLedger(stateStoragePath: storagePath)
         ledger?.initializeLedgerService { [weak self] in
             guard let self = self, let ledger = self.ledger else { return }
-            self.ads.initializeIfAdsEnabled { success in
-                if success {
-                    self.updateAdsWithWalletInfo()
+            if self.ads.isEnabled {
+                self.ads.initialize { success in
+                    if success {
+                        self.updateAdsWithWalletInfo()
+                    }
                 }
             }
             self.ledgerServiceDidStart?(ledger)
@@ -91,13 +93,18 @@ class BraveRewards: NSObject {
                 self.ledger?.isAutoContributeEnabled = newValue
                 self.ads.isEnabled = newValue
                 if !newValue {
+                    // TODO: Do not shutdown the ads service if Brave News is enabled (#3872)
                     self.ads.shutdown {
                         self.ads = BraveAds(stateStoragePath: self.configuration.storageURL.appendingPathComponent("ads").path)
                     }
                 } else {
-                    self.ads.initializeIfAdsEnabled { success in
-                        if success {
-                            self.updateAdsWithWalletInfo()
+                    if self.ads.isAdsServiceRunning() {
+                        self.updateAdsWithWalletInfo()
+                    } else {
+                        self.ads.initialize { success in
+                            if success {
+                                self.updateAdsWithWalletInfo()
+                            }
                         }
                     }
                 }
@@ -123,6 +130,7 @@ class BraveRewards: NSObject {
     }
     
     func reset() {
+        // TODO: Do not shutdown the ads service if Brave News is enabled (#3872)
         ads.shutdown { [self] in
             try? FileManager.default.removeItem(
                 at: configuration.storageURL.appendingPathComponent("ledger")
@@ -130,7 +138,9 @@ class BraveRewards: NSObject {
             try? FileManager.default.removeItem(
                 at: configuration.storageURL.appendingPathComponent("ads")
             )
-            ads.initializeIfAdsEnabled { _ in }
+            if ads.isEnabled {
+                ads.initialize { _ in }
+            }
         }
     }
     
