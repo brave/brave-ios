@@ -222,6 +222,7 @@
 		27201EFE24539B5500C19DD1 /* NewTabPageBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27201EFD24539B5500C19DD1 /* NewTabPageBackground.swift */; };
 		27201F022458879700C19DD1 /* NewTabPageBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27201F012458879700C19DD1 /* NewTabPageBackgroundView.swift */; };
 		27201F0424589B9800C19DD1 /* NewTabPageNotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27201F0324589B9800C19DD1 /* NewTabPageNotifications.swift */; };
+		27254F85269366CF00204EB4 /* AdblockRustEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27254F84269366CF00204EB4 /* AdblockRustEngine.swift */; };
 		2726636924944BFA0056CFE1 /* BraveNewsOptInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2726636824944BFA0056CFE1 /* BraveNewsOptInView.swift */; };
 		2726637324981B600056CFE1 /* FeedSectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2726637224981B5F0056CFE1 /* FeedSectionHeaderView.swift */; };
 		2727369B24A65F650096DCB9 /* UIActionExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2727369A24A65F650096DCB9 /* UIActionExtensions.swift */; };
@@ -317,8 +318,6 @@
 		27829E752549FF13007CF0B2 /* WalletTransferViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27829E742549FF13007CF0B2 /* WalletTransferViewController.swift */; };
 		27829E842549FF9D007CF0B2 /* WalletTransferView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27829E832549FF9D007CF0B2 /* WalletTransferView.swift */; };
 		2784874524DC658C0004F03C /* BraveNewsEmptyFeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2784874424DC658C0004F03C /* BraveNewsEmptyFeedView.swift */; };
-		278655A225C227C8009FFE80 /* AdblockRust.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27F47A3125AFCECE004922E4 /* AdblockRust.xcframework */; };
-		278655A325C227C8009FFE80 /* AdblockRust.xcframework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 27F47A3125AFCECE004922E4 /* AdblockRust.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		278655B925C227E1009FFE80 /* OnePasswordExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 277569F425ACFD3F00C129AF /* OnePasswordExtension.framework */; };
 		278655BA25C227E1009FFE80 /* OnePasswordExtension.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 277569F425ACFD3F00C129AF /* OnePasswordExtension.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		278C467823EDF0060083347F /* SimpleShieldsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 278C467723EDF0060083347F /* SimpleShieldsView.swift */; };
@@ -1364,7 +1363,6 @@
 				2748626A25AD30A500BC40AA /* sqlcipher.xcframework in Copy Frameworks */,
 				277568D825ACF91600C129AF /* SPMLibraries.framework in Copy Frameworks */,
 				278C468E23F1E6270083347F /* BraveUI.framework in Copy Frameworks */,
-				278655A325C227C8009FFE80 /* AdblockRust.xcframework in Copy Frameworks */,
 				E60138651C89EB7600DF9756 /* Shared.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
@@ -1629,6 +1627,7 @@
 		27201EFD24539B5500C19DD1 /* NewTabPageBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageBackground.swift; sourceTree = "<group>"; };
 		27201F012458879700C19DD1 /* NewTabPageBackgroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageBackgroundView.swift; sourceTree = "<group>"; };
 		27201F0324589B9800C19DD1 /* NewTabPageNotifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageNotifications.swift; sourceTree = "<group>"; };
+		27254F84269366CF00204EB4 /* AdblockRustEngine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AdblockRustEngine.swift; path = Client/WebFilters/AdblockRustEngine.swift; sourceTree = SOURCE_ROOT; };
 		2726636824944BFA0056CFE1 /* BraveNewsOptInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveNewsOptInView.swift; sourceTree = "<group>"; };
 		2726637224981B5F0056CFE1 /* FeedSectionHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedSectionHeaderView.swift; sourceTree = "<group>"; };
 		2727369A24A65F650096DCB9 /* UIActionExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIActionExtensions.swift; sourceTree = "<group>"; };
@@ -1896,7 +1895,6 @@
 		27F443952135E11200296C58 /* BraveShareTo.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BraveShareTo.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		27F4439C2135E11200296C58 /* BraveShareToInfo.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = BraveShareToInfo.plist; sourceTree = "<group>"; };
 		27F443AC2135E25300296C58 /* ShareToBraveViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareToBraveViewController.swift; sourceTree = "<group>"; };
-		27F47A3125AFCECE004922E4 /* AdblockRust.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = AdblockRust.xcframework; sourceTree = "<group>"; };
 		27F94A3921909A5900F4FADF /* SearchSuggestionsPromptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchSuggestionsPromptView.swift; sourceTree = "<group>"; };
 		27FCA8DF2447708300A8CA48 /* FavoritesSectionProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesSectionProvider.swift; sourceTree = "<group>"; };
 		27FCA8E2244770AB00A8CA48 /* FavoritesOverflowSectionProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesOverflowSectionProvider.swift; sourceTree = "<group>"; };
@@ -2824,7 +2822,6 @@
 				288A2D9D1AB8B3260023ABC3 /* Shared.framework in Frameworks */,
 				5DE7689920B3456E00FF5533 /* BraveShared.framework in Frameworks */,
 				2FCAE2311ABB51F800877008 /* Storage.framework in Frameworks */,
-				278655A225C227C8009FFE80 /* AdblockRust.xcframework in Frameworks */,
 				278655B925C227E1009FFE80 /* OnePasswordExtension.framework in Frameworks */,
 				5D1DC52820AC9AFB00905E5A /* Data.framework in Frameworks */,
 				0A1DF486244A2ECB00541FE4 /* NetworkExtension.framework in Frameworks */,
@@ -2920,6 +2917,7 @@
 				EB2A63241F3B49A7004EF8B0 /* ContentBlocker */,
 				4422D57721C073EE00BF1855 /* ShieldStats */,
 				0A0D3D3721A4BCF100BEE65B /* SafeBrowsing */,
+				27254F84269366CF00204EB4 /* AdblockRustEngine.swift */,
 				0A4BEF5C221AF1910005551A /* AdblockResourceDownloader.swift */,
 				0A4BEF61221B26610005551A /* LocalAdblockResourceProtocol.swift */,
 				0AEFB8522226D7C5007AF600 /* AdblockResourcesMappings.swift */,
@@ -3970,14 +3968,6 @@
 			path = BraveShareTo;
 			sourceTree = "<group>";
 		};
-		27F47A3025AFCECE004922E4 /* adblock */ = {
-			isa = PBXGroup;
-			children = (
-				27F47A3125AFCECE004922E4 /* AdblockRust.xcframework */,
-			);
-			path = adblock;
-			sourceTree = "<group>";
-		};
 		288A2D7E1AB8B2AD0023ABC3 /* Result */ = {
 			isa = PBXGroup;
 			children = (
@@ -3998,7 +3988,6 @@
 		28CE83EF1A1D246900576538 /* ThirdParty */ = {
 			isa = PBXGroup;
 			children = (
-				27F47A3025AFCECE004922E4 /* adblock */,
 				27756C5825AD152F00C129AF /* Static */,
 				277569ED25ACFCF000C129AF /* onepassword-app-extension */,
 				A1FEEE1F20BF28D900298DA2 /* Then.swift */,
@@ -7280,6 +7269,7 @@
 				0A4B7AC0243F3A8100F10CF2 /* DismissableNavigationViewController.swift in Sources */,
 				0ADA01F32450894B00B21475 /* IAPObserver.swift in Sources */,
 				39DD030D1CD53E1900BC09B3 /* HomePageHelper.swift in Sources */,
+				27254F85269366CF00204EB4 /* AdblockRustEngine.swift in Sources */,
 				C4F3B29A1CFCF93A00966259 /* ButtonToast.swift in Sources */,
 				0A918DC1252C785200496088 /* VPNRegion.swift in Sources */,
 				D31A0FC71A65D6D000DC8C7E /* SearchSuggestClient.swift in Sources */,

@@ -16,7 +16,6 @@ import BraveShared
 import Data
 import StoreKit
 import BraveCore
-import AdblockRust
 import Combine
 
 private let log = Logger.browserLogger
