@@ -23,6 +23,10 @@ public class DataController {
     private static let databaseName = "Brave.sqlite"
     private static let modelName = "Model"
     
+    /// This code is checked when the persistent store is loaded.
+    /// For all codes except this one we crash the app because of database failure.
+    private static let storeExistsErrorCode = 134081
+    
     // MARK: - Initialization
     
     /// Managed Object Model of the database stack.
@@ -235,27 +239,6 @@ public class DataController {
         return DataController.sharedInMemory.container.viewContext
     }
     
-    static func save(context: NSManagedObjectContext?) {
-        guard let context = context else {
-            log.warning("No context on save")
-            return
-        }
-        
-        if context.concurrencyType == .mainQueueConcurrencyType {
-            log.warning("Writing to view context, this should be avoided.")
-        }
-        
-        context.perform {
-            if !context.hasChanges { return }
-            
-            do {
-                try context.save()
-            } catch {
-                assertionFailure("Error saving DB: \(error)")
-            }
-        }
-    }
-    
     func addPersistentStore(for container: NSPersistentContainer, store: URL) {
         let storeDescription = NSPersistentStoreDescription(url: store)
         
@@ -274,10 +257,18 @@ public class DataController {
     private func configureContainer(_ container: NSPersistentContainer, store: URL) {
         addPersistentStore(for: container, store: store)
         
-        // Dev note: This completion handler might be misleading: the persistent store is loaded synchronously by default.
-        container.loadPersistentStores(completionHandler: { _, error in
+        container.loadPersistentStores(completionHandler: { store, error in
             if let error = error {
-                fatalError("Load persistent store error: \(error)")
+                // Do not crash the app if the store already exists.
+                if (error as NSError).code != Self.storeExistsErrorCode {
+                    fatalError("Load persistent store error: \(error)")
+                }
+            }
+            
+            if store.type != NSInMemoryStoreType {
+                // This makes the database file encrypted until device is unlocked.
+                let completeProtection = FileProtectionType.complete as NSObject
+                store.setOption(completeProtection, forKey: NSPersistentStoreFileProtectionKey)
             }
         })
         // We need this so the `viewContext` gets updated on changes from background tasks.
