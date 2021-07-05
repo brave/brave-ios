@@ -256,7 +256,7 @@ extension BraveRewards {
         }
         static var production: Configuration {
             var config = Configuration.default
-            config.environment = .staging
+            config.environment = .production
             return config
         }
         static var testing: Configuration {
