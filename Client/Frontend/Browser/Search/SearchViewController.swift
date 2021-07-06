@@ -269,9 +269,12 @@ class SearchViewController: SiteTableViewController, LoaderListener {
             if keyboardHeight == 0 {
                 make.bottom.equalTo(view.safeArea.bottom)
             } else {
-                make.bottom.equalTo(view).offset(-(UIDevice.current.orientation.isPortrait
-                                                    ? keyboardHeightForOrientation.portrait
-                                                    : keyboardHeightForOrientation.landscape))
+                let keyboardOrientationHeight = UIDevice.current.orientation.isPortrait
+                    ? keyboardHeightForOrientation.portrait
+                    : keyboardHeightForOrientation.landscape
+                let keyboardOffset = UIDevice.isIpad ? keyboardHeight : keyboardOrientationHeight
+                
+                make.bottom.equalTo(view).offset(-(keyboardOffset))
             }
         }
     }
