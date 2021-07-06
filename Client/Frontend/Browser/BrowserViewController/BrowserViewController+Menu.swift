@@ -11,24 +11,18 @@ import Shared
 extension BrowserViewController {
     func featuresMenuSection(_ menuController: MenuViewController) -> some View {
         VStack(spacing: 0) {
-//<<<<<<< HEAD
-//            VPNMenuButton(vpnProductInfo: self.vpnProductInfo) { vc in
-//                (self.presentedViewController as? MenuViewController)?
-//                    .pushInnerMenu(vc)
-//            }
-//=======
-            VPNMenuButton(vpnProductInfo: self.vpnProductInfo,
-                          displayVPNDestination: { vc in
-                            (self.presentedViewController as? MenuViewController)?
-                                .pushInnerMenu(vc)
-                          },
-                          enableInstalledVPN: { [unowned menuController] in
-                            /// Donate Enable VPN Activity for suggestions
-                            let enableVPNActivity = ActivityShortcutManager.shared.createShortcutActivity(type: .enableBraveVPN)
-                            menuController.userActivity = enableVPNActivity
-                            enableVPNActivity.becomeCurrent()
-                          })
-//>>>>>>> 5225e8a6d (Fixing Merge conflicts and adjustment menu options action using new menu UI)
+            VPNMenuButton(
+                vpnProductInfo: self.vpnProductInfo,
+                displayVPNDestination: { vc in
+                    (self.presentedViewController as? MenuViewController)?
+                        .pushInnerMenu(vc)
+                },
+                enableInstalledVPN: { [unowned menuController] in
+                    /// Donate Enable VPN Activity for suggestions
+                    let enableVPNActivity = ActivityShortcutManager.shared.createShortcutActivity(type: .enableBraveVPN)
+                    menuController.userActivity = enableVPNActivity
+                    enableVPNActivity.becomeCurrent()
+                })
         }
     }
     
