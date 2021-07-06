@@ -74,7 +74,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
                     level,
                     fileName: file,
                     lineNumber: Int(line),
-                    closure: { message.dropFirst(messageStartIndex) }
+                    // Only print the actual message content, and drop the final character which is
+                    // a new line as it will be handled by logln
+                    closure: { message.dropFirst(messageStartIndex).dropLast() }
                 )
             }
             return true
