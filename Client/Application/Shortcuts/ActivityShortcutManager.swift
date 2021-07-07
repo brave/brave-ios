@@ -114,20 +114,27 @@ class ActivityShortcutManager: NSObject {
     // MARK: Activity Action Methods
 
     public func performShortcutActivity(type: ActivityType, using bvc: BrowserViewController) {
+        // Adding a slight delay to overcome concurency issues with bvc setup
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+            self.handleActivityDetails(type: type, using: bvc)
+        }
+    }
+    
+    private func handleActivityDetails(type: ActivityType, using bvc: BrowserViewController) {
         switch type {
             case .newTab:
-                bvc.openBlankNewTab(attemptLocationFieldFocus: true, isPrivate: false)
+                bvc.openBlankNewTab(attemptLocationFieldFocus: false, isPrivate: false)
             case .newPrivateTab:
-                bvc.openBlankNewTab(attemptLocationFieldFocus: true, isPrivate: true)
+                bvc.openBlankNewTab(attemptLocationFieldFocus: false, isPrivate: true)
             case .clearBrowsingHistory:
                 bvc.clearHistoryAndOpenNewTab()
             case .enableBraveVPN:
-                bvc.openBlankNewTab(attemptLocationFieldFocus: true, isPrivate: false)
-
+                bvc.openBlankNewTab(attemptLocationFieldFocus: false, isPrivate: false)
+                
                 switch BraveVPN.vpnState {
                     case .notPurchased, .purchased, .expired:
                         guard let enableVPNController = BraveVPN.vpnState.enableVPNDestinationVC else { return }
-                    
+                        
                         bvc.openInsideSettingsNavigation(with: enableVPNController)
                     case .installed(let connected):
                         if !connected {
@@ -135,10 +142,16 @@ class ActivityShortcutManager: NSObject {
                         }
                 }
             case .openBraveNews:
-                bvc.openBlankNewTab(attemptLocationFieldFocus: true, isPrivate: false)
-
-                guard let newTabPageController = bvc.tabManager.selectedTab?.newTabPageViewController else { return }
-                newTabPageController.scrollToBraveNews()
+                if Preferences.BraveNews.isEnabled.value {
+                    bvc.openBlankNewTab(attemptLocationFieldFocus: false, isPrivate: false)
+                    
+                    guard let newTabPageController = bvc.tabManager.selectedTab?.newTabPageViewController else { return }
+                    newTabPageController.scrollToBraveNews()
+                } else {
+                    let controller = BraveNewsSettingsViewController(dataSource: bvc.feedDataSource)
+                    let container = UINavigationController(rootViewController: controller)
+                    bvc.present(container, animated: true)
+                }
             case .openPlayList:
                 let playlistController = (UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController ?? PlaylistViewController()
                 playlistController.modalPresentationStyle = .fullScreen
