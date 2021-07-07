@@ -123,14 +123,17 @@ class ActivityShortcutManager: NSObject {
     private func handleActivityDetails(type: ActivityType, using bvc: BrowserViewController) {
         switch type {
             case .newTab:
-                bvc.openBlankNewTab(attemptLocationFieldFocus: false, isPrivate: false)
+                bvc.openBlankNewTab(attemptLocationFieldFocus: false, isPrivate: false, isExternal: true)
+                bvc.popToBVC()
             case .newPrivateTab:
-                bvc.openBlankNewTab(attemptLocationFieldFocus: false, isPrivate: true)
+                bvc.openBlankNewTab(attemptLocationFieldFocus: false, isPrivate: true, isExternal: true)
+                bvc.popToBVC()
             case .clearBrowsingHistory:
                 bvc.clearHistoryAndOpenNewTab()
             case .enableBraveVPN:
-                bvc.openBlankNewTab(attemptLocationFieldFocus: false, isPrivate: false)
-                
+                bvc.openBlankNewTab(attemptLocationFieldFocus: false, isPrivate: false, isExternal: true)
+                bvc.popToBVC()
+
                 switch BraveVPN.vpnState {
                     case .notPurchased, .purchased, .expired:
                         guard let enableVPNController = BraveVPN.vpnState.enableVPNDestinationVC else { return }
@@ -143,8 +146,9 @@ class ActivityShortcutManager: NSObject {
                 }
             case .openBraveNews:
                 if Preferences.BraveNews.isEnabled.value {
-                    bvc.openBlankNewTab(attemptLocationFieldFocus: false, isPrivate: false)
-                    
+                    bvc.openBlankNewTab(attemptLocationFieldFocus: false, isPrivate: false, isExternal: true)
+                    bvc.popToBVC()
+
                     guard let newTabPageController = bvc.tabManager.selectedTab?.newTabPageViewController else { return }
                     newTabPageController.scrollToBraveNews()
                 } else {
