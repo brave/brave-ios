@@ -8,6 +8,14 @@ import BraveUI
 import Shared
 
 class TabCell: UICollectionViewCell {
+    
+    struct UX {
+        static let cornerRadius: CGFloat = 6
+        static let defaultBorderWidth = 1.0 / UIScreen.main.scale
+        static let textBoxHeight = CGFloat(32.0)
+        static let faviconSize = CGFloat(20)
+    }
+    
     static let identifier = "TabCellIdentifier"
     static let borderWidth: CGFloat = 3
     
@@ -25,14 +33,45 @@ class TabCell: UICollectionViewCell {
     
     var animator: SwipeAnimator!
     
-    weak var delegate: TabCellDelegate?
-    
     // Changes depending on whether we're full-screen or not.
     var margin = CGFloat(0)
     
+    var closedTab: ((Tab) -> Void)?
+    var tab: Tab?
+    
+    func configure(with tab: Tab) {
+        self.tab = tab
+        titleLabel.text = tab.displayTitle
+        favicon.image = #imageLiteral(resourceName: "defaultFavicon")
+
+        if !tab.displayTitle.isEmpty {
+            accessibilityLabel = tab.displayTitle
+        } else {
+            accessibilityLabel = tab.url?.aboutComponent ?? "" // If there is no title we are most likely on a home panel.
+        }
+        isAccessibilityElement = true
+        accessibilityHint = Strings.tabTrayCellCloseAccessibilityHint
+
+        favicon.clearMonogramFavicon()
+        
+        // Tab may not be restored and so may not include a tab URL yet...
+        if let favicon = tab.displayFavicon, let url = favicon.url.asURL {
+            WebImageCacheManager.shared.load(from: url, completion: { [weak self] image, _, _, _, loadedURL in
+                guard url == loadedURL else { return }
+                self?.favicon.image = image ?? FaviconFetcher.defaultFaviconImage
+            })
+        } else if let url = tab.url, !url.isLocal {
+            favicon.loadFavicon(for: url)
+        } else {
+            favicon.image = #imageLiteral(resourceName: "defaultFavicon")
+        }
+
+        screenshotView.image = tab.screenshot
+    }
+    
     override init(frame: CGRect) {
         self.backgroundHolder.backgroundColor = .white
-        self.backgroundHolder.layer.cornerRadius = TabTrayControllerUX.cornerRadius
+        self.backgroundHolder.layer.cornerRadius = UX.cornerRadius
         self.backgroundHolder.layer.cornerCurve = .continuous
         self.backgroundHolder.clipsToBounds = true
         
@@ -59,16 +98,17 @@ class TabCell: UICollectionViewCell {
         self.closeButton.setImage(#imageLiteral(resourceName: "tab_close"), for: [])
         self.closeButton.imageView?.contentMode = .scaleAspectFit
         self.closeButton.contentMode = .center
-        self.closeButton.imageEdgeInsets = UIEdgeInsets(equalInset: TabTrayControllerUX.closeButtonEdgeInset)
+        self.closeButton.imageEdgeInsets = UIEdgeInsets(equalInset: 7)
         
         super.init(frame: frame)
         
-        self.animator = SwipeAnimator(animatingView: self)
-        self.closeButton.addTarget(self, action: #selector(close), for: .touchUpInside)
+        animator = SwipeAnimator(animatingView: self)
+        animator.delegate = self
+        self.closeButton.addTarget(self, action: #selector(close), for: .touchUpInside) 
         
-        layer.borderWidth = TabTrayControllerUX.defaultBorderWidth
+        layer.borderWidth = UX.defaultBorderWidth
         layer.borderColor = UIColor.braveSeparator.resolvedColor(with: traitCollection).cgColor
-        layer.cornerRadius = TabTrayControllerUX.cornerRadius
+        layer.cornerRadius = UX.cornerRadius
         layer.cornerCurve = .continuous
         
         contentView.addSubview(backgroundHolder)
@@ -92,7 +132,7 @@ class TabCell: UICollectionViewCell {
         // create a frame that is "BorderWidth" size bigger than the cell
         layer.shadowOffset = CGSize(width: -TabCell.borderWidth, height: -TabCell.borderWidth)
         let shadowPath = CGRect(width: layer.frame.width + (TabCell.borderWidth * 2), height: layer.frame.height + (TabCell.borderWidth * 2))
-        layer.shadowPath = UIBezierPath(roundedRect: shadowPath, cornerRadius: TabTrayControllerUX.cornerRadius+TabCell.borderWidth).cgPath
+        layer.shadowPath = UIBezierPath(roundedRect: shadowPath, cornerRadius: UX.cornerRadius+TabCell.borderWidth).cgPath
         layer.borderWidth = 0.0
     }
     
@@ -108,13 +148,13 @@ class TabCell: UICollectionViewCell {
         
         titleBackgroundView.snp.makeConstraints { make in
             make.top.left.right.equalTo(backgroundHolder)
-            make.height.equalTo(TabTrayControllerUX.textBoxHeight + 15.0)
+            make.height.equalTo(UX.textBoxHeight + 15.0)
         }
         
         favicon.snp.makeConstraints { make in
             make.leading.equalTo(titleBackgroundView).offset(6)
-            make.top.equalTo((TabTrayControllerUX.textBoxHeight - TabTrayControllerUX.faviconSize) / 2)
-            make.size.equalTo(TabTrayControllerUX.faviconSize)
+            make.top.equalTo((UX.textBoxHeight - UX.faviconSize) / 2)
+            make.size.equalTo(UX.faviconSize)
         }
         
         titleLabel.snp.makeConstraints { make in
@@ -124,13 +164,13 @@ class TabCell: UICollectionViewCell {
         }
         
         closeButton.snp.makeConstraints { make in
-            make.size.equalTo(TabTrayControllerUX.closeButtonSize)
+            make.size.equalTo(32)
             make.trailing.equalTo(titleBackgroundView)
             make.centerY.equalTo(favicon)
         }
         
         let shadowPath = CGRect(width: layer.frame.width + (TabCell.borderWidth * 2), height: layer.frame.height + (TabCell.borderWidth * 2))
-        layer.shadowPath = UIBezierPath(roundedRect: shadowPath, cornerRadius: TabTrayControllerUX.cornerRadius+TabCell.borderWidth).cgPath
+        layer.shadowPath = UIBezierPath(roundedRect: shadowPath, cornerRadius: UX.cornerRadius+TabCell.borderWidth).cgPath
     }
     
     override func prepareForReuse() {
@@ -141,7 +181,7 @@ class TabCell: UICollectionViewCell {
         layer.shadowOffset = .zero
         layer.shadowPath = nil
         layer.shadowOpacity = 0
-        layer.borderWidth = TabTrayControllerUX.defaultBorderWidth
+        layer.borderWidth = UX.defaultBorderWidth
     }
     
     override func accessibilityScroll(_ direction: UIAccessibilityScrollDirection) -> Bool {
@@ -161,6 +201,9 @@ class TabCell: UICollectionViewCell {
     @objc
     func close() {
         animator.closeWithoutGesture()
+        if let tab = tab {
+            closedTab?(tab)
+        }
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -170,6 +213,14 @@ class TabCell: UICollectionViewCell {
         traitCollection.performAsCurrent {
             layer.shadowColor = UIColor.braveInfoBorder.cgColor
             layer.borderColor = UIColor.braveSeparator.cgColor
+        }
+    }
+}
+
+extension TabCell: SwipeAnimatorDelegate {
+    func swipeAnimator(_ animator: SwipeAnimator, viewWillExitContainerBounds: UIView) {
+        if let tab = tab {
+            closedTab?(tab)
         }
     }
 }
