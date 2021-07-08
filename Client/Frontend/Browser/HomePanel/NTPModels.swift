@@ -58,7 +58,7 @@ class NTPBackground: Codable {
     
     var image: UIImage? {
         // Remote resources are downloaded files, so must be loaded differently
-        if packaged == true {
+        if packaged {
             // Load without cache if possible
             if let path = Bundle.main.path(forResource: imageUrl, ofType: nil) {
                 return UIImage(contentsOfFile: path)
