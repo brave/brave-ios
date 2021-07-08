@@ -123,7 +123,7 @@ class ActivityShortcutManager: NSObject {
     private func handleActivityDetails(type: ActivityType, using bvc: BrowserViewController) {
         switch type {
             case .newTab:
-                bvc.openBlankNewTab(attemptLocationFieldFocus: false, isPrivate: false, isExternal: true)
+                bvc.openBlankNewTab(attemptLocationFieldFocus: false, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing, isExternal: true)
                 bvc.popToBVC()
             case .newPrivateTab:
                 bvc.openBlankNewTab(attemptLocationFieldFocus: false, isPrivate: true, isExternal: true)
