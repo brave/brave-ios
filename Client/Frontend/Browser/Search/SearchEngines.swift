@@ -73,7 +73,7 @@ class SearchEngines {
         let engineType = type ?? (PrivateBrowsingManager.shared.isPrivateBrowsing ? .privateMode : .standard)
             
         if let name = engineType.option.value,
-            let defaultEngine = orderedEngines.first(where: { $0.shortName == name }) {
+            let defaultEngine = orderedEngines.first(where: { $0.engineID == name }) {
             return defaultEngine
         }
         
