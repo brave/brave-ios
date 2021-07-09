@@ -2199,7 +2199,7 @@ extension Strings {
                               value: "Manage what information you would like to sync between devices. These settings only affect this device.",
                               comment: "Information Text underneath the toggles for enable/disable different sync types for the device")
         public static let syncSettingsTitle =
-            NSLocalizedString("sync.syncConfigurationInformationText", tableName: "BraveShared", bundle: .braveShared,
+            NSLocalizedString("sync.syncSettingsTitle", tableName: "BraveShared", bundle: .braveShared,
                               value: "Sync Settings",
                               comment: "Title for Sync Settings Toggle Header")
     }
