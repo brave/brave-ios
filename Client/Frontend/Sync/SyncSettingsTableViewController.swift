@@ -36,7 +36,7 @@ class SyncSettingsTableViewController: UITableViewController {
         
         self.updateDeviceList()
         
-        tableView.tableHeaderView = configureInformationView(with: Strings.syncSettingsHeader)
+        tableView.tableHeaderView = makeInformationTextView(with: Strings.syncSettingsHeader)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -250,7 +250,7 @@ extension SyncSettingsTableViewController {
     override func tableView(_ tableView: UITableView, viewForFooterInSection sectionIndex: Int) -> UIView? {
         switch sectionIndex {
             case Sections.syncTypes.rawValue:
-                return configureInformationView(with: Strings.Sync.syncConfigurationInformationText)
+                return makeInformationTextView(with: Strings.Sync.syncConfigurationInformationText)
             default:
                 return nil
         }
@@ -332,7 +332,7 @@ extension SyncSettingsTableViewController {
         }
     }
     
-    private func configureInformationView(with info: String) -> UITextView {
+    private func makeInformationTextView(with info: String) -> UITextView {
         return UITextView().then {
             $0.text = info
             $0.textContainerInset = UIEdgeInsets(top: 16, left: 16, bottom: 0, right: 16)

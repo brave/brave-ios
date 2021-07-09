@@ -19,7 +19,6 @@ class HistoryServiceStateObserver: BraveServiceStateObserver, HistoryServiceObse
     
     init(_ listener: @escaping (StateChange) -> Void) {
         self.listener = listener
-        
     }
     
     func historyServiceLoaded() {

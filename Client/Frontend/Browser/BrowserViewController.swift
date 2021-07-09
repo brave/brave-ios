@@ -1230,12 +1230,10 @@ class BrowserViewController: UIViewController {
             // Disable any sort of privileged execution contexts
             // IE: The user must explicitly tap a bookmark they have saved.
             // Block all other contexts such as redirects, downloads, embed, linked, etc..
-            if visitType == .bookmark {
-                if let webView = tab.webView, let code = url.bookmarkletCodeComponent {
-                    webView.evaluateSafeJavaScript(functionName: code, sandboxed: false, asFunction: false) { _, error in
-                        if let error = error {
-                            log.error(error)
-                        }
+            if visitType == .bookmark, let webView = tab.webView, let code = url.bookmarkletCodeComponent {
+                webView.evaluateSafeJavaScript(functionName: code, sandboxed: false, asFunction: false) { _, error in
+                    if let error = error {
+                        log.error(error)
                     }
                 }
             }

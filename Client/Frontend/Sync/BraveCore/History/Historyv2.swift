@@ -12,12 +12,6 @@ import Shared
 
 private let log = Logger.browserLogger
 
-struct Historyv2Section {
-    var title: String
-    
-    var numberOfObjects: Int
-}
-
 // A Lightweight wrapper around BraveCore history
 // with the same layout/interface as `History (from CoreData)`
 class Historyv2: WebsitePresentable {
