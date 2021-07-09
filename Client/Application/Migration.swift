@@ -15,10 +15,10 @@ class Migration {
     
     private(set) public static var braveCoreSyncObjectsMigrator: BraveCoreMigrator?
 
-    private(set) public static var isChromiumMigrationCompleted: Bool = {
+    public static var isChromiumMigrationCompleted: Bool {
         return Preferences.Chromium.syncV2BookmarksMigrationCompleted.value &&
             Preferences.Chromium.syncV2HistoryMigrationCompleted.value
-    }()
+    }
     
     static func launchMigrations(keyPrefix: String) {
         Preferences.migratePreferences(keyPrefix: keyPrefix)
@@ -46,8 +46,10 @@ class Migration {
         
         NotificationCenter.default.addObserver(
             self,
-            selector: #selector(enableUserSelectedTypesForSync), name: NSNotification.Name(rawValue: BraveServiceStateObserver.coreServiceLoadedNotification),
-            object: nil)
+            selector: #selector(enableUserSelectedTypesForSync),
+            name: NSNotification.Name(rawValue: BraveServiceStateObserver.coreServiceLoadedNotification),
+            object: nil
+        )
     }
     
     @objc private func enableUserSelectedTypesForSync() {
