@@ -2107,13 +2107,16 @@ extension BrowserViewController: TabManagerDelegate {
             // but this causes PDFs to stop rendering,
             // audio and video to stop playing, etc..
             
-            // wv.removeFromSuperview()
-            
-            wv.isHidden = true
-            wv.alpha = 0.0
-            
-            // We can try to set frame to (x: 0, y: 0, width: 1, height: 1)
-            // doesn't seem to help????
+            for tab in tabManager.allTabs where tab != selected {
+                if let webView = tab.webView {
+                    if webView.isPlayingAudio {
+                        webView.isHidden = true
+                        webView.alpha = 0.0
+                    } else {
+                        webView.removeFromSuperview()
+                    }
+                }
+            }
         }
         
         toolbar?.setSearchButtonState(url: selected?.url)
@@ -2136,7 +2139,7 @@ extension BrowserViewController: TabManagerDelegate {
 
             scrollController.tab = selected
             webViewContainer.addSubview(webView)
-            webView.snp.makeConstraints { make in
+            webView.snp.remakeConstraints { make in
                 make.left.right.top.bottom.equalTo(self.webViewContainer)
             }
             webView.accessibilityLabel = Strings.webContentAccessibilityLabel
