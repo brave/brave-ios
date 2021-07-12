@@ -2102,7 +2102,18 @@ extension BrowserViewController: TabManagerDelegate {
             wv.accessibilityLabel = nil
             wv.accessibilityElementsHidden = true
             wv.accessibilityIdentifier = nil
-            wv.removeFromSuperview()
+            
+            // Firefox code removed webview from superview,
+            // but this causes PDFs to stop rendering,
+            // audio and video to stop playing, etc..
+            
+            // wv.removeFromSuperview()
+            
+            wv.isHidden = true
+            wv.alpha = 0.0
+            
+            // We can try to set frame to (x: 0, y: 0, width: 1, height: 1)
+            // doesn't seem to help????
         }
         
         toolbar?.setSearchButtonState(url: selected?.url)
@@ -2131,6 +2142,10 @@ extension BrowserViewController: TabManagerDelegate {
             webView.accessibilityLabel = Strings.webContentAccessibilityLabel
             webView.accessibilityIdentifier = "contentView"
             webView.accessibilityElementsHidden = false
+            
+            // Restore WebView visibility state
+            webView.isHidden = false
+            webView.alpha = 1.0
 
             if webView.url == nil {
                 // The web view can go gray if it was zombified due to memory pressure.
