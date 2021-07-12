@@ -197,14 +197,8 @@ extension URL {
     /// This will return URL as a string without the scheme or ending "/" suffix limitation
     /// This will be used as a key while storing navigation type of url before it is added to history
     public var typedDisplayString: String {
-        var urlString = self.absoluteString
+        var urlString = self.schemelessAbsoluteString
 
-        if urlString.hasPrefix("http://") {
-            urlString = String(urlString[urlString.index(urlString.startIndex, offsetBy: 7)...])
-        } else if urlString.hasPrefix("https://") {
-            urlString = String(urlString[urlString.index(urlString.startIndex, offsetBy: 8)...])
-        }
-        
         if urlString.hasSuffix("/") {
             urlString.removeLast()
         }
