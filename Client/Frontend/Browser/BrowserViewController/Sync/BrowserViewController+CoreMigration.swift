@@ -49,7 +49,6 @@ extension BrowserViewController {
             return BookmarksInterstitialPageHandler.showBookmarksPage(tabManager: self.tabManager, url: url)
         }
         
-        
         Migration.braveCoreSyncObjectsMigrator?.migrate({ error in
             Preferences.Chromium.syncV2ObjectMigrationCount.value += 1
             
