@@ -26,9 +26,7 @@ class BookmarkModelStateObserver: BraveServiceStateObserver, BookmarkModelObserv
     func bookmarkModelLoaded() {
         self.listener(.modelLoaded)
         
-        if !BraveServiceStateObserver.isServiceLoadStatePosted {
-            postServiceLoadedNotification()
-        }
+        postServiceLoadedNotification()
     }
     
     func bookmarkNodeChanged(_ bookmarkNode: BookmarkNode) {

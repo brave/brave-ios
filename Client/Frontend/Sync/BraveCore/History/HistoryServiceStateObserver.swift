@@ -24,9 +24,7 @@ class HistoryServiceStateObserver: BraveServiceStateObserver, HistoryServiceObse
     func historyServiceLoaded() {
         listener(.serviceLoaded)
 
-        if !BraveServiceStateObserver.isServiceLoadStatePosted {
-            postServiceLoadedNotification()
-        }
+        postServiceLoadedNotification()
     }
     
     func historyServiceBeingDeleted() {

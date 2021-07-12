@@ -47,7 +47,7 @@ class Migration {
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(enableUserSelectedTypesForSync),
-            name: NSNotification.Name(rawValue: BraveServiceStateObserver.coreServiceLoadedNotification),
+            name: BraveServiceStateObserver.coreServiceLoadedNotification,
             object: nil
         )
     }
