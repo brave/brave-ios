@@ -19,11 +19,11 @@ extension BrowserViewController {
     func doSyncMigration() {
         // We stop ever attempting migration after 3 times.
         if Preferences.Chromium.syncV2ObjectMigrationCount.value < 3 {
-            self.migrateToSyncObjects { success, syncType in
-                if !success {
+            self.migrateToSyncObjects { error in
+                if let error = error {
                     DispatchQueue.main.async {
                         let alert = UIAlertController(title: Strings.Sync.v2MigrationErrorTitle,
-                                                      message: syncType == .bookmarks ?  Strings.Sync.v2MigrationErrorMessage : Strings.Sync.historyMigrationErrorMessage,
+                                                      message: error.localizedDescription,
                                                       preferredStyle: .alert)
                         alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
                         self.present(alert, animated: true)
@@ -39,7 +39,7 @@ extension BrowserViewController {
         }
     }
     
-    private func migrateToSyncObjects(_ completion: @escaping (_ success: Bool, _ type: MigrationSyncTypes?) -> Void) {
+    private func migrateToSyncObjects(_ completion: @escaping ((MigrationError?) -> Void)) {
         let showInterstitialPage = { (url: URL?) -> Bool in
             guard let url = url else {
                 log.error("Cannot open bookmarks page in new tab")
@@ -49,29 +49,31 @@ extension BrowserViewController {
             return BookmarksInterstitialPageHandler.showBookmarksPage(tabManager: self.tabManager, url: url)
         }
         
-        Migration.braveCoreSyncObjectsMigrator?.migrate({ success, syncType in
+        
+        Migration.braveCoreSyncObjectsMigrator?.migrate({ error in
             Preferences.Chromium.syncV2ObjectMigrationCount.value += 1
             
-            if !success {
-                switch syncType {
-                    case .bookmarks:
-                        guard let url = BraveCoreMigrator.datedBookmarksURL else {
-                            completion(showInterstitialPage(BraveCoreMigrator.bookmarksURL), .bookmarks)
-                            return
+            guard let error = error else {
+                completion(nil)
+                return
+            }
+            
+            switch error {
+                case .failedBookmarksMigration:
+                    guard let url = BraveCoreMigrator.datedBookmarksURL else {
+                        completion(showInterstitialPage(BraveCoreMigrator.bookmarksURL) ? nil : error)
+                        return
+                    }
+
+                    Migration.braveCoreSyncObjectsMigrator?.exportBookmarks(to: url) { success in
+                        if success {
+                            completion(showInterstitialPage(url) ? nil : error)
+                        } else {
+                            completion(showInterstitialPage(BraveCoreMigrator.bookmarksURL) ? nil : error)
                         }
-                        
-                        Migration.braveCoreSyncObjectsMigrator?.exportBookmarks(to: url) { success in
-                            if success {
-                                completion(showInterstitialPage(url), .bookmarks)
-                            } else {
-                                completion(showInterstitialPage(BraveCoreMigrator.bookmarksURL), .bookmarks)
-                            }
-                        }
-                    default:
-                        completion(false, syncType)
-                }
-            } else {
-                completion(true, syncType)
+                    }
+                default:
+                   completion(error)
             }
         })
     }

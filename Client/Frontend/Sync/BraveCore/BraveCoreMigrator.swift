@@ -12,12 +12,20 @@ import CoreData
 
 private let log = Logger.browserLogger
 
-// MARK: MigrationSyncTypes
+// MARK: MigrationError
 
-public enum MigrationSyncTypes {
-    case bookmarks
-    case history
-    case all
+public enum MigrationError: LocalizedError {
+    case failedBookmarksMigration
+    case failedHistoryMigration
+    
+    public var errorDescription: String? {
+        switch self {
+        case .failedBookmarksMigration:
+            return Strings.Sync.v2MigrationErrorMessage
+            case .failedHistoryMigration:
+            return Strings.Sync.historyMigrationErrorMessage
+        }
+    }
 }
 
 class BraveCoreMigrator {
@@ -105,11 +113,11 @@ class BraveCoreMigrator {
         _migrationObserver.observe(from: object, handler)
     }
     
-    public func migrate(_ completion: ((_ success: Bool, _ type: MigrationSyncTypes?) -> Void)? = nil) {
+    public func migrate(_ completion: ((MigrationError?) -> Void)? = nil) {
         // Check If Chromium Sync Objects Migration is complete (Bookmarks-History)
         if Migration.isChromiumMigrationCompleted {
             migrationObserver = .completed
-            completion?(true, .all)
+            completion?(nil)
             return
         }
         
@@ -117,7 +125,7 @@ class BraveCoreMigrator {
         migrateBookmarkModels { [unowned self] success in
             guard success else {
                 self.migrationObserver = .failed
-                completion?(false, .bookmarks)
+                completion?(.failedBookmarksMigration)
                 
                 return
             }
@@ -126,12 +134,12 @@ class BraveCoreMigrator {
             migrateHistoryModels { [unowned self] success in
                 guard success else {
                     self.migrationObserver = .failed
-                    completion?(false, .history)
+                    completion?(.failedHistoryMigration)
                     
                     return
                 }
                 
-                completion?(true, .all)
+                completion?(nil)
             }
         }
     }
