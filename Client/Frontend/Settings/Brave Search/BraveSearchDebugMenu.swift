@@ -12,7 +12,16 @@ struct BraveSearchDebugMenu: View {
     var body: some View {
         
         List() {
-            Toggle("Enable callback logging", isOn: $logging.isEnabled)
+            Group {
+                let toggle = Toggle("Enable callback logging", isOn: $logging.isEnabled)
+                if #available(iOS 14.0, *) {
+                    toggle
+                        .toggleStyle(SwitchToggleStyle(tint: .accentColor))
+                } else {
+                    toggle
+                }
+            }
+
             
             Section(header: Text("Logs")) {
                 ForEach(logging.logs) { logEntry in

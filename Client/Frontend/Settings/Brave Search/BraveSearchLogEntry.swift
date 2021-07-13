@@ -9,7 +9,7 @@ class BraveSearchLogEntry: ObservableObject {
     static let shared = BraveSearchLogEntry()
     
     init(isEnabled: Bool = false, logs: [FallbackLogEntry] = []) {
-        self.isEnabled = true // CHANGE BEFORE REVIEW
+        self.isEnabled = isEnabled
         self.logs = logs
     }
     
