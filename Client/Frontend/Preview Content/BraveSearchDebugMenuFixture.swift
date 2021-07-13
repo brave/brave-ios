@@ -24,12 +24,12 @@ struct BraveSearchDebugMenuFixture {
               fallbackData: sampleHTML.data(using: .utf8))
     
     private static let cookies: [HTTPCookie] =
-        [.init(properties: [
+        [HTTPCookie(properties: [
             .domain: "example.com",
             .name: "Cookie 1",
             .value: "Value 1",
         ]),
-         .init(properties: [
+         HTTPCookie(properties: [
              .domain: "example.com",
              .name: "Cookie 1",
              .value: 123,
