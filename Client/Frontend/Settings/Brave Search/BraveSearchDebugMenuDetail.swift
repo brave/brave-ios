@@ -16,45 +16,17 @@ struct BraveSearchDebugMenuDetail: View {
   @State private var showingSheet = false
   
   var body: some View {
-    List {
-      HStack {
-        Text("URL")
-        Spacer()
-        Text(logEntry.url.absoluteString)
-      }
+    Form {
+      ValueRow(title: "URL", value: logEntry.url.absoluteString)
       
       Section(header: Text("/can/answer")) {
-        HStack {
-          Text("Cookies")
-          Spacer()
-          Text(
-            logEntry.cookies.map {
-              "\($0.name): \($0.value)"
-            }
-            .joined(separator: ", ")
-          )
-        }
-        
-        HStack {
-          Text("Time taken(s)")
-          Spacer()
-          Text(logEntry.canAnswerTime ?? "-")
-        }
-        
-        HStack {
-          Text("Response")
-          Spacer()
-          Text(logEntry.backupQuery ?? "-")
-        }
+        ValueRow(title: "Cookies", value: cookieNames)
+        ValueRow(title: "Time taken(s)", value: logEntry.canAnswerTime ?? "-")
+        ValueRow(title: "Response", value: logEntry.backupQuery ?? "-")
       }
       
       Section(header: Text("Search Fallback")) {
-        HStack {
-          Text("Time taken(s)")
-          Spacer()
-          Text(logEntry.fallbackTime ?? "-")
-            .font(.body)
-        }
+        ValueRow(title: "Time taken(s)", value: logEntry.fallbackTime ?? "-")
         
         Button("Export response") {
           showingSheet.toggle()
@@ -67,6 +39,13 @@ struct BraveSearchDebugMenuDetail: View {
     }
   }
   
+  private var cookieNames: String {
+    logEntry.cookies.map {
+      "\($0.name): \($0.value)"
+    }
+    .joined(separator: ", ")
+  }
+  
   private var dataAsUrl: URL? {
     guard let data = logEntry.fallbackData else { return nil }
     let tempUrl = FileManager.default.temporaryDirectory.appendingPathComponent("output.html")
@@ -77,6 +56,19 @@ struct BraveSearchDebugMenuDetail: View {
     } catch {
       log.error("data write-to error")
       return nil
+    }
+  }
+  
+  private struct ValueRow: View {
+    var title: LocalizedStringKey
+    var value: String
+    
+    var body: some View {
+      HStack {
+        Text(title)
+        Spacer()
+        Text(value)
+      }
     }
   }
 }

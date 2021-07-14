@@ -120,7 +120,7 @@ class BraveSearchManager: NSObject {
             .dataTaskPublisher(for: request)
             .tryMap { [weak self] output -> Data in
                 if self?.callbackLog != nil, let timer = timer {
-                    timer.stop()
+                    _ = timer.stop()
                     self?.callbackLog?.canAnswerTime = String(format: "%.2f", Double(timer.duration ?? 0))
                 }
                 
@@ -190,7 +190,7 @@ class BraveSearchManager: NSObject {
             .dataTaskPublisher(for: request)
             .tryMap { [weak self] output -> String in
                 if self?.callbackLog != nil, let timer = timer {
-                    timer.stop()
+                    _ = timer.stop()
                     self?.callbackLog?.fallbackTime = String(format: "%.2f", Double(timer.duration ?? 0))
                 }
                 

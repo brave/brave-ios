@@ -33,7 +33,6 @@ open class PerformanceTimer {
         }
     }
 
-    @discardableResult
     public func stop() -> String? {
         endTime = CFAbsoluteTimeGetCurrent()
         if let duration = duration {
