@@ -2106,14 +2106,17 @@ extension BrowserViewController: TabManagerDelegate {
             // Firefox code removed webview from superview,
             // but this causes PDFs to stop rendering,
             // audio and video to stop playing, etc..
-            
             for tab in tabManager.allTabs where tab != selected {
                 if let webView = tab.webView {
-                    if webView.isPlayingAudio {
-                        webView.isHidden = true
-                        webView.alpha = 0.0
-                    } else {
-                        webView.removeFromSuperview()
+                    if #available(iOS 14.5, *) {
+                        webView.requestMediaPlaybackState { state in
+                            if state == .playing {
+                                webView.isHidden = true
+                                webView.alpha = 0.0
+                            } else {
+                                webView.removeFromSuperview()
+                            }
+                        }
                     }
                 }
             }

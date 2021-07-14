@@ -47,24 +47,3 @@ class BraveWebView: WKWebView {
         return super.hitTest(point, with: event)
     }
 }
-
-extension WKWebView {
-    var isPlayingAudio: Bool {
-        struct Private {
-            static var hasChecked = false
-            static var canCheckPlayingAudio = false
-        }
-        
-        if !Private.hasChecked {
-            Private.hasChecked = true
-            Private.canCheckPlayingAudio = responds(to: Selector(("_isPlayingAudio")))
-        }
-        
-        if Private.canCheckPlayingAudio {
-            if let isPlayingAudio = value(forKey: "_isPlayingAudio") as? Bool {
-                return isPlayingAudio
-            }
-        }
-        return false
-    }
-}
