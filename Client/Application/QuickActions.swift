@@ -11,7 +11,7 @@ import XCGLogger
 enum ShortcutType: String {
     case newTab = "NewTab"
     case newPrivateTab = "NewPrivateTab"
-    case scanQR = "ScanQR"
+    case scanQRCode = "ScanQRCode"
 
     init?(fullType: String) {
         guard let last = fullType.components(separatedBy: ".").last else { return nil }
@@ -61,7 +61,7 @@ class QuickActions: NSObject {
             handleOpenNewTab(withBrowserViewController: browserViewController, isPrivate: false)
         case .newPrivateTab:
             handleOpenNewTab(withBrowserViewController: browserViewController, isPrivate: true)
-        case .scanQR:
+        case .scanQRCode:
             handleScanQR(withBrowserViewController: browserViewController)
         }
     }

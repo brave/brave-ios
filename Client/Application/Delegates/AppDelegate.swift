@@ -228,13 +228,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
             icon: UIApplicationShortcutIcon(templateImageName: "quick_action_new_private_tab"),
             userInfo: [:])
         
-        let scanQr = UIMutableApplicationShortcutItem(type: "\(Bundle.main.bundleIdentifier ?? "").ScanQR",
+        let scanQRCodeItem = UIMutableApplicationShortcutItem(type: "\(Bundle.main.bundleIdentifier ?? "").ScanQRCode",
             localizedTitle: Strings.scanQRCodeViewTitle,
             localizedSubtitle: nil,
             icon: UIApplicationShortcutIcon(templateImageName: "recent-search-qrcode"),
             userInfo: [:])
 
-        application.shortcutItems = Preferences.Privacy.privateBrowsingOnly.value ? [privateTabItem, scanQr] : [newTabItem, privateTabItem, scanQr]
+        application.shortcutItems = Preferences.Privacy.privateBrowsingOnly.value ? [privateTabItem, scanQRCodeItem] : [newTabItem, privateTabItem, scanQRCodeItem]
     }
     
     private var cancellables: Set<AnyCancellable> = []
