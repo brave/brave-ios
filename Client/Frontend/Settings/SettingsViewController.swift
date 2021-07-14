@@ -99,7 +99,6 @@ class SettingsViewController: TableViewController {
     }
     
     private func displayBraveSearchDebugMenu() {
-        
         let hostingController =
             UIHostingController(rootView: BraveSearchDebugMenu(logging: BraveSearchLogEntry.shared))
         

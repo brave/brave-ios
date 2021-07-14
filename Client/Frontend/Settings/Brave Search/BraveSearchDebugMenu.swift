@@ -10,7 +10,6 @@ struct BraveSearchDebugMenu: View {
     @ObservedObject var logging: BraveSearchLogEntry
     
     var body: some View {
-        
         List {
             Section {
                 let toggle = Toggle("Enable callback logging", isOn: $logging.isEnabled)
@@ -41,7 +40,6 @@ struct BraveSearchDebugMenu: View {
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .short
         dateFormatter.timeStyle = .short
-        
         return dateFormatter.string(from: date)
     }
 }
