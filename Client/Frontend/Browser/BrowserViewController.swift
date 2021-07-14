@@ -2108,6 +2108,7 @@ extension BrowserViewController: TabManagerDelegate {
             // audio and video to stop playing, etc..
             for tab in tabManager.allTabs where tab != selected {
                 if let webView = tab.webView {
+                    #if swift(>=5.4)
                     if #available(iOS 14.5, *) {
                         webView.requestMediaPlaybackState { state in
                             if state == .playing {
@@ -2117,7 +2118,12 @@ extension BrowserViewController: TabManagerDelegate {
                                 webView.removeFromSuperview()
                             }
                         }
+                    } else {
+                        webView.removeFromSuperview()
                     }
+                    #else
+                    webView.removeFromSuperview()
+                    #endif
                 }
             }
         }
