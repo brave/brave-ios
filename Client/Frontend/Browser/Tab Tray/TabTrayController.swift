@@ -8,6 +8,7 @@ import Storage
 import Shared
 import BraveShared
 import BraveUI
+import GameController
 
 struct TabTrayControllerUX {
     static let cornerRadius = CGFloat(6.0)
@@ -348,7 +349,8 @@ class TabTrayController: UIViewController {
             self.toolbar.isUserInteractionEnabled = true
             if finished, request == nil, NewTabAccessors.getNewTabPage() == .blankPage,
                 let appDelegate = UIApplication.shared.delegate as? AppDelegate,
-                let bvc = appDelegate.browserViewController {
+                let bvc = appDelegate.browserViewController,
+                self.isHardwareKeyboardConnected() {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                     bvc.topToolbar.tabLocationViewDidTapLocation(bvc.topToolbar.locationView)
                 }
@@ -358,6 +360,15 @@ class TabTrayController: UIViewController {
                 self.delegate?.tabTrayDidAddTab(self, tab: tab)
             }
         })
+    }
+    
+    func isHardwareKeyboardConnected() -> Bool {
+        if #available(iOS 14.0, *) {
+            if GCKeyboard.coalesced != nil {
+                return true
+            }
+        }
+        return false
     }
 
     func closeTabsForCurrentTray() {
