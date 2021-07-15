@@ -27,7 +27,7 @@ class FrequencyQuery {
                     let bookmarkSites = Bookmarkv2.byFrequency(query: query)
                         .map { Site(url: $0.url ?? "", title: $0.title ?? "", bookmarked: true) }
 
-                    let result = Set<Site>(historySites+bookmarkSites)
+                    let result = Set<Site>(historySites + bookmarkSites)
 
                     completion(result)
                 }

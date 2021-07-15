@@ -12,22 +12,6 @@ import CoreData
 
 private let log = Logger.browserLogger
 
-// MARK: MigrationError
-
-public enum MigrationError: LocalizedError {
-    case failedBookmarksMigration
-    case failedHistoryMigration
-    
-    public var errorDescription: String? {
-        switch self {
-        case .failedBookmarksMigration:
-            return Strings.Sync.v2MigrationErrorMessage
-            case .failedHistoryMigration:
-            return Strings.Sync.historyMigrationErrorMessage
-        }
-    }
-}
-
 class BraveCoreMigrator {
     
     // MARK: Migration State
@@ -37,6 +21,22 @@ class BraveCoreMigrator {
         case inProgress
         case failed
         case completed
+    }
+    
+    // MARK: MigrationError
+    
+    enum MigrationError: LocalizedError {
+        case failedBookmarksMigration
+        case failedHistoryMigration
+        
+        public var errorDescription: String? {
+            switch self {
+            case .failedBookmarksMigration:
+                return Strings.Sync.v2MigrationErrorMessage
+            case .failedHistoryMigration:
+                return Strings.Sync.historyMigrationErrorMessage
+            }
+        }
     }
     
     @Observable
