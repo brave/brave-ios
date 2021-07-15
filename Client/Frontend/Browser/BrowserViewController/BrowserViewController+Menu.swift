@@ -35,7 +35,7 @@ extension BrowserViewController {
                 menuController.pushInnerMenu(vc)
             }
             MenuItemButton(icon: #imageLiteral(resourceName: "playlist_menu").template, title: Strings.playlistMenuItem) {
-                let playlistController = (UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController ?? PlaylistViewController()
+                let playlistController = (UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController ?? PlaylistCarplayManager.shared.getPlaylistController()
                 playlistController.modalPresentationStyle = .fullScreen
                 self.dismiss(animated: true) {
                     self.present(playlistController, animated: true)

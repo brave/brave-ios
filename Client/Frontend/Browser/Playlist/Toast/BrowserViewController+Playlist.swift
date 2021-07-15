@@ -73,7 +73,7 @@ extension BrowserViewController: PlaylistHelperDelegate {
     }
     
     private func openPlaylist() {
-        let playlistController = (UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController ?? PlaylistViewController()
+        let playlistController = (UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController ?? PlaylistCarplayManager.shared.getPlaylistController()
         playlistController.modalPresentationStyle = .fullScreen
         present(playlistController, animated: true)
     }
@@ -127,7 +127,7 @@ extension BrowserViewController: PlaylistHelperDelegate {
     }
     
     func openInPlaylist(item: PlaylistInfo, completion: (() -> Void)?) {
-        let playlistController = (UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController ?? PlaylistViewController()
+        let playlistController = (UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController ?? PlaylistCarplayManager.shared.getPlaylistController()
         playlistController.modalPresentationStyle = .fullScreen
         present(playlistController, animated: true) {
             completion?()
