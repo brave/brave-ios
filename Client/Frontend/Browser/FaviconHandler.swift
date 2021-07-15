@@ -99,6 +99,13 @@ extension FaviconHandler: TabEventHandler {
                 TabEvent.post(.didLoadFavicon(favicon, with: data), for: tab)
             }
         }
+        // No favicon fetched from metadata, trying base domain's standard favicon location.
+        else if let baseURL = tab.url?.domainURL {
+            loadFaviconURL(baseURL.appendingPathComponent("favicon.ico").absoluteString,
+                           type: .icon, forTab: tab) >>== { (favicon, data) in
+                TabEvent.post(.didLoadFavicon(favicon, with: data), for: tab)
+            }
+        }
     }
 }
 
