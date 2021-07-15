@@ -635,7 +635,7 @@ extension AppDelegate {
                 if let userInfo = userActivity.userInfo,
                     let urlString = userInfo[CSSearchableItemActivityIdentifier] as? String,
                     let url = URL(string: urlString) {
-                    browserViewController.switchToTabForURLOrOpen(url, isPrivileged: true)
+                    browserViewController.switchToTabForURLOrOpen(url, isPrivileged: false)
                     return true
                 }
             case ActivityType.newTab.identifier:
@@ -677,7 +677,7 @@ extension AppDelegate {
                 return false
             }
 
-            browserViewController.switchToTabForURLOrOpen(url, isPrivileged: true)
+            browserViewController.switchToTabForURLOrOpen(url, isPrivileged: false)
             return true
         }
         

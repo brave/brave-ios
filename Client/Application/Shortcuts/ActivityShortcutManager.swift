@@ -192,6 +192,10 @@ class ActivityShortcutManager: NSObject {
     // MARK: Intent Donation Methods
     
     public func donateCustomIntent(for type: IntentType, with urlString: String) {
+        guard !PrivateBrowsingManager.shared.isPrivateBrowsing else {
+            return
+        }
+        
         let intent = createCustomIntent(for: type, with: urlString)
 
         let interaction = INInteraction(intent: intent, response: nil)
