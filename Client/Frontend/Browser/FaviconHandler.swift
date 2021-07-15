@@ -51,10 +51,22 @@ class FaviconHandler {
         let onCompletedSiteFavicon: ImageCacheCompletion = { image, data, _, _, url in
             let favicon = Favicon(url: url.absoluteString, date: Date(), type: type)
 
-            guard let image = image else {
+            guard let image = image,
+                  let imageData = data else {
                 favicon.width = 0
                 favicon.height = 0
 
+                onSuccess(favicon, data)
+                return
+            }
+            
+            if let header = "%PDF".data(using: .utf8),
+               imageData.count >= header.count,
+               let range = imageData.range(of: header),
+               range.lowerBound.distance(to: imageData.startIndex) == 0 { //strict PDF parsing. Otherwise index <= (1024 - header.count)
+                
+                favicon.width = 0
+                favicon.height = 0
                 onSuccess(favicon, data)
                 return
             }
