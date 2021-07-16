@@ -695,4 +695,61 @@ class NSURLExtensionsTests: XCTestCase {
             XCTAssertFalse(URL(string: $0)?.isVideoSteamingSiteURL ?? false, "failed for \($0)")
         }
     }
+    
+    func testIsValidIPAddress() {
+        let validIPAddresses = [
+            "127.0.0.1",
+            "127.0.0.1:80",
+            "::ffff:127.0.0.1",
+            "::1",
+            "[::1]:80",
+            
+            //brave.com via nslookup -query=AAAA brave.com
+            "2a04:4e42:400::288",
+            "2a04:4e42::288",
+            "2a04:4e42:600::288",
+            "2a04:4e42:200::288",
+            "[2a04:4e42:600::288]:80",
+            "[2a04:4e42:600::288]:443",
+            "[2605:2700:0:3::4713:93e3]:443"
+        ]
+        
+        let invalidIPAddresses = [
+            "https://xyz.com",
+            "https://tube.tube",
+            "https://www.google.com",
+            "https://www.cnn.com",
+            "https://foo:5000",
+            "https://brave.com:8080",
+            
+            //brave.com via nslookup -query=AAAA brave.com
+            "[2a04:4e42:400::288]", // Invalid because it is using `port` format but no port specified.
+        ]
+        
+        func isValidIP(_ string: String) -> Bool {
+            var buffer = [UInt8](repeating: 0, count: Int(INET6_ADDRSTRLEN))
+            if inet_pton(AF_INET, string, &buffer) != 0 || inet_pton(AF_INET6, string, &buffer) != 0 {
+                return true
+            }
+            return false
+        }
+        
+        validIPAddresses.forEach {
+            // Extract the domain because we don't care about the port
+            // Whether a URL has a port or not does not determine if it's a valid IP address.
+            if let url = URL(string: "https://\($0)"),
+               let host = url.host, !host.isEmpty,
+               url.port != nil {
+                XCTAssertTrue(isValidIP(host), "failed for \($0)")
+            } else if URL(string: "https://\($0)") != nil || URL(string: $0) != nil {
+                XCTAssertTrue(isValidIP($0), "failed for \($0)")
+            } else {
+                XCTFail("Invalid IP Address for \($0)")
+            }
+        }
+        
+        invalidIPAddresses.forEach {
+            XCTAssertFalse(isValidIP(URL(string: $0)?.host ?? $0), "failed for \($0)")
+        }
+    }
 }
