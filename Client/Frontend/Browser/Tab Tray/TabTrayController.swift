@@ -347,7 +347,7 @@ class TabTrayController: UIViewController {
         }, completion: { finished in
             // The addTab delegate method will pop to the BVC no need to do anything here.
             self.toolbar.isUserInteractionEnabled = true
-            if finished, request == nil, NewTabAccessors.getNewTabPage() == .blankPage,
+            if finished, request == nil, NewTabAccessors.getNewTabPage() == .topSites,
                 let appDelegate = UIApplication.shared.delegate as? AppDelegate,
                 let bvc = appDelegate.browserViewController,
                 self.isHardwareKeyboardConnected() {
@@ -364,9 +364,7 @@ class TabTrayController: UIViewController {
     
     func isHardwareKeyboardConnected() -> Bool {
         if #available(iOS 14.0, *) {
-            if GCKeyboard.coalesced != nil {
-                return true
-            }
+            return GCKeyboard.coalesced != nil
         }
         return false
     }
