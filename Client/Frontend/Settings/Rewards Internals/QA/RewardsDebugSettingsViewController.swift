@@ -159,7 +159,7 @@ class RewardsDebugSettingsViewController: TableViewController {
             case delayed
             case complete
             
-            var status: DrainStatus? {
+            var status: Ledger.DrainStatus? {
                 switch self {
                 case .none: return nil
                 case .invalid: return .invalid

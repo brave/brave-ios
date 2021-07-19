@@ -152,7 +152,7 @@ class BrowserViewController: UIViewController {
     let legacyWallet: BraveLedger?
     var promotionFetchTimer: Timer?
     private var notificationsHandler: AdsNotificationHandler?
-    var publisher: PublisherInfo?
+    var publisher: Ledger.PublisherInfo?
     
     let vpnProductInfo = VPNProductInfo()
     
@@ -209,7 +209,7 @@ class BrowserViewController: UIViewController {
             }
         }
 
-        let buildChannel = BraveAdsBuildChannel().then {
+        let buildChannel = Ads.BraveAdsBuildChannel().then {
           $0.name = AppConstants.buildChannel.rawValue
           $0.isRelease = AppConstants.buildChannel == .release
         }
@@ -236,7 +236,7 @@ class BrowserViewController: UIViewController {
                 Preferences.Rewards.rewardsToggledOnce.value = true
             }
         }
-        deviceCheckClient = DeviceCheckClient(environment: configuration.environment)
+        deviceCheckClient = DeviceCheckClient(environment: configuration.ledgerEnvironment)
         
         if Locale.current.regionCode == "JP" {
             benchmarkBlockingDataSource = BlockingSummaryDataSource()
@@ -271,7 +271,7 @@ class BrowserViewController: UIViewController {
 
         // Check if we've already migrated the users wallet to the `legacy_rewards` folder
         if fm.fileExists(atPath: legacyLedger.path) {
-            BraveLedger.environment = config.environment
+            BraveLedger.environment = config.ledgerEnvironment
             return BraveLedger(stateStoragePath: legacyLedger.path)
         }
         
@@ -302,7 +302,7 @@ class BrowserViewController: UIViewController {
             }
             
             Preferences.Rewards.migratedLegacyWallet.value = true
-            BraveLedger.environment = config.environment
+            BraveLedger.environment = config.ledgerEnvironment
             return BraveLedger(stateStoragePath: legacyLedger.path)
         } catch {
             log.error("Failed to migrate legacy wallet into a new folder: \(error)")
