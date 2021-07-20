@@ -28,6 +28,7 @@ protocol TopToolbarDelegate: AnyObject {
     func topToolbarDidPressReaderMode(_ topToolbar: TopToolbarView)
     /// - returns: whether the long-press was handled by the delegate; i.e. return `false` when the conditions for even starting handling long-press were not satisfied
     func topToolbarDidLongPressReaderMode(_ topToolbar: TopToolbarView) -> Bool
+    func topToolbarDidPressPlaylistButton(_ urlBar: TopToolbarView)
     func topToolbarDidEnterOverlayMode(_ topToolbar: TopToolbarView)
     func topToolbarDidLeaveOverlayMode(_ topToolbar: TopToolbarView)
     func topToolbarDidLongPressLocation(_ topToolbar: TopToolbarView)
@@ -606,6 +607,10 @@ extension TopToolbarView: TabLocationViewDelegate {
 
     func tabLocationViewDidTapReaderMode(_ tabLocationView: TabLocationView) {
         delegate?.topToolbarDidPressReaderMode(self)
+    }
+    
+    func tabLocationViewDidTapPlaylist(_ tabLocationView: TabLocationView) {
+        delegate?.topToolbarDidPressPlaylistButton(self)
     }
 
     func tabLocationViewLocationAccessibilityActions(_ tabLocationView: TabLocationView) -> [UIAccessibilityCustomAction]? {

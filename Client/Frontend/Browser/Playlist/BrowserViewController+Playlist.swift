@@ -7,10 +7,17 @@ import Foundation
 import Data
 import Shared
 import BraveShared
+import BraveUI
 
 private let log = Logger.browserLogger
 
 extension BrowserViewController: PlaylistHelperDelegate {
+    
+    func showPlaylistPopover(state: PlaylistPopoverState) {
+        let popover = PopoverController(contentController: PlaylistPopoverViewController(state: state))
+        popover.present(from: topToolbar.locationView.playlistButton, on: self)
+    }
+    
     func showPlaylistAlert(_ alertController: UIAlertController) {
         self.present(alertController, animated: true)
     }
@@ -22,11 +29,14 @@ extension BrowserViewController: PlaylistHelperDelegate {
             return
         }
         
-        if let toast = playlistToast {
-            toast.item = info
-            return
+        switch itemState {
+        case .added, .existing:
+            topToolbar.locationView.playlistButton.buttonState = .addedToPlaylist
+        case .pendingUserAction:
+            topToolbar.locationView.playlistButton.buttonState = .addToPlaylist
         }
         
+        /*
         // Item requires the user to choose whether or not to add it to playlists
         let toast = PlaylistToast(item: info, state: itemState, completion: { [weak self] buttonPressed in
             guard let self = self, let item = self.playlistToast?.item else { return }
@@ -66,6 +76,7 @@ extension BrowserViewController: PlaylistHelperDelegate {
         playlistToast = toast
         let duration = itemState == .pendingUserAction ? 10 : 5
         show(toast: toast, afterWaiting: .milliseconds(250), duration: .seconds(duration))
+         */
     }
     
     func dismissPlaylistToast(animated: Bool) {

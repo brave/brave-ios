@@ -87,6 +87,20 @@ extension BrowserViewController: TopToolbarDelegate {
         // Maybe we want to add something here down the road
         return false
     }
+    
+    func topToolbarDidPressPlaylistButton(_ urlBar: TopToolbarView) {
+        let state = urlBar.locationView.playlistButton.buttonState
+        switch state {
+        case .addToPlaylist:
+            showPlaylistPopover(state: .addToPlaylist)
+            break
+        case .addedToPlaylist:
+            showPlaylistPopover(state: .addedToPlaylist)
+            break
+        case .none:
+            break
+        }
+    }
 
     func locationActions(for topToolbar: TopToolbarView) -> [AccessibleAction] {
         if UIPasteboard.general.hasStrings || UIPasteboard.general.hasURLs {
