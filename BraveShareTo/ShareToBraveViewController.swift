@@ -70,15 +70,15 @@ class ShareToBraveViewController: SLComposeServiceViewController {
             cancel()
             return []
         }
-        
-        provider.loadItem(forTypeIdentifier: String(kUTTypeText), options: nil, completionHandler: { item, error in
+
+        provider.loadItem(forTypeIdentifier: String(kUTTypeText), options: nil) { item, error in
             guard let item = item, let schemeUrl = Scheme(item: item)?.schemeUrl else {
                 self.cancel()
                 return
              }
                         
             self.handleUrl(schemeUrl)
-        })
+        }
         
         return []
     }
