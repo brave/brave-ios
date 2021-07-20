@@ -76,6 +76,26 @@ class ShortcutSettingsViewController: TableViewController {
                         }, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self)],
                     footer: .title(Strings.Shortcuts.shorcutSettingsOpenPlaylistDescription))
         )
+        
+        dataSource.sections.append(
+            Section(rows: [
+                Row(text: "Open Settings", selection: { [unowned self] in
+                    let style: UIAlertController.Style = UIDevice.current.userInterfaceIdiom == .pad ? .alert : .actionSheet
+                    let alert = UIAlertController(
+                        title: "Open Settings",
+                        message: "This option will open Brave Settings. In order to change various Siri options, please select 'Siri & Search' menu item and customize your choices.",
+                        preferredStyle: style)
+                    
+                    alert.addAction(UIAlertAction(title: "Open Settings", style: .default, handler: { _ in
+                        if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
+                            UIApplication.shared.open(settingsURL)
+                        }
+                    }))
+                    alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil))
+                    present(alert, animated: true, completion: nil)
+                }, cellClass: ButtonCell.self)],
+                    footer: .title("This option will open Brave Settings. In order to change various Siri options, please select 'Siri & Search' menu item and customize your choices."))
+        )
     }
     
     private func manageShortcutActivity(for type: ActivityType) {
