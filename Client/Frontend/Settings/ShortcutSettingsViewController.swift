@@ -74,19 +74,19 @@ class ShortcutSettingsViewController: TableViewController {
                         Row(text: Strings.Shortcuts.shortcutSettingsOpenPlaylistTitle, selection: { [unowned self] in
                             manageShortcutActivity(for: .openPlayList)
                         }, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self)],
-                    footer: .title(Strings.Shortcuts.shorcutSettingsOpenPlaylistDescription))
+                    footer: .title(Strings.Shortcuts.shortcutSettingsOpenPlaylistDescription))
         )
         
         dataSource.sections.append(
             Section(rows: [
-                Row(text: "Open Settings", selection: { [unowned self] in
+                Row(text: Strings.Shortcuts.shortcutOpenApplicationSettingsTitle, selection: { [unowned self] in
                     let style: UIAlertController.Style = UIDevice.current.userInterfaceIdiom == .pad ? .alert : .actionSheet
                     let alert = UIAlertController(
-                        title: "Open Settings",
-                        message: "This option will open Brave Settings. In order to change various Siri options, please select 'Siri & Search' menu item and customize your choices.",
+                        title: Strings.Shortcuts.shortcutOpenApplicationSettingsTitle,
+                        message: Strings.Shortcuts.shortcutOpenApplicationSettingsDescription,
                         preferredStyle: style)
                     
-                    alert.addAction(UIAlertAction(title: "Open Settings", style: .default, handler: { _ in
+                    alert.addAction(UIAlertAction(title: Strings.Shortcuts.shortcutOpenApplicationSettingsTitle, style: .default, handler: { _ in
                         if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
                             UIApplication.shared.open(settingsURL)
                         }
@@ -94,7 +94,7 @@ class ShortcutSettingsViewController: TableViewController {
                     alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil))
                     present(alert, animated: true, completion: nil)
                 }, cellClass: ButtonCell.self)],
-                    footer: .title("This option will open Brave Settings. In order to change various Siri options, please select 'Siri & Search' menu item and customize your choices."))
+                    footer: .title(Strings.Shortcuts.shortcutOpenApplicationSettingsDescription))
         )
     }
     
@@ -104,29 +104,29 @@ class ShortcutSettingsViewController: TableViewController {
                 guard let shortcuts = shortcuts else { return }
                 
                 guard let shortcut = shortcuts.first(where: { $0.shortcut.userActivity?.activityType == type.identifier }) else {
-                    presentAddShorcutActivity(for: type)
+                    presentAddShortcutActivity(for: type)
                     return
                 }
                 
-                self.presentEditShorcutActivity(for: shortcut)
+                self.presentEditShortcutActivity(for: shortcut)
             }
         }
     }
     
-    private func presentAddShorcutActivity(for type: ActivityType) {
+    private func presentAddShortcutActivity(for type: ActivityType) {
         let userActivity = ActivityShortcutManager.shared.createShortcutActivity(type: type)
                         
-        let addShorcutViewController = INUIAddVoiceShortcutViewController(shortcut: INShortcut(userActivity: userActivity))
-        addShorcutViewController.delegate = self
+        let addShortcutViewController = INUIAddVoiceShortcutViewController(shortcut: INShortcut(userActivity: userActivity))
+        addShortcutViewController.delegate = self
 
-        present(addShorcutViewController, animated: true, completion: nil)
+        present(addShortcutViewController, animated: true, completion: nil)
     }
     
-    private func presentEditShorcutActivity(for voiceShortcut: INVoiceShortcut) {
-        let addShorcutViewController = INUIEditVoiceShortcutViewController(voiceShortcut: voiceShortcut)
-        addShorcutViewController.delegate = self
+    private func presentEditShortcutActivity(for voiceShortcut: INVoiceShortcut) {
+        let addShortcutViewController = INUIEditVoiceShortcutViewController(voiceShortcut: voiceShortcut)
+        addShortcutViewController.delegate = self
 
-        present(addShorcutViewController, animated: true, completion: nil)
+        present(addShortcutViewController, animated: true, completion: nil)
     }
 }
 
