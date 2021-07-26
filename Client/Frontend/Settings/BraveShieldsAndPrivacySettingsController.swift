@@ -104,15 +104,21 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
         return shields
     }()
     
-    private lazy var toggles: [Bool] = {
-        let savedToggles = Preferences.Privacy.clearPrivateDataToggles.value
-        // Ensure if we ever add an option to the list of clearables we don't crash
-        if savedToggles.count == clearables.count {
-            return savedToggles
+    private var toggles: [Bool] {
+        get {
+            let savedToggles = Preferences.Privacy.clearPrivateDataToggles.value
+            // Ensure if we ever add an option to the list of clearables we don't crash
+            if savedToggles.count == clearables.count {
+                return savedToggles
+            }
+            
+            return self.clearables.map { $0.checked }
         }
         
-        return self.clearables.map { $0.checked }
-    }()
+        set {
+            Preferences.Privacy.clearPrivateDataToggles.value = newValue
+        }
+    }
     
     private lazy var clearables: [(clearable: Clearable, checked: Bool)] = {
         var alwaysVisible: [(clearable: Clearable, checked: Bool)] =
