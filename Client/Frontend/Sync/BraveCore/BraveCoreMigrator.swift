@@ -307,7 +307,7 @@ extension BraveCoreMigrator {
         DataController.performOnMainContext { context in
             var didSucceed = true
             
-            for history in History.fetchAllHistory(context) {
+            for history in History.fetchMigrationHistory(context) {
                 if self.migrateChromiumHistory(context: context, history: history) {
                     history.delete()
                 } else {
