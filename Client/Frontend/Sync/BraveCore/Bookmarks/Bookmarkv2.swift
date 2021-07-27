@@ -376,7 +376,6 @@ extension Bookmarkv2 {
                 completion()
             }
         } else {
-            //var observer: BookmarkModelListener?
             bookmarkModelLoadedObserver = bookmarksAPI.add(BookmarkModelStateObserver({
                 if case .modelLoaded = $0 {
                     bookmarkModelLoadedObserver?.destroy()

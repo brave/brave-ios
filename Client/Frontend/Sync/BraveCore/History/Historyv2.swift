@@ -24,7 +24,7 @@ class Historyv2: WebsitePresentable {
         case yesterday
         /// History happened between yesterday and end of this week
         case lastWeek
-        /// History happaned
+        /// History happened between end of this week and end of this month
         case thisMonth
         
         /// The list of titles time period

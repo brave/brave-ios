@@ -58,24 +58,22 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
     }
     
     private func refreshHistory() {
-        guard !isHistoryRefreshing else {
-            return
-        }
-        
-        view.addSubview(spinner)
-        spinner.snp.makeConstraints {
-            $0.center.equalTo(view.snp.center)
-        }
-        spinner.startAnimating()
-        isHistoryRefreshing = true
+        if !isHistoryRefreshing {
+            view.addSubview(spinner)
+            spinner.snp.makeConstraints {
+                $0.center.equalTo(view.snp.center)
+            }
+            spinner.startAnimating()
+            isHistoryRefreshing = true
 
-        Historyv2.waitForHistoryServiceLoaded { [weak self] in
-            guard let self = self else { return }
-            
-            self.reloadData() {
-                self.isHistoryRefreshing = false
-                self.spinner.stopAnimating()
-                self.spinner.removeFromSuperview()
+            Historyv2.waitForHistoryServiceLoaded { [weak self] in
+                guard let self = self else { return }
+                
+                self.reloadData() {
+                    self.isHistoryRefreshing = false
+                    self.spinner.stopAnimating()
+                    self.spinner.removeFromSuperview()
+                }
             }
         }
     }
@@ -140,10 +138,10 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
     fileprivate func updateEmptyPanelState() {
         if  historyFRC?.fetchedObjectsCount == 0 {
             if emptyStateOverlayView.superview == nil {
-                tableView.addSubview(emptyStateOverlayView)
+                view.addSubview(emptyStateOverlayView)
+                view.bringSubviewToFront(emptyStateOverlayView)
                 emptyStateOverlayView.snp.makeConstraints { make -> Void in
                     make.edges.equalTo(tableView)
-                    make.size.equalTo(view)
                 }
             }
         } else {
@@ -194,6 +192,7 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
             $0.imageView?.layer.borderColor = BraveUX.faviconBorderColor.cgColor
             $0.imageView?.layer.borderWidth = BraveUX.faviconBorderWidth
             $0.imageView?.layer.cornerRadius = 6
+            $0.imageView?.layer.cornerCurve = .continuous
             $0.imageView?.layer.masksToBounds = true
             
             if let url = historyItem.domain?.asURL {

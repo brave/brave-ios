@@ -11,20 +11,12 @@ import Storage
 
 enum VisitType: Int {
     case unknown
-    /**
-     * This transition type means the user followed a link and got a new toplevel
-     * window.
-     */
+    /// Transition type where user followed a link and got a new top-level window
     case link
-    
-    /**
-     * This transition type means that the user typed the page's URL in the
-     * URL bar or selected it from URL bar autocomplete results.
-     */
+    /// Transition type where user typed the page's URL in the URL bar or selected it from URL bar autocomplete results.
     case typed
-    /**
-     * This transition type means that user opened a link from bookmarks.
-     */
+
+    /// Transition type where user opened a link from bookmarks.
     case bookmark
     case download
 }

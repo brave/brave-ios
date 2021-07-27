@@ -85,7 +85,7 @@ class Historyv2Fetcher: NSObject, HistoryV2FetchResultsController {
     func performFetch(_ completion: @escaping () -> Void) {
         clearHistoryData()
         
-        historyAPI?.search(withQuery: "", maxCount: 0, completion: { [weak self] historyNodeList in
+        historyAPI?.search(withQuery: "", maxCount: 200, completion: { [weak self] historyNodeList in
             guard let self = self else { return }
             
             self.historyList = historyNodeList.map { [unowned self] historyNode in
