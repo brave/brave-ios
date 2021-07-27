@@ -104,21 +104,15 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
         return shields
     }()
     
-    private var toggles: [Bool] {
-        get {
-            let savedToggles = Preferences.Privacy.clearPrivateDataToggles.value
-            // Ensure if we ever add an option to the list of clearables we don't crash
-            if savedToggles.count == clearables.count {
-                return savedToggles
-            }
-            
-            return self.clearables.map { $0.checked }
+    private lazy var toggles: [Bool] = {
+        let savedToggles = Preferences.Privacy.clearPrivateDataToggles.value
+        // Ensure if we ever add an option to the list of clearables we don't crash
+        if savedToggles.count == clearables.count {
+            return savedToggles
         }
         
-        set {
-            Preferences.Privacy.clearPrivateDataToggles.value = newValue
-        }
-    }
+        return self.clearables.map { $0.checked }
+    }()
     
     private lazy var clearables: [(clearable: Clearable, checked: Bool)] = {
         var alwaysVisible: [(clearable: Clearable, checked: Bool)] =
@@ -150,6 +144,7 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
                     
                 return .boolRow(title: title, toggleValue: self.toggles[idx], valueChange: { [unowned self] checked in
                     self.toggles[idx] = checked
+                    Preferences.Privacy.clearPrivateDataToggles.value = self.toggles
                 }, cellReuseId: "\(title.lowercased().trimmingCharacters(in: .whitespacesAndNewlines))\(idx)")
             } + [
                 Row(text: Strings.clearDataNow, selection: { [unowned self] in
