@@ -678,7 +678,10 @@ extension AppDelegate {
                 return false
             }
 
-            browserViewController.switchToTabForURLOrOpen(url, isPrivileged: false)
+            browserViewController.switchToTabForURLOrOpen(
+                url,
+                isPrivate: Preferences.Privacy.privateBrowsingOnly.value ? true :  false,
+                isPrivileged: false)
             return true
         }
         
