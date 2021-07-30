@@ -7,21 +7,25 @@ import Shared
 
 class URIFixup {
     private static func isValidIPAddressURL(_ string: String) -> Bool {
-        func isValidIPAddress(_ string: String) -> Bool {
+        func isValidIPAddress(_ host: String) -> Bool {
             var buffer = [UInt8](repeating: 0, count: Int(INET6_ADDRSTRLEN))
-            if inet_pton(AF_INET, string, &buffer) != 0 ||
-                inet_pton(AF_INET6, string, &buffer) != 0 {
+            if inet_pton(AF_INET, host, &buffer) != 0 ||
+                inet_pton(AF_INET6, host, &buffer) != 0 {
                 return true
             }
             return false
         }
         
+        // IPv4 addresses MUST have a `.` character delimiting the octets.
+        // RFC-2732 states an IPv6 URL should contain brackets as in: `[IP_ADDRESS_HERE]`
+        if !(string.contains(".") || (string.contains("[") && string.contains("]"))) {
+            return false
+        }
+        
+        // Validate if the HOST is a valid IP address.
         if let url = URL(string: "https://\(string)"),
-           let host = url.host, !host.isEmpty,
-           url.port != nil {
+           let host = url.host, !host.isEmpty {
             return isValidIPAddress(host)
-        } else if URL(string: "https://\(string)") != nil || URL(string: string) != nil {
-            return isValidIPAddress(string)
         } else {
             return false
         }
@@ -36,6 +40,14 @@ class URIFixup {
             }
             
             if decodedASCIIURL.rangeOfCharacter(from: CharacterSet.URLAllowed.inverted) != nil {
+                return nil
+            }
+            
+            // `http://::192.9.5.5` will produce an invalid URL
+            // Its host, path, query, fragment, etc.. will all be empty
+            // This prevents bad URLs from being passed to the DNS resolver.
+            // Instead, the bad URL is forwarded to the search-engine (same behaviour as Desktop).
+            if URLComponents(url: url, resolvingAgainstBaseURL: false) == nil {
                 return nil
             }
             
