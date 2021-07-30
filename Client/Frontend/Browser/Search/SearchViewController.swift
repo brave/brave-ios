@@ -358,6 +358,7 @@ class SearchViewController: SiteTableViewController, LoaderListener {
     private func querySuggestClient() {
         suggestClient?.cancelPendingRequest()
 
+        let searchQuery = searchQuery.lowercased()
         if searchQuery.isEmpty || searchEngines?.shouldShowSearchSuggestionsOptIn == true || searchQuery.looksLikeAURL() {
             suggestions = []
             tableView.reloadData()
@@ -390,7 +391,7 @@ class SearchViewController: SiteTableViewController, LoaderListener {
 
             // If there are no suggestions, just use whatever the user typed.
             if suggestions?.isEmpty ?? true {
-                self.suggestions = [self.searchQuery]
+                self.suggestions = [searchQuery]
             }
 
             // Reload the tableView to show the new list of search suggestions.
@@ -414,7 +415,7 @@ class SearchViewController: SiteTableViewController, LoaderListener {
         }
 
         let engine = quickSearchEngines[index - 1]
-
+        let searchQuery = searchQuery.lowercased()
         guard let url = engine.searchURLForQuery(searchQuery) else {
             assertionFailure()
             return
@@ -464,6 +465,7 @@ class SearchViewController: SiteTableViewController, LoaderListener {
                 searchDelegate?.searchViewController(self, didSelectURL: url)
             }
         case .findInPage:
+            let searchQuery = searchQuery.lowercased()
             searchDelegate?.searchViewController(self, shouldFindInPage: searchQuery)
         }
     }
