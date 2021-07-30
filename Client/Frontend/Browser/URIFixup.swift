@@ -6,16 +6,16 @@ import Foundation
 import Shared
 
 class URIFixup {
-    private static func isValidIPAddressURL(_ string: String) -> Bool {
-        func isValidIPAddress(_ host: String) -> Bool {
-            var buffer = [UInt8](repeating: 0, count: Int(INET6_ADDRSTRLEN))
-            if inet_pton(AF_INET, host, &buffer) != 0 ||
-                inet_pton(AF_INET6, host, &buffer) != 0 {
-                return true
-            }
-            return false
+    private static func isValidIPAddress(_ host: String) -> Bool {
+        var buffer = [UInt8](repeating: 0, count: Int(INET6_ADDRSTRLEN))
+        if inet_pton(AF_INET, host, &buffer) != 0 ||
+            inet_pton(AF_INET6, host, &buffer) != 0 {
+            return true
         }
-        
+        return false
+    }
+    
+    private static func isValidIPAddressURL(_ string: String) -> Bool {
         // IPv4 addresses MUST have a `.` character delimiting the octets.
         // RFC-2732 states an IPv6 URL should contain brackets as in: `[IP_ADDRESS_HERE]`
         if !(string.contains(".") || (string.contains("[") && string.contains("]"))) {
@@ -52,8 +52,7 @@ class URIFixup {
             }
             
             // The host is a valid IPv4 or IPv6 address
-            var buffer = [UInt8](repeating: 0, count: Int(INET6_ADDRSTRLEN))
-            if inet_pton(AF_INET, host, &buffer) != 0 || inet_pton(AF_INET6, host, &buffer) != 0 {
+            if isValidIPAddress(host) {
                 return url
             }
         }
