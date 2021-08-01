@@ -42,6 +42,10 @@ class FavoritesViewController: UIViewController {
         let objectID: NSManagedObjectID
         let title: String?
         let url: String?
+        
+        func hash(into hasher: inout Hasher) {
+            hasher.combine(objectID)
+        }
     }
     
     /// Favorites VC has two fetch result controllers to pull from.
@@ -703,32 +707,30 @@ extension FavoritesViewController: NSFetchedResultsControllerDelegate {
                     return header
                 }
             case .favorites:
-                return collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "fav_header", for: indexPath)
+                return collectionView
+                    .dequeueReusableSupplementaryView(ofKind: kind,
+                                                      withReuseIdentifier: "fav_header",
+                                                      for: indexPath)
             case .recentSearches:
                 if let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "recent_searches_header", for: indexPath) as? RecentSearchHeaderView {
                     header.resetLayout(showRecentSearches: Preferences.Search.shouldShowRecentSearches.value)
-                    header.showButton.removeTarget(self, action: nil, for: .touchUpInside)
-                    header.hideClearButton.removeTarget(self, action: nil, for: .touchUpInside)
                     
                     header.showButton.addTarget(self, action: #selector(onRecentSearchShowPressed), for: .touchUpInside)
                     header.hideClearButton.addTarget(self, action: #selector(onRecentSearchHideOrClearPressed(_:)), for: .touchUpInside)
                     
-                    if Preferences.Search.shouldShowRecentSearches.value {
+                    let shouldShowRecentSearches = Preferences.Search.shouldShowRecentSearches.value
+                    var showButtonVisible = !shouldShowRecentSearches
+                    var clearButtonVisible = !shouldShowRecentSearches
+                    if let fetchedObjects = recentSearchesFRC.fetchedObjects, shouldShowRecentSearches {
                         let totalCount = RecentSearch.totalCount()
-                        if let fetchedObjects = recentSearchesFRC.fetchedObjects {
-                            if fetchedObjects.count < totalCount {
-                                header.setButtonVisibility(showButtonVisible: true, clearButtonVisible: true)
-                            } else if fetchedObjects.count == totalCount {
-                                header.setButtonVisibility(showButtonVisible: false, clearButtonVisible: true)
-                            } else {
-                                header.setButtonVisibility(showButtonVisible: false, clearButtonVisible: false)
-                            }
-                        } else {
-                            header.setButtonVisibility(showButtonVisible: false, clearButtonVisible: false)
-                        }
-                    } else {
-                        header.setButtonVisibility(showButtonVisible: true, clearButtonVisible: true)
+                        showButtonVisible = fetchedObjects.count < totalCount
+                        clearButtonVisible = fetchedObjects.count <= totalCount
                     }
+                    header.setButtonVisibility(
+                        showButtonVisible: showButtonVisible,
+                        clearButtonVisible: clearButtonVisible
+                    )
+                    
                     return header
                 }
             }
