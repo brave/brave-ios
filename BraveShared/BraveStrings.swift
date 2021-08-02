@@ -1517,7 +1517,7 @@ extension Strings {
         public static let shortcutSettingsOpenNewTabDescription =
             NSLocalizedString("shortcuts.shortcutSettingsOpenNewTabDescription",
                               bundle: .braveShared,
-                              value: "Use Shortcuts to open a new tab via Siri - Voice Assistant",
+                              value: "Use Shortcuts to Open a New Tab via Siri - Voice Assistant",
                               comment: "")
         
         public static let shortcutSettingsOpenNewPrivateTabTitle =
@@ -1529,7 +1529,7 @@ extension Strings {
         public static let shortcutSettingsOpenNewPrivateTabDescription =
             NSLocalizedString("shortcuts.shortcutSettingsOpenNewPrivateTabDescription",
                               bundle: .braveShared,
-                              value: "Use Shortcuts to open a new private tab via Siri - Voice Assistant",
+                              value: "Use Shortcuts to Open a New Private Tab via Siri - Voice Assistant",
                               comment: "")
         
         public static let shortcutSettingsClearBrowserHistoryTitle =
@@ -1553,7 +1553,7 @@ extension Strings {
         public static let shortcutSettingsEnableVPNDescription =
             NSLocalizedString("shortcuts.shortcutSettingsEnableVPNDescription",
                               bundle: .braveShared,
-                              value: "Use Shortcuts to enable Brave VPN via Siri - Voice Assistant",
+                              value: "Use Shortcuts to Enable Brave VPN via Siri - Voice Assistant",
                               comment: "")
 
         public static let shortcutSettingsOpenBraveNewsTitle =
