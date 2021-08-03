@@ -13,7 +13,7 @@ private let log = Logger.browserLogger
 enum DomainUserScript: CaseIterable {
     case youtube
     case archive
-    case braveSearch
+    case braveServices
     
     static func get(for domain: String) -> Self? {
         var found: DomainUserScript?
@@ -34,7 +34,7 @@ enum DomainUserScript: CaseIterable {
         switch self {
         case .youtube:
             return .AdblockAndTp
-        case .archive, .braveSearch:
+        case .archive, .braveServices:
             return nil
         }
     }
@@ -45,8 +45,8 @@ enum DomainUserScript: CaseIterable {
             return .init(arrayLiteral: "youtube.com")
         case .archive:
             return .init(arrayLiteral: "archive.is", "archive.today", "archive.vn", "archive.fo")
-        case .braveSearch:
-            return .init(arrayLiteral: "brave.com")
+        case .braveServices:
+            return .init(arrayLiteral: "brave.com", "bravesoftware.com", "iccub.github.io")
         }
     }
     
@@ -56,8 +56,8 @@ enum DomainUserScript: CaseIterable {
             return "YoutubeAdblock"
         case .archive:
             return "ArchiveIsCompat"
-        case .braveSearch:
-            return "BraveSearchHelper"
+        case .braveServices:
+            return "BraveServicesHelper"
         }
     }
     
@@ -82,13 +82,13 @@ enum DomainUserScript: CaseIterable {
             return WKUserScript(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false)
         case .archive:
             return WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false)
-        case .braveSearch:
+        case .braveServices:
             var alteredSource = source
             
             let securityToken = UserScriptManager.securityToken.uuidString
                 .replacingOccurrences(of: "-", with: "", options: .literal)
             alteredSource = alteredSource
-                .replacingOccurrences(of: "$<brave-search-helper>",
+                .replacingOccurrences(of: "$<brave-services-helper>",
                                       with: "BSH\(UserScriptManager.messageHandlerTokenString)",
                                       options: .literal)
                 .replacingOccurrences(of: "$<security_token>", with: securityToken)
