@@ -37,7 +37,7 @@ class BraveRewards: NSObject {
         BraveLedger.isDebug = configuration.ledgerEnvironment != .production
         BraveLedger.environment = configuration.ledgerEnvironment
         BraveLedger.isTesting = configuration.isTesting
-        BraveLedger.useShortRetries = configuration.useShortRetries
+        BraveLedger.retryInterval = Int32(configuration.retryInterval)
         BraveLedger.reconcileInterval = Int32(configuration.overridenNumberOfSecondsBetweenReconcile)
         
         ads = BraveAds(stateStoragePath: configuration.storageURL.appendingPathComponent("ads").path)
@@ -268,7 +268,7 @@ extension BraveRewards {
         var adsBuildChannel: Ads.BraveAdsBuildChannel = .init()
         var isTesting: Bool = false
         var overridenNumberOfSecondsBetweenReconcile: Int = 0
-        var useShortRetries: Bool = false
+        var retryInterval: Int = 0
         
         static var `default`: Configuration {
             .init(
@@ -296,7 +296,7 @@ extension BraveRewards {
                 adsEnvironment: .development,
                 isTesting: true,
                 overridenNumberOfSecondsBetweenReconcile: 30,
-                useShortRetries: true
+                retryInterval: 30
             )
         }
     }
