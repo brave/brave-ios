@@ -96,6 +96,7 @@ class BrowserViewController: UIViewController {
     weak var tabTrayController: TabTrayController!
     let profile: Profile
     let tabManager: TabManager
+    let historyManager: HistoryManager
     
     /// Whether last session was a crash or not
     fileprivate let crashedLastSession: Bool
@@ -181,10 +182,15 @@ class BrowserViewController: UIViewController {
     //let benchmarkBlockingDataSource = BlockingSummaryDataSource()
     var benchmarkBlockingDataSource: BlockingSummaryDataSource?
 
-    init(profile: Profile, tabManager: TabManager, crashedLastSession: Bool,
-         safeBrowsingManager: SafeBrowsing? = SafeBrowsing()) {
+    init(profile: Profile,
+         tabManager: TabManager,
+         historyManager: HistoryManager,
+         crashedLastSession: Bool,
+         safeBrowsingManager: SafeBrowsing? = SafeBrowsing())
+    {
         self.profile = profile
         self.tabManager = tabManager
+        self.historyManager = historyManager
         self.readerModeCache = ReaderMode.cache(for: tabManager.selectedTab)
         self.crashedLastSession = crashedLastSession
         self.safeBrowsing = safeBrowsingManager

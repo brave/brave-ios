@@ -428,6 +428,7 @@
 		2F098F8B255F2D730084FB37 /* BrowserViewController+ReaderMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F098F8A255F2D730084FB37 /* BrowserViewController+ReaderMode.swift */; };
 		2F12A176260A3B17005A8C2B /* ShortcutSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F12A175260A3B17005A8C2B /* ShortcutSettingsViewController.swift */; };
 		2F13E79B1AC0C02700D75081 /* StringExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F13E79A1AC0C02700D75081 /* StringExtensionsTests.swift */; };
+		2F18C22A26BC6FFA00FFC8AC /* HistoryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F18C22926BC6FFA00FFC8AC /* HistoryManager.swift */; };
 		2F198EE82603FDD900945AB3 /* AddSearchEngineActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F198EE72603FDD900945AB3 /* AddSearchEngineActivity.swift */; };
 		2F26C438267B9F0D00E5AD60 /* BlockSummaryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F26C437267B9F0D00E5AD60 /* BlockSummaryTests.swift */; };
 		2F26C43A267B9F9400E5AD60 /* blocking-summary-test.json in Resources */ = {isa = PBXBuildFile; fileRef = 2F26C439267B9F9400E5AD60 /* blocking-summary-test.json */; };
@@ -1953,6 +1954,7 @@
 		2F098F8A255F2D730084FB37 /* BrowserViewController+ReaderMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowserViewController+ReaderMode.swift"; sourceTree = "<group>"; };
 		2F12A175260A3B17005A8C2B /* ShortcutSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutSettingsViewController.swift; sourceTree = "<group>"; };
 		2F13E79A1AC0C02700D75081 /* StringExtensionsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringExtensionsTests.swift; sourceTree = "<group>"; };
+		2F18C22926BC6FFA00FFC8AC /* HistoryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryManager.swift; sourceTree = "<group>"; };
 		2F198EE72603FDD900945AB3 /* AddSearchEngineActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddSearchEngineActivity.swift; sourceTree = "<group>"; };
 		2F26C437267B9F0D00E5AD60 /* BlockSummaryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockSummaryTests.swift; sourceTree = "<group>"; };
 		2F26C439267B9F9400E5AD60 /* blocking-summary-test.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "blocking-summary-test.json"; sourceTree = "<group>"; };
@@ -4280,6 +4282,7 @@
 				2FD1C60826385C6200E3C25F /* Historyv2.swift */,
 				2FD1C60A2638823D00E3C25F /* HistoryFetchers.swift */,
 				2FA5A7572649CD9200740035 /* HistoryServiceStateObserver.swift */,
+				2F18C22926BC6FFA00FFC8AC /* HistoryManager.swift */,
 			);
 			path = History;
 			sourceTree = "<group>";
@@ -7188,6 +7191,7 @@
 				5E824A34260BC6CA00127F36 /* BrowserViewController+Playlist.swift in Sources */,
 				E4CD9F6D1A77DD2800318571 /* ReaderModeStyleViewController.swift in Sources */,
 				D0FCF7F51FE45842004A7995 /* UserScriptManager.swift in Sources */,
+				2F18C22A26BC6FFA00FFC8AC /* HistoryManager.swift in Sources */,
 				E4A960061ABB9C450069AD6F /* ReaderModeUtils.swift in Sources */,
 				2F12A176260A3B17005A8C2B /* ShortcutSettingsViewController.swift in Sources */,
 				0A1E843E2190A57F0042F782 /* SyncCodewordsView.swift in Sources */,
