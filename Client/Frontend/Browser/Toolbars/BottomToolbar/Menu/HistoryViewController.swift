@@ -22,6 +22,8 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
         $0.hidesWhenStopped = true
         $0.isHidden = true
     }
+
+    let historyManager: HistoryManager
     
     var historyFRC: HistoryV2FetchResultsController?
     
@@ -30,11 +32,13 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
     
     var isHistoryRefreshing = false
     
-    init(isPrivateBrowsing: Bool) {
+    init(isPrivateBrowsing: Bool, historyManager: HistoryManager) {
         self.isPrivateBrowsing = isPrivateBrowsing
+        self.historyManager = historyManager
+        
         super.init(nibName: nil, bundle: nil)
         
-        historyFRC = Historyv2.frc()
+        historyFRC = historyManager.frc()
         historyFRC?.delegate = self
     }
     
@@ -88,7 +92,7 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
     private func reloadData(_ completion: @escaping () -> Void) {
         // Recreate the frc if it was previously removed
         if historyFRC == nil {
-            historyFRC = Historyv2.frc()
+            historyFRC = historyManager.frc()
             historyFRC?.delegate = self
         }
         
@@ -168,8 +172,8 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
             title: Strings.History.historyClearAlertTitle, message: Strings.History.historyClearAlertDescription, preferredStyle: style)
         
         alert.addAction(UIAlertAction(title: Strings.History.historyClearActionTitle, style: .destructive, handler: { _ in
-            DispatchQueue.main.async {
-                Historyv2.deleteAll { [weak self] in
+            DispatchQueue.main.async { [weak self] in
+                self?.historyManager.deleteAll {
                     self?.refreshHistory()
                 }
             }
@@ -268,7 +272,7 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
         switch editingStyle {
             case .delete:
                 guard let historyItem = historyFRC?.object(at: indexPath) else { return }
-                historyItem.delete()
+                historyManager.delete(historyItem.historyNode)
                 
                 refreshHistory()
             default:
