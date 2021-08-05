@@ -54,6 +54,8 @@ class Historyv2: WebsitePresentable {
     
     // MARK: Internal
     
+    public let historyNode: HistoryNode
+    
     public var url: String? {
         historyNode.url.absoluteString
     }
@@ -82,7 +84,6 @@ class Historyv2: WebsitePresentable {
     
     // MARK: Private
     
-    private let historyNode: HistoryNode
     private static var observer: HistoryServiceListener?
     private static let historyAPI = (UIApplication.shared.delegate as? AppDelegate)?.braveCore?.historyAPI
 
@@ -121,74 +122,74 @@ class Historyv2: WebsitePresentable {
 
 // MARK: History Fetching
 
-extension Historyv2 {
-
-    public class func add(url: URL, title: String, dateAdded: Date, isURLTyped: Bool = true) {
-        guard let historyAPI = Historyv2.historyAPI else {
-            return
-        }
-
-        let historyNode = HistoryNode(url: url, title: title, dateAdded: dateAdded)
-        historyAPI.addHistory(historyNode, isURLTyped: isURLTyped)
-    }
-    
-    public static func frc() -> HistoryV2FetchResultsController? {
-        guard let historyAPI = Historyv2.historyAPI else {
-            return nil
-        }
-        
-        return Historyv2Fetcher(historyAPI: historyAPI)
-    }
-    
-    public func delete() {
-        guard let historyAPI = Historyv2.historyAPI else {
-            return
-        }
-        
-        historyAPI.removeHistory(historyNode)
-    }
-    
-    public class func deleteAll(_ completion: @escaping () -> Void) {
-        guard let historyAPI = Historyv2.historyAPI else {
-            return
-        }
-        
-        historyAPI.removeAll {
-            completion()
-        }
-    }
-    
-    public class func suffix(_ maxLength: Int, _ completion: @escaping ([Historyv2]) -> Void) {
-        guard let historyAPI = Historyv2.historyAPI else {
-            return
-        }
-        
-        historyAPI.search(withQuery: nil, maxCount: UInt(max(20, maxLength)), completion: { historyResults in
-            completion(historyResults.map { Historyv2(with: $0) })
-        })
-    }
-
-    public static func byFrequency(query: String? = nil, _ completion: @escaping ([WebsitePresentable]) -> Void) {
-        guard let query = query, !query.isEmpty,
-              let historyAPI = Historyv2.historyAPI else {
-            return
-        }
-        
-        historyAPI.search(withQuery: query, maxCount: 200, completion: { historyResults in
-            completion(historyResults.map { Historyv2(with: $0) })
-        })
-    }
-    
-    public func update(customTitle: String?, dateAdded: Date?) {
-        if let title = customTitle {
-            historyNode.title = title
-        }
-        
-        if let date = dateAdded {
-            historyNode.dateAdded = date
-        }
-    }
-}
+//extension Historyv2 {
+//
+//    public class func add(url: URL, title: String, dateAdded: Date, isURLTyped: Bool = true) {
+//        guard let historyAPI = Historyv2.historyAPI else {
+//            return
+//        }
+//
+//        let historyNode = HistoryNode(url: url, title: title, dateAdded: dateAdded)
+//        historyAPI.addHistory(historyNode, isURLTyped: isURLTyped)
+//    }
+//
+//    public static func frc() -> HistoryV2FetchResultsController? {
+//        guard let historyAPI = Historyv2.historyAPI else {
+//            return nil
+//        }
+//
+//        return Historyv2Fetcher(historyAPI: historyAPI)
+//    }
+//
+//    public func delete() {
+//        guard let historyAPI = Historyv2.historyAPI else {
+//            return
+//        }
+//
+//        historyAPI.removeHistory(historyNode)
+//    }
+//
+//    public class func deleteAll(_ completion: @escaping () -> Void) {
+//        guard let historyAPI = Historyv2.historyAPI else {
+//            return
+//        }
+//
+//        historyAPI.removeAll {
+//            completion()
+//        }
+//    }
+//
+//    public class func suffix(_ maxLength: Int, _ completion: @escaping ([Historyv2]) -> Void) {
+//        guard let historyAPI = Historyv2.historyAPI else {
+//            return
+//        }
+//
+//        historyAPI.search(withQuery: nil, maxCount: UInt(max(20, maxLength)), completion: { historyResults in
+//            completion(historyResults.map { Historyv2(with: $0) })
+//        })
+//    }
+//
+//    public static func byFrequency(query: String? = nil, _ completion: @escaping ([WebsitePresentable]) -> Void) {
+//        guard let query = query, !query.isEmpty,
+//              let historyAPI = Historyv2.historyAPI else {
+//            return
+//        }
+//
+//        historyAPI.search(withQuery: query, maxCount: 200, completion: { historyResults in
+//            completion(historyResults.map { Historyv2(with: $0) })
+//        })
+//    }
+//
+//    public func update(customTitle: String?, dateAdded: Date?) {
+//        if let title = customTitle {
+//            historyNode.title = title
+//        }
+//
+//        if let date = dateAdded {
+//            historyNode.dateAdded = date
+//        }
+//    }
+//}
 
 // MARK: Brave-Core Only
 
