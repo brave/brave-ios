@@ -9,7 +9,13 @@ import Data
 /// Shared data source for the SearchViewController and the URLBar domain completion.
 /// Since both of these use the same query, we can perform the query once and dispatch the results.
 class SearchLoader: Loader<[Site], SearchViewController> {
+    private let frequencyQuery: FrequencyQuery
+    
     var autocompleteSuggestionHandler: ((String) -> Void)?
+    
+    init(historyManager: HistoryManager, bookmarkManager: BookmarkManager) {
+        frequencyQuery = FrequencyQuery(historyManager: historyManager, bookmarkManager: bookmarkManager)
+    }
 
     var query: String = "" {
         didSet {
@@ -18,7 +24,7 @@ class SearchLoader: Loader<[Site], SearchViewController> {
                 return
             }
 
-            FrequencyQuery.sitesByFrequency(containing: query) { [weak self] result in
+            frequencyQuery.sitesByFrequency(containing: query) { [weak self] result in
                 guard let self = self else { return }
                 
                 self.load(Array(result))

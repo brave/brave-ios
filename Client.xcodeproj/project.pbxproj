@@ -431,6 +431,7 @@
 		2F098F8B255F2D730084FB37 /* BrowserViewController+ReaderMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F098F8A255F2D730084FB37 /* BrowserViewController+ReaderMode.swift */; };
 		2F12A176260A3B17005A8C2B /* ShortcutSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F12A175260A3B17005A8C2B /* ShortcutSettingsViewController.swift */; };
 		2F13E79B1AC0C02700D75081 /* StringExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F13E79A1AC0C02700D75081 /* StringExtensionsTests.swift */; };
+		2F18C22A26BC6FFA00FFC8AC /* HistoryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F18C22926BC6FFA00FFC8AC /* HistoryManager.swift */; };
 		2F198EE82603FDD900945AB3 /* AddSearchEngineActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F198EE72603FDD900945AB3 /* AddSearchEngineActivity.swift */; };
 		2F26C438267B9F0D00E5AD60 /* BlockSummaryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F26C437267B9F0D00E5AD60 /* BlockSummaryTests.swift */; };
 		2F26C43A267B9F9400E5AD60 /* blocking-summary-test.json in Resources */ = {isa = PBXBuildFile; fileRef = 2F26C439267B9F9400E5AD60 /* blocking-summary-test.json */; };
@@ -452,7 +453,6 @@
 		2F676FAD260BA4860048A1DB /* blocking-summary.json in Resources */ = {isa = PBXBuildFile; fileRef = 2F676FAC260BA4860048A1DB /* blocking-summary.json */; };
 		2F6931B7260CFB3700ECEB38 /* IntentHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F6931B6260CFB3700ECEB38 /* IntentHandler.swift */; };
 		2F6931BB260CFB3700ECEB38 /* BrowserIntents.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 2F6931B4260CFB3700ECEB38 /* BrowserIntents.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		2F5893D6265FEF7E002323D9 /* VisitType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F5893D5265FEF7E002323D9 /* VisitType.swift */; };
 		2F697F7E1A9FD22D009E03AE /* SearchEnginesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F697F7D1A9FD22D009E03AE /* SearchEnginesTests.swift */; };
 		2F91AFD325FFA830002DBC4A /* ActivityShortcutManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F91AFD225FFA830002DBC4A /* ActivityShortcutManager.swift */; };
 		2F9311D52665883400C6B74D /* DataSaved.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F9311D42665883400C6B74D /* DataSaved.swift */; };
@@ -476,6 +476,7 @@
 		2FD1C60926385C6200E3C25F /* Historyv2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FD1C60826385C6200E3C25F /* Historyv2.swift */; };
 		2FD1C60B2638823D00E3C25F /* HistoryFetchers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FD1C60A2638823D00E3C25F /* HistoryFetchers.swift */; };
 		2FD1C61C2639AE9100E3C25F /* BrowserViewController+Onboarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FD1C61B2639AE9100E3C25F /* BrowserViewController+Onboarding.swift */; };
+		2FD70DBA26C1C54D00345A33 /* BookmarkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FD70DB926C1C54D00345A33 /* BookmarkManager.swift */; };
 		2FDB10931A9FBEC5006CF312 /* PrefsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FDB10921A9FBEC5006CF312 /* PrefsTests.swift */; };
 		2FDF290825DEE265001E5C87 /* AddToPlaylistActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FDF290725DEE265001E5C87 /* AddToPlaylistActivity.swift */; };
 		2FE5B42B2580216700BFDDB8 /* ShareTrackersController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FE5B42A2580216700BFDDB8 /* ShareTrackersController.swift */; };
@@ -1920,6 +1921,7 @@
 		2F098F8A255F2D730084FB37 /* BrowserViewController+ReaderMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowserViewController+ReaderMode.swift"; sourceTree = "<group>"; };
 		2F12A175260A3B17005A8C2B /* ShortcutSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutSettingsViewController.swift; sourceTree = "<group>"; };
 		2F13E79A1AC0C02700D75081 /* StringExtensionsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringExtensionsTests.swift; sourceTree = "<group>"; };
+		2F18C22926BC6FFA00FFC8AC /* HistoryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryManager.swift; sourceTree = "<group>"; };
 		2F198EE72603FDD900945AB3 /* AddSearchEngineActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddSearchEngineActivity.swift; sourceTree = "<group>"; };
 		2F26C437267B9F0D00E5AD60 /* BlockSummaryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockSummaryTests.swift; sourceTree = "<group>"; };
 		2F26C439267B9F9400E5AD60 /* blocking-summary-test.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "blocking-summary-test.json"; sourceTree = "<group>"; };
@@ -1956,7 +1958,6 @@
 		2F69320D260D048400ECEB38 /* BrowserIntentsRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BrowserIntentsRelease.entitlements; sourceTree = "<group>"; };
 		2F69320E260D056100ECEB38 /* BrowserIntentsBeta.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BrowserIntentsBeta.entitlements; sourceTree = "<group>"; };
 		2F693223260D218900ECEB38 /* CustomIntentHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomIntentHandler.swift; sourceTree = "<group>"; };
-		2F5893D5265FEF7E002323D9 /* VisitType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitType.swift; sourceTree = "<group>"; };
 		2F697F7D1A9FD22D009E03AE /* SearchEnginesTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchEnginesTests.swift; sourceTree = "<group>"; };
 		2F84BCF8267BE0A100850801 /* Model13.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model13.xcdatamodel; sourceTree = "<group>"; };
 		2F91AFD225FFA830002DBC4A /* ActivityShortcutManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityShortcutManager.swift; sourceTree = "<group>"; };
@@ -1982,6 +1983,7 @@
 		2FD1C60826385C6200E3C25F /* Historyv2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Historyv2.swift; sourceTree = "<group>"; };
 		2FD1C60A2638823D00E3C25F /* HistoryFetchers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryFetchers.swift; sourceTree = "<group>"; };
 		2FD1C61B2639AE9100E3C25F /* BrowserViewController+Onboarding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowserViewController+Onboarding.swift"; sourceTree = "<group>"; };
+		2FD70DB926C1C54D00345A33 /* BookmarkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkManager.swift; sourceTree = "<group>"; };
 		2FDB10921A9FBEC5006CF312 /* PrefsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrefsTests.swift; sourceTree = "<group>"; };
 		2FDF290725DEE265001E5C87 /* AddToPlaylistActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddToPlaylistActivity.swift; sourceTree = "<group>"; };
 		2FE5B42A2580216700BFDDB8 /* ShareTrackersController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareTrackersController.swift; sourceTree = "<group>"; };
@@ -4100,8 +4102,8 @@
 				44C42CF9268378B1009572D7 /* BrowserIntents.intentdefinition */,
 			);
 			path = Shortcuts;
-            sourceTree = "<group>";
-        };
+			sourceTree = "<group>";
+		};
 		2FBCB15C262783FD00F512D8 /* Sync */ = {
 			isa = PBXGroup;
 			children = (
@@ -4178,6 +4180,7 @@
 				5E1DF2FC253E138500F84C39 /* Bookmarkv2.swift */,
 				5E9B28EA255047C80072E655 /* BookmarkModelStateObserver.swift */,
 				5E9B28F6255048540072E655 /* BookmarkFetchers.swift */,
+				2FD70DB926C1C54D00345A33 /* BookmarkManager.swift */,
 			);
 			path = Bookmarks;
 			sourceTree = "<group>";
@@ -4197,6 +4200,7 @@
 				2FD1C60826385C6200E3C25F /* Historyv2.swift */,
 				2FD1C60A2638823D00E3C25F /* HistoryFetchers.swift */,
 				2FA5A7572649CD9200740035 /* HistoryServiceStateObserver.swift */,
+				2F18C22926BC6FFA00FFC8AC /* HistoryManager.swift */,
 			);
 			path = History;
 			sourceTree = "<group>";
@@ -7019,6 +7023,7 @@
 				5E824A34260BC6CA00127F36 /* BrowserViewController+Playlist.swift in Sources */,
 				E4CD9F6D1A77DD2800318571 /* ReaderModeStyleViewController.swift in Sources */,
 				D0FCF7F51FE45842004A7995 /* UserScriptManager.swift in Sources */,
+				2F18C22A26BC6FFA00FFC8AC /* HistoryManager.swift in Sources */,
 				E4A960061ABB9C450069AD6F /* ReaderModeUtils.swift in Sources */,
 				2F12A176260A3B17005A8C2B /* ShortcutSettingsViewController.swift in Sources */,
 				0A1E843E2190A57F0042F782 /* SyncCodewordsView.swift in Sources */,
@@ -7050,6 +7055,7 @@
 				4422D56321BFFB7F00BF1855 /* compile.cc in Sources */,
 				2FBCB169262784BF00F512D8 /* BrowserViewController+CoreMigration.swift in Sources */,
 				D3C3696E1CC6B78800348A61 /* LocalRequestHelper.swift in Sources */,
+				2FD70DBA26C1C54D00345A33 /* BookmarkManager.swift in Sources */,
 				27733E5826977EC40086799A /* PasscodeMigrationView.swift in Sources */,
 				2726637324981B600056CFE1 /* FeedSectionHeaderView.swift in Sources */,
 				27C461DE211B76500088A441 /* ShieldsView.swift in Sources */,

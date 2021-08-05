@@ -95,6 +95,8 @@ class BrowserViewController: UIViewController {
     weak var tabTrayController: TabTrayController!
     let profile: Profile
     let tabManager: TabManager
+    let historyManager: HistoryManager
+    let bookmarkManager: BookmarkManager
     
     /// Whether last session was a crash or not
     fileprivate let crashedLastSession: Bool
@@ -181,10 +183,16 @@ class BrowserViewController: UIViewController {
     //let benchmarkBlockingDataSource = BlockingSummaryDataSource()
     var benchmarkBlockingDataSource: BlockingSummaryDataSource?
 
-    init(profile: Profile, tabManager: TabManager, crashedLastSession: Bool,
+    init(profile: Profile,
+         tabManager: TabManager,
+         historyManager: HistoryManager,
+         bookmarkManager: BookmarkManager,
+         crashedLastSession: Bool,
          safeBrowsingManager: SafeBrowsing? = SafeBrowsing()) {
         self.profile = profile
         self.tabManager = tabManager
+        self.historyManager = historyManager
+        self.bookmarkManager = bookmarkManager
         self.readerModeCache = ReaderMode.cache(for: tabManager.selectedTab)
         self.crashedLastSession = crashedLastSession
         self.safeBrowsing = safeBrowsingManager
@@ -1860,9 +1868,9 @@ class BrowserViewController: UIViewController {
                     if let visitType =
                         typedNavigation.first(where: { $0.key.typedDisplayString == url.typedDisplayString })?.value,
                        visitType == .typed {
-                        Historyv2.add(url: url, title: tab.title ?? "", dateAdded: Date())
+                        historyManager.add(url: url, title: title ?? "", dateAdded: Date())
                     } else {
-                        Historyv2.add(url: url, title: tab.title ?? "", dateAdded: Date(), isURLTyped: false)
+                        historyManager.add(url: url, title: title ?? "", dateAdded: Date(), isURLTyped: false)
                     }
                 }
             }

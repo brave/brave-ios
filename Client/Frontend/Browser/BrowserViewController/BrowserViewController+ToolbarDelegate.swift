@@ -244,7 +244,8 @@ extension BrowserViewController: TopToolbarDelegate {
                 let shieldsAndPrivacy = BraveShieldsAndPrivacySettingsController(
                     profile: self.profile,
                     tabManager: self.tabManager,
-                    feedDataSource: self.feedDataSource
+                    feedDataSource: self.feedDataSource,
+                    historyManager: self.historyManager
                 )
                 let container = SettingsNavigationController(rootViewController: shieldsAndPrivacy)
                 container.isModalInPresentation = true
@@ -327,7 +328,7 @@ extension BrowserViewController: TopToolbarDelegate {
         searchController.searchDelegate = self
         searchController.profile = self.profile
 
-        searchLoader = SearchLoader()
+        searchLoader = SearchLoader(historyManager: historyManager, bookmarkManager: bookmarkManager)
         searchLoader?.addListener(searchController)
         searchLoader?.autocompleteSuggestionHandler = { [weak self] completion in
             self?.topToolbar.setAutocompleteSuggestion(completion)
@@ -453,7 +454,8 @@ extension BrowserViewController: TopToolbarDelegate {
     
     private func showBookmarkController() {
         let bookmarkViewController = BookmarksViewController(
-            folder: Bookmarkv2.lastVisitedFolder(),
+            folder: bookmarkManager.lastVisitedFolder(),
+            bookmarkManager: bookmarkManager,
             isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing)
         
         bookmarkViewController.toolbarUrlActionsDelegate = self
@@ -472,7 +474,7 @@ extension BrowserViewController: TopToolbarDelegate {
 
         let mode = BookmarkEditMode.addBookmark(title: selectedTab.displayTitle, url: bookmarkUrl.absoluteString)
 
-        let addBookMarkController = AddEditBookmarkTableViewController(mode: mode)
+        let addBookMarkController = AddEditBookmarkTableViewController(bookmarkManager: bookmarkManager, mode: mode)
 
         presentSettingsNavigation(with: addBookMarkController, cancelEnabled: true)
     }
