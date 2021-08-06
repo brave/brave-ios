@@ -54,6 +54,11 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
+        guard Preferences.Privacy.privateBrowsingOnly.value else {
+            showEmptyPanelState()
+            return
+        }
+        
         refreshHistory()
     }
     
@@ -95,7 +100,7 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
         }
     }
     
-    fileprivate func createEmptyStateOverlayView() -> UIView {
+    private func createEmptyStateOverlayView() -> UIView {
         let overlayView = UIView().then {
             $0.backgroundColor = .secondaryBraveBackground
         }
@@ -105,7 +110,9 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
         }
         
         let welcomeLabel = UILabel().then {
-            $0.text = Strings.History.historyEmptyStateTitle
+            $0.text = Preferences.Privacy.privateBrowsingOnly.value
+                ? Strings.History.historyPrivateModeOnlyStateTitle
+                : Strings.History.historyEmptyStateTitle
             $0.textAlignment = .center
             $0.font = DynamicFontHelper.defaultHelper.DeviceFontLight
             $0.textColor = .braveLabel
@@ -135,17 +142,21 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
         return overlayView
     }
     
-    fileprivate func updateEmptyPanelState() {
-        if  historyFRC?.fetchedObjectsCount == 0 {
-            if emptyStateOverlayView.superview == nil {
-                view.addSubview(emptyStateOverlayView)
-                view.bringSubviewToFront(emptyStateOverlayView)
-                emptyStateOverlayView.snp.makeConstraints { make -> Void in
-                    make.edges.equalTo(tableView)
-                }
-            }
+    private func updateEmptyPanelState() {
+        if historyFRC?.fetchedObjectsCount == 0 {
+            showEmptyPanelState()
         } else {
             emptyStateOverlayView.removeFromSuperview()
+        }
+    }
+    
+    private func showEmptyPanelState() {
+        if emptyStateOverlayView.superview == nil {
+            view.addSubview(emptyStateOverlayView)
+            view.bringSubviewToFront(emptyStateOverlayView)
+            emptyStateOverlayView.snp.makeConstraints { make -> Void in
+                make.edges.equalTo(tableView)
+            }
         }
     }
     
