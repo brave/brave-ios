@@ -48,13 +48,16 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
         tableView.accessibilityIdentifier = "History List"
         title = Strings.historyScreenTitle
                 
-        navigationItem.rightBarButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "playlist_delete_item").template, style: .done, target: self, action: #selector(performDeleteAll))
+        if !Preferences.Privacy.privateBrowsingOnly.value {
+            navigationItem.rightBarButtonItem =
+                UIBarButtonItem(image: #imageLiteral(resourceName: "playlist_delete_item").template, style: .done, target: self, action: #selector(performDeleteAll))
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        guard Preferences.Privacy.privateBrowsingOnly.value else {
+        guard !Preferences.Privacy.privateBrowsingOnly.value else {
             showEmptyPanelState()
             return
         }
