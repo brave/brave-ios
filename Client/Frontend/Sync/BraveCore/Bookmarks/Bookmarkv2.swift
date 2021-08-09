@@ -15,7 +15,8 @@ private let log = Logger.browserLogger
 // A Lightweight wrapper around BraveCore bookmarks
 // with the same layout/interface as `Bookmark (from CoreData)`
 class Bookmarkv2: WebsitePresentable {
-    private let bookmarkNode: BookmarkNode
+    
+    let bookmarkNode: BookmarkNode
     private var bookmarkFavIconObserver: BookmarkModelListener?
     
     private static var bookmarkModelLoadedObserver: BookmarkModelListener?

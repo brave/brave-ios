@@ -23,7 +23,7 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
         $0.isHidden = true
     }
 
-    let historyManager: HistoryManager
+    private let historyManager: HistoryManager
     
     var historyFRC: HistoryV2FetchResultsController?
     
