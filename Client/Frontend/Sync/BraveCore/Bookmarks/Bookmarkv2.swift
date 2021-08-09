@@ -15,7 +15,8 @@ private let log = Logger.browserLogger
 // A Lightweight wrapper around BraveCore bookmarks
 // with the same layout/interface as `Bookmark (from CoreData)`
 class Bookmarkv2: WebsitePresentable {
-    private let bookmarkNode: BookmarkNode
+    
+    let bookmarkNode: BookmarkNode
     private var bookmarkFavIconObserver: BookmarkModelListener?
     
     private static var bookmarkModelLoadedObserver: BookmarkModelListener?
@@ -134,28 +135,17 @@ class BraveBookmarkFolder: Bookmarkv2 {
 // Bookmarks Fetching
 extension Bookmarkv2 {
     
-    public class func mobileNode() -> Bookmarkv2? {
-        guard let bookmarksAPI = Bookmarkv2.bookmarksAPI else {
-            return nil
-        }
-        
-        if let node = bookmarksAPI.mobileNode {
-            return Bookmarkv2(node)
-        }
-        return nil
-    }
-    
-    public class func addFolder(title: String, parentFolder: Bookmarkv2? = nil) {
-        guard let bookmarksAPI = Bookmarkv2.bookmarksAPI else {
-            return
-        }
-        
-        if let parentFolder = parentFolder?.bookmarkNode {
-            bookmarksAPI.createFolder(withParent: parentFolder, title: title)
-        } else {
-            bookmarksAPI.createFolder(withTitle: title)
-        }
-    }
+//    public class func addFolder(title: String, parentFolder: Bookmarkv2? = nil) {
+//        guard let bookmarksAPI = Bookmarkv2.bookmarksAPI else {
+//            return
+//        }
+//
+//        if let parentFolder = parentFolder?.bookmarkNode {
+//            bookmarksAPI.createFolder(withParent: parentFolder, title: title)
+//        } else {
+//            bookmarksAPI.createFolder(withTitle: title)
+//        }
+//    }
     
     public class func add(url: URL, title: String?, parentFolder: Bookmarkv2? = nil) {
         guard let bookmarksAPI = Bookmarkv2.bookmarksAPI else {

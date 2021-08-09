@@ -115,6 +115,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
     
     private var frc: BookmarksV2FetchResultsController?
     private let mode: BookmarkEditMode
+    private let bookmarkManager: BookmarkManager
     
     private var presentationMode: DataSourcePresentationMode
     
@@ -123,15 +124,16 @@ class AddEditBookmarkTableViewController: UITableViewController {
     private var rootFolderName: String
     private var rootFolderId: Int = 0 // MobileBookmarks Folder Id
     
-    init(mode: BookmarkEditMode) {
+    init(bookmarkManager: BookmarkManager, mode: BookmarkEditMode) {
+        self.bookmarkManager = bookmarkManager
         self.mode = mode
         
         saveLocation = mode.initialSaveLocation
         presentationMode = .currentSelection
         frc = Bookmarkv2.foldersFrc(excludedFolder: mode.folder)
-        rootFolderName = Bookmarkv2.mobileNode()?.displayTitle ?? Strings.bookmarkRootLevelCellTitle
+        rootFolderName = bookmarkManager.mobileNode()?.displayTitle ?? Strings.bookmarkRootLevelCellTitle
         
-        if let mobileFolderId = Bookmarkv2.mobileNode()?.objectID {
+        if let mobileFolderId = bookmarkManager.mobileNode()?.objectID {
             rootFolderId = mobileFolderId
         } else {
             log.error("Invalid MobileBookmarks Folder Id")
@@ -252,11 +254,11 @@ class AddEditBookmarkTableViewController: UITableViewController {
         case .addFolder(_):
             switch saveLocation {
             case .rootLevel:
-                Bookmarkv2.addFolder(title: title)
+                bookmarkManager.addFolder(title: title)
             case .favorites:
                 fatalError("Folders can't be saved to favorites")
             case .folder(let folder):
-                Bookmarkv2.addFolder(title: title, parentFolder: folder)
+                bookmarkManager.addFolder(title: title, parentFolder: folder)
             }
         case .editBookmark(let bookmark):
             guard let urlString = bookmarkDetailsView.urlTextField?.text,
@@ -367,7 +369,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
     }
     
     private func showNewFolderVC() {
-        let vc = AddEditBookmarkTableViewController(mode: .addFolder(title: Strings.newFolderDefaultName))
+        let vc = AddEditBookmarkTableViewController(bookmarkManager: bookmarkManager, mode: .addFolder(title: Strings.newFolderDefaultName))
         navigationController?.pushViewController(vc, animated: true)
     }
 

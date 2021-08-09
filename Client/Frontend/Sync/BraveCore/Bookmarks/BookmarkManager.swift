@@ -90,4 +90,27 @@ class BookmarkManager: NSObject {
         
         return []
     }
+    
+    public func mobileNode() -> Bookmarkv2? {
+        guard let bookmarksAPI = bookmarksAPI else {
+            return nil
+        }
+        
+        if let node = bookmarksAPI.mobileNode {
+            return Bookmarkv2(node)
+        }
+        return nil
+    }
+    
+    public func addFolder(title: String, parentFolder: Bookmarkv2? = nil) {
+        guard let bookmarksAPI = bookmarksAPI else {
+            return
+        }
+        
+        if let parentFolder = parentFolder?.bookmarkNode {
+            bookmarksAPI.createFolder(withParent: parentFolder, title: title)
+        } else {
+            bookmarksAPI.createFolder(withTitle: title)
+        }
+    }
 }

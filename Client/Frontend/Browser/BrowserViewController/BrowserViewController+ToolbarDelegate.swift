@@ -447,6 +447,7 @@ extension BrowserViewController: TopToolbarDelegate {
     private func showBookmarkController() {
         let bookmarkViewController = BookmarksViewController(
             folder: bookmarkManager.lastVisitedFolder(),
+            bookmarkManager: bookmarkManager,
             isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing)
         
         bookmarkViewController.toolbarUrlActionsDelegate = self
@@ -465,7 +466,7 @@ extension BrowserViewController: TopToolbarDelegate {
 
         let mode = BookmarkEditMode.addBookmark(title: selectedTab.displayTitle, url: bookmarkUrl.absoluteString)
 
-        let addBookMarkController = AddEditBookmarkTableViewController(mode: mode)
+        let addBookMarkController = AddEditBookmarkTableViewController(bookmarkManager: bookmarkManager, mode: mode)
 
         presentSettingsNavigation(with: addBookMarkController, cancelEnabled: true)
     }
