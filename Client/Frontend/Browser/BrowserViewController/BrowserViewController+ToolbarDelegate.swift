@@ -446,7 +446,7 @@ extension BrowserViewController: TopToolbarDelegate {
     
     private func showBookmarkController() {
         let bookmarkViewController = BookmarksViewController(
-            folder: Bookmarkv2.lastVisitedFolder(),
+            folder: bookmarkManager.lastVisitedFolder(),
             isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing)
         
         bookmarkViewController.toolbarUrlActionsDelegate = self
