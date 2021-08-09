@@ -473,6 +473,7 @@
 		2FD1C60926385C6200E3C25F /* Historyv2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FD1C60826385C6200E3C25F /* Historyv2.swift */; };
 		2FD1C60B2638823D00E3C25F /* HistoryFetchers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FD1C60A2638823D00E3C25F /* HistoryFetchers.swift */; };
 		2FD1C61C2639AE9100E3C25F /* BrowserViewController+Onboarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FD1C61B2639AE9100E3C25F /* BrowserViewController+Onboarding.swift */; };
+		2FD70DBA26C1C54D00345A33 /* BookmarkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FD70DB926C1C54D00345A33 /* BookmarkManager.swift */; };
 		2FDB10931A9FBEC5006CF312 /* PrefsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FDB10921A9FBEC5006CF312 /* PrefsTests.swift */; };
 		2FDF290825DEE265001E5C87 /* AddToPlaylistActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FDF290725DEE265001E5C87 /* AddToPlaylistActivity.swift */; };
 		2FE5B42B2580216700BFDDB8 /* ShareTrackersController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FE5B42A2580216700BFDDB8 /* ShareTrackersController.swift */; };
@@ -2016,6 +2017,7 @@
 		2FD1C60826385C6200E3C25F /* Historyv2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Historyv2.swift; sourceTree = "<group>"; };
 		2FD1C60A2638823D00E3C25F /* HistoryFetchers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryFetchers.swift; sourceTree = "<group>"; };
 		2FD1C61B2639AE9100E3C25F /* BrowserViewController+Onboarding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowserViewController+Onboarding.swift"; sourceTree = "<group>"; };
+		2FD70DB926C1C54D00345A33 /* BookmarkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkManager.swift; sourceTree = "<group>"; };
 		2FDB10921A9FBEC5006CF312 /* PrefsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrefsTests.swift; sourceTree = "<group>"; };
 		2FDF290725DEE265001E5C87 /* AddToPlaylistActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddToPlaylistActivity.swift; sourceTree = "<group>"; };
 		2FE5B42A2580216700BFDDB8 /* ShareTrackersController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareTrackersController.swift; sourceTree = "<group>"; };
@@ -4263,6 +4265,7 @@
 				5E1DF2FC253E138500F84C39 /* Bookmarkv2.swift */,
 				5E9B28EA255047C80072E655 /* BookmarkModelStateObserver.swift */,
 				5E9B28F6255048540072E655 /* BookmarkFetchers.swift */,
+				2FD70DB926C1C54D00345A33 /* BookmarkManager.swift */,
 			);
 			path = Bookmarks;
 			sourceTree = "<group>";
@@ -7223,6 +7226,7 @@
 				4422D56321BFFB7F00BF1855 /* compile.cc in Sources */,
 				2FBCB169262784BF00F512D8 /* BrowserViewController+CoreMigration.swift in Sources */,
 				D3C3696E1CC6B78800348A61 /* LocalRequestHelper.swift in Sources */,
+				2FD70DBA26C1C54D00345A33 /* BookmarkManager.swift in Sources */,
 				27733E5826977EC40086799A /* PasscodeMigrationView.swift in Sources */,
 				CA8D5C2926D7D0C6009BF13D /* MediaPlayer.swift in Sources */,
 				2726637324981B600056CFE1 /* FeedSectionHeaderView.swift in Sources */,

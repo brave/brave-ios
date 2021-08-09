@@ -97,6 +97,7 @@ class BrowserViewController: UIViewController {
     let profile: Profile
     let tabManager: TabManager
     let historyManager: HistoryManager
+    let bookmarkManager: BookmarkManager
     
     /// Whether last session was a crash or not
     fileprivate let crashedLastSession: Bool
@@ -185,12 +186,13 @@ class BrowserViewController: UIViewController {
     init(profile: Profile,
          tabManager: TabManager,
          historyManager: HistoryManager,
+         bookmarkManager: BookmarkManager,
          crashedLastSession: Bool,
-         safeBrowsingManager: SafeBrowsing? = SafeBrowsing())
-    {
+         safeBrowsingManager: SafeBrowsing? = SafeBrowsing()) {
         self.profile = profile
         self.tabManager = tabManager
         self.historyManager = historyManager
+        self.bookmarkManager = bookmarkManager
         self.readerModeCache = ReaderMode.cache(for: tabManager.selectedTab)
         self.crashedLastSession = crashedLastSession
         self.safeBrowsing = safeBrowsingManager
