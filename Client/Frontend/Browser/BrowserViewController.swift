@@ -1856,9 +1856,9 @@ class BrowserViewController: UIViewController {
                     if let visitType =
                         typedNavigation.first(where: { $0.key.typedDisplayString == url.typedDisplayString })?.value,
                        visitType == .typed {
-                        Historyv2.add(url: url, title: tab.title ?? "", dateAdded: Date())
+                        historyManager.add(url: url, title: title ?? "", dateAdded: Date())
                     } else {
-                        Historyv2.add(url: url, title: tab.title ?? "", dateAdded: Date(), isURLTyped: false)
+                        historyManager.add(url: url, title: title ?? "", dateAdded: Date(), isURLTyped: false)
                     }
                 }
             }
