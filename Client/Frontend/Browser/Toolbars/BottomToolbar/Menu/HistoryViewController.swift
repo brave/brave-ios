@@ -57,12 +57,11 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        guard !Preferences.Privacy.privateBrowsingOnly.value else {
+        if Preferences.Privacy.privateBrowsingOnly.value {
             showEmptyPanelState()
-            return
+        } else {
+            refreshHistory()
         }
-        
-        refreshHistory()
     }
     
     private func refreshHistory() {
