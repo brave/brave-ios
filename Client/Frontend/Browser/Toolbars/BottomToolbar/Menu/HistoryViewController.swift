@@ -76,8 +76,7 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
                 spinner.startAnimating()
                 isHistoryRefreshing = true
 
-<<<<<<< HEAD
-                Historyv2.waitForHistoryServiceLoaded { [weak self] in
+                historyManager.waitForHistoryServiceLoaded { [weak self] in
                     guard let self = self else { return }
                     
                     self.reloadData() {
@@ -85,15 +84,6 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
                         self.spinner.stopAnimating()
                         self.spinner.removeFromSuperview()
                     }
-=======
-            historyManager.waitForHistoryServiceLoaded { [weak self] in
-                guard let self = self else { return }
-                
-                self.reloadData() {
-                    self.isHistoryRefreshing = false
-                    self.spinner.stopAnimating()
-                    self.spinner.removeFromSuperview()
->>>>>>> d26c5aa08 (Including load observer and Delete function)
                 }
             }
         }
