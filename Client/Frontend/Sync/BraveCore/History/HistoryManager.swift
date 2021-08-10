@@ -12,14 +12,15 @@ import Shared
 
 class HistoryManager: NSObject {
     
-    private var observer: HistoryServiceListener?
-    private let historyAPI: BraveHistoryAPI?
+    // MARK: Lifecycle
     
     init(historyAPI: BraveHistoryAPI?) {
         self.historyAPI = historyAPI
         
         super.init()
     }
+    
+    // MARK: Internal
     
     public func add(url: URL, title: String, dateAdded: Date, isURLTyped: Bool = true) {
         guard let historyAPI = historyAPI else {
@@ -86,6 +87,11 @@ class HistoryManager: NSObject {
             historyNode.dateAdded = date
         }
     }
+    
+    // MARK: Private
+    
+    private var observer: HistoryServiceListener?
+    private let historyAPI: BraveHistoryAPI?
 }
 
 // MARK: Brave-Core Only
