@@ -250,6 +250,8 @@ extension Preferences {
         static let listViewSide = Option<String>(key: "playlist.listViewSide", default: PlayListSide.left.rawValue)
         /// Whether to show Add to playlist Toast
         static let showToastForAdd = Option<Bool>(key: "playlist.showToastForAdd", default: true)
+        /// Whether to show the Add to Playlist URL-Bar onboarding
+        static let showAddToPlaylistURLBarOnboarding = Option<Int>(key: "playlist.showAddToPlaylistURLBarOnboarding", default: 0)
         /// The last played item url
         static let lastPlayedItemUrl = Option<String?>(key: "playlist.last.played.item.url", default: nil)
         /// The last played item time
