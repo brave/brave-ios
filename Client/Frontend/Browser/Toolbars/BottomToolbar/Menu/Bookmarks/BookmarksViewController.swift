@@ -69,7 +69,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         
         self.currentFolder = folder
         self.title = folder?.displayTitle ?? Strings.bookmarks
-        self.bookmarksFRC = Bookmarkv2.frc(parent: folder)
+        self.bookmarksFRC = bookmarkManager.frc(parent: folder)
         self.bookmarksFRC?.delegate = self
     }
     
@@ -156,7 +156,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
             // Recreate the frc if it was previously removed
             // (when user navigated into a nested folder for example)
             if bookmarksFRC == nil {
-                bookmarksFRC = Bookmarkv2.frc(parent: currentFolder)
+                bookmarksFRC = bookmarkManager.frc(parent: currentFolder)
                 bookmarksFRC?.delegate = self
             }
             try self.bookmarksFRC?.performFetch()
@@ -178,7 +178,9 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         spinner.isHidden = false
         updateLastVisitedFolder(currentFolder)
         
-        Bookmarkv2.waitForBookmarkModelLoaded({
+        bookmarkManager.waitForBookmarkModelLoaded({ [weak self] in
+            guard let self = self else { return }
+           
             self.navigationController?.setToolbarHidden(false, animated: true)
             self.reloadData()
             self.switchTableEditingMode(true)
@@ -268,7 +270,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     }
     
     func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-        Bookmarkv2.reorderBookmarks(frc: bookmarksFRC, sourceIndexPath: sourceIndexPath, destinationIndexPath: destinationIndexPath)
+        bookmarkManager.reorderBookmarks(frc: bookmarksFRC, sourceIndexPath: sourceIndexPath, destinationIndexPath: destinationIndexPath)
     }
     
     func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
@@ -339,11 +341,8 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
                 }
                 
                 // Brave-Core favIcons are async and notify an observer when changed..
-                item.addFavIconObserver { [weak item] in
+                bookmarkManager.addFavIconObserver(item) { [weak item] in
                     guard let item = item else { return }
-                    if item.isFavIconLoaded {
-                        item.removeFavIconObserver()
-                    }
                     
                     setFavIcon(cell, item)
                 }
@@ -392,7 +391,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     }
     
     private func folderLongPressActions(_ folder: Bookmarkv2) -> [UIAlertAction] {
-        let children = Bookmarkv2.getChildren(forFolder: folder, includeFolders: false) ?? []
+        let children = bookmarkManager.getChildren(forFolder: folder, includeFolders: false) ?? []
         
         let urls: [URL] = children.compactMap { b in
             guard let url = b.url else { return nil }
@@ -513,13 +512,13 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
                     completion(false)
                 })
                 alert.addAction(UIAlertAction(title: Strings.yesDeleteButtonTitle, style: .destructive) { _ in
-                    item.delete()
+                    self.bookmarkManager.delete(item)
                     completion(true)
                 })
                 
                 self.present(alert, animated: true, completion: nil)
             } else {
-                item.delete()
+                self.bookmarkManager.delete(item)
                 completion(true)
             }
         }

@@ -13,8 +13,8 @@ class SearchLoader: Loader<[Site], SearchViewController> {
     
     var autocompleteSuggestionHandler: ((String) -> Void)?
     
-    init(historyManager: HistoryManager) {
-        frequencyQuery = FrequencyQuery(historyManager: historyManager)
+    init(historyManager: HistoryManager, bookmarkManager: BookmarkManager) {
+        frequencyQuery = FrequencyQuery(historyManager: historyManager, bookmarkManager: bookmarkManager)
     }
 
     var query: String = "" {

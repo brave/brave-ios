@@ -11,11 +11,14 @@ import Data
 class FrequencyQuery {
     
     private let historyManager: HistoryManager
+    private let bookmarkManager: BookmarkManager
+    
     private let queue = DispatchQueue(label: "frequency-query-queue")
     private var cancellable: DispatchWorkItem?
     
-    init(historyManager: HistoryManager) {
+    init(historyManager: HistoryManager, bookmarkManager: BookmarkManager) {
         self.historyManager = historyManager
+        self.bookmarkManager = bookmarkManager
     }
     
     public func sitesByFrequency(containing query: String? = nil, completion: @escaping (Set<Site>) -> Void) {
@@ -27,7 +30,7 @@ class FrequencyQuery {
                 // brave-core fetch can be slow over 200ms per call,
                 // a cancellable serial queue is used for it.
                 DispatchQueue.main.async {
-                    Bookmarkv2.byFrequency(query: query) { sites in
+                    self?.bookmarkManager.byFrequency(query: query) { sites in
                         let bookmarkSites = sites.map { Site(url: $0.url ?? "", title: $0.title ?? "", bookmarked: true) }
 
                         let result = Set<Site>(historySites+bookmarkSites)
