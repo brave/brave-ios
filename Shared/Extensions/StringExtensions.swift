@@ -178,4 +178,21 @@ extension String {
             return nil
         }
     }
+    
+    /// Encode Strings which are not sanitized for displaying
+    /// - Returns: Encoded String
+    public func encodeContaminatedString() -> String {
+        var sanitizedString = self
+        let entityList:[(value: String, replacement: String)] = [(value: "&", replacement: "&amp;"),
+                                                                 (value: "\"", replacement: "&quot;"),
+                                                                 (value: "'", replacement: "&#39;"),
+                                                                 (value: "<", replacement: "&lt;"),
+                                                                 (value: ">", replacement: "&gt;"),
+                                                                 (value: "`", replacement: "&lsquo;")]
+        for entity in entityList {
+            sanitizedString = sanitizedString.replacingOccurrences(of: entity.value, with: entity.replacement)
+        }
+        
+        return sanitizedString
+    }
 }
