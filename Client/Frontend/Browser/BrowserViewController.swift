@@ -2265,6 +2265,7 @@ extension BrowserViewController: TabManagerDelegate {
     }
 
     func tabManager(_ tabManager: TabManager, willRemoveTab tab: Tab) {
+        tab.webView?.removeFromSuperview()
     }
 
     func tabManager(_ tabManager: TabManager, didRemoveTab tab: Tab) {
