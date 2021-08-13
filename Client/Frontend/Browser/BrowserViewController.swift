@@ -1341,7 +1341,7 @@ class BrowserViewController: UIViewController {
                 // Notify Rewards of new page load.
                 if let rewardsURL = rewardsXHRLoadURL,
                     url.host == rewardsURL.host {
-                    tabManager.selectedTab?.reportPageNaviagtion(to: rewards)
+                    tabManager.selectedTab?.reportPageNavigation(to: rewards)
                     // Not passing redirection chain here, in page navigation should not use them.
                     tabManager.selectedTab?.reportPageLoad(to: rewards, redirectionURLs: [])
                 }

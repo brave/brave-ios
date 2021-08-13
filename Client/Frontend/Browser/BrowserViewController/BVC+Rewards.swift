@@ -324,7 +324,7 @@ extension Tab {
         }
     }
     
-    func reportPageNaviagtion(to rewards: BraveRewards) {
+    func reportPageNavigation(to rewards: BraveRewards) {
         rewards.reportTabNavigation(tabId: self.rewardsId)
     }
 }
