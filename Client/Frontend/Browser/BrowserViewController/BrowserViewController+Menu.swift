@@ -6,12 +6,14 @@
 import Foundation
 import SwiftUI
 import BraveUI
+import BraveShared
 import Shared
 import Data
 
 private let log = Logger.browserLogger
 
 extension BrowserViewController {
+    
     func featuresMenuSection(_ menuController: MenuViewController) -> some View {
         VStack(spacing: 0) {
             VPNMenuButton(
@@ -66,6 +68,19 @@ extension BrowserViewController {
                             self.present(playlistController, animated: true)
                         }
                     }
+                }
+            }
+            if showPasswordsInApplication.value {
+                MenuItemButton(icon: #imageLiteral(resourceName: "settings-save-logins").template, title: Strings.passwordsMenuItem) {
+                    let vc = LoginInfoViewController(profile: self.profile)
+                    menuController.pushInnerMenu(vc)
+                }
+            }
+            MenuItemButton(icon: #imageLiteral(resourceName: "playlist_menu").template, title: Strings.playlistMenuItem) {
+                let playlistController = (UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController ?? PlaylistViewController()
+                playlistController.modalPresentationStyle = .fullScreen
+                self.dismiss(animated: true) {
+                    self.present(playlistController, animated: true)
                 }
             }
             MenuItemButton(icon: #imageLiteral(resourceName: "menu-settings").template, title: Strings.settingsMenuItem) { [unowned self, unowned menuController] in

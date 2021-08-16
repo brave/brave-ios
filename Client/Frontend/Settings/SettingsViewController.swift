@@ -422,7 +422,10 @@ class SettingsViewController: TableViewController {
             header: .title(Strings.security),
             rows: [
                 .boolRow(title: Strings.browserLock, detailText: Strings.browserLockDescription, option: Preferences.Privacy.lockWithPasscode, image: #imageLiteral(resourceName: "settings-passcode").template),
-                .boolRow(title: Strings.saveLogins, option: Preferences.General.saveLogins, image: #imageLiteral(resourceName: "settings-save-logins").template)
+                Row(text: "Logins & Passwords", selection: {
+                    let loginsPasswordsViewController = LoginInfoViewController(profile: self.profile)
+                    self.navigationController?.pushViewController(loginsPasswordsViewController, animated: true)
+                }, image: #imageLiteral(resourceName: "settings-save-logins").template, accessory: .disclosureIndicator)
             ]
         )
     }()
