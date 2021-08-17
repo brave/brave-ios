@@ -19,15 +19,21 @@ extension BrowserViewController {
     func doSyncMigration() {
         // We stop ever attempting migration after 3 times.
         if Preferences.Chromium.syncV2ObjectMigrationCount.value < 3 {
-            self.migrateToSyncObjects { error in
-                if let error = error {
-                    DispatchQueue.main.async {
-                        let alert = UIAlertController(title: error.failureReason,
-                                                      message: error.localizedDescription,
-                                                      preferredStyle: .alert)
-                        alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
-                        self.present(alert, animated: true)
-                    }
+            self.migrateToSyncObjects { [weak self] error in
+                guard let self = self, let error = error else {
+                    return
+                }
+                
+                // Show the migration error for history If more than 5 elements failed to migrate
+                // Also not showing the error in History case more than once
+                // This is done to warn the user only in serious migration failures
+                if error == .failedHistoryMigration,
+                   Migration.braveCoreSyncObjectsMigrator?.historyFailedMigrationItemCount ?? 0 > 5,
+                   !Preferences.Chromium.syncV2HistoryMigrationErrorShown.value {
+                    self.showMigrationError(error)
+                    Preferences.Chromium.syncV2HistoryMigrationErrorShown.value = true
+                } else if error == .failedBookmarksMigration {
+                    self.showMigrationError(error)
                 }
             }
         } else {
@@ -36,6 +42,16 @@ extension BrowserViewController {
             Preferences.Chromium.syncV2BookmarksMigrationCompleted.value = true
             // Also marking the history migration completed after 3 tries
             Preferences.Chromium.syncV2HistoryMigrationCompleted.value = true
+        }
+    }
+    
+    private func showMigrationError(_ error: BraveCoreMigrator.MigrationError) {
+        DispatchQueue.main.async {
+            let alert = UIAlertController(title: error.failureReason,
+                                          message: error.localizedDescription,
+                                          preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
+            self.present(alert, animated: true)
         }
     }
     

@@ -56,6 +56,7 @@ class BraveCoreMigrator {
     
     private var bookmarksAPI: BraveBookmarksAPI?
     private var historyAPI: BraveHistoryAPI?
+    var historyFailedMigrationItemCount: Int
     
     private let dataImportExporter = BraveCoreImportExportUtility()
     private var bookmarkObserver: BookmarkModelListener?
@@ -66,6 +67,8 @@ class BraveCoreMigrator {
         if Migration.isChromiumMigrationCompleted {
             migrationObserver = .completed
         }
+        
+        historyFailedMigrationItemCount = 0
         
         if let appDelegate = (UIApplication.shared.delegate as? AppDelegate) {
             bookmarksAPI = appDelegate.braveCore?.bookmarksAPI
@@ -322,6 +325,10 @@ extension BraveCoreMigrator {
                 } else {
                     didSucceed = false
                 }
+            }
+            
+            if !didSucceed {
+                self.historyFailedMigrationItemCount = History.fetchMigrationHistory(context).count
             }
             
             DispatchQueue.main.async {

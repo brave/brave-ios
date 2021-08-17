@@ -228,6 +228,8 @@ extension Preferences {
         static let syncV2HistoryMigrationCompleted = Option<Bool>(key: "chromium.migration.history", default: false)
         /// The count of how many times migration is performed on client side - the value increases with every fail attempt and after 3 tries migration marked as successful
         static let syncV2ObjectMigrationCount = Option<Int>(key: "chromium.migration.attempt.count", default: 0)
+        /// The boolean determine History Migration error is shown
+        static let syncV2HistoryMigrationErrorShown = Option<Bool>(key: "chromium.migration.history.error.show", default: false)
         /// Whether the device is in sync chain
         static let syncEnabled = Option<Bool>(key: "chromium.sync.enabled", default: false)
         /// The sync type bookmarks enabled for the device in sync chain
