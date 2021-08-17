@@ -6,7 +6,7 @@
 - Added display ads to the Brave News feed. ([#3872](https://github.com/brave/brave-ios/issues/3872))
 - Added "Delete All" functionality to clear history via history page. ([#3723](https://github.com/brave/brave-ios/issues/3723))
 - Added ability to share selected text from other apps to Brave via share sheet. ([#3863](https://github.com/brave/brave-ios/issues/3863))
-- Fixed app theme being set to light at launch when "Private Browsing" only is being used as default. ([#3591](https://github.com/brave/brave-ios/issues/3591))
+- Fixed an issue with rewards not being disabled when toggling off via rewards panel. ([#3591](https://github.com/brave/brave-ios/issues/3591))
 - Fixed app theme issue at launch, being set to light mode, when Private Browsing only mode is enabled. ([#3936](https://github.com/brave/brave-ios/issues/3936))
 - Fixed menu to auto-close when a bookmark is selected. ([#3950](https://github.com/brave/brave-ios/issues/3950))
 - Fixed "Clear private data" global settings from resetting to defaults when menu is closed after changing the settings. ([#3958](https://github.com/brave/brave-ios/issues/3958))
