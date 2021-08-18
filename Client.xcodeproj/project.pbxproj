@@ -872,6 +872,8 @@
 		CAB127652639FB7000BBFC75 /* RecentSearchCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAB127642639FB7000BBFC75 /* RecentSearchCell.swift */; };
 		CAC2CB402644488600BB8D36 /* RecentSearchHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAC2CB3F2644488600BB8D36 /* RecentSearchHeaderView.swift */; };
 		CAC2CB4D2644496400BB8D36 /* RecentSearchClipboardHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAC2CB4C2644496400BB8D36 /* RecentSearchClipboardHeaderView.swift */; };
+		CAA7DC6A26332C5900E3910E /* CertificateViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAA7DC6926332C5900E3910E /* CertificateViewController.swift */; };
+		CAADDB05265FDD9F008F484D /* CertificateExtensionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAADDB04265FDD9F008F484D /* CertificateExtensionView.swift */; };
 		CE7F11941F3CEEC800ABFC0B /* RemoteDevices.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE7F115E1F3CCEF900ABFC0B /* RemoteDevices.swift */; };
 		D018F93E1F44A71A0098F8CA /* Schema.swift in Sources */ = {isa = PBXBuildFile; fileRef = D018F93D1F44A7190098F8CA /* Schema.swift */; };
 		D029A04920A62DB0001DB72F /* TemporaryDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = D029A04820A62DB0001DB72F /* TemporaryDocument.swift */; };
@@ -2555,6 +2557,8 @@
 		CAB127642639FB7000BBFC75 /* RecentSearchCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentSearchCell.swift; sourceTree = "<group>"; };
 		CAC2CB3F2644488600BB8D36 /* RecentSearchHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentSearchHeaderView.swift; sourceTree = "<group>"; };
 		CAC2CB4C2644496400BB8D36 /* RecentSearchClipboardHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentSearchClipboardHeaderView.swift; sourceTree = "<group>"; };
+		CAA7DC6926332C5900E3910E /* CertificateViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CertificateViewController.swift; sourceTree = "<group>"; };
+		CAADDB04265FDD9F008F484D /* CertificateExtensionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CertificateExtensionView.swift; sourceTree = "<group>"; };
 		CE7F115E1F3CCEF900ABFC0B /* RemoteDevices.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RemoteDevices.swift; sourceTree = "<group>"; };
 		D000661320472890009BA6F6 /* __firefox__.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = __firefox__.js; sourceTree = "<group>"; };
 		D018F93D1F44A7190098F8CA /* Schema.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Schema.swift; sourceTree = "<group>"; };
@@ -4968,6 +4972,15 @@
 			path = "Recent Search";
 			sourceTree = "<group>";
 		};
+		CAA7DC5D26332C4700E3910E /* Certificate Viewer */ = {
+			isa = PBXGroup;
+			children = (
+				CAA7DC6926332C5900E3910E /* CertificateViewController.swift */,
+				CAADDB04265FDD9F008F484D /* CertificateExtensionView.swift */,
+			);
+			path = "Certificate Viewer";
+			sourceTree = "<group>";
+		};
 		D03F8F11200EAB8C003C2224 /* AtDocumentStart */ = {
 			isa = PBXGroup;
 			children = (
@@ -5109,6 +5122,7 @@
 		D3A994941A368691008AD1AC /* Browser */ = {
 			isa = PBXGroup;
 			children = (
+				CAA7DC5D26332C4700E3910E /* Certificate Viewer */,
 				5E5E6E3825BA03360035B6A0 /* Playlist */,
 				0A3C789423055AC80022F6D8 /* Onboarding */,
 				C6D267612137E45D00465DFA /* PrivacyProtection */,
@@ -7117,6 +7131,7 @@
 				3BCE6D3C1CEB9E4D0080928C /* ThirdPartySearchAlerts.swift in Sources */,
 				4422D55A21BFFB7F00BF1855 /* regexp.cc in Sources */,
 				0A7B5D722269E7AD00AADF22 /* BookmarkEditMode.swift in Sources */,
+				CAA7DC6A26332C5900E3910E /* CertificateViewController.swift in Sources */,
 				4422D4DC21BFFB7600BF1855 /* block_builder.cc in Sources */,
 				27201EFE24539B5500C19DD1 /* NewTabPageBackground.swift in Sources */,
 				0BF0DB941A8545800039F300 /* TopToolbarView.swift in Sources */,
@@ -7508,6 +7523,7 @@
 				27953F7723F5DF5D00B4B595 /* AboutShieldsViewController.swift in Sources */,
 				0A1E84442190A57F0042F782 /* SyncCameraView.swift in Sources */,
 				2FD1C60926385C6200E3C25F /* Historyv2.swift in Sources */,
+				CAADDB05265FDD9F008F484D /* CertificateExtensionView.swift in Sources */,
 				A1CA29C420E1746A00CB9126 /* OptionSelectionViewController.swift in Sources */,
 				5EC594ED232C2C8F00922111 /* OnboardingWebViewController.swift in Sources */,
 				0A4B012420D0321A004D4011 /* UX.swift in Sources */,
