@@ -179,20 +179,16 @@ extension String {
         }
     }
     
-    /// Encode Strings which are not sanitized for displaying
+    /// Encode HTMLStrings
+    /// Also used for Strings which are not sanitized for displaying
     /// - Returns: Encoded String
-    public func encodeContaminatedString() -> String {
-        var sanitizedString = self
-        let entityList:[(value: String, replacement: String)] = [(value: "&", replacement: "&amp;"),
-                                                                 (value: "\"", replacement: "&quot;"),
-                                                                 (value: "'", replacement: "&#39;"),
-                                                                 (value: "<", replacement: "&lt;"),
-                                                                 (value: ">", replacement: "&gt;"),
-                                                                 (value: "`", replacement: "&lsquo;")]
-        for entity in entityList {
-            sanitizedString = sanitizedString.replacingOccurrences(of: entity.value, with: entity.replacement)
-        }
-        
-        return sanitizedString
+    public var htmlEntityEncodedString: String {
+       return self
+        .replacingOccurrences(of: "&", with: "&amp;", options: .literal)
+        .replacingOccurrences(of: "\"", with: "&quot;", options: .literal)
+        .replacingOccurrences(of: "'", with: "&#39;", options: .literal)
+        .replacingOccurrences(of: "<", with: "&lt;", options: .literal)
+        .replacingOccurrences(of: ">", with: "&gt;", options: .literal)
+        .replacingOccurrences(of: "`", with: "&lsquo;", options: .literal)
     }
 }
