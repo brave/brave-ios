@@ -1845,7 +1845,7 @@ class BrowserViewController: UIViewController {
             // Whether to show search icon or + icon
             toolbar?.setSearchButtonState(url: url)
             
-            if !url.isErrorPageURL, !url.isAboutHomeURL, !url.isFileURL {
+            if !url.isErrorPageURL, !url.isAboutHomeURL, !url.isFileURL, url.schemeIsValidForHistory {
                 // Fire the readability check. This is here and not in the pageShow event handler in ReaderMode.js anymore
                 // because that event wil not always fire due to unreliable page caching. This will either let us know that
                 // the currently loaded page can be turned into reading mode or if the page already is in reading mode. We

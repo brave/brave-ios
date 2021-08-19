@@ -110,7 +110,9 @@ extension URL {
 private let permanentURISchemes = ["aaa", "aaas", "about", "acap", "acct", "cap", "cid", "coap", "coaps", "crid", "data", "dav", "dict", "dns", "example", "file", "ftp", "geo", "go", "gopher", "h323", "http", "https", "iax", "icap", "im", "imap", "info", "ipp", "ipps", "iris", "iris.beep", "iris.lwz", "iris.xpc", "iris.xpcs", "jabber", "javascript", "ldap", "mailto", "mid", "msrp", "msrps", "mtqp", "mupdate", "news", "nfs", "ni", "nih", "nntp", "opaquelocktoken", "pkcs11", "pop", "pres", "reload", "rtsp", "rtsps", "rtspu", "service", "session", "shttp", "sieve", "sip", "sips", "sms", "snmp", "soap.beep", "soap.beeps", "stun", "stuns", "tag", "tel", "telnet", "tftp", "thismessage", "tip", "tn3270", "turn", "turns", "tv", "urn", "vemmi", "vnc", "ws", "wss", "xcon", "xcon-userid", "xmlrpc.beep", "xmlrpc.beeps", "xmpp", "z39.50r", "z39.50s"]
 
 private let ignoredSchemes = ["data"]
+private let ignoredSchemesForHistory = ["about", "tel", "mailto"]
 private let supportedSchemes = permanentURISchemes.filter { !ignoredSchemes.contains($0) }
+private let supportedSchemesForHistory = supportedSchemes.filter { !ignoredSchemesForHistory.contains($0) }
 
 extension URL {
     public func withQueryParams(_ params: [URLQueryItem]) -> URL {
@@ -358,6 +360,12 @@ extension URL {
         guard let scheme = scheme else { return false }
         return supportedSchemes.contains(scheme.lowercased())
     }
+    
+    /// Used for checking if the URL scheme is valid for adding this entry to browser history list
+    public var schemeIsValidForHistory: Bool {
+        guard let scheme = scheme else { return false }
+        return supportedSchemesForHistory.contains(scheme.lowercased())
+    }    
 
     public func havingRemovedAuthorisationComponents() -> URL {
         guard var urlComponents = URLComponents(url: self, resolvingAgainstBaseURL: false) else {
