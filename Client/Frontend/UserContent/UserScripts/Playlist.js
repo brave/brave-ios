@@ -39,10 +39,29 @@ window.__firefox__.includeOnce("$<Playlist>", function() {
         return value;
     }
     
+    // Algorithm:
+    // Generate a random number from 0 to 256
+    // Roll-Over clamp to the range [0, 15]
+    // If the index is 13, set it to 4.
+    // If the index is 17, clamp it to [0, 3]
+    // Subtract that number from 15 (XOR) and convert the result to hex.
     function uuid_v4() {
-        return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
-            (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-        );
+        // X >> 2 = X / 4 (integer division)
+        
+        // AND-ing (15 >> 0) roll-over clamps to 15
+        // AND-ing (15 >> 2) roll-over clamps to 3
+        // So '8' digit is clamped to 3 (inclusive) and all others clamped to 15 (inclusive).
+        
+        // 0 XOR 15 = 15
+        // 1 XOR 15 = 14
+        // 8 XOR 15 = 7
+        // So N XOR 15 = 15 - N
+
+        // UUID string format generated with array appending
+        // Results in "10000000-1000-4000-8000-100000000000".replace(...)
+        return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, (X) => {
+            (X ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (X >> 2)))).toString(16)
+        });
     }
     
     function $<tagNode>(node) {
