@@ -69,7 +69,7 @@ class Historyv2: WebsitePresentable {
     }
     
     public var domain: Domain? {
-        return Domain.getOrCreate(forUrl: historyNode.url, persistent: true)
+        return Domain.getOrCreate(forUrl: historyNode.url, persistent: !PrivateBrowsingManager.shared.isPrivateBrowsing)
     }
     
     public var sectionID: Section? {
