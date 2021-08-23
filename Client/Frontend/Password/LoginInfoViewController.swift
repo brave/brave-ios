@@ -7,6 +7,7 @@ import UIKit
 import Shared
 import BraveShared
 import Storage
+import Data
 
 private let log = Logger.browserLogger
 
@@ -42,7 +43,9 @@ class LoginInfoViewController: UITableViewController {
     
     private let profile: Profile
     private var loginEntries = [Login]()
-    
+    private var isFetchingLoginEntries: Bool = false
+    private var searchLoginTimer: Timer?
+
     private let searchController = UISearchController(searchResultsController: nil)
     
     // MARK: Lifecycle
@@ -58,9 +61,29 @@ class LoginInfoViewController: UITableViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func fetchLoginInfo() {
-        profile.logins.getAllLogins() >>== { [weak self] results in
-            self?.loginEntries = results.asArray()
+    private func fetchLoginInfo(_ searchQuery: String? = nil) {
+        guard !isFetchingLoginEntries else {
+            return
+        }
+        
+        isFetchingLoginEntries = true
+        
+        if let query = searchQuery {
+            profile.logins.getLoginsForQuery(query) >>== { [weak self] results in
+                self?.reloadEntries(results: results)
+            }
+        } else {
+            profile.logins.getAllLogins() >>== { [weak self] results in
+                self?.reloadEntries(results: results)
+            }
+        }
+    }
+    
+    private func reloadEntries(results: Cursor<Login>) {
+        loginEntries = results.asArray()
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+            self.isFetchingLoginEntries = false
         }
     }
     
@@ -105,7 +128,6 @@ class LoginInfoViewController: UITableViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        tableView.reloadData()
     }
     
     // MARK: Internal
@@ -182,11 +204,10 @@ class LoginInfoViewController: UITableViewController {
                 withIdentifier: Constants.savedItemLoginRowIdentifier, for: indexPath) as? TwoLineTableViewCell
             
             cell?.do {
-                $0.backgroundColor = UIColor.clear
                 $0.selectionStyle = .none
                 $0.accessoryType = .disclosureIndicator
 
-                $0.setLines(loginInfo.formSubmitURL, detailText: loginInfo.username)
+                $0.setLines(loginInfo.hostname, detailText: loginInfo.username)
                 $0.imageView?.contentMode = .scaleAspectFit
                 $0.imageView?.image = FaviconFetcher.defaultFaviconImage
                 $0.imageView?.layer.borderColor = BraveUX.faviconBorderColor.cgColor
@@ -194,13 +215,20 @@ class LoginInfoViewController: UITableViewController {
                 $0.imageView?.layer.cornerRadius = 6
                 $0.imageView?.layer.cornerCurve = .continuous
                 $0.imageView?.layer.masksToBounds = true
+            }
+                      
+            if let loginHostnameURL = URL(string: loginInfo.hostname) {
+                let domain = Domain.getOrCreate(forUrl: loginHostnameURL, persistent: true)
                 
-                if let url = URL(string: loginInfo.formSubmitURL ?? "")?.domainURL.absoluteString.asURL {
-                    cell?.imageView?.loadFavicon(for: url)
-                } else {
-                    cell?.imageView?.clearMonogramFavicon()
-                    cell?.imageView?.image = FaviconFetcher.defaultFaviconImage
-                }
+                cell?.imageView?.loadFavicon(
+                    for: loginHostnameURL,
+                    domain: domain,
+                    fallbackMonogramCharacter: loginHostnameURL.baseDomain?.first,
+                    shouldClearMonogramFavIcon: false,
+                    cachedOnly: true)
+            } else {
+                cell?.imageView?.clearMonogramFavicon()
+                cell?.imageView?.image = FaviconFetcher.defaultFaviconImage
             }
             
             guard let currentCell = cell else { return UITableViewCell() }
@@ -245,12 +273,11 @@ class LoginInfoViewController: UITableViewController {
             
             success.upon { result in
                 if result.isSuccess {
-                    tableView.deleteRows(at: [indexPath], with: .right)
+                    self.fetchLoginInfo()
                 } else {
                     log.error("Error while deleting a login entry")
                 }
             }
-            
         }
     }
     
@@ -280,7 +307,24 @@ extension LoginInfoViewController {
 
 extension LoginInfoViewController: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
+        guard let query = searchController.searchBar.text else { return }
 
+        if searchLoginTimer != nil {
+            searchLoginTimer?.invalidate()
+            searchLoginTimer = nil
+        }
+        
+        // Reschedule the search result fetch: in 0.05 second bot to overload the database fetch
+        searchLoginTimer =
+            Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(fetchSearchResults(timer:)), userInfo: query, repeats: false)
+    }
+    
+    @objc private func fetchSearchResults(timer: Timer) {
+        guard let query = timer.userInfo as? String else {
+            return
+        }
+        
+        fetchLoginInfo(query)
     }
 }
 
@@ -293,9 +337,5 @@ extension LoginInfoViewController: UISearchControllerDelegate {
     
     func willDismissSearchController(_ searchController: UISearchController) {
         tableView.reloadData()
-    }
-
-    func didDismissSearchController(_ searchController: UISearchController) {
-
     }
 }

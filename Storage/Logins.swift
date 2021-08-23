@@ -264,6 +264,8 @@ public protocol BrowserLogins {
     func getLoginsForProtectionSpace(_ protectionSpace: URLProtectionSpace) -> Deferred<Maybe<Cursor<LoginData>>>
     func getLoginsForProtectionSpace(_ protectionSpace: URLProtectionSpace, withUsername username: String?) -> Deferred<Maybe<Cursor<LoginData>>>
     func getAllLogins() -> Deferred<Maybe<Cursor<Login>>>
+    func getLoginsForQuery(_ query: String) -> Deferred<Maybe<Cursor<Login>>>
+    
     func searchLoginsWithQuery(_ query: String?) -> Deferred<Maybe<Cursor<Login>>>
 
     // Add a new login regardless of whether other logins might match some fields. Callers
