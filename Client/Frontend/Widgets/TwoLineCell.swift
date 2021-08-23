@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import UIKit
+import BraveUI
 
 struct TwoLineCellUX {
     static let imageSize: CGFloat = 29
@@ -14,7 +15,7 @@ struct TwoLineCellUX {
     static let detailTextTopMargin: CGFloat = 0
 }
 
-class TwoLineTableViewCell: UITableViewCell {
+class TwoLineTableViewCell: UITableViewCell, TableViewReusable {
     fileprivate let twoLineHelper = TwoLineCellHelper()
 
     let _textLabel = UILabel()

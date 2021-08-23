@@ -8,7 +8,7 @@ import Storage
 import Shared
 import SwiftKeychainWrapper
 
-class LoginDetailsViewController: UITableViewController {
+class LoginDetailsViewController: NoPreviewTableViewController {
     
     // MARK: UX
     
@@ -54,10 +54,10 @@ class LoginDetailsViewController: UITableViewController {
     
     // MARK: Lifecycle
 
-    init(profile: Profile, loginEntry: Login, webpageNavigationHandler: ((_ url: URL?) -> Void)?) {
+    init(profile: Profile, loginEntry: Login) {
         self.loginEntry = loginEntry
         self.profile = profile
-        super.init(nibName: nil, bundle: nil)
+        super.init()
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -67,7 +67,10 @@ class LoginDetailsViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(edit))
+        navigationItem.do {
+            $0.title = URL(string: loginEntry.hostname)?.baseDomain ?? ""
+            $0.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(edit))
+        }
 
         tableView.do {
             $0.accessibilityIdentifier = "Login Details"

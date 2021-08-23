@@ -144,4 +144,13 @@ class WindowProtection {
             }
         }
     }
+    
+    func presentAuthenticationForViewController() {
+        if isVisible {
+            return
+        }
+        
+        context = LAContext()
+        updateVisibleStatusForForeground()
+    }
 }

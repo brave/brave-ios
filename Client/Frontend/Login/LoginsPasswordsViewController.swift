@@ -11,7 +11,7 @@ import Data
 
 private let log = Logger.browserLogger
 
-class LoginInfoViewController: UITableViewController {
+class LoginInfoViewController: NoPreviewTableViewController {
     
     // MARK: UX
     
@@ -24,7 +24,6 @@ class LoginInfoViewController: UITableViewController {
     struct Constants {
         static let saveLoginsRowIdentifier = "saveLoginsRowIdentifier"
         static let showInMenuRowIdentifier = "showInMenuRowIdentifier"
-        static let savedItemLoginRowIdentifier = "savedItemLoginRowIdentifier"
     }
     
     // MARK: Section
@@ -54,7 +53,7 @@ class LoginInfoViewController: UITableViewController {
     
     init(profile: Profile) {
         self.profile = profile
-        super.init(nibName: nil, bundle: nil)
+        super.init(requiresAuthentication: true)
         
         fetchLoginInfo()
     }
@@ -74,7 +73,7 @@ class LoginInfoViewController: UITableViewController {
             $0.registerHeaderFooter(SettingsTableSectionHeaderFooterView.self)
             $0.register(UITableViewCell.self, forCellReuseIdentifier: Constants.saveLoginsRowIdentifier)
             $0.register(UITableViewCell.self, forCellReuseIdentifier: Constants.showInMenuRowIdentifier)
-            $0.register(TwoLineTableViewCell.self, forCellReuseIdentifier: Constants.savedItemLoginRowIdentifier)
+            $0.register(TwoLineTableViewCell.self)
         }
         
         searchController.do {
@@ -100,6 +99,10 @@ class LoginInfoViewController: UITableViewController {
 
         let footer = SettingsTableSectionHeaderFooterView(frame: CGRect(width: tableView.bounds.width, height: UX.headerHeight))
         tableView.tableFooterView = footer
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        tableView.endEditing(true)
     }
     
     // MARK: Internal
@@ -201,10 +204,9 @@ extension LoginInfoViewController {
         } else {
             let loginInfo = loginEntries[indexPath.item]
             
-            let cell = tableView.dequeueReusableCell(
-                withIdentifier: Constants.savedItemLoginRowIdentifier, for: indexPath) as? TwoLineTableViewCell
+            let cell = tableView.dequeueReusableCell(for: indexPath) as TwoLineTableViewCell
             
-            cell?.do {
+            cell.do {
                 $0.selectionStyle = .none
                 $0.accessoryType = .disclosureIndicator
 
@@ -221,19 +223,18 @@ extension LoginInfoViewController {
             if let loginHostnameURL = URL(string: loginInfo.hostname) {
                 let domain = Domain.getOrCreate(forUrl: loginHostnameURL, persistent: true)
                 
-                cell?.imageView?.loadFavicon(
+                cell.imageView?.loadFavicon(
                     for: loginHostnameURL,
                     domain: domain,
                     fallbackMonogramCharacter: loginHostnameURL.baseDomain?.first,
                     shouldClearMonogramFavIcon: false,
                     cachedOnly: true)
             } else {
-                cell?.imageView?.clearMonogramFavicon()
-                cell?.imageView?.image = FaviconFetcher.defaultFaviconImage
+                cell.imageView?.clearMonogramFavicon()
+                cell.imageView?.image = FaviconFetcher.defaultFaviconImage
             }
             
-            guard let currentCell = cell else { return UITableViewCell() }
-            return currentCell
+            return cell
         }
     }
     
@@ -245,8 +246,9 @@ extension LoginInfoViewController {
     }
 
     override func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
-        if indexPath.section == Section.savedLogins.rawValue {
-            //TODO: ADD Password detail screen indexPath.row present
+        if indexPath.section == Section.savedLogins.rawValue, let loginEntry = loginEntries[safe: indexPath.row] {
+            let loginDetailsViewController = LoginDetailsViewController(profile: profile, loginEntry: loginEntry)
+            navigationController?.pushViewController(loginDetailsViewController, animated: true)
         }
         
         return nil

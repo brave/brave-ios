@@ -445,6 +445,7 @@
 		2F51767425E4024B00429692 /* PlaylistSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F51767325E4024B00429692 /* PlaylistSettingsViewController.swift */; };
 		2F55443225913BD5000E4689 /* OpenSearchEngineButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F55443125913BD5000E4689 /* OpenSearchEngineButton.swift */; };
 		2F5893C5265ED772002323D9 /* BrowserViewController+ProductNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F5893C4265ED772002323D9 /* BrowserViewController+ProductNotification.swift */; };
+		2F59562826D427B400FEE43B /* NoPreviewTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F59562726D427B400FEE43B /* NoPreviewTableViewController.swift */; };
 		2F5B27D72698DBA8002BF5CF /* OrderedCollections in Frameworks */ = {isa = PBXBuildFile; productRef = 2F5B27D62698DBA8002BF5CF /* OrderedCollections */; };
 		2F676F6F260BA1B00048A1DB /* BlockingSummaryDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F676F6E260BA1B00048A1DB /* BlockingSummaryDataSource.swift */; };
 		2F676FAD260BA4860048A1DB /* blocking-summary.json in Resources */ = {isa = PBXBuildFile; fileRef = 2F676FAC260BA4860048A1DB /* blocking-summary.json */; };
@@ -1993,6 +1994,7 @@
 		2F51767325E4024B00429692 /* PlaylistSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistSettingsViewController.swift; sourceTree = "<group>"; };
 		2F55443125913BD5000E4689 /* OpenSearchEngineButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenSearchEngineButton.swift; sourceTree = "<group>"; };
 		2F5893C4265ED772002323D9 /* BrowserViewController+ProductNotification.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "BrowserViewController+ProductNotification.swift"; sourceTree = "<group>"; };
+		2F59562726D427B400FEE43B /* NoPreviewTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoPreviewTableViewController.swift; sourceTree = "<group>"; };
 		2F676F6E260BA1B00048A1DB /* BlockingSummaryDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockingSummaryDataSource.swift; sourceTree = "<group>"; };
 		2F676FAC260BA4860048A1DB /* blocking-summary.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "blocking-summary.json"; sourceTree = "<group>"; };
 		2F6931B4260CFB3700ECEB38 /* BrowserIntents.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BrowserIntents.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -4196,6 +4198,7 @@
 			children = (
 				2F8E21BC26C708EE00C5A0D9 /* LoginsPasswordsViewController.swift */,
 				2FB2F0CE26D3F92D00C8E576 /* LoginDetailsViewController.swift */,
+				2F59562726D427B400FEE43B /* NoPreviewTableViewController.swift */,
 			);
 			path = Login;
 			sourceTree = "<group>";
@@ -7463,6 +7466,7 @@
 				27201F0424589B9800C19DD1 /* NewTabPageNotifications.swift in Sources */,
 				E698FFDA1B4AADF40001F623 /* TabScrollController.swift in Sources */,
 				27448534245B5EC2001920B5 /* NTPModels.swift in Sources */,
+				2F59562826D427B400FEE43B /* NoPreviewTableViewController.swift in Sources */,
 				44331DD422551CC0007E3E93 /* ToolbarHelper.swift in Sources */,
 				D34510881ACF415700EC27F0 /* SearchLoader.swift in Sources */,
 				E65075521E37F6D1006961AC /* UIViewExtensions.swift in Sources */,
