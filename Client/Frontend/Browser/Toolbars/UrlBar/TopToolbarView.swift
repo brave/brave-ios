@@ -259,6 +259,8 @@ class TopToolbarView: UIView, ToolbarProtocol {
     private let mainStackView = UIStackView().then {
         $0.alignment = .center
         $0.spacing = 8
+        $0.isLayoutMarginsRelativeArrangement = true
+        $0.layoutMargins = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 10.0)
         $0.translatesAutoresizingMaskIntoConstraints = false
     }
     

@@ -52,22 +52,20 @@ struct PlaylistPopoverView: View {
             }) {
                 if #available(iOS 14.0, *) {
                     Text(Strings.PlayList.addToPlayListAlertTitle)
+                        .frame(maxWidth: .infinity)
                         .font(.title3.weight(.medium))
                         .foregroundColor(Color(UIColor.primaryButtonTint))
                         .padding()
                 } else {
                     Text(Strings.PlayList.addToPlayListAlertTitle)
+                        .frame(maxWidth: .infinity)
                         .font(.body.weight(.medium))
                         .foregroundColor(Color(UIColor.primaryButtonTint))
                         .padding()
                 }
             }
-            .frame(maxWidth: .infinity)
-            .background(
-                Capsule()
-                    .stroke(lineWidth: 1.0)
-                    .foregroundColor(Color(UIColor.secondaryButtonTint))
-            )
+            .buttonStyle(BraveOutlineButtonStyle(size: .normal))
+            .foregroundColor(Color(UIColor.secondaryButtonTint))
         }.padding(EdgeInsets(top: 22.0,
                              leading: 30.0,
                              bottom: 22.0,
@@ -93,21 +91,20 @@ struct PlaylistPopoverView: View {
             }) {
                 if #available(iOS 14.0, *) {
                     Text(Strings.PlayList.playlistPopoverOpenInBravePlaylist)
+                        .frame(maxWidth: .infinity)
                         .font(.title3.weight(.medium))
                         .foregroundColor(.white)
                         .padding()
                 } else {
                     Text(Strings.PlayList.playlistPopoverOpenInBravePlaylist)
+                        .frame(maxWidth: .infinity)
                         .font(.body.weight(.medium))
                         .foregroundColor(.white)
                         .padding()
                 }
             }
-            .frame(maxWidth: .infinity)
-            .background(
-                Capsule()
-                    .foregroundColor(Color(UIColor.braveBlurple))
-            )
+            .buttonStyle(BraveFilledButtonStyle(size: .small))
+            .foregroundColor(Color(UIColor.braveBlurple))
             
             Spacer(minLength: 20.0)
 
@@ -116,22 +113,20 @@ struct PlaylistPopoverView: View {
             }) {
                 if #available(iOS 14.0, *) {
                     Text(Strings.PlayList.playlistPopoverRemoveFromBravePlaylist)
+                        .frame(maxWidth: .infinity)
                         .font(.title3.weight(.medium))
                         .foregroundColor(Color(UIColor.primaryButtonTint))
                         .padding()
                 } else {
                     Text(Strings.PlayList.playlistPopoverRemoveFromBravePlaylist)
+                        .frame(maxWidth: .infinity)
                         .font(.body.weight(.medium))
                         .foregroundColor(Color(UIColor.primaryButtonTint))
                         .padding()
                 }
             }
-            .frame(maxWidth: .infinity)
-            .background(
-                Capsule()
-                    .stroke(lineWidth: 1.0)
-                    .foregroundColor(Color(UIColor.secondaryButtonTint))
-            )
+            .buttonStyle(BraveOutlineButtonStyle(size: .small))
+            .foregroundColor(Color(UIColor.secondaryButtonTint))
         }.padding(EdgeInsets(top: 22.0,
                              leading: 30.0,
                              bottom: 22.0,

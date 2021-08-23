@@ -265,8 +265,14 @@ extension BrowserViewController: PlaylistHelperDelegate {
                 self.openInPlaylistActivityItem = (enabled: true, item: item)
                 self.addToPlayListActivityItem = nil
                 
-                PlaylistItem.addItem(item, cachedData: nil) {
+                PlaylistItem.addItem(item, cachedData: nil) { [weak self] in
+                    guard let self = self else { return }
                     PlaylistManager.shared.autoDownload(item: item)
+                    
+                    self.updatePlaylistURLBar(tab: self.tabManager.selectedTab,
+                                              state: .existingItem,
+                                              item: item)
+                    
                     completion?(true)
                 }
             }))
@@ -274,13 +280,21 @@ extension BrowserViewController: PlaylistHelperDelegate {
             alert.addAction(UIAlertAction(title: Strings.CancelString, style: .cancel, handler: { _ in
                 completion?(false)
             }))
-            self.present(alert, animated: true, completion: nil)
+            
+            // Sometimes the MENU controller is being displayed and cannot present the alert
+            // So we need to ask it to present the alert
+            (presentedViewController ?? self).present(alert, animated: true, completion: nil)
         } else {
             openInPlaylistActivityItem = (enabled: true, item: item)
             addToPlayListActivityItem = nil
             
-            PlaylistItem.addItem(item, cachedData: nil) {
+            PlaylistItem.addItem(item, cachedData: nil) { [weak self] in
+                guard let self = self else { return }
                 PlaylistManager.shared.autoDownload(item: item)
+                
+                self.updatePlaylistURLBar(tab: self.tabManager.selectedTab,
+                                          state: .existingItem,
+                                          item: item)
                 completion?(true)
             }
         }
