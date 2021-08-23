@@ -41,6 +41,8 @@ class LoginInfoViewController: UITableViewController {
         case recentSearches
     }
     
+    // MARK: Private
+    
     private let profile: Profile
     private var loginEntries = [Login]()
     private var isFetchingLoginEntries: Bool = false
@@ -61,38 +63,13 @@ class LoginInfoViewController: UITableViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func fetchLoginInfo(_ searchQuery: String? = nil) {
-        guard !isFetchingLoginEntries else {
-            return
-        }
-        
-        isFetchingLoginEntries = true
-        
-        if let query = searchQuery {
-            profile.logins.getLoginsForQuery(query) >>== { [weak self] results in
-                self?.reloadEntries(results: results)
-            }
-        } else {
-            profile.logins.getAllLogins() >>== { [weak self] results in
-                self?.reloadEntries(results: results)
-            }
-        }
-    }
-    
-    private func reloadEntries(results: Cursor<Login>) {
-        loginEntries = results.asArray()
-        DispatchQueue.main.async {
-            self.tableView.reloadData()
-            self.isFetchingLoginEntries = false
-        }
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
 
         navigationItem.title = "Logins & Passwords"
 
         tableView.do {
+            $0.accessibilityIdentifier = "Logins Passwords List"
             $0.allowsSelectionDuringEditing = true
             $0.registerHeaderFooter(SettingsTableSectionHeaderFooterView.self)
             $0.register(UITableViewCell.self, forCellReuseIdentifier: Constants.saveLoginsRowIdentifier)
@@ -125,15 +102,39 @@ class LoginInfoViewController: UITableViewController {
         tableView.tableFooterView = footer
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
+    // MARK: Internal
+    
+    private func fetchLoginInfo(_ searchQuery: String? = nil) {
+        guard !isFetchingLoginEntries else {
+            return
+        }
         
+        isFetchingLoginEntries = true
+        
+        if let query = searchQuery {
+            profile.logins.getLoginsForQuery(query) >>== { [weak self] results in
+                self?.reloadEntries(results: results)
+            }
+        } else {
+            profile.logins.getAllLogins() >>== { [weak self] results in
+                self?.reloadEntries(results: results)
+            }
+        }
     }
     
-    // MARK: Internal
+    private func reloadEntries(results: Cursor<Login>) {
+        loginEntries = results.asArray()
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+            self.isFetchingLoginEntries = false
+        }
+    }
+}
 
-    // MARK: TableViewDataSource - TableViewDelegate
+// MARK: TableViewDataSource - TableViewDelegate
 
+extension LoginInfoViewController {
+    
     override func numberOfSections(in tableView: UITableView) -> Int {
         return Section.allCases.count
     }
@@ -306,6 +307,7 @@ extension LoginInfoViewController {
 // MARK: UISearchResultUpdating
 
 extension LoginInfoViewController: UISearchResultsUpdating {
+    
     func updateSearchResults(for searchController: UISearchController) {
         guard let query = searchController.searchBar.text else { return }
 
@@ -331,6 +333,7 @@ extension LoginInfoViewController: UISearchResultsUpdating {
 // MARK: UISearchControllerDelegate
 
 extension LoginInfoViewController: UISearchControllerDelegate {
+    
     func willPresentSearchController(_ searchController: UISearchController) {
         tableView.reloadData()
     }
