@@ -448,6 +448,7 @@
 		2F59562826D427B400FEE43B /* LoginAuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F59562726D427B400FEE43B /* LoginAuthViewController.swift */; };
 		2F59563526D5331100FEE43B /* LoginEmptyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F59563426D5331100FEE43B /* LoginEmptyView.swift */; };
 		2F59563726D5415100FEE43B /* FontExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F59563626D5415100FEE43B /* FontExtensions.swift */; };
+		2F59564226D5609800FEE43B /* LoginInfoTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F59564126D5609800FEE43B /* LoginInfoTableViewCell.swift */; };
 		2F5B27D72698DBA8002BF5CF /* OrderedCollections in Frameworks */ = {isa = PBXBuildFile; productRef = 2F5B27D62698DBA8002BF5CF /* OrderedCollections */; };
 		2F676F6F260BA1B00048A1DB /* BlockingSummaryDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F676F6E260BA1B00048A1DB /* BlockingSummaryDataSource.swift */; };
 		2F676FAD260BA4860048A1DB /* blocking-summary.json in Resources */ = {isa = PBXBuildFile; fileRef = 2F676FAC260BA4860048A1DB /* blocking-summary.json */; };
@@ -462,7 +463,7 @@
 		2FA01E5D25F2C93800103D67 /* ShieldsActivityItemSourceProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FA01E5C25F2C93800103D67 /* ShieldsActivityItemSourceProvider.swift */; };
 		2FA5A7582649CD9200740035 /* HistoryServiceStateObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FA5A7572649CD9200740035 /* HistoryServiceStateObserver.swift */; };
 		2FB0E26C2653132500B722AF /* BraveServiceStateObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FB0E26B2653132500B722AF /* BraveServiceStateObserver.swift */; };
-		2FB2F0CF26D3F92D00C8E576 /* LoginDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FB2F0CE26D3F92D00C8E576 /* LoginDetailsViewController.swift */; };
+		2FB2F0CF26D3F92D00C8E576 /* LoginInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FB2F0CE26D3F92D00C8E576 /* LoginInfoViewController.swift */; };
 		2FBCB169262784BF00F512D8 /* BrowserViewController+CoreMigration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FBCB168262784BF00F512D8 /* BrowserViewController+CoreMigration.swift */; };
 		2FCAE2251ABB51F800877008 /* Storage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2FCAE21A1ABB51F800877008 /* Storage.framework */; };
 		2FCAE2311ABB51F800877008 /* Storage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2FCAE21A1ABB51F800877008 /* Storage.framework */; };
@@ -1999,6 +2000,7 @@
 		2F59562726D427B400FEE43B /* LoginAuthViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginAuthViewController.swift; sourceTree = "<group>"; };
 		2F59563426D5331100FEE43B /* LoginEmptyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginEmptyView.swift; sourceTree = "<group>"; };
 		2F59563626D5415100FEE43B /* FontExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontExtensions.swift; sourceTree = "<group>"; };
+		2F59564126D5609800FEE43B /* LoginInfoTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginInfoTableViewCell.swift; sourceTree = "<group>"; };
 		2F676F6E260BA1B00048A1DB /* BlockingSummaryDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockingSummaryDataSource.swift; sourceTree = "<group>"; };
 		2F676FAC260BA4860048A1DB /* blocking-summary.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "blocking-summary.json"; sourceTree = "<group>"; };
 		2F6931B4260CFB3700ECEB38 /* BrowserIntents.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BrowserIntents.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2021,7 +2023,7 @@
 		2FA01E5C25F2C93800103D67 /* ShieldsActivityItemSourceProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShieldsActivityItemSourceProvider.swift; sourceTree = "<group>"; };
 		2FA5A7572649CD9200740035 /* HistoryServiceStateObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryServiceStateObserver.swift; sourceTree = "<group>"; };
 		2FB0E26B2653132500B722AF /* BraveServiceStateObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveServiceStateObserver.swift; sourceTree = "<group>"; };
-		2FB2F0CE26D3F92D00C8E576 /* LoginDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginDetailsViewController.swift; sourceTree = "<group>"; };
+		2FB2F0CE26D3F92D00C8E576 /* LoginInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginInfoViewController.swift; sourceTree = "<group>"; };
 		2FBCB168262784BF00F512D8 /* BrowserViewController+CoreMigration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowserViewController+CoreMigration.swift"; sourceTree = "<group>"; };
 		2FCAE21A1ABB51F800877008 /* Storage.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Storage.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2FCAE2241ABB51F800877008 /* StorageTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StorageTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -4201,9 +4203,10 @@
 			isa = PBXGroup;
 			children = (
 				2F8E21BC26C708EE00C5A0D9 /* LoginListViewController.swift */,
-				2FB2F0CE26D3F92D00C8E576 /* LoginDetailsViewController.swift */,
+				2FB2F0CE26D3F92D00C8E576 /* LoginInfoViewController.swift */,
 				2F59562726D427B400FEE43B /* LoginAuthViewController.swift */,
 				2F59563426D5331100FEE43B /* LoginEmptyView.swift */,
+				2F59564126D5609800FEE43B /* LoginInfoTableViewCell.swift */,
 			);
 			path = Login;
 			sourceTree = "<group>";
@@ -7383,6 +7386,7 @@
 				D0C95E36200FDC5500E4E51C /* MetadataParserHelper.swift in Sources */,
 				4422D55B21BFFB7F00BF1855 /* onepass.cc in Sources */,
 				0A3C78A1230597DA0022F6D8 /* OnboardingShieldsViewController.swift in Sources */,
+				2F59564226D5609800FEE43B /* LoginInfoTableViewCell.swift in Sources */,
 				27FCA8E3244770AB00A8CA48 /* FavoritesOverflowSectionProvider.swift in Sources */,
 				2FE5B42B2580216700BFDDB8 /* ShareTrackersController.swift in Sources */,
 				27EA04C2249D4336004F5D2E /* FeedCardContent.swift in Sources */,
@@ -7597,6 +7601,7 @@
 				27A1AC0924859D0900344503 /* FeedHeadlineViews.swift in Sources */,
 				CA8D5C2226D7D067009BF13D /* PlaylistStatusObserver.swift in Sources */,
 				2FB2F0CF26D3F92D00C8E576 /* LoginDetailsViewController.swift in Sources */,
+				2FB2F0CF26D3F92D00C8E576 /* LoginInfoViewController.swift in Sources */,
 				0A93F1892264C72000A3571B /* BookmarkFormFieldsProtocol.swift in Sources */,
 				4422D4D821BFFB7600BF1855 /* block.cc in Sources */,
 				F9B23EE523F613E8000EB3D8 /* PaymentRequestExtension.swift in Sources */,

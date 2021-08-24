@@ -8,11 +8,11 @@ import Storage
 import Shared
 import SwiftKeychainWrapper
 
-class LoginDetailsViewController: LoginAuthViewController {
+class LoginInfoViewController: LoginAuthViewController {
     
     // MARK: UX
     
-    struct LoginDetailUX {
+    struct UX {
         static let InfoRowHeight: CGFloat = 58
         static let DeleteRowHeight: CGFloat = 44
         static let SeparatorHeight: CGFloat = 84
@@ -20,7 +20,7 @@ class LoginDetailsViewController: LoginAuthViewController {
     
     // MARK: ItemType
     
-    enum InfoItem: Int {
+    enum InfoItem: Int, CaseIterable {
         case websiteItem
         case usernameItem
         case passwordItem
@@ -88,14 +88,14 @@ class LoginDetailsViewController: LoginAuthViewController {
 
 // MARK: TableViewDataSource - TableViewDelegate
 
-extension LoginDetailsViewController {
+extension LoginInfoViewController {
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         return UITableViewCell()
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 0
+        return InfoItem.allCases.count
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -109,7 +109,7 @@ extension LoginDetailsViewController {
 
 // MARK: Actions
 
-extension LoginDetailsViewController {
+extension LoginInfoViewController {
     @objc func edit() {
         
     }
@@ -117,7 +117,7 @@ extension LoginDetailsViewController {
 
 // MARK: KeyboardHelperDelegate
 
-extension LoginDetailsViewController: KeyboardHelperDelegate {
+extension LoginInfoViewController: KeyboardHelperDelegate {
 
     func keyboardHelper(_ keyboardHelper: KeyboardHelper, keyboardWillShowWithState state: KeyboardState) {
         let coveredHeight = state.intersectionHeightForView(tableView)

@@ -250,7 +250,7 @@ extension LoginListViewController {
 
     override func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
         if indexPath.section == Section.savedLogins.rawValue, let loginEntry = loginEntries[safe: indexPath.row] {
-            let loginDetailsViewController = LoginDetailsViewController(profile: profile, loginEntry: loginEntry)
+            let loginDetailsViewController = LoginInfoViewController(profile: profile, loginEntry: loginEntry)
             navigationController?.pushViewController(loginDetailsViewController, animated: true)
         }
         
@@ -340,6 +340,7 @@ extension LoginListViewController: UISearchResultsUpdating {
 extension LoginListViewController: UISearchControllerDelegate {
     
     func willPresentSearchController(_ searchController: UISearchController) {
+        tableView.setEditing(false, animated: true)
         tableView.reloadData()
     }
     
