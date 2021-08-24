@@ -8,7 +8,7 @@ import Storage
 import Shared
 import SwiftKeychainWrapper
 
-class LoginDetailsViewController: NoPreviewTableViewController {
+class LoginDetailsViewController: LoginAuthViewController {
     
     // MARK: UX
     

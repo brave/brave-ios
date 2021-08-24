@@ -72,7 +72,7 @@ extension BrowserViewController {
             }
             if showPasswordsInApplication.value {
                 MenuItemButton(icon: #imageLiteral(resourceName: "settings-save-logins").template, title: Strings.passwordsMenuItem) {
-                    let vc = LoginInfoViewController(profile: self.profile)
+                    let vc = LoginListViewController(profile: self.profile)
                     menuController.pushInnerMenu(vc)
                 }
             }

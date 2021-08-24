@@ -11,7 +11,7 @@ import Data
 
 private let log = Logger.browserLogger
 
-class LoginInfoViewController: NoPreviewTableViewController {
+class LoginListViewController: LoginAuthViewController {
     
     // MARK: UX
     
@@ -48,6 +48,7 @@ class LoginInfoViewController: NoPreviewTableViewController {
     private var searchLoginTimer: Timer?
 
     private let searchController = UISearchController(searchResultsController: nil)
+    private let emptyLoginView = LoginEmptyView()
     
     // MARK: Lifecycle
     
@@ -136,9 +137,11 @@ class LoginInfoViewController: NoPreviewTableViewController {
 
 // MARK: TableViewDataSource - TableViewDelegate
 
-extension LoginInfoViewController {
+extension LoginListViewController {
     
     override func numberOfSections(in tableView: UITableView) -> Int {
+        tableView.backgroundView = loginEntries.isEmpty ? emptyLoginView : nil
+
         return Section.allCases.count
     }
     
@@ -159,7 +162,7 @@ extension LoginInfoViewController {
     
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         if section == Section.savedLogins.rawValue {
-            return UX.headerHeight
+            return loginEntries.isEmpty ? .zero : UX.headerHeight
         }
         
         return .zero
@@ -291,7 +294,7 @@ extension LoginInfoViewController {
 
 // MARK: - Actions
 
-extension LoginInfoViewController {
+extension LoginListViewController {
     
     @objc func didToggleSaveLogins(_ toggle: UISwitch) {
         Preferences.General.saveLogins.value = toggle.isOn
@@ -308,7 +311,7 @@ extension LoginInfoViewController {
 
 // MARK: UISearchResultUpdating
 
-extension LoginInfoViewController: UISearchResultsUpdating {
+extension LoginListViewController: UISearchResultsUpdating {
     
     func updateSearchResults(for searchController: UISearchController) {
         guard let query = searchController.searchBar.text else { return }
@@ -334,7 +337,7 @@ extension LoginInfoViewController: UISearchResultsUpdating {
 
 // MARK: UISearchControllerDelegate
 
-extension LoginInfoViewController: UISearchControllerDelegate {
+extension LoginListViewController: UISearchControllerDelegate {
     
     func willPresentSearchController(_ searchController: UISearchController) {
         tableView.reloadData()

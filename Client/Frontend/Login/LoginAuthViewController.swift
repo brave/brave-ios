@@ -7,10 +7,9 @@ import Foundation
 import BraveShared
 import BraveUI
 
-class NoPreviewTableViewController: UITableViewController {
+class LoginAuthViewController: UITableViewController {
     
     private let requiresAuthentication: Bool
-    
     
     // MARK: Lifecycle
     
@@ -73,18 +72,18 @@ class NoPreviewTableViewController: UITableViewController {
         }
         
         let blurContentView = UIView(frame: view.frame)
-        view.addSubview(blurContentView)
-        blurContentView.snp.makeConstraints { $0.edges.equalToSuperview() }
-
-        // Snapshot View
         let snapshotImageView = UIImageView(image: snapshot)
-        blurContentView.addSubview(snapshotImageView)
-        snapshotImageView.snp.makeConstraints { $0.edges.equalToSuperview() }
-        
-        // Blur Visual Effect View
         let blurVisualEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .systemUltraThinMaterialDark))
 
-        blurContentView.addSubview(blurVisualEffectView)
+        view.addSubview(blurContentView)
+
+        blurContentView.do {
+            $0.snp.makeConstraints { $0.edges.equalToSuperview() }
+            $0.addSubview(snapshotImageView)
+            $0.addSubview(blurVisualEffectView)
+        }
+
+        snapshotImageView.snp.makeConstraints { $0.edges.equalToSuperview() }
         blurVisualEffectView.snp.makeConstraints { $0.edges.equalToSuperview() }
         
         view.layoutIfNeeded()
