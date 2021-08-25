@@ -1,24 +1,6 @@
 // The below is needed because the script may not be web-packed into a bundle so it may be missing the run-once code
 
-// MARK: - Include Once
-
-if (!window.__firefox__) {
-    window.__firefox__ = {};
-}
-
-if (!window.__firefox__.includeOnce) {
-    window.__firefox__ = {};
-    window.__firefox__.includeOnce = function(key, func) {
-        var keys = {};
-        if (!keys[key]) {
-            keys[key] = true;
-            func();
-        }
-    };
-}
-
-
-window.__firefox__.includeOnce("$<MediaBackgrounding>", function() {
+window.__firefox__.includeOnce("MediaBackgrounding", function() {
     var visibilityState_Get = Object.getOwnPropertyDescriptor(Document.prototype, "visibilityState").get;
     var visibilityState_Set = Object.getOwnPropertyDescriptor(Document.prototype, "visibilityState").set;
     Object.defineProperty(Document.prototype, 'visibilityState', {
