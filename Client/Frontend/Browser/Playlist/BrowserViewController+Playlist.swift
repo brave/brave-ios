@@ -221,8 +221,8 @@ extension BrowserViewController: PlaylistHelperDelegate {
         let shouldShowOnboarding = tab?.url?.isPlaylistSupportedSiteURL == true
         
         if shouldShowOnboarding {
-            if Preferences.Playlist.showAddToPlaylistURLBarOnboarding.value < 2 && shouldShowPlaylistOnboardingThisSession {
-                Preferences.Playlist.showAddToPlaylistURLBarOnboarding.value += 1
+            if Preferences.Playlist.addToPlaylistURLBarOnboardingCount.value < 2 && shouldShowPlaylistOnboardingThisSession {
+                Preferences.Playlist.addToPlaylistURLBarOnboardingCount.value += 1
                 showPlaylistPopover(tab: tab, state: .addToPlaylist)
             }
             
