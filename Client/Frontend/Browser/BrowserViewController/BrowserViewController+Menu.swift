@@ -16,7 +16,7 @@ extension BrowserViewController {
         VStack(spacing: 0) {
             VPNMenuButton(
                 vpnProductInfo: self.vpnProductInfo,
-                displayVPNDestination: { vc in
+                displayVPNDestination: { [unowned self] vc in
                     (self.presentedViewController as? MenuViewController)?
                         .pushInnerMenu(vc)
                 },
@@ -31,28 +31,28 @@ extension BrowserViewController {
     
     func destinationMenuSection(_ menuController: MenuViewController) -> some View {
         VStack(spacing: 0) {
-            MenuItemButton(icon: #imageLiteral(resourceName: "menu_bookmarks").template, title: Strings.bookmarksMenuItem) {
+            MenuItemButton(icon: #imageLiteral(resourceName: "menu_bookmarks").template, title: Strings.bookmarksMenuItem) { [unowned self, unowned menuController] in
                 let vc = BookmarksViewController(folder: Bookmarkv2.lastVisitedFolder(), isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing)
                 vc.toolbarUrlActionsDelegate = self
                 menuController.presentInnerMenu(vc)
             }
-            MenuItemButton(icon: #imageLiteral(resourceName: "menu-history").template, title: Strings.historyMenuItem) {
+            MenuItemButton(icon: #imageLiteral(resourceName: "menu-history").template, title: Strings.historyMenuItem) { [unowned self, unowned menuController] in
                 let vc = HistoryViewController(isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing)
                 vc.toolbarUrlActionsDelegate = self
                 menuController.pushInnerMenu(vc)
             }
-            MenuItemButton(icon: #imageLiteral(resourceName: "menu-downloads").template, title: Strings.downloadsMenuItem) {
+            MenuItemButton(icon: #imageLiteral(resourceName: "menu-downloads").template, title: Strings.downloadsMenuItem) { [unowned self, unowned menuController] in
                 let vc = DownloadsPanel(profile: self.profile)
                 menuController.pushInnerMenu(vc)
             }
-            MenuItemButton(icon: #imageLiteral(resourceName: "playlist_menu").template, title: Strings.playlistMenuItem) {
-                let playlistController = (UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController ?? PlaylistViewController(initialItem: nil, initialItemPlaybackOffset: 0.0)
+            MenuItemButton(icon: #imageLiteral(resourceName: "playlist_menu").template, title: Strings.playlistMenuItem) { [unowned self] in
+                let playlistController = (UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController ?? PlaylistViewController()
                 playlistController.modalPresentationStyle = .fullScreen
                 self.dismiss(animated: true) {
                     self.present(playlistController, animated: true)
                 }
             }
-            MenuItemButton(icon: #imageLiteral(resourceName: "menu-settings").template, title: Strings.settingsMenuItem) {
+            MenuItemButton(icon: #imageLiteral(resourceName: "menu-settings").template, title: Strings.settingsMenuItem) { [unowned self, unowned menuController] in
                 let vc = SettingsViewController(profile: self.profile, tabManager: self.tabManager, feedDataSource: self.feedDataSource, rewards: self.rewards, legacyWallet: self.legacyWallet)
                 vc.settingsDelegate = self
                 menuController.pushInnerMenu(vc)
@@ -124,12 +124,42 @@ extension BrowserViewController {
                 }
             }
         }
-    
+
+func activitiesMenuSection(_ menuController: MenuViewController, tabURL: URL, activities: [UIActivity]) -> some View {
+VStack(alignment: .leading, spacing: 0) {
+MenuTabDetailsView(tab: tabManager.selectedTab, url: tabURL)
+VStack(spacing: 0) {
+MenuItemButton(icon: #imageLiteral(resourceName: "nav-share").template, title: Strings.shareWithMenuItem) { [weak self] in
+guard let self = self else { return }
+
+self.dismiss(animated: true)
+self.tabToolbarDidPressShare()
+}
+MenuItemButton(icon: #imageLiteral(resourceName: "menu-add-bookmark").template, title: Strings.addToMenuItem) { [weak self] in
+guard let self = self else { return }
+
+self.dismiss(animated: true) {
+self.openAddBookmark()
+}
+}
+ForEach(activities, id: \.activityTitle) { activity in
+MenuItemButton(icon: activity.activityImage?.template ?? UIImage(), title: activity.activityTitle ?? "") { [weak self] in
+guard let self = self else { return }
+
+self.dismiss(animated: true) {
+activity.perform()
+}
+}
+}
+}
+}
+}
+
     struct MenuTabDetailsView: View {
         @SwiftUI.Environment(\.colorScheme) var colorScheme: ColorScheme
         weak var tab: Tab?
         var url: URL
-        
+
         var body: some View {
             VStack(alignment: .leading, spacing: 2) {
                 if let tab = tab {

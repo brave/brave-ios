@@ -80,6 +80,10 @@ class MenuViewController: UINavigationController, UIPopoverPresentationControlle
         fatalError()
     }
     
+    deinit {
+        print("MENU DEALLOCATED")
+    }
+    
     private var previousPreferredContentSize: CGSize?
     func presentInnerMenu(_ viewController: UIViewController,
                           expandToLongForm: Bool = true) {
