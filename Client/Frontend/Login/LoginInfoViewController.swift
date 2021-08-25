@@ -8,14 +8,24 @@ import Storage
 import Shared
 import SwiftKeychainWrapper
 
+private let log = Logger.browserLogger
+
 class LoginInfoViewController: LoginAuthViewController {
     
     // MARK: UX
     
     struct UX {
-        static let InfoRowHeight: CGFloat = 58
-        static let DeleteRowHeight: CGFloat = 44
-        static let SeparatorHeight: CGFloat = 84
+        static let informationRowHeight: CGFloat = 58
+        static let createdRowHeight: CGFloat = 66
+        static let standardItemHeight: CGFloat = 44
+    }
+    
+    // MARK: Section
+    
+    enum Section: Int, CaseIterable {
+        case information
+        case createdDate
+        case delete
     }
     
     // MARK: ItemType
@@ -24,12 +34,6 @@ class LoginInfoViewController: LoginAuthViewController {
         case websiteItem
         case usernameItem
         case passwordItem
-        case lastModifiedSeparator
-        case deleteItem
-
-        var indexPath: IndexPath {
-            return IndexPath(row: rawValue, section: 0)
-        }
     }
     
     // MARK: Private
@@ -50,6 +54,16 @@ class LoginInfoViewController: LoginAuthViewController {
                 tableView.reloadData()
             }
         }
+    }
+    
+    private var formattedCreationDate: String {
+        let date = Date(timeIntervalSince1970: TimeInterval(loginEntry.timeCreated / 1_000_000))
+        let dateFormatter = DateFormatter().then {
+            $0.locale = .current
+            $0.dateFormat = "EEEE, MMM d, yyyy"
+        }
+
+        return dateFormatter.string(from: date)
     }
     
     // MARK: Lifecycle
@@ -74,7 +88,10 @@ class LoginInfoViewController: LoginAuthViewController {
 
         tableView.do {
             $0.accessibilityIdentifier = "Login Details"
-            $0.tableFooterView = UIView()
+            $0.register(CenteredButtonCell.self)
+            $0.registerHeaderFooter(SettingsTableSectionHeaderFooterView.self)
+            $0.tableFooterView = SettingsTableSectionHeaderFooterView(
+                frame: CGRect(width: tableView.bounds.width, height: 1.0))
             $0.estimatedRowHeight = 44.0
         }
     }
@@ -89,29 +106,114 @@ class LoginInfoViewController: LoginAuthViewController {
 // MARK: TableViewDataSource - TableViewDelegate
 
 extension LoginInfoViewController {
-
+    
+    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let headerView = tableView.dequeueReusableHeaderFooter() as SettingsTableSectionHeaderFooterView
+        headerView.titleLabel.text = "LOGIN DETAILS"
+        return headerView
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return section == Section.information.rawValue ? UX.standardItemHeight : 1.0
+    }
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        return UITableViewCell()
+        switch indexPath.section {
+            case Section.information.rawValue:
+                switch indexPath.row {
+                    case InfoItem.websiteItem.rawValue:
+                        return UITableViewCell()
+                    case InfoItem.usernameItem.rawValue:
+                        return UITableViewCell()
+                    case InfoItem.passwordItem.rawValue:
+                        return UITableViewCell()
+                    default:
+                        fatalError("No cell available for index path: \(indexPath)")
+                }
+            case Section.createdDate.rawValue:
+                let cell = tableView.dequeueReusableCell(for: indexPath) as CenteredButtonCell
+            
+                cell.do {
+                    $0.textLabel?.text = "Created \(formattedCreationDate)"
+                    $0.tintColor = .secondaryBraveLabel
+                    $0.selectionStyle = .none
+                    $0.backgroundColor = .secondaryBraveBackground
+                }
+                return cell
+            case Section.delete.rawValue:
+                let cell = tableView.dequeueReusableCell(for: indexPath) as CenteredButtonCell
+                cell.do {
+                    $0.textLabel?.text = "Delete"
+                    $0.tintColor = .braveOrange
+                }
+                return cell
+            default:
+                fatalError("No cell available for index path: \(indexPath)")
+        }
+    }
+    
+    override func numberOfSections(in tableView: UITableView) -> Int {
+        return Section.allCases.count
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return InfoItem.allCases.count
-    }
-
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-
+        switch section {
+            case Section.information.rawValue:
+                return InfoItem.allCases.count
+            default:
+                return 1
+        }
     }
 
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 0
+        switch indexPath.section {
+            case Section.information.rawValue:
+                return UX.informationRowHeight
+            case Section.createdDate.rawValue:
+                return UX.createdRowHeight
+            case Section.delete.rawValue:
+                return UX.standardItemHeight
+            default:
+                return UITableView.automaticDimension
+        }
+    }
+
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        switch indexPath.section {
+            case Section.delete.rawValue:
+                deleteLogin()
+            default:
+                if !isEditingFieldData {
+                    showActionMenu(for: indexPath)
+                }
+        }
+        
+        tableView.deselectRow(at: indexPath, animated: true)
     }
 }
 
 // MARK: Actions
 
 extension LoginInfoViewController {
-    @objc func edit() {
+    @objc private func edit() {
         
+    }
+    
+    private func showActionMenu(for indexPath: IndexPath) {
+        if indexPath.section == Section.createdDate.rawValue || indexPath.row == Section.delete.rawValue {
+            return
+        }
+
+        guard let cell = tableView.cellForRow(at: indexPath) as? LoginInfoTableViewCell else {
+            return
+        }
+        cell.becomeFirstResponder()
+        
+        UIMenuController.shared.showMenu(from: tableView, rect: cell.frame)
+    }
+    
+    private func deleteLogin() {
+
     }
 }
 
@@ -128,3 +230,28 @@ extension LoginInfoViewController: KeyboardHelperDelegate {
         tableView.contentInset.bottom = 0
     }
 }
+
+// MARK: LoginInfoTableViewCellDelegate
+
+extension LoginInfoViewController: LoginInfoTableViewCellDelegate {
+    func shouldReturnAfterEditingTextField(_ cell: LoginInfoTableViewCell) -> Bool {
+        return false
+    }
+    
+    func canPerform(action: Selector, for cell: LoginInfoTableViewCell) -> Bool {
+        return false
+    }
+    
+    func didSelectOpenAndFill(_ cell: LoginInfoTableViewCell) {
+        
+    }
+    
+    func textFieldDidChange(_ cell: LoginInfoTableViewCell) {
+        
+    }
+    
+    func textFieldDidEndEditing(_ cell: LoginInfoTableViewCell) {
+        
+    }
+}
+

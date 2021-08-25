@@ -76,13 +76,6 @@ extension BrowserViewController {
                     menuController.pushInnerMenu(vc)
                 }
             }
-            MenuItemButton(icon: #imageLiteral(resourceName: "playlist_menu").template, title: Strings.playlistMenuItem) {
-                let playlistController = (UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController ?? PlaylistViewController()
-                playlistController.modalPresentationStyle = .fullScreen
-                self.dismiss(animated: true) {
-                    self.present(playlistController, animated: true)
-                }
-            }
             MenuItemButton(icon: #imageLiteral(resourceName: "menu-settings").template, title: Strings.settingsMenuItem) { [unowned self, unowned menuController] in
                 let vc = SettingsViewController(profile: self.profile,
                                                 tabManager: self.tabManager,

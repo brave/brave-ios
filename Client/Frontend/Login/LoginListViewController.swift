@@ -66,6 +66,32 @@ class LoginListViewController: LoginAuthViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        applyTheme()
+        
+        // Insert Done button if being presented outside of the Settings Navigation stack
+        if navigationController?.viewControllers.first === self {
+            navigationItem.leftBarButtonItem =
+                UIBarButtonItem(title: Strings.settingsSearchDoneButton, style: .done, target: self, action: #selector(dismissAnimated))
+        }
+
+        navigationItem.do {
+            $0.searchController = searchController
+            $0.hidesSearchBarWhenScrolling = false
+            self.navigationItem.rightBarButtonItem = editButtonItem
+        }
+        definesPresentationContext = true
+
+        tableView.tableFooterView = SettingsTableSectionHeaderFooterView(
+            frame: CGRect(width: tableView.bounds.width, height: UX.headerHeight))
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        tableView.endEditing(true)
+    }
+    
+    // MARK: Internal
+    
+    private func applyTheme() {
         navigationItem.title = "Logins & Passwords"
 
         tableView.do {
@@ -85,28 +111,9 @@ class LoginListViewController: LoginAuthViewController {
             $0.delegate = self
             $0.hidesNavigationBarDuringPresentation = true
         }
-
-        navigationItem.hidesSearchBarWhenScrolling = false
-        navigationItem.searchController = searchController
-        definesPresentationContext = true
-
-        // Insert Done button if being presented outside of the Settings Nav stack
-        if navigationController?.viewControllers.first === self {
-            navigationItem.leftBarButtonItem =
-                UIBarButtonItem(title: Strings.settingsSearchDoneButton, style: .done, target: self, action: #selector(dismissAnimated))
-        }
         
-        self.navigationItem.rightBarButtonItem = editButtonItem
-
-        let footer = SettingsTableSectionHeaderFooterView(frame: CGRect(width: tableView.bounds.width, height: UX.headerHeight))
-        tableView.tableFooterView = footer
+        navigationController?.view.backgroundColor = .secondaryBraveBackground
     }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        tableView.endEditing(true)
-    }
-    
-    // MARK: Internal
     
     private func fetchLoginInfo(_ searchQuery: String? = nil) {
         guard !isFetchingLoginEntries else {
@@ -243,7 +250,7 @@ extension LoginListViewController {
     
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let headerView = tableView.dequeueReusableHeaderFooter() as SettingsTableSectionHeaderFooterView
-        headerView.titleLabel.text = "Saved Logins"
+        headerView.titleLabel.text = "SAVED LOGINS"
         
         return headerView
     }
