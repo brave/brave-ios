@@ -218,12 +218,16 @@ extension BrowserViewController: PlaylistHelperDelegate {
     }
     
     func showPlaylistOnboarding(tab: Tab?) {
-        if Preferences.Playlist.showAddToPlaylistURLBarOnboarding.value < 2 && shouldShowPlaylistOnboardingThisSession {
-            Preferences.Playlist.showAddToPlaylistURLBarOnboarding.value += 1
-            showPlaylistPopover(tab: tab, state: .addToPlaylist)
-        }
+        let shouldShowOnboarding = tab?.url?.isPlaylistSupportedSiteURL == true
         
-        shouldShowPlaylistOnboardingThisSession = false
+        if shouldShowOnboarding {
+            if Preferences.Playlist.showAddToPlaylistURLBarOnboarding.value < 2 && shouldShowPlaylistOnboardingThisSession {
+                Preferences.Playlist.showAddToPlaylistURLBarOnboarding.value += 1
+                showPlaylistPopover(tab: tab, state: .addToPlaylist)
+            }
+            
+            shouldShowPlaylistOnboardingThisSession = false
+        }
     }
     
     func openPlaylist(item: PlaylistInfo?, playbackOffset: Double) {
