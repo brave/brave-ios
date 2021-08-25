@@ -124,37 +124,8 @@ extension BrowserViewController {
                 }
             }
         }
-
-func activitiesMenuSection(_ menuController: MenuViewController, tabURL: URL, activities: [UIActivity]) -> some View {
-VStack(alignment: .leading, spacing: 0) {
-MenuTabDetailsView(tab: tabManager.selectedTab, url: tabURL)
-VStack(spacing: 0) {
-MenuItemButton(icon: #imageLiteral(resourceName: "nav-share").template, title: Strings.shareWithMenuItem) { [weak self] in
-guard let self = self else { return }
-
-self.dismiss(animated: true)
-self.tabToolbarDidPressShare()
-}
-MenuItemButton(icon: #imageLiteral(resourceName: "menu-add-bookmark").template, title: Strings.addToMenuItem) { [weak self] in
-guard let self = self else { return }
-
-self.dismiss(animated: true) {
-self.openAddBookmark()
-}
-}
-ForEach(activities, id: \.activityTitle) { activity in
-MenuItemButton(icon: activity.activityImage?.template ?? UIImage(), title: activity.activityTitle ?? "") { [weak self] in
-guard let self = self else { return }
-
-self.dismiss(animated: true) {
-activity.perform()
-}
-}
-}
-}
-}
-}
-
+    }
+    
     struct MenuTabDetailsView: View {
         @SwiftUI.Environment(\.colorScheme) var colorScheme: ColorScheme
         weak var tab: Tab?
