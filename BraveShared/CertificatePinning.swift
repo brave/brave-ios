@@ -12,7 +12,6 @@ private let log = Logger.browserLogger
 public class PinningCertificateEvaluator: NSObject, URLSessionDelegate {
     struct ExcludedPinningHostUrls {
         static let urls = ["laptop-updates.brave.com",
-                           "laptop-updates.bravesoftware.com",
                            "updates.bravesoftware.com",
                            "updates-cdn.bravesoftware.com"]
     }
