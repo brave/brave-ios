@@ -127,7 +127,7 @@ extension BrowserViewController {
     
     struct MenuTabDetailsView: View {
         @SwiftUI.Environment(\.colorScheme) var colorScheme: ColorScheme
-        var tab: Tab?
+        weak var tab: Tab?
         var url: URL
         
         var body: some View {
