@@ -562,6 +562,10 @@ extension PlaylistCarplayController {
     }
 }
 
+// MPContentItem has no way of storing a thumbnail with it.
+// So to do that, we need associated values where we store its renderer.
+// The next time it attempts to retrieve its thumbnail, we return it from the renderer.
+// Otherwise it will constantly make requests for thumbnail :(
 extension MPContentItem {
     
     func loadThumbnail(for mediaItem: PlaylistInfo) {
