@@ -245,7 +245,7 @@ class PlaylistListViewController: UIViewController {
             lastPlayedTime > 0.0 &&
             lastPlayedTime < delegate?.currentPlaylistAsset?.duration.seconds ?? 0.0 &&
             Preferences.Playlist.playbackLeftOff.value {
-            self.playerView.seek(to: Preferences.Playlist.lastPlayedItemTime.value)
+            self.playerView.seek(to: lastPlayedTime)
         }
     }
     
