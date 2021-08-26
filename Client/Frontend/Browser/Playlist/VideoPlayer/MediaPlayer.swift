@@ -183,7 +183,7 @@ class MediaPlayer: NSObject {
     
     func stop() {
         if isPlaying {
-            previousRate = 0.0
+            previousRate = player.rate == 0.0 ? -1.0 : player.rate
             player.pause()
             player.replaceCurrentItem(with: nil)
             stopSubscriber.send(EventNotification(mediaPlayer: self, event: .stop))
@@ -297,7 +297,7 @@ class MediaPlayer: NSObject {
     }
     
     func setPlaybackRate(rate: Float) {
-        previousRate = player.rate
+        previousRate = player.rate == 0.0 ? -1.0 : player.rate
         player.rate = rate
         changePlaybackRateSubscriber.send(EventNotification(mediaPlayer: self,
                                                             event: .changePlaybackRate))

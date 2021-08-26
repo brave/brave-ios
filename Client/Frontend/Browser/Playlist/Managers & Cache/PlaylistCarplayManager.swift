@@ -35,7 +35,13 @@ class PlaylistCarplayManager: NSObject {
     
     private override init() {
         super.init()
-
+        
+        #if targetEnvironment(simulator)
+        // Force CarPlay on the simulator
+        // This is because we don't actually know if the CarPlay simulator is showing or not
+        // and we don't get notified when it disconnects :(
+        attemptInterfaceConnection(isCarPlayAvailable: true)
+        #else
         // We need to observe when CarPlay is connected
         // That way, we can  determine where the controls are coming from for Playlist
         // OR determine where the AudioSession is outputting
@@ -64,6 +70,7 @@ class PlaylistCarplayManager: NSObject {
         let hasCarPlay = AVAudioSession.sharedInstance().currentRoute.outputs.contains(where: { $0.portType == .carAudio })
         let hasCarPlayEndpoint = contentManager.context.endpointAvailable
         attemptInterfaceConnection(isCarPlayAvailable: hasCarPlay || hasCarPlayEndpoint)
+        #endif
     }
     
     func getCarPlayController() -> PlaylistCarplayController {

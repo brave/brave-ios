@@ -72,6 +72,10 @@ class PlaylistManager: NSObject {
         onDownloadStateChanged.eraseToAnyPublisher()
     }
     
+    var allItems: [PlaylistInfo] {
+        frc.fetchedObjects?.map({ PlaylistInfo(item: $0) }) ?? []
+    }
+    
     var numberOfAssets: Int {
         frc.fetchedObjects?.count ?? 0
     }

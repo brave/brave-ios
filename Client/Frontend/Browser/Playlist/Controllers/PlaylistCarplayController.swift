@@ -35,9 +35,7 @@ class PlaylistCarplayController: NSObject {
         observePlaylistStates()
         PlaylistManager.shared.reloadData()
         
-        playlistItemIds = (0..<PlaylistManager.shared.numberOfAssets).map({
-            PlaylistManager.shared.itemAtIndex($0)?.src ?? UUID().uuidString
-        })
+        playlistItemIds = PlaylistManager.shared.allItems.map { $0.pageSrc }
         
         contentManager.dataSource = self
         contentManager.delegate = self
@@ -46,15 +44,13 @@ class PlaylistCarplayController: NSObject {
             contentManager.beginUpdates()
             contentManager.endUpdates()
             contentManager.reloadData()
-        }
-        
-        // Workaround to see carplay NowPlaying on the simulator
-        #if targetEnvironment(simulator)
-        DispatchQueue.main.async {
+            
+            // Workaround to see carplay NowPlaying on the simulator
+            #if targetEnvironment(simulator)
             UIApplication.shared.endReceivingRemoteControlEvents()
             UIApplication.shared.beginReceivingRemoteControlEvents()
+            #endif
         }
-        #endif
     }
     
     func observePlayerStates() {
@@ -93,10 +89,7 @@ class PlaylistCarplayController: NSObject {
         let reloadData = { [weak self] in
             guard let self = self else { return }
             
-            self.playlistItemIds = (0..<PlaylistManager.shared.numberOfAssets).map({
-                PlaylistManager.shared.itemAtIndex($0)?.src ?? UUID().uuidString
-            })
-            
+            self.playlistItemIds = PlaylistManager.shared.allItems.map { $0.pageSrc }
             self.contentManager.beginUpdates()
             self.contentManager.endUpdates()
             
@@ -149,7 +142,7 @@ extension PlaylistCarplayController: MPPlayableContentDelegate {
                     return
                 }
                 
-                self.contentManager.nowPlayingIdentifiers = [mediaItem.src]
+                self.contentManager.nowPlayingIdentifiers = [mediaItem.pageSrc]
                 self.playItem(item: mediaItem) { [weak self] error in
                     PlaylistCarplayManager.shared.currentPlaylistItem = nil
                     
@@ -237,7 +230,7 @@ extension PlaylistCarplayController: MPPlayableContentDataSource {
                     return
                 }
 
-                let cacheState = PlaylistManager.shared.state(for: mediaItem.src)
+                let cacheState = PlaylistManager.shared.state(for: mediaItem.pageSrc)
                 item.title = mediaItem.name
                 item.subtitle = mediaItem.pageSrc
                 item.isPlayable = true
@@ -408,8 +401,8 @@ extension PlaylistCarplayController {
                 
                 // Track-bar
                 if autoPlayEnabled {
-                    resolver(.success(Void()))
                     self.play() // Play the new item
+                    resolver(.success(Void()))
                 }
             }).store(in: &self.assetLoadingStateObservers)
         }.eraseToAnyPublisher()
