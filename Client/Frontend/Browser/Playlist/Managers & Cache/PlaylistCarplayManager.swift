@@ -8,6 +8,7 @@ import Combine
 import MediaPlayer
 import Shared
 import Data
+import BraveShared
 
 private let log = Logger.browserLogger
 
@@ -75,6 +76,16 @@ class PlaylistCarplayManager: NSObject {
     }
     
     func getPlaylistController(initialItem: PlaylistInfo?, initialItemPlaybackOffset: Double) -> PlaylistViewController {
+        
+        // If background playback is enabled, tabs will continue to play media
+        // Even if another controller is presented and even when PIP is enabled in playlist.
+        // Therefore we need to stop the page/tab from playing when using playlist.
+        if Preferences.General.mediaAutoBackgrounding.value {
+            browserController?.tabManager.allTabs.forEach({
+                PlaylistHelper.stopPlayback(tab: $0)
+            })
+        }
+        
         // If there is no media player, create one,
         // pass it to the play-list controller
         let mediaPlayer = self.mediaPlayer ?? MediaPlayer()
