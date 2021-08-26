@@ -214,7 +214,7 @@ extension PlaylistCarplayController: MPPlayableContentDataSource {
         // Tab Section
         if indexPath.count == 1 {
             let item = MPContentItem(identifier: "BravePlaylist")
-            item.title = "Brave Playlist"
+            item.title = Strings.PlayList.playlistCarplayTitle
             item.isContainer = true
             item.isPlayable = false
             let imageIcon = #imageLiteral(resourceName: "settings-shields")
