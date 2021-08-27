@@ -6,10 +6,10 @@
 import UIKit
 import SnapKit
 import Storage
+import BraveUI
 
 protocol LoginInfoTableViewCellDelegate: AnyObject {
     /// TextField Related Actions/ Delegates
-    func textFieldDidChange(_ cell: LoginInfoTableViewCell)
     func textFieldDidEndEditing(_ cell: LoginInfoTableViewCell)
     func shouldReturnAfterEditingTextField(_ cell: LoginInfoTableViewCell) -> Bool
     /// Table Row Commands Related Actions (Copy - Open)
@@ -17,7 +17,7 @@ protocol LoginInfoTableViewCellDelegate: AnyObject {
     func didSelectOpenAndFill(_ cell: LoginInfoTableViewCell)
 }
 
-class LoginInfoTableViewCell: UITableViewCell {
+class LoginInfoTableViewCell: UITableViewCell, TableViewReusable {
     
     // MARK: UX
     
@@ -49,7 +49,8 @@ class LoginInfoTableViewCell: UITableViewCell {
             guard isEditingFieldData != oldValue else { return }
             descriptionTextField.isUserInteractionEnabled = isEditingFieldData
             
-            highlightedLabel.textColor = isEditingFieldData ? .secondaryBraveLabel : .bravePrimary
+            highlightedLabel.textColor = isEditingFieldData ? .bravePrimary : .secondaryBraveLabel
+            descriptionTextField.textColor = isEditingFieldData ? .bravePrimary : .braveLabel
         }
     }
     
@@ -105,13 +106,12 @@ class LoginInfoTableViewCell: UITableViewCell {
     // MARK: Internal
     
     private func applyTheme() {
-        textLabel?.textColor = .bravePrimary
-        detailTextLabel?.textColor = .bravePrimary
         backgroundColor = .secondaryBraveBackground
         selectionStyle = .none
+        separatorInset = .zero
         
         descriptionTextField.do {
-            $0.textColor = .bravePrimary
+            $0.textColor = .braveLabel
             $0.font = .preferredFont(forTextStyle: .callout)
             $0.isUserInteractionEnabled = false
             $0.autocapitalizationType = .none
@@ -120,12 +120,11 @@ class LoginInfoTableViewCell: UITableViewCell {
             $0.adjustsFontSizeToFitWidth = false
             $0.delegate = self
             $0.isAccessibilityElement = true
-            $0.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
         }
         
         highlightedLabel.do {
             $0.font = .preferredFont(forTextStyle: .footnote)
-            $0.textColor = .braveInfoLabel
+            $0.textColor = .secondaryBraveLabel
             $0.numberOfLines = 1
         }
     }
@@ -154,11 +153,6 @@ class LoginInfoTableViewCell: UITableViewCell {
         }
 
         setNeedsUpdateConstraints()
-    }
-    
-    func updateCellWithLogin(_ login: Login) {
-        descriptionTextField.text = login.hostname
-        highlightedLabel.text = login.username
     }
 }
 
@@ -205,9 +199,5 @@ extension LoginInfoTableViewCell: UITextFieldDelegate {
         }
         
         delegate?.textFieldDidEndEditing(self)
-    }
-    
-    @objc func textFieldDidChange(_ textField: UITextField) {
-        delegate?.textFieldDidChange(self)
     }
 }

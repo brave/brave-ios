@@ -89,17 +89,12 @@ class LoginInfoViewController: LoginAuthViewController {
         tableView.do {
             $0.accessibilityIdentifier = "Login Details"
             $0.register(CenteredButtonCell.self)
+            $0.register(LoginInfoTableViewCell.self)
             $0.registerHeaderFooter(SettingsTableSectionHeaderFooterView.self)
             $0.tableFooterView = SettingsTableSectionHeaderFooterView(
                 frame: CGRect(width: tableView.bounds.width, height: 1.0))
             $0.estimatedRowHeight = 44.0
         }
-    }
-
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-
-        KeyboardHelper.defaultHelper.addDelegate(self)
     }
 }
 
@@ -122,11 +117,56 @@ extension LoginInfoViewController {
             case Section.information.rawValue:
                 switch indexPath.row {
                     case InfoItem.websiteItem.rawValue:
-                        return UITableViewCell()
+                        let cell = tableView.dequeueReusableCell(for: indexPath) as LoginInfoTableViewCell
+                        
+                        cell.do {
+                            $0.delegate = self
+                            $0.highlightedLabel.text = "Website"
+                            $0.descriptionTextField.text = loginEntry.hostname
+                            $0.isEditingFieldData = false
+                            $0.tag = InfoItem.websiteItem.rawValue
+                        }
+                        
+                        websiteField = cell.descriptionTextField
+                        websiteField?.accessibilityIdentifier = "websiteField"
+                        
+                        cell.contentView.alpha = isEditingFieldData ? 0.5 : 1.0
+                        
+                        return cell
                     case InfoItem.usernameItem.rawValue:
-                        return UITableViewCell()
+                        let cell = tableView.dequeueReusableCell(for: indexPath) as LoginInfoTableViewCell
+                      
+                        cell.do {
+                            $0.delegate = self
+                            $0.highlightedLabel.text = "Username"
+                            $0.descriptionTextField.text = loginEntry.username
+                            $0.descriptionTextField.keyboardType = .emailAddress
+                            $0.descriptionTextField.returnKeyType = .next
+                            $0.isEditingFieldData = isEditingFieldData
+                            $0.tag = InfoItem.usernameItem.rawValue
+                        }
+                        
+                        usernameField = cell.descriptionTextField
+                        usernameField?.accessibilityIdentifier = "usernameField"
+                        
+                        return cell
                     case InfoItem.passwordItem.rawValue:
-                        return UITableViewCell()
+                        let cell = tableView.dequeueReusableCell(for: indexPath) as LoginInfoTableViewCell
+                      
+                        cell.do {
+                            $0.delegate = self
+                            $0.highlightedLabel.text = "Password"
+                            $0.descriptionTextField.text = loginEntry.password
+                            $0.descriptionTextField.returnKeyType = .done
+                            $0.displayDescriptionAsPassword = true
+                            $0.isEditingFieldData = isEditingFieldData
+                            $0.tag = InfoItem.passwordItem.rawValue
+                        }
+                        
+                        passwordField = cell.descriptionTextField
+                        passwordField?.accessibilityIdentifier = "passwordField"
+                        
+                        return cell
                     default:
                         fatalError("No cell available for index path: \(indexPath)")
                 }
@@ -195,8 +235,14 @@ extension LoginInfoViewController {
 // MARK: Actions
 
 extension LoginInfoViewController {
+    
     @objc private func edit() {
+        isEditingFieldData = true
         
+        navigationItem.rightBarButtonItem =
+            UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(doneEditing))
+
+        cellForItem(InfoItem.usernameItem)?.descriptionTextField.becomeFirstResponder()
     }
     
     private func showActionMenu(for indexPath: IndexPath) {
@@ -212,22 +258,24 @@ extension LoginInfoViewController {
         UIMenuController.shared.showMenu(from: tableView, rect: cell.frame)
     }
     
+    @objc private func doneEditing() {
+        isEditingFieldData = false
+        navigationItem.rightBarButtonItem =
+            UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(edit))
+        
+        tableView.reloadData()
+    }
+    
     private func deleteLogin() {
 
     }
-}
-
-// MARK: KeyboardHelperDelegate
-
-extension LoginInfoViewController: KeyboardHelperDelegate {
-
-    func keyboardHelper(_ keyboardHelper: KeyboardHelper, keyboardWillShowWithState state: KeyboardState) {
-        let coveredHeight = state.intersectionHeightForView(tableView)
-        tableView.contentInset.bottom = coveredHeight
-    }
-
-    func keyboardHelper(_ keyboardHelper: KeyboardHelper, keyboardWillHideWithState state: KeyboardState) {
-        tableView.contentInset.bottom = 0
+    
+    private func cellForItem(_ infoItem: InfoItem) -> LoginInfoTableViewCell? {
+        guard let cell = tableView.cellForRow(at: IndexPath(row: infoItem.rawValue, section: 0)) as? LoginInfoTableViewCell else {
+            return nil
+        }
+    
+        return cell
     }
 }
 
@@ -235,7 +283,16 @@ extension LoginInfoViewController: KeyboardHelperDelegate {
 
 extension LoginInfoViewController: LoginInfoTableViewCellDelegate {
     func shouldReturnAfterEditingTextField(_ cell: LoginInfoTableViewCell) -> Bool {
-        return false
+        switch cell.tag {
+            case InfoItem.usernameItem.rawValue:
+                cellForItem(InfoItem.passwordItem)?.descriptionTextField.becomeFirstResponder()
+                return false
+            case InfoItem.passwordItem.rawValue:
+                doneEditing()
+                return true
+            default:
+                return true
+        }
     }
     
     func canPerform(action: Selector, for cell: LoginInfoTableViewCell) -> Bool {
@@ -246,12 +303,10 @@ extension LoginInfoViewController: LoginInfoTableViewCellDelegate {
         
     }
     
-    func textFieldDidChange(_ cell: LoginInfoTableViewCell) {
-        
-    }
-    
     func textFieldDidEndEditing(_ cell: LoginInfoTableViewCell) {
-        
+        if cell.tag == InfoItem.passwordItem.rawValue {
+            cell.displayDescriptionAsPassword = true
+        }
     }
 }
 
