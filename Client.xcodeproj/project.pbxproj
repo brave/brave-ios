@@ -689,6 +689,8 @@
 		4481F24626CBF9C900658EAC /* DSTRootCA_X3.cer in Resources */ = {isa = PBXBuildFile; fileRef = 4481F24526CBF9C900658EAC /* DSTRootCA_X3.cer */; };
 		448DC7D6268A5C3E00F4795C /* BraveSearchDebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 448DC7D5268A5C3E00F4795C /* BraveSearchDebugMenu.swift */; };
 		448DC7E4268A6A2200F4795C /* BraveSearchLogEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 448DC7E3268A6A2200F4795C /* BraveSearchLogEntry.swift */; };
+		449AC16226D8FE5B00A53F33 /* BraveTalkScriptHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 449AC16126D8FE5B00A53F33 /* BraveTalkScriptHandler.swift */; };
+		449AC16F26D9008D00A53F33 /* BraveTalkHelper.js in Resources */ = {isa = PBXBuildFile; fileRef = 449AC16E26D9008D00A53F33 /* BraveTalkHelper.js */; };
 		44A58CC82693A309005C0879 /* ActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44A58CC72693A309005C0879 /* ActivityView.swift */; };
 		44A58CEA26947100005C0879 /* BraveSearchDebugMenuFixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44A58CE926947100005C0879 /* BraveSearchDebugMenuFixture.swift */; };
 		44C42CF6268378B1009572D7 /* BrowserIntents.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = 44C42CF9268378B1009572D7 /* BrowserIntents.intentdefinition */; };
@@ -2237,6 +2239,8 @@
 		4484BAF12654227A0099A205 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		448DC7D5268A5C3E00F4795C /* BraveSearchDebugMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveSearchDebugMenu.swift; sourceTree = "<group>"; };
 		448DC7E3268A6A2200F4795C /* BraveSearchLogEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveSearchLogEntry.swift; sourceTree = "<group>"; };
+		449AC16126D8FE5B00A53F33 /* BraveTalkScriptHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveTalkScriptHandler.swift; sourceTree = "<group>"; };
+		449AC16E26D9008D00A53F33 /* BraveTalkHelper.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = BraveTalkHelper.js; sourceTree = "<group>"; };
 		44A58CC72693A309005C0879 /* ActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityView.swift; sourceTree = "<group>"; };
 		44A58CE926947100005C0879 /* BraveSearchDebugMenuFixture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveSearchDebugMenuFixture.swift; sourceTree = "<group>"; };
 		44C42CF8268378B1009572D7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.intentdefinition; name = Base; path = Base.lproj/BrowserIntents.intentdefinition; sourceTree = "<group>"; };
@@ -5098,6 +5102,7 @@
 				D0FCF7E91FE44DA2004A7995 /* MainFrame */,
 				595E0EDA21CAD97C00813D49 /* CookieControl.js */,
 				0AE50853261C63D70099C6A3 /* BraveServicesHelper.js */,
+				449AC16E26D9008D00A53F33 /* BraveTalkHelper.js */,
 				F930CDAB227000F200A23FE1 /* U2F.js */,
 				F99505FE22937E3900CC6543 /* U2F-low-level.js */,
 				5E3477E822D7771700B0D5F8 /* ResourceDownloader.js */,
@@ -5295,6 +5300,7 @@
 				4452CAEF255412800053EFE6 /* DefaultBrowserIntroCalloutViewController.swift */,
 				0A0A5ED025B1F080007B3E74 /* DefaultBrowserIntroManager.swift */,
 				0AE50869261C6F2E0099C6A3 /* BraveServicesScriptHandler.swift */,
+				449AC16126D8FE5B00A53F33 /* BraveTalkScriptHandler.swift */,
 			);
 			indentWidth = 4;
 			path = Browser;
@@ -6672,6 +6678,7 @@
 				C6345ECB2113B3A000CFB983 /* SearchPlugins in Resources */,
 				4481F24326CBD42C00658EAC /* GlobalSignRootCA_R3.cer in Resources */,
 				F930CDAC227000F200A23FE1 /* U2F.js in Resources */,
+				449AC16F26D9008D00A53F33 /* BraveTalkHelper.js in Resources */,
 				4422D55921BFFB7F00BF1855 /* unicode.py in Resources */,
 				7B2142FE1E5E055000CDD3FC /* InfoPlist.strings in Resources */,
 				E69922171B94E3EF007C480D /* Licenses.html in Resources */,
@@ -7541,6 +7548,7 @@
 				27A1ABF42485567900344503 /* BraveNewsSectionProvider.swift in Sources */,
 				E68AEDB01B18F81A00133D99 /* SwipeAnimator.swift in Sources */,
 				0AEFB8532226D7C5007AF600 /* AdblockResourcesMappings.swift in Sources */,
+				449AC16226D8FE5B00A53F33 /* BraveTalkScriptHandler.swift in Sources */,
 				0A66550A23E9D9750047EF2A /* UserAgent.swift in Sources */,
 				3BF56D271CDBBE1F00AC4D75 /* SimpleToast.swift in Sources */,
 				D31F95E91AC226CB005C9F3B /* ScreenshotHelper.swift in Sources */,

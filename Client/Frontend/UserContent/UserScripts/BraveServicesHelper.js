@@ -47,14 +47,3 @@ writable: false,
     }
 }
 });
-
-Object.defineProperty(window, 'chrome', {
-enumerable: false,
-configurable: true,
-writable: false,
-    value: {
-    braveRequestAdsEnabled() {
-        return window.__firefox__.$<brave-services-helper>.sendMessage(3);
-    }
-}
-});

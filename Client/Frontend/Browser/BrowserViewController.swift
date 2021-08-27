@@ -2034,6 +2034,10 @@ extension BrowserViewController: TabDelegate {
                                                         profile: profile,
                                                         rewards: rewards),
                              name: BraveServicesScriptHandler.name(), sandboxed: false)
+        
+        tab.addContentScript(BraveTalkScriptHandler(tab: tab,
+                                                        rewards: rewards),
+                             name: BraveTalkScriptHandler.name(), sandboxed: false)
 
         if YubiKitDeviceCapabilities.supportsMFIAccessoryKey {
             tab.addContentScript(U2FExtensions(tab: tab), name: U2FExtensions.name(), sandboxed: false)

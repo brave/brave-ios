@@ -14,6 +14,7 @@ enum DomainUserScript: CaseIterable {
     case youtube
     case archive
     case braveServices
+    case braveTalk
     
     static func get(for domain: String) -> Self? {
         var found: DomainUserScript?
@@ -34,7 +35,7 @@ enum DomainUserScript: CaseIterable {
         switch self {
         case .youtube:
             return .AdblockAndTp
-        case .archive, .braveServices:
+        case .archive, .braveServices, .braveTalk:
             return nil
         }
     }
@@ -46,6 +47,8 @@ enum DomainUserScript: CaseIterable {
         case .archive:
             return .init(arrayLiteral: "archive.is", "archive.today", "archive.vn", "archive.fo")
         case .braveServices:
+            return .init(arrayLiteral: "brave.com", "bravesoftware.com")
+        case .braveTalk:
             return .init(arrayLiteral: "brave.com", "bravesoftware.com", "iccub.github.io")
         }
     }
@@ -58,6 +61,8 @@ enum DomainUserScript: CaseIterable {
             return "ArchiveIsCompat"
         case .braveServices:
             return "BraveServicesHelper"
+        case .braveTalk:
+            return "BraveTalkHelper"
         }
     }
     
@@ -90,6 +95,18 @@ enum DomainUserScript: CaseIterable {
             alteredSource = alteredSource
                 .replacingOccurrences(of: "$<brave-services-helper>",
                                       with: "BSH\(UserScriptManager.messageHandlerTokenString)",
+                                      options: .literal)
+                .replacingOccurrences(of: "$<security_token>", with: securityToken)
+                
+            return WKUserScript(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+        case .braveTalk:
+            var alteredSource = source
+            
+            let securityToken = UserScriptManager.securityToken.uuidString
+                .replacingOccurrences(of: "-", with: "", options: .literal)
+            alteredSource = alteredSource
+                .replacingOccurrences(of: "$<brave-talk-helper>",
+                                      with: "BT\(UserScriptManager.messageHandlerTokenString)",
                                       options: .literal)
                 .replacingOccurrences(of: "$<security_token>", with: securityToken)
                 
