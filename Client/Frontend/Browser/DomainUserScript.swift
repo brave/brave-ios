@@ -16,11 +16,23 @@ enum DomainUserScript: CaseIterable {
     case braveServices
     case braveTalk
     
-    static func get(for domain: String) -> Self? {
+    static func get(for url: URL) -> Self? {
         var found: DomainUserScript?
         
+        // First we look for exact domain match, if no matches we look for base domain matches.
+        guard let host = url.host else { return nil }
         allCases.forEach {
-            if $0.associatedDomains.contains(domain) {
+            if $0.associatedDomains.contains(host) {
+                found = $0
+                return
+            }
+        }
+        
+        if found != nil { return found }
+        
+        guard let baseDomain = url.baseDomain else { return nil }
+        allCases.forEach {
+            if $0.associatedDomains.contains(baseDomain) {
                 found = $0
                 return
             }
@@ -47,9 +59,18 @@ enum DomainUserScript: CaseIterable {
         case .archive:
             return .init(arrayLiteral: "archive.is", "archive.today", "archive.vn", "archive.fo")
         case .braveServices:
-            return .init(arrayLiteral: "brave.com", "bravesoftware.com")
+            return .init(arrayLiteral: "search.brave.com", "search-dev.brave.com")
         case .braveTalk:
             return .init(arrayLiteral: "brave.com", "bravesoftware.com", "iccub.github.io")
+        }
+    }
+    
+    var mustMatchExactHost: Bool {
+        switch self {
+        case .youtube, .archive:
+            return false
+        case .braveServices, .braveTalk:
+            return true
         }
     }
     
