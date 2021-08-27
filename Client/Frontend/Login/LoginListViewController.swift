@@ -282,20 +282,34 @@ extension LoginListViewController {
         if editingStyle == .delete {
             guard let loginItem = loginEntries[safe: indexPath.row] else { return }
             
-            let success = profile.logins.removeLoginByGUID(loginItem.guid)
-            
-            success.upon { result in
-                if result.isSuccess {
-                    self.fetchLoginInfo()
-                } else {
-                    log.error("Error while deleting a login entry")
-                }
-            }
+            showDeleteLoginWarning(with: loginItem)
         }
     }
     
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         return indexPath.section == Section.savedLogins.rawValue
+    }
+    
+    private func showDeleteLoginWarning(with loginItem: Login) {
+        let alert = UIAlertController(
+            title: Strings.deleteLoginAlertTitle,
+            message: "Saved Login will be removed permanently.",
+            preferredStyle: .alert)
+        
+        alert.addAction(UIAlertAction(title: Strings.deleteLoginButtonTitle, style: .destructive, handler: { [weak self] _ in
+            let success = self?.profile.logins.removeLoginByGUID(loginItem.guid)
+            
+            success?.upon { result in
+                if result.isSuccess {
+                    self?.fetchLoginInfo()
+                } else {
+                    log.error("Error while deleting a login entry")
+                }
+            }
+        }))
+        
+        alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil))
+        present(alert, animated: true, completion: nil)
     }
 }
 
@@ -328,7 +342,6 @@ extension LoginListViewController: UISearchResultsUpdating {
             searchLoginTimer = nil
         }
         
-        // Reschedule the search result fetch: in 0.05 second bot to overload the database fetch
         searchLoginTimer =
             Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(fetchSearchResults(timer:)), userInfo: query, repeats: false)
     }

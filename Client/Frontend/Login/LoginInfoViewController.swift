@@ -109,7 +109,14 @@ extension LoginInfoViewController {
     }
     
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return section == Section.information.rawValue ? UX.standardItemHeight : 1.0
+        switch section {
+            case Section.delete.rawValue:
+                return 1
+            case Section.information.rawValue:
+                return UX.standardItemHeight
+            default:
+                return 0
+        }
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -246,7 +253,7 @@ extension LoginInfoViewController {
     }
     
     private func showActionMenu(for indexPath: IndexPath) {
-        if indexPath.section == Section.createdDate.rawValue || indexPath.row == Section.delete.rawValue {
+        if indexPath.section == Section.createdDate.rawValue || indexPath.section == Section.delete.rawValue {
             return
         }
 
@@ -267,7 +274,25 @@ extension LoginInfoViewController {
     }
     
     private func deleteLogin() {
-
+        let alert = UIAlertController(
+            title: Strings.deleteLoginAlertTitle,
+            message: "Saved Login will be removed permanently.",
+            preferredStyle: .alert)
+        
+        alert.addAction(UIAlertAction(title: Strings.deleteLoginButtonTitle, style: .destructive, handler: { [unowned self] _ in
+            let success = self.profile.logins.removeLoginByGUID(self.loginEntry.guid)
+            
+            success.upon {result in
+                if result.isSuccess {
+                    //TODO:
+                } else {
+                    log.error("Error while deleting a login entry")
+                }
+            }
+        }))
+        
+        alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil))
+        present(alert, animated: true, completion: nil)
     }
     
     private func cellForItem(_ infoItem: InfoItem) -> LoginInfoTableViewCell? {
@@ -296,7 +321,19 @@ extension LoginInfoViewController: LoginInfoTableViewCellDelegate {
     }
     
     func canPerform(action: Selector, for cell: LoginInfoTableViewCell) -> Bool {
-        return false
+        switch cell.tag {
+            case InfoItem.websiteItem.rawValue:
+                return action == MenuHelper.selectorCopy || action == MenuHelper.selectorOpenAndFill
+        case InfoItem.usernameItem.rawValue:
+            return action == MenuHelper.selectorCopy
+        case InfoItem.passwordItem.rawValue:
+            let hideRevealPasswordOption = cell.descriptionTextField.isSecureTextEntry
+                ? (action == MenuHelper.selectorReveal)
+                : (action == MenuHelper.selectorHide)
+            return action == MenuHelper.selectorCopy || hideRevealPasswordOption
+        default:
+            return false
+        }
     }
     
     func didSelectOpenAndFill(_ cell: LoginInfoTableViewCell) {
