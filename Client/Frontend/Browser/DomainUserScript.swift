@@ -61,7 +61,11 @@ enum DomainUserScript: CaseIterable {
         case .braveServices:
             return .init(arrayLiteral: "search.brave.com", "search-dev.brave.com")
         case .braveTalk:
-            return .init(arrayLiteral: "brave.com", "bravesoftware.com", "iccub.github.io")
+            return .init(arrayLiteral: "talk.brave.com", "beta.talk.brave.com",
+                         "https://talk.bravesoftware.com", "beta.talk.bravesoftware.com",
+                         "dev.talk.brave.software", "beta.talk.brave.software",
+                         // TODO: Remove before merge
+                         "iccub.github.io")
         }
     }
     
