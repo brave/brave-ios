@@ -33,8 +33,13 @@ extension BrowserViewController: PlaylistHelperDelegate {
                 toolbar?.menuButton.removeBadge(.playlist, animated: true)
             case .newItem:
                 playlistButton.buttonState = shouldShowPlaylistURLBarButton ? .addToPlaylist : .none
-                topToolbar.menuButton.addBadge(.playlist, animated: true)
-                toolbar?.menuButton.addBadge(.playlist, animated: true)
+                if Preferences.Playlist.enablePlaylistMenuBadge.value {
+                    topToolbar.menuButton.addBadge(.playlist, animated: true)
+                    toolbar?.menuButton.addBadge(.playlist, animated: true)
+                } else {
+                    topToolbar.menuButton.removeBadge(.playlist, animated: true)
+                    toolbar?.menuButton.removeBadge(.playlist, animated: true)
+                }
             case .existingItem:
                 playlistButton.buttonState = shouldShowPlaylistURLBarButton ? .addedToPlaylist : .none
                 topToolbar.menuButton.removeBadge(.playlist, animated: true)

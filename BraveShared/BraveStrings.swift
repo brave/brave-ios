@@ -1413,6 +1413,18 @@ extension Strings {
                               bundle: .braveShared,
                               value: "Brave Playlist",
                               comment: "The title of the playlist when in Carplay mode")
+        
+        public static let menuBadgeOptionTitle =
+            NSLocalizedString("playlist.",
+                              bundle: .braveShared,
+                              value: "Show Menu Notification Badge",
+                              comment: "Title for playlist menu badge option")
+        
+        public static let menuBadgeOptionFooterText =
+            NSLocalizedString("playlist.",
+                              bundle: .braveShared,
+                              value: "When enabled, a badge will be displayed on the main menu icon, indicating media on the page may be added to Brave Playlist.",
+                              comment: "Description footer for playlist menu badge option")
     }
 }
 

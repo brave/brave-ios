@@ -269,6 +269,9 @@ extension Preferences {
         /// The option to disable long-press-to-add-to-playlist gesture.
         static let enableLongPressAddToPlaylist =
             Option<Bool>(key: "playlist.longPressAddToPlaylist", default: true)
+        /// The option to enable or disable the 3-dot menu badge for playlist
+        static let enablePlaylistMenuBadge =
+            Option<Bool>(key: "playlist.enablePlaylistMenuBadge", default: true)
     }
 }
 
