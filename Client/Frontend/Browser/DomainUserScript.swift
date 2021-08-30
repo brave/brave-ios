@@ -52,7 +52,7 @@ enum DomainUserScript: CaseIterable {
         }
     }
     
-    private var associatedDomains: Set<String> {
+    var associatedDomains: Set<String> {
         switch self {
         case .youtube:
             return .init(arrayLiteral: "youtube.com")
@@ -62,7 +62,7 @@ enum DomainUserScript: CaseIterable {
             return .init(arrayLiteral: "search.brave.com", "search-dev.brave.com")
         case .braveTalk:
             return .init(arrayLiteral: "talk.brave.com", "beta.talk.brave.com",
-                         "https://talk.bravesoftware.com", "beta.talk.bravesoftware.com",
+                         "talk.bravesoftware.com", "beta.talk.bravesoftware.com",
                          "dev.talk.brave.software", "beta.talk.brave.software",
                          // TODO: Remove before merge
                          "iccub.github.io")

@@ -30,14 +30,10 @@ class BraveTalkScriptHandler: TabContentScript {
     
     func userContentController(_ userContentController: WKUserContentController,
                                didReceiveScriptMessage message: WKScriptMessage) {
-        let allowedBaseDomains = ["brave.com",
-                                  "brave.software",
-                                  "bravesoftware.com",
-                                  // TODO: REMOVE
-                                  "iccub.github.io"]
+        let allowedHosts = DomainUserScript.braveTalk.associatedDomains
         
-        guard let requestHost = message.frameInfo.request.url?.baseDomain,
-              allowedBaseDomains.contains(requestHost),
+        guard let requestHost = message.frameInfo.request.url?.host,
+              allowedHosts.contains(requestHost),
               message.frameInfo.isMainFrame else {
             log.error("Backup search request called from disallowed host")
             return
