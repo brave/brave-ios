@@ -62,12 +62,12 @@ class LoginsHelper: TabContentScript {
         if let url = message.frameInfo.request.url {
             // Since responses go to the main frame, make sure we only listen for main frame requests
             // to avoid XSS attacks.
-            if message.frameInfo.isMainFrame && type == "request" {
+            if type == "request" {
                 res["username"] = "" as AnyObject?
                 res["password"] = "" as AnyObject?
                 if let login = Login.fromScript(url, script: res),
                    let requestId = res["requestId"] as? String {
-                    requestLogins(login, requestId: requestId)
+                    requestLogins(login, requestId: requestId, frameInfo: message.frameInfo)
                 }
             } else if type == "submit" {
                 if Preferences.General.saveLogins.value {
@@ -181,14 +181,31 @@ class LoginsHelper: TabContentScript {
         tab?.addSnackbar(snackBar!)
     }
 
-    fileprivate func requestLogins(_ login: LoginData, requestId: String) {
+    fileprivate func requestLogins(_ login: LoginData, requestId: String, frameInfo: WKFrameInfo) {
         profile.logins.getLoginsForProtectionSpace(login.protectionSpace).uponQueue(.main) { res in
             var jsonObj = [String: Any]()
             if let cursor = res.successValue {
                 log.debug("Found \(cursor.count) logins.")
                 jsonObj["requestId"] = requestId
                 jsonObj["name"] = "RemoteLogins:loginsFound"
-                jsonObj["logins"] = cursor.map { $0!.toDict() }
+                jsonObj["logins"] = cursor.compactMap { loginData -> [String: String]? in
+                    if frameInfo.isMainFrame {
+                        return loginData?.toDict()
+                    }
+                    
+                    // Prevent XSS on non main frame
+                    // If it is not the main frame, return username only, but no password!
+                    // Chromium does the same on iOS.
+                    // Firefox does NOT support third-party frames or iFrames.
+                    if let login = loginData as? Login {
+                        login.update(password: "", username: login.username ?? "")
+                        return login.toDict()
+                    }
+                    
+                    // If we can't safely remove the password,
+                    // do NOT return any credentials.
+                    return nil
+                }
             }
 
             let json = JSON(jsonObj)
