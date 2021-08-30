@@ -36,6 +36,8 @@ class LoginInfoViewController: LoginAuthViewController {
         case passwordItem
     }
     
+    weak var settingsDelegate: SettingsDelegate?
+
     // MARK: Private
     
     private let profile: Profile
@@ -270,7 +272,22 @@ extension LoginInfoViewController {
         navigationItem.rightBarButtonItem =
             UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(edit))
         
-        tableView.reloadData()
+        guard let username = usernameField?.text, let password = passwordField?.text,
+              username != loginEntry.username || password != loginEntry.password else {
+            return
+        }
+                
+        loginEntry.update(password: password, username: username)
+        
+        profile.logins.updateLoginByGUID(loginEntry.guid, new: loginEntry, significant: true).upon { [weak self] result in
+            DispatchQueue.main.async {
+                if result.isSuccess {
+                    self?.tableView.reloadData()
+                } else {
+                    log.error("Error while updating a login entry")
+                }
+            }
+        }
     }
     
     private func deleteLogin() {
@@ -280,13 +297,13 @@ extension LoginInfoViewController {
             preferredStyle: .alert)
         
         alert.addAction(UIAlertAction(title: Strings.deleteLoginButtonTitle, style: .destructive, handler: { [unowned self] _ in
-            let success = self.profile.logins.removeLoginByGUID(self.loginEntry.guid)
-            
-            success.upon {result in
-                if result.isSuccess {
-                    //TODO:
-                } else {
-                    log.error("Error while deleting a login entry")
+            self.profile.logins.removeLoginByGUID(self.loginEntry.guid).upon { result in
+                DispatchQueue.main.async {
+                    if result.isSuccess {
+                        self.navigationController?.popViewController(animated: true)
+                    } else {
+                        log.error("Error while deleting a login entry")
+                    }
                 }
             }
         }))
@@ -337,7 +354,13 @@ extension LoginInfoViewController: LoginInfoTableViewCellDelegate {
     }
     
     func didSelectOpenAndFill(_ cell: LoginInfoTableViewCell) {
-        
+        guard let url = (loginEntry.formSubmitURL?.asURL ?? loginEntry.hostname.asURL) else {
+            return
+        }
+    
+        dismiss(animated: true) { [weak self] in
+            self?.settingsDelegate?.settingsOpenURLInNewTab(url)
+        }
     }
     
     func textFieldDidEndEditing(_ cell: LoginInfoTableViewCell) {

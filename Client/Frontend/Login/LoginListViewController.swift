@@ -40,6 +40,8 @@ class LoginListViewController: LoginAuthViewController {
         case recentSearches
     }
     
+    weak var settingsDelegate: SettingsDelegate?
+    
     // MARK: Private
     
     private let profile: Profile
@@ -55,8 +57,6 @@ class LoginListViewController: LoginAuthViewController {
     init(profile: Profile) {
         self.profile = profile
         super.init(requiresAuthentication: true)
-        
-        fetchLoginInfo()
     }
     
     required init?(coder: NSCoder) {
@@ -85,7 +85,15 @@ class LoginListViewController: LoginAuthViewController {
             frame: CGRect(width: tableView.bounds.width, height: UX.headerHeight))
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        fetchLoginInfo()
+    }
+    
     override func viewWillDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        
         tableView.endEditing(true)
     }
     
@@ -258,6 +266,7 @@ extension LoginListViewController {
     override func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
         if indexPath.section == Section.savedLogins.rawValue, let loginEntry = loginEntries[safe: indexPath.row] {
             let loginDetailsViewController = LoginInfoViewController(profile: profile, loginEntry: loginEntry)
+            loginDetailsViewController.settingsDelegate = settingsDelegate
             navigationController?.pushViewController(loginDetailsViewController, animated: true)
         }
         
