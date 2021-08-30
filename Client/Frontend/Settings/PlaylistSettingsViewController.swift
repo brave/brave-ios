@@ -66,10 +66,9 @@ class PlaylistSettingsViewController: TableViewController {
         dataSource.sections = [
             Section(
                 rows: [
-                    .boolRow(title: Strings.PlayList.playlistToastShowSettingsOptionTitle,
-                             option: Preferences.Playlist.showToastForAdd),
+                    .boolRow(title: Strings.PlayList.menuBadgeOptionTitle, option: Preferences.Playlist.enablePlaylistMenuBadge),
                 ],
-                footer: .title(Strings.PlayList.playlistToastShowSettingsOptionFooterText)
+                footer: .title(Strings.PlayList.menuBadgeOptionFooterText)
             ),
             Section(
                 rows: [
@@ -77,12 +76,6 @@ class PlaylistSettingsViewController: TableViewController {
                              option: Preferences.Playlist.enableLongPressAddToPlaylist),
                 ],
                 footer: .title(Strings.PlayList.playlistLongPressSettingsOptionFooterText)
-            ),
-            Section(
-                rows: [
-                    .boolRow(title: Strings.PlayList.menuBadgeOptionTitle, option: Preferences.Playlist.enablePlaylistMenuBadge),
-                ],
-                footer: .title(Strings.PlayList.menuBadgeOptionFooterText)
             ),
             Section(
                 rows: [

@@ -49,8 +49,7 @@ extension BrowserViewController: PlaylistHelperDelegate {
     }
     
     func showPlaylistPopover(tab: Tab?, state: PlaylistPopoverState) {
-        guard Preferences.Playlist.showToastForAdd.value,
-              let selectedTab = tabManager.selectedTab,
+        guard let selectedTab = tabManager.selectedTab,
               tab == selectedTab else {
             return
         }
