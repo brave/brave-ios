@@ -695,6 +695,7 @@
 		44A58CEA26947100005C0879 /* BraveSearchDebugMenuFixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44A58CE926947100005C0879 /* BraveSearchDebugMenuFixture.swift */; };
 		44C42CF6268378B1009572D7 /* BrowserIntents.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = 44C42CF9268378B1009572D7 /* BrowserIntents.intentdefinition */; };
 		44C42CF7268378B1009572D7 /* BrowserIntents.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = 44C42CF9268378B1009572D7 /* BrowserIntents.intentdefinition */; };
+		44C6CCD226DE6CB100E90068 /* DomainUserScriptTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44C6CCD126DE6CB100E90068 /* DomainUserScriptTests.swift */; };
 		44FA2F3021F8DB1000EFA86A /* DataPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44FA2F2F21F8DB1000EFA86A /* DataPreferences.swift */; };
 		592F521E2217327C0078395E /* HttpCookieExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 592F521D2217327B0078395E /* HttpCookieExtension.swift */; };
 		59350AFB22612D95004D7445 /* DisplayTextFieldTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59350AFA22612D95004D7445 /* DisplayTextFieldTest.swift */; };
@@ -2261,6 +2262,7 @@
 		44C42D2226837A1B009572D7 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/BrowserIntents.strings; sourceTree = "<group>"; };
 		44C42D2426837A21009572D7 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/BrowserIntents.strings; sourceTree = "<group>"; };
 		44C42D2626837A30009572D7 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/BrowserIntents.strings; sourceTree = "<group>"; };
+		44C6CCD126DE6CB100E90068 /* DomainUserScriptTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DomainUserScriptTests.swift; sourceTree = "<group>"; };
 		44FA2F2F21F8DB1000EFA86A /* DataPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataPreferences.swift; sourceTree = "<group>"; };
 		5902D2FF22DCD681002232FB /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = zh.lproj/BraveShared.strings; sourceTree = "<group>"; };
 		590913E223268115004625FA /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -5606,6 +5608,7 @@
 				F95ED17D25A95426001A432D /* UserScriptManagerTest.swift */,
 				0A2BFB3325F2754600719AA9 /* NTPDownloaderTests.swift */,
 				27C5AE2D25D72B0A00B8F50E /* OPMLParsingTests.swift */,
+				44C6CCD126DE6CB100E90068 /* DomainUserScriptTests.swift */,
 				2F26C42B267B9B7E00E5AD60 /* ProductNotificationTests */,
 				F84B21D71A090F8100AAB793 /* Supporting Files */,
 			);
@@ -7716,6 +7719,7 @@
 				E696FE511C47F86E00EC007C /* AuthenticatorTests.swift in Sources */,
 				275965E224EEC4EA0051A827 /* FeedFillStrategyTests.swift in Sources */,
 				2FA01E2825F29B0900103D67 /* BenchmarkTierTests.swift in Sources */,
+				44C6CCD226DE6CB100E90068 /* DomainUserScriptTests.swift in Sources */,
 				F95ED17E25A95426001A432D /* UserScriptManagerTest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
