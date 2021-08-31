@@ -28,10 +28,6 @@ class BraveSearchScriptHandler: TabContentScript {
         self.tab = tab
         self.profile = profile
         self.rewards = rewards
-        
-        tab.rewardsEnabledCallback = { [weak self] success in
-            self?.callback(methodId: Method.braveRequestAdsEnabled.rawValue, result: success)
-        }
     }
     
     static func name() -> String { "BraveSearchHelper" }
@@ -41,7 +37,6 @@ class BraveSearchScriptHandler: TabContentScript {
     private enum Method: Int {
         case canSetBraveSearchAsDefault = 1
         case setBraveSearchDefault = 2
-        case braveRequestAdsEnabled = 3
     }
     
     private struct MethodModel: Codable {
@@ -74,8 +69,6 @@ class BraveSearchScriptHandler: TabContentScript {
             handleCanSetBraveSearchAsDefault(methodId: method)
         case Method.setBraveSearchDefault.rawValue:
             handleSetBraveSearchDefault(methodId: method)
-        case Method.braveRequestAdsEnabled.rawValue:
-            handleBraveRequestAdsEnabled(methodId: method)
         default:
             break
         }
@@ -109,30 +102,6 @@ class BraveSearchScriptHandler: TabContentScript {
     private func handleSetBraveSearchDefault(methodId: Int) {
         profile.searchEngines.updateDefaultEngine(OpenSearchEngine.EngineNames.brave, forType: .standard)
         callback(methodId: methodId, result: nil)
-    }
-    
-    private func handleBraveRequestAdsEnabled(methodId: Int) {
-        
-        if PrivateBrowsingManager.shared.isPrivateBrowsing {
-            callback(methodId: methodId, result: false)
-            return
-        }
-        
-        guard let rewards = rewards else {
-            callback(methodId: methodId, result: false)
-            return
-        }
-        
-        if rewards.isEnabled {
-            callback(methodId: methodId, result: true)
-            return
-        }
-        
-        // If rewards are disabled we show a Rewards panel,
-        // The `callback` will be called from other place.
-        if let tab = tab {
-            tab.tabDelegate?.showRequestRewardsPanel(tab)
-        }
     }
     
     private func callback(methodId: Int, result: Bool?) {
