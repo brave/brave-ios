@@ -2030,10 +2030,10 @@ extension BrowserViewController: TabDelegate {
         tab.addContentScript(FingerprintingProtection(tab: tab), name: FingerprintingProtection.name(), sandboxed: false)
         
         tab.addContentScript(BraveGetUA(tab: tab), name: BraveGetUA.name(), sandboxed: false)
-        tab.addContentScript(BraveServicesScriptHandler(tab: tab,
+        tab.addContentScript(BraveSearchScriptHandler(tab: tab,
                                                         profile: profile,
                                                         rewards: rewards),
-                             name: BraveServicesScriptHandler.name(), sandboxed: false)
+                             name: BraveSearchScriptHandler.name(), sandboxed: false)
         
         tab.addContentScript(BraveTalkScriptHandler(tab: tab,
                                                         rewards: rewards),

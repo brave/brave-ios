@@ -13,7 +13,7 @@ private let log = Logger.browserLogger
 enum DomainUserScript: CaseIterable {
     case youtube
     case archive
-    case braveServices
+    case braveSearch
     case braveTalk
     
     static func get(for url: URL) -> Self? {
@@ -47,7 +47,7 @@ enum DomainUserScript: CaseIterable {
         switch self {
         case .youtube:
             return .AdblockAndTp
-        case .archive, .braveServices, .braveTalk:
+        case .archive, .braveSearch, .braveTalk:
             return nil
         }
     }
@@ -58,7 +58,7 @@ enum DomainUserScript: CaseIterable {
             return .init(arrayLiteral: "youtube.com")
         case .archive:
             return .init(arrayLiteral: "archive.is", "archive.today", "archive.vn", "archive.fo")
-        case .braveServices:
+        case .braveSearch:
             return .init(arrayLiteral: "search.brave.com", "search-dev.brave.com")
         case .braveTalk:
             return .init(arrayLiteral: "talk.brave.com", "beta.talk.brave.com",
@@ -69,22 +69,13 @@ enum DomainUserScript: CaseIterable {
         }
     }
     
-    var mustMatchExactHost: Bool {
-        switch self {
-        case .youtube, .archive:
-            return false
-        case .braveServices, .braveTalk:
-            return true
-        }
-    }
-    
     private var scriptName: String {
         switch self {
         case .youtube:
             return "YoutubeAdblock"
         case .archive:
             return "ArchiveIsCompat"
-        case .braveServices:
+        case .braveSearch:
             return "BraveServicesHelper"
         case .braveTalk:
             return "BraveTalkHelper"
@@ -112,13 +103,13 @@ enum DomainUserScript: CaseIterable {
             return WKUserScript(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false)
         case .archive:
             return WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false)
-        case .braveServices:
+        case .braveSearch:
             var alteredSource = source
             
             let securityToken = UserScriptManager.securityToken.uuidString
                 .replacingOccurrences(of: "-", with: "", options: .literal)
             alteredSource = alteredSource
-                .replacingOccurrences(of: "$<brave-services-helper>",
+                .replacingOccurrences(of: "$<brave-search-helper>",
                                       with: "BSH\(UserScriptManager.messageHandlerTokenString)",
                                       options: .literal)
                 .replacingOccurrences(of: "$<security_token>", with: securityToken)

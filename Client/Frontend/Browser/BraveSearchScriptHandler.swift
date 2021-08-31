@@ -11,7 +11,7 @@ import BraveCore
 
 private let log = Logger.browserLogger
 
-class BraveServicesScriptHandler: TabContentScript {
+class BraveSearchScriptHandler: TabContentScript {
     private weak var tab: Tab?
     private let profile: Profile
     private weak var rewards: BraveRewards?
@@ -34,9 +34,9 @@ class BraveServicesScriptHandler: TabContentScript {
         }
     }
     
-    static func name() -> String { "BraveServicesHelper" }
+    static func name() -> String { "BraveSearchHelper" }
     
-    func scriptMessageHandlerName() -> String? { BraveServicesScriptHandler.name() }
+    func scriptMessageHandlerName() -> String? { BraveSearchScriptHandler.name() }
     
     private enum Method: Int {
         case canSetBraveSearchAsDefault = 1
@@ -54,7 +54,7 @@ class BraveServicesScriptHandler: TabContentScript {
     
     func userContentController(_ userContentController: WKUserContentController,
                                didReceiveScriptMessage message: WKScriptMessage) {
-        let allowedHosts = DomainUserScript.braveServices.associatedDomains
+        let allowedHosts = DomainUserScript.braveSearch.associatedDomains
         
         guard let requestHost = message.frameInfo.request.url?.host,
               allowedHosts.contains(requestHost),
