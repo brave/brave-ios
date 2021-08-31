@@ -578,8 +578,6 @@ window.__firefox__.includeOnce("LoginsHelper", function() {
       return [didFillForm, foundLogins];
     },
   }
-    
-  window.login_content_manager = LoginManagerContent;
 
   var LoginUtils = {
     /*
@@ -602,38 +600,9 @@ window.__firefox__.includeOnce("LoginsHelper", function() {
       return this._getPasswordOrigin(uriString, true);
     },
   }
-    
-  window.login_utils = LoginUtils;
 
   function onBlur(event) {
     LoginManagerContent.onUsernameInput(event)
-  }
-    
-  function observeFormSubmission(formNode) {
-    if (!formNode.submitListener) {
-      formNode.addEventListener("submit", function(event) {
-        try {
-          LoginManagerContent._onFormSubmit(event.target);
-        } catch(ex) {
-          // Eat errors to avoid leaking them to the page
-          log(ex);
-        }
-      });
-        
-      var button = formNode.querySelector('button');
-      if (button) {
-        button.addEventListener("click", function(e) {
-            try {
-              LoginManagerContent._onFormSubmit(formNode);
-            } catch(ex) {
-              // Eat errors to avoid leaking them to the page
-              log(ex);
-            }
-        });
-      }
-        
-      formNode.submitListener = true;
-    }
   }
 
   var observer = new MutationObserver(function(mutations) {
@@ -646,7 +615,6 @@ window.__firefox__.includeOnce("LoginsHelper", function() {
     for (var i = 0; i < nodes.length; i++) {
       var node = nodes[i];
       if (node.nodeName === "FORM") {
-        observeFormSubmission(node);
         findLogins(node);
       } else if(node.hasChildNodes()) {
         findForms(node.childNodes);
@@ -671,17 +639,58 @@ window.__firefox__.includeOnce("LoginsHelper", function() {
   window.addEventListener("load", function(event) {
     observer.observe(document.body, { attributes: false, childList: true, characterData: false, subtree: true });
     for (var i = 0; i < document.forms.length; i++) {
-      observeFormSubmission(document.forms[i]);
       findLogins(document.forms[i]);
     }
   });
 
   window.addEventListener("submit", function(event) {
     try {
+      for (var i = 0; i < document.forms.length; i++) {
+        findLogins(document.forms[i]);
+      }
+      
       LoginManagerContent._onFormSubmit(event.target);
     } catch(ex) {
       // Eat errors to avoid leaking them to the page
       log(ex);
+    }
+  });
+    
+  window.addEventListener("pagehide", function(event) {
+    if (event.persisted) {
+      return;
+    }
+    
+    var isSubmittedForm = (form) => {
+      var fields = LoginManagerContent._getFormFields(form, false);
+      if (!fields[0] || !fields[1]) {
+        return false;
+      }
+      
+      var formOrigin = LoginUtils._getPasswordOrigin();
+      var actionOrigin = LoginUtils._getActionOrigin(form);
+      if (actionOrigin == null) {
+        return false;
+      }
+      
+      for (var field of fields) {
+        if (field && (!field.value || field.value.length == 0)) {
+          return false;
+        }
+      }
+      
+      return true;
+    };
+    
+    for (var form of document.forms) {
+      if (isSubmittedForm(form)) {
+        try {
+          LoginManagerContent._onFormSubmit(form);
+        } catch (ex) {
+          // Eat errors to avoid leaking them to the page
+          log(ex);
+        }
+      }
     }
   });
 
