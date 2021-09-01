@@ -861,6 +861,15 @@ class BrowserViewController: UIViewController {
         if let tabId = tabManager.selectedTab?.rewardsId, rewards.ledger?.selectedTabId == 0 {
             rewards.ledger?.selectedTabId = tabId
         }
+
+        if let selectedTab = tabManager.selectedTab,
+           let playlistItem = selectedTab.playlistItem,
+           PlaylistManager.shared.index(of: playlistItem.pageSrc) == nil {
+            
+            updatePlaylistURLBar(tab: selectedTab,
+                                 state: .newItem,
+                                 item: playlistItem)
+        }
     }
     
     fileprivate lazy var checkCrashRestoration: () -> Void = {

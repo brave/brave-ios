@@ -240,6 +240,8 @@ extension BrowserViewController: PlaylistHelperDelegate {
     }
     
     func openPlaylist(item: PlaylistInfo?, playbackOffset: Double) {
+        stopMediaPlayback()
+        
         let playlistController = (UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController as? PlaylistViewController ?? PlaylistViewController(initialItem: item, initialItemPlaybackOffset: playbackOffset)
         playlistController.modalPresentationStyle = .fullScreen
         
@@ -310,6 +312,17 @@ extension BrowserViewController: PlaylistHelperDelegate {
                                           item: item)
                 completion?(true)
             }
+        }
+    }
+    
+    func stopMediaPlayback() {
+        // If background playback is enabled, tabs will continue to play media
+        // Even if another controller is presented and even when PIP is enabled in playlist.
+        // Therefore we need to stop the page/tab from playing when using playlist.
+        if Preferences.General.mediaAutoBackgrounding.value {
+            tabManager.allTabs.forEach({
+                PlaylistHelper.stopPlayback(tab: $0)
+            })
         }
     }
 }

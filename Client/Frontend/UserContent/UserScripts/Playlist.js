@@ -423,6 +423,23 @@ window.__firefox__.includeOnce("Playlist", function() {
                 return 0.0;
             }
         });
+        
+        Object.defineProperty(window.__firefox__, '$<stopMediaPlayback>', {
+            enumerable: false,
+            configurable: true,
+            value:
+            function(tag) {
+                for (element of document.querySelectorAll('video')) {
+                    element.pause();
+                }
+                
+                for (element of document.querySelectorAll('audio')) {
+                    element.pause();
+                }
+                
+                return 0.0;
+            }
+        });
     }
     
     // MARK: -----------------------------
