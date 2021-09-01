@@ -120,6 +120,25 @@ class URIFixup {
             URL(string: "http://\(escaped)")?.user != nil {
             return nil
         }
+        
+        // If the user enters anything arithmetic
+        // Such as 125.5, do not construct a URL from it
+        // It is a mathematical expression
+        if let url = URL(string: trimmed),
+           url.scheme == nil,
+           Double(trimmed) != nil {
+            return nil
+        }
+        
+        // URL contains more than 1 dot, but is NOT a valid IP.
+        // IE: brave.com.com.com.com or 123.4.5 or "hello.world.whatever"
+        // However, a valid URL can be "brave.com" or "hello.world"
+        if let url = URL(string: escaped),
+           url.scheme == nil,
+           escaped.reduce(0, { $1 == "." ? $0 + 1 : $0 }) > 1,
+           !isValidIPAddress(escaped) {
+            return nil
+        }
 
         // If there is a "." or ":", prepend "http://" and try again. Since this
         // is strictly an "http://" URL, we also require a host.
