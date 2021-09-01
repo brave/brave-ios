@@ -100,7 +100,7 @@ class LoginListViewController: LoginAuthViewController {
     // MARK: Internal
     
     private func applyTheme() {
-        navigationItem.title = "Logins & Passwords"
+        navigationItem.title = Strings.Login.loginListNavigationTitle
 
         tableView.do {
             $0.accessibilityIdentifier = "Logins Passwords List"
@@ -115,7 +115,7 @@ class LoginListViewController: LoginAuthViewController {
             $0.searchBar.autocapitalizationType = .none
             $0.searchResultsUpdater = self
             $0.obscuresBackgroundDuringPresentation = false
-            $0.searchBar.placeholder = "Filter"
+            $0.searchBar.placeholder = Strings.Login.loginListSearchBarPlaceHolderTitle
             $0.delegate = self
             $0.hidesNavigationBarDuringPresentation = true
         }
@@ -205,7 +205,7 @@ extension LoginListViewController {
                     }
                     
                     cell = tableView.dequeueReusableCell(withIdentifier: Constants.showInMenuRowIdentifier, for: indexPath).then {
-                        $0.textLabel?.text = "Show in Application Menu"
+                        $0.textLabel?.text = Strings.Login.loginListShowInApplicationMenuTitle
                         $0.accessoryView = toggle
                         $0.selectionStyle = .none
                     }
@@ -258,7 +258,7 @@ extension LoginListViewController {
     
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let headerView = tableView.dequeueReusableHeaderFooter() as SettingsTableSectionHeaderFooterView
-        headerView.titleLabel.text = "SAVED LOGINS"
+        headerView.titleLabel.text = Strings.Login.loginListSavedLoginsHeaderTitle
         
         return headerView
     }
@@ -302,7 +302,7 @@ extension LoginListViewController {
     private func showDeleteLoginWarning(with loginItem: Login) {
         let alert = UIAlertController(
             title: Strings.deleteLoginAlertTitle,
-            message: "Saved Login will be removed permanently.",
+            message: Strings.Login.loginEntryDeleteAlertMessage,
             preferredStyle: .alert)
         
         alert.addAction(UIAlertAction(title: Strings.deleteLoginButtonTitle, style: .destructive, handler: { [weak self] _ in

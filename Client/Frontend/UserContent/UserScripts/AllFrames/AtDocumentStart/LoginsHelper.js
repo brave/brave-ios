@@ -53,7 +53,7 @@ window.__firefox__.includeOnce("LoginsHelper", function() {
     receiveMessage: function (msg) {
       var request = this._takeRequest(msg);
       if (!request) {
-        log("INVALID REQUEST");
+        log("Invalid Request");
         return;
       }
         

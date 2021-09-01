@@ -10,7 +10,7 @@ extension LoginListViewController {
     class LoginEmptyView: UIView {
         
         private let titleLabel = UILabel().then {
-            $0.text = "No Logins found"
+            $0.text = Strings.Login.loginListEmptyScreenTitle
             $0.numberOfLines = 0
             $0.font = .preferredFont(for: .title3, weight: .semibold)
             $0.adjustsFontForContentSizeCategory = true

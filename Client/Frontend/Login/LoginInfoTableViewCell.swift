@@ -113,6 +113,7 @@ class LoginInfoTableViewCell: UITableViewCell, TableViewReusable {
         descriptionTextField.do {
             $0.textColor = .braveLabel
             $0.font = .preferredFont(forTextStyle: .callout)
+            $0.adjustsFontForContentSizeCategory = true
             $0.isUserInteractionEnabled = false
             $0.autocapitalizationType = .none
             $0.autocorrectionType = .no
@@ -124,6 +125,7 @@ class LoginInfoTableViewCell: UITableViewCell, TableViewReusable {
         
         highlightedLabel.do {
             $0.font = .preferredFont(forTextStyle: .footnote)
+            $0.adjustsFontForContentSizeCategory = true
             $0.textColor = .secondaryBraveLabel
             $0.numberOfLines = 1
         }

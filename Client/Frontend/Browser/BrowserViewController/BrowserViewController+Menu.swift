@@ -13,7 +13,6 @@ import Data
 private let log = Logger.browserLogger
 
 extension BrowserViewController {
-    
     func featuresMenuSection(_ menuController: MenuViewController) -> some View {
         VStack(spacing: 0) {
             VPNMenuButton(

@@ -2320,6 +2320,71 @@ extension Strings {
 }
 
 extension Strings {
+    public struct Login {
+        public static let loginListEmptyScreenTitle =
+            NSLocalizedString("login.loginListEmptyScreenTitle",
+                              tableName: "BraveShared",
+                              bundle: .braveShared,
+                              value: "No logins found",
+                              comment: "The message displayed on the password list screen when there is not password found")
+        public static let loginListNavigationTitle =
+            NSLocalizedString("login.loginListNavigationTitle",
+                              tableName: "BraveShared",
+                              bundle: .braveShared,
+                              value: "Logins & Passwords",
+                              comment: "Title for navigation bar of the login list screen")
+        public static let loginListSearchBarPlaceHolderTitle =
+            NSLocalizedString("login.loginListSearchBarPlaceHolderTitle",
+                              tableName: "BraveShared",
+                              bundle: .braveShared,
+                              value: "Filter",
+                              comment: "The text for placeholder inside search bar in login list")
+        public static let loginListShowInApplicationMenuTitle =
+            NSLocalizedString("login.loginListShowInApplicationMenuTitle",
+                              tableName: "BraveShared",
+                              bundle: .braveShared,
+                              value: "Show in Application Menu",
+                              comment: "The text for toggle to enable password as settings menu item")
+        public static let loginListSavedLoginsHeaderTitle =
+            NSLocalizedString("login.loginListSavedLoginsHeaderTitle",
+                              tableName: "BraveShared",
+                              bundle: .braveShared,
+                              value: "SAVED LOGINS",
+                              comment: "The header title displayed over the login list")
+        public static let loginInfoDetailsHeaderTitle =
+            NSLocalizedString("login.loginInfoDetailsHeaderTitle",
+                              tableName: "BraveShared",
+                              bundle: .braveShared,
+                              value: "LOGIN DETAILS",
+                              comment: "The header title displayed over the details of login entry")
+        public static let loginInfoDetailsWebsiteFieldTitle =
+            NSLocalizedString("login.loginInfoDetailsWebsiteFieldTitle",
+                              tableName: "BraveShared",
+                              bundle: .braveShared,
+                              value: "Website",
+                              comment: "Title for the website field in password detail page")
+        public static let loginInfoDetailsUsernameFieldTitle =
+            NSLocalizedString("login.loginInfoDetailsUsernameFieldTitle",
+                              tableName: "BraveShared",
+                              bundle: .braveShared,
+                              value: "Username",
+                              comment: "Title for the username field in password detail page")
+        public static let loginInfoDetailsPasswordFieldTitle =
+            NSLocalizedString("login.loginInfoDetailsPasswordFieldTitle",
+                              tableName: "BraveShared",
+                              bundle: .braveShared,
+                              value: "Password",
+                              comment: "Title for the password field in password detail page")
+        public static let loginEntryDeleteAlertMessage =
+            NSLocalizedString("login.loginEntryDeleteAlertMessage",
+                              tableName: "BraveShared",
+                              bundle: .braveShared,
+                              value: "Saved Login will be removed permanently.",
+                              comment: "The message displayed in alert when a login entry deleted")
+    }
+}
+
+extension Strings {
     public struct BraveNews {
         public static let braveNews = NSLocalizedString(
             "today.braveToday",

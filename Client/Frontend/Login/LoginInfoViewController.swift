@@ -106,7 +106,7 @@ extension LoginInfoViewController {
     
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let headerView = tableView.dequeueReusableHeaderFooter() as SettingsTableSectionHeaderFooterView
-        headerView.titleLabel.text = "LOGIN DETAILS"
+        headerView.titleLabel.text = Strings.Login.loginInfoDetailsHeaderTitle
         return headerView
     }
     
@@ -130,7 +130,7 @@ extension LoginInfoViewController {
                         
                         cell.do {
                             $0.delegate = self
-                            $0.highlightedLabel.text = "Website"
+                            $0.highlightedLabel.text = Strings.Login.loginInfoDetailsWebsiteFieldTitle
                             $0.descriptionTextField.text = loginEntry.hostname
                             $0.isEditingFieldData = false
                             $0.tag = InfoItem.websiteItem.rawValue
@@ -147,7 +147,7 @@ extension LoginInfoViewController {
                       
                         cell.do {
                             $0.delegate = self
-                            $0.highlightedLabel.text = "Username"
+                            $0.highlightedLabel.text = Strings.Login.loginInfoDetailsUsernameFieldTitle
                             $0.descriptionTextField.text = loginEntry.username
                             $0.descriptionTextField.keyboardType = .emailAddress
                             $0.descriptionTextField.returnKeyType = .next
@@ -164,7 +164,7 @@ extension LoginInfoViewController {
                       
                         cell.do {
                             $0.delegate = self
-                            $0.highlightedLabel.text = "Password"
+                            $0.highlightedLabel.text = Strings.Login.loginInfoDetailsPasswordFieldTitle
                             $0.descriptionTextField.text = loginEntry.password
                             $0.descriptionTextField.returnKeyType = .done
                             $0.displayDescriptionAsPassword = true
@@ -192,7 +192,7 @@ extension LoginInfoViewController {
             case Section.delete.rawValue:
                 let cell = tableView.dequeueReusableCell(for: indexPath) as CenteredButtonCell
                 cell.do {
-                    $0.textLabel?.text = "Delete"
+                    $0.textLabel?.text = Strings.delete
                     $0.tintColor = .braveOrange
                 }
                 return cell
@@ -293,7 +293,7 @@ extension LoginInfoViewController {
     private func deleteLogin() {
         let alert = UIAlertController(
             title: Strings.deleteLoginAlertTitle,
-            message: "Saved Login will be removed permanently.",
+            message: Strings.Login.loginEntryDeleteAlertMessage,
             preferredStyle: .alert)
         
         alert.addAction(UIAlertAction(title: Strings.deleteLoginButtonTitle, style: .destructive, handler: { [unowned self] _ in
