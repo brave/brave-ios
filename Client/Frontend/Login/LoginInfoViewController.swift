@@ -358,9 +358,8 @@ extension LoginInfoViewController: LoginInfoTableViewCellDelegate {
             return
         }
     
-        dismiss(animated: true) { [weak self] in
-            self?.settingsDelegate?.settingsOpenURLInNewTab(url)
-        }
+        settingsDelegate?.settingsOpenURLInNewTab(url)
+        dismiss(animated: true, completion: nil)
     }
     
     func textFieldDidEndEditing(_ cell: LoginInfoTableViewCell) {
