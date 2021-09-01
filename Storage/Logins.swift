@@ -31,6 +31,8 @@ public protocol LoginData: AnyObject {
     func toDict() -> [String: String]
 
     func isSignificantlyDifferentFrom(_ login: LoginData) -> Bool
+    
+    func update(password: String, username: String)
 }
 
 public protocol LoginUsageData {

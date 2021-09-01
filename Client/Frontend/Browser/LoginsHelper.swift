@@ -197,14 +197,8 @@ class LoginsHelper: TabContentScript {
                     // If it is not the main frame, return username only, but no password!
                     // Chromium does the same on iOS.
                     // Firefox does NOT support third-party frames or iFrames.
-                    if let login = loginData as? Login {
-                        login.update(password: "", username: login.username ?? "")
-                        return login.toDict()
-                    }
-                    
-                    // If we can't safely remove the password,
-                    // do NOT return any credentials.
-                    return nil
+                    loginData?.update(password: "", username: loginData?.username ?? "")
+                    return loginData?.toDict()
                 }
             }
 
