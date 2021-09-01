@@ -13,6 +13,62 @@ private let log = Logger.browserLogger
 
 extension BrowserViewController: PlaylistHelperDelegate {
     
+    private func createPlaylistPopover(tab: Tab?, state: PlaylistPopoverState) -> PopoverController {
+        return PopoverController(contentController: PlaylistPopoverViewController(state: state).then {
+            $0.rootView.onPrimaryButtonPressed = { [weak self, weak tab] in
+                guard let self = self,
+                      let selectedTab = tab,
+                      let item = selectedTab.playlistItem else { return }
+                
+                switch state {
+                case .addToPlaylist:
+                    // Dismiss popover
+                    UIImpactFeedbackGenerator(style: .medium).bzzt()
+                    self.dismiss(animated: true, completion: nil)
+                    
+                    // Update playlist with new items.
+                    self.addToPlaylist(item: item) { [weak self] didAddItem in
+                        guard let self = self else { return }
+                        
+                        if didAddItem {
+                            self.updatePlaylistURLBar(tab: tab, state: .existingItem, item: item)
+                        }
+                    }
+                    
+                case .addedToPlaylist:
+                    // Dismiss popover
+                    UIImpactFeedbackGenerator(style: .medium).bzzt()
+                    
+                    self.dismiss(animated: true) {
+                        DispatchQueue.main.async {
+                            if let webView = tab?.webView {
+                                PlaylistHelper.getCurrentTime(webView: webView, nodeTag: item.tagId) { [weak self] currentTime in
+                                    self?.openPlaylist(item: item, playbackOffset: currentTime)
+                                }
+                            } else {
+                                self.openPlaylist(item: item, playbackOffset: 0.0)
+                            }
+                        }
+                    }
+                }
+            }
+            
+            $0.rootView.onSecondaryButtonPressed = { [weak tab] in
+                guard let selectedTab = tab,
+                      let item = selectedTab.playlistItem else { return }
+                UIImpactFeedbackGenerator(style: .medium).bzzt()
+                
+                self.dismiss(animated: true)
+                
+                DispatchQueue.main.async {
+                    if PlaylistManager.shared.delete(item: item) {
+                        self.updatePlaylistURLBar(tab: tab, state: .newItem, item: item)
+                    }
+                }
+            }
+        })
+    }
+    
     func updatePlaylistURLBar(tab: Tab?, state: PlaylistItemAddedState, item: PlaylistInfo?) {
         // `tab` is nil when closed, along with the `.none` state and nil `item`
         guard let tab = tab else { return }
@@ -50,83 +106,30 @@ extension BrowserViewController: PlaylistHelperDelegate {
     
     func showPlaylistPopover(tab: Tab?, state: PlaylistPopoverState) {
         guard let selectedTab = tabManager.selectedTab,
-              tab == selectedTab else {
+              tab == selectedTab,
+              let playlistItem = selectedTab.playlistItem else {
             return
         }
         
         if state == .addToPlaylist {
-            if !shouldShowPlaylistOnboardingThisSession {
-                if let item = selectedTab.playlistItem {
-                    UIImpactFeedbackGenerator(style: .medium).bzzt()
+            UIImpactFeedbackGenerator(style: .medium).bzzt()
+            
+            // Update playlist with new items.
+            self.addToPlaylist(item: playlistItem) { [weak self] didAddItem in
+                guard let self = self else { return }
+                
+                if didAddItem {
+                    self.updatePlaylistURLBar(tab: tab, state: .existingItem, item: playlistItem)
                     
-                    // Update playlist with new items.
-                    self.addToPlaylist(item: item) { [weak self] didAddItem in
-                        guard let self = self else { return }
-                        
-                        if didAddItem {
-                            self.updatePlaylistURLBar(tab: tab, state: .existingItem, item: item)
-                            
-                            DispatchQueue.main.async {
-                                self.showPlaylistPopover(tab: tab, state: .addedToPlaylist)
-                            }
-                        }
+                    DispatchQueue.main.async {
+                        self.showPlaylistPopover(tab: tab, state: .addedToPlaylist)
                     }
                 }
-                return
             }
+            return
         }
         
-        let popover = PopoverController(contentController: PlaylistPopoverViewController(state: state).then {
-            $0.rootView.onPrimaryButtonPressed = { [weak self] in
-                guard let self = self,
-                      let item = selectedTab.playlistItem else { return }
-                
-                switch state {
-                case .addToPlaylist:
-                    // Dismiss popover
-                    UIImpactFeedbackGenerator(style: .medium).bzzt()
-                    self.dismiss(animated: true, completion: nil)
-                    
-                    // Update playlist with new items.
-                    self.addToPlaylist(item: item) { [weak self] didAddItem in
-                        guard let self = self else { return }
-                        
-                        if didAddItem {
-                            self.updatePlaylistURLBar(tab: tab, state: .existingItem, item: item)
-                        }
-                    }
-                    
-                case .addedToPlaylist:
-                    // Dismiss popover
-                    UIImpactFeedbackGenerator(style: .medium).bzzt()
-                    
-                    self.dismiss(animated: true) {
-                        DispatchQueue.main.async {
-                            if let webView = tab?.webView {
-                                PlaylistHelper.getCurrentTime(webView: webView, nodeTag: item.tagId) { [weak self] currentTime in
-                                    self?.openPlaylist(item: item, playbackOffset: currentTime)
-                                }
-                            } else {
-                                self.openPlaylist(item: item, playbackOffset: 0.0)
-                            }
-                        }
-                    }
-                }
-            }
-            
-            $0.rootView.onSecondaryButtonPressed = {
-                guard let item = selectedTab.playlistItem else { return }
-                UIImpactFeedbackGenerator(style: .medium).bzzt()
-                
-                self.dismiss(animated: true)
-                
-                DispatchQueue.main.async {
-                    if PlaylistManager.shared.delete(item: item) {
-                        self.updatePlaylistURLBar(tab: tab, state: .newItem, item: item)
-                    }
-                }
-            }
-        })
+        let popover = createPlaylistPopover(tab: tab, state: state)
         popover.present(from: topToolbar.locationView.playlistButton, on: self)
     }
     
@@ -227,7 +230,9 @@ extension BrowserViewController: PlaylistHelperDelegate {
         if shouldShowOnboarding {
             if Preferences.Playlist.addToPlaylistURLBarOnboardingCount.value < 2 && shouldShowPlaylistOnboardingThisSession {
                 Preferences.Playlist.addToPlaylistURLBarOnboardingCount.value += 1
-                showPlaylistPopover(tab: tab, state: .addToPlaylist)
+                
+                let popover = createPlaylistPopover(tab: tab, state: .addToPlaylist)
+                popover.present(from: topToolbar.locationView.playlistButton, on: self)
             }
             
             shouldShowPlaylistOnboardingThisSession = false
@@ -235,6 +240,8 @@ extension BrowserViewController: PlaylistHelperDelegate {
     }
     
     func openPlaylist(item: PlaylistInfo?, playbackOffset: Double) {
+        stopMediaPlayback()
+        
         let playlistController = (UIApplication.shared.delegate as? AppDelegate)?.playlistRestorationController as? PlaylistViewController ?? PlaylistViewController(initialItem: item, initialItemPlaybackOffset: playbackOffset)
         playlistController.modalPresentationStyle = .fullScreen
         
@@ -305,6 +312,17 @@ extension BrowserViewController: PlaylistHelperDelegate {
                                           item: item)
                 completion?(true)
             }
+        }
+    }
+    
+    func stopMediaPlayback() {
+        // If background playback is enabled, tabs will continue to play media
+        // Even if another controller is presented and even when PIP is enabled in playlist.
+        // Therefore we need to stop the page/tab from playing when using playlist.
+        if Preferences.General.mediaAutoBackgrounding.value {
+            tabManager.allTabs.forEach({
+                PlaylistHelper.stopPlayback(tab: $0)
+            })
         }
     }
 }

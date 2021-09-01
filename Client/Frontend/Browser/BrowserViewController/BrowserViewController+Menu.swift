@@ -63,6 +63,7 @@ extension BrowserViewController {
                         PlaylistHelper.getCurrentTime(webView: webView, nodeTag: item.tagId) { [weak self] currentTime in
                             guard let self = self else { return }
                             
+                            self.stopMediaPlayback()
                             let playlistController = PlaylistViewController(initialItem: item, initialItemPlaybackOffset: currentTime)
                             playlistController.modalPresentationStyle = .fullScreen
                             

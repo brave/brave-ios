@@ -236,4 +236,18 @@ extension PlaylistHelper {
             }
         })
     }
+    
+    static func stopPlayback(tab: Tab?) {
+        guard let tab = tab else { return }
+        
+        let token = UserScriptManager.securityTokenString
+        let javascript = String(format: "window.__firefox__.stopMediaPlayback_%@()", token)
+
+        // swiftlint:disable:next safe_javascript
+        tab.webView?.evaluateJavaScript(javascript, completionHandler: { value, error in
+            if let error = error {
+                log.error("Error Retrieving Stopping Media Playback: \(error)")
+            }
+        })
+    }
 }
