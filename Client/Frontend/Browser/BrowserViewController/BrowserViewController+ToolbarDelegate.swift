@@ -353,14 +353,6 @@ extension BrowserViewController: TopToolbarDelegate {
                     self?.submitSearchText(text)
                 }
                 
-                let submitWebsite = { [weak self] (url: String) in
-                    if let url = URL(string: url) {
-                        self?.finishEditingAndSubmit(url, visitType: .unknown)
-                    } else {
-                        submitSearch(url)
-                    }
-                }
-                
                 if let recentSearch = recentSearch,
                    let searchType = RecentSearchType(rawValue: recentSearch.searchType) {
                     if shouldSubmitSearch {
@@ -390,7 +382,7 @@ extension BrowserViewController: TopToolbarDelegate {
                             self.topToolbar(self.topToolbar, didEnterText: websiteUrl)
                             
                             if shouldSubmitSearch {
-                                submitWebsite(websiteUrl)
+                                submitSearch(websiteUrl)
                             }
                         }
                     case .website:
@@ -399,7 +391,7 @@ extension BrowserViewController: TopToolbarDelegate {
                             self.topToolbar(self.topToolbar, didEnterText: websiteUrl)
                             
                             if shouldSubmitSearch {
-                                submitWebsite(websiteUrl)
+                                submitSearch(websiteUrl)
                             }
                         }
                     }
@@ -410,7 +402,7 @@ extension BrowserViewController: TopToolbarDelegate {
                     self.topToolbar(self.topToolbar, didEnterText: searchQuery)
                     
                     if shouldSubmitSearch {
-                        submitWebsite(searchQuery)
+                        submitSearch(searchQuery)
                     }
                 }
             })
