@@ -11,13 +11,20 @@ import BraveShared
 extension BraveTalkRewardsOptInViewController {
     class View: UIView {
         
-        let enableRewardsButton = ActionButton().then {
+        let enableRewardsButton = UIButton(type: .system).then {
+            $0.titleLabel?.font = .preferredFont(forTextStyle: .headline)
+            $0.titleLabel?.textAlignment = .center
+            $0.titleLabel?.lineBreakMode = .byClipping
+            $0.titleLabel?.numberOfLines = 0
+            
             $0.layer.borderWidth = 0
-            $0.titleLabel?.font = .systemFont(ofSize: 16.0, weight: .semibold)
-            $0.setTitleColor(.white, for: .normal)
-            $0.setTitle(Strings.Rewards.braveTalkRewardsOptInButtonTitle, for: .normal)
+            $0.layer.cornerCurve = .continuous
             $0.contentEdgeInsets = UIEdgeInsets(top: 10, left: 20, bottom: 10, right: 20)
+            
             $0.backgroundColor = .braveLighterBlurple
+            $0.setTitle(Strings.Rewards.braveTalkRewardsOptInButtonTitle, for: .normal)
+            $0.setTitleColor(.white, for: .normal)
+            $0.titleLabel?.adjustsFontForContentSizeCategory = true
         }
         
         private let image = UIImageView(image: #imageLiteral(resourceName: "rewards_onboarding_cashback")).then {
@@ -31,7 +38,8 @@ extension BraveTalkRewardsOptInViewController {
         
         private let title = UILabel().then {
             $0.text = Strings.Rewards.braveTalkRewardsOptInTitle
-            $0.font = .systemFont(ofSize: 20)
+            $0.font = .preferredFont(forTextStyle: .title3)
+            $0.adjustsFontForContentSizeCategory = true
             $0.textColor = .bravePrimary
             $0.numberOfLines = 0
             $0.textAlignment = .center
@@ -39,7 +47,8 @@ extension BraveTalkRewardsOptInViewController {
         
         private let body = UILabel().then {
             $0.text = Strings.Rewards.braveTalkRewardsOptInBody
-            $0.font = .systemFont(ofSize: 17)
+            $0.font = .preferredFont(forTextStyle: .body)
+            $0.adjustsFontForContentSizeCategory = true
             $0.textColor = .braveLabel
             $0.numberOfLines = 0
             $0.textAlignment = .center
@@ -49,7 +58,8 @@ extension BraveTalkRewardsOptInViewController {
             $0.text = String(format: Strings.Rewards.braveTalkRewardsOptInDisclaimer,
                              Strings.OBRewardsAgreementDetailLink,
                              Strings.privacyPolicy)
-            $0.font = .systemFont(ofSize: 12)
+            $0.font = .preferredFont(forTextStyle: .caption1)
+            $0.adjustsFontForContentSizeCategory = true
             $0.textColor = .braveLabel
             $0.textAlignment = .center
             $0.setURLInfo([Strings.OBRewardsAgreementDetailLink: "tos",
@@ -73,18 +83,31 @@ extension BraveTalkRewardsOptInViewController {
                                      .view(body),
                                      .view(enableRewardsButton),
                                      .view(disclaimer))
+                
+                $0.layoutMargins = .init(top: 44, left: 32, bottom: 24, right: 32)
+                $0.isLayoutMarginsRelativeArrangement = true
             }
             
-            addSubview(stackView)
+            let scrollView = UIScrollView()
+            addSubview(scrollView)
+            
+            scrollView.snp.makeConstraints {
+                $0.leading.trailing.equalToSuperview()
+                $0.top.bottom.equalToSuperview()
+            }
+            
+            scrollView.addSubview(stackView)
             
             stackView.snp.makeConstraints {
-                $0.leading.trailing.equalToSuperview().inset(32)
-                $0.top.equalToSuperview().inset(44)
-                $0.bottom.equalToSuperview().inset(24)
-                $0.width.lessThanOrEqualTo(PopoverController.preferredPopoverWidth)
+                $0.edges.equalToSuperview()
             }
             
-            insertSubview(optinBackground, belowSubview: stackView)
+            scrollView.contentLayoutGuide.snp.makeConstraints {
+                $0.width.equalToSuperview()
+                $0.top.bottom.equalTo(stackView)
+            }
+            
+            scrollView.insertSubview(optinBackground, belowSubview: stackView)
             optinBackground.snp.makeConstraints {
                 $0.left.top.equalToSuperview().inset(10)
             }
@@ -93,6 +116,40 @@ extension BraveTalkRewardsOptInViewController {
         @available(*, unavailable)
         required init(coder: NSCoder) {
             fatalError()
+        }
+        
+        private func setupButtonConstaints() {
+            // This is required in order to support dynamic types.
+            // Otherwise the titleLabel do not fit the button's frame.
+            enableRewardsButton.titleLabel?.snp.remakeConstraints {
+                $0.edges.equalToSuperview()
+            }
+            
+            let isBigContentSize =
+                enableRewardsButton.traitCollection.preferredContentSizeCategory > .extraExtraLarge
+            
+            let cappedRadius: CGFloat = 24
+            let standardRadius = enableRewardsButton.bounds.height / 2.0
+            
+            enableRewardsButton.layer.cornerRadius = isBigContentSize ? cappedRadius : standardRadius
+        }
+        
+        override func layoutSubviews() {
+            super.layoutSubviews()
+            
+            setupButtonConstaints()
+        }
+        
+        override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+            super.traitCollectionDidChange(previousTraitCollection)
+            
+            if previousTraitCollection?.preferredContentSizeCategory
+                != traitCollection.preferredContentSizeCategory {
+                
+                DispatchQueue.main.async {
+                    self.setupButtonConstaints()
+                }
+            }
         }
     }
 }

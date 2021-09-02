@@ -23,12 +23,14 @@ class BraveTalkRewardsOptInViewController: UIViewController, PopoverContentCompo
     }
     
     override func viewDidLoad() {
+        preferredContentSize = .init(width: 350, height: 450)
+        
         braveTalkView.enableRewardsButton .addTarget(self, action: #selector(enableRewardsAction),
                                                      for: .touchUpInside)
-        braveTalkView.disclaimer.onLinkedTapped = { [weak self] link in
+        braveTalkView.disclaimer.onLinkedTapped = { [unowned self] link in
             var request: URLRequest?
             
-            self?.dismiss(animated: true) {
+            self.dismiss(animated: true) {
                 switch link.absoluteString {
                 case "tos":
                     request = URLRequest(url: BraveUX.batTermsOfUseURL)
@@ -39,7 +41,7 @@ class BraveTalkRewardsOptInViewController: UIViewController, PopoverContentCompo
                 }
                 
                 if let request = request {
-                    self?.linkTapped?(request)
+                    self.linkTapped?(request)
                 }
             }
         }

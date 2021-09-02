@@ -14,5 +14,6 @@ class BraveTalkOptInSuccessViewController: UIViewController, PopoverContentCompo
     
     override func loadView() {
         view = View()
+        preferredContentSize = .init(width: 350, height: 250)
     }
 }

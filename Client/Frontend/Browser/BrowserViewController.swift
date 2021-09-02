@@ -2107,7 +2107,8 @@ extension BrowserViewController: TabDelegate {
     func showRequestRewardsPanel(_ tab: Tab) {
         let vc = BraveTalkRewardsOptInViewController()
         
-        let popover = PopoverController(contentController: vc, contentSizeBehavior: .autoLayout)
+        let popover = PopoverController(contentController: vc,
+                                        contentSizeBehavior: .preferredContentSize)
         popover.addsConvenientDismissalMargins = false
         popover.present(from: topToolbar.locationView.rewardsButton, on: self)
         popover.popoverDidDismiss = { _ in
@@ -2123,13 +2124,14 @@ extension BrowserViewController: TabDelegate {
             tab.rewardsEnabledCallback?(true)
             
             let vc2 = BraveTalkOptInSuccessViewController()
-            let popover2 = PopoverController(contentController: vc2, contentSizeBehavior: .autoLayout)
+            let popover2 = PopoverController(contentController: vc2,
+                                             contentSizeBehavior: .preferredContentSize)
             popover2.present(from: self.topToolbar.locationView.rewardsButton, on: self)
         }
         
-        vc.linkTapped = { [weak self] request in
+        vc.linkTapped = { [unowned self] request in
             tab.rewardsEnabledCallback?(false)
-            self?.tabManager
+            self.tabManager
                 .addTabAndSelect(request, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
         }
     }

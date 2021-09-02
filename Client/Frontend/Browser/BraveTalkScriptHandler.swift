@@ -44,12 +44,7 @@ class BraveTalkScriptHandler: TabContentScript {
     
     private func handleBraveRequestAdsEnabled() {
         
-        if PrivateBrowsingManager.shared.isPrivateBrowsing {
-            callback(result: false)
-            return
-        }
-        
-        guard let rewards = rewards else {
+        guard let rewards = rewards, !PrivateBrowsingManager.shared.isPrivateBrowsing else {
             callback(result: false)
             return
         }

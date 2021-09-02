@@ -17,7 +17,8 @@ extension BraveTalkOptInSuccessViewController {
         
         private let title = UILabel().then {
             $0.text = Strings.Rewards.braveTalkRewardsOptInSuccessTitle
-            $0.font = .systemFont(ofSize: 20)
+            $0.font = .preferredFont(forTextStyle: .title3)
+            $0.adjustsFontForContentSizeCategory = true
             $0.textColor = .bravePrimary
             $0.numberOfLines = 0
             $0.textAlignment = .center
@@ -25,7 +26,8 @@ extension BraveTalkOptInSuccessViewController {
         
         private let body = UILabel().then {
             $0.text = Strings.Rewards.braveTalkRewardsOptInSuccessBody
-            $0.font = .systemFont(ofSize: 17)
+            $0.font = .preferredFont(forTextStyle: .body)
+            $0.adjustsFontForContentSizeCategory = true
             $0.textColor = .braveLabel
             $0.numberOfLines = 0
             $0.textAlignment = .center
@@ -40,24 +42,42 @@ extension BraveTalkOptInSuccessViewController {
             
             backgroundColor = .braveBackground
             
+            let scrollView = UIScrollView()
+            addSubview(scrollView)
+            scrollView.snp.makeConstraints {
+                $0.edges.equalToSuperview()
+            }
+            
             let stackView = UIStackView().then {
                 $0.axis = .vertical
                 $0.spacing = 12
                 $0.addStackViewItems(.view(image),
                                      .view(title),
                                      .view(body))
+                
+                $0.layoutMargins = .init(top: 44, left: 32, bottom: 24, right: 32)
+                $0.isLayoutMarginsRelativeArrangement = true
             }
             
-            addSubview(stackView)
+            scrollView.addSubview(stackView)
+            
+            scrollView.snp.makeConstraints {
+                $0.leading.trailing.equalToSuperview()
+                $0.top.bottom.equalToSuperview()
+            }
+            
+            scrollView.addSubview(stackView)
             
             stackView.snp.makeConstraints {
-                $0.leading.trailing.equalToSuperview().inset(32)
-                $0.top.equalToSuperview().inset(44)
-                $0.bottom.equalToSuperview().inset(24)
-                $0.width.lessThanOrEqualTo(PopoverController.preferredPopoverWidth)
+                $0.edges.equalToSuperview()
             }
             
-            insertSubview(optinBackground, belowSubview: stackView)
+            scrollView.contentLayoutGuide.snp.makeConstraints {
+                $0.width.equalToSuperview()
+                $0.top.bottom.equalTo(stackView)
+            }
+            
+            scrollView.insertSubview(optinBackground, belowSubview: stackView)
             optinBackground.snp.makeConstraints {
                 $0.left.top.equalToSuperview().inset(10)
             }
