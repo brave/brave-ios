@@ -31,7 +31,8 @@ class PlaylistCarplayManager: NSObject {
     var currentPlaylistItem: PlaylistInfo? {
         didSet {
             if #available(iOS 14, *) {
-                //#error("FIX")
+                // There doesn't seem to be a reason OR a way to do this on iOS 14+
+                // Possibly need to index the `CPListItem` and set `.isPlaying`
             } else {
                 if let item = currentPlaylistItem {
                     // Show the Now-Playing item indicator in Car-Play screen
@@ -67,7 +68,9 @@ class PlaylistCarplayManager: NSObject {
         super.init()
         
         if #available(iOS 14, *) {
-            //#error("FIX")
+            // iOS 14 does NOT require initialization :)
+            // This is because the CPTemplate gets called properly
+            // So we know exactly when CarPlay is connected, and when it is disconnected.
             return
         } else {
             contentManager = MPPlayableContentManager.shared()
@@ -112,6 +115,8 @@ class PlaylistCarplayManager: NSObject {
     
     func getCarPlayController() -> NSObject? {
         if #available(iOS 14, *) {
+            // On iOS 14, we use CPTemplate (Custom UI)
+            // We control what gets displayed
             guard let carplayInterface = carplayInterface else {
                 return nil
             }
@@ -123,6 +128,8 @@ class PlaylistCarplayManager: NSObject {
             self.mediaPlayer = mediaPlayer
             return carPlayController
         } else {
+            // On iOS 13, we cannot use anything custom, so we must resort to display
+            // data base on models and `NowPlayingInfoCenter`
             guard let contentManager = contentManager else {
                 return nil
             }
