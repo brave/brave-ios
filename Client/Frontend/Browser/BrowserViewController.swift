@@ -2107,6 +2107,10 @@ extension BrowserViewController: TabDelegate {
     func showRequestRewardsPanel(_ tab: Tab) {
         let vc = BraveTalkRewardsOptInViewController()
         
+        // Edge case: user disabled Rewards button and wants to access free Brave Talk
+        // We re-enable the button again. It can be disabled in settings later.
+        Preferences.Rewards.hideRewardsIcon.value = false
+        
         let popover = PopoverController(contentController: vc,
                                         contentSizeBehavior: .preferredContentSize)
         popover.addsConvenientDismissalMargins = false
