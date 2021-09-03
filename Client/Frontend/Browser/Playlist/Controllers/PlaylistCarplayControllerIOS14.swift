@@ -13,10 +13,11 @@ import Shared
 
 private let log = Logger.browserLogger
 
-class PlaylistCarplayController: NSObject {
+@available(iOS 14, *)
+class PlaylistCarplayControllerIOS14: NSObject {
     private let player: MediaPlayer
     private let mediaStreamer: PlaylistMediaStreamer
-    private let contentManager: MPPlayableContentManager
+    private let interfaceController: CPInterfaceController
     private var playerStateObservers = Set<AnyCancellable>()
     private var assetStateObservers = Set<AnyCancellable>()
     private var assetLoadingStateObservers = Set<AnyCancellable>()
@@ -24,27 +25,23 @@ class PlaylistCarplayController: NSObject {
     private var playlistItemIds = [String]()
     private weak var browser: BrowserViewController?
     
-    init(browser: BrowserViewController?, player: MediaPlayer, contentManager: MPPlayableContentManager) {
+    init(browser: BrowserViewController?, player: MediaPlayer, interfaceController: CPInterfaceController) {
         self.browser = browser
         self.player = player
-        self.contentManager = contentManager
+        self.interfaceController = interfaceController
         self.mediaStreamer = PlaylistMediaStreamer(playerView: browser?.view ?? UIView())
         super.init()
+        
+        interfaceController.delegate = self
         
         observePlayerStates()
         observePlaylistStates()
         PlaylistManager.shared.reloadData()
         
         playlistItemIds = PlaylistManager.shared.allItems.map { $0.pageSrc }
-        
-        contentManager.dataSource = self
-        contentManager.delegate = self
+        self.reloadData()
         
         DispatchQueue.main.async {
-            contentManager.beginUpdates()
-            contentManager.endUpdates()
-            contentManager.reloadData()
-            
             // Workaround to see carplay NowPlaying on the simulator
             #if targetEnvironment(simulator)
             UIApplication.shared.endReceivingRemoteControlEvents()
@@ -54,6 +51,8 @@ class PlaylistCarplayController: NSObject {
     }
     
     func observePlayerStates() {
+//        CPNowPlayingTemplate.shared.updateNowPlayingButtons
+        
         player.publisher(for: .play).sink { event in
             MPNowPlayingInfoCenter.default().playbackState = .playing
             var nowPlayingInfo = MPNowPlayingInfoCenter.default().nowPlayingInfo ?? [:]
@@ -100,163 +99,274 @@ class PlaylistCarplayController: NSObject {
             guard let self = self else { return }
             
             self.playlistItemIds = PlaylistManager.shared.allItems.map { $0.pageSrc }
-            
-            // FOR SOME REASON ON SIMULATOR,
-            // CALLING THIS DOES NOT UPDATE THE UI!!
-            // WE WILL GET A CRASH ON SIMULATOR HERE!
-            // SEE: https://developer.apple.com/forums/thread/112101
-            
-            self.contentManager.reloadData()
+            self.reloadData()
         }
         
         PlaylistManager.shared.contentWillChange
+        .receive(on: RunLoop.main)
         .sink { _ in
             reloadData()
         }.store(in: &playlistObservers)
         
         PlaylistManager.shared.contentDidChange
+        .receive(on: RunLoop.main)
         .sink { _ in
             reloadData()
         }.store(in: &playlistObservers)
         
         PlaylistManager.shared.objectDidChange
+        .receive(on: RunLoop.main)
         .sink { _ in
             reloadData()
         }.store(in: &playlistObservers)
         
         PlaylistManager.shared.downloadStateChanged
+        .receive(on: RunLoop.main)
         .sink { _ in
             reloadData()
         }.store(in: &playlistObservers)
     }
-}
-
-extension PlaylistCarplayController: MPPlayableContentDelegate {
-    func playableContentManager(_ contentManager: MPPlayableContentManager, didUpdate context: MPPlayableContentManagerContext) {
-        
-        log.debug("CAR PLAY CONNECTED: \(context.endpointAvailable)")
-    }
     
-    func playableContentManager(_ contentManager: MPPlayableContentManager, initiatePlaybackOfContentItemAt indexPath: IndexPath, completionHandler: @escaping (Error?) -> Void) {
+    private func reloadData() {
+        playlistItemIds = PlaylistManager.shared.allItems.map { $0.pageSrc }
         
-        if indexPath.count == 2 {
-            // Item Section
-            DispatchQueue.main.async {
-                guard let mediaItem = PlaylistManager.shared.itemAtIndex(indexPath.item) else {
-                    completionHandler(nil)
-                    return
-                }
+        // PLAYLIST TEMPLATE
+        let playlistTemplate = generatePlaylistListTemplate()
+        
+        // SETTINGS TEMPLATE
+        let settingsTemplate = generateSettingsTemplate()
+        
+        // ALL TEMPLATES
+        let tabTemplates: [CPTemplate] = [
+            playlistTemplate,
+            settingsTemplate
+        ]
+        
+        self.interfaceController.delegate = self
+        self.interfaceController.setRootTemplate(CPTabBarTemplate(templates: tabTemplates),
+                                                 animated: true,
+                                                 completion: { success, error in
+            if !success, let error = error {
+                // Can also use CPAlertTemplate, but it doesn't have a "Message" parameter.
+                let alert = CPActionSheetTemplate(title: Strings.PlayList.sorryAlertTitle,
+                                                  message: error.localizedDescription,
+                                                  actions: [
+                    CPAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: { _ in
+                        // Handler cannot be nil.. so..
+                    })
+                ])
                 
-                // Item is already playing.
-                // Show now-playing screen and don't restart playback.
-                if PlaylistCarplayManager.shared.currentlyPlayingItemIndex == indexPath.item ||
-                    PlaylistCarplayManager.shared.currentPlaylistItem?.src == mediaItem.src {
-                    completionHandler(nil)
-                    return
-                }
-                
-                self.playItem(item: mediaItem) { [weak self] error in
-                    PlaylistCarplayManager.shared.currentPlaylistItem = nil
-                    
-                    switch error {
-                    case .other(let error):
-                        log.error(error)
-                        completionHandler("Unknown Error")
-                    case .expired:
-                        completionHandler(Strings.PlayList.expiredAlertDescription)
-                    case .none:
-                        guard let self = self else {
-                            completionHandler("Unknown Error")
-                            return
-                        }
-                        
-                        PlaylistCarplayManager.shared.currentlyPlayingItemIndex = indexPath.item
-                        PlaylistCarplayManager.shared.currentPlaylistItem = mediaItem
-                        PlaylistMediaStreamer.setNowPlayingMediaArtwork(artwork: self.contentItem(at: indexPath)?.artwork)
-                        
-                        completionHandler(nil)
-                    case .cancelled:
-                        log.debug("User Cancelled Playlist playback")
-                        completionHandler(nil)
-                    }
-                    
-                    // Workaround to see carplay NowPlaying on the simulator
-                    #if targetEnvironment(simulator)
-                    DispatchQueue.main.async {
-                        UIApplication.shared.endReceivingRemoteControlEvents()
-                        UIApplication.shared.beginReceivingRemoteControlEvents()
-                    }
-                    #endif
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                    self.interfaceController.presentTemplate(alert, animated: true, completion: nil)
                 }
             }
-        } else {
-            // Tab Section
-            completionHandler(nil)
-        }
+         })
     }
     
-    func beginLoadingChildItems(at indexPath: IndexPath, completionHandler: @escaping (Error?) -> Void) {
-        // For some odd reason, this is never called in the simulator.
-        // It is only called in the car and that's fine.
-        completionHandler(nil)
-    }
-}
-
-extension PlaylistCarplayController: MPPlayableContentDataSource {
-    func numberOfChildItems(at indexPath: IndexPath) -> Int {
-        if indexPath.indices.count == 0 {
-            return 1 // 1 Tab.
-        }
-        
-        return playlistItemIds.count
-    }
-    
-    func childItemsDisplayPlaybackProgress(at indexPath: IndexPath) -> Bool {
-        true
-    }
-    
-    func contentItem(at indexPath: IndexPath) -> MPContentItem? {
-        // Tab Section
-        if indexPath.count == 1 {
-            let item = MPContentItem(identifier: "BravePlaylist")
-            item.title = Strings.PlayList.playlistCarplayTitle
-            item.isContainer = true
-            item.isPlayable = false
-            let imageIcon = #imageLiteral(resourceName: "settings-shields")
-            item.artwork = MPMediaItemArtwork(boundsSize: imageIcon.size, requestHandler: { _ -> UIImage in
-                return imageIcon
-            })
-            return item
-        }
-
-        if indexPath.count == 2 {
-            // Items section
-            guard let itemId = playlistItemIds[safe: indexPath.row] else {
+    private func generatePlaylistListTemplate() -> CPTemplate {
+        // Fetch all Playlist Items
+        let listItems = playlistItemIds.compactMap { itemId -> CPListItem? in
+            guard let itemIndex = PlaylistManager.shared.index(of: itemId),
+                  let item = PlaylistManager.shared.itemAtIndex(itemIndex) else {
                 return nil
             }
             
-            let item = MPContentItem(identifier: itemId)
-            
-            DispatchQueue.main.async {
-                guard let mediaItem = PlaylistManager.shared.itemAtIndex(indexPath.item) else {
-                    return
+            let listItem = CPListItem(text: item.name, detailText: item.pageSrc)
+            listItem.handler = { [unowned self, weak listItem] _, completion in
+                self.initiatePlaybackOfItem(itemId: itemId) { error in
+                    guard let listItem = listItem else {
+                        completion()
+                        return
+                    }
+                    
+                    if let error = error {
+                        log.error(error)
+                        listItem.isPlaying = false
+                    } else {
+                        listItem.isPlaying = true
+                    }
+                    
+                    let userInfo = listItem.userInfo as? [String: Any]
+                    PlaylistMediaStreamer.setNowPlayingMediaArtwork(image: userInfo?["icon"] as? UIImage)
+                    
+                    completion()
                 }
-
-                let cacheState = PlaylistManager.shared.state(for: mediaItem.pageSrc)
-                item.title = mediaItem.name
-                item.subtitle = mediaItem.pageSrc
-                item.isPlayable = true
-                item.isStreamingContent = cacheState != .downloaded
-                item.loadThumbnail(for: mediaItem)
             }
-            return item
+            
+            // Update the current playing status
+            listItem.isPlaying = PlaylistCarplayManager.shared.currentlyPlayingItemIndex == itemIndex || PlaylistCarplayManager.shared.currentPlaylistItem?.src == item.src
+            
+            listItem.setImage(FaviconFetcher.defaultFaviconImage)
+            var userInfo = [String: Any]()
+            userInfo.merge(with: [
+                "id": itemId,
+                "thumbnailRenderer": self.loadThumbnail(for: item) { [weak listItem]
+                    image in
+                    guard let listItem = listItem else { return }
+                    
+                    // Store the thumbnail that was fetched
+                    userInfo["icon"] = image
+                    listItem.userInfo = userInfo
+                    
+                    if let image = image {
+                        listItem.setImage(image.scale(toSize: CPListItem.maximumImageSize))
+                    }
+                    
+                    if listItem.isPlaying {
+                        PlaylistMediaStreamer.setNowPlayingMediaArtwork(image: image)
+                    }
+                    
+                    // After completion, remove the renderer from the user info
+                    // so that it can dealloc nicely and save us some memory.
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        userInfo["thumbnailRenderer"] = nil
+                        listItem.userInfo = userInfo
+                    }
+                } as Any
+            ])
+            listItem.userInfo = userInfo
+            return listItem
         }
-
-        return nil
+        
+        // Template
+        let playlistTemplate = CPListTemplate(
+            title: "Playlist",
+            sections: [CPListSection(items: listItems)]
+        ).then {
+            $0.tabImage = UIImage(systemName: "list.star")
+        }
+        return playlistTemplate
+    }
+    
+    private func generateSettingsTemplate() -> CPTemplate {
+        // Playback Options
+        let restartPlaybackOption = CPListItem(text: "Restart Playback",
+                                   detailText: "Decide whether or not selecting an already playing item will restart playback, or continue playing where last left off").then {
+            $0.handler = { [unowned self] listItem, completion in
+                let enableGridView = Preferences.Playlist.enableCarPlayRestartPlayback.value
+                let title = enableGridView ? "Enabled. Tap to disable playback restarting." : "Disabled. Tap to enable playback restarting"
+                let icon = enableGridView ? #imageLiteral(resourceName: "checkbox_on") : #imageLiteral(resourceName: "loginUnselected")
+                let button = CPGridButton(titleVariants: [title], image: icon) { [unowned self] button in
+                    Preferences.Playlist.enableCarPlayRestartPlayback.value = !enableGridView
+                    self.interfaceController.popTemplate(animated: true, completion: nil)
+                }
+                
+                self.interfaceController.pushTemplate(
+                    CPGridTemplate(title: "Playback Options", gridButtons: [button]),
+                    animated: true,
+                    completion: nil
+                )
+                
+                completion()
+            }
+        }
+        
+        // Sections
+        let playbackSection = CPListSection(items: [restartPlaybackOption],
+                                            header: "Playback Options",
+                                            sectionIndexTitle: "Playback Options")
+        
+        // Template
+        let settingsTemplate = CPListTemplate(title: "Settings",
+                                              sections: [playbackSection]).then {
+            $0.tabImage = UIImage(systemName: "gear")
+        }
+        return settingsTemplate
     }
 }
 
-extension PlaylistCarplayController {
+@available(iOS 14, *)
+extension PlaylistCarplayControllerIOS14: CPInterfaceControllerDelegate {
+    func templateWillAppear(_ aTemplate: CPTemplate, animated: Bool) {
+        log.debug("Template \(aTemplate.classForCoder) will appear.")
+    }
+
+    func templateDidAppear(_ aTemplate: CPTemplate, animated: Bool) {
+        log.debug("Template \(aTemplate.classForCoder) did appear.")
+    }
+
+    func templateWillDisappear(_ aTemplate: CPTemplate, animated: Bool) {
+        log.debug("Template \(aTemplate.classForCoder) will disappear.")
+    }
+
+    func templateDidDisappear(_ aTemplate: CPTemplate, animated: Bool) {
+        log.debug("Template \(aTemplate.classForCoder) did disappear.")
+    }
+}
+
+@available(iOS 14, *)
+extension PlaylistCarplayControllerIOS14 {
+    
+    func loadThumbnail(for mediaItem: PlaylistInfo, completion: @escaping (UIImage?) -> Void) -> PlaylistThumbnailRenderer? {
+        guard let assetUrl = URL(string: mediaItem.src),
+              let favIconUrl = URL(string: mediaItem.pageSrc) else {
+            completion(nil)
+            return nil
+        }
+        
+        let thumbnailRenderer = PlaylistThumbnailRenderer()
+        thumbnailRenderer.loadThumbnail(assetUrl: assetUrl,
+                                        favIconUrl: favIconUrl,
+                                        completion: { image in
+                                            completion(image)
+                                        })
+        return thumbnailRenderer
+    }
+    
+    func initiatePlaybackOfItem(itemId: String, completionHandler: @escaping (Error?) -> Void) {
+        guard let index = PlaylistManager.shared.index(of: itemId),
+              let item = PlaylistManager.shared.itemAtIndex(index) else {
+            displayLoadingResourceError()
+            completionHandler("Invalid Item")
+            return
+        }
+        
+        if !Preferences.Playlist.enableCarPlayRestartPlayback.value {
+            // Item is already playing.
+            // Show now-playing screen and don't restart playback.
+            if PlaylistCarplayManager.shared.currentPlaylistItem?.pageSrc == itemId {
+                completionHandler(nil)
+                return
+            }
+        }
+        
+        self.playItem(item: item) { [weak self] error in
+            PlaylistCarplayManager.shared.currentPlaylistItem = nil
+            guard let self = self else {
+                completionHandler(nil)
+                return
+            }
+            
+            switch error {
+            case .other(let error):
+                log.error(error)
+                self.displayLoadingResourceError()
+                completionHandler(error)
+            case .expired:
+                self.displayExpiredResourceError(item: item)
+                completionHandler("Item Expired")
+            case .none:
+                PlaylistCarplayManager.shared.currentlyPlayingItemIndex = index
+                PlaylistCarplayManager.shared.currentPlaylistItem = item
+                completionHandler(nil)
+            case .cancelled:
+                log.debug("User Cancelled Playlist playback")
+                completionHandler("User Cancelled")
+            }
+            
+            // Workaround to see carplay NowPlaying on the simulator
+            #if targetEnvironment(simulator)
+            DispatchQueue.main.async {
+                UIApplication.shared.endReceivingRemoteControlEvents()
+                UIApplication.shared.beginReceivingRemoteControlEvents()
+            }
+            #endif
+        }
+    }
+}
+
+@available(iOS 14, *)
+extension PlaylistCarplayControllerIOS14 {
     func onPreviousTrack(isUserInitiated: Bool) {
         if PlaylistCarplayManager.shared.currentlyPlayingItemIndex <= 0 {
             return
@@ -542,70 +652,30 @@ extension PlaylistCarplayController {
     }
     
     func displayExpiredResourceError(item: PlaylistInfo?) {
-        if let item = item {
-            let alert = UIAlertController(title: Strings.PlayList.expiredAlertTitle,
-                                          message: Strings.PlayList.expiredAlertDescription, preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: Strings.PlayList.reopenButtonTitle, style: .default, handler: { [weak self] _ in
-                guard let browser = self?.browser else { return }
-                
-                if let url = URL(string: item.pageSrc) {
-                    browser.dismiss(animated: true, completion: nil)
-                    browser.openURLInNewTab(url, isPrivileged: false)
-                }
-            }))
-            alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil))
-            browser?.present(alert, animated: true, completion: nil)
-        } else {
-            let alert = UIAlertController(title: Strings.PlayList.expiredAlertTitle,
-                                          message: Strings.PlayList.expiredAlertDescription, preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
-            browser?.present(alert, animated: true, completion: nil)
-        }
+        // CarPlay cannot "open" URLs so we display an alert with an okay button only.
+        // Maybe in the future, check if the phone is open, if it is, display the alert there.
+        // and the user can "open" the item in the webView/browser.
+        let alert = CPActionSheetTemplate(title: Strings.PlayList.expiredAlertTitle,
+                                          message: Strings.PlayList.expiredAlertDescription,
+                                          actions: [
+            CPAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: { _ in
+                // Handler cannot be nil.. so..
+            })
+        ])
+        
+        interfaceController.presentTemplate(alert, animated: true, completion: nil)
     }
     
     func displayLoadingResourceError() {
-        let alert = UIAlertController(
-            title: Strings.PlayList.sorryAlertTitle, message: Strings.PlayList.loadResourcesErrorAlertDescription, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: nil))
-        browser?.present(alert, animated: true, completion: nil)
-    }
-}
-
-// MPContentItem has no way of storing a thumbnail with it.
-// So to do that, we need associated values where we store its renderer.
-// The next time it attempts to retrieve its thumbnail, we return it from the renderer.
-// Otherwise it will constantly make requests for thumbnail :(
-extension MPContentItem {
-    
-    func loadThumbnail(for mediaItem: PlaylistInfo) {
-        if thumbnailRenderer != nil {
-            return
-        }
+        // Can also use CPAlertTemplate, but it doesn't have a "Message" parameter.
+        let alert = CPActionSheetTemplate(title: Strings.PlayList.sorryAlertTitle,
+                                          message: Strings.PlayList.loadResourcesErrorAlertDescription,
+                                          actions: [
+            CPAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: { _ in
+                // Handler cannot be nil.. so..
+            })
+        ])
         
-        guard let assetUrl = URL(string: mediaItem.src),
-              let favIconUrl = URL(string: mediaItem.pageSrc) else {
-            return
-        }
-        
-        thumbnailRenderer = PlaylistThumbnailRenderer()
-        thumbnailRenderer?.loadThumbnail(assetUrl: assetUrl,
-                                         favIconUrl: favIconUrl,
-                                         completion: { [weak self] image in
-                                            guard let self = self else { return }
-                                            
-                                            let image = image ?? #imageLiteral(resourceName: "settings-shields")
-                                            self.artwork = MPMediaItemArtwork(boundsSize: image.size, requestHandler: { _ -> UIImage in
-                                                return image
-                                            })
-                                         })
-    }
-    
-    private struct AssociatedKeys {
-        static var thumbnailRenderer: Int = 0
-    }
-    
-    private var thumbnailRenderer: PlaylistThumbnailRenderer? {
-        get { objc_getAssociatedObject(self, &AssociatedKeys.thumbnailRenderer) as? PlaylistThumbnailRenderer }
-        set { objc_setAssociatedObject(self, &AssociatedKeys.thumbnailRenderer, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC) }
+        interfaceController.presentTemplate(alert, animated: true, completion: nil)
     }
 }

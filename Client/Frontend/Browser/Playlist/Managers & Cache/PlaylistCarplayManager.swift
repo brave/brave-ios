@@ -6,6 +6,7 @@
 import Foundation
 import Combine
 import MediaPlayer
+import CarPlay
 import Shared
 import Data
 import BraveShared
@@ -16,21 +17,28 @@ private let log = Logger.browserLogger
 /// The MediaPlayer is then passed to any controller that needs to use it.
 class PlaylistCarplayManager: NSObject {
     private var carPlayStatusObservers = [Any]()
-    private let contentManager = MPPlayableContentManager.shared()
-    private var carPlayController: PlaylistCarplayController?
     private weak var mediaPlayer: MediaPlayer?
     private(set) var isCarPlayAvailable = false
+    
+    private var contentManager: MPPlayableContentManager?
+    private var carPlayController: NSObject?
+    private var carplayInterface: CPInterfaceController?
+    private var carplaySessionConfiguration: CPSessionConfiguration?
     
     var browserController: BrowserViewController?
     
     var currentlyPlayingItemIndex = -1
     var currentPlaylistItem: PlaylistInfo? {
         didSet {
-            if let item = currentPlaylistItem {
-                // Show the Now-Playing item indicator in Car-Play screen
-                contentManager.nowPlayingIdentifiers = [item.pageSrc]
+            if #available(iOS 14, *) {
+                //#error("FIX")
             } else {
-                contentManager.nowPlayingIdentifiers = []
+                if let item = currentPlaylistItem {
+                    // Show the Now-Playing item indicator in Car-Play screen
+                    contentManager?.nowPlayingIdentifiers = [item.pageSrc]
+                } else {
+                    contentManager?.nowPlayingIdentifiers = []
+                }
             }
         }
     }
@@ -57,6 +65,13 @@ class PlaylistCarplayManager: NSObject {
     
     private override init() {
         super.init()
+        
+        if #available(iOS 14, *) {
+            //#error("FIX")
+            return
+        } else {
+            contentManager = MPPlayableContentManager.shared()
+        }
         
         #if targetEnvironment(simulator)
         // Force CarPlay on the simulator
@@ -95,13 +110,30 @@ class PlaylistCarplayManager: NSObject {
         #endif
     }
     
-    func getCarPlayController() -> PlaylistCarplayController {
-        // If there is no media player, create one,
-        // pass it to the car-play controller
-        let mediaPlayer = self.mediaPlayer ?? MediaPlayer()
-        let carPlayController = PlaylistCarplayController(browser: browserController, player: mediaPlayer, contentManager: contentManager)
-        self.mediaPlayer = mediaPlayer
-        return carPlayController
+    func getCarPlayController() -> NSObject? {
+        if #available(iOS 14, *) {
+            guard let carplayInterface = carplayInterface else {
+                return nil
+            }
+            
+            // If there is no media player, create one,
+            // pass it to the car-play controller
+            let mediaPlayer = self.mediaPlayer ?? MediaPlayer()
+            let carPlayController = PlaylistCarplayControllerIOS14(browser: browserController, player: mediaPlayer, interfaceController: carplayInterface)
+            self.mediaPlayer = mediaPlayer
+            return carPlayController
+        } else {
+            guard let contentManager = contentManager else {
+                return nil
+            }
+            
+            // If there is no media player, create one,
+            // pass it to the car-play controller
+            let mediaPlayer = self.mediaPlayer ?? MediaPlayer()
+            let carPlayController = PlaylistCarplayController(browser: browserController, player: mediaPlayer, contentManager: contentManager)
+            self.mediaPlayer = mediaPlayer
+            return carPlayController
+        }
     }
     
     func getPlaylistController(initialItem: PlaylistInfo?, initialItemPlaybackOffset: Double) -> PlaylistViewController {
@@ -165,6 +197,29 @@ class PlaylistCarplayManager: NSObject {
 
         // Sometimes the `endpointAvailable` WILL RETURN TRUE!
         // Even when the car is NOT connected.
-        log.debug("CARPLAY CONNECTED: \(isCarPlayAvailable) -- \(contentManager.context.endpointAvailable)")
+        log.debug("CARPLAY CONNECTED: \(isCarPlayAvailable)")
+        log.debug("CARPLAY ENDPOINT AVAILABLE: \(contentManager?.context.endpointAvailable == true)")
+    }
+}
+
+extension PlaylistCarplayManager: CPSessionConfigurationDelegate {
+    func connect(interfaceController: CPInterfaceController) {
+        carplayInterface = interfaceController
+        carplaySessionConfiguration = CPSessionConfiguration(delegate: self)
+        
+        isCarPlayAvailable = true
+        attemptInterfaceConnection(isCarPlayAvailable: true)
+    }
+    
+    func disconnect(interfaceController: CPInterfaceController) {
+        isCarPlayAvailable = false
+        carplayInterface = nil
+        carplayInterface?.delegate = nil
+        attemptInterfaceConnection(isCarPlayAvailable: false)
+    }
+    
+    func sessionConfiguration(_ sessionConfiguration: CPSessionConfiguration,
+                              limitedUserInterfacesChanged limitedUserInterfaces: CPLimitableUserInterface) {
+        log.debug("Limited UI changed: \(limitedUserInterfaces)")
     }
 }

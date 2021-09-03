@@ -216,8 +216,15 @@ class PlaylistViewController: UIViewController {
     }
     
     private func observePlayerStates() {
-        player.publisher(for: .play).sink { [weak self] _ in
+        player.publisher(for: .play).sink { [weak self] event in
             self?.playerView.controlsView.playPauseButton.setImage(#imageLiteral(resourceName: "playlist_pause"), for: .normal)
+            
+            if !PlaylistCarplayManager.shared.isCarPlayAvailable {
+                MPNowPlayingInfoCenter.default().playbackState = .playing
+                var nowPlayingInfo = MPNowPlayingInfoCenter.default().nowPlayingInfo ?? [:]
+                nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = event.mediaPlayer.rate
+                MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
+            }
         }.store(in: &playerStateObservers)
         
         player.publisher(for: .pause).sink { [weak self] _ in
@@ -230,10 +237,10 @@ class PlaylistViewController: UIViewController {
             self.playerView.resetVideoInfo()
         }.store(in: &playerStateObservers)
         
-        player.publisher(for: .changePlaybackRate).sink { [weak self] _ in
+        player.publisher(for: .changePlaybackRate).sink { [weak self] event in
             guard let self = self else { return }
             
-            let playbackRate = self.player.rate
+            let playbackRate = event.mediaPlayer.rate
             let button = self.playerView.controlsView.playbackRateButton
             
             if playbackRate <= 1.0 {
@@ -242,6 +249,10 @@ class PlaylistViewController: UIViewController {
                 button.setTitle("1.5x", for: .normal)
             } else {
                 button.setTitle("2x", for: .normal)
+            }
+            
+            if !PlaylistCarplayManager.shared.isCarPlayAvailable {
+                MPNowPlayingInfoCenter.default().nowPlayingInfo?[MPNowPlayingInfoPropertyPlaybackRate] = event.mediaPlayer.rate
             }
         }.store(in: &playerStateObservers)
         
@@ -258,24 +269,47 @@ class PlaylistViewController: UIViewController {
         }.store(in: &playerStateObservers)
         
         player.publisher(for: .finishedPlaying).sink { [weak self] event in
-            guard let self = self /*,
-                  let currentItem = event.mediaPlayer.currentItem*/ else { return }
+            guard let self = self ,
+                  let currentItem = event.mediaPlayer.currentItem else { return }
             
-//            self.playerView.controlsView.playPauseButton.isEnabled = false
-//            self.playerView.controlsView.playPauseButton.setImage(#imageLiteral(resourceName: "playlist_pause"), for: .normal)
-//
-//            event.mediaPlayer.pause()
-//
-//            let endTime = CMTimeConvertScale(currentItem.asset.duration, timescale: event.mediaPlayer.currentTime.timescale, method: .roundHalfAwayFromZero)
-//
-//            self.playerView.controlsView.trackBar.setTimeRange(currentTime: currentItem.currentTime(), endTime: endTime)
-//            event.mediaPlayer.seek(to: .zero)
-            
-            self.playerView.controlsView.playPauseButton.isEnabled = true
-            self.playerView.controlsView.playPauseButton.setImage(#imageLiteral(resourceName: "playlist_play"), for: .normal)
+            // When CarPlay is available, do NOT pause or handle `nextTrack`
+            // CarPlay will do all of that. So, just update the UI only.
+            if PlaylistCarplayManager.shared.isCarPlayAvailable {
+                self.playerView.controlsView.playPauseButton.isEnabled = false
+                self.playerView.controlsView.playPauseButton.setImage(#imageLiteral(resourceName: "playlist_pause"), for: .normal)
 
-            self.playerView.toggleOverlays(showOverlay: true)
-            //self.onNextTrack(self.playerView, isUserInitiated: false)
+                let endTime = CMTimeConvertScale(currentItem.asset.duration, timescale: event.mediaPlayer.currentTime.timescale, method: .roundHalfAwayFromZero)
+
+                self.playerView.controlsView.trackBar.setTimeRange(currentTime: currentItem.currentTime(), endTime: endTime)
+                event.mediaPlayer.seek(to: .zero)
+                
+                self.playerView.controlsView.playPauseButton.isEnabled = true
+                self.playerView.controlsView.playPauseButton.setImage(#imageLiteral(resourceName: "playlist_play"), for: .normal)
+
+                self.playerView.toggleOverlays(showOverlay: true)
+            } else {
+                var nowPlayingInfo = MPNowPlayingInfoCenter.default().nowPlayingInfo
+                nowPlayingInfo?[MPNowPlayingInfoPropertyPlaybackProgress] = 0.0
+                nowPlayingInfo?[MPNowPlayingInfoPropertyElapsedPlaybackTime] = 0.0
+                nowPlayingInfo?[MPNowPlayingInfoPropertyPlaybackRate] = 0.0
+                MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
+                
+                self.playerView.controlsView.playPauseButton.isEnabled = false
+                self.playerView.controlsView.playPauseButton.setImage(#imageLiteral(resourceName: "playlist_pause"), for: .normal)
+
+                event.mediaPlayer.pause()
+
+                let endTime = CMTimeConvertScale(currentItem.asset.duration, timescale: event.mediaPlayer.currentTime.timescale, method: .roundHalfAwayFromZero)
+
+                self.playerView.controlsView.trackBar.setTimeRange(currentTime: currentItem.currentTime(), endTime: endTime)
+                event.mediaPlayer.seek(to: .zero)
+                
+                self.playerView.controlsView.playPauseButton.isEnabled = true
+                self.playerView.controlsView.playPauseButton.setImage(#imageLiteral(resourceName: "playlist_play"), for: .normal)
+
+                self.playerView.toggleOverlays(showOverlay: true)
+                self.onNextTrack(self.playerView, isUserInitiated: false)
+            }
         }.store(in: &playerStateObservers)
         
         player.publisher(for: .periodicPlayTimeChanged).sink { [weak self] event in

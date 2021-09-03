@@ -119,7 +119,8 @@ class PlaylistMediaStreamer {
         let mediaType: MPNowPlayingInfoMediaType =
             item.mimeType.contains("video") ? .video : .audio
         
-        MPNowPlayingInfoCenter.default().nowPlayingInfo = [
+        var nowPlayingInfo = MPNowPlayingInfoCenter.default().nowPlayingInfo ?? [:]
+        nowPlayingInfo.merge(with: [
             MPNowPlayingInfoPropertyMediaType: NSNumber(value: mediaType.rawValue),
             MPMediaItemPropertyTitle: item.name,
             MPMediaItemPropertyArtist: URL(string: item.pageSrc)?.baseDomain ?? item.pageSrc,
@@ -127,7 +128,8 @@ class PlaylistMediaStreamer {
             MPNowPlayingInfoPropertyPlaybackProgress: 0.0,
             MPNowPlayingInfoPropertyAssetURL: URL(string: item.pageSrc) as Any,
             MPNowPlayingInfoPropertyElapsedPlaybackTime: 0.0,
-        ]
+        ])
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
     }
     
     static func clearNowPlayingInfo() {
@@ -142,6 +144,8 @@ class PlaylistMediaStreamer {
                 return image
             })
             setNowPlayingMediaArtwork(artwork: artwork)
+        } else {
+            setNowPlayingMediaArtwork(artwork: nil)
         }
     }
     
