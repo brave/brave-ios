@@ -48,7 +48,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
         switch mode {
         case .addBookmark(let title, let url):
             return BookmarkDetailsView(title: title, url: url)
-        case .addFolder(let title):
+        case .addFolder(let title), .addFolderWithBookmarks(title: let title, _):
             return FolderDetailsViewTableViewCell(title: title, viewHeight: UX.cellHeight)
         case .editBookmark(let bookmark), .editFavorite(let bookmark):
             return BookmarkDetailsView(title: bookmark.title, url: bookmark.url)
@@ -72,7 +72,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
     /// Returns a count of how many non-folder cells should be visible(depends on Mode state)
     private var specialButtonsCount: Int {
         switch mode {
-        case .addFolder(_), .editFolder(_): return 0
+        case .addFolder(_), .addFolderWithBookmarks(_, _), .editFolder(_): return 0
         case .addBookmark(_, _), .editBookmark(_), .editFavorite(_): return 2
         }
     }
@@ -258,6 +258,25 @@ class AddEditBookmarkTableViewController: UITableViewController {
             case .folder(let folder):
                 Bookmarkv2.addFolder(title: title, parentFolder: folder)
             }
+        case .addFolderWithBookmarks(_, bookmarkList: let bookmarks):
+            switch saveLocation {
+            case .rootLevel:
+                Bookmarkv2.addFolder(title: title)
+                
+                guard addListOfBookmarks(bookmarks) else {
+                    earlyReturn()
+                    return
+                }
+            case .favorites:
+                fatalError("Folders can't be saved to favorites")
+            case .folder(let folder):
+                Bookmarkv2.addFolder(title: title, parentFolder: folder)
+                
+                guard addListOfBookmarks(bookmarks, parentFolder: folder) else {
+                    earlyReturn()
+                    return
+                }
+            }
         case .editBookmark(let bookmark):
             guard let urlString = bookmarkDetailsView.urlTextField?.text,
                 let url = URL(string: urlString) ?? urlString.bookmarkletURL else {
@@ -316,6 +335,19 @@ class AddEditBookmarkTableViewController: UITableViewController {
         } else {
             dismiss(animated: true)
         }
+    }
+    
+    private func addListOfBookmarks(_ bookmarks: [Bookmarkv2], parentFolder: Bookmarkv2? = nil) -> Bool {
+        for bookmark in bookmarks {
+            guard let urlString = bookmark.url,
+                  let url = URL(string: urlString) ?? urlString.bookmarkletURL else {
+                return false
+            }
+            
+            Bookmarkv2.add(url: url, title: bookmark.title, parentFolder: parentFolder)
+        }
+        
+        return true
     }
 
     // MARK: - Table view data source

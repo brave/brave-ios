@@ -620,19 +620,48 @@ extension BrowserViewController: ToolbarDelegate {
             addTabAlertActions().forEach(controller.addAction)
         }
         
+        controller.addAction(
+            UIAlertAction(title: String(format: Strings.bookmarkAllTabsTitle, tabManager.tabsForCurrentMode.count),
+                          style: .default, handler: { [unowned self] _ in
+                            guard let selectedTab = tabManager.selectedTab,
+                  let selectedUrl = selectedTab.url,
+                  !(selectedUrl.isLocal || selectedUrl.isReaderModeURL) else {
+                return
+            }
+
+            let bookmarkUrl = selectedUrl.decodeReaderModeURL ?? selectedUrl
+
+            let mode1 = BookmarkEditMode.addBookmark(title: selectedTab.displayTitle, url: bookmarkUrl.absoluteString)
+            
+            let mode = BookmarkEditMode.addFolder(title: "Add Folder")
+
+            let addBookMarkController = AddEditBookmarkTableViewController(mode: mode)
+
+            presentSettingsNavigation(with: addBookMarkController, cancelEnabled: true)
+                            
+        }), accessibilityIdentifier: "toolbarTabButtonLongPress.bookmarkTab")
+        
         if tabManager.tabsForCurrentMode.count > 1 {
-            controller.addAction(UIAlertAction(title: String(format: Strings.closeAllTabsTitle, tabManager.tabsForCurrentMode.count), style: .destructive, handler: { _ in
+            controller.addAction(
+                UIAlertAction(title: String(format: Strings.closeAllTabsTitle, tabManager.tabsForCurrentMode.count),
+                              style: .destructive, handler: { _ in
                 self.tabManager.removeAll()
             }), accessibilityIdentifier: "toolbarTabButtonLongPress.closeTab")
         }
+        
         controller.addAction(UIAlertAction(title: Strings.closeTabTitle, style: .destructive, handler: { _ in
             if let tab = self.tabManager.selectedTab {
                 self.tabManager.removeTab(tab)
             }
         }), accessibilityIdentifier: "toolbarTabButtonLongPress.closeTab")
-        controller.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil), accessibilityIdentifier: "toolbarTabButtonLongPress.cancel")
-        controller.popoverPresentationController?.sourceView = toolbar ?? topToolbar
-        controller.popoverPresentationController?.sourceRect = button.frame
+        
+        controller.do {
+            $0.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil),
+                         accessibilityIdentifier: "toolbarTabButtonLongPress.cancel")
+            $0.popoverPresentationController?.sourceView = toolbar ?? topToolbar
+            $0.popoverPresentationController?.sourceRect = button.frame
+        }
+        
         UIImpactFeedbackGenerator(style: .heavy).bzzt()
         present(controller, animated: true, completion: nil)
     }
