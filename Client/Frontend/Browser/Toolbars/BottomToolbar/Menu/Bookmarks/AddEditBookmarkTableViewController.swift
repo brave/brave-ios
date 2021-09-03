@@ -48,7 +48,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
         switch mode {
         case .addBookmark(let title, let url):
             return BookmarkDetailsView(title: title, url: url)
-        case .addFolder(let title), .addFolderWithBookmarks(title: let title, _):
+        case .addFolder(let title), .addFolderUsingTabs(title: let title, _):
             return FolderDetailsViewTableViewCell(title: title, viewHeight: UX.cellHeight)
         case .editBookmark(let bookmark), .editFavorite(let bookmark):
             return BookmarkDetailsView(title: bookmark.title, url: bookmark.url)
@@ -56,6 +56,31 @@ class AddEditBookmarkTableViewController: UITableViewController {
             return FolderDetailsViewTableViewCell(title: folder.title, viewHeight: UX.cellHeight)
         }
     }()
+    
+    private var loadingOverlayView: UIView?
+    
+    private var isLoading: Bool = false {
+        didSet {
+            loadingOverlayView?.removeFromSuperview()
+            
+            if !isLoading { return }
+            
+            let overlay = UIView().then {
+                $0.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+                let activityIndicator = UIActivityIndicatorView().then { indicator in
+                    indicator.startAnimating()
+                    indicator.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+                }
+                
+                $0.addSubview(activityIndicator)
+            }
+            
+            view.addSubview(overlay)
+            overlay.frame = CGRect(size: tableView.contentSize)
+            
+            loadingOverlayView = overlay
+        }
+    }
     
     // MARK: - Special cells
     
@@ -72,7 +97,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
     /// Returns a count of how many non-folder cells should be visible(depends on Mode state)
     private var specialButtonsCount: Int {
         switch mode {
-        case .addFolder(_), .addFolderWithBookmarks(_, _), .editFolder(_): return 0
+        case .addFolder(_), .addFolderUsingTabs(_, _), .editFolder(_): return 0
         case .addBookmark(_, _), .editBookmark(_), .editFavorite(_): return 2
         }
     }
@@ -258,23 +283,17 @@ class AddEditBookmarkTableViewController: UITableViewController {
             case .folder(let folder):
                 Bookmarkv2.addFolder(title: title, parentFolder: folder)
             }
-        case .addFolderWithBookmarks(_, bookmarkList: let bookmarks):
+        case .addFolderUsingTabs(_, tabList: let tabs):
             switch saveLocation {
             case .rootLevel:
-                Bookmarkv2.addFolder(title: title)
-                
-                guard addListOfBookmarks(bookmarks) else {
-                    earlyReturn()
-                    return
+                if let newFolder = Bookmarkv2.addFolder(title: title) {
+                    addListOfBookmarks(tabs, parentFolder: Bookmarkv2(newFolder))
                 }
             case .favorites:
                 fatalError("Folders can't be saved to favorites")
             case .folder(let folder):
-                Bookmarkv2.addFolder(title: title, parentFolder: folder)
-                
-                guard addListOfBookmarks(bookmarks, parentFolder: folder) else {
-                    earlyReturn()
-                    return
+                if let newFolder = Bookmarkv2.addFolder(title: title, parentFolder: folder) {
+                    addListOfBookmarks(tabs, parentFolder: Bookmarkv2(newFolder))
                 }
             }
         case .editBookmark(let bookmark):
@@ -337,17 +356,16 @@ class AddEditBookmarkTableViewController: UITableViewController {
         }
     }
     
-    private func addListOfBookmarks(_ bookmarks: [Bookmarkv2], parentFolder: Bookmarkv2? = nil) -> Bool {
-        for bookmark in bookmarks {
-            guard let urlString = bookmark.url,
-                  let url = URL(string: urlString) ?? urlString.bookmarkletURL else {
-                return false
+    private func addListOfBookmarks(_ tabs: [Tab], parentFolder: Bookmarkv2? = nil) {
+        isLoading = true
+        
+        for tab in tabs {
+            if let url = tab.url, url.isWebPage(), !url.isAboutHomeURL {
+                Bookmarkv2.add(url: url, title: tab.title, parentFolder: parentFolder)
             }
-            
-            Bookmarkv2.add(url: url, title: bookmark.title, parentFolder: parentFolder)
         }
         
-        return true
+        isLoading = false
     }
 
     // MARK: - Table view data source

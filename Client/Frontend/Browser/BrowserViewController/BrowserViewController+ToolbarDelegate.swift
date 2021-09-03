@@ -623,22 +623,10 @@ extension BrowserViewController: ToolbarDelegate {
         controller.addAction(
             UIAlertAction(title: String(format: Strings.bookmarkAllTabsTitle, tabManager.tabsForCurrentMode.count),
                           style: .default, handler: { [unowned self] _ in
-                            guard let selectedTab = tabManager.selectedTab,
-                  let selectedUrl = selectedTab.url,
-                  !(selectedUrl.isLocal || selectedUrl.isReaderModeURL) else {
-                return
-            }
-
-            let bookmarkUrl = selectedUrl.decodeReaderModeURL ?? selectedUrl
-
-            let mode1 = BookmarkEditMode.addBookmark(title: selectedTab.displayTitle, url: bookmarkUrl.absoluteString)
             
-            let mode = BookmarkEditMode.addFolder(title: "Add Folder")
-
-            let addBookMarkController = AddEditBookmarkTableViewController(mode: mode)
-
+            let addBookMarkController = AddEditBookmarkTableViewController(
+                mode: BookmarkEditMode.addFolderUsingTabs(title: "Saved Tabs", tabList: tabManager.allTabs))
             presentSettingsNavigation(with: addBookMarkController, cancelEnabled: true)
-                            
         }), accessibilityIdentifier: "toolbarTabButtonLongPress.bookmarkTab")
         
         if tabManager.tabsForCurrentMode.count > 1 {
