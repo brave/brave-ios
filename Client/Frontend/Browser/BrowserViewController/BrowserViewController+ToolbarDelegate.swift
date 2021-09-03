@@ -621,7 +621,7 @@ extension BrowserViewController: ToolbarDelegate {
         }
         
         controller.addAction(
-            UIAlertAction(title: String(format: Strings.bookmarkAllTabsTitle, tabManager.tabsForCurrentMode.count),
+            UIAlertAction(title: Strings.bookmarkAllTabsTitle,
                           style: .default, handler: { [unowned self] _ in
             
             let addBookMarkController = AddEditBookmarkTableViewController(
