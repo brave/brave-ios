@@ -21,9 +21,19 @@ class PlaylistCarplayManager: NSObject {
     private weak var mediaPlayer: MediaPlayer?
     private(set) var isCarPlayAvailable = false
     
-    var currentlyPlayingItemIndex = -1
-    var currentPlaylistItem: PlaylistInfo?
     var browserController: BrowserViewController?
+    
+    var currentlyPlayingItemIndex = -1
+    var currentPlaylistItem: PlaylistInfo? {
+        didSet {
+            if let item = currentPlaylistItem {
+                // Show the Now-Playing item indicator in Car-Play screen
+                contentManager.nowPlayingIdentifiers = [item.pageSrc]
+            } else {
+                contentManager.nowPlayingIdentifiers = []
+            }
+        }
+    }
     
     // When Picture-In-Picture is enabled, we need to store a reference to the controller to keep it alive, otherwise if it deallocates, the system automatically kills Picture-In-Picture.
     var playlistController: PlaylistViewController? {

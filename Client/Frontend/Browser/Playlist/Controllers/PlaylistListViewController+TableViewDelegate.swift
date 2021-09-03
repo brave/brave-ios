@@ -116,6 +116,7 @@ extension PlaylistListViewController: UITableViewDelegate {
             
             PlaylistCarplayManager.shared.currentlyPlayingItemIndex = indexPath.row
             self?.delegate?.playItem(item: item) { [weak self] error in
+                PlaylistCarplayManager.shared.currentPlaylistItem = nil
                 guard let self = self else { return }
                 self.activityIndicator.stopAnimating()
                 
@@ -128,6 +129,8 @@ extension PlaylistListViewController: UITableViewDelegate {
                     self.commitPlayerItemTransaction(at: indexPath, isExpired: true)
                     self.delegate?.displayExpiredResourceError(item: item)
                 case .none:
+                    PlaylistCarplayManager.shared.currentlyPlayingItemIndex = indexPath.row
+                    PlaylistCarplayManager.shared.currentPlaylistItem = item
                     self.commitPlayerItemTransaction(at: indexPath, isExpired: false)
                     self.delegate?.updateLastPlayedItem(item: item)
                 case .cancelled:

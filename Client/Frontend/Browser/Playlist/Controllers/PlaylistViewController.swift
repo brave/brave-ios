@@ -452,6 +452,8 @@ extension PlaylistViewController: VideoViewDelegate {
                 
                 PlaylistCarplayManager.shared.currentlyPlayingItemIndex = indexPath.row
                 self.playItem(item: item) { [weak self] error in
+                    PlaylistCarplayManager.shared.currentPlaylistItem = nil
+                    
                     guard let self = self else { return }
                     
                     switch error {
@@ -463,8 +465,9 @@ extension PlaylistViewController: VideoViewDelegate {
                         self.listController.commitPlayerItemTransaction(at: indexPath, isExpired: true)
                         self.displayExpiredResourceError(item: item)
                     case .none:
-                        self.listController.commitPlayerItemTransaction(at: indexPath, isExpired: false)
                         PlaylistCarplayManager.shared.currentlyPlayingItemIndex = index
+                        PlaylistCarplayManager.shared.currentPlaylistItem = item
+                        self.listController.commitPlayerItemTransaction(at: indexPath, isExpired: false)
                         self.updateLastPlayedItem(item: item)
                     case .cancelled:
                         self.listController.commitPlayerItemTransaction(at: indexPath, isExpired: false)
@@ -512,7 +515,9 @@ extension PlaylistViewController: VideoViewDelegate {
                     return
                 }
                 
+                PlaylistCarplayManager.shared.currentlyPlayingItemIndex = indexPath.row
                 self.playItem(item: item) { [weak self] error in
+                    PlaylistCarplayManager.shared.currentPlaylistItem = nil
                     guard let self = self else { return }
                     
                     switch error {
@@ -534,6 +539,7 @@ extension PlaylistViewController: VideoViewDelegate {
                     case .none:
                         self.listController.commitPlayerItemTransaction(at: indexPath, isExpired: false)
                         PlaylistCarplayManager.shared.currentlyPlayingItemIndex = index
+                        PlaylistCarplayManager.shared.currentPlaylistItem = item
                         self.updateLastPlayedItem(item: item)
                     case .cancelled:
                         self.listController.commitPlayerItemTransaction(at: indexPath, isExpired: false)
