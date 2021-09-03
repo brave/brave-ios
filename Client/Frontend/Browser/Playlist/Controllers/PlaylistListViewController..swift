@@ -209,6 +209,7 @@ class PlaylistListViewController: UIViewController {
                                                      isExpired: true)
                     delegate.displayExpiredResourceError(item: item)
                 case .none:
+                    PlaylistCarplayManager.shared.currentlyPlayingItemIndex = indexPath.row
                     PlaylistCarplayManager.shared.currentPlaylistItem = item
                     self.commitPlayerItemTransaction(at: indexPath,
                                                      isExpired: false)

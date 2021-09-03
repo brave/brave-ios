@@ -184,10 +184,11 @@ class MediaPlayer: NSObject {
     func stop() {
         if isPlaying {
             previousRate = player.rate == 0.0 ? -1.0 : player.rate
-            player.pause()
-            player.replaceCurrentItem(with: nil)
-            stopSubscriber.send(EventNotification(mediaPlayer: self, event: .stop))
         }
+        
+        player.pause()
+        player.replaceCurrentItem(with: nil)
+        stopSubscriber.send(EventNotification(mediaPlayer: self, event: .stop))
     }
     
     func seekPreviousTrack() {

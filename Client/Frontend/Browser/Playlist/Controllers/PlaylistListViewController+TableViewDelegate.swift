@@ -114,6 +114,7 @@ extension PlaylistListViewController: UITableViewDelegate {
                 return
             }
             
+            PlaylistCarplayManager.shared.currentlyPlayingItemIndex = indexPath.row
             self?.delegate?.playItem(item: item) { [weak self] error in
                 guard let self = self else { return }
                 self.activityIndicator.stopAnimating()
