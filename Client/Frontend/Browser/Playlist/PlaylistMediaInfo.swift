@@ -50,6 +50,13 @@ class PlaylistMediaInfo: NSObject {
             .success
         }
         
+        MPRemoteCommandCenter.shared().changePlaybackRateCommand.addTarget { event in
+            if let event = event as? MPChangePlaybackRateCommandEvent {
+                MPNowPlayingInfoCenter.default().nowPlayingInfo?[MPNowPlayingInfoPropertyPlaybackRate] = event.playbackRate
+            }
+            return .success
+        }
+        
         MPRemoteCommandCenter.shared().previousTrackCommand.addTarget { [weak self] _ in
             self?.playerView?.previous()
             return .success
@@ -95,9 +102,9 @@ class PlaylistMediaInfo: NSObject {
         
         UIApplication.shared.beginReceivingRemoteControlEvents()
         updateNowPlayingMediaInfo()
-        rateObserver = playerView.player.observe(\AVPlayer.rate, changeHandler: { [weak self] _, _ in
-            self?.updateNowPlayingMediaInfo()
-        })
+//        rateObserver = playerView.player.observe(\AVPlayer.rate, changeHandler: { [weak self] _, _ in
+//            self?.updateNowPlayingMediaInfo()
+//        })
     }
     
     deinit {
@@ -107,16 +114,22 @@ class PlaylistMediaInfo: NSObject {
     }
     
     func updateNowPlayingMediaInfo() {
-        if let nowPlayingItem = self.nowPlayingInfo {
-            MPNowPlayingInfoCenter.default().nowPlayingInfo = [
-                MPNowPlayingInfoPropertyMediaType: "Audio",
-                MPMediaItemPropertyTitle: nowPlayingItem.name,
-                MPMediaItemPropertyArtist: URL(string: nowPlayingItem.pageSrc)?.baseDomain ?? nowPlayingItem.pageSrc,
-                MPMediaItemPropertyPlaybackDuration: TimeInterval(nowPlayingItem.duration),
-                MPNowPlayingInfoPropertyPlaybackRate: Double(self.playerView?.player.rate ?? 1.0),
-                MPNowPlayingInfoPropertyPlaybackProgress: Float(0.0),
-                MPNowPlayingInfoPropertyElapsedPlaybackTime: Double(self.playerView?.player.currentTime().seconds ?? 0.0)
-            ]
+        if let item = nowPlayingInfo {
+            let mediaType: MPNowPlayingInfoMediaType =
+                item.mimeType.contains("video") ? .video : .audio
+                    
+            var nowPlayingInfo = MPNowPlayingInfoCenter.default().nowPlayingInfo ?? [:]
+            nowPlayingInfo.merge(with: [
+                MPNowPlayingInfoPropertyMediaType: NSNumber(value: mediaType.rawValue),
+                MPMediaItemPropertyTitle: item.name,
+                MPMediaItemPropertyArtist: URL(string: item.pageSrc)?.baseDomain ?? item.pageSrc,
+                MPMediaItemPropertyPlaybackDuration: item.duration,
+                MPNowPlayingInfoPropertyPlaybackRate: playerView?.player.rate ?? 1.0,
+//                MPNowPlayingInfoPropertyPlaybackProgress: 0.0,
+                MPNowPlayingInfoPropertyAssetURL: URL(string: item.pageSrc) as Any,
+                MPNowPlayingInfoPropertyElapsedPlaybackTime: playerView?.player.currentTime().seconds ?? 0.0,
+            ])
+            MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
         } else {
             MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
         }
