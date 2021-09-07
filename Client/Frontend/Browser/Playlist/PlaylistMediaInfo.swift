@@ -102,9 +102,6 @@ class PlaylistMediaInfo: NSObject {
         
         UIApplication.shared.beginReceivingRemoteControlEvents()
         updateNowPlayingMediaInfo()
-//        rateObserver = playerView.player.observe(\AVPlayer.rate, changeHandler: { [weak self] _, _ in
-//            self?.updateNowPlayingMediaInfo()
-//        })
     }
     
     deinit {
