@@ -626,7 +626,7 @@ extension BrowserViewController: ToolbarDelegate {
                               style: .default, handler: { [unowned self] _ in
                 
                 let addBookMarkController = AddEditBookmarkTableViewController(
-                    mode: BookmarkEditMode.addFolderUsingTabs(title: "Saved Tabs", tabList: tabManager.allTabs))
+                    mode: BookmarkEditMode.addFolderUsingTabs(title: Strings.savedTabsFolderTitle, tabList: tabManager.allTabs))
                 presentSettingsNavigation(with: addBookMarkController, cancelEnabled: true)
             }), accessibilityIdentifier: "toolbarTabButtonLongPress.bookmarkTab")
         }

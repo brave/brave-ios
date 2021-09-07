@@ -279,7 +279,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
             case .rootLevel:
                 Bookmarkv2.addFolder(title: title)
             case .favorites:
-                fatalError("Folders can't be saved to favorites")
+                assertionFailure("Folders can't be saved to favorites")
             case .folder(let folder):
                 Bookmarkv2.addFolder(title: title, parentFolder: folder)
             }
@@ -290,7 +290,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
                     addListOfBookmarks(tabs, parentFolder: Bookmarkv2(newFolder))
                 }
             case .favorites:
-                fatalError("Folders can't be saved to favorites")
+                assertionFailure("Folders can't be saved to favorites")
             case .folder(let folder):
                 if let newFolder = Bookmarkv2.addFolder(title: title, parentFolder: folder) {
                     addListOfBookmarks(tabs, parentFolder: Bookmarkv2(newFolder))
@@ -321,7 +321,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
             case .rootLevel:
                 folder.updateWithNewLocation(customTitle: title, url: nil, location: nil)
             case .favorites:
-                fatalError("Folders can't be saved to favorites")
+                assertionFailure("Folders can't be saved to favorites")
             case .folder(let folderSaveLocation):
                 folder.updateWithNewLocation(customTitle: title, url: nil, location: folderSaveLocation)
             }
