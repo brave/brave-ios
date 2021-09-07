@@ -172,9 +172,9 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
             title: Strings.History.historyClearAlertTitle, message: Strings.History.historyClearAlertDescription, preferredStyle: style)
         
         alert.addAction(UIAlertAction(title: Strings.History.historyClearActionTitle, style: .destructive, handler: { _ in
-            DispatchQueue.main.async { [weak self] in
-                self?.historyManager.deleteAll {
-                    self?.refreshHistory()
+            DispatchQueue.main.async {
+                self.historyManager.deleteAll {
+                    self.refreshHistory()
                 }
             }
         }))
