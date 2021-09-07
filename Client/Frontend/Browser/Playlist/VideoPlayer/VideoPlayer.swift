@@ -25,6 +25,7 @@ public protocol VideoViewDelegate: AnyObject {
     func onPictureInPicture(enabled: Bool)
     func onFullScreen()
     func onExitFullScreen()
+    func onPlayBackStateChanged()
 }
 
 public class VideoView: UIView, VideoTrackerBarDelegate {
@@ -99,7 +100,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         
         do {
             try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
-            try AVAudioSession.sharedInstance().setActive(true, options: [])
+            try AVAudioSession.sharedInstance().setActive(true, options: .notifyOthersOnDeactivation)
         } catch {
             log.error(error)
         }
@@ -426,6 +427,14 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
             }
         })
         
+        notificationObservers.append(NotificationCenter.default.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: .main) { [weak self] _ in
+            guard let self = self else { return }
+            
+            if self.pictureInPictureController?.isPictureInPictureActive == false {
+                self.playerLayer.player = self.player
+            }
+        })
+        
         notificationObservers.append(NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: .main) { [weak self] _ in
             guard let self = self else { return }
             
@@ -538,6 +547,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
     public func resetVideoInfo() {
         infoView.titleLabel.text = ""
         infoView.clearFavIcon()
+        controlsView.trackBar.setTimeRange(currentTime: .zero, endTime: .zero)
     }
     
     public func setControlsEnabled(_ enabled: Bool) {
@@ -583,6 +593,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
             
             toggleOverlays(showOverlay: false)
             isOverlayDisplayed = false
+            delegate?.onPlayBackStateChanged()
         }
     }
     
@@ -593,6 +604,8 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
             
             toggleOverlays(showOverlay: true)
             isOverlayDisplayed = true
+            
+            delegate?.onPlayBackStateChanged()
         } else {
             toggleOverlays(showOverlay: isOverlayDisplayed)
         }
@@ -605,6 +618,7 @@ public class VideoView: UIView, VideoTrackerBarDelegate {
         toggleOverlays(showOverlay: true)
         isOverlayDisplayed = true
         player.replaceCurrentItem(with: nil)
+        delegate?.onPlayBackStateChanged()
     }
     
     public func seek(to time: Double) {

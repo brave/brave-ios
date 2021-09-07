@@ -56,29 +56,16 @@ extension BrowserViewController {
                         self.present(playlistController, animated: true)
                     }
                 } else {
-                    // Retrieve the item and offset-time from the current tab's webview.
-                    if let item = self.tabManager.selectedTab?.playlistItem,
-                       let webView = self.tabManager.selectedTab?.webView {
-                        
-                        PlaylistHelper.getCurrentTime(webView: webView, nodeTag: item.tagId) { [weak self] currentTime in
-                            guard let self = self else { return }
-                            
-                            self.stopMediaPlayback()
-                            let playlistController = PlaylistViewController(initialItem: item, initialItemPlaybackOffset: currentTime)
-                            playlistController.modalPresentationStyle = .fullScreen
-                            
-                            self.dismiss(animated: true) {
-                                self.present(playlistController, animated: true)
-                            }
-                        }
-                    } else {
-                        // Otherwise no item to play, so just open the playlist controller.
-                        let playlistController = PlaylistViewController(initialItem: nil, initialItemPlaybackOffset: 0.0)
-                        playlistController.modalPresentationStyle = .fullScreen
-                        
-                        self.dismiss(animated: true) {
-                            self.present(playlistController, animated: true)
-                        }
+                    // Do NOT Retrieve the item and offset-time from the current tab's webview.
+                    // This is because they tapped on the generic playlist button,
+                    // And NOT the URL-Bar or the "Added to Playlist" Menu button.
+                    self.stopMediaPlayback()
+
+                    let playlistController = PlaylistViewController(initialItem: nil, initialItemPlaybackOffset: 0.0)
+                    playlistController.modalPresentationStyle = .fullScreen
+                    
+                    self.dismiss(animated: true) {
+                        self.present(playlistController, animated: true)
                     }
                 }
             }

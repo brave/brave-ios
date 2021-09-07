@@ -336,6 +336,7 @@ private class ListController: UIViewController {
                 if let lastPlayedItemUrl = lastPlayedItemUrl, let index = PlaylistManager.shared.index(of: lastPlayedItemUrl) {
                     let indexPath = IndexPath(row: index, section: 0)
                     
+                    self.currentlyPlayingItemIndex = indexPath.row
                     self.playItem(at: indexPath, completion: { [weak self] error in
                         guard let self = self else { return }
                         
@@ -350,6 +351,7 @@ private class ListController: UIViewController {
                             let seekLastPlayedItem = { [weak self] in
                                 guard let self = self else { return }
                                 let item = PlaylistManager.shared.itemAtIndex(indexPath.row)
+                                self.currentlyPlayingItemIndex = indexPath.row
                                 
                                 if item.pageSrc == lastPlayedItemUrl &&
                                     lastPlayedItemTime > 0.0 &&
@@ -945,6 +947,7 @@ extension ListController: UITableViewDelegate {
                 let item = PlaylistManager.shared.itemAtIndex(indexPath.row)
                 self.displayExpiredResourceError(item: item)
             case .none:
+                self.currentlyPlayingItemIndex = indexPath.row
                 self.updateLastPlayedItem(indexPath: indexPath)
             }
         })
@@ -960,10 +963,11 @@ extension ListController: UITableViewDelegate {
         currentlyPlayingItemIndex = indexPath.row
         
         let selectedCell = tableView.cellForRow(at: indexPath) as? PlaylistCell
+        let thumbnail = selectedCell?.thumbnailView.image
 
         let item = PlaylistManager.shared.itemAtIndex(indexPath.row)
         playerView.setVideoInfo(videoDomain: item.pageSrc, videoTitle: item.pageTitle)
-        mediaInfo.updateNowPlayingMediaArtwork(image: selectedCell?.thumbnailView.image)
+        mediaInfo.updateNowPlayingMediaArtwork(image: thumbnail)
         
         playerView.stop()
         
@@ -974,12 +978,17 @@ extension ListController: UITableViewDelegate {
             
             switch error {
             case .error:
+                self.mediaInfo.nowPlayingInfo = nil
                 break
                 
             case .expired:
                 selectedCell?.detailLabel.text = Strings.PlayList.expiredLabelTitle
+                self.mediaInfo.nowPlayingInfo = nil
                 
             case .none:
+                self.mediaInfo.nowPlayingInfo = item
+                self.mediaInfo.updateNowPlayingMediaArtwork(image: thumbnail)
+                
                 let mediaItem = self.playerView.player.currentItem ?? self.playerView.pendingMediaItem
                 log.debug("Playing Live Video: \(mediaItem?.duration.isIndefinite ?? false)")
             }
@@ -1241,6 +1250,10 @@ extension ListController: VideoViewDelegate {
             playerView.setExitButtonHidden(false)
             splitViewController?.parent?.dismiss(animated: true, completion: nil)
         }
+    }
+    
+    func onPlayBackStateChanged() {
+        mediaInfo.updateNowPlayingMediaInfo()
     }
 }
 
