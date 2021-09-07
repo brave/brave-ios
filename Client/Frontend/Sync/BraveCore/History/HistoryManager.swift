@@ -10,14 +10,12 @@ import BraveShared
 import CoreData
 import Shared
 
-class HistoryManager: NSObject {
+class HistoryManager {
     
     // MARK: Lifecycle
     
     init(historyAPI: BraveHistoryAPI?) {
         self.historyAPI = historyAPI
-        
-        super.init()
     }
     
     // MARK: Internal

@@ -12,14 +12,12 @@ import Shared
 
 private let log = Logger.browserLogger
 
-class BookmarkManager: NSObject {
+class BookmarkManager {
 
     // MARK: Lifecycle
     
     init(bookmarksAPI: BraveBookmarksAPI?) {
-        self.bookmarksAPI = bookmarksAPI
-        super.init()
-        
+        self.bookmarksAPI = bookmarksAPI        
         BookmarkManager.rootNodeId = bookmarksAPI?.rootNode?.guid
     }
     
