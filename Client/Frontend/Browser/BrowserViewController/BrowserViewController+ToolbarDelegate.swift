@@ -620,7 +620,7 @@ extension BrowserViewController: ToolbarDelegate {
             addTabAlertActions().forEach(controller.addAction)
         }
         
-        if tabManager.getCountForWebsite() > 0 {
+        if tabManager.openedWebsitesCount > 0 {
             controller.addAction( UIAlertAction(title: Strings.bookmarkAllTabsTitle, style: .default, handler: { [unowned self] _ in
                 let mode =  BookmarkEditMode.addFolderUsingTabs(title: Strings.savedTabsFolderTitle, tabList: tabManager.tabsForCurrentMode)
                 let addBookMarkController = AddEditBookmarkTableViewController(mode: mode)

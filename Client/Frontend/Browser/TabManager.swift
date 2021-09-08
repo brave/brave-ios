@@ -152,6 +152,10 @@ class TabManager: NSObject {
         let tabType: TabType = PrivateBrowsingManager.shared.isPrivateBrowsing ? .private : .regular
         return tabs(withType: tabType)
     }
+    
+    var openedWebsitesCount: Int {
+        tabsForCurrentMode.filter { $0.url?.isWebPage() == true && $0.url?.isAboutHomeURL == false }.count
+    }
 
     private func tabs(withType type: TabType) -> [Tab] {
         assert(Thread.isMainThread)
@@ -213,10 +217,6 @@ class TabManager: NSObject {
         }
 
         return nil
-    }
-    
-    func getCountForWebsite() -> Int {
-        return tabsForCurrentMode.filter { $0.url?.isWebPage() == true && $0.url?.isAboutHomeURL == false }.count
     }
 
     func selectTab(_ tab: Tab?, previous: Tab? = nil) {
