@@ -28,9 +28,17 @@ class BraveTalkOptInSuccessViewController: UIViewController, PopoverContentCompo
     }
     
     private func updatePreferredContentSize() {
-        let height = UIFontMetrics.default.scaledValue(for: 250)
+        let baseHeight: CGFloat = 250
+        let scale = UIFontMetrics.default
         
-        preferredContentSize = .init(width: 350, height: height)
-
+        // For phones in portrait we leave extra space to dismiss the popup by tapping outside of it.
+        if traitCollection.horizontalSizeClass == .compact && traitCollection.verticalSizeClass == .regular {
+            let scaledHeight = scale.scaledValue(for: baseHeight)
+            let height = min(scaledHeight, UIScreen.main.bounds.height - 150)
+            
+            preferredContentSize = .init(width: 350, height: height)
+        } else {
+            preferredContentSize = .init(width: 350, height: scale.scaledValue(for: baseHeight))
+        }
     }
 }
