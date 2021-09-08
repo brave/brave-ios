@@ -14,6 +14,23 @@ class BraveTalkOptInSuccessViewController: UIViewController, PopoverContentCompo
     
     override func loadView() {
         view = View()
-        preferredContentSize = .init(width: 350, height: 250)
+        updatePreferredContentSize()
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        
+        if previousTraitCollection?.preferredContentSizeCategory
+            != traitCollection.preferredContentSizeCategory {
+            
+            updatePreferredContentSize()
+        }
+    }
+    
+    private func updatePreferredContentSize() {
+        let height = UIFontMetrics.default.scaledValue(for: 250)
+        
+        preferredContentSize = .init(width: 350, height: height)
+
     }
 }

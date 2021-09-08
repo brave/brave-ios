@@ -17,7 +17,6 @@ extension BraveTalkRewardsOptInViewController {
             $0.titleLabel?.lineBreakMode = .byClipping
             $0.titleLabel?.numberOfLines = 0
             
-            $0.layer.borderWidth = 0
             $0.layer.cornerCurve = .continuous
             $0.contentEdgeInsets = UIEdgeInsets(top: 10, left: 20, bottom: 10, right: 20)
             

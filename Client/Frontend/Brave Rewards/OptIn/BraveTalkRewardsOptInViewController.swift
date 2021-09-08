@@ -23,7 +23,7 @@ class BraveTalkRewardsOptInViewController: UIViewController, PopoverContentCompo
     }
     
     override func viewDidLoad() {
-        preferredContentSize = .init(width: 350, height: 450)
+        updatePreferredContentSize()
         
         braveTalkView.enableRewardsButton .addTarget(self, action: #selector(enableRewardsAction),
                                                      for: .touchUpInside)
@@ -52,5 +52,20 @@ class BraveTalkRewardsOptInViewController: UIViewController, PopoverContentCompo
             self.rewardsEnabledHandler?()
         }
         
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        
+        if previousTraitCollection?.preferredContentSizeCategory
+            != traitCollection.preferredContentSizeCategory {
+            
+            updatePreferredContentSize()
+        }
+    }
+    
+    private func updatePreferredContentSize() {
+        let height = UIFontMetrics.default.scaledValue(for: 450)
+        preferredContentSize = .init(width: 350, height: height)
     }
 }

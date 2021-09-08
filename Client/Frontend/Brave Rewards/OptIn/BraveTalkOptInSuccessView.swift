@@ -61,11 +61,6 @@ extension BraveTalkOptInSuccessViewController {
             
             scrollView.addSubview(stackView)
             
-            scrollView.snp.makeConstraints {
-                $0.leading.trailing.equalToSuperview()
-                $0.top.bottom.equalToSuperview()
-            }
-            
             scrollView.addSubview(stackView)
             
             stackView.snp.makeConstraints {
