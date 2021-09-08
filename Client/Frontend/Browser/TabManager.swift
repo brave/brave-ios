@@ -216,7 +216,7 @@ class TabManager: NSObject {
     }
     
     func getCountForWebsite() -> Int {
-        return allTabs.filter { $0.url?.isWebPage() == true && $0.url?.isAboutHomeURL == false }.count
+        return tabsForCurrentMode.filter { $0.url?.isWebPage() == true && $0.url?.isAboutHomeURL == false }.count
     }
 
     func selectTab(_ tab: Tab?, previous: Tab? = nil) {
