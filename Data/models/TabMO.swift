@@ -129,6 +129,17 @@ public final class TabMO: NSManagedObject, CRUD {
         
     }
     
+    public class func fetchManagedTabObject(tabID: String, completion: @escaping (TabMO?) -> Void) {
+        DataController.perform { context in
+            guard let tabToUpdate = getInternal(fromId: tabID, context: context) else {
+                completion(nil)
+                return
+            }
+
+            completion(tabToUpdate)
+        }
+    }
+    
     // Deletes the Tab History by removing items except the last one from historysnapshot and setting current index
     public class func removeHistory(with tabID: String) {
         DataController.perform { context in

@@ -360,8 +360,22 @@ class AddEditBookmarkTableViewController: UITableViewController {
         isLoading = true
         
         for tab in tabs {
-            if let url = tab.url, url.isWebPage(), !url.isAboutHomeURL {
-                Bookmarkv2.add(url: url, title: tab.title, parentFolder: parentFolder)
+            if PrivateBrowsingManager.shared.isPrivateBrowsing {
+                if let url = tab.url, url.isWebPage(), !url.isAboutHomeURL {
+                    Bookmarkv2.add(url: url, title: tab.title, parentFolder: parentFolder)
+                }
+            } else {
+                if let tabID = tab.id {
+                    TabMO.fetchManagedTabObject(tabID: tabID) { fetchedTab in
+                        if let urlString = fetchedTab?.url, let url = URL(string: urlString), url.isWebPage(), !url.isAboutHomeURL {
+                            DispatchQueue.main.async {
+                                Bookmarkv2.add(url: url,
+                                               title: fetchedTab?.title ?? tab.title ?? tab.lastTitle,
+                                               parentFolder: parentFolder)
+                            }
+                        }
+                    }
+                }
             }
         }
         
