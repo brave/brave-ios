@@ -13,7 +13,8 @@ import Shared
 extension BookmarkNode {
         
     // MARK: Internal
-        
+       
+    // TODO:
     //public var bookmarkFavIconObserver: BookmarkModelListener?
 
     public var title: String? {

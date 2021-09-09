@@ -31,7 +31,7 @@ class FrequencyQuery {
                 // a cancellable serial queue is used for it.
                 DispatchQueue.main.async {
                     self?.bookmarkManager.byFrequency(query: query) { sites in
-                        let bookmarkSites = sites.map { Site(url: $0.url ?? "", title: $0.title ?? "", bookmarked: true) }
+                        let bookmarkSites = sites.map { Site(url: $0.absoluteUrl ?? "", title: $0.title ?? "", bookmarked: true) }
 
                         let result = Set<Site>(historySites+bookmarkSites)
 
