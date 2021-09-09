@@ -55,24 +55,24 @@ class HistoryManager {
         }
     }
 
-    public func suffix(_ maxLength: Int, _ completion: @escaping ([Historyv2]) -> Void) {
+    public func suffix(_ maxLength: Int, _ completion: @escaping ([HistoryNode]) -> Void) {
         guard let historyAPI = self.historyAPI else {
             return
         }
 
         historyAPI.search(withQuery: nil, maxCount: UInt(max(20, maxLength)), completion: { historyResults in
-            completion(historyResults.map { Historyv2(with: $0) })
+            completion(historyResults.map { $0 })
         })
     }
 
-    public func byFrequency(query: String? = nil, _ completion: @escaping ([WebsitePresentable]) -> Void) {
+    public func byFrequency(query: String? = nil, _ completion: @escaping ([HistoryNode]) -> Void) {
         guard let query = query, !query.isEmpty,
               let historyAPI = self.historyAPI else {
             return
         }
 
         historyAPI.search(withQuery: query, maxCount: 200, completion: { historyResults in
-            completion(historyResults.map { Historyv2(with: $0) })
+            completion(historyResults.map { $0 })
         })
     }
 

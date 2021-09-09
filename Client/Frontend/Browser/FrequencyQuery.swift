@@ -24,7 +24,7 @@ class FrequencyQuery {
     public func sitesByFrequency(containing query: String? = nil, completion: @escaping (Set<Site>) -> Void) {
         historyManager.byFrequency(query: query) { [weak self] historyList in
             let historySites = historyList
-                .map { Site(url: $0.url ?? "", title: $0.title ?? "") }
+                .map { Site(url: $0.absoluteUrl ?? "", title: $0.title ?? "") }
 
             self?.cancellable = DispatchWorkItem {
                 // brave-core fetch can be slow over 200ms per call,

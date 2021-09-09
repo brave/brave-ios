@@ -31,7 +31,7 @@ protocol HistoryV2FetchResultsController {
     
     var delegate: HistoryV2FetchResultsDelegate? { get set }
     
-    var fetchedObjects: [Historyv2]? { get }
+    var fetchedObjects: [HistoryNode]? { get }
     
     var fetchedObjectsCount: Int { get }
     
@@ -39,7 +39,7 @@ protocol HistoryV2FetchResultsController {
     
     func performFetch(_ completion: @escaping () -> Void)
     
-    func object(at indexPath: IndexPath) -> Historyv2?
+    func object(at indexPath: IndexPath) -> HistoryNode?
     
     func objectCount(for section: Int) -> Int
     
@@ -70,7 +70,7 @@ class Historyv2Fetcher: NSObject, HistoryV2FetchResultsController {
     
     weak var delegate: HistoryV2FetchResultsDelegate?
     
-    var fetchedObjects: [Historyv2]? {
+    var fetchedObjects: [HistoryNode]? {
         historyList
     }
     
@@ -88,9 +88,7 @@ class Historyv2Fetcher: NSObject, HistoryV2FetchResultsController {
         historyAPI?.search(withQuery: "", maxCount: 200, completion: { [weak self] historyNodeList in
             guard let self = self else { return }
             
-            self.historyList = historyNodeList.map { [unowned self] historyNode in
-                let historyItem = Historyv2(with: historyNode)
-                
+            self.historyList = historyNodeList.map { [unowned self] historyItem in
                 if let section = historyItem.sectionID, let numOfItemInSection = self.sectionDetails[section] {
                     self.sectionDetails.updateValue(numOfItemInSection + 1, forKey: section)
                 }
@@ -102,7 +100,7 @@ class Historyv2Fetcher: NSObject, HistoryV2FetchResultsController {
         })
     }
     
-    func object(at indexPath: IndexPath) -> Historyv2? {
+    func object(at indexPath: IndexPath) -> HistoryNode? {
         let filteredDetails = sectionDetails.elements.filter { $0.value > 0 }
         var totalItemIndex = 0
         
@@ -129,9 +127,9 @@ class Historyv2Fetcher: NSObject, HistoryV2FetchResultsController {
 
     private weak var historyAPI: BraveHistoryAPI?
     
-    private var historyList = [Historyv2]()
+    private var historyList = [HistoryNode]()
     
-    private var sectionDetails: OrderedDictionary<Historyv2.Section, Int> = [.today: 0,
+    private var sectionDetails: OrderedDictionary<HistoryNode.Section, Int> = [.today: 0,
                                                                              .yesterday: 0,
                                                                              .lastWeek: 0,
                                                                              .thisMonth: 0,
