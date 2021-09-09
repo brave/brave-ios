@@ -366,7 +366,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
                 }
             } else {
                 if let tabID = tab.id {
-                    let fetchedTab = TabMO.fetchManagedTabObject(tabID: tabID)
+                    let fetchedTab = TabMO.get(fromId: tabID)
                     
                     if let urlString = fetchedTab?.url, let url = URL(string: urlString), url.isWebPage(), !url.isAboutHomeURL {
                         Bookmarkv2.add(url: url,
