@@ -127,8 +127,10 @@ class PlaylistMediaStreamer {
             MPMediaItemPropertyPlaybackDuration: item.duration,
             MPNowPlayingInfoPropertyPlaybackProgress: 0.0,
             MPNowPlayingInfoPropertyAssetURL: URL(string: item.pageSrc) as Any,
-            MPNowPlayingInfoPropertyElapsedPlaybackTime: 0.0,
+            MPNowPlayingInfoPropertyElapsedPlaybackTime: player.currentTime.seconds,
         ])
+        
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
     }
     

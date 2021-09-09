@@ -777,6 +777,7 @@ extension PlaylistViewController: VideoViewDelegate {
                         return
                     }
                     
+                    PlaylistMediaStreamer.clearNowPlayingInfo()
                     self.playerView.setVideoInfo(videoDomain: item.pageSrc,
                                                  videoTitle: item.pageTitle)
                     PlaylistMediaStreamer.setNowPlayingInfo(item, withPlayer: self.player)
