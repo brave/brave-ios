@@ -471,7 +471,6 @@
 		2FCEED7B26EA64A400892699 /* HistoryNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FCEED7A26EA64A400892699 /* HistoryNode.swift */; };
 		2FD0E3AF2576C48A000C773B /* SchemePermissionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FD0E3AE2576C48A000C773B /* SchemePermissionTests.swift */; };
 		2FD0E3D62577F327000C773B /* SearchSuggestionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FD0E3D52577F327000C773B /* SearchSuggestionCell.swift */; };
-		2FD1C60926385C6200E3C25F /* Historyv2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FD1C60826385C6200E3C25F /* Historyv2.swift */; };
 		2FD1C60B2638823D00E3C25F /* HistoryFetchers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FD1C60A2638823D00E3C25F /* HistoryFetchers.swift */; };
 		2FD1C61C2639AE9100E3C25F /* BrowserViewController+Onboarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FD1C61B2639AE9100E3C25F /* BrowserViewController+Onboarding.swift */; };
 		2FD70DBA26C1C54D00345A33 /* BookmarkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FD70DB926C1C54D00345A33 /* BookmarkManager.swift */; };
@@ -2016,7 +2015,6 @@
 		2FCEED7A26EA64A400892699 /* HistoryNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryNode.swift; sourceTree = "<group>"; };
 		2FD0E3AE2576C48A000C773B /* SchemePermissionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchemePermissionTests.swift; sourceTree = "<group>"; };
 		2FD0E3D52577F327000C773B /* SearchSuggestionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchSuggestionCell.swift; sourceTree = "<group>"; };
-		2FD1C60826385C6200E3C25F /* Historyv2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Historyv2.swift; sourceTree = "<group>"; };
 		2FD1C60A2638823D00E3C25F /* HistoryFetchers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryFetchers.swift; sourceTree = "<group>"; };
 		2FD1C61B2639AE9100E3C25F /* BrowserViewController+Onboarding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowserViewController+Onboarding.swift"; sourceTree = "<group>"; };
 		2FD70DB926C1C54D00345A33 /* BookmarkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkManager.swift; sourceTree = "<group>"; };
@@ -4284,7 +4282,6 @@
 		2FD1C60726385AEC00E3C25F /* History */ = {
 			isa = PBXGroup;
 			children = (
-				2FD1C60826385C6200E3C25F /* Historyv2.swift */,
 				2FCEED7A26EA64A400892699 /* HistoryNode.swift */,
 				2F18C22926BC6FFA00FFC8AC /* HistoryManager.swift */,
 				2FD1C60A2638823D00E3C25F /* HistoryFetchers.swift */,
@@ -7671,7 +7668,6 @@
 				A1FEEE2020BF28D900298DA2 /* Then.swift in Sources */,
 				27953F7723F5DF5D00B4B595 /* AboutShieldsViewController.swift in Sources */,
 				0A1E84442190A57F0042F782 /* SyncCameraView.swift in Sources */,
-				2FD1C60926385C6200E3C25F /* Historyv2.swift in Sources */,
 				A1CA29C420E1746A00CB9126 /* OptionSelectionViewController.swift in Sources */,
 				5EC594ED232C2C8F00922111 /* OnboardingWebViewController.swift in Sources */,
 				0A4B012420D0321A004D4011 /* UX.swift in Sources */,
