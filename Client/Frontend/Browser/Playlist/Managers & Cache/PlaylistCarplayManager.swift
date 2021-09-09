@@ -82,6 +82,11 @@ class PlaylistCarplayManager: NSObject {
         // and we don't get notified when it disconnects :(
         attemptInterfaceConnection(isCarPlayAvailable: true)
         #else
+        guard let contentManager = contentManager else {
+            log.error("Invalid MPPlayableContentManager!")
+            return
+        }
+        
         // We need to observe when CarPlay is connected
         // That way, we can  determine where the controls are coming from for Playlist
         // OR determine where the AudioSession is outputting

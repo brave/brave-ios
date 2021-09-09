@@ -165,7 +165,8 @@ class PlaylistCarplayControllerIOS14: NSObject {
     
     private func generatePlaylistListTemplate() -> CPTemplate {
         // Fetch all Playlist Items
-        let listItems = playlistItemIds.compactMap { itemId -> CPListItem? in
+        var listItems = [CPListItem]()
+        listItems = playlistItemIds.compactMap { itemId -> CPListItem? in
             guard let itemIndex = PlaylistManager.shared.index(of: itemId),
                   let item = PlaylistManager.shared.itemAtIndex(itemIndex) else {
                 return nil
@@ -179,6 +180,10 @@ class PlaylistCarplayControllerIOS14: NSObject {
                         return
                     }
                     
+                    listItems.forEach({
+                        $0.isPlaying = false
+                    })
+                    
                     if let error = error {
                         log.error(error)
                         listItem.isPlaying = false
@@ -190,6 +195,24 @@ class PlaylistCarplayControllerIOS14: NSObject {
                     PlaylistMediaStreamer.setNowPlayingMediaArtwork(image: userInfo?["icon"] as? UIImage)
                     
                     completion()
+                    
+                    self.interfaceController.pushTemplate(CPNowPlayingTemplate.shared, animated: true) { success, error in
+                        
+                        if !success, let error = error {
+                            // Can also use CPAlertTemplate, but it doesn't have a "Message" parameter.
+                            let alert = CPActionSheetTemplate(title: Strings.PlayList.sorryAlertTitle,
+                                                              message: error.localizedDescription,
+                                                              actions: [
+                                CPAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: { _ in
+                                    // Handler cannot be nil.. so..
+                                })
+                            ])
+                            
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                                self.interfaceController.presentTemplate(alert, animated: true, completion: nil)
+                            }
+                        }
+                    }
                 }
             }
             
@@ -325,6 +348,11 @@ extension PlaylistCarplayControllerIOS14 {
             // Item is already playing.
             // Show now-playing screen and don't restart playback.
             if PlaylistCarplayManager.shared.currentPlaylistItem?.pageSrc == itemId {
+                // If the player is currently paused, un-pause it and play the item.
+                // If the player is currently stopped, do nothing.
+                if !self.player.isPlaying, self.player.currentItem != nil {
+                    self.play()
+                }
                 completionHandler(nil)
                 return
             }
