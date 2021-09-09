@@ -259,8 +259,7 @@ class BookmarkManager {
             }
         }
         
-        //TODO :
-        //bookmarkItem.bookmarkFavIconObserver = bookmarksAPI.add(observer)
+        bookmarkItem.bookmarkFavIconObserver = bookmarksAPI.add(observer)
     }
     
     // MARK: Private
@@ -269,8 +268,7 @@ class BookmarkManager {
     private let bookmarksAPI: BraveBookmarksAPI?
     
     private func removeFavIconObserver(_ bookmarkItem: BookmarkNode) {
-        // TODO:
-        //bookmarkItem.bookmarkFavIconObserver = nil
+        bookmarkItem.bookmarkFavIconObserver = nil
     }
 }
 
