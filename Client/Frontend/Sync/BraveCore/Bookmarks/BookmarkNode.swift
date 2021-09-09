@@ -100,7 +100,7 @@ extension BookmarkNode {
     }
 }
 
-class BraveBookmarkFolderX: BookmarkNode {
+class BraveBookmarkFolder: BookmarkNode {
     public let indentationLevel: Int
     
     private init(_ bookmarkNode: BookmarkNode) {
