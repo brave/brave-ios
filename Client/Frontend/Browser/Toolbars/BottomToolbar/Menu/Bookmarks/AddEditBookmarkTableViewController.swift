@@ -366,13 +366,13 @@ class AddEditBookmarkTableViewController: UITableViewController {
                 }
             } else {
                 if let tabID = tab.id {
-                    TabMO.fetchManagedTabObject(tabID: tabID) { fetchedTab in
-                        if let urlString = fetchedTab?.url, let url = URL(string: urlString), url.isWebPage(), !url.isAboutHomeURL {
-                            DispatchQueue.main.async {
-                                Bookmarkv2.add(url: url,
-                                               title: fetchedTab?.title ?? tab.title ?? tab.lastTitle,
-                                               parentFolder: parentFolder)
-                            }
+                    let fetchedTab = TabMO.fetchManagedTabObject(tabID: tabID)
+                    
+                    if let urlString = fetchedTab?.url, let url = URL(string: urlString), url.isWebPage(), !url.isAboutHomeURL {
+                        DispatchQueue.main.async {
+                            Bookmarkv2.add(url: url,
+                                           title: fetchedTab?.title ?? tab.title ?? tab.lastTitle,
+                                           parentFolder: parentFolder)
                         }
                     }
                 }
