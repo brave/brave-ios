@@ -8,6 +8,7 @@ import Shared
 import Data
 import BraveShared
 import CoreServices
+import BraveCore
 
 private let log = Logger.browserLogger
 
@@ -51,7 +52,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     
     var isEditingIndividualBookmark: Bool = false
     
-    var currentFolder: Bookmarkv2?
+    var currentFolder: BookmarkNode?
     /// Certain bookmark actions are different in private browsing mode.
     let isPrivateBrowsing: Bool
     
@@ -62,7 +63,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     private let importExportUtility = BraveCoreImportExportUtility()
     private var documentInteractionController: UIDocumentInteractionController?
     
-    init(folder: Bookmarkv2?, bookmarkManager: BookmarkManager, isPrivateBrowsing: Bool) {
+    init(folder: BookmarkNode?, bookmarkManager: BookmarkManager, isPrivateBrowsing: Bool) {
         self.isPrivateBrowsing = isPrivateBrowsing
         self.bookmarkManager = bookmarkManager
         super.init(nibName: nil, bundle: nil)
@@ -147,7 +148,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         }
     }
     
-    private func updateLastVisitedFolder(_ folder: Bookmarkv2?) {
+    private func updateLastVisitedFolder(_ folder: BookmarkNode?) {
         Preferences.Chromium.lastBookmarksFolderNodeId.value = folder?.objectID ?? -1
     }
     
@@ -290,7 +291,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         
         // See if the cell holds the same bookmark. If yes, we do not have to recreate its image view
         // This makes scrolling through bookmarks better if there's many bookmarks with the same url
-        let domainOrFolderName = item.isFolder ? item.displayTitle : (item.domain?.url ?? item.url)
+        let domainOrFolderName = item.isFolder ? item.displayTitle : (item.domain?.url ?? item.absoluteUrl)
         let shouldReuse = domainOrFolderName != cell.domainOrFolderName
         
         cell.domainOrFolderName = domainOrFolderName
@@ -326,7 +327,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
                 
                 // Sets the favIcon of a cell's imageView from Brave-Core
                 // If the icon does not exist, fallback to our FavIconFetcher
-                let setFavIcon = { (cell: UITableViewCell, item: Bookmarkv2) in
+                let setFavIcon = { (cell: UITableViewCell, item: BookmarkNode) in
                     cell.imageView?.clearMonogramFavicon()
                     
                     if let icon = item.icon {
@@ -363,7 +364,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         }
         
         let fontSize: CGFloat = 14.0
-        cell.textLabel?.text = item.displayTitle ?? item.url
+        cell.textLabel?.text = item.displayTitle ?? item.absoluteUrl
         cell.textLabel?.lineBreakMode = .byTruncatingTail
         
         if !item.isFolder {
@@ -386,15 +387,15 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
             return
         }
         
-        presentLongPressActions(gesture, urlString: bookmark.url, isPrivateBrowsing: isPrivateBrowsing,
+        presentLongPressActions(gesture, urlString: bookmark.absoluteUrl, isPrivateBrowsing: isPrivateBrowsing,
                                 customActions: bookmark.isFolder ? folderLongPressActions(bookmark) : nil)
     }
     
-    private func folderLongPressActions(_ folder: Bookmarkv2) -> [UIAlertAction] {
+    private func folderLongPressActions(_ folder: BookmarkNode) -> [UIAlertAction] {
         let children = bookmarkManager.getChildren(forFolder: folder, includeFolders: false) ?? []
         
         let urls: [URL] = children.compactMap { b in
-            guard let url = b.url else { return nil }
+            guard let url = b.absoluteUrl else { return nil }
             return URL(string: url)
         }
         
@@ -436,7 +437,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
                 // show editing view for bookmark item
                 self.showEditBookmarkController(bookmark: bookmark)
             } else {
-                if let url = URL(string: bookmark.url ?? "") {
+                if let url = URL(string: bookmark.absoluteUrl ?? "") {
                     let bookmarkClickEvent: (() -> Void)? = {
                         /// Donate Custom Intent Open Bookmark List
                         if !self.isPrivateBrowsing {
@@ -506,7 +507,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
                 return
             }
             
-            if let children = item.children, !children.isEmpty {
+            if !item.children.isEmpty {
                 let alert = UIAlertController(title: Strings.deleteBookmarksFolderAlertTitle, message: Strings.deleteBookmarksFolderAlertMessage, preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel) { _ in
                     completion(false)
@@ -531,7 +532,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         return UISwipeActionsConfiguration(actions: [deleteAction, editAction])
     }
     
-    fileprivate func showEditBookmarkController(bookmark: Bookmarkv2) {
+    fileprivate func showEditBookmarkController(bookmark: BookmarkNode) {
         self.isEditingIndividualBookmark = true
         
         var mode: BookmarkEditMode?

@@ -28,7 +28,7 @@ class BookmarkManager {
     // Returns the last visited folder
     // If no folder was visited, returns the mobile bookmarks folder
     // If the root folder was visited, returns nil
-    public func lastVisitedFolder() -> Bookmarkv2? {
+    public func lastVisitedFolder() -> BookmarkNode? {
         guard let bookmarksAPI = bookmarksAPI else {
             return nil
         }
@@ -37,7 +37,7 @@ class BookmarkManager {
               let nodeId = Preferences.Chromium.lastBookmarksFolderNodeId.value else {
             // Default folder is the mobile node..
             if let mobileNode = bookmarksAPI.mobileNode {
-                return Bookmarkv2(mobileNode)
+                return mobileNode
             }
             return nil
         }
@@ -50,17 +50,17 @@ class BookmarkManager {
         // Display last visited folder..
         if let folderNode = bookmarksAPI.getNodeById(nodeId),
            folderNode.isVisible {
-            return Bookmarkv2(folderNode)
+            return folderNode
         }
         
         // Default folder is the mobile node..
         if let mobileNode = bookmarksAPI.mobileNode {
-            return Bookmarkv2(mobileNode)
+            return mobileNode
         }
         return nil
     }
     
-    public func lastFolderPath() -> [Bookmarkv2] {
+    public func lastFolderPath() -> [BookmarkNode] {
         guard let bookmarksAPI = bookmarksAPI else {
             return []
         }
@@ -85,91 +85,91 @@ class BookmarkManager {
                 }
                 break
             }
-            return nodes.map({ Bookmarkv2($0) }).reversed()
+            return nodes.map({ $0 }).reversed()
         }
         
         // Default folder is the mobile node..
         if let mobileNode = bookmarksAPI.mobileNode {
-            return [Bookmarkv2(mobileNode)]
+            return [mobileNode]
         }
         
         return []
     }
     
-    public func mobileNode() -> Bookmarkv2? {
+    public func mobileNode() -> BookmarkNode? {
         guard let bookmarksAPI = bookmarksAPI else {
             return nil
         }
         
         if let node = bookmarksAPI.mobileNode {
-            return Bookmarkv2(node)
+            return node
         }
         return nil
     }
     
-    public func fetchParent(_ bookmarkItem: Bookmarkv2?) -> Bookmarkv2? {
+    public func fetchParent(_ bookmarkItem: BookmarkNode?) -> BookmarkNode? {
         guard let bookmarkItem = bookmarkItem, let bookmarksAPI = bookmarksAPI else {
             return nil
         }
         
-        if let parent = bookmarkItem.bookmarkNode.parent {
+        if let parent = bookmarkItem.parent {
             // Return nil if the parent is the ROOT node
             // because AddEditBookmarkTableViewController.sortFolders
             // sorts root folders by having a nil parent.
             // If that code changes, we should change here to match.
-            if bookmarkItem.bookmarkNode.parent?.guid != bookmarksAPI.rootNode?.guid {
-                return Bookmarkv2(parent)
+            if bookmarkItem.parent?.guid != bookmarksAPI.rootNode?.guid {
+                return parent
             }
         }
         return nil
     }
     
-    public func addFolder(title: String, parentFolder: Bookmarkv2? = nil) {
+    public func addFolder(title: String, parentFolder: BookmarkNode? = nil) {
         guard let bookmarksAPI = bookmarksAPI else {
             return
         }
         
-        if let parentFolder = parentFolder?.bookmarkNode {
+        if let parentFolder = parentFolder {
             bookmarksAPI.createFolder(withParent: parentFolder, title: title)
         } else {
             bookmarksAPI.createFolder(withTitle: title)
         }
     }
     
-    public func add(url: URL, title: String?, parentFolder: Bookmarkv2? = nil) {
+    public func add(url: URL, title: String?, parentFolder: BookmarkNode? = nil) {
         guard let bookmarksAPI = bookmarksAPI else {
             return
         }
         
-        if let parentFolder = parentFolder?.bookmarkNode {
+        if let parentFolder = parentFolder {
             bookmarksAPI.createBookmark(withParent: parentFolder, title: title ?? "", with: url)
         } else {
             bookmarksAPI.createBookmark(withTitle: title ?? "", url: url)
         }
     }
     
-    public func frc(parent: Bookmarkv2?) -> BookmarksV2FetchResultsController? {
+    public func frc(parent: BookmarkNode?) -> BookmarksV2FetchResultsController? {
         guard let bookmarksAPI = bookmarksAPI else {
             return nil
         }
         
-        return Bookmarkv2Fetcher(parent?.bookmarkNode, api: bookmarksAPI)
+        return Bookmarkv2Fetcher(parent, api: bookmarksAPI)
     }
     
-    public func foldersFrc(excludedFolder: Bookmarkv2? = nil) -> BookmarksV2FetchResultsController? {
+    public func foldersFrc(excludedFolder: BookmarkNode? = nil) -> BookmarksV2FetchResultsController? {
         guard let bookmarksAPI = bookmarksAPI else {
             return nil
         }
         
-        return Bookmarkv2ExclusiveFetcher(excludedFolder?.bookmarkNode, api: bookmarksAPI)
+        return Bookmarkv2ExclusiveFetcher(excludedFolder, api: bookmarksAPI)
     }
     
-    public func getChildren(forFolder folder: Bookmarkv2, includeFolders: Bool) -> [Bookmarkv2]? {
-        let result = folder.bookmarkNode.children.map({ Bookmarkv2($0) })
+    public func getChildren(forFolder folder: BookmarkNode, includeFolders: Bool) -> [BookmarkNode]? {
+        let result = folder.children.map({ $0 })
         return includeFolders ? result : result.filter({ $0.isFolder == false })
     }
     
-    public func byFrequency(query: String? = nil, completion: @escaping ([WebsitePresentable]) -> Void) {
+    public func byFrequency(query: String? = nil, completion: @escaping ([BookmarkNode]) -> Void) {
         // Invalid query.. BraveCore doesn't store bookmarks based on last visited.
         // Any last visited bookmarks would show up in `History` anyway.
         // BraveCore automatically sorts them by date as well.
@@ -179,7 +179,7 @@ class BookmarkManager {
         }
         
         return bookmarksAPI.search(withQuery: query, maxCount: 200, completion: { nodes in
-            completion(nodes.compactMap({ return !$0.isFolder ? Bookmarkv2($0) : nil }))
+            completion(nodes.compactMap({ return !$0.isFolder ? $0 : nil }))
         })
     }
     
@@ -188,7 +188,7 @@ class BookmarkManager {
             return
         }
         
-        if let node = frc.object(at: sourceIndexPath)?.bookmarkNode,
+        if let node = frc.object(at: sourceIndexPath),
            let parent = node.parent ?? bookmarksAPI.mobileNode {
             
             // Moving to the very last index.. same as appending..
@@ -206,32 +206,32 @@ class BookmarkManager {
         }
     }
     
-    public func delete(_ bookmarkItem: Bookmarkv2) {
+    public func delete(_ bookmarkItem: BookmarkNode) {
         guard let bookmarksAPI = bookmarksAPI else {
             return
         }
         
         if bookmarkItem.canBeDeleted {
-            bookmarksAPI.removeBookmark(bookmarkItem.bookmarkNode)
+            bookmarksAPI.removeBookmark(bookmarkItem)
         }
     }
     
-    public func updateWithNewLocation(_ bookmarkItem: Bookmarkv2, customTitle: String?, url: URL?, location: Bookmarkv2?) {
+    public func updateWithNewLocation(_ bookmarkItem: BookmarkNode, customTitle: String?, url: URL?, location: BookmarkNode?) {
         guard let bookmarksAPI = bookmarksAPI else {
             return
         }
         
-        if let location = location?.bookmarkNode ?? bookmarksAPI.mobileNode {
-            if location.guid != bookmarkItem.bookmarkNode.parent?.guid {
-                bookmarkItem.bookmarkNode.move(toParent: location)
+        if let location = location ?? bookmarksAPI.mobileNode {
+            if location.guid != bookmarkItem.parent?.guid {
+                bookmarkItem.move(toParent: location)
             }
             
             if let customTitle = customTitle {
-                bookmarkItem.bookmarkNode.setTitle(customTitle)
+                bookmarkItem.setTitle(customTitle)
             }
             
-            if let url = url, !bookmarkItem.bookmarkNode.isFolder {
-                bookmarkItem.bookmarkNode.url = url
+            if let url = url, !bookmarkItem.isFolder {
+                bookmarkItem.url = url
             } else if url != nil {
                 log.error("Error: Moving bookmark - Cannot convert a folder into a bookmark with url.")
             }
@@ -240,15 +240,15 @@ class BookmarkManager {
         }
     }
     
-    public func addFavIconObserver(_ bookmarkItem: Bookmarkv2, observer: @escaping () -> Void) {
+    public func addFavIconObserver(_ bookmarkItem: BookmarkNode, observer: @escaping () -> Void) {
         guard let bookmarksAPI = bookmarksAPI else {
             return
         }
         
         let observer = BookmarkModelStateObserver { [weak self] state in
             if case .favIconChanged(let node) = state {
-                if node.isValid && bookmarkItem.bookmarkNode.isValid
-                    && node.guid == bookmarkItem.bookmarkNode.guid {
+                if node.isValid && bookmarkItem.isValid
+                    && node.guid == bookmarkItem.guid {
                     
                     if bookmarkItem.isFavIconLoaded {
                         self?.removeFavIconObserver(bookmarkItem)
@@ -259,7 +259,8 @@ class BookmarkManager {
             }
         }
         
-        bookmarkItem.bookmarkFavIconObserver = bookmarksAPI.add(observer)
+        //TODO :
+        //bookmarkItem.bookmarkFavIconObserver = bookmarksAPI.add(observer)
     }
     
     // MARK: Private
@@ -267,8 +268,9 @@ class BookmarkManager {
     private var observer: BookmarkModelListener?
     private let bookmarksAPI: BraveBookmarksAPI?
     
-    private func removeFavIconObserver(_ bookmarkItem: Bookmarkv2) {
-        bookmarkItem.bookmarkFavIconObserver = nil
+    private func removeFavIconObserver(_ bookmarkItem: BookmarkNode) {
+        // TODO:
+        //bookmarkItem.bookmarkFavIconObserver = nil
     }
 }
 

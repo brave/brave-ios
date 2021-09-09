@@ -12,7 +12,7 @@ import Shared
 
 // A Lightweight wrapper around BraveCore bookmarks
 // with the same layout/interface as `Bookmark (from CoreData)`
-class Bookmarkv2: WebsitePresentable {
+class Bookmarkv3: WebsitePresentable {
         
     // MARK: Lifecycle
     
@@ -63,21 +63,21 @@ class Bookmarkv2: WebsitePresentable {
         }
     }
     
-    public var parent: Bookmarkv2? {
+    public var parent: Bookmarkv3? {
         if let parent = bookmarkNode.parent {
             // Return nil if the parent is the ROOT node
             // because AddEditBookmarkTableViewController.sortFolders
             // sorts root folders by having a nil parent.
             // If that code changes, we should change here to match.
             if bookmarkNode.parent?.guid != BookmarkManager.rootNodeId {
-                return Bookmarkv2(parent)
+                return Bookmarkv3(parent)
             }
         }
         return nil
     }
     
-    public var children: [Bookmarkv2]? {
-        return bookmarkNode.children.map({ Bookmarkv2($0) })
+    public var children: [Bookmarkv3]? {
+        return bookmarkNode.children.map({ Bookmarkv3($0) })
     }
     
     public var canBeDeleted: Bool {
@@ -124,7 +124,7 @@ class Bookmarkv2: WebsitePresentable {
     }
 }
 
-class BraveBookmarkFolder: Bookmarkv2 {
+class BraveBookmarkFolder: Bookmarkv3 {
     public let indentationLevel: Int
     
     private override init(_ bookmarkNode: BookmarkNode) {

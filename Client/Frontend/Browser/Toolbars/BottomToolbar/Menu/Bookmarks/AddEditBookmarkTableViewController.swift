@@ -6,6 +6,7 @@ import UIKit
 import CoreData
 import Data
 import Shared
+import BraveCore
 
 private let log = Logger.browserLogger
 
@@ -51,7 +52,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
         case .addFolder(let title), .addFolderUsingTabs(title: let title, _):
             return FolderDetailsViewTableViewCell(title: title, viewHeight: UX.cellHeight)
         case .editBookmark(let bookmark), .editFavorite(let bookmark):
-            return BookmarkDetailsView(title: bookmark.title, url: bookmark.url)
+            return BookmarkDetailsView(title: bookmark.title, url: bookmark.absoluteUrl)
         case .editFolder(let folder):
             return FolderDetailsViewTableViewCell(title: folder.title, viewHeight: UX.cellHeight)
         }
@@ -214,7 +215,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
     // MARK: - Getting data
     
     /// Bookmark with a level of indentation
-    private typealias IndentedFolder = (folder: Bookmarkv2, indentationLevel: Int)
+    private typealias IndentedFolder = (folder: BookmarkNode, indentationLevel: Int)
     
     /// Main data source
     private var sortedFolders = [IndentedFolder]()
@@ -225,7 +226,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
     private func sortFolders() -> [IndentedFolder] {
         guard let objects = frc?.fetchedObjects else { return [] }
         return objects.map({
-            if let folder = $0 as? BraveBookmarkFolder {
+            if let folder = $0 as? BraveBookmarkFolderX {
                 return IndentedFolder(folder, folder.indentationLevel)
             }
             return IndentedFolder($0, AddEditBookmarkTableViewController.defaultIndentationLevel)
@@ -466,7 +467,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
             cell.indentationLevel = indentedFolder.indentationLevel
             
             // Folders with children folders have a different icon
-            let hasChildrenFolders = indentedFolder.folder.children?.contains(where: { $0.isFolder })
+            let hasChildrenFolders = indentedFolder.folder.children.contains(where: { $0.isFolder })
             if indentedFolder.folder.parent == nil {
                 cell.customImage.image = #imageLiteral(resourceName: "menu_bookmarks").template
             } else {

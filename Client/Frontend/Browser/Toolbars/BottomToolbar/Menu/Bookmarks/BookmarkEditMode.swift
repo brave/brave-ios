@@ -5,6 +5,7 @@
 import Foundation
 import Data
 import Shared
+import BraveCore
 
 /// Bookmark editing has four states.
 /// each state has small differences in presentation as well as business logic.
@@ -34,7 +35,7 @@ enum BookmarkEditMode {
     /// Returns a folder which is edited, otherwise retuns nil.
     /// This is required to exclude the folder from showing in
     /// folder hierarchy.
-    var folder: Bookmarkv2? {
+    var folder: BookmarkNode? {
         switch self {
         case .editFolder(let folder): return folder
         default: return nil
@@ -52,7 +53,7 @@ enum BookmarkEditMode {
         }
     }
     
-    private func folderOrRoot(bookmarkOrFolder: Bookmarkv2) -> BookmarkSaveLocation {
+    private func folderOrRoot(bookmarkOrFolder: BookmarkNode) -> BookmarkSaveLocation {
         guard let parent = bookmarkOrFolder.parent else { return .rootLevel }
         return .folder(folder: parent)
     }
