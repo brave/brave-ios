@@ -193,24 +193,26 @@ class PlaylistCarplayManager: NSObject {
     }
     
     private func attemptInterfaceConnection(isCarPlayAvailable: Bool) {
-        self.isCarPlayAvailable = isCarPlayAvailable
-        
-        // If there is no media player, create one,
-        // pass it to the carplay controller
-        if isCarPlayAvailable {
-            // Protect against reentrancy.
-            if carPlayController == nil {
-                carPlayController = self.getCarPlayController()
+        ensureMainThread {
+            self.isCarPlayAvailable = isCarPlayAvailable
+            
+            // If there is no media player, create one,
+            // pass it to the carplay controller
+            if isCarPlayAvailable {
+                // Protect against reentrancy.
+                if self.carPlayController == nil {
+                    self.carPlayController = self.getCarPlayController()
+                }
+            } else {
+                self.carPlayController = nil
+                self.mediaPlayer = nil
             }
-        } else {
-            carPlayController = nil
-            mediaPlayer = nil
-        }
 
-        // Sometimes the `endpointAvailable` WILL RETURN TRUE!
-        // Even when the car is NOT connected.
-        log.debug("CARPLAY CONNECTED: \(isCarPlayAvailable)")
-        log.debug("CARPLAY ENDPOINT AVAILABLE: \(contentManager?.context.endpointAvailable == true)")
+            // Sometimes the `endpointAvailable` WILL RETURN TRUE!
+            // Even when the car is NOT connected.
+            log.debug("CARPLAY CONNECTED: \(isCarPlayAvailable)")
+            log.debug("CARPLAY ENDPOINT AVAILABLE: \(self.contentManager?.context.endpointAvailable == true)")
+        }
     }
 }
 

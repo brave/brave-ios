@@ -245,6 +245,13 @@ class PlaylistCarplayControllerIOS14: NSObject {
             settingsTemplate
         ]
         
+        // If we have any controllers presented, we need to remove them.
+        interfaceController.popToRootTemplate(animated: true) { success, error in
+            if !success, let error = error {
+                log.error(error)
+            }
+        }
+        
         // Reload the templates instead of replacing the RootTemplate
         tabBarTemplate.updateTemplates(tabTemplates)
     }
