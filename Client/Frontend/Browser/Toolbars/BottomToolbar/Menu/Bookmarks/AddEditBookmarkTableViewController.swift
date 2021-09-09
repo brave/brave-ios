@@ -201,7 +201,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
     private func sortFolders() -> [IndentedFolder] {
         guard let objects = frc?.fetchedObjects else { return [] }
         return objects.map({
-            if let folder = $0 as? BraveBookmarkFolderX {
+            if let folder = $0 as? BraveBookmarkFolder {
                 return IndentedFolder(folder, folder.indentationLevel)
             }
             return IndentedFolder($0, AddEditBookmarkTableViewController.defaultIndentationLevel)

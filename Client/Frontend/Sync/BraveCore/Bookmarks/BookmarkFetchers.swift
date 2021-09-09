@@ -143,8 +143,8 @@ class Bookmarkv2ExclusiveFetcher: NSObject, BookmarksV2FetchResultsController {
     
     private func getNestedFolders(_ node: BookmarkNode, guid: String?) -> [BookmarkNode] {
         if let guid = guid {
-            return node.nestedChildFolders.filter({ $0.bookmarkNode.guid != guid }).map({ BraveBookmarkFolderX($0) })
+            return node.nestedChildFolders.filter({ $0.bookmarkNode.guid != guid }).map({ BraveBookmarkFolder($0) })
         }
-        return node.nestedChildFolders.map({ BraveBookmarkFolderX($0) })
+        return node.nestedChildFolders.map({ BraveBookmarkFolder($0) })
     }
 }
