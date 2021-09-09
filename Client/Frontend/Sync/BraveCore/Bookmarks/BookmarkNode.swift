@@ -14,8 +14,14 @@ extension BookmarkNode {
         
     // MARK: Internal
        
-    // TODO:
-    //public var bookmarkFavIconObserver: BookmarkModelListener?
+    private struct AssociatedObjectKeys {
+        static var faviconObserver: Int = 0
+    }
+    
+    public var bookmarkFavIconObserver: BookmarkModelListener? {
+        get { objc_getAssociatedObject(self, &AssociatedObjectKeys.faviconObserver) as? BookmarkModelListener }
+        set { objc_setAssociatedObject(self, &AssociatedObjectKeys.faviconObserver, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC) }
+    }
 
     public var title: String? {
         return titleUrlNodeTitle
