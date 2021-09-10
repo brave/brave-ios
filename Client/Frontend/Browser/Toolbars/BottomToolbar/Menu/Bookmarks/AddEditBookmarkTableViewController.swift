@@ -116,7 +116,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
     
     private var frc: BookmarksV2FetchResultsController?
     private let mode: BookmarkEditMode
-    private let bookmarkManager: BookmarkManager
+    private let bookmarkAPI: BraveBookmarksAPI
     
     private var presentationMode: DataSourcePresentationMode
     
@@ -125,16 +125,16 @@ class AddEditBookmarkTableViewController: UITableViewController {
     private var rootFolderName: String
     private var rootFolderId: Int = 0 // MobileBookmarks Folder Id
     
-    init(bookmarkManager: BookmarkManager, mode: BookmarkEditMode) {
-        self.bookmarkManager = bookmarkManager
+    init(bookmarkAPI: BraveBookmarksAPI, mode: BookmarkEditMode) {
+        self.bookmarkAPI = bookmarkAPI
         self.mode = mode
         
         saveLocation = mode.initialSaveLocation
         presentationMode = .currentSelection
-        frc = bookmarkManager.foldersFrc(excludedFolder: mode.folder)
-        rootFolderName = bookmarkManager.mobileNode()?.displayTitle ?? Strings.bookmarkRootLevelCellTitle
+        frc = bookmarkAPI.foldersFrc(excludedFolder: mode.folder)
+        rootFolderName = bookmarkAPI.mobileNode()?.displayTitle ?? Strings.bookmarkRootLevelCellTitle
         
-        if let mobileFolderId = bookmarkManager.mobileNode()?.objectID {
+        if let mobileFolderId = bookmarkAPI.mobileNode()?.objectID {
             rootFolderId = mobileFolderId
         } else {
             log.error("Invalid MobileBookmarks Folder Id")
@@ -246,20 +246,20 @@ class AddEditBookmarkTableViewController: UITableViewController {
             
             switch saveLocation {
             case .rootLevel:
-                bookmarkManager.add(url: url, title: title)
+                bookmarkAPI.add(url: url, title: title)
             case .favorites:
                 Favorite.add(url: url, title: title)
             case .folder(let folder):
-                bookmarkManager.add(url: url, title: title, parentFolder: folder)
+                bookmarkAPI.add(url: url, title: title, parentFolder: folder)
             }
         case .addFolder(_):
             switch saveLocation {
             case .rootLevel:
-                bookmarkManager.addFolder(title: title)
+                bookmarkAPI.addFolder(title: title)
             case .favorites:
                 fatalError("Folders can't be saved to favorites")
             case .folder(let folder):
-                bookmarkManager.addFolder(title: title, parentFolder: folder)
+                bookmarkAPI.addFolder(title: title, parentFolder: folder)
             }
         case .editBookmark(let bookmark):
             guard let urlString = bookmarkDetailsView.urlTextField?.text,
@@ -271,12 +271,12 @@ class AddEditBookmarkTableViewController: UITableViewController {
             
             switch saveLocation {
             case .rootLevel:
-                bookmarkManager.updateWithNewLocation(bookmark, customTitle: title, url: url, location: nil)
+                bookmarkAPI.updateWithNewLocation(bookmark, customTitle: title, url: url, location: nil)
             case .favorites:
-                bookmarkManager.delete(bookmark)
+                bookmarkAPI.delete(bookmark)
                 Favorite.add(url: url, title: title)
             case .folder(let folder):
-                bookmarkManager.updateWithNewLocation(bookmark, customTitle: title, url: url, location: folder)
+                bookmarkAPI.updateWithNewLocation(bookmark, customTitle: title, url: url, location: folder)
             }
             
         case .editFolder(let folder):
@@ -284,11 +284,11 @@ class AddEditBookmarkTableViewController: UITableViewController {
             
             switch saveLocation {
             case .rootLevel:
-                bookmarkManager.updateWithNewLocation(folder, customTitle: title, url: nil, location: nil)
+                bookmarkAPI.updateWithNewLocation(folder, customTitle: title, url: nil, location: nil)
             case .favorites:
                 fatalError("Folders can't be saved to favorites")
             case .folder(let folderSaveLocation):
-                bookmarkManager.updateWithNewLocation(folder, customTitle: title, url: nil, location: folderSaveLocation)
+                bookmarkAPI.updateWithNewLocation(folder, customTitle: title, url: nil, location: folderSaveLocation)
             }
             
         case .editFavorite(let favorite):
@@ -301,13 +301,13 @@ class AddEditBookmarkTableViewController: UITableViewController {
             
             switch saveLocation {
             case .rootLevel:
-                bookmarkManager.delete(favorite)
-                bookmarkManager.add(url: url, title: title)
+                bookmarkAPI.delete(favorite)
+                bookmarkAPI.add(url: url, title: title)
             case .favorites:
                 favorite.update(customTitle: title, url: url)
             case .folder(let folder):
-                bookmarkManager.delete(favorite)
-                bookmarkManager.add(url: url, title: title, parentFolder: folder)
+                bookmarkAPI.delete(favorite)
+                bookmarkAPI.add(url: url, title: title, parentFolder: folder)
             }
         }
         
@@ -370,7 +370,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
     }
     
     private func showNewFolderVC() {
-        let vc = AddEditBookmarkTableViewController(bookmarkManager: bookmarkManager, mode: .addFolder(title: Strings.newFolderDefaultName))
+        let vc = AddEditBookmarkTableViewController(bookmarkAPI: bookmarkAPI, mode: .addFolder(title: Strings.newFolderDefaultName))
         navigationController?.pushViewController(vc, animated: true)
     }
 

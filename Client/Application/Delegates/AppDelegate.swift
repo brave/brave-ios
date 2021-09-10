@@ -177,10 +177,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         // the simulator via Xcode will count as a "crash" and lead to restore popups in the subsequent launch
         let crashedLastSession = !Preferences.AppState.backgroundedCleanly.value && AppConstants.buildChannel != .debug
         Preferences.AppState.backgroundedCleanly.value = false
-        
-        let bookmarkManager = BookmarkManager(bookmarksAPI: braveCore?.bookmarksAPI)
-            
-        guard let historyAPI = braveCore?.historyAPI else {
+                    
+        guard let historyAPI = braveCore?.historyAPI, let bookmarkAPI = braveCore?.bookmarksAPI else {
             return false
         }
 
@@ -188,7 +186,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
             profile: self.profile!,
             tabManager: self.tabManager,
             historyAPI: historyAPI,
-            bookmarkManager: bookmarkManager,
+            bookmarkAPI: bookmarkAPI,
             crashedLastSession: crashedLastSession)
         browserViewController.edgesForExtendedLayout = []
 
