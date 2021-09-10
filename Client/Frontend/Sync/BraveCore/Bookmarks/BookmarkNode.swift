@@ -52,9 +52,9 @@ extension BookmarkNode {
         // because AddEditBookmarkTableViewController.sortFolders
         // sorts root folders by having a nil parent.
         // If that code changes, we should change here to match.
-//        guard parent?.guid != BookmarkManager.rootNodeId else {
-//            return nil
-//        }
+        guard parent?.guid != BookmarkNode.rootNodeGuid else {
+            return nil
+        }
         
         return parent
     }
@@ -66,20 +66,6 @@ extension BookmarkNode {
     public var objectID: Int {
         return Int(nodeId)
     }
-    
-//    public var order: Int16 {
-//        let defaultOrder = 0 // taken from CoreData
-//
-//        // MUST Use childCount instead of children.count! for performance
-//        guard let childCount = parent?.childCount, childCount > 0 else {
-//            return Int16(defaultOrder)
-//        }
-//
-//        // Do NOT change this to self.parent.children.indexOf(where: { self.id == $0.id })
-//        // Swift's performance on `Array` is abominable!
-//        // Therefore we call a native function `index(ofChild:)` to return the index.
-//        return Int16(self.parentNode?.index(ofChild: self) ?? defaultOrder)
-//    }
     
     public func update(customTitle: String?, url: URL?) {
         setTitle(customTitle ?? "")

@@ -468,7 +468,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
             
             // Folders with children folders have a different icon
             let hasChildrenFolders = indentedFolder.folder.children.contains(where: { $0.isFolder })
-            if indentedFolder.folder.parent == nil {
+            if indentedFolder.folder.parentNode == nil {
                 cell.customImage.image = #imageLiteral(resourceName: "menu_bookmarks").template
             } else {
                 cell.customImage.image = (hasChildrenFolders == true ? #imageLiteral(resourceName: "menu_folder_open") : #imageLiteral(resourceName: "menu_folder")).template

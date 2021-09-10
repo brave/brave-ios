@@ -138,7 +138,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
             guard let navigationController = self.navigationController else { return }
             let index = navigationController.viewControllers.firstIndex(of: self) ?? 0
             if index <= 0 && self.currentFolder != nil {
-                let nextController = BookmarksViewController(folder: self.currentFolder?.parent, bookmarkAPI: self.bookmarkAPI, isPrivateBrowsing: self.isPrivateBrowsing)
+                let nextController = BookmarksViewController(folder: self.currentFolder?.parentNode, bookmarkAPI: self.bookmarkAPI, isPrivateBrowsing: self.isPrivateBrowsing)
                 nextController.profile = self.profile
                 nextController.bookmarksDidChange = self.bookmarksDidChange
                 nextController.toolbarUrlActionsDelegate = self.toolbarUrlActionsDelegate
