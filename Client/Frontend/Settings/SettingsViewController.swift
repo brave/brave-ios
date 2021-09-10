@@ -58,20 +58,20 @@ class SettingsViewController: TableViewController {
     private let rewards: BraveRewards?
     private let legacyWallet: BraveLedger?
     private let feedDataSource: FeedDataSource
-    private let historyManager: HistoryManager
+    private let historyAPI: BraveHistoryAPI
     
     init(profile: Profile,
          tabManager: TabManager,
          feedDataSource: FeedDataSource,
          rewards: BraveRewards? = nil,
          legacyWallet: BraveLedger? = nil,
-         historyManager: HistoryManager) {
+         historyAPI: BraveHistoryAPI) {
         self.profile = profile
         self.tabManager = tabManager
         self.feedDataSource = feedDataSource
         self.rewards = rewards
         self.legacyWallet = legacyWallet
-        self.historyManager = historyManager
+        self.historyAPI = historyAPI
         
         super.init(style: .insetGrouped)
     }
@@ -178,7 +178,7 @@ class SettingsViewController: TableViewController {
                         profile: self.profile,
                         tabManager: self.tabManager,
                         feedDataSource: self.feedDataSource,
-                        historyManager: self.historyManager)
+                        historyAPI: self.historyAPI)
                     self.navigationController?.pushViewController(controller, animated: true)
                 }, image: #imageLiteral(resourceName: "settings-shields"), accessory: .disclosureIndicator)
             ]

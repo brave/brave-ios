@@ -257,7 +257,7 @@ extension BrowserViewController: TopToolbarDelegate {
                     profile: self.profile,
                     tabManager: self.tabManager,
                     feedDataSource: self.feedDataSource,
-                    historyManager: self.historyManager
+                    historyAPI: self.historyAPI
                 )
                 let container = SettingsNavigationController(rootViewController: shieldsAndPrivacy)
                 container.isModalInPresentation = true
@@ -320,7 +320,7 @@ extension BrowserViewController: TopToolbarDelegate {
         searchController.searchDelegate = self
         searchController.profile = self.profile
 
-        searchLoader = SearchLoader(historyManager: historyManager, bookmarkManager: bookmarkManager)
+        searchLoader = SearchLoader(historyAPI: historyAPI, bookmarkManager: bookmarkManager)
         searchLoader?.addListener(searchController)
         searchLoader?.autocompleteSuggestionHandler = { [weak self] completion in
             self?.topToolbar.setAutocompleteSuggestion(completion)

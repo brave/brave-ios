@@ -174,13 +174,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         let crashedLastSession = !Preferences.AppState.backgroundedCleanly.value && AppConstants.buildChannel != .debug
         Preferences.AppState.backgroundedCleanly.value = false
         
-        let historyManager = HistoryManager(historyAPI: braveCore?.historyAPI)
         let bookmarkManager = BookmarkManager(bookmarksAPI: braveCore?.bookmarksAPI)
-        
+            
+        guard let historyAPI = braveCore?.historyAPI else {
+            return false
+        }
+
         browserViewController = BrowserViewController(
             profile: self.profile!,
             tabManager: self.tabManager,
-            historyManager: historyManager,
+            historyAPI: historyAPI,
             bookmarkManager: bookmarkManager,
             crashedLastSession: crashedLastSession)
         browserViewController.edgesForExtendedLayout = []

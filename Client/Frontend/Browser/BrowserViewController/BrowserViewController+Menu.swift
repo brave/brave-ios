@@ -38,7 +38,7 @@ extension BrowserViewController {
             }
 
             MenuItemButton(icon: #imageLiteral(resourceName: "menu-history").template, title: Strings.historyMenuItem) { [unowned self, unowned menuController] in
-                let vc = HistoryViewController(isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing, historyManager: self.historyManager)
+                let vc = HistoryViewController(isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing, historyAPI: self.historyAPI)
                 vc.toolbarUrlActionsDelegate = self
                 menuController.pushInnerMenu(vc)
             }
@@ -69,7 +69,7 @@ extension BrowserViewController {
                 }
             }
             MenuItemButton(icon: #imageLiteral(resourceName: "menu-settings").template, title: Strings.settingsMenuItem) { [unowned self, unowned menuController] in
-                let vc = SettingsViewController(profile: self.profile, tabManager: self.tabManager, feedDataSource: self.feedDataSource, rewards: self.rewards, legacyWallet: self.legacyWallet, historyManager: self.historyManager)
+                let vc = SettingsViewController(profile: self.profile, tabManager: self.tabManager, feedDataSource: self.feedDataSource, rewards: self.rewards, legacyWallet: self.legacyWallet, historyAPI: self.historyAPI)
                 vc.settingsDelegate = self
                 menuController.pushInnerMenu(vc)
             }
