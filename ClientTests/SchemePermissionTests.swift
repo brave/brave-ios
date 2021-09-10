@@ -6,6 +6,7 @@
 import Foundation
 import XCTest
 import Storage
+import BraveCore
 
 @testable import Client
 
@@ -63,14 +64,14 @@ class SchemePermissionTests: XCTestCase {
             return
         }
         
-        historyManager = HistoryManager(historyAPI: appDelegate.braveCore?.historyAPI)
-        bookmarkManager = BookmarkManager(bookmarksAPI: appDelegate.braveCore?.bookmarksAPI)
+        historyAPI = appDelegate.braveCore?.historyAPI
+        bookmarksAPI = appDelegate.braveCore?.bookmarksAPI
         
         subject = BrowserViewController(
             profile: profile,
             tabManager: tabManager,
-            historyManager: historyManager,
-            bookmarkManager: bookmarkManager,
+            historyAPI: historyAPI,
+            bookmarkAPI: bookmarksAPI,
             crashedLastSession: false)
     }
     
@@ -118,6 +119,6 @@ class SchemePermissionTests: XCTestCase {
     private var profile: Profile!
     private var tabManager: TabManager!
     private var imageStore: DiskImageStore!
-    private var historyManager: HistoryManager!
-    private var bookmarkManager: BookmarkManager!
+    private var historyAPI: BraveHistoryAPI!
+    private var bookmarksAPI: BraveBookmarksAPI!
 }
