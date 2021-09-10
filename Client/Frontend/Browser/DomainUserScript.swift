@@ -63,9 +63,7 @@ enum DomainUserScript: CaseIterable {
         case .braveTalk:
             return .init(arrayLiteral: "talk.brave.com", "beta.talk.brave.com",
                          "talk.bravesoftware.com", "beta.talk.bravesoftware.com",
-                         "dev.talk.brave.software", "beta.talk.brave.software",
-                         // TODO: Remove before merge
-                         "iccub.github.io")
+                         "dev.talk.brave.software", "beta.talk.brave.software")
         }
     }
     
