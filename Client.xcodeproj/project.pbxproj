@@ -470,6 +470,7 @@
 		2FCEED7B26EA64A400892699 /* HistoryNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FCEED7A26EA64A400892699 /* HistoryNode.swift */; };
 		2FCEED7D26EA6AF900892699 /* BookmarkNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FCEED7C26EA6AF900892699 /* BookmarkNode.swift */; };
 		2FCEED8526EAAB6C00892699 /* HistoryAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FCEED8426EAAB6C00892699 /* HistoryAPI.swift */; };
+		2FCEEDC126EBDEDE00892699 /* BookmarkAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FCEEDC026EBDEDE00892699 /* BookmarkAPI.swift */; };
 		2FD0E3AF2576C48A000C773B /* SchemePermissionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FD0E3AE2576C48A000C773B /* SchemePermissionTests.swift */; };
 		2FD0E3D62577F327000C773B /* SearchSuggestionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FD0E3D52577F327000C773B /* SearchSuggestionCell.swift */; };
 		2FD1C60B2638823D00E3C25F /* HistoryFetchers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FD1C60A2638823D00E3C25F /* HistoryFetchers.swift */; };
@@ -2014,6 +2015,7 @@
 		2FCEED7A26EA64A400892699 /* HistoryNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryNode.swift; sourceTree = "<group>"; };
 		2FCEED7C26EA6AF900892699 /* BookmarkNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkNode.swift; sourceTree = "<group>"; };
 		2FCEED8426EAAB6C00892699 /* HistoryAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryAPI.swift; sourceTree = "<group>"; };
+		2FCEEDC026EBDEDE00892699 /* BookmarkAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkAPI.swift; sourceTree = "<group>"; };
 		2FD0E3AE2576C48A000C773B /* SchemePermissionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchemePermissionTests.swift; sourceTree = "<group>"; };
 		2FD0E3D52577F327000C773B /* SearchSuggestionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchSuggestionCell.swift; sourceTree = "<group>"; };
 		2FD1C60A2638823D00E3C25F /* HistoryFetchers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryFetchers.swift; sourceTree = "<group>"; };
@@ -4264,6 +4266,7 @@
 			children = (
 				2FCEED7C26EA6AF900892699 /* BookmarkNode.swift */,
 				2FD70DB926C1C54D00345A33 /* BookmarkManager.swift */,
+				2FCEEDC026EBDEDE00892699 /* BookmarkAPI.swift */,
 				5E9B28EA255047C80072E655 /* BookmarkModelStateObserver.swift */,
 				5E9B28F6255048540072E655 /* BookmarkFetchers.swift */,
 			);
@@ -7440,6 +7443,7 @@
 				27FD3FBA25C8D20200696156 /* FeedDataSource+RSS.swift in Sources */,
 				27FCFB0C2673F265008E43AB /* AdCardView.swift in Sources */,
 				0A0D3D3921A4BD0600BEE65B /* SafeBrowsing.swift in Sources */,
+				2FCEEDC126EBDEDE00892699 /* BookmarkAPI.swift in Sources */,
 				278C6FFF24F6EA3700A246C8 /* ReportBrokenSiteView.swift in Sources */,
 				27676D472555F34D00BC955A /* BraveRewardsStatusView.swift in Sources */,
 				4422D4E821BFFB7600BF1855 /* log_writer.cc in Sources */,

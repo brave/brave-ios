@@ -60,14 +60,12 @@ extension BraveHistoryAPI {
     }
     
     // MARK: Private
-    
-    //private var observer: HistoryServiceListener?
-    
+        
     private struct AssociatedObjectKeys {
         static var serviceStateListener: Int = 0
     }
     
-    var observer: HistoryServiceListener? {
+    private var observer: HistoryServiceListener? {
         get { objc_getAssociatedObject(self, &AssociatedObjectKeys.serviceStateListener) as? HistoryServiceListener }
         set { objc_setAssociatedObject(self, &AssociatedObjectKeys.serviceStateListener, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC) }
     }
