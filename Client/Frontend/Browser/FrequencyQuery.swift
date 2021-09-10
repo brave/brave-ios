@@ -7,22 +7,23 @@ import Foundation
 import Shared
 import Storage
 import Data
+import BraveCore
 
 class FrequencyQuery {
     
-    private let historyManager: HistoryManager
+    private let historyAPI: BraveHistoryAPI
     private let bookmarkManager: BookmarkManager
     
     private let queue = DispatchQueue(label: "frequency-query-queue")
     private var cancellable: DispatchWorkItem?
     
-    init(historyManager: HistoryManager, bookmarkManager: BookmarkManager) {
-        self.historyManager = historyManager
+    init(historyAPI: BraveHistoryAPI, bookmarkManager: BookmarkManager) {
+        self.historyAPI = historyAPI
         self.bookmarkManager = bookmarkManager
     }
     
     public func sitesByFrequency(containing query: String? = nil, completion: @escaping (Set<Site>) -> Void) {
-        historyManager.byFrequency(query: query) { [weak self] historyList in
+        historyAPI.byFrequency(query: query) { [weak self] historyList in
             let historySites = historyList
                 .map { Site(url: $0.absoluteUrl ?? "", title: $0.title ?? "") }
 

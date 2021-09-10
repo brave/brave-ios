@@ -8,6 +8,7 @@ import BraveShared
 import Storage
 import Data
 import CoreData
+import BraveCore
 
 class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol {
     
@@ -23,7 +24,7 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
         $0.isHidden = true
     }
 
-    private let historyManager: HistoryManager
+    private let historyAPI: BraveHistoryAPI
     
     var historyFRC: HistoryV2FetchResultsController?
     
@@ -32,13 +33,12 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
     
     var isHistoryRefreshing = false
     
-    init(isPrivateBrowsing: Bool, historyManager: HistoryManager) {
+    init(isPrivateBrowsing: Bool, historyAPI: BraveHistoryAPI) {
         self.isPrivateBrowsing = isPrivateBrowsing
-        self.historyManager = historyManager
-        
+        self.historyAPI = historyAPI
         super.init(nibName: nil, bundle: nil)
         
-        historyFRC = historyManager.frc()
+        historyFRC = historyAPI.frc()
         historyFRC?.delegate = self
     }
     
@@ -76,7 +76,7 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
                 spinner.startAnimating()
                 isHistoryRefreshing = true
 
-                historyManager.waitForHistoryServiceLoaded { [weak self] in
+                historyAPI.waitForHistoryServiceLoaded { [weak self] in
                     guard let self = self else { return }
                     
                     self.reloadData() {
@@ -92,7 +92,7 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
     private func reloadData(_ completion: @escaping () -> Void) {
         // Recreate the frc if it was previously removed
         if historyFRC == nil {
-            historyFRC = historyManager.frc()
+            historyFRC = historyAPI.frc()
             historyFRC?.delegate = self
         }
         
@@ -173,7 +173,7 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
         
         alert.addAction(UIAlertAction(title: Strings.History.historyClearActionTitle, style: .destructive, handler: { _ in
             DispatchQueue.main.async {
-                self.historyManager.deleteAll {
+                self.historyAPI.deleteAll {
                     self.refreshHistory()
                 }
             }
@@ -272,7 +272,7 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
         switch editingStyle {
             case .delete:
                 guard let historyItem = historyFRC?.object(at: indexPath) else { return }
-                historyManager.delete(historyItem)
+                historyAPI.delete(historyItem)
                 
                 refreshHistory()
             default:

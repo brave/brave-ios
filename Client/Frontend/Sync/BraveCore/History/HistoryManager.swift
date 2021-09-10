@@ -10,7 +10,7 @@ import BraveShared
 import CoreData
 import Shared
 
-class HistoryManager {
+class HistoryManager2 {
     
     // MARK: Lifecycle
     
@@ -94,7 +94,7 @@ class HistoryManager {
 
 // MARK: Brave-Core Only
 
-extension HistoryManager {
+extension HistoryManager2 {
     
     public func waitForHistoryServiceLoaded(_ completion: @escaping () -> Void) {
         guard let historyAPI = self.historyAPI else { return }

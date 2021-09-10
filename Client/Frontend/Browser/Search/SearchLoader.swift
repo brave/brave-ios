@@ -5,6 +5,7 @@
 import Shared
 import Storage
 import Data
+import BraveCore
 
 /// Shared data source for the SearchViewController and the URLBar domain completion.
 /// Since both of these use the same query, we can perform the query once and dispatch the results.
@@ -13,8 +14,8 @@ class SearchLoader: Loader<[Site], SearchViewController> {
     
     var autocompleteSuggestionHandler: ((String) -> Void)?
     
-    init(historyManager: HistoryManager, bookmarkManager: BookmarkManager) {
-        frequencyQuery = FrequencyQuery(historyManager: historyManager, bookmarkManager: bookmarkManager)
+    init(historyAPI: BraveHistoryAPI, bookmarkManager: BookmarkManager) {
+        frequencyQuery = FrequencyQuery(historyAPI: historyAPI, bookmarkManager: bookmarkManager)
     }
 
     var query: String = "" {

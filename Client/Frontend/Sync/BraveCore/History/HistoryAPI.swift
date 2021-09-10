@@ -14,32 +14,32 @@ extension BraveHistoryAPI {
     
     // MARK: Internal
     
-    public func add(url: URL, title: String, dateAdded: Date, isURLTyped: Bool = true) {
+    func add(url: URL, title: String, dateAdded: Date, isURLTyped: Bool = true) {
         let historyNode = HistoryNode(url: url, title: title, dateAdded: dateAdded)
         addHistory(historyNode, isURLTyped: isURLTyped)
     }
 
-//    public func frc() -> HistoryV2FetchResultsController? {
-//        return Historyv2Fetcher(historyAPI: self)
-//    }
+    func frc() -> HistoryV2FetchResultsController? {
+        return Historyv2Fetcher(historyAPI: self)
+    }
 
-    public func delete(_ historyNode: HistoryNode) {
+    func delete(_ historyNode: HistoryNode) {
         removeHistory(historyNode)
     }
 
-    public func deleteAll(_ completion: @escaping () -> Void) {
+    func deleteAll(_ completion: @escaping () -> Void) {
         removeAll {
             completion()
         }
     }
 
-    public func suffix(_ maxLength: Int, _ completion: @escaping ([HistoryNode]) -> Void) {
+    func suffix(_ maxLength: Int, _ completion: @escaping ([HistoryNode]) -> Void) {
         search(withQuery: nil, maxCount: UInt(max(20, maxLength)), completion: { historyResults in
             completion(historyResults.map { $0 })
         })
     }
 
-    public func byFrequency(query: String? = nil, _ completion: @escaping ([HistoryNode]) -> Void) {
+    func byFrequency(query: String? = nil, _ completion: @escaping ([HistoryNode]) -> Void) {
         guard let query = query, !query.isEmpty else {
             return
         }
@@ -49,7 +49,7 @@ extension BraveHistoryAPI {
         })
     }
 
-    public func update(_ historyNode: HistoryNode, customTitle: String?, dateAdded: Date?) {
+    func update(_ historyNode: HistoryNode, customTitle: String?, dateAdded: Date?) {
         if let title = customTitle {
             historyNode.title = title
         }
@@ -67,7 +67,7 @@ extension BraveHistoryAPI {
         static var serviceStateListener: Int = 0
     }
     
-    public var observer: HistoryServiceListener? {
+    var observer: HistoryServiceListener? {
         get { objc_getAssociatedObject(self, &AssociatedObjectKeys.serviceStateListener) as? HistoryServiceListener }
         set { objc_setAssociatedObject(self, &AssociatedObjectKeys.serviceStateListener, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC) }
     }
@@ -77,7 +77,7 @@ extension BraveHistoryAPI {
 
 extension BraveHistoryAPI {
     
-    public func waitForHistoryServiceLoaded(_ completion: @escaping () -> Void) {
+    func waitForHistoryServiceLoaded(_ completion: @escaping () -> Void) {
         if isBackendLoaded {
             DispatchQueue.main.async {
                 completion()

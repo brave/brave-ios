@@ -7,6 +7,7 @@ import Shared
 import Data
 import BraveShared
 import WebKit
+import BraveCore
 
 private let log = Logger.browserLogger
 
@@ -97,10 +98,10 @@ class CacheClearable: Clearable {
 
 // Clears our browsing history, including favicons and thumbnails.
 class HistoryClearable: Clearable {
-    let historyManager: HistoryManager
+    let historyAPI: BraveHistoryAPI
     
-    init(historyManager: HistoryManager) {
-        self.historyManager = historyManager
+    init(historyAPI: BraveHistoryAPI) {
+        self.historyAPI = historyAPI
     }
     
     var label: String {
@@ -111,7 +112,7 @@ class HistoryClearable: Clearable {
         let result = Success()
         
         DispatchQueue.main.async {
-            self.historyManager.deleteAll {
+            self.historyAPI.deleteAll {
                 NotificationCenter.default.post(name: .privateDataClearedHistory, object: nil)
                 result.fill(Maybe<()>(success: ()))
             }
