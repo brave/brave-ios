@@ -32,7 +32,6 @@ class SearchTests: XCTestCase {
         checkValidURL("ftp://ftp.mozilla.org", afterFixup: "ftp://ftp.mozilla.org")
         checkValidURL("foo.bar", afterFixup: "http://foo.bar")
         checkValidURL(" foo.bar ", afterFixup: "http://foo.bar")
-        checkValidURL("1.2.3", afterFixup: "http://1.2.3")
         checkValidURL("[::1]:80", afterFixup: "http://[::1]:80")
         checkValidURL("[2a04:4e42:400::288]", afterFixup: "http://[2a04:4e42:400::288]")
         checkValidURL("[2a04:4e42:600::288]:80", afterFixup: "http://[2a04:4e42:600::288]:80")
@@ -41,6 +40,7 @@ class SearchTests: XCTestCase {
         checkValidURL("[::192.9.5.5]:80", afterFixup: "http://[::192.9.5.5]:80")
         checkValidURL("[::192.9.5.5]/png", afterFixup: "http://[::192.9.5.5]/png")
         checkValidURL("[::192.9.5.5]:80/png", afterFixup: "http://[::192.9.5.5]:80/png")
+        checkValidURL("192.168.2.1", afterFixup: "http://192.168.2.1")
 
         // Check invalid URLs. These are passed along to the default search engine.
         checkInvalidURL("foobar")
@@ -53,6 +53,8 @@ class SearchTests: XCTestCase {
         checkInvalidURL("创业咖啡. 中国")
         checkInvalidURL("data:text/html;base64,SGVsbG8gV29ybGQhCg==")
         checkInvalidURL("data://https://www.example.com,fake example.com")
+        checkInvalidURL("1.2.3")
+        checkInvalidURL("1.1")
         
         // Check invalid quoted URLs, emails, and quoted domains.
         // These are passed along to the default search engine.
