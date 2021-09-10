@@ -105,11 +105,12 @@ extension BraveBookmarksAPI {
         return nil
     }
     
-    func addFolder(title: String, parentFolder: BookmarkNode? = nil) {
+    @discardableResult
+    func addFolder(title: String, parentFolder: BookmarkNode? = nil) -> BookmarkNode? {
         if let parentFolder = parentFolder {
-            createFolder(withParent: parentFolder, title: title)
+            return  createFolder(withParent: parentFolder, title: title)
         } else {
-            createFolder(withTitle: title)
+            return createFolder(withTitle: title)
         }
     }
     

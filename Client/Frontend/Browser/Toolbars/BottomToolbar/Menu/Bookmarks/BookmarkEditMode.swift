@@ -13,9 +13,9 @@ enum BookmarkEditMode {
     case addBookmark(title: String, url: String)
     case addFolder(title: String)
     case addFolderUsingTabs(title: String, tabList: [Tab])
-    case editBookmark(_ bookmark: Bookmarkv2)
-    case editFolder(_ folder: Bookmarkv2)
-    case editFavorite(_ favorite: Bookmarkv2)
+    case editBookmark(_ bookmark: BookmarkNode)
+    case editFolder(_ folder: BookmarkNode)
+    case editFavorite(_ favorite: BookmarkNode)
     
     /// Returns a initial, default save location if none is provided
     var initialSaveLocation: BookmarkSaveLocation {

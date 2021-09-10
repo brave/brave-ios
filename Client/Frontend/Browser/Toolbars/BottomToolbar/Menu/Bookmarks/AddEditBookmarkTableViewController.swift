@@ -289,14 +289,14 @@ class AddEditBookmarkTableViewController: UITableViewController {
         case .addFolderUsingTabs(_, tabList: let tabs):
             switch saveLocation {
             case .rootLevel:
-                if let newFolder = Bookmarkv2.addFolder(title: title) {
-                    addListOfBookmarks(tabs, parentFolder: Bookmarkv2(newFolder))
+                if let newFolder = bookmarkAPI.addFolder(title: title) {
+                    addListOfBookmarks(tabs, parentFolder: newFolder)
                 }
             case .favorites:
                 assertionFailure("Folders can't be saved to favorites")
             case .folder(let folder):
-                if let newFolder = Bookmarkv2.addFolder(title: title, parentFolder: folder) {
-                    addListOfBookmarks(tabs, parentFolder: Bookmarkv2(newFolder))
+                if let newFolder = bookmarkAPI.addFolder(title: title, parentFolder: folder) {
+                    addListOfBookmarks(tabs, parentFolder: newFolder)
                 }
             }
         case .editBookmark(let bookmark):
@@ -359,20 +359,20 @@ class AddEditBookmarkTableViewController: UITableViewController {
         }
     }
     
-    private func addListOfBookmarks(_ tabs: [Tab], parentFolder: Bookmarkv2? = nil) {
+    private func addListOfBookmarks(_ tabs: [Tab], parentFolder: BookmarkNode? = nil) {
         isLoading = true
         
         for tab in tabs {
             if PrivateBrowsingManager.shared.isPrivateBrowsing {
                 if let url = tab.url, url.isWebPage(), !url.isAboutHomeURL {
-                    Bookmarkv2.add(url: url, title: tab.title, parentFolder: parentFolder)
+                    bookmarkAPI.add(url: url, title: tab.title, parentFolder: parentFolder)
                 }
             } else {
                 if let tabID = tab.id {
                     let fetchedTab = TabMO.get(fromId: tabID)
                     
                     if let urlString = fetchedTab?.url, let url = URL(string: urlString), url.isWebPage(), !url.isAboutHomeURL {
-                        Bookmarkv2.add(url: url,
+                        bookmarkAPI.add(url: url,
                                        title: fetchedTab?.title ?? tab.title ?? tab.lastTitle,
                                        parentFolder: parentFolder)
                     }
