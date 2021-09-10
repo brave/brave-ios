@@ -61,9 +61,7 @@ class PlaylistCarplayControllerIOS14: NSObject {
             guard let self = self else { return }
             
             MPNowPlayingInfoCenter.default().playbackState = .playing
-            var nowPlayingInfo = MPNowPlayingInfoCenter.default().nowPlayingInfo ?? [:]
-            nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = event.mediaPlayer.rate
-            MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
+            PlaylistMediaStreamer.updateNowPlayingInfo(event.mediaPlayer)
             
             // Update the playing item indicator & Cache State Icon
             guard let tabTemplate = self.interfaceController.rootTemplate as? CPTabBarTemplate else {
@@ -104,8 +102,9 @@ class PlaylistCarplayControllerIOS14: NSObject {
             }
         }.store(in: &playerStateObservers)
         
-        player.publisher(for: .pause).sink { _ in
+        player.publisher(for: .pause).sink { event in
             MPNowPlayingInfoCenter.default().playbackState = .paused
+            PlaylistMediaStreamer.updateNowPlayingInfo(event.mediaPlayer)
         }.store(in: &playerStateObservers)
         
         player.publisher(for: .stop).sink { _ in

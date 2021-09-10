@@ -221,14 +221,17 @@ class PlaylistViewController: UIViewController {
             
             if !PlaylistCarplayManager.shared.isCarPlayAvailable {
                 MPNowPlayingInfoCenter.default().playbackState = .playing
-                var nowPlayingInfo = MPNowPlayingInfoCenter.default().nowPlayingInfo ?? [:]
-                nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = event.mediaPlayer.rate
-                MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
+                PlaylistMediaStreamer.updateNowPlayingInfo(event.mediaPlayer)
             }
         }.store(in: &playerStateObservers)
         
-        player.publisher(for: .pause).sink { [weak self] _ in
+        player.publisher(for: .pause).sink { [weak self] event in
             self?.playerView.controlsView.playPauseButton.setImage(#imageLiteral(resourceName: "playlist_play"), for: .normal)
+            
+            if !PlaylistCarplayManager.shared.isCarPlayAvailable {
+                MPNowPlayingInfoCenter.default().playbackState = .paused
+                PlaylistMediaStreamer.updateNowPlayingInfo(event.mediaPlayer)
+            }
         }.store(in: &playerStateObservers)
         
         player.publisher(for: .stop).sink { [weak self] _ in
