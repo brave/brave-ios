@@ -294,52 +294,10 @@ class PlaylistCarplayControllerIOS14: NSObject {
                     completion()
                     
                     if error == nil && self.interfaceController.topTemplate != CPNowPlayingTemplate.shared {
-                        
                         self.interfaceController.pushTemplate(CPNowPlayingTemplate.shared, animated: true) { success, error in
                             
                             if !success, let error = error {
-                                // Some Cars (and the iOS Simulator) does not support CPActionSheetTemplate
-                                // So we MUST use CPAlertTemplate
-                                if PlaylistCarplayControllerIOS14.mustUseCPAlertTemplate {
-                                    let alert = CPAlertTemplate(titleVariants: [Strings.PlayList.sorryAlertTitle], actions: [
-                                        CPAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: { [weak self] _ in
-                                            self?.interfaceController.dismissTemplate(animated: true, completion: { success, error in
-                                                if !success, let error = error {
-                                                    log.error(error)
-                                                }
-                                            })
-                                        })
-                                    ])
-                                    
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                                        self.interfaceController.presentTemplate(alert, animated: true, completion: { success, error in
-                                            if !success, let error = error {
-                                                log.error(error)
-                                            }
-                                        })
-                                    }
-                                } else {
-                                    // Can also use CPAlertTemplate, but it doesn't have a "Message" parameter.
-                                    let alert = CPActionSheetTemplate(title: Strings.PlayList.sorryAlertTitle,
-                                                                      message: error.localizedDescription,
-                                                                      actions: [
-                                        CPAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: { [weak self] _ in
-                                            self?.interfaceController.dismissTemplate(animated: true, completion: { success, error in
-                                                if !success, let error = error {
-                                                    log.error(error)
-                                                }
-                                            })
-                                        })
-                                    ])
-                                    
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                                        self.interfaceController.presentTemplate(alert, animated: true, completion: { success, error in
-                                            if !success, let error = error {
-                                                log.error(error)
-                                            }
-                                        })
-                                    }
-                                }
+                                log.error(error)
                             }
                         }
                     }
