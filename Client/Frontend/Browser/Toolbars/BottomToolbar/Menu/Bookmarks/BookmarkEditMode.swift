@@ -53,7 +53,7 @@ enum BookmarkEditMode {
     }
     
     private func folderOrRoot(bookmarkOrFolder: BookmarkNode) -> BookmarkSaveLocation {
-        guard let parent = bookmarkOrFolder.parent else { return .rootLevel }
+        guard let parent = bookmarkOrFolder.parentNode else { return .rootLevel }
         return .folder(folder: parent)
     }
     
