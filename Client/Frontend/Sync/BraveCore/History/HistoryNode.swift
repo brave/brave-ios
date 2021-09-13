@@ -44,26 +44,12 @@ extension HistoryNode {
 
     // MARK: Internal
     
-    var absoluteUrl: String? {
-        url.absoluteString
-    }
-    
-    var created: Date? {
-        get {
-            return dateAdded
-        }
-        
-        set {
-            dateAdded = newValue ?? Date()
-        }
-    }
-    
     var domain: Domain? {
         return Domain.getOrCreate(forUrl: url, persistent: !PrivateBrowsingManager.shared.isPrivateBrowsing)
     }
     
     var sectionID: HistoryNode.Section? {
-        fetchHistoryTimePeriod(visited: created)
+        fetchHistoryTimePeriod(visited: dateAdded)
     }
     
     // MARK: Private
@@ -74,13 +60,13 @@ extension HistoryNode {
         let thisWeekOffset = -7
         let thisMonthOffset = -31
         
-        if created?.compare(getDate(todayOffset)) == ComparisonResult.orderedDescending {
+        if dateAdded?.compare(getDate(todayOffset)) == ComparisonResult.orderedDescending {
             return .today
-        } else if created?.compare(getDate(yesterdayOffset)) == ComparisonResult.orderedDescending {
+        } else if dateAdded?.compare(getDate(yesterdayOffset)) == ComparisonResult.orderedDescending {
             return .yesterday
-        } else if created?.compare(getDate(thisWeekOffset)) == ComparisonResult.orderedDescending {
+        } else if dateAdded?.compare(getDate(thisWeekOffset)) == ComparisonResult.orderedDescending {
             return .lastWeek
-        } else if created?.compare(getDate(thisMonthOffset))  == ComparisonResult.orderedDescending {
+        } else if dateAdded?.compare(getDate(thisMonthOffset))  == ComparisonResult.orderedDescending {
             return .thisMonth
         }
         

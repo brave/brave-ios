@@ -69,7 +69,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         super.init(nibName: nil, bundle: nil)
         
         self.currentFolder = folder
-        self.title = folder?.displayTitle ?? Strings.bookmarks
+        self.title = folder?.titleUrlNodeTitle ?? Strings.bookmarks
         self.bookmarksFRC = bookmarkAPI.frc(parent: folder)
         self.bookmarksFRC?.delegate = self
     }
@@ -291,7 +291,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         
         // See if the cell holds the same bookmark. If yes, we do not have to recreate its image view
         // This makes scrolling through bookmarks better if there's many bookmarks with the same url
-        let domainOrFolderName = item.isFolder ? item.displayTitle : (item.domain?.url ?? item.absoluteUrl)
+        let domainOrFolderName = item.isFolder ? item.titleUrlNodeTitle : (item.domain?.url ?? item.titleUrlNodeUrl?.absoluteString)
         let shouldReuse = domainOrFolderName != cell.domainOrFolderName
         
         cell.domainOrFolderName = domainOrFolderName
@@ -334,7 +334,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
                         cell.imageView?.image = icon
                     } else if let domain = item.domain, let url = domain.url?.asURL {
                         // favicon object associated through domain relationship - set from cache only
-                        cell.imageView?.loadFavicon(for: url, domain: domain, fallbackMonogramCharacter: item.title?.first, cachedOnly: true)
+                        cell.imageView?.loadFavicon(for: url, domain: domain, fallbackMonogramCharacter: item.titleUrlNodeTitle.first, cachedOnly: true)
                     } else {
                         cell.imageView?.clearMonogramFavicon()
                         cell.imageView?.image = FaviconFetcher.defaultFaviconImage
@@ -355,7 +355,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
                     setFavIcon(cell, item)
                 } else if let domain = item.domain, let url = domain.url?.asURL {
                     // favicon object associated through domain relationship - set from cache or download
-                    cell.imageView?.loadFavicon(for: url, domain: domain, fallbackMonogramCharacter: item.title?.first)
+                    cell.imageView?.loadFavicon(for: url, domain: domain, fallbackMonogramCharacter: item.titleUrlNodeTitle.first)
                 } else {
                     cell.imageView?.clearMonogramFavicon()
                     cell.imageView?.image = FaviconFetcher.defaultFaviconImage
@@ -364,7 +364,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         }
         
         let fontSize: CGFloat = 14.0
-        cell.textLabel?.text = item.displayTitle ?? item.absoluteUrl
+        cell.textLabel?.text = item.titleUrlNodeTitle
         cell.textLabel?.lineBreakMode = .byTruncatingTail
         
         if !item.isFolder {
@@ -387,7 +387,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
             return
         }
         
-        presentLongPressActions(gesture, urlString: bookmark.absoluteUrl, isPrivateBrowsing: isPrivateBrowsing,
+        presentLongPressActions(gesture, urlString: bookmark.titleUrlNodeUrl?.absoluteString, isPrivateBrowsing: isPrivateBrowsing,
                                 customActions: bookmark.isFolder ? folderLongPressActions(bookmark) : nil)
     }
     
@@ -395,7 +395,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         let children = bookmarkAPI.getChildren(forFolder: folder, includeFolders: false) ?? []
         
         let urls: [URL] = children.compactMap { b in
-            guard let url = b.absoluteUrl else { return nil }
+            guard let url = b.titleUrlNodeUrl?.absoluteString else { return nil }
             return URL(string: url)
         }
         
@@ -437,7 +437,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
                 // show editing view for bookmark item
                 self.showEditBookmarkController(bookmark: bookmark)
             } else {
-                if let url = URL(string: bookmark.absoluteUrl ?? "") {
+                if let url = URL(string: bookmark.titleUrlNodeUrl?.absoluteString ?? "") {
                     let bookmarkClickEvent: (() -> Void)? = {
                         /// Donate Custom Intent Open Bookmark List
                         if !self.isPrivateBrowsing {
@@ -494,12 +494,12 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         guard let item = bookmarksFRC?.object(at: indexPath) else { return false }
-        return item.canBeDeleted
+        return !item.isPermanentNode
     }
     
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         guard let item = bookmarksFRC?.object(at: indexPath),
-              item.canBeDeleted else { return nil }
+              !item.isPermanentNode else { return nil }
         
         let deleteAction = UIContextualAction(style: .destructive, title: Strings.delete) { [weak self] _, _, completion in
             guard let self = self else {

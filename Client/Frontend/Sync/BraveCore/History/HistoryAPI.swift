@@ -22,17 +22,7 @@ extension BraveHistoryAPI {
     func frc() -> HistoryV2FetchResultsController? {
         return Historyv2Fetcher(historyAPI: self)
     }
-
-    func delete(_ historyNode: HistoryNode) {
-        removeHistory(historyNode)
-    }
-
-    func deleteAll(_ completion: @escaping () -> Void) {
-        removeAll {
-            completion()
-        }
-    }
-
+    
     func suffix(_ maxLength: Int, _ completion: @escaping ([HistoryNode]) -> Void) {
         search(withQuery: nil, maxCount: UInt(max(20, maxLength)), completion: { historyResults in
             completion(historyResults.map { $0 })

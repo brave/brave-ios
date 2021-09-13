@@ -173,7 +173,7 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
         
         alert.addAction(UIAlertAction(title: Strings.History.historyClearActionTitle, style: .destructive, handler: { _ in
             DispatchQueue.main.async {
-                self.historyAPI.deleteAll {
+                self.historyAPI.removeAll {
                     self.refreshHistory()
                 }
             }
@@ -209,7 +209,7 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
         
         cell.do {
             $0.backgroundColor = UIColor.clear
-            $0.setLines(historyItem.title, detailText: historyItem.absoluteUrl)
+            $0.setLines(historyItem.title, detailText: historyItem.url.absoluteString)
             
             $0.imageView?.contentMode = .scaleAspectFit
             $0.imageView?.image = FaviconFetcher.defaultFaviconImage
@@ -236,7 +236,7 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard let historyItem = historyFRC?.object(at: indexPath) else { return }
         
-        if let historyURL = historyItem.absoluteUrl, let url = URL(string: historyURL) {
+        if let url = URL(string: historyItem.url.absoluteString) {
             dismiss(animated: true) {
                 self.toolbarUrlActionsDelegate?.select(url: url, visitType: .typed)
             }
@@ -249,7 +249,7 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
         guard gesture.state == .began,
               let cell = gesture.view as? UITableViewCell,
               let indexPath = tableView.indexPath(for: cell),
-              let urlString = historyFRC?.object(at: indexPath)?.absoluteUrl else {
+              let urlString = historyFRC?.object(at: indexPath)?.url.absoluteString else {
             return
         }
         
@@ -272,7 +272,7 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
         switch editingStyle {
             case .delete:
                 guard let historyItem = historyFRC?.object(at: indexPath) else { return }
-                historyAPI.delete(historyItem)
+                historyAPI.removeHistory(historyItem)
                 
                 refreshHistory()
             default:

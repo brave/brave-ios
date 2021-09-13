@@ -171,7 +171,7 @@ extension BraveBookmarksAPI {
     }
     
     func delete(_ bookmarkItem: BookmarkNode) {
-        if bookmarkItem.canBeDeleted {
+        if !bookmarkItem.isPermanentNode {
             removeBookmark(bookmarkItem)
         }
     }

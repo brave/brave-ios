@@ -13,38 +13,12 @@ import Shared
 extension BookmarkNode {
         
     // MARK: Internal
-
-    public var title: String? {
-        return titleUrlNodeTitle
-    }
-    
-    public var customTitle: String? {
-        return title
-    }
-    
-    public var displayTitle: String? {
-        return self.customTitle
-    }
-    
-    public var absoluteUrl: String? {
-        titleUrlNodeUrl?.absoluteString
-    }
     
     public var domain: Domain? {
         if let url = titleUrlNodeUrl {
             return Domain.getOrCreate(forUrl: url, persistent: true)
         }
         return nil
-    }
-    
-    public var created: Date? {
-        get {
-            return dateAdded
-        }
-        
-        set {
-            dateAdded = newValue ?? Date()
-        }
     }
     
     public var parentNode: BookmarkNode? {
@@ -57,10 +31,6 @@ extension BookmarkNode {
         }
         
         return parent
-    }
-    
-    public var canBeDeleted: Bool {
-        return isPermanentNode == false
     }
     
     public var objectID: Int {

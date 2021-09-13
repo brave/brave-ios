@@ -52,9 +52,9 @@ class AddEditBookmarkTableViewController: UITableViewController {
         case .addFolder(let title), .addFolderUsingTabs(title: let title, _):
             return FolderDetailsViewTableViewCell(title: title, viewHeight: UX.cellHeight)
         case .editBookmark(let bookmark), .editFavorite(let bookmark):
-            return BookmarkDetailsView(title: bookmark.title, url: bookmark.absoluteUrl)
+            return BookmarkDetailsView(title: bookmark.titleUrlNodeTitle, url: bookmark.titleUrlNodeUrl?.absoluteString)
         case .editFolder(let folder):
-            return FolderDetailsViewTableViewCell(title: folder.title, viewHeight: UX.cellHeight)
+            return FolderDetailsViewTableViewCell(title: folder.titleUrlNodeTitle, viewHeight: UX.cellHeight)
         }
     }()
     
@@ -157,7 +157,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
         saveLocation = mode.initialSaveLocation
         presentationMode = .currentSelection
         frc = bookmarkAPI.foldersFrc(excludedFolder: mode.folder)
-        rootFolderName = bookmarkAPI.mobileNode()?.displayTitle ?? Strings.bookmarkRootLevelCellTitle
+        rootFolderName = bookmarkAPI.mobileNode()?.titleUrlNodeTitle ?? Strings.bookmarkRootLevelCellTitle
         
         if let mobileFolderId = bookmarkAPI.mobileNode()?.objectID {
             rootFolderId = mobileFolderId
@@ -445,7 +445,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
             case .favorites: return favoritesCell
             case .folder(let folder):
                 let cell = IndentedImageTableViewCell(image: #imageLiteral(resourceName: "menu_folder").template)
-                cell.folderName.text = folder.displayTitle
+                cell.folderName.text = folder.titleUrlNodeTitle
                 cell.tag = folderCellTag
                 return cell
             }
@@ -463,7 +463,7 @@ class AddEditBookmarkTableViewController: UITableViewController {
             
             let indentedFolder = sortedFolders[row - specialButtonsCount]
             
-            cell.folderName.text = indentedFolder.folder.displayTitle
+            cell.folderName.text = indentedFolder.folder.titleUrlNodeTitle
             cell.indentationLevel = indentedFolder.indentationLevel
             
             // Folders with children folders have a different icon

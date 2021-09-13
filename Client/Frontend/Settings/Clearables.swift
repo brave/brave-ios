@@ -112,7 +112,7 @@ class HistoryClearable: Clearable {
         let result = Success()
         
         DispatchQueue.main.async {
-            self.historyAPI.deleteAll {
+            self.historyAPI.removeAll {
                 NotificationCenter.default.post(name: .privateDataClearedHistory, object: nil)
                 result.fill(Maybe<()>(success: ()))
             }
