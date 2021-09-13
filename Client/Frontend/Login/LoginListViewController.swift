@@ -23,7 +23,6 @@ class LoginListViewController: LoginAuthViewController {
     
     struct Constants {
         static let saveLoginsRowIdentifier = "saveLoginsRowIdentifier"
-        static let showInMenuRowIdentifier = "showInMenuRowIdentifier"
     }
     
     // MARK: Section
@@ -31,13 +30,6 @@ class LoginListViewController: LoginAuthViewController {
     enum Section: Int, CaseIterable {
         case options
         case savedLogins
-    }
-    
-    // MARK: OptionsType
-    
-    enum OptionsType: Int, CaseIterable {
-        case suggestions
-        case recentSearches
     }
     
     weak var settingsDelegate: SettingsDelegate?
@@ -107,7 +99,6 @@ class LoginListViewController: LoginAuthViewController {
             $0.allowsSelectionDuringEditing = true
             $0.registerHeaderFooter(SettingsTableSectionHeaderFooterView.self)
             $0.register(UITableViewCell.self, forCellReuseIdentifier: Constants.saveLoginsRowIdentifier)
-            $0.register(UITableViewCell.self, forCellReuseIdentifier: Constants.showInMenuRowIdentifier)
             $0.register(TwoLineTableViewCell.self)
         }
         
@@ -162,7 +153,7 @@ extension LoginListViewController {
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == Section.options.rawValue {
-            return OptionsType.allCases.count
+            return 1
         } else {
             return loginEntries.count
         }
@@ -185,40 +176,19 @@ extension LoginListViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.section == Section.options.rawValue {
-            var cell: UITableViewCell?
-            switch indexPath.item {
-                case OptionsType.suggestions.rawValue:
-                    let toggle = UISwitch().then {
-                        $0.addTarget(self, action: #selector(didToggleSaveLogins), for: .valueChanged)
-                        $0.isOn = Preferences.General.saveLogins.value
-                    }
-                    
-                    cell = tableView.dequeueReusableCell(withIdentifier: Constants.saveLoginsRowIdentifier, for: indexPath).then {
-                        $0.textLabel?.text = Strings.saveLogins
-                        $0.accessoryView = toggle
-                        $0.selectionStyle = .none
-                    }
-                case OptionsType.recentSearches.rawValue:
-                    let toggle = UISwitch().then {
-                        $0.addTarget(self, action: #selector(didToggleShowInsideApplicationMenu), for: .valueChanged)
-                        $0.isOn = Preferences.General.showPasswordsInApplicationMenu.value
-                    }
-                    
-                    cell = tableView.dequeueReusableCell(withIdentifier: Constants.showInMenuRowIdentifier, for: indexPath).then {
-                        $0.textLabel?.text = Strings.Login.loginListShowInApplicationMenuTitle
-                        $0.accessoryView = toggle
-                        $0.selectionStyle = .none
-                    }
-                default:
-                    // Should not happen.
-                    break
+            let toggle = UISwitch().then {
+                $0.addTarget(self, action: #selector(didToggleSaveLogins), for: .valueChanged)
+                $0.isOn = Preferences.General.saveLogins.value
             }
             
-            guard let currentCell = cell else { return UITableViewCell() }
-            currentCell.separatorInset = .zero
-
-            return currentCell
-
+            let cell = tableView.dequeueReusableCell(withIdentifier: Constants.saveLoginsRowIdentifier, for: indexPath).then {
+                $0.textLabel?.text = Strings.saveLogins
+                $0.separatorInset = .zero
+                $0.accessoryView = toggle
+                $0.selectionStyle = .none
+            }
+            
+            return cell
         } else {
             let loginInfo = loginEntries[indexPath.item]
             
@@ -328,10 +298,6 @@ extension LoginListViewController {
     
     @objc func didToggleSaveLogins(_ toggle: UISwitch) {
         Preferences.General.saveLogins.value = toggle.isOn
-    }
-    
-    @objc func didToggleShowInsideApplicationMenu(_ toggle: UISwitch) {
-        Preferences.General.showPasswordsInApplicationMenu.value = toggle.isOn
     }
 
     @objc func dismissAnimated() {

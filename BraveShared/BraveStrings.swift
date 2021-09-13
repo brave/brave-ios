@@ -2339,12 +2339,6 @@ extension Strings {
                               bundle: .braveShared,
                               value: "Filter",
                               comment: "The text for placeholder inside search bar in login list")
-        public static let loginListShowInApplicationMenuTitle =
-            NSLocalizedString("login.loginListShowInApplicationMenuTitle",
-                              tableName: "BraveShared",
-                              bundle: .braveShared,
-                              value: "Show in Application Menu",
-                              comment: "The text for toggle to enable password as settings menu item")
         public static let loginListSavedLoginsHeaderTitle =
             NSLocalizedString("login.loginListSavedLoginsHeaderTitle",
                               tableName: "BraveShared",

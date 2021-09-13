@@ -56,8 +56,6 @@ extension Preferences {
         static let isFirstLaunch = Option<Bool>(key: "general.first-launch", default: true)
         /// Whether or not to save logins in Brave
         static let saveLogins = Option<Bool>(key: "general.save-logins", default: true)
-        /// Whether or not to show passwords item in application menu in Brave
-        static let showPasswordsInApplicationMenu = Option<Bool>(key: "general.show-passwords-application-menu", default: false)
         /// Whether or not to block popups from websites automaticaly
         static let blockPopups = Option<Bool>(key: "general.block-popups", default: true)
         /// Controls how the tab bar should be shown (or not shown)
