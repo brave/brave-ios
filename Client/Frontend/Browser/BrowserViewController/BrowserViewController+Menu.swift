@@ -32,13 +32,13 @@ extension BrowserViewController {
     func destinationMenuSection(_ menuController: MenuViewController) -> some View {
         VStack(spacing: 0) {
             MenuItemButton(icon: #imageLiteral(resourceName: "menu_bookmarks").template, title: Strings.bookmarksMenuItem) { [unowned self, unowned menuController] in
-                let vc = BookmarksViewController(folder: self.bookmarkAPI.lastVisitedFolder(), bookmarkAPI: self.bookmarkAPI, isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing)
+                let vc = BookmarksViewController(folder: bookmarkAPI.lastVisitedFolder(), bookmarkAPI: bookmarkAPI, isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing)
                 vc.toolbarUrlActionsDelegate = self
                 menuController.presentInnerMenu(vc)
             }
 
             MenuItemButton(icon: #imageLiteral(resourceName: "menu-history").template, title: Strings.historyMenuItem) { [unowned self, unowned menuController] in
-                let vc = HistoryViewController(isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing, historyAPI: self.historyAPI)
+                let vc = HistoryViewController(isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing, historyAPI: historyAPI)
                 vc.toolbarUrlActionsDelegate = self
                 menuController.pushInnerMenu(vc)
             }
