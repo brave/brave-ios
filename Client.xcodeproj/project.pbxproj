@@ -467,9 +467,9 @@
 		2FCAE2771ABB531100877008 /* SwiftData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FCAE25B1ABB531100877008 /* SwiftData.swift */; };
 		2FCAE2841ABB533A00877008 /* MockFiles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FCAE2791ABB533A00877008 /* MockFiles.swift */; };
 		2FCAE33E1ABB5F1800877008 /* Storage-Bridging-Header.h in Headers */ = {isa = PBXBuildFile; fileRef = 2FCAE33D1ABB5F1800877008 /* Storage-Bridging-Header.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		2FCEED7D26EA6AF900892699 /* BookmarkNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FCEED7C26EA6AF900892699 /* BookmarkNode.swift */; };
-		2FCEED8526EAAB6C00892699 /* HistoryAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FCEED8426EAAB6C00892699 /* HistoryAPI.swift */; };
-		2FCEEDC126EBDEDE00892699 /* BookmarkAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FCEEDC026EBDEDE00892699 /* BookmarkAPI.swift */; };
+		2FCEED7D26EA6AF900892699 /* BookmarkNodeExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FCEED7C26EA6AF900892699 /* BookmarkNodeExtensions.swift */; };
+		2FCEED8526EAAB6C00892699 /* HistoryAPIExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FCEED8426EAAB6C00892699 /* HistoryAPIExtensions.swift */; };
+		2FCEEDC126EBDEDE00892699 /* BookmarkAPIExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FCEEDC026EBDEDE00892699 /* BookmarkAPIExtensions.swift */; };
 		2FD0E3AF2576C48A000C773B /* SchemePermissionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FD0E3AE2576C48A000C773B /* SchemePermissionTests.swift */; };
 		2FD0E3D62577F327000C773B /* SearchSuggestionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FD0E3D52577F327000C773B /* SearchSuggestionCell.swift */; };
 		2FD1C60B2638823D00E3C25F /* HistoryFetchers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FD1C60A2638823D00E3C25F /* HistoryFetchers.swift */; };
@@ -2010,9 +2010,9 @@
 		2FCAE25B1ABB531100877008 /* SwiftData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftData.swift; sourceTree = "<group>"; };
 		2FCAE2791ABB533A00877008 /* MockFiles.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockFiles.swift; sourceTree = "<group>"; };
 		2FCAE33D1ABB5F1800877008 /* Storage-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Storage-Bridging-Header.h"; sourceTree = "<group>"; };
-		2FCEED7C26EA6AF900892699 /* BookmarkNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkNode.swift; sourceTree = "<group>"; };
-		2FCEED8426EAAB6C00892699 /* HistoryAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryAPI.swift; sourceTree = "<group>"; };
-		2FCEEDC026EBDEDE00892699 /* BookmarkAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkAPI.swift; sourceTree = "<group>"; };
+		2FCEED7C26EA6AF900892699 /* BookmarkNodeExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkNodeExtensions.swift; sourceTree = "<group>"; };
+		2FCEED8426EAAB6C00892699 /* HistoryAPIExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryAPIExtensions.swift; sourceTree = "<group>"; };
+		2FCEEDC026EBDEDE00892699 /* BookmarkAPIExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkAPIExtensions.swift; sourceTree = "<group>"; };
 		2FD0E3AE2576C48A000C773B /* SchemePermissionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchemePermissionTests.swift; sourceTree = "<group>"; };
 		2FD0E3D52577F327000C773B /* SearchSuggestionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchSuggestionCell.swift; sourceTree = "<group>"; };
 		2FD1C60A2638823D00E3C25F /* HistoryFetchers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryFetchers.swift; sourceTree = "<group>"; };
@@ -4260,8 +4260,8 @@
 		2FD1C5FA2638599100E3C25F /* Bookmarks */ = {
 			isa = PBXGroup;
 			children = (
-				2FCEED7C26EA6AF900892699 /* BookmarkNode.swift */,
-				2FCEEDC026EBDEDE00892699 /* BookmarkAPI.swift */,
+				2FCEED7C26EA6AF900892699 /* BookmarkNodeExtensions.swift */,
+				2FCEEDC026EBDEDE00892699 /* BookmarkAPIExtensions.swift */,
 				5E9B28EA255047C80072E655 /* BookmarkModelStateObserver.swift */,
 				5E9B28F6255048540072E655 /* BookmarkFetchers.swift */,
 			);
@@ -4280,7 +4280,7 @@
 		2FD1C60726385AEC00E3C25F /* History */ = {
 			isa = PBXGroup;
 			children = (
-				2FCEED8426EAAB6C00892699 /* HistoryAPI.swift */,
+				2FCEED8426EAAB6C00892699 /* HistoryAPIExtensions.swift */,
 				2FD1C60A2638823D00E3C25F /* HistoryFetchers.swift */,
 				2FA5A7572649CD9200740035 /* HistoryServiceStateObserver.swift */,
 			);
@@ -7393,7 +7393,7 @@
 				D0C95E0E200FD3B200E4E51C /* PrintHelper.swift in Sources */,
 				4422D55821BFFB7F00BF1855 /* unicode_casefold.cc in Sources */,
 				C6620BBB213BCEC6009FE75A /* TabType.swift in Sources */,
-				2FCEED8526EAAB6C00892699 /* HistoryAPI.swift in Sources */,
+				2FCEED8526EAAB6C00892699 /* HistoryAPIExtensions.swift in Sources */,
 				F930CDB82270040D00A23FE1 /* WebAuthnClientData.swift in Sources */,
 				44A58CEA26947100005C0879 /* BraveSearchDebugMenuFixture.swift in Sources */,
 				277C5B21254CAD790032DEF2 /* BraveRewardsExtensions.swift in Sources */,
@@ -7436,7 +7436,7 @@
 				27FD3FBA25C8D20200696156 /* FeedDataSource+RSS.swift in Sources */,
 				27FCFB0C2673F265008E43AB /* AdCardView.swift in Sources */,
 				0A0D3D3921A4BD0600BEE65B /* SafeBrowsing.swift in Sources */,
-				2FCEEDC126EBDEDE00892699 /* BookmarkAPI.swift in Sources */,
+				2FCEEDC126EBDEDE00892699 /* BookmarkAPIExtensions.swift in Sources */,
 				278C6FFF24F6EA3700A246C8 /* ReportBrokenSiteView.swift in Sources */,
 				27676D472555F34D00BC955A /* BraveRewardsStatusView.swift in Sources */,
 				4422D4E821BFFB7600BF1855 /* log_writer.cc in Sources */,
@@ -7546,7 +7546,6 @@
 				D34DC8531A16C40C00D49B7B /* Profile.swift in Sources */,
 				27A1AC0924859D0900344503 /* FeedHeadlineViews.swift in Sources */,
 				CA8D5C2226D7D067009BF13D /* PlaylistStatusObserver.swift in Sources */,
-				2FB2F0CF26D3F92D00C8E576 /* LoginInfoViewController.swift in Sources */,
 				0A93F1892264C72000A3571B /* BookmarkFormFieldsProtocol.swift in Sources */,
 				4422D4D821BFFB7600BF1855 /* block.cc in Sources */,
 				F9B23EE523F613E8000EB3D8 /* PaymentRequestExtension.swift in Sources */,
@@ -7602,7 +7601,7 @@
 				2FA5A7582649CD9200740035 /* HistoryServiceStateObserver.swift in Sources */,
 				0A43293021B1C7F50041625B /* AdBlockStats.swift in Sources */,
 				F930CDAE2270015C00A23FE1 /* U2FExtensions.swift in Sources */,
-				2FCEED7D26EA6AF900892699 /* BookmarkNode.swift in Sources */,
+				2FCEED7D26EA6AF900892699 /* BookmarkNodeExtensions.swift in Sources */,
 				0AEFB88722299E6A007AF600 /* AdblockerType.swift in Sources */,
 				274398F824E71E9800E79605 /* URLString.swift in Sources */,
 				D863C8F21F68BFC20058D95F /* GradientProgressBar.swift in Sources */,
