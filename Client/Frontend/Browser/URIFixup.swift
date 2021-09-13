@@ -134,10 +134,18 @@ class URIFixup {
         // IE: brave.com.com.com.com or 123.4.5 or "hello.world.whatever"
         // However, a valid URL can be "brave.com" or "hello.world"
         if let url = URL(string: escaped),
-           url.scheme == nil,
-           escaped.reduce(0, { $1 == "." ? $0 + 1 : $0 }) > 1,
-           !isValidIPAddress(escaped) {
-            return nil
+           url.scheme == nil {
+            let dotCount = escaped.reduce(0, { $1 == "." ? $0 + 1 : $0 })
+            if dotCount > 0 && !isValidIPAddress(escaped) {
+                // If there is a "." or ":", prepend "http://" and try again. Since this
+                // is strictly an "http://" URL, we also require a host.
+                if let url = URL(string: "http://\(escaped)"),
+                   let host = url.host,
+                   host.rangeOfCharacter(from: CharacterSet(charactersIn: "1234567890.[]:").inverted) != nil {
+                    return validateURL(url)
+                }
+                return nil
+            }
         }
 
         // If there is a "." or ":", prepend "http://" and try again. Since this

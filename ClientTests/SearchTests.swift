@@ -41,6 +41,17 @@ class SearchTests: XCTestCase {
         checkValidURL("[::192.9.5.5]/png", afterFixup: "http://[::192.9.5.5]/png")
         checkValidURL("[::192.9.5.5]:80/png", afterFixup: "http://[::192.9.5.5]:80/png")
         checkValidURL("192.168.2.1", afterFixup: "http://192.168.2.1")
+        checkValidURL("brave.io", afterFixup: "http://brave.io")
+        checkValidURL("brave.new.world", afterFixup: "http://brave.new.world")
+        checkValidURL("brave.new.world.test", afterFixup: "http://brave.new.world.test")
+        checkValidURL("brave.new.world.test.io", afterFixup: "http://brave.new.world.test.io")
+        checkValidURL("brave.new.world.test.whatever.io", afterFixup: "http://brave.new.world.test.whatever.io")
+        checkValidURL("http://2130706433:8000/", afterFixup: "http://2130706433:8000/")
+        checkValidURL("http://127.0.0.1:8080", afterFixup: "http://127.0.0.1:8080")
+        checkValidURL("http://127.0.1", afterFixup: "http://127.0.1")
+        checkValidURL("http://127.1", afterFixup: "http://127.1")
+        checkValidURL("http://127.1:8000", afterFixup: "http://127.1:8000")
+        checkValidURL("http://1.1:80", afterFixup: "http://1.1:80")
 
         // Check invalid URLs. These are passed along to the default search engine.
         checkInvalidURL("foobar")
@@ -55,6 +66,8 @@ class SearchTests: XCTestCase {
         checkInvalidURL("data://https://www.example.com,fake example.com")
         checkInvalidURL("1.2.3")
         checkInvalidURL("1.1")
+        checkInvalidURL("127.1")
+        checkInvalidURL("127.1.1")
         
         // Check invalid quoted URLs, emails, and quoted domains.
         // These are passed along to the default search engine.
