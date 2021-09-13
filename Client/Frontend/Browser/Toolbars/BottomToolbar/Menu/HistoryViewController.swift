@@ -219,7 +219,10 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
             $0.imageView?.layer.cornerCurve = .continuous
             $0.imageView?.layer.masksToBounds = true
             
-            if let domain = historyItem.domain, let url = domain.url?.asURL {
+            let domain = Domain.getOrCreate(forUrl: historyItem.url,
+                                            persistent: !PrivateBrowsingManager.shared.isPrivateBrowsing)
+            
+            if let url = domain.url?.asURL {
                 cell.imageView?.loadFavicon(
                     for: url,
                     domain: domain,

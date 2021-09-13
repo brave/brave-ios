@@ -7,6 +7,7 @@ import Foundation
 import BraveCore
 import CoreData
 import OrderedCollections
+import Shared
 
 // MARK: - HistoryV2FetchResultsDelegate
 
@@ -51,6 +52,37 @@ protocol HistoryV2FetchResultsController {
 
 class Historyv2Fetcher: NSObject, HistoryV2FetchResultsController {
     
+    // MARK: Section
+    
+    enum Section: Int, CaseIterable {
+        /// History happened Today
+        case today
+        /// History happened Yesterday
+        case yesterday
+        /// History happened between yesterday and end of this week
+        case lastWeek
+        /// History happened between end of this week and end of this month
+        case thisMonth
+        /// History happened after the end of this month
+        case earlier
+        
+        /// The list of titles time period
+        var title: String {
+            switch self {
+                case .today:
+                     return Strings.today
+                case .yesterday:
+                     return Strings.yesterday
+                case .lastWeek:
+                     return Strings.lastWeek
+                case .thisMonth:
+                     return Strings.lastMonth
+                case .earlier:
+                     return Strings.earlier
+            }
+        }
+    }
+    
     // MARK: Lifecycle
     
     init(historyAPI: BraveHistoryAPI) {
@@ -89,7 +121,8 @@ class Historyv2Fetcher: NSObject, HistoryV2FetchResultsController {
             guard let self = self else { return }
             
             self.historyList = historyNodeList.map { [unowned self] historyItem in
-                if let section = historyItem.sectionID, let numOfItemInSection = self.sectionDetails[section] {
+                if let section = self.fetchHistoryTimePeriod(dateAdded: historyItem.dateAdded),
+                   let numOfItemInSection = self.sectionDetails[section] {
                     self.sectionDetails.updateValue(numOfItemInSection + 1, forKey: section)
                 }
                 
@@ -129,11 +162,43 @@ class Historyv2Fetcher: NSObject, HistoryV2FetchResultsController {
     
     private var historyList = [HistoryNode]()
     
-    private var sectionDetails: OrderedDictionary<HistoryNode.Section, Int> = [.today: 0,
+    private var sectionDetails: OrderedDictionary<Section, Int> = [.today: 0,
                                                                              .yesterday: 0,
                                                                              .lastWeek: 0,
                                                                              .thisMonth: 0,
                                                                              .earlier: 0]
+    
+    private func fetchHistoryTimePeriod(dateAdded: Date?) -> Section? {
+        let todayOffset = 0
+        let yesterdayOffset = -1
+        let thisWeekOffset = -7
+        let thisMonthOffset = -31
+        
+        if dateAdded?.compare(getDate(todayOffset)) == ComparisonResult.orderedDescending {
+            return .today
+        } else if dateAdded?.compare(getDate(yesterdayOffset)) == ComparisonResult.orderedDescending {
+            return .yesterday
+        } else if dateAdded?.compare(getDate(thisWeekOffset)) == ComparisonResult.orderedDescending {
+            return .lastWeek
+        } else if dateAdded?.compare(getDate(thisMonthOffset))  == ComparisonResult.orderedDescending {
+            return .thisMonth
+        }
+        
+        return .earlier
+    }
+    
+    private func getDate(_ dayOffset: Int) -> Date {
+        let calendar = Calendar(identifier: Calendar.Identifier.gregorian)
+        let nowComponents = calendar.dateComponents(
+            [Calendar.Component.year, Calendar.Component.month, Calendar.Component.day], from: Date())
+        
+        guard let today = calendar.date(from: nowComponents) else {
+            return Date()
+        }
+        
+        return (calendar as NSCalendar).date(
+            byAdding: NSCalendar.Unit.day, value: dayOffset, to: today, options: []) ?? Date()
+    }
     
     private func clearHistoryData() {
         historyList.removeAll()
