@@ -16,8 +16,6 @@ extension BraveBookmarksAPI {
 
     // MARK: Internal
     
-    static var rootNodeId: String?
-
     // Returns the last visited folder
     // If no folder was visited, returns the mobile bookmarks folder
     // If the root folder was visited, returns nil
