@@ -182,6 +182,9 @@ class LoginsHelper: TabContentScript {
     }
 
     fileprivate func requestLogins(_ login: LoginData, requestId: String, frameInfo: WKFrameInfo) {
+        let currentHost = tab?.webView?.url?.host
+        let frameHost = frameInfo.securityOrigin.host
+        
         profile.logins.getLoginsForProtectionSpace(login.protectionSpace).uponQueue(.main) { res in
             var jsonObj = [String: Any]()
             if let cursor = res.successValue {
@@ -193,12 +196,19 @@ class LoginsHelper: TabContentScript {
                         return loginData?.toDict()
                     }
                     
-                    // Prevent XSS on non main frame
-                    // If it is not the main frame, return username only, but no password!
-                    // Chromium does the same on iOS.
-                    // Firefox does NOT support third-party frames or iFrames.
-                    loginData?.update(password: "", username: loginData?.username ?? "")
-                    return loginData?.toDict()
+                    // The frame must belong to the same security origin
+                    if let currentHost = currentHost,
+                       !currentHost.isEmpty,
+                       currentHost == frameHost {
+                        // Prevent XSS on non main frame
+                        // If it is not the main frame, return username only, but no password!
+                        // Chromium does the same on iOS.
+                        // Firefox does NOT support third-party frames or iFrames.
+                        loginData?.update(password: "", username: loginData?.username ?? "")
+                        return loginData?.toDict()
+                    }
+                    
+                    return nil
                 }
             }
 
