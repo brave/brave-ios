@@ -64,8 +64,8 @@ class SchemePermissionTests: XCTestCase {
             return
         }
         
-        historyAPI = appDelegate.braveCore?.historyAPI
-        bookmarksAPI = appDelegate.braveCore?.bookmarksAPI
+        historyAPI = appDelegate.braveCore.historyAPI
+        bookmarksAPI = appDelegate.braveCore.bookmarksAPI
         
         subject = BrowserViewController(
             profile: profile,
