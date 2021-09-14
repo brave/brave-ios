@@ -2187,10 +2187,10 @@ extension BrowserViewController: TabManagerDelegate {
             wv.accessibilityLabel = nil
             wv.accessibilityElementsHidden = true
             wv.accessibilityIdentifier = nil
-            wv.alpha = 0.0
             
             #if swift(>=5.4)
             if #available(iOS 14.5, *) {
+                wv.alpha = 0.0
                 wv.requestMediaPlaybackState { state in
                     if state != .playing && wv != tabManager.selectedTab?.webView {
                         wv.alpha = 1.0
