@@ -321,7 +321,7 @@ class Tab: NSObject {
             jsonDict[SessionData.Keys.currentPage] = Int(currentPage) as AnyObject
             
             guard let escapedJSON = JSON(jsonDict).rawString()?.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed),
-                  let restoreURL = URL(string: "\(WebServer.sharedInstance.base)/about/sessionrestore?history=\(escapedJSON)") else {
+                  let restoreURL = URL(string: "\(WebServer.sharedInstance.base)/about/sessionrestore?timestamp=\(Date().timeIntervalSince1970)&history=\(escapedJSON)") else {
                 return
             }
             

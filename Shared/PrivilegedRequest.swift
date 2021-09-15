@@ -20,8 +20,8 @@ private let REQUEST_KEY_PRIVILEGED = "privileged"
  needed, and when you are sure the URL is from a trustworthy source!
  **/
 public class PrivilegedRequest: NSMutableURLRequest {
-    private static let key = "brave_prv"
-    private static let value = UUID().uuidString.replacingOccurrences(of: "-", with: "")
+    public static let key = "brave_prv"
+    public static let token = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 
     override init(url URL: URL, cachePolicy: NSURLRequest.CachePolicy, timeoutInterval: TimeInterval) {
         let modifyURL = { (url: URL) -> URL in
@@ -50,10 +50,10 @@ public class PrivilegedRequest: NSMutableURLRequest {
 
         var queryItems = components.queryItems ?? []
         if var item = queryItems.find({ $0.name == PrivilegedRequest.key }) {
-            item.value = PrivilegedRequest.value
+            item.value = PrivilegedRequest.token
         } else {
             let queryItem = URLQueryItem(name: PrivilegedRequest.key,
-                                         value: PrivilegedRequest.value)
+                                         value: PrivilegedRequest.token)
             queryItems.append(queryItem)
         }
 
@@ -76,7 +76,7 @@ public class PrivilegedRequest: NSMutableURLRequest {
     public static func isPrivileged(url: URL?) -> Bool {
         if let value = url?.getQuery()[PrivilegedRequest.key],
            !value.isEmpty,
-           value == PrivilegedRequest.value {
+           value == PrivilegedRequest.token {
             return true
         }
         return false
