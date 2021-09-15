@@ -33,16 +33,10 @@ public class PrivilegedRequest: NSMutableURLRequest {
         }
 
         super.init(url: modifyURL(URL), cachePolicy: cachePolicy, timeoutInterval: timeoutInterval)
-        setPrivileged()
     }
 
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        setPrivileged()
-    }
-
-    private func setPrivileged() {
-        URLProtocol.setProperty(true, forKey: REQUEST_KEY_PRIVILEGED, in: self)
     }
 
     private static func store(url: URL) -> URL? {
@@ -78,16 +72,12 @@ public class PrivilegedRequest: NSMutableURLRequest {
     }
 
     public static func isWebServerRequest(url: URL) -> Bool {
-        url.absoluteString.hasPrefix("http://localhost:\(AppConstants.webServerPort)/")
+        url.host == "localhost" && url.port == AppConstants.webServerPort
     }
 }
 
 extension URLRequest {
     public var isPrivileged: Bool {
-        if PrivilegedRequest.isPrivileged(url: url) {
-            return true
-        }
-
-        return URLProtocol.property(forKey: REQUEST_KEY_PRIVILEGED, in: self) != nil
+        return PrivilegedRequest.isPrivileged(url: url)
     }
 }

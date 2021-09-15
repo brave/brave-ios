@@ -86,14 +86,7 @@ class WebServer {
         if components.host == "localhost" && components.scheme == "http" {
             components.port = Int(WebServer.sharedInstance.server.port)
         }
-        
-        // If the request was privileged
-        // Update its privilege token
-        if let url = components.url,
-           PrivilegedRequest.isWebServerRequest(url: url),
-           components.valueForQuery(PrivilegedRequest.key) != nil {
-            return PrivilegedRequest(url: url).url
-        }
+
         return components.url
     }
 
