@@ -21,7 +21,7 @@ private let REQUEST_KEY_PRIVILEGED = "privileged"
  **/
 public class PrivilegedRequest: NSMutableURLRequest {
     private static let key = "brave_prv"
-    private static let value = UUID().uuidString
+    private static let value = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 
     override init(url URL: URL, cachePolicy: NSURLRequest.CachePolicy, timeoutInterval: TimeInterval) {
         let modifyURL = { (url: URL) -> URL in
