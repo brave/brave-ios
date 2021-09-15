@@ -46,16 +46,11 @@ public class PrivilegedRequest: NSMutableURLRequest {
     }
 
     private static func store(url: URL) -> URL? {
-        guard var components = URLComponents(string: url.absoluteString) else { return nil }
+        guard var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return nil }
 
-        var queryItems = components.queryItems ?? []
-        if var item = queryItems.find({ $0.name == PrivilegedRequest.key }) {
-            item.value = PrivilegedRequest.token
-        } else {
-            let queryItem = URLQueryItem(name: PrivilegedRequest.key,
-                                         value: PrivilegedRequest.token)
-            queryItems.append(queryItem)
-        }
+        var queryItems = (components.queryItems ?? []).filter({ $0.name != PrivilegedRequest.key })
+        queryItems.append(URLQueryItem(name: PrivilegedRequest.key,
+                                       value: PrivilegedRequest.token))
 
         components.queryItems = queryItems
         return components.url

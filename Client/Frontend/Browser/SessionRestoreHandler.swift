@@ -31,7 +31,8 @@ struct SessionRestoreHandler {
 
                     let securityToken = UserScriptManager.messageHandlerToken.uuidString
                     sessionRestoreString = sessionRestoreString.replacingOccurrences(of: "%SECURITY_TOKEN%", with: securityToken, options: .literal)
-//                    sessionRestoreString = sessionRestoreString.replacingOccurrences(of: "%RESTORE_TOKEN%", with: "\(PrivilegedRequest.key)=\(PrivilegedRequest.token)", options: .literal)
+                    sessionRestoreString = sessionRestoreString.replacingOccurrences(of: "%SESSION_RESTORE_KEY%", with: PrivilegedRequest.key, options: .literal)
+                    sessionRestoreString = sessionRestoreString.replacingOccurrences(of: "%SESSION_RESTORE_TOKEN%", with: PrivilegedRequest.token, options: .literal)
 
                     return GCDWebServerDataResponse(html: sessionRestoreString)
                 } catch _ {}

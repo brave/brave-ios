@@ -320,8 +320,17 @@ class Tab: NSObject {
             jsonDict[SessionData.Keys.history] = updatedURLs as AnyObject
             jsonDict[SessionData.Keys.currentPage] = Int(currentPage) as AnyObject
             
-            guard let escapedJSON = JSON(jsonDict).rawString()?.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed),
-                  let restoreURL = URL(string: "\(WebServer.sharedInstance.base)/about/sessionrestore?timestamp=\(Date().timeIntervalSince1970)&history=\(escapedJSON)") else {
+            // We escape everything, except alpha-numeric characters
+            // This is because when `URLSearchParams` in `SessionRestore.html`
+            // attempts to parse the URL query parameters, it will not properly parse
+            // the unescaped characters.. Therefore, we will get a blank screen,
+            // after restoring multiple times, because SessionRestore can be double
+            // percent-escaped (percent-encoded multiple times)!
+            // Especially if the original URL already has escaped query parameters.
+            let characterSet: CharacterSet = .alphanumerics
+            
+            guard let escapedJSON = JSON(jsonDict).rawString()?.addingPercentEncoding(withAllowedCharacters: characterSet),
+                  let restoreURL = URL(string: "\(WebServer.sharedInstance.base)/about/sessionrestore?timestamp=\(Int(Date().timeIntervalSince1970))&history=\(escapedJSON)") else {
                 return
             }
             
