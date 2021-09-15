@@ -99,7 +99,15 @@ class Tab: NSObject {
     fileprivate var lastRequest: URLRequest?
     var restoring: Bool = false
     var pendingScreenshot = false
-    var url: URL?
+    var url: URL? {
+        didSet {
+            if let _url = url,
+               PrivilegedRequest.isWebServerRequest(url: _url),
+               PrivilegedRequest.isPrivileged(url: _url) {
+                url = PrivilegedRequest.removePrivileges(url: _url)
+            }
+        }
+    }
     var mimeType: String?
     var isEditing: Bool = false
     var shouldClassifyLoadsForAds = true
