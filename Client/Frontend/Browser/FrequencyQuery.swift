@@ -22,7 +22,7 @@ class FrequencyQuery {
         self.bookmarkAPI = bookmarkAPI
     }
     
-    public func sitesByFrequency(containing query: String? = nil, completion: @escaping (Set<Site>) -> Void) {
+    public func sitesByFrequency(containing query: String, completion: @escaping (Set<Site>) -> Void) {
         historyAPI.byFrequency(query: query) { [weak self] historyList in
             guard let self = self else {
                 completion(Set<Site>())

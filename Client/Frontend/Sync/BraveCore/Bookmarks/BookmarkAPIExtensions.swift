@@ -102,11 +102,11 @@ extension BraveBookmarksAPI {
         return includeFolders ? folder.children : folder.children.filter({ $0.isFolder == false })
     }
     
-    func byFrequency(query: String? = nil, completion: @escaping ([BookmarkNode]) -> Void) {
+    func byFrequency(query: String, completion: @escaping ([BookmarkNode]) -> Void) {
         // Invalid query.. BraveCore doesn't store bookmarks based on last visited.
         // Any last visited bookmarks would show up in `History` anyway.
         // BraveCore automatically sorts them by date as well.
-        guard let query = query, !query.isEmpty else {
+        guard !query.isEmpty else {
             completion([])
             return
         }
@@ -116,11 +116,7 @@ extension BraveBookmarksAPI {
         })
     }
     
-    func reorderBookmarks(frc: BookmarksV2FetchResultsController?, sourceIndexPath: IndexPath, destinationIndexPath: IndexPath) {
-        guard let frc = frc else {
-            return
-        }
-        
+    func reorderBookmarks(frc: BookmarksV2FetchResultsController, sourceIndexPath: IndexPath, destinationIndexPath: IndexPath) {
         if let node = frc.object(at: sourceIndexPath),
            let parent = node.parent ?? mobileNode {
             
@@ -146,22 +142,24 @@ extension BraveBookmarksAPI {
     }
     
     func updateWithNewLocation(_ bookmarkItem: BookmarkNode, customTitle: String?, url: URL?, location: BookmarkNode?) {
-        if let location = location ?? mobileNode {
-            if location.guid != bookmarkItem.parent?.guid {
-                bookmarkItem.move(toParent: location)
-            }
-            
-            if let customTitle = customTitle {
-                bookmarkItem.setTitle(customTitle)
-            }
-            
-            if let url = url, !bookmarkItem.isFolder {
-                bookmarkItem.url = url
-            } else if url != nil {
-                log.error("Error: Moving bookmark - Cannot convert a folder into a bookmark with url.")
-            }
-        } else {
+        guard let location = location ?? mobileNode else {
             log.error("Error: Moving bookmark - Cannot move a bookmark to Root.")
+            
+            return
+        }
+        
+        if location.guid != bookmarkItem.parent?.guid {
+            bookmarkItem.move(toParent: location)
+        }
+        
+        if let customTitle = customTitle {
+            bookmarkItem.setTitle(customTitle)
+        }
+        
+        if let url = url, !bookmarkItem.isFolder {
+            bookmarkItem.url = url
+        } else if url != nil {
+            log.error("Error: Moving bookmark - Cannot convert a folder into a bookmark with url.")
         }
     }
     
