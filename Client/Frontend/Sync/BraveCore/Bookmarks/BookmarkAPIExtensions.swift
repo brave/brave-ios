@@ -23,10 +23,7 @@ extension BraveBookmarksAPI {
         guard Preferences.General.showLastVisitedBookmarksFolder.value,
               let nodeId = Preferences.Chromium.lastBookmarksFolderNodeId.value else {
             // Default folder is the mobile node..
-            if let mobileNode = mobileNode {
-                return mobileNode
-            }
-            return nil
+            return mobileNode
         }
         
         // Display root folder instead of mobile node..
@@ -41,10 +38,7 @@ extension BraveBookmarksAPI {
         }
         
         // Default folder is the mobile node..
-        if let mobileNode = mobileNode {
-            return mobileNode
-        }
-        return nil
+        return mobileNode
     }
     
     func lastFolderPath() -> [BookmarkNode] {
@@ -77,13 +71,6 @@ extension BraveBookmarksAPI {
         }
         
         return []
-    }
-    
-    func mobileNode() -> BookmarkNode? {
-        if let node = mobileNode {
-            return node
-        }
-        return nil
     }
     
     func fetchParent(_ bookmarkItem: BookmarkNode?) -> BookmarkNode? {

@@ -157,9 +157,9 @@ class AddEditBookmarkTableViewController: UITableViewController {
         saveLocation = mode.initialSaveLocation
         presentationMode = .currentSelection
         frc = bookmarkAPI.foldersFrc(excludedFolder: mode.folder)
-        rootFolderName = bookmarkAPI.mobileNode()?.titleUrlNodeTitle ?? Strings.bookmarkRootLevelCellTitle
+        rootFolderName = bookmarkAPI.mobileNode?.titleUrlNodeTitle ?? Strings.bookmarkRootLevelCellTitle
         
-        if let mobileFolderId = bookmarkAPI.mobileNode()?.objectID {
+        if let mobileFolderId = bookmarkAPI.mobileNode?.objectID {
             rootFolderId = mobileFolderId
         } else {
             log.error("Invalid MobileBookmarks Folder Id")
