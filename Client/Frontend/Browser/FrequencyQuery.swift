@@ -24,14 +24,19 @@ class FrequencyQuery {
     
     public func sitesByFrequency(containing query: String? = nil, completion: @escaping (Set<Site>) -> Void) {
         historyAPI.byFrequency(query: query) { [weak self] historyList in
+            guard let self = self else {
+                completion(Set<Site>())
+                return
+            }
+            
             let historySites = historyList
-                .map { Site(url: $0.url.absoluteString ?? "", title: $0.title ?? "") }
+                .map { Site(url: $0.url.absoluteString, title: $0.title ?? "") }
 
-            self?.cancellable = DispatchWorkItem {
+            self.cancellable = DispatchWorkItem {
                 // brave-core fetch can be slow over 200ms per call,
                 // a cancellable serial queue is used for it.
                 DispatchQueue.main.async {
-                    self?.bookmarkAPI.byFrequency(query: query) { sites in
+                    self.bookmarkAPI.byFrequency(query: query) { sites in
                         let bookmarkSites = sites.map { Site(url: $0.titleUrlNodeUrl?.absoluteString ?? "", title: $0.titleUrlNodeTitle, bookmarked: true) }
                         let result = Set<Site>(historySites+bookmarkSites)
 
