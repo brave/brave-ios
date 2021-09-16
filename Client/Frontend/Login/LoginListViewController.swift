@@ -69,7 +69,8 @@ class LoginListViewController: LoginAuthViewController {
         navigationItem.do {
             $0.searchController = searchController
             $0.hidesSearchBarWhenScrolling = false
-            self.navigationItem.rightBarButtonItem = editButtonItem
+            $0.rightBarButtonItem = editButtonItem
+            $0.rightBarButtonItem?.isEnabled = !self.loginEntries.isEmpty
         }
         definesPresentationContext = true
 
@@ -142,6 +143,7 @@ class LoginListViewController: LoginAuthViewController {
         DispatchQueue.main.async {
             self.tableView.reloadData()
             self.isFetchingLoginEntries = false
+            self.navigationItem.rightBarButtonItem?.isEnabled = !self.loginEntries.isEmpty
         }
     }
 }
