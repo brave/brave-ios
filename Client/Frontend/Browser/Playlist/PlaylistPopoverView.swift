@@ -20,13 +20,14 @@ struct PlaylistPopoverView: View {
     var onSecondaryButtonPressed: (() -> Void)?
     
     var body: some View {
-        if state == .addToPlaylist {
-            addToPlaylistView
-                .frame(maxWidth: 450)
-        } else {
-            addedToPlaylistView
-                .frame(maxWidth: 450)
+        Group {
+            if state == .addToPlaylist {
+                addToPlaylistView
+            } else {
+                addedToPlaylistView
+            }
         }
+        .frame(maxWidth: 450)   
     }
     
     private var addToPlaylistView: some View {
