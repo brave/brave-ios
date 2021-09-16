@@ -29,8 +29,8 @@ extension BraveHistoryAPI {
         })
     }
 
-    func byFrequency(query: String? = nil, _ completion: @escaping ([HistoryNode]) -> Void) {
-        guard let query = query, !query.isEmpty else {
+    func byFrequency(query: String, completion: @escaping ([HistoryNode]) -> Void) {
+        guard !query.isEmpty else {
             return
         }
 
