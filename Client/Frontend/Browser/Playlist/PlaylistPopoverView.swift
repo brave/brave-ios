@@ -22,8 +22,10 @@ struct PlaylistPopoverView: View {
     var body: some View {
         if state == .addToPlaylist {
             addToPlaylistView
+                .frame(maxWidth: 450)
         } else {
             addedToPlaylistView
+                .frame(maxWidth: 450)
         }
     }
     
