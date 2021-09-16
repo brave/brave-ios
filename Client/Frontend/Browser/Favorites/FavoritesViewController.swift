@@ -524,7 +524,7 @@ extension FavoritesViewController {
 extension FavoritesViewController: NSFetchedResultsControllerDelegate {
     
     private var recentSearchesSectionExists: Bool {
-        availableSections[safe: Section.recentSearches.rawValue] != nil
+        availableSections.contains(.recentSearches)
     }
     
     /// Performs first frc fetches and handles setting first snaphot.
