@@ -89,6 +89,12 @@ class SimpleShieldsView: UIView {
                 return string
             }()
             $0.backgroundColor = .clear
+            if #available(iOS 15.0, *) {
+                // do nothing
+            } else {
+                $0.setContentCompressionResistancePriority(.required, for: .horizontal)
+            }
+            
             $0.isAccessibilityElement = false
             $0.textColor = .braveLabel
         }
