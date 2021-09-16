@@ -8,9 +8,7 @@ import BraveShared
 import BraveUI
 
 class LoginAuthViewController: UITableViewController {
-    
-    private let requiresAuthentication: Bool
-    
+        
     // MARK: Lifecycle
     
     init(requiresAuthentication: Bool = false) {
@@ -23,12 +21,8 @@ class LoginAuthViewController: UITableViewController {
     }
     
     override func viewDidLoad() {
-        guard requiresAuthentication, let appDelegate = (UIApplication.shared.delegate as? AppDelegate) else {
-            return
-        }
-
-        if Preferences.Privacy.lockWithPasscode.value {
-            appDelegate.windowProtection?.presentAuthenticationForViewController()
+        if requiresAuthentication, Preferences.Privacy.lockWithPasscode.value {
+            askForAuthentication()
         }
     }
     
@@ -50,10 +44,21 @@ class LoginAuthViewController: UITableViewController {
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
+    
+    // MARK: Internal
+    
+    func askForAuthentication() {
+        guard let appDelegate = (UIApplication.shared.delegate as? AppDelegate) else {
+            return
+        }
+
+        appDelegate.windowProtection?.presentAuthenticationForViewController(determineLockWithPasscode: false)
+    }
 
     // MARK: Private
     
     private var blurredSnapshotView: UIView?
+    private let requiresAuthentication: Bool
 
     @objc private func blurContents() {
         if blurredSnapshotView == nil {

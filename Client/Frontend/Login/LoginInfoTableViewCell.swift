@@ -15,6 +15,7 @@ protocol LoginInfoTableViewCellDelegate: AnyObject {
     /// Table Row Commands Related Actions (Copy - Open)
     func canPerform(action: Selector, for cell: LoginInfoTableViewCell) -> Bool
     func didSelectOpenAndFill(_ cell: LoginInfoTableViewCell)
+    func didSelectReveal(_ cell: LoginInfoTableViewCell)
 }
 
 class LoginInfoTableViewCell: UITableViewCell, TableViewReusable {
@@ -164,6 +165,7 @@ extension LoginInfoTableViewCell: MenuHelperInterface {
 
     func menuHelperReveal() {
         displayDescriptionAsPassword = false
+        delegate?.didSelectReveal(self)
     }
 
     func menuHelperSecure() {

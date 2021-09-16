@@ -367,6 +367,10 @@ extension LoginInfoViewController: LoginInfoTableViewCellDelegate {
         dismiss(animated: true, completion: nil)
     }
     
+    func didSelectReveal(_ cell: LoginInfoTableViewCell) {
+        askForAuthentication()
+    }
+    
     func textFieldDidEndEditing(_ cell: LoginInfoTableViewCell) {
         if cell.tag == InfoItem.passwordItem.rawValue {
             cell.displayDescriptionAsPassword = true
