@@ -31,6 +31,9 @@ extension OnboardingSearchEnginesViewController {
             $0.alwaysBounceVertical = false
             $0.showsVerticalScrollIndicator = true
             $0.backgroundColor = .braveBackground
+            if #available(iOS 15.0, *) {
+                $0.sectionHeaderTopPadding = 0
+            }
         }
         
         let continueButton = CommonViews.primaryButton(text: Strings.OBSaveButton).then {
