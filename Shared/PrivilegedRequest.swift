@@ -5,8 +5,6 @@
 
 import Foundation
 
-private let REQUEST_KEY_PRIVILEGED = "privileged"
-
 /**
  Request that is allowed to load local resources.
 
