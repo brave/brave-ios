@@ -114,6 +114,9 @@ class FavoritesViewController: UIViewController {
         hasPasteboardURL = UIPasteboard.general.hasStrings || UIPasteboard.general.hasURLs
         
         KeyboardHelper.defaultHelper.addDelegate(self)
+        
+        Preferences.Search.shouldShowRecentSearches.observe(from: self)
+        Preferences.Search.shouldShowRecentSearchesOptIn.observe(from: self)
     }
     
     @available(*, unavailable)
@@ -148,7 +151,7 @@ class FavoritesViewController: UIViewController {
             self?.supplementaryViewProvider(collectionView: collectionView, kind: kind, indexPath: indexPath)
         }
         
-        initialSnapshotSetup()
+        updateUIWithSnapshot()
     }
     
     override func viewDidLayoutSubviews() {
@@ -520,6 +523,12 @@ extension FavoritesViewController {
     }
 }
 
+extension FavoritesViewController: PreferencesObserver {
+    func preferencesDidChange(for key: String) {
+        updateUIWithSnapshot()
+    }
+}
+
 // MARK: - Diffable data source + NSFetchedResultsControllerDelegate
 extension FavoritesViewController: NSFetchedResultsControllerDelegate {
     
@@ -527,8 +536,7 @@ extension FavoritesViewController: NSFetchedResultsControllerDelegate {
         availableSections.contains(.recentSearches)
     }
     
-    /// Performs first frc fetches and handles setting first snaphot.
-    private func initialSnapshotSetup() {
+    private func updateUIWithSnapshot() {
         do {
             try favoritesFRC.performFetch()
         } catch {
