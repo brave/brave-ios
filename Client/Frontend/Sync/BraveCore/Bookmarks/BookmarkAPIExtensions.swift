@@ -73,27 +73,10 @@ extension BraveBookmarksAPI {
         return []
     }
     
-    func fetchParent(_ bookmarkItem: BookmarkNode?) -> BookmarkNode? {
-        guard let bookmarkItem = bookmarkItem else {
-            return nil
-        }
-        
-        if let parent = bookmarkItem.parent {
-            // Return nil if the parent is the ROOT node
-            // because AddEditBookmarkTableViewController.sortFolders
-            // sorts root folders by having a nil parent.
-            // If that code changes, we should change here to match.
-            if bookmarkItem.parent?.guid != rootNode?.guid {
-                return parent
-            }
-        }
-        return nil
-    }
-    
     @discardableResult
     func addFolder(title: String, parentFolder: BookmarkNode? = nil) -> BookmarkNode? {
         if let parentFolder = parentFolder {
-            return  createFolder(withParent: parentFolder, title: title)
+            return createFolder(withParent: parentFolder, title: title)
         } else {
             return createFolder(withTitle: title)
         }
@@ -116,8 +99,7 @@ extension BraveBookmarksAPI {
     }
     
     func getChildren(forFolder folder: BookmarkNode, includeFolders: Bool) -> [BookmarkNode]? {
-        let result = folder.children.map({ $0 })
-        return includeFolders ? result : result.filter({ $0.isFolder == false })
+        return includeFolders ? folder.children : folder.children.filter({ $0.isFolder == false })
     }
     
     func byFrequency(query: String? = nil, completion: @escaping ([BookmarkNode]) -> Void) {
