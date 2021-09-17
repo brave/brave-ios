@@ -23,7 +23,7 @@ extension PlaylistListViewController: UITableViewDelegate {
         
         let itemsToShare: [Any] = [
             url,
-            OptionalTextActivityItemSource(text: item.pageTitle)
+            OptionalTextActivityItemSource(text: item.pageSrc)
         ]
         
         let activityViewController = UIActivityViewController(activityItems: itemsToShare,
