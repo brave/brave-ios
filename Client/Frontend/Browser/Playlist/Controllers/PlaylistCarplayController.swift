@@ -109,17 +109,7 @@ class PlaylistCarplayController: NSObject {
             self.contentManager.reloadData()
         }
         
-        PlaylistManager.shared.contentWillChange
-        .sink { _ in
-            reloadData()
-        }.store(in: &playlistObservers)
-        
         PlaylistManager.shared.contentDidChange
-        .sink { _ in
-            reloadData()
-        }.store(in: &playlistObservers)
-        
-        PlaylistManager.shared.objectDidChange
         .sink { _ in
             reloadData()
         }.store(in: &playlistObservers)
