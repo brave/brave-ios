@@ -403,11 +403,7 @@ extension PlaylistViewController: PlaylistViewControllerDelegate {
     }
     
     func onExitFullscreen() {
-        if !UIDevice.isIpad || splitViewController?.isCollapsed == true {
-            listController.onExitFullscreen()
-        } else {
-            detailController.onExitFullscreen()
-        }
+        listController.onExitFullscreen()
     }
     
     func deleteItem(item: PlaylistInfo, at index: Int) {
