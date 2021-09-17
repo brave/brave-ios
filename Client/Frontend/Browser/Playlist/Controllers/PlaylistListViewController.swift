@@ -493,8 +493,8 @@ extension PlaylistListViewController {
             
             self.dismiss(animated: true) {
                 let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
-                browser.openInNewTab(pageURL,
-                                     isPrivate: isPrivateBrowsing)
+                browser.tabManager.addTabAndSelect(URLRequest(url: pageURL),
+                                                   isPrivate: isPrivateBrowsing)
             }
         }
     }

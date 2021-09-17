@@ -16,20 +16,18 @@ private let log = Logger.browserLogger
 
 extension PlaylistListViewController: UITableViewDelegate {
     
-    private func shareItem(_ item: PlaylistInfo) {
+    private func shareItem(_ item: PlaylistInfo, anchorView: UIView?) {
         guard let url = URL(string: item.pageSrc) else {
             return
         }
         
-        let itemsToShare: [Any] = [
-            url,
-            OptionalTextActivityItemSource(text: item.pageSrc)
-        ]
-        
-        let activityViewController = UIActivityViewController(activityItems: itemsToShare,
+        let activityViewController = UIActivityViewController(activityItems: [url],
                                                               applicationActivities: nil)
         
         activityViewController.excludedActivityTypes = [.openInIBooks, .saveToCameraRoll, .assignToContact]
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            activityViewController.popoverPresentationController?.sourceView = anchorView ?? self.view
+        }
         self.present(activityViewController, animated: true, completion: nil)
     }
     
@@ -125,14 +123,14 @@ extension PlaylistListViewController: UITableViewDelegate {
                     
                     self.dismiss(animated: true) {
                         let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
-                        browser.openInNewTab(pageURL,
-                                             isPrivate: isPrivateBrowsing)
+                        browser.tabManager.addTabAndSelect(URLRequest(url: pageURL),
+                                                           isPrivate: isPrivateBrowsing)
                     }
                 }
             }))
             
             alert.addAction(UIAlertAction(title: Strings.PlayList.sharePlaylistShareActionMenuTitle, style: .default, handler: { [weak self] _ in
-                self?.shareItem(currentItem)
+                self?.shareItem(currentItem, anchorView: tableView.cellForRow(at: indexPath))
             }))
             
             alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil))
