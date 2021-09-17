@@ -305,20 +305,20 @@ class AddEditBookmarkTableViewController: UITableViewController {
                     return earlyReturn()
             }
             
-            if !bookmark.existsInPersistentStore() { break }
+            if !bookmark.existsInPersistentStore { break }
             
             switch saveLocation {
             case .rootLevel:
                 bookmarkAPI.updateWithNewLocation(bookmark, customTitle: title, url: url, location: nil)
             case .favorites:
-                bookmarkAPI.delete(bookmark)
+                bookmarkAPI.removeBookmark(bookmark)
                 Favorite.add(url: url, title: title)
             case .folder(let folder):
                 bookmarkAPI.updateWithNewLocation(bookmark, customTitle: title, url: url, location: folder)
             }
             
         case .editFolder(let folder):
-            if !folder.existsInPersistentStore() { break }
+            if !folder.existsInPersistentStore { break }
             
             switch saveLocation {
             case .rootLevel:
@@ -335,16 +335,16 @@ class AddEditBookmarkTableViewController: UITableViewController {
                     return earlyReturn()
             }
             
-            if !favorite.existsInPersistentStore() { break }
+            if !favorite.existsInPersistentStore { break }
             
             switch saveLocation {
             case .rootLevel:
-                bookmarkAPI.delete(favorite)
+                bookmarkAPI.removeBookmark(favorite)
                 bookmarkAPI.add(url: url, title: title)
             case .favorites:
                 favorite.update(customTitle: title, url: url)
             case .folder(let folder):
-                bookmarkAPI.delete(favorite)
+                bookmarkAPI.removeBookmark(favorite)
                 bookmarkAPI.add(url: url, title: title, parentFolder: folder)
             }
         }

@@ -32,7 +32,7 @@ enum BookmarkSaveLocation {
         // Root level and favorites locations are permanent, only custom folder needs to be checked.
         switch self {
         case .folder(let folder):
-            return folder.existsInPersistentStore()
+            return folder.existsInPersistentStore
         default:
             // Non-folder locations return nil
             return nil

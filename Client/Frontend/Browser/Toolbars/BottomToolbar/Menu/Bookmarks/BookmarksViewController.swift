@@ -498,6 +498,9 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         guard let item = bookmarksFRC?.object(at: indexPath) else { return false }
+        
+        // Deleting a permanent Node will crash on brave-core side inside Bookmark_model
+        // We have to filter out permanent nodes to enable edit mode
         return !item.isPermanentNode
     }
     
@@ -517,13 +520,13 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
                     completion(false)
                 })
                 alert.addAction(UIAlertAction(title: Strings.yesDeleteButtonTitle, style: .destructive) { _ in
-                    self.bookmarkAPI.delete(item)
+                    self.bookmarkAPI.removeBookmark(item)
                     completion(true)
                 })
                 
                 self.present(alert, animated: true, completion: nil)
             } else {
-                self.bookmarkAPI.delete(item)
+                self.bookmarkAPI.removeBookmark(item)
                 completion(true)
             }
         }
@@ -611,7 +614,7 @@ extension BookmarksViewController: BookmarksV2FetchResultsDelegate {
         // This is only possible if the user tries to purposely break sync..
         // See brave-ios/issues/3011 && brave-browser/issues/12530
         // - Brandon T.
-        if let currentFolder = currentFolder, !currentFolder.existsInPersistentStore() {
+        if let currentFolder = currentFolder, !currentFolder.existsInPersistentStore {
             self.navigationController?.popToRootViewController(animated: true)
             return
         }

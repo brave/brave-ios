@@ -42,8 +42,8 @@ extension BookmarkNode {
         self.url = url
     }
     
-    public func existsInPersistentStore() -> Bool {
-        return isValid && parent != nil
+    public var existsInPersistentStore: Bool {
+        isValid && parent != nil
     }
     
     private struct AssociatedObjectKeys {

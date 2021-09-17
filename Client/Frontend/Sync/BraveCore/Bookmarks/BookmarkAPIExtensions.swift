@@ -135,12 +135,6 @@ extension BraveBookmarksAPI {
         }
     }
     
-    func delete(_ bookmarkItem: BookmarkNode) {
-        if !bookmarkItem.isPermanentNode {
-            removeBookmark(bookmarkItem)
-        }
-    }
-    
     func updateWithNewLocation(_ bookmarkItem: BookmarkNode, customTitle: String?, url: URL?, location: BookmarkNode?) {
         guard let location = location ?? mobileNode else {
             log.error("Error: Moving bookmark - Cannot move a bookmark to Root.")
