@@ -234,8 +234,20 @@ class VideoTrackerBar: UIView {
     
     private func timeToString(_ time: CMTime) -> String {
         let totalSeconds = abs(CMTimeGetSeconds(time))
-        let minutes = floor(totalSeconds.truncatingRemainder(dividingBy: 3600.0) / 60.0)
-        let seconds = floor(totalSeconds.truncatingRemainder(dividingBy: 60.0))
-        return String(format: "%02zu:%02zu", Int(minutes), Int(seconds))
+        let days = floor(totalSeconds.remainder(dividingBy: 31536000.0) / 86400.0)
+        let hours = floor(totalSeconds.remainder(dividingBy: 86400.0) / 3600.0)
+        let minutes = floor(totalSeconds.remainder(dividingBy: 3600.0) / 60.0)
+        let seconds = floor(totalSeconds.remainder(dividingBy: 60.0))
+        
+        var result = ""
+        if Int(days) > 0 {
+            result += String(format: "%02zu:", Int(days))
+        }
+        
+        if Int(hours) > 0 {
+            result += String(format: "%02zu:", Int(hours))
+        }
+        
+        return result + String(format: "%02zu:%02zu", Int(minutes), Int(seconds))
     }
 }
