@@ -11,29 +11,31 @@ import Shared
 private let log = Logger.browserLogger
 
 class CarplayTemplateApplicationSceneDelegate: NSObject {
+    private static let configurationName = "CPTemplateSceneConfiguration"
     
     // MARK: UISceneDelegate
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        if scene is CPTemplateApplicationScene, session.configuration.name == "CPTemplateSceneConfiguration" {
+        if scene is CPTemplateApplicationScene,
+            session.configuration.name == CarplayTemplateApplicationSceneDelegate.configurationName {
             log.debug("Template application scene will connect.")
         }
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
-        if scene.session.configuration.name == "CPTemplateSceneConfiguration" {
+        if scene.session.configuration.name == CarplayTemplateApplicationSceneDelegate.configurationName {
             log.debug("Template application scene did disconnect.")
         }
     }
     
     func sceneDidBecomeActive(_ scene: UIScene) {
-        if scene.session.configuration.name == "CPTemplateSceneConfiguration" {
+        if scene.session.configuration.name == CarplayTemplateApplicationSceneDelegate.configurationName {
             log.debug("Template application scene did become active.")
         }
     }
     
     func sceneWillResignActive(_ scene: UIScene) {
-        if scene.session.configuration.name == "CPTemplateSceneConfiguration" {
+        if scene.session.configuration.name == CarplayTemplateApplicationSceneDelegate.configurationName {
             log.debug("Template application scene will resign active.")
         }
     }
