@@ -178,8 +178,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         browserViewController = BrowserViewController(
             profile: self.profile!,
             tabManager: self.tabManager,
-            historyAPI: braveCore.historyAPI!,
-            bookmarkAPI: braveCore.bookmarksAPI!,
+            historyAPI: braveCore.historyAPI,
+            bookmarkAPI: braveCore.bookmarksAPI,
             crashedLastSession: crashedLastSession)
         browserViewController.edgesForExtendedLayout = []
 
