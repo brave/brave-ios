@@ -102,7 +102,7 @@ class LoginInfoTableViewCell: UITableViewCell, TableViewReusable {
     }
     
     override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
-        return delegate?.canPerform(action: action, for: self) ?? false
+        return delegate?.canPerform(action: action, for: self) == true
     }
     
     // MARK: Internal

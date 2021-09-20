@@ -447,7 +447,6 @@
 		2F5893C5265ED772002323D9 /* BrowserViewController+ProductNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F5893C4265ED772002323D9 /* BrowserViewController+ProductNotification.swift */; };
 		2F59562826D427B400FEE43B /* LoginAuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F59562726D427B400FEE43B /* LoginAuthViewController.swift */; };
 		2F59563526D5331100FEE43B /* LoginEmptyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F59563426D5331100FEE43B /* LoginEmptyView.swift */; };
-		2F59563726D5415100FEE43B /* FontExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F59563626D5415100FEE43B /* FontExtensions.swift */; };
 		2F59564226D5609800FEE43B /* LoginInfoTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F59564126D5609800FEE43B /* LoginInfoTableViewCell.swift */; };
 		2F5B27D72698DBA8002BF5CF /* OrderedCollections in Frameworks */ = {isa = PBXBuildFile; productRef = 2F5B27D62698DBA8002BF5CF /* OrderedCollections */; };
 		2F676F6F260BA1B00048A1DB /* BlockingSummaryDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F676F6E260BA1B00048A1DB /* BlockingSummaryDataSource.swift */; };
@@ -465,6 +464,7 @@
 		2FB0E26C2653132500B722AF /* BraveServiceStateObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FB0E26B2653132500B722AF /* BraveServiceStateObserver.swift */; };
 		2FB2F0CF26D3F92D00C8E576 /* LoginInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FB2F0CE26D3F92D00C8E576 /* LoginInfoViewController.swift */; };
 		2FBCB169262784BF00F512D8 /* BrowserViewController+CoreMigration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FBCB168262784BF00F512D8 /* BrowserViewController+CoreMigration.swift */; };
+		2FBE200926F8E97300B7098B /* UIFontExtenions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FBE200826F8E97300B7098B /* UIFontExtenions.swift */; };
 		2FCAE2251ABB51F800877008 /* Storage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2FCAE21A1ABB51F800877008 /* Storage.framework */; };
 		2FCAE2311ABB51F800877008 /* Storage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2FCAE21A1ABB51F800877008 /* Storage.framework */; };
 		2FCAE25F1ABB531100877008 /* Cursor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FCAE2411ABB531100877008 /* Cursor.swift */; };
@@ -1999,7 +1999,6 @@
 		2F5893C4265ED772002323D9 /* BrowserViewController+ProductNotification.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "BrowserViewController+ProductNotification.swift"; sourceTree = "<group>"; };
 		2F59562726D427B400FEE43B /* LoginAuthViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginAuthViewController.swift; sourceTree = "<group>"; };
 		2F59563426D5331100FEE43B /* LoginEmptyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginEmptyView.swift; sourceTree = "<group>"; };
-		2F59563626D5415100FEE43B /* FontExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontExtensions.swift; sourceTree = "<group>"; };
 		2F59564126D5609800FEE43B /* LoginInfoTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginInfoTableViewCell.swift; sourceTree = "<group>"; };
 		2F676F6E260BA1B00048A1DB /* BlockingSummaryDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockingSummaryDataSource.swift; sourceTree = "<group>"; };
 		2F676FAC260BA4860048A1DB /* blocking-summary.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "blocking-summary.json"; sourceTree = "<group>"; };
@@ -2025,6 +2024,7 @@
 		2FB0E26B2653132500B722AF /* BraveServiceStateObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveServiceStateObserver.swift; sourceTree = "<group>"; };
 		2FB2F0CE26D3F92D00C8E576 /* LoginInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginInfoViewController.swift; sourceTree = "<group>"; };
 		2FBCB168262784BF00F512D8 /* BrowserViewController+CoreMigration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowserViewController+CoreMigration.swift"; sourceTree = "<group>"; };
+		2FBE200826F8E97300B7098B /* UIFontExtenions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIFontExtenions.swift; sourceTree = "<group>"; };
 		2FCAE21A1ABB51F800877008 /* Storage.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Storage.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2FCAE2241ABB51F800877008 /* StorageTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StorageTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2FCAE22C1ABB51F800877008 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -3474,6 +3474,7 @@
 			children = (
 				271DECB8234CC7EF009DAC37 /* UITableViewExtensions.swift */,
 				276A790B244660B500AC9446 /* UICollectionViewExtensions.swift */,
+				2FBE200826F8E97300B7098B /* UIFontExtenions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -5446,7 +5447,6 @@
 				59B6902821B684A700E9388E /* BundleExtension.swift */,
 				0AB7FCDB235DED0B00F1D9F5 /* NumberExtensions.swift */,
 				F91785DA255F38D6002976F2 /* WKWebViewExtensions.swift */,
-				2F59563626D5415100FEE43B /* FontExtensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -6951,6 +6951,7 @@
 				27733E792697867D0086799A /* AccessibilityEmbedInScrollViewViewModifier.swift in Sources */,
 				27EF6B8124BF6095005E034F /* UITableViewExtensions.swift in Sources */,
 				44A58CC82693A309005C0879 /* ActivityView.swift in Sources */,
+				2FBE200926F8E97300B7098B /* UIFontExtenions.swift in Sources */,
 				278C46B223F4A91D0083347F /* PopoverNavigationController.swift in Sources */,
 				278C46B023F4A91C0083347F /* PopoverContainerView.swift in Sources */,
 				5E2A74B8262DE62900DBBE88 /* Gradients.swift in Sources */,
@@ -7007,7 +7008,6 @@
 				7B3D9E651E4CBFDB007A50DA /* NSCoderExtensions.swift in Sources */,
 				0ADCD4522319640F0078CC67 /* UserAgentBuilder.swift in Sources */,
 				E65075931E37F7AB006961AC /* AppConstants.swift in Sources */,
-				2F59563726D5415100FEE43B /* FontExtensions.swift in Sources */,
 				A1510DDF20E51EF4008BF1F4 /* UIDeviceExtensions.swift in Sources */,
 				E65075B81E37F7AB006961AC /* NotificationConstants.swift in Sources */,
 				E65075AC1E37F7AB006961AC /* StringExtensions.swift in Sources */,
@@ -7600,7 +7600,7 @@
 				D34DC8531A16C40C00D49B7B /* Profile.swift in Sources */,
 				27A1AC0924859D0900344503 /* FeedHeadlineViews.swift in Sources */,
 				CA8D5C2226D7D067009BF13D /* PlaylistStatusObserver.swift in Sources */,
-				2FB2F0CF26D3F92D00C8E576 /* LoginDetailsViewController.swift in Sources */,
+				2FB2F0CF26D3F92D00C8E576 /* LoginInfoViewController.swift in Sources */,
 				2FB2F0CF26D3F92D00C8E576 /* LoginInfoViewController.swift in Sources */,
 				0A93F1892264C72000A3571B /* BookmarkFormFieldsProtocol.swift in Sources */,
 				4422D4D821BFFB7600BF1855 /* block.cc in Sources */,

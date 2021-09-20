@@ -182,13 +182,13 @@ extension LoginInfoViewController {
                         
                         return cell
                     default:
-                        fatalError("No cell available for index path: \(indexPath)")
+                        assertionFailure("No cell available for index path: \(indexPath)")
                 }
             case Section.createdDate.rawValue:
                 let cell = tableView.dequeueReusableCell(for: indexPath) as CenteredButtonCell
             
                 cell.do {
-                    $0.textLabel?.text = "Created \(formattedCreationDate)"
+                    $0.textLabel?.text = String(format: Strings.Login.loginInfoCreatedHeaderTitle, formattedCreationDate)
                     $0.tintColor = .secondaryBraveLabel
                     $0.selectionStyle = .none
                     $0.backgroundColor = .secondaryBraveBackground
@@ -202,8 +202,10 @@ extension LoginInfoViewController {
                 }
                 return cell
             default:
-                fatalError("No cell available for index path: \(indexPath)")
+                assertionFailure("No cell available for index path: \(indexPath)")
         }
+        
+        return UITableViewCell()
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -289,7 +291,7 @@ extension LoginInfoViewController {
                 if result.isSuccess {
                     self?.tableView.reloadData()
                 } else {
-                    log.error("Error while updating a login entry")
+                    log.error("Error while updating a login entry. Error Reason: \(result.failureValue ?? "")")
                 }
             }
         }

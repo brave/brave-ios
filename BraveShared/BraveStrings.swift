@@ -2375,6 +2375,12 @@ extension Strings {
                               bundle: .braveShared,
                               value: "Saved Login will be removed permanently.",
                               comment: "The message displayed in alert when a login entry deleted")
+        public static let loginInfoCreatedHeaderTitle =
+            NSLocalizedString("login.loginInfoCreatedHeaderTitle",
+                              tableName: "BraveShared",
+                              bundle: .braveShared,
+                              value: "Created %@",
+                              comment: "The message displayed in alert when a login entry deleted")
     }
 }
 

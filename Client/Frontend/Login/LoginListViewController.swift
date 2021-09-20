@@ -38,7 +38,7 @@ class LoginListViewController: LoginAuthViewController {
     
     private let profile: Profile
     private var loginEntries = [Login]()
-    private var isFetchingLoginEntries: Bool = false
+    private var isFetchingLoginEntries = false
     private var searchLoginTimer: Timer?
 
     private let searchController = UISearchController(searchResultsController: nil)
@@ -96,7 +96,7 @@ class LoginListViewController: LoginAuthViewController {
         navigationItem.title = Strings.Login.loginListNavigationTitle
 
         tableView.do {
-            $0.accessibilityIdentifier = "Logins Passwords List"
+            $0.accessibilityIdentifier = Strings.Login.loginListNavigationTitle
             $0.allowsSelectionDuringEditing = true
             $0.registerHeaderFooter(SettingsTableSectionHeaderFooterView.self)
             $0.register(UITableViewCell.self, forCellReuseIdentifier: Constants.saveLoginsRowIdentifier)
@@ -197,7 +197,9 @@ extension LoginListViewController {
             
             return cell
         } else {
-            let loginInfo = loginEntries[indexPath.item]
+            guard let loginInfo = loginEntries[safe: indexPath.item] else {
+                return UITableViewCell()
+            }
             
             let cell = tableView.dequeueReusableCell(for: indexPath) as TwoLineTableViewCell
             
