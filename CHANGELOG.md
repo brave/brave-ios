@@ -3,12 +3,12 @@
 
 ## [1.31](https://github.com/brave/brave-ios/releases/tag/v1.31)
 
+- Added auto-play settings for sites to auto-play video/audio. ([#1738](https://github.com/brave/brave-ios/issues/1738))
 - Added "Scan QR Code" shortcut when long pressed on Brave on home-screen. ([#3798](https://github.com/brave/brave-ios/issues/3798))
 - Added new playlist URL button and menu notification icon. ([#3976](https://github.com/brave/brave-ios/issues/3976))
 - Added support for background playback and picture-in-picture (PiP) support for videos. ([#4031](https://github.com/brave/brave-ios/issues/4031))
 - Updated "Brave Search beta" to "Brave Search" under search engines and in on-boarding screen. ([#4049](https://github.com/brave/brave-ios/issues/4049))
 - Updated settings for Playlist menu notification. ([#4098](https://github.com/brave/brave-ios/issues/4098))
-- Re-enabled auto-play settings for sites to auto-play video/audio. ([#1738](https://github.com/brave/brave-ios/issues/1738))
 - Added support for IPv6 address resolution. ([#3866](https://github.com/brave/brave-ios/issues/3866))
 - Fixed an issue with the preview URLs always showing in lowercase. ([#3901](https://github.com/brave/brave-ios/issues/3901))
 - Fixed an issue with shields stats not updating in certain cases. ([#4021](https://github.com/brave/brave-ios/issues/4021))
