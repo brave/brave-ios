@@ -6,6 +6,7 @@
 import UIKit
 import SnapKit
 import Storage
+import Shared
 import BraveUI
 
 protocol LoginInfoTableViewCellDelegate: AnyObject {
@@ -58,7 +59,7 @@ class LoginInfoTableViewCell: UITableViewCell, TableViewReusable {
     override var accessibilityLabel: String? {
         get {
             if descriptionTextField.isSecureTextEntry {
-                return highlightedLabel.text ?? ""
+                return highlightedLabel.text ?? Strings.Login.loginInfoDetailsPasswordFieldTitle
             } else {
                 return "\(highlightedLabel.text ?? ""), \(descriptionTextField.text ?? "")"
             }

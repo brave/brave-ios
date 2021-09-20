@@ -2343,13 +2343,13 @@ extension Strings {
             NSLocalizedString("login.loginListSavedLoginsHeaderTitle",
                               tableName: "BraveShared",
                               bundle: .braveShared,
-                              value: "SAVED LOGINS",
+                              value: "Saved Logins",
                               comment: "The header title displayed over the login list")
         public static let loginInfoDetailsHeaderTitle =
             NSLocalizedString("login.loginInfoDetailsHeaderTitle",
                               tableName: "BraveShared",
                               bundle: .braveShared,
-                              value: "LOGIN DETAILS",
+                              value: "Login Details",
                               comment: "The header title displayed over the details of login entry")
         public static let loginInfoDetailsWebsiteFieldTitle =
             NSLocalizedString("login.loginInfoDetailsWebsiteFieldTitle",

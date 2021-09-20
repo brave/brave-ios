@@ -235,7 +235,7 @@ extension LoginListViewController {
     
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let headerView = tableView.dequeueReusableHeaderFooter() as SettingsTableSectionHeaderFooterView
-        headerView.titleLabel.text = Strings.Login.loginListSavedLoginsHeaderTitle
+        headerView.titleLabel.text = Strings.Login.loginListSavedLoginsHeaderTitle.uppercased()
         
         return headerView
     }
