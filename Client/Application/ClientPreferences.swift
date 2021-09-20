@@ -236,6 +236,8 @@ extension Preferences {
         static let syncBookmarksEnabled = Option<Bool>(key: "chromium.sync.syncBookmarksEnabled", default: true)
         /// The sync type history enabled for the device in sync chain
         static let syncHistoryEnabled = Option<Bool>(key: "chromium.sync.syncHistoryEnabled", default: false)
+        /// The sync type passwords enabled the device in sync chain
+        static let syncPasswordsEnabled = Option<Bool>(key: "chromium.sync.syncPasswordsEnabled", default: false)
         /// Node Id for last bookmark folder
         static let lastBookmarksFolderNodeId = Option<Int?>(key: "chromium.last.bookmark.folder.node.id", default: nil)
     }
