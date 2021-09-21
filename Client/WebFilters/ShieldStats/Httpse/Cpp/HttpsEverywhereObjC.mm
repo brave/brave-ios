@@ -8,19 +8,16 @@ HTTPSEverywhere httpse;
 
 -(void)load:(NSString* )path
 {
-    @synchronized(self) {
-        if ([self isLoaded]) {
-            httpse.close();
-        }
-        httpse.initHTTPSE([path UTF8String]);
+    
+    if ([self isLoaded]) {
+        httpse.close();
     }
+    httpse.initHTTPSE([path UTF8String]);
 }
 
 -(BOOL)isLoaded
 {
-    @synchronized(self) {
-        return httpse.isLoaded();
-    }
+    return httpse.isLoaded();
 }
 
 -(void)close

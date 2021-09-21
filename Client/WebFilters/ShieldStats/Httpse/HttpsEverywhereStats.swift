@@ -14,6 +14,7 @@ class HttpsEverywhereStats: LocalAdblockResourceProtocol {
     let folderName = "https-everywhere-data"
     
     let httpseDb = HttpsEverywhereObjC()
+    let loadDbQueue = DispatchQueue(label: "com.brave.loaddb")
     
     fileprivate init() { }
     
@@ -72,7 +73,7 @@ class HttpsEverywhereStats: LocalAdblockResourceProtocol {
             
             self.unzipFile(dir: dir, data: data)
             
-            DispatchQueue.main.async {
+            self.loadDbQueue.async {
                 self.loadDb(dir: dir, name: HttpsEverywhereStats.levelDbFileName)
             }
         }

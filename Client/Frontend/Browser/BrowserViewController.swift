@@ -619,6 +619,7 @@ class BrowserViewController: UIViewController {
                            name: NSNotification.Name(rawValue: BraveGlobalShieldStats.didUpdateNotification), object: nil)
         }
         
+        view.backgroundColor = .white
         KeyboardHelper.defaultHelper.addDelegate(self)
         UNUserNotificationCenter.current().delegate = self
         
