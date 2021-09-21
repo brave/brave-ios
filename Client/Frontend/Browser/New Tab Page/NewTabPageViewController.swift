@@ -468,6 +468,9 @@ class NewTabPageViewController: UIViewController {
                 collectionView.deleteItems(at: [IndexPath(item: 0, section: section)])
             }
             
+            // We check if first item exists before scrolling up to it.
+            // This should never happen since first item is our shields stats view.
+            // However we saw it crashing in XCode logs, see #4202.
             let firstItemIndexPath = IndexPath(item: 0, section: 0)
             if collectionView.dataSource?
                 .collectionView(collectionView, cellForItemAt: firstItemIndexPath) != nil {
