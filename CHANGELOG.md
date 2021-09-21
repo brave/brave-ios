@@ -13,7 +13,7 @@
 - Fixed shields stats not updating in certain cases. ([#4021](https://github.com/brave/brave-ios/issues/4021))
 - Fixed share menu only sharing the canonical (base) URL instead of the actual page URL. ([#4071](https://github.com/brave/brave-ios/issues/4071))
 - Fixed Brave crashing in certain cases when history sync is enabled. ([#4073](https://github.com/brave/brave-ios/issues/4073))
-- Fixed an issue when returning search results instead of computing arithmetic queries typed into the URL bar. ([#4081](https://github.com/brave/brave-ios/issues/4081))
+- Fixed issue when returning search results instead of computing arithmetic queries typed into the URL bar. ([#4081](https://github.com/brave/brave-ios/issues/4081))
 - Fixed links not marked as visited when revisiting a search link via "Open in Brave". ([#4082](https://github.com/brave/brave-ios/issues/4082))
 - Fixed issue where audio continues to play on tab when opening and closing the 3-dot menu. ([#4092](https://github.com/brave/brave-ios/issues/4092))
 - Fixed playlist playback speed when playing in background. ([#4102](https://github.com/brave/brave-ios/issues/4102))
