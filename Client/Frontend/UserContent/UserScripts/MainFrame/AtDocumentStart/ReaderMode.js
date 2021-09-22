@@ -61,8 +61,9 @@ function checkReadability() {
       readabilityResult = readability.parse();
 
       // Sanitize the title to prevent a malicious page from inserting HTML in the `<title>`.
+      // The sanitization of HTML and the title has been moved to NATIVE code due to an iOS 13 exploit where we can't do anything without WKContentWorld
       if (readabilityResult && readabilityResult.title !== undefined) {
-        readabilityResult.title = escapeHTML(readabilityResult.title);
+        readabilityResult.title = readabilityResult.title;
       }
 
       debug({Type: "ReaderModeStateChange", Value: readabilityResult !== null ? "Available" : "Unavailable"});
@@ -74,15 +75,6 @@ function checkReadability() {
     debug({Type: "ReaderModeStateChange", Value: "Unavailable"});
     webkit.messageHandlers.readerModeMessageHandler.postMessage({"securitytoken": SECURITY_TOKEN, "data": {Type: "ReaderModeStateChange", Value: "Unavailable"}});
   }, 100);
-}
-
-function escapeHTML(string) {
-  return string
-    .replace(/\&/g, "&amp;")
-    .replace(/\</g, "&lt;")
-    .replace(/\>/g, "&gt;")
-    .replace(/\"/g, "&quot;")
-    .replace(/\'/g, "&#039;");
 }
 
 // Readerize the document. Since we did the actual readerization already in checkReadability, we
