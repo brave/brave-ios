@@ -177,12 +177,13 @@ extension BraveCoreMigrator {
     private func performBookmarkMigrationIfNeeded(_ completion: ((Bool) -> Void)?) {
         log.info("Migrating to Chromium Bookmarks v1 - Exporting")
         exportBookmarks { [weak self] success in
+            guard let self = self else { return }
             if success {
                 log.info("Migrating to Chromium Bookmarks v1 - Start")
-                self?.migrateBookmarks() { success in
+                self.migrateBookmarks() { success in
                     Preferences.Chromium.syncV2BookmarksMigrationCompleted.value = success
                     
-                    if let url = BraveCoreMigrator.bookmarksURL {
+                    if let url = self.bookmarksURL {
                         do {
                             try FileManager.default.removeItem(at: url)
                         } catch {
@@ -340,7 +341,7 @@ extension BraveCoreMigrator {
 
 extension BraveCoreMigrator {
     
-    public static var bookmarksURL: URL? {
+    public var bookmarksURL: URL? {
         let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
         guard let documentsDirectory = paths.first else {
             log.error("Unable to access documents directory")
@@ -355,7 +356,7 @@ extension BraveCoreMigrator {
         return url
     }
     
-    public static var datedBookmarksURL: URL? {
+    public var datedBookmarksURL: URL? {
         let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
         guard let documentsDirectory = paths.first else {
             log.error("Unable to access documents directory")
@@ -383,7 +384,7 @@ extension BraveCoreMigrator {
     }
     
     private func exportBookmarks(_ completion: @escaping (_ success: Bool) -> Void) {
-        guard let url = BraveCoreMigrator.bookmarksURL else {
+        guard let url = bookmarksURL else {
             return completion(false)
         }
         

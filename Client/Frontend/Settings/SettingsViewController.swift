@@ -59,19 +59,22 @@ class SettingsViewController: TableViewController {
     private let legacyWallet: BraveLedger?
     private let feedDataSource: FeedDataSource
     private let historyAPI: BraveHistoryAPI
-    
+    private let syncAPI: BraveSyncAPI
+
     init(profile: Profile,
          tabManager: TabManager,
          feedDataSource: FeedDataSource,
          rewards: BraveRewards? = nil,
          legacyWallet: BraveLedger? = nil,
-         historyAPI: BraveHistoryAPI) {
+         historyAPI: BraveHistoryAPI,
+         syncAPI: BraveSyncAPI) {
         self.profile = profile
         self.tabManager = tabManager
         self.feedDataSource = feedDataSource
         self.rewards = rewards
         self.legacyWallet = legacyWallet
         self.historyAPI = historyAPI
+        self.syncAPI = syncAPI
         
         super.init(style: .insetGrouped)
     }
@@ -234,16 +237,16 @@ class SettingsViewController: TableViewController {
                     self.navigationController?.pushViewController(viewController, animated: true)
                 }, image: #imageLiteral(resourceName: "settings-search").template, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self),
                 Row(text: Strings.sync, selection: { [unowned self] in
-                    if BraveSyncAPI.shared.isInSyncGroup {
+                    if syncAPI.isInSyncGroup {
                         if !DeviceInfo.hasConnectivity() {
                             self.present(SyncAlerts.noConnection, animated: true)
                             return
                         }
                         
                         self.navigationController?
-                            .pushViewController(SyncSettingsTableViewController(), animated: true)
+                            .pushViewController(SyncSettingsTableViewController(syncAPI: syncAPI), animated: true)
                     } else {
-                        self.navigationController?.pushViewController(SyncWelcomeViewController(), animated: true)
+                        self.navigationController?.pushViewController(SyncWelcomeViewController(syncAPI: syncAPI), animated: true)
                     }
                     }, image: #imageLiteral(resourceName: "settings-sync").template, accessory: .disclosureIndicator,
                        cellClass: MultilineValue1Cell.self),
