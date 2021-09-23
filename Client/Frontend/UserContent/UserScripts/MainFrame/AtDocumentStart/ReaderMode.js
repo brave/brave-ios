@@ -60,12 +60,6 @@ function checkReadability() {
       var readability = new Readability(uri, doc, { debug: DEBUG });
       readabilityResult = readability.parse();
 
-      // Sanitize the title to prevent a malicious page from inserting HTML in the `<title>`.
-      // The sanitization of HTML and the title has been moved to NATIVE code due to an iOS 13 exploit where we can't do anything without WKContentWorld
-      if (readabilityResult && readabilityResult.title !== undefined) {
-        readabilityResult.title = readabilityResult.title;
-      }
-
       debug({Type: "ReaderModeStateChange", Value: readabilityResult !== null ? "Available" : "Unavailable"});
       webkit.messageHandlers.readerModeMessageHandler.postMessage({"securitytoken": SECURITY_TOKEN, "data": {Type: "ReaderModeStateChange", Value: readabilityResult !== null ? "Available" : "Unavailable"}});
       webkit.messageHandlers.readerModeMessageHandler.postMessage({"securitytoken": SECURITY_TOKEN, "data": {Type: "ReaderContentParsed", Value: readabilityResult}});
