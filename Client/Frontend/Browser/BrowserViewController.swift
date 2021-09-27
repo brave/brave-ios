@@ -1177,10 +1177,12 @@ class BrowserViewController: UIViewController {
             UIAccessibility.post(notification: .screenChanged, argument: nil)
             
             // Refresh the reading view toolbar since the article record may have changed
-            if let readerMode = self.tabManager.selectedTab?.getContentScript(name: ReaderMode.name()) as? ReaderMode,
+            if let tab = self.tabManager.selectedTab,
+               let readerMode = tab.getContentScript(name: ReaderMode.name()) as? ReaderMode,
                readerMode.state == .active,
                isReaderModeURL {
                 self.showReaderModeBar(animated: false)
+                self.updatePlaylistURLBar(tab: tab, state: tab.playlistItemState, item: tab.playlistItem)
             }
         })
     }
@@ -1487,6 +1489,7 @@ class BrowserViewController: UIViewController {
             }
 
             updateInContentHomePanel(url as URL)
+            updatePlaylistURLBar(tab: tab, state: tab.playlistItemState, item: tab.playlistItem)
         }
     }
     
@@ -2227,13 +2230,16 @@ extension BrowserViewController: TabManagerDelegate {
         
         let shouldShowPlaylistURLBarButton = selected?.url?.isPlaylistSupportedSiteURL == true
         
-        if let readerMode = selected?.getContentScript(name: ReaderMode.name()) as? ReaderMode, !shouldShowPlaylistURLBarButton {
+        if let selected = selected,
+            let readerMode = selected.getContentScript(name: ReaderMode.name()) as? ReaderMode, !shouldShowPlaylistURLBarButton {
             topToolbar.updateReaderModeState(readerMode.state)
             if readerMode.state == .active {
                 showReaderModeBar(animated: false)
             } else {
                 hideReaderModeBar(animated: false)
             }
+            
+            updatePlaylistURLBar(tab: selected, state: selected.playlistItemState, item: selected.playlistItem)
         } else {
             topToolbar.updateReaderModeState(ReaderModeState.unavailable)
         }
