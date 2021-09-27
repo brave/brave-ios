@@ -1214,6 +1214,18 @@ extension Strings {
                               value: "This will delete the media from offline storage. Are you sure you want to continue?",
                               comment: "Message for the alert shown when the user tries to remove offline data of an item from playlist")
         
+        public static let urlBarButtonOptionTitle =
+            NSLocalizedString("playlist.urlBarButtonOptionTitle",
+                              bundle: .braveShared,
+                              value: "Show Playlist button in the URL bar",
+                              comment: "Title for playlist URL-Bar option")
+        
+        public static let urlBarButtonOptionFooterText =
+            NSLocalizedString("playlist.urlBarButtonOptionFooterText",
+                              bundle: .braveShared,
+                              value: "When enabled, a button will be displayed in URL bar, indicating media on the page may be added to Brave Playlist.",
+                              comment: "Description footer for playlist URL-Bar option")
+        
         public static let menuBadgeOptionTitle =
             NSLocalizedString("playlist.menuBadgeOptionTitle",
                               bundle: .braveShared,
