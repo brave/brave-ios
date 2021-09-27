@@ -44,23 +44,23 @@ class BraveCoreMigrator {
     private var bookmarkMigrationState: MigrationState = .notStarted
     private var historyMigrationState: MigrationState = .notStarted
     
-    private var bookmarksAPI: BraveBookmarksAPI?
-    private var historyAPI: BraveHistoryAPI?
+    private let bookmarksAPI: BraveBookmarksAPI
+    private let historyAPI: BraveHistoryAPI
+    private let syncAPI: BraveSyncAPI
     
     private let dataImportExporter = BraveCoreImportExportUtility()
     private var bookmarkObserver: BookmarkModelListener?
     private var historyObserver: HistoryServiceListener?
     
-    public init() {
-        // Check If Chromium Sync Objects Migration is complete (Bookmarks-History)
+    public init(bookmarksAPI: BraveBookmarksAPI, historyAPI: BraveHistoryAPI, syncAPI: BraveSyncAPI) {
+        
+            self.bookmarksAPI = bookmarksAPI
+            self.historyAPI = historyAPI
+            self.syncAPI = syncAPI
+        
+        // Check If Chromium Sync Objects Migration is complete (Bookmarks-History-PAssword)
         if Migration.isChromiumMigrationCompleted {
             migrationObserver = .completed
-        }
-        
-        // TODO: Handle fetching bookmarkAPI and historyAPI from using AppDelegate IOS-4170
-        if let appDelegate = (UIApplication.shared.delegate as? AppDelegate) {
-            bookmarksAPI = appDelegate.braveCore.bookmarksAPI
-            historyAPI = appDelegate.braveCore.historyAPI
         }
         
         #if TEST_MIGRATION
@@ -153,13 +153,13 @@ extension BraveCoreMigrator {
         if !Preferences.Chromium.syncV2BookmarksMigrationCompleted.value {
             // If the bookmark model has already loaded, the observer does NOT get called!
             // Therefore we should continue to migrate the bookmarks
-            if bookmarksAPI?.isLoaded == true {
+            if bookmarksAPI.isLoaded == true {
                 performBookmarkMigrationIfNeeded { success in
                     completion(success)
                 }
             } else {
                 // Wait for the bookmark model to load before we attempt to perform migration!
-                self.bookmarkObserver = bookmarksAPI?.add(BookmarksModelLoadedObserver({ [weak self] in
+                self.bookmarkObserver = bookmarksAPI.add(BookmarksModelLoadedObserver({ [weak self] in
                     guard let self = self else { return }
                     self.bookmarkObserver?.destroy()
                     self.bookmarkObserver = nil
@@ -202,7 +202,7 @@ extension BraveCoreMigrator {
     
     private func migrateBookmarks(_ completion: @escaping (_ success: Bool) -> Void) {
         // Migrate to the mobile folder by default..
-        guard let rootFolder = bookmarksAPI?.mobileNode else {
+        guard let rootFolder = bookmarksAPI.mobileNode else {
             log.error("Invalid Root Folder - Mobile Node")
             DispatchQueue.main.async {
                 completion(false)
@@ -276,13 +276,13 @@ extension BraveCoreMigrator {
         if !Preferences.Chromium.syncV2HistoryMigrationCompleted.value {
             // If the history model has already loaded, the observer does NOT get called!
             // Therefore we should continue to migrate the history
-            if historyAPI?.isBackendLoaded == true {
+            if historyAPI.isBackendLoaded == true {
                 performHistoryMigrationIfNeeded { success in
                     completion(success)
                 }
             } else {
                 // Wait for the history service to load before we attempt to perform migration!
-                self.historyObserver = historyAPI?.add(HistoryServiceLoadedObserver({ [weak self] in
+                self.historyObserver = historyAPI.add(HistoryServiceLoadedObserver({ [weak self] in
                     guard let self = self else { return }
                     self.historyObserver?.destroy()
                     self.historyObserver = nil
@@ -331,7 +331,7 @@ extension BraveCoreMigrator {
         }
 
         let historyNode = HistoryNode(url: url, title: title, dateAdded: dateAdded)
-        historyAPI?.addHistory(historyNode, isURLTyped: true)
+        historyAPI.addHistory(historyNode, isURLTyped: true)
         
         return true
     }

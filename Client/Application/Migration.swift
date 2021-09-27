@@ -14,9 +14,13 @@ private let log = Logger.browserLogger
 class Migration {
     
     private(set) public var braveCoreSyncObjectsMigrator: BraveCoreMigrator?
+    private let bookmarksAPI: BraveBookmarksAPI
+    private let historyAPI: BraveHistoryAPI
     private let syncAPI: BraveSyncAPI
     
-    public init(syncAPI: BraveSyncAPI) {
+    public init(bookmarksAPI: BraveBookmarksAPI, historyAPI: BraveHistoryAPI, syncAPI: BraveSyncAPI) {
+        self.bookmarksAPI = bookmarksAPI
+        self.historyAPI = historyAPI
         self.syncAPI = syncAPI
     }
     
@@ -35,7 +39,9 @@ class Migration {
         
         // `.migrate` is called in `BrowserViewController.viewDidLoad()`
         if !Migration.isChromiumMigrationCompleted {
-            braveCoreSyncObjectsMigrator = BraveCoreMigrator()
+            braveCoreSyncObjectsMigrator = BraveCoreMigrator(bookmarksAPI: bookmarksAPI,
+                                                             historyAPI: historyAPI,
+                                                             syncAPI: syncAPI)
         }
         
         if !Preferences.Migration.playlistV1FileSettingsLocationCompleted.value {

@@ -85,7 +85,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         }
         
         braveCore.setUserAgent(UserAgent.mobile)
-        migration = Migration(syncAPI: braveCore.syncAPI)
+        migration = Migration(bookmarksAPI: braveCore.bookmarksAPI,
+                              historyAPI: braveCore.historyAPI,
+                              syncAPI: braveCore.syncAPI)
         
         AdBlockStats.shared.startLoading()
         HttpsEverywhereStats.shared.startLoading()
