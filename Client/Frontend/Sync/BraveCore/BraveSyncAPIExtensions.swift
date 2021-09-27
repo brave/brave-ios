@@ -9,6 +9,8 @@ import BraveShared
 
 extension BraveSyncAPI {
     
+    public static let seedByteLength = 32
+    
     var isInSyncGroup: Bool {
         return Preferences.Chromium.syncEnabled.value
     }

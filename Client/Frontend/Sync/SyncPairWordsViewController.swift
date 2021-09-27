@@ -14,7 +14,6 @@ class SyncPairWordsViewController: SyncViewController {
     var scrollView: UIScrollView!
     var containerView: UIView!
     var codewordsView: SyncCodewordsView!
-    private let seedByteLength = 32
 
     lazy var wordCountLabel: UILabel = {
         let label = UILabel()
@@ -188,7 +187,7 @@ class SyncPairWordsViewController: SyncViewController {
         let codes = self.codewordsView.codeWords()
 
         // Maybe temporary validation, sync server has issues without this validation
-        if codes.count < seedByteLength / 2 {
+        if codes.count < BraveSyncAPI.seedByteLength / 2 {
             alert(title: Strings.notEnoughWordsTitle, message: Strings.notEnoughWordsDescription)
             return
         }

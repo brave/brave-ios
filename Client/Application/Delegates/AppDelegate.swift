@@ -178,8 +178,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         let crashedLastSession = !Preferences.AppState.backgroundedCleanly.value && AppConstants.buildChannel != .debug
         Preferences.AppState.backgroundedCleanly.value = false
 
-        // TODO: Remove brave-core APIs force-unwrapping after IOS-4166 merged
-        // History API and Bookmarks API should not be nullable on brave-core side
         browserViewController = BrowserViewController(
             profile: self.profile!,
             tabManager: self.tabManager,

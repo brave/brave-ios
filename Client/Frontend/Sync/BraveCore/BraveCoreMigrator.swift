@@ -53,12 +53,11 @@ class BraveCoreMigrator {
     private var historyObserver: HistoryServiceListener?
     
     public init(bookmarksAPI: BraveBookmarksAPI, historyAPI: BraveHistoryAPI, syncAPI: BraveSyncAPI) {
+        self.bookmarksAPI = bookmarksAPI
+        self.historyAPI = historyAPI
+        self.syncAPI = syncAPI
         
-            self.bookmarksAPI = bookmarksAPI
-            self.historyAPI = historyAPI
-            self.syncAPI = syncAPI
-        
-        // Check If Chromium Sync Objects Migration is complete (Bookmarks-History-PAssword)
+        // Check If Chromium Sync Objects Migration is complete (Bookmarks-History)
         if Migration.isChromiumMigrationCompleted {
             migrationObserver = .completed
         }
@@ -153,7 +152,7 @@ extension BraveCoreMigrator {
         if !Preferences.Chromium.syncV2BookmarksMigrationCompleted.value {
             // If the bookmark model has already loaded, the observer does NOT get called!
             // Therefore we should continue to migrate the bookmarks
-            if bookmarksAPI.isLoaded == true {
+            if bookmarksAPI.isLoaded {
                 performBookmarkMigrationIfNeeded { success in
                     completion(success)
                 }
@@ -276,7 +275,7 @@ extension BraveCoreMigrator {
         if !Preferences.Chromium.syncV2HistoryMigrationCompleted.value {
             // If the history model has already loaded, the observer does NOT get called!
             // Therefore we should continue to migrate the history
-            if historyAPI.isBackendLoaded == true {
+            if historyAPI.isBackendLoaded {
                 performHistoryMigrationIfNeeded { success in
                     completion(success)
                 }
