@@ -67,8 +67,7 @@ class PlaylistSettingsViewController: TableViewController {
             Section(
                 rows: [
                     .boolRow(title: Strings.PlayList.urlBarButtonOptionTitle, option: Preferences.Playlist.enablePlaylistURLBarButton),
-                ],
-                footer: .title(Strings.PlayList.urlBarButtonOptionFooterText)
+                ]
             ),
             Section(
                 rows: [
