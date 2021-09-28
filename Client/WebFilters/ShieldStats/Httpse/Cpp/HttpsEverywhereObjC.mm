@@ -8,7 +8,6 @@ HTTPSEverywhere httpse;
 
 -(void)load:(NSString* )path
 {
-    
     if ([self isLoaded]) {
         httpse.close();
     }
@@ -22,26 +21,22 @@ HTTPSEverywhere httpse;
 
 -(void)close
 {
-    @synchronized(self) {
-        httpse.close();
-    }
+    httpse.close();
 }
 
 - (NSString *)tryRedirectingUrl:(NSURL *)url
 {
-    @synchronized(self) {
-        NSString *host = url.host;
-        if (!host || host.length < 1) {
-            return @"";
-        }
-        NSString *path = [url.absoluteString stringByReplacingOccurrencesOfString:[@"http://" stringByAppendingString:host]
-                                                      withString:@""];
-        if (path.length < 1) {
-            path = @"/";
-        }
-        std::string result = httpse.getHTTPSURL(host ? host.UTF8String : "" , path ? path.UTF8String : "");
-        return [NSString stringWithUTF8String:result.c_str()];
+    NSString *host = url.host;
+    if (!host || host.length < 1) {
+        return @"";
     }
+    NSString *path = [url.absoluteString stringByReplacingOccurrencesOfString:[@"http://" stringByAppendingString:host]
+                                                                   withString:@""];
+    if (path.length < 1) {
+        path = @"/";
+    }
+    std::string result = httpse.getHTTPSURL(host ? host.UTF8String : "" , path ? path.UTF8String : "");
+    return [NSString stringWithUTF8String:result.c_str()];
 }
 
 @end
