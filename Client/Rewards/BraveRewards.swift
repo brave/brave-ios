@@ -25,7 +25,7 @@ class BraveRewards: NSObject {
     
     private let configuration: Configuration
     
-    init(configuration: Configuration, buildChannel: Ads.BraveAdsBuildChannel?) {
+    init(configuration: Configuration, buildChannel: Ads.BuildChannel?) {
         self.configuration = configuration
         
         BraveAds.isDebug = configuration.ledgerEnvironment != .production
@@ -264,8 +264,8 @@ extension BraveRewards {
     struct Configuration {
         var storageURL: URL
         var ledgerEnvironment: Ledger.Environment
-        var adsEnvironment: Ads.BraveAdsEnvironment
-        var adsBuildChannel: Ads.BraveAdsBuildChannel = .init()
+        var adsEnvironment: Ads.Environment
+        var adsBuildChannel: Ads.BuildChannel = .init()
         var isTesting: Bool = false
         var overridenNumberOfSecondsBetweenReconcile: Int = 0
         var retryInterval: Int = 0
@@ -274,7 +274,7 @@ extension BraveRewards {
             .init(
                 storageURL: FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!,
                 ledgerEnvironment: .development,
-                adsEnvironment: .development
+                adsEnvironment: .staging
             )
         }
         static var staging: Configuration {
@@ -293,7 +293,7 @@ extension BraveRewards {
             .init(
                 storageURL: URL(fileURLWithPath: NSTemporaryDirectory()),
                 ledgerEnvironment: .development,
-                adsEnvironment: .development,
+                adsEnvironment: .staging,
                 isTesting: true,
                 overridenNumberOfSecondsBetweenReconcile: 30,
                 retryInterval: 30
