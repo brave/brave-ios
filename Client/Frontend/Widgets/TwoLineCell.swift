@@ -32,8 +32,6 @@ class TwoLineTableViewCell: UITableViewCell, TableViewReusable {
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
-
-        backgroundColor = .secondaryBraveBackground
         
         contentView.addSubview(_textLabel)
         contentView.addSubview(_detailTextLabel)
@@ -101,6 +99,8 @@ class SiteTableViewCell: TwoLineTableViewCell {
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
+        backgroundColor = .secondaryBraveBackground
+
         twoLineHelper.setUpViews(contentView, textLabel: textLabel!, detailTextLabel: detailTextLabel!, imageView: imageView!)
     }
 
@@ -123,6 +123,8 @@ class BookmarkTableViewCell: TwoLineTableViewCell {
         super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
         guard let textLabel = textLabel, let detailTextLabel = detailTextLabel,
               let imageView = imageView else { return }
+        
+        backgroundColor = .secondaryBraveBackground
         
         twoLineHelper.setUpViews(contentView,
                                  textLabel: textLabel,

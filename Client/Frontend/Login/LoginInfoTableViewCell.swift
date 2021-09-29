@@ -108,7 +108,6 @@ class LoginInfoTableViewCell: UITableViewCell, TableViewReusable {
     // MARK: Internal
     
     private func applyTheme() {
-        backgroundColor = .secondaryBraveBackground
         selectionStyle = .none
         separatorInset = .zero
         
