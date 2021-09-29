@@ -247,9 +247,18 @@ extension LoginListViewController {
             let loginDetailsViewController = LoginInfoViewController(profile: profile, loginEntry: loginEntry)
             loginDetailsViewController.settingsDelegate = settingsDelegate
             navigationController?.pushViewController(loginDetailsViewController, animated: true)
+            
+            return indexPath
         }
         
         return nil
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if indexPath.section == Section.savedLogins.rawValue {
+            fetchLoginInfo()
+            searchController.isActive = false
+        }
     }
 
     // Determine whether to show delete button in edit mode
