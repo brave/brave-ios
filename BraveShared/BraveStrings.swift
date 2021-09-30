@@ -2381,6 +2381,18 @@ extension Strings {
                               bundle: .braveShared,
                               value: "Created %@",
                               comment: "The message displayed in alert when a login entry deleted")
+        public static let loginInfoSetPasscodeAlertTitle =
+            NSLocalizedString("login.loginInfoSetPasscodeAlertTitle",
+                              tableName: "BraveShared",
+                              bundle: .braveShared,
+                              value: "Set a Passcode",
+                              comment: "The title displayed in alert when a user needs to set passcode")
+        public static let loginInfoSetPasscodeAlertDescription =
+            NSLocalizedString("login.loginInfoSetPasscodeAlertDescription",
+                              tableName: "BraveShared",
+                              bundle: .braveShared,
+                              value: "To see passwords, you must first set a passcode on your device.",
+                              comment: "The message displayed in alert when a user needs to set a passcode")
     }
 }
 

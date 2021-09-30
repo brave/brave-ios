@@ -371,7 +371,7 @@ extension LoginInfoViewController: LoginInfoTableViewCellDelegate {
         dismiss(animated: true, completion: nil)
     }
     
-    func didSelectReveal(_ cell: LoginInfoTableViewCell) {
+    func didSelectReveal(_ cell: LoginInfoTableViewCell) -> Bool {
         askForAuthentication()
     }
     

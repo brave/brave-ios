@@ -6,6 +6,7 @@
 import Foundation
 import BraveShared
 import BraveUI
+import Shared
 
 class LoginAuthViewController: UITableViewController {
         
@@ -47,14 +48,31 @@ class LoginAuthViewController: UITableViewController {
     
     // MARK: Internal
     
-    func askForAuthentication() {
-        guard let appDelegate = (UIApplication.shared.delegate as? AppDelegate) else {
-            return
+    func askForAuthentication() -> Bool {
+        guard let windowProtection = (UIApplication.shared.delegate as? AppDelegate)?.windowProtection else {
+            return false
         }
 
-        appDelegate.windowProtection?.presentAuthenticationForViewController(determineLockWithPasscode: false)
+        if !windowProtection.isPassCodeAvailable {
+            showSetPasscodeError()
+            return false
+        } else {
+            windowProtection.presentAuthenticationForViewController(determineLockWithPasscode: false)
+            return true
+        }
     }
 
+    func showSetPasscodeError() {
+        let alert = UIAlertController(
+            title: Strings.Login.loginInfoSetPasscodeAlertTitle,
+            message: Strings.Login.loginInfoSetPasscodeAlertDescription,
+            preferredStyle: .alert)
+        
+        alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
+        
+        present(alert, animated: true, completion: nil)
+    }
+    
     // MARK: Private
     
     private var blurredSnapshotView: UIView?

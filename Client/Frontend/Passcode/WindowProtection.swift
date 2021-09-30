@@ -68,6 +68,16 @@ class WindowProtection {
         }
     }
     
+    var isPassCodeAvailable: Bool {
+        var error: NSError?
+        if !context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error),
+           (error as? LAError)?.code == .passcodeNotSet {
+            return false
+        }
+
+        return true
+    }
+    
     init?(window: UIWindow) {
         guard let scene = window.windowScene else { return nil }
         protectedWindow = window
