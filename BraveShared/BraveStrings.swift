@@ -1217,8 +1217,14 @@ extension Strings {
         public static let urlBarButtonOptionTitle =
             NSLocalizedString("playlist.urlBarButtonOptionTitle",
                               bundle: .braveShared,
-                              value: "Enable toolbar button",
-                              comment: "Title for playlist URL-Bar option")
+                              value: "Enable quick-access button",
+                              comment: "Title for option to disable URL-Bar button")
+        
+        public static let urlBarButtonOptionFooter =
+            NSLocalizedString("playlist.urlBarButtonOptionFooter",
+                              bundle: .braveShared,
+                              value: "Adds a playlist button (it looks like 4 lines with a + symbol) beside the address bar in the Brave browser. This button gives you quick access to open Playlist, or add or remove media.",
+                              comment: "Footer for option to disable URL-Bar button")
         
         public static let menuBadgeOptionTitle =
             NSLocalizedString("playlist.menuBadgeOptionTitle",
