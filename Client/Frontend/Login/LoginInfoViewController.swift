@@ -253,12 +253,12 @@ extension LoginInfoViewController {
 extension LoginInfoViewController {
     
     @objc private func edit() {
-        isEditingFieldData = true
-        
         navigationItem.rightBarButtonItem =
             UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(doneEditing))
 
         cellForItem(InfoItem.usernameItem)?.descriptionTextField.becomeFirstResponder()
+        
+        isEditingFieldData = true
     }
     
     private func showActionMenu(for indexPath: IndexPath) {
@@ -275,12 +275,12 @@ extension LoginInfoViewController {
     }
     
     @objc private func doneEditing() {
-        isEditingFieldData = false
         navigationItem.rightBarButtonItem =
             UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(edit))
         
         guard let username = usernameField?.text, let password = passwordField?.text,
               username != loginEntry.username || password != loginEntry.password else {
+            isEditingFieldData = false
             return
         }
                 
@@ -295,6 +295,8 @@ extension LoginInfoViewController {
                 }
             }
         }
+        
+        isEditingFieldData = false
     }
     
     private func deleteLogin() {
