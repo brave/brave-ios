@@ -118,6 +118,8 @@ extension LoginInfoViewController {
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         switch section {
             case Section.delete.rawValue:
+                // This is added because of the undesired separator over the Delete Row.
+                // An easy way of keeping separator over the created row but not underneath it
                 return 1
             case Section.information.rawValue:
                 return UX.standardItemHeight
@@ -253,12 +255,12 @@ extension LoginInfoViewController {
 extension LoginInfoViewController {
     
     @objc private func edit() {
-        navigationItem.rightBarButtonItem =
-            UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(doneEditing))
-
-        cellForItem(InfoItem.usernameItem)?.descriptionTextField.becomeFirstResponder()
-        
         isEditingFieldData = true
+        
+        cellForItem(InfoItem.usernameItem)?.descriptionTextField.becomeFirstResponder()
+
+        navigationItem.rightBarButtonItem =
+            UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
     }
     
     private func showActionMenu(for indexPath: IndexPath) {
@@ -274,29 +276,34 @@ extension LoginInfoViewController {
         UIMenuController.shared.showMenu(from: tableView, rect: cell.frame)
     }
     
-    @objc private func doneEditing() {
-        navigationItem.rightBarButtonItem =
-            UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(edit))
-        
+    @objc private func done() {
+        updateLoginInfo { [weak self] in
+            guard let self = self else { return }
+
+            self.isEditingFieldData = false
+            self.tableView.reloadData()
+            self.navigationItem.rightBarButtonItem =
+                UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(self.edit))
+        }
+    }
+    
+    private func updateLoginInfo(completion: @escaping () -> Void) {
         guard let username = usernameField?.text, let password = passwordField?.text,
               username != loginEntry.username || password != loginEntry.password else {
-            isEditingFieldData = false
+            completion()
             return
         }
                 
         loginEntry.update(password: password, username: username)
         
-        profile.logins.updateLoginByGUID(loginEntry.guid, new: loginEntry, significant: true).upon { [weak self] result in
+        profile.logins.updateLoginByGUID(loginEntry.guid, new: loginEntry, significant: true).upon { result in
             DispatchQueue.main.async {
-                if result.isSuccess {
-                    self?.tableView.reloadData()
-                } else {
+                if !result.isSuccess {
                     log.error("Error while updating a login entry. Error Reason: \(result.failureValue ?? "")")
                 }
+                completion()
             }
         }
-        
-        isEditingFieldData = false
     }
     
     private func deleteLogin() {
@@ -339,7 +346,7 @@ extension LoginInfoViewController: LoginInfoTableViewCellDelegate {
                 cellForItem(InfoItem.passwordItem)?.descriptionTextField.becomeFirstResponder()
                 return false
             case InfoItem.passwordItem.rawValue:
-                doneEditing()
+                done()
                 return true
             default:
                 return true
