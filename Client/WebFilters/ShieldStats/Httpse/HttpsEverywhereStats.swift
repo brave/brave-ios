@@ -46,12 +46,12 @@ class HttpsEverywhereStats: LocalAdblockResourceProtocol {
     }
     
     func tryRedirectingUrl(_ url: URL, _ completion: @escaping(Bool) -> Void) {
-        
-        if url.scheme?.starts(with: "https") == true {
-            completion(false)
-        }
-        
         loadDbQueue.async {
+            if url.scheme?.starts(with: "https") == true {
+                completion(false)
+                return
+            }
+            
             if let redirectUrl = self.httpseDb.tryRedirectingUrl(url) {
                 let result = redirectUrl.isEmpty ? false : true
                 completion(result)
