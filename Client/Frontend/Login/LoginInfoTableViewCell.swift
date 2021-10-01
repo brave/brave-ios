@@ -175,7 +175,7 @@ extension LoginInfoTableViewCell: MenuHelperInterface {
     }
 
     func menuHelperCopy() {
-        let expireDate = Date().addingTimeInterval(TimeInterval(60*5)) // 5 minutes
+        let expireDate = Date().addingTimeInterval(5.minutes)
                 
         UIPasteboard.general.setItems([[UIPasteboard.typeAutomatic: descriptionTextField.text ?? ""]],
                                       options: [UIPasteboard.OptionsKey.expirationDate: expireDate])

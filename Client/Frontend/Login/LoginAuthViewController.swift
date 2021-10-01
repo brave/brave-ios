@@ -48,6 +48,7 @@ class LoginAuthViewController: UITableViewController {
     
     // MARK: Internal
     
+    @discardableResult
     func askForAuthentication() -> Bool {
         guard let windowProtection = (UIApplication.shared.delegate as? AppDelegate)?.windowProtection else {
             return false
