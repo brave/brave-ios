@@ -159,6 +159,7 @@ extension LoginInfoViewController {
                             $0.descriptionTextField.keyboardType = .emailAddress
                             $0.descriptionTextField.returnKeyType = .next
                             $0.isEditingFieldData = isEditingFieldData
+                            $0.contentView.alpha = 1.0
                             $0.tag = InfoItem.usernameItem.rawValue
                         }
                         
@@ -176,6 +177,7 @@ extension LoginInfoViewController {
                             $0.descriptionTextField.returnKeyType = .done
                             $0.displayDescriptionAsPassword = true
                             $0.isEditingFieldData = isEditingFieldData
+                            $0.contentView.alpha = 1.0
                             $0.tag = InfoItem.passwordItem.rawValue
                         }
                         
