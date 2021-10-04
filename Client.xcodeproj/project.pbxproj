@@ -877,7 +877,6 @@
 		CA8D5C1026D7CDAF009BF13D /* PlaylistListViewController+DragDropDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA8D5C0F26D7CDAF009BF13D /* PlaylistListViewController+DragDropDelegate.swift */; };
 		CA8D5C1226D7CDCD009BF13D /* PlaylistListViewController+TableViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA8D5C1126D7CDCD009BF13D /* PlaylistListViewController+TableViewDataSource.swift */; };
 		CA8D5C1426D7CDEB009BF13D /* PlaylistListViewController+TableViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA8D5C1326D7CDEB009BF13D /* PlaylistListViewController+TableViewDelegate.swift */; };
-		CA8D5C1626D7CE04009BF13D /* PlaylistListViewController..swift in Sources */ = {isa = PBXBuildFile; fileRef = CA8D5C1526D7CE04009BF13D /* PlaylistListViewController..swift */; };
 		CA8D5C1826D7CE2E009BF13D /* PlaylistViewController+AVDelegates.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA8D5C1726D7CE2E009BF13D /* PlaylistViewController+AVDelegates.swift */; };
 		CA8D5C1A26D7CE46009BF13D /* PlaylistViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA8D5C1926D7CE46009BF13D /* PlaylistViewController.swift */; };
 		CA8D5C1C26D7CF04009BF13D /* PlaylistCarplayManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA8D5C1B26D7CF04009BF13D /* PlaylistCarplayManager.swift */; };
@@ -891,6 +890,7 @@
 		CA9A233426B97B4300923D70 /* PlaylistMenuButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA9A233326B97B4300923D70 /* PlaylistMenuButton.swift */; };
 		CA9A234126B97B8400923D70 /* MenuButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA9A234026B97B8400923D70 /* MenuButton.swift */; };
 		CAA0BD9026F2562D00F14212 /* PrivilegedRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAA0BD8F26F2562D00F14212 /* PrivilegedRequest.swift */; };
+		CAA0BDE026F4D76600F14212 /* PlaylistListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAA0BDD426F4D76600F14212 /* PlaylistListViewController.swift */; };
 		CAA10597266FE94700A0372D /* RecentSearchQRCodeScannerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAA1058B266FE94700A0372D /* RecentSearchQRCodeScannerController.swift */; };
 		CAADEFB326E26A9D0020DC4C /* CPTemplateApplicationSceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAADEFB226E26A9D0020DC4C /* CPTemplateApplicationSceneDelegate.swift */; };
 		CAADEFE026E2707F0020DC4C /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAADEFDF26E2707F0020DC4C /* SceneDelegate.swift */; };
@@ -2586,7 +2586,6 @@
 		CA8D5C0F26D7CDAF009BF13D /* PlaylistListViewController+DragDropDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlaylistListViewController+DragDropDelegate.swift"; sourceTree = "<group>"; };
 		CA8D5C1126D7CDCD009BF13D /* PlaylistListViewController+TableViewDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlaylistListViewController+TableViewDataSource.swift"; sourceTree = "<group>"; };
 		CA8D5C1326D7CDEB009BF13D /* PlaylistListViewController+TableViewDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlaylistListViewController+TableViewDelegate.swift"; sourceTree = "<group>"; };
-		CA8D5C1526D7CE04009BF13D /* PlaylistListViewController..swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistListViewController..swift; sourceTree = "<group>"; };
 		CA8D5C1726D7CE2E009BF13D /* PlaylistViewController+AVDelegates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlaylistViewController+AVDelegates.swift"; sourceTree = "<group>"; };
 		CA8D5C1926D7CE46009BF13D /* PlaylistViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistViewController.swift; sourceTree = "<group>"; };
 		CA8D5C1B26D7CF04009BF13D /* PlaylistCarplayManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistCarplayManager.swift; sourceTree = "<group>"; };
@@ -2601,6 +2600,7 @@
 		CA9A233326B97B4300923D70 /* PlaylistMenuButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistMenuButton.swift; sourceTree = "<group>"; };
 		CA9A234026B97B8400923D70 /* MenuButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuButton.swift; sourceTree = "<group>"; };
 		CAA0BD8F26F2562D00F14212 /* PrivilegedRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivilegedRequest.swift; sourceTree = "<group>"; };
+		CAA0BDD426F4D76600F14212 /* PlaylistListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlaylistListViewController.swift; sourceTree = "<group>"; };
 		CAA1058B266FE94700A0372D /* RecentSearchQRCodeScannerController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecentSearchQRCodeScannerController.swift; sourceTree = "<group>"; };
 		CAADEFB226E26A9D0020DC4C /* CPTemplateApplicationSceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPTemplateApplicationSceneDelegate.swift; sourceTree = "<group>"; };
 		CAADEFDF26E2707F0020DC4C /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -5033,7 +5033,7 @@
 				CA8D5C0F26D7CDAF009BF13D /* PlaylistListViewController+DragDropDelegate.swift */,
 				CA8D5C1126D7CDCD009BF13D /* PlaylistListViewController+TableViewDataSource.swift */,
 				CA8D5C1326D7CDEB009BF13D /* PlaylistListViewController+TableViewDelegate.swift */,
-				CA8D5C1526D7CE04009BF13D /* PlaylistListViewController..swift */,
+				CAA0BDD426F4D76600F14212 /* PlaylistListViewController.swift */,
 				CA8D5C1726D7CE2E009BF13D /* PlaylistViewController+AVDelegates.swift */,
 				CA8D5C1926D7CE46009BF13D /* PlaylistViewController.swift */,
 				CAADEFE126E2857F0020DC4C /* PlaylistCarplayControllerIOS14.swift */,
@@ -7244,7 +7244,6 @@
 				0A0A5ED125B1F080007B3E74 /* DefaultBrowserIntroManager.swift in Sources */,
 				442477FA268CB86F008A04D7 /* BraveSearchDebugMenuDetail.swift in Sources */,
 				27AD20CC26851DD100889AA7 /* BraveRewards.swift in Sources */,
-				CA8D5C1626D7CE04009BF13D /* PlaylistListViewController..swift in Sources */,
 				0A8ABE19247435E30062DA81 /* BraveVPNCommonUI.swift in Sources */,
 				A13AC72520EC12360040D4BB /* Migration.swift in Sources */,
 				27201EFC24535C2F00C19DD1 /* NewTabPageFlowLayout.swift in Sources */,
@@ -7465,6 +7464,7 @@
 				D0E55C4F1FB4FD23006DC274 /* FormPostHelper.swift in Sources */,
 				E650754E1E37F6AE006961AC /* GeometryExtensions.swift in Sources */,
 				D3972BF41C22412B00035B87 /* TitleActivityItemProvider.swift in Sources */,
+				CAA0BDE026F4D76600F14212 /* PlaylistListViewController.swift in Sources */,
 				4422D4EE21BFFB7600BF1855 /* table_cache.cc in Sources */,
 				2784874524DC658C0004F03C /* BraveNewsEmptyFeedView.swift in Sources */,
 				27829E092548AA8B007CF0B2 /* BraveRewardsView.swift in Sources */,

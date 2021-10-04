@@ -159,6 +159,18 @@ class VideoTrackerBar: UIView {
     
     private let slider = VideoSliderBar()
     
+    private let formatter = DateComponentsFormatter().then {
+        $0.allowedUnits = [.day, .hour, .minute, .second]
+        $0.unitsStyle = .positional
+        $0.zeroFormattingBehavior = [.dropLeading, .pad]
+    }
+    
+    private let minimumFormatter = DateComponentsFormatter().then {
+        $0.allowedUnits = [.minute, .second]
+        $0.unitsStyle = .positional
+        $0.zeroFormattingBehavior = [.pad]
+    }
+    
     private let currentTimeLabel = UILabel().then {
         $0.text = "00:00"
         $0.textColor = .white
@@ -234,20 +246,34 @@ class VideoTrackerBar: UIView {
     
     private func timeToString(_ time: CMTime) -> String {
         let totalSeconds = abs(CMTimeGetSeconds(time))
+        if Int(totalSeconds) > 3600,
+            let result = formatter.string(from: totalSeconds) {
+            // It is necessary to use the correct formatter because the formatter
+            // can drop leading zeroes which will cause `0s` to show instead of `00:00`
+            // Also if all zeroes are dropped and padded, it formats as `00`.
+            // We need to display a minimum format of `00:00`
+            // So we have a minimumFormatter (< 1h) and a regular formatter (>= 1h).
+            return result
+        } else if let result = minimumFormatter.string(from: totalSeconds) {
+            return result
+        }
+        
+        // If the DateFormatter cannot parse the seconds into the correct components
+        // We can do so manually if necessary.
         let days = floor(totalSeconds.remainder(dividingBy: 31536000.0) / 86400.0)
         let hours = floor(totalSeconds.remainder(dividingBy: 86400.0) / 3600.0)
         let minutes = floor(totalSeconds.remainder(dividingBy: 3600.0) / 60.0)
         let seconds = floor(totalSeconds.remainder(dividingBy: 60.0))
-        
+
         var result = ""
         if Int(days) > 0 {
             result += String(format: "%02zu:", Int(days))
         }
-        
+
         if Int(hours) > 0 {
             result += String(format: "%02zu:", Int(hours))
         }
-        
+
         return result + String(format: "%02zu:%02zu", Int(minutes), Int(seconds))
     }
 }

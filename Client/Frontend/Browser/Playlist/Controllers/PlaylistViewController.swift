@@ -615,6 +615,10 @@ extension PlaylistViewController: VideoViewDelegate {
         onExitFullscreen()
     }
     
+    func onFavIconSelected(_ videoView: VideoView) {
+        listController.onFavIconSelected(videoView)
+    }
+    
     func play(_ videoView: VideoView) {
         if isPlaying {
             playerView.toggleOverlays(showOverlay: playerView.isOverlayDisplayed)

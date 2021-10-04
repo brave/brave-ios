@@ -16,6 +16,23 @@ private let log = Logger.browserLogger
 
 extension PlaylistListViewController: UITableViewDelegate {
     
+    private func shareItem(_ item: PlaylistInfo) {
+        guard let url = URL(string: item.pageSrc) else {
+            return
+        }
+        
+        let itemsToShare: [Any] = [
+            url,
+            OptionalTextActivityItemSource(text: item.pageTitle)
+        ]
+        
+        let activityViewController = UIActivityViewController(activityItems: itemsToShare,
+                                                              applicationActivities: nil)
+        
+        activityViewController.excludedActivityTypes = [.openInIBooks, .saveToCameraRoll, .assignToContact]
+        self.present(activityViewController, animated: true, completion: nil)
+    }
+    
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         
         if indexPath.row < 0 || indexPath.row >= PlaylistManager.shared.numberOfAssets {
@@ -92,6 +109,37 @@ extension PlaylistListViewController: UITableViewDelegate {
             
             completionHandler(true)
         })
+        
+        let shareAction = UIContextualAction(style: .normal, title: nil, handler: { [weak self] (action, view, completionHandler) in
+            guard let self = self else { return }
+            
+            let style: UIAlertController.Style = UIDevice.current.userInterfaceIdiom == .pad ? .alert : .actionSheet
+            let alert = UIAlertController(
+                title: Strings.PlayList.sharePlaylistActionTitle, message: Strings.PlayList.sharePlaylistActionDetailsTitle, preferredStyle: style)
+            
+            alert.addAction(UIAlertAction(title: Strings.PlayList.sharePlaylistOpenInNewTabTitle, style: .default, handler: { [weak self] _ in
+                guard let self = self else { return }
+                            
+                if let browser = PlaylistCarplayManager.shared.browserController,
+                   let pageURL = URL(string: currentItem.pageSrc) {
+                    
+                    self.dismiss(animated: true) {
+                        let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
+                        browser.openInNewTab(pageURL,
+                                             isPrivate: isPrivateBrowsing)
+                    }
+                }
+            }))
+            
+            alert.addAction(UIAlertAction(title: Strings.PlayList.sharePlaylistShareActionMenuTitle, style: .default, handler: { [weak self] _ in
+                self?.shareItem(currentItem)
+            }))
+            
+            alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil))
+            self.present(alert, animated: true, completion: nil)
+            
+            completionHandler(true)
+        })
 
         cacheAction.image = cacheState == .invalid ? #imageLiteral(resourceName: "playlist_download") : #imageLiteral(resourceName: "playlist_delete_download")
         cacheAction.backgroundColor = #colorLiteral(red: 0.4509803922, green: 0.4784313725, blue: 0.8705882353, alpha: 1)
@@ -99,7 +147,10 @@ extension PlaylistListViewController: UITableViewDelegate {
         deleteAction.image = #imageLiteral(resourceName: "playlist_delete_item")
         deleteAction.backgroundColor = #colorLiteral(red: 0.9176470588, green: 0.2274509804, blue: 0.05098039216, alpha: 1)
         
-        return UISwipeActionsConfiguration(actions: [deleteAction, cacheAction])
+        shareAction.image = UIImage(systemName: "square.and.arrow.up")
+        shareAction.backgroundColor = #colorLiteral(red: 0.1764705926, green: 0.4980392158, blue: 0.7568627596, alpha: 1)
+        
+        return UISwipeActionsConfiguration(actions: [deleteAction, shareAction, cacheAction])
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
