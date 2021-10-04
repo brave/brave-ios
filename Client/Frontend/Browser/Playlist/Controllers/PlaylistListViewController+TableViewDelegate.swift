@@ -6,6 +6,7 @@
 import Foundation
 import UIKit
 import BraveShared
+import BraveUI
 import Shared
 import Data
 import MediaPlayer
@@ -161,13 +162,13 @@ extension PlaylistListViewController: UITableViewDelegate {
         })
 
         cacheAction.image = cacheState == .invalid ? #imageLiteral(resourceName: "playlist_download") : #imageLiteral(resourceName: "playlist_delete_download")
-        cacheAction.backgroundColor = #colorLiteral(red: 0.4509803922, green: 0.4784313725, blue: 0.8705882353, alpha: 1)
+        cacheAction.backgroundColor = UIColor.braveDarkerBlurple
         
         deleteAction.image = #imageLiteral(resourceName: "playlist_delete_item")
-        deleteAction.backgroundColor = #colorLiteral(red: 0.9176470588, green: 0.2274509804, blue: 0.05098039216, alpha: 1)
+        deleteAction.backgroundColor = UIColor.braveErrorLabel
         
         shareAction.image = UIImage(systemName: "square.and.arrow.up")
-        shareAction.backgroundColor = #colorLiteral(red: 0.1764705926, green: 0.4980392158, blue: 0.7568627596, alpha: 1)
+        shareAction.backgroundColor = UIColor.braveInfoLabel
         
         return UISwipeActionsConfiguration(actions: [deleteAction, shareAction, cacheAction])
     }
