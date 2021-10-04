@@ -1244,10 +1244,16 @@ extension Strings {
                               value: "Open In New Tab",
                               comment: "Button Title of the ActionSheet/Alert Button when sharing a playlist item from the Swipe-Action")
         
+        public static let sharePlaylistOpenInNewPrivateTabTitle =
+            NSLocalizedString("playlist.sharePlaylistOpenInNewPrivateTabTitle",
+                              bundle: .braveShared,
+                              value: "Open In Private Tab",
+                              comment: "Button Title of the ActionSheet/Alert Button when sharing a playlist item from the Swipe-Action")
+        
         public static let sharePlaylistShareActionMenuTitle =
             NSLocalizedString("playlist.sharePlaylistShareActionMenuTitle",
                               bundle: .braveShared,
-                              value: "Share Playlist Item",
+                              value: "Share...",
                               comment: "Button Title of the ActionSheet/Alert Button when sharing a playlist item from the Swipe-Action")
         
         public static let menuBadgeOptionTitle =

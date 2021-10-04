@@ -111,20 +111,41 @@ extension PlaylistListViewController: UITableViewDelegate {
         let shareAction = UIContextualAction(style: .normal, title: nil, handler: { [weak self] (action, view, completionHandler) in
             guard let self = self else { return }
             
+            let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
             let style: UIAlertController.Style = UIDevice.current.userInterfaceIdiom == .pad ? .alert : .actionSheet
-            let alert = UIAlertController(
-                title: Strings.PlayList.sharePlaylistActionTitle, message: Strings.PlayList.sharePlaylistActionDetailsTitle, preferredStyle: style)
             
-            alert.addAction(UIAlertAction(title: Strings.PlayList.sharePlaylistOpenInNewTabTitle, style: .default, handler: { [weak self] _ in
+            let alert = UIAlertController(
+                title: currentItem.pageTitle,
+                message: nil,
+                preferredStyle: style)
+            
+            // If we're already in private browsing, this should not show
+            // Option to open in regular tab
+            if !isPrivateBrowsing {
+                alert.addAction(UIAlertAction(title: Strings.PlayList.sharePlaylistOpenInNewTabTitle, style: .default, handler: { [weak self] _ in
+                    guard let self = self else { return }
+                                
+                    if let browser = PlaylistCarplayManager.shared.browserController,
+                       let pageURL = URL(string: currentItem.pageSrc) {
+                        
+                        self.dismiss(animated: true) {
+                            browser.tabManager.addTabAndSelect(URLRequest(url: pageURL),
+                                                               isPrivate: false)
+                        }
+                    }
+                }))
+            }
+            
+            // Option to open in private browsing tab
+            alert.addAction(UIAlertAction(title: Strings.PlayList.sharePlaylistOpenInNewPrivateTabTitle, style: .default, handler: { [weak self] _ in
                 guard let self = self else { return }
                             
                 if let browser = PlaylistCarplayManager.shared.browserController,
                    let pageURL = URL(string: currentItem.pageSrc) {
                     
                     self.dismiss(animated: true) {
-                        let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
                         browser.tabManager.addTabAndSelect(URLRequest(url: pageURL),
-                                                           isPrivate: isPrivateBrowsing)
+                                                           isPrivate: true)
                     }
                 }
             }))
