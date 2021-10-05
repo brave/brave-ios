@@ -59,7 +59,7 @@ extension ContentBlockerHelper: TabContentScript {
         var req = URLRequest(url: url)
         req.mainDocumentURL = mainDocumentUrl
 
-        TPStatsBlocklistChecker.shared.isBlocked(request: req, domain: domain, resourceType: resourceType) { listItem in
+        TPStatsBlocklistChecker.shared.isBlocked(tab: tab, request: req, domain: domain, resourceType: resourceType) { listItem in
             DispatchQueue.main.async {
                 if let listItem = listItem {
                     if listItem == .https {
