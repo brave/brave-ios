@@ -282,7 +282,6 @@ class SearchEngines {
     /// Get all bundled (not custom) search engines, with the default search engine first,
     /// but the others in no particular order.
     class func getUnorderedBundledEngines(for selectedEngines: [String] = [],
-                                          isOnboarding: Bool,
                                           locale: Locale) -> [OpenSearchEngine] {
         let parser = OpenSearchParser(pluginMode: true)
 
@@ -292,7 +291,7 @@ class SearchEngines {
         }
 
         let se = InitialSearchEngines(locale: locale)
-        let engines = isOnboarding ? se.onboardingEngines : se.engines
+        let engines = se.engines
         let engineIdentifiers: [(id: String, reference: String?)] = engines.map { (id: ($0.customId ?? $0.id.rawValue).lowercased(), reference: $0.reference) }
         assert(!engineIdentifiers.isEmpty, "No search engines")
 
@@ -306,7 +305,6 @@ class SearchEngines {
         let selectedSearchEngines = [Preferences.Search.defaultEngineName, Preferences.Search.defaultPrivateEngineName].compactMap { $0.value }
         let unorderedEngines =
         SearchEngines.getUnorderedBundledEngines(for: selectedSearchEngines,
-                                                    isOnboarding: false,
                                                     locale: locale) + customEngines
 
         // might not work to change the default.

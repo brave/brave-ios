@@ -19,7 +19,7 @@ class OnboardingSearchEnginesViewController: OnboardingViewController {
     }
     
     private lazy var availableEngines: [OpenSearchEngine] = {
-        SearchEngines.getUnorderedBundledEngines(isOnboarding: true, locale: .current)
+        SearchEngines.getUnorderedBundledEngines(locale: .current)
     }()
     
     private var contentView: View {
