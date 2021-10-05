@@ -83,11 +83,14 @@ class OnboardingNavigationController: UINavigationController {
         
         /// Depending on device's region we may or may not show the search engine picker screen.
         private var searchEnginesScreenOrNil: Screens? {
-            guard let region = Locale.current.regionCode,
-                !InitialSearchEngines.braveSearchDefaultRegions.contains(region) else {
+            guard let region = Locale.current.regionCode else {
                 return nil
             }
-            return .searchEnginePicker
+            
+            let isBraveSearchDefaultRegion =
+            InitialSearchEngines.braveSearchDefaultRegions.contains(region)
+            
+            return isBraveSearchDefaultRegion ? nil : .searchEnginePicker
         }
     }
     
