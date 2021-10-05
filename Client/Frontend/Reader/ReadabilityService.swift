@@ -22,9 +22,8 @@ class ReadabilityOperation: Operation {
     var result: ReadabilityOperationResult?
     var tab: Tab!
     var readerModeCache: ReaderModeCache
-    private var rewards: BraveRewards?
 
-    init(url: URL, readerModeCache: ReaderModeCache, rewards: BraveRewards?) {
+    init(url: URL, readerModeCache: ReaderModeCache) {
         self.url = url
         self.semaphore = DispatchSemaphore(value: 0)
         self.readerModeCache = readerModeCache
@@ -119,19 +118,13 @@ class ReadabilityService {
     }
 
     private var queue: OperationQueue
-    private weak var rewards: BraveRewards?
 
     init() {
         queue = OperationQueue()
         queue.maxConcurrentOperationCount = ReadabilityServiceDefaultConcurrency
-        
-        // TODO: REFACTOR for Multiple Windows Support
-        self.rewards = UIApplication.shared.browserViewController?.rewards
     }
 
     func process(_ url: URL, cache: ReaderModeCache) {
-        queue.addOperation(ReadabilityOperation(url: url,
-                                                readerModeCache: cache,
-                                                rewards: rewards))
+        queue.addOperation(ReadabilityOperation(url: url, readerModeCache: cache))
     }
 }

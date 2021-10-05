@@ -341,11 +341,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         application.shortcutItems = Preferences.Privacy.privateBrowsingOnly.value ? [privateTabItem, scanQRCodeItem] : [newTabItem, privateTabItem, scanQRCodeItem]
     }
-
-    func application(_ application: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
-        log.debug("APPLICATION OPEN URL")
-        return true
-    }
     
     func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
         if let presentedViewController = window?.rootViewController?.presentedViewController {
@@ -439,23 +434,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func sceneInfo(for sceneSession: UISceneSession) -> SceneInfoModel? {
         return sceneInfo
-    }
-}
-
-// MARK: - NSUserActivity
-
-extension AppDelegate {
-    
-    func application(_ application: UIApplication, continue userActivity: NSUserActivity,
-                     restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
-        log.debug("APPLICATION CONTINUE USER-ACTIVITY")
-        return true
-    }
-    
-    func application(_ application: UIApplication, performActionFor shortcutItem: UIApplicationShortcutItem,
-                     completionHandler: @escaping (Bool) -> Void) {
-        log.debug("APPLICATION PERFORM ACTION FOR SHORTCUT")
-        completionHandler(true)
     }
 }
 

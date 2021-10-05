@@ -484,24 +484,3 @@ extension UIViewController {
         return nil
     }
 }
-
-extension UIApplication {
-    /// An application can have multiple UIScene and UISceneSession
-    /// Returns ALL `BrowserViewController` from EVERY scene.
-    var browserViewControllers: [BrowserViewController] {
-        return UIApplication.shared.connectedScenes.compactMap({
-            $0 as? UIWindowScene
-        }).flatMap({
-            $0.browserViewControllers
-        })
-    }
-    
-    /// Should NEVER be used
-    /// Returns the very first `BrowserViewController` found in any `UIScene`
-    /// within the entire application. If this function is being used, it is time to refactor your code.
-    var browserViewController: BrowserViewController? {
-        log.debug("********* WARNING *********: Accessing `browserViewController` on `UIApplication`!!!\n DOES NOT SUPPORT MULTIPLE WINDOWS.")
-        
-        return browserViewControllers.first
-    }
-}

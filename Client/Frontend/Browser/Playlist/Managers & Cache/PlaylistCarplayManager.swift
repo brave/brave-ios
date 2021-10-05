@@ -20,7 +20,7 @@ class PlaylistCarplayManager: NSObject {
     private weak var mediaPlayer: MediaPlayer?
     private(set) var isCarPlayAvailable = false
     
-    private var carPlayController: NSObject?
+    private var carPlayController: PlaylistCarplayController?
     private var carplayInterface: CPInterfaceController?
     private var carplaySessionConfiguration: CPSessionConfiguration?
     
@@ -51,7 +51,7 @@ class PlaylistCarplayManager: NSObject {
     // in use at any given moment
     static let shared = PlaylistCarplayManager()
     
-    func getCarPlayController() -> NSObject? {
+    func getCarPlayController() -> PlaylistCarplayController? {
         // On iOS 14, we use CPTemplate (Custom UI)
         // We control what gets displayed
         guard let carplayInterface = carplayInterface else {
@@ -89,7 +89,8 @@ class PlaylistCarplayManager: NSObject {
         let mediaPlayer = self.mediaPlayer ?? MediaPlayer()
         
         let playlistController = self.playlistController ??
-            PlaylistViewController(browser: browserController,
+            PlaylistViewController(openInNewTab: browserController?.openURLInNewTab,
+                                   profile: browserController?.profile,
                                    mediaPlayer: mediaPlayer,
                                    initialItem: initialItem,
                                    initialItemPlaybackOffset: initialItemPlaybackOffset)

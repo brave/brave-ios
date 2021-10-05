@@ -56,13 +56,18 @@ class PlaylistViewController: UIViewController {
     private var assetStateObservers = Set<AnyCancellable>()
     private var assetLoadingStateObservers = Set<AnyCancellable>()
     
-    private(set) weak var browser: BrowserViewController?
+    private var openInNewTab: ((_ url: URL?, _ isPrivate: Bool, _ isPrivileged: Bool) -> Void)?
     
-    init(browser: BrowserViewController?, mediaPlayer: MediaPlayer, initialItem: PlaylistInfo?, initialItemPlaybackOffset: Double) {
-        self.browser = browser
+    init(openInNewTab: ((URL?, Bool, Bool) -> Void)?,
+         profile: Profile?,
+         mediaPlayer: MediaPlayer,
+         initialItem: PlaylistInfo?,
+         initialItemPlaybackOffset: Double) {
+        
+        self.openInNewTab = openInNewTab
         self.player = mediaPlayer
         self.mediaStreamer = PlaylistMediaStreamer(playerView: playerView,
-                                                   certStore: browser?.profile.certStore)
+                                                   certStore: profile?.certStore)
         super.init(nibName: nil, bundle: nil)
         
         listController.initialItem = initialItem
@@ -460,7 +465,7 @@ extension PlaylistViewController: PlaylistViewControllerDelegate {
     }
     
     func openURLInNewTab(_ url: URL?, isPrivate: Bool, isPrivileged: Bool) {
-        browser?.openURLInNewTab(url, isPrivate: isPrivate, isPrivileged: isPrivileged)
+        openInNewTab?(url, isPrivate, isPrivileged)
     }
     
     var currentPlaylistItem: AVPlayerItem? {
