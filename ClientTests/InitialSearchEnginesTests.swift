@@ -54,8 +54,7 @@ class InitialSearchEnginesTests: XCTestCase {
                                           .ecosia])
         
         let onboardingEngines = localeSE.onboardingEngines.map { $0.id }
-        XCTAssertEqual(onboardingEngines, [.braveSearch,
-                                           .google,
+        XCTAssertEqual(onboardingEngines, [.google,
                                            .bing,
                                            .duckduckgo,
                                            .qwant,

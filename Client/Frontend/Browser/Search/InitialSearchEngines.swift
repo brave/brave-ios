@@ -27,8 +27,12 @@ class InitialSearchEngines {
         }
         
         func excludedFromOnboarding(for locale: Locale) -> Bool {
-            // At the moment there are no custom rules to skip a SE in onboarding.
-            false
+            switch self {
+            case .braveSearch: return true
+            // In general we want all engines to be pickable,
+            // hence using default clause here instead of picking engines one by one
+            default: return false
+            }
         }
     }
     
