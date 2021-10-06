@@ -22,8 +22,9 @@ class ReadabilityOperation: Operation {
     var result: ReadabilityOperationResult?
     var tab: Tab!
     var readerModeCache: ReaderModeCache
+    private var rewards: BraveRewards?
 
-    init(url: URL, readerModeCache: ReaderModeCache) {
+    init(url: URL, readerModeCache: ReaderModeCache, rewards: BraveRewards?) {
         self.url = url
         self.semaphore = DispatchSemaphore(value: 0)
         self.readerModeCache = readerModeCache
@@ -37,7 +38,7 @@ class ReadabilityOperation: Operation {
         // Setup a tab, attach a Readability helper. Kick all this off on the main thread since UIKit
         // and WebKit are not safe from other threads.
 
-        DispatchQueue.main.async(execute: { () -> Void in
+        DispatchQueue.main.async {
             let configuration = WKWebViewConfiguration()
             self.tab = Tab(configuration: configuration)
             self.tab.createWebview()
@@ -51,7 +52,7 @@ class ReadabilityOperation: Operation {
             // get a readability callback. Or it takes too long, in which case the semaphore
             // times out. The script on the page will retry every 500ms for 10 seconds.
             self.tab.loadRequest(URLRequest(url: self.url))
-        })
+        }
         let timeout = DispatchTime.now() + .seconds(10)
         if semaphore.wait(timeout: timeout) == .timedOut {
             result = ReadabilityOperationResult.timeout
@@ -117,14 +118,20 @@ class ReadabilityService {
         return ReadabilityServiceSharedInstance
     }
 
-    var queue: OperationQueue
+    private var queue: OperationQueue
+    private weak var rewards: BraveRewards?
 
     init() {
         queue = OperationQueue()
         queue.maxConcurrentOperationCount = ReadabilityServiceDefaultConcurrency
+        
+        // TODO: REFACTOR for Multiple Windows Support
+        self.rewards = UIApplication.shared.browserViewController?.rewards
     }
 
     func process(_ url: URL, cache: ReaderModeCache) {
-        queue.addOperation(ReadabilityOperation(url: url, readerModeCache: cache))
+        queue.addOperation(ReadabilityOperation(url: url,
+                                                readerModeCache: cache,
+                                                rewards: rewards))
     }
 }

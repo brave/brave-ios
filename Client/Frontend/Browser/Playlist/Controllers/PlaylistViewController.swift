@@ -31,6 +31,7 @@ protocol PlaylistViewControllerDelegate: AnyObject {
     func updateLastPlayedItem(item: PlaylistInfo)
     func displayLoadingResourceError()
     func displayExpiredResourceError(item: PlaylistInfo)
+    func openURLInNewTab(_ url: URL?, isPrivate: Bool, isPrivileged: Bool)
     
     var isPlaying: Bool { get }
     var currentPlaylistItem: AVPlayerItem? { get }
@@ -45,7 +46,7 @@ class PlaylistViewController: UIViewController {
 
     private let player: MediaPlayer
     private let playerView = VideoView()
-    private lazy var mediaStreamer = PlaylistMediaStreamer(playerView: playerView)
+    private let mediaStreamer: PlaylistMediaStreamer
     
     private let splitController = UISplitViewController()
     private lazy var listController = PlaylistListViewController(playerView: playerView)
@@ -55,12 +56,19 @@ class PlaylistViewController: UIViewController {
     private var assetStateObservers = Set<AnyCancellable>()
     private var assetLoadingStateObservers = Set<AnyCancellable>()
     
-    init(mediaPlayer: MediaPlayer, initialItem: PlaylistInfo?, initialItemPlaybackOffset: Double) {
+    private(set) weak var browser: BrowserViewController?
+    
+    init(browser: BrowserViewController?, mediaPlayer: MediaPlayer, initialItem: PlaylistInfo?, initialItemPlaybackOffset: Double) {
+        self.browser = browser
         self.player = mediaPlayer
+        self.mediaStreamer = PlaylistMediaStreamer(playerView: playerView,
+                                                   certStore: browser?.profile.certStore)
         super.init(nibName: nil, bundle: nil)
         
         listController.initialItem = initialItem
         listController.initialItemPlaybackOffset = initialItemPlaybackOffset
+        listController.delegate = self
+        detailController.delegate = self
     }
     
     required init?(coder: NSCoder) {
@@ -434,7 +442,7 @@ extension PlaylistViewController: PlaylistViewControllerDelegate {
     }
     
     func displayLoadingResourceError() {
-        let isPrimaryDisplayMode = splitController.preferredDisplayMode == .primaryOverlay
+        let isPrimaryDisplayMode = splitController.preferredDisplayMode == .oneOverSecondary
         if isPrimaryDisplayMode {
             listController.displayLoadingResourceError()
         } else {
@@ -443,12 +451,16 @@ extension PlaylistViewController: PlaylistViewControllerDelegate {
     }
     
     func displayExpiredResourceError(item: PlaylistInfo) {
-        let isPrimaryDisplayMode = splitController.preferredDisplayMode == .primaryOverlay
+        let isPrimaryDisplayMode = splitController.preferredDisplayMode == .oneOverSecondary
         if isPrimaryDisplayMode {
             listController.displayExpiredResourceError(item: item)
         } else {
             detailController.displayExpiredResourceError(item: item)
         }
+    }
+    
+    func openURLInNewTab(_ url: URL?, isPrivate: Bool, isPrivileged: Bool) {
+        browser?.openURLInNewTab(url, isPrivate: isPrivate, isPrivileged: isPrivileged)
     }
     
     var currentPlaylistItem: AVPlayerItem? {
