@@ -331,7 +331,7 @@ extension SceneDelegate {
 }
 
 extension SceneDelegate {
-    private func createBrowserWindow(scene: UIWindowScene, profile: Profile, diskImageStore: DiskImageStore?) -> BrowserViewController? {
+    private func createBrowserWindow(scene: UIWindowScene, profile: Profile, diskImageStore: DiskImageStore?, migration: Migration?) -> BrowserViewController? {
         // There has to be an application delegate
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
             return nil
@@ -351,6 +351,8 @@ extension SceneDelegate {
             diskImageStore: diskImageStore,
             historyAPI: appDelegate.braveCore.historyAPI!,
             bookmarkAPI: appDelegate.braveCore.bookmarksAPI!,
+            syncAPI: appDelegate.braveCore.syncAPI,
+            migration: migration,
             crashedLastSession: crashedLastSession)
         
         browserViewController.do {
