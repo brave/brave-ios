@@ -54,7 +54,7 @@ class TPStatsBlocklistChecker {
     static let shared = TPStatsBlocklistChecker()
     private let adblockSerialQueue = AdBlockStats.adblockSerialQueue
 
-    func isBlocked(tab: Tab?, request: URLRequest, domain: Domain, resourceType: TPStatsResourceType? = nil, _ completion: @escaping (BlocklistName?) -> Void) {
+    func isBlocked(request: URLRequest, domain: Domain, resourceType: TPStatsResourceType? = nil, _ completion: @escaping (BlocklistName?) -> Void) {
         
         guard let url = request.url, let host = url.host, !host.isEmpty else {
             // TP Stats init isn't complete yet
@@ -66,8 +66,8 @@ class TPStatsBlocklistChecker {
         // to avoid threading problems(#1094, #1096)
         assertIsMainThread("Getting enabled blocklists should happen on main thread")
         let domainBlockLists = BlocklistName.blocklists(forDomain: domain).on
-        let currentTabUrl = tab?.url
-        
+        let currentTabUrl = request.mainDocumentURL
+
         adblockSerialQueue.async {
             let enabledLists = domainBlockLists
             
