@@ -291,6 +291,16 @@ class PlaylistManager: NSObject {
             }
         }
         
+        // Delete playlist directory.
+        // Though it should already be empty
+        if let playlistDirectory = PlaylistDownloadManager.playlistDirectory {
+            do {
+                try FileManager.default.removeItem(at: playlistDirectory)
+            } catch {
+                log.error("Failed to delete Playlist Directory: \(error)")
+            }
+        }
+        
         // Delete system cache
         deleteUserManagedAssets()
     }
@@ -303,6 +313,21 @@ class PlaylistManager: NSObject {
                                                                        includingPropertiesForKeys: nil,
                                                                        options: [.skipsHiddenFiles])
                 for url in urls where url.absoluteString.contains("com.apple.UserManagedAssets") {
+                    do {
+                        let assets = try FileManager.default.contentsOfDirectory(at: url,
+                                                                                 includingPropertiesForKeys: nil,
+                                                                                 options: [.skipsHiddenFiles])
+                        assets.forEach({
+                            if let item = PlaylistItem.cachedItem(cacheURL: $0),
+                               let pageSrc = item.pageSrc {
+                                self.cancelDownload(item: PlaylistInfo(item: item))
+                                PlaylistItem.updateCache(pageSrc: pageSrc, cachedData: nil)
+                            }
+                        })
+                    } catch {
+                        log.error("Failed to update Playlist item cached state: \(error)")
+                    }
+                    
                     do {
                         try FileManager.default.removeItem(at: url)
                     } catch {
