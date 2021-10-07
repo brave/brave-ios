@@ -253,11 +253,6 @@ private class PlaylistHLSDownloadManager: NSObject, AVAssetDownloadDelegate {
     
     func cancelDownload(item: PlaylistInfo) {
         if let task = activeDownloadTasks.first(where: { $0.value.id == item.pageSrc })?.key {
-//            if task.state == .completed {
-//                activeDownloadTasks.removeValue(forKey: task)
-//                return
-//            }
-            
             pendingCancellationTasks.append(task)
             task.cancel() // will call didCompleteWithError which will cleanup the assets
         }
