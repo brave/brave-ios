@@ -9,23 +9,20 @@ import Shared
 
 struct NetworkConnectionView: View {
   private let bullets = ["View the addresses of your permitted accounts (required)"]
+  @ScaledMetric private var networkIconLength = 48.0
   
     var body: some View {
-      ScrollView {
+      ScrollView(.vertical) {
         VStack(spacing: 35) {
           Text("Mainnet")
-            .font(.headline)
-            .fontWeight(.light)
+            .font(.headline.weight(.light))
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(EdgeInsets(top: 28,
-                                leading: 24,
-                                bottom: 0,
-                                trailing: 0))
+            .padding(.horizontal, 24)
           
           VStack(spacing: 10) {
             Rectangle()
               .fill(Color(.tertiaryBraveBackground))
-              .frame(width: 48, height: 48)
+              .frame(width: networkIconLength, height: networkIconLength)
               .cornerRadius(4)
               
             Text(verbatim: "https://app.uniswap.org")
@@ -38,39 +35,34 @@ struct NetworkConnectionView: View {
               .padding(.top, 2)
             
             Text("0xfcD...00ee, 0xffd3...11ae")
+              .foregroundColor(Color(.secondaryBraveLabel))
               .font(.footnote)
-              .opacity(0.7)
             
             VStack {
               ForEach(bullets, id: \.self) { bullet in
                 BulletView(bullet: bullet)
               }
             }
-            .padding(.top, 30)
+            .padding(.vertical, 30)
             
             Text("Only connect with sites you trust.")
               .font(.subheadline)
-              .padding(.top, 40)
-            
-            HStack() {
-              Button(action: back) {
-                Text(Strings.backTitle)
-                  .padding(.vertical, 4)
-                  .padding(.horizontal, 6)
-              }
-              .buttonStyle(BraveOutlineButtonStyle(size: .normal))
-              Button(action: connect) {
-                  Text("Connect")
-                    .padding(.vertical, 4)
-                    .padding(.horizontal, 12)
-              }
-              .buttonStyle(BraveFilledButtonStyle(size: .normal))
-            }
-            .padding(.top, 20)
           }
-          .padding(EdgeInsets(top: 0, leading: 45, bottom: 0, trailing: 45))
+          .padding(.horizontal, 45)
           .frame(maxHeight: .infinity, alignment: .center)
+          
+          HStack {
+            Button(action: back) {
+              Text(Strings.backTitle)
+            }
+            .buttonStyle(BraveOutlineButtonStyle(size: .large))
+            Button(action: connect) {
+                Text("Connect")
+            }
+            .buttonStyle(BraveFilledButtonStyle(size: .large))
+          }
         }
+        .padding(.top, 24)
       }
     }
   
@@ -80,9 +72,10 @@ struct NetworkConnectionView: View {
     var body: some View {
       HStack(spacing: 12) {
         Image("wallet-checkmark")
+          .foregroundColor(Color(.walletCheckmark))
         Text(bullet)
-          .font(.callout)
       }
+      .font(.callout)
     }
   }
   
