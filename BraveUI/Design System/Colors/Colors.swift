@@ -157,9 +157,6 @@ extension UIColor {
   public static var secondaryButtonTint: UIColor {
     DesignSystemColor.interactive08.color
   }
-  public static var walletCheckmark: UIColor {
-    DesignSystemColor.focusBorder.color
-  }
 }
 
 // MARK: - Static Colors

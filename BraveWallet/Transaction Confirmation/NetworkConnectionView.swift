@@ -17,7 +17,6 @@ struct NetworkConnectionView: View {
           Text("Mainnet")
             .font(.headline.weight(.light))
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 24)
           
           VStack(spacing: 10) {
             Rectangle()
@@ -48,7 +47,7 @@ struct NetworkConnectionView: View {
             Text("Only connect with sites you trust.")
               .font(.subheadline)
           }
-          .padding(.horizontal, 45)
+          .padding(.horizontal, 24)
           .frame(maxHeight: .infinity, alignment: .center)
           
           HStack {
@@ -62,7 +61,7 @@ struct NetworkConnectionView: View {
             .buttonStyle(BraveFilledButtonStyle(size: .large))
           }
         }
-        .padding(.top, 24)
+        .padding(.all, 24)
       }
     }
   
@@ -72,7 +71,7 @@ struct NetworkConnectionView: View {
     var body: some View {
       HStack(spacing: 12) {
         Image("wallet-checkmark")
-          .foregroundColor(Color(.walletCheckmark))
+          .foregroundColor(Color(.braveLighterBlurple))
         Text(bullet)
       }
       .font(.callout)
