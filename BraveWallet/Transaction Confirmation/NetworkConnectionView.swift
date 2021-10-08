@@ -61,7 +61,7 @@ struct NetworkConnectionView: View {
             .buttonStyle(BraveFilledButtonStyle(size: .large))
           }
         }
-        .padding(.all, 24)
+        .padding(24)
       }
     }
   
