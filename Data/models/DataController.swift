@@ -252,8 +252,8 @@ public class DataController {
     func addPersistentStore(for container: NSPersistentContainer, store: URL) {
         let storeDescription = NSPersistentStoreDescription(url: store)
         
-        // This makes the database file encrypted until first user unlock after device restart.
-        let completeProtection = FileProtectionType.completeUntilFirstUserAuthentication as NSObject
+        // This makes the database file encrypted until device is unlocked.
+         let completeProtection = FileProtectionType.none as NSObject
         storeDescription.setOption(completeProtection, forKey: NSPersistentStoreFileProtectionKey)
         
         container.persistentStoreDescriptions = [storeDescription]
@@ -271,6 +271,16 @@ public class DataController {
             if let error = error {
                 // Do not crash the app if the store already exists.
                 if (error as NSError).code != Self.storeExistsErrorCode {
+                    let er = (error as NSError)
+                    Preferences.cdError.value.append("Code: \(er.code), error: \(error), description: \(er.localizedDescription), domain \(er.domain), user info \(er.userInfo), reason: \(er.localizedFailureReason), recovery: \(er.localizedRecoverySuggestion)")
+                    
+                    if #available(iOS 14.5, *) {
+                        er.underlyingErrors.forEach {
+                            let nser = $0 as NSError
+                            Preferences.cdError.value.append("Underlying error: code: \(nser), error: \(nser), description: \(nser.localizedDescription), domain: \(nser.domain)")
+                        }
+                    }
+                    
                     fatalError("Load persistent store error: \(error)")
                 }
             }
