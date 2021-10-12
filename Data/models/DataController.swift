@@ -242,8 +242,8 @@ public class DataController {
     func addPersistentStore(for container: NSPersistentContainer, store: URL) {
         let storeDescription = NSPersistentStoreDescription(url: store)
         
-        // This makes the database file encrypted until device is unlocked.
-        let completeProtection = FileProtectionType.complete as NSObject
+        // This makes the database file encrypted until first user unlock after device restart.
+        let completeProtection = FileProtectionType.completeUntilFirstUserAuthentication as NSObject
         storeDescription.setOption(completeProtection, forKey: NSPersistentStoreFileProtectionKey)
         
         container.persistentStoreDescriptions = [storeDescription]
