@@ -16,17 +16,26 @@ class Migration {
     private(set) public var braveCoreSyncObjectsMigrator: BraveCoreMigrator?
     private let bookmarksAPI: BraveBookmarksAPI
     private let historyAPI: BraveHistoryAPI
+    private let passwordAPI: BravePasswordAPI
     private let syncAPI: BraveSyncAPI
+    private let profile: Profile
     
-    public init(bookmarksAPI: BraveBookmarksAPI, historyAPI: BraveHistoryAPI, syncAPI: BraveSyncAPI) {
+    public init(bookmarksAPI: BraveBookmarksAPI,
+                historyAPI: BraveHistoryAPI,
+                passwordAPI: BravePasswordAPI,
+                syncAPI: BraveSyncAPI,
+                profile: Profile) {
         self.bookmarksAPI = bookmarksAPI
         self.historyAPI = historyAPI
+        self.passwordAPI = passwordAPI
         self.syncAPI = syncAPI
+        self.profile = profile
     }
     
     public static var isChromiumMigrationCompleted: Bool {
         return Preferences.Chromium.syncV2BookmarksMigrationCompleted.value &&
-            Preferences.Chromium.syncV2HistoryMigrationCompleted.value
+        Preferences.Chromium.syncV2HistoryMigrationCompleted.value &&
+        Preferences.Chromium.syncV2PasswordMigrationCompleted.value
     }
     
     func launchMigrations(keyPrefix: String) {
@@ -41,7 +50,9 @@ class Migration {
         if !Migration.isChromiumMigrationCompleted {
             braveCoreSyncObjectsMigrator = BraveCoreMigrator(bookmarksAPI: bookmarksAPI,
                                                              historyAPI: historyAPI,
-                                                             syncAPI: syncAPI)
+                                                             passwordAPI: passwordAPI,
+                                                             syncAPI: syncAPI,
+                                                             profile: profile)
         }
         
         if !Preferences.Migration.playlistV1FileSettingsLocationCompleted.value {

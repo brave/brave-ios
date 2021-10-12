@@ -86,7 +86,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         migration = Migration(bookmarksAPI: braveCore.bookmarksAPI,
                               historyAPI: braveCore.historyAPI,
-                              syncAPI: braveCore.syncAPI)
+                              passwordAPI: braveCore.passwordAPI,
+                              syncAPI: braveCore.syncAPI,
+                              profile: getProfile(application))
         
         // Setup Adblock Stats and HTTPSE Stats.
         AdBlockStats.shared.startLoading()

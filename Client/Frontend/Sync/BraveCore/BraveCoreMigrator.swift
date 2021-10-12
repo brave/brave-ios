@@ -9,6 +9,7 @@ import Shared
 import BraveShared
 import Data
 import CoreData
+import Storage
 
 private let log = Logger.browserLogger
 
@@ -46,18 +47,27 @@ class BraveCoreMigrator {
     
     private let bookmarksAPI: BraveBookmarksAPI
     private let historyAPI: BraveHistoryAPI
+    private let passwordAPI: BravePasswordAPI
     private let syncAPI: BraveSyncAPI
+    private let profile: Profile
     
     private let dataImportExporter = BraveCoreImportExportUtility()
     private var bookmarkObserver: BookmarkModelListener?
     private var historyObserver: HistoryServiceListener?
     
-    public init(bookmarksAPI: BraveBookmarksAPI, historyAPI: BraveHistoryAPI, syncAPI: BraveSyncAPI) {
+    public init(bookmarksAPI: BraveBookmarksAPI,
+                historyAPI: BraveHistoryAPI,
+                passwordAPI: BravePasswordAPI,
+                syncAPI: BraveSyncAPI,
+                profile: Profile) {
+        
         self.bookmarksAPI = bookmarksAPI
         self.historyAPI = historyAPI
+        self.passwordAPI = passwordAPI
         self.syncAPI = syncAPI
+        self.profile = profile
         
-        // Check If Chromium Sync Objects Migration is complete (Bookmarks-History)
+        // Check If Chromium Sync Objects Migration is complete (Bookmarks-History-Password)
         if Migration.isChromiumMigrationCompleted {
             migrationObserver = .completed
         }
@@ -308,7 +318,7 @@ extension BraveCoreMigrator {
             var didSucceed = true
             
             for history in History.fetchMigrationHistory(context) {
-                if self.migrateChromiumHistory(context: context, history: history) {
+                if self.migrateChromiumHistory(history: history) {
                     history.delete()
                 } else {
                     didSucceed = false
@@ -321,7 +331,7 @@ extension BraveCoreMigrator {
         }
     }
     
-    private func migrateChromiumHistory(context: NSManagedObjectContext, history: History) -> Bool {
+    private func migrateChromiumHistory(history: History) -> Bool {
         guard let title = history.title,
               let absoluteUrl = history.url, let url = URL(string: absoluteUrl),
               let dateAdded = history.visitedOn else {
@@ -333,6 +343,79 @@ extension BraveCoreMigrator {
         historyAPI.addHistory(historyNode, isURLTyped: true)
         
         return true
+    }
+}
+
+// MARK: - Password Migration
+
+extension BraveCoreMigrator {
+    
+    private func migratePasswordForms(_ completion: @escaping (Bool) -> Void) {
+        if !Preferences.Chromium.syncV2PasswordMigrationCompleted.value {
+            // If the password store has already loaded, the observer does NOT get called!
+            // Therefore we should continue to migrate the password forms
+            if passwordAPI.isAbleToSavePasswords == true {
+                performPasswordMigrationIfNeeded { success in
+                    completion(success)
+                }
+            }
+        } else {
+            completion(true)
+        }
+    }
+    
+    private func performPasswordMigrationIfNeeded(_ completion: ((Bool) -> Void)?) {
+        log.info("Migrating to Chromium Password v1 - Start")
+        migratePasswords() { success in
+            Preferences.Chromium.syncV2PasswordMigrationCompleted.value = success
+            completion?(success)
+        }
+    }
+    
+    private func migratePasswords(_ completion: @escaping (_ success: Bool) -> Void) {
+        profile.logins.getAllLogins() >>== { [weak self] results in
+            guard let self = self else { return }
+
+            for login in results.asArray() {
+                if self.migrateChromiumPasswords(login: login) {
+                    self.profile.logins.removeLoginByGUID(login.guid).upon { result in
+                        DispatchQueue.main.async {
+                            if result.isSuccess {
+                                completion(true)
+                            } else {
+                                completion(false)
+                                log.error("Error while updating a login entry. Error Reason: \(result.failureValue ?? "")")
+                            }
+                        }
+                    }
+                } else {
+                    DispatchQueue.main.async {
+                        completion(false)
+                    }
+                }
+            }
+        }
+    }
+    
+    private func migrateChromiumPasswords(login: Login) -> Bool {
+        guard let url = (login.formSubmitURL?.asURL ?? login.hostname.asURL) else {
+            return false
+        }
+        
+//        let passwordForm = PasswordForm(url: url, dateCreated: <#T##Date?#>, usernameValue: <#T##String?#>, passwordValue: <#T##String?#>, isBlockedByUser: <#T##Bool#>, scheme: PasswordFormScheme.typeHtml)
+//        
+        return true
+//        guard let title = passwordForm.title,
+//              let absoluteUrl = passwordForm.url, let url = URL(string: absoluteUrl),
+//              let dateAdded = passwordForm.visitedOn else {
+//            log.error("Invalid History Specifics")
+//            return false
+//        }
+//
+//        let historyNode = HistoryNode(url: url, title: title, dateAdded: dateAdded)
+//        historyAPI.addHistory(historyNode, isURLTyped: true)
+//
+//        return true
     }
 }
 
