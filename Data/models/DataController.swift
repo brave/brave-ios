@@ -242,10 +242,6 @@ public class DataController {
     func addPersistentStore(for container: NSPersistentContainer, store: URL) {
         let storeDescription = NSPersistentStoreDescription(url: store)
         
-        // This makes the database file encrypted until first user unlock after device restart.
-        let completeProtection = FileProtectionType.completeUntilFirstUserAuthentication as NSObject
-        storeDescription.setOption(completeProtection, forKey: NSPersistentStoreFileProtectionKey)
-        
         container.persistentStoreDescriptions = [storeDescription]
     }
     
@@ -263,12 +259,6 @@ public class DataController {
                 if (error as NSError).code != Self.storeExistsErrorCode {
                     fatalError("Load persistent store error: \(error)")
                 }
-            }
-            
-            if store.type != NSInMemoryStoreType {
-                // This makes the database file encrypted until device is unlocked.
-                let completeProtection = FileProtectionType.complete as NSObject
-                store.setOption(completeProtection, forKey: NSPersistentStoreFileProtectionKey)
             }
         })
         // We need this so the `viewContext` gets updated on changes from background tasks.
