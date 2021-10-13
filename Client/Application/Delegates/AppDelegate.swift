@@ -86,9 +86,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Set Brave Core's User-Agent
         braveCore.setUserAgent(UserAgent.mobile)
 
-        migration = Migration(bookmarksAPI: braveCore.bookmarksAPI,
-                              historyAPI: braveCore.historyAPI,
-                              syncAPI: braveCore.syncAPI)
+        migration = Migration(braveCore: braveCore)
         
         // Setup Adblock Stats and HTTPSE Stats.
         AdBlockStats.shared.startLoading()
