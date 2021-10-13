@@ -148,7 +148,7 @@ extension BrowserViewController {
                             self.showBraveRewardsPanel()
                         }
                     }
-                case .batNotAllowed:
+                case .upholdBatNotAllowed:
                     // Uphold account doesn't support BAT...
                     let popup = AlertPopupView(
                         imageView: nil,
