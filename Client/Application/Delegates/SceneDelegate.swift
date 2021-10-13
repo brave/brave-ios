@@ -45,7 +45,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Create a browser instance
         guard let browserViewController = createBrowserWindow(scene: windowScene,
                                                               profile: sceneInfo.profile,
-                                                              diskImageStore: sceneInfo.diskImageStore) else {
+                                                              diskImageStore: sceneInfo.diskImageStore,
+                                                              migration: sceneInfo.migration) else {
             fatalError("Failed to create browser instance")
         }
         
@@ -345,9 +346,7 @@ extension SceneDelegate {
         let browserViewController = BrowserViewController(
             profile: profile,
             diskImageStore: diskImageStore,
-            historyAPI: appDelegate.braveCore.historyAPI!,
-            bookmarksAPI: appDelegate.braveCore.bookmarksAPI!,
-            syncAPI: appDelegate.braveCore.syncAPI,
+            braveCore: appDelegate.braveCore,
             migration: migration,
             crashedLastSession: crashedLastSession)
         
