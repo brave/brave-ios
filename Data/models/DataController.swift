@@ -267,7 +267,7 @@ public class DataController {
             
             if store.type != NSInMemoryStoreType {
                 // This makes the database file encrypted until device is unlocked.
-                let completeProtection = FileProtectionType.complete as NSObject
+                let completeProtection = FileProtectionType.completeUntilFirstUserAuthentication as NSObject
                 store.setOption(completeProtection, forKey: NSPersistentStoreFileProtectionKey)
             }
         })
