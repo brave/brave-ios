@@ -62,24 +62,20 @@ class SchemePermissionTests: XCTestCase {
         guard let appDelegate = UIApplication.shared.delegate as? TestAppDelegate else {
             return
         }
-        
-        bookmarksAPI = appDelegate.braveCore.bookmarksAPI
-        historyAPI = appDelegate.braveCore.historyAPI
-        syncAPI = appDelegate.braveCore.syncAPI
-        
-        let migration = Migration(bookmarksAPI: bookmarksAPI,
-                              historyAPI: historyAPI,
-                              syncAPI: syncAPI)
+                
+        guard let appDelegate = UIApplication.shared.delegate as? TestAppDelegate else {
+            return
+        }
         
         subject = BrowserViewController(
             profile: profile,
             diskImageStore: imageStore,
-            historyAPI: historyAPI,
-            bookmarkAPI: bookmarksAPI,
-            syncAPI: syncAPI,
-            migration: migration,
+            braveCore: appDelegate.braveCore,
+            migration: Migration(braveCore: appDelegate.braveCore),
             crashedLastSession: false)
     }
+    
+
     
     override func tearDown() {
         subject = nil
@@ -126,6 +122,5 @@ class SchemePermissionTests: XCTestCase {
     private var tabManager: TabManager!
     private var imageStore: DiskImageStore!
     private var historyAPI: BraveHistoryAPI!
-    private var bookmarksAPI: BraveBookmarksAPI!
-    private var syncAPI: BraveSyncAPI!
+    private var bookmarkManager: BookmarkManager!
 }

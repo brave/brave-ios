@@ -101,6 +101,7 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
     let tabManager: TabManager
     let historyAPI: BraveHistoryAPI
     let bookmarksAPI: BraveBookmarksAPI
+    let bookmarkManager: BookmarkManager
     let syncAPI: BraveSyncAPI
     let migration: Migration?
     
@@ -197,6 +198,7 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
         self.profile = profile
         self.historyAPI = braveCore.historyAPI
         self.bookmarksAPI = braveCore.bookmarksAPI
+        self.bookmarkManager = BookmarkManager(bookmarksAPI: braveCore.bookmarksAPI)
         self.syncAPI = braveCore.syncAPI
         self.migration = migration
         self.crashedLastSession = crashedLastSession

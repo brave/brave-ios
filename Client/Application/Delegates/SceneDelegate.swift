@@ -345,7 +345,7 @@ extension SceneDelegate {
         // the simulator via Xcode will count as a "crash" and lead to restore popups in the subsequent launch
         let crashedLastSession = !Preferences.AppState.backgroundedCleanly.value && AppConstants.buildChannel != .debug
         Preferences.AppState.backgroundedCleanly.value = false
-        
+                
         // Create a browser instance
         let browserViewController = BrowserViewController(
             profile: profile,
