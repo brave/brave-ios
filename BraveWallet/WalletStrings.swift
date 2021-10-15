@@ -860,14 +860,14 @@ extension Strings {
       tableName: "BraveWallet",
       bundle: .braveWallet,
       value: "Enter amount",
-      comment: "The header title for the textfield users will input the dollor value of the crypto they want to buy"
+      comment: "The header title for the textfield users will input the dollar value of the crypto they want to buy"
     )
     public static let amountInUSD = NSLocalizedString(
       "wallet.amountInUSD",
       tableName: "BraveWallet",
       bundle: .braveWallet,
       value: "Amount in USD",
-      comment: "The textFiled's placeholder for users to input dollor value of the crypto they want to buy"
+      comment: "The textFiled's placeholder for users to input dollar value of the crypto they want to buy"
     )
     public static let buyButtonTitle = NSLocalizedString(
       "wallet.buyButtonTitle",
