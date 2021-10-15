@@ -855,5 +855,26 @@ extension Strings {
       value: "Never",
       comment: "One of the auto-lock interval options. As in to never automatically lock the wallet."
     )
+    public static let enterAmount = NSLocalizedString(
+      "wallet.enterAmount",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Enter amount",
+      comment: "The header title for the textfield users will input the dollor value of the crypto they want to buy"
+    )
+    public static let amountInUSD = NSLocalizedString(
+      "wallet.amountInUSD",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Amount in USD",
+      comment: "The textFiled's placeholder for users to input dollor value of the crypto they want to buy"
+    )
+    public static let buyButtonTitle = NSLocalizedString(
+      "wallet.buyButtonTitle",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Continue to Wyre",
+      comment: "The title of the button for users to click when they are ready to buy"
+    )
   }
 }
