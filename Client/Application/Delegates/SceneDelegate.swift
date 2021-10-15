@@ -9,6 +9,7 @@ import Combine
 import BraveShared
 import Shared
 import Storage
+import Data
 
 private let log = Logger.browserLogger
 
@@ -27,6 +28,16 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         sceneInfo = (UIApplication.shared.delegate as? AppDelegate)?.sceneInfo(for: session)
         guard let sceneInfo = sceneInfo else {
             return
+        }
+        
+        Preferences.cdError.value.append("\nisProtectedDataAvailable: \(UIApplication.shared.isProtectedDataAvailable)\n")
+        
+        Preferences.cdError.value.append("\noptions: \(connectionOptions)\n")
+        
+        if !DataController.shared.initialized {
+            // We have to wait until pre1.12 migration is done until we proceed with database
+            // initialization. This is because Database container may change. See bugs #3416, #3377.
+            DataController.shared.initialize()
         }
         
         Preferences.General.themeNormalMode.objectWillChange

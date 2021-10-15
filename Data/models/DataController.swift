@@ -50,10 +50,13 @@ public class DataController {
         return queue
     }()
     
+    public var initialized = false
+    
     /// IMPORTANT: This must be called after pre 1.12 migration logic has been called.
     public func initialize() {
         configureContainer(container, store: storeURL)
         createOldDocumentStoreIfNeeded()
+        initialized = true
     }
     
     // MARK: - Public interface
