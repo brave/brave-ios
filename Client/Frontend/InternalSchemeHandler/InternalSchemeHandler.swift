@@ -32,16 +32,26 @@ class InternalSchemeHandler: NSObject, WKURLSchemeHandler {
         guard let url = urlSchemeTask.request.url else { return false }
 
         let allowedInternalResources = [
-            "/errorpage-resource/NetError.css",
-            "/errorpage-resource/CertError.css",
+            "/interstitial-style/InterstitialStyles.css": "text/css",
+            "/interstitial-style/NetworkError.css": "text/css",
+            "/interstitial-style/CertificateError.css": "text/css",
+            "/interstitial-icon/Generic.svg": "image/svg+xml",
+            "/interstitial-icon/Cloud.svg": "image/svg+xml",
+            "/interstitial-icon/Clock.svg": "image/svg+xml",
+            "/interstitial-icon/Globe.svg": "image/svg+xml",
+            "/interstitial-icon/Info.svg": "image/svg+xml",
+            "/interstitial-icon/Warning.svg": "image/svg+xml",
+            "/interstitial-icon/DarkWarning.svg": "image/svg+xml",
+            
            // "/reader-mode/..."
         ]
 
         // Handle resources from internal pages. For example 'internal://local/errorpage-resource/CertError.css'.
-        if allowedInternalResources.contains(where: { url.path == $0 }) {
+        if allowedInternalResources.contains(where: { url.path == $0.key }) {
             let path = url.lastPathComponent
+            let mimeType = allowedInternalResources[url.path]
             if let res = Bundle.main.path(forResource: path, ofType: nil), let str = try? String(contentsOfFile: res, encoding: .utf8), let data = str.data(using: .utf8) {
-                urlSchemeTask.didReceive(URLResponse(url: url, mimeType: nil, expectedContentLength: -1, textEncodingName: nil))
+                urlSchemeTask.didReceive(URLResponse(url: url, mimeType: mimeType, expectedContentLength: -1, textEncodingName: nil))
                 urlSchemeTask.didReceive(data)
                 urlSchemeTask.didFinish()
                 return true

@@ -174,7 +174,17 @@ class TabManager: NSObject {
         let configuration = WKWebViewConfiguration()
         configuration.processPool = WKProcessPool()
         configuration.preferences.javaScriptCanOpenWindowsAutomatically = !Preferences.General.blockPopups.value
-        configuration.dataDetectorTypes = .all
+        
+        // Do NOT add `.link` to the list, it breaks interstitial pages
+        // and pages that don't want the URL highlighted!
+        configuration.dataDetectorTypes = [
+            .phoneNumber,
+            .address,
+            .calendarEvent,
+            .trackingNumber,
+            .flightNumber,
+            .lookupSuggestion
+        ]
         
         UserReferralProgram.shared?.insertCookies(intoStore: configuration.websiteDataStore.httpCookieStore)
         return configuration
