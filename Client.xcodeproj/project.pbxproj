@@ -697,7 +697,6 @@
 		44C42CF6268378B1009572D7 /* BrowserIntents.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = 44C42CF9268378B1009572D7 /* BrowserIntents.intentdefinition */; };
 		44C42CF7268378B1009572D7 /* BrowserIntents.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = 44C42CF9268378B1009572D7 /* BrowserIntents.intentdefinition */; };
 		44C6CCD226DE6CB100E90068 /* DomainUserScriptTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44C6CCD126DE6CB100E90068 /* DomainUserScriptTests.swift */; };
-		44E39B372711F80800DAE5AA /* CDCrashList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44E39B362711F80800DAE5AA /* CDCrashList.swift */; };
 		44FA2F3021F8DB1000EFA86A /* DataPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44FA2F2F21F8DB1000EFA86A /* DataPreferences.swift */; };
 		592F521E2217327C0078395E /* HttpCookieExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 592F521D2217327B0078395E /* HttpCookieExtension.swift */; };
 		59350AFB22612D95004D7445 /* DisplayTextFieldTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59350AFA22612D95004D7445 /* DisplayTextFieldTest.swift */; };
@@ -2281,7 +2280,6 @@
 		44C42D2426837A21009572D7 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/BrowserIntents.strings; sourceTree = "<group>"; };
 		44C42D2626837A30009572D7 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/BrowserIntents.strings; sourceTree = "<group>"; };
 		44C6CCD126DE6CB100E90068 /* DomainUserScriptTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DomainUserScriptTests.swift; sourceTree = "<group>"; };
-		44E39B362711F80800DAE5AA /* CDCrashList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CDCrashList.swift; sourceTree = "<group>"; };
 		44FA2F2F21F8DB1000EFA86A /* DataPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataPreferences.swift; sourceTree = "<group>"; };
 		5902D2FF22DCD681002232FB /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = zh.lproj/BraveShared.strings; sourceTree = "<group>"; };
 		590913E223268115004625FA /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -4158,7 +4156,6 @@
 				27D114D52358FCA400166534 /* SettingsRowViews.swift */,
 				278C700924F96D7000A246C8 /* BraveShieldsAndPrivacySettingsController.swift */,
 				0A42BC42260CEDA3007EBBF3 /* VPNLogs.swift */,
-				44E39B362711F80800DAE5AA /* CDCrashList.swift */,
 				2F51767325E4024B00429692 /* PlaylistSettingsViewController.swift */,
 				2F12A175260A3B17005A8C2B /* ShortcutSettingsViewController.swift */,
 				272B862A270BD96F005ED304 /* SandboxInspectorView.swift */,
@@ -7452,7 +7449,6 @@
 				44331DD422551CC0007E3E93 /* ToolbarHelper.swift in Sources */,
 				D34510881ACF415700EC27F0 /* SearchLoader.swift in Sources */,
 				E65075521E37F6D1006961AC /* UIViewExtensions.swift in Sources */,
-				44E39B372711F80800DAE5AA /* CDCrashList.swift in Sources */,
 				27448538245B67B2001920B5 /* NewTabPageBackgroundButtonsView.swift in Sources */,
 				C8F457A81F1FD75A000CB895 /* BrowserViewController+WKNavigationDelegate.swift in Sources */,
 				5E612A8F234B7FCA007D12B5 /* OnboardingRewardsAgreementViewController.swift in Sources */,

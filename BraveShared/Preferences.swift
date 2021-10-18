@@ -15,8 +15,6 @@ public protocol UserDefaultsEncodable {}
 public class Preferences {
     /// The default `UserDefaults` that all `Option`s will use unless specified
     public static let defaultContainer = UserDefaults(suiteName: AppInfo.sharedContainerIdentifier)!
-    
-    public static let cdError = Option<[String]>(key: "general.cd-error-investigation", default: [])
 }
 
 /// Defines an object which may watch a set of `Preference.Option`s
