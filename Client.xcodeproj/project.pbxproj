@@ -274,7 +274,6 @@
 		276A791024476FD200AC9446 /* StatsSectionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 276A790F24476FD200AC9446 /* StatsSectionProvider.swift */; };
 		276E7A3C22F21DBE00939424 /* RewardsReporting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 276E7A3B22F21DBE00939424 /* RewardsReporting.swift */; };
 		277046C22684CD2A001CB097 /* PanModal in Frameworks */ = {isa = PBXBuildFile; productRef = 277046C12684CD2A001CB097 /* PanModal */; };
-		277223722469B4FB0059A7EB /* FaviconFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 277223712469B4FB0059A7EB /* FaviconFetcher.swift */; };
 		27733E5826977EC40086799A /* PasscodeMigrationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27733E5726977EC40086799A /* PasscodeMigrationView.swift */; };
 		27733E792697867D0086799A /* AccessibilityEmbedInScrollViewViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27733E6D2697867C0086799A /* AccessibilityEmbedInScrollViewViewModifier.swift */; };
 		277568D425ACF91600C129AF /* SPMLibraries.h in Headers */ = {isa = PBXBuildFile; fileRef = 277568D225ACF91600C129AF /* SPMLibraries.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1751,7 +1750,6 @@
 		276A790F24476FD200AC9446 /* StatsSectionProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsSectionProvider.swift; sourceTree = "<group>"; };
 		276E7A2E22F21A7700939424 /* RewardsReporting.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = RewardsReporting.js; sourceTree = "<group>"; };
 		276E7A3B22F21DBE00939424 /* RewardsReporting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardsReporting.swift; sourceTree = "<group>"; };
-		277223712469B4FB0059A7EB /* FaviconFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaviconFetcher.swift; sourceTree = "<group>"; };
 		27733E5726977EC40086799A /* PasscodeMigrationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasscodeMigrationView.swift; sourceTree = "<group>"; };
 		27733E6D2697867C0086799A /* AccessibilityEmbedInScrollViewViewModifier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccessibilityEmbedInScrollViewViewModifier.swift; sourceTree = "<group>"; };
 		277568D025ACF91500C129AF /* SPMLibraries.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SPMLibraries.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -3977,7 +3975,6 @@
 			children = (
 				27C434D3250AB8AC004F7791 /* SwiftUI.framework */,
 				27C434D1250AB8AC004F7791 /* WidgetKit.framework */,
-				277223712469B4FB0059A7EB /* FaviconFetcher.swift */,
 			);
 			name = "Recovered References";
 			sourceTree = "<group>";
@@ -7767,7 +7764,6 @@
 				2816F0001B33E05400522243 /* UIConstants.swift in Sources */,
 				CA8D5C1026D7CDAF009BF13D /* PlaylistListViewController+DragDropDelegate.swift in Sources */,
 				4422D56521BFFB7F00BF1855 /* filtered_re2.cc in Sources */,
-				277223722469B4FB0059A7EB /* FaviconFetcher.swift in Sources */,
 				CAADEFB326E26A9D0020DC4C /* CPTemplateApplicationSceneDelegate.swift in Sources */,
 				274398F524E71D8700E79605 /* FailableDecodable.swift in Sources */,
 				CA752EA526CEABF8009356EF /* PlaylistToast.swift in Sources */,

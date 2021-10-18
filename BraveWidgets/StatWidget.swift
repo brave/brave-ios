@@ -8,6 +8,7 @@ import SwiftUI
 import Intents
 import Shared
 import BraveShared
+import BraveUI
 
 struct StatEntry: TimelineEntry {
     var date: Date
@@ -135,9 +136,9 @@ struct StatWidget: Widget {
 
 struct StatWidget_Previews: PreviewProvider {
     static var previews: some View {
-        StatView(entry: StatEntry(date: Date(), statData: .init(name: "Ads & Trackers Blocked", value: "100k", color: BraveUX.braveOrange)))
+        StatView(entry: StatEntry(date: Date(), statData: .init(name: "Ads & Trackers Blocked", value: "100k", color: .braveOrange)))
             .previewContext(WidgetPreviewContext(family: .systemSmall))
-        StatView(entry: StatEntry(date: Date(), statData: .init(name: "Placeholder Count", value: "100k", color: BraveUX.braveOrange)))
+        StatView(entry: StatEntry(date: Date(), statData: .init(name: "Placeholder Count", value: "100k", color: .braveOrange)))
             .redacted(reason: .placeholder)
             .previewContext(WidgetPreviewContext(family: .systemSmall))
     }
