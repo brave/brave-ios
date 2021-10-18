@@ -14,6 +14,7 @@ private let rewardsLog = Logger.braveCoreLogger
 
 extension WKNavigationAction {
     /// Allow local requests only if the request is privileged.
+    /// If the request is internal or unprivileged, we should deny it.
     var isInternalUnprivileged: Bool {
         guard let url = request.url else {
             return true

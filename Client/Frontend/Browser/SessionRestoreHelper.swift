@@ -32,7 +32,7 @@ class SessionRestoreHelper: TabContentScript {
                 return
             }
             
-            if params["name"] as! String == "didRestoreSession" {
+            if params["name"] as? String == "didRestoreSession" {
                 DispatchQueue.main.async {
                     self.delegate?.sessionRestoreHelper(self, didRestoreSessionForTab: tab)
                 }
