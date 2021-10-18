@@ -50,13 +50,16 @@ public class DataController {
         return queue
     }()
     
-    public var initialized = false
+    private var initializationCompleted = false
     
     /// IMPORTANT: This must be called after pre 1.12 migration logic has been called.
-    public func initialize() {
+    /// Initialization logic will run only once, then do nothing on subsequent calls to this method.
+    public func initializeOnce() {
+        if initializationCompleted { return }
+        
         configureContainer(container, store: storeURL)
         createOldDocumentStoreIfNeeded()
-        initialized = true
+        initializationCompleted = true
     }
     
     // MARK: - Public interface

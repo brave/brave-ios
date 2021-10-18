@@ -58,12 +58,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.application = application
         self.launchOptions = launchOptions
         
-        if let launchOptions = launchOptions,
-            !launchOptions.isEmpty,
-           !application.isProtectedDataAvailable {
-            return false
-        }
-        
         // Brave Core Initialization
         BraveCoreMain.setLogHandler { severity, file, line, messageStartIndex, message in
             if !message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
