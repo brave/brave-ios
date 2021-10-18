@@ -230,7 +230,11 @@ extension URL {
         }
 
         if !InternalURL.isValid(url: self) {
-            return self.havingRemovedAuthorisationComponents()
+            let url = self.havingRemovedAuthorisationComponents()
+            if let internalUrl = InternalURL(url), internalUrl.isErrorPage {
+                return internalUrl.originalURLFromErrorPage?.displayURL
+            }
+            return url
         }
 
         return nil
@@ -381,7 +385,7 @@ extension URL {
 extension URL {
     public var isReaderModeURL: Bool {
         let scheme = self.scheme, host = self.host, path = self.path
-        return scheme == "http" && host == "localhost" && path == "/reader-mode/page"
+        return scheme == "http" && (host == "localhost" || host == "127.0.0.1") && path == "/reader-mode/page"
     }
 
     public var decodeReaderModeURL: URL? {
@@ -409,7 +413,7 @@ extension URL {
 
 extension URL {
     private var isLocalhost: Bool {
-        return scheme == "http" && host == "localhost"
+        return scheme == "http" && (host == "localhost" || host == "127.0.0.1")
     }
     
     // Check if the website is a video streaming content site used inside product notifications
@@ -510,7 +514,7 @@ extension URL {
             return false
         }
         
-        if self.host == "localhost" {
+        if self.host == "localhost" || self.host == "127.0.0.1" {
             return false
         }
         
@@ -616,7 +620,7 @@ public struct InternalURL {
     private let sessionRestoreHistoryItemBaseUrl = "\(InternalURL.baseUrl)/\(InternalURL.Path.sessionrestore.rawValue)?url="
 
     public static func isValid(url: URL) -> Bool {
-        let isWebServerUrl = url.absoluteString.hasPrefix("http://localhost:\(AppConstants.webServerPort)/")
+        let isWebServerUrl = url.absoluteString.hasPrefix("http://localhost:\(AppConstants.webServerPort)/") || url.absoluteString.hasPrefix("http://127.0.0.1:\(AppConstants.webServerPort)/")
         if isWebServerUrl, url.path.hasPrefix("/test-fixture/") {
             // internal test pages need to be treated as external pages
             return false
