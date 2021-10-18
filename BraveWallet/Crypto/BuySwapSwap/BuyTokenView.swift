@@ -77,7 +77,7 @@ struct BuyTokenView: View {
       .navigationTitle(Strings.Wallet.buy)
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {
-        ToolbarItemGroup(placement: .navigationBarLeading) {
+        ToolbarItemGroup(placement: .cancellationAction) {
           Button(action: {
             presentationMode.dismiss()
           }) {
