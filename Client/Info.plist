@@ -98,6 +98,8 @@
 		<string>OpenBookmarkWebsiteIntent</string>
 		<string>OpenHistoryWebsiteIntent</string>
 		<string>OpenWebsiteIntent</string>
+		<string>ShortcutsConfigurationIntent</string>
+		<string>StatsConfigurationIntent</string>
 		<string>org.mozilla.ios.firefox.browsing</string>
 	</array>
 	<key>UIAppFonts</key>

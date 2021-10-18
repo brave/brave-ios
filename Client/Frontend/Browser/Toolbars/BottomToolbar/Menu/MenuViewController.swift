@@ -256,6 +256,41 @@ extension MenuViewController: PanModalPresentable {
     var springDamping: CGFloat {
         0.85
     }
+        
+    // MARK: - Actions
+  
+    private func openVPNAction(menuCell: MenuCell) {
+        let enabled = !menuCell.toggleButton.isOn
+        /// Connecting to the vpn takes a while, that's why we have to show a spinner until it finishes.
+        if enabled {
+            menuCell.isLoading = true
+        }
+        bvc.navigationHelper.toggleVPN()
+    }
+    
+    private func openBookmarks() {
+        bvc.navigationHelper.openBookmarks()
+    }
+    
+    private func openDownloads() {
+        bvc.navigationHelper.openDownloads()
+    }
+    
+    private func openAddBookmark() {
+        bvc.navigationHelper.openAddBookmark()
+    }
+    
+    private func openHistory() {
+        bvc.navigationHelper.openHistory()
+    }
+    
+    private func openSettings() {
+        bvc.navigationHelper.openSettings()
+    }
+    
+    private func openShareSheet() {
+        bvc.navigationHelper.openShareSheet()
+    }
 }
 
 private class MenuHostingController<MenuContent: View>: UIHostingController<MenuView<MenuContent>> {
