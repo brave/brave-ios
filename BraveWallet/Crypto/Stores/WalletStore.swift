@@ -50,8 +50,6 @@ public class WalletStore {
       assetRatioController: assetRatioController,
       tokenRegistry: tokenRegistry
     )
-    self.buyTokenStore = .init(
-      keyringController: keyringController,
-      tokenRegistry: tokenRegistry)
+    self.buyTokenStore = .init(tokenRegistry: tokenRegistry)
   }
 }

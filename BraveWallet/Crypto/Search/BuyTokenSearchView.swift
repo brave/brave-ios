@@ -60,7 +60,6 @@ struct BuyTokenSearchView: View {
       }
     }
     .navigationTitle(Strings.Wallet.searchTitle)
-    .listStyle(InsetGroupedListStyle())
     .animation(nil, value: query)
     .filterable(text: $query)
   }

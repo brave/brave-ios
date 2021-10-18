@@ -13,14 +13,9 @@ public class BuyTokenStore: ObservableObject {
   /// All available buyable tokens
   @Published var buyTokens: [BraveWallet.ERCToken] = []
   
-  private let keyringController: BraveWalletKeyringController
   private let tokenRegistry: BraveWalletERCTokenRegistry
   
-  public init(
-    keyringController: BraveWalletKeyringController,
-    tokenRegistry: BraveWalletERCTokenRegistry
-  ) {
-    self.keyringController = keyringController
+  public init(tokenRegistry: BraveWalletERCTokenRegistry) {
     self.tokenRegistry = tokenRegistry
   }
   

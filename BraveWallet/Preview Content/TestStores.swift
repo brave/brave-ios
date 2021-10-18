@@ -43,9 +43,7 @@ extension KeyringStore {
 
 extension BuyTokenStore {
   static var previewStore: BuyTokenStore {
-    .init(
-      keyringController: TestKeyringController(),
-      tokenRegistry: TestTokenRegistry())
+    .init(tokenRegistry: TestTokenRegistry())
   }
 }
 

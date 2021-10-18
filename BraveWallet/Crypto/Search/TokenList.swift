@@ -36,9 +36,7 @@ struct TokenList<Content: View>: View {
       ) {
         let tokens = self.tokens
         if tokens.isEmpty {
-          Group {
-            Text(Strings.Wallet.assetSearchEmpty)
-          }
+          Text(Strings.Wallet.assetSearchEmpty)
           .font(.footnote)
           .foregroundColor(Color(.secondaryBraveLabel))
           .multilineTextAlignment(.center)
@@ -49,8 +47,9 @@ struct TokenList<Content: View>: View {
           }
         }
       }
+      .listRowBackground(Color(.secondaryBraveGroupedBackground))
     }
-    .listRowBackground(Color(.secondaryBraveGroupedBackground))
+    .listStyle(InsetGroupedListStyle())
   }
 }
 
@@ -64,7 +63,7 @@ struct TokenListView_Previews: PreviewProvider {
   ]
   
   static var previews: some View {
-    TokenList(tokens: Self.testTokens) { token in
+    TokenList(tokens: testTokens) { token in
       Text(token.name)
     }
   }
