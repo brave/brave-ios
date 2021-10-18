@@ -51,7 +51,7 @@ struct BuyTokenView: View {
         ) {
           HStack {
             Text("$")
-            TextField(Strings.Wallet.amountInCurrency, text: $amountInput)
+            TextField(String.localizedStringWithFormat(Strings.Wallet.amountInCurrency, "USD"), text: $amountInput)
               .keyboardType(.decimalPad)
           }
         }
