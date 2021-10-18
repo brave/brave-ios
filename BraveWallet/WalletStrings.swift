@@ -867,7 +867,7 @@ extension Strings {
       tableName: "BraveWallet",
       bundle: .braveWallet,
       value: "Amount in %@",
-      comment: "The textField's placeholder for users to input dollar value of the crypto they want to buy"
+      comment: "The textField's placeholder for users to input dollar value of the crypto they want to buy. '%@' will be replaced with a currency such as 'USD' or 'EUR'"
     )
     public static let buyButtonTitle = NSLocalizedString(
       "wallet.buyButtonTitle",

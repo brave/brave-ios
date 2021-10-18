@@ -37,10 +37,10 @@ struct TokenList<Content: View>: View {
         let tokens = self.tokens
         if tokens.isEmpty {
           Text(Strings.Wallet.assetSearchEmpty)
-          .font(.footnote)
-          .foregroundColor(Color(.secondaryBraveLabel))
-          .multilineTextAlignment(.center)
-          .frame(maxWidth: .infinity)
+            .font(.footnote)
+            .foregroundColor(Color(.secondaryBraveLabel))
+            .multilineTextAlignment(.center)
+            .frame(maxWidth: .infinity)
         } else {
           ForEach(tokens) { token in
             content(token)
