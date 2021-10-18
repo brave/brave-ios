@@ -449,7 +449,7 @@
 		2F676F6F260BA1B00048A1DB /* BlockingSummaryDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F676F6E260BA1B00048A1DB /* BlockingSummaryDataSource.swift */; };
 		2F676FAD260BA4860048A1DB /* blocking-summary.json in Resources */ = {isa = PBXBuildFile; fileRef = 2F676FAC260BA4860048A1DB /* blocking-summary.json */; };
 		2F6931B7260CFB3700ECEB38 /* IntentHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F6931B6260CFB3700ECEB38 /* IntentHandler.swift */; };
-		2F6931BB260CFB3700ECEB38 /* BrowserIntents.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 2F6931B4260CFB3700ECEB38 /* BrowserIntents.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		2F6931BB260CFB3700ECEB38 /* BrowserIntentsExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 2F6931B4260CFB3700ECEB38 /* BrowserIntentsExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		2F697F7E1A9FD22D009E03AE /* SearchEnginesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F697F7D1A9FD22D009E03AE /* SearchEnginesTests.swift */; };
 		2F91AFD325FFA830002DBC4A /* ActivityShortcutManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F91AFD225FFA830002DBC4A /* ActivityShortcutManager.swift */; };
 		2F9311D52665883400C6B74D /* DataSaved.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F9311D42665883400C6B74D /* DataSaved.swift */; };
@@ -1425,7 +1425,7 @@
 			dstSubfolderSpec = 13;
 			files = (
 				27F4439F2135E11200296C58 /* ShareExtension.appex in Embed App Extensions */,
-				2F6931BB260CFB3700ECEB38 /* BrowserIntents.appex in Embed App Extensions */,
+				2F6931BB260CFB3700ECEB38 /* BrowserIntentsExtension.appex in Embed App Extensions */,
 			);
 			name = "Embed App Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1993,7 +1993,7 @@
 		2F5893C4265ED772002323D9 /* BrowserViewController+ProductNotification.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "BrowserViewController+ProductNotification.swift"; sourceTree = "<group>"; };
 		2F676F6E260BA1B00048A1DB /* BlockingSummaryDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockingSummaryDataSource.swift; sourceTree = "<group>"; };
 		2F676FAC260BA4860048A1DB /* blocking-summary.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "blocking-summary.json"; sourceTree = "<group>"; };
-		2F6931B4260CFB3700ECEB38 /* BrowserIntents.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BrowserIntents.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		2F6931B4260CFB3700ECEB38 /* BrowserIntentsExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BrowserIntentsExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		2F6931B6260CFB3700ECEB38 /* IntentHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntentHandler.swift; sourceTree = "<group>"; };
 		2F6931B8260CFB3700ECEB38 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2F6931CD260CFB5300ECEB38 /* BrowserIntents.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BrowserIntents.entitlements; sourceTree = "<group>"; };
@@ -5561,7 +5561,7 @@
 				278C468623F1E6270083347F /* BraveUI.framework */,
 				277568D025ACF91500C129AF /* SPMLibraries.framework */,
 				27756E9425AF6F5F00C129AF /* SPMLibrariesTests.xctest */,
-				2F6931B4260CFB3700ECEB38 /* BrowserIntents.appex */,
+				2F6931B4260CFB3700ECEB38 /* BrowserIntentsExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -6074,9 +6074,9 @@
 			productReference = 288A2D861AB8B3260023ABC3 /* Shared.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		2F6931B3260CFB3700ECEB38 /* BrowserIntents */ = {
+		2F6931B3260CFB3700ECEB38 /* BrowserIntentsExtension */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 2F6931BC260CFB3800ECEB38 /* Build configuration list for PBXNativeTarget "BrowserIntents" */;
+			buildConfigurationList = 2F6931BC260CFB3800ECEB38 /* Build configuration list for PBXNativeTarget "BrowserIntentsExtension" */;
 			buildPhases = (
 				2F6931B0260CFB3700ECEB38 /* Sources */,
 				2F6931B1260CFB3700ECEB38 /* Frameworks */,
@@ -6086,9 +6086,9 @@
 			);
 			dependencies = (
 			);
-			name = BrowserIntents;
+			name = BrowserIntentsExtension;
 			productName = BrowserIntents;
-			productReference = 2F6931B4260CFB3700ECEB38 /* BrowserIntents.appex */;
+			productReference = 2F6931B4260CFB3700ECEB38 /* BrowserIntentsExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 		2FCAE2191ABB51F800877008 /* Storage */ = {
@@ -6458,7 +6458,7 @@
 				5DE7688B20B3456E00FF5533 /* BraveSharedTests */,
 				277568CF25ACF91500C129AF /* SPMLibraries */,
 				27756E9325AF6F5F00C129AF /* SPMLibrariesTests */,
-				2F6931B3260CFB3700ECEB38 /* BrowserIntents */,
+				2F6931B3260CFB3700ECEB38 /* BrowserIntentsExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -7808,7 +7808,7 @@
 		};
 		2F6931BA260CFB3700ECEB38 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 2F6931B3260CFB3700ECEB38 /* BrowserIntents */;
+			target = 2F6931B3260CFB3700ECEB38 /* BrowserIntentsExtension */;
 			targetProxy = 2F6931B9260CFB3700ECEB38 /* PBXContainerItemProxy */;
 		};
 		2FCAE2271ABB51F800877008 /* PBXTargetDependency */ = {
@@ -12930,7 +12930,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		2F6931BC260CFB3800ECEB38 /* Build configuration list for PBXNativeTarget "BrowserIntents" */ = {
+		2F6931BC260CFB3800ECEB38 /* Build configuration list for PBXNativeTarget "BrowserIntentsExtension" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				2F6931BD260CFB3800ECEB38 /* Debug */,
