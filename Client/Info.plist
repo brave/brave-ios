@@ -99,6 +99,8 @@
 		<string>OpenHistoryWebsiteIntent</string>
 		<string>OpenWebsiteIntent</string>
 		<string>org.mozilla.ios.firefox.browsing</string>
+		<string>ShortcutsConfigurationIntent</string>
+		<string>StatsConfigurationIntent</string>
 	</array>
 	<key>UIAppFonts</key>
 	<array>
@@ -197,8 +199,8 @@
 			<key>UIWindowSceneSessionRoleApplication</key>
 			<array>
 				<dict>
-                    <key>UISceneClassName</key>
-                    <string>UIWindowScene</string>
+					<key>UISceneClassName</key>
+					<string>UIWindowScene</string>
 					<key>UISceneConfigurationName</key>
 					<string>Default Configuration</string>
 					<key>UISceneDelegateClassName</key>
