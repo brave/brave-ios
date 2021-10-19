@@ -2275,7 +2275,6 @@ extension BrowserViewController: TabManagerDelegate {
                 make.left.right.top.bottom.equalTo(self.webViewContainer)
             }
             
-            
             // This is a terrible workaround for a bad iOS 12 bug where PDF
             // content disappears any time the view controller changes (i.e.
             // the user taps on the tabs tray). It seems the only way to get
@@ -2329,10 +2328,6 @@ extension BrowserViewController: TabManagerDelegate {
         topToolbar.locationView.loading = selected?.loading ?? false
         navigationToolbar.updateBackStatus(selected?.canGoBack ?? false)
         navigationToolbar.updateForwardStatus(selected?.canGoForward ?? false)
-        
-        if let url = selected?.webView?.url, !InternalURL.isValid(url: url) {
-            topToolbar.updateProgressBar(Float(selected?.estimatedProgress ?? 0))
-        }
         
         let shouldShowPlaylistURLBarButton = selected?.url?.isPlaylistSupportedSiteURL == true
         
