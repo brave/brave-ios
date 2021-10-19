@@ -2255,7 +2255,7 @@ extension BrowserViewController: TabManagerDelegate {
         if let tab = selected, let webView = tab.webView {
             updateURLBar()
             
-            if let url = tab.url, !url.isLocalUtility {
+            if let url = tab.url, !InternalURL.isValid(url: url) {
                 let previousEstimatedProgress = previous?.webView?.estimatedProgress ?? 1.0
                 let selectedEstimatedProgress = webView.estimatedProgress
                 
@@ -2299,7 +2299,6 @@ extension BrowserViewController: TabManagerDelegate {
                     webView.scrollView.setContentOffset(previousContentOffset, animated: false)
                 }
             }
-            
             
             webView.accessibilityLabel = Strings.webContentAccessibilityLabel
             webView.accessibilityIdentifier = "contentView"

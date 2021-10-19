@@ -338,7 +338,7 @@ extension URL {
         guard self.isLocal else {
             return false
         }
-        let utilityURLs = ["/errors", "/about/sessionrestore", "/about/home", "/reader-mode"]
+        let utilityURLs = ["/\(InternalURL.Path.errorpage)", "/\(InternalURL.Path.sessionrestore)", "/about/home", "/reader-mode"]
         return utilityURLs.contains { self.path.hasPrefix($0) }
     }
 
