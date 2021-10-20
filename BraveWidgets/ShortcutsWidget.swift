@@ -77,10 +77,10 @@ private struct ShortcutLink<Content: View>: View {
                     .multilineTextAlignment(.center)
             }
             .padding(8)
-            .foregroundColor(Color(UIColor.label))
+            .foregroundColor(Color(UIColor.braveLabel))
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(
-                Color(UIColor.secondaryBraveBackground)
+                Color(UIColor.braveBackground)
                     .clipShape(ContainerRelativeShape())
             )
         })
@@ -138,11 +138,11 @@ struct ShortcutsView: View {
         VStack(spacing: 8) {
             Link(destination: URL(string: "brave://shortcut?path=0")!, label: {
                 Label("Search or enter address", uiImage: UIImage(named: "brave-logo-no-bg-small")!)
-                    .foregroundColor(Color(UIColor.label))
+                    .foregroundColor(Color(UIColor.braveLabel))
                     .frame(maxWidth: .infinity)
                     .frame(height: 44)
                     .background(
-                        Color(UIColor.secondaryBraveBackground)
+                        Color(UIColor.braveBackground)
                             .clipShape(ContainerRelativeShape())
                     )
             })
@@ -159,7 +159,7 @@ struct ShortcutsView: View {
             .frame(maxHeight: .infinity)
         }
         .padding(8)
-        .background(Color(UIColor.braveBackground))
+        .background(Color(UIColor.secondaryBraveBackground))
     }
 }
 
