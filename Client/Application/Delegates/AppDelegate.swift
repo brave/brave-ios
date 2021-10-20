@@ -33,7 +33,7 @@ extension AppDelegate {
 
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
-    var braveCore = BraveCoreMain()
+    var braveCore = BraveCoreMain(userAgent: UserAgent.mobile)
     var migration: Migration?
 
     private weak var application: UIApplication?
@@ -83,9 +83,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             return true
         }
         
-        // Set Brave Core's User-Agent
-        braveCore.setUserAgent(UserAgent.mobile)
-
         migration = Migration(braveCore: braveCore)
         
         // Setup Adblock Stats and HTTPSE Stats.

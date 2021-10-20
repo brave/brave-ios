@@ -67,16 +67,16 @@ class SettingsViewController: TableViewController {
          feedDataSource: FeedDataSource,
          rewards: BraveRewards? = nil,
          legacyWallet: BraveLedger? = nil,
-         historyAPI: BraveHistoryAPI,
          windowProtection: WindowProtection?,
+         historyAPI: BraveHistoryAPI,
          syncAPI: BraveSyncAPI) {
         self.profile = profile
         self.tabManager = tabManager
         self.feedDataSource = feedDataSource
         self.rewards = rewards
         self.legacyWallet = legacyWallet
-        self.historyAPI = historyAPI
         self.windowProtection = windowProtection
+        self.historyAPI = historyAPI
         self.syncAPI = syncAPI
         
         super.init(style: .insetGrouped)
