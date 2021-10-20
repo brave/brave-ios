@@ -77,11 +77,10 @@ private struct ShortcutLink<Content: View>: View {
                     .multilineTextAlignment(.center)
             }
             .padding(8)
-            .foregroundColor(.white)
+            .foregroundColor(Color(UIColor.label))
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(
-                Color.white
-                    .opacity(0.2)
+                Color(UIColor.secondaryBraveBackground)
                     .clipShape(ContainerRelativeShape())
             )
         })
@@ -138,15 +137,12 @@ struct ShortcutsView: View {
     var body: some View {
         VStack(spacing: 8) {
             Link(destination: URL(string: "brave://shortcut?path=0")!, label: {
-                Label("Search or enter address", systemImage: "magnifyingglass")
-                    .labelStyle(IconOnlyLabelStyle())
-                    .font(.title3)
-                    .foregroundColor(.white)
+                Label("Search or enter address", uiImage: UIImage(named: "brave-logo-no-bg-small")!)
+                    .foregroundColor(Color(UIColor.label))
                     .frame(maxWidth: .infinity)
                     .frame(height: 44)
                     .background(
-                        Color.white
-                            .opacity(0.2)
+                        Color(UIColor.secondaryBraveBackground)
                             .clipShape(ContainerRelativeShape())
                     )
             })
@@ -163,18 +159,7 @@ struct ShortcutsView: View {
             .frame(maxHeight: .infinity)
         }
         .padding(8)
-        .background(
-            LinearGradient(
-                gradient: Gradient(
-                    colors: [
-                        Color(UIColor(rgb: 0xF73A1C)),
-                        Color(UIColor(rgb: 0xBF14A2))
-                    ]
-                ),
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        )
+        .background(Color(UIColor.braveBackground))
     }
 }
 

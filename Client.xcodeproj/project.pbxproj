@@ -679,6 +679,9 @@
 		4452CAF0255412800053EFE6 /* DefaultBrowserIntroCalloutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4452CAEF255412800053EFE6 /* DefaultBrowserIntroCalloutViewController.swift */; };
 		4457123226BAB1D200B60C1A /* BraveTalkOptInSuccessViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4457123126BAB1D200B60C1A /* BraveTalkOptInSuccessViewController.swift */; };
 		4457123F26BAB20000B60C1A /* BraveTalkOptInSuccessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4457123E26BAB20000B60C1A /* BraveTalkOptInSuccessView.swift */; };
+		4457A9AB272057D70056388A /* BraveUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C468623F1E6270083347F /* BraveUI.framework */; platformFilter = ios; };
+		4457A9BB27205C0C0056388A /* Shared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288A2D861AB8B3260023ABC3 /* Shared.framework */; platformFilter = ios; };
+		4457A9C0272070240056388A /* LabelExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4457A9BF272070240056388A /* LabelExtensions.swift */; };
 		4481F22D26CBD1C600658EAC /* AmazonRootCA3.cer in Resources */ = {isa = PBXBuildFile; fileRef = 4481F22926CBD1C400658EAC /* AmazonRootCA3.cer */; };
 		4481F22E26CBD1C600658EAC /* AmazonRootCA4.cer in Resources */ = {isa = PBXBuildFile; fileRef = 4481F22A26CBD1C500658EAC /* AmazonRootCA4.cer */; };
 		4481F22F26CBD1C600658EAC /* AmazonRootCA2.cer in Resources */ = {isa = PBXBuildFile; fileRef = 4481F22B26CBD1C600658EAC /* AmazonRootCA2.cer */; };
@@ -1302,6 +1305,20 @@
 			remoteInfo = Storage;
 		};
 		2FCAE23B1ABB520700877008 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F84B21B61A090F8100AAB793 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 288A2D851AB8B3260023ABC3;
+			remoteInfo = Shared;
+		};
+		4457A9AD272057D70056388A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F84B21B61A090F8100AAB793 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 278C468523F1E6270083347F;
+			remoteInfo = BraveUI;
+		};
+		4457A9BD27205C0C0056388A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F84B21B61A090F8100AAB793 /* Project object */;
 			proxyType = 1;
@@ -2298,6 +2315,7 @@
 		4452CAEF255412800053EFE6 /* DefaultBrowserIntroCalloutViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultBrowserIntroCalloutViewController.swift; sourceTree = "<group>"; };
 		4457123126BAB1D200B60C1A /* BraveTalkOptInSuccessViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveTalkOptInSuccessViewController.swift; sourceTree = "<group>"; };
 		4457123E26BAB20000B60C1A /* BraveTalkOptInSuccessView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveTalkOptInSuccessView.swift; sourceTree = "<group>"; };
+		4457A9BF272070240056388A /* LabelExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelExtensions.swift; sourceTree = "<group>"; };
 		4481F22926CBD1C400658EAC /* AmazonRootCA3.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = AmazonRootCA3.cer; sourceTree = "<group>"; };
 		4481F22A26CBD1C500658EAC /* AmazonRootCA4.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = AmazonRootCA4.cer; sourceTree = "<group>"; };
 		4481F22B26CBD1C600658EAC /* AmazonRootCA2.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = AmazonRootCA2.cer; sourceTree = "<group>"; };
@@ -3087,9 +3105,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				CA039232271E2517000EB13C /* BraveShared.framework in Frameworks */,
+				4457A9BB27205C0C0056388A /* Shared.framework in Frameworks */,
 				CA0391D5271E1085000EB13C /* SPMLibraries.framework in Frameworks */,
 				CA0391B6271E1023000EB13C /* SwiftUI.framework in Frameworks */,
 				CA0391B4271E1023000EB13C /* WidgetKit.framework in Frameworks */,
+				4457A9AB272057D70056388A /* BraveUI.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3569,6 +3589,7 @@
 				271DECB8234CC7EF009DAC37 /* UITableViewExtensions.swift */,
 				276A790B244660B500AC9446 /* UICollectionViewExtensions.swift */,
 				2FBE200826F8E97300B7098B /* UIFontExtenions.swift */,
+				4457A9BF272070240056388A /* LabelExtensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -6461,6 +6482,8 @@
 			dependencies = (
 				CA0391D8271E1086000EB13C /* PBXTargetDependency */,
 				CA039235271E2517000EB13C /* PBXTargetDependency */,
+				4457A9AE272057D70056388A /* PBXTargetDependency */,
+				4457A9BE27205C0C0056388A /* PBXTargetDependency */,
 			);
 			name = BraveWidgetsExtension;
 			productName = BraveWidgetsExtension;
@@ -7196,6 +7219,7 @@
 				278C46A023F1ED340083347F /* LinkLabel.swift in Sources */,
 				27B33D5826556E7300F3D274 /* BraveButtonStyle.swift in Sources */,
 				27953F7423F5B04500B4B595 /* ViewLabel.swift in Sources */,
+				4457A9C0272070240056388A /* LabelExtensions.swift in Sources */,
 				278C46B123F4A91D0083347F /* PopoverContentComponent.swift in Sources */,
 				278C46AF23F4A91C0083347F /* PopoverController.swift in Sources */,
 				278C46B523F4A9C80083347F /* POPExtensions.swift in Sources */,
@@ -8140,6 +8164,18 @@
 			isa = PBXTargetDependency;
 			target = 288A2D851AB8B3260023ABC3 /* Shared */;
 			targetProxy = 2FCAE23B1ABB520700877008 /* PBXContainerItemProxy */;
+		};
+		4457A9AE272057D70056388A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			platformFilter = ios;
+			target = 278C468523F1E6270083347F /* BraveUI */;
+			targetProxy = 4457A9AD272057D70056388A /* PBXContainerItemProxy */;
+		};
+		4457A9BE27205C0C0056388A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			platformFilter = ios;
+			target = 288A2D851AB8B3260023ABC3 /* Shared */;
+			targetProxy = 4457A9BD27205C0C0056388A /* PBXContainerItemProxy */;
 		};
 		5D1DC51E20AC9AFB00905E5A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
