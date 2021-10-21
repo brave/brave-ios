@@ -889,7 +889,6 @@
 		CA0391E3271E1382000EB13C /* BraveWidgets.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = CA0391E5271E1382000EB13C /* BraveWidgets.intentdefinition */; };
 		CA0391F8271E143F000EB13C /* ShortcutsWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA0391F3271E143F000EB13C /* ShortcutsWidget.swift */; };
 		CA0391F9271E143F000EB13C /* FavoritesWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA0391F4271E143F000EB13C /* FavoritesWidget.swift */; };
-		CA0391FA271E143F000EB13C /* WebpageWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA0391F5271E143F000EB13C /* WebpageWidget.swift */; };
 		CA0391FB271E143F000EB13C /* StatsWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA0391F6271E143F000EB13C /* StatsWidget.swift */; };
 		CA0391FC271E143F000EB13C /* StatWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA0391F7271E143F000EB13C /* StatWidget.swift */; };
 		CA039200271E151A000EB13C /* WebpagePreviewWidgetData.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA0391FE271E1519000EB13C /* WebpagePreviewWidgetData.swift */; };
@@ -2709,7 +2708,6 @@
 		CA0391F2271E138E000EB13C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/BraveWidgets.strings; sourceTree = "<group>"; };
 		CA0391F3271E143F000EB13C /* ShortcutsWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShortcutsWidget.swift; sourceTree = "<group>"; };
 		CA0391F4271E143F000EB13C /* FavoritesWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FavoritesWidget.swift; sourceTree = "<group>"; };
-		CA0391F5271E143F000EB13C /* WebpageWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebpageWidget.swift; sourceTree = "<group>"; };
 		CA0391F6271E143F000EB13C /* StatsWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatsWidget.swift; sourceTree = "<group>"; };
 		CA0391F7271E143F000EB13C /* StatWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatWidget.swift; sourceTree = "<group>"; };
 		CA0391FE271E1519000EB13C /* WebpagePreviewWidgetData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebpagePreviewWidgetData.swift; sourceTree = "<group>"; };
@@ -5277,7 +5275,6 @@
 				CA0391F3271E143F000EB13C /* ShortcutsWidget.swift */,
 				CA0391F6271E143F000EB13C /* StatsWidget.swift */,
 				CA0391F7271E143F000EB13C /* StatWidget.swift */,
-				CA0391F5271E143F000EB13C /* WebpageWidget.swift */,
 				CA0391B8271E1023000EB13C /* BraveWidgets.swift */,
 				CA0391E5271E1382000EB13C /* BraveWidgets.intentdefinition */,
 				CA0391BB271E1026000EB13C /* Assets.xcassets */,
@@ -7491,7 +7488,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CA0391FA271E143F000EB13C /* WebpageWidget.swift in Sources */,
 				CA0391FC271E143F000EB13C /* StatWidget.swift in Sources */,
 				CA0391FB271E143F000EB13C /* StatsWidget.swift in Sources */,
 				CA0391F8271E143F000EB13C /* ShortcutsWidget.swift in Sources */,

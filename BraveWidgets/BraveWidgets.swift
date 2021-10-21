@@ -9,10 +9,9 @@ import SwiftUI
 @main
 struct BraveWidgets: WidgetBundle {
     var body: some Widget {
-        FavoritesWidget()
         ShortcutsWidget()
+        FavoritesWidget()
         StatWidget()
         StatsWidget()
-        WebpageWidget()
     }
 }
