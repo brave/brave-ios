@@ -12,8 +12,8 @@ extension TabTrayController2 {
     
     class View: UIView {
         private struct UX {
-            static let regularCellHeight: CGFloat = 192
-            static let largeCellHeight: CGFloat = 256
+            static let regularCellHeight = 192.0
+            static let largeCellHeight = 256.0
         }
         
         private func generateLayout(numberOfColumns: Int = 2,

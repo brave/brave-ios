@@ -15,9 +15,9 @@ extension TabTrayController2 {
             static let descriptionColor = UIColor.secondaryBraveLabel
             static let descriptionFont = UIFont.systemFont(ofSize: 14)
             static let learnMoreFont = UIFont.systemFont(ofSize: 17, weight: .medium)
-            static let textMargin: CGFloat = 40
-            static let minBottomMargin: CGFloat = 15
-            static let stackViewSpacing: CGFloat = 15.0
+            static let textMargin = 40.0
+            static let minBottomMargin = 15.0
+            static let stackViewSpacing = 15.0
         }
         
         let scrollView = UIScrollView().then {

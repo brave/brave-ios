@@ -10,14 +10,14 @@ import Shared
 class TabCell: UICollectionViewCell {
     
     struct UX {
-        static let cornerRadius: CGFloat = 6
+        static let cornerRadius = 6.0
         static let defaultBorderWidth = 1.0 / UIScreen.main.scale
-        static let textBoxHeight = CGFloat(32.0)
-        static let faviconSize = CGFloat(20)
+        static let textBoxHeight = 32.0
+        static let faviconSize = 20.0
     }
     
     static let identifier = "TabCellIdentifier"
-    static let borderWidth: CGFloat = 3
+    static let borderWidth = 3.0
     
     let backgroundHolder = UIView()
     let screenshotView = UIImageViewAligned()
@@ -34,7 +34,7 @@ class TabCell: UICollectionViewCell {
     var animator: SwipeAnimator!
     
     // Changes depending on whether we're full-screen or not.
-    var margin = CGFloat(0)
+    var margin = 0.0
     
     var closedTab: ((Tab) -> Void)?
     var tab: Tab?
