@@ -80,17 +80,19 @@ struct BuyTokenView: View {
           .listRowBackground(Color(.secondaryBraveGroupedBackground))
         } else {
           Section {
-            VStack(alignment: .leading, spacing: 10.0) {
+            VStack(alignment: .leading, spacing: 4.0) {
               Text(Strings.Wallet.buyTestTitle)
                 .font(.headline)
-              Text(Strings.Wallet.buyTestDescription)
+              Text(String.localizedStringWithFormat(Strings.Wallet.buyTestDescription, buyTokenStore.networkName))
                 .font(.subheadline)
                 .foregroundColor(Color(.secondaryBraveLabel))
             }
+            .padding(.vertical, 6.0)
+            .listRowBackground(Color(.secondaryBraveGroupedBackground))
           }
           .listRowBackground(Color(.clear))
           Section(
-            header: HStack {
+            header:
               Button(action: {
                 buyTokenStore.fetchTestFaucetUrl { urlString in
                   guard let urlString = urlString, let url = URL(string: urlString) else {
@@ -101,9 +103,8 @@ struct BuyTokenView: View {
               }) {
                 Text(Strings.Wallet.buyTestButtonTitle)
               }
-                .buttonStyle(BraveFilledButtonStyle(size: .normal))
-                .frame(maxWidth: .infinity)
-            }
+              .buttonStyle(BraveFilledButtonStyle(size: .normal))
+              .frame(maxWidth: .infinity)
               .resetListHeaderStyle()
           ) {
           }

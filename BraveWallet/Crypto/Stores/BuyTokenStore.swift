@@ -14,6 +14,8 @@ public class BuyTokenStore: ObservableObject {
   @Published var buyTokens: [BraveWallet.ERCToken] = []
   /// Indicates if current network is mainnet network aka not for testing
   @Published var isMainnet: Bool = true
+  /// The name of the current selected network name
+  @Published var networkName: String = ""
   
   private let tokenRegistry: BraveWalletERCTokenRegistry
   private let rpcController: BraveWalletEthJsonRpcController
@@ -67,6 +69,16 @@ public class BuyTokenStore: ObservableObject {
   private func checkNetwork() {
     rpcController.chainId { [self] chainId in
       self.isMainnet = chainId == BraveWallet.MainnetChainId
+      
+      updateNetworkName(chainId: chainId)
+    }
+  }
+  
+  private func updateNetworkName(chainId: String) {
+    rpcController.allNetworks { [self] chains in
+      let chain = chains.first(where: { $0.chainId == chainId })
+      
+      self.networkName = chain?.chainName ?? ""
     }
   }
 }
@@ -74,6 +86,8 @@ public class BuyTokenStore: ObservableObject {
 extension BuyTokenStore: BraveWalletEthJsonRpcControllerObserver {
   public func chainChangedEvent(_ chainId: String) {
     isMainnet = chainId == BraveWallet.MainnetChainId
+    
+    updateNetworkName(chainId: chainId)
   }
   
   public func onAddEthereumChainRequestCompleted(_ chainId: String, error: String) {

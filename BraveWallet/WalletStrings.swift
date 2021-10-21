@@ -880,8 +880,8 @@ extension Strings {
       "wallet.buyTestDescription",
       tableName: "BraveWallet",
       bundle: .braveWallet,
-      value: "Get Ether from a faucet for Rinkeby Test Network",
-      comment: "The description of where user will go to once a test network has been picked in buy screen"
+      value: "Get Ether from a faucet for %@",
+      comment: "The description of where user will go to once a test network has been picked in buy screen. '%@' will be replaced with a network such as 'Rinkeby' or 'Ropsten'"
     )
     public static let buyTestButtonTitle = NSLocalizedString(
       "wallet.buyTestButtonTitle",
