@@ -12,20 +12,25 @@ public class BuyTokenStore: ObservableObject {
   @Published var selectedBuyToken: BraveWallet.ERCToken?
   /// All available buyable tokens
   @Published var buyTokens: [BraveWallet.ERCToken] = []
+  /// Indicates if current network is mainnet network aka not for testing
+  @Published var isMainnet: Bool = true
   
   private let tokenRegistry: BraveWalletERCTokenRegistry
+  private let rpcController: BraveWalletEthJsonRpcController
+  private let buyAssetUrls: [String: String] = [BraveWallet.RopstenChainId: "https://faucet.metamask.io/",
+                                                BraveWallet.RinkebyChainId: "https://www.rinkeby.io/",
+                                                BraveWallet.GoerliChainId: "https://goerli-faucet.slock.it/",
+                                                BraveWallet.KovanChainId: "https://github.com/kovan-testnet/faucet",
+                                                BraveWallet.LocalhostChainId: ""]
   
-  public init(tokenRegistry: BraveWalletERCTokenRegistry) {
+  public init(
+    tokenRegistry: BraveWalletERCTokenRegistry,
+    rpcController: BraveWalletEthJsonRpcController
+  ) {
     self.tokenRegistry = tokenRegistry
-  }
-  
-  func fetchBuyTokens() {
-    self.tokenRegistry.buyTokens { tokens in
-      self.buyTokens = tokens.sorted(by: { $0.symbol < $1.symbol })
-      if self.selectedBuyToken == nil, let index = tokens.firstIndex(where: { $0.symbol == "BAT" }) {
-        self.selectedBuyToken = tokens[index]
-      }
-    }
+    self.rpcController = rpcController
+    
+    self.rpcController.add(self)
   }
   
   func fetchBuyUrl(account: BraveWallet.AccountInfo, amount: String, completion: @escaping (_ url: String?) -> Void) {
@@ -37,5 +42,43 @@ public class BuyTokenStore: ObservableObject {
     tokenRegistry.buyUrl(account.address, symbol: token.symbol, amount: amount) { url in
       completion(url)
     }
+  }
+  
+  func fetchTestFaucetUrl(completion: @escaping (_ url: String?) -> Void) {
+    rpcController.chainId { [self] chainId in
+      completion(self.buyAssetUrls[chainId])
+    }
+  }
+  
+  func prepareScreen() {
+    fetchBuyTokens()
+    checkNetwork()
+  }
+  
+  private func fetchBuyTokens() {
+    self.tokenRegistry.buyTokens { tokens in
+      self.buyTokens = tokens.sorted(by: { $0.symbol < $1.symbol })
+      if self.selectedBuyToken == nil, let index = tokens.firstIndex(where: { $0.symbol == "BAT" }) {
+        self.selectedBuyToken = tokens[index]
+      }
+    }
+  }
+  
+  private func checkNetwork() {
+    rpcController.chainId { [self] chainId in
+      self.isMainnet = chainId == BraveWallet.MainnetChainId
+    }
+  }
+}
+
+extension BuyTokenStore: BraveWalletEthJsonRpcControllerObserver {
+  public func chainChangedEvent(_ chainId: String) {
+    isMainnet = chainId == BraveWallet.MainnetChainId
+  }
+  
+  public func onAddEthereumChainRequestCompleted(_ chainId: String, error: String) {
+  }
+  
+  public func onIsEip1559Changed(_ chainId: String, isEip1559: Bool) {
   }
 }
