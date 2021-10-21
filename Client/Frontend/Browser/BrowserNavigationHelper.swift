@@ -86,7 +86,7 @@ class BrowserNavigationHelper {
     
     func openBookmarks() {
         guard let bvc = bvc else { return }
-        let vc = BookmarksViewController(folder: nil, bookmarkAPI: bvc.bookmarkAPI, isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing)
+        let vc = BookmarksViewController(folder: nil, bookmarkManager: bvc.bookmarkManager, isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing)
         vc.toolbarUrlActionsDelegate = bvc
         
         open(vc, doneButton: DoneButton(style: .done, position: .right))
@@ -107,7 +107,7 @@ class BrowserNavigationHelper {
         
         let mode = BookmarkEditMode.addBookmark(title: tab.displayTitle, url: bookmarkUrl.absoluteString)
         
-        let vc = AddEditBookmarkTableViewController(bookmarkAPI: bvc.bookmarkAPI, mode: mode)
+        let vc = AddEditBookmarkTableViewController(bookmarkManager: bvc.bookmarkManager, mode: mode)
         
         open(vc, doneButton: DoneButton(style: .cancel, position: .left))
         
